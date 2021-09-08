@@ -1,0 +1,740 @@
+{
+    "os": {
+        "discovery": {
+            "devices": [
+                {
+                    "sysName": "<private>",
+                    "sysObjectID": ".1.3.6.1.4.1.8072.3.2.10",
+                    "sysDescr": "Linux pihole 5.10.11-v7l+ #1399 SMP Thu Jan 28 12:09:48 GMT 2021 armv7l",
+                    "sysContact": "<private>",
+                    "version": "5.10.11-v7l+",
+                    "hardware": "Generic ARMv7",
+                    "features": null,
+                    "os": "linux",
+                    "type": "server",
+                    "serial": null,
+                    "icon": "linux.svg",
+                    "location": null
+                }
+            ]
+        },
+        "poller": "matches discovery"
+    },
+    "applications": {
+        "discovery": {
+            "applications": [
+                {
+                    "app_type": "entropy",
+                    "app_state": "UNKNOWN",
+                    "discovered": 1,
+                    "app_state_prev": null,
+                    "app_status": "",
+                    "app_instance": ""
+                },
+                {
+                    "app_type": "pi-hole",
+                    "app_state": "UNKNOWN",
+                    "discovered": 1,
+                    "app_state_prev": null,
+                    "app_status": "",
+                    "app_instance": ""
+                },
+                {
+                    "app_type": "os-updates",
+                    "app_state": "UNKNOWN",
+                    "discovered": 1,
+                    "app_state_prev": null,
+                    "app_status": "",
+                    "app_instance": ""
+                },
+                {
+                    "app_type": "ntp-client",
+                    "app_state": "UNKNOWN",
+                    "discovered": 1,
+                    "app_state_prev": null,
+                    "app_status": "",
+                    "app_instance": ""
+                },
+                {
+                    "app_type": "portactivity",
+                    "app_state": "UNKNOWN",
+                    "discovered": 1,
+                    "app_state_prev": null,
+                    "app_status": "",
+                    "app_instance": ""
+                }
+            ],
+            "application_metrics": []
+        },
+        "poller": {
+            "applications": [
+                {
+                    "app_type": "entropy",
+                    "app_state": "OK",
+                    "discovered": 1,
+                    "app_state_prev": "UNKNOWN",
+                    "app_status": "3499",
+                    "app_instance": ""
+                },
+                {
+                    "app_type": "pi-hole",
+                    "app_state": "OK",
+                    "discovered": 1,
+                    "app_state_prev": "UNKNOWN",
+                    "app_status": "",
+                    "app_instance": ""
+                },
+                {
+                    "app_type": "os-updates",
+                    "app_state": "OK",
+                    "discovered": 1,
+                    "app_state_prev": "UNKNOWN",
+                    "app_status": "8",
+                    "app_instance": ""
+                },
+                {
+                    "app_type": "ntp-client",
+                    "app_state": "OK",
+                    "discovered": 1,
+                    "app_state_prev": "UNKNOWN",
+                    "app_status": "",
+                    "app_instance": ""
+                },
+                {
+                    "app_type": "portactivity",
+                    "app_state": "OK",
+                    "discovered": 1,
+                    "app_state_prev": "UNKNOWN",
+                    "app_status": "",
+                    "app_instance": ""
+                }
+            ],
+            "application_metrics": [
+                {
+                    "metric": "ads_blocked",
+                    "value": 1,
+                    "value_prev": null,
+                    "app_type": "pi-hole"
+                },
+                {
+                    "metric": "ads_percentage",
+                    "value": 0.002643,
+                    "value_prev": null,
+                    "app_type": "pi-hole"
+                },
+                {
+                    "metric": "dhcp_leases",
+                    "value": 3,
+                    "value_prev": null,
+                    "app_type": "pi-hole"
+                },
+                {
+                    "metric": "dhcp_scopesize",
+                    "value": 180,
+                    "value_prev": null,
+                    "app_type": "pi-hole"
+                },
+                {
+                    "metric": "dns_query",
+                    "value": 37839,
+                    "value_prev": null,
+                    "app_type": "pi-hole"
+                },
+                {
+                    "metric": "domains_blocked",
+                    "value": 66054,
+                    "value_prev": null,
+                    "app_type": "pi-hole"
+                },
+                {
+                    "metric": "entropy",
+                    "value": 3499,
+                    "value_prev": null,
+                    "app_type": "entropy"
+                },
+                {
+                    "metric": "frequency",
+                    "value": 98,
+                    "value_prev": null,
+                    "app_type": "ntp-client"
+                },
+                {
+                    "metric": "http_from_CLOSE_WAIT",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "portactivity"
+                },
+                {
+                    "metric": "http_from_CLOSED",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "portactivity"
+                },
+                {
+                    "metric": "http_from_CLOSING",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "portactivity"
+                },
+                {
+                    "metric": "http_from_ESTABLISHED",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "portactivity"
+                },
+                {
+                    "metric": "http_from_FIN_WAIT_1",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "portactivity"
+                },
+                {
+                    "metric": "http_from_FIN_WAIT_2",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "portactivity"
+                },
+                {
+                    "metric": "http_from_LAST_ACK",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "portactivity"
+                },
+                {
+                    "metric": "http_from_LISTEN",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "portactivity"
+                },
+                {
+                    "metric": "http_from_other",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "portactivity"
+                },
+                {
+                    "metric": "http_from_SYN_RECEIVED",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "portactivity"
+                },
+                {
+                    "metric": "http_from_SYN_SENT",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "portactivity"
+                },
+                {
+                    "metric": "http_from_TIME_WAIT",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "portactivity"
+                },
+                {
+                    "metric": "http_from_UNKNOWN",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "portactivity"
+                },
+                {
+                    "metric": "http_to_CLOSE_WAIT",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "portactivity"
+                },
+                {
+                    "metric": "http_to_CLOSED",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "portactivity"
+                },
+                {
+                    "metric": "http_to_CLOSING",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "portactivity"
+                },
+                {
+                    "metric": "http_to_ESTABLISHED",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "portactivity"
+                },
+                {
+                    "metric": "http_to_FIN_WAIT_1",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "portactivity"
+                },
+                {
+                    "metric": "http_to_FIN_WAIT_2",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "portactivity"
+                },
+                {
+                    "metric": "http_to_LAST_ACK",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "portactivity"
+                },
+                {
+                    "metric": "http_to_LISTEN",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "portactivity"
+                },
+                {
+                    "metric": "http_to_other",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "portactivity"
+                },
+                {
+                    "metric": "http_to_SYN_RECEIVED",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "portactivity"
+                },
+                {
+                    "metric": "http_to_SYN_SENT",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "portactivity"
+                },
+                {
+                    "metric": "http_to_TIME_WAIT",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "portactivity"
+                },
+                {
+                    "metric": "http_to_UNKNOWN",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "portactivity"
+                },
+                {
+                    "metric": "http_total_CLOSE_WAIT",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "portactivity"
+                },
+                {
+                    "metric": "http_total_CLOSED",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "portactivity"
+                },
+                {
+                    "metric": "http_total_CLOSING",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "portactivity"
+                },
+                {
+                    "metric": "http_total_conns",
+                    "value": 6,
+                    "value_prev": null,
+                    "app_type": "portactivity"
+                },
+                {
+                    "metric": "http_total_ESTABLISHED",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "portactivity"
+                },
+                {
+                    "metric": "http_total_FIN_WAIT_1",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "portactivity"
+                },
+                {
+                    "metric": "http_total_FIN_WAIT_2",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "portactivity"
+                },
+                {
+                    "metric": "http_total_from",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "portactivity"
+                },
+                {
+                    "metric": "http_total_LAST_ACK",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "portactivity"
+                },
+                {
+                    "metric": "http_total_LISTEN",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "portactivity"
+                },
+                {
+                    "metric": "http_total_other",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "portactivity"
+                },
+                {
+                    "metric": "http_total_SYN_RECEIVED",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "portactivity"
+                },
+                {
+                    "metric": "http_total_SYN_SENT",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "portactivity"
+                },
+                {
+                    "metric": "http_total_TIME_WAIT",
+                    "value": 6,
+                    "value_prev": null,
+                    "app_type": "portactivity"
+                },
+                {
+                    "metric": "http_total_to",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "portactivity"
+                },
+                {
+                    "metric": "http_total_UNKNOWN",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "portactivity"
+                },
+                {
+                    "metric": "jitter",
+                    "value": 68,
+                    "value_prev": null,
+                    "app_type": "ntp-client"
+                },
+                {
+                    "metric": "noise",
+                    "value": 6,
+                    "value_prev": null,
+                    "app_type": "ntp-client"
+                },
+                {
+                    "metric": "offset",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "ntp-client"
+                },
+                {
+                    "metric": "packages",
+                    "value": 8,
+                    "value_prev": null,
+                    "app_type": "os-updates"
+                },
+                {
+                    "metric": "queries_cached",
+                    "value": 32119,
+                    "value_prev": null,
+                    "app_type": "pi-hole"
+                },
+                {
+                    "metric": "queries_forwarded",
+                    "value": 5719,
+                    "value_prev": null,
+                    "app_type": "pi-hole"
+                },
+                {
+                    "metric": "query_a",
+                    "value": 68.52,
+                    "value_prev": null,
+                    "app_type": "pi-hole"
+                },
+                {
+                    "metric": "query_aaaa",
+                    "value": 3.61,
+                    "value_prev": null,
+                    "app_type": "pi-hole"
+                },
+                {
+                    "metric": "query_ptr",
+                    "value": 23.25,
+                    "value_prev": null,
+                    "app_type": "pi-hole"
+                },
+                {
+                    "metric": "query_srv",
+                    "value": 0.06,
+                    "value_prev": null,
+                    "app_type": "pi-hole"
+                },
+                {
+                    "metric": "ssh_from_CLOSE_WAIT",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "portactivity"
+                },
+                {
+                    "metric": "ssh_from_CLOSED",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "portactivity"
+                },
+                {
+                    "metric": "ssh_from_CLOSING",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "portactivity"
+                },
+                {
+                    "metric": "ssh_from_ESTABLISHED",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "portactivity"
+                },
+                {
+                    "metric": "ssh_from_FIN_WAIT_1",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "portactivity"
+                },
+                {
+                    "metric": "ssh_from_FIN_WAIT_2",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "portactivity"
+                },
+                {
+                    "metric": "ssh_from_LAST_ACK",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "portactivity"
+                },
+                {
+                    "metric": "ssh_from_LISTEN",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "portactivity"
+                },
+                {
+                    "metric": "ssh_from_other",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "portactivity"
+                },
+                {
+                    "metric": "ssh_from_SYN_RECEIVED",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "portactivity"
+                },
+                {
+                    "metric": "ssh_from_SYN_SENT",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "portactivity"
+                },
+                {
+                    "metric": "ssh_from_TIME_WAIT",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "portactivity"
+                },
+                {
+                    "metric": "ssh_from_UNKNOWN",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "portactivity"
+                },
+                {
+                    "metric": "ssh_to_CLOSE_WAIT",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "portactivity"
+                },
+                {
+                    "metric": "ssh_to_CLOSED",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "portactivity"
+                },
+                {
+                    "metric": "ssh_to_CLOSING",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "portactivity"
+                },
+                {
+                    "metric": "ssh_to_ESTABLISHED",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "portactivity"
+                },
+                {
+                    "metric": "ssh_to_FIN_WAIT_1",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "portactivity"
+                },
+                {
+                    "metric": "ssh_to_FIN_WAIT_2",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "portactivity"
+                },
+                {
+                    "metric": "ssh_to_LAST_ACK",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "portactivity"
+                },
+                {
+                    "metric": "ssh_to_LISTEN",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "portactivity"
+                },
+                {
+                    "metric": "ssh_to_other",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "portactivity"
+                },
+                {
+                    "metric": "ssh_to_SYN_RECEIVED",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "portactivity"
+                },
+                {
+                    "metric": "ssh_to_SYN_SENT",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "portactivity"
+                },
+                {
+                    "metric": "ssh_to_TIME_WAIT",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "portactivity"
+                },
+                {
+                    "metric": "ssh_to_UNKNOWN",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "portactivity"
+                },
+                {
+                    "metric": "ssh_total_CLOSE_WAIT",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "portactivity"
+                },
+                {
+                    "metric": "ssh_total_CLOSED",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "portactivity"
+                },
+                {
+                    "metric": "ssh_total_CLOSING",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "portactivity"
+                },
+                {
+                    "metric": "ssh_total_conns",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "portactivity"
+                },
+                {
+                    "metric": "ssh_total_ESTABLISHED",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "portactivity"
+                },
+                {
+                    "metric": "ssh_total_FIN_WAIT_1",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "portactivity"
+                },
+                {
+                    "metric": "ssh_total_FIN_WAIT_2",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "portactivity"
+                },
+                {
+                    "metric": "ssh_total_from",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "portactivity"
+                },
+                {
+                    "metric": "ssh_total_LAST_ACK",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "portactivity"
+                },
+                {
+                    "metric": "ssh_total_LISTEN",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "portactivity"
+                },
+                {
+                    "metric": "ssh_total_other",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "portactivity"
+                },
+                {
+                    "metric": "ssh_total_SYN_RECEIVED",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "portactivity"
+                },
+                {
+                    "metric": "ssh_total_SYN_SENT",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "portactivity"
+                },
+                {
+                    "metric": "ssh_total_TIME_WAIT",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "portactivity"
+                },
+                {
+                    "metric": "ssh_total_to",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "portactivity"
+                },
+                {
+                    "metric": "ssh_total_UNKNOWN",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "portactivity"
+                },
+                {
+                    "metric": "stability",
+                    "value": 3,
+                    "value_prev": null,
+                    "app_type": "ntp-client"
+                },
+                {
+                    "metric": "unique_domains",
+                    "value": 2186,
+                    "value_prev": null,
+                    "app_type": "pi-hole"
+                }
+            ]
+        }
+    }
+}
