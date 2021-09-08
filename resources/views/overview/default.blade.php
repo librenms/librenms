@@ -627,9 +627,9 @@
             type: 'POST',
             url: ajax_url + '/dash/' + data_type,
             data: {
-                id,
-                dimensions: { x: $widget_body.width(), y: $widget_body.height() },
-                settings,
+                id: id,
+                dimensions: {x: $widget_body.width(), y: $widget_body.height()},
+                settings: settings
             },
             dataType: 'json',
             success: function (data) {
