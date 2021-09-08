@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use LibreNMS\Interfaces\Models\Keyable;
 
 class AccessPoint extends DeviceRelatedModel
 {
@@ -27,4 +28,9 @@ class AccessPoint extends DeviceRelatedModel
         'nummonbssid',
         'interference',
     ];
+
+    public function getCompositeKey()
+    {
+        return "$this->mac_addr-$this->radio_number";
+    }
 }
