@@ -20,6 +20,7 @@ Auth::routes(['register' => false, 'reset' => false, 'verify' => false]);
 Route::group(['middleware' => ['auth'], 'guard' => 'auth'], function () {
 
     // pages
+    Route::post('alert/{alert}/ack', [\App\Http\Controllers\AlertController::class, 'ack'])->name('alert.ack');
     Route::resource('device-groups', 'DeviceGroupController');
     Route::resource('port-groups', 'PortGroupController');
     Route::resource('port', 'PortController', ['only' => 'update']);
