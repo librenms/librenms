@@ -258,12 +258,8 @@ class Arubaos extends OS implements
 
                 // Cleanup duplicate entries from other controllers
             }
-            return $access_points;
         }
-        
-
-    
-
+        return $access_points;
     }
 
 }

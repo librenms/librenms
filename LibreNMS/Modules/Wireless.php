@@ -36,25 +36,38 @@ class Wireless implements Module
         if ($os instanceof WirelessAccessPointPolling) {
             echo "\nWireless Access Points: ";
 
+            // Initialize empty collections
+            $newCollection = new Collection;
+            $offline_access_points = new Collection;
+
             // Get APs from controller
-            $access_points = $os->pollWirelessAccessPoints()->keyBy->getCompositeKey();
+            $access_points = $os->pollWirelessAccessPoints()->keyBy(function ($item) {
+                return $item->getCompositeKey();
+            });
+
             echo "\nCollection from controller: ";
-            d_echo($access_points);
+            //d_echo($access_points);
 
             // Get existing APs from the DB
             $db_access_points = AccessPoint::where(['device_id' => $os->getDeviceId()])->get();
-            $db_access_points = $db_access_points->keyBy->getCompositeKey();
-            echo "\nCollection from DB: ";
-            d_echo($db_access_points);
 
-            // Get a collection of possibly offline APs
-            $offline_access_points = $db_access_points->intersect($access_points);
-            echo "\nIntersect: ";
-            d_echo($offline_access_points);
-            
-            // Mark possibly offline APs as deleted
-            foreach ($offline_access_points as $offline_ap) {
-                $offline_ap->setOffline();
+            if($db_access_points->isNotEmpty()) {
+                $db_access_points = $db_access_points->keyBy(function ($item) {
+                    return $item->getCompositeKey();
+                });
+
+                echo "\nCollection from DB: ";
+                d_echo($db_access_points);
+    
+                // Get a collection of possibly offline APs
+                $offline_access_points = $db_access_points->intersect($access_points);
+                echo "\nIntersect: ";
+                d_echo($offline_access_points);
+                
+                // Mark possibly offline APs as deleted
+                foreach ($offline_access_points as $offline_ap) {
+                    $offline_ap->setOffline();
+                }
             }
 
             // Create a new collection with updated data, syncmodels
