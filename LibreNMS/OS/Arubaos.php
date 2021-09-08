@@ -24,6 +24,9 @@
 
 namespace LibreNMS\OS;
 
+use App\Models\AccessPoint;
+use LibreNMS\RRD\RrdDefinition;
+
 use App\Models\Device;
 use LibreNMS\Device\WirelessSensor;
 use LibreNMS\Interfaces\Discovery\OSDiscovery;
@@ -34,6 +37,7 @@ use LibreNMS\Interfaces\Discovery\Sensors\WirelessNoiseFloorDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessPowerDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessUtilizationDiscovery;
 use LibreNMS\Interfaces\Polling\Sensors\WirelessFrequencyPolling;
+use LibreNMS\Interfaces\Polling\WirelessAccessPointPolling;
 use LibreNMS\OS;
 
 class Arubaos extends OS implements
@@ -44,7 +48,8 @@ class Arubaos extends OS implements
     WirelessFrequencyPolling,
     WirelessNoiseFloorDiscovery,
     WirelessPowerDiscovery,
-    WirelessUtilizationDiscovery
+    WirelessUtilizationDiscovery,
+    WirelessAccessPointPolling
 {
     public function discoverOS(Device $device): void
     {
@@ -213,4 +218,50 @@ class Arubaos extends OS implements
     {
         return $this->pollWirelessChannelAsFrequency($sensors, [$this, 'decodeChannel']);
     }
+
+    public function pollWirelessAccessPoints()
+    {
+        // Poll data from device. Array format: $table[mac-of-ap][oid][radio number]
+        $wlsxWlanRadioTable = snmpwalk_group($this->getDeviceArray(), 'WLSX-WLAN-MIB::wlsxWlanRadioTable', 1);
+        $wlsxWlanAPChStatsTable = snmpwalk_group($this->getDeviceArray(), 'WLSX-WLAN-MIB::wlsxWlanAPChStatsTable', 1);
+
+        $access_points = new Collection;
+
+        // Loop through polled data
+        foreach($wlsxWlanRadioTable as $ap => $val1) {
+            foreach($wlsxWlanRadioTable[$ap]['wlanAPRadioAPName'] as $radio_id => $val2) {
+                $attributes = [
+                    'device_id' => $this->getDeviceId(),
+                    'name' => $wlsxWlanRadioTable[$ap]['wlanAPRadioAPName'][$radio_id],
+                    'radio_number' => $radio_id,
+                    'type' => $wlsxWlanRadioTable[$ap]['wlanAPRadioType'][$radio_id],
+                    'mac_addr' => $ap,
+                    'deleted' => 0,
+                    'channel' => $wlsxWlanRadioTable[$ap]['wlanAPRadioChannel'][$radio_id],
+                    'txpow' => $wlsxWlanRadioTable[$ap]['wlanAPRadioUtilization'][$radio_id] / 2,
+                    'radioutil' => $wlsxWlanRadioTable[$ap]['wlanAPRadioUtilization'][$radio_id],
+                    'numasoclients' => $wlsxWlanRadioTable[$ap]['wlanAPRadioNumAssociatedClients'][$radio_id],
+                    'nummonclients' => $wlsxWlanRadioTable[$ap]['wlanAPRadioNumMonitoredClients'][$radio_id],
+                    'numactbssid' => $wlsxWlanRadioTable[$ap]['wlanAPRadioNumActiveBSSIDs'][$radio_id],
+                    'nummonbssid' => $wlsxWlanRadioTable[$ap]['wlanAPRadioNumMonitoredBSSIDs'][$radio_id],
+                    'interference' => $wlsxWlanAPChStatsTable[$ap]['wlanAPChInterferenceIndex'][$radio_id],
+                ];
+                
+                d_echo($attributes);
+
+                // Update RRD
+
+                // Create AccessPoints models
+                $access_points->push(new AccessPoint($attributes));
+
+                // Cleanup duplicate entries from other controllers
+            }
+            return $access_points;
+        }
+        
+
+    
+
+    }
+
 }
