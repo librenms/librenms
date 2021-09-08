@@ -1,7 +1,7 @@
 <!DOCTYPE HTML>
 <html lang="{{ app()->getLocale() }}">
 <head>
-    <meta charset="UTF-8">
+    <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <title>{{ $pagetitle }}</title>
     <base href="{{ LibreNMS\Config::get('base_url') }}">
