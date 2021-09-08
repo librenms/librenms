@@ -41,11 +41,11 @@ class Eventlog extends DeviceRelatedModel
     /**
      * Log events to the event table
      *
-     * @param string $text message describing the event
-     * @param Device $device related device
-     * @param string $type brief category for this event. Examples: sensor, state, stp, system, temperature, interface
-     * @param int $severity 1: ok, 2: info, 3: notice, 4: warning, 5: critical, 0: unknown
-     * @param int $reference the id of the referenced entity.  Supported types: interface
+     * @param  string  $text  message describing the event
+     * @param  Device  $device  related device
+     * @param  string  $type  brief category for this event. Examples: sensor, state, stp, system, temperature, interface
+     * @param  int  $severity  1: ok, 2: info, 3: notice, 4: warning, 5: critical, 0: unknown
+     * @param  int  $reference  the id of the referenced entity.  Supported types: interface
      */
     public static function log($text, $device = null, $type = null, $severity = Alert::INFO, $reference = null)
     {

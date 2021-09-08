@@ -81,7 +81,7 @@ class AvailabilityMapController extends WidgetController
     }
 
     /**
-     * @param Request $request
+     * @param  Request  $request
      * @return array
      */
     private function getDevices(Request $request)

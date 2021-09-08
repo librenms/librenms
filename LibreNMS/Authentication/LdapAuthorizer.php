@@ -320,7 +320,7 @@ class LdapAuthorizer extends AuthorizerBase
      * Get the ldap connection. If it hasn't been established yet, connect and try to bind.
      * @internal
      *
-     * @param bool $skip_bind do not attempt to bind on connection
+     * @param  bool  $skip_bind  do not attempt to bind on connection
      * @return false|resource
      * @throws AuthenticationException
      */
@@ -340,7 +340,7 @@ class LdapAuthorizer extends AuthorizerBase
     }
 
     /**
-     * @param array $entry ldap entry array
+     * @param  array  $entry  ldap entry array
      * @return array
      */
     private function ldapToUser($entry)

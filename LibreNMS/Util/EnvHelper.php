@@ -34,9 +34,9 @@ class EnvHelper
      * Set a setting in .env file.
      * Will only set non-empty unset variables
      *
-     * @param array $settings KEY => value list of settings
-     * @param array $unset Remove the given KEYS from the config
-     * @param string $file
+     * @param  array  $settings  KEY => value list of settings
+     * @param  array  $unset  Remove the given KEYS from the config
+     * @param  string  $file
      * @return string
      * @throws \LibreNMS\Exceptions\FileWriteFailedException
      */
@@ -64,9 +64,9 @@ class EnvHelper
      * Set a setting in .env file content.
      * Will only set non-empty unset variables
      *
-     * @param string $content
-     * @param array $settings KEY => value list of settings
-     * @param array $unset Remove the given KEYS from the config
+     * @param  string  $content
+     * @param  array  $settings  KEY => value list of settings
+     * @param  array  $unset  Remove the given KEYS from the config
      * @return string
      */
     public static function setEnv($content, $settings, $unset = [])
@@ -141,7 +141,7 @@ class EnvHelper
     /**
      * Fix .env with # in them without a space before it
      *
-     * @param string $dotenv
+     * @param  string  $dotenv
      * @return string
      */
     private static function fixComments($dotenv)
@@ -162,7 +162,7 @@ class EnvHelper
     /**
      * quote strings with spaces
      *
-     * @param string $value
+     * @param  string  $value
      * @return string
      */
     private static function escapeValue($value)
@@ -177,9 +177,9 @@ class EnvHelper
     /**
      * Parse comma separated environment variable into an array.
      *
-     * @param string $env_name
-     * @param mixed $default
-     * @param array $except Ignore these values and return the unexploded string
+     * @param  string  $env_name
+     * @param  mixed  $default
+     * @param  array  $except  Ignore these values and return the unexploded string
      * @return array|mixed
      */
     public static function parseArray($env_name, $default = null, $except = [''])

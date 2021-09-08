@@ -392,7 +392,7 @@ class Database extends BaseValidation
     /**
      * Generate an SQL segment to create the column based on data from Schema::dump()
      *
-     * @param array $column_data The array of data for the column
+     * @param  array  $column_data  The array of data for the column
      * @return string sql fragment, for example: "`ix_id` int(10) unsigned NOT NULL"
      */
     private function columnToSql($column_data)
@@ -423,7 +423,7 @@ class Database extends BaseValidation
     /**
      * Generate an SQL segment to create the index based on data from Schema::dump()
      *
-     * @param array $index_data The array of data for the index
+     * @param  array  $index_data  The array of data for the index
      * @return string sql fragment, for example: "PRIMARY KEY (`device_id`)"
      */
     private function indexToSql($index_data)

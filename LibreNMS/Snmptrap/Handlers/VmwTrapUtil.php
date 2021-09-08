@@ -38,7 +38,7 @@ class VmwTrapUtil
     /**
      * Get the VMGuest hostname
      *
-     * @param Trap $trap
+     * @param  Trap  $trap
      * @return string
      */
     public static function getGuestName($trap)
@@ -49,7 +49,7 @@ class VmwTrapUtil
     /**
      * Get the VMGuest ID number
      *
-     * @param Trap $trap
+     * @param  Trap  $trap
      * @return string
      */
     public static function getGuestId($trap)
@@ -60,7 +60,7 @@ class VmwTrapUtil
     /**
      * Get the VMGuest configuration path
      *
-     * @param Trap $trap
+     * @param  Trap  $trap
      * @return string
      */
     public static function getGuestConfigPath($trap)

@@ -49,7 +49,7 @@ abstract class BaseDatastore implements DatastoreContract
 
     /**
      * Record statistics for operation
-     * @param Measurement $stat
+     * @param  Measurement  $stat
      */
     protected function recordStatistic(Measurement $stat)
     {

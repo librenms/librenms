@@ -32,11 +32,11 @@ class Fping
     /**
      * Run fping against a hostname/ip in count mode and collect stats.
      *
-     * @param string $host
-     * @param int $count (min 1)
-     * @param int $interval (min 20)
-     * @param int $timeout (not more than $interval)
-     * @param string $address_family ipv4 or ipv6
+     * @param  string  $host
+     * @param  int  $count  (min 1)
+     * @param  int  $interval  (min 20)
+     * @param  int  $timeout  (not more than $interval)
+     * @param  string  $address_family  ipv4 or ipv6
      * @return array
      */
     public function ping($host, $count = 3, $interval = 1000, $timeout = 500, $address_family = 'ipv4')

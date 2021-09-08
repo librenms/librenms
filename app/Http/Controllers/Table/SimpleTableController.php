@@ -40,10 +40,10 @@ abstract class SimpleTableController extends Controller
     /**
      * Validate the given request with the given rules.
      *
-     * @param  \Illuminate\Http\Request $request
-     * @param  array $rules
-     * @param  array $messages
-     * @param  array $customAttributes
+     * @param  \Illuminate\Http\Request  $request
+     * @param  array  $rules
+     * @param  array  $messages
+     * @param  array  $customAttributes
      * @return array
      */
     public function validate(Request $request, array $rules = [], array $messages = [], array $customAttributes = [])
@@ -54,10 +54,10 @@ abstract class SimpleTableController extends Controller
     }
 
     /**
-     * @param array|Collection $rows
-     * @param int $page
-     * @param int $currentCount
-     * @param int $total
+     * @param  array|Collection  $rows
+     * @param  int  $page
+     * @param  int  $currentCount
+     * @param  int  $total
      * @return \Illuminate\Http\JsonResponse
      */
     protected function formatResponse($rows, $page, $currentCount, $total)

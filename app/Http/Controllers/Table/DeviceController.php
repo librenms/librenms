@@ -85,7 +85,7 @@ class DeviceController extends TableController
     /**
      * Defines the base query for this resource
      *
-     * @param \Illuminate\Http\Request $request
+     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Query\Builder
      */
     protected function baseQuery($request)
@@ -135,7 +135,7 @@ class DeviceController extends TableController
     }
 
     /**
-     * @param Device $device
+     * @param  Device  $device
      * @return array|\Illuminate\Database\Eloquent\Model|\Illuminate\Support\Collection
      */
     public function formatItem($device)
@@ -158,7 +158,7 @@ class DeviceController extends TableController
 
     /**
      * Get the device up/down status
-     * @param Device $device
+     * @param  Device  $device
      * @return string
      */
     private function getStatus($device)
@@ -174,7 +174,7 @@ class DeviceController extends TableController
 
     /**
      * Get the status label class
-     * @param Device $device
+     * @param  Device  $device
      * @return string
      */
     private function getLabel($device)
@@ -198,7 +198,7 @@ class DeviceController extends TableController
     }
 
     /**
-     * @param Device $device
+     * @param  Device  $device
      * @return string
      */
     private function getHostname($device)
@@ -213,7 +213,7 @@ class DeviceController extends TableController
     }
 
     /**
-     * @param Device $device
+     * @param  Device  $device
      * @return string
      */
     private function getOsText($device)
@@ -228,7 +228,7 @@ class DeviceController extends TableController
     }
 
     /**
-     * @param Device $device
+     * @param  Device  $device
      * @return string
      */
     private function getMetrics($device)
@@ -257,10 +257,10 @@ class DeviceController extends TableController
     }
 
     /**
-     * @param int|Device $device
-     * @param mixed $count
-     * @param mixed $tab
-     * @param mixed $icon
+     * @param  int|Device  $device
+     * @param  mixed  $count
+     * @param  mixed  $tab
+     * @param  mixed  $icon
      * @return string
      */
     private function formatMetric($device, $count, $tab, $icon)
@@ -273,7 +273,7 @@ class DeviceController extends TableController
     }
 
     /**
-     * @param Device $device
+     * @param  Device  $device
      * @return string
      */
     private function getLocation($device)

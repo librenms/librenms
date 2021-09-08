@@ -46,7 +46,7 @@ class Laravel
     /**
      * Boot Laravel in a non-Laravel web script
      *
-     * @param bool $authenticate Use session+db to authenticate user (does not authorize)
+     * @param  bool  $authenticate  Use session+db to authenticate user (does not authorize)
      */
     public static function bootWeb($authenticate = false)
     {
@@ -89,8 +89,8 @@ class Laravel
     /**
      * Add prefix and strip .php to make the url helper work in non-laravel php scripts
      *
-     * @param \Illuminate\Http\Request $request
-     * @param bool $auth
+     * @param  \Illuminate\Http\Request  $request
+     * @param  bool  $auth
      */
     private static function rewriteDummyHeaders($request, $auth)
     {

@@ -34,7 +34,7 @@ class Clean
      * Sanitize file name by removing all invalid characters.
      * Does not make the string safe for javascript or sql!
      *
-     * @param string $file
+     * @param  string  $file
      * @return string|string[]|null
      */
     public static function fileName($file)
@@ -45,7 +45,7 @@ class Clean
     /**
      * Sanitize string to only contain alpha, numeric, dashes, and underscores
      *
-     * @param string $string
+     * @param  string  $string
      * @return string
      */
     public static function alphaDash($string)
@@ -56,7 +56,7 @@ class Clean
     /**
      * Sanitize string to only contain alpha, numeric, dashes, underscores, and spaces
      *
-     * @param string $string
+     * @param  string  $string
      * @return string
      */
     public static function alphaDashSpace($string)
@@ -68,8 +68,8 @@ class Clean
      * Clean a string for display in an html page.
      * For use in non-blade pages
      *
-     * @param string $value
-     * @param array $purifier_config (key, value pair)
+     * @param  string  $value
+     * @param  array  $purifier_config  (key, value pair)
      * @return string
      */
     public static function html($value, $purifier_config = [])

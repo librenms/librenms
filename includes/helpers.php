@@ -30,8 +30,8 @@ if (! function_exists('d_echo')) {
      * Legacy convenience function - please use this instead of 'if (Debug::isEnabled()) { echo ...; }'
      * Use Log directly in pure Laravel code!
      *
-     * @param string|array $text The error message or array to print
-     * @param string $no_debug_text Text to print if debug is disabled
+     * @param  string|array  $text  The error message or array to print
+     * @param  string  $no_debug_text  Text to print if debug is disabled
      */
     function d_echo($text, $no_debug_text = null)
     {
@@ -52,7 +52,7 @@ if (! function_exists('array_pairs')) {
      * Get all consecutive pairs of values in an array.
      * [1,2,3,4] -> [[1,2],[2,3],[3,4]]
      *
-     * @param array $array
+     * @param  array  $array
      * @return array
      */
     function array_pairs($array)
@@ -71,7 +71,7 @@ if (! function_exists('array_pairs')) {
  * Cast string to int or float.
  * Returns 0 if string is not numeric
  *
- * @param string $number
+ * @param  string  $number
  * @return float|int
  */
 function cast_number($number)
@@ -85,7 +85,7 @@ if (! function_exists('trans_fb')) {
      *
      * @param  string  $key
      * @param  string  $fallback
-     * @param  array   $replace
+     * @param  array  $replace
      * @param  string  $locale
      * @return \Symfony\Component\Translation\TranslatorInterface|string
      */

@@ -94,7 +94,7 @@ class Timos extends OS implements MplsDiscovery, MplsPolling, WirelessPowerDisco
     }
 
     /**
-     * @param mixed $tmnxEncapVal
+     * @param  mixed  $tmnxEncapVal
      * @return string encapsulation
      * @see TIMETRA-TC-MIB::TmnxEncapVal
      */
@@ -155,7 +155,7 @@ class Timos extends OS implements MplsDiscovery, MplsPolling, WirelessPowerDisco
     }
 
     /**
-     * @param Collection $lsps collecton of synchronized lsp objects from discoverMplsLsps()
+     * @param  Collection  $lsps  collecton of synchronized lsp objects from discoverMplsLsps()
      * @return Collection MplsLspPath objects
      */
     public function discoverMplsPaths($lsps)
@@ -501,7 +501,7 @@ class Timos extends OS implements MplsDiscovery, MplsPolling, WirelessPowerDisco
     }
 
     /**
-     * @param Collection $lsps collecton of synchronized lsp objects from pollMplsLsps()
+     * @param  Collection  $lsps  collecton of synchronized lsp objects from pollMplsLsps()
      * @return Collection MplsLspPath objects
      */
     public function pollMplsPaths($lsps)

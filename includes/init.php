@@ -23,7 +23,7 @@
  */
 
 /**
- * @param array $modules Which modules to initialize
+ * @param  array  $modules  Which modules to initialize
  */
 
 use LibreNMS\Authentication\LegacyAuth;
