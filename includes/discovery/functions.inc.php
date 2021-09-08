@@ -123,7 +123,7 @@ function load_discovery(&$device)
 function discover_device(&$device, $force_module = false)
 {
     if ($device['snmp_disable'] == '1') {
-        return false;
+        return true;
     }
 
     global $valid;
