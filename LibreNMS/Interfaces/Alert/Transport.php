@@ -28,6 +28,11 @@ namespace LibreNMS\Interfaces\Alert;
 interface Transport
 {
     /**
+     * @return string The display name of this transport.
+     */
+    public function name(): string;
+
+    /**
      * Gets called when an alert is sent
      *
      * @param  array  $alert_data  An array created by DescribeAlert

@@ -1,25 +1,53 @@
-/*
- * service-worker.js
- *
- * -Description-
- *
- * This program is free software: you can redistribute it and/or modify
- * it under the terms of the GNU General Public License as published by
- * the Free Software Foundation, either version 3 of the License, or
- * (at your option) any later version.
- *
- * This program is distributed in the hope that it will be useful,
- * but WITHOUT ANY WARRANTY; without even the implied warranty of
- * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.See the
- * GNU General Public License for more details.
- *
- * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
- *
- * @package    LibreNMS
- * @link       http://librenms.org
- * @copyright  2021 Tony Murray
- * @author     Tony Murray <murraytony@gmail.com>
- */
-
 self.addEventListener('fetch', function(event) {});
+
+self.addEventListener('push', function (e) {
+    if (!(self.Notification && self.Notification.permission === 'granted')) {
+        //notifications aren't supported or permission not granted!
+        return;
+    }
+
+    if (e.data) {
+        var msg = e.data.json();
+        console.log(msg)
+        e.waitUntil(self.registration.showNotification(msg.title, {
+            body: msg.body,
+            icon: msg.icon,
+            actions: msg.actions,
+            data: msg.data
+        }));
+    }
+});
+
+self.addEventListener('notificationclick', function(event) {
+    event.notification.close();
+    console.log(event);
+    let url;
+    if (event.action === 'alert.acknowledge') {
+
+    } else if (event.action === 'alert.view') {
+        url = '/alerts?alert_id=' + event.notification.data.id;
+    } else {
+        // Main body of notification was clicked
+    }
+
+    // Try to open in existing window WIP not working
+    if (url) {
+        event.waitUntil(clients.matchAll({ type: 'window' }).then(clientsArr => {
+            console.log(clientsArr);
+            if (clientsArr.length === 0) {
+                clients.openWindow(url).then(windowClient => windowClient ? windowClient.focus() : null);
+                return;
+            }
+
+            let first = clientsArr[0];
+            first.navigate(url).then(windowClient => windowClient ? windowClient.focus() : null);
+
+        }));
+    }
+}, false);
+
+var csrf;
+const fetchCsrf = async () => {
+    const response = await fetch('/push/token')
+    csrf = await response.text();
+}

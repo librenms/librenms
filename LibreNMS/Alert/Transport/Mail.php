@@ -65,9 +65,4 @@ class Mail extends Transport
             ],
         ];
     }
-
-    private function isHtmlContent($content): bool
-    {
-        return $content !== strip_tags($content);
-    }
 }

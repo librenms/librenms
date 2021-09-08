@@ -20,6 +20,7 @@ $page_title = 'Alerts';
 <div class="panel panel-default panel-condensed">
     <div class="panel-heading">
         <strong>Alerts</strong>
+        <button id="notify-me" class="btn btn-primary">Notify me</button>
     </div>
 
     <?php
@@ -32,5 +33,23 @@ $page_title = 'Alerts';
     unset($device['device_id']);
     ?>
 </div>
+<script>
+    // Let's check if the browser supports notifications
+    if ('Notification' in window) {
+        var button = document.getElementById('notify-me');
+        button.style.display = 'block'
+        button.onclick = () => {
+            Notification.requestPermission().then(function (permission) {
+                // If the user accepts, let's create a notification
+                if (permission === 'granted') {
+                    button.style.display = 'none'
+                }
+            });
+        }
 
+        if (Notification.permission !== 'granted') {
+            button.style.display = 'block'
+        }
+    }
+</script>
 

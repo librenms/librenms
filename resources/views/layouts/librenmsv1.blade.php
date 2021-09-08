@@ -74,16 +74,6 @@
             }
         });
         var ajax_url = "{{ url('/ajax') }}";
-
-        if ('serviceWorker' in navigator) {
-            window.addEventListener('load', function() {
-                navigator.serviceWorker.register('/service-worker.js').then(function(registration) {
-                    console.log('ServiceWorker registration successful with scope: ', registration.scope);
-                }, function(err) {
-                    console.log('ServiceWorker registration failed: ', err);
-                });
-            });
-        }
     </script>
     <script src="{{ asset('js/librenms.js?ver=09072021') }}"></script>
     <script type="text/javascript" src="{{ asset('js/overlib_mini.js') }}"></script>
@@ -97,6 +87,9 @@
             document.documentElement.classList.remove('tw-dark')
         }
     </script>
+    @auth
+        <script src="{{ asset('js/register-service-worker.js') }}" defer></script>
+    @endauth
     @yield('javascript')
 </head>
 <body>

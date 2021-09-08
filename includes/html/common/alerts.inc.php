@@ -164,6 +164,7 @@ if (defined('SHOW_SETTINGS')) {
 </form>
 ';
 } else {
+    $alert_id = $vars['alert_id'] ?? 0;
     $device_id = $device['device_id'];
     $acknowledged = $widget_settings['acknowledged'];
     $fired = $widget_settings['fired'];
@@ -255,6 +256,9 @@ var alerts_grid = $("#alerts_' . $unique_id . '").bootgrid({
         return {
             id: "alerts",
 ';
+    if (is_numeric($alert_id)) {
+        $common_output[] = "alert_id: '$alert_id',\n";
+    }
 
     if (is_numeric($acknowledged)) {
         $common_output[] = "acknowledged: '$acknowledged',\n";

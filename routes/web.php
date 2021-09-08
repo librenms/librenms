@@ -59,11 +59,20 @@ Route::group(['middleware' => ['auth'], 'guard' => 'auth'], function () {
         Route::get('devicedependency', 'DeviceDependencyController@dependencyMap');
     });
 
+    // Push notifications
+    Route::group(['prefix' => 'push'], function () {
+    Route::get('token', [\App\Http\Controllers\PushNotificationController::class, 'token']);
+        Route::get('key', [\App\Http\Controllers\PushNotificationController::class, 'key']);
+        Route::post('register', [\App\Http\Controllers\PushNotificationController::class, 'register']);
+    });
+
     // admin pages
     Route::group(['middleware' => ['can:admin']], function () {
         Route::get('settings/{tab?}/{section?}', 'SettingsController@index')->name('settings');
         Route::put('settings/{name}', 'SettingsController@update')->name('settings.update');
         Route::delete('settings/{name}', 'SettingsController@destroy')->name('settings.destroy');
+
+        Route::post('alert/transports/{transport}/test', [\App\Http\Controllers\AlertTransportController::class, 'test'])->name('alert.transports.test');
     });
 
     // old route redirects

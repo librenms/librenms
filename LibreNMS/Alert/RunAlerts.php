@@ -521,7 +521,7 @@ class RunAlerts
         }
 
         foreach ($transport_maps as $item) {
-            $class = 'LibreNMS\\Alert\\Transport\\' . ucfirst($item['transport_type']);
+            $class = Transport::getClass($item['transport_type']);
             if (class_exists($class)) {
                 //FIXME remove Deprecated transport
                 $transport_title = "Transport {$item['transport_type']}";
