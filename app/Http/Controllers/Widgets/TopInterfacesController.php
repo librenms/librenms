@@ -41,7 +41,7 @@ class TopInterfacesController extends WidgetController
     ];
 
     /**
-     * @param Request $request
+     * @param  Request  $request
      * @return View
      */
     public function getView(Request $request)

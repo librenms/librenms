@@ -28,7 +28,7 @@ class Validate
 {
     /**
      * Checks if the give string is a valid hostname
-     * @param string $hostname
+     * @param  string  $hostname
      * @return bool
      */
     public static function hostname($hostname)

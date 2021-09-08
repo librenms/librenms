@@ -148,7 +148,7 @@ class SmokepingGenerateCommand extends LnmsCommand
     /**
      * Bring together the probe lists
      *
-     * @param int   $probeCount Number of processes to create
+     * @param  int  $probeCount  Number of processes to create
      *
      * @return array
      */
@@ -167,11 +167,11 @@ class SmokepingGenerateCommand extends LnmsCommand
     /**
      * Determine if a list of probes is needed, and write one if so
      *
-     * @param string $module The smokeping module to use for this probe (FPing or FPing6, typically)
-     * @param string $defaultProbe A default probe, needed by the smokeping configuration parser
-     * @param string $probe The first part of the probe name, e.g. 'lnmsFPing' or 'lnmsFPing6'
-     * @param string $binary Path to the relevant probe binary (i.e. the output of `which fping` or `which fping6`)
-     * @param int    $probeCount Number of processes to create
+     * @param  string  $module  The smokeping module to use for this probe (FPing or FPing6, typically)
+     * @param  string  $defaultProbe  A default probe, needed by the smokeping configuration parser
+     * @param  string  $probe  The first part of the probe name, e.g. 'lnmsFPing' or 'lnmsFPing6'
+     * @param  string  $binary  Path to the relevant probe binary (i.e. the output of `which fping` or `which fping6`)
+     * @param  int  $probeCount  Number of processes to create
      *
      * @return array
      */
@@ -223,7 +223,7 @@ class SmokepingGenerateCommand extends LnmsCommand
     /**
      * Determine if a list of targets is needed, and write one if so
      *
-     * @param array $smokelist A list of devices to create a a config block for
+     * @param  array  $smokelist  A list of devices to create a a config block for
      *
      * @return array
      */
@@ -292,7 +292,7 @@ class SmokepingGenerateCommand extends LnmsCommand
     /**
      * Take config lines and output them to stdout
      *
-     * @param array ...$blocks Blocks of smokeping configuration arranged in arrays of strings
+     * @param  array  ...$blocks  Blocks of smokeping configuration arranged in arrays of strings
      *
      * @return int
      */
@@ -308,7 +308,7 @@ class SmokepingGenerateCommand extends LnmsCommand
     /**
      * Build the configuration for a set of devices inside a type block
      *
-     * @param array $devices A list of devices to create a a config block for
+     * @param  array  $devices  A list of devices to create a a config block for
      *
      * @return array
      */
@@ -337,7 +337,7 @@ class SmokepingGenerateCommand extends LnmsCommand
     /**
      * Smokeping refuses to load if it has an unresolvable host, so check for this
      *
-     * @param string $hostname Hostname to be checked
+     * @param  string  $hostname  Hostname to be checked
      *
      * @return bool
      */
@@ -357,7 +357,7 @@ class SmokepingGenerateCommand extends LnmsCommand
     /**
      * Rewrite menu entries to a format that smokeping finds acceptable
      *
-     * @param string $entry The LibreNMS device hostname to rewrite
+     * @param  string  $entry  The LibreNMS device hostname to rewrite
      *
      * @return string
      */
@@ -369,7 +369,7 @@ class SmokepingGenerateCommand extends LnmsCommand
     /**
      * Select a probe to use deterministically.
      *
-     * @param string $transport The transport (udp or udp6) as per the device database entry
+     * @param  string  $transport  The transport (udp or udp6) as per the device database entry
      *
      * @return string
      */

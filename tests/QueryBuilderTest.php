@@ -42,10 +42,10 @@ class QueryBuilderTest extends TestCase
 
     /**
      * @dataProvider loadQueryData
-     * @param string $legacy
-     * @param array $builder
-     * @param string $display
-     * @param string $sql
+     * @param  string  $legacy
+     * @param  array  $builder
+     * @param  string  $display
+     * @param  string  $sql
      */
     public function testQueryConversion($legacy, $builder, $display, $sql, $query)
     {

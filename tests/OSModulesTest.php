@@ -79,9 +79,9 @@ class OSModulesTest extends DBTestCase
      *
      * @group os
      * @dataProvider dumpedDataProvider
-     * @param string $os base os
-     * @param string $variant optional variant
-     * @param array $modules modules to test for this os
+     * @param  string  $os  base os
+     * @param  string  $variant  optional variant
+     * @param  array  $modules  modules to test for this os
      */
     public function testOS($os, $variant, $modules)
     {

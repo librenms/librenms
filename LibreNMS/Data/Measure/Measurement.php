@@ -39,7 +39,7 @@ class Measurement
     /**
      * Start the timer for a new operation
      *
-     * @param string $type
+     * @param  string  $type
      * @return static
      */
     public static function start(string $type)

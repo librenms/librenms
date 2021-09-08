@@ -34,7 +34,7 @@ class Plugin extends BaseModel
     // ---- Query scopes ----
 
     /**
-     * @param Builder $query
+     * @param  Builder  $query
      * @return Builder
      */
     public function scopeIsActive($query)

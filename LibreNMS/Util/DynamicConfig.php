@@ -48,7 +48,7 @@ class DynamicConfig
     /**
      * Check if a setting is valid
      *
-     * @param string $name
+     * @param  string  $name
      * @return bool
      */
     public function isValidSetting($name)
@@ -59,7 +59,7 @@ class DynamicConfig
     /**
      * Get config item by name
      *
-     * @param string $name
+     * @param  string  $name
      * @return DynamicConfigItem|null
      */
     public function get($name)

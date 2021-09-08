@@ -91,7 +91,7 @@ class Schema
     /**
      * Get the primary key column(s) for a table
      *
-     * @param string $table
+     * @param  string  $table
      * @return string if a single column just the name is returned, otherwise the first column listed will be returned
      */
     public function getPrimaryKey($table)
@@ -144,7 +144,7 @@ class Schema
     /**
      * Return all columns for the given table
      *
-     * @param string $table
+     * @param  string  $table
      * @return array
      */
     public function getColumns($table)
@@ -158,7 +158,7 @@ class Schema
      * Get all relationship paths.
      * Caches the data after the first call as long as the schema hasn't changed
      *
-     * @param string $base
+     * @param  string  $base
      * @return mixed
      */
     public function getAllRelationshipPaths($base = 'devices')
@@ -202,8 +202,8 @@ class Schema
     /**
      * Find the relationship path from $start to $target
      *
-     * @param string $target
-     * @param string $start Default: devices
+     * @param  string  $target
+     * @param  string  $start  Default: devices
      * @return array|false list of tables in path order, or false if no path is found
      */
     public function findRelationshipPath($target, $start = 'devices')
@@ -338,7 +338,7 @@ class Schema
      * Each entry in the Columns array contains these keys: Field, Type, Null, Default, Extra
      * Each entry in the Indexes array contains these keys: Name, Columns(array), Unique
      *
-     * @param string $connection use a specific connection
+     * @param  string  $connection  use a specific connection
      * @return array
      */
     public static function dump($connection = null)

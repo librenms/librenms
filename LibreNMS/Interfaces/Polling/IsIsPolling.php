@@ -28,7 +28,7 @@ namespace LibreNMS\Interfaces\Polling;
 interface IsIsPolling
 {
     /**
-     * @param \Illuminate\Support\Collection $adjacencies \App\Models\IsIsAdjacency
+     * @param  \Illuminate\Support\Collection  $adjacencies  \App\Models\IsIsAdjacency
      * @return \Illuminate\Support\Collection \App\Models\IsIsAdjacency
      */
     public function pollIsIs($adjacencies);
