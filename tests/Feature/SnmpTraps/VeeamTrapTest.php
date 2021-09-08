@@ -18,7 +18,7 @@ UDP: [$device->ip]:46024->[1.1.1.1]:162
 DISMAN-EVENT-MIB::sysUpTimeInstance 4:13:08:37.60
 SNMPv2-MIB::snmpTrapOID.0 VEEAM-MIB::onBackupCompleted
 VEEAM-MIB::backupJobId 7a1b3549-c4c7-4629-84d6-74e24fee8011
-VEEAM-MIB::backupJobName SureBackup Job
+VEEAM-MIB::backupJobName SureBackup Job 1
 VEEAM-MIB::sourceHostName hostname
 VEEAM-MIB::vmBackupComment 
 VEEAM-MIB::vmBackupResult Success";
@@ -40,7 +40,7 @@ UDP: [$device->ip]:46024->[1.1.1.1]:162
 DISMAN-EVENT-MIB::sysUpTimeInstance 4:13:08:37.60
 SNMPv2-MIB::snmpTrapOID.0 VEEAM-MIB::onBackupCompleted
 VEEAM-MIB::backupJobId 7a1b3549-c4c7-4629-84d6-74e24fee8011
-VEEAM-MIB::backupJobName SureBackup Job
+VEEAM-MIB::backupJobName SureBackup Job 1
 VEEAM-MIB::sourceHostName hostname
 VEEAM-MIB::vmBackupComment 
 VEEAM-MIB::vmBackupResult Failed";
