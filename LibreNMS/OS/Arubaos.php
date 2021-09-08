@@ -25,7 +25,9 @@
 namespace LibreNMS\OS;
 
 use App\Models\AccessPoint;
+use App\Observers\ModuleModelObserver;
 use LibreNMS\RRD\RrdDefinition;
+use Illuminate\Support\Collection;
 
 use App\Models\Device;
 use LibreNMS\Device\WirelessSensor;
@@ -247,7 +249,7 @@ class Arubaos extends OS implements
                     'interference' => $wlsxWlanAPChStatsTable[$ap]['wlanAPChInterferenceIndex'][$radio_id],
                 ];
                 
-                d_echo($attributes);
+                //d_echo($attributes);
 
                 // Update RRD
 

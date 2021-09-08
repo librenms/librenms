@@ -1,12 +1,13 @@
 <?php
 
 namespace LibreNMS\Modules;
-
+use App\Models\AccessPoint;
 use LibreNMS\DB\SyncsModels;
 use LibreNMS\Interfaces\Module;
-use LibreNMS\Interfaces\Polling\WirelessPolling;
+use LibreNMS\Interfaces\Polling\WirelessAccessPointPolling;
 use LibreNMS\OS;
-use LibreNMS\Util\ModuleModelObserver;
+use App\Observers\ModuleModelObserver;
+use Illuminate\Support\Collection;
 
 class Wireless implements Module
 {
@@ -32,18 +33,37 @@ class Wireless implements Module
      */
     public function poll(OS $os)
     {
-        if ($os instanceof WirelessPolling) {
+        if ($os instanceof WirelessAccessPointPolling) {
             echo "\nWireless Access Points: ";
 
             // Get APs from controller
-            $access_points = $os->pollWirelessAccessPoints();
+            $access_points = $os->pollWirelessAccessPoints()->keyBy->getCompositeKey();
+            echo "\nCollection from controller: ";
+            d_echo($access_points);
 
             // Get existing APs from the DB
-            $db_access_points = AccessPoint::where(['device_id' => $this->getDeviceId()]);
+            $db_access_points = AccessPoint::where(['device_id' => $os->getDeviceId()])->get();
+            $db_access_points = $db_access_points->keyBy->getCompositeKey();
+            echo "\nCollection from DB: ";
+            d_echo($db_access_points);
 
-            // Mark existing APs offline if not found in polled data
+            // Get a collection of possibly offline APs
+            $offline_access_points = $db_access_points->intersect($access_points);
+            echo "\nIntersect: ";
+            d_echo($offline_access_points);
+            
+            // Mark possibly offline APs as deleted
+            foreach ($offline_access_points as $offline_ap) {
+                $offline_ap->setOffline();
+            }
 
-            // Syncmodels
+            // Create a new collection with updated data, syncmodels
+            $newCollection = $access_points->concat($offline_access_points);
+            ModuleModelObserver::observe('\App\Models\AccessPoint');
+            $this->syncModels($os->getDevice(), 'AccessPoint', $newCollection);
+
+            // Cleanup duplicates? 
+            // Can there be any even after failover since the syncmodels hashes by mac+radioid?
 
             // RRD
 

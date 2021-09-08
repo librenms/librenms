@@ -33,4 +33,9 @@ class AccessPoint extends DeviceRelatedModel
     {
         return "$this->mac_addr-$this->radio_number";
     }
+
+    public function setOffline()
+    {
+        $this->deleted = 1;
+    }
 }
