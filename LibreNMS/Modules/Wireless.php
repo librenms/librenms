@@ -72,6 +72,14 @@ class Wireless implements Module
 
             // Create a new collection with updated data, syncmodels
             $newCollection = $access_points->concat($offline_access_points);
+            //d_echo($newCollection);
+
+/*          This errors:
+            Call to a member function getCompositeKey() on null 
+            {"exception":"[object] (Error(code: 0): 
+                Call to a member function getCompositeKey() on null at /opt/librenms/LibreNMS/DB/SyncsModels.php:43)"}
+
+ */
             ModuleModelObserver::observe('\App\Models\AccessPoint');
             $this->syncModels($os->getDevice(), 'AccessPoint', $newCollection);
 
