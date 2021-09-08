@@ -25,24 +25,21 @@ self.addEventListener('notificationclick', function(event) {
     if (event.action === 'alert.acknowledge') {
 
     } else if (event.action === 'alert.view') {
-        url = '/alerts?alert_id=' + event.notification.data.id;
+        // navigate to alert
+        event.waitUntil(self.clients.claim().then(() => self.clients.matchAll({type: 'window'}))
+            .then(clients => {
+            return clients.map(client => {
+                let alert_url = '/alerts?alert_id=' + event.notification.data.id;
+                // Check to make sure WindowClient.navigate() is supported.
+                if ('navigate' in client) {
+                    return client.navigate(alert_url);
+                }
+
+                return self.clients.openWindow(alert_url);
+            });
+        }));
     } else {
         // Main body of notification was clicked
-    }
-
-    // Try to open in existing window WIP not working
-    if (url) {
-        event.waitUntil(clients.matchAll({ type: 'window' }).then(clientsArr => {
-            console.log(clientsArr);
-            if (clientsArr.length === 0) {
-                clients.openWindow(url).then(windowClient => windowClient ? windowClient.focus() : null);
-                return;
-            }
-
-            let first = clientsArr[0];
-            first.navigate(url).then(windowClient => windowClient ? windowClient.focus() : null);
-
-        }));
     }
 }, false);
 
