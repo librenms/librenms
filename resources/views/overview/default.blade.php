@@ -642,7 +642,7 @@
                 }
             },
             error: function (data) {
-                $widget_body.html('<div class="alert alert-info">' +  (data.responseJSON.error || '{{ __('Problem with backend') }}') + '</div>');
+                $widget_body.html('<div class="alert alert-info">' + (data.responseJSON.error || '{{ __('Problem with backend') }}') + '</div>');
             }
         });
     }
