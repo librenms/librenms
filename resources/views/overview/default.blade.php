@@ -609,7 +609,7 @@
     return false;
     }
 
-    function widget_reload(id, data_type, forceDomInject = false) {
+    function widget_reload(id, data_type, forceDomInject) {
         const $widget_body = $(`#widget_body_${id}`);
         const $widget_bootgrid = $(`#widget_body_${id} .bootgrid-table`);
         const settings = $widget_body.parent().data('settings') == 1 ? 1 : 0;
