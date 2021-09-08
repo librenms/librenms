@@ -1,12 +1,12 @@
 <!DOCTYPE HTML>
 <html lang="{{ app()->getLocale() }}">
 <head>
-    <meta charset="UTF-8" />
-    <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+    <meta charset="UTF-8">
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <title>{{ $pagetitle }}</title>
-    <base href="{{ LibreNMS\Config::get('base_url') }}" />
-    <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <base href="{{ LibreNMS\Config::get('base_url') }}">
+    <meta http-equiv="content-type" content="text/html; charset=utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     @if(!LibreNMS\Config::get('favicon', false))
         <link rel="apple-touch-icon" sizes="180x180" href="{{ asset('images/apple-touch-icon.png') }}">
         <link rel="icon" type="image/png" href="{{ asset('images/favicon-32x32.png') }}" sizes="32x32">
@@ -14,13 +14,13 @@
         <link rel="mask-icon" href="{{ asset('images/safari-pinned-tab.svg') }}" color="#5bbad5">
         <link rel="shortcut icon" href="{{ asset('images/favicon.ico') }}">
     @else
-        <link rel="shortcut icon" href="{{ LibreNMS\Config::get('favicon') }}" />
+        <link rel="shortcut icon" href="{{ LibreNMS\Config::get('favicon') }}">
     @endif
 
     <link rel="manifest" href="{{ asset('images/manifest.json') }}" crossorigin="use-credentials">
-    <meta name="csrf-token" content="{{ csrf_token() }}" />
-    <meta name="msapplication-config" content="{{ asset('images/browserconfig.xml') }}" />
-    <meta name="theme-color" content="#ffffff" />
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+    <meta name="msapplication-config" content="{{ asset('images/browserconfig.xml') }}">
+    <meta name="theme-color" content="#ffffff">
 
     <link href="{{ asset('css/bootstrap.min.css') }}" rel="stylesheet">
     <link href="{{ asset('css/bootstrap-datetimepicker.min.css') }}" rel="stylesheet">
