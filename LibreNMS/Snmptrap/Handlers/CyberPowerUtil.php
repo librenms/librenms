@@ -33,7 +33,7 @@ class CyberPowerUtil
     /**
      * Get the trap message
      *
-     * @param Trap $trap
+     * @param  Trap  $trap
      * @return string
      */
     public static function getMessage($trap)

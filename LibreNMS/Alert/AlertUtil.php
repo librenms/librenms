@@ -35,7 +35,7 @@ class AlertUtil
     /**
      * Get the rule_id for a specific alert
      *
-     * @param int $alert_id
+     * @param  int  $alert_id
      * @return mixed|null
      */
     private static function getRuleId($alert_id)
@@ -48,7 +48,7 @@ class AlertUtil
     /**
      * Get the transport for a given alert_id
      *
-     * @param int $alert_id
+     * @param  int  $alert_id
      * @return array
      */
     public static function getAlertTransports($alert_id)
@@ -73,7 +73,7 @@ class AlertUtil
 
     /**
      * Find contacts for alert
-     * @param array $results Rule-Result
+     * @param  array  $results  Rule-Result
      * @return array
      */
     public static function getContacts($results)
@@ -193,7 +193,7 @@ class AlertUtil
 
     /**
      * Check if device is under maintenance
-     * @param int $device_id Device-ID
+     * @param  int  $device_id  Device-ID
      * @return bool
      */
     public static function isMaintenance($device_id)
@@ -203,7 +203,7 @@ class AlertUtil
 
     /**
      * Check if device is set to ignore alerts
-     * @param int $device_id Device-ID
+     * @param  int  $device_id  Device-ID
      * @return bool
      */
     public static function hasDisableNotify($device_id)
@@ -215,8 +215,8 @@ class AlertUtil
 
     /**
      * Process Macros
-     * @param string $rule Rule to process
-     * @param int $x Recursion-Anchor
+     * @param  string  $rule  Rule to process
+     * @param  int  $x  Recursion-Anchor
      * @return string|bool
      */
     public static function runMacros($rule, $x = 1)

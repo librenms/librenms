@@ -37,9 +37,9 @@ class YamlDiscovery
     private static $cache_time = 1800; // 30 min, Used for oid translation cache
 
     /**
-     * @param OS $os
-     * @param DiscoveryItem|string $class
-     * @param array $yaml_data
+     * @param  OS  $os
+     * @param  DiscoveryItem|string  $class
+     * @param  array  $yaml_data
      * @return array
      */
     public static function discover(OS $os, $class, $yaml_data)
@@ -125,8 +125,8 @@ class YamlDiscovery
     }
 
     /**
-     * @param array $device Device we are working on
-     * @param array $data Array derived from YAML
+     * @param  array  $device  Device we are working on
+     * @param  array  $data  Array derived from YAML
      * @return string
      */
     public static function computeNumericalOID($device, $data)
@@ -151,11 +151,11 @@ class YamlDiscovery
     }
 
     /**
-     * @param string $name Name of the field in yaml
-     * @param string $index index in the snmp table
-     * @param int $count current count of snmp table entries
-     * @param array $def yaml definition
-     * @param array $pre_cache snmp data fetched from device
+     * @param  string  $name  Name of the field in yaml
+     * @param  string  $index  index in the snmp table
+     * @param  int  $count  current count of snmp table entries
+     * @param  array  $def  yaml definition
+     * @param  array  $pre_cache  snmp data fetched from device
      * @return mixed|string|string[]|null
      */
     public static function replaceValues($name, $index, $count, $def, $pre_cache)
@@ -200,11 +200,11 @@ class YamlDiscovery
     /**
      * Helper function for dynamic discovery to search for data from pre_cached snmp data
      *
-     * @param string $name The name of the field from the discovery data or just an oid
-     * @param string|int $index The index of the current sensor
-     * @param array $discovery_data The discovery data for the current sensor
-     * @param array $pre_cache all pre-cached snmp data
-     * @param mixed $default The default value to return if data is not found
+     * @param  string  $name  The name of the field from the discovery data or just an oid
+     * @param  string|int  $index  The index of the current sensor
+     * @param  array  $discovery_data  The discovery data for the current sensor
+     * @param  array  $pre_cache  all pre-cached snmp data
+     * @param  mixed  $default  The default value to return if data is not found
      * @return mixed
      */
     public static function getValueFromData($name, $index, $discovery_data, $pre_cache, $default = null)
@@ -326,10 +326,10 @@ class YamlDiscovery
     /**
      * Check to see if we should skip this discovery item
      *
-     * @param mixed $value
-     * @param array $yaml_item_data The data key from this item
-     * @param array $group_options The options key from this group of items
-     * @param array $pre_cache The pre-cache data array
+     * @param  mixed  $value
+     * @param  array  $yaml_item_data  The data key from this item
+     * @param  array  $group_options  The options key from this group of items
+     * @param  array  $pre_cache  The pre-cache data array
      * @return bool
      */
     public static function canSkipItem($value, $index, $yaml_item_data, $group_options, $pre_cache = [])
@@ -374,10 +374,10 @@ class YamlDiscovery
     /**
      * Translate an oid to numeric format (if already numeric, return as-is)
      *
-     * @param string $oid
-     * @param array|null $device
-     * @param string $mib
-     * @param string|null $mibdir
+     * @param  string  $oid
+     * @param  array|null  $device
+     * @param  string  $mib
+     * @param  string|null  $mibdir
      * @return string numeric oid
      * @throws \LibreNMS\Exceptions\InvalidOidException
      */

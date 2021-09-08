@@ -48,8 +48,8 @@ class AvailabilityMapController extends Controller
     }
 
     /**
-     * @param \Illuminate\Http\Request $request
-     * @param string $key
+     * @param  \Illuminate\Http\Request  $request
+     * @param  string  $key
      * @return \Illuminate\Http\JsonResponse
      */
     private function setSessionValue($request, $key)

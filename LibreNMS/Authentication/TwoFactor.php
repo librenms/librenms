@@ -122,9 +122,9 @@ class TwoFactor
     /**
      * Verify HOTP token honouring window
      *
-     * @param string $key Secret Key
-     * @param int $otp OTP supplied by user
-     * @param int|bool $counter Counter, if false timestamp is used
+     * @param  string  $key  Secret Key
+     * @param  int  $otp  OTP supplied by user
+     * @param  int|bool  $counter  Counter, if false timestamp is used
      * @return bool|int
      */
     public static function verifyHOTP($key, $otp, $counter = false)
@@ -160,8 +160,8 @@ class TwoFactor
 
     /**
      * Generate HOTP (RFC 4226)
-     * @param string $key Secret Key
-     * @param int|bool $counter Optional Counter, Defaults to Timestamp
+     * @param  string  $key  Secret Key
+     * @param  int|bool  $counter  Optional Counter, Defaults to Timestamp
      * @return string
      */
     private static function oathHOTP($key, $counter = false)
@@ -195,9 +195,9 @@ class TwoFactor
 
     /**
      * Generate 2fa URI
-     * @param string $username
-     * @param string $key
-     * @param bool $counter if type is counter (false for time based)
+     * @param  string  $username
+     * @param  string  $key
+     * @param  bool  $counter  if type is counter (false for time based)
      * @return string
      */
     public static function generateUri($username, $key, $counter = false)

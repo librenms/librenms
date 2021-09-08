@@ -45,7 +45,7 @@ class Ekinops extends OS implements OSDiscovery
 
     /**
      * Parses Ekinops inventory returned in a tabular format within a single OID
-     * @param string $ekiInfo
+     * @param  string  $ekiInfo
      * @return array $inv
      */
     public static function ekinopsInfo($ekiInfo)

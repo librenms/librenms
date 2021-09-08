@@ -29,8 +29,8 @@ interface Transport
     /**
      * Gets called when an alert is sent
      *
-     * @param array $alert_data An array created by DescribeAlert
-     * @param array|true $opts The options from the alert_transports transport_config column
+     * @param  array  $alert_data  An array created by DescribeAlert
+     * @param  array|true  $opts  The options from the alert_transports transport_config column
      * @return mixed Returns if the call was successful
      */
     public function deliverAlert($alert_data, $opts);

@@ -55,16 +55,16 @@ class Processor extends Model implements DiscoveryModule, PollerModule, Discover
 
     /**
      * Processor constructor.
-     * @param string $type
-     * @param int $device_id
-     * @param string $oid
-     * @param int|string $index
-     * @param string $description
-     * @param int $precision The returned value will be divided by this number (should be factor of 10) If negative this oid returns idle cpu
-     * @param int $current_usage
-     * @param int $warn_percent
-     * @param int $entPhysicalIndex
-     * @param int $hrDeviceIndex
+     * @param  string  $type
+     * @param  int  $device_id
+     * @param  string  $oid
+     * @param  int|string  $index
+     * @param  string  $description
+     * @param  int  $precision  The returned value will be divided by this number (should be factor of 10) If negative this oid returns idle cpu
+     * @param  int  $current_usage
+     * @param  int  $warn_percent
+     * @param  int  $entPhysicalIndex
+     * @param  int  $hrDeviceIndex
      * @return static
      */
     public static function discover(
@@ -273,7 +273,7 @@ class Processor extends Model implements DiscoveryModule, PollerModule, Discover
     /**
      * Get an array of this sensor with fields that line up with the database.
      *
-     * @param array $exclude exclude columns
+     * @param  array  $exclude  exclude columns
      * @return array
      */
     public function toArray($exclude = [])
@@ -296,7 +296,7 @@ class Processor extends Model implements DiscoveryModule, PollerModule, Discover
     }
 
     /**
-     * @param Processor $processor
+     * @param  Processor  $processor
      */
     public static function onCreate($processor)
     {
@@ -307,7 +307,7 @@ class Processor extends Model implements DiscoveryModule, PollerModule, Discover
     }
 
     /**
-     * @param Processor $processor
+     * @param  Processor  $processor
      */
     public static function onDelete($processor)
     {

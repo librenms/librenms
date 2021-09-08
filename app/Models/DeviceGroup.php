@@ -72,7 +72,7 @@ class DeviceGroup extends BaseModel
     /**
      * Update the device groups for the given device or device_id
      *
-     * @param Device|int $device
+     * @param  Device|int  $device
      * @return array
      */
     public static function updateGroupsFor($device)

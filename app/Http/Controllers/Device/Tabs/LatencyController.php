@@ -96,7 +96,7 @@ class LatencyController implements DeviceTab
 
     /**
      * Data ready for json export
-     * @param \Illuminate\Support\Collection $data
+     * @param  \Illuminate\Support\Collection  $data
      * @return array
      */
     private function formatPerfData($data)

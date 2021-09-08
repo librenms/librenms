@@ -43,8 +43,8 @@ class PermissionsCache
      * Check if a device can be accessed by user (non-global read/admin)
      * If no user is given, use the logged in user
      *
-     * @param \App\Models\Device|int $device
-     * @param \App\Models\User|int $user
+     * @param  \App\Models\Device|int  $device
+     * @param  \App\Models\User|int  $user
      * @return bool
      */
     public function canAccessDevice($device, $user = null)
@@ -57,8 +57,8 @@ class PermissionsCache
      * Check if a access can be accessed by user (non-global read/admin)
      * If no user is given, use the logged in user
      *
-     * @param \App\Models\Port|int $port
-     * @param \App\Models\User|int $user
+     * @param  \App\Models\Port|int  $port
+     * @param  \App\Models\User|int  $user
      * @return bool
      */
     public function canAccessPort($port, $user = null)
@@ -73,8 +73,8 @@ class PermissionsCache
      * Check if a bill can be accessed by user (non-global read/admin)
      * If no user is given, use the logged in user
      *
-     * @param \App\Models\Bill|int $bill
-     * @param \App\Models\User|int $user
+     * @param  \App\Models\Bill|int  $bill
+     * @param  \App\Models\User|int  $user
      * @return bool
      */
     public function canAccessBill($bill, $user = null)
@@ -88,7 +88,7 @@ class PermissionsCache
     /**
      * Get the user_id of users that have been granted access to device
      *
-     * @param \App\Models\Device|int $device
+     * @param  \App\Models\Device|int  $device
      * @return \Illuminate\Support\Collection
      */
     /*
@@ -103,7 +103,7 @@ class PermissionsCache
     /**
      * Get the user_id of users that have been granted access to port
      *
-     * @param \App\Models\Port|int $port
+     * @param  \App\Models\Port|int  $port
      * @return \Illuminate\Support\Collection
      */
     public function usersForPort($port)
@@ -116,7 +116,7 @@ class PermissionsCache
     /**
      * Get the user_id of users that have been granted access to bill
      *
-     * @param \App\Models\Bill|int $bill
+     * @param  \App\Models\Bill|int  $bill
      * @return \Illuminate\Support\Collection
      */
     public function usersForBill($bill)
@@ -129,7 +129,7 @@ class PermissionsCache
     /**
      * Get a list of device_id of all devices the user can access
      *
-     * @param \App\Models\User|int $user
+     * @param  \App\Models\User|int  $user
      * @return \Illuminate\Support\Collection
      */
     public function devicesForUser($user = null)
@@ -141,7 +141,7 @@ class PermissionsCache
     /**
      * Get a list of port_id of all ports the user can access directly
      *
-     * @param \App\Models\User|int $user
+     * @param  \App\Models\User|int  $user
      * @return \Illuminate\Support\Collection
      */
     public function portsForUser($user = null)
@@ -154,7 +154,7 @@ class PermissionsCache
     /**
      * Get a list of bill_id of all bills the user can access directly
      *
-     * @param \App\Models\User|int $user
+     * @param  \App\Models\User|int  $user
      * @return \Illuminate\Support\Collection
      */
     public function billsForUser($user = null)
@@ -167,7 +167,7 @@ class PermissionsCache
     /**
      * Get the ids of all device groups the user can access
      *
-     * @param \App\Models\User|int $user
+     * @param  \App\Models\User|int  $user
      * @return \Illuminate\Support\Collection
      */
     public function deviceGroupsForUser($user = null)
@@ -188,7 +188,7 @@ class PermissionsCache
     /**
      * Get the cached data for device permissions.  Use helpers instead.
      *
-     * @param \App\Models\User|int $user
+     * @param  \App\Models\User|int  $user
      * @return \Illuminate\Support\Collection
      */
     public function getDevicePermissions($user = null)
@@ -238,7 +238,7 @@ class PermissionsCache
     }
 
     /**
-     * @param mixed $user
+     * @param  mixed  $user
      * @return int|null
      */
     private function getUserId($user)
@@ -247,7 +247,7 @@ class PermissionsCache
     }
 
     /**
-     * @param mixed $device
+     * @param  mixed  $device
      * @return int
      */
     private function getDeviceId($device)
@@ -256,7 +256,7 @@ class PermissionsCache
     }
 
     /**
-     * @param mixed $port
+     * @param  mixed  $port
      * @return int
      */
     private function getPortId($port)
@@ -265,7 +265,7 @@ class PermissionsCache
     }
 
     /**
-     * @param mixed $bill
+     * @param  mixed  $bill
      * @return int
      */
     private function getBillId($bill)

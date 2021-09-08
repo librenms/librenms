@@ -37,7 +37,7 @@ class RipeApi extends BaseApi
     /**
      * Get whois info
      *
-     * @param string $resource ASN/IPv4/IPv6
+     * @param  string  $resource  ASN/IPv4/IPv6
      * @return array
      * @throws ApiException
      */
@@ -53,7 +53,7 @@ class RipeApi extends BaseApi
     /**
      * Get Abuse contact
      *
-     * @param string $resource prefix, single IP address or ASN
+     * @param  string  $resource  prefix, single IP address or ASN
      * @return array|mixed
      * @throws ApiException
      */

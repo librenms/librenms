@@ -144,7 +144,7 @@ class GraylogController extends SimpleTableController
 
     /**
      * Cache device lookups so we don't lookup for every entry
-     * @param mixed $source
+     * @param  mixed  $source
      * @return mixed
      */
     private function deviceFromSource($source)

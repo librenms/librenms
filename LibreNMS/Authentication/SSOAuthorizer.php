@@ -72,7 +72,7 @@ class SSOAuthorizer extends MysqlAuthorizer
      * Return an attribute from the configured attribute store.
      * Returns null if the attribute cannot be found
      *
-     * @param string $attr The name of the attribute to find
+     * @param  string  $attr  The name of the attribute to find
      * @return string|null
      */
     public function authSSOGetAttr($attr, $prefix = 'HTTP_')

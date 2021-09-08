@@ -49,7 +49,7 @@ class Snmpsim
      * Run snmpsimd and fork it into the background
      * Captures all output to the log
      *
-     * @param int $wait Wait for x seconds after starting before returning
+     * @param  int  $wait  Wait for x seconds after starting before returning
      */
     public function fork($wait = 2)
     {
@@ -150,7 +150,7 @@ class Snmpsim
     /**
      * Generate the command for snmpsimd
      *
-     * @param bool $with_log
+     * @param  bool  $with_log
      * @return string
      */
     private function getCmd($with_log = true)

@@ -36,8 +36,8 @@ use LibreNMS\Alerting\QueryBuilderParser;
 class AlertDB
 {
     /**
-     * @param string $rule
-     * @param mixed $query_builder
+     * @param  string  $rule
+     * @param  mixed  $query_builder
      * @return bool|string
      */
     public static function genSQL($rule, $query_builder = false)
@@ -51,7 +51,7 @@ class AlertDB
 
     /**
      * Generate SQL from Rule
-     * @param string $rule Rule to generate SQL for
+     * @param  string  $rule  Rule to generate SQL for
      * @return string|bool
      */
     public static function genSQLOld($rule)

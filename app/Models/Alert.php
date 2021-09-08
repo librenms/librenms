@@ -38,7 +38,7 @@ class Alert extends Model
 
     /**
      * Only select active alerts
-     * @param Builder $query
+     * @param  Builder  $query
      * @return Builder
      */
     public function scopeActive($query)
@@ -48,7 +48,7 @@ class Alert extends Model
 
     /**
      * Only select active alerts
-     * @param Builder $query
+     * @param  Builder  $query
      * @return Builder
      */
     public function scopeAcknowledged($query)

@@ -43,7 +43,7 @@ class PortController extends SelectController
     /**
      * Defines search fields will be searched in order
      *
-     * @param \Illuminate\Http\Request $request
+     * @param  \Illuminate\Http\Request  $request
      * @return array
      */
     protected function searchFields($request)
@@ -54,7 +54,7 @@ class PortController extends SelectController
     /**
      * Defines the base query for this resource
      *
-     * @param \Illuminate\Http\Request $request
+     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Query\Builder
      */
     protected function baseQuery($request)
