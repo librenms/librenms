@@ -30,7 +30,7 @@ interface UpgradeableException
      * Try to convert the given Exception to this exception
      * It should return null if the Exception cannot be upgraded.
      *
-     * @param \Exception $exception
+     * @param  \Exception  $exception
      * @return static|null
      */
     public static function upgrade($exception);

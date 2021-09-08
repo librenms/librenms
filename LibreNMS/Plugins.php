@@ -90,8 +90,8 @@ class Plugins
     /**
      * Load plugin
      *
-     * @param  string $file       Full path and filename of plugin
-     * @param  string $pluginName Plugin name without any namespace
+     * @param  string  $file  Full path and filename of plugin
+     * @param  string  $pluginName  Plugin name without any namespace
      * @return object|null
      */
     public static function load($file, $pluginName)
@@ -119,8 +119,8 @@ class Plugins
      * Get an instance of this plugin
      * Search various namespaces and include files if needed.
      *
-     * @param string $file
-     * @param string $pluginName
+     * @param  string  $file
+     * @param  string  $pluginName
      * @return object|null
      */
     private static function getInstance($file, $pluginName)
@@ -151,7 +151,7 @@ class Plugins
     /**
      * Get all plugins implementing a specific hook.
      *
-     * @param  string $hook Name of the hook to get count for
+     * @param  string  $hook  Name of the hook to get count for
      * @return int|bool
      */
     public static function countHooks($hook)
@@ -168,8 +168,8 @@ class Plugins
     /**
      * Call hook for plugin.
      *
-     * @param string $hook Name of hook to call
-     * @param array|false $params Optional array of parameters for hook
+     * @param  string  $hook  Name of hook to call
+     * @param  array|false  $params  Optional array of parameters for hook
      * @return string
      */
     public static function call($hook, $params = false)

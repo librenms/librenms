@@ -121,7 +121,7 @@ class FileCategorizer extends Categorizer
     /**
      * convert class name to os name
      *
-     * @param string $class
+     * @param  string  $class
      * @return string|null
      */
     private function osFromClass($class)

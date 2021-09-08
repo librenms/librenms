@@ -60,7 +60,7 @@ class FdbTablesController extends TableController
     /**
      * Defines the base query for this resource
      *
-     * @param \Illuminate\Http\Request $request
+     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Query\Builder
      */
     protected function baseQuery($request)
@@ -69,9 +69,9 @@ class FdbTablesController extends TableController
     }
 
     /**
-     * @param string $search
-     * @param Builder $query
-     * @param array $fields
+     * @param  string  $search
+     * @param  Builder  $query
+     * @param  array  $fields
      * @return Builder|\Illuminate\Database\Query\Builder
      */
     protected function search($search, $query, $fields = [])
@@ -104,8 +104,8 @@ class FdbTablesController extends TableController
     }
 
     /**
-     * @param Request $request
-     * @param Builder $query
+     * @param  Request  $request
+     * @param  Builder  $query
      * @return Builder
      */
     public function sort($request, $query)
@@ -148,7 +148,7 @@ class FdbTablesController extends TableController
     }
 
     /**
-     * @param PortsFdb $fdb_entry
+     * @param  PortsFdb  $fdb_entry
      */
     public function formatItem($fdb_entry)
     {
@@ -191,7 +191,7 @@ class FdbTablesController extends TableController
     }
 
     /**
-     * @param string $ip
+     * @param  string  $ip
      * @return Builder
      */
     protected function findMacs($ip)
@@ -210,7 +210,7 @@ class FdbTablesController extends TableController
     }
 
     /**
-     * @param string $vlan
+     * @param  string  $vlan
      * @return Builder
      */
     protected function findVlans($vlan)
@@ -231,7 +231,7 @@ class FdbTablesController extends TableController
     }
 
     /**
-     * @param string $ifAlias
+     * @param  string  $ifAlias
      * @return Builder
      */
     protected function findPorts($ifAlias)
@@ -250,7 +250,7 @@ class FdbTablesController extends TableController
     }
 
     /**
-     * @param string $mac_address
+     * @param  string  $mac_address
      * @return \Illuminate\Support\Collection
      */
     protected function findIps($mac_address)
@@ -284,7 +284,7 @@ class FdbTablesController extends TableController
     }
 
     /**
-     * @param Port $port
+     * @param  Port  $port
      * @return int
      */
     protected function getMacCount($port)

@@ -58,7 +58,7 @@ class PollerCluster extends Model
     /**
      * Get the value of a setting (falls back to the global value if not set on this node)
      *
-     * @param string $name
+     * @param  string  $name
      * @return mixed
      * @throws \LibreNMS\Exceptions\InvalidNameException
      */
@@ -78,7 +78,7 @@ class PollerCluster extends Model
     /**
      * Get the frontend config definition for this poller
      *
-     * @param \Illuminate\Support\Collection|bool|null $groups optionally supply full list of poller groups to avoid fetching multiple times
+     * @param  \Illuminate\Support\Collection|bool|null  $groups  optionally supply full list of poller groups to avoid fetching multiple times
      * @return array[]
      */
     public function configDefinition($groups = null)

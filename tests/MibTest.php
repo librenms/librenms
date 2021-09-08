@@ -41,7 +41,7 @@ class MibTest extends TestCase
      *
      * @group mibs
      * @dataProvider mibDirs
-     * @param string $dir
+     * @param  string  $dir
      */
     public function testMibDirectory($dir)
     {
@@ -56,9 +56,9 @@ class MibTest extends TestCase
      *
      * @group mibs
      * @dataProvider mibFiles
-     * @param string $path
-     * @param string $file
-     * @param string $mib_name
+     * @param  string  $path
+     * @param  string  $file
+     * @param  string  $mib_name
      */
     public function testDuplicateMibs($path, $file, $mib_name)
     {
@@ -86,9 +86,9 @@ class MibTest extends TestCase
      *
      * @group mibs
      * @dataProvider mibFiles
-     * @param string $path
-     * @param string $file
-     * @param string $mib_name
+     * @param  string  $path
+     * @param  string  $file
+     * @param  string  $mib_name
      */
     public function testMibNameMatches($path, $file, $mib_name)
     {
@@ -104,9 +104,9 @@ class MibTest extends TestCase
      *
      * @group mibs
      * @dataProvider mibFiles
-     * @param string $path
-     * @param string $file
-     * @param string $mib_name
+     * @param  string  $path
+     * @param  string  $file
+     * @param  string  $mib_name
      */
     public function testMibContents($path, $file, $mib_name)
     {
@@ -165,7 +165,7 @@ class MibTest extends TestCase
     /**
      * Extract the mib name from a file
      *
-     * @param string $file
+     * @param  string  $file
      * @return mixed
      * @throws Exception
      */

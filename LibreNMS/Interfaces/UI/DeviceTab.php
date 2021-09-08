@@ -30,7 +30,7 @@ interface DeviceTab
 {
     /**
      * Check if the tab is visible
-     * @param Device $device
+     * @param  Device  $device
      * @return bool
      */
     public function visible(Device $device): bool;
@@ -55,7 +55,7 @@ interface DeviceTab
 
     /**
      * Collect data to send to the view
-     * @param Device $device
+     * @param  Device  $device
      * @return array
      */
     public function data(Device $device): array;

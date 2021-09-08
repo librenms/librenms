@@ -29,8 +29,8 @@ class StringHelpers
     /**
      * Shorten text over 50 chars, if shortened, add ellipsis
      *
-     * @param string $string
-     * @param int $max
+     * @param  string  $string
+     * @param  int  $max
      * @return string
      */
     public static function shortenText($string, $max = 30)
@@ -84,7 +84,7 @@ class StringHelpers
 
     /**
      * Convert a camel or studly case string to Title case (with spaces)
-     * @param string $string
+     * @param  string  $string
      * @return string
      */
     public static function camelToTitle($string)

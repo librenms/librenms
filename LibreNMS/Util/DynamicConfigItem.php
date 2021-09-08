@@ -58,7 +58,7 @@ class DynamicConfigItem implements \ArrayAccess
     /**
      * Check given value is valid. Using the type of this config item and possibly other variables.
      *
-     * @param mixed $value
+     * @param  mixed  $value
      * @return bool|mixed
      */
     public function checkValue($value)
@@ -193,7 +193,7 @@ class DynamicConfigItem implements \ArrayAccess
     }
 
     /**
-     * @param mixed $value The value that was validated
+     * @param  mixed  $value  The value that was validated
      * @return string
      */
     public function getValidationMessage($value)

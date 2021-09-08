@@ -36,13 +36,13 @@ use Symfony\Component\HttpFoundation\ParameterBag;
 class Url
 {
     /**
-     * @param Device $device
-     * @param string $text
-     * @param array $vars
-     * @param int $start
-     * @param int $end
-     * @param int $escape_text
-     * @param int $overlib
+     * @param  Device  $device
+     * @param  string  $text
+     * @param  array  $vars
+     * @param  int  $start
+     * @param  int  $end
+     * @param  int  $escape_text
+     * @param  int  $overlib
      * @return string
      */
     public static function deviceLink($device, $text = null, $vars = [], $start = 0, $end = 0, $escape_text = 1, $overlib = 1)
@@ -120,11 +120,11 @@ class Url
     }
 
     /**
-     * @param Port $port
-     * @param string $text
-     * @param string $type
-     * @param bool $overlib
-     * @param bool $single_graph
+     * @param  Port  $port
+     * @param  string  $text
+     * @param  string  $type
+     * @param  bool  $overlib
+     * @param  bool  $single_graph
      * @return mixed|string
      */
     public static function portLink($port, $text = null, $type = null, $overlib = true, $single_graph = false)
@@ -178,11 +178,11 @@ class Url
     }
 
     /**
-     * @param \App\Models\Sensor $sensor
-     * @param string $text
-     * @param string $type
-     * @param bool $overlib
-     * @param bool $single_graph
+     * @param  \App\Models\Sensor  $sensor
+     * @param  string  $text
+     * @param  string  $type
+     * @param  bool  $overlib
+     * @param  bool  $single_graph
      * @return mixed|string
      */
     public static function sensorLink($sensor, $text = null, $type = null, $overlib = true, $single_graph = false)
@@ -225,8 +225,8 @@ class Url
     }
 
     /**
-     * @param int|Device $device
-     * @param array $vars
+     * @param  int|Device  $device
+     * @param  array  $vars
      * @return string
      */
     public static function deviceUrl($device, $vars = [])
@@ -251,7 +251,7 @@ class Url
     }
 
     /**
-     * @param Port $port
+     * @param  Port  $port
      * @return string
      */
     public static function portThumbnail($port)
@@ -269,7 +269,7 @@ class Url
     }
 
     /**
-     * @param Port $port
+     * @param  Port  $port
      * @return string
      */
     public static function portErrorsThumbnail($port)
@@ -309,8 +309,8 @@ class Url
      * Generate url parameters to append to url
      * $prefix will only be prepended if there are parameters
      *
-     * @param array $vars
-     * @param string $prefix
+     * @param  array  $vars
+     * @param  string  $prefix
      * @return string
      */
     private static function urlParams($vars, $prefix = '/')
@@ -326,7 +326,7 @@ class Url
     }
 
     /**
-     * @param array $args
+     * @param  array  $args
      * @return string
      */
     public static function graphTag($args)
@@ -426,16 +426,16 @@ class Url
     /**
      * Generate minigraph image url
      *
-     * @param Device $device
-     * @param int $start
-     * @param int $end
-     * @param string $type
-     * @param string $legend
-     * @param int $width
-     * @param int $height
-     * @param string $sep
-     * @param string $class
-     * @param int $absolute_size
+     * @param  Device  $device
+     * @param  int  $start
+     * @param  int  $end
+     * @param  string  $type
+     * @param  string  $legend
+     * @param  int  $width
+     * @param  int  $height
+     * @param  string  $sep
+     * @param  string  $class
+     * @param  int  $absolute_size
      * @return string
      */
     public static function minigraphImage($device, $start, $end, $type, $legend = 'no', $width = 275, $height = 100, $sep = '&amp;', $class = 'minigraph-image', $absolute_size = 0)
@@ -446,7 +446,7 @@ class Url
     }
 
     /**
-     * @param Device $device
+     * @param  Device  $device
      * @return string
      */
     private static function deviceLinkDisplayClass($device)
@@ -465,7 +465,7 @@ class Url
     /**
      * Get html class for a port using ifAdminStatus and ifOperStatus
      *
-     * @param Port $port
+     * @param  Port  $port
      * @return string
      */
     public static function portLinkDisplayClass($port)
@@ -484,7 +484,7 @@ class Url
     /**
      * Get html class for a sensor
      *
-     * @param \App\Models\Sensor $sensor
+     * @param  \App\Models\Sensor  $sensor
      * @return string
      */
     public static function sensorLinkDisplayClass($sensor)
@@ -501,10 +501,10 @@ class Url
     }
 
     /**
-     * @param string $os
-     * @param string $feature
-     * @param string $icon
-     * @param string $dir directory to search in (images/os/ or images/logos)
+     * @param  string  $os
+     * @param  string  $feature
+     * @param  string  $icon
+     * @param  string  $dir  directory to search in (images/os/ or images/logos)
      * @return string
      */
     public static function findOsImage($os, $feature, $icon = null, $dir = 'images/os/')
@@ -544,7 +544,7 @@ class Url
     /**
      * parse a legacy path (one without ? or &)
      *
-     * @param string $path
+     * @param  string  $path
      * @return ParameterBag
      */
     public static function parseLegacyPath($path)

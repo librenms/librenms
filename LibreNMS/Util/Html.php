@@ -31,7 +31,7 @@ class Html
 {
     /**
      * return icon and color for application state
-     * @param string $app_state
+     * @param  string  $app_state
      * @return array
      */
     public static function appStateIcon($app_state)
@@ -70,8 +70,8 @@ class Html
     /**
      * Print or return a row of graphs
      *
-     * @param array $graph_array
-     * @param bool $print
+     * @param  array  $graph_array
+     * @param  bool  $print
      * @return array
      */
     public static function graphRow($graph_array, $print = false)
@@ -165,7 +165,7 @@ class Html
     }
 
     /**
-     * @param int|string $state
+     * @param  int|string  $state
      */
     public static function powerStateLabel($state): array
     {

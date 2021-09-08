@@ -50,7 +50,7 @@ abstract class TableController extends PaginatedAjaxController
     }
 
     /**
-     * @param Request $request
+     * @param  Request  $request
      * @return \Illuminate\Http\JsonResponse
      */
     public function __invoke(Request $request)
@@ -76,7 +76,7 @@ abstract class TableController extends PaginatedAjaxController
     }
 
     /**
-     * @param LengthAwarePaginator $paginator
+     * @param  LengthAwarePaginator  $paginator
      * @return \Illuminate\Http\JsonResponse
      */
     protected function formatResponse($paginator)
