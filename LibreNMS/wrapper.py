@@ -56,9 +56,9 @@ from LibreNMS.command_runner import command_runner
 
 logger = logging.getLogger(__name__)
 
-PER_DEVICE_TIMEOUT = (
-    900  # Timeout in seconds for any poller / service / discovery action per device
-)
+# Timeout in seconds for any poller / service / discovery action per device
+# Should be higher than stepping which defaults to 300
+PER_DEVICE_TIMEOUT = 900
 
 # 5 = no new discovered devices, 6 = unreachable device
 VALID_EXIT_CODES = [0, 5, 6]
@@ -284,7 +284,11 @@ def poll_worker(
                     valid_exit_codes=VALID_EXIT_CODES,
                 )
                 if exit_code not in [0, 6]:
-                    logger.error("Process exited with code {}".format(exit_code))
+                    logger.error(
+                        "Thread {} exited with code {}".format(
+                            threading.current_thread().name, exit_code
+                        )
+                    )
                     logger.error(output)
                 elif exit_code == 5:
                     logger.info("Unreachable device {}".format(device_id))
