@@ -68,6 +68,7 @@ DISTRIBUTED_POLLING = False  # Is overriden by config.php
 REAL_DURATION = 0
 DISCOVERED_DEVICES_COUNT = 0
 PER_DEVICE_DURATION = {}
+ERRORS = 0
 
 MEMC = None
 IS_NODE = None
@@ -232,6 +233,8 @@ def poll_worker(
     This function will fork off single instances of the php process, record
     how long it takes, and push the resulting reports to the printer queue
     """
+    
+    global ERRORS
 
     while True:
         device_id = poll_queue.get()
@@ -289,6 +292,7 @@ def poll_worker(
                             threading.current_thread().name, exit_code
                         )
                     )
+                    ERRORS += 1
                     logger.error(output)
                 elif exit_code == 5:
                     logger.info("Unreachable device {}".format(device_id))
@@ -523,11 +527,13 @@ def wrapper(
 
     total_time = int(time.time() - s_time)
 
-    logger.info(
-        "{}-wrapper checked {} devices in {} seconds with {} workers".format(
-            wrapper_type, DISCOVERED_DEVICES_COUNT, total_time, amount_of_workers
-        )
-    )
+    end_msg = "{}-wrapper checked {} devices in {} seconds with {} workers with {} errors".format(
+                wrapper_type, DISCOVERED_DEVICES_COUNT, total_time, amount_of_workers, ERRORS
+            )
+    if ERRORS == 0:
+        logger.info(end_msg)
+    else:
+        logger.error(end_msg)
 
     #  <<<EOC
     if DISTRIBUTED_POLLING or memc_alive(wrapper_type):
