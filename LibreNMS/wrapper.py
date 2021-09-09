@@ -209,7 +209,6 @@ def print_worker(print_queue, wrapper_type):  # Type: Queue  # Type: str
                 "worker {} finished device {} in {} seconds".format(
                     worker_id, device_id, elapsed_time
                 )
-                % (worker_id, device_id, elapsed_time)
             )
         print_queue.task_done()
 
