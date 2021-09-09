@@ -233,7 +233,7 @@ def poll_worker(
     This function will fork off single instances of the php process, record
     how long it takes, and push the resulting reports to the printer queue
     """
-    
+
     global ERRORS
 
     while True:
