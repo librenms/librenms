@@ -73,8 +73,8 @@ been up for 30344 seconds`.
 - Title for the Alert: `$alert->title`
 - Time Elapsed, Only available on recovery (`$alert->state == 0`): `$alert->elapsed`
 - Rule Builder (the actual rule) (use `{!! $alert->builder !!}`): `$alert->builder`
-- Alert-ID: `$alert->id`
-- Unique-ID: `$alert->uid`
+- Alert-ID: `$alert->id` (Same for both alert and recovery events)
+- Unique-ID: `$alert->uid` (Different for each event)
 - Faults, Only available on alert (`$alert->state != 0`), must be
   iterated in a foreach (`@foreach ($alert->faults as $key => $value)
   @endforeach`). Holds all available information about the Fault,
