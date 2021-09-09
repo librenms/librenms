@@ -9,14 +9,14 @@ modules:
                     num_oid: '.1.3.6.1.2.1.105.1.3.1.1.2.{{ $index }}'
                     index: 'pethMainPsePower.{{ $index }}'
                     group: "PoE"
-                    descr: "Budget Total - ID {{ $index }}"
+                    descr: "PoE Budget Total - ID {{ $index }}"
                 -
                     oid: pethMainPseTable
                     value: pethMainPseConsumptionPower
                     num_oid: '.1.3.6.1.2.1.105.1.3.1.1.4.{{ $index }}'
                     index: 'pethMainPseConsumptionPower.{{ $index }}' 
                     group: "PoE"
-                    descr: "Budget Consumed - ID {{ $index }}"
+                    descr: "PoE Budget Consumed - ID {{ $index }}"
         count:
             data:
                 -
