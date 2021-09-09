@@ -1944,14 +1944,17 @@ function add_device_group(Illuminate\Http\Request $request)
         return api_error(422, $v->messages());
     }
 
+    $deviceGroup = DeviceGroup::make(['name' => $data['name'], 'type' => $data['type'], 'desc' => $data['desc']]);
+
     // Only use the rules if they are able to be parsed by the QueryBuilder
-    $query = QueryBuilderParser::fromJson($data['rules'])->toSql();
-    if (empty($query)) {
-        return api_error(500, "We couldn't parse your rule");
+    if ($data['type'] == 'dynamic') {
+        $query = QueryBuilderParser::fromJson($data['rules'])->toSql();
+        if (empty($query)) {
+            return api_error(500, "We couldn't parse your rule");
+        }
+	$deviceGroup->rules = json_decode($data['rules']);
     }
 
-    $deviceGroup = DeviceGroup::make(['name' => $data['name'], 'type' => $data['type'], 'desc' => $data['desc']]);
-    $deviceGroup->rules = json_decode($data['rules']);
     $deviceGroup->save();
 
     if ($data['type'] == 'static') {
