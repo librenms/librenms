@@ -16,6 +16,7 @@ Auth::routes(['register' => false, 'reset' => false, 'verify' => false]);
 
 // WebUI
 Route::group(['middleware' => ['auth'], 'guard' => 'auth'], function () {
+
     // pages
     Route::resource('device-groups', 'DeviceGroupController');
     Route::resource('port-groups', 'PortGroupController');
