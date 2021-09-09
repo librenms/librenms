@@ -18,17 +18,27 @@ __intname__ = "command_runner"
 __author__ = "Orsiris de Jong"
 __copyright__ = "Copyright (C) 2015-2021 Orsiris de Jong"
 __licence__ = "BSD 3 Clause"
-__version__ = "1.0.0-dev"
-__build__ = "2021083101"
+__version__ = "1.2.1"
+__build__ = "2021090901"
 
-import os
 import io
+import os
 import shlex
 import subprocess
 import sys
-from time import sleep
 from datetime import datetime
 from logging import getLogger
+from time import sleep
+
+try:
+    import psutil
+except ImportError:
+    # Don't bother with an error since we need command_runner to work without dependencies
+    pass
+try:
+    import signal
+except ImportError:
+    pass
 
 # Python 2.7 compat fixes (queue was Queue)
 try:
@@ -91,6 +101,96 @@ class KbdInterruptGetOutput(BaseException):
 
 logger = getLogger(__intname__)
 PIPE = subprocess.PIPE
+MIN_RESOLUTION = 0.05  # Minimal sleep time between polling, reduces CPU usage
+
+
+def kill_childs_mod(
+    pid=None,  # type: int
+    itself=False,  # type: bool
+    soft_kill=False,  # type: bool
+):
+    # type: (...) -> bool
+    """
+    Inline version of ofunctions.kill_childs that has no hard dependency on psutil
+
+    Kills all childs of pid (current pid can be obtained with os.getpid())
+    If no pid given current pid is taken
+    Good idea when using multiprocessing, is to call with atexit.register(ofunctions.kill_childs, os.getpid(),)
+
+    Beware: MS Windows does not maintain a process tree, so child dependencies are computed on the fly
+    Knowing this, orphaned processes (where parent process died) cannot be found and killed this way
+
+    Prefer using process.send_signal() in favor of process.kill() to avoid race conditions when PID was reused too fast
+
+    :param pid: Which pid tree we'll kill
+    :param itself: Should parent be killed too ?
+    """
+    sig = None
+
+    ### BEGIN COMMAND_RUNNER MOD
+    if "psutil" not in sys.modules:
+        logger.error(
+            "No psutil module present. Can only kill direct pids, not child subtree."
+        )
+    if "signal" not in sys.modules:
+        logger.error(
+            "No signal module present. Using direct psutil kill API which might have race conditions when PID is reused too fast."
+        )
+    else:
+        """
+        Extract from Python3 doc
+        On Windows, signal() can only be called with SIGABRT, SIGFPE, SIGILL, SIGINT, SIGSEGV, SIGTERM, or SIGBREAK.
+        A ValueError will be raised in any other case. Note that not all systems define the same set of signal names;
+        an AttributeError will be raised if a signal name is not defined as SIG* module level constant.
+        """
+        try:
+            if not soft_kill and hasattr(signal, "SIGKILL"):
+                # Don't bother to make pylint go crazy on Windows
+                # pylint: disable=E1101
+                sig = signal.SIGKILL
+            else:
+                sig = signal.SIGTERM
+        except NameError:
+            sig = None
+    ### END COMMAND_RUNNER MOD
+
+    def _process_killer(process,  # type: Union[subprocess.Popen, psutil.Process]
+                        sig,  # type: signal.valid_signals
+                        soft_kill  # type: bool
+        ):
+        # (...) -> None
+        """
+        Simple abstract process killer that works with signals in order to avoid reused PID race conditions
+        and can prefers using terminate than kill
+        """
+        if sig:
+            try:
+                process.send_signal(sig)
+            # psutil.NoSuchProcess might not be available, let's be broad
+            # pylint: disable=W0703
+            except Exception:
+                pass
+        else:
+            if soft_kill:
+                process.terminate()
+            else:
+                process.kill()
+
+    try:
+        current_process = psutil.Process(pid if pid is not None else os.getpid())
+    # psutil.NoSuchProcess might not be available, let's be broad
+    # pylint: disable=W0703
+    except Exception:
+        if itself:
+            os.kill(pid, 15) # 15 being signal.SIGTERM or SIGKILL depending on the platform
+        return False
+
+    for child in current_process.children(recursive=True):
+        _process_killer(child, sig, soft_kill)
+
+    if itself:
+        _process_killer(current_process, sig, soft_kill)
+    return True
 
 
 def command_runner(
@@ -98,11 +198,12 @@ def command_runner(
     valid_exit_codes=None,  # type: Optional[List[int]]
     timeout=3600,  # type: Optional[int]
     shell=False,  # type: bool
-    encoding=None,  # type: str
+    encoding=None,  # type: Optional[str]
     stdout=None,  # type: Union[int, str]
     stderr=None,  # type: Union[int, str]
     windows_no_window=False,  # type: bool
     live_output=False,  # type: bool
+    method="monitor",  # type: str
     **kwargs  # type: Any
 ):
     # type: (...) -> Tuple[Optional[int], str]
@@ -161,6 +262,9 @@ def command_runner(
         creationflags = creationflags | subprocess.CREATE_NO_WINDOW
     close_fds = kwargs.pop("close_fds", "posix" in sys.builtin_module_names)
 
+    # Default buffer size. line buffer (1) is deprecated in Python 3.7+
+    bufsize = kwargs.pop("bufsize", 16384)
+
     # Decide whether we write to output variable only (stdout=None), to output variable and stdout (stdout=PIPE)
     # or to output variable and to file (stdout='path/to/file')
     if stdout is None:
@@ -182,22 +286,6 @@ def command_runner(
     else:
         _stderr = subprocess.STDOUT
         stderr_to_file = False
-
-    def _windows_child_kill(
-        pid,  # type: int
-    ):
-        # type: (...) -> None
-        """
-        windows does not have child process trees
-        So in order to deal with child process kills, we need to use a system tool here
-        """
-        dev_null = open(os.devnull, "w")
-        subprocess.call(
-            ["taskkill", "/F", "/T", "/PID", str(pid)],
-            stdin=dev_null,
-            stdout=dev_null,
-            stderr=dev_null,
-        )
 
     def to_encoding(
         process_output,  # type: Union[str, bytes]
@@ -221,62 +309,28 @@ def command_runner(
                     logger.debug("Output cannot be captured {}".format(process_output))
         return process_output
 
-    def kill(
-        process,  # type: Union[subprocess.Popen[str], subprocess.Popen]
-    ):
-        # type: (...) -> None
-        """
-        OS agnostic process kill function
-        """
-
-        # Try to terminate nicely before killing the process
-        if os.name == "nt":
-            _windows_child_kill(process.pid)
-        process.terminate()
-        # Let the process terminate itself before trying to kill it not nicely
-        # Under windows, terminate() and kill() are equivalent
-        if process.poll() is None:
-            process.kill()
-
     def _read_pipe(
-        stream,  # type: io.BinaryIO
-        output_queue,  # type: Optional[queue.Queue]
+        stream,  # type: io.StringIO
+        output_queue,  # type: queue.Queue
     ):
         # type: (...) -> None
         """
         will read from subprocess.PIPE
         Must be threaded since readline() might be blocking on Windows GUI apps
+
+        Partly based on https://stackoverflow.com/a/4896288/2635443
         """
-        int_queue = queue.Queue()
 
-        def stream_reader():
-            while True:
-                buffer = stream.read1(8192)
-                if len(buffer) > 0:
-                    int_queue.put(buffer)
-                else:
-                    int_queue.put(None)
-                    return
+        # WARNING: Depending on the stream type (binary or text), the sentinel character
+        # needs to be of the same type, or the iterator won't have an end
 
-        def queue_transfer():
-            active = True
-            while active:
-                output = int_queue.get()
-                try:
-                    while True:
-                        partial_output = int_queue.get(timeout=0.005)
-                        if partial_output is None:
-                            active = False
-                            break
-                        output += partial_output
-                except queue.Empty:
-                    pass
-                output_queue.put(output)
-
-        for function in [stream_reader, queue_transfer]:
-            thread = threading.Thread(target=function)
-            thread.setDaemon(True)
-            thread.start()
+        # We also need to check that stream has readline, in case we're writing to files instead of PIPE
+        if hasattr(stream, "readline"):
+            sentinel_char = "" if hasattr(stream, "encoding") else b""
+            for line in iter(stream.readline, sentinel_char):
+                output_queue.put(line)
+            output_queue.put(None)
+            stream.close()
 
     def _poll_process(
         process,  # type: Union[subprocess.Popen[str], subprocess.Popen]
@@ -287,7 +341,7 @@ def command_runner(
         # type: (...) -> Tuple[Optional[int], str]
         """
         Process stdout/stderr output polling is only used in live output mode
-        because it can be unreliable
+        since it takes more resources than using communicate()
 
         Reads from process output pipe until:
         - Timeout is reached, in which case we'll terminate the process
@@ -297,38 +351,62 @@ def command_runner(
         """
 
         begin_time = datetime.now()
-
         output = ""
         output_queue = queue.Queue()
-        with io.open(process.stdout.fileno(), "rb", closefd=False) as stdout:
-            _read_pipe(stdout, output_queue)
+
+        def __check_timeout(
+            begin_time,  # type: datetime.timestamp
+            timeout,  # type: int
+        ):
+            # type: (...) -> None
+            """
+            Simple subfunction to check whether timeout is reached
+            Since we check this alot, we put it into a function
+            """
+
+            if timeout and (datetime.now() - begin_time).total_seconds() > timeout:
+                kill_childs_mod(process.pid, itself=True, soft_kill=False)
+                raise TimeoutExpired(process, timeout, output)
 
         try:
-            while process.poll() is None:
+            read_thread = threading.Thread(
+                target=_read_pipe, args=(process.stdout, output_queue)
+            )
+            read_thread.daemon = True  # thread dies with the program
+            read_thread.start()
+
+            while True:
                 try:
-                    stream_output = output_queue.get(timeout=1.0)
-                    stream_output = to_encoding(stream_output, encoding, errors)
-                    output += stream_output
-                    if stream_output and live_output:
-                        sys.stdout.write(stream_output)
-
-                    if (
-                        timeout
-                        and (datetime.now() - begin_time).total_seconds() > timeout
-                    ):
-                        kill(process)
-                        raise TimeoutExpired(process, timeout, output)
-
+                    line = output_queue.get(timeout=MIN_RESOLUTION)
                 except queue.Empty:
-                    pass
-            return process.poll(), output
+                    __check_timeout(begin_time, timeout)
+                else:
+                    if line is None:
+                        break
+                    else:
+                        line = to_encoding(line, encoding, errors)
+                        if live_output:
+                            sys.stdout.write(line)
+                        output += line
+                    __check_timeout(begin_time, timeout)
+
+            # Make sure we wait for the process to terminate, even after
+            # output_queue has finished sending data, so we catch the exit code
+            while process.poll() is None:
+                __check_timeout(begin_time, timeout)
+            # Additional timeout check to make sure we don't return an exit code from processes
+            # that were killed because of timeout
+            __check_timeout(begin_time, timeout)
+            exit_code = process.poll()
+            return exit_code, output
+
         except KeyboardInterrupt:
             raise KbdInterruptGetOutput(output)
 
-    def _timeout_check(
+    def _timeout_check_thread(
         process,  # type: Union[subprocess.Popen[str], subprocess.Popen]
         timeout,  # type: int
-        timeout_dict,  # type: dict
+        timeout_queue,  # type: queue.Queue
     ):
         # type: (...) -> None
 
@@ -339,12 +417,12 @@ def command_runner(
         begin_time = datetime.now()
         while True:
             if timeout and (datetime.now() - begin_time).total_seconds() > timeout:
-                timeout_dict["is_timeout"] = True
-                kill(process)
+                kill_childs_mod(process.pid, itself=True, soft_kill=False)
+                timeout_queue.put(True)
                 break
             if process.poll() is not None:
                 break
-            sleep(0.1)
+            sleep(MIN_RESOLUTION)
 
     def _monitor_process(
         process,  # type: Union[subprocess.Popen[str], subprocess.Popen]
@@ -358,12 +436,16 @@ def command_runner(
         Get stdout output and return it
         """
 
-        # Let's create a mutable object since it will be shared with a thread
-        timeout_dict = {"is_timeout": False}
+        # Shared mutable objects have proven to have race conditions with PyPy 3.7 (mutable object
+        # is changed in thread, but outer monitor function has still old mutable object state)
+        # Strangely, this happened only sometimes on github actions/ubuntu 20.04.3 & pypy 3.7
+        # Let's create a queue to get the timeout thread response on a deterministic way
+        timeout_queue = queue.Queue()
+        is_timeout = False
 
         thread = threading.Thread(
-            target=_timeout_check,
-            args=(process, timeout, timeout_dict),
+            target=_timeout_check_thread,
+            args=(process, timeout, timeout_queue),
         )
         thread.setDaemon(True)
         thread.start()
@@ -375,28 +457,48 @@ def command_runner(
             # Don't use process.wait() since it may deadlock on old Python versions
             # Also it won't allow communicate() to get incomplete output on timeouts
             while process.poll() is None:
-                sleep(0.1)
+                sleep(MIN_RESOLUTION)
+                try:
+                    is_timeout = timeout_queue.get_nowait()
+                except queue.Empty:
+                    pass
+                else:
+                    break
+                # We still need to use process.communicate() in this loop so we don't get stuck
+                # with poll() is not None even after process is finished
                 try:
                     stdout, _ = process.communicate()
                 # ValueError is raised on closed IO file
                 except (TimeoutExpired, ValueError):
                     pass
-
             exit_code = process.poll()
+
             try:
                 stdout, _ = process.communicate()
             except (TimeoutExpired, ValueError):
                 pass
             process_output = to_encoding(stdout, encoding, errors)
 
-            if timeout_dict["is_timeout"]:
-                raise TimeoutExpired(process, timeout, process_output)
+            # On PyPy 3.7 only, we can have a race condition where we try to read the queue before
+            # the thread could write to it, failing to register a timeout.
+            # This workaround prevents reading the queue while the thread is still alive
+            while thread.is_alive():
+                sleep(MIN_RESOLUTION)
 
+            try:
+                is_timeout = timeout_queue.get_nowait()
+            except queue.Empty:
+                pass
+            if is_timeout:
+                raise TimeoutExpired(process, timeout, process_output)
             return exit_code, process_output
         except KeyboardInterrupt:
             raise KbdInterruptGetOutput(process_output)
 
     try:
+        # Finally, we won't use encoding & errors arguments for Popen
+        # since it would defeat the idea of binary pipe reading in live mode
+
         # Python >= 3.3 has SubProcessError(TimeoutExpired) class
         # Python >= 3.6 has encoding & error arguments
         # universal_newlines=True makes netstat command fail under windows
@@ -414,7 +516,7 @@ def command_runner(
                 encoding=encoding,
                 errors=errors,
                 creationflags=creationflags,
-                bufsize=1,  # 1 = line buffered
+                bufsize=bufsize,  # 1 = line buffered
                 close_fds=close_fds,
                 **kwargs
             )
@@ -426,13 +528,13 @@ def command_runner(
                 shell=shell,
                 universal_newlines=universal_newlines,
                 creationflags=creationflags,
-                bufsize=1,
+                bufsize=bufsize,
                 close_fds=close_fds,
                 **kwargs
             )
 
         try:
-            if live_output:
+            if method == "poller" or live_output:
                 exit_code, output = _poll_process(process, timeout, encoding, errors)
             else:
                 exit_code, output = _monitor_process(process, timeout, encoding, errors)
@@ -440,10 +542,7 @@ def command_runner(
             exit_code = -252
             output = "KeyboardInterrupted. Partial output\n{}".format(exc.output)
             try:
-                process.kill()
-                if os.name == "nt":
-                    _windows_child_kill(process.pid)
-                process.kill()
+                kill_childs_mod(process.pid, itself=True, soft_kill=False)
             except AttributeError:
                 pass
             if stdout_to_file:
