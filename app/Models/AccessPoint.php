@@ -5,7 +5,7 @@ namespace App\Models;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use LibreNMS\Interfaces\Models\Keyable;
 
-class AccessPoint extends DeviceRelatedModel
+class AccessPoint extends DeviceRelatedModel implements Keyable
 {
     use HasFactory;
 
@@ -36,6 +36,7 @@ class AccessPoint extends DeviceRelatedModel
 
     public function setOffline()
     {
+        // Todo: implement Laravel's soft-delete
         $this->deleted = 1;
     }
 }
