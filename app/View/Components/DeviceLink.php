@@ -29,7 +29,7 @@ class DeviceLink extends Component
     /**
      * Create a new component instance.
      *
-     * @param int|\App\Models\Device $device
+     * @param  int|\App\Models\Device  $device
      */
     public function __construct($device, ?string $tab = null, ?string $section = null)
     {
