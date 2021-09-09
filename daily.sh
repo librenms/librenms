@@ -136,7 +136,7 @@ check_dependencies() {
 
     python3=$(python3 -c "import sys;print(int(sys.version_info < (3, 4)))" 2> /dev/null)
     if [ "$python3" -eq 0 ]; then
-        if [ $("$python3" "${LIBRENMS_DIR}/scripts/dynamic_check_requirements.py" > /dev/null 2>&1; echo $?) -ne 0 ]; then
+        if [ "$("$python3" "${LIBRENMS_DIR}/scripts/dynamic_check_requirements.py" > /dev/null 2>&1; echo $?)" -ne 0 ]; then
             pip_result=$($(type -p python3) -m pip install -r "${LIBRENMS_DIR}/requirements.txt" > /dev/null 2>&1; echo $?)
             if [ "$pip_result" -eq 2 ]; then
                 status_run "Running pip install -r requirements" "$(type -p python3) -m pip install -r \"${LIBRENMS_DIR}/requirements.txt\""
