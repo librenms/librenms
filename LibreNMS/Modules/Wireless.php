@@ -100,6 +100,6 @@ class Wireless implements Module
      */
     public function cleanup(OS $os)
     {
-
+        $os->getDevice()->accessPoints()->delete();
     }
 }
