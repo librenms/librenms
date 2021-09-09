@@ -81,7 +81,7 @@ class Wireless implements Module
 
  */
             ModuleModelObserver::observe('\App\Models\AccessPoint');
-            $this->syncModels($os->getDevice(), 'AccessPoint', $newCollection);
+            $this->syncModels($os->getDevice(), 'accessPoints', $newCollection);
 
             // Cleanup duplicates? 
             // Can there be any even after failover since the syncmodels hashes by mac+radioid?

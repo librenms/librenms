@@ -552,7 +552,7 @@ class Device extends BaseModel
 
     public function accessPoints(): HasMany
     {
-        return $this->hasMany(AccessPoint::class, 'device_id');
+        return $this->hasMany(\App\Models\AccessPoint::class, 'device_id');
     }
 
     public function alerts(): HasMany
