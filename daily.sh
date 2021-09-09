@@ -136,10 +136,10 @@ check_dependencies() {
 
     python3=$(python3 -c "import sys;print(int(sys.version_info < (3, 4)))" 2> /dev/null)
     if [ "$python3" -eq 0 ]; then
-        python3 scripts/dynamic_check_requirements.py > /dev/null 2>&1 || $(type -p python3) -m pip install -r requirements.txt > /dev/null 2>&1
+        python3 "${LIBRENMS_DIR}/scripts/dynamic_check_requirements.py" > /dev/null 2>&1 || $(type -p python3) -m pip install -r "${LIBRENMS_DIR}/requirements.txt" > /dev/null 2>&1
         python_deps=$(python3 "${LIBRENMS_DIR}/scripts/dynamic_check_requirements.py" > /dev/null 2>&1; echo $?)
     else
-        scripts/check_requirements.py > /dev/null 2>&1 || pip3 install -r requirements.txt > /dev/null 2>&1
+        "${LIBRENMS_DIR}/scripts/check_requirements.py" > /dev/null 2>&1 || pip3 install -r "${LIBRENMS_DIR}/requirements.txt" > /dev/null 2>&1
         python_deps=$("${LIBRENMS_DIR}/scripts/check_requirements.py" > /dev/null 2>&1; echo $?)
     fi
 
@@ -172,6 +172,9 @@ check_dependencies() {
         if [[ "$python3" != "0" ]]; then
             msg="python3 is not available, $msg"
             pythonver="python3-missing"
+        elif [[ "$python_deps" != "2" ]]; then
+            # In that case, let's keep pythonver=master
+            msg="Python 3 dependencies missing. Cannot install them because of missing permissions, $msg"
         elif [[ "$python_deps" != "0" ]]; then
             msg="Python 3 dependencies missing, $msg"
             pythonver="python3-deps"
