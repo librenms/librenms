@@ -534,11 +534,11 @@ class RedisUniqueQueue(object):
         # Since it would trigger another exception in queuemanager
         except Exception as e:
             logger.critical(
-                "It seems like BZPOPMIN command is not supported by redis. Redis >= 5.0 required: {}".format(
+                "BZPOPMIN/ZPOPMIN command failed: {}\nNote that redis >= 5.0 is required.".format(
                     e
                 )
             )
-            sys.exit(1)
+            raise
 
         if item:
             item = item[1]
