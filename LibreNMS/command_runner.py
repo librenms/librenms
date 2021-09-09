@@ -154,10 +154,11 @@ def kill_childs_mod(
             sig = None
     ### END COMMAND_RUNNER MOD
 
-    def _process_killer(process,  # type: Union[subprocess.Popen, psutil.Process]
-                        sig,  # type: signal.valid_signals
-                        soft_kill  # type: bool
-        ):
+    def _process_killer(
+        process,  # type: Union[subprocess.Popen, psutil.Process]
+        sig,  # type: signal.valid_signals
+        soft_kill,  # type: bool
+    ):
         # (...) -> None
         """
         Simple abstract process killer that works with signals in order to avoid reused PID race conditions
@@ -182,7 +183,9 @@ def kill_childs_mod(
     # pylint: disable=W0703
     except Exception:
         if itself:
-            os.kill(pid, 15) # 15 being signal.SIGTERM or SIGKILL depending on the platform
+            os.kill(
+                pid, 15
+            )  # 15 being signal.SIGTERM or SIGKILL depending on the platform
         return False
 
     for child in current_process.children(recursive=True):
