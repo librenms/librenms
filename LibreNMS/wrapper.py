@@ -10,7 +10,7 @@
                 Distributed poller code (c) 2015, GPLv3, Daniel Preussker <f0o@devilcode.org>
                 All code parts that belong to Daniel are enclosed in EOC comments
 
- Date:          Jul 2021
+ Date:          Sep 2021
 
  Usage:         This program accepts three command line arguments
                 - the number of threads (defaults to 1 for discovery / service, and 16 for poller)
@@ -179,7 +179,13 @@ def print_worker(print_queue, wrapper_type):  # Type: Queue  # Type: str
             else:
                 memc_touch(NODES_TAG, wrappers[wrapper_type]["memc_touch_time"])
             try:
-                worker_id, device_id, elapsed_time = print_queue.get(False)
+                (
+                    worker_id,
+                    device_id,
+                    elapsed_time,
+                    command,
+                    exit_code,
+                ) = print_queue.get(False)
             except:
                 pass
                 try:
@@ -188,7 +194,7 @@ def print_worker(print_queue, wrapper_type):  # Type: Queue  # Type: str
                     pass
                 continue
         else:
-            worker_id, device_id, elapsed_time = print_queue.get()
+            worker_id, device_id, elapsed_time, command, exit_code = print_queue.get()
         # EOC
 
         global REAL_DURATION
@@ -198,7 +204,7 @@ def print_worker(print_queue, wrapper_type):  # Type: Queue  # Type: str
         REAL_DURATION += elapsed_time
         PER_DEVICE_DURATION[device_id] = elapsed_time
         DISCOVERED_DEVICES_COUNT += 1
-        if elapsed_time < STEPPING:
+        if elapsed_time < STEPPING and exit_code in VALID_EXIT_CODES:
             logger.info(
                 "worker {} finished device {} in {} seconds".format(
                     worker_id, device_id, elapsed_time
@@ -206,10 +212,11 @@ def print_worker(print_queue, wrapper_type):  # Type: Queue  # Type: str
             )
         else:
             logger.warning(
-                "worker {} finished device {} in {} seconds".format(
-                    worker_id, device_id, elapsed_time
+                "worker {} finished device {} in {} seconds with exit code {}".format(
+                    worker_id, device_id, elapsed_time, exit_code
                 )
             )
+            logger.debug("Command was {}".format(command))
         print_queue.task_done()
 
 
@@ -289,7 +296,13 @@ def poll_worker(
 
                 elapsed_time = int(time.time() - start_time)
                 print_queue.put(
-                    [threading.current_thread().name, device_id, elapsed_time]
+                    [
+                        threading.current_thread().name,
+                        device_id,
+                        elapsed_time,
+                        command,
+                        exit_code,
+                    ]
                 )
             except (KeyboardInterrupt, SystemExit):
                 raise
