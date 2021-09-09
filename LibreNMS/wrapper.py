@@ -460,12 +460,17 @@ def wrapper(
     poll_queue = queue.Queue()
     print_queue = queue.Queue()
 
+    # Don't have more threads than workers
+    amount_of_devices = len(devices_list)
+    if amount_of_workers > amount_of_devices:
+        amount_of_workers = amount_of_devices
+
     logger.info(
         "starting the {} check at {} with {} threads for {} devices".format(
             wrapper_type,
             time.strftime("%Y-%m-%d %H:%M:%S"),
             amount_of_workers,
-            len(devices_list),
+            amount_of_devices,
         )
     )
 
