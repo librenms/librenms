@@ -528,8 +528,8 @@ def wrapper(
     total_time = int(time.time() - s_time)
 
     end_msg = "{}-wrapper checked {} devices in {} seconds with {} workers with {} errors".format(
-                wrapper_type, DISCOVERED_DEVICES_COUNT, total_time, amount_of_workers, ERRORS
-            )
+        wrapper_type, DISCOVERED_DEVICES_COUNT, total_time, amount_of_workers, ERRORS
+    )
     if ERRORS == 0:
         logger.info(end_msg)
     else:
