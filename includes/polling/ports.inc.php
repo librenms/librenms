@@ -707,9 +707,17 @@ foreach ($ports as $port) {
                     $port['update'][$oid . '_prev'] = $port[$oid];
                 }
 
-                log_event($oid . ': ' . $port[$oid] . ' -> ' . $this_port[$oid], $device, 'interface', 3, $port['port_id']);
+                if ($oid == 'ifSpeed') {
+                    $old = Number::formatSi($port[$oid], 2, 3, 'bps');
+                    $new = Number::formatSi($this_port[$oid], 2, 3, 'bps');
+                } else {
+                    $old = $port[$oid];
+                    $new = $this_port[$oid];
+                }
+
+                log_event($oid . ': ' . $old . ' -> ' . $new, $device, 'interface', 3, $port['port_id']);
                 if (Debug::isEnabled()) {
-                    d_echo($oid . ': ' . $port[$oid] . ' -> ' . $this_port[$oid] . ' ');
+                    d_echo($oid . ': ' . $old . ' -> ' . $new . ' ');
                 } else {
                     echo $oid . ' ';
                 }

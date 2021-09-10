@@ -41,7 +41,7 @@ class QueryBuilderFilter implements \JsonSerializable
 
     /**
      * QueryBuilderFilter constructor.
-     * @param string $type alert|group
+     * @param  string  $type  alert|group
      */
     public function __construct($type = 'alert')
     {
@@ -162,7 +162,7 @@ class QueryBuilderFilter implements \JsonSerializable
      * Specify data which should be serialized to JSON
      * @link https://php.net/manual/en/jsonserializable.jsonserialize.php
      * @return mixed data which can be serialized by <b>json_encode</b>,
-     * which is a value of any type other than a resource.
+     *               which is a value of any type other than a resource.
      * @since 5.4.0
      */
     public function jsonSerialize()
@@ -176,7 +176,7 @@ class QueryBuilderFilter implements \JsonSerializable
     /**
      * Get the filter for a specific item
      *
-     * @param string $id
+     * @param  string  $id
      * @return array|null
      */
     public function getFilter($id)

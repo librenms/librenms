@@ -39,7 +39,7 @@ class DeviceGroupController extends SelectController
     }
 
     /**
-     * @param DeviceGroup $device_group
+     * @param  DeviceGroup  $device_group
      */
     public function formatItem($device_group)
     {

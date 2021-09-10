@@ -17,10 +17,10 @@ use LibreNMS\Util\Rewrite;
 
 /**
  * Compare $t with the value of $vars[$v], if that exists
- * @param string $v Name of the var to test
- * @param string $t Value to compare $vars[$v] to
+ * @param  string  $v  Name of the var to test
+ * @param  string  $t  Value to compare $vars[$v] to
  * @return bool true, if values are the same, false if $vars[$v]
- * is unset or values differ
+ *              is unset or values differ
  */
 function var_eq($v, $t)
 {
@@ -34,7 +34,7 @@ function var_eq($v, $t)
 
 /**
  * Get the value of $vars[$v], if it exists
- * @param string $v Name of the var to get
+ * @param  string  $v  Name of the var to get
  * @return string|bool The value of $vars[$v] if it exists, false if it does not exist
  */
 function var_get($v)
@@ -82,7 +82,7 @@ function toner2colour($descr, $percent)
 /**
  * Find all links in some text and turn them into html links.
  *
- * @param string $text
+ * @param  string  $text
  * @return string
  */
 function linkify($text)
@@ -312,7 +312,7 @@ function generate_entity_link($type, $entity, $text = null, $graph_type = null)
 
 /**
  * Extract type and subtype from a complex graph type, also makes sure variables are file name safe.
- * @param string $type
+ * @param  string  $type
  * @return array [type, subtype]
  */
 function extract_graph_type($type): array
@@ -452,8 +452,8 @@ function generate_port_image($args)
 /**
  * Create image to output text instead of a graph.
  *
- * @param string $text
- * @param int[] $color
+ * @param  string  $text
+ * @param  int[]  $color
  */
 function graph_error($text, $color = [128, 0, 0])
 {
@@ -500,7 +500,7 @@ SVG;
 /**
  * Output message to user in image format.
  *
- * @param string $text string to display
+ * @param  string  $text  string to display
  */
 function graph_text_and_exit($text)
 {
@@ -571,7 +571,7 @@ function getlocations()
 /**
  * Get the recursive file size and count for a directory
  *
- * @param string $path
+ * @param  string  $path
  * @return array [size, file count]
  */
 function foldersize($path)
@@ -1009,7 +1009,7 @@ function array_to_htmljson($data)
 }
 
 /**
- * @param int $eventlog_severity
+ * @param  int  $eventlog_severity
  * @return string $eventlog_severity_icon
  */
 function eventlog_severity($eventlog_severity)
@@ -1032,7 +1032,7 @@ function eventlog_severity($eventlog_severity)
 
 /**
  * Get the http content type of the image
- * @param  string  $type svg or png
+ * @param  string  $type  svg or png
  * @return string
  */
 function get_image_type(string $type)
@@ -1125,7 +1125,7 @@ function get_postgres_databases($device_id)
 /**
  * Return stacked graphs information
  *
- * @param string $transparency value of desired transparency applied to rrdtool options (values 01 - 99)
+ * @param  string  $transparency  value of desired transparency applied to rrdtool options (values 01 - 99)
  * @return array containing transparency and stacked setup
  */
 function generate_stacked_graphs($transparency = '88')
@@ -1139,7 +1139,7 @@ function generate_stacked_graphs($transparency = '88')
 
 /**
  * Parse AT time spec, does not handle the entire spec.
- * @param string|int $time
+ * @param  string|int  $time
  * @return int
  */
 function parse_at_time($time)
@@ -1269,8 +1269,8 @@ function get_state_label($sensor)
 
 /**
  * Get sensor label and state color
- * @param array $sensor
- * @param string $type sensors or wireless
+ * @param  array  $sensor
+ * @param  string  $type  sensors or wireless
  * @return string
  */
 function get_sensor_label_color($sensor, $type = 'sensors')

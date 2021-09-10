@@ -60,7 +60,7 @@ class OS implements ProcessorDiscovery, OSDiscovery, MempoolsDiscovery
     /**
      * OS constructor. Not allowed to be created directly.  Use OS::make()
      *
-     * @param array $device
+     * @param  array  $device
      */
     private function __construct(&$device)
     {
@@ -101,7 +101,7 @@ class OS implements ProcessorDiscovery, OSDiscovery, MempoolsDiscovery
     /**
      * Enable a graph for this device
      *
-     * @param string $name
+     * @param  string  $name
      */
     public function enableGraph($name)
     {
@@ -135,9 +135,9 @@ class OS implements ProcessorDiscovery, OSDiscovery, MempoolsDiscovery
      * If the data is cached, return the cached data.
      * DO NOT use numeric oids with this function! The snmp result must contain only one oid.
      *
-     * @param string $oid textual oid
-     * @param string $mib mib for this oid
-     * @param string $snmpflags snmpflags for this oid
+     * @param  string  $oid  textual oid
+     * @param  string  $mib  mib for this oid
+     * @param  string  $snmpflags  snmpflags for this oid
      * @return array|null array indexed by the snmp index with the value as the data returned by snmp
      */
     public function getCacheByIndex($oid, $mib = null, $snmpflags = '-OQUs')
@@ -161,9 +161,9 @@ class OS implements ProcessorDiscovery, OSDiscovery, MempoolsDiscovery
      * If the data is cached, return the cached data.
      * DO NOT use numeric oids with this function! The snmp result must contain only one oid.
      *
-     * @param string $oid textual oid
-     * @param string $mib mib for this oid (optional)
-     * @param int $depth depth for snmpwalk_group (optional)
+     * @param  string  $oid  textual oid
+     * @param  string  $mib  mib for this oid (optional)
+     * @param  int  $depth  depth for snmpwalk_group (optional)
      * @return array|null array indexed by the snmp index with the value as the data returned by snmp
      */
     public function getCacheTable($oid, $mib = null, $depth = 1)
@@ -184,7 +184,7 @@ class OS implements ProcessorDiscovery, OSDiscovery, MempoolsDiscovery
     /**
      * Check if an OID has been cached
      *
-     * @param string $oid
+     * @param  string  $oid
      * @return bool
      */
     public function isCached($oid)
@@ -197,7 +197,7 @@ class OS implements ProcessorDiscovery, OSDiscovery, MempoolsDiscovery
      * If no specific OS is found, Try the OS group.
      * Otherwise, returns Generic
      *
-     * @param array $device device array, must have os set
+     * @param  array  $device  device array, must have os set
      * @return OS
      */
     public static function make(&$device)
@@ -242,8 +242,8 @@ class OS implements ProcessorDiscovery, OSDiscovery, MempoolsDiscovery
     /**
      * Poll a channel based OID, but return data in MHz
      *
-     * @param array $sensors
-     * @param callable $callback Function to modify the value before converting it to a frequency
+     * @param  array  $sensors
+     * @param  callable  $callback  Function to modify the value before converting it to a frequency
      * @return array
      */
     protected function pollWirelessChannelAsFrequency($sensors, $callback = null)

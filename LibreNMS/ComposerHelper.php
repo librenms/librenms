@@ -123,7 +123,7 @@ class ComposerHelper
     /**
      * Run a command or array of commands and echo the command and output
      *
-     * @param string|array $cmds
+     * @param  string|array  $cmds
      */
     private static function exec($cmds)
     {

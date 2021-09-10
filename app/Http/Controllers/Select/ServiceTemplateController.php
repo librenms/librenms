@@ -39,7 +39,7 @@ class ServiceTemplateController extends SelectController
     }
 
     /**
-     * @param ServiceTemplate $template
+     * @param  ServiceTemplate  $template
      */
     public function formatItem($template)
     {

@@ -1,0 +1,23 @@
+{
+    "os": {
+        "discovery": {
+            "devices": [
+                {
+                    "sysName": "",
+                    "sysObjectID": ".1.3.6.1.4.1.11.2.3.7.11.151",
+                    "sysDescr": "HP 1810-24G, PL.1.9, eCos-3.0, 1_12_8-customized-h",
+                    "sysContact": null,
+                    "version": "PL.1.9",
+                    "hardware": "1810-24G,",
+                    "features": null,
+                    "os": "procurve",
+                    "type": "network",
+                    "serial": null,
+                    "icon": "hpe.svg",
+                    "location": null
+                }
+            ]
+        },
+        "poller": "matches discovery"
+    }
+}

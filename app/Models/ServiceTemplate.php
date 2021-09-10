@@ -98,7 +98,7 @@ class ServiceTemplate extends BaseModel
     /**
      * Update the device template groups for the given device or device_id
      *
-     * @param Device|int $device
+     * @param  Device|int  $device
      * @return array
      */
     public static function updateServiceTemplatesForDevice($device)
@@ -145,7 +145,7 @@ class ServiceTemplate extends BaseModel
     /**
      * Update the device template groups for the given device group or device_group_id
      *
-     * @param DeviceGroup|int $deviceGroup
+     * @param  DeviceGroup|int  $deviceGroup
      * @return array
      */
     public static function updateServiceTemplatesForDeviceGroup($deviceGroup)
@@ -188,7 +188,7 @@ class ServiceTemplate extends BaseModel
     // ---- Query Scopes ----
 
     /**
-     * @param  Builder $query
+     * @param  Builder  $query
      * @return Builder
      */
     public function scopeIsDisabled($query)

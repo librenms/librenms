@@ -34,7 +34,7 @@ class FilePermissionsException extends \Exception implements UpgradeableExceptio
     /**
      * Try to convert the given Exception to a FilePermissionsException
      *
-     * @param \Exception $exception
+     * @param  \Exception  $exception
      * @return static|null
      */
     public static function upgrade($exception)
@@ -78,7 +78,7 @@ class FilePermissionsException extends \Exception implements UpgradeableExceptio
     }
 
     /**
-     * @param string $log_file
+     * @param  string  $log_file
      * @return array
      */
     private function generateCommands($log_file): array

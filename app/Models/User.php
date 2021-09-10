@@ -87,7 +87,7 @@ class User extends Authenticatable
     /**
      * Check if this user has access to a device
      *
-     * @param Device|int $device can be a device Model or device id
+     * @param  Device|int  $device  can be a device Model or device id
      * @return bool
      */
     public function canAccessDevice($device)
@@ -98,7 +98,7 @@ class User extends Authenticatable
     /**
      * Helper function to hash passwords before setting
      *
-     * @param string $password
+     * @param  string  $password
      */
     public function setPassword($password)
     {
@@ -108,7 +108,7 @@ class User extends Authenticatable
     /**
      * Check if the given user can set the password for this user
      *
-     * @param User $user
+     * @param  User  $user
      * @return bool
      */
     public function canSetPassword($user)
@@ -130,7 +130,7 @@ class User extends Authenticatable
      * This restricts the query to only users that match the current auth method
      * It is not needed when using user_id, but should be used for username and auth_id
      *
-     * @param Builder $query
+     * @param  Builder  $query
      * @return Builder
      */
     public function scopeThisAuth($query)

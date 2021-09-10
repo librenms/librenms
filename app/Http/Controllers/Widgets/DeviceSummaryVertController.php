@@ -30,7 +30,7 @@ use Illuminate\View\View;
 class DeviceSummaryVertController extends DeviceSummaryController
 {
     /**
-     * @param Request $request
+     * @param  Request  $request
      * @return View
      */
     public function getView(Request $request)

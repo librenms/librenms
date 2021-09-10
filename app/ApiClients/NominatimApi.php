@@ -36,7 +36,7 @@ class NominatimApi extends BaseApi implements Geocoder
     /**
      * Get latitude and longitude from geocode response
      *
-     * @param array $data
+     * @param  array  $data
      * @return array
      */
     protected function parseLatLng($data)
@@ -50,7 +50,7 @@ class NominatimApi extends BaseApi implements Geocoder
     /**
      * Build Guzzle request option array
      *
-     * @param string $address
+     * @param  string  $address
      * @return array
      * @throws \Exception you may throw an Exception if validation fails
      */

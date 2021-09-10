@@ -99,7 +99,7 @@ class Smokeping
                     'device' => $device,
                     'graph' => [
                         'type' => 'smokeping_' . $direction,
-                        'device' => $this->device->device_id,
+                        'device' => $this->device,
                         $remote => $device->device_id,
                     ],
                 ];

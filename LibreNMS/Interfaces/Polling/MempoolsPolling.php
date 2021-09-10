@@ -28,7 +28,7 @@ namespace LibreNMS\Interfaces\Polling;
 interface MempoolsPolling
 {
     /**
-     * @param \Illuminate\Support\Collection $mempools \App\Models\Mempool
+     * @param  \Illuminate\Support\Collection  $mempools  \App\Models\Mempool
      * @return \Illuminate\Support\Collection \App\Models\Mempool
      */
     public function pollMempools($mempools);

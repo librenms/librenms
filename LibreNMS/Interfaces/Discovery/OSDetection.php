@@ -33,7 +33,7 @@ interface OSDetection
      * $device->sysObjectID and $device->sysDescr will be pre-populated
      * Please avoid additional snmp queries if possible
      *
-     * @param Device $device
+     * @param  Device  $device
      * @return bool
      */
     public static function detectOS(Device $device): bool;

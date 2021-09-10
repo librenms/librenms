@@ -16,7 +16,7 @@
             <tr>
                 <td>
                     @if ($vm->parentDevice)
-                        @deviceLink($vm->parentDevice)
+                        <x-device-link :device="$vm->parentDevice" />
                     @else
                         {{ $vm->vmwVmDisplayName }}
                     @endif
