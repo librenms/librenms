@@ -46,6 +46,7 @@ trait SyncsModels
             if ($models->offsetExists($exist_key)) {
                 // update
                 $exist_value->fill($models->get($exist_key)->getAttributes())->save();
+                if ($exist_value->trashed()) $exist_value->restore();
             } else {
                 // delete
                 $exist_value->delete();

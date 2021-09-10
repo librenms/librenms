@@ -66,11 +66,10 @@ class Wireless implements Module
                 return $item->getCompositeKey();
             });
 
+            // Sync models. In a situation where controller is changed, update existing APs
+            // TODO: Restore soft-deleted AP if found again!
             ModuleModelObserver::observe('\App\Models\AccessPoint');
             $this->syncModels($os->getDevice(), 'accessPoints', $access_points);
-
-            // Cleanup duplicates? 
-            // Can there be any even after failover since the syncmodels hashes by mac+radioid?
 
             // RRD
             // TODO
