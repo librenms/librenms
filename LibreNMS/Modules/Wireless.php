@@ -1,4 +1,26 @@
 <?php
+/**
+ * Wireless.php
+ *
+ * -Description-
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ *
+ * @link       http://librenms.org
+ * @copyright  2021 Otto Reinikainen
+ * @author     Otto Reinikainen <otto@ottorei.fi>
+ */
 
 namespace LibreNMS\Modules;
 use App\Models\AccessPoint;
@@ -36,57 +58,22 @@ class Wireless implements Module
         if ($os instanceof WirelessAccessPointPolling) {
             echo "\nWireless Access Points: ";
 
-            // Initialize empty collections
-            $newCollection = new Collection;
-            $offline_access_points = new Collection;
+            // Initialize empty collection
+            $access_points = new Collection;
 
             // Get APs from controller
             $access_points = $os->pollWirelessAccessPoints()->keyBy(function ($item) {
                 return $item->getCompositeKey();
             });
 
-            echo "\nCollection from controller: ";
-            //d_echo($access_points);
-
-            // Get existing APs from the DB
-            $db_access_points = AccessPoint::where(['device_id' => $os->getDeviceId()])->get();
-
-            if($db_access_points->isNotEmpty()) {
-                $db_access_points = $db_access_points->keyBy(function ($item) {
-                    return $item->getCompositeKey();
-                });
-
-                echo "\nCollection from DB: ";
-                d_echo($db_access_points);
-    
-                // Get a collection of possibly offline APs
-                $offline_access_points = $db_access_points->intersect($access_points);
-                echo "\nIntersect: ";
-                d_echo($offline_access_points);
-                
-                // Mark possibly offline APs as deleted
-                foreach ($offline_access_points as $offline_ap) {
-                    $offline_ap->setOffline();
-                }
-            }
-
-            // Create a new collection with updated data, syncmodels
-            $newCollection = $access_points->concat($offline_access_points);
-            //d_echo($newCollection);
-
-/*          This errors:
-            Call to a member function getCompositeKey() on null 
-            {"exception":"[object] (Error(code: 0): 
-                Call to a member function getCompositeKey() on null at /opt/librenms/LibreNMS/DB/SyncsModels.php:43)"}
-
- */
             ModuleModelObserver::observe('\App\Models\AccessPoint');
-            $this->syncModels($os->getDevice(), 'accessPoints', $newCollection);
+            $this->syncModels($os->getDevice(), 'accessPoints', $access_points);
 
             // Cleanup duplicates? 
             // Can there be any even after failover since the syncmodels hashes by mac+radioid?
 
             // RRD
+            // TODO
 
             echo PHP_EOL;
         }

@@ -238,7 +238,6 @@ class Arubaos extends OS implements
                     'radio_number' => $radio_id,
                     'type' => $wlsxWlanRadioTable[$ap]['wlanAPRadioType'][$radio_id],
                     'mac_addr' => $ap,
-                    'deleted' => 0,
                     'channel' => $wlsxWlanRadioTable[$ap]['wlanAPRadioChannel'][$radio_id],
                     'txpow' => $wlsxWlanRadioTable[$ap]['wlanAPRadioUtilization'][$radio_id] / 2,
                     'radioutil' => $wlsxWlanRadioTable[$ap]['wlanAPRadioUtilization'][$radio_id],

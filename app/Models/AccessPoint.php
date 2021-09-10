@@ -4,10 +4,12 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use LibreNMS\Interfaces\Models\Keyable;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class AccessPoint extends DeviceRelatedModel implements Keyable
 {
     use HasFactory;
+    use SoftDeletes;
 
     public $primaryKey = 'accesspoint_id';
     public $timestamps = false;
@@ -18,7 +20,6 @@ class AccessPoint extends DeviceRelatedModel implements Keyable
         'radio_number',
         'type',
         'mac_addr',
-        'deleted',
         'channel',
         'txpow',
         'radioutil',
@@ -34,9 +35,4 @@ class AccessPoint extends DeviceRelatedModel implements Keyable
         return "$this->mac_addr-$this->radio_number";
     }
 
-    public function setOffline()
-    {
-        // Todo: implement Laravel's soft-delete
-        $this->deleted = 1;
-    }
 }
