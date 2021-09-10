@@ -234,8 +234,8 @@ class Arubaos extends OS implements
         }
         
         return [
-            'wlsxSwitchTotalNumAccessPoints' => $switchCounterData[0]['wlsxSwitchTotalNumAccessPoints'] ?? 0,
-            'wlsxSwitchTotalNumStationsAssociated' => $switchCounterData[0]['wlsxSwitchTotalNumStationsAssociated'] ?? 0,
+            'NUMAPS' => $switchCounterData[0]['wlsxSwitchTotalNumAccessPoints'] ?? 0,
+            'NUMCLIENTS' => $switchCounterData[0]['wlsxSwitchTotalNumStationsAssociated'] ?? 0,
         ];
     }
 
