@@ -221,15 +221,36 @@ class Arubaos extends OS implements
         return $this->pollWirelessChannelAsFrequency($sensors, [$this, 'decodeChannel']);
     }
 
+    public function pollSwitchCounters()
+    {
+        $switchCounterData = [];
+        $switch_counter_oids = [
+            'wlsxSwitchTotalNumAccessPoints.0',
+            'wlsxSwitchTotalNumStationsAssociated.0',
+        ];
+
+        foreach($switch_counter_oids as $oid) {
+            $switchCounterData = snmpwalk_cache_oid($this->getDeviceArray(), $oid, $switchCounterData, 'WLSX-SWITCH-MIB');
+        }
+        
+        return [
+            'wlsxSwitchTotalNumAccessPoints' => $switchCounterData[0]['wlsxSwitchTotalNumAccessPoints'] ?? 0,
+            'wlsxSwitchTotalNumStationsAssociated' => $switchCounterData[0]['wlsxSwitchTotalNumStationsAssociated'] ?? 0,
+        ];
+    }
+
+    /**
+     * Poll wireless access points data from the controller
+     * The returned array should be sensor_id => value pairs
+     *
+     */
     public function pollWirelessAccessPoints()
     {
-        // Poll data from device. Array format: $table[mac-of-ap][oid][radio number]
+        $access_points = new Collection;
         $wlsxWlanRadioTable = snmpwalk_group($this->getDeviceArray(), 'WLSX-WLAN-MIB::wlsxWlanRadioTable', 1);
         $wlsxWlanAPChStatsTable = snmpwalk_group($this->getDeviceArray(), 'WLSX-WLAN-MIB::wlsxWlanAPChStatsTable', 1);
 
-        $access_points = new Collection;
-
-        // Loop through polled data
+        // Loop through the polled data. Array format: $table[mac-of-ap][oid][radio number]
         foreach($wlsxWlanRadioTable as $ap => $val1) {
             foreach($wlsxWlanRadioTable[$ap]['wlanAPRadioAPName'] as $radio_id => $val2) {
                 $attributes = [
@@ -247,17 +268,12 @@ class Arubaos extends OS implements
                     'nummonbssid' => $wlsxWlanRadioTable[$ap]['wlanAPRadioNumMonitoredBSSIDs'][$radio_id],
                     'interference' => $wlsxWlanAPChStatsTable[$ap]['wlanAPChInterferenceIndex'][$radio_id],
                 ];
-                
-                //d_echo($attributes);
 
-                // Update RRD
-
-                // Create AccessPoints models
+                // Create AccessPoint models
                 $access_points->push(new AccessPoint($attributes));
-
-                // Cleanup duplicate entries from other controllers
             }
         }
+        // Return the collection of accesspoints
         return $access_points;
     }
 
