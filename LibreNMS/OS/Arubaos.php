@@ -51,7 +51,8 @@ class Arubaos extends OS implements
     WirelessNoiseFloorDiscovery,
     WirelessPowerDiscovery,
     WirelessUtilizationDiscovery,
-    WirelessAccessPointPolling
+    WirelessAccessPointPolling,
+    WirelessCountersPolling
 {
     public function discoverOS(Device $device): void
     {
@@ -221,7 +222,7 @@ class Arubaos extends OS implements
         return $this->pollWirelessChannelAsFrequency($sensors, [$this, 'decodeChannel']);
     }
 
-    public function pollSwitchCounters()
+    public function pollWirelessCounters()
     {
         $switchCounterData = [];
         $switch_counter_oids = [

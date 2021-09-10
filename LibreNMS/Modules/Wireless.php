@@ -56,9 +56,7 @@ class Wireless implements Module
     public function poll(OS $os)
     {
         if ($os instanceof WirelessAccessPointPolling) {
-            echo "\nWireless Access Points: ";
-
-            // Initialize empty collection
+            echo "\nPoll Wireless Access Points: ";
             $access_points = new Collection;
 
             // Get APs from controller
@@ -66,13 +64,46 @@ class Wireless implements Module
                 return $item->getCompositeKey();
             });
 
+            // Update counters
+            $os->discoverWirelessApCount();
+            // clients?
+
             // Sync models. In a situation where controller is changed, update existing APs
-            // TODO: Restore soft-deleted AP if found again!
+            // TODO: Restore soft-deleted AP if found again
             ModuleModelObserver::observe('\App\Models\AccessPoint');
             $this->syncModels($os->getDevice(), 'accessPoints', $access_points);
 
-            // RRD
-            // TODO
+            // TODO: Update RRDs
+
+/*             $rrd_name = ['arubaap',  $name . $radionum];
+
+            $rrd_def = RrdDefinition::make()
+                ->addDataset('channel', 'GAUGE', 0, 200)
+                ->addDataset('txpow', 'GAUGE', 0, 200)
+                ->addDataset('radioutil', 'GAUGE', 0, 100)
+                ->addDataset('nummonclients', 'GAUGE', 0, 500)
+                ->addDataset('nummonbssid', 'GAUGE', 0, 200)
+                ->addDataset('numasoclients', 'GAUGE', 0, 500)
+                ->addDataset('interference', 'GAUGE', 0, 2000);
+
+            $fields = [
+                'channel'         => $channel,
+                'txpow'           => $txpow,
+                'radioutil'       => $radioutil,
+                'nummonclients'   => $nummonclients,
+                'nummonbssid'     => $nummonbssid,
+                'numasoclients'   => $numasoclients,
+                'interference'    => $interference,
+            ];
+
+            $tags = [
+                'name' => $name,
+                'radionum' => $radionum,
+                'rrd_name' => $rrd_name,
+                'rrd_def' => $rrd_def,
+            ];
+
+            data_update($device, 'aruba', $tags, $fields); */
 
             echo PHP_EOL;
         }
