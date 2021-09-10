@@ -44,9 +44,11 @@ trait SyncsModels
 
         foreach ($existing as $exist_key => $exist_value) {
             if ($models->offsetExists($exist_key)) {
-                // update
+                // update or restore soft-deleted model
+                if ($exist_value->trashed()) {
+                    $exist_value->restore();
+                }
                 $exist_value->fill($models->get($exist_key)->getAttributes())->save();
-                if ($exist_value->trashed()) $exist_value->restore();
             } else {
                 // delete
                 $exist_value->delete();
