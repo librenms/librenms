@@ -41,6 +41,7 @@ class LocationController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @param  Location  $location
      * @return \Illuminate\Http\JsonResponse
+     *
      * @throws \Illuminate\Auth\Access\AuthorizationException
      */
     public function update(Request $request, Location $location)
@@ -64,6 +65,7 @@ class LocationController extends Controller
      *
      * @param  Location  $location
      * @return \Illuminate\Http\JsonResponse
+     *
      * @throws \Exception
      */
     public function destroy(Request $request, Location $location)

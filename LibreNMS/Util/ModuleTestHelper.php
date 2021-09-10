@@ -18,6 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2017 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -68,9 +69,11 @@ class ModuleTestHelper
 
     /**
      * ModuleTester constructor.
+     *
      * @param  array|string  $modules
      * @param  string  $os
      * @param  string  $variant
+     *
      * @throws InvalidModuleException
      */
     public function __construct($modules, $os, $variant = '')
@@ -248,6 +251,7 @@ class ModuleTestHelper
      *
      * @param  array  $modules
      * @return array
+     *
      * @throws InvalidModuleException
      */
     public static function findOsWithData($modules = [])
@@ -319,6 +323,7 @@ class ModuleTestHelper
      *
      * @param  array  $modules
      * @return array
+     *
      * @throws InvalidModuleException
      */
     private static function resolveModuleDependencies($modules)
@@ -515,6 +520,7 @@ class ModuleTestHelper
      * @param  Snmpsim  $snmpsim
      * @param  bool  $no_save
      * @return array|null
+     *
      * @throws FileNotFoundException
      */
     public function generateTestData(Snmpsim $snmpsim, $no_save = false)

@@ -18,6 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2019 Vitali Kari
  * @author     Vitali Kari <vitali.kari@gmail.com>
  */

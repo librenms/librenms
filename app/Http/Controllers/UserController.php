@@ -18,6 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -47,6 +48,7 @@ class UserController extends Controller
      * Display a listing of the resource.
      *
      * @return \Illuminate\View\View
+     *
      * @throws \Illuminate\Auth\Access\AuthorizationException
      */
     public function index()
@@ -63,6 +65,7 @@ class UserController extends Controller
      * Show the form for creating a new resource.
      *
      * @return \Illuminate\View\View
+     *
      * @throws \Illuminate\Auth\Access\AuthorizationException
      */
     public function create()
@@ -113,6 +116,7 @@ class UserController extends Controller
      *
      * @param  User  $user
      * @return string
+     *
      * @throws \Illuminate\Auth\Access\AuthorizationException
      */
     public function show(User $user)
@@ -127,6 +131,7 @@ class UserController extends Controller
      *
      * @param  User  $user
      * @return \Illuminate\View\View
+     *
      * @throws \Illuminate\Auth\Access\AuthorizationException
      */
     public function edit(User $user)
@@ -189,6 +194,7 @@ class UserController extends Controller
      *
      * @param  User  $user
      * @return \Illuminate\Http\JsonResponse
+     *
      * @throws \Illuminate\Auth\Access\AuthorizationException
      */
     public function destroy(User $user)

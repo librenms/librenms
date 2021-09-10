@@ -18,6 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2017 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -124,6 +125,7 @@ class WirelessSensor extends Sensor
      *  'unit'  - units used by this class 'dBm' for example
      *  'icon'  - font awesome icon used by this class
      * )
+     *
      * @param  bool  $valid  filter this list by valid types in the database
      * @param  int  $device_id  when filtering, only return types valid for this device_id
      * @return array

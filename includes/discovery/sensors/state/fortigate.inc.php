@@ -18,6 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2020 Net Entertainment AB
  * @author     Patrik Jonsson <patrik.jonsson@gmail.com>
  */

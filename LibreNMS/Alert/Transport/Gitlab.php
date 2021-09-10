@@ -15,6 +15,7 @@
 
 /**
  * GitLab API Transport
+ *
  * @author Drew Hynes <drew.hynes@gmail.com>
  * @copyright 2018 Drew Hynes, LibreNMS
  * @license GPL

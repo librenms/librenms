@@ -18,6 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -61,6 +62,7 @@ class Datastore
 
     /**
      * Datastore constructor.
+     *
      * @param  array  $datastores  Implement DatastoreInterface
      */
     public function __construct($datastores)

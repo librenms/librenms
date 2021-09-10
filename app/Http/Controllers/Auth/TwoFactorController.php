@@ -18,6 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -150,6 +151,7 @@ class TwoFactorController extends Controller
      * @param  User  $user
      * @param  int  $token
      * @return true
+     *
      * @throws AuthenticationException
      */
     private function checkToken($user, $token)
