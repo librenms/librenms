@@ -65,8 +65,7 @@ class Wireless implements Module
             });
 
             // Update counters
-            $os->discoverWirelessApCount();
-            // clients?
+            $wireless_counters = $os->pollWirelessCounters();
 
             // Sync models. In a situation where controller is changed, update existing APs
             // TODO: Restore soft-deleted AP if found again
@@ -108,6 +107,7 @@ class Wireless implements Module
             echo PHP_EOL;
         }
     }
+
 
     /**
      * Remove all DB data for this module.
