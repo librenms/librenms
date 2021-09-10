@@ -28,6 +28,7 @@ Debug::set($_REQUEST['debug']);
 
 /**
  * Levenshtein Sort
+ *
  * @param  string  $base  Comparison basis
  * @param  array  $obj  Object to sort
  * @return array

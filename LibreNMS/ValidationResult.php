@@ -18,6 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2017 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -39,6 +40,7 @@ class ValidationResult
 
     /**
      * ValidationResult constructor.
+     *
      * @param  string  $message  The message to describe this result
      * @param  int  $status  The status of this result FAILURE, WARNING, or SUCCESS
      * @param  string  $fix  a suggested fix to highlight for the user
@@ -52,6 +54,7 @@ class ValidationResult
 
     /**
      * Create a new ok Validation result
+     *
      * @param  string  $message  The message to describe this result
      * @param  string  $fix  a suggested fix to highlight for the user
      * @return ValidationResult
@@ -63,6 +66,7 @@ class ValidationResult
 
     /**
      * Create a new warning Validation result
+     *
      * @param  string  $message  The message to describe this result
      * @param  string  $fix  a suggested fix to highlight for the user
      * @return ValidationResult
@@ -74,6 +78,7 @@ class ValidationResult
 
     /**
      * Create a new informational Validation result
+     *
      * @param  string  $message  The message to describe this result
      * @return ValidationResult
      */
@@ -84,6 +89,7 @@ class ValidationResult
 
     /**
      * Create a new failure Validation result
+     *
      * @param  string  $message  The message to describe this result
      * @param  string  $fix  a suggested fix to highlight for the user
      * @return ValidationResult

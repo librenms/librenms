@@ -1184,6 +1184,7 @@ function add_cbgp_peer($device, $peer, $afi, $safi)
 
 /**
  * check if we should skip this sensor from discovery
+ *
  * @param $device
  * @param  string  $sensor_class
  * @param  string  $sensor_descr
@@ -1210,6 +1211,7 @@ function can_skip_sensor($device, $sensor_class = '', $sensor_descr = '')
 
 /**
  * check if we should skip this device from discovery
+ *
  * @param  string  $sysName
  * @param  string  $sysDescr
  * @param  string  $platform

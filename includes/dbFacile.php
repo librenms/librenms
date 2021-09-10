@@ -39,6 +39,7 @@ function dbIsConnected()
  * @param  string  $db_port
  * @param  string  $db_socket
  * @return \Illuminate\Database\Connection
+ *
  * @throws DatabaseConnectException
  */
 function dbConnect($db_host = null, $db_user = '', $db_pass = '', $db_name = '', $db_port = null, $db_socket = null)
@@ -81,6 +82,7 @@ function dbConnect($db_host = null, $db_user = '', $db_pass = '', $db_name = '',
 
 /**
  * Performs a query using the given string.
+ *
  * @param  string  $sql
  * @param  array  $parameters
  * @return bool if query was successful or not

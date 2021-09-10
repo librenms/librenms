@@ -20,6 +20,7 @@
  * Trap sent when a Juniper transciever lambda reaches an alert level threshold.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2018 KanREN, Inc.
  * @author     Heath Barnhart <hbarnhart@kanren.net>
  */

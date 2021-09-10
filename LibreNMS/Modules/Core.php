@@ -36,6 +36,7 @@ class Core
      * @param  array  $device  device to check
      * @param  bool  $fetch  fetch sysDescr and sysObjectID fresh from the device
      * @return string the name of the os
+     *
      * @throws \Exception
      */
     public static function detectOS($device, $fetch = true)
