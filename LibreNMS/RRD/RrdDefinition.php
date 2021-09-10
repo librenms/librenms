@@ -18,6 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2017 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -111,6 +112,7 @@ class RrdDefinition
      *
      * @param  string  $type
      * @return mixed
+     *
      * @throws InvalidRrdTypeException
      */
     private function checkType($type)

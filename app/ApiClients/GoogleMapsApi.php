@@ -18,6 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -68,6 +69,7 @@ class GoogleMapsApi extends BaseApi implements Geocoder
      *
      * @param  string  $address
      * @return array
+     *
      * @throws \Exception you may throw an Exception if validation fails
      */
     protected function buildGeocodingOptions($address)
@@ -91,6 +93,7 @@ class GoogleMapsApi extends BaseApi implements Geocoder
      * @param  \Psr\Http\Message\ResponseInterface  $response
      * @param  array  $data  decoded response data
      * @return bool
+     *
      * @throws Exception you may throw an Exception if validation fails
      */
     protected function checkResponse($response, $data)

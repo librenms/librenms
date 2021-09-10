@@ -18,6 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -73,6 +74,7 @@ class Eloquent
 
     /**
      * Set the strict mode for the current connection (will not persist)
+     *
      * @param  bool  $strict
      */
     public static function setStrictMode($strict = true)

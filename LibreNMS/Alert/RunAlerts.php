@@ -41,6 +41,7 @@ class RunAlerts
 {
     /**
      * Populate variables
+     *
      * @param  string  $txt  Text with variables
      * @param  bool  $wrap  Wrap variable for text-usage (default: true)
      * @return string
@@ -76,6 +77,7 @@ class RunAlerts
 
     /**
      * Describe Alert
+     *
      * @param  array  $alert  Alert-Result from DB
      * @return array|bool|string
      */
@@ -196,6 +198,7 @@ class RunAlerts
 
     /**
      * Format Elapsed Time
+     *
      * @param  int  $secs  Seconds elapsed
      * @return string
      */
@@ -236,6 +239,7 @@ class RunAlerts
 
     /**
      * Re-Validate Rule-Mappings
+     *
      * @param  int  $device_id  Device-ID
      * @param  int  $rule  Rule-ID
      * @return bool
@@ -258,6 +262,7 @@ class RunAlerts
 
     /**
      * Issue Alert-Object
+     *
      * @param  array  $alert
      * @return bool
      */
@@ -285,6 +290,7 @@ class RunAlerts
 
     /**
      * Issue ACK notification
+     *
      * @return void
      */
     public function runAcks()
@@ -297,6 +303,7 @@ class RunAlerts
 
     /**
      * Run Follow-Up alerts
+     *
      * @return void
      */
     public function runFollowUp()
@@ -381,6 +388,7 @@ class RunAlerts
 
     /**
      * Run all alerts
+     *
      * @return void
      */
     public function runAlerts()
@@ -488,6 +496,7 @@ class RunAlerts
 
     /**
      * Run external transports
+     *
      * @param  array  $obj  Alert-Array
      * @return void
      */
@@ -576,6 +585,7 @@ class RunAlerts
     /**
      * Check if a device's all parent are down
      * Returns true if all parents are down
+     *
      * @param  int  $device  Device-ID
      * @return bool
      */

@@ -18,6 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2019 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -59,10 +60,9 @@ abstract class LnmsCommand extends Command
      * @param  int|null  $mode  The argument mode: InputArgument::REQUIRED or InputArgument::OPTIONAL
      * @param  string  $description  A description text
      * @param  string|string[]|null  $default  The default value (for InputArgument::OPTIONAL mode only)
+     * @return $this
      *
      * @throws InvalidArgumentException When argument mode is not valid
-     *
-     * @return $this
      */
     public function addArgument($name, $mode = null, $description = null, $default = null)
     {
@@ -85,10 +85,9 @@ abstract class LnmsCommand extends Command
      * @param  int|null  $mode  The option mode: One of the InputOption::VALUE_* constants
      * @param  string  $description  A description text
      * @param  string|string[]|int|bool|null  $default  The default value (must be null for InputOption::VALUE_NONE)
+     * @return $this
      *
      * @throws InvalidArgumentException If option mode is invalid or incompatible
-     *
-     * @return $this
      */
     public function addOption($name, $shortcut = null, $mode = null, $description = null, $default = null)
     {

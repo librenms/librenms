@@ -18,6 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2019 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -158,6 +159,7 @@ class DeviceController extends TableController
 
     /**
      * Get the device up/down status
+     *
      * @param  Device  $device
      * @return string
      */
@@ -174,6 +176,7 @@ class DeviceController extends TableController
 
     /**
      * Get the status label class
+     *
      * @param  Device  $device
      * @return string
      */

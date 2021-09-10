@@ -18,6 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -187,6 +188,7 @@ class Rrd extends BaseDatastore
      * Where $options is an array, each entry which is not a number is replaced with "U"
      *
      * @internal
+     *
      * @param  string  $filename
      * @param  array  $data
      * @return array|string
@@ -351,10 +353,12 @@ class Rrd extends BaseDatastore
      * Generates and pipes a command to rrdtool
      *
      * @internal
+     *
      * @param  string  $command  create, update, updatev, graph, graphv, dump, restore, fetch, tune, first, last, lastupdate, info, resize, xport, flushcached
      * @param  string  $filename  The full patth to the rrd file
      * @param  string  $options  rrdtool command options
      * @return array the output of stdout and stderr in an array
+     *
      * @throws \Exception thrown when the rrdtool process(s) cannot be started
      */
     private function command($command, $filename, $options)
@@ -410,10 +414,12 @@ class Rrd extends BaseDatastore
      * Determines if --daemon and -O should be used
      *
      * @internal
+     *
      * @param  string  $command  The base rrdtool command.  Usually create, update, last.
      * @param  string  $filename  The full path to the rrd file
      * @param  string  $options  Options for the command possibly including the rrd definition
      * @return string returns a full command ready to be piped to rrdtool
+     *
      * @throws FileExistsException if rrdtool <1.4.3 and the rrd file exists locally
      */
     public function buildCommand($command, $filename, $options)
@@ -529,6 +535,7 @@ class Rrd extends BaseDatastore
 
     /**
      * Remove RRD file(s).  Use with care as this permanently deletes rrd data.
+     *
      * @param  string  $hostname  rrd subfolder (hostname)
      * @param  string  $prefix  start of rrd file name all files matching will be deleted
      */
@@ -551,6 +558,7 @@ class Rrd extends BaseDatastore
      *
      * @param  string  $options
      * @return string
+     *
      * @throws \LibreNMS\Exceptions\FileExistsException
      * @throws \LibreNMS\Exceptions\RrdGraphException
      */

@@ -18,6 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2017 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -79,6 +80,7 @@ class OSModulesTest extends DBTestCase
      *
      * @group os
      * @dataProvider dumpedDataProvider
+     *
      * @param  string  $os  base os
      * @param  string  $variant  optional variant
      * @param  array  $modules  modules to test for this os

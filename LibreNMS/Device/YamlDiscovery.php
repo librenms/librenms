@@ -18,6 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2017 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -379,6 +380,7 @@ class YamlDiscovery
      * @param  string  $mib
      * @param  string|null  $mibdir
      * @return string numeric oid
+     *
      * @throws \LibreNMS\Exceptions\InvalidOidException
      */
     public static function oidToNumeric($oid, $device = null, $mib = 'ALL', $mibdir = null)

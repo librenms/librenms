@@ -18,6 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2017 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -66,6 +67,7 @@ class Config
 
     /**
      * Reload the config from files/db
+     *
      * @return mixed
      */
     public static function reload()
@@ -105,6 +107,7 @@ class Config
 
     /**
      * Load the user config from config.php
+     *
      * @param  array  $config  (this should be self::$config)
      */
     private static function loadUserConfigFile(&$config)
@@ -316,6 +319,7 @@ class Config
 
     /**
      * Get the full configuration array
+     *
      * @return array
      */
     public static function getAll()
