@@ -13,6 +13,7 @@ abstract class Transport implements TransportInterface
 
     /**
      * Transport constructor.
+     *
      * @param  null  $transport_id
      */
     public function __construct($transport_id = null)
@@ -44,6 +45,7 @@ abstract class Transport implements TransportInterface
 
     /**
      * Get the hex color string for a particular state
+     *
      * @param  int  $state  State code from alert
      * @return string Hex color, default to #337AB7 blue if state unrecognised
      */

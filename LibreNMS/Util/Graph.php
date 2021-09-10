@@ -18,6 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -36,6 +37,7 @@ class Graph
 
     /**
      * Get an array of all graph subtypes for the given type
+     *
      * @param  string  $type
      * @param  Device  $device
      * @return array

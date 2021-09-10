@@ -571,6 +571,7 @@ function object_is_cached($section, $obj)
  * Checks if config allows us to ping this device
  * $attribs contains an array of all of this devices
  * attributes
+ *
  * @param  array  $attribs  Device attributes
  * @return bool
  **/
@@ -592,6 +593,7 @@ function search_phrase_column($c)
 
 /**
  * Constructs the path to an RRD for the Ceph application
+ *
  * @param  string  $gtype  The type of rrd we're looking for
  * @return string
  **/
@@ -611,6 +613,7 @@ function ceph_rrd($gtype)
 
 /**
  * Parse location field for coordinates
+ *
  * @param string location The location field to look for coords in.
  * @return array|bool Containing the lat and lng coords
  **/
@@ -626,6 +629,7 @@ function parse_location($location)
 
 /**
  * Returns version info
+ *
  * @param  bool  $remote  fetch remote version info from github
  * @return array
  */
@@ -685,6 +689,7 @@ function snmpv3_capabilities(): array
 
 /**
  * Convert a MySQL binary v4 (4-byte) or v6 (16-byte) IP address to a printable string.
+ *
  * @param  string  $ip  A binary string containing an IP address, as returned from MySQL's INET6_ATON function
  * @return string Empty if not valid.
  */
@@ -701,6 +706,7 @@ function inet6_ntop($ip)
 
 /**
  * If hostname is an ip, use return sysName
+ *
  * @param  array  $device  (uses hostname and sysName fields)
  * @param  string  $hostname
  * @return string
@@ -728,6 +734,7 @@ function format_hostname($device, $hostname = null)
 
 /**
  * Return valid port association modes
+ *
  * @return array
  */
 function get_port_assoc_modes()
@@ -742,6 +749,7 @@ function get_port_assoc_modes()
 
 /**
  * Get DB id of given port association mode name
+ *
  * @param  string  $port_assoc_mode
  * @return int
  */
@@ -754,6 +762,7 @@ function get_port_assoc_mode_id($port_assoc_mode)
 
 /**
  * Get name of given port association_mode ID
+ *
  * @param  int  $port_assoc_mode_id  Port association mode ID
  * @return bool
  */
@@ -768,6 +777,7 @@ function get_port_assoc_mode_name($port_assoc_mode_id)
  * Query all ports of the given device (by ID) and build port array and
  * port association maps for ifIndex, ifName, ifDescr. Query port stats
  * if told to do so, too.
+ *
  * @param  int  $device_id  ID of device to query ports for
  * @param  bool  $with_statistics  Query port statistics, too. (optional, default false)
  * @return array
@@ -809,6 +819,7 @@ function get_ports_mapped($device_id, $with_statistics = false)
 
 /**
  * Calculate port_id of given port using given devices port information and port association mode
+ *
  * @param  array  $ports_mapped  Port information of device queried by get_ports_mapped()
  * @param  array  $port  Port information as fetched from DB
  * @param  string  $port_association_mode  Port association mode to use for mapping
@@ -837,6 +848,7 @@ function get_port_id($ports_mapped, $port, $port_association_mode)
 
 /**
  * Create a glue-chain
+ *
  * @param  array  $tables  Initial Tables to construct glue-chain
  * @param  string  $target  Glue to find (usual device_id)
  * @param  int  $x  Recursion Anchor

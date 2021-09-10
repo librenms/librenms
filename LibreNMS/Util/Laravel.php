@@ -18,6 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -77,6 +78,7 @@ class Laravel
     /**
      * Check if running in the command line.
      * Safe for code without Laravel running and in Laravel console application.
+     *
      * @return bool
      */
     public static function isCli(): bool

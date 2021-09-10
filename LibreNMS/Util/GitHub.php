@@ -19,6 +19,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2018 Neil Lathwood
  * @author     Neil Lathwood <gh+n@laf.io>
  */
@@ -308,6 +309,7 @@ GRAPHQL;
 
     /**
      * Create a markdown list of users and link their github profile
+     *
      * @param  array  $users
      * @return string
      */
@@ -351,6 +353,7 @@ GRAPHQL;
 
     /**
      * @return bool
+     *
      * @throws Exception
      */
     public function createRelease()
@@ -376,7 +379,9 @@ GRAPHQL;
 
     /**
      * Function to control the creation of creating a change log.
+     *
      * @param  bool  $write
+     *
      * @throws Exception
      */
     public function createChangelog($write = true)

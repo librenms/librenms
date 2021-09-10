@@ -12,6 +12,7 @@ interface Authorizer
      *
      * @param  array  $credentials
      * @return true throws an Exception on failure
+     *
      * @throws AuthenticationException thrown if the username or password is invalid
      */
     public function authenticate($credentials);

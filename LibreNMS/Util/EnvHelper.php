@@ -18,6 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2020 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -38,6 +39,7 @@ class EnvHelper
      * @param  array  $unset  Remove the given KEYS from the config
      * @param  string  $file
      * @return string
+     *
      * @throws \LibreNMS\Exceptions\FileWriteFailedException
      */
     public static function writeEnv($settings, $unset = [], $file = '.env')
@@ -107,6 +109,7 @@ class EnvHelper
      * Copy the example .env file and set APP_KEY
      *
      * @return bool|string
+     *
      * @throws \LibreNMS\Exceptions\FileWriteFailedException
      */
     public static function init()
