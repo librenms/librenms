@@ -60,7 +60,7 @@ class Wireless implements Module
             echo "\nPoll Wireless Access Points: ";
             $access_points = new Collection;
 
-            // Get APs from controller. Uniquely identify by CompositeKey (mac+radionumber)
+            // Get APs from controller. Uniquely identify by CompositeKey (apmac+radionumber)
             // Each logical unit has it's own record
             $access_points = $os->pollWirelessAccessPoints()->keyBy(function ($item) {
                 return $item->getCompositeKey();
@@ -112,6 +112,7 @@ class Wireless implements Module
                 ->addDataset('NUMAPS', 'GAUGE', 0, 12500000000)
                 ->addDataset('NUMCLIENTS', 'GAUGE', 0, 12500000000);
 
+            // Calculate the number of physical units (keyby mac)
             $fields = [
                 'NUMAPS'     => $access_points->keyBy('mac')->count() ?? 0,
                 'NUMCLIENTS' => $total_clients ?? 0,
@@ -124,6 +125,7 @@ class Wireless implements Module
             // Create WirelessSensor for total counters and save them to the DB
             // TODO ...
 
+            
             echo PHP_EOL;
         }
     }
