@@ -51,8 +51,7 @@ class Arubaos extends OS implements
     WirelessNoiseFloorDiscovery,
     WirelessPowerDiscovery,
     WirelessUtilizationDiscovery,
-    WirelessAccessPointPolling,
-    WirelessCountersPolling
+    WirelessAccessPointPolling
 {
     public function discoverOS(Device $device): void
     {
@@ -222,28 +221,27 @@ class Arubaos extends OS implements
         return $this->pollWirelessChannelAsFrequency($sensors, [$this, 'decodeChannel']);
     }
 
-    public function pollWirelessCounters()
+    public function getDatastoreMeasurementName()
     {
-        $switchCounterData = [];
-        $switch_counter_oids = [
-            'wlsxSwitchTotalNumAccessPoints.0',
-            'wlsxSwitchTotalNumStationsAssociated.0',
-        ];
+        // Datastore measurement name
+        return 'aruba';
+    }
 
-        foreach($switch_counter_oids as $oid) {
-            $switchCounterData = snmpwalk_cache_oid($this->getDeviceArray(), $oid, $switchCounterData, 'WLSX-SWITCH-MIB');
-        }
-        
-        return [
-            'NUMAPS' => $switchCounterData[0]['wlsxSwitchTotalNumAccessPoints'] ?? 0,
-            'NUMCLIENTS' => $switchCounterData[0]['wlsxSwitchTotalNumStationsAssociated'] ?? 0,
-        ];
+    public function getWirelessControllerDatastorePrefix()
+    {
+        // Prefix used to name RRD-files for AccessPoints
+        return 'aruba-controller';
+    }
+
+    public function getAccessPointDatastorePrefix()
+    {
+        // Prefix used to name RRD-files for AccessPoints
+        return 'arubaap';
     }
 
     /**
      * Poll wireless access points data from the controller
-     * The returned array should be sensor_id => value pairs
-     *
+     * Return collection of AccessPoints
      */
     public function pollWirelessAccessPoints()
     {
@@ -274,7 +272,7 @@ class Arubaos extends OS implements
                 $access_points->push(new AccessPoint($attributes));
             }
         }
-        // Return the collection of accesspoints
+        // Return the collection of AccessPoint models
         return $access_points;
     }
 

@@ -30,6 +30,7 @@ use LibreNMS\Interfaces\Polling\WirelessAccessPointPolling;
 use LibreNMS\OS;
 use App\Observers\ModuleModelObserver;
 use Illuminate\Support\Collection;
+use LibreNMS\RRD\RrdDefinition;
 
 class Wireless implements Module
 {
@@ -59,55 +60,73 @@ class Wireless implements Module
             echo "\nPoll Wireless Access Points: ";
             $access_points = new Collection;
 
-            // Get APs from controller
+            // Get APs from controller. Uniquely identify by CompositeKey (mac+radionumber)
+            // Each logical unit has it's own record
             $access_points = $os->pollWirelessAccessPoints()->keyBy(function ($item) {
                 return $item->getCompositeKey();
             });
 
-            // Update counters
-            $wireless_counters = $os->pollWirelessCounters();
-
             // Sync models. In a situation where controller is changed, update existing APs
-            // TODO: Restore soft-deleted AP if found again
+            // TODO: Test restoring soft deleted models
             ModuleModelObserver::observe('\App\Models\AccessPoint');
             $this->syncModels($os->getDevice(), 'accessPoints', $access_points);
 
-            // TODO: Update RRDs
+            // Update RRD-files for AccessPoints and calculate total counters for the controller
+            foreach($access_points as $ap) {
+                $total_clients += $ap->numasoclients;
+                $rrd_name = [$os->getAccessPointDatastorePrefix(),  $ap->name . $ap->radionum];
 
-/*             $rrd_name = ['arubaap',  $name . $radionum];
+                $rrd_def = RrdDefinition::make()
+                    ->addDataset('channel', 'GAUGE', 0, 200)
+                    ->addDataset('txpow', 'GAUGE', 0, 200)
+                    ->addDataset('radioutil', 'GAUGE', 0, 100)
+                    ->addDataset('nummonclients', 'GAUGE', 0, 500)
+                    ->addDataset('nummonbssid', 'GAUGE', 0, 200)
+                    ->addDataset('numasoclients', 'GAUGE', 0, 500)
+                    ->addDataset('interference', 'GAUGE', 0, 2000);
+    
+                $fields = [
+                    'channel'         => $ap->channel,
+                    'txpow'           => $ap->txpow,
+                    'radioutil'       => $ap->radioutil,
+                    'nummonclients'   => $ap->nummonclients,
+                    'nummonbssid'     => $ap->nummonbssid,
+                    'numasoclients'   => $ap->numasoclients,
+                    'interference'    => $ap->interference,
+                ];
+    
+                $tags = [
+                    'name' => $ap->name,
+                    'radionum' => $ap->radionum,
+                    'rrd_name' => $rrd_name,
+                    'rrd_def' => $rrd_def,
+                ];
+    
+                data_update($os->getDevice(), $os->getDatastoreMeasurementName(), $tags, $fields);
+            }
+            
+            // Update RRDs for the controller itself
+            $rrd_name = $os->getWirelessControllerDatastorePrefix();
 
             $rrd_def = RrdDefinition::make()
-                ->addDataset('channel', 'GAUGE', 0, 200)
-                ->addDataset('txpow', 'GAUGE', 0, 200)
-                ->addDataset('radioutil', 'GAUGE', 0, 100)
-                ->addDataset('nummonclients', 'GAUGE', 0, 500)
-                ->addDataset('nummonbssid', 'GAUGE', 0, 200)
-                ->addDataset('numasoclients', 'GAUGE', 0, 500)
-                ->addDataset('interference', 'GAUGE', 0, 2000);
+                ->addDataset('NUMAPS', 'GAUGE', 0, 12500000000)
+                ->addDataset('NUMCLIENTS', 'GAUGE', 0, 12500000000);
 
             $fields = [
-                'channel'         => $channel,
-                'txpow'           => $txpow,
-                'radioutil'       => $radioutil,
-                'nummonclients'   => $nummonclients,
-                'nummonbssid'     => $nummonbssid,
-                'numasoclients'   => $numasoclients,
-                'interference'    => $interference,
+                'NUMAPS'     => $access_points->keyBy('mac')->count() ?? 0,
+                'NUMCLIENTS' => $total_clients ?? 0,
             ];
 
-            $tags = [
-                'name' => $name,
-                'radionum' => $radionum,
-                'rrd_name' => $rrd_name,
-                'rrd_def' => $rrd_def,
-            ];
+            $tags = compact('rrd_name', 'rrd_def');
 
-            data_update($device, 'aruba', $tags, $fields); */
+            data_update($device, 'aruba-controller', $tags, $fields);
+
+            // Create WirelessSensor for total counters and save them to the DB
+            // TODO ...
 
             echo PHP_EOL;
         }
     }
-
 
     /**
      * Remove all DB data for this module.
@@ -117,6 +136,10 @@ class Wireless implements Module
      */
     public function cleanup(OS $os)
     {
+        // Delete all AccessPoints from the controller
         $os->getDevice()->accessPoints()->delete();
+
+        // Delete all WirelessSensors from the device
+        // TODO
     }
 }
