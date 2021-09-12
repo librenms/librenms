@@ -46,6 +46,7 @@ function makeTextBlock($text, $fontfile, $fontsize, $width)
 
 /**
  * No RRD files found that could match request
+ *
  * @code HTTP error code
  * @code_msg Short text description of HTTP error code
  * @title Title for fake RRD graph

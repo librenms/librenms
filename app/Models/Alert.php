@@ -18,6 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2016 Neil Lathwood
  * @author     Neil Lathwood <neil@lathwood.co.uk>
  */
@@ -38,6 +39,7 @@ class Alert extends Model
 
     /**
      * Only select active alerts
+     *
      * @param  Builder  $query
      * @return Builder
      */
@@ -48,6 +50,7 @@ class Alert extends Model
 
     /**
      * Only select active alerts
+     *
      * @param  Builder  $query
      * @return Builder
      */

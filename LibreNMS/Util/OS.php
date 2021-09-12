@@ -18,6 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2020 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -34,6 +35,7 @@ class OS
 {
     /**
      * Load os from yaml into config if not already loaded, preserving user os config
+     *
      * @param  string  $os
      */
     public static function loadDefinition($os)
@@ -85,6 +87,7 @@ class OS
 
     /**
      * Update the OS cache file cache/os_defs.cache
+     *
      * @param  bool  $force
      * @return bool true if the cache was updated
      */

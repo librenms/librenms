@@ -15,16 +15,19 @@
 
 /**
  * Notification Poller
+ *
  * @copyright 2015 Daniel Preussker, QuxLabs UG
  * @copyright 2017 Tony Murray
  * @author    Daniel Preussker
  * @author    Tony Murray <murraytony@gmail.com>
  * @license   GPL
+ *
  * @link      https://www.librenms.org
  */
 
 /**
  * Pull notifications from remotes
+ *
  * @return array Notifications
  */
 function get_notifications()
@@ -51,6 +54,7 @@ function get_notifications()
 
 /**
  * Post notifications to users
+ *
  * @return null
  */
 function post_notifications()
@@ -68,6 +72,7 @@ function post_notifications()
 
 /**
  * Parse RSS
+ *
  * @param  array  $feed  RSS Object
  * @return array Parsed Object
  */
@@ -91,6 +96,7 @@ function parse_rss($feed)
 
 /**
  * Parse Atom
+ *
  * @param  array  $feed  Atom Object
  * @return array Parsed Object
  */

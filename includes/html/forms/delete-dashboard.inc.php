@@ -15,6 +15,7 @@
 
 /**
  * Delete Dashboards
+ *
  * @author Daniel Preussker
  * @copyright 2015 Daniel Preussker, QuxLabs UG
  * @license GPL

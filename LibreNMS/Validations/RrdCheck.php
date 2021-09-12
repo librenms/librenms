@@ -18,6 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2017 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -86,7 +87,6 @@ class RrdCheck extends BaseValidation
      * @param  string  $path  Path to pass to rrdtool info
      * @param  string  $stdOutput  Variable to recieve the output of STDOUT
      * @param  string  $stdError  Variable to recieve the output of STDERR
-     *
      * @return int exit code
      *
      **/

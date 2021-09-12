@@ -5,6 +5,7 @@ use LibreNMS\RRD\RrdDefinition;
 if (! function_exists('proxmox_port_exists')) {
     /**
      * Check if a port on a Proxmox VM exists
+     *
      * @param  string  $p  Port name
      * @param  string  $c  Clustername
      * @param  int  $i  VM ID
@@ -23,6 +24,7 @@ if (! function_exists('proxmox_port_exists')) {
 if (! function_exists('proxmox_vm_exists')) {
     /**
      * Check if a Proxmox VM exists
+     *
      * @param  int  $i  VM ID
      * @param  string  $c  Clustername
      * @param  array  $pmxcache  Reference to the Proxmox VM Cache

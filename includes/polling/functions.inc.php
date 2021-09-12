@@ -611,8 +611,8 @@ function update_application($app, $response, $metrics = [], $status = '')
  * @param  array  $device
  * @param  string  $extend  the extend name. For example, if 'zfs' is passed it will be converted to 'nsExtendOutputFull.3.122.102.115'.
  * @param  int  $min_version  the minimum version to accept for the returned JSON. default: 1
- *
  * @return array The json output data parsed into an array
+ *
  * @throws JsonAppBlankJsonException
  * @throws JsonAppExtendErroredException
  * @throws JsonAppMissingKeysException
@@ -670,7 +670,6 @@ function json_app_get($device, $extend, $min_version = 1)
  * @param  string  $prefix  What to prefix to the name. Defaults to '', nothing.
  * @param  string  $joiner  The string to join the prefix, if set to something other
  *                          than '', and array keys with.
- *
  * @return array The flattened array.
  */
 function data_flatten($array, $prefix = '', $joiner = '_')

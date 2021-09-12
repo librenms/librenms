@@ -17,6 +17,7 @@ use LibreNMS\Util\Rewrite;
 
 /**
  * Compare $t with the value of $vars[$v], if that exists
+ *
  * @param  string  $v  Name of the var to test
  * @param  string  $t  Value to compare $vars[$v] to
  * @return bool true, if values are the same, false if $vars[$v]
@@ -34,6 +35,7 @@ function var_eq($v, $t)
 
 /**
  * Get the value of $vars[$v], if it exists
+ *
  * @param  string  $v  Name of the var to get
  * @return string|bool The value of $vars[$v] if it exists, false if it does not exist
  */
@@ -312,6 +314,7 @@ function generate_entity_link($type, $entity, $text = null, $graph_type = null)
 
 /**
  * Extract type and subtype from a complex graph type, also makes sure variables are file name safe.
+ *
  * @param  string  $type
  * @return array [type, subtype]
  */
@@ -882,6 +885,7 @@ function dynamic_override_config($type, $name, $device)
  * Return the rows from 'ports' for all ports of a certain type as parsed by port_descr_parser.
  * One or an array of strings can be provided as an argument; if an array is passed, all ports matching
  * any of the types in the array are returned.
+ *
  * @param $types mixed String or strings matching 'port_descr_type's.
  * @return array Rows from the ports table for matching ports.
  */
@@ -1032,6 +1036,7 @@ function eventlog_severity($eventlog_severity)
 
 /**
  * Get the http content type of the image
+ *
  * @param  string  $type  svg or png
  * @return string
  */
@@ -1073,6 +1078,7 @@ function get_oxidized_nodes_list()
 /**
  * Get the fail2ban jails for a device... just requires the device ID
  * an empty return means either no jails or fail2ban is not in use
+ *
  * @param $device_id
  * @return array
  */
@@ -1099,6 +1105,7 @@ function get_fail2ban_jails($device_id)
 /**
  * Get the Postgres databases for a device... just requires the device ID
  * an empty return means Postres is not in use
+ *
  * @param $device_id
  * @return array
  */
@@ -1139,6 +1146,7 @@ function generate_stacked_graphs($transparency = '88')
 
 /**
  * Parse AT time spec, does not handle the entire spec.
+ *
  * @param  string|int  $time
  * @return int
  */
@@ -1169,6 +1177,7 @@ function parse_at_time($time)
 /**
  * Get the ZFS pools for a device... just requires the device ID
  * an empty return means ZFS is not in use or there are currently no pools
+ *
  * @param $device_id
  * @return array
  */
@@ -1195,6 +1204,7 @@ function get_zfs_pools($device_id)
 /**
  * Get the ports for a device... just requires the device ID
  * an empty return means portsactivity is not in use or there are currently no ports
+ *
  * @param $device_id
  * @return array
  */
@@ -1222,6 +1232,7 @@ function get_portactivity_ports($device_id)
  * Returns the sysname of a device with a html line break prepended.
  * if the device has an empty sysname it will return device's hostname instead
  * And finally if the device has no hostname it will return an empty string
+ *
  * @param array device
  * @return string
  */
@@ -1269,6 +1280,7 @@ function get_state_label($sensor)
 
 /**
  * Get sensor label and state color
+ *
  * @param  array  $sensor
  * @param  string  $type  sensors or wireless
  * @return string
@@ -1307,6 +1319,7 @@ function get_sensor_label_color($sensor, $type = 'sensors')
 /**
  * @params int unix time
  * @params int seconds
+ *
  * @return int
  *
  * Rounds down to the nearest interval.
@@ -1324,6 +1337,7 @@ function lowest_time($time, $seconds = 300)
 
 /**
  * @params int
+ *
  * @return string
  *
  * This returns the subpath for working with nfdump.
@@ -1373,6 +1387,7 @@ function time_to_nfsen_subpath($time)
 
 /**
  * @params string hostname
+ *
  * @return string
  *
  * Takes a hostname and transforms it to the name
@@ -1391,6 +1406,7 @@ function nfsen_hostname($hostname)
 
 /**
  * @params string hostname
+ *
  * @return string
  *
  * Takes a hostname and returns the path to the nfsen
@@ -1410,6 +1426,7 @@ function nfsen_live_dir($hostname)
 /**
  * Get the ZFS pools for a device... just requires the device ID
  * an empty return means ZFS is not in use or there are currently no pools
+ *
  * @param $device_id
  * @return array
  */

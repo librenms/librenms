@@ -18,7 +18,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @license GPL
+ *
  * @link       https://www.librenms.org
+ *
  * @author f0o <f0o@devilcode.org>
  * @copyright 2014 f0o, LibreNMS
  * @copyright  2017 Tony Murray
@@ -91,6 +93,7 @@ class TwoFactor
 
     /**
      * Generate Secret Key
+     *
      * @return string
      */
     public static function genKey()
@@ -160,6 +163,7 @@ class TwoFactor
 
     /**
      * Generate HOTP (RFC 4226)
+     *
      * @param  string  $key  Secret Key
      * @param  int|bool  $counter  Optional Counter, Defaults to Timestamp
      * @return string
@@ -195,6 +199,7 @@ class TwoFactor
 
     /**
      * Generate 2fa URI
+     *
      * @param  string  $username
      * @param  string  $key
      * @param  bool  $counter  if type is counter (false for time based)

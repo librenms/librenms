@@ -19,12 +19,15 @@
  *
  *
  * Original code:
+ *
  * @author Daniel Preussker <f0o@devilcode.org>
  * @copyright 2014 f0o, LibreNMS
  * @license GPL
  *
  * Modified by:
+ *
  * @link       https://www.librenms.org
+ *
  * @copyright  2019 KanREN, Inc.
  * @author     Heath Barnhart <hbarnhart@kanren.net>
  */
@@ -51,6 +54,7 @@ class AlertDB
 
     /**
      * Generate SQL from Rule
+     *
      * @param  string  $rule  Rule to generate SQL for
      * @return string|bool
      */

@@ -733,6 +733,7 @@ function snmpwalk_cache_threepart_oid($device, $oid, $array, $mib = 0)
 
 /**
  * generate snmp auth arguments
+ *
  * @param  array  $device
  * @param  array  $cmd
  * @return array
@@ -821,7 +822,9 @@ function snmp_translate($oid, $mib = 'ALL', $mibdir = null, $options = null, $de
  * @param $device
  * @param $OID
  * @param  int  $indexes
+ *
  * @internal param $string
+ *
  * @return bool|array
  */
 function snmpwalk_array_num($device, $oid, $indexes = 1)

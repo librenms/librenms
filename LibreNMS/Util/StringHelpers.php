@@ -18,6 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -84,6 +85,7 @@ class StringHelpers
 
     /**
      * Convert a camel or studly case string to Title case (with spaces)
+     *
      * @param  string  $string
      * @return string
      */
