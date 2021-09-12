@@ -3,8 +3,8 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use LibreNMS\Interfaces\Models\Keyable;
 use Illuminate\Database\Eloquent\SoftDeletes;
+use LibreNMS\Interfaces\Models\Keyable;
 
 class AccessPoint extends DeviceRelatedModel implements Keyable
 {
@@ -34,5 +34,4 @@ class AccessPoint extends DeviceRelatedModel implements Keyable
     {
         return "$this->mac_addr-$this->radio_number";
     }
-
 }
