@@ -107,7 +107,7 @@ class Wireless implements Module
                     'rrd_def' => $rrd_def,
                 ];
 
-                data_update($os->getDevice(), $os->getDatastoreMeasurementName(), $tags, $fields);
+                data_update($os->getDeviceArray(), $os->getDatastoreMeasurementName(), $tags, $fields);
             }
 
             echo PHP_EOL;
