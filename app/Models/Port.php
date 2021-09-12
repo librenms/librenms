@@ -101,9 +101,17 @@ class Port extends DeviceRelatedModel
     }
 
     /**
+     * Get the description of this port either the parsed description or ifAlias
+     */
+    public function getDescription(): string
+    {
+        return (string) ($this->port_descr_descr ?: $this->ifAlias);
+    }
+
+    /**
      * Check if user can access this port.
      *
-     * @param User|int $user
+     * @param  User|int  $user
      * @return bool
      */
     public function canAccess($user)
@@ -133,7 +141,7 @@ class Port extends DeviceRelatedModel
     // ---- Query scopes ----
 
     /**
-     * @param Builder $query
+     * @param  Builder  $query
      * @return Builder
      */
     public function scopeIsDeleted($query)
@@ -144,7 +152,7 @@ class Port extends DeviceRelatedModel
     }
 
     /**
-     * @param Builder $query
+     * @param  Builder  $query
      * @return Builder
      */
     public function scopeIsNotDeleted($query)
@@ -155,7 +163,7 @@ class Port extends DeviceRelatedModel
     }
 
     /**
-     * @param Builder $query
+     * @param  Builder  $query
      * @return Builder
      */
     public function scopeIsUp($query)
@@ -169,7 +177,7 @@ class Port extends DeviceRelatedModel
     }
 
     /**
-     * @param Builder $query
+     * @param  Builder  $query
      * @return Builder
      */
     public function scopeIsDown($query)
@@ -184,7 +192,7 @@ class Port extends DeviceRelatedModel
     }
 
     /**
-     * @param Builder $query
+     * @param  Builder  $query
      * @return Builder
      */
     public function scopeIsShutdown($query)
@@ -198,7 +206,7 @@ class Port extends DeviceRelatedModel
     }
 
     /**
-     * @param Builder $query
+     * @param  Builder  $query
      * @return Builder
      */
     public function scopeIsIgnored($query)
@@ -210,7 +218,7 @@ class Port extends DeviceRelatedModel
     }
 
     /**
-     * @param Builder $query
+     * @param  Builder  $query
      * @return Builder
      */
     public function scopeIsDisabled($query)
@@ -222,7 +230,7 @@ class Port extends DeviceRelatedModel
     }
 
     /**
-     * @param Builder $query
+     * @param  Builder  $query
      * @return Builder
      */
     public function scopeHasErrors($query)
@@ -239,7 +247,7 @@ class Port extends DeviceRelatedModel
     }
 
     /**
-     * @param Builder $query
+     * @param  Builder  $query
      * @return Builder
      */
     public function scopeIsValid($query)

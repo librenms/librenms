@@ -18,13 +18,13 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
 namespace App\Http\Controllers\Widgets;
 
-use App\Models\Alert;
 use Illuminate\Http\Request;
 
 class AlertsController extends WidgetController

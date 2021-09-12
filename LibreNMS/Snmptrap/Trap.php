@@ -18,6 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -42,7 +43,8 @@ class Trap
 
     /**
      * Construct a trap from raw trap text
-     * @param string $trap
+     *
+     * @param  string  $trap
      */
     public function __construct($trap)
     {
@@ -72,7 +74,7 @@ class Trap
     /**
      * Find the first in this trap by substring
      *
-     * @param string|string[] $search
+     * @param  string|string[]  $search
      * @return string
      */
     public function findOid($search)
@@ -84,7 +86,8 @@ class Trap
 
     /**
      * Find all oids that match the given string
-     * @param string|string[] $search
+     *
+     * @param  string|string[]  $search
      * @return array
      */
     public function findOids($search)
@@ -146,7 +149,7 @@ class Trap
     /**
      * Render the Trap for debugging purpose
      *
-     * @param bool $detailed
+     * @param  bool  $detailed
      * @return string
      */
     public function toString($detailed = false)

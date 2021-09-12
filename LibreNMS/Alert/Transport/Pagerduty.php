@@ -15,6 +15,7 @@
 
 /**
  * PagerDuty Generic-API Transport
+ *
  * @author f0o <f0o@devilcode.org>
  * @copyright 2015 f0o, LibreNMS
  * @license GPL
@@ -48,8 +49,8 @@ class Pagerduty extends Transport
     }
 
     /**
-     * @param array $obj
-     * @param array $config
+     * @param  array  $obj
+     * @param  array  $config
      * @return bool|string
      */
     public function contactPagerduty($obj, $config)

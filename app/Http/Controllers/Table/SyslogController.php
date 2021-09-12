@@ -18,6 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -63,7 +64,7 @@ class SyslogController extends TableController
     /**
      * Defines the base query for this resource
      *
-     * @param \Illuminate\Http\Request $request
+     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Query\Builder
      */
     public function baseQuery($request)
@@ -85,7 +86,7 @@ class SyslogController extends TableController
     }
 
     /**
-     * @param Syslog $syslog
+     * @param  Syslog  $syslog
      */
     public function formatItem($syslog)
     {
@@ -113,7 +114,7 @@ class SyslogController extends TableController
     }
 
     /**
-     * @param int $syslog_priority
+     * @param  int  $syslog_priority
      * @return string
      */
     private function priorityLabel($syslog_priority)

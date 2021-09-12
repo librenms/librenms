@@ -116,14 +116,14 @@ function load_discovery(&$device)
 }
 
 /**
- * @param array $device The device to poll
- * @param bool $force_module Ignore device module overrides
+ * @param  array  $device  The device to poll
+ * @param  bool  $force_module  Ignore device module overrides
  * @return bool if the device was discovered or skipped
  */
 function discover_device(&$device, $force_module = false)
 {
     if ($device['snmp_disable'] == '1') {
-        return false;
+        return true;
     }
 
     global $valid;
@@ -751,10 +751,10 @@ function check_entity_sensor($string, $device)
  * Get the device divisor, account for device specific quirks
  * The default divisor is 10
  *
- * @param array $device device array
- * @param string $os_version firmware version poweralert quirks
- * @param string $sensor_type the type of this sensor
- * @param string $oid the OID of this sensor
+ * @param  array  $device  device array
+ * @param  string  $os_version  firmware version poweralert quirks
+ * @param  string  $sensor_type  the type of this sensor
+ * @param  string  $oid  the OID of this sensor
  * @return int
  */
 function get_device_divisor($device, $os_version, $sensor_type, $oid)
@@ -823,8 +823,8 @@ function get_device_divisor($device, $os_version, $sensor_type, $oid)
 /**
  * Should we ignore this storage device based on teh description? (usually the mount path or drive)
  *
- * @param string $os The OS of the device
- * @param string $descr The description of the storage
+ * @param  string  $os  The OS of the device
+ * @param  string  $descr  The description of the storage
  * @return bool
  */
 function ignore_storage($os, $descr)
@@ -991,7 +991,7 @@ function discovery_process(&$valid, $device, $sensor_class, $pre_cache)
 /**
  * @param $types
  * @param $device
- * @param array $pre_cache
+ * @param  array  $pre_cache
  */
 function sensors($types, $device, $valid, $pre_cache = [])
 {
@@ -1184,9 +1184,10 @@ function add_cbgp_peer($device, $peer, $afi, $safi)
 
 /**
  * check if we should skip this sensor from discovery
+ *
  * @param $device
- * @param string $sensor_class
- * @param string $sensor_descr
+ * @param  string  $sensor_class
+ * @param  string  $sensor_descr
  * @return bool
  */
 function can_skip_sensor($device, $sensor_class = '', $sensor_descr = '')
@@ -1210,9 +1211,10 @@ function can_skip_sensor($device, $sensor_class = '', $sensor_descr = '')
 
 /**
  * check if we should skip this device from discovery
- * @param string $sysName
- * @param string $sysDescr
- * @param string $platform
+ *
+ * @param  string  $sysName
+ * @param  string  $sysDescr
+ * @param  string  $platform
  * @return bool
  */
 function can_skip_discovery($sysName, $sysDescr = '', $platform = '')
@@ -1254,9 +1256,9 @@ function can_skip_discovery($sysName, $sysDescr = '', $platform = '')
  * Try to find a device by sysName, hostname, ip, or mac_address
  * If a device cannot be found, returns 0
  *
- * @param string $name sysName or hostname
- * @param string $ip May be an IP or hex string
- * @param string $mac_address
+ * @param  string  $name  sysName or hostname
+ * @param  string  $ip  May be an IP or hex string
+ * @param  string  $mac_address
  * @return int the device_id or 0
  */
 function find_device_id($name = '', $ip = '', $mac_address = '')
@@ -1335,10 +1337,10 @@ function find_device_id($name = '', $ip = '', $mac_address = '')
 /**
  * Try to find a port by ifDescr, ifName, ifAlias, or MAC
  *
- * @param string $description matched against ifDescr, ifName, and ifAlias
- * @param string $identifier matched against ifDescr, ifName, and ifAlias
- * @param int $device_id restrict search to ports on a specific device
- * @param string $mac_address check against ifPhysAddress (should be in lowercase hexadecimal)
+ * @param  string  $description  matched against ifDescr, ifName, and ifAlias
+ * @param  string  $identifier  matched against ifDescr, ifName, and ifAlias
+ * @param  int  $device_id  restrict search to ports on a specific device
+ * @param  string  $mac_address  check against ifPhysAddress (should be in lowercase hexadecimal)
  * @return int
  */
 function find_port_id($description, $identifier = '', $device_id = 0, $mac_address = null)

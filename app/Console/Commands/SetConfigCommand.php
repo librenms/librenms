@@ -206,7 +206,8 @@ class SetConfigCommand extends LnmsCommand
     /**
      * @param  string  $os
      * @param  string  $setting
-     * @param  mixed   $value
+     * @param  mixed  $value
+     *
      * @throws \JsonSchema\Exception\ValidationException
      */
     private function validateOsSetting(string $os, string $setting, $value)

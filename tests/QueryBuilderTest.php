@@ -18,6 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -42,10 +43,11 @@ class QueryBuilderTest extends TestCase
 
     /**
      * @dataProvider loadQueryData
-     * @param string $legacy
-     * @param array $builder
-     * @param string $display
-     * @param string $sql
+     *
+     * @param  string  $legacy
+     * @param  array  $builder
+     * @param  string  $display
+     * @param  string  $sql
      */
     public function testQueryConversion($legacy, $builder, $display, $sql, $query)
     {

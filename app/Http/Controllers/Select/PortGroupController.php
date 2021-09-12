@@ -18,6 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @link       http://librenms.org
+ *
  * @copyright  2020 Thomas Berberich
  * @author     Thomas Berberich <sourcehhdoctor@gmail.com>
  */
@@ -52,7 +53,7 @@ class PortGroupController extends SelectController
     }
 
     /**
-     * @param PortGroup $port_group
+     * @param  PortGroup  $port_group
      */
     public function formatItem($port_group)
     {

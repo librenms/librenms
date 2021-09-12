@@ -108,8 +108,8 @@ class Mempools implements Module
     }
 
     /**
-     * @param OS $os
-     * @param \Illuminate\Support\Collection $mempools
+     * @param  OS  $os
+     * @param  \Illuminate\Support\Collection  $mempools
      * @return \Illuminate\Support\Collection
      */
     private function defaultPolling($os, $mempools)

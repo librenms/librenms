@@ -18,6 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2019 Vitali Kari
  * @author     Vitali Kari <vitali.kari@gmail.com>
  */
@@ -49,7 +50,7 @@ class Lcos extends OS implements
     /**
      * Convert String to decimal encoded string notation
      *
-     * @param string $index
+     * @param  string  $index
      * @return string decimal encoded OID string
      */
     private function strToDecOid($index)
@@ -97,7 +98,7 @@ class Lcos extends OS implements
      * Poll wireless frequency as MHz
      * The returned array should be sensor_id => value pairs
      *
-     * @param array $sensors Array of sensors needed to be polled
+     * @param  array  $sensors  Array of sensors needed to be polled
      * @return array of polled data
      */
     public function pollWirelessFrequency(array $sensors)
