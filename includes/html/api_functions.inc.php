@@ -1019,15 +1019,25 @@ function get_port_info(Illuminate\Http\Request $request)
 
 function search_ports(Illuminate\Http\Request $request)
 {
+    $field = $request->route('field');
     $search = $request->route('search');
+
     $value = "%$search%";
+
     $ports = Port::hasAccess(Auth::user())
-         ->select(['device_id', 'port_id', 'ifIndex', 'ifName'])
-         ->where('ifAlias', 'like', $value)
-         ->orWhere('ifDescr', 'like', $value)
-         ->orWhere('ifName', 'like', $value)
-         ->orderBy('ifName')
-         ->get();
+         ->select(['device_id', 'port_id', 'ifIndex', 'ifName']);
+
+
+    if (isset($field)) {
+        $ports = $ports->where($field, 'like', $value);
+    } else {
+        $ports = $ports->where('ifAlias', 'like', $value)
+                       ->orWhere('ifDescr', 'like', $value)
+                       ->orWhere('ifName', 'like', $value);
+    }
+
+    $ports = $ports->orderBy('ifName')
+                   ->get();
 
     if ($ports->isEmpty()) {
         return api_error(404, 'No ports found');
