@@ -31,6 +31,7 @@ use LibreNMS\OS;
 use App\Observers\ModuleModelObserver;
 use Illuminate\Support\Collection;
 use LibreNMS\RRD\RrdDefinition;
+use LibreNMS\Device\WirelessSensor;
 
 class Wireless implements Module
 {
@@ -44,7 +45,10 @@ class Wireless implements Module
      */
     public function discover(OS $os)
     {
-        // Discover counters from the controllers
+        // Discover wireless sensors
+        WirelessSensor::runDiscovery($os);
+
+        // Run wireless sensor discoveries
         $os->discoverWirelessApCount();
         $os->discoverWirelessClients();
     }
@@ -58,6 +62,9 @@ class Wireless implements Module
      */
     public function poll(OS $os)
     {
+        echo "\nPoll Wireless sensors: ";
+        WirelessSensor::poll($os);
+
         if ($os instanceof WirelessAccessPointPolling) {
             echo "\nPoll Wireless Access Points: ";
             $access_points = new Collection;
@@ -121,8 +128,8 @@ class Wireless implements Module
     {
         // Delete all AccessPoints from the controller
         $os->getDevice()->accessPoints()->delete();
-
+        
         // Delete all WirelessSensors from the device
-        // TODO
+        $os->getDevice()->wirelessSensors()->delete();
     }
 }

@@ -18,13 +18,13 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
- *
  * @copyright  2017 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
-use LibreNMS\Device\WirelessSensor;
 use LibreNMS\OS;
 
-WirelessSensor::poll(OS::make($device));
+if (! $os instanceof OS) {
+    $os = OS::make($device);
+}
 (new \LibreNMS\Modules\Wireless())->poll($os);
