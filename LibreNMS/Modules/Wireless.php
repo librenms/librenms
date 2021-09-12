@@ -48,10 +48,6 @@ class Wireless implements Module
     {
         // Discover wireless sensors
         WirelessSensor::runDiscovery($os);
-
-        // Run wireless sensor discoveries
-        $os->discoverWirelessApCount();
-        $os->discoverWirelessClients();
     }
 
     /**
