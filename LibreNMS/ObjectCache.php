@@ -18,6 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2015 Daniel Preussker <f0o@devilcode.org>
  * @copyright  2015 LibreNMS
  * @author     Daniel Preussker (f0o) <f0o@devilcode.org>
@@ -35,6 +36,7 @@ class ObjectCache implements ArrayAccess
 
     /**
      * Initialize ObjectCache
+     *
      * @param  string  $obj  Name of Object
      */
     public function __construct($obj)
@@ -67,6 +69,7 @@ class ObjectCache implements ArrayAccess
 
     /**
      * Check if data exists
+     *
      * @param  string  $obj  Name of Data-Object
      * @return bool
      */
@@ -83,6 +86,7 @@ class ObjectCache implements ArrayAccess
 
     /**
      * Get Data-Object
+     *
      * @param  string  $obj  Name of Data-Object
      * @return mixed
      */
@@ -108,6 +112,7 @@ class ObjectCache implements ArrayAccess
 
     /**
      * Overrides internal Cache-Object
+     *
      * @param  string  $obj  Name of Data-Object
      * @param  mixed  $value  Value
      * @return bool
@@ -127,6 +132,7 @@ class ObjectCache implements ArrayAccess
 
     /**
      * Reset Data-Object
+     *
      * @param  string  $obj  Name of Data-Object
      * @return mixed
      */

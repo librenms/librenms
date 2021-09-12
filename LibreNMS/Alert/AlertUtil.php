@@ -18,6 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2019 KanREN, Inc.
  * @author     Heath Barnhart <hbarnhart@kanren.net>
  */
@@ -73,6 +74,7 @@ class AlertUtil
 
     /**
      * Find contacts for alert
+     *
      * @param  array  $results  Rule-Result
      * @return array
      */
@@ -193,6 +195,7 @@ class AlertUtil
 
     /**
      * Check if device is under maintenance
+     *
      * @param  int  $device_id  Device-ID
      * @return bool
      */
@@ -203,6 +206,7 @@ class AlertUtil
 
     /**
      * Check if device is set to ignore alerts
+     *
      * @param  int  $device_id  Device-ID
      * @return bool
      */
@@ -215,6 +219,7 @@ class AlertUtil
 
     /**
      * Process Macros
+     *
      * @param  string  $rule  Rule to process
      * @param  int  $x  Recursion-Anchor
      * @return string|bool

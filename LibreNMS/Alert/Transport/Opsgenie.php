@@ -15,6 +15,7 @@
 
 /**
  * OpsGenie API Transport
+ *
  * @author Celal Emre CICEK <celal.emre@opsgenie.com>
  * @copyright 2017 Celal Emre CICEK
  * @license GPL

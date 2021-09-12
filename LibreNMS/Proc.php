@@ -18,6 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2016 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -57,6 +58,7 @@ class Proc
      * @param  null  $cwd  working directory to change to
      * @param  array|null  $env  array of environment variables to set
      * @param  bool  $blocking  set the output pipes to blocking (default: false)
+     *
      * @throws Exception the command was unable to execute
      */
     public function __construct(
@@ -197,6 +199,7 @@ class Proc
      *
      * @param  int  $timeout  how many microseconds to wait before terminating (SIGKILL)
      * @param  int  $signal  the signal to send
+     *
      * @throws Exception
      */
     public function terminate($timeout = 3000, $signal = 15)

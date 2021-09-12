@@ -371,7 +371,6 @@ function delete_device($id)
  * @param  bool  $force_add  add even if the device isn't reachable
  * @param  string  $port_assoc_mode  snmp field to use to determine unique ports
  * @param  array  $additional  an array with additional parameters to take into consideration when adding devices
- *
  * @return int returns the device_id of the added device
  *
  * @throws HostExistsException This hostname already exists
@@ -520,7 +519,6 @@ function isSNMPable($device)
  * @param  string  $address_family  The address family ('ipv4' or 'ipv6') to use. Defaults to IPv4.
  *                                  Will *not* be autodetected for IP addresses, so it has to be set to 'ipv6' when pinging an IPv6 address or an IPv6-only host.
  * @param  array  $attribs  The device attributes
- *
  * @return array 'result' => bool pingable, 'last_ping_timetaken' => int time for last ping, 'db' => fping results
  */
 function isPingable($hostname, $address_family = 'ipv4', $attribs = [])
@@ -590,6 +588,7 @@ function getpollergroup($poller_group = '0')
  * @param  bool  $force_add  Do not detect the host os
  * @param  array  $additional  an array with additional parameters to take into consideration when adding devices
  * @return int the id of the added host
+ *
  * @throws HostExistsException Throws this exception if the host already exists
  * @throws Exception Throws this exception if insertion into the database fails
  */
@@ -1201,7 +1200,6 @@ function device_has_ip($ip)
  * @param  string  $transport  The SNMP transport specifier, for example "udp",
  *                             "udp6", "tcp", or "tcp6". See `man snmpcmd`,
  *                             section "Agent Specification" for a full list.
- *
  * @return string The address family associated with the given transport
  *                specifier: 'ipv4' (or local connections not associated
  *                with an IP stack) or 'ipv6'.
@@ -1266,7 +1264,6 @@ function oxidized_reload_nodes()
  *
  * @param  array  $device  Device array from database
  * @param  string  $type  The type of record to lookup
- *
  * @return string ip
  *
  **/
@@ -2149,6 +2146,7 @@ function oxidized_node_update($hostname, $msg, $username = 'not_provided')
 /**
  * @params int code
  * @params int subcode
+ *
  * @return string
  *                Take a BGP error code and subcode to return a string representation of it
  */

@@ -79,6 +79,7 @@ function collectd_compare_host($a, $b)
 
 /**
  * Fetch list of hosts found in collectd's datadirs.
+ *
  * @return array Sorted list of hosts (sorted by label from rigth to left)
  */
 function collectd_list_hosts()
@@ -173,9 +174,11 @@ function collectd_list_pinsts($arg_host, $arg_plugin)
 
 /**
  * Fetch list of types found in collectd's datadirs for given host+plugin+instance
+ *
  * @arg_host Name of host
  * @arg_plugin Name of plugin
  * @arg_pinst Plugin instance
+ *
  * @return array Sorted list of types (sorted alphabetically)
  */
 function collectd_list_types($arg_host, $arg_plugin, $arg_pinst)
@@ -211,10 +214,12 @@ function collectd_list_types($arg_host, $arg_plugin, $arg_pinst)
 
 /**
  * Fetch list of type instances found in collectd's datadirs for given host+plugin+instance+type
+ *
  * @arg_host Name of host
  * @arg_plugin Name of plugin
  * @arg_pinst Plugin instance
  * @arg_type Type
+ *
  * @return array Sorted list of type instances (sorted alphabetically)
  */
 function collectd_list_tinsts($arg_host, $arg_plugin, $arg_pinst, $arg_type)
@@ -700,6 +705,7 @@ function collectd_draw_generic($timespan, $host, $plugin, $type, $pinst = null, 
 
 /**
  * Draw stack-graph for set of RRD files
+ *
  * @param  array  $opts  Graph options like colors
  * @param  array  $sources  List of array(name, file, ds)
  * @return string Commandline to call RRDGraph in order to generate the final graph
@@ -836,6 +842,7 @@ function collectd_draw_meta_stack(&$opts, &$sources)
 
 /**
  * Draw stack-graph for set of RRD files
+ *
  * @param  array  $opts  Graph options like colors
  * @param  array  $sources  List of array(name, file, ds)
  * @return string Commandline to call RRDGraph in order to generate the final graph

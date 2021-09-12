@@ -1951,7 +1951,9 @@ function add_device_group(Illuminate\Http\Request $request)
     }
 
     $deviceGroup = DeviceGroup::make(['name' => $data['name'], 'type' => $data['type'], 'desc' => $data['desc']]);
-    $deviceGroup->rules = json_decode($data['rules']);
+    if ($data['type'] == 'dynamic') {
+        $deviceGroup->rules = json_decode($data['rules']);
+    }
     $deviceGroup->save();
 
     if ($data['type'] == 'static') {

@@ -15,6 +15,7 @@
 
 /**
  * Alertmanager Transport
+ *
  * @copyright 2019 LibreNMS
  * @license GPL
  */

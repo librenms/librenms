@@ -18,6 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2017 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -55,6 +56,7 @@ class Processor extends Model implements DiscoveryModule, PollerModule, Discover
 
     /**
      * Processor constructor.
+     *
      * @param  string  $type
      * @param  int  $device_id
      * @param  string  $oid

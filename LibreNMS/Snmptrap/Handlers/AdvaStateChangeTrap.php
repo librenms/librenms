@@ -23,6 +23,7 @@
  * on the unit that sent the trap.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2018 Heath Barnhart
  * @author     Heath Barnhart <hbarnhart@kanren.net> & Neil Kahle <nkahle@kanren.net>
  */

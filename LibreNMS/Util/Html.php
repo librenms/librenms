@@ -18,6 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -31,6 +32,7 @@ class Html
 {
     /**
      * return icon and color for application state
+     *
      * @param  string  $app_state
      * @return array
      */
