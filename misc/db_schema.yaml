@@ -6,7 +6,6 @@ access_points:
     - { Field: radio_number, Type: tinyint, 'Null': true, Extra: '' }
     - { Field: type, Type: varchar(16), 'Null': false, Extra: '' }
     - { Field: mac_addr, Type: varchar(24), 'Null': false, Extra: '' }
-    - { Field: deleted_at, Type: timestamp, 'Null': true, Extra: '' }
     - { Field: channel, Type: 'tinyint unsigned', 'Null': false, Extra: '', Default: '0' }
     - { Field: txpow, Type: tinyint, 'Null': false, Extra: '', Default: '0' }
     - { Field: radioutil, Type: tinyint, 'Null': false, Extra: '', Default: '0' }
@@ -15,6 +14,7 @@ access_points:
     - { Field: numactbssid, Type: tinyint, 'Null': false, Extra: '', Default: '0' }
     - { Field: nummonbssid, Type: tinyint, 'Null': false, Extra: '', Default: '0' }
     - { Field: interference, Type: 'tinyint unsigned', 'Null': false, Extra: '' }
+    - { Field: deleted_at, Type: timestamp, 'Null': true, Extra: '' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [accesspoint_id], Unique: true, Type: BTREE }
     name: { Name: name, Columns: [name, radio_number], Unique: false, Type: BTREE }
