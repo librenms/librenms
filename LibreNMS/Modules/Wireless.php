@@ -44,7 +44,9 @@ class Wireless implements Module
      */
     public function discover(OS $os)
     {
-
+        // Discover counters from the controllers
+        $os->discoverWirelessApCount();
+        $os->discoverWirelessClients();
     }
 
     /**
@@ -104,28 +106,7 @@ class Wireless implements Module
     
                 data_update($os->getDevice(), $os->getDatastoreMeasurementName(), $tags, $fields);
             }
-            
-            // Update RRDs for the controller itself
-            $rrd_name = $os->getWirelessControllerDatastorePrefix();
-
-            $rrd_def = RrdDefinition::make()
-                ->addDataset('NUMAPS', 'GAUGE', 0, 12500000000)
-                ->addDataset('NUMCLIENTS', 'GAUGE', 0, 12500000000);
-
-            // Calculate the number of physical units (keyby mac)
-            $fields = [
-                'NUMAPS'     => $access_points->keyBy('mac')->count() ?? 0,
-                'NUMCLIENTS' => $total_clients ?? 0,
-            ];
-
-            $tags = compact('rrd_name', 'rrd_def');
-
-            data_update($device, 'aruba-controller', $tags, $fields);
-
-            // Create WirelessSensor for total counters and save them to the DB
-            // TODO ...
-
-            
+                    
             echo PHP_EOL;
         }
     }
