@@ -244,8 +244,8 @@ class Arubaos extends OS implements
     public function pollWirelessAccessPoints()
     {
         $access_points = new Collection;
-        $wlsxWlanRadioTable = snmpwalk_group($this->getDeviceArray(), 'WLSX-WLAN-MIB::wlsxWlanRadioTable', 1);
-        $wlsxWlanAPChStatsTable = snmpwalk_group($this->getDeviceArray(), 'WLSX-WLAN-MIB::wlsxWlanAPChStatsTable', 1);
+        $wlsxWlanRadioTable = snmpwalk_group($this->getDeviceArray(), 'WLSX-WLAN-MIB::wlsxWlanRadioTable', '1');
+        $wlsxWlanAPChStatsTable = snmpwalk_group($this->getDeviceArray(), 'WLSX-WLAN-MIB::wlsxWlanAPChStatsTable', '1');
 
         // Loop through the polled data. Array format: $table[mac-of-ap][oid][radio number]
         foreach ($wlsxWlanRadioTable as $ap => $val1) {
