@@ -1022,12 +1022,16 @@ function search_ports(Illuminate\Http\Request $request)
     $field = $request->route('field');
     $search = $request->route('search');
 
-    $value = "%$search%";
+    if (isset($search)) {
+        $value = "%$search%";
+    } else {
+        $value = "%$field%";
+    }
 
     $ports = Port::hasAccess(Auth::user())
          ->select(['device_id', 'port_id', 'ifIndex', 'ifName']);
 
-    if (isset($field)) {
+    if (isset($search)) {
         $ports = $ports->where($field, 'like', $value);
     } else {
         $ports = $ports->where('ifAlias', 'like', $value)
@@ -1043,11 +1047,6 @@ function search_ports(Illuminate\Http\Request $request)
     }
 
     return api_success($ports, 'ports');
-}
-
-function search_ports_by_field(Illuminate\Http\Request $request)
-{
-    return search_ports($request);
 }
 
 function get_all_ports(Illuminate\Http\Request $request)
