@@ -1045,6 +1045,11 @@ function search_ports(Illuminate\Http\Request $request)
     return api_success($ports, 'ports');
 }
 
+function search_ports_by_field(Illuminate\Http\Request $request)
+{
+    return search_ports($request);
+}
+
 function get_all_ports(Illuminate\Http\Request $request)
 {
     $columns = $request->get('columns', 'port_id, ifName');
