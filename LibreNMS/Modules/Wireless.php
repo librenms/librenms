@@ -79,7 +79,6 @@ class Wireless implements Module
 
             // Update RRD-files for AccessPoints and calculate total counters for the controller
             foreach ($access_points as $ap) {
-                $total_clients += $ap->numasoclients;
                 $rrd_name = [$os->getAccessPointDatastorePrefix(),  $ap->name . $ap->radionum];
 
                 $rrd_def = RrdDefinition::make()
