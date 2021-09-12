@@ -1027,7 +1027,6 @@ function search_ports(Illuminate\Http\Request $request)
     $ports = Port::hasAccess(Auth::user())
          ->select(['device_id', 'port_id', 'ifIndex', 'ifName']);
 
-
     if (isset($field)) {
         $ports = $ports->where($field, 'like', $value);
     } else {
