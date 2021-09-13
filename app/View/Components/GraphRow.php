@@ -50,12 +50,12 @@ class GraphRow extends Component
      * @param  string|null  $title
      * @param  string  $loading
      * @param  string  $aspect
-     * @param  int  $columns
+     * @param  int|string  $columns Either a number or 'responsive' aka auto columns
      * @param  array  $graphs
      * @param  \App\Models\Device|int|null  $device
      * @param  \App\Models\Port|int|null  $port
      */
-    public function __construct(string $type = '', string $title = null, string $loading = 'eager', string $aspect = 'normal', int $columns = 2, array $graphs = [['from' => '-1d'], ['from' => '-7d'], ['from' => '-30d'], ['from' => '-1y']], $device = null, $port = null)
+    public function __construct(string $type = '', string $title = null, string $loading = 'eager', string $aspect = 'normal', $columns = 2, array $graphs = [['from' => '-1d'], ['from' => '-7d'], ['from' => '-30d'], ['from' => '-1y']], $device = null, $port = null)
     {
         $this->type = $type;
         $this->aspect = $aspect;
