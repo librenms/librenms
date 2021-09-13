@@ -32,49 +32,11 @@ use LibreNMS\Util\Debug;
 $init_modules = ['polling', 'alerts', 'laravel'];
 require __DIR__ . '/includes/init.php';
 
-$poller_start = microtime(true);
 echo Config::get('project_name') . " Poller\n";
 
 $options = getopt('h:m:i:n:r::d::v::a::f::q');
 
-if (isset($options['h'])) {
-    if ($options['h'] == 'odd') {
-        $options['n'] = '1';
-        $options['i'] = '2';
-    } elseif ($options['h'] == 'even') {
-        $options['n'] = '0';
-        $options['i'] = '2';
-    } elseif ($options['h'] == 'all') {
-        $where = ' ';
-        $doing = 'all';
-    } elseif ($options['h']) {
-        if (is_numeric($options['h'])) {
-            $where = 'AND `device_id` = ' . $options['h'];
-            $doing = $options['h'];
-        } else {
-            if (preg_match('/\*/', $options['h'])) {
-                $where = "AND `hostname` LIKE '" . str_replace('*', '%', $options['h']) . "'";
-            } else {
-                $where = "AND `hostname` = '" . $options['h'] . "'";
-            }
-            $doing = $options['h'];
-        }
-    }
-}
-
-if (isset($options['i']) && $options['i'] && isset($options['n'])) {
-    $where = true;
-    // FIXME
-    $query = 'SELECT * FROM (SELECT @rownum :=0) r,
-        (
-            SELECT @rownum := @rownum +1 AS rownum, `devices`.*
-            FROM `devices`
-            WHERE `disabled` = 0
-            ORDER BY `device_id` ASC
-        ) temp
-        WHERE MOD(temp.rownum, ' . $options['i'] . ') = ' . $options['n'] . ';';
-    $doing = $options['n'] . '/' . $options['i'];
-}
+$options = parse_options($options, $query, $where, $doing);
 
 if (empty($where)) {
     echo "-h <device id> | <device hostname wildcard>  Poll single device\n";
@@ -117,58 +79,131 @@ EOH;
     \LibreNMS\Util\OS::updateCache(true); // Force update of OS Cache
 }
 
-// If we've specified modules with -m, use them
-$module_override = parse_modules('poller', $options);
-
-$datastore = Datastore::init($options);
-
-echo "Starting polling run:\n\n";
 $polled_devices = 0;
 $unreachable_devices = 0;
-if (! isset($query)) {
-    $query = "SELECT * FROM `devices` WHERE `disabled` = 0 $where ORDER BY `device_id` ASC";
+
+if($options['h'] == "-") {
+	while($dev = fgets(STDIN)) {
+		$dev=rtrim($dev);
+		$options['h']=$dev;
+		$thisopt = parse_options($options, $query, $where, $doing);
+
+		run_poll($thisopt, $query, $where, $doing, $polled_devices, $unreachable_devices);
+		print("### Poll of $dev complete ###\n");
+		ob_flush();
+		flush();
+	}
+} else {
+	run_poll($options, $query, $where, $doing, $polled_devices, $unreachable_devices);
 }
-
-foreach (dbFetch($query) as $device) {
-    DeviceCache::setPrimary($device['device_id']);
-
-    if (! poll_device($device, $module_override)) {
-        $unreachable_devices++;
-    }
-
-    // Update device_groups
-    echo "### Start Device Groups ###\n";
-    $dg_start = microtime(true);
-    $group_changes = \App\Models\DeviceGroup::updateGroupsFor($device['device_id']);
-    d_echo('Groups Added: ' . implode(',', $group_changes['attached']) . PHP_EOL);
-    d_echo('Groups Removed: ' . implode(',', $group_changes['detached']) . PHP_EOL);
-    echo '### End Device Groups, runtime: ' . round(microtime(true) - $dg_start, 4) . "s ### \n\n";
-
-    echo "#### Start Alerts ####\n";
-    $rules = new AlertRules();
-    $rules->runRules($device['device_id']);
-    echo "#### End Alerts ####\r\n";
-    $polled_devices++;
-}
-
-$poller_end = microtime(true);
-$poller_run = ($poller_end - $poller_start);
-$poller_time = substr($poller_run, 0, 5);
-
-$string = $argv[0] . " $doing " . date(Config::get('dateformat.compact')) . " - $polled_devices devices polled in $poller_time secs";
-d_echo("$string\n");
-
-if (! isset($options['q'])) {
-    printStats();
-}
-
-logfile($string);
-Datastore::terminate();
-// Remove this for testing
-// print_r(get_defined_vars());
 
 if ($polled_devices === $unreachable_devices) {
     exit(6);
 }
 
 exit(0);
+
+
+function run_poll($options, $query, $where, $doing, &$polled_devices, &$unreachable_devices) {
+	global $device;
+	$poller_start = microtime(true);
+	// If we've specified modules with -m, use them
+	$module_override = parse_modules('poller', $options);
+
+	$datastore = Datastore::init($options);
+
+	echo "Starting polling run:\n\n";
+	if (! isset($query)) {
+	    $query = "SELECT * FROM `devices` WHERE `disabled` = 0 $where ORDER BY `device_id` ASC";
+	}
+
+	foreach (dbFetch($query) as $device) {
+	    DeviceCache::setPrimary($device['device_id']);
+	    if ($device['os_group'] == 'cisco') {
+		$device['vrf_lite_cisco'] = dbFetchRows('SELECT * FROM `vrf_lite_cisco` WHERE `device_id` = ' . $device['device_id']);
+	    } else {
+		$device['vrf_lite_cisco'] = '';
+	    }
+
+	    if (! poll_device($device, $module_override)) {
+		$unreachable_devices++;
+	    }
+
+	    // Update device_groups
+	    echo "### Start Device Groups ###\n";
+	    $dg_start = microtime(true);
+	    $group_changes = \App\Models\DeviceGroup::updateGroupsFor($device['device_id']);
+	    d_echo('Groups Added: ' . implode(',', $group_changes['attached']) . PHP_EOL);
+	    d_echo('Groups Removed: ' . implode(',', $group_changes['detached']) . PHP_EOL);
+	    echo '### End Device Groups, runtime: ' . round(microtime(true) - $dg_start, 4) . "s ### \n\n";
+
+	    echo "#### Start Alerts ####\n";
+	    $rules = new AlertRules();
+	    $rules->runRules($device['device_id']);
+	    echo "#### End Alerts ####\r\n";
+	    $polled_devices++;
+	}
+
+	$poller_end = microtime(true);
+	$poller_run = ($poller_end - $poller_start);
+	$poller_time = substr($poller_run, 0, 5);
+
+	$string = $argv[0] . " $doing " . date(Config::get('dateformat.compact')) . " - $polled_devices devices polled in $poller_time secs";
+	d_echo("$string\n");
+
+	if (! isset($options['q'])) {
+	    printStats();
+	}
+
+	logfile($string);
+	Datastore::terminate();
+	// Remove this for testing
+	// print_r(get_defined_vars());
+}
+
+function parse_options($options, &$query, &$where, &$doing) {
+	$ret=$options;
+	if (isset($options['h'])) {
+	    unset($query);
+	    if ($options['h'] == 'odd') {
+		$ret['n'] = '1';
+		$ret['i'] = '2';
+	    } elseif ($options['h'] == 'even') {
+		$ret['n'] = '0';
+		$ret['i'] = '2';
+	    } elseif ($options['h'] == 'all') {
+		$where = ' ';
+		$doing = 'all';
+	    } elseif ($options['h'] == "-") {
+		$where = true;
+	    } elseif ($options['h']) {
+		if (is_numeric($options['h'])) {
+		    $where = 'AND `device_id` = ' . $options['h'];
+		    $doing = $options['h'];
+		} else {
+		    if (preg_match('/\*/', $options['h'])) {
+			$where = "AND `hostname` LIKE '" . str_replace('*', '%', $options['h']) . "'";
+		    } else {
+			$where = "AND `hostname` = '" . $options['h'] . "'";
+		    }
+		    $doing = $options['h'];
+		}
+	    }
+	}
+
+	if (isset($ret['i']) && $ret['i'] && isset($ret['n'])) {
+	    $where = true;
+	    // FIXME
+	    $query = 'SELECT * FROM (SELECT @rownum :=0) r,
+		(
+		    SELECT @rownum := @rownum +1 AS rownum, `devices`.*
+		    FROM `devices`
+		    WHERE `disabled` = 0
+		    ORDER BY `device_id` ASC
+		) temp
+		WHERE MOD(temp.rownum, ' . $ret['i'] . ') = ' . $ret['n'] . ';';
+	    $doing = $ret['n'] . '/' . $ret['i'];
+	}
+
+	return $ret;
+}

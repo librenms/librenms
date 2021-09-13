@@ -154,8 +154,18 @@ def printworker():
 
 
 def poll_worker(poll_queue):
+    command = "/usr/bin/env php %s -h - 2>&1" % (
+        poller_path,
+    )
+    poller = subprocess.Popen(command, shell=True, stdin=subprocess.PIPE, stdout=subprocess.PIPE)
+
+    # TODO: replace with command_runner
     while True:
-        device_id = poll_queue.get()
+        try:
+            device_id = poll_queue.get(timeout=60)
+        except queue.Empty:
+            break
+
         # (c) 2015, GPLv3, Daniel Preussker <f0o@devilcode.org> <<<EOC5
         if (
             not distpoll
@@ -185,18 +195,34 @@ def poll_worker(poll_queue):
             try:
                 start_time = time.time()
 
-                output = (
-                    "-d >> %s/poll_device_%s.log" % (log_dir, device_id)
-                    if debug
-                    else ">> /dev/null"
-                )
-                command = "/usr/bin/env php %s -h %s %s 2>&1" % (
-                    poller_path,
-                    device_id,
-                    output,
-                )
-                # TODO: replace with command_runner
-                subprocess.check_call(command, shell=True)
+                while True:
+                    try:
+                        poller.stdin.write(str(device_id).encode())
+                        poller.stdin.write("\n".encode())
+                        poller.stdin.flush()
+                        break
+                    except:
+                        poller.stdin.close()
+                        poller.stdout.close()
+                        while poller.returncode is None:
+                            poller.poll()
+
+                        poller = subprocess.Popen(command, shell=True, stdin=subprocess.PIPE, stdout=subprocess.PIPE)
+
+                endofinput = "### Poll of " + str(device_id) + " complete ###"
+                if debug:
+                    debug_fd = open("%s/poll_device_%s.log" % (log_dir, device_id), "a")
+
+                while True:
+                    line = poller.stdout.readline()
+                    if not line or line.decode().rstrip('\r\n') == endofinput:
+                        break
+
+                    if debug:
+                        debug_fd.write(line.decode())
+
+                if debug:
+                    debug_fd.close()
 
                 elapsed_time = int(time.time() - start_time)
                 print_queue.put(
@@ -207,6 +233,11 @@ def poll_worker(poll_queue):
             except:
                 pass
         poll_queue.task_done()
+
+    poller.stdin.close()
+    poller.stdout.close()
+    while poller.returncode is None:
+        poller.poll()
 
 
 if __name__ == "__main__":
@@ -326,7 +357,7 @@ if __name__ == "__main__":
             + ") and disabled = 0 order by last_polled_timetaken desc"
         )
     else:
-        query = "select device_id, last_polled_timetaken from devices where disabled = 0 order by last_polled_timetaken desc"
+        query = "select device_id,last_polled_timetaken from devices where disabled = 0 order by last_polled_timetaken desc"
     # EOC2
 
     db = LNMS.db_open(
