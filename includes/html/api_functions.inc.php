@@ -20,9 +20,9 @@ use App\Models\OspfPort;
 use App\Models\Port;
 use App\Models\PortGroup;
 use App\Models\PortsFdb;
-use App\Models\UserPref;
 use App\Models\Sensor;
 use App\Models\ServiceTemplate;
+use App\Models\UserPref;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Routing\Router;
 use Illuminate\Support\Arr;
@@ -416,7 +416,7 @@ function maintenance_device(Illuminate\Http\Request $request)
         dbUpdate(['notes' => $device_notes], 'devices', '`device_id` = ?', [$device_id]);
     }
 
-    return api_success_noresult(201, "Device $hostname ($device_id) moved into maintenance mode for " . $data['duration'] . " h");
+    return api_success_noresult(201, "Device $hostname ($device_id) moved into maintenance mode for " . $data['duration'] . ' h');
 }
 
 function add_device(Illuminate\Http\Request $request)
