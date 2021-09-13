@@ -20,6 +20,7 @@ use App\Models\OspfPort;
 use App\Models\Port;
 use App\Models\PortGroup;
 use App\Models\PortsFdb;
+use App\Models\UserPref;
 use App\Models\Sensor;
 use App\Models\ServiceTemplate;
 use Illuminate\Database\Eloquent\Builder;
@@ -356,6 +357,66 @@ function list_devices(Illuminate\Http\Request $request)
     }
 
     return api_success($devices, 'devices');
+}
+
+function maintenance_device(Illuminate\Http\Request $request)
+{
+    //TODO: should be deduplicated with
+    // includes/html/forms/schedule-maintenance.inc.php
+
+    $data = json_decode($request->getContent(), true);
+
+    if (empty($data)) {
+        return api_error(400, 'No information has been provided to set this device into maintenance');
+    }
+
+    $hostname = $request->route('hostname');
+
+    // use hostname as device_id if it's all digits
+    $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
+
+    // find device matching the id
+    $device = device_by_id_cache($device_id);
+    if (! $device || ! $device['device_id']) {
+        return api_error(404, "Device $hostname does not exist");
+    }
+
+    $hostname = gethostbyid($device_id);
+
+    $title = $hostname;
+    $notes = $data['notes'];
+    $recurring = 0;
+    $start = date('Y-m-d H:i:s');
+    [$duration_hour, $duration_min] = explode(':', $data['duration']);
+
+    if (isset($duration_hour) && isset($duration_min)) {
+        $end = date('Y-m-d H:i:00', strtotime('+' . intval($duration_hour) . ' hour ' . intval($duration_min) . ' minute', strtotime($start)));
+    }
+
+    $start_recurring_dt = '1970-01-02';
+    $end_recurring_dt = '1970-01-02';
+    $start_recurring_hr = '00:00:00';
+    $end_recurring_hr = '00:00:00';
+
+    $schedule_id = 0;
+    $alert_schedule = \App\Models\AlertSchedule::findOrNew($schedule_id);
+    $alert_schedule->title = $title;
+    $alert_schedule->notes = $notes;
+    $alert_schedule->recurring = $recurring;
+    $alert_schedule->start = $start;
+    $alert_schedule->end = $end;
+    $alert_schedule->save();
+
+    $type = 'device';
+
+    $item = dbInsert(['schedule_id' => $alert_schedule->schedule_id, 'alert_schedulable_type' => $type, 'alert_schedulable_id' => $device_id], 'alert_schedulables');
+    if ($notes && $type = 'device' && UserPref::getPref(Auth::user(), 'add_schedule_note_to_device')) {
+        $device_notes = dbFetchCell('SELECT `notes` FROM `devices` WHERE `device_id` = ?;', [$device_id]);
+        $device_notes .= ((empty($device_notes)) ? '' : PHP_EOL) . date('Y-m-d H:i') . ' Alerts delayed: ' . $notes;
+        dbUpdate(['notes' => $device_notes], 'devices', '`device_id` = ?', [$device_id]);
+    }
+
+    return api_success_noresult(201, "Device $hostname ($device_id) moved into maintenance mode for " . $data['duration'] . " h");
 }
 
 function add_device(Illuminate\Http\Request $request)
