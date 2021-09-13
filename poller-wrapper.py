@@ -153,7 +153,7 @@ def printworker():
 """
 
 
-def poll_worker():
+def poll_worker(poll_queue):
     while True:
         device_id = poll_queue.get()
         # (c) 2015, GPLv3, Daniel Preussker <f0o@devilcode.org> <<<EOC5
@@ -309,7 +309,8 @@ if __name__ == "__main__":
     except (IndexError, ValueError):
         amount_of_workers = 16
 
-    devices_list = []
+    slow_devices_list = []
+    fast_devices_list = []
 
     """
         This query specificly orders the results depending on the last_polled_timetaken variable
@@ -320,12 +321,12 @@ if __name__ == "__main__":
     # (c) 2015, GPLv3, Daniel Preussker <f0o@devilcode.org> <<<EOC2
     if poller_group is not False:
         query = (
-            "select device_id from devices where poller_group IN("
+            "select device_id, last_polled_timetaken from devices where poller_group IN("
             + poller_group
             + ") and disabled = 0 order by last_polled_timetaken desc"
         )
     else:
-        query = "select device_id from devices where disabled = 0 order by last_polled_timetaken desc"
+        query = "select device_id, last_polled_timetaken from devices where disabled = 0 order by last_polled_timetaken desc"
     # EOC2
 
     db = LNMS.db_open(
@@ -339,8 +340,28 @@ if __name__ == "__main__":
     cursor = db.cursor()
     cursor.execute(query)
     devices = cursor.fetchall()
+
+    # Add up the poll time for all devices
+    all_poll_time=0
     for row in devices:
-        devices_list.append(int(row[0]))
+        all_poll_time+=int(row[1])
+
+    # Divide poll time by 2 so we can split into 2 lists of equal run time (est)
+    all_poll_time/=2
+
+    fast_poll_time=0
+    slow_poll_time=0
+    for row in devices:
+        # Start by putting the devices slowest first into the slow queue
+        if all_poll_time > 0:
+            slow_devices_list.append(int(row[0]))
+            all_poll_time-=int(row[1])
+            slow_poll_time+=int(row[1])
+        else:
+            # Then swap to the fast queue with the fastest first
+            fast_devices_list.insert(0,int(row[0]))
+            fast_poll_time+=int(row[1])
+
     # (c) 2015, GPLv3, Daniel Preussker <f0o@devilcode.org> <<<EOC3
     if distpoll and not IsNode:
         query = "select max(device_id),min(device_id) from devices"
@@ -351,7 +372,8 @@ if __name__ == "__main__":
     # EOC3
     db.close()
 
-    poll_queue = queue.Queue()
+    fast_poll_queue = queue.Queue()
+    slow_poll_queue = queue.Queue()
     print_queue = queue.Queue()
 
     print(
@@ -359,11 +381,24 @@ if __name__ == "__main__":
         % (time.strftime("%Y-%m-%d %H:%M:%S"), amount_of_workers)
     )
 
-    for device_id in devices_list:
-        poll_queue.put(device_id)
+    for device_id in slow_devices_list:
+        slow_poll_queue.put(device_id)
+
+    for device_id in fast_devices_list:
+        fast_poll_queue.put(device_id)
+
+    # We will split the amount of workers into 2 groups - fast and slow
+    amount_of_workers = amount_of_workers >> 1
+    if amount_of_workers == 0:
+        amount_of_workers = 1
 
     for i in range(amount_of_workers):
-        t = threading.Thread(target=poll_worker)
+        t = threading.Thread(target=poll_worker, args=(slow_poll_queue,))
+        t.setDaemon(True)
+        t.start()
+
+    for i in range(amount_of_workers):
+        t = threading.Thread(target=poll_worker, args=(fast_poll_queue,))
         t.setDaemon(True)
         t.start()
 
@@ -372,7 +407,8 @@ if __name__ == "__main__":
     p.start()
 
     try:
-        poll_queue.join()
+        fast_poll_queue.join()
+        slow_poll_queue.join()
         print_queue.join()
     except (KeyboardInterrupt, SystemExit):
         raise
