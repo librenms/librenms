@@ -65,7 +65,7 @@ class GraphRow extends Component
         $this->graphs = $graphs;
         $this->title = $title;
         $this->responsive = $columns == 'responsive';
-        $this->rowWidth = $this->calculateRowWidth($columns);
+        $this->rowWidth = $this->calculateRowWidth((int) $columns);
     }
 
     /**
