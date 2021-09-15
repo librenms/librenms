@@ -100,6 +100,8 @@ return [
         'VMWARE-VMINFO-MIB::vmwVmPoweredOn' => \LibreNMS\Snmptrap\Handlers\VmwVmPoweredOn::class,
         'VMWARE-VMINFO-MIB::vmwVmPoweredOff' => \LibreNMS\Snmptrap\Handlers\VmwVmPoweredOff::class,
         'VMWARE-VMINFO-MIB::vmwVmSuspended' => \LibreNMS\Snmptrap\Handlers\VmwVmSuspended::class,
+        'OCCAM-SENSOR-MIB::occamExtAlarmRaised' => \LibreNMS\Snmptrap\Handlers\OccamSensorExtAlarmRaised.php::class,
+        'OCCAM-KERNEL-MIB::fanTrayNotification' => \LibreNMS\Snmptrap\Handlers\OccamFanTrayNotification::class,
         'OSPF-TRAP-MIB::ospfIfStateChange' => \LibreNMS\Snmptrap\Handlers\OspfIfStateChange::class,
         'OSPF-TRAP-MIB::ospfNbrStateChange' => \LibreNMS\Snmptrap\Handlers\OspfNbrStateChange::class,
         'UPS-MIB::upsTraps.0.1' => \LibreNMS\Snmptrap\Handlers\UpsTrapsOnBattery::class,
