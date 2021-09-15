@@ -1927,7 +1927,6 @@ function get_port_groups(Illuminate\Http\Request $request)
 
 function assign_port_group(Illuminate\Http\Request $request)
 {
-    # add port group to listed port_ids
     $port_group_id = $request->route('port_group_id');
     $data = json_decode($request->getContent(), true);
     $port_id_list = $data['port_ids'];
@@ -1952,7 +1951,6 @@ function assign_port_group(Illuminate\Http\Request $request)
 
 function remove_port_group(Illuminate\Http\Request $request)
 {
-    # remove port group from listed port_ids
     $port_group_id = $request->route('port_group_id');
     $data = json_decode($request->getContent(), true);
     $port_id_list = $data['port_ids'];
@@ -1972,7 +1970,7 @@ function remove_port_group(Illuminate\Http\Request $request)
 
     $port_group->ports()->detach($port_id_list);
 
-    return api_success(200, 'Port Ids ' . implode(', ', $port_id_list). ' have been removed from Port Group Id ' . $port_group_id);
+    return api_success(200, 'Port Ids ' . implode(', ', $port_id_list) . ' have been removed from Port Group Id ' . $port_group_id);
 }
 
 function add_device_group(Illuminate\Http\Request $request)
