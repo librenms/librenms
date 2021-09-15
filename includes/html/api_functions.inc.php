@@ -1922,7 +1922,6 @@ function get_port_groups(Illuminate\Http\Request $request)
     }
 
     return api_success($groups->makeHidden('pivot')->toArray(), 'groups', 'Found ' . $groups->count() . ' port groups');
-
 }
 
 function assign_port_group(Illuminate\Http\Request $request)
