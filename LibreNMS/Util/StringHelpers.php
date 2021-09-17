@@ -117,6 +117,12 @@ class StringHelpers
             return (string) $converted;
         }
 
-        return (string) iconv('CP850', 'UTF-8', $string);
+        if ($charset !== 'CP850' && $converted =  @iconv('Windows-1252', 'UTF-8', $string) !== false) {
+            return (string) $converted;
+        }
+
+        \Log::debug('Failed to convert string: ' . $string);
+
+        return $string;
     }
 }
