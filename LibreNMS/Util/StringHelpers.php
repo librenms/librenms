@@ -110,13 +110,13 @@ class StringHelpers
         $charset = config('app.charset');
 
         if ($converted = @iconv($charset, 'UTF-8', $string) !== false) {
-            return $converted;
+            return (string) $converted;
         }
 
         if ($charset !== 'Windows-1252' && $converted = @iconv('Windows-1252', 'UTF-8', $string) !== false) {
-            return $converted;
+            return (string) $converted;
         }
 
-        return iconv('CP850', 'UTF-8', $string);
+        return (string) iconv('CP850', 'UTF-8', $string);
     }
 }
