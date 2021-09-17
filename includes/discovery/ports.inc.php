@@ -3,6 +3,7 @@
 // Build SNMP Cache Array
 use App\Models\PortGroup;
 use LibreNMS\Config;
+use LibreNMS\Util\StringHelpers;
 
 $port_stats = [];
 $port_stats = snmpwalk_cache_oid($device, 'ifDescr', $port_stats, 'IF-MIB');
@@ -60,6 +61,7 @@ $default_port_group = Config::get('default_port_group');
 // New interface detection
 foreach ($port_stats as $ifIndex => $snmp_data) {
     $snmp_data['ifIndex'] = $ifIndex; // Store ifIndex in port entry
+    $snmp_data['ifAlias'] = StringHelpers::inferEncoding($snmp_data['ifAlias']);
 
     // Get port_id according to port_association_mode used for this device
     $port_id = get_port_id($ports_mapped, $snmp_data, $port_association_mode);
