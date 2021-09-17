@@ -247,5 +247,5 @@ return [
         'Rrd' => App\Facades\Rrd::class,
     ],
 
-    'charset' => env('CHARSET', ini_get('php.output_encoding') ?: ini_get('default_charset') ?: 'UTF-8')
+    'charset' => env('CHARSET', ini_get('php.output_encoding') ?: ini_get('default_charset') ?: 'UTF-8'),
 ];
