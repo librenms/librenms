@@ -18,6 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2016 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -40,7 +41,8 @@ class HostUnreachableException extends \Exception
 
     /**
      * Add additional reasons
-     * @param string $message
+     *
+     * @param  string  $message
      */
     public function addReason($message)
     {
@@ -49,6 +51,7 @@ class HostUnreachableException extends \Exception
 
     /**
      * Get the reasons
+     *
      * @return array
      */
     public function getReasons()

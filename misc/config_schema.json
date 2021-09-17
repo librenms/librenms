@@ -27,8 +27,7 @@
                         "type": "integer"
                     },
                     "options": {
-                        "type": "object",
-                        "minProperties": 2
+                        "type": "object"
                     },
                     "units": {
                         "type": "string"
@@ -65,10 +64,37 @@
                 },
                 "required": ["type"],
                 "additionalProperties": false,
-                "anyOf": [
+                "oneOf": [
                     {
-                        "properties": { "type": {"const": "select"} },
+                        "properties": {
+                            "type": {"const": "select"},
+                            "options": {
+                                "type": "object",
+                                "minProperties": 2
+                            }
+                        },
                         "required": ["options"]
+                    },
+                    {
+                        "properties": {
+                            "type": {"const": "select-dynamic"},
+                            "options": {
+                                "type": "object",
+                                "properties": {
+                                    "allowClear": {"type": "boolean"},
+                                    "callback": {"type": "string"},
+                                    "placeholder": {"type": "string"},
+                                    "target": {"type": "string"}
+                                },
+                                "minProperties": 1,
+                                "required": ["target"],
+                                "additionalProperties": false
+                            },
+                            "validate": {
+                                "minProperties": 1
+                            }
+                        },
+                        "required": ["options", "validate"]
                     },
                     {
                         "properties": {
@@ -84,7 +110,6 @@
                                     "color",
                                     "float",
                                     "graph",
-                                    "dashboard-select",
                                     "snmp3auth",
                                     "ldap-groups",
                                     "ad-groups",

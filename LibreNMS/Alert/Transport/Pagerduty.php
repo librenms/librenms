@@ -15,6 +15,7 @@
 
 /**
  * PagerDuty Generic-API Transport
+ *
  * @author f0o <f0o@devilcode.org>
  * @copyright 2015 f0o, LibreNMS
  * @license GPL
@@ -48,8 +49,8 @@ class Pagerduty extends Transport
     }
 
     /**
-     * @param array $obj
-     * @param array $config
+     * @param  array  $obj
+     * @param  array  $config
      * @return bool|string
      */
     public function contactPagerduty($obj, $config)
@@ -60,7 +61,7 @@ class Pagerduty extends Transport
             'dedup_key'    => (string) $obj['alert_id'],
             'payload'    => [
                 'custom_details'  => strip_tags($obj['msg']) ?: 'Test',
-                'device_groups'   => \DeviceCache::get($obj['device_id'])->groups->pluck('name'),
+                'group'   => (string) \DeviceCache::get($obj['device_id'])->groups->pluck('name'),
                 'source'   => $obj['hostname'],
                 'severity' => $obj['severity'],
                 'summary'  => ($obj['name'] ? $obj['name'] . ' on ' . $obj['hostname'] : $obj['title']),

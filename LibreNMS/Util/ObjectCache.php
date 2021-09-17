@@ -18,6 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2019 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -122,8 +123,8 @@ class ObjectCache
     }
 
     /**
-     * @param int $device_id device id of the device to get counts for, 0 means all
-     * @param array $fields array of counts to get. Valid options: total, up, down, ignored, shutdown, disabled, deleted, errored, pseudowire
+     * @param  int  $device_id  device id of the device to get counts for, 0 means all
+     * @param  array  $fields  array of counts to get. Valid options: total, up, down, ignored, shutdown, disabled, deleted, errored, pseudowire
      * @return mixed
      */
     public static function portCounts($fields = ['total'], $device_id = 0)
@@ -167,7 +168,7 @@ class ObjectCache
     }
 
     /**
-     * @param array $fields array of counts to get. Valid options: total, up, down, ignored, disabled
+     * @param  array  $fields  array of counts to get. Valid options: total, up, down, ignored, disabled
      * @return array
      */
     public static function deviceCounts($fields = ['total'])
@@ -203,7 +204,7 @@ class ObjectCache
     }
 
     /**
-     * @param array $fields array of counts to get. Valid options: total, ok, warning, critical, ignored, disabled
+     * @param  array  $fields  array of counts to get. Valid options: total, ok, warning, critical, ignored, disabled
      * @return array
      */
     public static function serviceCounts($fields = ['total'], $device_id = 0)

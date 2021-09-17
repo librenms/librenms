@@ -18,6 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -138,7 +139,7 @@ class Rewrite
     /**
      * Reformat a mac stored in the DB (only hex) to a nice readable format
      *
-     * @param string $mac
+     * @param  string  $mac
      * @return string
      */
     public static function readableMac($mac)
@@ -149,7 +150,7 @@ class Rewrite
     /**
      * Extract the OUI and match it against cached values
      *
-     * @param string $mac
+     * @param  string  $mac
      * @return string
      */
     public static function readableOUI($mac)
@@ -167,7 +168,7 @@ class Rewrite
      * 00:02:04:0B:0D:0F becomes 0.2.4.11.13.239
      * 0:2:4:B:D:F       becomes 0.2.4.11.13.15
      *
-     * @param string $mac
+     * @param  string  $mac
      * @return string oid representation of a MAC address
      */
     public static function oidMac($mac)
@@ -188,7 +189,7 @@ class Rewrite
      * 00:02:04:0B:0D:0F becomes 0002040B0D0F
      * 0:2:4:B:D:F       becomes 0002040B0D0F
      *
-     * @param string $mac hexadecimal MAC address with or without common delimiters
+     * @param  string  $mac  hexadecimal MAC address with or without common delimiters
      * @return string undelimited hexadecimal MAC address
      */
     public static function macToHex($mac)
@@ -202,8 +203,8 @@ class Rewrite
     /**
      * Make Cisco hardware human readable
      *
-     * @param Device $device
-     * @param bool $short
+     * @param  Device  $device
+     * @param  bool  $short
      * @return string
      */
     public static function ciscoHardware(&$device, $short = false)
@@ -450,7 +451,8 @@ class Rewrite
 
     /**
      * If given input is an IPv6 address, wrap it in [] for use in applications that require it
-     * @param string $ip
+     *
+     * @param  string  $ip
      * @return string
      */
     public static function addIpv6Brackets($ip): string

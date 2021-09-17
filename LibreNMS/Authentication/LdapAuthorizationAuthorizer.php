@@ -16,6 +16,7 @@
 
 /**
  * libreNMS HTTP-Authentication and LDAP Authorization Library
+ *
  * @author Maximilian Wilhelm <max@rfc2324.org>
  * @copyright 2016 LibreNMS, Barbarossa
  * @license GPL

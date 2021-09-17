@@ -18,6 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2018 Neil Lathwood
  * @author     Neil Lathwood <gh+n@laf.io>
  */
@@ -34,7 +35,7 @@ class Template
     /**
      * Get the template details
      *
-     * @param array|null $obj
+     * @param  array|null  $obj
      * @return mixed
      */
     public function getTemplate($obj = null)
@@ -66,7 +67,7 @@ class Template
     /**
      * Parse Blade body
      *
-     * @param array $data
+     * @param  array  $data
      * @return string
      */
     public function bladeBody($data)
@@ -82,7 +83,7 @@ class Template
     /**
      * Parse Blade title
      *
-     * @param array $data
+     * @param  array  $data
      * @return string
      */
     public function bladeTitle($data)

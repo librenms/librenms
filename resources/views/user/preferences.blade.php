@@ -159,7 +159,7 @@
             <strong class="green">@lang('Global Viewing Access')</strong>
         @else
             @forelse($devices as $device)
-                @deviceLink($device) <br />
+                <x-device-link :device="$device" /><br />
             @empty
                 <strong class="red">@lang('No access!')</strong>
             @endforelse

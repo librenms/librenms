@@ -18,6 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @link       http://librenms.org
+ *
  * @copyright  2021 Otto Reinikainen
  * @author     Otto Reinikainen <otto@ottorei.fi>
  */
@@ -33,7 +34,6 @@ use LibreNMS\Interfaces\Discovery\IsIsDiscovery;
 use LibreNMS\Interfaces\Module;
 use LibreNMS\Interfaces\Polling\IsIsPolling;
 use LibreNMS\OS;
-use LibreNMS\OS\Junos;
 use LibreNMS\Util\IP;
 
 class Isis implements Module
@@ -115,8 +115,8 @@ class Isis implements Module
                     continue;
                 }
 
-                if ($os instanceof Junos && $circuit_id == 16) {
-                    continue; // Do not poll loopback interface
+                if ($circuit_data['isisCircPassiveCircuit'] == 'true') {
+                    continue; // Do not poll passive interfaces
                 }
 
                 $adjacency_data = Arr::last($adjacencies_data[$circuit_id] ?? [[]]);

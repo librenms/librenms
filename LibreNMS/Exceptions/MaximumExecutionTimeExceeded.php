@@ -18,6 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2020 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -33,7 +34,7 @@ class MaximumExecutionTimeExceeded extends \Exception implements UpgradeableExce
     /**
      * Try to convert the given Exception to a FilePermissionsException
      *
-     * @param \Exception $exception
+     * @param  \Exception  $exception
      * @return static|null
      */
     public static function upgrade($exception)

@@ -31,7 +31,7 @@ function bulk_sensor_snmpget($device, $sensors)
 
 /**
  * @param $device
- * @param string $type type/class of sensor
+ * @param  string  $type  type/class of sensor
  * @return array
  */
 function sensor_precache($device, $type)
@@ -226,8 +226,8 @@ function record_sensor_data($device, $all_sensors)
 }
 
 /**
- * @param array $device The device to poll
- * @param bool $force_module Ignore device module overrides
+ * @param  array  $device  The device to poll
+ * @param  bool  $force_module  Ignore device module overrides
  * @return bool
  */
 function poll_device($device, $force_module = false)
@@ -436,10 +436,10 @@ function poll_device($device, $force_module = false)
  * The group name (key) will be prepended to each metric in that group, separated by an underscore
  * The special group "none" will not be prefixed.
  *
- * @param array $app app from the db, including app_id
- * @param string $response This should be the return state of Application polling
- * @param array $metrics an array of additional metrics to store in the database for alerting
- * @param string $status This is the current value for alerting
+ * @param  array  $app  app from the db, including app_id
+ * @param  string  $response  This should be the return state of Application polling
+ * @param  array  $metrics  an array of additional metrics to store in the database for alerting
+ * @param  string  $status  This is the current value for alerting
  */
 function update_application($app, $response, $metrics = [], $status = '')
 {
@@ -608,11 +608,11 @@ function update_application($app, $response, $metrics = [], $status = '')
  *
  * If the error is less than -1, you can assume it is a legacy snmp extend script.
  *
- * @param array $device
- * @param string $extend the extend name. For example, if 'zfs' is passed it will be converted to 'nsExtendOutputFull.3.122.102.115'.
- * @param int $min_version the minimum version to accept for the returned JSON. default: 1
- *
+ * @param  array  $device
+ * @param  string  $extend  the extend name. For example, if 'zfs' is passed it will be converted to 'nsExtendOutputFull.3.122.102.115'.
+ * @param  int  $min_version  the minimum version to accept for the returned JSON. default: 1
  * @return array The json output data parsed into an array
+ *
  * @throws JsonAppBlankJsonException
  * @throws JsonAppExtendErroredException
  * @throws JsonAppMissingKeysException
@@ -666,11 +666,10 @@ function json_app_get($device, $extend, $min_version = 1)
  *
  * One argument is taken and that is the array to flatten.
  *
- * @param array $array
- * @param string $prefix What to prefix to the name. Defaults to '', nothing.
- * @param string $joiner The string to join the prefix, if set to something other
- *                       than '', and array keys with.
- *
+ * @param  array  $array
+ * @param  string  $prefix  What to prefix to the name. Defaults to '', nothing.
+ * @param  string  $joiner  The string to join the prefix, if set to something other
+ *                          than '', and array keys with.
  * @return array The flattened array.
  */
 function data_flatten($array, $prefix = '', $joiner = '_')

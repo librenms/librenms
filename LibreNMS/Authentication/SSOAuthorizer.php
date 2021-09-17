@@ -18,6 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://librenms.org
+ *
  * @copyright  2017 Adam Bishop
  * @author     Adam Bishop <adam@omega.org.uk>
  */
@@ -72,7 +73,7 @@ class SSOAuthorizer extends MysqlAuthorizer
      * Return an attribute from the configured attribute store.
      * Returns null if the attribute cannot be found
      *
-     * @param string $attr The name of the attribute to find
+     * @param  string  $attr  The name of the attribute to find
      * @return string|null
      */
     public function authSSOGetAttr($attr, $prefix = 'HTTP_')

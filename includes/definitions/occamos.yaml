@@ -3,7 +3,7 @@ text: Calix B6 System
 type: network
 icon: calix
 mib_dir: calix
-nobulk: true
+snmp_bulk: false
 over:
     - { graph: device_bits, text: 'Device Traffic' }
 discovery:

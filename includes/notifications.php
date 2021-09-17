@@ -15,16 +15,19 @@
 
 /**
  * Notification Poller
+ *
  * @copyright 2015 Daniel Preussker, QuxLabs UG
  * @copyright 2017 Tony Murray
  * @author    Daniel Preussker
  * @author    Tony Murray <murraytony@gmail.com>
  * @license   GPL
+ *
  * @link      https://www.librenms.org
  */
 
 /**
  * Pull notifications from remotes
+ *
  * @return array Notifications
  */
 function get_notifications()
@@ -51,6 +54,7 @@ function get_notifications()
 
 /**
  * Post notifications to users
+ *
  * @return null
  */
 function post_notifications()
@@ -68,7 +72,8 @@ function post_notifications()
 
 /**
  * Parse RSS
- * @param array $feed RSS Object
+ *
+ * @param  array  $feed  RSS Object
  * @return array Parsed Object
  */
 function parse_rss($feed)
@@ -91,7 +96,8 @@ function parse_rss($feed)
 
 /**
  * Parse Atom
- * @param array $feed Atom Object
+ *
+ * @param  array  $feed  Atom Object
  * @return array Parsed Object
  */
 function parse_atom($feed)
@@ -115,11 +121,11 @@ function parse_atom($feed)
 /**
  * Create a new custom notification. Duplicate title+message notifications will not be created.
  *
- * @param string $title
- * @param string $message
- * @param int $severity 0=ok, 1=warning, 2=critical
- * @param string $source A string describing what created this notification
- * @param string $date
+ * @param  string  $title
+ * @param  string  $message
+ * @param  int  $severity  0=ok, 1=warning, 2=critical
+ * @param  string  $source  A string describing what created this notification
+ * @param  string  $date
  * @return bool
  */
 function new_notification($title, $message, $severity = 0, $source = 'adhoc', $date = null)
@@ -144,7 +150,7 @@ function new_notification($title, $message, $severity = 0, $source = 'adhoc', $d
  * Removes all notifications with the given title.
  * This should be used with care.
  *
- * @param string $title
+ * @param  string  $title
  */
 function remove_notification($title)
 {

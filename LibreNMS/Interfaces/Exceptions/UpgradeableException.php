@@ -18,6 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2019 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -30,7 +31,7 @@ interface UpgradeableException
      * Try to convert the given Exception to this exception
      * It should return null if the Exception cannot be upgraded.
      *
-     * @param \Exception $exception
+     * @param  \Exception  $exception
      * @return static|null
      */
     public static function upgrade($exception);
