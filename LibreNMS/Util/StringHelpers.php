@@ -103,17 +103,17 @@ class StringHelpers
      */
     public static function inferEncoding(?string $string): ?string
     {
-        if (empty($string) || ctype_print($string) || ! \function_exists('iconv')) {
+        if (empty($string) || ctype_print($string) || ! function_exists('iconv')) {
             return $string;
         }
 
         $charset = config('app.charset');
 
-        if (false !== $converted = @iconv($charset, 'UTF-8', $string)) {
+        if ($converted = @iconv($charset, 'UTF-8', $string) !== false) {
             return $converted;
         }
 
-        if ('Windows-1252' !== $charset && false !== $converted = @iconv('Windows-1252', 'UTF-8', $string)) {
+        if ($charset !== 'Windows-1252' && $converted = @iconv('Windows-1252', 'UTF-8', $string) !== false) {
             return $converted;
         }
 
