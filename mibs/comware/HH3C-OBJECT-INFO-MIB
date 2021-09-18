@@ -1,0 +1,226 @@
+-- =================================================================
+-- Copyright (C) 2004 New H3C Tech. Co., Ltd. All rights reserved.
+--
+-- Description: Object Information query mib
+-- Reference: None
+-- Version: V1.0
+-- History:
+--   V1.0 created by longyin
+--     2005-01-04 Initial version
+-- =================================================================
+HH3C-OBJECT-INFO-MIB   DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        OBJECT-TYPE, MODULE-IDENTITY
+            FROM SNMPv2-SMI
+        OBJECT-GROUP, MODULE-COMPLIANCE
+            FROM SNMPv2-CONF
+        hh3cCommon
+            FROM HH3C-OID-MIB;
+
+    hh3cObjectInfo   MODULE-IDENTITY
+        LAST-UPDATED "200412270000Z"        -- December 27, 2004 at 14:49 GMT
+        ORGANIZATION
+            "New H3C Tech. Co., Ltd."
+        CONTACT-INFO
+            "Platform Team New H3C Tech. Co., Ltd.
+            Hai-Dian District Beijing P.R. China
+            http://www.h3c.com
+            Zip:100085
+            "
+        DESCRIPTION
+            "
+            This MIB is used to acquire information from the agent.
+            Before a NMS takes some actions, it is not sure whether the
+            agent supports it or not.  This MIB is used to solve this problem.
+            "
+        REVISION "200412270000Z"   -- December 27, 2004 at 14:49 GMT
+        DESCRIPTION
+            "
+            The initial revision of this MIB module.
+            "
+        ::= { hh3cCommon 55 }
+
+--
+-- Node definitions
+--
+
+hh3cObjectInformation   OBJECT IDENTIFIER ::= { hh3cObjectInfo 1 }
+
+-- The hh3cObjectInfo Table =========================================================
+
+    hh3cObjectInfoTable   OBJECT-TYPE
+        SYNTAX  SEQUENCE OF Hh3cObjectInfoEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+        "
+        MIB objects information query table.
+        "
+        ::= { hh3cObjectInformation 1 }
+
+    hh3cObjectInfoEntry   OBJECT-TYPE
+        SYNTAX Hh3cObjectInfoEntry
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+            " 
+            The entry of hh3cObjectInfoTable. 
+            "
+        INDEX   { hh3cObjectInfoOID, hh3cObjectInfoType, hh3cObjectInfoTypeExtension }
+        ::= { hh3cObjectInfoTable  1 }
+
+    Hh3cObjectInfoEntry ::= SEQUENCE {
+        hh3cObjectInfoOID             OBJECT IDENTIFIER,
+        hh3cObjectInfoType            INTEGER,
+        hh3cObjectInfoTypeExtension   OCTET STRING,
+        hh3cObjectInfoValue           OCTET STRING
+        }
+
+    hh3cObjectInfoOID   OBJECT-TYPE
+        SYNTAX  OBJECT IDENTIFIER
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+            " 
+            The OID of the MIB object which is queried.  
+            If the user has no privilege accessing to the object referred by this OID, 
+            get operation on hh3cObjectInfoValue will be failed.
+            "
+        ::= { hh3cObjectInfoEntry 1 }
+
+    hh3cObjectInfoType   OBJECT-TYPE
+        SYNTAX  INTEGER
+        {
+            reserved(1),       -- this value is reserved, not used.
+            accessType(2),     -- query access type of the MIB object
+            dataType(3),       -- query data type of the MIB object
+            dataRange(4),      -- query data value range of the MIB object
+            dataLength(5)      -- query data length of the MIB object
+        }
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+            "
+            The object's properties type to be queried.         
+            The queried result will be returned by hh3cObjectInfoValue.  The format of the result will be
+            different according to different hh3cObjectInfoType.
+            "
+        ::= { hh3cObjectInfoEntry 2 }
+
+    hh3cObjectInfoTypeExtension   OBJECT-TYPE
+        SYNTAX  OCTET STRING(SIZE (1..10))
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+            "
+            The object's property type extension to be queried.  
+            This object's value is relative to the value of hh3cObjectInfoType.
+            "
+        ::= { hh3cObjectInfoEntry 3 }
+
+    hh3cObjectInfoValue   OBJECT-TYPE
+        SYNTAX  OCTET STRING
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+            "
+            Return property value of the queried object.   
+            Zero length string is the default value of this object which means no value is returned.  
+            If the request is invalid, then the result should be the default value.  
+        
+            If the value of hh3cObjectInfoType is accessType, the rules below should be followed.  
+                1) The returned value must have prefix 'A', and followed by some nonnegative integers.
+                   The format is like 'A2'.
+                2) The nonnegative integers and the meaning of them are as follow:
+                               0 means 'not-accessible'.
+                               1 means 'notification'.
+                               2 means 'read-only'.
+                               3 means 'read-write'.
+                               4 means 'read-create'.
+                               5 means 'write-only'.
+                               6 means 'accessible-for-notify'.
+                               7 means 'error'.
+                               --the above values are defined by standard protocol 
+                               101 means 'not implemented'.  -- The queried node is not implemented by agent.
+                               102 means 'unknown error'.    -- Query failed for unknown reason.
+                 
+            If the value of hh3cObjectInfoType is dataType, the rules below should be followed.  
+               1) The returned value must have prefix 'T', and followed by string which has
+                  format like 2), such as 'T1', the character '1' means INTEGER.  
+               2) The following data types are defined in standard protocol, the values in brackets 
+                  will be returned to indicate these data types.
+                               INTEGER(1)
+                               Integer32(2)
+                               Unsigned32(4)
+                               Gauge(6)
+                               Counter(7)
+                               Counter32(8)
+                               Counter64(9)
+                               TimeTicks(10)
+                               OCTET STRING(11)
+                               OBJECT IDENTIFIER(12)
+                               IpAddress(13)
+                               NetworkAddress(14)
+                               Opaque(15)
+                               BITS(16)
+            
+            If the value of hh3cObjectInfoType is dataRange, the rules below should be followed.
+               1) The returned value must have prefix 'R', and followed by string which has the
+                  format like 2) to 5), such as 'R[1,1]'.
+               2) If hh3cObjectInfoValue returns Integer32, the format is as followed. Suppose A is a 
+                  MIB object.
+                  If SYNTAX of A is 'Integer32{1|2|3|5|6|7}', the format is 'R[1,3],[5,7]'.
+                  If SYNTAX of A is 'Integer32{1|3}', the format is 'R[1,1],[3,3]'.
+                  If SYNTAX of A is 'Integer32', the format is 'R[]' which means the default value 
+                  range of Integer32 between -2147483648 and 2147483647.
+               3) The process of Counter, Counter32, Counter64, Unsigned32, Gauge32, INTEGER is the 
+                  same as that of Integer32.
+               4) If SYNTAX of A is other types such as OCTET STRING, then this object returns default value 'R[]'.
+               5) If SYNTAX of A is 'BITS{a(0),b(1)}', the format is 'R[0,0],[1,1]'.
+            
+            If the value of hh3cObjectInfoType is dataLength, the rules below should be followed.
+               1) The returned value must have prefix 'L', and followed by string which has the format
+                  like 2) to 4), such as 'L[6,6]'.
+               2) If SYNTAX of A is 'OCTET STRING(SIZE (6|10..255))', the format is 'L[6,6],[10,255]'.
+                  If SYNTAX of A is 'OCTET STRING', the format is like 'L[]' which means the default 
+                  length of OCTET STRING between 0 and 65535.
+               3) If SYNTAX of A is BITS, the format of it is the same as OCTET STIRNG. But its unit 
+                  is in bit, not in byte.
+               4) If SYNTAX of A is other types such as INTEGER and IpAddress, this object returns 'L[]'.
+            "
+        ::= { hh3cObjectInfoEntry 4 }
+
+-- The hh3cObjectInfoMIB Conformance ==============================================
+
+    hh3cObjectInfoMIBConformance   OBJECT IDENTIFIER ::= { hh3cObjectInfo 2 }
+
+    hh3cObjectInfoMIBCompliances   OBJECT IDENTIFIER ::= { hh3cObjectInfoMIBConformance 1 }
+
+    hh3cObjectInfoMIBCompliance   MODULE-COMPLIANCE
+        STATUS  current
+        DESCRIPTION
+            " 
+            The compliance statement for implementing ObjectInfo MIB.
+            "
+        MODULE
+            HH3C-OBJECT-INFO-MIB
+        MANDATORY-GROUPS { hh3cObjectInfoTableGroup }
+
+        ::= { hh3cObjectInfoMIBCompliances 1 }
+
+-- The hh3cObjectInfoMIB Groups ====================================================
+    hh3cObjectInfoMIBGroups   OBJECT IDENTIFIER ::= { hh3cObjectInfoMIBConformance 2 }
+
+    hh3cObjectInfoTableGroup   OBJECT-GROUP
+        OBJECTS {
+                    hh3cObjectInfoValue
+                }
+        STATUS  current
+        DESCRIPTION
+            " 
+            The basic collection of hh3cObjectInfo table objects.
+            "
+        ::= { hh3cObjectInfoMIBGroups 1 }
+
+END

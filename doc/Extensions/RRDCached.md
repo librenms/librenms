@@ -17,7 +17,7 @@ This setting has to be the exact version of rrdtool you are running.
 NOTE: This feature requires your client version of rrdtool to be 1.5.5
 or newer, in addition to your rrdcached version.
 
-# Distributed Poller Support Matrix
+## Distributed Poller Support Matrix
 
 Shared FS: Is a shared filesystem required?
 
@@ -41,7 +41,7 @@ It is recommended that you monitor your LibreNMS server with LibreNMS
 so you can view the disk I/O usage delta.
 
 
-# Installation Manual for
+## Installation Manual for
 
 1. [RRDCached installation Ubuntu 16](#rrdcached-installation-ubuntu-16)
 1. [RRDCached installation Debian Buster](#rrdcached-installation-debian-buster)
@@ -51,7 +51,7 @@ so you can view the disk I/O usage delta.
 1. [Securing RRCached](#securing-rrcached)
 
 
-## RRDCached installation Ubuntu 16
+### RRDCached installation Ubuntu 16
 
 1: Install rrdcached
 
@@ -94,7 +94,7 @@ systemctl restart rrdcached.service
 $config['rrdcached'] = "unix:/run/rrdcached.sock";
 ```
 
-## RRDCached installation Debian Buster
+### RRDCached installation Debian Buster
 (rrdcached 1.7.1)
 
 1: Install rrdcached
@@ -152,7 +152,7 @@ $config['rrdcached'] = "IPADDRESS:42217";
 
 NOTE: change IPADDRESS to the ip the rrdcached server is listening on.
 
-## RRDCached installation Debian Stretch
+### RRDCached installation Debian Stretch
 (rrdcached 1.6.0)
 
 1: Install rrdcached
@@ -210,7 +210,7 @@ $config['rrdcached'] = "IPADDRESS:42217";
 
 NOTE: change IPADDRESS to the ip the rrdcached server is listening on.
 
-## RRDCached installation CentOS 7 or 8
+### RRDCached installation CentOS 7 or 8
 
 1: Create `/etc/systemd/system/rrdcached.service` with this content:
 
@@ -240,7 +240,7 @@ systemctl enable --now rrdcached.service
 $config['rrdcached'] = "unix:/run/rrdcached.sock";
 ```
 
-## RRDCached installation CentOS 6
+### RRDCached installation CentOS 6
 
 This example is based on a fresh LibreNMS install, on a minimal CentOS 6 installation.
 In this example, we'll use the Repoforge repository.
@@ -280,7 +280,7 @@ service rrdcached start
 $config['rrdcached']    = "unix:/run/rrdcached.sock";
 ```
 
-# Verify
+## Verify
 
 Check to see if the graphs are being drawn in LibreNMS. This might take a few minutes.
 After at least one poll cycle (5 mins), check the LibreNMS disk I/O performance delta.
@@ -289,7 +289,7 @@ hostname](../Installation/Installation-CentOS-7-Apache.md)>Health>Disk I/O.
 
 Depending on many factors, you should see the Ops/sec drop by ~30-40%.
 
-# Securing RRCached
+## Securing RRCached
 
 Please see [RRDCached Security](RRDCached-Security.md)
 

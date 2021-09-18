@@ -15,44 +15,44 @@ return [
     ],
     'sections' => [
         'alerting' => [
-            'general' => 'Generelle Alarm Einstellungen',
-            'email' => 'E-Mail Optionen',
+            'general' => ['name' => 'Generelle Alarm Einstellungen'],
+            'email' => ['name' => 'E-Mail Optionen'],
         ],
         'auth' => [
-            'general' => 'Generelle Authentifizierungseinstellungen',
-            'ad' => 'Active Directory Einstellungen',
-            'ldap' => 'LDAP Einstellungen',
+            'general' => ['name' => 'Generelle Authentifizierungseinstellungen'],
+            'ad' => ['name' => 'Active Directory Einstellungen'],
+            'ldap' => ['name' => 'LDAP Einstellungen'],
         ],
         'discovery' => [
-            'general' => 'Generelle Discovery Einstellungen',
+            'general' => ['name' => 'Generelle Discovery Einstellungen'],
         ],
         'external' => [
-            'binaries' => 'Programmpfade',
-            'location' => 'Location Settings',
-            'graylog' => 'Graylog Integration',
-            'oxidized' => 'Oxidized Integration',
-            'peeringdb' => 'PeeringDB Integration',
-            'nfsen' => 'NfSen Integration',
-            'unix-agent' => 'Unix-Agent Integration',
+            'binaries' => ['name' => 'Programmpfade'],
+            'location' => ['name' => 'Location Settings'],
+            'graylog' => ['name' => 'Graylog Integration'],
+            'oxidized' => ['name' => 'Oxidized Integration'],
+            'peeringdb' => ['name' => 'PeeringDB Integration'],
+            'nfsen' => ['name' => 'NfSen Integration'],
+            'unix-agent' => ['name' => 'Unix-Agent Integration'],
         ],
         'poller' => [
-            'distributed' => 'Distributed Poller',
-            'ping' => 'Ping',
-            'rrdtool' => 'RRDTool Konfiguration',
-            'snmp' => 'SNMP',
+            'distributed' => ['name' => 'Distributed Poller'],
+            'ping' => ['name' => 'Ping'],
+            'rrdtool' => ['name' => 'RRDTool Konfiguration'],
+            'snmp' => ['name' => 'SNMP'],
         ],
         'system' => [
-            'cleanup' => 'Bereinigung',
-            'proxy' => 'Proxy',
-            'updates' => 'Updates',
-            'server' => 'Server',
+            'cleanup' => ['name' => 'Bereinigung'],
+            'proxy' => ['name' => 'Proxy'],
+            'updates' => ['name' => 'Updates'],
+            'server' => ['name' => 'Server'],
         ],
         'webui' => [
-            'availability-map' => 'Availability Map Einstellungen',
-            'graph' => 'Graphen Einstellungen',
-            'dashboard' => 'Dashboard Einstellungen',
-            'search' => 'Sucheinstellungen',
-            'style' => 'Theme',
+            'availability-map' => ['name' => 'Availability Map Einstellungen'],
+            'graph' => ['name' => 'Graphen Einstellungen'],
+            'dashboard' => ['name' => 'Dashboard Einstellungen'],
+            'search' => ['name' => 'Sucheinstellungen'],
+            'style' => ['name' => 'Theme'],
         ],
     ],
     'settings' => [
@@ -308,7 +308,7 @@ return [
             'help' => 'Anzahl an Tagen welche ein Benutzer eingeloggt bleibt wenn er die Checkbox zum eingeloggt bleiben nutzt',
         ],
         'authlog_purge' => [
-            'description' => 'Entferne Auth log Einträge welche älter sind als (Tage)',
+            'description' => 'Entferne Auth log Einträge welche älter sind als',
             'help' => 'Wird durch daily.sh erledigt',
         ],
         'base_url' => [
@@ -316,7 +316,7 @@ return [
             'help' => 'Sollte nur gesetzt werden wenn man den Zugriff nur über einen bestimmten Hostnamen/Port erlauben möchte',
         ],
         'device_perf_purge' => [
-            'description' => 'Entferne Performanzdaten welche älter sind als (Tage)',
+            'description' => 'Entferne Performanzdaten welche älter sind als',
             'help' => 'Wird durch daily.sh erledigt',
         ],
         'distributed_poller' => [
@@ -393,7 +393,7 @@ return [
             'help' => 'Name benutzt als Teil der "from" E-Mail Adresse',
         ],
         'eventlog_purge' => [
-            'description' => 'Entferne Event Log Daten welche älter sind als (Tage)',
+            'description' => 'Entferne Event Log Daten welche älter sind als',
             'help' => 'Wird durch daily.sh erledigt',
         ],
         'favicon' => [
@@ -586,7 +586,7 @@ return [
             'help' => 'Bereinigung wird erledigt durch daily.sh',
         ],
         'ports_purge' => [
-            'description' => 'Ports älter als (days)',
+            'description' => 'Ports älter als',
             'help' => 'Bereinigung wird erledigt durch daily.sh',
         ],
         'public_status' => [
@@ -606,7 +606,7 @@ return [
             'help' => 'Verzeichnis für RRD Dateien.  Standardmässig ist RRD innerhalb des LibreNMS Verzeichnisses.  Eine Änderung verschiebt nicht die vorhandenen RRD Dateien.',
         ],
         'rrd_purge' => [
-            'description' => 'RRD Dateien älter als (Tage)',
+            'description' => 'RRD Dateien älter als',
             'help' => 'Bereinigung wird erledigt durch daily.sh',
         ],
         'rrd_rra' => [
@@ -700,7 +700,7 @@ return [
             'description' => 'Filtere Syslog Meldungen beinhaltend',
         ],
         'syslog_purge' => [
-            'description' => 'Syslog Einträge älter als (Tage)',
+            'description' => 'Syslog Einträge älter als',
             'help' => 'Bereinigung wird erledigt durch daily.sh',
         ],
         'title_image' => [

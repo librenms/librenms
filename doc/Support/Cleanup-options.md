@@ -11,15 +11,20 @@ entries. With Cleanup Options, you can stay in control.
 
 These options rely on ```daily.sh``` running from cron as per the installation instructions.
 
-Cleanup Options are set in ```config.php```
+You can adjust the config in Global Setting -> System -> Cleanup.
+
+Cleanup Options can also be set in ```config.php```
 
 ```php
-$config['syslog_purge']                              = 30;
 $config['eventlog_purge']                            = 30;
+$config['syslog_purge']                              = 30;
+$config['route_purge']                               = 10;
+$config['alert_log_purge']                           = 365;
 $config['authlog_purge']                             = 30;
+$config['ports_fdb_purge']                           = 10;
 $config['device_perf_purge']                         = 7;
-$config['rrd_purge']                                 = 90;// Not set by default
-$config['ports_purge']                               = true;// Set to false by default
+$config['rrd_purge']                                 = 0;
+$config['ports_purge']                               = 10;
 ```
 
 These options will ensure data within LibreNMS over X days old is
@@ -32,7 +37,7 @@ updated for the set amount of days automatically - only enable this if
 you are comfortable with that happening. (All active RRD files are
 updated every polling period.)
 
-# Ports Purge
+## Ports Purge
 
 Over time as you add devices some interfaces will need to be purged as
 they are set to be ignored or bad interfaces or marked as deleted.

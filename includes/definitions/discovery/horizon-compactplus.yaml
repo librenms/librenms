@@ -1,0 +1,75 @@
+mib: DRAGONWAVE-HCP-MIB
+modules:
+    os:
+        version: DRAGONWAVE-HCP-MIB::hzCpSwInvOmniRelease.bank-A
+        serial: DRAGONWAVE-HCP-MIB::hzCpUnitSerialNo.0
+        hardware: DRAGONWAVE-HCP-MIB::hzCpUnitAssemblyNo.0
+    sensors:
+        temperature:
+            data:
+                -
+                    oid: hzCpRadioTemperature
+                    num_oid: '.1.3.6.1.4.1.7262.2.5.4.4.1.1.11.{{ $index }}'
+                    index: 'hzCpRadioTemperature.{{ $index }}'
+                    divisor: 10
+                    descr: 'Radio{{ $index }} Temp'
+                    snmp_flags: ['-ObsQ']
+        state:
+            data:
+                -
+                    oid: hzCpAlarmStatus.modemRxLossOfSignal.1
+                    value: hzCpAlarmStatus
+                    num_oid: '.1.3.6.1.4.1.7262.2.5.5.3.1.3.13.1'
+                    index: 'hzCpAlarmStatus.modemRxLossOfSignal.1'
+                    descr: 'Modem1 Rx Loss Of Signal'
+                    states:
+                        - { value: 1, generic: 0, graph: 0, descr: 'No' }
+                        - { value: 2, generic: 2, graph: 0, descr: 'Yes' }
+                -
+                    oid: hzCpEnetPortLinkStatus
+                    num_oid: '.1.3.6.1.4.1.7262.2.5.3.1.2.1.2.{{ $index }}'
+                    index: 'hzCpEnetPortLinkStatus.{{ $index }}'
+                    descr: 'Enet Port{{ $index }} Link State'
+                    states:
+                        - { value: 1, generic: 2, graph: 0, descr: 'Down' }
+                        - { value: 2, generic: 0, graph: 0, descr: 'Up' }
+                    snmp_flags: ['-ObsQe']
+                -
+                    oid: hzCpAlarmStatus.tempOutOfLimits.1
+                    value: hzCpAlarmStatus
+                    num_oid: '.1.3.6.1.4.1.7262.2.5.5.3.1.3.24.1'
+                    index: 'hzCpAlarmStatus.tempOutOfLimits.1'
+                    descr: 'Radio1 Temp Out of Limit'
+                    states:
+                        - { value: 1, generic: 0, graph: 0, descr: 'No' }
+                        - { value: 2, generic: 2, graph: 0, descr: 'Yes' }
+                -
+                    oid: hzCpModemModulationType
+                    num_oid: '.1.3.6.1.4.1.7262.2.5.4.2.1.1.5.{{ $index }}'
+                    index: 'hzCpModemModulationType.{{ $index }}'
+                    descr: 'Modem{{ $index }} Modulation'
+                    states:
+                        - { value: 1, generic: 2, graph: 0, descr: 'qpsk' }
+                        - { value: 2, generic: 2, graph: 0, descr: 'qam16' }
+                        - { value: 3, generic: 2, graph: 0, descr: 'qam32' }
+                        - { value: 4, generic: 1, graph: 0, descr: 'qam64' }
+                        - { value: 5, generic: 1, graph: 0, descr: 'qam128' }
+                        - { value: 6, generic: 1, graph: 0, descr: 'qam256' }
+                        - { value: 7, generic: 0, graph: 0, descr: 'qam512' }
+                        - { value: 8, generic: 0, graph: 0, descr: 'qam1024' }
+                        - { value: 9, generic: 0, graph: 0, descr: 'qam2048' }
+                    snmp_flags: ['-ObsQ']
+        count:
+            data:
+                -
+                    oid: hzCpEnetPortRxFramesLengthErrors
+                    num_oid: '.1.3.6.1.4.1.7262.2.5.3.1.3.1.6.{{ $index }}'
+                    index: 'hzCpEnetPortRxFramesLengthErrors.{{ $index }}'
+                    descr: 'Enet Port{{ $index }} Input Errors'
+                    snmp_flags: ['-ObsQ']
+                -
+                    oid: hzCpEnetPortRxFramesCRCErrors
+                    num_oid: '.1.3.6.1.4.1.7262.2.5.3.1.3.1.7.{{ $index }}'
+                    index: 'hzCpEnetPortRxFramesCRCErrors.{{ $index }}'
+                    descr: 'Enet Port{{ $index }} CRC Errors'
+                    snmp_flags: ['-ObsQ']

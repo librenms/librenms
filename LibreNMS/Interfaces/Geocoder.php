@@ -18,6 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -30,7 +31,7 @@ interface Geocoder
      * Try to get the coordinates of a given address.
      * If unsuccessful, the returned array will be empty
      *
-     * @param string $address
+     * @param  string  $address
      * @return array ['lat' => 0, 'lng' => 0]
      */
     public function getCoordinates($address);

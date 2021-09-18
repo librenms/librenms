@@ -1,0 +1,12 @@
+mib: ZXR10-MIB
+modules:
+    mempools:
+        data:
+            -
+                total: ZXR10-MIB::zxr10SystemMemSize
+                percent_used: ZXR10-MIB::zxr10SystemMemUsed
+    processors:
+        data:
+            -
+                oid: zxr10SystemCpuUtility5m
+                num_oid: '.1.3.6.1.4.1.3902.3.3.1.1.12.{{ $index }}'

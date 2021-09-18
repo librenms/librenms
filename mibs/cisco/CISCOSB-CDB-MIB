@@ -47,4 +47,13 @@ rlManualReboot OBJECT-TYPE
          not (i.e. power failure)"
     ::= {rlCDB 2 }
 
+rlStartupCDBEmpty OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Indicates whether the startup-cdb is empty, meaning: does not include
+         any user configuration."
+    ::= {rlCDB 3 }
+
 END

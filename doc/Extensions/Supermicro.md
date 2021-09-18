@@ -1,10 +1,11 @@
 source: Extensions/Supermicro.md
 path: blob/master/doc/
 
-# Introduction
+# Supermicro
+
 For some Supermicro information to show up in LibreNMS, you will need to install an agent.
 
-# Supermicro SuperDoctor
+## Supermicro SuperDoctor
 Install Supermicro SuperDoctor onto the device you want to monitor.
 
 Then add the following to /etc/snmp/snmpd.conf:

@@ -21,6 +21,7 @@
  * Tests JnxVpnPwDown and JnxVpnPwUp traps from Juniper devices.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2019 KanREN, Inc
  * @author     Heath Barnhart <hbarnhart@kanren.net>
  */
@@ -36,8 +37,8 @@ class JnxVpnPwTest extends SnmpTrapTestCase
 {
     public function testVpnPwDown()
     {
-        $device = Device::factory()->create();
-        $port = Port::factory()->make(['ifAdminStatus' => 'up', 'ifOperStatus' => 'up']);
+        $device = Device::factory()->create(); /** @var Device $device */
+        $port = Port::factory()->make(['ifAdminStatus' => 'up', 'ifOperStatus' => 'up']); /** @var Port $port */
         $device->ports()->save($port);
 
         $trapText = "$device->hostname
@@ -58,8 +59,8 @@ SNMPv2-MIB::snmpTrapEnterprise.0 JUNIPER-CHASSIS-DEFINES-MIB::jnxProductNameMX48
 
     public function testVpnPwUp()
     {
-        $device = Device::factory()->create();
-        $port = Port::factory()->make(['ifAdminStatus' => 'up', 'ifOperStatus' => 'up']);
+        $device = Device::factory()->create(); /** @var Device $device */
+        $port = Port::factory()->make(['ifAdminStatus' => 'up', 'ifOperStatus' => 'up']); /** @var Port $port */
         $device->ports()->save($port);
 
         $trapText = "$device->hostname

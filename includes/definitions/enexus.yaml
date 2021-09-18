@@ -2,7 +2,7 @@ os: enexus
 text: 'Eltek Valere eNexus'
 type: power
 icon: eltek
-nobulk: true
+snmp_bulk: false
 over:
     - { graph: device_current, text: Current }
     - { graph: device_runtime, text: Runtime }

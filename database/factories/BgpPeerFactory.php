@@ -5,6 +5,7 @@ namespace Database\Factories;
 use App\Models\BgpPeer;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
+/** @extends Factory<BgpPeer> */
 class BgpPeerFactory extends Factory
 {
     /**
@@ -27,12 +28,12 @@ class BgpPeerFactory extends Factory
             'bgpPeerRemoteAddr' => $this->faker->ipv4,
             'bgpPeerRemoteAs' => $this->faker->numberBetween(1, 65535),
             'bgpPeerState' => $this->faker->randomElement(['established', 'idle']),
-            'astext' => $this->faker->sentence(),
+            'astext' => $this->faker->sentence,
             'bgpPeerAdminStatus' => $this->faker->randomElement(['start', 'stop']),
-            'bgpPeerInUpdates' => $this->faker->randomDigit,
-            'bgpPeerOutUpdates' => $this->faker->randomDigit,
-            'bgpPeerInTotalMessages' => $this->faker->randomDigit,
-            'bgpPeerOutTotalMessages' => $this->faker->randomDigit,
+            'bgpPeerInUpdates' => $this->faker->randomDigit(),
+            'bgpPeerOutUpdates' => $this->faker->randomDigit(),
+            'bgpPeerInTotalMessages' => $this->faker->randomDigit(),
+            'bgpPeerOutTotalMessages' => $this->faker->randomDigit(),
             'bgpPeerFsmEstablishedTime' => $this->faker->unixTime,
             'bgpPeerInUpdateElapsedTime' => $this->faker->unixTime,
         ];

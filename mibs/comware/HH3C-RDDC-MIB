@@ -1,0 +1,303 @@
+-- =========================================================================
+-- Copyright (c) 2004-2014 New H3C Tech. Co., Ltd. All rights reserved.
+--
+-- Description:  RDDC MIB
+-- Reference:  Enterprise MIB
+-- Version: V1.0
+-- History:
+--     V1.0 Initial version 2014-01-03
+-- =========================================================================
+HH3C-RDDC-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    Unsigned32, Integer32, OBJECT-TYPE, MODULE-IDENTITY, NOTIFICATION-TYPE
+        FROM SNMPv2-SMI
+    DisplayString
+        FROM SNMPv2-TC
+    ifIndex, ifDescr
+        FROM IF-MIB
+    hh3cCommon
+        FROM HH3C-OID-MIB;
+
+hh3cRddc MODULE-IDENTITY
+    LAST-UPDATED "201401030000Z"        -- January 03, 2014 at 00:00 GMT
+    ORGANIZATION
+        "New H3C Tech. Co., Ltd."
+    CONTACT-INFO
+        "Platform Team New H3C Tech. Co., Ltd.
+        Hai-Dian District Beijing P.R. China
+        http://www.h3c.com
+        Zip:100085
+        "
+    DESCRIPTION
+         "Redundancy group is concerned with ensuring minimal disruption to
+         data and control planes in case of a failover.  If one of the
+         group-node in an IRF fails, the other group-node in the IRF takes over the
+         function of the failed group-node with minimal service interruption.
+         This module defines the objects pertaining to redundancy group(RDDC)."
+    REVISION  "201401030000Z"        -- January 03, 2014 at 00:00 GMT
+    DESCRIPTION "Creation Date."
+    ::= { hh3cCommon 151 }
+
+hh3cRddcNotifications  OBJECT IDENTIFIER ::= { hh3cRddc 0 }
+hh3cRddcObjects        OBJECT IDENTIFIER ::= { hh3cRddc 1 }
+
+hh3cRddcInfo           OBJECT IDENTIFIER ::= { hh3cRddcObjects 1 }
+hh3cRddcTrapObjects    OBJECT IDENTIFIER ::= { hh3cRddcObjects 2 }
+
+-- ---------------------------------------------------------- --
+-- The redundancy group status Table
+-- ---------------------------------------------------------- --
+
+hh3cRddcTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Hh3cRddcEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "This table describes the current status of redundancy groups."
+    ::= { hh3cRddcInfo 1 }
+
+hh3cRddcEntry OBJECT-TYPE
+    SYNTAX Hh3cRddcEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The entry of hh3cRddcEntry."
+    INDEX { hh3cRddcGroupIdx }
+    ::= { hh3cRddcTable 1 }
+
+Hh3cRddcEntry ::=
+    SEQUENCE {
+        hh3cRddcGroupIdx          Unsigned32,
+        hh3cRddcGroupName         OCTET STRING,
+        hh3cRddcPreempTimeRemain  Unsigned32,
+        hh3cRddcPreempTimeConfig  Unsigned32,
+        hh3cRddcHoldTimeRemain    Unsigned32,
+        hh3cRddcHoldTimeConfig    Unsigned32
+        }
+
+hh3cRddcGroupIdx OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "Unique identifier of this redundancy group.  0 is an invalid value."
+    ::= { hh3cRddcEntry 1 }
+
+hh3cRddcGroupName OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE (1..16))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Unique identifier of this redundancy group."
+    ::= { hh3cRddcEntry 2 }
+
+hh3cRddcPreempTimeRemain OBJECT-TYPE
+    SYNTAX    Unsigned32
+    UNITS     "minutes"
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The redundancy group should not switch back immediately
+        when a failover is recovered.  The preempt delay timer is started
+        for waiting the failover became believable.
+        This object contains the current preempt delay time remained
+        when a failover is recovered."
+    ::= { hh3cRddcEntry 3 }
+
+hh3cRddcPreempTimeConfig OBJECT-TYPE
+    SYNTAX    Unsigned32
+    UNITS     "minutes"
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The current preempt delay time."
+    ::= { hh3cRddcEntry 4 }
+
+hh3cRddcHoldTimeRemain OBJECT-TYPE
+    SYNTAX    Unsigned32
+    UNITS     "seconds"
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "To prevent frequent switchovers of the redundancy group,
+        the hold-down timer started to keeping in a state for
+        a fixed time.
+        This object contains the current remained hold-down time
+        when a switchover or a failover recovery occurred."
+    ::= { hh3cRddcEntry 5 }
+
+hh3cRddcHoldTimeConfig OBJECT-TYPE
+    SYNTAX    Unsigned32
+    UNITS     "seconds"
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The current hold-down time."
+    ::= { hh3cRddcEntry 6 }
+
+-- ---------------------------------------------------------- --
+-- The redundancy group node Table
+-- ---------------------------------------------------------- --
+
+hh3cRddcNodeTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Hh3cRddcNodeEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "This table describes the current status of a redundancy group node."
+    ::= { hh3cRddcInfo 2 }
+
+hh3cRddcNodeEntry OBJECT-TYPE
+    SYNTAX Hh3cRddcNodeEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The entry of hh3cRddcNodeEntry."
+    INDEX { hh3cRddcNodeGroupIdx,
+            hh3cRddcNodeId }
+    ::= { hh3cRddcNodeTable 1 }
+
+Hh3cRddcNodeEntry ::=
+    SEQUENCE {
+        hh3cRddcNodeGroupIdx          Unsigned32,
+        hh3cRddcNodeId                Unsigned32,
+        hh3cRddcNodeBindType          INTEGER,
+        hh3cRddcNodeBindInfo          Unsigned32,
+        hh3cRddcNodePriority          Unsigned32,
+        hh3cRddcNodeWeight            Integer32,
+        hh3cRddcNodeStatus            INTEGER
+        }
+
+hh3cRddcNodeGroupIdx OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Unique identifier of this redundancy group.  0 is an invalid value."
+    ::= { hh3cRddcNodeEntry 1 }
+
+hh3cRddcNodeId OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Unique identifier of this redundancy group node.  0 is an invalid value."
+    ::= { hh3cRddcNodeEntry 2 }
+
+hh3cRddcNodeBindType OBJECT-TYPE
+    SYNTAX INTEGER {
+                      invalid(1),
+                      chassis(2)
+                   }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The bind type of this redundancy group node.
+         The current version only supports binding chassis of an IRF device."
+    ::= { hh3cRddcNodeEntry 3 }
+
+hh3cRddcNodeBindInfo OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The bind information of this redundancy group node.
+         The current version only supports binding chassis of an IRF device.
+         If the value of hh3cRddcNodeBindType is invalid, the value of hh3cRddcNodeBindInfo is 65535."
+    ::= { hh3cRddcNodeEntry 4 }
+
+hh3cRddcNodePriority OBJECT-TYPE
+    SYNTAX    Unsigned32 (1..255)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The priority of this redundancy group node.  The higher the value, the greater the priority."
+    ::= { hh3cRddcNodeEntry 5 }
+
+hh3cRddcNodeWeight OBJECT-TYPE
+    SYNTAX    Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The current weight of this redundancy group node.  The max value is 255."
+    ::= { hh3cRddcNodeEntry 6 }
+
+hh3cRddcNodeStatus OBJECT-TYPE
+    SYNTAX    INTEGER {
+                         invalid(1),
+                         master(2),
+                         standby(3)
+                      }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The current status of this redundancy group node."
+    ::= { hh3cRddcNodeEntry 7 }
+
+-- ---------------------------------------------------------- --
+-- The redundancy group trap objects Table
+-- ---------------------------------------------------------- --
+
+hh3cRddcNodeInfo OBJECT-TYPE
+    SYNTAX DisplayString   (SIZE (0..255))
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "This object contains node identification information
+        where the switchover occurred."
+    ::= { hh3cRddcTrapObjects 1 }
+
+hh3cRddcSwitchReason OBJECT-TYPE
+    SYNTAX DisplayString    (SIZE (0..255))
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "This object contains the cause for switchover."
+    ::= { hh3cRddcTrapObjects 2 }
+
+-- ==================================================================
+--
+-- ======================= trap definition begin ====================
+--
+-- ==================================================================
+hh3cRddcSwitchoverTrap NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cRddcGroupIdx,
+            hh3cRddcGroupName,
+            hh3cRddcNodeInfo,
+            hh3cRddcSwitchReason
+        }
+    STATUS      current
+    DESCRIPTION
+        "Notification to signal switchover/failover."
+    ::= { hh3cRddcNotifications 1 }
+
+hh3cRddcFailIfRecoverTrap NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cRddcGroupIdx,
+            hh3cRddcGroupName,
+            ifIndex,
+            ifDescr
+        }
+    STATUS      current
+    DESCRIPTION
+        "Notification to signal the failed interface recovered."
+    ::= { hh3cRddcNotifications 2 }
+
+hh3cRddcFailIfGenerateTrap NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cRddcGroupIdx,
+            hh3cRddcGroupName,
+            ifIndex,
+            ifDescr
+        }
+    STATUS      current
+    DESCRIPTION
+        "Notification to signal the failed interface generated."
+    ::= { hh3cRddcNotifications 3 }
+
+END

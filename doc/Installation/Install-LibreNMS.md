@@ -1,7 +1,9 @@
 source: Installation/Install-LibreNMS.md
 path: blob/master/doc/
 
-# Prepare Linux Server
+# Install LibreNMS
+
+## Prepare Linux Server
 
 You should have an installed Linux server running one of the supported OS.
 Make sure you select your server's OS in the tabbed options below.
@@ -421,6 +423,7 @@ Feel free to tune the performance settings in librenms.conf to meet your needs.
     ```
     semanage fcontext -a -t httpd_sys_content_t '/opt/librenms/html(/.*)?'
     semanage fcontext -a -t httpd_sys_rw_content_t '/opt/librenms/(logs|rrd|storage)(/.*)?'
+    semanage fcontext -a -t bin_t '/opt/librenms/librenms-service.py'
     restorecon -RFvv /opt/librenms
     setsebool -P httpd_can_sendmail=1
     setsebool -P httpd_execmem 1

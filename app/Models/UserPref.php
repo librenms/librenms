@@ -18,6 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -36,6 +37,10 @@ class UserPref extends BaseModel
     // ---- Helper Functions ----
     public static function getPref(User $user, $pref)
     {
+        if ($user->relationLoaded('preferences')) {
+            return optional($user->preferences->firstWhere('pref', $pref))->value;
+        }
+
         return $user->preferences()->where('pref', $pref)->value('value');
     }
 
@@ -87,7 +92,7 @@ class UserPref extends BaseModel
     /**
      * Set the keys for a save update query. (no primary key)
      *
-     * @param  \Illuminate\Database\Eloquent\Builder $query
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
      * @return \Illuminate\Database\Eloquent\Builder
      */
     protected function setKeysForSaveQuery($query)
@@ -108,7 +113,7 @@ class UserPref extends BaseModel
     /**
      * Get the primary key value for a save query. (no primary key)
      *
-     * @param mixed $keyName
+     * @param  mixed  $keyName
      * @return mixed
      */
     protected function getKeyForSaveQuery($keyName = null)

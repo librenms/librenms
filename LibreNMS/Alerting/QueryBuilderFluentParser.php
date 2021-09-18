@@ -18,6 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2019 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -52,9 +53,9 @@ class QueryBuilderFluentParser extends QueryBuilderParser
     }
 
     /**
-     * @param Builder $query
-     * @param array $rule
-     * @param string $parent_condition AND or OR  (for root, this should be null)
+     * @param  Builder  $query
+     * @param  array  $rule
+     * @param  string  $parent_condition  AND or OR  (for root, this should be null)
      * @return Builder
      */
     protected function parseGroupToQuery($query, $rule, $parent_condition = null)
@@ -71,9 +72,9 @@ class QueryBuilderFluentParser extends QueryBuilderParser
     }
 
     /**
-     * @param Builder $query
-     * @param array $rule
-     * @param string $condition AND or OR
+     * @param  Builder  $query
+     * @param  array  $rule
+     * @param  string  $condition  AND or OR
      * @return Builder
      */
     protected function parseRuleToQuery($query, $rule, $condition)
@@ -126,7 +127,7 @@ class QueryBuilderFluentParser extends QueryBuilderParser
     /**
      * Extract field, operator and value from the rule and expand macros and raw values
      *
-     * @param array $rule
+     * @param  array  $rule
      * @return array [field, operator, value]
      */
     protected function expandRule($rule)
@@ -147,7 +148,7 @@ class QueryBuilderFluentParser extends QueryBuilderParser
     }
 
     /**
-     * @param Builder $query
+     * @param  Builder  $query
      * @return Builder
      */
     protected function joinTables($query)

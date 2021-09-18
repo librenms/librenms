@@ -38,9 +38,9 @@ class Debug
     /**
      * Enable/disable debug output
      *
-     * @param  bool  $debug whether to enable or disable debug output
-     * @param  bool  $silence Silence error output or output all errors except notices
-     * @return bool  returns $debug
+     * @param  bool  $debug  whether to enable or disable debug output
+     * @param  bool  $silence  Silence error output or output all errors except notices
+     * @return bool returns $debug
      */
     public static function set($debug = true, bool $silence = false): bool
     {

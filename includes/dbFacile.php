@@ -32,13 +32,14 @@ function dbIsConnected()
  * Connect to the database.
  * Will use global config variables if they are not sent: db_host, db_user, db_pass, db_name, db_port, db_socket
  *
- * @param string $db_host
- * @param string $db_user
- * @param string $db_pass
- * @param string $db_name
- * @param string $db_port
- * @param string $db_socket
+ * @param  string  $db_host
+ * @param  string  $db_user
+ * @param  string  $db_pass
+ * @param  string  $db_name
+ * @param  string  $db_port
+ * @param  string  $db_socket
  * @return \Illuminate\Database\Connection
+ *
  * @throws DatabaseConnectException
  */
 function dbConnect($db_host = null, $db_user = '', $db_pass = '', $db_name = '', $db_port = null, $db_socket = null)
@@ -81,8 +82,9 @@ function dbConnect($db_host = null, $db_user = '', $db_pass = '', $db_name = '',
 
 /**
  * Performs a query using the given string.
- * @param string $sql
- * @param array $parameters
+ *
+ * @param  string  $sql
+ * @param  array  $parameters
  * @return bool if query was successful or not
  */
 function dbQuery($sql, $parameters = [])
@@ -102,8 +104,8 @@ function dbQuery($sql, $parameters = [])
 }
 
 /**
- * @param array $data
- * @param string $table
+ * @param  array  $data
+ * @param  string  $table
  * @return null|int
  */
 function dbInsert($data, $table)
@@ -131,8 +133,8 @@ function dbInsert($data, $table)
  * $data is an array (rows) of key value pairs.  keys are fields.  Rows need to have same fields.
  * Check for boolean false to determine whether insert failed
  *
- * @param array $data
- * @param string $table
+ * @param  array  $data
+ * @param  string  $table
  * @return bool
  */
 function dbBulkInsert($data, $table)
@@ -174,10 +176,10 @@ function dbBulkInsert($data, $table)
  * Passed an array, table name, WHERE clause, and placeholder parameters, it attempts to update a record.
  * Returns the number of affected rows
  *
- * @param array $data
- * @param string $table
- * @param string $where
- * @param array $parameters
+ * @param  array  $data
+ * @param  string  $table
+ * @param  string  $where
+ * @param  array  $parameters
  * @return bool|int
  */
 function dbUpdate($data, $table, $where = null, $parameters = [])
@@ -245,8 +247,8 @@ function dbDelete($table, $where = null, $parameters = [])
  * Delete orphaned entries from a table that no longer have a parent in parent_table
  * Format of parents array is as follows table.table_key_column<.target_key_column>
  *
- * @param string $target_table The table to delete entries from
- * @param array $parents an array of parent tables to check.
+ * @param  string  $target_table  The table to delete entries from
+ * @param  array  $parents  an array of parent tables to check.
  * @return bool|int
  */
 function dbDeleteOrphans($target_table, $parents)
@@ -448,7 +450,7 @@ function dbFetchKeyValue($sql, $parameters = [])
 /**
  * Legacy dbFacile indicates DB::raw() as a value wrapped in an array
  *
- * @param array $data
+ * @param  array  $data
  * @return array
  */
 function dbArrayToRaw($data)
@@ -494,7 +496,7 @@ function dbHandleException(QueryException $exception)
  * Given a data array, this returns an array of placeholders
  * These may be question marks, or ":email" type
  *
- * @param array $values
+ * @param  array  $values
  * @return array
  */
 function dbPlaceHolders(&$values)
@@ -545,9 +547,9 @@ function dbGenPlaceholders($count)
 /**
  * Update statistics for db operations
  *
- * @param string $stat fetchcell, fetchrow, fetchrows, fetchcolumn, update, insert, delete
- * @param float $start_time The time the operation started with 'microtime(true)'
- * @return float  The calculated run time
+ * @param  string  $stat  fetchcell, fetchrow, fetchrows, fetchcolumn, update, insert, delete
+ * @param  float  $start_time  The time the operation started with 'microtime(true)'
+ * @return float The calculated run time
  */
 function recordDbStatistic($stat, $start_time)
 {
@@ -597,11 +599,11 @@ function recordDbStatistic($stat, $start_time)
 /**
  * Synchronize a relationship to a list of related ids
  *
- * @param string $table
- * @param string $target_column column name for the target
- * @param int $target column target id
- * @param string $list_column related column names
- * @param array $list list of related ids
+ * @param  string  $table
+ * @param  string  $target_column  column name for the target
+ * @param  int  $target  column target id
+ * @param  string  $list_column  related column names
+ * @param  array  $list  list of related ids
  * @return array [$inserted, $deleted]
  */
 function dbSyncRelationship($table, $target_column = null, $target = null, $list_column = null, $list = null)
@@ -630,8 +632,8 @@ function dbSyncRelationship($table, $target_column = null, $target = null, $list
 /**
  * Synchronize a relationship to a list of relations
  *
- * @param string $table
- * @param array $relationships array of relationship pairs with columns as keys and ids as values
+ * @param  string  $table
+ * @param  array  $relationships  array of relationship pairs with columns as keys and ids as values
  * @return array [$inserted, $deleted]
  */
 function dbSyncRelationships($table, $relationships = [])

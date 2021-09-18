@@ -1,0 +1,437 @@
+-- ==================================================================
+-- Copyright (C) 2002 New H3C Tech. Co., Ltd. All rights reserved.
+--
+-- Description: Rstp MIB
+-- Reference:
+-- Version: V1.4
+-- History:
+--(1) Created by Zhangshilin, 2001.06.29
+--(2) Revised by Qi Zhenglin, 2002.01.08
+-- V1.1 2004-10-12 updated by gaolong
+--      Import TEXTUAL-CONVENTION, OBJECT-IDENTITY, NOTIFICATION-TYPE.
+--      Relocate hh3cLswRstpMib MODULE-IDENTITY clause.
+--      Substitute chinese characters with English words.
+--      Change MAX-ACCESS clause value of hh3cdot1dStpClearStatistics and
+--      hh3cdot1dSetStpDefaultPortCost from write-only to read-write.
+-- V1.2 2004-11-10 add hh3cdot1dStpRXTCBPDU by xuboning
+-- V1.3 2004-12-21 add hh3cdot1dStpPortSendingBPDUType, hh3cdot1dStpOperPortPointToPoint,
+--                 change hh3cdot1dStpPortPointToPoint by zhuchaopeng
+-- V1.4 2005-07-04 modify hh3cdot1dStpPathCostStandard by zhanghaihong
+--                 adjust file format by gaolong 
+-- ==================================================================
+-- ==================================================================
+--
+-- Varibles and types be imported
+--
+-- ==================================================================
+HH3C-LswRSTP-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+     TruthValue, MacAddress, TEXTUAL-CONVENTION
+        FROM SNMPv2-TC
+
+    MODULE-IDENTITY,OBJECT-TYPE,Counter32, OBJECT-IDENTITY, NOTIFICATION-TYPE
+        FROM SNMPv2-SMI
+
+    dot1dStpPortEntry, dot1dStpPort
+        FROM BRIDGE-MIB
+    hh3clswCommon
+        FROM HH3C-OID-MIB;
+
+   hh3cLswRstpMib MODULE-IDENTITY
+            LAST-UPDATED "200106290000Z"
+            ORGANIZATION
+                "New H3C Tech. Co., Ltd."
+            CONTACT-INFO
+                "Platform Team New H3C Tech. Co., Ltd.
+                Hai-Dian District Beijing P.R. China
+                http://www.h3c.com
+                Zip:100085
+                "
+            DESCRIPTION
+            ""
+            REVISION "200106290000Z"
+            DESCRIPTION
+            ""
+            ::= { hh3clswCommon  6 }
+
+    EnabledStatus ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "A simple status value for the object."
+    SYNTAX      INTEGER { enabled(1), disabled(2) }
+
+
+-- ==================================================================
+--
+-- ======================= definition begin =========================
+--
+-- ==================================================================
+
+    hh3cLswRstpMibObject OBJECT IDENTIFIER ::= {  hh3cLswRstpMib 1  }
+
+
+
+     hh3cdot1dStpStatus OBJECT-TYPE
+          SYNTAX   EnabledStatus
+          MAX-ACCESS read-write
+          STATUS current
+          DESCRIPTION " Bridge STP enabled/disabled state"
+          ::= { hh3cLswRstpMibObject 1 }
+
+     hh3cdot1dStpForceVersion OBJECT-TYPE
+          SYNTAX   INTEGER
+          {
+              stp(0),
+              rstp(2)
+          }
+          MAX-ACCESS read-write
+          STATUS current
+          DESCRIPTION " Running mode of the bridge RSTP state machine"
+          ::= { hh3cLswRstpMibObject 2 }
+
+     hh3cdot1dStpDiameter OBJECT-TYPE
+          SYNTAX   INTEGER (1..7)
+          MAX-ACCESS read-write
+          STATUS current
+          DESCRIPTION " Permitted amount of bridges between any two ends on the network."
+          ::= { hh3cLswRstpMibObject 3 }
+
+     hh3cdot1dStpRootBridgeAddress OBJECT-TYPE
+          SYNTAX  MacAddress
+          MAX-ACCESS read-only
+          STATUS current
+          DESCRIPTION " MAC address of the root bridge"
+          ::= { hh3cLswRstpMibObject 4 }
+
+     hh3cDot1dStpBpduGuard  OBJECT-TYPE
+          SYNTAX   EnabledStatus
+          MAX-ACCESS read-write
+          STATUS current
+          DESCRIPTION " If BPDU guard enabled. The edge port will discard illegal BPDU when enabled"
+          ::= { hh3cLswRstpMibObject 6 }
+
+     hh3cDot1dStpRootType  OBJECT-TYPE
+          SYNTAX  INTEGER
+          {
+          normal       (1),
+          primary      (2),
+          secondary    (3)
+          }
+          MAX-ACCESS read-write
+          STATUS current
+          DESCRIPTION " Root type of the bridge"
+          ::= { hh3cLswRstpMibObject 7 }
+
+     hh3cDot1dTimeOutFactor  OBJECT-TYPE
+          SYNTAX   INTEGER (3..7)
+          MAX-ACCESS read-write
+          STATUS current
+          DESCRIPTION " Time Out Factor of the bridge."
+          ::= { hh3cLswRstpMibObject 8 }
+
+     hh3cDot1dStpPathCostStandard  OBJECT-TYPE
+          SYNTAX  INTEGER
+          {
+          dot1d-1998       (1),
+          dot1t      (2),
+          legacy     (3)
+          }
+          MAX-ACCESS read-write
+          STATUS current
+          DESCRIPTION " Path Cost Standard of the bridge. Value 'dot1d-1998' is
+          IEEE 802.1d standard in 1998, value 'dot1t' is IEEE 802.1t standard,
+          and value 'legacy' is a private legacy standard."
+          ::= { hh3cLswRstpMibObject 9 }
+
+     hh3cdot1dStpPortXTable  OBJECT-TYPE
+          SYNTAX   SEQUENCE OF Hh3cDot1dStpPortXEntry
+          MAX-ACCESS not-accessible
+          STATUS   current
+          DESCRIPTION "RSTP extended information of the port "
+          ::= { hh3cLswRstpMibObject  5 }
+
+
+     hh3cdot1dStpPortXEntry  OBJECT-TYPE
+          SYNTAX Hh3cDot1dStpPortXEntry
+          MAX-ACCESS  not-accessible
+          STATUS   current
+          DESCRIPTION " RSTP extended information of the port  "
+          AUGMENTS    { dot1dStpPortEntry }
+          ::= { hh3cdot1dStpPortXTable 1 }
+
+    Hh3cDot1dStpPortXEntry    ::=
+    SEQUENCE {
+        hh3cdot1dStpPortStatus        EnabledStatus   ,
+        hh3cdot1dStpPortEdgeport      TruthValue  ,
+        hh3cdot1dStpPortPointToPoint  INTEGER ,
+        hh3cdot1dStpMcheck        TruthValue  ,
+        hh3cdot1dStpTransLimit        INTEGER ,
+        hh3cdot1dStpRXStpBPDU     Counter32   ,
+        hh3cdot1dStpTXStpBPDU     Counter32   ,
+        hh3cdot1dStpRXTCNBPDU     Counter32   ,
+        hh3cdot1dStpTXTCNBPDU     Counter32   ,
+        hh3cdot1dStpRXRSTPBPDU        Counter32   ,
+        hh3cdot1dStpTXRSTPBPDU        Counter32  ,
+        hh3cdot1dStpClearStatistics   INTEGER ,
+        hh3cdot1dSetStpDefaultPortCost    INTEGER ,
+        hh3cdot1dStpRootGuard         EnabledStatus ,
+        hh3cdot1dStpLoopGuard         EnabledStatus,
+        hh3cdot1dStpPortBlockedReason     INTEGER  ,
+        hh3cdot1dStpRXTCBPDU              Counter32 ,
+        hh3cdot1dStpPortSendingBPDUType   INTEGER,
+        hh3cdot1dStpOperPortPointToPoint  INTEGER
+        }
+
+
+
+     hh3cdot1dStpPortStatus  OBJECT-TYPE
+          SYNTAX  EnabledStatus
+          MAX-ACCESS read-write
+          STATUS current
+          DESCRIPTION " RSTP status of the port"
+          ::= { hh3cdot1dStpPortXEntry 1 }
+
+
+     hh3cdot1dStpPortEdgeport  OBJECT-TYPE
+          SYNTAX  TruthValue
+          MAX-ACCESS read-write
+          STATUS current
+          DESCRIPTION " Whether the port can be an edge port"
+          ::= { hh3cdot1dStpPortXEntry 2 }
+
+
+     hh3cdot1dStpPortPointToPoint OBJECT-TYPE
+          SYNTAX  INTEGER
+          {
+          forceTrue (1),
+          forceFalse    (2),
+          auto      (3)
+          }
+          MAX-ACCESS read-write
+          STATUS current
+          DESCRIPTION " It is the administrative value indicates whether the port
+          can be connected to a point-to-point link or not.
+
+          If the value is 'auto', the operative value of a point-to-point link state is
+          determined by device itself, and can be read from hh3cdot1dStpOperPortPointToPoint."
+          ::= { hh3cdot1dStpPortXEntry 3 }
+
+
+     hh3cdot1dStpMcheck  OBJECT-TYPE
+        SYNTAX  TruthValue
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION " Check if the port transfer state machine enters"
+        ::= { hh3cdot1dStpPortXEntry 4 }
+
+
+     hh3cdot1dStpTransLimit  OBJECT-TYPE
+        SYNTAX  INTEGER(1..255)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION " Packet transmission limit of the bridge in a duration of Hello Time."
+        ::= { hh3cdot1dStpPortXEntry 5 }
+
+
+     hh3cdot1dStpRXStpBPDU  OBJECT-TYPE
+        SYNTAX  Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION " Number of STP BPDU received   "
+        ::= { hh3cdot1dStpPortXEntry 6 }
+
+
+     hh3cdot1dStpTXStpBPDU  OBJECT-TYPE
+        SYNTAX  Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION " Number of STP BPDU transmitted    "
+        ::= { hh3cdot1dStpPortXEntry 7 }
+
+
+     hh3cdot1dStpRXTCNBPDU  OBJECT-TYPE
+        SYNTAX  Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION " Number of TCN BPDU received    "
+        ::= { hh3cdot1dStpPortXEntry 8 }
+
+
+     hh3cdot1dStpTXTCNBPDU  OBJECT-TYPE
+        SYNTAX  Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION " Number of TCN BPDU transmitted    "
+        ::= { hh3cdot1dStpPortXEntry 9 }
+
+
+     hh3cdot1dStpRXRSTPBPDU  OBJECT-TYPE
+        SYNTAX  Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION "Number of RSTP BPDU received"
+        ::= { hh3cdot1dStpPortXEntry 10 }
+
+
+     hh3cdot1dStpTXRSTPBPDU  OBJECT-TYPE
+        SYNTAX  Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION " Number of RSTP BPDU transmitted    "
+        ::= { hh3cdot1dStpPortXEntry 11 }
+
+      hh3cdot1dStpClearStatistics  OBJECT-TYPE
+        SYNTAX  INTEGER {clear(1)}
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION "Clear RSTP statistics. Read operation not supported. "
+        ::= { hh3cdot1dStpPortXEntry 12 }
+
+      hh3cdot1dSetStpDefaultPortCost  OBJECT-TYPE
+        SYNTAX  INTEGER {enable(1)}
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION "Set PathCost back to the default setting. Read operation not supported."
+        ::= { hh3cdot1dStpPortXEntry 13 }
+
+     hh3cdot1dStpRootGuard  OBJECT-TYPE
+        SYNTAX  EnabledStatus
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION " If the port guard root bridge. Other bridge which want to be root can not become root through this port if enabled. "
+        ::= { hh3cdot1dStpPortXEntry 14 }
+
+     hh3cdot1dStpLoopGuard  OBJECT-TYPE
+        SYNTAX  EnabledStatus
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION " Loop guard function that keep a root port or an alternate port in discarding state while the information on the port is aged out."
+        ::= { hh3cdot1dStpPortXEntry 15 }
+
+     hh3cdot1dStpPortBlockedReason  OBJECT-TYPE
+          SYNTAX  INTEGER
+          {
+          notBlock       (1),
+          blockForProtocol   (2),
+          blockForRootGuard  (3),
+          blockForBPDUGuard  (4),
+          blockForLoopGuard  (5)
+          }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION " Record the block reason of the port.
+               notBlock         (1) means that the port is not in block state,.
+               blockForProtocol (2) means that the port is blocked by stp protocol to avoid loop.
+               blockForRootGuard(3) means that the root guard flag of bridge is set and a better message received from the port,and the port is blocked.
+               blockForBPDUGuard(4) means that the port has been configured as an edge port and receive a BPDU and thus blocked.
+               blockForLoopGuard(5) means that the port is blocked for loopguarded. "
+        ::= { hh3cdot1dStpPortXEntry 16 }
+
+     hh3cdot1dStpRXTCBPDU  OBJECT-TYPE
+        SYNTAX  Counter32
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION " The number of received TC BPDUs "
+        ::= { hh3cdot1dStpPortXEntry 17 }
+
+     hh3cdot1dStpPortSendingBPDUType  OBJECT-TYPE
+        SYNTAX  INTEGER
+        {
+        stp(0),
+        rstp(2)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION " Type of BPDU which the port is sending. "
+        ::= { hh3cdot1dStpPortXEntry 18 }
+
+     hh3cdot1dStpOperPortPointToPoint  OBJECT-TYPE
+        SYNTAX  INTEGER
+        {
+        true    (1),
+        false   (2)
+        }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION " This object indicates whether the port
+          has connected to a point-to-point link or not.
+
+          The administrative value should be read from hh3cdot1dStpPortPointToPoint. "
+        ::= { hh3cdot1dStpPortXEntry 19 }
+
+     hh3cRstpEventsV2 OBJECT-IDENTITY
+     STATUS      current
+     DESCRIPTION "Definition point for RSTP notifications."
+     ::= { hh3cLswRstpMibObject 0 }
+
+     hh3cRstpBpduGuarded NOTIFICATION-TYPE
+     OBJECTS  { dot1dStpPort }
+     STATUS   current
+     DESCRIPTION
+         "The SNMP trap that is generated when an edged port of the BPDU-guard switch recevies BPDU packets."
+     ::= { hh3cRstpEventsV2 1 }
+
+     hh3cRstpRootGuarded NOTIFICATION-TYPE
+     OBJECTS { dot1dStpPort }
+     STATUS    current
+     DESCRIPTION
+         "The SNMP trap that is generated when a root-guard port receives a superior bpdu."
+     ::= { hh3cRstpEventsV2 2 }
+
+     hh3cRstpBridgeLostRootPrimary NOTIFICATION-TYPE
+     STATUS   current
+     DESCRIPTION
+         "The SNMP trap that is generated when the bridge is no longer the root bridge of the spanning tree.
+          Another switch with higher priority has already been the root bridge. "
+     ::= { hh3cRstpEventsV2 3 }
+
+     hh3cRstpLoopGuarded NOTIFICATION-TYPE
+     OBJECTS { dot1dStpPort }
+     STATUS    current
+     DESCRIPTION
+         "The SNMP trap that is generated when a loop-guard port is aged out ."
+     ::= { hh3cRstpEventsV2 4 }
+
+     hh3cdot1dStpIgnoredVlanTable  OBJECT-TYPE
+          SYNTAX   SEQUENCE OF Hh3cDot1dStpIgnoredVlanEntry
+          MAX-ACCESS not-accessible
+          STATUS   current
+          DESCRIPTION "RSTP extended information of vlan "
+          ::= { hh3cLswRstpMibObject  10 }
+
+
+     hh3cdot1dStpIgnoredVlanEntry  OBJECT-TYPE
+          SYNTAX Hh3cDot1dStpIgnoredVlanEntry
+          MAX-ACCESS  not-accessible
+          STATUS   current
+          DESCRIPTION " RSTP extended information of the vlan  "
+          INDEX    { hh3cdot1dVlan }
+          ::= { hh3cdot1dStpIgnoredVlanTable 1 }
+
+    Hh3cDot1dStpIgnoredVlanEntry  ::=
+    SEQUENCE {
+        hh3cdot1dVlan     INTEGER ,
+        hh3cdot1dStpIgnore    INTEGER
+        }
+
+     hh3cdot1dVlan  OBJECT-TYPE
+          SYNTAX  INTEGER(1..4094)
+          MAX-ACCESS read-only
+          STATUS current
+          DESCRIPTION " Vlan id supported"
+          ::= { hh3cdot1dStpIgnoredVlanEntry 1 }
+
+
+     hh3cdot1dStpIgnore  OBJECT-TYPE
+          SYNTAX  INTEGER
+          {
+          enable    (1),
+          disable   (2)
+          }
+          MAX-ACCESS read-write
+          STATUS current
+          DESCRIPTION " Whether the vlan is stp Ignored"
+          ::= { hh3cdot1dStpIgnoredVlanEntry 2 }
+
+END

@@ -1,13 +1,13 @@
 source: Extensions/Rancid.md
 path: blob/master/doc/
 
-# Rancid integration
+# Rancid
 
 Librenms can generate a list of hosts that can be monitored by
 RANCID. We assume you have currently a running Rancid, and you just
 need to create and update the file 'router.db'
 
-# Included Rancid script
+## Included Rancid script
 
 To generate the config file (maybe even add a cron to schedule
 this). We've assumed a few locations for Rancid, the config file you
@@ -33,7 +33,7 @@ $config['rancid_ignorecomments'] = 0;
 
 After that, you should see some "config" tab on routers that have a rancid update.
 
-# Ubuntu Rancid Install
+## Ubuntu Rancid Install
 
 The options shown below also contains the default values.
 

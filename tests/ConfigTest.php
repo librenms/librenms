@@ -18,6 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2017 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -188,7 +189,8 @@ class ConfigTest extends TestCase
 
     /**
      * Pass an anonymous function which will be passed the config variable to modify before it is set
-     * @param callable $function
+     *
+     * @param  callable  $function
      */
     private function setConfig($function)
     {

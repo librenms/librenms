@@ -1,0 +1,99 @@
+   TPLINK-DDMTXPOWTHRESHOLD-MIB DEFINITIONS ::= BEGIN
+
+         IMPORTS
+            MODULE-IDENTITY, OBJECT-TYPE
+          	  	        FROM SNMPv2-SMI
+          	ifIndex
+						FROM RFC1213-MIB
+			DisplayString
+						FROM SNMPv2-TC
+			tplinkDdmManageMIBObjects
+						FROM TPLINK-DDMMANAGE-MIB;
+						
+		   		ddmTxPowThreshold MODULE-IDENTITY  
+				    LAST-UPDATED    "200908270000Z"
+				    ORGANIZATION    "TPLINK"
+				    CONTACT-INFO		"www.tplink.com"
+				    DESCRIPTION			"The config of DDM Tx Power threshold."
+				    REVISION        "200908270000Z"
+				    DESCRIPTION			"Initial version of this MIB module."
+				    ::= { tplinkDdmManageMIBObjects 5 } 
+			 												
+				ddmTxPowThresholdTable OBJECT-TYPE
+					SYNTAX SEQUENCE OF DDMTxPowThresholdEntry
+					MAX-ACCESS	not-accessible
+					STATUS			current
+					DESCRIPTION 
+					"A table that is used to configure the DDM Tx Power Threshold for specific ports on the Switch."
+					::= { ddmTxPowThreshold 1 }
+				
+				ddmTxPowThresholdEntry OBJECT-TYPE
+					SYNTAX			DDMTxPowThresholdEntry
+					MAX-ACCESS	not-accessible
+					STATUS			current
+					DESCRIPTION 
+					"A list of information for every port."	
+					INDEX { ifIndex }
+					::= { ddmTxPowThresholdTable 1 }
+					
+				DDMTxPowThresholdEntry ::=
+				SEQUENCE
+				{
+                    ddmTxPowThresholdPort			DisplayString(SIZE(0..255)),
+					ddmTxPowThresholdHighAlarm		OCTET STRING(SIZE(0..30)),
+					ddmTxPowThresholdLowAlarm		OCTET STRING(SIZE(0..30)),
+					ddmTxPowThresholdHighWarn		OCTET STRING(SIZE(0..30)),
+					ddmTxPowThresholdLowWarn		OCTET STRING(SIZE(0..30)),
+					ddmTxPowThresholdPortLAG		OCTET STRING(SIZE(0..30))
+				}
+				         
+				ddmTxPowThresholdPort OBJECT-TYPE
+					SYNTAX				DisplayString(SIZE(0..255))
+					MAX-ACCESS			read-only
+					STATUS				current
+					DESCRIPTION
+					"This object indicates the port number."
+					::= { ddmTxPowThresholdEntry 1 }
+
+				ddmTxPowThresholdHighAlarm OBJECT-TYPE
+					SYNTAX 				OCTET STRING(SIZE(0..30)) 
+					MAX-ACCESS			read-write
+					STATUS				current
+					DESCRIPTION		
+					"This object indicates the highest threshold for the alarm."
+					::= { ddmTxPowThresholdEntry 2 }
+				
+				ddmTxPowThresholdLowAlarm OBJECT-TYPE
+					SYNTAX				OCTET STRING(SIZE(0..30)) 
+					MAX-ACCESS			read-write
+					STATUS				current
+					DESCRIPTION		
+					"This object indicates the lowest threshold for the alarm."
+					::=	{ ddmTxPowThresholdEntry 3 }
+		        
+				ddmTxPowThresholdHighWarn OBJECT-TYPE
+					SYNTAX 				OCTET STRING(SIZE(0..30)) 
+					MAX-ACCESS			read-write
+					STATUS				current
+					DESCRIPTION		
+					"This object indicates the highest threshold for the warning."
+					::= { ddmTxPowThresholdEntry 4 }
+				
+				ddmTxPowThresholdLowWarn OBJECT-TYPE
+					SYNTAX				OCTET STRING(SIZE(0..30)) 
+					MAX-ACCESS			read-write
+					STATUS				current
+					DESCRIPTION		
+					"This object indicates the lowest threshold for the warning."
+					::=	{ ddmTxPowThresholdEntry 5 }
+
+				ddmTxPowThresholdPortLAG OBJECT-TYPE
+					SYNTAX				OCTET STRING(SIZE(0..30))
+					MAX-ACCESS			read-only
+					STATUS				current
+					DESCRIPTION
+					"This object indicates the lag number of the port."
+					::= { ddmTxPowThresholdEntry 6 }
+																			
+END
+					

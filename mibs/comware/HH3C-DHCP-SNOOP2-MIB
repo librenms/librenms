@@ -1,0 +1,728 @@
+-- =========================================================================
+-- Copyright (c) 2004-2017 New H3C Tech. Co., Ltd. All rights reserved.
+--
+-- Description: DHCP Snooping MIB 2
+-- Reference:
+-- Version:     V1.3
+-- History:
+-- V1.0 The initial version, created by lilin, 2012.05.15
+-- V1.1 Modified the mib description by lilin, 2013.04.15
+-- V1.2 Modified hh3cDhcpSnoop2IfMaxLearnNum by yuguoqing, 2014.03.20
+-- V1.3 Modified hh3cDhcpSnoop2IfOpt82CIDMode by heminhong, 2017.01.13
+-- =========================================================================
+HH3C-DHCP-SNOOP2-MIB DEFINITIONS ::= BEGIN
+
+-- =========================================================================
+-- Imported variables and types
+-- =========================================================================
+IMPORTS
+    TruthValue, RowStatus, MacAddress
+        FROM SNMPv2-TC
+    MODULE-IDENTITY, OBJECT-TYPE, Counter64, Unsigned32
+        FROM SNMPv2-SMI
+    ifIndex, InterfaceIndexOrZero
+        FROM IF-MIB
+    InetAddressIPv4
+        FROM INET-ADDRESS-MIB
+    hh3cCommon
+        FROM HH3C-OID-MIB;
+
+-- =========================================================================
+-- Module identity
+-- =========================================================================
+hh3cDhcpSnoop2 MODULE-IDENTITY
+    LAST-UPDATED "201701130000Z"
+    ORGANIZATION
+        "New H3C Technologies Co., Ltd."
+    CONTACT-INFO
+        "Platform Team New H3C Technologies Co., Ltd.
+         Hai-Dian District Beijing P.R. China
+         http://www.h3c.com
+         Zip:100085
+        "
+    DESCRIPTION "DHCP SNOOPING MIB 2"
+    REVISION
+        "201701130000Z"
+    DESCRIPTION
+        "Modified to add 'hh3cDhcpSnoop2IfOpt82CIDMode' mode."
+    REVISION
+         "201304150000Z"
+    DESCRIPTION
+        "The private MIB file includes the DHCP Snooping profile."
+    ::= { hh3cCommon  124 }
+
+-- ==========================================================================
+-- Scalar objects definition
+-- ==========================================================================
+    hh3cDhcpSnoop2ScalarObjects OBJECT IDENTIFIER ::= {  hh3cDhcpSnoop2 1  }
+
+-- ==================================================================
+-- hh3cDhcpSnoop2ScalarObjects: hh3cDhcpSnoop2ConfigGroup
+-- ==================================================================
+hh3cDhcpSnoop2ConfigGroup   OBJECT IDENTIFIER ::= { hh3cDhcpSnoop2ScalarObjects 1 }
+
+hh3cDhcpSnoop2Enabled OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "If the value of this object is set to 'true',
+         DHCP snooping is enabled."
+    DEFVAL { false }
+    ::= { hh3cDhcpSnoop2ConfigGroup 1 }
+
+hh3cDhcpSnoop2BindDbName OBJECT-TYPE
+    SYNTAX     OCTET STRING(SIZE(0..512))
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "Name of the file that used to store binding information.
+
+         If the value of the object is set to a zero-length string,
+         the configuration will be removed."
+    ::= { hh3cDhcpSnoop2ConfigGroup 2 }
+
+hh3cDhcpSnoop2BindRefreshIntvl OBJECT-TYPE
+    SYNTAX     Unsigned32(60..864000)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "The refresh interval of the binding information in seconds."
+    DEFVAL { 300 }
+    ::= { hh3cDhcpSnoop2ConfigGroup 3 }
+
+hh3cDhcpSnoop2BindRefresh OBJECT-TYPE
+    SYNTAX     INTEGER
+    {
+        on(1)
+    }
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "If the value of this object is set to 'on', the binding
+         information will be refreshed immediately."
+    ::= { hh3cDhcpSnoop2ConfigGroup 4 }
+
+-- ==================================================================
+-- hh3cDhcpSnoop2ScalarObjects: hh3cDhcpSnoop2StatisticsGroup
+-- ==================================================================
+hh3cDhcpSnoop2StatisticsGroup   OBJECT IDENTIFIER ::= { hh3cDhcpSnoop2ScalarObjects 2 }
+
+hh3cDhcpSnoop2PktSentNum OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of the packets send by DHCP snooping."
+    ::= { hh3cDhcpSnoop2StatisticsGroup 1 }
+
+hh3cDhcpSnoop2PktRcvNum OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of the packets received by
+         DHCP snooping."
+    ::= { hh3cDhcpSnoop2StatisticsGroup 2 }
+
+hh3cDhcpSnoop2PktDropNum OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The total number of the packets dropped by
+         DHCP snooping."
+    ::= { hh3cDhcpSnoop2StatisticsGroup 3 }
+
+-- ==========================================================================
+-- Table definition
+-- ==========================================================================
+    hh3cDhcpSnoop2Tables OBJECT IDENTIFIER ::= {  hh3cDhcpSnoop2 2  }
+
+-- ==========================================================================
+-- 1st Table of hh3cDhcpSnoop2Tables: hh3cDhcpSnoop2BindTable
+-- ==========================================================================
+hh3cDhcpSnoop2BindTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF Hh3cDhcpSnoop2BindEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "The table containing information of DHCP clients listened by
+         DHCP snooping."
+    ::= { hh3cDhcpSnoop2Tables 1 }
+
+hh3cDhcpSnoop2BindEntry OBJECT-TYPE
+    SYNTAX     Hh3cDhcpSnoop2BindEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "An entry containing information of DHCP clients."
+    INDEX
+        {
+            hh3cDhcpSnoop2BindIpAddr,
+            hh3cDhcpSnoop2BindVlanId,
+            hh3cDhcpSnoop2BindSecVlanId
+        }
+    ::= { hh3cDhcpSnoop2BindTable 1 }
+
+Hh3cDhcpSnoop2BindEntry ::=
+    SEQUENCE
+        {
+            hh3cDhcpSnoop2BindIpAddr           InetAddressIPv4,
+            hh3cDhcpSnoop2BindVlanId           Unsigned32,
+            hh3cDhcpSnoop2BindSecVlanId        Unsigned32,
+            hh3cDhcpSnoop2BindMacAddr          MacAddress,
+            hh3cDhcpSnoop2BindLease            Unsigned32,
+            hh3cDhcpSnoop2BindPortIndex        InterfaceIndexOrZero,
+            hh3cDhcpSnoop2BindRowStatus        RowStatus
+        }
+
+hh3cDhcpSnoop2BindIpAddr OBJECT-TYPE
+    SYNTAX     InetAddressIPv4
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "DHCP client's IP addresses collected by DHCP snooping."
+    ::= { hh3cDhcpSnoop2BindEntry 1 }
+
+hh3cDhcpSnoop2BindVlanId OBJECT-TYPE
+    SYNTAX     Unsigned32(1..4094)
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "DHCP client's VLAN ID collected by DHCP snooping."
+    ::= { hh3cDhcpSnoop2BindEntry 2 }
+
+hh3cDhcpSnoop2BindSecVlanId OBJECT-TYPE
+    SYNTAX     Unsigned32(1..4094 | 65535)
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "DHCP client's second VLAN ID collected by DHCP snooping.
+         65535 means no second VLAN."
+    ::= { hh3cDhcpSnoop2BindEntry 3 }
+
+hh3cDhcpSnoop2BindMacAddr OBJECT-TYPE
+    SYNTAX     MacAddress
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "DHCP client's MAC address collected by DHCP snooping."
+    ::= { hh3cDhcpSnoop2BindEntry 4 }
+
+hh3cDhcpSnoop2BindLease OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Left lease time in seconds collected by DHCP snooping.
+         The value of this object cannot be 0."
+    ::= { hh3cDhcpSnoop2BindEntry 5 }
+
+hh3cDhcpSnoop2BindPortIndex OBJECT-TYPE
+    SYNTAX     InterfaceIndexOrZero
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "DHCP client's port index collected by DHCP snooping.
+         The value of zero means unknown port."
+    ::= { hh3cDhcpSnoop2BindEntry 6 }
+
+hh3cDhcpSnoop2BindRowStatus    OBJECT-TYPE
+     SYNTAX      RowStatus
+     MAX-ACCESS  read-create
+     STATUS      current
+     DESCRIPTION
+         "RowStatus.  Only destroy action is allow to use."
+     ::= { hh3cDhcpSnoop2BindEntry 7 }
+
+-- ==========================================================================
+-- 2nd Table of hh3cDhcpSnoop2Tables: hh3cDhcpSnoop2IfConfigTable
+-- ==========================================================================
+hh3cDhcpSnoop2IfConfigTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF Hh3cDhcpSnoop2IfConfigEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "A table is used to configure DHCP snooping functions on ports."
+    ::= {hh3cDhcpSnoop2Tables 2 }
+
+hh3cDhcpSnoop2IfConfigEntry OBJECT-TYPE
+    SYNTAX     Hh3cDhcpSnoop2IfConfigEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "An entry containing DHCP snooping configurations of ports."
+    INDEX   { ifIndex }
+    ::= {hh3cDhcpSnoop2IfConfigTable 1}
+
+Hh3cDhcpSnoop2IfConfigEntry  ::=
+    SEQUENCE
+        {
+            hh3cDhcpSnoop2IfTrustStatus                INTEGER,
+            hh3cDhcpSnoop2IfCheckMac                   TruthValue,
+            hh3cDhcpSnoop2IfCheckRequest               TruthValue,
+            hh3cDhcpSnoop2IfRateLimit                  Unsigned32,
+            hh3cDhcpSnoop2IfRecordBind                 TruthValue,
+            hh3cDhcpSnoop2IfMaxLearnNum                Unsigned32,
+            hh3cDhcpSnoop2IfOpt82Enable                TruthValue,
+            hh3cDhcpSnoop2IfOpt82Strategy              INTEGER,
+            hh3cDhcpSnoop2IfOpt82CIDMode               INTEGER,
+            hh3cDhcpSnoop2IfOpt82CIDNodeType           INTEGER,
+            hh3cDhcpSnoop2IfOpt82CIDNodeStr            OCTET STRING,
+            hh3cDhcpSnoop2IfOpt82CIDStr                OCTET STRING,
+            hh3cDhcpSnoop2IfOpt82CIDFormat             INTEGER,
+            hh3cDhcpSnoop2IfOpt82RIDMode               INTEGER,
+            hh3cDhcpSnoop2IfOpt82RIDStr                OCTET STRING,
+            hh3cDhcpSnoop2IfOpt82RIDFormat             INTEGER
+        }
+
+hh3cDhcpSnoop2IfTrustStatus OBJECT-TYPE
+    SYNTAX     INTEGER
+    {
+        untrusted(0),
+        trusted(1)
+    }
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "Trusted status of the port."
+    DEFVAL { untrusted }
+    ::= { hh3cDhcpSnoop2IfConfigEntry 1 }
+
+hh3cDhcpSnoop2IfCheckMac OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "If the value is 'true', MAC address of DHCP packets received
+         on the port will be checked."
+    DEFVAL { false }
+    ::= { hh3cDhcpSnoop2IfConfigEntry 2 }
+
+hh3cDhcpSnoop2IfCheckRequest OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "If the value is 'true', DHCP request packets will be checked."
+    DEFVAL { false }
+    ::= { hh3cDhcpSnoop2IfConfigEntry 3 }
+
+hh3cDhcpSnoop2IfRateLimit OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "The rate limit in Kbps.
+         If the value is 0, there is no rate limit on the port."
+    DEFVAL { 0 }
+    ::= { hh3cDhcpSnoop2IfConfigEntry 4 }
+
+hh3cDhcpSnoop2IfRecordBind OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "If the value is 'true', information of DHCP packets received
+         on the port will be recorded."
+    DEFVAL { false }
+    ::= { hh3cDhcpSnoop2IfConfigEntry 5 }
+
+hh3cDhcpSnoop2IfMaxLearnNum OBJECT-TYPE
+    SYNTAX     Unsigned32(0..4294967295)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "The maximum number of binding entries that could be learned on
+         the port.
+         If the value is 0, it means that there is no threshold on the
+         port."
+    DEFVAL { 0 }
+    ::= { hh3cDhcpSnoop2IfConfigEntry 6 }
+
+hh3cDhcpSnoop2IfOpt82Enable OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "If DHCP snooping supports option 82 functions, the
+         value is 'true'.
+         If DHCP snooping does NOT support option 82 functions,
+         the value is 'false'."
+    DEFVAL     { false }
+    ::= { hh3cDhcpSnoop2IfConfigEntry 7 }
+
+hh3cDhcpSnoop2IfOpt82Strategy     OBJECT-TYPE
+    SYNTAX      INTEGER
+    {
+        drop(1),
+        keep(2),
+        replace(3)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The strategy of DHCP snooping handling option 82.
+
+         'drop' indicates DHCP snooping discarding the request
+         packet including option 82.
+
+         'keep' indicates DHCP snooping accepting the request
+         packet without any change of the option 82.
+
+         'replace' indicates DHCP snooping accepting the
+         request packet on condition that it generates a new
+         option 82 to replace the original one."
+    DEFVAL      { replace }
+    ::= { hh3cDhcpSnoop2IfConfigEntry 8 }
+
+hh3cDhcpSnoop2IfOpt82CIDMode OBJECT-TYPE
+    SYNTAX      INTEGER
+    {
+        normal(1),
+        verbose(2),
+        userDefine(3),
+        bas(4)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The mode of filling in the circuit ID suboption
+         of DHCP option 82.
+
+         'normal' is the standard mode.
+
+         'verbose' is the detailed mode.
+
+         'userDefine' is the user-defined mode.
+
+         'bas' is the bas mode.
+
+         If the value of this object is set to 'userDefine',
+         hh3cDhcpSnoop2IfOpt82CIDStr must also be set."
+    DEFVAL      { normal }
+    ::= { hh3cDhcpSnoop2IfConfigEntry 9 }
+
+hh3cDhcpSnoop2IfOpt82CIDNodeType OBJECT-TYPE
+    SYNTAX     INTEGER
+    {
+        invalid(1),
+        mac(2),
+        sysname(3),
+        userDefine(4)
+    }
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "Type of access node identifier that is used to fill
+         in the circuit ID suboption of option 82 when the value
+         of hh3cDhcpSnoop2IfOption82CIDMode is set to 'verbose'.
+
+         The SET operation of this object must be with the SET
+         operation of hh3cDhcpSnoop2IfOpt82CIDMode.
+
+         'invalid' indicates that the node identifier is NOT used
+         to fill in the circuit ID suboption of option 82.
+         If the value of hh3cDhcpSnoop2IfOpt82CIDMode is NOT
+         'verbose', the value of this object is set to 'invalid'
+         automatically.
+         Otherwise the value of this object cannot be set to 'invalid'.
+
+         'mac' indicates that the node identifier is
+         filled in with the bridge MAC of DHCP snooping device.
+         If the value of hh3cDhcpSnoop2IfOpt82CIDMode is set to
+         'verbose', the default value of this object is 'mac'.
+
+         'sysname' indicates that the node identifier
+         is filled in with the sysname of the DHCP snooping.
+
+         'userDefine' indicates the node identifier
+         is filled in with the string defined by the object
+         of hh3cDhcpSnoop2IfOpt82CIDNodeStr.
+         If the value is set to 'userDefine', the value of
+         hh3cDhcpSnoop2IfOpt82CIDNodeStr must also be set to
+         a non-zero length string."
+    ::= { hh3cDhcpSnoop2IfConfigEntry 10 }
+
+hh3cDhcpSnoop2IfOpt82CIDNodeStr      OBJECT-TYPE
+    SYNTAX     OCTET STRING(SIZE(0..50))
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "The string defined by user to fill in the
+         node identifier in the verbose mode.
+
+         If the value of hh3cDhcpSnoop2IfOpt82CIDMode is NOT
+         'verbose', or the value of hh3cDhcpSnoop2IfOpt82CIDNodeType
+         is NOT 'userDefine', it is set to a zero-length string
+         automatically.
+         Otherwise it must be set to a non-zero length string.
+
+         The SET operation of this object must be with the SET
+         operation of hh3cDhcpSnoop2IfOpt82CIDMode and
+         hh3cDhcpSnoop2IfOpt82CIDNodeType."
+    ::= { hh3cDhcpSnoop2IfConfigEntry 11 }
+
+hh3cDhcpSnoop2IfOpt82CIDStr      OBJECT-TYPE
+    SYNTAX      OCTET STRING(SIZE(0|3..63))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The string defined by user to fill in the circuit ID
+         suboption of option 82 in the user-define mode.
+
+         If the value of hh3cDhcpSnoop2IfOpt82CIDMode is
+         NOT 'userDefine', it is set to a zero-length string
+         automatically.
+         Otherwise it must be set to a non-zero length string.
+
+         The SET operation of this object must be with the SET
+         operation of hh3cDhcpSnoop2IfOpt82CIDMode."
+    ::= { hh3cDhcpSnoop2IfConfigEntry 12 }
+
+hh3cDhcpSnoop2IfOpt82CIDFormat    OBJECT-TYPE
+    SYNTAX      INTEGER
+    {
+        hex(1),
+        ascii(2),
+        undefine(3)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The format of the circuit ID suboption of DHCP
+         option 82.
+
+         'hex' is the hex format.
+
+         'ascii' is the ascii format.
+
+         'undefine' is the undefine format.
+
+         If the value of hh3cDhcpSnoop2IfOpt82CIDMode is
+         'normal', this object is set with 'hex' automatically
+         and cannot be set with 'undefine'.
+
+         If the value of hh3cDhcpSnoop2IfOpt82CIDMode is
+         'verbose', the default value of this object is 'undefine'.
+
+         If the value of hh3cDhcpSnoop2IfOpt82CIDMode is
+         'userDefine', this object is set with 'ascii' automatically
+         and cannot be set with other value.
+
+         The SET operation of this object must be with the SET
+         operation of hh3cDhcpSnoop2IfOpt82CIDMode."
+    ::= { hh3cDhcpSnoop2IfConfigEntry 13 }
+
+hh3cDhcpSnoop2IfOpt82RIDMode OBJECT-TYPE
+    SYNTAX      INTEGER
+    {
+        normal(1),
+        sysname(2),
+        userDefine(3)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The mode of filling in the remote ID suboption
+         of DHCP option 82.
+
+         'normal' is the standard mode.
+
+         'userDefine' is the user-defined mode.
+
+         'sysname' is the sysname mode.
+
+         If the value of this object is set to 'userDefine',
+         hh3cDhcpSnoop2IfOpt82RIDStr must also be set."
+    DEFVAL      { normal }
+    ::= { hh3cDhcpSnoop2IfConfigEntry 14 }
+
+hh3cDhcpSnoop2IfOpt82RIDStr  OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(0..63))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The string defined by user to fill in the
+         remote ID in the user-defined mode.
+
+         If the value of hh3cDhcpSnoop2IfOpt82RIDMode is
+         NOT 'userDefine', this object is set with a zero-length
+         string automatically.
+         Otherwise it must be set with a non-zero length string.
+
+         The SET operation of this object must be with the SET
+         operation of hh3cDhcpSnoop2IfOpt82RIDMode."
+    ::= { hh3cDhcpSnoop2IfConfigEntry 15 }
+
+hh3cDhcpSnoop2IfOpt82RIDFormat    OBJECT-TYPE
+    SYNTAX      INTEGER
+    {
+        hex(1),
+        ascii(2)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The format of DHCP option 82 remote ID in 'normal' mode.
+
+         'hex' is the hex format.
+
+         'ascii' is the ascii format.
+
+         If the value of hh3cDhcpSnoop2IfOpt82RIDMode is
+         'sysname' or 'userDefine', this object is set with 'ascii'
+         automatically and cannot be set with other value.
+
+         If the value of hh3cDhcpSnoop2IfOpt82RIDMode is
+         'normal', the default value of this object is 'hex'.
+
+         The SET operation of this object must be with the SET
+         operation of hh3cDhcpSnoop2IfOpt82RIDMode."
+    ::= { hh3cDhcpSnoop2IfConfigEntry 16 }
+
+-- ==================================================================
+-- 3rd Table of hh3cDhcpSnoop2Tables: hh3cDhcpSnoop2IfVlanCIDTable
+-- ==================================================================
+hh3cDhcpSnoop2IfVlanCIDTable   OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cDhcpSnoop2IfVlanCIDEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table containing the information of the circuit ID
+         suboption of DHCP option 82 in VLAN."
+    ::= { hh3cDhcpSnoop2Tables 3 }
+
+hh3cDhcpSnoop2IfVlanCIDEntry  OBJECT-TYPE
+    SYNTAX      Hh3cDhcpSnoop2IfVlanCIDEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry containing the information of the circuit ID
+         suboption of DHCP option 82 in VLAN."
+    INDEX { ifIndex, hh3cDhcpSnoop2IfVlanCIDVlanIndex }
+    ::= { hh3cDhcpSnoop2IfVlanCIDTable 1 }
+
+Hh3cDhcpSnoop2IfVlanCIDEntry   ::=
+    SEQUENCE
+    {
+        hh3cDhcpSnoop2IfVlanCIDVlanIndex          Unsigned32,
+        hh3cDhcpSnoop2IfVlanCIDStr                OCTET STRING,
+        hh3cDhcpSnoop2IfVlanCIDRowStatus          RowStatus
+    }
+
+hh3cDhcpSnoop2IfVlanCIDVlanIndex OBJECT-TYPE
+    SYNTAX      Unsigned32(1..4094)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "VLAN ID."
+    ::= { hh3cDhcpSnoop2IfVlanCIDEntry 1 }
+
+hh3cDhcpSnoop2IfVlanCIDStr      OBJECT-TYPE
+    SYNTAX      OCTET STRING(SIZE(3..63))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The string defined by user to fill in the
+         circuit ID suboption of option 82."
+    ::= { hh3cDhcpSnoop2IfVlanCIDEntry 2 }
+
+hh3cDhcpSnoop2IfVlanCIDRowStatus    OBJECT-TYPE
+     SYNTAX      RowStatus
+     MAX-ACCESS  read-create
+     STATUS      current
+     DESCRIPTION
+         "Operation status of this table entry.
+          Three actions are used: active,
+          createAndGo, destroy."
+     ::= { hh3cDhcpSnoop2IfVlanCIDEntry 3 }
+
+-- ==================================================================
+-- 4th Table of hh3cDhcpSnoop2Tables: hh3cDhcpSnoop2IfVlanRIDTable
+-- ==================================================================
+hh3cDhcpSnoop2IfVlanRIDTable   OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cDhcpSnoop2IfVlanRIDEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table containing the information of the remote ID
+         suboption of DHCP option 82 in VLAN."
+    ::= { hh3cDhcpSnoop2Tables 4 }
+
+hh3cDhcpSnoop2IfVlanRIDEntry  OBJECT-TYPE
+    SYNTAX      Hh3cDhcpSnoop2IfVlanRIDEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry containing the information of the remote ID
+         suboption of DHCP option 82 in VLAN."
+    INDEX { ifIndex, hh3cDhcpSnoop2IfVlanRIDVlanIndex }
+    ::= { hh3cDhcpSnoop2IfVlanRIDTable 1 }
+
+Hh3cDhcpSnoop2IfVlanRIDEntry   ::=
+    SEQUENCE
+    {
+        hh3cDhcpSnoop2IfVlanRIDVlanIndex              Unsigned32,
+        hh3cDhcpSnoop2IfVlanRIDMode                   INTEGER,
+        hh3cDhcpSnoop2IfVlanRIDStr                    OCTET STRING,
+        hh3cDhcpSnoop2IfVlanRIDRowStatus              RowStatus
+    }
+
+hh3cDhcpSnoop2IfVlanRIDVlanIndex    OBJECT-TYPE
+    SYNTAX      Unsigned32(1..4094)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "VLAN ID."
+    ::= { hh3cDhcpSnoop2IfVlanRIDEntry 1 }
+
+hh3cDhcpSnoop2IfVlanRIDMode    OBJECT-TYPE
+    SYNTAX      INTEGER
+    {
+        sysname(1),
+        userDefine(2)
+    }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The mode of filling in the remote ID suboption
+         of DHCP option 82 in VLAN.
+
+         'sysname' indicates using the device sysname to fill in
+         the suboption.
+
+         'userDefine' indicates using the string defined
+         by hh3cDhcpSnoop2IfVlanRIDStr to fill in the suboption.
+
+         If the value of this object is set to 'userDefine',
+         hh3cDhcpSnoop2IfVlanRIDStr must also be set."
+    ::= { hh3cDhcpSnoop2IfVlanRIDEntry 2 }
+
+hh3cDhcpSnoop2IfVlanRIDStr      OBJECT-TYPE
+    SYNTAX      OCTET STRING(SIZE(0..63))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The string used to fill in the remote ID suboption.
+
+         If the value of hh3cDhcpSnoop2IfVlanRIDMode is NOT 'userDefine',
+         this object is set with a zero-length string automatically.
+         Otherwise it must be set with a non-zero length string.
+
+         The SET operation of this object must be with the SET
+         operation of hh3cDhcpSnoop2IfVlanRIDMode."
+    ::= { hh3cDhcpSnoop2IfVlanRIDEntry 3 }
+
+hh3cDhcpSnoop2IfVlanRIDRowStatus    OBJECT-TYPE
+     SYNTAX      RowStatus
+     MAX-ACCESS  read-create
+     STATUS      current
+     DESCRIPTION
+         "Operation status of this table entry.
+          Three actions are used: active,
+          createAndGo, destroy."
+     ::= { hh3cDhcpSnoop2IfVlanRIDEntry 4 }
+
+END

@@ -18,6 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2016 Neil Lathwood
  * @author     Neil Lathwood <neil@lathwood.co.uk>
  */
@@ -36,7 +37,7 @@ class AlertRule extends BaseModel
     // ---- Query scopes ----
 
     /**
-     * @param Builder<AlertRule> $query
+     * @param  Builder<AlertRule>  $query
      * @return Builder
      */
     public function scopeEnabled($query)
@@ -47,7 +48,7 @@ class AlertRule extends BaseModel
     /**
      * Scope for only alert rules that are currently in alarm
      *
-     * @param Builder<AlertRule> $query
+     * @param  Builder<AlertRule>  $query
      * @return Builder
      */
     public function scopeIsActive($query)
@@ -61,8 +62,8 @@ class AlertRule extends BaseModel
      * Scope to filter rules for devices permitted to user
      * (do not use for admin and global read-only users)
      *
-     * @param Builder<AlertRule> $query
-     * @param User $user
+     * @param  Builder<AlertRule>  $query
+     * @param  User  $user
      * @return mixed
      */
     public function scopeHasAccess($query, User $user)

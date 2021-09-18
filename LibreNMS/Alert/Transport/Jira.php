@@ -15,6 +15,7 @@
 
 /**
  * Jira API Transport
+ *
  * @author  Aldemir Akpinar <aldemir.akpinar@gmail.com>
  * @copyright 2017 Aldemir Akpinar, LibreNMS
  * @license GPL

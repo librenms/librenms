@@ -18,6 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2016 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -31,7 +32,7 @@ $snmpMockCache = [];
  * Cache the data from an snmprec file
  * in ./tests/snmpsim/
  *
- * @param string $file the snmprec file name (excluding .snmprec)
+ * @param  string  $file  the snmprec file name (excluding .snmprec)
  */
 function cache_snmprec($file)
 {
@@ -70,8 +71,9 @@ function cache_snmprec($file)
 /**
  * Get all data of the specified $community from the snmprec cache
  *
- * @param string $community snmp community to return
+ * @param  string  $community  snmp community to return
  * @return array array of the data containing: [$oid][$type, $data]
+ *
  * @throws Exception this $community is not cached
  */
 function snmprec_get($community)
@@ -90,9 +92,10 @@ function snmprec_get($community)
 /**
  * Get an $oid from the specified $community
  *
- * @param string $community the community to fetch data from
- * @param string $oid numeric oid of data to fetch
+ * @param  string  $community  the community to fetch data from
+ * @param  string  $oid  numeric oid of data to fetch
  * @return array array of the data containing: [$type, $data]
+ *
  * @throws Exception this $oid is not cached
  */
 function snmprec_get_oid($community, $oid)
@@ -111,10 +114,11 @@ function snmprec_get_oid($community, $oid)
  * Get the numeric oid of an oid
  * The leading dot is ommited by default to be compatible with snmpsim
  *
- * @param string $oid the oid to tranlslate
- * @param string $mib mib to use
- * @param string $mibdir mib dir to look for mib in
+ * @param  string  $oid  the oid to tranlslate
+ * @param  string  $mib  mib to use
+ * @param  string  $mibdir  mib dir to look for mib in
  * @return string the oid in numeric format (.1.3.4.5)
+ *
  * @throws Exception Could not translate the oid
  */
 function snmp_translate_number($oid, $mib = null, $mibdir = null)

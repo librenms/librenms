@@ -24,7 +24,7 @@ for individual devices are available showing the relationship with
 other devices. Also you can Build Device Groups and those Device
 Groups can be drawn with Network Map.
 
-# Network Map Configurator
+## Network Map Configurator
 
 [This link](https://visjs.github.io/vis-network/docs/network/) will
 show you all the options and explain what they do.
@@ -39,14 +39,14 @@ $config['network_map_vis_options'] = '{
 }';
 ```
 
-## Note
+### Note
 
 You may want to disable the automatic page refresh while you're
 tweaking your configuration, as the refresh will reset the dynamic
 configuration UI to the values currently saved in config.php This can
 be done by clicking on the Settings Icon then Refresh Pause.
 
-## Configurator Output
+### Configurator Output
 
 Once you've achieved your desired map appearance, click the generate
 options button at the bottom to be given the necessary parameters to

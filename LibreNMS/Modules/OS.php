@@ -18,6 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2020 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -51,12 +52,14 @@ class OS implements Module
 
     public function poll(\LibreNMS\OS $os)
     {
-        $deviceModel = $os->getDevice();
+        $deviceModel = $os->getDevice(); /** @var \App\Models\Device $deviceModel */
         if ($os instanceof OSPolling) {
             $os->pollOS();
         } else {
             // legacy poller files
             global $graphs, $device;
+            $location = null;
+
             if (is_file(base_path('/includes/polling/os/' . $device['os'] . '.inc.php'))) {
                 // OS Specific
                 include base_path('/includes/polling/os/' . $device['os'] . '.inc.php');
@@ -74,7 +77,6 @@ class OS implements Module
             $deviceModel->serial = ($serial ?? $deviceModel->serial) ?: null;
 
             if (! empty($location)) { // legacy support, remove when no longer needed
-                /** @phpstan-ignore-next-line */
                 $deviceModel->setLocation($location);
                 optional($deviceModel->location)->save();
             }

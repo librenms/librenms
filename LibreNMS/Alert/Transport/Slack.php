@@ -15,6 +15,7 @@
 
 /**
  * API Transport
+ *
  * @author f0o <f0o@devilcode.org>
  * @copyright 2014 f0o, LibreNMS
  * @license GPL
@@ -38,7 +39,7 @@ class Slack extends Transport
     {
         $host = $api['url'];
         $curl = curl_init();
-        $slack_msg = strip_tags($obj['msg']);
+        $slack_msg = html_entity_decode(strip_tags($obj['msg']), ENT_QUOTES);
         $color = self::getColorForState($obj['state']);
         $data = [
             'attachments' => [

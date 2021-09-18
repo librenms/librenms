@@ -18,7 +18,8 @@
 
 /**
  * Fetch all VM's in a Proxmox Cluster
- * @param string $c Clustername
+ *
+ * @param  string  $c  Clustername
  * @return array An array with all the VM's on this cluster
  */
 function proxmox_cluster_vms($c)
@@ -28,7 +29,8 @@ function proxmox_cluster_vms($c)
 
 /**
  * Fetch all VM's on a Proxmox node
- * @param int $n device_id
+ *
+ * @param  int  $n  device_id
  * @return array An array with all the VM's on this node
  */
 function proxmox_node_vms($n)
@@ -38,8 +40,9 @@ function proxmox_node_vms($n)
 
 /**
  * Fetch all info about a Proxmox VM
- * @param int $vmid Proxmox VM ID
- * @param string $c Clustername
+ *
+ * @param  int  $vmid  Proxmox VM ID
+ * @param  string  $c  Clustername
  * @return array An array with all info of this VM on this cluster, including ports
  */
 function proxmox_vm_info($vmid, $c)

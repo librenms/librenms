@@ -384,7 +384,11 @@
             "group": "auth",
             "section": "ad",
             "order": 4,
-            "type": "ldap-groups"
+            "type": "ldap-groups",
+            "validate": {
+                "value": "array",
+                "value.*": "array"
+            }
         },
         "auth_ad_user_filter": {
             "default": "(objectclass=user)",
@@ -508,7 +512,11 @@
             "group": "auth",
             "section": "ldap",
             "order": 4,
-            "type": "ldap-groups"
+            "type": "ldap-groups",
+            "validate": {
+                "value": "array",
+                "value.*": "array"
+            }
         },
         "auth_ldap_port": {
             "default": 389,
@@ -612,11 +620,12 @@
             "units": "days",
             "group": "auth",
             "section": "general",
-            "order": 3,
+            "order": 4,
             "type": "integer"
         },
         "authlog_purge": {
             "default": 30,
+            "units": "days",
             "group": "system",
             "section": "cleanup",
             "order": 4,
@@ -662,6 +671,13 @@
             "default": [
                 "/-K9W8-/"
             ]
+        },
+        "bad_entity_sensor_regex": {
+            "default": null,
+            "type": "array",
+            "validate": {
+                "value.*": "is_regex"
+            }
         },
         "bad_disk_regexp": {
             "default": [],
@@ -759,6 +775,14 @@
             "default": "https://stats.librenms.org/log.php",
             "type": "text"
         },
+        "callback_proxy": {
+            "default": null,
+            "type": "text"
+        },
+        "collectd_dir": {
+            "default": null,
+            "type": "directory"
+        },
         "core_descr": {
             "default": ["core"],
             "type": "array",
@@ -834,6 +858,23 @@
             "hidden": true,
             "type": "boolean"
         },
+        "debug.run_trace": {
+            "default": false,
+            "type": "boolean"
+        },
+        "default_port_group": {
+            "default": 0,
+            "type": "select-dynamic",
+            "group": "discovery",
+            "section": "networks",
+            "order": 0,
+            "options": {
+                "target": "port-group"
+            },
+            "validate": {
+                "value": "integer|zero_or_exists:port_groups,id"
+            }
+        },
         "device_location_map_open": {
             "order": 2,
             "group": "webui",
@@ -853,6 +894,7 @@
         },
         "device_perf_purge": {
             "default": 7,
+            "units": "days",
             "group": "system",
             "section": "cleanup",
             "order": 7,
@@ -945,6 +987,17 @@
                 }
             ],
             "type": "array"
+        },
+        "disabled_sensors": {
+            "default": null,
+            "type": "array"
+        },
+        "disabled_sensors_regex": {
+            "default": null,
+            "type": "array",
+            "validate": {
+                "value.*": "is_regex"
+            }
         },
         "discover_services": {
             "default": false,
@@ -1265,10 +1318,16 @@
         },
         "default_poller_group": {
             "default": 0,
-            "type": "integer",
+            "type": "select-dynamic",
             "group": "poller",
             "section": "distributed",
-            "order": 3
+            "order": 3,
+            "options": {
+                "target": "poller-group"
+            },
+            "validate": {
+                "value": "integer|zero_or_exists:poller_groups,id"
+            }
         },
         "distributed_poller_memcached_host": {
             "default": "example.net",
@@ -1543,6 +1602,7 @@
         },
         "eventlog_purge": {
             "default": 30,
+            "units": "days",
             "group": "system",
             "section": "cleanup",
             "order": 0,
@@ -1677,6 +1737,10 @@
         "github_api": {
             "default": "https://api.github.com/repos/librenms/librenms/",
             "type": "text"
+        },
+        "good_if": {
+            "default": null,
+            "type": "array"
         },
         "graph_colours.blues": {
             "default": [
@@ -3272,6 +3336,13 @@
             },
             "type": "array"
         },
+        "graphs.port_speed_zoom": {
+            "default": false,
+            "type": "boolean",
+            "group": "webui",
+            "section": "graph",
+            "order": 4
+        },
         "graphs.row.normal": {
             "default": {
                 "sixhour": "6 Hours",
@@ -3377,6 +3448,19 @@
             "options": {
                 "old": "Old",
                 "new": "New"
+            }
+        },
+        "html.device.links": {
+            "default": [],
+            "type": "array",
+            "validate": {
+                "value": "array",
+                "value.*": "object",
+                "value.*.action": "boolean",
+                "value.*.icon": "string",
+                "value.*.external": "boolean",
+                "value.*.title": "required|string",
+                "value.*.url": "required|string"
             }
         },
         "html.device.primary_link": {
@@ -3691,6 +3775,10 @@
             ],
             "type": "array"
         },
+        "libvirt_username": {
+            "default": null,
+            "type": "text"
+        },
         "list_colour.even": {
             "default": "#ffffff",
             "type": "color"
@@ -3719,6 +3807,27 @@
             "default": "#e3e3e3",
             "type": "color"
         },
+        "location_map": {
+            "default": null,
+            "type": "array",
+            "validate": {
+                "value.*": "string"
+            }
+        },
+        "location_map_regex": {
+            "default": null,
+            "type": "array",
+            "validate": {
+                "value.*": "string"
+            }
+        },
+        "location_map_regex_sub": {
+            "default": null,
+            "type": "array",
+            "validate": {
+                "value.*": "string"
+            }
+        },
         "log_dir": {
             "type": "directory"
         },
@@ -3729,7 +3838,7 @@
             "default": "Unauthorised access or use shall render the user liable to criminal and/or civil prosecution.",
             "group": "auth",
             "section": "general",
-            "order": 4,
+            "order": 5,
             "type": "text"
         },
         "mac_oui.enabled": {
@@ -4074,6 +4183,13 @@
             "order": 4,
             "type": "text"
         },
+        "oxidized.ignore_groups": {
+            "default": [],
+            "type" : "array",
+            "group": "external",
+            "section": "oxidized",
+            "order": 5
+        },
         "oxidized.enabled": {
             "default": false,
             "group": "external",
@@ -4134,7 +4250,7 @@
             "type": "oxidized-maps",
             "validate": {
                 "value": "array",
-                "value.*": "array|keys_in:hostname,sysName,sysDescr,hardware,os,location,ip",
+                "value.*": "array|keys_in:hostname,sysName,sysDescr,sysObjectID,hardware,os,location,ip",
                 "value.*.*": "array|min:1",
                 "value.*.*.*": "array|size:2|keys_in:match,regex,value",
                 "value.*.*.*.value": "required|string",
@@ -4205,7 +4321,7 @@
             "type": "integer",
             "group": "auth",
             "section": "general",
-            "order": 5
+            "order": 6
         },
         "peering_descr": {
             "default": [
@@ -4236,6 +4352,10 @@
             "order": 1,
             "section": "device-group",
             "type": "boolean"
+        },
+        "php_memory_limit": {
+            "default": null,
+            "type": "integer"
         },
         "ping": {
             "default": "/bin/ping",
@@ -4655,8 +4775,12 @@
             "default": false,
             "group": "auth",
             "section": "general",
-            "order": 6,
+            "order": 7,
             "type": "boolean"
+        },
+        "rancid_configs": {
+            "default": [],
+            "type": "array"
         },
         "rancid_ignorecomments": {
             "default": false,
@@ -4688,6 +4812,7 @@
         },
         "route_purge": {
             "default": 10,
+            "units": "days",
             "group": "system",
             "section": "cleanup",
             "order": 2,
@@ -4718,6 +4843,7 @@
             "section": "cleanup",
             "order": 8,
             "default": 0,
+            "units": "days",
             "type": "integer"
         },
         "rrd_rra": {
@@ -4997,6 +5123,11 @@
                 "public"
             ]
         },
+        "snmp.exec_timeout": {
+            "default": 1200,
+            "type": "integer",
+            "units": "seconds"
+        },
         "snmp.max_repeaters": {
             "group": "poller",
             "section": "snmp",
@@ -5130,8 +5261,8 @@
             "type": "text"
         },
         "summary_errors": {
-            "default": 0,
-            "type": "integer"
+            "default": false,
+            "type": "boolean"
         },
         "syslog_filter": {
             "default": [
@@ -5144,9 +5275,10 @@
         },
         "syslog_purge": {
             "default": 30,
+            "units": "days",
             "group": "system",
             "section": "cleanup",
-            "order": 2,
+            "order": 1,
             "type": "integer"
         },
         "temp_dir": {
@@ -5188,10 +5320,18 @@
             "order": 1
         },
         "twofactor": {
+            "default": "false",
             "type": "boolean",
             "group": "auth",
             "section": "general",
             "order": 1
+        },
+        "twofactor_lock": {
+            "default": "0",
+            "type": "integer",
+            "group": "auth",
+            "section": "general",
+            "order": 2
         },
         "unix-agent-connection-time-out": {
             "default": 10,
@@ -5305,14 +5445,21 @@
             "order": 2,
             "type": "boolean"
         },
+        "webui.custom_css": {
+            "default": [],
+            "type": "array"
+        },
         "webui.default_dashboard_id": {
             "default": 0,
             "group": "webui",
             "section": "dashboard",
             "order": 0,
-            "type": "dashboard-select",
+            "type": "select-dynamic",
+            "options": {
+                "target": "dashboard"
+            },
             "validate": {
-                "value": "zero_or_exists:dashboards,dashboard_id"
+                "value": "integer|zero_or_exists:dashboards,dashboard_id"
             }
         },
         "webui.dynamic_graphs": {

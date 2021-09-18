@@ -1,0 +1,310 @@
+-- ==================================================================
+-- Copyright (C) 2002 New H3C Tech. Co., Ltd. All rights reserved.
+-- 
+-- Description: 802.1X MIB
+-- Reference:
+-- Version: V1.3
+-- History:
+-- 1) 2003-03-27 Fuzhenyu created  
+-- 2) v1.1 2004-08-28 chaiyongfu 
+--         change node  hh3cdot1xAuthServerTimeout's DEFVAL { 30 } to DEFVAL { 100 }
+--    v1.2 2004-10-12 updated by gaolong
+--         Import NOTIFICATION-TYPE
+--         Remove chinese characters
+--         Fix time format of  hh3cpaeExtMib.
+--    v1.3 2007-10-23 updated by chaiyongfu
+--         Add node hh3cdot1xAuthMethod, hh3cdot1xpaeportMcastTrigStatus,
+--         hh3cdot1xpaeportHandshakeStatus
+-- ==================================================================
+
+HH3C-8021PAE-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+    hh3cRhw          
+        FROM HH3C-OID-MIB
+    OBJECT-TYPE,Unsigned32,NOTIFICATION-TYPE
+        FROM SNMPv2-SMI
+    
+    MODULE-IDENTITY
+            FROM SNMPv2-SMI 
+    MacAddress
+        FROM SNMPv2-TC
+
+    dot1xPaePortNumber
+            FROM IEEE8021-PAE-MIB;          
+   
+
+     hh3cpaeExtMib MODULE-IDENTITY
+            LAST-UPDATED "200106290000Z"
+            ORGANIZATION
+            "New H3C Tech. Co., Ltd."
+            CONTACT-INFO
+            "Platform Team New H3C Tech. Co., Ltd.
+            Hai-Dian District Beijing P.R. China
+            http://www.h3c.com
+            Zip:100085
+            "
+            DESCRIPTION
+            "this file extends IEEE8021-PAE-MIB(802.1x)"
+            REVISION "200106290000Z"
+            DESCRIPTION
+            ""
+            ::= { hh3cRhw 6 }
+   -- ============================================================
+   -- groups in the PAE MIB
+   -- ============================================================
+
+   hh3cpaeExtMibObjects           OBJECT IDENTIFIER ::= { hh3cpaeExtMib 1 }    
+   hh3cdot1xPaeSystem             OBJECT IDENTIFIER ::= { hh3cpaeExtMibObjects 1 }
+   hh3cdot1xPaeAuthenticator      OBJECT IDENTIFIER ::= { hh3cpaeExtMibObjects 2 }
+ 
+   -- ============================================================
+
+    hh3cdot1xAuthQuietPeriod OBJECT-TYPE
+            SYNTAX             Unsigned32
+            MAX-ACCESS     read-write
+            STATUS             current
+            DESCRIPTION
+                    "The value, in seconds, of the quietPeriod constant
+                    currently in use by the Authenticator PAE state
+                    machine."
+            REFERENCE
+                    " 9.4.1, quietPeriod"
+            DEFVAL { 60 }
+            ::= { hh3cdot1xPaeSystem 1 }
+
+    hh3cdot1xAuthTxPeriod OBJECT-TYPE
+            SYNTAX             Unsigned32
+            MAX-ACCESS     read-write
+            STATUS             current
+            DESCRIPTION
+                    "The value, in seconds, of the txPeriod constant
+                    currently in use by the Authenticator PAE state
+                    machine."
+            REFERENCE
+                    " 9.4.1, txPeriod"
+            DEFVAL { 30 }
+            ::= { hh3cdot1xPaeSystem 2 }
+
+    hh3cdot1xAuthSuppTimeout OBJECT-TYPE
+            SYNTAX             Unsigned32
+            MAX-ACCESS     read-write
+            STATUS             current
+            DESCRIPTION
+                   "The value, in seconds, of the suppTimeout constant
+                   currently in use by the Backend Authentication state
+                   machine."
+            REFERENCE
+                   " 9.4.1, suppTimeout"
+            DEFVAL { 30 }
+            ::= { hh3cdot1xPaeSystem 3 }
+
+   hh3cdot1xAuthServerTimeout OBJECT-TYPE
+           SYNTAX             Unsigned32
+           MAX-ACCESS     read-write
+           STATUS             current
+           DESCRIPTION
+                   "The value, in seconds, of the serverTimeout constant
+                   currently in use by the Backend Authentication state
+                   machine."
+           REFERENCE
+                   " 9.4.1, serverTimeout"
+           DEFVAL { 100 }
+           ::= { hh3cdot1xPaeSystem 4 }
+
+   hh3cdot1xAuthMaxReq OBJECT-TYPE
+           SYNTAX             Unsigned32
+           MAX-ACCESS     read-write
+           STATUS             current
+           DESCRIPTION
+                   "The value of the maxReq constant currently in use by
+                   the Backend Authentication state machine."
+           REFERENCE
+                   " 9.4.1, maxReq"
+           DEFVAL { 2 }
+           ::= { hh3cdot1xPaeSystem 5 }
+
+   hh3cdot1xAuthReAuthPeriod OBJECT-TYPE
+           SYNTAX             Unsigned32
+           MAX-ACCESS     read-write
+           STATUS             current
+           DESCRIPTION
+                   "The value, in seconds, of the reAuthPeriod constant
+                   currently in use by the Reauthentication Timer state
+                   machine."
+           REFERENCE
+                   " 9.4.1, reAuthPeriod"
+           DEFVAL  { 3600 }
+           ::= { hh3cdot1xPaeSystem 6 }
+ 
+   hh3cdot1xAuthMethod OBJECT-TYPE
+           SYNTAX         INTEGER { chap(1), pap(2), eap(3) }
+           MAX-ACCESS     read-write
+           STATUS         current
+           DESCRIPTION
+                   "The value defines the 802.1X authenticatin method."
+           REFERENCE
+                   ""
+           DEFVAL  { 1 }
+           ::= { hh3cdot1xPaeSystem 7 }
+
+   -- ============================================================
+   -- The Authenticator Configuration Extracte Table
+   -- ============================================================
+
+   hh3cdot1xAuthConfigExtTable OBJECT-TYPE
+           SYNTAX             SEQUENCE OF Hh3cdot1xAuthConfigExtEntry
+           MAX-ACCESS     not-accessible
+           STATUS             current
+           DESCRIPTION
+                   " table extends dot1xAuthConfigTable"
+            REFERENCE
+                    " 9.4.1 Authenticator Configuration"
+            ::= { hh3cdot1xPaeAuthenticator 1 }
+
+    hh3cdot1xAuthConfigExtEntry OBJECT-TYPE
+            SYNTAX             Hh3cdot1xAuthConfigExtEntry
+            MAX-ACCESS     not-accessible
+            STATUS             current
+            DESCRIPTION
+                    " The configuration information for an Authenticator PAE."
+            INDEX { dot1xPaePortNumber }
+            ::= { hh3cdot1xAuthConfigExtTable 1 }
+            
+    Hh3cdot1xAuthConfigExtEntry   ::=
+    SEQUENCE {
+        hh3cdot1xpaeportAuthAdminStatus   INTEGER ,
+        hh3cdot1xpaeportControlledType    INTEGER ,
+        hh3cdot1xpaeportMaxUserNum        INTEGER ,
+        hh3cdot1xpaeportUserNumNow		INTEGER ,
+        hh3cdot1xpaeportClearStatistics	INTEGER ,
+        hh3cdot1xpaeportMcastTrigStatus   INTEGER ,
+        hh3cdot1xpaeportHandshakeStatus   INTEGER
+        }
+        
+    hh3cdot1xpaeportAuthAdminStatus  OBJECT-TYPE
+           SYNTAX             INTEGER { enabled( 1), disabled( 2) }
+           MAX-ACCESS     read-write
+           STATUS             current
+           DESCRIPTION
+                   "The administrative enable/disable state for Port Access Control in a port."
+           REFERENCE
+                   ""
+           DEFVAL  {2}
+           ::= { hh3cdot1xAuthConfigExtEntry 1 }
+           
+           
+    hh3cdot1xpaeportControlledType  OBJECT-TYPE
+           SYNTAX             INTEGER { port(1), mac(2) }
+           MAX-ACCESS     read-write
+           STATUS             current
+           DESCRIPTION
+                   "Port Access Control type , base port access control or base MAC access control"
+           REFERENCE
+                   ""
+           DEFVAL  {2}
+           ::= { hh3cdot1xAuthConfigExtEntry 2 }
+           
+    hh3cdot1xpaeportMaxUserNum  OBJECT-TYPE
+           SYNTAX             INTEGER 
+           MAX-ACCESS     read-write
+           STATUS             current
+           DESCRIPTION
+                   "the max num of online user in a port"
+           REFERENCE
+                   ""
+           DEFVAL  {256}
+           ::= { hh3cdot1xAuthConfigExtEntry 3 }
+          
+    hh3cdot1xpaeportUserNumNow  OBJECT-TYPE
+           SYNTAX             INTEGER 
+           MAX-ACCESS     read-only
+           STATUS             current
+           DESCRIPTION
+                   "the num of online user in a port now "
+           REFERENCE
+                   ""
+           ::= { hh3cdot1xAuthConfigExtEntry 4 }             
+      
+        
+    hh3cdot1xpaeportClearStatistics  OBJECT-TYPE
+           SYNTAX             INTEGER {clear(1)}
+           MAX-ACCESS     read-write
+           STATUS             current
+           DESCRIPTION
+                   "Clear various Statistics viz. "
+           REFERENCE
+                   ""
+           ::= { hh3cdot1xAuthConfigExtEntry 5 }    
+           
+           
+    hh3cdot1xpaeportMcastTrigStatus  OBJECT-TYPE
+           SYNTAX         INTEGER { enabled( 1), disabled( 2) }
+           MAX-ACCESS     read-write
+           STATUS         current
+           DESCRIPTION
+                   "The administrative enable/disable state for sending
+                   muticast EAP_REQ/ID packet."
+           REFERENCE
+                   ""
+           DEFVAL  {1}
+           ::= { hh3cdot1xAuthConfigExtEntry 6 }
+           
+    hh3cdot1xpaeportHandshakeStatus  OBJECT-TYPE
+           SYNTAX         INTEGER { enabled( 1 ), disabled( 2 ) }
+           MAX-ACCESS     read-write
+           STATUS         current
+           DESCRIPTION
+                   "The administrative enable/disable state for sending
+                   handshake EAP_REQ/ID packet."
+           REFERENCE
+                   ""
+           DEFVAL  {1}
+           ::= { hh3cdot1xAuthConfigExtEntry 7 }
+
+  -- trap defination
+    hh3cdot1xPaeTraps             OBJECT IDENTIFIER ::= { hh3cpaeExtMibObjects 0 }
+
+    hh3csupplicantproxycheck NOTIFICATION-TYPE 
+      OBJECTS { hh3cproxycheckVlanId, hh3cproxycheckPortName, hh3cproxycheckMacAddr, hh3cproxycheckIpaddr, hh3cproxycheckUsrName }
+      STATUS current
+      DESCRIPTION ""
+      ::= { hh3cdot1xPaeTraps 1 }
+
+    hh3cproxycheckVlanId OBJECT-TYPE 
+      SYNTAX INTEGER
+      MAX-ACCESS accessible-for-notify
+      STATUS current
+      DESCRIPTION "."
+      ::= { hh3cdot1xPaeTraps 2 }
+
+    hh3cproxycheckPortName OBJECT-TYPE 
+      SYNTAX OCTET STRING
+      MAX-ACCESS accessible-for-notify
+      STATUS current
+      DESCRIPTION "."
+      ::= { hh3cdot1xPaeTraps 3 }
+
+    hh3cproxycheckMacAddr OBJECT-TYPE 
+      SYNTAX MacAddress
+      MAX-ACCESS accessible-for-notify
+      STATUS current
+      DESCRIPTION "."
+      ::= { hh3cdot1xPaeTraps 4 }
+      
+    hh3cproxycheckIpaddr OBJECT-TYPE 
+      SYNTAX IpAddress
+      MAX-ACCESS accessible-for-notify
+      STATUS current
+      DESCRIPTION "."
+      ::= { hh3cdot1xPaeTraps 5 } 
+              
+    hh3cproxycheckUsrName OBJECT-TYPE 
+      SYNTAX OCTET STRING
+      MAX-ACCESS accessible-for-notify
+      STATUS current
+      DESCRIPTION "."
+      ::= { hh3cdot1xPaeTraps 6 }               
+END
+               
+    

@@ -1,0 +1,731 @@
+-- ============================================================================
+-- Copyright (c) 2004-2013 New H3C Tech. Co., Ltd. All rights reserved.
+--
+-- Description: The EVB MIB module for managing devices that support Ethernet
+--              Virtual Bridging (EVB).
+-- Reference: IEEE Std 802.1Qbg
+-- Version: V1.0
+-- History:
+-- V1.0 2012-12-21 created by Guo Xiangbin.
+-- ============================================================================
+HH3C-EVB-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    Integer32, OBJECT-TYPE, MODULE-IDENTITY, Unsigned32
+        FROM SNMPv2-SMI
+    RowStatus, TruthValue, MacAddress
+        FROM SNMPv2-TC
+    hh3cCommon
+        FROM  HH3C-OID-MIB
+    IEEE8021BridgePortNumber
+        FROM IEEE8021-TC-MIB
+    VlanIndex
+        FROM Q-BRIDGE-MIB
+    InterfaceIndexOrZero
+        FROM IF-MIB;
+
+hh3cEvb MODULE-IDENTITY
+    LAST-UPDATED "201212211200Z"
+    ORGANIZATION
+        "New H3C Tech. Co., Ltd."
+    CONTACT-INFO
+        "Platform Team New H3C Tech. Co., Ltd.
+        Haidian District Beijing P.R. China
+        http://www.h3c.com
+        Zip:100085
+        "
+    DESCRIPTION
+        "EVB management information base for managing devices that support
+         Ethernet Virtual Bridging.  This MIB is an extension of
+         IEEE8021-EVB-MIB."
+    REVISION "201212211200Z"
+    DESCRIPTION
+        "Created by Guo Xiangbin."
+    ::= { hh3cCommon 134 }
+
+-- =============================================================
+-- Subtrees in the EVB MIB
+-- =============================================================
+
+hh3cEvbSysObjects
+    OBJECT IDENTIFIER ::= { hh3cEvb 1 }
+
+hh3cEvbPortObjects
+    OBJECT IDENTIFIER ::= { hh3cEvb 2 }
+
+hh3cFlex10Objects
+    OBJECT IDENTIFIER ::= { hh3cEvb 3 }
+
+hh3cEvbSetResult OBJECT-TYPE
+    SYNTAX INTEGER
+    {
+        unknown(1),
+        processing(2),
+        success(3),
+        failed(4)
+    }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "If a set operation on EVB-MIB-tables returns success, this object
+         indicates the actual result of this operation.  Otherwise, it is
+         meaningless.
+         unknown: The set operation on the node has been completed, but the
+                  result could only be got from the table which the set
+                  operation happended.
+         processing: The set operation is in process.  Another set operation
+                     cannot be performed at this time.
+         success: The set operation has succeeded.
+         failed: The set operation has failed."
+    ::= { hh3cEvbSysObjects 1}
+
+--  =========================
+--  VSI default manager table
+--  =========================
+
+hh3cEvbDefaultManagerTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Hh3cEvbDefaultManagerEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "A table that contains configuration information for the default
+         Virtual Station Interface (VSI) manager."
+    ::= { hh3cEvbSysObjects 2 }
+
+hh3cEvbDefaultManagerEntry OBJECT-TYPE
+    SYNTAX Hh3cEvbDefaultManagerEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "A list of objects containing information for the default VSI manager."
+    INDEX { hh3cEvbManagerIndex }
+    ::= { hh3cEvbDefaultManagerTable 1 }
+
+Hh3cEvbDefaultManagerEntry ::=
+    SEQUENCE
+    {
+        hh3cEvbManagerIndex
+            Unsigned32,
+        hh3cEvbManagerType
+            INTEGER,
+        hh3cEvbManagerID
+            OCTET STRING,
+        hh3cEvbManagerPort
+            Unsigned32,
+        hh3cEvbManagerRowStatus
+            RowStatus
+    }
+
+hh3cEvbManagerIndex OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Index of the default manager table."
+    ::= { hh3cEvbDefaultManagerEntry 1 }
+
+hh3cEvbManagerType OBJECT-TYPE
+    SYNTAX INTEGER
+    {
+        ipv4(1),
+        ipv6(2),
+        name(3),
+        local(4)
+    }
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Type of the default VSI manager.
+         ipv4: Specifies the IPv4 address of the default VSI manager.
+         ipv6: Specifies the IPv6 address of the default VSI manager.
+         name: Specifies the name of the default VSI manager, a
+               case-insensitive string of 1 to 127 characters.
+         local: Specifies the device as the default VSI manager."
+    ::= { hh3cEvbDefaultManagerEntry 2 }
+
+hh3cEvbManagerID OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE(0..127))
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Default VSI manager.
+         The value is zero-length string when the VSI manager type is 'local'."
+    ::= { hh3cEvbDefaultManagerEntry 3 }
+
+hh3cEvbManagerPort OBJECT-TYPE
+    SYNTAX Unsigned32 (0..65535)
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Port number of the default VSI manager.
+         Optional when the VSI manager type is not 'local'.
+         If the VSI manager type is 'local', it returns zero."
+    DEFVAL { 8080 }
+    ::= { hh3cEvbDefaultManagerEntry 4 }
+
+hh3cEvbManagerRowStatus OBJECT-TYPE
+    SYNTAX RowStatus
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Row status: CreateAndGo, Active, or Destroy."
+    ::= { hh3cEvbDefaultManagerEntry 5 }
+
+--  =====================
+--  EVB bridge port table
+--  =====================
+
+hh3cEvbPortConfigTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Hh3cEvbPortConfigEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "A table that contains configuration information for the EVB bridge
+         port."
+    ::= { hh3cEvbPortObjects 1 }
+
+hh3cEvbPortConfigEntry OBJECT-TYPE
+    SYNTAX Hh3cEvbPortConfigEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "A list of objects containing information for the EVB bridge port."
+    INDEX { hh3cEvbPortNumber }
+    ::= { hh3cEvbPortConfigTable 1 }
+
+Hh3cEvbPortConfigEntry ::=
+    SEQUENCE
+    {
+        hh3cEvbPortNumber
+            IEEE8021BridgePortNumber,
+        hh3cEvbRWD
+            Unsigned32,
+        hh3cEvbRKA
+            Unsigned32
+    }
+
+hh3cEvbPortNumber OBJECT-TYPE
+    SYNTAX IEEE8021BridgePortNumber
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Port number."
+    ::= { hh3cEvbPortConfigEntry 1 }
+
+hh3cEvbRWD OBJECT-TYPE
+    SYNTAX Unsigned32 (15..31)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "VDP resource wait delay exponent."
+    DEFVAL { 20 }
+    ::= { hh3cEvbPortConfigEntry 2 }
+
+hh3cEvbRKA OBJECT-TYPE
+    SYNTAX Unsigned32 (14..31)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "VDP keepalive exponent."
+    DEFVAL { 20 }
+    ::= { hh3cEvbPortConfigEntry 3 }
+
+--  ======================
+--  S-channel config table
+--  ======================
+
+hh3cEvbSchannelConfigTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Hh3cEvbSchannelConfigEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "A table that contains configuration information for the S-channel."
+    ::= { hh3cEvbPortObjects 2 }
+
+hh3cEvbSchannelConfigEntry OBJECT-TYPE
+    SYNTAX Hh3cEvbSchannelConfigEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "A list of objects containing information for the S-channel."
+    INDEX { hh3cEvbPortNumber,
+            hh3cEvbSchannelID }
+    ::= { hh3cEvbSchannelConfigTable 1 }
+
+Hh3cEvbSchannelConfigEntry ::=
+    SEQUENCE
+    {
+        hh3cEvbSchannelID
+            Unsigned32,
+        hh3cEvbSchannelSVLAN
+            Unsigned32,
+        hh3cEvbMacLearningStatus
+            TruthValue,
+        hh3cEvbRRStatus
+            TruthValue,
+        hh3cEvbSchannelRowStatus
+            RowStatus
+    }
+
+hh3cEvbSchannelID OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "S-channel ID."
+    ::= { hh3cEvbSchannelConfigEntry 1 }
+
+hh3cEvbSchannelSVLAN OBJECT-TYPE
+    SYNTAX Unsigned32 (0..4094)
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "S-VLAN ID. 0 means that the S-channel is not bound to any S-VLAN.
+         1 represents the SVID for the default S-channel S-channel 1."
+    DEFVAL { 0 }
+    ::= { hh3cEvbSchannelConfigEntry 2 }
+
+hh3cEvbMacLearningStatus OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The MAC address learning function is enabled or not."
+    DEFVAL { true }
+    ::= { hh3cEvbSchannelConfigEntry 3 }
+
+hh3cEvbRRStatus OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The RR mode for the S-channel is enabled or not."
+    DEFVAL { false }
+    ::= { hh3cEvbSchannelConfigEntry 4 }
+
+
+hh3cEvbSchannelRowStatus OBJECT-TYPE
+    SYNTAX RowStatus
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Row status: CreateAndGo, Active, or Destroy."
+    ::= { hh3cEvbSchannelConfigEntry 5 }
+
+--  ================
+--  VSI config table
+--  ================
+
+hh3cEvbVSIConfigTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Hh3cEvbVSIConfigEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "A table that contains configuration information for the VSI."
+    ::= { hh3cEvbPortObjects 3 }
+
+hh3cEvbVSIConfigEntry OBJECT-TYPE
+    SYNTAX Hh3cEvbVSIConfigEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "A list of objects containing information for the VSI."
+    INDEX { hh3cEvbSBPPortNumber,
+            hh3cEvbVSILocalID }
+    ::= { hh3cEvbVSIConfigTable 1 }
+
+Hh3cEvbVSIConfigEntry ::=
+    SEQUENCE
+    {
+        hh3cEvbSBPPortNumber
+            IEEE8021BridgePortNumber,
+        hh3cEvbVSILocalID
+            Unsigned32,
+        hh3cEvbVSICommand
+            INTEGER,
+        hh3cEvbVSIIfIndex
+            InterfaceIndexOrZero,
+        hh3cEvbVSIIsActive
+            TruthValue,
+        hh3cEvbVSIRowStatus
+            RowStatus
+    }
+
+hh3cEvbSBPPortNumber OBJECT-TYPE
+    SYNTAX IEEE8021BridgePortNumber
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The Station-facing Bridge Port (SBP) port number."
+    ::= { hh3cEvbVSIConfigEntry 1 }
+
+hh3cEvbVSILocalID OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "VSI local ID."
+    ::= { hh3cEvbVSIConfigEntry 2 }
+
+hh3cEvbVSICommand OBJECT-TYPE
+    SYNTAX INTEGER
+    {
+        preAssociate (1),
+        preAssociateWithRsrcReservation (2),
+        associate (3),
+        deAssociate (4)
+    }
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "This object indicates the association or pre-associate property of the
+         VSI."
+    ::= { hh3cEvbVSIConfigEntry 3 }
+
+hh3cEvbVSIIfIndex OBJECT-TYPE
+    SYNTAX InterfaceIndexOrZero
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "VSI interface index."
+    ::= { hh3cEvbVSIConfigEntry 4 }
+
+hh3cEvbVSIIsActive OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The VSI is activated or not.  Activate a VSI after configuring a VSI
+         filter, and deactivate a VSI before removing a VSI filter."
+    DEFVAL { false }
+    ::= { hh3cEvbVSIConfigEntry 5 }
+
+
+hh3cEvbVSIRowStatus OBJECT-TYPE
+    SYNTAX RowStatus
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Row status: CreateAndGo, Active, or Destroy."
+    ::= { hh3cEvbVSIConfigEntry 6 }
+
+--  =======================
+--  VSI filter config table
+--  =======================
+
+hh3cEvbVSIFilterConfigTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Hh3cEvbVSIFilterConfigEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "A table that contains configuration information for filters of the
+         VSI."
+    ::= { hh3cEvbPortObjects 4 }
+
+hh3cEvbVSIFilterConfigEntry OBJECT-TYPE
+    SYNTAX Hh3cEvbVSIFilterConfigEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "A list of objects containing information for filters of the VSI."
+    INDEX { hh3cEvbSBPPortNumber,
+            hh3cEvbVSILocalID,
+            hh3cEvbGroupID,
+            hh3cEvbVSIMac,
+            hh3cEvbVSIVlanId }
+    ::= { hh3cEvbVSIFilterConfigTable 1 }
+
+Hh3cEvbVSIFilterConfigEntry ::=
+    SEQUENCE
+    {
+        hh3cEvbGroupID
+            Unsigned32,
+        hh3cEvbVSIMac
+            MacAddress,
+        hh3cEvbVSIVlanId
+            VlanIndex,
+        hh3cEvbVSIFilterRowStatus
+            RowStatus
+    }
+
+hh3cEvbGroupID OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Group ID."
+    ::= { hh3cEvbVSIFilterConfigEntry 1 }
+
+hh3cEvbVSIMac OBJECT-TYPE
+    SYNTAX MacAddress
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The MAC address part of the MAC/VLANs for a VSI."
+    ::= { hh3cEvbVSIFilterConfigEntry 2 }
+
+hh3cEvbVSIVlanId OBJECT-TYPE
+    SYNTAX VlanIndex
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The VLAN ID part of the MAC/VLANs for a VSI."
+    ::= { hh3cEvbVSIFilterConfigEntry 3 }
+
+hh3cEvbVSIFilterRowStatus OBJECT-TYPE
+    SYNTAX RowStatus
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Row status: CreateAndGo, Active, or Destroy."
+    ::= { hh3cEvbVSIFilterConfigEntry 4 }
+
+--  ========================
+--  Flex10 port config table
+--  ========================
+
+hh3cFlex10PortConfigTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Hh3cFlex10PortConfigEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "A table that contains configuration information for the flex10 bridge
+         port."
+    ::= { hh3cFlex10Objects 1 }
+
+hh3cFlex10PortConfigEntry OBJECT-TYPE
+    SYNTAX Hh3cFlex10PortConfigEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "A list of objects containing information for the flex10 bridge port."
+    INDEX { hh3cFlex10PortNumber }
+    ::= { hh3cFlex10PortConfigTable 1 }
+
+Hh3cFlex10PortConfigEntry ::=
+    SEQUENCE
+    {
+        hh3cFlex10PortNumber
+            IEEE8021BridgePortNumber,
+        hh3cFlex10PortEnableStatus
+            TruthValue
+    }
+
+hh3cFlex10PortNumber OBJECT-TYPE
+    SYNTAX IEEE8021BridgePortNumber
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Port number."
+    ::= { hh3cFlex10PortConfigEntry 1 }
+
+hh3cFlex10PortEnableStatus OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The flex10 function is enabled or not."
+    DEFVAL { false }
+    ::= { hh3cFlex10PortConfigEntry 2 }
+
+--  =============================
+--  Flex10 remote S-channel table
+--  =============================
+
+hh3cFlex10RemoteSchannelTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Hh3cFlex10RemoteSchannelEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "A table that contains remote S-channel details."
+    ::= { hh3cFlex10Objects 2 }
+
+hh3cFlex10RemoteSchannelEntry OBJECT-TYPE
+    SYNTAX Hh3cFlex10RemoteSchannelEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "A list of objects describing remote S-channels."
+    INDEX { hh3cFlex10PortNumber,
+            hh3cEvbSchannelID }
+    ::= { hh3cFlex10RemoteSchannelTable 1 }
+
+Hh3cFlex10RemoteSchannelEntry ::=
+    SEQUENCE
+    {
+        hh3cFlex10RemSchDesFormat
+            BITS,
+        hh3cFlex10RemSchTerminationType
+            Integer32,
+        hh3cFlex10RemSchTerminationCap
+            BITS,
+        hh3cFlex10RemSchTrafficClass
+            BITS,
+        hh3cFlex10RemSchCir
+            Integer32,
+        hh3cFlex10RemSchPir
+            Integer32,
+        hh3cFlex10RemSchConnectionID
+            OCTET STRING
+    }
+
+hh3cFlex10RemSchDesFormat OBJECT-TYPE
+    SYNTAX BITS
+    {
+        format0 (0),
+        format1 (1)
+    }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Description format of the remote S-channel."
+    ::= { hh3cFlex10RemoteSchannelEntry 1 }
+
+hh3cFlex10RemSchTerminationType OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Termination type of the remote S-channel.
+         0: PCI Physical Function (Primary).
+         1: SRIOV Virtual Function.
+         2: PCI Physical Function (Secondary).
+         3: Virtual Switch Port.
+         4: NCSI Port.
+         2147483647: This value means a Description TLV with format 0 has not
+                     been received.
+         other: Unknown termination type."
+    ::= { hh3cFlex10RemoteSchannelEntry 2 }
+
+hh3cFlex10RemSchTerminationCap OBJECT-TYPE
+    SYNTAX BITS
+    {
+        ethernet (0),
+        fCOE (1),
+        iSCSI (2),
+        roCEE (3)
+    }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Termination capabilities of the remote S-channel.  If a Description
+         TLV with format 0 has not been received, it returns all zeros."
+    ::= { hh3cFlex10RemoteSchannelEntry 3 }
+
+hh3cFlex10RemSchTrafficClass OBJECT-TYPE
+    SYNTAX BITS
+    {
+        class0 (0),
+        class1 (1),
+        class2 (2),
+        class3 (3),
+        class4 (4),
+        class5 (5),
+        class6 (6),
+        class7 (7)
+    }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Traffic classes of the remote S-channel.  If a Description TLV with
+         format 0 has not been received, it returns all zeros."
+    ::= { hh3cFlex10RemoteSchannelEntry 4 }
+
+hh3cFlex10RemSchCir OBJECT-TYPE
+    SYNTAX Integer32
+    UNITS  "mbps"
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Committed Information Rate (CIR) of the remote S-channel.  If a
+         Description TLV with format 0 has not been received, it returns 0."
+    ::= { hh3cFlex10RemoteSchannelEntry 5 }
+
+hh3cFlex10RemSchPir OBJECT-TYPE
+    SYNTAX Integer32
+    UNITS  "mbps"
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Peak Information Rate (PIR) of the remote S-channel.  If a Description
+         TLV with format 0 has not been received, it returns 0."
+    ::= { hh3cFlex10RemoteSchannelEntry 6 }
+
+hh3cFlex10RemSchConnectionID OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE (0..16))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Connection instance ID of the remote S-channel.
+         The value is a zero-length string if a Description TLV with format 1
+         has not been received.  Otherwise it returns a string with length 16."
+    ::= { hh3cFlex10RemoteSchannelEntry 7 }
+
+--  ===================================
+--  Flex10 S-channel link control table
+--  ===================================
+
+hh3cFlex10SchannelLinkCtlTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Hh3cFlex10SchannelLinkCtlEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "A table that contains link status information for the S-channel."
+    ::= { hh3cFlex10Objects 3 }
+
+hh3cFlex10SchannelLinkCtlEntry OBJECT-TYPE
+    SYNTAX Hh3cFlex10SchannelLinkCtlEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "A list of objects containing information for the S-channel."
+    INDEX { hh3cFlex10PortNumber,
+            hh3cEvbSchannelID }
+    ::= { hh3cFlex10SchannelLinkCtlTable 1 }
+
+Hh3cFlex10SchannelLinkCtlEntry ::=
+    SEQUENCE
+    {
+        hh3cFlex10SchannelSVID
+            VlanIndex,
+        hh3cFlex10SchannelLocalStatus
+            INTEGER,
+        hh3cFlex10SchannelRemoteStatus
+            INTEGER
+    }
+
+hh3cFlex10SchannelSVID OBJECT-TYPE
+    SYNTAX VlanIndex
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "S-VLAN ID for the S-channel."
+    ::= { hh3cFlex10SchannelLinkCtlEntry 1 }
+
+hh3cFlex10SchannelLocalStatus OBJECT-TYPE
+    SYNTAX INTEGER
+    {
+        unknown (1),
+        disabled (2),
+        enabled (3)
+    }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Link status of the local S-channel."
+    ::= { hh3cFlex10SchannelLinkCtlEntry 2 }
+
+hh3cFlex10SchannelRemoteStatus OBJECT-TYPE
+    SYNTAX INTEGER
+    {
+        unknown (1),
+        disabled (2),
+        enabled (3)
+    }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Link status of the remote S-channel."
+    ::= { hh3cFlex10SchannelLinkCtlEntry 3 }
+
+END

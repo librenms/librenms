@@ -2,7 +2,7 @@ os: eltek-webpower
 text: 'Eltek WebPower'
 type: power
 icon: eltek
-nobulk: true
+snmp_bulk: false
 over:
     - { graph: device_current, text: Load }
     - { graph: device_voltage, text: Voltage }

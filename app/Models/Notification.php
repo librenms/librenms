@@ -34,7 +34,7 @@ class Notification extends Model
     /**
      * Mark this notification as read or unread
      *
-     * @param bool $enabled
+     * @param  bool  $enabled
      * @return bool
      */
     public function markRead(bool $enabled = true): bool
@@ -46,6 +46,7 @@ class Notification extends Model
      * Mark this notification as sticky or unsticky
      *
      * @var bool
+     *
      * @return bool
      */
     public function markSticky(bool $enabled = true): bool
@@ -54,8 +55,8 @@ class Notification extends Model
     }
 
     /**
-     * @param string $name
-     * @param bool $enabled
+     * @param  string  $name
+     * @param  bool  $enabled
      * @return bool
      */
     private function setAttrib($name, bool $enabled): bool
@@ -76,8 +77,8 @@ class Notification extends Model
     // ---- Query Scopes ----
 
     /**
-     * @param Builder<Notification> $query
-     * @param User $user
+     * @param  Builder<Notification>  $query
+     * @param  User  $user
      * @return mixed
      */
     public function scopeIsUnread(Builder $query, User $user)
@@ -93,7 +94,7 @@ class Notification extends Model
     /**
      * Get all sticky notifications
      *
-     * @param Builder<Notification> $query
+     * @param  Builder<Notification>  $query
      */
     public function scopeIsSticky(Builder $query)
     {
@@ -102,21 +103,7 @@ class Notification extends Model
     }
 
     /**
-     * @param Builder<Notification> $query
-     * @param User $user
-     * @return mixed
-     */
-    public function scopeIsArchived(Builder $query, User $user)
-    {
-        return $query->leftJoin('notifications_attribs', 'notifications.notifications_id', '=', 'notifications_attribs.notifications_id')
-            ->source()
-            ->where('notifications_attribs.user_id', $user->user_id)
-            ->where(['key' => 'read', 'value' => 1])
-            ->limit(1);
-    }
-
-    /**
-     * @param Builder<Notification> $query
+     * @param  Builder<Notification>  $query
      * @return Builder<Notification>
      */
     public function scopeLimit(Builder $query)
@@ -125,7 +112,7 @@ class Notification extends Model
     }
 
     /**
-     * @param Builder<Notification> $query
+     * @param  Builder<Notification>  $query
      * @return Builder|static
      */
     public function scopeSource(Builder $query)

@@ -6,9 +6,13 @@ use App\Console\Commands\Traits\CompletesConfigArgument;
 use App\Console\LnmsCommand;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
+use JsonSchema\Constraints\Constraint;
+use JsonSchema\Exception\ValidationException;
+use JsonSchema\Validator;
 use LibreNMS\Config;
 use LibreNMS\DB\Eloquent;
 use LibreNMS\Util\DynamicConfig;
+use LibreNMS\Util\OS;
 use Symfony\Component\Console\Input\InputArgument;
 
 class SetConfigCommand extends LnmsCommand
@@ -43,7 +47,17 @@ class SetConfigCommand extends LnmsCommand
         $force = $this->option('ignore-checks');
         $parent = null;
 
-        if (! $definition->isValidSetting($setting)) {
+        if (preg_match('/^os\.(?<os>[a-z_\-]+)\.(?<setting>.*)$/', $setting, $matches)) {
+            $os = $matches['os'];
+            try {
+                $this->validateOsSetting($os, $matches['setting'], $value);
+            } catch (ValidationException $e) {
+                $this->error(trans('commands.config:set.errors.invalid'));
+                $this->line($e->getMessage());
+
+                return 2;
+            }
+        } elseif (! $definition->isValidSetting($setting)) {
             $parent = $this->findParentSetting($definition, $setting);
             if (! $force && ! $parent) {
                 $this->error(trans('commands.config:set.errors.invalid'));
@@ -58,7 +72,7 @@ class SetConfigCommand extends LnmsCommand
             return 1;
         }
 
-        if (! $force && ! $value) {
+        if (! $force && $value === null) {
             $message = $parent
                 ? trans('commands.config:set.forget_from', ['path' => $this->getChildPath($setting, $parent), 'parent' => $parent])
                 : trans('commands.config:set.confirm', ['setting' => $setting]);
@@ -87,7 +101,7 @@ class SetConfigCommand extends LnmsCommand
         }
 
         // handle setting value inside multi-dimensional array
-        if ($parent) {
+        if ($parent && $parent !== $setting) {
             $parent_data = Config::get($parent);
             Arr::set($parent_data, $this->getChildPath($setting, $parent), $value);
             $value = $parent_data;
@@ -95,7 +109,10 @@ class SetConfigCommand extends LnmsCommand
         }
 
         $configItem = $definition->get($setting);
-        if (! $force && ! $configItem->checkValue($value)) {
+        if (! $force
+            && empty($os) // if os is set, value was already validated against os config
+            && ! $configItem->checkValue($value)
+        ) {
             $message = ($configItem->type || $configItem->validate)
                 ? $configItem->getValidationMessage($value)
                 : trans('commands.config:set.errors.no-validation', ['setting' => $setting]);
@@ -118,7 +135,7 @@ class SetConfigCommand extends LnmsCommand
      *
      * @return mixed
      */
-    private function juggleType(string $value)
+    private function juggleType(?string $value)
     {
         $json = json_decode($value, true);
 
@@ -183,6 +200,67 @@ class SetConfigCommand extends LnmsCommand
             array_splice($data, (int) $matches, 1);
         } else {
             Arr::forget($data, $matches);
+        }
+    }
+
+    /**
+     * @param  string  $os
+     * @param  string  $setting
+     * @param  mixed  $value
+     *
+     * @throws \JsonSchema\Exception\ValidationException
+     */
+    private function validateOsSetting(string $os, string $setting, $value)
+    {
+        // prep data to be validated
+        OS::loadDefinition($os);
+        $os_data = \LibreNMS\Config::get("os.$os");
+        if ($os_data === null) {
+            throw new ValidationException(trans('commands.config:set.errors.invalid_os', ['os' => $os]));
+        }
+        $value = $this->juggleType($value);
+
+        // append value if requested
+        if (Str::endsWith($setting, '.+')) {
+            $setting = substr($setting, 0, -2);
+            $container = Arr::get($os_data, $setting, []);
+            $container[] = $value;
+            $value = $container;
+        }
+
+        Arr::set($os_data, $setting, $value);
+        unset($os_data['definition_loaded']);
+
+        $validator = new Validator;
+        $validator->validate(
+            $os_data,
+            (object) ['$ref' => 'file://' . base_path('/misc/os_schema.json')],
+            Constraint::CHECK_MODE_TYPE_CAST
+        );
+
+        $code = 0;
+
+        $errors = collect($validator->getErrors())->filter(function ($error) use ($value, &$code) {
+            if ($error['constraint'] == 'additionalProp') {
+                $code = 1;
+
+                return true;
+            }
+
+            // only check type if value is set (otherwise we are unsetting it)
+            if (! empty($value) && $error['constraint'] == 'type') {
+                if ($code === 0) {
+                    $code = 2; // wrong path takes precedence over wrong type
+                }
+
+                return true;
+            }
+
+            return false;
+        });
+
+        if ($errors->isNotEmpty()) {
+            throw new ValidationException($errors->pluck('message')->implode(PHP_EOL), $code);
         }
     }
 }

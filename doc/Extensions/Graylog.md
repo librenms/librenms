@@ -120,13 +120,15 @@ $config['graylog']['loglevel']
 ```
  (applies to  /graylog and /device/device=/tab=logs/section=graylog/ (min: 0, max: 7)
 
-# Suppressing/enabling the domain part of a hostname for specific platforms
+## Domain and hostname handling
+
+Suppressing/enabling the domain part of a hostname for specific platforms
 
 You should see if what you get in syslog/Graylog matches up with your
 configured hosts first. If you need to modify the syslog messages from
 specific platforms, this may be of assistance:
 
-## IOS (Cisco)
+### IOS (Cisco)
 
 ```
 router(config)# logging origin-id hostname
@@ -138,13 +140,13 @@ or
 router(config)# logging origin-id string
 ```
 
-## JunOS (Juniper Networks)
+### JunOS (Juniper Networks)
 
 ```
 set system syslog host yourlogserver.corp log-prefix YOUR_PREFERRED_STRING
 ```
 
-## PanOS (Palo Alto Networks)
+### PanOS (Palo Alto Networks)
 
 ```
 set deviceconfig setting management hostname-type-in-syslog hostname

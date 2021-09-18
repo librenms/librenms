@@ -72,7 +72,7 @@ foreach (dbFetchRows($sql, $param) as $alertlog) {
     $response[] = [
         'id' => $rulei++,
         'count' => $alertlog['COUNT(*)'],
-        'hostname' => '<div class="incident">' . generate_device_link($dev, shorthost($dev['hostname'])),
+        'hostname' => '<div class="incident">' . generate_device_link($dev),
         'alert_rule' => $alertlog['name'],
     ];
 }//end foreach

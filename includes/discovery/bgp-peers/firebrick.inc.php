@@ -18,6 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2020 Chris Malton (@cjsoftuk)
  * @author     Chris Malton (@cjsoftuk)
  */
@@ -33,8 +34,7 @@ foreach ($bgpPeersCache as $key => $value) {
     if (strlen($address) > 15) {
         $address = IP::fromHexString($address)->compressed();
     }
-
-    if (isset($value['fbBgpPeerTableId'])) {
+    if (isset($value['fbBgpPeerTableId']) && $value['fbBgpPeerTableId'] !== '') {
         $bgpPeers[$value['fbBgpPeerTableId']][$address] = $value;
     } else {
         $bgpPeers[0][$address] = $value;
@@ -45,6 +45,8 @@ unset($bgpPeersCache);
 foreach ($bgpPeers as $vrfId => $vrf) {
     if (empty($vrfId)) {
         $checkVrf = ' AND `vrf_id` IS NULL ';
+        // Force to null to avoid 0s going to the DB instead of Nulls
+        $vrfId = null;
     } else {
         $checkVrf = ' AND vrf_id = ? ';
         $vrfs = [
@@ -93,19 +95,25 @@ foreach ($bgpPeers as $vrfId => $vrf) {
 $peers = dbFetchRows('SELECT `vrf_id`, `bgpPeerIdentifier` FROM `bgpPeers` WHERE `device_id` = ?', [$device['device_id']]);
 foreach ($peers as $value) {
     $vrfId = $value['vrf_id'];
-    if ($vrfId === null) {
-        $vrfId = 0;
-    }
     $address = $value['bgpPeerIdentifier'];
 
-    if (empty($bgpPeers[$vrfId][$address])) {
+    // Cleanup code to deal with 0 vs Null in the DB
+    if ($vrfId === 0) {
+        // Database says it's table 0 - which is wrong.  It should be "null" for global table
+        $deleted = dbDelete('bgpPeers', 'device_id = ? AND bgpPeerIdentifier = ? AND vrf_id = ?', [$device['device_id'], $address, $vrfId]);
+        echo str_repeat('-', $deleted);
+        continue;
+    } else {
+        $testVrfId = empty($vrfId) ? 0 : $vrfId;
+    }
+
+    if (empty($bgpPeers[$testVrfId][$address])) {
         if ($vrfId === null) {
             $deleted = dbDelete('bgpPeers', 'device_id = ? AND bgpPeerIdentifier = ? AND vrf_id IS NULL', [$device['device_id'], $address]);
         } else {
             $deleted = dbDelete('bgpPeers', 'device_id = ? AND bgpPeerIdentifier = ? AND vrf_id = ?', [$device['device_id'], $address, $vrfId]);
         }
         echo str_repeat('-', $deleted);
-        echo PHP_EOL;
     }
 }
 

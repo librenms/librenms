@@ -16,58 +16,58 @@ return [
     ],
     'sections' => [
         'alerting' => [
-            'general' => 'General Alert Settings',
-            'email' => 'Email Options',
-            'rules' => 'Alert Rule Default Settings',
+            'general' => ['name' => 'General Alert Settings'],
+            'email' => ['name' => 'Email Options'],
+            'rules' => ['name' => 'Alert Rule Default Settings'],
         ],
         'auth' => [
-            'general' => 'General Authentication Settings',
-            'ad' => 'Active Directory Settings',
-            'ldap' => 'LDAP Settings',
+            'general' => ['name' => 'General Authentication Settings'],
+            'ad' => ['name' => 'Active Directory Settings'],
+            'ldap' => ['name' => 'LDAP Settings'],
         ],
         'authorization' => [
-            'device-group' => 'Device Group Settings',
+            'device-group' => ['name' => 'Device Group Settings'],
         ],
         'discovery' => [
-            'general' => 'General Discovery Settings',
-            'route' => 'Routes Discovery Module',
-            'discovery_modules' => 'Discovery Modules',
-            'storage' => 'Storage Module',
+            'general' => ['name' => 'General Discovery Settings'],
+            'route' => ['name' => 'Routes Discovery Module'],
+            'discovery_modules' => ['name' => 'Discovery Modules'],
+            'storage' => ['name' => 'Storage Module'],
         ],
         'external' => [
-            'binaries' => 'Binary Locations',
-            'location' => 'Location Settings',
-            'graylog' => 'Graylog Integration',
-            'oxidized' => 'Oxidized Integration',
-            'peeringdb' => 'PeeringDB Integration',
-            'nfsen' => 'NfSen Integration',
-            'unix-agent' => 'Unix-Agent Integration',
+            'binaries' => ['name' => 'Binary Locations'],
+            'location' => ['name' => 'Location Settings'],
+            'graylog' => ['name' => 'Graylog Integration'],
+            'oxidized' => ['name' => 'Oxidized Integration'],
+            'peeringdb' => ['name' => 'PeeringDB Integration'],
+            'nfsen' => ['name' => 'NfSen Integration'],
+            'unix-agent' => ['name' => 'Unix-Agent Integration'],
         ],
         'poller' => [
-            'distributed' => 'Distributed Poller',
-            'graphite' => 'Datastore: Graphite',
-            'influxdb' => 'Datastore: InfluxDB',
-            'opentsdb' => 'Datastore: OpenTSDB',
-            'ping' => 'Ping',
-            'prometheus' => 'Datastore: Prometheus',
-            'rrdtool' => 'Datastore: RRDTool',
-            'snmp' => 'SNMP',
-            'poller_modules' => 'Poller Modules',
+            'distributed' => ['name' => 'Distributed Poller'],
+            'graphite' => ['name' => 'Datastore: Graphite'],
+            'influxdb' => ['name' => 'Datastore: InfluxDB'],
+            'opentsdb' => ['name' => 'Datastore: OpenTSDB'],
+            'ping' => ['name' => 'Ping'],
+            'prometheus' => ['name' => 'Datastore: Prometheus'],
+            'rrdtool' => ['name' => 'Datastore: RRDTool'],
+            'snmp' => ['name' => 'SNMP'],
+            'poller_modules' => ['name' => 'Poller Modules'],
         ],
         'system' => [
-            'cleanup' => 'Cleanup',
-            'proxy' => 'Proxy',
-            'updates' => 'Updates',
-            'server' => 'Server',
+            'cleanup' => ['name' => 'Cleanup'],
+            'proxy' => ['name' => 'Proxy'],
+            'updates' => ['name' => 'Updates'],
+            'server' => ['name' => 'Server'],
         ],
         'webui' => [
-            'availability-map' => 'Availability Map Settings',
-            'graph' => 'Graph Settings',
-            'dashboard' => 'Dashboard Settings',
-            'search' => 'Search Settings',
-            'style' => 'Style',
-            'device' => 'Device Settings',
-            'worldmap' => 'World Map Settings',
+            'availability-map' => ['name' => 'Availability Map Settings'],
+            'graph' => ['name' => 'Graph Settings'],
+            'dashboard' => ['name' => 'Dashboard Settings'],
+            'search' => ['name' => 'Search Settings'],
+            'style' => ['name' => 'Style'],
+            'device' => ['name' => 'Device Settings'],
+            'worldmap' => ['name' => 'World Map Settings'],
         ],
     ],
     'settings' => [
@@ -361,7 +361,7 @@ return [
             'help' => 'Number of days to keep a user logged in when checking the remember me checkbox at log in.',
         ],
         'authlog_purge' => [
-            'description' => 'Auth log entries older than (days)',
+            'description' => 'Auth log entries older than',
             'help' => 'Cleanup done by daily.sh',
         ],
         'base_url' => [
@@ -369,7 +369,7 @@ return [
             'help' => 'This should *only* be set if you want to *force* a particular hostname/port. It will prevent the web interface being usable form any other hostname',
         ],
         'device_perf_purge' => [
-            'description' => 'Device performance entries older than (days)',
+            'description' => 'Device performance entries older than',
             'help' => 'Cleanup done by daily.sh',
         ],
         'discovery_modules' => [
@@ -574,7 +574,7 @@ return [
             'help' => 'Name used as part of the from address',
         ],
         'eventlog_purge' => [
-            'description' => 'Event log entries older than (days)',
+            'description' => 'Event log entries older than',
             'help' => 'Cleanup done by daily.sh',
         ],
         'favicon' => [
@@ -1020,7 +1020,7 @@ return [
             'help' => 'Cleanup done by daily.sh',
         ],
         'ports_purge' => [
-            'description' => 'Ports older than (days)',
+            'description' => 'Ports older than',
             'help' => 'Cleanup done by daily.sh',
         ],
         'prometheus' => [
@@ -1046,7 +1046,7 @@ return [
             'help' => 'No route will be discovered if the size of the routing table is bigger than this number',
         ],
         'route_purge' => [
-            'description' => 'Route entries older than (days)',
+            'description' => 'Route entries older than',
             'help' => 'Cleanup done by daily.sh',
         ],
         'rrd' => [
@@ -1062,7 +1062,7 @@ return [
             'help' => 'Location of rrd files.  Default is rrd inside the LibreNMS directory.  Changing this setting does not move the rrd files.',
         ],
         'rrd_purge' => [
-            'description' => 'RRD Files entries older than (days)',
+            'description' => 'RRD Files entries older than',
             'help' => 'Cleanup done by daily.sh',
         ],
         'rrd_rra' => [
@@ -1156,7 +1156,7 @@ return [
             'description' => 'Filter syslog messages containing',
         ],
         'syslog_purge' => [
-            'description' => 'Syslog entries older than (days)',
+            'description' => 'Syslog entries older than',
             'help' => 'Cleanup done by daily.sh',
         ],
         'title_image' => [

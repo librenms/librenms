@@ -12,9 +12,12 @@ IMPORTS
     neIndex, shelfIndex, slotIndex
              FROM  CM-ENTITY-MIB
     cmEthernetAccPortIndex, cmEthernetNetPortIndex,
-    cmEthernetAccPortEntry, cmEthernetNetPortEntry
+    cmEthernetAccPortEntry, cmEthernetNetPortEntry,
+    cmEthernetTrafficPortIndex, cmEthernetTrafficPortEntry
              FROM  CM-FACILITY-MIB
-    IpVersion, CmPmIntervalType, CmPmBinAction, F3DisplayString
+    IpVersion, CmPmIntervalType, CmPmBinAction, F3DisplayString,
+    AdminState, OperationalState, SecondaryState, PerfCounter64,
+    IpPriorityMapMode, FlowSecState
              FROM  CM-COMMON-MIB
     fsp150cm
              FROM  ADVA-MIB
@@ -22,25 +25,150 @@ IMPORTS
           PerfCounter64, IpPriorityMapMode
              FROM  CM-COMMON-MIB
     SSMQualityLevel, HoldoverAccuracy, TimeSource
-             FROM F3-SYNC-MIB;
+             FROM F3-SYNC-MIB
+    Ipv6Address
+             FROM  IPV6-TC
+    CmGenPgSwitchoverReason
+             FROM  CM-REDUNDANCY-MIB;
 
 f3PtpMIB MODULE-IDENTITY
-    LAST-UPDATED    "201601200000Z"
-    ORGANIZATION    "ADVA Optical Networking"
+    LAST-UPDATED    "202002100000Z"
+    ORGANIZATION    "ADVA Optical Networking SE"
     CONTACT-INFO
-            "        Raghav Trivedi
-                     ADVA Optical Networking, Inc.
-                Tel: +1 972 759-1239
-             E-mail: rtrivedi@advaoptical.com
-             Postal: 2301 N. Greenville Ave. #300
-                     Richardson, TX USA 75082"
+        "Web URL: http://adva.com/
+        E-mail:  support@adva.com
+        Postal:  ADVA Optical Networking SE
+             Campus Martinsried
+             Fraunhoferstrasse 9a
+             82152 Martinsried/Munich
+             Germany
+        Phone: +49 089 89 06 65 0
+        Fax:  +49 089 89 06 65 199 "
     DESCRIPTION
             "This module defines the 1588 PTP MIB definitions used by 
              the F3 (FSP150CM/CC) product lines.  
-             Copyright (C) ADVA Optical Networking."
-    REVISION        "201601200000Z"
+             Copyright (C) ADVA."
+    REVISION        "202002100000Z"
     DESCRIPTION
          "
+          Notes from release 202002100000Z,
+           (1) Added new tables:
+                f3PtpL3PTPPortStatsTable,
+                f3PtpL3PTPPortHistoryTable,
+                f3PtpL3PTPPortThresholdTable
+           (2) Added new notification:
+                f3PtpL3PTPPortCrossingAlert
+
+          Notes from release 202002100000Z,
+           (1) Added new literal to PTPClockProfile:
+                power-c37-238-2011(3)
+                     
+          Notes from release 201912310000Z,
+           (1) Added to f3PtpL3PTPPortEntry: 
+                f3PtpL3PTPPortIndex,
+                f3PtpL3PTPPortAdminState,
+                f3PtpL3PTPPortAlias,          
+                f3PtpL3PTPPortOperationalState,  
+                f3PtpL3PTPPortSecondaryState,
+                f3PtpL3PTPPortPortIdentity,    
+                f3PtpL3PTPPortLocalPriority,         
+                f3PtpL3PTPPortPtpFlowPointEid,         
+                f3PtpL3PTPPortSyncMessageRate,   
+                f3PtpL3PTPPortDelayReqRespMsgRate,
+                f3PtpL3PTPPortAnnounceMsgRate,
+                f3PtpL3PTPPortAnnounceReceiptTimeout,                            
+                f3PtpL3PTPPortSyncReceiptTimeout,                            
+                f3PtpL3PTPPortDelayRespTimeout,  
+                f3PtpL3PTPPortPortState,
+                f3PtpL3PTPPortBmcaDecisionCode, 
+                f3PtpL3PTPPortPeerClockClass, 
+                f3PtpL3PTPPortMinimumExpectedClockClass,
+                f3PtpL3PTPPortIpProtocol,
+                f3PtpL3PTPPortIfName,
+                f3PtpL3PTPPortIpPriorityMapMode,
+                f3PtpL3PTPPortIpPriority,
+                f3PtpL3PTPPortIpV4Address,
+                f3PtpL3PTPPortIpV4SubnetMask,
+                f3PtpL3PTPPortIpV6Address,             
+                f3PtpL3PTPPortIpV6AddrPrefixLength,
+                f3PtpL3PTPPortDefaultGatewayControl,
+                f3PtpL3PTPPortGateway,
+                f3PtpL3PTPPortIpV6Gateway,
+                f3PtpL3PTPPortUnicastMessageNegEnabled,
+                f3PtpL3PTPPortTransmitDuration,
+                f3PtpL3PTPPortRequestUnicastTimeout,
+                f3PtpL3PTPPortRequestUnicastRestartTimer,
+                f3PtpL3PTPPortMasterIpV4Address,
+                f3PtpL3PTPPortMasterIpV6Address,
+                f3PtpL3PTPPortDelayAsymmetryComp,
+                f3PtpL3PTPPortAutoAsymmetryCompStatus,
+                f3PtpL3PTPPortDelayAsymmetry,
+                f3PtpL3PTPPortStorageType,
+                f3PtpL3PTPPortRowStatus
+        
+          Notes from release 201912020000Z,
+           (1) Added to f3PtpPTPPortEntry: 
+                 f3PtpPTPPortTimeTraceable
+                 f3PtpPTPPortFrequencyTraceable
+
+          Notes from release 201911280000Z,
+           (1) Added to f3PtpPTPPortEntry: 
+                 f3PtpPTPPortDelayResponderType
+                 
+          Notes from release 201909090000Z,
+           (1) Added to f3PtpPTPPortEntry: 
+                 f3PtpPTPPortVirtualPortCtrl
+                Notes from release 201907080000Z,
+           (1) Added new TEXTUAL-CONVENTION to PTPClockProfile
+                     - c37-238-2011, c37-238-2017 and iec-61850-9-3
+           (2) Added f3PtpPTPClockGrandMasterID, f3PtpPTPClockTimeInaccuracy, f3PtpPTPClockNetworkTimeInaccuracy
+           (3) Added f3PtpMasterClockSmpteSystemFrameRateNumerator, f3PtpMasterClockSmpteSystemFrameRateDenominator, 
+                     f3PtpMasterClockSmpteTimeAddressFlags
+           (4) Added f3PtpSOOCAlgorithmPtpAware
+
+          Notes from release 201906180000Z,
+           (1) Deprecated f3PtpPTPPortClockClass in favor of
+               f3PtpPTPPortPeerClockClass
+
+          Notes from release 201903140000Z,
+           (1) Added new table:
+                 f3PtpTrafficPortFlowPointExtTable to augment
+                   f3PtpTrafficPortFlowPointTable with BufferSize
+
+          Notes from release 201901310000Z,
+           (1) Added to F3PtpSOOCEntry: 
+                 f3PtpSOOCDefaultGatewayControl
+                 f3PtpSOOCGateway              
+                 f3PtpSOOCIpV6Gateway          
+
+           (2) Added to F3PtpMCIEntry: 
+                 f3PtpMCIDefaultGatewayControl 
+                 f3PtpMCIGateway               
+                 f3PtpMCIIpV6Gateway           
+
+          Notes from release 201901240000Z,
+           (1) Added table indices: 
+                f3PtpMCIProtGroupIndex in f3PtpMCIProtMemberEntry
+                
+          Notes from release 201807300000Z,
+           (1) New tables:
+                 f3PtpMCIProtGroupTable,
+                 f3PtpMCIProtMemberTable  
+          Notes from release 201901070000Z
+           (1) Added TEXTUAL-CONVENTION:: SlaveMode
+           (2) Added f3PtpSOOCMasterMessageMode
+           (3) Added f3PtpMasterClockServiceAvailableTime, 
+                     f3PtpMasterClockServiceUnavailableTime, and 
+                     f3PtpMasterClockServiceAvailablePercentage
+           (4) Added f3PtpPTPClockServiceAvailableTime,
+                     f3PtpPTPClockServiceUnavailableTime,
+                     f3PtpPTPClockServiceAvailablePercentage
+           (5) Added f3PtpPTPPortDelayAsymmetryComp,
+                     f3PtpPTPPortAutoAsymmetryCompStatus, and
+                     f3PtpPTPPortDelayAsymmetry
+
+          Notes from release 201602170000Z
+             a) add f3PtpBCPhysicalEntityIndex to f3PtpBCTable and adjust the index
           Notes from release 201601200000Z
              a) remove f3PtpPTPPortPTPPortType that is not supported and not in other products
           Notes from release 201512180000Z
@@ -119,6 +247,17 @@ f3PtpStatusChangeNotifications OBJECT IDENTIFIER ::= {f3PtpMIB 5}
 --
 -- Textual Conventions 
 --
+SlaveMode ::= TEXTUAL-CONVENTION
+    STATUS         current
+    DESCRIPTION
+        "Describes the PTP slave mode on OSA540X."
+    SYNTAX      INTEGER {
+                    not-applicable(0),
+                    unicast (1),
+                    multicast (2),
+                    hybrid (3)
+                }
+
 PtpFlowPointType ::= TEXTUAL-CONVENTION
     STATUS       current
     DESCRIPTION
@@ -148,7 +287,8 @@ PtpPortState ::= TEXTUAL-CONVENTION
                slave(6),
                premaster(7),
                master(8),  
-               passive(9) 
+               passive(9),
+               na(10) 
              }
 
 MasterClockType ::= TEXTUAL-CONVENTION
@@ -205,6 +345,7 @@ ClockRecoveryState ::= TEXTUAL-CONVENTION
     DESCRIPTION
           "Enumerations for 1588 Clock Recovery State."
     SYNTAX   INTEGER {
+               not-applicable(0),
                start(1),
                normal(2),
                freerun(3),
@@ -265,7 +406,8 @@ DelayRespMsgRate ::= TEXTUAL-CONVENTION
                pkts64persec(7),
                pkts128persec(8),
                none(9),
-               na(10)
+               na(10),
+               pkts0persec(11)
              }
 
 DelayReqMsgRate ::= TEXTUAL-CONVENTION
@@ -381,7 +523,13 @@ PTPClockProfile ::= TEXTUAL-CONVENTION
           "Enumerations for PTP Clock Profile."
     SYNTAX   INTEGER {
                g8275-1(1),
-               ieee-1588-2008-annex-f(2)
+               ieee-1588-2008-annex-f(2),
+               ieee-1588-2008(3),
+               power-c37-238-2011(4),
+               power-c37-238-2017(5),
+               utility-iec-61850-9-3(6),
+               g8275-2(7),
+               gptp-802-1as-2011(8)
              }
 
 PTPClockType ::= TEXTUAL-CONVENTION
@@ -405,7 +553,7 @@ PTPClockOperMode ::= TEXTUAL-CONVENTION
                t-tsc(2),
                idle(3),
                t-bc(4),
-	       gm(5)
+               gm(5)
              }
 
 DestMacAddrType ::= TEXTUAL-CONVENTION
@@ -449,7 +597,7 @@ DelayReqMessageRate ::= TEXTUAL-CONVENTION
                pkts32persec(6),
                pkts64persec(7),
                pkts128persec(8),
-	       none(9),
+               none(9),
                na(10)
             }
 
@@ -493,7 +641,10 @@ ClockClassProfile ::= TEXTUAL-CONVENTION
                g82651(1),  
                ieee-1588-2008(2),
                ptp-enterprise(3),
-               na(4)  
+               na(4),
+               g82752(5),
+               ptp-enterprise-and-ieee-1588-2008(6)
+
             }
 
 PTPProfile ::= TEXTUAL-CONVENTION
@@ -502,10 +653,13 @@ PTPProfile ::= TEXTUAL-CONVENTION
           "Enumerations for Master Clock PTP Profile."
     SYNTAX   INTEGER {
                g82651(1),  
-               ptp-enterprise(2)  
+               ptp-enterprise(2),
+               ieee-1588-2008(3),
+               g82752(4),
+               aes67-media(5),
+               smpte-st-2059-2(6)
             }
 
---- PTPTransportMap in enumtypes.xml
 PTPTransport ::= TEXTUAL-CONVENTION
     STATUS       current
     DESCRIPTION
@@ -516,7 +670,6 @@ PTPTransport ::= TEXTUAL-CONVENTION
                udp-over-ipv6(3)  
             }
 
---- PTPTransportModeMap in enumtypes.xml
 PTPTransportMode ::= TEXTUAL-CONVENTION
     STATUS       current
     DESCRIPTION
@@ -526,11 +679,21 @@ PTPTransportMode ::= TEXTUAL-CONVENTION
                multicast(2)
             }
 
+
+ToggleValue ::= TEXTUAL-CONVENTION
+    STATUS         current
+    DESCRIPTION    "Enumerations for functionality that can be enabled or disabled."
+    SYNTAX INTEGER    {
+        enabled(1),
+        disabled(2),
+        not-available(3)
+        }
+
 --
 -- CONFIGURATION 
 --
 -- Transparent Clock Table 
---- f3PtpTC : f3PtpConfigObjects 1 
+--
 f3PtpTCTable OBJECT-TYPE
     SYNTAX     SEQUENCE OF F3PtpTCEntry 
     MAX-ACCESS not-accessible
@@ -565,7 +728,8 @@ F3PtpTCEntry ::= SEQUENCE {
     f3PtpTCClockIdentity      ClockIdentity,
 
     f3PtpTCStorageType        StorageType,
-    f3PtpTCRowStatus          RowStatus
+    f3PtpTCRowStatus          RowStatus,
+    f3PtpTCPtpProfile         PTPClockProfile
 }
 
 f3PtpTCIndex OBJECT-TYPE
@@ -673,10 +837,17 @@ f3PtpTCRowStatus OBJECT-TYPE
             the associated instance of this object is equal to active(1)."
     ::= { f3PtpTCEntry 11 }
 
+f3PtpTCPtpProfile     OBJECT-TYPE
+    SYNTAX      PTPClockProfile 
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+           "This object represents whether Tc or T-Tc."
+    ::= { f3PtpTCEntry 12 }
 
 --
 -- PTP Transparent Clock Virtual Port Table 
---- f3PtpTCVirtualPort : f3PtpConfigObjects 2
+--
 f3PtpTCVirtualPortTable OBJECT-TYPE
     SYNTAX     SEQUENCE OF F3PtpTCVirtualPortEntry 
     MAX-ACCESS not-accessible
@@ -804,7 +975,7 @@ f3PtpTCVirtualPortRowStatus OBJECT-TYPE
 
 --
 -- Telecom Slave Table 
---- f3PtpTS : f3PtpConfigObjects 3
+--
 f3PtpTSTable OBJECT-TYPE
     SYNTAX     SEQUENCE OF F3PtpTSEntry 
     MAX-ACCESS not-accessible
@@ -822,7 +993,6 @@ f3PtpTSEntry OBJECT-TYPE
            Telecom Slave Entity."
     INDEX { neIndex, f3PtpTSIndex}
     ::= { f3PtpTSTable 1 }
-
 
 F3PtpTSEntry ::= SEQUENCE {
     f3PtpTSIndex                             Integer32,
@@ -1162,7 +1332,7 @@ f3PtpTSTimeLastPRScore OBJECT-TYPE
 f3PtpTSClockClass OBJECT-TYPE
     SYNTAX      Unsigned32
     MAX-ACCESS  read-only
-    STATUS      current
+    STATUS      deprecated
     DESCRIPTION
            "This object specify Telecome Slave clock class."
     ::= { f3PtpTSEntry 30 }
@@ -1210,7 +1380,7 @@ f3PtpTSWtrTime OBJECT-TYPE
 
 --
 -- PTP Slave Only Ordinary Clock Table 
---- f3PtpSOOC : f3PtpConfigObjects 4
+--
 f3PtpSOOCTable OBJECT-TYPE
     SYNTAX     SEQUENCE OF F3PtpSOOCEntry 
     MAX-ACCESS not-accessible
@@ -1288,7 +1458,18 @@ F3PtpSOOCEntry ::= SEQUENCE {
     f3PtpSOOCE2eDelayAsymmetryComp               CompensationMode,
     f3PtpSOOCE2eAutoAsymmetryCompStatus          CompensationStatus,
     f3PtpSOOCE2eDelayAsymmetry                   Integer32,
-    f3PtpSOOCSoocLockOutControl                  TruthValue
+    f3PtpSOOCSoocLockOutControl                  TruthValue,
+    f3PtpSOOCSlaveIpV6Address                    Ipv6Address,             
+    f3PtpSOOCSlaveIpV6AddrPrefixLength           Integer32,
+    f3PtpSOOCMasterIpV6Address                   Ipv6Address,
+    f3PtpSOOCMinimumExpectedClockClass           Integer32,
+    f3PtpSOOCMasterMessageMode                   SlaveMode,
+
+    f3PtpSOOCDefaultGatewayControl               ToggleValue,
+    f3PtpSOOCGateway                             IpAddress,
+    f3PtpSOOCIpV6Gateway                         Ipv6Address,
+    f3PtpSOOCAlgorithmPtpAware                   TruthValue
+
 
 }
 
@@ -1707,9 +1888,92 @@ f3PtpSOOCSoocLockOutControl OBJECT-TYPE
           Lockout operation is enabled for the Sooc."
      ::= { f3PtpSOOCEntry 45 }
 
+
+f3PtpSOOCSlaveIpV6Address OBJECT-TYPE
+    SYNTAX     Ipv6Address 
+    MAX-ACCESS read-create
+    STATUS   current
+    DESCRIPTION
+         "This object allows specification of the unicast IPv6 Address of
+          the Slave Only Ordinary Clock."
+    ::= { f3PtpSOOCEntry 46 }
+
+f3PtpSOOCSlaveIpV6AddrPrefixLength OBJECT-TYPE
+    SYNTAX     Integer32 (0..128)
+    MAX-ACCESS read-create
+    STATUS   current
+    DESCRIPTION
+       "This object allows specification of the unicast IPv6 Address prefix length of
+          the Slave Only Ordinary Clock."
+    ::= { f3PtpSOOCEntry 47 }
+
+f3PtpSOOCMasterIpV6Address OBJECT-TYPE
+    SYNTAX     Ipv6Address 
+    MAX-ACCESS read-create
+    STATUS   current
+    DESCRIPTION
+       "This object allows specification of the unicast IPv6 Address of
+          the OC Master."
+    ::= { f3PtpSOOCEntry 48 }
+
+f3PtpSOOCMinimumExpectedClockClass  OBJECT-TYPE 
+    SYNTAX     Integer32 (0..255)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "This object allows setting the minimum expected clock class value,
+     which setes the minimum threshold for receiving packets.
+     if the received clock clock class is greater than the expected
+     clock class value, the packets for the grandmaster or boundary clock that
+     are sending this clock class are dropped.
+     In addition, an alarm called clock-class-mismatch is generated. The default is 247."
+     ::= { f3PtpSOOCEntry 49 }
+
+f3PtpSOOCMasterMessageMode  OBJECT-TYPE 
+    SYNTAX     SlaveMode
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "Describes the PTP slave mode on OSA540X."
+     ::= { f3PtpSOOCEntry 50 }
+
+f3PtpSOOCDefaultGatewayControl OBJECT-TYPE
+    SYNTAX     ToggleValue
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This attribute control Gatwaye address for Slave Only Ordinary Clock."
+     ::= { f3PtpSOOCEntry 51 }
+
+f3PtpSOOCGateway OBJECT-TYPE
+    SYNTAX     IpAddress
+    MAX-ACCESS read-create 
+    STATUS     current
+    DESCRIPTION
+         "This object allows specification of the IPv4 Gateway Address of
+          Slave Only Ordinary Clock."
+     ::= { f3PtpSOOCEntry 52 }
+
+f3PtpSOOCIpV6Gateway OBJECT-TYPE
+    SYNTAX     Ipv6Address 
+    MAX-ACCESS read-create
+    STATUS   current
+    DESCRIPTION
+         "This object allows specification of the IPv6 Gateway Address of
+          Slave Only Ordinary Clock."
+    ::= { f3PtpSOOCEntry 53 }
+
+f3PtpSOOCAlgorithmPtpAware OBJECT-TYPE
+    SYNTAX     TruthValue 
+    MAX-ACCESS read-write
+    STATUS   current
+    DESCRIPTION
+         "This object allows specification of the slave algorithm mode - PTP aware or unaware."
+    ::= { f3PtpSOOCEntry 54 }
+
 --
 -- PTP Ordinary Clock Slave Virtual Port Table 
---- f3PtpOCSlaveVirtualPort : f3PtpConfigObjects 5
+--
 f3PtpOCSlaveVirtualPortTable OBJECT-TYPE
     SYNTAX     SEQUENCE OF F3PtpOCSlaveVirtualPortEntry 
     MAX-ACCESS not-accessible
@@ -1848,7 +2112,7 @@ f3PtpOCSlaveVirtualPortRowStatus OBJECT-TYPE
 
 --
 -- Ethernet Access Port - PTP Flow Point Table 
---- f3PtpAccPortFlowPoint : f3PtpConfigObjects 6
+--
 f3PtpAccPortFlowPointTable OBJECT-TYPE
     SYNTAX     SEQUENCE OF F3PtpAccPortFlowPointEntry 
     MAX-ACCESS not-accessible
@@ -1868,7 +2132,6 @@ f3PtpAccPortFlowPointEntry OBJECT-TYPE
     INDEX { neIndex, shelfIndex, slotIndex, cmEthernetAccPortIndex, 
             f3PtpAccPortFlowPointIndex }
     ::= { f3PtpAccPortFlowPointTable 1 }
-
 
 F3PtpAccPortFlowPointEntry ::= SEQUENCE {
     f3PtpAccPortFlowPointIndex                 Integer32,
@@ -1900,7 +2163,10 @@ F3PtpAccPortFlowPointEntry ::= SEQUENCE {
     f3PtpAccPortFlowPointEIRLo                 Unsigned32,
     f3PtpAccPortFlowPointEIRHi                 Unsigned32,
     f3PtpAccPortFlowPointBufferSize            Unsigned32,
-    f3PtpAccPortFlowPointLoopAvoidance         VariablePointer
+    f3PtpAccPortFlowPointLoopAvoidance         VariablePointer,
+    f3PtpAccPortFlowPointRefConnectGuardFlow   VariablePointer,
+    f3PtpAccPortFlowPointSecureState           FlowSecState,
+    f3PtpAccPortFlowPointSecureBlockingEnabled TruthValue
 }
 
 f3PtpAccPortFlowPointIndex OBJECT-TYPE
@@ -2153,9 +2419,35 @@ f3PtpAccPortFlowPointLoopAvoidance OBJECT-TYPE
     DESCRIPTION
             "This object allows specify OID of this associated Loop Avoidance protocol entity."
     ::= { f3PtpAccPortFlowPointEntry 26 }
+
+f3PtpAccPortFlowPointRefConnectGuardFlow OBJECT-TYPE
+    SYNTAX      VariablePointer
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+           "This object specifies Mac Sec flow object OID."
+    ::= { f3PtpAccPortFlowPointEntry 27 }
+
+f3PtpAccPortFlowPointSecureState OBJECT-TYPE
+    SYNTAX      FlowSecState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "This object specifies the secure state of this flow."
+    ::= { f3PtpAccPortFlowPointEntry 28 }
+
+f3PtpAccPortFlowPointSecureBlockingEnabled OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+           "This object can be used to enable/disable secure block."
+    ::= { f3PtpAccPortFlowPointEntry 29 }
+
+
 --
 -- Ethernet Network Port - PTP Flow Point Table 
---- f3PtpNetPortFlowPoint : f3PtpConfigObjects 7
+--
 f3PtpNetPortFlowPointTable OBJECT-TYPE
     SYNTAX     SEQUENCE OF F3PtpNetPortFlowPointEntry 
     MAX-ACCESS not-accessible
@@ -2207,7 +2499,10 @@ F3PtpNetPortFlowPointEntry ::= SEQUENCE {
     f3PtpNetPortFlowPointEIRLo                 Unsigned32,
     f3PtpNetPortFlowPointEIRHi                 Unsigned32,
     f3PtpNetPortFlowPointBufferSize            Unsigned32,
-    f3PtpNetPortFlowPointLoopAvoidance         VariablePointer
+    f3PtpNetPortFlowPointLoopAvoidance         VariablePointer,
+    f3PtpNetPortFlowPointRefConnectGuardFlow   VariablePointer,
+    f3PtpNetPortFlowPointSecureState           FlowSecState,
+    f3PtpNetPortFlowPointSecureBlockingEnabled TruthValue
 }
 
 f3PtpNetPortFlowPointIndex OBJECT-TYPE
@@ -2460,7 +2755,35 @@ f3PtpNetPortFlowPointLoopAvoidance OBJECT-TYPE
             "This object allows specify OID of this associated Loop Avoidance protocol entity."
     ::= { f3PtpNetPortFlowPointEntry 26 }
 
---- f3PtpEthernetAccPortExt : f3PtpConfigObjects 8
+f3PtpNetPortFlowPointRefConnectGuardFlow OBJECT-TYPE
+    SYNTAX      VariablePointer
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+           "This object specifies Mac Sec flow object OID."
+    ::= { f3PtpNetPortFlowPointEntry 27 }
+
+f3PtpNetPortFlowPointSecureState OBJECT-TYPE
+    SYNTAX      FlowSecState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "This object specifies the secure state of this flow."
+    ::= { f3PtpNetPortFlowPointEntry 28 }
+
+f3PtpNetPortFlowPointSecureBlockingEnabled OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+           "This object can be used to enable/disable secure block."
+    ::= { f3PtpNetPortFlowPointEntry 29 }
+
+
+
+
+
+
 f3PtpEthernetAccPortExtTable  OBJECT-TYPE
     SYNTAX      SEQUENCE OF F3PtpEthernetAccPortExtEntry
     MAX-ACCESS  not-accessible
@@ -2491,8 +2814,6 @@ f3PtpEthernetAccPortDelayAsymmetry OBJECT-TYPE
           the Ethernet Access Port. The default value is 0."
      ::= { f3PtpEthernetAccPortExtEntry 1 }
 
-
---- f3PtpEthernetNetPortExt : f3PtpConfigObjects 9
 f3PtpEthernetNetPortExtTable  OBJECT-TYPE
     SYNTAX      SEQUENCE OF F3PtpEthernetNetPortExtEntry
     MAX-ACCESS  not-accessible
@@ -2523,9 +2844,9 @@ f3PtpEthernetNetPortDelayAsymmetry OBJECT-TYPE
           the Ethernet Network Port. The default value is 0."
      ::= { f3PtpEthernetNetPortExtEntry 1 }
 
----
+--
 -- Scalars
---- f3PtpConfigObjects 10
+--
 f3PtpConfigScalars             OBJECT IDENTIFIER ::= {f3PtpConfigObjects 10}
 
 f3PtpSysTimeOfDayClock  OBJECT-TYPE
@@ -2542,7 +2863,6 @@ f3PtpSysTimeOfDayClock  OBJECT-TYPE
     ::= { f3PtpConfigScalars 1 }
 
 
---- f3PtpBC : f3PtpConfigObjects 11
 f3PtpBCTable OBJECT-TYPE
     SYNTAX     SEQUENCE OF F3PtpBCEntry
     MAX-ACCESS not-accessible
@@ -2575,7 +2895,7 @@ F3PtpBCEntry ::= SEQUENCE {
     f3PtpBCStorageType        StorageType,
     f3PtpBCRowStatus          RowStatus,
     f3PtpBCPhysicalEntityIndex  Integer32,
-    f3PtpBCMediationControl   TruthValue
+    f3PtpBCMediationControl     TruthValue
 }
 
 f3PtpBCIndex OBJECT-TYPE
@@ -2682,26 +3002,26 @@ f3PtpBCRowStatus OBJECT-TYPE
             The f3PtpBCRowStatus object may be modified if
             the associated instance of this object is equal to active(1)."
     ::= { f3PtpBCEntry 11 }
-                               
+
 f3PtpBCPhysicalEntityIndex OBJECT-TYPE
     SYNTAX     Integer32
     MAX-ACCESS read-create
     STATUS     current
     DESCRIPTION
             "Populated with index into the physEntityTable (always point to left card slot in case of protection)"
-    ::= { f3PtpBCEntry 12 } 
-     
-  f3PtpBCMediationControl OBJECT-TYPE
+    ::= { f3PtpBCEntry 12 }
+
+f3PtpBCMediationControl OBJECT-TYPE
     SYNTAX     TruthValue
     MAX-ACCESS read-create
     STATUS     current
     DESCRIPTION
             "Enable/disable BC Mediation Control"
-    ::= { f3PtpBCEntry 13 }   
-   
+    ::= { f3PtpBCEntry 13 }
+
 --
 -- Master Clock Table 
---- f3PtpMasterClock : f3PtpConfigObjects 12
+--
 f3PtpMasterClockTable OBJECT-TYPE
     SYNTAX     SEQUENCE OF F3PtpMasterClockEntry
     MAX-ACCESS not-accessible
@@ -2743,7 +3063,13 @@ F3PtpMasterClockEntry ::= SEQUENCE {
     f3PtpMasterClockPhysicalEntityIndex              Integer32,
     f3PtpMasterClockActiveGrantsAnnounceService      Integer32,
     f3PtpMasterClockActiveGrantsSyncService          Integer32,
-    f3PtpMasterClockActiveGrantsDelayRequestService  Integer32
+    f3PtpMasterClockActiveGrantsDelayRequestService  Integer32,
+    f3PtpMasterClockServiceAvailableTime             Unsigned32,
+    f3PtpMasterClockServiceUnavailableTime           Unsigned32,
+    f3PtpMasterClockServiceAvailablePercentage       DisplayString,
+    f3PtpMasterClockSmpteSystemFrameRateNumerator    Unsigned32,
+    f3PtpMasterClockSmpteSystemFrameRateDenominator  Unsigned32,
+    f3PtpMasterClockSmpteTimeAddressFlags            Integer32
 
 }
 
@@ -2941,10 +3267,57 @@ f3PtpMasterClockActiveGrantsDelayRequestService OBJECT-TYPE
             "Report number of active grants delay-request service."
     ::= { f3PtpMasterClockEntry 22 }
 
+f3PtpMasterClockServiceAvailableTime OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "This object allows to manage service available time (seconds) for PTP."
+    ::= { f3PtpMasterClockEntry 23 }
+
+f3PtpMasterClockServiceUnavailableTime OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "This object allows to manage service unavailable  time (seconds) for PTP."
+    ::= { f3PtpMasterClockEntry 24 }
+
+f3PtpMasterClockServiceAvailablePercentage OBJECT-TYPE
+    SYNTAX     DisplayString
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "This object allows to manage service available in percentage [XXX.YY%] for PTP."
+    ::= { f3PtpMasterClockEntry 25 }
+
+f3PtpMasterClockSmpteSystemFrameRateNumerator OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+            "This object allows to manage the frame rate (Numerator) for PTP Broadcast Profile."
+    ::= { f3PtpMasterClockEntry 26 }
+
+f3PtpMasterClockSmpteSystemFrameRateDenominator OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+            "This object allows to manage the frame rate (Denominator) for PTP Broadcast Profile."
+    ::= { f3PtpMasterClockEntry 27 }
+
+f3PtpMasterClockSmpteTimeAddressFlags OBJECT-TYPE
+    SYNTAX     Integer32 (0..255) 
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+            "This object allows to manage the flags for PTP Broadcast Profile."
+    ::= { f3PtpMasterClockEntry 28 }
 
 --
 -- Master Clock Interface Table 
---- f3PtpMCI : f3PtpConfigObjects 13
+--
 f3PtpMCITable OBJECT-TYPE
     SYNTAX     SEQUENCE OF F3PtpMCIEntry
     MAX-ACCESS not-accessible
@@ -2952,7 +3325,6 @@ f3PtpMCITable OBJECT-TYPE
     DESCRIPTION
        "A list of entries corresponding to the PTP Master Clock Interface entities."
     ::= { f3PtpConfigObjects 13 }
-
 
 f3PtpMCIEntry OBJECT-TYPE
     SYNTAX     F3PtpMCIEntry
@@ -2962,7 +3334,6 @@ f3PtpMCIEntry OBJECT-TYPE
           "An entry containing information applicable to a particular
            Master Clock Interface Entity."
     INDEX { neIndex, f3PtpBCIndex, f3PtpMCIIndex }
-            
     ::= { f3PtpMCITable 1 }
 
 F3PtpMCIEntry ::= SEQUENCE {
@@ -2995,7 +3366,13 @@ F3PtpMCIEntry ::= SEQUENCE {
     f3PtpMCIAnnounceExtTLVEnable        TruthValue,
     f3PtpMCIPtpTransport                PTPTransport,
     f3PtpMCIPtpTransportMode            PTPTransportMode,
-    f3PtpMCIPtpRemoteSlaveAgingTimeout  Integer32
+    f3PtpMCIPtpRemoteSlaveAgingTimeout  Integer32,
+    f3PtpMCIMasterIpV6Address           Ipv6Address,             
+    f3PtpMCIMasterIpV6AddrPrefixLength  Integer32,
+
+    f3PtpMCIDefaultGatewayControl       ToggleValue,
+    f3PtpMCIGateway                     IpAddress,
+    f3PtpMCIIpV6Gateway                 Ipv6Address
 }
 
 f3PtpMCIIndex OBJECT-TYPE
@@ -3269,11 +3646,59 @@ f3PtpMCIPtpRemoteSlaveAgingTimeout OBJECT-TYPE
     MAX-ACCESS read-create
     STATUS     current
     DESCRIPTION
-         "This attribute specifies the aging timeout for inactive dynamic remote slaves."
+         "This attribute (in seconds) specifies the aging timeout for inactive dynamic remote slaves.
+          The value 0 means it is never aged.
+          Note that this attribute is not applicable to static slaves." 
     DEFVAL { 60 }
      ::= { f3PtpMCIEntry 30 }
 
---- f3PtpMasterVirtualPort : f3PtpConfigObjects 14
+f3PtpMCIMasterIpV6Address OBJECT-TYPE
+    SYNTAX     Ipv6Address 
+    MAX-ACCESS read-create
+    STATUS   current
+    DESCRIPTION
+         "This object allows specification of the unicast ipv6 Address of
+          the PTP Master."
+    ::= { f3PtpMCIEntry 31 }
+
+f3PtpMCIMasterIpV6AddrPrefixLength OBJECT-TYPE
+    SYNTAX     Integer32 (0..128)
+    MAX-ACCESS read-create
+    STATUS   current
+    DESCRIPTION
+         "This object allows specification of the unicast IPv6 address prefix length of
+          the PTP Master."
+    ::= { f3PtpMCIEntry 32 }
+
+
+f3PtpMCIDefaultGatewayControl OBJECT-TYPE
+    SYNTAX     ToggleValue
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This attribute control Gatwaye address for PTP Master."
+     ::= { f3PtpMCIEntry 33 }
+
+f3PtpMCIGateway OBJECT-TYPE
+    SYNTAX     IpAddress
+    MAX-ACCESS read-create 
+    STATUS     current
+    DESCRIPTION
+         "This object allows specification of the IPv4 Gateway Address of
+          the PTP Master."
+     ::= { f3PtpMCIEntry 34 }
+
+f3PtpMCIIpV6Gateway OBJECT-TYPE
+    SYNTAX     Ipv6Address 
+    MAX-ACCESS read-create
+    STATUS   current
+    DESCRIPTION
+         "This object allows specification of the IPv6 Gateway Address of
+          the PTP Master."
+    ::= { f3PtpMCIEntry 35 }
+
+
+
 f3PtpMasterVirtualPortTable OBJECT-TYPE
     SYNTAX     SEQUENCE OF F3PtpMasterVirtualPortEntry
     MAX-ACCESS not-accessible
@@ -3384,8 +3809,6 @@ f3PtpMasterVirtualPortRowStatus OBJECT-TYPE
             the associated instance of this object is equal to active(1)."
     ::= { f3PtpMasterVirtualPortEntry 8 }
 
-
---- f3PtpStaticRemoteSlave : f3PtpConfigObjects 15
 f3PtpStaticRemoteSlaveTable OBJECT-TYPE
     SYNTAX     SEQUENCE OF F3PtpStaticRemoteSlaveEntry
     MAX-ACCESS not-accessible
@@ -3426,7 +3849,9 @@ F3PtpStaticRemoteSlaveEntry ::= SEQUENCE {
     f3PtpStaticRemoteSlaveAnnounceDurRemTime       Unsigned32,
     f3PtpStaticRemoteSlaveUmnControl               TruthValue,
     f3PtpStaticRemoteSlaveStorageType              StorageType,
-    f3PtpStaticRemoteSlaveRowStatus                RowStatus
+    f3PtpStaticRemoteSlaveRowStatus                RowStatus,
+    f3PtpStaticRemoteSlaveIpV6Address              Ipv6Address             
+
 }
 
 f3PtpStaticRemoteSlaveIndex OBJECT-TYPE
@@ -3609,7 +4034,17 @@ f3PtpStaticRemoteSlaveRowStatus OBJECT-TYPE
     ::= { f3PtpStaticRemoteSlaveEntry 20 }
 
 
---- f3PtpDynamicRemoteSlave : f3PtpConfigObjects 16
+f3PtpStaticRemoteSlaveIpV6Address OBJECT-TYPE
+    SYNTAX     Ipv6Address 
+    MAX-ACCESS read-create
+    STATUS   current
+    DESCRIPTION
+         "This object allows specification of the unicast IPv6 Address of
+          the Remote Slave."
+    ::= { f3PtpStaticRemoteSlaveEntry 21 }
+
+
+
 f3PtpDynamicRemoteSlaveTable OBJECT-TYPE
     SYNTAX     SEQUENCE OF F3PtpDynamicRemoteSlaveEntry
     MAX-ACCESS not-accessible
@@ -3651,7 +4086,8 @@ F3PtpDynamicRemoteSlaveEntry ::= SEQUENCE {
     f3PtpDynamicRemoteSlaveRowStatus                RowStatus,
     f3PtpDynamicRemoteSlaveStorageType              StorageType,
     f3PtpDynamicRemoteSlavePortIdentity             PortIdentity,
-    f3PtpDynamicRemoteSlavePeerMacAddress           MacAddress
+    f3PtpDynamicRemoteSlavePeerMacAddress           MacAddress,
+    f3PtpDynamicRemoteSlaveIpV6Address              Ipv6Address
 }
 
 f3PtpDynamicRemoteSlaveIndex OBJECT-TYPE
@@ -3839,10 +4275,22 @@ f3PtpDynamicRemoteSlavePeerMacAddress OBJECT-TYPE
             "The port identity of the remote slave"
     ::= { f3PtpDynamicRemoteSlaveEntry 21 }
 
+f3PtpDynamicRemoteSlaveIpV6Address OBJECT-TYPE
+    SYNTAX     Ipv6Address 
+    MAX-ACCESS read-only
+    STATUS   current
+    DESCRIPTION
+         "This object allows specification of the unicast IPv6 Address of
+          the Remote Slave."
+    ::= { f3PtpDynamicRemoteSlaveEntry 22 }
 
----
+
+
+
+
+--
 -- Ethernet Traffic Port - PTP Flow Point Table
---- f3PtpTrafficPortFlowPoint : f3PtpConfigObjects 17
+--
 f3PtpTrafficPortFlowPointTable OBJECT-TYPE
     SYNTAX     SEQUENCE OF F3PtpTrafficPortFlowPointEntry 
     MAX-ACCESS not-accessible
@@ -4148,7 +4596,7 @@ f3PtpTrafficPortFlowPointLoopAvoidance OBJECT-TYPE
 
 --
 -- traffic port ext talbe
---- f3PtpEthernetTrafficPortExt : f3PtpConfigObjects 18
+--
 f3PtpEthernetTrafficPortExtTable  OBJECT-TYPE
     SYNTAX      SEQUENCE OF F3PtpEthernetTrafficPortExtEntry
     MAX-ACCESS  not-accessible
@@ -4181,7 +4629,7 @@ f3PtpEthernetTrafficPortDelayAsymmetry OBJECT-TYPE
 
 --
 -- PTP Clock Table
---- f3PtpPTPClock : f3PtpConfigObjects 19
+--
 f3PtpPTPClockTable OBJECT-TYPE
     SYNTAX     SEQUENCE OF F3PtpPTPClockEntry
     MAX-ACCESS not-accessible
@@ -4246,8 +4694,15 @@ F3PtpPTPClockEntry ::= SEQUENCE {
     f3PtpPTPClockPhysicalEntityIndex                Integer32,
     f3PtpPTPClockActiveGrantsAnnounceService        Integer32,
     f3PtpPTPClockActiveGrantsSyncService            Integer32,
-    f3PtpPTPClockActiveGrantsDelayRequestService    Integer32
-}                  
+    f3PtpPTPClockActiveGrantsDelayRequestService    Integer32,
+    f3PtpPTPClockMaxStepRemoved                     Integer32,
+    f3PtpPTPClockServiceAvailableTime               Unsigned32,
+    f3PtpPTPClockServiceUnavailableTime             Unsigned32,
+    f3PtpPTPClockServiceAvailablePercentage         DisplayString,
+    f3PtpPTPClockGrandMasterID                      Integer32,
+    f3PtpPTPClockTimeInaccuracy                     Unsigned32,
+    f3PtpPTPClockNetworkTimeInaccuracy              Unsigned32
+}
 
 
 f3PtpPTPClockIndex OBJECT-TYPE
@@ -4368,7 +4823,7 @@ f3PtpPTPClockLocalPriority OBJECT-TYPE
     DESCRIPTION
         "This object allows configuration of  local priority used by the PTP Clock." 
      ::= { f3PtpPTPClockEntry 14 }
-
+     
      
 f3PtpPTPClockClockAccuracy OBJECT-TYPE
     SYNTAX     Unsigned32 
@@ -4573,7 +5028,7 @@ f3PtpPTPClockCurrentOffsetFromMaster OBJECT-TYPE
     STATUS     current
     DESCRIPTION
          "This object provides the value for current offset from master.
-         Note: the SYNTAX should be ScaledNanoseconds."
+          Note: the SYNTAX should be ScaledNanoseconds."
      ::= { f3PtpPTPClockEntry 33 }
 
 f3PtpPTPClockRecentMeanPathDelay OBJECT-TYPE 
@@ -4582,7 +5037,7 @@ f3PtpPTPClockRecentMeanPathDelay OBJECT-TYPE
     STATUS     current
     DESCRIPTION
          "This object provides recent mean path delay.
-         Note: the SYNTAX should be ScaledNanoseconds."
+          Note: the SYNTAX should be ScaledNanoseconds."
      ::= { f3PtpPTPClockEntry 34 }
 
 f3PtpPTPClockRecentSyncPDV OBJECT-TYPE 
@@ -4591,7 +5046,7 @@ f3PtpPTPClockRecentSyncPDV OBJECT-TYPE
     STATUS     current
     DESCRIPTION
          "This object provides the recent Sync messages packet delay variation.
-         Note: the SYNTAX should be ScaledNanoseconds."
+          Note: the SYNTAX should be ScaledNanoseconds."
      ::= { f3PtpPTPClockEntry 35 }
 
 f3PtpPTPClockClockClass OBJECT-TYPE 
@@ -4634,11 +5089,67 @@ f3PtpPTPClockActiveGrantsDelayRequestService OBJECT-TYPE
          "Report number of active grants delay-request service."
      ::= { f3PtpPTPClockEntry 40 }
 
+f3PtpPTPClockMaxStepRemoved OBJECT-TYPE 
+    SYNTAX     Integer32
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         "Local PTP Clock only qualify the announce message with the value less than configured."
+     ::= { f3PtpPTPClockEntry 41 }
+
+f3PtpPTPClockServiceAvailableTime OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "This object allows to manage service available time (seconds) for PTP."
+    ::= { f3PtpPTPClockEntry 42 }
+
+f3PtpPTPClockServiceUnavailableTime OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "This object allows to manage service unavailable  time (seconds) for PTP."
+    ::= { f3PtpPTPClockEntry 43 }
+
+f3PtpPTPClockServiceAvailablePercentage OBJECT-TYPE
+    SYNTAX     DisplayString
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+            "This object allows to manage service available in percentage [XXX.YY%] for PTP."
+    ::= { f3PtpPTPClockEntry 44 }
+
+f3PtpPTPClockGrandMasterID OBJECT-TYPE
+    SYNTAX     Integer32 (0..65535)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+            "Grandmaster Identity to be transmitted in IEEE_C37_238 TLV (2 bytes). Most significant byte is reserved and shall be 0.
+             Configurable for grandmaster-capable devices only. Note: the range for c37-238-2011 is (3..254)"
+    ::= { f3PtpPTPClockEntry 45 }
+
+f3PtpPTPClockTimeInaccuracy OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+            "networkTimeInaccuracy to be transmitted in IEEE_C37_238 TLV. This value is set at the grandmaster-capable clocks."
+    ::= { f3PtpPTPClockEntry 46 }
+
+f3PtpPTPClockNetworkTimeInaccuracy OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+            "Maximum TimeInaccuracy that the device contributes to the networkTimeInaccuracy."
+    ::= { f3PtpPTPClockEntry 47 }
+
 
 --
 -- PTP Port Table      
---- f3PtpPTPPort : f3PtpConfigObjects 20
-
+--
 f3PtpPTPPortTable OBJECT-TYPE
     SYNTAX     SEQUENCE OF F3PtpPTPPortEntry
     MAX-ACCESS not-accessible
@@ -4682,14 +5193,24 @@ F3PtpPTPPortEntry ::= SEQUENCE {
     f3PtpPTPPortPeerPortMacAddress                 MacAddress,
     f3PtpPTPPortRowStatus                          RowStatus,
     f3PtpPTPPortPortIdentity                       PortIdentity,
-    f3PtpPTPPortMaxExpectedL2Slaves                Unsigned32,     
+    f3PtpPTPPortMaxExpectedL2Slaves                Unsigned32,
     f3PtpPTPPortMasterClockType                    MasterClockType,
     f3PtpPTPPortLastRcvdAnnounceMsg                F3DisplayString,
     f3PtpPTPPortLastRcvdSyncMsg                    F3DisplayString,
     f3PtpPTPPortLastRcvdDelayReqMsg                F3DisplayString,
-    f3PtpPTPPortLastRcvdDelayRspMsg                F3DisplayString
-}                  
-
+    f3PtpPTPPortLastRcvdDelayRspMsg                F3DisplayString,
+    f3PtpPTPPortMasterOnly                         TruthValue,
+    f3PtpPTPPortIsProbingSlave                     TruthValue,
+    f3PtpPTPPortPeerClockClass                     Unsigned32,
+    f3PtpPTPPortMinimumExpectedClockClass          Integer32,
+    f3PtpPTPPortDelayAsymmetryComp                 CompensationMode,
+    f3PtpPTPPortAutoAsymmetryCompStatus            CompensationStatus,
+    f3PtpPTPPortDelayAsymmetry                     Integer32,
+    f3PtpPTPPortVirtualPortCtrl                    ToggleValue,
+    f3PtpPTPPortDelayResponderType                 MasterClockType,
+    f3PtpPTPPortTimeTraceable                      TruthValue,
+    f3PtpPTPPortFrequencyTraceable                 TruthValue
+}
 
 f3PtpPTPPortIndex OBJECT-TYPE
     SYNTAX     Integer32
@@ -4698,8 +5219,6 @@ f3PtpPTPPortIndex OBJECT-TYPE
     DESCRIPTION
          "Unique index value associated with the PTP Port Entity."
      ::= { f3PtpPTPPortEntry 1 }
-
-
 
 f3PtpPTPPortAdminState OBJECT-TYPE
     SYNTAX      AdminState 
@@ -4717,7 +5236,6 @@ f3PtpPTPPortAlias    OBJECT-TYPE
          "This object allows SNMP management entities to provide an 
           alias to the PTP Port entity."
      ::= { f3PtpPTPPortEntry 3 }
-
 
 f3PtpPTPPortOperationalState   OBJECT-TYPE
     SYNTAX      OperationalState 
@@ -4762,7 +5280,7 @@ f3PtpPTPPortPtpFlowPointEid OBJECT-TYPE
 f3PtpPTPPortNotSlave OBJECT-TYPE
     SYNTAX      TruthValue
     MAX-ACCESS  read-create
-    STATUS      current
+    STATUS      deprecated
     DESCRIPTION
            "This object indicate if PTP Port is slave."
     ::= { f3PtpPTPPortEntry 9 }
@@ -4913,6 +5431,7 @@ f3PtpPTPPortLastRcvdAnnounceMsg OBJECT-TYPE
    DESCRIPTION
         "This object specifies the last recieved announce message." 
     ::= { f3PtpPTPPortEntry 25 }
+ 
 f3PtpPTPPortLastRcvdSyncMsg OBJECT-TYPE
    SYNTAX     F3DisplayString 
    MAX-ACCESS read-only
@@ -4920,6 +5439,7 @@ f3PtpPTPPortLastRcvdSyncMsg OBJECT-TYPE
    DESCRIPTION
         "This object specifies the last recieved sync message." 
     ::= { f3PtpPTPPortEntry 26 }
+ 
 f3PtpPTPPortLastRcvdDelayReqMsg OBJECT-TYPE
    SYNTAX     F3DisplayString 
    MAX-ACCESS read-only
@@ -4927,6 +5447,7 @@ f3PtpPTPPortLastRcvdDelayReqMsg OBJECT-TYPE
    DESCRIPTION
         "This object specifies the last recieved delay request message." 
     ::= { f3PtpPTPPortEntry 27 }
+ 
 f3PtpPTPPortLastRcvdDelayRspMsg OBJECT-TYPE
    SYNTAX     F3DisplayString 
    MAX-ACCESS read-only
@@ -4934,10 +5455,116 @@ f3PtpPTPPortLastRcvdDelayRspMsg OBJECT-TYPE
    DESCRIPTION
         "This object specifies the last recieved response message." 
     ::= { f3PtpPTPPortEntry 28 }
+    
+f3PtpPTPPortMasterOnly OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+           "This object indicate if PTP Port is master only."
+    ::= { f3PtpPTPPortEntry 29 }
+    
+f3PtpPTPPortIsProbingSlave OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+           "This object indicate if PTP Port is probing slave."
+    ::= { f3PtpPTPPortEntry 30 }
+
+f3PtpPTPPortPeerClockClass OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "This object specify PTP Port peer clock class."
+     ::= { f3PtpPTPPortEntry 31 }
+
+
+f3PtpPTPPortMinimumExpectedClockClass OBJECT-TYPE
+    SYNTAX     Integer32 (0..255)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "Note: This value is only applicable for a dynamic or slave port that is 
+     related to a PTP clock, either a boundary clock or slave clock. 
+     Otherwise, this field is not applicable (N/A) and cannot be configured.  
+
+     This object allows setting the minimum expected clock class value,
+     which setes the minimum threshold for receiving packets.
+     if the received clock clock class is greater than the expected
+     clock class value, the packets for the grandmaster or boundary clock that
+     are sending this clock class are dropped.
+     In addition, an alarm called clock-class-mismatch is generated. The default is 247."
+     ::= { f3PtpPTPPortEntry 32 }
+
+f3PtpPTPPortDelayAsymmetryComp OBJECT-TYPE
+    SYNTAX     CompensationMode
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "This object allows configuration of asymmetry delay
+        compensation mode for L2 PTP slave on OSA540X."   
+     ::= { f3PtpPTPPortEntry 33 }
+
+f3PtpPTPPortAutoAsymmetryCompStatus OBJECT-TYPE
+    SYNTAX     CompensationStatus  
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "This object provides the automatic delay asymmetry 
+        compensation status for L2 PTP slave on OSA540X." 
+     ::= { f3PtpPTPPortEntry 34 }
+
+f3PtpPTPPortDelayAsymmetry OBJECT-TYPE
+    SYNTAX     Integer32 
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "This object is used for manual configuration of delay asymmetry
+        in ns if delay asymmetry compensation is Manual.
+        Or for indication of the measured delay asymmetry if
+        delay asymmetry compensation is automatic."
+     ::= { f3PtpPTPPortEntry 35 }
+
+f3PtpPTPPortVirtualPortCtrl OBJECT-TYPE                    
+    SYNTAX      ToggleValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+           "This object indicate if PTP Port is virtual."
+    ::= { f3PtpPTPPortEntry 36 }
+    
+f3PtpPTPPortDelayResponderType    OBJECT-TYPE
+    SYNTAX      MasterClockType 
+    MAX-ACCESS  read-create
+    STATUS     current
+    DESCRIPTION
+          "This object allows specification of the Delay Responder Type for the 
+           PTP Port." 
+    ::= { f3PtpPTPPortEntry 37 }
+
+f3PtpPTPPortTimeTraceable    OBJECT-TYPE
+    SYNTAX      TruthValue 
+    MAX-ACCESS  read-only
+    STATUS     current
+    DESCRIPTION
+          "This object indicate the Time Traceable for the 
+           PTP Port." 
+    ::= { f3PtpPTPPortEntry 38 }
+
+f3PtpPTPPortFrequencyTraceable    OBJECT-TYPE
+    SYNTAX      TruthValue 
+    MAX-ACCESS  read-only
+    STATUS     current
+    DESCRIPTION
+          "This object indicate the Frequency Traceable for the 
+           PTP Port." 
+    ::= { f3PtpPTPPortEntry 39 }
+    
+    
 
 --- NOTE: To support IEEE 1588 Default Profile L2
----
---- f3PtpL2DynamicRemoteSlave : f3PtpConfigObjects 21
 f3PtpL2DynamicRemoteSlaveTable OBJECT-TYPE
        SYNTAX     SEQUENCE OF F3PtpL2DynamicRemoteSlaveEntry
        MAX-ACCESS not-accessible
@@ -4953,7 +5580,7 @@ f3PtpL2DynamicRemoteSlaveEntry OBJECT-TYPE
        STATUS     current
        DESCRIPTION
              "An entry containing information applicable to a particular
-             L2 dynamic slave entry."
+             L2 Dynamic Remote Slave entity."
        INDEX { neIndex, f3PtpPTPClockIndex, f3PtpPTPPortIndex, f3PtpL2DynamicRemoteSlaveIndex }
        ::= { f3PtpL2DynamicRemoteSlaveTable 1 }
 
@@ -5028,12 +5655,648 @@ f3PtpL2DynamicRemoteSlaveClockIdentity OBJECT-TYPE
          "L2 Dynamic Remote Slave Clock Identity for this entry."
      ::= { f3PtpL2DynamicRemoteSlaveEntry 6 }
 
-----------------------------------------------------------------
+--
+-- PTP MCI Protection Group Table 
+--
+f3PtpMCIProtGroupTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF F3PtpMCIProtGroupEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "A list of entries corresponding to the MCI Protection Groups.
+             "
+    ::= { f3PtpConfigObjects 22 }
+
+f3PtpMCIProtGroupEntry OBJECT-TYPE
+    SYNTAX     F3PtpMCIProtGroupEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "An entry containing information applicable to a PTP MCI
+             Protection Group."
+    INDEX { neIndex, f3PtpMCIProtGroupIndex }
+    ::= { f3PtpMCIProtGroupTable 1 }
+
+F3PtpMCIProtGroupEntry ::= SEQUENCE {
+    f3PtpMCIProtGroupIndex                    Integer32,
+    f3PtpMCIProtGroupAdminState               AdminState,
+    f3PtpMCIProtGroupActiveMember             VariablePointer,
+    f3PtpMCIProtGroupLastSwitchOverTime       TimeTicks,
+    f3PtpMCIProtGroupLastSwitchOverReason     CmGenPgSwitchoverReason,
+    f3PtpMCIProtGroupStorageType              StorageType, 
+    f3PtpMCIProtGroupRowStatus                RowStatus
+}
+
+f3PtpMCIProtGroupIndex OBJECT-TYPE
+    SYNTAX     Integer32
+    MAX-ACCESS read-only 
+    STATUS     current
+    DESCRIPTION
+         "Unique index value associated with the PTP MCI Protection Group
+          entity."
+     ::= { f3PtpMCIProtGroupEntry 1 }
+
+f3PtpMCIProtGroupAdminState OBJECT-TYPE
+    SYNTAX         AdminState
+    MAX-ACCESS     read-write
+    STATUS         current
+    DESCRIPTION
+         "This object represents the Administrative State of the PTP MCI
+          Protection Group."
+    ::= { f3PtpMCIProtGroupEntry 2 }
+
+f3PtpMCIProtGroupActiveMember OBJECT-TYPE
+    SYNTAX     VariablePointer
+    MAX-ACCESS read-only 
+    STATUS     current
+    DESCRIPTION
+         "The corresponding OID of the Active Member in the PTP MCI Protection Group."
+     ::= { f3PtpMCIProtGroupEntry 3 }
+     
+f3PtpMCIProtGroupLastSwitchOverTime OBJECT-TYPE
+    SYNTAX     TimeTicks
+    MAX-ACCESS read-only 
+    STATUS     current
+    DESCRIPTION
+         "The value of sysUpTime when last switch over occurred."
+     ::= { f3PtpMCIProtGroupEntry 4 }
+
+f3PtpMCIProtGroupLastSwitchOverReason OBJECT-TYPE
+    SYNTAX     CmGenPgSwitchoverReason
+    MAX-ACCESS read-only 
+    STATUS     current
+    DESCRIPTION
+         "The reason for last switch over in the PTP MCI Protection Group."
+     ::= { f3PtpMCIProtGroupEntry 5 }
+
+f3PtpMCIProtGroupStorageType OBJECT-TYPE
+    SYNTAX     StorageType
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+            "The type of storage configured for this entry."
+    ::= { f3PtpMCIProtGroupEntry 6 }
+
+f3PtpMCIProtGroupRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+           "The status of this row.  An entry MUST NOT exist in the 
+            active state unless all objects in the entry have an 
+            appropriate value, as described
+            in the description clause for each writable object.
+
+            The values of f3PtpMCIProtGroupRowStatus supported are
+            createAndGo(4) and destroy(6).  All mandatory attributes
+            must be specified in a single SNMP SET request with
+            f3PtpMCIProtGroupRowStatus value as createAndGo(4).
+            Upon successful row creation, this object has a
+            value of active(1).
+
+            The f3PtpMCIProtGroupRowStatus object may be modified if
+            the associated instance of this object is equal to active(1)."
+    ::= { f3PtpMCIProtGroupEntry 7 }
+
+
+---
+--- Ptp MCI Protection Member Table
+---
+f3PtpMCIProtMemberTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF F3PtpMCIProtMemberEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A list of entries for the Ptp MCI Protection Group Members."
+    ::= { f3PtpConfigObjects 23 }
+
+f3PtpMCIProtMemberEntry  OBJECT-TYPE
+    SYNTAX      F3PtpMCIProtMemberEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A conceptual row in the f3PtpMCIProtMemberTable."
+    INDEX { neIndex, f3PtpMCIProtGroupIndex, f3PtpMCIProtMemberObject }
+    ::= { f3PtpMCIProtMemberTable 1 }
+
+F3PtpMCIProtMemberEntry ::= SEQUENCE {
+    f3PtpMCIProtMemberObject             VariablePointer,
+    f3PtpMCIProtMemberStorageType        StorageType,
+    f3PtpMCIProtMemberRowStatus          RowStatus
+}
+
+f3PtpMCIProtMemberObject OBJECT-TYPE
+    SYNTAX      VariablePointer
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+           "This object points to the Protection Group Member."
+    ::= { f3PtpMCIProtMemberEntry 1 }
+
+f3PtpMCIProtMemberStorageType OBJECT-TYPE
+    SYNTAX      StorageType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+           "The type of storage configured for this entry."
+    ::= { f3PtpMCIProtMemberEntry 2 }
+
+f3PtpMCIProtMemberRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+           "The status of this row.
+            An entry MUST NOT exist in the active state unless all
+            objects in the entry have an appropriate value, as described
+            in the description clause for each writable object.
+    
+            The values of f3PtpMCIProtMemberRowStatus supported are
+            createAndGo(4) and destroy(6).  All mandatory attributes
+            must be specified in a single SNMP SET request with
+            f3PtpMCIProtMemberRowStatus value as createAndGo(4).
+            Upon successful row creation, this object has a
+            value of active(1).
+    
+            The f3PtpMCIProtMemberRowStatus object may be modified if
+            the associated instance of this object is equal to active(1)."
+    ::= { f3PtpMCIProtMemberEntry 3 }
+
+--
+-- Traffic Port FlowPoint Extension Table
+--
+f3PtpTrafficPortFlowPointExtTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF F3PtpTrafficPortFlowPointExtEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "This table extends f3PtpTrafficPortFlowPointTable."
+    ::= { f3PtpConfigObjects 24 }
+
+f3PtpTrafficPortFlowPointExtEntry OBJECT-TYPE
+    SYNTAX      F3PtpTrafficPortFlowPointExtEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A conceptual row in the f3PtpTrafficPortFlowPointExtTable."
+    AUGMENTS { f3PtpTrafficPortFlowPointEntry }
+    ::= { f3PtpTrafficPortFlowPointExtTable 1 }
+
+F3PtpTrafficPortFlowPointExtEntry ::= SEQUENCE {
+    f3PtpTrafficPortFlowPointBufferSize Integer32
+}
+
+f3PtpTrafficPortFlowPointBufferSize OBJECT-TYPE
+     SYNTAX     Integer32
+     MAX-ACCESS read-write
+     STATUS     current
+     DESCRIPTION
+         "This object allows configuring the buffer size for the
+         PTP FlowPoint's bandwidth profile. The default value is 16KB."
+     ::= { f3PtpTrafficPortFlowPointExtEntry 1 }
+
+--
+-- L3 PTP Port Table      
+--
+f3PtpL3PTPPortTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF F3PtpL3PTPPortEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+       "A list of entries corresponding to the L3 PTP Port entities."
+    ::= { f3PtpConfigObjects 25 }
+
+f3PtpL3PTPPortEntry OBJECT-TYPE
+    SYNTAX     F3PtpL3PTPPortEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+          "An entry containing information applicable to a particular
+           L3 PTP Port Entity."
+    INDEX { neIndex, f3PtpPTPClockIndex,f3PtpL3PTPPortIndex}
+            
+    ::= { f3PtpL3PTPPortTable 1 }
+
+
+F3PtpL3PTPPortEntry ::= SEQUENCE {
+    f3PtpL3PTPPortIndex                              Integer32,
+    f3PtpL3PTPPortAdminState                         AdminState,
+    f3PtpL3PTPPortAlias                              DisplayString,          
+    f3PtpL3PTPPortOperationalState                   OperationalState,  
+    f3PtpL3PTPPortSecondaryState                     SecondaryState,
+    f3PtpL3PTPPortPortIdentity                       PortIdentity,    
+    f3PtpL3PTPPortLocalPriority                      Unsigned32,         
+    f3PtpL3PTPPortPtpFlowPointEid                    VariablePointer,         
+    f3PtpL3PTPPortSyncMessageRate                    SyncMessageRate,   
+    f3PtpL3PTPPortDelayReqRespMsgRate                DelayReqMessageRate,
+    f3PtpL3PTPPortAnnounceMsgRate                    AnnounceMessageRate,
+    f3PtpL3PTPPortAnnounceReceiptTimeout             Integer32,                            
+    f3PtpL3PTPPortSyncReceiptTimeout                 Integer32,                            
+    f3PtpL3PTPPortDelayRespTimeout                   Integer32,  
+    f3PtpL3PTPPortPortState                          PtpPortState,
+    f3PtpL3PTPPortBmcaDecisionCode                   BMCARole, 
+    f3PtpL3PTPPortPeerClockClass                     Unsigned32, 
+    f3PtpL3PTPPortMinimumExpectedClockClass          Integer32,
+    f3PtpL3PTPPortIpProtocol                         IpVersion,
+    f3PtpL3PTPPortIfName                             DisplayString,
+    f3PtpL3PTPPortIpPriorityMapMode                  IpPriorityMapMode,
+    f3PtpL3PTPPortIpPriority                         Integer32,
+    f3PtpL3PTPPortIpV4Address                        IpAddress,
+    f3PtpL3PTPPortIpV4SubnetMask                     IpAddress,
+    f3PtpL3PTPPortIpV6Address                        Ipv6Address,             
+    f3PtpL3PTPPortIpV6AddrPrefixLength               Integer32,
+    f3PtpL3PTPPortDefaultGatewayControl              ToggleValue,
+    f3PtpL3PTPPortGateway                            IpAddress,
+    f3PtpL3PTPPortIpV6Gateway                        Ipv6Address,
+    f3PtpL3PTPPortUnicastMessageNegEnabled           TruthValue,
+    f3PtpL3PTPPortTransmitDuration                   Integer32,
+    f3PtpL3PTPPortRequestUnicastTimeout              Integer32,
+    f3PtpL3PTPPortRequestUnicastRestartTimer         Integer32,
+    f3PtpL3PTPPortMasterIpV4Address                  IpAddress,
+    f3PtpL3PTPPortMasterIpV6Address                  Ipv6Address,
+    f3PtpL3PTPPortDelayAsymmetryComp                 CompensationMode,
+    f3PtpL3PTPPortAutoAsymmetryCompStatus            CompensationStatus,
+    f3PtpL3PTPPortDelayAsymmetry                     Integer32,
+    f3PtpL3PTPPortStorageType                        StorageType,
+    f3PtpL3PTPPortRowStatus                          RowStatus
+}
+
+f3PtpL3PTPPortIndex OBJECT-TYPE
+    SYNTAX     Integer32
+    MAX-ACCESS not-accessible 
+    STATUS     current
+    DESCRIPTION
+         "Unique index value associated with the L3 PTP Port Entity."
+     ::= { f3PtpL3PTPPortEntry 1 }
+
+f3PtpL3PTPPortAdminState OBJECT-TYPE
+    SYNTAX      AdminState 
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+          "This object represents the Administrative State of the L3 PTP Port."
+    ::= { f3PtpL3PTPPortEntry 2 }
+
+f3PtpL3PTPPortAlias    OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..256))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+         "This object allows SNMP management entities to provide an 
+          alias to the L3 PTP Port entity."
+     ::= { f3PtpL3PTPPortEntry 3 }
+
+f3PtpL3PTPPortOperationalState   OBJECT-TYPE
+    SYNTAX      OperationalState 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+          "This object represents the Operational State of the L3 PTP Port." 
+    ::= { f3PtpL3PTPPortEntry 4 }
+
+f3PtpL3PTPPortSecondaryState     OBJECT-TYPE
+    SYNTAX      SecondaryState 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "This object represents the Secondary State of the L3 PTP Port."
+    ::= { f3PtpL3PTPPortEntry 5 }
+                                 
+f3PtpL3PTPPortPortIdentity OBJECT-TYPE
+   SYNTAX     PortIdentity 
+   MAX-ACCESS read-only
+   STATUS     current
+   DESCRIPTION
+        "This object specifies the Port Identity of the L3 PTP Port." 
+    ::= { f3PtpL3PTPPortEntry 6 }                                                                
+                                 
+f3PtpL3PTPPortLocalPriority OBJECT-TYPE
+    SYNTAX     Unsigned32 (1..255) 
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "This object allows configuration of  local priority used by the L3 PTP Port." 
+     ::= { f3PtpL3PTPPortEntry 7 }
+
+f3PtpL3PTPPortPtpFlowPointEid OBJECT-TYPE
+    SYNTAX     VariablePointer 
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object associates the PTP Flow Point Eid."
+     ::= { f3PtpL3PTPPortEntry 8 }
+                                 
+                                 
+f3PtpL3PTPPortSyncMessageRate OBJECT-TYPE
+    SYNTAX     SyncMessageRate
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+        "This object allows specification of the L3 PTP Port Sync 
+         Message Rate." 
+     ::= { f3PtpL3PTPPortEntry 9 }
+                                 
+f3PtpL3PTPPortDelayReqRespMsgRate OBJECT-TYPE
+    SYNTAX     DelayReqMessageRate
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+        "This object allows specification of the L3 PTP Port Delay Response 
+         Message Rate." 
+     ::= { f3PtpL3PTPPortEntry 10 }
+                                 
+f3PtpL3PTPPortAnnounceMsgRate OBJECT-TYPE
+    SYNTAX     AnnounceMessageRate
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object allows specification of the L3 PTP Port Announce Message Rate."
+     ::= { f3PtpL3PTPPortEntry 11 }
+                   
+f3PtpL3PTPPortAnnounceReceiptTimeout OBJECT-TYPE
+    SYNTAX     Integer32 (2..255)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "This object allows specification of the L3 PTP Port Announce Message 
+         Receipt Timeout."
+     ::= { f3PtpL3PTPPortEntry 12 }
+
+f3PtpL3PTPPortSyncReceiptTimeout OBJECT-TYPE
+    SYNTAX     Integer32 (2..128)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "This object allows specification of the L3 PTP Port Sync Message 
+         Receipt Timeout."
+     ::= { f3PtpL3PTPPortEntry 13 }
+
+f3PtpL3PTPPortDelayRespTimeout OBJECT-TYPE
+    SYNTAX     Integer32 (2..128)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "This object allows specification of the L3 PTP Port Delay Response 
+         Message Receipt Timeout."
+     ::= { f3PtpL3PTPPortEntry 14 }
+
+f3PtpL3PTPPortPortState OBJECT-TYPE
+    SYNTAX     PtpPortState 
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object provides the L3 PTP Port state." 
+     ::= { f3PtpL3PTPPortEntry 15 }
+                          
+f3PtpL3PTPPortBmcaDecisionCode OBJECT-TYPE
+    SYNTAX     BMCARole 
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+         "This object provides the L3 PTP Port BMCA Role" 
+     ::= { f3PtpL3PTPPortEntry 16 }
+                          
+f3PtpL3PTPPortPeerClockClass OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "This object specify L3 PTP Port class."
+     ::= { f3PtpL3PTPPortEntry 17 }
+     
+f3PtpL3PTPPortMinimumExpectedClockClass OBJECT-TYPE
+    SYNTAX     Integer32 (0..255)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "Note: This value is only applicable for a dynamic or slave port that is 
+     related to a PTP clock, either a boundary clock or slave clock. 
+     Otherwise, this field is not applicable (N/A) and cannot be configured.  
+
+     This object allows setting the minimum expected clock class value,
+     which setes the minimum threshold for receiving packets.
+     if the received clock clock class is greater than the expected
+     clock class value, the packets for the grandmaster or boundary clock that
+     are sending this clock class are dropped.
+     In addition, an alarm called clock-class-mismatch is generated. The default is 247."
+     ::= { f3PtpL3PTPPortEntry 18 }                          
+ 
+f3PtpL3PTPPortIpProtocol OBJECT-TYPE
+    SYNTAX     IpVersion
+    MAX-ACCESS read-create 
+    STATUS     current
+    DESCRIPTION
+         "This object allows specification of the IP Protocol of the L3 PTP Port."
+     ::= { f3PtpL3PTPPortEntry 19 }
+
+f3PtpL3PTPPortIfName     OBJECT-TYPE
+    SYNTAX         DisplayString (SIZE(1..15))
+    MAX-ACCESS     read-create
+    STATUS         current
+    DESCRIPTION
+         "This object allows SNMP management entities to provide a
+          name to the L3 PTP Port IP interface."
+     ::= { f3PtpL3PTPPortEntry 20 }
+
+f3PtpL3PTPPortIpPriorityMapMode  OBJECT-TYPE
+    SYNTAX     IpPriorityMapMode 
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object enables specification of Priority Mapping Mode for
+          the  L3 PTP Port IP interface."
+     ::= { f3PtpL3PTPPortEntry 21 }
+
+f3PtpL3PTPPortIpPriority  OBJECT-TYPE
+    SYNTAX     Integer32 (0..63)
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This object enables specification of Priority Value for the
+          L3 PTP Port IP interface."
+     ::= { f3PtpL3PTPPortEntry 22 }
+
+f3PtpL3PTPPortIpV4Address OBJECT-TYPE
+    SYNTAX     IpAddress
+    MAX-ACCESS read-create 
+    STATUS     current
+    DESCRIPTION
+         "This object allows specification of the IPv4 Address of
+          the L3 PTP Port IP interface."
+     ::= { f3PtpL3PTPPortEntry 23 }
+
+f3PtpL3PTPPortIpV4SubnetMask OBJECT-TYPE
+    SYNTAX     IpAddress
+    MAX-ACCESS read-create 
+    STATUS     current
+    DESCRIPTION
+         "This object allows specification of the IPv4 Subnet Mask of
+          the L3 PTP Port IP interface."
+     ::= { f3PtpL3PTPPortEntry 24 }
+
+f3PtpL3PTPPortIpV6Address OBJECT-TYPE
+    SYNTAX     Ipv6Address 
+    MAX-ACCESS read-create
+    STATUS   current
+    DESCRIPTION
+         "This object allows specification of the unicast ipv6 Address of
+          the L3 PTP Port IP interface."
+    ::= { f3PtpL3PTPPortEntry 25 }
+
+f3PtpL3PTPPortIpV6AddrPrefixLength OBJECT-TYPE
+    SYNTAX     Integer32 
+    MAX-ACCESS read-create
+    STATUS   current
+    DESCRIPTION
+         "This object allows specification of the unicast IPv6 address prefix length of
+          the L3 PTP Port IP interface."
+    ::= { f3PtpL3PTPPortEntry 26 }
+
+
+f3PtpL3PTPPortDefaultGatewayControl OBJECT-TYPE
+    SYNTAX     ToggleValue
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+         "This attribute control Gateway address for the L3 PTP Port IP interface."
+     ::= { f3PtpL3PTPPortEntry 27 }
+
+f3PtpL3PTPPortGateway OBJECT-TYPE
+    SYNTAX     IpAddress
+    MAX-ACCESS read-create 
+    STATUS     current
+    DESCRIPTION
+         "This object allows specification of the IPv4 Gateway Address of
+          the L3 PTP Port IP interface."
+     ::= { f3PtpL3PTPPortEntry 28 }
+
+f3PtpL3PTPPortIpV6Gateway OBJECT-TYPE
+    SYNTAX     Ipv6Address 
+    MAX-ACCESS read-create
+    STATUS   current
+    DESCRIPTION
+         "This object allows specification of the IPv6 Gateway Address of
+          the L3 PTP Port IP interface."
+    ::= { f3PtpL3PTPPortEntry 29 }
+
+f3PtpL3PTPPortUnicastMessageNegEnabled OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS read-create 
+    STATUS     current
+    DESCRIPTION
+         "This object must be used to specify whether Unicast Message
+          Negotiation is enabled for the L3 PTP Port."
+     ::= { f3PtpL3PTPPortEntry 30 }
+
+f3PtpL3PTPPortTransmitDuration  OBJECT-TYPE 
+    SYNTAX     Integer32 (60..1000)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "This object specifices Duration Field in the REQUEST_UNICAST_TRANSMISSION_TLV."
+     ::= { f3PtpL3PTPPortEntry 31 }
+
+f3PtpL3PTPPortRequestUnicastTimeout  OBJECT-TYPE 
+    SYNTAX     Integer32 (1..600)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "This object allows specification of the Request Unicast 
+         Timeout in seconds.  Unicast transmission is termed as
+         failed when this timeout occurs."
+     ::= { f3PtpL3PTPPortEntry 32 }
+
+f3PtpL3PTPPortRequestUnicastRestartTimer  OBJECT-TYPE 
+    SYNTAX     Integer32 (30..1800)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "This object allows specification of the time (in seconds) to wait
+         to restart the Request Unicast signalling." 
+     ::= { f3PtpL3PTPPortEntry 33 }
+
+f3PtpL3PTPPortMasterIpV4Address OBJECT-TYPE
+    SYNTAX     IpAddress
+    MAX-ACCESS read-create 
+    STATUS     current
+    DESCRIPTION
+         "This object allows specification of the IPv4 Address of
+          the PTP Master."
+     ::= { f3PtpL3PTPPortEntry 34 }
+
+f3PtpL3PTPPortMasterIpV6Address OBJECT-TYPE
+    SYNTAX     Ipv6Address 
+    MAX-ACCESS read-create
+    STATUS   current
+    DESCRIPTION
+         "This object allows specification of the unicast ipv6 Address of
+          the PTP Master."
+    ::= { f3PtpL3PTPPortEntry 35 }
+
+f3PtpL3PTPPortDelayAsymmetryComp OBJECT-TYPE
+    SYNTAX     CompensationMode
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "This object allows configuration of asymmetry delay
+        compensation mode."   
+     ::= { f3PtpL3PTPPortEntry 36 }
+
+f3PtpL3PTPPortAutoAsymmetryCompStatus OBJECT-TYPE
+    SYNTAX     CompensationStatus  
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "This object provides the automatic delay asymmetry 
+        compensation status." 
+     ::= { f3PtpL3PTPPortEntry 37 }
+
+f3PtpL3PTPPortDelayAsymmetry OBJECT-TYPE
+    SYNTAX     Integer32 (-10000000..10000000)
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "This object is used for manual configuration of delay asymmetry
+        in ns if delay asymmetry compensation is Manual.
+        Or for indication of the measured delay asymmetry if
+        delay asymmetry compensation is automatic."
+     ::= { f3PtpL3PTPPortEntry 38 }
+
+f3PtpL3PTPPortStorageType OBJECT-TYPE
+    SYNTAX     StorageType
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+            "The type of storage configured for this entry."
+    ::= { f3PtpL3PTPPortEntry 39 }
+
+f3PtpL3PTPPortRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+           "The status of this row.  An entry MUST NOT exist in the 
+            active state unless all objects in the entry have an 
+            appropriate value, as described
+            in the description clause for each writable object.
+
+            The values of f3PtpPTPPortRowStatus supported are
+            createAndGo(4) and destroy(6).  All mandatory attributes
+            must be specified in a single SNMP SET request with
+            f3PtpPTPPortRowStatus value as createAndGo(4).
+            Upon successful row creation, this object has a
+            value of active(1).
+
+            The f3PtpPTPPortRowStatus object may be modified if
+            the associated instance of this object is equal to active(1)."
+    ::= { f3PtpL3PTPPortEntry 40 }
+
+--
 -- PERFORMANCE 
-----------------------------------------------------------------
+--
 --
 -- Access Port PTP Flow Point Current Statistics Table
---- f3PtpAccPortFlowPointStats : f3PtpPerformanceObjects 1
+--
 f3PtpAccPortFlowPointStatsTable OBJECT-TYPE
     SYNTAX      SEQUENCE OF F3PtpAccPortFlowPointStatsEntry
     MAX-ACCESS  not-accessible
@@ -5424,9 +6687,10 @@ f3PtpAccPortFlowPointStatsTagNoMatchDiscards OBJECT-TYPE
      DESCRIPTION
          "The tag no match discards messages."
      ::= { f3PtpAccPortFlowPointStatsEntry 40 }
+
 --
 -- Access Port PTP Flow Point History Table
---- f3PtpAccPortFlowPointHistory : f3PtpPerformanceObjects 2
+--
 f3PtpAccPortFlowPointHistoryTable OBJECT-TYPE
     SYNTAX      SEQUENCE OF F3PtpAccPortFlowPointHistoryEntry
     MAX-ACCESS  not-accessible
@@ -5813,9 +7077,10 @@ f3PtpAccPortFlowPointHistoryTagNoMatchDiscards OBJECT-TYPE
      DESCRIPTION
          "The tag no match discards messages."
      ::= { f3PtpAccPortFlowPointHistoryEntry 40 }
+
 --
 -- Access Port PTP Flow Point Threshold Table
---- f3PtpAccPortFlowPointThreshold : f3PtpPerformanceObjects 3
+--
 f3PtpAccPortFlowPointThresholdTable OBJECT-TYPE
     SYNTAX      SEQUENCE OF F3PtpAccPortFlowPointThresholdEntry
     MAX-ACCESS  not-accessible
@@ -5898,7 +7163,7 @@ f3PtpAccPortFlowPointThresholdMonValue OBJECT-TYPE
 
 --
 -- Network Port PTP Flow Point Current Statistics Table
---- f3PtpNetPortFlowPointStats : f3PtpPerformanceObjects 4
+--
 f3PtpNetPortFlowPointStatsTable OBJECT-TYPE
     SYNTAX      SEQUENCE OF F3PtpNetPortFlowPointStatsEntry
     MAX-ACCESS  not-accessible
@@ -6289,9 +7554,10 @@ f3PtpNetPortFlowPointStatsTagNoMatchDiscards OBJECT-TYPE
      DESCRIPTION
          "The tag no match discards messages."
      ::= { f3PtpNetPortFlowPointStatsEntry 40 }
+
 --
 -- Network Port PTP Flow Point History Table
---- f3PtpNetPortFlowPointHistory : f3PtpPerformanceObjects 5
+--
 f3PtpNetPortFlowPointHistoryTable OBJECT-TYPE
     SYNTAX      SEQUENCE OF F3PtpNetPortFlowPointHistoryEntry
     MAX-ACCESS  not-accessible
@@ -6677,9 +7943,10 @@ f3PtpNetPortFlowPointHistoryTagNoMatchDiscards OBJECT-TYPE
      DESCRIPTION
          "The Tag no match discards messages."
      ::= { f3PtpNetPortFlowPointHistoryEntry 40 }
+
 --
 -- Network Port PTP Flow Point Threshold Table
---- f3PtpNetPortFlowPointThreshold : f3PtpPerformanceObjects 6
+--
 f3PtpNetPortFlowPointThresholdTable OBJECT-TYPE
     SYNTAX      SEQUENCE OF F3PtpNetPortFlowPointThresholdEntry
     MAX-ACCESS  not-accessible
@@ -6762,7 +8029,7 @@ f3PtpNetPortFlowPointThresholdMonValue OBJECT-TYPE
 
 --
 -- Slave Only Ordinary Clock Current Statistics Table
---- f3PtpSOOCStats : f3PtpPerformanceObjects 7
+--
 f3PtpSOOCStatsTable OBJECT-TYPE
     SYNTAX      SEQUENCE OF F3PtpSOOCStatsEntry
     MAX-ACCESS  not-accessible
@@ -7127,7 +8394,7 @@ f3PtpSOOCStatsNumClockRecTransients OBJECT-TYPE
 
 --
 -- Slave Only Ordinary Clock History Table
---- f3PtpSOOCHistory : f3PtpPerformanceObjects 8
+--
 f3PtpSOOCHistoryTable OBJECT-TYPE
     SYNTAX      SEQUENCE OF F3PtpSOOCHistoryEntry
     MAX-ACCESS  not-accessible
@@ -7489,7 +8756,7 @@ f3PtpSOOCHistoryNumClockRecTransients OBJECT-TYPE
 
 --
 -- Slave Only Ordinary Clock Threshold Table
---- f3PtpSOOCThreshold : f3PtpPerformanceObjects 9
+--
 f3PtpSOOCThresholdTable OBJECT-TYPE
     SYNTAX      SEQUENCE OF F3PtpSOOCThresholdEntry
     MAX-ACCESS  not-accessible
@@ -7586,7 +8853,7 @@ f3PtpSOOCThresholdMonValue OBJECT-TYPE
 
 --
 -- Telecom Slave Current Statistics Table
---- f3PtpTSStats : f3PtpPerformanceObjects 10
+--
 f3PtpTSStatsTable OBJECT-TYPE
     SYNTAX      SEQUENCE OF F3PtpTSStatsEntry
     MAX-ACCESS  not-accessible
@@ -7705,9 +8972,9 @@ f3PtpTSStatsTotalTimePR3 OBJECT-TYPE
          "Total Time in seconds Phase Recovery Score is 3."
      ::= { f3PtpTSStatsEntry 10 }
 
-
+--
 -- Telecom Slave History Table
---- f3PtpTSHistory : f3PtpPerformanceObjects 11
+--
 f3PtpTSHistoryTable OBJECT-TYPE
     SYNTAX      SEQUENCE OF F3PtpTSHistoryEntry
     MAX-ACCESS  not-accessible
@@ -7826,7 +9093,7 @@ f3PtpTSHistoryTotalTimePR3 OBJECT-TYPE
 
 --
 -- Telecom Slave Threshold Table
---- f3PtpTSThreshold : f3PtpPerformanceObjects 12
+--
 f3PtpTSThresholdTable OBJECT-TYPE
     SYNTAX      SEQUENCE OF F3PtpTSThresholdEntry
     MAX-ACCESS  not-accessible
@@ -7906,9 +9173,9 @@ f3PtpTSThresholdMonValue OBJECT-TYPE
         "Monitored value corresponding to f3PtpTSThresholdVariable."
     ::= { f3PtpTSThresholdEntry 6 }
 
-
+--
 -- Master Clock Interface current data
---- f3PtpMCIStats : f3PtpPerformanceObjects 13
+--
 f3PtpMCIStatsTable OBJECT-TYPE
     SYNTAX      SEQUENCE OF F3PtpMCIStatsEntry
     MAX-ACCESS  not-accessible
@@ -8059,9 +9326,9 @@ f3PtpMCIStatsDynamicSlavesDropped OBJECT-TYPE
              lease expired."
     ::= { f3PtpMCIStatsEntry 13 }
 
-
+--
 -- Master Clock Interface history data
---- f3PtpMCIHistory : f3PtpPerformanceObjects 14
+--
 f3PtpMCIHistoryTable OBJECT-TYPE
     SYNTAX      SEQUENCE OF F3PtpMCIHistoryEntry
     MAX-ACCESS  not-accessible
@@ -8208,9 +9475,9 @@ f3PtpMCIHistoryDynamicSlavesDropped OBJECT-TYPE
              lease expired."
     ::= { f3PtpMCIHistoryEntry 13 }
 
-
+--
 -- Master Clock Interface Threshold Table
---- f3PtpMCIThreshold : f3PtpPerformanceObjects 15
+--
 f3PtpMCIThresholdTable OBJECT-TYPE
     SYNTAX      SEQUENCE OF F3PtpMCIThresholdEntry
     MAX-ACCESS  not-accessible
@@ -8290,9 +9557,9 @@ f3PtpMCIThresholdMonValue OBJECT-TYPE
         "Monitored value corresponding to f3PtpMCIThresholdVariable."
     ::= { f3PtpMCIThresholdEntry 6 }
 
-
+--
 -- Remote Slave current data
---- f3PtpRemoteSlaveStats : f3PtpPerformanceObjects 16
+--
 f3PtpRemoteSlaveStatsTable OBJECT-TYPE
     SYNTAX      SEQUENCE OF F3PtpRemoteSlaveStatsEntry
     MAX-ACCESS  not-accessible
@@ -8486,9 +9753,9 @@ f3PtpRemoteSlaveStatsTimesAnnounceLeaseExp OBJECT-TYPE
             "Count of Announce service lease duration expired events."
     ::= { f3PtpRemoteSlaveStatsEntry 18 }
 
-
+--
 -- Remote Slave history data
---- f3PtpRemoteSlaveHistory : f3PtpPerformanceObjects 17
+--
 f3PtpRemoteSlaveHistoryTable OBJECT-TYPE
     SYNTAX      SEQUENCE OF F3PtpRemoteSlaveHistoryEntry
     MAX-ACCESS  not-accessible
@@ -8658,9 +9925,9 @@ f3PtpRemoteSlaveHistoryTimesAnnounceLeaseExp OBJECT-TYPE
             "Count of Announce service lease duration expired events."
     ::= { f3PtpRemoteSlaveHistoryEntry 16 }
 
-
+--
 -- Remote Slave Threshold Table
---- f3PtpRemoteSlaveThreshold : f3PtpPerformanceObjects 18
+--
 f3PtpRemoteSlaveThresholdTable OBJECT-TYPE
     SYNTAX      SEQUENCE OF F3PtpRemoteSlaveThresholdEntry
     MAX-ACCESS  not-accessible
@@ -8740,9 +10007,9 @@ f3PtpRemoteSlaveThresholdMonValue OBJECT-TYPE
         "Monitored value corresponding to f3PtpRemoteSlaveThresholdVariable."
     ::= { f3PtpRemoteSlaveThresholdEntry 6 }
 
-
+--
 -- Traffic Port PTP Flow Point Current Statistics Table
---- f3PtpTrafficPortFlowPointStats : f3PtpPerformanceObjects 19
+--
 f3PtpTrafficPortFlowPointStatsTable OBJECT-TYPE
     SYNTAX      SEQUENCE OF F3PtpTrafficPortFlowPointStatsEntry
    MAX-ACCESS  not-accessible
@@ -9138,7 +10405,7 @@ f3PtpTrafficPortFlowPointStatsTagNoMatchDiscards OBJECT-TYPE
 
 --
 -- Traffic Port PTP Flow Point History Table
---- f3PtpTrafficPortFlowPointHistory : f3PtpPerformanceObjects 20
+--
 f3PtpTrafficPortFlowPointHistoryTable OBJECT-TYPE
     SYNTAX      SEQUENCE OF F3PtpTrafficPortFlowPointHistoryEntry
    MAX-ACCESS  not-accessible
@@ -9529,7 +10796,7 @@ f3PtpTrafficPortFlowPointHistoryTagNoMatchDiscards OBJECT-TYPE
 
 --
 -- Traffic Port PTP Flow Point Threshold Table
---- f3PtpTrafficPortFlowPointThreshold : f3PtpPerformanceObjects 21
+--
 f3PtpTrafficPortFlowPointThresholdTable OBJECT-TYPE
     SYNTAX      SEQUENCE OF F3PtpTrafficPortFlowPointThresholdEntry
    MAX-ACCESS  not-accessible
@@ -9938,7 +11205,7 @@ f3PtpTrafficPortFlowPointThresholdMonValue OBJECT-TYPE
 
 --
 -- PTP Port Current Statistics Table
---- f3PtpPTPPortStats : f3PtpPerformanceObjects 22
+--
 f3PtpPTPPortStatsTable OBJECT-TYPE
     SYNTAX      SEQUENCE OF F3PtpPTPPortStatsEntry
     MAX-ACCESS  not-accessible
@@ -10081,7 +11348,7 @@ f3PtpPTPPortStatsMessagesWrongLengthDiscards OBJECT-TYPE
 f3PtpPTPPortStatsUnknownMasterDiscards OBJECT-TYPE
      SYNTAX     PerfCounter64
      MAX-ACCESS read-only
-     STATUS     current
+     STATUS     deprecated
      DESCRIPTION
          "Unknown Master Discards."
      ::= { f3PtpPTPPortStatsEntry 12 }
@@ -10162,14 +11429,14 @@ f3PtpPTPPortStatsAvgMeanPathDelay OBJECT-TYPE
 f3PtpPTPPortStatsMsgMiscDiscards OBJECT-TYPE
      SYNTAX     PerfCounter64
      MAX-ACCESS read-only
-     STATUS     current
+     STATUS     deprecated
      DESCRIPTION
          "Number of received packets discarded due to miscellaneous reasons."
      ::= { f3PtpPTPPortStatsEntry 22 }
 
 --
 -- PTP Port Current History Table
---- f3PtpPTPPortHistory : f3PtpPerformanceObjects 23
+--
 f3PtpPTPPortHistoryTable OBJECT-TYPE
     SYNTAX      SEQUENCE OF F3PtpPTPPortHistoryEntry
     MAX-ACCESS  not-accessible
@@ -10311,7 +11578,7 @@ f3PtpPTPPortHistoryMessagesWrongLengthDiscards OBJECT-TYPE
 f3PtpPTPPortHistoryUnknownMasterDiscards OBJECT-TYPE
      SYNTAX     PerfCounter64
      MAX-ACCESS read-only
-     STATUS     current
+     STATUS     deprecated
      DESCRIPTION
          "Unknown Master Discards."
      ::= { f3PtpPTPPortHistoryEntry 12 }
@@ -10391,14 +11658,14 @@ f3PtpPTPPortHistoryAvgMeanPathDelay OBJECT-TYPE
 f3PtpPTPPortHistoryMsgMiscDiscards OBJECT-TYPE
      SYNTAX     PerfCounter64
      MAX-ACCESS read-only
-     STATUS     current
+     STATUS     deprecated
      DESCRIPTION
          "Number of received packets discarded due to miscellaneous reasons."
      ::= { f3PtpPTPPortHistoryEntry 22 }
 
 --
 -- PTP Port Threshold Table
---- f3PtpPTPPortThreshold : f3PtpPerformanceObjects 24
+--
 f3PtpPTPPortThresholdTable OBJECT-TYPE
     SYNTAX      SEQUENCE OF F3PtpPTPPortThresholdEntry
     MAX-ACCESS  not-accessible
@@ -10630,7 +11897,7 @@ f3PtpPTPClockStatsAvgMeanPathDelay OBJECT-TYPE
      ::= { f3PtpPTPClockStatsEntry 13 }
 
 --
--- PTP Port Current History Table
+-- PTP Clock Current History Table
 --
 f3PtpPTPClockHistoryTable OBJECT-TYPE
     SYNTAX      SEQUENCE OF F3PtpPTPClockHistoryEntry
@@ -10780,7 +12047,7 @@ f3PtpPTPClockHistoryAvgMeanPathDelay OBJECT-TYPE
 
 
 --
--- PTP Port Threshold Table
+-- PTP Clock Threshold Table
 --
 f3PtpPTPClockThresholdTable OBJECT-TYPE
     SYNTAX      SEQUENCE OF F3PtpPTPClockThresholdEntry
@@ -10861,10 +12128,552 @@ f3PtpPTPClockThresholdMonValue OBJECT-TYPE
         "Monitored value corresponding to f3PtpPTPClockThresholdVariable."
     ::= { f3PtpPTPClockThresholdEntry 6 }
 
---------------------------------------------------------------------------
+--
+-- L3 PTP Port Current Statistics Table
+--
+f3PtpL3PTPPortStatsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF F3PtpL3PTPPortStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A collection of PTP Port related statistics.  
+             These reflect the current data."
+    ::= { f3PtpPerformanceObjects 28 }
+
+f3PtpL3PTPPortStatsEntry OBJECT-TYPE
+    SYNTAX      F3PtpL3PTPPortStatsEntry 
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A conceptual row in the f3PtpL3PTPPortStatsTable.
+             Entries exist in this table for each L3 PTP Port."
+    INDEX { neIndex, f3PtpPTPClockIndex, f3PtpL3PTPPortIndex, f3PtpL3PTPPortStatsIndex }
+ 
+    ::= { f3PtpL3PTPPortStatsTable 1 }
+
+F3PtpL3PTPPortStatsEntry ::= SEQUENCE {
+    f3PtpL3PTPPortStatsIndex                        Integer32,
+    f3PtpL3PTPPortStatsIntervalType                 CmPmIntervalType,
+    f3PtpL3PTPPortStatsValid                        TruthValue,
+    f3PtpL3PTPPortStatsAction                       CmPmBinAction,
+    f3PtpL3PTPPortStatsAvgAnnounceRate              Unsigned32,
+    f3PtpL3PTPPortStatsAvgSyncRate                  Unsigned32,
+    f3PtpL3PTPPortStatsAvgDelayReqRate              Unsigned32,
+    f3PtpL3PTPPortStatsAvgDelayRespRate             Unsigned32,
+    f3PtpL3PTPPortStatsMismatchDomainDiscards       PerfCounter64,
+    f3PtpL3PTPPortStatsMessageWrongTypeDiscards     PerfCounter64,
+    f3PtpL3PTPPortStatsMessagesWrongLengthDiscards  PerfCounter64,
+    f3PtpL3PTPPortStatsUnknownMasterDiscards        PerfCounter64,
+    f3PtpL3PTPPortStatsMinOffsetFromMaster          PerfCounter64,
+    f3PtpL3PTPPortStatsMaxOffsetFromMaster          PerfCounter64,
+    f3PtpL3PTPPortStatsAvgOffsetFromMaster          PerfCounter64,
+    f3PtpL3PTPPortStatsMinSyncPathDelay             PerfCounter64,
+    f3PtpL3PTPPortStatsMaxSyncPathDelay             PerfCounter64,
+    f3PtpL3PTPPortStatsAvgSyncPathDelay             PerfCounter64,
+    f3PtpL3PTPPortStatsMinMeanPathDelay             PerfCounter64,
+    f3PtpL3PTPPortStatsMaxMeanPathDelay             PerfCounter64,
+    f3PtpL3PTPPortStatsAvgMeanPathDelay             PerfCounter64,
+    f3PtpL3PTPPortStatsMsgMiscDiscards              PerfCounter64
+}
+
+f3PtpL3PTPPortStatsIndex OBJECT-TYPE
+    SYNTAX      Integer32 (1..4)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "An arbitrary integer index value used to uniquely identify
+            this PTP Port statistics entry. 
+            1 - 15min
+            2 - 1day
+            3 - rollover
+            4 - 5min"
+    ::= { f3PtpL3PTPPortStatsEntry 1 }
+
+f3PtpL3PTPPortStatsIntervalType OBJECT-TYPE
+    SYNTAX      CmPmIntervalType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Indicates the type of collection, i.e. whether it is
+             15 Min, 1 Day or rollover."
+    ::= { f3PtpL3PTPPortStatsEntry 2 }
+
+f3PtpL3PTPPortStatsValid OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Indicates the validity of the bin."
+    ::= { f3PtpL3PTPPortStatsEntry 3 }
+
+f3PtpL3PTPPortStatsAction OBJECT-TYPE
+    SYNTAX      CmPmBinAction
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "Allows the Manager to clear the bin."
+    ::= { f3PtpL3PTPPortStatsEntry 4 }
+
+f3PtpL3PTPPortStatsAvgAnnounceRate OBJECT-TYPE
+     SYNTAX     Unsigned32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "Avg Announce Rate."
+     ::= { f3PtpL3PTPPortStatsEntry 5 }
+
+f3PtpL3PTPPortStatsAvgSyncRate OBJECT-TYPE
+     SYNTAX     Unsigned32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "Avg Sync Rate."
+     ::= { f3PtpL3PTPPortStatsEntry 6 }
+
+f3PtpL3PTPPortStatsAvgDelayReqRate OBJECT-TYPE
+     SYNTAX     Unsigned32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "Avg Delay Req Rate."
+     ::= { f3PtpL3PTPPortStatsEntry 7 }
+
+f3PtpL3PTPPortStatsAvgDelayRespRate OBJECT-TYPE
+     SYNTAX     Unsigned32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "Avg Delay Resp Rate."
+     ::= { f3PtpL3PTPPortStatsEntry 8 }
+
+f3PtpL3PTPPortStatsMismatchDomainDiscards OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "Mismatch Domain Discards."
+     ::= { f3PtpL3PTPPortStatsEntry 9 }
+
+f3PtpL3PTPPortStatsMessageWrongTypeDiscards OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "Message Wrong Type Discards."
+     ::= { f3PtpL3PTPPortStatsEntry 10 }
+
+f3PtpL3PTPPortStatsMessagesWrongLengthDiscards OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "Messages Wrong Length Discards."
+     ::= { f3PtpL3PTPPortStatsEntry 11 }
+
+f3PtpL3PTPPortStatsUnknownMasterDiscards OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     deprecated
+     DESCRIPTION
+         "Unknown Master Discards."
+     ::= { f3PtpL3PTPPortStatsEntry 12 }
+
+f3PtpL3PTPPortStatsMinOffsetFromMaster OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "Min Offset From Master."
+     ::= { f3PtpL3PTPPortStatsEntry 13 }
+
+f3PtpL3PTPPortStatsMaxOffsetFromMaster OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "Max Offset From Master."
+     ::= { f3PtpL3PTPPortStatsEntry 14 }
+
+f3PtpL3PTPPortStatsAvgOffsetFromMaster OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "Avg Offset From Master."
+     ::= { f3PtpL3PTPPortStatsEntry 15 }
+
+f3PtpL3PTPPortStatsMinSyncPathDelay OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "Min Sync Path Delay."
+     ::= { f3PtpL3PTPPortStatsEntry 16 }
+
+f3PtpL3PTPPortStatsMaxSyncPathDelay OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "Max Sync Path Delay."
+     ::= { f3PtpL3PTPPortStatsEntry 17 }
+
+f3PtpL3PTPPortStatsAvgSyncPathDelay OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "Avg Sync Path Delay."
+     ::= { f3PtpL3PTPPortStatsEntry 18 }
+
+
+f3PtpL3PTPPortStatsMinMeanPathDelay OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "Min Mean Path Delay."
+     ::= { f3PtpL3PTPPortStatsEntry 19 }
+
+f3PtpL3PTPPortStatsMaxMeanPathDelay OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "Max Mean Path Delay."
+     ::= { f3PtpL3PTPPortStatsEntry 20 }
+
+f3PtpL3PTPPortStatsAvgMeanPathDelay OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "Avg Mean Path Delay."
+     ::= { f3PtpL3PTPPortStatsEntry 21 }
+
+f3PtpL3PTPPortStatsMsgMiscDiscards OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     deprecated
+     DESCRIPTION
+         "Number of received packets discarded due to miscellaneous reasons."
+     ::= { f3PtpL3PTPPortStatsEntry 22 }
+
+--
+-- L3 PTP Port Current History Table
+--
+f3PtpL3PTPPortHistoryTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF F3PtpL3PTPPortHistoryEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A collection of PTP Port related statistics.  
+             These reflect the current data."
+    ::= { f3PtpPerformanceObjects 29 }
+
+f3PtpL3PTPPortHistoryEntry OBJECT-TYPE
+    SYNTAX      F3PtpL3PTPPortHistoryEntry 
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A conceptual row in the f3PtpL3PTPPortHistoryTable.
+             Entries exist in this table for each PTP Port."
+    INDEX { neIndex, f3PtpPTPClockIndex, f3PtpL3PTPPortIndex,  f3PtpL3PTPPortStatsIndex, f3PtpL3PTPPortHistoryIndex }
+
+    ::= { f3PtpL3PTPPortHistoryTable 1 }
+
+F3PtpL3PTPPortHistoryEntry ::= SEQUENCE {
+    f3PtpL3PTPPortHistoryIndex                        Integer32,
+    f3PtpL3PTPPortHistoryTime                         DateAndTime,
+    f3PtpL3PTPPortHistoryValid                        TruthValue,
+    f3PtpL3PTPPortHistoryAction                       CmPmBinAction,
+    f3PtpL3PTPPortHistoryAvgAnnounceRate              Unsigned32,
+    f3PtpL3PTPPortHistoryAvgSyncRate                  Unsigned32,
+    f3PtpL3PTPPortHistoryAvgDelayReqRate              Unsigned32,
+    f3PtpL3PTPPortHistoryAvgDelayRespRate             Unsigned32,
+    f3PtpL3PTPPortHistoryMismatchDomainDiscards       PerfCounter64,
+    f3PtpL3PTPPortHistoryMessageWrongTypeDiscards     PerfCounter64,
+    f3PtpL3PTPPortHistoryMessagesWrongLengthDiscards  PerfCounter64,
+    f3PtpL3PTPPortHistoryUnknownMasterDiscards        PerfCounter64,
+    f3PtpL3PTPPortHistoryMinOffsetFromMaster          PerfCounter64,
+    f3PtpL3PTPPortHistoryMaxOffsetFromMaster          PerfCounter64,
+    f3PtpL3PTPPortHistoryAvgOffsetFromMaster          PerfCounter64,
+    f3PtpL3PTPPortHistoryMinSyncPathDelay             PerfCounter64,
+    f3PtpL3PTPPortHistoryMaxSyncPathDelay             PerfCounter64,
+    f3PtpL3PTPPortHistoryAvgSyncPathDelay             PerfCounter64,
+    f3PtpL3PTPPortHistoryMinMeanPathDelay             PerfCounter64,
+    f3PtpL3PTPPortHistoryMaxMeanPathDelay             PerfCounter64,
+    f3PtpL3PTPPortHistoryAvgMeanPathDelay             PerfCounter64,
+    f3PtpL3PTPPortHistoryMsgMiscDiscards              PerfCounter64
+}
+
+f3PtpL3PTPPortHistoryIndex OBJECT-TYPE
+    SYNTAX      Integer32 (1..4)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "An arbitrary integer index value used to uniquely identify
+            this PTP Port statistics entry. 
+            1 - 15min
+            2 - 1day
+            3 - rollover
+            4 - 5min"
+    ::= { f3PtpL3PTPPortHistoryEntry 1 }
+
+f3PtpL3PTPPortHistoryTime OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Indicates the time of history bin creation." 
+    ::= { f3PtpL3PTPPortHistoryEntry 2 }
+
+f3PtpL3PTPPortHistoryValid OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Indicates the validity of the bin."
+    ::= { f3PtpL3PTPPortHistoryEntry 3 }
+
+f3PtpL3PTPPortHistoryAction OBJECT-TYPE
+    SYNTAX      CmPmBinAction
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "Allows the Manager to clear the bin."
+    ::= { f3PtpL3PTPPortHistoryEntry 4 }
+
+f3PtpL3PTPPortHistoryAvgAnnounceRate OBJECT-TYPE
+     SYNTAX     Unsigned32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "Avg Announce Rate."
+     ::= { f3PtpL3PTPPortHistoryEntry 5 }
+
+f3PtpL3PTPPortHistoryAvgSyncRate OBJECT-TYPE
+     SYNTAX     Unsigned32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "Avg Sync Rate."
+     ::= { f3PtpL3PTPPortHistoryEntry 6 }
+
+f3PtpL3PTPPortHistoryAvgDelayReqRate OBJECT-TYPE
+     SYNTAX     Unsigned32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "Avg Delay Req Rate."
+     ::= { f3PtpL3PTPPortHistoryEntry 7 }
+
+f3PtpL3PTPPortHistoryAvgDelayRespRate OBJECT-TYPE
+     SYNTAX     Unsigned32
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "Avg Delay Resp Rate."
+     ::= { f3PtpL3PTPPortHistoryEntry 8 }
+
+f3PtpL3PTPPortHistoryMismatchDomainDiscards OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "Mismatch Domain Discards."
+     ::= { f3PtpL3PTPPortHistoryEntry 9 }
+
+f3PtpL3PTPPortHistoryMessageWrongTypeDiscards OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "Message Wrong Type Discards."
+     ::= { f3PtpL3PTPPortHistoryEntry 10 }
+
+f3PtpL3PTPPortHistoryMessagesWrongLengthDiscards OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "Messages Wrong Length Discards."
+     ::= { f3PtpL3PTPPortHistoryEntry 11 }
+
+f3PtpL3PTPPortHistoryUnknownMasterDiscards OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     deprecated
+     DESCRIPTION
+         "Unknown Master Discards."
+     ::= { f3PtpL3PTPPortHistoryEntry 12 }
+
+f3PtpL3PTPPortHistoryMinOffsetFromMaster OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "Min Offset From Master."
+     ::= { f3PtpL3PTPPortHistoryEntry 13 }
+
+f3PtpL3PTPPortHistoryMaxOffsetFromMaster OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "Max Offset From Master."
+     ::= { f3PtpL3PTPPortHistoryEntry 14 }
+
+f3PtpL3PTPPortHistoryAvgOffsetFromMaster OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "Avg Offset From Master."
+     ::= { f3PtpL3PTPPortHistoryEntry 15 }
+
+f3PtpL3PTPPortHistoryMinSyncPathDelay OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "Min Sync Path Delay."
+     ::= { f3PtpL3PTPPortHistoryEntry 16 }
+
+f3PtpL3PTPPortHistoryMaxSyncPathDelay OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "Max Sync Path Delay."
+     ::= { f3PtpL3PTPPortHistoryEntry 17 }
+
+f3PtpL3PTPPortHistoryAvgSyncPathDelay OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "Avg Sync Path Delay."
+     ::= { f3PtpL3PTPPortHistoryEntry 18 }
+
+f3PtpL3PTPPortHistoryMinMeanPathDelay OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "Min Mean Path Delay."
+     ::= { f3PtpL3PTPPortHistoryEntry 19 }
+
+f3PtpL3PTPPortHistoryMaxMeanPathDelay OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "Max Mean Path Delay."
+     ::= { f3PtpL3PTPPortHistoryEntry 20 }
+
+f3PtpL3PTPPortHistoryAvgMeanPathDelay OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+         "Avg Mean Path Delay."
+     ::= { f3PtpL3PTPPortHistoryEntry 21 }
+
+f3PtpL3PTPPortHistoryMsgMiscDiscards OBJECT-TYPE
+     SYNTAX     PerfCounter64
+     MAX-ACCESS read-only
+     STATUS     deprecated
+     DESCRIPTION
+         "Number of received packets discarded due to miscellaneous reasons."
+     ::= { f3PtpL3PTPPortHistoryEntry 22 }
+
+--
+-- L3 PTP Port Threshold Table
+--
+f3PtpL3PTPPortThresholdTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF F3PtpL3PTPPortThresholdEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A table of entries that allow manageability of 
+             PTP Port Thresholds."
+    ::= { f3PtpPerformanceObjects 30 }
+
+f3PtpL3PTPPortThresholdEntry OBJECT-TYPE
+    SYNTAX      F3PtpL3PTPPortThresholdEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A conceptual row in the f3PtpL3PTPPortThresholdTable."
+    INDEX { neIndex, f3PtpPTPClockIndex, f3PtpL3PTPPortIndex,  
+            f3PtpL3PTPPortStatsIndex, f3PtpL3PTPPortThresholdIndex }
+    ::= { f3PtpL3PTPPortThresholdTable 1 }
+
+F3PtpL3PTPPortThresholdEntry ::= SEQUENCE {
+    f3PtpL3PTPPortThresholdIndex       Integer32,
+    f3PtpL3PTPPortThresholdInterval    CmPmIntervalType,
+    f3PtpL3PTPPortThresholdVariable    VariablePointer,
+    f3PtpL3PTPPortThresholdValueLo     Unsigned32,
+    f3PtpL3PTPPortThresholdValueHi     Unsigned32,
+    f3PtpL3PTPPortThresholdMonValue    PerfCounter64
+}
+
+f3PtpL3PTPPortThresholdIndex OBJECT-TYPE
+    SYNTAX     Integer32 (1..65535)
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "An index that uniquely identifies an entry in the
+        f3PtpL3PTPPortThresholdTable."
+    ::= { f3PtpL3PTPPortThresholdEntry 1 }
+
+f3PtpL3PTPPortThresholdInterval OBJECT-TYPE
+    SYNTAX     CmPmIntervalType
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The interval over which monitored value is
+        sampled and compared with the specified threshold."
+    ::= { f3PtpL3PTPPortThresholdEntry 2 }
+
+f3PtpL3PTPPortThresholdVariable OBJECT-TYPE
+    SYNTAX     VariablePointer
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The object identifier of the particular variable to be
+        sampled."
+    ::= { f3PtpL3PTPPortThresholdEntry 3 }
+
+f3PtpL3PTPPortThresholdValueLo OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "Lower 32 bits of the threshold value."
+    ::= { f3PtpL3PTPPortThresholdEntry 4 }
+
+f3PtpL3PTPPortThresholdValueHi OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "Higher 32 bits of the threshold value."
+    ::= { f3PtpL3PTPPortThresholdEntry 5 }
+
+f3PtpL3PTPPortThresholdMonValue OBJECT-TYPE
+    SYNTAX     PerfCounter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Monitored value corresponding to f3PtpL3PTPPortThresholdVariable."
+    ::= { f3PtpL3PTPPortThresholdEntry 6 }
+
+
+---
 ---Notifications
---------------------------------------------------------------------------
---- 
+---
 f3PtpAccPortFlowPointThresholdCrossingAlert NOTIFICATION-TYPE
     OBJECTS {
         f3PtpAccPortFlowPointThresholdIndex,
@@ -11020,6 +12829,22 @@ f3PtpPTPClockCrossingAlert NOTIFICATION-TYPE
   ::= { f3PtpPerformanceNotifications 9 }
 
 
+f3PtpL3PTPPortCrossingAlert NOTIFICATION-TYPE
+    OBJECTS {
+        f3PtpL3PTPPortThresholdIndex,
+        f3PtpL3PTPPortThresholdInterval,
+        f3PtpL3PTPPortThresholdVariable,
+        f3PtpL3PTPPortThresholdValueLo,
+        f3PtpL3PTPPortThresholdValueHi,
+        f3PtpL3PTPPortThresholdMonValue
+    }
+    STATUS  current
+    DESCRIPTION
+            "This trap is sent each time a threshold on a PM condition
+             on an L3 PTP Port is crossed."
+  ::= { f3PtpPerformanceNotifications 10 }
+
+
 
 
 f3PtpTSStatusChangeTrap NOTIFICATION-TYPE
@@ -11095,6 +12920,7 @@ f3PtpObjectGroup OBJECT-GROUP
       f3PtpTCOperationalState, f3PtpTCSecondaryState,
       f3PtpTCServiceFlow, f3PtpTCDelayMechanism, 
       f3PtpTCSync, f3PtpTCClockIdentity, f3PtpTCStorageType, f3PtpTCRowStatus,
+      f3PtpTCPtpProfile,
 
       f3PtpTCVirtualPortIndex, f3PtpTCVirtualPortAlias,
       f3PtpTCVirtualPortAdminState,
@@ -11145,7 +12971,10 @@ f3PtpObjectGroup OBJECT-GROUP
       f3PtpSOOCSoocClockRecoveryState,f3PtpSOOCSoocPhaseRecoveryState,
       f3PtpSOOCE2eDelayAsymmetryComp, f3PtpSOOCE2eAutoAsymmetryCompStatus,
       f3PtpSOOCE2eDelayAsymmetry, f3PtpSOOCSoocLockOutControl,
-
+      f3PtpSOOCSlaveIpV6Address,f3PtpSOOCSlaveIpV6AddrPrefixLength,f3PtpSOOCMasterIpV6Address,
+      f3PtpSOOCMinimumExpectedClockClass, f3PtpSOOCMasterMessageMode,
+      f3PtpSOOCDefaultGatewayControl,f3PtpSOOCGateway,f3PtpSOOCIpV6Gateway, f3PtpSOOCAlgorithmPtpAware,
+             
       f3PtpOCSlaveVirtualPortIndex, f3PtpOCSlaveVirtualPortAlias,
       f3PtpOCSlaveVirtualPortAdminState,
       f3PtpOCSlaveVirtualPortOperationalState, 
@@ -11175,6 +13004,10 @@ f3PtpObjectGroup OBJECT-GROUP
       f3PtpAccPortFlowPointEIRLo,
       f3PtpAccPortFlowPointEIRHi,
       f3PtpAccPortFlowPointBufferSize,
+      f3PtpAccPortFlowPointLoopAvoidance,
+      f3PtpAccPortFlowPointRefConnectGuardFlow,
+      f3PtpAccPortFlowPointSecureState,
+      f3PtpAccPortFlowPointSecureBlockingEnabled,
 
       f3PtpNetPortFlowPointIndex, f3PtpNetPortFlowPointAlias,
       f3PtpNetPortFlowPointAdminState, f3PtpNetPortFlowPointOperationalState, 
@@ -11197,6 +13030,10 @@ f3PtpObjectGroup OBJECT-GROUP
       f3PtpNetPortFlowPointEIRLo,
       f3PtpNetPortFlowPointEIRHi,
       f3PtpNetPortFlowPointBufferSize,
+      f3PtpNetPortFlowPointLoopAvoidance,
+      f3PtpNetPortFlowPointRefConnectGuardFlow,
+      f3PtpNetPortFlowPointSecureState,
+      f3PtpNetPortFlowPointSecureBlockingEnabled,
 
       f3PtpEthernetAccPortDelayAsymmetry, f3PtpEthernetNetPortDelayAsymmetry,
       f3PtpSysTimeOfDayClock,      
@@ -11228,6 +13065,7 @@ f3PtpObjectGroup OBJECT-GROUP
       f3PtpTrafficPortFlowPointAssociatedQueueProfile,
       f3PtpTrafficPortFlowPointLoopAvoidance,
       
+      f3PtpTrafficPortFlowPointBufferSize,
       f3PtpEthernetTrafficPortDelayAsymmetry,
 
       f3PtpPTPClockIndex,
@@ -11264,6 +13102,17 @@ f3PtpObjectGroup OBJECT-GROUP
       f3PtpPTPClockRecentMeanPathDelay,
       f3PtpPTPClockRecentSyncPDV,
       f3PtpPTPClockClockClass,
+      f3PtpPTPClockPhysicalEntityIndex,
+      f3PtpPTPClockActiveGrantsAnnounceService,
+      f3PtpPTPClockActiveGrantsSyncService,
+      f3PtpPTPClockActiveGrantsDelayRequestService,
+      f3PtpPTPClockMaxStepRemoved,
+      f3PtpPTPClockServiceAvailableTime,
+      f3PtpPTPClockServiceUnavailableTime,
+      f3PtpPTPClockServiceAvailablePercentage,
+      f3PtpPTPClockGrandMasterID,
+      f3PtpPTPClockTimeInaccuracy,
+      f3PtpPTPClockNetworkTimeInaccuracy,
 
       f3PtpPTPClockStorageType,
       f3PtpPTPClockRowStatus,
@@ -11291,6 +13140,20 @@ f3PtpObjectGroup OBJECT-GROUP
        f3PtpPTPPortRowStatus,
        f3PtpPTPPortPortIdentity,
        f3PtpPTPPortMasterClockType,
+       f3PtpPTPPortLastRcvdAnnounceMsg,
+       f3PtpPTPPortLastRcvdSyncMsg,
+       f3PtpPTPPortLastRcvdDelayReqMsg,
+       f3PtpPTPPortLastRcvdDelayRspMsg,
+       f3PtpPTPPortMasterOnly,
+       f3PtpPTPPortPeerClockClass,
+       f3PtpPTPPortMinimumExpectedClockClass,
+       f3PtpPTPPortDelayAsymmetryComp,
+       f3PtpPTPPortAutoAsymmetryCompStatus,
+       f3PtpPTPPortDelayAsymmetry,
+       f3PtpPTPPortVirtualPortCtrl,
+       f3PtpPTPPortDelayResponderType,
+       f3PtpPTPPortTimeTraceable,
+       f3PtpPTPPortFrequencyTraceable,
 
 
        f3PtpL2DynamicRemoteSlaveIndex,
@@ -11298,9 +13161,49 @@ f3PtpObjectGroup OBJECT-GROUP
        f3PtpL2DynamicRemoteSlaveClockIdentity,
        f3PtpL2DynamicRemoteSlaveMacAddress,
        f3PtpL2DynamicRemoteSlaveRowStatus,
-       f3PtpL2DynamicRemoteSlaveStorageType
+       f3PtpL2DynamicRemoteSlaveStorageType,
 
-           
+
+       f3PtpL3PTPPortIndex,
+       f3PtpL3PTPPortAdminState,
+       f3PtpL3PTPPortAlias,          
+       f3PtpL3PTPPortOperationalState,  
+       f3PtpL3PTPPortSecondaryState,
+       f3PtpL3PTPPortPortIdentity,    
+       f3PtpL3PTPPortLocalPriority,         
+       f3PtpL3PTPPortPtpFlowPointEid,         
+       f3PtpL3PTPPortSyncMessageRate,   
+       f3PtpL3PTPPortDelayReqRespMsgRate,
+       f3PtpL3PTPPortAnnounceMsgRate,
+       f3PtpL3PTPPortAnnounceReceiptTimeout,                            
+       f3PtpL3PTPPortSyncReceiptTimeout,                            
+       f3PtpL3PTPPortDelayRespTimeout,  
+       f3PtpL3PTPPortPortState,
+       f3PtpL3PTPPortBmcaDecisionCode, 
+       f3PtpL3PTPPortPeerClockClass, 
+       f3PtpL3PTPPortMinimumExpectedClockClass,
+       f3PtpL3PTPPortIpProtocol,
+       f3PtpL3PTPPortIfName,
+       f3PtpL3PTPPortIpPriorityMapMode,
+       f3PtpL3PTPPortIpPriority,
+       f3PtpL3PTPPortIpV4Address,
+       f3PtpL3PTPPortIpV4SubnetMask,
+       f3PtpL3PTPPortIpV6Address,             
+       f3PtpL3PTPPortIpV6AddrPrefixLength,
+       f3PtpL3PTPPortDefaultGatewayControl,
+       f3PtpL3PTPPortGateway,
+       f3PtpL3PTPPortIpV6Gateway,
+       f3PtpL3PTPPortUnicastMessageNegEnabled,
+       f3PtpL3PTPPortTransmitDuration,
+       f3PtpL3PTPPortRequestUnicastTimeout,
+       f3PtpL3PTPPortRequestUnicastRestartTimer,
+       f3PtpL3PTPPortMasterIpV4Address,
+       f3PtpL3PTPPortMasterIpV6Address,
+       f3PtpL3PTPPortDelayAsymmetryComp,
+       f3PtpL3PTPPortAutoAsymmetryCompStatus,
+       f3PtpL3PTPPortDelayAsymmetry,
+       f3PtpL3PTPPortStorageType,
+       f3PtpL3PTPPortRowStatus    
 
     }
 
@@ -11519,6 +13422,7 @@ f3PtpPerfObjectGroup OBJECT-GROUP
     f3PtpTrafficPortFlowPointStatsMaxPDelayRspResTime,
     f3PtpTrafficPortFlowPointStatsAvgPDelayRspResTime,
     f3PtpTrafficPortFlowPointStatsDestMciNoMatchDiscards,
+    f3PtpTrafficPortFlowPointStatsTagNoMatchDiscards,
     
     f3PtpTrafficPortFlowPointHistoryIndex,
     f3PtpTrafficPortFlowPointHistoryTime,
@@ -11559,6 +13463,7 @@ f3PtpPerfObjectGroup OBJECT-GROUP
     f3PtpTrafficPortFlowPointHistoryMaxPDelayRspResTime,
     f3PtpTrafficPortFlowPointHistoryAvgPDelayRspResTime,
     f3PtpTrafficPortFlowPointHistoryDestMciNoMatchDiscards,
+    f3PtpTrafficPortFlowPointHistoryTagNoMatchDiscards,
     
     f3PtpTrafficPortFlowPointThresholdIndex,
     f3PtpTrafficPortFlowPointThresholdInterval,
@@ -11604,6 +13509,7 @@ f3PtpPerfObjectGroup OBJECT-GROUP
     f3PtpPTPPortStatsMinMeanPathDelay,
     f3PtpPTPPortStatsMaxMeanPathDelay,
     f3PtpPTPPortStatsAvgMeanPathDelay,
+    f3PtpPTPPortStatsMsgMiscDiscards,
 
 
     f3PtpPTPPortHistoryIndex,
@@ -11627,14 +13533,61 @@ f3PtpPerfObjectGroup OBJECT-GROUP
     f3PtpPTPPortHistoryMinMeanPathDelay,
     f3PtpPTPPortHistoryMaxMeanPathDelay,
     f3PtpPTPPortHistoryAvgMeanPathDelay,
+    f3PtpPTPPortHistoryMsgMiscDiscards,
 
     f3PtpPTPPortThresholdIndex, f3PtpPTPPortThresholdInterval,
     f3PtpPTPPortThresholdVariable, f3PtpPTPPortThresholdValueLo,
     f3PtpPTPPortThresholdValueHi, f3PtpPTPPortThresholdMonValue,
 
-    f3PtpTrafficPortFlowPointHistoryTagNoMatchDiscards,
-    f3PtpTrafficPortFlowPointStatsTagNoMatchDiscards,
-    f3PtpPTPPortStatsMsgMiscDiscards,f3PtpPTPPortHistoryMsgMiscDiscards,
+    f3PtpL3PTPPortStatsIndex,                        
+    f3PtpL3PTPPortStatsIntervalType,
+    f3PtpL3PTPPortStatsValid,
+    f3PtpL3PTPPortStatsAction,
+    f3PtpL3PTPPortStatsAvgAnnounceRate,
+    f3PtpL3PTPPortStatsAvgSyncRate,
+    f3PtpL3PTPPortStatsAvgDelayReqRate,
+    f3PtpL3PTPPortStatsAvgDelayRespRate,
+    f3PtpL3PTPPortStatsMismatchDomainDiscards,
+    f3PtpL3PTPPortStatsMessageWrongTypeDiscards,
+    f3PtpL3PTPPortStatsMessagesWrongLengthDiscards,
+    f3PtpL3PTPPortStatsUnknownMasterDiscards,
+    f3PtpL3PTPPortStatsMinOffsetFromMaster, 
+    f3PtpL3PTPPortStatsMaxOffsetFromMaster,
+    f3PtpL3PTPPortStatsAvgOffsetFromMaster,
+    f3PtpL3PTPPortStatsMinSyncPathDelay,
+    f3PtpL3PTPPortStatsMaxSyncPathDelay,
+    f3PtpL3PTPPortStatsAvgSyncPathDelay,
+    f3PtpL3PTPPortStatsMinMeanPathDelay,
+    f3PtpL3PTPPortStatsMaxMeanPathDelay,
+    f3PtpL3PTPPortStatsAvgMeanPathDelay,
+    f3PtpL3PTPPortStatsMsgMiscDiscards,
+
+    f3PtpL3PTPPortHistoryIndex,
+    f3PtpL3PTPPortHistoryTime,
+    f3PtpL3PTPPortHistoryValid,
+    f3PtpL3PTPPortHistoryAction,
+    f3PtpL3PTPPortHistoryAvgAnnounceRate,
+    f3PtpL3PTPPortHistoryAvgSyncRate,
+    f3PtpL3PTPPortHistoryAvgDelayReqRate,
+    f3PtpL3PTPPortHistoryAvgDelayRespRate,
+    f3PtpL3PTPPortHistoryMismatchDomainDiscards,
+    f3PtpL3PTPPortHistoryMessageWrongTypeDiscards,
+    f3PtpL3PTPPortHistoryMessagesWrongLengthDiscards,
+    f3PtpL3PTPPortHistoryUnknownMasterDiscards,
+    f3PtpL3PTPPortHistoryMinOffsetFromMaster,
+    f3PtpL3PTPPortHistoryMaxOffsetFromMaster,
+    f3PtpL3PTPPortHistoryAvgOffsetFromMaster,        
+    f3PtpL3PTPPortHistoryMinSyncPathDelay,
+    f3PtpL3PTPPortHistoryMaxSyncPathDelay,
+    f3PtpL3PTPPortHistoryAvgSyncPathDelay,
+    f3PtpL3PTPPortHistoryMinMeanPathDelay,
+    f3PtpL3PTPPortHistoryMaxMeanPathDelay,
+    f3PtpL3PTPPortHistoryAvgMeanPathDelay,
+    f3PtpL3PTPPortHistoryMsgMiscDiscards,
+
+    f3PtpL3PTPPortThresholdIndex, f3PtpL3PTPPortThresholdInterval,
+    f3PtpL3PTPPortThresholdVariable, f3PtpL3PTPPortThresholdValueLo,
+    f3PtpL3PTPPortThresholdValueHi, f3PtpL3PTPPortThresholdMonValue,
 
     f3PtpPTPClockStatsIndex,
     f3PtpPTPClockStatsIntervalType,
@@ -11682,8 +13635,8 @@ f3PtpPerfNotifGroup NOTIFICATION-GROUP
         f3PtpNetPortFlowPointThresholdCrossingAlert,
         f3PtpSOOCCrossingAlert, f3PtpTSCrossingAlert,
         f3PtpPTPClockCrossingAlert,
-        f3PtpPTPPortCrossingAlert
-
+        f3PtpPTPPortCrossingAlert,
+        f3PtpL3PTPPortCrossingAlert
     }
     STATUS  current
     DESCRIPTION
@@ -11732,6 +13685,12 @@ f3PtpBoundaryClockObjectGroup OBJECT-GROUP
        f3PtpMasterClockRowStatus,
        f3PtpMasterClockActiveTimeRef,
        f3PtpMasterClockPTPProfile,
+       f3PtpMasterClockServiceAvailableTime, 
+       f3PtpMasterClockServiceUnavailableTime, 
+       f3PtpMasterClockServiceAvailablePercentage,
+       f3PtpMasterClockSmpteSystemFrameRateNumerator,
+       f3PtpMasterClockSmpteSystemFrameRateDenominator,
+       f3PtpMasterClockSmpteTimeAddressFlags,
 
        f3PtpMCIAlias,
        f3PtpMCIAdminState,
@@ -11762,6 +13721,13 @@ f3PtpBoundaryClockObjectGroup OBJECT-GROUP
        f3PtpMCIPtpTransport,
        f3PtpMCIPtpTransportMode,
        f3PtpMCIPtpRemoteSlaveAgingTimeout,
+       f3PtpMCIMasterIpV6Address,            
+       f3PtpMCIMasterIpV6AddrPrefixLength,
+       f3PtpMCIDefaultGatewayControl,
+       f3PtpMCIGateway,              
+       f3PtpMCIIpV6Gateway,          
+
+
 
        f3PtpMasterVirtualPortAlias,
        f3PtpMasterVirtualPortAdminState,
@@ -11790,6 +13756,7 @@ f3PtpBoundaryClockObjectGroup OBJECT-GROUP
        f3PtpStaticRemoteSlaveUmnControl,
        f3PtpStaticRemoteSlaveStorageType,
        f3PtpStaticRemoteSlaveRowStatus,
+       f3PtpStaticRemoteSlaveIpV6Address,
 
        f3PtpDynamicRemoteSlaveAlias,
        f3PtpDynamicRemoteSlaveAdminState,
@@ -11811,6 +13778,7 @@ f3PtpBoundaryClockObjectGroup OBJECT-GROUP
        f3PtpDynamicRemoteSlaveStorageType,
        f3PtpDynamicRemoteSlavePortIdentity,
        f3PtpDynamicRemoteSlavePeerMacAddress,
+       f3PtpDynamicRemoteSlaveIpV6Address,
 
        f3PtpMCIStatsIntervalType,
        f3PtpMCIStatsValid,
@@ -11892,13 +13860,27 @@ f3PtpBoundaryClockNotifGroup NOTIFICATION-GROUP
     NOTIFICATIONS {
        f3PtpMCICrossingAlert,
        f3PtpRemoteSlaveCrossingAlert,
-       f3PtpMasterClockStatusChangeTrap,	 
-       f3PtpBCStatusChangeTrap,	 
+       f3PtpMasterClockStatusChangeTrap,     
+       f3PtpBCStatusChangeTrap,  
        f3PtpDynamicRemoteSlaveStatusChangeTrap 
     }
     STATUS  current
     DESCRIPTION
             "A collection of notifications related to F3 PTP Boundary Clock feature." 
     ::= { f3PtpGroups 6 }
+
+f3PtpProtObjectGroup OBJECT-GROUP
+    OBJECTS {
+        f3PtpMCIProtGroupIndex, f3PtpMCIProtGroupAdminState,
+        f3PtpMCIProtGroupActiveMember,
+        f3PtpMCIProtGroupLastSwitchOverTime, f3PtpMCIProtGroupLastSwitchOverReason,
+        f3PtpMCIProtGroupStorageType, f3PtpMCIProtGroupRowStatus,
+        
+        f3PtpMCIProtMemberObject, f3PtpMCIProtMemberStorageType, f3PtpMCIProtMemberRowStatus
+    }
+    STATUS  current
+    DESCRIPTION
+        "A collection of objects used to manage the Protection Object group."
+    ::= { f3PtpGroups 7 }
 
 END

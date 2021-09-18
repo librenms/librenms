@@ -18,6 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2017 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -39,23 +40,23 @@ class WirelessSensor extends Sensor
     /**
      * Sensor constructor. Create a new sensor to be discovered.
      *
-     * @param string $type Class of this sensor, must be a supported class
-     * @param int $device_id the device_id of the device that owns this sensor
-     * @param array|string $oids an array or single oid that contains the data for this sensor
-     * @param string $subtype the type of sensor an additional identifier to separate out sensors of the same class, generally this is the os name
-     * @param int|string $index the index of this sensor, must be stable, generally the index of the oid
-     * @param string $description A user visible description of this sensor, may be truncated in some places (like graphs)
-     * @param int|float $current The current value of this sensor, will seed the db and may be used to guess limits
-     * @param int $multiplier a number to multiply the value(s) by
-     * @param int $divisor a number to divide the value(s) by
-     * @param string $aggregator an operation to combine multiple numbers. Supported: sum, avg
-     * @param int $access_point_id The id of the AP in the access_points sensor this belongs to (generally used for controllers)
-     * @param int|float $high_limit Alerting: Maximum value
-     * @param int|float $low_limit Alerting: Minimum value
-     * @param int|float $high_warn Alerting: High warning value
-     * @param int|float $low_warn Alerting: Low warning value
-     * @param int|float $entPhysicalIndex The entPhysicalIndex this sensor is associated, often a port
-     * @param int|float $entPhysicalMeasured the table to look for the entPhysicalIndex, for example 'ports' (maybe unused)
+     * @param  string  $type  Class of this sensor, must be a supported class
+     * @param  int  $device_id  the device_id of the device that owns this sensor
+     * @param  array|string  $oids  an array or single oid that contains the data for this sensor
+     * @param  string  $subtype  the type of sensor an additional identifier to separate out sensors of the same class, generally this is the os name
+     * @param  int|string  $index  the index of this sensor, must be stable, generally the index of the oid
+     * @param  string  $description  A user visible description of this sensor, may be truncated in some places (like graphs)
+     * @param  int|float  $current  The current value of this sensor, will seed the db and may be used to guess limits
+     * @param  int  $multiplier  a number to multiply the value(s) by
+     * @param  int  $divisor  a number to divide the value(s) by
+     * @param  string  $aggregator  an operation to combine multiple numbers. Supported: sum, avg
+     * @param  int  $access_point_id  The id of the AP in the access_points sensor this belongs to (generally used for controllers)
+     * @param  int|float  $high_limit  Alerting: Maximum value
+     * @param  int|float  $low_limit  Alerting: Minimum value
+     * @param  int|float  $high_warn  Alerting: High warning value
+     * @param  int|float  $low_warn  Alerting: Low warning value
+     * @param  int|float  $entPhysicalIndex  The entPhysicalIndex this sensor is associated, often a port
+     * @param  int|float  $entPhysicalMeasured  the table to look for the entPhysicalIndex, for example 'ports' (maybe unused)
      */
     public function __construct(
         $type,
@@ -124,8 +125,9 @@ class WirelessSensor extends Sensor
      *  'unit'  - units used by this class 'dBm' for example
      *  'icon'  - font awesome icon used by this class
      * )
-     * @param bool $valid filter this list by valid types in the database
-     * @param int $device_id when filtering, only return types valid for this device_id
+     *
+     * @param  bool  $valid  filter this list by valid types in the database
+     * @param  int  $device_id  when filtering, only return types valid for this device_id
      * @return array
      */
     public static function getTypes($valid = false, $device_id = null)
@@ -248,7 +250,7 @@ class WirelessSensor extends Sensor
     /**
      * Convert a WiFi channel to a Frequency in MHz
      *
-     * @param int $channel
+     * @param  int  $channel
      * @return int
      */
     public static function channelToFrequency($channel)

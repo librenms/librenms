@@ -1,7 +1,7 @@
 source: Extensions/Oxidized.md
 path: blob/master/doc/
 
-# Oxidized intro
+# Oxidized
 
 Integrating LibreNMS with
 [Oxidized](https://github.com/ytti/oxidized-web) brings the following
@@ -26,7 +26,7 @@ LibreNMS will automatically map the OS to the Oxidized model name if
 they don't match. this means you shouldn't need to use the model_map
 config option within Oxidized.
 
-# Detailed integration information
+## Detailed integration information
 
 This is a straight forward use of Oxidized, it relies on you having a
 working Oxidized setup which is already taking config snapshots for
@@ -62,7 +62,7 @@ You can set a default group that devices will fall back to with:
 lnms config:set oxidized.default_group default
 ```
 
-# SELinux
+## SELinux
 
 If you're running SELinux, you'll need to allow httpd to connect
 outbound to the network, otherwise Oxidized integration in the web UI
@@ -72,7 +72,7 @@ will silently fail:
 setsebool -P httpd_can_network_connect 1
 ```
 
-# Feeding Oxidized
+## Feeding Oxidized
 
 ----
 
@@ -107,7 +107,7 @@ to your config.
 lnms config:set oxidized.reload_nodes true
 ```
 
-# Creating overrides
+## Creating overrides
 
 To return an override to Oxidized you can do this by providing the
 override key, followed by matching a lookup for a host (or hosts), and
@@ -205,7 +205,7 @@ groups:
     password: <password>
 ```
 
-# Miscellaneous
+## Miscellaneous
 
 If you have devices which you do not wish to appear in Oxidized then
 you can edit those devices in Device -> Edit -> Misc and enable
@@ -219,7 +219,13 @@ lnms config:set oxidized.ignore_types '["server", "power"]'
 lnms config:set oxidized.ignore_os '["linux", "windows"]'
 ```
 
-# Trigger configuration backups
+You can also ignore whole groups of devices
+
+```bash
+lnms config:set oxidized.ignore_groups '["london-switches", "default"]'
+```
+
+## Trigger configuration backups
 
 Using the Oxidized REST API and [Syslog
 Hooks](/Extensions/Syslog/#external-hooks), Oxidized can trigger
@@ -233,7 +239,7 @@ configuration
 next_adds_job: true
 ```
 
-# Validate Oxidized config
+## Validate Oxidized config
 
 You can perform basic validation of the Oxidized configuration by
 going to the Overview -> Tools -> Oxidized link and in the Oxidized
@@ -243,7 +249,7 @@ click 'Validate YAML'.
 We check for yaml syntax errors and also actual config values to
 ensure they are used in the correct location.
 
-# Accessing configuration of a disabled/removed device
+## Accessing configuration of a disabled/removed device
 
 When you're disabling or removing a device from LibreNMS, the
 configuration will no longer be available via the LibreNMS web interface.  
@@ -270,7 +276,7 @@ file content:
 git cat-file -p <object id>
 ```
 
-# Remove disabled/removed device
+## Remove disabled/removed device
 If you want to purge saved config of a device that is not in LibreNMS anymore, you can run the following command:
 
 ```
