@@ -103,7 +103,7 @@ class StringHelpers
      */
     public static function inferEncoding(?string $string): ?string
     {
-        if (empty($string) || ctype_print($string) || ! function_exists('iconv')) {
+        if (empty($string) || preg_match('//u', $string) || ! function_exists('iconv')) {
             return $string;
         }
 
