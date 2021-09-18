@@ -103,6 +103,37 @@ Output:
 }
 ```
 
+### `discover_device_now`
+
+Trigger an instant  discovery of given device.
+
+Route: `/api/v0/devices/:hostname/discover/now`
+
+- hostname can be either the device hostname or id
+
+Input:
+
+  -
+
+Example:
+
+```curl
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/devices/localhost/discover/now
+```
+
+Output:
+
+```json
+{
+    "status": "ok",
+    "result": {
+        "status": 0,
+        "message": "Device will be rediscovered"
+    },
+    "count": 2
+}
+```
+
 ### `availability`
 
 Get calculated availabilities of given device.

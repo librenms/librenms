@@ -819,7 +819,7 @@ function get_graphs(Illuminate\Http\Request $request)
     });
 }
 
-function trigger_device_discovery(Illuminate\Http\Request $request)
+function trigger_device_discovery(Illuminate\Http\Request $request, $internal=false)
 {
     // return details of a single device
     $hostname = $request->route('hostname');
@@ -834,7 +834,32 @@ function trigger_device_discovery(Illuminate\Http\Request $request)
 
     $ret = device_discovery_trigger($device_id);
 
-    return api_success($ret, 'result');
+    if (! $internal) {
+        return api_success($ret, 'result');
+    }
+}
+
+function trigger_device_discovery_now(Illuminate\Http\Request $request)
+{
+    // return details of a single device
+    $hostname = $request->route('hostname');
+    // use hostname as device_id if it's all digits
+    $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
+    // find device matching the id
+    $device = device_by_id_cache($device_id);
+
+    if (! $device) {
+        return api_error(404, "Device $hostname does not exist");
+    }
+
+    // run enforced discovery
+    $ret = trigger_device_discovery($request, true);
+
+    if (discover_device($device, true)) {
+        return api_success($ret, 'result');
+    } else {
+        return api_error(404, "Device $hostname discovery failed");
+    }
 }
 
 function list_available_health_graphs(Illuminate\Http\Request $request)

@@ -91,6 +91,7 @@ Route::group(['prefix' => 'v0', 'namespace' => '\App\Api\Controllers'], function
     Route::group(['prefix' => 'devices'], function () {
         Route::get('{hostname}', 'LegacyApiController@get_device')->name('get_device');
         Route::get('{hostname}/discover', 'LegacyApiController@trigger_device_discovery')->name('trigger_device_discovery');
+        Route::get('{hostname}/discover/now', 'LegacyApiController@trigger_device_discovery_now')->name('trigger_device_discovery_now');
         Route::get('{hostname}/availability', 'LegacyApiController@device_availability')->name('device_availability');
         Route::get('{hostname}/outages', 'LegacyApiController@device_outages')->name('device_outages');
         Route::get('{hostname}/graphs/health/{type}/{sensor_id?}', 'LegacyApiController@get_graph_generic_by_hostname')->name('get_health_graph');
