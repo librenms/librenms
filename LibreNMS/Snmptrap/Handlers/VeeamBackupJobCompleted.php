@@ -23,7 +23,7 @@ class VeeamBackupJobCompleted implements SnmptrapHandler
         $comment = $trap->getOidData('VEEAM-MIB::backupJobComment');
 
         if ($trap->getOidData('VEEAM-MIB::backupJobResult') == 'Success') {
-            Log::event('SNMP Trap: Backup Job success - ' . $name . '' . $comment, $device->device_id, 'backup', 1);
+            Log::event('SNMP Trap: Backup Job success - ' . $name . ' ' . $comment, $device->device_id, 'backup', 1);
         } else {
             Log::event('SNMP Trap: Backup Job failed - ' . $name . ' ' . $comment, $device->device_id, 'backup', 5);
         }
