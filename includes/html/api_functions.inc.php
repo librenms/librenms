@@ -819,7 +819,7 @@ function get_graphs(Illuminate\Http\Request $request)
     });
 }
 
-function trigger_device_discovery(Illuminate\Http\Request $request, $internal=false)
+function trigger_device_discovery(Illuminate\Http\Request $request, $internal = false)
 {
     // return details of a single device
     $hostname = $request->route('hostname');
