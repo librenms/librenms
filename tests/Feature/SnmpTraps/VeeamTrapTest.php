@@ -24,7 +24,7 @@ VEEAM-MIB::vmBackupComment
 VEEAM-MIB::backupJobResult Success";
 
         $trap = new Trap($trapText);
-        
+
         $message = 'SNMP Trap: Backup Job success - SureBackup Job 1 ';
         Log::shouldReceive('event')->once()->with($message, $device->device_id, 'backup', 1);
 
@@ -68,8 +68,7 @@ VEEAM-MIB::vmBackupComment
 VEEAM-MIB::vmBackupResult Success";
 
         $trap = new Trap($trapText);
-        dump($device->device_id);
-        
+
         $message = 'SNMP Trap: VM Backup success - Linux taeglich low vmname1';
         Log::shouldReceive('event')->once()->with($message, $device->device_id, 'backup', 1);
 
