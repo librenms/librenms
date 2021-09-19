@@ -1026,13 +1026,12 @@ function search_ports(Illuminate\Http\Request $request)
          ->select(['device_id', 'port_id', 'ifIndex', 'ifName']);
 
     if (isset($search)) {
-        $value = "%$search%";
-        $query = $query->where($field, 'like', $value);
+        $query->where($field, 'like', "%$search%");
     } else {
         $value = "%$field%";
-        $query = $query->where('ifAlias', 'like', $value)
-                       ->orWhere('ifDescr', 'like', $value)
-                       ->orWhere('ifName', 'like', $value);
+        $query->where('ifAlias', 'like', $value)
+            ->orWhere('ifDescr', 'like', $value)
+            ->orWhere('ifName', 'like', $value);
     }
 
     $ports = $query->orderBy('ifName')
