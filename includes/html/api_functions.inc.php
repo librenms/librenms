@@ -1022,24 +1022,20 @@ function search_ports(Illuminate\Http\Request $request)
     $field = $request->route('field');
     $search = $request->route('search');
 
-    if (isset($search)) {
-        $value = "%$search%";
-    } else {
-        $value = "%$field%";
-    }
-
-    $ports = Port::hasAccess(Auth::user())
+    $query = Port::hasAccess(Auth::user())
          ->select(['device_id', 'port_id', 'ifIndex', 'ifName']);
 
     if (isset($search)) {
-        $ports = $ports->where($field, 'like', $value);
+        $value = "%$search%";
+        $query = $query->where($field, 'like', $value);
     } else {
-        $ports = $ports->where('ifAlias', 'like', $value)
+        $value = "%$field%";
+        $query = $query->where('ifAlias', 'like', $value)
                        ->orWhere('ifDescr', 'like', $value)
                        ->orWhere('ifName', 'like', $value);
     }
 
-    $ports = $ports->orderBy('ifName')
+    $ports = $query->orderBy('ifName')
                    ->get();
 
     if ($ports->isEmpty()) {
