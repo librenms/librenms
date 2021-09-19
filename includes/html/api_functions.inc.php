@@ -419,7 +419,8 @@ function add_device(Illuminate\Http\Request $request)
         return api_error(500, $e->getMessage());
     }
 
-    return api_success_noresult(201, "Device $hostname ($device_id) has been added successfully");
+    $device = device_by_id_cache($device_id);
+    return api_success([$device], 'devices', $response);
 }
 
 function del_device(Illuminate\Http\Request $request)
