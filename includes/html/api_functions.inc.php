@@ -420,6 +420,7 @@ function add_device(Illuminate\Http\Request $request)
     }
 
     $device = device_by_id_cache($device_id);
+
     return api_success([$device], 'devices', $response);
 }
 
