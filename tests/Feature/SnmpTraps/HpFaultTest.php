@@ -94,4 +94,3 @@ SNMPv2-MIB::snmpTrapEnterprise.0 HP-ICF-OID::hpicfCommonTraps";
         $this->assertTrue(Dispatcher::handle($trap), 'Could not handle NETGEAR-SWITCHING-MIB::failedUserLoginTrap trap');
     }
 }
-
