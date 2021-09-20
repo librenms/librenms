@@ -109,15 +109,15 @@ class StringHelpers
 
         $charset = config('app.charset');
 
-        if ($converted = @iconv($charset, 'UTF-8', $string) !== false) {
+        if (($converted = @iconv($charset, 'UTF-8', $string)) !== false) {
             return (string) $converted;
         }
 
-        if ($charset !== 'Windows-1252' && $converted = @iconv('Windows-1252', 'UTF-8', $string) !== false) {
+        if ($charset !== 'Windows-1252' && ($converted = @iconv('Windows-1252', 'UTF-8', $string)) !== false) {
             return (string) $converted;
         }
 
-        if ($charset !== 'CP850' && $converted =  @iconv('Windows-1252', 'UTF-8', $string) !== false) {
+        if ($charset !== 'CP850' && ($converted =  @iconv('Windows-1252', 'UTF-8', $string)) !== false) {
             return (string) $converted;
         }
 
