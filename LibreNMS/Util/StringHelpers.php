@@ -117,7 +117,7 @@ class StringHelpers
             return (string) $converted;
         }
 
-        if ($charset !== 'CP850' && ($converted =  @iconv('Windows-1252', 'UTF-8', $string)) !== false) {
+        if ($charset !== 'CP850' && ($converted =  @iconv('CP850', 'UTF-8', $string)) !== false) {
             return (string) $converted;
         }
 
