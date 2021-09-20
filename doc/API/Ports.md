@@ -90,6 +90,53 @@ Output:
 }
 ```
 
+### `search_ports in specific column`
+
+Specific search for ports matching the query.
+
+Route: `/api/v0/ports/search/:field/:search`
+
+- search string to search in field specified by field
+
+Input:
+
+  -
+
+Example:
+
+```curl
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/ports/search/ifName/lo
+```
+
+Output:
+
+```json
+{
+    "status": "ok",
+    "ports": [
+        {
+            "device_id": 1,
+            "port_id": 1,
+            "ifIndex": 1,
+            "ifName": "lo"
+        },
+        {
+            "device_id": 2,
+            "port_id": 3,
+            "ifIndex": 1,
+            "ifName": "lo"
+        },
+        {
+            "device_id": 3,
+            "port_id": 5,
+            "ifIndex": 1,
+            "ifName": "lo"
+        }
+    ]
+}
+```
+
+
 ### `ports_with_associated_mac`
 
 Search for ports matching the search mac.
