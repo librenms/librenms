@@ -28,7 +28,7 @@ use LibreNMS\Snmptrap\Trap;
 
 class HpFaultTest extends SnmpTrapTestCase
 {
-    public function testBadCable()
+    public function testBadCable(): void
     {
         $device = Device::factory()->create(); /** @var Device $device */
         $trapText = "$device->hostname
@@ -50,7 +50,7 @@ SNMPv2-MIB::snmpTrapEnterprise.0 HP-ICF-OID::hpicfCommonTraps";
         $this->assertTrue(Dispatcher::handle($trap), 'Could not handle NETGEAR-SWITCHING-MIB::failedUserLoginTrap trap');
     }
 
-    public function testBadDriver()
+    public function testBadDriver(): void
     {
         $device = Device::factory()->create(); /** @var Device $device */
         $trapText = "$device->hostname
@@ -72,7 +72,7 @@ SNMPv2-MIB::snmpTrapEnterprise.0 HP-ICF-OID::hpicfCommonTraps";
         $this->assertTrue(Dispatcher::handle($trap), 'Could not handle NETGEAR-SWITCHING-MIB::failedUserLoginTrap trap');
     }
 
-    public function testBcastStorm()
+    public function testBcastStorm(): void
     {
         $device = Device::factory()->create(); /** @var Device $device */
         $trapText = "$device->hostname
@@ -94,3 +94,4 @@ SNMPv2-MIB::snmpTrapEnterprise.0 HP-ICF-OID::hpicfCommonTraps";
         $this->assertTrue(Dispatcher::handle($trap), 'Could not handle NETGEAR-SWITCHING-MIB::failedUserLoginTrap trap');
     }
 }
+
