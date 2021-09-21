@@ -44,6 +44,7 @@ class ConfigSeeder extends Seeder
     {
         if (\App\Models\Config::exists()) {
             echo "Skipped config seeding, existing config\n";
+
             return;  // don't over-write existing settings.
         }
 
@@ -51,7 +52,7 @@ class ConfigSeeder extends Seeder
             $settings = Yaml::parse(file_get_contents($file));
             foreach (Arr::wrap($settings) as $key => $value) {
                 if (! is_string($key)) {
-                    echo "Skipped non-string config key: " . json_encode($key) . PHP_EOL;
+                    echo 'Skipped non-string config key: ' . json_encode($key) . PHP_EOL;
                     continue;
                 }
 
