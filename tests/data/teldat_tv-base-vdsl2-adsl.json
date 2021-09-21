@@ -3593,14 +3593,14 @@
                     "sensor_aggregator": "sum",
                     "sensor_current": 4,
                     "sensor_prev": null,
-                    "sensor_limit": 40,
-                    "sensor_limit_warn": 30,
-                    "sensor_limit_low": null,
-                    "sensor_limit_low_warn": 2,
+                    "sensor_limit": null,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": 40,
+                    "sensor_limit_low_warn": 30,
                     "sensor_alert": 1,
                     "sensor_custom": "No",
-                    "entPhysicalIndex": "ports",
-                    "entPhysicalIndex_measured": null,
+                    "entPhysicalIndex": "2",
+                    "entPhysicalIndex_measured": "ports",
                     "sensor_oids": "[\".1.3.6.1.4.1.2007.4.1.2.2.2.24.2.1.23.3\"]"
                 }
             ]
@@ -3618,14 +3618,14 @@
                     "sensor_aggregator": "sum",
                     "sensor_current": 4,
                     "sensor_prev": 4,
-                    "sensor_limit": 40,
-                    "sensor_limit_warn": 30,
-                    "sensor_limit_low": null,
-                    "sensor_limit_low_warn": 2,
+                    "sensor_limit": null,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": 40,
+                    "sensor_limit_low_warn": 30,
                     "sensor_alert": 1,
                     "sensor_custom": "No",
-                    "entPhysicalIndex": "ports",
-                    "entPhysicalIndex_measured": null,
+                    "entPhysicalIndex": "2",
+                    "entPhysicalIndex_measured": "ports",
                     "sensor_oids": "[\".1.3.6.1.4.1.2007.4.1.2.2.2.24.2.1.23.3\"]"
                 }
             ]
