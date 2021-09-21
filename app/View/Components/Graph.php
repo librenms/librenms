@@ -123,24 +123,25 @@ class Graph extends Component
     private function getSrc(): string
     {
         return url('graph.php') . '?' . http_build_query($this->vars + [
-                    'type' => $this->type,
-                    'legend' => $this->legend,
-                    'absolute_size' => $this->absolute_size,
-                    'width' => $this->width,
-                    'height' => $this->height,
-                    'from' => $this->from,
-                    'to' => $this->to,
-                ]);
+            'type' => $this->type,
+            'legend' => $this->legend,
+            'absolute_size' => $this->absolute_size,
+            'width' => $this->width,
+            'height' => $this->height,
+            'from' => $this->from,
+            'to' => $this->to,
+        ]);
     }
 
     private function getLink(): string
     {
         if ($this->link === true) {
             $url = url('graphs') . '/' . http_build_query($this->vars + [
-                        'type' => $this->type,
-                        'from' => $this->from,
-                        'to' => $this->to,
-                    ], '', '/');
+                'type' => $this->type,
+                'from' => $this->from,
+                'to' => $this->to,
+            ], '', '/');
+
             return $url;
         }
 
