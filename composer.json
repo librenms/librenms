@@ -34,6 +34,7 @@
         "fruitcake/laravel-cors": "^2.0",
         "genealabs/laravel-caffeine": "^8.0",
         "guzzlehttp/guzzle": "^7.0.1",
+        "influxdata/influxdb-client-php": "^2.2",
         "influxdb/influxdb-php": "^1.14",
         "justinrainbow/json-schema": "^5.2",
         "laravel/framework": "^8.12",
