@@ -47,7 +47,7 @@ SNMPv2-MIB::snmpTrapEnterprise.0 HP-ICF-OID::hpicfCommonTraps";
         \Log::shouldReceive('event')->once()->with($message, $device->device_id, 'badCable', 4);
 
         $trap = new Trap($trapText);
-        $this->assertTrue(Dispatcher::handle($trap), 'Could not handle NETGEAR-SWITCHING-MIB::failedUserLoginTrap trap');
+        $this->assertTrue(Dispatcher::handle($trap), 'Could not handle HP-ICF-FAULT-FINDER-MIB::hpicfFaultFinderTrap trap');
     }
 
     public function testBadDriver(): void
@@ -66,10 +66,10 @@ SNMP-COMMUNITY-MIB::snmpTrapCommunity.0 public
 SNMPv2-MIB::snmpTrapEnterprise.0 HP-ICF-OID::hpicfCommonTraps";
 
         $message = "Fault - Unhandled http:\/\/$device->ip\/cgi\/fDetail?index=1510";
-        \Log::shouldReceive('event')->once()->with($message, $device->device_id, 'badCable', 2);
+        \Log::shouldReceive('event')->once()->with($message, $device->device_id, 'badDriver', 2);
 
         $trap = new Trap($trapText);
-        $this->assertTrue(Dispatcher::handle($trap), 'Could not handle NETGEAR-SWITCHING-MIB::failedUserLoginTrap trap');
+        $this->assertTrue(Dispatcher::handle($trap), 'Could not handle HP-ICF-FAULT-FINDER-MIB::hpicfFaultFinderTrap trap');
     }
 
     public function testBcastStorm(): void
@@ -91,6 +91,6 @@ SNMPv2-MIB::snmpTrapEnterprise.0 HP-ICF-OID::hpicfCommonTraps";
         \Log::shouldReceive('event')->once()->with($message, $device->device_id, 'bcastStorm', 5);
 
         $trap = new Trap($trapText);
-        $this->assertTrue(Dispatcher::handle($trap), 'Could not handle NETGEAR-SWITCHING-MIB::failedUserLoginTrap trap');
+        $this->assertTrue(Dispatcher::handle($trap), 'Could not handle HP-ICF-FAULT-FINDER-MIB::hpicfFaultFinderTrap trap');
     }
 }
