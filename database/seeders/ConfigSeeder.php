@@ -46,23 +46,29 @@ class ConfigSeeder extends Seeder
 
     public function run()
     {
-        if (\App\Models\Config::exists() && ! $this->command->option('force')) {
-            echo "Skipped config seeding, existing config.  Use --force to override.\n";
+        $files = array_merge(...array_map(function ($dir) {
+            return glob("$dir/*.y*ml");  // both .yml and .yaml extensions
+        }, $this->directories));
 
-            return;  // don't overwrite existing settings.
+        if (empty($files)) {
+            return; // nothing to do
         }
 
-        foreach ($this->directories as $directory) {
-            foreach (glob("$directory/*.y*ml") as $file) { // both .yml and .yaml extensions
-                $settings = Yaml::parse(file_get_contents($file));
-                foreach (Arr::wrap($settings) as $key => $value) {
-                    if (! is_string($key)) {
-                        echo 'Skipped non-string config key: ' . json_encode($key) . PHP_EOL;
-                        continue;
-                    }
+        if (\App\Models\Config::exists()) {
+            if (! $this->command->confirm(trans('commands.db:seed.existing_config'), true)) {
+                return; // don't overwrite existing settings.
+            }
+        }
 
-                    Config::persist($key, $value);
+        foreach ($files as $file) {
+            $settings = Yaml::parse(file_get_contents($file));
+            foreach (Arr::wrap($settings) as $key => $value) {
+                if (! is_string($key)) {
+                    echo 'Skipped non-string config key: ' . json_encode($key) . PHP_EOL;
+                    continue;
                 }
+
+                Config::persist($key, $value);
             }
         }
     }
