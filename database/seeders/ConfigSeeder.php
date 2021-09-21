@@ -33,11 +33,15 @@ use Symfony\Component\Yaml\Yaml;
 
 class ConfigSeeder extends Seeder
 {
-    private $directory;
+    private $directories;
 
     public function __construct()
     {
-        $this->directory = dirname(__FILE__) . '/config';
+        $this->directories = [dirname(__FILE__) . '/config'];
+
+        if (is_dir('/data/config')) {
+            $this->directories[] = '/data/config';
+        }
     }
 
     public function run()
@@ -45,18 +49,20 @@ class ConfigSeeder extends Seeder
         if (\App\Models\Config::exists()) {
             echo "Skipped config seeding, existing config\n";
 
-            return;  // don't over-write existing settings.
+            return;  // don't overwrite existing settings.
         }
 
-        foreach (glob($this->directory . '/*.y*ml') as $file) { // both .yml and .yaml extensions
-            $settings = Yaml::parse(file_get_contents($file));
-            foreach (Arr::wrap($settings) as $key => $value) {
-                if (! is_string($key)) {
-                    echo 'Skipped non-string config key: ' . json_encode($key) . PHP_EOL;
-                    continue;
-                }
+        foreach ($this->directories as $directory) {
+            foreach (glob("$directory/*.y*ml") as $file) { // both .yml and .yaml extensions
+                $settings = Yaml::parse(file_get_contents($file));
+                foreach (Arr::wrap($settings) as $key => $value) {
+                    if (! is_string($key)) {
+                        echo 'Skipped non-string config key: ' . json_encode($key) . PHP_EOL;
+                        continue;
+                    }
 
-                Config::persist($key, $value);
+                    Config::persist($key, $value);
+                }
             }
         }
     }
