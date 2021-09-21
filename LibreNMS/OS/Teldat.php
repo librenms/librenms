@@ -105,6 +105,7 @@ class Teldat extends OS implements
 
                 if (Str::startsWith($descr, 'wlan')) {
                     // Copy ifName into data
+                    $data[$index]['IfIndex'] = $entIndex;
                     $data[$index]['ifName'] = $descr;
                     break;
                 }
