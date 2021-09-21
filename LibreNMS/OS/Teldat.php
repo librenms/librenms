@@ -130,7 +130,7 @@ class Teldat extends OS implements
                 null,
                 30,
                 $entry['IfIndex'],
-                'ports'
+                null
             );
         }
 
