@@ -33,6 +33,9 @@ use Symfony\Component\Yaml\Yaml;
 
 class ConfigSeeder extends Seeder
 {
+    /**
+     * @var string[]
+     */
     private $directories;
 
     public function __construct()
@@ -44,7 +47,7 @@ class ConfigSeeder extends Seeder
         }
     }
 
-    public function run()
+    public function run(): void
     {
         $files = array_merge(...array_map(function ($dir) {
             return glob("$dir/*.y*ml");  // both .yml and .yaml extensions
