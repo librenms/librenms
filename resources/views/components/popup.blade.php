@@ -37,11 +37,11 @@
           x-on:mouseenter="clearTimeout(hideTimeout)"
           x-on:mouseleave="hide(delay)"
           x-bind:class="{'tw-hidden': !popupShow, 'tw-block': popupShow}"
-          class="tw-hidden tw-bg-white dark:tw-bg-gray-800 dark:tw-text-white tw-border-2 tw-border-gray-200 dark:tw-border-gray-600 tw-ml-3 tw-z-50 tw-font-normal tw-leading-normal tw-text-sm tw-text-left tw-no-underline tw-rounded-lg"
+          class="tw-hidden tw-bg-white dark:tw-bg-dark-gray-300 dark:tw-text-white tw-border-2 tw-border-gray-200 dark:tw-border-dark-gray-200 tw-ml-3 tw-z-50 tw-font-normal tw-leading-normal tw-text-sm tw-text-left tw-no-underline tw-rounded-lg"
           style="max-width:95vw;"
     >
         @isset($title)
-            <div class="tw-opacity-90 tw-p-3 tw-mb-0 tw-border-b-2 tw-border-solid tw-border-gray-200 dark:tw-border-gray-600 tw-rounded-t-lg">
+            <div class="tw-opacity-90 tw-p-3 tw-mb-0 tw-border-b-2 tw-border-solid tw-border-gray-200 dark:tw-border-dark-gray-200 tw-rounded-t-lg">
                 {{ $title }}
             </div>
         @endisset

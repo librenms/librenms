@@ -1,3 +1,5 @@
+const colors = require('tailwindcss/colors')
+
 module.exports = {
   prefix: 'tw-',
   purge: [
@@ -8,7 +10,21 @@ module.exports = {
   ],
   darkMode: 'class',
   theme: {
-    extend: {},
+    extend: {
+      colors: {
+        dark: {
+          'gray-100': '#4f565d',
+          'gray-200': '#3e444c',
+          'gray-300': '#353a41',
+          'gray-400': '#2e3338',
+          'gray-500': '#272b30',
+          'white-100': '#f9fafb',
+          'white-200': '#c8c8c8',
+          'white-300': '#bebfbf',
+          'white-400': '#acb6bf',
+        }
+      }
+    },
     screens: {
       'sm': '576px',
       'md': '768px',
