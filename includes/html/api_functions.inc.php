@@ -393,11 +393,6 @@ function maintenance_device(Illuminate\Http\Request $request)
         $end = date('Y-m-d H:i:00', strtotime('+' . intval($duration_hour) . ' hour ' . intval($duration_min) . ' minute', strtotime($start)));
     }
 
-    $start_recurring_dt = '1970-01-02';
-    $end_recurring_dt = '1970-01-02';
-    $start_recurring_hr = '00:00:00';
-    $end_recurring_hr = '00:00:00';
-
     $schedule_id = 0;
     $alert_schedule = \App\Models\AlertSchedule::findOrNew($schedule_id);
     $alert_schedule->title = $title;
