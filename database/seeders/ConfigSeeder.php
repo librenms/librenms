@@ -46,8 +46,8 @@ class ConfigSeeder extends Seeder
 
     public function run()
     {
-        if (\App\Models\Config::exists()) {
-            echo "Skipped config seeding, existing config\n";
+        if (\App\Models\Config::exists() && ! $this->command->option('force')) {
+            echo "Skipped config seeding, existing config.  Use --force to override.\n";
 
             return;  // don't overwrite existing settings.
         }
