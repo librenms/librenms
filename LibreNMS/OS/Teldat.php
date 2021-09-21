@@ -67,7 +67,7 @@ class Teldat extends OS implements
             }
         }
 
-        // Check if any cellullar interface is up
+        // Check if any cellular interface is up
         foreach ($this->deviceInfo as $entIndex => $ent) {
             if (Str::startsWith($ent['ifName'], 'cellular') and $ent['ifOperStatus'] == 'up') {
                 $this->hasGSMif = true;
