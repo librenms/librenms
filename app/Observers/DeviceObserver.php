@@ -20,7 +20,7 @@ class DeviceObserver
         }
 
         // key attribute changes
-        foreach (['os', 'sysName', 'version', 'hardware', 'features', 'serial', 'icon'] as $attribute) {
+        foreach (['os', 'sysName', 'version', 'hardware', 'features', 'serial', 'icon', 'type'] as $attribute) {
             if ($device->isDirty($attribute)) {
                 \Log::event(self::attributeChangedMessage($attribute, $device->$attribute, $device->getOriginal($attribute)), $device, 'system', 3);
             }
