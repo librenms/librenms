@@ -33,7 +33,7 @@ class HpFaultTest extends SnmpTrapTestCase
         $device = Device::factory()->create(); /** @var Device $device */
         $trapText = "$device->hostname
 UDP: [$device->ip]:44298->[192.168.5.5]:162
-HP-ICF-FAULT-FINDER-MIB::hpicfFaultFinderTrap
+SNMPv2-MIB::snmpTrapOID.0 HP-ICF-FAULT-FINDER-MIB::hpicfFaultFinderTrap
 DISMAN-EVENT-MIB::sysUpTimeInstance 133:19:41:09.17
 HP-ICF-FAULT-FINDER-MIB::hpicfFfLogFaultType.1510 badCable
 HP-ICF-FAULT-FINDER-MIB::hpicfFfLogAction.1510 warn
@@ -55,7 +55,7 @@ SNMPv2-MIB::snmpTrapEnterprise.0 HP-ICF-OID::hpicfCommonTraps";
         $device = Device::factory()->create(); /** @var Device $device */
         $trapText = "$device->hostname
 UDP: [$device->ip]:44298->[192.168.5.5]:162
-HP-ICF-FAULT-FINDER-MIB::hpicfFaultFinderTrap
+SNMPv2-MIB::snmpTrapOID.0 HP-ICF-FAULT-FINDER-MIB::hpicfFaultFinderTrap
 DISMAN-EVENT-MIB::sysUpTimeInstance 133:19:41:09.17
 HP-ICF-FAULT-FINDER-MIB::hpicfFfLogFaultType.1510 badDriver
 HP-ICF-FAULT-FINDER-MIB::hpicfFfLogAction.1510 warn
@@ -66,7 +66,7 @@ SNMP-COMMUNITY-MIB::snmpTrapCommunity.0 public
 SNMPv2-MIB::snmpTrapEnterprise.0 HP-ICF-OID::hpicfCommonTraps";
 
         $message = "Fault - Unhandled http:\/\/$device->ip\/cgi\/fDetail?index=1510";
-        \Log::shouldReceive('event')->once()->with($message, $device->device_id, 'badCable', 4);
+        \Log::shouldReceive('event')->once()->with($message, $device->device_id, 'badCable', 2);
 
         $trap = new Trap($trapText);
         $this->assertTrue(Dispatcher::handle($trap), 'Could not handle NETGEAR-SWITCHING-MIB::failedUserLoginTrap trap');
@@ -77,7 +77,7 @@ SNMPv2-MIB::snmpTrapEnterprise.0 HP-ICF-OID::hpicfCommonTraps";
         $device = Device::factory()->create(); /** @var Device $device */
         $trapText = "$device->hostname
 UDP: [$device->ip]:44298->[192.168.5.5]:162
-HP-ICF-FAULT-FINDER-MIB::hpicfFaultFinderTrap
+SNMPv2-MIB::snmpTrapOID.0 HP-ICF-FAULT-FINDER-MIB::hpicfFaultFinderTrap
 DISMAN-EVENT-MIB::sysUpTimeInstance 133:19:41:09.17
 HP-ICF-FAULT-FINDER-MIB::hpicfFfLogFaultType.1510 bcastStorm
 HP-ICF-FAULT-FINDER-MIB::hpicfFfLogAction.1510 warn
@@ -88,7 +88,7 @@ SNMP-COMMUNITY-MIB::snmpTrapCommunity.0 public
 SNMPv2-MIB::snmpTrapEnterprise.0 HP-ICF-OID::hpicfCommonTraps";
 
         $message = "Fault - Broadcaststorm http:\/\/$device->ip\/cgi\/fDetail?index=1510";
-        \Log::shouldReceive('event')->once()->with($message, $device->device_id, 'bcastStorm', 4);
+        \Log::shouldReceive('event')->once()->with($message, $device->device_id, 'bcastStorm', 5);
 
         $trap = new Trap($trapText);
         $this->assertTrue(Dispatcher::handle($trap), 'Could not handle NETGEAR-SWITCHING-MIB::failedUserLoginTrap trap');
