@@ -25,7 +25,6 @@
 
 namespace LibreNMS\OS;
 
-use App\Models\Port;
 use Illuminate\Support\Str;
 use LibreNMS\Device\WirelessSensor;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessCellDiscovery;
@@ -49,7 +48,7 @@ class Teldat extends OS implements
      *
      * @param  string  $ifName
      * @param  int  $ifIndex
-     * @return string  with Short Interface Name
+     * @return string with Short Interface Name
      */
     public function shortIfName($ifName, $index)
     {
