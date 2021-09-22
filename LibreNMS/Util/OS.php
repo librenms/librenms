@@ -18,6 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2020 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -34,7 +35,8 @@ class OS
 {
     /**
      * Load os from yaml into config if not already loaded, preserving user os config
-     * @param string $os
+     *
+     * @param  string  $os
      */
     public static function loadDefinition($os)
     {
@@ -53,8 +55,8 @@ class OS
      * Load all OS, optionally load just the OS used by existing devices
      * Default cache time is 1 day. Controlled by os_def_cache_time.
      *
-     * @param bool $existing Only load OS that have existing OS in the database
-     * @param bool $cached Load os definitions from the cache file
+     * @param  bool  $existing  Only load OS that have existing OS in the database
+     * @param  bool  $cached  Load os definitions from the cache file
      */
     public static function loadAllDefinitions($existing = false, $cached = true)
     {
@@ -85,7 +87,8 @@ class OS
 
     /**
      * Update the OS cache file cache/os_defs.cache
-     * @param bool $force
+     *
+     * @param  bool  $force
      * @return bool true if the cache was updated
      */
     public static function updateCache($force = false)

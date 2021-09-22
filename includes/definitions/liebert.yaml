@@ -9,3 +9,7 @@ discovery:
     -
         sysObjectID:
             - .1.3.6.1.4.1.476.1.42
+over:
+    - { graph: device_power, text: 'Power' }
+    - { graph: device_current, text: 'Current' }
+    - { graph: device_voltage, text: 'Voltage' }

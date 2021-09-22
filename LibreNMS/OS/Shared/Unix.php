@@ -119,7 +119,7 @@ class Unix extends \LibreNMS\OS implements MempoolsDiscovery
             '.1.3.6.1.4.1.674.10892.1.300.10.1.11.1', // Dell
             '.1.3.6.1.4.1.8072.1.3.2.3.1.1.6.115.101.114.105.97.108', // NET-SNMP-EXTEND-MIB::nsExtendOutput1Line.\"serial\"
             '.1.3.6.1.4.1.2021.7890.4.4.1.2.6.115.101.114.105.97.108.1', // UCD-MIB shell
-        ], '-OUQn', 'NET-SNMP-EXTEND-MIB:MIB-Dell-10892');
+        ], '-OUQn', 'NET-SNMP-EXTEND-MIB:MIB-Dell-10892', 'dell');
         $serial = reset($serial_extend);
         $device->serial = $serial ?: $device->serial;
     }

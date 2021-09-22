@@ -2,6 +2,7 @@ os: osag
 text: OpenSystems
 type: firewall
 icon: osag
+ifname: true
 over:
     - { graph: device_bits, text: Traffic }
     - { graph: device_processor, text: CPU }

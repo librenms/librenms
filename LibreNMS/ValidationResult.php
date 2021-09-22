@@ -18,6 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2017 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -39,9 +40,10 @@ class ValidationResult
 
     /**
      * ValidationResult constructor.
-     * @param string $message The message to describe this result
-     * @param int $status The status of this result FAILURE, WARNING, or SUCCESS
-     * @param string $fix a suggested fix to highlight for the user
+     *
+     * @param  string  $message  The message to describe this result
+     * @param  int  $status  The status of this result FAILURE, WARNING, or SUCCESS
+     * @param  string  $fix  a suggested fix to highlight for the user
      */
     public function __construct($message, $status, $fix = null)
     {
@@ -52,8 +54,9 @@ class ValidationResult
 
     /**
      * Create a new ok Validation result
-     * @param string $message The message to describe this result
-     * @param string $fix a suggested fix to highlight for the user
+     *
+     * @param  string  $message  The message to describe this result
+     * @param  string  $fix  a suggested fix to highlight for the user
      * @return ValidationResult
      */
     public static function ok($message, $fix = null)
@@ -63,8 +66,9 @@ class ValidationResult
 
     /**
      * Create a new warning Validation result
-     * @param string $message The message to describe this result
-     * @param string $fix a suggested fix to highlight for the user
+     *
+     * @param  string  $message  The message to describe this result
+     * @param  string  $fix  a suggested fix to highlight for the user
      * @return ValidationResult
      */
     public static function warn($message, $fix = null)
@@ -74,7 +78,8 @@ class ValidationResult
 
     /**
      * Create a new informational Validation result
-     * @param string $message The message to describe this result
+     *
+     * @param  string  $message  The message to describe this result
      * @return ValidationResult
      */
     public static function info($message)
@@ -84,8 +89,9 @@ class ValidationResult
 
     /**
      * Create a new failure Validation result
-     * @param string $message The message to describe this result
-     * @param string $fix a suggested fix to highlight for the user
+     *
+     * @param  string  $message  The message to describe this result
+     * @param  string  $fix  a suggested fix to highlight for the user
      * @return ValidationResult
      */
     public static function fail($message, $fix = null)
@@ -147,7 +153,7 @@ class ValidationResult
      * The commands (generally) to fix the issue.
      * If there are multiple, use an array.
      *
-     * @param string|array $fix
+     * @param  string|array  $fix
      * @return ValidationResult $this
      */
     public function setFix($fix)
@@ -203,8 +209,8 @@ class ValidationResult
      * Print a list of items up to a max amount
      * If over that number, a line will print the total items
      *
-     * @param string $format format as consumed by printf()
-     * @param int $max the max amount of items to print, default 15
+     * @param  string  $format  format as consumed by printf()
+     * @param  int  $max  the max amount of items to print, default 15
      */
     private function printList($format = "\t %s\n", $max = 15)
     {

@@ -18,6 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2017 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -38,7 +39,7 @@ class RrdCheck extends BaseValidation
      * Validate this module.
      * To return ValidationResults, call ok, warn, fail, or result methods on the $validator
      *
-     * @param Validator $validator
+     * @param  Validator  $validator
      */
     public function validate(Validator $validator)
     {
@@ -83,10 +84,9 @@ class RrdCheck extends BaseValidation
     /**
      * Run rrdtool info on a file path
      *
-     * @param string $path Path to pass to rrdtool info
-     * @param string $stdOutput Variable to recieve the output of STDOUT
-     * @param string $stdError Variable to recieve the output of STDERR
-     *
+     * @param  string  $path  Path to pass to rrdtool info
+     * @param  string  $stdOutput  Variable to recieve the output of STDOUT
+     * @param  string  $stdError  Variable to recieve the output of STDERR
      * @return int exit code
      *
      **/

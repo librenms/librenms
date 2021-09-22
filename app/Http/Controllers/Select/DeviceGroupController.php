@@ -18,6 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -39,7 +40,7 @@ class DeviceGroupController extends SelectController
     }
 
     /**
-     * @param DeviceGroup $device_group
+     * @param  DeviceGroup  $device_group
      */
     public function formatItem($device_group)
     {

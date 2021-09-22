@@ -609,14 +609,14 @@
     return false;
     }
 
-    function widget_reload(id, data_type, forceDomInject = false) {
-        const $widget_body = $(`#widget_body_${id}`);
-        const $widget_bootgrid = $(`#widget_body_${id} .bootgrid-table`);
+    function widget_reload(id, data_type, forceDomInject) {
+        const $widget_body = $('#widget_body_' + id);
+        const $widget_bootgrid = $('#widget_body_' + id + ' .bootgrid-table');
         const settings = $widget_body.parent().data('settings') == 1 ? 1 : 0;
 
         if (settings === 1 || forceDomInject) {
             $widget_bootgrid.bootgrid('destroy');
-            $(`#widget_body_${id} *`).off();
+            $('#widget_body_' + id + ' *').off();
         } else if ($widget_bootgrid[0] && $widget_bootgrid.data('ajax') === true) {
             // Check to see if a bootgrid already exists and has ajax reloading enabled.
             // If so, use bootgrid to refresh the data instead of injecting the DOM in request.
@@ -625,30 +625,30 @@
 
         $.ajax({
             type: 'POST',
-            url: `${ajax_url}/dash/${data_type}`,
+            url: ajax_url + '/dash/' + data_type,
             data: {
-                id,
-                dimensions: { x: $widget_body.width(), y: $widget_body.height() },
-                settings,
+                id: id,
+                dimensions: {x: $widget_body.width(), y: $widget_body.height()},
+                settings: settings
             },
             dataType: 'json',
             success: function (data) {
                 if (data.status === 'ok') {
-                    $(`#widget_title_${id}`).html(data.title);
+                    $('#widget_title_' + id).html(data.title);
                     $widget_body.html(data.html);
                     $widget_body.parent().data('settings', data.show_settings).data('refresh', data.settings.refresh);
                 } else {
-                    $widget_body.html(`<div class="alert alert-info">${data.message}</div>`);
+                    $widget_body.html('<div class="alert alert-info">' + data.message + '</div>');
                 }
             },
             error: function (data) {
-                $widget_body.html(`<div class="alert alert-info">${ data.responseJSON.error || '{{ __('Problem with backend') }}'}</div>`);
+                $widget_body.html('<div class="alert alert-info">' + (data.responseJSON.error || '{{ __('Problem with backend') }}') + '</div>');
             }
         });
     }
 
     function grab_data(id, data_type) {
-        const $parent = $(`#widget_body_${id}`).parent();
+        const $parent = $('#widget_body_' + id).parent();
 
         if($parent.data('settings') == 0) {
             widget_reload(id, data_type);

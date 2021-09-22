@@ -7,6 +7,7 @@
  * the source code distribution for details. */
 /**
  * API Transport
+ *
  * @author GitStoph <https://github.com/GitStoph>
  * @copyright 2019 GitStoph
  * @license GPL

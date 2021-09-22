@@ -18,6 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -44,7 +45,7 @@ abstract class SelectController extends PaginatedAjaxController
     /**
      * The default method called by the route handler
      *
-     * @param \Illuminate\Http\Request $request
+     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\JsonResponse
      */
     public function __invoke(Request $request)
@@ -63,7 +64,7 @@ abstract class SelectController extends PaginatedAjaxController
     }
 
     /**
-     * @param Paginator $paginator
+     * @param  Paginator  $paginator
      * @return \Illuminate\Http\JsonResponse
      */
     protected function formatResponse($paginator)
@@ -80,7 +81,7 @@ abstract class SelectController extends PaginatedAjaxController
      * Default implementation uses primary key and the first value in the model
      * If only one value is in the model attributes, that is the id and text.
      *
-     * @param Model $model
+     * @param  Model  $model
      * @return array
      */
     public function formatItem($model)

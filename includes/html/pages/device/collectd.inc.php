@@ -26,8 +26,8 @@ load_graph_definitions();
 /**
  * Send back new list content
  *
- * @param array $items Array of options values to return to browser
- * @param string $method Name of Javascript method that will be called to process data
+ * @param  array  $items  Array of options values to return to browser
+ * @param  string  $method  Name of Javascript method that will be called to process data
  */
 function dhtml_response_list(&$items, $method)
 {

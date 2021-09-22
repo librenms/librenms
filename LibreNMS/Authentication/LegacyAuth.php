@@ -48,7 +48,7 @@ class LegacyAuth
     /**
      * Get class for the given or current authentication type/mechanism
      *
-     * @param string $type
+     * @param  string  $type
      * @return string
      */
     public static function getClass($type = null)

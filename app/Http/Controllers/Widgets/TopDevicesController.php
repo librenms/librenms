@@ -18,6 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -60,7 +61,7 @@ class TopDevicesController extends WidgetController
     }
 
     /**
-     * @param Request $request
+     * @param  Request  $request
      * @return View
      */
     public function getView(Request $request)
@@ -106,8 +107,8 @@ class TopDevicesController extends WidgetController
     }
 
     /**
-     * @param array|string $headers
-     * @param Collection $rows
+     * @param  array|string  $headers
+     * @param  Collection  $rows
      * @return array
      */
     private function formatData($headers, $rows)
@@ -119,8 +120,8 @@ class TopDevicesController extends WidgetController
     }
 
     /**
-     * @param Builder $query
-     * @param string $left_table
+     * @param  Builder  $query
+     * @param  string  $left_table
      * @return Builder
      */
     private function withDeviceQuery(Builder $query, $left_table)
@@ -159,9 +160,9 @@ class TopDevicesController extends WidgetController
     }
 
     /**
-     * @param Device $device
-     * @param string $graph_type
-     * @param array $graph_params
+     * @param  Device  $device
+     * @param  string  $graph_type
+     * @param  array  $graph_params
      * @return array
      */
     private function standardRow($device, $graph_type, $graph_params = [])
