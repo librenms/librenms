@@ -44,17 +44,16 @@ class Teldat extends OS implements
     WirelessRsrpDiscovery,
     WirelessSinrDiscovery
 {
-
     /**
      * deviceIfInfo will cache an ifIndex'ed array with 'ifName' and 'ifOperStatus' for internal use in this class
      *
      * @var array
      */
     private $deviceIfInfo = [];
-    
+
     /** @var bool */
     private $hasWLANif = false;
-    
+
     /** @var bool */
     private $hasGSMif = false;
 
@@ -65,25 +64,27 @@ class Teldat extends OS implements
      */
     public function getdevicePortsInfo()
     {
-
         $devicePortsInfo = Port::whereIn('device_id', [$this->getDeviceId()])
             ->select('ifIndex', 'ifName', 'ifOperStatus')
             ->get();
 
-        if (!isset($this->deviceIfInfo) or (count($this->deviceIfInfo) == 0)) {
-
+        if (! isset($this->deviceIfInfo) or (count($this->deviceIfInfo) == 0)) {
             $ifNames = $this->getCacheByIndex('ifName', 'IF-MIB');
             $ifOperStatuss = $this->getCacheByIndex('ifOperStatus', 'IF-MIB');
 
             foreach ($ifNames as $entIndex => $entValue) {
-                if (!isset($this->deviceIfInfo[$entIndex]))$this->deviceIfInfo[$entIndex] = [];
+                if (! isset($this->deviceIfInfo[$entIndex])) {
+                    $this->deviceIfInfo[$entIndex] = [];
+                }
                 $this->deviceIfInfo[$entIndex]['ifName'] = $entValue;
             }
 
             foreach ($ifOperStatuss as $entIndex => $entValue) {
-                if (!isset($this->deviceIfInfo[$entIndex]))$this->deviceIfInfo[$entIndex] = [];
+                if (! isset($this->deviceIfInfo[$entIndex])) {
+                    $this->deviceIfInfo[$entIndex] = [];
+                }
                 $this->deviceIfInfo[$entIndex]['ifOperStatus'] = $entValue;
-            
+
                 $device = $this->deviceIfInfo[$entIndex];
 
                 // Check if any wlan interface is up
@@ -96,14 +97,12 @@ class Teldat extends OS implements
                     $this->hasGSMif = true;
                 }
             }
-
         } else {
-
             foreach ($devicePortsInfo as $entIndex => $entValue) {
                 $ifIndex = $entValue['ifIndex'];
                 $this->deviceIfInfo[$ifIndex]['ifName'] = $entValue['ifName'];
                 $this->deviceIfInfo[$ifIndex]['ifOperStatus'] = $entValue['ifOperStatus'];
-            }    
+            }
 
             foreach ($this->deviceIfInfo as $entIndex => $entValue) {
                 // Check if any wlan interface is up
@@ -116,11 +115,9 @@ class Teldat extends OS implements
                     $this->hasGSMif = true;
                 }
             }
-
         }
 
-        d_echo('@getdevicePortsInfo: deviceIfInfo:'. print_r($this->deviceIfInfo, true));
-
+        d_echo('@getdevicePortsInfo: deviceIfInfo:' . print_r($this->deviceIfInfo, true));
     }
 
     /**
@@ -170,7 +167,6 @@ class Teldat extends OS implements
      * Return Cellular Short Interface Name.
      *
      * @param  int  $index
-     * 
      * @return string with Short Interface Name
      */
     public function shortIfName($index)
