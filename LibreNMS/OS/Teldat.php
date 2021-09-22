@@ -45,79 +45,17 @@ class Teldat extends OS implements
     WirelessSinrDiscovery
 {
     /**
-     * deviceIfInfo will cache an ifIndex'ed array with 'ifName' and 'ifOperStatus' for internal use in this class
+     * Return Cellular Short Interface Name.
      *
-     * @var array
+     * @param  string  $ifName
+     * @param  int  $ifIndex
+     * @return string  with Short Interface Name
      */
-    private $deviceIfInfo = [];
-
-    /** @var bool */
-    private $hasWLANif = false;
-
-    /** @var bool */
-    private $hasGSMif = false;
-
-    /**
-     * getdevicePortsInfo will create/update $deviceIfInfo array
-     *
-     * @return void
-     */
-    public function getdevicePortsInfo()
+    public function shortIfName($ifName, $index)
     {
-        $devicePortsInfo = Port::whereIn('device_id', [$this->getDeviceId()])
-            ->select('ifIndex', 'ifName', 'ifOperStatus')
-            ->get();
+        $device = ($ifName == '' ? strval($index) : preg_replace('/cellular/', 'Ce', $ifName));
 
-        if (! isset($this->deviceIfInfo) or (count($this->deviceIfInfo) == 0)) {
-            $ifNames = $this->getCacheByIndex('ifName', 'IF-MIB');
-            $ifOperStatuss = $this->getCacheByIndex('ifOperStatus', 'IF-MIB');
-
-            foreach ($ifNames as $entIndex => $entValue) {
-                if (! isset($this->deviceIfInfo[$entIndex])) {
-                    $this->deviceIfInfo[$entIndex] = [];
-                }
-                $this->deviceIfInfo[$entIndex]['ifName'] = $entValue;
-            }
-
-            foreach ($ifOperStatuss as $entIndex => $entValue) {
-                if (! isset($this->deviceIfInfo[$entIndex])) {
-                    $this->deviceIfInfo[$entIndex] = [];
-                }
-                $this->deviceIfInfo[$entIndex]['ifOperStatus'] = $entValue;
-
-                $device = $this->deviceIfInfo[$entIndex];
-
-                // Check if any wlan interface is up
-                if (Str::startsWith($device['ifName'], 'wlan') and $device['ifOperStatus'] == 'up') {
-                    $this->hasWLANif = true;
-                }
-
-                // Check if any cellular interface is up
-                if (Str::startsWith($device['ifName'], 'cellular') and $device['ifOperStatus'] == 'up') {
-                    $this->hasGSMif = true;
-                }
-            }
-        } else {
-            foreach ($devicePortsInfo as $entIndex => $entValue) {
-                $ifIndex = $entValue['ifIndex'];
-                $this->deviceIfInfo[$ifIndex]['ifName'] = $entValue['ifName'];
-                $this->deviceIfInfo[$ifIndex]['ifOperStatus'] = $entValue['ifOperStatus'];
-            }
-
-            foreach ($this->deviceIfInfo as $entIndex => $entValue) {
-                // Check if any wlan interface is up
-                if (Str::startsWith($entValue['ifName'], 'wlan') and $entValue['ifOperStatus'] == 'up') {
-                    $this->hasWLANif = true;
-                }
-
-                // Check if any cellular interface is up
-                if (Str::startsWith($entValue['ifName'], 'cellular') and $entValue['ifOperStatus'] == 'up') {
-                    $this->hasGSMif = true;
-                }
-            }
-        }
-
-        d_echo('@getdevicePortsInfo: deviceIfInfo:' . print_r($this->deviceIfInfo, true));
+        return $device;
     }
 
     /**
@@ -127,63 +65,39 @@ class Teldat extends OS implements
     {
         $sensors = [];
 
-        if (empty($this->deviceIfInfo)) {
-            $this->getdevicePortsInfo();
-        }
-        if (! $this->hasWLANif) {
-            return $sensors;
-        }
-
-        $device = $this->getDeviceArray();
         // telProdNpMonInterfWlanBSSCurrent :: Count of current associated stations
-        $data = snmpwalk_cache_oid($device, 'telProdNpMonInterfWlanBSSCurrent', [], 'TELDAT-MON-INTERF-WLAN-MIB');
+        $data = snmpwalk_cache_oid($this->getDeviceArray(), 'telProdNpMonInterfWlanBSSCurrent', [], 'TELDAT-MON-INTERF-WLAN-MIB');
 
-        foreach ($data as $index => $entry) {
-            $sensors[] = new WirelessSensor(
-                'clients',
-                $device['device_id'],
-                ".1.3.6.1.4.1.2007.4.1.2.2.2.24.2.1.23.$index",
-                'teldat',
-                $index,
-                $this->deviceIfInfo[$index]['ifName'],
-                $entry['telProdNpMonInterfWlanBSSCurrent'],
-                1,
-                1,
-                'sum',
-                null,
-                null,
-                40,
-                null,
-                30,
-                $index,
-                null
-            );
+        if (! empty($data)) {
+            $ifNames = $this->getCacheByIndex('ifName', 'IF-MIB');
+            $ifOperStatuses = $this->getCacheByIndex('ifOperStatus', 'IF-MIB');
+
+            foreach ($data as $index => $entry) {
+                if (Str::startsWith($ifNames[$index], 'wlan') && $ifOperStatuses[$index] == 'up') {
+                    $sensors[] = new WirelessSensor(
+                        'clients',
+                        $this->getDeviceId(),
+                        ".1.3.6.1.4.1.2007.4.1.2.2.2.24.2.1.23.$index",
+                        'teldat',
+                        $index,
+                        $ifNames[$index],
+                        $entry['telProdNpMonInterfWlanBSSCurrent'],
+                        1,
+                        1,
+                        'sum',
+                        null,
+                        null,
+                        40,
+                        null,
+                        30,
+                        $index,
+                        null
+                    );
+                }
+            }
         }
 
         return $sensors;
-    }
-
-    /**
-     * Return Cellular Short Interface Name.
-     *
-     * @param  int  $index
-     * @return string with Short Interface Name
-     */
-    public function shortIfName($index)
-    {
-        if (empty($this->deviceIfInfo)) {
-            $this->getdevicePortsInfo();
-        }
-        if (! $this->hasGSMif) {
-            return '';
-        }
-
-        $device = '';
-        if (isset($this->deviceIfInfo[$index]['ifName'])) {
-            $device = ($this->deviceIfInfo[$index]['ifName'] == '' ? strval($index) : preg_replace('/cellular/', 'Ce', $this->deviceIfInfo[$index]['ifName']));
-        }
-
-        return $device;
     }
 
     /**
@@ -198,26 +112,24 @@ class Teldat extends OS implements
     {
         $sensors = [];
 
-        if (empty($this->deviceIfInfo)) {
-            $this->getdevicePortsInfo();
-        }
-        if (! $this->hasGSMif) {
-            return $sensors;
-        }
-
         $data = snmpwalk_cache_oid($this->getDeviceArray(), 'teldatCellularStateMobileSignalQuality', [], 'TELDAT-MON-INTERF-CELLULAR-MIB');
 
-        foreach ($data as $index => $entry) {
-            if (isset($this->deviceIfInfo[$index]['ifOperStatus']) and $this->deviceIfInfo[$index]['ifOperStatus'] == 'up') {
-                $sensors[] = new WirelessSensor(
-                    'rssi',
-                    $this->getDeviceId(),
-                    '.1.3.6.1.4.1.2007.4.1.2.2.2.18.3.2.1.10.' . $index,
-                    'teldat',
-                    $index,
-                    'RSSI: ' . $this->shortIfName($index),
-                    $entry['teldatCellularStateMobileSignalQuality']
-                );
+        if (! empty($data)) {
+            $ifNames = $this->getCacheByIndex('ifName', 'IF-MIB');
+            $ifOperStatuses = $this->getCacheByIndex('ifOperStatus', 'IF-MIB');
+
+            foreach ($data as $index => $entry) {
+                if (Str::startsWith($ifNames[$index], 'cellular') && $ifOperStatuses[$index] == 'up') {
+                    $sensors[] = new WirelessSensor(
+                        'rssi',
+                        $this->getDeviceId(),
+                        '.1.3.6.1.4.1.2007.4.1.2.2.2.18.3.2.1.10.' . $index,
+                        'teldat',
+                        $index,
+                        'RSSI: ' . $this->shortIfName($ifNames[$index], $index),
+                        $entry['teldatCellularStateMobileSignalQuality']
+                    );
+                }
             }
         }
 
@@ -236,26 +148,24 @@ class Teldat extends OS implements
     {
         $sensors = [];
 
-        if (empty($this->deviceIfInfo)) {
-            $this->getdevicePortsInfo();
-        }
-        if (! $this->hasGSMif) {
-            return $sensors;
-        }
-
         $data = snmpwalk_cache_oid($this->getDeviceArray(), 'teldatCellularStateMobileRxSINR', [], 'TELDAT-MON-INTERF-CELLULAR-MIB');
 
-        foreach ($data as $index => $entry) {
-            if (isset($this->deviceIfInfo[$index]['ifOperStatus']) and $this->deviceIfInfo[$index]['ifOperStatus'] == 'up') {
-                $sensors[] = new WirelessSensor(
-                    'sinr',
-                    $this->getDeviceId(),
-                    '.1.3.6.1.4.1.2007.4.1.2.2.2.18.3.2.1.24.' . $index,
-                    'teldat',
-                    $index,
-                    'SINR: ' . $this->shortIfName($index),
-                    $entry['teldatCellularStateMobileRxSINR']
-                );
+        if (! empty($data)) {
+            $ifNames = $this->getCacheByIndex('ifName', 'IF-MIB');
+            $ifOperStatuses = $this->getCacheByIndex('ifOperStatus', 'IF-MIB');
+
+            foreach ($data as $index => $entry) {
+                if (Str::startsWith($ifNames[$index], 'cellular') && $ifOperStatuses[$index] == 'up') {
+                    $sensors[] = new WirelessSensor(
+                        'sinr',
+                        $this->getDeviceId(),
+                        '.1.3.6.1.4.1.2007.4.1.2.2.2.18.3.2.1.24.' . $index,
+                        'teldat',
+                        $index,
+                        'SINR: ' . $this->shortIfName($ifNames[$index], $index),
+                        $entry['teldatCellularStateMobileRxSINR']
+                    );
+                }
             }
         }
 
@@ -274,26 +184,24 @@ class Teldat extends OS implements
     {
         $sensors = [];
 
-        if (empty($this->deviceIfInfo)) {
-            $this->getdevicePortsInfo();
-        }
-        if (! $this->hasGSMif) {
-            return $sensors;
-        }
-
         $data = snmpwalk_cache_oid($this->getDeviceArray(), 'teldatCellularStateMobileRxRSRQ', [], 'TELDAT-MON-INTERF-CELLULAR-MIB');
 
-        foreach ($data as $index => $entry) {
-            if (isset($this->deviceIfInfo[$index]['ifOperStatus']) and $this->deviceIfInfo[$index]['ifOperStatus'] == 'up') {
-                $sensors[] = new WirelessSensor(
-                    'rsrq',
-                    $this->getDeviceId(),
-                    '.1.3.6.1.4.1.2007.4.1.2.2.2.18.3.2.1.23.' . $index,
-                    'teldat',
-                    $index,
-                    'RSRQ: ' . $this->shortIfName($index),
-                    $entry['teldatCellularStateMobileRxRSRQ']
-                );
+        if (! empty($data)) {
+            $ifNames = $this->getCacheByIndex('ifName', 'IF-MIB');
+            $ifOperStatuses = $this->getCacheByIndex('ifOperStatus', 'IF-MIB');
+
+            foreach ($data as $index => $entry) {
+                if (Str::startsWith($ifNames[$index], 'cellular') && $ifOperStatuses[$index] == 'up') {
+                    $sensors[] = new WirelessSensor(
+                        'rsrq',
+                        $this->getDeviceId(),
+                        '.1.3.6.1.4.1.2007.4.1.2.2.2.18.3.2.1.23.' . $index,
+                        'teldat',
+                        $index,
+                        'RSRQ: ' . $this->shortIfName($ifNames[$index], $index),
+                        $entry['teldatCellularStateMobileRxRSRQ']
+                    );
+                }
             }
         }
 
@@ -312,26 +220,24 @@ class Teldat extends OS implements
     {
         $sensors = [];
 
-        if (empty($this->deviceIfInfo)) {
-            $this->getdevicePortsInfo();
-        }
-        if (! $this->hasGSMif) {
-            return $sensors;
-        }
-
         $data = snmpwalk_cache_oid($this->getDeviceArray(), 'teldatCellularStateMobileRxRSRP', [], 'TELDAT-MON-INTERF-CELLULAR-MIB');
 
-        foreach ($data as $index => $entry) {
-            if (isset($this->deviceIfInfo[$index]['ifOperStatus']) and $this->deviceIfInfo[$index]['ifOperStatus'] == 'up') {
-                $sensors[] = new WirelessSensor(
-                    'rsrp',
-                    $this->getDeviceId(),
-                    '.1.3.6.1.4.1.2007.4.1.2.2.2.18.3.2.1.22.' . $index,
-                    'teldat',
-                    $index,
-                    'RSRP: ' . $this->shortIfName($index),
-                    $entry['teldatCellularStateMobileRxRSRP']
-                );
+        if (! empty($data)) {
+            $ifNames = $this->getCacheByIndex('ifName', 'IF-MIB');
+            $ifOperStatuses = $this->getCacheByIndex('ifOperStatus', 'IF-MIB');
+
+            foreach ($data as $index => $entry) {
+                if (Str::startsWith($ifNames[$index], 'cellular') && $ifOperStatuses[$index] == 'up') {
+                    $sensors[] = new WirelessSensor(
+                        'rsrp',
+                        $this->getDeviceId(),
+                        '.1.3.6.1.4.1.2007.4.1.2.2.2.18.3.2.1.22.' . $index,
+                        'teldat',
+                        $index,
+                        'RSRP: ' . $this->shortIfName($ifNames[$index], $index),
+                        $entry['teldatCellularStateMobileRxRSRP']
+                    );
+                }
             }
         }
 
@@ -350,45 +256,52 @@ class Teldat extends OS implements
     public function discoverWirelessCell()
     {
         $sensors = [];
-
-        if (empty($this->deviceIfInfo)) {
-            $this->getdevicePortsInfo();
-        }
-        if (! $this->hasGSMif) {
-            return $sensors;
-        }
+        $ifNames = [];
+        $ifOperStatuses = [];
 
         $data = snmpwalk_cache_oid($this->getDeviceArray(), 'teldatCellularStateMobileCellId', [], 'TELDAT-MON-INTERF-CELLULAR-MIB');
 
-        foreach ($data as $index => $entry) {
-            if (isset($this->deviceIfInfo[$index]['ifOperStatus']) and $this->deviceIfInfo[$index]['ifOperStatus'] == 'up') {
-                $sensors[] = new WirelessSensor(
-                    'cell',
-                    $this->getDeviceId(),
-                    '.1.3.6.1.4.1.2007.4.1.2.2.2.18.3.2.1.5.' . $index,
-                    'teldat',
-                    $index,
-                    'CellID: ' . $this->shortIfName($index),
-                    $entry['teldatCellularStateMobileCellId']
-                );
+        if (! empty($data)) {
+            $ifNames = $this->getCacheByIndex('ifName', 'IF-MIB');
+            $ifOperStatuses = $this->getCacheByIndex('ifOperStatus', 'IF-MIB');
+
+            foreach ($data as $index => $entry) {
+                if (Str::startsWith($ifNames[$index], 'cellular') && $ifOperStatuses[$index] == 'up') {
+                    $sensors[] = new WirelessSensor(
+                        'cell',
+                        $this->getDeviceId(),
+                        '.1.3.6.1.4.1.2007.4.1.2.2.2.18.3.2.1.5.' . $index,
+                        'teldat',
+                        $index,
+                        'CellID: ' . $this->shortIfName($ifNames[$index], $index),
+                        $entry['teldatCellularStateMobileCellId']
+                    );
+                }
             }
         }
 
         $data = snmpwalk_cache_oid($this->getDeviceArray(), 'teldatCellularStateMobileLTECellId', [], 'TELDAT-MON-INTERF-CELLULAR-MIB');
-        if (empty($this->deviceIfInfo)) {
-            $this->getdevicePortsInfo();
-        }
-        foreach ($data as $index => $entry) {
-            if (isset($this->deviceIfInfo[$index]['ifOperStatus']) and $this->deviceIfInfo[$index]['ifOperStatus'] == 'up') {
-                $sensors[] = new WirelessSensor(
-                    'cell',
-                    $this->getDeviceId(),
-                    '.1.3.6.1.4.1.2007.4.1.2.2.2.18.3.2.1.25.' . $index,
-                    'teldat',
-                    (10 * count($sensors)) + $index,
-                    'LteCellID: ' . $this->shortIfName($index),
-                    $entry['teldatCellularStateMobileLTECellId']
-                );
+
+        if (! empty($data)) {
+            if (empty($ifNames)) {
+                $ifNames = $this->getCacheByIndex('ifName', 'IF-MIB');
+            }
+            if (empty($ifOperStatuses)) {
+                $ifOperStatuses = $this->getCacheByIndex('ifOperStatus', 'IF-MIB');
+            }
+
+            foreach ($data as $index => $entry) {
+                if (Str::startsWith($ifNames[$index], 'cellular') && $ifOperStatuses[$index] == 'up') {
+                    $sensors[] = new WirelessSensor(
+                        'cell',
+                        $this->getDeviceId(),
+                        '.1.3.6.1.4.1.2007.4.1.2.2.2.18.3.2.1.25.' . $index,
+                        'teldat',
+                        (10 * count($sensors)) + $index,
+                        'LteCellID: ' . $this->shortIfName($ifNames[$index], $index),
+                        $entry['teldatCellularStateMobileLTECellId']
+                    );
+                }
             }
         }
 
