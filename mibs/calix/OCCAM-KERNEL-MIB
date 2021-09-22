@@ -1,0 +1,381 @@
+
+OCCAM-KERNEL-MIB	DEFINITIONS ::= BEGIN
+	IMPORTS
+		occamGenericHardwareModules
+			FROM OCCAM-REG-MODULE
+		TEXTUAL-CONVENTION, TruthValue, DisplayString
+			FROM SNMPv2-TC
+		MODULE-COMPLIANCE, OBJECT-GROUP
+			FROM SNMPv2-CONF
+		OBJECT-IDENTITY, MODULE-IDENTITY, OBJECT-TYPE, 
+                NOTIFICATION-TYPE, Integer32, enterprises, private,
+                IpAddress
+			FROM SNMPv2-SMI
+		AlarmStatus
+		        FROM OCCAM-TC
+		cardShelfIndex, cardSlotIndex, ValidValue
+			FROM OCCAM-SHELF-MIB;
+
+	occamKernelMib	MODULE-IDENTITY
+		LAST-UPDATED	"200104271051Z"
+		ORGANIZATION	"Occam Networks"
+		CONTACT-INFO	"email support@occamnetworks.com"
+		DESCRIPTION	"The mib module to describe kernel 
+                                events."
+
+                REVISION	"200104271051Z"
+		DESCRIPTION	"Reformatted certain text"
+
+		REVISION	"201001070000Z"
+		DESCRIPTION	"Added  thresholdExceededNotification"
+		                          
+		REVISION	"200907060000Z"
+		DESCRIPTION	"Corrected syntax:
+                                bviInvalidDhcpAddressReason DisplayString
+                                bviIpAddressAssigned IpAddress"
+	        
+		REVISION	"200709170000Z"
+		DESCRIPTION	"added NSP notifications"
+                                
+		REVISION	"200702220000Z"
+		DESCRIPTION	"remove DISPLAY-HINT"
+		
+		REVISION        "200611200000Z"
+		DESCRIPTION     "Added bvi invalid dhcp address 
+                                notification"
+		::=  {  occamGenericHardwareModules  4  }
+
+-- TEXTUAL-CONVENTIONS --
+	VoicePortGnkStatusValue ::= TEXTUAL-CONVENTION 
+		STATUS			current
+		DESCRIPTION
+			"A voice port GNK status value."
+		SYNTAX 			INTEGER  { gnk-detected ( 1 ) ,
+                                         gnk-not-detected ( 2 ) } 
+
+	VoicePortIndexValue ::= TEXTUAL-CONVENTION 
+		STATUS			current
+		DESCRIPTION
+			"A voice port index."
+		SYNTAX 			Integer32  ( 1 .. 48  ) 
+
+	VoicePortOverTempStatusValue ::= TEXTUAL-CONVENTION 
+		STATUS			current
+		DESCRIPTION
+			"A voice port over temp status value."
+		SYNTAX 			INTEGER  { overtemp ( 1 ) ,
+                                         not-overtemp ( 2 ) } 
+
+	FanTrayStatusValue ::= TEXTUAL-CONVENTION 
+		STATUS			current
+		DESCRIPTION
+			"Fan tray inserted status value."
+		SYNTAX 			INTEGER  { inserted ( 1 ) ,
+                                         removed ( 2 ) } 
+
+	AcPowerStatusValue ::= TEXTUAL-CONVENTION 
+		STATUS			current
+		DESCRIPTION
+			"Blade AC power status value."
+		SYNTAX 			INTEGER  { on ( 1 ) , off ( 2 ) }
+		
+	BviPortIndexValue ::= TEXTUAL-CONVENTION 
+		STATUS			current
+		DESCRIPTION
+			"A bvi port index."
+		SYNTAX 			Integer32  ( 1 .. 2  ) 
+		
+	BviInvalidDhcpAddressStatusValue ::= TEXTUAL-CONVENTION 
+		STATUS			current
+		DESCRIPTION
+			"BVI ip address status value."
+		SYNTAX 			INTEGER  { alarm ( 1 ) , 
+                                        clear ( 2 ) }
+		
+	NspPeerValue ::= TEXTUAL-CONVENTION 
+		STATUS			current
+		DESCRIPTION
+			"An NSP peer value."
+		SYNTAX 			INTEGER  { primary ( 1 ) , 
+                                        secondary( 2 ) } 
+
+	NspAlarmStateValue ::= TEXTUAL-CONVENTION 
+		STATUS			current
+		DESCRIPTION
+			"An NSP alarm state  value."
+		SYNTAX 			INTEGER  { active ( 1 ) ,
+                                        cleared ( 2 ) } 
+
+--Objects
+
+
+	kernelMibObjects	OBJECT IDENTIFIER
+		::=  {  occamKernelMib  1  }
+
+	kernelMibTraps	OBJECT IDENTIFIER
+		::=  {  occamKernelMib  2  }
+
+	acPowerStatus	OBJECT-TYPE	
+		SYNTAX			AcPowerStatusValue
+		MAX-ACCESS		accessible-for-notify
+		STATUS			current
+		DESCRIPTION		"Indicates AC power status."
+		::=  {  kernelMibObjects  1  }
+
+	fanTrayStatus	OBJECT-TYPE	
+		SYNTAX			FanTrayStatusValue
+		MAX-ACCESS		accessible-for-notify
+		STATUS			current
+		DESCRIPTION		"Indicates fan tray insertion 
+                                        status."
+		::=  {  kernelMibObjects  2  }
+
+	voicePortTable	OBJECT-TYPE
+		SYNTAX		SEQUENCE  OF  VoicePortEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	"A table of information about 
+                                voice port GNK and dsp over temp errors. 
+                                The number of entries depends 
+                                on how voice ports are configured on
+                                the blade."
+		::=  { kernelMibObjects  3 }
+
+	voicePortEntry	OBJECT-TYPE
+		SYNTAX		VoicePortEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	"An entry in the VoicePortTable.
+                                A row in this table cannot be created 
+                                or deleted by SNMP operations on columns 
+                                of the table."
+		INDEX		{  portIndex  }
+		::=  { voicePortTable 1 }
+
+	VoicePortEntry  ::=  SEQUENCE {
+		portIndex  VoicePortIndexValue,
+		gnkStatus  VoicePortGnkStatusValue,
+		overTempStatus  VoicePortOverTempStatusValue,
+		voicePortRowStatus  ValidValue
+		}
+
+
+	portIndex	OBJECT-TYPE	
+		SYNTAX			VoicePortIndexValue
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"The index of a voice port."
+		::=  {  voicePortEntry  1  }
+
+
+	gnkStatus	OBJECT-TYPE	
+		SYNTAX			VoicePortGnkStatusValue
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"Indicates if the voice port had 
+                                        a GNK error."
+		::=  {  voicePortEntry  2  }
+
+
+	overTempStatus	OBJECT-TYPE	
+		SYNTAX			VoicePortOverTempStatusValue
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"Indicates if the voice port dsp 
+                                        is over temp."
+		::=  {  voicePortEntry  3  }
+
+
+	voicePortRowStatus	OBJECT-TYPE	
+		SYNTAX			ValidValue
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"Indicates if this row of the 
+                                        voice port table is valid."
+		::=  {  voicePortEntry  4  }
+		
+	bviPortTable	OBJECT-TYPE
+		SYNTAX		SEQUENCE  OF  BviPortEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	"A table of information about bvi ip 
+                                address errors. The number of entries 
+                                depends on how bvi ports are configured
+                                on the blade."
+		::=  { kernelMibObjects  4 }
+
+	bviPortEntry	OBJECT-TYPE
+		SYNTAX		BviPortEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	"An entry in the BviPortTable.
+                                A row in this table cannot be created
+                                or deleted by SNMP operations on columns
+                                of the table."
+		INDEX		{  bviPortIndex  }
+		::=  { bviPortTable 1 }
+
+	BviPortEntry  ::=  SEQUENCE {
+	bviPortIndex  BviPortIndexValue,
+	bviInvalidDhcpAddressStatus  BviInvalidDhcpAddressStatusValue,
+	bviIpAddressAssigned  IpAddress,
+	bviInvalidDhcpAddressReason  DisplayString
+	}
+
+
+	bviPortIndex	OBJECT-TYPE	
+		SYNTAX			BviPortIndexValue
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"The index of a bvi port."
+		::=  {  bviPortEntry  1  }
+
+
+	bviInvalidDhcpAddressStatus	OBJECT-TYPE	
+		SYNTAX			BviInvalidDhcpAddressStatusValue
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"Indicates the status of the bvi
+                                        ip address."
+		::=  {  bviPortEntry  2  }
+
+
+	bviIpAddressAssigned	OBJECT-TYPE	
+		SYNTAX			IpAddress
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"Indicates the ip address 
+                                        assigned to the bvi port."
+		::=  {  bviPortEntry  3  }
+
+
+	bviInvalidDhcpAddressReason	OBJECT-TYPE	
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"Indicates the reason for the 
+                                        bvi invalid dhcp address 
+                                        notification."
+		::=  {  bviPortEntry  4  }
+		
+	nspPeer				OBJECT-TYPE	
+		SYNTAX			NspPeerValue
+		MAX-ACCESS		accessible-for-notify
+		STATUS			current
+		DESCRIPTION		"Indicates NSP peer."
+		::=  {  kernelMibObjects  5  }
+		
+	nspAlarmState   OBJECT-TYPE	
+		SYNTAX			NspAlarmStateValue
+		MAX-ACCESS		accessible-for-notify
+		STATUS			current
+		DESCRIPTION		"Indicates NSP alarm state."
+		::=  {  kernelMibObjects  6  }
+		
+	nspAlarmMsg   OBJECT-TYPE	
+		SYNTAX			DisplayString
+		MAX-ACCESS		accessible-for-notify
+		STATUS			current
+		DESCRIPTION		"Indicates NSP alarm display 
+                                        string."
+		::=  {  kernelMibObjects  7  }
+
+	alarmState   OBJECT-TYPE	
+		SYNTAX			AlarmStatus
+		MAX-ACCESS		accessible-for-notify
+		STATUS			current
+		DESCRIPTION		"Indicates the alarm status."
+		::=  {  kernelMibObjects  8  }
+		
+	thresholdEntity   OBJECT-TYPE	
+		SYNTAX			INTEGER { 
+                                                macAddr ( 1 ) ,
+                                                multicastGroup ( 2 )
+					        } 
+		MAX-ACCESS      	accessible-for-notify
+		STATUS			current
+		DESCRIPTION		"Indicates the type of 
+                                        entity/resource."
+		::=  {  kernelMibObjects  9  }
+
+	thresholdValue   OBJECT-TYPE	
+		SYNTAX			Integer32
+		MAX-ACCESS		accessible-for-notify
+		STATUS			current
+		DESCRIPTION		"Indicates the threshold value."
+		::=  {  kernelMibObjects  10  }
+		
+		
+-- Notifications
+
+	gnkNotification	NOTIFICATION-TYPE
+		OBJECTS			{ cardShelfIndex, cardSlotIndex, 
+                                        portIndex, gnkStatus }
+		STATUS			current
+		DESCRIPTION		"This trap is sent when the gnk 
+                                        status changes."
+		::=  {  kernelMibTraps  1  }
+
+	overTempNotification	NOTIFICATION-TYPE
+		OBJECTS			{ cardShelfIndex, cardSlotIndex, 
+                                        portIndex, overTempStatus }
+		STATUS			current
+		DESCRIPTION		"This trap is sent when the DSP 
+                                        over temp status changes."
+		::=  {  kernelMibTraps  2  }
+
+	acPowerNotification	NOTIFICATION-TYPE
+		OBJECTS			{ cardShelfIndex, cardSlotIndex,
+                                         acPowerStatus }
+		STATUS			current
+		DESCRIPTION		"This trap is sent when blade ac
+                                         power status changes."
+		::=  {  kernelMibTraps  3  }
+
+	fanTrayNotification	NOTIFICATION-TYPE
+		OBJECTS			{ cardShelfIndex, cardSlotIndex, 
+                                        fanTrayStatus }
+		STATUS			current
+		DESCRIPTION		"This trap is sent when the 
+                                        shelf fan tray status changes."
+		::=  {  kernelMibTraps  4  }
+		
+	bviInvalidDhcpAddressNotification	NOTIFICATION-TYPE
+		OBJECTS			{ cardShelfIndex, cardSlotIndex, 
+                                        bviPortIndex, 
+                                        bviInvalidDhcpAddressStatus, 
+                                        bviIpAddressAssigned, 
+                                        bviInvalidDhcpAddressReason  }
+		STATUS			current
+		DESCRIPTION		"This trap is sent when the 
+                                        status of the bvi port ip address
+                                        changes."
+		::=  {  kernelMibTraps  5  }
+		
+	nspClockOutOfRangeNotification	NOTIFICATION-TYPE
+		OBJECTS			{ cardShelfIndex, cardSlotIndex, 
+                                        nspAlarmState, nspAlarmMsg  }
+		STATUS			current
+		DESCRIPTION		"This trap is sent when an NSP 
+                                        clock out of range event occurs."
+		::=  {  kernelMibTraps  6  }
+		
+	nspPeerDeadNotification		NOTIFICATION-TYPE
+		OBJECTS			{ cardShelfIndex, cardSlotIndex, 
+                                        nspAlarmState, nspPeer,
+                                        nspAlarmMsg }
+		STATUS			current
+		DESCRIPTION		"This trap is sent when an NSP 
+                                        peer dead event occurs."
+		::=  {  kernelMibTraps  7  }
+
+	thresholdExceededNotification		NOTIFICATION-TYPE
+		OBJECTS			{ alarmState, thresholdEntity, 
+                                        thresholdValue  }
+		STATUS			current
+		DESCRIPTION		"This trap is sent when a 
+                                        resource exceeds the threshold
+                                        value."
+		::=  {  kernelMibTraps  8  }
+
+END

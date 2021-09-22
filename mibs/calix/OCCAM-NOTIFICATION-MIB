@@ -1,0 +1,312 @@
+
+
+OCCAM-NOTIFICATION-MIB DEFINITIONS ::= BEGIN
+        IMPORTS
+                occamGenericXdslModules, occamGenericNotifications
+                        FROM OCCAM-REG-MODULE
+                TEXTUAL-CONVENTION, TruthValue, DisplayString
+                        FROM SNMPv2-TC
+                MODULE-COMPLIANCE, OBJECT-GROUP
+                        FROM SNMPv2-CONF
+                OBJECT-IDENTITY, MODULE-IDENTITY, OBJECT-TYPE, 
+                NOTIFICATION-TYPE, Integer32
+                        FROM SNMPv2-SMI
+                AlarmStatus 
+                        FROM OCCAM-TC
+                ontId, oltPonPortId
+                        FROM OCCAM-GPON-NOTIFICATION-MIB
+                cardShelfIndex, cardSlotIndex, ValidValue
+                        FROM OCCAM-SHELF-MIB;
+
+        occamNotificationMib    MODULE-IDENTITY
+                LAST-UPDATED    "201003080000Z"
+                ORGANIZATION    "Occam Networks"
+                CONTACT-INFO    "email support@occamnetworks.com"
+                DESCRIPTION     "The mib module contains Occam's 
+                                notifications that may be applicable 
+                                to multiple interfaces."
+
+
+                REVISION        "201011090000Z"
+		DESCRIPTION	"Added Ethernet CFM traps"
+                ::=  {  occamGenericNotifications  1  }
+
+
+        occamNotificationObjects        OBJECT IDENTIFIER
+        ::=  {  occamNotificationMib  1  } 
+
+        ontCesT1Objects OBJECT IDENTIFIER
+        ::=  {  occamNotificationMib  2  }
+
+        ontCesT1Notifications   OBJECT IDENTIFIER
+        ::=  {  occamNotificationMib  3  }
+
+        ethernetCfmObjects OBJECT IDENTIFIER
+        ::=  {  occamNotificationMib  4  }
+
+        ethernetCfmNotifications   OBJECT IDENTIFIER
+        ::=  {  occamNotificationMib  5  }
+
+   	sfpNotificationObjects  OBJECT IDENTIFIER
+	:: = { occamNotificationMib 6 } 
+
+        sfpNotifications   OBJECT IDENTIFIER
+        ::=  {  occamNotificationMib  7  }
+
+	genericNotificationObjects  OBJECT IDENTIFIER
+	::= {  occamNotificationMib 8 }	
+
+	genericNotifications  OBJECT IDENTIFIER
+	::= {  occamNotificationMib 9 }	
+
+
+
+
+        ontCesT1PortId          OBJECT-TYPE     
+                SYNTAX          Integer32 
+                MAX-ACCESS      accessible-for-notify
+                STATUS          current
+                DESCRIPTION
+                        "An ONT's T1 port ID."
+                ::=  {  ontCesT1Objects  1  }
+
+        ontCesT1AlarmType       OBJECT-TYPE     
+                SYNTAX          INTEGER {
+                                tf(1),          -- Transmission failure
+                                los(2),         -- Loss of signal
+                                lof(3),         -- Loss of frame
+                                oof(4),         -- Out of frame
+                                rai(5),         -- Remonte alarm indication
+                                ais-1544M(6)    -- 1.544 Mbits/s back 
+                                                -- alarm indication signal
+                                } 
+
+                MAX-ACCESS      accessible-for-notify
+                STATUS          current
+                DESCRIPTION
+                        "The Ont CES port T1 alarm status."
+                ::=  {  ontCesT1Objects  2  }
+
+
+        ontCesT1AlarmStatus     OBJECT-TYPE     
+                SYNTAX          AlarmStatus 
+                MAX-ACCESS      accessible-for-notify
+                STATUS          current
+                DESCRIPTION
+                        "The Ont CES port T1 alarm status."
+                ::=  {  ontCesT1Objects 3  }
+
+
+
+
+         ecfmMepid              OBJECT-TYPE     
+                SYNTAX          Integer32 
+                MAX-ACCESS      accessible-for-notify
+                STATUS          current
+                DESCRIPTION
+                        "A CFM Maintenance end point Id."
+                ::=  {  ethernetCfmObjects 1  }
+
+         ecfmPortId             OBJECT-TYPE     
+                SYNTAX          Integer32 
+                MAX-ACCESS      accessible-for-notify
+                STATUS          current
+                DESCRIPTION
+                        "A ethernet or XG port Id."
+                ::=  {  ethernetCfmObjects 2  }
+
+         ecfmDomainLevel        OBJECT-TYPE     
+                SYNTAX          Integer32 
+                MAX-ACCESS      accessible-for-notify
+                STATUS          current
+                DESCRIPTION
+                        "A CFM domain level number."
+                ::=  {  ethernetCfmObjects 3  }
+
+         ecfmVlanId             OBJECT-TYPE     
+                SYNTAX          Integer32 
+                MAX-ACCESS      accessible-for-notify
+                STATUS          current
+                DESCRIPTION
+                        "A Vlan Id."
+                ::=  {  ethernetCfmObjects 4 }
+
+         ecfmRemoteMepId        OBJECT-TYPE     
+                SYNTAX          Integer32 
+                MAX-ACCESS      accessible-for-notify
+                STATUS          current
+                DESCRIPTION
+                        "A CFM remote side Maintenance end point Id."
+                  ::=  {  ethernetCfmObjects 5  }
+
+
+         ecfmAlarmType          OBJECT-TYPE     
+                SYNTAX          INTEGER {            -- 1 to 7 are Y1731 alarms.
+                                rdi(1),              -- A Mep receives a RDI.  
+                                loc(2),              -- A Mep detects Loss of Continuity with a peer Mep.
+                                unexpCCM(3),         -- A Mep receives a CCM with a wrong interval.
+                                unexpMep(4),         -- A Mep receives a CCM with correct Meg Id and level 
+                                                     -- with unexpected Mep Id.
+                                                     -- receiver's Id.
+                                misMerge(5),         -- A Mep receives a CCM with incorrect domain Id.
+                                unexpMegLevel(6),    -- A Mep receives a CCM with a wrong level.
+                                ais(7),              -- A Mep receives an AIS frame.
+
+                                                     -- 8 to 11 are 802.1ag alarms.
+                                crossConnect(8),  -- A Mep receives an CCM with incorrect Mep, or 
+                                                     -- maintenance association Id.
+                                ccmDefect(9),        -- A MEP has received at least one invalid CCM
+                                                     -- whose CCM Interval has not yet timed out.
+                                remoteCCMDefect(10), -- Have not received a CCM in 3.5*CCm interval.
+                                macStatusDefect(11)  -- A remote Mep has a port status value other 
+                                                     -- than psUp.
+
+                                }
+                MAX-ACCESS      accessible-for-notify
+                STATUS          current
+                DESCRIPTION
+                        "The CFM alarm status."
+                ::=  {  ethernetCfmObjects 6  }  
+ 
+         ecfmAlarmStatus        OBJECT-TYPE     
+                SYNTAX          AlarmStatus 
+                MAX-ACCESS      accessible-for-notify
+                STATUS          current
+                DESCRIPTION
+                        "The CFM alarm status."
+                ::=  {  ethernetCfmObjects 7  }          
+
+	sfpPortIdentifier	OBJECT-TYPE 
+                SYNTAX         	OCTET STRING  (SIZE(0..12))  
+                MAX-ACCESS      accessible-for-notify
+                DESCRIPTION
+                        "1G/XG port identifier."
+		::= { sfpNotificationObjects 1 }
+
+	sfpType		OBJECT-TYPE
+	        SYNTAX         	INTEGER  {
+				sfp(1),
+				csfp(2),
+				sfpplus(3),
+				xfp(4),
+				unknown(5) 
+			}
+		MAX-ACCESS      accessible-for-notify
+		DESCRIPTION
+			"SFP switch type."
+		::= { sfpNotificationObjects 2 }
+
+	sfpFailureReason	OBJECT-TYPE 
+        	SYNTAX         	INTEGER  {
+					sfpUnsupported(1),
+					sfpUnrecognized(2)
+				}
+                STATUS          current
+                DESCRIPTION
+                        "SFP failure reason."
+		::= { sfpNotificationObjects 3 }
+
+	sfpAlarmStatus		OBJECT-TYPE
+		SYNTAX		AlarmStatus
+		MAX-ACCESS	accessible-for-notify
+		STATUS		current
+		DESCRIPTION
+				"SFP alarm status."
+		::= { sfpNotificationObjects 4 }
+
+	genericDescription	OBJECT-TYPE
+                SYNTAX         	OCTET STRING  (SIZE(0..20))  
+		MAX-ACCESS	accessible-for-notify
+		STATUS		current
+		DESCRIPTION
+				"Generic system notification description."
+		::= { genericNotificationObjects 1 }
+
+	genericSeverity		OBJECT-TYPE
+		SYNTAX          INTEGER  {
+					other(1),
+					minor(2),
+					major(3),
+					critical(4)
+				}
+                STATUS          current
+		MAX-ACCESS	accessible-for-notify
+                DESCRIPTION
+                        "System notification severity.  Valid values are:
+                                        other(1): a severity other than those
+                                        listed below.
+                                        minor(2): Minor Problem 
+                                        major(3): Major Problem 
+                                        critical(4): Critical Problem."
+		::= { genericNotificationObjects 2 }
+
+	genericAlarmStatus	OBJECT-TYPE
+		SYNTAX		AlarmStatus
+		MAX-ACCESS	accessible-for-notify
+		STATUS		current
+		DESCRIPTION
+				"Generic alarm status."
+		::= { genericNotificationObjects 3 }
+
+	genericAddlInfo		OBJECT-TYPE
+                SYNTAX         	OCTET STRING  (SIZE(0..50))  
+		MAX-ACCESS	accessible-for-notify
+		STATUS		current
+		DESCRIPTION
+				"Generic additional information about the notification."
+		::= { genericNotificationObjects 4 }
+
+
+-- ONT CES port T1 Alarm NOTIFICATIONS --
+                
+        ontCesT1Alarm           NOTIFICATION-TYPE
+                OBJECTS         {cardShelfIndex, cardSlotIndex, 
+                                oltPonPortId, ontId, ontCesT1PortId,
+                                ontCesT1AlarmType, ontCesT1AlarmStatus }
+                STATUS          current
+                DESCRIPTION             
+                        "An ONT CES port T1 alarm."
+                ::=  { ontCesT1Notifications  1  }
+
+
+-- Ethnet Connectivity Fault Management Alarm NOTIFICATIONS --
+                
+        ecfmNotification        NOTIFICATION-TYPE
+                OBJECTS         {cardShelfIndex, cardSlotIndex, 
+                                ecfmMepid, ecfmPortId, ecfmDomainLevel,
+                                ecfmVlanId, ecfmRemoteMepId, 
+                                ecfmAlarmType, ecfmAlarmStatus }
+                STATUS          current
+                DESCRIPTION             
+                        "An Ethernet CFM alarm notification."
+                ::=  { ethernetCfmNotifications  1  }
+
+-- SFP Alarm NOTIFICATIONS --
+                
+        sfpNotification        NOTIFICATION-TYPE
+                OBJECTS         {sfpPortIdentifier,
+                                sfpType,
+                                sfpFailureReason, 
+                                sfpAlarmStatus }
+                STATUS          current
+                DESCRIPTION             
+                        "SFP alarm notification."
+                ::=  { sfpNotifications  1  }
+
+-- GENERIC SYSTEM NOTIFICATION --
+
+	genericSystemNotification	NOTIFICATION-TYPE
+		OBJECTS			{ genericDescription,
+					  genericSeverity,
+					  genericAlarmStatus,
+					  genericAddlInfo }
+		STATUS			current
+		DESCRIPTION
+			"Generic System Alarm Notification."
+		::=  { genericNotifications 1 }
+        
+END
+
+
+
+

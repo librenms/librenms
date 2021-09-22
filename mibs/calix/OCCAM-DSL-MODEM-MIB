@@ -1,0 +1,114 @@
+
+OCCAM-DSL-MODEM-MIB	DEFINITIONS ::= BEGIN
+	IMPORTS
+		occamGenericDslModules
+			FROM OCCAM-REG-MODULE
+		TEXTUAL-CONVENTION, TruthValue
+			FROM SNMPv2-TC
+		MODULE-COMPLIANCE, OBJECT-GROUP
+			FROM SNMPv2-CONF
+		OBJECT-IDENTITY, MODULE-IDENTITY, OBJECT-TYPE, 
+		NOTIFICATION-TYPE, Integer32, enterprises
+			FROM SNMPv2-SMI
+		cardShelfIndex, cardSlotIndex, ValidValue
+			FROM OCCAM-SHELF-MIB;
+
+	occamDslModemMib	MODULE-IDENTITY
+		LAST-UPDATED	"200702211030Z"
+		ORGANIZATION	"Occam Networks"
+		CONTACT-INFO	"email support@occamnetworks.com"
+		DESCRIPTION	"The mib module to describe Dsl 
+				modem state."
+		REVISION	"200702211030Z"
+		DESCRIPTION	"changed dslModemIndex to 
+				dslPortIndex. 
+				sending ch# in trap.
+				chg'd ShowTime to Showtime."
+		
+		::=  {  occamGenericDslModules  2  }
+
+-- TEXTUAL-CONVENTIONS --
+	ShowtimeValue ::= TEXTUAL-CONVENTION 
+		STATUS			current
+		DESCRIPTION
+			"An ShowTime in/out value."
+		SYNTAX 			INTEGER  { in ( 1 ) , out ( 2 ) } 
+
+	DslPortIdentifier ::= TEXTUAL-CONVENTION 
+		STATUS			current
+		DESCRIPTION
+			"A dsl port number."
+		SYNTAX 			Integer32  ( 1 .. 48  ) 
+
+
+	dslModemMibObjects	OBJECT IDENTIFIER
+		::=  {  occamDslModemMib  1  }
+
+	dslModemMibTraps	OBJECT IDENTIFIER
+		::=  {  occamDslModemMib  2  }
+
+	dslModemTable	OBJECT-TYPE
+		SYNTAX		SEQUENCE  OF  DslModemEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	"A table of information about 
+				DSL Modems connected to DSL ports on 
+				the system. 
+				The number of entries depends 
+				on how many Dsl ports are configured on 
+				the system."
+		::=  { dslModemMibObjects  1 }
+
+	dslModemEntry	OBJECT-TYPE
+		SYNTAX		DslModemEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	"An entry in the dslModemTable.
+				A row in this table cannot be created 
+				or deleted by SNMP operations on columns 
+				of the table."
+		INDEX		{ dslPortIndex  }
+		::=  { dslModemTable 1 }
+
+	DslModemEntry  ::=  SEQUENCE {
+		dslPortIndex  DslPortIdentifier,
+		dslModemShowtimeStatus  ShowtimeValue,
+		dslModemRowStatus  ValidValue
+		}
+
+	dslPortIndex	OBJECT-TYPE	
+		SYNTAX			DslPortIdentifier
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"Selects a dslModem (port) for 
+                                        dslModemTable lookups."
+		::=  {  dslModemEntry  1  }
+
+
+	dslModemShowtimeStatus	OBJECT-TYPE	
+		SYNTAX			ShowtimeValue
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"Indicates if the dsl modem is
+                                        operational or down."
+		::=  {  dslModemEntry  2  }
+
+
+	dslModemRowStatus	OBJECT-TYPE	
+		SYNTAX			ValidValue
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"Indicates if this row of the 
+                                        dslModem table is valid."
+		::=  {  dslModemEntry  3  }
+
+	dslModemShowtimeNotification	NOTIFICATION-TYPE
+		OBJECTS			{ cardShelfIndex, cardSlotIndex, 
+                                        dslPortIndex, 
+                                        dslModemShowtimeStatus }
+		STATUS			current
+		DESCRIPTION		"This trap is sent when 
+                                        dslModemShowtime status changes."
+		::=  {  dslModemMibTraps  1  }
+
+END

@@ -1,0 +1,313 @@
+
+OCCAM-SUBS-MIB    DEFINITIONS ::= BEGIN
+    IMPORTS
+        occamGenericSubscriberModules
+            FROM OCCAM-REG-MODULE
+        RowStatus, TEXTUAL-CONVENTION
+            FROM SNMPv2-TC
+        MODULE-COMPLIANCE, OBJECT-GROUP
+            FROM SNMPv2-CONF
+        ifIndex
+            FROM IF-MIB
+        MODULE-IDENTITY, OBJECT-TYPE, Integer32
+            FROM SNMPv2-SMI
+        SnmpAdminString
+            FROM SNMP-FRAMEWORK-MIB;
+
+    occamSubsMib    MODULE-IDENTITY
+        LAST-UPDATED    "200104271051Z"
+        ORGANIZATION    "Occam Networks"
+	CONTACT-INFO	"email support@occamnetworks.com"             
+                      
+        DESCRIPTION     "The MIB module defining objects for the 
+                        management of subscriber interfaces on 
+                        Occam Networks' products. Subscriber interfaces
+                        are those interfaces facing customer premises
+                        equipment and to which subscriber management 
+                        functions apply.  These functions include,
+                        but are not limited to, definitions of traffic
+                        flows and subsequent handling of traffic in those
+                        flows, for example, rate limiting, filtering and
+                        assignment to a specified VLAN."
+
+        REVISION        "200104271051Z"
+        DESCRIPTION     "MODULE-IDENTITY update"
+ 
+
+        REVISION        "200309101641Z"
+        DESCRIPTION     "Initial Version"
+        ::=  {  occamGenericSubscriberModules  1  }
+
+--
+-- TEXTUAL-CONVENTIONS
+--
+    OccamSubsVlanNumber ::= TEXTUAL-CONVENTION 
+        DISPLAY-HINT    "d"
+        STATUS    current
+        DESCRIPTION
+            "The number of the virtual LAN. A limited range for objects
+            of this type is acceptable."
+        SYNTAX             Integer32  ( 1 .. 4095  ) 
+
+    PvcStatus ::= TEXTUAL-CONVENTION 
+        STATUS    current
+        DESCRIPTION
+            "This column indicates the desired state of the PVC."
+        SYNTAX     INTEGER  { up ( 1 ) , down ( 2 ) } 
+
+    SubsVpIdentifier ::= TEXTUAL-CONVENTION 
+        DISPLAY-HINT    "d"
+        STATUS    current
+        DESCRIPTION
+            "The VPI value for a subscriber PVC. A limited range for objects 
+            of this type is acceptable."
+        SYNTAX    Integer32  ( 0 .. 255  ) 
+
+    SubsVcIdentifier ::= TEXTUAL-CONVENTION 
+        DISPLAY-HINT    "d"
+        STATUS    current
+        DESCRIPTION
+            "The VCI value for a subscriber PVC. A limited range for objects 
+            of this type is acceptable."
+        SYNTAX    Integer32  ( 0 .. 65535  ) 
+
+
+--
+-- OBJECT-IDENTIFIERs
+--
+
+    occamSubsMibObjects    OBJECT IDENTIFIER
+        ::=  {  occamSubsMib  1  }
+
+    occamSubsMibTraps    OBJECT IDENTIFIER
+        ::=  {  occamSubsMib  2  }
+
+    occamSubsMibConformance    OBJECT IDENTIFIER
+        ::=  {  occamSubsMib  3  }
+
+
+--
+-- objects
+--
+
+--
+-- The Subscriber configuration table
+--
+    occamSubsConfTable    OBJECT-TYPE
+        SYNTAX        SEQUENCE  OF  OccamSubsConfEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "This table is used to configure the subscriber
+            interfaces.  Rows may be created by setting the rowStatus
+            to createAndGo(4). Creating a row creates a PVC on the
+            managed system. Rows may be destroyed by setting rowStatus
+            to destroy(6). Destroying a row removes the PVC from the
+            managed system. The maximum number of rows is given by
+            the total number of subscriber interfaces and the maximum
+            number of PVCs per subscriber interfaces. A row created
+            without specifying the occamSubsPvcStatus will have
+            occamSubsPvcStatus equal to down(2)."
+        ::=  { occamSubsMibObjects  1 }
+
+    occamSubsConfEntry    OBJECT-TYPE
+        SYNTAX        OccamSubsConfEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "An entry in the occamSubsConfTable."
+        INDEX    {  ifIndex, occamSubsVpi, occamSubsVci  }
+        ::=  { occamSubsConfTable 1 }
+
+    OccamSubsConfEntry  ::=  SEQUENCE {
+        occamSubsVpi  SubsVpIdentifier,
+        occamSubsVci  SubsVcIdentifier,
+        occamSubsAccessProfile  SnmpAdminString,
+        occamSubsPvcStatus  PvcStatus,
+        occamSubsRowStatus  RowStatus
+        }
+
+    occamSubsVpi    OBJECT-TYPE    
+        SYNTAX        SubsVpIdentifier ( 0 .. 15 )
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "The VPI for this PVC." 
+        ::=  {  occamSubsConfEntry  1  }
+
+
+    occamSubsVci    OBJECT-TYPE    
+        SYNTAX        SubsVcIdentifier ( 32 .. 511 )
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "The VCI for this PVC."
+        ::=  {  occamSubsConfEntry  2  }
+
+
+    occamSubsAccessProfile    OBJECT-TYPE    
+        SYNTAX        SnmpAdminString  ( SIZE ( 0 .. 255  ) ) 
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+            "The access profile for this PVC."
+        ::=  {  occamSubsConfEntry  3  }
+
+
+    occamSubsPvcStatus    OBJECT-TYPE    
+        SYNTAX        PvcStatus
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+            "The desired state of the PVC. The PVC is initially in the
+            down(2) state."
+        ::=  {  occamSubsConfEntry  4  }
+
+
+    occamSubsRowStatus    OBJECT-TYPE    
+        SYNTAX        RowStatus  { createAndGo(4), destroy(6) }
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+            "The status of the row."
+        ::=  {  occamSubsConfEntry  5  }
+
+
+--
+-- The Subscriber Device Reservation table
+--
+    occamSubsDeviceReservationTable    OBJECT-TYPE
+        SYNTAX        SEQUENCE  OF  OccamSubsDeviceReservationEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "This table is used to manage the number of devices that
+            have been reserved for this VLAN on this PVC on this
+            interface. The number reduces the total available to other
+            VLANs and must not exceed the number of available devices
+            for this PVC. The VLAN can be one defined for a flow by
+            an embedded class map or the default VLAN. The number of
+            rows depends on the number of subscriber interfaces, the
+            number of PVCs per interface and the number of configured
+            VLANs per PVC."
+        ::=  { occamSubsMibObjects  2 }
+
+    occamSubsDeviceReservationEntry    OBJECT-TYPE
+        SYNTAX        OccamSubsDeviceReservationEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "An entry in the occamSubsDeviceReservationTable."
+        INDEX    {  ifIndex, occamSubsVpi, occamSubsVci, occamSubsVlan  }
+        ::=  { occamSubsDeviceReservationTable 1 }
+
+    OccamSubsDeviceReservationEntry  ::=  SEQUENCE {
+        occamSubsVlan  OccamSubsVlanNumber,
+        occamSubsDeviceReservationNumber  Integer32,
+        occamSubsDeviceReservationRowStatus  RowStatus
+        }
+
+
+    occamSubsVlan    OBJECT-TYPE    
+        SYNTAX        OccamSubsVlanNumber ( 2 .. 122 )
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "The VLAN to reserve devices for." 
+        ::=  {  occamSubsDeviceReservationEntry  1  }
+
+
+    occamSubsDeviceReservationNumber    OBJECT-TYPE    
+        SYNTAX        Integer32  ( 0 .. 1024  ) 
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+            "The number of devices reserved on this VLAN on this PVC on
+            this interface. The maximum allowed value may be less than that 
+            specified, according to the product and software release."
+        ::=  {  occamSubsDeviceReservationEntry  2  }
+
+
+    occamSubsDeviceReservationRowStatus    OBJECT-TYPE    
+        SYNTAX        RowStatus { createAndGo(4), destroy(6) }
+        MAX-ACCESS    read-create
+        STATUS        current
+        DESCRIPTION
+            "Setting a valid VLAN and device reservation number with a
+            row status of createAndGo(4) reserves the devices for
+            this VLAN on this PVC on this interface. Setting the row
+            status to destroy(6) releases these devices, effectively 
+            setting the device reservation number to zero."
+        ::=  {  occamSubsDeviceReservationEntry  3  }
+
+
+--
+-- Compliance statements
+--
+
+    occamSubsMibGroups    OBJECT IDENTIFIER
+        ::=  {  occamSubsMibConformance  1  }
+
+    occamSubsMibCompliances    OBJECT IDENTIFIER
+        ::=  {  occamSubsMibConformance  2  }
+
+--
+-- Groups
+--
+    occamSubsConfGroup    OBJECT-GROUP
+        OBJECTS    { 
+                       occamSubsAccessProfile ,
+                       occamSubsPvcStatus 
+                   }
+        STATUS    current
+        DESCRIPTION
+            "A collection of objects necessary to configure a subscriber
+            interface."
+        ::=  {  occamSubsMibGroups  1  }
+
+    occamSubsReservationGroup    OBJECT-GROUP
+        OBJECTS    { occamSubsDeviceReservationNumber  }
+        STATUS     current
+        DESCRIPTION
+            "A collection of objects necessary to configure device 
+            reservations on subscriber interfaces."
+        ::=  {  occamSubsMibGroups  2  }
+
+    occamSubsControlGroup    OBJECT-GROUP
+        OBJECTS    { 
+                        occamSubsDeviceReservationRowStatus,
+                        occamSubsRowStatus  
+                    }
+        STATUS    current
+        DESCRIPTION
+            "A collection of objects necessary to create the tables."
+        ::=  {  occamSubsMibGroups  3  }
+
+
+--
+-- Compliance statements
+--
+    occamSubsComplianceV01    MODULE-COMPLIANCE
+        STATUS    current
+        DESCRIPTION
+            "Description"
+        MODULE     
+        MANDATORY-GROUPS  {  
+                             occamSubsConfGroup, 
+                             occamSubsReservationGroup,
+                             occamSubsControlGroup  
+                          }
+
+        OBJECT        occamSubsRowStatus
+        WRITE-SYNTAX    INTEGER { createAndGo(4), destroy(6) }
+        DESCRIPTION
+            "Can only support one-shot creation and deletion."
+
+        OBJECT        occamSubsDeviceReservationRowStatus
+        WRITE-SYNTAX    INTEGER { createAndGo(4), destroy(6) }
+        DESCRIPTION
+            "Can only support one-shot creation and deletion."
+
+        ::=  {  occamSubsMibCompliances  1  }
+
+END

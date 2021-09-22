@@ -1,0 +1,87 @@
+
+OCCAM-POWER-MGMT-MIB	DEFINITIONS ::= BEGIN
+	IMPORTS
+		OBJECT-IDENTITY, MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE
+			FROM SNMPv2-SMI
+		MODULE-COMPLIANCE, OBJECT-GROUP
+			FROM SNMPv2-CONF
+		occamGenericMonitorModules
+			FROM OCCAM-REG-MODULE;
+
+	powerMgmtMib	MODULE-IDENTITY
+		LAST-UPDATED	"200104271051Z"
+		ORGANIZATION	"Occam Networks"
+		CONTACT-INFO	"email support@occamnetworks.com"
+		DESCRIPTION     "The mib module to describe power management."
+
+		REVISION	"200104271051Z"
+		DESCRIPTION     "Updated MODULE-IDENTITY update and
+                                reformatted certain text."
+		
+		::=  {  occamGenericMonitorModules  2  }
+
+-- Object identifiers
+
+	powerMgmtMibObjects	OBJECT IDENTIFIER
+		::=  {  powerMgmtMib  1  }
+
+	powerMgmtMibTraps	OBJECT IDENTIFIER
+		::=  {  powerMgmtMib  2  }
+
+	powerMgmtMibTrapsSubId	OBJECT IDENTIFIER
+		::=  {  powerMgmtMibTraps  0  }
+
+-- Objects
+
+	powerMgmtAdminStatus	OBJECT-TYPE	
+		SYNTAX			INTEGER  { 
+                            on ( 1 ), 
+                            off ( 2 ) 
+                        } 
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+			"Indicates the configured state of the power management
+                        function. If on, the DSL ports will be disabled when the
+                        system goes onto battery power and enabled when the	
+			system goes onto main power."
+		DEFVAL			{ off }
+		::=  {  powerMgmtMibObjects  1  }
+
+	powerMgmtPowerSource	OBJECT-TYPE	
+		SYNTAX			INTEGER  { 
+                            mainPower ( 1 ), 
+                            batteryPower ( 2 ) 
+                        }
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+			"The current source of power to the unit."
+		::=  {  powerMgmtMibObjects  2  }
+		
+	dslModemPower	OBJECT-TYPE	
+		SYNTAX			INTEGER  { 
+                            on ( 1 ), 
+                            off ( 2 ) 
+                        } 
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+			"Indicates if power is or is not applied to the DSL	
+			modems."
+		DEFVAL			{ off }
+		::=  {  powerMgmtMibObjects  3  }
+
+
+-- Notifications
+
+	powerMgmtPowerSourceChange	NOTIFICATION-TYPE
+		OBJECTS			{ powerMgmtAdminStatus,			
+					powerMgmtPowerSource, dslModemPower  }
+		STATUS			current
+		DESCRIPTION
+			"This trap is sent when the value of			
+			powerMgmtPowerSource changes."
+		::=  {  powerMgmtMibTrapsSubId  1  }
+
+END

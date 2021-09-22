@@ -1,0 +1,388 @@
+
+OCCAM-SUBSERVICES-MIB	DEFINITIONS ::= BEGIN
+	IMPORTS
+		occamGenericSubscriberModules
+			FROM OCCAM-REG-MODULE
+		TEXTUAL-CONVENTION, TruthValue
+			FROM SNMPv2-TC
+		MODULE-COMPLIANCE, OBJECT-GROUP
+			FROM SNMPv2-CONF
+		OBJECT-IDENTITY, MODULE-IDENTITY, OBJECT-TYPE, 
+		NOTIFICATION-TYPE, Integer32, enterprises, private
+			FROM SNMPv2-SMI
+		cardShelfIndex, cardSlotIndex, ValidValue
+			FROM OCCAM-SHELF-MIB;
+
+	occamSubServicesMib	MODULE-IDENTITY
+		LAST-UPDATED	"200107060000Z"
+		ORGANIZATION	"Occam Networks"
+		CONTACT-INFO	"email support@occamnetworks.com"
+		DESCRIPTION	"The mib module to describe BlackListing, 
+                                Client Queue,and Ingress Filter 
+                                subscriber services."
+
+                REVISION	"200107060000Z"
+                DESCRIPTION     "Changed the oid assignment of this mib
+                                 from .3 to .4 under
+                                 occamGenericSubscriberModules."
+
+		REVISION	"200104271051Z"
+		DESCRIPTION	"Reformatted certain text"
+					 
+		REVISION	"200702220000Z"
+		DESCRIPTION	"remove DISPLAY-HINT"
+		
+		
+		::=  {  occamGenericSubscriberModules  4  }
+
+-- TEXTUAL-CONVENTIONS --
+	SubPortValue ::= TEXTUAL-CONVENTION 
+		STATUS			current
+		DESCRIPTION
+			"Identifier of the service."
+		SYNTAX 			INTEGER  ( 1 .. 128  ) 
+		
+        ProfileValue ::= TEXTUAL-CONVENTION 
+		STATUS			current
+		DESCRIPTION
+			"A port profile status."
+		SYNTAX 			INTEGER  { inp ( 1 ) , outp ( 2 ) } 
+
+	PortTypeValue ::= TEXTUAL-CONVENTION 
+		STATUS			current
+		DESCRIPTION
+			"A port type value based on the platform."
+		SYNTAX 			INTEGER  
+					{ dsl (1) , ethernet ( 2 ) , gpon (3) }
+		
+        TriggerTypeValue ::= TEXTUAL-CONVENTION 
+		STATUS			current
+		DESCRIPTION
+			"A blag trigger type value."
+		SYNTAX 			INTEGER  
+					{ dhcp ( 1 ), igmp ( 2 ), arp ( 3 ) } 
+
+	DroppedPacketStatusValue ::= TEXTUAL-CONVENTION 
+		STATUS			current
+		DESCRIPTION
+			"A packets dropping status value."
+		SYNTAX 			INTEGER  
+					{ packetsDropping ( 1 ) ,		
+					packetsNotDropping ( 2 ) } 
+
+	PortValue ::= TEXTUAL-CONVENTION 
+		STATUS			current
+		DESCRIPTION
+			"Subscriber port value. olt/ont format for GPON,
+                        portId for other platforms."
+		SYNTAX 			OCTET STRING
+
+	ResourceStatusValue ::= TEXTUAL-CONVENTION 
+		STATUS			current
+		DESCRIPTION
+			"A resources exhausted status value."
+		SYNTAX 			INTEGER  { exhausted ( 1 ) ,		
+						notExhausted ( 2 ) } 
+
+	ThresholdStatusValue ::= TEXTUAL-CONVENTION 
+		STATUS			current
+		DESCRIPTION
+			"A threshold status value."
+		SYNTAX 			INTEGER  { reached ( 1 ) ,
+						 cleared ( 2 ) 
+} 
+
+
+	subServicesMibObjects	OBJECT IDENTIFIER
+		::=  {  occamSubServicesMib  1  }
+
+	subServicesMibTraps	OBJECT IDENTIFIER
+		::=  {  occamSubServicesMib  2  }
+
+	clientQueueThresholdStatus	OBJECT-TYPE	
+		SYNTAX			ThresholdStatusValue
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+                        "Indicates if the upper warning threshold of the 
+                        client queue has been reached."
+		::=  {  subServicesMibObjects  1  }
+
+	clientQueueDroppedPacketStatus	OBJECT-TYPE	
+		SYNTAX			DroppedPacketStatusValue
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+                        "Indicates if packets are being dropped because
+                        the client queue is full."
+		::=  {  subServicesMibObjects  2  }
+
+	clientQueueEventReporter	OBJECT-TYPE	
+		SYNTAX			OCTET STRING
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+                        "Indicates the reporter of a client queue event."
+		::=  {  subServicesMibObjects  3  }
+
+	clientQueueLength	OBJECT-TYPE	
+		SYNTAX			Integer32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+                        "Indicates the current size of the client queue."
+		::=  {  subServicesMibObjects  4  }
+
+	ingressFilterMaskThresholdStatus	OBJECT-TYPE	
+		SYNTAX			ThresholdStatusValue
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+                        "Indicates if the upper threshold of the ingress
+                        filter mask resources has been reached."
+		::=  {  subServicesMibObjects  5  }
+
+	ingressFilterMaskExhaustedStatus	OBJECT-TYPE	
+		SYNTAX			ResourceStatusValue
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+                        "Indicates if the ingress filter mask resources
+                        have been exhausted."
+		::=  {  subServicesMibObjects  6  }
+
+	ingressFilterRuleThresholdStatus	OBJECT-TYPE	
+		SYNTAX			ThresholdStatusValue
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+                        "Indicates if the upper threshold of the ingress
+                        filter rule resources has been reached."
+		::=  {  subServicesMibObjects  7  }
+
+	ingressFilterRuleExhaustedStatus	OBJECT-TYPE	
+		SYNTAX			ResourceStatusValue
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+                        "Indicates if the ingress filter rule resources
+                        have been exhausted."
+		::=  {  subServicesMibObjects  8  }
+
+	blackListingTable	OBJECT-TYPE
+		SYNTAX		SEQUENCE  OF  BlackListingEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	
+                        "A table about Blacklisting on ports in the system. 
+                        The number of entries depends on how many ethernet
+                        (and vlan) and dsp ports (and pvcs) are configured
+                        on the system."
+		::=  { subServicesMibObjects  9 }
+
+	blackListingEntry	OBJECT-TYPE
+		SYNTAX		BlackListingEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	
+                        "An entry in the blackListing table. A row in this
+                        table cannot be created or deleted by SNMP operations
+                        on columns of the table."
+		INDEX		{  blackListingPortType, 
+                                blackListingInterface, 
+                                blackListingSubPort  }
+		::=  { blackListingTable 1 }
+
+	BlackListingEntry  ::=  SEQUENCE {
+		blackListingPortType  PortTypeValue,
+		blackListingInterface  PortValue,
+		blackListingSubPort  SubPortValue,
+		blackListingProfileStatus  ProfileValue,
+		blackListingTriggerType TriggerTypeValue,
+		blackListingPortState  OCTET STRING,
+		blackListingRetryCount Integer32,
+		blackListingStartDate  OCTET STRING,
+		blackListingLastRetryDate  OCTET STRING,
+		blackListingClearingReason  OCTET STRING,
+		blackListingRemoteDev  OCTET STRING,
+		blackListingRowStatus  ValidValue
+		}
+
+
+	blackListingPortType	OBJECT-TYPE	
+		SYNTAX			PortTypeValue
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+                        "Indicates the port type."
+		::=  {  blackListingEntry  1  }
+
+
+	blackListingInterface	OBJECT-TYPE	
+		SYNTAX			PortValue
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+                        "Indicates the interface."
+		::=  {  blackListingEntry  2  }
+
+	blackListingSubPort	OBJECT-TYPE	
+		SYNTAX			SubPortValue
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+                        "Indicates the sub port."
+		::=  {  blackListingEntry  3  }
+
+        blackListingProfileStatus	OBJECT-TYPE	
+		SYNTAX			ProfileValue
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+                        "Indicates the profile status of the port."
+		::=  {  blackListingEntry  4  }
+
+	blackListingTriggerType	OBJECT-TYPE	
+		SYNTAX			TriggerTypeValue
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+                        "Indicates the sub port."
+		::=  {  blackListingEntry  5  }
+
+	blackListingPortState	OBJECT-TYPE	
+		SYNTAX			OCTET STRING
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+                        "Indicates the state of the port."
+		::=  {  blackListingEntry  6  }
+
+	blackListingRetryCount	OBJECT-TYPE	
+		SYNTAX			Integer32
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+                        "Indicates the retry count of the port."
+		::=  {  blackListingEntry  7  }
+		
+        blackListingStartDate	OBJECT-TYPE	
+		SYNTAX			OCTET STRING
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+                        "Indicates when the black listing problem occurred."
+		::=  {  blackListingEntry  8  }
+
+	blackListingLastRetryDate	OBJECT-TYPE	
+		SYNTAX			OCTET STRING
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+                        "Indicates the last retry date."
+		::=  {  blackListingEntry  9  }
+
+	blackListingClearingReason	OBJECT-TYPE	
+		SYNTAX			OCTET STRING
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+                        "Indicates the reason for clearing the port
+                         to operate again."
+		::=  {  blackListingEntry  10  }
+
+	blackListingRemoteDev	OBJECT-TYPE	
+		SYNTAX			OCTET STRING
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+                        "Indicates the mac address of the subscriber for
+                        the black listing event."
+		::=  {  blackListingEntry  11  }
+
+	blackListingRowStatus	OBJECT-TYPE	
+		SYNTAX			ValidValue
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		
+                        "Indicates if this row of the blackListing table
+                        is valid."
+		::=  {  blackListingEntry  12  }
+
+	subscriberPortBlackListingNotification	NOTIFICATION-TYPE
+		OBJECTS			{ cardShelfIndex, cardSlotIndex,
+                                        blackListingPortType,			
+					blackListingInterface, 
+                                        blackListingSubPort,			
+					blackListingProfileStatus,
+                                        blackListingTriggerType,		
+					blackListingPortState,
+                                        blackListingRetryCount,			
+					blackListingStartDate,
+                                        blackListingLastRetryDate,
+                                        blackListingClearingReason,
+                                        blackListingRemoteDev }
+		STATUS			current
+		DESCRIPTION		
+                        "This trap is sent when a Blacklisting event occurs."
+		::=  {  subServicesMibTraps  1  }
+
+	clientQueueThresholdNotification	NOTIFICATION-TYPE
+		OBJECTS			{ cardShelfIndex, cardSlotIndex,
+                                        clientQueueEventReporter,		
+					clientQueueLength,
+                                        clientQueueThresholdStatus }
+		STATUS			current
+		DESCRIPTION		
+                        "This trap is sent when a Client Queue threshold event	
+			occurs."
+		::=  {  subServicesMibTraps  2  }
+
+	clientQueuePacketDropNotification	NOTIFICATION-TYPE
+		OBJECTS			{ cardShelfIndex, cardSlotIndex,
+                                        clientQueueEventReporter, 
+                                        clientQueueLength,
+                                        clientQueueDroppedPacketStatus }
+		STATUS			current
+		DESCRIPTION		
+                        "This trap is sent when a Client Queue packet dropped
+                        event occurs."
+		::=  {  subServicesMibTraps  3  }
+
+	ingressFilterMaskThresholdNotification	NOTIFICATION-TYPE
+		OBJECTS			{ cardShelfIndex, cardSlotIndex,
+                                        ingressFilterMaskThresholdStatus }
+		STATUS			current
+		DESCRIPTION		
+                        "This trap is sent when an Ingress Filter mask 
+                        threshold event occurs."
+		::=  {  subServicesMibTraps  4  }
+
+	ingressFilterMaskResourcesNotification	NOTIFICATION-TYPE
+		OBJECTS			{ cardShelfIndex, cardSlotIndex, 
+                                        ingressFilterMaskExhaustedStatus }
+		STATUS			current
+		DESCRIPTION		
+                        "This trap is sent when an Ingress Filter mask		
+			exhaustion event occurs."
+		::=  {  subServicesMibTraps  5  }
+
+	ingressFilterRuleThresholdNotification	NOTIFICATION-TYPE
+		OBJECTS			{ cardShelfIndex, cardSlotIndex,	
+					ingressFilterRuleThresholdStatus }
+		STATUS			current
+		DESCRIPTION		
+                        "This trap is sent when an Ingress Filter rule threshold
+                        event occurs."
+		::=  {  subServicesMibTraps  6  }
+
+	ingressFilterRuleResourcesNotification	NOTIFICATION-TYPE
+		OBJECTS			{ cardShelfIndex, cardSlotIndex,
+                                        ingressFilterRuleExhaustedStatus }
+		STATUS			current
+		DESCRIPTION		
+                        "This trap is sent when an Ingress Filter rule
+                        exhaustion event occurs."
+		::=  {  subServicesMibTraps  7  }
+
+END

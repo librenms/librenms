@@ -1,0 +1,400 @@
+
+OCCAM-TR08-IG-MIB	DEFINITIONS ::= BEGIN
+	IMPORTS
+		occamGenericIgModules
+			FROM OCCAM-REG-MODULE
+		TEXTUAL-CONVENTION, TruthValue, DisplayString
+			FROM SNMPv2-TC
+		MODULE-COMPLIANCE, OBJECT-GROUP
+			FROM SNMPv2-CONF
+		OBJECT-IDENTITY, MODULE-IDENTITY, OBJECT-TYPE, 
+		NOTIFICATION-TYPE, Integer32, enterprises, private
+			FROM SNMPv2-SMI
+		shelfClusterIpAddress, ShelfIndexValue, ShelfSlotIndexValue, 
+		ValidValue, cardShelfIndex, cardSlotIndex
+			FROM OCCAM-SHELF-MIB;
+
+	occamTr08IgMib	MODULE-IDENTITY
+		LAST-UPDATED	"200104271051Z"
+		ORGANIZATION	"Occam Networks"
+		CONTACT-INFO	"email support@occamnetworks.com"
+		DESCRIPTION	"The mib module to describe tr08 IGs."
+
+		REVISION	"200104271051Z"
+		DESCRIPTION	"Reformatted certain text"
+		
+		REVISION	"200702220000Z"
+		DESCRIPTION	"Removed DISPLAY-HINT"
+		
+		::=  {  occamGenericIgModules  1  }
+
+-- TEXTUAL-CONVENTIONS --
+	InServiceValue ::= TEXTUAL-CONVENTION 
+		STATUS			current
+		DESCRIPTION
+			"An in-service value."
+		SYNTAX 			INTEGER  { in-service ( 1 ) ,		
+						out-of-service ( 2 ) } 
+
+	Tr08ShelfIdentifier ::= TEXTUAL-CONVENTION 
+		STATUS			current
+		DESCRIPTION
+			"A shelf value."
+		SYNTAX 			INTEGER  
+					{ a ( 1 ), b ( 2 ), c ( 3 ), d ( 4 ) } 
+
+	IgIdentifier ::= TEXTUAL-CONVENTION 
+		STATUS			current
+		DESCRIPTION
+			"An IG number."
+		SYNTAX 			Integer32  ( 1 .. 10  ) 
+
+	OnOffValue ::= TEXTUAL-CONVENTION 
+		STATUS			current
+		DESCRIPTION
+			"An on/off value."
+		SYNTAX 			INTEGER  { on ( 1 ) , off ( 2 ) } 
+
+	IgType ::= TEXTUAL-CONVENTION 
+		STATUS			current
+		DESCRIPTION
+			"An IG type."
+		SYNTAX 			INTEGER  
+					{ tr08 ( 1 ) , crossconnect ( 2 ) } 
+		
+        OperationalValue ::= TEXTUAL-CONVENTION 
+		STATUS			current
+		DESCRIPTION
+			"An operational value."
+		SYNTAX 			INTEGER  { up ( 1 ) , down ( 2 ) } 
+
+
+	tr08IgMibObjects	OBJECT IDENTIFIER
+		::=  {  occamTr08IgMib  1  }
+
+	tr08IgMibTraps	OBJECT IDENTIFIER
+		::=  {  occamTr08IgMib  2  }
+
+	tr08IgTable	                OBJECT-TYPE
+		SYNTAX		        SEQUENCE  OF  Tr08IgEntry
+		MAX-ACCESS      	not-accessible
+		STATUS		        current
+		DESCRIPTION             "A table of information about TR08 
+                                        Interface Groups configured on the	
+					system. The number of entries depends on	
+					how many IGs are configured on the	
+					system."
+		::=  { tr08IgMibObjects  1 }
+
+	tr08IgEntry	                OBJECT-TYPE
+		SYNTAX		        Tr08IgEntry
+		MAX-ACCESS	        not-accessible
+		STATUS		        current
+		DESCRIPTION             "An entry in the occamTr08IgTable.
+                                        A row in this table cannot be created 
+                                        or deleted by SNMP operations on columns
+                                        of the table."
+		INDEX		{  tr08IgIndex  }
+		::=  { tr08IgTable 1 }
+
+	Tr08IgEntry  ::=  SEQUENCE {
+		tr08IgIndex  IgIdentifier,
+		tr08IgType  IgType,
+		tr08IgIncomingPowerMiscAlmStatus  OnOffValue,
+		tr08IgOutgoingPowerMiscAlmStatus  OnOffValue,
+		tr08IgIncomingShelfAlmStatus  OnOffValue,
+		tr08IgIncomingShelfAlmShelfId  Tr08ShelfIdentifier,
+		tr08IgOutgoingShelfAlmStatus  OnOffValue,
+		tr08IgOutgoingShelfAlmShelfId  Tr08ShelfIdentifier,
+		tr08IgIncomingMajorAlmStatus  OnOffValue,
+		tr08IgOutgoingMajorAlmStatus  OnOffValue,
+		tr08IgIncomingMinorAlmStatus  OnOffValue,
+		tr08IgOutgoingMinorAlmStatus  OnOffValue,
+		tr08IgOperationalStatus  OperationalValue,
+		tr08IgRowStatus  ValidValue
+		}
+
+
+	tr08IgIndex	OBJECT-TYPE	
+		SYNTAX			IgIdentifier
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION             "Selects IG for for tr08IgTable		
+					lookups."
+		::=  {  tr08IgEntry  1  }
+
+
+	tr08IgType	OBJECT-TYPE	
+		SYNTAX			IgType
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"Indicates the IG type."
+		::=  {  tr08IgEntry  2  }
+
+
+	tr08IgIncomingPowerMiscAlmStatus	OBJECT-TYPE	
+		SYNTAX			OnOffValue
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"Indicates if the			
+					tr08gIncomingPowerMiscAlm 
+					is set (on) or cleared (off)."
+		::=  {  tr08IgEntry  3  }
+
+
+	tr08IgOutgoingPowerMiscAlmStatus	OBJECT-TYPE	
+		SYNTAX			OnOffValue
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"Indicates if the 
+					tr08IgOutgoingPowerMiscAlm
+                                        is set (on) or cleared (off)."
+		::=  {  tr08IgEntry  4  }
+
+
+	tr08IgIncomingShelfAlmStatus	OBJECT-TYPE	
+		SYNTAX			OnOffValue
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"Indicates if the tr08IgIncomingShelfAlm 
+					is set (on) or cleared (off)."
+		::=  {  tr08IgEntry  5  }
+
+
+	tr08IgIncomingShelfAlmShelfId	OBJECT-TYPE	
+		SYNTAX			Tr08ShelfIdentifier
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"Indicates tr08IgIncomingShelfAlm shelf 
+					id."
+		::=  {  tr08IgEntry  6  }
+
+
+	tr08IgOutgoingShelfAlmStatus	OBJECT-TYPE	
+		SYNTAX			OnOffValue
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"Indicates if the tr08IgOutgoingShelfAlm 
+					is set (on) or cleared (off)."
+		::=  {  tr08IgEntry  7  }
+
+
+	tr08IgOutgoingShelfAlmShelfId	OBJECT-TYPE	
+		SYNTAX			Tr08ShelfIdentifier
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"Indicates tr08IgOutgoingShelfAlm shelf 
+					id."
+		::=  {  tr08IgEntry  8  }
+
+
+	tr08IgIncomingMajorAlmStatus	OBJECT-TYPE	
+		SYNTAX			OnOffValue
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"Indicates if the tr08IgIncomingMajorAlm
+                                        is set (on) or cleared (off)."
+		::=  {  tr08IgEntry  9  }
+
+
+	tr08IgOutgoingMajorAlmStatus	OBJECT-TYPE	
+		SYNTAX			OnOffValue
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"Indicates if the tr08IgOutgoingMajorAlm
+                                        is set (on) or cleared (off)."
+		::=  {  tr08IgEntry  10  }
+
+
+	tr08IgIncomingMinorAlmStatus	OBJECT-TYPE	
+		SYNTAX			OnOffValue
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"Indicates if the tr08IgIncomingMinorAlm
+                                        is set (on) or cleared (off)."
+		::=  {  tr08IgEntry  11  }
+
+
+	tr08IgOutgoingMinorAlmStatus	OBJECT-TYPE	
+		SYNTAX			OnOffValue
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"Indicates if the tr08IgOutgoingMinorAlm
+                                        is set (on) or cleared (off)."
+		::=  {  tr08IgEntry  12  }
+
+	tr08IgOperationalStatus 	OBJECT-TYPE	
+		SYNTAX			OperationalValue
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"Indicates if the IG id up or down."
+		::=  {  tr08IgEntry  13  }
+		
+	tr08IgRowStatus                 OBJECT-TYPE	
+		SYNTAX			ValidValue
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"Indicates if this row of the tr08Ig
+                                        table is valid."
+		::=  {  tr08IgEntry  14  }
+
+	tr08IgEndptTable	        OBJECT-TYPE
+		SYNTAX		        SEQUENCE  OF  Tr08IgEndptEntry
+		MAX-ACCESS	        not-accessible
+		STATUS		        current
+		DESCRIPTION		"A table of information about the	
+					endpoints in a TR08 Interface Group	
+					configured on the system." 
+		::=  { tr08IgMibObjects  2 }
+
+	tr08IgEndptEntry	        OBJECT-TYPE
+		SYNTAX		        Tr08IgEndptEntry
+		MAX-ACCESS	        not-accessible
+		STATUS		        current
+		DESCRIPTION             "An entry in the occamTr08IgEndptTable.
+                                        A row in this table cannot be created
+                                        or deleted by SNMP operations on columns
+                                        of the table."
+		INDEX		        {  tr08IgIndex, tr08IgEndptIndex  }
+		::=  { tr08IgEndptTable 1 }
+
+	Tr08IgEndptEntry  ::=  SEQUENCE {
+		tr08IgEndptIndex  Integer32,
+		tr08IgEndptName  OCTET STRING,
+		tr08IgEndptStatus  InServiceValue
+		}
+
+
+	tr08IgEndptIndex	        OBJECT-TYPE	
+		SYNTAX			Integer32  ( 1 .. 192  ) 
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION             "Selects Endpt for tr08IgEndptTable 
+                                        lookups. Same as endpt crv."
+		::=  {  tr08IgEndptEntry  1  }
+
+
+	tr08IgEndptName	OBJECT-TYPE	
+		SYNTAX			OCTET STRING
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"Indicates endpt text name."
+		::=  {  tr08IgEndptEntry  2  }
+
+
+	tr08IgEndptStatus	        OBJECT-TYPE	
+		SYNTAX			InServiceValue
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"Indicates endpt in-service status."
+		::=  {  tr08IgEndptEntry  3  }
+
+	tr08IgIncomingPowerMiscAlmNotification	NOTIFICATION-TYPE
+		OBJECTS			{ cardShelfIndex, cardSlotIndex,
+                                        tr08IgIndex, tr08IgType,
+                                        shelfClusterIpAddress,
+                                        tr08IgIncomingPowerMiscAlmStatus }
+		STATUS			current
+		DESCRIPTION		"This trap is sent when			
+					IncomingPowerMiscAlm status changes."
+		::=  {  tr08IgMibTraps  1  }
+
+	tr08IgOutgoingPowerMiscAlmNotification	NOTIFICATION-TYPE
+		OBJECTS			{ cardShelfIndex, cardSlotIndex,
+                                        tr08IgIndex, tr08IgType, 
+                                        shelfClusterIpAddress,
+                                        tr08IgOutgoingPowerMiscAlmStatus }
+		STATUS			current
+		DESCRIPTION		"This trap is sent when			
+					tr08IgOutgoingPowerMiscAlm status	
+					changes."
+		::=  {  tr08IgMibTraps  2  }
+
+	tr08IgIncomingShelfAlmNotification	NOTIFICATION-TYPE
+		OBJECTS			{ cardShelfIndex, cardSlotIndex, 
+                                        tr08IgIndex, tr08IgType,		
+					shelfClusterIpAddress,
+                                        tr08IgIncomingShelfAlmStatus, 
+                                        tr08IgIncomingShelfAlmShelfId }
+		STATUS			current
+		DESCRIPTION		"This trap is sent when			
+					tr08IgIncomingShelfAlm status changes."
+		::=  {  tr08IgMibTraps  3  }
+
+	tr08IgOutgoingShelfAlmNotification	NOTIFICATION-TYPE
+		OBJECTS			{ cardShelfIndex, cardSlotIndex, 
+                                        tr08IgIndex, tr08IgType,		
+					shelfClusterIpAddress,
+                                        tr08IgOutgoingShelfAlmStatus,
+                                        tr08IgOutgoingShelfAlmShelfId }
+		STATUS			current
+		DESCRIPTION		"This trap is sent when			
+	tr08IgOutgoingShelfAlm 
+                                        status changes."
+		::=  {  tr08IgMibTraps  4  }
+
+	tr08IgIncomingMajorAlmNotification	NOTIFICATION-TYPE
+		OBJECTS			{ cardShelfIndex, cardSlotIndex, 
+                                        tr08IgIndex, tr08IgType,		
+					shelfClusterIpAddress,
+                                        tr08IgIncomingMajorAlmStatus }
+		STATUS			current
+		DESCRIPTION		"This trap is sent when			
+					tr08IgIncomingMajorAlm  status changes."
+		::=  {  tr08IgMibTraps  5  }
+
+	tr08IgOutgoingMajorAlmNotification	NOTIFICATION-TYPE
+		OBJECTS			{ cardShelfIndex, cardSlotIndex, 
+                                        tr08IgIndex, tr08IgType,		
+					shelfClusterIpAddress,
+                                        tr08IgOutgoingMajorAlmStatus }
+		STATUS			current
+		DESCRIPTION		"This trap is sent when			
+					tr08IgOutgoingMajorAlm status changes."
+		::=  {  tr08IgMibTraps  6  }
+
+	tr08IgIncomingMinorAlmNotification	NOTIFICATION-TYPE
+		OBJECTS			{ cardShelfIndex, cardSlotIndex, 
+                                        tr08IgIndex, tr08IgType,		
+					shelfClusterIpAddress,
+                                        tr08IgIncomingMinorAlmStatus }
+		STATUS			current
+		DESCRIPTION		"This trap is sent when			
+					tr08IgIncomingMinorAlm 
+                                        status changes."
+		::=  {  tr08IgMibTraps  7  }
+
+	tr08IgOutgoingMinorAlmNotification	NOTIFICATION-TYPE
+		OBJECTS			{ cardShelfIndex, cardSlotIndex, 
+					tr08IgIndex,
+                                        tr08IgType, shelfClusterIpAddress, 
+                                        tr08IgOutgoingMinorAlmStatus }
+		STATUS			current
+		DESCRIPTION		"This trap is sent when 
+					tr08IgOutgoingMinorAlm 
+					status changes."
+		::=  {  tr08IgMibTraps  8  }
+
+	tr08IgOperationalNotification	NOTIFICATION-TYPE
+		OBJECTS			{ cardShelfIndex, cardSlotIndex,
+                                        tr08IgIndex, tr08IgType, 
+					shelfClusterIpAddress,
+                                        tr08IgOperationalStatus }
+		STATUS			current
+		DESCRIPTION		"This trap is sent when 
+					tr08IgOutgoingMinorAlm
+                                        status changes."
+		::=  {  tr08IgMibTraps  9  }
+		
+	tr08IgEndptServiceNotification	NOTIFICATION-TYPE
+		OBJECTS			{ cardShelfIndex, cardSlotIndex, 
+					tr08IgIndex,
+                                        tr08IgType, shelfClusterIpAddress, 
+                                        tr08IgEndptIndex, tr08IgEndptName, 
+                                        tr08IgEndptStatus }
+		STATUS			current
+		DESCRIPTION		"This trap is sent when endpoint status 
+changes."
+		::=  {  tr08IgMibTraps  10  }
+
+END

@@ -1,0 +1,1114 @@
+
+OCCAM-SERVICE-ACTIVATION-MIB	DEFINITIONS ::= BEGIN
+	IMPORTS
+		occamGenericSubscriberModules
+			FROM OCCAM-REG-MODULE
+		RowStatus, TEXTUAL-CONVENTION, DisplayString, TruthValue
+			FROM SNMPv2-TC
+		MODULE-COMPLIANCE, OBJECT-GROUP
+			FROM SNMPv2-CONF
+		MODULE-IDENTITY, OBJECT-TYPE, Integer32, OBJECT-IDENTITY
+			FROM SNMPv2-SMI;
+
+	occamServiceActivationMib	MODULE-IDENTITY
+		LAST-UPDATED	"200104271051Z"
+		ORGANIZATION	"Occam Networks, Inc."
+		CONTACT-INFO	"support@occamnetworks.com"
+		DESCRIPTION
+		        	"The mib module to support service activation 
+                                on Occam BLCs. Service Activation for TGW 
+                                channels, MGW POTS ports, DSL ports, and	
+				Ethernet Subscriber ports is supported. The mib	
+				module also allows the running config to be	
+				saved."
+			 
+		REVISION	"200104271051Z"
+		DESCRIPTION	"Reformatted certain text"
+
+		REVISION	"200702220000Z"
+		DESCRIPTION	"remove DISPLAY-HINT"
+		
+		REVISION	"200606271644Z"
+		DESCRIPTION     "Initial Release"
+			
+		::=  {  occamGenericSubscriberModules  2  }
+
+-- TEXTUAL-CONVENTIONS --
+	EnableDisableValue ::= TEXTUAL-CONVENTION 
+		STATUS			current
+		DESCRIPTION
+			"An enable or disable value."
+		SYNTAX 			INTEGER  {
+					enable ( 1 ) , disable ( 2 ) 
+					} 
+		
+	IgIdentifier ::= TEXTUAL-CONVENTION 
+		STATUS			current
+		DESCRIPTION
+			"A GR303 Interface Group number value."
+		SYNTAX 			Integer32  ( 1 .. 10  ) 
+		
+	PotsChannelIdentifier ::= TEXTUAL-CONVENTION 
+		STATUS			current
+		DESCRIPTION
+			"An POTs channel identifier value."
+		SYNTAX 			Integer32  ( 1 .. 2048  )
+		
+	PotsVoicePortIdentifier ::= TEXTUAL-CONVENTION 
+		STATUS			current
+		DESCRIPTION
+			"A POTS voice port identifier value."
+		SYNTAX 			Integer32  ( 1 .. 48  ) 
+		
+	VoicePortProtocolChoice ::= TEXTUAL-CONVENTION 
+		STATUS			current
+		DESCRIPTION
+			"A POTS voice port protocol value."
+		SYNTAX 			INTEGER  { mgcp ( 1 ) , sip ( 2 ) } 
+		
+	DslPortIdentifier ::= TEXTUAL-CONVENTION 
+		STATUS			current
+		DESCRIPTION
+			"A DSL port identifier value."
+		SYNTAX 			Integer32  ( 1 .. 48  )
+
+	DslServiceIdentifier ::= TEXTUAL-CONVENTION 
+		STATUS			current
+		DESCRIPTION
+			"A DSL service identifier value. 
+                        Note that a DSL service is a PVC."
+		SYNTAX 			Integer32  ( 1 .. 4  )
+
+	DslMacLimitValue ::= TEXTUAL-CONVENTION 
+		STATUS			current
+		DESCRIPTION
+			"A mac address limit count value for DSL ports."
+		SYNTAX 			Integer32  ( 1 .. 16  )
+		
+	EthernetSubscriberPortIdentifier ::= TEXTUAL-CONVENTION 
+		STATUS			current
+		DESCRIPTION
+			"An ethernet subscriber port identifier value."
+		SYNTAX 			Integer32  ( 1 .. 22  )
+		
+	EthernetSubscriberServiceIdentifier ::= TEXTUAL-CONVENTION 
+		STATUS			current
+		DESCRIPTION
+			"An ethernet subscriber port service identifier value."
+		SYNTAX 			Integer32  ( 1 .. 5  ) 
+		
+	EthernetSubscriberVlanIdentifier ::= TEXTUAL-CONVENTION 
+		STATUS			current
+		DESCRIPTION
+			"An ethernet subscriber port service VLAN identifier	
+			value."
+		SYNTAX 			Integer32  ( 1 .. 4095  )
+		
+	EthernetSubscriberMacLimitValue ::= TEXTUAL-CONVENTION 
+		STATUS			current
+		DESCRIPTION
+			"A mac address limit count value for ethernet subscriber	
+			ports."
+		SYNTAX 			Integer32  ( 1 .. 64  ) 
+	
+	IgmpGroupLimitValue ::= TEXTUAL-CONVENTION 
+		STATUS			current
+		DESCRIPTION
+			"An igmp-group limit count value."
+		SYNTAX 			Integer32  ( 1 .. 255  ) 
+ 
+
+	potsServiceActivation	OBJECT IDENTIFIER
+		::=  {  occamServiceActivationMib  1  }
+
+	dslServiceActivation	OBJECT IDENTIFIER
+		::=  {  occamServiceActivationMib  2  }
+
+	ethernetSubscriberServiceActivation	OBJECT IDENTIFIER
+		::=  {  occamServiceActivationMib  3  }
+
+	persistence	OBJECT IDENTIFIER
+		::=  {  occamServiceActivationMib  4  }
+
+	potsTrunkingGatewayServiceActivation	OBJECT IDENTIFIER
+		::=  {  potsServiceActivation  1  }
+
+	potsMediaGatewayServiceActivation	OBJECT IDENTIFIER
+		::=  {  potsServiceActivation  2  }
+		
+-- LAST MAPI ERROR --
+
+	lastMapiErrorText	OBJECT-TYPE	
+		SYNTAX			OCTET STRING
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+			"The text of the last MAPI exception error.
+                        Useful for debugging configuration errors."
+		::=  {  occamServiceActivationMib  5  }
+
+
+-- POTS TGW --    
+
+	potsTgwChannelTable	OBJECT-TYPE
+		SYNTAX		SEQUENCE  OF  PotsTgwChannelEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+			"A table of information about configured channels
+                        on the GR303/TR08 Trunking Gateway (TGW). 
+                        The number of entries depends on the number of
+                        interface groups and the number of configured channels."
+		::=  { potsTrunkingGatewayServiceActivation  1 }
+
+	potsTgwChannelEntry	OBJECT-TYPE
+		SYNTAX		PotsTgwChannelEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+			"An entry in the potsTgwChannelTable. An entry 
+                        can be created or deleted using SNMP operations
+                        on the potsChannelAdminStatus column."
+		INDEX	{ig, potsChannel  }
+		::=  { potsTgwChannelTable 1 }
+
+	PotsTgwChannelEntry  ::=  SEQUENCE {
+		ig  IgIdentifier,
+		potsChannel  PotsChannelIdentifier,
+		potsEndpointName  DisplayString,
+		potsChannelDescription  DisplayString,
+		potsSubscriberProfileName  DisplayString,
+		potsChannelAdminStatus  RowStatus
+		}
+
+
+	ig	OBJECT-TYPE	
+		SYNTAX			IgIdentifier  ( 1 .. 10  ) 
+		MAX-ACCESS		not-accessible
+		STATUS			current
+		DESCRIPTION
+			"The interface group that contains this channel."
+		::=  {  potsTgwChannelEntry  1  }
+
+
+	potsChannel	OBJECT-TYPE	
+		SYNTAX			PotsChannelIdentifier  ( 1 .. 2048  ) 
+		MAX-ACCESS		not-accessible
+		STATUS			current
+		DESCRIPTION
+			"The channel number."
+		::=  {  potsTgwChannelEntry  2  }
+
+
+	potsEndpointName	OBJECT-TYPE	
+		SYNTAX			DisplayString  ( SIZE ( 0 .. 255  ) ) 
+		MAX-ACCESS		read-create
+		STATUS			current
+		DESCRIPTION
+			"The MGCP endpoint name associated with this channel."
+		::=  {  potsTgwChannelEntry  3  }
+
+
+	potsChannelDescription	OBJECT-TYPE	
+		SYNTAX			DisplayString  ( SIZE ( 0 .. 255  ) ) 
+		MAX-ACCESS		read-create
+		STATUS			current
+		DESCRIPTION
+			"A user supplied textual description of this channel."
+		::=  {  potsTgwChannelEntry  4  }
+
+
+	potsSubscriberProfileName	OBJECT-TYPE	
+		SYNTAX			DisplayString  ( SIZE ( 0 .. 255  ) ) 
+		MAX-ACCESS		read-create
+		STATUS			current
+		DESCRIPTION
+			"The name of the subscriber profile associated with this	
+			channel."
+		::=  {  potsTgwChannelEntry  5  }
+
+
+	potsChannelAdminStatus	OBJECT-TYPE	
+		SYNTAX			RowStatus  { 				
+					active ( 1 ) , notInService ( 2 ) ,	
+					notReady ( 3 ) , createAndGo ( 4 ) ,	
+					createAndWait ( 5 ) , destroy ( 6 ) } 
+		MAX-ACCESS		read-create
+		STATUS			current
+		DESCRIPTION
+			"The Administration Status of this channel. 
+                        A channel can be created or destroyed 
+			using SNMP operations on this column."
+		::=  {  potsTgwChannelEntry  6  }
+
+	potsTgwSubscriberProfileList	OBJECT-TYPE	
+		SYNTAX			OCTET STRING
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+			"A space delimited list of the available 
+                        (previously configured) subscriber profile names."
+		::=  {  potsTrunkingGatewayServiceActivation  2  }
+		
+-- POTS MGW --
+
+	potsMgwVoicePortTable	OBJECT-TYPE
+		SYNTAX		SEQUENCE  OF  PotsMgwVoicePortEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+			"A table of information about Media Gateway (MGW) voice	
+			ports.
+                        The number of entries depends on the number of supported
+                        voice ports on a particular BLC. Voice ports cannot be 
+                        created or destroyed using SNMP operations on columns of
+                        this table."
+		::=  { potsMediaGatewayServiceActivation  1 }
+
+	potsMgwVoicePortEntry	OBJECT-TYPE
+		SYNTAX		PotsMgwVoicePortEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+			"An entry in the potsMgwVoicePortTable."
+		INDEX		{  voicePort  }
+		::=  { potsMgwVoicePortTable 1 }
+
+	PotsMgwVoicePortEntry  ::=  SEQUENCE {
+		voicePort  PotsVoicePortIdentifier,
+		voicePortAdminStatus  EnableDisableValue,
+		voicePortProtocol  VoicePortProtocolChoice,
+		voicePortProfileName  DisplayString,
+		voicePortDescription  DisplayString,
+		voicePortUnbalancedRing  EnableDisableValue,
+		voicePortSipProfileName  DisplayString,
+		voicePortSipUserName  DisplayString,
+		voicePortSipDisplayName  DisplayString,
+		voicePortSipAuthUserName  DisplayString,
+		voicePortSipPassword  DisplayString,
+		voicePortSipDomainNameOverride  DisplayString,
+		voicePortInfoList  OCTET STRING,
+		voicePortMaxBalancedRing  EnableDisableValue
+		}
+
+
+	voicePort	OBJECT-TYPE	
+		SYNTAX			PotsVoicePortIdentifier
+		MAX-ACCESS		not-accessible
+		STATUS			current
+		DESCRIPTION
+			"The voice port identifier."
+		::=  {  potsMgwVoicePortEntry  1  }
+
+
+	voicePortAdminStatus	OBJECT-TYPE	
+		SYNTAX			EnableDisableValue
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+			"The Administration Status value for the voice port."
+		::=  {  potsMgwVoicePortEntry  2  }
+
+
+	voicePortProtocol	OBJECT-TYPE	
+		SYNTAX			VoicePortProtocolChoice 
+					 { mgcp ( 1 ) , sip ( 2 ) } 
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+			"The voice port protocol. The default protocol is MGCP."
+		DEFVAL			{ mgcp }
+		::=  {  potsMgwVoicePortEntry  3  }
+
+
+	voicePortProfileName	OBJECT-TYPE	
+		SYNTAX			DisplayString  ( SIZE ( 0 .. 255  ) ) 
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+			"The name of the (previously configured) voice
+                        profile for the voice port."
+		::=  {  potsMgwVoicePortEntry  4  }
+
+
+	voicePortDescription	OBJECT-TYPE	
+		SYNTAX			DisplayString  ( SIZE ( 0 .. 255  ) ) 
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+			"A (user supplied) textual description of the voice	
+			port."
+		::=  {  potsMgwVoicePortEntry  5  }
+
+
+	voicePortUnbalancedRing	OBJECT-TYPE	
+		SYNTAX			EnableDisableValue  {
+					 enable ( 1 ),	disable ( 2 ) } 
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+			"A value selecting unbalanced ring support for the voice	
+			port."
+		::=  {  potsMgwVoicePortEntry  6  }
+
+
+	voicePortSipProfileName	OBJECT-TYPE	
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+			"The name of a (previously configured) SIP profile for
+                        the voice port. This value is not used or supported if 
+                        the voice port protocol selection is MGCP."
+		::=  {  potsMgwVoicePortEntry  7  }
+
+
+	voicePortSipUserName	OBJECT-TYPE	
+		SYNTAX			DisplayString  ( SIZE ( 0 .. 255  ) ) 
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+			"The voice port SIP user name. 
+			This value is not used or supported if the voice port 
+                        protocol selection is MGCP."
+		::=  {  potsMgwVoicePortEntry  8  }
+
+
+	voicePortSipDisplayName	OBJECT-TYPE	
+		SYNTAX			DisplayString  ( SIZE ( 0 .. 255  ) ) 
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+			"The voice port SIP display name.
+			This value is not used or supported if the voice port
+                        protocol selection is MGCP."
+		::=  {  potsMgwVoicePortEntry  9  }
+
+
+	voicePortSipAuthUserName	OBJECT-TYPE	
+		SYNTAX			DisplayString  ( SIZE ( 0 .. 255  ) ) 
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+			"The voice port SIP authorized user name.
+			This value is not used or supported if the voice port
+                        protocol selection is MGCP."
+		::=  {  potsMgwVoicePortEntry  10  }
+
+
+	voicePortSipPassword	OBJECT-TYPE	
+		SYNTAX			DisplayString  ( SIZE ( 0 .. 255  ) ) 
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+			"The voice port SIP user password.
+			This value is not used or supported if the voice port
+                        protocol selection is MGCP."
+		::=  {  potsMgwVoicePortEntry  11  }
+
+
+	voicePortSipDomainNameOverride	OBJECT-TYPE	
+		SYNTAX			DisplayString  ( SIZE ( 0 .. 255  ) ) 
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+			"The Hostname or IP address for the domain part of 
+                        the SIP URI for the voice port. This value is not 
+                        used or supported if the voice port protocol selection 
+			is MGCP."
+		::=  {  potsMgwVoicePortEntry  12  }
+
+
+	voicePortInfoList	OBJECT-TYPE	
+		SYNTAX			OCTET STRING
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+			"A specially delimited list of user supplied 
+                        informational key/value pairs for the voice port.
+			Each key/value pair is delimited by '~~' and an 
+                        individual key/value is separated by '%%'.
+			An example looks like: ~~key1%%value text here 
+                        for key1~~key2%%value text here for key2~~."
+		::=  {  potsMgwVoicePortEntry  13  }
+		
+        voicePortMaxBalancedRing	OBJECT-TYPE	
+		SYNTAX			EnableDisableValue  
+					{ enable ( 1 ) , disable ( 2 ) } 
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+			"A value selecting max balanced ring support for 
+                        the voice port."
+		::=  {  potsMgwVoicePortEntry  14  }
+
+	potsMgwVoicePortInfoTable	OBJECT-TYPE
+		SYNTAX		SEQUENCE  OF  PotsMgwVoicePortInfoEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+			"A table of user supplied informational key/value 
+                        pairs describing the voice port. A total of 5 
+                        informational key/value pairs may be created using
+                        SNMP operations. 
+			All configured informational key/value pairs may be 
+                        read out using SNMP operations. Key/value pairs may
+                        be deleted using SNMP operations."
+		::=  { potsMediaGatewayServiceActivation  2 }
+
+	potsMgwVoicePortInfoEntry	OBJECT-TYPE
+		SYNTAX		PotsMgwVoicePortInfoEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+			"An entry in the potsMgwVoicePortInfoTable.
+			Entries are indexed by the voice port number and
+                        the key part of the key/value pair.
+			Note that the key is textual. Thus the index part 
+                        of an OID for the voicePortInfoText looks like:
+			<voice port #>.
+                        <character count of key value>.
+                        <ascii value for letter 1 of key value>.
+			<ascii value for letter 2 of key value>...
+                        <ascii value for letter n of key value>"
+		INDEX		{  voicePort, voicePortInfoKey  }
+		::=  { potsMgwVoicePortInfoTable 1 }
+
+	PotsMgwVoicePortInfoEntry  ::=  SEQUENCE {
+		voicePortInfoKey  DisplayString,
+		voicePortInfoText  DisplayString
+		}
+
+
+	voicePortInfoKey	OBJECT-TYPE	
+		SYNTAX			DisplayString  ( SIZE ( 0 .. 255  ) ) 
+		MAX-ACCESS		not-accessible
+		STATUS			current
+		DESCRIPTION
+			"The key text for this key/value information pair."
+		::=  {  potsMgwVoicePortInfoEntry  1  }
+
+
+	voicePortInfoText	OBJECT-TYPE	
+		SYNTAX			DisplayString  ( SIZE ( 0 .. 255  ) ) 
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+			"The value text for this key/value information pair."
+		::=  {  potsMgwVoicePortInfoEntry  2  }
+
+	potsMgwVoiceProfileList	OBJECT-TYPE	
+		SYNTAX			OCTET STRING
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+			"Space delimited list of (previously configured)
+                        voice profile names."
+		::=  {  potsMediaGatewayServiceActivation  3  }
+
+	potsMgwSipProfileList	OBJECT-TYPE	
+		SYNTAX			OCTET STRING
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+			"Space delimited list of (previously configured)
+                        SIP profile names."
+		::=  {  potsMediaGatewayServiceActivation  4  }
+		
+-- DSL --
+		
+	dslPortTable	OBJECT-TYPE
+		SYNTAX		SEQUENCE  OF  DslPortEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+			"A table of information about DSL ports.
+                        The number of entries depends on the number of
+                        supported DSL ports on a particular BLC. 
+                        DSL ports cannot be created or destroyed using 
+			SNMP operations on columns of this table."
+		::=  { dslServiceActivation  1 }
+
+	dslPortEntry	OBJECT-TYPE
+		SYNTAX		DslPortEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+			"An entry in the dslPortTable."
+		INDEX		{  dslPort  }
+		::=  { dslPortTable 1 }
+
+	DslPortEntry  ::=  SEQUENCE {
+		dslPort  DslPortIdentifier,
+		dslPortAdminStatus  EnableDisableValue,
+		dslPortDslProfileName  DisplayString,
+		dslPortInfoList  OCTET STRING
+		}
+
+
+	dslPort	OBJECT-TYPE	
+		SYNTAX			DslPortIdentifier  ( 1 .. 48  ) 
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+			"The DSL port number."
+		::=  {  dslPortEntry  1  }
+
+
+	dslPortAdminStatus	OBJECT-TYPE	
+		SYNTAX			EnableDisableValue  
+					{ enable ( 1 ) , disable ( 2 ) } 
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+			"The Admin Status of the DSL port. Enable is 
+                        equivalent to 'no shut' in the CLI."
+		::=  {  dslPortEntry  2  }
+
+
+	dslPortDslProfileName	OBJECT-TYPE	
+		SYNTAX			DisplayString  ( SIZE ( 0 .. 255  ) ) 
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+			"The name of the (previously configured) DSL 
+                        Profile assigned to the port."
+		::=  {  dslPortEntry  3  }
+
+
+	dslPortInfoList	OBJECT-TYPE	
+		SYNTAX			OCTET STRING
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+			"A specially delimited list of user supplied 
+                        informational key/value pairs for the DSL port.
+			Each key/value pair is delimited by '~~' and 
+                        an individual key/value is separated by '%%'.
+			An example looks like: ~~key1%%value text here 
+                        for key1~~key2%%value text here for key2~~."
+		::=  {  dslPortEntry  4  }
+
+	dslPortInfoTable	OBJECT-TYPE
+		SYNTAX		SEQUENCE  OF  DslPortInfoEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+			"A table of user supplied informational key/value 
+                        pairs describing the DSL port.  A total of 5 
+                        informational key/value pairs may be created 
+                        using SNMP operations. 
+			All configured informational key/value pairs may
+                        be read out using SNMP operations. Key/value pairs
+                        may be deleted using SNMP operations."
+		::=  { dslServiceActivation  2 }
+
+	dslPortInfoEntry	OBJECT-TYPE
+		SYNTAX		DslPortInfoEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+			"An entry in the dslPortInfoTable
+			Entries are indexed by the DSL port number and 
+                        the key part of the key/value pair.
+			Note that the key is textual. Thus the index part
+                        of an OID for the dslPortInfoText looks like:
+			<dsl port #>.
+                        <character count of key value>.
+                        <ascii value for letter 1 of key value>.
+			<ascii value for letter 2 of key value>...
+                        <ascii value for letter n of key value>"
+		INDEX		{  dslPort, dslPortInfoKey  }
+		::=  { dslPortInfoTable 1 }
+
+	DslPortInfoEntry  ::=  SEQUENCE {
+		dslPortInfoKey  DisplayString,
+		dslPortInfoText  DisplayString
+		}
+
+
+	dslPortInfoKey	OBJECT-TYPE	
+		SYNTAX			DisplayString  ( SIZE ( 0 .. 255  ) )
+		MAX-ACCESS		not-accessible
+		STATUS			current
+		DESCRIPTION
+			"The key text for this key/value information pair."
+		::=  {  dslPortInfoEntry  1  }
+
+
+	dslPortInfoText	OBJECT-TYPE	
+		SYNTAX			DisplayString  ( SIZE ( 0 .. 255  ) )
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+			"The value text for this key/value information pair."
+		::=  {  dslPortInfoEntry  2  }
+
+	dslPortServiceTable	OBJECT-TYPE
+		SYNTAX		SEQUENCE  OF  DslPortServiceEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+			"A table of information about services 
+                        configured on the DSL ports. The number 
+                        of entries depends on the number of 
+                        services configured on each DSL port. 
+                        Up to four services may be configured on
+                        a DSL port."
+		::=  { dslServiceActivation  3 }
+
+	dslPortServiceEntry	OBJECT-TYPE
+		SYNTAX		DslPortServiceEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+			"An entry in the dslPortServiceTable. 
+                        An entry can be created or deleted using SNMP
+                        operations on the dslPortServiceAdminStatus column."
+		INDEX		{  dslPort, dslPortServiceIdentifier  }
+		::=  { dslPortServiceTable 1 }
+
+	DslPortServiceEntry  ::=  SEQUENCE {
+		dslPortServiceIdentifier  DslServiceIdentifier,
+		dslPortServiceVpiVci  DisplayString,
+		dslPortServiceAccessProfileName  DisplayString,
+		dslPortServiceIgmpGroupLimitOverriden  TruthValue,
+		dslPortServiceOverrideIgmpGroupLimit  INTEGER,
+		dslPortServiceMacLimitOverriden  TruthValue,
+		dslPortServiceOverrideMacLimit  INTEGER,
+		dslPortServiceMacLearningOverriden  TruthValue,
+		dslPortServiceOverrideMacLearning  INTEGER,
+		dslPortServiceAdminStatus  RowStatus
+		}
+
+
+	dslPortServiceIdentifier	OBJECT-TYPE	
+		SYNTAX			DslServiceIdentifier  ( 1 .. 4  ) 
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+			"The identifier number for a service configured
+                        on the DSL port."
+		::=  {  dslPortServiceEntry  1  }
+
+
+	dslPortServiceVpiVci	OBJECT-TYPE	
+		SYNTAX			DisplayString 
+		MAX-ACCESS		read-create
+		STATUS			current
+		DESCRIPTION
+			"The vpi/vci for the service. The format is 
+                        vpi + / + vci, like 1/33.
+			Vpi may be 0-15. Vci may be 32-511."
+		::=  {  dslPortServiceEntry  2  }
+		
+
+	dslPortServiceAccessProfileName	OBJECT-TYPE	
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-create
+		STATUS			current
+		DESCRIPTION
+			"The name of the (previously configured) access
+                        profile assigned to the service."
+		::=  {  dslPortServiceEntry  3  }
+
+
+	dslPortServiceIgmpGroupLimitOverriden	OBJECT-TYPE	
+		SYNTAX			TruthValue
+		MAX-ACCESS		read-create
+		STATUS			current
+		DESCRIPTION
+			"An indicator that the igmp-group limit value of
+                        the assigned access profile has been overriden.
+			Setting this value to false will remove any existing
+                        igmp-group limit override. Setting this value to
+                        true does nothing."
+		::=  {  dslPortServiceEntry  4  }
+
+
+	dslPortServiceOverrideIgmpGroupLimit	OBJECT-TYPE	
+		SYNTAX			INTEGER  ( 1 .. 255  ) 
+		MAX-ACCESS		read-create
+		STATUS			current
+		DESCRIPTION
+			"The override value for the igmp-group limit for
+                        the service."
+		::=  {  dslPortServiceEntry  5  }
+
+
+	dslPortServiceMacLimitOverriden	OBJECT-TYPE	
+		SYNTAX			TruthValue
+		MAX-ACCESS		read-create
+		STATUS			current
+		DESCRIPTION
+			"An indicator that the mac address limit value of
+                        the assigned access profile has been overriden.
+			Setting this value to false will remove any
+                        existing mac address limit override. Setting 
+                        this value to true does nothing."
+		::=  {  dslPortServiceEntry  6  }
+
+
+	dslPortServiceOverrideMacLimit	OBJECT-TYPE	
+		SYNTAX			INTEGER  ( 1 .. 16  ) 
+		MAX-ACCESS		read-create
+		STATUS			current
+		DESCRIPTION
+			"The override value for the mac address limit
+                        for the service."
+		::=  {  dslPortServiceEntry  7  }
+
+
+	dslPortServiceMacLearningOverriden	OBJECT-TYPE	
+		SYNTAX			TruthValue
+		MAX-ACCESS		read-create
+		STATUS			current
+		DESCRIPTION
+			"An indicator that the mac-learning value of the
+                        assigned access profile has been overriden.
+			Setting this value to false will remove any existing
+                        mac-learning override. Setting this value to 
+                        true does nothing."
+		::=  {  dslPortServiceEntry  8  }
+
+
+	dslPortServiceOverrideMacLearning	OBJECT-TYPE	
+		SYNTAX			INTEGER  { enable ( 1 ) , disable ( 2 ) 
+} 
+		MAX-ACCESS		read-create
+		STATUS			current
+		DESCRIPTION
+			"The override value for the mac-learning state
+                        for the service."
+		::=  {  dslPortServiceEntry  9  }
+
+
+	dslPortServiceAdminStatus	OBJECT-TYPE	
+		SYNTAX			RowStatus
+		MAX-ACCESS		read-create
+		STATUS			current
+		DESCRIPTION
+			"The Administration Status of this service.
+                        A service can be created or destroyed 
+			using SNMP operations on this column."
+		::=  {  dslPortServiceEntry  10  }
+
+	dslDslProfileList	OBJECT-TYPE	
+		SYNTAX			OCTET STRING
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+			"Space delimited list of (previously configured)
+                        dsl profile names."
+		::=  {  dslServiceActivation  4  }
+
+	dslAccessProfileList	OBJECT-TYPE	
+		SYNTAX			OCTET STRING
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+			"Space delimited list of (previously configured)
+                        access profile names."
+		::=  {  dslServiceActivation  5  } 
+		
+-- ETHERNET SUBSCRIBER --     
+	
+	ethernetSubscriberPortTable	OBJECT-TYPE
+		SYNTAX		SEQUENCE  OF  EthernetSubscriberPortEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+			"A table of information about ethernet 
+                        subscriber ports. The number of entries depends 
+                        on the number of supported ethernet subscriber ports 
+			on a particular BLC. Ethernet subscriber ports cannot
+                        be created or destroyed using SNMP operations on
+                        columns of this table."
+		::=  { ethernetSubscriberServiceActivation  1 }
+
+	ethernetSubscriberPortEntry	OBJECT-TYPE
+		SYNTAX		EthernetSubscriberPortEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+			"An entry in the ethernetSubscriberPortTable."
+		INDEX		{  ethernetSubscriberPort  }
+		::=  { ethernetSubscriberPortTable 1 }
+
+	EthernetSubscriberPortEntry  ::=  SEQUENCE {
+		ethernetSubscriberPort  EthernetSubscriberPortIdentifier,
+		ethernetSubscriberPortAdminStatus  EnableDisableValue,
+		ethernetSubscriberPortInfoList  OCTET STRING
+		}
+
+
+	ethernetSubscriberPort	OBJECT-TYPE	
+		SYNTAX			EthernetSubscriberPortIdentifier 
+					 ( 1 .. 22 ) 
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+			"The ethernet subscriber port number."
+		::=  {  ethernetSubscriberPortEntry  1  }
+
+
+	ethernetSubscriberPortAdminStatus	OBJECT-TYPE	
+		SYNTAX			EnableDisableValue  
+					{ enable ( 1 ) , disable ( 2 ) } 
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+			"The Admin Status of the ethernet subscriber port. 
+                        Enable is equivalent to 'no shut' in the CLI."
+		::=  {  ethernetSubscriberPortEntry  2  }
+
+
+	ethernetSubscriberPortInfoList	OBJECT-TYPE	
+		SYNTAX			OCTET STRING
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+			"A specially delimited list of user supplied 
+                        informational key/value pairs for the ethernet 
+                        subscriber port. Each key/value pair is delimited 
+                        by '~~' and an individual key/value is separated by
+                        '%%'.  An example looks like: 
+                        ~~key1%%value text here for
+                        key1~~key2%%value text here for key2~~."
+		::=  {  ethernetSubscriberPortEntry  3  }
+
+	ethernetSubscriberPortInfoTable	OBJECT-TYPE
+		SYNTAX		SEQUENCE  OF  EthernetSubscriberPortInfoEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+			"A table of user supplied informational key/value 
+                        pairs describing the ethernet subscriber port.
+			A total of 5 informational key/value pairs may 
+                        be created using SNMP operations. 
+			All configured informational key/value pairs may
+                        be read out using SNMP operations.
+			Key/value pairs may be deleted using SNMP operations."
+		::=  { ethernetSubscriberServiceActivation  2 }
+
+	ethernetSubscriberPortInfoEntry	OBJECT-TYPE
+		SYNTAX		EthernetSubscriberPortInfoEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+			"An entry in the ethernetSubscriberPortInfoTable.
+			Entries are indexed by the ethernet subscriber 
+                        port number and the key part of the key/value pair.
+			Note that the key is textual. Thus the index part 
+                        of an OID for the ethernetSubscriberPortInfoText 
+			looks like:
+			<ethernet subscriber port #>.
+                        <character count of key value>.
+                        <ascii value for letter 1 of key value>.
+			<ascii value for letter 2 of key value>...
+                        <ascii value for letter n of key value>"
+		INDEX		{  ethernetSubscriberPort,			
+				ethernetSubscriberPortInfoKey  }
+		::=  { ethernetSubscriberPortInfoTable 1 }
+
+	EthernetSubscriberPortInfoEntry  ::=  SEQUENCE {
+		ethernetSubscriberPortInfoKey  DisplayString,
+		ethernetSubscriberPortInfoText  DisplayString
+		}
+
+
+	ethernetSubscriberPortInfoKey	OBJECT-TYPE	
+		SYNTAX			DisplayString  ( SIZE ( 0 .. 255  ) )
+		MAX-ACCESS		not-accessible
+		STATUS			current
+		DESCRIPTION
+			"The key text for this key/value information pair."
+		::=  {  ethernetSubscriberPortInfoEntry  1  }
+
+
+	ethernetSubscriberPortInfoText	OBJECT-TYPE	
+		SYNTAX			DisplayString  ( SIZE ( 0 .. 255  ) )
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+			"The value text for this key/value information pair."
+		::=  {  ethernetSubscriberPortInfoEntry  2  }
+
+	ethernetSubscriberPortServiceTable	OBJECT-TYPE
+		SYNTAX		SEQUENCE  OF  EthernetSubscriberPortServiceEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+			"A table of information about services configured 
+                        on ethernet subscriber ports.  The number of entries
+                        depends on the number of services configured on
+                        each ethernet subscriber port. Up to five
+                        services may be configured on an ethernet
+                        subscriber port."
+		::=  { ethernetSubscriberServiceActivation  3 }
+
+	ethernetSubscriberPortServiceEntry	OBJECT-TYPE
+		SYNTAX		EthernetSubscriberPortServiceEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+			"An entry in the ethernetSubscriberPortServiceTable.
+                        An entry can be created or deleted using SNMP 
+                        operations on the					
+			ethernetSubscriberPortServiceAdminStatus column."
+		INDEX		{  ethernetSubscriberPort, 
+ethernetSubscriberPortServiceIdentifier  }
+		::=  { ethernetSubscriberPortServiceTable 1 }
+
+	EthernetSubscriberPortServiceEntry  ::=  SEQUENCE {
+		ethernetSubscriberPortServiceIdentifier				
+		EthernetSubscriberServiceIdentifier,
+		ethernetSubscriberPortServiceSubscriberVlan INTEGER,
+		ethernetSubscriberPortServiceAccessProfileName  DisplayString,
+		ethernetSubscriberPortServiceIgmpGroupLimitOverriden  
+TruthValue,
+		ethernetSubscriberPortServiceOverrideIgmpGroupLimit  INTEGER,
+		ethernetSubscriberPortServiceMacLimitOverriden  TruthValue,
+		ethernetSubscriberPortServiceOverrideMacLimit  INTEGER,
+		ethernetSubscriberPortServiceMacLearningOverriden  TruthValue,
+		ethernetSubscriberPortServiceOverrideMacLearning  INTEGER,
+		ethernetSubscriberPortServiceAdminStatus  RowStatus
+		}
+
+
+	ethernetSubscriberPortServiceIdentifier	    OBJECT-TYPE	
+		SYNTAX			EthernetSubscriberServiceIdentifier  
+					( 1 .. 5  ) 
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+			"The identifier number for a service configured
+                        on an ethernet subscriber port."
+		::=  {  ethernetSubscriberPortServiceEntry  1  }
+
+
+	ethernetSubscriberPortServiceSubscriberVlan	    OBJECT-TYPE	
+		SYNTAX			INTEGER ( 1 .. 4095 )
+		MAX-ACCESS		read-create
+		STATUS			current
+		DESCRIPTION
+			"The subscriber vlan identifier configured for the	
+			service."
+		::=  {  ethernetSubscriberPortServiceEntry  2  }
+
+
+	ethernetSubscriberPortServiceAccessProfileName	OBJECT-TYPE	
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-create
+		STATUS			current
+		DESCRIPTION
+			"The name of the (previously configured) access
+                        profile assigned to the service."
+		::=  {  ethernetSubscriberPortServiceEntry  3  }
+
+
+	ethernetSubscriberPortServiceIgmpGroupLimitOverriden	OBJECT-TYPE	
+		SYNTAX			TruthValue
+		MAX-ACCESS		read-create
+		STATUS			current
+		DESCRIPTION
+			"An indicator that the igmp-group limit value of
+                        the assigned access profile has been overriden.
+			Setting this value to false will remove any
+                        existing igmp-group limit override. Setting this
+                        value to true does nothing."
+		::=  {  ethernetSubscriberPortServiceEntry  4  }
+
+
+	ethernetSubscriberPortServiceOverrideIgmpGroupLimit	OBJECT-TYPE	
+		SYNTAX			INTEGER  ( 1 .. 255  ) 
+		MAX-ACCESS		read-create
+		STATUS			current
+		DESCRIPTION
+			"The override value for the igmp-group limit
+                        for the service."
+		::=  {  ethernetSubscriberPortServiceEntry  5  }
+
+	
+	ethernetSubscriberPortServiceMacLimitOverriden	OBJECT-TYPE	
+		SYNTAX			TruthValue
+		MAX-ACCESS		read-create
+		STATUS			current
+		DESCRIPTION
+			"An indicator that the mac address limit value of
+                        the assigned access profile has been overriden.
+			Setting this value to false will remove any 
+                        existing mac address limit override. Setting this
+                        value to true does nothing."
+		::=  {  ethernetSubscriberPortServiceEntry  6  }
+
+
+	ethernetSubscriberPortServiceOverrideMacLimit	OBJECT-TYPE	
+		SYNTAX			INTEGER  ( 1 .. 64  ) 
+		MAX-ACCESS		read-create
+		STATUS			current
+		DESCRIPTION
+			"The override value for the mac address
+                        limit for the service."
+		::=  {  ethernetSubscriberPortServiceEntry  7  }
+
+
+	ethernetSubscriberPortServiceMacLearningOverriden	OBJECT-TYPE	
+		SYNTAX			TruthValue
+		MAX-ACCESS		read-create
+		STATUS			current
+		DESCRIPTION
+			"An indicator that the mac-learning value of
+                        the assigned access profile has been overriden.
+			Setting this value to false will remove any 
+                        existing mac-learning override. Setting this
+                        value to true does nothing."
+		::=  {  ethernetSubscriberPortServiceEntry  8  }
+
+
+	ethernetSubscriberPortServiceOverrideMacLearning	OBJECT-TYPE	
+		SYNTAX			INTEGER  { enable ( 1 ) , disable ( 2 ) 
+} 
+		MAX-ACCESS		read-create
+		STATUS			current
+		DESCRIPTION
+			"The override value for the mac-learning 
+                        state for the service."
+		::=  {  ethernetSubscriberPortServiceEntry  9  }
+
+
+	ethernetSubscriberPortServiceAdminStatus	OBJECT-TYPE	
+		SYNTAX			RowStatus
+		MAX-ACCESS		read-create
+		STATUS			current
+		DESCRIPTION
+			"The Administration Status of this service.
+                        A service can be created or destroyed 
+			using SNMP operations on this column."
+		::=  {  ethernetSubscriberPortServiceEntry  10  }
+		
+	ethernetSubscriberAccessProfileList	OBJECT-TYPE	
+		SYNTAX			OCTET STRING
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+			"Space delimited list of (previously configured)
+                        access profile names."
+		::=  {  ethernetSubscriberServiceActivation  4  }
+		
+-- PERSISTENCE --
+		
+	 copyRunningToStartup	OBJECT-TYPE	
+		SYNTAX			Integer32
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+			"A write of anything to this object will cause
+                        the running config to be copied to the startup
+                        config. A value read from this object has no meaning."
+		::=  {  persistence  1  }
+
+
+
+
+END

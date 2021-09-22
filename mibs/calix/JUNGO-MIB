@@ -1,0 +1,585 @@
+JUNGO-MIB DEFINITIONS ::= BEGIN
+IMPORTS 
+	MODULE-IDENTITY,
+        Counter64,
+        Integer32,
+        OBJECT-TYPE,
+        IpAddress,
+        NOTIFICATION-TYPE,
+	enterprises 		FROM SNMPv2-SMI
+	TruthValue		FROM SNMPv2-TC
+	ifIndex,
+	InterfaceIndex 		FROM IF-MIB
+	DisplayString,
+	RowStatus 		FROM SNMPv2-TC
+	sysDescr		FROM SNMPv2-MIB
+	SnmpAdminString 	FROM SNMP-FRAMEWORK-MIB;
+
+jungoMib MODULE-IDENTITY 
+        LAST-UPDATED    "200402081500Z"
+	ORGANIZATION    "Jungo" 
+	CONTACT-INFO 
+		"support@jungo.com"
+	DESCRIPTION 
+		"This MIB module supplies the basic management objects 
+                 for the OpenRG gateway."
+             
+    ::= { enterprises 10799 } 
+
+jObjects    			OBJECT IDENTIFIER ::= { jungoMib 1 }
+jNotifications			OBJECT IDENTIFIER ::= { jungoMib 2 }
+jOpenrgDevObjects		OBJECT IDENTIFIER ::= { jungoMib 3 }
+jOpenrgSecObjects		OBJECT IDENTIFIER ::= { jungoMib 4 }
+jOpenrgRGConfObjects		OBJECT IDENTIFIER ::= { jungoMib 5 }
+jOpenrgDiskMngObjects           OBJECT IDENTIFIER ::= { jungoMib 6 }
+jOpenrgSecFwObjects		OBJECT IDENTIFIER ::= { jOpenrgSecObjects 2 }
+jDSLStatusNotifications		OBJECT IDENTIFIER ::= { jNotifications 1 }
+jOpenrgDevPPPObjects		OBJECT IDENTIFIER ::= { jOpenrgDevObjects 1 }
+jSubscriberInformation		OBJECT IDENTIFIER ::= { jOpenrgDevObjects 6 }
+
+jOpenrgDevPPPConnectionTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JOpenrgDevPPPConnectionEntry 
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+	"A list of interface entries used to bind usernames to the connections
+	they create.  The index field is the interface number as listed in 
+	ifTable."  
+    ::= { jOpenrgDevPPPObjects 1 }
+
+jOpenrgDevPPPConnectionEntry OBJECT-TYPE
+    SYNTAX      JOpenrgDevPPPConnectionEntry 
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry contating the username used to establish a connection.
+    
+        Entries in jOpenrgDevConnectionTable are created and deleted by the
+        gateway according to the connections listed in ifTable."
+    INDEX { jOpenrgDevPPPConnectionIndex }
+    ::= { jOpenrgDevPPPConnectionTable 1 }
+
+JOpenrgDevPPPConnectionEntry ::= SEQUENCE {
+    jOpenrgDevPPPConnectionIndex  	InterfaceIndex, 
+    jOpenrgDevPPPConnectionUserName     DisplayString 
+}
+
+jOpenrgDevPPPConnectionIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the corresponding interface index as listed in ifTable."
+    DEFVAL { 3 }
+    ::= { jOpenrgDevPPPConnectionEntry 1 }
+    
+jOpenrgDevPPPConnectionUserName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..255)) 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The username used to establish a PPP connection."
+    ::= { jOpenrgDevPPPConnectionEntry 2 }
+
+jOpenrgDevMainWanAddress	 OBJECT-TYPE
+    SYNTAX 	IpAddress 
+    MAX-ACCESS 	read-only
+    STATUS 	current
+    DESCRIPTION
+        "The main WAN connection IP address used by the gateway."
+    ::= { jOpenrgDevObjects 2 }
+
+jDSLStatusTrap  NOTIFICATION-TYPE
+    OBJECTS   { 
+        jOpenrgDevMainWanAddress,
+        jOpenrgDevPPPConnectionUserName,
+        sysDescr,
+	ifIndex,
+	jSubscriberName,
+	jSubscriberSurname,
+	jSubscriberAddress,
+	jSubscriberCity,
+	jSubscriberState,
+	jSubscriberPostalCode,
+	jSubscriberCountry,
+	jSubscriberPhoneNumber,
+	jSubscriberEmail
+    } 
+    STATUS  current 
+    DESCRIPTION 
+	"The status notification is sent by the gateway shortly after it has
+	become fully operational. It contains:
+	 1. jOpenrgDevMainWanAddress - The IP of the main PPPoE Wan connection.
+	 2. jOpenrgDevPPPConnectionUserName - Username used to connect the
+	    main PPPoE Wan.
+	 3. sysDescr - A textual description of the gateway entity as described
+	    in sysDescr object under mib-2.
+	 4. ifIndex - The interface index of the main PPPoE Wan connection as
+	    listed in ifTable.
+	 5. All the current subscriber information contained in 
+	    jSubscriberInformation."
+   ::= { jDSLStatusNotifications 1 }
+
+jOpenrgDevCurrentRemoteUpgradeFile OBJECT-TYPE
+    SYNTAX      	SnmpAdminString (SIZE(0..128))
+    MAX-ACCESS  	read-only
+    STATUS      	current
+    DESCRIPTION
+        "The URL of the host from which the current firmware upgrade was
+	downloaded."
+    ::= { jOpenrgDevObjects 3 }
+    
+jOpenrgDevRemoteUpgradeFile OBJECT-TYPE
+    SYNTAX      	SnmpAdminString (SIZE(0..128))
+    MAX-ACCESS  	read-write
+    STATUS      	current
+    DESCRIPTION
+        "The URL of the host for downloading a gateway firmware upgrade.  
+	 Setting this object to a different URL triggers a software upgrade,
+	 in case a newer revision is found.
+	 This object holds the last URL attempted to download a file from,
+	 while jOpenrgDevRemoteUpgradeFileStatus indicates the status of the
+	 upgrade operation.
+
+         Returns NULL if the server address is unknown.
+	 Zero-length strings cannot be written to this object."
+    ::= { jOpenrgDevObjects 4 }
+
+jOpenrgDevRemoteUpgradeFileStatus OBJECT-TYPE
+    SYNTAX		INTEGER 
+    {
+	pass(1), 
+        inProgress(2), 
+        fail(3),
+	notRequired(4)
+    }
+    MAX-ACCESS		read-only
+    STATUS		current
+    DESCRIPTION
+        "This object indicates the current status of the 
+	 configuration file download process or the status of the last attempt
+	 of remote upgrade operation. It is provided also to 
+         indicate to the management entity that the gateway will reject 
+         upgrade file triggers (set request to jOpenrgDevRemoteUpgradeFile)
+	 when inProgress(2).
+	 If no upgarde is needed (due to version number) this object reads
+	 notReuired(4)."
+    ::= { jOpenrgDevObjects 5 }
+
+jOpenrgDevRemoteUpgradeType OBJECT-TYPE
+    SYNTAX		INTEGER 
+    {
+	automaticUpgrade(1),
+        automaticNotify(2), 
+        disable(3)
+    }
+    MAX-ACCESS		read-write
+    STATUS		current
+    DESCRIPTION
+        "This object indicates the current status of the Firmware Upgrade. 
+	 Setting this object to automaticUpgrade(1) will cause OpenRG to check
+	 for an update every jOpenrgDevRemoteUpgradeTimeInterval and commit the
+	 upgrade if one is available. Setting the object to automaticNotify(2) 
+	 will create a notification if an upgrade is needed.  While when the 
+	 disable(3) option is selected, the OpenRG will not check for updates."
+    ::= { jOpenrgDevObjects 9 }
+    
+jOpenrgDevRemoteUpgradeTimeInterval OBJECT-TYPE
+    SYNTAX		INTEGER (0..1728000)
+    MAX-ACCESS		read-write
+    STATUS		current
+    DESCRIPTION
+        "This object indicates the amount of seconds that is waited between 
+	 each check for an update. Selecting zero(0) seconds will disable 
+	 the OpenRG upgrade check."
+    ::= { jOpenrgDevObjects 10 }
+
+jOpenrgDevRemoteUpgradeForce OBJECT-TYPE
+    SYNTAX		TruthValue
+    MAX-ACCESS		read-write
+    STATUS		current
+    DESCRIPTION
+        "Setting this object to true(1) will force OpenRG to remote upgrade.
+	 Reading this value always returns false(2)."
+    ::= { jOpenrgDevObjects 11 }
+
+jOpenrgDevReboot OBJECT-TYPE
+    SYNTAX		TruthValue
+    MAX-ACCESS		read-write
+    STATUS		current
+    DESCRIPTION
+        "Setting this object to true(1) will cause OpenRG to reboot.
+	 Reading this value always returns false(2)."
+    ::= { jOpenrgDevObjects 12 }
+
+jOpenrgDevRestoreDefaults OBJECT-TYPE
+    SYNTAX		TruthValue
+    MAX-ACCESS		read-write
+    STATUS		current
+    DESCRIPTION
+        "Setting this object to true(1) will cause OpenRG to restore defaults.
+	 Reading this value always returns false(2)."
+    ::= { jOpenrgDevObjects 13 }
+
+jOpenrgDevNewTrap OBJECT-TYPE
+    SYNTAX		OCTET STRING
+    MAX-ACCESS		read-write
+    STATUS		current
+    DESCRIPTION
+        "Creates a new SNMP Trap with the IP, port and community specified. 
+	 Command expects a string that contains the 3 parameters seperated by a
+	 space in the following order: <IP> <Port> <Community>.
+	 Reading this value returns an empty string."
+    ::= { jOpenrgDevObjects 14 }
+
+jOpenrgTrapsEnable OBJECT-TYPE
+    SYNTAX		TruthValue
+    MAX-ACCESS		read-write
+    STATUS		current
+    DESCRIPTION
+        "Setting this object to true(1) will enable snmp traps. Setting this 
+	 object to false(2) will disable the snmp traps.
+	 Reading this value returns true(1) if the traps are enabled and 
+	 false(2) otherwise. Traps may also be enabled or disabled via
+	 snmpNotifyTable regardless of the value here."
+    ::= { jOpenrgDevObjects 15 }
+
+jOpenrgSecDHKickstartMgrPublic OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The DH kick-start NMS public key concatenated with a digital
+	 signed hash, encoded as an ASN.1:
+	
+	     jOpenrgSecDHKickstartMgrPublic ::= SEQUENCE {
+                 key   		OCTET STRING,   -- the public key
+           	 digest   	OCTET STRING    -- digital signed hash
+	     }
+
+	 The algorithm used is sha1WithRSAEncryption.
+	 The agent calculates the hash over the the key, and compares it with
+	 that extracted digest to ensure authenticity."
+    ::= { jOpenrgSecObjects 1 }
+
+jSubscriberName OBJECT-TYPE
+    SYNTAX      SnmpAdminString (SIZE(0..64))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    	"Current subscriber's name.
+	 Zero-length strings cannot be written to this object."
+    ::= { jSubscriberInformation 1 }
+
+jSubscriberSurname OBJECT-TYPE
+    SYNTAX      SnmpAdminString (SIZE(0..64))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+      	"Current subscriber's surname.
+	 Zero-length strings cannot be written to this object."
+    ::= { jSubscriberInformation 2 }
+
+jSubscriberAddress OBJECT-TYPE
+    SYNTAX      SnmpAdminString (SIZE(0..64))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+      	"Current subscriber's address.
+	 Zero-length strings cannot be written to this object."
+    ::= { jSubscriberInformation 3 }
+
+jSubscriberCity OBJECT-TYPE
+    SYNTAX      SnmpAdminString (SIZE(0..64))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+      	"Current subscriber's city of residence name.
+	 Zero-length strings cannot be written to this object."
+    ::= { jSubscriberInformation 4 }
+
+jSubscriberState OBJECT-TYPE
+    SYNTAX      SnmpAdminString (SIZE(0..64))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    	"Current subscriber's residence state.
+	 Zero-length strings cannot be written to this object."
+    ::= { jSubscriberInformation 5 }
+
+jSubscriberPostalCode OBJECT-TYPE
+    SYNTAX      SnmpAdminString (SIZE(0..64))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Current subscriber's residence postal code.
+	 Zero-length strings cannot be written to this object."
+    ::= { jSubscriberInformation 6 }
+
+jSubscriberCountry OBJECT-TYPE
+    SYNTAX      SnmpAdminString (SIZE(0..64))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+      	"Current subscriber's country of residence.
+	 Zero-length strings cannot be written to this object."
+    ::= { jSubscriberInformation 7 }
+
+jSubscriberPhoneNumber OBJECT-TYPE
+    SYNTAX      SnmpAdminString (SIZE(0..64))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    	"Current subscriber's telephone number.
+	 Zero-length strings cannot be written to this object."
+    ::= { jSubscriberInformation 8 }
+
+jSubscriberEmail OBJECT-TYPE
+    SYNTAX      SnmpAdminString (SIZE(0..64))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+ 	"Current subscriber's e-mail address.
+	 Zero-length strings cannot be written to this object."
+    ::= { jSubscriberInformation 9 }
+
+jOpenrgDevWBMAdminPassSetToFactory OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    	"by setting this object to true(1) the NMS can reset the password of the
+	 gateway web console to its factory default setting.
+	 Reading this object always returns false(2)."
+    ::= { jOpenrgDevObjects 7 }
+
+jOpenrgSecFwEnable OBJECT-TYPE 
+    SYNTAX      INTEGER    { 
+                   enabled(1), 
+                   disabled(2) 
+                 } 
+    MAX-ACCESS  read-write 
+    STATUS      current 
+    DESCRIPTION 
+            "This parameter indicates whether to enable or disable the 
+             firewall." 
+    DEFVAL { enabled } 
+    ::= { jOpenrgSecFwObjects 1 }
+
+jOpenrgSecFwLevel OBJECT-TYPE 
+    SYNTAX      INTEGER    { 
+                   minimum(1), 
+                   typical(2),
+		   maximum(3)
+                 } 
+    MAX-ACCESS  read-write 
+    STATUS      current 
+    DESCRIPTION 
+            "This parameter determines the security level for OpenRG Firewall
+	     by restricting/allowing traffic in and out of the gateway.
+	     
+	     Setting this object to minimum(1) sets the following policies:
+	       Inbound Policy: Accept.
+	       Outbound Policy: Accept.
+	     Setting this object to typical(2) sets the following policies:
+ 	       Inbound Policy: Reject.
+	       Remote Administration settings will override the security
+	       inbound policy.
+	     Setting this object to maximum(3) sets the following policies:
+	       Inbound Policy: Reject.
+	       Remote Administration settings will override the security
+	       inbound policy.
+	       Outbound Policy: Reject.
+	       Outbound access is allowed to the following services: Telnet,
+	       FTP, HTTP, HTTPS, DNS, IMAP, POP3, Ping and SMTP.  Please note
+	       that the Firewall will not block applications that use these
+	       services, such as Peer-to-Peer client applications or Internet
+	       messengers.
+	       Outbound Policy: Accept."
+    DEFVAL { typical } 
+    ::= { jOpenrgSecFwObjects 2 }
+
+----------------------------------------------------------------------------
+----------------------------------------------------------------------------
+-- The following are internal MIB objects.
+----------------------------------------------------------------------------
+----------------------------------------------------------------------------
+
+jCwDisableFeatures OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE (0..65535))
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+    	    "Setting this object to the string jungo_disable_features
+	     causes the PS device to boot up with the following effects:
+             - UPnP feature disabled
+             - CLI  feature disabled
+             - Telnet Server feature disabled
+             - WBM feature in read-only mode.
+             Setting this object to jungo_enable_features restores operability
+	     of these features (under the distribution constraints).
+
+  	     Reading of this object always returns empty string."
+  ::= { jObjects 1 }
+  
+jOpenrgRGConfWorkingPath OBJECT-TYPE
+    SYNTAX SnmpAdminString (SIZE (0..255))
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+	    "This object is used in conjunction with jOpenrgRGConfValue
+	     to read and write OpenRG conf values.
+	     The object represents a single path into OpenRG configuration
+	     tree."
+    DEFVAL { "" }
+    ::= { jOpenrgRGConfObjects 1 }
+
+jOpenrgRGConfValue OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE (0..65535))
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+  	    "This object is used in conjunction
+	     with jOpenrgRGConfWorkingPath Object to read and write
+	     OpenRG conf values.
+	     
+	     Reading this objects returns the value of the corresponding entry
+	     in the gateway rg_conf tree pointed by jOpenrgRGConfWorkingPath.
+
+	     Setting this object, sets the corresponding gateway rg_conf entry
+	     pointed by jOpenrgRGConfWorkingPath."
+    ::= { jOpenrgRGConfObjects 2 }
+
+jOpenrgRGConfObscuredValue OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE (0..65535))
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+  	    "This object is used in conjunction
+	     with jOpenrgRGConfWorkingPath Object to read and write
+	     OpenRG conf obscured values.
+	     Obscured values are values that were encoded to be unreadable to
+	     anyone unaware of OpenRG special encoding key.
+	     
+	     Reading this objects returns the value of the corresponding
+	     obscured entry in the gateway rg_conf tree pointed by
+	     jOpenrgRGConfWorkingPath.
+
+	     Setting this object, sets the corresponding gateway rg_conf entry
+	     pointed by jOpenrgRGConfWorkingPath as an obscured value."
+    ::= { jOpenrgRGConfObjects 3 }
+
+jOpenrgRGConfBackup OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE (0..65535))
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+  	    "Upon set, snmp receives a string with the tftp server ip and the 
+	     destination file name (e.g. tftp://192.168.1.10/rg_conf_file).  
+	     As a result a the rg_conf will be sent (for backup) using tftp 
+	     to the server. 
+	     Reading this object returns the status of the last/current backup."
+    ::= { jOpenrgRGConfObjects 4 }
+
+jOpenrgRGConfRestore OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE (0..65535))
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+  	    "Upon set, OpenRG receives a string with the tftp server ip and the 
+	     destination file name (e.g. tftp://192.168.1.10/rg_conf_file). 
+	     As a result a the rg_conf will be downloaded from the server using 
+	     tftp. 
+	     Reading this object returns the status of the last/current 
+	     restore."
+    ::= { jOpenrgRGConfObjects 5 }
+
+jOpenrgRGConfMode OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE (0..65535))
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+            "Changes the mode of rg_conf restore.
+	     Possible strings are: always, once, never.
+	     always - OpenRG always downloads a configuration file if a URL is
+	     specified in DHCP lease.
+	     once - openRG downloads a configuration file if a URL is specified
+	     in DHCP lease and OpenRG is after restore defaults.
+	     never - OpenRG never downloads the configuration file, even if a
+	     URL is specified in the DHCP lease."
+    ::= { jOpenrgRGConfObjects 6 }
+
+jOpenrgRGrlTransTrapLevel OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+	    "The logging level from which SNMP traps will be
+	     sent when performing RL conf file translation."
+    ::= { jOpenrgRGConfObjects 7 }
+
+jOpenrgDiskMngPartitionTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JOpenrgDiskMngPartitionEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Table showing the partitions currently connected to OpenRG."
+    ::= { jOpenrgDiskMngObjects 1 }
+
+jOpenrgDiskMngPartitionEntry OBJECT-TYPE
+    SYNTAX      JOpenrgDiskMngPartitionEntry 
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry shows the total and free space in a partition. Entry also
+         contains the partition ID."
+    INDEX { jOpenrgPartitionIndex }
+    ::= { jOpenrgDiskMngPartitionTable 1 }
+
+JOpenrgDiskMngPartitionEntry ::= SEQUENCE {
+    jOpenrgPartitionIndex Integer32, 
+    jOpenrgPartitionID DisplayString,
+    jOpenrgPartitionTotalSpace Counter64,
+    jOpenrgPartitionFreeSpace Counter64
+}
+
+jOpenrgPartitionIndex OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Index number of the partition."
+    ::= { jOpenrgDiskMngPartitionEntry 1 }
+
+jOpenrgPartitionID OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Partition ID build from the manufacturer name, HD serial number and
+         partition sector range."
+    ::= { jOpenrgDiskMngPartitionEntry 2 }
+
+jOpenrgPartitionTotalSpace OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Total bytes available in the partition."
+    ::= { jOpenrgDiskMngPartitionEntry 3 }
+
+jOpenrgPartitionFreeSpace OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Free bytes available in the partition."
+    ::= { jOpenrgDiskMngPartitionEntry 4 }
+
+END
+
+
+
+
+
+

@@ -1,0 +1,27 @@
+RFC1155-SMI DEFINITIONS ::= BEGIN
+
+
+            internet      OBJECT IDENTIFIER ::= { iso org(3) dod(6) 1 }
+
+            directory     OBJECT IDENTIFIER ::= { internet 1 }
+            mgmt          OBJECT IDENTIFIER ::= { internet 2 }
+
+            experimental  OBJECT IDENTIFIER ::= { internet 3 }
+
+            private       OBJECT IDENTIFIER ::= { internet 4 }
+            enterprises   OBJECT IDENTIFIER ::= { private 1 }
+
+
+-- These are all loaded by default - so this is just a shell for IMPORTS to work 
+--                 NetworkAddress ::=
+
+--                  IpAddress ::=
+
+--                  Counter ::=
+
+--                  Gauge ::=
+
+--                  TimeTicks ::=
+
+--                  Opaque ::=
+END

@@ -1,0 +1,92 @@
+
+OCCAM-CPU-UTIL-MIB	DEFINITIONS ::= BEGIN
+	IMPORTS
+		OBJECT-IDENTITY, MODULE-IDENTITY, OBJECT-TYPE, Integer32
+			FROM SNMPv2-SMI
+		MODULE-COMPLIANCE, OBJECT-GROUP
+			FROM SNMPv2-CONF
+		occamGenericMonitorModules	
+			FROM OCCAM-REG-MODULE;
+
+	cpuUtilMIB	MODULE-IDENTITY
+		LAST-UPDATED	"200104271051Z"
+		ORGANIZATION	"Occam Networks"
+		CONTACT-INFO    "email support@occamnetworks.com"
+
+		DESCRIPTION	"This mib describes the BLC's cup 
+                                utilization."
+		REVISION	"200104271051Z"
+		DESCRIPTION	"MODULE-IDENTITY update."
+		::=  {  occamGenericMonitorModules  1  }
+
+
+--identifiers
+
+	cpuUtilMIBObjects	OBJECT IDENTIFIER
+		::=  {  cpuUtilMIB  1  }
+
+
+--conformance statement
+
+	cpuUtilMIBConformance	OBJECT IDENTIFIER
+		::=  {  cpuUtilMIB  2  }
+
+
+--
+-- objects
+--
+
+        avgCpuUtilization OBJECT-TYPE
+                SYNTAX                  Integer32
+                MAX-ACCESS              read-only
+                STATUS                  current
+                DESCRIPTION
+                                "The average cpu utilization which is the
+                                 average percentage of the cpu used in
+                                 doing non idle work, since this host was
+                                 last initialiazed."
+               ::=  {  cpuUtilMIBObjects  1  }
+
+
+	cpuUtilMIBGroups	OBJECT IDENTIFIER
+		::=  {  cpuUtilMIBConformance  1  }
+
+	cpuUtilMIBCompliances	OBJECT IDENTIFIER
+		::=  {  cpuUtilMIBConformance  2  }
+
+	cpuUtilMIBObjectGroups	OBJECT IDENTIFIER
+		::=  {  cpuUtilMIBGroups  1  }
+
+	cpuUtilMIBEventGroups	OBJECT IDENTIFIER
+		::=  {  cpuUtilMIBGroups  2  }
+
+
+--
+-- compliance statements
+--
+
+	cpuUtilCompliance	MODULE-COMPLIANCE
+		STATUS			current
+		DESCRIPTION		
+				"In order to measure utilization for a 
+                                procesor this group must be implemented."
+
+		MODULE 	
+			MANDATORY-GROUPS	{ cpuUtilMeasureGroup  }
+		::=  {  cpuUtilMIBCompliances  1  }
+
+
+--
+-- units of conformance 
+--
+
+	cpuUtilMeasureGroup	OBJECT-GROUP
+		OBJECTS			{ avgCpuUtilization }
+		STATUS			current
+		DESCRIPTION		
+				"The collection of objects which are used
+				to describe the cpu utilization for a 
+                                processor."
+		::=  {  cpuUtilMIBObjectGroups  1  }
+
+END

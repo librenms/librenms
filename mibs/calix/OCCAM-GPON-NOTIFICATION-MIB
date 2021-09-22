@@ -1,0 +1,607 @@
+
+OCCAM-GPON-NOTIFICATION-MIB DEFINITIONS ::= BEGIN
+	IMPORTS
+		occamGenericGponModules
+			FROM OCCAM-REG-MODULE
+		TEXTUAL-CONVENTION, TruthValue, DisplayString
+			FROM SNMPv2-TC
+		MODULE-COMPLIANCE, OBJECT-GROUP
+			FROM SNMPv2-CONF
+		OBJECT-IDENTITY, MODULE-IDENTITY, OBJECT-TYPE, 
+		NOTIFICATION-TYPE, Integer32
+			FROM SNMPv2-SMI;
+
+	occamGponNotificationMib	MODULE-IDENTITY
+		LAST-UPDATED	"201007080000Z"
+		ORGANIZATION	"Occam Networks"
+		CONTACT-INFO	"email support@occamnetworks.com"
+		DESCRIPTION	"The mib module to describe notifications 
+				 related to Occam GPON OLT and ONT."
+
+                REVISION        "201007080000Z"
+                DESCRIPTION     "Removed ontId from oltPonRogueOnt."
+
+                REVISION        "201004060000Z"
+		DESCRIPTION	"Added oltPonRogueOnt notification"
+		::=  {  occamGenericGponModules  1  }
+
+-- TEXTUAL-CONVENTIONS --
+	AlarmStatus ::= TEXTUAL-CONVENTION 
+		STATUS			current
+		DESCRIPTION
+			"Alarm status which indicates whether alarming or 
+                        clearing condition"
+		SYNTAX 		INTEGER  {raised (1), cleared (2)}
+
+	PortIdentifier ::= TEXTUAL-CONVENTION 
+		STATUS			current
+		DESCRIPTION
+			"An OLT/ONT port  identifier"
+		SYNTAX 		Integer32  ( 1 .. 16  ) 
+
+	OntIdentifier ::= TEXTUAL-CONVENTION 
+		STATUS			current
+		DESCRIPTION
+			"ONT identifier"
+		SYNTAX 		Integer32  ( 0 .. 64  ) 
+
+
+	ResetTypeValue ::= TEXTUAL-CONVENTION
+		STATUS		current
+		DESCRIPTION
+			"An ONT reset type value."
+		SYNTAX 		INTEGER  { local (1), 
+					   remote(2), 
+					   swFailure(3), 
+					   watchdog(4), 
+					   powerUp(5), 
+					   swSwitch(6) 
+					  }
+
+	
+        BatteryStatus ::= TEXTUAL-CONVENTION
+		STATUS		current
+		DESCRIPTION
+			"An ONT battery installation value."
+		SYNTAX 		INTEGER  { batteryMissing(1), 
+					   batteryFailure(2), 
+					   batteryLow(3), 
+					   batteryHigh(4),
+					   batteryNotInstalled(5),
+					   batteryShutdown(6), 
+					   batteryDeprovisioned(7), 
+					   batteryNeedsReplacement(8) 
+					  }
+
+		
+        TemperatureStatus ::= TEXTUAL-CONVENTION
+		STATUS		current
+		DESCRIPTION
+			"An ONT Temperature status value."
+		SYNTAX 		INTEGER  { low (1), high (2), over(3) }     
+	
+        PonLinkStatus ::= TEXTUAL-CONVENTION
+		STATUS		current
+		DESCRIPTION
+			"An ONT PON link status value."
+		SYNTAX 		INTEGER  {  
+                                        los(1), lof (2), lcdg(3), suf(4),
+                                        mem(5), dact(6), dis(7), mis(8),
+                                        pee(9), rdi(10), lcda(11),tf(12), 
+                                        reset(13), dow(14), sf(15), 
+                                        sd(16), df(17), loa(18), dg(19),
+                                        loam(20),dup(21),rx-pwr-drop(22)}     
+
+
+        PonThresoldExceededEntity ::= TEXTUAL-CONVENTION
+		STATUS		current
+		DESCRIPTION
+			"An ONT entity exceeded threshold value."
+		SYNTAX 		INTEGER  {  sd(1), sf (2) }
+
+ 			
+        SlicIndicatorValue ::= TEXTUAL-CONVENTION
+		STATUS		current
+		DESCRIPTION
+			"An ONT SLIC indicator value."
+		SYNTAX 		INTEGER  { sLIC0 (1), sLIC1 (2) }
+		
+        OntLanStatus ::= TEXTUAL-CONVENTION
+		STATUS		current
+		DESCRIPTION
+			"An ONT LAN port status value."
+		SYNTAX 		INTEGER  { los(1), fault(2), videoLos(3)} 
+
+        OntStatus ::= TEXTUAL-CONVENTION
+		STATUS		current
+		DESCRIPTION
+			"An ONT status."
+		SYNTAX 		INTEGER  { online (1), offline(2) } 
+
+        OntTopologyAction ::= TEXTUAL-CONVENTION
+		STATUS		current
+		DESCRIPTION
+			"An ONT Topology change type."
+		SYNTAX 		INTEGER  { ontAdd (1), ontDelete(2), 
+                                ontBind(3), ontUnbind(4) } 
+
+        OntHardwareFailure ::= TEXTUAL-CONVENTION
+		STATUS		current
+		DESCRIPTION
+			"ONT Hardware error."
+		SYNTAX 		INTEGER  { ontPhyRHang(1), 
+                                       ontPhyRCrystal(2) } 
+
+        PortType ::= TEXTUAL-CONVENTION
+		STATUS		current
+		DESCRIPTION
+			"Type of Port."
+		SYNTAX 		INTEGER  { gpon(1), ethernet (2), 
+                                        pots(3), hpna(4), t1(5) } 
+
+        OntAutoUpgradeFailure ::= TEXTUAL-CONVENTION
+		STATUS		current
+		DESCRIPTION
+			"ONT Auto Upgrade error."
+		SYNTAX 		INTEGER  { ontRepNotReachable(1), 
+                                       OutOfMemory(2) } 
+
+
+-- MIB OBJECT IDENTIFIERS --
+
+	gponNotificationMibObjects	OBJECT IDENTIFIER
+		::=  {  occamGponNotificationMib  1  }
+
+	gponNotificationMibTraps	OBJECT IDENTIFIER
+		::=  {  occamGponNotificationMib  2  }
+
+-- MIB OBJECTS --
+
+	
+      ponLinkStatus			OBJECT-TYPE	
+		SYNTAX			PonLinkStatus 
+		MAX-ACCESS		accessible-for-notify
+		STATUS			current
+		DESCRIPTION
+			"The pon link status."
+		::=  {  gponNotificationMibObjects  1  }
+
+     ontAlarmStatus			OBJECT-TYPE	
+		SYNTAX			AlarmStatus 
+		MAX-ACCESS		accessible-for-notify
+		STATUS			current
+		DESCRIPTION
+			"The alarm status."
+		::=  {  gponNotificationMibObjects  2  }
+
+     ontThresholdExceededEntity	OBJECT-TYPE	
+		SYNTAX			PonThresoldExceededEntity
+		MAX-ACCESS		accessible-for-notify
+		STATUS			current
+		DESCRIPTION
+			"The entity which has crossed the threshold."
+		::=  {  gponNotificationMibObjects  3  }
+
+
+		
+      ontBatteryStatus	OBJECT-TYPE	
+		SYNTAX			BatteryStatus 
+		MAX-ACCESS		accessible-for-notify
+		STATUS			current
+		DESCRIPTION
+			"The battery installation status."
+		::=  {  gponNotificationMibObjects  4  }		
+
+      ontTemperatureStatus		OBJECT-TYPE	
+		SYNTAX			TemperatureStatus 
+		MAX-ACCESS		accessible-for-notify
+		STATUS			current
+		DESCRIPTION
+			"The battery installation status."
+		::=  {  gponNotificationMibObjects  5  }			
+
+      ontResetReason			OBJECT-TYPE	
+		SYNTAX			ResetTypeValue 
+		MAX-ACCESS		accessible-for-notify
+		STATUS			current
+		DESCRIPTION
+			"Reason which triggered the reset."
+		::=  {  gponNotificationMibObjects  6  }	
+		
+      ontSlicIndicator			OBJECT-TYPE	
+		SYNTAX			SlicIndicatorValue 
+		MAX-ACCESS		accessible-for-notify
+		STATUS			current
+		DESCRIPTION                   
+			"An ONT SLIC indicator."
+		::=  {  gponNotificationMibObjects  7  }
+			
+
+      ontLanLinkStatus 			OBJECT-TYPE	
+		SYNTAX			OntLanStatus 
+		MAX-ACCESS		accessible-for-notify
+		STATUS			current
+		DESCRIPTION                   
+			"An ONT LAN port status."
+		::=  {  gponNotificationMibObjects  8  }
+
+      oltPonPortId			OBJECT-TYPE	
+		SYNTAX			PortIdentifier
+		MAX-ACCESS		accessible-for-notify
+		STATUS			current
+		DESCRIPTION                   
+			"An OLT PON Port."
+		::=  {  gponNotificationMibObjects  9  }
+
+
+      ontPonPortId			OBJECT-TYPE	
+		SYNTAX			PortIdentifier
+		MAX-ACCESS		not-accessible
+		STATUS			current
+		DESCRIPTION                   
+			"An ONT PON Port."
+		::=  {  gponNotificationMibObjects  10  }
+
+      ontLanPortId			OBJECT-TYPE	
+		SYNTAX			PortIdentifier
+		MAX-ACCESS		accessible-for-notify
+		STATUS			current
+		DESCRIPTION                   
+			"An ONT LAN Port."
+		::=  {  gponNotificationMibObjects  11  }
+
+      ontPotsPortId			OBJECT-TYPE	
+		SYNTAX			PortIdentifier
+		MAX-ACCESS		accessible-for-notify
+		STATUS			current
+		DESCRIPTION                   
+			"An ONT LAN Port."
+		::=  {  gponNotificationMibObjects  12  }
+
+      ontId				OBJECT-TYPE	
+		SYNTAX			OntIdentifier 
+		MAX-ACCESS		accessible-for-notify
+		STATUS			current
+		DESCRIPTION                   
+			"An ONT PON Port."
+		::=  {  gponNotificationMibObjects  13  }
+
+
+
+      ontSerialNumber			OBJECT-TYPE	
+		SYNTAX			DisplayString 
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION                   
+			"ONT serial number."
+		::=  {  gponNotificationMibObjects  14  }
+
+
+      ontVendorId			OBJECT-TYPE	
+		SYNTAX			DisplayString 
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION                   
+			"ONT VendorId."
+		::=  {  gponNotificationMibObjects  15  }
+
+      ontSoftwareVersion		OBJECT-TYPE	
+		SYNTAX			DisplayString 
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION                   
+			"ONT software veriosn."
+		::=  {  gponNotificationMibObjects  16  }
+
+      ontCleiCode			OBJECT-TYPE	
+		SYNTAX			DisplayString 
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION                   
+			"ONT CLEI code."
+		::=  {  gponNotificationMibObjects  17  }
+
+
+      ontConfigFailureOperation		OBJECT-TYPE	
+		SYNTAX			DisplayString 
+		MAX-ACCESS		accessible-for-notify
+		STATUS			current
+		DESCRIPTION                   
+			"Details of the failed operation on the ONT."
+		::=  {  gponNotificationMibObjects  18  }
+
+      ontConfigFailureReason		OBJECT-TYPE	
+		SYNTAX			DisplayString 
+		MAX-ACCESS		accessible-for-notify
+		STATUS			current
+		DESCRIPTION                   
+			"Reason for a failed operation on the ONT."
+		::=  {  gponNotificationMibObjects  19  }
+
+      ontDownloadFailedReason		OBJECT-TYPE	
+		SYNTAX			DisplayString 
+		MAX-ACCESS		accessible-for-notify
+		STATUS			current
+		DESCRIPTION                   
+			"Reason for failed download."
+		::=  {  gponNotificationMibObjects  20  }
+
+      ontStatus		OBJECT-TYPE	
+		SYNTAX			OntStatus 
+		MAX-ACCESS		accessible-for-notify
+		STATUS			current
+		DESCRIPTION                   
+			"Status of the ONT whether its online or offline."
+		::=  {  gponNotificationMibObjects  21  }
+
+      ontTopologyAction			OBJECT-TYPE	
+		SYNTAX			OntTopologyAction
+		MAX-ACCESS		accessible-for-notify
+		STATUS			current
+		DESCRIPTION                   
+			"Type of topology change."
+		::=  {  gponNotificationMibObjects  22  }
+
+      ontHardwareFailure		OBJECT-TYPE	
+		SYNTAX			OntHardwareFailure 
+		MAX-ACCESS		accessible-for-notify
+		STATUS			current
+		DESCRIPTION                   
+			"Type of hardware failure on ONT."
+		::=  {  gponNotificationMibObjects  23  }
+
+      ontPortId				OBJECT-TYPE	
+		SYNTAX			PortIdentifier
+		MAX-ACCESS		accessible-for-notify
+		STATUS			current
+		DESCRIPTION                   
+			"Identifier of the ONT port."
+		::=  {  gponNotificationMibObjects  24  }
+
+      ontPortType			OBJECT-TYPE	
+		SYNTAX			PortType
+		MAX-ACCESS		accessible-for-notify
+		STATUS			current
+		DESCRIPTION                   
+			"Type of the ONT port."
+		::=  {  gponNotificationMibObjects  25  }
+
+      ontRegistrationId			OBJECT-TYPE	
+		SYNTAX			DisplayString 
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION                   
+			"ONT registrationId. Has to be 10 characters l
+                        ong. This attribute helps in uniquely 
+                        associating a subscriber to a logical ONT 
+                        interface,independent of the ONT device"
+		::=  {  gponNotificationMibObjects  26  }
+
+	ontUpgradeFailureReason		OBJECT-TYPE
+		SYNTAX			OntAutoUpgradeFailure
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION                  	
+			"ONT Auto upgrade failure reason."
+		::= { gponNotificationMibObjects 27 }
+
+
+
+-- MIB NOTIFICATIONS --
+		
+	ontEquipmentAlarmNotification	NOTIFICATION-TYPE
+		OBJECTS			{ oltPonPortId, ontId, 
+                                        ontAlarmStatus }
+		STATUS			current
+		DESCRIPTION		"Functional failure on an ONT's 
+                                        internal interface."
+		::=  {  gponNotificationMibTraps  1  }
+
+	ontPoweringAlarmNotification	NOTIFICATION-TYPE
+		OBJECTS			{ oltPonPortId, ontId, 
+                                        ontAlarmStatus }
+		STATUS			current
+		DESCRIPTION		"Loss of ONT's external power."
+		::=  {  gponNotificationMibTraps  2  }
+
+	ontPhysicalIntrusionNotification	NOTIFICATION-TYPE
+		OBJECTS			{ oltPonPortId, ontId, 
+                                        ontAlarmStatus }
+		STATUS			current
+		DESCRIPTION		"ONT detects door or box open."
+		::=  {  gponNotificationMibTraps  3  }
+
+	oltPonLinkStatusNotification	NOTIFICATION-TYPE
+		OBJECTS			{ oltPonPortId, ponLinkStatus,
+                                        ontAlarmStatus }
+		STATUS			current
+		DESCRIPTION		"The OLT PON link status event."
+		::=  {  gponNotificationMibTraps  4  }
+
+	ontPonLinkStatusByOltNotification	NOTIFICATION-TYPE
+		OBJECTS			{ oltPonPortId, ontId, 
+                                        ponLinkStatus, ontAlarmStatus }
+		STATUS			current
+		DESCRIPTION		"The PON link status of an ONT 
+                                        detected by OLT."
+		::=  {  gponNotificationMibTraps  5  }
+
+	ontPonLinkStatusNotification	NOTIFICATION-TYPE
+		OBJECTS			{ oltPonPortId, ontId, 
+                                        ponLinkStatus, ontAlarmStatus }
+		STATUS			current
+		DESCRIPTION		"The PON link status event from 
+                                        the ONT."
+		::=  {  gponNotificationMibTraps  6  }
+
+	ontThresholdExceededNotification	NOTIFICATION-TYPE
+		OBJECTS			{ oltPonPortId, ontId, 
+                                        ontThresholdExceededEntity, 
+                                        ontAlarmStatus }
+		STATUS			current
+		DESCRIPTION		"Downstream BIP error counter 
+                                        crossed signal degrade threshold."
+		::=  {  gponNotificationMibTraps  7  }
+
+        ontTemperatureStatusNotification	NOTIFICATION-TYPE
+		OBJECTS			{ oltPonPortId, ontId, 
+                                        ontTemperatureStatus, 
+                                        ontAlarmStatus }
+		STATUS			current
+		DESCRIPTION		"The ONT temperature status 
+                                        event."
+		::=  {  gponNotificationMibTraps  8  }
+
+        ontBatteryStatusNotification	NOTIFICATION-TYPE
+		OBJECTS			{ oltPonPortId, ontId, 
+                                        ontBatteryStatus, ontAlarmStatus}
+		STATUS			current
+		DESCRIPTION		"The ONT battery status event."
+		::=  {  gponNotificationMibTraps  9  }
+
+	ontResetNotification		NOTIFICATION-TYPE
+		OBJECTS			{ oltPonPortId, ontId,
+                                        ontResetReason }
+		STATUS			current
+		DESCRIPTION		"The ONT reset event."
+		::=  {  gponNotificationMibTraps  10  }					
+		
+        ontSlicAlarmNotification	NOTIFICATION-TYPE
+		OBJECTS			{ oltPonPortId, ontId, 
+                                        ontSlicIndicator, ontAlarmStatus}
+		STATUS			current
+		DESCRIPTION		"The SLIC alarm status on the 
+                                        ONT."
+		::=  {  gponNotificationMibTraps  11  }
+		
+        				
+        ontLanLinkStatusNotification	NOTIFICATION-TYPE
+		OBJECTS			{ oltPonPortId, ontId, 
+                                        ontLanPortId, ontLanLinkStatus,
+                                        ontAlarmStatus}
+		STATUS			current
+		DESCRIPTION		"The ONT Lan Link status event."
+		::=  {  gponNotificationMibTraps  12  }
+
+
+        ontDiscoveredNotification	NOTIFICATION-TYPE
+		OBJECTS			{ oltPonPortId, ontId, 
+                                        ontSerialNumber, ontVendorId,
+                                        ontRegistrationId }
+		STATUS			current
+		DESCRIPTION		"ONT has been discovered on a
+                                        PON port with this serial 
+                                        number/registrationId. 
+                                        If this ONT is unbound, then 
+                                        ontId will be set to 0"
+		::=  {  gponNotificationMibTraps  13  }
+
+        ontStatusChangeNotification	NOTIFICATION-TYPE
+		OBJECTS			{ oltPonPortId, ontId, ontStatus}
+		STATUS			current
+		DESCRIPTION		"ONT state has changed. Either 
+                                        come online or gone offline."
+		::=  {  gponNotificationMibTraps  14  }
+
+
+        ontConfigFailedNotification	NOTIFICATION-TYPE
+		OBJECTS			{ oltPonPortId, ontSerialNumber,
+                                        ontConfigFailureOperation, 
+                                        ontConfigFailureReason, 
+                                        ontAlarmStatus}
+		STATUS			current
+		DESCRIPTION		"ONT config operation failed."
+		::=  {  gponNotificationMibTraps  15  }
+
+        ontSwDownloadFailedNotification	NOTIFICATION-TYPE
+		OBJECTS			{ oltPonPortId, ontId, 
+                                        ontDownloadFailedReason}
+		STATUS			current
+		DESCRIPTION		"ONT software download 
+                                        operation failed."
+		::=  {  gponNotificationMibTraps  16  }
+
+        ontSwapOutNotification		NOTIFICATION-TYPE
+		OBJECTS			{ oltPonPortId, ontId, 
+                                        ontSerialNumber}
+		STATUS			current
+		DESCRIPTION		"ONT has been swapped out with an
+                                        ONT having this serial number."
+		::=  {  gponNotificationMibTraps  17  }
+
+	ontLimitExceededNotification	NOTIFICATION-TYPE
+		OBJECTS			{ oltPonPortId, ontSerialNumber }
+		STATUS			current
+		DESCRIPTION		"Supported ONT limit on this PON
+                                        port has been exceeded on 
+                                        discovering this ONT."
+		::=  {  gponNotificationMibTraps  18  }
+
+	usBandwidthLimitExceededNotification	NOTIFICATION-TYPE
+		OBJECTS			{ oltPonPortId }
+		STATUS			current
+		DESCRIPTION		"Upstream bandwidth limit 
+                                        exceeded on this PON port."
+		::=  {  gponNotificationMibTraps  19  }
+
+	ontTopologyChangeNotification	NOTIFICATION-TYPE
+		OBJECTS			{ oltPonPortId, ontId, 
+                                        ontSerialNumber,
+                                        ontTopologyAction}
+		STATUS			current
+		DESCRIPTION		"Topology change indicating 
+                                        whether an ONT was added or 
+                                        deleted on a PON port."
+		::=  {  gponNotificationMibTraps  20  }
+
+	sfpMissingNotification	NOTIFICATION-TYPE
+		OBJECTS			{ oltPonPortId, ontAlarmStatus}
+		STATUS			current
+		DESCRIPTION		"SFP missing on a PON port."
+		::=  {  gponNotificationMibTraps  21  }
+
+	ontHardwareFailureNotification	NOTIFICATION-TYPE
+		OBJECTS			{ oltPonPortId, ontId, 
+                                        ontHardwareFailure, ontPortId,
+                                        ontPortType, ontAlarmStatus}
+		STATUS			current
+		DESCRIPTION		"ONT hardware failure. This may 
+                                        cause lockup issuses on remote 
+                                        ports on the ONT."
+		::=  {  gponNotificationMibTraps  22  }
+
+	ontRfReturnFrequencyMismatchNotification	NOTIFICATION-TYPE
+		OBJECTS			{ oltPonPortId, ontId,
+                                         ontAlarmStatus}
+		STATUS			current
+		DESCRIPTION		"RF Return Frequency set by OLT 
+                                        is outside the capabilities of 
+                                        this ONT, or a frequency that is
+                                        not on the standardized frequency
+                                        plan."
+		::=  {  gponNotificationMibTraps  23  }
+ 
+        oltPonRogueOnt	NOTIFICATION-TYPE
+		OBJECTS			{ oltPonPortId,  
+                                        ontAlarmStatus}
+		STATUS			current
+		DESCRIPTION		"Detection of a rogue ONT."
+		::=  {  gponNotificationMibTraps  24  }
+
+	ontAutoUpgradeNotification NOTIFICATION-TYPE
+		OBJECTS			{ ontAlarmStatus,
+					  ontUpgradeFailureReason
+					} 
+		STATUS			current
+		DESCRIPTION		"ONT Auto Upgrade failure notification."
+		::=  {  gponNotificationMibTraps  25  }
+
+	ontRfrEolNotification NOTIFICATION-TYPE
+		OBJECTS			{ oltPonPortId, ontId,
+					ontAlarmStatus }
+		STATUS			current
+		DESCRIPTION		"ONT RF-Return End Of Life (EOL) notification."
+		::=  {  gponNotificationMibTraps  26  }
+		
+        
+END

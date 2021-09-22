@@ -1,0 +1,477 @@
+
+
+OCCAM-ONT-NOTIFICATION-MIB DEFINITIONS ::= BEGIN
+	IMPORTS
+		occamGenericSubscriberModules
+			FROM OCCAM-REG-MODULE
+		TEXTUAL-CONVENTION, TruthValue, DisplayString
+			FROM SNMPv2-TC
+		MODULE-COMPLIANCE, OBJECT-GROUP
+			FROM SNMPv2-CONF
+		OBJECT-IDENTITY, MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE, Integer32
+			FROM SNMPv2-SMI;
+
+	occamOntNotificationMib	MODULE-IDENTITY
+		LAST-UPDATED	"201007290000Z"
+		ORGANIZATION	"Occam Networks"
+		CONTACT-INFO	"email support@occamnetworks.com"
+		DESCRIPTION     "The mib module to describe Occam ONT device family notifications."
+
+               REVISION "201007290000Z"
+               DESCRIPTION"Added bootLoaderStatusNotification
+                           Corrected some syntax errors."
+
+		::=  {  occamGenericSubscriberModules  3  }
+
+-- TEXTUAL-CONVENTIONS --
+
+	ResetTypeValue ::= TEXTUAL-CONVENTION
+		DISPLAY-HINT	""
+		STATUS		current
+		DESCRIPTION
+			"An ONT reset type value."
+		SYNTAX 		INTEGER  { factoryReset (1), rebootReset (2) }
+		
+        BatteryInstallationValue ::= TEXTUAL-CONVENTION
+		DISPLAY-HINT	""
+		STATUS		current
+		DESCRIPTION
+			"An ONT battery installation value."
+		SYNTAX 		INTEGER  { batteryNotInstalled (1), batteryInstalled (2) }
+		
+        BatteryVoltageLevelValue ::= TEXTUAL-CONVENTION
+		DISPLAY-HINT	""
+		STATUS		current
+		DESCRIPTION
+			"An ONT battery voltage level value."
+		SYNTAX 		INTEGER  { low (1), normal (2) }
+
+	BatteryUpsSelfTestResultValue ::= TEXTUAL-CONVENTION
+		DISPLAY-HINT	""
+		STATUS		current
+		DESCRIPTION
+			"An ONT battery self test result value."
+		SYNTAX 		INTEGER  { fail (1), pass (2) }
+		
+        UpsConnectionValue ::= TEXTUAL-CONVENTION
+		DISPLAY-HINT	""
+		STATUS		current
+		DESCRIPTION
+			"An ONT UPS connection value."
+		SYNTAX 		INTEGER  { notReady (1), ready (2) }     
+
+	OpticsModulePresentValue ::= TEXTUAL-CONVENTION
+		DISPLAY-HINT	""
+		STATUS		current
+		DESCRIPTION
+			"An ONT optics module presence value."
+		SYNTAX 		INTEGER  { missing (1), found (2) }
+		
+	OpticsModuleValue ::= TEXTUAL-CONVENTION
+		DISPLAY-HINT	""
+		STATUS		current
+		DESCRIPTION
+			"An ONT optics module value."
+		SYNTAX 		INTEGER  { primary (1), secondary (2) }
+
+	OpticsReceiverSignalValue ::= TEXTUAL-CONVENTION
+		DISPLAY-HINT	""
+		STATUS		current
+		DESCRIPTION
+			"An ONT optics receiver signal value."
+		SYNTAX 		INTEGER  { lost (1), found (2) }
+		
+       OpticsTransmitterSignalValue ::= TEXTUAL-CONVENTION
+		DISPLAY-HINT	""
+		STATUS		current
+		DESCRIPTION
+			"An ONT optics transmitter signal value."
+		SYNTAX 		INTEGER  { failure (1), ok (2) }
+		
+       SlicAlarmStateValue ::= TEXTUAL-CONVENTION
+		DISPLAY-HINT	""
+		STATUS		current
+		DESCRIPTION
+			"An ONT SLIC alarm on/off value."
+		SYNTAX 		INTEGER  { off (1), on (2) }
+		
+       SlicIndicatorValue ::= TEXTUAL-CONVENTION
+		DISPLAY-HINT	""
+		STATUS		current
+		DESCRIPTION
+			"An ONT SLIC indicator value."
+		SYNTAX 		INTEGER  { sLIC0 (1), sLIC1 (2) }
+		
+       ImageDownloadProgressValue ::= TEXTUAL-CONVENTION
+		DISPLAY-HINT	""
+		STATUS		current
+		DESCRIPTION
+			"An ONT image download progress value."
+		SYNTAX 		INTEGER  { inProgress (1), failed (2), successful (3) }
+		
+       VoiceProtocolRebootValue ::= TEXTUAL-CONVENTION
+		DISPLAY-HINT	""
+		STATUS		current
+		DESCRIPTION
+			"An ONT system voice protocol reboot value."
+		SYNTAX 		INTEGER  { mgcpDown (1), sipMemLow (2), sipDown (3) }
+		
+       ImageUpgradeErrorValue ::= TEXTUAL-CONVENTION
+		DISPLAY-HINT	""
+		STATUS		current
+		DESCRIPTION
+			"An ONT image upgrade error value."
+		SYNTAX 		INTEGER  { imageCorrupted (1), alreadyUpgraded (2), upgradeFailure (3), tftpTimeoutFailure (4), downgradeFailure (5) }
+
+       NspStatusValue ::= TEXTUAL-CONVENTION
+		DISPLAY-HINT	""
+		STATUS		current
+		DESCRIPTION
+			"An ONT NSP status value."
+		SYNTAX 		INTEGER  { nspOff (1), nspOnPrimary (2), nspOnSecondary (3), nspClockOutOfRange (4) } 
+
+       RlTranslationStatusValue ::= TEXTUAL-CONVENTION
+		DISPLAY-HINT	""
+		STATUS		current
+		DESCRIPTION
+			"An ONT RL conf translation status value."
+		SYNTAX 		INTEGER  { failed (1), successful (2) }
+
+      FieldUpgradeStatusValue ::= TEXTUAL-CONVENTION
+		DISPLAY-HINT	""
+		STATUS		current
+		DESCRIPTION
+			"An ONT field upgrade status value. Possible values are:
+			Uninitialized - The field upgrade process has not
+				started yet, or the new image download failed.
+			FactoryConversion - The following operations have completed successfully:
+				- Reading permanent configuration (such as MAC addresses).
+				- Conversion of permanent configuration parameters to
+				  rg_factory format.
+				- Writing rg_factory to flash.
+				- Deletion of rg_conf sections.
+			RGloaderInstall - The following operations have	completed successfully:
+				- Downloading of RGLoader.
+				- Verification of RGLoader.
+			     	- Initialization of bootconf (RGLoader rg_conf section).
+				- Burning RGLoader to its section.
+			HeaderUpdate - The following operations have completed successfully:
+				- Finding what section the OpenRG image is located at.
+			     	- Updating OpenRG flash header with the right offset so that
+				  RGloader can boot the image.
+				- Verification of the written header.
+			WriteJmpInstructions - The following operation has completed successfully:
+				- Writing a jump instruction to the location of the RGLoader
+				  at flash address 0x0 (RedBoot is destroyed at this stage).
+			Complete - The upgrade has completed successfully."
+		SYNTAX 		INTEGER  { uninitialized (1), factoryConversion (2), rgloaderInstall (3),
+			headerUpdate (4), writeJmpInstructions (5), complete (6) }
+
+		SlotIdValue ::= TEXTUAL-CONVENTION
+        DISPLAY-HINT    ""
+        STATUS      current
+        DESCRIPTION
+            "A Slot Identification value."
+        SYNTAX      INTEGER  ( 0 .. 16 )
+
+	BootLoaderStatusValue ::= TEXTUAL-CONVENTION
+        DISPLAY-HINT    ""
+        STATUS      current
+        DESCRIPTION
+            "An ONT boot loader status value."
+        SYNTAX      INTEGER  { bootLoaderDamaged (1), bootLoaderOk(2) }
+
+-- MIB OBJECT IDENTIFIERS --
+
+	ontNotificationMibObjects	OBJECT IDENTIFIER
+		::=  {  occamOntNotificationMib  1  }
+
+	ontNotificationMibTraps	OBJECT IDENTIFIER
+		::=  {  occamOntNotificationMib  2  }
+
+-- MIB OBJECTS --
+		
+      ontResetType	OBJECT-TYPE	
+		SYNTAX			ResetTypeValue 
+		MAX-ACCESS		accessible-for-notify
+		STATUS			current
+		DESCRIPTION
+			"The reset type."
+		::=  {  ontNotificationMibObjects  1  }
+		
+      ontBatteryInstallationStatus	OBJECT-TYPE	
+		SYNTAX			BatteryInstallationValue 
+		MAX-ACCESS		accessible-for-notify
+		STATUS			current
+		DESCRIPTION
+			"The battery installation status."
+		::=  {  ontNotificationMibObjects  2  }
+		
+      ontBatteryVoltageLevelStatus	OBJECT-TYPE	
+		SYNTAX			BatteryVoltageLevelValue 
+		MAX-ACCESS		accessible-for-notify
+		STATUS			current
+		DESCRIPTION
+			"The battery voltage level status."
+		::=  {  ontNotificationMibObjects  3  }
+	
+      ontBatteryUpsSelfTestStatus	OBJECT-TYPE	
+		SYNTAX			BatteryUpsSelfTestResultValue 
+		MAX-ACCESS		accessible-for-notify
+		STATUS			current
+		DESCRIPTION
+			"The battery UPS self test status."
+		::=  {  ontNotificationMibObjects  4  }
+		
+      ontUpsConnectionStatus	OBJECT-TYPE	
+		SYNTAX			UpsConnectionValue 
+		MAX-ACCESS		accessible-for-notify
+		STATUS			current
+		DESCRIPTION
+			"The UPS connection status."
+		::=  {  ontNotificationMibObjects  5  }
+		
+      ontOpticsModulePresenceStatus	OBJECT-TYPE	
+		SYNTAX			OpticsModulePresentValue 
+		MAX-ACCESS		accessible-for-notify
+		STATUS			current
+		DESCRIPTION
+			"The optics module presence status."
+		::=  {  ontNotificationMibObjects  6  }
+
+
+      ontOpticsModuleIndicator	OBJECT-TYPE	
+		SYNTAX			OpticsModuleValue 
+		MAX-ACCESS		accessible-for-notify
+		STATUS			current
+		DESCRIPTION
+			"The optics module indicator."
+		::=  {  ontNotificationMibObjects  7  }
+		
+      ontOpticsReceiverSignalStatus	OBJECT-TYPE	
+		SYNTAX			OpticsReceiverSignalValue 
+		MAX-ACCESS		accessible-for-notify
+		STATUS			current
+		DESCRIPTION                   
+			"The optics signal status."
+		::=  {  ontNotificationMibObjects  8  }
+		
+      ontOpticsTransmitterSignalStatus	OBJECT-TYPE	
+		SYNTAX			OpticsTransmitterSignalValue 
+		MAX-ACCESS		accessible-for-notify
+		STATUS			current
+		DESCRIPTION                   
+			"The optics transmitter signal status."
+		::=  {  ontNotificationMibObjects  9  }
+		
+      ontSlicAlarmStatus	OBJECT-TYPE	
+		SYNTAX			SlicAlarmStateValue 
+		MAX-ACCESS		accessible-for-notify
+		STATUS			current
+		DESCRIPTION                   
+			"A SLIC alarm status."
+		::=  {  ontNotificationMibObjects  10  }
+		
+      ontSlicIndicator	OBJECT-TYPE	
+		SYNTAX			SlicIndicatorValue 
+		MAX-ACCESS		accessible-for-notify
+		STATUS			current
+		DESCRIPTION                   
+			"An ONT SLIC indicator."
+		::=  {  ontNotificationMibObjects  11  }
+		
+      ontLocalSwVersion	OBJECT-TYPE	
+		SYNTAX			DisplayString 
+		MAX-ACCESS		accessible-for-notify
+		STATUS			current
+		DESCRIPTION                   
+			"An ONT software software version."
+		::=  {  ontNotificationMibObjects  12  }
+		
+      ontServerSwVersion	OBJECT-TYPE	
+		SYNTAX			DisplayString 
+		MAX-ACCESS		accessible-for-notify
+		STATUS			current
+		DESCRIPTION                   
+			"An ONT server software software version."
+		::=  {  ontNotificationMibObjects  13  }
+		
+      ontImageDownloadProgressStatus	OBJECT-TYPE	
+		SYNTAX			ImageDownloadProgressValue 
+		MAX-ACCESS		accessible-for-notify
+		STATUS			current
+		DESCRIPTION                   
+			"An ONT image download progress status."
+		::=  {  ontNotificationMibObjects  14  }
+				
+      ontImageUpgradeErrorStatus	OBJECT-TYPE	
+		SYNTAX			ImageUpgradeErrorValue 
+		MAX-ACCESS		accessible-for-notify
+		STATUS			current
+		DESCRIPTION                   
+			"An ONT image upgrade error status."
+		::=  {  ontNotificationMibObjects  15  }
+		
+      ontNspStatus	OBJECT-TYPE	
+		SYNTAX			NspStatusValue 
+		MAX-ACCESS		accessible-for-notify
+		STATUS			current
+		DESCRIPTION                   
+			"An ONT NSP status."
+		::=  {  ontNotificationMibObjects  16  }
+
+      ontRlTranslationStatus		OBJECT-TYPE	
+		SYNTAX			RlTranslationStatusValue 
+		MAX-ACCESS		accessible-for-notify
+		STATUS			current
+		DESCRIPTION                   
+			"An ONT RL conf translation status."
+		::=  {  ontNotificationMibObjects  17  }
+
+      ontRlTranslationMsg		OBJECT-TYPE	
+		SYNTAX			OCTET STRING (SIZE (0..1500)) 
+		MAX-ACCESS		accessible-for-notify
+		STATUS			current
+		DESCRIPTION                   
+			"An ONT RL conf translation log message.
+			The octet is composed of concatenated strings, each of
+			the form: <LOG_LEV>: <LOG_MSG>.
+			The strings are separated by CRLF"
+		::=  {  ontNotificationMibObjects  18  }
+
+      ontFieldUpgradeStatus		OBJECT-TYPE	
+		SYNTAX			FieldUpgradeStatusValue 
+		MAX-ACCESS		accessible-for-notify
+		STATUS			current
+		DESCRIPTION                   
+			"An ONT field upgrade status."
+		::=  {  ontNotificationMibObjects  19  }
+
+      ontFieldUpgradeMsg		OBJECT-TYPE	
+		SYNTAX			DisplayString 
+		MAX-ACCESS		accessible-for-notify
+		STATUS			current
+		DESCRIPTION                   
+			"An ONT field upgrade log message."
+		::=  {  ontNotificationMibObjects  20  }
+	
+	  ontSlotIDMsg        OBJECT-TYPE
+        SYNTAX          DisplayString
+        MAX-ACCESS      accessible-for-notify
+        STATUS          current
+        DESCRIPTION
+            "An ONT slot id update notification."
+        ::=  {  ontNotificationMibObjects  21  }
+
+	ontBootLoaderStatusMsg        OBJECT-TYPE
+        SYNTAX          BootLoaderStatusValue
+        MAX-ACCESS      accessible-for-notify
+        STATUS          current
+        DESCRIPTION
+            "An ONT boot status notification."
+        ::=  {  ontNotificationMibObjects  22  }
+	
+
+
+-- MIB NOTIFICATIONS --
+
+	ontResetNotification	NOTIFICATION-TYPE
+		OBJECTS			{ ontResetType }
+		STATUS			current
+		DESCRIPTION		"The reset notification event from the ONT."
+		::=  {  ontNotificationMibTraps  1  }
+		
+        ontBatteryInstallationNotification	NOTIFICATION-TYPE
+		OBJECTS			{ ontBatteryInstallationStatus }
+		STATUS			current
+		DESCRIPTION		"The battery installation event from the ONT."
+		::=  {  ontNotificationMibTraps  2  }
+		
+        ontBatteryVoltageLevelNotification	NOTIFICATION-TYPE
+		OBJECTS			{ ontBatteryVoltageLevelStatus }
+		STATUS			current
+		DESCRIPTION		"The battery voltage level event from the ONT."
+		::=  {  ontNotificationMibTraps  3  }
+		
+        ontBatteryUpsSelfTestNotification	NOTIFICATION-TYPE
+		OBJECTS			{ ontBatteryUpsSelfTestStatus }
+		STATUS			current
+		DESCRIPTION		"The battery UPS self test event from the ONT."
+		::=  {  ontNotificationMibTraps  4  }
+		
+	ontUpsConnectionNotification	NOTIFICATION-TYPE
+		OBJECTS			{ ontUpsConnectionStatus }
+		STATUS			current
+		DESCRIPTION		"The UPS connection event from the ONT."
+		::=  {  ontNotificationMibTraps  5  }
+		
+	ontOpticsModulePresenceNotification	NOTIFICATION-TYPE
+		OBJECTS			{ ontOpticsModuleIndicator, ontOpticsModulePresenceStatus }
+		STATUS			current
+		DESCRIPTION		"The optics module presence indicator event from the ONT."
+		::=  {  ontNotificationMibTraps  6  }
+		
+	ontOpticsReceiverSignalNotification	NOTIFICATION-TYPE
+		OBJECTS			{ ontOpticsModuleIndicator, ontOpticsReceiverSignalStatus }
+		STATUS			current
+		DESCRIPTION		"The optics signal status event from the ONT."
+		::=  {  ontNotificationMibTraps  7  }
+		
+        ontOpticsTransmitterSignalNotification	NOTIFICATION-TYPE
+		OBJECTS			{ ontOpticsModuleIndicator, ontOpticsTransmitterSignalStatus }
+		STATUS			current
+		DESCRIPTION		"The optics transmitter signal status event from the ONT."
+		::=  {  ontNotificationMibTraps  8  }
+		
+        ontSlicAlarmNotification	NOTIFICATION-TYPE
+		OBJECTS			{ ontSlicIndicator, ontSlicAlarmStatus }
+		STATUS			current
+		DESCRIPTION		"The SLIC alarm status event from the ONT."
+		::=  {  ontNotificationMibTraps  9  }
+		
+        ontImageDownloadProgressNotification	NOTIFICATION-TYPE
+		OBJECTS			{ ontLocalSwVersion, ontServerSwVersion, ontImageDownloadProgressStatus }
+		STATUS			current
+		DESCRIPTION		"The image download progress event from the ONT."
+		::=  {  ontNotificationMibTraps  10  }
+        		
+        ontImageUpgradeErrorNotification	NOTIFICATION-TYPE
+		OBJECTS			{ ontImageUpgradeErrorStatus}
+		STATUS			current
+		DESCRIPTION		"The ONT image upgrade error event from the ONT."
+		::=  {  ontNotificationMibTraps  11 }
+		
+        ontNspStatusNotification	NOTIFICATION-TYPE
+		OBJECTS			{ ontNspStatus}
+		STATUS			current
+		DESCRIPTION		"The ONT NSP status event from the ONT."
+		::=  {  ontNotificationMibTraps  12  }
+
+        ontRlTranslationStatusNotification	NOTIFICATION-TYPE
+		OBJECTS			{ ontRlTranslationStatus, ontRlTranslationMsg }
+		STATUS			current
+		DESCRIPTION		"The ONT RL conf translation event from the ONT."
+		::=  {  ontNotificationMibTraps  13  }
+
+		ontFieldUpgradeStatusNotification	NOTIFICATION-TYPE
+		OBJECTS			{ ontFieldUpgradeStatus, ontFieldUpgradeMsg }
+		STATUS			current
+		DESCRIPTION		"The ONT field upgrade event from the ONT."
+		::=  {  ontNotificationMibTraps  14  }
+	
+		ontSlotIdNotification   NOTIFICATION-TYPE
+        OBJECTS         { ontSlotIDMsg }
+        STATUS          current
+        DESCRIPTION     "The ONT slot ID update notification."
+        ::=  {  ontNotificationMibTraps  15  }
+
+        bootLoaderStatusNotification   NOTIFICATION-TYPE
+        OBJECTS         { ontBootLoaderStatusMsg }
+        STATUS          current
+        DESCRIPTION     "The ONT boot loader status notification."
+        ::=  {  ontNotificationMibTraps  16  }
+
+
+
+
+END

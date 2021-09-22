@@ -1,0 +1,221 @@
+
+OCCAM-EPS-MIB	DEFINITIONS ::= BEGIN
+	IMPORTS
+		occamGenericEtherlikeModules
+			FROM OCCAM-REG-MODULE
+		TEXTUAL-CONVENTION, TruthValue, DisplayString
+			FROM SNMPv2-TC
+		MODULE-COMPLIANCE, OBJECT-GROUP
+			FROM SNMPv2-CONF
+		OBJECT-IDENTITY, MODULE-IDENTITY, OBJECT-TYPE, 
+                NOTIFICATION-TYPE, Integer32, enterprises, private 
+			FROM SNMPv2-SMI
+		cardShelfIndex, cardSlotIndex, ValidValue
+			FROM OCCAM-SHELF-MIB;
+
+	occamEpsMib	MODULE-IDENTITY
+		LAST-UPDATED	"200702220000Z"
+		ORGANIZATION	"Occam Networks"
+		CONTACT-INFO	"email support@occamnetworks.com"
+		DESCRIPTION	"The mib module to describe Ethernet 
+                                Protection Switching."
+		
+		REVISION	"200702220000Z"
+		DESCRIPTION	"remove DISPLAY-HINT"
+		
+		
+		::=  {  occamGenericEtherlikeModules  2  }
+
+-- TEXTUAL-CONVENTIONS --
+	EpsHeartbeatStatusValue ::= TEXTUAL-CONVENTION 
+		STATUS			current
+		DESCRIPTION
+			"An eps heartbeat status value."
+		SYNTAX 			INTEGER  { up ( 1 ) , down ( 2 ) } 
+
+	EpsRingIdentifier ::= TEXTUAL-CONVENTION 
+		STATUS			current
+		DESCRIPTION
+			"An eps ring number.."
+		SYNTAX 			Integer32  ( 0 .. 29  ) 
+
+	EpsRingStatusValue ::= TEXTUAL-CONVENTION 
+		STATUS			current
+		DESCRIPTION
+			"An eps ring status value."
+		SYNTAX 			INTEGER  { not-failed ( 1 ) , 
+                                        failed-over( 2 ), reverted( 3 )} 
+
+	EpsPathGroupIdentifier ::= TEXTUAL-CONVENTION 
+		STATUS			current
+		DESCRIPTION
+			"An eps path group identifier."
+		SYNTAX 			Integer32  ( 1 .. 2  ) 
+
+	
+	epsMibObjects	OBJECT IDENTIFIER
+		::=  {  occamEpsMib  1  }
+
+	epsMibTraps	OBJECT IDENTIFIER
+		::=  {  occamEpsMib  2  }
+
+	epsRingTable   	        OBJECT-TYPE
+		SYNTAX	        SEQUENCE  OF  EpsRingEntry
+		MAX-ACCESS      not-accessible
+		STATUS	        current
+		DESCRIPTION     "A table of information about eps rings 
+                                configured the system. The number of 
+                                entries depends on how many eps rings are
+                                configured on the system."
+		::=  { epsMibObjects  1 }
+
+	epsRingEntry            OBJECT-TYPE
+		SYNTAX          EpsRingEntry
+		MAX-ACCESS      not-accessible
+		STATUS          current
+		DESCRIPTION     "An entry in the epsRingTable. A row in 
+                                this table cannot be created or deleted 
+                                by SNMP operations on columns of the 
+                                table."
+		INDEX		{  epsRingIndex  }
+		::=  { epsRingTable 1 }
+
+	EpsRingEntry  ::=  SEQUENCE {
+		epsRingIndex  EpsRingIdentifier,
+		epsRingStatus  EpsRingStatusValue,
+		epsRingCurrentPathGroup EpsPathGroupIdentifier,
+		epsRingPreviousPathGroup  EpsPathGroupIdentifier,
+		epsRingRowStatus  ValidValue
+		}
+
+
+	epsRingIndex            OBJECT-TYPE	
+		SYNTAX		EpsRingIdentifier
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION	"Selects eps ring for eps ring lookups."
+		::=  {  epsRingEntry  1  }
+
+
+	epsRingStatus           OBJECT-TYPE	
+		SYNTAX		EpsRingStatusValue
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION	"Indicates the status of an eps ring."
+		::=  {  epsRingEntry  2  }
+
+
+	epsRingCurrentPathGroup	        OBJECT-TYPE	
+		SYNTAX			EpsPathGroupIdentifier
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"Indicates the current path group
+                                        of the eps ring."
+		::=  {  epsRingEntry  3  }
+
+
+	epsRingPreviousPathGroup	OBJECT-TYPE	
+		SYNTAX			EpsPathGroupIdentifier
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"Indicates the previous path group
+                                        of the eps ring."
+		::=  {  epsRingEntry  4  }
+
+
+	epsRingRowStatus	        OBJECT-TYPE	
+		SYNTAX			ValidValue
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"Indicates if this row of the 
+                                        epsRing table is valid."
+		::=  {  epsRingEntry  5  }
+
+	epsPathGroupTable	        OBJECT-TYPE
+		SYNTAX		        SEQUENCE  OF  EpsPathGroupEntry
+		MAX-ACCESS	        not-accessible
+		STATUS		        current
+		DESCRIPTION	        "A table of information about 
+                                        eps path groups configured on the
+                                        system. 
+                                        The number of entries depends 
+                                        on how eps rings are configured on
+                                        the system. There are two path 
+                                        groups per eps ring."
+		::=  { epsMibObjects  2 }
+
+	epsPathGroupEntry	OBJECT-TYPE
+		SYNTAX		EpsPathGroupEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	"An entry in the epsPathGroupTable.
+                                A row in this table cannot be created 
+                                or deleted by SNMP operations on columns 
+                                of the table."
+		INDEX		{  epsRingIndex, epsPathGroupIndex  }
+		::=  { epsPathGroupTable 1 }
+
+	EpsPathGroupEntry  ::=  SEQUENCE {
+		epsPathGroupIndex  EpsPathGroupIdentifier,
+		epsHeartbeatStatus  EpsHeartbeatStatusValue,
+		epsPathGroupRowStatus  ValidValue
+		}
+
+
+	epsPathGroupIndex	OBJECT-TYPE	
+		SYNTAX		EpsPathGroupIdentifier
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION	"Selects a path group for 
+                                epsPathGroupTable lookups."
+		::=  {  epsPathGroupEntry  1  }
+
+
+	epsHeartbeatStatus	OBJECT-TYPE	
+		SYNTAX		EpsHeartbeatStatusValue
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION	"Indicates the heartbeat status of an eps
+                                path group."
+		::=  {  epsPathGroupEntry  2  }
+
+
+	epsPathGroupRowStatus	OBJECT-TYPE	
+		SYNTAX		ValidValue
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION	"Indicates if this row of the epsPathGroup
+                                table is valid."
+		::=  {  epsPathGroupEntry  3  }
+
+	epsRingFailoverNotification	NOTIFICATION-TYPE
+		OBJECTS		{ cardShelfIndex, cardSlotIndex, 
+                                epsRingIndex, epsRingStatus, 
+                                epsRingCurrentPathGroup, 
+                                epsRingPreviousPathGroup }
+		STATUS			current
+		DESCRIPTION		"This trap is sent when an eps 
+                                        ring failover occurs."
+		::=  {  epsMibTraps  1  }
+
+	epsRingRevertNotification	NOTIFICATION-TYPE
+		OBJECTS		{ cardShelfIndex, cardSlotIndex,
+                                epsRingIndex, epsRingStatus, 
+                                epsRingCurrentPathGroup, 
+                                epsRingPreviousPathGroup }
+		STATUS		current
+		DESCRIPTION	"This trap is sent when an eps ring 
+                                reverts to the preferred path group."
+		::=  {  epsMibTraps  2  }
+
+	epsPathGroupHeartbeatNotification	NOTIFICATION-TYPE
+		OBJECTS		{ cardShelfIndex, cardSlotIndex,
+                                epsRingIndex, epsPathGroupIndex, 
+                                epsHeartbeatStatus }
+		STATUS		current
+		DESCRIPTION	"This trap is sent when an eps 
+                                        path group heartbeat status 
+                                        changes."
+		::=  {  epsMibTraps  3  }
+
+END

@@ -1,0 +1,121 @@
+
+OCCAM-LEPS-MIB	DEFINITIONS ::= BEGIN
+	IMPORTS
+		occamGenericEtherlikeModules
+			FROM OCCAM-REG-MODULE
+		InterfaceIndex
+			FROM IF-MIB
+		TEXTUAL-CONVENTION, TruthValue, DisplayString
+			FROM SNMPv2-TC
+		MODULE-COMPLIANCE, OBJECT-GROUP
+			FROM SNMPv2-CONF
+		OBJECT-IDENTITY, MODULE-IDENTITY, OBJECT-TYPE, 
+                NOTIFICATION-TYPE, Integer32, enterprises, private
+			FROM SNMPv2-SMI
+		cardShelfIndex, cardSlotIndex, ValidValue
+			FROM OCCAM-SHELF-MIB;
+
+	occamLepsMib	MODULE-IDENTITY
+		LAST-UPDATED	"200104271051Z"
+		ORGANIZATION	"Occam Networks"
+		CONTACT-INFO	"email support@occamnetworks.com"
+		DESCRIPTION	"The mib module to describe Ethernet
+                                 Loop Detection."
+
+                REVISION	"200104271051Z"
+		DESCRIPTION	"Reformatted certain text"
+		
+		REVISION	"200702220000Z"
+		DESCRIPTION	"remove DISPLAY-HINT"
+
+		REVISION	"200701181000Z"
+		DESCRIPTION	"Added portDescr to notification"
+		
+		::=  {  occamGenericEtherlikeModules  3  }
+
+-- TEXTUAL-CONVENTIONS --
+	EpsLoopStatusValue ::= TEXTUAL-CONVENTION 
+		STATUS			current
+		DESCRIPTION
+			"An eps detected loop status value."
+		SYNTAX 			INTEGER  { detected ( 1 ) , 
+                                        cleared ( 2 ) } 
+
+	lepsMibObjects	OBJECT IDENTIFIER
+		::=  {  occamLepsMib  1  }
+
+	lepsMibTraps	OBJECT IDENTIFIER
+		::=  {  occamLepsMib  2  }
+
+	epsLoopTable	OBJECT-TYPE
+		SYNTAX		SEQUENCE  OF  EpsLoopEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	"A table of information about 
+                                eps loops discovered on interfaces in 
+                                the system. The number of entries depends 
+                                on how many eps loops are detected on the
+                                system."
+		::=  { lepsMibObjects  1 }
+
+	epsLoopEntry	OBJECT-TYPE
+		SYNTAX		EpsLoopEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	"An entry in the epsLoopTable.
+                                A row in this table cannot be created 
+                                or deleted by SNMP operations on columns 
+                                of the table."
+		INDEX		{  portIndex  }
+		::=  { epsLoopTable 1 }
+
+	EpsLoopEntry  ::=  SEQUENCE {
+		portIndex  		InterfaceIndex,
+		epsLoopStatus  		EpsLoopStatusValue,
+		epsLoopRowStatus  	ValidValue,
+		portDescr		DisplayString
+		}
+
+
+	portIndex	OBJECT-TYPE	
+		SYNTAX			InterfaceIndex
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"The ifIndex of an ethernet port."
+		::=  {  epsLoopEntry  1  }
+
+
+	epsLoopStatus	OBJECT-TYPE	
+		SYNTAX			EpsLoopStatusValue
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"Indicates the status of a 
+                                        detected loop."
+		::=  {  epsLoopEntry  2  }
+
+
+	epsLoopRowStatus	OBJECT-TYPE	
+		SYNTAX			ValidValue
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"Indicates if this row of the 
+                                        epsLoop table is valid."
+		::=  {  epsLoopEntry  3  }
+		
+	portDescr			OBJECT-TYPE	
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"The ifDescr of an ethernet port."
+		::=  {  epsLoopEntry  4  }
+
+	epsLoopNotification	NOTIFICATION-TYPE
+		OBJECTS			{ cardShelfIndex, cardSlotIndex, 
+                                        portIndex, epsLoopStatus, 
+                                        portDescr }
+		STATUS			current
+		DESCRIPTION		"This trap is sent when an eps 
+                                        loop status changes."
+		::=  {  lepsMibTraps  1  }
+
+END

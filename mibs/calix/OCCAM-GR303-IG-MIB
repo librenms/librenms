@@ -1,0 +1,984 @@
+
+OCCAM-GR303-IG-MIB	DEFINITIONS ::= BEGIN
+	IMPORTS
+		occamGenericIgModules
+			FROM OCCAM-REG-MODULE
+		TEXTUAL-CONVENTION, TruthValue
+			FROM SNMPv2-TC
+		MODULE-COMPLIANCE, OBJECT-GROUP
+			FROM SNMPv2-CONF
+		OBJECT-IDENTITY, MODULE-IDENTITY, OBJECT-TYPE, 
+                NOTIFICATION-TYPE, Integer32, enterprises, private
+			FROM SNMPv2-SMI
+		DisplayString
+			FROM RFC1213-MIB
+		shelfClusterIpAddress, cardShelfIndex, cardSlotIndex,
+                ShelfSlotIndexValue, ValidValue
+			FROM OCCAM-SHELF-MIB;
+
+	occamGr303IgMib	MODULE-IDENTITY
+		LAST-UPDATED	"200104271051Z"
+		ORGANIZATION	"Occam Networks"
+		CONTACT-INFO	"email support@occamnetworks.com"
+		DESCRIPTION	"The mib module to describe gr303 IGs."
+		
+                REVISION	"200104271051Z"
+		DESCRIPTION	"Reformatted certain text"
+
+                REVISION	"200702220000Z"
+		DESCRIPTION	"Removed DISPLAY-HINT"
+		
+		
+		::=  {  occamGenericIgModules  2  }
+
+-- TEXTUAL-CONVENTIONS --
+	IgIdentifier ::= TEXTUAL-CONVENTION 
+		STATUS			current
+		DESCRIPTION
+			"An IG number."
+		SYNTAX 			Integer32  ( 1 .. 10  ) 
+
+	OperationalValue ::= TEXTUAL-CONVENTION 
+		STATUS		current
+		DESCRIPTION
+			"An operational value."
+		SYNTAX 		INTEGER  { up ( 1 ) , down ( 2 ) } 
+
+	SwitchCauseValue ::= TEXTUAL-CONVENTION 
+		STATUS		current
+		DESCRIPTION
+			"A switch cause value."
+		SYNTAX 		INTEGER { 
+                                        forced ( 1 ) , manual ( 2 ) ,
+                                        auto ( 3 ) , inhibited ( 4 ) , 
+                                        unknown ( 5 ) } 
+
+	IgDs1LogicalIdentifier ::= TEXTUAL-CONVENTION 
+		STATUS		current
+		DESCRIPTION
+			"An IG DS1 number."
+		SYNTAX 		Integer32  ( 1 .. 28  ) 
+
+	LinkRoleValue ::= TEXTUAL-CONVENTION 
+		STATUS		current
+		DESCRIPTION
+			"A link role value."
+		SYNTAX 		INTEGER  { 
+                                        active ( 1 ) , standby ( 2 ) ,
+                                        unknown ( 3 ) } 
+
+	InServiceValue ::= TEXTUAL-CONVENTION 
+		STATUS		current
+		DESCRIPTION
+			"An in-service value."
+		SYNTAX 		INTEGER  { 
+                                        in-service ( 1 ) , 
+                                        out-of-service ( 2 ) } 
+
+	CardDs1PortIdentifier ::= TEXTUAL-CONVENTION 
+		STATUS		current
+		DESCRIPTION
+			"A card DS1 port number."
+		SYNTAX 		Integer32  ( 1 .. 8  ) 
+
+	AvailabilityValue ::= TEXTUAL-CONVENTION 
+		STATUS		current
+		DESCRIPTION
+			"An availability value."
+		SYNTAX 		INTEGER  { 
+                                        available ( 1 ) , 
+                                        not-available ( 2 ) } 
+
+	gr303IgMibObjects	OBJECT IDENTIFIER
+		::=  {  occamGr303IgMib  1  }
+
+	gr303IgMibTraps	OBJECT IDENTIFIER
+		::=  {  occamGr303IgMib  2  }
+
+	gr303IgTable	OBJECT-TYPE
+		SYNTAX		SEQUENCE  OF  Gr303IgEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	"A table of information about 
+                                GR303 Interface Groups configured
+                                on the system. The number of entries
+                                depends on how many IGs are configured
+                                on the system."
+		::=  { gr303IgMibObjects  1 }
+
+	gr303IgEntry	OBJECT-TYPE
+		SYNTAX		Gr303IgEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	"An entry in the occamGr303IgTable.
+                                A row in this table cannot be created
+                                or deleted by SNMP operations on columns 
+                                of the table."
+		INDEX		{  gr303IgIndex  }
+		::=  { gr303IgTable 1 }
+
+	Gr303IgEntry  ::=  SEQUENCE {
+	gr303IgIndex  IgIdentifier,
+	gr303IgEocPrimaryDs1Slot  ShelfSlotIndexValue,
+	gr303IgEocPrimaryDs1Port  CardDs1PortIdentifier,
+	gr303IgEocPrimaryLogicalId  IgDs1LogicalIdentifier,
+	gr303IgEocPrimaryRole  LinkRoleValue,
+	gr303IgEocSecondaryDs1Slot  ShelfSlotIndexValue,
+	gr303IgEocSecondaryDs1Port  CardDs1PortIdentifier,
+	gr303IgEocSecondaryLogicalId  IgDs1LogicalIdentifier,
+	gr303IgEocSecondaryRole  LinkRoleValue,
+	gr303IgTmcPrimaryDs1Slot  ShelfSlotIndexValue,
+	gr303IgTmcPrimaryDs1Port  CardDs1PortIdentifier,
+	gr303IgTmcPrimaryLogicalId  IgDs1LogicalIdentifier,
+	gr303IgTmcPrimaryRole  LinkRoleValue,
+	gr303IgTmcSecondaryDs1Slot  ShelfSlotIndexValue,
+	gr303IgTmcSecondaryDs1Port  CardDs1PortIdentifier,
+	gr303IgTmcSecondaryLogicalId  IgDs1LogicalIdentifier,
+	gr303IgTmcSecondaryRole  LinkRoleValue,
+	gr303IgEocProtectionStatus  AvailabilityValue,
+	gr303IgTmcProtectionStatus  AvailabilityValue,
+	gr303IgEocOperationalStatus  OperationalValue,
+	gr303IgTmcOperationalStatus  OperationalValue,
+	gr303IgEocSwitchBackCauseStatus  SwitchCauseValue,
+	gr303IgTmcSwitchBackCauseStatus  SwitchCauseValue,
+	gr303IgEocSwitchToProtectStatus  SwitchCauseValue,
+	gr303IgTmcSwitchToProtectStatus  SwitchCauseValue,
+	gr303IgOperationalStatus  OperationalValue,
+	gr303IgRedundantStatus  TruthValue,
+	gr303IgRedundantCause  DisplayString,
+	gr303IgEocPrimaryLapdOperationalStatus  OperationalValue,
+	gr303IgEocSecondaryLapdOperationalStatus  OperationalValue,
+	gr303IgEocPrimaryLapdOampOperationalStatus  OperationalValue,
+	gr303IgEocPrimaryLapdPpsOperationalStatus  OperationalValue,
+	gr303IgEocSecondaryLapdOampOperationalStatus  OperationalValue,
+	gr303IgEocSecondaryLapdPpsOperationalStatus  OperationalValue,
+	gr303IgEocLapdRedundantStatus  TruthValue,
+	gr303IgEocLapdDualFailStatus  TruthValue,
+	gr303IgTmcPrimaryLapdOperationalStatus  OperationalValue,
+	gr303IgTmcSecondaryLapdOperationalStatus  OperationalValue,
+	gr303IgTmcPrimaryLapdCpOperationalStatus  OperationalValue,
+	gr303IgTmcPrimaryLapdPpsOperationalStatus  OperationalValue,
+	gr303IgTmcSecondaryLapdCpOperationalStatus  OperationalValue,
+	gr303IgTmcSecondaryLapdPpsOperationalStatus  OperationalValue,
+	gr303IgTmcLapdRedundantStatus  TruthValue,
+	gr303IgTmcLapdDualFailStatus  TruthValue,
+	gr303IgRowStatus  ValidValue
+	}
+
+
+	gr303IgIndex	OBJECT-TYPE	
+		SYNTAX			IgIdentifier
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"Selects IG for for gr303IgTable 
+                                        lookups."
+		::=  {  gr303IgEntry  1  }
+
+
+	gr303IgEocPrimaryDs1Slot	OBJECT-TYPE	
+		SYNTAX			ShelfSlotIndexValue
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"Indicates the chasis slot number
+                                        of the primary eoc link."
+		::=  {  gr303IgEntry  2  }
+
+
+	gr303IgEocPrimaryDs1Port	OBJECT-TYPE	
+		SYNTAX			CardDs1PortIdentifier
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"Indicates the card port number 
+                                        of the primary eoc link."
+		::=  {  gr303IgEntry  3  }
+
+
+	gr303IgEocPrimaryLogicalId	OBJECT-TYPE	
+		SYNTAX			IgDs1LogicalIdentifier
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"Indicates the logical Id of the
+                                        primary eoc link."
+		::=  {  gr303IgEntry  4  }
+
+
+	gr303IgEocPrimaryRole	OBJECT-TYPE	
+		SYNTAX			LinkRoleValue
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"Indicates the role of the 
+                                        primary eoc link."
+		::=  {  gr303IgEntry  5  }
+
+
+	gr303IgEocSecondaryDs1Slot	OBJECT-TYPE	
+		SYNTAX			ShelfSlotIndexValue
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"Indicates the chasis slot number
+                                        of the secondary eoc link."
+		::=  {  gr303IgEntry  6  }
+
+
+	gr303IgEocSecondaryDs1Port	OBJECT-TYPE	
+		SYNTAX			CardDs1PortIdentifier
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"Indicates the card port number
+                                        of the secondary eoc link."
+		::=  {  gr303IgEntry  7  }
+
+
+	gr303IgEocSecondaryLogicalId	OBJECT-TYPE	
+		SYNTAX			IgDs1LogicalIdentifier
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"Indicates the logical Id of the
+                                        secondary eoc link."
+		::=  {  gr303IgEntry  8  }
+
+
+	gr303IgEocSecondaryRole	OBJECT-TYPE	
+		SYNTAX			LinkRoleValue
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"Indicates the role of the 
+                                        secondary eoc link."
+		::=  {  gr303IgEntry  9  }
+
+
+	gr303IgTmcPrimaryDs1Slot	OBJECT-TYPE	
+		SYNTAX			ShelfSlotIndexValue
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"Indicates the chasis slot number
+                                        of the primary tmc link."
+		::=  {  gr303IgEntry  10  }
+
+
+	gr303IgTmcPrimaryDs1Port	OBJECT-TYPE	
+		SYNTAX			CardDs1PortIdentifier
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"Indicates the card port number
+                                        of the primary tmc link."
+		::=  {  gr303IgEntry  11  }
+
+
+	gr303IgTmcPrimaryLogicalId	OBJECT-TYPE	
+		SYNTAX			IgDs1LogicalIdentifier
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"Indicates the logical Id of the
+                                        primary tmc link."
+		::=  {  gr303IgEntry  12  }
+
+
+	gr303IgTmcPrimaryRole	OBJECT-TYPE	
+		SYNTAX			LinkRoleValue
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"Indicates the role of the 
+                                        primary tmc link."
+		::=  {  gr303IgEntry  13  }
+
+
+	gr303IgTmcSecondaryDs1Slot	OBJECT-TYPE	
+		SYNTAX			ShelfSlotIndexValue
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"Indicates the chasis slot number
+                                        of the secondary tmc link."
+		::=  {  gr303IgEntry  14  }
+
+
+	gr303IgTmcSecondaryDs1Port	OBJECT-TYPE	
+		SYNTAX			CardDs1PortIdentifier
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"Indicates the card port number 
+                                        of the secondary tmc link."
+		::=  {  gr303IgEntry  15  }
+
+
+	gr303IgTmcSecondaryLogicalId	OBJECT-TYPE	
+		SYNTAX			IgDs1LogicalIdentifier
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"Indicates the logical Id of the
+                                        secondary tmc link."
+		::=  {  gr303IgEntry  16  }
+
+
+	gr303IgTmcSecondaryRole	OBJECT-TYPE	
+		SYNTAX			LinkRoleValue
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"Indicates the role of the 
+                                        secondary tmc link."
+		::=  {  gr303IgEntry  17  }
+
+
+	gr303IgEocProtectionStatus	OBJECT-TYPE	
+		SYNTAX			AvailabilityValue
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"Indicates if eoc link protection
+                                        is available."
+		::=  {  gr303IgEntry  18  }
+
+
+	gr303IgTmcProtectionStatus	OBJECT-TYPE	
+		SYNTAX			AvailabilityValue
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"Indicates if tmc link protection
+                                        is available."
+		::=  {  gr303IgEntry  19  }
+
+
+	gr303IgEocOperationalStatus	OBJECT-TYPE	
+		SYNTAX			OperationalValue
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"Indicates if eoc is operational."
+		::=  {  gr303IgEntry  20  }
+
+
+	gr303IgTmcOperationalStatus	OBJECT-TYPE	
+		SYNTAX			OperationalValue
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"Indicates if tmc is operational."
+		::=  {  gr303IgEntry  21  }
+
+
+	gr303IgEocSwitchBackCauseStatus	OBJECT-TYPE	
+		SYNTAX			SwitchCauseValue
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"Indicates eoc switchback cause
+                                        status."
+		::=  {  gr303IgEntry  22  }
+
+
+	gr303IgTmcSwitchBackCauseStatus	OBJECT-TYPE	
+		SYNTAX			SwitchCauseValue
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"Indicates tmc switchback cause
+                                        status."
+		::=  {  gr303IgEntry  23  }
+
+
+	gr303IgEocSwitchToProtectStatus	OBJECT-TYPE	
+		SYNTAX			SwitchCauseValue
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"Indicates tmc switch to protect
+                                        cause status."
+		::=  {  gr303IgEntry  24  }
+
+
+	gr303IgTmcSwitchToProtectStatus	OBJECT-TYPE	
+		SYNTAX			SwitchCauseValue
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"Indicates tmc switch to protect
+                                        cause status."
+		::=  {  gr303IgEntry  25  }
+
+
+	gr303IgOperationalStatus	OBJECT-TYPE	
+		SYNTAX			OperationalValue
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"Indicates ig operational status."
+		::=  {  gr303IgEntry  26  }
+
+
+	gr303IgRedundantStatus	OBJECT-TYPE	
+		SYNTAX			TruthValue
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"Indicates ig redundancy status."
+		::=  {  gr303IgEntry  27  }
+
+
+	gr303IgRedundantCause	OBJECT-TYPE	
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"Indicates ig not redundant/
+                                        redundant cause."
+		::=  {  gr303IgEntry  28  }
+
+
+	gr303IgEocPrimaryLapdOperationalStatus	OBJECT-TYPE	
+		SYNTAX			OperationalValue
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"Indicates eoc primary lapd 
+                                        operational status. 
+                                        This indication combines status
+                                        of OAM&P and PPS links."
+		::=  {  gr303IgEntry  29  }
+
+
+	gr303IgEocSecondaryLapdOperationalStatus	OBJECT-TYPE	
+		SYNTAX			OperationalValue
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"Indicates eoc secondary lapd 
+                                        operational status.
+                                        This indication combines status
+                                        of OAM&P and PPS links."
+		::=  {  gr303IgEntry  30  }
+
+
+	gr303IgEocPrimaryLapdOampOperationalStatus	OBJECT-TYPE	
+		SYNTAX			OperationalValue
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"Indicates eoc primary lapd OAM&P
+                                        link operational status."
+		::=  {  gr303IgEntry  31  }
+
+
+	gr303IgEocPrimaryLapdPpsOperationalStatus	OBJECT-TYPE	
+		SYNTAX			OperationalValue
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"Indicates eoc primary lapd PPS
+                                        link operational status."
+		::=  {  gr303IgEntry  32  }
+
+
+	gr303IgEocSecondaryLapdOampOperationalStatus	OBJECT-TYPE	
+		SYNTAX			OperationalValue
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"Indicates eoc secondary lapd 
+                                        OAM&P link operational status."
+		::=  {  gr303IgEntry  33  }
+
+
+	gr303IgEocSecondaryLapdPpsOperationalStatus	OBJECT-TYPE	
+		SYNTAX			OperationalValue
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"Indicates eoc secondary lapd 
+                                        PPS link operational status."
+		::=  {  gr303IgEntry  34  }
+
+
+	gr303IgEocLapdRedundantStatus	OBJECT-TYPE	
+		SYNTAX			TruthValue
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"Indicates eoc lapd redundancy
+                                        status."
+		::=  {  gr303IgEntry  35  }
+
+
+	gr303IgEocLapdDualFailStatus	OBJECT-TYPE	
+		SYNTAX			TruthValue
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"Indicates eoc lapd dual failure
+                                        status."
+		::=  {  gr303IgEntry  36  }
+
+
+	gr303IgTmcPrimaryLapdOperationalStatus	OBJECT-TYPE	
+		SYNTAX			OperationalValue
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"Indicates tmc primary lapd
+                                        operational status. 
+                                        This indication combines status 
+                                        of call processing and PPS links."
+		::=  {  gr303IgEntry  37  }
+
+
+	gr303IgTmcSecondaryLapdOperationalStatus	OBJECT-TYPE	
+		SYNTAX			OperationalValue
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"Indicates tmc secondary lapd 
+                                        operational status.
+                                        This indication combines status
+                                        of call processing and PPS links."
+		::=  {  gr303IgEntry  38  }
+
+
+	gr303IgTmcPrimaryLapdCpOperationalStatus	OBJECT-TYPE	
+		SYNTAX			OperationalValue
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"Indicates tmc primary lapd call 
+                                        processing link operational 
+                                        status."
+		::=  {  gr303IgEntry  39  }
+
+
+	gr303IgTmcPrimaryLapdPpsOperationalStatus	OBJECT-TYPE	
+		SYNTAX			OperationalValue
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"Indicates tmc primary lapd PPS 
+                                        link operational status."
+		::=  {  gr303IgEntry  40  }
+
+
+	gr303IgTmcSecondaryLapdCpOperationalStatus	OBJECT-TYPE	
+		SYNTAX			OperationalValue
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"Indicates tmc secondary lapd 
+                                        call processing link operational
+                                        status."
+		::=  {  gr303IgEntry  41  }
+
+
+	gr303IgTmcSecondaryLapdPpsOperationalStatus	OBJECT-TYPE	
+		SYNTAX			OperationalValue
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"Indicates tmc secondary lapd PPS
+                                        link operational status."
+		::=  {  gr303IgEntry  42  }
+
+
+	gr303IgTmcLapdRedundantStatus	OBJECT-TYPE	
+		SYNTAX			TruthValue
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"Indicates tmc lapd redundancy 
+                                        status."
+		::=  {  gr303IgEntry  43  }
+
+
+	gr303IgTmcLapdDualFailStatus	OBJECT-TYPE	
+		SYNTAX			TruthValue
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"Indicates tmc lapd dual failure
+                                        status."
+		::=  {  gr303IgEntry  44  }
+
+
+	gr303IgRowStatus	OBJECT-TYPE	
+		SYNTAX			ValidValue
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION		"Indicates if this row of the 
+                                        gr303Ig table is valid."
+		::=  {  gr303IgEntry  45  }
+
+	gr303IgEndptTable	OBJECT-TYPE
+		SYNTAX		SEQUENCE  OF  Gr303IgEndptEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	"A table of information about the endpoints
+                                in a GR303 Interface Group configured on
+                                the system."
+           
+		::=  { gr303IgMibObjects  2 }
+
+	gr303IgEndptEntry	OBJECT-TYPE
+		SYNTAX		Gr303IgEndptEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION	"An entry in the occamGr303IgEndptTable.
+                                A row in this table cannot be created 
+                                or deleted by SNMP operations on columns 
+                                of the table."
+		INDEX		{  gr303IgIndex, gr303IgEndptIndex  }
+		::=  { gr303IgEndptTable 1 }
+
+	Gr303IgEndptEntry  ::=  SEQUENCE {
+		gr303IgEndptIndex  Integer32,
+		gr303IgEndptName  OCTET STRING,
+		gr303IgEndptStatus  InServiceValue
+		}
+
+
+	gr303IgEndptIndex	OBJECT-TYPE	
+		SYNTAX		Integer32  ( 1 .. 2048  ) 
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION	"Selects Endpt for gr303IgEndptTable 
+                                lookups. Same as endpt crv."
+		::=  {  gr303IgEndptEntry  1  }
+
+
+	gr303IgEndptName	OBJECT-TYPE	
+		SYNTAX		OCTET STRING
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION	"Indicates endpt text name."
+		::=  {  gr303IgEndptEntry  2  }
+
+
+	gr303IgEndptStatus	OBJECT-TYPE	
+		SYNTAX		InServiceValue
+		MAX-ACCESS	read-only
+		STATUS		current
+		DESCRIPTION	"Indicates endpt in-service status."
+		::=  {  gr303IgEndptEntry  3  }
+
+	gr303IgEocProtectionNotification	NOTIFICATION-TYPE
+		OBJECTS		{ cardShelfIndex, cardSlotIndex, 
+                                gr303IgIndex, shelfClusterIpAddress, 
+                                gr303IgEocProtectionStatus, 
+                                gr303IgEocPrimaryDs1Slot, 
+                                gr303IgEocPrimaryDs1Port, 
+                                gr303IgEocPrimaryLogicalId, 
+                                gr303IgEocPrimaryRole, 
+                                gr303IgEocSecondaryDs1Slot, 
+                                gr303IgEocSecondaryDs1Port, 
+                                gr303IgEocSecondaryLogicalId, 
+                                gr303IgEocSecondaryRole }
+		STATUS		current
+		DESCRIPTION	"This trap is sent when 
+                                EocProtectionStatus changes."
+		::=  {  gr303IgMibTraps  1  }
+
+	gr303IgTmcProtectionNotification	NOTIFICATION-TYPE
+		OBJECTS		{ cardShelfIndex, cardSlotIndex, 
+                                gr303IgIndex, shelfClusterIpAddress, 
+                                gr303IgTmcProtectionStatus, 
+                                gr303IgTmcPrimaryDs1Slot,
+                                gr303IgTmcPrimaryDs1Port, 
+                                gr303IgTmcPrimaryLogicalId, 
+                                gr303IgTmcPrimaryRole, 
+                                gr303IgTmcSecondaryDs1Slot, 
+                                gr303IgTmcSecondaryDs1Port, 
+                                gr303IgTmcSecondaryLogicalId,
+                                gr303IgTmcSecondaryRole }
+		STATUS		current
+		DESCRIPTION	"This trap is sent when 
+                                TmcProtectionStatus changes."
+		::=  {  gr303IgMibTraps  2  }
+
+	gr303IgEocOperationalNotification	NOTIFICATION-TYPE
+		OBJECTS		{ cardShelfIndex, cardSlotIndex, 
+                                gr303IgIndex, shelfClusterIpAddress,
+                                gr303IgEocOperationalStatus, 
+                                gr303IgEocPrimaryDs1Slot, 
+                                gr303IgEocPrimaryDs1Port, 
+                                gr303IgEocPrimaryLogicalId, 
+                                gr303IgEocPrimaryRole, 
+                                gr303IgEocSecondaryDs1Slot, 
+                                gr303IgEocSecondaryDs1Port, 
+                                gr303IgEocSecondaryLogicalId, 
+                                gr303IgEocSecondaryRole }
+		STATUS		current
+		DESCRIPTION	"This trap is sent when
+                                EocOperationalStatus changes."
+		::=  {  gr303IgMibTraps  3  }
+
+	gr303IgTmcOperationalNotification	NOTIFICATION-TYPE
+		OBJECTS		{ cardShelfIndex, cardSlotIndex, 
+                                gr303IgIndex, shelfClusterIpAddress,
+                                gr303IgTmcOperationalStatus, 
+                                gr303IgTmcPrimaryDs1Slot,
+                                gr303IgTmcPrimaryDs1Port, 
+                                gr303IgTmcPrimaryLogicalId, 
+                                gr303IgTmcPrimaryRole, 
+                                gr303IgTmcSecondaryDs1Slot, 
+                                gr303IgTmcSecondaryDs1Port, 
+                                gr303IgTmcSecondaryLogicalId, 
+                                gr303IgTmcSecondaryRole }
+		STATUS		current
+		DESCRIPTION	"This trap is sent when 
+                                TmcOperationalStatus changes."
+		::=  {  gr303IgMibTraps  4  }
+
+	gr303IgEocSwitchBackNotification	NOTIFICATION-TYPE
+		OBJECTS		{ cardShelfIndex, cardSlotIndex, 
+                                gr303IgIndex, shelfClusterIpAddress, 
+                                gr303IgEocSwitchBackCauseStatus, 
+                                gr303IgEocPrimaryDs1Slot, 
+                                gr303IgEocPrimaryDs1Port, 
+                                gr303IgEocPrimaryLogicalId, 
+                                gr303IgEocPrimaryRole, 
+                                gr303IgEocSecondaryDs1Slot, 
+                                gr303IgEocSecondaryDs1Port, 
+                                gr303IgEocSecondaryLogicalId, 
+                                gr303IgEocSecondaryRole }
+		STATUS		current
+		DESCRIPTION	"This trap is sent when
+                                EocSwitchBackStatus changes."
+		::=  {  gr303IgMibTraps  5  }
+
+	gr303IgTmcSwitchBackNotification	NOTIFICATION-TYPE
+		OBJECTS		{ cardShelfIndex, cardSlotIndex, 
+                                gr303IgIndex, shelfClusterIpAddress,
+                                gr303IgTmcSwitchBackCauseStatus,
+                                gr303IgTmcPrimaryDs1Slot, 
+                                gr303IgTmcPrimaryDs1Port, 
+                                gr303IgTmcPrimaryLogicalId, 
+                                gr303IgTmcPrimaryRole, 
+                                gr303IgTmcSecondaryDs1Slot, 
+                                gr303IgTmcSecondaryDs1Port, 
+                                gr303IgTmcSecondaryLogicalId, 
+                                gr303IgTmcSecondaryRole }
+		STATUS		current
+		DESCRIPTION	"This trap is sent when 
+                                TmcSwitchBackStatus changes."
+		::=  {  gr303IgMibTraps  6  }
+
+	gr303IgEocSwitchToProtectNotification	NOTIFICATION-TYPE
+		OBJECTS		{ cardShelfIndex, cardSlotIndex, 
+                                gr303IgIndex, shelfClusterIpAddress, 
+                                gr303IgEocSwitchToProtectStatus, 
+                                gr303IgEocPrimaryDs1Slot, 
+                                gr303IgEocPrimaryDs1Port, 
+                                gr303IgEocPrimaryLogicalId, 
+                                gr303IgEocPrimaryRole, 
+                                gr303IgEocSecondaryDs1Slot, 
+                                gr303IgEocSecondaryDs1Port, 
+                                gr303IgEocSecondaryLogicalId, 
+                                gr303IgEocSecondaryRole }
+		STATUS		current
+		DESCRIPTION	"This trap is sent when 
+                                EocSwitchToProtectStatus changes."
+		::=  {  gr303IgMibTraps  7  }
+
+	gr303IgTmcSwitchToProtectNotification	NOTIFICATION-TYPE
+		OBJECTS		{ cardShelfIndex, cardSlotIndex, 
+                                gr303IgIndex, shelfClusterIpAddress, 
+                                gr303IgTmcSwitchToProtectStatus, 
+                                gr303IgTmcPrimaryDs1Slot, 
+                                gr303IgTmcPrimaryDs1Port, 
+                                gr303IgTmcPrimaryLogicalId, 
+                                gr303IgTmcPrimaryRole, 
+                                gr303IgTmcSecondaryDs1Slot, 
+                                gr303IgTmcSecondaryDs1Port, 
+                                gr303IgTmcSecondaryLogicalId, 
+                                gr303IgTmcSecondaryRole }
+		STATUS		current
+		DESCRIPTION	"This trap is sent when 
+                                TmcSwitchToProtectStatus changes."
+		::=  {  gr303IgMibTraps  8  }
+
+	gr303IgEocPrimaryRoleNotification	NOTIFICATION-TYPE
+		OBJECTS		{ cardShelfIndex, cardSlotIndex, 
+                                gr303IgIndex, shelfClusterIpAddress, 
+                                gr303IgEocPrimaryRole, 
+                                gr303IgEocPrimaryDs1Slot, 
+                                gr303IgEocPrimaryDs1Port, 
+                                gr303IgEocPrimaryLogicalId,
+                                gr303IgEocPrimaryRole, 
+                                gr303IgEocSecondaryDs1Slot, 
+                                gr303IgEocSecondaryDs1Port, 
+                                gr303IgEocSecondaryLogicalId, 
+                                gr303IgEocSecondaryRole }
+		STATUS		current
+		DESCRIPTION	"This trap is sent when 
+                                EocPrimaryRole changes."
+		::=  {  gr303IgMibTraps  9  }
+
+	gr303IgEocSecondaryRoleNotification	NOTIFICATION-TYPE
+		OBJECTS		{ cardShelfIndex, cardSlotIndex, 
+                                gr303IgIndex, shelfClusterIpAddress, 
+                                gr303IgEocSecondaryRole, 
+                                gr303IgEocPrimaryDs1Slot, 
+                                gr303IgEocPrimaryDs1Port, 
+                                gr303IgEocPrimaryLogicalId, 
+                                gr303IgEocPrimaryRole, 
+                                gr303IgEocSecondaryDs1Slot, 
+                                gr303IgEocSecondaryDs1Port,
+                                gr303IgEocSecondaryLogicalId, 
+                                gr303IgEocSecondaryRole }
+		STATUS		current
+		DESCRIPTION	"This trap is sent when 
+                                EocSecondaryRole changes."
+		::=  {  gr303IgMibTraps  10  }
+
+	gr303IgTmcPrimaryRoleNotification	NOTIFICATION-TYPE
+		OBJECTS		{ cardShelfIndex, cardSlotIndex, 
+                                gr303IgIndex, shelfClusterIpAddress, 
+                                gr303IgTmcPrimaryRole, 
+                                gr303IgTmcPrimaryDs1Slot, 
+                                gr303IgTmcPrimaryDs1Port, 
+                                gr303IgTmcPrimaryLogicalId, 
+                                gr303IgTmcPrimaryRole, 
+                                gr303IgTmcSecondaryDs1Slot, 
+                                gr303IgTmcSecondaryDs1Port, 
+                                gr303IgTmcSecondaryLogicalId, 
+                                gr303IgTmcSecondaryRole }
+		STATUS		current
+		DESCRIPTION	"This trap is sent when 
+                                TmcPrimaryRole changes."
+		::=  {  gr303IgMibTraps  11  }
+
+	gr303IgTmcSecondaryRoleNotification	NOTIFICATION-TYPE
+		OBJECTS		{ cardShelfIndex, cardSlotIndex, 
+                                gr303IgIndex, shelfClusterIpAddress,
+                                gr303IgTmcSecondaryRole, 
+                                gr303IgTmcPrimaryDs1Slot, 
+                                gr303IgTmcPrimaryDs1Port, 
+                                gr303IgTmcPrimaryLogicalId, 
+                                gr303IgTmcPrimaryRole, 
+                                gr303IgTmcSecondaryDs1Slot,
+                                gr303IgTmcSecondaryDs1Port, 
+                                gr303IgTmcSecondaryLogicalId, 
+                                gr303IgTmcSecondaryRole }
+		STATUS		current
+		DESCRIPTION	"This trap is sent when 
+                                TmcSecondaryRole changes."
+		::=  {  gr303IgMibTraps  12  }
+
+	gr303IgOperationalNotification	NOTIFICATION-TYPE
+		OBJECTS		{ cardShelfIndex, cardSlotIndex, 
+                                gr303IgIndex, shelfClusterIpAddress, 
+                                gr303IgOperationalStatus }
+		STATUS		current
+		DESCRIPTION	"This trap is sent when IG operational
+                                status changes."
+		::=  {  gr303IgMibTraps  13  }
+
+	gr303IgRedundantNotification	NOTIFICATION-TYPE
+		OBJECTS		{ cardShelfIndex, cardSlotIndex, 
+                                gr303IgIndex, shelfClusterIpAddress, 
+                                gr303IgRedundantStatus, 
+                                gr303IgRedundantCause }
+		STATUS		current
+		DESCRIPTION	"This trap is sent when IG redundancy changes."
+		::=  {  gr303IgMibTraps  14  }
+
+	gr303IgEocPrimaryLapdOperationalNotification	NOTIFICATION-TYPE
+		OBJECTS		{ cardShelfIndex, cardSlotIndex, 
+                                gr303IgIndex, shelfClusterIpAddress,
+                                gr303IgEocPrimaryLapdOperationalStatus,
+                                gr303IgEocPrimaryLapdOampOperationalStatus,
+                                gr303IgEocPrimaryLapdPpsOperationalStatus,
+                                gr303IgEocPrimaryDs1Slot, 
+                                gr303IgEocPrimaryDs1Port, 
+                                gr303IgEocPrimaryLogicalId, 
+                                gr303IgEocPrimaryRole }
+		STATUS		current
+		DESCRIPTION	"This trap is sent when IG eoc primary
+                                lapd operational status changes."
+		::=  {  gr303IgMibTraps  15  }
+
+	gr303IgEocSecondaryLapdOperationalNotification	NOTIFICATION-TYPE
+		OBJECTS		{ cardShelfIndex, cardSlotIndex, 
+                gr303IgIndex, shelfClusterIpAddress, 
+                gr303IgEocSecondaryLapdOperationalStatus, 
+                gr303IgEocSecondaryLapdOampOperationalStatus, 
+                gr303IgEocSecondaryLapdPpsOperationalStatus, 
+                gr303IgEocSecondaryDs1Slot, gr303IgEocSecondaryDs1Port, 
+                gr303IgEocSecondaryLogicalId, gr303IgEocSecondaryRole }
+		STATUS		current
+		DESCRIPTION	"This trap is sent when IG eoc secondary 
+                                lapd operational status changes."
+		::=  {  gr303IgMibTraps  16  }
+
+	gr303IgEocLapdRedundantNotification	NOTIFICATION-TYPE
+		OBJECTS		{ cardShelfIndex, cardSlotIndex, 
+                gr303IgIndex, shelfClusterIpAddress, 
+                gr303IgEocLapdRedundantStatus, 
+                gr303IgEocPrimaryLapdOampOperationalStatus, 
+                gr303IgEocPrimaryLapdPpsOperationalStatus, 
+                gr303IgEocSecondaryLapdOampOperationalStatus, 
+                gr303IgEocSecondaryLapdPpsOperationalStatus, 
+                gr303IgEocPrimaryDs1Slot, gr303IgEocPrimaryDs1Port,
+                gr303IgEocPrimaryLogicalId, gr303IgEocPrimaryRole, 
+                gr303IgEocSecondaryDs1Slot, gr303IgEocSecondaryDs1Port,
+                gr303IgEocSecondaryLogicalId, gr303IgEocSecondaryRole }
+		STATUS		current
+		DESCRIPTION	"This trap is sent when IG eoc lapd 
+                                redundancy changes."
+		::=  {  gr303IgMibTraps  17  }
+
+	gr303IgEocLapdDualFailNotification	NOTIFICATION-TYPE
+		OBJECTS		{ cardShelfIndex, cardSlotIndex, 
+                gr303IgIndex, shelfClusterIpAddress, 
+                gr303IgEocLapdDualFailStatus, 
+                gr303IgEocPrimaryLapdOampOperationalStatus, 
+                gr303IgEocPrimaryLapdPpsOperationalStatus, 
+                gr303IgEocSecondaryLapdOampOperationalStatus, 
+                gr303IgEocSecondaryLapdPpsOperationalStatus, 
+                gr303IgEocPrimaryDs1Slot, gr303IgEocPrimaryDs1Port,
+                gr303IgEocPrimaryLogicalId, gr303IgEocPrimaryRole, 
+                gr303IgEocSecondaryDs1Slot, gr303IgEocSecondaryDs1Port,
+                gr303IgEocSecondaryLogicalId, gr303IgEocSecondaryRole }
+		STATUS		current
+		DESCRIPTION	"This trap is sent when IG eoc lapd 
+                                dual failure status changes."
+		::=  {  gr303IgMibTraps  18  }
+
+	gr303IgTmcPrimaryLapdOperationalNotification	NOTIFICATION-TYPE
+		OBJECTS		{ cardShelfIndex, cardSlotIndex,
+                gr303IgIndex, shelfClusterIpAddress, 
+                gr303IgTmcPrimaryLapdOperationalStatus, 
+                gr303IgTmcPrimaryLapdCpOperationalStatus, 
+                gr303IgTmcPrimaryLapdPpsOperationalStatus, 
+                gr303IgTmcPrimaryDs1Slot, gr303IgTmcPrimaryDs1Port, 
+                gr303IgTmcPrimaryLogicalId, gr303IgTmcPrimaryRole }
+		STATUS		current
+		DESCRIPTION	"This trap is sent when IG tmc 
+                                primary lapd operational status changes."
+		::=  {  gr303IgMibTraps  19  }
+
+	gr303IgTmcSecondaryLapdOperationalNotification	NOTIFICATION-TYPE
+		OBJECTS		{ cardShelfIndex, cardSlotIndex, 
+                gr303IgIndex, shelfClusterIpAddress, 
+                gr303IgTmcSecondaryLapdOperationalStatus,
+                gr303IgTmcSecondaryLapdCpOperationalStatus, 
+                gr303IgTmcSecondaryLapdPpsOperationalStatus, 
+                gr303IgTmcSecondaryDs1Slot, gr303IgTmcSecondaryDs1Port, 
+                gr303IgTmcSecondaryLogicalId, gr303IgTmcSecondaryRole }
+		STATUS		current
+		DESCRIPTION	"This trap is sent when IG tmc secondary 
+                                lapd operational status changes."
+		::=  {  gr303IgMibTraps  20  }
+
+	gr303IgTmcLapdRedundantNotification	NOTIFICATION-TYPE
+		OBJECTS		{ cardShelfIndex, cardSlotIndex, 
+                gr303IgIndex, shelfClusterIpAddress, 
+                gr303IgTmcLapdRedundantStatus, 
+                gr303IgTmcPrimaryLapdCpOperationalStatus, 
+                gr303IgTmcPrimaryLapdPpsOperationalStatus, 
+                gr303IgTmcSecondaryLapdCpOperationalStatus, 
+                gr303IgTmcSecondaryLapdPpsOperationalStatus, 
+                gr303IgTmcPrimaryDs1Slot, gr303IgTmcPrimaryDs1Port, 
+                gr303IgTmcPrimaryLogicalId, gr303IgTmcPrimaryRole, 
+                gr303IgTmcSecondaryDs1Slot, gr303IgTmcSecondaryDs1Port, 
+                gr303IgTmcSecondaryLogicalId, gr303IgTmcSecondaryRole }
+		STATUS		current
+		DESCRIPTION	"This trap is sent when IG tmc lapd 
+                                redundancy changes."
+		::=  {  gr303IgMibTraps  21  }
+
+	gr303IgTmcLapdDualFailNotification	NOTIFICATION-TYPE
+		OBJECTS		{ cardShelfIndex, cardSlotIndex, 
+                gr303IgIndex, shelfClusterIpAddress, 
+                gr303IgTmcLapdDualFailStatus, 
+                gr303IgTmcPrimaryLapdCpOperationalStatus, 
+                gr303IgTmcPrimaryLapdPpsOperationalStatus, 
+                gr303IgTmcSecondaryLapdCpOperationalStatus, 
+                gr303IgTmcSecondaryLapdPpsOperationalStatus, 
+                gr303IgTmcPrimaryDs1Slot, gr303IgTmcPrimaryDs1Port, 
+                gr303IgTmcPrimaryLogicalId, gr303IgTmcPrimaryRole, 
+                gr303IgTmcSecondaryDs1Slot, gr303IgTmcSecondaryDs1Port, 
+                gr303IgTmcSecondaryLogicalId, gr303IgTmcSecondaryRole }
+		STATUS		current
+		DESCRIPTION	"This trap is sent when IG tmc lapd dual
+                                 failure status changes."
+		::=  {  gr303IgMibTraps  22  }
+
+	gr303IgEndptServiceNotification	NOTIFICATION-TYPE
+		OBJECTS		{ cardShelfIndex, cardSlotIndex, 
+                gr303IgIndex, shelfClusterIpAddress, gr303IgEndptIndex, 
+                gr303IgEndptName, gr303IgEndptStatus }
+		STATUS		current
+		DESCRIPTION	"This trap is sent when gr303 IG 
+                                endpoint status changes."
+		::=  {  gr303IgMibTraps  23  }
+
+END

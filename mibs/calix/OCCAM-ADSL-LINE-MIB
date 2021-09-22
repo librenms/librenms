@@ -1,0 +1,62 @@
+
+OCCAM-ADSL-LINE-MIB    DEFINITIONS ::= BEGIN
+    IMPORTS
+        MODULE-IDENTITY, OBJECT-TYPE
+            FROM SNMPv2-SMI
+        SnmpAdminString
+            FROM SNMP-FRAMEWORK-MIB
+        ifIndex
+            FROM IF-MIB
+        occamGenericDslModules
+            FROM OCCAM-REG-MODULE;
+
+    occamAdslLineMib    MODULE-IDENTITY
+        LAST-UPDATED    "201004022000Z"
+        ORGANIZATION    "Occam Networks"
+        CONTACT-INFO    "email support@occamnetworks.com"
+             
+        DESCRIPTION
+            "This mib module describes objects used to provision a dsl 
+            physical interface. Each such interface has an entry in the 
+            ifTable."
+        REVISION        "201004022000Z"
+        DESCRIPTION     "Updated contact info."
+        
+        REVISION        "200309101509Z"
+        DESCRIPTION     "Initial version."
+        ::=  {  occamGenericDslModules  1  }
+
+    occamAdslLineTable    OBJECT-TYPE
+        SYNTAX        SEQUENCE  OF  OccamAdslLineEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "This table describes the attributes of the physical 
+            ADSL interface. There is an entry for every physical ADSL 
+            interface in the ifTable. Physical ADSL interfaces are those
+            ifEntries where ifType is equal to adsl(94)."
+        ::=  { occamAdslLineMib  1 }
+
+    occamAdslLineEntry    OBJECT-TYPE
+        SYNTAX        OccamAdslLineEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "A row in the occamAdslLineTable."
+        INDEX        {  ifIndex  }
+        ::=  { occamAdslLineTable 1 }
+
+    OccamAdslLineEntry  ::=  SEQUENCE {
+        occamAdslLineConfProfile  SnmpAdminString
+        }
+
+    occamAdslLineConfProfile    OBJECT-TYPE    
+        SYNTAX            SnmpAdminString
+        MAX-ACCESS        read-write
+        STATUS            current
+        DESCRIPTION
+            "The dsl profile attached to this virtual 
+                circuit."
+        ::=  {  occamAdslLineEntry  1  }
+
+END

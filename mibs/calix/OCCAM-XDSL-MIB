@@ -1,0 +1,94 @@
+
+OCCAM-XDSL-MIB DEFINITIONS ::= BEGIN
+	IMPORTS
+		occamGenericXdslModules
+			FROM OCCAM-REG-MODULE
+		TEXTUAL-CONVENTION, TruthValue, DisplayString
+			FROM SNMPv2-TC
+		MODULE-COMPLIANCE, OBJECT-GROUP
+			FROM SNMPv2-CONF
+		OBJECT-IDENTITY, MODULE-IDENTITY, OBJECT-TYPE, 
+		NOTIFICATION-TYPE, Integer32
+			FROM SNMPv2-SMI
+		AlarmStatus 
+		        FROM OCCAM-TC
+		cardShelfIndex, cardSlotIndex, ValidValue
+			FROM OCCAM-SHELF-MIB;
+
+    occamXdslMib	MODULE-IDENTITY
+		LAST-UPDATED	"200912180000Z"
+		ORGANIZATION	"Occam Networks"
+		CONTACT-INFO	"email support@occamnetworks.com"
+		DESCRIPTION	"The mib module describes Occam's XDSL
+		                 interfaces related mib objects and 
+				 notifications."
+
+		::=  {  occamGenericXdslModules  1  }
+
+-- TEXTUAL-CONVENTIONS --
+
+    XdslPortId ::= TEXTUAL-CONVENTION 
+		STATUS		current
+		DESCRIPTION     "An XDSL interface  identifier"
+		SYNTAX 		Integer32  ( 1 .. 48  ) 
+
+
+ -- XDSL Interfaces MIB groups  --
+
+    xdslIntfcObjects	OBJECT IDENTIFIER
+	::=  {  occamXdslMib  1  }
+
+    xdslIntfcNotifications	OBJECT IDENTIFIER
+	::=  {  occamXdslMib  2  }
+
+    xdslIntfcNotifAlarms	OBJECT IDENTIFIER
+	::=  {  xdslIntfcNotifications  1  }
+
+    xdslIntfcNotifEvents	OBJECT IDENTIFIER
+	::=  {  xdslIntfcNotifications  2  }
+
+-- XDSL Interfaces MIB OBJECTS --
+
+    xdslPortId			OBJECT-TYPE	
+	SYNTAX			XdslPortId 
+	MAX-ACCESS		accessible-for-notify
+	STATUS			current
+	DESCRIPTION             "The Xdsl port ID."
+	::=  {  xdslIntfcObjects  1  }
+
+    xdslAlarmStatus		OBJECT-TYPE	
+	SYNTAX			AlarmStatus 
+	MAX-ACCESS		accessible-for-notify
+	STATUS			current
+	DESCRIPTION             "The XDSL alarm status."
+	::=  {  xdslIntfcObjects  2  }
+
+    xdslPortsAffected		OBJECT-TYPE	
+	SYNTAX			OCTET STRING 
+	MAX-ACCESS		accessible-for-notify
+	STATUS			current
+	DESCRIPTION             "The Xdsl ports affected on DSP shutdown."
+	::=  {  xdslIntfcObjects  3  }
+
+-- XDSL Interfaces Alarm NOTIFICATIONS --
+		
+	xdslIntfNoATMCircuitConfiged	NOTIFICATION-TYPE
+		OBJECTS			{cardShelfIndex, cardSlotIndex,
+                                        xdslPortId, xdslAlarmStatus }
+		STATUS			current
+		DESCRIPTION		"No ATM circuit configured alarm."
+	::=  {  xdslIntfcNotifAlarms  1  }
+
+	xdslIntfDspShutdownNotification	NOTIFICATION-TYPE
+		OBJECTS			{ xdslPortsAffected,
+                                        xdslAlarmStatus }
+		STATUS			current
+		DESCRIPTION             "If repeated DSP issues occur, then that particular DSP
+				will be shutdown and trap will be generated. Each DSP core will impact
+				12 DSL ports and xdslPortsAffected will have information about the ports
+				affected. eg. 25 to 36, which indicates those 12 DSL ports are impacted.
+				There is no clear alarm for this trap."
+	::=  {  xdslIntfcNotifAlarms  2  }
+	
+END
+

@@ -1,0 +1,32 @@
+
+OCCAM-TC DEFINITIONS ::= BEGIN
+	IMPORTS
+		TEXTUAL-CONVENTION, TruthValue, DisplayString
+			FROM SNMPv2-TC
+		MODULE-COMPLIANCE, OBJECT-GROUP
+			FROM SNMPv2-CONF
+		OBJECT-IDENTITY, MODULE-IDENTITY, OBJECT-TYPE, 
+		NOTIFICATION-TYPE, Integer32, TimeTicks
+			FROM SNMPv2-SMI;
+
+                
+
+AlarmStatus ::= TEXTUAL-CONVENTION 
+		STATUS		current
+		DESCRIPTION
+                        "The generic alarm status that indicates the
+                        nofication is a raised alarm or a cleared alarm."
+		SYNTAX 		INTEGER  {raised (1), cleared (2)}
+
+
+AlarmEventStatus ::= TEXTUAL-CONVENTION 
+		STATUS		current
+		DESCRIPTION
+                        "The generic alarm and event status that indicates
+                        the nofication is a raised alarm, a cleared alarm
+                        or an event."
+		SYNTAX 		INTEGER  {raised (1), cleared (2), event(3)}
+
+
+
+END
