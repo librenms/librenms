@@ -46,8 +46,8 @@ class Teldat extends OS implements
     /**
      * Return Cellular Short Interface Name.
      *
-     * @param  string  $ifName
-     * @param  int  $ifIndex
+     * @param  string  ifName
+     * @param  int  ifIndex
      * @return string with Short Interface Name
      */
     public function shortIfName($ifName, $index)
