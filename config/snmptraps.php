@@ -102,6 +102,7 @@ return [
         'VMWARE-VMINFO-MIB::vmwVmSuspended' => \LibreNMS\Snmptrap\Handlers\VmwVmSuspended::class,
         'OCCAM-SENSOR-MIB::occamExtAlarmRaised' => \LibreNMS\Snmptrap\Handlers\OccamSensorExtAlarmRaised::class,
         'OCCAM-KERNEL-MIB::fanTrayNotification' => \LibreNMS\Snmptrap\Handlers\OccamFanTrayNotification::class,
+        'OCCAM-EPS-MIB::epsPathGroupHeartbeatNotification' => \LibreNMS\Snmptrap\Handlers\OccamEpsPathGroupHeartbeatNotification::class,
         'OSPF-TRAP-MIB::ospfIfStateChange' => \LibreNMS\Snmptrap\Handlers\OspfIfStateChange::class,
         'OSPF-TRAP-MIB::ospfNbrStateChange' => \LibreNMS\Snmptrap\Handlers\OspfNbrStateChange::class,
         'UPS-MIB::upsTraps.0.1' => \LibreNMS\Snmptrap\Handlers\UpsTrapsOnBattery::class,
