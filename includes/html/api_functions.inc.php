@@ -401,14 +401,13 @@ function maintenance_device(Illuminate\Http\Request $request)
     $alert_schedule->start = $start;
     $alert_schedule->end = $end;
     $alert_schedule->save();
+    $alert_schedule->devices()->attach([$device_id]);
+    $alert_schedule->save();
 
-    $type = 'device';
-
-    $item = dbInsert(['schedule_id' => $alert_schedule->schedule_id, 'alert_schedulable_type' => $type, 'alert_schedulable_id' => $device_id], 'alert_schedulables');
-    if ($notes && $type = 'device' && UserPref::getPref(Auth::user(), 'add_schedule_note_to_device')) {
-        $device_notes = dbFetchCell('SELECT `notes` FROM `devices` WHERE `device_id` = ?;', [$device_id]);
-        $device_notes .= ((empty($device_notes)) ? '' : PHP_EOL) . date('Y-m-d H:i') . ' Alerts delayed: ' . $notes;
-        dbUpdate(['notes' => $device_notes], 'devices', '`device_id` = ?', [$device_id]);
+    if ($notes && UserPref::getPref(Auth::user(), 'add_schedule_note_to_device')) {
+        $device = Device::find($device_id);
+        $device->notes .= ((empty($device->notes)) ? '' : PHP_EOL) . date('Y-m-d H:i') . ' Alerts delayed: ' . $notes;
+        $device->save();
     }
 
     return api_success_noresult(201, "Device $hostname ($device_id) moved into maintenance mode for " . $data['duration'] . ' h');
