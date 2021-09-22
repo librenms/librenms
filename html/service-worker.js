@@ -2,7 +2,7 @@ self.addEventListener('fetch', function (event) {
 });
 
 self.addEventListener('push', function (e) {
-    if (!(self.Notification && self.Notification.permission === 'granted')) {
+    if (!(self.Notification && self.Notification.permission === 'granted') && localStorage.getItem('notifications') !== 'disabled') {
         //notifications aren't supported or permission not granted!
         return;
     }
