@@ -1,6 +1,6 @@
 if ('serviceWorker' in navigator) {
     // Register a Service Worker.
-    navigator.serviceWorker.register('http://localhost/service-worker.js');
+    navigator.serviceWorker.register('/service-worker.js');
 
     navigator.serviceWorker.ready
         .then(function (registration) {
