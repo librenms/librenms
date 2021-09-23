@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "7971c0ef0ed8ea90a3df66dbd8f05295",
+    "content-hash": "9ab00e7f7d4af766342b38b9019f7fe7",
     "packages": [
         {
             "name": "amenadiel/jpgraph",
@@ -11007,6 +11007,62 @@
                 "source": "https://github.com/Seldaek/phar-utils/tree/master"
             },
             "time": "2020-07-07T18:42:57+00:00"
+        },
+        {
+            "name": "spaze/phpstan-disallowed-calls",
+            "version": "v1.9.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/spaze/phpstan-disallowed-calls.git",
+                "reference": "2f5402fd88a2a7345a5cca28e98b84f559cdc0f2"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/spaze/phpstan-disallowed-calls/zipball/2f5402fd88a2a7345a5cca28e98b84f559cdc0f2",
+                "reference": "2f5402fd88a2a7345a5cca28e98b84f559cdc0f2",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^7.1 || ^8.0",
+                "phpstan/phpstan": "^0.12"
+            },
+            "require-dev": {
+                "nette/neon": "^3.2",
+                "php-parallel-lint/php-console-highlighter": "^0.5.0",
+                "php-parallel-lint/php-parallel-lint": "^1.2",
+                "phpunit/phpunit": "^7.0 || ^9.4.2",
+                "spaze/coding-standard": "^0.0"
+            },
+            "type": "phpstan-extension",
+            "extra": {
+                "phpstan": {
+                    "includes": [
+                        "extension.neon"
+                    ]
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Spaze\\PHPStan\\Rules\\Disallowed\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Michal Špaček",
+                    "email": "mail@michalspacek.cz",
+                    "homepage": "https://www.michalspacek.cz"
+                }
+            ],
+            "description": "Disallowed method and function calls plug-in for PHPStan",
+            "support": {
+                "issues": "https://github.com/spaze/phpstan-disallowed-calls/issues",
+                "source": "https://github.com/spaze/phpstan-disallowed-calls/tree/v1.9.0"
+            },
+            "time": "2021-08-18T22:45:42+00:00"
         },
         {
             "name": "staudenmeir/dusk-updater",
