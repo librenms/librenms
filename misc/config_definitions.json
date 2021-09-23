@@ -818,6 +818,7 @@
             "options": {
                 "graphite": "Graphite",
                 "influxdb": "InfluxDB",
+                "influxdb2": "InfluxDB2",
                 "opentsdb": "OpenTSDB",
                 "prometheus": "Prometheus",
                 "rrd": "RRD"

@@ -1,6 +1,6 @@
 <?php
 /*
- * Processor.php
+ * RrdQueryBuilder.php
  *
  * -Description-
  *
@@ -23,26 +23,32 @@
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
-namespace App\Data\Sets;
+namespace App\Graphing\Builders;
 
-use App\Data\DataGroup;
-use LibreNMS\Enum\DataRateType;
-use LibreNMS\Enum\DataType;
+use App\Graphing\QueryBuilder;
 use Rrd;
 
-class Processor extends DataGroup
+class RrdQueryBuilder extends QueryBuilder
 {
-    public static function make(\App\Models\Processor $processor)
+    protected $datastore = 'rrd';
+
+    public function toQuery()
     {
-        $dg = (new self('processor'))
-            ->addTag('device', $processor->device_id)
-            ->addTag('index', $processor->processor_index)
-            ->addAnnotation('hostname', $processor->device->hostname)
-            ->addAnnotation('description', $processor->processor_descr)
-            ->addDataSet('usage', DataRateType::NONE, DataType::FLOAT, 0, 100);
+        $defs = [];
 
-        $dg->getDataSet('usage')->migrateFrom(Rrd::name($processor->device->hostname, ['processor', $processor->processor_type, $processor->processor_index]), 'usage');
+        foreach ($this->fields as $index => $field) {
+            $name = $field['name'];
+            $ds = $this->dataGroup->getDataSet($name);
+            $rrd_file = Rrd::fileName($this->dataGroup, $ds);
+            $defs[] = "DEF:{$name}_raw_$index=$rrd_file:value:AVERAGE";
+            if (isset($field['op'], $field['value'])) {
+                $defs[] = "CDEF:{$name}_calc_$index={$name}_raw_$index,{$field['value']},{$field['op']}";
+                $defs[] = "XPORT:{$name}_calc_$index:'$name'";
+            } else {
+                $defs[] = "XPORT:{$name}_raw_$index:'$name'";
+            }
+        }
 
-        return $dg;
+        return $defs;
     }
 }

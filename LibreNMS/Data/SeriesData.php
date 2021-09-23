@@ -46,6 +46,12 @@ class SeriesData implements Iterator, JsonSerializable
         return $new;
     }
 
+    /**
+     * Append a point of data usually this contains a timestamp and one more data values
+     * index should be the same as the label indexes
+     * @param array $values
+     * @return $this
+     */
     public function appendPoint(...$values): SeriesData
     {
         foreach ($values as $index => $value) {

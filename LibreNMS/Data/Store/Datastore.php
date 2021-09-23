@@ -130,7 +130,7 @@ class Datastore
 
     public function fetch(QueryBuilder $query): SeriesData
     {
-        $store = $this->stores->get($this->graph_store);
+        $store = $this->stores->get($query->getDatastore() ?? $this->graph_store);
 
         if ($store === null) {
             throw new \Exception('Invalid graphing datastore');

@@ -228,7 +228,7 @@ class InfluxDB extends BaseDatastore
 
     public function fetch(QueryBuilder $query): SeriesData
     {
-        $resultSet = $this->getConnection()->query($query->toInfluxDBQuery(), ['epoch' => 's']);
+        $resultSet = $this->getConnection()->query($query->toQuery(), ['epoch' => 's']);
 
         try {
             $output = SeriesData::make($resultSet->getColumns());

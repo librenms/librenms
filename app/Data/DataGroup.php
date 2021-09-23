@@ -135,24 +135,24 @@ abstract class DataGroup
     }
 
     /**
-     * Array of key value pairs to identify this data, generally will not change
+     * tags to uniquely to identify this data, generally should not change
      *
      * @param  array  $tags
      */
-    protected function setTags(array $tags)
+    protected function addTag($key, $value): DataGroup
     {
-        $this->tags = $tags;
+        $this->tags[(string) $key] = (string) $value;
         return $this;
     }
 
     /**
-     * Array of key value pairs of additional info for this data, may change
+     * additional value pairs of info for this data, may change
      *
      * @param  array  $fields
      */
-    protected function setAnnotations(array $fields)
+    protected function addAnnotation($key, $value): DataGroup
     {
-        $this->annotations = $fields;
+        $this->annotations[(string) $key] = (string) $value;
         return $this;
     }
 

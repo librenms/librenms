@@ -27,24 +27,25 @@ namespace App\Graphing;
 
 use App\Data\DataGroup;
 use Carbon\CarbonImmutable;
-use Rrd;
 
-class QueryBuilder
+abstract class QueryBuilder
 {
-    private $fields = [];
-    private $currentField = -1;
-    private $start;
-    private $end;
-    private $minMax = false;
+    protected $datastore;
+
+    protected $fields = [];
+    protected $currentField = -1;
+    protected $start;
+    protected $end;
+    protected $minMax = false;
 
     /**
      * @var \App\Data\DataGroup
      */
-    private $dataGroup;
+    protected $dataGroup;
 
-    public static function fromDataGroup(DataGroup $dataGroup)
+    public static function fromDataGroup(DataGroup $dataGroup): QueryBuilder
     {
-        $new = new static();
+        $new = app('graph-query-builder');
         $new->dataGroup = $dataGroup;
         return $new;
     }
@@ -74,57 +75,6 @@ class QueryBuilder
         $this->minMax = true;
     }
 
-    public function toInfluxDBQuery()
-    {
-        $fields = [];
-        foreach ($this->fields as $field) {
-            $select = "non_negative_derivative(mean(\"{$field['name']}\"), 1s)";
-            if (isset($field['op'])) {
-                $select .= ' ' . $field['op'] . $field['value'];
-            }
-            $fields[] = $select . " AS \"{$field['name']}\"";
-        }
-        $query = 'SELECT ' . implode(', ', $fields);
-
-        $query .= ' FROM "' . $this->dataGroup->getName() . '"';
-
-        $where = [];
-        foreach ($this->dataGroup->getTags() as $tagK => $tagV) {
-            $where[] = "$tagK = '$tagV'";
-        }
-        if ($this->start) {
-            $where[] = 'time >= ' . $this->start->timestamp . 's';
-        }
-        if ($this->end) {
-            $where[] = 'time <= ' . $this->end->timestamp . 's';
-        }
-
-        $query .= ' WHERE ' . implode(' AND ', $where);
-        $query .= ' GROUP BY time(15s) fill(null)';
-
-        return $query;
-    }
-
-    public function toRrdQuery()
-    {
-        $defs = [];
-
-        foreach ($this->fields as $index => $field) {
-            $name = $field['name'];
-            $ds = $this->dataGroup->getDataSet($name);
-            $rrd_file = Rrd::fileName($this->dataGroup, $ds);
-            $defs[] = "DEF:{$name}_raw_$index=$rrd_file:value:AVERAGE";
-            if (isset($field['op'], $field['value'])) {
-                $defs[] = "CDEF:{$name}_calc_$index={$name}_raw_$index,{$field['value']},{$field['op']}";
-                $defs[] = "XPORT:{$name}_calc_$index:'$name'";
-            } else {
-                $defs[] = "XPORT:{$name}_raw_$index:'$name'";
-            }
-        }
-
-        return $defs;
-    }
-
     public function getStart(): CarbonImmutable
     {
         return $this->start;
@@ -133,5 +83,12 @@ class QueryBuilder
     public function getEnd(): CarbonImmutable
     {
         return $this->end;
+    }
+
+    abstract public function toQuery();
+
+    public function getDatastore()
+    {
+        return $this->datastore;
     }
 }

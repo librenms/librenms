@@ -35,8 +35,8 @@ use LibreNMS\Data\SeriesData;
 use LibreNMS\Enum\DataRateType;
 use LibreNMS\Enum\DataType;
 use LibreNMS\Exceptions\FileExistsException;
-use LibreNMS\Exceptions\RrdGraphException;
 use LibreNMS\Exceptions\RrdExportFailedException;
+use LibreNMS\Exceptions\RrdGraphException;
 use LibreNMS\Proc;
 use LibreNMS\Util\Debug;
 use LibreNMS\Util\Rewrite;
@@ -158,16 +158,16 @@ class Rrd extends BaseDatastore
 
     public function fetch(QueryBuilder $query): SeriesData
     {
-        $data = $this->xport($query->toRrdQuery(), $query->getStart()->timestamp, $query->getEnd()->timestamp);
+        $data = $this->xport($query->toQuery(), $query->getStart()->timestamp, $query->getEnd()->timestamp);
 
         $timestamp = $data['meta']['start'];
         $step = $data['meta']['step'];
         $labels = $data['meta']['legend'];
+        array_unshift($labels, 'timestamp');
         $output = SeriesData::make($labels);
 
         foreach ($data['data'] as $values) {
-            array_unshift($values, $timestamp);
-            $output->appendPoint(...$values);
+            $output->appendPoint($timestamp, ...$values);
             $timestamp += $step;
         }
 

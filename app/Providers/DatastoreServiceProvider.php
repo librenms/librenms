@@ -27,6 +27,7 @@ namespace App\Providers;
 
 use Illuminate\Contracts\Foundation\Application;
 use Illuminate\Support\ServiceProvider;
+use LibreNMS\Config;
 use LibreNMS\Data\Store\Datastore;
 use LibreNMS\Interfaces\Data\Datastore as DatastoreContract;
 
@@ -34,11 +35,18 @@ class DatastoreServiceProvider extends ServiceProvider
 {
     protected $namespace = 'LibreNMS\\Data\\Store\\';
     protected $stores = [
-        'graphite' => 'LibreNMS\Data\Store\Graphite',
-        'influxdb' => 'LibreNMS\Data\Store\InfluxDB',
-        'opentsdb' => 'LibreNMS\Data\Store\OpenTSDB',
-        'prometheus' => 'LibreNMS\Data\Store\Prometheus',
-        'rrd' => 'LibreNMS\Data\Store\Rrd',
+        'graphite' => \LibreNMS\Data\Store\Graphite::class,
+        'influxdb' => \LibreNMS\Data\Store\InfluxDB::class,
+        'influxdb2' => \LibreNMS\Data\Store\InfluxDB2::class,
+        'opentsdb' => \LibreNMS\Data\Store\OpenTSDB::class,
+        'prometheus' => \LibreNMS\Data\Store\Prometheus::class,
+        'rrd' => \LibreNMS\Data\Store\Rrd::class,
+    ];
+
+    protected $builders = [
+        'influxdb' => \App\Graphing\Builders\InfluxDBQueryBuilder::class,
+        'influxdb2' => \App\Graphing\Builders\InfluxDB2QueryBuilder::class,
+        'rrd' => \App\Graphing\Builders\RrdQueryBuilder::class,
     ];
 
     public function register()
@@ -61,6 +69,12 @@ class DatastoreServiceProvider extends ServiceProvider
             return new Datastore(iterator_to_array($app->tagged('datastore')));
         });
 
+        $this->app->bind('graph-query-builder', function () {
+            $class = $this->builders[Config::get('datastores.graphs.source', 'rrd')];
+
+            return new $class;
+        });
+
         // additional bindings
         $this->registerInflux();
     }
@@ -69,6 +83,10 @@ class DatastoreServiceProvider extends ServiceProvider
     {
         $this->app->singleton('InfluxDB\Database', function ($app) {
             return \LibreNMS\Data\Store\InfluxDB::createFromConfig();
+        });
+
+        $this->app->bind(\InfluxDB2\Client::class, function ($app) {
+            return \LibreNMS\Data\Store\InfluxDB2::createFromConfig();
         });
     }
 }

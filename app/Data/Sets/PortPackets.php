@@ -36,17 +36,13 @@ class PortPackets extends DataGroup
     public static function make(Port $port): DataGroup
     {
         $dg = (new self('port_packets'))
-            ->setTags([
-                'device' => $port->device_id,
-                'port' => $port->port_id,
-            ])
-            ->setAnnotations([
-                'hostname' => $port->device->hostname,
-                'ifName' => $port->ifName,
-                'ifAlias' => $port->ifAlias,
-                'ifIndex' => $port->ifIndex,
-                'port_descr_type' => $port->port_descr_type,
-            ])
+            ->addTag('device', $port->device_id)
+            ->addTag('port', $port->port_id)
+            ->addAnnotation('hostname', $port->device->hostname)
+            ->addAnnotation('ifName', $port->ifName)
+            ->addAnnotation('ifAlias', $port->ifAlias)
+            ->addAnnotation('ifIndex', $port->ifIndex)
+            ->addAnnotation('port_descr_type', $port->port_descr_type)
             ->addDataSet('ifInOctets', DataRateType::DERIVE, DataType::INT, 0)
             ->addDataSet('ifOutOctets', DataRateType::DERIVE, DataType::INT, 0)
             ->addDataSet('ifInErrors', DataRateType::DERIVE, DataType::INT, 0)
