@@ -3455,7 +3455,7 @@
             "type": "array",
             "validate": {
                 "value": "array",
-                "value.*": "object",
+                "value.*": "array",
                 "value.*.action": "boolean",
                 "value.*.icon": "string",
                 "value.*.external": "boolean",
