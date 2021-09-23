@@ -7,11 +7,13 @@
         <div class="row">
             <div class="col-md-12">
                 <x-datepicker :to="$to" :from="$from"></x-datepicker>
+                @admin
                 <button type="button"
                         x-on:click="showQuery"
                         x-text="show_query ? 'Hide Query' : 'Show Query'"
                         class="tw-border tw-border-gray-300 tw-text-gray-500 hover:tw-bg-gray-300 hover:tw-text-gray-900 tw-rounded tw-px-4 tw-py-2"
                 ></button>
+                @endadmin
             </div>
         </div>
         <div class="row">
@@ -43,8 +45,10 @@
             </div>
         </div>
         <div class="row">
-            <div class="col-md-8 col-md-offset-2">
-                <pre x-show="show_query" style="display: none" x-text="query_text"></pre>
+            <div class="col-md-8 col-md-offset-2" x-show="show_query" style="display: none">
+                <x-panel title="Datastore Query">
+                    <pre x-text="query_text" class="tw-border-none tw-bg-transparent"></pre>
+                </x-panel>
             </div>
         </div>
     </div>

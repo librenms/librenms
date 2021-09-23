@@ -28,12 +28,17 @@ namespace App\Graphing;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Validation\UnauthorizedException;
 
 class GraphDataController extends Controller
 {
     public function __invoke(Request $request, BaseGraph $graph)
     {
         if ($request->type == 'query') {
+            if (! $request->user()->isAdmin()) {
+                    throw new UnauthorizedException();
+            }
+
             return response(app()->call([$graph, 'queryText']));
         }
 

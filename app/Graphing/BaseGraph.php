@@ -68,7 +68,7 @@ abstract class BaseGraph extends Controller
         $this->init($request);
         $query = $this->query($request)->toQuery();
 
-        return is_array($query) ? implode(' ', $query) : $query;
+        return is_array($query) ? implode(PHP_EOL, $query) : $query;
     }
 
     public function data(Request $request): array
