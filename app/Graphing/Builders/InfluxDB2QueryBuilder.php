@@ -33,13 +33,13 @@ class InfluxDB2QueryBuilder extends \App\Graphing\QueryBuilder
     {
         $bucket = \LibreNMS\Config::get('influxdb2.bucket', 'librenms');
         $query = 'from(bucket: "' . $bucket . '")';
-        $query .= ' |> range(start: ' . $this->start->timestamp . ', stop: ' . $this->end->timestamp . ')';
+        $query .= ' |> range(start: ' . $this->start->timestamp . ', stop: ' . $this->end->timestamp . ')' . PHP_EOL;
         $query .= ' |> filter(fn: (r) => r["_measurement"] == "' . $this->dataGroup->getName() . '"';
 
         foreach ($this->dataGroup->getTags() as $key => $value) {
             $query .= ' and r["' . $key . '"] == "' . $value . '"';
         }
-        $query .= ')';
+        $query .= ')' . PHP_EOL;
 
         $fields = [];
         $maps = [];
@@ -53,15 +53,15 @@ class InfluxDB2QueryBuilder extends \App\Graphing\QueryBuilder
             }
             $maps[] = $mapQuery;
         }
-        $query .= ' |> filter(fn: (r) => ' . implode(' or ', $fields) . ')';
-        $query .= ' |> derivative(nonNegative: true)';
+        $query .= ' |> filter(fn: (r) => ' . implode(' or ', $fields) . ')' . PHP_EOL;
+        $query .= ' |> derivative(nonNegative: true)' . PHP_EOL;
 
         if ($map) {
-            $query .= ' |> map(fn: (r) => ({ r with ' . implode(', ', $maps) . '}))';
+            $query .= ' |> map(fn: (r) => ({ r with ' . implode(', ', $maps) . '}))' . PHP_EOL;
         }
 
-        $query .= ' |> aggregateWindow(every: 15s, fn: mean, createEmpty: false)';
-        $query .= ' |> yield(name: "mean")';
+        $query .= ' |> aggregateWindow(every: 15s, fn: mean, createEmpty: false)' . PHP_EOL;
+        $query .= ' |> yield(name: "mean")' . PHP_EOL;
 
         return $query;
     }

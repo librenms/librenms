@@ -59,14 +59,16 @@
                 show_query: false,
                 query_text: '',
                 showQuery() {
-                    this.show_query = ! this.show_query
-                    if (this.show_query && this.query_text === '') {
+                    if (! this.show_query) {
                         fetch(graphUrl + '&type=query')
                             .then(res => res.text())
                             .then(text => {
                                 this.query_text = text;
+                                this.show_query = true;
                             });
 
+                    } else {
+                        this.show_query = false;
                     }
                 }
             }

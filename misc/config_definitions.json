@@ -3665,6 +3665,30 @@
             "section": "influxdb",
             "order": 8
         },
+        "influxdb2.bucket": {
+            "type": "text",
+            "default": "librenms"
+        },
+        "influxdb2.enable": {
+            "type": "boolean",
+            "default": false
+        },
+        "influxdb2.org": {
+            "type": "text",
+            "default": "librenms"
+        },
+        "influxdb2.timeout": {
+            "type": "integer",
+            "default": 0
+        },
+
+        "influxdb2.token": {
+            "type": "password"
+        },
+        "influxdb2.verifySSL": {
+            "type": "boolean",
+            "default": false
+        },
         "install_dir": {
             "type": "directory"
         },

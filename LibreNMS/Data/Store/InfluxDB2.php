@@ -101,7 +101,7 @@ class InfluxDB2 extends BaseDatastore
 
             $this->wApi()->write($point);
 
-            Log::debug("[InfluxDB2] " . $point->toLineProtocol());
+            Log::debug('InfluxDB2 [%g' . $point->toLineProtocol() . '%n]', ['color' => true]);
             $this->recordStatistic($stat->end());
         } catch (\Exception $e) {
             Log::error('InfluxDB2 exception: ' . $e->getMessage());
@@ -111,7 +111,6 @@ class InfluxDB2 extends BaseDatastore
 
     public function fetch(QueryBuilder $query): SeriesData
     {
-//        dd($query->toFluxQuery());
         /** @var \InfluxDB2\FluxTable $resultSet */
         $resultSet = $this->qApi()->query($query->toQuery());
 
