@@ -63,6 +63,23 @@ abstract class BaseGraph extends Controller
         $this->renderer = RendererFactory::make($request->get('renderer'));
     }
 
+    final public function queryText(Request $request): string
+    {
+        $this->init($request);
+        $query = $this->query($request)->toQuery();
+
+        return is_array($query) ? implode(' ', $query) : $query;
+    }
+
+    public function data(Request $request): array
+    {
+        $this->init($request);
+        $data = app('Datastore')->fetch($this->query($request));
+        return $this->renderer->formatData($data);
+    }
+
+    abstract public function query(Request $request): QueryBuilder;
+
     public static function __set_state(array $properties)
     {
         $class = new static();

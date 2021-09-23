@@ -27,11 +27,16 @@ namespace App\Graphing;
 
 use App\Http\Controllers\Controller;
 use Illuminate\Http\JsonResponse;
+use Illuminate\Http\Request;
 
 class GraphDataController extends Controller
 {
-    public function __invoke(BaseGraph $graph)
+    public function __invoke(Request $request, BaseGraph $graph)
     {
+        if ($request->type == 'query') {
+            return response(app()->call([$graph, 'queryText']));
+        }
+
         return new JsonResponse(app()->call([$graph, 'data']));
     }
 }

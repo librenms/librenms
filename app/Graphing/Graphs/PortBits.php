@@ -25,7 +25,6 @@
 
 namespace App\Graphing\Graphs;
 
-use App\Data\DataGroup;
 use App\Data\Sets\PortPackets;
 use App\Graphing\BaseGraph;
 use App\Graphing\QueryBuilder;
@@ -34,19 +33,12 @@ use Illuminate\Http\Request;
 
 class PortBits extends BaseGraph
 {
-    public function data(Request $request): array
+    public function query(Request $request): QueryBuilder
     {
-        $this->init($request);
         $this->renderer->setLabels(['In', 'Out'], 'bps');
         $port = Port::with('device')->find($request->get('id'));
-        $query = $this->getQuery(PortPackets::make($port));
+        $dataGroup = PortPackets::make($port);
 
-        $data = app('Datastore')->fetch($query);
-        return $this->renderer->formatData($data);
-    }
-
-    private function getQuery(DataGroup $dataGroup): QueryBuilder
-    {
         return QueryBuilder::fromDataGroup($dataGroup)
             ->select('ifInOctets')->math('*', 8)
             ->select('ifOutOctets')->math('*', -8)

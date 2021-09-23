@@ -26,23 +26,26 @@
 namespace App\Graphing\Graphs;
 
 use App\Data\Sets\Processor;
+use App\Graphing\QueryBuilder;
 use Illuminate\Http\Request;
 use LibreNMS\Data\Store\InfluxDB;
-use LibreNMS\Proc;
 use Rrd;
 
 class ProcessorUsage extends \App\Graphing\BaseGraph
 {
-    public function data(Request $request): array
+    public function query(Request $request): QueryBuilder
     {
-        $this->init($request);
         $this->renderer->setLabels(['Usage'], 'Percent');
         $this->renderer->enableRangeValues();
         $this->renderer->setYRange(0, 100);
-
         $processor = \App\Models\Processor::with('device')->find(1);
+        $dataGroup = Processor::make($processor);
 
-        return $this->renderer->formatRrdData($this->fetchData($processor));
+        // FIXME, nonsense
+        return QueryBuilder::fromDataGroup($dataGroup)
+            ->select('usage', 'minusage')->aggregate('min')
+            ->select('usage')->aggregate('mean')
+            ->select('usage', 'maxusage')->aggregate('max');
     }
 
     private function fetchData(\App\Models\Processor $processor)

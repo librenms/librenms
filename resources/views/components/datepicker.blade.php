@@ -1,4 +1,4 @@
-<div style="text-align: center;">
+<div class="tw-inline-block">
     <form class="form-inline" id="customrange">
         <input type="hidden" id="selfaction" value="http://librenms.local/graphs/to=1612928100/id=447/type=port_bits/from=1612841700/">
         <div class="form-group">

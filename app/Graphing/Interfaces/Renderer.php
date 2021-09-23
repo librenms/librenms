@@ -25,7 +25,6 @@
 
 namespace App\Graphing\Interfaces;
 
-use InfluxDB\ResultSet;
 use LibreNMS\Data\SeriesData;
 
 interface Renderer
@@ -35,6 +34,4 @@ interface Renderer
     public function setTimeRange($start, $end);
     public function setYRange($min = null, $max = null);
     public function formatData(SeriesData $data): array;
-    public function formatRrdData($data): array;
-    public function formatInfluxData(ResultSet $data): array;
 }
