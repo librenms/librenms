@@ -1,4 +1,4 @@
-os: ipos
+os: ericsson-ipos
 group: ericsson
 text: 'Ericsson IPOS'
 type: network
