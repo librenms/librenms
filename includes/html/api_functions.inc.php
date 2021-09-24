@@ -399,7 +399,6 @@ function maintenance_device(Illuminate\Http\Request $request)
     return api_success_noresult(201, "Device {$device->hostname} ({$device->device_id}) moved into maintenance mode for " . $data['duration'] . ' h');
 }
 
-
 function add_device(Illuminate\Http\Request $request)
 {
     // This will add a device using the data passed encoded with json
