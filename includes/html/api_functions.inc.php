@@ -361,57 +361,44 @@ function list_devices(Illuminate\Http\Request $request)
 
 function maintenance_device(Illuminate\Http\Request $request)
 {
-    //TODO: should be deduplicated with
-    // includes/html/forms/schedule-maintenance.inc.php
-
-    $data = json_decode($request->getContent(), true);
-
-    if (empty($data)) {
+    if (empty($request->json())) {
         return api_error(400, 'No information has been provided to set this device into maintenance');
     }
 
     $hostname = $request->route('hostname');
 
     // use hostname as device_id if it's all digits
-    $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
+    $device = ctype_digit($hostname) ? DeviceCache::get($hostname) : DeviceCache::getByHostname($hostname);
 
-    // find device matching the id
-    $device = device_by_id_cache($device_id);
-    if (! $device || ! $device['device_id']) {
+    if (! $device) {
         return api_error(404, "Device $hostname does not exist");
     }
 
-    $hostname = gethostbyid($device_id);
+    $notes = $request->json('notes');
+    $alert_schedule = new \App\Models\AlertSchedule([
+        'title' => $device->displayName(),
+        'notes' => $notes,
+        'recurring' => 0,
+        'start' => date('Y-m-d H:i:s'),
+    ]);
 
-    $title = $hostname;
-    $notes = $data['notes'];
-    $recurring = 0;
-    $start = date('Y-m-d H:i:s');
-    [$duration_hour, $duration_min] = explode(':', $data['duration']);
-
-    if (isset($duration_hour) && isset($duration_min)) {
-        $end = date('Y-m-d H:i:00', strtotime('+' . intval($duration_hour) . ' hour ' . intval($duration_min) . ' minute', strtotime($start)));
+    if (Str::contains($request->json('duration'), ':')) {
+        [$duration_hour, $duration_min] = explode(':', $request->json('duration'));
+        $alert_schedule->end = \Carbon\Carbon::now()
+            ->addHours($duration_hour)->addMinutes($duration_min)
+            ->format('Y-m-d H:i:00');
     }
 
-    $schedule_id = 0;
-    $alert_schedule = \App\Models\AlertSchedule::findOrNew($schedule_id);
-    $alert_schedule->title = $title;
-    $alert_schedule->notes = $notes;
-    $alert_schedule->recurring = $recurring;
-    $alert_schedule->start = $start;
-    $alert_schedule->end = $end;
-    $alert_schedule->save();
-    $alert_schedule->devices()->attach([$device_id]);
-    $alert_schedule->save();
+    $device->alertSchedules()->save($alert_schedule);
 
     if ($notes && UserPref::getPref(Auth::user(), 'add_schedule_note_to_device')) {
-        $device = Device::find($device_id);
-        $device->notes .= ((empty($device->notes)) ? '' : PHP_EOL) . date('Y-m-d H:i') . ' Alerts delayed: ' . $notes;
+        $device->notes .= (empty($device->notes) ? '' : PHP_EOL) . date('Y-m-d H:i') . ' Alerts delayed: ' . $notes;
         $device->save();
     }
 
-    return api_success_noresult(201, "Device $hostname ($device_id) moved into maintenance mode for " . $data['duration'] . ' h');
+    return api_success_noresult(201, "Device {$device->hostname} ({$device->device_id}) moved into maintenance mode for " . $data['duration'] . ' h');
 }
+
 
 function add_device(Illuminate\Http\Request $request)
 {
