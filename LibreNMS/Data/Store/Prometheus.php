@@ -47,6 +47,10 @@ class Prometheus extends BaseDatastore
         $url = Config::get('prometheus.url');
         $job = Config::get('prometheus.job', 'librenms');
         $this->base_uri = "$url/metrics/job/$job/instance/";
+        $this->prefix = Config::get('prometheus.prefix', '');
+        if ($this->prefix) {
+            $this->prefix = "$this->prefix" . '_';
+        }
 
         $this->default_opts = [
             'headers' => ['Content-Type' => 'text/plain'],
@@ -82,7 +86,7 @@ class Prometheus extends BaseDatastore
 
             foreach ($fields as $k => $v) {
                 if ($v !== null) {
-                    $vals .= "$k $v\n";
+                    $vals .= $this->prefix . "$k $v\n";
                 }
             }
 
