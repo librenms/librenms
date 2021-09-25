@@ -12,10 +12,8 @@
  * the source code distribution for details.
  */
 
-use App\Models\Availability;
 use App\Models\Device;
 use App\Models\DeviceGroup;
-use App\Models\DeviceOutage;
 use App\Models\OspfPort;
 use App\Models\Port;
 use App\Models\PortGroup;
