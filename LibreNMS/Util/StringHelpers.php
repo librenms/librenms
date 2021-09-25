@@ -93,4 +93,36 @@ class StringHelpers
     {
         return ucwords(implode(' ', preg_split('/(?=[A-Z])/', $string)));
     }
+
+    /**
+     * Sometimes devices store strings as non-unicode strings and return them directly.
+     * NetSnmp parses those as UTF-8, try to convert the string if it contains non-printable ascii characters.
+     *
+     * @param  string|null  $string
+     * @return string
+     */
+    public static function inferEncoding(?string $string): ?string
+    {
+        if (empty($string) || preg_match('//u', $string) || ! function_exists('iconv')) {
+            return $string;
+        }
+
+        $charset = config('app.charset');
+
+        if (($converted = @iconv($charset, 'UTF-8', $string)) !== false) {
+            return (string) $converted;
+        }
+
+        if ($charset !== 'Windows-1252' && ($converted = @iconv('Windows-1252', 'UTF-8', $string)) !== false) {
+            return (string) $converted;
+        }
+
+        if ($charset !== 'CP850' && ($converted = @iconv('CP850', 'UTF-8', $string)) !== false) {
+            return (string) $converted;
+        }
+
+        \Log::debug('Failed to convert string: ' . $string);
+
+        return $string;
+    }
 }

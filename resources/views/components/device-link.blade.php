@@ -1,5 +1,5 @@
 <x-popup>
-    <a class="tw-font-bold @if($status=='disabled') tw-text-gray-400 visited:tw-text-gray-400 @elseif($status=='down') tw-text-red-600 visited:tw-text-red-600 @else tw-text-blue-900 visited:tw-text-blue-900 @endif" href="{{ route('device', ['device' => $device->device_id, 'tab' => $tab, 'section' => $section]) }}">
+    <a class="tw-font-bold @if($status=='disabled') tw-text-gray-400 visited:tw-text-gray-400 @elseif($status=='down') tw-text-red-600 visited:tw-text-red-600 @else tw-text-blue-900 visited:tw-text-blue-900 dark:tw-text-dark-white-100 dark:visited:tw-text-dark-white-100 @endif" href="{{ route('device', ['device' => $device->device_id, 'tab' => $tab, 'section' => $section]) }}">
         {{ $slot->isNotEmpty() ? $slot : $device->displayName() }}
     </a>
     <x-slot name="title">

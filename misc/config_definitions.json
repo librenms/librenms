@@ -3455,7 +3455,7 @@
             "type": "array",
             "validate": {
                 "value": "array",
-                "value.*": "object",
+                "value.*": "array",
                 "value.*.action": "boolean",
                 "value.*.icon": "string",
                 "value.*.external": "boolean",
@@ -4250,7 +4250,7 @@
             "type": "oxidized-maps",
             "validate": {
                 "value": "array",
-                "value.*": "array|keys_in:hostname,sysName,sysDescr,hardware,os,location,ip",
+                "value.*": "array|keys_in:hostname,sysName,sysDescr,sysObjectID,hardware,os,location,ip",
                 "value.*.*": "array|min:1",
                 "value.*.*.*": "array|size:2|keys_in:match,regex,value",
                 "value.*.*.*.value": "required|string",
