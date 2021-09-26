@@ -1151,7 +1151,15 @@ Output:
 ```json
 {
     "status": "ok",
-    "message": "Device localhost.localdomain (57) has been added successfully"
+    "message": "Device localhost.localdomain (57) has been added successfully",
+    "devices": [
+        {
+            "device_id": "57",
+            "hostname": "localhost",
+            ...
+            "serial": null,
+            "icon": null
+        }
 }
 ```
 

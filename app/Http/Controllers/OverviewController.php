@@ -39,7 +39,7 @@ class OverviewController extends Controller
     public function default(Request $request)
     {
         $user = Auth::user();
-        $dashboards = Dashboard::allAvailable($user)->with('user:user_id,username')->get()->keyBy('dashboard_id');
+        $dashboards = Dashboard::allAvailable($user)->with('user:user_id,username')->orderBy('dashboard_name')->get()->keyBy('dashboard_id');
 
         // Split dashboards into user owned or shared
         [$user_dashboards, $shared_dashboards] = $dashboards->partition(function ($dashboard) use ($user) {

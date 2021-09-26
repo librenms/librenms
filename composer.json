@@ -67,6 +67,7 @@
         "php-parallel-lint/php-parallel-lint": "^1.1",
         "phpstan/phpstan-mockery": "^0.12.13",
         "phpunit/phpunit": "^9.3.3",
+        "spaze/phpstan-disallowed-calls": "^1.9",
         "staudenmeir/dusk-updater": "^1.1"
     },
     "suggest": {

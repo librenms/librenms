@@ -91,7 +91,7 @@
     <script type="text/javascript" src="{{ asset('js/boot.js') }}"></script>
     <script>
         // Apply color scheme
-        if ('{{ LibreNMS\Config::get('applied_site_style', 'light') }}' === 'dark' || window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        if ('{{ LibreNMS\Config::get('applied_site_style') }}' === 'dark') {
             document.documentElement.classList.add('tw-dark')
         } else {
             document.documentElement.classList.remove('tw-dark')
