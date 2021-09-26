@@ -15,9 +15,9 @@ class CreateHrSystemTable extends Migration
         Schema::create('hrSystem', function (Blueprint $table) {
             $table->increments('hrSystem_id');
             $table->unsignedInteger('device_id')->index();
-            $table->string('key', 255);
-            $table->string('value', 255);
-            $table->string('value_prev', 255);
+            $table->string('key', 32);
+            $table->string('value', 32);
+            $table->string('value_prev', 32);
             $table->unique(['device_id', 'key']);
         });
     }
