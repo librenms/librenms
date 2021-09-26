@@ -4,7 +4,6 @@
 // Generic System Statistics
 
 use App\Models\Device;
-use App\Models\HrSystem;
 use LibreNMS\RRD\RrdDefinition;
 
 $oid_list = ['hrSystemProcesses.0', 'hrSystemNumUsers.0'];
