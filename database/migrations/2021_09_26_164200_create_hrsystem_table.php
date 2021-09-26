@@ -14,10 +14,11 @@ class CreateHrSystemTable extends Migration
     {
         Schema::create('hrSystem', function (Blueprint $table) {
             $table->increments('hrSystem_id');
-            $table->unsignedInteger('device_id')->default(0)->index();
-            $table->string('key');
-            $table->string('value');
-            $table->string('value_prev');
+            $table->unsignedInteger('device_id')->index();
+            $table->string('key', 255);
+            $table->string('value', 255);
+            $table->string('value_prev', 255);
+            $table->unique(['device_id', 'key']);
         });
     }
 
@@ -31,3 +32,4 @@ class CreateHrSystemTable extends Migration
         Schema::drop('hrSystem');
     }
 }
+
