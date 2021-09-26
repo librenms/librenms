@@ -5,20 +5,34 @@
     if (this.enabled) {
       localStorage.setItem('notifications', 'disabled');
       this.enabled = false;
-    } else {
-      Notification.requestPermission().then(function (permission) {
-        this.enabled = permission === 'granted';
-      });
+    } else if (Notification.permission === 'granted') {
       localStorage.setItem('notifications', 'enabled');
       this.enabled = true;
+    } else {
+      Notification.requestPermission().then((permission) => {
+        localStorage.setItem('notifications', 'enabled');
+        this.enabled = permission === 'granted';
+      });
     }
  }
 }">
-    <div x-show="! supported">This browser does not support notifications</div>
+    <div x-show="! supported">@lang('components.notification-subscription-status.no-support')</div>
+    @if($userHasTransport)
     <div x-show="supported">
         <div>
-            Notifications <span x-text="enabled ? 'enabled' : 'not enabled'"></span> for this browser
-            <button x-on:click="toggle()" type="button" class="tw-float-right tw-border tw-border-gray-500 tw-text-gray-500 hover:tw-bg-gray-500 hover:tw-text-gray-100 tw-rounded tw-px-4 tw-py-2" x-text="enabled ? 'Disable' : 'Enable'"></button>
+            <span x-text="enabled ? '@lang('components.notification-subscription-status.enabled')' : '@lang('components.notification-subscription-status.disabled')'"></span>
+            <button x-on:click="toggle()" type="button" class="tw-float-right tw-border tw-border-gray-500 tw-text-gray-500 hover:tw-bg-gray-500 hover:tw-text-gray-100 tw-rounded tw-px-4 tw-py-2" x-text="enabled ? '@lang('components.notification-subscription-status.disable')' : '@lang('components.notification-subscription-status.enable')'"></button>
         </div>
     </div>
+    @else
+    <div x-show="supported">
+        @admin
+            <a href="{{ url('alert-transports') }}">
+                @lang('components.notification-subscription-status.no-transport')
+            </a>
+        @else
+            @lang('components.notification-subscription-status.no-transport')
+        @endadmin
+    </div>
+    @endif
 </div>
