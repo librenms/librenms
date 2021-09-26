@@ -729,6 +729,17 @@ hrDevice:
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [hrDevice_id], Unique: true, Type: BTREE }
     hrdevice_device_id_index: { Name: hrdevice_device_id_index, Columns: [device_id], Unique: false, Type: BTREE }
+hrSystem:
+  Columns:
+    - { Field: hrSystem_id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
+    - { Field: device_id, Type: 'int unsigned', 'Null': false, Extra: '' }
+    - { Field: key, Type: text, 'Null': false, Extra: '' },
+    - { Field: value, Type: text, 'Null': true, Extra: '' },
+    - { Field: value_prev, Type: text, 'Null': true, Extra: '' },
+  Indexes:
+    PRIMARY: { Name: PRIMARY, Columns: [hrSystem_id], Unique: true, Type: BTREE }
+    hrsystem_device_id_index: { Name: hrsystem_device_id_index, Columns: [device_id], Unique: false, Type: BTREE }
+    hrsystem_device_id_key_unique: { Name: hrsystem_device_id_key_unique, Columns: [device_id, key], Unique: true, Type: BTREE }
 ipsec_tunnels:
   Columns:
     - { Field: tunnel_id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }

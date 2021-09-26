@@ -2,10 +2,15 @@
 
 // HOST-RESOURCES-MIB
 // Generic System Statistics
+
+use App\Models\Device;
+use App\Models\HrSystem;
 use LibreNMS\RRD\RrdDefinition;
 
 $oid_list = ['hrSystemProcesses.0', 'hrSystemNumUsers.0'];
 $hrSystem = snmp_get_multi($device, $oid_list, '-OUQs', 'HOST-RESOURCES-MIB');
+
+$current_device = Device::find($device['device_id']);
 
 if (is_numeric($hrSystem[0]['hrSystemProcesses'])) {
     $tags = [
@@ -31,28 +36,7 @@ if (is_numeric($hrSystem[0]['hrSystemNumUsers'])) {
 
     data_update($device, 'hr_users', $tags, $fields);
 
-    $device_id = $device['device_id'];
-    $options = [
-        'filter' => [
-            'device_id' => ['=', $device_id],
-            'type' => ['=', 'device'],
-        ],
-    ];
-
-    $component = new LibreNMS\Component();
-    $components = $component->getComponents($device_id, $options);
-
-    if (isset($components[$device_id])) {
-        $component_data = $components[$device_id];
-    } else {
-        $component_data = $component->createComponent($device_id, 'device');
-    }
-
-    $id = $component->getFirstComponentID($component_data);
-    $component_data[$id]['label'] = 'system';
-    $component_data[$id]['users_logged_in'] = $hrSystem[0]['hrSystemNumUsers'];
-
-    $component->setComponentPrefs($device_id, $component_data);
+    $current_device->hostResourceValues()->updateOrCreate(['device_id' => $current_device->id, 'key' => 'num_users'], ['value' => $fields['users']]);
 
     $os->enableGraph('hr_users');
     echo ' Users';
