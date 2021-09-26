@@ -66,7 +66,7 @@ class Browserpush extends Transport
                 ]
             ],
             'validation' => [
-                'user' => 'required|exists:users,user_id',
+                'user' => 'required|zero_or_exists:users,user_id',
             ],
         ];
     }
