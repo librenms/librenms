@@ -125,6 +125,21 @@ class User extends Authenticatable
         return false;
     }
 
+    /**
+     * Checks if this user has a browser push notification transport configured.
+     *
+     * @return bool
+     */
+    public function hasBrowserPushTransport(): bool
+    {
+        $user_id = \Auth::id();
+
+        return AlertTransport::query()
+            ->where('transport_type', 'browserpush')
+            ->where('transport_config', 'regexp', "\"user\":\"(0|$user_id)\"")
+            ->exists();
+    }
+
     // ---- Query scopes ----
 
     /**
