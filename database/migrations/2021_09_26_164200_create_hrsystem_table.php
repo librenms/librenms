@@ -32,4 +32,3 @@ class CreateHrSystemTable extends Migration
         Schema::drop('hrSystem');
     }
 }
-
