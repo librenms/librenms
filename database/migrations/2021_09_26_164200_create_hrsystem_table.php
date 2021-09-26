@@ -16,8 +16,8 @@ class CreateHrSystemTable extends Migration
             $table->increments('hrSystem_id');
             $table->unsignedInteger('device_id')->index();
             $table->string('key', 32);
-            $table->string('value', 32);
-            $table->string('value_prev', 32);
+            $table->string('value', 32)->nullable();
+            $table->string('value_prev', 32)->nullable();
             $table->unique(['device_id', 'key']);
         });
     }
