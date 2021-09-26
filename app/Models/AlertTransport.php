@@ -20,6 +20,7 @@ class AlertTransport extends Model
     public function instance(): Transport
     {
         $class = Transport::getClass($this->transport_type);
+
         return new $class($this);
     }
 }

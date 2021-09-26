@@ -51,7 +51,7 @@ class AlertController extends Controller
         }
 
         return response()->json([
-            'message' => "Alert has not been acknowledged.",
+            'message' => 'Alert has not been acknowledged.',
             'status' => 'error',
         ]);
     }

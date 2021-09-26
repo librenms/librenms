@@ -62,7 +62,7 @@ Route::group(['middleware' => ['auth'], 'guard' => 'auth'], function () {
 
     // Push notifications
     Route::group(['prefix' => 'push'], function () {
-    Route::get('token', [\App\Http\Controllers\PushNotificationController::class, 'token']);
+        Route::get('token', [\App\Http\Controllers\PushNotificationController::class, 'token']);
         Route::get('key', [\App\Http\Controllers\PushNotificationController::class, 'key']);
         Route::post('register', [\App\Http\Controllers\PushNotificationController::class, 'register']);
     });

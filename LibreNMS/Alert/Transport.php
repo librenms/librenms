@@ -20,6 +20,7 @@ abstract class Transport implements TransportInterface
     public static function make(string $type): TransportInterface
     {
         $class = self::getClass($type);
+
         return new $class();
     }
 
@@ -53,6 +54,7 @@ abstract class Transport implements TransportInterface
         }
 
         $path = explode('\\', get_called_class());
+
         return array_pop($path);
     }
 
@@ -96,6 +98,7 @@ abstract class Transport implements TransportInterface
 
     /**
      * Get the alert transport class from transport type.
+     *
      * @param  string  $type
      * @return string
      */

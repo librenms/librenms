@@ -27,7 +27,7 @@ class PushNotificationController extends Controller
             'description' => 'string',
             'subscription.endpoint' => 'required',
             'subscription.keys.auth' => 'required',
-            'subscription.keys.p256dh' => 'required'
+            'subscription.keys.p256dh' => 'required',
         ]);
 
         $subscription = $request->user()

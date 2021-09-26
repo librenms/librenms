@@ -37,6 +37,7 @@ return [
 
     /**
      * Google Cloud Messaging.
+     *
      * @deprecated
      */
     'gcm' => [

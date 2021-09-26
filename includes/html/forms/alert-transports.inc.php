@@ -22,7 +22,6 @@
  * @copyright  2018 Vivia Nguyen-Tran
  * @author     Vivia Nguyen-Tran <vivia@ualberta.ca>
  */
-
 header('Content-type: application/json');
 
 if (! Auth::user()->hasGlobalAdmin()) {

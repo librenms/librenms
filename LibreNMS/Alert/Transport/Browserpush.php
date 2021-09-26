@@ -45,6 +45,7 @@ class Browserpush extends Transport
             $alert_data['title'],
             $alert_data['msg'],
         ));
+
         return true;
     }
 
@@ -63,7 +64,7 @@ class Browserpush extends Transport
                     'descr' => 'LibreNMS User',
                     'type' => 'select',
                     'options' => $users,
-                ]
+                ],
             ],
             'validation' => [
                 'user' => 'required|zero_or_exists:users,user_id',

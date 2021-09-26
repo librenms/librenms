@@ -12,7 +12,6 @@ class AlertTransportController extends Controller
 {
     public function test(Request $request, AlertTransport $transport)
     {
-
         $device = Device::with('location')->first();
         $obj = [
             'hostname'  => $device->hostname,
@@ -36,8 +35,7 @@ class AlertTransportController extends Controller
             'msg'       => 'This is a test alert',
         ];
 
-
-        $opts = Config::get("alert.transports." . $transport->transport_type);
+        $opts = Config::get('alert.transports.' . $transport->transport_type);
         try {
             $result = $transport->instance()->deliverAlert($obj, $opts);
 

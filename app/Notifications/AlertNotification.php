@@ -54,7 +54,7 @@ class AlertNotification extends Notification
             // ->requireInteraction()
             // ->tag()
             // ->vibrate()
-        ;
+;
     }
 
     public function via($notifiable)
