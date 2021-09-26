@@ -17,10 +17,11 @@ use LibreNMS\Util\Rewrite;
 
 /**
  * Compare $t with the value of $vars[$v], if that exists
- * @param string $v Name of the var to test
- * @param string $t Value to compare $vars[$v] to
+ *
+ * @param  string  $v  Name of the var to test
+ * @param  string  $t  Value to compare $vars[$v] to
  * @return bool true, if values are the same, false if $vars[$v]
- * is unset or values differ
+ *              is unset or values differ
  */
 function var_eq($v, $t)
 {
@@ -34,7 +35,8 @@ function var_eq($v, $t)
 
 /**
  * Get the value of $vars[$v], if it exists
- * @param string $v Name of the var to get
+ *
+ * @param  string  $v  Name of the var to get
  * @return string|bool The value of $vars[$v] if it exists, false if it does not exist
  */
 function var_get($v)
@@ -82,7 +84,7 @@ function toner2colour($descr, $percent)
 /**
  * Find all links in some text and turn them into html links.
  *
- * @param string $text
+ * @param  string  $text
  * @return string
  */
 function linkify($text)
@@ -312,7 +314,8 @@ function generate_entity_link($type, $entity, $text = null, $graph_type = null)
 
 /**
  * Extract type and subtype from a complex graph type, also makes sure variables are file name safe.
- * @param string $type
+ *
+ * @param  string  $type
  * @return array [type, subtype]
  */
 function extract_graph_type($type): array
@@ -347,7 +350,9 @@ function generate_port_link($port, $text = null, $type = null, $overlib = 1, $si
     }
 
     $content = '<div class=list-large>' . $port['hostname'] . ' - ' . Rewrite::normalizeIfName(addslashes(\LibreNMS\Util\Clean::html($port['label'], []))) . '</div>';
-    if ($port['ifAlias']) {
+    if ($port['port_descr_descr']) {
+        $content .= addslashes(\LibreNMS\Util\Clean::html($port['port_descr_descr'], [])) . '<br />';
+    } elseif ($port['ifAlias']) {
         $content .= addslashes(\LibreNMS\Util\Clean::html($port['ifAlias'], [])) . '<br />';
     }
 
@@ -450,8 +455,8 @@ function generate_port_image($args)
 /**
  * Create image to output text instead of a graph.
  *
- * @param string $text
- * @param int[] $color
+ * @param  string  $text
+ * @param  int[]  $color
  */
 function graph_error($text, $color = [128, 0, 0])
 {
@@ -498,7 +503,7 @@ SVG;
 /**
  * Output message to user in image format.
  *
- * @param string $text string to display
+ * @param  string  $text  string to display
  */
 function graph_text_and_exit($text)
 {
@@ -569,7 +574,7 @@ function getlocations()
 /**
  * Get the recursive file size and count for a directory
  *
- * @param string $path
+ * @param  string  $path
  * @return array [size, file count]
  */
 function foldersize($path)
@@ -880,6 +885,7 @@ function dynamic_override_config($type, $name, $device)
  * Return the rows from 'ports' for all ports of a certain type as parsed by port_descr_parser.
  * One or an array of strings can be provided as an argument; if an array is passed, all ports matching
  * any of the types in the array are returned.
+ *
  * @param $types mixed String or strings matching 'port_descr_type's.
  * @return array Rows from the ports table for matching ports.
  */
@@ -1007,7 +1013,7 @@ function array_to_htmljson($data)
 }
 
 /**
- * @param int $eventlog_severity
+ * @param  int  $eventlog_severity
  * @return string $eventlog_severity_icon
  */
 function eventlog_severity($eventlog_severity)
@@ -1030,7 +1036,8 @@ function eventlog_severity($eventlog_severity)
 
 /**
  * Get the http content type of the image
- * @param  string  $type svg or png
+ *
+ * @param  string  $type  svg or png
  * @return string
  */
 function get_image_type(string $type)
@@ -1071,6 +1078,7 @@ function get_oxidized_nodes_list()
 /**
  * Get the fail2ban jails for a device... just requires the device ID
  * an empty return means either no jails or fail2ban is not in use
+ *
  * @param $device_id
  * @return array
  */
@@ -1097,6 +1105,7 @@ function get_fail2ban_jails($device_id)
 /**
  * Get the Postgres databases for a device... just requires the device ID
  * an empty return means Postres is not in use
+ *
  * @param $device_id
  * @return array
  */
@@ -1123,7 +1132,7 @@ function get_postgres_databases($device_id)
 /**
  * Return stacked graphs information
  *
- * @param string $transparency value of desired transparency applied to rrdtool options (values 01 - 99)
+ * @param  string  $transparency  value of desired transparency applied to rrdtool options (values 01 - 99)
  * @return array containing transparency and stacked setup
  */
 function generate_stacked_graphs($transparency = '88')
@@ -1137,7 +1146,8 @@ function generate_stacked_graphs($transparency = '88')
 
 /**
  * Parse AT time spec, does not handle the entire spec.
- * @param string|int $time
+ *
+ * @param  string|int  $time
  * @return int
  */
 function parse_at_time($time)
@@ -1167,6 +1177,7 @@ function parse_at_time($time)
 /**
  * Get the ZFS pools for a device... just requires the device ID
  * an empty return means ZFS is not in use or there are currently no pools
+ *
  * @param $device_id
  * @return array
  */
@@ -1193,6 +1204,7 @@ function get_zfs_pools($device_id)
 /**
  * Get the ports for a device... just requires the device ID
  * an empty return means portsactivity is not in use or there are currently no ports
+ *
  * @param $device_id
  * @return array
  */
@@ -1220,6 +1232,7 @@ function get_portactivity_ports($device_id)
  * Returns the sysname of a device with a html line break prepended.
  * if the device has an empty sysname it will return device's hostname instead
  * And finally if the device has no hostname it will return an empty string
+ *
  * @param array device
  * @return string
  */
@@ -1267,8 +1280,9 @@ function get_state_label($sensor)
 
 /**
  * Get sensor label and state color
- * @param array $sensor
- * @param string $type sensors or wireless
+ *
+ * @param  array  $sensor
+ * @param  string  $type  sensors or wireless
  * @return string
  */
 function get_sensor_label_color($sensor, $type = 'sensors')
@@ -1305,6 +1319,7 @@ function get_sensor_label_color($sensor, $type = 'sensors')
 /**
  * @params int unix time
  * @params int seconds
+ *
  * @return int
  *
  * Rounds down to the nearest interval.
@@ -1322,6 +1337,7 @@ function lowest_time($time, $seconds = 300)
 
 /**
  * @params int
+ *
  * @return string
  *
  * This returns the subpath for working with nfdump.
@@ -1371,6 +1387,7 @@ function time_to_nfsen_subpath($time)
 
 /**
  * @params string hostname
+ *
  * @return string
  *
  * Takes a hostname and transforms it to the name
@@ -1389,6 +1406,7 @@ function nfsen_hostname($hostname)
 
 /**
  * @params string hostname
+ *
  * @return string
  *
  * Takes a hostname and returns the path to the nfsen
@@ -1408,6 +1426,7 @@ function nfsen_live_dir($hostname)
 /**
  * Get the ZFS pools for a device... just requires the device ID
  * an empty return means ZFS is not in use or there are currently no pools
+ *
  * @param $device_id
  * @return array
  */

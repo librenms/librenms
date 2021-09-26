@@ -419,7 +419,9 @@ function add_device(Illuminate\Http\Request $request)
         return api_error(500, $e->getMessage());
     }
 
-    return api_success_noresult(201, "Device $hostname ($device_id) has been added successfully");
+    $device = device_by_id_cache($device_id);
+
+    return api_success([$device], 'devices', $response);
 }
 
 function del_device(Illuminate\Http\Request $request)
@@ -1019,15 +1021,23 @@ function get_port_info(Illuminate\Http\Request $request)
 
 function search_ports(Illuminate\Http\Request $request)
 {
+    $field = $request->route('field');
     $search = $request->route('search');
-    $value = "%$search%";
-    $ports = Port::hasAccess(Auth::user())
-         ->select(['device_id', 'port_id', 'ifIndex', 'ifName'])
-         ->where('ifAlias', 'like', $value)
-         ->orWhere('ifDescr', 'like', $value)
-         ->orWhere('ifName', 'like', $value)
-         ->orderBy('ifName')
-         ->get();
+
+    $query = Port::hasAccess(Auth::user())
+         ->select(['device_id', 'port_id', 'ifIndex', 'ifName']);
+
+    if (isset($search)) {
+        $query->where($field, 'like', "%$search%");
+    } else {
+        $value = "%$field%";
+        $query->where('ifAlias', 'like', $value)
+            ->orWhere('ifDescr', 'like', $value)
+            ->orWhere('ifName', 'like', $value);
+    }
+
+    $ports = $query->orderBy('ifName')
+                   ->get();
 
     if ($ports->isEmpty()) {
         return api_error(404, 'No ports found');
@@ -1395,7 +1405,7 @@ function list_oxidized(Illuminate\Http\Request $request)
              ->whereNotIn('type', Config::get('oxidized.ignore_types', []))
              ->whereNotIn('os', Config::get('oxidized.ignore_os', []))
              ->whereAttributeDisabled('override_Oxidized_disable')
-             ->select(['hostname', 'sysName', 'sysDescr', 'hardware', 'os', 'ip', 'location_id'])
+             ->select(['hostname', 'sysName', 'sysDescr', 'sysObjectID', 'hardware', 'os', 'ip', 'location_id'])
              ->get();
 
     /** @var Device $device */
@@ -1924,6 +1934,54 @@ function get_port_groups(Illuminate\Http\Request $request)
     return api_success($groups->makeHidden('pivot')->toArray(), 'groups', 'Found ' . $groups->count() . ' port groups');
 }
 
+function assign_port_group(Illuminate\Http\Request $request)
+{
+    $port_group_id = $request->route('port_group_id');
+    $data = json_decode($request->getContent(), true);
+    $port_id_list = $data['port_ids'];
+
+    if (json_last_error() || ! is_array($data)) {
+        return api_error(400, "We couldn't parse the provided json. " . json_last_error_msg());
+    }
+
+    if (! isset($port_id_list)) {
+        return api_error(400, "Missing data field 'port_ids' " . json_last_error_msg());
+    }
+
+    $port_group = PortGroup::find($port_group_id);
+    if (! isset($port_group)) {
+        return api_error(404, 'Port Group ID ' . $port_group_id . ' not found');
+    }
+
+    $port_group->ports()->attach($port_id_list);
+
+    return api_success(200, 'Port Ids ' . implode(', ', $port_id_list) . ' have been added to Port Group Id ' . $port_group_id);
+}
+
+function remove_port_group(Illuminate\Http\Request $request)
+{
+    $port_group_id = $request->route('port_group_id');
+    $data = json_decode($request->getContent(), true);
+    $port_id_list = $data['port_ids'];
+
+    if (json_last_error() || ! is_array($data)) {
+        return api_error(400, "We couldn't parse the provided json. " . json_last_error_msg());
+    }
+
+    if (! isset($port_id_list)) {
+        return api_error(400, "Missing data field 'port_ids' " . json_last_error_msg());
+    }
+
+    $port_group = PortGroup::find($port_group_id);
+    if (! isset($port_group)) {
+        return api_error(404, 'Port Group ID ' . $port_group_id . ' not found');
+    }
+
+    $port_group->ports()->detach($port_id_list);
+
+    return api_success(200, 'Port Ids ' . implode(', ', $port_id_list) . ' have been removed from Port Group Id ' . $port_group_id);
+}
+
 function add_device_group(Illuminate\Http\Request $request)
 {
     $data = json_decode($request->getContent(), true);
@@ -1951,7 +2009,9 @@ function add_device_group(Illuminate\Http\Request $request)
     }
 
     $deviceGroup = DeviceGroup::make(['name' => $data['name'], 'type' => $data['type'], 'desc' => $data['desc']]);
-    $deviceGroup->rules = json_decode($data['rules']);
+    if ($data['type'] == 'dynamic') {
+        $deviceGroup->rules = json_decode($data['rules']);
+    }
     $deviceGroup->save();
 
     if ($data['type'] == 'static') {

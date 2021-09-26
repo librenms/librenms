@@ -96,6 +96,9 @@
                 "cisco-ace-loadbalancer": {
                     "type": "boolean"
                 },
+                "entity-state": {
+                    "type": "boolean"
+                },
                 "wifi": {
                     "type": "boolean"
                 },
@@ -231,6 +234,9 @@
                 "cisco-pw": {
                     "type": "boolean"
                 },
+                "entity-state": {
+                    "type": "boolean"
+                },
                 "vrf": {
                     "type": "boolean"
                 },
@@ -357,7 +363,7 @@
                 "type": "string"
             }
         },
-        "nobulk": {
+        "snmp_bulk": {
             "type": "boolean"
         },
         "snmp_max_oid": {
@@ -372,6 +378,7 @@
         "empty_ifdescr": {
             "type": "boolean"
         },
+        "bad_entity_sensor_regex": {"$ref": "#/definitions/regex_group"},
         "bad_if": {
             "type": "array",
             "items": {
@@ -399,6 +406,13 @@
         "processor_stacked": {
             "type": "boolean"
         },
+        "disabled_sensors": {
+            "type": "object",
+            "patternProperties": {
+                ".": {"type": "boolean"}
+            }
+        },
+        "disabled_sensors_regex": {"$ref": "#/definitions/regex_group"},
         "bad_ifname_regexp": {"$ref": "#/definitions/regex_group"},
         "bad_if_regexp": {"$ref": "#/definitions/regex_group"},
         "bad_snmpEngineTime": {

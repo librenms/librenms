@@ -35,6 +35,7 @@
         "genealabs/laravel-caffeine": "^8.0",
         "guzzlehttp/guzzle": "^7.0.1",
         "influxdb/influxdb-php": "^1.14",
+        "justinrainbow/json-schema": "^5.2",
         "laravel/framework": "^8.12",
         "laravel/tinker": "^2.5",
         "laravel/ui": "^3.0",
@@ -59,7 +60,6 @@
         "facade/ignition": "^2.5",
         "fakerphp/faker": "^1.9.1",
         "friendsofphp/php-cs-fixer": "^2.16",
-        "justinrainbow/json-schema": "^5.2",
         "laravel/dusk": "^6.15",
         "mockery/mockery": "^1.4.2",
         "nunomaduro/collision": "^5.0",
@@ -67,6 +67,7 @@
         "php-parallel-lint/php-parallel-lint": "^1.1",
         "phpstan/phpstan-mockery": "^0.12.13",
         "phpunit/phpunit": "^9.3.3",
+        "spaze/phpstan-disallowed-calls": "^1.9",
         "staudenmeir/dusk-updater": "^1.1"
     },
     "suggest": {

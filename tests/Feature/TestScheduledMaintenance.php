@@ -81,7 +81,7 @@ class TestScheduledMaintenance extends DBTestCase
     /**
      * Set the test time
      *
-     * @param Carbon|CarbonImmutable $time
+     * @param  Carbon|CarbonImmutable  $time
      */
     private function setTestNow($time)
     {

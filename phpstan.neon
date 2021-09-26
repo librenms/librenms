@@ -5,6 +5,8 @@ includes:
 
 parameters:
 
+    phpVersion: 70300
+
     paths:
         - app
         - config

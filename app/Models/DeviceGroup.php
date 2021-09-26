@@ -18,6 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2016 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -72,7 +73,7 @@ class DeviceGroup extends BaseModel
     /**
      * Update the device groups for the given device or device_id
      *
-     * @param Device|int $device
+     * @param  Device|int  $device
      * @return array
      */
     public static function updateGroupsFor($device)

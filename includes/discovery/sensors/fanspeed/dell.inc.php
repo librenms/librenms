@@ -10,7 +10,7 @@
  * the source code distribution for details.
  */
 
-$temp = snmpwalk_cache_multi_oid($device, 'coolingDeviceTable', [], 'MIB-Dell-10892');
+$temp = snmpwalk_cache_multi_oid($device, 'coolingDeviceTable', [], 'MIB-Dell-10892', 'dell');
 $cur_oid = '.1.3.6.1.4.1.674.10892.1.700.12.1.6.';
 
 if (is_array($temp)) {

@@ -3,8 +3,10 @@
  * LibreNMS - ADVA device support - Temperature Sensors
  *
  * @category   Network_Monitoring
+ *
  * @author     Christoph Zilian <czilian@hotmail.com>
  * @license    https://gnu.org/copyleft/gpl.html GNU GPL
+ *
  * @link       https://github.com/librenms/librenms/
  *
  * This program is free software: you can redistribute it and/or modify it

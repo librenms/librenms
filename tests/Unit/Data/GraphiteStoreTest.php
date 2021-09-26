@@ -18,6 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -90,7 +91,7 @@ class GraphiteStoreTest extends TestCase
     }
 
     /**
-     * @param mixed $mockSocket
+     * @param  mixed  $mockSocket
      * @return Graphite
      */
     private function mockGraphite($mockSocket)

@@ -18,6 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -31,7 +32,7 @@ class MuninPluginController extends SelectController
     /**
      * Defines the base query for this resource
      *
-     * @param \Illuminate\Http\Request $request
+     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Query\Builder
      */
     protected function baseQuery($request)
@@ -44,7 +45,7 @@ class MuninPluginController extends SelectController
     }
 
     /**
-     * @param MuninPlugin $munin_plugin
+     * @param  MuninPlugin  $munin_plugin
      */
     public function formatItem($munin_plugin)
     {
