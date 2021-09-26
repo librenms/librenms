@@ -18,6 +18,4 @@ class HrSystem extends DeviceRelatedModel
             $hrsystem->value_prev = $hrsystem->getRawOriginal('value');
         });
     }
-
-
 }
