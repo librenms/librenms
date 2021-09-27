@@ -61,7 +61,7 @@ class InfluxDB2QueryBuilder extends \App\Graphing\QueryBuilder
         }
 
         $query .= ' |> aggregateWindow(every: 15s, fn: mean, createEmpty: false)' . PHP_EOL;
-        $query .= ' |> yield(name: "mean")' . PHP_EOL;
+        $query .= ' |> yield()' . PHP_EOL;
 
         return $query;
     }

@@ -3681,7 +3681,6 @@
             "type": "integer",
             "default": 0
         },
-
         "influxdb2.token": {
             "type": "password"
         },

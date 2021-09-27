@@ -63,6 +63,12 @@ abstract class QueryBuilder
         return $this;
     }
 
+    public function aggregate($method): QueryBuilder
+    {
+        $this->fields[$this->currentField]['ag'] = $method;
+        return $this;
+    }
+
     public function range(CarbonImmutable $from, CarbonImmutable $to)
     {
         $this->start = $from;
