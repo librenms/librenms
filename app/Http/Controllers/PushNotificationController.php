@@ -25,9 +25,9 @@ class PushNotificationController extends Controller
     {
         $this->validate($request, [
             'description' => 'string',
-            'subscription.endpoint' => 'required',
-            'subscription.keys.auth' => 'required',
-            'subscription.keys.p256dh' => 'required',
+            'subscription.endpoint' => 'required|url',
+            'subscription.keys.auth' => 'required|string',
+            'subscription.keys.p256dh' => 'required|string',
         ]);
 
         $subscription = $request->user()
@@ -38,8 +38,18 @@ class PushNotificationController extends Controller
             );
 
         $subscription->description = $request->get('description');
-        $subscription->save();
+        $success = $subscription->save();
 
-        return response()->json(['success' => true], 200);
+        return response()->json(['success' => $success], 200);
+    }
+
+    public function unregister(Request $request)
+    {
+        $this->validate($request, [
+            'endpoint' => 'required|url',
+        ]);
+
+        $request->user()
+            ->deletePushSubscription($request->input('endpoint'));
     }
 }

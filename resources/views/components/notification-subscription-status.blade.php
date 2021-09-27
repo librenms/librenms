@@ -1,21 +1,4 @@
-<div x-data="{
- supported: 'Notification' in window,
- enabled: 'Notification' in window && Notification.permission === 'granted' && localStorage.getItem('notifications') !== 'disabled',
- toggle() {
-    if (this.enabled) {
-      localStorage.setItem('notifications', 'disabled');
-      this.enabled = false;
-    } else if (Notification.permission === 'granted') {
-      localStorage.setItem('notifications', 'enabled');
-      this.enabled = true;
-    } else {
-      Notification.requestPermission().then((permission) => {
-        localStorage.setItem('notifications', 'enabled');
-        this.enabled = permission === 'granted';
-      });
-    }
- }
-}">
+<div<div x-data="notificationSubscriptionStatus()">
     <div x-show="! supported">@lang('components.notification-subscription-status.no-support')</div>
     @if($userHasTransport)
     <div x-show="supported">
@@ -35,4 +18,47 @@
         @endadmin
     </div>
     @endif
-</div>
+    <script>
+        function notificationSubscriptionStatus() {
+            return {
+                supported: 'Notification' in window,
+                enabled: 'Notification' in window && Notification.permission === 'granted' && localStorage.getItem('notifications') !== 'disabled',
+                toggle() {
+                    if (this.enabled) {
+                        localStorage.setItem('notifications', 'disabled');
+                        this.enabled = false;
+                        navigator.serviceWorker.ready.then(function(serviceWorkerRegistration) {
+                            serviceWorkerRegistration.pushManager.getSubscription()
+                                .then(function(subscription) {
+                                    if (subscription) {
+                                        subscription.unsubscribe().then(function(success) {
+                                            if (success) {
+                                                fetch('./push/unregister', {
+                                                    method: 'post',
+                                                    headers: {
+                                                        'Content-Type': 'application/json',
+                                                        'X-CSRF-Token': '{{ csrf_token() }}'
+                                                    },
+                                                    body: JSON.stringify({
+                                                        endpoint: subscription.endpoint
+                                                    }),
+                                                });
+                                            }
+                                        })
+                                    }
+                                })
+                        })
+                    } else if (Notification.permission === 'granted') {
+                        localStorage.setItem('notifications', 'enabled');
+                        this.enabled = true;
+                    } else {
+                        Notification.requestPermission().then((permission) => {
+                            localStorage.setItem('notifications', 'enabled');
+                            this.enabled = permission === 'granted';
+                        });
+                    }
+                }
+            }
+        }
+    </script>
+</di</div>

@@ -28,20 +28,38 @@ if ('serviceWorker' in navigator) {
                 return;
             }
 
-            // Send the subscription details to the server
             const token = document.querySelector('meta[name=csrf-token]').getAttribute('content');
-            fetch('./push/register', {
-                method: 'post',
-                headers: {
-                    'Accept': 'application/json',
-                    'Content-Type': 'application/json',
-                    'X-CSRF-Token': token
-                },
-                body: JSON.stringify({
-                    description: navigator.userAgent,
-                    subscription: subscription
-                }),
-            });
+
+            if (localStorage.getItem('notifications') === 'disabled') {
+                // disabled by user remove the subscription
+                fetch('./push/unregister', {
+                    method: 'post',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json',
+                        'X-CSRF-Token': token
+                    },
+                    body: JSON.stringify({
+                        endpoint: subscription.endpoint
+                    }),
+                });
+
+            } else {
+                // Send the subscription details to the server
+                fetch('./push/register', {
+                    method: 'post',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json',
+                        'X-CSRF-Token': token
+                    },
+                    body: JSON.stringify({
+                        description: navigator.userAgent,
+                        subscription: subscription
+                    }),
+                });
+
+            }
     });
 }
 

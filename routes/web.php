@@ -62,9 +62,10 @@ Route::group(['middleware' => ['auth'], 'guard' => 'auth'], function () {
 
     // Push notifications
     Route::group(['prefix' => 'push'], function () {
-        Route::get('token', [\App\Http\Controllers\PushNotificationController::class, 'token']);
-        Route::get('key', [\App\Http\Controllers\PushNotificationController::class, 'key']);
-        Route::post('register', [\App\Http\Controllers\PushNotificationController::class, 'register']);
+        Route::get('token', [\App\Http\Controllers\PushNotificationController::class, 'token'])->name('push.token');
+        Route::get('key', [\App\Http\Controllers\PushNotificationController::class, 'key'])->name('push.key');
+        Route::post('register', [\App\Http\Controllers\PushNotificationController::class, 'register'])->name('push.register');
+        Route::post('unregister', [\App\Http\Controllers\PushNotificationController::class, 'unregister'])->name('push.unregister');
     });
 
     // admin pages
