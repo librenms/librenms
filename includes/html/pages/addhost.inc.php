@@ -241,7 +241,7 @@ foreach (get_port_assoc_modes() as $mode) {
               <select name="authalgo" id="authalgo" class="form-control input-sm">
                   <?php
                   foreach (\LibreNMS\SNMPCapabilities::authAlgorithms() as $algo => $enabled) {
-                      echo "<option value=\"$algo\""  . ($enabled ?: ' disabled') . ">$algo</option>";
+                      echo "<option value=\"$algo\"" . ($enabled ?: ' disabled') . ">$algo</option>";
                   }
                   ?>
               </select>
@@ -262,7 +262,7 @@ foreach (get_port_assoc_modes() as $mode) {
               <select name="cryptoalgo" id="cryptoalgo" class="form-control input-sm">
                   <?php
                   foreach (\LibreNMS\SNMPCapabilities::cryptoAlgoritms() as $algo => $enabled) {
-                      echo "<option value=\"$algo\""  . ($enabled ?: ' disabled') . ">$algo</option>";
+                      echo "<option value=\"$algo\"" . ($enabled ?: ' disabled') . ">$algo</option>";
                   }
                   ?>
               </select>
@@ -275,7 +275,7 @@ foreach (get_port_assoc_modes() as $mode) {
       </div>
 <?php
 if (Config::get('distributed_poller') === true) {
-    echo '
+                      echo '
           <div class="form-group">
               <label for="poller_group" class="col-sm-3 control-label">Poller Group</label>
               <div class="col-sm-9">
@@ -283,16 +283,16 @@ if (Config::get('distributed_poller') === true) {
                       <option value="0"> Default poller group</option>
     ';
 
-    foreach (dbFetchRows('SELECT `id`,`group_name` FROM `poller_groups` ORDER BY `group_name`') as $group) {
-        echo '<option value="' . $group['id'] . '">' . $group['group_name'] . '</option>';
-    }
+                      foreach (dbFetchRows('SELECT `id`,`group_name` FROM `poller_groups` ORDER BY `group_name`') as $group) {
+                          echo '<option value="' . $group['id'] . '">' . $group['group_name'] . '</option>';
+                      }
 
-    echo '
+                      echo '
                   </select>
               </div>
           </div>
     ';
-}//endif
+                  }//endif
 ?>
       <div class="form-group">
           <label for="force_add" class="col-sm-3 control-label">Force add<br><small>(No ICMP or SNMP checks performed)</small></label>

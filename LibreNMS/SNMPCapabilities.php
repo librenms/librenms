@@ -56,7 +56,7 @@ class SNMPCapabilities
 
         return self::$aes256;
     }
-    
+
     public static function supportedAuthAlgorithms(): array
     {
         return array_keys(array_filter(self::authAlgorithms()));
@@ -84,7 +84,7 @@ class SNMPCapabilities
     public static function cryptoAlgoritms(): array
     {
         $aes256 = self::supportsAES256();
-        
+
         return [
             'AES' => true,
             'AES-192' => $aes256,
