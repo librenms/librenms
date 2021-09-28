@@ -733,13 +733,12 @@ hrSystem:
   Columns:
     - { Field: hrSystem_id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
     - { Field: device_id, Type: 'int unsigned', 'Null': false, Extra: '' }
-    - { Field: key, Type: varchar(32), 'Null': false, Extra: '' },
-    - { Field: value, Type: varchar(32), 'Null': true, Extra: '' },
-    - { Field: value_prev, Type: varchar(32), 'Null': true, Extra: '' },
+    - { Field: hrSystemNumUsers, Type: int, 'Null': false, Extra: '', Default: '0' }
+    - { Field: hrSystemProcesses, Type: int, 'Null': false, Extra: '', Default: '0' }
+    - { Field: hrSystemMaxProcesses, Type: int, 'Null': false, Extra: '', Default: '0' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [hrSystem_id], Unique: true, Type: BTREE }
     hrsystem_device_id_index: { Name: hrsystem_device_id_index, Columns: [device_id], Unique: false, Type: BTREE }
-    hrsystem_device_id_key_unique: { Name: hrsystem_device_id_key_unique, Columns: [device_id, key], Unique: true, Type: BTREE }
 ipsec_tunnels:
   Columns:
     - { Field: tunnel_id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
