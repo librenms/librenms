@@ -30,6 +30,9 @@ return [
             'no-validation' => 'Cannot set :setting, it is missing validation definition.',
         ],
     ],
+    'db:seed' => [
+        'existing_config' => 'Database contains existing settings. Continue?',
+    ],
     'dev:check' => [
         'description' => 'LibreNMS code checks. Running with no options runs all checks',
         'arguments' => [

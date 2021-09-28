@@ -43,9 +43,10 @@ if __name__ == "__main__":
 
     if args.verbose:
         logging.getLogger().setLevel(logging.INFO)
-
-    if args.debug:
+    elif args.debug:
         logging.getLogger().setLevel(logging.DEBUG)
+    else:
+        logging.getLogger().setLevel(logging.WARNING)
 
     info("Configuring LibreNMS service")
     try:
