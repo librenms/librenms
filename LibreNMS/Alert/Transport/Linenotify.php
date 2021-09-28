@@ -6,6 +6,7 @@
 namespace LibreNMS\Alert\Transport;
 
 use LibreNMS\Alert\Transport;
+use LibreNMS\Util\Proxy;
 
 class Linenotify extends Transport
 {
@@ -25,6 +26,7 @@ class Linenotify extends Transport
         $lineFields = ['message' => $obj['msg']];
 
         $curl = curl_init();
+        Proxy::applyToCurl($curl);
         curl_setopt($curl, CURLOPT_URL, $lineUrl);
         curl_setopt($curl, CURLOPT_HTTPHEADER, $lineHead);
         curl_setopt($curl, CURLOPT_NOBODY, false);

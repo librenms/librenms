@@ -25,6 +25,7 @@
 namespace LibreNMS\Alert\Transport;
 
 use LibreNMS\Alert\Transport;
+use LibreNMS\Util\Proxy;
 
 class Api extends Transport
 {
@@ -72,7 +73,7 @@ class Api extends Transport
         }
 
         $client = new \GuzzleHttp\Client();
-        $request_opts['proxy'] = get_guzzle_proxy();
+        $request_opts['proxy'] = Proxy::forGuzzle();
         if (isset($auth) && ! empty($auth[0])) {
             $request_opts['auth'] = $auth;
         }

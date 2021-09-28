@@ -24,6 +24,7 @@
 namespace LibreNMS\Alert\Transport;
 
 use LibreNMS\Alert\Transport;
+use LibreNMS\Util\Proxy;
 
 class Ukfastpss extends Transport
 {
@@ -59,7 +60,7 @@ class Ukfastpss extends Transport
         $request_headers['Accept'] = 'application/json';
 
         $client = new \GuzzleHttp\Client();
-        $request_opts['proxy'] = get_guzzle_proxy();
+        $request_opts['proxy'] = Proxy::forGuzzle();
         $request_opts['headers'] = $request_headers;
         $request_opts['body'] = json_encode($body);
 

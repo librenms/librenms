@@ -28,6 +28,7 @@ use Illuminate\Support\Facades\Log;
 use LibreNMS\Alert\Transport;
 use LibreNMS\Config;
 use LibreNMS\Enum\AlertState;
+use LibreNMS\Util\Proxy;
 
 class Sensu extends Transport
 {
@@ -51,6 +52,9 @@ class Sensu extends Transport
         'better' => AlertState::BETTER,
     ];
 
+    /**
+     * @var Client
+     */
     private static $client = null;
 
     public function deliverAlert($obj, $opts)
@@ -74,7 +78,8 @@ class Sensu extends Transport
     {
         // The Sensu agent should be running on the poller - events can be sent directly to the backend but this has not been tested, and likely needs mTLS.
         // The agent API is documented at https://docs.sensu.io/sensu-go/latest/reference/agent/#create-monitoring-events-using-the-agent-api
-        if (Sensu::$client->request('GET', $opts['url'] . '/healthz')->getStatusCode() !== 200) {
+        $request_options = ['proxy' => Proxy::forGuzzle()];
+        if (Sensu::$client->request('GET', $opts['url'] . '/healthz', $request_options)->getStatusCode() !== 200) {
             return 'Sensu API is not responding';
         }
 
@@ -83,7 +88,8 @@ class Sensu extends Transport
             $data = Sensu::generateData($obj, $opts, Sensu::OK, round(Config::get('rrd.step', 300) / 2));
             Log::debug('Sensu transport sent last good event to socket: ', $data);
 
-            $result = Sensu::$client->request('POST', $opts['url'] . '/events', ['json' => $data]);
+            $request_options['json'] = $data;
+            $result = Sensu::$client->request('POST', $opts['url'] . '/events', $request_options);
             if ($result->getStatusCode() !== 202) {
                 return $result->getReasonPhrase();
             }
@@ -94,7 +100,8 @@ class Sensu extends Transport
         $data = Sensu::generateData($obj, $opts, Sensu::calculateStatus($obj['state'], $obj['severity']));
         Log::debug('Sensu transport sent event to socket: ', $data);
 
-        $result = Sensu::$client->request('POST', $opts['url'] . '/events', ['json' => $data]);
+        $request_options['json'] = $data;
+        $result = Sensu::$client->request('POST', $opts['url'] . '/events', $request_options);
         if ($result->getStatusCode() === 202) {
             return true;
         }

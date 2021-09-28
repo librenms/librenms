@@ -28,6 +28,7 @@ use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Http\Request;
 use LibreNMS\Alert\Transport;
 use LibreNMS\Enum\AlertState;
+use LibreNMS\Util\Proxy;
 use Log;
 use Validator;
 
@@ -82,7 +83,7 @@ class Pagerduty extends Transport
         $client = new Client();
 
         $request_opts = ['json' => $data];
-        $request_opts['proxy'] = get_proxy();
+        $request_opts['proxy'] = Proxy::forGuzzle();
 
         try {
             $result = $client->request('POST', $url, $request_opts);

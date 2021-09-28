@@ -18,6 +18,7 @@
 namespace LibreNMS\Alert\Transport;
 
 use LibreNMS\Alert\Transport;
+use LibreNMS\Util\Proxy;
 
 class Signalwire extends Transport
 {
@@ -56,7 +57,7 @@ class Signalwire extends Transport
 
         $curl = curl_init($url);
 
-        // set_curl_proxy($curl);
+        Proxy::applyToCurl($curl);
 
         curl_setopt($curl, CURLOPT_POST, true);
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);

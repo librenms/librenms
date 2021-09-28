@@ -22,7 +22,6 @@ use LibreNMS\Modules\Core;
 use LibreNMS\Util\Debug;
 use LibreNMS\Util\IPv4;
 use LibreNMS\Util\IPv6;
-use PHPMailer\PHPMailer\PHPMailer;
 use Symfony\Component\Process\Process;
 
 function array_sort_by_column($array, $on, $order = SORT_ASC)
@@ -757,82 +756,12 @@ function log_event($text, $device = null, $type = null, $severity = 2, $referenc
 // Parse string with emails. Return array with email (as key) and name (as value)
 function parse_email($emails)
 {
-    $result = [];
-    $regex = '/^[\"\']?([^\"\']+)[\"\']?\s{0,}<([^@]+@[^>]+)>$/';
-    if (is_string($emails)) {
-        $emails = preg_split('/[,;]\s{0,}/', $emails);
-        foreach ($emails as $email) {
-            if (preg_match($regex, $email, $out, PREG_OFFSET_CAPTURE)) {
-                $result[$out[2][0]] = $out[1][0];
-            } else {
-                if (strpos($email, '@')) {
-                    $from_name = Config::get('email_user');
-                    $result[$email] = $from_name;
-                }
-            }
-        }
-    } else {
-        // Return FALSE if input not string
-        return false;
-    }
-
-    return $result;
+    return \LibreNMS\Util\Mail::parseEmails($emails);
 }
 
 function send_mail($emails, $subject, $message, $html = false)
 {
-    if (is_array($emails) || ($emails = parse_email($emails))) {
-        d_echo("Attempting to email $subject to: " . implode('; ', array_keys($emails)) . PHP_EOL);
-        $mail = new PHPMailer(true);
-        try {
-            $mail->Hostname = php_uname('n');
-
-            foreach (parse_email(Config::get('email_from')) as $from => $from_name) {
-                $mail->setFrom($from, $from_name);
-            }
-            foreach ($emails as $email => $email_name) {
-                $mail->addAddress($email, $email_name);
-            }
-            $mail->Subject = $subject;
-            $mail->XMailer = Config::get('project_name');
-            $mail->CharSet = 'utf-8';
-            $mail->WordWrap = 76;
-            $mail->Body = $message;
-            if ($html) {
-                $mail->isHTML(true);
-            }
-            switch (strtolower(trim(Config::get('email_backend')))) {
-                case 'sendmail':
-                    $mail->Mailer = 'sendmail';
-                    $mail->Sendmail = Config::get('email_sendmail_path');
-                    break;
-                case 'smtp':
-                    $mail->isSMTP();
-                    $mail->Host = Config::get('email_smtp_host');
-                    $mail->Timeout = Config::get('email_smtp_timeout');
-                    $mail->SMTPAuth = Config::get('email_smtp_auth');
-                    $mail->SMTPSecure = Config::get('email_smtp_secure');
-                    $mail->Port = Config::get('email_smtp_port');
-                    $mail->Username = Config::get('email_smtp_username');
-                    $mail->Password = Config::get('email_smtp_password');
-                    $mail->SMTPAutoTLS = Config::get('email_auto_tls');
-                    $mail->SMTPDebug = false;
-                    break;
-                default:
-                    $mail->Mailer = 'mail';
-                    break;
-            }
-            $mail->send();
-
-            return true;
-        } catch (\PHPMailer\PHPMailer\Exception $e) {
-            return $e->errorMessage();
-        } catch (Exception $e) {
-            return $e->getMessage();
-        }
-    }
-
-    return 'No contacts found';
+    return \LibreNMS\Util\Mail::send($emails, $subject, $message, $html);
 }
 
 function hex2str($hex)
@@ -1100,13 +1029,7 @@ function guidv4($data)
  */
 function set_curl_proxy($curl)
 {
-    $proxy = get_proxy();
-
-    $tmp = rtrim($proxy, '/');
-    $proxy = str_replace(['http://', 'https://'], '', $tmp);
-    if (! empty($proxy)) {
-        curl_setopt($curl, CURLOPT_PROXY, $proxy);
-    }
+    \LibreNMS\Util\Proxy::applyToCurl($curl);
 }
 
 /**
@@ -1116,12 +1039,7 @@ function set_curl_proxy($curl)
  */
 function get_guzzle_proxy()
 {
-    $proxy = get_proxy();
-
-    $tmp = rtrim($proxy, '/');
-    $proxy = str_replace(['http://', 'https://'], '', $tmp);
-
-    return empty($proxy) ? '' : ('tcp://' . $proxy);
+    return \LibreNMS\Util\Proxy::forGuzzle();
 }
 
 /**
@@ -1131,17 +1049,7 @@ function get_guzzle_proxy()
  */
 function get_proxy()
 {
-    if (getenv('http_proxy')) {
-        return getenv('http_proxy');
-    } elseif (getenv('https_proxy')) {
-        return getenv('https_proxy');
-    } elseif ($callback_proxy = Config::get('callback_proxy')) {
-        return $callback_proxy;
-    } elseif ($http_proxy = Config::get('http_proxy')) {
-        return $http_proxy;
-    }
-
-    return false;
+    return \LibreNMS\Util\Proxy::get();
 }
 
 function target_to_id($target)

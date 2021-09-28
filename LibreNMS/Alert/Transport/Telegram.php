@@ -26,6 +26,7 @@
 namespace LibreNMS\Alert\Transport;
 
 use LibreNMS\Alert\Transport;
+use LibreNMS\Util\Proxy;
 
 class Telegram extends Transport
 {
@@ -41,7 +42,7 @@ class Telegram extends Transport
     public static function contactTelegram($obj, $data)
     {
         $curl = curl_init();
-        set_curl_proxy($curl);
+        Proxy::applyToCurl($curl);
         $text = urlencode($obj['msg']);
         $format = '';
         if ($data['format']) {
