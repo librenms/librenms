@@ -7,7 +7,6 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Hash;
@@ -205,9 +204,9 @@ class User extends Authenticatable
 
     // ---- Define Relationships ----
 
-    public function apiToken(): HasOne
+    public function apiTokens(): HasMany
     {
-        return $this->hasOne(\App\Models\ApiToken::class, 'user_id', 'user_id');
+        return $this->hasMany(\App\Models\ApiToken::class, 'user_id', 'user_id');
     }
 
     public function devices()
