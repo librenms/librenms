@@ -148,8 +148,8 @@ def check_for_file(file):
 
 
 def get_config_data(base_dir):
-    check_for_file(os.path.join(base_dir, ".env"))
-    env_path = "{}/.env".format(base_dir)
+    env_path = os.path.join(base_dir, ".env")
+    check_for_file(env_path)
 
     try:
         import dotenv
