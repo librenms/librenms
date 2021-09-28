@@ -27,6 +27,8 @@ use LibreNMS\Alert\Transport;
 
 class Smsfeedback extends Transport
 {
+    protected $name = 'SMSfeedback';
+
     public function deliverAlert($obj, $opts)
     {
         $smsfeedback_opts['user'] = $this->config['smsfeedback-user'];

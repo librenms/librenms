@@ -27,6 +27,8 @@ use LibreNMS\Alert\Transport;
 
 class Playsms extends Transport
 {
+    protected $name = 'playSMS';
+
     public function deliverAlert($obj, $opts)
     {
         $playsms_opts['url'] = $this->config['playsms-url'];

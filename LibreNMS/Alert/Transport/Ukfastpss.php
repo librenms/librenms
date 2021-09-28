@@ -27,6 +27,8 @@ use LibreNMS\Alert\Transport;
 
 class Ukfastpss extends Transport
 {
+    protected $name = 'UKFast PSS';
+
     public function deliverAlert($obj, $opts)
     {
         return $this->contactUkfastpss($obj, $opts);

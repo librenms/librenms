@@ -17,6 +17,8 @@ use LibreNMS\Config;
 
 class Osticket extends Transport
 {
+    protected $name = 'osTicket';
+
     public function deliverAlert($obj, $opts)
     {
         if (! empty($this->config)) {

@@ -29,6 +29,8 @@ use LibreNMS\Enum\AlertState;
 
 class Victorops extends Transport
 {
+    protected $name = 'VictorOps';
+
     public function deliverAlert($obj, $opts)
     {
         if (! empty($this->config)) {

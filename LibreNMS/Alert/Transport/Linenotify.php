@@ -9,6 +9,8 @@ use LibreNMS\Alert\Transport;
 
 class Linenotify extends Transport
 {
+    protected $name = 'LINE Notify';
+
     public function deliverAlert($obj, $opts)
     {
         $opts['line-notify-access-token'] = $this->config['line-notify-access-token'];

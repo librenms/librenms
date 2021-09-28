@@ -28,6 +28,8 @@ use LibreNMS\Alert\Transport;
 
 class Smseagle extends Transport
 {
+    protected $name = 'SMSEagle';
+
     public function deliverAlert($obj, $opts)
     {
         $smseagle_opts['url'] = $this->config['smseagle-url'];

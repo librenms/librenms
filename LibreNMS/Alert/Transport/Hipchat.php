@@ -28,6 +28,8 @@ use LibreNMS\Alert\Transport;
 
 class Hipchat extends Transport
 {
+    protected $name = 'HipChat';
+
     public function deliverAlert($obj, $opts)
     {
         $hipchat_opts = $this->parseUserOptions($this->config['hipchat-options']);

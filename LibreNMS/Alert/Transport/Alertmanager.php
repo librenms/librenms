@@ -28,6 +28,8 @@ use LibreNMS\Enum\AlertState;
 
 class Alertmanager extends Transport
 {
+    protected $name = 'Alert Manager';
+
     public function deliverAlert($obj, $opts)
     {
         $alertmanager_opts = $this->parseUserOptions($this->config['alertmanager-options']);

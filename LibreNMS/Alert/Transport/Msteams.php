@@ -16,6 +16,8 @@ use LibreNMS\Alert\Transport;
 
 class Msteams extends Transport
 {
+    protected $name = "Microsoft Teams";
+
     public function deliverAlert($obj, $opts)
     {
         if (! empty($this->config)) {

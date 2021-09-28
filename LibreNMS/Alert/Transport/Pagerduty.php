@@ -33,6 +33,7 @@ use Validator;
 
 class Pagerduty extends Transport
 {
+    protected $name = 'PagerDuty';
     public static $integrationKey = '2fc7c9f3c8030e74aae6';
 
     public function deliverAlert($obj, $opts)

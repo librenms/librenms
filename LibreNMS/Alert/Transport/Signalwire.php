@@ -21,6 +21,8 @@ use LibreNMS\Alert\Transport;
 
 class Signalwire extends Transport
 {
+    protected $name = 'SignalWire';
+
     public function deliverAlert($obj, $opts)
     {
         $signalwire_opts['spaceUrl'] = $this->config['signalwire-spaceUrl'];

@@ -28,6 +28,8 @@ use Log;
 
 class Googlechat extends Transport
 {
+    protected $name = 'Google Chat';
+
     public function deliverAlert($obj, $opts)
     {
         $googlechat_conf['webhookurl'] = $this->config['googlechat-webhook'];

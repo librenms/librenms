@@ -16,6 +16,8 @@ use LibreNMS\Alert\Transport;
 
 class Ciscospark extends Transport
 {
+    protected $name = 'Cisco Spark';
+
     public function deliverAlert($obj, $opts)
     {
         if (empty($this->config)) {
