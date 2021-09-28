@@ -17,7 +17,7 @@ use LibreNMS\Util\Proxy;
 
 class Msteams extends Transport
 {
-    protected $name = "Microsoft Teams";
+    protected $name = 'Microsoft Teams';
 
     public function deliverAlert($obj, $opts)
     {

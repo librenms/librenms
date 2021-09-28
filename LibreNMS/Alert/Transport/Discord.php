@@ -33,7 +33,7 @@ use LibreNMS\Util\Proxy;
 
 class Discord extends Transport
 {
-    const ALERT_FIELDS_TO_DISCORD_FIELDS = [
+    public const ALERT_FIELDS_TO_DISCORD_FIELDS = [
         'timestamp' => 'Timestamp',
         'severity' => 'Severity',
         'hostname' => 'Hostname',

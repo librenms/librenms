@@ -33,10 +33,10 @@ use LibreNMS\Util\Proxy;
 class Sensu extends Transport
 {
     // Sensu alert coding
-    const OK = 0;
-    const WARNING = 1;
-    const CRITICAL = 2;
-    const UNKNOWN = 3;
+    public const OK = 0;
+    public const WARNING = 1;
+    public const CRITICAL = 2;
+    public const UNKNOWN = 3;
 
     private static $status = [
         'ok' => Sensu::OK,

@@ -76,9 +76,11 @@ class Browserpush extends Transport
     {
         if ($this->config['user'] == 0) {
             $count = \DB::table('push_subscriptions')->count();
+
             return "All users: $count subscriptions";
         } elseif ($user = User::find($this->config['user'])) {
             $count = $user->pushSubscriptions()->count();
+
             return "User: $user->username ($count subscriptions)";
         }
 
