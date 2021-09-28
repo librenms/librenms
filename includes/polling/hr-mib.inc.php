@@ -38,7 +38,7 @@ if (is_numeric($hrSystem[0]['hrSystemNumUsers'])) {
     $current_device->hostResourceValues()->updateOrCreate(['device_id' => $current_device->id, 'key' => 'num_users'],
                                                           ['hrSystemNumUsers' => $hrSystem[0]['hrSystemNumUsers'],
                                                               'hrSystemProcesses' => $hrSystem[0]['hrSystemProcesses'],
-                                                              'hrSystemMaxProcesses' => $hrSystem[0]['hrSystemMaxProcesses']]);
+                                                              'hrSystemMaxProcesses' => $hrSystem[0]['hrSystemMaxProcesses'], ]);
     $os->enableGraph('hr_users');
     echo ' Users';
 }
