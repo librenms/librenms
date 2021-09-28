@@ -241,7 +241,7 @@ class User extends Authenticatable
     {
         return $this->hasMany(NotificationAttrib::class, 'user_id');
     }
-    
+
     public function preferences(): HasMany
     {
         return $this->hasMany(\App\Models\UserPref::class, 'user_id');
