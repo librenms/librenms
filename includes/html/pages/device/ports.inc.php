@@ -103,7 +103,15 @@ if ($vars['view'] == 'minigraphs') {
 
     foreach (dbFetchRows('select * from ports WHERE device_id = ? AND `disabled` = 0 ORDER BY ifIndex', [$device['device_id']]) as $port) {
         $port = cleanPort($port, $device);
-        echo "<div class='minigraph-div'><div style='font-weight: bold;'>" . generate_port_link($port) . '</div></div>';
+        echo "<div class='minigraph-div'><div style='font-weight: bold;'>" . generate_port_link($port) . '</div>
+        <a href="' . generate_port_url($port) . "\" onmouseover=\"return overlib('<div class=\'overlib-content\'>\
+            <div class=\'overlib-text\'>" . $device['hostname'] . ' - ' . $port['ifDescr'] . "</div>\
+        <img src=\'graph.php?type=" . $graph_type . '&amp;id=' . $port['port_id'] . '&amp;from=' . $from . '&amp;to=' . \LibreNMS\Config::get('time.now') . "&amp;width=450&amp;height=150\'>\
+        </div>\
+        ', CENTER, LEFT, FGCOLOR, '#e5e5e5', BGCOLOR, '#e5e5e5', WIDTH, 400, HEIGHT, 150);\" onmouseout=\"return nd();\"  >" . "<img src='graph.php?type=" . $graph_type . '&amp;id=' . $port['port_id'] . '&amp;from=' . $from . '&amp;to=' . \LibreNMS\Config::get('time.now') . "&amp;width=180&amp;height=45&amp;legend=no'>
+        </a>
+        <div style='font-size: 9px;'>" . substr(short_port_descr($port['ifAlias']), 0, 32) . '</div>
+        </div>';
     }
 
     echo '</div>';
