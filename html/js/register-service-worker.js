@@ -30,7 +30,7 @@ if ('serviceWorker' in navigator) {
 
             const token = document.querySelector('meta[name=csrf-token]').getAttribute('content');
 
-            if (localStorage.getItem('notifications') === 'disabled') {
+            if (localStorage.getItem('notifications') === 'disabled' || Notification.permission === "denied") {
                 // disabled by user remove the subscription
                 fetch('./push/unregister', {
                     method: 'post',
