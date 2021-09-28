@@ -28,6 +28,8 @@ use LibreNMS\Alert\Transport;
 
 class Api extends Transport
 {
+    protected $name = 'API';
+
     public function deliverAlert($obj, $opts)
     {
         $url = $this->config['api-url'];

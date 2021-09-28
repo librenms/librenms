@@ -79,7 +79,7 @@ if (Auth::user()->hasGlobalAdmin()) {
 
         echo '<form method="post" role="form" id="' . strtolower($transport) . '-form" class="form-horizontal transport">';
         echo csrf_field();
-        echo '<input type="hidden" name="transport-type" id="transport-type" value="' . strtolower($transport) . '">';
+        echo '<input type="hidden" name="transport-type" value="' . strtolower($transport) . '">';
 
         $tmp = call_user_func($class . '::configTemplate');
 
