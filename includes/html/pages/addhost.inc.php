@@ -190,7 +190,6 @@ foreach (get_port_assoc_modes() as $mode) {
     echo "              <option value=\"$mode\" $selected>$mode</option>\n";
 }
 
-['sha2' => $snmpv3_sha2, 'aes256' => $snmpv3_aes256] = snmpv3_capabilities();
 ?>
             </select>
           </div>
@@ -240,14 +239,13 @@ foreach (get_port_assoc_modes() as $mode) {
             <label for="authalgo" class="col-sm-3 control-label">Auth Algorithm</label>
             <div class="col-sm-9">
               <select name="authalgo" id="authalgo" class="form-control input-sm">
-                <option value="MD5" selected>MD5</option>
-                <option value="SHA">SHA</option>
-                <option value="SHA-224"<?= $snmpv3_sha2 ?: ' disabled'?>>SHA-224</option>
-                <option value="SHA-256"<?= $snmpv3_sha2 ?: ' disabled'?>>SHA-256</option>
-                <option value="SHA-384"<?= $snmpv3_sha2 ?: ' disabled'?>>SHA-384</option>
-                <option value="SHA-512"<?= $snmpv3_sha2 ?: ' disabled'?>>SHA-512</option>
+                  <?php
+                  foreach (\LibreNMS\SNMPCapabilities::authAlgorithms() as $algo => $enabled) {
+                      echo "<option value=\"$algo\""  . ($enabled ?: ' disabled') . ">$algo</option>";
+                  }
+                  ?>
               </select>
-              <?php if (! $snmpv3_sha2) {?>
+              <?php if (! \LibreNMS\SNMPCapabilities::supportsSHA2()) {?>
               <label class="text-left"><small>Some options are disabled. <a href="https://docs.librenms.org/Support/FAQ/#optional-requirements-for-snmpv3-sha2-auth">Read more here</a></small></label>
               <?php } ?>
             </div>
@@ -262,13 +260,13 @@ foreach (get_port_assoc_modes() as $mode) {
             <label for="cryptoalgo" class="col-sm-3 control-label">Crypto Algorithm</label>
             <div class="col-sm-9">
               <select name="cryptoalgo" id="cryptoalgo" class="form-control input-sm">
-                <option value="AES" selected>AES</option>
-                <option value="AES-192"<?= $snmpv3_aes256 ?: ' disabled'?>>AES-192</option>
-                <option value="AES-256"<?= $snmpv3_aes256 ?: ' disabled'?>>AES-256</option>
-                <option value="AES-256-C"<?= $snmpv3_aes256 ?: ' disabled'?>>AES-256-C</option>
-                <option value="DES">DES</option>
+                  <?php
+                  foreach (\LibreNMS\SNMPCapabilities::cryptoAlgoritms() as $algo => $enabled) {
+                      echo "<option value=\"$algo\""  . ($enabled ?: ' disabled') . ">$algo</option>";
+                  }
+                  ?>
               </select>
-              <?php if (! $snmpv3_aes256) {?>
+              <?php if (! \LibreNMS\SNMPCapabilities::supportsAES256()) {?>
               <label class="text-left"><small>Some options are disabled. <a href="https://docs.librenms.org/Support/FAQ/#optional-requirements-for-snmpv3-sha2-auth">Read more here</a></small></label>
               <?php } ?>
             </div>

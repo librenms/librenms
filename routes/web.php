@@ -91,6 +91,7 @@ Route::group(['middleware' => ['auth'], 'guard' => 'auth'], function () {
             Route::post('set_resolution', 'ResolutionController@set');
             Route::get('netcmd', 'NetCommand@run');
             Route::post('ripe/raw', 'RipeNccApiController@raw');
+            Route::get('snmp/capabilities', 'SnmpCapabilities')->name('snmp.capabilities');
         });
 
         Route::get('settings/list', 'SettingsController@listAll')->name('settings.list');
