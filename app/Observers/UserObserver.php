@@ -15,7 +15,7 @@ class UserObserver
     public function deleted(User $user)
     {
         $user->apiTokens()->delete();
-        $user->notifications()->delete();
+        $user->notificationAttribs()->delete();
         $user->preferences()->delete();
         $user->pushSubscriptions()->delete();
     }
