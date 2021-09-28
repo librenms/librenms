@@ -38,6 +38,7 @@ class Prometheus extends BaseDatastore
     private $base_uri;
     private $default_opts;
     private $enabled;
+    private $prefix;
 
     public function __construct(\GuzzleHttp\Client $client)
     {
