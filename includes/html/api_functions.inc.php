@@ -12,8 +12,10 @@
  * the source code distribution for details.
  */
 
+use App\Models\Availability;
 use App\Models\Device;
 use App\Models\DeviceGroup;
+use App\Models\DeviceOutage;
 use App\Models\OspfPort;
 use App\Models\Port;
 use App\Models\PortGroup;
@@ -357,10 +359,65 @@ function list_devices(Illuminate\Http\Request $request)
     return api_success($devices, 'devices');
 }
 
-function maintenance_device(Illuminate\Http\Request $request)
+function add_device(Illuminate\Http\Request $request)
 {
-    if (empty($request->json())) {
-        return api_error(400, 'No information has been provided to set this device into maintenance');
+    // This will add a device using the data passed encoded with json
+    // FIXME: Execution flow through this function could be improved
+    $data = json_decode($request->getContent(), true);
+
+    $additional = [];
+    // keep scrutinizer from complaining about snmpver not being set for all execution paths
+    $snmpver = 'v2c';
+    if (empty($data)) {
+        return api_error(400, 'No information has been provided to add this new device');
+    }
+    if (empty($data['hostname'])) {
+        return api_error(400, 'Missing the device hostname');
+    }
+
+    $hostname = $data['hostname'];
+    $port = $data['port'] ?: Config::get('snmp.port');
+    $transport = $data['transport'] ?: 'udp';
+    $poller_group = $data['poller_group'] ?: 0;
+    $force_add = $data['force_add'] ? true : false;
+    $snmp_disable = ($data['snmp_disable']);
+    if ($snmp_disable) {
+        $additional = [
+            'sysName'      => $data['sysName'] ?: '',
+            'os'           => $data['os'] ?: 'ping',
+            'hardware'     => $data['hardware'] ?: '',
+            'snmp_disable' => 1,
+        ];
+    } elseif ($data['version'] == 'v1' || $data['version'] == 'v2c') {
+        if ($data['community']) {
+            Config::set('snmp.community', [$data['community']]);
+        }
+
+        $snmpver = $data['version'];
+    } elseif ($data['version'] == 'v3') {
+        $v3 = [
+            'authlevel'  => $data['authlevel'],
+            'authname'   => $data['authname'],
+            'authpass'   => $data['authpass'],
+            'authalgo'   => $data['authalgo'],
+            'cryptopass' => $data['cryptopass'],
+            'cryptoalgo' => $data['cryptoalgo'],
+        ];
+
+        $v3_config = Config::get('snmp.v3');
+        array_unshift($v3_config, $v3);
+        Config::set('snmp.v3', $v3_config);
+        $snmpver = 'v3';
+    } else {
+        return api_error(400, 'You haven\'t specified an SNMP version to use');
+    }
+
+    $additional['overwrite_ip'] = $data['overwrite_ip'] ?: null;
+
+    try {
+        $device_id = addHost($hostname, $snmpver, $port, $transport, $poller_group, $force_add, 'ifIndex', $additional);
+    } catch (Exception $e) {
+        return api_error(500, $e->getMessage());
     }
 
     $device = device_by_id_cache($device_id);
@@ -370,6 +427,41 @@ function maintenance_device(Illuminate\Http\Request $request)
 
 function del_device(Illuminate\Http\Request $request)
 {
+    // This will add a device using the data passed encoded with json
+    $hostname = $request->route('hostname');
+
+    if (empty($hostname)) {
+        return api_error(400, 'No hostname has been provided to delete');
+    }
+
+    // allow deleting by device_id or hostname
+    $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
+    $device = null;
+    if ($device_id) {
+        // save the current details for returning to the client on successful delete
+        $device = device_by_id_cache($device_id);
+    }
+
+    if (! $device) {
+        return api_error(404, "Device $hostname not found");
+    }
+
+    $response = delete_device($device_id);
+    if (empty($response)) {
+        // FIXME: Need to provide better diagnostics out of delete_device
+        return api_error(500, 'Device deletion failed');
+    }
+
+    // deletion succeeded - include old device details in response
+    return api_success([$device], 'devices', $response);
+}
+
+function maintenance_device(Illuminate\Http\Request $request)
+{
+    if (empty($request->json())) {
+        return api_error(400, 'No information has been provided to set this device into maintenance');
+    }
+
     // This will add a device using the data passed encoded with json
     $hostname = $request->route('hostname');
 
@@ -404,6 +496,74 @@ function del_device(Illuminate\Http\Request $request)
     }
 
     return api_success_noresult(201, "Device {$device->hostname} ({$device->device_id}) moved into maintenance mode" . ($duration ? " for {$duration}h" : ''));
+}
+
+function device_availability(Illuminate\Http\Request $request)
+{
+    // return availability per device
+
+    $hostname = $request->route('hostname');
+
+    if (empty($hostname)) {
+        return api_error(400, 'No hostname has been provided to get availability');
+    }
+
+    $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
+
+    return check_device_permission($device_id, function ($device_id) {
+        $availabilities = Availability::select('duration', 'availability_perc')
+                      ->where('device_id', '=', $device_id)
+                      ->orderBy('duration', 'ASC');
+
+        return api_success($availabilities->get(), 'availability');
+    });
+}
+
+function device_outages(Illuminate\Http\Request $request)
+{
+    // return outages per device
+
+    $hostname = $request->route('hostname');
+
+    if (empty($hostname)) {
+        return api_error(400, 'No hostname has been provided to get availability');
+    }
+
+    $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
+
+    return check_device_permission($device_id, function ($device_id) {
+        $outages = DeviceOutage::select('going_down', 'up_again')
+                   ->where('device_id', '=', $device_id)
+                   ->orderBy('going_down', 'DESC');
+
+        return api_success($outages->get(), 'outages');
+    });
+}
+
+function get_vlans(Illuminate\Http\Request $request)
+{
+    $hostname = $request->route('hostname');
+
+    if (empty($hostname)) {
+        return api_error(500, 'No hostname has been provided');
+    }
+
+    $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
+    $device = null;
+    if ($device_id) {
+        // save the current details for returning to the client on successful delete
+        $device = device_by_id_cache($device_id);
+    }
+
+    if (! $device) {
+        return api_error(404, "Device $hostname not found");
+    }
+
+    return check_device_permission($device_id, function ($device_id) {
+        $vlans = dbFetchRows('SELECT vlan_vlan,vlan_domain,vlan_name,vlan_type,vlan_mtu FROM vlans WHERE `device_id` = ?', [$device_id]);
+
+        return api_success($vlans, 'vlans');
+    });
 }
 
 function show_endpoints(Illuminate\Http\Request $request, Router $router)
