@@ -45,4 +45,11 @@ interface Transport
      * @return array
      */
     public static function configTemplate();
+
+    /**
+     * Display the configuration details of this alert transport
+     *
+     * @return string
+     */
+    public function displayDetails(): string;
 }

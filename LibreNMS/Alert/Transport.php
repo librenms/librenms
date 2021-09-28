@@ -98,6 +98,36 @@ abstract class Transport implements TransportInterface
     }
 
     /**
+     * Display the configuration details of this alert transport
+     *
+     * @return string
+     */
+    public function displayDetails(): string
+    {
+        $output = '';
+
+        // Iterate through transport config template to display config details
+        $config = static::configTemplate();
+        foreach ($config['config'] as $item) {
+            if ($item['type'] == 'oauth') {
+                continue;
+            }
+
+            $val = $this->config[$item['name']];
+            if ($item['type'] == 'password') {
+                $val = '<b>&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;</b>';
+            } elseif ($item['type'] == 'select') {
+                // Match value to key name for select inputs
+                $val = array_search($val, $item['options']);
+            }
+
+            $output .= $item['title'] . ': ' . $val . PHP_EOL;
+        }
+
+        return $output;
+    }
+
+    /**
      * Get the alert transport class from transport type.
      *
      * @param  string  $type

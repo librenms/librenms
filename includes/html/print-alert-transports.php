@@ -37,30 +37,9 @@ foreach (\App\Models\AlertTransport::all() as $transport) {
     echo '<td>' . $transport->transport_name . '</td>';
     echo '<td>' . $instance->name() . '</td>';
     echo $transport->is_default ? '<td>Yes</td>' : '<td>No</td>';
-    echo "<td class='col-sm-4'>";
+    echo '<td class="col-sm-4"><i>' . nl2br($instance->displayDetails()) . '</i></td>';
 
-    // Iterate through transport config template to display config details
-    $tmp = call_user_func(get_class($instance) . '::configTemplate');
-    foreach ($tmp['config'] as $item) {
-        if ($item['type'] == 'oauth') {
-            continue;
-        }
-
-        $val = $transport->transport_config[$item['name']];
-        if ($item['type'] == 'password') {
-            $val = '<b>&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;</b>';
-        }
-        // Match value to key name for select inputs
-        if ($item['type'] == 'select') {
-            $val = array_search($val, $item['options']);
-        }
-
-        echo '<i>' . $item['title'] . ': ' . $val . '<br/></i>';
-    }
-
-    echo '</td>';
     echo '<td>';
-
     // Add action buttons for admin users only
     if (Auth::user()->hasGlobalAdmin()) {
         echo "<div class='btn-group btn-group-sm' role='group'>";
