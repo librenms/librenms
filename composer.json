@@ -71,8 +71,9 @@
         "staudenmeir/dusk-updater": "^1.1"
     },
     "suggest": {
+        "ext-gmp": "Used for browser push notifications",
         "ext-ldap": "*",
-        "ext-memcached": "Required if you utilize distributed polling",
+        "ext-memcached": "Required if you utilize wrapper based distributed polling",
         "ext-mysqlnd": "*",
         "ext-posix": "Allows for additional validation tests"
     },
