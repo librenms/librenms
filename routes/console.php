@@ -42,8 +42,8 @@ Artisan::command('device:add
     {--r|port=161 : ' . __('SNMP transport port') . '}
     {--u|security-name=root : ' . __('SNMPv3 security username') . '}
     {--A|auth-password= : ' . __('SNMPv3 authentication password') . '}
-    {--a|auth-protocol=md5 : ' . __('SNMPv3 authentication protocol') . ' [md5, sha, sha-512, sha-384, sha-256, sha-224]}
-    {--x|privacy-protocol=aes : ' . __('SNMPv3 privacy protocol') . ' [des, aes]}
+    {--a|auth-protocol=md5 : ' . __('SNMPv3 authentication protocol') . ' [' . implode(', ', \LibreNMS\SNMPCapabilities::supportedAuthAlgorithms()) . ']}
+    {--x|privacy-protocol=aes : ' . __('SNMPv3 privacy protocol') . ' [' . implode(', ', \LibreNMS\SNMPCapabilities::supportedCryptoAlgorithms()) . ']}
     {--X|privacy-password= : ' . __('SNMPv3 privacy password') . '}
     {--P|ping-only : ' . __('Add a ping only device') . '}
     {--o|os=ping : ' . __('Ping only: specify OS') . '}
@@ -60,11 +60,11 @@ Artisan::command('device:add
         $this->error(__('Invalid SNMP transport'));
     }
 
-    if (! in_array($this->option('auth-protocol'), ['md5', 'sha', 'sha-512', 'sha-384', 'sha-256', 'sha-224'])) {
+    if (! in_array($this->option('auth-protocol'), \LibreNMS\SNMPCapabilities::supportedAuthAlgorithms())) {
         $this->error(__('Invalid authentication protocol'));
     }
 
-    if (! in_array($this->option('privacy-protocol'), ['des', 'aes'])) {
+    if (! in_array($this->option('privacy-protocol'), \LibreNMS\SNMPCapabilities::supportedCryptoAlgorithms())) {
         $this->error(__('Invalid privacy protocol'));
     }
 

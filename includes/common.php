@@ -671,23 +671,6 @@ function version_info($remote = false)
 }//end version_info()
 
 /**
- * Checks SNMPv3 capabilities
- *
- * SHA2 for Auth Algorithms (SHA-224,SHA-256,SHA-384,SHA-512)
- * AES-192, AES-256 for Privacy Algorithms
- */
-function snmpv3_capabilities(): array
-{
-    $process = new Process([Config::get('snmpget', 'snmpget'), '--help']);
-    $process->run();
-
-    $ret['sha2'] = Str::contains($process->getErrorOutput(), 'SHA-512');
-    $ret['aes256'] = Str::contains($process->getErrorOutput(), 'AES-256');
-
-    return $ret;
-}
-
-/**
  * Convert a MySQL binary v4 (4-byte) or v6 (16-byte) IP address to a printable string.
  *
  * @param  string  $ip  A binary string containing an IP address, as returned from MySQL's INET6_ATON function
