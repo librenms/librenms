@@ -10,7 +10,7 @@ use LibreNMS\Config;
 
 class AlertTransportController extends Controller
 {
-    public function test(Request $request, AlertTransport $transport)
+    public function test(Request $request, AlertTransport $transport): \Illuminate\Http\JsonResponse
     {
         $device = Device::with('location')->first();
         $obj = [

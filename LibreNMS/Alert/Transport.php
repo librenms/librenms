@@ -36,7 +36,8 @@ abstract class Transport implements TransportInterface
                 $this->config = $transport->transport_config;
             } else {
                 try {
-                    $this->config = \App\Models\AlertTransport::findOrFail($transport)->transport_config;
+                    $model = \App\Models\AlertTransport::findOrFail($transport); /** @var AlertTransport $model */
+                    $this->config = $model->transport_config;
                 } catch (ModelNotFoundException $e) {
                     $this->config = [];
                 }

@@ -43,7 +43,7 @@ class PushNotificationController extends Controller
         return response()->json(['success' => $success], 200);
     }
 
-    public function unregister(Request $request)
+    public function unregister(Request $request): void
     {
         $this->validate($request, [
             'endpoint' => 'required|url',
