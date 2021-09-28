@@ -22,6 +22,7 @@ class AlertTransportController extends Controller
             'location' => $device->location,
             'title' => 'Testing transport from ' . Config::get('project_name'),
             'elapsed'   => '11s',
+            'alert_id'  => '000',
             'id'        => '000',
             'faults'    => false,
             'uid'       => '000',
