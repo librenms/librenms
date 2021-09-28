@@ -72,7 +72,7 @@ class Proxy
     /**
      * Set the proxy on a curl handle
      *
-     * @param resource $curl
+     * @param  resource  $curl
      */
     public static function applyToCurl($curl): void
     {

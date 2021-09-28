@@ -58,7 +58,7 @@ class AlertNotification extends Notification
     }
 
     /**
-     * @param mixed $notifiable
+     * @param  mixed  $notifiable
      * @return string[]
      */
     public function via($notifiable): array
@@ -67,7 +67,7 @@ class AlertNotification extends Notification
     }
 
     /**
-     * @param mixed $notifiable
+     * @param  mixed  $notifiable
      * @param  \Illuminate\Notifications\Notification  $notification
      * @return \NotificationChannels\WebPush\WebPushMessage
      */

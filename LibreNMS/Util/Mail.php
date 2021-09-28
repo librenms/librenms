@@ -34,7 +34,7 @@ class Mail
     /**
      * Parse string with emails. Return array with email (as key) and name (as value)
      *
-     * @param string $emails
+     * @param  string  $emails
      * @return array|false
      */
     public static function parseEmails($emails)
@@ -67,7 +67,7 @@ class Mail
      * @param  string  $emails
      * @param  string  $subject
      * @param  string  $message
-     * @param  bool    $html
+     * @param  bool  $html
      * @return bool|string
      */
     public static function send($emails, $subject, $message, bool $html = false)

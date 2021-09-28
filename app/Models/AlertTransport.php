@@ -14,6 +14,7 @@ use LibreNMS\Alert\Transport;
  * @property string $transport_type
  * @property bool $is_default
  * @property array|null $transport_config
+ *
  * @method static \Illuminate\Database\Eloquent\Builder|AlertTransport newModelQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|AlertTransport newQuery()
  * @method static \Illuminate\Database\Eloquent\Builder|AlertTransport query()
