@@ -3,6 +3,7 @@
 namespace App\Observers;
 
 use App\Models\Device;
+use Log;
 
 class DeviceObserver
 {
@@ -14,7 +15,7 @@ class DeviceObserver
      */
     public function created(Device $device)
     {
-        \Log::event("Device $device->hostname has been created", $device, 'system', 3);
+        Log::event("Device $device->hostname has been created", $device, 'system', 3);
     }
 
     /**
@@ -25,7 +26,7 @@ class DeviceObserver
      */
     public function deleted(Device $device)
     {
-        \Log::event("Device $device->hostname has been deleted", $device, 'system', 3);
+        Log::event("Device $device->hostname has been deleted", $device, 'system', 3);
     }
 
     /**
@@ -44,11 +45,11 @@ class DeviceObserver
         // key attribute changes
         foreach (['os', 'sysName', 'version', 'hardware', 'features', 'serial', 'icon', 'type'] as $attribute) {
             if ($device->isDirty($attribute)) {
-                \Log::event(self::attributeChangedMessage($attribute, $device->$attribute, $device->getOriginal($attribute)), $device, 'system', 3);
+                Log::event(self::attributeChangedMessage($attribute, $device->$attribute, $device->getOriginal($attribute)), $device, 'system', 3);
             }
         }
         if ($device->isDirty('location_id')) {
-            \Log::event(self::attributeChangedMessage('location', (string) $device->location, null), $device, 'system', 3);
+            Log::event(self::attributeChangedMessage('location', (string) $device->location, null), $device, 'system', 3);
         }
     }
 
@@ -61,7 +62,7 @@ class DeviceObserver
     public function deleting(Device $device)
     {
         // delete with NULL Device, so it doesn't get's deleted by daily cleanup scripts
-        \Log::event("Device $device->hostname has been removed", null, 'system', 3);
+        Log::event("Device $device->hostname has been removed", null, 'system', 3);
 
         // delete related data
         $device->ports()->delete();
