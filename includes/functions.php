@@ -302,10 +302,10 @@ function delete_device($id)
     }
 
     $ret = '';
+    $device = DeviceCache::get($id);
 
-    $host = dbFetchCell('SELECT hostname FROM devices WHERE device_id = ?', [$id]);
-    if (empty($host)) {
-        return 'No such host.';
+    if (empty($device->hostname)) {
+        return 'No such device.';
     }
 
     // Remove IPv4/IPv6 addresses before removing ports as they depend on port_id
@@ -340,6 +340,9 @@ function delete_device($id)
     foreach ($fields as $field) {
         foreach (dbFetch('SELECT TABLE_NAME FROM information_schema.columns WHERE table_schema = ? AND column_name = ?', [$db_name, $field]) as $table) {
             $table = $table['TABLE_NAME'];
+            if ($table == 'devices') {
+                continue;
+            }
             $entries = (int) dbDelete($table, "`$field` =  ?", [$id]);
             if ($entries > 0 && Debug::isEnabled()) {
                 $ret .= "$field@$table = #$entries\n";
@@ -347,14 +350,14 @@ function delete_device($id)
         }
     }
 
-    $ex = shell_exec("bash -c '( [ ! -d " . trim(Rrd::dirFromHost($host)) . ' ] || rm -vrf ' . trim(Rrd::dirFromHost($host)) . " 2>&1 ) && echo -n OK'");
+    $ex = shell_exec("bash -c '( [ ! -d " . trim(Rrd::dirFromHost($device->hostname)) . ' ] || rm -vrf ' . trim(Rrd::dirFromHost($device->hostname)) . " 2>&1 ) && echo -n OK'");
     $tmp = explode("\n", $ex);
     if ($tmp[sizeof($tmp) - 1] != 'OK') {
         $ret .= "Could not remove files:\n$ex\n";
     }
 
-    $ret .= "Removed device $host\n";
-    log_event("Device $host has been removed", 0, 'system', 3);
+    $device->delete();
+    $ret .= "Removed device $device->hostname\n";
     oxidized_reload_nodes();
 
     return $ret;
@@ -643,9 +646,9 @@ function createHost(
         }
     }
 
-    $device_id = dbInsert($device, 'devices');
-    if ($device_id) {
-        return $device_id;
+    $deviceModel = Device::create($device);
+    if ($deviceModel->device_id) {
+        return $deviceModel->device_id;
     }
 
     throw new \Exception('Failed to add host to the database, please run ./validate.php');

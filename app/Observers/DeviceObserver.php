@@ -7,6 +7,28 @@ use App\Models\Device;
 class DeviceObserver
 {
     /**
+     * Handle the device "created" event.
+     *
+     * @param  \App\Models\Device  $device
+     * @return void
+     */
+    public function created(Device $device)
+    {
+        \Log::event("Device $device->hostname has been created", $device, 'system', 3);
+    }
+
+    /**
+     * Handle the device "deleted" event.
+     *
+     * @param  \App\Models\Device  $device
+     * @return void
+     */
+    public function deleted(Device $device)
+    {
+        \Log::event("Device $device->hostname has been deleted", $device, 'system', 3);
+    }
+
+    /**
      * Handle the device "updated" event.
      *
      * @param  \App\Models\Device  $device
@@ -38,6 +60,8 @@ class DeviceObserver
      */
     public function deleting(Device $device)
     {
+        \Log::event("Device $device->hostname has been removed", $device, 'system', 3);
+
         // delete related data
         $device->ports()->delete();
         $device->syslogs()->delete();
