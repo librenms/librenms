@@ -49,8 +49,7 @@
                         <label for="authalgo" class="col-sm-3 control-label" v-text="$t('settings.settings.snmp.v3.fields.authalgo')"></label>
                         <div class="col-sm-9">
                         <select class="form-control" id="authalgo" name="authalgo" v-model="item.authalgo" @change="updateItem(id, $event.target.id, $event.target.value)">
-                            <option value="MD5">MD5</option>
-                            <option value="SHA">SHA</option>
+                            <option v-for="name in authAlgorithms" :value="name" v-text="name"></option>
                         </select>
                         </div>
                     </div>
@@ -74,8 +73,7 @@
                         <label for="cryptoalgo" class="col-sm-3 control-label">Cryptoalgo</label>
                         <div class="col-sm-9">
                         <select class="form-control" id="cryptoalgo" v-model="item.cryptoalgo" @change="updateItem(id, $event.target.id, $event.target.value)">
-                            <option value="AES">AES</option>
-                            <option value="DES">DES</option>
+                            <option v-for="name in cryptoAlgorithms" :value="name" v-text="name"></option>
                         </select>
                         </div>
 
@@ -101,15 +99,23 @@
 </template>
 
 <script>
-    import BaseSetting from "./BaseSetting";
+import BaseSetting from "./BaseSetting";
 
-    export default {
+export default {
         name: "SettingSnmp3auth",
         mixins: [BaseSetting],
         data() {
             return {
-                localList: this.value
+                localList: this.value,
+                authAlgorithms: ['MD5', 'AES'],
+                cryptoAlgorithms: ['AES', 'DES'],
             }
+        },
+        mounted() {
+            axios.get(route('snmp.capabilities')).then((res) => {
+                this.authAlgorithms = res.data.auth;
+                this.cryptoAlgorithms = res.data.crypto;
+            })
         },
         methods: {
             addItem() {

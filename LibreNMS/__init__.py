@@ -148,21 +148,21 @@ def check_for_file(file):
 
 
 def get_config_data(base_dir):
-    check_for_file(os.path.join(base_dir, ".env"))
+    env_path = os.path.join(base_dir, ".env")
+    check_for_file(env_path)
 
     try:
         import dotenv
 
-        env_path = "{}/.env".format(base_dir)
         logger.info("Attempting to load .env from '%s'", env_path)
         dotenv.load_dotenv(dotenv_path=env_path, verbose=True)
 
         if not os.getenv("NODE_ID"):
             logger.critical(".env does not contain a valid NODE_ID setting.")
 
-    except ImportError as exc:
+    except (ImportError, ModuleNotFoundError) as exc:
         logger.critical(
-            'Could not import "%s" - Please check that the poller user can read the file, and that composer install has been run recently\nAdditional info: %s'
+            'Could not import "%s" - Please check that the poller user can read the file, and python-dotenv/python3-dotenv is installed\nAdditional info: %s'
             % (env_path, exc)
         )
         logger.debug("Traceback:", exc_info=True)
