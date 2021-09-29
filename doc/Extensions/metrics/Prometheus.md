@@ -45,18 +45,22 @@ the configured value.
 For instance without setting this option metric names will be something 
 like this:
 
+```
 OUTUCASTPKTS
 ifOutUcastPkts_rate
 INOCTETS
 ifInErrors_rate
+```
 
 Configuring a prefix name, for example 'librenms', instead caused those 
 metrics to be exposed with the following names:
 
+```
 librenms_OUTUCASTPKTS
 librenms_ifOutUcastPkts_rate
 librenms_INOCTETS
 librenms_ifInErrors_rate
+```
 
 ## Sample Prometheus Scrape Config (for scraping the Push Gateway)
 
