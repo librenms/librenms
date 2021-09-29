@@ -293,7 +293,7 @@ ul ul ul { list-style: square outside; }
   background:#FFAAAA;
 }
 
-img  { border: 0; }
+img  { margin: 0 auto; }
 
 A.sectionhead         { text-decoration: none; color: #555; }
 A.sectionhead:link    { text-decoration: none; color: #555; }
