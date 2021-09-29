@@ -22,6 +22,7 @@ use App\Models\PortGroup;
 use App\Models\PortsFdb;
 use App\Models\Sensor;
 use App\Models\ServiceTemplate;
+use App\Models\UserPref;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Routing\Router;
 use Illuminate\Support\Arr;
@@ -453,6 +454,48 @@ function del_device(Illuminate\Http\Request $request)
 
     // deletion succeeded - include old device details in response
     return api_success([$device], 'devices', $response);
+}
+
+function maintenance_device(Illuminate\Http\Request $request)
+{
+    if (empty($request->json())) {
+        return api_error(400, 'No information has been provided to set this device into maintenance');
+    }
+
+    // This will add a device using the data passed encoded with json
+    $hostname = $request->route('hostname');
+
+    // use hostname as device_id if it's all digits
+    $device = ctype_digit($hostname) ? DeviceCache::get($hostname) : DeviceCache::getByHostname($hostname);
+
+    if (! $device) {
+        return api_error(404, "Device $hostname does not exist");
+    }
+
+    $notes = $request->json('notes');
+    $alert_schedule = new \App\Models\AlertSchedule([
+        'title' => $device->displayName(),
+        'notes' => $notes,
+        'recurring' => 0,
+        'start' => date('Y-m-d H:i:s'),
+    ]);
+
+    $duration = $request->json('duration');
+    if (Str::contains($duration, ':')) {
+        [$duration_hour, $duration_min] = explode(':', $duration);
+        $alert_schedule->end = \Carbon\Carbon::now()
+            ->addHours($duration_hour)->addMinutes($duration_min)
+            ->format('Y-m-d H:i:00');
+    }
+
+    $device->alertSchedules()->save($alert_schedule);
+
+    if ($notes && UserPref::getPref(Auth::user(), 'add_schedule_note_to_device')) {
+        $device->notes .= (empty($device->notes) ? '' : PHP_EOL) . date('Y-m-d H:i') . ' Alerts delayed: ' . $notes;
+        $device->save();
+    }
+
+    return api_success_noresult(201, "Device {$device->hostname} ({$device->device_id}) moved into maintenance mode" . ($duration ? " for {$duration}h" : ''));
 }
 
 function device_availability(Illuminate\Http\Request $request)

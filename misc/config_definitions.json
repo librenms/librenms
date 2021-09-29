@@ -4771,6 +4771,13 @@
             "section": "prometheus",
             "order": 3
         },
+        "prometheus.prefix": {
+            "default": "",
+            "type": "text",
+            "group": "poller",
+            "section": "prometheus",
+            "order": 4
+        },
         "public_status": {
             "default": false,
             "group": "auth",

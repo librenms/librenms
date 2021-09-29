@@ -1103,6 +1103,32 @@ Output:
 }
 ```
 
+### `maintenance_device`
+
+Set a device into maintenance mode.
+
+Route: `/api/v0/devices/:hostname/maintenance`
+
+Input (JSON):
+
+- notes: Some description for the Maintenance
+- duration: Duration of Maintenance in format H:m
+
+Example:
+
+```curl
+curl -X POST -d '{"notes":"A 2 hour Maintenance triggered via API","duration":"2:00"}' -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/localhost/maintenance
+```
+
+Output:
+
+```json
+{
+    "status": "ok",
+    "message": "Device localhost.localdomain (57) moved into maintenance mode for 2:00 h"
+}
+```
+
 ### `add_device`
 
 Add a new device.

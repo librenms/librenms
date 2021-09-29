@@ -1176,6 +1176,10 @@ return [
                 'description' => 'Attach Device sysName',
                 'help' => 'Attach sysName information put to Prometheus.',
             ],
+            'prefix' => [
+                'description' => 'Prefix',
+                'help' => 'Optional text to prepend to exported metric names',
+            ],
         ],
         'public_status' => [
             'description' => 'Show status publicly',
