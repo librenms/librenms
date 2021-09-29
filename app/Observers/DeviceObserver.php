@@ -60,7 +60,8 @@ class DeviceObserver
      */
     public function deleting(Device $device)
     {
-        \Log::event("Device $device->hostname has been removed", $device, 'system', 3);
+        // delete with NULL Device, so it doesn't get's deleted by daily cleanup scripts
+        \Log::event("Device $device->hostname has been removed", null, 'system', 3);
 
         // delete related data
         $device->ports()->delete();
