@@ -4,7 +4,6 @@ namespace App\Console\Commands;
 
 use App\Models\Device;
 use Illuminate\Console\Command;
-use LibreNMS\Polling\SNMP;
 use LibreNMS\Util\Debug;
 
 class SnmpFetch extends Command
@@ -21,7 +20,7 @@ class SnmpFetch extends Command
      *
      * @var string
      */
-    protected $description = 'Command description';
+    protected $description = 'Run snmp query against a device';
 
     /**
      * Create a new command instance.
@@ -49,9 +48,7 @@ class SnmpFetch extends Command
         $device_id = Device::where('device_id', $spec)->orWhere('hostname', $spec)->value('device_id');
         \DeviceCache::setPrimary($device_id);
 
-        $snmp = new SNMP();
-        $res = $snmp
-//            ->options('-On')
+        $res = \NetSnmp::options([])
         ->$type($this->argument('oid'));
 
         dump($res->isValid());
