@@ -26,6 +26,7 @@
 namespace LibreNMS\Polling;
 
 use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
 
 class SnmpResponse
 {
@@ -34,8 +35,8 @@ class SnmpResponse
     public function __construct(string $output, int $exitCode = 0)
     {
         $this->exitCode = $exitCode;
-        $output = str_replace('Wrong Type (should be OBJECT IDENTIFIER): ', '', $output);
-        $this->raw = trim($output);
+        $output = preg_replace('/Wrong Type \(should be .*\): /', '', $output);
+        $this->raw = rtrim($output, "\r\n");
     }
 
     public function isValid(): bool
@@ -55,17 +56,44 @@ class SnmpResponse
 
     public function value(): string
     {
-        return Arr::first($this->values());
+        return Arr::first($this->values(), null, '');
     }
 
     public function values(): array
     {
         $values = [];
         foreach (explode(PHP_EOL, $this->raw) as $line) {
-            [$key, $value] = explode(' ', $line, 2);
-            $values[trim($key)] = $value;
+            if (empty($line) || Str::contains($line, ['at this OID', 'this MIB View'])) {
+                continue;
+            }
+
+            $split = explode(' ', $line, 2);
+            if (count($split) == 2) {
+                $values[$split[0]] = $split[1];
+            } else {
+                $values[] = $split[0];
+            }
         }
 
         return $values;
+    }
+
+    public function table($group = 0, &$array = []): array
+    {
+        foreach ($this->values() as $key => $value) {
+            preg_match_all('/([^[\]]+)/', $key, $parts);
+            $parts = $parts[1];
+            array_splice($parts, $group, 0, array_shift($parts)); // move the oid name to the correct depth
+
+            // merge the parts into an array, creating keys if they don't exist
+            $tmp = &$array;
+            foreach ($parts as $part) {
+                $key = trim($part, '"');
+                $tmp = &$tmp[$key];
+            }
+            $tmp = $value; // assign the value as the leaf
+        }
+
+        return $array;
     }
 }

@@ -141,6 +141,16 @@ class SNMP
         return $this->exec('snmpwalk', is_string($oid) ? explode(' ', $oid) : $oid);
     }
 
+    public function next($oid): SnmpResponse
+    {
+        return $this->exec('snmpgetnext', is_string($oid) ? explode(' ', $oid) : $oid);
+    }
+
+    public function translate($oid): SnmpResponse
+    {
+        return $this->exec('snmptranslate', is_string($oid) ? explode(' ', $oid) : $oid);
+    }
+
     private function recordStatistic(string $type, $start_time): float
     {
         global $snmp_stats;
@@ -156,7 +166,39 @@ class SNMP
     {
         $cmd = $this->initCommand($command);
 
+        // mibs
+        if ($this->mib) {
+            array_push($cmd, '-m', $this->mib);
+        }
+        array_push($cmd, '-M', $this->mibDirectories());
+
+        if ($command === 'snmptranslate') {
+            return array_merge($cmd, $this->options, $oids);
+        }
+
         // authentication
+        $this->buildAuth($cmd);
+
+        $cmd = array_merge($cmd, $this->defaultOptions, $this->options);
+
+        $timeout = $this->device->timeout ?? Config::get('snmp.timeout');
+        if ($timeout && $timeout !== 1) {
+            array_push($cmd, '-t', $timeout);
+        }
+
+        $retries = $this->device->retries ?? Config::get('snmp.retries');
+        if ($retries && $retries !== 5) {
+            array_push($cmd, '-r', $retries);
+        }
+
+        $hostname = \LibreNMS\Util\Rewrite::addIpv6Brackets($this->device->overwrite_ip ?: $this->device->hostname);
+        $cmd[] = ($this->device->transport ?? 'udp') . ':' . $hostname . ':' . $this->device->port;
+
+        return array_merge($cmd, $oids);
+    }
+
+    private function buildAuth(array &$cmd)
+    {
         if ($this->device->snmpver === 'v3') {
             array_push($cmd, '-v3', '-l', $this->device->authlevel);
             array_push($cmd, '-n', $this->context);
@@ -182,29 +224,6 @@ class SNMP
         } else {
             Log::debug("Unsupported SNMP Version: {$this->device->snmpver}");
         }
-
-        // mibs
-        if ($this->mib) {
-            array_push($cmd, '-m', $this->mib);
-        }
-        array_push($cmd, '-M', $this->mibDirectories());
-
-        $cmd = array_merge($cmd, $this->defaultOptions, $this->options);
-
-        $timeout = $this->device->timeout ?? Config::get('snmp.timeout');
-        if ($timeout && $timeout !== 1) {
-            array_push($cmd, '-t', $timeout);
-        }
-
-        $retries = $this->device->retries ?? Config::get('snmp.retries');
-        if ($retries && $retries !== 5) {
-            array_push($cmd, '-r', $retries);
-        }
-
-        $hostname = \LibreNMS\Util\Rewrite::addIpv6Brackets($this->device->overwrite_ip ?: $this->device->hostname);
-        $cmd[] = ($this->device->transport ?? 'udp') . ':' . $hostname . ':' . $this->device->port;
-
-        return array_merge($cmd, $oids);
     }
 
     private function exec(string $command, array $oids): SnmpResponse
@@ -232,24 +251,17 @@ class SNMP
 
     private function initCommand($binary): array
     {
-        if ($binary == 'snmpwalk') {
-            if ($this->device->snmpver == 'v1' || (isset($this->device->os) && Config::getOsSetting($this->device->os, 'snmp_bulk', true) == false)) {
-                return [Config::get($binary, $binary)];
-            } else {
-                $snmpcmd = [Config::get('snmpbulkwalk', 'snmpbulkwalk')];
+        if ($binary == 'snmpwalk' && $this->device->snmpver !== 'v1' && ! Config::getOsSetting($this->device->os, 'snmp_bulk', true)) {
+            $snmpcmd = [Config::get('snmpbulkwalk', 'snmpbulkwalk')];
 
-                $max_repeaters = $this->device->getAttrib('snmp_max_repeaters') ?: Config::getOsSetting($this->device->os, 'snmp.max_repeaters', Config::get('snmp.max_repeaters', false));
-                if ($max_repeaters > 0) {
-                    $snmpcmd[] = "-Cr$max_repeaters";
-                }
-                return $snmpcmd;
+            $max_repeaters = $this->device->getAttrib('snmp_max_repeaters') ?: Config::getOsSetting($this->device->os, 'snmp.max_repeaters', Config::get('snmp.max_repeaters', false));
+            if ($max_repeaters > 0) {
+                $snmpcmd[] = "-Cr$max_repeaters";
             }
+            return $snmpcmd;
         }
 
-        return [$binary];
-
-
-        return $snmpcmd;
+        return [Config::get($binary, $binary)];
     }
 
     private function mibDirectories(): string
