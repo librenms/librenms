@@ -18,6 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ * 
  * @copyright  2021 Maikel de Boer
  * @author     Maikel de Boer <maikel@loopodoopo.nl>
  */
@@ -35,7 +36,6 @@ class EricssonTn extends OS implements
     WirelessPowerDiscovery,
     WirelessRateDiscovery
 {
-
     public function discoverWirelessRate()
     {
         $sensors = [];
