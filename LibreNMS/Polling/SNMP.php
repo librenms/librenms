@@ -81,6 +81,10 @@ class SNMP
      * @var string
      */
     private $mib;
+    /**
+     * @var \App\Models\Device
+     */
+    private $device;
 
     public function __construct()
     {
@@ -191,7 +195,7 @@ class SNMP
             array_push($cmd, '-r', $retries);
         }
 
-        $hostname = \LibreNMS\Util\Rewrite::addIpv6Brackets($this->device->overwrite_ip ?: $this->device->hostname);
+        $hostname = \LibreNMS\Util\Rewrite::addIpv6Brackets((string) ($this->device->overwrite_ip ?: $this->device->hostname));
         $cmd[] = ($this->device->transport ?? 'udp') . ':' . $hostname . ':' . $this->device->port;
 
         return array_merge($cmd, $oids);
