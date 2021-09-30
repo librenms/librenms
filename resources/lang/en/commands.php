@@ -69,6 +69,16 @@ return [
             'device spec' => 'Device to ping one of: <Device ID>, <Hostname/IP>, all',
         ],
     ],
+    'device:poll' => [
+        'description' => 'Poll data from device(s) as defined by discovery',
+        'arguments' => [
+            'device spec' => 'Device spec to poll: device_id, hostname, wildcard, odd, even, all',
+        ],
+        'options' => [
+            'modules' => 'Specify single module to be run. Comma separate modules, submodules may be added with /',
+            'no-data' => 'Do not update datastores (RRD, InfluxDB, etc)',
+        ]
+    ],
     'key:rotate' => [
         'description' => 'Rotate APP_KEY, this decrypts all encrypted data with the given old key and stores it with the new key in APP_KEY.',
         'arguments' => [

@@ -31,22 +31,34 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Str;
 use LibreNMS\Exceptions\PollerException;
 use LibreNMS\Util\Debug;
+use LibreNMS\Util\Dns;
 use LibreNMS\Util\Git;
 
-class Poller
+class Poller extends PollingCommon
 {
     /** @var string */
     private $device_spec;
     /** @var array */
     private $module_override;
+    private $output;
     private $polled = 0;
-    private $unreachable =0;
+    private $unreachable = 0;
 
-    public function __construct(string $device_spec, array $module_override)
+
+    /**
+     * @var Device
+     */
+    private $device;
+    /**
+     * @var array
+     */
+    private $deviceArray;
+
+    public function __construct(string $device_spec, array $module_override, \Illuminate\Console\OutputStyle $output)
     {
-
         $this->device_spec = $device_spec;
         $this->module_override = $module_override;
+        $this->output = $output;
     }
 
     public function poll()
@@ -57,13 +69,27 @@ class Poller
             \LibreNMS\Util\OS::updateCache(true); // Force update of OS Cache
         }
 
-        echo "Starting polling run:\n\n";
+        $this->output->writeln('Starting polling run:');
+        $this->output->newLine();
 
         foreach ($this->buildDeviceQuery()->pluck('device_id') as $device_id) {
             \DeviceCache::setPrimary($device_id);
-            $device = \DeviceCache::getPrimary()->toArray();
+            $this->device = \DeviceCache::getPrimary();
+            $this->device->ip = $this->device->overwrite_ip ?: Dns::lookupIp($this->device);
+
+            $os_group = $this->initDeviceArray();
+            $this->printDeviceInfo($os_group);
+            $this->initRrdDirectory();
+
 
         }
+    }
+
+    private function pollLegacyModule(array $device)
+    {
+        global $device;
+
+
     }
 
     private function moduleExists(string $module): bool{
@@ -91,6 +117,25 @@ class Poller
         return $query->where('hostname', $this->device_spec);
     }
 
+    private function initDeviceArray(): string
+    {
+        $this->deviceArray = $this->device->toArray();
+        if ($os_group = Config::get("os.{$this->device->os}.group")) {
+            $this->deviceArray['os_group'] = $os_group;
+        }
+
+        return $os_group;
+    }
+
+    private function initRrdDirectory(): void
+    {
+        $host_rrd = \Rrd::name($this->device->hostname, '', '');
+        if (Config::get('rrd.enable', true) && ! is_dir($host_rrd)) {
+            mkdir($host_rrd);
+            $this->output->writeln("Created directory : $host_rrd");
+        }
+    }
+
     private function parseModules()
     {
         foreach ($this->module_override as $index => $module) {
@@ -111,6 +156,17 @@ class Poller
         }
     }
 
+    private function printDeviceInfo($group)
+    {
+        $this->output->writeln(sprintf(<<<EOH
+Hostname:  %s %s
+ID:        %s
+OS:        %s
+IP:        %s
+EOH, $this->device->hostname, $group ? " ($group)" : '', $this->device->device_id, $this->device->os, $this->device->ip));
+        $this->output->newLine();
+    }
+
     private function printModules()
     {
         $modules = array_map(function ($module) {
@@ -126,7 +182,7 @@ class Poller
     {
         if (Debug::isEnabled() || Debug::isVerbose()) {
             $version = \LibreNMS\Util\Version::get();
-            printf(<<<EOH
+            $this->output->writeln(sprintf(<<<EOH
 ===================================
 Version info:
 Commit SHA: %s
@@ -145,7 +201,7 @@ EOH,
                 \LibreNMS\DB\Eloquent::isConnected() ? \LibreNMS\DB\Eloquent::version() : '?',
                 $version->rrdtool(),
                 $version->netSnmp()
-            );
+            ));
 
         }
     }
