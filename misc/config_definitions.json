@@ -833,31 +833,6 @@
             "default": "H:i:s",
             "type": "text"
         },
-        "db_name": {
-            "default": "librenms",
-            "hidden": true,
-            "type": "boolean"
-        },
-        "db_pass": {
-            "default": null,
-            "hidden": true,
-            "type": "boolean"
-        },
-        "db_port": {
-            "default": 3306,
-            "hidden": true,
-            "type": "boolean"
-        },
-        "db_socket": {
-            "default": null,
-            "hidden": true,
-            "type": "boolean"
-        },
-        "db_user": {
-            "default": "librenms",
-            "hidden": true,
-            "type": "boolean"
-        },
         "debug.run_trace": {
             "default": false,
             "type": "boolean"
@@ -3442,6 +3417,10 @@
                 "other": "Other"
             }
         },
+        "group": {
+            "type": "text",
+            "default": "librenms"
+        },
         "gui.network-map.style": {
             "default": "new",
             "type": "select",
@@ -5389,6 +5368,10 @@
             "validate": {
                 "value": "integer|min:0"
             }
+        },
+        "user": {
+            "type": "text",
+            "default": "librenms"
         },
         "vertical_summary": {
             "default": 0,
