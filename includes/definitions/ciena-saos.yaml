@@ -7,3 +7,4 @@ over:
 discovery:
     - sysObjectID:
         - .1.3.6.1.4.1.562.68.11
+mib_dir: nortel
