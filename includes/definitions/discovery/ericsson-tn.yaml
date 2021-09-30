@@ -2,7 +2,6 @@ mib: XF-RADIOLINK-PTP-RADIO-MIB:XF-RADIOLINK-RLT-MIB:ENTITY-MIB:IF-MIB
 modules:
     os:
         hardware: ENTITY-MIB::entPhysicalDescr.1 
-        serial: entPhysicalSerialNum.1
         version: XF-SOFTWARE-MIB::xfSwReleaseRevision.1        
     sensors:
         pre-cache:
