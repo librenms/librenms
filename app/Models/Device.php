@@ -26,6 +26,7 @@ use Permissions;
  * @property-read int|null $ports_count
  * @property-read int|null $sensors_count
  * @property-read int|null $wirelessSensors_count
+ *
  * @method static \Database\Factories\DeviceFactory factory(...$parameters)
  */
 class Device extends BaseModel
@@ -50,8 +51,8 @@ class Device extends BaseModel
     /**
      * Returns IP/Hostname where polling will be targeted to
      *
-     * @param string|array $device hostname which will be triggered
-     *        array  $device associative array with device data
+     * @param  string|array  $device  hostname which will be triggered
+     *                                array  $device associative array with device data
      * @return string IP/Hostname to which Device polling is targeted
      */
     public static function pollerTarget($device)
@@ -117,6 +118,17 @@ class Device extends BaseModel
     }
 
     /**
+     * Get VRF contexts to poll.
+     * If no contexts are found, return the default context ''
+     *
+     * @return array
+     */
+    public function getVrfContexts(): array
+    {
+        return $this->vrfLites->isEmpty() ? [''] : $this->vrfLites->pluck('context_name')->all();
+    }
+
+    /**
      * Get the display name of this device (hostname) unless force_ip_to_sysname is set
      * and hostname is an IP and sysName is set
      *
@@ -175,7 +187,7 @@ class Device extends BaseModel
      * Get the shortened display name of this device.
      * Length is always overridden by shorthost_target_length.
      *
-     * @param int $length length to shorten to, will not break up words so may be longer
+     * @param  int  $length  length to shorten to, will not break up words so may be longer
      * @return string
      */
     public function shortDisplayName($length = 12)
@@ -200,7 +212,7 @@ class Device extends BaseModel
     /**
      * Check if user can access this device.
      *
-     * @param User $user
+     * @param  User  $user
      * @return bool
      */
     public function canAccess($user)
@@ -249,7 +261,7 @@ class Device extends BaseModel
      * Update the max_depth field based on parents
      * Performs SQL query, so make sure all parents are saved first
      *
-     * @param int $exclude exclude a device_id from being considered (used for deleting)
+     * @param  int  $exclude  exclude a device_id from being considered (used for deleting)
      */
     public function updateMaxDepth($exclude = null)
     {
@@ -339,7 +351,7 @@ class Device extends BaseModel
      * Update the location to the correct location and update GPS if needed
      *
      * @param  \App\Models\Location|string  $new_location  location data
-     * @param  bool  $doLookup try to lookup the GPS coordinates
+     * @param  bool  $doLookup  try to lookup the GPS coordinates
      */
     public function setLocation($new_location, bool $doLookup = false)
     {

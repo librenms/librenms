@@ -15,6 +15,7 @@
 
 /**
  * SMSEagle API Transport
+ *
  * @author Barry O'Donovan <barry@lightnet.ie>
  * @copyright 2017 Barry O'Donovan, LibreNMS
  * @license GPL

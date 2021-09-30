@@ -18,6 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2017 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -30,7 +31,9 @@ class IPv6 extends IP
 {
     /**
      * IPv6 constructor.
-     * @param string $ipv6
+     *
+     * @param  string  $ipv6
+     *
      * @throws InvalidIpException
      */
     public function __construct($ipv6)
@@ -47,7 +50,8 @@ class IPv6 extends IP
 
     /**
      * Convert a MySQL binary v6 (16-byte) IP address to a printable string.
-     * @param string $ip A binary string containing an IP address, as returned from MySQL's INET6_ATON function
+     *
+     * @param  string  $ip  A binary string containing an IP address, as returned from MySQL's INET6_ATON function
      * @return string Empty if not valid.
      */
     // Fuction is from https://php.net/manual/en/function.inet-ntop.php
@@ -63,8 +67,9 @@ class IPv6 extends IP
 
     /**
      * Check if the supplied IP is valid.
-     * @param string $ipv6
-     * @param bool $exclude_reserved Exclude reserved IP ranges.
+     *
+     * @param  string  $ipv6
+     * @param  bool  $exclude_reserved  Exclude reserved IP ranges.
      * @return bool
      */
     public static function isValid($ipv6, $exclude_reserved = false)
@@ -79,6 +84,7 @@ class IPv6 extends IP
 
     /**
      * Remove extra 0s from this IPv6 address to make it easier to read.
+     *
      * @return string|false
      */
     public function compressed()
@@ -88,7 +94,8 @@ class IPv6 extends IP
 
     /**
      * Get the network address of this IP
-     * @param int $cidr If not given will use the cidr stored with this IP
+     *
+     * @param  int  $cidr  If not given will use the cidr stored with this IP
      * @return string
      */
     public function getNetworkAddress($cidr = null)
@@ -100,7 +107,7 @@ class IPv6 extends IP
         foreach ($net_bytes as $index => $byte) {
             $shift = min($cidr - 16 * ($index - 1), 16);
             if ($shift > 0) {
-                $mask = ~(0xffff >> $shift) & 0xffff;
+                $mask = ~(0xFFFF >> $shift) & 0xFFFF;
                 $net_bytes[$index] = $byte & $mask;
             } else {
                 $net_bytes[$index] = 0;
@@ -113,7 +120,8 @@ class IPv6 extends IP
 
     /**
      * Check if this IP address is contained inside the network
-     * @param string $network should be in cidr format.
+     *
+     * @param  string  $network  should be in cidr format.
      * @return mixed
      */
     public function inNetwork($network)
@@ -134,7 +142,7 @@ class IPv6 extends IP
         for ($index = 1; $index <= 8; $index++) {
             $shift = $cidr - 16 * ($index - 1);
             if ($shift > 0) {
-                $mask = ~(0xffff >> $shift) & 0xffff;
+                $mask = ~(0xFFFF >> $shift) & 0xFFFF;
                 if (($net_bytes[$index] & $mask) != ($ip_bytes[$index] & $mask)) {
                     return false;
                 }
@@ -148,6 +156,7 @@ class IPv6 extends IP
 
     /**
      * Expand this IPv6 address to it's full IPv6 representation. For example: ::1 -> 0000:0000:0000:0000:0000:0000:0000:0001
+     *
      * @return string
      */
     public function uncompressed()

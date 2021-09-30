@@ -105,6 +105,7 @@ by following the steps under the `SNMP Extend` heading.
 1. [Mailcow-dockerized postfix](#mailcow-dockerized-postfix) - SNMP extend
 1. [Mailscanner](#mailscanner) - SNMP extend
 1. [Mdadm](#mdadm) - SNMP extend
+1. [MegaRAID](#megaraid) - SNMP extend
 1. [Memcached](#memcached) - SNMP extend
 1. [Munin](#munin) - Agent
 1. [MySQL](#mysql) - SNMP extend, Agent
@@ -154,33 +155,28 @@ module before trying the script.
 
 1. Download the script onto the desired host (the host must be added
 to LibreNMS devices)
-
 ```
 wget https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/apache-stats.py -O /etc/snmp/apache-stats.py
 ```
 
 2. Make the script executable
-
 ```
 chmod +x /etc/snmp/apache-stats.py
 ```
 
 3. Create the cache directory, '/var/cache/librenms/' and make sure
 that it is owned by the user running the SNMP daemon.
-
 ```
 mkdir -p /var/cache/librenms/
 ```
 
 4. Verify it is working by running /etc/snmp/apache-stats.py Package `urllib3` for python3 needs to be
 installed. In Debian-based systems for example you can achieve this by issuing:
-
 ```
 apt-get install python3-urllib3
 ```
 
 5. Edit your snmpd.conf file (usually /etc/snmp/snmpd.conf) and add:
-
 ```
 extend apache /etc/snmp/apache-stats.py
 ```
@@ -188,7 +184,6 @@ extend apache /etc/snmp/apache-stats.py
 6. Restart snmpd on your host
 
 7. Test by running
-
 ```
 snmpwalk <various options depending on your setup> localhost NET-SNMP-EXTEND-MIB::nsExtendOutput2Table
 ```
@@ -204,7 +199,6 @@ to be installed: apt-get install libwww-perl)
 
 2. Create the cache directory, '/var/cache/librenms/' and make sure
 that it is owned by the user running the SNMP daemon.
-
 ```
 mkdir -p /var/cache/librenms/
 ```
@@ -226,7 +220,6 @@ wget https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/aster
 ```
 
 2. Make the script executable
-
 ```
 chmod +x /etc/snmp/asterisk
 ```
@@ -236,7 +229,6 @@ chmod +x /etc/snmp/asterisk
 4. Verify it is working by running `/etc/snmp/asterisk`
 
 5. Edit your snmpd.conf file (usually `/etc/snmp/snmpd.conf`) and add:
-
 ```
 extend asterisk /etc/snmp/asterisk
 ```
@@ -265,7 +257,6 @@ chmod +x /etc/snmp/backupninja.py
 ```
 
 3. Edit your snmpd.conf file (usually `/etc/snmp/snmpd.conf`) and add:
-
 ```
 extend backupninja /etc/snmp/backupninja.py
 ```
@@ -276,16 +267,13 @@ extend backupninja /etc/snmp/backupninja.py
 ## BIND9 aka named
 
 1. Create stats file with appropriate permissions:
-
 ```bash
 ~$ touch /var/cache/bind/stats
 ~$ chown bind:bind /var/cache/bind/stats
 ```
-
 Change `user:group` to the user and group that's running bind/named.
 
 2. Bind/named configuration:
-
 ```text
 options {
     ...
@@ -305,9 +293,7 @@ make sure you changed the ownership correctly.
 is called. Given this it is suggested you setup file rotation for
 it. Alternatively you can also set zero_stats to 1 in the config.
 
-6. The script for this also requires the Perl module
-`File::ReadBackwards`.
-
+6. The script for this also requires the Perl module `File::ReadBackwards`.
 ```
 FreeBSD       => p5-File-ReadBackwards
 CentOS/RedHat => perl-File-ReadBackwards
@@ -348,19 +334,16 @@ and it will print out what it thinks it should be.
 ### SNMP Extend
 
 1. Copy the bind shell script, to the desired host.
-
 ```
 wget https://github.com/librenms/librenms-agent/raw/master/snmp/bind -O /etc/snmp/bind
 ```
 
 2. Make the script executable
-
 ```
 chmod +x /etc/snmp/bind
 ```
 
 3. Edit your snmpd.conf file and add:
-
 ```
 extend bind /etc/snmp/bind
 ```
@@ -431,7 +414,6 @@ C.H.I.P. is a $9 R8 based tiny computer ideal for small projects.
 Further details: <https://getchip.com/pages/chip>
 
 1. Copy the shell script to the desired host.
-
 ```
 wget https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/chip.sh -O /etc/snmp/power-stat.sh
 ```
@@ -442,7 +424,6 @@ chmod +x /etc/snmp/power-stat.sh
 ```
 
 3. Edit your snmpd.conf file (usually /etc/snmp/snmpd.conf) and add:
-
 ```
 extend power-stat /etc/snmp/power-stat.sh
 ```
@@ -463,7 +444,6 @@ Under Ubuntu/Debian just run `apt install dhcpd-pools`
 ### SNMP Extend
 
 1. Copy the shell script to the desired host.
-
 ```
 wget https://github.com/librenms/librenms-agent/raw/master/snmp/dhcp.py -O /etc/snmp/dhcp.py
 ```
@@ -473,17 +453,13 @@ wget https://github.com/librenms/librenms-agent/raw/master/snmp/dhcp.py -O /etc/
 chmod +x /etc/snmp/dhcp.py
 ```
 
-3. edit a config file:
-
-Content of an example /etc/snmp/dhcp.json . Please edit with your own settings.
+3. Edit your config file, Content of an example /etc/snmp/dhcp.json
 ```
-{"leasefile": "/var/lib/dhcp/dhcpd.leases"
-}
+{"leasefile": "/var/lib/dhcp/dhcpd.leases" }
 ```
 Key 'leasefile' specifies the path to your lease file.
 
 4. Edit your snmpd.conf file (usually /etc/snmp/snmpd.conf) and add:
-
 ```
 extend dhcpstats /etc/snmp/dhcp.py
 ```
@@ -534,7 +510,6 @@ A small shell script that checks your system's available random entropy.
 ### SNMP Extend
 
 1. Download the script onto the desired host.
-
 ```
 wget https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/entropy.sh -O /etc/snmp/entropy.sh
 ```
@@ -545,7 +520,6 @@ chmod +x /etc/snmp/entropy.sh
 ```
 
 3. Edit your snmpd.conf file (usually /etc/snmp/snmpd.conf) and add:
-
 ```
 extend entropy /etc/snmp/entropy.sh
 ```
@@ -563,7 +537,6 @@ SNMP extend script to get your exim stats data into your host.
 ### SNMP Extend
 
 1. Download the script onto the desired host.
-
 ```
 wget https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/exim-stats.sh -O /etc/snmp/exim-stats.sh
 ```
@@ -574,14 +547,12 @@ chmod +x /etc/snmp/exim-stats.sh
 ```
 
 3. Edit your snmpd.conf file (usually `/etc/snmp/snmpd.conf`) and add:
-
 ```
 extend exim-stats /etc/snmp/exim-stats.sh
 ```
 
 4. If you are using sudo edit your sudo users (usually `visudo`) and
 add at the bottom:
-
 ```
 snmp ALL=(ALL) NOPASSWD: /etc/snmp/exim-stats.sh, /usr/bin/exim*
 ```
@@ -597,7 +568,6 @@ Extend` heading top of page.
 ### SNMP Extend
 
 1. Copy the shell script, fail2ban, to the desired host.
-
 ```
 wget https://github.com/librenms/librenms-agent/raw/master/snmp/fail2ban -O /etc/snmp/fail2ban
 ```
@@ -608,38 +578,30 @@ chmod +x /etc/snmp/fail2ban
 ```
 
 3. Edit your snmpd.conf file (usually /etc/snmp/snmpd.conf) and add:
-
 ```
 extend fail2ban /etc/snmp/fail2ban
 ```
+    
+    1. If you want to use the cache, it is as below, by using the -c switch.
+    ```
+    extend fail2ban /etc/snmp/fail2ban -c
+    ```
+    
+    2. If you want to use the cache and update it if needed, this can by using the -c and -U switches.
+    ```
+    extend fail2ban /etc/snmp/fail2ban -c -U
+    ```
+    
+    3. If you need to specify a custom location for the fail2ban-client, that can be done via the -f switch.
+    ```
+    extend fail2ban /etc/snmp/fail2ban -f /foo/bin/fail2ban-client
+    ```
+    If not specified, "/usr/bin/env fail2ban-client" is used.
 
-If you want to use the cache, it is as below, by using the -c switch.
+1. Restart snmpd on your host
 
-```
-extend fail2ban /etc/snmp/fail2ban -c
-```
-
-If you want to use the cache and update it if needed, this can by
-using the -c and -U switches.
-
-```
-extend fail2ban /etc/snmp/fail2ban -c -U
-```
-
-If you need to specify a custom location for the fail2ban-client, that
-can be done via the -f switch.
-
-If not specified, "/usr/bin/env fail2ban-client" is used.
-
-```
-extend fail2ban /etc/snmp/fail2ban -f /foo/bin/fail2ban-client
-```
-
-4. Restart snmpd on your host
-
-5. If you wish to use caching, add the following to /etc/crontab and
+2. If you wish to use caching, add the following to /etc/crontab and
 restart cron.
-
 ```
 */3    *    *    *    *    root    /etc/snmp/fail2ban -u
 ```
@@ -724,7 +686,6 @@ or /etc/freeradius).
 4. Restart FreeRADIUS.
 
 5. You should be able to test with the radclient as follows...
-
 ```
 echo "Message-Authenticator = 0x00, FreeRADIUS-Statistics-Type = 31, Response-Packet-Type = Access-Accept" | \
 radclient -x localhost:18121 status adminsecret
@@ -821,7 +782,6 @@ authentication.
 4. Verify it is working by running `/etc/snmp/freeswitch`
 
 5. Edit your snmpd.conf file (usually `/etc/snmp/snmpd.conf`) and add:
-
 ```
 extend freeswitch /etc/snmp/freeswitch
 ```
@@ -847,7 +807,6 @@ chmod +x /etc/snmp/gpsd
 ```
 
 3. Edit your snmpd.conf file (usually `/etc/snmp/snmpd.conf`) and add:
-
 ```
 extend gpsd /etc/snmp/gpsd
 ```
@@ -885,7 +844,6 @@ chmod +x /etc/snmp/icecast-stats.sh
 3. Verify it is working by running `/etc/snmp/icecast-stats.sh`
 
 4. Edit your snmpd.conf file (usually `/etc/snmp/icecast-stats.sh`) and add:
-
 ```
 extend icecast /etc/snmp/icecast-stats.sh
 ```
@@ -894,7 +852,6 @@ extend icecast /etc/snmp/icecast-stats.sh
 ### SNMP Extend
 
 1. Download the script into the desired host.
-
 ```
 wget https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/mailcow-dockerized-postfix -O /etc/snmp/mailcow-dockerized-postfix
 ```
@@ -903,11 +860,9 @@ wget https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/mailc
 ```
 chmod +x /etc/snmp/mailcow-dockerized-postfix
 ```
-
 > Maybe you will need to install `pflogsumm` on debian based OS. Please check if you have package installed.
 
 3. Edit your snmpd.conf file (usually /etc/snmp/snmpd.conf) and add:
-
 ```
 extend mailcow-postfix /etc/snmp/mailcow-dockerized-postfix
 ```
@@ -933,7 +888,6 @@ chmod +x /etc/snmp/mailscanner.php
 ```
 
 3. Edit your snmpd.conf file (usually /etc/snmp/snmpd.conf) and add:
-
 ```
 extend mailscanner /etc/snmp/mailscanner.php
 ```
@@ -951,7 +905,6 @@ This shell script checks mdadm health and array data
 ### SNMP Extend
 
 1. Download the script onto the desired host.
-
 ```
 wget https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/mdadm -O /etc/snmp/mdadm
 ```
@@ -962,7 +915,6 @@ chmod +x /etc/snmp/mdadm
 ```
 
 3. Edit your snmpd.conf file (usually /etc/snmp/snmpd.conf) and add:
-
 ```
 extend mdadm /etc/snmp/mdadm
 ```
@@ -973,6 +925,21 @@ The application should be auto-discovered as described at the
 top of the page. If it is not, please follow the steps set out
 under `SNMP Extend` heading top of page.
 
+
+## MegaRAID
+
+This software from Broadcom/LSI let you monitor MegaRAID controller.
+
+1. Download the [external software](https://docs.broadcom.com/docs/1211132411799) and follow the included install instructions.
+
+2. Add the following line to your snmpd.conf file (usually /etc/snmp/snmpd.conf)
+```
+pass .1.3.6.1.4.1.3582 /usr/sbin/lsi_mrdsnmpmain
+```
+
+3. Restart snmpd on your host
+
+
 ## Memcached
 
 ### SNMP Extend
@@ -980,7 +947,6 @@ under `SNMP Extend` heading top of page.
 1. Copy the [memcached
    script](https://github.com/librenms/librenms-agent/blob/master/agent-local/memcached)
    to `/etc/snmp/` on your remote server.
-
 ```
 wget https://raw.githubusercontent.com/librenms/librenms-agent/master/agent-local/memcached -O /etc/snmp/memcached
 ```
@@ -991,7 +957,6 @@ chmod +x /etc/snmp/memcached
 ```
 
 3. Edit your snmpd.conf file (usually `/etc/snmp/snmpd.conf`) and add:
-
 ```
 extend memcached /etc/snmp/memcached
 ```
@@ -1045,7 +1010,6 @@ echo -n "foobar.value " $(date +%s) #Populate a value, here unix-timestamp
 
 Create the cache directory, '/var/cache/librenms/' and make sure
 that it is owned by the user running the SNMP daemon.
-
 ```
 mkdir -p /var/cache/librenms/
 ```
@@ -1054,13 +1018,11 @@ The MySQL script requires PHP-CLI and the PHP MySQL extension, so
 please verify those are installed.
 
 CentOS (May vary based on PHP version)
-
 ```
 yum install php-cli php-mysql
 ```
 
 Debian (May vary based on PHP version)
-
 ```
 apt-get install php-cli php-mysql
 ```
@@ -1123,7 +1085,6 @@ NGINX is a free, open-source, high-performance HTTP server: <https://www.nginx.o
 
 It's required to have the following directive in your nginx
 configuration responsible for the localhost server:
-
 ```text
 location /nginx-status {
     stub_status on;
@@ -1172,8 +1133,7 @@ Export the NFS stats from as server.
 ```
 extend nfs-server /bin/cat /proc/net/rpc/nfsd
 ```
-
-note : find out where cat is located using : `which cat`
+>find out where cat is located using : `which cat`
 
 2. reload snmpd service to activate the configuration
 
@@ -1434,15 +1394,11 @@ chmod +x /etc/snmp/portactivity
 ```
 extend portactivity /etc/snmp/portactivity -p http,ldap,imap
 ```
-
-Will monitor HTTP, LDAP, and IMAP. The -p switch specifies what ports
-to use. This is a comma seperated list.
-
-These must be found in '/etc/services' or where ever NSS is set to
-fetch it from. If not, it will throw an error.
-
-If you want to JSON returned by it to be printed in a pretty format
-use the -P flag.
+>Will monitor HTTP, LDAP, and IMAP. The -p switch specifies what ports to use. This is a comma seperated list.
+>
+>These must be found in '/etc/services' or where ever NSS is set to fetch it from. If not, it will throw an error.
+>
+>If you want to JSON returned by it to be printed in a pretty format use the -P flag.
 
 5. Restart snmpd on your host.
 

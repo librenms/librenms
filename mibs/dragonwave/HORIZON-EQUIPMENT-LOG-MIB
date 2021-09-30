@@ -1,0 +1,654 @@
+
+-- File Name : HorizonEquipmentLog_MIB_1.00.00.mib
+-- Version   : 1.00.00
+-- Date      : July 07, 2010
+-- Author    : DragonWave Inc.
+
+HORIZON-EQUIPMENT-LOG-MIB DEFINITIONS ::= BEGIN
+
+	IMPORTS
+		Integer32, OBJECT-TYPE, MODULE-IDENTITY,NOTIFICATION-TYPE,
+                Unsigned32, TimeTicks, Counter32, Counter64,
+                  IpAddress
+                  -- Not supported : Opaque
+			FROM SNMPv2-SMI -- [RFC2578]
+                 TEXTUAL-CONVENTION, RowStatus, TimeStamp, DateAndTime
+			FROM SNMPv2-TC  -- [RFC2579]
+		horizon
+			FROM HORIZON-MIB;
+
+--
+-- Module Identity
+--
+
+horizonEquipmentLogMib MODULE-IDENTITY
+	LAST-UPDATED "200901210000Z"
+	ORGANIZATION
+		"DragonWave Inc."
+	CONTACT-INFO
+		""
+	DESCRIPTION
+		"This MIB Module defines a notification log mechanism and a current alarm list."
+    REVISION "200901210000Z"
+    DESCRIPTION
+        "Initial Revision"
+	::= { horizon 100 }
+
+--
+-- History of MIB Changes
+-- 
+--
+
+--
+-- Textual conventions
+--
+EnableType ::= TEXTUAL-CONVENTION
+	
+	STATUS current
+	DESCRIPTION       
+		"Enable/Disable"
+	SYNTAX INTEGER
+	{
+	disabled(0),
+	enabled(1)
+	}
+--
+-- Node definitions
+--
+
+horizonEquipmentLogMibObjects OBJECT IDENTIFIER ::= { horizonEquipmentLogMib 1 }
+
+horizonEquipmentConfigLog OBJECT IDENTIFIER ::= { horizonEquipmentLogMibObjects 1 }
+
+horizonEquipmentLog OBJECT IDENTIFIER ::= { horizonEquipmentLogMibObjects 2 }
+
+horizonEquipmentAlarmList  OBJECT IDENTIFIER ::= { horizonEquipmentLogMibObjects 3 }
+
+horizonEquipmentSnmpTrap  OBJECT IDENTIFIER ::= { horizonEquipmentLogMibObjects 4 }
+
+horizonEquipmentPseudoEventsObjects  OBJECT IDENTIFIER ::= { horizonEquipmentLogMib 2 }
+
+horizonEquipmentMirrorObjects OBJECT IDENTIFIER ::= { horizonEquipmentLogMib 3 }
+
+
+--
+-- Object definitions: configuration section 
+--
+
+horizonEquipmentEventLogEntryLimit		OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+     "The maximum number of notification entries that may be held
+     in EventLogTable."
+     DEFVAL { 4096 }
+     ::= { horizonEquipmentConfigLog 1 }
+
+--
+-- Object definitions: event log section 
+--                     
+
+horizonEquipmentEventLogLastEntry  OBJECT-TYPE
+   SYNTAX      Unsigned32
+   MAX-ACCESS  read-only
+   STATUS      current
+   DESCRIPTION
+      "The value of horizonEquipmentEventLogIndex at the time of the last
+       creation of an entry in the horizonEquipmentEventLogTable."
+   ::= { horizonEquipmentLog 1 }
+
+		
+--
+-- Event Notification Log Table (inspired by RFC 3014)
+--
+
+	horizonEquipmentEventLogTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF HorizonEquipmentEventLogEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"A table of Notification log entries."
+		::= { horizonEquipmentLog 2 }
+
+	horizonEquipmentEventLogEntry OBJECT-TYPE
+		SYNTAX HorizonEquipmentEventLogEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"A Notification log entry. Entries appear in this table 
+                         when Notifications occur.  They are removed to make way 
+                         for new entries due to lack of resources or the values of 
+                         horizonEquipmentEventLogEntryLimit.If adding an entry would exceed 
+                         horizonEquipmentEventLogEntryLimit the oldest entry in that log SHOULD 
+                         be removed to make room for the new one."
+		INDEX { horizonEquipmentEventLogIndex  }
+		::= { horizonEquipmentEventLogTable 1 }
+
+	HorizonEquipmentEventLogEntry ::=
+		SEQUENCE {
+		horizonEquipmentEventLogIndex  		Unsigned32,
+		horizonEquipmentEventLogTime                 	TimeStamp,
+		horizonEquipmentEventLogDateAndTime		DateAndTime,
+		horizonEquipmentEventLogNotificationID	OBJECT IDENTIFIER,
+		horizonEquipmentEventLogVariables		Unsigned32
+		}
+
+	horizonEquipmentEventLogIndex  		OBJECT-TYPE
+    		SYNTAX     Unsigned32 (1..4294967295)
+    		MAX-ACCESS not-accessible
+    		STATUS     current
+    		DESCRIPTION
+     		"A monotonically increasing integer for the sole purpose of
+     		indexing entries within the log.  When it reaches the
+     		maximum value,the agent wraps the value back to 1.
+		This number should correspond to the number of notifications 
+		sent by the agent."
+    		::= { horizonEquipmentEventLogEntry 1 }
+
+	horizonEquipmentEventLogTime                 	OBJECT-TYPE
+    		SYNTAX      TimeStamp
+  		MAX-ACCESS  read-only
+		STATUS      current
+		DESCRIPTION
+  		   "The value of sysUpTime when the entry was placed in the log."
+  		::= { horizonEquipmentEventLogEntry 2 }
+
+	horizonEquipmentEventLogDateAndTime		OBJECT-TYPE
+ 		 SYNTAX      DateAndTime
+		 MAX-ACCESS  read-only
+ 		 STATUS      current
+ 		 DESCRIPTION
+ 		    "The local date and time when the entry was logged, useful when browsing the MIB."
+ 		::= { horizonEquipmentEventLogEntry 3 }
+
+	horizonEquipmentEventLogNotificationID             OBJECT-TYPE
+ 		SYNTAX     OBJECT IDENTIFIER
+                MAX-ACCESS read-only
+                STATUS     current
+                DESCRIPTION
+                "The NOTIFICATION-TYPE object identifier of the Notification that
+                 occurred."
+                ::= { horizonEquipmentEventLogEntry 4 }
+
+	horizonEquipmentEventLogVariables		OBJECT-TYPE
+ 		  SYNTAX      Unsigned32
+		  MAX-ACCESS  read-only
+ 		  STATUS      current
+ 		  DESCRIPTION
+ 		      "The number of variables in horizonEquipmentEventLogVariableTable for this
+ 		      logged notification."
+ 		::= { horizonEquipmentEventLogEntry 5 }
+
+ 
+
+--
+-- Event Log variable Table
+--
+	
+horizonEquipmentEventLogVariableTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF HorizonEquipmentEventLogVariableEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"A table of variables to go with Notification log entries."
+		::= { horizonEquipmentLog 3 }
+
+	horizonEquipmentEventLogVariableEntry OBJECT-TYPE
+		SYNTAX HorizonEquipmentEventLogVariableEntry 
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"A Notification log entry variable.
+
+    			 Entries appear in this table when there are variables in
+  			 the varbind list of a Notification in horizonEquipmentEventLogTable."
+		INDEX { horizonEquipmentEventLogIndex, horizonEquipmentEventLogVariableIndex  }
+		::= { horizonEquipmentEventLogVariableTable 1 }
+
+	HorizonEquipmentEventLogVariableEntry ::=
+		SEQUENCE {
+		horizonEquipmentEventLogVariableIndex  	     Unsigned32,
+    		horizonEquipmentEventLogVariableID                 OBJECT IDENTIFIER,
+    		horizonEquipmentEventLogVariableValueType          INTEGER,
+    		horizonEquipmentEventLogVariableCounter32Val       Counter32,
+    		horizonEquipmentEventLogVariableUnsigned32Val      Unsigned32,
+    		horizonEquipmentEventLogVariableTimeTicksVal       TimeTicks,
+    		horizonEquipmentEventLogVariableInteger32Val       Integer32,
+    		horizonEquipmentEventLogVariableOctetStringVal     OCTET STRING,
+    		horizonEquipmentEventLogVariableIpAddressVal       IpAddress,
+    		horizonEquipmentEventLogVariableOidVal             OBJECT IDENTIFIER,
+    		horizonEquipmentEventLogVariableCounter64Val       Counter64
+    		--horizonEquipmentEventLogVariableOpaqueVal          Opaque
+
+		}
+
+	horizonEquipmentEventLogVariableIndex  	 OBJECT-TYPE
+		SYNTAX     Unsigned32 (1..4294967295)
+ 		MAX-ACCESS not-accessible
+ 		STATUS     current
+		DESCRIPTION
+	     	"A monotonically increasing integer, starting at 1 for a given
+	 	horizonEquipmentEventLogIndex, for indexing variables within the logged
+	 	    Event Notification."
+ 		::= { horizonEquipmentEventLogVariableEntry 1 }
+
+	horizonEquipmentEventLogVariableID             OBJECT-TYPE
+ 		SYNTAX     OBJECT IDENTIFIER
+                MAX-ACCESS read-only
+                STATUS     current
+                DESCRIPTION
+                "The variable's object identifier."
+                ::= { horizonEquipmentEventLogVariableEntry 2 }
+
+        horizonEquipmentEventLogVariableValueType         OBJECT-TYPE
+                SYNTAX      INTEGER { counter32(1), unsigned32(2), timeTicks(3),
+                                      integer32(4), ipAddress(5), octetString(6),
+                                      objectId(7), counter64(8) } -- Not supported: opaque(9)
+                MAX-ACCESS  read-only
+                STATUS      current
+                DESCRIPTION
+                "The type of the value.  One and only one of the value
+                 objects that follow must be instantiated, based on this type."
+                ::= { horizonEquipmentEventLogVariableEntry 3 }
+
+
+	horizonEquipmentEventLogVariableCounter32Val       OBJECT-TYPE
+	    SYNTAX      Counter32
+ 	   MAX-ACCESS  read-only
+ 	   STATUS      current
+	   DESCRIPTION
+	    "The value when horizonEquipmentEventLogVariableValueType is 'counter32'."
+ 	   ::= { horizonEquipmentEventLogVariableEntry 4 }
+
+	horizonEquipmentEventLogVariableUnsigned32Val      OBJECT-TYPE
+ 	   SYNTAX      Unsigned32
+ 	   MAX-ACCESS  read-only
+ 	   STATUS      current
+ 	   DESCRIPTION
+	     "The value when horizonEquipmentEventLogVariableValueType is 'unsigned32'."
+ 	   ::= { horizonEquipmentEventLogVariableEntry 5 }
+
+	horizonEquipmentEventLogVariableTimeTicksVal       OBJECT-TYPE
+	    SYNTAX      TimeTicks
+ 	   MAX-ACCESS  read-only
+ 	   STATUS      current
+ 	   DESCRIPTION
+ 	    "The value when horizonEquipmentEventLogVariableValueType is 'timeTicks'."
+ 	   ::= { horizonEquipmentEventLogVariableEntry 6 }
+
+	horizonEquipmentEventLogVariableInteger32Val       OBJECT-TYPE
+	    SYNTAX      Integer32
+	    MAX-ACCESS  read-only
+	    STATUS      current
+	    DESCRIPTION
+ 	    "The value when horizonEquipmentEventLogVariableValueType is 'integer32'."
+	    ::= { horizonEquipmentEventLogVariableEntry 7 }
+
+	horizonEquipmentEventLogVariableOctetStringVal     OBJECT-TYPE
+ 	   SYNTAX      OCTET STRING
+ 	   MAX-ACCESS  read-only
+ 	   STATUS      current
+	   DESCRIPTION
+ 	    "The value when horizonEquipmentEventLogVariableValueType is 'octetString'."
+ 	   ::= { horizonEquipmentEventLogVariableEntry 8 }
+
+	horizonEquipmentEventLogVariableIpAddressVal       OBJECT-TYPE
+	    SYNTAX      IpAddress
+	    MAX-ACCESS  read-only
+	    STATUS      current
+ 	   DESCRIPTION
+	    "The value when horizonEquipmentEventLogVariableValueType is 'ipAddress'.
+	     Although this seems to be unfriendly for IPv6, we
+	     have to recognize that there are a number of older
+ 	    MIBs that do contain an IPv4 format address, known
+ 	    as IpAddress.
+
+	  IPv6 addresses are represented using TAddress or
+	   InetAddress, and so the underlying datatype is
+	     OCTET STRING, and their value would be stored in
+	     the horizonEquipmentEventLogVariableOctetStringVal column."
+	    ::= { horizonEquipmentEventLogVariableEntry 9 }
+
+	horizonEquipmentEventLogVariableOidVal             OBJECT-TYPE
+ 	   SYNTAX      OBJECT IDENTIFIER
+ 	   MAX-ACCESS  read-only
+ 	   STATUS      current
+ 	  DESCRIPTION
+ 	    "The value when horizonEquipmentEventLogVariableValueType is 'objectId'."
+ 	   ::= { horizonEquipmentEventLogVariableEntry 10 }
+
+	horizonEquipmentEventLogVariableCounter64Val       OBJECT-TYPE
+	    SYNTAX      Counter64
+ 	   MAX-ACCESS  read-only
+ 	   STATUS      current
+	    DESCRIPTION
+ 	    "The value when horizonEquipmentEventLogVariableValueType is 'counter64'."
+ 	   ::= { horizonEquipmentEventLogVariableEntry 11 }
+--
+-- Opaque type not supported 
+--
+--	horizonEquipmentEventLogVariableOpaqueVal          OBJECT-TYPE
+-- 	   SYNTAX      Opaque
+-- 	   MAX-ACCESS  read-only
+-- 	   STATUS      current
+-- 	   DESCRIPTION
+-- 	    "The value when horizonEquipmentEventLogVariableValueType is 'opaque'."
+-- 	   ::= { horizonEquipmentEventLogVariableEntry 12 }
+
+
+--
+-- Object definitions: active alarm list section
+--
+
+--
+-- Active Alarm Table 
+--
+
+ 
+	horizonEquipmentAlarmActiveLastChanged  OBJECT-TYPE
+	   SYNTAX      TimeTicks
+	   MAX-ACCESS  read-only
+	   STATUS      current
+	   DESCRIPTION
+ 	     "The value of sysUpTime at the time of the last
+	       creation or deletion of an entry in the horizonEquipmentAlarmActiveTable.
+	       Useful in case of polling (no traps mechanism used).
+	       If the number of entries has been unchanged since the
+	       last re-initialization, then this object contains a zero value."
+	   ::= { horizonEquipmentAlarmList  1 }
+
+ 	horizonEquipmentAlarmActiveRowCounter OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The number of active alarms row in the table."
+		::= { horizonEquipmentAlarmList  2 }
+
+
+	horizonEquipmentAlarmActiveTable OBJECT-TYPE
+	  SYNTAX      SEQUENCE OF HorizonEquipmentAlarmActiveEntry
+	  MAX-ACCESS  not-accessible
+ 	  STATUS      current
+ 	  DESCRIPTION
+          "A table of Active Alarms entries."
+ 	  ::= { horizonEquipmentAlarmList  3 }
+
+	horizonEquipmentAlarmActiveEntry OBJECT-TYPE
+	  SYNTAX      HorizonEquipmentAlarmActiveEntry
+ 	  MAX-ACCESS  not-accessible
+	  STATUS      current
+ 	  DESCRIPTION
+	       "Entries appear in this table when alarms are raised.  They
+	        are removed when the alarm is cleared."
+ 	  INDEX       { horizonEquipmentAlarmActiveTime,
+	                horizonEquipmentAlarmActiveIndex }
+	   ::= { horizonEquipmentAlarmActiveTable 1 }
+
+	HorizonEquipmentAlarmActiveEntry ::= SEQUENCE {
+	  horizonEquipmentAlarmActiveIndex         	Unsigned32,
+	  horizonEquipmentAlarmActiveTime           	TimeStamp,
+	  horizonEquipmentAlarmActiveDateAndTime   	DateAndTime,
+        horizonEquipmentAlarmActiveSourceID		OBJECT IDENTIFIER
+    	--horizonEquipmentAlarmActiveSourceOpaqueVal     Opaque
+	}
+
+
+	
+
+	horizonEquipmentAlarmActiveIndex OBJECT-TYPE
+	   SYNTAX     Unsigned32 (1..4294967295)
+	   MAX-ACCESS not-accessible
+	   STATUS     current
+	   DESCRIPTION
+ 	      "A strictly monotonically increasing integer which
+ 	      acts as the index of entries within the named alarm
+	       list.  It wraps back to 1 after it reaches its
+ 	      maximum value."
+	   ::= { horizonEquipmentAlarmActiveEntry 1 }
+
+	horizonEquipmentAlarmActiveTime                 	OBJECT-TYPE
+    		SYNTAX      TimeStamp
+  		MAX-ACCESS  not-accessible
+		STATUS      current
+		DESCRIPTION
+  		   "The value of sysUpTime when the entry was placed in the list.
+	       This object facilitates retrieving all instances of
+	       alarms that have been raised or have changed state
+	       since a given point in time."
+  		::= { horizonEquipmentAlarmActiveEntry 2 }
+
+    horizonEquipmentAlarmActiveDateAndTime OBJECT-TYPE
+	   SYNTAX      DateAndTime
+	   MAX-ACCESS  read-only
+	   STATUS      current
+	   DESCRIPTION
+	       "The local date and time when the error occurred.
+
+	       This object facilitates retrieving all instances of
+	       alarms that have been raised or have changed state
+	       since a given point in time.
+
+ 	      Implementations MUST include the offset from UTC,
+	       if available.  Implementation in environments in which
+	       the UTC offset is not available is NOT RECOMMENDED."
+	   ::= { horizonEquipmentAlarmActiveEntry 3 }
+    
+	horizonEquipmentAlarmActiveSourceID        	OBJECT-TYPE
+	   SYNTAX      OBJECT IDENTIFIER
+	   MAX-ACCESS  read-only
+	   STATUS      current
+	   DESCRIPTION
+	       "The MIB object identifier of the alarm (contained in an Alarm Notification
+		type object) that is occurring."
+	   ::= { horizonEquipmentAlarmActiveEntry 4 }
+--
+-- Opaque type not supported
+--
+--	horizonEquipmentAlarmActiveSourceOpaqueVal          OBJECT-TYPE
+-- 	   SYNTAX      Opaque
+-- 	   MAX-ACCESS  read-only
+-- 	   STATUS      current
+-- 	   DESCRIPTION
+-- 	    "The value when value type is 'opaque'.It is coded as follows:
+--		code: OCTET STRING(SIZE(1)), fixed to 1 (structure identifier);
+--		type: INTEGER, see horizonEquipmentEventLogVariableValueType values;
+--		value: ASN.1 basic encoding rule"
+-- 	   ::= { horizonEquipmentAlarmActiveEntry 5 }
+
+--
+-- Object definitions: trap counter and timestamp
+--
+   horizonEquipmentOutTrapsCounter OBJECT-TYPE
+		SYNTAX Counter32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The counter of the output traps.
+			It increases by one every time a new trap is sent to all the managers configured
+			in the relevant table. In this way its value is the number of notification events
+			occurred since the last agent reset and every manager that reads this value can understand
+			whether some event has been lost or not.
+			(Note that in general this counter differs from the RFC1213 snmpOutTraps, that counts the
+			number of Trap PDUs sent). When the logging mechanism is enabled, it corresponds to the index in the eventlog table"
+		::= { horizonEquipmentSnmpTrap 1 }
+
+	horizonEquipmentLastOutTrapTimeStamp OBJECT-TYPE
+		SYNTAX TimeStamp
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The value of sysUpTime when the last trap was sent."
+		::= { horizonEquipmentSnmpTrap 2 }
+    
+--
+-- SNMP Management: managers destination table 
+--
+	
+	horizonEquipmentTrapDestTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF HorizonEquipmentTrapDestEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"The trap destination table."
+		::= { horizonEquipmentSnmpTrap 4 }
+	
+	horizonEquipmentTrapDestEntry OBJECT-TYPE
+		SYNTAX HorizonEquipmentTrapDestEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"An entry in the table. The table is indexed by the Manager IP Address."
+		INDEX { horizonEquipmentTrapDestAddress }
+		::= { horizonEquipmentTrapDestTable 1 }
+	
+	HorizonEquipmentTrapDestEntry ::=
+		SEQUENCE { 
+			horizonEquipmentTrapDestAddress
+				IpAddress,
+			horizonEquipmentTrapDestCommString
+				OCTET STRING,
+			horizonEquipmentTrapDestUdpPort
+				INTEGER,
+			horizonEquipmentTrapDestSnmpVer
+				INTEGER,
+			horizonEquipmentTrapDestEraseTime
+				TimeTicks,
+			horizonEquipmentTrapDestRowStatus
+				RowStatus
+		 }
+
+	horizonEquipmentTrapDestAddress OBJECT-TYPE
+		SYNTAX IpAddress
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"Manager IP address.
+			STORAGE: volatile."
+		::= { horizonEquipmentTrapDestEntry 1 }
+
+	horizonEquipmentTrapDestCommString OBJECT-TYPE
+		SYNTAX OCTET STRING (SIZE(1..24))
+		MAX-ACCESS read-create
+		STATUS current
+		DESCRIPTION
+			"Manager SNMP community string.
+			STORAGE: volatile."
+		::= { horizonEquipmentTrapDestEntry 2 }
+
+	horizonEquipmentTrapDestUdpPort OBJECT-TYPE
+		SYNTAX INTEGER (1..65535)
+		MAX-ACCESS read-create
+		STATUS current
+		DESCRIPTION
+			"Destination UDP port. Default: 162.
+			STORAGE: volatile."
+		DEFVAL { 162 }
+		::= { horizonEquipmentTrapDestEntry 3 }
+
+	horizonEquipmentTrapDestSnmpVer OBJECT-TYPE
+		SYNTAX INTEGER
+		{
+		v1(0),
+		v2(1)
+		}
+		MAX-ACCESS read-create
+		STATUS current
+		DESCRIPTION
+			"SMI version supported by the manager.
+			STORAGE: volatile."
+		DEFVAL { v2 }
+		::= { horizonEquipmentTrapDestEntry 4 }
+    
+    horizonEquipmentTrapDestEraseTime OBJECT-TYPE
+		SYNTAX TimeTicks
+		MAX-ACCESS read-create
+		STATUS current
+		DESCRIPTION
+			"The time (in hundredths of a second) after which
+			the relevant row in horizonEquipmentTrapDestTable is erased.
+			1440000 (i.e. 4 hours) is the maximum value for this parameter. 
+			STORAGE: volatile."
+		DEFVAL {1440000}
+		::= { horizonEquipmentTrapDestEntry 5 }
+		
+	horizonEquipmentTrapDestRowStatus OBJECT-TYPE
+		SYNTAX RowStatus
+		MAX-ACCESS read-create
+		STATUS current
+		DESCRIPTION
+			"The row status variable, used according to row creation and removal conventions."
+		::= { horizonEquipmentTrapDestEntry 6 }
+    
+--
+-- Object definitions: pseudo-events support
+--
+	horizonEquipmentConfChangeOid OBJECT-TYPE
+		SYNTAX OBJECT IDENTIFIER
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"The OID of the last node changed. It is sent to the managers in order to
+			notify a configuration change."
+		::= { horizonEquipmentPseudoEventsObjects 1 }
+--
+-- Not Supported
+--		
+--	horizonEquipmentConfChangeVal OBJECT-TYPE
+--		SYNTAX Opaque
+--		MAX-ACCESS read-only
+--		STATUS current
+--		DESCRIPTION
+--			"The value of the last node changed. It is sent to the managers when meaningful."
+--		::= { horizonEquipmentPseudoEventsObjects 2 }
+		
+	horizonEquipmentConfChangeMode OBJECT-TYPE
+		SYNTAX EnableType
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+			"Enable/Disable of sending ConfChange Trap.
+			STORAGE: permanent."
+		DEFVAL { enabled }
+		::= { horizonEquipmentPseudoEventsObjects 3 }
+		
+	horizonEquipmentConfChangeNotification NOTIFICATION-TYPE
+		OBJECTS { horizonEquipmentConfChangeOid,
+				--horizonEquipmentConfChangeVal,
+				horizonEquipmentOutTrapsCounter }
+		STATUS current
+		DESCRIPTION
+			"Notification of configuration change."
+		::= { horizonEquipmentPseudoEventsObjects 4 }	
+
+--
+-- Object definitions: mirror-traps support
+--
+
+	horizonEquipmentMirrorFlag OBJECT-TYPE
+		SYNTAX INTEGER    (0..65535)
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Fixed to 1=mirror trap"
+		::= { horizonEquipmentMirrorObjects 1 }
+		
+
+
+   horizonEquipmentMirrorColdStart NOTIFICATION-TYPE
+		OBJECTS { horizonEquipmentMirrorFlag, horizonEquipmentOutTrapsCounter }
+       STATUS  current
+       DESCRIPTION
+               "A coldStart trap signifies that the SNMP entity,
+               supporting a notification originator application, is
+               reinitializing itself and that its configuration may
+               have been altered."
+       ::= { horizonEquipmentMirrorObjects 2 }
+   
+
+END	
+
+
+
+

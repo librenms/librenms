@@ -15,6 +15,7 @@
 
 /**
  * Mattermost API Transport
+ *
  * @author George Pantazis <gpant@eservices-greece.com>
  * @copyright 2019 George Pantazis, LibreNMS
  * @license GPL

@@ -57,6 +57,8 @@
                                 <option value="hostname">hostname</option>
                                 <option value="os">os</option>
                                 <option value="type">type</option>
+                                <option value="hostname">hostname</option>
+                                <option value="sysObjectID">sysObjectID</option>
                             </select>
                         </div>
                     </div>

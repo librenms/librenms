@@ -15,4 +15,4 @@ poller_modules:
     ports: false
 discovery_modules:
     ports: false
-nobulk: true
+snmp_bulk: false

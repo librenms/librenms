@@ -1,5 +1,5 @@
 <div class="table-responsive">
-    <table id="graylog-{{ $id }}" class="table table-hover table-condensed graylog">
+    <table id="graylog-{{ $id }}" class="table table-hover table-condensed graylog" data-ajax="true">
         <thead>
         <tr>
             <th data-column-id="severity" data-sortable="false"></th>

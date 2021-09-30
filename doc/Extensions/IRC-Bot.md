@@ -62,20 +62,20 @@ Command | Description
 
 ### Server examples
 
-Unencrypted Connection to `irc.freenode.org`:
+Unencrypted Connection to `irc.libera.chat`:
 
 ```php
    ...
-   $config['irc_host'] = "irc.freenode.org";
+   $config['irc_host'] = "irc.libera.chat";
    $config['irc_port'] = 6667;
    ...
 ```
 
-SSL-Encrypted Connection to `irc.freenode.org`:
+SSL-Encrypted Connection to `irc.libera.chat`:
 
 ```php
    ...
-   $config['irc_host'] = "irc.freenode.org";
+   $config['irc_host'] = "irc.libera.chat";
    $config['irc_port'] = "+6697";
    ...
 ```

@@ -5,7 +5,7 @@ icon: hwg
 mib_dir: hwg
 over:
     - { graph: device_temperature, text: Temperature }
-nobulk: true
+snmp_bulk: false
 poller_modules:
     applications: false
     bgp-peers: false

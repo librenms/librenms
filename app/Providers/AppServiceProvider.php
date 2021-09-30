@@ -63,16 +63,8 @@ class AppServiceProvider extends ServiceProvider
             return auth()->check() && auth()->user()->isAdmin();
         });
 
-        Blade::directive('deviceLink', function ($arguments) {
-            return "<?php echo \LibreNMS\Util\Url::deviceLink($arguments); ?>";
-        });
-
         Blade::directive('deviceUrl', function ($arguments) {
             return "<?php echo \LibreNMS\Util\Url::deviceUrl($arguments); ?>";
-        });
-
-        Blade::directive('portLink', function ($arguments) {
-            return "<?php echo \LibreNMS\Util\Url::portLink($arguments); ?>";
         });
     }
 
@@ -163,7 +155,7 @@ class AppServiceProvider extends ServiceProvider
         });
 
         Validator::extend('zero_or_exists', function ($attribute, $value, $parameters, $validator) {
-            if ($value === 0) {
+            if ($value === 0 || $value === '0') {
                 return true;
             }
 

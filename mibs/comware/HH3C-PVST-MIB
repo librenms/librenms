@@ -1,0 +1,161 @@
+-- ===================================================================
+-- Copyright (c) 2004-2014 New H3C Tech. Co., Ltd. All rights reserved.
+--
+-- Description: Per-VLAN spanning tree (PVST) MIB
+-- Reference:
+-- Version: V1.0
+-- History:
+-- V1.0 2014-05-27 Created by wangmingjun.
+-- ===================================================================
+-- ===================================================================
+--
+-- Imported variables and types
+--
+-- ===================================================================
+
+HH3C-PVST-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Integer32, NOTIFICATION-TYPE
+        FROM SNMPv2-SMI
+    hh3cCommon
+        FROM HH3C-OID-MIB;
+
+hh3cPvst MODULE-IDENTITY
+    LAST-UPDATED "201405270000Z"
+    ORGANIZATION
+        "New H3C Tech. Co., Ltd."
+    CONTACT-INFO
+        "Platform Team New H3C Tech. Co., Ltd.
+         Hai-Dian District Beijing P.R. China
+         http://www.h3c.com
+         Zip:100085"
+    DESCRIPTION
+        "This MIB defines objects for managing Per-VLAN spanning tree (PVST)."
+    REVISION "201405270000Z"
+    DESCRIPTION
+        "The initial version of this MIB file."
+    ::= { hh3cCommon  131 }
+
+-- =========================
+-- Subtrees in the PVST MIB
+-- =========================
+
+hh3cPvstObjects
+    OBJECT IDENTIFIER ::= { hh3cPvst 1 }
+
+hh3cPvstNotifications
+    OBJECT IDENTIFIER ::= { hh3cPvst 2 }
+
+--  ==================================================================
+--  PVST objects table
+--  ==================================================================
+
+--  ===============================
+--  PVST VLAN table
+--  ===============================
+
+hh3cPvstVlanConfigTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Hh3cPvstVlanConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "PVST VLAN configuration table."
+    ::= { hh3cPvstObjects 1 }
+
+hh3cPvstVlanConfigEntry OBJECT-TYPE
+    SYNTAX      Hh3cPvstVlanConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "PVST VLAN configuration table entry."
+    INDEX {
+              hh3cPvstVlanID
+          }
+    ::= { hh3cPvstVlanConfigTable 1 }
+
+Hh3cPvstVlanConfigEntry ::=
+    SEQUENCE
+    {
+        hh3cPvstVlanID      Integer32
+    }
+
+hh3cPvstVlanID OBJECT-TYPE
+    SYNTAX      Integer32(1..4094)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The index of the VLAN configuration table."
+    ::= { hh3cPvstVlanConfigEntry 1 }
+
+--  ===============================
+--  PVST VLAN port table
+--  ===============================
+
+hh3cPvstVlanPortConfigTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Hh3cPvstVlanPortConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "PVST VLAN port configuration table."
+        ::= { hh3cPvstObjects 2 }
+
+hh3cPvstVlanPortConfigEntry OBJECT-TYPE
+    SYNTAX      Hh3cPvstVlanPortConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "PVST VLAN port configuration table entry."
+    INDEX {
+              hh3cPvstPortVlanID,
+              hh3cPvstPortIndex
+          }
+    ::= { hh3cPvstVlanPortConfigTable 1 }
+
+Hh3cPvstVlanPortConfigEntry ::=
+    SEQUENCE
+    {
+        hh3cPvstPortVlanID     Integer32,
+        hh3cPvstPortIndex      Integer32
+    }
+
+hh3cPvstPortVlanID       OBJECT-TYPE
+    SYNTAX      Integer32(1..4094)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The index of the VLAN."
+    ::={ hh3cPvstVlanPortConfigEntry 1 }
+
+hh3cPvstPortIndex OBJECT-TYPE
+    SYNTAX      Integer32(1..2147483647)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The index of the bridge port."
+    ::={ hh3cPvstVlanPortConfigEntry 2 }
+
+--  ==================================================================
+--  PVST notification table
+--  ==================================================================
+
+hh3cPvstEvents
+    OBJECT IDENTIFIER ::= { hh3cPvstNotifications 0 }
+
+hh3cPvstVlanPortDetectedTc NOTIFICATION-TYPE
+    OBJECTS  { hh3cPvstPortVlanID , hh3cPvstPortIndex }
+    STATUS   current
+    DESCRIPTION
+        "The SNMP trap is generated when a port detects
+         a topology change in a VLAN."
+    ::= { hh3cPvstEvents 1 }
+
+hh3cPvstVlanPortRcvdTc NOTIFICATION-TYPE
+    OBJECTS  { hh3cPvstPortVlanID , hh3cPvstPortIndex }
+    STATUS   current
+    DESCRIPTION
+        "The SNMP trap is generated when a port receives
+         a topology change in a VLAN."
+    ::= { hh3cPvstEvents 2 }
+
+END

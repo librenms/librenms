@@ -11,8 +11,6 @@
 $init_modules = [];
 require __DIR__ . '/includes/init.php';
 
-$i = '1';
-
 $s = fopen('php://stdin', 'r');
 while ($line = fgets($s)) {
     //logfile($line);
@@ -20,5 +18,4 @@ while ($line = fgets($s)) {
     process_syslog($entry, 1);
     unset($entry);
     unset($line);
-    $i++;
 }

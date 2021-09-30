@@ -15,6 +15,7 @@
 
 /**
  * API Transport
+ *
  * @author f0o <f0o@devilcode.org>
  * @author PipoCanaja (github.com/PipoCanaja)
  * @copyright 2014 f0o, LibreNMS
@@ -85,6 +86,10 @@ class Api extends Transport
             $res = $client->request('PUT', $host, $request_opts);
         } else { //Method POST
             $request_opts['form_params'] = $query;
+            foreach ($query as $metric => $value) { // replace all variables defined in Options and found in Body for their values
+                $body = str_replace('{{ $' . $metric . ' }}', $value, $body);
+            }
+            $request_opts['body'] = $body;
             $res = $client->request('POST', $host, $request_opts);
         }
 

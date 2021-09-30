@@ -63,7 +63,7 @@ function graylog_severity_label($severity)
 /**
  * Execute and snmp command, filter debug output unless -v is specified
  *
- * @param array $command
+ * @param  array  $command
  * @return null|string
  */
 function external_exec($command)
@@ -315,7 +315,6 @@ function device_by_id_cache($device_id, $refresh = false)
     $device['lat'] = $model->location->lat ?? null;
     $device['lng'] = $model->location->lng ?? null;
     $device['attribs'] = $model->getAttribs();
-    $device['vrf_lite_cisco'] = $model->vrfLites->keyBy('context_name')->toArray();
 
     return $device;
 }
@@ -421,8 +420,8 @@ function del_dev_attrib($device, $attrib_type)
  * Output using console color if possible
  * https://github.com/pear/Console_Color2/blob/master/examples/documentation
  *
- * @param string $string the string to print with console color
- * @param bool $enabled if set to false, this function does nothing
+ * @param  string  $string  the string to print with console color
+ * @param  bool  $enabled  if set to false, this function does nothing
  */
 function c_echo($string, $enabled = true)
 {
@@ -572,7 +571,8 @@ function object_is_cached($section, $obj)
  * Checks if config allows us to ping this device
  * $attribs contains an array of all of this devices
  * attributes
- * @param array $attribs Device attributes
+ *
+ * @param  array  $attribs  Device attributes
  * @return bool
  **/
 function can_ping_device($attribs)
@@ -593,7 +593,8 @@ function search_phrase_column($c)
 
 /**
  * Constructs the path to an RRD for the Ceph application
- * @param string $gtype The type of rrd we're looking for
+ *
+ * @param  string  $gtype  The type of rrd we're looking for
  * @return string
  **/
 function ceph_rrd($gtype)
@@ -612,6 +613,7 @@ function ceph_rrd($gtype)
 
 /**
  * Parse location field for coordinates
+ *
  * @param string location The location field to look for coords in.
  * @return array|bool Containing the lat and lng coords
  **/
@@ -627,7 +629,8 @@ function parse_location($location)
 
 /**
  * Returns version info
- * @param bool $remote fetch remote version info from github
+ *
+ * @param  bool  $remote  fetch remote version info from github
  * @return array
  */
 function version_info($remote = false)
@@ -656,7 +659,7 @@ function version_info($remote = false)
     $output['db_schema'] = vsprintf('%s (%s)', $version->database());
     $output['php_ver'] = phpversion();
     $output['python_ver'] = \LibreNMS\Util\Version::python();
-    $output['mysql_ver'] = dbIsConnected() ? dbFetchCell('SELECT version()') : '?';
+    $output['mysql_ver'] = \LibreNMS\DB\Eloquent::isConnected() ? \LibreNMS\DB\Eloquent::version() : '?';
     $output['rrdtool_ver'] = str_replace('1.7.01.7.0', '1.7.0', implode(' ', array_slice(explode(' ', shell_exec(
         Config::get('rrdtool', 'rrdtool') . ' --version |head -n1'
     )), 1, 1)));
@@ -668,25 +671,9 @@ function version_info($remote = false)
 }//end version_info()
 
 /**
- * Checks SNMPv3 capabilities
- *
- * SHA2 for Auth Algorithms (SHA-224,SHA-256,SHA-384,SHA-512)
- * AES-192, AES-256 for Privacy Algorithms
- */
-function snmpv3_capabilities(): array
-{
-    $process = new Process([Config::get('snmpget', 'snmpget'), '--help']);
-    $process->run();
-
-    $ret['sha2'] = Str::contains($process->getErrorOutput(), 'SHA-512');
-    $ret['aes256'] = Str::contains($process->getErrorOutput(), 'AES-256');
-
-    return $ret;
-}
-
-/**
  * Convert a MySQL binary v4 (4-byte) or v6 (16-byte) IP address to a printable string.
- * @param string $ip A binary string containing an IP address, as returned from MySQL's INET6_ATON function
+ *
+ * @param  string  $ip  A binary string containing an IP address, as returned from MySQL's INET6_ATON function
  * @return string Empty if not valid.
  */
 // Fuction is from https://php.net/manual/en/function.inet-ntop.php
@@ -702,8 +689,9 @@ function inet6_ntop($ip)
 
 /**
  * If hostname is an ip, use return sysName
- * @param array $device (uses hostname and sysName fields)
- * @param string $hostname
+ *
+ * @param  array  $device  (uses hostname and sysName fields)
+ * @param  string  $hostname
  * @return string
  */
 function format_hostname($device, $hostname = null)
@@ -729,6 +717,7 @@ function format_hostname($device, $hostname = null)
 
 /**
  * Return valid port association modes
+ *
  * @return array
  */
 function get_port_assoc_modes()
@@ -743,7 +732,8 @@ function get_port_assoc_modes()
 
 /**
  * Get DB id of given port association mode name
- * @param string $port_assoc_mode
+ *
+ * @param  string  $port_assoc_mode
  * @return int
  */
 function get_port_assoc_mode_id($port_assoc_mode)
@@ -755,7 +745,8 @@ function get_port_assoc_mode_id($port_assoc_mode)
 
 /**
  * Get name of given port association_mode ID
- * @param int $port_assoc_mode_id Port association mode ID
+ *
+ * @param  int  $port_assoc_mode_id  Port association mode ID
  * @return bool
  */
 function get_port_assoc_mode_name($port_assoc_mode_id)
@@ -769,8 +760,9 @@ function get_port_assoc_mode_name($port_assoc_mode_id)
  * Query all ports of the given device (by ID) and build port array and
  * port association maps for ifIndex, ifName, ifDescr. Query port stats
  * if told to do so, too.
- * @param int $device_id ID of device to query ports for
- * @param bool $with_statistics Query port statistics, too. (optional, default false)
+ *
+ * @param  int  $device_id  ID of device to query ports for
+ * @param  bool  $with_statistics  Query port statistics, too. (optional, default false)
  * @return array
  */
 function get_ports_mapped($device_id, $with_statistics = false)
@@ -810,9 +802,10 @@ function get_ports_mapped($device_id, $with_statistics = false)
 
 /**
  * Calculate port_id of given port using given devices port information and port association mode
- * @param array $ports_mapped Port information of device queried by get_ports_mapped()
- * @param array $port Port information as fetched from DB
- * @param string $port_association_mode Port association mode to use for mapping
+ *
+ * @param  array  $ports_mapped  Port information of device queried by get_ports_mapped()
+ * @param  array  $port  Port information as fetched from DB
+ * @param  string  $port_association_mode  Port association mode to use for mapping
  * @return int port_id (or Null)
  */
 function get_port_id($ports_mapped, $port, $port_association_mode)
@@ -838,11 +831,12 @@ function get_port_id($ports_mapped, $port, $port_association_mode)
 
 /**
  * Create a glue-chain
- * @param array $tables Initial Tables to construct glue-chain
- * @param string $target Glue to find (usual device_id)
- * @param int $x Recursion Anchor
- * @param array $hist History of processed tables
- * @param array $last Glues on the fringe
+ *
+ * @param  array  $tables  Initial Tables to construct glue-chain
+ * @param  string  $target  Glue to find (usual device_id)
+ * @param  int  $x  Recursion Anchor
+ * @param  array  $hist  History of processed tables
+ * @param  array  $last  Glues on the fringe
  * @return array|false
  */
 function ResolveGlues($tables, $target, $x = 0, $hist = [], $last = [])
@@ -920,8 +914,8 @@ function ResolveGlues($tables, $target, $x = 0, $hist = [], $last = [])
 /**
  * Determine if a given string contains a given substring.
  *
- * @param  string $haystack
- * @param  string|array $needles
+ * @param  string  $haystack
+ * @param  string|array  $needles
  * @return bool
  */
 function str_i_contains($haystack, $needles)
@@ -938,8 +932,8 @@ function str_i_contains($haystack, $needles)
 /**
  * Get alert_rules sql filter by minimal severity
  *
- * @param  string|int $min_severity
- * @param  string $alert_rules_name
+ * @param  string|int  $min_severity
+ * @param  string  $alert_rules_name
  * @return string
  */
 function get_sql_filter_min_severity($min_severity, $alert_rules_name)
@@ -969,7 +963,7 @@ function get_sql_filter_min_severity($min_severity, $alert_rules_name)
  * Load the os definition for the device and set type and os_group
  * $device['os'] must be set
  *
- * @param array $device
+ * @param  array  $device
  */
 function load_os(&$device)
 {
@@ -983,11 +977,11 @@ function load_os(&$device)
 
     // Set type to a predefined type for the OS if it's not already set
     $loaded_os_type = Config::get("os.{$device['os']}.type");
-    if ((! isset($device['attribs']['override_device_type']) && $device['attribs']['override_device_type'] != 1) && array_key_exists('type', $device) && $loaded_os_type != $device['type']) {
-        log_event('Device type changed ' . $device['type'] . ' => ' . $loaded_os_type, $device, 'system', 3);
-        $device['type'] = $loaded_os_type;
-        dbUpdate(['type' => $loaded_os_type], 'devices', 'device_id=?', [$device['device_id']]);
-        d_echo("Device type changed to $loaded_os_type!\n");
+    $model = DeviceCache::get($device['device_id']);
+    if (! $model->getAttrib('override_device_type') && $loaded_os_type != $model->type) {
+        $model->type = $loaded_os_type;
+        $model->save();
+        Log::debug("Device type changed to $loaded_os_type!");
     }
 
     if ($os_group = Config::get("os.{$device['os']}.group")) {
@@ -1001,8 +995,8 @@ function load_os(&$device)
  * Converts fahrenheit to celsius (with 2 decimal places)
  * if $scale is not fahrenheit, it assumes celsius and  returns the value
  *
- * @param float $value
- * @param string $scale fahrenheit or celsius
+ * @param  float  $value
+ * @param  string  $scale  fahrenheit or celsius
  * @return string (containing a float)
  */
 function fahrenheit_to_celsius($value, $scale = 'fahrenheit')
@@ -1018,8 +1012,8 @@ function fahrenheit_to_celsius($value, $scale = 'fahrenheit')
  * Converts celsius to fahrenheit (with 2 decimal places)
  * if $scale is not celsius, it assumes celsius and  returns the value
  *
- * @param float $value
- * @param string $scale fahrenheit or celsius
+ * @param  float  $value
+ * @param  string  $scale  fahrenheit or celsius
  * @return string (containing a float)
  */
 function celsius_to_fahrenheit($value, $scale = 'celsius')
@@ -1059,8 +1053,8 @@ function mw_to_dbm($value)
 
 /**
  * @param $value
- * @param null $default
- * @param int $min
+ * @param  null  $default
+ * @param  int  $min
  * @return null
  */
 function set_null($value, $default = null, $min = null)
@@ -1107,9 +1101,9 @@ function get_vm_parent_id($device)
  * Generate a class name from a lowercase string containing - or _
  * Remove - and _ and camel case words
  *
- * @param string $name The string to convert to a class name
- * @param string $namespace namespace to prepend to the name for example: LibreNMS\
- * @return string  Class name
+ * @param  string  $name  The string to convert to a class name
+ * @param  string  $namespace  namespace to prepend to the name for example: LibreNMS\
+ * @return string Class name
  */
 function str_to_class($name, $namespace = null)
 {
@@ -1127,8 +1121,8 @@ function str_to_class($name, $namespace = null)
 /**
  * Index an array by a column
  *
- * @param array $array
- * @param string|int $column
+ * @param  array  $array
+ * @param  string|int  $column
  * @return array
  */
 function array_by_column($array, $column)

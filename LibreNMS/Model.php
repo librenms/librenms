@@ -27,10 +27,10 @@ abstract class Model
      * This the sensors array should contain all the sensors of a specific class
      * It may contain sensors from multiple tables and devices, but that isn't the primary use
      *
-     * @param int $device_id
-     * @param array $models
-     * @param array $unique_fields fields to search for an existing entry
-     * @param array $ignored_update_fields Don't compare these field when updating
+     * @param  int  $device_id
+     * @param  array  $models
+     * @param  array  $unique_fields  fields to search for an existing entry
+     * @param  array  $ignored_update_fields  Don't compare these field when updating
      */
     final public static function sync($device_id, array $models, $unique_fields = [], $ignored_update_fields = [])
     {
@@ -50,8 +50,8 @@ abstract class Model
     /**
      * Remove invalid Models.  Passing an empty array will remove all models related to $device_id
      *
-     * @param int $device_id
-     * @param array $model_ids valid Model ids
+     * @param  int  $device_id
+     * @param  array  $model_ids  valid Model ids
      */
     protected static function clean($device_id, $model_ids)
     {
@@ -78,8 +78,8 @@ abstract class Model
     /**
      * Save this Model to the database.
      *
-     * @param array $unique_fields fields to search for an existing entry
-     * @param array $ignored_update_fields Don't compare these field when updating
+     * @param  array  $unique_fields  fields to search for an existing entry
+     * @param  array  $ignored_update_fields  Don't compare these field when updating
      * @return int the id of this model in the database
      */
     final public function save($unique_fields = [], $ignored_update_fields = [])
@@ -112,7 +112,7 @@ abstract class Model
      * Fetch the sensor from the database.
      * If it doesn't exist, returns null.
      *
-     * @param array $unique_fields fields to search for an existing entry
+     * @param  array  $unique_fields  fields to search for an existing entry
      * @return array|null
      */
     protected function fetch($unique_fields = [])
@@ -153,7 +153,7 @@ abstract class Model
     /**
      * Convert this Model to an array with fields that match the database
      *
-     * @param array $exclude Exclude the listed fields
+     * @param  array  $exclude  Exclude the listed fields
      * @return array
      */
     abstract public function toArray($exclude = []);
@@ -166,7 +166,7 @@ abstract class Model
     abstract public function isValid();
 
     /**
-     * @param static $model
+     * @param  static  $model
      */
     public static function onDelete($model)
     {
@@ -176,7 +176,7 @@ abstract class Model
     }
 
     /**
-     * @param static $model
+     * @param  static  $model
      */
     public static function onCreate($model)
     {
@@ -186,7 +186,7 @@ abstract class Model
     }
 
     /**
-     * @param static $model
+     * @param  static  $model
      */
     public static function onUpdate($model)
     {

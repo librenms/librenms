@@ -66,7 +66,7 @@ class MempoolsController extends TableController
     }
 
     /**
-     * @param Device|Mempool $mempool
+     * @param  Device|Mempool  $mempool
      */
     public function formatItem($mempool)
     {

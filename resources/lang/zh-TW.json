@@ -1,4 +1,6 @@
 {
+    "Server Name": "伺服器名稱",
+    "Power Status": "電源狀態", 
     "Services Templates": "服務範本",
     "New Service Template": "新增服務範本",
     "Apply Service Templates": "套用服務範本",    

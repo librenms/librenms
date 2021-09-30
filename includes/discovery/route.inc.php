@@ -282,7 +282,7 @@ if ($mpls_skip != 1) {
                             d_echo(isset($current));
                             d_echo(isset($current['db']));
                             d_echo($current['db']);
-                            d_echo(count($current['db']));
+                            d_echo(count($current['db'] ?? []));
                             d_echo($delete_row[$current['db']['route_id']]);
                             $entry['created_at'] = ['NOW()'];
                             $create_row[] = $entry;

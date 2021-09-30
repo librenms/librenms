@@ -18,6 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2019 PipoCanaja
  * @author     PipoCanaja
  */
@@ -71,7 +72,7 @@ class RoutesTablesController extends TableController
     /**
      * Defines the base query for this resource
      *
-     * @param \Illuminate\Http\Request $request
+     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Query\Builder
      */
     protected function baseQuery($request)
@@ -112,9 +113,9 @@ class RoutesTablesController extends TableController
     }
 
     /**
-     * @param string $search
-     * @param Builder $query
-     * @param array $fields
+     * @param  string  $search
+     * @param  Builder  $query
+     * @param  array  $fields
      * @return Builder|\Illuminate\Database\Query\Builder
      */
     protected function search($search, $query, $fields = [])
@@ -132,8 +133,8 @@ class RoutesTablesController extends TableController
     }
 
     /**
-     * @param Request $request
-     * @param Builder $query
+     * @param  Request  $request
+     * @param  Builder  $query
      * @return Builder
      */
     public function sort($request, $query)
@@ -165,7 +166,7 @@ class RoutesTablesController extends TableController
     }
 
     /**
-     * @param Route $route_entry
+     * @param  Route  $route_entry
      */
     public function formatItem($route_entry)
     {

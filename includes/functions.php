@@ -68,8 +68,8 @@ function only_alphanumeric($string)
 /**
  * Parse cli discovery or poller modules and set config for this run
  *
- * @param string $type discovery or poller
- * @param array $options get_opts array (only m key is checked)
+ * @param  string  $type  discovery or poller
+ * @param  array  $options  get_opts array (only m key is checked)
  * @return bool
  */
 function parse_modules($type, $options)
@@ -117,8 +117,8 @@ function logfile($string)
 /**
  * Check an array of regexes against a subject if any match, return true
  *
- * @param string $subject the string to match against
- * @param array|string $regexes an array of regexes or single regex to check
+ * @param  string  $subject  the string to match against
+ * @param  array|string  $regexes  an array of regexes or single regex to check
  * @return bool if any of the regexes matched, return true
  */
 function preg_match_any($subject, $regexes)
@@ -138,9 +138,9 @@ function preg_match_any($subject, $regexes)
  * contains, starts, ends: $a haystack, $b needle(s)
  * regex: $a subject, $b regex
  *
- * @param mixed $a
- * @param mixed $b
- * @param string $comparison =, !=, ==, !== >=, <=, >, <, contains, starts, ends, regex
+ * @param  mixed  $a
+ * @param  mixed  $b
+ * @param  string  $comparison  =, !=, ==, !== >=, <=, >, <, contains, starts, ends, regex
  * @return bool
  */
 function compare_var($a, $b, $comparison = '=')
@@ -218,8 +218,8 @@ function getLogo($device)
 }
 
 /**
- * @param array $device
- * @param string $class to apply to the image tag
+ * @param  array  $device
+ * @param  string  $class  to apply to the image tag
  * @return string an image tag with the logo for this device. Images are often wide, not square.
  */
 function getLogoTag($device, $class = null)
@@ -363,15 +363,14 @@ function delete_device($id)
 /**
  * Add a device to LibreNMS
  *
- * @param string $host dns name or ip address
- * @param string $snmp_version If this is empty, try v2c,v3,v1.  Otherwise, use this specific version.
- * @param int $port the port to connect to for snmp
- * @param string $transport udp or tcp
- * @param string $poller_group the poller group this device will belong to
- * @param bool $force_add add even if the device isn't reachable
- * @param string $port_assoc_mode snmp field to use to determine unique ports
- * @param array $additional an array with additional parameters to take into consideration when adding devices
- *
+ * @param  string  $host  dns name or ip address
+ * @param  string  $snmp_version  If this is empty, try v2c,v3,v1.  Otherwise, use this specific version.
+ * @param  int  $port  the port to connect to for snmp
+ * @param  string  $transport  udp or tcp
+ * @param  string  $poller_group  the poller group this device will belong to
+ * @param  bool  $force_add  add even if the device isn't reachable
+ * @param  string  $port_assoc_mode  snmp field to use to determine unique ports
+ * @param  array  $additional  an array with additional parameters to take into consideration when adding devices
  * @return int returns the device_id of the added device
  *
  * @throws HostExistsException This hostname already exists
@@ -516,12 +515,11 @@ function isSNMPable($device)
 /**
  * Check if the given host responds to ICMP echo requests ("pings").
  *
- * @param string $hostname The hostname or IP address to send ping requests to.
- * @param string $address_family The address family ('ipv4' or 'ipv6') to use. Defaults to IPv4.
- * Will *not* be autodetected for IP addresses, so it has to be set to 'ipv6' when pinging an IPv6 address or an IPv6-only host.
- * @param array $attribs The device attributes
- *
- * @return array  'result' => bool pingable, 'last_ping_timetaken' => int time for last ping, 'db' => fping results
+ * @param  string  $hostname  The hostname or IP address to send ping requests to.
+ * @param  string  $address_family  The address family ('ipv4' or 'ipv6') to use. Defaults to IPv4.
+ *                                  Will *not* be autodetected for IP addresses, so it has to be set to 'ipv6' when pinging an IPv6 address or an IPv6-only host.
+ * @param  array  $attribs  The device attributes
+ * @return array 'result' => bool pingable, 'last_ping_timetaken' => int time for last ping, 'db' => fping results
  */
 function isPingable($hostname, $address_family = 'ipv4', $attribs = [])
 {
@@ -579,17 +577,18 @@ function getpollergroup($poller_group = '0')
 /**
  * Add a host to the database
  *
- * @param string $host The IP or hostname to add
- * @param string $community The snmp community
- * @param string $snmpver snmp version: v1 | v2c | v3
- * @param int $port SNMP port number
- * @param string $transport SNMP transport: udp | udp6 | udp | tcp6
- * @param array $v3 SNMPv3 settings required array keys: authlevel, authname, authpass, authalgo, cryptopass, cryptoalgo
- * @param int $poller_group distributed poller group to assign this host to
- * @param string $port_assoc_mode field to use to identify ports: ifIndex, ifName, ifDescr, ifAlias
- * @param bool $force_add Do not detect the host os
- * @param array $additional an array with additional parameters to take into consideration when adding devices
+ * @param  string  $host  The IP or hostname to add
+ * @param  string  $community  The snmp community
+ * @param  string  $snmpver  snmp version: v1 | v2c | v3
+ * @param  int  $port  SNMP port number
+ * @param  string  $transport  SNMP transport: udp | udp6 | udp | tcp6
+ * @param  array  $v3  SNMPv3 settings required array keys: authlevel, authname, authpass, authalgo, cryptopass, cryptoalgo
+ * @param  int  $poller_group  distributed poller group to assign this host to
+ * @param  string  $port_assoc_mode  field to use to identify ports: ifIndex, ifName, ifDescr, ifAlias
+ * @param  bool  $force_add  Do not detect the host os
+ * @param  array  $additional  an array with additional parameters to take into consideration when adding devices
  * @return int the id of the added host
+ *
  * @throws HostExistsException Throws this exception if the host already exists
  * @throws Exception Throws this exception if insertion into the database fails
  */
@@ -675,7 +674,7 @@ function match_network($nets, $ip, $first = false)
         $ip_arr = explode('/', $net);
         $net_long = ip2long($ip_arr[0]);
         $x = ip2long($ip_arr[1]);
-        $mask = long2ip($x) == $ip_arr[1] ? $x : 0xffffffff << (32 - $ip_arr[1]);
+        $mask = long2ip($x) == $ip_arr[1] ? $x : 0xFFFFFFFF << (32 - $ip_arr[1]);
         $ip_long = ip2long($ip);
         if ($rev) {
             if (($ip_long & $mask) == ($net_long & $mask)) {
@@ -739,11 +738,11 @@ function get_astext($asn)
 /**
  * Log events to the event table
  *
- * @param string $text message describing the event
- * @param array|int $device device array or device_id
- * @param string $type brief category for this event. Examples: sensor, state, stp, system, temperature, interface
- * @param int $severity 1: ok, 2: info, 3: notice, 4: warning, 5: critical, 0: unknown
- * @param int $reference the id of the referenced entity.  Supported types: interface
+ * @param  string  $text  message describing the event
+ * @param  array|int  $device  device array or device_id
+ * @param  string  $type  brief category for this event. Examples: sensor, state, stp, system, temperature, interface
+ * @param  int  $severity  1: ok, 2: info, 3: notice, 4: warning, 5: critical, 0: unknown
+ * @param  int  $reference  the id of the referenced entity.  Supported types: interface
  */
 function log_event($text, $device = null, $type = null, $severity = 2, $reference = null)
 {
@@ -885,8 +884,8 @@ function include_dir($dir, $regex = '')
  * Check if port is valid to poll.
  * Settings: empty_ifdescr, good_if, bad_if, bad_if_regexp, bad_ifname_regexp, bad_ifalias_regexp, bad_iftype, bad_ifoperstatus
  *
- * @param array $port
- * @param array $device
+ * @param  array  $port
+ * @param  array  $device
  * @return bool
  */
 function is_port_valid($port, $device)
@@ -973,8 +972,8 @@ function is_port_valid($port, $device)
  * Try to fill in data for ifDescr, ifName, and ifAlias if devices do not provide them.
  * Will not fill ifAlias if the user has overridden it
  *
- * @param array $port
- * @param array $device
+ * @param  array  $port
+ * @param  array  $device
  */
 function port_fill_missing(&$port, $device)
 {
@@ -1090,8 +1089,8 @@ function guidv4($data)
     // From: Jack http://stackoverflow.com/users/1338292/ja%CD%A2ck
     assert(strlen($data) == 16);
 
-    $data[6] = chr(ord($data[6]) & 0x0f | 0x40); // set version to 0100
-    $data[8] = chr(ord($data[8]) & 0x3f | 0x80); // set bits 6-7 to 10
+    $data[6] = chr(ord($data[6]) & 0x0F | 0x40); // set version to 0100
+    $data[8] = chr(ord($data[8]) & 0x3F | 0x80); // set bits 6-7 to 10
 
     return vsprintf('%s%s-%s-%s-%s-%s%s%s', str_split(bin2hex($data), 4));
 }
@@ -1170,7 +1169,7 @@ function fix_integer_value($value)
 /**
  * Find a device that has this IP. Checks ipv4_addresses and ipv6_addresses tables.
  *
- * @param string $ip
+ * @param  string  $ip
  * @return \App\Models\Device|false
  */
 function device_has_ip($ip)
@@ -1198,13 +1197,12 @@ function device_has_ip($ip)
  * Try to determine the address family (IPv4 or IPv6) associated with an SNMP
  * transport specifier (like "udp", "udp6", etc.).
  *
- * @param string $transport The SNMP transport specifier, for example "udp",
- *                          "udp6", "tcp", or "tcp6". See `man snmpcmd`,
- *                          section "Agent Specification" for a full list.
- *
+ * @param  string  $transport  The SNMP transport specifier, for example "udp",
+ *                             "udp6", "tcp", or "tcp6". See `man snmpcmd`,
+ *                             section "Agent Specification" for a full list.
  * @return string The address family associated with the given transport
- *             specifier: 'ipv4' (or local connections not associated
- *             with an IP stack) or 'ipv6'.
+ *                specifier: 'ipv4' (or local connections not associated
+ *                with an IP stack) or 'ipv6'.
  */
 function snmpTransportToAddressFamily($transport)
 {
@@ -1220,8 +1218,8 @@ function snmpTransportToAddressFamily($transport)
 /**
  * Checks if the $hostname provided exists in the DB already
  *
- * @param string $hostname The hostname to check for
- * @param string $sysName The sysName to check
+ * @param  string  $hostname  The hostname to check for
+ * @param  string  $sysName  The sysName to check
  * @return bool true if hostname already exists
  *              false if hostname doesn't exist
  */
@@ -1264,9 +1262,8 @@ function oxidized_reload_nodes()
 /**
  * Perform DNS lookup
  *
- * @param array $device Device array from database
- * @param string $type The type of record to lookup
- *
+ * @param  array  $device  Device array from database
+ * @param  string  $type  The type of record to lookup
  * @return string ip
  *
  **/
@@ -1299,8 +1296,8 @@ function dnslookup($device, $type = false, $return = false)
  * For for backward compatibility:
  *   Returns null if $states is empty, $state_name already exists, and contains state translations
  *
- * @param string $state_name the unique name for this state translation
- * @param array $states array of states, each must contain keys: descr, graph, value, generic
+ * @param  string  $state_name  the unique name for this state translation
+ * @param  array  $states  array of states, each must contain keys: descr, graph, value, generic
  * @return int|null
  */
 function create_state_index($state_name, $states = [])
@@ -1332,8 +1329,8 @@ function create_state_index($state_name, $states = [])
 /**
  * Synchronize the sensor state translations with the database
  *
- * @param int $state_index_id index of the state
- * @param array $states array of states, each must contain keys: descr, graph, value, generic
+ * @param  int  $state_index_id  index of the state
+ * @param  array  $states  array of states, each must contain keys: descr, graph, value, generic
  */
 function sync_sensor_states($state_index_id, $states)
 {
@@ -1635,7 +1632,7 @@ function initStats()
 /**
  * Print out the stats totals since the last time this function was called
  *
- * @param bool $update_only Only update the stats checkpoint, don't print them
+ * @param  bool  $update_only  Only update the stats checkpoint, don't print them
  */
 function printChangedStats($update_only = false)
 {
@@ -1720,9 +1717,9 @@ function printStats()
 }
 
 /**
- * @param string $stat snmpget, snmpwalk
- * @param float $start_time The time the operation started with 'microtime(true)'
- * @return float  The calculated run time
+ * @param  string  $stat  snmpget, snmpwalk
+ * @param  float  $start_time  The time the operation started with 'microtime(true)'
+ * @return float The calculated run time
  */
 function recordSnmpStatistic($stat, $start_time)
 {
@@ -1752,7 +1749,7 @@ function runTraceroute($device)
 
 /**
  * @param $device
- * @param bool $record_perf
+ * @param  bool  $record_perf
  * @return array
  */
 function device_is_up($device, $record_perf = false)
@@ -2047,8 +2044,8 @@ function get_device_oid_limit($device)
 /**
  * If Distributed, create a lock, then purge the mysql table
  *
- * @param string $table
- * @param string $sql
+ * @param  string  $table
+ * @param  string  $sql
  * @return int exit code
  */
 function lock_and_purge($table, $sql)
@@ -2075,9 +2072,9 @@ function lock_and_purge($table, $sql)
 /**
  * If Distributed, create a lock, then purge the mysql table according to the sql query
  *
- * @param string $table
- * @param string $sql
- * @param string $msg
+ * @param  string  $table
+ * @param  string  $sql
+ * @param  string  $msg
  * @return int exit code
  */
 function lock_and_purge_query($table, $sql, $msg)
@@ -2105,8 +2102,8 @@ function lock_and_purge_query($table, $sql, $msg)
  * Check if disk is valid to poll.
  * Settings: bad_disk_regexp
  *
- * @param array $disk
- * @param array $device
+ * @param  array  $disk
+ * @param  array  $device
  * @return bool
  */
 function is_disk_valid($disk, $device)
@@ -2126,9 +2123,9 @@ function is_disk_valid($disk, $device)
  * Queues a hostname to be refreshed by Oxidized
  * Settings: oxidized.url
  *
- * @param string $hostname
- * @param string $msg
- * @param string $username
+ * @param  string  $hostname
+ * @param  string  $msg
+ * @param  string  $username
  * @return bool
  */
 function oxidized_node_update($hostname, $msg, $username = 'not_provided')
@@ -2149,8 +2146,9 @@ function oxidized_node_update($hostname, $msg, $username = 'not_provided')
 /**
  * @params int code
  * @params int subcode
+ *
  * @return string
- * Take a BGP error code and subcode to return a string representation of it
+ *                Take a BGP error code and subcode to return a string representation of it
  */
 function describe_bgp_error_code($code, $subcode)
 {

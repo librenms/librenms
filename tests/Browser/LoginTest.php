@@ -13,6 +13,7 @@ use LibreNMS\Tests\DuskTestCase;
 
 /**
  * Class LoginTest
+ *
  * @group browser
  */
 class LoginTest extends DuskTestCase
@@ -27,6 +28,7 @@ class LoginTest extends DuskTestCase
         $this->browse(function (Browser $browser) {
             $password = 'some_password';
             $user = User::factory()->create([
+                /** @phpstan-ignore-next-line */
                 'password' => password_hash($password, PASSWORD_DEFAULT),
             ]); /** @var User $user */
             $browser->visit(new LoginPage())
@@ -52,6 +54,7 @@ class LoginTest extends DuskTestCase
         $this->browse(function (Browser $browser) {
             $password = 'another_password';
             $user = User::factory()->create([
+                /** @phpstan-ignore-next-line */
                 'password' => password_hash($password, PASSWORD_DEFAULT),
             ]); /** @var User $user */
             Config::persist('twofactor', true); // set to db
