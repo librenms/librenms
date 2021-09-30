@@ -62,6 +62,9 @@ class DeviceObserver
      */
     public function deleting(Device $device)
     {
+        $device->disabled = 1;
+        $device->save();
+        
         // delete related data
         $device->ports()->delete();
         $device->syslogs()->delete();
