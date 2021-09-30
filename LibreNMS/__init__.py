@@ -13,6 +13,17 @@ from subprocess import check_output
 from time import time
 
 from .command_runner import command_runner
+from .queuemanager import (
+    QueueManager,
+    TimedQueueManager,
+    BillingQueueManager,
+    PingQueueManager,
+    ServicesQueueManager,
+    AlertQueueManager,
+    PollerQueueManager,
+    DiscoveryQueueManager,
+)
+from .service import Service, ServiceConfig
 
 # Hard limit script execution time so we don't get to "hang"
 DEFAULT_SCRIPT_TIMEOUT = 3600
