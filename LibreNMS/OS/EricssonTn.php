@@ -35,28 +35,6 @@ class EricssonTn extends OS implements
     WirelessPowerDiscovery,
     WirelessRateDiscovery
 {
-    public function discoverWirelessSnr()
-    {
-        $sensors = [];
-
-        $data = snmpwalk_cache_oid($this->getDeviceArray(), 'xfCarrierTermSNIR', [], 'XF-RADIOLINK-RLT-MIB');
-        $carrier = $this->getCacheTable('xfCarrierTermDistinguishedName', 'XF-RADIOLINK-RLT-MIB');
-        foreach ($data as $index => $entry) {
-            $sensors[] = new WirelessSensor(
-                'snr',
-                $this->getDeviceId(),
-                '.1.3.6.1.4.1.193.81.3.4.5.1.3.1.17.' . $index,
-                'ericsson-6600',
-                $index,
-                'SNR: ' . $carrier[$index]['xfCarrierTermDistinguishedName'],
-                null,
-                1,
-                10
-            );
-        }
-
-        return $sensors;
-    }
 
     public function discoverWirelessRate()
     {
