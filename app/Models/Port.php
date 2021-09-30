@@ -61,34 +61,30 @@ class Port extends DeviceRelatedModel
      */
     public function getLabel()
     {
-        $label = '';
+        $os = optional($this->device)->os;
 
-        if (isset($this->device) && is_object($this->device)) {
-            $os = $this->device->os;
+        if ($os && \LibreNMS\Config::getOsSetting($os, 'ifname')) {
+            $label = $this->ifName;
+        } elseif ($os && \LibreNMS\Config::getOsSetting($os, 'ifalias')) {
+            $label = $this->ifAlias;
+        }
 
-            if (\LibreNMS\Config::getOsSetting($os, 'ifname')) {
-                $label = $this->ifName;
-            } elseif (\LibreNMS\Config::getOsSetting($os, 'ifalias')) {
-                $label = $this->ifAlias;
+        if (empty($label)) {
+            $label = $this->ifDescr;
+
+            if ($os && \LibreNMS\Config::getOsSetting($os, 'ifindex')) {
+                $label .= " $this->ifIndex";
             }
+        }
 
-            if (empty($label)) {
-                $label = $this->ifDescr;
-
-                if (\LibreNMS\Config::getOsSetting($os, 'ifindex')) {
-                    $label .= " $this->ifIndex";
-                }
+        foreach ((array) \LibreNMS\Config::get('rewrite_if', []) as $src => $val) {
+            if (Str::contains(strtolower($label), strtolower($src))) {
+                $label = $val;
             }
+        }
 
-            foreach ((array) \LibreNMS\Config::get('rewrite_if', []) as $src => $val) {
-                if (Str::contains(strtolower($label), strtolower($src))) {
-                    $label = $val;
-                }
-            }
-
-            foreach ((array) \LibreNMS\Config::get('rewrite_if_regexp', []) as $reg => $val) {
-                $label = preg_replace($reg . 'i', $val, $label);
-            }
+        foreach ((array) \LibreNMS\Config::get('rewrite_if_regexp', []) as $reg => $val) {
+            $label = preg_replace($reg . 'i', $val, $label);
         }
 
         return $label;
