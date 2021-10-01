@@ -23,27 +23,39 @@
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
-namespace LibreNMS\Polling;
+namespace LibreNMS\Data\Source;
 
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
+use Log;
 
 class SnmpResponse
 {
     private $raw;
+    /**
+     * @var int
+     */
+    private $exitCode;
 
     public function __construct(string $output, int $exitCode = 0)
     {
         $this->exitCode = $exitCode;
-        $output = preg_replace('/Wrong Type \(should be .*\): /', '', $output);
-        $this->raw = rtrim($output, "\r\n");
+        $this->raw = preg_replace('/Wrong Type \(should be .*\): /', '', $output);
     }
 
     public function isValid(): bool
     {
-        return ! ($this->exitCode !== 0
-            || empty($this->raw)
-            || preg_match('/(No Such Instance|No Such Object|No more variables left|Authentication failure)/i', $this->raw));
+        $invalid = empty($this->raw)
+//            || $this->exitCode !== 0
+            || preg_match('/(No Such Instance|No Such Object|No more variables left|Authentication failure|Timeout: No Response from)/i', $this->raw, $matches);
+
+        if ($invalid) {
+            Log::debug(sprintf('SNMP query failed. Exit Code: %s Empty: %s Bad String: %s', $this->exitCode, var_export(empty($this->raw), true), $matches[1] ?? 'not found'));
+
+            return false;
+        }
+
+        return true;
     }
 
     /**
@@ -62,17 +74,22 @@ class SnmpResponse
     public function values(): array
     {
         $values = [];
-        foreach (explode(PHP_EOL, $this->raw) as $line) {
-            if (empty($line) || Str::contains($line, ['at this OID', 'this MIB View'])) {
+        $line = strtok($this->raw, PHP_EOL);
+        while ($line !== false) {
+            if (Str::contains($line, 'at this OID') || Str::contains($line, 'this MIB View')) {
+                $line = strtok(PHP_EOL);
                 continue;
             }
 
-            $split = explode(' ', $line, 2);
-            if (count($split) == 2) {
-                $values[$split[0]] = $split[1];
-            } else {
-                $values[] = $split[0];
+            [$oid, $value] = explode(' = ', $line, 2);
+
+            $line = strtok(PHP_EOL); // get the next line and concatenate multi-line values
+            while ($line !== false && ! Str::contains($line, '=')) {
+                $value .= PHP_EOL . $line;
+                $line = strtok(PHP_EOL);
             }
+
+            $values[$oid] = $value;
         }
 
         return $values;
@@ -95,5 +112,13 @@ class SnmpResponse
         }
 
         return $array;
+    }
+
+    /**
+     * @return int
+     */
+    public function getExitCode(): int
+    {
+        return $this->exitCode;
     }
 }

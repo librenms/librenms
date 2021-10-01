@@ -23,14 +23,16 @@
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
-namespace LibreNMS\Polling;
+namespace LibreNMS\Data\Source;
 
 use App\Models\Device;
+use DeviceCache;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use LibreNMS\Config;
 use LibreNMS\Enum\Alert;
 use LibreNMS\Util\Debug;
+use LibreNMS\Util\Rewrite;
 use Log;
 use Symfony\Component\Process\Process;
 
@@ -76,7 +78,7 @@ class SNMP
      */
     private $options = [];
 
-    private $defaultOptions = ['-OqX'];
+    private $defaultOptions = ['-OQXUte'];
     /**
      * @var \App\Models\Device
      */
@@ -84,7 +86,7 @@ class SNMP
 
     public function __construct()
     {
-        $this->device = \DeviceCache::getPrimary();
+        $this->device = DeviceCache::getPrimary();
     }
 
     public function device(Device $device): SNMP
@@ -117,8 +119,9 @@ class SNMP
 
     /**
      * Get and OID
-     * @param array|string $oid
-     * @return \LibreNMS\Polling\SnmpResponse
+     *
+     * @param  array|string  $oid
+     * @return \LibreNMS\Data\Source\SnmpResponse
      */
     public function get($oid): SnmpResponse
     {
@@ -127,8 +130,8 @@ class SNMP
 
     /**
      * Walk and OID
-     * @param array|string $oid
-     * @return \LibreNMS\Polling\SnmpResponse
+     * @param  array|string  $oid
+     * @return \LibreNMS\Data\Source\SnmpResponse
      */
     public function walk($oid): SnmpResponse
     {
@@ -145,15 +148,13 @@ class SNMP
         return $this->exec('snmptranslate', is_string($oid) ? explode(' ', $oid) : $oid);
     }
 
-    private function recordStatistic(string $type, $start_time): float
+    private function recordStatistic(string $type, $start_time): void
     {
         global $snmp_stats;
 
         $runtime = microtime(true) - $start_time;
         $snmp_stats['ops'][$type] = isset($snmp_stats['ops'][$type]) ? $snmp_stats['ops'][$type] + 1 : 0;
         $snmp_stats['time'][$type] = isset($snmp_stats['time'][$type]) ? $snmp_stats['time'][$type] + $runtime : $runtime;
-
-        return $runtime;
     }
 
     private function buildCli(string $command, array $oids): array
@@ -181,7 +182,7 @@ class SNMP
             array_push($cmd, '-r', $retries);
         }
 
-        $hostname = \LibreNMS\Util\Rewrite::addIpv6Brackets((string) ($this->device->overwrite_ip ?: $this->device->hostname));
+        $hostname = Rewrite::addIpv6Brackets((string) ($this->device->overwrite_ip ?: $this->device->hostname));
         $cmd[] = ($this->device->transport ?? 'udp') . ':' . $hostname . ':' . $this->device->port;
 
         return array_merge($cmd, $oids);

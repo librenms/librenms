@@ -108,11 +108,15 @@ return [
             'device spec' => 'Device to query: device_id or hostname/ip',
             'oid' => 'SNMP OID to fetch.  Should be either MIB::oid or a numeric oid',
         ],
+        'failed' => 'SNMP command failed!',
+        'oid' => 'OID',
         'options' => [
             'type' => 'The type of snmp query to perform :types',
             'output' => 'Specify the output format :formats',
             'numeric' => 'Numeric OIDs'
         ],
+        'not_found' => 'Device not found',
+        'value' => 'Value',
     ],
     'translation:generate' => [
         'description' => 'Generate updated json language files for use in the web frontend',
