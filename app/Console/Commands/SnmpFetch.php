@@ -45,6 +45,7 @@ class SnmpFetch extends LnmsCommand
         $device_id = Device::where('device_id', $spec)->orWhere('hostname', $spec)->value('device_id');
         if ($device_id == null) {
             $this->error(trans('commands.snmp:fetch.not_found'));
+
             return 1;
         }
 
@@ -67,12 +68,14 @@ class SnmpFetch extends LnmsCommand
             $this->line($res->raw());
             $this->alert(trans('commands.snmp:fetch.failed'));
             $res->isValid();
+
             return 1;
         }
 
         switch ($output) {
             case 'value':
                 $this->line($res->value());
+
                 return 0;
             case 'values':
                 $values = [];
@@ -83,11 +86,13 @@ class SnmpFetch extends LnmsCommand
                     [trans('commands.snmp:fetch.oid'), trans('commands.snmp:fetch.value')],
                     $values
                 );
+
                 return 0;
             case 'table':
                 $dumper = new VarDumper();
 
                 dump($res->table($this->option('depth')));
+
                 return 0;
         }
 

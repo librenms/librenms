@@ -31,6 +31,9 @@ use Log;
 
 class SnmpResponse
 {
+    /**
+     * @var string
+     */
     private $raw;
     /**
      * @var int
@@ -95,7 +98,7 @@ class SnmpResponse
         return $values;
     }
 
-    public function table($group = 0, &$array = []): array
+    public function table(int $group = 0, array &$array = []): array
     {
         foreach ($this->values() as $key => $value) {
             preg_match_all('/([^[\]]+)/', $key, $parts);

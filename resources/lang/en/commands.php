@@ -113,7 +113,7 @@ return [
         'options' => [
             'type' => 'The type of snmp query to perform :types',
             'output' => 'Specify the output format :formats',
-            'numeric' => 'Numeric OIDs'
+            'numeric' => 'Numeric OIDs',
         ],
         'not_found' => 'Device not found',
         'value' => 'Value',

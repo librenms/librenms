@@ -38,6 +38,9 @@ use Symfony\Component\Process\Process;
 
 class SNMP
 {
+    /**
+     * @var array
+     */
     private $cleanup = [
         'command' => [
             [
@@ -58,12 +61,12 @@ class SNMP
                 '-P\' \'PASSWORD\'',
                 '-H\' \'HOSTNAME\'',
                 '\1:HOSTNAME:\3',
-            ]
+            ],
         ],
         'output' => [
             '/(?:(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)\.){3}(?:25[0-5]|2[0-4][0-9]|[01]?[0-9][0-9]?)/',
             '*',
-        ]
+        ],
     ];
     /**
      * @var string
@@ -77,7 +80,9 @@ class SNMP
      * @var array|string
      */
     private $options = [];
-
+    /**
+     * @var string[]
+     */
     private $defaultOptions = ['-OQXUte'];
     /**
      * @var \App\Models\Device
@@ -89,36 +94,65 @@ class SNMP
         $this->device = DeviceCache::getPrimary();
     }
 
+    /**
+     * Specify a device to make the snmp query against.
+     * By default the query will use the primary device.
+     *
+     * @param  \App\Models\Device  $device
+     * @return $this
+     */
     public function device(Device $device): SNMP
     {
         $this->device = $device;
-        return $this;
-    }
 
-    public function context(string $context): SNMP
-    {
-        $this->context = $context;
-        return $this;
-    }
-
-    public function mibDir(string $dir): SNMP
-    {
-        $this->mibDir = $dir;
         return $this;
     }
 
     /**
-     * @param array|string $options
+     * Set a context for the snmp query
+     * This is most commonly used to fetch alternate sets of data, such as different VRFs
+     *
+     * @param  string  $context
+     * @return $this
+     */
+    public function context(string $context): SNMP
+    {
+        $this->context = $context;
+
+        return $this;
+    }
+
+    /**
+     * Set an additional MIB directory to search for MIBs.
+     * You do not need to specify the base and os directories, they are already included.
+     *
+     * @param  string  $dir
+     * @return $this
+     */
+    public function mibDir(string $dir): SNMP
+    {
+        $this->mibDir = $dir;
+
+        return $this;
+    }
+
+    /**
+     * Set option(s) for net-snmp command line.
+     * Some options may break parsing, but you can manually parse the raw output if needed.
+     *
+     * @param  array|string  $options
      * @return $this
      */
     public function options($options): SNMP
     {
         $this->options = Arr::wrap($options);
+
         return $this;
     }
 
     /**
-     * Get and OID
+     * snmpget an OID
+     * Commonly used to fetch a single or multiple explicit values.
      *
      * @param  array|string  $oid
      * @return \LibreNMS\Data\Source\SnmpResponse
@@ -129,7 +163,9 @@ class SNMP
     }
 
     /**
-     * Walk and OID
+     * snmpwalk an OID
+     * Fetches all OIDs under a given OID, commonly used with tables.
+     *
      * @param  array|string  $oid
      * @return \LibreNMS\Data\Source\SnmpResponse
      */
@@ -138,11 +174,26 @@ class SNMP
         return $this->exec('snmpwalk', is_string($oid) ? explode(' ', $oid) : $oid);
     }
 
+    /**
+     * snmpnext for the given oid
+     * snmpnext retrieves the first oid after the given oid.
+     *
+     * @param  array|string  $oid
+     * @return \LibreNMS\Data\Source\SnmpResponse
+     */
     public function next($oid): SnmpResponse
     {
-        return $this->exec('snmpgetnext', is_string($oid) ? explode(' ', $oid) : $oid);
+        $oids = is_string($oid) ? explode(' ', $oid) : $oid;
+        return $this->exec('snmpgetnext', $oids);
     }
 
+    /**
+     * Translate an OID.
+     * Specify -On option to output numeric OID.
+     *
+     * @param $oid
+     * @return \LibreNMS\Data\Source\SnmpResponse
+     */
     public function translate($oid): SnmpResponse
     {
         return $this->exec('snmptranslate', is_string($oid) ? explode(' ', $oid) : $oid);
@@ -188,7 +239,7 @@ class SNMP
         return array_merge($cmd, $oids);
     }
 
-    private function buildAuth(array &$cmd)
+    private function buildAuth(array &$cmd): void
     {
         if ($this->device->snmpver === 'v3') {
             array_push($cmd, '-v3', '-l', $this->device->authlevel);
@@ -209,7 +260,6 @@ class SNMP
                 default:
                     Log::debug("Unsupported SNMPv3 AuthLevel: {$this->device->snmpver}");
             }
-
         } elseif ($this->device->snmpver === 'v2c' || $this->device->snmpver === 'v1') {
             array_push($cmd, '-' . $this->device->snmpver, '-c', $this->context ? "{$this->device->community}@$this->context" : $this->device->community);
         } else {
@@ -240,7 +290,7 @@ class SNMP
         return new SnmpResponse($output, $exitCode);
     }
 
-    private function initCommand($binary): array
+    private function initCommand(string $binary): array
     {
         if ($binary == 'snmpwalk' && $this->device->snmpver !== 'v1' && ! Config::getOsSetting($this->device->os, 'snmp_bulk', true)) {
             $snmpcmd = [Config::get('snmpbulkwalk', 'snmpbulkwalk')];
@@ -249,6 +299,7 @@ class SNMP
             if ($max_repeaters > 0) {
                 $snmpcmd[] = "-Cr$max_repeaters";
             }
+
             return $snmpcmd;
         }
 
@@ -286,7 +337,7 @@ class SNMP
         return implode(':', $dirs);
     }
 
-    private function checkExitCode($code, $error)
+    private function checkExitCode(int $code, string $error): void
     {
         if ($code) {
             if (Str::startsWith($error, 'Invalid authentication protocol specified')) {
@@ -298,17 +349,17 @@ class SNMP
         }
     }
 
-    private function logCommand(string $command)
+    private function logCommand(string $command): void
     {
         if (Debug::isEnabled() && ! Debug::isVerbose()) {
             $debug_command = preg_replace($this->cleanup['command'][0], $this->cleanup['command'][1], $command);
-            Log::debug('SNMP[%c' . $debug_command . "%n]", ['color' => true]);
+            Log::debug('SNMP[%c' . $debug_command . '%n]', ['color' => true]);
         } elseif (Debug::isVerbose()) {
-            Log::debug('SNMP[%c' . $command . "%n]", ['color' => true]);
+            Log::debug('SNMP[%c' . $command . '%n]', ['color' => true]);
         }
     }
 
-    private function logOutput(string $output, string $error)
+    private function logOutput(string $output, string $error): void
     {
         if (Debug::isEnabled() && ! Debug::isVerbose()) {
             Log::debug(preg_replace($this->cleanup['output'][0], $this->cleanup['output'][1], $output));
@@ -316,5 +367,13 @@ class SNMP
             Log::debug($output);
         }
         Log::debug($error);
+    }
+
+    /**
+     * @param  array|string  $oid
+     */
+    private function parseOid($oid): array
+    {
+        return is_string($oid) ? explode(' ', $oid) : $oid;
     }
 }
