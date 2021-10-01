@@ -57,15 +57,15 @@ class Device extends BaseModel
         'poller_group',
         'port_association_mode',
         'snmp_disable',
-    // ---- snmpV3 fields ----
+        // ---- snmpV3 fields ----
         'authlevel',
         'authname',
         'authpass',
         'authalgo',
         'cryptopass',
-        'cryptoalgo'
+        'cryptoalgo',
     ];
-    
+
     protected $casts = [
         'last_polled' => 'datetime',
         'status' => 'boolean',
