@@ -1,0 +1,119 @@
+MDS-SERVICES-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, 
+    OBJECT-TYPE
+        FROM SNMPv2-SMI
+    MODULE-COMPLIANCE, 
+    OBJECT-GROUP
+        FROM SNMPv2-CONF
+    mdsServices 
+        FROM MDS-ORBIT-SMI-MIB;
+
+mdsServicesMIB MODULE-IDENTITY
+    LAST-UPDATED "201805160000Z" -- May 16, 2018
+    ORGANIZATION 
+        "GE MDS LLC
+        http://www.gemds.com"
+    CONTACT-INFO
+        "T 1-800-474-0694 (Toll Free in North America)
+         T 585-242-9600
+         F 585-242-9620
+
+         175 Science Parkway
+         Rochester, New York 14620
+         USA"
+    DESCRIPTION
+        "The MIB module to describe the services."
+    REVISION      "201805160000Z"
+    DESCRIPTION
+        "Updated conformance statments baed on smilint."
+    REVISION      "201410200000Z"
+    DESCRIPTION
+        "Removed hyphens from enumerations."
+    REVISION      "201405120000Z"
+    DESCRIPTION
+        "Initial version."
+    ::= { mdsServices 1 }
+
+mServMIBObjects OBJECT IDENTIFIER
+    ::= { mdsServicesMIB 1 }
+
+mServConfig OBJECT IDENTIFIER
+    ::= { mServMIBObjects 1 }
+
+mServStatus OBJECT IDENTIFIER
+    ::= { mServMIBObjects 2 }
+
+-- Textual Conventions
+
+-- Services Status Objects
+mServStatusTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF MServStatusEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+      "This table contains status of services."
+    ::= { mServStatus 1 }
+
+mServStatusEntry OBJECT-TYPE
+    SYNTAX      MServStatusEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+      "Each entry contains status of a service."
+    INDEX   { mServServiceName }
+    ::= { mServStatusTable 1 }
+
+MServStatusEntry ::=
+    SEQUENCE {
+        mServServiceName OCTET STRING,
+        mServServiceStatus INTEGER
+    }
+
+mServServiceName OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+      "Service name."
+    ::= { mServStatusEntry 1 }
+
+mServServiceStatus OBJECT-TYPE
+    SYNTAX      INTEGER {running(0),disabled(1),error(2),notRunning(3)}
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+      "Service status."
+    ::= { mServStatusEntry  2 }
+
+-- conformance information
+mdsServMIBConformance   OBJECT IDENTIFIER ::= { mdsServicesMIB 3 }
+mdsServMIBCompliances OBJECT IDENTIFIER ::= { mdsServMIBConformance 1 }
+mdsServMIBGroups      OBJECT IDENTIFIER ::= { mdsServMIBConformance 2 }
+
+-- compliance statements
+mServCompliance MODULE-COMPLIANCE
+    STATUS  current
+    DESCRIPTION
+            "The compliance statement for SNMP entities that 
+            implement the MDS-SERVICES-MIB."
+    MODULE  -- this module
+        MANDATORY-GROUPS {
+            mServStatusGroup
+        }
+    ::= { mdsServMIBCompliances 1 }
+
+-- units of conformance
+mServStatusGroup OBJECT-GROUP
+    OBJECTS {
+        mServServiceName,
+        mServServiceStatus
+    }
+    STATUS  current
+    DESCRIPTION
+        "A collection of objects providing information about
+        orbit services status."
+    ::= { mdsServMIBGroups 1 }
+
+END

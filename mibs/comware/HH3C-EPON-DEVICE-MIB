@@ -1,0 +1,1510 @@
+--===========================================================
+-- Copyright (C) 2003 New H3C Tech. Co., Ltd. All rights reserved.
+-- Description: This MIB is excerpted from the draft-ietf-hubmib-efm-epon-mib-02 directly
+---             only changed the object name,added the hh3c as prefix.
+-- Reference:  
+-- Version: V1.0
+-- History:
+-- V1.0 created by liyue.  
+--     Define MODULE-IDENTITY for hh3cEponDeviceMIB
+--=================================================================
+HH3C-EPON-DEVICE-MIB DEFINITIONS ::= BEGIN
+
+   IMPORTS
+       hh3cEpon            
+           FROM HH3C-OID-MIB  
+       MODULE-IDENTITY, mib-2, OBJECT-TYPE, Counter32,
+       Unsigned32, Integer32, zeroDotZero
+           FROM SNMPv2-SMI
+       TruthValue, DateAndTime, RowStatus, MacAddress
+           FROM SNMPv2-TC
+       ifIndex
+           FROM IF-MIB
+       MODULE-COMPLIANCE, OBJECT-GROUP
+           FROM SNMPv2-CONF
+       SnmpAdminString
+           FROM SNMP-FRAMEWORK-MIB;
+
+   hh3cEponDeviceMIB MODULE-IDENTITY
+       LAST-UPDATED "200409210000Z"  -- September 21, 2004
+       ORGANIZATION
+           "New H3C Tech. Co., Ltd."
+       CONTACT-INFO
+           "Platform Team New H3C Tech. Co., Ltd.
+           Hai-Dian District Beijing P.R. China
+           http://www.h3c.com
+           Zip:100085
+           "
+       DESCRIPTION
+               "The objects in this MIB module are used to manage
+                Ethernet Passive Optical Network (EPON) devices which
+                are based on the Ethernet in the First Mile (EFM) PON
+                as defined in IEEE Draft P802.3ah/D3.0 clause 60,64,65.
+                                                                        
+                This MIB is excerpted from the draft files directly,only 
+                changed the object name,added the hh3c as prefix.  
+                                                                      
+                The following reference is used throughout this MIB
+                module:
+                [802.3ah] refers to:
+                IEEE Draft P802.3ah/D3.3: 'Draft amendment to -
+                Information technology - Telecommunications and
+                information exchange between systems - Local and
+                metropolitan area networks - Specific requirements -
+                Part 3: Carrier sense multiple access with collision
+                detection (CSMA/CD) access method and physical layer
+                specifications - Media Access Control Parameters,
+                Physical Layers and Management Parameters for subscriber
+                access networks', 22 April 2004.
+                Of particular interest are Clause 64(MPCP) 65(P2mP RS)
+                and 60 (PON PMDs). Clause 30, 'Management', and Clause
+                45,'Management Data Input/Output (MDIO) Interface'.
+
+                Copyright (C) The Internet Society (2004).  This version
+                of this MIB module is part of XXXX see the RFC itself
+                for full legal notices."
+
+             -- Editor's Note: Replace XXXX with the actual RFC number
+             -- assigned by RFC Editor and remove this note
+
+             REVISION    "200409210000Z"  -- September 21, 2004
+             DESCRIPTION "Initial version, published as RFC XXXX."
+
+       ::= { hh3cEpon 4 }      
+
+             -- Editor's Note: Replace XXX with a real OID once it is
+             -- assigned by IANA and remove this note.
+
+   hh3cEponDeviceObjectMIB OBJECT IDENTIFIER ::= { hh3cEponDeviceMIB 1 }
+
+   hh3cEponDeviceObjects OBJECT IDENTIFIER ::= { hh3cEponDeviceObjectMIB  1 }
+
+   hh3cEponDeviceConformance OBJECT IDENTIFIER ::= { hh3cEponDeviceObjectMIB  2 }
+
+   hh3cEponDeviceControlObjects OBJECT IDENTIFIER ::= { hh3cEponDeviceObjects 1 }
+
+   hh3cEponDeviceStatObjects OBJECT IDENTIFIER ::= { hh3cEponDeviceObjects 2 }
+
+   hh3cEponDeviceEventObjects OBJECT IDENTIFIER ::= { hh3cEponDeviceObjects 3 }
+
+
+   hh3cEponDeviceControlTable OBJECT-TYPE
+       SYNTAX  SEQUENCE OF Hh3cEponDeviceControlEntry
+       MAX-ACCESS  not-accessible
+       STATUS  current
+       DESCRIPTION
+               "Table for EPON device MIB modules."
+       ::= { hh3cEponDeviceControlObjects 1 }
+
+   hh3cEponDeviceControlEntry OBJECT-TYPE
+       SYNTAX  Hh3cEponDeviceControlEntry
+       MAX-ACCESS  not-accessible
+       STATUS  current
+       DESCRIPTION
+               "An entry in the EPON device Control table."
+       INDEX  { ifIndex }
+       ::= { hh3cEponDeviceControlTable 1 }
+
+   Hh3cEponDeviceControlEntry ::=
+       SEQUENCE {
+        hh3cEponDeviceObjectReset                       INTEGER,
+        hh3cEponDeviceObjectModes                       INTEGER,
+        hh3cEponDeviceObjectFecEnabled                  INTEGER,
+        hh3cEponDeviceObjectOamMode                     INTEGER,
+        hh3cEponDeviceObjectDeviceReadyMode             INTEGER,
+        hh3cEponDeviceObjectPowerDown                   TruthValue,
+        hh3cEponDeviceObjectNumberOfLLIDs               Integer32,
+        hh3cEponDeviceObjectReportThreshold             Integer32,
+        hh3cEponDeviceRemoteMACAddressLLIDControl       INTEGER
+       }
+
+
+   hh3cEponDeviceObjectReset OBJECT-TYPE
+       SYNTAX  INTEGER {
+               running(1),
+               reset(2)
+       }
+       MAX-ACCESS  read-write
+       STATUS  current
+       DESCRIPTION
+               "This variable is used to reset the EPON device. The
+                interface may be unavailable while the reset occurs and
+                data may be lost. During reading operation it returns
+                the state of the EPON device. running(1) indicates and
+                operates normal operation, reset(2) indicates and
+                operates reset mode. Writing can be done all the time."
+       DEFVAL { 1 }
+       ::= { hh3cEponDeviceControlEntry 1 }
+
+   hh3cEponDeviceObjectModes OBJECT-TYPE
+       SYNTAX  INTEGER {
+               olt(1),
+               onu(2)
+       }
+       MAX-ACCESS  read-only
+       STATUS  current
+       DESCRIPTION
+               "This variable defines the mode of the EPON device. When
+                an olt(1) it is an Optical Line Terminal device (server)
+                and when an onu(2) and Optical Network Unit device
+                (client)"
+       ::= { hh3cEponDeviceControlEntry 2 }
+
+   hh3cEponDeviceObjectFecEnabled OBJECT-TYPE
+       SYNTAX  INTEGER {
+               noFecEnabled (1),
+               fecTxEnabled (2),
+               fecRxEnabled (3),
+               fecTxRxEnabled (4)
+       }
+       MAX-ACCESS  read-write
+       STATUS  current
+       DESCRIPTION
+             "This variable defines and provides information whether the
+              EPON device uses FEC as defined in the [802.3ah] clause
+              65.2 for EPON. When noFECEnabled(1) the device does not
+              support FEC mode When fecTxEnabled(2) the device supports
+              the FEC transmission mode. When fecRxEnabled(3) the device
+              supports the FEC Receive mode. When fecTxRxEnabled(4) the
+              device supports the FEC transmission and receive mode.
+              Writing can be done all the time.
+              This attribute is relevant for an OLT and an ONU."
+       DEFVAL { 1 }
+       ::= { hh3cEponDeviceControlEntry 4 }
+
+   hh3cEponDeviceObjectOamMode OBJECT-TYPE
+       SYNTAX  INTEGER {
+               noOam (1),
+               oamServer (2),
+               oamclient (3)
+       }
+       MAX-ACCESS  read-write
+       STATUS  current
+       DESCRIPTION
+               "This variable defines and provides information on the
+                Operation Administration and Maintenance (OAM) mode of
+                an EPON device as defined by the [802.3ah] clause 57.
+                When noOam(1) the device does not supports the OAM mode.
+                When oamServer(2) the device supports the OAM mode as a
+                server unit. When oamClient(3) the device supports the
+                OAM mode as a client unit.
+                Writing can be done during initialization,
+                hh3cEponDeviceObjectDeviceReadyMode is in notReady(1) or
+                inProcess(2).
+                This attribute is relevant for an OLT and an ONU."
+       DEFVAL { 1 }
+       ::= { hh3cEponDeviceControlEntry 5 }
+
+
+   hh3cEponDeviceObjectDeviceReadyMode     OBJECT-TYPE
+       SYNTAX  INTEGER {
+               notReady (1),
+               inProcess (2),
+               ready (3)
+       }
+       MAX-ACCESS  read-write
+       STATUS  current
+       DESCRIPTION
+               "This variable defines the mode of an EPON device and
+                provides information on the mode in initialization -
+                ready for registration as defined by the [802.3ah]
+                clause 64.
+                When notReady(1) the device is not ready for operation.
+                When inProcess(2) the device is in initialization
+                process.
+                When ready(3) the device is ready for registration.
+                Writing can be done all the time.
+                This attribute is relevant for an OLT and an ONU."
+       DEFVAL { 1 }
+       ::= { hh3cEponDeviceControlEntry 6 }
+
+   hh3cEponDeviceObjectPowerDown OBJECT-TYPE
+       SYNTAX  TruthValue
+       MAX-ACCESS  read-write
+       STATUS  current
+       DESCRIPTION
+               "Setting this variable to True(1) will cause Device to be
+                entered into Power down mode where no registration is
+                allowed and only receiving data from the link.
+                Writing can be done all the time.
+                This attribute is relevant for an OLT and an ONU."
+       DEFVAL { false }
+       ::= { hh3cEponDeviceControlEntry 7 }
+
+
+   hh3cEponDeviceObjectNumberOfLLIDs OBJECT-TYPE
+       SYNTAX  Integer32
+       MAX-ACCESS  read-only
+       STATUS  current
+       DESCRIPTION
+               "A read only variable which defines the number of
+                registered LLIDs (as defined by the [802.3ah] clause 65)
+                in a EPON network for an OLT and an ONU. Initialization
+                value is 0.
+                This attribute is relevant for an OLT and an ONU."
+       ::= { hh3cEponDeviceControlEntry 8 }
+
+   hh3cEponDeviceObjectReportThreshold OBJECT-TYPE
+       SYNTAX  Integer32
+       UNITS       "TQ (16nsec)"
+       MAX-ACCESS  read-write
+       STATUS  current
+       DESCRIPTION
+               "A set of 8 integers, for each LLID, that defines the
+                threshold reporting for each Queue in the REPORT
+                message, as defined in [802.3ah] 64. First Queue set
+                reporting will provide information on the queue
+                occupancy of frames below this Threshold. The value
+                returned shall be in Time quanta (TQ) which is 16nsec or
+                2 octets increments.
+                Writing can be done all the time.
+                This attribute is relevant for an OLT and an ONU."
+       DEFVAL { 0 }
+       ::= { hh3cEponDeviceControlEntry 9 }
+
+   hh3cEponDeviceRemoteMACAddressLLIDControl OBJECT-TYPE
+       SYNTAX INTEGER {
+               none(1),
+               resetLog(2),
+               useDefaultReporting(3)
+       }
+       MAX-ACCESS  read-write
+       STATUS      current
+       DESCRIPTION
+               "Indicates and controls the resetting of the LLID MAC
+                address log. Setting this object to none(1) has no
+                action resetLog(2) empties the LLID MAC address log. All
+                data is deleted. Setting it to useDefaultReporting(3)
+                returns all entries priorities to their factory-default
+                reporting. Reading this object always returns
+                useDefaultReporting(3)."
+       DEFVAL { 3 }
+       ::= { hh3cEponDeviceControlEntry 10 }
+
+   hh3cEponDeviceRemoteMACAddressLLIDTable OBJECT-TYPE
+       SYNTAX      SEQUENCE OF Hh3cEponDeviceRemoteMACAddressLLIDEntry
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+               "A table of read-only value that identifies the
+                source_address and LLIDs parameter of the remote devices
+                in the network. This MacAddress value, as defined in
+                [802.3ah], 30.3.5.1.5, is updated on reception of a
+                valid frame with a unicast destination Field or
+                (1) a destination Field equal to the reserved multicast
+                address for MAC Control specified in [802.3ah] Annex
+                31A, (2) lengthOrType field value equal to the reserved
+                Type for MAC Control as specified in [802.3ah] Annex
+                31A. (3)an MPCP subtype value equal to the subtype
+                reserved for MPCP as specified in [802.3ah] Annex 31A,
+                and an LLID as allocated by the OLT. The table is
+                defined as Remote MAC address - LLID (RMadL)
+                The table is relevant only for an OLT device, and is
+                equivalent from a bridge emulation to the bridge
+                port-MAC address table where the LLIDs are equivalent to
+                virtual bridge ports."
+       ::= { hh3cEponDeviceControlObjects 2 }
+
+
+   hh3cEponDeviceRemoteMACAddressLLIDEntry OBJECT-TYPE
+       SYNTAX      Hh3cEponDeviceRemoteMACAddressLLIDEntry
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+               "A group of entries.  Applications create and delete
+                entries using hh3cEponDeviceRMadlEntryStatus.
+                When adding objects to an LLID they are added in the
+                persistent order of their index in this table."
+       INDEX       {ifIndex }
+       ::= { hh3cEponDeviceRemoteMACAddressLLIDTable 1 }
+
+       Hh3cEponDeviceRemoteMACAddressLLIDEntry ::=
+       SEQUENCE {
+               hh3cEponDeviceRemoteMACAddressLLIDName    SnmpAdminString,
+               hh3cEponDeviceRMadlLLID                   Unsigned32,
+               hh3cEponDeviceRMadlLogID                  OBJECT IDENTIFIER,
+               hh3cEponDeviceRMadlRemoteAddress          MacAddress,
+               hh3cEponDeviceRMadlType                   INTEGER,
+               hh3cEponDeviceRMadlAction                 INTEGER,
+               hh3cEponDeviceRMadlEntryStatus            RowStatus
+       }
+
+   hh3cEponDeviceRemoteMACAddressLLIDName OBJECT-TYPE
+       SYNTAX      SnmpAdminString (SIZE (1..32))
+       MAX-ACCESS  read-create
+       STATUS      current
+       DESCRIPTION
+               "A locally-unique, administratively assigned name for a
+                group of entries."
+       ::= { hh3cEponDeviceRemoteMACAddressLLIDEntry 1 }
+
+   hh3cEponDeviceRMadlLLID OBJECT-TYPE
+       SYNTAX      Unsigned32 (1..4294967295)
+       MAX-ACCESS  read-create
+       STATUS      current
+       DESCRIPTION
+               "An arbitrary integer for the purpose of identifying the
+                LLID. Writing can be done all the time."
+       DEFVAL { 1 }
+       ::= { hh3cEponDeviceRemoteMACAddressLLIDEntry 2 }
+
+
+   hh3cEponDeviceRMadlLogID OBJECT-TYPE
+       SYNTAX      OBJECT IDENTIFIER
+       MAX-ACCESS  read-create
+       STATUS      current
+       DESCRIPTION
+               "The object identifier of a MIB module object to add to
+                an entry, indicating the entry ID in the table. Writing
+                can be done all the time."
+       DEFVAL { zeroDotZero }
+       ::= { hh3cEponDeviceRemoteMACAddressLLIDEntry 3 }
+
+   hh3cEponDeviceRMadlRemoteAddress OBJECT-TYPE
+       SYNTAX     MacAddress
+       MAX-ACCESS  read-create
+       STATUS      current
+       DESCRIPTION
+               "The remote MAC address of the LLID.
+                Writing can be done all the time."
+       ::= { hh3cEponDeviceRemoteMACAddressLLIDEntry 4 }
+
+
+   hh3cEponDeviceRMadlType OBJECT-TYPE
+       SYNTAX  INTEGER {
+               notRegister (1),
+               registered (2)
+       }
+       MAX-ACCESS  read-create
+       STATUS  current
+       DESCRIPTION
+               "A list of types for entries - LLIDs. Indicates and
+                defines the state of registration. notRegister(1) marks
+                a non registered LID, registered(2) marks a registered
+                LLID.  Writing can be done all the time."
+       DEFVAL { 1 }
+       ::= { hh3cEponDeviceRemoteMACAddressLLIDEntry 5 }
+
+   hh3cEponDeviceRMadlAction OBJECT-TYPE
+       SYNTAX  INTEGER {
+               none (1),
+               register (2),
+               deregister (3),
+               reregister (4)
+       }
+       MAX-ACCESS  read-create
+       STATUS  current
+       DESCRIPTION
+               "A list of actions for an entry - LLID.  Indicates and
+                defines the state of registration for the remote device.
+                none(1) marks no action, register(2) marks to register
+                an LLID, deregister(3) marks to deregister an LLID,
+                reregister(4) marks reregistered LLID.
+                Writing can be done all the time."
+       DEFVAL { 1 }
+       ::= { hh3cEponDeviceRemoteMACAddressLLIDEntry 6 }
+
+
+   hh3cEponDeviceRMadlEntryStatus OBJECT-TYPE
+       SYNTAX      RowStatus
+       MAX-ACCESS  read-create
+       STATUS      current
+       DESCRIPTION
+               "The control that allows creation and deletion of
+                entries. Once made active an entry MAY not be modified
+                except to delete it."
+      ::= { hh3cEponDeviceRemoteMACAddressLLIDEntry 7 }
+
+
+   --Statistics tables
+
+
+   hh3cEponDeviceStatTable OBJECT-TYPE
+       SYNTAX     SEQUENCE OF Hh3cEponDeviceStatEntry
+       MAX-ACCESS not-accessible
+       STATUS     current
+       DESCRIPTION
+               "This table defines the list of statistics counters of
+                EPON devices. The attributes are relevant for an OLT and
+                an ONU."
+       ::= { hh3cEponDeviceStatObjects 1 }
+
+   hh3cEponDeviceStatEntry OBJECT-TYPE
+       SYNTAX     Hh3cEponDeviceStatEntry
+       MAX-ACCESS not-accessible
+       STATUS     current
+       DESCRIPTION
+               "Table entries for Table of statistics counters of EPON
+                devices."
+       INDEX       { ifIndex }
+       ::= { hh3cEponDeviceStatTable 1 }
+
+   Hh3cEponDeviceStatEntry ::=
+       SEQUENCE {
+               hh3cEponDeviceStatTxFramesQueue0            Counter32,
+               hh3cEponDeviceStatTxFramesQueue1            Counter32,
+               hh3cEponDeviceStatTxFramesQueue2            Counter32,
+               hh3cEponDeviceStatTxFramesQueue3            Counter32,
+               hh3cEponDeviceStatTxFramesQueue4            Counter32,
+               hh3cEponDeviceStatTxFramesQueue5            Counter32,
+               hh3cEponDeviceStatTxFramesQueue6            Counter32,
+               hh3cEponDeviceStatTxFramesQueue7            Counter32,
+               hh3cEponDeviceStatRxFramesQueue0            Counter32,
+               hh3cEponDeviceStatRxFramesQueue1            Counter32,
+               hh3cEponDeviceStatRxFramesQueue2            Counter32,
+               hh3cEponDeviceStatRxFramesQueue3            Counter32,
+               hh3cEponDeviceStatRxFramesQueue4            Counter32,
+               hh3cEponDeviceStatRxFramesQueue5            Counter32,
+               hh3cEponDeviceStatRxFramesQueue6            Counter32,
+               hh3cEponDeviceStatRxFramesQueue7            Counter32,
+               hh3cEponDeviceStatDroppedFramesQueue0       Counter32,
+               hh3cEponDeviceStatDroppedFramesQueue1       Counter32,
+               hh3cEponDeviceStatDroppedFramesQueue2       Counter32,
+               hh3cEponDeviceStatDroppedFramesQueue3       Counter32,
+               hh3cEponDeviceStatDroppedFramesQueue4       Counter32,
+               hh3cEponDeviceStatDroppedFramesQueue5       Counter32,
+               hh3cEponDeviceStatDroppedFramesQueue6       Counter32,
+               hh3cEponDeviceStatDroppedFramesQueue7       Counter32
+       }
+
+
+     hh3cEponDeviceStatTxFramesQueue0 OBJECT-TYPE
+       SYNTAX  Counter32
+       UNITS      "frames"
+       MAX-ACCESS  read-only
+       STATUS  current
+       DESCRIPTION
+               "A count of the number of times a -Queue-0- frames
+                transmission occurs. Increment the counter by one for
+                each frame transmitted which is an output of -Queue-0-.
+                The -Queue-0- marking matched the REPORT MPCP message
+                Queue-0 field, as defined in [802.3ah] clause 64. This
+                counter is mandatory for an ONU."
+       ::= { hh3cEponDeviceStatEntry 1 }
+
+   hh3cEponDeviceStatTxFramesQueue1 OBJECT-TYPE
+       SYNTAX  Counter32
+       UNITS      "frames"
+       MAX-ACCESS  read-only
+       STATUS  current
+       DESCRIPTION
+               "A count of the number of times a -Queue-1- frames
+                transmission occurs. Increment the counter by one for
+                each frame transmitted which is an output of -Queue-1-.
+                The -Queue-1- marking matched the REPORT MPCP message
+                Queue-1 field, as defined in [802.3ah] clause 64. This
+                counter is mandatory for an ONU."
+       ::= { hh3cEponDeviceStatEntry 2 }
+
+   hh3cEponDeviceStatTxFramesQueue2 OBJECT-TYPE
+       SYNTAX  Counter32
+       UNITS      "frames"
+       MAX-ACCESS  read-only
+       STATUS  current
+       DESCRIPTION
+               "A count of the number of times a -Queue-2- frames
+                transmission occurs. Increment the counter by one for
+                each frame transmitted which is an output of -Queue-2-.
+                The -Queue-2- marking matched the REPORT MPCP message
+                Queue-2 field, as defined in [802.3ah] clause 64. This
+                counter is mandatory for an ONU."
+       ::= { hh3cEponDeviceStatEntry 3 }
+
+   hh3cEponDeviceStatTxFramesQueue3 OBJECT-TYPE
+       SYNTAX  Counter32
+       UNITS      "frames"
+       MAX-ACCESS  read-only
+       STATUS  current
+       DESCRIPTION
+               "A count of the number of times a -Queue-3- frames
+                transmission occurs. Increment the counter by one for
+                each frame transmitted which is an output of -Queue-3-.
+                The -Queue-3- marking matched the REPORT MPCP message
+                Queue-3 field, as defined in [802.3ah] clause 64.
+                This counter is mandatory for an ONU."
+       ::= { hh3cEponDeviceStatEntry 4 }
+
+   hh3cEponDeviceStatTxFramesQueue4 OBJECT-TYPE
+       SYNTAX  Counter32
+       UNITS      "frames"
+       MAX-ACCESS  read-only
+       STATUS  current
+       DESCRIPTION
+               "A count of the number of times a -Queue-4- frames
+                transmission occurs. Increment the counter by one for
+                each frame transmitted which is an output of -Queue-4-.
+                The -Queue-4- marking matched the REPORT MPCP message
+                Queue-4 field, as defined in [802.3ah] clause 64.
+                This counter is mandatory for an ONU."
+       ::= { hh3cEponDeviceStatEntry 5 }
+
+   hh3cEponDeviceStatTxFramesQueue5 OBJECT-TYPE
+       SYNTAX  Counter32
+       UNITS      "frames"
+       MAX-ACCESS  read-only
+       STATUS  current
+       DESCRIPTION
+               "A count of the number of times a -Queue-5- frames
+                transmission occurs. Increment the counter by one for
+                each frame transmitted which is an output of -Queue-5-.
+                The -Queue-5- marking matched the REPORT MPCP message
+                Queue-5 field, as defined in [802.3ah] clause 64.
+                This counter is mandatory for an ONU."
+       ::= { hh3cEponDeviceStatEntry 6 }
+
+   hh3cEponDeviceStatTxFramesQueue6 OBJECT-TYPE
+       SYNTAX  Counter32
+       UNITS      "frames"
+       MAX-ACCESS  read-only
+       STATUS  current
+       DESCRIPTION
+               "A count of the number of times a -Queue-6- frames
+                transmission occurs. Increment the counter by one for
+                each frame transmitted which is an output of -Queue-6-.
+                The -Queue-6- marking matched the REPORT MPCP message
+                Queue-6 field, as defined in [802.3ah] clause 64.
+                This counter is mandatory for an ONU."
+       ::= { hh3cEponDeviceStatEntry 7 }
+
+   hh3cEponDeviceStatTxFramesQueue7 OBJECT-TYPE
+       SYNTAX  Counter32
+       UNITS      "frames"
+       MAX-ACCESS  read-only
+          STATUS  current
+          DESCRIPTION
+               "A count of the number of times a -Queue-7- frames
+                transmission occurs. Increment the counter by one for
+                each frame transmitted which is an output of -Queue-7-.
+                The -Queue-7- marking matched the REPORT MPCP message
+                Queue-7 field, as defined in [802.3ah] clause 64.
+                This counter is mandatory for an ONU."
+       ::= { hh3cEponDeviceStatEntry 8 }
+
+   hh3cEponDeviceStatRxFramesQueue0 OBJECT-TYPE
+       SYNTAX  Counter32
+       UNITS      "frames"
+       MAX-ACCESS  read-only
+       STATUS  current
+       DESCRIPTION
+               "A count of the number of times a -Queue-0- frames
+                reception occurs. A single counter at the ONU and a set
+                of counters, one for each LLID, at the OLT. Increment
+                the counter by one for each frame received for each
+                LLID, which is an output of -Queue-0-. The -Queue-0-
+                marking matched the REPORT MPCP message Queue-0 field,
+                as defined in [802.3ah] clause 64.
+                This counter is mandatory for an ONU and an OLT."
+       ::= { hh3cEponDeviceStatEntry 9 }
+
+   hh3cEponDeviceStatRxFramesQueue1 OBJECT-TYPE
+       SYNTAX  Counter32
+       UNITS      "frames"
+       MAX-ACCESS  read-only
+       STATUS  current
+       DESCRIPTION
+               "A count of the number of times a -Queue-1- frames
+                reception occurs. A single counter at the ONU and a set
+                of counters, one for each LLID, at the OLT. Increment
+                the counter by one for each frame received for each
+                LLID, which is an output of -Queue-1-. The -Queue-1-
+                marking matched the REPORT MPCP message Queue-1 field,
+                as defined in [802.3ah] clause 64.
+                This counter is mandatory for an ONU and an OLT."
+       ::= { hh3cEponDeviceStatEntry 10 }
+
+
+   hh3cEponDeviceStatRxFramesQueue2 OBJECT-TYPE
+       SYNTAX  Counter32
+       UNITS      "frames"
+       MAX-ACCESS  read-only
+       STATUS  current
+       DESCRIPTION
+               "A count of the number of times a -Queue-2- frames
+                reception occurs. A single counter at the ONU and a set
+                of counters, one for each LLID, at the OLT. Increment
+                the counter by one for each frame received for each
+                LLID, which is an output of -Queue-2-. The -Queue-2-
+                marking matched the REPORT MPCP message Queue-2 field,
+                as defined in [802.3ah] clause 64.
+                This counter is mandatory for an ONU and an OLT."
+       ::= { hh3cEponDeviceStatEntry 11 }
+
+   hh3cEponDeviceStatRxFramesQueue3 OBJECT-TYPE
+       SYNTAX  Counter32
+       UNITS      "frames"
+       MAX-ACCESS  read-only
+       STATUS  current
+       DESCRIPTION
+               "A count of the number of times a -Queue-3- frames
+                reception occurs. A single counter at the ONU and a set
+                of counters, one for each LLID, at the OLT. Increment
+                the counter by one for each frame received for each
+                LLID, which is an output of -Queue-3-. The -Queue-3-
+                marking matched the REPORT MPCP message Queue-3 field,
+                as defined in [802.3ah] clause 64.
+                This counter is mandatory for an ONU and an OLT."
+       ::= { hh3cEponDeviceStatEntry 12 }
+
+   hh3cEponDeviceStatRxFramesQueue4 OBJECT-TYPE
+       SYNTAX  Counter32
+       UNITS      "frames"
+       MAX-ACCESS  read-only
+       STATUS  current
+       DESCRIPTION
+               "A count of the number of times a -Queue-4- frames
+                reception occurs. A single counter at the ONU and a set
+                of counters, one for each LLID, at the OLT. Increment
+                the counter by one for each frame received for each
+                LLID, which is an output of -Queue-4-. The -Queue-4-
+                marking matched the REPORT MPCP message Queue-4 field,
+                as defined in [802.3ah] clause 64.
+                This counter is mandatory for an ONU and an OLT."
+       ::= { hh3cEponDeviceStatEntry 13 }
+
+
+   hh3cEponDeviceStatRxFramesQueue5 OBJECT-TYPE
+       SYNTAX  Counter32
+       UNITS      "frames"
+       MAX-ACCESS  read-only
+       STATUS  current
+       DESCRIPTION
+               "A count of the number of times a -Queue-5- frames
+                reception occurs. A single counter at the ONU and a set
+                of counters, one for each LLID, at the OLT. Increment
+                the counter by one for each frame received for each
+                LLID, which is an output of -Queue-5-. The -Queue-5-
+                marking matched the REPORT MPCP message Queue-5 field,
+                as defined in [802.3ah] clause 64.
+                This counter is mandatory for an ONU and an OLT."
+       ::= { hh3cEponDeviceStatEntry 14 }
+
+   hh3cEponDeviceStatRxFramesQueue6 OBJECT-TYPE
+       SYNTAX  Counter32
+       UNITS      "frames"
+       MAX-ACCESS  read-only
+       STATUS  current
+       DESCRIPTION
+               "A count of the number of times a -Queue-6- frames
+                reception occurs. A single counter at the ONU and a set
+                of counters, one for each LLID, at the OLT. Increment
+                the counter by one for each frame received for each
+                LLID, which is an output of -Queue-6-. The -Queue-6-
+                marking matched the REPORT MPCP message Queue-6 field,
+                as defined in [802.3ah] clause 64.
+                This counter is mandatory for an ONU and an OLT."
+       ::= { hh3cEponDeviceStatEntry 15 }
+
+   hh3cEponDeviceStatRxFramesQueue7 OBJECT-TYPE
+       SYNTAX  Counter32
+       UNITS      "frames"
+       MAX-ACCESS  read-only
+       STATUS  current
+       DESCRIPTION
+               "A count of the number of times a -Queue-7- frames
+                reception occurs. A single counter at the ONU and a set
+                of counters, one for each LLID, at the OLT. Increment
+                the counter by one for each frame received for each
+                LLID, which is an output of -Queue-7-. The -Queue-7-
+                marking matched the REPORT MPCP message Queue-7 field,
+                as defined in [802.3ah] clause 64.
+                This counter is mandatory for an ONU and an OLT."
+       ::= { hh3cEponDeviceStatEntry 16 }
+
+
+
+   hh3cEponDeviceStatDroppedFramesQueue0 OBJECT-TYPE
+       SYNTAX  Counter32
+       UNITS      "frames"
+       MAX-ACCESS  read-only
+       STATUS  current
+       DESCRIPTION
+               "A count of the number of times a -Queue-0- frames drops
+                occurs. Increment the counter by one for each frame
+                dropped from -Queue-0-. The -Queue-0- marking matched
+                the REPORT MPCP message Queue-0 field, as defined in
+                [802.3ah] clause 64.
+                This counter is mandatory for an ONU."
+       ::= { hh3cEponDeviceStatEntry 17 }
+
+   hh3cEponDeviceStatDroppedFramesQueue1 OBJECT-TYPE
+       SYNTAX  Counter32
+       UNITS      "frames"
+       MAX-ACCESS  read-only
+       STATUS  current
+       DESCRIPTION
+               "A count of the number of times a -Queue-1- frames drops
+                occurs. Increment the counter by one for each frame
+                dropped from -Queue-1-. The -Queue-1- marking matched
+                the REPORT MPCP message Queue-1 field, as defined in
+                [802.3ah] clause 64.
+                This counter is mandatory for an ONU."
+       ::= { hh3cEponDeviceStatEntry 18 }
+
+   hh3cEponDeviceStatDroppedFramesQueue2 OBJECT-TYPE
+       SYNTAX  Counter32
+       UNITS      "frames"
+       MAX-ACCESS  read-only
+       STATUS  current
+       DESCRIPTION
+               "A count of the number of times a -Queue-2- frames drops
+                occurs. Increment the counter by one for each frame
+                dropped from -Queue-2-. The -Queue-2- marking matched
+                the REPORT MPCP message Queue-2 field, as defined in
+                [802.3ah] clause 64.
+                This counter is mandatory for an ONU."
+       ::= { hh3cEponDeviceStatEntry 19 }
+
+   hh3cEponDeviceStatDroppedFramesQueue3 OBJECT-TYPE
+       SYNTAX  Counter32
+       UNITS      "frames"
+       MAX-ACCESS  read-only
+       STATUS  current
+       DESCRIPTION
+               "A count of the number of times a -Queue-3- frames drops
+                occurs. Increment the counter by one for each frame
+                dropped from -Queue-3-. The -Queue-3- marking matched
+                the REPORT MPCP message Queue-3 field, as defined in
+                [802.3ah] clause 64.
+                This counter is mandatory for an ONU."
+       ::= { hh3cEponDeviceStatEntry 20}
+
+   hh3cEponDeviceStatDroppedFramesQueue4 OBJECT-TYPE
+       SYNTAX  Counter32
+       UNITS      "frames"
+       MAX-ACCESS  read-only
+       STATUS  current
+       DESCRIPTION
+               "A count of the number of times a -Queue-4- frames drops
+                occurs. Increment the counter by one for each frame
+                dropped from -Queue-4-. The -Queue-4- marking matched
+                the REPORT MPCP message Queue-4 field, as defined in
+                [802.3ah] clause 64.
+                This counter is mandatory for an ONU."
+       ::= { hh3cEponDeviceStatEntry 21 }
+
+   hh3cEponDeviceStatDroppedFramesQueue5 OBJECT-TYPE
+       SYNTAX  Counter32
+       UNITS      "frames"
+       MAX-ACCESS  read-only
+       STATUS  current
+       DESCRIPTION
+               "A count of the number of times a -Queue-5- frames drops
+                occurs. Increment the counter by one for each frame
+                dropped from -Queue-5-. The -Queue-5- marking matched
+                the REPORT MPCP message Queue-5 field, as defined in
+                [802.3ah] clause 64.
+                This counter is mandatory for an ONU."
+       ::= { hh3cEponDeviceStatEntry 22 }
+
+   hh3cEponDeviceStatDroppedFramesQueue6 OBJECT-TYPE
+       SYNTAX  Counter32
+       UNITS      "frames"
+       MAX-ACCESS  read-only
+       STATUS  current
+       DESCRIPTION
+               "A count of the number of times a -Queue-6- frames drops
+                occurs. Increment the counter by one for each frame
+                dropped from -Queue-6-. The -Queue-6- marking matched
+                the REPORT MPCP message Queue-6 field, as defined in
+                [802.3ah] clause 64.
+                This counter is mandatory for an ONU."
+       ::= { hh3cEponDeviceStatEntry 23 }
+
+   hh3cEponDeviceStatDroppedFramesQueue7 OBJECT-TYPE
+       SYNTAX  Counter32
+       UNITS      "frames"
+       MAX-ACCESS  read-only
+       STATUS  current
+       DESCRIPTION
+               "A count of the number of times a -Queue-7- frames drops
+                occurs. Increment the counter by one for each frame
+                dropped from -Queue-7-. The -Queue-7- marking matched
+                the REPORT MPCP message Queue-7 field, as defined in
+                [802.3ah] clause 64.
+                This counter is mandatory for an ONU."
+       ::= { hh3cEponDeviceStatEntry 24 }
+
+   --Editor's Note use reference to event MIB modules [RFC2981] and
+   --docsis MIB modules [RFC2669]
+
+
+   hh3cEponDeviceEventObjectTable OBJECT-TYPE
+       SYNTAX     SEQUENCE OF Hh3cEponDeviceEventObjectEntry
+       MAX-ACCESS not-accessible
+       STATUS     current
+       DESCRIPTION
+               "This table defines the Event Objects for EPON devices.
+                The attributes are relevant for an OLT and an ONU."
+       ::= { hh3cEponDeviceEventObjects 1 }
+
+   hh3cEponDeviceEventObjectEntry OBJECT-TYPE
+       SYNTAX     Hh3cEponDeviceEventObjectEntry
+       MAX-ACCESS not-accessible
+       STATUS     current
+       DESCRIPTION
+               "Table entries for Table of Event objects for EPON
+                devices."
+       INDEX       { ifIndex }
+       ::= { hh3cEponDeviceEventObjectTable 1 }
+
+   Hh3cEponDeviceEventObjectEntry ::=
+       SEQUENCE {
+   hh3cEponDeviceSampleMinimum                               Integer32,
+   hh3cEponDeviceDyingGaspAlarmState                         TruthValue,
+   hh3cEponDeviceDyingGaspAlarmEnabled                       TruthValue,
+   hh3cEponDeviceCriticalEventState                          TruthValue,
+   hh3cEponDeviceCriticalEventEnabled                        TruthValue,
+   hh3cEponDeviceLocalLinkFaultAlarmState                    TruthValue,
+   hh3cEponDeviceLocalLinkFaultAlarmEnabled                  TruthValue,
+   hh3cEponDeviceTemperatureEventIndicationState             TruthValue,
+   hh3cEponDeviceTemperatureEventIndicationEnabled           TruthValue,
+   hh3cEponDevicePowerVoltageEventIndicationState            TruthValue,
+   hh3cEponDevicePowerVoltageEventIndicationEnabled          TruthValue,
+   hh3cEponDeviceGlobalEventState                            TruthValue,
+   hh3cEponDeviceGlobalEventEnabled                          TruthValue,
+   hh3cEponDeviceErroredSymbolPeriodEventState               TruthValue,
+   hh3cEponDeviceErroredSymbolPeriodEventEnabled             TruthValue,
+   hh3cEponDeviceErroredFrameEventState                      TruthValue,
+   hh3cEponDeviceErroredFrameEventEnabled                    TruthValue,
+   hh3cEponDeviceErroredFramePeriodEventState                TruthValue,
+   hh3cEponDeviceErroredFramePeriodEventEnabled              TruthValue,
+   hh3cEponDeviceErroredFrameSecondsSummaryEventState        TruthValue,
+   hh3cEponDeviceErroredFrameSecondsSummaryEventEnabled      TruthValue,
+   hh3cEponDeviceOrganizationSpecificEventState              TruthValue,
+   hh3cEponDeviceOrganizationSpecificEventEnabled            TruthValue,
+   hh3cEponDeviceEventControl                                INTEGER
+       }
+
+   hh3cEponDeviceSampleMinimum OBJECT-TYPE
+       SYNTAX      Integer32 (1..2147483647)
+       UNITS       "seconds"
+       MAX-ACCESS  read-write
+       STATUS      current
+       DESCRIPTION
+               "The minimum Frequency of events this system will accept.
+                A system may use the larger values of this minimum to
+                lessen the impact of constant sampling. For larger
+                sampling intervals the system samples less often and
+                suffers less overhead.
+                Unless explicitly resource limited, a system's value for
+                this object SHOULD be 1, allowing as small as a 1 second
+                interval for ongoing trigger sampling.
+                Writing of the value can be done all the time."
+       DEFVAL { 1 }
+       ::= { hh3cEponDeviceEventObjectEntry 1 }
+
+   hh3cEponDeviceDyingGaspAlarmState OBJECT-TYPE
+       SYNTAX  TruthValue
+       MAX-ACCESS  read-only
+       STATUS  current
+       DESCRIPTION
+               "A read-only variable, which defines the state of the
+                Dying Gasp indication of the OAM alarm indications as
+                described in the [802.3ah] clause 57. When true the
+                device has a dying gasp alarm asserted. When false the
+                dying gasp alarm is reset "
+       ::= { hh3cEponDeviceEventObjectEntry 2 }
+
+
+
+   hh3cEponDeviceDyingGaspAlarmEnabled OBJECT-TYPE
+       SYNTAX      TruthValue
+       MAX-ACCESS  read-write
+       STATUS      current
+       DESCRIPTION
+               "A control to allow DyingGaspAlarm event to be used.
+                When the value is true the event is sampled. When the
+                value is false the event is not sampled.
+                Writing can be done all the time."
+       DEFVAL { false }
+       ::= { hh3cEponDeviceEventObjectEntry 3 }
+
+   hh3cEponDeviceCriticalEventState OBJECT-TYPE
+       SYNTAX  TruthValue
+       MAX-ACCESS  read-only
+       STATUS  current
+       DESCRIPTION
+               "A read-only variable, which defines the state of the
+                Critical Event indication of the OAM alarm indications
+                as described in the [802.3ah] clause 57. When true the
+                device has a Critical Event asserted. When false the
+                Critical Event is reset."
+       ::= { hh3cEponDeviceEventObjectEntry 4 }
+
+   hh3cEponDeviceCriticalEventEnabled OBJECT-TYPE
+       SYNTAX      TruthValue
+       MAX-ACCESS  read-write
+       STATUS      current
+       DESCRIPTION
+               "A control to allow CriticalEvent event to be used. When
+                the value is true the event is sampled. When the value
+                is false the event is not sampled.
+                Writing can be done all the time."
+       DEFVAL { false }
+       ::= { hh3cEponDeviceEventObjectEntry 5 }
+
+
+      hh3cEponDeviceLocalLinkFaultAlarmState OBJECT-TYPE
+       SYNTAX  TruthValue
+       MAX-ACCESS  read-only
+       STATUS  current
+       DESCRIPTION
+               "A read-only variable, which defines the state of the
+                Local Link Fault indication of the OAM alarm indications
+                as described in the [802.3ah] clause 57. When true the
+                device has a Local Link Fault alarm asserted. When
+                false the Local Link Fault alarm is reset."
+       ::= { hh3cEponDeviceEventObjectEntry 6 }
+
+
+
+   hh3cEponDeviceLocalLinkFaultAlarmEnabled OBJECT-TYPE
+       SYNTAX      TruthValue
+       MAX-ACCESS  read-write
+       STATUS      current
+       DESCRIPTION
+               "A control to allow LocalLinkFaultAlarm event to be used.
+                When the value is true the event is sampled. When the
+                value is false the event is not sampled.
+                Writing can be done all the time."
+       DEFVAL { false }
+       ::= { hh3cEponDeviceEventObjectEntry 7 }
+
+
+      hh3cEponDeviceTemperatureEventIndicationState OBJECT-TYPE
+       SYNTAX  TruthValue
+       MAX-ACCESS  read-only
+       STATUS  current
+       DESCRIPTION
+               "A read-only variable, which defines the state of the
+                Temperature Event indication of an EPON device. When
+                condition of box temperature is above the threshold
+                defined the alarm is asserted. When the condition is
+                below that threshold the alarm is de-asserted. When true
+                the device has a Temperature Event Indication asserted.
+                When false the Temperature Event Indication is reset."
+       ::= { hh3cEponDeviceEventObjectEntry 8 }
+
+   hh3cEponDeviceTemperatureEventIndicationEnabled OBJECT-TYPE
+       SYNTAX      TruthValue
+       MAX-ACCESS  read-write
+       STATUS      current
+       DESCRIPTION
+               "A control to allow TemperatureEventIndication event to
+                be used. When the value is true the event is sampled.
+                When the value is false the event is not sampled.
+                Writing can be done all the time."
+       DEFVAL { false }
+       ::= { hh3cEponDeviceEventObjectEntry 9 }
+
+   hh3cEponDevicePowerVoltageEventIndicationState OBJECT-TYPE
+       SYNTAX  TruthValue
+       MAX-ACCESS  read-only
+       STATUS  current
+       DESCRIPTION
+               "A read-only variable, which defines the state of the
+                Power/Voltage Event Indication of an EPON device. When
+                condition of box Power/voltage is above the threshold
+                defined the alarm is asserted. When the condition is
+                below that threshold the alarm is de-asserted. When true
+                the device has a Power/Voltage Event Indication
+                asserted. When false the Power/Voltage Event Indication
+                is reset. "
+       ::= { hh3cEponDeviceEventObjectEntry 10 }
+
+
+   hh3cEponDevicePowerVoltageEventIndicationEnabled OBJECT-TYPE
+       SYNTAX      TruthValue
+       MAX-ACCESS  read-write
+       STATUS      current
+       DESCRIPTION
+               "A control to allow PowerVoltageEventIndication event to
+                be used. When the value is true the event is sampled.
+                When the value is false the event is not sampled.
+                Writing can be done all the time."
+       DEFVAL { false }
+       ::= { hh3cEponDeviceEventObjectEntry 11 }
+
+
+      hh3cEponDeviceGlobalEventState OBJECT-TYPE
+       SYNTAX  TruthValue
+       MAX-ACCESS  read-only
+       STATUS  current
+       DESCRIPTION
+               "A read-only variable, which defines the state of the
+                Global Event indication of an EPON device. When the
+                indication of the event input occurs the event is
+                asserted. When the input is removed that event is
+                de-asserted. When true the device has a Global Event
+                asserted. When false the Global Event Indication is
+                reset."
+       ::= { hh3cEponDeviceEventObjectEntry 12 }
+
+   hh3cEponDeviceGlobalEventEnabled OBJECT-TYPE
+       SYNTAX      TruthValue
+       MAX-ACCESS  read-write
+       STATUS      current
+       DESCRIPTION
+               "A control to allow GlobalEvent event to be used. When
+                the value is true the event is sampled. When the value
+                is false the event is not sampled. Writing can be done
+                all the time."
+       DEFVAL { false }
+       ::= { hh3cEponDeviceEventObjectEntry 13 }
+
+   hh3cEponDeviceErroredSymbolPeriodEventState OBJECT-TYPE
+       SYNTAX  TruthValue
+       MAX-ACCESS  read-only
+       STATUS  current
+       DESCRIPTION
+               "A read-only variable, which defines the state of the
+                Errored Symbol Period Event indication of the OAM alarm
+                TLV indications as described in the [802.3ah]
+                clause 57.5.3. When true the device has an Errored
+                Symbol Period Event asserted. When false the Errored
+                Symbol Period Event is reset."
+       ::= { hh3cEponDeviceEventObjectEntry 14 }
+
+   hh3cEponDeviceErroredSymbolPeriodEventEnabled OBJECT-TYPE
+       SYNTAX      TruthValue
+       MAX-ACCESS  read-write
+       STATUS      current
+       DESCRIPTION
+               "A control to allow ErroredSymbolPeriodEvent event to be
+                used. When the value is true the event is sampled. When
+                the value is false the event is not sampled. Writing can
+                be done all the time."
+       DEFVAL { false }
+       ::= { hh3cEponDeviceEventObjectEntry 15 }
+
+   hh3cEponDeviceErroredFrameEventState OBJECT-TYPE
+       SYNTAX  TruthValue
+       MAX-ACCESS  read-only
+       STATUS  current
+       DESCRIPTION
+               "A read-only variable, which defines the state of the
+                Errored Frame Event indication of the OAM alarm TLV
+                indications as described in the [802.3ah] clause 57.5.3.
+                When true the device has an Errored Frame Event
+                asserted. When false the Errored Frame Event is reset."
+       ::= { hh3cEponDeviceEventObjectEntry 16 }
+
+   hh3cEponDeviceErroredFrameEventEnabled OBJECT-TYPE
+       SYNTAX      TruthValue
+       MAX-ACCESS  read-write
+       STATUS      current
+       DESCRIPTION
+               "A control to allow ErroredFrameEvent event to be used.
+                When the value is true the event is sampled. When the
+                value is false the event is not sampled.
+                Writing can be done all the time."
+       DEFVAL { false }
+       ::= { hh3cEponDeviceEventObjectEntry 17 }
+
+
+   hh3cEponDeviceErroredFramePeriodEventState OBJECT-TYPE
+       SYNTAX  TruthValue
+       MAX-ACCESS  read-only
+       STATUS  current
+       DESCRIPTION
+               "A read-only variable, which defines the state of the
+                Errored Frame Period Event indication of the OAM alarm
+                TLV indications as described in the [802.3ah] clause
+                57.5.3. When true the device has an Errored Frame Period
+                Event asserted. When false the Errored Frame Period
+                Event is reset."
+       ::= { hh3cEponDeviceEventObjectEntry 18 }
+
+   hh3cEponDeviceErroredFramePeriodEventEnabled OBJECT-TYPE
+       SYNTAX      TruthValue
+       MAX-ACCESS  read-write
+       STATUS      current
+       DESCRIPTION
+               "A control to allow ErroredFramePeriodEvent event to be
+                used. When the value is true the event is sampled. When
+                the value is false the event is not sampled. Writing can
+                be done all the time."
+       DEFVAL { false }
+       ::= { hh3cEponDeviceEventObjectEntry 19 }
+
+
+   hh3cEponDeviceErroredFrameSecondsSummaryEventState OBJECT-TYPE
+       SYNTAX  TruthValue
+       MAX-ACCESS  read-only
+       STATUS  current
+       DESCRIPTION
+               "A read-only variable, which defines the state of the
+                Errored Frame Seconds Summary Event indication of the
+                OAM alarm TLV indications as described in the [802.3ah]
+                clause 57.5.3. When true the device has an Errored Frame
+                Seconds Summary Event asserted. When false the Errored
+                Frame Seconds Summary Event is reset."
+       ::= { hh3cEponDeviceEventObjectEntry 20 }
+
+   hh3cEponDeviceErroredFrameSecondsSummaryEventEnabled OBJECT-TYPE
+       SYNTAX      TruthValue
+       MAX-ACCESS  read-write
+       STATUS      current
+       DESCRIPTION
+               "A control to allow ErroredFrameSecondsSummaryEvent event
+                to be used. When the value is true the event is sampled.
+                When the value is false the event is not sampled.
+                Writing can be done all the time."
+       DEFVAL { false }
+       ::= { hh3cEponDeviceEventObjectEntry 21 }
+
+
+   hh3cEponDeviceOrganizationSpecificEventState OBJECT-TYPE
+       SYNTAX  TruthValue
+       MAX-ACCESS  read-only
+       STATUS  current
+       DESCRIPTION
+               "A read-only variable, which defines the state of the
+                Organization Specific Event indication of the OAM alarm
+                TLV indications as described in the [802.3ah] clause
+                57.5.3. When true the device has an Organization
+                Specific Event asserted. When false the Organization
+                Specific Event is reset."
+       ::= { hh3cEponDeviceEventObjectEntry 22 }
+
+   hh3cEponDeviceOrganizationSpecificEventEnabled OBJECT-TYPE
+       SYNTAX      TruthValue
+       MAX-ACCESS  read-write
+       STATUS      current
+       DESCRIPTION
+               "A control to allow OrganizationSpecificEvent event to be
+                used. When the value is true the event is sampled. When
+                the value is false the event is not sampled.
+                Writing can be done all the time."
+       DEFVAL { false }
+       ::= { hh3cEponDeviceEventObjectEntry 23 }
+
+   hh3cEponDeviceEventControl OBJECT-TYPE
+       SYNTAX INTEGER {
+               none(1),
+               resetLog(2),
+               useDefaultReporting(3)
+       }
+       MAX-ACCESS  read-write
+       STATUS      current
+       DESCRIPTION
+               "Indicates and controls the resetting of the Event log.
+                Setting this object to none(1) has no action resetLog(2)
+                empties the event log. All data is deleted. Setting it
+                to useDefaultReporting(3) returns all event priorities
+                to their factory-default reporting. Reading this object
+                always returns useDefaultReporting(3)."
+       DEFVAL { 3 }
+       ::= { hh3cEponDeviceEventObjectEntry 24 }
+
+
+
+   -- Events Log Table
+
+   hh3cEponDeviceEventsLogTable OBJECT-TYPE
+       SYNTAX      SEQUENCE OF Hh3cEponDeviceEventsLogEntry
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+               "A table of objects provides a log of notification based
+                on the event as pointed to by entries in those tables.
+                The intent is a MAC level event log (set of events to
+                when they happened).
+                This attribute is relevant for an OLT and an ONU."
+       ::= { hh3cEponDeviceEventObjects 2 }
+
+   hh3cEponDeviceEventsLogEntry OBJECT-TYPE
+       SYNTAX      Hh3cEponDeviceEventsLogEntry
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+               "A group of Events. Applications create and delete
+                entries using hh3cEponDeviceEventsEntryStatus. When adding
+                objects to a notification they are added in the lexical
+                order of their index in this table."
+       INDEX       { hh3cEponDeviceEventsLogName, hh3cEponDeviceEventsLogIndex }
+       ::= { hh3cEponDeviceEventsLogTable 1 }
+
+   Hh3cEponDeviceEventsLogEntry ::=
+       SEQUENCE {
+               hh3cEponDeviceEventsLogName            SnmpAdminString,
+               hh3cEponDeviceEventsLogIndex           Unsigned32,
+               hh3cEponDeviceEventsLogID              OBJECT IDENTIFIER,
+               hh3cEponDeviceEventsLogFirstTime       DateAndTime,
+               hh3cEponDeviceEventsLogLastTime        DateAndTime,
+               hh3cEponDeviceEventsLogCounts          Counter32,
+               hh3cEponDeviceEventsLogType            INTEGER,
+               hh3cEponDeviceEventsLogEntryStatus     RowStatus
+       }
+
+   hh3cEponDeviceEventsLogName OBJECT-TYPE
+       SYNTAX      SnmpAdminString (SIZE (1..32))
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+               "A locally-unique, administratively assigned name for a
+                group of Events."
+       ::= { hh3cEponDeviceEventsLogEntry 1 }
+
+   hh3cEponDeviceEventsLogIndex OBJECT-TYPE
+       SYNTAX      Unsigned32 (1..4294967295)
+       MAX-ACCESS  not-accessible
+       STATUS      current
+       DESCRIPTION
+               "An arbitrary integer for the purpose of identifying
+                individual Events within a hh3cEponDeviceEventsLogName
+                group. Events within a group are placed in the
+                notification in the numerical order of this index."
+       ::= { hh3cEponDeviceEventsLogEntry 2 }
+
+   hh3cEponDeviceEventsLogID OBJECT-TYPE
+       SYNTAX      OBJECT IDENTIFIER
+       MAX-ACCESS  read-create
+       STATUS      current
+       DESCRIPTION
+               "The object identifier of a MIB module object to add to a
+                Notification that results from the event.
+                Writing can be done all the time."
+       DEFVAL { zeroDotZero }
+       ::= { hh3cEponDeviceEventsLogEntry 3 }
+
+   hh3cEponDeviceEventsLogFirstTime OBJECT-TYPE
+       SYNTAX      DateAndTime
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+               "The time that an entry was created."
+       ::= { hh3cEponDeviceEventsLogEntry 4 }
+
+   hh3cEponDeviceEventsLogLastTime OBJECT-TYPE
+       SYNTAX      DateAndTime
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+               "If multiple events are reported via the same entry, the
+                time that the last event for this entry occurred,
+                otherwise this should have the same value as
+                hh3cEponDeviceEventsLogFirstTime."
+       ::= { hh3cEponDeviceEventsLogEntry 5 }
+
+   hh3cEponDeviceEventsLogCounts OBJECT-TYPE
+       SYNTAX      Counter32
+       MAX-ACCESS  read-only
+       STATUS      current
+       DESCRIPTION
+               "The number of consecutive event instances reported by
+                this entry. This starts at 1 with the creation of this
+                row and increments by 1 for each subsequent duplicate
+                event."
+       ::= { hh3cEponDeviceEventsLogEntry 6 }
+
+   hh3cEponDeviceEventsLogType OBJECT-TYPE
+       SYNTAX  INTEGER {
+               hh3cEponDeviceDyingGaspAlarmState (1),
+               hh3cEponDeviceCriticalEventState (2),
+               hh3cEponDeviceLocalLinkFaultAlarmState (3),
+               hh3cEponDeviceTemperatureEventIndicationState (4),
+               hh3cEponDevicePowerVoltageEventIndicationState (5),
+               hh3cEponDeviceGlobalEventState (6),
+               hh3cEponDeviceErroredSymbolPeriodEventState (7),
+               hh3cEponDeviceErroredFrameEventState (8),
+               hh3cEponDeviceErroredFramePeriodEventState (9),
+               hh3cEponDeviceErroredFrameSecondsSummaryEventState (10),
+               hh3cEponDeviceOrganizationSpecificEventState (11)
+       }
+       MAX-ACCESS  read-only
+       STATUS  current
+       DESCRIPTION
+               "A list of types for Events. Events are ordered according
+                to their significance where 1 is the highest severity.
+                hh3cEponDeviceDyingGaspAlarmState(1) indicates a Dying Gasp
+                 Alarm State,
+                hh3cEponDeviceCriticalEventState(2) indicates a Critical
+                 Event State,
+                hh3cEponDeviceLocalLinkFaultAlarmState(3) indicates a Local
+                 Link Fault Alarm State,
+                hh3cEponDeviceTemperatureEventIndicationState(4) indicates a
+                 Temperature Event Indication State,
+                hh3cEponDevicePowerVoltageEventIndicationState(5) indicates
+                 a Power Voltage Event Indication State,
+                hh3cEponDeviceGlobalEventState(6) indicates a Global Event
+                 State,
+                hh3cEponDeviceErroredSymbolPeriodEventState(7) indicates an
+                 Errored Symbol Period Event State,
+                hh3cEponDeviceErroredFrameEventState(8) indicates an Errored
+                 Frame Event State,
+                hh3cEponDeviceErroredFramePeriodEventState(9) indicates an
+                 Errored Frame Period Event State,
+                hh3cEponDeviceErroredFrameSecondsSummaryEventState(10)
+                 indicates an Errored Frame Seconds Summary Event State,
+                hh3cEponDeviceOrganizationSpecificEventState(11) indicates
+                 an Organization Specific Event State. "
+       ::= { hh3cEponDeviceEventsLogEntry 7 }
+
+
+   hh3cEponDeviceEventsLogEntryStatus OBJECT-TYPE
+       SYNTAX      RowStatus
+       MAX-ACCESS  read-create
+       STATUS      current
+       DESCRIPTION
+               "The control that allows creation and deletion of
+                entries. Once made active an entry MAY not be modified
+                except to delete it."
+       ::= { hh3cEponDeviceEventsLogEntry 8 }
+
+
+
+
+        -- Conformance Statements
+
+   -- Conformance Groups
+
+   hh3cEponDeviceGroups OBJECT IDENTIFIER ::= { hh3cEponDeviceConformance 1 }
+
+   hh3cEponDeviceGroupControl OBJECT-GROUP
+       OBJECTS {
+               hh3cEponDeviceObjectReset,
+               hh3cEponDeviceObjectModes,
+               hh3cEponDeviceObjectFecEnabled,
+               hh3cEponDeviceObjectOamMode,
+               hh3cEponDeviceObjectDeviceReadyMode,
+               hh3cEponDeviceObjectPowerDown,
+               hh3cEponDeviceObjectNumberOfLLIDs,
+               hh3cEponDeviceObjectReportThreshold,
+               hh3cEponDeviceRemoteMACAddressLLIDControl
+       }
+       STATUS  current
+       DESCRIPTION
+               "A collection of objects of hh3cEponDevice control
+                definition."
+       ::= { hh3cEponDeviceGroups 1 }
+
+
+   hh3cEponDeviceGroupRMadLTable OBJECT-GROUP
+       OBJECTS {
+               hh3cEponDeviceRMadlLLID,
+               hh3cEponDeviceRMadlLogID,
+               hh3cEponDeviceRMadlRemoteAddress,
+               hh3cEponDeviceRMadlType,
+               hh3cEponDeviceRMadlAction,
+               hh3cEponDeviceRMadlEntryStatus
+       }
+       STATUS  current
+       DESCRIPTION
+               "A collection of objects of hh3cEponDevice remote Mac address
+                to LLID table."
+       ::= { hh3cEponDeviceGroups 2 }
+
+
+   hh3cEponDeviceGroupStat OBJECT-GROUP
+       OBJECTS {
+               hh3cEponDeviceStatTxFramesQueue0,
+               hh3cEponDeviceStatTxFramesQueue1,
+               hh3cEponDeviceStatTxFramesQueue2,
+               hh3cEponDeviceStatTxFramesQueue3,
+               hh3cEponDeviceStatTxFramesQueue4,
+               hh3cEponDeviceStatTxFramesQueue5,
+               hh3cEponDeviceStatTxFramesQueue6,
+               hh3cEponDeviceStatTxFramesQueue7,
+               hh3cEponDeviceStatRxFramesQueue0,
+               hh3cEponDeviceStatRxFramesQueue1,
+               hh3cEponDeviceStatRxFramesQueue2,
+               hh3cEponDeviceStatRxFramesQueue3,
+               hh3cEponDeviceStatRxFramesQueue4,
+               hh3cEponDeviceStatRxFramesQueue5,
+               hh3cEponDeviceStatRxFramesQueue6,
+               hh3cEponDeviceStatRxFramesQueue7,
+               hh3cEponDeviceStatDroppedFramesQueue0,
+               hh3cEponDeviceStatDroppedFramesQueue1,
+               hh3cEponDeviceStatDroppedFramesQueue2,
+               hh3cEponDeviceStatDroppedFramesQueue3,
+               hh3cEponDeviceStatDroppedFramesQueue4,
+               hh3cEponDeviceStatDroppedFramesQueue5,
+               hh3cEponDeviceStatDroppedFramesQueue6,
+               hh3cEponDeviceStatDroppedFramesQueue7
+       }
+       STATUS  current
+       DESCRIPTION
+               "A collection of objects of EPON device Statistics"
+       ::= { hh3cEponDeviceGroups 3 }
+
+
+
+   hh3cEponDeviceGroupEvent OBJECT-GROUP
+       OBJECTS {
+               hh3cEponDeviceSampleMinimum,
+               hh3cEponDeviceDyingGaspAlarmState,
+               hh3cEponDeviceDyingGaspAlarmEnabled,
+               hh3cEponDeviceCriticalEventState,
+               hh3cEponDeviceCriticalEventEnabled,
+               hh3cEponDeviceLocalLinkFaultAlarmState,
+               hh3cEponDeviceLocalLinkFaultAlarmEnabled,
+               hh3cEponDeviceTemperatureEventIndicationState,
+               hh3cEponDeviceTemperatureEventIndicationEnabled,
+               hh3cEponDevicePowerVoltageEventIndicationState,
+               hh3cEponDevicePowerVoltageEventIndicationEnabled,
+               hh3cEponDeviceGlobalEventState,
+               hh3cEponDeviceGlobalEventEnabled,
+               hh3cEponDeviceErroredSymbolPeriodEventState,
+               hh3cEponDeviceErroredSymbolPeriodEventEnabled,
+               hh3cEponDeviceErroredFrameEventState,
+               hh3cEponDeviceErroredFrameEventEnabled,
+               hh3cEponDeviceErroredFramePeriodEventState ,
+               hh3cEponDeviceErroredFramePeriodEventEnabled  ,
+               hh3cEponDeviceErroredFrameSecondsSummaryEventState ,
+               hh3cEponDeviceErroredFrameSecondsSummaryEventEnabled,
+               hh3cEponDeviceOrganizationSpecificEventState  ,
+               hh3cEponDeviceOrganizationSpecificEventEnabled,
+               hh3cEponDeviceEventControl
+       }
+       STATUS  current
+       DESCRIPTION
+               "A collection of objects for EPON device Events"
+       ::= { hh3cEponDeviceGroups 4 }
+
+   hh3cEponDeviceGroupEventLog OBJECT-GROUP
+       OBJECTS {
+               hh3cEponDeviceEventsLogID,
+               hh3cEponDeviceEventsLogFirstTime,
+               hh3cEponDeviceEventsLogLastTime,
+               hh3cEponDeviceEventsLogCounts,
+               hh3cEponDeviceEventsLogType,
+               hh3cEponDeviceEventsLogEntryStatus
+       }
+       STATUS  current
+       DESCRIPTION
+               "A collection of objects for EPON device Events log"
+       ::= { hh3cEponDeviceGroups 5 }
+
+
+   -- Compliance
+
+   hh3cEponDeviceCompliances OBJECT IDENTIFIER ::= { hh3cEponDeviceConformance 2 }
+
+   hh3cEponDeviceCompliance MODULE-COMPLIANCE
+       STATUS      current
+       DESCRIPTION "The compliance statement for EPON Devices."
+       MODULE  -- this module
+       MANDATORY-GROUPS { hh3cEponDeviceGroupControl }
+       GROUP       hh3cEponDeviceGroupRMadLTable
+       DESCRIPTION " This group is mandatory for all
+                              OLT EPON devices supporting LLID-MAC
+                              address table."
+
+       GROUP       hh3cEponDeviceGroupStat
+       DESCRIPTION "This group is mandatory for all EPON devices
+                    supporting interfaces for Statistics collection."
+
+       GROUP       hh3cEponDeviceGroupEvent
+       DESCRIPTION "This group is mandatory for all EPON devices
+                    supporting interfaces for event collection."
+
+       GROUP       hh3cEponDeviceGroupEventLog
+       DESCRIPTION "This group is mandatory for all EPON devices
+                    supporting interfaces for event log collection."
+
+       ::= { hh3cEponDeviceCompliances 1 }
+
+
+
+   END

@@ -19,6 +19,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2018 Neil Lathwood
  * @author     Neil Lathwood <gh+n@laf.io>
  */
@@ -40,22 +41,22 @@ class GitHub
     protected $pull_requests = [];
     protected $changelog = [
         'feature' => [],
-        'enhancement' => [],
         'breaking change' => [],
         'security' => [],
         'device' => [],
         'webui' => [],
-        'authentication' => [],
+        'alerting' => [],
         'graphs' => [],
         'snmp traps' => [],
         'applications' => [],
-        'api' => [],
-        'alerting' => [],
         'billing' => [],
+        'api' => [],
+        'settings' => [],
         'discovery' => [],
         'polling' => [],
         'rancid' => [],
         'oxidized' => [],
+        'authentication' => [],
         'bug' => [],
         'refactor' => [],
         'cleanup' => [],
@@ -63,6 +64,7 @@ class GitHub
         'translation' => [],
         'tests' => [],
         'misc' => [],
+        'mibs' => [],
         'dependencies' => [],
     ];
     protected $changelog_users = [];
@@ -105,7 +107,7 @@ class GitHub
     /**
      * Get the release information for a specific tag
      *
-     * @param $tag
+     * @param  string  $tag
      * @return mixed
      */
     public function getRelease($tag)
@@ -127,8 +129,8 @@ class GitHub
     /**
      * Get all closed pull requests up to a certain date
      *
-     * @param $date
-     * @param string $after
+     * @param  string  $date
+     * @param  string  $after
      */
     public function getPullRequests($date, $after = null)
     {
@@ -200,7 +202,7 @@ GRAPHQL;
     /**
      * Parse labels response into standardized names and remove emoji
      *
-     * @param array $labels
+     * @param  array  $labels
      * @return array
      */
     private function parseLabels($labels)
@@ -259,8 +261,8 @@ GRAPHQL;
      * Record user info and count into the specified array (default changelog_users)
      * Record profile links too.
      *
-     * @param array $user
-     * @param string $type
+     * @param  array  $user
+     * @param  string  $type
      */
     private function recordUserInfo($user, $type = 'changelog_users')
     {
@@ -307,7 +309,8 @@ GRAPHQL;
 
     /**
      * Create a markdown list of users and link their github profile
-     * @param $users
+     *
+     * @param  array  $users
      * @return string
      */
     private function formatUserList($users)
@@ -350,6 +353,7 @@ GRAPHQL;
 
     /**
      * @return bool
+     *
      * @throws Exception
      */
     public function createRelease()
@@ -375,7 +379,9 @@ GRAPHQL;
 
     /**
      * Function to control the creation of creating a change log.
-     * @param bool $write
+     *
+     * @param  bool  $write
+     *
      * @throws Exception
      */
     public function createChangelog($write = true)
@@ -411,9 +417,9 @@ GRAPHQL;
     }
 
     /**
-     * @param string $file Path in git repo
-     * @param string $contents new file contents
-     * @param string $message The commit message
+     * @param  string  $file  Path in git repo
+     * @param  string  $contents  new file contents
+     * @param  string  $message  The commit message
      * @return Requests_Response
      */
     private function pushFileContents($file, $contents, $message)

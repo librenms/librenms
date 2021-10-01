@@ -16,6 +16,7 @@
 
 /**
  * Package Search
+ *
  * @author Daniel Preussker <f0o@devilcode.org>
  * @copyright 2014 f0o, LibreNMS
  * @license GPL
@@ -79,7 +80,7 @@ if (! Auth::user()->hasGlobalRead()) {
     $param = array_merge($param, $device_ids);
 }
 
-$query .= " WHERE packages.device_id = devices.device_id AND packages.name LIKE '%" . mres($_POST['package']) . "%' $sql_where GROUP BY packages.name";
+$query .= " WHERE packages.device_id = devices.device_id AND packages.name LIKE '%" . $_POST['package'] . "%' $sql_where GROUP BY packages.name";
 
 $where = '';
 $ver = '';
@@ -87,7 +88,7 @@ $opt = '';
 
 if (! empty($_POST['arch'])) {
     $where .= ' AND packages.arch = ?';
-    $param[] = mres($_POST['arch']);
+    $param[] = $_POST['arch'];
 }
 
 if (is_numeric($_REQUEST['device_id'])) {
@@ -153,7 +154,7 @@ foreach ($ordered as $name => $entry) {
     if (sizeof($arch) > 0 && sizeof($vers) > 0) {
         ?>
         <tr>
-            <td><a href="<?php echo generate_url(['page'=>'packages', 'name'=>$name]); ?>"><?php echo $name; ?></a></td>
+            <td><a href="<?php echo \LibreNMS\Util\Url::generate(['page' => 'packages', 'name' => $name]); ?>"><?php echo $name; ?></a></td>
             <td><?php echo implode('<br/>', $vers); ?></td>
             <td><?php echo implode('<br/>', $arch); ?></td>
             <td><?php echo implode('<br/>', $devs); ?></td>
@@ -181,12 +182,12 @@ if ((int) ($count / $results) > 0 && $count != $results) {
     function updateResults(results) {
        $('#results_amount').val(results.value);
        $('#page_number').val(1);
-       $('#result_form').submit();
+       $('#result_form').trigger( "submit" );
     }
 
     function changePage(page,e) {
         e.preventDefault();
         $('#page_number').val(page);
-        $('#result_form').submit();
+        $('#result_form').trigger( "submit" );
     }
 </script>

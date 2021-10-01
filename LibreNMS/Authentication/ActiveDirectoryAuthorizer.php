@@ -14,7 +14,7 @@ class ActiveDirectoryAuthorizer extends AuthorizerBase
 {
     use ActiveDirectoryCommon;
 
-    protected static $CAN_UPDATE_PASSWORDS = 0;
+    protected static $CAN_UPDATE_PASSWORDS = false;
 
     protected $ldap_connection;
     protected $is_bound = false; // this variable tracks if bind has been called so we don't call it multiple times
@@ -91,7 +91,7 @@ class ActiveDirectoryAuthorizer extends AuthorizerBase
         }
 
         // special character handling
-        $group_dn = addcslashes($result[0]['dn'], '()');
+        $group_dn = addcslashes($result[0]['dn'], '()#');
 
         $search = ldap_search(
             $connection,

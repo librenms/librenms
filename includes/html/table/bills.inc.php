@@ -86,12 +86,12 @@ foreach (dbFetchRows($sql, $param) as $bill) {
         $datefrom = $day_data['0'];
         $dateto = $day_data['1'];
     }
-    $rate_95th = format_si($bill['rate_95th']) . 'bps';
+    $rate_95th = \LibreNMS\Util\Number::formatSi($bill['rate_95th'], 2, 3, '') . 'bps';
     $dir_95th = $bill['dir_95th'];
     $total_data = format_bytes_billing($bill['total_data']);
     $rate_average = $bill['rate_average'];
-    $url = generate_url(['page' => 'bill', 'bill_id' => $bill['bill_id']]);
-    $used95th = format_si($bill['rate_95th']) . 'bps';
+    $url = \LibreNMS\Util\Url::generate(['page' => 'bill', 'bill_id' => $bill['bill_id']]);
+    $used95th = \LibreNMS\Util\Number::formatSi($bill['rate_95th'], 2, 3, '') . 'bps';
     $notes = $bill['bill_notes'];
 
     if ($prev) {
@@ -102,15 +102,15 @@ foreach (dbFetchRows($sql, $param) as $bill) {
 
     if (strtolower($bill['bill_type']) == 'cdr') {
         $type = 'CDR';
-        $allowed = format_si($bill['bill_allowed']) . 'bps';
-        $in = format_si($bill['rate_95th_in']) . 'bps';
-        $out = format_si($bill['rate_95th_out']) . 'bps';
+        $allowed = \LibreNMS\Util\Number::formatSi($bill['bill_allowed'], 2, 3, '') . 'bps';
+        $in = \LibreNMS\Util\Number::formatSi($bill['rate_95th_in'], 2, 3, '') . 'bps';
+        $out = \LibreNMS\Util\Number::formatSi($bill['rate_95th_out'], 2, 3, '') . 'bps';
         if (! $prev) {
             $percent = round((($bill['rate_95th'] / $bill['bill_allowed']) * 100), 2);
             $overuse = ($bill['rate_95th'] - $bill['bill_allowed']);
         }
 
-        $overuse_formatted = format_si($overuse) . 'bps';
+        $overuse_formatted = \LibreNMS\Util\Number::formatSi($overuse, 2, 3, '') . 'bps';
         $used = $rate_95th;
         $tmp_used = $bill['rate_95th'];
         $rate_95th = "<b>$rate_95th</b>";
@@ -135,7 +135,7 @@ foreach (dbFetchRows($sql, $param) as $bill) {
         $total_data = "<b>$total_data</b>";
     }
 
-    $background = get_percentage_colours($percent);
+    $background = \LibreNMS\Util\Colors::percentage($percent, null);
     $right_background = $background['right'];
     $left_background = $background['left'];
     $overuse_formatted = (($overuse <= 0) ? '-' : "<span style='color: #${background['left']}; font-weight: bold;'>$overuse_formatted</span>");
@@ -146,11 +146,11 @@ foreach (dbFetchRows($sql, $param) as $bill) {
     $actions = '';
 
     if (! $prev && Auth::user()->hasGlobalAdmin()) {
-        $actions .= "<a href='" . generate_url(['page' => 'bill', 'bill_id' => $bill['bill_id'], 'view' => 'edit']) .
+        $actions .= "<a href='" . \LibreNMS\Util\Url::generate(['page' => 'bill', 'bill_id' => $bill['bill_id'], 'view' => 'edit']) .
             "'><i class='fa fa-pencil fa-lg icon-theme' title='Edit' aria-hidden='true'></i> Edit</a> ";
     }
     if (strtolower($bill['bill_type']) == 'cdr') {
-        $predicted = format_si(getPredictedUsage($bill['bill_day'], $tmp_used)) . 'bps';
+        $predicted = \LibreNMS\Util\Number::formatSi(getPredictedUsage($bill['bill_day'], $tmp_used), 2, 3, '') . 'bps';
     } elseif (strtolower($bill['bill_type']) == 'quota') {
         $predicted = format_bytes_billing(getPredictedUsage($bill['bill_day'], $tmp_used));
     }
@@ -173,4 +173,4 @@ foreach (dbFetchRows($sql, $param) as $bill) {
 }
 
 $output = ['current' => $current, 'rowCount' => $rowCount, 'rows' => $response, 'total' => $total];
-echo _json_encode($output);
+echo json_encode($output, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);

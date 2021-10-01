@@ -27,7 +27,7 @@
                     <ul class="dropdown-menu multi-level" role="menu">
                         <li class="dropdown-submenu">
                             <a href="{{ route('overview') }}"><i class="fa fa-tv fa-fw fa-lg" aria-hidden="true"></i> @lang('Dashboard')</a>
-                            <ul class="dropdown-menu">
+                            <ul class="dropdown-menu scrollable-menu">
                                 @foreach($dashboards as $dashboard)
                                 <li><a href="{{ route('overview', ['dashboard' => $dashboard->dashboard_id]) }}"><i class="fa fa-tv fa-fw fa-lg" aria-hidden="true"></i> {{ $dashboard->dashboard_name }}</a></li>
                                 @endforeach
@@ -274,13 +274,13 @@
                                                             aria-hidden="true"></i> @lang('All Ports')</a></li>
 
                         @if($port_counts['errored'] > 0)
-                            <li><a href="{{ url('ports/errors=yes') }}"><i class="fa fa-exclamation-circle fa-fw fa-lg"
+                            <li><a href="{{ url('ports/errors=1') }}"><i class="fa fa-exclamation-circle fa-fw fa-lg"
                                                                            aria-hidden="true"></i> @lang('Errored :port_count', ['port_count' => $port_counts['errored']])
                                 </a></li>
                         @endif
 
                         @if($port_counts['ignored'] > 0)
-                            <li><a href="{{ url('ports/ignore=yes') }}"><i class="fa fa-question-circle fa-fw fa-lg"
+                            <li><a href="{{ url('ports/ignore=1') }}"><i class="fa fa-question-circle fa-fw fa-lg"
                                                                            aria-hidden="true"></i> @lang('Ignored :port_count', ['port_count' => $port_counts['ignored']])
                                 </a></li>
                         @endif
@@ -335,9 +335,13 @@
                             @endif
 
                             <li role="presentation" class="divider"></li>
+                            <li><a href="{{ url('port-groups') }}"><i class="fa fa-th fa-fw fa-lg"
+                                                                      aria-hidden="true"></i> @lang('Manage Groups')
+                            </a></li>
 
+                            <li role="presentation" class="divider"></li>
                             @if($port_counts['alerted'])
-                                <li><a href="{{ url('ports/alerted=yes') }}"><i
+                                <li><a href="{{ url('ports/alerted=1') }}"><i
                                             class="fa fa-exclamation-circle fa-fw fa-lg"
                                             aria-hidden="true"></i> @lang('Alerts :port_count', ['port_count' => $port_counts['alerted']])
                                     </a></li>
@@ -352,7 +356,7 @@
                                 </a></li>
 
                             @if($port_counts['deleted'])
-                                <li><a href="{{ url('ports/deleted=yes') }}"><i class="fa fa-minus-circle fa-fw fa-lg"
+                                <li><a href="{{ url('ports/deleted=1') }}"><i class="fa fa-minus-circle fa-fw fa-lg"
                                                                                 aria-hidden="true"></i> @lang('Deleted :port_count', ['port_count' => $port_counts['deleted']])
                                     </a></li>
                             @endif
@@ -416,7 +420,7 @@
                                         <a href="{{ url('apps/app=' . $app_type) }}"><i class="fa fa-server fa-fw fa-lg" aria-hidden="true"></i> {{ $app_instances->first()->displayName() }}</a>
                                         <ul class="dropdown-menu scrollable-menu">
                                             @foreach($app_instances as $app_instance)
-                                            <li><a href="{{ url("apps/app=$app_type/instance=$app_instance") }}"><i class="fa fa-angle-double-right fa-fw fa-lg" aria-hidden="true"></i> {{ ucfirst($app_instance->app_instance) }}</a></li>
+                                            <li><a href="{{ url("apps/app=$app_type/instance=$app_instance->app_instance") }}"><i class="fa fa-angle-double-right fa-fw fa-lg" aria-hidden="true"></i> {{ ucfirst($app_instance->app_instance) }}</a></li>
                                             @endforeach
                                         </ul>
                                     </li>
@@ -713,7 +717,7 @@
         }).on('keyup', function (e) {
             // on enter go to the first selection
             if (e.which === 13) {
-                $('.tt-selectable').first().click();
+                $('.tt-selectable').first().trigger( "click" );
             }
         });
 

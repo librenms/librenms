@@ -1,0 +1,2874 @@
+LUM-IFPERF-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Unsigned32, Counter64
+        FROM SNMPv2-SMI
+    OBJECT-GROUP, MODULE-COMPLIANCE
+        FROM SNMPv2-CONF
+    TEXTUAL-CONVENTION, DateAndTime, DisplayString
+        FROM SNMPv2-TC
+    lumModules, lumIfPerfMIB
+        FROM LUM-REG
+    Unsigned32WithNA, MgmtNameString, AdminStatusWithNA, OperStatusWithNA,
+    ResetWithNA, OnOff, FaultStatusWithNA, Signed32WithNA, CommandString, TribPortIdType
+        FROM LUM-TC;
+
+lumIfPerfMIBModule MODULE-IDENTITY
+    LAST-UPDATED
+        "201906280000Z" -- June 28th 2019
+    ORGANIZATION
+        "Infinera Corporation"
+    CONTACT-INFO
+        "techsupport@infinera.com"
+    DESCRIPTION
+        "The MIB module for management of performance objects.
+
+        The tables contained in this MIB are:
+
+        (1) The General group contains some general attributes as time stamps
+            and tables sizes.
+
+        (2) The ifPerfAdmin performance group contains information and
+            configuration for all Admin performance objects
+
+        (3) The ifPerfFec performance group contains information and
+            configuration for all Fec performance objects.
+
+        (4) The ifPerfG826 performance group contains information and
+            configuration for all G826 performance objects. Notice table
+            is uni-directional meaning one entry for each direction.
+
+        (5) The ifPerfL1 performance group contains information and
+            configuration for all L1 performance objects. Notice table
+            is uni-directional meaning one entry for each direction.
+
+        (6) The ifPerfL0 performance group contains information and
+            configuration for all L0 performance objects.
+
+        (7) The ifPerfL2 performance group contains information and
+            configuration for all L2 performance objects.
+
+"
+    REVISION
+        "201906280000Z" -- June 28th 2019
+    DESCRIPTION
+        "Changes made for release r33.0:
+         - Added oa1x21dBmVgEC board
+         - Added oa2x21dBmVgEC board"
+    REVISION
+         "201903300000Z" -- March 30th 2019
+    DESCRIPTION
+         "Changes made for release r32.1:
+           - Added ifPerfL0OpticalSNR
+           - Added ifPerfL0QFactor
+           - Added ifPerfFecQMargin
+           - Added ifPerfFecPreFecBer
+           - Added ifPerfL0OpticalSNR and ifPerfFecQMargin
+           - Added ifPerfG826TribPortId."
+    REVISION
+        "201706150000Z" -- June 15th 2017
+    DESCRIPTION
+        "Changes made for release r29.0:
+         - Changed ORGANIZATION and CONTACT-INFO"
+    REVISION
+        "201611300000Z" -- November 30th 2016
+    DESCRIPTION
+        "Changes made for release r28:
+        - Added tp100gotnii board."
+    REVISION
+        "201609300000Z" -- September 30th 2016
+    DESCRIPTION
+        "Changes made for release r27.1:
+        - Added rfuac1 board."
+    REVISION
+        "201601110000Z" -- Jan 11th 2016
+    DESCRIPTION
+        "Added default operStatus to notPresent."
+    REVISION
+        "201512220000Z" -- December 22nd 2015
+    DESCRIPTION
+        "Changes made for release r27:
+        - Added fhau1 board
+        - Added fha1u1 board"
+    REVISION
+        "201511300000Z" -- Nov 30th 2015
+    DESCRIPTION
+        "Changes made for release r26:
+        - Added attribute optical SNR."
+    REVISION
+        "201505290000Z" -- May 29th 2015
+    DESCRIPTION
+        "Changes made for release r25:
+        - Added attribute FEC corrected bits.
+        - Added corresponding FEC RxBitErorrEstimate attribute as display string."
+    REVISION
+        "201409300000Z" -- September 30th 2014
+    DESCRIPTION
+        "Changes made for release r23.1:
+        - Added mxp100gotn board."
+    REVISION
+        "201405160000Z" -- May 16th 2014
+    DESCRIPTION
+        "Changes made for release r23:
+        - Added some L2 PM attributes
+        - Added some L0 PM attributes"
+    REVISION
+        "201311150000Z" -- November 15th 2013
+    DESCRIPTION
+        "Changes made for release r22:
+        - Added tp10gotn, tp100gotn board.
+        - Added the L2 table
+        - Added Current Utilization attribute"
+    REVISION
+        "201305010000Z" -- May 1st 2013
+    DESCRIPTION
+        "The initial revision of this module."
+    ::= { lumModules 56 }
+
+
+PerfPeriodWithNA ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "The period time for performance data.
+
+        period15minutes - 15 minutes
+        period24hours - 24 hours"
+
+    SYNTAX INTEGER {
+        period15minutes (1),
+        period24hours (2),
+        notApplicable (2147483647) }
+
+
+G826MonitorLevelWithNA ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "The monitor level."
+
+    SYNTAX INTEGER {
+        opu0 (1),
+        odu0 (2),
+        otu0 (3),
+        opu1 (4),
+        odu1 (5),
+        otu1 (6),
+        opu2 (7),
+        odu2 (8),
+        otu2 (9),
+        opu3 (10),
+        odu3 (11),
+        otu3 (12),
+        opu4 (13),
+        odu4 (14),
+        otu4 (15),
+        oduFlex (16),
+        rs (17),
+        ms (18),
+        mac (19),
+        pcs (20),
+        cpriL1 (21),
+        obsaiL1 (22),
+        irsoh (23),
+        imsoh (24),
+        otuj2 (25),
+        opuFlex (26),
+        otuj1 (27),
+        notApplicable (2147483647) }
+
+
+G826MonitorChannelWithNA ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "The monitor channel."
+
+    SYNTAX INTEGER {
+        unused (0),
+        sm (1),
+        pm (2),
+        tcm1 (3),
+        tcm2 (4),
+        tcm3 (5),
+        tcm4 (6),
+        tcm5 (7),
+        tcm6 (8),
+        notAvailable (2147483646),
+        notApplicable (2147483647) }
+
+
+L1MeasurementTypeWithNA ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "The direction type.
+
+        rx - receiver, only ingoing signal
+        tx - transmitter, only outgoing signal"
+
+    SYNTAX INTEGER {
+        rx (1),
+        tx (2),
+        notApplicable (2147483647) }
+
+L2MeasurementTypeWithNA ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "The direction type.
+
+        rx - receiver, only ingoing signal
+        tx - transmitter, only outgoing signal"
+
+    SYNTAX INTEGER {
+        rx (1),
+        tx (2),
+        notApplicable (2147483647) }
+
+
+G826MeasurementTypeWithNA ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "The direction type.
+
+        rx - receiver, only ingoing signal
+        tx - transmitter, only outgoing signal
+        uniDi - unidirectional
+        biDi - bidirectional, ingoing and outgoing signal on the same port"
+
+    SYNTAX INTEGER {
+        rx (1),
+        tx (2),
+        uniDi (3),
+        biDi (4),
+        notApplicable (2147483647) }
+
+BooleanValueWithNA ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "Defines a value that can be true, false or not available
+
+        true -        The condition is true
+
+        false -       The condition is false
+
+        notAvailable (2147483646) is used when attribute is
+        not available under current circumstances. This value
+        is only used when used for a state.
+
+        notApplicable (2147483647) is used when attribute is
+        not used in current configuration."
+
+    SYNTAX INTEGER {
+           true (1),
+           false (2),
+           notAvailable (2147483646),
+           notApplicable (2147483647) }
+
+
+-- ----------------------------------------------------
+-- Compliance area, containing groups and compliance
+-- specifications.
+-- ----------------------------------------------------
+
+lumIfPerfConfs OBJECT IDENTIFIER ::= { lumIfPerfMIB 1 }
+lumIfPerfGroups OBJECT IDENTIFIER ::= { lumIfPerfConfs 1 }
+lumIfPerfCompl OBJECT IDENTIFIER ::= { lumIfPerfConfs 2 }
+
+
+-- ----------------------------------------------------
+-- Root for objects in the IFPERF MIB
+-- ----------------------------------------------------
+
+lumIfPerfMIBObjects OBJECT IDENTIFIER ::= { lumIfPerfMIB 2 }
+
+
+-- ----------------------------------------------------
+-- This MIB contains the following groups:
+-- ----------------------------------------------------
+
+ifPerfGeneral OBJECT IDENTIFIER ::= { lumIfPerfMIBObjects 1 }
+ifPerfAdminList OBJECT IDENTIFIER ::= { lumIfPerfMIBObjects 2 }
+ifPerfFecList OBJECT IDENTIFIER ::= { lumIfPerfMIBObjects 3 }
+ifPerfG826List OBJECT IDENTIFIER ::= { lumIfPerfMIBObjects 4 }
+ifPerfL1List OBJECT IDENTIFIER ::= { lumIfPerfMIBObjects 5 }
+ifPerfL0List OBJECT IDENTIFIER ::= { lumIfPerfMIBObjects 6 }
+ifPerfL2StatList OBJECT IDENTIFIER ::= { lumIfPerfMIBObjects 7 }
+ifPerfL2ErrorList OBJECT IDENTIFIER ::= { lumIfPerfMIBObjects 8 }
+ifPerfDelayList OBJECT IDENTIFIER ::= { lumIfPerfMIBObjects 9 }
+
+-- ----------------------------------------------------
+-- General group
+-- ----------------------------------------------------
+
+
+ifPerfGeneralConfigLastChangeTime OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The time when the configuration of the MIB was
+        last changed.
+
+"
+    ::= { ifPerfGeneral 1 }
+
+ifPerfGeneralStateLastChangeTime OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The time when the state and/or configuration of
+        the MIB was last changed.
+
+"
+    ::= { ifPerfGeneral 2 }
+
+ifPerfGeneralAdminTableSize OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Size of ifPerfAdmin performance table.
+
+"
+    ::= { ifPerfGeneral 3 }
+
+ifPerfGeneralAdminConfigLastChangeTime OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The time when the configuration of the table was
+        last changed.
+
+"
+    ::= { ifPerfGeneral 4 }
+
+ifPerfGeneralAdminStateLastChangeTime OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The time when the state and/or configuration of
+        the table was last changed.
+
+"
+    ::= { ifPerfGeneral 5 }
+
+ifPerfGeneralFecTableSize OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Size of ifPerfFec performance table.
+
+"
+    ::= { ifPerfGeneral 6 }
+
+ifPerfGeneralFecConfigLastChangeTime OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The time when the configuration of the table was
+        last changed.
+
+"
+    ::= { ifPerfGeneral 7 }
+
+ifPerfGeneralFecStateLastChangeTime OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The time when the state and/or configuration of
+        the table was last changed.
+
+"
+    ::= { ifPerfGeneral 8 }
+
+ifPerfGeneralG826TableSize OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Size of ifPerfG826 performance table.
+
+"
+    ::= { ifPerfGeneral 9 }
+
+ifPerfGeneralG826ConfigLastChangeTime OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The time when the configuration of the table was
+        last changed.
+
+"
+    ::= { ifPerfGeneral 10 }
+
+ifPerfGeneralG826StateLastChangeTime OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The time when the state and/or configuration of
+        the table was last changed.
+
+"
+    ::= { ifPerfGeneral 11 }
+
+ifPerfGeneralL1TableSize OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Size of ifPerfL1 performance table.
+
+"
+    ::= { ifPerfGeneral 12 }
+
+ifPerfGeneralL1ConfigLastChangeTime OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The time when the configuration of the table was
+        last changed.
+
+"
+    ::= { ifPerfGeneral 13 }
+
+ifPerfGeneralL1StateLastChangeTime OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The time when the state and/or configuration of
+        the table was last changed.
+
+"
+    ::= { ifPerfGeneral 14 }
+
+ifPerfGeneralL0TableSize OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Size of ifPerfL0 performance table.
+
+"
+    ::= { ifPerfGeneral 15 }
+
+ifPerfGeneralL0ConfigLastChangeTime OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The time when the configuration of the table was
+        last changed.
+
+"
+    ::= { ifPerfGeneral 16 }
+
+ifPerfGeneralL0StateLastChangeTime OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The time when the state and/or configuration of
+        the table was last changed.
+
+"
+    ::= { ifPerfGeneral 17 }
+
+ifPerfGeneralL2StatTableSize OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Size of ifPerfL0 performance table.
+
+"
+    ::= { ifPerfGeneral 18 }
+
+ifPerfGeneralL2StatConfigLastChangeTime OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The time when the configuration of the table was
+        last changed.
+
+"
+    ::= { ifPerfGeneral 19 }
+
+ifPerfGeneralL2StatStateLastChangeTime OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The time when the state and/or configuration of
+        the table was last changed.
+
+"
+    ::= { ifPerfGeneral 20 }
+
+ifPerfGeneralL2ErrorTableSize OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Size of ifPerfL0 performance table.
+
+"
+    ::= { ifPerfGeneral 21 }
+
+ifPerfGeneralL2ErrorConfigLastChangeTime OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The time when the configuration of the table was
+        last changed.
+
+"
+    ::= { ifPerfGeneral 22 }
+
+ifPerfGeneralL2ErrorStateLastChangeTime OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The time when the state and/or configuration of
+        the table was last changed.
+
+"
+    ::= { ifPerfGeneral 23 }
+
+ifPerfGeneralDelayTableSize OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Size of ifPerfDelay performance table.
+
+"
+    ::= { ifPerfGeneral 24 }
+
+ifPerfGeneralDelayConfigLastChangeTime OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The time when the configuration of the table was
+        last changed.
+
+"
+    ::= { ifPerfGeneral 25 }
+
+ifPerfGeneralDelayStateLastChangeTime OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The time when the state and/or configuration of
+        the table was last changed.
+
+"
+    ::= { ifPerfGeneral 26 }
+
+-- ----------------------------------------------------
+-- IfPerfAdmin admin group
+-- ----------------------------------------------------
+
+ifPerfAdminTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF IfPerfAdminEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The  ifPerfAdmin performance group contains information and
+        configuration for all ifPerfAdmin performance objects."
+
+    ::= { ifPerfAdminList 1 }
+
+ifPerfAdminEntry OBJECT-TYPE
+    SYNTAX      IfPerfAdminEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry in the ifPerfAdmin list.
+
+"
+    INDEX { ifPerfAdminIndex }
+    ::= { ifPerfAdminTable 1 }
+
+IfPerfAdminEntry ::=
+    SEQUENCE {
+        ifPerfAdminIndex                        Unsigned32,
+        ifPerfAdminName                         MgmtNameString,
+        ifPerfAdminConnIfBasicIfIndex           Unsigned32WithNA,
+        ifPerfAdminAdminStatus                  AdminStatusWithNA,
+        ifPerfAdminReportMode                   OnOff,
+        ifPerfAdminOperStatus                   OperStatusWithNA,
+        ifPerfAdminIsSuspect15m                 BooleanValueWithNA,
+        ifPerfAdminIsSuspect24h                 BooleanValueWithNA,
+        ifPerfAdminReset15m                     ResetWithNA,
+        ifPerfAdminReset24h                     ResetWithNA,
+        ifPerfAdminUpId                         Unsigned32  }
+
+ifPerfAdminIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "An index assigned to each entry.
+
+"
+    ::= { ifPerfAdminEntry 1 }
+
+
+ifPerfAdminName OBJECT-TYPE
+    SYNTAX      MgmtNameString
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The management name of the performance object,
+        for example 'lineAdmin:1:2:1-2', where the first number indicates
+        subrack, the second slot number and the third/fourth
+        are the physical port numbers.
+
+"
+    ::= { ifPerfAdminEntry 2 }
+
+ifPerfAdminConnIfBasicIfIndex OBJECT-TYPE
+    SYNTAX      Unsigned32WithNA
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "An index that describes to which index in ifBasicIf table
+        this object is related.
+
+"
+    ::= { ifPerfAdminEntry 3 }
+
+ifPerfAdminAdminStatus OBJECT-TYPE
+    SYNTAX      AdminStatusWithNA
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The administrative state of the ifPerf interface.
+
+        down - The interface is de-activated.
+
+        service - The interface is activated.
+
+        up - The interface will be activated when
+        available.
+
+"
+    DEFVAL { up }
+    ::= { ifPerfAdminEntry 4 }
+
+ifPerfAdminReportMode OBJECT-TYPE
+    SYNTAX      OnOff
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The performance reporting mode on the interface.
+
+        off - performance reporting is inactive.
+
+        on - performance reporting is activated.
+
+"
+    DEFVAL { on }
+    ::= { ifPerfAdminEntry 5 }
+
+ifPerfAdminOperStatus OBJECT-TYPE
+    SYNTAX      OperStatusWithNA
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The operational state for the interface.
+
+        notPresent - The interface is not available.
+
+        down - The interface is de-activated or there are
+        faults preventing its transition to the 'up' state.
+
+        up - The interface is active.
+
+"
+    DEFVAL { notPresent }
+    ::= { ifPerfAdminEntry 6 }
+
+ifPerfAdminIsSuspect15m OBJECT-TYPE
+    SYNTAX      BooleanValueWithNA
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This variable indicates if the performance data is
+        unreliable for the 15 minute interval. The 'isSuspect'
+        value is set to true if the interface has
+        been reconfigured or reset during the maintenance
+        operation. For example if
+        - a full interval has not passed since last reset
+        - the board has been restarted during the interval
+        - adminStatus has been set to down
+        - the system time has been set in the node during the interval.
+
+"
+    ::= { ifPerfAdminEntry 7 }
+
+ifPerfAdminIsSuspect24h OBJECT-TYPE
+    SYNTAX      BooleanValueWithNA
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This variable indicates if the performance data is
+        unreliable for the 24 hour interval. The 'isSuspect'
+        value is set to true if the interface has
+        been reconfigured or reset during the maintenance
+        operation. For example if
+        - a full interval has not passed since last reset
+        - the board has been restarted during the interval
+        - adminStatus has been set to down
+        - the system time has been set in the node during the interval.
+
+"
+    ::= { ifPerfAdminEntry 8 }
+
+ifPerfAdminReset15m OBJECT-TYPE
+    SYNTAX      ResetWithNA
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Reset all performance counters for the 15 minute interval.
+        After a successful reset the default value
+        (normal) is restored in this attribute.
+
+"
+    DEFVAL { normal }
+    ::= { ifPerfAdminEntry 9 }
+
+ifPerfAdminReset24h OBJECT-TYPE
+    SYNTAX      ResetWithNA
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Reset performance counters for the 24 hour interval.
+        After a successful reset the default value
+        (normal) is restored in this attribute.
+
+        notApplicable (2147483647) is used when attribute is
+        not used in current configuration.
+
+"
+    DEFVAL { normal }
+    ::= { ifPerfAdminEntry 10 }
+
+ifPerfAdminUpId OBJECT-TYPE
+    SYNTAX      Unsigned32   (0..2147483647)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Identity in the UP for the Perf Admin entry
+"
+    DEFVAL { 0  }
+    ::= { ifPerfAdminEntry 11 }
+
+-- ----------------------------------------------------
+-- IfPerfFec fec group
+-- ----------------------------------------------------
+
+ifPerfFecTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF IfPerfFecEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The  ifPerfFec performance group contains information and
+         configuration for all ifPerfFec performance objects."
+
+    ::= { ifPerfFecList 1 }
+
+ifPerfFecEntry OBJECT-TYPE
+    SYNTAX      IfPerfFecEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry in the ifPerfFec list.
+
+"
+    INDEX { ifPerfFecIndex }
+    ::= { ifPerfFecTable 1 }
+
+IfPerfFecEntry ::=
+    SEQUENCE {
+        ifPerfFecIndex                        Unsigned32,
+        ifPerfFecName                         MgmtNameString,
+        ifPerfFecConnIfPerfAdminIfIndex       Unsigned32WithNA,
+        ifPerfFecCorrectedZeros               Unsigned32WithNA,
+        ifPerfFecCorrectedOnes                Unsigned32WithNA,
+        ifPerfFecRxBerEstimation              Unsigned32WithNA,
+        ifPerfFecRxAvgPreFecBer               Unsigned32WithNA,
+        ifPerfFecCorrectedBits                Unsigned32WithNA,
+        ifPerfFecRxBitErrorEstimation         DisplayString,
+        ifPerfFecOpticalSNR                   Unsigned32WithNA,
+        ifPerfFecUpId                         Unsigned32,
+        ifPerfFecQMargin                      Unsigned32WithNA,
+        ifPerfFecPreFecBer                    DisplayString }
+
+ifPerfFecIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "An index assigned to each entry.
+
+"
+    ::= { ifPerfFecEntry 1 }
+
+ifPerfFecName OBJECT-TYPE
+    SYNTAX      MgmtNameString
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The management name of the performance object,
+        for example 'lineFec:1:2:1-2', where the first number indicates
+        subrack, the second slot number and the third/fourth
+        are the physical port numbers.
+
+"
+    ::= { ifPerfFecEntry 2 }
+
+ifPerfFecConnIfPerfAdminIfIndex OBJECT-TYPE
+    SYNTAX      Unsigned32WithNA
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "An index that describes to which index in ifPerfAdminIf table
+        this object is related.
+
+"
+    ::= { ifPerfFecEntry 3 }
+
+ifPerfFecCorrectedZeros OBJECT-TYPE
+    SYNTAX      Unsigned32WithNA
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "FEC counter. Number of corrected zeros.
+
+"
+    ::= { ifPerfFecEntry 4 }
+
+ifPerfFecCorrectedOnes OBJECT-TYPE
+    SYNTAX      Unsigned32WithNA
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "FEC counter. Number of corrected ones.
+
+"
+    ::= { ifPerfFecEntry 5 }
+
+ifPerfFecRxBerEstimation OBJECT-TYPE
+    SYNTAX      Unsigned32WithNA
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Rx Bit Error Rate estimation.
+
+"
+    ::= { ifPerfFecEntry 6 }
+
+ifPerfFecRxAvgPreFecBer OBJECT-TYPE
+    SYNTAX      Unsigned32WithNA
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Rx Average Pre FEC Bit Error Rate of PM interval.
+
+"
+    ::= { ifPerfFecEntry 7 }
+
+ifPerfFecCorrectedBits OBJECT-TYPE
+    SYNTAX      Unsigned32WithNA
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "FEC counter. Number of corrected bits.
+
+"
+    ::= { ifPerfFecEntry 8 }
+
+ifPerfFecRxBitErrorEstimation OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Rx Bit Error Rate estimation.
+
+"
+    DEFVAL { " " }
+    ::= { ifPerfFecEntry 9 }
+
+ifPerfFecOpticalSNR OBJECT-TYPE
+    SYNTAX      Unsigned32WithNA
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Optical signal-to-noise ratio margin (dB/0.1nm) with respect to FEC cliff, based on calculation from rate of corrected bits.
+
+"
+    ::= { ifPerfFecEntry 10 }
+
+ifPerfFecUpId OBJECT-TYPE
+    SYNTAX      Unsigned32   (0..2147483647)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Identity in the UP for the Perf Admin entry
+
+"
+    DEFVAL { 0  }
+    ::= { ifPerfFecEntry 11 }
+
+ifPerfFecQMargin OBJECT-TYPE
+    SYNTAX      Unsigned32WithNA
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Q factor margin (dB) with respect to the FEC threshold.
+
+"
+    ::= { ifPerfFecEntry 12 }
+
+ifPerfFecPreFecBer OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Pre-FEC BER.
+
+"
+    DEFVAL { "" }
+    ::= { ifPerfFecEntry 13 }
+
+-- ----------------------------------------------------
+-- IfPerfG826 g826 group
+-- ----------------------------------------------------
+
+ifPerfG826Table OBJECT-TYPE
+    SYNTAX      SEQUENCE OF IfPerfG826Entry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The ifPerfG826 performance group contains information and
+         configuration for all ifPerfG826 performance objects. Notice table
+         is uni-directional meaning one entry for each direction."
+
+    ::= { ifPerfG826List 1 }
+
+ifPerfG826Entry OBJECT-TYPE
+    SYNTAX      IfPerfG826Entry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry in the ifPerfG826 list.
+
+
+"
+    INDEX { ifPerfG826Index }
+    ::= { ifPerfG826Table 1 }
+
+IfPerfG826Entry ::=
+    SEQUENCE {
+        ifPerfG826Index                  Unsigned32,
+        ifPerfG826Name                   MgmtNameString,
+        ifPerfG826ConnIfPerfAdminIfIndex Unsigned32WithNA,
+        ifPerfG826Period                 PerfPeriodWithNA,
+        ifPerfG826Type                   G826MeasurementTypeWithNA,
+        ifPerfG826MonitorLevel           G826MonitorLevelWithNA,
+        ifPerfG826MonitorChannel         G826MonitorChannelWithNA,
+        ifPerfG826CounterEs              Unsigned32WithNA,
+        ifPerfG826CounterSes             Unsigned32WithNA,
+        ifPerfG826CounterUas             Unsigned32WithNA,
+        ifPerfG826CounterBbe             Counter64,
+        ifPerfG826ThresholdEs            Unsigned32WithNA,
+        ifPerfG826ThresholdSes           Unsigned32WithNA,
+        ifPerfG826ThresholdUas           Unsigned32WithNA,
+        ifPerfG826ThresholdBbe           Counter64,
+        ifPerfG826FaultStatusEs          FaultStatusWithNA,
+        ifPerfG826FaultStatusSes         FaultStatusWithNA,
+        ifPerfG826FaultStatusUas         FaultStatusWithNA,
+        ifPerfG826FaultStatusBbe         FaultStatusWithNA,
+        ifPerfG826UpId                   Unsigned32,
+        ifPerfG826TribPortId             TribPortIdType }
+
+ifPerfG826Index OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "An index assigned to each entry.
+
+"
+    ::= { ifPerfG826Entry 1 }
+
+ifPerfG826Name OBJECT-TYPE
+    SYNTAX      MgmtNameString
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The management name of the performance object,
+        for example 'lineG826OtsOtu2SmUni15m:1:2:23-24',
+        where the textual part indicates the hierarchy and type
+        line/client
+        G826
+        OTS/OTUk/ODUk/OPUk/RS/MS/MAC/PCS etc or any combination thereof
+        SM/PM/TCMn monitor channel type, no monitor type is also possible
+        Rx/Tx/Uni/Bi direction type
+        15m/24h time period, 15 minutes or 24 hours
+
+        For the part after the colon the first number indicates
+        subrack, the second slot number and the third/fourth
+        are the physical port numbers.
+
+"
+    ::= { ifPerfG826Entry 2 }
+
+ifPerfG826ConnIfPerfAdminIfIndex OBJECT-TYPE
+    SYNTAX      Unsigned32WithNA
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "An index that describes to which index in ifPerfAdminIf table
+        this object is related.
+
+"
+    ::= { ifPerfG826Entry 3 }
+
+ifPerfG826Period OBJECT-TYPE
+    SYNTAX      PerfPeriodWithNA
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Period, 15 minute or 24 hour.
+        - 15 minute interval measurements per
+        measurement point
+
+        - 24 hour interval measurements per
+        measurement point
+
+"
+    ::= { ifPerfG826Entry 4 }
+
+ifPerfG826Type OBJECT-TYPE
+    SYNTAX      G826MeasurementTypeWithNA
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The direction type of signal the interface expects.
+
+        rx - Only ingoing signal.
+
+        tx - Only outgoing signal.
+
+        uniDi - Unidirectional signal.
+
+        biDi - Ingoing and outgoing signal on the same
+        port.
+
+"
+    ::= { ifPerfG826Entry 5 }
+
+ifPerfG826MonitorLevel OBJECT-TYPE
+    SYNTAX      G826MonitorLevelWithNA
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Monitor level, e.g. OPUk, ODUk, OTUk, RS, MS, MAC, PCS.
+
+"
+    ::= { ifPerfG826Entry 6 }
+
+ifPerfG826MonitorChannel OBJECT-TYPE
+    SYNTAX      G826MonitorChannelWithNA
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Monitor channel, e.g. SM, PM, TCM1-6.
+
+"
+    ::= { ifPerfG826Entry 7 }
+
+ifPerfG826CounterEs OBJECT-TYPE
+    SYNTAX      Unsigned32WithNA
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Errored Seconds.
+        The counter associated with the number of
+        errored seconds in the interval specified by the
+        period attribute.
+
+"
+    ::= { ifPerfG826Entry 8 }
+
+ifPerfG826CounterSes OBJECT-TYPE
+    SYNTAX      Unsigned32WithNA
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Severely Errored Seconds.
+        The counter associated with the number of
+        severely errored seconds in the interval specified
+        by the period attribute.
+
+"
+    ::= { ifPerfG826Entry 9 }
+
+ifPerfG826CounterUas OBJECT-TYPE
+    SYNTAX      Unsigned32WithNA
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Unavailable Seconds.
+        The counter associated with the number of
+        unavailable seconds in the interval specified
+        by the period attribute.
+
+"
+    ::= { ifPerfG826Entry 10 }
+
+ifPerfG826CounterBbe OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Background Block Errors.
+        The counter associated with the number of
+        background block errors in the interval specified
+        by the period attribute.
+
+"
+    ::= { ifPerfG826Entry 11 }
+
+ifPerfG826ThresholdEs OBJECT-TYPE
+    SYNTAX      Unsigned32WithNA
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Sets the threshold in seconds for the
+        errored seconds alarm.
+
+        Range     15m: 0 to 900 seconds
+                  24h: 0 to 86400 seconds
+
+"
+    DEFVAL { 20 }
+    ::= { ifPerfG826Entry 12 }
+
+ifPerfG826ThresholdSes OBJECT-TYPE
+    SYNTAX      Unsigned32WithNA
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Sets the threshold in seconds for the
+        severely errored seconds alarm.
+
+        Range     15m: 0 to 900 seconds
+                  24h: 0 to 86400 seconds
+
+"
+    DEFVAL { 10 }
+    ::= { ifPerfG826Entry 13 }
+
+ifPerfG826ThresholdUas OBJECT-TYPE
+    SYNTAX      Unsigned32WithNA
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Sets the threshold in seconds for the
+        unavailable seconds alarm.
+
+        Range     15m: 0 to 900 seconds
+                  24h: 0 to 86400 seconds
+
+"
+    DEFVAL { 30 }
+    ::= { ifPerfG826Entry 14 }
+
+ifPerfG826ThresholdBbe OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Sets the threshold for the
+        background block errors alarms.
+
+"
+    DEFVAL { 100000 }
+    ::= { ifPerfG826Entry 15 }
+
+ifPerfG826FaultStatusEs OBJECT-TYPE
+    SYNTAX      FaultStatusWithNA
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Errored Seconds threshold exceeded.
+
+        alarm: The number of errors during a period
+        exceeds the associated threshold.
+
+        ok: The number of errored seconds during a
+        period is below the threshold.
+
+"
+    ::= { ifPerfG826Entry 16 }
+
+ifPerfG826FaultStatusSes OBJECT-TYPE
+    SYNTAX      FaultStatusWithNA
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Severely Errored Seconds threshold exceeded.
+
+        alarm: The number of severely errored seconds
+        during a period exceeds the associated threshold.
+
+        ok: The number of severely errored seconds during
+        a period is below the threshold.
+
+"
+    ::= { ifPerfG826Entry 17 }
+
+ifPerfG826FaultStatusUas OBJECT-TYPE
+    SYNTAX      FaultStatusWithNA
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Unavailable Seconds threshold exceeded.
+
+        alarm: The number of unavailable seconds during
+        a period exceeds the associated threshold.
+
+        ok: The number of unavailable seconds during a
+        period is below the threshold.
+
+"
+    ::= { ifPerfG826Entry 18 }
+
+ifPerfG826FaultStatusBbe OBJECT-TYPE
+    SYNTAX      FaultStatusWithNA
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Background Block Errors threshold exceeded.
+
+        alarm: The number of background block errors
+        during a period exceeds the associated threshold.
+
+        ok: The number of background block errors during
+        a period is below the threshold.
+
+"
+    ::= { ifPerfG826Entry 19 }
+
+ifPerfG826UpId OBJECT-TYPE
+    SYNTAX      Unsigned32   (0..2147483647)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Identity in the UP for the Perf Admin entry
+
+"
+    DEFVAL { 0  }
+    ::= { ifPerfG826Entry 20 }
+
+ifPerfG826TribPortId OBJECT-TYPE
+    SYNTAX      TribPortIdType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Tributary port id that describes to which high-order
+         tributary port this object belong to.
+
+"
+    DEFVAL { 0 }
+    ::= { ifPerfG826Entry 21 }
+
+-- ----------------------------------------------------
+-- IfPerfL1 l1 group
+-- ----------------------------------------------------
+
+ifPerfL1Table OBJECT-TYPE
+    SYNTAX      SEQUENCE OF IfPerfL1Entry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The  ifPerfL1 performance group contains information and
+         configuration for all ifPerfL1 performance objects. Notice table
+         is uni-directional meaning one entry for each direction."
+
+    ::= { ifPerfL1List 1 }
+
+ifPerfL1Entry OBJECT-TYPE
+    SYNTAX      IfPerfL1Entry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry in the ifPerfL1 list.
+
+"
+    INDEX { ifPerfL1Index }
+    ::= { ifPerfL1Table 1 }
+
+IfPerfL1Entry ::=
+    SEQUENCE {
+        ifPerfL1Index                  Unsigned32,
+        ifPerfL1Name                   MgmtNameString,
+        ifPerfL1ConnIfPerfAdminIfIndex Unsigned32WithNA,
+        ifPerfL1Period                 PerfPeriodWithNA,
+        ifPerfL1Type                   L1MeasurementTypeWithNA,
+        ifPerfL1MaxUtilization         Unsigned32WithNA,
+        ifPerfL1AverageUtilization     Unsigned32WithNA,
+        ifPerfL1CurrentUtilization     Unsigned32WithNA }
+
+ifPerfL1Index OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "An index assigned to each entry.
+
+"
+    ::= { ifPerfL1Entry 1 }
+
+ifPerfL1Name OBJECT-TYPE
+    SYNTAX      MgmtNameString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The management name of the performance object,
+        for example 'clientL1Rx15m:1:2:1-2',
+        where the textual part indicates the type
+        line/client
+        L1
+        Rx/Tx/Uni/Bi direction type
+        15m/24h time period, 15 minutes or 24 hours
+
+        For the part after the colon the first number indicates
+        subrack, the second slot number and the third/fourth
+        are the physical port numbers.
+
+"
+    ::= { ifPerfL1Entry 2 }
+
+ifPerfL1ConnIfPerfAdminIfIndex OBJECT-TYPE
+    SYNTAX      Unsigned32WithNA
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "An index that describes to which index in ifPerfAdminIf table
+        this object is related.
+
+"
+    ::= { ifPerfL1Entry 3 }
+
+ifPerfL1Period OBJECT-TYPE
+    SYNTAX      PerfPeriodWithNA
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Period, 15 minute or 24 hour.
+        - 15 minute interval measurements per
+        measurement point
+
+        - 24 hour interval measurements per
+        measurement point
+
+"
+    ::= { ifPerfL1Entry 4 }
+
+ifPerfL1Type OBJECT-TYPE
+    SYNTAX      L1MeasurementTypeWithNA
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The direction type of signal the interface expects.
+
+        rx - Only ingoing signal.
+
+        tx - Only outgoing signal.
+
+"
+    ::= { ifPerfL1Entry 5 }
+
+ifPerfL1MaxUtilization OBJECT-TYPE
+    SYNTAX      Unsigned32WithNA
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The maximum bandwidth utilization of the received or
+         transmitted signal during a particular 15 minute or
+         24 hour interval.
+
+"
+    ::= { ifPerfL1Entry 6 }
+
+ifPerfL1AverageUtilization OBJECT-TYPE
+    SYNTAX      Unsigned32WithNA
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The average bandwidth utilization of the received or
+         transmitted signal during a particular 15 minute or
+         24 hour interval.
+
+"
+    ::= { ifPerfL1Entry 7 }
+
+ifPerfL1CurrentUtilization OBJECT-TYPE
+    SYNTAX      Unsigned32WithNA
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The Current bandwidth utilization of the received or
+         transmitted signal during a particular 15 minute or
+         24 hour interval.
+
+"
+    ::= { ifPerfL1Entry 8 }
+
+-- ----------------------------------------------------
+-- IfPerfL0 l0 group
+-- ----------------------------------------------------
+
+ifPerfL0Table OBJECT-TYPE
+    SYNTAX      SEQUENCE OF IfPerfL0Entry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The  ifPerfL0 performance group contains information and
+         configuration for all ifPerfL0 performance objects."
+
+    ::= { ifPerfL0List 1 }
+
+ifPerfL0Entry OBJECT-TYPE
+    SYNTAX      IfPerfL0Entry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry in the ifPerfL0 list.
+
+"
+    INDEX { ifPerfL0Index }
+    ::= { ifPerfL0Table 1 }
+
+IfPerfL0Entry ::=
+    SEQUENCE {
+        ifPerfL0Index                           Unsigned32,
+        ifPerfL0Name                            MgmtNameString,
+        ifPerfL0ConnIfPerfAdminIfIndex          Unsigned32WithNA,
+        ifPerfL0RxPower                         Signed32WithNA,
+        ifPerfL0TxPower                         Signed32WithNA,
+        ifPerfL0InitialRxPower                  Signed32WithNA,
+        ifPerfL0ChromaticDispersion             Signed32WithNA,
+        ifPerfL0DifferentialGroupDelay          Unsigned32WithNA,
+        ifPerfL0InitialDifferentialGroupDelay   Unsigned32WithNA,
+        ifPerfL0UpId                            Unsigned32,
+        ifPerfL0OpticalSNR                      Unsigned32WithNA,
+        ifPerfL0QFactor                         Unsigned32WithNA}
+
+ifPerfL0Index OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "An index assigned to each entry.
+
+"
+    ::= { ifPerfL0Entry 1 }
+
+ifPerfL0Name OBJECT-TYPE
+    SYNTAX      MgmtNameString
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The management name of the performance object,
+        for example 'clientL0:1:2:1-2', where the first number indicates
+        subrack, the second slot number and the third/fourth
+        are the physical port numbers.
+
+"
+    ::= { ifPerfL0Entry 2 }
+
+ifPerfL0ConnIfPerfAdminIfIndex OBJECT-TYPE
+    SYNTAX      Unsigned32WithNA
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "An index that describes to which index in ifPerfAdminIf table
+        this object is related.
+
+"
+    ::= { ifPerfL0Entry 3 }
+
+ifPerfL0RxPower OBJECT-TYPE
+    SYNTAX      Signed32WithNA
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Received power in units of 0.1 dBm.
+
+"
+    ::= { ifPerfL0Entry 4 }
+
+ifPerfL0TxPower OBJECT-TYPE
+    SYNTAX      Signed32WithNA
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Transmitted power in units of 0.1 dBm.
+
+"
+    ::= { ifPerfL0Entry 5 }
+
+ifPerfL0InitialRxPower OBJECT-TYPE
+    SYNTAX      Signed32WithNA
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Initial received power in units of 0.1 dBm.
+         The value is set using the install command.
+
+"
+    ::= { ifPerfL0Entry 6}
+
+ifPerfL0ChromaticDispersion OBJECT-TYPE
+    SYNTAX      Signed32WithNA
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Received chromatic dispersion that describe the spreading of a light
+         pulse as it travels down a fiber when light pulses launched close together.
+
+"
+    ::= { ifPerfL0Entry 7 }
+
+ifPerfL0DifferentialGroupDelay OBJECT-TYPE
+    SYNTAX      Unsigned32WithNA
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The arrival time difference between two polarization states at
+         the output of the media (fiber).
+
+"
+    ::= { ifPerfL0Entry 8 }
+
+ifPerfL0InitialDifferentialGroupDelay OBJECT-TYPE
+    SYNTAX      Unsigned32WithNA
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The initial received differential group delay in units of picoseconds.
+         The value is set using the install command.
+
+"
+    ::= { ifPerfL0Entry 9 }
+
+ifPerfL0UpId OBJECT-TYPE
+    SYNTAX      Unsigned32   (0..2147483647)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+    "Identity in the UP for the Perf Admin entry
+"
+    DEFVAL { 0  }
+    ::= { ifPerfL0Entry 10 }
+
+
+ifPerfL0OpticalSNR OBJECT-TYPE
+    SYNTAX      Unsigned32WithNA
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "OSNR of the received signal (dB/0.1nm) reported by the coherent module receiver.
+
+"
+    ::= { ifPerfL0Entry 11 }
+
+ifPerfL0QFactor OBJECT-TYPE
+    SYNTAX      Unsigned32WithNA
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Pre-FEC Q factor (dB).
+
+"
+    ::= { ifPerfL0Entry 12 }
+
+-- ----------------------------------------------------
+-- IfPerfL2Stat L2 group
+-- ----------------------------------------------------
+
+ifPerfL2StatTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF IfPerfL2StatEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The  ifPerfL2Stat performance group contains information and
+         configuration for all ifPerfL2Stat performance objects."
+
+    ::= { ifPerfL2StatList 1 }
+
+ifPerfL2StatEntry OBJECT-TYPE
+    SYNTAX      IfPerfL2StatEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry in the ifPerfL2Stat list.
+
+"
+    INDEX { ifPerfL2StatIndex }
+    ::= { ifPerfL2StatTable 1 }
+
+IfPerfL2StatEntry ::=
+    SEQUENCE {
+        ifPerfL2StatIndex                  Unsigned32,
+        ifPerfL2StatName                   MgmtNameString,
+        ifPerfL2StatConnIfPerfAdminIfIndex Unsigned32WithNA,
+        ifPerfL2StatPeriod                 PerfPeriodWithNA,
+        ifPerfL2StatType                   L2MeasurementTypeWithNA,
+
+        -- Ethernet traffic data
+        ifPerfL2StatCurrentFrames          Counter64,
+        ifPerfL2StatCurrentBytes           Counter64,
+        ifPerfL2StatCurrentUnicastFrames   Counter64,
+        ifPerfL2StatCurrentMulticastFrames Counter64,
+        ifPerfL2StatCurrentBroadcastFrames Counter64,
+        ifPerfL2StatMaxUtilization         Unsigned32WithNA,
+        ifPerfL2StatAverageUtilization     Unsigned32WithNA,
+        ifPerfL2StatCurrentUtilization     Unsigned32WithNA }
+
+ifPerfL2StatIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "An index assigned to each entry.
+
+"
+    ::= { ifPerfL2StatEntry 1 }
+
+ifPerfL2StatName OBJECT-TYPE
+    SYNTAX      MgmtNameString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The management name of the performance object,
+        for example 'clientL2:1:2:1-2', where the first number indicates
+        subrack, the second slot number and the third/fourth
+        are the physical port numbers.
+
+"
+    ::= { ifPerfL2StatEntry 2 }
+
+ifPerfL2StatConnIfPerfAdminIfIndex OBJECT-TYPE
+    SYNTAX      Unsigned32WithNA
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "An index that describes to which index in ifPerfAdminIf table
+        this object is related.
+
+"
+    ::= { ifPerfL2StatEntry 3 }
+
+ifPerfL2StatPeriod OBJECT-TYPE
+    SYNTAX      PerfPeriodWithNA
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Period, 15 minute or 24 hour.
+        - 15 minute interval measurements per
+        measurement point
+
+        - 24 hour interval measurements per
+        measurement point
+
+"
+    ::= { ifPerfL2StatEntry 4 }
+
+ifPerfL2StatType OBJECT-TYPE
+    SYNTAX      L2MeasurementTypeWithNA
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The direction type of signal the interface expects.
+
+        rx - Only ingoing signal.
+
+        tx - Only outgoing signal.
+
+"
+    ::= { ifPerfL2StatEntry 5 }
+
+ifPerfL2StatCurrentFrames OBJECT-TYPE
+     SYNTAX     Counter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+        "The amount of Ethernet frames during a particular interval.
+
+"
+    ::= { ifPerfL2StatEntry 6 }
+
+ifPerfL2StatCurrentBytes OBJECT-TYPE
+     SYNTAX     Counter64
+     MAX-ACCESS read-only
+     STATUS     current
+     DESCRIPTION
+        "The amount of bytes during a particular interval.
+
+"
+    ::= { ifPerfL2StatEntry 7 }
+
+ifPerfL2StatCurrentUnicastFrames OBJECT-TYPE
+     SYNTAX Counter64
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+        "The amount of Ethernet unicast frames during a
+        particular interval.
+
+"
+    ::= { ifPerfL2StatEntry 8 }
+
+ifPerfL2StatCurrentMulticastFrames OBJECT-TYPE
+     SYNTAX Counter64
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+        "The amount of Ethernet multicast frames during a
+        particular interval.
+
+"
+    ::= { ifPerfL2StatEntry 9 }
+
+ifPerfL2StatCurrentBroadcastFrames OBJECT-TYPE
+     SYNTAX Counter64
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+        "The amount of Ethernet broadcast frames during a
+        particular interval.
+
+"
+    ::= { ifPerfL2StatEntry 10 }
+
+ifPerfL2StatMaxUtilization OBJECT-TYPE
+    SYNTAX      Unsigned32WithNA
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The maximum bandwidth utilization of the received or
+         transmitted signal during a particular 15 minute or
+         24 hour interval.
+
+"
+    ::= { ifPerfL2StatEntry 11 }
+
+ifPerfL2StatAverageUtilization OBJECT-TYPE
+    SYNTAX      Unsigned32WithNA
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The average bandwidth utilization of the received or
+         transmitted signal during a particular 15 minute or
+         24 hour interval.
+
+"
+    ::= { ifPerfL2StatEntry 12 }
+
+ifPerfL2StatCurrentUtilization OBJECT-TYPE
+    SYNTAX      Unsigned32WithNA
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The Current bandwidth utilization of the received or
+         transmitted signal during a particular 15 minute or
+         24 hour interval.
+
+"
+    ::= { ifPerfL2StatEntry 13 }
+
+-- ----------------------------------------------------
+-- IfPerfL2Error L2 group
+-- ----------------------------------------------------
+
+ifPerfL2ErrorTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF IfPerfL2ErrorEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The  ifPerfL2Error performance group contains information and
+         configuration for all ifPerfL2Error performance objects."
+
+    ::= { ifPerfL2ErrorList 1 }
+
+ifPerfL2ErrorEntry OBJECT-TYPE
+    SYNTAX      IfPerfL2ErrorEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry in the ifPerfL2Error list.
+
+"
+    INDEX { ifPerfL2ErrorIndex }
+    ::= { ifPerfL2ErrorTable 1 }
+
+IfPerfL2ErrorEntry ::=
+    SEQUENCE {
+        ifPerfL2ErrorIndex                  Unsigned32,
+        ifPerfL2ErrorName                   MgmtNameString,
+        ifPerfL2ErrorConnIfPerfAdminIfIndex Unsigned32WithNA,
+        ifPerfL2ErrorPeriod                 PerfPeriodWithNA,
+        ifPerfL2ErrorType                   L2MeasurementTypeWithNA,
+
+        -- Ethernet traffic data
+        ifPerfL2ErrorCurrentUndersizedFrames Counter64,
+        ifPerfL2ErrorCurrentOversizedFrames Counter64,
+        ifPerfL2ErrorCurrentFragments       Counter64,
+        ifPerfL2ErrorCurrentFcsErrors       Counter64,
+
+        -- Ethernet traffic thresholds
+        ifPerfL2ErrorUndersizedFramesThreshold Counter64,
+        ifPerfL2ErrorOversizedFramesThreshold Counter64,
+        ifPerfL2ErrorFragmentsThreshold     Counter64,
+        ifPerfL2ErrorFcsErrorsThreshold     Counter64,
+
+        -- Ethernet traffic fault statuses
+        ifPerfL2ErrorUndersizedFramesFault  FaultStatusWithNA,
+        ifPerfL2ErrorOversizedFramesFault   FaultStatusWithNA,
+        ifPerfL2ErrorFragmentsFault         FaultStatusWithNA,
+        ifPerfL2ErrorFcsErrorsFault         FaultStatusWithNA }
+
+ifPerfL2ErrorIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "An index assigned to each entry.
+
+"
+    ::= { ifPerfL2ErrorEntry 1 }
+
+ifPerfL2ErrorName OBJECT-TYPE
+    SYNTAX      MgmtNameString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The management name of the performance object,
+        for example 'clientL2:1:2:1-2', where the first number indicates
+        subrack, the second slot number and the third/fourth
+        are the physical port numbers.
+
+"
+    ::= { ifPerfL2ErrorEntry 2 }
+
+ifPerfL2ErrorConnIfPerfAdminIfIndex OBJECT-TYPE
+    SYNTAX      Unsigned32WithNA
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "An index that describes to which index in ifPerfAdminIf table
+        this object is related.
+
+"
+    ::= { ifPerfL2ErrorEntry 3 }
+
+ifPerfL2ErrorPeriod OBJECT-TYPE
+    SYNTAX      PerfPeriodWithNA
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Period, 15 minute or 24 hour.
+        - 15 minute interval measurements per
+        measurement point
+
+        - 24 hour interval measurements per
+        measurement point
+
+"
+    ::= { ifPerfL2ErrorEntry 4 }
+
+ifPerfL2ErrorType OBJECT-TYPE
+    SYNTAX      L2MeasurementTypeWithNA
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The direction type of signal the interface expects.
+
+        rx - Only ingoing signal.
+
+        tx - Only outgoing signal.
+
+"
+    ::= { ifPerfL2ErrorEntry 5 }
+
+ifPerfL2ErrorCurrentUndersizedFrames OBJECT-TYPE
+     SYNTAX Counter64
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+        "The amount of undersized Ethernet frames during a
+        particular interval.
+
+"
+    ::= { ifPerfL2ErrorEntry 6 }
+
+ifPerfL2ErrorCurrentOversizedFrames OBJECT-TYPE
+     SYNTAX Counter64
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+        "The amount of oversized Ethernet frames during a
+        particular interval.
+        Frames with a length over 9600 bytes are counted
+        as oversized frames.
+
+"
+    ::= { ifPerfL2ErrorEntry 7 }
+
+ifPerfL2ErrorCurrentFragments OBJECT-TYPE
+     SYNTAX Counter64
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+        "The amount of fragmented Ethernet frames during a
+        particular interval.
+
+"
+    ::= { ifPerfL2ErrorEntry 8 }
+
+ifPerfL2ErrorCurrentFcsErrors OBJECT-TYPE
+     SYNTAX Counter64
+     MAX-ACCESS read-only
+     STATUS current
+     DESCRIPTION
+        "The amount of Ethernet frames with FCS or alignment
+        errors during a particular interval.
+
+"
+    ::= { ifPerfL2ErrorEntry 9 }
+
+ifPerfL2ErrorUndersizedFramesThreshold  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Sets the threshold for the undersized frames alarm.
+
+"
+    DEFVAL { 10 }
+    ::= { ifPerfL2ErrorEntry 10 }
+
+ifPerfL2ErrorOversizedFramesThreshold  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Sets the threshold for the oversized frames alarm.
+        A value 0 (zero) will disable the alarm.
+
+"
+    DEFVAL { 10 }
+    ::= { ifPerfL2ErrorEntry 11 }
+
+ifPerfL2ErrorFragmentsThreshold  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Sets the threshold for the fragmented frames alarm.
+
+"
+    DEFVAL { 10 }
+    ::= { ifPerfL2ErrorEntry 12 }
+
+ifPerfL2ErrorFcsErrorsThreshold  OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Sets the threshold for the FCS errors alarm.
+
+"
+    DEFVAL { 10 }
+    ::= { ifPerfL2ErrorEntry 13 }
+
+ifPerfL2ErrorUndersizedFramesFault  OBJECT-TYPE
+    SYNTAX      FaultStatusWithNA
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Undersized frames threshold exceeded.
+
+        alarm: The number of undersized frames during a
+        period exceeds the associated threshold.
+
+        ok: At the start of a new period the associated
+        undersized frames counter is reset to zero.
+        At the same time the fault status is cleared.
+
+"
+
+    ::= { ifPerfL2ErrorEntry 14 }
+
+ifPerfL2ErrorOversizedFramesFault OBJECT-TYPE
+    SYNTAX      FaultStatusWithNA
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Oversized frames threshold exceeded.
+
+        alarm: The number of oversized frames during a
+        period exceeds the associated threshold.
+
+        ok: At the start of a new period the associated
+        oversized frames counter is reset to zero.
+        At the same time the fault status is cleared.
+
+"
+    ::= { ifPerfL2ErrorEntry 15 }
+
+ifPerfL2ErrorFragmentsFault  OBJECT-TYPE
+    SYNTAX      FaultStatusWithNA
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Fragments threshold exceeded.
+
+        alarm: The number of fragmented frames during a
+        period exceeds the associated threshold.
+
+        ok: At the start of a new period the associated
+        fragmented frames counter is reset to zero.
+        At the same time the fault status is cleared.
+
+"
+    ::= { ifPerfL2ErrorEntry 16 }
+
+ifPerfL2ErrorFcsErrorsFault  OBJECT-TYPE
+    SYNTAX      FaultStatusWithNA
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "FCS errors threshold exceeded.
+
+        alarm: The number of FCS or alignment errors during a
+        period exceeds the associated threshold.
+
+        ok: At the start of a new period the associated
+        FCS error counter is reset to zero.
+        At the same time the fault status is cleared.
+
+"
+    ::= { ifPerfL2ErrorEntry 17 }
+
+-- ----------------------------------------------------
+-- Delay measurement group
+-- ----------------------------------------------------
+
+ifPerfDelayTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF IfPerfDelayEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The Delay group group contains information and
+         configuration for the delay measurment of line ports."
+
+    ::= { ifPerfDelayList 1 }
+
+ifPerfDelayEntry OBJECT-TYPE
+    SYNTAX      IfPerfDelayEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry in the ifPerf Delay list.
+
+"
+    INDEX { ifPerfDelayIndex }
+    ::= { ifPerfDelayTable 1 }
+
+IfPerfDelayEntry ::=
+    SEQUENCE {
+        ifPerfDelayIndex                   Unsigned32,
+        ifPerfDelayUId                     Unsigned32,
+        ifPerfDelayName                    MgmtNameString,
+        ifPerfDelayTwoWayFiberDelay        Unsigned32WithNA,
+        ifPerfDelayConnIfPerfAdminIfIndex  Unsigned32WithNA}
+
+ifPerfDelayIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "An index assigned to each entry.
+
+"
+    ::= { ifPerfDelayEntry 1 }
+
+ifPerfDelayUId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "An unique identifier assigned to each entry.
+
+"
+    ::= { ifPerfDelayEntry 2 }
+
+ifPerfDelayName OBJECT-TYPE
+    SYNTAX      MgmtNameString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The management name of the object,
+        for example 'delay:1:2:1-2', where the first number indicates
+        subrack, the second slot number and the third/fourth
+        are the physical port numbers.
+
+"
+    ::= { ifPerfDelayEntry 3 }
+
+ifPerfDelayTwoWayFiberDelay OBJECT-TYPE
+    SYNTAX      Unsigned32WithNA
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The measured delay in ns.
+
+"
+    ::= { ifPerfDelayEntry 4 }
+
+ifPerfDelayConnIfPerfAdminIfIndex OBJECT-TYPE
+    SYNTAX      Unsigned32WithNA
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "An index that describes to which index in ifPerfAdminIf table
+        this object is related.
+
+"
+    ::= { ifPerfDelayEntry 5 }
+
+-- ----------------------------------------------------
+-- Notifications
+-- ----------------------------------------------------
+
+
+-- ----------------------------------------------------
+-- Object and event groups
+-- ----------------------------------------------------
+
+ifPerfGeneralGroupV1 OBJECT-GROUP
+    OBJECTS {
+        ifPerfGeneralConfigLastChangeTime,
+        ifPerfGeneralStateLastChangeTime,
+        ifPerfGeneralAdminTableSize,
+        ifPerfGeneralAdminConfigLastChangeTime,
+        ifPerfGeneralAdminStateLastChangeTime,
+        ifPerfGeneralFecTableSize,
+        ifPerfGeneralFecConfigLastChangeTime,
+        ifPerfGeneralFecStateLastChangeTime,
+        ifPerfGeneralG826TableSize,
+        ifPerfGeneralG826ConfigLastChangeTime,
+        ifPerfGeneralG826StateLastChangeTime,
+        ifPerfGeneralL1TableSize,
+        ifPerfGeneralL1ConfigLastChangeTime,
+        ifPerfGeneralL1StateLastChangeTime,
+        ifPerfGeneralL0TableSize,
+        ifPerfGeneralL0ConfigLastChangeTime,
+        ifPerfGeneralL0StateLastChangeTime }
+    STATUS      deprecated
+    DESCRIPTION
+        "The general objects."
+    ::= { lumIfPerfGroups 1 }
+
+ifPerfAdminGroupV1 OBJECT-GROUP
+    OBJECTS {
+        ifPerfAdminIndex,
+        ifPerfAdminName,
+        ifPerfAdminConnIfBasicIfIndex,
+        ifPerfAdminAdminStatus,
+        ifPerfAdminReportMode,
+        ifPerfAdminOperStatus,
+        ifPerfAdminIsSuspect15m,
+        ifPerfAdminIsSuspect24h,
+        ifPerfAdminReset15m,
+        ifPerfAdminReset24h}
+    STATUS      deprecated
+    DESCRIPTION
+        "The ifPerfAdmin objects."
+    ::= { lumIfPerfGroups 2 }
+
+ifPerfFecGroupV1 OBJECT-GROUP
+    OBJECTS {
+        ifPerfFecIndex,
+        ifPerfFecName,
+        ifPerfFecConnIfPerfAdminIfIndex,
+        ifPerfFecCorrectedZeros,
+        ifPerfFecCorrectedOnes,
+        ifPerfFecRxBerEstimation,
+        ifPerfFecRxAvgPreFecBer}
+    STATUS      deprecated
+    DESCRIPTION
+        "The ifPerfFec objects."
+    ::= { lumIfPerfGroups 3 }
+
+
+ifPerfG826GroupV1 OBJECT-GROUP
+    OBJECTS {
+        ifPerfG826Index,
+        ifPerfG826Name,
+        ifPerfG826ConnIfPerfAdminIfIndex,
+        ifPerfG826Period,
+        ifPerfG826Type,
+        ifPerfG826MonitorLevel,
+        ifPerfG826MonitorChannel,
+        ifPerfG826CounterEs,
+        ifPerfG826CounterSes,
+        ifPerfG826CounterUas,
+        ifPerfG826CounterBbe,
+        ifPerfG826ThresholdEs,
+        ifPerfG826ThresholdSes,
+        ifPerfG826ThresholdUas,
+        ifPerfG826ThresholdBbe,
+        ifPerfG826FaultStatusEs,
+        ifPerfG826FaultStatusSes,
+        ifPerfG826FaultStatusUas,
+        ifPerfG826FaultStatusBbe}
+    STATUS      deprecated
+    DESCRIPTION
+        "The ifPerfG826 objects."
+    ::= { lumIfPerfGroups 4 }
+
+ifPerfL1GroupV1 OBJECT-GROUP
+    OBJECTS {
+        ifPerfL1Index,
+        ifPerfL1Name,
+        ifPerfL1ConnIfPerfAdminIfIndex,
+        ifPerfL1Period,
+        ifPerfL1Type,
+        ifPerfL1MaxUtilization,
+        ifPerfL1AverageUtilization }
+    STATUS      deprecated
+    DESCRIPTION
+        "The ifPerfL1 objects."
+    ::= { lumIfPerfGroups 5 }
+
+ifPerfL0GroupV1 OBJECT-GROUP
+    OBJECTS {
+        ifPerfL0Index,
+        ifPerfL0Name,
+        ifPerfL0ConnIfPerfAdminIfIndex,
+        ifPerfL0RxPower,
+        ifPerfL0TxPower,
+        ifPerfL0InitialRxPower }
+    STATUS      deprecated
+    DESCRIPTION
+        "The ifPerfL0 objects."
+    ::= { lumIfPerfGroups 6 }
+
+ifPerfGeneralGroupV2 OBJECT-GROUP
+    OBJECTS {
+        ifPerfGeneralConfigLastChangeTime,
+        ifPerfGeneralStateLastChangeTime,
+        ifPerfGeneralAdminTableSize,
+        ifPerfGeneralAdminConfigLastChangeTime,
+        ifPerfGeneralAdminStateLastChangeTime,
+        ifPerfGeneralFecTableSize,
+        ifPerfGeneralFecConfigLastChangeTime,
+        ifPerfGeneralFecStateLastChangeTime,
+        ifPerfGeneralG826TableSize,
+        ifPerfGeneralG826ConfigLastChangeTime,
+        ifPerfGeneralG826StateLastChangeTime,
+        ifPerfGeneralL1TableSize,
+        ifPerfGeneralL1ConfigLastChangeTime,
+        ifPerfGeneralL1StateLastChangeTime,
+        ifPerfGeneralL0TableSize,
+        ifPerfGeneralL0ConfigLastChangeTime,
+        ifPerfGeneralL0StateLastChangeTime,
+        ifPerfGeneralL2StatTableSize,
+        ifPerfGeneralL2StatConfigLastChangeTime,
+        ifPerfGeneralL2StatStateLastChangeTime,
+        ifPerfGeneralL2ErrorTableSize,
+        ifPerfGeneralL2ErrorConfigLastChangeTime,
+        ifPerfGeneralL2ErrorStateLastChangeTime }
+    STATUS      deprecated
+    DESCRIPTION
+        "The general objects."
+    ::= { lumIfPerfGroups 7 }
+
+ifPerfL2StatGroupV1 OBJECT-GROUP
+    OBJECTS {
+        ifPerfL2StatIndex,
+        ifPerfL2StatName,
+        ifPerfL2StatConnIfPerfAdminIfIndex,
+        ifPerfL2StatPeriod,
+        ifPerfL2StatType,
+        ifPerfL2StatCurrentFrames,
+        ifPerfL2StatCurrentBytes,
+        ifPerfL2StatCurrentUnicastFrames,
+        ifPerfL2StatCurrentMulticastFrames,
+        ifPerfL2StatCurrentBroadcastFrames }
+    STATUS      deprecated
+    DESCRIPTION
+        "The ifPerfL2Stat objects."
+    ::= { lumIfPerfGroups 8 }
+
+ifPerfL1GroupV2 OBJECT-GROUP
+    OBJECTS {
+        ifPerfL1Index,
+        ifPerfL1Name,
+        ifPerfL1ConnIfPerfAdminIfIndex,
+        ifPerfL1Period,
+        ifPerfL1Type,
+        ifPerfL1MaxUtilization,
+        ifPerfL1AverageUtilization,
+        ifPerfL1CurrentUtilization }
+    STATUS      current
+    DESCRIPTION
+        "The ifPerfL2 objects."
+    ::= { lumIfPerfGroups 9 }
+
+ifPerfL0GroupV2 OBJECT-GROUP
+    OBJECTS {
+        ifPerfL0Index,
+        ifPerfL0Name,
+        ifPerfL0ConnIfPerfAdminIfIndex,
+        ifPerfL0RxPower,
+        ifPerfL0TxPower,
+        ifPerfL0InitialRxPower,
+        ifPerfL0ChromaticDispersion,
+        ifPerfL0DifferentialGroupDelay,
+        ifPerfL0InitialDifferentialGroupDelay}
+    STATUS      deprecated
+    DESCRIPTION
+        "The ifPerfL0 objects."
+    ::= { lumIfPerfGroups 10 }
+
+ifPerfL2ErrorGroupV1 OBJECT-GROUP
+    OBJECTS {
+        ifPerfL2ErrorIndex,
+        ifPerfL2ErrorName,
+        ifPerfL2ErrorConnIfPerfAdminIfIndex,
+        ifPerfL2ErrorPeriod,
+        ifPerfL2ErrorType,
+        ifPerfL2ErrorCurrentUndersizedFrames,
+        ifPerfL2ErrorCurrentOversizedFrames,
+        ifPerfL2ErrorCurrentFragments,
+        ifPerfL2ErrorCurrentFcsErrors,
+        ifPerfL2ErrorUndersizedFramesThreshold,
+        ifPerfL2ErrorOversizedFramesThreshold,
+        ifPerfL2ErrorFragmentsThreshold,
+        ifPerfL2ErrorFcsErrorsThreshold,
+        ifPerfL2ErrorUndersizedFramesFault,
+        ifPerfL2ErrorOversizedFramesFault,
+        ifPerfL2ErrorFragmentsFault,
+        ifPerfL2ErrorFcsErrorsFault }
+    STATUS      current
+    DESCRIPTION
+        "The ifPerfL2Error objects."
+    ::= { lumIfPerfGroups 11 }
+
+ifPerfFecGroupV2 OBJECT-GROUP
+    OBJECTS {
+        ifPerfFecIndex,
+        ifPerfFecName,
+        ifPerfFecConnIfPerfAdminIfIndex,
+        ifPerfFecCorrectedZeros,
+        ifPerfFecCorrectedOnes,
+        ifPerfFecRxBerEstimation,
+        ifPerfFecRxAvgPreFecBer,
+        ifPerfFecCorrectedBits}
+    STATUS      deprecated
+    DESCRIPTION
+        "The ifPerfFec objects."
+    ::= { lumIfPerfGroups 12 }
+
+ifPerfFecGroupV3 OBJECT-GROUP
+    OBJECTS {
+        ifPerfFecIndex,
+        ifPerfFecName,
+        ifPerfFecConnIfPerfAdminIfIndex,
+        ifPerfFecCorrectedZeros,
+        ifPerfFecCorrectedOnes,
+        ifPerfFecRxBerEstimation,
+        ifPerfFecRxAvgPreFecBer,
+        ifPerfFecCorrectedBits,
+        ifPerfFecRxBitErrorEstimation}
+    STATUS      deprecated
+    DESCRIPTION
+        "The ifPerfFec objects."
+    ::= { lumIfPerfGroups 13 }
+
+ifPerfAdminGroupV2 OBJECT-GROUP
+    OBJECTS {
+        ifPerfAdminIndex,
+        ifPerfAdminName,
+        ifPerfAdminConnIfBasicIfIndex,
+        ifPerfAdminAdminStatus,
+        ifPerfAdminReportMode,
+        ifPerfAdminOperStatus,
+        ifPerfAdminIsSuspect15m,
+        ifPerfAdminIsSuspect24h,
+        ifPerfAdminReset15m,
+        ifPerfAdminReset24h,
+        ifPerfAdminUpId}
+    STATUS      current
+    DESCRIPTION
+        "The ifPerfAdmin objects. (R26)"
+    ::= { lumIfPerfGroups 14 }
+
+ifPerfG826GroupV2 OBJECT-GROUP
+    OBJECTS {
+        ifPerfG826Index,
+        ifPerfG826Name,
+        ifPerfG826ConnIfPerfAdminIfIndex,
+        ifPerfG826Period,
+        ifPerfG826Type,
+        ifPerfG826MonitorLevel,
+        ifPerfG826MonitorChannel,
+        ifPerfG826CounterEs,
+        ifPerfG826CounterSes,
+        ifPerfG826CounterUas,
+        ifPerfG826CounterBbe,
+        ifPerfG826ThresholdEs,
+        ifPerfG826ThresholdSes,
+        ifPerfG826ThresholdUas,
+        ifPerfG826ThresholdBbe,
+        ifPerfG826FaultStatusEs,
+        ifPerfG826FaultStatusSes,
+        ifPerfG826FaultStatusUas,
+        ifPerfG826FaultStatusBbe,
+        ifPerfG826UpId}
+    STATUS      deprecated
+    DESCRIPTION
+        "The ifPerfG826 objects."
+    ::= { lumIfPerfGroups 15 }
+
+ifPerfL2StatGroupV2 OBJECT-GROUP
+    OBJECTS {
+        ifPerfL2StatIndex,
+        ifPerfL2StatName,
+        ifPerfL2StatConnIfPerfAdminIfIndex,
+        ifPerfL2StatPeriod,
+        ifPerfL2StatType,
+        ifPerfL2StatCurrentFrames,
+        ifPerfL2StatCurrentBytes,
+        ifPerfL2StatCurrentUnicastFrames,
+        ifPerfL2StatCurrentMulticastFrames,
+        ifPerfL2StatCurrentBroadcastFrames,
+        ifPerfL2StatMaxUtilization,
+        ifPerfL2StatAverageUtilization,
+        ifPerfL2StatCurrentUtilization }
+    STATUS      current
+    DESCRIPTION
+        "The ifPerfL2Stat objects."
+    ::= { lumIfPerfGroups 16 }
+
+ifPerfFecGroupV4 OBJECT-GROUP
+    OBJECTS {
+        ifPerfFecIndex,
+        ifPerfFecName,
+        ifPerfFecConnIfPerfAdminIfIndex,
+        ifPerfFecCorrectedZeros,
+        ifPerfFecCorrectedOnes,
+        ifPerfFecRxBerEstimation,
+        ifPerfFecRxAvgPreFecBer,
+        ifPerfFecCorrectedBits,
+        ifPerfFecRxBitErrorEstimation,
+        ifPerfFecOpticalSNR }
+    STATUS      deprecated
+    DESCRIPTION
+        "The ifPerfFec objects."
+    ::= { lumIfPerfGroups 17 }
+
+ifPerfL0GroupV3 OBJECT-GROUP
+    OBJECTS {
+        ifPerfL0Index,
+        ifPerfL0Name,
+        ifPerfL0ConnIfPerfAdminIfIndex,
+        ifPerfL0RxPower,
+        ifPerfL0TxPower,
+        ifPerfL0InitialRxPower,
+        ifPerfL0ChromaticDispersion,
+        ifPerfL0DifferentialGroupDelay,
+        ifPerfL0InitialDifferentialGroupDelay,
+        ifPerfL0UpId}
+    STATUS      deprecated
+    DESCRIPTION
+        "The ifPerfL0 objects."
+    ::= { lumIfPerfGroups 18 }
+
+ifPerfFecGroupV5 OBJECT-GROUP
+    OBJECTS {
+        ifPerfFecIndex,
+        ifPerfFecName,
+        ifPerfFecConnIfPerfAdminIfIndex,
+        ifPerfFecCorrectedZeros,
+        ifPerfFecCorrectedOnes,
+        ifPerfFecRxBerEstimation,
+        ifPerfFecRxAvgPreFecBer,
+        ifPerfFecCorrectedBits,
+        ifPerfFecRxBitErrorEstimation,
+        ifPerfFecOpticalSNR,
+        ifPerfFecUpId}
+    STATUS      deprecated
+    DESCRIPTION
+        "The ifPerfFec objects."
+    ::= { lumIfPerfGroups 19 }
+
+ifPerfGeneralGroupV3 OBJECT-GROUP
+    OBJECTS {
+        ifPerfGeneralConfigLastChangeTime,
+        ifPerfGeneralStateLastChangeTime,
+        ifPerfGeneralAdminTableSize,
+        ifPerfGeneralAdminConfigLastChangeTime,
+        ifPerfGeneralAdminStateLastChangeTime,
+        ifPerfGeneralFecTableSize,
+        ifPerfGeneralFecConfigLastChangeTime,
+        ifPerfGeneralFecStateLastChangeTime,
+        ifPerfGeneralG826TableSize,
+        ifPerfGeneralG826ConfigLastChangeTime,
+        ifPerfGeneralG826StateLastChangeTime,
+        ifPerfGeneralL1TableSize,
+        ifPerfGeneralL1ConfigLastChangeTime,
+        ifPerfGeneralL1StateLastChangeTime,
+        ifPerfGeneralL0TableSize,
+        ifPerfGeneralL0ConfigLastChangeTime,
+        ifPerfGeneralL0StateLastChangeTime,
+        ifPerfGeneralL2StatTableSize,
+        ifPerfGeneralL2StatConfigLastChangeTime,
+        ifPerfGeneralL2StatStateLastChangeTime,
+        ifPerfGeneralL2ErrorTableSize,
+        ifPerfGeneralL2ErrorConfigLastChangeTime,
+        ifPerfGeneralL2ErrorStateLastChangeTime,
+        ifPerfGeneralDelayTableSize,
+        ifPerfGeneralDelayConfigLastChangeTime,
+        ifPerfGeneralDelayStateLastChangeTime }
+    STATUS      current
+    DESCRIPTION
+        "The general objects."
+    ::= { lumIfPerfGroups 20 }
+
+ifPerfDelayGroupV1 OBJECT-GROUP
+    OBJECTS {
+        ifPerfDelayIndex,
+        ifPerfDelayUId,
+        ifPerfDelayName,
+        ifPerfDelayTwoWayFiberDelay }
+
+    STATUS      deprecated
+    DESCRIPTION
+        "The Delay objects."
+    ::= { lumIfPerfGroups 21 }
+
+ifPerfDelayGroupV2 OBJECT-GROUP
+    OBJECTS {
+        ifPerfDelayIndex,
+        ifPerfDelayUId,
+        ifPerfDelayName,
+        ifPerfDelayTwoWayFiberDelay,
+        ifPerfDelayConnIfPerfAdminIfIndex }
+
+    STATUS      current
+    DESCRIPTION
+        "The Delay objects."
+    ::= { lumIfPerfGroups 22 }
+
+ifPerfFecGroupV6 OBJECT-GROUP
+    OBJECTS {
+        ifPerfFecIndex,
+        ifPerfFecName,
+        ifPerfFecConnIfPerfAdminIfIndex,
+        ifPerfFecCorrectedZeros,
+        ifPerfFecCorrectedOnes,
+        ifPerfFecRxBerEstimation,
+        ifPerfFecRxAvgPreFecBer,
+        ifPerfFecCorrectedBits,
+        ifPerfFecRxBitErrorEstimation,
+        ifPerfFecOpticalSNR,
+        ifPerfFecUpId,
+        ifPerfFecQMargin,
+        ifPerfFecPreFecBer}
+    STATUS      current
+    DESCRIPTION
+        "The ifPerfFec objects."
+    ::= { lumIfPerfGroups 23 }
+
+ifPerfL0GroupV4 OBJECT-GROUP
+    OBJECTS {
+        ifPerfL0Index,
+        ifPerfL0Name,
+        ifPerfL0ConnIfPerfAdminIfIndex,
+        ifPerfL0RxPower,
+        ifPerfL0TxPower,
+        ifPerfL0InitialRxPower,
+        ifPerfL0ChromaticDispersion,
+        ifPerfL0DifferentialGroupDelay,
+        ifPerfL0InitialDifferentialGroupDelay,
+        ifPerfL0OpticalSNR,
+        ifPerfL0UpId,
+        ifPerfL0QFactor}
+    STATUS      current
+    DESCRIPTION
+        "The ifPerfL0 objects."
+    ::= { lumIfPerfGroups 24 }
+
+    ifPerfG826GroupV3 OBJECT-GROUP
+        OBJECTS {
+            ifPerfG826Index,
+            ifPerfG826Name,
+            ifPerfG826ConnIfPerfAdminIfIndex,
+            ifPerfG826Period,
+            ifPerfG826Type,
+            ifPerfG826MonitorLevel,
+            ifPerfG826MonitorChannel,
+            ifPerfG826CounterEs,
+            ifPerfG826CounterSes,
+            ifPerfG826CounterUas,
+            ifPerfG826CounterBbe,
+            ifPerfG826ThresholdEs,
+            ifPerfG826ThresholdSes,
+            ifPerfG826ThresholdUas,
+            ifPerfG826ThresholdBbe,
+            ifPerfG826FaultStatusEs,
+            ifPerfG826FaultStatusSes,
+            ifPerfG826FaultStatusUas,
+            ifPerfG826FaultStatusBbe,
+            ifPerfG826UpId,
+            ifPerfG826TribPortId}
+        STATUS      current
+        DESCRIPTION
+            "The ifPerfG826 objects."
+        ::= { lumIfPerfGroups 25 }
+
+-- ----------------------------------------------------
+-- Compliance
+-- ----------------------------------------------------
+
+lumIfPerfComplV1 MODULE-COMPLIANCE
+    STATUS      deprecated
+    DESCRIPTION
+        "Basic implementation requirements for the ifPerf MIB."
+    MODULE
+        MANDATORY-GROUPS {
+            ifPerfGeneralGroupV1,
+            ifPerfAdminGroupV1,
+            ifPerfFecGroupV1,
+            ifPerfG826GroupV1,
+            ifPerfL1GroupV1,
+            ifPerfL0GroupV1 }
+    ::= { lumIfPerfCompl 1 }
+
+lumIfPerfComplV2 MODULE-COMPLIANCE
+    STATUS      deprecated
+    DESCRIPTION
+        "Basic implementation requirements for the ifPerf MIB."
+    MODULE
+        MANDATORY-GROUPS {
+            ifPerfGeneralGroupV2,
+            ifPerfAdminGroupV1,
+            ifPerfFecGroupV1,
+            ifPerfG826GroupV1,
+            ifPerfL1GroupV1,
+            ifPerfL0GroupV1,
+            ifPerfL2StatGroupV1 }
+    ::= { lumIfPerfCompl 2 }
+
+lumIfPerfComplV3 MODULE-COMPLIANCE
+    STATUS      deprecated
+    DESCRIPTION
+        "Basic implementation requirements for the ifPerf MIB."
+    MODULE
+        MANDATORY-GROUPS {
+            ifPerfGeneralGroupV2,
+            ifPerfAdminGroupV1,
+            ifPerfFecGroupV1,
+            ifPerfG826GroupV1,
+            ifPerfL1GroupV2,
+            ifPerfL0GroupV1,
+            ifPerfL2StatGroupV1 }
+    ::= { lumIfPerfCompl 3 }
+
+lumIfPerfComplV4 MODULE-COMPLIANCE
+    STATUS      deprecated
+    DESCRIPTION
+        "Basic implementation requirements for the ifPerf MIB."
+    MODULE
+        MANDATORY-GROUPS {
+            ifPerfGeneralGroupV2,
+            ifPerfAdminGroupV1,
+            ifPerfFecGroupV1,
+            ifPerfG826GroupV1,
+            ifPerfL1GroupV2,
+            ifPerfL0GroupV2,
+            ifPerfL2StatGroupV1 }
+    ::= { lumIfPerfCompl 4 }
+
+lumIfPerfComplV5 MODULE-COMPLIANCE
+    STATUS      deprecated
+    DESCRIPTION
+        "Basic implementation requirements for the ifPerf MIB."
+    MODULE
+        MANDATORY-GROUPS {
+            ifPerfGeneralGroupV2,
+            ifPerfAdminGroupV1,
+            ifPerfFecGroupV1,
+            ifPerfG826GroupV1,
+            ifPerfL1GroupV2,
+            ifPerfL0GroupV2,
+            ifPerfL2StatGroupV1,
+            ifPerfL2ErrorGroupV1 }
+    ::= { lumIfPerfCompl 5 }
+
+lumIfPerfComplV6 MODULE-COMPLIANCE
+    STATUS      deprecated
+    DESCRIPTION
+        "Basic implementation requirements for the ifPerf MIB."
+    MODULE
+        MANDATORY-GROUPS {
+            ifPerfGeneralGroupV2,
+            ifPerfAdminGroupV1,
+            ifPerfFecGroupV2,
+            ifPerfG826GroupV1,
+            ifPerfL1GroupV2,
+            ifPerfL0GroupV2,
+            ifPerfL2StatGroupV1,
+            ifPerfL2ErrorGroupV1 }
+    ::= { lumIfPerfCompl 6 }
+
+lumIfPerfComplV7 MODULE-COMPLIANCE
+    STATUS      deprecated
+    DESCRIPTION
+        "Basic implementation requirements for the ifPerf MIB."
+    MODULE
+        MANDATORY-GROUPS {
+            ifPerfGeneralGroupV2,
+            ifPerfAdminGroupV1,
+            ifPerfFecGroupV3,
+            ifPerfG826GroupV1,
+            ifPerfL1GroupV2,
+            ifPerfL0GroupV2,
+            ifPerfL2StatGroupV1,
+            ifPerfL2ErrorGroupV1 }
+    ::= { lumIfPerfCompl 7 }
+
+lumIfPerfComplV8 MODULE-COMPLIANCE
+    STATUS      deprecated
+    DESCRIPTION
+        "Basic implementation requirements for the ifPerf MIB. (R26)"
+    MODULE
+        MANDATORY-GROUPS {
+            ifPerfGeneralGroupV2,
+            ifPerfAdminGroupV2,
+            ifPerfFecGroupV4,
+            ifPerfG826GroupV2,
+            ifPerfL1GroupV2,
+            ifPerfL0GroupV2,
+            ifPerfL2StatGroupV2,
+            ifPerfL2ErrorGroupV1 }
+    ::= { lumIfPerfCompl 8 }
+
+lumIfPerfComplV9 MODULE-COMPLIANCE
+    STATUS      deprecated
+    DESCRIPTION
+        "Basic implementation requirements for the ifPerf MIB. (R26)"
+    MODULE
+        MANDATORY-GROUPS {
+            ifPerfGeneralGroupV2,
+            ifPerfAdminGroupV2,
+            ifPerfFecGroupV4,
+            ifPerfG826GroupV2,
+            ifPerfL1GroupV2,
+            ifPerfL0GroupV3,
+            ifPerfL2StatGroupV2,
+            ifPerfL2ErrorGroupV1 }
+    ::= { lumIfPerfCompl 9 }
+
+lumIfPerfComplV10 MODULE-COMPLIANCE
+    STATUS      deprecated
+    DESCRIPTION
+        "Basic implementation requirements for the ifPerf MIB. (R26)"
+    MODULE
+        MANDATORY-GROUPS {
+            ifPerfGeneralGroupV2,
+            ifPerfAdminGroupV2,
+            ifPerfFecGroupV5,
+            ifPerfG826GroupV2,
+            ifPerfL1GroupV2,
+            ifPerfL0GroupV3,
+            ifPerfL2StatGroupV2,
+            ifPerfL2ErrorGroupV1 }
+    ::= { lumIfPerfCompl 10 }
+
+lumIfPerfComplV11 MODULE-COMPLIANCE
+    STATUS      deprecated
+    DESCRIPTION
+        "Basic implementation requirements for the ifPerf MIB. (R27.1)"
+    MODULE
+        MANDATORY-GROUPS {
+            ifPerfGeneralGroupV3,
+            ifPerfAdminGroupV2,
+            ifPerfFecGroupV5,
+            ifPerfG826GroupV2,
+            ifPerfL1GroupV2,
+            ifPerfL0GroupV3,
+            ifPerfL2StatGroupV2,
+            ifPerfL2ErrorGroupV1,
+            ifPerfDelayGroupV1 }
+    ::= { lumIfPerfCompl 11 }
+
+lumIfPerfComplV12 MODULE-COMPLIANCE
+    STATUS      deprecated
+    DESCRIPTION
+        "Basic implementation requirements for the ifPerf MIB. (R29)"
+    MODULE
+        MANDATORY-GROUPS {
+            ifPerfGeneralGroupV3,
+            ifPerfAdminGroupV2,
+            ifPerfFecGroupV5,
+            ifPerfG826GroupV2,
+            ifPerfL1GroupV2,
+            ifPerfL0GroupV3,
+            ifPerfL2StatGroupV2,
+            ifPerfL2ErrorGroupV1,
+            ifPerfDelayGroupV2 }
+    ::= { lumIfPerfCompl 12 }
+
+
+lumIfPerfComplV13 MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "Basic implementation requirements for the ifPerf MIB. (R32.1)"
+    MODULE
+        MANDATORY-GROUPS {
+            ifPerfGeneralGroupV3,
+            ifPerfAdminGroupV2,
+            ifPerfFecGroupV6,
+            ifPerfG826GroupV3,
+            ifPerfL1GroupV2,
+            ifPerfL0GroupV4,
+            ifPerfL2StatGroupV2,
+            ifPerfL2ErrorGroupV1,
+            ifPerfDelayGroupV2 }
+    ::= { lumIfPerfCompl 13 }
+
+END
+

@@ -18,6 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2020 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -100,9 +101,9 @@ class Allied extends OS implements OSDiscovery
             $hardware = $e;
         }
 
-        $device->version = str_replace(['"', ','], '', $version);
-        $device->features = str_replace('"', '', $features);
-        $device->hardware = str_replace('"', '', $hardware);
-        $device->serial = $serial;
+        $device->version = str_replace(['"', ','], '', $version ?? null);
+        $device->features = str_replace('"', '', $features ?? null);
+        $device->hardware = str_replace('"', '', $hardware ?? null);
+        $device->serial = $serial ?? null;
     }
 }

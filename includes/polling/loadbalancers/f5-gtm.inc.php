@@ -45,7 +45,7 @@ foreach ($components as $k => $v) {
 $components = $keep;
 
 // Only collect SNMP data if we have enabled components
-if (count($components > 0)) {
+if (! empty($components)) {
     // Let's gather the stats..
     $f5_stats['gtmWideIPStatEntryRequests'] = snmpwalk_array_num($device, '.1.3.6.1.4.1.3375.2.3.12.2.3.1.2', 0);
     $f5_stats['gtmWideIPStatEntryResolved'] = snmpwalk_array_num($device, '.1.3.6.1.4.1.3375.2.3.12.2.3.1.3', 0);

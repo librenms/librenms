@@ -29,8 +29,8 @@ $colour_line = '36393D';
 $colour_area_max = 'FFEE99';
 $graph_max = 0;
 $unit_text = 'Minutes';
-$ups_nut = rrd_name($device['hostname'], ['app', 'ups-nut', $app['app_id']]);
-if (rrdtool_check_rrd_exists($ups_nut)) {
+$ups_nut = Rrd::name($device['hostname'], ['app', 'ups-nut', $app['app_id']]);
+if (Rrd::checkRrdExists($ups_nut)) {
     $rrd_filename = $ups_nut;
 } else {
     echo "file missing: $rrd_filename";

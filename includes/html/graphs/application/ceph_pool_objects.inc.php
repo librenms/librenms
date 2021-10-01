@@ -6,7 +6,7 @@ require 'includes/html/graphs/common.inc.php';
 
 $ceph_pool_rrd = ceph_rrd('df');
 
-if (rrdtool_check_rrd_exists($ceph_pool_rrd)) {
+if (Rrd::checkRrdExists($ceph_pool_rrd)) {
     $rrd_filename = $ceph_pool_rrd;
 }
 

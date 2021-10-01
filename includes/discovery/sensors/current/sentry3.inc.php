@@ -58,7 +58,6 @@ while ($towers <= $tower_count) {
                     $outlet_index = $outlet_split_oid[(count($outlet_split_oid) - 1)];
 
                     $outletsuffix = "$towers.$infeed_index.$outlet_index";
-                    $outlet_insert_index = $towers . $outlet_index;
 
                     // outletLoadValue: "A non-negative value indicates the measured load in hundredths of Amps"
                     $outlet_oid = ".1.3.6.1.4.1.1718.3.2.3.1.7.$outletsuffix";
@@ -72,6 +71,7 @@ while ($towers <= $tower_count) {
                     $outlet_current = (snmp_get($device, "$outlet_oid", '-Ovq', 'Sentry3-MIB') / $outlet_divisor);
 
                     if ($outlet_current >= 0) {
+                        $outlet_insert_index = "outletID.$towers.$infeed_index.$outlet_index";
                         discover_sensor($valid['sensor'], 'current', $device, $outlet_oid, $outlet_insert_index, 'sentry3', $outlet_descr, $outlet_divisor, $multiplier, $outlet_low_limit, $outlet_low_warn_limit, $outlet_high_warn_limit, $outlet_high_limit, $outlet_current);
                     }
                 } //end if

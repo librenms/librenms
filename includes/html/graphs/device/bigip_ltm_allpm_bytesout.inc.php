@@ -51,8 +51,8 @@ if ($components[$vars['id']]['type'] == 'f5-ltm-pool') {
 
         $label = $comp['label'];
         $hash = $comp['hash'];
-        $rrd_filename = rrd_name($device['hostname'], [$comp['type'], $label, $hash]);
-        if (rrdtool_check_rrd_exists($rrd_filename)) {
+        $rrd_filename = Rrd::name($device['hostname'], [$comp['type'], $label, $hash]);
+        if (Rrd::checkRrdExists($rrd_filename)) {
             d_echo("\n  Adding PM: " . $label . "\t+ added to the graph");
 
             // Grab a colour from the array.

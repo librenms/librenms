@@ -16,7 +16,7 @@
     <thead>
     <tr>
         <th data-column-id="bwcid" data-type="numeric" data-visible="false">bwcid</th>
-        <th data-column-id="name">Name</th> 
+        <th data-column-id="name">Name</th>
     </tr>
     </thead>
     <tbody>
@@ -27,7 +27,7 @@
         } ?>
         <tr>
             <td><?php echo $bwc_id; ?></td>
-            <td><?php echo $array['label']; ?></td> 
+            <td><?php echo $array['label']; ?></td>
         </tr>
         <?php
     }
@@ -96,7 +96,7 @@
                 2: "danger"
             },
         }).on("click.rs.jquery.bootgrid", function (e, columns, row) {
-            var link = '<?php echo generate_url($vars, ['type' => 'ltm_bwc', 'subtype' => 'ltm_bwc_det']); ?>bwcid='+row['bwcid'];
+            var link = '<?php echo \LibreNMS\Util\Url::generate($vars, ['type' => 'ltm_bwc', 'subtype' => 'ltm_bwc_det']); ?>bwcid='+row['bwcid'];
             window.location.href = link;
         });
     </script>

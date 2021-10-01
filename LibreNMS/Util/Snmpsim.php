@@ -18,12 +18,14 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2017 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
 namespace LibreNMS\Util;
 
+use App;
 use LibreNMS\Config;
 use LibreNMS\Proc;
 
@@ -48,7 +50,7 @@ class Snmpsim
      * Run snmpsimd and fork it into the background
      * Captures all output to the log
      *
-     * @param int $wait Wait for x seconds after starting before returning
+     * @param  int  $wait  Wait for x seconds after starting before returning
      */
     public function fork($wait = 2)
     {
@@ -60,7 +62,7 @@ class Snmpsim
 
         $cmd = $this->getCmd();
 
-        if (isCli()) {
+        if (App::runningInConsole()) {
             echo "Starting snmpsim listening on {$this->ip}:{$this->port}... \n";
             d_echo($cmd);
         }
@@ -71,7 +73,7 @@ class Snmpsim
             sleep($wait);
         }
 
-        if (isCli() && ! $this->proc->isRunning()) {
+        if (App::runningInConsole() && ! $this->proc->isRunning()) {
             // if starting failed, run snmpsim again and output to the console and validate the data
             passthru($this->getCmd(false) . ' --validate-data');
 
@@ -149,7 +151,7 @@ class Snmpsim
     /**
      * Generate the command for snmpsimd
      *
-     * @param bool $with_log
+     * @param  bool  $with_log
      * @return string
      */
     private function getCmd($with_log = true)
@@ -173,7 +175,7 @@ class Snmpsim
         unset($this->proc);
     }
 
-    private function findSnmpsimd()
+    public function findSnmpsimd()
     {
         $cmd = Config::locateBinary('snmpsimd');
         if (! is_executable($cmd)) {

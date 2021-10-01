@@ -18,6 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -36,7 +37,7 @@ use App\Models\User;
 use App\Models\UserPref;
 use App\Models\Vminfo;
 use App\Models\WirelessSensor;
-use Auth;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
 use LibreNMS\Config;
 use LibreNMS\Util\ObjectCache;
@@ -46,7 +47,7 @@ class MenuComposer
     /**
      * Bind data to the view.
      *
-     * @param  View $view
+     * @param  View  $view
      * @return void
      */
     public function compose(View $view)
@@ -158,6 +159,16 @@ class MenuComposer
                         'url' => 'ospf',
                         'icon' => 'circle-o-notch fa-rotate-180',
                         'text' => 'OSPF Devices',
+                    ],
+                ];
+            }
+
+            if ($routing_count['isis']) {
+                $routing_menu[] = [
+                    [
+                        'url' => 'isis',
+                        'icon' => 'arrows-alt',
+                        'text' => 'ISIS Adjacencies',
                     ],
                 ];
             }

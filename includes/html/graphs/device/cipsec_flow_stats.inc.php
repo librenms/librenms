@@ -2,7 +2,7 @@
 
 require 'includes/html/graphs/common.inc.php';
 
-$rrd_filename = rrd_name($device['hostname'], 'cipsec_flow');
+$rrd_filename = Rrd::name($device['hostname'], 'cipsec_flow');
 
 $i = 0;
 $rrd_list[$i]['filename'] = $rrd_filename;

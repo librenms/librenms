@@ -18,6 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2019 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -55,14 +56,13 @@ abstract class LnmsCommand extends Command
      * Adds an argument. If $description is null, translate commands.command-name.arguments.name
      * If you want the description to be empty, just set an empty string
      *
-     * @param string               $name        The argument name
-     * @param int|null             $mode        The argument mode: InputArgument::REQUIRED or InputArgument::OPTIONAL
-     * @param string               $description A description text
-     * @param string|string[]|null $default     The default value (for InputArgument::OPTIONAL mode only)
+     * @param  string  $name  The argument name
+     * @param  int|null  $mode  The argument mode: InputArgument::REQUIRED or InputArgument::OPTIONAL
+     * @param  string  $description  A description text
+     * @param  string|string[]|null  $default  The default value (for InputArgument::OPTIONAL mode only)
+     * @return $this
      *
      * @throws InvalidArgumentException When argument mode is not valid
-     *
-     * @return $this
      */
     public function addArgument($name, $mode = null, $description = null, $default = null)
     {
@@ -80,15 +80,14 @@ abstract class LnmsCommand extends Command
      * Adds an option. If $description is null, translate commands.command-name.arguments.name
      * If you want the description to be empty, just set an empty string
      *
-     * @param string                        $name        The option name
-     * @param string|array|null             $shortcut    The shortcuts, can be null, a string of shortcuts delimited by | or an array of shortcuts
-     * @param int|null                      $mode        The option mode: One of the InputOption::VALUE_* constants
-     * @param string                        $description A description text
-     * @param string|string[]|int|bool|null $default     The default value (must be null for InputOption::VALUE_NONE)
+     * @param  string  $name  The option name
+     * @param  string|array|null  $shortcut  The shortcuts, can be null, a string of shortcuts delimited by | or an array of shortcuts
+     * @param  int|null  $mode  The option mode: One of the InputOption::VALUE_* constants
+     * @param  string  $description  A description text
+     * @param  string|string[]|int|bool|null  $default  The default value (must be null for InputOption::VALUE_NONE)
+     * @return $this
      *
      * @throws InvalidArgumentException If option mode is invalid or incompatible
-     *
-     * @return $this
      */
     public function addOption($name, $shortcut = null, $mode = null, $description = null, $default = null)
     {
@@ -105,16 +104,20 @@ abstract class LnmsCommand extends Command
     /**
      * Validate the input of this command.  Uses Laravel input validation
      * merging the arguments and options together to check.
-     *
-     * @param array $rules
-     * @param array $messages
      */
-    protected function validate($rules, $messages = [])
+    protected function validate(array $rules, array $messages = []): array
     {
-        $validator = Validator::make($this->arguments() + $this->options(), $rules, $messages);
+        $error_messages = trans('commands.' . $this->getName() . '.validation-errors');
+        $validator = Validator::make(
+            $this->arguments() + $this->options(),
+            $rules,
+            is_array($error_messages) ? array_merge($error_messages, $messages) : $messages
+        );
 
         try {
             $validator->validate();
+
+            return $validator->validated();
         } catch (ValidationException $e) {
             collect($validator->getMessageBag()->all())->each(function ($message) {
                 $this->error($message);

@@ -6,8 +6,8 @@ require realpath(__DIR__ . '/..') . '/includes/init.php';
 
 $options = getopt('h:p:');
 
-$hosts = str_replace('*', '%', mres($options['h']));
-$ports = str_replace('*', '%', mres($options['p']));
+$hosts = str_replace('*', '%', $options['h']);
+$ports = str_replace('*', '%', $options['p']);
 
 if (empty($hosts) && empty($ports)) {
     echo "-h <device hostname wildcard>    Device(s) to match (all is a valid arg)\n";

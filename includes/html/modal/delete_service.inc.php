@@ -45,7 +45,7 @@ if (Auth::user()->hasGlobalAdmin()) {
             $("#service_id").val(service_id);
         });
 
-        $('#service-removal').click('', function (e) {
+        $('#service-removal').on("click", function (e) {
             e.preventDefault();
             var service_id = $("#service_id").val();
             $.ajax({

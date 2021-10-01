@@ -1,0 +1,23 @@
+{
+    "os": {
+        "discovery": {
+            "devices": [
+                {
+                    "sysName": "",
+                    "sysObjectID": ".1.3.6.1.4.1.11.2.3.7.11.167",
+                    "sysDescr": "HPE OfficeConnect Switch 1820 8G J9979A, PT.02.01, Linux 3.6.5-79c95a77, U-Boot 2012.10-00116-g3ab515c (Jul 30 2014 - 10:52:01)",
+                    "sysContact": null,
+                    "version": "PT.02.01",
+                    "hardware": "1820 8G",
+                    "features": null,
+                    "os": "procurve",
+                    "type": "network",
+                    "serial": null,
+                    "icon": "hpe.svg",
+                    "location": null
+                }
+            ]
+        },
+        "poller": "matches discovery"
+    }
+}

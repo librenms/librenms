@@ -18,6 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2017 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -30,6 +31,7 @@ use Illuminate\Database\QueryException;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use LibreNMS\DB\Eloquent;
+use LibreNMS\Util\Debug;
 use Log;
 
 class Config
@@ -65,6 +67,7 @@ class Config
 
     /**
      * Reload the config from files/db
+     *
      * @return mixed
      */
     public static function reload()
@@ -104,7 +107,8 @@ class Config
 
     /**
      * Load the user config from config.php
-     * @param array $config (this should be self::$config)
+     *
+     * @param  array  $config  (this should be self::$config)
      */
     private static function loadUserConfigFile(&$config)
     {
@@ -115,8 +119,8 @@ class Config
     /**
      * Get a config value, if non existent null (or default if set) will be returned
      *
-     * @param string $key period separated config variable name
-     * @param mixed $default optional value to return if the setting is not set
+     * @param  string  $key  period separated config variable name
+     * @param  mixed  $default  optional value to return if the setting is not set
      * @return mixed
      */
     public static function get($key, $default = null)
@@ -136,7 +140,7 @@ class Config
      * Unset a config setting
      * or multiple
      *
-     * @param string|array $key
+     * @param  string|array  $key
      */
     public static function forget($key)
     {
@@ -148,10 +152,10 @@ class Config
      * fall back to the global config setting prefixed by $global_prefix
      * The key must be the same for the global setting and the device setting.
      *
-     * @param array $device Device array
-     * @param string $key Name of setting to fetch
-     * @param string $global_prefix specify where the global setting lives in the global config
-     * @param mixed $default will be returned if the setting is not set on the device or globally
+     * @param  array  $device  Device array
+     * @param  string  $key  Name of setting to fetch
+     * @param  string  $global_prefix  specify where the global setting lives in the global config
+     * @param  mixed  $default  will be returned if the setting is not set on the device or globally
      * @return mixed
      */
     public static function getDeviceSetting($device, $key, $global_prefix = null, $default = null)
@@ -170,9 +174,9 @@ class Config
     /**
      * Get a setting from the $config['os'] array using the os of the given device
      *
-     * @param string $os The os name
-     * @param string $key period separated config variable name
-     * @param mixed $default optional value to return if the setting is not set
+     * @param  string  $os  The os name
+     * @param  string  $key  period separated config variable name
+     * @param  mixed  $default  optional value to return if the setting is not set
      * @return mixed
      */
     public static function getOsSetting($os, $key, $default = null)
@@ -198,9 +202,9 @@ class Config
      * Removes any duplicates.
      * When the arrays have keys, os settings take precedence over global settings
      *
-     * @param string $os The os name
-     * @param string $key period separated config variable name
-     * @param array $default optional array to return if the setting is not set
+     * @param  string  $os  The os name
+     * @param  string  $key  period separated config variable name
+     * @param  array  $default  optional array to return if the setting is not set
      * @return array
      */
     public static function getCombined($os, $key, $default = [])
@@ -227,8 +231,8 @@ class Config
     /**
      * Set a variable in the global config
      *
-     * @param mixed $key period separated config variable name
-     * @param mixed $value
+     * @param  mixed  $key  period separated config variable name
+     * @param  mixed  $value
      */
     public static function set($key, $value)
     {
@@ -238,8 +242,8 @@ class Config
     /**
      * Save setting to persistent storage.
      *
-     * @param mixed $key period separated config variable name
-     * @param mixed $value
+     * @param  mixed  $key  period separated config variable name
+     * @param  mixed  $value
      * @return bool if the save was successful
      */
     public static function persist($key, $value)
@@ -259,8 +263,7 @@ class Config
             if (class_exists(Log::class)) {
                 Log::error($e);
             }
-            global $debug;
-            if ($debug) {
+            if (Debug::isEnabled()) {
                 echo $e;
             }
 
@@ -272,7 +275,7 @@ class Config
      * Forget a key and all it's descendants from persistent storage.
      * This will effectively set it back to default.
      *
-     * @param string $key
+     * @param  string  $key
      * @return int|false
      */
     public static function erase($key)
@@ -288,7 +291,7 @@ class Config
     /**
      * Check if a setting is set
      *
-     * @param string $key period separated config variable name
+     * @param  string  $key  period separated config variable name
      * @return bool
      */
     public static function has($key)
@@ -316,6 +319,7 @@ class Config
 
     /**
      * Get the full configuration array
+     *
      * @return array
      */
     public static function getAll()
@@ -404,7 +408,10 @@ class Config
     private static function processConfig()
     {
         // If we're on SSL, let's properly detect it
-        if (isset($_SERVER['HTTPS'])) {
+        if (
+            isset($_SERVER['HTTPS']) ||
+            (isset($_SERVER['HTTP_X_FORWARDED_PROTO']) && $_SERVER['HTTP_X_FORWARDED_PROTO'] == 'https')
+        ) {
             self::set('base_url', preg_replace('/^http:/', 'https:', self::get('base_url')));
         }
 
@@ -432,6 +439,10 @@ class Config
         self::deprecatedVariable('rrdgraph_real_95th', 'rrdgraph_real_percentile');
         self::deprecatedVariable('fping_options.millisec', 'fping_options.interval');
         self::deprecatedVariable('discovery_modules.cisco-vrf', 'discovery_modules.vrf');
+        self::deprecatedVariable('discovery_modules.toner', 'discovery_modules.printer-supplies');
+        self::deprecatedVariable('poller_modules.toner', 'poller_modules.printer-supplies');
+        self::deprecatedVariable('discovery_modules.cisco-sla', 'discovery_modules.slas');
+        self::deprecatedVariable('poller_modules.cisco-sla', 'poller_modules.slas');
         self::deprecatedVariable('oxidized.group', 'oxidized.maps.group');
 
         $persist = Eloquent::isConnected();
@@ -455,9 +466,9 @@ class Config
     /**
      * Set default values for defaults that depend on other settings, if they are not already loaded
      *
-     * @param string $key
-     * @param string $value value to set to key or vsprintf() format string for values below
-     * @param array $format_values array of keys to send to vsprintf()
+     * @param  string  $key
+     * @param  string  $value  value to set to key or vsprintf() format string for values below
+     * @param  array  $format_values  array of keys to send to vsprintf()
      */
     private static function setDefault($key, $value, $format_values = [])
     {
@@ -474,14 +485,13 @@ class Config
     /**
      * Copy data from old variables to new ones.
      *
-     * @param $old
-     * @param $new
+     * @param  string  $old
+     * @param  string  $new
      */
     private static function deprecatedVariable($old, $new)
     {
         if (self::has($old)) {
-            global $debug;
-            if ($debug) {
+            if (Debug::isEnabled()) {
                 echo "Copied deprecated config $old to $new\n";
             }
             self::set($new, self::get($old));
@@ -491,7 +501,7 @@ class Config
     /**
      * Locate the actual path of a binary
      *
-     * @param $binary
+     * @param  string  $binary
      * @return mixed
      */
     public static function locateBinary($binary)

@@ -2,7 +2,7 @@ os: valere
 text: 'Eltek Valere'
 type: power
 icon: eltek
-nobulk: true
+snmp_bulk: false
 mib_dir: eltek
 over:
     - { graph: device_bits, text: 'Device Traffic' }

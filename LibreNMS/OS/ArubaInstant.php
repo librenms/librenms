@@ -19,6 +19,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2019 Timothy Willey
  * @author     Timothy Willey <developer@timothywilley.net>
  */
@@ -76,7 +77,7 @@ class ArubaInstant extends OS implements
         foreach ($ai_ap_data as $ai_ap => $ai_ap_oid) {
             $value = $ai_ap_oid['aiAPCPUUtilization'];
             $combined_oid = sprintf('%s::%s.%s', $ai_mib, 'aiAPCPUUtilization', Rewrite::oidMac($ai_ap));
-            $oid = snmp_translate($combined_oid, 'ALL', 'arubaos', '-On', null);
+            $oid = snmp_translate($combined_oid, 'ALL', 'arubaos', '-On');
             $description = $ai_ap_data[$ai_ap]['aiAPSerialNum'];
             $processors[] = Processor::discover('aruba-instant', $this->getDeviceId(), $oid, Rewrite::macToHex($ai_ap), $description, 1, $value);
         } // end foreach
@@ -111,7 +112,7 @@ class ArubaInstant extends OS implements
             // Clients Per SSID
             foreach ($ssid_data as $index => $entry) {
                 $combined_oid = sprintf('%s::%s.%s', $ai_mib, 'aiSSIDClientNum', $index);
-                $oid = snmp_translate($combined_oid, 'ALL', 'arubaos', '-On', null);
+                $oid = snmp_translate($combined_oid, 'ALL', 'arubaos', '-On');
                 $description = sprintf('SSID %s Clients', $entry['aiSSID']);
                 $oids[] = $oid;
                 $total_clients += $entry['aiSSIDClientNum'];
@@ -125,7 +126,7 @@ class ArubaInstant extends OS implements
             foreach ($ap_data as $index => $entry) {
                 foreach ($entry['aiRadioClientNum'] as $radio => $value) {
                     $combined_oid = sprintf('%s::%s.%s.%s', $ai_mib, 'aiRadioClientNum', Rewrite::oidMac($index), $radio);
-                    $oid = snmp_translate($combined_oid, 'ALL', 'arubaos', '-On', null);
+                    $oid = snmp_translate($combined_oid, 'ALL', 'arubaos', '-On');
                     $description = sprintf('%s Radio %s', $entry['aiAPSerialNum'], $radio);
                     $sensor_index = sprintf('%s.%s', Rewrite::macToHex($index), $radio);
                     $sensors[] = new WirelessSensor('clients', $this->getDeviceId(), $oid, 'aruba-instant', $sensor_index, $description, $value);
@@ -139,7 +140,7 @@ class ArubaInstant extends OS implements
             $total_clients = sizeof($client_data);
 
             $combined_oid = sprintf('%s::%s', $ai_mib, 'aiClientMACAddress');
-            $oid = snmp_translate($combined_oid, 'ALL', 'arubaos', '-On', null);
+            $oid = snmp_translate($combined_oid, 'ALL', 'arubaos', '-On');
 
             $sensors[] = new WirelessSensor('clients', $this->getDeviceId(), $oid, 'aruba-instant', 'total-clients', 'Total Clients', $total_clients);
         }
@@ -162,7 +163,7 @@ class ArubaInstant extends OS implements
         $total_aps = sizeof($ap_data);
 
         $combined_oid = sprintf('%s::%s', $ai_mib, 'aiAPSerialNum');
-        $oid = snmp_translate($combined_oid, 'ALL', 'arubaos', '-On', null);
+        $oid = snmp_translate($combined_oid, 'ALL', 'arubaos', '-On');
 
         $sensors[] = new WirelessSensor('ap-count', $this->getDeviceId(), $oid, 'aruba-instant', 'total-aps', 'Total APs', $total_aps);
 
@@ -249,7 +250,7 @@ class ArubaInstant extends OS implements
                     }
 
                     $combined_oid = sprintf('%s::%s.%s.%s', $ai_mib, $mib, Rewrite::oidMac($ai_ap), $ai_ap_radio);
-                    $oid = snmp_translate($combined_oid, 'ALL', 'arubaos', '-On', null);
+                    $oid = snmp_translate($combined_oid, 'ALL', 'arubaos', '-On');
                     $description = sprintf($desc, $ai_sg_data[$ai_ap]['aiAPSerialNum'], $ai_ap_radio);
                     $index = sprintf('%s.%s', Rewrite::macToHex($ai_ap), $ai_ap_radio);
 
@@ -270,7 +271,7 @@ class ArubaInstant extends OS implements
      * Poll wireless frequency as MHz
      * The returned array should be sensor_id => value pairs
      *
-     * @param array $sensors Array of sensors needed to be polled
+     * @param  array  $sensors  Array of sensors needed to be polled
      * @return array of polled data
      */
     public function pollWirelessFrequency(array $sensors)
@@ -282,7 +283,7 @@ class ArubaInstant extends OS implements
      * Poll wireless clients
      * The returned array should be sensor_id => value pairs
      *
-     * @param array $sensors Array of sensors needed to be polled
+     * @param  array  $sensors  Array of sensors needed to be polled
      * @return array of polled data
      */
     public function pollWirelessClients(array $sensors)
@@ -328,7 +329,7 @@ class ArubaInstant extends OS implements
      * Poll AP Count
      * The returned array should be sensor_id => value pairs
      *
-     * @param array $sensors Array of sensors needed to be polled
+     * @param  array  $sensors  Array of sensors needed to be polled
      * @return array of polled data
      */
     public function pollWirelessApCount(array $sensors)

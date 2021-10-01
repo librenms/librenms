@@ -18,10 +18,11 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2016 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
-$rrd = rrd_name($device['hostname'], ['app', 'rrdcached', $app['app_id']]);
-if (rrdtool_check_rrd_exists($rrd)) {
+$rrd = Rrd::name($device['hostname'], ['app', 'rrdcached', $app['app_id']]);
+if (Rrd::checkRrdExists($rrd)) {
     $rrd_filename = $rrd;
 }

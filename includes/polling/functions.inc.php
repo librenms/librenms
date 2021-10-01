@@ -31,7 +31,7 @@ function bulk_sensor_snmpget($device, $sensors)
 
 /**
  * @param $device
- * @param string $type type/class of sensor
+ * @param  string  $type  type/class of sensor
  * @return array
  */
 function sensor_precache($device, $type)
@@ -158,8 +158,8 @@ function record_sensor_data($device, $all_sensors)
 
     foreach ($all_sensors as $sensor) {
         $class = ucfirst($sensor['sensor_class']);
-        $unit = $supported_sensors[$class];
-        $sensor_value = is_string($sensor['new_value']) ? floatval($sensor['new_value']) : $sensor['new_value'];
+        $unit = $supported_sensors[$sensor['sensor_class']];
+        $sensor_value = cast_number($sensor['new_value']);
         $prev_sensor_value = $sensor['sensor_current'];
 
         if ($sensor_value == -32768 || is_nan($sensor_value)) {
@@ -220,14 +220,14 @@ function record_sensor_data($device, $all_sensors)
             log_event("$class sensor {$sensor['sensor_descr']} has changed from {$trans[$prev_sensor_value]} ($prev_sensor_value) to {$trans[$sensor_value]} ($sensor_value)", $device, $class, 3, $sensor['sensor_id']);
         }
         if ($sensor_value != $prev_sensor_value) {
-            dbUpdate(['sensor_current' => $sensor_value, 'sensor_prev' => $prev_sensor_value, 'lastupdate' => ['NOW()']], 'sensors', '`sensor_class` = ? AND `sensor_id` = ?', [$class, $sensor['sensor_id']]);
+            dbUpdate(['sensor_current' => $sensor_value, 'sensor_prev' => $prev_sensor_value, 'lastupdate' => ['NOW()']], 'sensors', '`sensor_class` = ? AND `sensor_id` = ?', [$sensor['sensor_class'], $sensor['sensor_id']]);
         }
     }
 }
 
 /**
- * @param array $device The device to poll
- * @param bool $force_module Ignore device module overrides
+ * @param  array  $device  The device to poll
+ * @param  bool  $force_module  Ignore device module overrides
  * @return bool
  */
 function poll_device($device, $force_module = false)
@@ -283,7 +283,7 @@ function poll_device($device, $force_module = false)
     $poll_update_array = [];
     $update_array = [];
 
-    $host_rrd = rrd_name($device['hostname'], '', '');
+    $host_rrd = Rrd::name($device['hostname'], '', '');
     if (Config::get('norrd') !== true && ! is_dir($host_rrd)) {
         mkdir($host_rrd);
         echo "Created directory : $host_rrd\n";
@@ -341,7 +341,7 @@ function poll_device($device, $force_module = false)
                 $os->enableGraph('poller_perf');
 
                 // remove old rrd
-                $oldrrd = rrd_name($device['hostname'], ['poller', $module, 'perf']);
+                $oldrrd = Rrd::name($device['hostname'], ['poller', $module, 'perf']);
                 if (is_file($oldrrd)) {
                     unlink($oldrrd);
                 }
@@ -436,10 +436,10 @@ function poll_device($device, $force_module = false)
  * The group name (key) will be prepended to each metric in that group, separated by an underscore
  * The special group "none" will not be prefixed.
  *
- * @param array $app app from the db, including app_id
- * @param string $response This should be the return state of Application polling
- * @param array $metrics an array of additional metrics to store in the database for alerting
- * @param string $status This is the current value for alerting
+ * @param  array  $app  app from the db, including app_id
+ * @param  string  $response  This should be the return state of Application polling
+ * @param  array  $metrics  an array of additional metrics to store in the database for alerting
+ * @param  string  $status  This is the current value for alerting
  */
 function update_application($app, $response, $metrics = [], $status = '')
 {
@@ -572,13 +572,6 @@ function update_application($app, $response, $metrics = [], $status = '')
     }
 }
 
-function convert_to_celsius($value)
-{
-    $value = ($value - 32) / 1.8;
-
-    return sprintf('%.02f', $value);
-}
-
 /**
  * This is to make it easier polling apps. Also to help standardize around JSON.
  *
@@ -615,11 +608,11 @@ function convert_to_celsius($value)
  *
  * If the error is less than -1, you can assume it is a legacy snmp extend script.
  *
- * @param array $device
- * @param string $extend the extend name. For example, if 'zfs' is passed it will be converted to 'nsExtendOutputFull.3.122.102.115'.
- * @param int $min_version the minimum version to accept for the returned JSON. default: 1
- *
+ * @param  array  $device
+ * @param  string  $extend  the extend name. For example, if 'zfs' is passed it will be converted to 'nsExtendOutputFull.3.122.102.115'.
+ * @param  int  $min_version  the minimum version to accept for the returned JSON. default: 1
  * @return array The json output data parsed into an array
+ *
  * @throws JsonAppBlankJsonException
  * @throws JsonAppExtendErroredException
  * @throws JsonAppMissingKeysException
@@ -673,11 +666,10 @@ function json_app_get($device, $extend, $min_version = 1)
  *
  * One argument is taken and that is the array to flatten.
  *
- * @param array $array
- * @param string $prefix What to prefix to the name. Defaults to '', nothing.
- * @param string $joiner The string to join the prefix, if set to something other
- *                       than '', and array keys with.
- *
+ * @param  array  $array
+ * @param  string  $prefix  What to prefix to the name. Defaults to '', nothing.
+ * @param  string  $joiner  The string to join the prefix, if set to something other
+ *                          than '', and array keys with.
  * @return array The flattened array.
  */
 function data_flatten($array, $prefix = '', $joiner = '_')

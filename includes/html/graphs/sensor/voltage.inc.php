@@ -11,7 +11,7 @@ $rrd_options .= " DEF:sensor=$rrd_filename:sensor:AVERAGE";
 $rrd_options .= " DEF:sensor_max=$rrd_filename:sensor:MAX";
 $rrd_options .= " DEF:sensor_min=$rrd_filename:sensor:MIN";
 
-$rrd_options .= " LINE1.5:sensor#cc0000:'" . rrdtool_escape($sensor['sensor_descr'], 22) . "'";
+$rrd_options .= " LINE1.5:sensor#cc0000:'" . \LibreNMS\Data\Store\Rrd::fixedSafeDescr($sensor['sensor_descr'], 22) . "'";
 $rrd_options .= ' GPRINT:sensor:LAST:%6.2lfV';
 $rrd_options .= ' GPRINT:sensor:MAX:%6.2lfV\l';
 

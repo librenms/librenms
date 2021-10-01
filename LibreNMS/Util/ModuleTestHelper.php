@@ -18,6 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2017 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -56,20 +57,23 @@ class ModuleTestHelper
     private $exclude_from_all = ['arp-table', 'fdb-table'];
     private static $module_deps = [
         'arp-table' => ['ports', 'arp-table'],
+        'cisco-mac-accounting' => ['ports', 'cisco-mac-accounting'],
         'fdb-table' => ['ports', 'vlans', 'fdb-table'],
-        'vlans' => ['ports', 'vlans'],
-        'vrf' => ['ports', 'vrf'],
+        'isis' => ['ports', 'isis'],
         'mpls' => ['ports', 'vrf', 'mpls'],
         'nac' => ['ports', 'nac'],
         'ospf' => ['ports', 'ospf'],
-        'cisco-mac-accounting' => ['ports', 'cisco-mac-accounting'],
+        'vlans' => ['ports', 'vlans'],
+        'vrf' => ['ports', 'vrf'],
     ];
 
     /**
      * ModuleTester constructor.
-     * @param array|string $modules
-     * @param string $os
-     * @param string $variant
+     *
+     * @param  array|string  $modules
+     * @param  string  $os
+     * @param  string  $variant
+     *
      * @throws InvalidModuleException
      */
     public function __construct($modules, $os, $variant = '')
@@ -140,9 +144,18 @@ class ModuleTestHelper
         $this->json_file = $path;
     }
 
-    public function captureFromDevice($device_id, $write = true, $prefer_new = false)
+    public function captureFromDevice($device_id, $write = true, $prefer_new = false, $full = false)
     {
-        $snmp_oids = $this->collectOids($device_id);
+        if ($full) {
+            $snmp_oids[] = [
+                'oid' => '.',
+                'method' => 'walk',
+                'mib' => null,
+                'mibdir' => null,
+            ];
+        } else {
+            $snmp_oids = $this->collectOids($device_id);
+        }
 
         $device = device_by_id_cache($device_id, true);
         DeviceCache::setPrimary($device_id);
@@ -172,21 +185,21 @@ class ModuleTestHelper
 
     private function collectOids($device_id)
     {
-        global $debug, $vdebug, $device;
+        global $device;
 
         $device = device_by_id_cache($device_id);
         DeviceCache::setPrimary($device_id);
 
         // Run discovery
         ob_start();
-        $save_debug = $debug;
-        $save_vedbug = $vdebug;
-        $debug = true;
-        $vdebug = false;
+        $save_debug = Debug::isEnabled();
+        $save_vdebug = Debug::isVerbose();
+        Debug::set();
+        Debug::setVerbose(false);
         discover_device($device, $this->parseArgs('discovery'));
         poll_device($device, $this->parseArgs('poller'));
-        $debug = $save_debug;
-        $vdebug = $save_vedbug;
+        Debug::set($save_debug);
+        Debug::setVerbose($save_vdebug);
         $collection_output = ob_get_contents();
         ob_end_clean();
 
@@ -236,8 +249,9 @@ class ModuleTestHelper
      * Each entry contains [$os, $variant, $valid_modules]
      * $valid_modules is an array of selected modules this os has test data for
      *
-     * @param array $modules
+     * @param  array  $modules
      * @return array
+     *
      * @throws InvalidModuleException
      */
     public static function findOsWithData($modules = [])
@@ -249,12 +263,14 @@ class ModuleTestHelper
             [$os, $variant] = self::extractVariant($file);
 
             // calculate valid modules
-            $data_modules = array_keys(json_decode(file_get_contents($file), true));
+            $decoded = json_decode(file_get_contents($file), true);
 
             if (json_last_error()) {
                 echo "Invalid json data: $base_name\n";
                 exit(1);
             }
+
+            $data_modules = array_keys($decoded);
 
             if (empty($modules)) {
                 $valid_modules = $data_modules;
@@ -283,7 +299,7 @@ class ModuleTestHelper
     /**
      * Given a json filename or basename, extract os and variant
      *
-     * @param string $os_file Either a filename or the basename
+     * @param  string  $os_file  Either a filename or the basename
      * @return array [$os, $variant]
      */
     public static function extractVariant($os_file)
@@ -305,8 +321,9 @@ class ModuleTestHelper
      * Generate a module list.  Try to take dependencies into account.
      * Probably needs to be more robust
      *
-     * @param array $modules
+     * @param  array  $modules
      * @return array
+     *
      * @throws InvalidModuleException
      */
     private static function resolveModuleDependencies($modules)
@@ -500,14 +517,15 @@ class ModuleTestHelper
      * Run discovery and polling against snmpsim data and create a database dump
      * Save the dumped data to tests/data/<os>.json
      *
-     * @param Snmpsim $snmpsim
-     * @param bool $no_save
-     * @return array
+     * @param  Snmpsim  $snmpsim
+     * @param  bool  $no_save
+     * @return array|null
+     *
      * @throws FileNotFoundException
      */
     public function generateTestData(Snmpsim $snmpsim, $no_save = false)
     {
-        global $device, $debug, $vdebug;
+        global $device;
         Config::set('rrd.enable', false); // disable rrd
 
         if (! is_file($this->snmprec_file)) {
@@ -541,11 +559,11 @@ class ModuleTestHelper
         $data = [];  // array to hold dumped data
 
         // Run discovery
-        $save_debug = $debug;
-        $save_vedbug = $vdebug;
+        $save_debug = Debug::isEnabled();
+        $save_vedbug = Debug::isVerbose();
         if ($this->quiet) {
-            $debug = true;
-            $vdebug = true;
+            Debug::setOnly();
+            Debug::setVerbose();
         }
         ob_start();
 
@@ -553,8 +571,8 @@ class ModuleTestHelper
 
         $this->discovery_output = ob_get_contents();
         if ($this->quiet) {
-            $debug = $save_debug;
-            $vdebug = $save_vedbug;
+            Debug::setOnly($save_debug);
+            Debug::setVerbose($save_vedbug);
         } else {
             ob_flush();
         }
@@ -572,8 +590,8 @@ class ModuleTestHelper
 
         // Run the poller
         if ($this->quiet) {
-            $debug = true;
-            $vdebug = true;
+            Debug::setOnly();
+            Debug::setVerbose();
         }
         ob_start();
 
@@ -581,8 +599,8 @@ class ModuleTestHelper
 
         $this->poller_output = ob_get_contents();
         if ($this->quiet) {
-            $debug = $save_debug;
-            $vdebug = $save_vedbug;
+            Debug::setOnly($save_debug);
+            Debug::setVerbose($save_vedbug);
         } else {
             ob_flush();
         }
@@ -597,8 +615,7 @@ class ModuleTestHelper
 
         // Remove the test device, we don't need the debug from this
         if ($device['hostname'] == $snmpsim->getIp()) {
-            global $debug;
-            $debug = false;
+            Debug::set(false);
             delete_device($device['device_id']);
         }
 
@@ -624,7 +641,7 @@ class ModuleTestHelper
                 }
             }
 
-            file_put_contents($this->json_file, _json_encode($existing_data) . PHP_EOL);
+            file_put_contents($this->json_file, json_encode($existing_data, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) . PHP_EOL);
             $this->qPrint("Saved to $this->json_file\nReady for testing!\n");
         }
 
@@ -632,8 +649,8 @@ class ModuleTestHelper
     }
 
     /**
-     * @param string $output poller or discovery output
-     * @param string $type poller|disco identified by "#### Load disco module" string
+     * @param  string  $output  poller or discovery output
+     * @param  string  $type  poller|disco identified by "#### Load disco module" string
      * @return array
      */
     private function extractModuleOutput($output, $type)
@@ -664,9 +681,9 @@ class ModuleTestHelper
      * Dump the current database data for the module to an array
      * Mostly used for testing
      *
-     * @param int $device_id The test device id
-     * @param array modules to capture data for (should be a list of modules that were actually run)
-     * @param string $key a key to store the data under the module key (usually discovery or poller)
+     * @param  int  $device_id  The test device id
+     * @param  array  $modules  to capture data for (should be a list of modules that were actually run)
+     * @param  string  $key  a key to store the data under the module key (usually discovery or poller)
      * @return array The dumped data keyed by module -> table
      */
     public function dumpDb($device_id, $modules, $key = null)
@@ -763,7 +780,7 @@ class ModuleTestHelper
      * Get the output from the last discovery that was run
      * If module was specified, only return that module's output
      *
-     * @param null $module
+     * @param  null  $module
      * @return mixed
      */
     public function getDiscoveryOutput($module = null)
@@ -783,7 +800,7 @@ class ModuleTestHelper
      * Get output from the last poller that was run
      * If module was specified, only return that module's output
      *
-     * @param null $module
+     * @param  null  $module
      * @return mixed
      */
     public function getPollerOutput($module = null)
@@ -837,7 +854,9 @@ class ModuleTestHelper
     private function collectComponents($device_id)
     {
         $components = (new Component())->getComponents($device_id)[$device_id] ?? [];
-        $components = Arr::sort($components, 'label');
+        $components = Arr::sort($components, function ($item) {
+            return $item['type'] . $item['label'];
+        });
 
         return array_values($components);
     }

@@ -58,6 +58,9 @@ $graphs['powerdns-recursor'] = [
     'cache_performance',
     'outqueries',
 ];
+$graphs['powermon'] = [
+    'consumption',
+];
 $graphs['pureftpd'] = [
     'bitrate',
     'connections',
@@ -356,6 +359,18 @@ $graphs['voip-monitor'] = [
     'cpuload',
     'memoryusage',
     'openfiles',
+];
+$graphs['docker'] = [
+    'cpu_usage',
+    'pids',
+    'mem_limit',
+    'mem_used',
+    'mem_perc',
+];
+$graphs['chronyd'] = [
+    'time',
+    'frequency',
+    'root',
 ];
 
 echo '<div class="panel panel-default">';

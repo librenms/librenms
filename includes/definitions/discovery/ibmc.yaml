@@ -4,6 +4,8 @@ modules:
         hardware: HUAWEI-SERVER-IBMC-MIB::deviceName.0
         serial: HUAWEI-SERVER-IBMC-MIB::deviceSerialNo.0
         version: .1.3.6.1.4.1.2011.2.235.1.1.11.50.1.4.11.65.99.116.105.118.101.32.105.66.77.67 # HUAWEI-SERVER-IBMC-MIB::firmwareVersion."Active iBMC"
+        features: .1.3.6.1.4.1.2011.2.235.1.1.11.50.1.4.4.66.73.79.83 # HUAWEI-SERVER-IBMC-MIB::firmwareVersion."BIOS"
+        features_template: 'BIOS {{ .1.3.6.1.4.1.2011.2.235.1.1.11.50.1.4.4.66.73.79.83 }}'
     processors:
         data:
             -

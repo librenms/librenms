@@ -54,4 +54,4 @@ foreach (dbFetchRows('SELECT `id`,`rule`,`name` FROM `alert_rules` order by `nam
 $output['rules'] = $rules;
 
 header('Content-type: application/json');
-echo _json_encode($output);
+echo json_encode($output, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);

@@ -25,6 +25,14 @@
         <label for="hidenavigation-{{ $id }}" class="control-label">@lang('Hide Navigation')</label>
         <input type="checkbox" class="form-control" name="hidenavigation" id="hidenavigation-{{ $id }}" value="{{ $hidenavigation }}" data-size="normal" @if($hidenavigation) checked @endif>
     </div>
+    <div class="form-group">
+        <label for="level-{{ $id }}" class="control-label">@lang('Priority')</label>
+        <select class="form-control" name="level" id="level-{{ $id }}">
+            @foreach($priorities as $val => $name)
+                <option value="{{ $val }}" @if($level == $val) selected @endif>{{ $name }}</option>
+            @endforeach
+        </select>
+    </div>
 @endsection
 
 @section('javascript')

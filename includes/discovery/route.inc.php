@@ -145,7 +145,7 @@ if (isset($ipForwardNb['0']['inetCidrRouteNumber']) && $ipForwardNb['0']['inetCi
                     unset($entry['inetCidrRouteStatus']);
                     $entryPerType[$inetCidrRouteDestType]++;
                     $current = $mixed[''][$inetCidrRouteDestType][$inetCidrRouteDest][$inetCidrRoutePfxLen][$inetCidrRoutePolicy][$inetCidrRouteNextHopType][$inetCidrRouteNextHop];
-                    if (isset($current) && isset($current['db']) && count($current['db']) > 0 && $delete_row[$current['db']['route_id']] != 1) {
+                    if (! empty($current['db']) && $delete_row[$current['db']['route_id']] != 1) {
                         //we already have a row in DB
                         $entry['route_id'] = $current['db']['route_id'];
                         $update_row[] = $entry;
@@ -153,7 +153,6 @@ if (isset($ipForwardNb['0']['inetCidrRouteNumber']) && $ipForwardNb['0']['inetCi
                         d_echo(isset($current));
                         d_echo(isset($current['db']));
                         d_echo($current['db']);
-                        d_echo(count($current['db']));
                         d_echo($delete_row[$current['db']['route_id']]);
                         $entry['created_at'] = ['NOW()'];
                         $create_row[] = $entry;
@@ -283,7 +282,7 @@ if ($mpls_skip != 1) {
                             d_echo(isset($current));
                             d_echo(isset($current['db']));
                             d_echo($current['db']);
-                            d_echo(count($current['db']));
+                            d_echo(count($current['db'] ?? []));
                             d_echo($delete_row[$current['db']['route_id']]);
                             $entry['created_at'] = ['NOW()'];
                             $create_row[] = $entry;

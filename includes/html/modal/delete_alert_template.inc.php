@@ -42,7 +42,7 @@ if (! Auth::user()->hasGlobalAdmin()) {
 
 <script>
 
-$('#alert-template-removal').click('', function(event) {
+$('#alert-template-removal').on("click", function(event) {
     event.preventDefault();
     var template_id = $("#template_id").val();
     $.ajax({

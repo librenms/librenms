@@ -65,6 +65,9 @@ class MempoolsController extends TableController
         return $query;
     }
 
+    /**
+     * @param  Device|Mempool  $mempool
+     */
     public function formatItem($mempool)
     {
         if ($mempool instanceof Device) {
@@ -107,7 +110,7 @@ class MempoolsController extends TableController
 
         $link = Url::generate(['page' => 'graphs'], Arr::only($graph, ['id', 'type', 'from']));
 
-        return Url::overlibLink($link, Url::lazyGraphTag($graph), Url::graphTag(['height' => 150, 'width' => 400] + $graph));
+        return Url::overlibLink($link, Url::graphTag($graph), Url::graphTag(['height' => 150, 'width' => 400] + $graph));
     }
 
     private function barLink(Mempool $mempool)

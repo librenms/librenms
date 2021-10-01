@@ -7,25 +7,31 @@ return [
             'setting' => 'setting to get value of in dot notation (example: snmp.community.0)',
         ],
         'options' => [
-            'json' => 'Output setting or entire config as json',
+            'dump' => 'Output the entire config as json',
         ],
     ],
     'config:set' => [
         'description' => 'Set configuration value (or unset)',
         'arguments' => [
-            'setting' => 'setting to set in dot notation (example: snmp.community.0)',
+            'setting' => 'setting to set in dot notation (example: snmp.community.0) To append to an array suffix with .+',
             'value' => 'value to set, unset setting if this is omitted',
         ],
         'options' => [
             'ignore-checks' => 'Ignore all safety checks',
         ],
         'confirm' => 'Reset :setting to the default?',
+        'forget_from' => 'Forget :path from :parent?',
         'errors' => [
+            'append' => 'Cannot append to non-array setting',
             'failed' => 'Failed to set :setting',
-            'invalid' => 'This is not a valid setting. Please check your spelling',
+            'invalid' => 'This is not a valid setting. Please check your input',
+            'invalid_os' => 'Specified OS (:os) does not exist',
             'nodb' => 'Database is not connected',
             'no-validation' => 'Cannot set :setting, it is missing validation definition.',
         ],
+    ],
+    'db:seed' => [
+        'existing_config' => 'Database contains existing settings. Continue?',
     ],
     'dev:check' => [
         'description' => 'LibreNMS code checks. Running with no options runs all checks',
@@ -41,6 +47,40 @@ return [
             'os' => 'Specific OS to run tests on. Implies unit, --db, --snmpsim',
             'quiet' => 'Hide output unless there is an error',
             'snmpsim' => 'Use snmpsim for unit tests',
+        ],
+    ],
+    'dev:simulate' => [
+        'description' => 'Simulate devices using test data',
+        'arguments' => [
+            'file' => 'The file name (only base name) of the snmprec file to update or add to LibreNMS. If file not specified, no device will be added or updated.',
+        ],
+        'options' => [
+            'multiple' => 'Use community name for hostname instead of snmpsim',
+            'remove' => 'Remove the device after stopping',
+        ],
+        'added' => 'Device :hostname (:id) added',
+        'exit' => 'Ctrl-C to stop',
+        'removed' => 'Device :id removed',
+        'updated' => 'Device :hostname (:id) updated',
+    ],
+    'key:rotate' => [
+        'description' => 'Rotate APP_KEY, this decrypts all encrypted data with the given old key and stores it with the new key in APP_KEY.',
+        'arguments' => [
+            'old_key' => 'The old APP_KEY which is valid for encrypted data',
+        ],
+        'cleared-cache' => 'Config was cached, cleared cache to make sure APP_KEY is correct. Please re-run lnms key:rotate',
+        'backup_keys' => 'Document BOTH keys! In case something goes wrong set the new key in .env and use the old key as an argument to this command',
+        'backups' => 'This command could cause irreversible loss of data and will invalidate all browser sessions. Make sure you have backups.',
+        'confirm' => 'I have backups and want to continue',
+        'decrypt-failed' => 'Failed to decrypt :item, skipping',
+        'failed' => 'Failed to decrypt item(s).  Set new key as APP_KEY and run this again with the old key as an argument.',
+        'new_key' => 'New key: :key',
+        'old_key' => 'Old key: :key',
+        'save_key' => 'Save new key to .env?',
+        'success' => 'Successfully rotated keys!',
+        'validation-errors' => [
+            'not_in' => ':attribute must not match current APP_KEY',
+            'required' => 'Either old key or --generate-new-key is required.',
         ],
     ],
     'smokeping:generate' => [

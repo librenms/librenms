@@ -18,16 +18,17 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://librenms.org
+ *
  * @copyright  2020 Adam Bishop
  * @author     Adam Bishop <adam@omega.org.uk>
  */
 
 namespace LibreNMS\Tests;
 
-use app\Console\Commands\SmokepingGenerateCommand;
+use App\Console\Commands\SmokepingGenerateCommand;
 use App\Models\Device;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
-use Illuminate\Support\arr;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 
 class SmokepingCliTest extends DBTestCase
@@ -332,7 +333,7 @@ class SmokepingCliTest extends DBTestCase
 
         // Generate a ridiculous number of random devices for testing
         foreach (range(1, 1000) as $i) {
-            $device = Device::factory()->create();
+            $device = Device::factory()->create(); /** @var Device $device */
             $data[$device->type][] = $device->hostname;
         }
 

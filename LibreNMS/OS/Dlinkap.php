@@ -18,6 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -38,8 +39,8 @@ class Dlinkap extends OS implements MempoolsDiscovery, ProcessorDiscovery
         $firmware_oid = $device->sysObjectID . '.5.1.1.0';
         $hardware_oid = $device->sysObjectID . '.5.1.5.0';
 
-        $device->version = snmp_get($device, $firmware_oid, '-Oqv') ?: null;
-        $device->hardware = trim($device->sysDescr . ' ' . snmp_get($device, $hardware_oid, '-Oqv'));
+        $device->version = snmp_get($this->getDeviceArray(), $firmware_oid, '-Oqv') ?: null;
+        $device->hardware = trim($device->sysDescr . ' ' . snmp_get($this->getDeviceArray(), $hardware_oid, '-Oqv'));
     }
 
     /**

@@ -172,11 +172,11 @@ if (Auth::user()->hasGlobalAdmin()) {
     <script>
         // Scripts related to editing/updating alert transports
 
-        // Display different form on selection 
-        $("#transport-choice").change(function (){
+        // Display different form on selection
+        $("#transport-choice").on("change", function (){
             $(".transport").hide();
             $("#" + $(this).val()).show().find("input:text").val("");
-         
+
         });
 
         $("#edit-alert-transport").on("show.bs.modal", function(e) {
@@ -195,7 +195,7 @@ if (Auth::user()->hasGlobalAdmin()) {
                         toastr.error("Failed to process alert transport");
                     }
                 });
-            
+
             } else {
             // Resetting to default
                 $("#name").val("");
@@ -203,7 +203,7 @@ if (Auth::user()->hasGlobalAdmin()) {
                 $(".transport").hide();
                 $("#" + $("#transport-choice").val()).show().find("input:text").val("");
                 $("#is_default").bootstrapSwitch('state', false);
-                
+
                 // Turn on all switches in form
                 var switches = <?php echo json_encode($switches); ?>;
                 $.each(switches, function(name, state) {
@@ -221,7 +221,7 @@ if (Auth::user()->hasGlobalAdmin()) {
             $("#is_default").bootstrapSwitch('state', transport.is_default);
             $(".transport").hide();
             transport_form.show().find("input:text").val("");
-             
+
             // Populate the field values
             transport.details.forEach(function(config) {
                 var $field = transport_form.find("#" + config.name);
@@ -233,7 +233,7 @@ if (Auth::user()->hasGlobalAdmin()) {
             });
         }
 
-        $(".btn-oauth").click(function (e) {
+        $(".btn-oauth").on("click", function (e) {
             this.href = $(this).data('base-url') + '%26id=' + $("#transport_id").val();
         });
 
@@ -244,7 +244,7 @@ if (Auth::user()->hasGlobalAdmin()) {
             //Combine form data (general and transport specific)
             data = $("form.transports-form").serializeArray();
             data = data.concat($("#" + $("#transport-choice").val()).serializeArray());
-            
+
             if (data !== null) {
                 //post data to ajax form
                 $.ajax({
@@ -279,7 +279,7 @@ if (Auth::user()->hasGlobalAdmin()) {
         });
 
         // Delete the alert transport
-        $("#remove-alert-transport").click('', function(event) {
+        $("#remove-alert-transport").on("click", function(event) {
             event.preventDefault();
             var transport_id = $("#delete_transport_id").val();
             $.ajax({

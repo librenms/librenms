@@ -109,6 +109,7 @@ $rulei = 0;
 $format = $vars['format'];
 foreach (dbFetchRows($sql, $param) as $alert) {
     $log = dbFetchCell('SELECT details FROM alert_log WHERE rule_id = ? AND device_id = ? ORDER BY id DESC LIMIT 1', [$alert['rule_id'], $alert['device_id']]);
+    $alert_log_id = dbFetchCell('SELECT id FROM alert_log WHERE rule_id = ? AND device_id = ? ORDER BY id DESC LIMIT 1', [$alert['rule_id'], $alert['device_id']]);
     $fault_detail = alert_details($log);
     $info = json_decode($alert['info'], true);
 
@@ -168,8 +169,9 @@ foreach (dbFetchRows($sql, $param) as $alert) {
 
     $response[] = [
         'id' => $rulei++,
-        'rule' => '<i title="' . htmlentities($alert['rule']) . '"><a href="' . generate_url(['page' => 'alert-rules']) . '">' . htmlentities($alert['name']) . '</a></i>',
+        'rule' => '<i title="' . htmlentities($alert['rule']) . '"><a href="' . \LibreNMS\Util\Url::generate(['page' => 'alert-rules']) . '">' . htmlentities($alert['name']) . '</a></i>',
         'details' => '<a class="fa fa-plus incident-toggle" style="display:none" data-toggle="collapse" data-target="#incident' . ($alert['id']) . '" data-parent="#alerts"></a>',
+        'verbose_details' => "<button type='button' class='btn btn-alert-details fa fa-info command-alert-details' aria-label='Details' id='alert-details' data-alert_log_id='{$alert_log_id}'></button>",
         'hostname' => $hostname,
         'location' => generate_link($alert['location'], ['page' => 'devices', 'location' => $alert['location']]),
         'timestamp' => ($alert['timestamp'] ? $alert['timestamp'] : 'N/A'),
@@ -188,4 +190,4 @@ $output = [
     'rows' => $response,
     'total' => $total,
 ];
-echo _json_encode($output);
+echo json_encode($output, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);

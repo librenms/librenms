@@ -18,6 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2019 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -43,7 +44,7 @@ class Device
      * Set the primary device.
      * This will be fetched by getPrimary()
      *
-     * @param int $device_id
+     * @param  int  $device_id
      */
     public function setPrimary(int $device_id)
     {
@@ -53,7 +54,7 @@ class Device
     /**
      * Get a device by device_id
      *
-     * @param int $device_id
+     * @param  int  $device_id
      * @return \App\Models\Device
      */
     public function get(?int $device_id): \App\Models\Device
@@ -68,7 +69,7 @@ class Device
     /**
      * Get a device by hostname
      *
-     * @param string $hostname
+     * @param  string  $hostname
      * @return \App\Models\Device
      */
     public function getByHostname($hostname): \App\Models\Device
@@ -85,7 +86,7 @@ class Device
     /**
      * Ignore cache and load the device fresh from the database
      *
-     * @param int $device_id
+     * @param  int  $device_id
      * @return \App\Models\Device
      */
     public function refresh(?int $device_id): \App\Models\Device

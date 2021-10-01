@@ -1,0 +1,274 @@
+
+OCCAM-REG-MODULE	DEFINITIONS ::= BEGIN
+
+
+        IMPORTS
+                MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE,
+                TimeTicks, Counter32, snmpModules, mib-2, OBJECT-IDENTITY
+                        FROM SNMPv2-SMI;
+
+	occam	MODULE-IDENTITY
+		LAST-UPDATED	"200104271051Z"
+		ORGANIZATION	"Occam Networks"
+		CONTACT-INFO	"email support@occamnetworks.com"
+		DESCRIPTION	"The OccamNetworks central registration Module."
+				
+		REVISION        "200104271051Z"
+		DESCRIPTION     "Reformatted certain text"			
+	
+
+		REVISION        "200712051000Z"
+		DESCRIPTION     "Added occamGenericGponModules"			
+	
+
+		REVISION        "200703021000Z"
+		DESCRIPTION     "Added new product identifiers"
+
+		REVISION        "200701101000Z"
+		DESCRIPTION     "Added occamEms node"
+			
+		REVISION        "200905181000Z"
+		DESCRIPTION     "Added blc6316"
+
+                REVISION        "200912090000Z"
+                DESCRIPTION     "Added blc632201"
+
+		REVISION        "200912180000Z"
+                DESCRIPTION     "Added occamGenericXdslModules"
+
+                REVISION        "201003080000Z"
+		DESCRIPTION     "Added occamGenericNotifications"
+		::=  {  enterprises  6066  }
+
+	org	OBJECT IDENTIFIER
+		::=  {  iso  3  }
+
+	dod	OBJECT IDENTIFIER
+		::=  {  org  6  }
+
+	internet	OBJECT IDENTIFIER
+		::=  {  dod  1  }
+
+	private	OBJECT IDENTIFIER
+		::=  {  internet  4  }
+
+	enterprises	OBJECT IDENTIFIER
+		::=  {  private  1  }
+
+	occamProducts	OBJECT-IDENTITY
+		STATUS		current
+		DESCRIPTION		
+				"Sub-tree for Product registrations"
+		REFERENCE	"Sub-tree for Product registrations"
+		::=  {  occam  1  }
+
+	occamGeneric	OBJECT-IDENTITY
+		STATUS		current
+		DESCRIPTION		
+				"Sub-tree for common object and event		
+				definitions" 
+		REFERENCE		
+				"Sub-tree for common object and event		
+				definitions" 
+		::=  {  occam  2  }
+
+	occamCaps	OBJECT-IDENTITY
+		STATUS			current
+		DESCRIPTION		
+				"Sub-tree for agent profiles."
+		REFERENCE	"Sub-tree for agent profiles."
+		::=  {  occam  3  }
+
+	occamModules	OBJECT-IDENTITY
+		STATUS			current
+		DESCRIPTION		
+				"Sub-tree to register the values assigned to	
+				modules with the MODULE-IDENTITY construct."
+		REFERENCE  		
+				"Sub-tree to register the values assigned to	
+				modules with the MODULE-IDENTITY construct."
+		::=  {  occam  4  }
+
+        occamVendors       OBJECT-IDENTITY
+                STATUS                  current
+                DESCRIPTION
+                                "Sub-tree for Occam vendors to add their object	
+				definitions."
+                REFERENCE       "Sub-tree for Occam vendors."
+                ::=  {  occam  5  }
+		
+	occamEms       OBJECT-IDENTITY
+                STATUS                  current
+                DESCRIPTION
+                                "Sub-tree for Occam EMS system object		
+				definitions."
+                REFERENCE       "Sub-tree for Occam EMS system."
+                ::=  {  occam  6  } 
+
+--Product list
+	blc1100 	OBJECT IDENTIFIER ::= { occamProducts 1 }
+	blc1200 	OBJECT IDENTIFIER ::= { occamProducts 2 }
+	blc2200 	OBJECT IDENTIFIER ::= { occamProducts 3 }
+	blc1240 	OBJECT IDENTIFIER ::= { occamProducts 4 }
+	blc6220	        OBJECT IDENTIFIER ::= { occamProducts 5 }
+	blc1210 	OBJECT IDENTIFIER ::= { occamProducts 6 }
+	blc1220	        OBJECT IDENTIFIER ::= { occamProducts 7 }
+	blc6100	        OBJECT IDENTIFIER ::= { occamProducts 8 }
+	blc6110 	OBJECT IDENTIFIER ::= { occamProducts 9 }
+	blc6140 	OBJECT IDENTIFIER ::= { occamProducts 10 }
+ 	blc6150 	OBJECT IDENTIFIER ::= { occamProducts 11 }
+	blc6205 	OBJECT IDENTIFIER ::= { occamProducts 12 }
+	blc6235 	OBJECT IDENTIFIER ::= { occamProducts 13 }
+	blc6640 	OBJECT IDENTIFIER ::= { occamProducts 14 }
+	blc6440 	OBJECT IDENTIFIER ::= { occamProducts 15 }
+	blc6151 	OBJECT IDENTIFIER ::= { occamProducts 16 }
+	blc6248	        OBJECT IDENTIFIER ::= { occamProducts 17 }
+	blc6208	        OBJECT IDENTIFIER ::= { occamProducts 18 }
+	blc6212 	OBJECT IDENTIFIER ::= { occamProducts 19 }
+  	blc615001	OBJECT IDENTIFIER ::= { occamProducts 20 }
+	blc664001	OBJECT IDENTIFIER ::= { occamProducts 21 }
+	blc644001	OBJECT IDENTIFIER ::= { occamProducts 22 }
+	blc620801	OBJECT IDENTIFIER ::= { occamProducts 23 }
+	blc624801	OBJECT IDENTIFIER ::= { occamProducts 24 }
+	blc621201	OBJECT IDENTIFIER ::= { occamProducts 25 }
+	blc6252         OBJECT IDENTIFIER ::= { occamProducts 26 }
+	blc625201	OBJECT IDENTIFIER ::= { occamProducts 27 }
+	blc615101	OBJECT IDENTIFIER ::= { occamProducts 28 }
+  	blc621202	OBJECT IDENTIFIER ::= { occamProducts 29 }
+	blc625202	OBJECT IDENTIFIER ::= { occamProducts 30 }
+	blc666001	OBJECT IDENTIFIER ::= { occamProducts 31 }
+	blc615201	OBJECT IDENTIFIER ::= { occamProducts 32 }
+	blc666002	OBJECT IDENTIFIER ::= { occamProducts 35 }
+	blc666003	OBJECT IDENTIFIER ::= { occamProducts 36 }
+	blc6312         OBJECT IDENTIFIER ::= { occamProducts 37 }
+	blc6214         OBJECT IDENTIFIER ::= { occamProducts 38 }
+	blc6314         OBJECT IDENTIFIER ::= { occamProducts 39 }
+	blc6246         OBJECT IDENTIFIER ::= { occamProducts 40 }
+	blc6244         OBJECT IDENTIFIER ::= { occamProducts 41 }
+	blc6242         OBJECT IDENTIFIER ::= { occamProducts 42 }
+	blc6322         OBJECT IDENTIFIER ::= { occamProducts 43 }
+	blc6450         OBJECT IDENTIFIER ::= { occamProducts 44 }
+	blc625203	OBJECT IDENTIFIER ::= { occamProducts 45 }
+	blc632201	OBJECT IDENTIFIER ::= { occamProducts 46 }
+	blc6316         OBJECT IDENTIFIER ::= { occamProducts 50 }
+	blc6216         OBJECT IDENTIFIER ::= { occamProducts 51 }
+	
+        
+--Generic list
+    occamGenericModules    OBJECT-IDENTITY
+        STATUS                  current
+        DESCRIPTION
+            "Sub-tree for modules used on multiple Occam Products."
+        REFERENCE
+            "Sub-tree for modules used on multiple Occam Products."
+        ::=  {  occamGeneric  1  }   
+
+    occamGenericMonitorModules OBJECT-IDENTITY
+        STATUS                  current 
+        DESCRIPTION
+            "Sub-tree for generic monitor type modules"
+        ::= { occamGenericModules 1 }
+
+    occamGenericInterfaceModules OBJECT-IDENTITY
+        STATUS                  current 
+        DESCRIPTION
+            "Sub-tree for generic interface type modules"
+    
+        ::= { occamGenericModules 2 }
+
+    occamGenericHardwareModules OBJECT-IDENTITY
+        STATUS                  current 
+        DESCRIPTION
+            "Sub-tree for generic hardware type modules.
+             This is used for anything related to the hardware itself."
+        ::= { occamGenericModules 3 }
+
+
+    occamGenericNotifications OBJECT-IDENTITY
+        STATUS                  current 
+        DESCRIPTION
+            "Sub-tree for generic notifications that may
+             be applicable to different BLCs"
+        ::= { occamGenericModules 4 }
+
+--Generic interface Modules
+    occamGenericEtherlikeModules OBJECT-IDENTITY
+        STATUS                  current 
+        DESCRIPTION
+            "Sub-tree for mibs related to ethernet interfaces"
+        ::= { occamGenericInterfaceModules 1 }
+
+    occamGenericSerialModules OBJECT-IDENTITY
+        STATUS                  current 
+        DESCRIPTION
+            "Sub-tree for mibs related to serial interfaces"
+        ::= { occamGenericInterfaceModules 2 }
+
+    occamGenericDslModules OBJECT-IDENTITY
+        STATUS                  current 
+        DESCRIPTION
+            "Sub-tree for mibs related to dsl interfaces"
+        ::= { occamGenericInterfaceModules 3 }
+
+    occamGenericSubscriberModules OBJECT-IDENTITY
+        STATUS                  current 
+        DESCRIPTION
+            "Sub-tree for mibs related to subscriber
+            interfaces. Subscriber interfaces are those interfaces
+            facing customer premises equipment and to which subscriber
+            management functions apply.  These functions include,
+            but are not limited to, definitions of traffic flows
+            and subsequent handling of traffic in those flows, for
+            example, rate limiting, filtering and assignment to a
+            specified VLAN."
+        ::= { occamGenericInterfaceModules 4 }
+
+    occamGenericIgModules OBJECT-IDENTITY
+        STATUS                  current 
+        DESCRIPTION
+            "Sub-tree for mibs related to interface groups"
+        ::= { occamGenericInterfaceModules 5 }
+
+    occamGenericGponModules OBJECT-IDENTITY
+        STATUS                  current 
+        DESCRIPTION
+            "Sub-tree for mibs related to GPON"
+        ::= { occamGenericInterfaceModules 6 }
+
+    occamGenericXdslModules OBJECT-IDENTITY
+        STATUS                  current 
+        DESCRIPTION
+            "Sub-tree for mibs related to Xdsl interfaces"
+        ::= { occamGenericInterfaceModules 7 }
+
+  
+	
+-- EMS Modules
+    occamEmsModules OBJECT-IDENTITY
+        STATUS                  current 
+        DESCRIPTION
+            "Sub-tree for mibs related to Occam Ems system"
+        ::= { occamEms 1 }
+	
+    occamEmsForwardingModules OBJECT-IDENTITY
+        STATUS                  current 
+        DESCRIPTION
+            "Sub-tree for mibs related to Occam Ems trap forwarding"
+        ::= { occamEms 2 }
+	
+
+
+--Module List
+	blc1100Modules  OBJECT IDENTIFIER ::= { occamModules 1 }
+
+	blc1200Modules  OBJECT IDENTIFIER ::= { occamModules 2 }
+
+	blc2200Modules	OBJECT IDENTIFIER ::= { occamModules 3 }
+
+	blc1240Modules	OBJECT IDENTIFIER ::= { occamModules 4 }
+
+	blc6220Modules	OBJECT IDENTIFIER ::= { occamModules 5 }
+
+
+
+END

@@ -18,6 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2020 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -39,7 +40,7 @@ class Measurement
     /**
      * Start the timer for a new operation
      *
-     * @param string $type
+     * @param  string  $type
      * @return static
      */
     public static function start(string $type)

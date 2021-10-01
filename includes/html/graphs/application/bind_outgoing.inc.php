@@ -9,7 +9,7 @@ $unit_text = 'query/sec';
 $colours = 'psychedelic';
 $rrd_list = [];
 
-$rrd_filename = rrd_name($device['hostname'], ['app', 'bind', $app['app_id'], 'outgoing']);
+$rrd_filename = Rrd::name($device['hostname'], ['app', 'bind', $app['app_id'], 'outgoing']);
 $array = [
     'any',
     'a',
@@ -54,7 +54,7 @@ $array = [
     'ixfr',
     'opt',
 ];
-if (rrdtool_check_rrd_exists($rrd_filename)) {
+if (Rrd::checkRrdExists($rrd_filename)) {
     foreach ($array as $ds) {
         $rrd_list[] = [
             'filename' => $rrd_filename,

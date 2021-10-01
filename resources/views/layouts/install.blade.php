@@ -11,7 +11,7 @@
     <script src="{{ asset('js/popper.min.js') }}"></script>
     <script src="{{ asset('js/bootstrap4.min.js') }}"></script>
     <script src="{{ asset('js/clipboard.min.js') }}"></script>
-    <style type="text/css">
+    <style>
         body {
             background-color: #046C8B;
         }
@@ -137,7 +137,7 @@
     var step = '{{ $step }}';
     function checkStepStatus(callback) {
         $.ajax('{{ route('install.action.steps') }}')
-            .success(function (data) {
+            .done(function (data) {
                 var primary;
                 Object.keys(data).forEach(function (key) {
                     var classes = 'btn btn-circle';

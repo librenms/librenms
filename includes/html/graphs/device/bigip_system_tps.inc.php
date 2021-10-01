@@ -3,9 +3,9 @@
 require 'includes/html/graphs/common.inc.php';
 
 $scale_min = '0';
-$descr = rrdtool_escape('SSL TPS');
-$rrd = rrd_name($device['hostname'], 'bigip_system_tps');
-if (rrdtool_check_rrd_exists($rrd)) {
+$descr = 'SSL TPS';
+$rrd = Rrd::name($device['hostname'], 'bigip_system_tps');
+if (Rrd::checkRrdExists($rrd)) {
     $rrd_options .= ' DEF:a="' . $rrd . '":"TotNativeConns":AVERAGE';
     $rrd_options .= ' DEF:b="' . $rrd . '":"TotCompatConns":AVERAGE';
     $rrd_options .= ' CDEF:cdefi="a,b,-"';

@@ -53,8 +53,7 @@ if ($if_list) {
 
         echo "<tr class='iftype'>
             <td><span class=list-large>" . generate_port_link($port, $port['port_descr_descr']) . "</span><br />
-            <span class=interface-desc style='float: left;'>" . generate_device_link($port) . ' ' . generate_port_link($port) . ' </span></td>
-            <td>' . generate_port_link($port, makeshortif($port['ifDescr'])) . '</td>
+            <span class=interface-desc style='float: left;'>" . generate_device_link($port) . ' - ' . generate_port_link($port) . ' </span></td>
             <td>' . $port['port_descr_speed'] . '</td>
             <td>' . $port['port_descr_circuit'] . '</td>
             <td>' . $port['port_descr_notes'] . "</td>
@@ -63,7 +62,7 @@ if ($if_list) {
             <td colspan='5'";
 
         if (dbFetchCell('SELECT count(*) FROM mac_accounting WHERE port_id = ?', [$port['port_id']])) {
-            echo "<span style='float: right;'><a href='" . generate_url(['page'=>'device', 'device'=>$port['device_id'], 'tab'=>'port', 'port'=>$port['port_id'], 'view'=>'macaccounting']) . "'><i class='fa fa-pie-chart fa-lg icon-theme' aria-hidden='true'></i> MAC Accounting</a></span>";
+            echo "<span style='float: right;'><a href='" . \LibreNMS\Util\Url::generate(['page' => 'device', 'device' => $port['device_id'], 'tab' => 'port', 'port' => $port['port_id'], 'view' => 'macaccounting']) . "'><i class='fa fa-pie-chart fa-lg icon-theme' aria-hidden='true'></i> MAC Accounting</a></span>";
         }
 
         echo '<br />';

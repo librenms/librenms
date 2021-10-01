@@ -16,7 +16,7 @@ if (Auth::user()->isDemo()) {
             <div class="col-sm-offset-2 col-sm-7">
             ';
         if ($_REQUEST['confirm']) {
-            print_message(nl2br(delete_device(mres($_REQUEST['id']))) . "\n");
+            print_message(nl2br(delete_device($_REQUEST['id'])) . "\n");
         } else {
             $device = device_by_id_cache($_REQUEST['id']);
             print_error('Are you sure you want to delete device ' . $device['hostname'] . '?'); ?>

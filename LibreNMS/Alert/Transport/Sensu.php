@@ -14,6 +14,7 @@
 
 /**
  * API Transport
+ *
  * @author Adam Bishop <adam@omega.org.uk>
  * @copyright 2020 Adam Bishop, LibreNMS
  * @license GPL
@@ -143,7 +144,9 @@ class Sensu extends Transport
             'librenms-device-id' => strval($obj['device_id']),
             'librenms-rule-id' => strval($obj['rule_id']),
             'librenms-status-reason' => $obj['status_reason'],
-        ], 'strlen'); // strlen returns 0 for null, false or '', but 1 for integer 0 - unlike empty()
+        ], function (string $s): bool {
+            return (bool) strlen($s); // strlen returns 0 for null, false or '', but 1 for integer 0 - unlike empty()
+        });
     }
 
     public static function calculateStatus($state, $severity)

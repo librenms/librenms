@@ -4,7 +4,7 @@ $scale_min = 0;
 
 require 'includes/html/graphs/common.inc.php';
 
-$rrd_filename = rrd_name($device['hostname'], ['app', 'apache', $app['app_id']]);
+$rrd_filename = Rrd::name($device['hostname'], ['app', 'apache', $app['app_id']]);
 
 $array = [
     'sb_reading'   => [
@@ -50,7 +50,7 @@ $array = [
 ];
 
 $i = 0;
-if (rrdtool_check_rrd_exists($rrd_filename)) {
+if (Rrd::checkRrdExists($rrd_filename)) {
     foreach ($array as $ds => $var) {
         $rrd_list[$i]['filename'] = $rrd_filename;
         $rrd_list[$i]['descr'] = $var['descr'];

@@ -15,6 +15,7 @@
 
 /**
  * Alertmanager Transport
+ *
  * @copyright 2019 LibreNMS
  * @license GPL
  */
@@ -35,7 +36,7 @@ class Alertmanager extends Transport
         return $this->contactAlertmanager($obj, $alertmanager_opts);
     }
 
-    public static function contactAlertmanager($obj, $api)
+    public function contactAlertmanager($obj, $api)
     {
         if ($obj['state'] == AlertState::RECOVERED) {
             $alertmanager_status = 'endsAt';
@@ -43,8 +44,6 @@ class Alertmanager extends Transport
             $alertmanager_status = 'startsAt';
         }
         $gen_url = (Config::get('base_url') . 'device/device=' . $obj['device_id']);
-        $host = ($api['url'] . '/api/v2/alerts');
-        $curl = curl_init();
         $alertmanager_msg = strip_tags($obj['msg']);
         $data = [[
             $alertmanager_status => date('c'),
@@ -61,26 +60,59 @@ class Alertmanager extends Transport
             ],
         ]];
 
+        $url = $api['url'];
         unset($api['url']);
         foreach ($api as $label => $value) {
             $data[0]['labels'][$label] = $value;
         }
 
-        $alert_message = json_encode($data);
-        curl_setopt($curl, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
+        return $this->postAlerts($url, $data);
+    }
+
+    public static function postAlerts($url, $data)
+    {
+        $curl = curl_init();
         set_curl_proxy($curl);
-        curl_setopt($curl, CURLOPT_URL, $host);
+        curl_setopt($curl, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
+        curl_setopt($curl, CURLOPT_TIMEOUT, 5);
+        curl_setopt($curl, CURLOPT_TIMEOUT_MS, 5000);
+        curl_setopt($curl, CURLOPT_CONNECTTIMEOUT, 5);
+        curl_setopt($curl, CURLOPT_CONNECTTIMEOUT_MS, 5000);
         curl_setopt($curl, CURLOPT_POST, true);
+
+        $alert_message = json_encode($data);
         curl_setopt($curl, CURLOPT_POSTFIELDS, $alert_message);
 
-        $ret = curl_exec($curl);
-        $code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
-        if ($code != 200) {
-            return 'HTTP Status code ' . $code;
+        foreach (explode(',', $url) as $am) {
+            $post_url = ($am . '/api/v2/alerts');
+            curl_setopt($curl, CURLOPT_URL, $post_url);
+            $ret = curl_exec($curl);
+            if ($ret === false || curl_errno($curl)) {
+                logfile("Failed to contact $post_url: " . curl_error($curl));
+                continue;
+            }
+            $code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
+            if ($code == 200) {
+                curl_close($curl);
+
+                return true;
+            }
         }
 
-        return true;
+        $err = "Unable to POST to Alertmanager at $post_url .";
+
+        if ($ret === false || curl_errno($curl)) {
+            $err .= ' cURL error: ' . curl_error($curl);
+        } else {
+            $err .= ' HTTP status: ' . curl_getinfo($curl, CURLINFO_HTTP_CODE);
+        }
+
+        curl_close($curl);
+
+        logfile($err);
+
+        return $err;
     }
 
     public static function configTemplate()
@@ -88,9 +120,9 @@ class Alertmanager extends Transport
         return [
             'config' => [
                 [
-                    'title' => 'Alertmanager URL',
+                    'title' => 'Alertmanager URL(s)',
                     'name' => 'alertmanager-url',
-                    'descr' => 'Alertmanager Webhook URL',
+                    'descr' => 'Alertmanager Webhook URL(s). Can contain comma-separated URLs',
                     'type' => 'text',
                 ],
                 [
@@ -101,7 +133,7 @@ class Alertmanager extends Transport
                 ],
             ],
             'validation' => [
-                'alertmanager-url' => 'required|url',
+                'alertmanager-url' => 'required|string',
             ],
         ];
     }

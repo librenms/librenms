@@ -1,6 +1,6 @@
 <?php
 
-$rrd_filename = rrd_name($device['hostname'], 'sonicwall_sessions');
+$rrd_filename = Rrd::name($device['hostname'], 'sonicwall_sessions');
 
 $rrd_list[0]['filename'] = $rrd_filename;
 $rrd_list[0]['descr'] = 'Maxiumum Sessions';

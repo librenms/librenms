@@ -19,6 +19,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2020 Anthony F McInerney <bofh80>
  * @author     Anthony F McInerney <afm404@gmail.com>
  */
@@ -26,6 +27,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use LibreNMS\Alerting\QueryBuilderFluentParser;
 use Log;
 
@@ -36,11 +38,9 @@ class ServiceTemplate extends BaseModel
     protected $fillable = [
         'id',
         'ip',
+        'check',
         'type',
-        'dtype',
-        'dgtype',
-        'drules',
-        'dgrules',
+        'rules',
         'desc',
         'param',
         'ignore',
@@ -58,8 +58,7 @@ class ServiceTemplate extends BaseModel
     protected $casts = [
         'ignore' => 'integer',
         'disabled' => 'integer',
-        'drules' => 'array',
-        'dgrules' => 'array',
+        'rules' => 'array',
     ];
 
     public static function boot()
@@ -72,20 +71,14 @@ class ServiceTemplate extends BaseModel
         });
 
         static::saving(function (ServiceTemplate $template) {
-            if ($template->isDirty('drules')) {
-                $template->drules = $template->getDeviceParser()->generateJoins()->toArray();
-            }
-            if ($template->isDirty('dgrules')) {
-                $template->dgrules = $template->getDeviceGroupParser()->generateJoins()->toArray();
+            if ($template->type == 'dynamic' and $template->isDirty('rules')) {
+                $template->rules = $template->getDeviceParser()->generateJoins()->toArray();
             }
         });
 
         static::saved(function (ServiceTemplate $template) {
-            if ($template->isDirty('drules')) {
+            if ($template->type == 'dynamic' and $template->isDirty('rules')) {
                 $template->updateDevices();
-            }
-            if ($template->isDirty('dgrules')) {
-                $template->updateGroups();
             }
         });
     }
@@ -97,27 +90,16 @@ class ServiceTemplate extends BaseModel
      */
     public function updateDevices()
     {
-        if ($this->dtype == 'dynamic') {
+        if ($this->type == 'dynamic') {
             $this->devices()->sync(QueryBuilderFluentParser::fromJSON($this->rules)->toQuery()
                 ->distinct()->pluck('devices.device_id'));
         }
     }
 
     /**
-     * Update device groups included in this template (dynamic only)
-     */
-    public function updateGroups()
-    {
-        if ($this->dgtype == 'dynamic') {
-            $this->groups()->sync(QueryBuilderFluentParser::fromJSON($this->rules)->toQuery()
-                ->distinct()->pluck('device_groups.id'));
-        }
-    }
-
-    /**
      * Update the device template groups for the given device or device_id
      *
-     * @param Device|int $device
+     * @param  Device|int  $device
      * @return array
      */
     public static function updateServiceTemplatesForDevice($device)
@@ -139,7 +121,7 @@ class ServiceTemplate extends BaseModel
             ->get()
             ->filter(function ($template) use ($device) {
                 /** @var ServiceTemplate $template */
-                if ($template->dtype == 'dynamic') {
+                if ($template->type == 'dynamic') {
                     try {
                         return $template->getDeviceParser()
                             ->toQuery()
@@ -164,7 +146,7 @@ class ServiceTemplate extends BaseModel
     /**
      * Update the device template groups for the given device group or device_group_id
      *
-     * @param DeviceGroup|int $deviceGroup
+     * @param  DeviceGroup|int  $deviceGroup
      * @return array
      */
     public static function updateServiceTemplatesForDeviceGroup($deviceGroup)
@@ -185,20 +167,6 @@ class ServiceTemplate extends BaseModel
             }])
             ->get()
             ->filter(function ($template) use ($deviceGroup) {
-                /** @var ServiceTemplate $template */
-                if ($template->dgtype == 'dynamic') {
-                    try {
-                        return $template->getDeviceGroupParser()
-                            ->toQuery()
-                            ->where('device_groups.id', $deviceGroup->id)
-                            ->exists();
-                    } catch (\Illuminate\Database\QueryException $e) {
-                        Log::error("Service Template '$template->name' generates invalid query: " . $e->getMessage());
-
-                        return false;
-                    }
-                }
-
                 // for static, if this device group is include, keep it.
                 return $template->groups
                     ->where('device_group_id', $deviceGroup->id)
@@ -215,23 +183,13 @@ class ServiceTemplate extends BaseModel
      */
     public function getDeviceParser()
     {
-        return QueryBuilderFluentParser::fromJson($this->drules);
-    }
-
-    /**
-     * Get a query builder parser instance from this Service Template device group rule
-     *
-     * @return QueryBuilderFluentParser
-     */
-    public function getDeviceGroupParser()
-    {
-        return QueryBuilderFluentParser::fromJson($this->dgrules);
+        return QueryBuilderFluentParser::fromJson($this->rules);
     }
 
     // ---- Query Scopes ----
 
     /**
-     * @param  Builder $query
+     * @param  Builder  $query
      * @return Builder
      */
     public function scopeIsDisabled($query)
@@ -241,17 +199,17 @@ class ServiceTemplate extends BaseModel
 
     // ---- Define Relationships ----
 
-    public function devices()
+    public function devices(): BelongsToMany
     {
         return $this->belongsToMany(\App\Models\Device::class, 'service_templates_device', 'service_template_id', 'device_id');
     }
 
-    public function services()
+    public function services(): BelongsToMany
     {
         return $this->belongsToMany(\App\Models\Service::class, 'service_templates_device', 'service_template_id', 'device_id');
     }
 
-    public function groups()
+    public function groups(): BelongsToMany
     {
         return $this->belongsToMany(\App\Models\DeviceGroup::class, 'service_templates_device_group', 'service_template_id', 'device_group_id');
     }

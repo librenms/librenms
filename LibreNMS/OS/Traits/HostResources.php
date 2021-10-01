@@ -18,6 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -29,6 +30,7 @@ use Closure;
 use Exception;
 use Illuminate\Support\Str;
 use LibreNMS\Device\Processor;
+use Rrd;
 
 trait HostResources
 {
@@ -116,7 +118,7 @@ trait HostResources
 
             $old_name = ['hrProcessor', $index];
             $new_name = ['processor', 'hr', $index];
-            rrd_file_rename($this->getDeviceArray(), $old_name, $new_name);
+            Rrd::renameFile($this->getDeviceArray(), $old_name, $new_name);
 
             $processor = Processor::discover(
                 'hr',

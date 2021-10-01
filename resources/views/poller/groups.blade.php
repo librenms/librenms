@@ -116,7 +116,7 @@ $('#confirm-delete').on('show.bs.modal', function(e) {
     $("#group_id").val(group_id);
 });
 
-$('#group-removal').click('', function(e) {
+$('#group-removal').on("click", function(e) {
     e.preventDefault();
     groupId = $("#group_id").val();
     $.ajax({
@@ -153,7 +153,7 @@ $('#poller-groups').on('show.bs.modal', function (event) {
     }
 });
 
-$('#create-group').click('', function(e) {
+$('#create-group').on("click", function(e) {
     e.preventDefault();
     var group_name = $("#group_name").val();
     var descr = $("#descr").val();

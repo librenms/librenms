@@ -16,7 +16,7 @@ try {
     $legacy = $e->getOutput();
 
     $ntp = [
-        data => [],
+        'data' => [],
     ];
     [$ntp['data']['offset'], $ntp['data']['frequency'], $ntp['data']['sys_jitter'],
           $ntp['data']['clk_jitter'], $ntp['data']['clk_wander']] = explode("\n", $legacy);

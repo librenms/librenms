@@ -66,14 +66,14 @@ if ($device['type'] == 'wireless' && $device['os'] == 'arubaos') {
             $radioid = str_replace('.1.3.6.1.4.1.14823.2.2.1.5.2.1.5.1.16.', '', $key);
             $name = $value;
             $type = $aruba_apstats[$key1][".1.3.6.1.4.1.14823.2.2.1.5.2.1.5.1.2.$radioid"];
-            $channel = ($aruba_apstats[$key1][".1.3.6.1.4.1.14823.2.2.1.5.2.1.5.1.3.$radioid"] + 0);
-            $txpow = ($aruba_apstats[$key1][".1.3.6.1.4.1.14823.2.2.1.5.2.1.5.1.4.$radioid"] + 0) / 2;
-            $radioutil = ($aruba_apstats[$key1][".1.3.6.1.4.1.14823.2.2.1.5.2.1.5.1.6.$radioid"] + 0);
-            $numasoclients = ($aruba_apstats[$key1][".1.3.6.1.4.1.14823.2.2.1.5.2.1.5.1.7.$radioid"] + 0);
-            $nummonclients = ($aruba_apstats[$key1][".1.3.6.1.4.1.14823.2.2.1.5.2.1.5.1.8.$radioid"] + 0);
-            $numactbssid = ($aruba_apstats[$key1][".1.3.6.1.4.1.14823.2.2.1.5.2.1.5.1.9.$radioid"] + 0);
-            $nummonbssid = ($aruba_apstats[$key1][".1.3.6.1.4.1.14823.2.2.1.5.2.1.5.1.10.$radioid"] + 0);
-            $interference = ($aruba_apstats[$key1][".1.3.6.1.4.1.14823.2.2.1.5.3.1.6.1.11.$radioid"] + 0);
+            $channel = cast_number($aruba_apstats[$key1][".1.3.6.1.4.1.14823.2.2.1.5.2.1.5.1.3.$radioid"]);
+            $txpow = cast_number($aruba_apstats[$key1][".1.3.6.1.4.1.14823.2.2.1.5.2.1.5.1.4.$radioid"]) / 2;
+            $radioutil = cast_number($aruba_apstats[$key1][".1.3.6.1.4.1.14823.2.2.1.5.2.1.5.1.6.$radioid"]);
+            $numasoclients = cast_number($aruba_apstats[$key1][".1.3.6.1.4.1.14823.2.2.1.5.2.1.5.1.7.$radioid"]);
+            $nummonclients = cast_number($aruba_apstats[$key1][".1.3.6.1.4.1.14823.2.2.1.5.2.1.5.1.8.$radioid"]);
+            $numactbssid = cast_number($aruba_apstats[$key1][".1.3.6.1.4.1.14823.2.2.1.5.2.1.5.1.9.$radioid"]);
+            $nummonbssid = cast_number($aruba_apstats[$key1][".1.3.6.1.4.1.14823.2.2.1.5.2.1.5.1.10.$radioid"]);
+            $interference = cast_number($aruba_apstats[$key1][".1.3.6.1.4.1.14823.2.2.1.5.3.1.6.1.11.$radioid"]);
 
             $radionum = substr($radioid, (strlen($radioid) - 1), 1);
 

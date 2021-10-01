@@ -21,6 +21,7 @@ class Ruckuswireless extends OS implements
 
         $total_oids = [];
         $total = 0;
+        $index = null;
         foreach ($counts as $index => $count) {
             $oid = '.1.3.6.1.4.1.25053.1.2.2.1.1.1.1.1.12.' . $index;
             $total_oids[] = $oid;
@@ -60,8 +61,7 @@ class Ruckuswireless extends OS implements
                     $oidconnected,
                     'ruckuswireless',
                     ++$sensorindex,
-                    'Connected APs',
-                    $count
+                    'Connected APs'
                 );
 
         array_push($sensors, new WirelessSensor('ap-count', $this->getDeviceId(), $oidtotal, 'ruckuswireless', ++$sensorindex, 'Total APs'));

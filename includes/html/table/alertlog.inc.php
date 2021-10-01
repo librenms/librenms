@@ -33,7 +33,7 @@ if (is_numeric($vars['device_id'])) {
 
 if ($vars['state'] >= 0) {
     $where .= ' AND `E`.`state` = ?';
-    $param[] = mres($vars['state']);
+    $param[] = $vars['state'];
 }
 
 if (isset($vars['min_severity'])) {
@@ -84,7 +84,9 @@ foreach (dbFetchRows($sql, $param) as $alertlog) {
     $dev = device_by_id_cache($alertlog['device_id']);
     logfile($alertlog['rule_id']);
     $log = dbFetchCell('SELECT details FROM alert_log WHERE rule_id = ? AND device_id = ? AND `state` = 1 ORDER BY id DESC LIMIT 1', [$alertlog['rule_id'], $alertlog['device_id']]);
+    $alert_log_id = dbFetchCell('SELECT id FROM alert_log WHERE rule_id = ? AND device_id = ? ORDER BY id DESC LIMIT 1', [$alertlog['rule_id'], $alertlog['device_id']]);
     $fault_detail = alert_details($log);
+
     if (empty($fault_detail)) {
         $fault_detail = 'Rule created, no faults found';
     }
@@ -105,7 +107,8 @@ foreach (dbFetchRows($sql, $param) as $alertlog) {
         'id' => $rulei++,
         'time_logged' => $alertlog['humandate'],
         'details' => '<a class="fa fa-plus incident-toggle" style="display:none" data-toggle="collapse" data-target="#incident' . ($rulei) . '" data-parent="#alerts"></a>',
-        'hostname' => '<div class="incident">' . generate_device_link($dev, shorthost($dev['hostname'])) . '<div id="incident' . ($rulei) . '" class="collapse">' . $fault_detail . '</div></div>',
+        'verbose_details' => "<button type='button' class='btn btn-alert-details fa fa-info command-alert-details' style='display:none' aria-label='Details' id='alert-details' data-alert_log_id='{$alert_log_id}'></button>",
+        'hostname' => '<div class="incident">' . generate_device_link($dev) . '<div id="incident' . ($rulei) . '" class="collapse">' . $fault_detail . '</div></div>',
         'alert' => htmlspecialchars($alertlog['alert']),
         'status' => "<i class='alert-status " . $status . "' title='" . ($alert_state ? 'active' : 'recovered') . "'></i>",
         'severity' => $alertlog['severity'],
@@ -118,4 +121,4 @@ $output = [
     'rows' => $response,
     'total' => $total,
 ];
-echo _json_encode($output);
+echo json_encode($output, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);

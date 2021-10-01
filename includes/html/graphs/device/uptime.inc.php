@@ -4,7 +4,7 @@ $scale_min = '0';
 
 require 'includes/html/graphs/common.inc.php';
 
-$rrd_filename = rrd_name($device['hostname'], 'uptime');
+$rrd_filename = Rrd::name($device['hostname'], 'uptime');
 
 $rrd_options .= ' DEF:uptime=' . $rrd_filename . ':uptime:AVERAGE';
 $rrd_options .= ' CDEF:cuptime=uptime,86400,/';

@@ -48,7 +48,7 @@
         });
     });
 
-    $("#save-alert-notes").click('', function(event) {
+    $("#save-alert-notes").on("click", function(event) {
         event.preventDefault();
         var alert_id = $("#alert_id").val();
         var note = $("#note").val();

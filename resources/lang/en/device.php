@@ -10,5 +10,6 @@ return [
         'serial' => 'Serial',
         'sysName' => 'sysName',
         'version' => 'OS Version',
+        'type' => 'Device type',
     ],
 ];

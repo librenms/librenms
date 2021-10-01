@@ -31,7 +31,7 @@ class ModuleModelObserver
     /**
      * Install observers to output +, -, U for models being created, deleted, and updated
      *
-     * @param string|\Illuminate\Database\Eloquent\Model $model The model name including namespace
+     * @param  string|\Illuminate\Database\Eloquent\Model  $model  The model name including namespace
      */
     public static function observe($model)
     {
@@ -44,25 +44,37 @@ class ModuleModelObserver
         }
     }
 
-    public function saving(Eloquent $model)
+    /**
+     * @param  Eloquent  $model
+     */
+    public function saving($model)
     {
         if (! $model->isDirty()) {
             echo '.';
         }
     }
 
-    public function updated(Eloquent $model)
+    /**
+     * @param  Eloquent  $model
+     */
+    public function updated($model)
     {
         d_echo('Updated data:', 'U');
         d_echo($model->getDirty());
     }
 
-    public function created(Eloquent $model)
+    /**
+     * @param  Eloquent  $model
+     */
+    public function created($model)
     {
         echo '+';
     }
 
-    public function deleted(Eloquent $model)
+    /**
+     * @param  Eloquent  $model
+     */
+    public function deleted($model)
     {
         echo '-';
     }

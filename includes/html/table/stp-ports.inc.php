@@ -1,6 +1,6 @@
 <?php
 
-$device_id = mres($vars['device_id']);
+$device_id = $vars['device_id'];
 
 $param[] = $device_id;
 
@@ -40,9 +40,9 @@ foreach (dbFetchRows($sql, [$device_id]) as $stp_ports_db) {
         'state'              => $stp_ports_db['state'],
         'enable'             => $stp_ports_db['enable'],
         'pathCost'           => $stp_ports_db['pathCost'],
-        'designatedRoot'     => generate_device_link($root_device, $root_device['hostname']) . '<br>' . $stp_ports_db['designatedRoot'],
+        'designatedRoot'     => ($root_device ? generate_device_link($root_device) : \LibreNMS\Util\Rewrite::readableOUI($stp_ports_db['designatedRoot'])) . '<br>' . \LibreNMS\Util\Rewrite::readableMac($stp_ports_db['designatedRoot']),
         'designatedCost'     => $stp_ports_db['designatedCost'],
-        'designatedBridge'   => generate_device_link($bridge_device, $bridge_device['hostname']) . '<br>' . $stp_ports_db['designatedBridge'],
+        'designatedBridge'   => ($bridge_device ? generate_device_link($bridge_device) : \LibreNMS\Util\Rewrite::readableOUI($stp_ports_db['designatedBridge'])) . '<br>' . \LibreNMS\Util\Rewrite::readableMac($stp_ports_db['designatedBridge']),
         'designatedPort'     => $stp_ports_db['designatedPort'],
         'forwardTransitions' => $stp_ports_db['forwardTransitions'],
     ];
@@ -54,4 +54,4 @@ $output = [
     'rows'     => $response,
     'total'    => $total,
 ];
-echo _json_encode($output);
+echo json_encode($output, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);

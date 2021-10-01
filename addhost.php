@@ -86,8 +86,8 @@ if (! empty($argv[1])) {
         $snmpver = 'v2c';
         $additional = [
             'snmp_disable' => 1,
-            'os'           => $argv[2] ? mres($argv[2]) : 'ping',
-            'hardware'     => $argv[3] ? mres($argv[3]) : '',
+            'os'           => $argv[2] ? $argv[2] : 'ping',
+            'hardware'     => $argv[3] ? $argv[3] : '',
         ];
     } elseif ($snmpver === 'v3') {
         $seclevel = $community;

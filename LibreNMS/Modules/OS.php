@@ -18,6 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2020 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -51,12 +52,14 @@ class OS implements Module
 
     public function poll(\LibreNMS\OS $os)
     {
-        $deviceModel = $os->getDevice();
+        $deviceModel = $os->getDevice(); /** @var \App\Models\Device $deviceModel */
         if ($os instanceof OSPolling) {
             $os->pollOS();
         } else {
             // legacy poller files
             global $graphs, $device;
+            $location = null;
+
             if (is_file(base_path('/includes/polling/os/' . $device['os'] . '.inc.php'))) {
                 // OS Specific
                 include base_path('/includes/polling/os/' . $device['os'] . '.inc.php');
@@ -72,8 +75,10 @@ class OS implements Module
             $deviceModel->hardware = ($hardware ?? $deviceModel->hardware) ?: null;
             $deviceModel->features = ($features ?? $deviceModel->features) ?: null;
             $deviceModel->serial = ($serial ?? $deviceModel->serial) ?: null;
-            if (! empty($location)) {
-                $deviceModel->setLocation(new Location(['location' => $location]));
+
+            if (! empty($location)) { // legacy support, remove when no longer needed
+                $deviceModel->setLocation($location);
+                optional($deviceModel->location)->save();
             }
         }
 
@@ -102,14 +107,8 @@ class OS implements Module
     private function updateLocation(\LibreNMS\OS $os)
     {
         $device = $os->getDevice();
-        if ($device->override_sysLocation) {
-            optional($device->location)->lookupCoordinates();
-        } else {
-            $new = $os->fetchLocation();  // fetch location data from device
-            $new->lookupCoordinates();
-            $device->setLocation($new);
-        }
-
+        $new_location = $device->override_sysLocation ? new Location() : $os->fetchLocation(); // fetch location data from device
+        $device->setLocation($new_location, true); // set location and lookup coordinates if needed
         optional($device->location)->save();
     }
 
@@ -117,7 +116,7 @@ class OS implements Module
     {
         $device = $os->getDevice();
         $device->sysContact = snmp_get($os->getDeviceArray(), 'sysContact.0', '-Ovq', 'SNMPv2-MIB');
-        $device->sysContact = str_replace(['', '"', '\n', 'not set'], null, $device->sysContact);
+        $device->sysContact = str_replace(['', '"', '\n', 'not set'], '', $device->sysContact);
         if (empty($device->sysContact)) {
             $device->sysContact = null;
         }

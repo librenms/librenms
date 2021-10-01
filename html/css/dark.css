@@ -1,6 +1,3 @@
-  body {
-    background: #333;
-  }
   .fa-nav-icons {
     color: #bfc0c0;
   }
@@ -186,7 +183,7 @@
   }
   small {
     font-size: 80%;
-    color: #FFF;  
+    color: #FFF;
   }
   sub,
   sup {
@@ -7211,4 +7208,31 @@
   }
   .vis-legend-text {
     color: black;
+  }
+
+  .expandable:hover span {
+      background-color: #2e3338;
+  }
+  table tr:nth-child(odd){
+    background: #2a2e33!important;
+  }
+  table tr:hover{
+    background: #2d3237!important;
+  }
+  div[role=listbox]{
+    background: #464c53;
+  }
+  .overlib, .overlib-contents{
+    background: #353a41;
+    color: #bebfbf;
+  }
+  .overlib-text, .overlib-contents list-large{
+    color: #bebfbf;
+  }
+  #overDiv{
+    background: #353a41;
+  }
+  .bootgrid-table td.loading, .bootgrid-table td.no-results {
+    background: #3e444c;
+    text-align: center;
   }

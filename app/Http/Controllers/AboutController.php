@@ -18,6 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -38,19 +39,20 @@ use App\Models\Ipv6Address;
 use App\Models\Ipv6Network;
 use App\Models\Mempool;
 use App\Models\Port;
+use App\Models\PrinterSupply;
 use App\Models\Processor;
 use App\Models\Pseudowire;
 use App\Models\Sensor;
 use App\Models\Service;
+use App\Models\Sla;
 use App\Models\Storage;
 use App\Models\Syslog;
-use App\Models\Toner;
 use App\Models\Vlan;
 use App\Models\Vrf;
 use App\Models\WirelessSensor;
-use DB;
 use Illuminate\Http\Request;
 use LibreNMS\Config;
+use LibreNMS\DB\Eloquent;
 use LibreNMS\Util\Version;
 
 class AboutController extends Controller
@@ -70,7 +72,7 @@ class AboutController extends Controller
             'project_name' => Config::get('project_name'),
 
             'version_local'     => $version->local(),
-            'version_mysql'     => current(DB::selectOne('select version()')),
+            'version_mysql'     => Eloquent::version(),
             'version_php'       => phpversion(),
             'version_laravel'   => App::VERSION(),
             'version_python'    => Version::python(),
@@ -96,9 +98,10 @@ class AboutController extends Controller
             'stat_pw'         => Pseudowire::count(),
             'stat_sensors'    => Sensor::count(),
             'stat_services'   => Service::count(),
+            'stat_slas'       => Sla::count(),
             'stat_storage'    => Storage::count(),
             'stat_syslog'     => Syslog::count(),
-            'stat_toner'      => Toner::count(),
+            'stat_toner'      => PrinterSupply::count(),
             'stat_vlans'      => Vlan::count(),
             'stat_vrf'        => Vrf::count(),
             'stat_wireless'   => WirelessSensor::count(),

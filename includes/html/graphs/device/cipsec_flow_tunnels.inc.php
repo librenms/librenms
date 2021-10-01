@@ -2,7 +2,7 @@
 
 require 'includes/html/graphs/common.inc.php';
 
-$rrd_filename = rrd_name($device['hostname'], 'cipsec_flow');
+$rrd_filename = Rrd::name($device['hostname'], 'cipsec_flow');
 $ds = 'Tunnels';
 $colour_area = '9999cc';
 $colour_line = '0000cc';

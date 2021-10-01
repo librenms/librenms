@@ -18,6 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://librenms.org
+ *
  * @copyright  2017 Adam Bishop
  * @author     Adam Bishop <adam@omega.org.uk>
  */
@@ -26,6 +27,8 @@ namespace LibreNMS\Tests;
 
 use LibreNMS\Authentication\LegacyAuth;
 use LibreNMS\Config;
+use function strip_tags;
+use function strip_tags as strip_tags1;
 
 class AuthHTTPTest extends TestCase
 {
@@ -53,11 +56,11 @@ class AuthHTTPTest extends TestCase
     {
         $a = LegacyAuth::reset();
 
-        $this->assertTrue($a->canUpdatePasswords() === 0);
-        $this->assertTrue($a->changePassword(null, null) === 0);
-        $this->assertTrue($a->canManageUsers() === 1);
-        $this->assertTrue($a->canUpdateUsers() === 1);
-        $this->assertTrue($a->authIsExternal() === 1);
+        $this->assertFalse($a->canUpdatePasswords());
+        $this->assertFalse($a->changePassword(null, null));
+        $this->assertTrue($a->canManageUsers());
+        $this->assertTrue($a->canUpdateUsers());
+        $this->assertTrue($a->authIsExternal());
     }
 
     public function testOldBehaviourAgainstCurrent()
@@ -76,9 +79,9 @@ class AuthHTTPTest extends TestCase
 
                 // Old Behaviour
                 if (isset($_SERVER['REMOTE_USER'])) {
-                    $old_username = clean($_SERVER['REMOTE_USER']);
+                    $old_username = strip_tags1($_SERVER['REMOTE_USER']);
                 } elseif (isset($_SERVER['PHP_AUTH_USER']) && Config::get('auth_mechanism') === 'http-auth') {
-                    $old_username = clean($_SERVER['PHP_AUTH_USER']);
+                    $old_username = strip_tags($_SERVER['PHP_AUTH_USER']);
                 }
 
                 // Current Behaviour

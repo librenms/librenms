@@ -18,6 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2016 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -27,6 +28,7 @@ namespace LibreNMS\Tests;
 use Illuminate\Support\Str;
 use LibreNMS\Config;
 use LibreNMS\Modules\Core;
+use LibreNMS\Util\Debug;
 use LibreNMS\Util\OS;
 
 class OSDiscoveryTest extends TestCase
@@ -57,9 +59,10 @@ class OSDiscoveryTest extends TestCase
      *
      * @group os
      * @dataProvider osProvider
-     * @param $os_name
+     *
+     * @param  string  $os_name
      */
-    public function testOS($os_name)
+    public function testOSDetection($os_name)
     {
         $glob = Config::get('install_dir') . "/tests/snmpsim/$os_name*.snmprec";
         $files = array_map(function ($file) {
@@ -82,7 +85,7 @@ class OSDiscoveryTest extends TestCase
     /**
      * Test that all files have been tested (removed from self::$unchecked_files
      *
-     * @depends testOS
+     * @depends testOSDetection
      */
     public function testAllFilesTested()
     {
@@ -96,15 +99,14 @@ class OSDiscoveryTest extends TestCase
      * Set up and test an os
      * If $filename is not set, it will use the snmprec file matching $expected_os
      *
-     * @param string $expected_os The os we should get back from getHostOS()
-     * @param string $filename the name of the snmprec file to use
+     * @param  string  $expected_os  The os we should get back from getHostOS()
+     * @param  string  $filename  the name of the snmprec file to use
      */
     private function checkOS($expected_os, $filename = null)
     {
         $community = $filename ?: $expected_os;
-        global $debug, $vdebug;
-        $debug = true;
-        $vdebug = true;
+        Debug::set();
+        Debug::setVerbose();
         ob_start();
         $os = Core::detectOS($this->genDevice($community));
         $output = ob_get_contents();
@@ -116,7 +118,7 @@ class OSDiscoveryTest extends TestCase
     /**
      * Generate a fake $device array
      *
-     * @param string $community The snmp community to set
+     * @param  string  $community  The snmp community to set
      * @return array resulting device array
      */
     private function genDevice($community)

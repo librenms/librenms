@@ -194,7 +194,7 @@ if (! Auth::user()->hasGlobalAdmin()) {
         foreach ($interface_perms as $interface_perm) {
             echo '<tr>
               <td>
-                <strong>' . $interface_perm['hostname'] . ' - ' . $interface_perm['ifDescr'] . '</strong>' . '' . display($interface_perm['ifAlias']) . "
+                <strong>' . $interface_perm['hostname'] . ' - ' . $interface_perm['ifDescr'] . '</strong>' . '' . \LibreNMS\Util\Clean::html($interface_perm['ifAlias'], []) . "
               </td>
               <td>
                 &nbsp;&nbsp;<a href='edituser/action=delifperm/user_id=" . $user_data['user_id'] . '/port_id=' . $interface_perm['port_id'] . "'><i class='fa fa-trash fa-lg icon-theme' aria-hidden='true'></i></a>

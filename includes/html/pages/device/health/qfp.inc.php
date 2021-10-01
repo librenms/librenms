@@ -7,6 +7,7 @@
  * the source code distribution for details.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2019 LibreNMS
  * @author     Pavle Obradovic <pobradovic08@gmail.com>
  */
@@ -14,6 +15,9 @@
 /*
  * Get module's components for a device
  */
+
+use LibreNMS\Util\Number;
+
 $component = new LibreNMS\Component();
 $components = $component->getComponents($device['device_id'], ['type' => 'cisco-qfp']);
 $components = $components[$device['device_id']];
@@ -132,7 +136,7 @@ foreach ($components as $component_id => $tmp_component) {
                 <h3 class='panel-title'>
                     $text_descr
                     <div class='pull-right'>
-                        <span class='label {$packets_label}'>" . format_bi($tmp_component['packets']) . 'pps</span>
+                        <span class='label {$packets_label}'>" . Number::formatBi($tmp_component['packets'], 2, 3, 'pps') . '</span>
                     </div>
                 </h3>
             </div>';
@@ -152,7 +156,7 @@ foreach ($components as $component_id => $tmp_component) {
                 <h3 class='panel-title'>
                     $text_descr
                     <div class='pull-right'>
-                        <span class='label {$throughput_label}'>" . format_bi($tmp_component['throughput']) . 'bps</span>
+                        <span class='label {$throughput_label}'>" . Number::formatBi($tmp_component['throughput'], 2, 3, 'bps') . '</span>
                     </div>
                 </h3>
             </div>';
@@ -194,7 +198,7 @@ foreach ($components as $component_id => $tmp_component) {
     $graph_array = $default_graph_array;
     $graph_array['type'] = 'qfp_memory';
     $text_descr = 'QFP Memory';
-    $label_text = sprintf('%sB / %sB', format_bi($tmp_component['memory_used']), format_bi($tmp_component['memory_total']));
+    $label_text = sprintf('%sB / %sB', Number::formatBi($tmp_component['memory_used'], 2, 3, ''), Number::formatBi($tmp_component['memory_total'], 2, 3, ''));
     echo "<div class='panel panel-default'>
             <div class='panel-heading'>
                 <h3 class='panel-title'>

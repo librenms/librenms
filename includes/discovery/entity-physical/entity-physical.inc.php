@@ -118,6 +118,40 @@ if ($device['os'] == 'saf-cfm') {
     }
 }
 
+if ($device['os'] == 'ios' or $device['os'] == 'iosxe') {
+    $tables = [
+        ['num_oid' => '.1.3.6.1.4.1.9.9.661.1.3.1.1.1.', 'oid' => 'c3gImsi',  'state_name' => 'c3gImsi',  'mib' => 'CISCO-WAN-3G-MIB', 'descr' => 'IMSI',  'entPhysicalIndex' => '9999'],
+        ['num_oid' => '.1.3.6.1.4.1.9.9.661.1.3.1.1.2.', 'oid' => 'c3gImei',  'state_name' => 'c3gImei',  'mib' => 'CISCO-WAN-3G-MIB', 'descr' => 'IMEI',  'entPhysicalIndex' => '9999'],
+        ['num_oid' => '.1.3.6.1.4.1.9.9.661.1.3.1.1.3.', 'oid' => 'c3gIccId', 'state_name' => 'c3gIccId', 'mib' => 'CISCO-WAN-3G-MIB', 'descr' => 'ICCID', 'entPhysicalIndex' => '9999'],
+    ];
+
+    foreach ($tables as $tablevalue) {
+        $temp = snmpwalk_cache_multi_oid($device, $tablevalue['oid'], [], $tablevalue['mib']);
+        $cur_oid = $tablevalue['num_oid'];
+        $state_name = $tablevalue['state_name'];
+        foreach ($temp as $index => $entry) {
+            if ($state_name == 'c3gImei') {
+                $FRU = 'false';
+                $vendor_type = 'modem';
+            } else {
+                $FRU = 'true';
+                $vendor_type = 'sim';
+            }
+            $entity_array[] = [
+                'entPhysicalIndex' => $tablevalue['entPhysicalIndex'] . $index,
+                'entPhysicalDescr' => $entry[$state_name],
+                'entPhysicalVendorType' => $vendor_type,
+                'entPhysicalContainedIn' => $index,
+                'entPhysicalClass' => 'module',
+                'entPhysicalParentRelPos' => '-1',
+                'entPhysicalName' => $vendor_type,
+                'entPhysicalModelName' => $tablevalue['descr'],
+                'entPhysicalIsFRU' => $FRU,
+            ];
+        }
+    }
+}
+
 foreach ($entity_array as $entPhysicalIndex => $entry) {
     unset($ifIndex);
     if ($device['os'] == 'junos') {
@@ -216,6 +250,10 @@ foreach ($entity_array as $entPhysicalIndex => $entry) {
         $entPhysicalAlias = array_key_exists('entPhysicalAlias', $entry) ? $entry['entPhysicalAlias'] : '';
         $entPhysicalAssetID = array_key_exists('entPhysicalAssetID', $entry) ? $entry['entPhysicalAssetID'] : '';
     }//end if
+
+    if ($device['os'] == 'dnos' && $entPhysicalSerialNum == 'NA' && preg_match('/Unit/', $entPhysicalName)) {
+        $entPhysicalSerialNum = snmp_get($device, '.1.3.6.1.4.1.674.10895.3000.1.2.100.8.1.4.' . preg_replace('/Unit (\d+)/', '$1', $entPhysicalName), '-Oqv', '');
+    }
 
     if (isset($entity_array[$entPhysicalIndex]['0']['entAliasMappingIdentifier'])) {
         $ifIndex = $entity_array[$entPhysicalIndex]['0']['entAliasMappingIdentifier'];

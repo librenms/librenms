@@ -301,7 +301,6 @@ foreach (get_port_assoc_modes() as $pam_id => $pam) {
     echo ">$pam</option>\n";
 }
 
-['sha2' => $snmpv3_sha2, 'aes256' => $snmpv3_aes256] = snmpv3_capabilities();
 echo "        </select>
       </div>
     </div>
@@ -357,19 +356,16 @@ echo "        </select>
     <div class='form-group'>
     <label for='authalgo' class='col-sm-2 control-label'>Auth Algorithm</label>
     <div class='col-sm-4'>
-    <select id='authalgo' name='authalgo' class='form-control'>
-    <option value='MD5'>MD5</option>
-    <option value='SHA' " . ($device['authalgo'] === 'SHA' ? 'selected' : '') . ">SHA</option>
-    <option value='SHA-224' " . ($device['authalgo'] === 'SHA-224' ? 'selected' : '') . ($snmpv3_sha2 ?: ' disabled') . ">SHA-224</option>
-    <option value='SHA-256' " . ($device['authalgo'] === 'SHA-256' ? 'selected' : '') . ($snmpv3_sha2 ?: ' disabled') . ">SHA-256</option>
-    <option value='SHA-384' " . ($device['authalgo'] === 'SHA-384' ? 'selected' : '') . ($snmpv3_sha2 ?: ' disabled') . ">SHA-384</option>
-    <option value='SHA-512' " . ($device['authalgo'] === 'SHA-512' ? 'selected' : '') . ($snmpv3_sha2 ?: ' disabled') . '>SHA-512</option>
-    </select>
-    ';
-if (! $snmpv3_sha2) {
+    <select id='authalgo' name='authalgo' class='form-control'>";
+foreach (\LibreNMS\SNMPCapabilities::authAlgorithms() as $algo => $enabled) {
+    echo "<option value='$algo' " . ($device['authalgo'] === $algo ? 'selected' : '') . ($enabled ? '' : ' disabled') . ">$algo</option>\n";
+}
+echo '</select>';
+
+if (! \LibreNMS\SNMPCapabilities::supportsSHA2()) {
     echo '<label class="text-left"><small>Some options are disabled. <a href="https://docs.librenms.org/Support/FAQ/#optional-requirements-for-snmpv3-sha2-auth">Read more here</a></small></label>';
 }
-    echo "
+echo "
     </div>
     </div>
     <div class='form-group'>
@@ -381,14 +377,14 @@ if (! $snmpv3_sha2) {
     <div class='form-group'>
     <label for='cryptoalgo' class='col-sm-2 control-label'>Crypto Algorithm</label>
     <div class='col-sm-4'>
-    <select id='cryptoalgo' name='cryptoalgo' class='form-control'>
-    <option value='AES' " . ($device['cryptoalgo'] === 'AES' ? 'selected' : '') . ">AES</option>
-    <option value='AES-192' " . ($device['cryptoalgo'] === 'AES-192' ? 'selected' : '') . ($snmpv3_aes256 ?: ' disabled') . ">AES-192</option>
-    <option value='AES-256' " . ($device['cryptoalgo'] === 'AES-256' ? 'selected' : '') . ($snmpv3_aes256 ?: ' disabled') . ">AES-256</option>
-    <option value='DES'>DES</option>
-    </select>
-    ";
-if (! $snmpv3_aes256) {
+    <select id='cryptoalgo' name='cryptoalgo' class='form-control'>";
+
+foreach (\LibreNMS\SNMPCapabilities::cryptoAlgoritms() as $algo => $enabled) {
+    echo "<option value='$algo' " . ($device['cryptoalgo'] === $algo ? 'selected' : '') . ($enabled ? '' : ' disabled') . ">$algo</option>\n";
+}
+echo '</select>
+    ';
+if (! \LibreNMS\SNMPCapabilities::supportsAES256()) {
     echo '<label class="text-left"><small>Some options are disabled. <a href="https://docs.librenms.org/Support/FAQ/#optional-requirements-for-snmpv3-sha2-auth">Read more here</a></small></label>';
 }
     echo '

@@ -3,8 +3,8 @@
 namespace App\Providers;
 
 use App\Guards\ApiTokenGuard;
-use Auth;
 use Illuminate\Foundation\Support\Providers\AuthServiceProvider as ServiceProvider;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Gate;
 
 class AuthServiceProvider extends ServiceProvider

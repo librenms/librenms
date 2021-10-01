@@ -18,6 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2017 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -30,6 +31,7 @@ use LibreNMS\Config;
 use LibreNMS\Exceptions\FileNotFoundException;
 use LibreNMS\Exceptions\InvalidModuleException;
 use LibreNMS\Fping;
+use LibreNMS\Util\Debug;
 use LibreNMS\Util\ModuleTestHelper;
 
 class OSModulesTest extends DBTestCase
@@ -78,9 +80,10 @@ class OSModulesTest extends DBTestCase
      *
      * @group os
      * @dataProvider dumpedDataProvider
-     * @param string $os base os
-     * @param string $variant optional variant
-     * @param array $modules modules to test for this os
+     *
+     * @param  string  $os  base os
+     * @param  string  $variant  optional variant
+     * @param  array  $modules  modules to test for this os
      */
     public function testOS($os, $variant, $modules)
     {
@@ -89,7 +92,7 @@ class OSModulesTest extends DBTestCase
         $this->stubClasses();
 
         try {
-            set_debug(false); // avoid all undefined index errors in the legacy code
+            Debug::set(false); // avoid all undefined index errors in the legacy code
             $helper = new ModuleTestHelper($modules, $os, $variant);
             $helper->setQuiet();
 
@@ -97,13 +100,9 @@ class OSModulesTest extends DBTestCase
             $expected_data = $helper->getTestData();
             $results = $helper->generateTestData($this->getSnmpsim(), true);
         } catch (FileNotFoundException $e) {
-            $this->fail($e->getMessage());
-
-            return;
+            return $this->fail($e->getMessage());
         } catch (InvalidModuleException $e) {
-            $this->fail($e->getMessage());
-
-            return;
+            return $this->fail($e->getMessage());
         }
 
         if (is_null($results)) {
@@ -111,17 +110,17 @@ class OSModulesTest extends DBTestCase
         }
 
         // output all discovery and poller output if debug mode is enabled for phpunit
-        $debug = in_array('--debug', $_SERVER['argv'], true);
+        $phpunit_debug = in_array('--debug', $_SERVER['argv'], true);
 
         foreach ($modules as $module) {
-            $expected = $expected_data[$module]['discovery'];
-            $actual = $results[$module]['discovery'];
+            $expected = $expected_data[$module]['discovery'] ?? [];
+            $actual = $results[$module]['discovery'] ?? [];
             $this->assertEquals(
                 $expected,
                 $actual,
                 "OS $os: Discovered $module data does not match that found in $filename\n"
                 . print_r(array_diff($expected, $actual), true)
-                . $helper->getDiscoveryOutput($debug ? null : $module)
+                . $helper->getDiscoveryOutput($phpunit_debug ? null : $module)
                 . "\nOS $os: Discovered $module data does not match that found in $filename"
             );
 
@@ -133,15 +132,15 @@ class OSModulesTest extends DBTestCase
             if ($expected_data[$module]['poller'] == 'matches discovery') {
                 $expected = $expected_data[$module]['discovery'];
             } else {
-                $expected = $expected_data[$module]['poller'];
+                $expected = $expected_data[$module]['poller'] ?? [];
             }
-            $actual = $results[$module]['poller'];
+            $actual = $results[$module]['poller'] ?? [];
             $this->assertEquals(
                 $expected,
                 $actual,
                 "OS $os: Polled $module data does not match that found in $filename\n"
                 . print_r(array_diff($expected, $actual), true)
-                . $helper->getPollerOutput($debug ? null : $module)
+                . $helper->getPollerOutput($phpunit_debug ? null : $module)
                 . "\nOS $os: Polled $module data does not match that found in $filename"
             );
         }

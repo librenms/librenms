@@ -26,7 +26,7 @@
                     "sysDescr": "HPE Comware Platform Software, Software Version 7.1.045, Release 2422P01\nHPE 5900AF-48G-4XG-2QSFP+ Switch\r\nCopyright (c) 2010-2015 Hewlett Packard Enterprise Development LP",
                     "sysContact": "<private>",
                     "version": "7.1.045",
-                    "hardware": "5900AF-48G-4XG-2QSFP+ Switch\r",
+                    "hardware": "5900AF-48G-4XG-2QSFP+ Switch",
                     "features": "2422P01",
                     "os": "comware",
                     "type": "network",

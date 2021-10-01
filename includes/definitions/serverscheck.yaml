@@ -1,6 +1,7 @@
 os: serverscheck
 text: ServersCheck
-type: network
+type: environment
+snmp_bulk: false
 discovery:
     -
         sysObjectID:

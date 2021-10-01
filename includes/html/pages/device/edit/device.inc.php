@@ -1,7 +1,6 @@
 <?php
 
 use App\Models\Device;
-use App\Models\Location;
 
 require_once 'includes/html/modal/device_maintenance.inc.php';
 
@@ -16,15 +15,12 @@ if ($_POST['editing']) {
         }
 
         $override_sysLocation = (int) isset($_POST['override_sysLocation']);
-        $override_sysLocation_string = isset($_POST['sysLocation']) ? $_POST['sysLocation'] : null;
+        $override_sysLocation_string = $_POST['sysLocation'] ?? null;
 
         if ($override_sysLocation) {
-            if ($override_sysLocation_string) {
-                $location = Location::firstOrCreate(['location' => $override_sysLocation_string]);
-                $device_model->location()->associate($location);
-            } else {
-                $device_model->location()->dissociate();
-            }
+            $device_model->override_sysLocation = false;  // allow override (will be set to actual value later)
+            $device_model->setLocation($override_sysLocation_string, true);
+            optional($device_model->location)->save();
         } elseif ($device_model->override_sysLocation) {
             // no longer overridden, clear location
             $device_model->location()->dissociate();
@@ -70,9 +66,9 @@ if ($_POST['editing']) {
             }
         }
 
-        $override_sysContact_bool = mres($_POST['override_sysContact']);
+        $override_sysContact_bool = $_POST['override_sysContact'];
         if (isset($_POST['sysContact'])) {
-            $override_sysContact_string = mres($_POST['sysContact']);
+            $override_sysContact_string = $_POST['sysContact'];
         }
 
         if ($override_sysContact_bool) {
@@ -125,7 +121,7 @@ $disable_notify = get_dev_attrib($device, 'disable_notify');
     <div class="form-group" data-toggle="tooltip" data-container="body" data-placement="bottom" title="Change the hostname used for name resolution" >
         <label for="edit-hostname-input" class="col-sm-2 control-label" >Hostname:</label>
         <div class="col-sm-6">
-            <input type="text" id="edit-hostname-input" name="hostname" class="form-control" disabled value=<?php echo display($device['hostname']); ?> />
+            <input type="text" id="edit-hostname-input" name="hostname" class="form-control" disabled value=<?php echo \LibreNMS\Util\Clean::html($device['hostname'], []); ?> />
         </div>
         <div class="col-sm-2">
             <button name="hostname-edit-button" id="hostname-edit-button" class="btn btn-danger"> <i class="fa fa-pencil"></i> </button>
@@ -140,7 +136,7 @@ $disable_notify = get_dev_attrib($device, 'disable_notify');
      <div class="form-group">
         <label for="descr" class="col-sm-2 control-label">Description:</label>
         <div class="col-sm-6">
-            <textarea id="descr" name="descr" class="form-control"><?php echo display($device_model->purpose); ?></textarea>
+            <textarea id="descr" name="descr" class="form-control"><?php echo \LibreNMS\Util\Clean::html($device_model->purpose, []); ?></textarea>
         </div>
     </div>
     <div class="form-group">
@@ -189,7 +185,7 @@ $disable_notify = get_dev_attrib($device, 'disable_notify');
                 if (! $device_model->override_sysLocation) {
                     echo ' disabled="1"';
                 }
-                ?> value="<?php echo display($device_model->location); ?>" />
+                ?> value="<?php echo \LibreNMS\Util\Clean::html($device_model->location, []); ?>" />
         </div>
     </div>
     <div class="form-group">
@@ -317,10 +313,10 @@ If `devices.ignore = 0` or `macros.device = 1` condition is is set and ignore al
 <script>
     $('[type="checkbox"]').bootstrapSwitch('offColor', 'danger');
 
-    $("#maintenance").click(function() {
+    $("#maintenance").on("click", function() {
         $("#device_maintenance_modal").modal('show');
     });
-    $("#rediscover").click(function() {
+    $("#rediscover").on("click", function() {
         var device_id = $(this).data("device_id");
         $.ajax({
             type: 'POST',
@@ -339,7 +335,7 @@ If `devices.ignore = 0` or `macros.device = 1` condition is is set and ignore al
             }
         });
     });
-    $("#reset_port_state").click(function() {
+    $("#reset_port_state").on("click", function() {
         var device_id = $(this).data("device_id");
         $.ajax({
             type: 'POST',
@@ -358,7 +354,7 @@ If `devices.ignore = 0` or `macros.device = 1` condition is is set and ignore al
             }
         });
     });
-    $('#hostname-edit-button').click(function(e) {
+    $('#hostname-edit-button').on("click", function(e) {
         e.preventDefault();
         disabled_state = document.getElementById('edit-hostname-input').disabled;
         if (disabled_state == true) {
@@ -367,10 +363,10 @@ If `devices.ignore = 0` or `macros.device = 1` condition is is set and ignore al
             document.getElementById('edit-hostname-input').disabled = true;
         }
     });
-    $('#sysLocation').keypress(function (e) {
+    $('#sysLocation').on('keypress', function (e) {
         if(e.keyCode === 13) {
             e.preventDefault();
-            $('#edit').submit();
+            $('#edit').trigger( "submit" );
         }
     });
     $('#parent_id').select2({
@@ -379,8 +375,8 @@ If `devices.ignore = 0` or `macros.device = 1` condition is is set and ignore al
 </script>
 <?php
 print_optionbar_start();
-[$sizeondisk, $numrrds] = foldersize(get_rrd_dir($device['hostname']));
-echo 'Size on Disk: <b>' . formatStorage($sizeondisk) . '</b> in <b>' . $numrrds . ' RRD files</b>.';
+[$sizeondisk, $numrrds] = foldersize(Rrd::dirFromHost($device['hostname']));
+echo 'Size on Disk: <b>' . \LibreNMS\Util\Number::formatBi($sizeondisk, 2, 3) . '</b> in <b>' . $numrrds . ' RRD files</b>.';
 echo ' | Last polled: <b>' . $device['last_polled'] . '</b>';
 if ($device['last_discovered']) {
     echo ' | Last discovered: <b>' . $device['last_discovered'] . '</b>';

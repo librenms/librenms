@@ -63,16 +63,8 @@ class AppServiceProvider extends ServiceProvider
             return auth()->check() && auth()->user()->isAdmin();
         });
 
-        Blade::directive('deviceLink', function ($arguments) {
-            return "<?php echo \LibreNMS\Util\Url::deviceLink($arguments); ?>";
-        });
-
         Blade::directive('deviceUrl', function ($arguments) {
             return "<?php echo \LibreNMS\Util\Url::deviceUrl($arguments); ?>";
-        });
-
-        Blade::directive('portLink', function ($arguments) {
-            return "<?php echo \LibreNMS\Util\Url::portLink($arguments); ?>";
         });
     }
 
@@ -143,20 +135,33 @@ class AppServiceProvider extends ServiceProvider
             $ip = substr($value, 0, strpos($value, '/') ?: strlen($value)); // allow prefixes too
 
             return IP::isValid($ip) || Validate::hostname($value);
-        }, __('The :attribute must a valid IP address/network or hostname.'));
+        });
 
         Validator::extend('is_regex', function ($attribute, $value) {
-            return @preg_match($value, null) !== false;
-        }, __(':attribute is not a valid regular expression'));
+            return @preg_match($value, '') !== false;
+        });
+
+        Validator::extend('keys_in', function ($attribute, $value, $parameters, $validator) {
+            $extra_keys = is_array($value) ? array_diff(array_keys($value), $parameters) : [];
+
+            $validator->addReplacer('keys_in', function ($message, $attribute, $rule, $parameters) use ($extra_keys) {
+                return str_replace(
+                    [':extra', ':values'],
+                    [implode(',', $extra_keys), implode(',', $parameters)],
+                    $message);
+            });
+
+            return is_array($value) && empty($extra_keys);
+        });
 
         Validator::extend('zero_or_exists', function ($attribute, $value, $parameters, $validator) {
-            if ($value === 0) {
+            if ($value === 0 || $value === '0') {
                 return true;
             }
 
             $validator = Validator::make([$attribute => $value], [$attribute => 'exists:' . implode(',', $parameters)]);
 
             return $validator->passes();
-        }, __('validation.exists'));
+        }, trans('validation.exists'));
     }
 }

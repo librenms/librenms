@@ -18,6 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2015 Aaron Daniels <aaron@daniels.id.au>
  * @author     Aaron Daniels <aaron@daniels.id.au>
  */
@@ -48,7 +49,7 @@ class Component
     public function getComponentCount($device_id = null)
     {
         $counts = \App\Models\Component::query()->when($device_id, function ($query, $device_id) {
-            $query->where('device_id', $device_id);
+            return $query->where('device_id', $device_id);
         })->selectRaw('type, count(*) as count')->groupBy('type')->pluck('count', 'type');
 
         return $counts->isEmpty() ? false : $counts->all();
@@ -220,7 +221,7 @@ class Component
         \App\Models\Component::whereIn('id', array_keys($updated))
             ->with('prefs')
             ->get()
-            ->each(function (\App\Models\Component $component) use ($updated) {
+            ->each(function (\App\Models\Component $component) use ($device_id, $updated) {
                 $update = $updated[$component->id];
                 unset($update['type']);  // can't change type
 
@@ -256,7 +257,7 @@ class Component
                         $invalid->forget($existing->id);
                         $existing->fill(['value' => $value]);
                         if ($existing->isDirty()) {
-                            Log::event("Component: $component->type($component->id). Attribute: $attribute, was modified from: " . $existing->getOriginal('value') . ", to: $value", $device_id, 'component', 3, $component_id);
+                            Log::event("Component: $component->type($component->id). Attribute: $attribute, was modified from: " . $existing->getOriginal('value') . ", to: $value", $device_id, 'component', 3, $component->id);
                             $existing->save();
                         }
                     } else {
@@ -278,8 +279,8 @@ class Component
      * Get the component id for the first component in the array
      * Only set $device_id if using the array from getCompenents(), which is keyed by device_id
      *
-     * @param array $component_array
-     * @param int $device_id
+     * @param  array  $component_array
+     * @param  int  $device_id
      * @return int the component id
      */
     public function getFirstComponentID($component_array, $device_id = null)

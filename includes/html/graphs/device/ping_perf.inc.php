@@ -18,7 +18,7 @@ $scale_min = '0';
 
 require 'includes/html/graphs/common.inc.php';
 
-$rrd_filename = rrd_name($device['hostname'], 'ping-perf');
+$rrd_filename = Rrd::name($device['hostname'], 'ping-perf');
 
 $rrd_options .= ' DEF:ping=' . $rrd_filename . ':ping:AVERAGE';
 $rrd_options .= " 'COMMENT:Milliseconds      Cur      Min     Max     Avg\\n'";

@@ -1,8 +1,8 @@
 -- ============================================================================
--- Copyright (C) 2016 by  HUAWEI TECHNOLOGIES. All rights reserved.
+-- Copyright (C) 2019 by  HUAWEI TECHNOLOGIES. All rights reserved.
 -- Description: The mib is used for WIDS.
 -- Reference: 
--- Version: V1.11
+-- Version: V1.16
 -- ============================================================================
 -- Module definition
 
@@ -22,7 +22,7 @@
 				FROM SNMPv2-TC;
 		--1.3.6.1.4.1.2011.6.139.15
 		hwWlanWidsService MODULE-IDENTITY
-			LAST-UPDATED "201606271543Z"		-- June 27, 2016 at 15:43 GMT
+			LAST-UPDATED "201904101256Z"		-- Apr 10, 2019 at 12:56 GMT
 			ORGANIZATION 
 				"Huawei Technologies Co.,Ltd."
 			CONTACT-INFO 
@@ -34,8 +34,23 @@
 				   Email: support@huawei.com
 				  "
 			DESCRIPTION 
+				"V1.16, Add hwWlanWidsDetDevStaNum"
+			REVISION "201904101256Z"		-- Apr 10, 2019 at 12:56 GMT 
+                                                          DESCRIPTION 
+				"V1.15, Add hwWlanWidsApDetDevContainReason,hwWlanWidsDetDevContainReason "
+			REVISION "201805092018Z"		-- May 9, 2018 at 20:18 GMT      				  
+			DESCRIPTION 
+				"V1.14, Add hwWlanWidsRogueDeviceTrap, hwWlanWidsAttackDeviceTrap, hwWlanWidsNonWifiDeviceTrap"
+			REVISION "201802262018Z"		-- Feb 26, 2018 at 20:18 GMT      				  
+			DESCRIPTION 
+				"V1.13, Modify hwWlanWidsApDetDevRogueFlag"
+			REVISION "201712071418Z"		-- Dec 7, 2017 at 14:18 GMT      				  
+			DESCRIPTION 
+				"V1.12, Add hwWlanWidsDetDevInterferenceBridgeCount, hwWlanWidsDetDevInterferenceClientCount"
+			REVISION "201709081417Z"		-- Sep 8, 2017 at 14:18 GMT      		
+			DESCRIPTION 
 				"V1.11, Add hwWlanWidsDetDevStatisticsTable."
-			REVISION "201606271543Z"		-- June 27, 2016 at 15:43 GMT      		
+			REVISION "201606271543Z"		-- June 27, 2016 at 15:43 GMT      					
 			DESCRIPTION 
 				"V1.10, Add hwWlanWidsDynamicBlacklistLeftAgeTime, hwWlanWidsDynamicBlacklistBlockTime nodes."
 			REVISION "201606011030Z"		-- June 1, 2016 at 10:30 GMT                                                                
@@ -105,7 +120,7 @@
 			OBJECTS { hwWlanWidsObjRogueDevMAC, hwWlanWidsObjRogueDevType, hwWlanWidsObjRogueDevChannel, hwWlanWidsObjRogueDevRSSI, hwWlanWidsObjRogueDevSSID, 
 				hwWlanWidsObjDetAPName, hwWlanWidsObjDetAPMAC, hwWlanWidsObjDetRadioId, hwWlanWidsObjDetAPID
 				 }
-			STATUS current
+			STATUS obsolete
 			DESCRIPTION 
 				"This object indicates the rogue device alarm."
 			::= { hwWlanWidsTrap 1 }
@@ -116,7 +131,7 @@
 			OBJECTS { hwWlanWidsObjRogueDevMAC, hwWlanWidsObjRogueDevType, hwWlanWidsObjRogueDevChannel, hwWlanWidsObjRogueDevRSSI, hwWlanWidsObjRogueDevSSID, 
 				hwWlanWidsObjDetAPName, hwWlanWidsObjDetAPMAC, hwWlanWidsObjDetRadioId, hwWlanWidsObjDetAPID
 				 }
-			STATUS current
+			STATUS obsolete
 			DESCRIPTION 
 				"This object indicates the rogue device clear alarm."
 			::= { hwWlanWidsTrap 2 }
@@ -126,7 +141,7 @@
 		hwWlanWidsNonWifiDetTrap NOTIFICATION-TYPE
 			OBJECTS { hwWlanWidsObjDetAPMAC, hwWlanWidsObjDetAPName, hwWlanWidsObjDetRadioId, hwWlanWidsObjDetRadioType, hwWlanWidsObjNonWifiDeviceType, 
 				hwWlanWidsObjNonWifiRssi, hwWlanWidsObjNonWifiInterChannel, hwWlanWidsObjDetAPID }
-			STATUS current
+			STATUS obsolete
 			DESCRIPTION 
 				"This object indicates the non-Wi-Fi device alarm."
 			::= { hwWlanWidsTrap 3 }
@@ -136,7 +151,7 @@
 		hwWlanWidsNonWifiClearTrap NOTIFICATION-TYPE
 			OBJECTS { hwWlanWidsObjDetAPMAC, hwWlanWidsObjDetAPName, hwWlanWidsObjDetRadioId, hwWlanWidsObjDetRadioType, hwWlanWidsObjNonWifiDeviceType, 
 				hwWlanWidsObjNonWifiRssi, hwWlanWidsObjNonWifiInterChannel, hwWlanWidsObjDetAPID }
-			STATUS current
+			STATUS obsolete
 			DESCRIPTION 
 				"This object indicates the non-Wi-Fi device clear alarm."
 			::= { hwWlanWidsTrap 4 }
@@ -146,7 +161,7 @@
 		hwWlanWidsFloodAttackDetectedTrap NOTIFICATION-TYPE
 			OBJECTS { hwWlanWidsObjDetAPMAC, hwWlanWidsObjAttackDevMAC, hwWlanWidsObjDetAPChannel, hwWlanWidsObjAttackType, hwWlanWidsObjAttackTypeStr
 				 }
-			STATUS current
+			STATUS obsolete
 			DESCRIPTION 
 				"This object indicates the flood attack alarm."
 			::= { hwWlanWidsTrap 5 }
@@ -156,7 +171,7 @@
 		hwWlanWidsFloodAttackClearTrap NOTIFICATION-TYPE
 			OBJECTS { hwWlanWidsObjDetAPMAC, hwWlanWidsObjAttackDevMAC, hwWlanWidsObjDetAPChannel, hwWlanWidsObjAttackType, hwWlanWidsObjAttackTypeStr
 				 }
-			STATUS current
+			STATUS obsolete
 			DESCRIPTION 
 				"This object indicates the flood attack clear alarm."
 			::= { hwWlanWidsTrap 6 }
@@ -166,7 +181,7 @@
 		hwWlanWidsSpoofAttackDetectedTrap NOTIFICATION-TYPE
 			OBJECTS { hwWlanWidsObjDetAPMAC, hwWlanWidsObjAttackDevMAC, hwWlanWidsObjDetAPChannel, hwWlanWidsObjAttackType, hwWlanWidsObjAttackTypeStr
 				 }
-			STATUS current
+			STATUS obsolete
 			DESCRIPTION 
 				"This object indicates the spoofing attack alarm."
 			::= { hwWlanWidsTrap 7 }
@@ -176,7 +191,7 @@
 		hwWlanWidsSpoofAttackClearTrap NOTIFICATION-TYPE
 			OBJECTS { hwWlanWidsObjDetAPMAC, hwWlanWidsObjAttackDevMAC, hwWlanWidsObjDetAPChannel, hwWlanWidsObjAttackType, hwWlanWidsObjAttackTypeStr
 				 }
-			STATUS current
+			STATUS obsolete
 			DESCRIPTION 
 				"This object indicates the spoofing attack clear alarm."
 			::= { hwWlanWidsTrap 8 }
@@ -186,7 +201,7 @@
 		hwWlanWidsWeakIvAttackDetectedTrap NOTIFICATION-TYPE
 			OBJECTS { hwWlanWidsObjDetAPChannel, hwWlanWidsObjAttackType, hwWlanWidsObjAttackTypeStr, hwWlanWidsObjDetAPMAC, hwWlanWidsObjAttackDevMAC
 				 }
-			STATUS current
+			STATUS obsolete
 			DESCRIPTION 
 				"This object indicates the weak IV attack alarm."
 			::= { hwWlanWidsTrap 9 }
@@ -196,7 +211,7 @@
 		hwWlanWidsWeakIvAttackClearTrap NOTIFICATION-TYPE
 			OBJECTS { hwWlanWidsObjDetAPChannel, hwWlanWidsObjAttackType, hwWlanWidsObjAttackTypeStr, hwWlanWidsObjDetAPMAC, hwWlanWidsObjAttackDevMAC
 				 }
-			STATUS current
+			STATUS obsolete
 			DESCRIPTION 
 				"This object indicates the weak IV attack clear alarm."
 			::= { hwWlanWidsTrap 10 }
@@ -206,7 +221,7 @@
 		hwWlanWidsPSKAttackDetectedTrap NOTIFICATION-TYPE
 			OBJECTS { hwWlanWidsObjAttackTypeStr, hwWlanWidsObjAttackType, hwWlanWidsObjDetAPChannel, hwWlanWidsObjAttackDevMAC, hwWlanWidsObjDetAPMAC
 				 }
-			STATUS current
+			STATUS obsolete
 			DESCRIPTION 
 				"This object indicates the brute-force PSK attack alarm."
 			::= { hwWlanWidsTrap 11 }
@@ -216,10 +231,38 @@
 		hwWlanWidsPSKAttackClearTrap NOTIFICATION-TYPE
 			OBJECTS { hwWlanWidsObjAttackTypeStr, hwWlanWidsObjAttackType, hwWlanWidsObjDetAPChannel, hwWlanWidsObjAttackDevMAC, hwWlanWidsObjDetAPMAC
 				 }
-			STATUS current
+			STATUS obsolete
 			DESCRIPTION 
 				"This object indicates the brute-force PSK attack clear alarm."
 			::= { hwWlanWidsTrap 12 }
+
+		
+		-- 1.3.6.1.4.1.2011.6.139.15.1.1.13
+		hwWlanWidsRogueDeviceTrap NOTIFICATION-TYPE
+			OBJECTS { hwWlanWidsObjDeviceCount }
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the rogue device alarm."
+			::= { hwWlanWidsTrap 13 }
+
+		
+		-- 1.3.6.1.4.1.2011.6.139.15.1.1.14
+		hwWlanWidsAttackDeviceTrap NOTIFICATION-TYPE
+			OBJECTS { hwWlanWidsObjDeviceCount }
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the attack device alarm."
+			::= { hwWlanWidsTrap 14 }
+
+		
+		-- 1.3.6.1.4.1.2011.6.139.15.1.1.15
+		hwWlanWidsNonWifiDeviceTrap NOTIFICATION-TYPE
+			OBJECTS { hwWlanWidsObjDeviceCount }
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the non-Wi-Fi device alarm."
+			::= { hwWlanWidsTrap 15 }
+
 		
 -- 1.3.6.1.4.1.2011.6.139.15.1.2
 		-- 1.3.6.1.4.1.2011.6.139.15.1.2
@@ -404,6 +447,17 @@
 			DESCRIPTION
 				"Character string description of the attack device type (OCTET STRING)."
 			::= { hwWlanWidsTrapObjects 18 }
+
+		
+		-- 1.3.6.1.4.1.2011.6.139.15.1.2.19
+		hwWlanWidsObjDeviceCount OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Count of the specified device."
+			::= { hwWlanWidsTrapObjects 19 }
+
 		
 -- 1.3.6.1.4.1.2011.6.139.15.2
 		-- 1.3.6.1.4.1.2011.6.139.15.2
@@ -414,7 +468,7 @@
 		hwWlanWidsResetDetDevTableAll OBJECT-TYPE
 			SYNTAX Unsigned32
 			MAX-ACCESS read-write
-			STATUS current
+			STATUS obsolete
 			DESCRIPTION
 				"This object indicates that all devices are deleted."
 			::= { hwWlanWidsGloablOper 1 }
@@ -430,7 +484,7 @@
 				client(4)
 				}
 			MAX-ACCESS read-write
-			STATUS current
+			STATUS obsolete
 			DESCRIPTION
 				"This object indicates that entries are deleted based on device types."
 			::= { hwWlanWidsGloablOper 2 }
@@ -557,7 +611,11 @@
 				hwWlanWidsDetDevFirstDetTime
 					Unsigned32,
 				hwWlanWidsDetDevAuthenMethod
-					INTEGER
+					INTEGER,
+				hwWlanWidsDetDevContainReason
+					INTEGER,
+				hwWlanWidsDetDevStaNum
+					Unsigned32
 			 }
 
 -- 1.3.6.1.4.1.2011.6.139.15.3.1.1
@@ -622,7 +680,8 @@
 			SYNTAX INTEGER
 				{
 				legal(1),
-				illegal(2)
+				illegal(2),
+				interference(3)
 				}
 			MAX-ACCESS read-only
 			STATUS current
@@ -707,6 +766,34 @@
 				"This object indicates the authentication of the detected device."
 			::= { hwWlanWidsDetDevEntry 12 }
 		
+		-- 1.3.6.1.4.1.2011.6.139.15.3.1.13
+		hwWlanWidsDetDevContainReason OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				notContain(1),
+				adhoc(2),
+				rougeClient(3),
+				protectClient(4),
+				openEncrypt(5),
+				spoofAp(6),
+				manual(7)
+				}
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { hwWlanWidsDetDevEntry 13 }
+
+
+		-- 1.3.6.1.4.1.2011.6.139.15.3.1.14
+	                   hwWlanWidsDetDevStaNum OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the sta num of the detected device."
+			::= { hwWlanWidsDetDevEntry 14 }		
+--  1.3.6.1.4.1.2011.6.139.15.4
 -- 1.3.6.1.4.1.2011.6.139.15.4
 		-- 1.3.6.1.4.1.2011.6.139.15.4
 		hwWlanWidsRogueHistoryTable OBJECT-TYPE
@@ -2396,7 +2483,9 @@
 				hwWlanWidsApDetDevContainFlag
 					INTEGER,
 				hwWlanWidsApDetDevBSSID
-					MacAddress
+					MacAddress,
+				hwWlanWidsApDetDevContainReason
+					INTEGER
 			 }
 
 		-- 1.3.6.1.4.1.2011.6.139.15.9.6.1.1
@@ -2480,7 +2569,8 @@
 			SYNTAX INTEGER
 				{
 				legal(1),
-				illegal(2)
+				illegal(2),
+				interference(3)
 				}
 			MAX-ACCESS read-only
 			STATUS current
@@ -2522,6 +2612,24 @@
 				"This object indicates the BSSID of the detected device."
 			::= { hwWlanWidsApDetDevEntry 11 }
 
+		
+		-- 1.3.6.1.4.1.2011.6.139.15.9.6.1.12
+		hwWlanWidsApDetDevContainReason OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				notContain(1),
+				adhoc(2),
+				rougeClient(3),
+				protectClient(4),
+				openEncrypt(5),
+				spoofAp(6),
+				manual(7)
+				}
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { hwWlanWidsApDetDevEntry 12 }
 
 		-- 1.3.6.1.4.1.2011.6.139.15.9.7
 		hwWlanWidsDetDevStatisticsTable OBJECT IDENTIFIER ::= { hwWlanWidsSrvObjects 7 }
@@ -2635,6 +2743,24 @@
 				"Counting."
 			::= { hwWlanWidsDetDevStatisticsTable 11 }
 
+		-- 1.3.6.1.4.1.2011.6.139.15.9.12
+		hwWlanWidsDetDevInterferenceBridgeCount OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Counting."
+			::= { hwWlanWidsDetDevStatisticsTable 12 }
+
+		-- 1.3.6.1.4.1.2011.6.139.15.9.13
+		hwWlanWidsDetDevInterferenceClientCount OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Counting."
+			::= { hwWlanWidsDetDevStatisticsTable 13 }
+
 
 			
 -- 1.3.6.1.4.1.2011.6.139.15.10
@@ -2698,7 +2824,7 @@
 		hwWlanWidsDetDevGroup OBJECT-GROUP
 			OBJECTS { hwWlanWidsDetDevType, hwWlanWidsDetDevRssi, hwWlanWidsDetDevChannel, hwWlanWidsDetDevSSID, 
 				hwWlanWidsDetDevRogue, hwWlanWidsDetDevLastTime, hwWlanWidsDetDevIsContained, hwWlanWidsDetDevInterference, hwWlanWidsDetDevBSSID, 
-			hwWlanWidsDetDevFirstDetTime, hwWlanWidsDetDevAuthenMethod, hwWlanWidsDetDevMonitorApName, 
+			hwWlanWidsDetDevFirstDetTime,hwWlanWidsDetDevAuthenMethod,hwWlanWidsDetDevContainReason,  hwWlanWidsDetDevStaNum, hwWlanWidsDetDevMonitorApName, 
 				hwWlanWidsDetDevMonitorApIP, hwWlanWidsDetDevMonitorApChannel, hwWlanWidsDetDevMonitorApRssi, hwWlanWidsDetDevMonitorApLastDetTime, hwWlanWidsDetDevMonitorApCountermeasuresDev, 
 				hwWlanWidsDetDevMonitorDetAtt, hwWlanWidsDetDevMonitorApId }
 			STATUS current
@@ -2733,8 +2859,8 @@
 		hwWlanWidsAttackDetectGroup OBJECT-GROUP
 			OBJECTS { hwWlanWidsAttackHistoryDevMac, hwWlanWidsAttackHistoryDevType, hwWlanWidsAttackHistoryRssi, 
 				hwWlanWidsAttackHistoryChannel, hwWlanWidsAttackHistoryAttackType, hwWlanWidsAttackHistoryPacketBmp1, hwWlanWidsAttackHistoryPacketBmp2, hwWlanWidsAttackHistorySSID, 
-				hwWlanWidsAttackHistoryDetTime, hwWlanWidsAttackHistoryDetectorApName, hwWlanWidsAttackDevChannel, hwWlanWidsAttackDevRssi, 
-				hwWlanWidsAttackDevLastAttType, hwWlanWidsAttackDevLastPacketBmp, hwWlanWidsAttackDevLastDetTime,  
+			hwWlanWidsAttackHistoryDetTime, hwWlanWidsAttackHistoryDetectorApName, hwWlanWidsAttackDevChannel, hwWlanWidsAttackDevRssi, 
+			hwWlanWidsAttackDevLastAttType, hwWlanWidsAttackDevLastPacketBmp, hwWlanWidsAttackDevLastDetTime,  
 				hwWlanWidsAttackDetorApName, hwWlanWidsAttackDetorAttTypeBmp, hwWlanWidsAttackDetorPacketBmpFlood, hwWlanWidsAttackDetorPacketBmpSpoof, hwWlanWidsAttackDetorFirstDetTimeFlood, 
 				hwWlanWidsAttackDetorFirstDetTimeSpoof, hwWlanWidsAttackDetorFirstDetTimeWeakIv, hwWlanWidsAttackDetorFirstDetTimeWep, hwWlanWidsAttackDetorFirstDetTimeWpa, hwWlanWidsAttackDetorFirstDetTimeWpa2, 
 				hwWlanWidsAttackDetorFirstDetTimeWapi, hwWlanWidsAttackDetorRSSI, hwWlanWidsAttackDetorChannel, hwWlanWidsAttackDetorLastDetTime, hwWlanWidsApDetDevType, 
@@ -2786,3 +2912,9 @@
 --
 -- HUAWEI-WLAN-WIDS-SERVICE-MIB.mib
 --
+
+
+
+
+
+

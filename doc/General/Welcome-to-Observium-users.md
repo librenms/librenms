@@ -62,5 +62,5 @@ Reasons why you might want to use LibreNMS instead of Observium:
 "Contribution guidelines"
 [9]: https://community.librenms.org
 "LibreNMS issue database at GitHub"
-[10]: https://vlan50.com/2015/04/17/migrating-from-observium-to-librenms/
+[10]: ../Installation/Migrating-from-Observium.md
 "Migrating from Observium to LibreNMS"

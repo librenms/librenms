@@ -9,9 +9,9 @@ $colour_line = 'B3D0DB';
 $colour_area_max = 'FFEE99';
 $graph_max = 100;
 $unit_text = 'Latency';
-$powerdns_rrd = rrd_name($device['hostname'], ['app', 'powerdns', $app['app_id']]);
+$powerdns_rrd = Rrd::name($device['hostname'], ['app', 'powerdns', $app['app_id']]);
 
-if (rrdtool_check_rrd_exists($powerdns_rrd)) {
+if (Rrd::checkRrdExists($powerdns_rrd)) {
     $rrd_filename = $powerdns_rrd;
 }
 

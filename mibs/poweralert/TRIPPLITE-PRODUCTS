@@ -25,12 +25,12 @@
 -- 04/03/2017 Refactored Cooling section
 -- 04/19/2017 Refactored tlpAtsConfigVoltageRangeTable
 -- 05/23/2017 Added more objects to Cooling section
--- 07/31/2017 Added tlpPduConfigPhaseThresholdTable,tlpAtsConfigPhaseThresholdTable 
+-- 07/31/2017 Added tlpPduConfigPhaseThresholdTable,tlpAtsConfigPhaseThresholdTable
 ---           and new alarms to support "Output Current Below Threshold" events
--- 08/30/2017 Updated the description of tlpPduIdentNumBreakers and tlpAtsIdentNumBreakers 
+-- 08/30/2017 Updated the description of tlpPduIdentNumBreakers and tlpAtsIdentNumBreakers
 -- 09/28/2017 Added tlpCoolingCompressorStatus
 -- 11/30/2017 Added tlpAtsOutputFrequency and tlpPduOutputFrequency
--- 01/15/2018 Updated/Corrected some descriptions and typos 
+-- 01/15/2018 Updated/Corrected some descriptions and typos
 -- 03/19/2018 Added tlpCoolingWaterStatus
 -- 04/25/2018 Obsoleted tlpAgentSnmpContactPrivPassword and tlpAgentSnmpContactAuthPassword
 -- 04/30/2018 Added tlpUpsOutputVARating
@@ -38,10 +38,10 @@
 -- 05/10/2018 Updated the UNIT definition of tlpUpsDeviceTemperatureF, tlpUpsDeviceTemperatureC,
 --            tlpPduInputLowTransferVoltageLowerBound, tlpPduInputLowTransferVoltageUpperBound,
 --            tlpPduInputHighTransferVoltageLowerBound and tlpPduInputHighTransferVoltageUpperBound
--- 07/17/2018 Added tlpPduOutputCalculatedPowerKVA, tlpPduOutputCalculatedPowerKW tlpPduOutputCalculated24hrEnergy, 
+-- 07/17/2018 Added tlpPduOutputCalculatedPowerKVA, tlpPduOutputCalculatedPowerKW tlpPduOutputCalculated24hrEnergy,
 --            tlpAtsOutputCalculatedPowerKVA, tlpAtsOutputCalculatedPowerKW and tlpAtsOutputCalculated24hrEnergy
--- 01/17/2019 Added tlpDeviceIdentFirmwareVersion2, tlpDeviceIdentFirmwareVersion3, tlpUpsDeviceLastACFailureReason, 
---            tlpUpsDeviceLastShutdownReason, tlpUpsIdentNumFans, tlpUpsFanTable, tlpUpsInputWattHours, 
+-- 01/17/2019 Added tlpDeviceIdentFirmwareVersion2, tlpDeviceIdentFirmwareVersion3, tlpUpsDeviceLastACFailureReason,
+--            tlpUpsDeviceLastShutdownReason, tlpUpsIdentNumFans, tlpUpsFanTable, tlpUpsInputWattHours,
 --            tlpUpsControlResetWattHours, tlpDeviceIdentNvrID, Added more notification to support new device events
 -- 05/06/2019 Added tlpUpsDeviceOutputCurrentPrecision
 --            Updated the UNITS to "0.01 Amps" for tlpUpsOutputLineCurrent
@@ -52,6 +52,14 @@
 --            tlpNotificationsUpsTransferToFaultBypass, tlpNotificationsUpsBypassPowerDistributionModuleDisconnected,
 --            tlpNotificationsUpsManualBypassActivatedFromUnsupportedMode, tlpNotificationsUpsOnBatteryTimeoutShutdown,
 --            tlpNotificationsUpsLowBatteryPercentageShutdown
+-- 09/17/2019 Added tlpUpsIdentNumHeatsinks, tlpUpsIdentNumOutputContacts,tlpUpsIdentNumInputContacts,
+--            tlpUpsOutputLineApparentPower, tlpUpsControlCancelSelfTest,  tlpUpsControlResetAllParameters,
+--            tlpUpsConfigLineQualifyTime, tlpUpsConfigACPowerSenseType, tlpUpsOutputPowerFactor, tlpUpsBatteryTotalMinutesOnBattery
+--            Added Tables: tlpUpsHeatsinkTable, tlpUpsOutputContactTable, tlpUpsInputContactTable, tlpUpsConfigVoltageTable.
+--            tlpUpsConfigContactTable, tlpUpsConfigOutputContactTable, tlpUpsConfigInputContactTable.
+--            Added more alarms to tlpAlarmsWellKnown section
+--            Added 'testing' to tlpUpsOutputSource
+--            Added UNITS and updated the description of tlpDeviceIdentCurrentUptime and tlpDeviceIdentTotalUptime
 ---------------
 
 TRIPPLITE-PRODUCTS DEFINITIONS ::= BEGIN
@@ -82,7 +90,7 @@ IMPORTS
     FROM TRIPPLITE;
 
 tlpProducts MODULE-IDENTITY
-  LAST-UPDATED "201906180930Z"
+  LAST-UPDATED "201909270930Z"
   ORGANIZATION "Tripp Lite"
   CONTACT-INFO
     "Software Engineering
@@ -93,6 +101,16 @@ tlpProducts MODULE-IDENTITY
     "This MIB module defines MIB objects which provide mechanisms for
     remote management capabilities of Tripp Lite PowerAlert and related
     software."
+  REVISION "201909270930Z"
+  DESCRIPTION
+    "Added tlpUpsIdentNumHeatsinks, tlpUpsIdentNumOutputContacts,tlpUpsIdentNumInputContacts,
+    tlpUpsOutputLineApparentPower, tlpUpsControlCancelSelfTest,  tlpUpsControlResetAllParameters,
+    tlpUpsConfigLineQualifyTime, tlpUpsConfigACPowerSenseType, tlpUpsOutputPowerFactor,
+    Added Tables: tlpUpsHeatsinkTable, tlpUpsOutputContactTable, tlpUpsInputContactTable, tlpUpsConfigVoltageTable.
+    tlpUpsConfigContactTable, tlpUpsConfigOutputContactTable,  tlpUpsConfigInputContactTable.
+    Added more alarm entries to tlpAlarmsWellKnown section
+	Added 'testing' to tlpUpsOutputSource
+	Added UNITS and updated the description of tlpDeviceIdentCurrentUptime and tlpDeviceIdentTotalUptime"
   REVISION "201906180930Z"
   DESCRIPTION
     "Added tlpNotificationsDeviceUnhandledFault, tlpNotificationsUpsLineConnectRelayFaultShutdown,
@@ -109,13 +127,13 @@ tlpProducts MODULE-IDENTITY
     tlpPduOutputCurrentMax, tlpAtsOutputCurrent, tlpAtsOutputCurrentMin and tlpAtsOutputCurrentMax"
   REVISION "201901171030Z"
   DESCRIPTION
-      "Added tlpDeviceIdentFirmwareVersion2, tlpDeviceIdentFirmwareVersion3, tlpUpsDeviceLastACFailureReason, 
-       tlpUpsDeviceLastShutdownReason, tlpUpsIdentNumFans, tlpUpsFanTable, tlpUpsInputWattHours, 
-       tlpUpsControlResetWattHours, tlpDeviceIdentNvrID. Added more notification to support new device events" 
+      "Added tlpDeviceIdentFirmwareVersion2, tlpDeviceIdentFirmwareVersion3, tlpUpsDeviceLastACFailureReason,
+       tlpUpsDeviceLastShutdownReason, tlpUpsIdentNumFans, tlpUpsFanTable, tlpUpsInputWattHours,
+       tlpUpsControlResetWattHours, tlpDeviceIdentNvrID. Added more notification to support new device events"
   REVISION "201807131430Z"
-  DESCRIPTION 
+  DESCRIPTION
       "Added tlpPduOutputCalculatedPowerKVA, tlpPduOutputCalculatedPowerKW, tlpPduOutputCalculated24hrEnergy,
-	  tlpAtsOutputCalculatedPowerKVA, tlpAtsOutputCalculatedPowerKW and tlpAtsOutputCalculated24hrEnergy"  
+	  tlpAtsOutputCalculatedPowerKVA, tlpAtsOutputCalculatedPowerKW and tlpAtsOutputCalculated24hrEnergy"
   REVISION "201805101430Z"
   DESCRIPTION
       "Updated the UNIT definition of tlpUpsDeviceTemperatureF, tlpUpsDeviceTemperatureC,
@@ -128,37 +146,37 @@ tlpProducts MODULE-IDENTITY
   DESCRIPTION
      "Added tlpUpsOutputVARating"
   REVISION "201804251330Z"
-  DESCRIPTION  
+  DESCRIPTION
      "Obsoleted tlpAgentSnmpContactPrivPassword and tlpAgentSnmpContactAuthPassword"
   REVISION "201803190730Z"
-  DESCRIPTION  
+  DESCRIPTION
      "Added tlpCoolingWaterStatus"
   REVISION "201801151130Z"
   DESCRIPTION
 	"Updated/Corrected some descriptions and typos"
   REVISION "201712291330Z"
   DESCRIPTION
-      "Updated the output current OIDs description with regards to precision" 
+      "Updated the output current OIDs description with regards to precision"
   REVISION "201711301130Z"
   DESCRIPTION
-     "Added tlpAtsOutputFrequency and tlpPduOutputFrequency" 	
+     "Added tlpAtsOutputFrequency and tlpPduOutputFrequency"
   REVISION "201709290800Z"
   DESCRIPTION
-     "Added tlpCoolingCompressorStatus"     
+     "Added tlpCoolingCompressorStatus"
   REVISION "201708300900Z"
   DESCRIPTION
-     "Updated the description of tlpPduIdentNumBreakers and tlpAtsIdentNumBreakers"   
+     "Updated the description of tlpPduIdentNumBreakers and tlpAtsIdentNumBreakers"
   REVISION "201707310900Z"
   DESCRIPTION
-	"Added tlpPduConfigThresholdTable and new alarms to support Output Current Below Threshold events"  
+	"Added tlpPduConfigThresholdTable and new alarms to support Output Current Below Threshold events"
   REVISION "201705231423Z"
   DESCRIPTION
     "Added more objects to Cooling section"
   REVISION "201704192230Z"
-  DESCRIPTION	
+  DESCRIPTION
     "Refactored tlpAtsConfigVoltageRangeTable"
   REVISION "201704031533Z"
-  DESCRIPTION	
+  DESCRIPTION
     "Refactored Cooling section"
   REVISION "201702281600Z"
   DESCRIPTION
@@ -207,7 +225,7 @@ tlpProducts MODULE-IDENTITY
   REVISION "201404140900Z"
   DESCRIPTION
     "Consolidated and Released for PAL v12.07.007x"
-  
+
   ::= { tripplite 1 }
 
 -- tlpProducts                 OBJECT IDENTIFIER   ::= { tripplite 1 }
@@ -243,6 +261,11 @@ tlpUpsBypass                OBJECT IDENTIFIER   ::= { tlpUpsDetail 4 }
 tlpUpsOutlet                OBJECT IDENTIFIER   ::= { tlpUpsDetail 5 }
 tlpUpsWatchdog              OBJECT IDENTIFIER   ::= { tlpUpsDetail 6 }
 tlpUpsFan                   OBJECT IDENTIFIER   ::= { tlpUpsDetail 7 }
+tlpUpsHeatsink              OBJECT IDENTIFIER   ::= { tlpUpsDetail 8 }
+tlpUpsContact               OBJECT IDENTIFIER   ::= { tlpUpsDetail 9 }
+
+tlpUpsInputContact          OBJECT IDENTIFIER   ::= { tlpUpsContact 1 }
+tlpUpsOutputContact         OBJECT IDENTIFIER   ::= { tlpUpsContact 2 }
 
 tlpPduIdent                 OBJECT IDENTIFIER   ::= { tlpPdu 1 }
 tlpPduDevice                OBJECT IDENTIFIER   ::= { tlpPdu 2 }
@@ -560,23 +583,21 @@ tlpDeviceIdentHardwareVersion OBJECT-TYPE
 
 tlpDeviceIdentCurrentUptime OBJECT-TYPE
     SYNTAX DisplayString
+    UNITS "hours"
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION
-        "The device uptime since its last startup. The format of this value is a comma-
-        delimited string representing days, hours and minutes. For example, the value of
-        123,4,5 represents 123 days, 4 hours and 5 minutes. This value will return
+        "The device uptime since its last startup. This value will return
         ERROR_NO_SUCH_NAME if not supported by the device."
     ::= { tlpDeviceIdentEntry 8 }
 
 tlpDeviceIdentTotalUptime OBJECT-TYPE
     SYNTAX DisplayString
+    UNITS "days"
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION
-        "The cumulative (total) uptime for the device. The format of this value is a comma-
-        delimited string representing days, hours and minutes. For example, the value of
-        123,4,5 represents 123 days, 4 hours and 5 minutes. This value will return
+        "The cumulative (total) uptime for the device. This value will return
         ERROR_NO_SUCH_NAME if not supported by the device."
     ::= { tlpDeviceIdentEntry 9 }
 
@@ -585,7 +606,7 @@ tlpDeviceIdentFirmwareVersion2 OBJECT-TYPE
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION
-        "The firmware version of second IC on the device. This value will return 
+        "The firmware version of second IC on the device. This value will return
 		ERROR_NO_SUCH_NAME if not supported by the device."
     ::= { tlpDeviceIdentEntry 10 }
 
@@ -594,7 +615,7 @@ tlpDeviceIdentFirmwareVersion3 OBJECT-TYPE
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION
-        "The firmware version of third IC on the device. This value will return 
+        "The firmware version of third IC on the device. This value will return
 		ERROR_NO_SUCH_NAME if not supported by the device."
     ::= { tlpDeviceIdentEntry 11 }
 
@@ -643,7 +664,10 @@ TlpUpsIdentEntry ::= SEQUENCE {
     tlpUpsIdentNumOutlets               Unsigned32,
     tlpUpsIdentNumOutletGroups          Unsigned32,
     tlpUpsIdentNumBatteryPacks          Unsigned32,
-    tlpUpsIdentNumFans                  Unsigned32 }
+    tlpUpsIdentNumFans                  Unsigned32,
+    tlpUpsIdentNumHeatsinks             Unsigned32,
+    tlpUpsIdentNumInputContacts         Unsigned32,
+    tlpUpsIdentNumOutputContacts        Unsigned32 }
 
 tlpUpsIdentNumInputs OBJECT-TYPE
     SYNTAX Unsigned32
@@ -709,6 +733,30 @@ tlpUpsIdentNumFans OBJECT-TYPE
     DESCRIPTION
         "The number of fans supported by the ups."
     ::= { tlpUpsIdentEntry 8 }
+
+tlpUpsIdentNumHeatsinks OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The number of heatsink thermistors supported by the ups."
+    ::= { tlpUpsIdentEntry 9 }
+
+tlpUpsIdentNumInputContacts OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The number of input contacts supported by the ups."
+    ::= { tlpUpsIdentEntry 10 }
+
+tlpUpsIdentNumOutputContacts OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The number of output contacts supported by the ups."
+    ::= { tlpUpsIdentEntry 11 }
 
 tlpUpsSupportsTable OBJECT-TYPE
     SYNTAX SEQUENCE OF TlpUpsSupportsEntry
@@ -812,7 +860,7 @@ TlpUpsDeviceEntry ::= SEQUENCE {
     tlpUpsDeviceTemperatureF            Integer32,
     tlpUpsDeviceLastACFailureReason     INTEGER,
     tlpUpsDeviceLastShutdownReason      INTEGER,
-    tlpUpsDeviceOutputCurrentPrecision	INTEGER }
+    tlpUpsDeviceOutputCurrentPrecision  INTEGER }
 
 tlpUpsDeviceMainLoadState OBJECT-TYPE
     SYNTAX INTEGER {
@@ -916,7 +964,7 @@ tlpUpsDeviceLastACFailureReason OBJECT-TYPE
         highLineVoltage(3),
         lowLineVoltage(4),
         averageFrequencyFault(5),
-        instantaneousLowLineFrequency(6), 
+        instantaneousLowLineFrequency(6),
 		delayedBrownout(7) }
     MAX-ACCESS read-only
     STATUS current
@@ -929,7 +977,7 @@ tlpUpsDeviceLastShutdownReason OBJECT-TYPE
 	    noShutdownSinceReset(0),
         onOffButtonShutdown(1),
         averageVbattSmallerThenLVCShutdown(2),
-        fastVbattKeepaliveVoltageFastShutdown(3),   
+        fastVbattKeepaliveVoltageFastShutdown(3),
         averageCurrentLimitShutdown(4),
         fastCurrentLimitShutdown(5),
         heavyLoadThermalTimeLimitShutdown(6),
@@ -938,7 +986,7 @@ tlpUpsDeviceLastShutdownReason OBJECT-TYPE
         averageVbattKeepaliveVoltageShutdown(9),
         shutdownCommandWithAutorestartEnabled(10),
         shutdownCommandWithoutAutorestartEnabled(11),
-        lineConnectRelayFault(12), 
+        lineConnectRelayFault(12),
         epoInvertMode(13),
         epoRebootMode(14),
         invalidLineStandbyMode(15),
@@ -955,7 +1003,7 @@ tlpUpsDeviceLastShutdownReason OBJECT-TYPE
         overTemperatureShutdownAutorestartEnabled(26),
         overTemperatureShutdownAutorestartDisabled(27),
         onOffButtonShutdownAutorestartEnabled(28),
-        onOffButtonShutdownAutorestartDisabled(29), 
+        onOffButtonShutdownAutorestartDisabled(29),
         batteryReportedFault(30),
         batteryCommunicationLost(31),
         batteryJumpStartChargerTimeoutError(32)  }
@@ -1007,7 +1055,8 @@ TlpUpsBatterySummaryEntry ::= SEQUENCE {
     tlpUpsSecondsOnBattery                  Unsigned32,
     tlpUpsEstimatedMinutesRemaining         Unsigned32,
     tlpUpsEstimatedChargeRemaining          INTEGER,
-    tlpUpsBatteryRunTimeRemaining           TimeTicks }
+    tlpUpsBatteryRunTimeRemaining           TimeTicks,
+    tlpUpsBatteryTotalMinutesOnBattery  	Unsigned32 }
 
 tlpUpsBatteryStatus OBJECT-TYPE
     SYNTAX INTEGER {
@@ -1072,6 +1121,15 @@ tlpUpsBatteryRunTimeRemaining OBJECT-TYPE
         does not support run time remaining, then the agent reports
         ERROR_NO_SUCH_NAME."
     ::= { tlpUpsBatterySummaryEntry 5 }
+
+tlpUpsBatteryTotalMinutesOnBattery OBJECT-TYPE
+    SYNTAX Unsigned32
+    UNITS "minutes"
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The total accumulative minutes the ups has run on the battery."
+    ::= { tlpUpsBatterySummaryEntry 6 }
 
 tlpUpsBatteryDetailTable OBJECT-TYPE
     SYNTAX SEQUENCE OF TlpUpsBatteryDetailEntry
@@ -1197,7 +1255,7 @@ tlpUpsBatteryPackIdentManufacturer OBJECT-TYPE
     STATUS current
     DESCRIPTION
         "The manufacturer of the battery pack. If the device does not
-        support this value, then the agent reports ERROR_NO_SUCH_NAME." 
+        support this value, then the agent reports ERROR_NO_SUCH_NAME."
     ::= { tlpUpsBatteryPackIdentEntry 2 }
 
 tlpUpsBatteryPackIdentModel OBJECT-TYPE
@@ -1206,7 +1264,7 @@ tlpUpsBatteryPackIdentModel OBJECT-TYPE
     STATUS current
     DESCRIPTION
         "The model or device name of the battery pack. If the device does not
-        support this value, then the agent reports ERROR_NO_SUCH_NAME." 
+        support this value, then the agent reports ERROR_NO_SUCH_NAME."
     ::= { tlpUpsBatteryPackIdentEntry 3 }
 
 tlpUpsBatteryPackIdentSerialNum OBJECT-TYPE
@@ -1215,7 +1273,7 @@ tlpUpsBatteryPackIdentSerialNum OBJECT-TYPE
     STATUS current
     DESCRIPTION
         "The serial number of the battery pack. If the device does not support
-        this value, then the agent reports ERROR_NO_SUCH_NAME." 
+        this value, then the agent reports ERROR_NO_SUCH_NAME."
     ::= { tlpUpsBatteryPackIdentEntry 4 }
 
 tlpUpsBatteryPackIdentFirmware OBJECT-TYPE
@@ -1224,7 +1282,7 @@ tlpUpsBatteryPackIdentFirmware OBJECT-TYPE
     STATUS current
     DESCRIPTION
         "The firmware of the battery pack. If the device does not support this
-        value, then the agent reports ERROR_NO_SUCH_NAME." 
+        value, then the agent reports ERROR_NO_SUCH_NAME."
     ::= { tlpUpsBatteryPackIdentEntry 5 }
 
 tlpUpsBatteryPackIdentSKU OBJECT-TYPE
@@ -1233,7 +1291,7 @@ tlpUpsBatteryPackIdentSKU OBJECT-TYPE
     STATUS current
     DESCRIPTION
         "The SKU of the battery pack. If the device does not support this value,
-        then the agent reports ERROR_NO_SUCH_NAME." 
+        then the agent reports ERROR_NO_SUCH_NAME."
     ::= { tlpUpsBatteryPackIdentEntry 6 }
 
 tlpUpsBatteryPackConfigTable OBJECT-TYPE
@@ -1476,7 +1534,7 @@ tlpUpsBatteryPackDetailLastReplaceDate OBJECT-TYPE
     MAX-ACCESS read-write
     STATUS current
     DESCRIPTION
-        "The date when the batteries were last replaced in YYYYMMDD format." 
+        "The date when the batteries were last replaced in YYYYMMDD format."
     ::= { tlpUpsBatteryPackDetailEntry 5 }
 
 tlpUpsBatteryPackDetailNextReplaceDate OBJECT-TYPE
@@ -1521,16 +1579,18 @@ tlpUpsInputEntry OBJECT-TYPE
     ::= { tlpUpsInputTable 1 }
 
 TlpUpsInputEntry ::= SEQUENCE {
-    tlpUpsInputLineBads                         INTEGER,
-    tlpUpsInputNominalVoltage                   Unsigned32,
-    tlpUpsInputNominalFrequency                 Unsigned32,
-    tlpUpsInputLowTransferVoltage               Unsigned32,
-    tlpUpsInputLowTransferVoltageLowerBound     Unsigned32,
-    tlpUpsInputLowTransferVoltageUpperBound     Unsigned32,
-    tlpUpsInputHighTransferVoltage              Unsigned32,
-    tlpUpsInputHighTransferVoltageLowerBound    Unsigned32,
-    tlpUpsInputHighTransferVoltageUpperBound    Unsigned32,
-    tlpUpsInputWattHours                        Unsigned32 }
+    tlpUpsInputLineBads                           INTEGER,
+    tlpUpsInputNominalVoltage                     Unsigned32,
+    tlpUpsInputNominalFrequency                   Unsigned32,
+    tlpUpsInputLowTransferVoltage                 Unsigned32,
+    tlpUpsInputLowTransferVoltageLowerBound       Unsigned32,
+    tlpUpsInputLowTransferVoltageUpperBound       Unsigned32,
+    tlpUpsInputHighTransferVoltage                Unsigned32,
+    tlpUpsInputHighTransferVoltageLowerBound      Unsigned32,
+    tlpUpsInputHighTransferVoltageUpperBound      Unsigned32,
+    tlpUpsInputWattHours                          Unsigned32,
+    tlpUpsInputLowTransferVoltageResetTolerance   Unsigned32,
+    tlpUpsInputHighTransferVoltageResetTolerance  Unsigned32 }
 
 tlpUpsInputLineBads OBJECT-TYPE
     SYNTAX INTEGER
@@ -1631,9 +1691,31 @@ tlpUpsInputWattHours OBJECT-TYPE
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION
-        "The number of watt hours of energy utilized in the past 24 hours. Use 
+        "The number of watt hours of energy utilized in the past 24 hours. Use
 		tlpUpsControlResetWattHours to reset the watt hours calculation algorithm."
-    ::= { tlpUpsInputEntry 10 }  
+    ::= { tlpUpsInputEntry 10 }
+
+tlpUpsInputLowTransferVoltageResetTolerance OBJECT-TYPE
+    SYNTAX Unsigned32
+    UNITS "Volts"
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "If a unit is transferred to battery backup due to under-voltage, the
+        line voltage has to rise above this value from tlpUpsConfigLowVoltageTransfer,
+        before the unit switched back to the AC input."
+    ::= { tlpUpsInputEntry 11 }
+
+tlpUpsInputHighTransferVoltageResetTolerance OBJECT-TYPE
+    SYNTAX Unsigned32
+    UNITS "Volts"
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "If an input transferred to battery backup due to over-voltage, the line voltage
+        on the input source has to fall below this value from tlpUpsConfigHighVoltageTransfer,
+        before the unit switched back to the AC input."
+    ::= { tlpUpsInputEntry 12 }
 
 tlpUpsInputPhaseTable OBJECT-TYPE
     SYNTAX SEQUENCE OF TlpUpsInputPhaseEntry
@@ -1756,8 +1838,9 @@ tlpUpsOutputEntry OBJECT-TYPE
 TlpUpsOutputEntry ::= SEQUENCE {
     tlpUpsOutputSource              INTEGER,
     tlpUpsOutputNominalVoltage      Unsigned32,
-    tlpUpsOutputFrequency           Unsigned32, 
-    tlpUpsOutputVARating            Unsigned32 }
+    tlpUpsOutputFrequency           Unsigned32,
+    tlpUpsOutputVARating            Unsigned32,
+    tlpUpsOutputPowerFactor         Unsigned32 }
 
 tlpUpsOutputSource OBJECT-TYPE
     SYNTAX INTEGER {
@@ -1770,7 +1853,8 @@ tlpUpsOutputSource OBJECT-TYPE
         boosting(6),
         reducing(7),
         second(8),
-        economy(9) }
+        economy(9),
+        testing(10) }
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION
@@ -1802,7 +1886,7 @@ tlpUpsOutputFrequency OBJECT-TYPE
         supported by the ups, then this frequency will contain the common
         frequency value. If not supported, the agent reports ERROR_NO_SUCH_NAME."
     ::= { tlpUpsOutputEntry 3 }
-	
+
 tlpUpsOutputVARating OBJECT-TYPE
     SYNTAX Unsigned32
 	UNITS "VA"
@@ -1812,8 +1896,16 @@ tlpUpsOutputVARating OBJECT-TYPE
         "The VA Rating of the ups. This value may not be
         supported on all models. If not supported, the agent reports
         ERROR_NO_SUCH_NAME."
-    ::= { tlpUpsOutputEntry 4 }	
-	
+    ::= { tlpUpsOutputEntry 4 }
+
+tlpUpsOutputPowerFactor OBJECT-TYPE
+    SYNTAX Unsigned32
+    UNITS "percent"
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The percentage of output power factor."
+    ::= { tlpUpsOutputEntry 5 }
 
 tlpUpsOutputLineTable OBJECT-TYPE
     SYNTAX SEQUENCE OF TlpUpsOutputLineEntry
@@ -1842,7 +1934,8 @@ TlpUpsOutputLineEntry ::= SEQUENCE {
     tlpUpsOutputLineCurrent         Unsigned32,
     tlpUpsOutputLinePower           Unsigned32,
     tlpUpsOutputLinePercentLoad     INTEGER,
-    tlpUpsOutputLineFrequency       Unsigned32 }
+    tlpUpsOutputLineFrequency       Unsigned32,
+    tlpUpsOutputLineApparentPower   Unsigned32 }
 
 tlpUpsOutputLineIndex OBJECT-TYPE
     SYNTAX Unsigned32
@@ -1904,6 +1997,15 @@ tlpUpsOutputLineFrequency OBJECT-TYPE
         supported by the ups, then this frequency value will reports the value of this
         line. If not supported, the agent reports ERROR_NO_SUCH_NAME."
     ::= { tlpUpsOutputLineEntry 6 }
+
+tlpUpsOutputLineApparentPower OBJECT-TYPE
+    SYNTAX Unsigned32
+    UNITS "Watts"
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The present output apparent power."
+    ::= { tlpUpsOutputLineEntry 9 }
 
 tlpUpsBypassTable OBJECT-TYPE
     SYNTAX SEQUENCE OF TlpUpsBypassEntry
@@ -2330,30 +2432,30 @@ tlpUpsWatchdogSecsBeforeReboot OBJECT-TYPE
         the ups will cycle its outputs.  Set this to zero to turns disable
         this feature."
     ::= { tlpUpsWatchdogEntry 2 }
-	
+
 tlpUpsFanTable OBJECT-TYPE
-    SYNTAX SEQUENCE OF TlpUpsFanEntry 
+    SYNTAX SEQUENCE OF TlpUpsFanEntry
     MAX-ACCESS not-accessible
     STATUS current
     DESCRIPTION
         "The fan speed of each ups in the device table. This is a sparse
         dependent table, and will contain the number of entries based upon the
         number of upss managed by the agent as reported by tlpUpsIdentNumFans."
-    ::= { tlpUpsFan 1 }	
-	
+    ::= { tlpUpsFan 1 }
+
 tlpUpsFanEntry  OBJECT-TYPE
-    SYNTAX TlpUpsFanEntry 
+    SYNTAX TlpUpsFanEntry
     MAX-ACCESS not-accessible
     STATUS current
     DESCRIPTION
         "An entry containing information applicable to a particular fan
         managed by this agent."
     INDEX { tlpDeviceIndex, tlpUpsFanIndex }
-    ::= { tlpUpsFanTable 1 }	
-	
+    ::= { tlpUpsFanTable 1 }
+
 TlpUpsFanEntry ::= SEQUENCE {
     tlpUpsFanIndex            Unsigned32,
-    tlpUpsFanSpeed            Unsigned32 }	
+    tlpUpsFanSpeed            Unsigned32 }
 
 tlpUpsFanIndex  OBJECT-TYPE
     SYNTAX Unsigned32
@@ -2361,8 +2463,8 @@ tlpUpsFanIndex  OBJECT-TYPE
     STATUS current
     DESCRIPTION
         "The table row index for the ups fan speed."
-    ::= { tlpUpsFanEntry 1 }	
-	
+    ::= { tlpUpsFanEntry 1 }
+
 tlpUpsFanSpeed  OBJECT-TYPE
     SYNTAX Unsigned32
 	UNITS "RPM"
@@ -2370,7 +2472,143 @@ tlpUpsFanSpeed  OBJECT-TYPE
     STATUS current
     DESCRIPTION
         "The fan speed in rotations per minute."
-    ::= { tlpUpsFanEntry 2 }	
+    ::= { tlpUpsFanEntry 2 }
+
+tlpUpsHeatsinkTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF TlpUpsHeatsinkEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "A list of ups heatsink thermistor table entries. The number of entries
+        is given by the value of tlpUpsIdentNumHeatsinks."
+    ::= { tlpUpsHeatsink 1 }
+
+tlpUpsHeatsinkEntry OBJECT-TYPE
+    SYNTAX TlpUpsHeatsinkEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "An entry containing information applicable to a particular heatsink
+        managed by this agent."
+    INDEX { tlpDeviceIndex, tlpUpsHeatsinkIndex }
+    ::= { tlpUpsHeatsinkTable 1 }
+
+TlpUpsHeatsinkEntry ::= SEQUENCE {
+    tlpUpsHeatsinkIndex            Unsigned32,
+    tlpUpsHeatsinkTemperatureC     Integer32,
+    tlpUpsHeatsinkTemperatureF     Integer32 }
+
+tlpUpsHeatsinkIndex OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The table row index for the ups heatsink."
+    ::= { tlpUpsHeatsinkEntry 1 }
+
+tlpUpsHeatsinkTemperatureC OBJECT-TYPE
+    SYNTAX Integer32
+    UNITS "0.1 degrees Celsius"
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The temperature at the heatsink thermistor in tenths degrees Celsius.
+        Heatsink temperature measurements are not supported on all models. If
+        not supported, this value will always return ERROR_NO_SUCH_NAME."
+    ::= { tlpUpsHeatsinkEntry 2 }
+
+tlpUpsHeatsinkTemperatureF OBJECT-TYPE
+    SYNTAX Integer32
+    UNITS "0.1 degrees Fahrenheit"
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The temperature at the heatsink thermistor in tenths degrees Fahrenheit.
+        Heatsink temperature measurements are not supported on all models. If
+        not supported, this value will always return ERROR_NO_SUCH_NAME."
+    ::= { tlpUpsHeatsinkEntry 3 }
+
+tlpUpsInputContactTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF TlpUpsInputContactEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The input contact details of each ups in the device table. The number of entries
+        is given by the value of tlpUpsIdentNumInputContacts."
+    ::= { tlpUpsInputContact 1 }
+
+tlpUpsInputContactEntry OBJECT-TYPE
+    SYNTAX TlpUpsInputContactEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "An entry containing input contact details for a particular ups."
+    INDEX { tlpDeviceIndex, tlpUpsInputContactIndex }
+    ::= { tlpUpsInputContactTable 1 }
+
+TlpUpsInputContactEntry ::= SEQUENCE {
+    tlpUpsInputContactIndex            Unsigned32,
+    tlpUpsInputContactInAlarm          INTEGER }
+
+tlpUpsInputContactIndex OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The table row index for the ups input contact details."
+    ::= { tlpUpsInputContactEntry 1 }
+
+tlpUpsInputContactInAlarm OBJECT-TYPE
+    SYNTAX INTEGER {
+		notInAlarm(0),
+		inAlarm(1) }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The alarm status of the input contact. Input contacts are not supported on
+        all models. If not supported, the agent reports ERROR_NO_SUCH_NAME."
+    ::= { tlpUpsInputContactEntry 2 }
+
+tlpUpsOutputContactTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF TlpUpsOutputContactEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The output contact details of each ups in the device table. The number of entries
+        is given by the value of tlpUpsIdentNumOuputContacts."
+    ::= { tlpUpsOutputContact 1 }
+
+tlpUpsOutputContactEntry OBJECT-TYPE
+    SYNTAX TlpUpsOutputContactEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "An entry containing output contact details for a particular ups."
+    INDEX { tlpDeviceIndex, tlpUpsOutputContactIndex }
+    ::= { tlpUpsOutputContactTable 1 }
+
+TlpUpsOutputContactEntry ::= SEQUENCE {
+    tlpUpsOutputContactIndex            Unsigned32,
+    tlpUpsOutputContactInAlarm          INTEGER }
+
+tlpUpsOutputContactIndex OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The table row index for the ups output contact details."
+    ::= { tlpUpsOutputContactEntry 1 }
+
+tlpUpsOutputContactInAlarm OBJECT-TYPE
+    SYNTAX INTEGER {
+		notInAlarm(0),
+		inAlarm(1) }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The alarm status of the output contact. Output contacts are not supported on
+        all models. If not supported, the agent reports ERROR_NO_SUCH_NAME."
+    ::= { tlpUpsOutputContactEntry 2 }
 
 tlpUpsControlTable OBJECT-TYPE
     SYNTAX SEQUENCE OF TlpUpsControlEntry
@@ -2392,14 +2630,16 @@ tlpUpsControlEntry OBJECT-TYPE
     ::= { tlpUpsControlTable 1 }
 
 TlpUpsControlEntry ::= SEQUENCE {
-    tlpUpsControlSelfTest       TruthValue,
-    tlpUpsControlRamp           TruthValue,
-    tlpUpsControlShed           TruthValue,
-    tlpUpsControlUpsOn          TruthValue,
-    tlpUpsControlUpsOff         TruthValue,
-    tlpUpsControlUpsReboot      TruthValue,
-    tlpUpsControlBypass         INTEGER, 
-	tlpUpsControlResetWattHours TruthValue }
+    tlpUpsControlSelfTest            TruthValue,
+    tlpUpsControlRamp                TruthValue,
+    tlpUpsControlShed                TruthValue,
+    tlpUpsControlUpsOn               TruthValue,
+    tlpUpsControlUpsOff              TruthValue,
+    tlpUpsControlUpsReboot           TruthValue,
+    tlpUpsControlBypass              INTEGER,
+    tlpUpsControlResetWattHours      TruthValue,
+    tlpUpsControlCancelSelfTest      TruthValue,
+    tlpUpsControlResetAllParameters  TruthValue }
 
 tlpUpsControlSelfTest OBJECT-TYPE
     SYNTAX TruthValue
@@ -2408,7 +2648,7 @@ tlpUpsControlSelfTest OBJECT-TYPE
     DESCRIPTION
         "Set to TRUE to initiate a self test on the ups."
     ::= { tlpUpsControlEntry 1 }
-  
+
 tlpUpsControlRamp OBJECT-TYPE
     SYNTAX TruthValue
     MAX-ACCESS read-write
@@ -2417,7 +2657,7 @@ tlpUpsControlRamp OBJECT-TYPE
         "Set to TRUE to initiate the pre-designated ramp
         sequence on the ups."
     ::= { tlpUpsControlEntry 2 }
-  
+
 tlpUpsControlShed OBJECT-TYPE
     SYNTAX TruthValue
     MAX-ACCESS read-write
@@ -2426,7 +2666,7 @@ tlpUpsControlShed OBJECT-TYPE
         "Set to TRUE to initiate the pre-designated shed
         sequence on the ups."
     ::= { tlpUpsControlEntry 3 }
-  
+
 tlpUpsControlUpsOn OBJECT-TYPE
     SYNTAX TruthValue
     MAX-ACCESS read-write
@@ -2465,14 +2705,30 @@ tlpUpsControlBypass OBJECT-TYPE
         mode is not supported, this value will return ERROR_NO_SUCH_NAME."
     ::= { tlpUpsControlEntry 7 }
 
-tlpUpsControlResetWattHours  OBJECT-TYPE 
+tlpUpsControlResetWattHours OBJECT-TYPE
     SYNTAX TruthValue
     MAX-ACCESS read-write
     STATUS current
     DESCRIPTION
         "Set to TRUE to reset the tlpUpsInputWattHours calculation algorithm."
-    ::= { tlpUpsControlEntry 8 }                 
-	
+    ::= { tlpUpsControlEntry 8 }
+
+tlpUpsControlCancelSelfTest OBJECT-TYPE
+	SYNTAX TruthValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Set to TRUE to cancel the self test in progress."
+    ::= { tlpUpsControlEntry 9 }
+
+tlpUpsControlResetAllParameters OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Set to TRUE to reset all configuration settings to the default values."
+    ::= { tlpUpsControlEntry 10 }
+
 tlpUpsConfigTable OBJECT-TYPE
     SYNTAX SEQUENCE OF TlpUpsConfigEntry
     MAX-ACCESS not-accessible
@@ -2512,7 +2768,9 @@ TlpUpsConfigEntry ::= SEQUENCE {
     tlpUpsConfigEconomicMode                INTEGER,
     tlpUpsConfigFaultAction                 INTEGER,
     tlpUpsConfigOffMode                     INTEGER,
-    tlpUpsConfigLineSensitivity             INTEGER }
+    tlpUpsConfigLineSensitivity             INTEGER,
+    tlpUpsConfigLineQualifyTime             Unsigned32,
+    tlpUpsConfigACPowerSenseType            INTEGER }
 
 tlpUpsConfigInputVoltage OBJECT-TYPE
     SYNTAX Unsigned32
@@ -2766,6 +3024,31 @@ tlpUpsConfigLineSensitivity OBJECT-TYPE
         by the ups, then this value will always return ERROR_NO_SUCH_NAME."
     ::= { tlpUpsConfigEntry 18 }
 
+tlpUpsConfigLineQualifyTime OBJECT-TYPE
+    SYNTAX Unsigned32
+    UNITS "seconds"
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+    "The amount of time the ups monitors line power quality for stability before ac power
+    is restored. If there is an attempt to set this variable to a
+    value that is not supported, the request will be rejected and the agent
+    will respond with an appropriate error message."
+    ::= { tlpUpsConfigEntry 19 }
+
+tlpUpsConfigACPowerSenseType OBJECT-TYPE
+    SYNTAX INTEGER {
+        generator(1),
+        ups(2) }
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "This option enables configuration of ups AC power sensing to maximize ups
+		operation for standard line power AC and generator power applications.
+		If this value is not supported by the ups, then this value will always return
+		ERROR_NO_SUCH_NAME."
+    ::= { tlpUpsConfigEntry 20 }
+
 tlpUpsConfigAutoRestartTable OBJECT-TYPE
     SYNTAX SEQUENCE OF TlpUpsConfigAutoRestartEntry
     MAX-ACCESS not-accessible
@@ -2927,6 +3210,224 @@ tlpUpsConfigOverLoadThreshold OBJECT-TYPE
         percentage of output load exceeds this value."
     ::= { tlpUpsConfigThresholdEntry 4 }
 
+tlpUpsConfigVoltageTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF TlpUpsConfigVoltageEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The voltage configuration details for each ups in device table. This
+        is a sparse dependent table, and will contain some subset of devices
+        that are upss. Not all options are available on all upss."
+    ::= { tlpUpsConfig 4 }
+
+tlpUpsConfigVoltageEntry OBJECT-TYPE
+    SYNTAX TlpUpsConfigVoltageEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "An entry containing voltage configuration options for a particular ups."
+    INDEX { tlpDeviceIndex }
+    ::= { tlpUpsConfigVoltageTable 1 }
+
+TlpUpsConfigVoltageEntry ::= SEQUENCE {
+    tlpUpsConfigHighVoltageTransfer                 Unsigned32,
+    tlpUpsConfigHighVoltageResetTolerance           Unsigned32,
+	tlpUpsConfigHighVoltageReset                    Unsigned32,
+    tlpUpsConfigLowVoltageTransfer                  Unsigned32,
+    tlpUpsConfigLowVoltageResetTolerance            Unsigned32,
+	tlpUpsConfigLowVoltageReset                     Unsigned32 }
+
+tlpUpsConfigHighVoltageTransfer OBJECT-TYPE
+    SYNTAX Unsigned32
+	UNITS "0.1 Volts"
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The maximum line voltage allowed on the input source before the unit
+        disconnects the AC input connection."
+    ::= { tlpUpsConfigVoltageEntry 1 }
+
+tlpUpsConfigHighVoltageResetTolerance OBJECT-TYPE
+    SYNTAX Unsigned32
+	UNITS "Volts"
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "If an input connection is disconnected due to over-voltage, the line voltage on the input source
+		has to fall below tlpUpsConfigHighVoltageTransfer less tlpUpsConfigHighVoltageTransferResetTolerance	`
+        before the unit reconnects the AC input to input source."
+    ::= { tlpUpsConfigVoltageEntry 2 }
+
+tlpUpsConfigHighVoltageReset OBJECT-TYPE
+    SYNTAX Unsigned32
+	UNITS "0.1 Volts"
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "If an input connection is disconnected due to over-voltage, the line voltage on the input source
+		has to fall below tlpUpsConfigHighVoltageReset before the unit reconnects the AC input to input source."
+    ::= { tlpUpsConfigVoltageEntry 3 }
+
+tlpUpsConfigLowVoltageTransfer OBJECT-TYPE
+    SYNTAX Unsigned32
+    UNITS "0.1 Volts"
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The minimum line voltage allowed before the unit disconnects the AC input
+        connection."
+    ::= { tlpUpsConfigVoltageEntry 4 }
+
+tlpUpsConfigLowVoltageResetTolerance OBJECT-TYPE
+    SYNTAX Unsigned32
+	UNITS "Volts"
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "If a unit is disconnected due to under-voltage or is not powered up yet, the line voltage
+        has to rise above tlpUpsConfigLowVoltageTransfer plus tlpUpsConfigLowVoltageTransferResetTolerance
+        before the unit reonnect the AC input to input source."
+    ::= { tlpUpsConfigVoltageEntry 5 }
+
+tlpUpsConfigLowVoltageReset OBJECT-TYPE
+    SYNTAX Unsigned32
+	UNITS "0.1 Volts"
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "If a unit is disconnected due to under-voltage or is not powered up yet, the line voltage
+        has to rise above tlpUpsConfigLowVoltageReset before the unit reonnect the AC input to input source."
+    ::= { tlpUpsConfigVoltageEntry 6 }
+
+tlpUpsConfigContact OBJECT IDENTIFIER::= { tlpUpsConfig 5 }
+
+tlpUpsConfigContactTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF TlpUpsConfigContactEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The configuration options of each ups in device table. This
+        is a sparse dependent table, and will contain some subset of
+        devices that are upss. Not all options are available on all
+        upss."
+    ::= {  tlpUpsConfigContact  1 }
+
+tlpUpsConfigContactEntry OBJECT-TYPE
+    SYNTAX TlpUpsConfigContactEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "An entry containing contact configuration options for a particular ups."
+    INDEX { tlpDeviceIndex }
+    ::= { tlpUpsConfigContactTable 1 }
+
+TlpUpsConfigContactEntry ::= SEQUENCE {
+    tlpUpsConfigOutputContactBackupTimer    INTEGER }
+
+tlpUpsConfigOutputContactBackupTimer OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS  read-write
+    STATUS current
+    DESCRIPTION
+        "This is the amount of runtime the UPS supports in battery mode before sending
+		a configured output contact notification.  Output contacts are not supported on all
+		models. If not supported, this value will always return ERROR_NO_SUCH_NAME."
+    ::= { tlpUpsConfigContactEntry 1 }
+
+tlpUpsConfigInputContactTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF TlpUpsConfigInputContactEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The input contact details of each ups in device table. the number of entries is
+        given by tlpUpsIdentNumInputContacts. This is a sparse dependent table, and will
+        contain some subset of devices that are upss. Not all options are available on all
+        upss."
+    ::= { tlpUpsConfigContact  2 }
+
+tlpUpsConfigInputContactEntry OBJECT-TYPE
+    SYNTAX TlpUpsConfigInputContactEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "An entry containing input contact details for a particular ups."
+    INDEX { tlpDeviceIndex, tlpUpsConfigInputContactIndex }
+    ::= { tlpUpsConfigInputContactTable 1 }
+
+TlpUpsConfigInputContactEntry ::= SEQUENCE {
+    tlpUpsConfigInputContactIndex            Unsigned32,
+    tlpUpsConfigInputContactSetup            INTEGER }
+
+tlpUpsConfigInputContactIndex OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The table row index for the ups input contact details."
+    ::= { tlpUpsConfigInputContactEntry 1 }
+
+tlpUpsConfigInputContactSetup  OBJECT-TYPE
+    SYNTAX INTEGER {
+		userDefined(0),
+		externalAlarm(1),
+		externalBatteryAlarm(2),
+		externalFanFailed(3),
+		doorUnlock(4)}
+    MAX-ACCESS  read-write
+    STATUS current
+    DESCRIPTION
+        "Input contact configuration options. Input contacts are not supported on
+        all models. If not supported, the agent reports ERROR_NO_SUCH_NAME."
+    ::= { tlpUpsConfigInputContactEntry 2 }
+
+tlpUpsConfigOutputContactTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF TlpUpsConfigOutputContactEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Output contact details of each ups in device table. The number of entries is
+        given by tlpUpsIdentNumOutputContacts. This is a sparse dependent table, and
+        will contain some subset of devices that are upss. Not all options are available
+        on all upss."
+    ::= {  tlpUpsConfigContact  3 }
+
+tlpUpsConfigOutputContactEntry OBJECT-TYPE
+    SYNTAX TlpUpsConfigOutputContactEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "An entry containing output contact details for a particular ups."
+    INDEX { tlpDeviceIndex, tlpUpsConfigOutputContactIndex }
+    ::= { tlpUpsConfigOutputContactTable 1 }
+
+TlpUpsConfigOutputContactEntry ::= SEQUENCE {
+    tlpUpsConfigOutputContactIndex            Unsigned32,
+    tlpUpsConfigOutputContactSetup            INTEGER }
+
+tlpUpsConfigOutputContactIndex OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The table row index for the ups output contact details."
+    ::= { tlpUpsConfigOutputContactEntry 1 }
+
+tlpUpsConfigOutputContactSetup OBJECT-TYPE
+    SYNTAX INTEGER {
+		disabled(0),
+		onBattery(1),
+		batteryLow(2),
+		timer(3),
+		alarm(4),
+		fault(5),
+		outputOff(6) }
+    MAX-ACCESS  read-write
+    STATUS current
+    DESCRIPTION
+        "Output contact configuration options. Output contacts are not supported on
+        all models. If not supported, the agent reports ERROR_NO_SUCH_NAME."
+    ::= { tlpUpsConfigOutputContactEntry 2 }
+
 -- pdu
 
 tlpPduIdentNumPdu OBJECT-TYPE
@@ -3019,8 +3520,8 @@ tlpPduIdentNumBreakers OBJECT-TYPE
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION
-        "The number of monitored bank breakers supported by the pdu. 
-		 If the pdu has breakers that are not monitored by the device, 
+        "The number of monitored bank breakers supported by the pdu.
+		 If the pdu has breakers that are not monitored by the device,
 		 the value of zero(0) will be returned."
     ::= { tlpPduIdentEntry 7 }
 
@@ -3349,12 +3850,12 @@ tlpPduDeviceOutputCurrentPrecision OBJECT-TYPE
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION
-        "Output current is reported by tlpPduOutputCurrent, tlpPduOutputCurrentMin 
-        and tlpPduOutputCurrentMax. These values are all reported in hundredths(0.01A), 
-        which accommodates all models; however, on any given device the actual precision 
-        may vary. All current values must be divided by 100 to obtain the actual value. 
-        For example, if tlpPduOutputCurrent reports 500, then the actual output current 
-        is 5.00. This tlpPduDeviceOutputCurrentPrecision defines the actual resolution 
+        "Output current is reported by tlpPduOutputCurrent, tlpPduOutputCurrentMin
+        and tlpPduOutputCurrentMax. These values are all reported in hundredths(0.01A),
+        which accommodates all models; however, on any given device the actual precision
+        may vary. All current values must be divided by 100 to obtain the actual value.
+        For example, if tlpPduOutputCurrent reports 500, then the actual output current
+        is 5.00. This tlpPduDeviceOutputCurrentPrecision defines the actual resolution
         of that value: wholeNumber(0) is 5, tenths(1) is 5.0 and hundredths(2) is 5.00."
     ::= { tlpPduDeviceEntry 11 }
 
@@ -3748,8 +4249,8 @@ tlpPduOutputFrequency OBJECT-TYPE
     DESCRIPTION
         "The present output frequency. If not supported, the agent reports ERROR_NO_SUCH_NAME."
     ::= { tlpPduOutputEntry 11 }
-	
-	
+
+
 tlpPduOutputCalculatedPowerKVA OBJECT-TYPE
     SYNTAX Unsigned32
     UNITS "0.01 KVA"
@@ -3758,7 +4259,7 @@ tlpPduOutputCalculatedPowerKVA OBJECT-TYPE
     DESCRIPTION
         "The calculated amount of apparent power being used."
     ::= { tlpPduOutputEntry 12 }
-	
+
 tlpPduOutputCalculatedPowerKW OBJECT-TYPE
     SYNTAX Unsigned32
     UNITS "0.01 KW"
@@ -3767,7 +4268,7 @@ tlpPduOutputCalculatedPowerKW OBJECT-TYPE
     DESCRIPTION
         "The calculated amount of active power being used."
     ::= { tlpPduOutputEntry 13 }
-	
+
 tlpPduOutputCalculated24hrEnergy OBJECT-TYPE
     SYNTAX Unsigned32
     UNITS "0.01 KWH"
@@ -3777,7 +4278,7 @@ tlpPduOutputCalculated24hrEnergy OBJECT-TYPE
         "Estimated 24 hour power consumption using present value
         of tlpPduOutputCalculatedPowerKW."
     ::= { tlpPduOutputEntry 14 }
-	
+
 
 tlpPduOutletTable OBJECT-TYPE
     SYNTAX SEQUENCE OF TlpPduOutletEntry
@@ -4197,7 +4698,7 @@ tlpPduCircuitCurrentLimit OBJECT-TYPE
     STATUS current
     DESCRIPTION
         "The current capacity, in hundredths of amps, of a circuit in
-        the system limited by the circuit breaker or wiring used in a 
+        the system limited by the circuit breaker or wiring used in a
         given unit."
     ::= { tlpPduCircuitEntry 5 }
 
@@ -4217,7 +4718,7 @@ tlpPduCircuitCurrentMax OBJECT-TYPE
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION
-        "The maximum total current, in hundredths of amps, for 
+        "The maximum total current, in hundredths of amps, for
         all receptacles in a given circuit since last reset."
     ::= { tlpPduCircuitEntry 7 }
 
@@ -4393,7 +4894,7 @@ tlpPduControlRamp OBJECT-TYPE
         "Set to TRUE to initiate the pre-designated ramp
         sequence on the pdu."
     ::= { tlpPduControlEntry 1 }
-  
+
 tlpPduControlShed OBJECT-TYPE
     SYNTAX TruthValue
     MAX-ACCESS read-write
@@ -4402,7 +4903,7 @@ tlpPduControlShed OBJECT-TYPE
         "Set to TRUE to initiate the pre-designated shed
         sequence on the pdu."
     ::= { tlpPduControlEntry 2 }
-  
+
 tlpPduControlPduOn OBJECT-TYPE
     SYNTAX TruthValue
     MAX-ACCESS read-write
@@ -4484,10 +4985,10 @@ tlpPduConfigPhaseThresholdEntry OBJECT-TYPE
 
 TlpPduConfigPhaseThresholdEntry ::= SEQUENCE {
     tlpPduPhaseIndex                             Unsigned32,
-    tlpPduConfigOutputCurrentThresholdTolerance  Unsigned32, 
-	tlpPduConfigOutputCurrentHighThreshold       Unsigned32, 
+    tlpPduConfigOutputCurrentThresholdTolerance  Unsigned32,
+	tlpPduConfigOutputCurrentHighThreshold       Unsigned32,
 	tlpPduConfigOutputCurrentLowThreshold        Unsigned32}
-	 
+
 tlpPduPhaseIndex OBJECT-TYPE
     SYNTAX Unsigned32
     MAX-ACCESS read-only
@@ -4495,14 +4996,14 @@ tlpPduPhaseIndex OBJECT-TYPE
     DESCRIPTION
         "The table row index for the pdu phase."
     ::= { tlpPduConfigPhaseThresholdEntry 1 }
-	 
+
 tlpPduConfigOutputCurrentThresholdTolerance OBJECT-TYPE
     SYNTAX Unsigned32
 	UNITS "0.1 Amps"
     MAX-ACCESS read-write
     STATUS current
     DESCRIPTION
-        "The threshold tolerance value used together with output current high/low 
+        "The threshold tolerance value used together with output current high/low
 		threshold to evaluate output current high/low condition."
     ::= { tlpPduConfigPhaseThresholdEntry 2 }
 
@@ -4976,8 +5477,8 @@ tlpAtsIdentNumBreakers OBJECT-TYPE
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION
-        "The number of monitored bank breakers supported by the ats. 
-		 If the ats has breakers that are not monitored by the device, 
+        "The number of monitored bank breakers supported by the ats.
+		 If the ats has breakers that are not monitored by the device,
 		 the value of zero(0) will be returned."
     ::= { tlpAtsIdentEntry 7 }
 
@@ -5489,7 +5990,7 @@ tlpAtsInputSourceAvailability OBJECT-TYPE
         only one line is available, or inputSourceAB(3) if both lines are
         available. The agent will never return none(0) since the device will
         be powered off if neither line is available."
-    ::= { tlpAtsInputEntry 12 } 
+    ::= { tlpAtsInputEntry 12 }
 
 tlpAtsInputSourceInUse OBJECT-TYPE
     SYNTAX INTEGER {
@@ -5665,8 +6166,8 @@ TlpAtsOutputEntry ::= SEQUENCE {
     tlpAtsOutputActivePower         Unsigned32,
     tlpAtsOutputPowerFactor         Unsigned32,
     tlpAtsOutputSource              INTEGER,
-    tlpAtsOutputFrequency           Unsigned32, 
-	tlpAtsOutputCalculatedPowerKVA  Unsigned32, 
+    tlpAtsOutputFrequency           Unsigned32,
+	tlpAtsOutputCalculatedPowerKVA  Unsigned32,
 	tlpAtsOutputCalculatedPowerKW   Unsigned32,
 	tlpAtsOutputCalculated24hrEnergy Unsigned32 }
 
@@ -5782,7 +6283,7 @@ tlpAtsOutputFrequency OBJECT-TYPE
     DESCRIPTION
         "The present output frequency. If not supported, the agent reports ERROR_NO_SUCH_NAME."
     ::= { tlpAtsOutputEntry 11 }
-	
+
 tlpAtsOutputCalculatedPowerKVA OBJECT-TYPE
     SYNTAX Unsigned32
     UNITS "0.01 KVA"
@@ -5791,7 +6292,7 @@ tlpAtsOutputCalculatedPowerKVA OBJECT-TYPE
     DESCRIPTION
         "The calculated amount of apparent power being used."
     ::= { tlpAtsOutputEntry 12 }
-	
+
 tlpAtsOutputCalculatedPowerKW OBJECT-TYPE
     SYNTAX Unsigned32
     UNITS "0.01 KW"
@@ -5800,7 +6301,7 @@ tlpAtsOutputCalculatedPowerKW OBJECT-TYPE
     DESCRIPTION
         "The calculated amount of active power being used."
     ::= { tlpAtsOutputEntry 13 }
-	
+
 tlpAtsOutputCalculated24hrEnergy OBJECT-TYPE
     SYNTAX Unsigned32
     UNITS "0.01 KWH"
@@ -5810,7 +6311,7 @@ tlpAtsOutputCalculated24hrEnergy OBJECT-TYPE
         "Estimated 24 hour power consumption using present value
         of tlpAtsOutputCalculatedPowerKW."
     ::= { tlpAtsOutputEntry 14 }
-		
+
 tlpAtsOutletTable OBJECT-TYPE
     SYNTAX SEQUENCE OF TlpAtsOutletEntry
     MAX-ACCESS not-accessible
@@ -6426,7 +6927,7 @@ tlpAtsControlRamp OBJECT-TYPE
         "Set to TRUE to initiate the pre-designated ramp
         sequence on the ats."
     ::= { tlpAtsControlEntry 1 }
-  
+
 tlpAtsControlShed OBJECT-TYPE
     SYNTAX TruthValue
     MAX-ACCESS read-write
@@ -6435,7 +6936,7 @@ tlpAtsControlShed OBJECT-TYPE
         "Set to TRUE to initiate the pre-designated shed
         sequence on the ats."
     ::= { tlpAtsControlEntry 2 }
-  
+
 tlpAtsControlAtsOn OBJECT-TYPE
     SYNTAX TruthValue
     MAX-ACCESS read-write
@@ -6590,7 +7091,7 @@ tlpAtsConfigVoltageRangeOldTable OBJECT-TYPE
         The lower limit of line voltage is tlpAtsInputBadTransferVoltageLowerBound. All
         minimum and maximum limits for each voltage point are all exclusive unless
         indicated otherwise.
-        
+
         This table in its entirety is obsolete and replaced by tlpAtsConfigVoltageRangeTable."
     ::= { tlpAtsConfig 2 }
 
@@ -7067,10 +7568,10 @@ tlpAtsConfigPhaseThresholdEntry OBJECT-TYPE
 
 TlpAtsConfigPhaseThresholdEntry ::= SEQUENCE {
     tlpAtsPhaseIndex                             Unsigned32,
-    tlpAtsConfigOutputCurrentThresholdTolerance  Unsigned32, 
-	tlpAtsConfigOutputCurrentHighThreshold       Unsigned32, 
+    tlpAtsConfigOutputCurrentThresholdTolerance  Unsigned32,
+	tlpAtsConfigOutputCurrentHighThreshold       Unsigned32,
 	tlpAtsConfigOutputCurrentLowThreshold        Unsigned32}
-	 
+
 tlpAtsPhaseIndex OBJECT-TYPE
     SYNTAX Unsigned32
     MAX-ACCESS read-only
@@ -7078,14 +7579,14 @@ tlpAtsPhaseIndex OBJECT-TYPE
     DESCRIPTION
         "The table row index for the Ats phase."
     ::= { tlpAtsConfigPhaseThresholdEntry 1 }
-	 
+
 tlpAtsConfigOutputCurrentThresholdTolerance OBJECT-TYPE
     SYNTAX Unsigned32
 	UNITS "0.1 Amps"
     MAX-ACCESS read-write
     STATUS current
     DESCRIPTION
-        "The threshold tolerance value used together with output current high/low 
+        "The threshold tolerance value used together with output current high/low
 		threshold to evaluate output current high/low condition."
     ::= { tlpAtsConfigPhaseThresholdEntry 2 }
 
@@ -7105,8 +7606,8 @@ tlpAtsConfigOutputCurrentLowThreshold OBJECT-TYPE
     STATUS current
     DESCRIPTION
         "The value at which a output current low condition is declared."
-    ::= { tlpAtsConfigPhaseThresholdEntry 4 }	
-		
+    ::= { tlpAtsConfigPhaseThresholdEntry 4 }
+
 -- cooling
 
 tlpCoolingIdentNumCooling OBJECT-TYPE
@@ -7141,7 +7642,7 @@ TlpCoolingCurrentEntry ::= SEQUENCE {
     tlpCoolingCompressorCurrent      Unsigned32,
     tlpCoolingEvaporatorFanCurrent   Unsigned32,
     tlpCoolingCondenserFanCurrent    Unsigned32 }
-	
+
 tlpCoolingUnitCurrent OBJECT-TYPE
     SYNTAX Unsigned32
 	UNITS "0.1 Amps"
@@ -7150,7 +7651,7 @@ tlpCoolingUnitCurrent OBJECT-TYPE
     DESCRIPTION
         "The total current draw of the unit in tenths of Amps. If not supported,
         this value will always return ERROR_NO_SUCH_NAME."
-    ::= { tlpCoolingCurrentEntry 1 }	
+    ::= { tlpCoolingCurrentEntry 1 }
 
 tlpCoolingCompressorCurrent  OBJECT-TYPE
     SYNTAX Unsigned32
@@ -7160,7 +7661,7 @@ tlpCoolingCompressorCurrent  OBJECT-TYPE
     DESCRIPTION
         "The compressor current draw of the unit in tenths of Amps. If not supported,
         this value will always return ERROR_NO_SUCH_NAME."
-    ::= { tlpCoolingCurrentEntry 2 }		
+    ::= { tlpCoolingCurrentEntry 2 }
 
 tlpCoolingEvaporatorFanCurrent OBJECT-TYPE
     SYNTAX Unsigned32
@@ -7171,7 +7672,7 @@ tlpCoolingEvaporatorFanCurrent OBJECT-TYPE
         "The current draw of the evaporator fan in tenths of Amps. If not supported,
         this value will always return ERROR_NO_SUCH_NAME."
     ::= { tlpCoolingCurrentEntry 3 }
-	
+
 tlpCoolingCondenserFanCurrent OBJECT-TYPE
     SYNTAX Unsigned32
 	UNITS "0.1 Amps"
@@ -7180,8 +7681,8 @@ tlpCoolingCondenserFanCurrent OBJECT-TYPE
     DESCRIPTION
         "The current draw of the condenser fan in tenths of Amps. If not supported,
         this value will always return ERROR_NO_SUCH_NAME."
-    ::= { tlpCoolingCurrentEntry 4 }	
-	
+    ::= { tlpCoolingCurrentEntry 4 }
+
 tlpCoolingTemperatureFahrenheitTable OBJECT-TYPE
     SYNTAX SEQUENCE OF TlpCoolingTemperatureFahrenheitEntry
     MAX-ACCESS not-accessible
@@ -7203,14 +7704,14 @@ tlpCoolingTemperatureFahrenheitEntry OBJECT-TYPE
 
 TlpCoolingTemperatureFahrenheitEntry ::= SEQUENCE {
     tlpCoolingAmbientDegF            Integer32,
-	tlpCoolingSupplyAirDegF          Integer32,    
-	tlpCoolingReturnAirDegF          Integer32,    
+	tlpCoolingSupplyAirDegF          Integer32,
+	tlpCoolingReturnAirDegF          Integer32,
 	tlpCoolingCondenserInletDegF     Integer32,
-	tlpCoolingEvaporatorDegF         Integer32,  
+	tlpCoolingEvaporatorDegF         Integer32,
 	tlpCoolingSuctionDegF            Integer32,
 	tlpCoolingRemoteDegF             Integer32,
-	tlpCoolingCondenserOutletDegF    Integer32}	
-	
+	tlpCoolingCondenserOutletDegF    Integer32}
+
 tlpCoolingAmbientDegF OBJECT-TYPE
     SYNTAX Integer32
 	UNITS "0.1 degrees Fahrenheit"
@@ -7219,17 +7720,17 @@ tlpCoolingAmbientDegF OBJECT-TYPE
     DESCRIPTION
         "The ambient temperature in tenths degrees Fahrenheit. If not supported,
         this value will always return ERROR_NO_SUCH_NAME."
-    ::= { tlpCoolingTemperatureFahrenheitEntry 1 }	
-			
+    ::= { tlpCoolingTemperatureFahrenheitEntry 1 }
+
 tlpCoolingSupplyAirDegF OBJECT-TYPE
     SYNTAX Integer32
 	UNITS "0.1 degrees Fahrenheit"
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION
-        "The temperature of the air entering the cooling unit in tenths degrees Fahrenheit. 
+        "The temperature of the air entering the cooling unit in tenths degrees Fahrenheit.
          If not supported, this value will always return ERROR_NO_SUCH_NAME."
-    ::= { tlpCoolingTemperatureFahrenheitEntry 2 }		
+    ::= { tlpCoolingTemperatureFahrenheitEntry 2 }
 
 tlpCoolingReturnAirDegF OBJECT-TYPE
     SYNTAX Integer32
@@ -7237,60 +7738,60 @@ tlpCoolingReturnAirDegF OBJECT-TYPE
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION
-        "The temperature of the air entering the cooling unit in tenths degrees Fahrenheit. 
+        "The temperature of the air entering the cooling unit in tenths degrees Fahrenheit.
          If not supported, this value will always return ERROR_NO_SUCH_NAME."
-    ::= { tlpCoolingTemperatureFahrenheitEntry 3 }		
-	
+    ::= { tlpCoolingTemperatureFahrenheitEntry 3 }
+
 tlpCoolingCondenserInletDegF OBJECT-TYPE
     SYNTAX Integer32
 	UNITS "0.1 degrees Fahrenheit"
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION
-        "The temperature of the air entering the condenser in tenths degrees Fahrenheit. 
+        "The temperature of the air entering the condenser in tenths degrees Fahrenheit.
          If not supported, this value will always return ERROR_NO_SUCH_NAME."
-    ::= { tlpCoolingTemperatureFahrenheitEntry 4 }		
-	
+    ::= { tlpCoolingTemperatureFahrenheitEntry 4 }
+
 tlpCoolingEvaporatorDegF OBJECT-TYPE
     SYNTAX Integer32
 	UNITS "0.1 degrees Fahrenheit"
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION
-        "The temperature of the evaporator surface in tenths degrees Fahrenheit. 
+        "The temperature of the evaporator surface in tenths degrees Fahrenheit.
          If not supported, this value will always return ERROR_NO_SUCH_NAME."
-    ::= { tlpCoolingTemperatureFahrenheitEntry 5 }		
-	
+    ::= { tlpCoolingTemperatureFahrenheitEntry 5 }
+
 tlpCoolingSuctionDegF OBJECT-TYPE
     SYNTAX Integer32
 	UNITS "0.1 degrees Fahrenheit"
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION
-        "The temperature of the low pressure refrigerant line in tenths degrees Fahrenheit. 
+        "The temperature of the low pressure refrigerant line in tenths degrees Fahrenheit.
          If not supported, this value will always return ERROR_NO_SUCH_NAME."
-    ::= { tlpCoolingTemperatureFahrenheitEntry 6 }		
-	
+    ::= { tlpCoolingTemperatureFahrenheitEntry 6 }
+
 tlpCoolingRemoteDegF OBJECT-TYPE
     SYNTAX Integer32
 	UNITS "0.1 degrees Fahrenheit"
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION
-        "The external remote temperature in tenths degrees Fahrenheit. If not supported, 
+        "The external remote temperature in tenths degrees Fahrenheit. If not supported,
          this value will always return ERROR_NO_SUCH_NAME."
-    ::= { tlpCoolingTemperatureFahrenheitEntry 7 }	
+    ::= { tlpCoolingTemperatureFahrenheitEntry 7 }
 
-tlpCoolingCondenserOutletDegF OBJECT-TYPE	
+tlpCoolingCondenserOutletDegF OBJECT-TYPE
     SYNTAX Integer32
 	UNITS "0.1 degrees Fahrenheit"
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION
-        "The temperature of the air leaving the condenser in tenths degrees Fahrenheit. 
+        "The temperature of the air leaving the condenser in tenths degrees Fahrenheit.
          If not supported, this value will always return ERROR_NO_SUCH_NAME."
     ::= { tlpCoolingTemperatureFahrenheitEntry 8 }
-		
+
 tlpCoolingTemperatureCelsiusTable OBJECT-TYPE
     SYNTAX SEQUENCE OF TlpCoolingTemperatureCelsiusEntry
     MAX-ACCESS not-accessible
@@ -7312,14 +7813,14 @@ tlpCoolingTemperatureCelsiusEntry OBJECT-TYPE
 
 TlpCoolingTemperatureCelsiusEntry ::= SEQUENCE {
     tlpCoolingAmbientDegC            Integer32,
-	tlpCoolingSupplyAirDegC          Integer32,    
+	tlpCoolingSupplyAirDegC          Integer32,
 	tlpCoolingReturnAirDegC          Integer32,
 	tlpCoolingCondenserInletDegC     Integer32,
 	tlpCoolingEvaporatorDegC         Integer32,
 	tlpCoolingSuctionDegC            Integer32,
 	tlpCoolingRemoteDegC             Integer32,
-    tlpCoolingCondenserOutletDegC    Integer32 }		
-	
+    tlpCoolingCondenserOutletDegC    Integer32 }
+
 tlpCoolingAmbientDegC OBJECT-TYPE
     SYNTAX Integer32
 	UNITS "0.1 degrees Celsius"
@@ -7328,8 +7829,8 @@ tlpCoolingAmbientDegC OBJECT-TYPE
     DESCRIPTION
         "The ambient temperature in tenths degrees Celsius. If not supported,
         this value will always return ERROR_NO_SUCH_NAME."
-    ::= { tlpCoolingTemperatureCelsiusEntry 1 }	
-	
+    ::= { tlpCoolingTemperatureCelsiusEntry 1 }
+
 tlpCoolingSupplyAirDegC OBJECT-TYPE
     SYNTAX Integer32
 	UNITS "0.1 degrees Celsius"
@@ -7338,8 +7839,8 @@ tlpCoolingSupplyAirDegC OBJECT-TYPE
     DESCRIPTION
         "The temperature of the air entering the cooling unit in tenths degrees Celsius. If not supported,
         this value will always return ERROR_NO_SUCH_NAME."
-    ::= { tlpCoolingTemperatureCelsiusEntry 2 }	
-		
+    ::= { tlpCoolingTemperatureCelsiusEntry 2 }
+
 tlpCoolingReturnAirDegC OBJECT-TYPE
     SYNTAX Integer32
 	UNITS "0.1 degrees Celsius"
@@ -7348,8 +7849,8 @@ tlpCoolingReturnAirDegC OBJECT-TYPE
     DESCRIPTION
         "The temperature of the air entering the cooling unit in tenths degrees Celsius. If not supported,
         this value will always return ERROR_NO_SUCH_NAME."
-    ::= { tlpCoolingTemperatureCelsiusEntry 3 }	
-		
+    ::= { tlpCoolingTemperatureCelsiusEntry 3 }
+
 tlpCoolingCondenserInletDegC OBJECT-TYPE
     SYNTAX Integer32
 	UNITS "0.1 degrees Celsius"
@@ -7358,8 +7859,8 @@ tlpCoolingCondenserInletDegC OBJECT-TYPE
     DESCRIPTION
         "The temperature of the air entering the condenser in tenths degrees Celsius. If not supported,
          this value will always return ERROR_NO_SUCH_NAME."
-    ::= { tlpCoolingTemperatureCelsiusEntry 4 }	
-		
+    ::= { tlpCoolingTemperatureCelsiusEntry 4 }
+
 tlpCoolingEvaporatorDegC OBJECT-TYPE
     SYNTAX Integer32
 	UNITS "0.1 degrees Celsius"
@@ -7368,8 +7869,8 @@ tlpCoolingEvaporatorDegC OBJECT-TYPE
     DESCRIPTION
         "The temperature of the evaporator surface in tenths degrees Celsius. If not supported,
         this value will always return ERROR_NO_SUCH_NAME."
-    ::= { tlpCoolingTemperatureCelsiusEntry 5 }	
-			
+    ::= { tlpCoolingTemperatureCelsiusEntry 5 }
+
 tlpCoolingSuctionDegC OBJECT-TYPE
     SYNTAX Integer32
 	UNITS "0.1 degrees Celsius"
@@ -7379,18 +7880,18 @@ tlpCoolingSuctionDegC OBJECT-TYPE
         "The temperature of the low pressure refrigerant line in tenths degrees Celsius. If not supported,
         this value will always return ERROR_NO_SUCH_NAME."
     ::= { tlpCoolingTemperatureCelsiusEntry 6 }
-	
+
 tlpCoolingRemoteDegC OBJECT-TYPE
     SYNTAX Integer32
 	UNITS "0.1 degrees Celsius"
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION
-        "The external remote temperature in tenths degrees Celsius. If not supported, 
+        "The external remote temperature in tenths degrees Celsius. If not supported,
         this value will always return ERROR_NO_SUCH_NAME."
     ::= { tlpCoolingTemperatureCelsiusEntry 7 }
-	
-tlpCoolingCondenserOutletDegC OBJECT-TYPE	
+
+tlpCoolingCondenserOutletDegC OBJECT-TYPE
     SYNTAX Integer32
 	UNITS "0.1 degrees Celsius"
     MAX-ACCESS read-only
@@ -7399,7 +7900,7 @@ tlpCoolingCondenserOutletDegC OBJECT-TYPE
         "The temperature of the air leaving the condenser in tenths degrees Celsius. If not supported,
         this value will always return ERROR_NO_SUCH_NAME."
     ::= { tlpCoolingTemperatureCelsiusEntry 8 }
-	
+
 tlpCoolingPressureMpaTable OBJECT-TYPE
     SYNTAX SEQUENCE OF TlpCoolingPressureMpaEntry
     MAX-ACCESS not-accessible
@@ -7421,8 +7922,8 @@ tlpCoolingPressureMpaEntry OBJECT-TYPE
 
 TlpCoolingPressureMpaEntry ::= SEQUENCE {
     tlpCoolingSuctionPressureMpa          Unsigned32,
-	tlpCoolingDischargePressureMpa        Unsigned32 }	
-	
+	tlpCoolingDischargePressureMpa        Unsigned32 }
+
 tlpCoolingSuctionPressureMpa OBJECT-TYPE
     SYNTAX Unsigned32
 	UNITS "0.1 Mpa"
@@ -7431,8 +7932,8 @@ tlpCoolingSuctionPressureMpa OBJECT-TYPE
     DESCRIPTION
         "The pressure of the compressor discharge line in tenths of Mpa. If not supported,
         this value will always return ERROR_NO_SUCH_NAME."
-    ::= { tlpCoolingPressureMpaEntry 1 }	
-	
+    ::= { tlpCoolingPressureMpaEntry 1 }
+
 tlpCoolingDischargePressureMpa     OBJECT-TYPE
     SYNTAX Unsigned32
 	UNITS "0.1 Mpa"
@@ -7441,8 +7942,8 @@ tlpCoolingDischargePressureMpa     OBJECT-TYPE
     DESCRIPTION
         "The pressure of the compressor discharge line in tenths of Mpa. If not supported,
          this value will always return ERROR_NO_SUCH_NAME."
-    ::= { tlpCoolingPressureMpaEntry 2 }		
-	
+    ::= { tlpCoolingPressureMpaEntry 2 }
+
 tlpCoolingPressurePsiTable OBJECT-TYPE
     SYNTAX SEQUENCE OF TlpCoolingPressurePsiEntry
     MAX-ACCESS not-accessible
@@ -7464,8 +7965,8 @@ tlpCoolingPressurePsiEntry OBJECT-TYPE
 
 TlpCoolingPressurePsiEntry ::= SEQUENCE {
     tlpCoolingSuctionPressurePsi          Unsigned32,
-	tlpCoolingDischargePressurePsi        Unsigned32 }		
-	
+	tlpCoolingDischargePressurePsi        Unsigned32 }
+
 tlpCoolingSuctionPressurePsi OBJECT-TYPE
     SYNTAX Unsigned32
 	UNITS "0.1 Psi"
@@ -7475,7 +7976,7 @@ tlpCoolingSuctionPressurePsi OBJECT-TYPE
         "The pressure of the compressor discharge line in tenths of Psi. If not supported,
         this value will always return ERROR_NO_SUCH_NAME."
     ::= { tlpCoolingPressurePsiEntry 1 }
-	
+
 tlpCoolingDischargePressurePsi OBJECT-TYPE
     SYNTAX Unsigned32
 	UNITS "0.1 Psi"
@@ -7484,8 +7985,8 @@ tlpCoolingDischargePressurePsi OBJECT-TYPE
     DESCRIPTION
         "The pressure of the compressor discharge line in tenths of Psi. If not supported,
         this value will always return ERROR_NO_SUCH_NAME."
-    ::= { tlpCoolingPressurePsiEntry 2 }	
-	
+    ::= { tlpCoolingPressurePsiEntry 2 }
+
 tlpCoolingDynamicTable OBJECT-TYPE
     SYNTAX SEQUENCE OF TlpCoolingDynamicEntry
     MAX-ACCESS not-accessible
@@ -7506,13 +8007,13 @@ tlpCoolingDynamicEntry OBJECT-TYPE
     ::= { tlpCoolingDynamicTable 1 }
 
 TlpCoolingDynamicEntry ::= SEQUENCE {
-    tlpCoolingEvaporatorFanSpeed    INTEGER, 
+    tlpCoolingEvaporatorFanSpeed    INTEGER,
     tlpCoolingCondenserFanSpeed     INTEGER,
 	tlpCoolingCompressorFrequency   Unsigned32,
-	tlpCoolingEEVSteps              INTEGER }	
-		
+	tlpCoolingEEVSteps              INTEGER }
+
 tlpCoolingEvaporatorFanSpeed OBJECT-TYPE
-    SYNTAX INTEGER { 
+    SYNTAX INTEGER {
 	    off(0),
 		low(1),
 		mediumLow(2),
@@ -7523,10 +8024,10 @@ tlpCoolingEvaporatorFanSpeed OBJECT-TYPE
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION
-        "The current speed of the evaporator fan. If not supported, 
+        "The current speed of the evaporator fan. If not supported,
         this value will always return ERROR_NO_SUCH_NAME."
     ::= { tlpCoolingDynamicEntry 1 }
-  
+
 tlpCoolingCondenserFanSpeed OBJECT-TYPE
     SYNTAX INTEGER {
         off(0),
@@ -7539,10 +8040,10 @@ tlpCoolingCondenserFanSpeed OBJECT-TYPE
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION
-        "The current speed of the condenser fan. If not supported, 
+        "The current speed of the condenser fan. If not supported,
         this value will always return ERROR_NO_SUCH_NAME."
     ::= { tlpCoolingDynamicEntry 2 }
-  
+
 tlpCoolingCompressorFrequency OBJECT-TYPE
     SYNTAX Unsigned32
     UNITS "Hertz"
@@ -7551,14 +8052,14 @@ tlpCoolingCompressorFrequency OBJECT-TYPE
     DESCRIPTION
         "The operating mechanical frequency(Hz) of the compressor. If not supported,
         this value will always return ERROR_NO_SUCH_NAME."
-    ::= {  tlpCoolingDynamicEntry 3 }	
-		
+    ::= {  tlpCoolingDynamicEntry 3 }
+
 tlpCoolingEEVSteps OBJECT-TYPE
-	SYNTAX INTEGER    
+	SYNTAX INTEGER
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION
-       "The current EEV steps. If not supported, 
+       "The current EEV steps. If not supported,
         this value will always return ERROR_NO_SUCH_NAME."
     ::= { tlpCoolingDynamicEntry 4 }
 
@@ -7597,8 +8098,8 @@ tlpCoolingCompressorRunDays OBJECT-TYPE
     DESCRIPTION
         "Total days the compressor has been under operation. If not supported,
         this value will always return ERROR_NO_SUCH_NAME."
-    ::= { tlpCoolingRuntimeEntry 1 }	
-	
+    ::= { tlpCoolingRuntimeEntry 1 }
+
 tlpCoolingCondensatePumpRunDays OBJECT-TYPE
     SYNTAX Unsigned32
 	UNITS "days"
@@ -7607,8 +8108,8 @@ tlpCoolingCondensatePumpRunDays OBJECT-TYPE
     DESCRIPTION
         "Total days the condensate pump has been under operation. If not supported,
         this value will always return ERROR_NO_SUCH_NAME."
-    ::= { tlpCoolingRuntimeEntry 2}		
-	
+    ::= { tlpCoolingRuntimeEntry 2}
+
 tlpCoolingAirFilterRunHours OBJECT-TYPE
     SYNTAX Unsigned32
 	UNITS "hours"
@@ -7617,8 +8118,8 @@ tlpCoolingAirFilterRunHours OBJECT-TYPE
     DESCRIPTION
         "Total hours the air filter has been under operation. If not supported,
         this value will always return ERROR_NO_SUCH_NAME."
-    ::= { tlpCoolingRuntimeEntry 3 }	
-	
+    ::= { tlpCoolingRuntimeEntry 3 }
+
 tlpCoolingEvaporatorFanRunDays OBJECT-TYPE
     SYNTAX Unsigned32
 	UNITS "days"
@@ -7627,8 +8128,8 @@ tlpCoolingEvaporatorFanRunDays OBJECT-TYPE
     DESCRIPTION
         "Total days the evaporator fan has been under operation. If not supported,
         this value will always return ERROR_NO_SUCH_NAME."
-    ::= { tlpCoolingRuntimeEntry 4 }		
-	
+    ::= { tlpCoolingRuntimeEntry 4 }
+
 tlpCoolingCondenserFanRunDays OBJECT-TYPE
     SYNTAX Unsigned32
 	UNITS "days"
@@ -7637,8 +8138,8 @@ tlpCoolingCondenserFanRunDays OBJECT-TYPE
     DESCRIPTION
         "Total days the condenser fan has been under operation. If not supported,
         this value will always return ERROR_NO_SUCH_NAME."
-    ::= { tlpCoolingRuntimeEntry 5 }		
-	
+    ::= { tlpCoolingRuntimeEntry 5 }
+
 tlpCoolingAtomizerRunDays OBJECT-TYPE
     SYNTAX Unsigned32
     UNITS "days"
@@ -7647,8 +8148,8 @@ tlpCoolingAtomizerRunDays OBJECT-TYPE
     DESCRIPTION
         "Total days the atomizer has been under operation. If not supported,
         this value will always return ERROR_NO_SUCH_NAME."
-    ::= { tlpCoolingRuntimeEntry 6 }	
-	
+    ::= { tlpCoolingRuntimeEntry 6 }
+
 tlpCoolingStatusTable OBJECT-TYPE
     SYNTAX SEQUENCE OF TlpCoolingStatusEntry
     MAX-ACCESS not-accessible
@@ -7666,17 +8167,17 @@ tlpCoolingStatusEntry OBJECT-TYPE
     DESCRIPTION
         "An entry containing status for a particular cooling device."
     INDEX { tlpDeviceIndex }
-    ::= { tlpCoolingStatusTable 1 }	
+    ::= { tlpCoolingStatusTable 1 }
 
 TlpCoolingStatusEntry ::= SEQUENCE {
     tlpCoolingOperatingMode    INTEGER,
     tlpCoolingCoolOutput	   Unsigned32,
 	tlpCoolingAlarmStatus      INTEGER,
 	tlpCoolingCompressorStatus INTEGER,
-	tlpCoolingWaterStatus      INTEGER}	
-	
+	tlpCoolingWaterStatus      INTEGER}
+
 tlpCoolingOperatingMode OBJECT-TYPE
-    SYNTAX INTEGER { 
+    SYNTAX INTEGER {
 	    off(0),
 		idle(1),
 		cooling(2),
@@ -7687,54 +8188,54 @@ tlpCoolingOperatingMode OBJECT-TYPE
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION
-        "The current operating mode. If not supported, 
+        "The current operating mode. If not supported,
         this value will always return ERROR_NO_SUCH_NAME."
-    ::= { tlpCoolingStatusEntry 1 }	
-	
+    ::= { tlpCoolingStatusEntry 1 }
+
 tlpCoolingCoolOutput OBJECT-TYPE
-    SYNTAX Unsigned32 
+    SYNTAX Unsigned32
 	UNITS "0.1 kilowatts"
 	MAX-ACCESS read-only
     STATUS current
     DESCRIPTION
-        "The current cooling output of the cooling device in tenth of kilowatt. If not supported, 
+        "The current cooling output of the cooling device in tenth of kilowatt. If not supported,
         this value will always return ERROR_NO_SUCH_NAME."
     ::= { tlpCoolingStatusEntry 2 }
- 
+
 tlpCoolingAlarmStatus OBJECT-TYPE
-    SYNTAX INTEGER { 
+    SYNTAX INTEGER {
 	    noAlarm(0),
 		warning(1),
 		critical(2)}
 	MAX-ACCESS read-only
     STATUS current
     DESCRIPTION
-        "The current alarm status of the cooling device. If not supported, 
+        "The current alarm status of the cooling device. If not supported,
         this value will always return ERROR_NO_SUCH_NAME."
-    ::= { tlpCoolingStatusEntry 3 }	
-		
+    ::= { tlpCoolingStatusEntry 3 }
+
 tlpCoolingCompressorStatus OBJECT-TYPE
-    SYNTAX INTEGER { 
+    SYNTAX INTEGER {
 	    off(0),
 		on(1)}
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION
-        "The current operating status of compressor. If not supported, 
+        "The current operating status of compressor. If not supported,
         this value will always return ERROR_NO_SUCH_NAME."
     ::= { tlpCoolingStatusEntry 4 }
 
 tlpCoolingWaterStatus OBJECT-TYPE
-    SYNTAX INTEGER { 
+    SYNTAX INTEGER {
 	    notFull(0),
 	    full(1)}
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION
-        "The current water status of cooling unit. If not supported, 
+        "The current water status of cooling unit. If not supported,
         this value will always return ERROR_NO_SUCH_NAME."
     ::= { tlpCoolingStatusEntry 5 }
-		
+
 tlpCoolingControlTable OBJECT-TYPE
     SYNTAX SEQUENCE OF TlpCoolingControlEntry
     MAX-ACCESS not-accessible
@@ -7755,7 +8256,7 @@ tlpCoolingControlEntry OBJECT-TYPE
     ::= { tlpCoolingControlTable 1 }
 
 TlpCoolingControlEntry ::= SEQUENCE {
-    tlpCoolingOnOff    INTEGER }	
+    tlpCoolingOnOff    INTEGER }
 
 tlpCoolingOnOff OBJECT-TYPE
     SYNTAX INTEGER {
@@ -7766,7 +8267,7 @@ tlpCoolingOnOff OBJECT-TYPE
     DESCRIPTION
         "Turn the unit on or off."
     ::= { tlpCoolingControlEntry 1 }
-  
+
 tlpCoolingConfigTable OBJECT-TYPE
     SYNTAX SEQUENCE OF TlpCoolingConfigEntry
     MAX-ACCESS not-accessible
@@ -7790,7 +8291,7 @@ tlpCoolingConfigEntry OBJECT-TYPE
 TlpCoolingConfigEntry ::= SEQUENCE {
 	tlpCoolingAutoStart            INTEGER,
 	tlpCoolingFanSpeed             INTEGER,
-	tlpCoolingControlType          INTEGER, 
+	tlpCoolingControlType          INTEGER,
 	tlpCoolingDisplayUnits         INTEGER,
 	tlpCoolingBeepOnKey            INTEGER,
 	tlpCoolingInputContactType     INTEGER,
@@ -7803,15 +8304,15 @@ TlpCoolingConfigEntry ::= SEQUENCE {
 	tlpCoolingAirFilterInterval    Unsigned32,
     tlpCoolingAirFilterAlarm       INTEGER,
 	tlpCoolingMaxAirFilterRunHours Unsigned32,
-	tlpCoolingStartTimer           Unsigned32, 
+	tlpCoolingStartTimer           Unsigned32,
     tlpCoolingStopTimer            Unsigned32,
 	tlpCoolingEnergyMode           INTEGER,
 	tlpCoolingDefrostMode          INTEGER,
     tlpCoolingRemoteTemperatureSensor  	INTEGER,
 	tlpCoolingDehumidifyingMode    INTEGER,
-    tlpCoolingFanAlwaysOn          INTEGER,  
+    tlpCoolingFanAlwaysOn          INTEGER,
     tlpCoolingQuietMode       	   INTEGER,
-	tlpCoolingHotGasBypass         INTEGER, 
+	tlpCoolingHotGasBypass         INTEGER,
 	tlpCoolingAutoFanSpeed         INTEGER }
 
 tlpCoolingAutoStart OBJECT-TYPE
@@ -7837,17 +8338,17 @@ tlpCoolingFanSpeed OBJECT-TYPE
     MAX-ACCESS read-write
     STATUS current
     DESCRIPTION
-        "Specifies the actual speed of the evaporator fan. Setting the fan speed 
-		to auto(6) will enable tlpCoolingAutoFanSpeed; however, on most units getting 
-		the fan speed will return the actual fan speed regardless whether auto fan 
-		speed is enabled or disabled. The value auto(6) is returned only on units that 
-		do not report the actual fan speed when auto fan speed is enabled. Not all 
+        "Specifies the actual speed of the evaporator fan. Setting the fan speed
+		to auto(6) will enable tlpCoolingAutoFanSpeed; however, on most units getting
+		the fan speed will return the actual fan speed regardless whether auto fan
+		speed is enabled or disabled. The value auto(6) is returned only on units that
+		do not report the actual fan speed when auto fan speed is enabled. Not all
 		values are supported on all cooling units. Invalid values will return an appropriate
 		error when accessed. If not supported, this value will always return ERROR_NO_SUCH_NAME"
     ::= { tlpCoolingConfigEntry 2 }
 
 tlpCoolingControlType OBJECT-TYPE
-    SYNTAX INTEGER { 
+    SYNTAX INTEGER {
 	    returnAirTemperature(0),
 		remoteTemperature(1) }
     MAX-ACCESS read-write
@@ -7855,10 +8356,10 @@ tlpCoolingControlType OBJECT-TYPE
     DESCRIPTION
         "Specifies which temperature is used as a control point. If not supported,
 		this value will always return ERROR_NO_SUCH_NAME."
-    ::= { tlpCoolingConfigEntry 3 }	
-	
+    ::= { tlpCoolingConfigEntry 3 }
+
 tlpCoolingDisplayUnits OBJECT-TYPE
-    SYNTAX INTEGER { 
+    SYNTAX INTEGER {
 	    metric(0),
 		english(1) }
     MAX-ACCESS read-write
@@ -7866,7 +8367,7 @@ tlpCoolingDisplayUnits OBJECT-TYPE
     DESCRIPTION
         "Specifies whether displays output values in Metric or English formats. If not supported,
         this value will always return ERROR_NO_SUCH_NAME."
-    ::= { tlpCoolingConfigEntry 4 }	
+    ::= { tlpCoolingConfigEntry 4 }
 
 tlpCoolingBeepOnKey OBJECT-TYPE
     SYNTAX INTEGER {
@@ -7887,7 +8388,7 @@ tlpCoolingInputContactType OBJECT-TYPE
     STATUS current
     DESCRIPTION
         "The input contact type. If not supported, this value will always return ERROR_NO_SUCH_NAME."
-    ::= { tlpCoolingConfigEntry 6 }	
+    ::= { tlpCoolingConfigEntry 6 }
 
 tlpCoolingOutputContactType OBJECT-TYPE
     SYNTAX INTEGER {
@@ -7897,8 +8398,8 @@ tlpCoolingOutputContactType OBJECT-TYPE
     STATUS current
     DESCRIPTION
         "The output contact type. If not supported, this value will always return ERROR_NO_SUCH_NAME."
-    ::= { tlpCoolingConfigEntry 7 }		
-	
+    ::= { tlpCoolingConfigEntry 7 }
+
 tlpCoolingOutputRelaySource OBJECT-TYPE
     SYNTAX INTEGER {
         disabled(0),
@@ -7909,8 +8410,8 @@ tlpCoolingOutputRelaySource OBJECT-TYPE
     DESCRIPTION
         "The alarm level that causes the output relay to activate. If not supported,
 		this value will always return ERROR_NO_SUCH_NAME."
-    ::= { tlpCoolingConfigEntry 8 }	
-      
+    ::= { tlpCoolingConfigEntry 8 }
+
 tlpCoolingOutputRelayDefault OBJECT-TYPE
     SYNTAX INTEGER {
         normallyClosed(0),
@@ -7920,8 +8421,8 @@ tlpCoolingOutputRelayDefault OBJECT-TYPE
     DESCRIPTION
         "Type of contact to make when output relay is activated. If not supported,
 		this value will always return ERROR_NO_SUCH_NAME."
-   ::= { tlpCoolingConfigEntry 9 }	  
-  
+   ::= { tlpCoolingConfigEntry 9 }
+
 tlpCoolingOffOnInputContact OBJECT-TYPE
     SYNTAX INTEGER {
         turnOff(0),
@@ -7931,7 +8432,7 @@ tlpCoolingOffOnInputContact OBJECT-TYPE
     DESCRIPTION
         "Indicates if the unit should stop cooling when input contact is activated. If not supported,
         this value will always return ERROR_NO_SUCH_NAME."
-    ::= { tlpCoolingConfigEntry 10 }	
+    ::= { tlpCoolingConfigEntry 10 }
 
 tlpCoolingOffOnLeak OBJECT-TYPE
     SYNTAX INTEGER {
@@ -7942,10 +8443,10 @@ tlpCoolingOffOnLeak OBJECT-TYPE
     DESCRIPTION
         "Indicates if the unit should stop cooling when leak input is activated. If not supported,
         this value will always return ERROR_NO_SUCH_NAME."
-    ::= { tlpCoolingConfigEntry 11 } 
+    ::= { tlpCoolingConfigEntry 11 }
 
 tlpCoolingWaterLeakContactType OBJECT-TYPE
-    SYNTAX INTEGER { 
+    SYNTAX INTEGER {
 	    normallyClosed(0),
 		normallyOpen(1) }
     MAX-ACCESS read-write
@@ -7954,7 +8455,7 @@ tlpCoolingWaterLeakContactType OBJECT-TYPE
         "The water leak contact type. If not supported,
 		this value will always return ERROR_NO_SUCH_NAME."
     ::= { tlpCoolingConfigEntry 12 }
-  
+
 tlpCoolingAirFilterInterval OBJECT-TYPE
     SYNTAX Unsigned32
 	UNITS "weeks"
@@ -7963,8 +8464,8 @@ tlpCoolingAirFilterInterval OBJECT-TYPE
     DESCRIPTION
         "The number of weeks before the air filter needs to be changed.
         If not supported, this value will always return ERROR_NO_SUCH_NAME."
-    ::= { tlpCoolingConfigEntry 13 }	
-  
+    ::= { tlpCoolingConfigEntry 13 }
+
 tlpCoolingAirFilterAlarm OBJECT-TYPE
     SYNTAX INTEGER {
         disabled(0),
@@ -7976,7 +8477,7 @@ tlpCoolingAirFilterAlarm OBJECT-TYPE
         "When enabled, an alarm should occur when the maximum number of air filter run hours
 		has been exceeded. If not supported, this value will always return ERROR_NO_SUCH_NAME."
   ::= { tlpCoolingConfigEntry 14 }
-  
+
 tlpCoolingMaxAirFilterRunHours OBJECT-TYPE
     SYNTAX Unsigned32
 	UNITS "hours"
@@ -7986,26 +8487,26 @@ tlpCoolingMaxAirFilterRunHours OBJECT-TYPE
         "The maximum interval for air filter run hours before warning is annunciated.
         If not supported, this value will always return ERROR_NO_SUCH_NAME."
     ::= { tlpCoolingConfigEntry 15 }
-  
+
 tlpCoolingStartTimer OBJECT-TYPE
-    SYNTAX Unsigned32 
+    SYNTAX Unsigned32
 	UNITS "minutes"
     MAX-ACCESS read-write
     STATUS current
     DESCRIPTION
         "The unit will start operate after the specified timer elapsed. If not supported,
         this value will always return ERROR_NO_SUCH_NAME."
-    ::= { tlpCoolingConfigEntry 16 }  
-  
+    ::= { tlpCoolingConfigEntry 16 }
+
 tlpCoolingStopTimer  OBJECT-TYPE
-    SYNTAX Unsigned32 
+    SYNTAX Unsigned32
 	UNITS "minutes"
     MAX-ACCESS read-write
     STATUS current
     DESCRIPTION
         "The unit will switch to standby mode after the specified timer elapsed. If not supported,
         this value will always return ERROR_NO_SUCH_NAME."
-    ::= { tlpCoolingConfigEntry 17 }    
+    ::= { tlpCoolingConfigEntry 17 }
 
 tlpCoolingEnergyMode  OBJECT-TYPE
     SYNTAX INTEGER {
@@ -8049,9 +8550,9 @@ tlpCoolingDehumidifyingMode OBJECT-TYPE
     DESCRIPTION
         "This option enables or disables the dehumidifying mode.
          If not supported, this value will always return ERROR_NO_SUCH_NAME."
-    ::= { tlpCoolingConfigEntry 21 }	
-	
-tlpCoolingFanAlwaysOn OBJECT-TYPE  
+    ::= { tlpCoolingConfigEntry 21 }
+
+tlpCoolingFanAlwaysOn OBJECT-TYPE
     SYNTAX INTEGER {
         disabled(0),
         enabled(1) }
@@ -8060,9 +8561,9 @@ tlpCoolingFanAlwaysOn OBJECT-TYPE
     DESCRIPTION
         "This option enables or disables the fan always on.
          If not supported, this value will always return ERROR_NO_SUCH_NAME."
-    ::= { tlpCoolingConfigEntry 22 }	   
-   
-tlpCoolingQuietMode OBJECT-TYPE 	
+    ::= { tlpCoolingConfigEntry 22 }
+
+tlpCoolingQuietMode OBJECT-TYPE
     SYNTAX INTEGER {
         disabled(0),
         enabled(1) }
@@ -8071,9 +8572,9 @@ tlpCoolingQuietMode OBJECT-TYPE
     DESCRIPTION
         "This option enables or disables the quiet mode.
          If not supported, this value will always return ERROR_NO_SUCH_NAME."
-    ::= { tlpCoolingConfigEntry 23 }	
-	
-tlpCoolingHotGasBypass OBJECT-TYPE 	
+    ::= { tlpCoolingConfigEntry 23 }
+
+tlpCoolingHotGasBypass OBJECT-TYPE
     SYNTAX INTEGER {
         disabled(0),
         enabled(1) }
@@ -8094,8 +8595,8 @@ tlpCoolingAutoFanSpeed OBJECT-TYPE
         "This option enables or disables the auto fan speed.
          If not supported, this value will always return ERROR_NO_SUCH_NAME."
     ::= { tlpCoolingConfigEntry 25 }
-	
-	
+
+
 tlpCoolingConfigTemperatureFahrenheitTable OBJECT-TYPE
     SYNTAX SEQUENCE OF TlpCoolingConfigTemperatureFahrenheitEntry
     MAX-ACCESS not-accessible
@@ -8118,23 +8619,23 @@ tlpCoolingConfigTemperatureFahrenheitEntry OBJECT-TYPE
 
 TlpCoolingConfigTemperatureFahrenheitEntry ::= SEQUENCE {
     tlpCoolingSetPointDegF  	        Integer32,
-	tlpCoolingSupplyAirHighLimitDegF    Integer32,  
+	tlpCoolingSupplyAirHighLimitDegF    Integer32,
 	tlpCoolingSupplyAirLowLimitDegF     Integer32,
-	tlpCoolingMaxDeviationLimitDegF     Integer32, 
+	tlpCoolingMaxDeviationLimitDegF     Integer32,
 	tlpCoolingReturnAirHighLimitDegF    Integer32,
 	tlpCoolingReturnAirLowLimitDegF     Integer32,
     tlpCoolingRemoteSetPointDegF  	    Integer32 }
-		  
+
 tlpCoolingSetPointDegF OBJECT-TYPE
     SYNTAX Integer32
-    UNITS "0.1 degrees Fahrenheit" 
+    UNITS "0.1 degrees Fahrenheit"
     MAX-ACCESS read-write
     STATUS current
     DESCRIPTION
-        "The set point temperature the unit will control the temperature in tenths degrees Fahrenheit. 
+        "The set point temperature the unit will control the temperature in tenths degrees Fahrenheit.
         If not supported, this value will always return ERROR_NO_SUCH_NAME."
-    ::= { tlpCoolingConfigTemperatureFahrenheitEntry 1 }  
- 
+    ::= { tlpCoolingConfigTemperatureFahrenheitEntry 1 }
+
 tlpCoolingSupplyAirHighLimitDegF OBJECT-TYPE
     SYNTAX Integer32
     UNITS "0.1 degrees Fahrenheit"
@@ -8144,7 +8645,7 @@ tlpCoolingSupplyAirHighLimitDegF OBJECT-TYPE
         "Maximum allowed supply air temperature in tenths degrees Fahrenheit before firing an alarm.
         If not supported, this value will always return ERROR_NO_SUCH_NAME."
     ::= { tlpCoolingConfigTemperatureFahrenheitEntry 2  }
-    
+
 tlpCoolingSupplyAirLowLimitDegF OBJECT-TYPE
     SYNTAX Integer32
     UNITS "0.1 degrees Fahrenheit"
@@ -8153,8 +8654,8 @@ tlpCoolingSupplyAirLowLimitDegF OBJECT-TYPE
     DESCRIPTION
         "Minimum allowed supply air temperature in tenths degrees Fahrenheit before firing an alarm.
         If not supported, this value will always return ERROR_NO_SUCH_NAME."
-    ::= { tlpCoolingConfigTemperatureFahrenheitEntry 3 }  
-  
+    ::= { tlpCoolingConfigTemperatureFahrenheitEntry 3 }
+
 tlpCoolingMaxDeviationLimitDegF OBJECT-TYPE
     SYNTAX Integer32
     UNITS "0.1 degrees Fahrenheit"
@@ -8164,7 +8665,7 @@ tlpCoolingMaxDeviationLimitDegF OBJECT-TYPE
         "Maximum allowed air temperature deviation from set temperature before firing an alarm.
         If not supported, this value will always return ERROR_NO_SUCH_NAME."
     ::= { tlpCoolingConfigTemperatureFahrenheitEntry  4 }
-  
+
 tlpCoolingReturnAirHighLimitDegF OBJECT-TYPE
     SYNTAX Integer32
     UNITS "0.1 degrees Fahrenheit"
@@ -8173,29 +8674,29 @@ tlpCoolingReturnAirHighLimitDegF OBJECT-TYPE
     DESCRIPTION
         "Maximum allowed supply air temperature in tenths degrees Fahrenheit before firing an alarm.
         If not supported, this value will always return ERROR_NO_SUCH_NAME."
-    ::= { tlpCoolingConfigTemperatureFahrenheitEntry 5 }   
-  
+    ::= { tlpCoolingConfigTemperatureFahrenheitEntry 5 }
+
 tlpCoolingReturnAirLowLimitDegF OBJECT-TYPE
     SYNTAX Integer32
-    UNITS "0.1 degrees Fahrenheit" 
+    UNITS "0.1 degrees Fahrenheit"
     MAX-ACCESS read-write
     STATUS current
     DESCRIPTION
         "Minimum allowed supply air temperature in tenths degrees Fahrenheit before firing an alarm.
         If not supported, this value will always return ERROR_NO_SUCH_NAME."
-    ::= { tlpCoolingConfigTemperatureFahrenheitEntry 6 }   
+    ::= { tlpCoolingConfigTemperatureFahrenheitEntry 6 }
 
 tlpCoolingRemoteSetPointDegF OBJECT-TYPE
     SYNTAX Integer32
-    UNITS "0.1 degrees Fahrenheit" 
+    UNITS "0.1 degrees Fahrenheit"
     MAX-ACCESS read-write
     STATUS current
     DESCRIPTION
-        "The remote set point temperature the unit will control the temperature in tenths degrees Fahrenheit. 
+        "The remote set point temperature the unit will control the temperature in tenths degrees Fahrenheit.
         If not supported, this value will always return ERROR_NO_SUCH_NAME."
-    ::= { tlpCoolingConfigTemperatureFahrenheitEntry 7 }  
- 
- 
+    ::= { tlpCoolingConfigTemperatureFahrenheitEntry 7 }
+
+
 tlpCoolingConfigTemperatureCelsiusTable OBJECT-TYPE
     SYNTAX SEQUENCE OF TlpCoolingConfigTemperatureCelsiusEntry
     MAX-ACCESS not-accessible
@@ -8217,34 +8718,34 @@ tlpCoolingConfigTemperatureCelsiusEntry OBJECT-TYPE
     ::= { tlpCoolingConfigTemperatureCelsiusTable 1 }
 
 TlpCoolingConfigTemperatureCelsiusEntry ::= SEQUENCE {
-	tlpCoolingSetPointDegC  	      Integer32, 
-	tlpCoolingSupplyAirHighLimitDegC  Integer32, 
+	tlpCoolingSetPointDegC  	      Integer32,
+	tlpCoolingSupplyAirHighLimitDegC  Integer32,
 	tlpCoolingSupplyAirLowLimitDegC   Integer32,
-	tlpCoolingMaxDeviationLimitDegC   Integer32, 
+	tlpCoolingMaxDeviationLimitDegC   Integer32,
 	tlpCoolingReturnAirHighLimitDegC  Integer32,
 	tlpCoolingReturnAirLowLimitDegC   Integer32,
-    tlpCoolingRemoteSetPointDegC  	  Integer32 }  
- 
+    tlpCoolingRemoteSetPointDegC  	  Integer32 }
+
 tlpCoolingSetPointDegC OBJECT-TYPE
-    SYNTAX Integer32 
+    SYNTAX Integer32
     UNITS "0.1 degrees Celsius"
     MAX-ACCESS read-write
     STATUS current
     DESCRIPTION
         "The set point temperature the unit will control the temperature in tenths degrees Celsius.
-	    If not supported, this value will always return ERROR_NO_SUCH_NAME." 
-    ::= { tlpCoolingConfigTemperatureCelsiusEntry 1 } 
-    
+	    If not supported, this value will always return ERROR_NO_SUCH_NAME."
+    ::= { tlpCoolingConfigTemperatureCelsiusEntry 1 }
+
 tlpCoolingSupplyAirHighLimitDegC OBJECT-TYPE
-    SYNTAX Integer32 
+    SYNTAX Integer32
     UNITS "0.1 degrees Celsius"
     MAX-ACCESS read-write
     STATUS current
     DESCRIPTION
         "Maximum allowed supply air temperature in tenths degrees Celsius before firing an alarm.
         If not supported, this value will always return ERROR_NO_SUCH_NAME."
-    ::= { tlpCoolingConfigTemperatureCelsiusEntry 2 }  
-  
+    ::= { tlpCoolingConfigTemperatureCelsiusEntry 2 }
+
 tlpCoolingSupplyAirLowLimitDegC OBJECT-TYPE
     SYNTAX Integer32
     UNITS "0.1 degrees Celsius"
@@ -8254,17 +8755,17 @@ tlpCoolingSupplyAirLowLimitDegC OBJECT-TYPE
         "Minimum allowed supply air temperature in tenths degrees Celsius before firing an alarm.
         If not supported, this value will always return ERROR_NO_SUCH_NAME."
     ::= { tlpCoolingConfigTemperatureCelsiusEntry 3 }
-  
+
 tlpCoolingMaxDeviationLimitDegC OBJECT-TYPE
     SYNTAX Integer32
-    UNITS "0.1 degrees Celsius" 
+    UNITS "0.1 degrees Celsius"
     MAX-ACCESS read-write
     STATUS current
     DESCRIPTION
         "Maximum allowed air temperature deviation from set temperature before firing an alarm.
         If not supported, this value will always return ERROR_NO_SUCH_NAME."
-    ::= { tlpCoolingConfigTemperatureCelsiusEntry 4 } 
-    
+    ::= { tlpCoolingConfigTemperatureCelsiusEntry 4 }
+
 tlpCoolingReturnAirHighLimitDegC OBJECT-TYPE
     SYNTAX Integer32
     UNITS "0.1 degrees Celsius"
@@ -8273,8 +8774,8 @@ tlpCoolingReturnAirHighLimitDegC OBJECT-TYPE
     DESCRIPTION
         "Maximum allowed return air temperature in tenths degrees Celsius before firing an alarm.
         If not supported, this value will always return ERROR_NO_SUCH_NAME."
-    ::= { tlpCoolingConfigTemperatureCelsiusEntry 5 } 
-  
+    ::= { tlpCoolingConfigTemperatureCelsiusEntry 5 }
+
 tlpCoolingReturnAirLowLimitDegC OBJECT-TYPE
     SYNTAX Integer32
     UNITS "0.1 degrees Celsius"
@@ -8287,14 +8788,14 @@ tlpCoolingReturnAirLowLimitDegC OBJECT-TYPE
 
 tlpCoolingRemoteSetPointDegC OBJECT-TYPE
     SYNTAX Integer32
-    UNITS "0.1 degrees Celsius" 
+    UNITS "0.1 degrees Celsius"
     MAX-ACCESS read-write
     STATUS current
     DESCRIPTION
-        "The remote set point temperature the unit will control the temperature in tenths degrees Celsius. 
+        "The remote set point temperature the unit will control the temperature in tenths degrees Celsius.
         If not supported, this value will always return ERROR_NO_SUCH_NAME."
-    ::= { tlpCoolingConfigTemperatureCelsiusEntry 7 }  
-  
+    ::= { tlpCoolingConfigTemperatureCelsiusEntry 7 }
+
 -- kvm
 
 tlpKvmIdentNumKvm OBJECT-TYPE
@@ -8641,26 +9142,26 @@ tlpAgentConfigRemoteRegistration OBJECT-TYPE
     MAX-ACCESS read-write
     STATUS current
     DESCRIPTION
-        "Registers an SNMP contact's IP address and the port on which 
+        "Registers an SNMP contact's IP address and the port on which
         the contact is listening for SNMP traps.  Setting this
         value is used to CREATE a table entry in a non-standard way.
         Getting this value will return a string INADDR_ANY and any
         port number.
-    
+
         The port number should always be included. When unregistering
         an SNMP contact, the requester's IP address should be provided
-        with a port number of 0.  When setting or unsetting this OID, 
+        with a port number of 0.  When setting or unsetting this OID,
         the IP address string should never be 0 nor should it be empty.
 
         The registration uses its default community string to register
         each contact. To use a community other than the default, then
         it must be appended to the end of the string delimited with a
         comma.
-    
-        The address should be of the format 0.0.0.0:00000 for IPv4. 
-        If IPv6 is supported, use the bracket-enclosed format given 
+
+        The address should be of the format 0.0.0.0:00000 for IPv4.
+        If IPv6 is supported, use the bracket-enclosed format given
         in IETF RFC 2732 Section 2, with the following examples:
-    
+
         [FEDC:BA98:7654:3210:FEDC:BA98:7654:3210]:80
         [1080:0:0:0:8:800:200C:417A]:162
         [3ffe:2a00:100:7031::1]:162
@@ -8694,7 +9195,7 @@ tlpAgentEmailContactTable OBJECT-TYPE
         "A list of email contact entries. The number of entries is given by
         the value of tlpAgentNumEmailContacts."
     ::= { tlpAgentEmailContacts 2 }
-  
+
 tlpAgentEmailContactEntry OBJECT-TYPE
     SYNTAX TlpAgentEmailContactEntry
     MAX-ACCESS not-accessible
@@ -8725,7 +9226,7 @@ tlpAgentEmailContactRowStatus OBJECT-TYPE
     DESCRIPTION
         "Row status for the tlpAgentEmailContactTable."
     ::= { tlpAgentEmailContactEntry 2 }
-  
+
 tlpAgentEmailContactName OBJECT-TYPE
     SYNTAX DisplayString
     MAX-ACCESS read-write
@@ -8758,7 +9259,7 @@ tlpAgentSnmpContactTable OBJECT-TYPE
         "A list of SNMP contact entries. The number of entries is given by
         the value of tlpAgentNumSnmpContacts."
     ::= { tlpAgentSnmpContacts 2 }
-  
+
 tlpAgentSnmpContactEntry OBJECT-TYPE
     SYNTAX TlpAgentSnmpContactEntry
     MAX-ACCESS not-accessible
@@ -8794,7 +9295,7 @@ tlpAgentSnmpContactRowStatus OBJECT-TYPE
     DESCRIPTION
         "Row status for the tlpAgentSnmpContactTable."
     ::= { tlpAgentSnmpContactEntry 2 }
-  
+
 tlpAgentSnmpContactName OBJECT-TYPE
     SYNTAX DisplayString
     MAX-ACCESS read-write
@@ -8810,7 +9311,7 @@ tlpAgentSnmpContactIpAddress OBJECT-TYPE
     DESCRIPTION
         "The IP address of the SNMP contact."
     ::= { tlpAgentSnmpContactEntry 4 }
-  
+
 tlpAgentSnmpContactPort OBJECT-TYPE
     SYNTAX Unsigned32
     MAX-ACCESS read-write
@@ -8818,7 +9319,7 @@ tlpAgentSnmpContactPort OBJECT-TYPE
     DESCRIPTION
         "The port of the SNMP contact."
     ::= { tlpAgentSnmpContactEntry 5 }
-  
+
 tlpAgentSnmpContactSnmpVersion OBJECT-TYPE
     SYNTAX INTEGER {
         snmpv1(1),
@@ -8829,7 +9330,7 @@ tlpAgentSnmpContactSnmpVersion OBJECT-TYPE
     DESCRIPTION
         "The SNMP contact version to use for sending traps."
     ::= { tlpAgentSnmpContactEntry 6 }
-  
+
 tlpAgentSnmpContactSecurityName OBJECT-TYPE
     SYNTAX DisplayString
     MAX-ACCESS read-write
@@ -8852,8 +9353,8 @@ tlpAgentSnmpContactAuthPassword OBJECT-TYPE
     DESCRIPTION
         "The authentication password to use for sending V3 traps to the
         SNMP contact."
-    ::= { tlpAgentSnmpContactEntry 9 }	
-	
+    ::= { tlpAgentSnmpContactEntry 9 }
+
 -- alarms
 
 tlpAlarmsPresent OBJECT-TYPE
@@ -8939,7 +9440,7 @@ tlpAlarmTime OBJECT-TYPE
         existed before agent startup, the value of tlpAlarmsTime shall equal
         0."
     ::= { tlpAlarmEntry 3 }
-  
+
 tlpAlarmTableRef OBJECT-TYPE
     SYNTAX OBJECT IDENTIFIER
     MAX-ACCESS read-only
@@ -9112,6 +9613,12 @@ tlpAlarmInternalFirmwareError OBJECT-IDENTITY
     DESCRIPTION
         "A problem has been encountered with the device firmware."
     ::= { tlpDeviceAlarms 3 }
+
+tlpAlarmDeviceEEPROMFault OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "A problem has been encountered with the device EEPROM."
+    ::= { tlpDeviceAlarms 4 }
 
 tlpUpsAlarmBatteryBad OBJECT-IDENTITY
     STATUS current
@@ -9677,6 +10184,84 @@ tlpUpsAlarmLoadsNotAllOn OBJECT-IDENTITY
         "One of more loads are not on."
     ::= { tlpUpsAlarms 47 }
 
+tlpUpsAlarmBatteryTemperatureHigh OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "The battery temperature is high."
+    ::= { tlpUpsAlarms 48 }
+
+tlpUpsAlarmBatteryTemperatureLow OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "The battery temperature is low."
+    ::= { tlpUpsAlarms 49 }
+
+tlpUpsAlarmBatteryDisconnected OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "The battery disconnected."
+    ::= { tlpUpsAlarms 50 }
+
+tlpUpsAlarmBatteryTemperatureSensorDisconnected OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "The battery temperature sensor disconnected."
+    ::= { tlpUpsAlarms 51 }
+
+tlpUpsAlarmTemperatureDerating 	OBJECT-IDENTITY
+    STATUS current
+    DESCRIPTION
+        "Power derating due to high environment temperature."
+    ::= { tlpUpsAlarms 52 }
+
+tlpUpsAlarmInputContact OBJECT IDENTIFIER
+	::= { tlpUpsAlarms 53 }
+
+tlpUpsAlarmInputContact1 OBJECT-IDENTITY
+	STATUS current
+    DESCRIPTION
+        "Input contact 1 in alarm."
+	::= { tlpUpsAlarmInputContact 1 }
+
+tlpUpsAlarmOutputContact OBJECT IDENTIFIER
+	::= { tlpUpsAlarms 54 }
+
+tlpUpsAlarmOutputContact1 OBJECT-IDENTITY
+	STATUS current
+    DESCRIPTION
+        "Output contact 1 in alarm."
+	::= { tlpUpsAlarmOutputContact 1 }
+
+tlpUpsAlarmOutputContact2 OBJECT-IDENTITY
+	STATUS current
+    DESCRIPTION
+        "Output contact 2 in alarm."
+	::= { tlpUpsAlarmOutputContact 2 }
+
+tlpUpsAlarmOutputContact3 OBJECT-IDENTITY
+	STATUS current
+    DESCRIPTION
+        "Output contact 3 in alarm."
+	::= { tlpUpsAlarmOutputContact 3 }
+
+tlpUpsAlarmOutputContact4 OBJECT-IDENTITY
+	STATUS current
+    DESCRIPTION
+        "Output contact 4 in alarm."
+	::= { tlpUpsAlarmOutputContact 4 }
+
+tlpUpsAlarmOutputContact5 OBJECT-IDENTITY
+	STATUS current
+    DESCRIPTION
+        "Output contact 5 in alarm."
+	::= { tlpUpsAlarmOutputContact 5 }
+
+tlpUpsAlarmOutputContact6 OBJECT-IDENTITY
+	STATUS current
+    DESCRIPTION
+        "Output contact 6 in alarm."
+	::= { tlpUpsAlarmOutputContact 6 }
+
 tlpPduAlarmLoadLevelAboveThreshold OBJECT-IDENTITY
     STATUS current
     DESCRIPTION
@@ -10016,34 +10601,34 @@ tlpPduAlarmLoadsNotAllOn OBJECT-IDENTITY
     DESCRIPTION
         "One of more loads are not on."
     ::= { tlpPduAlarms 9 }
-	
+
 tlpPduAlarmLoadLevelBelowThreshold OBJECT-IDENTITY
     STATUS current
     DESCRIPTION
         "The load level is below the designated threshold."
-    ::= { tlpPduAlarms 10 }	
-	
+    ::= { tlpPduAlarms 10 }
+
 tlpPduAlarmCurrentBelowThreshold OBJECT IDENTIFIER
-    ::= { tlpPduAlarms 11 }	
+    ::= { tlpPduAlarms 11 }
 
 tlpPduAlarmCurrentBelowThreshold1 OBJECT-IDENTITY
     STATUS current
     DESCRIPTION
         "The output current on phase 1 below load limits."
-    ::= { tlpPduAlarmCurrentBelowThreshold 1 }	
-	
+    ::= { tlpPduAlarmCurrentBelowThreshold 1 }
+
 tlpPduAlarmCurrentBelowThreshold2 OBJECT-IDENTITY
     STATUS current
     DESCRIPTION
         "The output current on phase 2 below load limits."
-    ::= { tlpPduAlarmCurrentBelowThreshold 2 }	
-		
+    ::= { tlpPduAlarmCurrentBelowThreshold 2 }
+
 tlpPduAlarmCurrentBelowThreshold3 OBJECT-IDENTITY
     STATUS current
     DESCRIPTION
         "The output current on phase 3 below load limits."
-    ::= { tlpPduAlarmCurrentBelowThreshold 3 }	
-	
+    ::= { tlpPduAlarmCurrentBelowThreshold 3 }
+
 tlpEnvAlarmTemperatureBeyondLimits OBJECT-IDENTITY
     STATUS current
     DESCRIPTION
@@ -10555,16 +11140,16 @@ tlpAtsAlarmLoadLevelBelowThreshold OBJECT-IDENTITY
     DESCRIPTION
         "The load level is below the designated threshold."
     ::= {  tlpAtsAlarms 15 }
-	
+
 tlpAtsAlarmCurrentBelowThreshold OBJECT IDENTIFIER
     ::= { tlpAtsAlarms 16 }
- 	
+
 tlpAtsAlarmCurrentBelowThresholdA1 OBJECT-IDENTITY
     STATUS current
     DESCRIPTION
         "The output current on input source 1 phase 1 below load limits."
     ::= { tlpAtsAlarmCurrentBelowThreshold 1 }
-	
+
 tlpAtsAlarmCurrentBelowThresholdA2 OBJECT-IDENTITY
     STATUS current
     DESCRIPTION
@@ -10582,7 +11167,7 @@ tlpAtsAlarmCurrentBelowThresholdB1 OBJECT-IDENTITY
     DESCRIPTION
         "The output current on input source 2 phase 1 below load limits."
     ::= { tlpAtsAlarmCurrentBelowThreshold 4 }
-	
+
 tlpAtsAlarmCurrentBelowThresholdB2 OBJECT-IDENTITY
     STATUS current
     DESCRIPTION
@@ -10593,7 +11178,7 @@ tlpAtsAlarmCurrentBelowThresholdB3 OBJECT-IDENTITY
     STATUS current
     DESCRIPTION
         "The output current on input source 2 phase 3 below load limits."
-    ::= { tlpAtsAlarmCurrentBelowThreshold 6 }		
+    ::= { tlpAtsAlarmCurrentBelowThreshold 6 }
 
 tlpCoolingAlarmSupplyAirSensorFault OBJECT-IDENTITY
     STATUS current
@@ -10817,58 +11402,58 @@ tlpCoolingAlarmDisconnectedFromDevice OBJECT-IDENTITY
     DESCRIPTION
         "The device communications is disconnected."
     ::= { tlpCoolingAlarms 37 }
-	
+
 tlpCoolingAlarmAmbientTemperatureSensorFault OBJECT-IDENTITY
     STATUS current
     DESCRIPTION
         "Ambient temperature sensor is in fault."
     ::= { tlpCoolingAlarms 38 }
-	
+
 tlpCoolingAlarmRemoteTemperatureSensorFault OBJECT-IDENTITY
     STATUS current
     DESCRIPTION
         "Remote temperature sensor is in fault."
     ::= { tlpCoolingAlarms 39 }
-	
+
 tlpCoolingAlarmLowPressureSensorFault OBJECT-IDENTITY
     STATUS current
     DESCRIPTION
         "Low pressure sensor is in fault."
-    ::= { tlpCoolingAlarms 40 }	
-		
+    ::= { tlpCoolingAlarms 40 }
+
 tlpCoolingAlarmHighPressureSensorFault OBJECT-IDENTITY
     STATUS current
     DESCRIPTION
         "High pressure sensor is in fault."
-    ::= { tlpCoolingAlarms 41 }	
+    ::= { tlpCoolingAlarms 41 }
 
 tlpCoolingAlarmSentrytimerTimeout OBJECT-IDENTITY
     STATUS current
     DESCRIPTION
         "Sentry timer time out."
-    ::= { tlpCoolingAlarms 42 }	
-	
+    ::= { tlpCoolingAlarms 42 }
+
 tlpAutoProbeAlarms OBJECT IDENTIFIER
     ::= { tlpAgentAlarms 1 }
- 
+
 tlpAutoProbeAlarm01 OBJECT-IDENTITY
     STATUS current
     DESCRIPTION
         "Auto Probe 1 had failed"
     ::= { tlpAutoProbeAlarms 1 }
-	
+
 tlpAutoProbeAlarm02 OBJECT-IDENTITY
     STATUS current
     DESCRIPTION
         "Auto Probe 2 had failed"
     ::= { tlpAutoProbeAlarms 2 }
-	
+
 tlpAutoProbeAlarm03 OBJECT-IDENTITY
     STATUS current
     DESCRIPTION
         "Auto Probe 3 had failed"
     ::= { tlpAutoProbeAlarms 3 }
-	
+
 tlpAutoProbeAlarm04 OBJECT-IDENTITY
     STATUS current
     DESCRIPTION
@@ -10880,44 +11465,44 @@ tlpAutoProbeAlarm05 OBJECT-IDENTITY
     DESCRIPTION
         "Auto Probe 5 had failed"
     ::= { tlpAutoProbeAlarms 5 }
-	
+
 tlpAutoProbeAlarm06 OBJECT-IDENTITY
     STATUS current
     DESCRIPTION
         "Auto Probe 6 had failed"
     ::= { tlpAutoProbeAlarms 6 }
-	
+
 tlpAutoProbeAlarm07 OBJECT-IDENTITY
     STATUS current
     DESCRIPTION
         "Auto Probe 7 had failed"
     ::= { tlpAutoProbeAlarms 7 }
-	
+
 tlpAutoProbeAlarm08 OBJECT-IDENTITY
     STATUS current
     DESCRIPTION
         "Auto Probe 8 had failed"
     ::= { tlpAutoProbeAlarms 8 }
-	
- 
+
+
 tlpAutoProbeAlarm09 OBJECT-IDENTITY
     STATUS current
     DESCRIPTION
         "Auto Probe 9 had failed"
     ::= { tlpAutoProbeAlarms 9 }
-	
+
 tlpAutoProbeAlarm10 OBJECT-IDENTITY
     STATUS current
     DESCRIPTION
         "Auto Probe 10 had failed"
     ::= { tlpAutoProbeAlarms 10 }
-	
+
 tlpAutoProbeAlarm11 OBJECT-IDENTITY
     STATUS current
     DESCRIPTION
         "Auto Probe 11 had failed"
     ::= { tlpAutoProbeAlarms 11 }
-	
+
 tlpAutoProbeAlarm12 OBJECT-IDENTITY
     STATUS current
     DESCRIPTION
@@ -10929,55 +11514,55 @@ tlpAutoProbeAlarm13 OBJECT-IDENTITY
     DESCRIPTION
         "Auto Probe 13 had failed"
     ::= { tlpAutoProbeAlarms 13 }
-	
+
 tlpAutoProbeAlarm14 OBJECT-IDENTITY
     STATUS current
     DESCRIPTION
         "Auto Probe 14 had failed"
     ::= { tlpAutoProbeAlarms 14 }
-	
+
 tlpAutoProbeAlarm15 OBJECT-IDENTITY
     STATUS current
     DESCRIPTION
         "Auto Probe 15 had failed"
     ::= { tlpAutoProbeAlarms 15 }
-	
+
 tlpAutoProbeAlarm16 OBJECT-IDENTITY
     STATUS current
     DESCRIPTION
         "Auto Probe 16 had failed"
     ::= { tlpAutoProbeAlarms 16 }
- 
+
 tlpAutoProbeAlarm17 OBJECT-IDENTITY
     STATUS current
     DESCRIPTION
         "Auto Probe 17 had failed"
     ::= { tlpAutoProbeAlarms 17 }
-	
+
 tlpAutoProbeAlarm18 OBJECT-IDENTITY
     STATUS current
     DESCRIPTION
         "Auto Probe 18 had failed"
     ::= { tlpAutoProbeAlarms 18 }
-	
+
 tlpAutoProbeAlarm19 OBJECT-IDENTITY
     STATUS current
     DESCRIPTION
         "Auto Probe 19 had failed"
     ::= { tlpAutoProbeAlarms 19 }
-	
+
 tlpAutoProbeAlarm20 OBJECT-IDENTITY
     STATUS current
     DESCRIPTION
         "Auto Probe 20 had failed"
     ::= { tlpAutoProbeAlarms 20 }
-	
+
 tlpAutoProbeAlarm21 OBJECT-IDENTITY
     STATUS current
     DESCRIPTION
         "Auto Probe 21 had failed"
     ::= { tlpAutoProbeAlarms 21 }
-	
+
 tlpAutoProbeAlarm22 OBJECT-IDENTITY
     STATUS current
     DESCRIPTION
@@ -10989,55 +11574,55 @@ tlpAutoProbeAlarm23 OBJECT-IDENTITY
     DESCRIPTION
         "Auto Probe 23 had failed"
     ::= { tlpAutoProbeAlarms 23 }
-	
+
 tlpAutoProbeAlarm24 OBJECT-IDENTITY
     STATUS current
     DESCRIPTION
         "Auto Probe 24 had failed"
     ::= { tlpAutoProbeAlarms 24 }
-	
+
 tlpAutoProbeAlarm25 OBJECT-IDENTITY
     STATUS current
     DESCRIPTION
         "Auto Probe 25 had failed"
     ::= { tlpAutoProbeAlarms 25 }
-	
+
 tlpAutoProbeAlarm26 OBJECT-IDENTITY
     STATUS current
     DESCRIPTION
         "Auto Probe 26 had failed"
     ::= { tlpAutoProbeAlarms 26 }
- 
+
 tlpAutoProbeAlarm27 OBJECT-IDENTITY
     STATUS current
     DESCRIPTION
         "Auto Probe 27 had failed"
     ::= { tlpAutoProbeAlarms 27 }
-	
+
 tlpAutoProbeAlarm28 OBJECT-IDENTITY
     STATUS current
     DESCRIPTION
         "Auto Probe 28 had failed"
     ::= { tlpAutoProbeAlarms 28 }
-	
+
 tlpAutoProbeAlarm29 OBJECT-IDENTITY
     STATUS current
     DESCRIPTION
         "Auto Probe 29 had failed"
     ::= { tlpAutoProbeAlarms 29 }
-	
+
 tlpAutoProbeAlarm30 OBJECT-IDENTITY
     STATUS current
     DESCRIPTION
         "Auto Probe 30 had failed"
     ::= { tlpAutoProbeAlarms 30 }
-	
+
 tlpAutoProbeAlarm31 OBJECT-IDENTITY
     STATUS current
     DESCRIPTION
         "Auto Probe 31 had failed"
     ::= { tlpAutoProbeAlarms 31 }
-	
+
 tlpAutoProbeAlarm32 OBJECT-IDENTITY
     STATUS current
     DESCRIPTION
@@ -11049,55 +11634,55 @@ tlpAutoProbeAlarm33 OBJECT-IDENTITY
     DESCRIPTION
         "Auto Probe 33 had failed"
     ::= { tlpAutoProbeAlarms 33 }
-	
+
 tlpAutoProbeAlarm34 OBJECT-IDENTITY
     STATUS current
     DESCRIPTION
         "Auto Probe 34 had failed"
     ::= { tlpAutoProbeAlarms 34 }
-	
+
 tlpAutoProbeAlarm35 OBJECT-IDENTITY
     STATUS current
     DESCRIPTION
         "Auto Probe 35 had failed"
     ::= { tlpAutoProbeAlarms 35 }
-	
+
 tlpAutoProbeAlarm36 OBJECT-IDENTITY
     STATUS current
     DESCRIPTION
         "Auto Probe 36 had failed"
     ::= { tlpAutoProbeAlarms 36 }
- 
+
 tlpAutoProbeAlarm37 OBJECT-IDENTITY
     STATUS current
     DESCRIPTION
         "Auto Probe 37 had failed"
     ::= { tlpAutoProbeAlarms 37 }
-	
+
 tlpAutoProbeAlarm38 OBJECT-IDENTITY
     STATUS current
     DESCRIPTION
         "Auto Probe 38 had failed"
     ::= { tlpAutoProbeAlarms 38 }
-	
+
 tlpAutoProbeAlarm39 OBJECT-IDENTITY
     STATUS current
     DESCRIPTION
         "Auto Probe 39 had failed"
     ::= { tlpAutoProbeAlarms 39 }
-	
+
 tlpAutoProbeAlarm40 OBJECT-IDENTITY
     STATUS current
     DESCRIPTION
         "Auto Probe 40 had failed"
     ::= { tlpAutoProbeAlarms 40 }
-	
+
 tlpAutoProbeAlarm41 OBJECT-IDENTITY
     STATUS current
     DESCRIPTION
         "Auto Probe 41 had failed"
     ::= { tlpAutoProbeAlarms 41 }
-	
+
 tlpAutoProbeAlarm42 OBJECT-IDENTITY
     STATUS current
     DESCRIPTION
@@ -11109,55 +11694,55 @@ tlpAutoProbeAlarm43 OBJECT-IDENTITY
     DESCRIPTION
         "Auto Probe 43 had failed"
     ::= { tlpAutoProbeAlarms 43 }
-	
+
 tlpAutoProbeAlarm44 OBJECT-IDENTITY
     STATUS current
     DESCRIPTION
         "Auto Probe 44 had failed"
     ::= { tlpAutoProbeAlarms 44 }
-	
+
 tlpAutoProbeAlarm45 OBJECT-IDENTITY
     STATUS current
     DESCRIPTION
         "Auto Probe 45 had failed"
     ::= { tlpAutoProbeAlarms 45 }
-	
+
 tlpAutoProbeAlarm46 OBJECT-IDENTITY
     STATUS current
     DESCRIPTION
         "Auto Probe 46 had failed"
     ::= { tlpAutoProbeAlarms 46 }
- 
+
 tlpAutoProbeAlarm47 OBJECT-IDENTITY
     STATUS current
     DESCRIPTION
         "Auto Probe 47 had failed"
     ::= { tlpAutoProbeAlarms 47 }
-	
+
 tlpAutoProbeAlarm48 OBJECT-IDENTITY
     STATUS current
     DESCRIPTION
         "Auto Probe 48 had failed"
     ::= { tlpAutoProbeAlarms 48 }
-	
+
 tlpAutoProbeAlarm49 OBJECT-IDENTITY
     STATUS current
     DESCRIPTION
         "Auto Probe 49 had failed"
     ::= { tlpAutoProbeAlarms 49 }
-	
+
 tlpAutoProbeAlarm50 OBJECT-IDENTITY
     STATUS current
     DESCRIPTION
         "Auto Probe 50 had failed"
     ::= { tlpAutoProbeAlarms 50 }
-	
+
 tlpAutoProbeAlarm51 OBJECT-IDENTITY
     STATUS current
     DESCRIPTION
         "Auto Probe 51 had failed"
     ::= { tlpAutoProbeAlarms 51 }
-	
+
 tlpAutoProbeAlarm52 OBJECT-IDENTITY
     STATUS current
     DESCRIPTION
@@ -11169,55 +11754,55 @@ tlpAutoProbeAlarm53 OBJECT-IDENTITY
     DESCRIPTION
         "Auto Probe 53 had failed"
     ::= { tlpAutoProbeAlarms 53 }
-	
+
 tlpAutoProbeAlarm54 OBJECT-IDENTITY
     STATUS current
     DESCRIPTION
         "Auto Probe 54 had failed"
     ::= { tlpAutoProbeAlarms 54 }
-	
+
 tlpAutoProbeAlarm55 OBJECT-IDENTITY
     STATUS current
     DESCRIPTION
         "Auto Probe 55 had failed"
     ::= { tlpAutoProbeAlarms 55 }
-	
+
 tlpAutoProbeAlarm56 OBJECT-IDENTITY
     STATUS current
     DESCRIPTION
         "Auto Probe 56 had failed"
     ::= { tlpAutoProbeAlarms 56 }
- 
+
 tlpAutoProbeAlarm57 OBJECT-IDENTITY
     STATUS current
     DESCRIPTION
         "Auto Probe 57 had failed"
     ::= { tlpAutoProbeAlarms 57 }
-	
+
 tlpAutoProbeAlarm58 OBJECT-IDENTITY
     STATUS current
     DESCRIPTION
         "Auto Probe 58 had failed"
     ::= { tlpAutoProbeAlarms 58 }
-	
+
 tlpAutoProbeAlarm59 OBJECT-IDENTITY
     STATUS current
     DESCRIPTION
         "Auto Probe 59 had failed"
     ::= { tlpAutoProbeAlarms 59 }
-	
+
 tlpAutoProbeAlarm60 OBJECT-IDENTITY
     STATUS current
     DESCRIPTION
         "Auto Probe 60 had failed"
     ::= { tlpAutoProbeAlarms 60 }
-	
+
 tlpAutoProbeAlarm61 OBJECT-IDENTITY
     STATUS current
     DESCRIPTION
         "Auto Probe 61 had failed"
     ::= { tlpAutoProbeAlarms 61 }
-	
+
 tlpAutoProbeAlarm62 OBJECT-IDENTITY
     STATUS current
     DESCRIPTION
@@ -11229,7 +11814,7 @@ tlpAutoProbeAlarm63 OBJECT-IDENTITY
     DESCRIPTION
         "Auto Probe 63 had failed"
     ::= { tlpAutoProbeAlarms 63 }
-	
+
 tlpAutoProbeAlarm64 OBJECT-IDENTITY
     STATUS current
     DESCRIPTION
@@ -11342,11 +11927,11 @@ tlpNotifySystemStartup NOTIFICATION-TYPE
         Obj3Value = The MAC address of the engine
         OBJ4      = tlpAgentSerialNum
         Obj4Value = The serial number of the web card [should be 0 on PC]
-    
+
         --- if this trap is extended, place all static OIDs above this mark. all objects below
         --- the number of devices (tlpDeviceNumDevices) is explicit as per device for enumeration by
         --- the target receiver
-    
+
         OBJ5      = tlpDeviceNumDevices
         Obj5Value = The number of devices attached
 
@@ -11380,11 +11965,11 @@ tlpNotifySystemShutdown NOTIFICATION-TYPE
         Obj3Value = The MAC address of the engine
         OBJ4      = tlpAgentSerialNum
         Obj4Value = The serial number of the web card [should be 0 on PC]
-    
+
         --- if this trap is extended, place all static OIDs above this mark. all objects below
         --- the number of devices (tlpDeviceNumDevices) is explicit as per device for enumeration by
         --- the target receiver
-    
+
         OBJ5      = tlpDeviceNumDevices
         Obj5Value = The number of devices attached
 
@@ -11418,11 +12003,11 @@ tlpNotifySystemUpdate NOTIFICATION-TYPE
     Obj3Value = The MAC address of the engine
     OBJ4      = tlpAgentSerialNum
     Obj4Value = The serial number of the web card [should be 0 on PC]
-    
+
     --- if this trap is extended, place all static OIDs above this mark. all objects below
     --- the number of devices (tlpDeviceNumDevices) is explicit as per device for enumeration by
     --- the target receiver
-    
+
     OBJ5      = tlpDeviceNumDevices
     Obj5Value = The number of devices attached
 
@@ -11528,13 +12113,13 @@ tlpNotificationsDeviceUsbCommunicationsLost NOTIFICATION-TYPE
     DESCRIPTION
         "This notification is sent when the device USB communications is lost."
     ::= { tlpNotificationsDevice 9 }
-	
+
 tlpNotificationsDevicePowerSupplyShutdown NOTIFICATION-TYPE
     OBJECTS { sysUpTime, tlpNotifyEventTableRef, tlpNotifyEventTableRowRef }
     STATUS current
     DESCRIPTION
         "This notification is sent when the device reports a shutdown occurred due to a power supply fault."
-    ::= { tlpNotificationsDevice 10 }  
+    ::= { tlpNotificationsDevice 10 }
 
 tlpNotificationsDeviceOverLoadShutdown NOTIFICATION-TYPE
     OBJECTS { sysUpTime, tlpNotifyEventTableRef, tlpNotifyEventTableRowRef }
@@ -11555,21 +12140,21 @@ tlpNotificationsDeviceOverTemperatureShutdown NOTIFICATION-TYPE
     STATUS current
     DESCRIPTION
         "This notification is sent when the device reports a shutdown occurred due to an over temperature fault."
-    ::= { tlpNotificationsDevice 13 }	
+    ::= { tlpNotificationsDevice 13 }
 
 tlpNotificationsDeviceModeTransitionTimeout NOTIFICATION-TYPE
     OBJECTS { sysUpTime, tlpNotifyEventTableRef, tlpNotifyEventTableRowRef }
     STATUS current
     DESCRIPTION
         "This notification is sent when the device timed out transitioning to a mode."
-    ::= { tlpNotificationsDevice 14 }	
+    ::= { tlpNotificationsDevice 14 }
 
 tlpNotificationsDeviceFailedModeTransitionToIdle NOTIFICATION-TYPE
     OBJECTS { sysUpTime, tlpNotifyEventTableRef, tlpNotifyEventTableRowRef }
     STATUS current
     DESCRIPTION
         "This notification is sent when the device failed a transition to idle mode."
-    ::= { tlpNotificationsDevice 15 }	
+    ::= { tlpNotificationsDevice 15 }
 
 tlpNotificationsDeviceInternalCommunicationsLost NOTIFICATION-TYPE
     OBJECTS { sysUpTime, tlpNotifyEventTableRef, tlpNotifyEventTableRowRef }
@@ -11591,21 +12176,21 @@ tlpNotificationsDeviceTransferToReboot NOTIFICATION-TYPE
     DESCRIPTION
         "This notification is sent when a device reboot occurred."
     ::= { tlpNotificationsDevice 18 }
-	
+
 tlpNotificationsDeviceTransferToWatchdogReboot NOTIFICATION-TYPE
     OBJECTS { sysUpTime, tlpNotifyEventTableRef, tlpNotifyEventTableRowRef }
     STATUS current
     DESCRIPTION
         "This notification is sent when a device reboot occurred due to a watchdog fault."
     ::= { tlpNotificationsDevice 19 }
-	
+
 tlpNotificationsDeviceTransferToLatchedIdle NOTIFICATION-TYPE
     OBJECTS { sysUpTime, tlpNotifyEventTableRef, tlpNotifyEventTableRowRef }
     STATUS current
     DESCRIPTION
         "This notification is sent when the device transferred to latched idle mode."
     ::= { tlpNotificationsDevice 20 }
-	
+
 tlpNotificationsDeviceTransferToLatchedStandby NOTIFICATION-TYPE
     OBJECTS { sysUpTime, tlpNotifyEventTableRef, tlpNotifyEventTableRowRef }
     STATUS current
@@ -11618,8 +12203,8 @@ tlpNotificationsDeviceTransferToLatchedLine NOTIFICATION-TYPE
     STATUS current
     DESCRIPTION
         "This notification is sent when the device transferred to latched line mode."
-    ::= { tlpNotificationsDevice 22 }	
-		
+    ::= { tlpNotificationsDevice 22 }
+
 tlpNotificationsDeviceFailSafeClockMonitorEngaged NOTIFICATION-TYPE
     OBJECTS { sysUpTime, tlpNotifyEventTableRef, tlpNotifyEventTableRowRef }
     STATUS current
@@ -11633,7 +12218,7 @@ tlpNotificationsDeviceTransferToIdle NOTIFICATION-TYPE
     DESCRIPTION
         "This notification is sent when the device transferred to idle mode."
     ::= { tlpNotificationsDevice 24 }
-	
+
 tlpNotificationsDeviceVoutUnderVoltageShutdown NOTIFICATION-TYPE
     OBJECTS { sysUpTime, tlpNotifyEventTableRef, tlpNotifyEventTableRowRef }
     STATUS current
@@ -11647,7 +12232,7 @@ tlpNotificationsDeviceVoutOverVoltageShutdown NOTIFICATION-TYPE
     DESCRIPTION
         "This notification is sent when the device reports a shutdown occurred due to a vout over voltage fault."
     ::= { tlpNotificationsDevice 26 }
-	
+
 tlpNotificationsDeviceUnhandledFault NOTIFICATION-TYPE
     OBJECTS { sysUpTime, tlpNotifyEventTableRef, tlpNotifyEventTableRowRef }
     STATUS current
@@ -11698,7 +12283,7 @@ tlpNotificationsUpsBatteryConfigurationMismatch NOTIFICATION-TYPE
     DESCRIPTION
         "This notification is sent when the ups battery configuration is mismatched."
     ::= { tlpNotificationsUps 6 }
- 
+
 tlpNotificationsUpsBatteryUnderVoltageShutdown NOTIFICATION-TYPE
     OBJECTS { sysUpTime, tlpNotifyEventTableRef, tlpNotifyEventTableRowRef }
     STATUS current
@@ -11747,13 +12332,13 @@ tlpNotificationsUpsTransferToSelftest NOTIFICATION-TYPE
     DESCRIPTION
         "This notification is sent when a self test is initiated."
     ::= { tlpNotificationsUps 13 }
-	
+
 tlpNotificationsUpsTransferToEconomy NOTIFICATION-TYPE
     OBJECTS { sysUpTime, tlpNotifyEventTableRef, tlpNotifyEventTableRowRef }
     STATUS current
     DESCRIPTION
         "This notification is sent when the device transferred to economy mode."
-    ::= { tlpNotificationsUps 14 }	
+    ::= { tlpNotificationsUps 14 }
 
 tlpNotificationsUpsLineConnectRelayFaultShutdown NOTIFICATION-TYPE
     OBJECTS { sysUpTime, tlpNotifyEventTableRef, tlpNotifyEventTableRowRef }
@@ -11761,7 +12346,7 @@ tlpNotificationsUpsLineConnectRelayFaultShutdown NOTIFICATION-TYPE
     DESCRIPTION
         "This notification is sent when the device reports a shutdown occurred due to line connect relay fault."
     ::= { tlpNotificationsUps 15 }
-	
+
 tlpNotificationsUpsTransferToFaultBypass NOTIFICATION-TYPE
     OBJECTS { sysUpTime, tlpNotifyEventTableRef, tlpNotifyEventTableRowRef }
     STATUS current

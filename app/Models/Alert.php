@@ -18,6 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2016 Neil Lathwood
  * @author     Neil Lathwood <neil@lathwood.co.uk>
  */
@@ -26,6 +27,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use LibreNMS\Enum\AlertState;
 
 class Alert extends Model
@@ -36,7 +39,8 @@ class Alert extends Model
 
     /**
      * Only select active alerts
-     * @param Builder $query
+     *
+     * @param  Builder  $query
      * @return Builder
      */
     public function scopeActive($query)
@@ -46,7 +50,8 @@ class Alert extends Model
 
     /**
      * Only select active alerts
-     * @param Builder $query
+     *
+     * @param  Builder  $query
      * @return Builder
      */
     public function scopeAcknowledged($query)
@@ -56,17 +61,17 @@ class Alert extends Model
 
     // ---- Define Relationships ----
 
-    public function device()
+    public function device(): BelongsTo
     {
         return $this->belongsTo(\App\Models\Device::class, 'device_id');
     }
 
-    public function rule()
+    public function rule(): BelongsTo
     {
         return $this->belongsTo(\App\Models\AlertRule::class, 'rule_id', 'id');
     }
 
-    public function users()
+    public function users(): BelongsToMany
     {
         return $this->belongsToMany(\App\Models\User::class, 'devices_perms', 'device_id', 'user_id');
     }

@@ -16,6 +16,7 @@
 
 /**
  * libreNMS HTTP-Authentication and LDAP Authorization Library
+ *
  * @author Maximilian Wilhelm <max@rfc2324.org>
  * @copyright 2016 LibreNMS, Barbarossa
  * @license GPL
@@ -33,7 +34,7 @@ class LdapAuthorizationAuthorizer extends AuthorizerBase
     use LdapSessionCache;
 
     protected $ldap_connection;
-    protected static $AUTH_IS_EXTERNAL = 1;
+    protected static $AUTH_IS_EXTERNAL = true;
 
     public function __construct()
     {
@@ -77,7 +78,7 @@ class LdapAuthorizationAuthorizer extends AuthorizerBase
     public function userExists($username, $throw_exception = false)
     {
         if ($this->authLdapSessionCacheGet('user_exists')) {
-            return 1;
+            return true;
         }
 
         $filter = '(' . Config::get('auth_ldap_prefix') . $username . ')';
@@ -90,7 +91,7 @@ class LdapAuthorizationAuthorizer extends AuthorizerBase
          */
             $this->authLdapSessionCacheSet('user_exists', 1);
 
-            return 1;
+            return true;
         }
 
         /*
@@ -98,7 +99,7 @@ class LdapAuthorizationAuthorizer extends AuthorizerBase
          * on some end and the user will be happy if it "just works" after the user
          * has been added to LDAP.
          */
-        return 0;
+        return false;
     }
 
     public function getUserlevel($username)
@@ -209,7 +210,7 @@ class LdapAuthorizationAuthorizer extends AuthorizerBase
             }
         }
 
-        return 0;
+        return false;
     }
 
     protected function getMembername($username)

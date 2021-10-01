@@ -18,6 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2019 Vitali Kari
  * @copyright  2019 Tony Murray
  * @author     Vitali Kari <vitali.kari@gmail.com>
@@ -66,6 +67,7 @@ class Timos extends OS implements MplsDiscovery, MplsPolling, WirelessPowerDisco
      * Discover wireless Rx (Received Signal Strength). This is in dBm. Type is power.
      * Returns an array of LibreNMS\Device\Sensor objects that have been discovered
      * ALU-MICROWAVE-MIB::aluMwRadioLocalRxMainPower
+     *
      * @return array
      */
     public function discoverWirelesspower()
@@ -94,9 +96,10 @@ class Timos extends OS implements MplsDiscovery, MplsPolling, WirelessPowerDisco
     }
 
     /**
-     * @param tmnxEnacpVal
-     * @return encapsulation string
-     * see TIMETRA-TC-MIB::TmnxEncapVal
+     * @param  mixed  $tmnxEncapVal
+     * @return string encapsulation
+     *
+     * @see TIMETRA-TC-MIB::TmnxEncapVal
      */
     private function nokiaEncap($tmnxEncapVal)
     {
@@ -155,7 +158,7 @@ class Timos extends OS implements MplsDiscovery, MplsPolling, WirelessPowerDisco
     }
 
     /**
-     * @param Collection $lsps collecton of synchronized lsp objects from discoverMplsLsps()
+     * @param  Collection  $lsps  collecton of synchronized lsp objects from discoverMplsLsps()
      * @return Collection MplsLspPath objects
      */
     public function discoverMplsPaths($lsps)
@@ -501,7 +504,7 @@ class Timos extends OS implements MplsDiscovery, MplsPolling, WirelessPowerDisco
     }
 
     /**
-     * @param Collection $lsps collecton of synchronized lsp objects from pollMplsLsps()
+     * @param  Collection  $lsps  collecton of synchronized lsp objects from pollMplsLsps()
      * @return Collection MplsLspPath objects
      */
     public function pollMplsPaths($lsps)
@@ -668,7 +671,7 @@ class Timos extends OS implements MplsDiscovery, MplsPolling, WirelessPowerDisco
                 'sapLastStatusChange' => round($value['sapLastStatusChange'] / 100),
             ]));
             //create SAP graphs
-            $rrd_name = safename('sap-' . $traffic_id);
+            $rrd_name = \LibreNMS\Data\Store\Rrd::safeName('sap-' . $traffic_id);
             $rrd_def = RrdDefinition::make()
             ->addDataset('sapIngressBits', 'COUNTER', 0)
             ->addDataset('sapEgressBits', 'COUNTER', 0)

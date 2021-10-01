@@ -9,9 +9,9 @@ use LibreNMS\Exceptions\AuthenticationException;
 
 class MysqlAuthorizer extends AuthorizerBase
 {
-    protected static $HAS_AUTH_USERMANAGEMENT = 1;
-    protected static $CAN_UPDATE_USER = 1;
-    protected static $CAN_UPDATE_PASSWORDS = 1;
+    protected static $HAS_AUTH_USERMANAGEMENT = true;
+    protected static $CAN_UPDATE_USER = true;
+    protected static $CAN_UPDATE_PASSWORDS = true;
 
     public function authenticate($credentials)
     {
@@ -23,7 +23,7 @@ class MysqlAuthorizer extends AuthorizerBase
         $enabled = $user_data->enabled;
 
         if (! $enabled) {
-            throw new AuthenticationException($message = 'login denied');
+            throw new AuthenticationException();
         }
 
         if (Hash::check($password, $hash)) {
@@ -45,9 +45,9 @@ class MysqlAuthorizer extends AuthorizerBase
          */
 
         if (! static::$CAN_UPDATE_PASSWORDS) {
-            return 0;
+            return false;
         } elseif (empty($username) || ! $this->userExists($username)) {
-            return 1;
+            return true;
         } else {
             return User::thisAuth()->where('username', $username)->value('can_modify_passwd');
         }
@@ -57,7 +57,7 @@ class MysqlAuthorizer extends AuthorizerBase
     {
         // check if updating passwords is allowed (mostly for classes that extend this)
         if (! static::$CAN_UPDATE_PASSWORDS) {
-            return 0;
+            return false;
         }
 
         /** @var User $user */
@@ -129,7 +129,7 @@ class MysqlAuthorizer extends AuthorizerBase
         Eloquent::DB()->table('ports_perms')->where('user_id', $user_id)->delete();
         Eloquent::DB()->table('users_prefs')->where('user_id', $user_id)->delete();
 
-        return User::destroy($user_id);
+        return (bool) User::destroy($user_id);
     }
 
     public function getUserlist()
@@ -144,7 +144,7 @@ class MysqlAuthorizer extends AuthorizerBase
             return $user->toArray();
         }
 
-        return null;
+        return false;
     }
 
     public function updateUser($user_id, $realname, $level, $can_modify_passwd, $email)
@@ -156,6 +156,6 @@ class MysqlAuthorizer extends AuthorizerBase
         $user->can_modify_passwd = (int) $can_modify_passwd;
         $user->email = $email;
 
-        $user->save();
+        return $user->save();
     }
 }

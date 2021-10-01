@@ -12,16 +12,16 @@ if ($device['os_group'] == 'unix' || $device['os'] == 'windows') {
     }
 
     $agent_start = microtime(true);
-    $poller_target = Device::pollerTarget($device['hostname']);
+    $poller_target = \LibreNMS\Util\Rewrite::addIpv6Brackets(Device::pollerTarget($device['hostname']));
     $agent = fsockopen($poller_target, $agent_port, $errno, $errstr, \LibreNMS\Config::get('unix-agent.connection-timeout'));
-
-    // Set stream timeout (for timeouts during agent  fetch
-    stream_set_timeout($agent, \LibreNMS\Config::get('unix-agent.read-timeout'));
-    $agentinfo = stream_get_meta_data($agent);
 
     if (! $agent) {
         echo 'Connection to UNIX agent failed on port ' . $agent_port . '.';
     } else {
+        // Set stream timeout (for timeouts during agent  fetch
+        stream_set_timeout($agent, \LibreNMS\Config::get('unix-agent.read-timeout'));
+        $agentinfo = stream_get_meta_data($agent);
+
         // fetch data while not eof and not timed-out
         while ((! feof($agent)) && (! $agentinfo['timed_out'])) {
             $agent_raw .= fgets($agent, 128);

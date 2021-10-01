@@ -18,6 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2017 Neil Lathwood
  * @author     Neil Lathwood <librenms+n@laf.io>
  */
@@ -60,7 +61,7 @@ class DBSetupTest extends DBTestCase
     {
         $files = array_map(function ($migration_file) {
             return basename($migration_file, '.php');
-        }, array_diff(scandir(base_path('/database/migrations')), ['.', '..']));
+        }, array_diff(scandir(base_path('/database/migrations')), ['.', '..', '.gitkeep']));
         $migrated = DB::connection($this->connection)->table('migrations')->pluck('migration')->toArray();
         sort($files);
         sort($migrated);
@@ -75,9 +76,9 @@ class DBSetupTest extends DBTestCase
 
     public function testCheckDBCollation()
     {
-        $collation = DB::connection($this->connection)->select(DB::raw("SELECT DEFAULT_CHARACTER_SET_NAME, DEFAULT_COLLATION_NAME FROM information_schema.SCHEMATA S WHERE schema_name = '$this->db_name' AND  ( DEFAULT_CHARACTER_SET_NAME != 'utf8' OR DEFAULT_COLLATION_NAME != 'utf8_unicode_ci')"));
+        $collation = DB::connection($this->connection)->select(DB::raw("SELECT DEFAULT_CHARACTER_SET_NAME, DEFAULT_COLLATION_NAME FROM information_schema.SCHEMATA S WHERE schema_name = '$this->db_name' AND  ( DEFAULT_CHARACTER_SET_NAME != 'utf8mb4' OR DEFAULT_COLLATION_NAME != 'utf8mb4_unicode_ci')"));
         if (isset($collation[0])) {
-            $error = implode(' ', $collation[0]);
+            $error = implode(' ', (array) $collation[0]);
         } else {
             $error = '';
         }
@@ -86,35 +87,45 @@ class DBSetupTest extends DBTestCase
 
     public function testCheckTableCollation()
     {
-        $collation = DB::connection($this->connection)->select(DB::raw("SELECT T.TABLE_NAME, C.CHARACTER_SET_NAME, C.COLLATION_NAME FROM information_schema.TABLES AS T, information_schema.COLLATION_CHARACTER_SET_APPLICABILITY AS C WHERE C.collation_name = T.table_collation AND T.table_schema = '$this->db_name' AND  ( C.CHARACTER_SET_NAME != 'utf8' OR C.COLLATION_NAME != 'utf8_unicode_ci' );"));
+        $collation = DB::connection($this->connection)->select(DB::raw("SELECT T.TABLE_NAME, C.CHARACTER_SET_NAME, C.COLLATION_NAME FROM information_schema.TABLES AS T, information_schema.COLLATION_CHARACTER_SET_APPLICABILITY AS C WHERE C.collation_name = T.table_collation AND T.table_schema = '$this->db_name' AND  ( C.CHARACTER_SET_NAME != 'utf8mb4' OR C.COLLATION_NAME != 'utf8mb4_unicode_ci' );"));
         $error = '';
-        foreach ($collation as $id => $data) {
-            $error .= implode(' ', $data) . PHP_EOL;
+        foreach ($collation as $data) {
+            $error .= implode(' ', (array) $data) . PHP_EOL;
         }
         $this->assertEmpty($collation, 'Wrong Table Collation or Character set: ' . $error);
     }
 
     public function testCheckColumnCollation()
     {
-        $collation = DB::connection($this->connection)->select(DB::raw("SELECT TABLE_NAME, COLUMN_NAME, CHARACTER_SET_NAME, COLLATION_NAME FROM information_schema.COLUMNS  WHERE TABLE_SCHEMA = '$this->db_name'  AND  ( CHARACTER_SET_NAME != 'utf8' OR COLLATION_NAME != 'utf8_unicode_ci' );"));
+        $collation = DB::connection($this->connection)->select(DB::raw("SELECT TABLE_NAME, COLUMN_NAME, CHARACTER_SET_NAME, COLLATION_NAME FROM information_schema.COLUMNS  WHERE TABLE_SCHEMA = '$this->db_name'  AND  ( CHARACTER_SET_NAME != 'utf8mb4' OR COLLATION_NAME != 'utf8mb4_unicode_ci' );"));
         $error = '';
-        foreach ($collation as $id => $data) {
-            $error .= implode(' ', $data) . PHP_EOL;
+        foreach ($collation as $data) {
+            $error .= implode(' ', (array) $data) . PHP_EOL;
         }
         $this->assertEmpty($collation, 'Wrong Column Collation or Character set: ' . $error);
     }
 
     public function testSqlMode()
     {
-        $this->assertEquals(
-            'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION',
-            DB::connection($this->connection)->select(DB::raw('SELECT @@sql_mode AS mode'))[0]->mode
-        );
+        $result = DB::connection($this->connection)->selectOne(DB::raw('SELECT @@version AS version, @@sql_mode AS mode'));
+        preg_match('/([0-9.]+)(?:-(\w+))?/', $result->version, $matches);
+        $version = $matches[1] ?? null;
+        $vendor = $matches[2] ?? null;
+        $mode = $result->mode;
+
+        // NO_AUTO_CREATE_USER is removed in mysql 8
+        $expected = ($vendor !== 'MariaDB' && version_compare($version, '8.0.0') >= 0)
+            ? 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION'
+            : 'ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_AUTO_CREATE_USER,NO_ENGINE_SUBSTITUTION';
+
+        $this->assertEquals($expected, $mode);
     }
 
     public function testValidateSchema()
     {
         if (is_file('misc/db_schema.yaml')) {
+            DB::connection($this->connection)->statement('SET time_zone = "+00:00";');
+
             $master_schema = \Symfony\Component\Yaml\Yaml::parse(
                 file_get_contents('misc/db_schema.yaml')
             );

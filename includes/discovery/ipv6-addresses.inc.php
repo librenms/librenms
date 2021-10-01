@@ -1,12 +1,7 @@
 <?php
 
-if (key_exists('vrf_lite_cisco', $device) && (count($device['vrf_lite_cisco']) != 0)) {
-    $vrfs_lite_cisco = $device['vrf_lite_cisco'];
-} else {
-    $vrfs_lite_cisco = [['context_name'=>null]];
-}
-foreach ($vrfs_lite_cisco as $vrf) {
-    $device['context_name'] = $vrf['context_name'];
+foreach (DeviceCache::getPrimary()->getVrfContexts() as $context_name) {
+    $device['context_name'] = $context_name;
 
     $oids = snmp_walk($device, 'ipAddressIfIndex.ipv6', ['-Osq', '-Ln'], 'IP-MIB');
     $oids = str_replace('ipAddressIfIndex.ipv6.', '', $oids);

@@ -1,15 +1,16 @@
 <?php
 
 use LibreNMS\Config;
+use LibreNMS\Util\Number;
 
 function format_bytes_billing($value)
 {
-    return format_number($value, Config::get('billing.base')) . 'B';
+    return Number::formatBase($value, Config::get('billing.base'));
 }//end format_bytes_billing()
 
 function format_bytes_billing_short($value)
 {
-    return format_number($value, Config::get('billing.base'), 2, 3);
+    return Number::formatBase($value, Config::get('billing.base'), 2, 3, '');
 }//end format_bytes_billing_short()
 
 function getDates($dayofmonth, $months = 0)
@@ -215,7 +216,7 @@ function getSum($bill_id, $datefrom, $dateto)
 
 function getPeriod($bill_id, $datefrom, $dateto)
 {
-    $ptot = dbFetchCell('SELECT SUM(period) FROM bill_data WHERE bill_id = ? AND timestamp > ? AND timestamp <= ?', [$bill_id, $datefrom, $dateto]);
+    $ptot = dbFetchRow('SELECT SUM(period) as `period`, MAX(in_delta) as `peak_in`, MAX(out_delta) as `peak_out`  FROM bill_data WHERE bill_id = ? AND timestamp > ? AND timestamp <= ?', [$bill_id, $datefrom, $dateto]);
 
     return $ptot;
 }//end getPeriod()

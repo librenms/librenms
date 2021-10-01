@@ -21,7 +21,7 @@
 */
 
 require 'includes/html/graphs/common.inc.php';
-$rrd_filename = rrd_name($device['hostname'], 'riverbed_passthrough');
+$rrd_filename = Rrd::name($device['hostname'], 'riverbed_passthrough');
 
 $scale_min = 0;
 $colours = 'mixed';
@@ -41,7 +41,7 @@ $data_sources = [
 
 $i = 0;
 
-if (rrdtool_check_rrd_exists($rrd_filename)) {
+if (Rrd::checkRrdExists($rrd_filename)) {
     foreach ($data_sources as $ds => $var) {
         $rrd_list[$i]['filename'] = $rrd_filename;
         $rrd_list[$i]['descr'] = $var['descr'];

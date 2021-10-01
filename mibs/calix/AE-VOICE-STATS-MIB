@@ -1,0 +1,641 @@
+AE-VOICE-STATS-MIB DEFINITIONS ::= BEGIN
+
+
+IMPORTS
+    OBJECT-TYPE,
+    MODULE-IDENTITY,
+    Counter32
+        FROM SNMPv2-SMI
+
+    TruthValue, RowStatus
+        FROM SNMPv2-TC
+
+	AeVoiceSvcIndex,
+	AeVoipCfgState,
+	AeVoipServerStatus,
+	AeSipCallStatus,
+	AeHookState,
+	AeVoipIpLineStatus,
+	AeRtpEncodeType,
+	AeRtpPacketSize,
+	AeClearAction
+        FROM AE-TC
+
+    pSeries
+        FROM AE-ALARM-TABLE-MIB
+    ;
+
+aeVoiceStatsModule MODULE-IDENTITY
+    LAST-UPDATED "201006290000Z"
+    ORGANIZATION "Calix Networks, Inc."
+    CONTACT-INFO
+        "   Calix Networks, Inc.
+
+        Postal: 1035 North McDowell Boulevard
+            Petaluma, CA  94954-1173
+            USA
+
+         Phone: +1 707 766 3000
+           Fax: +1 707 766 3100
+
+        E-mail: mib-info@calix.com"
+    DESCRIPTION "This management information module contains Voice status and statistics."
+
+    REVISION "201006290000Z"
+    DESCRIPTION "Initial release."
+    ::= { pSeries 6 }
+
+
+--------------------------------------------------------------------------
+--
+-- General Design:
+--  There is a pair of tables (counters/status) for each Voice Port that uses VoIP(SIP) service
+--  These tables are auto-instantiated by the ONT
+--  Each table has a clearing object that clears all object in its instance of table
+--
+--------------------------------------------------------------------------
+
+--------------------------------------------------------------
+--  aeVoiceStatusTable definition
+--------------------------------------------------------------
+
+aeVoiceStatusTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AeVoiceStatusEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    ::= { aeVoiceStatsModule 1 }
+
+aeVoiceStatusEntry OBJECT-TYPE
+    SYNTAX      AeVoiceStatusEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    INDEX       { aeVoiceStatusServiceIndex }
+    ::= { aeVoiceStatusTable 1 }
+
+AeVoiceStatusEntry ::=
+    SEQUENCE {
+        aeVoiceStatusServiceIndex
+            AeVoiceSvcIndex,
+        aeVoiceStatusConfigStatus
+            AeVoipCfgState,
+        aeVoiceStatusServerStatus
+            AeVoipServerStatus,
+        aeVoiceStatusCallState
+            AeSipCallStatus,
+        aeVoiceStatusHookState
+            AeHookState,
+        aeVoiceStatusIpLineStatus
+            AeVoipIpLineStatus,
+        aeVoiceStatusEncodeType
+            AeRtpEncodeType,
+        aeVoiceStatusRtpPacketSize
+            AeRtpPacketSize,
+        aeVoiceStatusActive911Call
+            TruthValue,
+        aeVoiceStatusLocalUdpPort
+            INTEGER,
+        aeVoiceStatusRemIpAddr
+            IpAddress,
+        aeVoiceStatusRemUdpPort
+            INTEGER,
+        aeVoiceStatusSecRemIpAddr
+            IpAddress,
+        aeVoiceStatusSecRemUdpPort
+            INTEGER,
+        aeVoiceStatusQos
+            Unsigned32
+    }
+
+aeVoiceStatusServiceIndex OBJECT-TYPE
+    SYNTAX      AeVoiceSvcIndex
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { aeVoiceStatusEntry 1 }
+
+aeVoiceStatusConfigStatus OBJECT-TYPE
+    SYNTAX      AeVoipCfgState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { aeVoiceStatusEntry 2 }
+
+aeVoiceStatusServerStatus OBJECT-TYPE
+    SYNTAX      AeVoipServerStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { aeVoiceStatusEntry 3 }
+
+aeVoiceStatusCallState OBJECT-TYPE
+    SYNTAX      AeSipCallStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { aeVoiceStatusEntry 4 }
+
+aeVoiceStatusHookState OBJECT-TYPE
+    SYNTAX      AeHookState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { aeVoiceStatusEntry 5 }
+
+aeVoiceStatusIpLineStatus OBJECT-TYPE
+    SYNTAX      AeVoipIpLineStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { aeVoiceStatusEntry 6 }
+
+aeVoiceStatusEncodeType OBJECT-TYPE
+    SYNTAX      AeRtpEncodeType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { aeVoiceStatusEntry 7 }
+
+aeVoiceStatusRtpPacketSize OBJECT-TYPE
+    SYNTAX      AeRtpPacketSize
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { aeVoiceStatusEntry 8 }
+
+aeVoiceStatusActive911Call OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { aeVoiceStatusEntry 9 }
+
+aeVoiceStatusLocalUdpPort OBJECT-TYPE
+    SYNTAX      INTEGER (0..65535)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { aeVoiceStatusEntry 10 }
+
+aeVoiceStatusRemIpAddr OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { aeVoiceStatusEntry 11 }
+
+aeVoiceStatusRemUdpPort OBJECT-TYPE
+    SYNTAX      INTEGER (0..65535)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { aeVoiceStatusEntry 12 }
+
+aeVoiceStatusSecRemIpAddr OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { aeVoiceStatusEntry 13 }
+
+aeVoiceStatusSecRemUdpPort OBJECT-TYPE
+    SYNTAX      INTEGER (0..65535)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { aeVoiceStatusEntry 14 }
+
+aeVoiceStatusQos OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { aeVoiceStatusEntry 15 }
+
+--------------------------------------------------------------
+--  aeVoiceCountersTable definition
+--------------------------------------------------------------
+
+aeVoiceCountersTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AeVoiceCountersEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    ::= { aeVoiceStatsModule 2 }
+
+aeVoiceCountersEntry OBJECT-TYPE
+    SYNTAX      AeVoiceCountersEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    INDEX       { aeVoiceCountersServiceIndex }
+    ::= { aeVoiceCountersTable 1 }
+
+AeVoiceCountersEntry ::=
+    SEQUENCE {
+        aeVoiceCountersServiceIndex
+            AeVoiceSvcIndex,
+        aeVoiceCountersDhcpAttempts
+            Counter32,
+        aeVoiceCountersDhcpAcks
+            Counter32,
+        aeVoiceCountersDhcpNacks
+            Counter32,
+        aeVoiceCountersRegAttempts
+            Counter32,
+        aeVoiceCountersRegChallenges
+            Counter32,
+        aeVoiceCountersRegRejects
+            Counter32,
+        aeVoiceCountersRegGrants
+            Counter32,
+        aeVoiceCountersInCallAttempts
+            Counter32,
+        aeVoiceCountersInCallCompletions
+            Counter32,
+        aeVoiceCountersInCallBusy
+            Counter32,
+        aeVoiceCountersInCallPeerDisconnects
+            Counter32,
+        aeVoiceCountersInCallOntDisconnects
+            Counter32,
+        aeVoiceCountersOutCallAttempts
+            Counter32,
+        aeVoiceCountersOutCallCompletions
+            Counter32,
+        aeVoiceCountersOutCallBusy
+            Counter32,
+        aeVoiceCountersOutCallPeerDisconnects
+            Counter32,
+        aeVoiceCountersOutCallOntDisconnects
+            Counter32,
+        aeVoiceCountersE911CallAttempts
+            Counter32,
+        aeVoiceCountersE911CallCompletions
+            Counter32,
+        aeVoiceCountersE911CallBusy
+            Counter32,
+        aeVoiceCountersE911CallPeerDisconnects
+            Counter32,
+        aeVoiceCountersE911CallOnHooks
+            Counter32,
+        aeVoiceCountersVmwiNotifyMsgsWaiting
+            Counter32,
+        aeVoiceCountersVmwiNotifyNoMsgsWaiting
+            Counter32,
+        aeVoiceCountersRtpPktsSent
+            Counter32,
+        aeVoiceCountersRtpPktsRecv
+            Counter32,
+        aeVoiceCountersRtpNullIPSent
+            Counter32,
+        aeVoiceCountersRtpNullIPRecv
+            Counter32,
+        aeVoiceCountersActiveCallCntr
+            Counter32,
+        aeVoiceCountersClearCounters
+            AeClearAction
+    }
+
+aeVoiceCountersServiceIndex OBJECT-TYPE
+    SYNTAX      AeVoiceSvcIndex
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { aeVoiceCountersEntry 1 }
+
+aeVoiceCountersDhcpAttempts OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { aeVoiceCountersEntry 2 }
+
+aeVoiceCountersDhcpAcks OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { aeVoiceCountersEntry 3 }
+
+aeVoiceCountersDhcpNacks OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { aeVoiceCountersEntry 4 }
+
+aeVoiceCountersRegAttempts OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { aeVoiceCountersEntry 5 }
+
+aeVoiceCountersRegChallenges OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { aeVoiceCountersEntry 6 }
+
+aeVoiceCountersRegRejects OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { aeVoiceCountersEntry 7 }
+
+aeVoiceCountersRegGrants OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { aeVoiceCountersEntry 8 }
+
+aeVoiceCountersInCallAttempts OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { aeVoiceCountersEntry 9 }
+
+aeVoiceCountersInCallCompletions OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { aeVoiceCountersEntry 10 }
+
+aeVoiceCountersInCallBusy OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { aeVoiceCountersEntry 11 }
+
+aeVoiceCountersInCallPeerDisconnects OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { aeVoiceCountersEntry 12 }
+
+aeVoiceCountersInCallOntDisconnects OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { aeVoiceCountersEntry 13 }
+
+aeVoiceCountersOutCallAttempts OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { aeVoiceCountersEntry 14 }
+
+aeVoiceCountersOutCallCompletions OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { aeVoiceCountersEntry 15 }
+
+aeVoiceCountersOutCallBusy OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { aeVoiceCountersEntry 16 }
+
+aeVoiceCountersOutCallPeerDisconnects OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { aeVoiceCountersEntry 17 }
+
+aeVoiceCountersOutCallOntDisconnects OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { aeVoiceCountersEntry 18 }
+
+aeVoiceCountersE911CallAttempts OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { aeVoiceCountersEntry 19 }
+
+aeVoiceCountersE911CallCompletions OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { aeVoiceCountersEntry 20 }
+
+aeVoiceCountersE911CallBusy OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { aeVoiceCountersEntry 21 }
+
+aeVoiceCountersE911CallPeerDisconnects OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { aeVoiceCountersEntry 22 }
+
+aeVoiceCountersE911CallOnHooks OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { aeVoiceCountersEntry 23 }
+
+aeVoiceCountersVmwiNotifyMsgsWaiting OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { aeVoiceCountersEntry 24 }
+
+aeVoiceCountersVmwiNotifyNoMsgsWaiting OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { aeVoiceCountersEntry 25 }
+
+aeVoiceCountersRtpPktsSent OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { aeVoiceCountersEntry 26 }
+
+aeVoiceCountersRtpPktsRecv OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { aeVoiceCountersEntry 27 }
+
+aeVoiceCountersRtpNullIPSent OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { aeVoiceCountersEntry 28 }
+
+aeVoiceCountersRtpNullIPRecv OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { aeVoiceCountersEntry 29 }
+
+aeVoiceCountersActiveCallCntr OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { aeVoiceCountersEntry 30 }
+
+aeVoiceCountersClearCounters OBJECT-TYPE
+    SYNTAX      AeClearAction
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION ""
+    ::= { aeVoiceCountersEntry 31 }
+
+--------------------------------------------------------------
+--  aeVoiceErrorsTable definition
+--------------------------------------------------------------
+
+aeVoiceErrorsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AeVoiceErrorsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    ::= { aeVoiceStatsModule 3 }
+
+aeVoiceErrorsEntry OBJECT-TYPE
+    SYNTAX      AeVoiceErrorsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION ""
+    INDEX       { aeVoiceErrorsServiceIndex }
+    ::= { aeVoiceErrorsTable 1 }
+
+AeVoiceErrorsEntry ::=
+    SEQUENCE {
+        aeVoiceErrorsServiceIndex
+            AeVoiceSvcIndex,
+        aeVoiceErrorsRecvErrors
+            Counter32,
+        aeVoiceErrorsXmitErrors
+            Counter32,
+        aeVoiceErrorsMissingRtp
+            Counter32,
+        aeVoiceErrorsSequenceErr
+            Counter32,
+        aeVoiceErrorsDropOuts
+            Counter32,
+        aeVoiceErrorsUnderRuns
+            Counter32,
+        aeVoiceErrorsListens
+            Counter32,
+        aeVoiceErrorsRecvComfortNoisePkts
+            Counter32,
+        aeVoiceErrorsRecvBadSrcPorts
+            Counter32,
+        aeVoiceErrorsClearErrors
+            AeClearAction
+    }
+
+aeVoiceErrorsServiceIndex OBJECT-TYPE
+    SYNTAX      AeVoiceSvcIndex
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { aeVoiceErrorsEntry 1 }
+
+aeVoiceErrorsRecvErrors OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { aeVoiceErrorsEntry 2 }
+
+aeVoiceErrorsXmitErrors OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { aeVoiceErrorsEntry 3 }
+
+aeVoiceErrorsMissingRtp OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { aeVoiceErrorsEntry 4 }
+
+aeVoiceErrorsSequenceErr OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { aeVoiceErrorsEntry 5 }
+
+aeVoiceErrorsDropOuts OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { aeVoiceErrorsEntry 6 }
+
+aeVoiceErrorsUnderRuns OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { aeVoiceErrorsEntry 7 }
+
+aeVoiceErrorsListens OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { aeVoiceErrorsEntry 8 }
+
+aeVoiceErrorsRecvComfortNoisePkts OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { aeVoiceErrorsEntry 9 }
+
+aeVoiceErrorsRecvBadSrcPorts OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION ""
+    ::= { aeVoiceErrorsEntry 10 }
+
+aeVoiceErrorsClearErrors OBJECT-TYPE
+    SYNTAX      AeClearAction
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION ""
+    ::= { aeVoiceErrorsEntry 11 }
+
+
+END

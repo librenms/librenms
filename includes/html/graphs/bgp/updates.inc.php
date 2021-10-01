@@ -2,7 +2,7 @@
 
 $scale_min = '0';
 
-$rrd_filename = rrd_name($device['hostname'], ['bgp', $data['bgpPeerIdentifier']]);
+$rrd_filename = Rrd::name($device['hostname'], ['bgp', $data['bgpPeerIdentifier']]);
 
 $ds_in = 'bgpPeerInUpdates';
 $ds_out = 'bgpPeerOutUpdates';

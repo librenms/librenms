@@ -1,6 +1,6 @@
 <?php
 
-$rrd_filename = rrd_name($device['hostname'], 'ucd_ssCpuRawSteal');
+$rrd_filename = Rrd::name($device['hostname'], 'ucd_ssCpuRawSteal');
 
 $ds = 'value';
 

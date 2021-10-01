@@ -4,6 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
 
 class Notification extends Model
@@ -32,10 +34,10 @@ class Notification extends Model
     /**
      * Mark this notification as read or unread
      *
-     * @param bool $enabled
+     * @param  bool  $enabled
      * @return bool
      */
-    public function markRead($enabled = true)
+    public function markRead(bool $enabled = true): bool
     {
         return $this->setAttrib('read', $enabled);
     }
@@ -44,25 +46,26 @@ class Notification extends Model
      * Mark this notification as sticky or unsticky
      *
      * @var bool
+     *
      * @return bool
      */
-    public function markSticky($enabled = true)
+    public function markSticky(bool $enabled = true): bool
     {
         return $this->setAttrib('sticky', $enabled);
     }
 
     /**
-     * @param $name
-     * @param $enabled
+     * @param  string  $name
+     * @param  bool  $enabled
      * @return bool
      */
-    private function setAttrib($name, $enabled)
+    private function setAttrib($name, bool $enabled): bool
     {
         if ($enabled === true) {
             $read = new NotificationAttrib;
-            $read->user_id = \Auth::user()->user_id;
+            $read->user_id = Auth::user()->user_id;
             $read->key = $name;
-            $read->value = 1;
+            $read->value = '1';
             $this->attribs()->save($read);
 
             return true;
@@ -74,7 +77,8 @@ class Notification extends Model
     // ---- Query Scopes ----
 
     /**
-     * @param Builder $query
+     * @param  Builder<Notification>  $query
+     * @param  User  $user
      * @return mixed
      */
     public function scopeIsUnread(Builder $query, User $user)
@@ -90,7 +94,7 @@ class Notification extends Model
     /**
      * Get all sticky notifications
      *
-     * @param Builder $query
+     * @param  Builder<Notification>  $query
      */
     public function scopeIsSticky(Builder $query)
     {
@@ -99,22 +103,8 @@ class Notification extends Model
     }
 
     /**
-     * @param Builder $query
-     * @param User $user
-     * @return mixed
-     */
-    public function scopeIsArchived(Builder $query, User $user)
-    {
-        return $query->leftJoin('notifications_attribs', 'notifications.notifications_id', '=', 'notifications_attribs.notifications_id')
-            ->source()
-            ->where('notifications_attribs.user_id', $user->user_id)
-            ->where(['key' => 'read', 'value' => 1])
-            ->limit();
-    }
-
-    /**
-     * @param Builder $query
-     * @return $this
+     * @param  Builder<Notification>  $query
+     * @return Builder<Notification>
      */
     public function scopeLimit(Builder $query)
     {
@@ -122,7 +112,7 @@ class Notification extends Model
     }
 
     /**
-     * @param Builder $query
+     * @param  Builder<Notification>  $query
      * @return Builder|static
      */
     public function scopeSource(Builder $query)
@@ -132,10 +122,7 @@ class Notification extends Model
 
     // ---- Define Relationships ----
 
-    /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany
-     */
-    public function attribs()
+    public function attribs(): HasMany
     {
         return $this->hasMany(\App\Models\NotificationAttrib::class, 'notifications_id', 'notifications_id');
     }

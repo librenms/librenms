@@ -3,6 +3,7 @@
 use App\Models\Location;
 use LibreNMS\Config;
 use LibreNMS\Exceptions\InvalidIpException;
+use LibreNMS\Util\Clean;
 use LibreNMS\Util\IP;
 use LibreNMS\Util\Time;
 
@@ -13,7 +14,7 @@ echo "<div class='row'>
 
 if (Config::get('overview_show_sysDescr')) {
     echo '<i class="fa fa-id-card fa-lg icon-theme" aria-hidden="true"></i> <strong>';
-    echo Config::get('overview_show_sysDescr', true) ? display($device['sysDescr']) : 'System';
+    echo Config::get('overview_show_sysDescr', true) ? Clean::html($device['sysDescr'], []) : 'System';
     echo '</strong>';
 }
 
@@ -34,7 +35,7 @@ $device['os_text'] = Config::getOsSetting($device['os'], 'text');
 
 echo '<div class="row">
         <div class="col-sm-4">System Name</div>
-        <div class="col-sm-8">' . display($device['sysName']) . ' </div>
+        <div class="col-sm-8">' . Clean::html($device['sysName'], []) . ' </div>
       </div>';
 
 if (! empty($device['overwrite_ip'])) {
@@ -53,33 +54,33 @@ if (! empty($device['overwrite_ip'])) {
 if ($device['purpose']) {
     echo '<div class="row">
         <div class="col-sm-4">Description</div>
-        <div class="col-sm-8">' . display($device['purpose']) . '</div>
+        <div class="col-sm-8">' . Clean::html($device['purpose'], []) . '</div>
       </div>';
 }
 
 if ($device['hardware']) {
     echo '<div class="row">
         <div class="col-sm-4">Hardware</div>
-        <div class="col-sm-8">' . display($device['hardware']) . '</div>
+        <div class="col-sm-8">' . Clean::html($device['hardware'], []) . '</div>
       </div>';
 }
 
 echo '<div class="row">
         <div class="col-sm-4 text-nowrap">Operating System</div>
-        <div class="col-sm-8">' . display($device['os_text'] . ' ' . $device['version'] . ' ' . $device['features']) . ' </div>
+        <div class="col-sm-8">' . Clean::html($device['os_text'] . ' ' . $device['version'] . ' ' . $device['features'], []) . ' </div>
       </div>';
 
 if ($device['serial']) {
     echo '<div class="row">
         <div class="col-sm-4">Serial</div>
-        <div class="col-sm-8">' . display($device['serial']) . '</div>
+        <div class="col-sm-8">' . Clean::html($device['serial'], []) . '</div>
       </div>';
 }
 
 if ($device['sysObjectID']) {
     echo '<div class="row">
         <div class="col-sm-4">Object ID</div>
-        <div class="col-sm-8">' . display($device['sysObjectID']) . '</div>
+        <div class="col-sm-8">' . Clean::html($device['sysObjectID'], []) . '</div>
       </div>';
 }
 
@@ -88,14 +89,14 @@ if ($device['sysContact']) {
         <div class="col-sm-4">Contact</div>';
     if (get_dev_attrib($device, 'override_sysContact_bool')) {
         echo '
-        <div class="col-sm-8">' . display(htmlspecialchars(get_dev_attrib($device, 'override_sysContact_string'))) . '</div>
+        <div class="col-sm-8">' . Clean::html(get_dev_attrib($device, 'override_sysContact_string')) . '</div>
       </div>
       <div class="row">
         <div class="col-sm-4">SNMP Contact</div>';
     }
 
     echo '
-        <div class="col-sm-8">' . display(htmlspecialchars($device['sysContact'])) . '</div>
+        <div class="col-sm-8">' . Clean::html($device['sysContact']) . '</div>
       </div>';
 }
 
@@ -129,7 +130,7 @@ if ($device['location_id']) {
     echo '
     <div class="row">
         <div class="col-sm-4">Location</div>
-        <div class="col-sm-8">' . display($location->display()) . '</div>
+        <div class="col-sm-8">' . Clean::html($location->display(), []) . '</div>
     </div>
     <div class="row" id="coordinates-row" data-toggle="collapse" data-target="#toggle-map">
         <div class="col-sm-4">Lat / Lng</div>
@@ -146,16 +147,21 @@ if ($device['location_id']) {
     <script>
         var device_marker, device_location, device_map;
         $("#toggle-map").on("shown.bs.collapse", function () {
-            if (device_marker == null) {
+             if (device_marker == null) {
+
                 device_location = new L.LatLng(' . (float) $location->lat . ', ' . (float) $location->lng . ');
                 config = {"tile_url": "' . Config::get('leaflet.tile_url', '{s}.tile.openstreetmap.org') . '"};
                 device_map = init_map("location-map", "' . $maps_engine . '", "' . $maps_api . '", config);
-                device_marker = init_map_marker(device_map, device_location);
+                device_marker = L.marker(device_location).addTo(device_map);
+                device_map.setView(device_location);
                 device_map.setZoom(18);
+                device_marker.dragging.enable();
+
+
                 ';
 
     if (Auth::user()->isAdmin()) {
-        echo '  device_map.on("dragend", function () {
+        echo '  device_marker.on("dragend", function () {
                     var new_location = device_marker.getLatLng();
                     if (confirm("Update location to " + new_location + "? This will update this location for all devices!")) {
                         update_location(' . $location->id . ', new_location, function(success) {

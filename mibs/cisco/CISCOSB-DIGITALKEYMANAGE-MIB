@@ -1,0 +1,159 @@
+CISCOSB-DIGITALKEYMANAGE-MIB DEFINITIONS ::= BEGIN
+
+-- Title:                CISCOSB ROS
+--                       Private DIGITAL KEY MANAGE MIB
+-- Version:              7.50
+-- Date:                 26-Jan-2011
+
+IMPORTS
+    switch001                                               FROM CISCOSB-MIB
+    OBJECT-TYPE, MODULE-IDENTITY                            FROM SNMPv2-SMI
+    DisplayString, RowStatus, DateAndTime, TruthValue       FROM SNMPv2-TC;
+
+rlDigitalKeyManage MODULE-IDENTITY
+                LAST-UPDATED "200701020000Z"
+                ORGANIZATION "Cisco Systems, Inc."
+
+                CONTACT-INFO
+                "Postal: 170 West Tasman Drive
+                San Jose , CA 95134-1706
+                USA
+
+                
+                Website:  Cisco Small Business Support Community <http://www.cisco.com/go/smallbizsupport>"
+
+                DESCRIPTION
+                      "This private MIB module defines digital key manage private MIBs."
+                REVISION "200701020000Z"
+                DESCRIPTION
+                      "Initial revision."
+        ::= { switch001 86 }
+
+rlMD5KeyChainTable OBJECT-TYPE
+    SYNTAX  SEQUENCE  OF RlMD5KeyChainEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+       "Key-chains and keys"
+    ::=   { rlDigitalKeyManage 1 }
+
+rlMD5KeyChainEntry   OBJECT-TYPE
+    SYNTAX  RlMD5KeyChainEntry
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+            "Key-chain with key ID that belongs to this chain"
+    INDEX  {rlMD5KeyChainName, rlMD5KeyChainKeyId}
+    ::=  { rlMD5KeyChainTable 1 }
+
+RlMD5KeyChainEntry ::= SEQUENCE {
+    rlMD5KeyChainName                       DisplayString,
+    rlMD5KeyChainKeyId                      INTEGER,
+    rlMD5KeyChainKey                        DisplayString,
+    rlMD5KeyChainKeyStartAccept             DateAndTime,
+    rlMD5KeyChainKeyStartGenerate           DateAndTime,
+    rlMD5KeyChainKeyStopGenerate            DateAndTime,
+    rlMD5KeyChainKeyStopAccept              DateAndTime,
+    rlMD5KeyChainKeyValidForAccept          TruthValue,
+    rlMD5KeyChainKeyValidForGenerate        TruthValue,
+    rlMD5KeyChainRowStatus                  RowStatus
+}
+
+rlMD5KeyChainName OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "Name of the key-chain to which belongs
+         the secret authentication key"
+    ::= { rlMD5KeyChainEntry 1 }
+
+rlMD5KeyChainKeyId OBJECT-TYPE
+    SYNTAX  INTEGER  (1..255)
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+        "A 8-bit identifier for the secret authentication key.
+         This identifier unique only for specific key chain"
+    ::= { rlMD5KeyChainEntry 2 }
+
+rlMD5KeyChainKey OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (0..16))
+    MAX-ACCESS  read-create
+    STATUS  current
+    DESCRIPTION
+        "The 128-bit secret authentication key"
+    ::= { rlMD5KeyChainEntry 3 }
+
+rlMD5KeyChainKeyStartAccept OBJECT-TYPE
+    SYNTAX  DateAndTime
+    MAX-ACCESS  read-create
+    STATUS  current
+    DESCRIPTION
+        "The time that the router will start accepting packets
+          that have been created with the given key"
+    DEFVAL   { '00000000'H }
+    ::= { rlMD5KeyChainEntry 4 }
+
+rlMD5KeyChainKeyStartGenerate OBJECT-TYPE
+    SYNTAX  DateAndTime
+    MAX-ACCESS  read-create
+    STATUS  current
+    DESCRIPTION
+        "The time that the router will start using the key
+         for packet generation"
+    DEFVAL   { '00000000'H }
+    ::= { rlMD5KeyChainEntry 5 }
+
+rlMD5KeyChainKeyStopGenerate OBJECT-TYPE
+    SYNTAX  DateAndTime
+    MAX-ACCESS  read-create
+    STATUS  current
+    DESCRIPTION
+        "The time that the router will stop using the key
+         for packet generation"
+    DEFVAL   { 'FFFFFFFF'H }
+    ::= { rlMD5KeyChainEntry 6 }
+
+rlMD5KeyChainKeyStopAccept OBJECT-TYPE
+    SYNTAX  DateAndTime
+    MAX-ACCESS  read-create
+    STATUS  current
+    DESCRIPTION
+        "The time that the router will stop accepting packets
+          that have been created with the given key"
+    DEFVAL   { 'FFFFFFFF'H }
+    ::= { rlMD5KeyChainEntry 7 }
+
+
+rlMD5KeyChainKeyValidForAccept  OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "A value of 'true' indicates that given key is valid for
+             accepting packets"
+    DEFVAL { false }
+    ::= { rlMD5KeyChainEntry 8 }
+
+rlMD5KeyChainKeyValidForGenerate  OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "A value of 'true' indicates that given key is valid for
+             packet generation"
+    DEFVAL { false }
+    ::= { rlMD5KeyChainEntry 9 }
+
+rlMD5KeyChainRowStatus OBJECT-TYPE
+    SYNTAX  RowStatus
+    MAX-ACCESS  read-create
+    STATUS  current
+    DESCRIPTION
+        "It is used to insert, update or delete an entry"
+    ::= { rlMD5KeyChainEntry 10 }
+
+
+END
+

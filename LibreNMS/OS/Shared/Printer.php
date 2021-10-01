@@ -25,8 +25,22 @@
 
 namespace LibreNMS\OS\Shared;
 
+use App\Models\Device;
+
 class Printer extends \LibreNMS\OS
 {
+    public function discoverOS(Device $device): void
+    {
+        parent::discoverOS($device); // yaml
+
+        $device->serial = $device->serial ?? $this->getSerial() ?: null;
+    }
+
+    protected function getSerial()
+    {
+        return snmp_get($this->getDeviceArray(), 'prtGeneralSerialNumber.1', '-Oqv', 'Printer-MIB');
+    }
+
     protected function parseDeviceId($data)
     {
         $vars = [];

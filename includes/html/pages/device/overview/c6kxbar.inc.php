@@ -50,10 +50,10 @@ foreach ($entity_state['group']['c6kxbar'] as $index => $entry) {
             }
 
             $percent_in = $fabric['cc6kxbarStatisticsInUtil'];
-            $background_in = get_percentage_colours($percent_in);
+            $background_in = \LibreNMS\Util\Colors::percentage($percent_in, null);
 
             $percent_out = $fabric['cc6kxbarStatisticsOutUtil'];
-            $background_out = get_percentage_colours($percent_out);
+            $background_out = \LibreNMS\Util\Colors::percentage($percent_out, null);
 
             $graph_array = [];
             $graph_array['height'] = '100';
@@ -69,7 +69,7 @@ foreach ($entity_state['group']['c6kxbar'] as $index => $entry) {
             $link_array = $graph_array;
             $link_array['page'] = 'graphs';
             unset($link_array['height'], $link_array['width'], $link_array['legend']);
-            $link = generate_url($link_array);
+            $link = \LibreNMS\Util\Url::generate($link_array);
 
             $text_descr = $entity['entPhysicalName'] . ' - Fabric ' . $subindex;
 
@@ -79,14 +79,14 @@ foreach ($entity_state['group']['c6kxbar'] as $index => $entry) {
             $graph_array['height'] = 20;
             $graph_array['bg'] = 'ffffff00';
             // the 00 at the end makes the area transparent.
-            $minigraph = generate_lazy_graph_tag($graph_array);
+            $minigraph = \LibreNMS\Util\Url::lazyGraphTag($graph_array);
 
             echo '<tr>
                 <td></td>
                 <td><strong>Fabric ' . $subindex . "</strong></td>
                 <td><span style='font-weight: bold;' class=" . $fabric['mode_class'] . '>' . $fabric['cc6kxbarModuleChannelFabStatus'] . '</span></td>
-                <td>' . formatRates(($fabric['cc6kxbarModuleChannelSpeed'] * 1000000)) . '</td>
-                <td>' . overlib_link($link, $minigraph, $overlib_content) . '</td>
+                <td>' . \LibreNMS\Util\Number::formatSi(($fabric['cc6kxbarModuleChannelSpeed'] * 1000000), 2, 3, 'bps') . '</td>
+                <td>' . \LibreNMS\Util\Url::overlibLink($link, $minigraph, $overlib_content) . '</td>
                 <td>' . print_percentage_bar(125, 20, $percent_in, 'Ingress', 'ffffff', $background_in['left'], $percent_in . '%', 'ffffff', $background_in['right']) . '</td>
                 <td>' . print_percentage_bar(125, 20, $percent_out, 'Egress', 'ffffff', $background_out['left'], $percent_out . '%', 'ffffff', $background_out['right']) . '</td>
                 </tr>';

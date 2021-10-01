@@ -26,26 +26,33 @@ jobs:
       matrix:
         include:
           -
-            php-version: 7.4
+            php-version: 8.0
             name: Unit
-            skip-style-check: 1
             skip-web-check: 1
+            database: mariadb:10.5
+          -
+            php-version: 8.0
+            name: Web
+            skip-unit-check: 1
+            database: mysql:5.7
           -
             php-version: 7.4
-            name: Style and Web
-            skip-unit-check: 1
+            name: Unit
+            skip-web-check: 1
+            database: mysql:5.7
           -
             php-version: 7.3
             name: Unit
-            skip-style-check: 1
             skip-web-check: 1
+            database: mysql:8.0
           -
             php-version: 7.3
-            name: Style and Web
+            name: Web
             skip-unit-check: 1
+            database: mysql:8.0
     services:
-      mysql:
-        image: mysql:5.7
+      database:
+        image: ${{ matrix.database }}
         env:
           MYSQL_ALLOW_EMPTY_PASSWORD: yes
           MYSQL_DATABASE: librenms_phpunit_78hunjuybybh
@@ -122,13 +129,13 @@ jobs:
           APP_ENV=testing
           DB_DRIVER=mysql
           DB_HOST=127.0.0.1
-          DB_PORT=${{ job.services.mysql.ports[3306] }}
+          DB_PORT=${{ job.services.database.ports[3306] }}
           DB_DATABASE=librenms_phpunit_78hunjuybybh
           DB_USERNAME=librenms
           DB_PASSWORD=librenms
           DB_TEST_DRIVER=mysql
           DB_TEST_HOST=127.0.0.1
-          DB_TEST_PORT=${{ job.services.mysql.ports[3306] }}
+          DB_TEST_PORT=${{ job.services.database.ports[3306] }}
           DB_TEST_DATABASE=librenms_phpunit_78hunjuybybh
           DB_TEST_USERNAME=librenms
           DB_TEST_PASSWORD=librenms
@@ -145,15 +152,22 @@ jobs:
       -
         name: Ensure MySQL is up
         env:
-          PORT: ${{ job.services.mysql.ports[3306] }}
+          PORT: ${{ job.services.database.ports[3306] }}
         run: |
           mysqladmin -h"127.0.0.1" -P"$PORT" --user=librenms --password=librenms ping --wait=5
       -
+        name: Set MySQL authentication plugin
+        if: matrix.database == 'mysql:8.0'
+        env:
+          PORT: ${{ job.services.database.ports[3306] }}
+        run: |
+          mysql -h"127.0.0.1" -P"$PORT" --user=root -e "ALTER USER 'librenms'@'%' IDENTIFIED WITH mysql_native_password BY 'librenms'"
+      -
         name: Set MySQL collate
         env:
-          PORT: ${{ job.services.mysql.ports[3306] }}
+          PORT: ${{ job.services.database.ports[3306] }}
         run: |
-          mysql -h"127.0.0.1" -P"$PORT" --user=librenms --password=librenms -e 'ALTER DATABASE librenms_phpunit_78hunjuybybh CHARACTER SET utf8 COLLATE utf8_unicode_ci;'
+          mysql -h"127.0.0.1" -P"$PORT" --user=librenms --password=librenms -e 'ALTER DATABASE librenms_phpunit_78hunjuybybh CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;'
       -
         name: Artisan serve
         if: matrix.skip-web-check != '1'
@@ -170,7 +184,6 @@ jobs:
         run: |
           php lnms dev:check ci
         env:
-          SKIP_STYLE_CHECK: ${{ matrix.skip-style-check }}
           SKIP_UNIT_CHECK: ${{ matrix.skip-unit-check }}
           SKIP_WEB_CHECK: ${{ matrix.skip-web-check }}
       -

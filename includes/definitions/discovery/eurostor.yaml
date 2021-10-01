@@ -1,0 +1,132 @@
+mib: proware-SNMP-MIB
+modules:
+    sensors:
+        temperature:
+            data:
+                -
+                    oid: hwControllerBoardTempTable
+                    value: hwControllerBoardTempValue
+                    num_oid: '.1.3.6.1.4.1.14752.1.3.2.1.10.1.3.{{ $index }}'
+                    index: hwControllerBoardTempIndex.{{ $index }}
+                    descr: hwControllerBoardTempDesc
+                -
+                    oid:   hwEnclosure01TempTable
+                    value: hwEnclosure01TempValue
+                    num_oid: '.1.3.6.1.4.1.14752.1.3.2.2.10.1.3.{{ $index }}'
+                    index: hwEnclosure01TempIndex.{{ $index }}
+                    descr: hwEnclosure01TempDesc
+                -
+                    oid:   hwEnclosure02TempTable
+                    value: hwEnclosure02TempValue
+                    num_oid: '.1.3.6.1.4.1.14752.1.3.2.3.10.1.3.{{ $index }}'
+                    index: hwEnclosure02TempIndex.{{ $index }}
+                    descr: hwEnclosure02TempDesc
+                -
+                    oid:   hwEnclosure03TempTable
+                    value: hwEnclosure03TempValue
+                    num_oid: '.1.3.6.1.4.1.14752.1.3.2.4.10.1.3.{{ $index }}'
+                    index: hwEnclosure03TempIndex.{{ $index }}
+                    descr: hwEnclosure03TempDesc
+                -
+                    oid:   hwEnclosure04TempTable
+                    value: hwEnclosure04TempValue
+                    num_oid: '.1.3.6.1.4.1.14752.1.3.2.5.10.1.3.{{ $index }}'
+                    index: hwEnclosure04TempIndex.{{ $index }}
+                    descr: hwEnclosure04TempDesc
+                -
+                    oid:   hwEnclosure05TempTable
+                    value: hwEnclosure05TempValue
+                    num_oid: '.1.3.6.1.4.1.14752.1.3.2.6.10.1.3.{{ $index }}'
+                    index: hwEnclosure05TempIndex.{{ $index }}
+                    descr: hwEnclosure05TempDesc
+                -
+                    oid:   hwEnclosure06TempTable
+                    value: hwEnclosure06TempValue
+                    num_oid: '.1.3.6.1.4.1.14752.1.3.2.7.10.1.3.{{ $index }}'
+                    index: hwEnclosure06TempIndex.{{ $index }}
+                    descr: hwEnclosure06TempDesc
+                -
+                    oid:   hwEnclosure07TempTable
+                    value: hwEnclosure07TempValue
+                    num_oid: '.1.3.6.1.4.1.14752.1.3.2.8.10.1.3.{{ $index }}'
+                    index: hwEnclosure07TempIndex.{{ $index }}
+                    descr: hwEnclosure07TempDesc
+                -
+                    oid:   hwEnclosure08TempTable
+                    value: hwEnclosure08TempValue
+                    num_oid: '.1.3.6.1.4.1.14752.1.3.2.9.10.1.3.{{ $index }}'
+                    index: hwEnclosure08TempIndex.{{ $index }}
+                    descr: hwEnclosure08TempDesc
+        fanspeed:
+            data:
+                -
+                    oid:   hwEnclosure01FanTable
+                    value: hwEnclosure01FanSpeed
+                    num_oid: '.1.3.6.1.4.1.14752.1.3.2.2.9.1.3.{{ $index }}'
+                    index: hwEnclosure01FanIndex.{{ $index }}
+                    descr: hwEnclosure01FanDesc
+                    group: 'Backplane 1'
+                -
+                    oid:   hwEnclosure02FanTable
+                    value: hwEnclosure02FanSpeed
+                    num_oid: '.1.3.6.1.4.1.14752.1.3.2.3.9.1.3.{{ $index }}'
+                    index: hwEnclosure02FanIndex.{{ $index }}
+                    descr: hwEnclosure02FanDesc
+                    group: 'Backplane 2'
+                -
+                    oid:   hwEnclosure03FanTable
+                    value: hwEnclosure03FanSpeed
+                    num_oid: '.1.3.6.1.4.1.14752.1.3.2.4.9.1.3.{{ $index }}'
+                    index: hwEnclosure03FanIndex.{{ $index }}
+                    descr: hwEnclosure03FanDesc
+                    group: 'Backplane 3'
+                -
+                    oid:   hwEnclosure04FanTable
+                    value: hwEnclosure04FanSpeed
+                    num_oid: '.1.3.6.1.4.1.14752.1.3.2.5.9.1.3.{{ $index }}'
+                    index: hwEnclosure04FanIndex.{{ $index }}
+                    descr: hwEnclosure04FanDesc
+                    group: 'Backplane 4'
+                -
+                    oid:   hwEnclosure05FanTable
+                    value: hwEnclosure05FanSpeed
+                    num_oid: '.1.3.6.1.4.1.14752.1.3.2.6.9.1.3.{{ $index }}'
+                    index: hwEnclosure05FanIndex.{{ $index }}
+                    descr: hwEnclosure05FanDesc
+                    group: 'Backplane 5'
+                -
+                    oid:   hwEnclosure06FanTable
+                    value: hwEnclosure06FanSpeed
+                    num_oid: '.1.3.6.1.4.1.14752.1.3.2.7.9.1.3.{{ $index }}'
+                    index: hwEnclosure06FanIndex.{{ $index }}
+                    descr: hwEnclosure06FanDesc
+                    group: 'Backplane 6'
+                -
+                    oid:   hwEnclosure07FanTable
+                    value: hwEnclosure07FanSpeed
+                    num_oid: '.1.3.6.1.4.1.14752.1.3.2.8.9.1.3.{{ $index }}'
+                    index: hwEnclosure07FanIndex.{{ $index }}
+                    descr: hwEnclosure07FanDesc
+                    group: 'Backplane 7'
+                -
+                    oid:   hwEnclosure08FanTable
+                    value: hwEnclosure08FanSpeed
+                    num_oid: '.1.3.6.1.4.1.14752.1.3.2.9.9.1.3.{{ $index }}'
+                    index: hwEnclosure08FanIndex.{{ $index }}
+                    descr: hwEnclosure08FanDesc
+                    group: 'Backplane 8'
+        voltage:
+            data:
+                -
+                    oid:   hwControllerBoardVolTable
+                    value: hwControllerBoardVolValue
+                    num_oid: '.1.3.6.1.4.1.14752.1.3.2.1.8.1.3.{{ $index }}'
+                    index: hwControllerBoardVolIndex.{{ $index }}
+                    descr: hwControllerBoardVolDesc
+                    divisor: 1000
+                    skip_values:
+
+                    -
+                      oid: hwControllerBoardVolDesc
+                      op: '=='
+                      value: 'Battery Status'

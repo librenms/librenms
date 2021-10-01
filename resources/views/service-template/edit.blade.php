@@ -6,9 +6,9 @@
     <div class="container">
         <div class="row">
             <form action="{{ route('services.templates.update', $template->id) }}" method="POST" role="form"
-                  class="form-horizontal services-templates-form col-md-10 col-md-offset-1 col-sm-12">
+                  class="form-horizontal service-template-form col-md-10 col-md-offset-1 col-sm-12">
                 <legend><h2>@lang('Edit Service Template'): {{ $template->name }}</h2></legend>
-                <div class='alert alert-info'>Service Template will edited for the specified Device Group.</div>
+                <div class='alert alert-info'>Service Template will be edited for the specified Device Group.</div>
                 {{ method_field('PUT') }}
                 @csrf
                 <div class='well well-lg'>

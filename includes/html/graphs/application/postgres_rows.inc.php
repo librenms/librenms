@@ -19,9 +19,9 @@ if (isset($vars['database'])) {
     $rrd_name_array = ['app', $name, $app_id];
 }
 
-$rrd_filename = rrd_name($device['hostname'], $rrd_name_array);
+$rrd_filename = Rrd::name($device['hostname'], $rrd_name_array);
 
-if (rrdtool_check_rrd_exists($rrd_filename)) {
+if (Rrd::checkRrdExists($rrd_filename)) {
     $rrd_list = [
         [
             'filename' => $rrd_filename,

@@ -7,6 +7,7 @@
  * the source code distribution for details. */
 /**
  * API Transport
+ *
  * @author GitStoph <https://github.com/GitStoph>
  * @copyright 2019 GitStoph
  * @license GPL
@@ -75,7 +76,7 @@ class Alerta extends Transport
             var_dump("API '$host' returned Error");
             var_dump('Params: ' . $alert_message);
             var_dump('Return: ' . $ret);
-            var_dump('Headers: ' . $headers);
+            var_dump('Headers: ', $headers);
 
             return 'HTTP Status code ' . $code;
         }

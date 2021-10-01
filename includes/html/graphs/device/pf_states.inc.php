@@ -1,6 +1,6 @@
 <?php
 
-$rrd_filename = rrd_name($device['hostname'], 'pf_states');
+$rrd_filename = Rrd::name($device['hostname'], 'pf_states');
 
 $ds = 'states';
 

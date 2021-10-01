@@ -13,7 +13,8 @@ abstract class Transport implements TransportInterface
 
     /**
      * Transport constructor.
-     * @param null $transport_id
+     *
+     * @param  null  $transport_id
      */
     public function __construct($transport_id = null)
     {
@@ -26,7 +27,7 @@ abstract class Transport implements TransportInterface
     /**
      * Helper function to parse free form text box defined in ini style to key value pairs
      *
-     * @param string $input
+     * @param  string  $input
      * @return array
      */
     protected function parseUserOptions($input)
@@ -44,7 +45,8 @@ abstract class Transport implements TransportInterface
 
     /**
      * Get the hex color string for a particular state
-     * @param int $state State code from alert
+     *
+     * @param  int  $state  State code from alert
      * @return string Hex color, default to #337AB7 blue if state unrecognised
      */
     public static function getColorForState($state)

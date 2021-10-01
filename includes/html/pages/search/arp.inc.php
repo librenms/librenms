@@ -5,8 +5,9 @@
     <table id="arp-search" class="table table-hover table-condensed table-striped">
         <thead>
             <tr>
-                <th data-column-id="mac_address">MAC Address</th>
-                <th data-column-id="ipv4_address">IP Address</th>
+                <th data-column-id="mac_address" data-formatter="tooltip">MAC Address</th>
+                <th data-column-id="mac_oui" data-sortable="false" data-visible="false" data-formatter="tooltip">Vendor</th>
+                <th data-column-id="ipv4_address" data-formatter="tooltip">IP Address</th>
                 <th data-column-id="hostname" data-order="asc">Device</th>
                 <th data-column-id="interface">Interface</th>
                 <th data-column-id="remote_device" data-sortable="false">Remote device</th>
@@ -90,11 +91,21 @@ echo '"' . $_POST['searchPhrase'] . '"+';
         return {
             id: "arp-search",
             device_id: '<?php echo htmlspecialchars($_POST['device_id']); ?>',
-            searchby: '<?php echo mres($_POST['searchby']); ?>',
-            searchPhrase: '<?php echo mres($_POST['searchPhrase']); ?>'
+            searchby: '<?php echo $_POST['searchby']; ?>',
+            searchPhrase: '<?php echo $_POST['searchPhrase']; ?>'
         };
     },
-    url: "ajax_table.php"
+    url: "ajax_table.php",
+    formatters: {
+        "tooltip": function (column, row) {
+                var value = row[column.id];
+                var vendor = '';
+                if (column.id == 'mac_address' && ((vendor = row['mac_oui']) != '' )) {
+                    return "<span title=\'" + value + " (" + vendor + ")\' data-toggle=\'tooltip\'>" + value + "</span>";
+                }
+                return "<span title=\'" + value + "\' data-toggle=\'tooltip\'>" + value + "</span>";
+            },
+    },
 });
 
 </script>

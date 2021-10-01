@@ -18,6 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -72,12 +73,12 @@ class GraylogApi
     /**
      * Query the Graylog server
      *
-     * @param string $query
-     * @param int $range
-     * @param int $limit
-     * @param int $offset
-     * @param string $sort field:asc or field:desc
-     * @param string $filter
+     * @param  string  $query
+     * @param  int  $range
+     * @param  int  $limit
+     * @param  int  $offset
+     * @param  string  $sort  field:asc or field:desc
+     * @param  string  $filter
      * @return array
      */
     public function query($query = '*', $range = 0, $limit = 0, $offset = 0, $sort = null, $filter = null)
@@ -109,8 +110,8 @@ class GraylogApi
     /**
      * Build a simple query string that searches the messages field and/or filters by device
      *
-     * @param string $search Search the message field for this string
-     * @param Device $device
+     * @param  string  $search  Search the message field for this string
+     * @param  Device  $device
      * @return string
      */
     public function buildSimpleQuery($search = null, $device = null)

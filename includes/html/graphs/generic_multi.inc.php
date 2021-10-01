@@ -57,7 +57,7 @@ foreach ($rrd_list as $rrd) {
     $ds = $rrd['ds'];
     $filename = $rrd['filename'];
 
-    $descr = rrdtool_escape($rrd['descr'], $descr_len);
+    $descr = \LibreNMS\Data\Store\Rrd::fixedSafeDescr($rrd['descr'], $descr_len);
 
     $ids[] = ($id = 'ds' . $i);
 
@@ -94,7 +94,7 @@ if ($print_total) {
     }
 
     $rrd_options .= ' CDEF:tot=' . implode($tot, ',');
-    $rrd_options .= ' COMMENT:"  ' . rrdtool_escape('Total', $descr_len) . '"';
+    $rrd_options .= ' COMMENT:"  ' . \LibreNMS\Data\Store\Rrd::fixedSafeDescr('Total', $descr_len) . '"';
     $rrd_options .= ' GPRINT:tot:LAST:%5.1lf%s';
     $rrd_options .= ' GPRINT:tot:MIN:%5.1lf%s';
     $rrd_options .= ' GPRINT:tot:MAX:%5.1lf%s';

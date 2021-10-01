@@ -7,7 +7,7 @@ if (! Auth::user()->hasGlobalAdmin()) {
         'status'  => 'error',
         'message' => 'Need to be admin',
     ];
-    echo _json_encode($response);
+    echo json_encode($response, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
     exit;
 }
 
@@ -16,57 +16,57 @@ $message = '';
 
 $device_id = $_POST['device_id'];
 $id = $_POST['ccustomoid_id'];
-$action = mres($_POST['action']);
-$name = mres($_POST['name']);
-$oid = mres($_POST['oid']);
-$datatype = mres($_POST['datatype']);
-if (empty(mres($_POST['unit']))) {
+$action = $_POST['action'];
+$name = $_POST['name'];
+$oid = $_POST['oid'];
+$datatype = $_POST['datatype'];
+if (empty(($_POST['unit']))) {
     $unit = ['NULL'];
 } else {
-    $unit = mres($_POST['unit']);
+    $unit = $_POST['unit'];
 }
-if (! empty(mres($_POST['limit'])) && is_numeric(mres($_POST['limit']))) {
-    $limit = mres($_POST['limit']);
+if (! empty(($_POST['limit'])) && is_numeric($_POST['limit'])) {
+    $limit = $_POST['limit'];
 } else {
     $limit = ['NULL'];
 }
-if (! empty(mres($_POST['limit_warn'])) && is_numeric(mres($_POST['limit_warn']))) {
-    $limit_warn = mres($_POST['limit_warn']);
+if (! empty(($_POST['limit_warn'])) && is_numeric($_POST['limit_warn'])) {
+    $limit_warn = $_POST['limit_warn'];
 } else {
     $limit_warn = ['NULL'];
 }
-if (! empty(mres($_POST['limit_low'])) && is_numeric(mres($_POST['limit_low']))) {
-    $limit_low = mres($_POST['limit_low']);
+if (! empty(($_POST['limit_low'])) && is_numeric($_POST['limit_low'])) {
+    $limit_low = $_POST['limit_low'];
 } else {
     $limit_low = ['NULL'];
 }
-if (! empty(mres($_POST['limit_low_warn'])) && is_numeric(mres($_POST['limit_low_warn']))) {
-    $limit_low_warn = mres($_POST['limit_low_warn']);
+if (! empty(($_POST['limit_low_warn'])) && is_numeric($_POST['limit_low_warn'])) {
+    $limit_low_warn = $_POST['limit_low_warn'];
 } else {
     $limit_low_warn = ['NULL'];
 }
-if (mres($_POST['alerts']) == 'on') {
+if ($_POST['alerts'] == 'on') {
     $alerts = 1;
 } else {
     $alerts = 0;
 }
-if (mres($_POST['passed']) == 'on') {
+if ($_POST['passed'] == 'on') {
     $passed = 1;
 } else {
     $passed = 0;
 }
-if (! empty(mres($_POST['divisor'])) && is_numeric(mres($_POST['divisor']))) {
-    $divisor = mres($_POST['divisor']);
+if (! empty(($_POST['divisor'])) && is_numeric($_POST['divisor'])) {
+    $divisor = $_POST['divisor'];
 } else {
     $divisor = 1;
 }
-if (! empty(mres($_POST['multiplier'])) && is_numeric(mres($_POST['multiplier']))) {
-    $multiplier = mres($_POST['multiplier']);
+if (! empty(($_POST['multiplier'])) && is_numeric($_POST['multiplier'])) {
+    $multiplier = $_POST['multiplier'];
 } else {
     $multiplier = 1;
 }
-if (! empty(mres($_POST['user_func']))) {
-    $user_func = mres($_POST['user_func']);
+if (! empty(($_POST['user_func']))) {
+    $user_func = $_POST['user_func'];
 } else {
     $user_func = ['NULL'];
 }

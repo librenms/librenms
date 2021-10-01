@@ -18,6 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2020 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -36,8 +37,10 @@ class RoutingController implements DeviceTab
     public function __construct()
     {
         $device = DeviceCache::getPrimary();
+        //dd($device);
         $this->tabs = [
             'ospf' => $device->ospfInstances()->count(),
+            'isis' => $device->isisAdjacencies()->count(),
             'bgp' => $device->bgppeers()->count(),
             'vrf' => $device->vrfs()->count(),
             'cef' => $device->cefSwitching()->count(),

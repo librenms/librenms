@@ -166,7 +166,7 @@ if (Auth::user()->hasGlobalAdmin()) {
         if ($config_total > 1) {
             // populate current_version
             if (isset($_POST['config'])) {
-                [$oid,$date,$version] = explode('|', mres($_POST['config']));
+                [$oid,$date,$version] = explode('|', $_POST['config']);
                 $current_config = ['oid'=>$oid, 'date'=>$date, 'version'=>$version];
             } else { // no version selected
                 $current_config = ['oid' => $config_versions[0]['oid'], 'date' => $config_versions[0]['date'], 'version' => $config_total];
@@ -174,7 +174,7 @@ if (Auth::user()->hasGlobalAdmin()) {
 
             // populate previous_version
             if (isset($_POST['diff'])) { // diff requested
-                [$oid,$date,$version] = explode('|', mres($_POST['prevconfig']));
+                [$oid,$date,$version] = explode('|', $_POST['prevconfig']);
                 if (isset($oid) && $oid != $current_config['oid']) {
                     $previous_config = ['oid'=>$oid, 'date'=>$date, 'version'=>$version];
                 } elseif ($current_config['version'] != 1) {  // assume previous, unless current is first config

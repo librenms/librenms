@@ -33,7 +33,7 @@ $unit_text = 'query/sec';
 $colours = 'psychedelic';
 $rrd_list = [];
 
-$rrd_filename = rrd_name($device['hostname'], ['app', 'bind', $app['app_id']]);
+$rrd_filename = Rrd::name($device['hostname'], ['app', 'bind', $app['app_id']]);
 $array = [
     'any',
     'a',
@@ -46,7 +46,7 @@ $array = [
     'srv',
     'spf',
 ];
-if (rrdtool_check_rrd_exists($rrd_filename)) {
+if (Rrd::checkRrdExists($rrd_filename)) {
     foreach ($array as $ds) {
         $rrd_list[] = [
             'filename' => $rrd_filename,
@@ -58,7 +58,7 @@ if (rrdtool_check_rrd_exists($rrd_filename)) {
     echo "file missing: $file";
 }
 
-$rrd_filename = rrd_name($device['hostname'], ['app', 'bind', $app['app_id'], 'incoming']);
+$rrd_filename = Rrd::name($device['hostname'], ['app', 'bind', $app['app_id'], 'incoming']);
 $array = [
     'afsdb',
     'apl',
@@ -93,7 +93,7 @@ $array = [
     'ixfr',
     'opt',
 ];
-if (rrdtool_check_rrd_exists($rrd_filename)) {
+if (Rrd::checkRrdExists($rrd_filename)) {
     foreach ($array as $ds) {
         $rrd_list[] = [
             'filename' => $rrd_filename,

@@ -1,0 +1,180 @@
+--
+-- Microwave Data Systems - OID Registration MIB
+-- Web Page http://www.microwavedata.com
+-- Copyright (C) 2002 Microwave Data Systems
+--
+-- $Author: jlange $
+-- $Date: 2011/05/02 17:21:41 $
+-- $Header: /home/cvsroot/allmibs/mdsreg.mib,v 1.13 2011/05/02 17:21:41 jlange Exp $
+-- $Revision: 1.13 $
+-- $Name:  $
+--
+--
+--	
+--MDS-REG-MIB
+--mdsRoot                              enterprises.4130               (4130)
+--  mdsWideband                          MDSRoot.1                    (4130.1)  
+--    mdsPointToPoint                      mdsWideband.1              (4130.1.1)
+--      ledrmodule                           mdsPointToPoint.1        (4130.1.1.1) 
+--  mdsNarrowband                        MDSRoot.2                    (4130.2)
+--    mdsPointToMultiPoint                 mdsNarrowband.1            (4130.2.1)
+--      mdsINet                              mdsPointToMultiPoint.1   (4130.2.1.1)
+--        mdsINetRegModule                     mdsINet.1              (4130.2.1.1.1)
+--        mdsINetCommon                        MDSINet.2              (4130.2.1.1.2)
+--        mdsINetStation                       MDSINet.3              (4130.2.1.1.3)
+--        mdsINetAP                            MDSINet.4              (4130.2.1.1.4)
+--        mdsINetV1Traps                       MDSINet.5              (4130.2.1.1.5)
+--        mdsINetV2Traps                       MDSINet.6              (4130.2.1.1.6)
+--        mdsINetSecurity                      MDSINet.7              (4130.2.1.1.7)
+--        mdsINet2                             MDSINet.8              (4130.2.1.1.8)
+--      mdsEntraNET                          mdsPointToMultiPoint.2   (4130.2.1.2)
+--        mdsEntraNetRegModule                 mdsEntraNET.1          (4130.2.1.2.1)
+--        mdsEntraNetAP                        mdsEntraNET.2          (4130.2.1.2.2)
+--          entraNetSecurityConfig               mdsEntraNetAp.4      (4130.2.1.2.2.4)
+--          entraNetWirelessNetworkConfig        mdsEntraNetAp.5      (4130.2.1.2.2.5)
+--        mdsEntraNetV1Traps                   mdsEntraNET.5          (4130.2.1.2.5)
+--      mdsTransIt                           mdsPointToMultiPoint.3   (4130.2.1.3)
+--      mdsMercury                           mdsPointToMultiPoint.4   (4130.2.1.4)
+--      mdsTD200                             mdsPointToMultiPoint.5   (4130.2.1.5)
+--      mdsWiyz                              mdsPointToMultiPoint.6   (4130.2.1.6)
+--  mdsBroadband                         MDSRoot.3                    (4130.3)
+--  mdsGlobalRegModule                   MDSRoot.4                    (4130.4)
+--  mdsCommon                            MDSRoot.5                    (4130.5)
+--  mdsGateNET                           MDSRoot.7                    (4130.7)
+--  mdsSixPortMux                        MDSRoot.8                    (4130.8)
+--  mdsSoftware                          MDSRoot.9                    (4130.9)
+--    mdsPulseNET                          mdsSoftware.1              (4130.9.1)
+--  mdsOrbit                             MDSRoot.10                   (4130.10)
+--
+
+	MDS-REG-MIB DEFINITIONS ::= BEGIN
+
+	IMPORTS 
+		MODULE-IDENTITY, OBJECT-IDENTITY,
+		enterprises
+		   FROM SNMPv2-SMI;
+	
+	mdsGlobalRegModule MODULE-IDENTITY
+		LAST-UPDATED 				"200602080000Z"
+		ORGANIZATION 				"Microwave Data Systems, Inc."
+		CONTACT-INFO 				"Technical Services
+									 Microwave Data Systems, Inc.
+								 
+									 e-mail: techsupport@microwavedata.com
+									 phone:(585)241-5510
+									 fax:(585)242-8369"
+
+		DESCRIPTION 
+			"MDS sub-tree registrations"
+		REVISION "200602080000Z"
+			DESCRIPTION
+				"Initial Revision"
+
+		::= { mdsRoot 4 }
+
+-- the root of the product tree for Microwave Data Systems
+
+    mdsRoot            OBJECT-IDENTITY
+		STATUS			current
+		DESCRIPTION		"The root of the OID sub-tree assigned to MDS"
+		::= { enterprises 4130 }
+
+    mdsWideband	       OBJECT-IDENTITY
+		STATUS			current
+		DESCRIPTION		"Sub-tree for wideband products"
+		::= { mdsRoot 1 }
+
+	    mdsPointToPoint	OBJECT-IDENTITY
+		    STATUS			current
+		    DESCRIPTION		"Sub-tree for wideband point-to-point products"
+		    ::= { mdsWideband 1 }
+
+    mdsNarrowband      OBJECT-IDENTITY
+		STATUS			current
+		DESCRIPTION		"Sub-tree for narrowband products"
+		::= { mdsRoot 2 }
+
+	    mdsPointToMultiPoint	OBJECT-IDENTITY
+		    STATUS			current
+		    DESCRIPTION		"Sub-tree narrowband point-to-multipoint products"
+		    ::= { mdsNarrowband 1 }
+
+    mdsBroadband       OBJECT-IDENTITY
+		STATUS			current
+		DESCRIPTION		"Sub-tree for broadband products"
+		::= { mdsRoot 3 }
+
+
+--  mdsCommon          OBJECT-IDENTITY
+--      STATUS			current
+--      DESCRIPTION		"Sub-tree for common MIB among all products"
+--      := { mdsRoot 5 }
+
+    mdsSoftware        OBJECT-IDENTITY
+		STATUS			current
+		DESCRIPTION		"Sub-tree for non-equipment software such as desktop applications"
+		::= { mdsRoot 9 }
+END
+
+
+
+--
+-- $Log: mdsreg.mib,v $
+-- Revision 1.13  2011/05/02 17:21:41  jlange
+-- Rename MDS-REG to MDS-REG-MIB to be SMIv2 compliant
+--
+-- Revision 1.12  2010/10/20 13:36:57  ctedrow
+-- Changed name from mdsApplications to mdsSoftware
+--
+-- Revision 1.11  2010/10/20 13:22:45  ctedrow
+-- Added mdsApplications as node 9 on mdsRoot.  PulseNET MIB be added under this node
+--
+-- Revision 1.10  2010/03/11 23:28:53  pruhland
+-- add mdsWiyz (documentation only)
+--
+-- Revision 1.9  2008/02/15 21:49:37  alawson
+-- PTC - 1st pass
+--
+-- Revision 1.8  2007/03/19 16:24:36  awright
+-- Merge of changes between UnityHost-Release1_x_x-MergeToTrunk-20070307 and UnityHost-Release1_x_x-MergeToTrunk-20070319
+--
+-- Revision 1.7  2007/02/08 16:42:52  awright
+-- Merge of changes between UnityHost-BranchRoot-Release1_x_x and UnityHost-Release1_x_x-MergeToTrunk-20070208
+--
+-- Revision 1.6.14.2  2007/03/09 22:57:11  jharmon
+-- reorganized oid numbers from mercury_reg down
+--
+-- Revision 1.6.14.1  2007/01/23 12:27:52  ctedrow
+-- Added comments
+--
+-- Revision 1.6  2006/02/13 20:58:38  awright
+-- Modified code to add support for iNET-II specific changes to the iNET MIBs.  Also added authbit support for the OPT_AESENCRYPT bit
+--
+-- Revision 1.5  2005/08/16 14:17:46  ctedrow
+-- Added note for SixPortMux at 4130.8
+--
+-- Revision 1.4  2005/07/20 13:24:05  ctedrow
+-- Fixed timestamp and moved cvs log
+--
+-- Revision 1.3  2004/03/05 19:39:46  ctedrow
+-- Updated tree in header with new gateNET, entraNET, and TransIt info
+--
+-- Revision 1.2  2003/01/21 12:45:40  gbetteri
+-- changed contact information
+--
+-- Revision 1.1.1.1  2002/03/04 13:02:58  ctedrow
+-- Imported mibs
+--
+-- Revision 1.1  2002/02/04 21:42:21  ctedrow
+-- Initial development update
+--
+-- Revision 1.3  2002/01/31 18:17:03  ctedrow
+-- Minor update in comments
+--
+-- Revision 1.2  2002/01/30 15:20:03  ctedrow
+-- Added mdsCommon & mdsSerialGateway
+--
+-- Revision 1.1  2002/01/28 21:01:27  ctedrow
+-- Initial rev
+--
+

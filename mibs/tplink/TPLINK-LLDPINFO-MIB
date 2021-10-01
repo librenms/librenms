@@ -1,0 +1,797 @@
+	
+	TPLINK-LLDPINFO-MIB DEFINITIONS ::= BEGIN
+       
+		IMPORTS
+			OBJECT-TYPE,IpAddress
+						FROM SNMPv2-SMI
+			tplinkLldpMIBObjects
+						FROM TPLINK-LLDP-MIB
+			ifIndex
+						FROM RFC1213-MIB;
+
+			lldpInfo OBJECT IDENTIFIER ::= {tplinkLldpMIBObjects 2}
+			
+			lldpLocalInfoTable OBJECT-TYPE
+              SYNTAX  SEQUENCE OF LLDPLOCALINFOENTRY
+              MAX-ACCESS  not-accessible
+              STATUS  current
+              DESCRIPTION
+                      "Local port information entries."
+              ::= { lldpInfo 1 }
+
+          lldpLocalInfoEntry OBJECT-TYPE
+              SYNTAX  LLDPLOCALINFOENTRY
+              MAX-ACCESS  not-accessible
+              STATUS  current
+              DESCRIPTION
+                      "An entry contains of the information of local port of the switch."
+              INDEX   { ifIndex }
+              ::= { lldpLocalInfoTable 1 }
+      
+          LLDPLOCALINFOENTRY ::=
+              SEQUENCE {
+					lldpLocalPortId
+              				OCTET STRING,
+                  lldpLocalChassisIdType
+                  		OCTET STRING,
+                  lldpLocalChassisId
+                      OCTET STRING,
+                  lldpLocalPortIdType
+                      OCTET STRING,
+                  lldpLocalPortIdDescr
+                      OCTET STRING,
+                  lldpLocalTtl
+                      INTEGER,
+                  lldpLocalPortDescr
+                      OCTET STRING,
+                  lldpLocalDeviceName
+                      OCTET STRING,
+                  lldpLocalDeviceDescr
+                      OCTET STRING,
+                  lldpLocalCapAvailable
+                      OCTET STRING,
+                  lldpLocalCapEnabled
+                      OCTET STRING,
+                  lldpLocalManageIpAddr
+                      IpAddress,
+                  lldpLocalManageAddrType
+                      OCTET STRING,
+                  lldpLocalManageAddrInterfaceType
+                      OCTET STRING,
+                  lldpLocalManageAddrInterfaceId
+                      INTEGER,
+                  lldpLocalManageAddrOID
+                      OCTET STRING,
+				  lldpLocalPortAndProtocolVlanID
+					  OCTET STRING,
+				  lldpLocalVlanName
+					  OCTET STRING,
+                  lldpLocalAutoNegotiationSupported
+                      INTEGER,
+                  lldpLocalAutoNegotiationEnabled
+                      INTEGER,
+                  lldpLocalOperMau
+                      OCTET STRING,
+                  lldpLocalLinkAggregationSupported
+                      INTEGER,
+                  lldpLocalLinkAggregationEnabled
+                      INTEGER,
+                  lldpLocalAggregationPortId
+                      INTEGER,
+                  lldpLocalPowerPortClass
+                      OCTET STRING,
+                  lldpLocalPsePowerSupported
+                      INTEGER,
+                  lldpLocalPsePowerEnabled
+                      INTEGER,
+                  lldpLocalPsePairsControlAbility
+                      INTEGER,
+                  lldpLocalMaximumFrameSize
+                      INTEGER                      
+              	}
+              	
+              
+          lldpLocalPortId OBJECT-TYPE
+            	SYNTAX  OCTET STRING (SIZE (0..255))  
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION
+                      "Displays the port index."
+              ::= { lldpLocalInfoEntry 1 }
+              
+          lldpLocalChassisIdType OBJECT-TYPE
+            	SYNTAX  OCTET STRING (SIZE (0..255))  
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION
+                      "Displays the type of the chassis ID."
+              ::= { lldpLocalInfoEntry 2 }
+                     
+          lldpLocalChassisId OBJECT-TYPE
+            	SYNTAX  OCTET STRING (SIZE (0..255))  
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION
+                      "Displays the chassis ID."
+              ::= { lldpLocalInfoEntry 3 }
+            
+          lldpLocalPortIdType OBJECT-TYPE
+            	SYNTAX  OCTET STRING (SIZE (0..255))  
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION
+                      "Displays the type of the port ID."
+              ::= { lldpLocalInfoEntry 4 }
+           
+          lldpLocalPortIdDescr OBJECT-TYPE
+            	SYNTAX  OCTET STRING (SIZE (0..255))  
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION
+                      "Displays the description of the port ID."
+              ::= { lldpLocalInfoEntry 5 }
+              
+          lldpLocalTtl OBJECT-TYPE
+            	SYNTAX  INTEGER 
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION
+                      "Displays the TTL."
+              ::= { lldpLocalInfoEntry 6 }
+              
+          lldpLocalPortDescr OBJECT-TYPE
+            	SYNTAX  OCTET STRING (SIZE (0..255))  
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION
+                      "Displays the port description."
+              ::= { lldpLocalInfoEntry 7 }
+              
+          lldpLocalDeviceName OBJECT-TYPE
+            	SYNTAX  OCTET STRING (SIZE (0..255))  
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION
+                      "Displays the system name."
+              ::= { lldpLocalInfoEntry 8 }
+              
+          lldpLocalDeviceDescr OBJECT-TYPE
+            	SYNTAX  OCTET STRING (SIZE (0..255))  
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION
+                      "Displays the system description."
+              ::= { lldpLocalInfoEntry 9 }
+              
+          lldpLocalCapAvailable OBJECT-TYPE
+            	SYNTAX  OCTET STRING (SIZE (0..255))  
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION
+                      "Displays the system capabilities supported."
+              ::= { lldpLocalInfoEntry 10 }
+              
+          lldpLocalCapEnabled OBJECT-TYPE
+            	SYNTAX  OCTET STRING (SIZE (0..255))  
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION
+                      "Displays the system capabilities enabled."
+              ::= { lldpLocalInfoEntry 11 }
+              
+          lldpLocalManageIpAddr OBJECT-TYPE
+            	SYNTAX  IpAddress  
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION
+                      "Displays the management address."
+              ::= { lldpLocalInfoEntry 12 }
+       
+           lldpLocalManageAddrType OBJECT-TYPE
+            	SYNTAX  OCTET STRING (SIZE (0..255))  
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION
+                      "Displays the management address type."
+              ::= { lldpLocalInfoEntry 13 }
+              
+          lldpLocalManageAddrInterfaceType OBJECT-TYPE
+            	SYNTAX  OCTET STRING (SIZE (0..255))  
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION
+                      "Displays the management address interface type."
+              ::= { lldpLocalInfoEntry 14 }
+       
+          lldpLocalManageAddrInterfaceId OBJECT-TYPE
+            	SYNTAX  INTEGER 
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION
+                      "Displays the management address interface ID."
+              ::= { lldpLocalInfoEntry 15 }
+              
+          lldpLocalManageAddrOID OBJECT-TYPE
+            	SYNTAX  OCTET STRING (SIZE (0..255)) 
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION
+                      "Displays the management address OID."
+              ::= { lldpLocalInfoEntry 16 }         
+              
+          lldpLocalPortAndProtocolVlanID OBJECT-TYPE
+            	SYNTAX  OCTET STRING (SIZE (0..255)) 
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION
+                      "Displays the port and protocol VLAN ID."
+              ::= { lldpLocalInfoEntry 17 } 
+			  
+           lldpLocalVlanName OBJECT-TYPE
+            	SYNTAX  OCTET STRING (SIZE (0..255)) 
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION
+                      "Displays the port and protocol VLAN ID."
+              ::= { lldpLocalInfoEntry 18 }                   
+              
+          lldpLocalAutoNegotiationSupported OBJECT-TYPE
+            	SYNTAX  INTEGER {
+	      							disable(0), 						--disable
+	      							enable(1)								--enable
+	      							}
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION
+                      "Displays the supported state of the auto-negotiation ."
+              ::= { lldpLocalInfoEntry 19 } 
+              
+          lldpLocalAutoNegotiationEnabled OBJECT-TYPE
+            	SYNTAX  INTEGER {
+	      							disable(0), 						--disable
+	      							enable(1)								--enable
+	      							}
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION
+                      "Displays the enabled state of the auto-negotiation ."
+              ::= { lldpLocalInfoEntry 20 } 
+              
+          lldpLocalOperMau OBJECT-TYPE
+            	SYNTAX  OCTET STRING (SIZE (0..255)) 
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION
+                      "Displays the OperMau."
+              ::= { lldpLocalInfoEntry 21 } 
+              
+          lldpLocalLinkAggregationSupported OBJECT-TYPE
+            	SYNTAX  INTEGER {
+	      							disable(0), 						--disable
+	      							enable(1)								--enable
+	      							}
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION
+                      "Displays the supported state of the link aggregation ."
+              ::= { lldpLocalInfoEntry 22 } 
+              
+          lldpLocalLinkAggregationEnabled OBJECT-TYPE
+            	SYNTAX  INTEGER {
+	      							disable(0), 						--disable
+	      							enable(1)								--enable
+	      							}
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION
+                      "Displays the enabled state of the link aggregation ."
+              ::= { lldpLocalInfoEntry 23 } 
+              
+          lldpLocalAggregationPortId OBJECT-TYPE
+            	SYNTAX  INTEGER
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION
+                      "Displays the aggregation port id ."
+              ::= { lldpLocalInfoEntry 24 } 
+              
+          lldpLocalPowerPortClass OBJECT-TYPE
+            	SYNTAX  OCTET STRING (SIZE (0..255)) 
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION
+                      "Displays the power port class."
+              ::= { lldpLocalInfoEntry 25 } 
+              
+          lldpLocalPsePowerSupported OBJECT-TYPE
+            	SYNTAX  INTEGER {
+	      							disable(0), 						--disable
+	      							enable(1)								--enable
+	      							}
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION
+                      "Displays the supported state of the PSE power ."
+              ::= { lldpLocalInfoEntry 26 }
+              
+          lldpLocalPsePowerEnabled OBJECT-TYPE
+            	SYNTAX  INTEGER {
+	      							disable(0), 						--disable
+	      							enable(1)								--enable
+	      							}
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION
+                      "Displays the enabled state of the PSE power."
+              ::= { lldpLocalInfoEntry 27 } 
+              
+          lldpLocalPsePairsControlAbility OBJECT-TYPE
+            	SYNTAX  INTEGER {
+	      							disable(0), 						--disable
+	      							enable(1)								--enable
+	      							}
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION
+                      "Displays the enabled state of the PSE pairs control."
+              ::= { lldpLocalInfoEntry 28 } 
+              
+          lldpLocalMaximumFrameSize OBJECT-TYPE
+            	SYNTAX  INTEGER 
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION
+                      "Displays the size of the maximum frame."
+              ::= { lldpLocalInfoEntry 29 } 
+       
+       
+       lldpNeighborInfoTable OBJECT-TYPE
+              SYNTAX  SEQUENCE OF LLDPNEIGHBORINFOENTRY
+              MAX-ACCESS  not-accessible
+              STATUS  current
+              DESCRIPTION
+                      "Neighbor port information  entries."
+              ::= { lldpInfo 2 }
+
+          lldpNeighborInfoEntry OBJECT-TYPE
+              SYNTAX  LLDPNEIGHBORINFOENTRY
+              MAX-ACCESS  not-accessible
+              STATUS  current
+              DESCRIPTION
+                      "An entry contains of the information of neighbor port of the switch."
+              INDEX   { ifIndex , lldpNeighborPortIndexId}
+              ::= { lldpNeighborInfoTable 1 }
+      
+          LLDPNEIGHBORINFOENTRY ::=
+              SEQUENCE {
+              		lldpNeighborPortId
+              				OCTET STRING,
+              		lldpNeighborPortIndexId
+              				INTEGER,
+                  lldpNeighborChassisIdType
+                  		OCTET STRING,
+                  lldpNeighborChassisId
+                      OCTET STRING,
+                  lldpNeighborPortIdType
+                      OCTET STRING,
+                  lldpNeighborPortIdDescr
+                      OCTET STRING,
+                  lldpNeighborTtl
+                      INTEGER,
+                  lldpNeighborPortDescr
+                      OCTET STRING,
+                  lldpNeighborDeviceName
+                      OCTET STRING,
+                  lldpNeighborDeviceDescr
+                      OCTET STRING,
+                  lldpNeighborCapAvailable
+                      OCTET STRING,
+                  lldpNeighborCapEnabled
+                      OCTET STRING,
+                  lldpNeighborManageIpAddr
+                      IpAddress,
+                  lldpNeighborManageAddrType
+                      OCTET STRING,
+                  lldpNeighborManageAddrInterfaceType
+                      OCTET STRING,
+                  lldpNeighborManageAddrInterfaceId
+                      INTEGER,
+                  lldpNeighborManageAddrOID
+                      OCTET STRING,
+				  lldpNeighborPortAndProtocolVlanID
+					  OCTET STRING,
+				  lldpNeighborVlanName
+					  OCTET STRING,
+				  lldpNeighborProtocolIdentity
+					  OCTET STRING,
+                  lldpNeighborAutoNegotiationSupported
+                      INTEGER,
+                  lldpNeighborAutoNegotiationEnabled
+                      INTEGER,
+                  lldpNeighborOperMau
+                      OCTET STRING,
+                  lldpNeighborLinkAggregationSupported
+                      INTEGER,
+                  lldpNeighborLinkAggregationEnabled
+                      INTEGER,
+                  lldpNeighborAggregationPortId
+                      INTEGER,
+                  lldpNeighborPowerPortClass
+                      OCTET STRING,
+                  lldpNeighborPsePowerSupported
+                      INTEGER,
+                  lldpNeighborPsePowerEnabled
+                      INTEGER,
+                  lldpNeighborPsePairsControlAbility
+                      INTEGER,
+                  lldpNeighborMaximumFrameSize
+                      INTEGER                   
+              	}              	
+              
+          lldpNeighborPortId OBJECT-TYPE
+            	SYNTAX  OCTET STRING (SIZE (0..255))  
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION
+                      "Displays the port index."
+              ::= { lldpNeighborInfoEntry 1 }
+              
+          lldpNeighborPortIndexId OBJECT-TYPE
+            	SYNTAX  INTEGER  
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION
+                      "Displays the neighbor index."
+              ::= { lldpNeighborInfoEntry 2 }
+              
+          lldpNeighborChassisIdType OBJECT-TYPE
+            	SYNTAX  OCTET STRING (SIZE (0..255))  
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION
+                      "Displays the type of the chassis ID."
+              ::= { lldpNeighborInfoEntry 3 }
+                     
+          lldpNeighborChassisId OBJECT-TYPE
+            	SYNTAX  OCTET STRING (SIZE (0..255))  
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION
+                      "Displays the chassis ID."
+              ::= { lldpNeighborInfoEntry 4 }
+            
+          lldpNeighborPortIdType OBJECT-TYPE
+            	SYNTAX  OCTET STRING (SIZE (0..255))  
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION
+                      "Displays the type of the port ID."
+              ::= { lldpNeighborInfoEntry 5 }
+           
+          lldpNeighborPortIdDescr OBJECT-TYPE
+            	SYNTAX  OCTET STRING (SIZE (0..255))  
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION
+                      "Displays the description of the port ID."
+              ::= { lldpNeighborInfoEntry 6 }
+              
+          lldpNeighborTtl OBJECT-TYPE
+            	SYNTAX  INTEGER 
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION
+                      "Displays the TTL."
+              ::= { lldpNeighborInfoEntry 7 }
+              
+          lldpNeighborPortDescr OBJECT-TYPE
+            	SYNTAX  OCTET STRING (SIZE (0..255))  
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION
+                      "Displays the port description."
+              ::= { lldpNeighborInfoEntry 8 }
+              
+          lldpNeighborDeviceName OBJECT-TYPE
+            	SYNTAX  OCTET STRING (SIZE (0..255))  
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION
+                      "Displays the system name."
+              ::= { lldpNeighborInfoEntry 9 }
+              
+          lldpNeighborDeviceDescr OBJECT-TYPE
+            	SYNTAX  OCTET STRING (SIZE (0..255))  
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION
+                      "Displays the system description."
+              ::= { lldpNeighborInfoEntry 10 }
+              
+          lldpNeighborCapAvailable OBJECT-TYPE
+            	SYNTAX  OCTET STRING (SIZE (0..255))  
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION
+                      "Displays the system capabilities supported."
+              ::= { lldpNeighborInfoEntry 11 }
+              
+          lldpNeighborCapEnabled OBJECT-TYPE
+            	SYNTAX  OCTET STRING (SIZE (0..255))  
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION
+                      "Displays the system capabilities enabled."
+              ::= { lldpNeighborInfoEntry 12 }
+              
+          lldpNeighborManageIpAddr OBJECT-TYPE
+            	SYNTAX  IpAddress  
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION
+                      "Displays the management address."
+              ::= { lldpNeighborInfoEntry 13 }
+              
+          lldpNeighborManageAddrType OBJECT-TYPE
+            	SYNTAX  OCTET STRING (SIZE (0..255))  
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION
+                      "Displays the management address type."
+              ::= { lldpNeighborInfoEntry 14 }
+              
+          lldpNeighborManageAddrInterfaceType OBJECT-TYPE
+            	SYNTAX  OCTET STRING (SIZE (0..255))  
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION
+                      "Displays the management address interface type."
+              ::= { lldpNeighborInfoEntry 15 }
+       
+          lldpNeighborManageAddrInterfaceId OBJECT-TYPE
+            	SYNTAX  INTEGER 
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION
+                      "Displays the management address interface ID."
+              ::= { lldpNeighborInfoEntry 16 }
+              
+          lldpNeighborManageAddrOID OBJECT-TYPE
+            	SYNTAX  OCTET STRING (SIZE (0..255)) 
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION
+                      "Displays the management address OID."
+              ::= { lldpNeighborInfoEntry 17 } 
+          
+          lldpNeighborPortAndProtocolVlanID OBJECT-TYPE
+            	SYNTAX  OCTET STRING (SIZE (0..512)) 
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION
+                      "Displays the port and protocol VLAN ID tlv."
+              ::= { lldpNeighborInfoEntry 18 } 
+ 
+          lldpNeighborVlanName OBJECT-TYPE
+            	SYNTAX  OCTET STRING (SIZE (0..512)) 
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION
+                      "Displays the VLAN name tlv."
+              ::= { lldpNeighborInfoEntry 19 } 
+
+          lldpNeighborProtocolIdentity OBJECT-TYPE
+            	SYNTAX  OCTET STRING (SIZE (0..512)) 
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION
+                      "Displays the protocol identity tlv."
+              ::= { lldpNeighborInfoEntry 20 } 
+			  
+          lldpNeighborAutoNegotiationSupported OBJECT-TYPE
+            	SYNTAX  INTEGER {
+	      							disable(0), 						--disable
+	      							enable(1)								--enable
+	      							}
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION
+                      "Displays the supported state of the auto-negotiation ."
+              ::= { lldpNeighborInfoEntry 21 } 
+              
+          lldpNeighborAutoNegotiationEnabled OBJECT-TYPE
+            	SYNTAX  INTEGER {
+	      							disable(0), 						--disable
+	      							enable(1)								--enable
+	      							}
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION
+                      "Displays the enabled state of the auto-negotiation ."
+              ::= { lldpNeighborInfoEntry 22 } 
+              
+          lldpNeighborOperMau OBJECT-TYPE
+            	SYNTAX  OCTET STRING (SIZE (0..255)) 
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION
+                      "Displays the OperMau."
+              ::= { lldpNeighborInfoEntry 23 } 
+              
+          lldpNeighborLinkAggregationSupported OBJECT-TYPE
+            	SYNTAX  INTEGER {
+	      							disable(0), 						--disable
+	      							enable(1)								--enable
+	      							}
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION
+                      "Displays the supported state of the link aggregation ."
+              ::= { lldpNeighborInfoEntry 24 } 
+              
+          lldpNeighborLinkAggregationEnabled OBJECT-TYPE
+            	SYNTAX  INTEGER {
+	      							disable(0), 						--disable
+	      							enable(1)								--enable
+	      							}
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION
+                      "Displays the enabled state of the link aggregation ."
+              ::= { lldpNeighborInfoEntry 25 } 
+              
+          lldpNeighborAggregationPortId OBJECT-TYPE
+            	SYNTAX  INTEGER
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION
+                      "Displays the aggregation port id ."
+              ::= { lldpNeighborInfoEntry 26 } 
+              
+          lldpNeighborPowerPortClass OBJECT-TYPE
+            	SYNTAX  OCTET STRING (SIZE (0..255)) 
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION
+                      "Displays the power port class."
+              ::= { lldpNeighborInfoEntry 27 } 
+              
+          lldpNeighborPsePowerSupported OBJECT-TYPE
+            	SYNTAX  INTEGER {
+	      							disable(0), 						--disable
+	      							enable(1)								--enable
+	      							}
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION
+                      "Displays the supported state of the PSE power ."
+              ::= { lldpNeighborInfoEntry 28 }
+              
+          lldpNeighborPsePowerEnabled OBJECT-TYPE
+            	SYNTAX  INTEGER {
+	      							disable(0), 						--disable
+	      							enable(1)								--enable
+	      							}
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION
+                      "Displays the enabled state of the PSE power."
+              ::= { lldpNeighborInfoEntry 29 } 
+              
+          lldpNeighborPsePairsControlAbility OBJECT-TYPE
+            	SYNTAX  INTEGER {
+	      							disable(0), 						--disable
+	      							enable(1)								--enable
+	      							}
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION
+                      "Displays the enabled state of the PSE pairs control."
+              ::= { lldpNeighborInfoEntry 30 } 
+              
+          lldpNeighborMaximumFrameSize OBJECT-TYPE
+            	SYNTAX  INTEGER 
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION
+                      "Displays the size of the maximum frame."
+              ::= { lldpNeighborInfoEntry 31 } 
+			  
+       lldpNeighborManAddrTable OBJECT-TYPE
+              SYNTAX  SEQUENCE OF LLDPNEIGHBORMANADDRENTRY
+              MAX-ACCESS  not-accessible
+              STATUS  current
+              DESCRIPTION
+                      "Neighbor management IP address information  entries."
+              ::= { lldpInfo 3 }
+
+          lldpNeighborManAddrEntry OBJECT-TYPE
+              SYNTAX  LLDPNEIGHBORMANADDRENTRY
+              MAX-ACCESS  not-accessible
+              STATUS  current
+              DESCRIPTION
+                      "An entry contains of the information of neighbor management address."
+              INDEX   { ifIndex , lldpNeighborManAddrPortIndexId, lldpNeighborManAddrSubtype, lldpNeighborManAddr}
+              ::= { lldpNeighborManAddrTable 1 }
+      
+          LLDPNEIGHBORMANADDRENTRY ::=
+              SEQUENCE {
+              		lldpNeighborManAddrPortId
+              				OCTET STRING,
+              		lldpNeighborManAddrPortIndexId
+              				INTEGER,
+					lldpNeighborManAddrSubtype
+							INTEGER,
+					lldpNeighborManAddr
+                      OCTET STRING,
+					lldpNeighborManAddrIfSubtype
+							INTEGER,
+					lldpNeighborManAddrIfId
+							INTEGER,
+					lldpNeighborManAddrIfOID
+						OCTET STRING                  
+              	}
+			
+          lldpNeighborManAddrPortId OBJECT-TYPE
+            	SYNTAX  OCTET STRING (SIZE (0..255))  
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION
+                      "Displays the port index."
+              ::= { lldpNeighborManAddrEntry 1 }
+			  
+          lldpNeighborManAddrPortIndexId OBJECT-TYPE
+            	SYNTAX  INTEGER  
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION
+                      "Displays the neighbor index."
+              ::= { lldpNeighborManAddrEntry 2 }
+
+          lldpNeighborManAddrSubtype OBJECT-TYPE
+            	SYNTAX  INTEGER {
+					ipv4(1),
+					ipv6(2)
+				}				
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION
+                      "Displays the neighbor index."
+              ::= { lldpNeighborManAddrEntry 3 }
+
+          lldpNeighborManAddr OBJECT-TYPE
+            	SYNTAX  OCTET STRING (SIZE (0..255))  
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION
+                      "Displays the management address."
+              ::= { lldpNeighborManAddrEntry 4 }
+			  
+          lldpNeighborManAddrIfSubtype OBJECT-TYPE
+            	SYNTAX  INTEGER {
+					unknown(1),
+					ifIndex(2),
+					sysPortNumber(3)
+				}
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION
+                      "Displays the management address interface ID subtype."
+              ::= { lldpNeighborManAddrEntry 5 }
+
+          lldpNeighborManAddrIfId OBJECT-TYPE
+            	SYNTAX  INTEGER  
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION
+                      "Displays the management address interface ID."
+              ::= { lldpNeighborManAddrEntry 6 }
+
+          lldpNeighborManAddrIfOID OBJECT-TYPE
+            	SYNTAX  OCTET STRING (SIZE (0..255))   
+              MAX-ACCESS  read-only
+              STATUS  current
+              DESCRIPTION
+                      "Displays the management address interface OID."
+              ::= { lldpNeighborManAddrEntry 7 }				  
+	 END	

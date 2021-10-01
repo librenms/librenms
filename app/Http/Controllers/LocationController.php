@@ -38,9 +38,10 @@ class LocationController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param \Illuminate\Http\Request $request
-     * @param Location $location
-     * @return \Illuminate\Http\Response
+     * @param  \Illuminate\Http\Request  $request
+     * @param  Location  $location
+     * @return \Illuminate\Http\JsonResponse
+     *
      * @throws \Illuminate\Auth\Access\AuthorizationException
      */
     public function update(Request $request, Location $location)
@@ -53,6 +54,7 @@ class LocationController extends Controller
         ]);
 
         $location->fill($request->only(['lat', 'lng']));
+        $location->fixed_coordinates = true;  // user has set coordinates, block automated changes
         $location->save();
 
         return response()->json(['status' => 'success']);
@@ -61,8 +63,9 @@ class LocationController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param  Location $location
-     * @return \Illuminate\Http\Response
+     * @param  Location  $location
+     * @return \Illuminate\Http\JsonResponse
+     *
      * @throws \Exception
      */
     public function destroy(Request $request, Location $location)

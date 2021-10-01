@@ -1,10 +1,12 @@
 source: General/Updating.md
 path: blob/master/doc/
 
+# Updating an Install
+
 By default, LibreNMS is set to automatically update. If you have
 disabled this feature then you can perform a manual update.
 
-# Manual update
+## Manual update
 
 If you would like to perform a manual update then you can do this by
 running the following command as the `librenms` user:
@@ -14,7 +16,7 @@ running the following command as the `librenms` user:
 This will update both the core LibreNMS files but also update the database
 structure if updates are available.
 
-# Advanced users
+## Advanced users
 
 If you absolutely must update manually without using `./daily.sh` then
 you can do so by running the following commands:
@@ -31,8 +33,6 @@ You should continue to run daily.sh.  This does database cleanup and
 other processes in addition to updating. You can disable the daily.sh
 update process as described below.
 
-# Disabling automatic updates
+## Disabling automatic updates
 
-LibreNMS by default performs updates on a daily basis. This can be disabled by setting:
-
-`$config['update'] = 0;`
+LibreNMS by default performs updates on a daily basis. This can be disabled in the WebUI Global Settings under System -> Updates, or using lnms: `./lnms config:set update false`

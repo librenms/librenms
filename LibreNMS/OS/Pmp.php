@@ -18,6 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2017 Paul Heinrichs
  * @author     Paul Heinrichs<pdheinrichs@gmail.com>
  */
@@ -130,7 +131,7 @@ class Pmp extends OS implements
             $tags = compact('rrd_def');
             data_update($this->getDeviceArray(), 'canopy-generic-jitter', $tags, $fields);
             $this->enableGraph('canopy_generic_jitter');
-            unset($rrd_filename, $jitter);
+            unset($rrd_def, $jitter);
         }
 
         $multi_get_array = snmp_get_multi($this->getDeviceArray(), ['regCount.0', 'regFailureCount.0'], '-OQU', 'WHISP-APS-MIB');
@@ -149,7 +150,7 @@ class Pmp extends OS implements
             $tags = compact('rrd_def');
             data_update($this->getDeviceArray(), 'canopy-generic-regCount', $tags, $fields);
             $this->enableGraph('canopy_generic_regCount');
-            unset($rrd_filename, $registered, $failed);
+            unset($rrd_def, $registered, $failed);
         }
 
         $visible = str_replace('"', '', snmp_get($this->getDeviceArray(), '.1.3.6.1.4.1.161.19.3.4.4.7.0', '-Ovqn', ''));
@@ -227,7 +228,7 @@ class Pmp extends OS implements
             $tags = compact('rrd_def');
             data_update($this->getDeviceArray(), 'canopy-generic-signalHV', $tags, $fields);
             $this->enableGraph('canopy_generic_signalHV');
-            unset($rrd_filename, $vertical, $horizontal, $combined);
+            unset($rrd_def, $vertical, $horizontal, $combined);
         }
 
         $horizontal = str_replace('"', '', snmp_get($this->getDeviceArray(), 'radioDbmHorizontal.0', '-Ovqn', 'WHISP-SM-MIB'));

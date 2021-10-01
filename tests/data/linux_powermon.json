@@ -1,0 +1,49 @@
+{
+    "applications": {
+        "discovery": {
+            "applications": [
+                {
+                    "app_type": "powermon",
+                    "app_state": "UNKNOWN",
+                    "discovered": 1,
+                    "app_state_prev": null,
+                    "app_status": "",
+                    "app_instance": ""
+                }
+            ],
+            "application_metrics": []
+        },
+        "poller": {
+            "applications": [
+                {
+                    "app_type": "powermon",
+                    "app_state": "OK",
+                    "discovered": 1,
+                    "app_state_prev": "UNKNOWN",
+                    "app_status": "",
+                    "app_instance": ""
+                }
+            ],
+            "application_metrics": [
+                {
+                    "metric": "rate",
+                    "value": 0.224931,
+                    "value_prev": null,
+                    "app_type": "powermon"
+                },
+                {
+                    "metric": "watts-abs",
+                    "value": 340,
+                    "value_prev": null,
+                    "app_type": "powermon"
+                },
+                {
+                    "metric": "watts-gauge",
+                    "value": 340,
+                    "value_prev": null,
+                    "app_type": "powermon"
+                }
+            ]
+        }
+    }
+}

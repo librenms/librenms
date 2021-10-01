@@ -1,5 +1,7 @@
 <?php
 
+use LibreNMS\Util\Debug;
+
 $init_modules = ['web', 'auth'];
 require realpath(__DIR__ . '/..') . '/includes/init.php';
 
@@ -7,7 +9,7 @@ if (! Auth::check()) {
     exit('Unauthorized');
 }
 
-set_debug($_REQUEST['debug']);
+Debug::set($_REQUEST['debug']);
 
 $device = [];
 $ports = [];
@@ -15,7 +17,7 @@ $bgp = [];
 $limit = (int) \LibreNMS\Config::get('webui.global_search_result_limit');
 
 if (isset($_REQUEST['search'])) {
-    $search = mres($_REQUEST['search']);
+    $search = $_REQUEST['search'];
     header('Content-type: application/json');
     if (strlen($search) > 0) {
         $found = 0;
@@ -67,9 +69,10 @@ if (isset($_REQUEST['search'])) {
                               OR `L`.`location` LIKE ?
                               OR `D`.`sysName` LIKE ?
                               OR `D`.`purpose` LIKE ?
+                              OR `D`.`serial` LIKE ?
                               OR `D`.`notes` LIKE ?';
             $query_args_list = array_merge($query_args_list, ["%$search%", "%$search%", "%$search%",
-                "%$search%", "%$search%", ]);
+                "%$search%", "%$search%", "%$search%", ]);
 
             if (\LibreNMS\Util\IPv4::isValid($search, false)) {
                 $query .= ' LEFT JOIN `ports` AS `P` ON `P`.`device_id` = `D`.`device_id`
@@ -124,7 +127,7 @@ if (isset($_REQUEST['search'])) {
                     $device[] = [
                         'name'            => $name,
                         'device_id'       => $result['device_id'],
-                        'url'             => generate_device_url($result),
+                        'url'             => \LibreNMS\Util\Url::deviceUrl((int) $result['device_id']),
                         'colours'         => $highlight_colour,
                         'device_ports'    => $num_ports,
                         'device_image'    => getIcon($result),
@@ -157,7 +160,7 @@ if (isset($_REQUEST['search'])) {
 
                 foreach ($results as $result) {
                     $name = $result['ifDescr'] == $result['ifAlias'] ? $result['ifName'] : $result['ifDescr'];
-                    $description = display($result['ifAlias']);
+                    $description = \LibreNMS\Util\Clean::html($result['ifAlias'], []);
 
                     if ($result['deleted'] == 0 && ($result['ignore'] == 0 || $result['ignore'] == 0) && ($result['ifInErrors_delta'] > 0 || $result['ifOutErrors_delta'] > 0)) {
                         // Errored ports
@@ -225,7 +228,7 @@ if (isset($_REQUEST['search'])) {
 
                     $bgp[] = [
                         'count'       => count($results),
-                        'url'         => generate_peer_url($result),
+                        'url'         => \LibreNMS\Util\Url::generate(['page' => 'device', 'device' => $result['device_id'], 'tab' => 'routing', 'proto' => 'bgp'], []),
                         'name'        => $name,
                         'description' => $description,
                         'localas'     => $localas,

@@ -25,22 +25,19 @@
 
 namespace App\Observers;
 
-use Illuminate\Database\Eloquent\Model as Eloquent;
 use Log;
+use Rrd;
 
 class MempoolObserver extends ModuleModelObserver
 {
-    public function updated(Eloquent $model)
+    /** @param \App\Models\Mempool $model  */
+    public function updated($model)
     {
         parent::updated($model);
 
         if ($model->isDirty('mempool_class')) {
             Log::debug("Mempool class changed $model->mempool_descr ($model->mempool_id)");
-            rrd_file_rename(
-                $model->device->toArray(),
-                ['mempool', $model->mempool_type, $model->getOriginal('mempool_class'), $model->mempool_index],
-                ['mempool', $model->mempool_type, $model->mempool_class, $model->mempool_index]
-            );
+            Rrd::renameFile($model->device->toArray(), ['mempool', $model->mempool_type, $model->getOriginal('mempool_class'), $model->mempool_index], ['mempool', $model->mempool_type, $model->mempool_class, $model->mempool_index]);
         }
     }
 }

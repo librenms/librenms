@@ -30,7 +30,7 @@
                     "processor_index": "0",
                     "processor_type": "fortigate-fixed",
                     "processor_usage": 6,
-                    "processor_descr": "Processor",
+                    "processor_descr": "System Cpu Usage",
                     "processor_precision": 1,
                     "processor_perc_warn": 75
                 }

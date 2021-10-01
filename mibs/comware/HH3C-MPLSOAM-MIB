@@ -1,0 +1,498 @@
+-- ==================================================================
+-- Copyright (C) 2005 New H3C Tech. Co., Ltd. All rights reserved.
+--
+-- Description: MPLSOAM MIB
+-- Reference:
+-- Version: V1.0
+-- History:
+-- V1.0 2007-03-31 Created by Lixufu ID: 05023
+-- ==================================================================
+HH3C-MPLSOAM-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+        hh3cCommon
+    FROM HH3C-OID-MIB
+        IpAddress, Integer32, Unsigned32, OBJECT-TYPE, MODULE-IDENTITY, 
+        NOTIFICATION-TYPE
+    FROM SNMPv2-SMI
+        TruthValue, RowStatus, TEXTUAL-CONVENTION
+    FROM SNMPv2-TC;
+
+hh3cMplsOam MODULE-IDENTITY
+    LAST-UPDATED "200703310000Z"                -- March 31, 2007 at 00:00 GMT
+    ORGANIZATION
+        "New H3C Tech. Co., Ltd."
+    CONTACT-INFO
+        "Platform Team New H3C Tech. Co., Ltd.
+        Hai-Dian District Beijing P.R. China
+        http://www.h3c.com
+        Zip:100085
+        "
+    DESCRIPTION
+        "This MIB contains objects to configure OAM module.
+        The Operation, Administration and Maintenance (OAM)
+        is an effective means for decreasing the cost of network maintenance.
+        The MPLS OAM is used to administrate and maintain MPLS."
+    ::= { hh3cCommon 79 }
+
+Hh3cMplsOAMDefectType ::=  TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "An indication of the OAM's defect type:
+        1: dServer, server layer defect;
+        2: dPeerMe, peer network maintenance entity defect;
+        3: dLOCV, Loss of Connectivity Verification defect;
+        4: dTTSIMismatch, Trail Termination Source Identifier Mismatch defect;
+        5: dTTSIMismerge, Trail Termination Source Identifier Mismerge defect;
+        6: dExcess, receiving excess rate of CV/FFD;
+        7: dUnknown, unknown defect in the MPLS network..
+        8: rlsn down;
+        9: dLspDown;
+        10: MPLS OAM ME;
+        11: no defect."
+    SYNTAX      INTEGER
+        {
+            dServer(1),
+            dPeerMe(2),
+            dLOCV(3),
+            dTTSIMismatch(4),
+            dTTSIMismerge(5),
+            dExcess(6),
+            dUnknown(7),
+            dRlsnDown(8),
+            dLspDown(9),
+            dME(10),
+            noDefect(11)
+        }
+
+Hh3cMplsOAMDetectFreq ::=  TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "An indication of the OAM's frequent type( ITU-T: Y.1711(0402) ):
+        For CV: the frequency is static. The value is 1/s.
+        For FFD: the frequency is set by user. The value
+        can be 10ms, 20ms, 50ms, 100ms, 200ms, 500ms.
+        Any other frequency is wrong.
+        1: 10ms;
+        2: 20ms;
+        3: 50ms;
+        4: 100ms;
+        5: 200ms;
+        6: 500ms;
+        7: 1000ms(only for cv)."
+    SYNTAX      INTEGER
+        {
+            ffd10ms(1),
+            ffd20ms(2),
+            ffd50ms(3),
+            ffd100ms(4),
+            ffd200ms(5),
+            ffd500ms(6),
+            cv1000ms(7)
+        }
+
+-- ==================================================================
+--
+-- ======================= definition begin =========================
+--
+-- ==================================================================
+hh3cMplsOamScalarGroup OBJECT IDENTIFIER ::= { hh3cMplsOam 1 }
+
+hh3cMplsOamCapability OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Whether OAM is globally capable.
+        false: incapable;
+        true: capable;
+        The default value is incapable."
+    DEFVAL  { false }
+    ::= { hh3cMplsOamScalarGroup 1 }
+
+hh3cMplsOamTrapOpen OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Whether OAM trap is globally enabled.
+        false: disable;
+        true: enable;
+        The default value is disable."
+    DEFVAL  { false }
+    ::= { hh3cMplsOamScalarGroup 2 }
+
+hh3cMplsOamTable OBJECT IDENTIFIER ::= { hh3cMplsOam 2 }
+
+hh3cMplsOamIgrTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cMplsOamIgrEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table specifies per-LSP MPLS OAM ingress capability and
+        associated information, such as IgrLspName and IgrDetType."
+    ::= { hh3cMplsOamTable 1 }
+
+hh3cMplsOamIgrEntry OBJECT-TYPE
+    SYNTAX      Hh3cMplsOamIgrEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry in this table is created by an LSR for every LSP
+        capable of supporting MPLS OAM at ingress."
+    INDEX
+        {
+            hh3cMplsOamIgrIndex
+        }
+    ::= { hh3cMplsOamIgrTable 1 }
+
+Hh3cMplsOamIgrEntry ::= SEQUENCE
+    {
+        hh3cMplsOamIgrIndex         Unsigned32,
+        hh3cMplsOamIgrLspName       OCTET STRING,
+        hh3cMplsOamIgrDetectType    INTEGER,
+        hh3cMplsOamIgrDetectFreq    Hh3cMplsOAMDetectFreq,
+        hh3cMplsOamIgrRevType       INTEGER,
+        hh3cMplsOamIgrRevLspName    OCTET STRING,
+        hh3cMplsOamIgrLspId         Integer32,
+        hh3cMplsOamIgrEnable        TruthValue,
+        hh3cMplsOamIgrDefectType    Hh3cMplsOAMDefectType,
+        hh3cMplsOamIgrRowStatus     RowStatus
+    }
+
+hh3cMplsOamIgrIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This is an unique index for an OAM ingress entry in the OAM table."
+    ::= { hh3cMplsOamIgrEntry 1 }
+
+hh3cMplsOamIgrLspName OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The name of an LSP.
+        It means the LSP name of the detected LSP."
+    ::= { hh3cMplsOamIgrEntry 2 }
+
+hh3cMplsOamIgrDetectType OBJECT-TYPE
+    SYNTAX      INTEGER
+        {
+            cv(1),
+            ffd(2)
+        }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "There are two types of OAM packets, CV and FFD.
+        The CV flow is generated at the source LSR of the LSP with
+        a nominal frequency of 1/s and terminated at the sink LSR of the LSP.
+        FFD provides failure detection option for an LSP independent
+        of the CV based availability model and is not tied to the
+        CV insertion rate. Insertion rates at 1/s or faster may
+        also be used.
+        The CV/FFD packet contains a network-unique identifier (TTSI)
+        so that all types of defects can be detected.
+        1: CV;
+        2: FFD."
+    ::= { hh3cMplsOamIgrEntry 3 }
+
+hh3cMplsOamIgrDetectFreq OBJECT-TYPE
+    SYNTAX      Hh3cMplsOAMDetectFreq
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Indication of the OAM's frequent type."
+    ::= { hh3cMplsOamIgrEntry 4 }
+
+hh3cMplsOamIgrRevType OBJECT-TYPE
+    SYNTAX      INTEGER
+        {
+            private(1),
+            share(2)
+        }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "When an LSP is found to be in defect, the sink LSR of the LSP
+        should send BDI to inform the source LSR of the LSP, the BDI is
+        transferred through the reverse LSP.
+        The type of reverse LSP can be private or shared.
+        If private, then the reverse LSP can be used only by the oam ingress;
+        If shared, the reverse LSP which is shared between many forward
+        LSPs, whose source LSRs are the same and sink LSRs are the same.
+        1: private;
+        2: share."
+    ::= { hh3cMplsOamIgrEntry 5 }
+
+hh3cMplsOamIgrRevLspName OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The object indicates the name of the reverse LSP."
+    ::= { hh3cMplsOamIgrEntry 6 }
+
+hh3cMplsOamIgrLspId OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "For ingress, the object indicates the lsp ID of
+        the detected LSP."
+    ::= { hh3cMplsOamIgrEntry 7 }
+
+hh3cMplsOamIgrEnable OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Whether one LSP is OAM enable.
+        If disable, LSP is not monitored;
+        If enable, CV/FFD is generated at the source LSR of the LSP and
+        checked at the sink LSR of the LSP, and user can set
+        other configuration.
+        false: The OAM function is disabled on the ingress;
+        true: The OAM function is enabled on the ingress."
+    DEFVAL  { false }
+    ::= { hh3cMplsOamIgrEntry 8 }
+
+hh3cMplsOamIgrDefectType OBJECT-TYPE
+    SYNTAX      Hh3cMplsOAMDefectType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indication of the OAM's defect type."
+    ::= { hh3cMplsOamIgrEntry 9 }
+
+hh3cMplsOamIgrRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object is responsible for managing the creation,
+        deletion and modification of rows, which support active
+        status and CreatAndGo, destroy operation.
+        To create a new row, hh3cMplsOamIgrLspName, hh3cMplsOamIgrDetectType,
+        hh3cMplsOamIgrDetectFreq, hh3cMplsOamIgrRevType, hh3cMplsOamIgrRevLspName,
+        and hh3cMplsOamIgrLspId must be specified."
+    ::= { hh3cMplsOamIgrEntry 10 }
+
+hh3cMplsOamEgrTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cMplsOamEgrEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table specifies per-LSP MPLS OAM capability and
+        associated information, such as DetectType, DetectFrequency."
+    ::= { hh3cMplsOamTable 2 }
+
+hh3cMplsOamEgrEntry OBJECT-TYPE
+    SYNTAX      Hh3cMplsOamEgrEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry in this table is created by an LSR for every LSP
+        capable of supporting MPLS OAM at egress."
+    INDEX
+        {
+            hh3cMplsOamEgrIndex
+        }
+    ::= { hh3cMplsOamEgrTable 1 }
+
+Hh3cMplsOamEgrEntry ::= SEQUENCE
+    {
+        hh3cMplsOamEgrIndex         Unsigned32,
+        hh3cMplsOamEgrLspName       OCTET STRING,
+        hh3cMplsOamEgrDetectType    INTEGER,
+        hh3cMplsOamEgrDetectFreq    Hh3cMplsOAMDetectFreq,
+        hh3cMplsOamEgrRevType       INTEGER,
+        hh3cMplsOamEgrRevLspName    OCTET STRING,
+        hh3cMplsOamEgrLsrId         IpAddress,
+        hh3cMplsOamEgrLspId         Integer32,
+        hh3cMplsOamEgrEnable        TruthValue,
+        hh3cMplsOamEgrDefectType    Hh3cMplsOAMDefectType,
+        hh3cMplsOamEgrRowStatus     RowStatus
+    }
+
+hh3cMplsOamEgrIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This is a unique index for an OAM egress entry in the OAM table."
+    ::= { hh3cMplsOamEgrEntry 1 }
+
+hh3cMplsOamEgrLspName OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The object indicates the name of static LSP at egress."
+    ::= { hh3cMplsOamEgrEntry 2 }
+
+hh3cMplsOamEgrDetectType OBJECT-TYPE
+    SYNTAX      INTEGER
+        {
+            cv(1),
+            ffd(2)
+        }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "There are two types of OAM packets, CV and FFD.
+        The CV flow is generated at the source LSR of the LSP with
+        a nominal frequency of 1/s and terminated at the sink LSR of the LSP.
+        FFD provides failure detection option for an LSP independent
+        of the CV based availability model and is not tied to the
+        CV insertion rate. Insertion rates at 1/s or faster may
+        also be used.
+        The CV/FFD packet contains a network-unique identifier (TTSI)
+        so that all types of defects can be detected.
+        1: CV;
+        2: FFD."
+    ::= { hh3cMplsOamEgrEntry 3 }
+
+hh3cMplsOamEgrDetectFreq OBJECT-TYPE
+    SYNTAX      Hh3cMplsOAMDetectFreq
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Indication of the OAM's frequent type."
+    ::= { hh3cMplsOamEgrEntry 4 }
+
+hh3cMplsOamEgrRevType OBJECT-TYPE
+    SYNTAX      INTEGER
+        {
+            private(1),
+            share(2)
+        }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "When an LSP is found to be in defect, the sink LSR of the LSP
+        should send BDI to inform the source LSR of the LSP, the BDI is
+        transferred through the reverse LSP.
+        The type of reverse LSP can be private or shared.
+        If private, then the reverse LSP can be used only when the only
+        LSP in defect;
+        If shared, the reverse LSP, which is shared between many forward
+        LSPs that have the same source LSRs and sink LSRs.
+        1: private;
+        2: share."
+    ::= { hh3cMplsOamEgrEntry 5 }
+
+hh3cMplsOamEgrRevLspName OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The object indicates the name of a reverse static-lsp."
+    ::= { hh3cMplsOamEgrEntry 6 }
+
+hh3cMplsOamEgrLsrId OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The object indicates the Ingress LSR ID of the LSP."
+    ::= { hh3cMplsOamEgrEntry 7 }
+
+hh3cMplsOamEgrLspId OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The object indicates the the Ingress session lsp ID of the
+        detected static-LSP."
+    ::= { hh3cMplsOamEgrEntry 8 }
+
+hh3cMplsOamEgrEnable OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Whether one LSP is enabled with OAM.
+        If disable, LSP is not monitored;
+        If enable, CV/FFD is generated at the source LSR of the LSP and
+        checked at the sink LSR of the LSP, and user can set
+        other configuration.
+        false: The OAM function is disabled on the egress;
+        true: The OAM function is enabled on the egress."
+    DEFVAL  { false }
+    ::= { hh3cMplsOamEgrEntry 9 }
+
+hh3cMplsOamEgrDefectType OBJECT-TYPE
+    SYNTAX      Hh3cMplsOAMDefectType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indication of the OAM's defect type."
+    ::= { hh3cMplsOamEgrEntry 10 }
+
+hh3cMplsOamEgrRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This object is responsible for managing the creation,
+        deletion and modification of rows, which support active
+        status and CreatAndGo, destroy operation.
+        To create a new row, hh3cMplsOamEgrLspName, hh3cMplsOamEgrDetectType,
+        hh3cMplsOamEgrDetectFreq, hh3cMplsOamEgrRevType, hh3cMplsOamEgrRevLspName,
+        hh3cMplsOamEgrLsrId and hh3cMplsOamEgrLspId must be specified."
+    ::= { hh3cMplsOamEgrEntry 11 }
+
+hh3cMplsOamNotifications OBJECT IDENTIFIER ::= { hh3cMplsOam 3 }
+
+hh3cMplsOamIgrLSPOutDefect NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cMplsOamIgrLspName,
+            hh3cMplsOamIgrDefectType
+        }
+    STATUS      current
+    DESCRIPTION
+        "This notification is generated when the LSP is found
+        out of the defect state at the LSP ingress."
+    ::= { hh3cMplsOamNotifications 1 }
+
+hh3cMplsOamIgrLSPInDefect NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cMplsOamIgrLspName,
+            hh3cMplsOamIgrDefectType
+        }
+    STATUS      current
+    DESCRIPTION
+        "This notification is generated when the LSP is found
+        in the defect state at the LSP ingress."
+    ::= { hh3cMplsOamNotifications 2 }
+
+hh3cMplsOamEgrLSPOutDefect NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cMplsOamEgrLspName,
+            hh3cMplsOamEgrDefectType
+        }
+    STATUS      current
+    DESCRIPTION
+        "This notification is generated when the LSP is found
+        out of the defect state at the LSP egress."
+    ::= { hh3cMplsOamNotifications 3 }
+
+hh3cMplsOamEgrLSPInDefect NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cMplsOamEgrLspName,
+            hh3cMplsOamEgrDefectType
+        }
+    STATUS      current
+    DESCRIPTION
+        "This notification is generated when the LSP is found
+        in the defect state at the LSP egress."
+    ::= { hh3cMplsOamNotifications 4 }
+
+END

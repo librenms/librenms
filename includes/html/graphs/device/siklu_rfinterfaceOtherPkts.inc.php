@@ -2,9 +2,9 @@
 
 require 'includes/html/graphs/common.inc.php';
 
-$rrdfilename = rrd_name($device['hostname'], 'siklu-interface');
+$rrdfilename = Rrd::name($device['hostname'], 'siklu-interface');
 
-if (rrdtool_check_rrd_exists($rrdfilename)) {
+if (Rrd::checkRrdExists($rrdfilename)) {
     $rrd_options .= " COMMENT:'pps      Now       Ave      Max     \\n'";
     $rrd_options .= ' DEF:rfInGoodPkts=' . $rrdfilename . ':rfInGoodPkts:AVERAGE ';
     $rrd_options .= ' DEF:rfInErroredPkts=' . $rrdfilename . ':rfInErroredPkts:AVERAGE ';

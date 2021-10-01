@@ -29,6 +29,7 @@
 
 /**
  * Boxcar API Transport
+ *
  * @author trick77 <jan@trick77.com>
  * @copyright 2015 trick77, neokjames, f0o, LibreNMS
  * @license GPL
@@ -68,6 +69,9 @@ class Boxcar extends Transport
                     $data['notification[sound]'] = $api['sound_warning'];
                 }
                 break;
+            default:
+                $severity = 'Unknown';
+                break;
         }
         switch ($obj['state']) {
             case AlertState::RECOVERED:
@@ -76,12 +80,16 @@ class Boxcar extends Transport
                     $data['notification[sound]'] = $api['sound_ok'];
                 }
                 break;
-            case AlertState::Active:
+            case AlertState::ACTIVE:
                 $title_text = $severity;
                 break;
             case AlertState::ACKNOWLEDGED:
                 $title_text = 'Acknowledged';
                 break;
+            default:
+                $title_text = $severity;
+                break;
+
         }
         $data['notification[title]'] = $title_text . ' - ' . $obj['hostname'] . ' - ' . $obj['name'];
         $message_text = 'Timestamp: ' . $obj['timestamp'];

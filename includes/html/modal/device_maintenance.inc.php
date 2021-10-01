@@ -18,6 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2020 Thomas Berberich
  * @author     Thomas Berberich <sourcehhdoctor@gmail.com>
  */
@@ -85,9 +86,9 @@ foreach ($hour_steps as $hour) {
     </div>
 </div>
 <script>
-    $("#maintenance-submit").click(function() {
+    $("#maintenance-submit").on("click", function() {
         var device_id = $(this).data("device_id");
-        var title = '<?=display($device['hostname']); ?>';
+        var title = '<?=\LibreNMS\Util\Clean::html($device['hostname'], []); ?>';
         var notes = $('#notes').val();
         var recurring = 0;
         var start = '<?=date('Y-m-d H:i:00'); ?>';

@@ -76,7 +76,7 @@ class LdapAuthorizer extends AuthorizerBase
             $search = ldap_search($connection, trim(Config::get('auth_ldap_suffix'), ','), $filter);
             $entries = ldap_get_entries($connection, $search);
             if ($entries['count']) {
-                return 1;
+                return true;
             }
         } catch (AuthenticationException $e) {
             if ($throw_exception) {
@@ -92,7 +92,7 @@ class LdapAuthorizer extends AuthorizerBase
             }
         }
 
-        return 0;
+        return false;
     }
 
     public function getUserlevel($username)
@@ -234,7 +234,7 @@ class LdapAuthorizer extends AuthorizerBase
             return $user;
         }
 
-        return 0;
+        return false;
     }
 
     protected function getMembername($username)
@@ -279,6 +279,7 @@ class LdapAuthorizer extends AuthorizerBase
 
     /**
      * Get the full dn with auth_ldap_prefix and auth_ldap_suffix
+     *
      * @internal
      *
      * @return string
@@ -291,6 +292,7 @@ class LdapAuthorizer extends AuthorizerBase
     /**
      * Set auth_ldap_suffix ou according to $username dn
      * useful if Config::get('auth_ldap_wildcard_ou) is set
+     *
      * @internal
      *
      * @return false|true
@@ -318,10 +320,12 @@ class LdapAuthorizer extends AuthorizerBase
 
     /**
      * Get the ldap connection. If it hasn't been established yet, connect and try to bind.
+     *
      * @internal
      *
-     * @param bool $skip_bind do not attempt to bind on connection
+     * @param  bool  $skip_bind  do not attempt to bind on connection
      * @return false|resource
+     *
      * @throws AuthenticationException
      */
     protected function getLdapConnection($skip_bind = false)
@@ -340,7 +344,7 @@ class LdapAuthorizer extends AuthorizerBase
     }
 
     /**
-     * @param array $entry ldap entry array
+     * @param  array  $entry  ldap entry array
      * @return array
      */
     private function ldapToUser($entry)

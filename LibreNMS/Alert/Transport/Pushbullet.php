@@ -15,6 +15,7 @@
 
 /**
  * Pushbullet API Transport
+ *
  * @author f0o <f0o@librenms.org>
  * @copyright 2015 f0o, LibreNMS
  * @license GPL
@@ -56,9 +57,7 @@ class Pushbullet extends Transport
         $ret = curl_exec($curl);
         $code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
         if ($code > 201) {
-            if ($debug) {
-                var_dump($ret);
-            }
+            var_dump($ret);
 
             return 'HTTP Status code ' . $code;
         }

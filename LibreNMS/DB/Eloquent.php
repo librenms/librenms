@@ -18,6 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -28,6 +29,7 @@ use Dotenv\Dotenv;
 use Illuminate\Database\Capsule\Manager as Capsule;
 use Illuminate\Database\Events\StatementPrepared;
 use Illuminate\Events\Dispatcher;
+use Illuminate\Support\Arr;
 use LibreNMS\Util\Laravel;
 
 class Eloquent
@@ -41,7 +43,7 @@ class Eloquent
         if (! Laravel::isBooted() && is_null(self::$capsule)) {
             $install_dir = realpath(__DIR__ . '/../../');
 
-            Dotenv::create($install_dir)->load();
+            Dotenv::createMutable($install_dir)->load();
 
             $db_config = include $install_dir . '/config/database.php';
             $settings = $db_config['connections'][$db_config['default']];
@@ -72,7 +74,8 @@ class Eloquent
 
     /**
      * Set the strict mode for the current connection (will not persist)
-     * @param bool $strict
+     *
+     * @param  bool  $strict
      */
     public static function setStrictMode($strict = true)
     {
@@ -102,8 +105,8 @@ class Eloquent
     /**
      * Access the Database Manager for Fluent style queries. Like the Laravel DB facade.
      *
-     * @param string $name
-     * @return \Illuminate\Database\Connection
+     * @param  string  $name
+     * @return \Illuminate\Database\Connection|null
      */
     public static function DB($name = null)
     {
@@ -136,12 +139,17 @@ class Eloquent
             'username' => $db_user,
             'password' => $db_pass,
             'unix_socket' => $db_socket,
-            'charset' => 'utf8',
-            'collation' => 'utf8_unicode_ci',
+            'charset' => 'utf8mb4',
+            'collation' => 'utf8mb4_unicode_ci',
             'prefix' => '',
             'strict' => true,
             'engine' => null,
         ]);
         \Config::set('database.default', $name);
+    }
+
+    public static function version($name = null)
+    {
+        return Arr::first(self::DB($name)->selectOne('select version()'));
     }
 }

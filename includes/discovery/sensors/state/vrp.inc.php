@@ -18,13 +18,14 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2019 PipoCanaja
  * @author     PipoCanaja
  */
-$stacked_device = count(array_keys($pre_cache['hwStackMemberInfoTable']));
+$stacked_device = empty($pre_cache['hwStackMemberInfoTable']) ? false : count($pre_cache['hwStackMemberInfoTable']) > 1;
 // If we have more than 1 device in the stack, then we should alert on stack ports not up
 
-if ($stacked_device > 1) {
+if ($stacked_device) {
     $state_name = 'hwStackPortStatus';
     $states = [
         ['value' => 1, 'generic' => 0, 'graph' => 0, 'descr' => 'Up'],

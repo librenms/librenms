@@ -55,7 +55,7 @@ if (Auth::user()->hasGlobalAdmin()) {
                             // Need to pre-populate port as we've got a port pre-selected
                             foreach (dbFetch('SELECT * FROM ports WHERE device_id = ?', [$port_device_id]) as $interface) {
                                 $interface = cleanPort($interface);
-                                $string = $interface['label'] . ' - ' . display($interface['ifAlias']);
+                                $string = $interface['label'] . ' - ' . \LibreNMS\Util\Clean::html($interface['ifAlias'], []);
                                 $selected = $interface['port_id'] === $port['port_id'] ? ' selected' : '';
                                 echo "<option value='${interface['port_id']}' $selected>$string</option>\n";
                             }

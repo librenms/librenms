@@ -15,6 +15,7 @@
 
 /**
  * Clickatell REST-API Transport
+ *
  * @author f0o <f0o@librenms.org>
  * @copyright 2015 f0o, LibreNMS
  * @license GPL
@@ -46,7 +47,9 @@ class Clickatell extends Transport
         $ret = curl_exec($curl);
         $code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
         if ($code > 200) {
-            return var_dump($ret);
+            var_dump($ret);
+
+            return;
         }
 
         return true;

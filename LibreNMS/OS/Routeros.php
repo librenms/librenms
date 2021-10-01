@@ -18,6 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2017 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -109,7 +110,6 @@ class Routeros extends OS implements
     {
         $data = $this->fetchData();
 
-        $sensors = [];
         foreach ($data as $index => $entry) {
             if ($entry['mtxrWlApFreq'] == null) {
                 return $this->discoverSensor(
@@ -125,6 +125,8 @@ class Routeros extends OS implements
                 );
             }
         }
+
+        return [];
     }
 
     /**
@@ -249,7 +251,7 @@ class Routeros extends OS implements
         return $sensors;
     }
 
-    private function discoverSensor($type, $oid, $num_oid_base)
+    private function discoverSensor($type, $oid, $num_oid_base): array
     {
         $data = $this->fetchData();
         $sensors = [];

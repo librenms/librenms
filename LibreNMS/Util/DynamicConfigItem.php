@@ -18,6 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2019 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -58,7 +59,7 @@ class DynamicConfigItem implements \ArrayAccess
     /**
      * Check given value is valid. Using the type of this config item and possibly other variables.
      *
-     * @param $value
+     * @param  mixed  $value
      * @return bool|mixed
      */
     public function checkValue($value)
@@ -193,7 +194,7 @@ class DynamicConfigItem implements \ArrayAccess
     }
 
     /**
-     * @param mixed $value The value that was validated
+     * @param  mixed  $value  The value that was validated
      * @return string
      */
     public function getValidationMessage($value)

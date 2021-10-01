@@ -34,6 +34,7 @@ use LibreNMS\Interfaces\Module;
 use LibreNMS\Interfaces\Polling\MempoolsPolling;
 use LibreNMS\OS;
 use LibreNMS\RRD\RrdDefinition;
+use LibreNMS\Util\Number;
 use Log;
 
 class Mempools implements Module
@@ -85,24 +86,30 @@ class Mempools implements Module
             }
             $mempool->save();
 
-            $rrd_name = ['mempool', $mempool->mempool_type, $mempool->mempool_class, $mempool->mempool_index];
-            $rrd_oldname = ['mempool', $mempool->mempool_type, $mempool->mempool_index];
             $rrd_def = RrdDefinition::make()
-            ->addDataset('used', 'GAUGE', 0)
-            ->addDataset('free', 'GAUGE', 0);
+                ->addDataset('used', 'GAUGE', 0)
+                ->addDataset('free', 'GAUGE', 0);
+
+            $tags = [
+                'mempool_type' => $mempool->mempool_type,
+                'mempool_class' => $mempool->mempool_class,
+                'mempool_index' => $mempool->mempool_index,
+                'rrd_name' => ['mempool', $mempool->mempool_type, $mempool->mempool_class, $mempool->mempool_index],
+                'rrd_oldname' => ['mempool', $mempool->mempool_type, $mempool->mempool_index],
+                'rrd_def' => $rrd_def,
+            ];
             $fields = [
                 'used' => $mempool->mempool_used,
                 'free' => $mempool->mempool_free,
             ];
 
-            $tags = compact('mempool_type', 'mempool_index', 'rrd_name', 'rrd_def', 'rrd_oldname');
             data_update($os->getDeviceArray(), 'mempool', $tags, $fields);
         });
     }
 
     /**
-     * @param OS $os
-     * @param \Illuminate\Support\Collection $mempools
+     * @param  OS  $os
+     * @param  \Illuminate\Support\Collection  $mempools
      * @return \Illuminate\Support\Collection
      */
     private function defaultPolling($os, $mempools)
@@ -169,10 +176,10 @@ class Mempools implements Module
             }
 
             if ($system !== null) {
-                $old = format_bi($system->mempool_free);
+                $old = Number::formatBi($system->mempool_free);
                 $system->fillUsage(($system->mempool_used - $buffers - $cached) / $system->mempool_precision, $system->mempool_total / $system->mempool_precision);
-                $new = format_bi($system->mempool_free);
-                Log::debug("Free memory adjusted by availability calculation: {$old}iB -> {$new}iB\n");
+                $new = Number::formatBi($system->mempool_free);
+                Log::debug("Free memory adjusted by availability calculation: {$old} -> {$new}\n");
             }
         }
 
@@ -183,9 +190,9 @@ class Mempools implements Module
     {
         echo "$mempool->mempool_type [$mempool->mempool_class]: $mempool->mempool_descr: $mempool->mempool_perc%";
         if ($mempool->mempool_total != 100) {
-            $used = format_bi($mempool->mempool_used);
-            $total = format_bi($mempool->mempool_total);
-            echo "  {$used}iB / {$total}iB";
+            $used = Number::formatBi($mempool->mempool_used);
+            $total = Number::formatBi($mempool->mempool_total);
+            echo "  {$used} / {$total}";
         }
         echo PHP_EOL;
     }

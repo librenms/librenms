@@ -174,8 +174,8 @@ foreach (dbFetchRows("SELECT * FROM `bgpPeers` WHERE `device_id` = ? $extra_sql 
         unset($peerhost);
     }
 
-    $peerhost = cleanPort($peerhost);
     if (is_array($peerhost)) {
+        $peerhost = cleanPort($peerhost);
         // $peername = generate_device_link($peerhost);
         $peername = generate_device_link($peerhost) . ' ' . generate_port_link($peerhost);
         $peer_url = 'device/device=' . $peer['device_id'] . '/tab=routing/proto=bgp/view=updates/';
@@ -226,8 +226,8 @@ foreach (dbFetchRows("SELECT * FROM `bgpPeers` WHERE `device_id` = ? $extra_sql 
     $link_array = $graph_array;
     $link_array['page'] = 'graphs';
     unset($link_array['height'], $link_array['width'], $link_array['legend']);
-    $link = generate_url($link_array);
-    $peeraddresslink = '<span class=list-large>' . overlib_link($link, $peer['bgpPeerIdentifier'], generate_graph_tag($graph_array_zoom), null) . '</span>';
+    $link = \LibreNMS\Util\Url::generate($link_array);
+    $peeraddresslink = '<span class=list-large>' . \LibreNMS\Util\Url::overlibLink($link, $peer['bgpPeerIdentifier'], \LibreNMS\Util\Url::graphTag($graph_array_zoom)) . '</span>';
 
     if ($peer['bgpPeerLastErrorCode'] == 0 && $peer['bgpPeerLastErrorSubCode'] == 0) {
         $last_error = $peer['bgpPeerLastErrorText'];
@@ -246,7 +246,7 @@ foreach (dbFetchRows("SELECT * FROM `bgpPeers` WHERE `device_id` = ? $extra_sql 
         <td>' . $peer['bgpPeerDescr'] . "</td>
         <td><strong><span style='color: $admin_col;'>" . $peer['bgpPeerAdminStatus'] . "<span><br /><span style='color: $col;'>" . $peer['bgpPeerState'] . '</span></strong></td>
         <td>' . $last_error . '</td>
-        <td>' . formatUptime($peer['bgpPeerFsmEstablishedTime']) . "<br />
+        <td>' . \LibreNMS\Util\Time::formatInterval($peer['bgpPeerFsmEstablishedTime']) . "<br />
         Updates <i class='fa fa-arrow-down icon-theme' aria-hidden='true'></i> " . $peer['bgpPeerInUpdates'] . "
         <i class='fa fa-arrow-up icon-theme' aria-hidden='true'></i> " . $peer['bgpPeerOutUpdates'] . '</td>
         </tr>
@@ -275,7 +275,7 @@ foreach (dbFetchRows("SELECT * FROM `bgpPeers` WHERE `device_id` = ? $extra_sql 
         case 'macaccounting_bits':
         case 'macaccounting_pkts':
             $acc = dbFetchRow('SELECT * FROM `ipv4_mac` AS I, `mac_accounting` AS M, `ports` AS P, `devices` AS D WHERE I.ipv4_address = ? AND M.mac = I.mac_address AND P.port_id = M.port_id AND D.device_id = P.device_id', [$peer['bgpPeerIdentifier']]);
-            $database = rrd_name($device['hostname'], ['cip', $acc['ifIndex'], $acc['mac']]);
+            $database = Rrd::name($device['hostname'], ['cip', $acc['ifIndex'], $acc['mac']]);
             if (is_array($acc) && is_file($database)) {
                 $peer['graph'] = 1;
                 $graph_array['id'] = $acc['ma_id'];

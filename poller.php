@@ -27,6 +27,7 @@
 use LibreNMS\Alert\AlertRules;
 use LibreNMS\Config;
 use LibreNMS\Data\Store\Datastore;
+use LibreNMS\Util\Debug;
 
 $init_modules = ['polling', 'alerts', 'laravel'];
 require __DIR__ . '/includes/init.php';
@@ -52,9 +53,9 @@ if (isset($options['h'])) {
             $doing = $options['h'];
         } else {
             if (preg_match('/\*/', $options['h'])) {
-                $where = "AND `hostname` LIKE '" . str_replace('*', '%', mres($options['h'])) . "'";
+                $where = "AND `hostname` LIKE '" . str_replace('*', '%', $options['h']) . "'";
             } else {
-                $where = "AND `hostname` = '" . mres($options['h']) . "'";
+                $where = "AND `hostname` = '" . $options['h'] . "'";
             }
             $doing = $options['h'];
         }
@@ -71,7 +72,7 @@ if (isset($options['i']) && $options['i'] && isset($options['n'])) {
             WHERE `disabled` = 0
             ORDER BY `device_id` ASC
         ) temp
-        WHERE MOD(temp.rownum, ' . mres($options['i']) . ') = ' . mres($options['n']) . ';';
+        WHERE MOD(temp.rownum, ' . $options['i'] . ') = ' . $options['n'] . ';';
     $doing = $options['n'] . '/' . $options['i'];
 }
 
@@ -94,7 +95,7 @@ if (empty($where)) {
     exit;
 }
 
-if (set_debug(isset($options['d'])) || isset($options['v'])) {
+if (Debug::set(isset($options['d']), false) || isset($options['v'])) {
     $versions = version_info();
     echo <<<EOH
 ===================================
@@ -111,14 +112,13 @@ EOH;
 
     echo "DEBUG!\n";
     if (isset($options['v'])) {
-        $vdebug = true;
+        Debug::setVerbose();
     }
     \LibreNMS\Util\OS::updateCache(true); // Force update of OS Cache
 }
 
 // If we've specified modules with -m, use them
 $module_override = parse_modules('poller', $options);
-set_debug($debug);
 
 $datastore = Datastore::init($options);
 
@@ -131,11 +131,6 @@ if (! isset($query)) {
 
 foreach (dbFetch($query) as $device) {
     DeviceCache::setPrimary($device['device_id']);
-    if ($device['os_group'] == 'cisco') {
-        $device['vrf_lite_cisco'] = dbFetchRows('SELECT * FROM `vrf_lite_cisco` WHERE `device_id` = ' . $device['device_id']);
-    } else {
-        $device['vrf_lite_cisco'] = '';
-    }
 
     if (! poll_device($device, $module_override)) {
         $unreachable_devices++;

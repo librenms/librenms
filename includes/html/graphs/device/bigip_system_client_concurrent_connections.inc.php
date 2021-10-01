@@ -1,6 +1,6 @@
 <?php
 
-$rrd_filename = rrd_name($device['hostname'], 'bigip_system_client_concurrent_connections');
+$rrd_filename = Rrd::name($device['hostname'], 'bigip_system_client_concurrent_connections');
 
 require 'includes/html/graphs/common.inc.php';
 

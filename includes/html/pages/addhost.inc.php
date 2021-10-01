@@ -21,21 +21,21 @@ echo '<div class="row">
 $snmp_enabled = ! isset($_POST['hostname']) || isset($_POST['snmp']);
 
 if (! empty($_POST['hostname'])) {
-    $hostname = clean($_POST['hostname']);
-    if (! is_valid_hostname($hostname) && ! IP::isValid($hostname)) {
+    $hostname = strip_tags($_POST['hostname']);
+    if (! \LibreNMS\Util\Validate::hostname($hostname) && ! IP::isValid($hostname)) {
         print_error("Invalid hostname or IP: $hostname");
     }
 
     if (Auth::user()->hasGlobalRead()) {
         // Settings common to SNMPv2 & v3
         if ($_POST['port']) {
-            $port = clean($_POST['port']);
+            $port = strip_tags($_POST['port']);
         } else {
             $port = Config::get('snmp.port');
         }
 
         if ($_POST['transport']) {
-            $transport = clean($_POST['transport']);
+            $transport = strip_tags($_POST['transport']);
         } else {
             $transport = 'udp';
         }
@@ -45,25 +45,25 @@ if (! empty($_POST['hostname'])) {
             $snmpver = 'v2c';
             $additional = [
                 'snmp_disable' => 1,
-                'os'           => $_POST['os'] ? mres($_POST['os_id']) : 'ping',
-                'hardware'     => mres($_POST['hardware']),
-                'sysName'      => mres($_POST['sysName']),
+                'os'           => $_POST['os'] ? $_POST['os_id'] : 'ping',
+                'hardware'     => $_POST['hardware'],
+                'sysName'      => $_POST['sysName'],
             ];
         } elseif ($_POST['snmpver'] === 'v2c' || $_POST['snmpver'] === 'v1') {
             if ($_POST['community']) {
-                Config::set('snmp.community', [clean($_POST['community'], false)]);
+                Config::set('snmp.community', [$_POST['community']]);
             }
 
-            $snmpver = clean($_POST['snmpver']);
+            $snmpver = strip_tags($_POST['snmpver']);
             print_message("Adding host $hostname communit" . (count(Config::get('snmp.community')) == 1 ? 'y' : 'ies') . ' ' . implode(', ', Config::get('snmp.community')) . " port $port using $transport");
         } elseif ($_POST['snmpver'] === 'v3') {
             $v3 = [
-                'authlevel'  => clean($_POST['authlevel']),
-                'authname'   => clean($_POST['authname'], false),
-                'authpass'   => clean($_POST['authpass'], false),
-                'authalgo'   => clean($_POST['authalgo']),
-                'cryptopass' => clean($_POST['cryptopass'], false),
-                'cryptoalgo' => clean($_POST['cryptoalgo'], false),
+                'authlevel'  => strip_tags($_POST['authlevel']),
+                'authname'   => $_POST['authname'],
+                'authpass'   => $_POST['authpass'],
+                'authalgo'   => strip_tags($_POST['authalgo']),
+                'cryptopass' => $_POST['cryptopass'],
+                'cryptoalgo' => $_POST['cryptoalgo'],
             ];
 
             $v3_config = Config::get('snmp.v3');
@@ -76,13 +76,13 @@ if (! empty($_POST['hostname'])) {
             print_error('Unsupported SNMP Version. There was a dropdown menu, how did you reach this error ?');
         }//end if
 
-        $poller_group = clean($_POST['poller_group']);
+        $poller_group = strip_tags($_POST['poller_group']);
         $force_add = ($_POST['force_add'] == 'on');
 
-        $port_assoc_mode = clean($_POST['port_assoc_mode']);
+        $port_assoc_mode = strip_tags($_POST['port_assoc_mode']);
         try {
             $device_id = addHost($hostname, $snmpver, $port, $transport, $poller_group, $force_add, $port_assoc_mode, $additional);
-            $link = generate_device_url(['device_id' => $device_id]);
+            $link = \LibreNMS\Util\Url::deviceUrl($device_id);
             print_message("Device added <a href='$link'>$hostname ($device_id)</a>");
         } catch (HostUnreachableException $e) {
             print_error($e->getMessage());
@@ -190,7 +190,6 @@ foreach (get_port_assoc_modes() as $mode) {
     echo "              <option value=\"$mode\" $selected>$mode</option>\n";
 }
 
-['sha2' => $snmpv3_sha2, 'aes256' => $snmpv3_aes256] = snmpv3_capabilities();
 ?>
             </select>
           </div>
@@ -240,14 +239,13 @@ foreach (get_port_assoc_modes() as $mode) {
             <label for="authalgo" class="col-sm-3 control-label">Auth Algorithm</label>
             <div class="col-sm-9">
               <select name="authalgo" id="authalgo" class="form-control input-sm">
-                <option value="MD5" selected>MD5</option>
-                <option value="SHA">SHA</option>
-                <option value="SHA-224"<?= $snmpv3_sha2 ?: ' disabled'?>>SHA-224</option>
-                <option value="SHA-256"<?= $snmpv3_sha2 ?: ' disabled'?>>SHA-256</option>
-                <option value="SHA-384"<?= $snmpv3_sha2 ?: ' disabled'?>>SHA-384</option>
-                <option value="SHA-512"<?= $snmpv3_sha2 ?: ' disabled'?>>SHA-512</option>
+                  <?php
+                  foreach (\LibreNMS\SNMPCapabilities::authAlgorithms() as $algo => $enabled) {
+                      echo "<option value=\"$algo\"" . ($enabled ?: ' disabled') . ">$algo</option>";
+                  }
+                  ?>
               </select>
-              <?php if (! $snmpv3_sha2) {?>
+              <?php if (! \LibreNMS\SNMPCapabilities::supportsSHA2()) {?>
               <label class="text-left"><small>Some options are disabled. <a href="https://docs.librenms.org/Support/FAQ/#optional-requirements-for-snmpv3-sha2-auth">Read more here</a></small></label>
               <?php } ?>
             </div>
@@ -262,12 +260,13 @@ foreach (get_port_assoc_modes() as $mode) {
             <label for="cryptoalgo" class="col-sm-3 control-label">Crypto Algorithm</label>
             <div class="col-sm-9">
               <select name="cryptoalgo" id="cryptoalgo" class="form-control input-sm">
-                <option value="AES" selected>AES</option>
-                <option value="AES-192"<?= $snmpv3_aes256 ?: ' disabled'?>>AES-192</option>
-                <option value="AES-256"<?= $snmpv3_aes256 ?: ' disabled'?>>AES-256</option>
-                <option value="DES">DES</option>
+                  <?php
+                  foreach (\LibreNMS\SNMPCapabilities::cryptoAlgoritms() as $algo => $enabled) {
+                      echo "<option value=\"$algo\"" . ($enabled ?: ' disabled') . ">$algo</option>";
+                  }
+                  ?>
               </select>
-              <?php if (! $snmpv3_aes256) {?>
+              <?php if (! \LibreNMS\SNMPCapabilities::supportsAES256()) {?>
               <label class="text-left"><small>Some options are disabled. <a href="https://docs.librenms.org/Support/FAQ/#optional-requirements-for-snmpv3-sha2-auth">Read more here</a></small></label>
               <?php } ?>
             </div>
@@ -276,7 +275,7 @@ foreach (get_port_assoc_modes() as $mode) {
       </div>
 <?php
 if (Config::get('distributed_poller') === true) {
-    echo '
+                      echo '
           <div class="form-group">
               <label for="poller_group" class="col-sm-3 control-label">Poller Group</label>
               <div class="col-sm-9">
@@ -284,16 +283,16 @@ if (Config::get('distributed_poller') === true) {
                       <option value="0"> Default poller group</option>
     ';
 
-    foreach (dbFetchRows('SELECT `id`,`group_name` FROM `poller_groups` ORDER BY `group_name`') as $group) {
-        echo '<option value="' . $group['id'] . '">' . $group['group_name'] . '</option>';
-    }
+                      foreach (dbFetchRows('SELECT `id`,`group_name` FROM `poller_groups` ORDER BY `group_name`') as $group) {
+                          echo '<option value="' . $group['id'] . '">' . $group['group_name'] . '</option>';
+                      }
 
-    echo '
+                      echo '
                   </select>
               </div>
           </div>
     ';
-}//endif
+                  }//endif
 ?>
       <div class="form-group">
           <label for="force_add" class="col-sm-3 control-label">Force add<br><small>(No ICMP or SNMP checks performed)</small></label>

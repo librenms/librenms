@@ -4,7 +4,7 @@ require 'includes/html/graphs/common.inc.php';
 
 $rrd_options .= " COMMENT:'                                               Min           Max\\n'";
 $rrd_options .= " DEF:sensor=$rrd_filename:sensor:AVERAGE";
-$rrd_options .= " LINE1.5:sensor#cc0000:'" . rrdtool_escape($sensor['sensor_descr'], 34) . "'";
+$rrd_options .= " LINE1.5:sensor#cc0000:'" . \LibreNMS\Data\Store\Rrd::fixedSafeDescr($sensor['sensor_descr'], 34) . "'";
 $rrd_options .= ' GPRINT:sensor:MIN:%8.0lfkWh';
 $rrd_options .= ' GPRINT:sensor:MAX:%8.0lfkWh\l';
 

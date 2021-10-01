@@ -1,6 +1,7 @@
 <?php
 
 use LibreNMS\Device\WirelessSensor;
+use LibreNMS\Util\Number;
 
 // this determines the order of the tabs
 $types = WirelessSensor::getTypes();
@@ -84,15 +85,15 @@ if ($vars['metric'] == 'overview') {
             $sensor_limit = ((int) $sensor['sensor_limit']) . $unit;
             $sensor_limit_low = ((int) $sensor['sensor_limit_low']) . $unit;
         } else {
-            $sensor_current = format_si($sensor['sensor_current'] * $factor, 3) . $unit;
-            $sensor_limit = format_si($sensor['sensor_limit'] * $factor, 3) . $unit;
-            $sensor_limit_low = format_si($sensor['sensor_limit_low'] * $factor, 3) . $unit;
+            $sensor_current = Number::formatSi($sensor['sensor_current'] * $factor, 3, 3, $unit);
+            $sensor_limit = Number::formatSi($sensor['sensor_limit'] * $factor, 3, 3, $unit);
+            $sensor_limit_low = Number::formatSi($sensor['sensor_limit_low'] * $factor, 3, 3, $unit);
         }
 
         echo "<div class='panel panel-default'>
             <div class='panel-heading'>
                 <h3 class='panel-title'>
-                    $sensor_descr 
+                    $sensor_descr
                     <div class='pull-right'>$sensor_current | $sensor_limit_low <> $sensor_limit</div>
                 </h3>
             </div>";

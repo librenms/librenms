@@ -11,8 +11,8 @@
 
 require 'includes/html/graphs/common.inc.php';
 
-$rrdfilename = rrd_name($device['hostname'], 'cambium-250-transmitPower');
-if (rrdtool_check_rrd_exists($rrdfilename)) {
+$rrdfilename = Rrd::name($device['hostname'], 'cambium-250-transmitPower');
+if (Rrd::checkRrdExists($rrdfilename)) {
     $rrd_options .= " COMMENT:'dBm                Now       Ave      Max     \\n'";
     $rrd_options .= ' DEF:transmitPower=' . $rrdfilename . ':transmitPower:AVERAGE ';
     $rrd_options .= " LINE2:transmitPower#FF0000:'Transmit Power         ' ";

@@ -18,6 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -95,8 +96,8 @@ class TwoFactorController extends Controller
     /**
      * Show the form for creating a new resource.
      *
-     * @param Request $request
-     * @return \Illuminate\Http\Response
+     * @param  Request  $request
+     * @return \Illuminate\Http\RedirectResponse.
      */
     public function create(Request $request)
     {
@@ -122,8 +123,8 @@ class TwoFactorController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param Request $request
-     * @return \Illuminate\Http\Response
+     * @param  Request  $request
+     * @return \Illuminate\Http\RedirectResponse.
      */
     public function destroy(Request $request)
     {
@@ -136,8 +137,8 @@ class TwoFactorController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param Request $request
-     * @return \Illuminate\Http\Response
+     * @param  Request  $request
+     * @return \Illuminate\Http\RedirectResponse.
      */
     public function cancelAdd(Request $request)
     {
@@ -147,9 +148,10 @@ class TwoFactorController extends Controller
     }
 
     /**
-     * @param User $user
-     * @param string $token
+     * @param  User  $user
+     * @param  int  $token
      * @return true
+     *
      * @throws AuthenticationException
      */
     private function checkToken($user, $token)
@@ -199,10 +201,9 @@ class TwoFactorController extends Controller
     }
 
     /**
-     * @param $user
      * @return mixed
      */
-    private function loadSettings($user)
+    private function loadSettings(User $user)
     {
         if (Session::has('twofactoradd')) {
             return Session::get('twofactoradd');

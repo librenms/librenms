@@ -51,7 +51,7 @@ if (! Auth::user()->hasGlobalAdmin()) {
             }
 
             if (isset($_POST['format']) && ! empty($_POST['searchPhrase'])) {
-                $searchphrase = '%' . mres($_POST['searchPhrase']) . '%';
+                $searchphrase = '%' . $_POST['searchPhrase'] . '%';
                 $search_arr = [$searchphrase, $searchphrase, $searchphrase];
                 $device_deps = dbFetchRows($deps_query, $search_arr);
                 $rec_count = dbFetchCell($count_query, $search_arr);
@@ -108,4 +108,4 @@ if (! Auth::user()->hasGlobalAdmin()) {
 }
 
 header('Content-Type: application/json');
-echo _json_encode($status);
+echo json_encode($status, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);

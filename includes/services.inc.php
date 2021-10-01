@@ -109,7 +109,7 @@ function discover_service($device, $service)
 {
     if (! dbFetchCell('SELECT COUNT(service_id) FROM `services` WHERE `service_type`= ? AND `device_id` = ?', [$service, $device['device_id']])) {
         add_service($device, $service, "$service Monitoring (Auto Discovered)", null, null, 0, 0, 0, "AUTO: $service");
-        log_event('Autodiscovered service: type ' . mres($service), $device, 'service', 2);
+        log_event('Autodiscovered service: type ' . $service, $device, 'service', 2);
         echo '+';
     }
     echo "$service ";
@@ -150,7 +150,7 @@ function poll_service($service)
         foreach ($perf as $k => $v) {
             $DS[$k] = $v['uom'];
         }
-        d_echo('Service DS: ' . _json_encode($DS) . "\n");
+        d_echo('Service DS: ' . json_encode($DS, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE) . "\n");
         if (($service['service_ds'] == '{}') || ($service['service_ds'] == '')) {
             $update['service_ds'] = json_encode($DS);
         }

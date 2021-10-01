@@ -26,9 +26,9 @@ $rrd_additions = '';
 
 $count = 0;
 foreach ($components as $id => $array) {
-    $rrd_filename = rrd_name($device['hostname'], ['ntp', $array['peer']]);
+    $rrd_filename = Rrd::name($device['hostname'], ['ntp', $array['peer']]);
 
-    if (rrdtool_check_rrd_exists($rrd_filename)) {
+    if (Rrd::checkRrdExists($rrd_filename)) {
         // Grab a color from the array.
         $color = \LibreNMS\Config::get("graph_colours.mixed.$count", \LibreNMS\Config::get('graph_colours.oranges.' . ($count - 7)));
 

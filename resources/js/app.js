@@ -36,6 +36,9 @@ Vue.component('multiselect', Multiselect)
 import VueTabs from 'vue-nav-tabs'
 Vue.use(VueTabs)
 
+import VModal from 'vue-js-modal'
+Vue.use(VModal)
+
 // Vue.mixin({
 //     methods: {
 //         route: route

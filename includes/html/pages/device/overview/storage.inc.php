@@ -1,5 +1,7 @@
 <?php
 
+use LibreNMS\Util\Number;
+
 $graph_type = 'storage_usage';
 
 $drives = dbFetchRows('SELECT * FROM `storage` WHERE device_id = ? ORDER BY `storage_descr` ASC', [$device['device_id']]);
@@ -40,11 +42,11 @@ if (count($drives)) {
             continue;
         }
 
-        $percent = round($drive['storage_perc'], 0);
-        $total = formatStorage($drive['storage_size']);
-        $free = formatStorage($drive['storage_free']);
-        $used = formatStorage($drive['storage_used']);
-        $background = get_percentage_colours($percent, $drive['storage_perc_warn']);
+        $percent = round($drive['storage_perc']);
+        $total = Number::formatBi($drive['storage_size']);
+        $free = Number::formatBi($drive['storage_free']);
+        $used = Number::formatBi($drive['storage_used']);
+        $background = \LibreNMS\Util\Colors::percentage($percent, $drive['storage_perc_warn']);
 
         $graph_array = [];
         $graph_array['height'] = '100';
@@ -58,9 +60,9 @@ if (count($drives)) {
         $link_array = $graph_array;
         $link_array['page'] = 'graphs';
         unset($link_array['height'], $link_array['width'], $link_array['legend']);
-        $link = generate_url($link_array);
+        $link = \LibreNMS\Util\Url::generate($link_array);
 
-        $drive['storage_descr'] = shorten_text($drive['storage_descr'], 50);
+        $drive['storage_descr'] = \LibreNMS\Util\StringHelpers::shortenText($drive['storage_descr'], 50);
 
         $overlib_content = generate_overlib_content($graph_array, $device['hostname'] . ' - ' . $drive['storage_descr']);
 
@@ -68,12 +70,12 @@ if (count($drives)) {
         $graph_array['height'] = 20;
         $graph_array['bg'] = 'ffffff00';
         // the 00 at the end makes the area transparent.
-        $minigraph = generate_lazy_graph_tag($graph_array);
+        $minigraph = \LibreNMS\Util\Url::lazyGraphTag($graph_array);
 
         echo '<tr>
-           <td class="col-md-4">' . overlib_link($link, $drive['storage_descr'], $overlib_content) . '</td>
-           <td class="col-md-4">' . overlib_link($link, $minigraph, $overlib_content) . '</td>
-           <td class="col-md-4">' . overlib_link($link, print_percentage_bar(200, 20, $percent, null, 'ffffff', $background['left'], $percent . '%', 'ffffff', $background['right']), $overlib_content) . '
+           <td class="col-md-4">' . \LibreNMS\Util\Url::overlibLink($link, $drive['storage_descr'], $overlib_content) . '</td>
+           <td class="col-md-4">' . \LibreNMS\Util\Url::overlibLink($link, $minigraph, $overlib_content) . '</td>
+           <td class="col-md-4">' . \LibreNMS\Util\Url::overlibLink($link, print_percentage_bar(200, 20, $percent, null, 'ffffff', $background['left'], $percent . '%', 'ffffff', $background['right']), $overlib_content) . '
            </a></td>
          </tr>';
     }//end foreach

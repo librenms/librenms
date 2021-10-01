@@ -151,7 +151,7 @@ if (Auth::user()->hasGlobalAdmin()) {
           <td>' . $user_details->auth_type . '</td>
           <td>' . $api->token_hash . '</td>
           <td><button class="btn btn-info btn-xs" data-toggle="modal" data-target="#display-qr" data-token_hash="' . $api->token_hash . '"><i class="fa fa-qrcode" ></i></button></td>
-          <td>' . $api->description . '</td>
+          <td>' . htmlspecialchars($api->description) . '</td>
           <td><input type="checkbox" name="token-status" data-token_id="' . $api->id . '" data-off-text="No" data-on-text="Yes" data-on-color="danger" ' . $api_disabled . ' data-size="mini"></td>
           <td><button type="button" class="btn btn-danger btn-xs" id="' . $api->id . '" data-token_id="' . $api->id . '" data-toggle="modal" data-target="#confirm-delete">Delete</button></td>
         </tr>
@@ -195,7 +195,7 @@ if (Auth::user()->hasGlobalAdmin()) {
      new QRCode(document.getElementById("qrcode"), token_hash);
    });
 
-  $('#token-removal').click('', function(event) {
+  $('#token-removal').on("click", function(event) {
     event.preventDefault();
     token_id = $("#token_id").val();
     $.ajax({
@@ -213,7 +213,7 @@ if (Auth::user()->hasGlobalAdmin()) {
       }
     });
   });
-  $('#token-create').click('', function(event) {
+  $('#token-create').on("click", function(event) {
     event.preventDefault();
     $.ajax({
       type: "POST",
@@ -232,7 +232,7 @@ if (Auth::user()->hasGlobalAdmin()) {
       }
     });
   });
-  $('#pass-gen').click('', function(event) {
+  $('#pass-gen').on("click", function(event) {
     event.preventDefault();
     token = $.password(32,false);
     $('#token').val(token);

@@ -14,8 +14,6 @@
 * You should have received a copy of the GNU General Public License
 * along with this program. If not, see <https://www.gnu.org/licenses/>. */
 
-global $debug;
-
 // This one only will work with the CISCO-CONTEXT-MAPPING-MIB V2 of cisco
 use LibreNMS\Config;
 
@@ -62,7 +60,7 @@ if (Config::get('enable_vrf_lite_cisco')) {
         unset($listIntance);
 
         foreach ((array) $tableVrf as $context => $vrf) {
-            if ($debug) {
+            if (\LibreNMS\Util\Debug::isEnabled()) {
                 echo "\n[DEBUG]\nRelation:t" . $context . 't' . $vrf['intance'] . 't' . $vrf['vrf'] . "\n[/DEBUG]\n";
             }
 
@@ -100,7 +98,6 @@ if (Config::get('enable_vrf_lite_cisco')) {
     //get all vrf_lite_cisco, this will used where the value depend of the context, be careful with the order that you call this module, if the module is disabled the context search will not work
     $tmpVrfC = dbFetchRows('SELECT * FROM vrf_lite_cisco WHERE device_id = ? ', [
         $device['device_id'], ]);
-    $device['vrf_lite_cisco'] = $tmpVrfC;
 
     //Delete all vrf that chaged
     foreach ($tmpVrfC as $vrfC) {

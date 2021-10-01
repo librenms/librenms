@@ -18,6 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2017 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -54,8 +55,8 @@ foreach ($sensors as $index => $sensor) {
     $colour_index = $index % count(\LibreNMS\Config::get('graph_colours.mixed'));
     $colour = \LibreNMS\Config::get("graph_colours.mixed.$colour_index");
 
-    $sensor_descr_fixed = rrdtool_escape($sensor['sensor_descr'], 28);
-    $rrd_file = rrd_name($device['hostname'], ['wireless-sensor', $sensor['sensor_class'], $sensor['sensor_type'], $sensor['sensor_index']]);
+    $sensor_descr_fixed = \LibreNMS\Data\Store\Rrd::fixedSafeDescr($sensor['sensor_descr'], 28);
+    $rrd_file = Rrd::name($device['hostname'], ['wireless-sensor', $sensor['sensor_class'], $sensor['sensor_type'], $sensor['sensor_index']]);
     $rrd_options .= " DEF:sensor$sensor_id=$rrd_file:sensor:AVERAGE";
 
     if ($unit == 'Hz') {

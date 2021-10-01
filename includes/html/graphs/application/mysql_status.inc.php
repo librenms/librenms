@@ -2,7 +2,7 @@
 
 require 'includes/html/graphs/common.inc.php';
 
-$rrd_filename = rrd_name($device['hostname'], ['app', 'mysql', $app['app_id'], 'status']);
+$rrd_filename = Rrd::name($device['hostname'], ['app', 'mysql', $app['app_id'], 'status']);
 
 $array = [
     'State_closing_tables'       => 'd2',
@@ -24,7 +24,7 @@ $array = [
 ];
 
 $i = 0;
-if (rrdtool_check_rrd_exists($rrd_filename)) {
+if (Rrd::checkRrdExists($rrd_filename)) {
     foreach ($array as $var => $ds) {
         $rrd_list[$i]['filename'] = $rrd_filename;
         if (is_array($var)) {

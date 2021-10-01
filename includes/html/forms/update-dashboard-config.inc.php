@@ -7,7 +7,7 @@ if (! Auth::check()) {
         'status'  => 'error',
         'message' => 'Unauthenticated',
     ];
-    echo _json_encode($response);
+    echo json_encode($response, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);
     exit;
 }
 
@@ -76,4 +76,4 @@ $response = [
     'message'       => $message,
     'extra'         => $extra,
 ];
-echo _json_encode($response);
+echo json_encode($response, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);

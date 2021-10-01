@@ -11,13 +11,13 @@ $app_id = $app['app_id'];
 
 $int = 0;
 $rrd_list = [];
-$rrd_filename = rrd_name($device['hostname'], ['app', $app['app_type'], $app['app_id'], $int]);
+$rrd_filename = Rrd::name($device['hostname'], ['app', $app['app_type'], $app['app_id'], $int]);
 
-if (! rrdtool_check_rrd_exists($rrd_filename)) {
+if (! Rrd::checkRrdExists($rrd_filename)) {
     echo "file missing: $rrd_filename";
 }
 
-while (rrdtool_check_rrd_exists($rrd_filename)) {
+while (Rrd::checkRrdExists($rrd_filename)) {
     $rrd_list[] = [
         'filename' => $rrd_filename,
         'descr'    => 'GPU ' . $int,
@@ -25,7 +25,7 @@ while (rrdtool_check_rrd_exists($rrd_filename)) {
     ];
 
     $int++;
-    $rrd_filename = rrd_name($device['hostname'], ['app', $app['app_type'], $app['app_id'], $int]);
+    $rrd_filename = Rrd::name($device['hostname'], ['app', $app['app_type'], $app['app_id'], $int]);
 }
 
 require 'includes/html/graphs/generic_multi_line_exact_numbers.inc.php';

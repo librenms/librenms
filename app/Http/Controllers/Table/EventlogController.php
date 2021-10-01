@@ -18,6 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -62,7 +63,7 @@ class EventlogController extends TableController
     /**
      * Defines the base query for this resource
      *
-     * @param \Illuminate\Http\Request $request
+     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Query\Builder
      */
     public function baseQuery($request)
@@ -74,6 +75,9 @@ class EventlogController extends TableController
             });
     }
 
+    /**
+     * @param  Eventlog  $eventlog
+     */
     public function formatItem($eventlog)
     {
         return [
@@ -94,6 +98,8 @@ class EventlogController extends TableController
                     return '<b>' . Url::portLink($port, $port->getShortLabel()) . '</b>';
                 }
             }
+        } elseif ($eventlog->type == 'stp') {
+            return Url::deviceLink($eventlog->device, $eventlog->type, ['tab' => 'stp']);
         } elseif (in_array($eventlog->type, \App\Models\Sensor::getTypes())) {
             if (is_numeric($eventlog->reference)) {
                 $sensor = $eventlog->related;
@@ -118,7 +124,7 @@ class EventlogController extends TableController
     }
 
     /**
-     * @param int $eventlog_severity
+     * @param  int  $eventlog_severity
      * @return string $eventlog_severity_icon
      */
     private function severityLabel($eventlog_severity)

@@ -18,9 +18,9 @@ if ($ipmi['host'] = get_dev_attrib($device, 'ipmi_hostname')) {
     foreach (Config::get('ipmi.type', []) as $ipmi_type) {
         $results = explode(PHP_EOL, external_exec(array_merge($cmd, ['-I', $ipmi_type, 'sensor'])));
 
-        array_filter($results, function ($line) {
+        $results = array_values(array_filter($results, function ($line) {
             return ! Str::contains($line, 'discrete');
-        });
+        }));
 
         if (! empty($results)) {
             set_dev_attrib($device, 'ipmi_type', $ipmi_type);
