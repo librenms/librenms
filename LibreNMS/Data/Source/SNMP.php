@@ -142,6 +142,7 @@ class SNMP
     {
         if ($enabled) {
             $this->options = array_merge($this->options, ['-On']);
+
             return $this;
         }
 

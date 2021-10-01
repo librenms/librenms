@@ -30,7 +30,7 @@ use LibreNMS\Tests\TestCase;
 
 class SnmpResponseTest extends TestCase
 {
-    public function testSimple()
+    public function testSimple(): void
     {
         $response = new SnmpResponse("IF-MIB::ifDescr[1] = lo\nIF-MIB::ifDescr[2] = enp4s0\n");
 
@@ -40,14 +40,14 @@ class SnmpResponseTest extends TestCase
         $this->assertEquals([1 => ['IF-MIB::ifDescr' => 'lo'], 2 => ['IF-MIB::ifDescr' => 'enp4s0']], $response->table(1));
     }
 
-    public function testMultiLine()
+    public function testMultiLine(): void
     {
         $response = new SnmpResponse("SNMPv2-MIB::sysDescr.0 = \"something\n on two lines\"\n");
         $this->assertEquals("\"something\n on two lines\"", $response->value());
         $this->assertEquals(['SNMPv2-MIB::sysDescr.0' => "\"something\n on two lines\""], $response->values());
     }
 
-    public function numericTest()
+    public function numericTest(): void
     {
         $response = new SnmpResponse(".1.3.6.1.2.1.2.2.1.10.1 = 495813425\n.1.3.6.1.2.1.2.2.1.10.2 = 3495809228\n");
         $this->assertEquals('496255256', $response->value());
