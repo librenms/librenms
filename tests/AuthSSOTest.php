@@ -418,6 +418,11 @@ class AuthSSOTest extends DBTestCase
         $_SERVER['member'] = '';
         $this->assertTrue($a->authSSOParseGroups() === 0);
 
+        // Empty with default access level
+        Config::set('sso.static_level', 5);
+        $this->assertTrue($a->authSSOParseGroups() === 5);
+        Config::forget('sso.static_level');
+
         // Null
         $_SERVER['member'] = null;
         $this->assertTrue($a->authSSOParseGroups() === 0);

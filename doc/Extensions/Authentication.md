@@ -499,14 +499,20 @@ $config['sso']['group_level_map'] = ['librenms-admins' => 10, 'librenms-readers'
 $config['sso']['group_delimiter'] = ';';
 ```
 
-The mechanism expects to find a delimited list of groups within the
+This mechanism expects to find a delimited list of groups within the
 attribute that ___sso\_group\_attr___ points to. This should be an
-associative array of group name keys, with  privilege levels as
+associative array of group name keys, with privilege levels as
 values. The mechanism will scan the list and find the ___highest___
 privilege level that the user is entitled to, and assign that value to
 the user.
 
-This format may be specific to Shibboleth; other relying party
+If there are no matches between the user's groups and the
+___sso\_group\_level\_map___, the user will be assigned the privilege level
+specified in the ___sso\_static\_level___ variable, with a default of 0 (no access).
+This feature can be used to provide a default access level (such as read-only)
+to all authenticated users.
+
+Additionally, this format may be specific to Shibboleth; other relying party
 software may need changes to the mechanism (e.g. ___mod\_auth\_mellon___
 may create pseudo arrays).
 
@@ -527,7 +533,11 @@ If your Relying Party has a magic URL that needs to be called to end a
 session, you can configure LibreNMS to direct the user to it:
 
 ```php
-$config['post_logout_action'] = '/Shibboleth.sso/Logout';
+# Example for Shibboleth
+$config['auth_logout_handler'] = '/Shibboleth.sso/Logout';
+
+# Example for oauth2-proxy
+$config['auth_logout_handler'] = '/oauth2/sign_out';
 ```
 
 This option functions independently of the Single Sign-on mechanism.
