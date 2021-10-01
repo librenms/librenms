@@ -42,8 +42,17 @@ class SnmpResponseTest extends TestCase
 
     public function testMultiLine()
     {
-        $response = new SnmpResponse("SNMPv2-MIB::sysDescr.0 = \"something\n on two lines\"");
+        $response = new SnmpResponse("SNMPv2-MIB::sysDescr.0 = \"something\n on two lines\"\n");
         $this->assertEquals("\"something\n on two lines\"", $response->value());
         $this->assertEquals(['SNMPv2-MIB::sysDescr.0' => "\"something\n on two lines\""], $response->values());
+    }
+
+    public function numericTest()
+    {
+        $response = new SnmpResponse(".1.3.6.1.2.1.2.2.1.10.1 = 495813425\n.1.3.6.1.2.1.2.2.1.10.2 = 3495809228\n");
+        $this->assertEquals('496255256', $response->value());
+        $this->assertEquals(['.1.3.6.1.2.1.2.2.1.10.1' => '496255256', '.1.3.6.1.2.1.2.2.1.10.2' => '3495809228'], $response->values());
+        $this->assertEquals(['.1.3.6.1.2.1.2.2.1.10.1' => '496255256', '.1.3.6.1.2.1.2.2.1.10.2' => '3495809228'], $response->table());
+        $this->assertEquals(['.1.3.6.1.2.1.2.2.1.10.1' => '496255256', '.1.3.6.1.2.1.2.2.1.10.2' => '3495809228'], $response->table(3));
     }
 }
