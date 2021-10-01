@@ -643,9 +643,9 @@ function createHost(
         }
     }
 
-    $device_id = dbInsert($device, 'devices');
-    if ($device_id) {
-        return $device_id;
+    $deviceModel = Device::create($device);
+    if ($deviceModel->device_id) {
+        return $deviceModel->device_id;
     }
 
     throw new \Exception('Failed to add host to the database, please run ./validate.php');
