@@ -2,25 +2,15 @@
 
 namespace App\Console\Commands;
 
+use App\Console\LnmsCommand;
 use App\Models\Device;
-use Illuminate\Console\Command;
 use LibreNMS\Util\Debug;
+use Symfony\Component\Console\Input\InputArgument;
+use Symfony\Component\Console\Input\InputOption;
 
-class SnmpFetch extends Command
+class SnmpFetch extends LnmsCommand
 {
-    /**
-     * The name and signature of the console command.
-     *
-     * @var string
-     */
-    protected $signature = 'snmp:fetch {device spec} {oid} {depth=0} {--type=get}';
-
-    /**
-     * The console command description.
-     *
-     * @var string
-     */
-    protected $description = 'Run snmp query against a device';
+    protected $name = 'snmp:fetch';
 
     /**
      * Create a new command instance.
@@ -30,6 +20,12 @@ class SnmpFetch extends Command
     public function __construct()
     {
         parent::__construct();
+        $this->addArgument('device spec', InputArgument::REQUIRED);
+        $this->addArgument('oid', InputArgument::REQUIRED);
+        $this->addOption('type', 't', InputOption::VALUE_REQUIRED, trans('commands.snmp:fetch.options.type', ['types' => '[get, walk, next, translate]']), 'get');
+        $this->addOption('output', 'o', InputOption::VALUE_REQUIRED, trans('commands.snmp:fetch.options.output', ['formats' => '']), '[value, values, table]');
+        $this->addOption('depth', 'd', InputOption::VALUE_REQUIRED);
+        $this->addOption('numeric', 'n', InputOption::VALUE_NONE);
     }
 
     /**

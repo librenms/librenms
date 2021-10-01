@@ -78,10 +78,6 @@ class SNMP
 
     private $defaultOptions = ['-OqX'];
     /**
-     * @var string
-     */
-    private $mib;
-    /**
      * @var \App\Models\Device
      */
     private $device;
@@ -106,12 +102,6 @@ class SNMP
     public function mibDir(string $dir): SNMP
     {
         $this->mibDir = $dir;
-        return $this;
-    }
-
-    public function mib(string $mib): SNMP
-    {
-        $this->mib = $mib;
         return $this;
     }
 
@@ -170,10 +160,6 @@ class SNMP
     {
         $cmd = $this->initCommand($command);
 
-        // mibs
-        if ($this->mib) {
-            array_push($cmd, '-m', $this->mib);
-        }
         array_push($cmd, '-M', $this->mibDirectories());
 
         if ($command === 'snmptranslate') {

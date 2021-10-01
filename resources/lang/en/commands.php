@@ -102,6 +102,18 @@ return [
             'compat' => '[deprecated] Mimic the behaviour of gen_smokeping.php',
         ],
     ],
+    'snmp:fetch' => [
+        'description' => 'Run snmp query against a device',
+        'arguments' => [
+            'device spec' => 'Device to query: device_id or hostname/ip',
+            'oid' => 'SNMP OID to fetch.  Should be either MIB::oid or a numeric oid',
+        ],
+        'options' => [
+            'type' => 'The type of snmp query to perform :types',
+            'output' => 'Specify the output format :formats',
+            'numeric' => 'Numeric OIDs'
+        ],
+    ],
     'translation:generate' => [
         'description' => 'Generate updated json language files for use in the web frontend',
     ],
