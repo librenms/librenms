@@ -31,6 +31,7 @@ use Log;
 
 class SnmpResponse
 {
+    const DELIMITER = ' = ';
     /**
      * @var string
      */
@@ -48,9 +49,9 @@ class SnmpResponse
 
     public function isValid(): bool
     {
+        // not checking exitCode because I think it may lead to false negatives
         $invalid = empty($this->raw)
-//            || $this->exitCode !== 0
-            || preg_match('/(No Such Instance|No Such Object|No more variables left|Authentication failure|Timeout: No Response from)/i', $this->raw, $matches);
+            || preg_match('/(No Such Instance|No Such Object|No more variables left|Authentication failure|Timeout: No Response from)/', $this->raw, $matches);
 
         if ($invalid) {
             Log::debug(sprintf('SNMP query failed. Exit Code: %s Empty: %s Bad String: %s', $this->exitCode, var_export(empty($this->raw), true), $matches[1] ?? 'not found'));
@@ -79,15 +80,16 @@ class SnmpResponse
         $values = [];
         $line = strtok($this->raw, PHP_EOL);
         while ($line !== false) {
-            if (Str::contains($line, 'at this OID') || Str::contains($line, 'this MIB View')) {
+            if (Str::contains($line, ['at this OID', 'this MIB View'])) {
+                // these occur when we seek past the end of data, usually the end of the response, but grab the next line and continue
                 $line = strtok(PHP_EOL);
                 continue;
             }
 
-            [$oid, $value] = explode(' = ', $line, 2);
+            [$oid, $value] = explode(self::DELIMITER, $line, 2);
 
             $line = strtok(PHP_EOL); // get the next line and concatenate multi-line values
-            while ($line !== false && ! Str::contains($line, '=')) {
+            while ($line !== false && ! Str::contains($line, self::DELIMITER)) {
                 $value .= PHP_EOL . $line;
                 $line = strtok(PHP_EOL);
             }
