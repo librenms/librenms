@@ -631,6 +631,11 @@ class Device extends BaseModel
         return $this->hasMany(HrDevice::class, 'device_id');
     }
 
+    public function hostResourceValues(): HasMany
+    {
+        return $this->hasMany(HrSystem::class, 'device_id');
+    }
+
     public function entityPhysical(): HasMany
     {
         return $this->hasMany(EntPhysical::class, 'device_id');
