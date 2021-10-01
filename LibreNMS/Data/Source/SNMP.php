@@ -159,7 +159,7 @@ class SNMP
      */
     public function get($oid): SnmpResponse
     {
-        return $this->exec('snmpget', is_string($oid) ? explode(' ', $oid) : $oid);
+        return $this->exec('snmpget', $this->parseOid($oid));
     }
 
     /**
@@ -171,7 +171,7 @@ class SNMP
      */
     public function walk($oid): SnmpResponse
     {
-        return $this->exec('snmpwalk', is_string($oid) ? explode(' ', $oid) : $oid);
+        return $this->exec('snmpwalk', $this->parseOid($oid));
     }
 
     /**
@@ -183,8 +183,7 @@ class SNMP
      */
     public function next($oid): SnmpResponse
     {
-        $oids = is_string($oid) ? explode(' ', $oid) : $oid;
-        return $this->exec('snmpgetnext', $oids);
+        return $this->exec('snmpgetnext', $this->parseOid($oid));
     }
 
     /**
@@ -196,7 +195,7 @@ class SNMP
      */
     public function translate($oid): SnmpResponse
     {
-        return $this->exec('snmptranslate', is_string($oid) ? explode(' ', $oid) : $oid);
+        return $this->exec('snmptranslate', $this->parseOid($oid));
     }
 
     private function recordStatistic(string $type, $start_time): void
