@@ -35,7 +35,37 @@ class Device extends BaseModel
 
     public $timestamps = false;
     protected $primaryKey = 'device_id';
-    protected $fillable = ['hostname', 'ip', 'status', 'status_reason', 'sysName', 'sysDescr', 'sysObjectID', 'hardware', 'version', 'features', 'serial', 'icon'];
+    protected $fillable = [
+        'hostname',
+        'ip',
+        'status',
+        'status_reason',
+        'sysName',
+        'sysDescr',
+        'sysObjectID',
+        'hardware',
+        'version',
+        'features',
+        'serial',
+        'icon',
+        'overwrite_ip',
+        'os',
+        'community',
+        'port',
+        'transport',
+        'snmpver',
+        'poller_group',
+        'port_association_mode',
+        'snmp_disable',
+        // ---- snmpV3 fields ----
+        'authlevel',
+        'authname',
+        'authpass',
+        'authalgo',
+        'cryptopass',
+        'cryptoalgo',
+    ];
+
     protected $casts = [
         'last_polled' => 'datetime',
         'status' => 'boolean',
