@@ -137,7 +137,7 @@ foreach (dbFetchRows($sql, $param) as $alert) {
 
     $hostname = '<div class="incident">' . generate_device_link($alert, format_hostname($alert, shorthost($alert['hostname']))) . '<div id="incident' . ($alert['id']) . '"';
     if (is_numeric($vars['details'])) {
-        $hostname .= (int)$vars['details'] ? '' : ' class="collapse"';
+        $hostname .= (int) $vars['details'] ? '' : ' class="collapse"';
     } else {
         $hostname .= ' class="collapse"';
     }
