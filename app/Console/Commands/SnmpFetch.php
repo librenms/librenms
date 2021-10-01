@@ -54,13 +54,9 @@ class SnmpFetch extends LnmsCommand
         $output = $this->option('output')
             ?: ($type == 'walk' ? 'table' : 'value');
 
-        $request = \NetSnmp::make();
-        if ($this->option('numeric')) {
-            $request->numeric();
-        }
-
         /** @var \LibreNMS\Data\Source\SnmpResponse $res */
-        $res = $request->$type($this->argument('oid'));
+        $res = \NetSnmp::numeric($this->option('numeric'))
+            ->$type($this->argument('oid'));
 
         if (! $res->isValid()) {
             $this->line($res->raw());

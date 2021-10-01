@@ -138,9 +138,14 @@ class SNMP
     /**
      * Output all OIDs numerically
      */
-    public function numeric(): SNMP
+    public function numeric(bool $enabled = true): SNMP
     {
-        $this->options = array_merge($this->options, ['-On']);
+        if ($enabled) {
+            $this->options = array_merge($this->options, ['-On']);
+            return $this;
+        }
+
+        $this->options = array_diff($this->options, ['-On']);
 
         return $this;
     }
