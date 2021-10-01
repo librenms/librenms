@@ -128,7 +128,7 @@ class LegacyUserProvider implements UserProvider
             }
 
             if (empty($credentials['username']) || ! $authorizer->authenticate($credentials)) {
-                throw new AuthenticationException('Invalid Credentials');
+                throw new AuthenticationException();
             }
 
             return true;
