@@ -61,6 +61,13 @@
         </select>
     </div>
     <div class="form-group">
+        <label for="details-{{ $id }}" class="control-label">@lang('Show Alert Details by default'):</label>
+        <select class="form-control" name="details" id="details-{{ $id }}">
+            <option value="1" @if($details == 1) selected @endif>@lang('show')</option>
+            <option value="0" @if($details == 0) selected @endif>@lang('hide')</option>
+        </select>
+    </div>
+    <div class="form-group">
         <label for="sort-{{ $id }}" class="control-label">@lang('Sort alerts by'):</label>
         <select class="form-control" name="sort" id="sort-{{ $id }}">
             <option value="" @if($sort == 1) selected @endif>@lang('timestamp, descending')</option>

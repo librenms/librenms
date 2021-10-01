@@ -135,7 +135,13 @@ foreach (dbFetchRows($sql, $param) as $alert) {
         }
     }
 
-    $hostname = '<div class="incident">' . generate_device_link($alert, format_hostname($alert, shorthost($alert['hostname']))) . '<div id="incident' . ($alert['id']) . '" class="collapse">' . $fault_detail . '</div></div>';
+    $hostname = '<div class="incident">' . generate_device_link($alert, format_hostname($alert, shorthost($alert['hostname']))) . '<div id="incident' . ($alert['id']) . '"';
+    if (is_numeric($vars['details'])) {
+        $hostname .= (int)$vars['details'] ? '' : ' class="collapse"';
+    } else {
+        $hostname .= ' class="collapse"';
+    }
+    $hostname .= '>' . $fault_detail . '</div></div>';
 
     $severity = $alert['severity'];
     $severity_ico = '<span class="alert-status label-' . alert_layout($severity)['background_color'] . '">&nbsp;</span>';
