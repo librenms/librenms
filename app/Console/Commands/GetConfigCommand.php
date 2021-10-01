@@ -24,7 +24,7 @@ class GetConfigCommand extends LnmsCommand
         parent::__construct();
 
         $this->addArgument('setting', InputArgument::OPTIONAL);
-        $this->addOption('json');
+        $this->addOption('dump');
     }
 
     /**
@@ -42,7 +42,7 @@ class GetConfigCommand extends LnmsCommand
             Config::forget("os.{$matches['os']}.definition_loaded");
         }
 
-        if ($this->option('json')) {
+        if ($this->option('dump')) {
             $this->line($setting ? json_encode(Config::get($setting)) : Config::toJson());
 
             return 0;
@@ -55,7 +55,7 @@ class GetConfigCommand extends LnmsCommand
         if (Config::has($setting)) {
             $output = Config::get($setting);
             if (! is_string($output)) {
-                $output = var_export($output, true);
+                $output = json_encode($output, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES);
             }
 
             $this->line($output);

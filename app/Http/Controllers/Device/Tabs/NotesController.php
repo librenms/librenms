@@ -18,6 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2020 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -61,8 +62,8 @@ class NotesController implements DeviceTab
     /**
      * Update the specified resource in storage.
      *
-     * @param Request $request
-     * @param Device $device
+     * @param  Request  $request
+     * @param  Device  $device
      * @return \Illuminate\Http\RedirectResponse
      */
     public function update(Request $request, Device $device)

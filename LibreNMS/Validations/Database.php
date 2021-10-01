@@ -18,6 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2017 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -319,6 +320,11 @@ class Database extends BaseValidation
             $schema_update[] = $this->dropTableSql($table);
         }
 
+        // set utc timezone if timestamp issues
+        if (preg_grep('/\d{4}-\d\d-\d\d \d\d:\d\d:\d\d/', $schema_update)) {
+            array_unshift($schema_update, "SET TIME_ZONE='+00:00';");
+        }
+
         if (empty($schema_update)) {
             $validator->ok('Database schema correct');
         } else {
@@ -387,7 +393,7 @@ class Database extends BaseValidation
     /**
      * Generate an SQL segment to create the column based on data from Schema::dump()
      *
-     * @param array $column_data The array of data for the column
+     * @param  array  $column_data  The array of data for the column
      * @return string sql fragment, for example: "`ix_id` int(10) unsigned NOT NULL"
      */
     private function columnToSql($column_data)
@@ -418,7 +424,7 @@ class Database extends BaseValidation
     /**
      * Generate an SQL segment to create the index based on data from Schema::dump()
      *
-     * @param array $index_data The array of data for the index
+     * @param  array  $index_data  The array of data for the index
      * @return string sql fragment, for example: "PRIMARY KEY (`device_id`)"
      */
     private function indexToSql($index_data)

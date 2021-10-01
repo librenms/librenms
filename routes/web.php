@@ -91,6 +91,7 @@ Route::group(['middleware' => ['auth'], 'guard' => 'auth'], function () {
             Route::post('set_resolution', 'ResolutionController@set');
             Route::get('netcmd', 'NetCommand@run');
             Route::post('ripe/raw', 'RipeNccApiController@raw');
+            Route::get('snmp/capabilities', 'SnmpCapabilities')->name('snmp.capabilities');
         });
 
         Route::get('settings/list', 'SettingsController@listAll')->name('settings.list');
@@ -103,24 +104,25 @@ Route::group(['middleware' => ['auth'], 'guard' => 'auth'], function () {
 
         // js select2 data controllers
         Route::group(['prefix' => 'select', 'namespace' => 'Select'], function () {
-            Route::get('application', 'ApplicationController');
-            Route::get('bill', 'BillController');
+            Route::get('application', 'ApplicationController')->name('ajax.select.application');
+            Route::get('bill', 'BillController')->name('ajax.select.bill');
             Route::get('dashboard', 'DashboardController')->name('ajax.select.dashboard');
-            Route::get('device', 'DeviceController');
-            Route::get('device-field', 'DeviceFieldController');
-            Route::get('device-group', 'DeviceGroupController');
-            Route::get('port-group', 'PortGroupController');
-            Route::get('eventlog', 'EventlogController');
-            Route::get('graph', 'GraphController');
-            Route::get('graph-aggregate', 'GraphAggregateController');
-            Route::get('graylog-streams', 'GraylogStreamsController');
-            Route::get('syslog', 'SyslogController');
-            Route::get('location', 'LocationController');
-            Route::get('munin', 'MuninPluginController');
-            Route::get('service', 'ServiceController');
-            Route::get('template', 'ServiceTemplateController');
-            Route::get('port', 'PortController');
-            Route::get('port-field', 'PortFieldController');
+            Route::get('device', 'DeviceController')->name('ajax.select.device');
+            Route::get('device-field', 'DeviceFieldController')->name('ajax.select.device-field');
+            Route::get('device-group', 'DeviceGroupController')->name('ajax.select.device-group');
+            Route::get('port-group', 'PortGroupController')->name('ajax.select.port-group');
+            Route::get('eventlog', 'EventlogController')->name('ajax.select.eventlog');
+            Route::get('graph', 'GraphController')->name('ajax.select.graph');
+            Route::get('graph-aggregate', 'GraphAggregateController')->name('ajax.select.graph-aggregate');
+            Route::get('graylog-streams', 'GraylogStreamsController')->name('ajax.select.graylog-streams');
+            Route::get('syslog', 'SyslogController')->name('ajax.select.syslog');
+            Route::get('location', 'LocationController')->name('ajax.select.location');
+            Route::get('munin', 'MuninPluginController')->name('ajax.select.munin');
+            Route::get('service', 'ServiceController')->name('ajax.select.service');
+            Route::get('template', 'ServiceTemplateController')->name('ajax.select.template');
+            Route::get('poller-group', 'PollerGroupController')->name('ajax.select.poller-group');
+            Route::get('port', 'PortController')->name('ajax.select.port');
+            Route::get('port-field', 'PortFieldController')->name('ajax.select.port-field');
         });
 
         // jquery bootgrid data controllers
@@ -136,6 +138,7 @@ Route::group(['middleware' => ['auth'], 'guard' => 'auth'], function () {
             Route::post('mempools', 'MempoolsController');
             Route::post('outages', 'OutagesController');
             Route::post('port-nac', 'PortNacController');
+            Route::post('ports', 'PortsController')->name('table.ports');
             Route::post('routes', 'RoutesTablesController');
             Route::post('syslog', 'SyslogController');
             Route::post('vminfo', 'VminfoController');

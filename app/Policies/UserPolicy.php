@@ -35,7 +35,7 @@ class UserPolicy
     /**
      * Determine whether the user can view any user.
      *
-     * @param  User $user
+     * @param  User  $user
      * @return mixed
      */
     public function viewAny(User $user)

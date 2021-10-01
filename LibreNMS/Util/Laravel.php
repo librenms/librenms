@@ -18,6 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -46,7 +47,7 @@ class Laravel
     /**
      * Boot Laravel in a non-Laravel web script
      *
-     * @param bool $authenticate Use session+db to authenticate user (does not authorize)
+     * @param  bool  $authenticate  Use session+db to authenticate user (does not authorize)
      */
     public static function bootWeb($authenticate = false)
     {
@@ -77,6 +78,7 @@ class Laravel
     /**
      * Check if running in the command line.
      * Safe for code without Laravel running and in Laravel console application.
+     *
      * @return bool
      */
     public static function isCli(): bool
@@ -89,8 +91,8 @@ class Laravel
     /**
      * Add prefix and strip .php to make the url helper work in non-laravel php scripts
      *
-     * @param \Illuminate\Http\Request $request
-     * @param bool $auth
+     * @param  \Illuminate\Http\Request  $request
+     * @param  bool  $auth
      */
     private static function rewriteDummyHeaders($request, $auth)
     {

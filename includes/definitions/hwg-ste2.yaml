@@ -5,7 +5,7 @@ icon: hwg
 over:
     - { graph: device_temperature, text: Temperature }
 mib_dir: hwg
-nobulk: true
+snmp_bulk: false
 discovery:
     -
         sysObjectID:

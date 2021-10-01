@@ -3,6 +3,7 @@ text: 'Mcafee Web Gateway'
 type: firewall
 icon: mcafeewebgateway
 mib_dir: mcafee
+ifname: true
 over:
     - { graph: device_bits, text: Traffic }
     - { graph: device_processor, text: 'CPU Usage' }

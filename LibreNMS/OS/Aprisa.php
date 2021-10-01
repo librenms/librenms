@@ -16,6 +16,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2018 Maikel de Boer and Janno Schouwenburg
  * @author     Maikel de Boer <mdb@tampnet.com>, Janno Schouwenburg <js@tampnet.com>
  */

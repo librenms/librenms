@@ -1,14 +1,15 @@
 {
-    "/js/app.js": "/js/app.js?id=a6bdef835406a9a4e138",
-    "/js/manifest.js": "/js/manifest.js?id=1514baaea419f38abb7d",
-    "/css/app.css": "/css/app.css?id=996b9e3da0c3ab98067e",
-    "/js/vendor.js": "/js/vendor.js?id=ccca9695062f1f68aaa8",
-    "/js/lang/de.js": "/js/lang/de.js?id=db973f6aaff0cda764c6",
-    "/js/lang/en.js": "/js/lang/en.js?id=c7c74acfea120c671190",
-    "/js/lang/fr.js": "/js/lang/fr.js?id=096c9e010fc548e53b0a",
-    "/js/lang/it.js": "/js/lang/it.js?id=b28a63928155eeb4e2a1",
+    "/js/app.js": "/js/app.js?id=cc34801c36c263f094da",
+    "/js/manifest.js": "/js/manifest.js?id=8d61162bb0caf92f60ff",
+    "/css/vendor.css": "/css/vendor.css?id=8d7b2ecb46047fe813e4",
+    "/css/app.css": "/css/app.css?id=54a173acc7d587a9afa4",
+    "/js/vendor.js": "/js/vendor.js?id=294cef17a3cf43045d61",
+    "/js/lang/de.js": "/js/lang/de.js?id=8959e785f5790d6b6836",
+    "/js/lang/en.js": "/js/lang/en.js?id=bd7598fcfc462394f0de",
+    "/js/lang/fr.js": "/js/lang/fr.js?id=707149152bde5b5e2b8d",
+    "/js/lang/it.js": "/js/lang/it.js?id=4e3b200da489000822dd",
     "/js/lang/ru.js": "/js/lang/ru.js?id=f6b7c078755312a0907c",
     "/js/lang/uk.js": "/js/lang/uk.js?id=c19a5dcee4724579cb41",
-    "/js/lang/zh-CN.js": "/js/lang/zh-CN.js?id=12f95651fb6629cbf3f3",
-    "/js/lang/zh-TW.js": "/js/lang/zh-TW.js?id=87ab9d2f187593100bc3"
+    "/js/lang/zh-CN.js": "/js/lang/zh-CN.js?id=acab91683e556299b62b",
+    "/js/lang/zh-TW.js": "/js/lang/zh-TW.js?id=4d48f47a17010848f963"
 }

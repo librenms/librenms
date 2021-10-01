@@ -18,6 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2019 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -48,7 +49,7 @@ class DynamicConfig
     /**
      * Check if a setting is valid
      *
-     * @param string $name
+     * @param  string  $name
      * @return bool
      */
     public function isValidSetting($name)
@@ -59,7 +60,7 @@ class DynamicConfig
     /**
      * Get config item by name
      *
-     * @param string $name
+     * @param  string  $name
      * @return DynamicConfigItem|null
      */
     public function get($name)

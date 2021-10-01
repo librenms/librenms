@@ -1,5 +1,5 @@
 <div class="table-responsive">
-    <table id="alertlog_{{ $id }}" class="table table-hover table-condensed alerts">
+    <table id="alertlog_{{ $id }}" class="table table-hover table-condensed alerts" data-ajax="true">
         <thead>
         <tr>
             <th data-column-id="status" data-sortable="false"></th>

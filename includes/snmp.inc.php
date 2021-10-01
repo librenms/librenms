@@ -41,7 +41,7 @@ function prep_snmp_setting($device, $setting)
 }//end prep_snmp_setting()
 
 /**
- * @param array $device
+ * @param  array  $device
  * @return array will contain a list of mib dirs
  */
 function get_mib_dir($device)
@@ -78,8 +78,8 @@ function get_mib_dir($device)
  * If null return the default mib dir
  * If $mibdir is empty '', return an empty string
  *
- * @param string $mibdir should be the name of the directory within \LibreNMS\Config::get('mib_dir')
- * @param array|null $device
+ * @param  string  $mibdir  should be the name of the directory within \LibreNMS\Config::get('mib_dir')
+ * @param  array|null  $device
  * @return string The option string starting with -M
  */
 function mibdir($mibdir = null, $device = null)
@@ -103,11 +103,11 @@ function mibdir($mibdir = null, $device = null)
 /**
  * Generate an snmpget command
  *
- * @param array $device the we will be connecting to
- * @param array|string $oids the oids to fetch, separated by spaces
- * @param array|string $options extra snmp command options, usually this is output options
- * @param string $mib an additional mib to add to this command
- * @param string $mibdir a mib directory to search for mibs, usually prepended with +
+ * @param  array  $device  the we will be connecting to
+ * @param  array|string  $oids  the oids to fetch, separated by spaces
+ * @param  array|string  $options  extra snmp command options, usually this is output options
+ * @param  string  $mib  an additional mib to add to this command
+ * @param  string  $mibdir  a mib directory to search for mibs, usually prepended with +
  * @return array the fully assembled command, ready to run
  */
 function gen_snmpget_cmd($device, $oids, $options = null, $mib = null, $mibdir = null)
@@ -120,16 +120,16 @@ function gen_snmpget_cmd($device, $oids, $options = null, $mib = null, $mibdir =
 /**
  * Generate an snmpwalk command
  *
- * @param array $device the we will be connecting to
- * @param array|string $oids the oids to fetch, separated by spaces
- * @param array|string $options extra snmp command options, usually this is output options
- * @param string $mib an additional mib to add to this command
- * @param string $mibdir a mib directory to search for mibs, usually prepended with +
+ * @param  array  $device  the we will be connecting to
+ * @param  array|string  $oids  the oids to fetch, separated by spaces
+ * @param  array|string  $options  extra snmp command options, usually this is output options
+ * @param  string  $mib  an additional mib to add to this command
+ * @param  string  $mibdir  a mib directory to search for mibs, usually prepended with +
  * @return array the fully assembled command, ready to run
  */
 function gen_snmpwalk_cmd($device, $oids, $options = null, $mib = null, $mibdir = null, $strIndexing = null)
 {
-    if ($device['snmpver'] == 'v1' || (isset($device['os']) && Config::getOsSetting($device['os'], 'nobulk'))) {
+    if ($device['snmpver'] == 'v1' || (isset($device['os']) && Config::getOsSetting($device['os'], 'snmp_bulk', true) == false)) {
         $snmpcmd = [Config::get('snmpwalk')];
     } else {
         $snmpcmd = [Config::get('snmpbulkwalk')];
@@ -145,12 +145,12 @@ function gen_snmpwalk_cmd($device, $oids, $options = null, $mib = null, $mibdir 
 /**
  * Generate an snmp command
  *
- * @param array $cmd the snmp command to run, like snmpget plus any additional arguments in an array
- * @param array $device the we will be connecting to
- * @param array|string $oids the oids to fetch, separated by spaces
- * @param array|string $options extra snmp command options, usually this is output options
- * @param string $mib an additional mib to add to this command
- * @param string $mibdir a mib directory to search for mibs, usually prepended with +
+ * @param  array  $cmd  the snmp command to run, like snmpget plus any additional arguments in an array
+ * @param  array  $device  the we will be connecting to
+ * @param  array|string  $oids  the oids to fetch, separated by spaces
+ * @param  array|string  $options  extra snmp command options, usually this is output options
+ * @param  string  $mib  an additional mib to add to this command
+ * @param  string  $mibdir  a mib directory to search for mibs, usually prepended with +
  * @return array the fully assembled command, ready to run
  */
 function gen_snmp_cmd($cmd, $device, $oids, $options = null, $mib = null, $mibdir = null, $strIndexing = null)
@@ -176,7 +176,7 @@ function gen_snmp_cmd($cmd, $device, $oids, $options = null, $mib = null, $mibdi
         array_push($cmd, '-r', $retries);
     }
 
-    $pollertarget = Device::pollerTarget($device);
+    $pollertarget = \LibreNMS\Util\Rewrite::addIpv6Brackets(Device::pollerTarget($device));
     $cmd[] = $device['transport'] . ':' . $pollertarget . ':' . $device['port'];
     $cmd = array_merge($cmd, (array) $oids);
 
@@ -263,11 +263,11 @@ function snmp_get_multi_oid($device, $oids, $options = '-OUQn', $mib = null, $mi
 /**
  * Simple snmpget, returns the output of the get or false if the get failed.
  *
- * @param array $device
- * @param array|string $oid
- * @param array|string $options
- * @param string $mib
- * @param string $mibdir
+ * @param  array  $device
+ * @param  array|string  $oid
+ * @param  array|string  $options
+ * @param  string  $mib
+ * @param  string  $mibdir
  * @return bool|string
  */
 function snmp_get($device, $oid, $options = null, $mib = null, $mibdir = null)
@@ -296,11 +296,11 @@ function snmp_get($device, $oid, $options = null, $mib = null, $mibdir = null)
  * Calls snmpgetnext.  Getnext returns the next oid after the specified oid.
  * For example instead of get sysName.0, you can getnext sysName to get the .0 value.
  *
- * @param array $device Target device
- * @param array|string $oid The oid to getnext
- * @param array|string $options Options to pass to snmpgetnext (-Oqv for example)
- * @param string $mib The MIB to use
- * @param string $mibdir Optional mib directory to search
+ * @param  array  $device  Target device
+ * @param  array|string  $oid  The oid to getnext
+ * @param  array|string  $options  Options to pass to snmpgetnext (-Oqv for example)
+ * @param  string  $mib  The MIB to use
+ * @param  string  $mibdir  Optional mib directory to search
  * @return string|false the output or false if the data could not be fetched
  */
 function snmp_getnext($device, $oid, $options = null, $mib = null, $mibdir = null)
@@ -325,11 +325,11 @@ function snmp_getnext($device, $oid, $options = null, $mib = null, $mibdir = nul
  * Calls snmpgetnext for multiple OIDs.  Getnext returns the next oid after the specified oid.
  * For example instead of get sysName.0, you can getnext sysName to get the .0 value.
  *
- * @param array $device Target device
- * @param array $oids The oids to getnext
- * @param string $options Options to pass to snmpgetnext (-OQUs for example)
- * @param string $mib The MIB to use
- * @param string $mibdir Optional mib directory to search
+ * @param  array  $device  Target device
+ * @param  array  $oids  The oids to getnext
+ * @param  string  $options  Options to pass to snmpgetnext (-OQUs for example)
+ * @param  string  $mib  The MIB to use
+ * @param  string  $mibdir  Optional mib directory to search
  * @return array|false the output or false if the data could not be fetched
  */
 function snmp_getnext_multi($device, $oids, $options = '-OQUs', $mib = null, $mibdir = null, $array = [])
@@ -538,11 +538,11 @@ function snmpwalk_cache_long_oid($device, $oid, $noid, $array, $mib = null, $mib
  * return periods (.) for non-printable numbers, thus making many different indexes appear
  * to be the same.
  *
- * @param array $device
- * @param string $oid
- * @param array $array Pass an array to add the cache to, useful for multiple calls
- * @param string $mib
- * @param string $mibdir
+ * @param  array  $device
+ * @param  string  $oid
+ * @param  array  $array  Pass an array to add the cache to, useful for multiple calls
+ * @param  string  $mib
+ * @param  string  $mibdir
  * @return bool|array
  */
 function snmpwalk_cache_oid_num($device, $oid, $array, $mib = null, $mibdir = null)
@@ -643,12 +643,12 @@ function snmpwalk_cache_triple_oid($device, $oid, $array, $mib = null, $mibdir =
  *   2 => [ 'ifIndex' => '2', 'ifDescr' => 'enp0s25', 'ifMtu' => '1500', ...],
  * ]
  *
- * @param array $device Target device
- * @param string $oid The string based oid to walk
- * @param string $mib The MIB to use
- * @param int $depth how many indexes to group
- * @param array $array optionally insert the entries into an existing array (helpful for grouping multiple walks)
- * @param string $mibdir custom mib dir to search for mib
+ * @param  array  $device  Target device
+ * @param  string  $oid  The string based oid to walk
+ * @param  string  $mib  The MIB to use
+ * @param  int  $depth  how many indexes to group
+ * @param  array  $array  optionally insert the entries into an existing array (helpful for grouping multiple walks)
+ * @param  string  $mibdir  custom mib dir to search for mib
  * @return array grouped array of data
  */
 function snmpwalk_group($device, $oid, $mib = '', $depth = 1, $array = [], $mibdir = null, $strIndexing = null)
@@ -733,8 +733,9 @@ function snmpwalk_cache_threepart_oid($device, $oid, $array, $mib = 0)
 
 /**
  * generate snmp auth arguments
- * @param array $device
- * @param array $cmd
+ *
+ * @param  array  $device
+ * @param  array  $cmd
  * @return array
  */
 function snmp_gen_auth(&$device, $cmd = [], $strIndexing = null)
@@ -776,11 +777,11 @@ function snmp_gen_auth(&$device, $cmd = [], $strIndexing = null)
  * Default options for a textual oid is -On
  * You may override these by setting $options (an empty string for no options)
  *
- * @param string $oid
- * @param string $mib
- * @param string $mibdir the mib directory (relative to the LibreNMS mibs directory)
- * @param array|string $options Options to pass to snmptranslate
- * @param array|null $device
+ * @param  string  $oid
+ * @param  string  $mib
+ * @param  string  $mibdir  the mib directory (relative to the LibreNMS mibs directory)
+ * @param  array|string  $options  Options to pass to snmptranslate
+ * @param  array|null  $device
  * @return string
  */
 function snmp_translate($oid, $mib = 'ALL', $mibdir = null, $options = null, $device = null)
@@ -820,8 +821,10 @@ function snmp_translate($oid, $mib = 'ALL', $mibdir = null, $options = null, $de
  *
  * @param $device
  * @param $OID
- * @param int $indexes
+ * @param  int  $indexes
+ *
  * @internal param $string
+ *
  * @return bool|array
  */
 function snmpwalk_array_num($device, $oid, $indexes = 1)
@@ -882,7 +885,7 @@ function get_device_max_repeaters($device)
 /**
  * Check if a given oid is numeric.
  *
- * @param string $oid
+ * @param  string  $oid
  * @return bool
  */
 function oid_is_numeric($oid)

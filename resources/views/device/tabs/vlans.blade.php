@@ -18,14 +18,13 @@
                 <td>
                 @foreach($vlans as $port)
                     @if(!$vars)
-@if($port->port)
-@portLink($port->port, $port->port->getShortLabel())
-@if($port->untagged)
-(U)@endif
-@if(!$loop->last),
-@endif
-@endif
-
+                        <span class="tw-inline-flex">
+                            @if($port->port)
+                                <x-port-link :port="$port->port">{{ $port->port->getShortLabel() }}</x-port-link>
+                                @if($port->untagged)<span>&nbsp;(U)</span>@endif
+                                @if(!$loop->last)<span>,</span>@endif
+                            @endif
+                        </span>
                     @else
                     <div style="display: block; padding: 2px; margin: 2px; min-width: 139px; max-width:139px; min-height:85px; max-height:85px; text-align: center; float: left; background-color: {{ \LibreNMS\Config::get('list_colour.odd_alt2') }}">
 

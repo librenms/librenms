@@ -73,13 +73,11 @@
         if (e.type === 'keyup' && e.keyCode !== 13) return;
         var $this = $(this);
         var speed = $this.val().replace(/[^0-9]/gi, '');
-        var device_id = $this.data('device_id');
         var port_id = $this.data('port_id');
-        var ifName = $this.data('ifname');
         $.ajax({
             type: 'POST',
             url: 'ajax_form.php',
-            data: {type: "update-ifspeed", speed: speed, ifName: ifName, port_id: port_id, device_id: device_id},
+            data: {type: "update-ifspeed", speed: speed, port_id: port_id},
             dataType: "json",
             success: function (data) {
                 if (data.status == 'ok') {

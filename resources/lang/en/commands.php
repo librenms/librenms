@@ -7,7 +7,7 @@ return [
             'setting' => 'setting to get value of in dot notation (example: snmp.community.0)',
         ],
         'options' => [
-            'json' => 'Output setting or entire config as json',
+            'dump' => 'Output the entire config as json',
         ],
     ],
     'config:set' => [
@@ -24,10 +24,14 @@ return [
         'errors' => [
             'append' => 'Cannot append to non-array setting',
             'failed' => 'Failed to set :setting',
-            'invalid' => 'This is not a valid setting. Please check your spelling',
+            'invalid' => 'This is not a valid setting. Please check your input',
+            'invalid_os' => 'Specified OS (:os) does not exist',
             'nodb' => 'Database is not connected',
             'no-validation' => 'Cannot set :setting, it is missing validation definition.',
         ],
+    ],
+    'db:seed' => [
+        'existing_config' => 'Database contains existing settings. Continue?',
     ],
     'dev:check' => [
         'description' => 'LibreNMS code checks. Running with no options runs all checks',
@@ -58,6 +62,26 @@ return [
         'exit' => 'Ctrl-C to stop',
         'removed' => 'Device :id removed',
         'updated' => 'Device :hostname (:id) updated',
+    ],
+    'key:rotate' => [
+        'description' => 'Rotate APP_KEY, this decrypts all encrypted data with the given old key and stores it with the new key in APP_KEY.',
+        'arguments' => [
+            'old_key' => 'The old APP_KEY which is valid for encrypted data',
+        ],
+        'cleared-cache' => 'Config was cached, cleared cache to make sure APP_KEY is correct. Please re-run lnms key:rotate',
+        'backup_keys' => 'Document BOTH keys! In case something goes wrong set the new key in .env and use the old key as an argument to this command',
+        'backups' => 'This command could cause irreversible loss of data and will invalidate all browser sessions. Make sure you have backups.',
+        'confirm' => 'I have backups and want to continue',
+        'decrypt-failed' => 'Failed to decrypt :item, skipping',
+        'failed' => 'Failed to decrypt item(s).  Set new key as APP_KEY and run this again with the old key as an argument.',
+        'new_key' => 'New key: :key',
+        'old_key' => 'Old key: :key',
+        'save_key' => 'Save new key to .env?',
+        'success' => 'Successfully rotated keys!',
+        'validation-errors' => [
+            'not_in' => ':attribute must not match current APP_KEY',
+            'required' => 'Either old key or --generate-new-key is required.',
+        ],
     ],
     'smokeping:generate' => [
         'args-nonsense' => 'Use one of --probes and --targets',
