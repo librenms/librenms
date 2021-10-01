@@ -7,7 +7,6 @@ use App\Models\Device;
 use Illuminate\Validation\Rule;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\VarDumper\VarDumper;
 
 class SnmpFetch extends LnmsCommand
 {
@@ -89,9 +88,7 @@ class SnmpFetch extends LnmsCommand
 
                 return 0;
             case 'table':
-                $dumper = new VarDumper();
-
-                dump($res->table($this->option('depth')));
+                dump($res->table((int) $this->option('depth')));
 
                 return 0;
         }

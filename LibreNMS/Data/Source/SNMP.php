@@ -190,7 +190,7 @@ class SNMP
      * Translate an OID.
      * Specify -On option to output numeric OID.
      *
-     * @param $oid
+     * @param  array|string  $oid
      * @return \LibreNMS\Data\Source\SnmpResponse
      */
     public function translate($oid): SnmpResponse
