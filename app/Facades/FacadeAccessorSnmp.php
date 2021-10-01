@@ -31,6 +31,6 @@ class FacadeAccessorSnmp extends Facade
 {
     protected static function getFacadeAccessor()
     {
-        return \LibreNMS\Data\Source\SNMP::class;
+        return \LibreNMS\Data\Source\SnmpQuery::class;
     }
 }

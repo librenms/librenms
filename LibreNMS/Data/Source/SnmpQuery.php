@@ -36,7 +36,7 @@ use LibreNMS\Util\Rewrite;
 use Log;
 use Symfony\Component\Process\Process;
 
-class SNMP
+class SnmpQuery
 {
     /**
      * @var array
@@ -97,7 +97,7 @@ class SNMP
     /**
      * Easy way to start a new instance
      */
-    public static function make(): SNMP
+    public static function make(): SnmpQuery
     {
         return new static;
     }
@@ -106,7 +106,7 @@ class SNMP
      * Specify a device to make the snmp query against.
      * By default the query will use the primary device.
      */
-    public function device(Device $device): SNMP
+    public function device(Device $device): SnmpQuery
     {
         $this->device = $device;
 
@@ -117,7 +117,7 @@ class SNMP
      * Set a context for the snmp query
      * This is most commonly used to fetch alternate sets of data, such as different VRFs
      */
-    public function context(string $context): SNMP
+    public function context(string $context): SnmpQuery
     {
         $this->context = $context;
 
@@ -128,7 +128,7 @@ class SNMP
      * Set an additional MIB directory to search for MIBs.
      * You do not need to specify the base and os directories, they are already included.
      */
-    public function mibDir(string $dir): SNMP
+    public function mibDir(string $dir): SnmpQuery
     {
         $this->mibDir = $dir;
 
@@ -138,7 +138,7 @@ class SNMP
     /**
      * Output all OIDs numerically
      */
-    public function numeric(bool $enabled = true): SNMP
+    public function numeric(bool $enabled = true): SnmpQuery
     {
         if ($enabled) {
             $this->options = array_merge($this->options, ['-On']);
@@ -160,7 +160,7 @@ class SNMP
      * @param  array|string  $options
      * @return $this
      */
-    public function options($options = []): SNMP
+    public function options($options = []): SnmpQuery
     {
         $this->options = Arr::wrap($options);
 
