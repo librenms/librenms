@@ -646,7 +646,7 @@ function createHost(
     $device_id = dbInsert($device, 'devices');
     if ($device_id) {
         log_event("Device $host has been created", 0, 'system', 3);
-        
+
         return $device_id;
     }
 
