@@ -54,14 +54,13 @@ class SnmpFetch extends LnmsCommand
         $output = $this->option('output')
             ?: ($type == 'walk' ? 'table' : 'value');
 
-        $options = [];
+        $request = \NetSnmp::make();
         if ($this->option('numeric')) {
-            $options[] = '-On';
+            $request->numeric();
         }
 
         /** @var \LibreNMS\Data\Source\SnmpResponse $res */
-        $res = \NetSnmp::options($options)
-            ->$type($this->argument('oid'));
+        $res = $request->$type($this->argument('oid'));
 
         if (! $res->isValid()) {
             $this->line($res->raw());

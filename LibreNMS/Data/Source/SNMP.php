@@ -95,11 +95,16 @@ class SNMP
     }
 
     /**
+     * Easy way to start a new instance
+     */
+    public static function make(): SNMP
+    {
+        return new static;
+    }
+
+    /**
      * Specify a device to make the snmp query against.
      * By default the query will use the primary device.
-     *
-     * @param  \App\Models\Device  $device
-     * @return $this
      */
     public function device(Device $device): SNMP
     {
@@ -111,9 +116,6 @@ class SNMP
     /**
      * Set a context for the snmp query
      * This is most commonly used to fetch alternate sets of data, such as different VRFs
-     *
-     * @param  string  $context
-     * @return $this
      */
     public function context(string $context): SNMP
     {
@@ -125,9 +127,6 @@ class SNMP
     /**
      * Set an additional MIB directory to search for MIBs.
      * You do not need to specify the base and os directories, they are already included.
-     *
-     * @param  string  $dir
-     * @return $this
      */
     public function mibDir(string $dir): SNMP
     {
@@ -137,13 +136,25 @@ class SNMP
     }
 
     /**
+     * Output all OIDs numerically
+     */
+    public function numeric(): SNMP
+    {
+        $this->options = array_merge($this->options, ['-On']);
+
+        return $this;
+    }
+
+    /**
      * Set option(s) for net-snmp command line.
      * Some options may break parsing, but you can manually parse the raw output if needed.
+     * This will override other options set such as setting numeric.  Call with no options to reset to default.
+     * Try to avoid setting options this way to keep the API generic.
      *
      * @param  array|string  $options
      * @return $this
      */
-    public function options($options): SNMP
+    public function options($options = []): SNMP
     {
         $this->options = Arr::wrap($options);
 
