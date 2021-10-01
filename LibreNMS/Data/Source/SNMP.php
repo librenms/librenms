@@ -198,7 +198,7 @@ class SNMP
         return $this->exec('snmptranslate', $this->parseOid($oid));
     }
 
-    private function recordStatistic(string $type, $start_time): void
+    private function recordStatistic(string $type, float $start_time): void
     {
         global $snmp_stats;
 
