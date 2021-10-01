@@ -59,8 +59,8 @@ class SnmpFetch extends LnmsCommand
             ->$type($this->argument('oid'));
 
         if (! $res->isValid()) {
-            $this->line($res->raw());
             $this->alert(trans('commands.snmp:fetch.failed'));
+            $this->line($res->getErrorMessage());
             $res->isValid();
 
             return 1;

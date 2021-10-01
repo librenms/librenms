@@ -2,7 +2,7 @@
 /*
  * SnmpResponse.php
  *
- * -Description-
+ * Responsible for parsing net-snmp output into usable PHP data structures.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -40,26 +40,57 @@ class SnmpResponse
      * @var int
      */
     private $exitCode;
+    /**
+     * @var string
+     */
+    private $errorMessage;
+    /**
+     * @var string
+     */
+    private $stderr;
 
-    public function __construct(string $output, int $exitCode = 0)
+    /**
+     * Create a new response object filling with output from the net-snmp command.
+     *
+     * @param  string  $output
+     * @param  string  $errorOutput
+     * @param  int  $exitCode
+     */
+    public function __construct(string $output, string $errorOutput = '', int $exitCode = 0)
     {
         $this->exitCode = $exitCode;
         $this->raw = preg_replace('/Wrong Type \(should be .*\): /', '', $output);
+        $this->stderr = $errorOutput;
     }
 
     public function isValid(): bool
     {
+        $this->errorMessage = '';
         // not checking exitCode because I think it may lead to false negatives
-        $invalid = empty($this->raw)
-            || preg_match('/(No Such Instance|No Such Object|No more variables left|Authentication failure|Timeout: No Response from)/', $this->raw, $matches);
+        $invalid = preg_match('/(Timeout: No Response from .*|Unknown user name|Authentication failure)/', $this->stderr, $errors)
+            || empty($this->raw)
+            || preg_match('/(No Such Instance|No Such Object|No more variables left).*/', $this->raw, $errors);
 
         if ($invalid) {
-            Log::debug(sprintf('SNMP query failed. Exit Code: %s Empty: %s Bad String: %s', $this->exitCode, var_export(empty($this->raw), true), $matches[1] ?? 'not found'));
+            $this->errorMessage = $errors[0] ?? 'Empty Output';
+            Log::debug(sprintf('SNMP query failed. Exit Code: %s Empty: %s Bad String: %s', $this->exitCode, var_export(empty($this->raw), true), $errors[0] ?? 'not found'));
 
             return false;
         }
 
         return true;
+    }
+
+    /**
+     * Get the error message if any
+     */
+    public function getErrorMessage(): string
+    {
+        if (empty($this->errorMessage)) {
+            $this->isValid(); // if no error message, double check.
+        }
+
+        return $this->errorMessage;
     }
 
     /**

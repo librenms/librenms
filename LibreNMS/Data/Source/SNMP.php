@@ -303,7 +303,7 @@ class SNMP
 
         $this->recordStatistic($command, $time_start);
 
-        return new SnmpResponse($output, $exitCode);
+        return new SnmpResponse($output, $stderr, $exitCode);
     }
 
     private function initCommand(string $binary): array
