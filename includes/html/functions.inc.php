@@ -753,8 +753,10 @@ function alert_details($details)
         $details = json_decode(gzuncompress($details), true);
     }
 
-    $fault_detail = '';
+    $max_row_length = 0;
+    $all_fault_detail = '';
     foreach ($details['rule'] as $o => $tmp_alerts) {
+        $fault_detail = '';
         $fallback = true;
         $fault_detail .= '#' . ($o + 1) . ':&nbsp;';
         if ($tmp_alerts['bill_id']) {
@@ -861,9 +863,13 @@ function alert_details($details)
         }
 
         $fault_detail .= '<br>';
+
+        $max_row_length = strlen(strip_tags($fault_detail)) > $max_row_length ? strlen(strip_tags($fault_detail)) : $max_row_length;
+
+        $all_fault_detail .= $fault_detail;
     }//end foreach
 
-    return $fault_detail;
+    return array($all_fault_detail, $max_row_length);
 }//end alert_details()
 
 function dynamic_override_config($type, $name, $device)

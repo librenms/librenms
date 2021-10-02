@@ -27,7 +27,7 @@
             group: '{{ $device_group }}',
             proc: '{{ $proc }}',
             sort: '{{ $sort }}',
-            details: '{{ $details }}',
+            uncollapse_key_count: '{{ $uncollapse_key_count }}',
             device_id: '{{ $device }}'
         }),
         responseHandler: response => {
