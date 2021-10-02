@@ -39,7 +39,7 @@ class Fping
      * @param  int  $interval  (min 20)
      * @param  int  $timeout  (not more than $interval)
      * @param  string  $address_family  ipv4 or ipv6
-     * @return array
+     * @return \LibreNMS\Data\Source\FpingResponse
      */
     public function ping($host, $count = 3, $interval = 1000, $timeout = 500, $address_family = 'ipv4'): FpingResponse
     {
