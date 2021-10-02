@@ -110,7 +110,7 @@ $format = $vars['format'];
 foreach (dbFetchRows($sql, $param) as $alert) {
     $log = dbFetchCell('SELECT details FROM alert_log WHERE rule_id = ? AND device_id = ? ORDER BY id DESC LIMIT 1', [$alert['rule_id'], $alert['device_id']]);
     $alert_log_id = dbFetchCell('SELECT id FROM alert_log WHERE rule_id = ? AND device_id = ? ORDER BY id DESC LIMIT 1', [$alert['rule_id'], $alert['device_id']]);
-    list($fault_detail, $max_row_length) = alert_details($log);
+    [$fault_detail, $max_row_length] = alert_details($log);
     $info = json_decode($alert['info'], true);
 
     $alert_to_ack = '<button type="button" class="btn btn-danger command-ack-alert fa fa-eye" aria-hidden="true" title="Mark as acknowledged" data-target="ack-alert" data-state="' . $alert['state'] . '" data-alert_id="' . $alert['id'] . '" data-alert_state="' . $alert['state'] . '" name="ack-alert"></button>';
