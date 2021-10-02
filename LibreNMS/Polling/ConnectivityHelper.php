@@ -1,8 +1,8 @@
 <?php
 /*
- * PollerHelper.php
+ * ConnectivityHelper.php
  *
- * -Description-
+ * Helper to check the connectivity to a device and optionally save metrics about that connectivity
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -34,7 +34,7 @@ use LibreNMS\RRD\RrdDefinition;
 use Log;
 use Symfony\Component\Process\Process;
 
-class PollerHelper
+class ConnectivityHelper
 {
     /**
      * @var \App\Models\Device
@@ -43,11 +43,15 @@ class PollerHelper
     /**
      * @var bool
      */
-    private $savePingPerf = false;
+    private $saveMetrics = false;
     /**
      * @var string
      */
     private $family;
+    /**
+     * @var string
+     */
+    private $target;
 
     public function __construct(Device $device)
     {
@@ -55,15 +59,17 @@ class PollerHelper
         $this->target = $device->overwrite_ip ?: $device->hostname;
     }
 
-    public function savePingPerf()
+    /**
+     * After pinging the device, save metrics about the ping response
+     */
+    public function saveMetrics(): void
     {
-        $this->savePingPerf = true;
+        $this->saveMetrics = true;
     }
 
     /**
      * Check if the device is up.
      * Save availability and ping data if enabled with savePingPerf()
-     *
      */
     public function isUp(): bool
     {
@@ -74,18 +80,21 @@ class PollerHelper
         $this->device->status = $ping_response->success();
         if ($this->device->status) {
             // if up (or ping disabled), check snmp too
-            $this->device->status = $this->device->snmp_disable || $this->isSNMPable();
-            $this->device->status_reason = $this->device->status ? '' : 'snmp';
+            $status = $this->device->snmp_disable || $this->isSNMPable();
+            $this->device->status_reason = $status ? '' : 'snmp';
+            $this->device->status = $status;
         } else {
             $this->device->status_reason = 'ping';
         }
 
-        $this->updateAvailability($previous, $this->device->status);
+        if ($this->saveMetrics) {
+            if ($this->canPing()) {
+                $this->savePingStats($ping_response);
+            }
+            $this->updateAvailability($previous, $this->device->status);
 
-        if ($this->savePingPerf && $this->canPing()) {
-            $this->savePingStats($ping_response);
+            $this->device->save(); // confirm device is saved
         }
-        $this->device->save(); // confirm device is saved
 
         return $this->device->status;
     }
@@ -115,14 +124,14 @@ class PollerHelper
         return $status;
     }
 
-    public function isSNMPable()
+    public function isSNMPable(): bool
     {
         $response = \NetSnmp::device($this->device)->get('SNMPv2-MIB::sysObjectID.0');
 
         return $response->getExitCode() === 0 && $response->isValid();
     }
 
-    public function traceroute()
+    public function traceroute(): array
     {
         $command = [Config::get('traceroute', 'traceroute'), '-q', '1', '-w', '1', $this->target];
         if ($this->ipFamily() == 'ipv6') {
@@ -137,7 +146,7 @@ class PollerHelper
         ];
     }
 
-    public function canPing()
+    public function canPing(): bool
     {
         return Config::get('icmp_check') && ! ($this->device->exists && $this->device->getAttrib('override_icmp_disable') === 'true');
     }
@@ -151,7 +160,7 @@ class PollerHelper
         return $this->family;
     }
 
-    private function updateAvailability($previous, $status): void
+    private function updateAvailability(bool $previous, bool $status): void
     {
         if (Config::get('graphing.availability_consider_maintenance') && $this->device->isUnderMaintenance()) {
             return;
@@ -190,7 +199,5 @@ class PollerHelper
         ], [
             'ping' => $ping_response->avg_latency,
         ]);
-
-//        $os->enableGraph('ping_perf'); // FIXME
     }
 }

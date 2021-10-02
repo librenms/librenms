@@ -29,24 +29,51 @@ use App\Models\DevicePerf;
 
 class FpingResponse
 {
+    /**
+     * @var int
+     */
     public $transmitted;
+    /**
+     * @var int
+     */
     public $received;
+    /**
+     * @var int
+     */
     public $loss;
+    /**
+     * @var float
+     */
     public $min_latency;
+    /**
+     * @var float
+     */
     public $max_latency;
+    /**
+     * @var float
+     */
     public $avg_latency;
+    /**
+     * @var int
+     */
     public $duplicates;
+    /**
+     * @var int
+     */
     public $exit_code;
+    /**
+     * @var bool
+     */
     private $skipped;
 
     /**
-     * @param  int  $transmitted ICMP packets transmitted
-     * @param  int  $received ICMP packets received
-     * @param  int  $loss Percentage of packets lost
-     * @param  float  $min_latency Minimum latency (ms)
-     * @param  float  $max_latency Maximum latency (ms)
-     * @param  float  $avg_latency Average latency (ms)
-     * @param  int  $duplicates Number of duplicate responses (Indicates network issue)
+     * @param  int  $transmitted  ICMP packets transmitted
+     * @param  int  $received  ICMP packets received
+     * @param  int  $loss  Percentage of packets lost
+     * @param  float  $min_latency  Minimum latency (ms)
+     * @param  float  $max_latency  Maximum latency (ms)
+     * @param  float  $avg_latency  Average latency (ms)
+     * @param  int  $duplicates  Number of duplicate responses (Indicates network issue)
      * @param  int  $exit_code Return code from fping
      */
     public function __construct(int $transmitted, int $received, int $loss, float $min_latency, float $max_latency, float $avg_latency, int $duplicates, int $exit_code, bool $skipped = false)

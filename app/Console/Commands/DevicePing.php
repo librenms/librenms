@@ -6,7 +6,7 @@ use App\Console\LnmsCommand;
 use App\Models\Device;
 use Illuminate\Database\Eloquent\Builder;
 use LibreNMS\Config;
-use LibreNMS\Polling\PollerHelper;
+use LibreNMS\Polling\ConnectivityHelper;
 use Symfony\Component\Console\Input\InputArgument;
 
 class DevicePing extends LnmsCommand
@@ -29,7 +29,7 @@ class DevicePing extends LnmsCommand
      *
      * @return int
      */
-    public function handle()
+    public function handle(): int
     {
         $spec = $this->argument('device spec');
         $devices = Device::when($spec !== 'all', function (Builder $query) use ($spec) {
@@ -46,7 +46,7 @@ class DevicePing extends LnmsCommand
 
         /** @var Device $device */
         foreach ($devices as $device) {
-            $helper = new PollerHelper($device);
+            $helper = new ConnectivityHelper($device);
             $response = $helper->isPingable();
 
             $this->line($device->displayName() . ' : ' . ($response->wasSkipped() ? 'skipped' : $response));

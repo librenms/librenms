@@ -411,7 +411,7 @@ function addHost($host, $snmp_version = '', $port = 161, $transport = 'udp', $po
 
     // Test reachability
     if (! $force_add) {
-        if (! ((new \LibreNMS\Polling\PollerHelper(new Device(['hostname' => $ip])))->isPingable()->success())) {
+        if (! ((new \LibreNMS\Polling\ConnectivityHelper(new Device(['hostname' => $ip])))->isPingable()->success())) {
             throw new HostUnreachablePingException("Could not ping $host");
         }
     }

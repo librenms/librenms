@@ -289,8 +289,8 @@ function poll_device($device, $force_module = false)
         echo "Created directory : $host_rrd\n";
     }
 
-    $helper = new \LibreNMS\Polling\PollerHelper(DeviceCache::getPrimary());
-    $helper->savePingPerf();
+    $helper = new \LibreNMS\Polling\ConnectivityHelper(DeviceCache::getPrimary());
+    $helper->saveMetrics();
 
     if ($helper->isUp()) {
         if ($device['snmp_disable']) {
@@ -356,10 +356,11 @@ function poll_device($device, $force_module = false)
             }
         }
 
-        // Ping response FIXME
+        // Ping response
         if ($helper->canPing()) {
-            $os->enableGraph('poller_modules_perf');
+            $os->enableGraph('ping_perf');
         }
+        $os->enableGraph('poller_modules_perf');
 
         if (! $force_module) {
             // don't update last_polled time if we are forcing a specific module to be polled
