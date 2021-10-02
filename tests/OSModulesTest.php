@@ -28,9 +28,9 @@ namespace LibreNMS\Tests;
 use DeviceCache;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use LibreNMS\Config;
+use LibreNMS\Data\Source\Fping;
 use LibreNMS\Exceptions\FileNotFoundException;
 use LibreNMS\Exceptions\InvalidModuleException;
-use LibreNMS\Fping;
 use LibreNMS\Util\Debug;
 use LibreNMS\Util\ModuleTestHelper;
 
@@ -172,7 +172,7 @@ class OSModulesTest extends DBTestCase
         });
 
         $this->app->bind(Fping::class, function ($app) {
-            $mock = \Mockery::mock('\LibreNMS\Fping');
+            $mock = \Mockery::mock('\LibreNMS\Data\Source\Fping');
             $mock->shouldReceive('ping')->andReturn([
                 'xmt' => 3,
                 'rcv' => 3,

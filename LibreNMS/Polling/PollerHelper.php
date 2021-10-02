@@ -28,6 +28,8 @@ namespace LibreNMS\Polling;
 use App\Models\Device;
 use App\Models\DeviceOutage;
 use LibreNMS\Config;
+use LibreNMS\Data\Source\Fping;
+use LibreNMS\Data\Source\FpingResponse;
 use LibreNMS\RRD\RrdDefinition;
 use Log;
 use Symfony\Component\Process\Process;
@@ -88,7 +90,7 @@ class PollerHelper
     public function isPingable(): FpingResponse
     {
         if (! $this->canPing()) {
-            return \LibreNMS\Polling\FpingResponse::artificialUp();
+            return FpingResponse::artificialUp();
         }
 
         $status = app()->make(Fping::class)->ping(
@@ -165,7 +167,7 @@ class PollerHelper
     }
 
     /**
-     * @param  \LibreNMS\Polling\FpingResponse  $ping_response
+     * @param  \LibreNMS\Data\Source\FpingResponse  $ping_response
      */
     private function savePingStats(FpingResponse $ping_response): void
     {

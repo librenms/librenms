@@ -23,7 +23,7 @@
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
-namespace LibreNMS\Polling;
+namespace LibreNMS\Data\Source;
 
 use App\Models\DevicePerf;
 

@@ -11,13 +11,13 @@
 use App\Models\Device;
 use Illuminate\Support\Str;
 use LibreNMS\Config;
+use LibreNMS\Data\Source\Fping;
 use LibreNMS\Exceptions\HostExistsException;
 use LibreNMS\Exceptions\HostIpExistsException;
 use LibreNMS\Exceptions\HostUnreachableException;
 use LibreNMS\Exceptions\HostUnreachablePingException;
 use LibreNMS\Exceptions\InvalidPortAssocModeException;
 use LibreNMS\Exceptions\SnmpVersionUnsupportedException;
-use LibreNMS\Fping;
 use LibreNMS\Modules\Core;
 use LibreNMS\Util\Debug;
 use LibreNMS\Util\IPv4;
