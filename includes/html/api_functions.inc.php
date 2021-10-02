@@ -2045,18 +2045,31 @@ function add_device_group(Illuminate\Http\Request $request)
         return api_error(422, $v->messages());
     }
 
+<<<<<<< HEAD
     if (! empty($data['rules'])) {
         // Only use the rules if they are able to be parsed by the QueryBuilder
+=======
+    $deviceGroup = DeviceGroup::make(['name' => $data['name'], 'type' => $data['type'], 'desc' => $data['desc']]);
+
+    // Only use the rules if they are able to be parsed by the QueryBuilder
+    if ($data['type'] == 'dynamic') {
+>>>>>>> 7a9a139a13050ae204408e74a605aa302744521d
         $query = QueryBuilderParser::fromJson($data['rules'])->toSql();
         if (empty($query)) {
             return api_error(500, "We couldn't parse your rule");
         }
+<<<<<<< HEAD
     }
 
     $deviceGroup = DeviceGroup::make(['name' => $data['name'], 'type' => $data['type'], 'desc' => $data['desc']]);
     if ($data['type'] == 'dynamic') {
         $deviceGroup->rules = json_decode($data['rules']);
     }
+=======
+	$deviceGroup->rules = json_decode($data['rules']);
+    }
+
+>>>>>>> 7a9a139a13050ae204408e74a605aa302744521d
     $deviceGroup->save();
 
     if ($data['type'] == 'static') {
