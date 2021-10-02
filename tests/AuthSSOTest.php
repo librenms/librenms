@@ -397,6 +397,7 @@ class AuthSSOTest extends DBTestCase
 
         $this->basicEnvironmentEnv();
 
+        Config::set('sso.static_level', 0);
         Config::set('sso.group_strategy', 'map');
         Config::set('sso.group_delimiter', ';');
         Config::set('sso.group_attr', 'member');
