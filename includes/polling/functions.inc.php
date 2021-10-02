@@ -236,7 +236,8 @@ function poll_device($device, $force_module = false)
 
     $device_start = microtime(true);
 
-    $attribs = DeviceCache::getPrimary()->getAttribs();
+    $deviceModel = DeviceCache::getPrimary();
+    $attribs = $deviceModel->getAttribs();
     $device['attribs'] = $attribs;
 
     load_os($device);
@@ -289,7 +290,7 @@ function poll_device($device, $force_module = false)
         echo "Created directory : $host_rrd\n";
     }
 
-    $helper = new \LibreNMS\Polling\ConnectivityHelper(DeviceCache::getPrimary());
+    $helper = new \LibreNMS\Polling\ConnectivityHelper($deviceModel);
     $helper->saveMetrics();
 
     if ($helper->isUp()) {
@@ -299,6 +300,10 @@ function poll_device($device, $force_module = false)
             // we always want the core module to be included, prepend it
             Config::set('poller_modules', ['core' => true, 'availability' => true] + Config::get('poller_modules'));
         }
+
+        // update $device array status
+        $device['status'] = $deviceModel->status;
+        $device['status_reason'] = $deviceModel->status_reason;
 
         printChangedStats(true); // don't count previous stats
         foreach (Config::get('poller_modules') as $module => $module_status) {

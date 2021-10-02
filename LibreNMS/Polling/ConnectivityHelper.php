@@ -182,7 +182,7 @@ class ConnectivityHelper
     }
 
     /**
-     * @param  \LibreNMS\Data\Source\FpingResponse  $ping_response
+     * Save the ping stats to db and rrd, also updates last_ping_timetaken and saves the device model.
      */
     private function savePingStats(FpingResponse $ping_response): void
     {
