@@ -60,6 +60,11 @@ class PollerHelper
         $this->savePingPerf = true;
     }
 
+    /**
+     * Check if the device is up.
+     * Save availability and ping data if enabled with savePingPerf()
+     *
+     */
     public function isUp(): bool
     {
         $previous = $this->device->status;

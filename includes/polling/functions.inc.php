@@ -289,9 +289,10 @@ function poll_device($device, $force_module = false)
         echo "Created directory : $host_rrd\n";
     }
 
-    $response = device_is_up($device, true);
+    $helper = new \LibreNMS\Polling\PollerHelper(DeviceCache::getPrimary());
+    $helper->savePingPerf();
 
-    if ($response['status'] == '1') {
+    if ($helper->isUp()) {
         if ($device['snmp_disable']) {
             Config::set('poller_modules', ['availability' => true]);
         } else {
@@ -355,35 +356,8 @@ function poll_device($device, $force_module = false)
             }
         }
 
-        // Ping response
-        if (can_ping_device($attribs) === true && ! empty($response['ping_time'])) {
-            $tags = [
-                'rrd_def' => RrdDefinition::make()->addDataset('ping', 'GAUGE', 0, 65535),
-            ];
-            $fields = [
-                'ping' => $response['ping_time'],
-            ];
-
-            $update_array['last_ping'] = ['NOW()'];
-            $update_array['last_ping_timetaken'] = $response['ping_time'];
-
-            data_update($device, 'ping-perf', $tags, $fields);
-            $os->enableGraph('ping_perf');
-        }
-
-        $device_time = round(microtime(true) - $device_start, 3);
-
-        // Poller performance
-        if (! empty($device_time)) {
-            $tags = [
-                'rrd_def' => RrdDefinition::make()->addDataset('poller', 'GAUGE', 0),
-                'module'  => 'ALL',
-            ];
-            $fields = [
-                'poller' => $device_time,
-            ];
-
-            data_update($device, 'poller-perf', $tags, $fields);
+        // Ping response FIXME
+        if ($helper->canPing()) {
             $os->enableGraph('poller_modules_perf');
         }
 
