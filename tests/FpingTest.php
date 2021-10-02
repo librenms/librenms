@@ -75,7 +75,6 @@ class FpingTest extends TestCase
         $this->assertEquals(0.23, $actual->avg_latency);
         $this->assertEquals(0, $actual->duplicates);
         $this->assertEquals(0, $actual->exit_code);
-
     }
 
     public function testDownPing()
