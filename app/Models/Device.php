@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Illuminate\Database\Query\JoinClause;
 use Illuminate\Support\Str;
@@ -631,9 +632,9 @@ class Device extends BaseModel
         return $this->hasMany(HrDevice::class, 'device_id');
     }
 
-    public function hostResourceValues(): HasMany
+    public function hostResourceValues(): HasOne
     {
-        return $this->hasMany(HrSystem::class, 'device_id');
+        return $this->hasOne(HrSystem::class, 'device_id');
     }
 
     public function entityPhysical(): HasMany
