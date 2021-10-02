@@ -32,7 +32,8 @@ class DevicePing extends LnmsCommand
     public function handle(): int
     {
         $spec = $this->argument('device spec');
-        $devices = Device::when($spec !== 'all', function (Builder $query) use ($spec) {
+        $devices = Device::query()->when($spec !== 'all', function (Builder $query) use ($spec) {
+            /** @phpstan-var Builder<Device> $query */
             return $query->where('device_id', $spec)
                 ->orWhere('hostname', $spec)
                 ->limit(1);
