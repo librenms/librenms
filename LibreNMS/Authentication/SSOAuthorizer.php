@@ -202,11 +202,7 @@ class SSOAuthorizer extends MysqlAuthorizer
             $groups = $valid_groups;
         }
 
-        if (is_numeric(Config::get('sso.static_level'))) {
-            $level = (int) Config::get('sso.static_level');
-        } else {
-            $level = 0;
-        }
+        $level = (int) Config::get('sso.static_level', 0);
 
         $config_map = Config::get('sso.group_level_map');
 
