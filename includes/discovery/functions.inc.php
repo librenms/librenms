@@ -139,7 +139,7 @@ function discover_device(&$device, $force_module = false)
 
     $helper = new \LibreNMS\Polling\ConnectivityHelper(DeviceCache::getPrimary());
 
-    if ($helper->isUp()) {
+    if (! $helper->isUp()) {
         return false;
     }
 
