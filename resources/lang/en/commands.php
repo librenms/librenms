@@ -67,7 +67,7 @@ return [
         'description' => 'Ping device and record data for response',
         'arguments' => [
             'device spec' => 'Device to ping one of: <Device ID>, <Hostname/IP>, all',
-        ]
+        ],
     ],
     'key:rotate' => [
         'description' => 'Rotate APP_KEY, this decrypts all encrypted data with the given old key and stores it with the new key in APP_KEY.',

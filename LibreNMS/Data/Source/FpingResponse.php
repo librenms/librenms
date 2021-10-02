@@ -74,7 +74,7 @@ class FpingResponse
      * @param  float  $max_latency  Maximum latency (ms)
      * @param  float  $avg_latency  Average latency (ms)
      * @param  int  $duplicates  Number of duplicate responses (Indicates network issue)
-     * @param  int  $exit_code Return code from fping
+     * @param  int  $exit_code  Return code from fping
      */
     public function __construct(int $transmitted, int $received, int $loss, float $min_latency, float $max_latency, float $avg_latency, int $duplicates, int $exit_code, bool $skipped = false)
     {

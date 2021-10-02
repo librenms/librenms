@@ -140,6 +140,7 @@ class ConnectivityHelper
 
         $process = new Process($command);
         $process->run();
+
         return [
             'traceroute' => $process->getOutput(),
             'output' => $process->getErrorOutput(),
