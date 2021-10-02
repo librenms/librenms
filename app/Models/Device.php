@@ -826,6 +826,11 @@ class Device extends BaseModel
         return $this->hasMany(\App\Models\MplsTunnelCHop::class, 'device_id');
     }
 
+    public function outages(): HasMany
+    {
+        return $this->hasMany(DeviceOutage::class, 'device_id');
+    }
+
     public function printerSupplies(): HasMany
     {
         return $this->hasMany(PrinterSupply::class, 'device_id');

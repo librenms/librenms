@@ -26,7 +26,9 @@
 namespace LibreNMS\Polling;
 
 use App\Models\Device;
+use App\Models\DeviceOutage;
 use LibreNMS\Config;
+use LibreNMS\RRD\RrdDefinition;
 use Log;
 use Symfony\Component\Process\Process;
 
@@ -57,91 +59,27 @@ class PollerHelper
 
     public function isUp(): bool
     {
-        $poller_target = Device::pollerTarget($device['hostname']);
-        $ping_response = isPingable($poller_target, $address_family, $device['attribs']);
-        $deviceModel = DeviceCache::get($device['device_id']);
-        $deviceModel->perf()->save($ping_response->toModel());
-        $device_perf = $ping_response['db'];
-        $device_perf['device_id'] = $device['device_id'];
-        $device_perf['timestamp'] = ['NOW()'];
-        $consider_maintenance = Config::get('graphing.availability_consider_maintenance');
-        $state_update_again = false;
+        $previous = $this->device->status;
+        $ping_response = $this->isPingable();
+
+        // check status: both disabled or up = up, one down = down
+        $this->device->status = $ping_response->success();
+        if ($this->device->status) {
+            // if up (or ping disabled), check snmp too
+            $this->device->status = $this->device->snmp_disable || $this->isSNMPable();
+            $this->device->status_reason = $this->device->status ? '' : 'snmp';
+        } else {
+            $this->device->status_reason = 'ping';
+        }
+
+        $this->updateAvailability($previous, $this->device->status);
 
         if ($this->savePingPerf && $this->canPing()) {
-            $perf = $ping_response->toModel();
-            if (! $ping_response->success() && Config::get('debug.run_trace', false)) {
-                $perf->debug = $this->traceroute();
-            }
-            $this->device->perf()->save($perf);
-            $this->device->last_ping_timetaken = $ping_response->avg_latency ?: $this->device->last_ping_timetaken;
-            $this->device->save();
+            $this->savePingStats($ping_response);
         }
+        $this->device->save(); // confirm device is saved
 
-        $response = [];
-        $response['ping_time'] = $ping_response['last_ping_timetaken'];
-        if ($ping_response['result']) {
-            if ($this->device->snmp_disable || isSNMPable($device)) {
-                $response['status'] = '1';
-                $response['status_reason'] = '';
-            } else {
-                echo 'SNMP Unreachable';
-                $response['status'] = '0';
-                $response['status_reason'] = 'snmp';
-            }
-        } else {
-            echo 'Unpingable';
-            $response['status'] = '0';
-            $response['status_reason'] = 'icmp';
-        }
-
-        // Special case where the device is still down, optional mode is on, device not in maintenance mode and has no ongoing outages
-        if (($consider_maintenance && ! ($deviceModel->isUnderMaintenance())) && ($device['status'] == '0' && $response['status'] == '0')) {
-            $state_update_again = empty(dbFetchCell('SELECT going_down FROM device_outages WHERE device_id=? AND up_again IS NULL ORDER BY going_down DESC', [$device['device_id']]));
-        }
-
-        if ($device['status'] != $response['status'] || $device['status_reason'] != $response['status_reason'] || $state_update_again) {
-            if (! $state_update_again) {
-                dbUpdate(
-                    ['status' => $response['status'], 'status_reason' => $response['status_reason']],
-                    'devices',
-                    'device_id=?',
-                    [$device['device_id']]
-                );
-            }
-
-            if ($response['status']) {
-                $type = 'up';
-                $reason = $device['status_reason'];
-
-                $going_down = dbFetchCell('SELECT going_down FROM device_outages WHERE device_id=? AND up_again IS NULL ORDER BY going_down DESC', [$device['device_id']]);
-                if (! empty($going_down)) {
-                    $up_again = time();
-                    dbUpdate(
-                        ['device_id' => $device['device_id'], 'up_again' => $up_again],
-                        'device_outages',
-                        'device_id=? and going_down=? and up_again is NULL',
-                        [$device['device_id'], $going_down]
-                    );
-                }
-            } else {
-                $type = 'down';
-                $reason = $response['status_reason'];
-
-                if ($device['status'] != $response['status']) {
-                    if (! $consider_maintenance || (! ($deviceModel->isUnderMaintenance()) && $consider_maintenance)) {
-                        // use current time as a starting point when an outage starts
-                        $data = ['device_id' => $device['device_id'],
-                            'going_down' => time(), ];
-                        dbInsert($data, 'device_outages');
-                    }
-                }
-            }
-
-            log_event('Device status changed to ' . ucfirst($type) . " from $reason check.", $device, $type);
-        }
-
-        return $response;
-
+        return $this->device->status;
     }
 
     /**
@@ -171,17 +109,9 @@ class PollerHelper
 
     public function isSNMPable()
     {
-        $pos = snmp_check($device);
-        if ($pos === true) {
-            return true;
-        } else {
-            $pos = snmp_get($device, 'sysObjectID.0', '-Oqv', 'SNMPv2-MIB');
-            if ($pos === '' || $pos === false) {
-                return false;
-            } else {
-                return true;
-            }
-        }
+        $response = \NetSnmp::device($this->device)->get('SNMPv2-MIB::sysObjectID.0');
+
+        return $response->getExitCode() === 0 && $response->isValid();
     }
 
     public function traceroute()
@@ -211,5 +141,48 @@ class PollerHelper
         }
 
         return $this->family;
+    }
+
+    private function updateAvailability($previous, $status): void
+    {
+        if (Config::get('graphing.availability_consider_maintenance') && $this->device->isUnderMaintenance()) {
+            return;
+        }
+
+        // check for open outage
+        $open_outage = $this->device->outages()->whereNull('up_again')->orderBy('going_down', 'desc')->first();
+
+        if ($status) {
+            if ($open_outage) {
+                $open_outage->up_again = time();
+                $open_outage->save();
+            }
+        } elseif ($previous || $open_outage === null) {
+            // status changed from up to down or there is no open outage
+            // open new outage
+            $this->device->outages()->save(new DeviceOutage(['going_down' => time()]));
+        }
+    }
+
+    /**
+     * @param  \LibreNMS\Polling\FpingResponse  $ping_response
+     */
+    private function savePingStats(FpingResponse $ping_response): void
+    {
+        $perf = $ping_response->toModel();
+        if (! $ping_response->success() && Config::get('debug.run_trace', false)) {
+            $perf->debug = $this->traceroute();
+        }
+        $this->device->perf()->save($perf);
+        $this->device->last_ping_timetaken = $ping_response->avg_latency ?: $this->device->last_ping_timetaken;
+        $this->device->save();
+
+        app('Datastore')->put($this->device->toArray(), 'ping-perf', [
+            'rrd_def' => RrdDefinition::make()->addDataset('ping', 'GAUGE', 0, 65535),
+        ], [
+            'ping' => $ping_response->avg_latency,
+        ]);
+
+//        $os->enableGraph('ping_perf'); // FIXME
     }
 }

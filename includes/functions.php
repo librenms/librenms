@@ -17,8 +17,8 @@ use LibreNMS\Exceptions\HostUnreachableException;
 use LibreNMS\Exceptions\HostUnreachablePingException;
 use LibreNMS\Exceptions\InvalidPortAssocModeException;
 use LibreNMS\Exceptions\SnmpVersionUnsupportedException;
+use LibreNMS\Fping;
 use LibreNMS\Modules\Core;
-use LibreNMS\Polling\Fping;
 use LibreNMS\Util\Debug;
 use LibreNMS\Util\IPv4;
 use LibreNMS\Util\IPv6;
@@ -415,7 +415,7 @@ function addHost($host, $snmp_version = '', $port = 161, $transport = 'udp', $po
     if (! $force_add) {
         $address_family = snmpTransportToAddressFamily($transport);
         $ping_result = isPingable($ip, $address_family);
-        if (! $ping_result->success()) {
+        if (! $ping_result['result']) {
             throw new HostUnreachablePingException("Could not ping $host");
         }
     }
@@ -499,26 +499,6 @@ function deviceArray($host, $community, $snmpver, $port = 161, $transport = 'udp
 
 function isSNMPable($device)
 {
-    $time_start = microtime(true);
-
-    try {
-        $oid = '.1.3.6.1.2.1.1.2.0';
-        $cmd = gen_snmpget_cmd($device, $oid, '-Oqvn');
-        $proc = new \Symfony\Component\Process\Process($cmd);
-        $proc->run();
-        $code = $proc->getExitCode();
-        Log::debug("SNMP Check response code: $code");
-    } catch (ProcessTimedOutException $e) {
-        Log::debug("Device didn't respond to snmpget before {$e->getExceededTimeout()}s timeout");
-    }
-
-    recordSnmpStatistic('snmpget', $time_start);
-
-    if ($code === 0) {
-        return true;
-    }
-
-    return false;
     $pos = snmp_check($device);
     if ($pos === true) {
         return true;
@@ -535,16 +515,19 @@ function isSNMPable($device)
 /**
  * Check if the given host responds to ICMP echo requests ("pings").
  *
- * @param  Device|string  $hostname  The hostname or IP address to send ping requests to.
+ * @param  string  $hostname  The hostname or IP address to send ping requests to.
  * @param  string  $address_family  The address family ('ipv4' or 'ipv6') to use. Defaults to IPv4.
  *                                  Will *not* be autodetected for IP addresses, so it has to be set to 'ipv6' when pinging an IPv6 address or an IPv6-only host.
  * @param  array  $attribs  The device attributes
- * @return \LibreNMS\Polling\FpingResponse
+ * @return array 'result' => bool pingable, 'last_ping_timetaken' => int time for last ping, 'db' => fping results
  */
 function isPingable($hostname, $address_family = 'ipv4', $attribs = [])
 {
     if (can_ping_device($attribs) !== true) {
-        return \LibreNMS\Polling\FpingResponse::artificialUp();
+        return [
+            'result' => true,
+            'last_ping_timetaken' => 0,
+        ];
     }
 
     $status = app()->make(Fping::class)->ping(
@@ -555,12 +538,16 @@ function isPingable($hostname, $address_family = 'ipv4', $attribs = [])
         $address_family
     );
 
-    if ($status->duplicates > 0) {
-        Log::event('Duplicate ICMP response detected! This could indicate a network issue.', DeviceCache::getByHostname($hostname), 'icmp', 4);
-        $status->exit_code = 0;   // when duplicate is detected fping returns 1. The device is up, but there is another issue. Clue admins in with above event.
+    if ($status['dup'] > 0) {
+        Log::event('Duplicate ICMP response detected! This could indicate a network issue.', getidbyname($hostname), 'icmp', 4);
+        $status['exitcode'] = 0;   // when duplicate is detected fping returns 1. The device is up, but there is another issue. Clue admins in with above event.
     }
 
-    return $status;
+    return [
+        'result' => ($status['exitcode'] == 0 && $status['loss'] < 100),
+        'last_ping_timetaken' => $status['avg'],
+        'db' => array_intersect_key($status, array_flip(['xmt', 'rcv', 'loss', 'min', 'max', 'avg'])),
+    ];
 }
 
 function getpollergroup($poller_group = '0')
@@ -1770,11 +1757,10 @@ function device_is_up($device, $record_perf = false)
     $address_family = snmpTransportToAddressFamily($device['transport']);
     $poller_target = Device::pollerTarget($device['hostname']);
     $ping_response = isPingable($poller_target, $address_family, $device['attribs']);
-    $deviceModel = DeviceCache::get($device['device_id']);
-    $deviceModel->perf()->save($ping_response->toModel());
     $device_perf = $ping_response['db'];
     $device_perf['device_id'] = $device['device_id'];
     $device_perf['timestamp'] = ['NOW()'];
+    $maintenance = DeviceCache::get($device['device_id'])->isUnderMaintenance();
     $consider_maintenance = Config::get('graphing.availability_consider_maintenance');
     $state_update_again = false;
 
@@ -1814,7 +1800,7 @@ function device_is_up($device, $record_perf = false)
     }
 
     // Special case where the device is still down, optional mode is on, device not in maintenance mode and has no ongoing outages
-    if (($consider_maintenance && ! ($deviceModel->isUnderMaintenance())) && ($device['status'] == '0' && $response['status'] == '0')) {
+    if (($consider_maintenance && ! $maintenance) && ($device['status'] == '0' && $response['status'] == '0')) {
         $state_update_again = empty(dbFetchCell('SELECT going_down FROM device_outages WHERE device_id=? AND up_again IS NULL ORDER BY going_down DESC', [$device['device_id']]));
     }
 
@@ -1847,7 +1833,7 @@ function device_is_up($device, $record_perf = false)
             $reason = $response['status_reason'];
 
             if ($device['status'] != $response['status']) {
-                if (! $consider_maintenance || (! ($deviceModel->isUnderMaintenance()) && $consider_maintenance)) {
+                if (! $consider_maintenance || (! $maintenance && $consider_maintenance)) {
                     // use current time as a starting point when an outage starts
                     $data = ['device_id' => $device['device_id'],
                         'going_down' => time(), ];
