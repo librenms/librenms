@@ -869,7 +869,7 @@ function alert_details($details)
         $all_fault_detail .= $fault_detail;
     }//end foreach
 
-    return array($all_fault_detail, $max_row_length);
+    return [$all_fault_detail, $max_row_length];
 }//end alert_details()
 
 function dynamic_override_config($type, $name, $device)
