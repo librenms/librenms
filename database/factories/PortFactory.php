@@ -23,7 +23,7 @@ class PortFactory extends Factory
     public function definition()
     {
         return [
-            'ifIndex' => $this->faker->unique()->numberBetween(), /* @phpstan-ignore-line */
+            'ifIndex' => $this->faker->unique()->numberBetween(),
             'ifName' => $this->faker->text(20),
             'ifDescr' => $this->faker->text(255),
             'ifLastChange' => $this->faker->unixTime(),

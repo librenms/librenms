@@ -26,7 +26,7 @@ class UserFactory extends Factory
 
         return [
             'auth_type' => 'mysql',
-            'username' => $this->faker->unique()->userName, /* @phpstan-ignore-line */
+            'username' => $this->faker->unique()->userName,
             'realname' => $this->faker->name,
             'email' => $this->faker->safeEmail,
             'password' => $password ?: $password = bcrypt('secret'),
