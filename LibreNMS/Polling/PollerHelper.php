@@ -34,9 +34,6 @@ use LibreNMS\RRD\RrdDefinition;
 use Log;
 use Symfony\Component\Process\Process;
 
-/**
- * @property string $family
- */
 class PollerHelper
 {
     /**
@@ -47,6 +44,10 @@ class PollerHelper
      * @var bool
      */
     private $savePingPerf = false;
+    /**
+     * @var string
+     */
+    private $family;
 
     public function __construct(Device $device)
     {

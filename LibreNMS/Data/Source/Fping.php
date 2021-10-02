@@ -71,7 +71,7 @@ class Fping
 
         $response = FpingResponse::parseOutput($process->getErrorOutput(), $process->getExitCode());
 
-        Log::debug('response: ', [$response]);
+        Log::debug("response: $response");
 
         return $response;
     }

@@ -5,7 +5,7 @@ namespace App\Console\Commands;
 use App\Console\LnmsCommand;
 use App\Models\Device;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Support\Arr;
+use LibreNMS\Config;
 use LibreNMS\Polling\PollerHelper;
 use Symfony\Component\Console\Input\InputArgument;
 
@@ -38,13 +38,18 @@ class DevicePing extends LnmsCommand
                 ->limit(1);
         })->get();
 
+        if ($devices->isEmpty()) {
+            $devices = [new Device(['hostname' => $spec])];
+        }
+
+        Config::set('icmp_check', true); // ignore icmp disabled, this is an explicit user action
+
         /** @var Device $device */
         foreach ($devices as $device) {
             $helper = new PollerHelper($device);
             $response = $helper->isPingable();
 
-            $device->perf()->saveMany(Arr::wrap($response->toModel()));
-            \Log::debug('ping: ' . var_export($response->success()), [$response]);
+            $this->line($device->displayName() . ' : ' . ($response->wasSkipped() ? 'skipped' : $response));
         }
 
         return 0;

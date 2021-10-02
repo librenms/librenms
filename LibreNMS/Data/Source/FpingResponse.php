@@ -37,6 +37,7 @@ class FpingResponse
     public $avg_latency;
     public $duplicates;
     public $exit_code;
+    private $skipped;
 
     /**
      * @param  int  $transmitted ICMP packets transmitted
@@ -48,7 +49,7 @@ class FpingResponse
      * @param  int  $duplicates Number of duplicate responses (Indicates network issue)
      * @param  int  $exit_code Return code from fping
      */
-    public function __construct(int $transmitted, int $received, int $loss, float $min_latency, float $max_latency, float $avg_latency, int $duplicates, int $exit_code)
+    public function __construct(int $transmitted, int $received, int $loss, float $min_latency, float $max_latency, float $avg_latency, int $duplicates, int $exit_code, bool $skipped = false)
     {
         $this->transmitted = $transmitted;
         $this->received = $received;
@@ -58,11 +59,17 @@ class FpingResponse
         $this->avg_latency = $avg_latency;
         $this->duplicates = $duplicates;
         $this->exit_code = $exit_code;
+        $this->skipped = $skipped;
     }
 
     public static function artificialUp(): FpingResponse
     {
-        return new FpingResponse(1, 1, 0, 0, 0, 0, 0, 0);
+        return new FpingResponse(1, 1, 0, 0, 0, 0, 0, 0, true);
+    }
+
+    public function wasSkipped(): bool
+    {
+        return $this->skipped;
     }
 
     public static function parseOutput(string $output, int $code): FpingResponse
@@ -103,9 +110,20 @@ class FpingResponse
             'xmt' => $this->transmitted,
             'rcv' => $this->received,
             'loss' => $this->loss,
-            'min' => $this->min_latency ?: null,
-            'max' => $this->max_latency ?: null,
-            'avg' => $this->avg_latency ?: null,
+            'min' => $this->min_latency,
+            'max' => $this->max_latency,
+            'avg' => $this->avg_latency,
         ]);
+    }
+
+    public function __toString()
+    {
+        $str = "xmt/rcv/%loss = $this->transmitted/$this->received/$this->loss%";
+
+        if ($this->max_latency) {
+            $str .= ", min/avg/max = $this->min_latency/$this->avg_latency/$this->max_latency";
+        }
+
+        return $str;
     }
 }
