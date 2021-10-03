@@ -20,7 +20,7 @@ Please ensure you keep your install [up to date](Updating.md).
 
 ## Trusted Proxies
 
-When using a reverse proxy, you may restrict the hosts allowedto forward
+When using a reverse proxy, you may restrict the hosts allowed to forward
 headers to LibreNMS. By default this allows all proxies, due to legacy reasons.
 
 Set APP_TRUSTED_PROXIES in your .env to an empty string or the urls to
