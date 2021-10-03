@@ -136,7 +136,7 @@ class ConnectivityHelper
     {
         $response = \NetSnmp::device($this->device)->get('SNMPv2-MIB::sysObjectID.0');
 
-        return $response->getExitCode() === 0 && $response->isValid();
+        return $response->getExitCode() === 0 || $response->isValid();
     }
 
     public function traceroute(): array

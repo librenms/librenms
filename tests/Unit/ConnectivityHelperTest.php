@@ -12,12 +12,7 @@ use LibreNMS\Tests\TestCase;
 
 class ConnectivityHelperTest extends TestCase
 {
-    /**
-     * A basic unit test example.
-     *
-     * @return void
-     */
-    public function testDeviceStatus()
+    public function testDeviceStatus(): void
     {
         // not called when ping is disabled
         $this->app->singleton(Fping::class, function ($app) {
@@ -154,5 +149,24 @@ class ConnectivityHelperTest extends TestCase
         $this->assertTrue($ch->isUp());
         $this->assertEquals(true, $device->status);
         $this->assertEquals('', $device->status_reason);
+    }
+
+    public function testIsSNMPable(): void
+    {
+        \NetSnmp::partialMock()->shouldReceive('get')
+            ->times(4)
+            ->andReturn(
+                new SnmpResponse('SNMPv2-MIB::sysObjectID.0 = .1', '', 0),
+                new SnmpResponse('SNMPv2-MIB::sysObjectID.0 = .1', '', 1),
+                new SnmpResponse('', '', 0),
+                new SnmpResponse('', '', 1)
+            );
+
+        $ch = new ConnectivityHelper(new Device());
+
+        $this->assertTrue($ch->isSNMPable());
+        $this->assertTrue($ch->isSNMPable());
+        $this->assertTrue($ch->isSNMPable());
+        $this->assertFalse($ch->isSNMPable());
     }
 }
