@@ -32,6 +32,7 @@ use LibreNMS\Data\Source\Fping;
 use LibreNMS\Data\Source\FpingResponse;
 use LibreNMS\RRD\RrdDefinition;
 use Log;
+use NetSnmp;
 use Symfony\Component\Process\Process;
 
 class ConnectivityHelper
@@ -75,8 +76,6 @@ class ConnectivityHelper
     {
         $previous = $this->device->status;
         $ping_response = $this->isPingable();
-
-        global $mark;
 
         // calculate device status
         if ($ping_response->success()) {
@@ -134,7 +133,7 @@ class ConnectivityHelper
 
     public function isSNMPable(): bool
     {
-        $response = \NetSnmp::device($this->device)->get('SNMPv2-MIB::sysObjectID.0');
+        $response = NetSnmp::device($this->device)->get('SNMPv2-MIB::sysObjectID.0');
 
         return $response->getExitCode() === 0 || $response->isValid();
     }

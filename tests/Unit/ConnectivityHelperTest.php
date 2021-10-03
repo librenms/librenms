@@ -9,14 +9,16 @@ use LibreNMS\Data\Source\FpingResponse;
 use LibreNMS\Data\Source\SnmpResponse;
 use LibreNMS\Polling\ConnectivityHelper;
 use LibreNMS\Tests\TestCase;
+use Mockery;
+use NetSnmp;
 
 class ConnectivityHelperTest extends TestCase
 {
     public function testDeviceStatus(): void
     {
         // not called when ping is disabled
-        $this->app->singleton(Fping::class, function ($app) {
-            $mock = \Mockery::mock(\LibreNMS\Data\Source\Fping::class);
+        $this->app->singleton(Fping::class, function () {
+            $mock = Mockery::mock(Fping::class);
             $up = FpingResponse::artificialUp();
             $down = new FpingResponse(1, 0, 100, 0, 0, 0, 0, 0);
             $mock->shouldReceive('ping')
@@ -38,7 +40,7 @@ class ConnectivityHelperTest extends TestCase
         // not called when snmp is disabled or ping up
         $up = new SnmpResponse('SNMPv2-MIB::sysObjectID.0 = .1');
         $down = new SnmpResponse('', '', 1);
-        \NetSnmp::partialMock()->shouldReceive('get')
+        NetSnmp::partialMock()->shouldReceive('get')
             ->times(6)
             ->andReturn(
                 $up,
@@ -49,7 +51,6 @@ class ConnectivityHelperTest extends TestCase
                 $down
             );
 
-        global $mark;
         $device = new Device();
 
         /** ping and snmp enabled */
@@ -91,7 +92,6 @@ class ConnectivityHelperTest extends TestCase
         $this->assertEquals(true, $device->status);
         $this->assertEquals('', $device->status_reason);
 
-        $mark = true;
         // ping up, snmp down
         $this->assertFalse($ch->isUp());
         $this->assertEquals(false, $device->status);
@@ -153,7 +153,7 @@ class ConnectivityHelperTest extends TestCase
 
     public function testIsSNMPable(): void
     {
-        \NetSnmp::partialMock()->shouldReceive('get')
+        NetSnmp::partialMock()->shouldReceive('get')
             ->times(4)
             ->andReturn(
                 new SnmpResponse('SNMPv2-MIB::sysObjectID.0 = .1', '', 0),
