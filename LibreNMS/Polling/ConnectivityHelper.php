@@ -76,14 +76,18 @@ class ConnectivityHelper
         $previous = $this->device->status;
         $ping_response = $this->isPingable();
 
-        // check status: both disabled or up = up, one down = down
+        // check status: both disabled or up = up, one up = up
         $this->device->status = $ping_response->success();
         if ($this->device->status) {
-            // if up (or ping disabled), check snmp too
-            $status = $this->device->snmp_disable || $this->isSNMPable();
-            $this->device->status_reason = $status ? '' : 'snmp';
-            $this->device->status = $status;
+            // Only check snmp if the device is pingable or ping is disabled
+            $status = $this->device->snmp_disable || $this->isSNMPable(); // snmp disabled or snmp success
+            $this->device->status_reason = $status ? '' : 'snmp'; // both up set reason as '' (or down by snmp)
+            if (! $this->canPing()) {
+                // if ping is disabled, update the status (otherwise just use status from ping, which we know is up at this point)
+                $this->device->status = $status;
+            }
         } else {
+            // ping failed and ping not disabled
             $this->device->status_reason = 'ping';
         }
 
