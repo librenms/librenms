@@ -18,6 +18,14 @@ an SSL certificate such as ones provided by [LetsEncrypt](http://www.letsencrypt
 
 Please ensure you keep your install [up to date](Updating.md).
 
+## Trusted Proxies
+
+When using a reverse proxy, you may restrict the hosts allowed to forward
+headers to LibreNMS. By default this allows all proxies, due to legacy reasons.
+
+Set APP_TRUSTED_PROXIES in your .env to an empty string or the urls to
+the proxies allowed to forward.
+
 # Reporting vulnerabilities
 
 Like anyone, we appreciate the work people put in to find flaws in
