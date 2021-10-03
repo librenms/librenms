@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class CreateHrSystemTable extends Migration
+class UpdateHrSystemTable extends Migration
 {
     /**
      * Run the migrations.
@@ -28,9 +28,9 @@ class CreateHrSystemTable extends Migration
     public function down()
     {
         Schema::table('hrSystem', function (Blueprint $table) {
-            $table->integer('hrSystemNumUsers')->default(0)->change();
-            $table->integer('hrSystemProcesses')->default(0)->change();
-            $table->integer('hrSystemMaxProcesses')->default(0)->change();
+            $table->integer('hrSystemNumUsers')->default(0)->nullable(false)->change();
+            $table->integer('hrSystemProcesses')->default(0)->nullable(false)->change();
+            $table->integer('hrSystemMaxProcesses')->default(0)->nullable(false)->change();
         });
     }
 }
