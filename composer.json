@@ -30,6 +30,7 @@
         "easybook/geshi": "^1.0.8",
         "ezyang/htmlpurifier": "^4.8",
         "fico7489/laravel-pivot": "^3.0",
+        "fideloper/proxy": "^4.4",
         "fruitcake/laravel-cors": "^2.0",
         "genealabs/laravel-caffeine": "^8.0",
         "guzzlehttp/guzzle": "^7.0.1",
