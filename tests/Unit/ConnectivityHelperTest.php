@@ -52,7 +52,7 @@ class ConnectivityHelperTest extends TestCase
                 $up,
                 $down,
                 $down
-            );;
+            );
 
         global $mark;
         $device = new Device();
@@ -81,7 +81,6 @@ class ConnectivityHelperTest extends TestCase
         $this->assertFalse($ch->isUp());
         $this->assertEquals(false, $device->status);
         $this->assertEquals('icmp', $device->status_reason);
-
 
         /** ping disabled and snmp enabled */
         Config::set('icmp_check', false);
@@ -131,7 +130,6 @@ class ConnectivityHelperTest extends TestCase
         $this->assertFalse($ch->isUp());
         $this->assertEquals(false, $device->status);
         $this->assertEquals('icmp', $device->status_reason);
-
 
         /** ping and snmp disabled */
         Config::set('icmp_check', false);
