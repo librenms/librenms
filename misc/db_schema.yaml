@@ -733,9 +733,9 @@ hrSystem:
   Columns:
     - { Field: hrSystem_id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
     - { Field: device_id, Type: 'int unsigned', 'Null': false, Extra: '' }
-    - { Field: hrSystemNumUsers, Type: int, 'Null': false, Extra: '', Default: '0' }
-    - { Field: hrSystemProcesses, Type: int, 'Null': false, Extra: '', Default: '0' }
-    - { Field: hrSystemMaxProcesses, Type: int, 'Null': false, Extra: '', Default: '0' }
+    - { Field: hrSystemNumUsers, Type: int, 'Null': true, Extra: '', Default: '0' }
+    - { Field: hrSystemProcesses, Type: int, 'Null': true, Extra: '', Default: '0' }
+    - { Field: hrSystemMaxProcesses, Type: int, 'Null': true, Extra: '', Default: '0' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [hrSystem_id], Unique: true, Type: BTREE }
     hrsystem_device_id_index: { Name: hrsystem_device_id_index, Columns: [device_id], Unique: false, Type: BTREE }
