@@ -14,9 +14,9 @@ class UpdateHrSystemTable extends Migration
     public function up()
     {
         Schema::table('hrSystem', function (Blueprint $table) {
-            $table->integer('hrSystemNumUsers')->nullable()->change();
-            $table->integer('hrSystemProcesses')->nullable()->change();
-            $table->integer('hrSystemMaxProcesses')->nullable()->change();
+            $table->integer('hrSystemNumUsers')->nullable()->default(null)->change();
+            $table->integer('hrSystemProcesses')->nullable()->default(null)->change();
+            $table->integer('hrSystemMaxProcesses')->nullable()->default(null)->change();
         });
     }
 
