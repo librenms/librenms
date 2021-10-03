@@ -3,26 +3,23 @@
 namespace App\Http\Middleware;
 
 use Illuminate\Http\Middleware\TrustProxies as Middleware;
-use Illuminate\Http\Request;
 
 class TrustProxies extends Middleware
 {
-    /**
-     * The trusted proxies for this application.
-     *
-     * @var array|string|null
-     */
-    protected $proxies;
+    protected function getTrustedHeaderNames()
+    {
+        $this->headers = config('trustedproxy.headers');
+        return parent::getTrustedHeaderNames();
+    }
 
     /**
-     * The headers that should be used to detect proxies.
+     * Get the trusted proxies.
      *
-     * @var int
+     * @return array|string|null
      */
-    protected $headers =
-        Request::HEADER_X_FORWARDED_FOR |
-        Request::HEADER_X_FORWARDED_HOST |
-        Request::HEADER_X_FORWARDED_PORT |
-        Request::HEADER_X_FORWARDED_PROTO |
-        Request::HEADER_X_FORWARDED_AWS_ELB;
+    protected function proxies()
+    {
+        $this->proxies = config('trustedproxy.proxies');
+        return parent::proxies();
+    }
 }

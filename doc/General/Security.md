@@ -10,19 +10,21 @@ should show that we take things seriously.
 
 # Securing your install
 
-As with any system of this nature, we highly recommend that you
-restrict access to the install via a firewall or VPN.
+As with any system of this nature, we highly recommend that you restrict access to the install via a firewall or VPN.
 
-It is also highly recommended that the Web interface is protected with
-an SSL certificate such as ones provided by [LetsEncrypt](http://www.letsencrypt.org).
+It is also highly recommended that the Web interface is protected with an SSL certificate such as ones provided by [LetsEncrypt](http://www.letsencrypt.org).
 
 Please ensure you keep your install [up to date](Updating.md).
 
+## Trusted Proxies
+
+When using a reverse proxy, you may restrict the hosts allowed to forward headers to LibreNMS. By default this allows all proxies, due to legacy reasons.
+
+Set APP_TRUSTED_PROXIES in your .env to an empty string or the urls to the proxies allowed to forward.
+
 # Reporting vulnerabilities
 
-Like anyone, we appreciate the work people put in to find flaws in
-software and welcome anyone to do so with LibreNMS, this will lead to
-better quality and more secure software for everyone.
+Like anyone, we appreciate the work people put in to find flaws in software and welcome anyone to do so with LibreNMS, this will lead to better quality and more secure software for everyone.
 
 If you think you've found a vulnerability and want to discuss it with
 some of the core team then you can contact us on
