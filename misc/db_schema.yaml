@@ -608,6 +608,7 @@ device_group_device:
     device_group_device_device_id_foreign: { name: device_group_device_device_id_foreign, foreign_key: device_id, table: devices, key: device_id, extra: 'ON DELETE CASCADE' }
 device_outages:
   Columns:
+    - { Field: id, Type: 'bigint unsigned', 'Null': false, Extra: auto_increment }
     - { Field: device_id, Type: 'int unsigned', 'Null': false, Extra: '' }
     - { Field: going_down, Type: bigint, 'Null': false, Extra: '' }
     - { Field: up_again, Type: bigint, 'Null': true, Extra: '' }
