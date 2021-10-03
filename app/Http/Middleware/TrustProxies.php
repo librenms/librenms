@@ -9,6 +9,7 @@ class TrustProxies extends Middleware
     protected function getTrustedHeaderNames()
     {
         $this->headers = config('trustedproxy.headers');
+
         return parent::getTrustedHeaderNames();
     }
 
@@ -20,6 +21,7 @@ class TrustProxies extends Middleware
     protected function proxies()
     {
         $this->proxies = config('trustedproxy.proxies');
+
         return parent::proxies();
     }
 }
