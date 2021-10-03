@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class AddDeviceOutageIndex extends Migration
+class AddDeviceOutagesIndex extends Migration
 {
     /**
      * Run the migrations.
@@ -13,9 +13,11 @@ class AddDeviceOutageIndex extends Migration
      */
     public function up()
     {
-        Schema::table('device_outages', function (Blueprint $table) {
-            $table->bigIncrements('id')->first();
-        });
+        if (! Schema::hasColumn('device_outages', 'id')) {
+            Schema::table('device_outages', function (Blueprint $table) {
+                $table->bigIncrements('id')->first();
+            });
+        }
     }
 
     /**
@@ -25,8 +27,5 @@ class AddDeviceOutageIndex extends Migration
      */
     public function down()
     {
-        Schema::table('device_outages', function (Blueprint $table) {
-            $table->dropColumn('id');
-        });
     }
 }
