@@ -76,19 +76,23 @@ class ConnectivityHelper
         $previous = $this->device->status;
         $ping_response = $this->isPingable();
 
-        // check status: both disabled or up = up, one up = up
-        $this->device->status = $ping_response->success();
-        if ($this->device->status) {
-            // Only check snmp if the device is pingable or ping is disabled
-            $status = $this->device->snmp_disable || $this->isSNMPable(); // snmp disabled or snmp success
-            $this->device->status_reason = $status ? '' : 'snmp'; // both up set reason as '' (or down by snmp)
-            if (! $this->canPing()) {
-                // if ping is disabled, update the status (otherwise just use status from ping, which we know is up at this point)
-                $this->device->status = $status;
+        global $mark;
+
+        // calculate device status
+        if ($ping_response->success()) {
+            if (! $this->canSnmp() || $this->isSNMPable()) {
+                // up
+                $this->device->status = true;
+                $this->device->status_reason = '';
+            } else {
+                // snmp down
+                $this->device->status = false;
+                $this->device->status_reason = 'snmp';
             }
         } else {
-            // ping failed and ping not disabled
-            $this->device->status_reason = 'ping';
+            // icmp down
+            $this->device->status = false;
+            $this->device->status_reason = 'icmp';
         }
 
         if ($this->saveMetrics) {
@@ -149,6 +153,11 @@ class ConnectivityHelper
             'traceroute' => $process->getOutput(),
             'output' => $process->getErrorOutput(),
         ];
+    }
+
+    public function canSnmp(): bool
+    {
+        return ! $this->device->snmp_disable;
     }
 
     public function canPing(): bool
