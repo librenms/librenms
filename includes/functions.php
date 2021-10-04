@@ -21,7 +21,6 @@ use LibreNMS\Modules\Core;
 use LibreNMS\Util\Debug;
 use LibreNMS\Util\IPv4;
 use LibreNMS\Util\IPv6;
-use Symfony\Component\Process\Process;
 
 function array_sort_by_column($array, $on, $order = SORT_ASC)
 {
