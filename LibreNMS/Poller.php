@@ -60,6 +60,7 @@ class Poller extends PollingCommon
         $this->device_spec = $device_spec;
         $this->module_override = $module_override;
         $this->output = $output;
+        $this->parseModules();
     }
 
     public function poll()
@@ -86,16 +87,10 @@ class Poller extends PollingCommon
             $helper->saveMetrics();
 
             if ($helper->isUp()) {
+                $this->filterModules();
                 dump('we are polling the device now (:');
             }
         }
-    }
-
-    private function pollLegacyModule(array $device)
-    {
-        global $device;
-
-
     }
 
     private function moduleExists(string $module): bool{
@@ -159,6 +154,21 @@ class Poller extends PollingCommon
             }
 
             Config::set("poller_modules.$module", 1);
+        }
+    }
+
+    private function filterModules(): void
+    {
+        if ($this->device->snmp_disable) {
+            // only non-snmp modules
+            Config::set('poller_modules', array_intersect_key(Config::get('poller_modules'), [
+                'availability' => true,
+                'ipmi' => true,
+                'unix-agent' => true,
+            ]));
+        } else {
+            // we always want the core module to be included, prepend it
+            Config::set('poller_modules', ['core' => true] + Config::get('poller_modules'));
         }
     }
 
