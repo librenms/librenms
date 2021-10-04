@@ -4223,8 +4223,7 @@
                         {"match": "fortigate", "value": "fortios"},
                         {"match": "vyos", "value": "vyatta"},
                         {"match": "slms", "value": "zhoneolt"},
-                        {"match": "oneaccess", "value": "oneos"},
-                        {"match": "Huawei SmartAX", "value": "smartax"}
+                        {"match": "oneaccess", "value": "oneos"}
                     ]
                 }
             },
