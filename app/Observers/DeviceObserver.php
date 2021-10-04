@@ -31,6 +31,13 @@ class DeviceObserver
             $device->children->each->updateMaxDepth();
         }
 
+        // log up/down status changes
+        if ($device->isDirty(['status', 'status_reason'])) {
+            $type = $device->status ? 'up' : 'down';
+            $reason = $device->status ? $device->getOriginal('status_reason') : $device->status_reason;
+            Log::event('Device status changed to ' . ucfirst($type) . " from $reason check.", $device, $type);
+        }
+
         // key attribute changes
         foreach (['os', 'sysName', 'version', 'hardware', 'features', 'serial', 'icon', 'type'] as $attribute) {
             if ($device->isDirty($attribute)) {
