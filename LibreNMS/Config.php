@@ -30,6 +30,7 @@ use Exception;
 use Illuminate\Database\QueryException;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
+use LibreNMS\Data\Store\Rrd;
 use LibreNMS\DB\Eloquent;
 use LibreNMS\Util\Debug;
 use Log;
@@ -455,6 +456,10 @@ class Config
                     self::set($bin, self::locateBinary($bin));
                 }
             }
+        }
+
+        if (! self::has('rrdtool_version')) {
+            self::persist('rrdtool_version', Rrd::version());
         }
 
         self::populateTime();
