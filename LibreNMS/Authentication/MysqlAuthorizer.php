@@ -23,7 +23,7 @@ class MysqlAuthorizer extends AuthorizerBase
         $enabled = $user_data->enabled;
 
         if (! $enabled) {
-            throw new AuthenticationException($message = 'login denied');
+            throw new AuthenticationException();
         }
 
         if (Hash::check($password, $hash)) {

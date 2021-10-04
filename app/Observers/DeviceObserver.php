@@ -3,9 +3,21 @@
 namespace App\Observers;
 
 use App\Models\Device;
+use Log;
 
 class DeviceObserver
 {
+    /**
+     * Handle the device "created" event.
+     *
+     * @param  \App\Models\Device  $device
+     * @return void
+     */
+    public function created(Device $device)
+    {
+        Log::event("Device $device->hostname has been created", $device, 'system', 3);
+    }
+
     /**
      * Handle the device "updated" event.
      *
@@ -19,14 +31,21 @@ class DeviceObserver
             $device->children->each->updateMaxDepth();
         }
 
+        // log up/down status changes
+        if ($device->isDirty(['status', 'status_reason'])) {
+            $type = $device->status ? 'up' : 'down';
+            $reason = $device->status ? $device->getOriginal('status_reason') : $device->status_reason;
+            Log::event('Device status changed to ' . ucfirst($type) . " from $reason check.", $device, $type);
+        }
+
         // key attribute changes
         foreach (['os', 'sysName', 'version', 'hardware', 'features', 'serial', 'icon', 'type'] as $attribute) {
             if ($device->isDirty($attribute)) {
-                \Log::event(self::attributeChangedMessage($attribute, $device->$attribute, $device->getOriginal($attribute)), $device, 'system', 3);
+                Log::event(self::attributeChangedMessage($attribute, $device->$attribute, $device->getOriginal($attribute)), $device, 'system', 3);
             }
         }
         if ($device->isDirty('location_id')) {
-            \Log::event(self::attributeChangedMessage('location', (string) $device->location, null), $device, 'system', 3);
+            Log::event(self::attributeChangedMessage('location', (string) $device->location, null), $device, 'system', 3);
         }
     }
 

@@ -1,5 +1,11 @@
 <?php
 
+use App\Models\Device;
+use Illuminate\Support\Facades\Artisan;
+use LibreNMS\Exceptions\HostUnreachableException;
+use LibreNMS\Util\Debug;
+use Symfony\Component\Process\Process;
+
 /*
 |--------------------------------------------------------------------------
 | Console Routes
@@ -10,11 +16,6 @@
 | simple approach to interacting with each command's IO methods.
 |
 */
-
-use App\Models\Device;
-use LibreNMS\Exceptions\HostUnreachableException;
-use LibreNMS\Util\Debug;
-use Symfony\Component\Process\Process;
 
 Artisan::command('device:rename
     {old hostname : ' . __('The existing hostname, IP, or device id') . '}

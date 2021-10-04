@@ -1783,7 +1783,7 @@ Debian-snmp ALL=(ALL) NOPASSWD: /usr/local/bin/proxmox
 
 SNMP extend script to get your Puppet Agent data into your host.
 
-## SNMP Extend
+### SNMP Extend
 
 1. Download the script onto the desired host
 ```

@@ -236,7 +236,8 @@ function poll_device($device, $force_module = false)
 
     $device_start = microtime(true);
 
-    $attribs = DeviceCache::getPrimary()->getAttribs();
+    $deviceModel = DeviceCache::getPrimary();
+    $attribs = $deviceModel->getAttribs();
     $device['attribs'] = $attribs;
 
     load_os($device);
@@ -289,15 +290,25 @@ function poll_device($device, $force_module = false)
         echo "Created directory : $host_rrd\n";
     }
 
-    $response = device_is_up($device, true);
+    $helper = new \LibreNMS\Polling\ConnectivityHelper($deviceModel);
+    $helper->saveMetrics();
 
-    if ($response['status'] == '1') {
+    if ($helper->isUp()) {
         if ($device['snmp_disable']) {
-            Config::set('poller_modules', ['availability' => true]);
+            // only non-snmp modules
+            Config::set('poller_modules', array_intersect_key(Config::get('poller_modules'), [
+                'availability' => true,
+                'ipmi' => true,
+                'unix-agent' => true,
+            ]));
         } else {
             // we always want the core module to be included, prepend it
-            Config::set('poller_modules', ['core' => true, 'availability' => true] + Config::get('poller_modules'));
+            Config::set('poller_modules', ['core' => true] + Config::get('poller_modules'));
         }
+
+        // update $device array status
+        $device['status'] = $deviceModel->status;
+        $device['status_reason'] = $deviceModel->status_reason;
 
         printChangedStats(true); // don't count previous stats
         foreach (Config::get('poller_modules') as $module => $module_status) {
@@ -356,36 +367,10 @@ function poll_device($device, $force_module = false)
         }
 
         // Ping response
-        if (can_ping_device($attribs) === true && ! empty($response['ping_time'])) {
-            $tags = [
-                'rrd_def' => RrdDefinition::make()->addDataset('ping', 'GAUGE', 0, 65535),
-            ];
-            $fields = [
-                'ping' => $response['ping_time'],
-            ];
-
-            $update_array['last_ping'] = ['NOW()'];
-            $update_array['last_ping_timetaken'] = $response['ping_time'];
-
-            data_update($device, 'ping-perf', $tags, $fields);
+        if ($helper->canPing()) {
             $os->enableGraph('ping_perf');
         }
-
-        $device_time = round(microtime(true) - $device_start, 3);
-
-        // Poller performance
-        if (! empty($device_time)) {
-            $tags = [
-                'rrd_def' => RrdDefinition::make()->addDataset('poller', 'GAUGE', 0),
-                'module'  => 'ALL',
-            ];
-            $fields = [
-                'poller' => $device_time,
-            ];
-
-            data_update($device, 'poller-perf', $tags, $fields);
-            $os->enableGraph('poller_modules_perf');
-        }
+        $os->enableGraph('poller_modules_perf');
 
         if (! $force_module) {
             // don't update last_polled time if we are forcing a specific module to be polled

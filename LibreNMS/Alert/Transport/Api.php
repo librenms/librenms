@@ -85,8 +85,8 @@ class Api extends Transport
             $request_opts['body'] = $body;
             $res = $client->request('PUT', $host, $request_opts);
         } else { //Method POST
-            $request_opts['form_params'] = $query;
-            foreach ($query as $metric => $value) { // replace all variables defined in Options and found in Body for their values
+            $request_opts['query'] = $query;
+            foreach ($obj as $metric => $value) {
                 $body = str_replace('{{ $' . $metric . ' }}', $value, $body);
             }
             $request_opts['body'] = $body;
@@ -144,7 +144,7 @@ class Api extends Transport
                 [
                     'title' => 'body',
                     'name' => 'api-body',
-                    'descr' => 'Enter the body (only used by PUT method, discarded otherwise)',
+                    'descr' => 'Enter the body (only used by PUT/POST method, discarded GET)',
                     'type' => 'textarea',
                 ],
                 [

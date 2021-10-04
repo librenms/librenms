@@ -97,4 +97,5 @@ modules:
                             oid: nnOpticalPmRecentMonTypeDescr
                             op: 'regex'
                             value: (.*(MAX|MIN|AVG|LOW|HIGH).*)
-                    group: nnOpticalPmRecentIfIndexDescr                
+                    group: nnOpticalPmRecentIfIndexDescr
+                                    

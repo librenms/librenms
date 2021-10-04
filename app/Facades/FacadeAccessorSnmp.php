@@ -1,6 +1,6 @@
 <?php
-/**
- * DeviceOutage.php
+/*
+ * SNMP.php
  *
  * -Description-
  *
@@ -15,18 +15,22 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @link       https://www.librenms.org
- *
- * @copyright  2020 Thomas Berberich
- * @author     Thomas Berberich <sourcehhdoctor@gmail.com>
+ * @package    LibreNMS
+ * @link       http://librenms.org
+ * @copyright  2021 Tony Murray
+ * @author     Tony Murray <murraytony@gmail.com>
  */
 
-namespace App\Models;
+namespace App\Facades;
 
-class DeviceOutage extends DeviceRelatedModel
+use Illuminate\Support\Facades\Facade;
+
+class FacadeAccessorSnmp extends Facade
 {
-    public $timestamps = false;
-    protected $fillable = ['going_down', 'up_again'];
+    protected static function getFacadeAccessor()
+    {
+        return \LibreNMS\Data\Source\SnmpQuery::class;
+    }
 }

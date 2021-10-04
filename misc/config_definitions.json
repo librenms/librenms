@@ -4222,7 +4222,8 @@
                         {"match": "fireware", "value": "firewareos"},
                         {"match": "fortigate", "value": "fortios"},
                         {"match": "vyos", "value": "vyatta"},
-                        {"match": "slms", "value": "zhoneolt"}
+                        {"match": "slms", "value": "zhoneolt"},
+                        {"match": "oneaccess", "value": "oneos"}
                     ]
                 }
             },
@@ -4355,6 +4356,13 @@
         },
         "poller_modules.os": {
             "order": 320,
+            "group": "poller",
+            "section": "poller_modules",
+            "default": true,
+            "type": "boolean"
+        },
+        "poller_modules.availability": {
+            "order": 25,
             "group": "poller",
             "section": "poller_modules",
             "default": true,

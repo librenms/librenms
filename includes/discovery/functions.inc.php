@@ -137,9 +137,9 @@ function discover_device(&$device, $force_module = false)
     // Start counting device poll time
     echo $device['hostname'] . ' ' . $device['device_id'] . ' ' . $device['os'] . ' ';
 
-    $response = device_is_up($device, true);
+    $helper = new \LibreNMS\Polling\ConnectivityHelper(DeviceCache::getPrimary());
 
-    if ($response['status'] !== '1') {
+    if (! $helper->isUp()) {
         return false;
     }
 
