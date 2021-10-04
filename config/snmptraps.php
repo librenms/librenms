@@ -103,6 +103,8 @@ return [
         'OCCAM-SENSOR-MIB::occamExtAlarmRaised' => \LibreNMS\Snmptrap\Handlers\OccamSensorExtAlarmRaised::class,
         'OCCAM-KERNEL-MIB::fanTrayNotification' => \LibreNMS\Snmptrap\Handlers\OccamFanTrayNotification::class,
         'OCCAM-EPS-MIB::epsPathGroupHeartbeatNotification' => \LibreNMS\Snmptrap\Handlers\OccamEpsPathGroupHeartbeatNotification::class,
+        'OCCAM-EPS-MIB::epsRingFailoverNotification' => \LibreNMS\Snmptrap\Handlers\OccamEpsRingNotification::class,
+        'OCCAM-EPS-MIB::epsRingRevertNotification' => \LibreNMS\Snmptrap\Handlers\OccamEpsRingNotification::class,
         'OSPF-TRAP-MIB::ospfIfStateChange' => \LibreNMS\Snmptrap\Handlers\OspfIfStateChange::class,
         'OSPF-TRAP-MIB::ospfNbrStateChange' => \LibreNMS\Snmptrap\Handlers\OspfNbrStateChange::class,
         'UPS-MIB::upsTraps.0.1' => \LibreNMS\Snmptrap\Handlers\UpsTrapsOnBattery::class,

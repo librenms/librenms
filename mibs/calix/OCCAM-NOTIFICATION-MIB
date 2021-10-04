@@ -1,5 +1,3 @@
-
-
 OCCAM-NOTIFICATION-MIB DEFINITIONS ::= BEGIN
         IMPORTS
                 occamGenericXdslModules, occamGenericNotifications
@@ -8,10 +6,10 @@ OCCAM-NOTIFICATION-MIB DEFINITIONS ::= BEGIN
                         FROM SNMPv2-TC
                 MODULE-COMPLIANCE, OBJECT-GROUP
                         FROM SNMPv2-CONF
-                OBJECT-IDENTITY, MODULE-IDENTITY, OBJECT-TYPE, 
+                OBJECT-IDENTITY, MODULE-IDENTITY, OBJECT-TYPE,
                 NOTIFICATION-TYPE, Integer32
                         FROM SNMPv2-SMI
-                AlarmStatus 
+                AlarmStatus
                         FROM OCCAM-TC
                 ontId, oltPonPortId
                         FROM OCCAM-GPON-NOTIFICATION-MIB
@@ -22,8 +20,8 @@ OCCAM-NOTIFICATION-MIB DEFINITIONS ::= BEGIN
                 LAST-UPDATED    "201003080000Z"
                 ORGANIZATION    "Occam Networks"
                 CONTACT-INFO    "email support@occamnetworks.com"
-                DESCRIPTION     "The mib module contains Occam's 
-                                notifications that may be applicable 
+                DESCRIPTION     "The mib module contains Occam's
+                                notifications that may be applicable
                                 to multiple interfaces."
 
 
@@ -33,7 +31,7 @@ OCCAM-NOTIFICATION-MIB DEFINITIONS ::= BEGIN
 
 
         occamNotificationObjects        OBJECT IDENTIFIER
-        ::=  {  occamNotificationMib  1  } 
+        ::=  {  occamNotificationMib  1  }
 
         ontCesT1Objects OBJECT IDENTIFIER
         ::=  {  occamNotificationMib  2  }
@@ -47,39 +45,39 @@ OCCAM-NOTIFICATION-MIB DEFINITIONS ::= BEGIN
         ethernetCfmNotifications   OBJECT IDENTIFIER
         ::=  {  occamNotificationMib  5  }
 
-   	sfpNotificationObjects  OBJECT IDENTIFIER
-	:: = { occamNotificationMib 6 } 
+   	    sfpNotificationObjects  OBJECT IDENTIFIER
+	    :: = { occamNotificationMib 6 }
 
         sfpNotifications   OBJECT IDENTIFIER
         ::=  {  occamNotificationMib  7  }
 
 	genericNotificationObjects  OBJECT IDENTIFIER
-	::= {  occamNotificationMib 8 }	
+	::= {  occamNotificationMib 8 }
 
 	genericNotifications  OBJECT IDENTIFIER
-	::= {  occamNotificationMib 9 }	
+	::= {  occamNotificationMib 9 }
 
 
 
 
-        ontCesT1PortId          OBJECT-TYPE     
-                SYNTAX          Integer32 
+        ontCesT1PortId          OBJECT-TYPE
+                SYNTAX          Integer32
                 MAX-ACCESS      accessible-for-notify
                 STATUS          current
                 DESCRIPTION
                         "An ONT's T1 port ID."
                 ::=  {  ontCesT1Objects  1  }
 
-        ontCesT1AlarmType       OBJECT-TYPE     
+        ontCesT1AlarmType       OBJECT-TYPE
                 SYNTAX          INTEGER {
                                 tf(1),          -- Transmission failure
                                 los(2),         -- Loss of signal
                                 lof(3),         -- Loss of frame
                                 oof(4),         -- Out of frame
                                 rai(5),         -- Remonte alarm indication
-                                ais-1544M(6)    -- 1.544 Mbits/s back 
+                                ais-1544M(6)    -- 1.544 Mbits/s back
                                                 -- alarm indication signal
-                                } 
+                                }
 
                 MAX-ACCESS      accessible-for-notify
                 STATUS          current
@@ -88,8 +86,8 @@ OCCAM-NOTIFICATION-MIB DEFINITIONS ::= BEGIN
                 ::=  {  ontCesT1Objects  2  }
 
 
-        ontCesT1AlarmStatus     OBJECT-TYPE     
-                SYNTAX          AlarmStatus 
+        ontCesT1AlarmStatus     OBJECT-TYPE
+                SYNTAX          AlarmStatus
                 MAX-ACCESS      accessible-for-notify
                 STATUS          current
                 DESCRIPTION
@@ -99,40 +97,40 @@ OCCAM-NOTIFICATION-MIB DEFINITIONS ::= BEGIN
 
 
 
-         ecfmMepid              OBJECT-TYPE     
-                SYNTAX          Integer32 
+         ecfmMepid              OBJECT-TYPE
+                SYNTAX          Integer32
                 MAX-ACCESS      accessible-for-notify
                 STATUS          current
                 DESCRIPTION
                         "A CFM Maintenance end point Id."
                 ::=  {  ethernetCfmObjects 1  }
 
-         ecfmPortId             OBJECT-TYPE     
-                SYNTAX          Integer32 
+         ecfmPortId             OBJECT-TYPE
+                SYNTAX          Integer32
                 MAX-ACCESS      accessible-for-notify
                 STATUS          current
                 DESCRIPTION
                         "A ethernet or XG port Id."
                 ::=  {  ethernetCfmObjects 2  }
 
-         ecfmDomainLevel        OBJECT-TYPE     
-                SYNTAX          Integer32 
+         ecfmDomainLevel        OBJECT-TYPE
+                SYNTAX          Integer32
                 MAX-ACCESS      accessible-for-notify
                 STATUS          current
                 DESCRIPTION
                         "A CFM domain level number."
                 ::=  {  ethernetCfmObjects 3  }
 
-         ecfmVlanId             OBJECT-TYPE     
-                SYNTAX          Integer32 
+         ecfmVlanId             OBJECT-TYPE
+                SYNTAX          Integer32
                 MAX-ACCESS      accessible-for-notify
                 STATUS          current
                 DESCRIPTION
                         "A Vlan Id."
                 ::=  {  ethernetCfmObjects 4 }
 
-         ecfmRemoteMepId        OBJECT-TYPE     
-                SYNTAX          Integer32 
+         ecfmRemoteMepId        OBJECT-TYPE
+                SYNTAX          Integer32
                 MAX-ACCESS      accessible-for-notify
                 STATUS          current
                 DESCRIPTION
@@ -140,12 +138,12 @@ OCCAM-NOTIFICATION-MIB DEFINITIONS ::= BEGIN
                   ::=  {  ethernetCfmObjects 5  }
 
 
-         ecfmAlarmType          OBJECT-TYPE     
+         ecfmAlarmType          OBJECT-TYPE
                 SYNTAX          INTEGER {            -- 1 to 7 are Y1731 alarms.
-                                rdi(1),              -- A Mep receives a RDI.  
+                                rdi(1),              -- A Mep receives a RDI.
                                 loc(2),              -- A Mep detects Loss of Continuity with a peer Mep.
                                 unexpCCM(3),         -- A Mep receives a CCM with a wrong interval.
-                                unexpMep(4),         -- A Mep receives a CCM with correct Meg Id and level 
+                                unexpMep(4),         -- A Mep receives a CCM with correct Meg Id and level
                                                      -- with unexpected Mep Id.
                                                      -- receiver's Id.
                                 misMerge(5),         -- A Mep receives a CCM with incorrect domain Id.
@@ -153,12 +151,12 @@ OCCAM-NOTIFICATION-MIB DEFINITIONS ::= BEGIN
                                 ais(7),              -- A Mep receives an AIS frame.
 
                                                      -- 8 to 11 are 802.1ag alarms.
-                                crossConnect(8),  -- A Mep receives an CCM with incorrect Mep, or 
+                                crossConnect(8),  -- A Mep receives an CCM with incorrect Mep, or
                                                      -- maintenance association Id.
                                 ccmDefect(9),        -- A MEP has received at least one invalid CCM
                                                      -- whose CCM Interval has not yet timed out.
                                 remoteCCMDefect(10), -- Have not received a CCM in 3.5*CCm interval.
-                                macStatusDefect(11)  -- A remote Mep has a port status value other 
+                                macStatusDefect(11)  -- A remote Mep has a port status value other
                                                      -- than psUp.
 
                                 }
@@ -166,18 +164,18 @@ OCCAM-NOTIFICATION-MIB DEFINITIONS ::= BEGIN
                 STATUS          current
                 DESCRIPTION
                         "The CFM alarm status."
-                ::=  {  ethernetCfmObjects 6  }  
- 
-         ecfmAlarmStatus        OBJECT-TYPE     
-                SYNTAX          AlarmStatus 
+                ::=  {  ethernetCfmObjects 6  }
+
+         ecfmAlarmStatus        OBJECT-TYPE
+                SYNTAX          AlarmStatus
                 MAX-ACCESS      accessible-for-notify
                 STATUS          current
                 DESCRIPTION
                         "The CFM alarm status."
-                ::=  {  ethernetCfmObjects 7  }          
+                ::=  {  ethernetCfmObjects 7  }
 
-	sfpPortIdentifier	OBJECT-TYPE 
-                SYNTAX         	OCTET STRING  (SIZE(0..12))  
+	sfpPortIdentifier	OBJECT-TYPE
+                SYNTAX         	OCTET STRING  (SIZE(0..12))
                 MAX-ACCESS      accessible-for-notify
                 DESCRIPTION
                         "1G/XG port identifier."
@@ -189,14 +187,14 @@ OCCAM-NOTIFICATION-MIB DEFINITIONS ::= BEGIN
 				csfp(2),
 				sfpplus(3),
 				xfp(4),
-				unknown(5) 
+				unknown(5)
 			}
 		MAX-ACCESS      accessible-for-notify
 		DESCRIPTION
 			"SFP switch type."
 		::= { sfpNotificationObjects 2 }
 
-	sfpFailureReason	OBJECT-TYPE 
+	sfpFailureReason	OBJECT-TYPE
         	SYNTAX         	INTEGER  {
 					sfpUnsupported(1),
 					sfpUnrecognized(2)
@@ -215,7 +213,7 @@ OCCAM-NOTIFICATION-MIB DEFINITIONS ::= BEGIN
 		::= { sfpNotificationObjects 4 }
 
 	genericDescription	OBJECT-TYPE
-                SYNTAX         	OCTET STRING  (SIZE(0..20))  
+                SYNTAX         	OCTET STRING  (SIZE(0..20))
 		MAX-ACCESS	accessible-for-notify
 		STATUS		current
 		DESCRIPTION
@@ -235,8 +233,8 @@ OCCAM-NOTIFICATION-MIB DEFINITIONS ::= BEGIN
                         "System notification severity.  Valid values are:
                                         other(1): a severity other than those
                                         listed below.
-                                        minor(2): Minor Problem 
-                                        major(3): Major Problem 
+                                        minor(2): Minor Problem
+                                        major(3): Major Problem
                                         critical(4): Critical Problem."
 		::= { genericNotificationObjects 2 }
 
@@ -249,7 +247,7 @@ OCCAM-NOTIFICATION-MIB DEFINITIONS ::= BEGIN
 		::= { genericNotificationObjects 3 }
 
 	genericAddlInfo		OBJECT-TYPE
-                SYNTAX         	OCTET STRING  (SIZE(0..50))  
+                SYNTAX         	OCTET STRING  (SIZE(0..50))
 		MAX-ACCESS	accessible-for-notify
 		STATUS		current
 		DESCRIPTION
@@ -258,38 +256,38 @@ OCCAM-NOTIFICATION-MIB DEFINITIONS ::= BEGIN
 
 
 -- ONT CES port T1 Alarm NOTIFICATIONS --
-                
+
         ontCesT1Alarm           NOTIFICATION-TYPE
-                OBJECTS         {cardShelfIndex, cardSlotIndex, 
+                OBJECTS         {cardShelfIndex, cardSlotIndex,
                                 oltPonPortId, ontId, ontCesT1PortId,
                                 ontCesT1AlarmType, ontCesT1AlarmStatus }
                 STATUS          current
-                DESCRIPTION             
+                DESCRIPTION
                         "An ONT CES port T1 alarm."
                 ::=  { ontCesT1Notifications  1  }
 
 
 -- Ethnet Connectivity Fault Management Alarm NOTIFICATIONS --
-                
+
         ecfmNotification        NOTIFICATION-TYPE
-                OBJECTS         {cardShelfIndex, cardSlotIndex, 
+                OBJECTS         {cardShelfIndex, cardSlotIndex,
                                 ecfmMepid, ecfmPortId, ecfmDomainLevel,
-                                ecfmVlanId, ecfmRemoteMepId, 
+                                ecfmVlanId, ecfmRemoteMepId,
                                 ecfmAlarmType, ecfmAlarmStatus }
                 STATUS          current
-                DESCRIPTION             
+                DESCRIPTION
                         "An Ethernet CFM alarm notification."
                 ::=  { ethernetCfmNotifications  1  }
 
 -- SFP Alarm NOTIFICATIONS --
-                
+
         sfpNotification        NOTIFICATION-TYPE
                 OBJECTS         {sfpPortIdentifier,
                                 sfpType,
-                                sfpFailureReason, 
+                                sfpFailureReason,
                                 sfpAlarmStatus }
                 STATUS          current
-                DESCRIPTION             
+                DESCRIPTION
                         "SFP alarm notification."
                 ::=  { sfpNotifications  1  }
 
@@ -304,7 +302,7 @@ OCCAM-NOTIFICATION-MIB DEFINITIONS ::= BEGIN
 		DESCRIPTION
 			"Generic System Alarm Notification."
 		::=  { genericNotifications 1 }
-        
+
 END
 
 

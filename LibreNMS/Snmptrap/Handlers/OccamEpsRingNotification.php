@@ -1,9 +1,10 @@
 <?php
 /**
- * OccamEpsPathGroupHeartbeatNotification.php
+ * OccamEpsRingNotification.php
  *
- * Handles the OCCAM-EPS-MIB::epsPathGroupHeartbeatNotification trap
- * (SNMPv2-SMI::enterprises.6066.2.1.2.1.2.2.3)
+ * Handles the following traps:
+ * - OCCAM-EPS-MIB::epsRingFailoverNotification
+ * - OCCAM-EPS-MIB::epsRingRevertNotification
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -32,7 +33,7 @@ use LibreNMS\Interfaces\SnmptrapHandler;
 use LibreNMS\Snmptrap\Trap;
 use Log;
 
-class OccamEpsPathGroupHeartbeatNotification implements SnmptrapHandler
+class OccamEpsRingNotification implements SnmptrapHandler
 {
     /**
      * Handle snmptrap.
@@ -44,11 +45,18 @@ class OccamEpsPathGroupHeartbeatNotification implements SnmptrapHandler
      */
     public function handle(Device $device, Trap $trap)
     {
+        $notificationType = "";
         $shelfIndex = "unknown";
         $slotIndex = "unknown";
         $epsRingIndex = "unknown";
-        $epsPathGroupIndex = "unknown";
-        $epsHeartbeatStatus = "unknown";
+        $epsRingStatus = "unknown";
+        $epsRingCurrentPathGroup = "unknown";
+        $epsRingPreviousPathGroup = "unknown";
+
+        if ($trap->getTrapOid() == 'OCCAM-EPS-MIB::epsRingRevertNotification')
+            $notificationType = 'Revert';
+        else if ($trap->getTrapOid() == 'OCCAM-EPS-MIB::epsRingFailoverNotification')
+            $notificationType = "Failover";
 
         if ($trap_oid = $trap->findOid('OCCAM-SHELF-MIB::cardShelfIndex'))
             $shelfIndex = $trap->getOidData($trap_oid);
@@ -59,12 +67,15 @@ class OccamEpsPathGroupHeartbeatNotification implements SnmptrapHandler
         if ($trap_oid = $trap->findOid('OCCAM-EPS-MIB::epsRingIndex'))
             $epsRingIndex = $trap->getOidData($trap_oid);
 
-        if ($trap_oid = $trap->findOid('OCCAM-EPS-MIB::epsPathGroupIndex'))
-            $epsPathGroupIndex = $trap->getOidData($trap_oid);
+        if ($trap_oid = $trap->findOid('OCCAM-EPS-MIB::epsRingStatus'))
+            $epsRingStatus = $trap->getOidData($trap_oid);
 
-        if ($trap_oid = $trap->findOid('OCCAM-EPS-MIB::epsHeartbeatStatus'))
-            $epsHeartbeatStatus = $trap->getOidData($trap_oid);
+        if ($trap_oid = $trap->findOid('OCCAM-EPS-MIB::epsRingCurrentPathGroup'))
+            $epsRingCurrentPathGroup = $trap->getOidData($trap_oid);
 
-        Log::event("EPS PG Heartbeat Notification: PG status $epsHeartbeatStatus on PG index $epsPathGroupIndex ring $epsRingIndex of shelf $shelfIndex/$slotIndex", $device->device_id, 'trap', 4);
+        if ($trap_oid = $trap->findOid('OCCAM-EPS-MIB::epsRingPreviousPathGroup'))
+            $epsRingPreviousPathGroup = $trap->getOidData($trap_oid);
+
+        Log::event("EPS Ring $notificationType Notification: ring $epsRingIndex status $epsRingStatus on shelf/slot $shelfIndex/$slotIndex; current PG $epsRingCurrentPathGroup, previous $epsRingPreviousPathGroup", $device->device_id, 'trap', 4);
     }
 }
