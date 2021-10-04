@@ -30,6 +30,7 @@ use DB;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Str;
 use LibreNMS\Exceptions\PollerException;
+use LibreNMS\Polling\ConnectivityHelper;
 use LibreNMS\Util\Debug;
 use LibreNMS\Util\Dns;
 use LibreNMS\Util\Git;
@@ -81,7 +82,12 @@ class Poller extends PollingCommon
             $this->printDeviceInfo($os_group);
             $this->initRrdDirectory();
 
+            $helper = new ConnectivityHelper($this->device);
+            $helper->saveMetrics();
 
+            if ($helper->isUp()) {
+                dump('we are polling the device now (:');
+            }
         }
     }
 
