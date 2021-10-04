@@ -662,6 +662,18 @@ class Rrd extends BaseDatastore
     }
 
     /**
+     * Run rrdtool and parse the version from the output.
+     *
+     * @return string
+     */
+    public static function version(): string
+    {
+        return str_replace('1.7.01.7.0', '1.7.0', implode(' ', array_slice(explode(' ', shell_exec(
+            Config::get('rrdtool', 'rrdtool') . ' --version | head -n1'
+        )), 1, 1)));
+    }
+
+    /**
      * Only track update and create primarily, just put all others in an "other" bin
      *
      * @param  string  $type
