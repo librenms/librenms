@@ -4361,6 +4361,13 @@
             "default": true,
             "type": "boolean"
         },
+        "poller_modules.availability": {
+            "order": 25,
+            "group": "poller",
+            "section": "poller_modules",
+            "default": true,
+            "type": "boolean"
+        },
         "poller_modules.ipmi": {
             "order": 210,
             "group": "poller",
