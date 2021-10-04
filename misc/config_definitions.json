@@ -4222,7 +4222,8 @@
                         {"match": "fireware", "value": "firewareos"},
                         {"match": "fortigate", "value": "fortios"},
                         {"match": "vyos", "value": "vyatta"},
-                        {"match": "slms", "value": "zhoneolt"}
+                        {"match": "slms", "value": "zhoneolt"},
+                        {"match": "oneaccess", "value": "oneos"}
                     ]
                 }
             },
