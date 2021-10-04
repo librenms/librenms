@@ -294,7 +294,14 @@ function poll_device($device, $force_module = false)
     $helper->saveMetrics();
 
     if ($helper->isUp()) {
-        if (! $device['snmp_disable']) {
+        if ($device['snmp_disable']) {
+            // only non-snmp modules
+            Config::set('poller_modules', array_intersect_key(Config::get('poller_modules'), [
+                'availability' => true,
+                'ipmi' => true,
+                'unix-agent' => true,
+            ]));
+        } else {
             // we always want the core module to be included, prepend it
             Config::set('poller_modules', ['core' => true] + Config::get('poller_modules'));
         }
