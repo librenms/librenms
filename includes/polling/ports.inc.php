@@ -669,6 +669,8 @@ foreach ($ports as $port) {
             if ($oid == 'ifAlias') {
                 if ($attribs['ifName:' . $port['ifName']]) {
                     $this_port['ifAlias'] = $port['ifAlias'];
+                } else {
+                    $this_port['ifAlias'] = \LibreNMS\Util\StringHelpers::inferEncoding($this_port['ifAlias']);
                 }
             }
             if ($oid == 'ifSpeed') {

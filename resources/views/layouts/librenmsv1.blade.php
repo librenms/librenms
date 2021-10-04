@@ -31,7 +31,7 @@
     <link href="{{ asset('css/mktree.css') }}" rel="stylesheet">
     <link href="{{ asset('css/vis.min.css') }}" rel="stylesheet">
     <link href="{{ asset('css/font-awesome.min.css') }}" rel="stylesheet">
-    <link href="{{ asset('css/jquery.gridster.min.css') }}" rel="stylesheet">
+    <link href="{{ asset('css/jquery.gridster.min.css?ver=09292021') }}" rel="stylesheet">
     <link href="{{ asset('css/leaflet.css') }}" rel="stylesheet">
     <link href="{{ asset('css/MarkerCluster.css') }}" rel="stylesheet">
     <link href="{{ asset('css/MarkerCluster.Default.css') }}" rel="stylesheet">
@@ -91,7 +91,7 @@
     <script type="text/javascript" src="{{ asset('js/boot.js') }}"></script>
     <script>
         // Apply color scheme
-        if ('{{ LibreNMS\Config::get('applied_site_style', 'light') }}' === 'dark' || window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        if ('{{ LibreNMS\Config::get('applied_site_style') }}' === 'dark') {
             document.documentElement.classList.add('tw-dark')
         } else {
             document.documentElement.classList.remove('tw-dark')

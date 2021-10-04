@@ -105,6 +105,7 @@ by following the steps under the `SNMP Extend` heading.
 1. [Mailcow-dockerized postfix](#mailcow-dockerized-postfix) - SNMP extend
 1. [Mailscanner](#mailscanner) - SNMP extend
 1. [Mdadm](#mdadm) - SNMP extend
+1. [MegaRAID](#megaraid) - SNMP extend
 1. [Memcached](#memcached) - SNMP extend
 1. [Munin](#munin) - Agent
 1. [MySQL](#mysql) - SNMP extend, Agent
@@ -923,6 +924,21 @@ extend mdadm /etc/snmp/mdadm
 The application should be auto-discovered as described at the
 top of the page. If it is not, please follow the steps set out
 under `SNMP Extend` heading top of page.
+
+
+## MegaRAID
+
+This software from Broadcom/LSI let you monitor MegaRAID controller.
+
+1. Download the [external software](https://docs.broadcom.com/docs/1211132411799) and follow the included install instructions.
+
+2. Add the following line to your snmpd.conf file (usually /etc/snmp/snmpd.conf)
+```
+pass .1.3.6.1.4.1.3582 /usr/sbin/lsi_mrdsnmpmain
+```
+
+3. Restart snmpd on your host
+
 
 ## Memcached
 
@@ -1767,7 +1783,7 @@ Debian-snmp ALL=(ALL) NOPASSWD: /usr/local/bin/proxmox
 
 SNMP extend script to get your Puppet Agent data into your host.
 
-## SNMP Extend
+### SNMP Extend
 
 1. Download the script onto the desired host
 ```

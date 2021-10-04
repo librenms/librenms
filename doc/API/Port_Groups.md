@@ -69,3 +69,58 @@ Output:
     "message": "Port group New Port Group created"
 }
 ```
+
+### `assign_portgroup`
+
+Assign a Port Group to a list of Ports
+
+Route: `/api/v0/port_groups/:port_group_id/assign`
+
+Input (JSON):
+
+- `port_ids`: *required* - List of Port Ids
+
+Examples:
+
+Dynamic Example:
+
+```curl
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' -X POST -d '{"port_ids": ["4","34","25,"983"]}' https://librenms.org/api/v0/port_groups/3/assign
+```
+
+Output:
+
+```json
+{
+    "status": "ok",
+    "Port Ids 4, 34, 25, 983 have been added to Port Group Id 3": 200
+}
+```
+
+### `remove_portgroup`
+
+Remove a Port Group from a list of Ports
+
+Route: `/api/v0/port_groups/:port_group_id/remove`
+
+Input (JSON):
+
+- `port_ids`: *required* - List of Port Ids
+
+Examples:
+
+Dynamic Example:
+
+```curl
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' -X POST -d '{"port_ids": ["4","34","25,"983"]}' https://librenms.org/api/v0/port_groups/3/remove
+```
+
+Output:
+
+```json
+{
+    "status": "ok",
+    "Port Ids 4, 34, 25, 983 have been removed from Port Group Id 3": 200
+}
+```
+

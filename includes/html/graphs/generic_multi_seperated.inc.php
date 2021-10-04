@@ -37,7 +37,11 @@ if ($format == 'octets' || $format == 'bytes') {
     $units = 'Bps';
     $format = 'bits';
 } else {
-    $units = 'bps';
+    if (isset($total_units) && $total_units == 'pps') {
+        $units = 'pps';
+    } else {
+        $units = 'bps';
+    }
     $format = 'bits';
 }
 

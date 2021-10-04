@@ -30,6 +30,9 @@ return [
             'no-validation' => 'Cannot set :setting, it is missing validation definition.',
         ],
     ],
+    'db:seed' => [
+        'existing_config' => 'Database contains existing settings. Continue?',
+    ],
     'dev:check' => [
         'description' => 'LibreNMS code checks. Running with no options runs all checks',
         'arguments' => [
@@ -59,6 +62,12 @@ return [
         'exit' => 'Ctrl-C to stop',
         'removed' => 'Device :id removed',
         'updated' => 'Device :hostname (:id) updated',
+    ],
+    'device:ping' => [
+        'description' => 'Ping device and record data for response',
+        'arguments' => [
+            'device spec' => 'Device to ping one of: <Device ID>, <Hostname/IP>, all',
+        ],
     ],
     'key:rotate' => [
         'description' => 'Rotate APP_KEY, this decrypts all encrypted data with the given old key and stores it with the new key in APP_KEY.',
@@ -98,6 +107,22 @@ return [
             'single-process' => 'Only use a single process for smokeping',
             'compat' => '[deprecated] Mimic the behaviour of gen_smokeping.php',
         ],
+    ],
+    'snmp:fetch' => [
+        'description' => 'Run snmp query against a device',
+        'arguments' => [
+            'device spec' => 'Device to query: device_id or hostname/ip',
+            'oid' => 'SNMP OID to fetch.  Should be either MIB::oid or a numeric oid',
+        ],
+        'failed' => 'SNMP command failed!',
+        'oid' => 'OID',
+        'options' => [
+            'type' => 'The type of snmp query to perform :types',
+            'output' => 'Specify the output format :formats',
+            'numeric' => 'Numeric OIDs',
+        ],
+        'not_found' => 'Device not found',
+        'value' => 'Value',
     ],
     'translation:generate' => [
         'description' => 'Generate updated json language files for use in the web frontend',

@@ -30,7 +30,6 @@
         "easybook/geshi": "^1.0.8",
         "ezyang/htmlpurifier": "^4.8",
         "fico7489/laravel-pivot": "^3.0",
-        "fideloper/proxy": "^4.4",
         "fruitcake/laravel-cors": "^2.0",
         "genealabs/laravel-caffeine": "^8.0",
         "guzzlehttp/guzzle": "^7.0.1",
@@ -67,6 +66,7 @@
         "php-parallel-lint/php-parallel-lint": "^1.1",
         "phpstan/phpstan-mockery": "^0.12.13",
         "phpunit/phpunit": "^9.3.3",
+        "spaze/phpstan-disallowed-calls": "^1.9",
         "staudenmeir/dusk-updater": "^1.1"
     },
     "suggest": {

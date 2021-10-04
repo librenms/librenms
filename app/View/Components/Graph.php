@@ -45,6 +45,10 @@ class Graph extends Component
      * @var int
      */
     public $absolute_size;
+    /**
+     * @var bool|string
+     */
+    private $link;
 
     /**
      * Create a new component instance.
@@ -61,8 +65,20 @@ class Graph extends Component
      * @param  \App\Models\Device|int|null  $device
      * @param  \App\Models\Port|int|null  $port
      */
-    public function __construct(string $type = '', array $vars = [], $from = '-1d', $to = null, string $legend = 'no', string $aspect = 'normal', ?int $width = null, ?int $height = null, int $absolute_size = 0, $device = null, $port = null)
-    {
+    public function __construct(
+        string $type = '',
+        array $vars = [],
+        $from = '-1d',
+        $to = null,
+        string $legend = 'no',
+        string $aspect = 'normal',
+        ?int $width = null,
+        ?int $height = null,
+        int $absolute_size = 0,
+        $link = true,
+        $device = null,
+        $port = null
+    ) {
         $this->type = $type;
         $this->vars = $vars;
         $this->from = $from;
@@ -71,6 +87,7 @@ class Graph extends Component
         $this->absolute_size = $absolute_size;
         $this->width = $width ?: ($aspect == 'wide' ? self::DEFAULT_WIDE_WIDTH : self::DEFAULT_NORMAL_WIDTH);
         $this->height = $height ?: ($aspect == 'wide' ? self::DEFAULT_WIDE_HEIGHT : self::DEFAULT_NORMAL_HEIGHT);
+        $this->link = $link;
 
         // handle device and port ids/models for convenience could be set in $vars
         if ($device instanceof Device) {
@@ -91,16 +108,47 @@ class Graph extends Component
      */
     public function render()
     {
-        return view('components.graph', [
-            'link' => url('graph.php') . '?' . http_build_query($this->vars + [
+        if ($this->link === false) {
+            return view('components.graph', [
+                'src' => $this->getSrc(),
+            ]);
+        }
+
+        return view('components.linked-graph', [
+            'link' => $this->getLink(),
+            'src' => $this->getSrc(),
+        ]);
+    }
+
+    private function getSrc(): string
+    {
+        return url('graph.php') . '?' . http_build_query($this->vars + [
+            'type' => $this->type,
+            'legend' => $this->legend,
+            'absolute_size' => $this->absolute_size,
+            'width' => $this->width,
+            'height' => $this->height,
+            'from' => $this->from,
+            'to' => $this->to,
+        ]);
+    }
+
+    private function getLink(): string
+    {
+        if ($this->link === true) {
+            $url = url('graphs') . '/' . http_build_query($this->vars + [
                 'type' => $this->type,
-                'legend' => $this->legend,
-                'absolute_size' => $this->absolute_size,
-                'width' => $this->width,
-                'height' => $this->height,
                 'from' => $this->from,
                 'to' => $this->to,
-            ]),
-        ]);
+            ], '', '/');
+
+            return $url;
+        }
+
+        if ($this->link === false) {
+            return '';
+        }
+
+        return $this->link;
     }
 }
