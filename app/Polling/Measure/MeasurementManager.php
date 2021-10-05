@@ -39,7 +39,6 @@ class MeasurementManager
      */
     private static $db;
 
-
     public function __construct()
     {
         if (self::$snmp === null) {
