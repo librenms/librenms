@@ -131,7 +131,7 @@ class MeasurementManager
 
     private function printSummary(string $name, MeasurementCollection $collection, string $color = ''): void
     {
-        printf("%s%s%s [%d/%.2fs]:", $color, $name, $color ? self::NO_COLOR : '', $collection->getTotalCount(), $collection->getTotalDuration());
+        printf('%s%s%s [%d/%.2fs]:', $color, $name, $color ? self::NO_COLOR : '', $collection->getTotalCount(), $collection->getTotalDuration());
 
         $collection->each(function (MeasurementSummary $stat) {
             printf(' %s[%d/%.2fs]', ucfirst($stat->getType()), $stat->getCount(), $stat->getDuration());
