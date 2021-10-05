@@ -666,11 +666,13 @@ class Rrd extends BaseDatastore
      *
      * @return string
      */
-    public static function version(): string
+    public static function version(): ?string
     {
-        return str_replace('1.7.01.7.0', '1.7.0', implode(' ', array_slice(explode(' ', shell_exec(
-            Config::get('rrdtool', 'rrdtool') . ' --version | head -n1'
-        )), 1, 1)));
+        $proc = new Process([Config::get('rrdtool', 'rrdtool'), '--version']);
+        $proc->run();
+        $parts = explode(' ', $proc->getOutput(), 3);
+
+        return $proc->isSuccessful() && isset($parts[1]) ? str_replace('1.7.01.7.0', '1.7.0', $parts[1]) : null;
     }
 
     /**
