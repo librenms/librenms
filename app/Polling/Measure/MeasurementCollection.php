@@ -1,5 +1,5 @@
 <?php
-/**
+/*
  * MeasurementCollection.php
  *
  * -Description-
@@ -15,15 +15,15 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @link       https://www.librenms.org
- *
- * @copyright  2020 Tony Murray
+ * @package    LibreNMS
+ * @link       http://librenms.org
+ * @copyright  2021 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
-namespace LibreNMS\Data\Measure;
+namespace App\Polling\Measure;
 
 use Illuminate\Support\Collection;
 
@@ -63,6 +63,11 @@ class MeasurementCollection extends Collection
         }
 
         $this->get($type)->add($measurement);
+    }
+
+    public function getSummary(string $type): MeasurementSummary
+    {
+        return $this->get($type, new MeasurementSummary($type));
     }
 
     private function sumStat($function)

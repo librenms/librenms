@@ -159,7 +159,7 @@ $string = $argv[0] . " $doing " . date(Config::get('dateformat.compact')) . " - 
 d_echo("$string\n");
 
 if (! isset($options['q'])) {
-    printStats();
+    app(\App\Polling\Measure\MeasurementManager::class)->printStats();
 }
 
 logfile($string);

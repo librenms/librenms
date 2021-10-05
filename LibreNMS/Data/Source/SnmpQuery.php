@@ -26,6 +26,7 @@
 namespace LibreNMS\Data\Source;
 
 use App\Models\Device;
+use App\Polling\Measure\Measurement;
 use DeviceCache;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
@@ -215,15 +216,6 @@ class SnmpQuery
         return $this->exec('snmptranslate', $this->parseOid($oid));
     }
 
-    private function recordStatistic(string $type, float $start_time): void
-    {
-        global $snmp_stats;
-
-        $runtime = microtime(true) - $start_time;
-        $snmp_stats['ops'][$type] = isset($snmp_stats['ops'][$type]) ? $snmp_stats['ops'][$type] + 1 : 0;
-        $snmp_stats['time'][$type] = isset($snmp_stats['time'][$type]) ? $snmp_stats['time'][$type] + $runtime : $runtime;
-    }
-
     private function buildCli(string $command, array $oids): array
     {
         $cmd = $this->initCommand($command);
@@ -285,7 +277,7 @@ class SnmpQuery
 
     private function exec(string $command, array $oids): SnmpResponse
     {
-        $time_start = microtime(true);
+        $measure = Measurement::start($command);
 
         $proc = new Process($this->buildCli($command, $oids));
         $proc->setTimeout(Config::get('snmp.exec_timeout', 1200));
@@ -301,7 +293,7 @@ class SnmpQuery
         $this->checkExitCode($exitCode, $stderr);
         $this->logOutput($output, $stderr);
 
-        $this->recordStatistic($command, $time_start);
+        $measure->manager()->recordSnmp($measure->end());
 
         return new SnmpResponse($output, $stderr, $exitCode);
     }
