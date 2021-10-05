@@ -370,7 +370,22 @@ function poll_device($device, $force_module = false)
         if ($helper->canPing()) {
             $os->enableGraph('ping_perf');
         }
-        $os->enableGraph('poller_modules_perf');
+
+        $device_time = round(microtime(true) - $device_start, 3);
+
+        // Poller performance
+        if (! empty($device_time)) {
+            $tags = [
+                'rrd_def' => RrdDefinition::make()->addDataset('poller', 'GAUGE', 0),
+                'module' => 'ALL',
+            ];
+            $fields = [
+                'poller' => $device_time,
+            ];
+
+            data_update($device, 'poller-perf', $tags, $fields);
+            $os->enableGraph('poller_modules_perf');
+        }
 
         if (! $force_module) {
             // don't update last_polled time if we are forcing a specific module to be polled

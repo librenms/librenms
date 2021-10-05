@@ -1238,6 +1238,10 @@ return [
             'description' => 'Tune all rrd port files to use max values',
             'help' => 'Auto tune maximum value for rrd port files',
         ],
+        'rrdtool_version' => [
+            'description' => 'Sets the version of rrdtool on your server',
+            'help' => 'Anything over 1.5.5 supports all features LibreNMS uses, do not set higher than your installed version',
+        ],
         'sfdp' => [
             'description' => 'Path to sfdp',
         ],
