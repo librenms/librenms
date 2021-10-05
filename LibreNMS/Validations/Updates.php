@@ -57,11 +57,18 @@ class Updates extends BaseValidation
             return;
         }
 
-        $versions = $validator->getVersions(true);
+        $version = \LibreNMS\Util\Version::get();
+
+        $versions = [
+            'local_hash' => $version->gitHash(),
+            'local_date' => $version->gitDate(),
+            'local_branch' => $version->gitBranch(),
+            'github' => $version->github(),
+        ];
 
         // check if users on master update channel are up to date
         if (Config::get('update_channel') == 'master') {
-            if ($versions['local_sha'] != $versions['github']['sha']) {
+            if ($versions['local_hash'] != $versions['github']['sha']) {
                 try {
                     $commit_date = new DateTime('@' . $versions['local_date'], new DateTimeZone(date_default_timezone_get()));
                     if ($commit_date->diff(new DateTime())->days > 0) {

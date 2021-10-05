@@ -32,23 +32,23 @@ if (isset($options['h'])) {
         -s Print the status of each group
         -g Any validation groups you want to run, comma separated:
           Non-default groups:
-          - mail: this will test your email settings  (uses default_mail option even if default_only is not set)
-          - distributedpoller: this will test for the install running as a distributed poller
-          - rrdcheck: this will check to see if your rrd files are corrupt
+          - Mail: this will test your email settings  (uses default_mail option even if default_only is not set)
+          - DistributedPoller: this will test for the install running as a distributed poller
+          - RrdCheck: this will check to see if your rrd files are corrupt
           Default groups:
-          - configuration: checks various config settings are correct
-          - database: checks the database for errors
-          - dependencies: checks that all required libraries are installed and up-to-date
-          - disk: checks for disk space and other disk related issues
-          - php: check that various PHP modules and functions exist
-          - poller: check that the poller and discovery are running properly
-          - programs: check that external programs exist and are executable
-          - python: check that various Python modules and functions exist
-          - system: checks system related items
-          - updates: checks the status of git and updates
-          - user: check that the LibreNMS user is set properly
+          - Configuration: checks various config settings are correct
+          - Database: checks the database for errors
+          - Dependencies: checks that all required libraries are installed and up-to-date
+          - Disk: checks for disk space and other disk related issues
+          - Php: check that various PHP modules and functions exist
+          - Poller: check that the poller and discovery are running properly
+          - Programs: check that external programs exist and are executable
+          - Python: check that various Python modules and functions exist
+          - System: checks system related items
+          - Updates: checks the status of git and updates
+          - User: check that the LibreNMS user is set properly
 
-        Example: ./validate.php -g mail.
+        Example: ./validate.php -g Mail.
 
         ";
     exit;
@@ -134,7 +134,7 @@ if (\LibreNMS\DB\Eloquent::isConnected()) {
 }
 
 $precheck_complete = true; // disable shutdown function
-print_header($validator->getVersions());
+print_header(version_info());
 
 if (isset($options['g'])) {
     $modules = explode(',', $options['g']);

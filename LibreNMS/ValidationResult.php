@@ -37,6 +37,8 @@ class ValidationResult
     private $list_description = '';
     private $list;
     private $fix;
+    /** @var bool */
+    private $auto_fix;
 
     /**
      * ValidationResult constructor.
@@ -147,6 +149,24 @@ class ValidationResult
     public function getFix()
     {
         return $this->fix;
+    }
+
+    /**
+     * The validator has a autofix
+     *
+     * @param  bool  $has
+     * @return ValidationResult $this
+     */
+    public function setAutoFix(bool $has = true)
+    {
+        $this->auto_fix = $has;
+
+        return $this;
+    }
+
+    public function hasAutoFix(): bool
+    {
+        return $this->auto_fix;
     }
 
     /**

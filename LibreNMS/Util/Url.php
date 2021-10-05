@@ -561,6 +561,16 @@ class Url
         return new ParameterBag($vars);
     }
 
+    /**
+     * Find all links in some text and turn them into html links.
+     */
+    public static function linkify(string $text): string
+    {
+        $regex = "#(http|https|ftp|ftps)://[a-z0-9\-.]*[a-z0-9\-]+(/\S*)?#i";
+
+        return preg_replace($regex, '<a href="$0">$0</a>', $text);
+    }
+
     private static function escapeBothQuotes($string)
     {
         return str_replace(["'", '"'], "\'", $string);

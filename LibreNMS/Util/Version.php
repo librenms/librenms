@@ -25,6 +25,7 @@
 
 namespace LibreNMS\Util;
 
+use Illuminate\Support\Facades\Http;
 use LibreNMS\Config;
 use LibreNMS\DB\Eloquent;
 use Symfony\Component\Process\Process;
@@ -93,6 +94,31 @@ class Version
         return $this->is_git_install
             ? rtrim(shell_exec("git show --pretty='%ct' -s HEAD"))
             : '';
+    }
+
+    public function gitHash(): string
+    {
+        return $this->is_git_install
+            ? rtrim(shell_exec("git show --pretty='%H' -s HEAD"))
+            : '';
+    }
+
+    public function gitBranch(): string
+    {
+        return $this->is_git_install
+            ? rtrim(shell_exec('git rev-parse --abbrev-ref HEAD'))
+            : '';
+    }
+
+    public function github(): array
+    {
+        if ($this->is_git_install && Config::get('update_channel') == 'master') {
+            $response = Http::timeout(5)->get(Config::get('github_api') . 'commits/master');
+
+            return $response->json();
+        }
+
+        return [];
     }
 
     public function python(): string

@@ -877,22 +877,6 @@ a.sensor-ok:hover, a.sensor-low:hover, a.sensor-high:hover {
 
 }
 
-.errorbox {
-  border: 2px dashed #CC0000;
-  background-color: #FFCCCC;
-  padding: 5px;
-  font-size: small;
-  margin: 5px;
-}
-
-.messagebox {
-  border: thin dashed #009900;
-  background-color: #ccffaa;
-  padding: 5px;
-  font-size: small;
-  margin: 5px;
-}
-
 .left {clear:both;}
 
 /* For fancy tabs */

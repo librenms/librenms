@@ -543,7 +543,7 @@
                         @admin
                         <li><a href="{{ url('settings') }}"><i class="fa fa-cogs fa-fw fa-lg"
                                                                aria-hidden="true"></i> @lang('Global Settings')</a></li>
-                        <li><a href="{{ url('validate') }}"><i class="fa fa-check-circle fa-fw fa-lg"
+                        <li><a href="{{ route('validate') }}"><i class="fa fa-check-circle fa-fw fa-lg"
                                                                aria-hidden="true"></i> @lang('Validate Config')</a></li>
                         <li role="presentation" class="divider"></li>
                         <li><a href="{{ route('users.index') }}"><i class="fa fa-user-circle-o fa-fw fa-lg"

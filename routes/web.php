@@ -75,6 +75,12 @@ Route::group(['middleware' => ['auth'], 'guard' => 'auth'], function () {
         Route::delete('settings/{name}', 'SettingsController@destroy')->name('settings.destroy');
 
         Route::post('alert/transports/{transport}/test', [\App\Http\Controllers\AlertTransportController::class, 'test'])->name('alert.transports.test');
+
+        // Validations
+        Route::group(['prefix' => 'validate'], function () {
+            Route::get('', 'ValidateController@index')->name('validate');
+            Route::post('fix/{class}', 'ValidateController@fix')->name('validate.fix');
+        });
     });
 
     Route::get('plugin/settings', 'PluginAdminController')->name('plugin.admin');

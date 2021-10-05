@@ -75,6 +75,10 @@ class AppServiceProvider extends ServiceProvider
         Blade::directive('deviceUrl', function ($arguments) {
             return "<?php echo \LibreNMS\Util\Url::deviceUrl($arguments); ?>";
         });
+
+        Blade::directive('linkify', function ($arguments) {
+            return "<?php echo \LibreNMS\Util\Url::linkify(e($arguments)); ?>";
+        });
     }
 
     private function configureMorphAliases()

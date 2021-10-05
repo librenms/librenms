@@ -37,7 +37,6 @@ class Validator
 
     // data cache
     private $username;
-    private $versions;
 
     /**
      * Validator constructor.
@@ -53,7 +52,7 @@ class Validator
 
             $rc = new ReflectionClass($class);
             if (! $rc->isAbstract()) {
-                $validation_name = strtolower($class_name);
+                $validation_name = $class_name;
                 $this->validation_groups[$validation_name] = new $class();
                 $this->results[$validation_name] = [];
             }
@@ -181,7 +180,7 @@ class Validator
             }
         }
 
-        $this->results[strtolower($group)][] = $result;
+        $this->results[$group][] = $result;
     }
 
     /**
@@ -229,25 +228,6 @@ class Validator
     public function info($message, $group = null)
     {
         $this->result(new ValidationResult($message, ValidationResult::INFO), $group);
-    }
-
-    /**
-     * Get version_info() array.  This will cache the result and add remote data if requested and not already existing.
-     *
-     * @param  bool  $remote
-     * @return array
-     */
-    public function getVersions($remote = false)
-    {
-        if (! isset($this->versions)) {
-            $this->versions = version_info($remote);
-        } else {
-            if ($remote && ! isset($this->versions['github'])) {
-                $this->versions = version_info($remote);
-            }
-        }
-
-        return $this->versions;
     }
 
     /**

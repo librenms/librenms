@@ -595,31 +595,19 @@ function parse_location($location)
 /**
  * Returns version info
  *
- * @param  bool  $remote  fetch remote version info from github
  * @return array
  */
-function version_info($remote = false)
+function version_info()
 {
     $version = \LibreNMS\Util\Version::get();
     $output = [
         'local_ver' => $version->local(),
     ];
     if (Git::repoPresent() && Git::binaryExists()) {
-        if ($remote === true && Config::get('update_channel') == 'master') {
-            $api = curl_init();
-            set_curl_proxy($api);
-            curl_setopt($api, CURLOPT_USERAGENT, 'LibreNMS');
-            curl_setopt($api, CURLOPT_URL, Config::get('github_api') . 'commits/master');
-            curl_setopt($api, CURLOPT_RETURNTRANSFER, 1);
-            curl_setopt($api, CURLOPT_TIMEOUT, 5);
-            curl_setopt($api, CURLOPT_TIMEOUT_MS, 5000);
-            curl_setopt($api, CURLOPT_CONNECTTIMEOUT, 5);
-            $output['github'] = json_decode(curl_exec($api), true);
-        }
         [$local_sha, $local_date] = explode('|', rtrim(`git show --pretty='%H|%ct' -s HEAD`));
         $output['local_sha'] = $local_sha;
         $output['local_date'] = $local_date;
-        $output['local_branch'] = rtrim(`git rev-parse --abbrev-ref HEAD`);
+        $output['local_branch'] = $version->gitBranch();
     }
     $output['db_schema'] = vsprintf('%s (%s)', $version->database());
     $output['php_ver'] = phpversion();

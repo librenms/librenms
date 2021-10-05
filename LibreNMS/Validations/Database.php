@@ -27,14 +27,16 @@ namespace LibreNMS\Validations;
 
 use Carbon\Carbon;
 use Carbon\CarbonInterval;
+use Illuminate\Support\Facades\DB;
 use LibreNMS\Config;
 use LibreNMS\DB\Eloquent;
 use LibreNMS\DB\Schema;
+use LibreNMS\Interfaces\ValidationFix;
 use LibreNMS\ValidationResult;
 use LibreNMS\Validator;
 use Symfony\Component\Yaml\Yaml;
 
-class Database extends BaseValidation
+class Database extends BaseValidation implements ValidationFix
 {
     const MYSQL_MIN_VERSION = '5.7.7';
     const MYSQL_MIN_VERSION_DATE = 'March, 2021';
@@ -64,6 +66,17 @@ class Database extends BaseValidation
         $this->checkMode($validator);
         $this->checkTime($validator);
         $this->checkMysqlEngine($validator);
+    }
+
+    public function fix(Validator $validator): void
+    {
+        $schema_update = $this->getSchemaUpdates($validator);
+
+        foreach ($schema_update as $update) {
+            DB::transaction(function () use ($update) {
+                DB::update($update);
+            });
+        }
     }
 
     private function checkSchemaVersion(Validator $validator): bool
@@ -211,125 +224,14 @@ class Database extends BaseValidation
 
     private function checkSchema(Validator $validator)
     {
-        $schema_file = Config::get('install_dir') . '/misc/db_schema.yaml';
-
-        if (! is_file($schema_file)) {
-            $validator->warn("We haven't detected the db_schema.yaml file");
-
-            return;
-        }
-
-        $master_schema = Yaml::parse(file_get_contents($schema_file));
-        $current_schema = Schema::dump();
-        $schema_update = [];
-
-        foreach ((array) $master_schema as $table => $data) {
-            if (empty($current_schema[$table])) {
-                $validator->fail("Database: missing table ($table)");
-                $schema_update[] = $this->addTableSql($table, $data);
-            } else {
-                $current_columns = array_reduce($current_schema[$table]['Columns'], function ($array, $item) {
-                    $array[$item['Field']] = $item;
-
-                    return $array;
-                }, []);
-
-                foreach ($data['Columns'] as $index => $cdata) {
-                    $column = $cdata['Field'];
-
-                    // MySQL 8 fix, remove DEFAULT_GENERATED from timestamp extra columns
-                    if ($cdata['Type'] == 'timestamp') {
-                        $current_columns[$column]['Extra'] = preg_replace('/DEFAULT_GENERATED[ ]*/', '', $current_columns[$column]['Extra']);
-                    }
-
-                    if (empty($current_columns[$column])) {
-                        $validator->fail("Database: missing column ($table/$column)");
-                        $primary = false;
-                        if ($data['Indexes']['PRIMARY']['Columns'] == [$column]) {
-                            // include the primary index with the add statement
-                            unset($data['Indexes']['PRIMARY']);
-                            $primary = true;
-                        }
-                        $schema_update[] = $this->addColumnSql($table, $cdata, isset($data['Columns'][$index - 1]) ? $data['Columns'][$index - 1]['Field'] : null, $primary);
-                    } elseif ($cdata !== $current_columns[$column]) {
-                        $validator->fail("Database: incorrect column ($table/$column)");
-                        $schema_update[] = $this->updateTableSql($table, $column, $cdata);
-                    }
-
-                    unset($current_columns[$column]); // remove checked columns
-                }
-
-                foreach ($current_columns as $column => $_unused) {
-                    $validator->fail("Database: extra column ($table/$column)");
-                    $schema_update[] = $this->dropColumnSql($table, $column);
-                }
-
-                $index_changes = [];
-                if (isset($data['Indexes'])) {
-                    foreach ($data['Indexes'] as $name => $index) {
-                        if (empty($current_schema[$table]['Indexes'][$name])) {
-                            $validator->fail("Database: missing index ($table/$name)");
-                            $index_changes[] = $this->addIndexSql($table, $index);
-                        } elseif ($index != $current_schema[$table]['Indexes'][$name]) {
-                            $validator->fail("Database: incorrect index ($table/$name)");
-                            $index_changes[] = $this->updateIndexSql($table, $name, $index);
-                        }
-
-                        unset($current_schema[$table]['Indexes'][$name]);
-                    }
-                }
-
-                if (isset($current_schema[$table]['Indexes'])) {
-                    foreach ($current_schema[$table]['Indexes'] as $name => $_unused) {
-                        $validator->fail("Database: extra index ($table/$name)");
-                        $schema_update[] = $this->dropIndexSql($table, $name);
-                    }
-                }
-                $schema_update = array_merge($schema_update, $index_changes); // drop before create/update
-
-                $constraint_changes = [];
-                if (isset($data['Constraints'])) {
-                    foreach ($data['Constraints'] as $name => $constraint) {
-                        if (empty($current_schema[$table]['Constraints'][$name])) {
-                            $validator->fail("Database: missing constraint ($table/$name)");
-                            $constraint_changes[] = $this->addConstraintSql($table, $constraint);
-                        } elseif ($constraint != $current_schema[$table]['Constraints'][$name]) {
-                            $validator->fail("Database: incorrect constraint ($table/$name)");
-                            $constraint_changes[] = $this->dropConstraintSql($table, $name);
-                            $constraint_changes[] = $this->addConstraintSql($table, $constraint);
-                        }
-
-                        unset($current_schema[$table]['Constraints'][$name]);
-                    }
-                }
-
-                if (isset($current_schema[$table]['Constraints'])) {
-                    foreach ($current_schema[$table]['Constraints'] as $name => $_unused) {
-                        $validator->fail("Database: extra constraint ($table/$name)");
-                        $schema_update[] = $this->dropConstraintSql($table, $name);
-                    }
-                }
-                $schema_update = array_merge($schema_update, $constraint_changes); // drop before create/update
-            }
-
-            unset($current_schema[$table]); // remove checked tables
-        }
-
-        foreach ($current_schema as $table => $data) {
-            $validator->fail("Database: extra table ($table)");
-            $schema_update[] = $this->dropTableSql($table);
-        }
-
-        // set utc timezone if timestamp issues
-        if (preg_grep('/\d{4}-\d\d-\d\d \d\d:\d\d:\d\d/', $schema_update)) {
-            array_unshift($schema_update, "SET TIME_ZONE='+00:00';");
-        }
+        $schema_update = $this->getSchemaUpdates($validator);
 
         if (empty($schema_update)) {
             $validator->ok('Database schema correct');
         } else {
             $result = ValidationResult::fail('We have detected that your database schema may be wrong')
                 ->setFix('Run the following SQL statements to fix it')
+                ->setAutoFix()
                 ->setList('SQL Statements', $schema_update);
             $validator->result($result);
         }
@@ -459,5 +361,124 @@ class Database extends BaseValidation
     private function dropConstraintSql($table, $name)
     {
         return "ALTER TABLE `$table` DROP FOREIGN KEY `$name`;";
+    }
+
+    private function getSchemaUpdates(Validator $validator): array
+    {
+        $schema_file = Config::get('install_dir') . '/misc/db_schema.yaml';
+
+        if (! is_file($schema_file)) {
+            $validator->warn("We haven't detected the db_schema.yaml file");
+
+            return [];
+        }
+
+        $master_schema = Yaml::parse(file_get_contents($schema_file));
+        $current_schema = Schema::dump();
+        $schema_update = [];
+
+        foreach ((array) $master_schema as $table => $data) {
+            if (empty($current_schema[$table])) {
+                $validator->fail("Database: missing table ($table)");
+                $schema_update[] = $this->addTableSql($table, $data);
+            } else {
+                $current_columns = array_reduce($current_schema[$table]['Columns'], function ($array, $item) {
+                    $array[$item['Field']] = $item;
+
+                    return $array;
+                }, []);
+
+                foreach ($data['Columns'] as $index => $cdata) {
+                    $column = $cdata['Field'];
+
+                    // MySQL 8 fix, remove DEFAULT_GENERATED from timestamp extra columns
+                    if ($cdata['Type'] == 'timestamp') {
+                        $current_columns[$column]['Extra'] = preg_replace('/DEFAULT_GENERATED[ ]*/', '', $current_columns[$column]['Extra']);
+                    }
+
+                    if (empty($current_columns[$column])) {
+                        $validator->fail("Database: missing column ($table/$column)");
+                        $primary = false;
+                        if ($data['Indexes']['PRIMARY']['Columns'] == [$column]) {
+                            // include the primary index with the add statement
+                            unset($data['Indexes']['PRIMARY']);
+                            $primary = true;
+                        }
+                        $schema_update[] = $this->addColumnSql($table, $cdata, isset($data['Columns'][$index - 1]) ? $data['Columns'][$index - 1]['Field'] : null, $primary);
+                    } elseif ($cdata !== $current_columns[$column]) {
+                        $validator->fail("Database: incorrect column ($table/$column)");
+                        $schema_update[] = $this->updateTableSql($table, $column, $cdata);
+                    }
+
+                    unset($current_columns[$column]); // remove checked columns
+                }
+
+                foreach ($current_columns as $column => $_unused) {
+                    $validator->fail("Database: extra column ($table/$column)");
+                    $schema_update[] = $this->dropColumnSql($table, $column);
+                }
+
+                $index_changes = [];
+                if (isset($data['Indexes'])) {
+                    foreach ($data['Indexes'] as $name => $index) {
+                        if (empty($current_schema[$table]['Indexes'][$name])) {
+                            $validator->fail("Database: missing index ($table/$name)");
+                            $index_changes[] = $this->addIndexSql($table, $index);
+                        } elseif ($index != $current_schema[$table]['Indexes'][$name]) {
+                            $validator->fail("Database: incorrect index ($table/$name)");
+                            $index_changes[] = $this->updateIndexSql($table, $name, $index);
+                        }
+
+                        unset($current_schema[$table]['Indexes'][$name]);
+                    }
+                }
+
+                if (isset($current_schema[$table]['Indexes'])) {
+                    foreach ($current_schema[$table]['Indexes'] as $name => $_unused) {
+                        $validator->fail("Database: extra index ($table/$name)");
+                        $schema_update[] = $this->dropIndexSql($table, $name);
+                    }
+                }
+                $schema_update = array_merge($schema_update, $index_changes); // drop before create/update
+
+                $constraint_changes = [];
+                if (isset($data['Constraints'])) {
+                    foreach ($data['Constraints'] as $name => $constraint) {
+                        if (empty($current_schema[$table]['Constraints'][$name])) {
+                            $validator->fail("Database: missing constraint ($table/$name)");
+                            $constraint_changes[] = $this->addConstraintSql($table, $constraint);
+                        } elseif ($constraint != $current_schema[$table]['Constraints'][$name]) {
+                            $validator->fail("Database: incorrect constraint ($table/$name)");
+                            $constraint_changes[] = $this->dropConstraintSql($table, $name);
+                            $constraint_changes[] = $this->addConstraintSql($table, $constraint);
+                        }
+
+                        unset($current_schema[$table]['Constraints'][$name]);
+                    }
+                }
+
+                if (isset($current_schema[$table]['Constraints'])) {
+                    foreach ($current_schema[$table]['Constraints'] as $name => $_unused) {
+                        $validator->fail("Database: extra constraint ($table/$name)");
+                        $schema_update[] = $this->dropConstraintSql($table, $name);
+                    }
+                }
+                $schema_update = array_merge($schema_update, $constraint_changes); // drop before create/update
+            }
+
+            unset($current_schema[$table]); // remove checked tables
+        }
+
+        foreach ($current_schema as $table => $data) {
+            $validator->fail("Database: extra table ($table)");
+            $schema_update[] = $this->dropTableSql($table);
+        }
+
+        // set utc timezone if timestamp issues
+        if (preg_grep('/\d{4}-\d\d-\d\d \d\d:\d\d:\d\d/', $schema_update)) {
+            array_unshift($schema_update, "SET TIME_ZONE='+00:00';");
+        }
+
+        return $schema_update;
     }
 }

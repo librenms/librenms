@@ -7311,11 +7311,6 @@ parameters:
 			path: LibreNMS/Validator.php
 
 		-
-			message: "#^Property LibreNMS\\\\Validator\\:\\:\\$versions has no type specified\\.$#"
-			count: 1
-			path: LibreNMS/Validator.php
-
-		-
 			message: "#^Method App\\\\ApiClients\\\\BaseApi\\:\\:getClient\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: app/ApiClients/BaseApi.php

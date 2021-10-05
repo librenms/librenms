@@ -26,6 +26,7 @@
 namespace LibreNMS\Validations;
 
 use LibreNMS\Config;
+use LibreNMS\Data\Store\Rrd as StoreRrd;
 use LibreNMS\Validator;
 
 class Rrd extends BaseValidation
@@ -38,17 +39,17 @@ class Rrd extends BaseValidation
      */
     public function validate(Validator $validator)
     {
-        $versions = $validator->getVersions();
+        $rrdtool_version = StoreRrd::version();
 
         // Check that rrdtool config version is what we see
         if (Config::has('rrdtool_version')
             && version_compare(Config::get('rrdtool_version'), '1.5.5', '<')
-            && version_compare(Config::get('rrdtool_version'), $versions['rrdtool_ver'], '>')
+            && version_compare(Config::get('rrdtool_version'), $rrdtool_version, '>')
         ) {
             $validator->fail(
                 'The rrdtool version you have specified is newer than what is installed.',
                 "Either comment out \$config['rrdtool_version'] = '" .
-                Config::get('rrdtool_version') . "'; or set \$config['rrdtool_version'] = '{$versions['rrdtool_ver']}';"
+                Config::get('rrdtool_version') . "'; or set \$config['rrdtool_version'] = '{$rrdtool_version}';"
             );
         }
 
