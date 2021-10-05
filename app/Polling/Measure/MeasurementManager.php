@@ -25,10 +25,16 @@
 
 namespace App\Polling\Measure;
 
+use DB;
 use Illuminate\Database\Events\QueryExecuted;
 
 class MeasurementManager
 {
+    const SNMP_COLOR = "\e[0;36m";
+    const DB_COLOR = "\e[1;33m";
+    const DATASTORE_COLOR = "\e[0;32m";
+    const NO_COLOR = "\e[0m";
+
     /**
      * @var MeasurementCollection
      */
@@ -52,7 +58,7 @@ class MeasurementManager
      */
     public function listenDb(): void
     {
-        \DB::listen(function (QueryExecuted $event) {
+        DB::listen(function (QueryExecuted $event) {
             $type = strtolower(substr($event->sql, 0, strpos($event->sql, ' ')));
             $this->recordDb(Measurement::make($type, $event->time ? $event->time / 100 : 0));
         });
@@ -72,17 +78,20 @@ class MeasurementManager
     public function printChangedStats(): void
     {
         printf(
-            '>> SNMP: [%d/%.2fs] MySQL: [%d/%.2fs]',
+            '>> %sSNMP%s: [%d/%.2fs] %sMySQL%s: [%d/%.2fs]',
+            self::SNMP_COLOR,
+            self::NO_COLOR,
             self::$snmp->getCountDiff(),
             self::$snmp->getDurationDiff(),
+            self::DB_COLOR,
+            self::NO_COLOR,
             self::$db->getCountDiff(),
             self::$db->getDurationDiff()
         );
 
-        foreach (app('Datastore')->getStats() as $datastore => $stats) {
-            /** @var \App\Polling\Measure\MeasurementCollection $stats */
-            printf(' %s: [%d/%.2fs]', $datastore, $stats->getCountDiff(), $stats->getDurationDiff());
-        }
+        app('Datastore')->getStats()->each(function (MeasurementCollection $stats, $datastore) {
+            printf(' %s%s%s: [%d/%.2fs]', self::DATASTORE_COLOR, $datastore, self::NO_COLOR, $stats->getCountDiff(), $stats->getDurationDiff());
+        });
 
         $this->checkpoint();
 
@@ -112,41 +121,22 @@ class MeasurementManager
      */
     public function printStats(): void
     {
-        printf(
-            "SNMP [%d/%.2fs]: Get[%d/%.2fs] Getnext[%d/%.2fs] Walk[%d/%.2fs]\n",
-            self::$snmp->getTotalCount(),
-            self::$snmp->getTotalDuration(),
-            self::$snmp->getSummary('snmpget')->getCount(),
-            self::$snmp->getSummary('snmpget')->getDuration(),
-            self::$snmp->getSummary('snmpgetnext')->getCount(),
-            self::$snmp->getSummary('snmpgetnext')->getDuration(),
-            self::$snmp->getSummary('snmpwalk')->getCount(),
-            self::$snmp->getSummary('snmpwalk')->getDuration(),
-        );
+        $this->printSummary('SNMP', self::$snmp, self::SNMP_COLOR);
+        $this->printSummary('SQL', self::$db, self::DB_COLOR);
 
-        printf(
-            "MySQL [%d/%.2fs]: Select[%d/%.2fs] Update[%d/%.2fs] Insert[%d/%.2fs] Delete[%d/%.2fs]\n",
-            self::$db->getTotalCount(),
-            self::$db->getTotalDuration(),
-            self::$db->getSummary('select')->getCount(),
-            self::$db->getSummary('select')->getDuration(),
-            self::$db->getSummary('update')->getCount(),
-            self::$db->getSummary('update')->getDuration(),
-            self::$db->getSummary('insert')->getCount(),
-            self::$db->getSummary('insert')->getDuration(),
-            self::$db->getSummary('delete')->getCount(),
-            self::$db->getSummary('delete')->getDuration(),
-        );
+        app('Datastore')->getStats()->each(function (MeasurementCollection $stats, string $datastore) {
+            $this->printSummary($datastore, $stats, self::DATASTORE_COLOR);
+        });
+    }
 
-        foreach (app('Datastore')->getStats() as $datastore => $stats) {
-            /** @var \App\Polling\Measure\MeasurementCollection $stats */
-            printf('%s [%d/%.2fs]:', $datastore, $stats->getTotalCount(), $stats->getTotalDuration());
+    private function printSummary(string $name, MeasurementCollection $collection, string $color = ''): void
+    {
+        printf("%s%s%s [%d/%.2fs]:", $color, $name, $color ? self::NO_COLOR : '', $collection->getTotalCount(), $collection->getTotalDuration());
 
-            foreach ($stats as $stat) {
-                /** @var \App\Polling\Measure\MeasurementSummary $stat */
-                printf(' %s[%d/%.2fs]', ucfirst($stat->getType()), $stat->getCount(), $stat->getDuration());
-            }
-            echo PHP_EOL;
-        }
+        $collection->each(function (MeasurementSummary $stat) {
+            printf(' %s[%d/%.2fs]', ucfirst($stat->getType()), $stat->getCount(), $stat->getDuration());
+        });
+
+        echo PHP_EOL;
     }
 }
