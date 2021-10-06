@@ -608,10 +608,12 @@ device_group_device:
     device_group_device_device_id_foreign: { name: device_group_device_device_id_foreign, foreign_key: device_id, table: devices, key: device_id, extra: 'ON DELETE CASCADE' }
 device_outages:
   Columns:
+    - { Field: id, Type: 'bigint unsigned', 'Null': false, Extra: auto_increment }
     - { Field: device_id, Type: 'int unsigned', 'Null': false, Extra: '' }
     - { Field: going_down, Type: bigint, 'Null': false, Extra: '' }
     - { Field: up_again, Type: bigint, 'Null': true, Extra: '' }
   Indexes:
+    PRIMARY: { Name: PRIMARY, Columns: [ id ], Unique: true, Type: BTREE }
     device_outages_device_id_going_down_unique: { Name: device_outages_device_id_going_down_unique, Columns: [device_id, going_down], Unique: true, Type: BTREE }
     device_outages_device_id_index: { Name: device_outages_device_id_index, Columns: [device_id], Unique: false, Type: BTREE }
 device_perf:
@@ -729,6 +731,16 @@ hrDevice:
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [hrDevice_id], Unique: true, Type: BTREE }
     hrdevice_device_id_index: { Name: hrdevice_device_id_index, Columns: [device_id], Unique: false, Type: BTREE }
+hrSystem:
+  Columns:
+    - { Field: hrSystem_id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
+    - { Field: device_id, Type: 'int unsigned', 'Null': false, Extra: '' }
+    - { Field: hrSystemNumUsers, Type: int, 'Null': true, Extra: '' }
+    - { Field: hrSystemProcesses, Type: int, 'Null': true, Extra: '' }
+    - { Field: hrSystemMaxProcesses, Type: int, 'Null': true, Extra: '' }
+  Indexes:
+    PRIMARY: { Name: PRIMARY, Columns: [hrSystem_id], Unique: true, Type: BTREE }
+    hrsystem_device_id_index: { Name: hrsystem_device_id_index, Columns: [device_id], Unique: false, Type: BTREE }
 ipsec_tunnels:
   Columns:
     - { Field: tunnel_id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
