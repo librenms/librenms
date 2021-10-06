@@ -7,11 +7,11 @@ use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
-use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
 use Illuminate\Support\Facades\Hash;
 use LibreNMS\Authentication\LegacyAuth;
+use NotificationChannels\WebPush\HasPushSubscriptions;
 use Permissions;
 
 /**
@@ -19,7 +19,7 @@ use Permissions;
  */
 class User extends Authenticatable
 {
-    use Notifiable, HasFactory;
+    use Notifiable, HasFactory, HasPushSubscriptions;
 
     protected $primaryKey = 'user_id';
     protected $fillable = ['realname', 'username', 'email', 'level', 'descr', 'can_modify_passwd', 'auth_type', 'auth_id', 'enabled'];
@@ -124,6 +124,21 @@ class User extends Authenticatable
         return false;
     }
 
+    /**
+     * Checks if this user has a browser push notification transport configured.
+     *
+     * @return bool
+     */
+    public function hasBrowserPushTransport(): bool
+    {
+        $user_id = \Auth::id();
+
+        return AlertTransport::query()
+            ->where('transport_type', 'browserpush')
+            ->where('transport_config', 'regexp', "\"user\":\"(0|$user_id)\"")
+            ->exists();
+    }
+
     // ---- Query scopes ----
 
     /**
@@ -189,9 +204,9 @@ class User extends Authenticatable
 
     // ---- Define Relationships ----
 
-    public function apiToken(): HasOne
+    public function apiTokens(): HasMany
     {
-        return $this->hasOne(\App\Models\ApiToken::class, 'user_id', 'user_id');
+        return $this->hasMany(\App\Models\ApiToken::class, 'user_id', 'user_id');
     }
 
     public function devices()
@@ -220,6 +235,11 @@ class User extends Authenticatable
     public function dashboards(): HasMany
     {
         return $this->hasMany(\App\Models\Dashboard::class, 'user_id');
+    }
+
+    public function notificationAttribs(): HasMany
+    {
+        return $this->hasMany(NotificationAttrib::class, 'user_id');
     }
 
     public function preferences(): HasMany

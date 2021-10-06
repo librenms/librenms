@@ -24,6 +24,7 @@
 namespace LibreNMS\Alert\Transport;
 
 use LibreNMS\Alert\Transport;
+use LibreNMS\Util\Proxy;
 
 class Pushbullet extends Transport
 {
@@ -44,7 +45,7 @@ class Pushbullet extends Transport
         $data = json_encode($data);
 
         $curl = curl_init('https://api.pushbullet.com/v2/pushes');
-        set_curl_proxy($curl);
+        Proxy::applyToCurl($curl);
         curl_setopt($curl, CURLOPT_CUSTOMREQUEST, 'POST');
         curl_setopt($curl, CURLOPT_POSTFIELDS, $data);
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);

@@ -34,6 +34,9 @@ use LibreNMS\Enum\AlertState;
 class Alert extends Model
 {
     public $timestamps = false;
+    public $casts = [
+        'info' => 'array',
+    ];
 
     // ---- Query scopes ----
 
