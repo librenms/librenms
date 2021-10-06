@@ -425,22 +425,16 @@ class Service:
         self.queue_managers["poller"] = self.poller_manager
         self.discovery_manager = LibreNMS.DiscoveryQueueManager(self.config, self._lm)
         self.queue_managers["discovery"] = self.discovery_manager
-        if self.config.alerting.enabled:
-            self.queue_managers["alerting"] = LibreNMS.AlertQueueManager(
-                self.config, self._lm
-            )
-        if self.config.services.enabled:
-            self.queue_managers["services"] = LibreNMS.ServicesQueueManager(
-                self.config, self._lm
-            )
-        if self.config.billing.enabled:
-            self.queue_managers["billing"] = LibreNMS.BillingQueueManager(
-                self.config, self._lm
-            )
-        if self.config.ping.enabled:
-            self.queue_managers["ping"] = LibreNMS.PingQueueManager(
-                self.config, self._lm
-            )
+        self.queue_managers["alerting"] = LibreNMS.AlertQueueManager(
+            self.config, self._lm
+        )
+        self.queue_managers["services"] = LibreNMS.ServicesQueueManager(
+            self.config, self._lm
+        )
+        self.queue_managers["billing"] = LibreNMS.BillingQueueManager(
+            self.config, self._lm
+        )
+        self.queue_managers["ping"] = LibreNMS.PingQueueManager(self.config, self._lm)
         if self.config.update_enabled:
             self.daily_timer.start()
         self.stats_timer.start()
