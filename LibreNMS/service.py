@@ -482,6 +482,19 @@ class Service:
                         logger.info(
                             "{} is now the master dispatcher".format(self.config.name)
                         )
+                        # When the node is the master one, start all queuemanagers
+                        self.queue_managers["alerting"] = LibreNMS.AlertQueueManager(
+                            self.config, self._lm
+                        )
+                        self.queue_managers["services"] = LibreNMS.ServicesQueueManager(
+                            self.config, self._lm
+                        )
+                        self.queue_managers["billing"] = LibreNMS.BillingQueueManager(
+                            self.config, self._lm
+                        )
+                        self.queue_managers["ping"] = LibreNMS.PingQueueManager(
+                            self.config, self._lm
+                        )
                         self.is_master = True
                         self.start_dispatch_timers()
 
