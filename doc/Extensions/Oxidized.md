@@ -33,6 +33,7 @@ working Oxidized setup which is already taking config snapshots for
 your devices. When you have that, you only need the following config
 to enable the display of device configs within the device page itself:
 
+!!! setting "external/oxidized"
 ```bash
 lnms config:set oxidized.enabled true
 lnms config:set oxidized.url http://127.0.0.1:8888
@@ -41,6 +42,7 @@ lnms config:set oxidized.url http://127.0.0.1:8888
 LibreNMS supports config versioning if Oxidized does.  This is known
 to work with the git output module.
 
+!!! setting "external/oxidized"
 ```bash
 lnms config:set oxidized.features.versioning true
 ```
@@ -52,14 +54,31 @@ supports sending groups back to Oxidized so that you can then define
 group credentials within Oxidized. To enable this support please
 switch on 'Enable the return of groups to Oxidized':
 
+!!! setting "external/oxidized"
 ```bash
 lnms config:set oxidized.group_support true
 ```
 
 You can set a default group that devices will fall back to with:
 
+!!! setting "external/oxidized"
 ```bash
 lnms config:set oxidized.default_group default
+```
+
+You can ignore specific groups
+
+!!! setting "external/oxidized"
+```bash
+lnms config:set oxidized.ignore_groups '["badgroup", "nobackup"]'
+```
+
+One trick you can do to ignore all ungrouped devices is set both of these settings
+
+!!! setting "external/oxidized"
+```bash
+lnms config:set oxidized.default_group nobackup
+lnms config:set oxidized.ignore_groups.+ nobackup
 ```
 
 ## SELinux
@@ -103,6 +122,7 @@ device is added to LibreNMS. To do so, edit the option in Global
 Settings>External Settings>Oxidized Integration or add the following
 to your config.
 
+!!! setting "external/oxidized"
 ```bash
 lnms config:set oxidized.reload_nodes true
 ```
@@ -130,6 +150,7 @@ key and value, or a 'regex' key and value. The order of matching is:
 To match on the device hostnames or sysNames that contain 'lon-sw' or
 if the location contains 'London' then you would set the following:
 
+!!! setting "external/oxidized"
 ```bash
 lnms config:set oxidized.maps.group.hostname.+ '{"regex": "/^lon-sw/", "value": "london-switches"}'
 lnms config:set oxidized.maps.group.sysName.+ '{"regex": "/^lon-sw/", "value": "london-switches"}'
@@ -138,6 +159,7 @@ lnms config:set oxidized.maps.group.location.+ '{"regex": "/london/", "value": "
 
 To match on a device os of edgeos then please use the following:
 
+!!! setting "external/oxidized"
 ```bash
 lnms config:set oxidized.maps.group.os.+ '{"match": "edgeos", "value": "wireless"}'
 ```
@@ -147,6 +169,7 @@ will not work, while "match": "routeros" will.
 
 To edit an existing map, you must use the index to override it.
 
+!!! setting "external/oxidized"
 ```bash
 lnms config:get oxidized.maps.os.os
 array (
@@ -167,6 +190,7 @@ lnms config:set oxidized.maps.os.os.1 '{"match": "airos-af", "value": "something
 
 To override the IP Oxidized uses to poll the device, set the following:
 
+!!! setting "external/oxidized"
 ```bash
 lnms config:set oxidized.maps.ip.sysName.+ '{"regex": "/^my.node/", "value": "192.168.1.10"}'
 lnms config:set oxidized.maps.ip.sysName.+ '{"match": "my-other.node", "value": "192.168.1.20"}'
@@ -177,6 +201,7 @@ completely flexible model for custom flags and settings, for example,
 below shows the ability to add an ssh_proxy host within Oxidized
 simply by adding the below to your configuration:
 
+!!! setting "external/oxidized"
 ```bash
 lnms config:set oxidized.maps.ssh_proxy.sysName.+ '{"regex": "/^my.node/", "value": "my-ssh-gateway.node"}'
 ```
@@ -185,6 +210,7 @@ Or of course, any custom value that could be needed or wanted can be
 applied, for example, setting a "myAttribute" to "Super cool value"
 for any configured and enabled "routeros" device.
 
+!!! setting "external/oxidized"
 ```bash
 lnms config:set oxidized.maps.myAttribute.os.+ '{"match": "routeros", "value": "Super cool value"}'
 ```
@@ -214,6 +240,7 @@ you can edit those devices in Device -> Edit -> Misc and enable
 It's also possible to exclude certain device types and OS' from being
 output via the API.
 
+!!! setting "external/oxidized"
 ```bash
 lnms config:set oxidized.ignore_types '["server", "power"]'
 lnms config:set oxidized.ignore_os '["linux", "windows"]'
@@ -221,6 +248,7 @@ lnms config:set oxidized.ignore_os '["linux", "windows"]'
 
 You can also ignore whole groups of devices
 
+!!! setting "external/oxidized"
 ```bash
 lnms config:set oxidized.ignore_groups '["london-switches", "default"]'
 ```
