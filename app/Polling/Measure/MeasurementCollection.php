@@ -15,7 +15,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
  *
@@ -29,32 +29,32 @@ use Illuminate\Support\Collection;
 
 class MeasurementCollection extends Collection
 {
-    public function getTotalCount()
+    public function getTotalCount(): int
     {
         return $this->sumStat('getCount');
     }
 
-    public function getTotalDuration()
+    public function getTotalDuration(): float
     {
         return $this->sumStat('getDuration');
     }
 
-    public function getCountDiff()
+    public function getCountDiff(): int
     {
         return $this->sumStat('getCountDiff');
     }
 
-    public function getDurationDiff()
+    public function getDurationDiff(): float
     {
         return $this->sumStat('getDurationDiff');
     }
 
-    public function checkpoint()
+    public function checkpoint(): void
     {
         $this->each->checkpoint();
     }
 
-    public function record(Measurement $measurement)
+    public function record(Measurement $measurement): void
     {
         $type = $measurement->getType();
 
@@ -70,6 +70,10 @@ class MeasurementCollection extends Collection
         return $this->get($type, new MeasurementSummary($type));
     }
 
+    /**
+     * @param $function
+     * @return int|float
+     */
     private function sumStat($function)
     {
         return $this->reduce(function ($sum, $measurement) use ($function) {

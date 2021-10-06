@@ -15,7 +15,7 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ *  along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
  *
@@ -39,7 +39,7 @@ class MeasurementSummary
         $this->type = $type;
     }
 
-    public function add(Measurement $measurement)
+    public function add(Measurement $measurement): void
     {
         $this->count++;
         $this->duration += $measurement->getDuration();
@@ -48,10 +48,8 @@ class MeasurementSummary
     /**
      * Get the measurement summary
      * ['count' => #, 'duration' => s]
-     *
-     * @return array
      */
-    public function get()
+    public function get(): array
     {
         return [
             'count' => $this->count,
@@ -59,33 +57,36 @@ class MeasurementSummary
         ];
     }
 
-    public function getCount()
+    public function getCount(): int
     {
         return $this->count;
     }
 
-    public function getType()
+    public function getType(): string
     {
         return $this->type;
     }
 
-    public function getDuration()
+    public function getDuration(): float
     {
         return $this->duration;
     }
 
-    public function checkpoint()
+    /**
+     * Set a new checkpoint to compare against with diff methods
+     */
+    public function checkpoint(): void
     {
         $this->checkpointCount = $this->count;
         $this->checkpointDuration = $this->duration;
     }
 
-    public function getCountDiff()
+    public function getCountDiff(): int
     {
         return $this->count - $this->checkpointCount;
     }
 
-    public function getDurationDiff()
+    public function getDurationDiff(): float
     {
         return $this->duration - $this->checkpointDuration;
     }
