@@ -55,11 +55,9 @@
         var ack_until_clear = $("#ack_until_clear").bootstrapSwitch('state');
         $.ajax({
             type: "POST",
-            url: "ajax_form.php",
+            url: '{{ route('alert.ack', ['alert' => ':alert_id']) }}'.replace(':alert_id', ack_alert_id),
             dataType: "json",
             data: {
-                type: "ack-alert",
-                alert_id: ack_alert_id,
                 state: ack_alert_state,
                 ack_msg: ack_alert_note,
                 ack_until_clear: ack_until_clear
