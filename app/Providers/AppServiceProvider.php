@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use App\Models\Sensor;
+use App\Polling\Measure\MeasurementManager;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Log;
@@ -38,8 +39,9 @@ class AppServiceProvider extends ServiceProvider
      *
      * @return void
      */
-    public function boot()
+    public function boot(MeasurementManager $measure)
     {
+        $measure->listenDb();
         \Illuminate\Pagination\Paginator::useBootstrap();
 
         $this->app->booted('\LibreNMS\DB\Eloquent::initLegacyListeners');
