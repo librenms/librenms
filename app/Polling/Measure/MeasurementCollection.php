@@ -71,7 +71,7 @@ class MeasurementCollection extends Collection
     }
 
     /**
-     * @param string $method method on measurement class to call
+     * @param  string  $method  method on measurement class to call
      * @return int|float
      */
     private function sumStat(string $method)
