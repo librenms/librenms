@@ -71,13 +71,13 @@ class MeasurementCollection extends Collection
     }
 
     /**
-     * @param $function
+     * @param string $method method on measurement class to call
      * @return int|float
      */
-    private function sumStat($function)
+    private function sumStat(string $method)
     {
-        return $this->reduce(function ($sum, $measurement) use ($function) {
-            $sum += $measurement->$function();
+        return $this->reduce(function ($sum, $measurement) use ($method) {
+            $sum += $measurement->$method();
 
             return $sum;
         }, 0);
