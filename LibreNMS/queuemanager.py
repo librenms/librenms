@@ -13,7 +13,7 @@ logger = logging.getLogger(__name__)
 
 class QueueManager:
     def __init__(
-        self, config, lock_manager, type_desc, uses_groups=False, auto_start=True
+        self, config, lock_manager, type_desc, uses_groups=False, auto_start=False
     ):
         """
         This class manages a queue of jobs and can be used to submit jobs to the queue with post_work()
