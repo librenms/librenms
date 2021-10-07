@@ -34,6 +34,7 @@ class FacadeAccessorSnmp extends Facade
     {
         // always resolve a new instance
         self::clearResolvedInstance(SnmpQuery::class);
+
         return SnmpQuery::class;
     }
 }
