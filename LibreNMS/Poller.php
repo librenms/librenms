@@ -201,8 +201,18 @@ class Poller extends PollingCommon
         $this->os->enableGraph('poller_perf');
     }
 
-    private function isModuleEnabled($module, $global_status): bool
+    private function isModuleEnabled(string $module, bool $global_status): bool
     {
+        if (! empty($this->module_override)) {
+            if (in_array($module, $this->module_override)) {
+                Log::debug("Module $module manually enabled");
+                return true;
+            }
+
+            Log::debug("Module [ $module ] disabled manual override");
+            return false;
+        }
+
         $os_module_status = Config::get("os.{$this->device->os}.poller_modules.$module");
         $device_attrib = $this->device->getAttrib('poll_' . $module);
         Log::debug(sprintf('Modules status: Global %s OS %s Device %s',
@@ -219,7 +229,7 @@ class Poller extends PollingCommon
 
         $reason = (isset($device_attrib) && ! $device_attrib) ? 'by device'
                 : (isset($os_module_status) && ! $os_module_status ? 'by OS' : 'globally');
-        $this->output->writeln("Module [ $module ] disabled $reason");
+        Log::debug("Module [ $module ] disabled $reason");
         return false;
     }
 
