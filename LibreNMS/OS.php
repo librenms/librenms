@@ -2,7 +2,7 @@
 /**
  * OS.php
  *
- * Base OS class
+ * -Description-
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,7 +19,7 @@
  *
  * @link       https://www.librenms.org
  *
- * @copyright  2017 Tony Murray
+ * @copyright  2021 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
@@ -39,6 +39,7 @@ use LibreNMS\OS\Traits\HostResources;
 use LibreNMS\OS\Traits\UcdResources;
 use LibreNMS\OS\Traits\YamlMempoolsDiscovery;
 use LibreNMS\OS\Traits\YamlOSDiscovery;
+use LibreNMS\Util\StringHelpers;
 
 class OS implements ProcessorDiscovery, OSDiscovery, MempoolsDiscovery
 {
@@ -222,8 +223,8 @@ class OS implements ProcessorDiscovery, OSDiscovery, MempoolsDiscovery
 
             // If not a specific OS, check for a group one.
             if ($os_group) {
-                $class = str_to_class($device['os_group'], 'LibreNMS\\OS\\Shared\\');
-                d_echo('Attempting to initialize OS: ' . $device['os_group'] . PHP_EOL);
+                $class = str_to_class($os_group, 'LibreNMS\\OS\\Shared\\');
+                d_echo('Attempting to initialize OS: ' . $os_group . PHP_EOL);
                 if (class_exists($class)) {
                     d_echo("OS initialized: $class\n");
 

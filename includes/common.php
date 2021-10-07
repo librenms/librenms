@@ -1075,15 +1075,7 @@ function get_vm_parent_id($device)
  */
 function str_to_class($name, $namespace = null)
 {
-    $pre_format = str_replace(['-', '_'], ' ', $name);
-    $class = str_replace(' ', '', ucwords(strtolower($pre_format)));
-    $class = preg_replace_callback('/^(\d)(.)/', function ($matches) {
-        $numbers = ['Zero', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine'];
-
-        return $numbers[$matches[1]] . strtoupper($matches[2]);
-    }, $class);
-
-    return $namespace . $class;
+    return \LibreNMS\Util\StringHelpers::toClass($name, $namespace);
 }
 
 /**
