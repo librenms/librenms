@@ -101,29 +101,31 @@ class Poller extends PollingCommon
                 $this->pollModules();
             }
 
-            // record performance
-            $measurement->manager()->record('poller', $measurement->end());
-            $this->device->last_polled = time();
-            $this->device->last_ping_timetaken = $measurement->getDuration();
-            app('Datastore')->put($this->deviceArray, 'poller-perf', [
-                'rrd_def' => RrdDefinition::make()->addDataset('poller', 'GAUGE', 0),
-                'module' => 'ALL',
-            ], [
-                'poller' => $measurement->getDuration(),
-            ]);
-            $this->os->enableGraph('poller_modules_perf');
+            if (empty($this->module_override)) {
+                // record performance
+                $measurement->manager()->record('poller', $measurement->end());
+                $this->device->last_polled = time();
+                $this->device->last_ping_timetaken = $measurement->getDuration();
+                app('Datastore')->put($this->deviceArray, 'poller-perf', [
+                    'rrd_def' => RrdDefinition::make()->addDataset('poller', 'GAUGE', 0),
+                    'module' => 'ALL',
+                ], [
+                    'poller' => $measurement->getDuration(),
+                ]);
+                $this->os->enableGraph('poller_perf');
 
-            $this->output->write('Enabling graphs: ');
-            if ($helper->canPing()) {
-                $this->os->enableGraph('ping_perf');
+                $this->output->write('Enabling graphs: ');
+                if ($helper->canPing()) {
+                    $this->os->enableGraph('ping_perf');
+                }
+                DeviceGraph::deleted(function ($graph) {
+                    $this->output->write('-');
+                });
+                DeviceGraph::created(function ($graph) {
+                    $this->output->write('+');
+                });
+                $this->os->persistGraphs();
             }
-            DeviceGraph::deleted(function ($graph) {
-                $this->output->write('-');
-            });
-            DeviceGraph::created(function ($graph) {
-                $this->output->write('+');
-            });
-            $this->os->persistGraphs();
 
             $this->device->save();
             $polled++;
@@ -198,7 +200,7 @@ class Poller extends PollingCommon
         ], [
             'poller' => $module_time,
         ]);
-        $this->os->enableGraph('poller_perf');
+        $this->os->enableGraph('poller_modules_perf');
     }
 
     private function isModuleEnabled(string $module, bool $global_status): bool
