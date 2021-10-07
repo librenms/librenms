@@ -5,6 +5,7 @@ namespace App\Console\Commands;
 use App\Console\LnmsCommand;
 use App\Models\Device;
 use Illuminate\Validation\Rule;
+use SnmpQuery;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 
@@ -55,7 +56,7 @@ class SnmpFetch extends LnmsCommand
             ?: ($type == 'walk' ? 'table' : 'value');
 
         /** @var \LibreNMS\Data\Source\SnmpResponse $res */
-        $res = \NetSnmp::numeric($this->option('numeric'))
+        $res = SnmpQuery::numeric($this->option('numeric'))
             ->$type($this->argument('oid'));
 
         if (! $res->isValid()) {

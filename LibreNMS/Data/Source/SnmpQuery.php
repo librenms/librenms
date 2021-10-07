@@ -139,15 +139,9 @@ class SnmpQuery
     /**
      * Output all OIDs numerically
      */
-    public function numeric(bool $enabled = true): SnmpQuery
+    public function numeric(): SnmpQuery
     {
-        if ($enabled) {
-            $this->options = array_merge($this->options, ['-On']);
-
-            return $this;
-        }
-
-        $this->options = array_diff($this->options, ['-On']);
+        $this->options = array_merge($this->options, ['-On']);
 
         return $this;
     }
