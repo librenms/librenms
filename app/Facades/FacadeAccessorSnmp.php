@@ -26,11 +26,15 @@
 namespace App\Facades;
 
 use Illuminate\Support\Facades\Facade;
+use LibreNMS\Data\Source\SnmpQuery;
 
 class FacadeAccessorSnmp extends Facade
 {
     protected static function getFacadeAccessor()
     {
-        return \LibreNMS\Data\Source\SnmpQuery::class;
+        // always resolve a new instance
+        self::clearResolvedInstance(SnmpQuery::class);
+
+        return SnmpQuery::class;
     }
 }

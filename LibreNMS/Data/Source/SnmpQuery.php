@@ -115,6 +115,23 @@ class SnmpQuery
     }
 
     /**
+     * Specify a device by a device array.
+     * The device will be fetched from the cache if it is loaded, otherwise, it will fill the array into a new Device
+     */
+    public function deviceArray(array $device): SnmpQuery
+    {
+        if (isset($device['device_id']) && DeviceCache::has($device['device_id'])) {
+            $this->device = DeviceCache::get($device['device_id']);
+
+            return $this;
+        }
+
+        $this->device = new Device($device);
+
+        return $this;
+    }
+
+    /**
      * Set a context for the snmp query
      * This is most commonly used to fetch alternate sets of data, such as different VRFs
      */
@@ -139,15 +156,9 @@ class SnmpQuery
     /**
      * Output all OIDs numerically
      */
-    public function numeric(bool $enabled = true): SnmpQuery
+    public function numeric(): SnmpQuery
     {
-        if ($enabled) {
-            $this->options = array_merge($this->options, ['-On']);
-
-            return $this;
-        }
-
-        $this->options = array_diff($this->options, ['-On']);
+        $this->options = array_merge($this->options, ['-On']);
 
         return $this;
     }
