@@ -324,6 +324,7 @@ class Service:
     _fp = False
     _started = False
     start_time = 0
+    queue_workers = {}
     queue_managers = {}
     poller_manager = None
     discovery_manager = None
@@ -418,27 +419,27 @@ class Service:
             raise RuntimeWarning("Not allowed to start Poller twice")
         self._started = True
 
-        logger.debug("Starting up queue managers...")
+        logger.debug("Starting up queue workers...")
 
-        # initialize and start the worker pools
-        self.poller_manager = LibreNMS.PollerQueueManager(self.config, self._lm)
-        self.queue_managers["poller"] = self.poller_manager
-        self.discovery_manager = LibreNMS.DiscoveryQueueManager(self.config, self._lm)
-        self.queue_managers["discovery"] = self.discovery_manager
+        # initialize and start the workers
+        self.poller_worker = LibreNMS.PollerQueueManager(self.config, self._lm)
+        self.queue_workers["poller"] = self.poller_manager
+        self.discovery_worker = LibreNMS.DiscoveryQueueManager(self.config, self._lm)
+        self.queue_workers["discovery"] = self.discovery_manager
         if self.config.alerting.enabled:
-            self.queue_managers["alerting"] = LibreNMS.AlertQueueManager(
+            self.queue_workers["alerting"] = LibreNMS.AlertQueueManager(
                 self.config, self._lm
             )
         if self.config.services.enabled:
-            self.queue_managers["services"] = LibreNMS.ServicesQueueManager(
+            self.queue_workers["services"] = LibreNMS.ServicesQueueManager(
                 self.config, self._lm
             )
         if self.config.billing.enabled:
-            self.queue_managers["billing"] = LibreNMS.BillingQueueManager(
+            self.queue_workers["billing"] = LibreNMS.BillingQueueManager(
                 self.config, self._lm
             )
         if self.config.ping.enabled:
-            self.queue_managers["ping"] = LibreNMS.PingQueueManager(
+            self.queue_workers["ping"] = LibreNMS.PingQueueManager(
                 self.config, self._lm
             )
         if self.config.update_enabled:
@@ -447,6 +448,8 @@ class Service:
         self.systemd_watchdog_timer.start()
         if self.config.watchdog_enabled:
             self.watchdog_timer.start()
+
+        self.start_worker_timers()
 
         logger.info("LibreNMS Service: {} started!".format(self.config.unique_name))
         logger.info(
@@ -745,6 +748,16 @@ class Service:
             "Shutdown of %s/%s complete", os.getpid(), threading.current_thread().name
         )
         self.exit(0)
+
+    def start_worker_timers(self):
+        """
+        Start worker timers and begin popping work from queues.
+        """
+        for worker in self.queue_workers.values():
+            try:
+                worker.start()
+            except AttributeError:
+                pass
 
     def start_dispatch_timers(self):
         """
