@@ -1,5 +1,5 @@
 <?php
-/*
+/**
  * LegacyModule.php
  *
  * -Description-
@@ -15,10 +15,10 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
+ *
  * @copyright  2021 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -27,6 +27,7 @@ namespace LibreNMS\Modules;
 
 use LibreNMS\Interfaces\Module;
 use LibreNMS\OS;
+use LibreNMS\Util\Debug;
 
 class LegacyModule implements Module
 {
@@ -48,7 +49,13 @@ class LegacyModule implements Module
 
     public function poll(OS $os)
     {
-        // TODO: Implement poll() method.
+        $device = &$os->getDeviceArray();
+        $device['attribs'] = $os->getDevice()->attribs->toArray();
+        Debug::set(false);
+
+        include_once base_path('includes/dbFacile.php');
+
+        include base_path("includes/polling/$this->name.inc.php");
     }
 
     public function cleanup(OS $os)
