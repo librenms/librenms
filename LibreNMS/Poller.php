@@ -50,9 +50,6 @@ class Poller extends PollingCommon
     /** @var array */
     private $module_override;
     private $output;
-    private $polled = 0;
-    private $unreachable = 0;
-
 
     /**
      * @var Device
@@ -100,10 +97,11 @@ class Poller extends PollingCommon
             if ($helper->isUp()) {
                 $this->pollModules();
             }
+            $measurement->end();
 
             if (empty($this->module_override)) {
                 // record performance
-                $measurement->manager()->record('poller', $measurement->end());
+                $measurement->manager()->record('poller', $measurement);
                 $this->device->last_polled = time();
                 $this->device->last_ping_timetaken = $measurement->getDuration();
                 app('Datastore')->put($this->deviceArray, 'poller-perf', [
@@ -211,7 +209,6 @@ class Poller extends PollingCommon
                 return true;
             }
 
-            Log::debug("Module [ $module ] disabled manual override");
             return false;
         }
 
@@ -237,7 +234,8 @@ class Poller extends PollingCommon
 
     private function moduleExists(string $module): bool
     {
-        return is_file("includes/polling/$module.inc.php");
+        return class_exists(StringHelpers::toClass($module, '\\LibreNMS\\Modules\\'))
+            || is_file("includes/polling/$module.inc.php");
     }
 
     private function buildDeviceQuery(): Builder
