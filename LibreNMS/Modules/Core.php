@@ -1,5 +1,5 @@
 <?php
-/*
+/**
  * Core.php
  *
  * -Description-
@@ -17,19 +17,117 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
  * @link       https://www.librenms.org
- * @copyright  2020 Tony Murray
+ *
+ * @copyright  2021 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
 namespace LibreNMS\Modules;
 
+use DeviceCache;
 use Illuminate\Support\Str;
 use LibreNMS\Config;
+use LibreNMS\Data\Source\SnmpQuery;
+use LibreNMS\Interfaces\Module;
+use LibreNMS\OS;
+use LibreNMS\RRD\RrdDefinition;
+use LibreNMS\Util\Time;
+use Log;
 
-class Core
+class Core implements Module
 {
+
+    public function discover(OS $os)
+    {
+        $snmpdata = SnmpQuery::make()->numeric()->get(['SNMPv2-MIB::sysObjectID.0', 'SNMPv2-MIB::sysDescr.0', 'SNMPv2-MIB::sysName.0'])
+            ->values();
+
+        $deviceModel = DeviceCache::getPrimary();
+        $deviceModel->fill([
+            'sysObjectID' => $snmpdata['.1.3.6.1.2.1.1.2.0'] ?? null,
+            'sysName' => strtolower(trim($snmpdata['.1.3.6.1.2.1.1.5.0'] ?? '')),
+            'sysDescr' => isset($snmpdata['.1.3.6.1.2.1.1.1.0']) ? str_replace(chr(218), "\n", $snmpdata['.1.3.6.1.2.1.1.1.0']) : null,
+        ]);
+
+        foreach ($deviceModel->getDirty() as $attribute => $value) {
+            Log::event($value . ' -> ' . $deviceModel->$attribute, $deviceModel, 'system', 3);
+            $device[$attribute] = $value; // update device array
+        }
+
+// detect OS
+        $deviceModel->os = self::detectOS($device, false);
+
+        if ($deviceModel->isDirty('os')) {
+            Log::event('Device OS changed: ' . $deviceModel->getOriginal('os') . ' -> ' . $deviceModel->os, $deviceModel, 'system', 3);
+            $device['os'] = $deviceModel->os;
+
+            echo 'Changed ';
+        }
+
+        $deviceModel->save();
+        load_os($device);
+        load_discovery($device);
+        $os = OS::make($device);
+
+        echo 'OS: ' . Config::getOsSetting($device['os'], 'text') . " ({$device['os']})\n\n";
+
+        unset($snmpdata, $attribute, $value, $deviceModel);
+
+    }
+
+    public function poll(OS $os)
+    {
+        $snmpdata = SnmpQuery::make()->numeric()
+            ->get(['SNMPv2-MIB::sysDescr.0', 'SNMPv2-MIB::sysObjectID.0', 'SNMPv2-MIB::sysUpTime.0', 'SNMPv2-MIB::sysName.0'])
+            ->values();
+
+        $device = $os->getDevice();
+        $device->fill([
+            'uptime' => $snmpdata['.1.3.6.1.2.1.1.3.0'],
+            'sysName' => str_replace("\n", '', strtolower($snmpdata['.1.3.6.1.2.1.1.5.0'])),
+            'sysObjectID' => $snmpdata['.1.3.6.1.2.1.1.2.0'],
+            'sysDescr' => str_replace(chr(218), "\n", $snmpdata['.1.3.6.1.2.1.1.1.0']),
+        ]);
+
+        if (! empty($agent_data['uptime'])) {
+            [$uptime] = explode(' ', $agent_data['uptime']);
+            $uptime = round($uptime);
+            echo "Using UNIX Agent Uptime ($uptime)\n";
+        } else {
+            $uptime_data = SnmpQuery::make()->get(['SNMP-FRAMEWORK-MIB::snmpEngineTime.0', 'HOST-RESOURCES-MIB::hrSystemUptime.0'])->values();
+
+            $uptime = max(
+                round($device->uptime / 100),
+                Config::get("os.{$device->os}.bad_snmpEngineTime") ? 0 : $uptime_data['SNMP-FRAMEWORK-MIB::snmpEngineTime.0'],
+                Config::get("os.{$device->os}.bad_hrSystemUptime") ? 0 : round($uptime_data['HOST-RESOURCES-MIB::hrSystemUptime.0'] / 100)
+            );
+            d_echo("Uptime seconds: $uptime\n");
+        }
+
+        if ($uptime != 0 && Config::get("os.{$device->os}.bad_uptime") !== true) {
+            if ($uptime < $device->uptime) {
+                Log::event('Device rebooted after ' . Time::formatInterval($device->uptime) . " -> {$uptime}s", $device, 'reboot', 4, $device->uptime);
+            }
+
+            app('Datastore')->put($os->getDevice(), 'uptime', [
+                'rrd_def' => RrdDefinition::make()->addDataset('uptime', 'GAUGE', 0),
+            ], $uptime);
+
+            $os->enableGraph('uptime');
+
+            echo 'Uptime: ' . Time::formatInterval($uptime) . PHP_EOL;
+            $device->uptime = $uptime;
+
+            $device->save(); // FIXME stdout?
+        }
+    }
+
+    public function cleanup(OS $os)
+    {
+        // TODO: Implement cleanup() method.
+    }
+
     /**
      * Detect the os of the given device.
      *
