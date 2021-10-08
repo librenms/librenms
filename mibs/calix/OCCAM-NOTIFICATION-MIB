@@ -175,11 +175,12 @@ OCCAM-NOTIFICATION-MIB DEFINITIONS ::= BEGIN
                 ::=  {  ethernetCfmObjects 7  }
 
 	sfpPortIdentifier	OBJECT-TYPE
-                SYNTAX         	OCTET STRING  (SIZE(0..12))
-                MAX-ACCESS      accessible-for-notify
-                DESCRIPTION
-                        "1G/XG port identifier."
-		::= { sfpNotificationObjects 1 }
+            SYNTAX         	OCTET STRING  (SIZE(0..12))
+            STATUS          current
+            MAX-ACCESS      accessible-for-notify
+            DESCRIPTION
+                "1G/XG port identifier."
+	        ::= { sfpNotificationObjects 1 }
 
 	sfpType		OBJECT-TYPE
 	        SYNTAX         	INTEGER  {
@@ -190,6 +191,7 @@ OCCAM-NOTIFICATION-MIB DEFINITIONS ::= BEGIN
 				unknown(5)
 			}
 		MAX-ACCESS      accessible-for-notify
+		STATUS          current
 		DESCRIPTION
 			"SFP switch type."
 		::= { sfpNotificationObjects 2 }
@@ -199,6 +201,7 @@ OCCAM-NOTIFICATION-MIB DEFINITIONS ::= BEGIN
 					sfpUnsupported(1),
 					sfpUnrecognized(2)
 				}
+				MAX-ACCESS      accessible-for-notify
                 STATUS          current
                 DESCRIPTION
                         "SFP failure reason."
@@ -227,8 +230,8 @@ OCCAM-NOTIFICATION-MIB DEFINITIONS ::= BEGIN
 					major(3),
 					critical(4)
 				}
+		        MAX-ACCESS	accessible-for-notify
                 STATUS          current
-		MAX-ACCESS	accessible-for-notify
                 DESCRIPTION
                         "System notification severity.  Valid values are:
                                         other(1): a severity other than those
