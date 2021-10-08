@@ -423,7 +423,7 @@ class Service:
 
         # initialize and start the workers
         self.poller_worker = LibreNMS.PollerQueueManager(self.config, self._lm)
-        self.queue_workers["poller"] = self.poller_manager
+        self.queue_workers["poller"] = self.poller_worker
         self.discovery_worker = LibreNMS.DiscoveryQueueManager(self.config, self._lm)
         self.queue_workers["discovery"] = self.discovery_manager
         if self.config.alerting.enabled:
@@ -537,13 +537,13 @@ class Service:
 
     # ------------ Discovery ------------
     def dispatch_immediate_discovery(self, device_id, group):
-        if not self.discovery_manager.is_locked(device_id):
-            self.discovery_manager.post_work(device_id, group)
+        if not self.discovery_worker.is_locked(device_id):
+            self.discovery_worker.post_work(device_id, group)
 
     # ------------ Polling ------------
     def dispatch_immediate_polling(self, device_id, group):
-        if not self.poller_manager.is_locked(device_id):
-            self.poller_manager.post_work(device_id, group)
+        if not self.poller_worker.is_locked(device_id):
+            self.poller_worker.post_work(device_id, group)
 
             if self.config.debug:
                 cur_time = time.time()
