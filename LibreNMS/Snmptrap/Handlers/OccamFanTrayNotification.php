@@ -43,21 +43,17 @@ class OccamFanTrayNotification implements SnmptrapHandler
      */
     public function handle(Device $device, Trap $trap)
     {
-        $shelfIndex = "unknown";
-        $slotIndex = "unknown";
-        $fanTrayStatus = "unknown";
+        $shelfIndex = $slotIndex = $fanTrayStatus = "unknown";
 
-        if ($trap_oid = $trap->findOid('OCCAM-KERNEL-MIB::cardShelfIndex'))
+        if ($trap_oid = $trap->findOid('OCCAM-SHELF-MIB::cardShelfIndex'))
             $shelfIndex = $trap->getOidData($trap_oid);
 
-        if ($trap_oid = $trap->findOid('OCCAM-KERNEL-MIB::cardSlotIndex'))
+        if ($trap_oid = $trap->findOid('OCCAM-SHELF-MIB::cardSlotIndex'))
             $slotIndex = $trap->getOidData($trap_oid);
 
-        if ($trap_oid = $trap->findOid('OCCAM-KERNEL-MIB::fanTrayStatus')) {
-            $fanTrayStatusRaw = $trap->getOidData($trap_oid);
-            $fanTrayStatus = ($fanTrayStatusRaw == 1 ? "inserted" : "removed")
-        }
+        if ($trap_oid = $trap->findOid('OCCAM-KERNEL-MIB::fanTrayStatus'))
+            $fanTrayStatus = $trap->getOidData($trap_oid);
 
-        Log::event("Fan Tray Status Notification: Tray status $fanTrayStatus on shelf $shelfIndex slot $slotIndex", $device->device_id, 'trap', 5);
+        Log::event("Fan Tray Status Notification: Tray status $fanTrayStatus on shelf/slot $shelfIndex/$slotIndex", $device->device_id, 'trap', 5);
     }
 }
