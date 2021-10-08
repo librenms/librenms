@@ -62,15 +62,15 @@ jobs:
           - 3306
     steps:
       -
-        name: Checkout
-        uses: actions/checkout@v2
-        with:
-          fetch-depth: 0
-      -
         name: Cancel Previous Runs
         uses: styfle/cancel-workflow-action@0.9.1
         with:
           access_token: ${{ github.token }}
+      -
+        name: Checkout
+        uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
       -
          name: Set $FILES
          run: |
