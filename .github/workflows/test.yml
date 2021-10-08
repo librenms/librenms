@@ -67,6 +67,11 @@ jobs:
         with:
           fetch-depth: 0
       -
+        name: Cancel Previous Runs
+        uses: styfle/cancel-workflow-action@0.9.1
+        with:
+          access_token: ${{ github.token }}
+      -
          name: Set $FILES
          run: |
            FILES=$(git diff --diff-filter=d --name-only origin/master | tr '\n' ' '|sed 's/,*$//g')
