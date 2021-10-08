@@ -67,17 +67,6 @@ class OS implements ProcessorDiscovery, OSDiscovery, MempoolsDiscovery
     {
         $this->device = &$device;
         $this->graphs = [];
-
-        // load os definition and populate os_group
-        if (isset($device['os'])) {
-            \LibreNMS\Util\OS::loadDefinition($device['os']);
-
-            if ($os_group = Config::get("os.{$device['os']}.group")) {
-                $device['os_group'] = $os_group;
-            } else {
-                unset($device['os_group']);
-            }
-        }
     }
 
     /**
@@ -214,22 +203,32 @@ class OS implements ProcessorDiscovery, OSDiscovery, MempoolsDiscovery
      */
     public static function make(&$device)
     {
-        $class = str_to_class($device['os'], 'LibreNMS\\OS\\');
-        d_echo('Attempting to initialize OS: ' . $device['os'] . PHP_EOL);
-        if (class_exists($class)) {
-            d_echo("OS initialized: $class\n");
+        if (isset($device['os'])) {
+            // load os definition and populate os_group
+            \LibreNMS\Util\OS::loadDefinition($device['os']);
+            if ($os_group = Config::get("os.{$device['os']}.group")) {
+                $device['os_group'] = $os_group;
+            } else {
+                unset($device['os_group']);
+            }
 
-            return new $class($device);
-        }
-
-        // If not a specific OS, check for a group one.
-        if (isset($device['os_group'])) {
-            $class = str_to_class($device['os_group'], 'LibreNMS\\OS\\Shared\\');
-            d_echo('Attempting to initialize OS: ' . $device['os_group'] . PHP_EOL);
+            $class = str_to_class($device['os'], 'LibreNMS\\OS\\');
+            d_echo('Attempting to initialize OS: ' . $device['os'] . PHP_EOL);
             if (class_exists($class)) {
                 d_echo("OS initialized: $class\n");
 
                 return new $class($device);
+            }
+
+            // If not a specific OS, check for a group one.
+            if ($os_group) {
+                $class = str_to_class($device['os_group'], 'LibreNMS\\OS\\Shared\\');
+                d_echo('Attempting to initialize OS: ' . $device['os_group'] . PHP_EOL);
+                if (class_exists($class)) {
+                    d_echo("OS initialized: $class\n");
+
+                    return new $class($device);
+                }
             }
         }
 

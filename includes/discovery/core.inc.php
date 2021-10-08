@@ -32,7 +32,6 @@ if ($deviceModel->isDirty('os')) {
 $loaded_os_type = Config::get("os.{$device['os']}.type");
 if (! $deviceModel->getAttrib('override_device_type') && $loaded_os_type != $deviceModel->type) {
     $deviceModel->type = $loaded_os_type;
-    $deviceModel->save();
     Log::debug("Device type changed to $loaded_os_type!");
 }
 
