@@ -240,7 +240,6 @@ function poll_device($device, $force_module = false)
     $attribs = $deviceModel->getAttribs();
     $device['attribs'] = $attribs;
 
-    load_os($device);
     $os = \LibreNMS\OS::make($device);
 
     unset($array);

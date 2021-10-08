@@ -959,37 +959,6 @@ function get_sql_filter_min_severity($min_severity, $alert_rules_name)
     return '';
 }
 
-/**
- * Load the os definition for the device and set type and os_group
- * $device['os'] must be set
- *
- * @param  array  $device
- */
-function load_os(&$device)
-{
-    if (! isset($device['os'])) {
-        d_echo("No OS to load\n");
-
-        return;
-    }
-
-    \LibreNMS\Util\OS::loadDefinition($device['os']);
-
-    // Set type to a predefined type for the OS if it's not already set
-    $loaded_os_type = Config::get("os.{$device['os']}.type");
-    $model = DeviceCache::get($device['device_id']);
-    if (! $model->getAttrib('override_device_type') && $loaded_os_type != $model->type) {
-        $model->type = $loaded_os_type;
-        $model->save();
-        Log::debug("Device type changed to $loaded_os_type!");
-    }
-
-    if ($os_group = Config::get("os.{$device['os']}.group")) {
-        $device['os_group'] = $os_group;
-    } else {
-        unset($device['os_group']);
-    }
-}
 
 /**
  * Converts fahrenheit to celsius (with 2 decimal places)

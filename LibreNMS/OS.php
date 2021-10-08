@@ -67,6 +67,17 @@ class OS implements ProcessorDiscovery, OSDiscovery, MempoolsDiscovery
     {
         $this->device = &$device;
         $this->graphs = [];
+
+        // load os definition and populate os_group
+        if (isset($device['os'])) {
+            \LibreNMS\Util\OS::loadDefinition($device['os']);
+
+            if ($os_group = Config::get("os.{$device['os']}.group")) {
+                $device['os_group'] = $os_group;
+            } else {
+                unset($device['os_group']);
+            }
+        }
     }
 
     /**
