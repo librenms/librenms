@@ -55,6 +55,6 @@ class OccamThresholdExceededNotification implements SnmptrapHandler
         if ($trap_oid = $trap->findOid('OCCAM-KERNEL-MIB::thresholdValue'))
             $thresholdValue = $trap->getOidData($trap_oid);
 
-        Log::event("Threshold Exceeded: alarm state $alarmState for entity (MAC address / multicast group) $thresholdEntity: threshold value $thresholdValue", $device->device_id, 'trap', 4);
+        Log::event("Threshold Exceeded: alarm state $alarmState for $thresholdEntity: threshold value $thresholdValue", $device->device_id, 'trap', 4);
     }
 }
