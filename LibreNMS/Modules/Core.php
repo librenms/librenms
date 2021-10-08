@@ -25,6 +25,7 @@
 
 namespace LibreNMS\Modules;
 
+use App\Models\Device;
 use Illuminate\Support\Str;
 use LibreNMS\Config;
 use LibreNMS\Interfaces\Module;
@@ -55,7 +56,7 @@ class Core implements Module
         }
 
         // detect OS
-        $device->os = self::detectOS($os->getDeviceArray(), false);
+        $device->os = self::detectOS($device, false);
 
         if ($device->isDirty('os')) {
             Log::event('Device OS changed: ' . $device->getOriginal('os') . ' -> ' . $device->os, $device, 'system', 3);
@@ -131,21 +132,21 @@ class Core implements Module
     /**
      * Detect the os of the given device.
      *
-     * @param  array  $device  device to check
+     * @param  Device  $device  device to check
      * @param  bool  $fetch  fetch sysDescr and sysObjectID fresh from the device
      * @return string the name of the os
      *
      * @throws \Exception
      */
-    public static function detectOS($device, $fetch = true)
+    public static function detectOS(Device $device, bool $fetch = true): string
     {
         if ($fetch) {
             // some devices act odd when getting both oids at once
-            $device['sysDescr'] = snmp_get($device, 'SNMPv2-MIB::sysDescr.0', '-Ovq');
-            $device['sysObjectID'] = snmp_get($device, 'SNMPv2-MIB::sysObjectID.0', '-Ovqn');
+            $device->sysDescr = SnmpQuery::device($device)->get('SNMPv2-MIB::sysDescr.0')->value();
+            $device->sysObjectID = SnmpQuery::device($device)->get('SNMPv2-MIB::sysObjectID.0')->value();
         }
 
-        d_echo("| {$device['sysDescr']} | {$device['sysObjectID']} | \n");
+        d_echo("| {$device->sysDescr} | {$device->sysObjectID} | \n");
 
         $deferred_os = [];
         $generic_os = [
@@ -194,12 +195,12 @@ class Core implements Module
      *
      * Appending _except to any condition will invert the match.
      *
-     * @param  array  $device
+     * @param  Device  $device
      * @param  array  $array  Array of items, keys should be sysObjectID, sysDescr, or sysDescr_regex
      * @param  string|array  $mibdir  MIB directory for evaluated OS
      * @return bool the result (all items passed return true)
      */
-    protected static function checkDiscovery($device, $array, $mibdir)
+    protected static function checkDiscovery(Device $device, array $array, $mibdir): bool
     {
         // all items must be true
         foreach ($array as $key => $value) {
@@ -224,24 +225,20 @@ class Core implements Module
                     return false;
                 }
             } elseif ($key == 'snmpget') {
-                $get_value = snmp_get(
-                    $device,
-                    $value['oid'],
-                    $value['options'] ?? '-Oqv',
-                    $value['mib'] ?? null,
-                    $value['mib_dir'] ?? $mibdir
-                );
+                $get_value = SnmpQuery::device($device)
+                    ->options($value['options'] ?? [])
+                    ->mibDir($value['mib_dir'] ?? $mibdir)
+                    ->get(isset($value['mib']) ? "{$value['mib']}::{$value['oid']}" : $value['oid'])
+                    ->value();
                 if (compare_var($get_value, $value['value'], $value['op'] ?? 'contains') == $check) {
                     return false;
                 }
             } elseif ($key == 'snmpwalk') {
-                $walk_value = snmp_walk(
-                    $device,
-                    $value['oid'],
-                    $value['options'] ?? '-Oqv',
-                    $value['mib'] ?? null,
-                    $value['mib_dir'] ?? $mibdir
-                );
+                $walk_value = SnmpQuery::device($device)
+                    ->options($value['options'] ?? [])
+                    ->mibDir($value['mib_dir'] ?? $mibdir)
+                    ->walk(isset($value['mib']) ? "{$value['mib']}::{$value['oid']}" : $value['oid'])
+                    ->raw();
                 if (compare_var($walk_value, $value['value'], $value['op'] ?? 'contains') == $check) {
                     return false;
                 }

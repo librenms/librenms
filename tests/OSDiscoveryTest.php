@@ -25,6 +25,7 @@
 
 namespace LibreNMS\Tests;
 
+use App\Models\Device;
 use Illuminate\Support\Str;
 use LibreNMS\Config;
 use LibreNMS\Modules\Core;
@@ -119,12 +120,11 @@ class OSDiscoveryTest extends TestCase
      * Generate a fake $device array
      *
      * @param  string  $community  The snmp community to set
-     * @return array resulting device array
+     * @return Device resulting device array
      */
-    private function genDevice($community)
+    private function genDevice($community): Device
     {
-        return [
-            'device_id' => 1,
+        return new Device([
             'hostname' => $this->getSnmpsim()->getIP(),
             'snmpver' => 'v2c',
             'port' => $this->getSnmpsim()->getPort(),
@@ -133,9 +133,7 @@ class OSDiscoveryTest extends TestCase
             'snmp_max_repeaters' => 10,
             'community' => $community,
             'os' => 'generic',
-            'os_group' => '',
-            'attribs' => [],
-        ];
+        ]);
     }
 
     /**

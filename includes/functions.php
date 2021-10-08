@@ -572,7 +572,7 @@ function createHost(
         $port_assoc_mode = get_port_assoc_mode_id($port_assoc_mode);
     }
 
-    $device = [
+    $device = new Device(array_merge([
         'hostname' => $host,
         'overwrite_ip' => $overwrite_ip,
         'sysName' => $additional['sysName'] ?? $host,
@@ -587,22 +587,18 @@ function createHost(
         'status_reason' => '',
         'port_association_mode' => $port_assoc_mode,
         'snmp_disable' => $additional['snmp_disable'] ?? 0,
-    ];
-
-    $device = array_merge($device, $v3);  // merge v3 settings
+    ], $v3));
 
     if ($force_add !== true) {
-        $device['os'] = Core::detectOS($device);
+        $device->os = Core::detectOS($device);
 
-        $snmphost = snmp_get($device, 'sysName.0', '-Oqv', 'SNMPv2-MIB');
-        if (host_exists($host, $snmphost)) {
-            throw new HostExistsException("Already have host $host ($snmphost) due to duplicate sysName");
+        $device->sysName = SnmpQuery::device($device)->get('SNMPv2-MIB::sysName.0')->value();
+        if (host_exists($host, $device->sysName)) {
+            throw new HostExistsException("Already have host $host ({$device->sysName}) due to duplicate sysName");
         }
     }
-
-    $deviceModel = Device::create($device);
-    if ($deviceModel->device_id) {
-        return $deviceModel->device_id;
+    if ($device->save()) {
+        return $device->device_id;
     }
 
     throw new \Exception('Failed to add host to the database, please run ./validate.php');

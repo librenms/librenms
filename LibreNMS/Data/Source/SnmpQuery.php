@@ -146,7 +146,7 @@ class SnmpQuery
      * Set an additional MIB directory to search for MIBs.
      * You do not need to specify the base and os directories, they are already included.
      */
-    public function mibDir(string $dir): SnmpQuery
+    public function mibDir(?string $dir): SnmpQuery
     {
         $this->mibDir = $dir;
 
