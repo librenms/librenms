@@ -15,7 +15,6 @@
  * the source code distribution for details.
  */
 
-use App\Models\Device;
 use App\Polling\Measure\Measurement;
 use Illuminate\Support\Str;
 use LibreNMS\Config;
@@ -177,7 +176,7 @@ function gen_snmp_cmd($cmd, $device, $oids, $options = null, $mib = null, $mibdi
         array_push($cmd, '-r', $retries);
     }
 
-    $pollertarget = \LibreNMS\Util\Rewrite::addIpv6Brackets(Device::pollerTarget($device));
+    $pollertarget = \LibreNMS\Util\Rewrite::addIpv6Brackets((string) ($device['overwrite_ip'] ?? $device['hostname']));
     $cmd[] = $device['transport'] . ':' . $pollertarget . ':' . $device['port'];
     $cmd = array_merge($cmd, (array) $oids);
 
