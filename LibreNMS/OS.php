@@ -47,7 +47,6 @@ use LibreNMS\OS\Traits\UcdResources;
 use LibreNMS\OS\Traits\YamlMempoolsDiscovery;
 use LibreNMS\OS\Traits\YamlOSDiscovery;
 use LibreNMS\Util\StringHelpers;
-use Log;
 
 class OS implements
     ProcessorDiscovery,
@@ -86,25 +85,6 @@ class OS implements
     {
         $this->device = &$device;
         $this->graphs = [];
-
-        if (isset($device['os'])) {
-            \LibreNMS\Util\OS::loadDefinition($device['os']);
-
-            // Set type to a predefined type for the OS if it's not already set
-            $loaded_os_type = Config::get("os.{$device['os']}.type");
-            $model = DeviceCache::get($device['device_id']);
-            if (! $model->getAttrib('override_device_type') && $loaded_os_type != $model->type) {
-                $model->type = $loaded_os_type;
-                $model->save();
-                Log::debug("Device type changed to $loaded_os_type!");
-            }
-
-            if ($os_group = Config::get("os.{$device['os']}.group")) {
-                $device['os_group'] = $os_group;
-            } else {
-                unset($device['os_group']);
-            }
-        }
     }
 
     /**
