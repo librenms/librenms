@@ -129,6 +129,7 @@ class YamlDiscovery
      * @param  \LibreNMS\OS  $os  OS/device we areworking on
      * @param  array  $data  Array derived from YAML
      * @return string
+     *
      * @throws \LibreNMS\Exceptions\InvalidOidException
      */
     public static function computeNumericalOID(OS $os, array $data): string
