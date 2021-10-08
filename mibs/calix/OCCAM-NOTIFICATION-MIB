@@ -46,7 +46,7 @@ OCCAM-NOTIFICATION-MIB DEFINITIONS ::= BEGIN
         ::=  {  occamNotificationMib  5  }
 
    	    sfpNotificationObjects  OBJECT IDENTIFIER
-	    :: = { occamNotificationMib 6 }
+	    ::= { occamNotificationMib 6 }
 
         sfpNotifications   OBJECT IDENTIFIER
         ::=  {  occamNotificationMib  7  }
