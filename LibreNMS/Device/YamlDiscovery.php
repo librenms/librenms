@@ -126,11 +126,12 @@ class YamlDiscovery
     }
 
     /**
-     * @param  array  $device  Device we are working on
+     * @param  \LibreNMS\OS  $os  OS/device we areworking on
      * @param  array  $data  Array derived from YAML
      * @return string
+     * @throws \LibreNMS\Exceptions\InvalidOidException
      */
-    public static function computeNumericalOID(OS $os, $data)
+    public static function computeNumericalOID(OS $os, array $data): string
     {
         d_echo('Info: Trying to find a numerical OID for ' . $data['value'] . '.');
         $search_mib = $os->getDiscovery()['mib'];

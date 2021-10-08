@@ -910,7 +910,7 @@ function discovery_process(&$valid, $os, $sensor_class, $pre_cache)
                 // Check if we have a "num_oid" value. If not, we'll try to compute it from textual OIDs with snmptranslate.
                 if (empty($data['num_oid'])) {
                     try {
-                        $data['num_oid'] = YamlDiscovery::computeNumericalOID($device, $data);
+                        $data['num_oid'] = YamlDiscovery::computeNumericalOID($os, $data);
                     } catch (\Exception $e) {
                         d_echo('Error: We cannot find a numerical OID for ' . $data['value'] . '. Skipping this one...');
                         $skippedFromYaml = true;
