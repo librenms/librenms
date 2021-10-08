@@ -959,7 +959,6 @@ function get_sql_filter_min_severity($min_severity, $alert_rules_name)
     return '';
 }
 
-
 /**
  * Converts fahrenheit to celsius (with 2 decimal places)
  * if $scale is not fahrenheit, it assumes celsius and  returns the value
