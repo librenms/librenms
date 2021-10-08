@@ -25,7 +25,6 @@
 
 namespace LibreNMS\Modules;
 
-use DeviceCache;
 use Illuminate\Support\Str;
 use LibreNMS\Config;
 use LibreNMS\Interfaces\Module;
@@ -43,39 +42,38 @@ class Core implements Module
         $snmpdata = SnmpQuery::numeric()->get(['SNMPv2-MIB::sysObjectID.0', 'SNMPv2-MIB::sysDescr.0', 'SNMPv2-MIB::sysName.0'])
             ->values();
 
-        $deviceModel = DeviceCache::getPrimary();
-        $deviceModel->fill([
+        $device = $os->getDevice();
+        $device->fill([
             'sysObjectID' => $snmpdata['.1.3.6.1.2.1.1.2.0'] ?? null,
             'sysName' => strtolower(trim($snmpdata['.1.3.6.1.2.1.1.5.0'] ?? '')),
             'sysDescr' => isset($snmpdata['.1.3.6.1.2.1.1.1.0']) ? str_replace(chr(218), "\n", $snmpdata['.1.3.6.1.2.1.1.1.0']) : null,
         ]);
 
-        foreach ($deviceModel->getDirty() as $attribute => $value) {
-            Log::event($value . ' -> ' . $deviceModel->$attribute, $deviceModel, 'system', 3);
+        foreach ($device->getDirty() as $attribute => $value) {
+            Log::event($value . ' -> ' . $device->$attribute, $device, 'system', 3);
             $os->getDeviceArray()[$attribute] = $value; // update device array
         }
 
         // detect OS
-        $deviceModel->os = self::detectOS($os->getDeviceArray(), false);
+        $device->os = self::detectOS($os->getDeviceArray(), false);
 
-        if ($deviceModel->isDirty('os')) {
-            Log::event('Device OS changed: ' . $deviceModel->getOriginal('os') . ' -> ' . $deviceModel->os, $deviceModel, 'system', 3);
-            $os->getDeviceArray()['os'] = $deviceModel->os;
+        if ($device->isDirty('os')) {
+            Log::event('Device OS changed: ' . $device->getOriginal('os') . ' -> ' . $device->os, $device, 'system', 3);
+            $os->getDeviceArray()['os'] = $device->os;
 
             echo 'Changed ';
         }
 
         // Set type to a predefined type for the OS if it's not already set
-        $loaded_os_type = Config::get("os.{$device['os']}.type");
-        if (! $deviceModel->getAttrib('override_device_type') && $loaded_os_type != $deviceModel->type) {
-            $deviceModel->type = $loaded_os_type;
+        $loaded_os_type = Config::get("os.{$device->os}.type");
+        if (! $device->getAttrib('override_device_type') && $loaded_os_type != $device->type) {
+            $device->type = $loaded_os_type;
             Log::debug("Device type changed to $loaded_os_type!");
         }
 
-        $deviceModel->save();
-        $os = OS::make($device);
+        $device->save();
 
-        echo 'OS: ' . Config::getOsSetting($device['os'], 'text') . " ({$device['os']})\n\n";
+        echo 'OS: ' . Config::getOsSetting($device->os, 'text') . " ({$device->os})\n\n";
     }
 
     public function poll(OS $os)
