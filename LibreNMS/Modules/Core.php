@@ -28,19 +28,19 @@ namespace LibreNMS\Modules;
 use DeviceCache;
 use Illuminate\Support\Str;
 use LibreNMS\Config;
-use LibreNMS\Data\Source\SnmpQuery;
 use LibreNMS\Interfaces\Module;
 use LibreNMS\OS;
 use LibreNMS\RRD\RrdDefinition;
 use LibreNMS\Util\Time;
 use Log;
+use SnmpQuery;
 
 class Core implements Module
 {
 
     public function discover(OS $os)
     {
-        $snmpdata = SnmpQuery::make()->numeric()->get(['SNMPv2-MIB::sysObjectID.0', 'SNMPv2-MIB::sysDescr.0', 'SNMPv2-MIB::sysName.0'])
+        $snmpdata = SnmpQuery::numeric()->get(['SNMPv2-MIB::sysObjectID.0', 'SNMPv2-MIB::sysDescr.0', 'SNMPv2-MIB::sysName.0'])
             ->values();
 
         $deviceModel = DeviceCache::getPrimary();
@@ -52,33 +52,35 @@ class Core implements Module
 
         foreach ($deviceModel->getDirty() as $attribute => $value) {
             Log::event($value . ' -> ' . $deviceModel->$attribute, $deviceModel, 'system', 3);
-            $device[$attribute] = $value; // update device array
+            $os->getDeviceArray()[$attribute] = $value; // update device array
         }
 
-// detect OS
-        $deviceModel->os = self::detectOS($device, false);
+        // detect OS
+        $deviceModel->os = self::detectOS($os->getDeviceArray(), false);
 
         if ($deviceModel->isDirty('os')) {
             Log::event('Device OS changed: ' . $deviceModel->getOriginal('os') . ' -> ' . $deviceModel->os, $deviceModel, 'system', 3);
-            $device['os'] = $deviceModel->os;
+            $os->getDeviceArray()['os'] = $deviceModel->os;
 
             echo 'Changed ';
         }
 
+        // Set type to a predefined type for the OS if it's not already set
+        $loaded_os_type = Config::get("os.{$device['os']}.type");
+        if (! $deviceModel->getAttrib('override_device_type') && $loaded_os_type != $deviceModel->type) {
+            $deviceModel->type = $loaded_os_type;
+            Log::debug("Device type changed to $loaded_os_type!");
+        }
+
         $deviceModel->save();
-        load_os($device);
-        load_discovery($device);
         $os = OS::make($device);
 
         echo 'OS: ' . Config::getOsSetting($device['os'], 'text') . " ({$device['os']})\n\n";
-
-        unset($snmpdata, $attribute, $value, $deviceModel);
-
     }
 
     public function poll(OS $os)
     {
-        $snmpdata = SnmpQuery::make()->numeric()
+        $snmpdata = SnmpQuery::numeric()
             ->get(['SNMPv2-MIB::sysDescr.0', 'SNMPv2-MIB::sysObjectID.0', 'SNMPv2-MIB::sysUpTime.0', 'SNMPv2-MIB::sysName.0'])
             ->values();
 
@@ -110,7 +112,7 @@ class Core implements Module
                 Log::event('Device rebooted after ' . Time::formatInterval($device->uptime) . " -> {$uptime}s", $device, 'reboot', 4, $device->uptime);
             }
 
-            app('Datastore')->put($os->getDevice(), 'uptime', [
+            app('Datastore')->put($os->getDeviceArray(), 'uptime', [
                 'rrd_def' => RrdDefinition::make()->addDataset('uptime', 'GAUGE', 0),
             ], $uptime);
 
@@ -125,7 +127,7 @@ class Core implements Module
 
     public function cleanup(OS $os)
     {
-        // TODO: Implement cleanup() method.
+        // nothing to cleanup
     }
 
     /**
