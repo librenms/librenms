@@ -838,7 +838,7 @@ class Service:
                 )
             )
 
-            for worker_type, manager in self.queue_managers.items():
+            for worker_type, manager in self.queue_workers.items():
                 worker_seconds, devices = manager.performance.reset()
 
                 # Record the queue state
