@@ -13,7 +13,12 @@ logger = logging.getLogger(__name__)
 
 class QueueManager:
     def __init__(
-        self, config, lock_manager, type_desc, uses_groups=False, auto_start=False
+        self,
+        config,
+        lock_manager,
+        type_desc,
+        uses_groups=False,
+        auto_start=False,
     ):
         """
         This class manages a queue of jobs and can be used to submit jobs to the queue with post_work()
@@ -130,7 +135,7 @@ class QueueManager:
             for group in groups:
                 group_workers = max(
                     int(workers / len(groups)), 1
-                )  # Note for self, should we really use equal amount of workers of each group?
+                )  # Note for self, should we really use equal amount of workers for each group? Could this be dynamic?
                 for i in range(group_workers):
                     thread_name = "{}_{}-{}".format(self.type.title(), group, i + 1)
                     self.spawn_worker(thread_name, group)
