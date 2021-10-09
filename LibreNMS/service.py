@@ -422,10 +422,14 @@ class Service:
         logger.debug("Starting up queue workers...")
 
         # initialize and start the workers
-        self.poller_worker = LibreNMS.PollerQueueManager(self.config, self._lm)
-        self.queue_workers["poller"] = self.poller_worker
-        self.discovery_worker = LibreNMS.DiscoveryQueueManager(self.config, self._lm)
-        self.queue_workers["discovery"] = self.discovery_manager
+        if self.config.poller.enabled:
+            self.queue_workers["poller"] = LibreNMS.PollerQueueManager(
+                self.config, self._lm
+            )
+        if self.config.discovery.enabled:
+            self.queue_workers["discovery"] = LibreNMS.DiscoveryQueueManager(
+                self.config, self._lm
+            )
         if self.config.alerting.enabled:
             self.queue_workers["alerting"] = LibreNMS.AlertQueueManager(
                 self.config, self._lm
@@ -838,8 +842,8 @@ class Service:
                 )
             )
 
-            for worker_type, manager in self.queue_workers.items():
-                worker_seconds, devices = manager.performance.reset()
+            for worker_type, worker in self.queue_workers.items():
+                worker_seconds, devices = worker.performance.reset()
 
                 # Record the queue state
                 self._db.query(
@@ -849,7 +853,7 @@ class Service:
                         worker_type,
                         sum(
                             [
-                                manager.get_queue(group).qsize()
+                                worker.get_queue(group).qsize()
                                 for group in self.config.group
                             ]
                         ),
