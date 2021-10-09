@@ -333,8 +333,6 @@ class Service:
     terminate_flag = False
     reload_flag = False
     db_failures = 0
-    manager_mode = 1
-    worker_mode = 2
 
     def __init__(self):
         self.start_time = time.time()
@@ -426,27 +424,27 @@ class Service:
         # initialize and start the workers
         if self.config.poller.enabled:
             self.queue_workers["poller"] = LibreNMS.PollerQueueManager(
-                self.config, self._lm, self.worker_mode
+                self.config, self._lm
             )
         if self.config.discovery.enabled:
             self.queue_workers["discovery"] = LibreNMS.DiscoveryQueueManager(
-                self.config, self._lm, self.worker_mode
+                self.config, self._lm
             )
         if self.config.alerting.enabled:
             self.queue_workers["alerting"] = LibreNMS.AlertQueueManager(
-                self.config, self._lm, self.worker_mode
+                self.config, self._lm
             )
         if self.config.services.enabled:
             self.queue_workers["services"] = LibreNMS.ServicesQueueManager(
-                self.config, self._lm, self.worker_mode
+                self.config, self._lm
             )
         if self.config.billing.enabled:
             self.queue_workers["billing"] = LibreNMS.BillingQueueManager(
-                self.config, self._lm, self.worker_mode
+                self.config, self._lm
             )
         if self.config.ping.enabled:
             self.queue_workers["ping"] = LibreNMS.PingQueueManager(
-                self.config, self._lm, self.worker_mode
+                self.config, self._lm
             )
         if self.config.update_enabled:
             self.daily_timer.start()
@@ -493,16 +491,16 @@ class Service:
                         )
                         # When the node is the master one, start all queuemanagers
                         self.queue_managers["alerting"] = LibreNMS.AlertQueueManager(
-                            self.config, self._lm, self.manager_mode
+                            self.config, self._lm
                         )
                         self.queue_managers["services"] = LibreNMS.ServicesQueueManager(
-                            self.config, self._lm, self.manager_mode
+                            self.config, self._lm
                         )
                         self.queue_managers["billing"] = LibreNMS.BillingQueueManager(
-                            self.config, self._lm, self.manager_mode
+                            self.config, self._lm
                         )
                         self.queue_managers["ping"] = LibreNMS.PingQueueManager(
-                            self.config, self._lm, self.manager_mode
+                            self.config, self._lm
                         )
                         self.is_master = True
                         self.start_dispatch_timers()
