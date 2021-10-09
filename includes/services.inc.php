@@ -3,6 +3,7 @@
 use App\Models\Device;
 use LibreNMS\Config;
 use LibreNMS\RRD\RrdDefinition;
+use LibreNMS\Alert\AlertRules;
 
 function get_service_status($device = null)
 {
@@ -196,6 +197,10 @@ function poll_service($service)
             4,
             $service['service_id']
         );
+
+        // Run alert rules due to status changed
+        $rules = new AlertRules;
+        $rules->runRules($service->device_id);
     }
 
     if ($service['service_message'] != $msg) {
