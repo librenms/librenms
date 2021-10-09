@@ -91,7 +91,7 @@ class QueueManager:
 
                         runtime = t.delta()
                         logger.info(
-                            "Completed {} run for {} in {:.2f}s".format(
+                            "QueueManager completed {} run for {} in {:.2f}s".format(
                                 self.type, target_desc, runtime
                             )
                         )
