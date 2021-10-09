@@ -541,13 +541,13 @@ class Service:
 
     # ------------ Discovery ------------
     def dispatch_immediate_discovery(self, device_id, group):
-        if not self.discovery_worker.is_locked(device_id):
+        if not self.queue_workers["discovery"].is_locked(device_id):
             self.discovery_worker.post_work(device_id, group)
 
     # ------------ Polling ------------
     def dispatch_immediate_polling(self, device_id, group):
-        if not self.poller_worker.is_locked(device_id):
-            self.poller_worker.post_work(device_id, group)
+        if not self.queue_workers["poller"].is_locked(device_id):
+            self.queue_workers["poller"].post_work(device_id, group)
 
             if self.config.debug:
                 cur_time = time.time()
