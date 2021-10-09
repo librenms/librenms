@@ -19,6 +19,7 @@ class QueueManager:
         type_desc,
         uses_groups=False,
         auto_start=False,
+        mode=1,  # 1 = manager, 2 = worker
     ):
         """
         This class manages a queue of jobs and can be used to submit jobs to the queue with post_work()
@@ -34,6 +35,7 @@ class QueueManager:
         :param work_function: function that will be called to perform the task
         :param auto_start: automatically start worker threads
         """
+        self.mode = mode
         self.type = type_desc
         self.uses_groups = uses_groups
         self.config = config
@@ -60,7 +62,9 @@ class QueueManager:
 
     def _service_worker(self, queue_id):
         logger.debug("Worker started {}".format(threading.current_thread().getName()))
-        while not self._stop_event.is_set():
+        while (
+            not self._stop_event.is_set() and self.mode == 2
+        ):  # check for work only on worker queues
             logger.debug(
                 "Worker {} checking queue {} ({}) for work".format(
                     threading.current_thread().getName(),
