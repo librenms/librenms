@@ -24,10 +24,13 @@
 namespace LibreNMS\Alert\Transport;
 
 use LibreNMS\Alert\Transport;
+use LibreNMS\Util\Proxy;
 use Log;
 
 class Googlechat extends Transport
 {
+    protected $name = 'Google Chat';
+
     public function deliverAlert($obj, $opts)
     {
         $googlechat_conf['webhookurl'] = $this->config['googlechat-webhook'];
@@ -43,6 +46,7 @@ class Googlechat extends Transport
 
         // Create a new cURL resource
         $ch = curl_init($data['webhookurl']);
+        Proxy::applyToCurl($ch);
 
         // Attach encoded JSON string to the POST fields
         curl_setopt($ch, CURLOPT_POSTFIELDS, $payload);

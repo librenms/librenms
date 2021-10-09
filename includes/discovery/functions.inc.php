@@ -17,6 +17,7 @@ use LibreNMS\Config;
 use LibreNMS\Device\YamlDiscovery;
 use LibreNMS\Exceptions\HostExistsException;
 use LibreNMS\Exceptions\InvalidIpException;
+use LibreNMS\OS;
 use LibreNMS\Util\IP;
 use LibreNMS\Util\IPv6;
 
@@ -101,21 +102,6 @@ function discover_new_device($hostname, $device = [], $method = '', $interface =
 //end discover_new_device()
 
 /**
- * @param $device
- */
-function load_discovery(&$device)
-{
-    $yaml_discovery = Config::get('install_dir') . '/includes/definitions/discovery/' . $device['os'] . '.yaml';
-    if (file_exists($yaml_discovery)) {
-        $device['dynamic_discovery'] = Symfony\Component\Yaml\Yaml::parse(
-            file_get_contents($yaml_discovery)
-        );
-    } else {
-        unset($device['dynamic_discovery']);
-    }
-}
-
-/**
  * @param  array  $device  The device to poll
  * @param  bool  $force_module  Ignore device module overrides
  * @return bool if the device was discovered or skipped
@@ -146,6 +132,10 @@ function discover_device(&$device, $force_module = false)
     $discovery_devices = Config::get('discovery_modules', []);
     $discovery_devices = ['core' => true] + $discovery_devices;
 
+    /** @var \App\Polling\Measure\MeasurementManager $measurements */
+    $measurements = app(\App\Polling\Measure\MeasurementManager::class);
+    $measurements->checkpoint(); // don't count previous stats
+
     foreach ($discovery_devices as $module => $module_status) {
         $os_module_status = Config::getOsSetting($device['os'], "discovery_modules.$module");
         d_echo('Modules status: Global' . (isset($module_status) ? ($module_status ? '+ ' : '- ') : '  '));
@@ -173,7 +163,7 @@ function discover_device(&$device, $force_module = false)
             $module_time = substr($module_time, 0, 5);
             $module_mem = (memory_get_usage() - $start_memory);
             printf("\n>> Runtime for discovery module '%s': %.4f seconds with %s bytes\n", $module, $module_time, $module_mem);
-            printChangedStats();
+            $measurements->printChangedStats();
             echo "#### Unload disco module $module ####\n\n";
         } elseif (isset($attribs['discover_' . $module]) && $attribs['discover_' . $module] == '0') {
             echo "Module [ $module ] disabled on host.\n\n";
@@ -858,22 +848,25 @@ function ignore_storage($os, $descr)
 
 /**
  * @param $valid
- * @param $device
+ * @param  OS  $os
  * @param $sensor_type
  * @param $pre_cache
  */
-function discovery_process(&$valid, $device, $sensor_class, $pre_cache)
+function discovery_process(&$valid, $os, $sensor_class, $pre_cache)
 {
-    if (! empty($device['dynamic_discovery']['modules']['sensors'][$sensor_class]) && ! can_skip_sensor($device, $sensor_class, '')) {
+    $discovery = $os->getDiscovery('sensors');
+    $device = $os->getDeviceArray();
+
+    if (! empty($discovery[$sensor_class]) && ! can_skip_sensor($device, $sensor_class, '')) {
         $sensor_options = [];
-        if (isset($device['dynamic_discovery']['modules']['sensors'][$sensor_class]['options'])) {
-            $sensor_options = $device['dynamic_discovery']['modules']['sensors'][$sensor_class]['options'];
+        if (isset($discovery[$sensor_class]['options'])) {
+            $sensor_options = $discovery[$sensor_class]['options'];
         }
 
         d_echo("Dynamic Discovery ($sensor_class): ");
-        d_echo($device['dynamic_discovery']['modules']['sensors'][$sensor_class]);
+        d_echo($discovery[$sensor_class]);
 
-        foreach ($device['dynamic_discovery']['modules']['sensors'][$sensor_class]['data'] as $data) {
+        foreach ($discovery[$sensor_class]['data'] as $data) {
             $tmp_name = $data['oid'];
             $raw_data = (array) $pre_cache[$tmp_name];
 
@@ -917,7 +910,7 @@ function discovery_process(&$valid, $device, $sensor_class, $pre_cache)
                 // Check if we have a "num_oid" value. If not, we'll try to compute it from textual OIDs with snmptranslate.
                 if (empty($data['num_oid'])) {
                     try {
-                        $data['num_oid'] = YamlDiscovery::computeNumericalOID($device, $data);
+                        $data['num_oid'] = YamlDiscovery::computeNumericalOID($os, $data);
                     } catch (\Exception $e) {
                         d_echo('Error: We cannot find a numerical OID for ' . $data['value'] . '. Skipping this one...');
                         $skippedFromYaml = true;
@@ -990,11 +983,12 @@ function discovery_process(&$valid, $device, $sensor_class, $pre_cache)
 
 /**
  * @param $types
- * @param $device
+ * @param  OS  $os
  * @param  array  $pre_cache
  */
-function sensors($types, $device, $valid, $pre_cache = [])
+function sensors($types, $os, $valid, $pre_cache = [])
 {
+    $device = &$os->getDeviceArray();
     foreach ((array) $types as $sensor_class) {
         echo ucfirst($sensor_class) . ': ';
         $dir = Config::get('install_dir') . '/includes/discovery/sensors/' . $sensor_class . '/';
@@ -1010,7 +1004,7 @@ function sensors($types, $device, $valid, $pre_cache = [])
                 include $dir . '/rfc1628.inc.php';
             }
         }
-        discovery_process($valid, $device, $sensor_class, $pre_cache);
+        discovery_process($valid, $os, $sensor_class, $pre_cache);
         d_echo($valid['sensor'][$sensor_class] ?? []);
         check_valid_sensors($device, $sensor_class, $valid['sensor']);
         echo "\n";

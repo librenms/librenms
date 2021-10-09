@@ -246,7 +246,7 @@ return [
         'Permissions' => \App\Facades\Permissions::class,
         'DeviceCache' => \App\Facades\DeviceCache::class,
         'Rrd' => \App\Facades\Rrd::class,
-        'NetSnmp' => \App\Facades\FacadeAccessorSnmp::class,
+        'SnmpQuery' => \App\Facades\FacadeAccessorSnmp::class,
     ],
 
     'charset' => env('CHARSET', ini_get('php.output_encoding') ?: ini_get('default_charset') ?: 'UTF-8'),

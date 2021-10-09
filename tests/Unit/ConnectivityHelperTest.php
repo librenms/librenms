@@ -10,7 +10,7 @@ use LibreNMS\Data\Source\SnmpResponse;
 use LibreNMS\Polling\ConnectivityHelper;
 use LibreNMS\Tests\TestCase;
 use Mockery;
-use NetSnmp;
+use SnmpQuery;
 
 class ConnectivityHelperTest extends TestCase
 {
@@ -40,7 +40,7 @@ class ConnectivityHelperTest extends TestCase
         // not called when snmp is disabled or ping up
         $up = new SnmpResponse('SNMPv2-MIB::sysObjectID.0 = .1');
         $down = new SnmpResponse('', '', 1);
-        NetSnmp::partialMock()->shouldReceive('get')
+        SnmpQuery::partialMock()->shouldReceive('get')
             ->times(6)
             ->andReturn(
                 $up,
@@ -153,7 +153,7 @@ class ConnectivityHelperTest extends TestCase
 
     public function testIsSNMPable(): void
     {
-        NetSnmp::partialMock()->shouldReceive('get')
+        SnmpQuery::partialMock()->shouldReceive('get')
             ->times(4)
             ->andReturn(
                 new SnmpResponse('SNMPv2-MIB::sysObjectID.0 = .1', '', 0),

@@ -26,10 +26,10 @@
 
 namespace LibreNMS\Data\Store;
 
+use App\Polling\Measure\Measurement;
 use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Support\Str;
 use LibreNMS\Config;
-use LibreNMS\Data\Measure\Measurement;
 use Log;
 
 class Prometheus extends BaseDatastore

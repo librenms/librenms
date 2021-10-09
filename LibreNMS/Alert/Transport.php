@@ -2,6 +2,8 @@
 
 namespace LibreNMS\Alert;
 
+use App\Models\AlertTransport;
+use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Str;
 use LibreNMS\Config;
 use LibreNMS\Enum\AlertState;
@@ -10,18 +12,51 @@ use LibreNMS\Interfaces\Alert\Transport as TransportInterface;
 abstract class Transport implements TransportInterface
 {
     protected $config;
+    /**
+     * @var string
+     */
+    protected $name;
+
+    public static function make(string $type): TransportInterface
+    {
+        $class = self::getClass($type);
+
+        return new $class();
+    }
 
     /**
      * Transport constructor.
      *
-     * @param  null  $transport_id
+     * @param  null  $transport
      */
-    public function __construct($transport_id = null)
+    public function __construct($transport = null)
     {
-        if (! empty($transport_id)) {
-            $sql = 'SELECT `transport_config` FROM `alert_transports` WHERE `transport_id`=?';
-            $this->config = json_decode(dbFetchCell($sql, [$transport_id]), true);
+        if (! empty($transport)) {
+            if ($transport instanceof AlertTransport) {
+                $this->config = $transport->transport_config;
+            } else {
+                try {
+                    $model = \App\Models\AlertTransport::findOrFail($transport); /** @var AlertTransport $model */
+                    $this->config = $model->transport_config;
+                } catch (ModelNotFoundException $e) {
+                    $this->config = [];
+                }
+            }
         }
+    }
+
+    /**
+     * @return string The display name of this transport
+     */
+    public function name(): string
+    {
+        if ($this->name !== null) {
+            return $this->name;
+        }
+
+        $path = explode('\\', get_called_class());
+
+        return array_pop($path);
     }
 
     /**
@@ -60,5 +95,51 @@ abstract class Transport implements TransportInterface
         ];
 
         return isset($colors[$state]) ? $colors[$state] : '#337AB7';
+    }
+
+    /**
+     * Display the configuration details of this alert transport
+     *
+     * @return string
+     */
+    public function displayDetails(): string
+    {
+        $output = '';
+
+        // Iterate through transport config template to display config details
+        $config = static::configTemplate();
+        foreach ($config['config'] as $item) {
+            if ($item['type'] == 'oauth') {
+                continue;
+            }
+
+            $val = $this->config[$item['name']];
+            if ($item['type'] == 'password') {
+                $val = '<b>&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;</b>';
+            } elseif ($item['type'] == 'select') {
+                // Match value to key name for select inputs
+                $val = array_search($val, $item['options']);
+            }
+
+            $output .= $item['title'] . ': ' . $val . PHP_EOL;
+        }
+
+        return $output;
+    }
+
+    /**
+     * Get the alert transport class from transport type.
+     *
+     * @param  string  $type
+     * @return string
+     */
+    public static function getClass(string $type): string
+    {
+        return 'LibreNMS\\Alert\\Transport\\' . ucfirst($type);
+    }
+
+    protected function isHtmlContent($content): bool
+    {
+        return $content !== strip_tags($content);
     }
 }

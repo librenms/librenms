@@ -27,15 +27,40 @@ namespace LibreNMS\OS;
 
 use LibreNMS\Device\WirelessSensor;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessFrequencyDiscovery;
+use LibreNMS\Interfaces\Discovery\Sensors\WirelessMseDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessPowerDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessRateDiscovery;
 use LibreNMS\OS;
 
 class EricssonTn extends OS implements
+    WirelessMseDiscovery,
     WirelessFrequencyDiscovery,
     WirelessPowerDiscovery,
     WirelessRateDiscovery
 {
+    public function discoverWirelessMSE()
+    {
+        $sensors = [];
+
+        $data = snmpwalk_cache_oid($this->getDeviceArray(), 'xfModemEntry', [], 'XF-RADIOLINK-PTP-MODEM-MIB');
+        $ifname = $this->getCacheTable('entPhysicalName', 'ENTITY-MIB');
+        foreach ($data as $index => $entry) {
+            $sensors[] = new WirelessSensor(
+                'mse',
+                $this->getDeviceId(),
+                '.1.3.6.1.4.1.193.81.3.4.2.1.1.1.15.' . $index,
+                'ericsson-tn',
+                $index,
+                'MSE RAU: ' . $ifname[$index]['entPhysicalName'],
+                null,
+                1,
+                10
+            );
+        }
+
+        return $sensors;
+    }
+
     public function discoverWirelessRate()
     {
         $sensors = [];
@@ -47,7 +72,7 @@ class EricssonTn extends OS implements
                 'rate',
                 $this->getDeviceId(),
                 '.1.3.6.1.4.1.193.81.3.4.1.1.14.1.7.' . $index,
-                'ericsson-6600',
+                'ericsson-tn',
                 $index,
                 'Rate: ' . $carrier[$index]['xfTermSysName'],
                 null,
@@ -71,7 +96,7 @@ class EricssonTn extends OS implements
                 'frequency',
                 $this->getDeviceId(),
                 '.1.3.6.1.4.1.193.81.3.4.3.1.2.1.1.' . $index,
-                'ericsson-6600',
+                'ericsson-tn',
                 $index . 'tx',
                 'TX Frequency: ' . $ifname[$index]['ifName'],
                 null,
@@ -84,7 +109,7 @@ class EricssonTn extends OS implements
                 'frequency',
                 $this->getDeviceId(),
                 '.1.3.6.1.4.1.193.81.3.4.3.1.2.1.2.' . $index,
-                'ericsson-6600',
+                'ericsson-tn',
                 $index . 'rx',
                 'RX Frequency: ' . $ifname[$index]['ifName'],
                 null,
