@@ -842,8 +842,8 @@ class Service:
                 )
             )
 
-            for worker_type, worker in self.queue_workers.items():
-                worker_seconds, devices = worker.performance.reset()
+            for worker_type, manager in self.queue_managers.items():
+                worker_seconds, devices = manager.performance.reset()
 
                 # Record the queue state
                 self._db.query(
@@ -853,7 +853,7 @@ class Service:
                         worker_type,
                         sum(
                             [
-                                worker.get_queue(group).qsize()
+                                manager.get_queue(group).qsize()
                                 for group in self.config.group
                             ]
                         ),
