@@ -608,7 +608,7 @@ modules:
                     descr: 'VoltStatus {{ $subindex0 }}.{{ $subindex1 }}.{{ $subindex2 }}.{{ $subindex3 }}'
                     states:
                         - { descr: 'Normal', graph: 1, value: 1, generic: 0 }
-                        - { descr: 'Minor', graph: 1, value: 2, generic: 2 }
+                        - { descr: 'Minor', graph: 1, value: 2, generic: 1 }
                         - { descr: 'Major', graph: 1, value: 3, generic: 2 }
                         - { descr: 'Fatal', graph: 1, value: 4, generic: 2 }
                 -
@@ -619,7 +619,7 @@ modules:
                     descr: 'TempStatus {{ $subindex0 }}.{{ $subindex1 }}.{{ $subindex2 }}.{{ $subindex3 }}'
                     states:
                         - { descr: 'Normal', graph: 1, value: 1, generic: 0 }
-                        - { descr: 'Minor', graph: 1, value: 2, generic: 2 }
+                        - { descr: 'Minor', graph: 1, value: 2, generic: 1 }
                         - { descr: 'Major', graph: 1, value: 3, generic: 2 }
                         - { descr: 'Fatal', graph: 1, value: 4, generic: 2 }
 
