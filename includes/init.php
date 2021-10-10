@@ -61,8 +61,8 @@ require_once $install_dir . '/includes/datastore.inc.php';
 require_once $install_dir . '/includes/billing.php';
 require_once $install_dir . '/includes/syslog.php';
 if (module_selected('mocksnmp', $init_modules)) {
-    require_once $install_dir . '/tests/mocks/mock.snmp.inc.php';
-} elseif (! in_array($install_dir . '/tests/mocks/mock.snmp.inc.php', get_included_files())) {
+    require_once $install_dir . '/tests/Mocks/mock.snmp.inc.php';
+} elseif (! in_array($install_dir . '/tests/Mocks/mock.snmp.inc.php', get_included_files())) {
     require_once $install_dir . '/includes/snmp.inc.php';
 }
 require_once $install_dir . '/includes/services.inc.php';

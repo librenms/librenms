@@ -37,7 +37,7 @@ use LibreNMS\Util\Rewrite;
 use Log;
 use Symfony\Component\Process\Process;
 
-class SnmpQuery
+class SnmpQuery implements SnmpQueryInterface
 {
     /**
      * @var array
@@ -98,7 +98,7 @@ class SnmpQuery
     /**
      * Easy way to start a new instance
      */
-    public static function make(): SnmpQuery
+    public static function make(): SnmpQueryInterface
     {
         return new static;
     }
@@ -107,7 +107,7 @@ class SnmpQuery
      * Specify a device to make the snmp query against.
      * By default the query will use the primary device.
      */
-    public function device(Device $device): SnmpQuery
+    public function device(Device $device): SnmpQueryInterface
     {
         $this->device = $device;
 
@@ -118,7 +118,7 @@ class SnmpQuery
      * Specify a device by a device array.
      * The device will be fetched from the cache if it is loaded, otherwise, it will fill the array into a new Device
      */
-    public function deviceArray(array $device): SnmpQuery
+    public function deviceArray(array $device): SnmpQueryInterface
     {
         if (isset($device['device_id']) && DeviceCache::has($device['device_id'])) {
             $this->device = DeviceCache::get($device['device_id']);
@@ -135,7 +135,7 @@ class SnmpQuery
      * Set a context for the snmp query
      * This is most commonly used to fetch alternate sets of data, such as different VRFs
      */
-    public function context(string $context): SnmpQuery
+    public function context(string $context): SnmpQueryInterface
     {
         $this->context = $context;
 
@@ -146,7 +146,7 @@ class SnmpQuery
      * Set an additional MIB directory to search for MIBs.
      * You do not need to specify the base and os directories, they are already included.
      */
-    public function mibDir(?string $dir): SnmpQuery
+    public function mibDir(?string $dir): SnmpQueryInterface
     {
         $this->mibDir = $dir;
 
@@ -156,7 +156,7 @@ class SnmpQuery
     /**
      * Output all OIDs numerically
      */
-    public function numeric(): SnmpQuery
+    public function numeric(): SnmpQueryInterface
     {
         $this->options = array_merge($this->options, ['-On']);
 
@@ -172,7 +172,7 @@ class SnmpQuery
      * @param  array|string  $options
      * @return $this
      */
-    public function options($options = []): SnmpQuery
+    public function options($options = []): SnmpQueryInterface
     {
         $this->options = Arr::wrap($options);
 
