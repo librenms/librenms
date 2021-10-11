@@ -38,7 +38,14 @@ use Log;
 class SnmpQueryMock implements SnmpQueryInterface
 {
 
+    /**
+     * @var array
+     */
     private static $cache;
+
+    /**
+     * @var Device
+     */
     private $device;
     /**
      * @var string
@@ -60,7 +67,7 @@ class SnmpQueryMock implements SnmpQueryInterface
     public static function make(): SnmpQueryInterface
     {
         $new = new static;
-        $new->device = DeviceCache::primary();
+        $new->device = DeviceCache::getPrimary();
 
         return $new;
     }
@@ -170,7 +177,7 @@ class SnmpQueryMock implements SnmpQueryInterface
         return new SnmpResponse('');
     }
 
-    private function cacheSnmprec($file): void
+    private function cacheSnmprec(string $file): void
     {
         if (isset(self::$cache[$file])) {
             return;
@@ -225,7 +232,7 @@ class SnmpQueryMock implements SnmpQueryInterface
         throw new Exception("SNMPREC: community $community not cached");
     }
 
-    private function outputLine($oid, $num_oid, $type, $data)
+    private function outputLine(string $oid, string $num_oid, string $type, string $data): string
     {
         if ($type == 6) {
             $data = $this->numeric ? ".$data" : $this->translate($data, $this->extractMib($oid))->value();
