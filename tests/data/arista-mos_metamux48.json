@@ -5,7 +5,7 @@
                 {
                     "sysName": "<private>",
                     "sysObjectID": ".1.3.6.1.4.1.43191.1.6.7",
-                    "sysDescr": "Metamako MOS release 0.32.0 \\\\\\\\(build mos-0.32+22\\\\\\\\) running on a MetaMux 48 with L-Series",
+                    "sysDescr": "Metamako MOS release 0.32.0 \\\\(build mos-0.32+22\\\\) running on a MetaMux 48 with L-Series",
                     "sysContact": "<private>",
                     "version": "0.32.0",
                     "hardware": null,
