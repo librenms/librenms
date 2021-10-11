@@ -67,7 +67,9 @@ class OSDiscoveryTest extends TestCase
      */
     public function testOSDetection($os_name)
     {
-        $this->app->bind(SnmpQuery::class, SnmpQueryMock::class);
+        if (! getenv('SNMPSIM')) {
+            $this->app->bind(SnmpQuery::class, SnmpQueryMock::class);
+        }
 
         $glob = Config::get('install_dir') . "/tests/snmpsim/$os_name*.snmprec";
         $files = array_map(function ($file) {
@@ -109,6 +111,8 @@ class OSDiscoveryTest extends TestCase
      */
     private function checkOS($expected_os, $filename = null)
     {
+        $start = microtime(true);
+
         $community = $filename ?: $expected_os;
         Debug::set();
         Debug::setVerbose();
@@ -117,6 +121,7 @@ class OSDiscoveryTest extends TestCase
         $output = ob_get_contents();
         ob_end_clean();
 
+        $this->assertLessThan(2, microtime(true) - $start, "OS $expected_os took longer than 2s to detect");
         $this->assertEquals($expected_os, $os, "Test file: $community.snmprec\n$output");
     }
 

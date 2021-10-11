@@ -32,6 +32,8 @@ use Illuminate\Support\Str;
 use LibreNMS\Data\Source\SnmpQuery;
 use LibreNMS\Data\Source\SnmpQueryInterface;
 use LibreNMS\Data\Source\SnmpResponse;
+use LibreNMS\Device\YamlDiscovery;
+use Log;
 
 class SnmpQueryMock implements SnmpQueryInterface
 {
@@ -84,70 +86,6 @@ class SnmpQueryMock implements SnmpQueryInterface
         return $this;
     }
 
-    public function get($oid): SnmpResponse
-    {
-        $community = $this->device->community;
-        $num_oid = $this->translateNumber($oid);
-        $data = $this->getSnmprec($community)[$num_oid] ?? [0, ''];
-
-        return new SnmpResponse($this->outputLine($oid, $num_oid, $data[0], $data[1]));
-    }
-
-    /**
-     * Get the numeric oid of an oid
-     * The leading dot is ommited by default to be compatible with snmpsim
-     *
-     * @param  string  $oid  the oid to tranlslate
-     * @param  string  $mib  mib to use
-     * @return string the oid in numeric format (1.3.4.5)
-     *
-     * @throws Exception Could not translate the oid
-     */
-    private function translateNumber($oid, $mib = null)
-    {
-        // optimizations (35s -> 1.6s on my laptop)
-        switch ($oid) {
-            case 'SNMPv2-MIB::sysDescr.0':
-                return '1.3.6.1.2.1.1.1.0';
-            case 'SNMPv2-MIB::sysObjectID.0':
-                return '1.3.6.1.2.1.1.2.0';
-            case 'ENTITY-MIB::entPhysicalDescr.1':
-                return '1.3.6.1.2.1.47.1.1.1.1.2.1';
-            case 'SML-MIB::product-Name.0':
-                return '1.3.6.1.4.1.2.6.182.3.3.1.0';
-            case 'ENTITY-MIB::entPhysicalMfgName.1':
-                return '1.3.6.1.2.1.47.1.1.1.1.12.1';
-            case 'GAMATRONIC-MIB::psUnitManufacture.0':
-                return '1.3.6.1.4.1.6050.1.1.2.0';
-            case 'SYNOLOGY-SYSTEM-MIB::systemStatus.0':
-                return '1.3.6.1.4.1.6574.1.1.0';
-        }
-
-        if ($this->isNumeric($oid)) {
-            return ltrim($oid, '.');
-        }
-
-        $options = ['-IR'];
-        if ($mib) {
-            $options[] = "-m $mib";
-        }
-
-        $number = SnmpQuery::make()->mibDir($this->mibDir)
-            ->options(array_merge($options, $this->options))->numeric()->translate($oid)->value();
-
-
-        if (empty($number)) {
-            throw new Exception('Could not translate oid: ' . $oid . PHP_EOL);
-        }
-
-        return $number;
-    }
-
-    private function isNumeric($oid): bool
-    {
-        return (bool) preg_match('/^[.\d]*$/', $oid);
-    }
-
     public function translate($oid): SnmpResponse
     {
         throw new Exception('Translate unsupported');
@@ -174,26 +112,55 @@ class SnmpQueryMock implements SnmpQueryInterface
         return $this;
     }
 
-    /**
-     * Get all data of the specified $community from the snmprec cache
-     *
-     * @param  string  $community  snmp community to return
-     * @return array array of the data containing: [$oid][$type, $data]
-     *
-     * @throws Exception this $community is not cached
-     */
-    private function getSnmprec(string $community): array
+    public function get($oid): SnmpResponse
     {
-        if (! isset(self::$cache[$community])) {
-            $this->cacheSnmprec($community);
+        $community = $this->device->community;
+        $num_oid = $this->translateNumber($oid);
+        $data = $this->getSnmprec($community)[$num_oid] ?? [0, ''];
 
+        Log::debug("[SNMP] snmpget $community $num_oid: ");
+
+        return new SnmpResponse($this->outputLine($oid, $num_oid, $data[0], $data[1]));
+    }
+
+    public function walk($oid): SnmpResponse
+    {
+        $community = $this->device->community;
+        $num_oid = $this->translateNumber($oid);
+        $dev = $this->getSnmprec($community);
+
+        $start = microtime(true);
+        $output = '';
+        foreach ($dev as $key => $data) {
+            if (Str::startsWith($key, $num_oid)) {
+                $output .= $this->outputLine($oid, $num_oid, $data[0], $data[1]);
+            }
         }
 
-        if (isset(self::$cache[$community])) {
-            return self::$cache[$community];
+        Log::debug("[SNMP] snmpwalk $community $num_oid");
+
+        return new SnmpResponse($output);
+    }
+
+    public function next($oid): SnmpResponse
+    {
+        $community = $this->device->community;
+        $num_oid = $this->translateNumber($oid);
+        $dev = $this->getSnmprec($community);
+
+        Log::debug("[SNMP] snmpnext $community $num_oid: ");
+        while (Str::contains($num_oid, '.')) {
+            foreach ($dev as $key => $data) {
+                if (Str::startsWith($key, $num_oid)) {
+                    return new SnmpResponse($this->outputLine($oid, $num_oid, $data[0], $data[1]));
+                }
+
+            }
+
+            $num_oid = substr($num_oid, 0, strrpos($num_oid, '.'));
         }
 
-        throw new Exception("SNMPREC: community $community not cached");
+        return new SnmpResponse('');
     }
 
     private function cacheSnmprec($file): void
@@ -229,6 +196,28 @@ class SnmpQueryMock implements SnmpQueryInterface
         }
     }
 
+    /**
+     * Get all data of the specified $community from the snmprec cache
+     *
+     * @param  string  $community  snmp community to return
+     * @return array array of the data containing: [$oid][$type, $data]
+     *
+     * @throws Exception this $community is not cached
+     */
+    private function getSnmprec(string $community): array
+    {
+        if (! isset(self::$cache[$community])) {
+            $this->cacheSnmprec($community);
+
+        }
+
+        if (isset(self::$cache[$community])) {
+            return self::$cache[$community];
+        }
+
+        throw new Exception("SNMPREC: community $community not cached");
+    }
+
     private function outputLine($oid, $num_oid, $type, $data)
     {
         if ($type == 6) {
@@ -239,97 +228,60 @@ class SnmpQueryMock implements SnmpQueryInterface
             return "$num_oid = $data";
         }
 
-        if (! empty($oid) && $this->isNumeric($oid)) {
+        if (! empty($oid) && YamlDiscovery::oidIsNumeric($oid)) {
             $oid = SnmpQuery::make()->translate($oid)->value();
         }
 
         return "$oid = $data";
     }
 
-    public function walk($oid): SnmpResponse
+    /**
+     * Get the numeric oid of an oid
+     * The leading dot is ommited by default to be compatible with snmpsim
+     *
+     * @param  string  $oid  the oid to tranlslate
+     * @param  string  $mib  mib to use
+     * @return string the oid in numeric format (1.3.4.5)
+     *
+     * @throws Exception Could not translate the oid
+     */
+    private function translateNumber($oid, $mib = null)
     {
-        $community = $this->device->community;
-        $num_oid = $this->translateNumber($oid);
-        $dev = $this->getSnmprec($community);
-
-        $output = '';
-        foreach ($dev as $key => $data) {
-            if (Str::startsWith($key, $num_oid)) {
-                $output .= $this->outputLine($oid, $num_oid, $data[0], $data[1]);
-            }
+        // optimizations (35s -> 1.6s on my laptop)
+        switch ($oid) {
+            case 'SNMPv2-MIB::sysDescr.0':
+                return '1.3.6.1.2.1.1.1.0';
+            case 'SNMPv2-MIB::sysObjectID.0':
+                return '1.3.6.1.2.1.1.2.0';
+            case 'ENTITY-MIB::entPhysicalDescr.1':
+                return '1.3.6.1.2.1.47.1.1.1.1.2.1';
+            case 'SML-MIB::product-Name.0':
+                return '1.3.6.1.4.1.2.6.182.3.3.1.0';
+            case 'ENTITY-MIB::entPhysicalMfgName.1':
+                return '1.3.6.1.2.1.47.1.1.1.1.12.1';
+            case 'GAMATRONIC-MIB::psUnitManufacture.0':
+                return '1.3.6.1.4.1.6050.1.1.2.0';
+            case 'SYNOLOGY-SYSTEM-MIB::systemStatus.0':
+                return '1.3.6.1.4.1.6574.1.1.0';
         }
 
-        d_echo("[SNMP] snmpwalk $community $num_oid: ");
-        return new SnmpResponse($output);
-    }
-
-    public function next($oid): SnmpResponse
-    {
-        $community = $this->device->community;
-        $num_oid = $this->translateNumber($oid);
-        $dev = $this->getSnmprec($community);
-
-        d_echo("[SNMP] snmpwalk $community $num_oid: ");
-        while (Str::contains($num_oid, '.')) {
-            foreach ($dev as $key => $data) {
-                if (Str::startsWith($key, $num_oid)) {
-                    return new SnmpResponse($this->outputLine($oid, $num_oid, $data[0], $data[1]));
-                }
-
-            }
-
-            $num_oid = substr($num_oid, 0, strrpos($num_oid, '.'));
-            dd(get_defined_vars());
+        if (YamlDiscovery::oidIsNumeric($oid)) {
+            return ltrim($oid, '.');
         }
 
-        return new SnmpResponse('');
-    }
-
-    private function translateType($oid, $mib = null, $mibdir = null)
-    {
-        $options = ['-IR', '-Td'];
+        $options = ['-IR'];
         if ($mib) {
             $options[] = "-m $mib";
         }
 
-        $result = SnmpQuery::make()->mibDir($mibdir)
-            ->options($options)->translate($oid)->raw();
+        $number = SnmpQuery::make()->mibDir($this->mibDir)
+            ->options(array_merge($options, $this->options))->numeric()->translate($oid)->value();
 
-        if (empty($result)) {
-            throw new Exception('Could not translate oid: ' . $oid . PHP_EOL . 'Tried: ' . $cmd);
-        }
 
-        if (Str::contains($result, 'OCTET STRING')) {
-            return 4;
-        }
-        if (Str::contains($result, 'Integer32')) {
-            return 2;
-        }
-        if (Str::contains($result, 'NULL')) {
-            return 5;
-        }
-        if (Str::contains($result, 'OBJECT IDENTIFIER')) {
-            return 6;
-        }
-        if (Str::contains($result, 'IpAddress')) {
-            return 64;
-        }
-        if (Str::contains($result, 'Counter32')) {
-            return 65;
-        }
-        if (Str::contains($result, 'Gauge32')) {
-            return 66;
-        }
-        if (Str::contains($result, 'TimeTicks')) {
-            return 67;
-        }
-        if (Str::contains($result, 'Opaque')) {
-            return 68;
-        }
-        if (Str::contains($result, 'Counter64')) {
-            return 70;
+        if (empty($number)) {
+            throw new Exception('Could not translate oid: ' . $oid . PHP_EOL);
         }
 
-        throw new Exception('Unknown type');
+        return ltrim($number, '.');
     }
 }
