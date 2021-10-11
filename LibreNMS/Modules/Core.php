@@ -65,7 +65,7 @@ class Core implements Module
         }
 
         // Set type to a predefined type for the OS if it's not already set
-        $loaded_os_type = Config::get("os.{$device->os}.type");
+        $loaded_os_type = Config::get("os.$device->os.type");
         if (! $device->getAttrib('override_device_type') && $loaded_os_type != $device->type) {
             $device->type = $loaded_os_type;
             Log::debug("Device type changed to $loaded_os_type!");
@@ -73,7 +73,7 @@ class Core implements Module
 
         $device->save();
 
-        echo 'OS: ' . Config::getOsSetting($device->os, 'text') . " ({$device->os})\n\n";
+        echo 'OS: ' . Config::getOsSetting($device->os, 'text') . " ($device->os)\n\n";
     }
 
     public function poll(OS $os)
@@ -101,13 +101,13 @@ class Core implements Module
 
             $uptime = max(
                 round($device->uptime / 100),
-                Config::get("os.{$device->os}.bad_snmpEngineTime") ? 0 : $uptime_data['SNMP-FRAMEWORK-MIB::snmpEngineTime.0'],
-                Config::get("os.{$device->os}.bad_hrSystemUptime") ? 0 : round($uptime_data['HOST-RESOURCES-MIB::hrSystemUptime.0'] / 100)
+                Config::get("os.$device->os.bad_snmpEngineTime") ? 0 : $uptime_data['SNMP-FRAMEWORK-MIB::snmpEngineTime.0'],
+                Config::get("os.$device->os.bad_hrSystemUptime") ? 0 : round($uptime_data['HOST-RESOURCES-MIB::hrSystemUptime.0'] / 100)
             );
             Log::debug("Uptime seconds: $uptime\n");
         }
 
-        if ($uptime != 0 && Config::get("os.{$device->os}.bad_uptime") !== true) {
+        if ($uptime != 0 && Config::get("os.$device->os.bad_uptime") !== true) {
             if ($uptime < $device->uptime) {
                 Log::event('Device rebooted after ' . Time::formatInterval($device->uptime) . " -> {$uptime}s", $device, 'reboot', 4, $device->uptime);
             }
@@ -121,7 +121,7 @@ class Core implements Module
             echo 'Uptime: ' . Time::formatInterval($uptime) . PHP_EOL;
             $device->uptime = $uptime;
 
-            $device->save(); // FIXME stdout?
+            $device->save();
         }
     }
 
@@ -147,7 +147,7 @@ class Core implements Module
             $device->sysObjectID = SnmpQuery::device($device)->numeric()->get('SNMPv2-MIB::sysObjectID.0')->value();
         }
 
-        Log::debug("| {$device->sysDescr} | {$device->sysObjectID} | \n");
+        Log::debug("| $device->sysDescr | $device->sysObjectID | \n");
 
         $deferred_os = [];
         $generic_os = [
@@ -249,7 +249,7 @@ class Core implements Module
         return true;
     }
 
-    protected static function discoveryIsSlow($def)
+    protected static function discoveryIsSlow($def): bool
     {
         foreach ($def['discovery'] as $item) {
             if (array_key_exists('snmpget', $item) || array_key_exists('snmpwalk', $item)) {
