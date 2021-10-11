@@ -46,7 +46,7 @@ class Mail extends Transport
             $msg = preg_replace("/(?<!\r)\n/", "\r\n", $obj['msg']);
         }
 
-        return send_mail($email, $obj['title'], $msg, $html);
+        return \LibreNMS\Util\Mail::send($email, $obj['title'], $msg, $html);
     }
 
     public static function configTemplate()
@@ -64,10 +64,5 @@ class Mail extends Transport
                 'email' => 'required|email',
             ],
         ];
-    }
-
-    private function isHtmlContent($content): bool
-    {
-        return $content !== strip_tags($content);
     }
 }

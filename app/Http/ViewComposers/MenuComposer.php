@@ -250,6 +250,8 @@ class MenuComposer
         // Search bar
         $vars['typeahead_limit'] = Config::get('webui.global_search_result_limit');
 
+        $vars['browser_push'] = $user->hasBrowserPushTransport();
+
         $view->with($vars);
     }
 }

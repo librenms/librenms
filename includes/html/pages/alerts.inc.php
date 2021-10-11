@@ -32,5 +32,3 @@ $page_title = 'Alerts';
     unset($device['device_id']);
     ?>
 </div>
-
-

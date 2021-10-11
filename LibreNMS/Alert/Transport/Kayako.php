@@ -14,6 +14,7 @@ namespace LibreNMS\Alert\Transport;
 
 use LibreNMS\Alert\Transport;
 use LibreNMS\Config;
+use LibreNMS\Util\Proxy;
 
 class Kayako extends Transport
 {
@@ -60,6 +61,7 @@ class Kayako extends Transport
         $post_data = http_build_query($protocol, '', '&');
 
         $curl = curl_init();
+        Proxy::applyToCurl($curl);
         curl_setopt($curl, CURLOPT_POST, true);
         curl_setopt($curl, CURLOPT_URL, $url);
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);

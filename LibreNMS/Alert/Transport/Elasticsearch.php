@@ -19,6 +19,7 @@ namespace LibreNMS\Alert\Transport;
 
 use LibreNMS\Alert\Transport;
 use LibreNMS\Enum\AlertState;
+use LibreNMS\Util\Proxy;
 
 class Elasticsearch extends Transport
 {
@@ -41,7 +42,6 @@ class Elasticsearch extends Transport
         $index = strftime('librenms-%Y.%m.%d');
         $type = 'alert';
         $severity = $obj['severity'];
-        $device = device_by_id_cache($obj['device_id']); // for event logging
 
         if (! empty($opts['es_host'])) {
             if (preg_match('/[a-zA-Z]/', $opts['es_host'])) {
@@ -168,7 +168,7 @@ class Elasticsearch extends Transport
                 $alert_message = json_encode($data);
                 curl_setopt($curl, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
                 if ($opts['es_proxy'] === true) {
-                    set_curl_proxy($curl);
+                    Proxy::applyToCurl($curl);
                 }
                 curl_setopt($curl, CURLOPT_URL, $host);
                 curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
@@ -186,7 +186,7 @@ class Elasticsearch extends Transport
             $alert_message = json_encode($data);
             curl_setopt($curl, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
             if ($opts['es_proxy'] === true) {
-                set_curl_proxy($curl);
+                Proxy::applyToCurl($curl);
             }
             curl_setopt($curl, CURLOPT_URL, $host);
             curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);

@@ -26,6 +26,7 @@ Table of Content:
 - [Transports](Transports.md)
   - [E-Mail](Transports.md#e-mail)
   - [API](Transports.md#api)
+  - [Browser Push](Transports.md#browser-push)
   - [Nagios-Compatible](Transports.md#nagios-compatible)
   - [IRC](Transports.md#irc)
   - [Slack](Transports.md#slack)

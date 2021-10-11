@@ -18,7 +18,6 @@
  */
 
 use Illuminate\Database\QueryException;
-use LibreNMS\Config;
 use LibreNMS\DB\Eloquent;
 use LibreNMS\Exceptions\DatabaseConnectException;
 use LibreNMS\Util\Laravel;
@@ -110,8 +109,6 @@ function dbQuery($sql, $parameters = [])
  */
 function dbInsert($data, $table)
 {
-    $time_start = microtime(true);
-
     $sql = 'INSERT IGNORE INTO `' . $table . '` (`' . implode('`,`', array_keys($data)) . '`)  VALUES (' . implode(',', dbPlaceHolders($data)) . ')';
 
     try {
@@ -120,7 +117,6 @@ function dbInsert($data, $table)
         dbHandleException(new QueryException($sql, $data, $pdoe));
     }
 
-    recordDbStatistic('insert', $time_start);
     if ($result) {
         return Eloquent::DB()->getPdo()->lastInsertId();
     } else {
@@ -139,8 +135,6 @@ function dbInsert($data, $table)
  */
 function dbBulkInsert($data, $table)
 {
-    $time_start = microtime(true);
-
     // check that data isn't an empty array
     if (empty($data)) {
         return false;
@@ -159,8 +153,6 @@ function dbBulkInsert($data, $table)
     foreach ($data_chunks as $data_chunk) {
         try {
             $result = Eloquent::DB()->table($table)->insert((array) $data_chunk);
-
-            recordDbStatistic('insert', $time_start);
 
             return $result;
         } catch (PDOException $pdoe) {
@@ -184,8 +176,6 @@ function dbBulkInsert($data, $table)
  */
 function dbUpdate($data, $table, $where = null, $parameters = [])
 {
-    $time_start = microtime(true);
-
     // need field name and placeholder value
     // but how merge these field placeholders with actual $parameters array for the WHERE clause
     $sql = 'UPDATE `' . $table . '` set ';
@@ -213,8 +203,6 @@ function dbUpdate($data, $table, $where = null, $parameters = [])
     try {
         $result = Eloquent::DB()->update($sql, (array) $data);
 
-        recordDbStatistic('update', $time_start);
-
         return $result;
     } catch (PDOException $pdoe) {
         dbHandleException(new QueryException($sql, $data, $pdoe));
@@ -225,8 +213,6 @@ function dbUpdate($data, $table, $where = null, $parameters = [])
 
 function dbDelete($table, $where = null, $parameters = [])
 {
-    $time_start = microtime(true);
-
     $sql = 'DELETE FROM `' . $table . '`';
     if ($where) {
         $sql .= ' WHERE ' . $where;
@@ -237,8 +223,6 @@ function dbDelete($table, $where = null, $parameters = [])
     } catch (PDOException $pdoe) {
         dbHandleException(new QueryException($sql, $parameters, $pdoe));
     }
-
-    recordDbStatistic('delete', $time_start);
 
     return $result;
 }//end dbDelete()
@@ -253,8 +237,6 @@ function dbDelete($table, $where = null, $parameters = [])
  */
 function dbDeleteOrphans($target_table, $parents)
 {
-    $time_start = microtime(true);
-
     if (empty($parents)) {
         // don't delete all entries if parents is missing
         return false;
@@ -288,8 +270,6 @@ function dbDeleteOrphans($target_table, $parents)
         dbHandleException(new QueryException($query, [], $pdoe));
     }
 
-    recordDbStatistic('delete', $time_start);
-
     return $result;
 }
 
@@ -301,13 +281,10 @@ function dbDeleteOrphans($target_table, $parents)
 function dbFetchRows($sql, $parameters = [])
 {
     global $PDO_FETCH_ASSOC;
-    $time_start = microtime(true);
 
     try {
         $PDO_FETCH_ASSOC = true;
         $rows = Eloquent::DB()->select($sql, (array) $parameters);
-
-        recordDbStatistic('fetchrows', $time_start);
 
         return $rows;
     } catch (PDOException $pdoe) {
@@ -347,13 +324,10 @@ function dbFetch($sql, $parameters = [])
 function dbFetchRow($sql = null, $parameters = [])
 {
     global $PDO_FETCH_ASSOC;
-    $time_start = microtime(true);
 
     try {
         $PDO_FETCH_ASSOC = true;
         $row = Eloquent::DB()->selectOne($sql, (array) $parameters);
-
-        recordDbStatistic('fetchrow', $time_start);
 
         return $row;
     } catch (PDOException $pdoe) {
@@ -372,12 +346,10 @@ function dbFetchRow($sql = null, $parameters = [])
 function dbFetchCell($sql, $parameters = [])
 {
     global $PDO_FETCH_ASSOC;
-    $time_start = microtime(true);
 
     try {
         $PDO_FETCH_ASSOC = true;
         $row = Eloquent::DB()->selectOne($sql, (array) $parameters);
-        recordDbStatistic('fetchcell', $time_start);
         if ($row) {
             return reset($row);
             // shift first field off first row
@@ -399,7 +371,6 @@ function dbFetchCell($sql, $parameters = [])
 function dbFetchColumn($sql, $parameters = [])
 {
     global $PDO_FETCH_ASSOC;
-    $time_start = microtime(true);
 
     $cells = [];
 
@@ -409,8 +380,6 @@ function dbFetchColumn($sql, $parameters = [])
             $cells[] = reset($row);
         }
         $PDO_FETCH_ASSOC = false;
-
-        recordDbStatistic('fetchcolumn', $time_start);
 
         return $cells;
     } catch (PDOException $pdoe) {
@@ -542,58 +511,6 @@ function dbRollbackTransaction()
 function dbGenPlaceholders($count)
 {
     return '(' . implode(',', array_fill(0, $count, '?')) . ')';
-}
-
-/**
- * Update statistics for db operations
- *
- * @param  string  $stat  fetchcell, fetchrow, fetchrows, fetchcolumn, update, insert, delete
- * @param  float  $start_time  The time the operation started with 'microtime(true)'
- * @return float The calculated run time
- */
-function recordDbStatistic($stat, $start_time)
-{
-    global $db_stats, $db_stats_last;
-
-    if (! isset($db_stats)) {
-        $db_stats = [
-            'ops' => [
-                'insert' => 0,
-                'update' => 0,
-                'delete' => 0,
-                'fetchcell' => 0,
-                'fetchcolumn' => 0,
-                'fetchrow' => 0,
-                'fetchrows' => 0,
-            ],
-            'time' => [
-                'insert' => 0.0,
-                'update' => 0.0,
-                'delete' => 0.0,
-                'fetchcell' => 0.0,
-                'fetchcolumn' => 0.0,
-                'fetchrow' => 0.0,
-                'fetchrows' => 0.0,
-            ],
-        ];
-        $db_stats_last = $db_stats;
-    }
-
-    $runtime = microtime(true) - $start_time;
-    $db_stats['ops'][$stat]++;
-    $db_stats['time'][$stat] += $runtime;
-
-    //double accounting corrections
-    if ($stat == 'fetchcolumn') {
-        $db_stats['ops']['fetchrows']--;
-        $db_stats['time']['fetchrows'] -= $runtime;
-    }
-    if ($stat == 'fetchcell') {
-        $db_stats['ops']['fetchrow']--;
-        $db_stats['time']['fetchrow'] -= $runtime;
-    }
-
-    return $runtime;
 }
 
 /**
