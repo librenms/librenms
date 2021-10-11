@@ -37,7 +37,6 @@ use Log;
 
 class SnmpQueryMock implements SnmpQueryInterface
 {
-
     /**
      * @var array
      */
@@ -222,7 +221,6 @@ class SnmpQueryMock implements SnmpQueryInterface
     {
         if (! isset(self::$cache[$community])) {
             $this->cacheSnmprec($community);
-
         }
 
         if (isset(self::$cache[$community])) {
@@ -290,7 +288,6 @@ class SnmpQueryMock implements SnmpQueryInterface
 
         $number = SnmpQuery::make()->mibDir($this->mibDir)
             ->options(array_merge($options, $this->options))->numeric()->translate($oid)->value();
-
 
         if (empty($number)) {
             throw new Exception('Could not translate oid: ' . $oid . PHP_EOL);

@@ -37,7 +37,6 @@ use SnmpQuery;
 
 class Core implements Module
 {
-
     public function discover(OS $os)
     {
         $snmpdata = SnmpQuery::numeric()->get(['SNMPv2-MIB::sysObjectID.0', 'SNMPv2-MIB::sysDescr.0', 'SNMPv2-MIB::sysName.0'])
@@ -103,7 +102,7 @@ class Core implements Module
                 Config::get("os.{$device->os}.bad_snmpEngineTime") ? 0 : $uptime_data['SNMP-FRAMEWORK-MIB::snmpEngineTime.0'],
                 Config::get("os.{$device->os}.bad_hrSystemUptime") ? 0 : round($uptime_data['HOST-RESOURCES-MIB::hrSystemUptime.0'] / 100)
             );
-            d_echo("Uptime seconds: $uptime\n");
+            Log::debug("Uptime seconds: $uptime\n");
         }
 
         if ($uptime != 0 && Config::get("os.{$device->os}.bad_uptime") !== true) {
@@ -146,7 +145,7 @@ class Core implements Module
             $device->sysObjectID = SnmpQuery::device($device)->numeric()->get('SNMPv2-MIB::sysObjectID.0')->value();
         }
 
-        d_echo("| {$device->sysDescr} | {$device->sysObjectID} | \n");
+        Log::debug("| {$device->sysDescr} | {$device->sysObjectID} | \n");
 
         $deferred_os = [];
         $generic_os = [
