@@ -13,7 +13,6 @@ modules:
                     oid:
                         - ogCellModemTable
                         - ogEmdTemperatureTable
-                        - ogEmdHumidityTable
         temperature:
             data:
                 -
