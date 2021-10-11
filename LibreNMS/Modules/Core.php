@@ -78,6 +78,8 @@ class Core implements Module
 
     public function poll(OS $os)
     {
+        global $agent_data;
+
         $snmpdata = SnmpQuery::numeric()
             ->get(['SNMPv2-MIB::sysDescr.0', 'SNMPv2-MIB::sysObjectID.0', 'SNMPv2-MIB::sysUpTime.0', 'SNMPv2-MIB::sysName.0'])
             ->values();
@@ -92,7 +94,7 @@ class Core implements Module
 
         if (! empty($agent_data['uptime'])) {
             [$uptime] = explode(' ', $agent_data['uptime']);
-            $uptime = round($uptime);
+            $uptime = round((float) $uptime);
             echo "Using UNIX Agent Uptime ($uptime)\n";
         } else {
             $uptime_data = SnmpQuery::make()->get(['SNMP-FRAMEWORK-MIB::snmpEngineTime.0', 'HOST-RESOURCES-MIB::hrSystemUptime.0'])->values();
