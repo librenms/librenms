@@ -103,10 +103,7 @@ interface SnmpQueryInterface
 
     /**
      * Translate an OID.
-     * Specify -On option to output numeric OID.
-     *
-     * @param  array|string  $oid
-     * @return \LibreNMS\Data\Source\SnmpResponse
+     * Call numeric method prior output numeric OID.
      */
-    public function translate($oid): SnmpResponse;
+    public function translate(string $oid, ?string $mib = null): SnmpResponse;
 }

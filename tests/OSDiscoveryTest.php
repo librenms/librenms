@@ -121,7 +121,7 @@ class OSDiscoveryTest extends TestCase
         $output = ob_get_contents();
         ob_end_clean();
 
-        $this->assertLessThan(2, microtime(true) - $start, "OS $expected_os took longer than 2s to detect");
+        $this->assertLessThan(5, microtime(true) - $start, "OS $expected_os took longer than 5s to detect");
         $this->assertEquals($expected_os, $os, "Test file: $community.snmprec\n$output");
     }
 

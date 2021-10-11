@@ -141,9 +141,9 @@ class Core implements Module
     public static function detectOS(Device $device, bool $fetch = true): string
     {
         if ($fetch) {
-            // some devices act odd when getting both oids at once
+            // some devices act oddly when getting both OIDs at once
             $device->sysDescr = SnmpQuery::device($device)->get('SNMPv2-MIB::sysDescr.0')->value();
-            $device->sysObjectID = SnmpQuery::device($device)->get('SNMPv2-MIB::sysObjectID.0')->value();
+            $device->sysObjectID = SnmpQuery::device($device)->numeric()->get('SNMPv2-MIB::sysObjectID.0')->value();
         }
 
         d_echo("| {$device->sysDescr} | {$device->sysObjectID} | \n");

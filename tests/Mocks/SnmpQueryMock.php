@@ -86,9 +86,18 @@ class SnmpQueryMock implements SnmpQueryInterface
         return $this;
     }
 
-    public function translate($oid): SnmpResponse
+    public function translate(string $oid, ?string $mib = null): SnmpResponse
     {
-        throw new Exception('Translate unsupported');
+        // call real snmptranslate
+        $options = $this->options;
+        if ($this->numeric) {
+            $options[] = '-On';
+        }
+
+        return SnmpQuery::make()
+            ->mibDir($this->mibDir)
+            ->options($options)
+            ->translate($oid, $mib);
     }
 
     public function numeric(): SnmpQueryInterface
@@ -129,7 +138,6 @@ class SnmpQueryMock implements SnmpQueryInterface
         $num_oid = $this->translateNumber($oid);
         $dev = $this->getSnmprec($community);
 
-        $start = microtime(true);
         $output = '';
         foreach ($dev as $key => $data) {
             if (Str::startsWith($key, $num_oid)) {
@@ -154,7 +162,6 @@ class SnmpQueryMock implements SnmpQueryInterface
                 if (Str::startsWith($key, $num_oid)) {
                     return new SnmpResponse($this->outputLine($oid, $num_oid, $data[0], $data[1]));
                 }
-
             }
 
             $num_oid = substr($num_oid, 0, strrpos($num_oid, '.'));
@@ -221,7 +228,7 @@ class SnmpQueryMock implements SnmpQueryInterface
     private function outputLine($oid, $num_oid, $type, $data)
     {
         if ($type == 6) {
-            $data = '.' . $data;
+            $data = $this->numeric ? ".$data" : $this->translate($data, $this->extractMib($oid))->value();
         }
 
         if ($this->numeric) {
@@ -229,7 +236,7 @@ class SnmpQueryMock implements SnmpQueryInterface
         }
 
         if (! empty($oid) && YamlDiscovery::oidIsNumeric($oid)) {
-            $oid = SnmpQuery::make()->translate($oid)->value();
+            $oid = $this->translate($oid)->value();
         }
 
         return "$oid = $data";
@@ -283,5 +290,14 @@ class SnmpQueryMock implements SnmpQueryInterface
         }
 
         return ltrim($number, '.');
+    }
+
+    private function extractMib(string $oid): ?string
+    {
+        if (Str::contains($oid, '::')) {
+            return explode('::', $oid, 2)[0];
+        }
+
+        return null;
     }
 }
