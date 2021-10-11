@@ -81,7 +81,6 @@ modules:
                     num_oid: '.1.3.6.1.4.1.2011.5.25.31.1.1.8.1.6.{{ $index }}'
                     descr: 'TempSensor {{ $subindex0 }}.{{ $subindex1 }}.{{ $subindex2 }}.{{ $subindex3 }}'
                     divisor: 1
-
         count:
             data:
                 -
@@ -385,7 +384,6 @@ modules:
                             oid: hwEntityOpticalMode
                             op: '='
                             value: '1'
-
                 -
                     oid: hwEntityStateTable
                     value: hwEntityVoltage
@@ -402,7 +400,6 @@ modules:
                             oid: hwEntityVoltage
                             op: '>='
                             value: '2147483646'
- 
                 -
                     oid: hwPwrStatusTable
                     value: hwEntityPwrVoltage
@@ -417,9 +414,6 @@ modules:
                     num_oid: '.1.3.6.1.4.1.2011.5.25.31.1.1.9.1.7.{{ $index }}'
                     descr: 'VoltSensor {{ $subindex0 }}.{{ $subindex1 }}.{{ $subindex2 }}.{{ $subindex3 }}'
                     divisor: 1000
-
-
-
         current:
             data:
                 -
@@ -445,7 +439,6 @@ modules:
                     descr: 'PWR{{ $hwEntityPwrSlot }}'
                     index: '{{ $index }}'
                     divisor: 1000
-
         power:
             data:
                 -
@@ -466,8 +459,6 @@ modules:
                     descr: '{{ $hwBoardName }}'
                     index: '{{ $index }}'
                     divisor: 1000
-
-
         percent:
             data:
                 -
@@ -475,8 +466,6 @@ modules:
                     value: hwEntityFanSpeed
                     num_oid: '.1.3.6.1.4.1.2011.5.25.31.1.1.10.1.5.{{ $index }}'
                     descr: 'Slot {{ $subindex0 }} Fan {{ $subindex1 }} Speed'
-
-
         state:
             data:
                 -
@@ -590,7 +579,6 @@ modules:
                         - { descr: 'serviceAvailable', graph: 1, value: 2, generic: 0 }
                         - { descr: 'regionEmergency', graph: 1, value: 3, generic: 2 }
                         - { descr: 'savingStatus', graph: 1, value: 4, generic: 3 }
-
                     skip_values:
                         -
                             oid: hw3GDeviceNumber
@@ -622,4 +610,3 @@ modules:
                         - { descr: 'Minor', graph: 1, value: 2, generic: 1 }
                         - { descr: 'Major', graph: 1, value: 3, generic: 2 }
                         - { descr: 'Fatal', graph: 1, value: 4, generic: 2 }
-
