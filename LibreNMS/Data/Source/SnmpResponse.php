@@ -2,7 +2,7 @@
 /**
  * SnmpResponse.php
  *
- * Responsible for parsing net-snmp output into usable PHP data structures.
+ * -Description-
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
