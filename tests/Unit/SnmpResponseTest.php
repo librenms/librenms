@@ -1,5 +1,5 @@
 <?php
-/*
+/**
  * SnmpResponseTest.php
  *
  * -Description-
@@ -15,10 +15,10 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
+ *
  * @copyright  2021 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -39,6 +39,14 @@ class SnmpResponseTest extends TestCase
         $this->assertEquals('lo', $response->value());
         $this->assertEquals(['IF-MIB::ifDescr' => [1 => 'lo', 2 => 'enp4s0']], $response->table());
         $this->assertEquals([1 => ['IF-MIB::ifDescr' => 'lo'], 2 => ['IF-MIB::ifDescr' => 'enp4s0']], $response->table(1));
+
+        // snmptranslate type response
+        $response = new SnmpResponse("IF-MIB::ifDescr\n");
+
+        $this->assertTrue($response->isValid());
+        $this->assertEquals(['' => 'IF-MIB::ifDescr'], $response->values());
+        $this->assertEquals('IF-MIB::ifDescr', $response->value());
+        $this->assertEquals(['IF-MIB::ifDescr'], $response->table());
     }
 
     public function testMultiLine(): void
@@ -46,8 +54,8 @@ class SnmpResponseTest extends TestCase
         $response = new SnmpResponse("SNMPv2-MIB::sysDescr.0 = \"something\n on two lines\"\n");
 
         $this->assertTrue($response->isValid());
-        $this->assertEquals("\"something\n on two lines\"", $response->value());
-        $this->assertEquals(['SNMPv2-MIB::sysDescr.0' => "\"something\n on two lines\""], $response->values());
+        $this->assertEquals("something\n on two lines", $response->value());
+        $this->assertEquals(['SNMPv2-MIB::sysDescr.0' => "something\n on two lines"], $response->values());
     }
 
     public function numericTest(): void
@@ -59,6 +67,118 @@ class SnmpResponseTest extends TestCase
         $this->assertEquals(['.1.3.6.1.2.1.2.2.1.10.1' => '496255256', '.1.3.6.1.2.1.2.2.1.10.2' => '3495809228'], $response->values());
         $this->assertEquals(['.1.3.6.1.2.1.2.2.1.10.1' => '496255256', '.1.3.6.1.2.1.2.2.1.10.2' => '3495809228'], $response->table());
         $this->assertEquals(['.1.3.6.1.2.1.2.2.1.10.1' => '496255256', '.1.3.6.1.2.1.2.2.1.10.2' => '3495809228'], $response->table(3));
+    }
+
+    public function tableTest(): void
+    {
+        $response = new SnmpResponse('HOST-RESOURCES-MIB::hrStorageIndex.1 = 1
+HOST-RESOURCES-MIB::hrStorageIndex.34 = 34
+HOST-RESOURCES-MIB::hrStorageIndex.36 = 36
+HOST-RESOURCES-MIB::hrStorageType.1 = HOST-RESOURCES-TYPES::hrStorageRam
+HOST-RESOURCES-MIB::hrStorageType.34 = HOST-RESOURCES-TYPES::hrStorageFixedDisk
+HOST-RESOURCES-MIB::hrStorageType.36 = HOST-RESOURCES-TYPES::hrStorageFixedDisk
+HOST-RESOURCES-MIB::hrStorageDescr.1 = Physical memory
+HOST-RESOURCES-MIB::hrStorageDescr.34 = /run
+HOST-RESOURCES-MIB::hrStorageDescr.36 = /
+HOST-RESOURCES-MIB::hrStorageAllocationUnits.1 = 1024 Bytes
+HOST-RESOURCES-MIB::hrStorageAllocationUnits.34 = 4096 Bytes
+HOST-RESOURCES-MIB::hrStorageAllocationUnits.36 = 4096 Bytes
+HOST-RESOURCES-MIB::hrStorageSize.1 = 12136128
+HOST-RESOURCES-MIB::hrStorageSize.34 = 1517016
+HOST-RESOURCES-MIB::hrStorageSize.36 = 193772448
+HOST-RESOURCES-MIB::hrStorageUsed.1 = 11577192
+HOST-RESOURCES-MIB::hrStorageUsed.34 = 429
+HOST-RESOURCES-MIB::hrStorageUsed.36 = 127044934
+');
+
+        $this->assertTrue($response->isValid());
+        $this->assertEquals('34', $response->value());
+        $this->assertEquals([
+            'HOST-RESOURCES-MIB::hrStorageIndex.1' => '1',
+            'HOST-RESOURCES-MIB::hrStorageIndex.34' => '34',
+            'HOST-RESOURCES-MIB::hrStorageIndex.36' => '36',
+            'HOST-RESOURCES-MIB::hrStorageType.1' => 'HOST-RESOURCES-TYPES::hrStorageRam',
+            'HOST-RESOURCES-MIB::hrStorageType.34' => 'HOST-RESOURCES-TYPES::hrStorageFixedDisk',
+            'HOST-RESOURCES-MIB::hrStorageType.36' => 'HOST-RESOURCES-TYPES::hrStorageFixedDisk',
+            'HOST-RESOURCES-MIB::hrStorageDescr.1' => 'Physical memory',
+            'HOST-RESOURCES-MIB::hrStorageDescr.34' => '/run',
+            'HOST-RESOURCES-MIB::hrStorageDescr.36' => '/',
+            'HOST-RESOURCES-MIB::hrStorageAllocationUnits.1' => '1024',
+            'HOST-RESOURCES-MIB::hrStorageAllocationUnits.34' => '4096',
+            'HOST-RESOURCES-MIB::hrStorageAllocationUnits.36' => '4096',
+            'HOST-RESOURCES-MIB::hrStorageSize.1' => '12136128',
+            'HOST-RESOURCES-MIB::hrStorageSize.34 ' => '1517016',
+            'HOST-RESOURCES-MIB::hrStorageSize.36 ' => '193772448',
+            'HOST-RESOURCES-MIB::hrStorageUsed.1 =' => '11577192',
+            'HOST-RESOURCES-MIB::hrStorageUsed.34 ' => '429',
+            'HOST-RESOURCES-MIB::hrStorageUsed.36' => '127044934',
+        ], $response->values());
+        $this->assertEquals([
+            '1' => [
+                'HOST-RESOURCES-MIB::hrStorageIndex' => '1',
+                'HOST-RESOURCES-MIB::hrStorageType' => 'HOST-RESOURCES-TYPES::hrStorageRam',
+                'HOST-RESOURCES-MIB::hrStorageDescr' => 'Physical memory',
+                'HOST-RESOURCES-MIB::hrStorageAllocationUnits' => '1024',
+                'HOST-RESOURCES-MIB::hrStorageSize' => '12136128',
+                'HOST-RESOURCES-MIB::hrStorageUsed' => '11577192',
+            ],
+            '34' => [
+                'HOST-RESOURCES-MIB::hrStorageIndex' => '34',
+                'HOST-RESOURCES-MIB::hrStorageType' => 'HOST-RESOURCES-TYPES::hrStorageFixedDisk',
+                'HOST-RESOURCES-MIB::hrStorageDescr' => '/run',
+                'HOST-RESOURCES-MIB::hrStorageAllocationUnits' => '4096',
+                'HOST-RESOURCES-MIB::hrStorageSize' => '1517016',
+                'HOST-RESOURCES-MIB::hrStorageUsed' => '429',
+            ],
+            '36' => [
+                'HOST-RESOURCES-MIB::hrStorageIndex' => '36',
+                'HOST-RESOURCES-MIB::hrStorageType' => 'HOST-RESOURCES-TYPES::hrStorageFixedDisk',
+                'HOST-RESOURCES-MIB::hrStorageDescr' => '/',
+                'HOST-RESOURCES-MIB::hrStorageAllocationUnits' => '4096',
+                'HOST-RESOURCES-MIB::hrStorageSize' => '193772448',
+                'HOST-RESOURCES-MIB::hrStorageUsed' => '127044934',
+            ],
+        ], $response->table());
+        $this->assertEquals([
+            'HOST-RESOURCES-MIB::hrStorageIndex' => [
+                '1' => '1',
+                '34' => '34',
+                '36' => '36',
+            ],
+            'HOST-RESOURCES-MIB::hrStorageType' => [
+                '1' => 'HOST-RESOURCES-TYPES::hrStorageRam',
+                '34' => 'HOST-RESOURCES-TYPES::hrStorageFixedDisk',
+                '36' => 'HOST-RESOURCES-TYPES::hrStorageFixedDisk',
+            ],
+            'HOST-RESOURCES-MIB::hrStorageDescr' => [
+                '1' => 'Physical memory',
+                '34' => '/run',
+                '36' => '/',
+            ],
+            'HOST-RESOURCES-MIB::hrStorageAllocationUnits' => [
+                '1' => '1024',
+                '34' => '4096',
+                '36' => '4096',
+            ],
+            'HOST-RESOURCES-MIB::hrStorageSize' => [
+                '1' => '12136128',
+                '34' => '1517016',
+                '36' => '193772448',
+            ],
+            'HOST-RESOURCES-MIB::hrStorageUsed' => [
+                '1' => '11577192',
+                '34' => '429',
+                '36' => '127044934',
+            ],
+        ], $response->table(1));
+    }
+
+    public function trimTest(): void
+    {
+        $response = new SnmpResponse(".1.3.6.1.2.1.2.2.1.10.1 = \\\"4958\\\"\n.1.3.6.1.2.1.2.2.1.10.2 = \"\" 349\r\n\n");
+        $this->assertTrue($response->isValid());
+        $this->assertEquals('4958', $response->value());
+        $this->assertEquals(['.1.3.6.1.2.1.2.2.1.10.1' => '4958', '.1.3.6.1.2.1.2.2.1.10.2' => '349'], $response->values());
     }
 
     public function testErrorHandling(): void
