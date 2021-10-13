@@ -1,20 +1,29 @@
 <?php
-/*
- * LibreNMS - SNMP Functions
+/**
+ * snmp.inc.php
  *
- * Original Observium code by: Adam Armstrong, Tom Laermans
- * Copyright (c) 2010-2012 Adam Armstrong.
+ * -Description-
  *
- * Additions for LibreNMS by Paul Gear
- * Copyright (c) 2014-2015 Gear Consulting Pty Ltd <http://libertysys.com.au/>
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
  *
- * This program is free software: you can redistribute it and/or modify it
- * under the terms of the GNU General Public License as published by the
- * Free Software Foundation, either version 3 of the License, or (at your
- * option) any later version.  Please see LICENSE.txt at the top level of
- * the source code distribution for details.
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ *
+ * @link       https://www.librenms.org
+ *
+ * @copyright  2021 Tony Murray
+ * @author     Tony Murray <murraytony@gmail.com>
  */
 
+use App\Models\Device;
 use App\Polling\Measure\Measurement;
 use Illuminate\Support\Str;
 use LibreNMS\Config;
@@ -176,7 +185,7 @@ function gen_snmp_cmd($cmd, $device, $oids, $options = null, $mib = null, $mibdi
         array_push($cmd, '-r', $retries);
     }
 
-    $pollertarget = \LibreNMS\Util\Rewrite::addIpv6Brackets((string) ($device['overwrite_ip'] ?? $device['hostname']));
+    $pollertarget = \LibreNMS\Util\Rewrite::addIpv6Brackets(Device::pollerTarget($device));
     $cmd[] = $device['transport'] . ':' . $pollertarget . ':' . $device['port'];
     $cmd = array_merge($cmd, (array) $oids);
 
