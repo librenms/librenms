@@ -467,26 +467,6 @@ if ($count < 1) {
 $("[data-toggle='modal'], [data-toggle='popover']").popover({
     trigger: 'hover'
 });
-$('#ack-alert').on("click", function(e) {
-    event.preventDefault();
-    var alert_id = $(this).data("alert_id");
-    $.ajax({
-        type: "POST",
-            url: "ajax_form.php",
-            data: { type: "ack-alert", alert_id: alert_id },
-            success: function(msg){
-                $("#message").html('<div class="alert alert-info">'+msg+'</div>');
-                if(msg.indexOf("ERROR:") <= -1) {
-                    setTimeout(function() {
-                        location.reload(1);
-                    }, 1000);
-                }
-            },
-                error: function(){
-                    $("#message").html('<div class="alert alert-info">An error occurred acking this alert.</div>');
-                }
-    });
-});
 
 $("[name='alert-rule']").bootstrapSwitch('offColor','danger');
 $('input[name="alert-rule"]').on('switchChange.bootstrapSwitch',  function(event, state) {

@@ -25,9 +25,12 @@ namespace LibreNMS\Alert\Transport;
 use LibreNMS\Alert\Transport;
 use LibreNMS\Config;
 use LibreNMS\Enum\AlertState;
+use LibreNMS\Util\Proxy;
 
 class Alertmanager extends Transport
 {
+    protected $name = 'Alert Manager';
+
     public function deliverAlert($obj, $opts)
     {
         $alertmanager_opts = $this->parseUserOptions($this->config['alertmanager-options']);
@@ -72,7 +75,7 @@ class Alertmanager extends Transport
     public static function postAlerts($url, $data)
     {
         $curl = curl_init();
-        set_curl_proxy($curl);
+        Proxy::applyToCurl($curl);
         curl_setopt($curl, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
         curl_setopt($curl, CURLOPT_TIMEOUT, 5);

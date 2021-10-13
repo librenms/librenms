@@ -1,5 +1,7 @@
 <?php
 
+use Illuminate\Support\Facades\Route;
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -18,6 +20,7 @@ Auth::routes(['register' => false, 'reset' => false, 'verify' => false]);
 Route::group(['middleware' => ['auth'], 'guard' => 'auth'], function () {
 
     // pages
+    Route::post('alert/{alert}/ack', [\App\Http\Controllers\AlertController::class, 'ack'])->name('alert.ack');
     Route::resource('device-groups', 'DeviceGroupController');
     Route::resource('port-groups', 'PortGroupController');
     Route::resource('port', 'PortController', ['only' => 'update']);
@@ -57,11 +60,21 @@ Route::group(['middleware' => ['auth'], 'guard' => 'auth'], function () {
         Route::get('devicedependency', 'DeviceDependencyController@dependencyMap');
     });
 
+    // Push notifications
+    Route::group(['prefix' => 'push'], function () {
+        Route::get('token', [\App\Http\Controllers\PushNotificationController::class, 'token'])->name('push.token');
+        Route::get('key', [\App\Http\Controllers\PushNotificationController::class, 'key'])->name('push.key');
+        Route::post('register', [\App\Http\Controllers\PushNotificationController::class, 'register'])->name('push.register');
+        Route::post('unregister', [\App\Http\Controllers\PushNotificationController::class, 'unregister'])->name('push.unregister');
+    });
+
     // admin pages
     Route::group(['middleware' => ['can:admin']], function () {
         Route::get('settings/{tab?}/{section?}', 'SettingsController@index')->name('settings');
         Route::put('settings/{name}', 'SettingsController@update')->name('settings.update');
         Route::delete('settings/{name}', 'SettingsController@destroy')->name('settings.destroy');
+
+        Route::post('alert/transports/{transport}/test', [\App\Http\Controllers\AlertTransportController::class, 'test'])->name('alert.transports.test');
     });
 
     // old route redirects
@@ -91,6 +104,7 @@ Route::group(['middleware' => ['auth'], 'guard' => 'auth'], function () {
             Route::post('set_resolution', 'ResolutionController@set');
             Route::get('netcmd', 'NetCommand@run');
             Route::post('ripe/raw', 'RipeNccApiController@raw');
+            Route::get('snmp/capabilities', 'SnmpCapabilities')->name('snmp.capabilities');
         });
 
         Route::get('settings/list', 'SettingsController@listAll')->name('settings.list');
@@ -137,6 +151,7 @@ Route::group(['middleware' => ['auth'], 'guard' => 'auth'], function () {
             Route::post('mempools', 'MempoolsController');
             Route::post('outages', 'OutagesController');
             Route::post('port-nac', 'PortNacController');
+            Route::post('ports', 'PortsController')->name('table.ports');
             Route::post('routes', 'RoutesTablesController');
             Route::post('syslog', 'SyslogController');
             Route::post('vminfo', 'VminfoController');

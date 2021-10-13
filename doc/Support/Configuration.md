@@ -78,6 +78,19 @@ lnms config:get snmp.community
   ]
 ```
 
+## Pre-load configuration
+
+This feature is primarily for docker images and other automation.
+When installing LibreNMS for the first time with a new database you can place yaml key value files
+in `database/seeders/config` to pre-populate the config database.
+
+Example snmp.yaml
+```yaml
+snmp.community:
+    - public
+    - private
+snmp.max_repeaters: 30
+```
 
 ## Directories
 

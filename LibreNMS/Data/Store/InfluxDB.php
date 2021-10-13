@@ -26,10 +26,10 @@
 
 namespace LibreNMS\Data\Store;
 
+use App\Polling\Measure\Measurement;
 use InfluxDB\Client;
 use InfluxDB\Driver\UDP;
 use LibreNMS\Config;
-use LibreNMS\Data\Measure\Measurement;
 use Log;
 
 class InfluxDB extends BaseDatastore

@@ -31,7 +31,7 @@
     <link href="{{ asset('css/mktree.css') }}" rel="stylesheet">
     <link href="{{ asset('css/vis.min.css') }}" rel="stylesheet">
     <link href="{{ asset('css/font-awesome.min.css') }}" rel="stylesheet">
-    <link href="{{ asset('css/jquery.gridster.min.css') }}" rel="stylesheet">
+    <link href="{{ asset('css/jquery.gridster.min.css?ver=09292021') }}" rel="stylesheet">
     <link href="{{ asset('css/leaflet.css') }}" rel="stylesheet">
     <link href="{{ asset('css/MarkerCluster.css') }}" rel="stylesheet">
     <link href="{{ asset('css/MarkerCluster.Default.css') }}" rel="stylesheet">
@@ -75,28 +75,21 @@
         });
         var ajax_url = "{{ url('/ajax') }}";
     </script>
-    <script src="{{ asset('js/librenms.js?ver=05072021') }}"></script>
-    <script type="text/javascript">
-        <!-- Begin
-        function popUp(URL)
-        {
-            day = new Date();
-            id = day.getTime();
-            eval("page" + id + " = window.open(URL, '" + id + "', 'toolbar=0,scrollbars=1,location=0,statusbar=0,menubar=0,resizable=1,width=550,height=600');");
-        }
-        // End -->
-    </script>
+    <script src="{{ asset('js/librenms.js?ver=09072021') }}"></script>
     <script type="text/javascript" src="{{ asset('js/overlib_mini.js') }}"></script>
     <script type="text/javascript" src="{{ asset('js/toastr.min.js?ver=05072021') }}"></script>
     <script type="text/javascript" src="{{ asset('js/boot.js') }}"></script>
     <script>
         // Apply color scheme
-        if ('{{ LibreNMS\Config::get('applied_site_style', 'light') }}' === 'dark' || window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        if ('{{ LibreNMS\Config::get('applied_site_style') }}' === 'dark') {
             document.documentElement.classList.add('tw-dark')
         } else {
             document.documentElement.classList.remove('tw-dark')
         }
     </script>
+    @auth
+        <script src="{{ asset('js/register-service-worker.js') }}" defer></script>
+    @endauth
     @yield('javascript')
 </head>
 <body>

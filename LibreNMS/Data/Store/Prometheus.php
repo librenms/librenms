@@ -26,10 +26,10 @@
 
 namespace LibreNMS\Data\Store;
 
+use App\Polling\Measure\Measurement;
 use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Support\Str;
 use LibreNMS\Config;
-use LibreNMS\Data\Measure\Measurement;
 use Log;
 
 class Prometheus extends BaseDatastore
@@ -38,6 +38,7 @@ class Prometheus extends BaseDatastore
     private $base_uri;
     private $default_opts;
     private $enabled;
+    private $prefix;
 
     public function __construct(\GuzzleHttp\Client $client)
     {
@@ -47,6 +48,10 @@ class Prometheus extends BaseDatastore
         $url = Config::get('prometheus.url');
         $job = Config::get('prometheus.job', 'librenms');
         $this->base_uri = "$url/metrics/job/$job/instance/";
+        $this->prefix = Config::get('prometheus.prefix', '');
+        if ($this->prefix) {
+            $this->prefix = "$this->prefix" . '_';
+        }
 
         $this->default_opts = [
             'headers' => ['Content-Type' => 'text/plain'],
@@ -82,7 +87,7 @@ class Prometheus extends BaseDatastore
 
             foreach ($fields as $k => $v) {
                 if ($v !== null) {
-                    $vals .= "$k $v\n";
+                    $vals .= $this->prefix . "$k $v\n";
                 }
             }
 

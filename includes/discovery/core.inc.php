@@ -28,9 +28,15 @@ if ($deviceModel->isDirty('os')) {
     echo 'Changed ';
 }
 
+// Set type to a predefined type for the OS if it's not already set
+$loaded_os_type = Config::get("os.{$device['os']}.type");
+if (! $deviceModel->getAttrib('override_device_type') && $loaded_os_type != $deviceModel->type) {
+    $deviceModel->type = $loaded_os_type;
+    Log::debug("Device type changed to $loaded_os_type!");
+}
+
 $deviceModel->save();
-load_os($device);
-load_discovery($device);
+
 $os = OS::make($device);
 
 echo 'OS: ' . Config::getOsSetting($device['os'], 'text') . " ({$device['os']})\n\n";

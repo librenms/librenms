@@ -671,23 +671,6 @@ function version_info($remote = false)
 }//end version_info()
 
 /**
- * Checks SNMPv3 capabilities
- *
- * SHA2 for Auth Algorithms (SHA-224,SHA-256,SHA-384,SHA-512)
- * AES-192, AES-256 for Privacy Algorithms
- */
-function snmpv3_capabilities(): array
-{
-    $process = new Process([Config::get('snmpget', 'snmpget'), '--help']);
-    $process->run();
-
-    $ret['sha2'] = Str::contains($process->getErrorOutput(), 'SHA-512');
-    $ret['aes256'] = Str::contains($process->getErrorOutput(), 'AES-256');
-
-    return $ret;
-}
-
-/**
  * Convert a MySQL binary v4 (4-byte) or v6 (16-byte) IP address to a printable string.
  *
  * @param  string  $ip  A binary string containing an IP address, as returned from MySQL's INET6_ATON function
@@ -974,38 +957,6 @@ function get_sql_filter_min_severity($min_severity, $alert_rules_name)
     }
 
     return '';
-}
-
-/**
- * Load the os definition for the device and set type and os_group
- * $device['os'] must be set
- *
- * @param  array  $device
- */
-function load_os(&$device)
-{
-    if (! isset($device['os'])) {
-        d_echo("No OS to load\n");
-
-        return;
-    }
-
-    \LibreNMS\Util\OS::loadDefinition($device['os']);
-
-    // Set type to a predefined type for the OS if it's not already set
-    $loaded_os_type = Config::get("os.{$device['os']}.type");
-    if ((! isset($device['attribs']['override_device_type']) && $device['attribs']['override_device_type'] != 1) && array_key_exists('type', $device) && $loaded_os_type != $device['type']) {
-        log_event('Device type changed ' . $device['type'] . ' => ' . $loaded_os_type, $device, 'system', 3);
-        $device['type'] = $loaded_os_type;
-        dbUpdate(['type' => $loaded_os_type], 'devices', 'device_id=?', [$device['device_id']]);
-        d_echo("Device type changed to $loaded_os_type!\n");
-    }
-
-    if ($os_group = Config::get("os.{$device['os']}.group")) {
-        $device['os_group'] = $os_group;
-    } else {
-        unset($device['os_group']);
-    }
 }
 
 /**

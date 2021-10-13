@@ -22,7 +22,7 @@
  * @copyright  2017 Neil Lathwood
  * @author     Neil Lathwood <neil@lathwood.co.uk>
  */
-$temp = snmpwalk_cache_multi_oid($device, 'amperageProbeTableEntry', [], 'MIB-Dell-10892');
+$temp = snmpwalk_cache_multi_oid($device, 'amperageProbeTableEntry', [], 'MIB-Dell-10892', 'dell');
 $cur_oid = '.1.3.6.1.4.1.674.10892.1.600.30.1.6.';
 
 foreach ((array) $temp as $index => $entry) {

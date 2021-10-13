@@ -11,7 +11,7 @@ class PortVlan extends PortRelatedModel
     public function getUntaggedAttribute($value)
     {
         if (! $value) {
-            if ($this->vlan == $this->port->ifVlan) {
+            if ($this->port && $this->vlan == $this->port->ifVlan) {
                 $value = 1;
             }
         }

@@ -18,6 +18,10 @@
         </div>
     @endif
 
+    <x-panel title="{{ __('Push Notifications') }}">
+        <x-notification-subscription-status></x-notification-subscription-status>
+    </x-panel>
+
     @if($can_change_password)
     <x-panel title="{{ __('Change Password') }}">
         <form method="POST" action="{{ route('users.update', [$user->user_id]) }}" class="form-horizontal" role="form">
