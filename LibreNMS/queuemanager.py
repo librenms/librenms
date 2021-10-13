@@ -318,7 +318,9 @@ class BillingQueueManager(TimedQueueManager):
         :param config: LibreNMS.ServiceConfig reference to the service config object
         :param lock_manager: the single instance of lock manager
         """
-        TimedQueueManager.__init__(self, config, lock_manager, "billing", False, config.billing.enabled)
+        TimedQueueManager.__init__(
+            self, config, lock_manager, "billing", False, config.billing.enabled
+        )
         self.calculate_timer = LibreNMS.RecurringTimer(
             self.get_poller_config().calculate,
             self.dispatch_calculate_billing,
@@ -370,7 +372,9 @@ class PingQueueManager(TimedQueueManager):
         :param config: LibreNMS.ServiceConfig reference to the service config object
         :param lock_manager: the single instance of lock manager
         """
-        TimedQueueManager.__init__(self, config, lock_manager, "ping", config.ping.enabled)
+        TimedQueueManager.__init__(
+            self, config, lock_manager, "ping", config.ping.enabled
+        )
         self._db = LibreNMS.DB(self.config)
 
     def do_dispatch(self):
@@ -404,7 +408,9 @@ class ServicesQueueManager(TimedQueueManager):
         :param config: LibreNMS.ServiceConfig reference to the service config object
         :param lock_manager: the single instance of lock manager
         """
-        TimedQueueManager.__init__(self, config, lock_manager, "services", config.services.enabled)
+        TimedQueueManager.__init__(
+            self, config, lock_manager, "services", config.services.enabled
+        )
         self._db = LibreNMS.DB(self.config)
 
     def do_dispatch(self):
@@ -452,7 +458,9 @@ class AlertQueueManager(TimedQueueManager):
         :param config: LibreNMS.ServiceConfig reference to the service config object
         :param lock_manager: the single instance of lock manager
         """
-        TimedQueueManager.__init__(self, config, lock_manager, "alerting", config.alerting.enabled)
+        TimedQueueManager.__init__(
+            self, config, lock_manager, "alerting", config.alerting.enabled
+        )
         self._db = LibreNMS.DB(self.config)
 
     def do_dispatch(self):
@@ -476,7 +484,9 @@ class PollerQueueManager(QueueManager):
         :param config: LibreNMS.ServiceConfig reference to the service config object
         :param lock_manager: the single instance of lock manager
         """
-        QueueManager.__init__(self, config, lock_manager, "poller", True, config.poller.enabled)
+        QueueManager.__init__(
+            self, config, lock_manager, "poller", True, config.poller.enabled
+        )
 
     def do_work(self, device_id, group):
         if self.lock(device_id, timeout=self.config.poller.frequency):
@@ -515,7 +525,9 @@ class DiscoveryQueueManager(TimedQueueManager):
         :param config: LibreNMS.ServiceConfig reference to the service config object
         :param lock_manager: the single instance of lock manager
         """
-        TimedQueueManager.__init__(self, config, lock_manager, "discovery", config.discovery.enabled)
+        TimedQueueManager.__init__(
+            self, config, lock_manager, "discovery", config.discovery.enabled
+        )
         self._db = LibreNMS.DB(self.config)
 
     def do_dispatch(self):
