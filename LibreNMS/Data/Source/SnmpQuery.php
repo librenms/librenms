@@ -217,14 +217,19 @@ class SnmpQuery
 
     /**
      * Translate an OID.
-     * Specify -On option to output numeric OID.
+     * call numeric() on the query to output numeric OID
      *
      * @param  array|string  $oid
+     * @param  string  $oid
      * @return \LibreNMS\Data\Source\SnmpResponse
      */
-    public function translate($oid): SnmpResponse
+    public function translate(string $oid, ?string $mib = null): SnmpResponse
     {
-        return $this->exec('snmptranslate', $this->parseOid($oid));
+        if ($mib) {
+            $this->options = array_merge($this->options, ['-m', $mib]);
+        }
+
+        return $this->exec('snmptranslate', [$oid]);
     }
 
     private function buildCli(string $command, array $oids): array
