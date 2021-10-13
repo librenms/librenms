@@ -1,0 +1,39 @@
+mib: ENVIROMUX-1W-MIB
+modules:
+    sensors:
+        temperature:
+            data:
+                -
+                   oid: extSensorTable
+                   value: extSensorValue
+                   num_oid: '.1.3.6.1.4.1.3699.1.1.12.1.2.1.{{ $index }}'
+                   index: 'temp-extSensorValue.{{ $index }}'
+                   descr: "{{ $extSensorDescription }}"
+                   divisor: 10
+                   skip_values:
+                       -
+                           oid: extSensorType
+                           op: '=='
+                           value: 0
+                       -
+                           oid: extSensorType
+                           op: 'not_in_array'
+                           value: ['1', '24']
+        humidity:
+            data:
+                -
+                   oid: extSensorTable
+                   value: extSensorValue
+                   num_oid: '.1.3.6.1.4.1.3699.1.1.12.1.2.1.{{ $index }}'
+                   index: 'humidity-extSensorValue.{{ $index }}'
+                   descr: "{{ $extSensorDescription }}"
+                   divisor: 10
+                   skip_values:
+                       -
+                           oid: extSensorType
+                           op: '=='
+                           value: 0
+                       -
+                           oid: extSensorType
+                           op: 'not_in_array'
+                           value: ['2']
