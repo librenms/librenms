@@ -216,13 +216,13 @@ class SnmpQuery
     }
 
     /**
-    * Translate an OID.
-    * call numeric() on the query to output numeric OID
-    *
-    * @param  array|string  $oid
-    * @param  string  $oid
-    * @return \LibreNMS\Data\Source\SnmpResponse
-    */
+     * Translate an OID.
+     * call numeric() on the query to output numeric OID
+     *
+     * @param  array|string  $oid
+     * @param  string  $oid
+     * @return \LibreNMS\Data\Source\SnmpResponse
+     */
     public function translate(string $oid, ?string $mib = null): SnmpResponse
     {
         if ($mib) {
