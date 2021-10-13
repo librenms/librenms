@@ -217,7 +217,7 @@ class SnmpQuery
 
     /**
     * Translate an OID.
-    * Specify -On option to output numeric OID.
+    * call numeric() on the query to output numeric OID
     *
     * @param  array|string  $oid
     * @param  string  $oid
