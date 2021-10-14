@@ -9,7 +9,6 @@ from collections import deque
 from logging.handlers import RotatingFileHandler
 from math import ceil
 from queue import Queue
-from subprocess import check_output
 from time import time
 
 from .command_runner import command_runner
@@ -170,7 +169,10 @@ def get_config_data(base_dir):
 
     config_cmd = ["/usr/bin/env", "php", "%s/config_to_json.php" % base_dir]
     try:
-        return json.loads(check_output(config_cmd).decode())
+        exit_code, output = command_runner(config_cmd, timeout=300, stderr=False)
+        if exit_code != 0:
+            logger.critical("Error in config fetching process: %s" % exit_code)
+        return json.loads(output)
     except Exception as exc:
         logger.critical("ERROR: Could not execute command [%s]: %s" % (config_cmd, exc))
         logger.debug("Traceback:", exc_info=True)
