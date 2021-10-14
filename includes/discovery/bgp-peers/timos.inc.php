@@ -43,6 +43,7 @@ if (Config::get('enable_bgp')) {
 
         foreach ($bgpPeers as $vrfOid => $vrf) {
             $vrfId = dbFetchCell('SELECT vrf_id from `vrfs` WHERE vrf_oid = ?', [$vrfOid]);
+            d_echo($vrfId);
             foreach ($vrf as $address => $value) {
                 $astext = get_astext($value['tBgpPeerNgPeerAS4Byte']);
 
