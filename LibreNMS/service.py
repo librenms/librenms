@@ -819,7 +819,7 @@ class Service:
                 self._db.query(
                     "INSERT INTO poller_cluster_stats(parent_poller, poller_type, depth, devices, worker_seconds, workers, frequency) "
                     'values(@parent_poller_id, "{0}", {1}, {2}, {3}, {4}, {5}) '
-                    "ON DUPLICATE KEY UPDATE depth={1}, devices={2}, worker_seconds={3}, workers={4}, frequency={5}; ".format(
+                    "ON DUPLICATE KEY UPDATE depth={1}, devices={2}, worker_seconds={3}; ".format(
                         worker_type,
                         sum(
                             [
