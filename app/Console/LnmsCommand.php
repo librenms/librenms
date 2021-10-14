@@ -27,6 +27,7 @@ namespace App\Console;
 
 use Illuminate\Console\Command;
 use Illuminate\Validation\ValidationException;
+use LibreNMS\Util\Debug;
 use Symfony\Component\Console\Exception\InvalidArgumentException;
 use Validator;
 
@@ -123,6 +124,16 @@ abstract class LnmsCommand extends Command
                 $this->error($message);
             });
             exit(1);
+        }
+    }
+
+    protected function parseDebug()
+    {
+        if (($verbosity = $this->getOutput()->getVerbosity()) >= 128) {
+            Debug::set();
+            if ($verbosity >= 256) {
+                Debug::setVerbose();
+            }
         }
     }
 }

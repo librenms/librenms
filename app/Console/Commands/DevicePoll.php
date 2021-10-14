@@ -33,6 +33,8 @@ class DevicePoll extends LnmsCommand
      */
     public function handle()
     {
+        $this->parseDebug();
+
         if ($this->option('no-data')) {
             Config::set('rrd.enable', false);
             Config::set('influxdb.enable', false);
@@ -42,7 +44,11 @@ class DevicePoll extends LnmsCommand
 
         try {
             $poller = new Poller($this->argument('device spec'), explode(',', $this->option('modules')), $this->output);
-            $poller->poll();
+            $polled = $poller->poll();
+
+            if ($polled > 0) {
+                return 0;
+            }
         } catch (QueryException $e){
             if ($e->getCode() == 2002) {
                 $this->error(trans('commands.device:poll.errors.db_connect'));
@@ -57,6 +63,6 @@ class DevicePoll extends LnmsCommand
             return 1;
         }
 
-        return 0;
+        return 1; // failed to poll
     }
 }

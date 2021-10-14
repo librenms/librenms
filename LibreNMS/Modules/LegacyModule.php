@@ -51,7 +51,7 @@ class LegacyModule implements Module
     {
         $device = &$os->getDeviceArray();
         $device['attribs'] = $os->getDevice()->attribs->toArray();
-        Debug::set(false);
+        Debug::set(Debug::isEnabled());
 
         include_once base_path('includes/dbFacile.php');
 
