@@ -796,7 +796,7 @@ class Service:
             self._db.query(
                 "INSERT INTO poller_cluster(node_id, poller_name, poller_version, poller_groups, last_report, master) "
                 'values("{0}", "{1}", "{2}", "{3}", NOW(), {4}) '
-                'ON DUPLICATE KEY UPDATE poller_version="{2}", poller_groups="{3}", last_report=NOW(), master={4}; '.format(
+                'ON DUPLICATE KEY UPDATE poller_version="{2}", last_report=NOW(), master={4}; '.format(
                     self.config.node_id,
                     self.config.name,
                     "librenms-service",
@@ -819,7 +819,7 @@ class Service:
                 self._db.query(
                     "INSERT INTO poller_cluster_stats(parent_poller, poller_type, depth, devices, worker_seconds, workers, frequency) "
                     'values(@parent_poller_id, "{0}", {1}, {2}, {3}, {4}, {5}) '
-                    "ON DUPLICATE KEY UPDATE depth={1}, devices={2}, worker_seconds={3}; ".format(
+                    "ON DUPLICATE KEY UPDATE depth={1}, devices={2}, worker_seconds={3}, workers={4}, frequency={5}; ".format(
                         worker_type,
                         sum(
                             [
