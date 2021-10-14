@@ -36,6 +36,44 @@ Output:
 ]
 ```
 
+### `get_ports_by_group`
+
+List all ports matching the group provided.
+
+Route: `/api/v0/port_groups/:name`
+
+- name Is the name of the port group which can be obtained using
+  [`get_port_groups`](#function-get_port_groups). Please ensure that
+  the name is urlencoded if it needs to be (i.e Linux Servers would
+  need to be urlencoded.
+
+Params:
+
+- full: set to any value to return all data for the devices in a given group
+
+Examples:
+
+```curl
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/port_groups/Billable
+```
+
+Output:
+
+```json
+{
+    "status": "ok",
+    "ports": [
+        {
+            "port_id": 1376
+        },
+        {
+            "port_id": 2376
+        }
+    ],
+    "count": 2
+}
+```
+
 ### `add_portgroup`
 
 Add a new port group. Upon success, the ID of the new port group is returned
