@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Console\LnmsCommand;
+use Illuminate\Database\QueryException;
 use LibreNMS\Config;
 use LibreNMS\Poller;
 use Symfony\Component\Console\Input\InputArgument;
@@ -39,9 +40,22 @@ class DevicePoll extends LnmsCommand
             Config::set('graphite.enable', false);
         }
 
-        $poller = new Poller($this->argument('device spec'), explode(',', $this->option('modules')), $this->output);
+        try {
+            $poller = new Poller($this->argument('device spec'), explode(',', $this->option('modules')), $this->output);
+            $poller->poll();
+        } catch (QueryException $e){
+            if ($e->getCode() == 2002) {
+                $this->error(trans('commands.device:poll.errors.db_connect'));
+                return 1;
+            } elseif($e->getCode() == 1045) {
+                // auth failed, don't need to include the query
+                $this->error(trans('commands.device:poll.errors.db_auth', ['error' => $e->getPrevious()->getMessage()]));
+                return 1;
+            }
 
-        $poller->poll();
+            $this->error($e->getMessage());
+            return 1;
+        }
 
         return 0;
     }

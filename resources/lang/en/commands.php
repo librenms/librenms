@@ -77,7 +77,11 @@ return [
         'options' => [
             'modules' => 'Specify single module to be run. Comma separate modules, submodules may be added with /',
             'no-data' => 'Do not update datastores (RRD, InfluxDB, etc)',
-        ]
+        ],
+        'errors' => [
+            'db_connect' => 'Failed to connect to database. Verify database service is running and connection settings.',
+            'db_auth' => 'Failed to connect to database. Verify credentials: :error',
+        ],
     ],
     'key:rotate' => [
         'description' => 'Rotate APP_KEY, this decrypts all encrypted data with the given old key and stores it with the new key in APP_KEY.',
