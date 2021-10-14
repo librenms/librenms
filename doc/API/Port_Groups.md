@@ -1,20 +1,16 @@
 source: API/Port_Groups.md
 path: blob/master/doc/
 
-### `get_portgroups`
+### `get_port_groups`
 
 List all port groups.
 
-Route: `/api/v0/portgroups`
-
-Input (JSON):
-
-  -
+Route: `/api/v0/port_groups`
 
 Examples:
 
 ```curl
-curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/portgroups
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/port_groups
 ```
 
 Output:
@@ -74,7 +70,7 @@ Output:
 }
 ```
 
-### `add_portgroup`
+### `add_port_group`
 
 Add a new port group. Upon success, the ID of the new port group is returned
 and the HTTP response code is `201`.
@@ -108,7 +104,7 @@ Output:
 }
 ```
 
-### `assign_portgroup`
+### `assign_port_group`
 
 Assign a Port Group to a list of Ports
 
@@ -135,7 +131,7 @@ Output:
 }
 ```
 
-### `remove_portgroup`
+### `remove_port_group`
 
 Remove a Port Group from a list of Ports
 
