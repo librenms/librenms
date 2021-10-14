@@ -240,7 +240,6 @@ function poll_device($device, $force_module = false)
     $attribs = $deviceModel->getAttribs();
     $device['attribs'] = $attribs;
 
-    load_os($device);
     $os = \LibreNMS\OS::make($device);
 
     unset($array);
@@ -310,7 +309,10 @@ function poll_device($device, $force_module = false)
         $device['status'] = $deviceModel->status;
         $device['status_reason'] = $deviceModel->status_reason;
 
-        printChangedStats(true); // don't count previous stats
+        /** @var \App\Polling\Measure\MeasurementManager $measurements */
+        $measurements = app(\App\Polling\Measure\MeasurementManager::class);
+        $measurements->checkpoint(); // don't count previous stats
+
         foreach (Config::get('poller_modules') as $module => $module_status) {
             $os_module_status = Config::get("os.{$device['os']}.poller_modules.$module");
             d_echo('Modules status: Global' . (isset($module_status) ? ($module_status ? '+ ' : '- ') : '  '));
@@ -336,7 +338,7 @@ function poll_device($device, $force_module = false)
                 $module_time = microtime(true) - $module_start;
                 $module_mem = (memory_get_usage() - $start_memory);
                 printf("\n>> Runtime for poller module '%s': %.4f seconds with %s bytes\n", $module, $module_time, $module_mem);
-                printChangedStats();
+                $measurements->printChangedStats();
                 echo "#### Unload poller module $module ####\n\n";
 
                 // save per-module poller stats

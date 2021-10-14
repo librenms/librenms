@@ -85,7 +85,7 @@ foreach (dbFetchRows($sql, $param) as $alertlog) {
     logfile($alertlog['rule_id']);
     $log = dbFetchCell('SELECT details FROM alert_log WHERE rule_id = ? AND device_id = ? AND `state` = 1 ORDER BY id DESC LIMIT 1', [$alertlog['rule_id'], $alertlog['device_id']]);
     $alert_log_id = dbFetchCell('SELECT id FROM alert_log WHERE rule_id = ? AND device_id = ? ORDER BY id DESC LIMIT 1', [$alertlog['rule_id'], $alertlog['device_id']]);
-    $fault_detail = alert_details($log);
+    [$fault_detail, $max_row_length] = alert_details($log);
 
     if (empty($fault_detail)) {
         $fault_detail = 'Rule created, no faults found';

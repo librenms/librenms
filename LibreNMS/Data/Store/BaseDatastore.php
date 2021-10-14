@@ -25,8 +25,8 @@
 
 namespace LibreNMS\Data\Store;
 
-use LibreNMS\Data\Measure\Measurement;
-use LibreNMS\Data\Measure\MeasurementCollection;
+use App\Polling\Measure\Measurement;
+use App\Polling\Measure\MeasurementCollection;
 use LibreNMS\Interfaces\Data\Datastore as DatastoreContract;
 
 abstract class BaseDatastore implements DatastoreContract

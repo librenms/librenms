@@ -58,9 +58,9 @@ use LibreNMS\Config;
         var ack_until_clear = $("#ack_until_clear").bootstrapSwitch('state');
         $.ajax({
             type: "POST",
-            url: "ajax_form.php",
+            url: '<?php echo route('alert.ack', ['alert' => ':alert_id']) ?>'.replace(':alert_id', ack_alert_id),
             dataType: "json",
-            data: { type: "ack-alert", alert_id: ack_alert_id, state: ack_alert_state, ack_msg: ack_alert_note, ack_until_clear: ack_until_clear },
+            data: { state: ack_alert_state, ack_msg: ack_alert_note, ack_until_clear: ack_until_clear },
             success: function (data) {
                 if (data.status === "ok") {
                     toastr.success(data.message);
@@ -70,7 +70,7 @@ use LibreNMS\Config;
                     $table.bootgrid("sort", sortDictionary);
                     $("#alert_ack_modal").modal('hide');
                 } else {
-                    toastr.error(data.message);
+                    toastr.error(data.message || 'Failed to update acknowledgement');
                 }
             },
             error: function(){

@@ -28,6 +28,8 @@ use LibreNMS\Config;
 
 class Irc extends Transport
 {
+    protected $name = 'IRC';
+
     public function deliverAlert($obj, $opts)
     {
         return $this->contactIrc($obj, $opts);

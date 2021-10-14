@@ -21,7 +21,6 @@ use LibreNMS\Modules\Core;
 use LibreNMS\Util\Debug;
 use LibreNMS\Util\IPv4;
 use LibreNMS\Util\IPv6;
-use PHPMailer\PHPMailer\PHPMailer;
 
 function array_sort_by_column($array, $on, $order = SORT_ASC)
 {
@@ -715,82 +714,12 @@ function log_event($text, $device = null, $type = null, $severity = 2, $referenc
 // Parse string with emails. Return array with email (as key) and name (as value)
 function parse_email($emails)
 {
-    $result = [];
-    $regex = '/^[\"\']?([^\"\']+)[\"\']?\s{0,}<([^@]+@[^>]+)>$/';
-    if (is_string($emails)) {
-        $emails = preg_split('/[,;]\s{0,}/', $emails);
-        foreach ($emails as $email) {
-            if (preg_match($regex, $email, $out, PREG_OFFSET_CAPTURE)) {
-                $result[$out[2][0]] = $out[1][0];
-            } else {
-                if (strpos($email, '@')) {
-                    $from_name = Config::get('email_user');
-                    $result[$email] = $from_name;
-                }
-            }
-        }
-    } else {
-        // Return FALSE if input not string
-        return false;
-    }
-
-    return $result;
+    return \LibreNMS\Util\Mail::parseEmails($emails);
 }
 
 function send_mail($emails, $subject, $message, $html = false)
 {
-    if (is_array($emails) || ($emails = parse_email($emails))) {
-        d_echo("Attempting to email $subject to: " . implode('; ', array_keys($emails)) . PHP_EOL);
-        $mail = new PHPMailer(true);
-        try {
-            $mail->Hostname = php_uname('n');
-
-            foreach (parse_email(Config::get('email_from')) as $from => $from_name) {
-                $mail->setFrom($from, $from_name);
-            }
-            foreach ($emails as $email => $email_name) {
-                $mail->addAddress($email, $email_name);
-            }
-            $mail->Subject = $subject;
-            $mail->XMailer = Config::get('project_name');
-            $mail->CharSet = 'utf-8';
-            $mail->WordWrap = 76;
-            $mail->Body = $message;
-            if ($html) {
-                $mail->isHTML(true);
-            }
-            switch (strtolower(trim(Config::get('email_backend')))) {
-                case 'sendmail':
-                    $mail->Mailer = 'sendmail';
-                    $mail->Sendmail = Config::get('email_sendmail_path');
-                    break;
-                case 'smtp':
-                    $mail->isSMTP();
-                    $mail->Host = Config::get('email_smtp_host');
-                    $mail->Timeout = Config::get('email_smtp_timeout');
-                    $mail->SMTPAuth = Config::get('email_smtp_auth');
-                    $mail->SMTPSecure = Config::get('email_smtp_secure');
-                    $mail->Port = Config::get('email_smtp_port');
-                    $mail->Username = Config::get('email_smtp_username');
-                    $mail->Password = Config::get('email_smtp_password');
-                    $mail->SMTPAutoTLS = Config::get('email_auto_tls');
-                    $mail->SMTPDebug = false;
-                    break;
-                default:
-                    $mail->Mailer = 'mail';
-                    break;
-            }
-            $mail->send();
-
-            return true;
-        } catch (\PHPMailer\PHPMailer\Exception $e) {
-            return $e->errorMessage();
-        } catch (Exception $e) {
-            return $e->getMessage();
-        }
-    }
-
-    return 'No contacts found';
+    return \LibreNMS\Util\Mail::send($emails, $subject, $message, $html);
 }
 
 function hex2str($hex)
@@ -1058,13 +987,7 @@ function guidv4($data)
  */
 function set_curl_proxy($curl)
 {
-    $proxy = get_proxy();
-
-    $tmp = rtrim($proxy, '/');
-    $proxy = str_replace(['http://', 'https://'], '', $tmp);
-    if (! empty($proxy)) {
-        curl_setopt($curl, CURLOPT_PROXY, $proxy);
-    }
+    \LibreNMS\Util\Proxy::applyToCurl($curl);
 }
 
 /**
@@ -1074,12 +997,7 @@ function set_curl_proxy($curl)
  */
 function get_guzzle_proxy()
 {
-    $proxy = get_proxy();
-
-    $tmp = rtrim($proxy, '/');
-    $proxy = str_replace(['http://', 'https://'], '', $tmp);
-
-    return empty($proxy) ? '' : ('tcp://' . $proxy);
+    return \LibreNMS\Util\Proxy::forGuzzle();
 }
 
 /**
@@ -1089,17 +1007,7 @@ function get_guzzle_proxy()
  */
 function get_proxy()
 {
-    if (getenv('http_proxy')) {
-        return getenv('http_proxy');
-    } elseif (getenv('https_proxy')) {
-        return getenv('https_proxy');
-    } elseif ($callback_proxy = Config::get('callback_proxy')) {
-        return $callback_proxy;
-    } elseif ($http_proxy = Config::get('http_proxy')) {
-        return $http_proxy;
-    }
-
-    return false;
+    return \LibreNMS\Util\Proxy::get();
 }
 
 function target_to_id($target)
@@ -1539,134 +1447,6 @@ function q_bridge_bits2indices($hex_data)
     }
 
     return $indices;
-}
-
-/**
- * Intialize global stat arrays
- */
-function initStats()
-{
-    global $snmp_stats, $snmp_stats_last;
-
-    if (! isset($snmp_stats)) {
-        $snmp_stats = [
-            'ops' => [
-                'snmpget' => 0,
-                'snmpgetnext' => 0,
-                'snmpwalk' => 0,
-            ],
-            'time' => [
-                'snmpget' => 0.0,
-                'snmpgetnext' => 0.0,
-                'snmpwalk' => 0.0,
-            ],
-        ];
-        $snmp_stats_last = $snmp_stats;
-    }
-}
-
-/**
- * Print out the stats totals since the last time this function was called
- *
- * @param  bool  $update_only  Only update the stats checkpoint, don't print them
- */
-function printChangedStats($update_only = false)
-{
-    global $snmp_stats, $db_stats;
-    global $snmp_stats_last, $db_stats_last;
-    $output = sprintf(
-        '>> SNMP: [%d/%.2fs] MySQL: [%d/%.2fs]',
-        array_sum($snmp_stats['ops'] ?? []) - array_sum($snmp_stats_last['ops'] ?? []),
-        array_sum($snmp_stats['time'] ?? []) - array_sum($snmp_stats_last['time'] ?? []),
-        array_sum($db_stats['ops'] ?? []) - array_sum($db_stats_last['ops'] ?? []),
-        array_sum($db_stats['time'] ?? []) - array_sum($db_stats_last['time'] ?? [])
-    );
-
-    foreach (app('Datastore')->getStats() as $datastore => $stats) {
-        /** @var \LibreNMS\Data\Measure\MeasurementCollection $stats */
-        $output .= sprintf(' %s: [%d/%.2fs]', $datastore, $stats->getCountDiff(), $stats->getDurationDiff());
-        $stats->checkpoint();
-    }
-
-    if (! $update_only) {
-        echo $output . PHP_EOL;
-    }
-
-    // make a new checkpoint
-    $snmp_stats_last = $snmp_stats;
-    $db_stats_last = $db_stats;
-}
-
-/**
- * Print global stat arrays
- */
-function printStats()
-{
-    global $snmp_stats, $db_stats;
-
-    if ($snmp_stats) {
-        printf(
-            "SNMP [%d/%.2fs]: Get[%d/%.2fs] Getnext[%d/%.2fs] Walk[%d/%.2fs]\n",
-            array_sum($snmp_stats['ops']),
-            array_sum($snmp_stats['time']),
-            $snmp_stats['ops']['snmpget'],
-            $snmp_stats['time']['snmpget'],
-            $snmp_stats['ops']['snmpgetnext'],
-            $snmp_stats['time']['snmpgetnext'],
-            $snmp_stats['ops']['snmpwalk'],
-            $snmp_stats['time']['snmpwalk']
-        );
-    }
-
-    if ($db_stats) {
-        printf(
-            "MySQL [%d/%.2fs]: Cell[%d/%.2fs] Row[%d/%.2fs] Rows[%d/%.2fs] Column[%d/%.2fs] Update[%d/%.2fs] Insert[%d/%.2fs] Delete[%d/%.2fs]\n",
-            array_sum($db_stats['ops']),
-            array_sum($db_stats['time']),
-            $db_stats['ops']['fetchcell'],
-            $db_stats['time']['fetchcell'],
-            $db_stats['ops']['fetchrow'],
-            $db_stats['time']['fetchrow'],
-            $db_stats['ops']['fetchrows'],
-            $db_stats['time']['fetchrows'],
-            $db_stats['ops']['fetchcolumn'],
-            $db_stats['time']['fetchcolumn'],
-            $db_stats['ops']['update'],
-            $db_stats['time']['update'],
-            $db_stats['ops']['insert'],
-            $db_stats['time']['insert'],
-            $db_stats['ops']['delete'],
-            $db_stats['time']['delete']
-        );
-    }
-
-    foreach (app('Datastore')->getStats() as $datastore => $stats) {
-        /** @var \LibreNMS\Data\Measure\MeasurementCollection $stats */
-        printf('%s [%d/%.2fs]:', $datastore, $stats->getTotalCount(), $stats->getTotalDuration());
-
-        foreach ($stats as $stat) {
-            /** @var \LibreNMS\Data\Measure\MeasurementSummary $stat */
-            printf(' %s[%d/%.2fs]', ucfirst($stat->getType()), $stat->getCount(), $stat->getDuration());
-        }
-        echo PHP_EOL;
-    }
-}
-
-/**
- * @param  string  $stat  snmpget, snmpwalk
- * @param  float  $start_time  The time the operation started with 'microtime(true)'
- * @return float The calculated run time
- */
-function recordSnmpStatistic($stat, $start_time)
-{
-    global $snmp_stats;
-    initStats();
-
-    $runtime = microtime(true) - $start_time;
-    $snmp_stats['ops'][$stat]++;
-    $snmp_stats['time'][$stat] += $runtime;
-
-    return $runtime;
 }
 
 function update_device_logo(&$device)

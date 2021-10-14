@@ -24,6 +24,7 @@
 namespace LibreNMS\Alert\Transport;
 
 use LibreNMS\Alert\Transport;
+use LibreNMS\Util\Proxy;
 
 class Matrix extends Transport
 {
@@ -57,7 +58,7 @@ class Matrix extends Transport
         $body = ['body'=>$message, 'msgtype'=>'m.text'];
 
         $client = new \GuzzleHttp\Client();
-        $request_opts['proxy'] = get_guzzle_proxy();
+        $request_opts['proxy'] = Proxy::forGuzzle();
         $request_opts['headers'] = $request_heads;
         $request_opts['body'] = json_encode($body);
         $res = $client->request('PUT', $host, $request_opts);

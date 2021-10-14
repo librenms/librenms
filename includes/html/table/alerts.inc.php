@@ -26,6 +26,11 @@ $alert_states = [
 
 $show_recovered = false;
 
+if (is_numeric($vars['alert_id']) && $vars['alert_id'] > 0) {
+    $where .= ' AND `alerts`.`id` = ?';
+    $param[] = $vars['alert_id'];
+}
+
 if (is_numeric($vars['device_id']) && $vars['device_id'] > 0) {
     $where .= ' AND `alerts`.`device_id`=' . $vars['device_id'];
 }
