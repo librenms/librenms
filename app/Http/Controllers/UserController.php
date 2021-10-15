@@ -18,6 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -47,6 +48,7 @@ class UserController extends Controller
      * Display a listing of the resource.
      *
      * @return \Illuminate\View\View
+     *
      * @throws \Illuminate\Auth\Access\AuthorizationException
      */
     public function index()
@@ -54,7 +56,7 @@ class UserController extends Controller
         $this->authorize('manage', User::class);
 
         return view('user.index', [
-            'users' => User::orderBy('username')->get(),
+            'users' => User::with('preferences')->orderBy('username')->get(),
             'multiauth' => User::query()->distinct('auth_type')->count('auth_type') > 1,
         ]);
     }
@@ -63,6 +65,7 @@ class UserController extends Controller
      * Show the form for creating a new resource.
      *
      * @return \Illuminate\View\View
+     *
      * @throws \Illuminate\Auth\Access\AuthorizationException
      */
     public function create()
@@ -70,7 +73,7 @@ class UserController extends Controller
         $this->authorize('create', User::class);
 
         $tmp_user = new User;
-        $tmp_user->can_modify_passwd = LegacyAuth::get()->canUpdatePasswords(); // default to true for new users
+        $tmp_user->can_modify_passwd = (int) LegacyAuth::get()->canUpdatePasswords(); // default to true for new users
 
         return view('user.create', [
             'user' => $tmp_user,
@@ -82,7 +85,7 @@ class UserController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param StoreUserRequest $request
+     * @param  StoreUserRequest  $request
      * @return \Illuminate\Http\RedirectResponse
      */
     public function store(StoreUserRequest $request)
@@ -111,8 +114,9 @@ class UserController extends Controller
     /**
      * Display the specified resource.
      *
-     * @param User $user
+     * @param  User  $user
      * @return string
+     *
      * @throws \Illuminate\Auth\Access\AuthorizationException
      */
     public function show(User $user)
@@ -125,8 +129,9 @@ class UserController extends Controller
     /**
      * Show the form for editing the specified resource.
      *
-     * @param User $user
+     * @param  User  $user
      * @return \Illuminate\View\View
+     *
      * @throws \Illuminate\Auth\Access\AuthorizationException
      */
     public function edit(User $user)
@@ -155,8 +160,8 @@ class UserController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param UpdateUserRequest $request
-     * @param User $user
+     * @param  UpdateUserRequest  $request
+     * @param  User  $user
      * @return \Illuminate\Http\RedirectResponse
      */
     public function update(UpdateUserRequest $request, User $user)
@@ -187,8 +192,9 @@ class UserController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param User $user
+     * @param  User  $user
      * @return \Illuminate\Http\JsonResponse
+     *
      * @throws \Illuminate\Auth\Access\AuthorizationException
      */
     public function destroy(User $user)
@@ -201,8 +207,8 @@ class UserController extends Controller
     }
 
     /**
-     * @param User $user
-     * @param mixed $dashboard
+     * @param  User  $user
+     * @param  mixed  $dashboard
      * @return bool
      */
     protected function updateDashboard(User $user, $dashboard)

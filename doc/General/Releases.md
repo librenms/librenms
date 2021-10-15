@@ -1,7 +1,7 @@
 source: General/Releases.md
 path: blob/master/doc/
 
-# Introduction
+# Choosing a release
 
 We try to ensure that breaking changes aren't introduced by utilising
 various automated code testing, syntax testing and unit testing along
@@ -10,7 +10,7 @@ well as major refactoring to improve the quality of the code base.
 
 We have two branches available for you to use. The default is the `master` branch.
 
-# Development branch
+## Development branch
 
 Our `master` branch is our dev branch, this is actively commited to
 and it's not uncommon for multiple commits to be merged in daily. As
@@ -27,7 +27,7 @@ branch by setting `$config['update_channel'] = 'master';` in
 
 `cd /opt/librenms && git checkout master`
 
-# Stable branch
+## Stable branch
 
 With this in mind, we provide a monthly stable release which is
 released on or around  the last Sunday of the month. Code pull

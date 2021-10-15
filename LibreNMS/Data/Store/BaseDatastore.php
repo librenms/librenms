@@ -18,14 +18,15 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2020 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
 namespace LibreNMS\Data\Store;
 
-use LibreNMS\Data\Measure\Measurement;
-use LibreNMS\Data\Measure\MeasurementCollection;
+use App\Polling\Measure\Measurement;
+use App\Polling\Measure\MeasurementCollection;
 use LibreNMS\Interfaces\Data\Datastore as DatastoreContract;
 
 abstract class BaseDatastore implements DatastoreContract
@@ -49,7 +50,8 @@ abstract class BaseDatastore implements DatastoreContract
 
     /**
      * Record statistics for operation
-     * @param Measurement $stat
+     *
+     * @param  Measurement  $stat
      */
     protected function recordStatistic(Measurement $stat)
     {

@@ -18,6 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2017 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -45,11 +46,11 @@ class RrdDefinition
      * Add a dataset to this definition.
      * See https://oss.oetiker.ch/rrdtool/doc/rrdcreate.en.html for more information.
      *
-     * @param string $name Textual name for this dataset. Must be [a-zA-Z0-9_], max length 19.
-     * @param string $type GAUGE | COUNTER | DERIVE | DCOUNTER | DDERIVE | ABSOLUTE.
-     * @param int $min Minimum allowed value.  null means undefined.
-     * @param int $max Maximum allowed value.  null means undefined.
-     * @param int $heartbeat Heartbeat for this dataset. Uses the global setting if null.
+     * @param  string  $name  Textual name for this dataset. Must be [a-zA-Z0-9_], max length 19.
+     * @param  string  $type  GAUGE | COUNTER | DERIVE | DCOUNTER | DDERIVE | ABSOLUTE.
+     * @param  int  $min  Minimum allowed value.  null means undefined.
+     * @param  int  $max  Maximum allowed value.  null means undefined.
+     * @param  int  $heartbeat  Heartbeat for this dataset. Uses the global setting if null.
      * @return RrdDefinition
      */
     public function addDataset($name, $type, $min = null, $max = null, $heartbeat = null)
@@ -85,7 +86,7 @@ class RrdDefinition
     /**
      * Check if the give dataset name is valid for this definition
      *
-     * @param string $name
+     * @param  string  $name
      * @return bool
      */
     public function isValidDataset($name)
@@ -109,8 +110,9 @@ class RrdDefinition
     /**
      * Check that the data set type is valid.
      *
-     * @param string $type
+     * @param  string  $type
      * @return mixed
+     *
      * @throws InvalidRrdTypeException
      */
     private function checkType($type)
@@ -126,7 +128,7 @@ class RrdDefinition
     /**
      * Remove all invalid characters from the name and truncate to 19 characters.
      *
-     * @param string $name
+     * @param  string  $name
      * @return string
      */
     private function escapeName($name)

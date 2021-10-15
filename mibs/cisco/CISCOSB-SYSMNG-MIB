@@ -13,7 +13,7 @@ IMPORTS
 
 
 rlSysmngMib MODULE-IDENTITY
-        LAST-UPDATED "201010310000z"
+        LAST-UPDATED "201010310000a"
         ORGANIZATION "Cisco Systems, Inc."
 
         CONTACT-INFO
@@ -26,7 +26,7 @@ rlSysmngMib MODULE-IDENTITY
 
         DESCRIPTION
              "The private MIB module definition for System Manager pool."
-        REVISION "201010310000z"
+        REVISION "201010310000a"
         DESCRIPTION
              "Initial revision."
         ::= { switch001 204 }
@@ -40,8 +40,11 @@ SysmngResourceRouteType ::= TEXTUAL-CONVENTION
         ipv6(2),
         ipmv4(3),
         ipmv6(4),
-        nonIp(5)
-
+        nonIp(5),
+        ipv4Policy(6),
+        ipv6Policy(7),
+        vlanMapping(8),
+        totalCount(9)
 }
 
 SysmngResourceRouteUsageType ::= TEXTUAL-CONVENTION
@@ -59,7 +62,10 @@ SysmngResourceRouteUsageType ::= TEXTUAL-CONVENTION
         ipmv4Route(8),
         ipmv4RouteStarG(9),
         ipmv6Route(10),
-        ipmv6RouteStarG(11)
+        ipmv6RouteStarG(11),
+        ipv4PolicyRoute(12),
+        ipv6PolicyRoute(13),
+        vlanMapping(14)
 }
 
 SysmngPoolType ::= TEXTUAL-CONVENTION
@@ -310,7 +316,7 @@ rlSysmngRouterResourceAction OBJECT-TYPE
     MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
-      "Router recource action."
+      "Router resource action."
     ::=  { rlSysmngMib 3 }
 
 -- System Manager Router Resource Table
@@ -503,4 +509,23 @@ rlSysmngResourcePerUnitCurrentNexthopUseHw OBJECT-TYPE
     DEFVAL { 0 }
     ::= { rlSysmngResourcePerUnitEntry 12 }
 
+rlRouterHwReactivate  OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION "Router hardware reactivation action."
+    DEFVAL      { 0 }
+    ::=  { rlSysmngMib 6 }
+
+rlRouterHwStatus OBJECT-TYPE
+    SYNTAX      INTEGER {
+                  normal(1),
+                  inRecovery(2),
+                  suspended(3)
+                }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Router hardware active state."
+    DEFVAL      { 1 }
+    ::=  { rlSysmngMib 7 }
 END

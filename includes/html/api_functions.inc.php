@@ -16,10 +16,13 @@ use App\Models\Availability;
 use App\Models\Device;
 use App\Models\DeviceGroup;
 use App\Models\DeviceOutage;
+use App\Models\OspfPort;
+use App\Models\Port;
 use App\Models\PortGroup;
 use App\Models\PortsFdb;
 use App\Models\Sensor;
 use App\Models\ServiceTemplate;
+use App\Models\UserPref;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Routing\Router;
 use Illuminate\Support\Arr;
@@ -31,6 +34,7 @@ use LibreNMS\Data\Store\Datastore;
 use LibreNMS\Exceptions\InvalidIpException;
 use LibreNMS\Util\IP;
 use LibreNMS\Util\IPv4;
+use LibreNMS\Util\Rewrite;
 
 function api_success($result, $result_name, $message = null, $code = 200, $count = null, $extra = null)
 {
@@ -265,7 +269,7 @@ function get_device(Illuminate\Http\Request $request)
 
     // find device matching the id
     $device = device_by_id_cache($device_id);
-    if (! $device) {
+    if (! $device || ! $device['device_id']) {
         return api_error(404, "Device $hostname does not exist");
     }
 
@@ -416,7 +420,9 @@ function add_device(Illuminate\Http\Request $request)
         return api_error(500, $e->getMessage());
     }
 
-    return api_success_noresult(201, "Device $hostname ($device_id) has been added successfully");
+    $device = device_by_id_cache($device_id);
+
+    return api_success([$device], 'devices', $response);
 }
 
 function del_device(Illuminate\Http\Request $request)
@@ -450,6 +456,48 @@ function del_device(Illuminate\Http\Request $request)
     return api_success([$device], 'devices', $response);
 }
 
+function maintenance_device(Illuminate\Http\Request $request)
+{
+    if (empty($request->json())) {
+        return api_error(400, 'No information has been provided to set this device into maintenance');
+    }
+
+    // This will add a device using the data passed encoded with json
+    $hostname = $request->route('hostname');
+
+    // use hostname as device_id if it's all digits
+    $device = ctype_digit($hostname) ? DeviceCache::get($hostname) : DeviceCache::getByHostname($hostname);
+
+    if (! $device) {
+        return api_error(404, "Device $hostname does not exist");
+    }
+
+    $notes = $request->json('notes');
+    $alert_schedule = new \App\Models\AlertSchedule([
+        'title' => $device->displayName(),
+        'notes' => $notes,
+        'recurring' => 0,
+        'start' => date('Y-m-d H:i:s'),
+    ]);
+
+    $duration = $request->json('duration');
+    if (Str::contains($duration, ':')) {
+        [$duration_hour, $duration_min] = explode(':', $duration);
+        $alert_schedule->end = \Carbon\Carbon::now()
+            ->addHours($duration_hour)->addMinutes($duration_min)
+            ->format('Y-m-d H:i:00');
+    }
+
+    $device->alertSchedules()->save($alert_schedule);
+
+    if ($notes && UserPref::getPref(Auth::user(), 'add_schedule_note_to_device')) {
+        $device->notes .= (empty($device->notes) ? '' : PHP_EOL) . date('Y-m-d H:i') . ' Alerts delayed: ' . $notes;
+        $device->save();
+    }
+
+    return api_success_noresult(201, "Device {$device->hostname} ({$device->device_id}) moved into maintenance mode" . ($duration ? " for {$duration}h" : ''));
+}
+
 function device_availability(Illuminate\Http\Request $request)
 {
     // return availability per device
@@ -464,8 +512,8 @@ function device_availability(Illuminate\Http\Request $request)
 
     return check_device_permission($device_id, function ($device_id) {
         $availabilities = Availability::select('duration', 'availability_perc')
-            ->where('device_id', '=', $device_id)
-            ->orderBy('duration', 'ASC');
+                      ->where('device_id', '=', $device_id)
+                      ->orderBy('duration', 'ASC');
 
         return api_success($availabilities->get(), 'availability');
     });
@@ -485,8 +533,8 @@ function device_outages(Illuminate\Http\Request $request)
 
     return check_device_permission($device_id, function ($device_id) {
         $outages = DeviceOutage::select('going_down', 'up_again')
-            ->where('device_id', '=', $device_id)
-            ->orderBy('going_down', 'DESC');
+                   ->where('device_id', '=', $device_id)
+                   ->orderBy('going_down', 'DESC');
 
         return api_success($outages->get(), 'outages');
     });
@@ -601,6 +649,35 @@ function get_bgp(Illuminate\Http\Request $request)
     return api_success($bgp_session, 'bgp_session');
 }
 
+function edit_bgp_descr(Illuminate\Http\Request $request)
+{
+    $bgp_descr = $request->json('bgp_descr');
+    if (! $bgp_descr) {
+        return api_error(500, 'Invalid JSON data');
+    }
+
+    //find existing bgp for update
+    $bgpPeerId = $request->route('id');
+    if (! is_numeric($bgpPeerId)) {
+        return api_error(400, 'Invalid id has been provided');
+    }
+
+    $peer = \App\Models\BgpPeer::firstWhere('bgpPeer_id', $bgpPeerId);
+
+    // update existing bgp
+    if ($peer === null) {
+        return api_error(404, 'BGP peer ' . $bgpPeerId . ' does not exist');
+    }
+
+    $peer->bgpPeerDescr = $bgp_descr;
+
+    if ($peer->save()) {
+        return api_success_noresult(200, 'BGP description for peer ' . $peer->bgpPeerIdentifier . ' on device ' . $peer->device_id . ' updated to ' . $peer->bgpPeerDescr . '.');
+    }
+
+    return api_error(500, 'Failed to update existing bgp');
+}
+
 function list_cbgp(Illuminate\Http\Request $request)
 {
     $sql = '';
@@ -647,6 +724,17 @@ function list_ospf(Illuminate\Http\Request $request)
     }
 
     return api_success($ospf_neighbours, 'ospf_neighbours');
+}
+
+function list_ospf_ports(Illuminate\Http\Request $request)
+{
+    $ospf_ports = OspfPort::hasAccess(Auth::user())
+              ->get();
+    if ($ospf_ports->isEmpty()) {
+        return api_error(404, 'Ospf ports do not exist');
+    }
+
+    return api_success($ospf_ports, 'ospf_ports', null, 200, $ospf_ports->count());
 }
 
 function get_graph_by_portgroup(Illuminate\Http\Request $request)
@@ -976,15 +1064,23 @@ function get_port_info(Illuminate\Http\Request $request)
 
 function search_ports(Illuminate\Http\Request $request)
 {
+    $field = $request->route('field');
     $search = $request->route('search');
-    $value = "%$search%";
-    $ports = \App\Models\Port::hasAccess(Auth::user())
-        ->select(['device_id', 'port_id', 'ifIndex', 'ifName'])
-        ->where('ifAlias', 'like', $value)
-        ->orWhere('ifDescr', 'like', $value)
-        ->orWhere('ifName', 'like', $value)
-        ->orderBy('ifName')
-        ->get();
+
+    $query = Port::hasAccess(Auth::user())
+         ->select(['device_id', 'port_id', 'ifIndex', 'ifName']);
+
+    if (isset($search)) {
+        $query->where($field, 'like', "%$search%");
+    } else {
+        $value = "%$field%";
+        $query->where('ifAlias', 'like', $value)
+            ->orWhere('ifDescr', 'like', $value)
+            ->orWhere('ifName', 'like', $value);
+    }
+
+    $ports = $query->orderBy('ifName')
+                   ->get();
 
     if ($ports->isEmpty()) {
         return api_error(404, 'No ports found');
@@ -1345,15 +1441,15 @@ function list_oxidized(Illuminate\Http\Request $request)
 {
     $return = [];
     $devices = Device::query()
-        ->where('disabled', 0)
-        ->when($request->route('hostname'), function ($query, $hostname) {
-            return $query->where('hostname', $hostname);
-        })
-        ->whereNotIn('type', Config::get('oxidized.ignore_types', []))
-        ->whereNotIn('os', Config::get('oxidized.ignore_os', []))
-        ->whereAttributeDisabled('override_Oxidized_disable')
-        ->select(['hostname', 'sysName', 'sysDescr', 'hardware', 'os', 'ip', 'location_id'])
-        ->get();
+             ->where('disabled', 0)
+             ->when($request->route('hostname'), function ($query, $hostname) {
+                 return $query->where('hostname', $hostname);
+             })
+             ->whereNotIn('type', Config::get('oxidized.ignore_types', []))
+             ->whereNotIn('os', Config::get('oxidized.ignore_os', []))
+             ->whereAttributeDisabled('override_Oxidized_disable')
+             ->select(['hostname', 'sysName', 'sysDescr', 'sysObjectID', 'hardware', 'os', 'ip', 'location_id'])
+             ->get();
 
     /** @var Device $device */
     foreach ($devices as $device) {
@@ -1393,6 +1489,10 @@ function list_oxidized(Illuminate\Http\Request $request)
                     }
                 }
             }
+        }
+        //Exclude groups from being sent to Oxidized
+        if (in_array($output['group'], Config::get('oxidized.ignore_groups'))) {
+            continue;
         }
 
         $return[] = $output;
@@ -1598,8 +1698,8 @@ function get_bill_history_graphdata(Illuminate\Http\Request $request)
         }
 
         return ! isset($graph_data) ?
-            api_error(400, "Unsupported graph type $graph_type") :
-            api_success($graph_data, 'graph_data');
+               api_error(400, "Unsupported graph type $graph_type") :
+               api_success($graph_data, 'graph_data');
     });
 }
 
@@ -1877,6 +1977,54 @@ function get_port_groups(Illuminate\Http\Request $request)
     return api_success($groups->makeHidden('pivot')->toArray(), 'groups', 'Found ' . $groups->count() . ' port groups');
 }
 
+function assign_port_group(Illuminate\Http\Request $request)
+{
+    $port_group_id = $request->route('port_group_id');
+    $data = json_decode($request->getContent(), true);
+    $port_id_list = $data['port_ids'];
+
+    if (json_last_error() || ! is_array($data)) {
+        return api_error(400, "We couldn't parse the provided json. " . json_last_error_msg());
+    }
+
+    if (! isset($port_id_list)) {
+        return api_error(400, "Missing data field 'port_ids' " . json_last_error_msg());
+    }
+
+    $port_group = PortGroup::find($port_group_id);
+    if (! isset($port_group)) {
+        return api_error(404, 'Port Group ID ' . $port_group_id . ' not found');
+    }
+
+    $port_group->ports()->attach($port_id_list);
+
+    return api_success(200, 'Port Ids ' . implode(', ', $port_id_list) . ' have been added to Port Group Id ' . $port_group_id);
+}
+
+function remove_port_group(Illuminate\Http\Request $request)
+{
+    $port_group_id = $request->route('port_group_id');
+    $data = json_decode($request->getContent(), true);
+    $port_id_list = $data['port_ids'];
+
+    if (json_last_error() || ! is_array($data)) {
+        return api_error(400, "We couldn't parse the provided json. " . json_last_error_msg());
+    }
+
+    if (! isset($port_id_list)) {
+        return api_error(400, "Missing data field 'port_ids' " . json_last_error_msg());
+    }
+
+    $port_group = PortGroup::find($port_group_id);
+    if (! isset($port_group)) {
+        return api_error(404, 'Port Group ID ' . $port_group_id . ' not found');
+    }
+
+    $port_group->ports()->detach($port_id_list);
+
+    return api_success(200, 'Port Ids ' . implode(', ', $port_id_list) . ' have been removed from Port Group Id ' . $port_group_id);
+}
+
 function add_device_group(Illuminate\Http\Request $request)
 {
     $data = json_decode($request->getContent(), true);
@@ -1897,14 +2045,18 @@ function add_device_group(Illuminate\Http\Request $request)
         return api_error(422, $v->messages());
     }
 
-    // Only use the rules if they are able to be parsed by the QueryBuilder
-    $query = QueryBuilderParser::fromJson($data['rules'])->toSql();
-    if (empty($query)) {
-        return api_error(500, "We couldn't parse your rule");
+    if (! empty($data['rules'])) {
+        // Only use the rules if they are able to be parsed by the QueryBuilder
+        $query = QueryBuilderParser::fromJson($data['rules'])->toSql();
+        if (empty($query)) {
+            return api_error(500, "We couldn't parse your rule");
+        }
     }
 
     $deviceGroup = DeviceGroup::make(['name' => $data['name'], 'type' => $data['type'], 'desc' => $data['desc']]);
-    $deviceGroup->rules = json_decode($data['rules']);
+    if ($data['type'] == 'dynamic') {
+        $deviceGroup->rules = json_decode($data['rules']);
+    }
     $deviceGroup->save();
 
     if ($data['type'] == 'static') {
@@ -2129,10 +2281,10 @@ function list_fdb(Illuminate\Http\Request $request)
     $mac = $request->route('mac');
 
     $fdb = PortsFdb::hasAccess(Auth::user())
-        ->when(! empty($mac), function (Builder $query) use ($mac) {
-            return $query->where('mac_address', $mac);
-        })
-        ->get();
+           ->when(! empty($mac), function (Builder $query) use ($mac) {
+               return $query->where('mac_address', $mac);
+           })
+           ->get();
 
     if ($fdb->isEmpty()) {
         return api_error(404, 'Fdb do not exist');
@@ -2586,6 +2738,36 @@ function del_service_from_host(Illuminate\Http\Request $request)
     return api_error(500, 'Failed to delete the service');
 }
 
+function search_by_mac(Illuminate\Http\Request $request)
+{
+    $macAddress = Rewrite::macToHex((string) $request->route('search'));
+
+    $rules = [
+        'macAddress' => 'required|string|regex:/^[0-9a-fA-F]{12}$/',
+    ];
+
+    $validate = Validator::make(['macAddress' => $macAddress], $rules);
+    if ($validate->fails()) {
+        return api_error(422, $validate->messages());
+    }
+
+    $ports = Port::whereHas('fdbEntries', function ($fdbDownlink) use ($macAddress) {
+        $fdbDownlink->where('mac_address', $macAddress);
+    })
+         ->withCount('fdbEntries')
+         ->orderBy('fdb_entries_count')
+         ->get();
+
+    if ($ports->count() == 0) {
+        return api_error(404, 'mac not found');
+    }
+
+    if ($request->has('filter') && $request->get('filter') === 'first') {
+        return  api_success($ports->first(), 'ports');
+    }
+
+    return api_success($ports, 'ports');
+}
 function edit_service_for_host(Illuminate\Http\Request $request)
 {
     $service_id = $request->route('id');

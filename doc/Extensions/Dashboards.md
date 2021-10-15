@@ -16,7 +16,7 @@ LibreNMS has a whole list of Widgets to select from.
 
 - Alerts Widget: Displays all alert notifications.
 - Availability Map: Displays all devices with colored tiles, green up,
-  yellow for warning (device has been restarted in last 24 hours),red
+  yellow for warning (device has been restarted in last 24 hours), red
   for down. You can also list all services and ignored/disabled
   devices in this widget.
 - Components Status: List all components Ok state, Warning state, Critical state.
@@ -42,8 +42,8 @@ LibreNMS has a whole list of Widgets to select from.
   from override sysLocation.
 
 List of Widgets:
-![List of Widgets][image of widgets]
 
+![List of Widgets][image of widgets]  
 [image of widgets]: /img/list-widgets.png "List of the widgets"
 
 ## Dashboard Permissions
@@ -82,7 +82,7 @@ Also some web pages may not support html embedded or iframe.
 
 In the dashboard, you want to create an interface graph select the widget called
 
-'Graph' then select "Port" "Bits"
+'Graph' then select "Port" -> "Bits"
 ![port-bits-graph](/img/port-bits-graph.png)
 
 Note: you can map the port by description or the alias or by port

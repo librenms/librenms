@@ -85,7 +85,7 @@ foreach (dbFetchRows($sql, $param) as $alertlog) {
     logfile($alertlog['rule_id']);
     $log = dbFetchCell('SELECT details FROM alert_log WHERE rule_id = ? AND device_id = ? AND `state` = 1 ORDER BY id DESC LIMIT 1', [$alertlog['rule_id'], $alertlog['device_id']]);
     $alert_log_id = dbFetchCell('SELECT id FROM alert_log WHERE rule_id = ? AND device_id = ? ORDER BY id DESC LIMIT 1', [$alertlog['rule_id'], $alertlog['device_id']]);
-    $fault_detail = alert_details($log);
+    [$fault_detail, $max_row_length] = alert_details($log);
 
     if (empty($fault_detail)) {
         $fault_detail = 'Rule created, no faults found';
@@ -108,7 +108,7 @@ foreach (dbFetchRows($sql, $param) as $alertlog) {
         'time_logged' => $alertlog['humandate'],
         'details' => '<a class="fa fa-plus incident-toggle" style="display:none" data-toggle="collapse" data-target="#incident' . ($rulei) . '" data-parent="#alerts"></a>',
         'verbose_details' => "<button type='button' class='btn btn-alert-details fa fa-info command-alert-details' style='display:none' aria-label='Details' id='alert-details' data-alert_log_id='{$alert_log_id}'></button>",
-        'hostname' => '<div class="incident">' . generate_device_link($dev, shorthost($dev['hostname'])) . '<div id="incident' . ($rulei) . '" class="collapse">' . $fault_detail . '</div></div>',
+        'hostname' => '<div class="incident">' . generate_device_link($dev) . '<div id="incident' . ($rulei) . '" class="collapse">' . $fault_detail . '</div></div>',
         'alert' => htmlspecialchars($alertlog['alert']),
         'status' => "<i class='alert-status " . $status . "' title='" . ($alert_state ? 'active' : 'recovered') . "'></i>",
         'severity' => $alertlog['severity'],

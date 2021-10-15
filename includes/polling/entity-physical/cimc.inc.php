@@ -18,7 +18,7 @@ $components = $component->getComponents($device['device_id'], ['type'=>'Cisco-CI
 $components = $components[$device['device_id']];
 
 // Only collect SNMP data if we have enabled components
-if (count($components > 0)) {
+if (! empty($components)) {
     // Let's gather some data..
     $tblUCSObjects = snmpwalk_array_num($device, '.1.3.6.1.4.1.9.9.719.1', 0);
 

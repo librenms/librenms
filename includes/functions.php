@@ -17,13 +17,10 @@ use LibreNMS\Exceptions\HostUnreachableException;
 use LibreNMS\Exceptions\HostUnreachablePingException;
 use LibreNMS\Exceptions\InvalidPortAssocModeException;
 use LibreNMS\Exceptions\SnmpVersionUnsupportedException;
-use LibreNMS\Fping;
 use LibreNMS\Modules\Core;
 use LibreNMS\Util\Debug;
 use LibreNMS\Util\IPv4;
 use LibreNMS\Util\IPv6;
-use PHPMailer\PHPMailer\PHPMailer;
-use Symfony\Component\Process\Process;
 
 function array_sort_by_column($array, $on, $order = SORT_ASC)
 {
@@ -68,8 +65,8 @@ function only_alphanumeric($string)
 /**
  * Parse cli discovery or poller modules and set config for this run
  *
- * @param string $type discovery or poller
- * @param array $options get_opts array (only m key is checked)
+ * @param  string  $type  discovery or poller
+ * @param  array  $options  get_opts array (only m key is checked)
  * @return bool
  */
 function parse_modules($type, $options)
@@ -117,8 +114,8 @@ function logfile($string)
 /**
  * Check an array of regexes against a subject if any match, return true
  *
- * @param string $subject the string to match against
- * @param array|string $regexes an array of regexes or single regex to check
+ * @param  string  $subject  the string to match against
+ * @param  array|string  $regexes  an array of regexes or single regex to check
  * @return bool if any of the regexes matched, return true
  */
 function preg_match_any($subject, $regexes)
@@ -138,9 +135,9 @@ function preg_match_any($subject, $regexes)
  * contains, starts, ends: $a haystack, $b needle(s)
  * regex: $a subject, $b regex
  *
- * @param mixed $a
- * @param mixed $b
- * @param string $comparison =, !=, ==, !== >=, <=, >, <, contains, starts, ends, regex
+ * @param  mixed  $a
+ * @param  mixed  $b
+ * @param  string  $comparison  =, !=, ==, !== >=, <=, >, <, contains, starts, ends, regex
  * @return bool
  */
 function compare_var($a, $b, $comparison = '=')
@@ -218,8 +215,8 @@ function getLogo($device)
 }
 
 /**
- * @param array $device
- * @param string $class to apply to the image tag
+ * @param  array  $device
+ * @param  string  $class  to apply to the image tag
  * @return string an image tag with the logo for this device. Images are often wide, not square.
  */
 function getLogoTag($device, $class = null)
@@ -312,6 +309,9 @@ function delete_device($id)
     dbQuery('DELETE `ipv4_addresses` FROM `ipv4_addresses` INNER JOIN `ports` ON `ports`.`port_id`=`ipv4_addresses`.`port_id` WHERE `device_id`=?', [$id]);
     dbQuery('DELETE `ipv6_addresses` FROM `ipv6_addresses` INNER JOIN `ports` ON `ports`.`port_id`=`ipv6_addresses`.`port_id` WHERE `device_id`=?', [$id]);
 
+    //Remove IsisAdjacencies
+    \App\Models\IsisAdjacency::where('device_id', $id)->delete();
+
     //Remove Outages
     \App\Models\Availability::where('device_id', $id)->delete();
     \App\Models\DeviceOutage::where('device_id', $id)->delete();
@@ -360,15 +360,14 @@ function delete_device($id)
 /**
  * Add a device to LibreNMS
  *
- * @param string $host dns name or ip address
- * @param string $snmp_version If this is empty, try v2c,v3,v1.  Otherwise, use this specific version.
- * @param int $port the port to connect to for snmp
- * @param string $transport udp or tcp
- * @param string $poller_group the poller group this device will belong to
- * @param bool $force_add add even if the device isn't reachable
- * @param string $port_assoc_mode snmp field to use to determine unique ports
- * @param array $additional an array with additional parameters to take into consideration when adding devices
- *
+ * @param  string  $host  dns name or ip address
+ * @param  string  $snmp_version  If this is empty, try v2c,v3,v1.  Otherwise, use this specific version.
+ * @param  int  $port  the port to connect to for snmp
+ * @param  string  $transport  udp or tcp
+ * @param  string  $poller_group  the poller group this device will belong to
+ * @param  bool  $force_add  add even if the device isn't reachable
+ * @param  string  $port_assoc_mode  snmp field to use to determine unique ports
+ * @param  array  $additional  an array with additional parameters to take into consideration when adding devices
  * @return int returns the device_id of the added device
  *
  * @throws HostExistsException This hostname already exists
@@ -414,9 +413,7 @@ function addHost($host, $snmp_version = '', $port = 161, $transport = 'udp', $po
 
     // Test reachability
     if (! $force_add) {
-        $address_family = snmpTransportToAddressFamily($transport);
-        $ping_result = isPingable($ip, $address_family);
-        if (! $ping_result['result']) {
+        if (! ((new \LibreNMS\Polling\ConnectivityHelper(new Device(['hostname' => $ip])))->isPingable()->success())) {
             throw new HostUnreachablePingException("Could not ping $host");
         }
     }
@@ -513,45 +510,6 @@ function isSNMPable($device)
     }
 }
 
-/**
- * Check if the given host responds to ICMP echo requests ("pings").
- *
- * @param string $hostname The hostname or IP address to send ping requests to.
- * @param string $address_family The address family ('ipv4' or 'ipv6') to use. Defaults to IPv4.
- * Will *not* be autodetected for IP addresses, so it has to be set to 'ipv6' when pinging an IPv6 address or an IPv6-only host.
- * @param array $attribs The device attributes
- *
- * @return array  'result' => bool pingable, 'last_ping_timetaken' => int time for last ping, 'db' => fping results
- */
-function isPingable($hostname, $address_family = 'ipv4', $attribs = [])
-{
-    if (can_ping_device($attribs) !== true) {
-        return [
-            'result' => true,
-            'last_ping_timetaken' => 0,
-        ];
-    }
-
-    $status = app()->make(Fping::class)->ping(
-        $hostname,
-        Config::get('fping_options.count', 3),
-        Config::get('fping_options.interval', 500),
-        Config::get('fping_options.timeout', 500),
-        $address_family
-    );
-
-    if ($status['dup'] > 0) {
-        Log::event('Duplicate ICMP response detected! This could indicate a network issue.', getidbyname($hostname), 'icmp', 4);
-        $status['exitcode'] = 0;   // when duplicate is detected fping returns 1. The device is up, but there is another issue. Clue admins in with above event.
-    }
-
-    return [
-        'result' => ($status['exitcode'] == 0 && $status['loss'] < 100),
-        'last_ping_timetaken' => $status['avg'],
-        'db' => array_intersect_key($status, array_flip(['xmt', 'rcv', 'loss', 'min', 'max', 'avg'])),
-    ];
-}
-
 function getpollergroup($poller_group = '0')
 {
     //Is poller group an integer
@@ -579,17 +537,18 @@ function getpollergroup($poller_group = '0')
 /**
  * Add a host to the database
  *
- * @param string $host The IP or hostname to add
- * @param string $community The snmp community
- * @param string $snmpver snmp version: v1 | v2c | v3
- * @param int $port SNMP port number
- * @param string $transport SNMP transport: udp | udp6 | udp | tcp6
- * @param array $v3 SNMPv3 settings required array keys: authlevel, authname, authpass, authalgo, cryptopass, cryptoalgo
- * @param int $poller_group distributed poller group to assign this host to
- * @param string $port_assoc_mode field to use to identify ports: ifIndex, ifName, ifDescr, ifAlias
- * @param bool $force_add Do not detect the host os
- * @param array $additional an array with additional parameters to take into consideration when adding devices
+ * @param  string  $host  The IP or hostname to add
+ * @param  string  $community  The snmp community
+ * @param  string  $snmpver  snmp version: v1 | v2c | v3
+ * @param  int  $port  SNMP port number
+ * @param  string  $transport  SNMP transport: udp | udp6 | udp | tcp6
+ * @param  array  $v3  SNMPv3 settings required array keys: authlevel, authname, authpass, authalgo, cryptopass, cryptoalgo
+ * @param  int  $poller_group  distributed poller group to assign this host to
+ * @param  string  $port_assoc_mode  field to use to identify ports: ifIndex, ifName, ifDescr, ifAlias
+ * @param  bool  $force_add  Do not detect the host os
+ * @param  array  $additional  an array with additional parameters to take into consideration when adding devices
  * @return int the id of the added host
+ *
  * @throws HostExistsException Throws this exception if the host already exists
  * @throws Exception Throws this exception if insertion into the database fails
  */
@@ -648,9 +607,9 @@ function createHost(
         }
     }
 
-    $device_id = dbInsert($device, 'devices');
-    if ($device_id) {
-        return $device_id;
+    $deviceModel = Device::create($device);
+    if ($deviceModel->device_id) {
+        return $deviceModel->device_id;
     }
 
     throw new \Exception('Failed to add host to the database, please run ./validate.php');
@@ -679,7 +638,7 @@ function match_network($nets, $ip, $first = false)
         $ip_arr = explode('/', $net);
         $net_long = ip2long($ip_arr[0]);
         $x = ip2long($ip_arr[1]);
-        $mask = long2ip($x) == $ip_arr[1] ? $x : 0xffffffff << (32 - $ip_arr[1]);
+        $mask = long2ip($x) == $ip_arr[1] ? $x : 0xFFFFFFFF << (32 - $ip_arr[1]);
         $ip_long = ip2long($ip);
         if ($rev) {
             if (($ip_long & $mask) == ($net_long & $mask)) {
@@ -743,11 +702,11 @@ function get_astext($asn)
 /**
  * Log events to the event table
  *
- * @param string $text message describing the event
- * @param array|int $device device array or device_id
- * @param string $type brief category for this event. Examples: sensor, state, stp, system, temperature, interface
- * @param int $severity 1: ok, 2: info, 3: notice, 4: warning, 5: critical, 0: unknown
- * @param int $reference the id of the referenced entity.  Supported types: interface
+ * @param  string  $text  message describing the event
+ * @param  array|int  $device  device array or device_id
+ * @param  string  $type  brief category for this event. Examples: sensor, state, stp, system, temperature, interface
+ * @param  int  $severity  1: ok, 2: info, 3: notice, 4: warning, 5: critical, 0: unknown
+ * @param  int  $reference  the id of the referenced entity.  Supported types: interface
  */
 function log_event($text, $device = null, $type = null, $severity = 2, $reference = null)
 {
@@ -762,82 +721,12 @@ function log_event($text, $device = null, $type = null, $severity = 2, $referenc
 // Parse string with emails. Return array with email (as key) and name (as value)
 function parse_email($emails)
 {
-    $result = [];
-    $regex = '/^[\"\']?([^\"\']+)[\"\']?\s{0,}<([^@]+@[^>]+)>$/';
-    if (is_string($emails)) {
-        $emails = preg_split('/[,;]\s{0,}/', $emails);
-        foreach ($emails as $email) {
-            if (preg_match($regex, $email, $out, PREG_OFFSET_CAPTURE)) {
-                $result[$out[2][0]] = $out[1][0];
-            } else {
-                if (strpos($email, '@')) {
-                    $from_name = Config::get('email_user');
-                    $result[$email] = $from_name;
-                }
-            }
-        }
-    } else {
-        // Return FALSE if input not string
-        return false;
-    }
-
-    return $result;
+    return \LibreNMS\Util\Mail::parseEmails($emails);
 }
 
 function send_mail($emails, $subject, $message, $html = false)
 {
-    if (is_array($emails) || ($emails = parse_email($emails))) {
-        d_echo("Attempting to email $subject to: " . implode('; ', array_keys($emails)) . PHP_EOL);
-        $mail = new PHPMailer(true);
-        try {
-            $mail->Hostname = php_uname('n');
-
-            foreach (parse_email(Config::get('email_from')) as $from => $from_name) {
-                $mail->setFrom($from, $from_name);
-            }
-            foreach ($emails as $email => $email_name) {
-                $mail->addAddress($email, $email_name);
-            }
-            $mail->Subject = $subject;
-            $mail->XMailer = Config::get('project_name');
-            $mail->CharSet = 'utf-8';
-            $mail->WordWrap = 76;
-            $mail->Body = $message;
-            if ($html) {
-                $mail->isHTML(true);
-            }
-            switch (strtolower(trim(Config::get('email_backend')))) {
-                case 'sendmail':
-                    $mail->Mailer = 'sendmail';
-                    $mail->Sendmail = Config::get('email_sendmail_path');
-                    break;
-                case 'smtp':
-                    $mail->isSMTP();
-                    $mail->Host = Config::get('email_smtp_host');
-                    $mail->Timeout = Config::get('email_smtp_timeout');
-                    $mail->SMTPAuth = Config::get('email_smtp_auth');
-                    $mail->SMTPSecure = Config::get('email_smtp_secure');
-                    $mail->Port = Config::get('email_smtp_port');
-                    $mail->Username = Config::get('email_smtp_username');
-                    $mail->Password = Config::get('email_smtp_password');
-                    $mail->SMTPAutoTLS = Config::get('email_auto_tls');
-                    $mail->SMTPDebug = false;
-                    break;
-                default:
-                    $mail->Mailer = 'mail';
-                    break;
-            }
-            $mail->send();
-
-            return true;
-        } catch (\PHPMailer\PHPMailer\Exception $e) {
-            return $e->errorMessage();
-        } catch (Exception $e) {
-            return $e->getMessage();
-        }
-    }
-
-    return 'No contacts found';
+    return \LibreNMS\Util\Mail::send($emails, $subject, $message, $html);
 }
 
 function hex2str($hex)
@@ -889,8 +778,8 @@ function include_dir($dir, $regex = '')
  * Check if port is valid to poll.
  * Settings: empty_ifdescr, good_if, bad_if, bad_if_regexp, bad_ifname_regexp, bad_ifalias_regexp, bad_iftype, bad_ifoperstatus
  *
- * @param array $port
- * @param array $device
+ * @param  array  $port
+ * @param  array  $device
  * @return bool
  */
 function is_port_valid($port, $device)
@@ -977,8 +866,8 @@ function is_port_valid($port, $device)
  * Try to fill in data for ifDescr, ifName, and ifAlias if devices do not provide them.
  * Will not fill ifAlias if the user has overridden it
  *
- * @param array $port
- * @param array $device
+ * @param  array  $port
+ * @param  array  $device
  */
 function port_fill_missing(&$port, $device)
 {
@@ -1094,8 +983,8 @@ function guidv4($data)
     // From: Jack http://stackoverflow.com/users/1338292/ja%CD%A2ck
     assert(strlen($data) == 16);
 
-    $data[6] = chr(ord($data[6]) & 0x0f | 0x40); // set version to 0100
-    $data[8] = chr(ord($data[8]) & 0x3f | 0x80); // set bits 6-7 to 10
+    $data[6] = chr(ord($data[6]) & 0x0F | 0x40); // set version to 0100
+    $data[8] = chr(ord($data[8]) & 0x3F | 0x80); // set bits 6-7 to 10
 
     return vsprintf('%s%s-%s-%s-%s-%s%s%s', str_split(bin2hex($data), 4));
 }
@@ -1105,13 +994,7 @@ function guidv4($data)
  */
 function set_curl_proxy($curl)
 {
-    $proxy = get_proxy();
-
-    $tmp = rtrim($proxy, '/');
-    $proxy = str_replace(['http://', 'https://'], '', $tmp);
-    if (! empty($proxy)) {
-        curl_setopt($curl, CURLOPT_PROXY, $proxy);
-    }
+    \LibreNMS\Util\Proxy::applyToCurl($curl);
 }
 
 /**
@@ -1121,12 +1004,7 @@ function set_curl_proxy($curl)
  */
 function get_guzzle_proxy()
 {
-    $proxy = get_proxy();
-
-    $tmp = rtrim($proxy, '/');
-    $proxy = str_replace(['http://', 'https://'], '', $tmp);
-
-    return empty($proxy) ? '' : ('tcp://' . $proxy);
+    return \LibreNMS\Util\Proxy::forGuzzle();
 }
 
 /**
@@ -1136,17 +1014,7 @@ function get_guzzle_proxy()
  */
 function get_proxy()
 {
-    if (getenv('http_proxy')) {
-        return getenv('http_proxy');
-    } elseif (getenv('https_proxy')) {
-        return getenv('https_proxy');
-    } elseif ($callback_proxy = Config::get('callback_proxy')) {
-        return $callback_proxy;
-    } elseif ($http_proxy = Config::get('http_proxy')) {
-        return $http_proxy;
-    }
-
-    return false;
+    return \LibreNMS\Util\Proxy::get();
 }
 
 function target_to_id($target)
@@ -1208,29 +1076,6 @@ function device_has_ip($ip, $within_poller_groups = [])
 }
 
 /**
- * Try to determine the address family (IPv4 or IPv6) associated with an SNMP
- * transport specifier (like "udp", "udp6", etc.).
- *
- * @param string $transport The SNMP transport specifier, for example "udp",
- *                          "udp6", "tcp", or "tcp6". See `man snmpcmd`,
- *                          section "Agent Specification" for a full list.
- *
- * @return string The address family associated with the given transport
- *             specifier: 'ipv4' (or local connections not associated
- *             with an IP stack) or 'ipv6'.
- */
-function snmpTransportToAddressFamily($transport)
-{
-    $ipv6_snmp_transport_specifiers = ['udp6', 'udpv6', 'udpipv6', 'tcp6', 'tcpv6', 'tcpipv6'];
-
-    if (in_array($transport, $ipv6_snmp_transport_specifiers)) {
-        return 'ipv6';
-    }
-
-    return 'ipv4';
-}
-
-/**
  * Checks if the $hostname provided exists in the DB already
  *
  * @param string $hostname The hostname to check for
@@ -1273,6 +1118,7 @@ function oxidized_reload_nodes()
         curl_setopt($ch, CURLOPT_TIMEOUT_MS, 5000);
         curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 5);
         curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
         curl_setopt($ch, CURLOPT_HEADER, 1);
         curl_exec($ch);
         curl_close($ch);
@@ -1282,9 +1128,8 @@ function oxidized_reload_nodes()
 /**
  * Perform DNS lookup
  *
- * @param array $device Device array from database
- * @param string $type The type of record to lookup
- *
+ * @param  array  $device  Device array from database
+ * @param  string  $type  The type of record to lookup
  * @return string ip
  *
  **/
@@ -1317,8 +1162,8 @@ function dnslookup($device, $type = false, $return = false)
  * For for backward compatibility:
  *   Returns null if $states is empty, $state_name already exists, and contains state translations
  *
- * @param string $state_name the unique name for this state translation
- * @param array $states array of states, each must contain keys: descr, graph, value, generic
+ * @param  string  $state_name  the unique name for this state translation
+ * @param  array  $states  array of states, each must contain keys: descr, graph, value, generic
  * @return int|null
  */
 function create_state_index($state_name, $states = [])
@@ -1350,8 +1195,8 @@ function create_state_index($state_name, $states = [])
 /**
  * Synchronize the sensor state translations with the database
  *
- * @param int $state_index_id index of the state
- * @param array $states array of states, each must contain keys: descr, graph, value, generic
+ * @param  int  $state_index_id  index of the state
+ * @param  array  $states  array of states, each must contain keys: descr, graph, value, generic
  */
 function sync_sensor_states($state_index_id, $states)
 {
@@ -1626,249 +1471,6 @@ function q_bridge_bits2indices($hex_data)
     return $indices;
 }
 
-/**
- * Intialize global stat arrays
- */
-function initStats()
-{
-    global $snmp_stats, $snmp_stats_last;
-
-    if (! isset($snmp_stats)) {
-        $snmp_stats = [
-            'ops' => [
-                'snmpget' => 0,
-                'snmpgetnext' => 0,
-                'snmpwalk' => 0,
-            ],
-            'time' => [
-                'snmpget' => 0.0,
-                'snmpgetnext' => 0.0,
-                'snmpwalk' => 0.0,
-            ],
-        ];
-        $snmp_stats_last = $snmp_stats;
-    }
-}
-
-/**
- * Print out the stats totals since the last time this function was called
- *
- * @param bool $update_only Only update the stats checkpoint, don't print them
- */
-function printChangedStats($update_only = false)
-{
-    global $snmp_stats, $db_stats;
-    global $snmp_stats_last, $db_stats_last;
-    $output = sprintf(
-        '>> SNMP: [%d/%.2fs] MySQL: [%d/%.2fs]',
-        array_sum($snmp_stats['ops'] ?? []) - array_sum($snmp_stats_last['ops'] ?? []),
-        array_sum($snmp_stats['time'] ?? []) - array_sum($snmp_stats_last['time'] ?? []),
-        array_sum($db_stats['ops'] ?? []) - array_sum($db_stats_last['ops'] ?? []),
-        array_sum($db_stats['time'] ?? []) - array_sum($db_stats_last['time'] ?? [])
-    );
-
-    foreach (app('Datastore')->getStats() as $datastore => $stats) {
-        /** @var \LibreNMS\Data\Measure\MeasurementCollection $stats */
-        $output .= sprintf(' %s: [%d/%.2fs]', $datastore, $stats->getCountDiff(), $stats->getDurationDiff());
-        $stats->checkpoint();
-    }
-
-    if (! $update_only) {
-        echo $output . PHP_EOL;
-    }
-
-    // make a new checkpoint
-    $snmp_stats_last = $snmp_stats;
-    $db_stats_last = $db_stats;
-}
-
-/**
- * Print global stat arrays
- */
-function printStats()
-{
-    global $snmp_stats, $db_stats;
-
-    if ($snmp_stats) {
-        printf(
-            "SNMP [%d/%.2fs]: Get[%d/%.2fs] Getnext[%d/%.2fs] Walk[%d/%.2fs]\n",
-            array_sum($snmp_stats['ops']),
-            array_sum($snmp_stats['time']),
-            $snmp_stats['ops']['snmpget'],
-            $snmp_stats['time']['snmpget'],
-            $snmp_stats['ops']['snmpgetnext'],
-            $snmp_stats['time']['snmpgetnext'],
-            $snmp_stats['ops']['snmpwalk'],
-            $snmp_stats['time']['snmpwalk']
-        );
-    }
-
-    if ($db_stats) {
-        printf(
-            "MySQL [%d/%.2fs]: Cell[%d/%.2fs] Row[%d/%.2fs] Rows[%d/%.2fs] Column[%d/%.2fs] Update[%d/%.2fs] Insert[%d/%.2fs] Delete[%d/%.2fs]\n",
-            array_sum($db_stats['ops']),
-            array_sum($db_stats['time']),
-            $db_stats['ops']['fetchcell'],
-            $db_stats['time']['fetchcell'],
-            $db_stats['ops']['fetchrow'],
-            $db_stats['time']['fetchrow'],
-            $db_stats['ops']['fetchrows'],
-            $db_stats['time']['fetchrows'],
-            $db_stats['ops']['fetchcolumn'],
-            $db_stats['time']['fetchcolumn'],
-            $db_stats['ops']['update'],
-            $db_stats['time']['update'],
-            $db_stats['ops']['insert'],
-            $db_stats['time']['insert'],
-            $db_stats['ops']['delete'],
-            $db_stats['time']['delete']
-        );
-    }
-
-    foreach (app('Datastore')->getStats() as $datastore => $stats) {
-        /** @var \LibreNMS\Data\Measure\MeasurementCollection $stats */
-        printf('%s [%d/%.2fs]:', $datastore, $stats->getTotalCount(), $stats->getTotalDuration());
-
-        foreach ($stats as $stat) {
-            /** @var \LibreNMS\Data\Measure\MeasurementSummary $stat */
-            printf(' %s[%d/%.2fs]', ucfirst($stat->getType()), $stat->getCount(), $stat->getDuration());
-        }
-        echo PHP_EOL;
-    }
-}
-
-/**
- * @param string $stat snmpget, snmpwalk
- * @param float $start_time The time the operation started with 'microtime(true)'
- * @return float  The calculated run time
- */
-function recordSnmpStatistic($stat, $start_time)
-{
-    global $snmp_stats;
-    initStats();
-
-    $runtime = microtime(true) - $start_time;
-    $snmp_stats['ops'][$stat]++;
-    $snmp_stats['time'][$stat] += $runtime;
-
-    return $runtime;
-}
-
-function runTraceroute($device)
-{
-    $address_family = snmpTransportToAddressFamily($device['transport']);
-    $trace_name = $address_family == 'ipv6' ? 'traceroute6' : 'traceroute';
-    $trace_path = Config::get($trace_name, $trace_name);
-    $process = new Process([$trace_path, '-q', '1', '-w', '1', $device['hostname']]);
-    $process->run();
-    if ($process->isSuccessful()) {
-        return ['traceroute' => $process->getOutput()];
-    }
-
-    return ['output' => $process->getErrorOutput()];
-}
-
-/**
- * @param $device
- * @param bool $record_perf
- * @return array
- */
-function device_is_up($device, $record_perf = false)
-{
-    $address_family = snmpTransportToAddressFamily($device['transport']);
-    $poller_target = Device::pollerTarget($device['hostname']);
-    $ping_response = isPingable($poller_target, $address_family, $device['attribs']);
-    $device_perf = $ping_response['db'];
-    $device_perf['device_id'] = $device['device_id'];
-    $device_perf['timestamp'] = ['NOW()'];
-    $maintenance = DeviceCache::get($device['device_id'])->isUnderMaintenance();
-    $consider_maintenance = Config::get('graphing.availability_consider_maintenance');
-    $state_update_again = false;
-
-    if ($record_perf === true && can_ping_device($device['attribs'])) {
-        $trace_debug = [];
-        if ($ping_response['result'] === false && Config::get('debug.run_trace', false)) {
-            $trace_debug = runTraceroute($device);
-        }
-        $device_perf['debug'] = json_encode($trace_debug);
-        dbInsert($device_perf, 'device_perf');
-
-        // if device_perf is inserted and the ping was successful then update device last_ping timestamp
-        if (! empty($ping_response['last_ping_timetaken']) && $ping_response['last_ping_timetaken'] != '0') {
-            dbUpdate(
-                ['last_ping' => NOW(), 'last_ping_timetaken' => $ping_response['last_ping_timetaken']],
-                'devices',
-                'device_id=?',
-                [$device['device_id']]
-            );
-        }
-    }
-    $response = [];
-    $response['ping_time'] = $ping_response['last_ping_timetaken'];
-    if ($ping_response['result']) {
-        if ($device['snmp_disable'] || isSNMPable($device)) {
-            $response['status'] = '1';
-            $response['status_reason'] = '';
-        } else {
-            echo 'SNMP Unreachable';
-            $response['status'] = '0';
-            $response['status_reason'] = 'snmp';
-        }
-    } else {
-        echo 'Unpingable';
-        $response['status'] = '0';
-        $response['status_reason'] = 'icmp';
-    }
-
-    // Special case where the device is still down, optional mode is on, device not in maintenance mode and has no ongoing outages
-    if (($consider_maintenance && ! $maintenance) && ($device['status'] == '0' && $response['status'] == '0')) {
-        $state_update_again = empty(dbFetchCell('SELECT going_down FROM device_outages WHERE device_id=? AND up_again IS NULL ORDER BY going_down DESC', [$device['device_id']]));
-    }
-
-    if ($device['status'] != $response['status'] || $device['status_reason'] != $response['status_reason'] || $state_update_again) {
-        if (! $state_update_again) {
-            dbUpdate(
-                ['status' => $response['status'], 'status_reason' => $response['status_reason']],
-                'devices',
-                'device_id=?',
-                [$device['device_id']]
-            );
-        }
-
-        if ($response['status']) {
-            $type = 'up';
-            $reason = $device['status_reason'];
-
-            $going_down = dbFetchCell('SELECT going_down FROM device_outages WHERE device_id=? AND up_again IS NULL ORDER BY going_down DESC', [$device['device_id']]);
-            if (! empty($going_down)) {
-                $up_again = time();
-                dbUpdate(
-                    ['device_id' => $device['device_id'], 'up_again' => $up_again],
-                    'device_outages',
-                    'device_id=? and going_down=? and up_again is NULL',
-                    [$device['device_id'], $going_down]
-                );
-            }
-        } else {
-            $type = 'down';
-            $reason = $response['status_reason'];
-
-            if ($device['status'] != $response['status']) {
-                if (! $consider_maintenance || (! $maintenance && $consider_maintenance)) {
-                    // use current time as a starting point when an outage starts
-                    $data = ['device_id' => $device['device_id'],
-                        'going_down' => time(), ];
-                    dbInsert($data, 'device_outages');
-                }
-            }
-        }
-
-        log_event('Device status changed to ' . ucfirst($type) . " from $reason check.", $device, $type);
-    }
-
-    return $response;
-}
-
 function update_device_logo(&$device)
 {
     $icon = getImageName($device, false);
@@ -2065,8 +1667,8 @@ function get_device_oid_limit($device)
 /**
  * If Distributed, create a lock, then purge the mysql table
  *
- * @param string $table
- * @param string $sql
+ * @param  string  $table
+ * @param  string  $sql
  * @return int exit code
  */
 function lock_and_purge($table, $sql)
@@ -2093,9 +1695,9 @@ function lock_and_purge($table, $sql)
 /**
  * If Distributed, create a lock, then purge the mysql table according to the sql query
  *
- * @param string $table
- * @param string $sql
- * @param string $msg
+ * @param  string  $table
+ * @param  string  $sql
+ * @param  string  $msg
  * @return int exit code
  */
 function lock_and_purge_query($table, $sql, $msg)
@@ -2123,8 +1725,8 @@ function lock_and_purge_query($table, $sql, $msg)
  * Check if disk is valid to poll.
  * Settings: bad_disk_regexp
  *
- * @param array $disk
- * @param array $device
+ * @param  array  $disk
+ * @param  array  $device
  * @return bool
  */
 function is_disk_valid($disk, $device)
@@ -2144,9 +1746,9 @@ function is_disk_valid($disk, $device)
  * Queues a hostname to be refreshed by Oxidized
  * Settings: oxidized.url
  *
- * @param string $hostname
- * @param string $msg
- * @param string $username
+ * @param  string  $hostname
+ * @param  string  $msg
+ * @param  string  $username
  * @return bool
  */
 function oxidized_node_update($hostname, $msg, $username = 'not_provided')
@@ -2167,8 +1769,9 @@ function oxidized_node_update($hostname, $msg, $username = 'not_provided')
 /**
  * @params int code
  * @params int subcode
+ *
  * @return string
- * Take a BGP error code and subcode to return a string representation of it
+ *                Take a BGP error code and subcode to return a string representation of it
  */
 function describe_bgp_error_code($code, $subcode)
 {

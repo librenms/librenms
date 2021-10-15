@@ -18,6 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2020 Thomas Berberich
  * @author     Thomas Berberich <sourcehhdoctor@gmail.com>
  */
@@ -55,7 +56,7 @@ class OutagesController extends TableController
     /**
      * Defines the base query for this resource
      *
-     * @param \Illuminate\Http\Request $request
+     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Query\Builder
      */
     public function baseQuery($request)
@@ -71,7 +72,7 @@ class OutagesController extends TableController
     }
 
     /**
-     * @param DeviceOutage $outage
+     * @param  DeviceOutage  $outage
      */
     public function formatItem($outage)
     {
@@ -112,7 +113,7 @@ class OutagesController extends TableController
         }
 
         $output = "<span style='display:inline;'>";
-        $output .= (new Carbon($timestamp))->format(Config::get('dateformat.compact'));
+        $output .= (Carbon::createFromTimestamp($timestamp))->format(Config::get('dateformat.compact')); // Convert epoch to local time
         $output .= '</span>';
 
         return $output;

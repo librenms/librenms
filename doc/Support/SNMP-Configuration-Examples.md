@@ -203,8 +203,8 @@ Notes:
 
 CLI SNMP v3 Configuration for *authPriv*
 ```
-/snmp community 
-add name="<COMMUNITY>" addresses="<ALLOWED-SRC-IPs/NETMASK>" 
+/snmp community
+add name="<COMMUNITY>" addresses="<ALLOWED-SRC-IPs/NETMASK>"
 set "<COMMUNITY>" authentication-password="<AUTH_PASS>" authentication-protocol=MD5
 set "<COMMUNITY>" encryption-password="<ENCRYP_PASS>" encryption-protocol=AES
 set "<COMMUNITY>" read-access=yes write-access=no security=private
@@ -497,7 +497,7 @@ service snmpd restart
 
 #### PowerShell
 The following example will install SNMP, set the Librenms IP and set a read only community string.  
-Replace `$IP` and `$communitystring` with your values.  
+Replace `$IP` and `$communitystring` with your values.
 
 ```Powershell
 Install-WindowsFeature -Name 'SNMP-Service','RSAT-SNMP'

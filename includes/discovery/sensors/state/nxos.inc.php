@@ -11,7 +11,7 @@
  */
 
 $fan_tray_oid = '.1.3.6.1.4.1.9.9.117.1.4.1.1.1';
-$fan_trays = snmpwalk_cache_oid_num($device, $fan_tray_oid, []);
+$fan_trays = snmpwalk_cache_oid($device, $fan_tray_oid, []);
 
 /* CISCO-ENTITY-FRU-CONTROL-MIB cefcFanTrayOperStatus
  *  unknown(1),

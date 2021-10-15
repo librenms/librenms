@@ -16,62 +16,64 @@ return [
     ],
     'sections' => [
         'alerting' => [
-            'general' => '一般警報設定',
-            'email' => '電子郵件設定',
-            'rules' => '警報規則預設值',
+            'general' => ['name' => '一般警報設定'],
+            'email' => ['name' => '電子郵件設定'],
+            'rules' => ['name' => '警報規則預設值'],
         ],
         'auth' => [
-            'general' => '一般驗證設定',
-            'ad' => 'Active Directory 設定',
-            'ldap' => 'LDAP 設定',
+            'general' => ['name' => '一般驗證設定'],
+            'ad' => ['name' => 'Active Directory 設定'],
+            'ldap' => ['name' => 'LDAP 設定'],
         ],
         'authorization' => [
-            'device-group' => '裝置群組設定',
+            'device-group' => ['name' => '裝置群組設定'],
         ],
         'discovery' => [
-            'general' => '一般探索設定',
-            'route' => '路由探索模組',
-            'discovery_modules' => '探索模組',
-            'storage' => '儲存模組',
-            'networks' => '網路',
+            'general' => ['name' => '一般探索設定'],
+            'route' => ['name' => '路由探索模組'],
+            'discovery_modules' => ['name' => '探索模組'],
+            'storage' => ['name' => '儲存模組'],
+            'networks' => ['name' => '網路'],
         ],
         'external' => [
-            'binaries' => '執行檔位置',
-            'location' => '位置資訊設定',
-            'graylog' => 'Graylog 整合',
-            'oxidized' => 'Oxidized 整合',
-            'peeringdb' => 'PeeringDB 整合',
-            'nfsen' => 'NfSen 整合',
-            'unix-agent' => 'Unix-Agent 整合',
-            'smokeping' => 'Smokeping 整合',
-            'snmptrapd' => 'SNMP Traps 整合',
+            'binaries' => ['name' => '執行檔位置'],
+            'location' => ['name' => '位置資訊設定'],
+            'graylog' => ['name' => 'Graylog 整合'],
+            'oxidized' => ['name' => 'Oxidized 整合'],
+            'mac_oui' => ['name' => 'Mac OUI 查詢整合'],
+            'peeringdb' => ['name' => 'PeeringDB 整合'],
+            'nfsen' => ['name' => 'NfSen 整合'],
+            'unix-agent' => ['name' => 'Unix-Agent 整合'],
+            'smokeping' => ['name' => 'Smokeping 整合'],
+            'snmptrapd' => ['name' => 'SNMP Traps 整合'],
         ],
         'poller' => [
-            'availability' => '裝置可用性',
-            'distributed' => '分散式輪詢器',
-            'graphite' => '資料存放區: Graphite',
-            'influxdb' => '資料存放區: InfluxDB',
-            'opentsdb' => '資料存放區: OpenTSDB',
-            'ping' => 'Ping',
-            'prometheus' => '資料存放區: Prometheus',
-            'rrdtool' => 'RRDTool 設定',
-            'snmp' => 'SNMP',
-            'poller_modules' => '輪詢器模組',
+            'availability' => ['name' => '裝置可用性'],
+            'distributed' => ['name' => '分散式輪詢器'],
+            'graphite' => ['name' => '資料存放區: Graphite'],
+            'influxdb' => ['name' => '資料存放區: InfluxDB'],
+            'opentsdb' => ['name' => '資料存放區: OpenTSDB'],
+            'ping' => ['name' => 'Ping'],
+            'prometheus' => ['name' => '資料存放區: Prometheus'],
+            'rrdtool' => ['name' => 'RRDTool 設定'],
+            'snmp' => ['name' => 'SNMP'],
+            'poller_modules' => ['name' => '輪詢器模組'],
+            'interface_types' => ['name' => 'RFC 7224 介面類型'],
         ],
         'system' => [
-            'cleanup' => '清理',
-            'proxy' => 'Proxy',
-            'updates' => '更新',
-            'server' => '伺服器',
+            'cleanup' => ['name' => '清理'],
+            'proxy' => ['name' => 'Proxy'],
+            'updates' => ['name' => '更新'],
+            'server' => ['name' => '伺服器'],
         ],
         'webui' => [
-            'availability-map' => '可用性地圖設定',
-            'graph' => '圖表設定',
-            'dashboard' => '資訊看板設定',
-            'search' => '搜尋設定',
-            'style' => '樣式',
-            'device' => '裝置設定',
-            'worldmap' => '世界地圖設定',
+            'availability-map' => ['name' => '可用性地圖設定'],
+            'graph' => ['name' => '圖表設定'],
+            'dashboard' => ['name' => '資訊看板設定'],
+            'search' => ['name' => '搜尋設定'],
+            'style' => ['name' => '樣式'],
+            'device' => ['name' => '裝置設定'],
+            'worldmap' => ['name' => '世界地圖設定'],
         ],
     ],
     'settings' => [
@@ -361,7 +363,7 @@ return [
             'help' => 'Number of days to keep a user logged in when checking the remember me checkbox at log in.',
         ],
         'authlog_purge' => [
-            'description' => '驗證記錄項目大於 (天)',
+            'description' => '驗證記錄項目大於',
             'help' => 'Cleanup done by daily.sh',
         ],
         'base_url' => [
@@ -369,7 +371,7 @@ return [
             'help' => 'This should *only* be set if you want to *force* a particular hostname/port. It will prevent the web interface being usable form any other hostname',
         ],
         'device_perf_purge' => [
-            'description' => '裝置效能項目大於 (天)',
+            'description' => '裝置效能項目大於',
             'help' => 'Cleanup done by daily.sh',
         ],
         'distributed_poller' => [
@@ -446,7 +448,7 @@ return [
             'help' => 'Name used as part of the from address',
         ],
         'eventlog_purge' => [
-            'description' => '事件記錄大於 (天)',
+            'description' => '事件記錄大於',
             'help' => '由 daily.sh 進行清理作業',
         ],
         'favicon' => [
@@ -595,6 +597,12 @@ return [
             'description' => '登入訊息',
             'help' => '顯示於登入頁面',
         ],
+        'mac_oui' => [
+            'enabled' => [
+                'description' => '啟用 MAC OUI 查詢',
+                'help' => 'Enable mac-address vendor (OUI) lookup (data is downloaded by daily.sh)',
+            ],
+        ],
         'mono_font' => [
             'description' => 'Monospaced 字型',
         ],
@@ -700,6 +708,10 @@ return [
                 ],
             ],
         ],
+        'bad_iftype' => [
+            'description' => '捨棄介面',
+            'help' => '應該被忽略的網路介面類型',
+        ],
         'ping' => [
             'description' => 'ping 路徑',
         ],
@@ -708,7 +720,7 @@ return [
             'help' => 'Cleanup done by daily.sh',
         ],
         'ports_purge' => [
-            'description' => '連接埠大於 (天)',
+            'description' => '連接埠大於',
             'help' => 'Cleanup done by daily.sh',
         ],
         'prometheus' => [
@@ -748,7 +760,7 @@ return [
             ],
         ],
         'route_purge' => [
-            'description' => '路由記錄大於 (天)',
+            'description' => '路由記錄大於',
             'help' => 'Cleanup done by daily.sh',
         ],
         'rrd' => [
@@ -764,7 +776,7 @@ return [
             'help' => 'Location of rrd files.  Default is rrd inside the LibreNMS directory.  Changing this setting does not move the rrd files.',
         ],
         'rrd_purge' => [
-            'description' => 'RRD 檔案項目大於 (天)',
+            'description' => 'RRD 檔案項目大於',
             'help' => 'Cleanup done by daily.sh',
         ],
         'rrd_rra' => [
@@ -868,7 +880,7 @@ return [
             'description' => 'Filter syslog messages containing',
         ],
         'syslog_purge' => [
-            'description' => 'Syslog 項目大於 (天)',
+            'description' => 'Syslog 項目大於',
             'help' => 'Cleanup done by daily.sh',
         ],
         'title_image' => [
@@ -880,6 +892,14 @@ return [
         ],
         'traceroute6' => [
             'description' => 'traceroute6 路徑',
+        ],
+        'twofactor' => [
+            'description' => '雙因素驗證',
+            'help' => '允許使用者啟用基於時間 (TOTP) 或基於雜湊訊息驗證 (HOTP) 的一次性密碼 (OTP)',
+        ],
+        'twofactor_lock' => [
+            'description' => '雙因素驗證碼有效時間 (秒)',
+            'help' => 'Lock-out time to wait in seconds before allowing further attempts if Two-Factor authentication is failed 3 times consecutively - will prompt user to wait this long.  Set to 0 to disable resulting in a permanent account lock-out and a message to user to contact administrator',
         ],
         'unix-agent' => [
             'connection-timeout' => [

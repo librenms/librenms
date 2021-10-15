@@ -103,6 +103,33 @@ Output:
 }
 ```
 
+### `edit_bgp_descr`
+
+This is a POST type request
+Set the BGP session description by ID
+
+Route: `/api/v0/bgp/:id`
+
+Input:
+
+- id = The id of the BGP Peer Session.
+- bgp_descr = The description for the bgpPeerDescr field on the BGP Session.
+
+Example:
+
+```curl
+curl -v -H 'X-Auth-Token: YOURAPITOKENHERE' --data '{"bgp_descr": "Your description here"}' https://librenms.org/api/v0/bgp/4
+```
+
+Output:
+
+```json
+{
+    "status": "ok",
+    "message": "BGP description for peer X.X.X.X on device 1 updated to Your description here"
+}
+```
+
 ### `list_cbgp`
 
 List the current BGP sessions counters.
@@ -343,6 +370,61 @@ Output:
             "ospfNbmaNbrPermanence": "dynamic",
             "ospfNbrHelloSuppressed": "false",
             "context_name": ""
+        }
+    ],
+    "count": 1
+}
+```
+
+### `list_ospf_ports`
+
+List the current OSPF ports.
+
+Route: `/api/v0/ospf_ports`
+
+Example:
+
+```curl
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/ospf_ports
+```
+
+Output:
+
+```json
+{
+ "status": "ok",
+ "ospf_ports": [
+        {
+          "id": 189086,
+          "device_id": 43,
+          "port_id": 2838,
+          "ospf_port_id": "10.10.2.86.0",
+          "ospfIfIpAddress": "10.10.2.86",
+          "ospfAddressLessIf": 0,
+          "ospfIfAreaId": "0.0.0.0",
+          "ospfIfType": "pointToPoint",
+          "ospfIfAdminStat": "enabled",
+          "ospfIfRtrPriority": 128,
+          "ospfIfTransitDelay": 1,
+          "ospfIfRetransInterval": 5,
+          "ospfIfHelloInterval": 10,
+          "ospfIfRtrDeadInterval": 40,
+          "ospfIfPollInterval": 90,
+          "ospfIfState": "pointToPoint",
+          "ospfIfDesignatedRouter": "0.0.0.0",
+          "ospfIfBackupDesignatedRouter": "0.0.0.0",
+          "ospfIfEvents": 33,
+          "ospfIfAuthKey": "",
+          "ospfIfStatus": "active",
+          "ospfIfMulticastForwarding": "unicast",
+          "ospfIfDemand": "false",
+          "ospfIfAuthType": "0",
+          "ospfIfMetricIpAddress": "10.10.2.86",
+          "ospfIfMetricAddressLessIf": 0,
+          "ospfIfMetricTOS": 0,
+          "ospfIfMetricValue": 10,
+          "ospfIfMetricStatus": "active",
+          "context_name": null
         }
     ],
     "count": 1

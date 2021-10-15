@@ -126,12 +126,12 @@ if ($stpprotocol == 'ieee8021d' || $stpprotocol == 'unknown') {
             // set port binding
             $stp_port['port_id'] = dbFetchCell('SELECT port_id FROM `ports` WHERE `device_id` = ? AND `ifIndex` = ?', [$device['device_id'], $stp_raw[$port]['dot1dStpPort']]);
 
-            $dr = str_replace([' ', ':', '-'], '', strtolower($stp_raw[$port]['dot1dStpPortDesignatedRoot']));
-            $dr = substr($dr, -12); //remove first two octets
+            $dr = str_replace(['.', ' ', ':', '-'], '', strtolower($stp_raw[$port]['dot1dStpPortDesignatedRoot']));
+            $dr = substr($dr, -12); //keep the last 12 chars (the mac address)
             $stp_port['designatedRoot'] = $dr;
 
-            $db = str_replace([' ', ':', '-'], '', strtolower($stp_raw[$port]['dot1dStpPortDesignatedBridge']));
-            $db = substr($db, -12); //remove first two octets
+            $db = str_replace(['.', ' ', ':', '-'], '', strtolower($stp_raw[$port]['dot1dStpPortDesignatedBridge']));
+            $db = substr($db, -12); //keep the last 12 chars (the mac address)
             $stp_port['designatedBridge'] = $db;
 
             if ($device['os'] == 'pbn') {
@@ -145,9 +145,15 @@ if ($stpprotocol == 'ieee8021d' || $stpprotocol == 'unknown') {
                     $stp_port['designatedPort'] = $dp;
                 }
             } else {
-                // Port saved in format priority+port (ieee 802.1d-1998: clause 8.5.5.1)
-                $dp = substr($stp_raw[$port]['dot1dStpPortDesignatedPort'], -2); //discard the first octet (priority part)
-                $stp_port['designatedPort'] = hexdec($dp);
+                if (preg_match('/-/', $stp_raw[$port]['dot1dStpPortDesignatedPort'])) {
+                    // Syntax with "priority" dash "portID" like so : 32768-54, both in decimal
+                    $dp = explode('-', $stp_raw[$port]['dot1dStpPortDesignatedPort'])[1];
+                    $stp_port['designatedPort'] = $dp;
+                } else {
+                    // Port saved in format priority+port (ieee 802.1d-1998: clause 8.5.5.1)
+                    $dp = substr($stp_raw[$port]['dot1dStpPortDesignatedPort'], -2); //discard the first octet (priority part)
+                    $stp_port['designatedPort'] = hexdec($dp);
+                }
             }
 
             d_echo($stp_port);

@@ -6,6 +6,42 @@ modules:
                 -
                     oid:
                         - janitza
+        power_consumed:
+            options:
+                divisor: 10
+            data:
+                -
+                    oid: whL1
+                    num_oid: .1.3.6.1.4.1.34278.4.1.{{ $index }}
+                    index: whL1.{{ $index }}
+                    descr: 'L1'	    
+                -
+                    oid: whL2
+                    num_oid: .1.3.6.1.4.1.34278.4.2.{{ $index }}
+                    index: whL2.{{ $index }}
+                    descr: 'L2'
+                -
+                    oid: whL3
+                    num_oid: .1.3.6.1.4.1.34278.4.3.{{ $index }}
+                    index: whL3.{{ $index }}
+                    descr: 'L3'
+                -
+                    oid: whL4
+                    num_oid: .1.3.6.1.4.1.34278.4.4.{{ $index }}
+                    index: whL4.{{ $index }}
+                    descr: 'L4'
+                -
+                    oid: wh3
+                    num_oid: .1.3.6.1.4.1.34278.5.1.{{ $index }}
+                    index: wh3.{{ $index }}
+                    group: 'Sum'
+                    descr: 'L1-L3'		    
+                -
+                    oid: qh3
+                    num_oid: .1.3.6.1.4.1.34278.5.2.{{ $index }}
+                    index: qh3.{{ $index }}
+                    group: 'Sum'
+                    descr: 'L1-L3 Reactive'
         voltage:
             options:
                 divisor: 10

@@ -18,6 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2016 Neil Lathwood
  * @author     Neil Lathwood <neil@lathwood.co.uk>
  */
@@ -33,12 +34,16 @@ use LibreNMS\Enum\AlertState;
 class Alert extends Model
 {
     public $timestamps = false;
+    public $casts = [
+        'info' => 'array',
+    ];
 
     // ---- Query scopes ----
 
     /**
      * Only select active alerts
-     * @param Builder $query
+     *
+     * @param  Builder  $query
      * @return Builder
      */
     public function scopeActive($query)
@@ -48,7 +53,8 @@ class Alert extends Model
 
     /**
      * Only select active alerts
-     * @param Builder $query
+     *
+     * @param  Builder  $query
      * @return Builder
      */
     public function scopeAcknowledged($query)

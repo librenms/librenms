@@ -61,9 +61,7 @@ modules:
                     states:
                         - { descr: invalid, graph: 0, value: 0, generic: 2 }
                         - { descr: normal, graph: 0, value: 1, generic: 0 }
-                        - { descr: outofrangelo, graph: 0, value: 2, generic: 2 }
-                        - { descr: outofrangehi, graph: 0, value: 3, generic: 2 }
-                        - { descr: alarmlo, graph: 0, value: 4, generic: 2 }
-                        - { descr: alarmhi, graph: 0, value: 5, generic: 2 }
-
-
+                        - { descr: outOfRangeLo, graph: 0, value: 2, generic: 2 }
+                        - { descr: outofRangeHi, graph: 0, value: 3, generic: 2 }
+                        - { descr: alarmLo, graph: 0, value: 4, generic: 2 }
+                        - { descr: alarmHi, graph: 0, value: 5, generic: 2 }

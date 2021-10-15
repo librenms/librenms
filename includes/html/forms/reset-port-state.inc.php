@@ -19,6 +19,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2021 Adam Bishop
  * @author     Adam Bishop <adam@omega.org.uk>
  */
@@ -46,7 +47,6 @@ if (isset($_POST['device_id'])) {
         try {
             foreach ($device->ports()->get() as $port) {
                 $port->ifSpeed_prev = null;
-                $port->ifHighSpeed_prev = null;
                 $port->ifOperStatus_prev = null;
                 $port->ifAdminStatus_prev = null;
 

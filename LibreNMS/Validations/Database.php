@@ -18,6 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2017 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -99,23 +100,23 @@ class Database extends BaseValidation
 
     private function checkVersion(Validator $validator)
     {
-        $version = Eloquent::DB()->selectOne('SELECT VERSION() as version')->version;
+        $version = Eloquent::version();
         $version = explode('-', $version);
 
         if (isset($version[1]) && $version[1] == 'MariaDB') {
             if (version_compare($version[0], self::MARIADB_MIN_VERSION, '<=')) {
                 $validator->fail(
                     'MariaDB version ' . self::MARIADB_MIN_VERSION . ' is the minimum supported version as of ' .
-                    self::MARIADB_MIN_VERSION_DATE . '. Update MariaDB to a supported version ' .
-                    self::MARIADB_RECOMMENDED_VERSION . ' suggested).'
+                    self::MARIADB_MIN_VERSION_DATE . '.',
+                    'Update MariaDB to a supported version, ' . self::MARIADB_RECOMMENDED_VERSION . ' suggested.'
                 );
             }
         } else {
             if (version_compare($version[0], self::MYSQL_MIN_VERSION, '<=')) {
                 $validator->fail(
                     'MySQL version ' . self::MYSQL_MIN_VERSION . ' is the minimum supported version as of ' .
-                    self::MYSQL_MIN_VERSION_DATE . '. Update MySQL to a supported version (' .
-                    self::MYSQL_RECOMMENDED_VERSION . ' suggested).'
+                    self::MYSQL_MIN_VERSION_DATE . '.',
+                    'Update MySQL to a supported version, ' . self::MYSQL_RECOMMENDED_VERSION . ' suggested.'
                 );
             }
         }
@@ -319,11 +320,16 @@ class Database extends BaseValidation
             $schema_update[] = $this->dropTableSql($table);
         }
 
+        // set utc timezone if timestamp issues
+        if (preg_grep('/\d{4}-\d\d-\d\d \d\d:\d\d:\d\d/', $schema_update)) {
+            array_unshift($schema_update, "SET TIME_ZONE='+00:00';");
+        }
+
         if (empty($schema_update)) {
             $validator->ok('Database schema correct');
         } else {
-            $result = ValidationResult::fail('We have detected that your database schema may be wrong, please report the following to us on Discord (https://t.libren.ms/discord) or the community site (https://t.libren.ms/5gscd):')
-                ->setFix('Run the following SQL statements to fix.')
+            $result = ValidationResult::fail('We have detected that your database schema may be wrong')
+                ->setFix('Run the following SQL statements to fix it')
                 ->setList('SQL Statements', $schema_update);
             $validator->result($result);
         }
@@ -387,7 +393,7 @@ class Database extends BaseValidation
     /**
      * Generate an SQL segment to create the column based on data from Schema::dump()
      *
-     * @param array $column_data The array of data for the column
+     * @param  array  $column_data  The array of data for the column
      * @return string sql fragment, for example: "`ix_id` int(10) unsigned NOT NULL"
      */
     private function columnToSql($column_data)
@@ -418,7 +424,7 @@ class Database extends BaseValidation
     /**
      * Generate an SQL segment to create the index based on data from Schema::dump()
      *
-     * @param array $index_data The array of data for the index
+     * @param  array  $index_data  The array of data for the index
      * @return string sql fragment, for example: "PRIMARY KEY (`device_id`)"
      */
     private function indexToSql($index_data)

@@ -2,7 +2,9 @@
 
 namespace App\Models;
 
-class PrinterSupply extends DeviceRelatedModel
+use LibreNMS\Interfaces\Models\Keyable;
+
+class PrinterSupply extends DeviceRelatedModel implements Keyable
 {
     protected $table = 'printer_supplies';
     protected $primaryKey = 'supply_id';

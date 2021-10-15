@@ -20,6 +20,7 @@ Route::group(['prefix' => 'v0', 'namespace' => '\App\Api\Controllers'], function
         Route::get('bgp', 'LegacyApiController@list_bgp')->name('list_bgp');
         Route::get('bgp/{id}', 'LegacyApiController@get_bgp')->name('get_bgp');
         Route::get('ospf', 'LegacyApiController@list_ospf')->name('list_ospf');
+        Route::get('ospf_ports', 'LegacyApiController@list_ospf_ports')->name('list_ospf_ports');
         Route::get('oxidized/{hostname?}', 'LegacyApiController@list_oxidized')->name('list_oxidized');
         Route::get('devicegroups/{name}', 'LegacyApiController@get_devices_by_group')->name('get_devices_by_group');
         Route::get('devicegroups', 'LegacyApiController@get_device_groups')->name('get_device_groups');
@@ -62,6 +63,7 @@ Route::group(['prefix' => 'v0', 'namespace' => '\App\Api\Controllers'], function
             Route::post('{hostname}/components/{type}', 'LegacyApiController@add_components')->name('add_components');
             Route::put('{hostname}/components', 'LegacyApiController@edit_components')->name('edit_components');
             Route::delete('{hostname}/components/{component}', 'LegacyApiController@delete_components')->name('delete_components');
+            Route::post('{hostname}/maintenance', 'LegacyApiController@maintenance_device')->name('maintenance_device');
         });
 
         Route::post('bills', 'LegacyApiController@create_edit_bill')->name('create_bill');
@@ -76,6 +78,8 @@ Route::group(['prefix' => 'v0', 'namespace' => '\App\Api\Controllers'], function
         Route::get('oxidized/config/{device_name}', 'LegacyApiController@get_oxidized_config')->name('get_oxidized_config');
         Route::post('devicegroups', 'LegacyApiController@add_device_group')->name('add_device_group');
         Route::post('port_groups', 'LegacyApiController@add_port_group')->name('add_port_group');
+        Route::post('port_groups/{port_group_id}/assign', 'LegacyApiController@assign_port_group')->name('assign_port_group');
+        Route::post('port_groups/{port_group_id}/remove', 'LegacyApiController@remove_port_group')->name('remove_port_group');
         Route::post('devices/{id}/parents', 'LegacyApiController@add_parents_to_host')->name('add_parents_to_host');
         Route::delete('/devices/{id}/parents', 'LegacyApiController@del_parents_from_host')->name('del_parents_from_host');
         Route::post('locations', 'LegacyApiController@add_location')->name('add_location');
@@ -83,6 +87,7 @@ Route::group(['prefix' => 'v0', 'namespace' => '\App\Api\Controllers'], function
         Route::delete('locations/{location}', 'LegacyApiController@del_location')->name('del_location');
         Route::delete('services/{id}', 'LegacyApiController@del_service_from_host')->name('del_service_from_host');
         Route::patch('services/{id}', 'LegacyApiController@edit_service_for_host')->name('edit_service_for_host');
+        Route::post('bgp/{id}', 'LegacyApiController@edit_bgp_descr')->name('edit_bgp_descr');
     });
 
     // restricted by access
@@ -115,7 +120,8 @@ Route::group(['prefix' => 'v0', 'namespace' => '\App\Api\Controllers'], function
     Route::group(['prefix' => 'ports'], function () {
         Route::get('{portid}', 'LegacyApiController@get_port_info')->name('get_port_info');
         Route::get('{portid}/ip', 'LegacyApiController@get_port_ip_addresses')->name('get_port_ip_info');
-        Route::get('search/{search}', 'LegacyApiController@search_ports')->name('search_ports');
+        Route::get('search/{field}/{search?}', 'LegacyApiController@search_ports')->name('search_ports');
+        Route::get('mac/{search}', 'LegacyApiController@search_by_mac')->name('search_mac');
         Route::get(null, 'LegacyApiController@get_all_ports')->name('get_all_ports');
     });
 

@@ -18,6 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2017 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -62,8 +63,8 @@ class Validator
     /**
      * Run validations. An empty array will run all default validations.
      *
-     * @param array $validation_groups selected validation groups to run
-     * @param bool $print_group_status print out group status
+     * @param  array  $validation_groups  selected validation groups to run
+     * @param  bool  $print_group_status  print out group status
      */
     public function validate($validation_groups = [], $print_group_status = false)
     {
@@ -99,7 +100,7 @@ class Validator
     /**
      * Get the overall status of a validation group.
      *
-     * @param string $validation_group
+     * @param  string  $validation_group
      * @return int
      */
     public function getGroupStatus($validation_group)
@@ -117,8 +118,8 @@ class Validator
     /**
      * Get the ValidationResults for a specific validation group.
      *
-     * @param string $validation_group
-     * @return array
+     * @param  string  $validation_group
+     * @return ValidationResult[]
      */
     public function getResults($validation_group = null)
     {
@@ -147,7 +148,7 @@ class Validator
     /**
      * Print all ValidationResults or a group of them.
      *
-     * @param string $validation_group
+     * @param  string  $validation_group
      */
     public function printResults($validation_group = null)
     {
@@ -163,8 +164,8 @@ class Validator
      * Submit a validation result.
      * This allows customizing ValidationResults before submitting.
      *
-     * @param ValidationResult $result
-     * @param string $group manually specify the group, otherwise this will be inferred from the callers class name
+     * @param  ValidationResult  $result
+     * @param  string  $group  manually specify the group, otherwise this will be inferred from the callers class name
      */
     public function result(ValidationResult $result, $group = null)
     {
@@ -186,9 +187,9 @@ class Validator
     /**
      * Submit an ok validation result.
      *
-     * @param string $message
-     * @param string $fix
-     * @param string $group manually specify the group, otherwise this will be inferred from the callers class name
+     * @param  string  $message
+     * @param  string  $fix
+     * @param  string  $group  manually specify the group, otherwise this will be inferred from the callers class name
      */
     public function ok($message, $fix = null, $group = null)
     {
@@ -198,9 +199,9 @@ class Validator
     /**
      * Submit a warning validation result.
      *
-     * @param string $message
-     * @param string $fix
-     * @param string $group manually specify the group, otherwise this will be inferred from the callers class name
+     * @param  string  $message
+     * @param  string  $fix
+     * @param  string  $group  manually specify the group, otherwise this will be inferred from the callers class name
      */
     public function warn($message, $fix = null, $group = null)
     {
@@ -210,9 +211,9 @@ class Validator
     /**
      * Submit a failed validation result.
      *
-     * @param string $message
-     * @param string $fix
-     * @param string $group manually specify the group, otherwise this will be inferred from the callers class name
+     * @param  string  $message
+     * @param  string  $fix
+     * @param  string  $group  manually specify the group, otherwise this will be inferred from the callers class name
      */
     public function fail($message, $fix = null, $group = null)
     {
@@ -222,8 +223,8 @@ class Validator
     /**
      * Submit an informational validation result.
      *
-     * @param string $message
-     * @param string $group manually specify the group, otherwise this will be inferred from the callers class name
+     * @param  string  $message
+     * @param  string  $group  manually specify the group, otherwise this will be inferred from the callers class name
      */
     public function info($message, $group = null)
     {
@@ -233,7 +234,7 @@ class Validator
     /**
      * Get version_info() array.  This will cache the result and add remote data if requested and not already existing.
      *
-     * @param bool $remote
+     * @param  bool  $remote
      * @return array
      */
     public function getVersions($remote = false)
@@ -253,9 +254,9 @@ class Validator
      * Execute a command, but don't run it as root.  If we are root, run as the LibreNMS user.
      * Arguments match exec()
      *
-     * @param string $command the command to run
-     * @param array $output will hold the output of the command
-     * @param int $code will hold the return code from the command
+     * @param  string  $command  the command to run
+     * @param  array  $output  will hold the output of the command
+     * @param  int  $code  will hold the return code from the command
      */
     public function execAsUser($command, &$output = null, &$code = null)
     {

@@ -36,6 +36,7 @@ path: blob/master/doc/
 - [Why does modifying 'Default Alert Template' fail?](#faq31)
 - [Why would alert un-mute itself](#faq32)
 - [How do I change the Device Type?](#faq33)
+- [Editing large device groups gives error messages](#faq34)
 - [Where do I update my database credentials?](#faq-where-do-i-update-my-database-credentials)
 - [My reverse proxy is not working](#my-reverse-proxy-is-not-working)
 - [My alerts aren't being delivered on time](#my-alerts-aren't-being-delivered-on-time)
@@ -305,7 +306,7 @@ $config['device_traffic_iftype'][] = '/ppp/';
 If you are moving from one CPU architecture to another then you will
 need to dump the rrd files and re-create them. If you are in this
 scenario then you can use [Dan Brown's migration
-scripts](https://vlan50.com/2015/04/17/migrating-from-observium-to-librenms/).
+scripts](https://web.archive.org/web/20180815212723/https://vlan50.com/2015/04/17/migrating-from-observium-to-librenms/).
 
 If you are just moving to another server with the same CPU
 architecture then the following steps should be all that's needed:
@@ -543,6 +544,12 @@ to change, then click on the Gear Icon -> Edit. If you would like to
 define custom types, we suggest using [Device
 Groups](/Extensions/Device-Groups/). They will be listed in the
 menu similarly to device types.
+
+## <a name="faq34"> Editing large device groups gives error messages</a>
+
+If the device group contains large amount of devices, editing it from the UI might cause errors on the form even when all the data seems correct. This is caused by PHP's `max_input_vars`-variable. You should be able to confirm that this is the case by inspecting the PHP's error logs.
+
+With the basic installation on Ubuntu 20.04 LTS with Nginx and PHP 7.4 FPM this value can be tuned by editing the file `/etc/php/7.4/fpm/php.ini` and adjusting the value of `max_input_vars` to be at least the size of the large group. In larger installations a value such as `10000` should suffice.
 
 ## <a name="faq-where-do-i-update-my-database-credentials">Where do I update my database credentials?</a>
 

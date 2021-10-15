@@ -18,6 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2017 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -56,20 +57,23 @@ class ModuleTestHelper
     private $exclude_from_all = ['arp-table', 'fdb-table'];
     private static $module_deps = [
         'arp-table' => ['ports', 'arp-table'],
+        'cisco-mac-accounting' => ['ports', 'cisco-mac-accounting'],
         'fdb-table' => ['ports', 'vlans', 'fdb-table'],
-        'vlans' => ['ports', 'vlans'],
-        'vrf' => ['ports', 'vrf'],
+        'isis' => ['ports', 'isis'],
         'mpls' => ['ports', 'vrf', 'mpls'],
         'nac' => ['ports', 'nac'],
         'ospf' => ['ports', 'ospf'],
-        'cisco-mac-accounting' => ['ports', 'cisco-mac-accounting'],
+        'vlans' => ['ports', 'vlans'],
+        'vrf' => ['ports', 'vrf'],
     ];
 
     /**
      * ModuleTester constructor.
-     * @param array|string $modules
-     * @param string $os
-     * @param string $variant
+     *
+     * @param  array|string  $modules
+     * @param  string  $os
+     * @param  string  $variant
+     *
      * @throws InvalidModuleException
      */
     public function __construct($modules, $os, $variant = '')
@@ -245,8 +249,9 @@ class ModuleTestHelper
      * Each entry contains [$os, $variant, $valid_modules]
      * $valid_modules is an array of selected modules this os has test data for
      *
-     * @param array $modules
+     * @param  array  $modules
      * @return array
+     *
      * @throws InvalidModuleException
      */
     public static function findOsWithData($modules = [])
@@ -294,7 +299,7 @@ class ModuleTestHelper
     /**
      * Given a json filename or basename, extract os and variant
      *
-     * @param string $os_file Either a filename or the basename
+     * @param  string  $os_file  Either a filename or the basename
      * @return array [$os, $variant]
      */
     public static function extractVariant($os_file)
@@ -316,8 +321,9 @@ class ModuleTestHelper
      * Generate a module list.  Try to take dependencies into account.
      * Probably needs to be more robust
      *
-     * @param array $modules
+     * @param  array  $modules
      * @return array
+     *
      * @throws InvalidModuleException
      */
     private static function resolveModuleDependencies($modules)
@@ -511,9 +517,10 @@ class ModuleTestHelper
      * Run discovery and polling against snmpsim data and create a database dump
      * Save the dumped data to tests/data/<os>.json
      *
-     * @param Snmpsim $snmpsim
-     * @param bool $no_save
+     * @param  Snmpsim  $snmpsim
+     * @param  bool  $no_save
      * @return array|null
+     *
      * @throws FileNotFoundException
      */
     public function generateTestData(Snmpsim $snmpsim, $no_save = false)
@@ -642,8 +649,8 @@ class ModuleTestHelper
     }
 
     /**
-     * @param string $output poller or discovery output
-     * @param string $type poller|disco identified by "#### Load disco module" string
+     * @param  string  $output  poller or discovery output
+     * @param  string  $type  poller|disco identified by "#### Load disco module" string
      * @return array
      */
     private function extractModuleOutput($output, $type)
@@ -674,9 +681,9 @@ class ModuleTestHelper
      * Dump the current database data for the module to an array
      * Mostly used for testing
      *
-     * @param int $device_id The test device id
-     * @param array $modules to capture data for (should be a list of modules that were actually run)
-     * @param string $key a key to store the data under the module key (usually discovery or poller)
+     * @param  int  $device_id  The test device id
+     * @param  array  $modules  to capture data for (should be a list of modules that were actually run)
+     * @param  string  $key  a key to store the data under the module key (usually discovery or poller)
      * @return array The dumped data keyed by module -> table
      */
     public function dumpDb($device_id, $modules, $key = null)
@@ -773,7 +780,7 @@ class ModuleTestHelper
      * Get the output from the last discovery that was run
      * If module was specified, only return that module's output
      *
-     * @param null $module
+     * @param  null  $module
      * @return mixed
      */
     public function getDiscoveryOutput($module = null)
@@ -793,7 +800,7 @@ class ModuleTestHelper
      * Get output from the last poller that was run
      * If module was specified, only return that module's output
      *
-     * @param null $module
+     * @param  null  $module
      * @return mixed
      */
     public function getPollerOutput($module = null)

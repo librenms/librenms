@@ -15,6 +15,7 @@
 
 /**
  * Custom Frontpage
+ *
  * @author f0o <f0o@devilcode.org>
  * @copyright 2014 f0o, LibreNMS
  * @license GPL
@@ -84,6 +85,7 @@ var greenMarker = L.AwesomeMarkers.icon({
         $sql = "SELECT DISTINCT(`device_id`),`location`,`sysName`,`hostname`,`os`,`status`,`lat`,`lng` FROM `devices`
                 LEFT JOIN `locations` ON `devices`.`location_id`=`locations`.`id`
                 WHERE `disabled`=0 AND `ignore`=0 AND ((`lat` != '' AND `lng` != '') OR (`location` REGEXP '\[[0-9\.\, ]+\]'))
+                AND (`lat` IS NOT NULL AND `lng` IS NOT NULL)
                 AND `status` IN " . dbGenPlaceholders(count($show_status)) .
                 ' ORDER BY `status` ASC, `hostname`';
         $param = $show_status;
@@ -95,6 +97,7 @@ var greenMarker = L.AwesomeMarkers.icon({
                 FROM `devices`
                 LEFT JOIN `locations` ON `devices`.location_id=`locations`.`id`
                 WHERE `disabled`=0 AND `ignore`=0 AND ((`lat` != '' AND `lng` != '') OR (`location` REGEXP '\[[0-9\.\, ]+\]'))
+                AND (`lat` IS NOT NULL AND `lng` IS NOT NULL)
                 AND `devices`.`device_id` IN " . dbGenPlaceholders(count($device_ids)) .
                 ' AND `status` IN ' . dbGenPlaceholders(count($show_status)) .
                 ' ORDER BY `status` ASC, `hostname`';
@@ -139,7 +142,7 @@ marker.bindPopup(title);
               rl.id AS right_id,
               rl.lat AS right_lat,
               rl.lng AS right_lng,
-              sum(lp.ifHighSpeed) AS link_capacity,
+              sum(lp.ifSpeed) AS link_capacity,
               sum(lp.ifOutOctets_rate) * 8 / sum(lp.ifSpeed) * 100 as link_out_usage_pct,
               sum(lp.ifInOctets_rate) * 8 / sum(lp.ifSpeed) * 100 as link_in_usage_pct
             FROM
@@ -185,7 +188,7 @@ marker.bindPopup(title);
               rl.id AS right_id,
               rl.lat AS right_lat,
               rl.lng AS right_lng,
-              sum(lp.ifHighSpeed) AS link_capacity,
+              sum(lp.ifSpeed) AS link_capacity,
               sum(lp.ifOutOctets_rate) * 8 / sum(lp.ifSpeed) * 100 as link_out_usage_pct,
               sum(lp.ifInOctets_rate) * 8 / sum(lp.ifSpeed) * 100 as link_in_usage_pct
             FROM
@@ -229,7 +232,7 @@ marker.bindPopup(title);
             $icon = 'greenMarker';
             $z_offset = 0;
 
-            $speed = $link['link_capacity'] / 1000;
+            $speed = $link['link_capacity'] / 1000000000;
             if ($speed > 500000) {
                 $width = 20;
             } else {

@@ -15,6 +15,7 @@
 
 /**
  * PagerDuty Generic-API Transport
+ *
  * @author f0o <f0o@devilcode.org>
  * @copyright 2015 f0o, LibreNMS
  * @license GPL
@@ -27,11 +28,13 @@ use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Http\Request;
 use LibreNMS\Alert\Transport;
 use LibreNMS\Enum\AlertState;
+use LibreNMS\Util\Proxy;
 use Log;
 use Validator;
 
 class Pagerduty extends Transport
 {
+    protected $name = 'PagerDuty';
     public static $integrationKey = '2fc7c9f3c8030e74aae6';
 
     public function deliverAlert($obj, $opts)
@@ -48,8 +51,8 @@ class Pagerduty extends Transport
     }
 
     /**
-     * @param array $obj
-     * @param array $config
+     * @param  array  $obj
+     * @param  array  $config
      * @return bool|string
      */
     public function contactPagerduty($obj, $config)
@@ -60,18 +63,27 @@ class Pagerduty extends Transport
             'dedup_key'    => (string) $obj['alert_id'],
             'payload'    => [
                 'custom_details'  => strip_tags($obj['msg']) ?: 'Test',
-                'device_groups'   => \DeviceCache::get($obj['device_id'])->groups->pluck('name'),
+                'group'   => (string) \DeviceCache::get($obj['device_id'])->groups->pluck('name'),
                 'source'   => $obj['hostname'],
                 'severity' => $obj['severity'],
                 'summary'  => ($obj['name'] ? $obj['name'] . ' on ' . $obj['hostname'] : $obj['title']),
             ],
         ];
 
-        $url = 'https://events.pagerduty.com/v2/enqueue';
+        // EU service region
+        if ($config['region'] == 'EU') {
+            $url = 'https://events.eu.pagerduty.com/v2/enqueue';
+        }
+
+        // US service region
+        else {
+            $url = 'https://events.pagerduty.com/v2/enqueue';
+        }
+
         $client = new Client();
 
         $request_opts = ['json' => $data];
-        $request_opts['proxy'] = get_proxy();
+        $request_opts['proxy'] = Proxy::forGuzzle();
 
         try {
             $result = $client->request('POST', $url, $request_opts);
@@ -91,12 +103,30 @@ class Pagerduty extends Transport
         return [
             'config' => [
                 [
-                    'title' => 'Authorize',
+                    'title' => 'Authorize (EU)',
+                    'descr' => 'Alert with PagerDuty',
+                    'type'  => 'oauth',
+                    'icon'  => 'pagerduty-white.svg',
+                    'class' => 'btn-success',
+                    'url'   => 'https://connect.eu.pagerduty.com/connect?vendor=' . self::$integrationKey . '&callback=',
+                ],
+                [
+                    'title' => 'Authorize (US)',
                     'descr' => 'Alert with PagerDuty',
                     'type'  => 'oauth',
                     'icon'  => 'pagerduty-white.svg',
                     'class' => 'btn-success',
                     'url'   => 'https://connect.pagerduty.com/connect?vendor=' . self::$integrationKey . '&callback=',
+                ],
+                [
+                    'title' => 'Service Region',
+                    'name' => 'region',
+                    'descr' => 'Service Region of the PagerDuty account',
+                    'type' => 'select',
+                    'options' => [
+                        'EU' => 'EU',
+                        'US' => 'US',
+                    ],
                 ],
                 [
                     'title' => 'Account',
@@ -114,7 +144,9 @@ class Pagerduty extends Transport
                     'name'  => 'service_key',
                 ],
             ],
-            'validation' => [],
+            'validation' => [
+                'region' => 'in:EU,US',
+            ],
         ];
     }
 

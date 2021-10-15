@@ -18,6 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -46,7 +47,7 @@ class MenuComposer
     /**
      * Bind data to the view.
      *
-     * @param  View $view
+     * @param  View  $view
      * @return void
      */
     public function compose(View $view)
@@ -162,6 +163,16 @@ class MenuComposer
                 ];
             }
 
+            if ($routing_count['isis']) {
+                $routing_menu[] = [
+                    [
+                        'url' => 'isis',
+                        'icon' => 'arrows-alt',
+                        'text' => 'ISIS Adjacencies',
+                    ],
+                ];
+            }
+
             if ($routing_count['cisco-otv']) {
                 $routing_menu[] = [
                     [
@@ -238,6 +249,8 @@ class MenuComposer
 
         // Search bar
         $vars['typeahead_limit'] = Config::get('webui.global_search_result_limit');
+
+        $vars['browser_push'] = $user->hasBrowserPushTransport();
 
         $view->with($vars);
     }

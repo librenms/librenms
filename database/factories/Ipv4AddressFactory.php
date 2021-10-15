@@ -3,9 +3,12 @@
 namespace Database\Factories;
 
 use App\Models\Ipv4Address;
+use App\Models\Ipv4Network;
+use App\Models\Port;
 use Illuminate\Database\Eloquent\Factories\Factory;
 use LibreNMS\Util\IPv4;
 
+/** @extends Factory<Ipv4Address> */
 class Ipv4AddressFactory extends Factory
 {
     /**
@@ -29,10 +32,14 @@ class Ipv4AddressFactory extends Factory
             'ipv4_address' => $ip->uncompressed(),
             'ipv4_prefixlen' => $prefix,
             'port_id' => function () {
-                return \App\Models\Port::factory()->create()->port_id;
+                $port = Port::factory()->create(); /** @var Port $port */
+
+                return $port->port_id;
             },
             'ipv4_network_id' => function () use ($ip) {
-                return \App\Models\Ipv4Network::factory()->create(['ipv4_network' => $ip->getNetworkAddress() . '/' . $ip->cidr])->ipv4_network_id;
+                $ipv4 = Ipv4Network::factory()->create(['ipv4_network' => $ip->getNetworkAddress() . '/' . $ip->cidr]); /** @var Ipv4Address $ipv4 */
+
+                return $ipv4->ipv4_network_id;
             },
         ];
     }

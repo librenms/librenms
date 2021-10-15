@@ -18,6 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2019 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -36,8 +37,8 @@ class BgpTrapTest extends SnmpTrapTestCase
     {
         // Cache it to avoid DNS Lookup
         Config::set('astext.1', 'PHPUnit ASTEXT');
-        $device = Device::factory()->create();
-        $bgppeer = BgpPeer::factory()->make(['bgpPeerState' => 'idle', 'bgpPeerRemoteAs' => 1]);
+        $device = Device::factory()->create(); /** @var Device $device */
+        $bgppeer = BgpPeer::factory()->make(['bgpPeerState' => 'idle', 'bgpPeerRemoteAs' => 1]); /** @var BgpPeer $bgppeer */
         $device->bgppeers()->save($bgppeer);
 
         $trapText = "$device->hostname
@@ -61,8 +62,8 @@ BGP4-MIB::bgpPeerState.$bgppeer->bgpPeerIdentifier established\n";
     {
         // Cache it to avoid DNS Lookup
         Config::set('astext.1', 'PHPUnit ASTEXT');
-        $device = Device::factory()->create();
-        $bgppeer = BgpPeer::factory()->make(['bgpPeerState' => 'established', 'bgpPeerRemoteAs' => 1]);
+        $device = Device::factory()->create(); /** @var Device $device */
+        $bgppeer = BgpPeer::factory()->make(['bgpPeerState' => 'established', 'bgpPeerRemoteAs' => 1]); /** @var BgpPeer $bgppeer */
         $device->bgppeers()->save($bgppeer);
 
         $trapText = "$device->hostname

@@ -1,0 +1,229 @@
+-- ==================================================================
+-- Copyright (C) 2008-2015 New H3C Tech. Co., Ltd. All rights reserved.
+--
+-- Description: Loopback detection MIB
+-- Reference:
+-- Version: V1.2
+-- History:
+-- V1.0 2008-09-27 Created by LuoXuefang
+-- V1.1 2009-03-30 Added hh3cLpbkdtTrapPerVlanLoopbacked,
+--                 hh3cLpbkdtTrapPerVlanRecovered and
+--                 hh3cLpbkdtObjects by TongWei.
+-- V1.2 2014-07-26 Added hh3cLpbkdtVlanEnable, hh3cLpbkdtAction,
+--                 hh3cLpbkdtIntervalTime, hh3cLpbkdtPortTable,
+--                 hh3cLpbkdtPortEntry, hh3cLpbkdtPortIfIndex,
+--                 hh3cLpbkdtPortVlanEnable, hh3cLpbkdtPortAction and
+--                 hh3cLpbkdtPortLoopbacked by ZhangWei.
+-- ==================================================================
+HH3C-LPBKDT-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    hh3cCommon
+        FROM HH3C-OID-MIB
+    ifIndex, ifDescr
+        FROM IF-MIB
+    VlanId
+        FROM Q-BRIDGE-MIB
+    TEXTUAL-CONVENTION, TruthValue
+        FROM SNMPv2-TC
+    OBJECT-TYPE, MODULE-IDENTITY, NOTIFICATION-TYPE, Integer32
+        FROM SNMPv2-SMI
+    InterfaceIndex
+        FROM IF-MIB;
+
+hh3cLpbkdt MODULE-IDENTITY
+    LAST-UPDATED "201407261518Z"        -- July 26, 2014 at 15:18 GMT
+    ORGANIZATION "New H3C Technologies Co., Ltd."
+    CONTACT-INFO
+        "Comware Team New H3C Technologies Co., Ltd.
+        Hai-Dian District Beijing P.R. China
+        http://www.h3c.com
+        Zip:100085"
+    DESCRIPTION
+        "Loops may cause broadcast storms.  The purpose of loopback detection
+         is to detect loops on the device and to protect the network."
+
+    REVISION "201407261518Z"
+    DESCRIPTION
+        "Added new nodes to configure the loop detection."
+    REVISION "200903301741Z"
+    DESCRIPTION
+        "To fix bugs in the MIB file."
+    REVISION "200809271504Z"
+    DESCRIPTION
+        "The initial revision of this MIB module."
+    ::= { hh3cCommon 95 }
+
+-- ==================================================================
+--
+-- ======================= definition begin =========================
+--
+-- ==================================================================
+
+Hh3cLpbkdtActionType ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "Loopback detection action on the port on which a loop is detected.
+        When a loop is detected on a port, the device generates a log.  The
+        enumeration 'none(1)' means that the device performs no action on the
+        port.  The enumeration 'block(2)' means that the device disables MAC
+        address learning and blocks traffic on the port.  The enumeration
+        'nolearning(3)' means that the device disables MAC address learning on
+        the port.  The enumeration 'shutdown(4)' means that the device shuts
+        down the port.  The device automatically sets the port to the forwarding
+        state after the time interval configured."
+    SYNTAX  INTEGER {
+            none(1),
+            block(2),
+            nolearning(3),
+            shutdown(4)
+    }
+
+hh3cLpbkdtNotifications OBJECT IDENTIFIER ::= { hh3cLpbkdt 1 }
+hh3cLpbkdtObjects       OBJECT IDENTIFIER ::= { hh3cLpbkdt 2 }
+hh3cLpbkdtTrapPrefix    OBJECT IDENTIFIER ::= { hh3cLpbkdtNotifications 0 }
+
+hh3cLpbkdtTrapLoopbacked NOTIFICATION-TYPE
+    OBJECTS { ifIndex, ifDescr }
+    STATUS current
+    DESCRIPTION
+        "Trap message is generated when the interface is looped."
+    ::= { hh3cLpbkdtTrapPrefix 1 }
+
+hh3cLpbkdtTrapRecovered NOTIFICATION-TYPE
+    OBJECTS { ifIndex, ifDescr }
+    STATUS current
+    DESCRIPTION
+        "Trap message is generated when the loops on the interface
+         are eliminated."
+    ::= { hh3cLpbkdtTrapPrefix 2 }
+
+hh3cLpbkdtTrapPerVlanLoopbacked NOTIFICATION-TYPE
+    OBJECTS { ifIndex, ifDescr, hh3cLpbkdtVlanID }
+    STATUS current
+    DESCRIPTION
+        "Trap message is generated when the interface is looped in the VLAN."
+    ::= { hh3cLpbkdtTrapPrefix 3 }
+
+hh3cLpbkdtTrapPerVlanRecovered NOTIFICATION-TYPE
+    OBJECTS { ifIndex, ifDescr, hh3cLpbkdtVlanID }
+    STATUS current
+    DESCRIPTION
+        "Trap message is generated when the loop on the interface
+         is eliminated in the VLAN."
+    ::= { hh3cLpbkdtTrapPrefix 4 }
+
+hh3cLpbkdtVlanID OBJECT-TYPE
+    SYNTAX      VlanId
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The ID of VLAN."
+    ::= { hh3cLpbkdtObjects 1 }
+
+hh3cLpbkdtVlanEnable OBJECT-TYPE
+    SYNTAX      OCTET STRING(SIZE(512))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+       "Whether the loop detection is enabled globally for the VLANs.  Each
+       octet within this value specifies a set of eight VLANs, with the first
+       octet specifying VLANs 1 through 8, the second octet specifying VLANs 9
+       through 16, etc.  Within each octet, the most significant bit represents
+       the highest numbered VLAN, and the least significant bit represents the
+       lowest numbered VLAN.  Thus, each VLAN is represented by a single bit
+       within the value of this object.  A bit with a value of '1' indicates
+       that the loop detection is enabled globally for the VLAN; the loop
+       detection is disabled globally for the VLAN if its bit has a value of
+       '0'.  The 4095th and 4096th bits must be have a value of '0'."
+    ::= { hh3cLpbkdtObjects 2 }
+
+hh3cLpbkdtAction OBJECT-TYPE
+    SYNTAX      Hh3cLpbkdtActionType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Global loopback detection action on the port on which a loop is
+        detected.  The global action applies to all ports.  The per-port action
+        takes precedence over the global action."
+    DEFVAL      { none }
+    ::= { hh3cLpbkdtObjects 3 }
+
+hh3cLpbkdtIntervalTime OBJECT-TYPE
+    SYNTAX      Integer32(1..300)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The interval at which loop detection frames are transmitted."
+    DEFVAL      { 30 }
+    ::= { hh3cLpbkdtObjects 4 }
+
+hh3cLpbkdtPortTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cLpbkdtPortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table containing information about the loop detection configurations
+        and status for individual ports."
+    ::= { hh3cLpbkdtObjects  5 }
+
+hh3cLpbkdtPortEntry OBJECT-TYPE
+    SYNTAX      Hh3cLpbkdtPortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Detailed information of a specified port."
+    INDEX   { hh3cLpbkdtPortIfIndex }
+    ::= { hh3cLpbkdtPortTable 1 }
+
+Hh3cLpbkdtPortEntry  ::= SEQUENCE
+    {
+        hh3cLpbkdtPortIfIndex       InterfaceIndex,
+        hh3cLpbkdtPortVlanEnable    OCTET STRING,
+        hh3cLpbkdtPortAction        Hh3cLpbkdtActionType,
+        hh3cLpbkdtPortLoopbacked    TruthValue
+    }
+
+hh3cLpbkdtPortIfIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The ifIndex of the port."
+    ::={ hh3cLpbkdtPortEntry 1 }
+
+hh3cLpbkdtPortVlanEnable OBJECT-TYPE
+    SYNTAX      OCTET STRING(SIZE(512))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Whether the loop detection is enabled on the port for the VLANs.  Each
+        octet within this value specifies a set of eight VLANs, with the first
+        octet specifying VLANs 1 through 8, the second octet specifying VLANs 9
+        through 16, etc.  Within each octet, the most significant bit represents
+        the highest numbered VLAN, and the least significant bit represents the
+        lowest numbered VLAN.  Thus, each VLAN is represented by a single bit
+        within the value of this object.  A bit with a value of '1' indicates
+        that the loop detection is enabled on the port for the VLAN; the loop
+        detection is disabled on the port for the VLAN if its bit has a value of
+        '0'.  The 4095th and 4096th bits must be have a value of '0'."
+    ::={ hh3cLpbkdtPortEntry 2 }
+
+hh3cLpbkdtPortAction OBJECT-TYPE
+    SYNTAX      Hh3cLpbkdtActionType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Loopback detection action on the port on which a loop is detected.  The
+        per-port action takes precedence over the global action."
+    ::={ hh3cLpbkdtPortEntry 3 }
+
+hh3cLpbkdtPortLoopbacked OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Whether the port is looped."
+    ::={ hh3cLpbkdtPortEntry 4 }
+
+END

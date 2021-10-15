@@ -18,6 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://librenms.org
+ *
  * @copyright  2017 Adam Bishop
  * @author     Adam Bishop <adam@omega.org.uk>
  */
@@ -72,7 +73,7 @@ class SSOAuthorizer extends MysqlAuthorizer
      * Return an attribute from the configured attribute store.
      * Returns null if the attribute cannot be found
      *
-     * @param string $attr The name of the attribute to find
+     * @param  string  $attr  The name of the attribute to find
      * @return string|null
      */
     public function authSSOGetAttr($attr, $prefix = 'HTTP_')
@@ -179,7 +180,7 @@ class SSOAuthorizer extends MysqlAuthorizer
     }
 
     /**
-     * Map a user to a permission level based on a table mapping, 0 if no matching group is found.
+     * Map a user to a permission level based on a table mapping, sso.static_level (default 0) if no matching group is found.
      *
      * @return int
      */
@@ -201,7 +202,7 @@ class SSOAuthorizer extends MysqlAuthorizer
             $groups = $valid_groups;
         }
 
-        $level = 0;
+        $level = (int) Config::get('sso.static_level', 0);
 
         $config_map = Config::get('sso.group_level_map');
 

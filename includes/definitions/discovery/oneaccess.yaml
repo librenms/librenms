@@ -1,4 +1,4 @@
-mib: ONEACCESS-GLOBAL-REG:ONEACCESS-SYS-MIB 
+mib: ONEACCESS-GLOBAL-REG:ONEACCESS-SYS-MIB:ONEACCESS-SHDSL-MIB:ONEACCESS-CELLULAR-MIB
 modules:
     pre-cache:
         data:
@@ -37,3 +37,119 @@ modules:
                         - { descr: dataforwarding, graph: 1, value: 1, generic: 0 }
                         - { descr: application, graph: 1, value: 2, generic: 0 }
                         - { descr: mixed, graph: 1, value: 3, generic: 0 }
+                -
+                    oid: oacCellRadioAccessTechnology
+                    value: oacCellRadioAccessTechnology
+                    num_oid: '.1.3.6.1.4.1.13191.10.3.9.2.1.46.{{ $index }}'
+                    descr: 'Technology'
+                    group: UMTS/LTE
+                    index: 'oacCellRadioAccessTechnology.{{ $index }}'
+                    states:
+                        - { descr: GSM, graph: 1, value: 2, generic: 0 }
+                        - { descr: UMTS, graph: 1, value: 3, generic: 0 }
+                        - { descr: LTE, graph: 1, value: 4, generic: 0 }
+
+        count:
+            data:
+                -
+                    oid: oacSHDSLSpanStatusCurrCRCanomalies
+                    num_oid: '.1.3.6.1.4.1.13191.10.3.3.3.1.2.1.5.{{ $index }}'
+                    index: 'oacSHDSLSpanStatusCurrCRCanomalies.{{ $index }}'
+                    descr: 'CRC Errors Line #{{ $index }}'
+                    group: SDSL
+                -
+                    oid: oacSHDSLSpanStatusCurrHECErrors
+                    num_oid: '.1.3.6.1.4.1.13191.10.3.3.3.1.2.1.6.{{ $index }}'
+                    index: 'oacSHDSLSpanStatusCurrHECErrors.{{ $index }}'
+                    descr: 'HEC Errors Line #{{ $index }}'
+                    group: SDSL
+                -
+                    oid: oacSHDSLSpanStatusCurrES
+                    num_oid: '.1.3.6.1.4.1.13191.10.3.3.3.1.2.1.10.{{ $index }}'
+                    index: 'oacSHDSLSpanStatusCurrES.{{ $index }}'
+                    descr: 'ES Errors Line #{{ $index }}'
+                    group: SDSL
+                -
+                    oid: oacSHDSLSpanStatusCurrSES
+                    num_oid: '.1.3.6.1.4.1.13191.10.3.3.3.1.2.1.11.{{ $index }}'
+                    index: 'oacSHDSLSpanStatusCurrSES.{{ $index }}'
+                    descr: 'SES Line #{{ $index }}'
+                    group: SDSL
+                -
+                    oid: oacSHDSLSpanStatusUpDown
+                    num_oid: '.1.3.6.1.4.1.13191.10.3.3.3.1.2.1.1.{{ $index }}'
+                    index: 'oacSHDSLSpanStatusUpDown.{{ $index }}'
+                    descr: 'Up/Down Line #{{ $index }}'
+                    group: SDSL
+                -
+                    oid: oacCellCellID
+                    num_oid: '.1.3.6.1.4.1.13191.10.3.9.2.1.71.{{ $index }}'
+                    index: 'oacCellCellID.{{ $index }}'
+                    descr: 'CellID'
+                    group: UMTS/LTE
+                -
+                    oid: oacCellPLMN
+                    num_oid: '.1.3.6.1.4.1.13191.10.3.9.2.1.73.{{ $index }}'
+                    index: 'oacCellPLMN.{{ $index }}'
+                    descr: 'PLMN'
+                    group: UMTS/LTE
+
+        dbm:
+            data:
+                -
+                    oid: oacCellSignalStrength
+                    num_oid: '.1.3.6.1.4.1.13191.10.3.9.2.1.41.{{ $index }}'
+                    index: 'oacCellSignalStrength.{{ $index }}'
+                    descr: 'Signal strength'
+                    group: UMTS/LTE
+                    skip_values:
+                         -
+                            oid: oacCellSignalStrength
+                            op: '='
+                            value: ''
+                -
+                    oid: oacCellRSRP
+                    num_oid: '.1.3.6.1.4.1.13191.10.3.9.2.1.44.{{ $index }}'
+                    index: 'oacCellRSRP.{{ $index }}'
+                    descr: 'RSRP'
+                    group: UMTS/LTE
+                    skip_values:
+                         -
+                            oid: oacCellRSRP
+                            op: '='
+                            value: ''
+        quality_factor:
+            data:
+                -
+                    oid: oacCellRSRQ
+                    num_oid: '.1.3.6.1.4.1.13191.10.3.9.2.1.43.{{ $index }}'
+                    index: 'oacCellRSRQ.{{ $index }}'
+                    descr: 'RSRQ'
+                    group: UMTS/LTE
+                    skip_values:
+                         -
+                            oid: oacCellRSRQ
+                            op: '='
+                            value: ''
+        snr:
+            data:
+                -
+                    oid: oacCellSNR
+                    num_oid: '.1.3.6.1.4.1.13191.10.3.9.2.1.45.{{ $index }}'
+                    index: 'oacCellSNR.{{ $index }}'
+                    descr: 'SNR'
+                    group: UMTS/LTE
+                    skip_values:
+                         -
+                            oid: oacCellSNR
+                            op: '='
+                            value: ''
+        runtime:
+            data:
+                -
+                    oid: oacSHDSLSpanStatusCurrShowtimeStart
+                    num_oid: '.1.3.6.1.4.1.13191.10.3.3.3.1.2.1.3.{{ $index }}'
+                    index: 'oacSHDSLSpanStatusCurrShowtimeStart.{{ $index }}'
+                    descr: 'Showtime Start #{{ $index }}'
+                    group: SDSL
+

@@ -17,7 +17,7 @@ poller_modules:
     cisco-mac-accounting: false
     cisco-otv: false
     cisco-remote-access-monitor: false
-    cisco-sla: false
+    slas: false
     cisco-voice: false
     ipmi: false
     ospf: false
@@ -30,7 +30,7 @@ discovery_modules:
     cisco-mac-accounting: false
     cisco-otv: false
     cisco-pw: false
-    cisco-sla: false
+    slas: false
     cisco-vrf-lite: false
     vrf: false
     libvirt-vminfo: false

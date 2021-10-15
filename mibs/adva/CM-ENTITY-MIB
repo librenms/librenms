@@ -12,7 +12,8 @@ IMPORTS
              FROM  CM-COMMON-MIB
     fsp150cm
              FROM  ADVA-MIB 
-    VlanId, CmPmIntervalType, TDMFrequencySourceType 
+    VlanId, CmPmIntervalType, TDMFrequencySourceType ,
+    UsbOperationalMode
              FROM  CM-COMMON-MIB
     PhysicalIndex 
              FROM ENTITY-MIB
@@ -20,23 +21,118 @@ IMPORTS
              FROM CM-SYSTEM-MIB;
 
 cmEntityMIB MODULE-IDENTITY
-    LAST-UPDATED    "201505190000Z"
-    ORGANIZATION    "ADVA Optical Networking"
+    LAST-UPDATED    "202101270000Z"
+    ORGANIZATION    "ADVA Optical Networking SE"
     CONTACT-INFO
-            "        Raghav Trivedi
-                     ADVA Optical Networking, Inc.
-                Tel: +1 972 759-1239
-             E-mail: rtrivedi@advaoptical.com
-             Postal: 2301 N. Greenville Ave. #300
-                     Richardson, TX USA 75082"
+        "Web URL: http://adva.com/
+        E-mail:  support@adva.com
+        Postal:  ADVA Optical Networking SE
+             Campus Martinsried
+             Fraunhoferstrasse 9a
+             82152 Martinsried/Munich
+             Germany
+        Phone: +49 089 89 06 65 0
+        Fax:  +49 089 89 06 65 199 "
     DESCRIPTION
             "This module defines the Entity MIB definitions used by 
              the F3 (FSP150CM/CC) product lines.  These definitions are 
              vendor specific extensions to the standard ENTITY MIB (RFC2737). 
-             Copyright (C) ADVA Optical Networking."
-    REVISION        "201505190000Z"
+             Copyright (C) ADVA."
+    REVISION        "202101270000Z"
     DESCRIPTION
             "  
+               Notes from release 202002170000Z
+               (1) Added new table f3StorageDeviceTable
+
+               Notes from release 202002060000Z
+               (1) Added new attribute to serverCardTable
+               
+               Notes from release 201911050000Z
+               (1) Added new literal CompositeClock to CardType
+               (2) New compositeClockCardTable, with columns:
+                    compositeClockCardEntityIndex, 
+                    compositeClockCardAdminState,
+                    compositeClockCardOperationalState, 
+                    compositeClockCardSecondaryState,
+                    compositeClockCardRowStatus,    
+                    compositeClockCardAlias
+               (3) New Conformance Group: compositeClockCardGroup 
+
+               Notes from release 201909150000Z
+               (1) Added new literal MbGnss to CardType
+               (2) New mbGnssCardTable, with columns:
+                    mbGnssCardEntityIndex, 
+                    mbGnssCardAdminState,
+                    mbGnssCardOperationalState, 
+                    mbGnssCardSecondaryState,
+                    mbGnssCardRowStatus,    
+                    mbGnssCardAlias
+               (3) New Conformance Group: mbGnssCardGroup 
+
+               Notes from release 201909130000Z
+               (1) Added new literal irig to CardType
+               (2) New f3IrigCardTable, with columns:
+                  f3IrigCardEntityIndex, f3IrigCardAlias,
+                  f3IrigCardAdminState, ff3IrigCardOperationalState,
+                  f3IrigCardSecondaryState, f3IrigCardTemperature,
+                  f3IrigCardStorageType, f3IrigCardRowStatus
+               (3) New Conformance Group: f3IrigCardGroup 
+	       
+               Notes from release 201903070000Z
+               (1) Added new literal eth-xg-118proac-sh to CardType
+               (2) Added new literal onerackunit-xg118proacSH to ShelfType
+               (3) Added new literal eth-xg-118proac-sh to CardType
+               (4) Added ethernetNTEXG118PROACSHCardTable
+               (5) Added nteXg118ProacSHCardGroup
+
+               Notes from release 201901300000Z
+               (1) Added auxPortCardTemperature column
+                   in auxPortCardTable entry
+               (2) Added ge4PortCardTemperature column
+                   in ge4PortCardTable entry
+               (3) Added bits16PortCardTemperature column
+                   in bits16PortCardTable entry
+           
+               Notes from release 201901070000Z
+               (1) Added ethernetNTEOSA5401CardTableRestartAction 
+               (2) Added ethernetNTEOSA5405CardTableRestartAction
+
+               Notes from release 201809240000Z
+               (1) Added new literal ccxg118proSH to NetworkElementType
+               (2) Added new literal onerackunit-xg118proSH to ShelfType
+               (3) Added new literal eth-xg-118pro-sh to CardType
+               (4) Added ethernetNTEXG118PROSHCardTable
+               (5) Added nteXg118ProSHCardGroup
+               
+               Notes from release 201804190000Z
+               (1) Added new literal ccxg116proH to NetworkElementType
+               (2) Added new literal onerackunit-xg116proH to ShelfType
+               (3) Added new literal eth-xg-116pro-h to CardType
+               (4) Added ethernetNTEXG116PROHCardTable
+               (5) Added nteXg116ProHCardGroup
+
+               Notes from release 201802210000Z
+               (1) Added table: ethernetOsa3350MgntCardTable
+               (2) New textual convention: ResyncType
+
+               Notes from release 201802020000Z
+               (1) Added ethernetNTEGE102ProHCardTable and ethernetNTEGE102ProEFMHCardTable
+               (2) Added new literals to NetworkElementType, ShelfType and CardType.
+               
+               Notes from release 201709050000Z
+               (1) add auxPortCardTable
+
+               Notes from release 201708220000Z
+               (1) add ccosa5430, ccosa5440 to NetworkElementType
+               (2) add onerackunit-osa5430, threerackunit-osa5440 to ShelfType
+               (3) add ethernetCSMCardTable
+
+               Notes from release 201705290000Z
+               (1) add osa5401, osa5405 to ShelfType
+               (2) add eth-osa5401, eth-osa5405 to CardType
+               (3) add ethernetNTEOSA5401CardTable
+               (4) add ethernetNTEOSA5405CardTable
+
                Notes from release 201603170000Z
                (1) add ethGe112ProVm to CardType
                (2) add ethGe112ProVmTable
@@ -49,7 +145,7 @@ cmEntityMIB MODULE-IDENTITY
                (1) add bits-x16 bits-x16 to CardType
                (2) add bits16PortCardTable
 
-	       Notes from release 20150519000Z
+           Notes from release 20150519000Z
                1) change the OID of ethernetNTEXG210CCardTable to 55 
                2) change the OID of ethernetGE8SCryptoConnectorCardTable to 56
 
@@ -203,7 +299,7 @@ NetworkElementType ::= TEXTUAL-CONVENTION
                   ccge112proH(31),
                   ccxg210c(32),
                   ccosa5420(33),  -- OSA5420
-                  ccosa5421(34),   -- OSA5421 		  
+                  ccosa5421(34),   -- OSA5421         
                   ccge114g(35),
                   ccge114proVmH(36),
                   ccge114proVmCH(37),
@@ -215,7 +311,18 @@ NetworkElementType ::= TEXTUAL-CONVENTION
                   cccx102Pro30A(43),
                   ccxg116pro(44),
                   ccxg120pro(45),
-                  ccge112proVm(46)
+                  ccge112proVm(46),
+                  ccosa5430(47),  -- OSA5430
+                  ccosa5440(48),   -- OSA5440
+                  ge102proh(49),
+                  ge102proefmh(50),
+                  ccxg116proH(51),
+                  ccgo102ProSM(52),
+                  ccxg118proSH(53),
+                  ccxg118proacSH(54),
+                  ccge114proVmSH(55),
+                  ccge104(56),
+                  ccxg120proSH(57)
                  }
 
 SlotType ::= TEXTUAL-CONVENTION
@@ -293,7 +400,20 @@ ShelfType ::= TEXTUAL-CONVENTION
                   onerackunit-cx102pro30A(43),
                   onerackunit-xg116pro(44),
                   onerackunit-xg120pro(45),
-                  onerackunitGe112ProVm(46)
+                  onerackunitGe112ProVm(46),
+                  osa5401(47),
+                  osa5405(48),
+                  onerackunit-osa5430(49),
+                  threerackunit-osa5440(50),
+                  ge102proh(51),
+                  ge102proefmh(52),
+                  onerackunit-xg116proH(53),
+                  go102proSM(54),
+                  onerackunit-xg118proSH(55),
+                  onerackunit-xg118proacSH(56),
+                  onerackunitGe114ProVmSH(57),
+                  onerackunitGe104(58),
+                  onerackunit-xg120proSH(59)
                  }
 
 ShelfAction ::= TEXTUAL-CONVENTION
@@ -415,9 +535,27 @@ CardType ::= TEXTUAL-CONVENTION
                   osa-ge-4s(78),
                   eth-xg-116pro(79),
                   eth-xg-120pro(80),
-                  ethGe112ProVm(81)
-                 }
-
+                  ethGe112ProVm(81),
+                  eth-osa5401(82),
+                  eth-osa5405(83),
+                  eth-csm(84),
+                  aux-osa(85),            
+                  bits-x16-enhanced(86),  
+                  osa-ge-4s-protected(87),
+                  eth-ge-102pro-h(88),    
+                  eth-ge-102pro-efmh(89), 
+                  eth-xg-116pro-h(90),    
+                  ethgo102proSM(91),      
+                  eth-xg-118pro-sh(92),  
+		  eth-xg-118proac-sh(93),
+                  ethGe114ProVmSH(94),
+                  ethGe104(95),
+                  eth-xg-120pro-sh(96),
+                  irig(97),                   
+                  mb-gnss(98),
+                  composite-clock(99)                   
+                 }                        
+                                          
 CmCPMRLinkLossFwdMode ::= TEXTUAL-CONVENTION
     STATUS  current
     DESCRIPTION
@@ -470,6 +608,35 @@ LLDPEnableAction ::= TEXTUAL-CONVENTION
                 enableLLDPRxOnly(4)  -- set the admin status as Rx Only
             }
 
+LedControlType ::= TEXTUAL-CONVENTION
+    STATUS  current
+    DESCRIPTION
+        "."
+    SYNTAX  INTEGER {
+                notApplicable(0),
+                normal(1),
+                status-led-only(2),
+                all-disabled(3)
+            }
+
+ResyncType ::= TEXTUAL-CONVENTION
+    STATUS         current
+    DESCRIPTION    "Enumerations for Resync Type."
+    SYNTAX INTEGER    {
+        no-action(1),
+        resync-to-pps(2)
+        }
+
+StorageStatus ::= TEXTUAL-CONVENTION
+    STATUS         current
+    DESCRIPTION    "Enumerations for Storage Status."
+    SYNTAX INTEGER    {
+        formatting(1),
+        empty(2),
+        ready(3),
+        unformatted(4),
+        unmounted(5)
+        }
 --
 --NetworkElement
 --
@@ -698,7 +865,8 @@ ShelfEntry ::= SEQUENCE {
     shelfOperationalState    OperationalState,
     shelfSecondaryState      SecondaryState,
     shelfMfgSite             DisplayString,
-    shelfOscillatorType      DisplayString
+    shelfOscillatorType      DisplayString,
+    shelfLedControl          LedControlType
 }
 
 shelfIndex OBJECT-TYPE
@@ -798,6 +966,13 @@ shelfOscillatorType OBJECT-TYPE
               "The mOscillatorType."
     ::= { shelfEntry 12 }
 
+shelfLedControl OBJECT-TYPE
+    SYNTAX   LedControlType
+    MAX-ACCESS   read-write
+    STATUS   current
+    DESCRIPTION
+              "Led Control of the shelf."
+    ::= { shelfEntry 13 }
 
 --
 --Slot
@@ -3377,7 +3552,8 @@ F3UsbHostEntry ::= SEQUENCE {
     f3UsbHostMfgDate             DateAndTime,
     f3UsbHostMfgSite             DisplayString,
     f3UsbHostSecondaryState      SecondaryState,
-    f3UsbHostPhysicalAddress     DisplayString
+    f3UsbHostPhysicalAddress     DisplayString,
+    f3UsbHostMuxOperationalMode  UsbOperationalMode
 }
 
 f3UsbHostIndex OBJECT-TYPE
@@ -3493,6 +3669,13 @@ f3UsbHostPhysicalAddress OBJECT-TYPE
            "This is the inserted usb device's MAC Address, if applicable."
     ::= { f3UsbHostEntry 14 }
 
+f3UsbHostMuxOperationalMode OBJECT-TYPE
+    SYNTAX     UsbOperationalMode
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+         "This object describe the USB operatioan mode."
+     ::= { f3UsbHostEntry 15 }
 
 --
 --Card - Ethernet NTE - GE 112 Card 
@@ -8526,8 +8709,8 @@ Bits16PortCardEntry ::= SEQUENCE {
     bits16PortCardOperationalState           OperationalState,
     bits16PortCardSecondaryState             SecondaryState,
     bits16PortCardRowStatus                  RowStatus,
-    bits16PortCardAlias                      DisplayString
-
+    bits16PortCardAlias                      DisplayString,
+    bits16PortCardTemperature                Integer32
 }
     
 -- bits16PortCard Indices 
@@ -8594,6 +8777,14 @@ bits16PortCardAlias OBJECT-TYPE
             "This object allows SNMP management entities to provide an 
              alias to the BITS 16 Port Expansion Card."
     ::= { bits16PortCardEntry 6 }
+
+bits16PortCardTemperature OBJECT-TYPE
+    SYNTAX  Integer32 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+             "Temperature of the BITS 16 Port Expansion Card"
+    ::= { bits16PortCardEntry 7 }
 
 
 --
@@ -9015,7 +9206,11 @@ ServerCardEntry ::= SEQUENCE {
     serverCardStorageTotal          Integer32,
     serverCardStorageAvailiable     Integer32,
     serverCardHvVersion             DisplayString,
-    serverCardHostName              DisplayString
+    serverCardHostName              DisplayString,
+    serverCardRestartAction         RestartType,
+    serverCardRowStatus             RowStatus,
+    serverCardIgnoreWatchdog        TruthValue
+
 }
 
 serverCardEntityIndex OBJECT-TYPE
@@ -9154,6 +9349,42 @@ serverCardHostName OBJECT-TYPE
              "Hostname of the Server Card."
     ::= { serverCardEntry 17 }
 
+serverCardRestartAction OBJECT-TYPE
+    SYNTAX  RestartType 
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+             "Allows to perform specified action on the VM server card."
+    ::= { serverCardEntry 18 }
+
+serverCardRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+           "The status of this row.  An entry MUST NOT exist in the 
+            active state unless all objects in the entry have an 
+            appropriate value, as described
+            in the description clause for each writable object.
+
+            The values of serverCardRowStatus supported are
+            createAndGo(4) and destroy(6).  All mandatory attributes
+            must be specified in a single SNMP SET request with
+            serverCardRowStatus value as createAndGo(4).
+            Upon successful row creation, this object has a
+            value of active(1).
+
+            The serverCardRowStatus object may be modified if
+            the associated instance of this object is equal to active(1)."
+    ::= { serverCardEntry 19 }
+
+serverCardIgnoreWatchdog OBJECT-TYPE
+    SYNTAX  TruthValue 
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+             "Ignore keep-alive watchdog."
+    ::= { serverCardEntry 20 }
 --
 --  PPS 16 Port Expansion Card (Building Integrated Timing System) 
 --
@@ -10131,8 +10362,8 @@ Ge4PortCardEntry ::= SEQUENCE {
     ge4PortCardOperationalState           OperationalState,
     ge4PortCardSecondaryState             SecondaryState,
     ge4PortCardRowStatus                  RowStatus,
-    ge4PortCardAlias                      DisplayString
-
+    ge4PortCardAlias                      DisplayString,
+    ge4PortCardTemperature                Integer32
 }
     
 -- ge4PortCard Indices 
@@ -10199,6 +10430,14 @@ ge4PortCardAlias OBJECT-TYPE
             "This object allows SNMP management entities to provide an 
              alias to the GE 4 Port Expansion Card."
     ::= { ge4PortCardEntry 6 }
+
+ge4PortCardTemperature OBJECT-TYPE
+    SYNTAX  Integer32 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+             "Temperature of the GE 4 Port Expansion Card."
+    ::= { ge4PortCardEntry 7 }
 
 --
 -- Card - Ethernet NTE - XG116PRO Card 
@@ -10551,6 +10790,1978 @@ ethernetNTEGE112ProVmCardSwitchPortAction OBJECT-TYPE
              "Allows to perform specified action on the Ethernet NTE GE112ProVm card."
     ::= { ethernetNTEGE112ProVmCardEntry 11 }
 
+--
+--Card - Ethernet NTE - OSA5401 
+--
+ethernetNTEOSA5401CardTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF EthernetNTEOSA5401CardEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+         "Contains information on Ethernet NTE OSA5401 Card.
+          These are supported on the OSA5401 product." 
+    ::= { cmEntityObjects 83 }
+
+ethernetNTEOSA5401CardEntry  OBJECT-TYPE
+    SYNTAX      EthernetNTEOSA5401CardEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A conceptual row in the ethernetNTEOSA5401CardTable."
+    INDEX { neIndex, shelfIndex, slotIndex }
+    ::= { ethernetNTEOSA5401CardTable 1 }
+
+EthernetNTEOSA5401CardEntry ::= SEQUENCE {
+    ethernetNTEOSA5401CardEntityIndex             PhysicalIndex,
+    ethernetNTEOSA5401CardAdminState              AdminState,
+    ethernetNTEOSA5401CardOperationalState        OperationalState,
+    ethernetNTEOSA5401CardTableRestartAction      RestartType
+}
+
+ethernetNTEOSA5401CardEntityIndex OBJECT-TYPE
+    SYNTAX  PhysicalIndex 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "Entity Index from ENTITY-MIB for the Ethernet NTE OSA5401 Card."
+    ::= { ethernetNTEOSA5401CardEntry 1 }
+
+ethernetNTEOSA5401CardAdminState OBJECT-TYPE
+    SYNTAX  AdminState 
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+             "Administrative State of the Ethernet NTE OSA5401 Card."
+    ::= { ethernetNTEOSA5401CardEntry 2 }
+
+ethernetNTEOSA5401CardOperationalState OBJECT-TYPE
+    SYNTAX  OperationalState 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+             "Operational State of the Ethernet NTE OSA5401 Card."
+    ::= { ethernetNTEOSA5401CardEntry 3 }
+
+ethernetNTEOSA5401CardTableRestartAction OBJECT-TYPE
+    SYNTAX      RestartType 
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+             "Allows to perform restart action on NTE OSA5401 Card."
+    ::= { ethernetNTEOSA5401CardEntry 4 }
+
+
+--
+--Card - Ethernet NTE - OSA5405
+--
+ethernetNTEOSA5405CardTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF EthernetNTEOSA5405CardEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+         "Contains information on Ethernet NTE OSA5405 Card.
+          These are supported on the OSA5405 product." 
+    ::= { cmEntityObjects 84 }
+
+ethernetNTEOSA5405CardEntry  OBJECT-TYPE
+    SYNTAX      EthernetNTEOSA5405CardEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A conceptual row in the ethernetNTEOSA5405CardTable."
+    INDEX { neIndex, shelfIndex, slotIndex }
+    ::= { ethernetNTEOSA5405CardTable 1 }
+
+EthernetNTEOSA5405CardEntry ::= SEQUENCE {
+    ethernetNTEOSA5405CardEntityIndex             PhysicalIndex,
+    ethernetNTEOSA5405CardAdminState              AdminState,
+    ethernetNTEOSA5405CardOperationalState        OperationalState,
+    ethernetNTEOSA5405CardVoltage                 Integer32,
+    ethernetNTEOSA5405CardTemperature             Integer32,
+    ethernetNTEOSA5405CardTableRestartAction      RestartType
+}
+
+ethernetNTEOSA5405CardEntityIndex OBJECT-TYPE
+    SYNTAX  PhysicalIndex 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "Entity Index from ENTITY-MIB for the Ethernet NTE OSA5405 Card."
+    ::= { ethernetNTEOSA5405CardEntry 1 }
+
+ethernetNTEOSA5405CardAdminState OBJECT-TYPE
+    SYNTAX  AdminState 
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+             "Administrative State of the Ethernet NTE OSA5405 Card."
+    ::= { ethernetNTEOSA5405CardEntry 2 }
+
+ethernetNTEOSA5405CardOperationalState OBJECT-TYPE
+    SYNTAX  OperationalState 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+             "Operational State of the Ethernet NTE OSA5405 Card."
+    ::= { ethernetNTEOSA5405CardEntry 3 }
+
+ethernetNTEOSA5405CardVoltage OBJECT-TYPE
+    SYNTAX  Integer32 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+             "Voltage of the Ethernet NTE OSA5405 Card in mV units."
+    ::= { ethernetNTEOSA5405CardEntry 4 }
+
+ethernetNTEOSA5405CardTemperature OBJECT-TYPE
+    SYNTAX  Integer32 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+             "Temperature of the Ethernet NTE OSA5405 Card."
+    ::= { ethernetNTEOSA5405CardEntry 5 }
+
+ethernetNTEOSA5405CardTableRestartAction OBJECT-TYPE
+    SYNTAX  RestartType 
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+             "Allows to perform restart action on NTE OSA5405 Card."
+    ::= { ethernetNTEOSA5405CardEntry 6 }
+
+--
+--Card - Ethernet NTE - CSM
+--
+ethernetCSMCardTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF EthernetCSMCardEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+         "Contains information on Ethernet CSM Card.
+          These are supported on the OSA5430 and OSA5440 product." 
+    ::= { cmEntityObjects 85 }
+
+ethernetCSMCardEntry  OBJECT-TYPE
+    SYNTAX      EthernetCSMCardEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A conceptual row in the ethernetCSMCardTable."
+    INDEX { neIndex, shelfIndex, slotIndex }
+    ::= { ethernetCSMCardTable 1 }
+
+EthernetCSMCardEntry ::= SEQUENCE {
+    ethernetCSMCardEntityIndex             PhysicalIndex,
+    ethernetCSMCardAdminState              AdminState,
+    ethernetCSMCardOperationalState        OperationalState,
+    ethernetCSMCardSecondaryState          SecondaryState,
+    ethernetCSMCardVoltage                 Integer32,
+    ethernetCSMCardTemperature             Integer32,
+    ethernetCSMCardSnmpDyingGaspEnabled    TruthValue,
+    ethernetCSMCardRestartAction           RestartType,
+    ethernetCSMCardFineGrainedPmInterval   CmPmIntervalType,
+    ethernetCSMCardOscillatorType          DisplayString
+
+}
+
+ethernetCSMCardEntityIndex OBJECT-TYPE
+    SYNTAX  PhysicalIndex 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "Entity Index from ENTITY-MIB for the Ethernet NTE CSM Card."
+    ::= { ethernetCSMCardEntry 1 }
+
+ethernetCSMCardAdminState OBJECT-TYPE
+    SYNTAX  AdminState 
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+             "Administrative State of the Ethernet NTE CSM Card."
+    ::= { ethernetCSMCardEntry 2 }
+
+ethernetCSMCardOperationalState OBJECT-TYPE
+    SYNTAX  OperationalState 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+             "Operational State of the Ethernet NTE CSM Card."
+    ::= { ethernetCSMCardEntry 3 }
+
+ethernetCSMCardSecondaryState OBJECT-TYPE
+    SYNTAX  SecondaryState 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+             "Secondary State of the Ethernet NTE CSM Card."
+    ::= { ethernetCSMCardEntry 4 }
+
+ethernetCSMCardVoltage OBJECT-TYPE
+    SYNTAX  Integer32 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+             "Voltage of the Ethernet NTE CSM Card."
+    ::= { ethernetCSMCardEntry 5 }
+
+ethernetCSMCardTemperature OBJECT-TYPE
+    SYNTAX  Integer32 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+             "Temperature of the Ethernet NTE CSM Card."
+    ::= { ethernetCSMCardEntry 6 }
+
+ethernetCSMCardSnmpDyingGaspEnabled OBJECT-TYPE
+    SYNTAX  TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+          "Whether or not SNMP dying gasp is enabled 
+           on the Ethernet NTE CSM Card."
+    ::= { ethernetCSMCardEntry 7 }
+
+ethernetCSMCardRestartAction OBJECT-TYPE
+    SYNTAX  RestartType 
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+             "Allows to perform specified action on the Ethernet NTE CSM card."
+    ::= { ethernetCSMCardEntry 8 }
+
+ethernetCSMCardFineGrainedPmInterval   OBJECT-TYPE 
+    SYNTAX  CmPmIntervalType 
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+      "Allows specification of the fine-grained PM interval at the card level.
+       This applies to all monitored PM entities. The default value of this
+       attribute is interval-15min.  Valid values are interval-5min and interval-15min.
+       interval-1day and rollover are not considered fine-grained intervals."
+    ::= { ethernetCSMCardEntry 9 }
+
+ethernetCSMCardOscillatorType OBJECT-TYPE
+    SYNTAX   DisplayString (SIZE (0..16))
+    MAX-ACCESS   read-only
+    STATUS   current
+    DESCRIPTION
+              "The mOscillatorType."
+    ::= { ethernetCSMCardEntry 10 }
+
+
+
+--
+--  Auxiliary Port Expansion Card (Building Integrated Timing System) 
+--
+auxPortCardTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AuxPortCardEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A list of entries corresponding to Auxiliary Port Expansion Card 
+             Facilities for configuration purposes."
+    ::= { cmEntityObjects 87 }
+
+auxPortCardEntry OBJECT-TYPE
+    SYNTAX      AuxPortCardEntry 
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A conceptual row in the auxPortCardTable"
+    INDEX { neIndex, shelfIndex, slotIndex }
+    ::= { auxPortCardTable 1 }
+
+AuxPortCardEntry ::= SEQUENCE {
+    -- Port Indices 
+    auxPortCardEntityIndex                PhysicalIndex,
+
+    -- State Management params
+    auxPortCardAdminState                 AdminState,
+    auxPortCardOperationalState           OperationalState,
+    auxPortCardSecondaryState             SecondaryState,
+    auxPortCardRowStatus                  RowStatus,
+    auxPortCardAlias                      DisplayString,
+    auxPortCardTemperature                Integer32
+
+}
+    
+-- auxPortCard Indices 
+
+auxPortCardEntityIndex OBJECT-TYPE
+    SYNTAX      PhysicalIndex 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "Entity Index from ENTITY-MIB for this card"
+    ::= { auxPortCardEntry 1 }
+
+-- State Management params
+auxPortCardAdminState OBJECT-TYPE
+    SYNTAX      AdminState 
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "This object represents the Administrative State of the Auxiliary Port Expansion Card."
+    ::= { auxPortCardEntry 2 }
+
+auxPortCardOperationalState OBJECT-TYPE
+    SYNTAX      OperationalState 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This object represents the Operational State of the Auxiliary Port Expansion Card."
+    ::= { auxPortCardEntry 3 }
+
+auxPortCardSecondaryState OBJECT-TYPE
+    SYNTAX      SecondaryState 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This object represents the Secondary State of the Auxiliary Port Expansion Card."
+    ::= { auxPortCardEntry 4 }
+
+auxPortCardRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+           "The status of this row.  An entry MUST NOT exist in the 
+            active state unless all objects in the entry have an 
+            appropriate value, as described
+            in the description clause for each writable object.
+
+            The values of auxPortCardRowStatus supported are
+            createAndGo(4) and destroy(6).  All mandatory attributes
+            must be specified in a single SNMP SET request with
+            auxPortCardRowStatus value as createAndGo(4).
+            Upon successful row creation, this object has a
+            value of active(1).
+
+            The auxPortCardRowStatus object may be modified if
+            the associated instance of this object is equal to active(1)."
+    ::= { auxPortCardEntry 5 }
+
+auxPortCardAlias OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..256))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "This object allows SNMP management entities to provide an 
+             alias to the Auxiliary Port Expansion Card."
+    ::= { auxPortCardEntry 6 }
+
+auxPortCardTemperature OBJECT-TYPE
+    SYNTAX  Integer32 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+             "Temperature of the Auxiliary Port Expansion Card."
+    ::= { auxPortCardEntry 7 }
+
+
+--
+--Card - Ethernet NTE - GE 102ProH Card 
+--
+ethernetNTEGE102ProHCardTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF EthernetNTEGE102ProHCardEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+         "Contains information on Ethernet NTE GE102 Pro H Cards.
+          These are supported on the FSP150CC GE102 Pro H product." 
+    ::= { cmEntityObjects 88 }
+
+ethernetNTEGE102ProHCardEntry  OBJECT-TYPE
+    SYNTAX      EthernetNTEGE102ProHCardEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A conceptual row in the ethernetNTEGE102ProHCardTable."
+    INDEX { neIndex, shelfIndex, slotIndex }
+    ::= { ethernetNTEGE102ProHCardTable 1 }
+
+EthernetNTEGE102ProHCardEntry ::= SEQUENCE {
+    ethernetNTEGE102ProHCardEntityIndex             PhysicalIndex,
+    ethernetNTEGE102ProHCardAdminState              AdminState,
+    ethernetNTEGE102ProHCardOperationalState        OperationalState,
+    ethernetNTEGE102ProHCardSecondaryState          SecondaryState,
+    ethernetNTEGE102ProHCardVoltage                 Integer32,
+    ethernetNTEGE102ProHCardTemperature             Integer32,
+    ethernetNTEGE102ProHCardSnmpDyingGaspEnabled    TruthValue,
+    ethernetNTEGE102ProHCardRestartAction           RestartType,
+    ethernetNTEGE102ProHCardFineGrainedPmInterval   CmPmIntervalType,
+    ethernetNTEGE102ProHCardSwitchPortActionPort    VariablePointer,
+    ethernetNTEGE102ProHCardSwitchPortAction        SwitchPortAction,
+    ethernetNTEGE102ProHCardPSU1State               OperationalState,
+    ethernetNTEGE102ProHCardPSU2State               OperationalState,
+    ethernetNTEGE102ProHCardFAN1State               OperationalState,
+    ethernetNTEGE102ProHCardFAN2State               OperationalState,
+    ethernetNTEGE102ProHCardPsuType                 PsuType
+}
+
+ethernetNTEGE102ProHCardEntityIndex OBJECT-TYPE
+    SYNTAX  PhysicalIndex 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "Entity Index from ENTITY-MIB for the Ethernet NTE GE102 Pro H Card."
+    ::= { ethernetNTEGE102ProHCardEntry 1 }
+
+ethernetNTEGE102ProHCardAdminState OBJECT-TYPE
+    SYNTAX  AdminState 
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+             "Administrative State of the Ethernet NTE GE102 Pro H Card."
+    ::= { ethernetNTEGE102ProHCardEntry 2 }
+
+ethernetNTEGE102ProHCardOperationalState OBJECT-TYPE
+    SYNTAX  OperationalState 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+             "Operational State of the Ethernet NTE GE102 Pro H Card."
+    ::= { ethernetNTEGE102ProHCardEntry 3 }
+
+ethernetNTEGE102ProHCardSecondaryState OBJECT-TYPE
+    SYNTAX  SecondaryState 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+             "Secondary State of the Ethernet NTE GE102 Pro H Card."
+    ::= { ethernetNTEGE102ProHCardEntry 4 }
+
+ethernetNTEGE102ProHCardVoltage OBJECT-TYPE
+    SYNTAX  Integer32 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+             "Voltage of the Ethernet NTE GE102 Pro H Card."
+    ::= { ethernetNTEGE102ProHCardEntry 5 }
+
+ethernetNTEGE102ProHCardTemperature OBJECT-TYPE
+    SYNTAX  Integer32 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+             "Temperature of the Ethernet NTE GE102 Pro H Card."
+    ::= { ethernetNTEGE102ProHCardEntry 6 }
+
+ethernetNTEGE102ProHCardSnmpDyingGaspEnabled OBJECT-TYPE
+    SYNTAX  TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+          "Whether or not SNMP dying gasp is enabled 
+           on the Ethernet NTE GE102 Pro H Card."
+    ::= { ethernetNTEGE102ProHCardEntry 7 }
+
+ethernetNTEGE102ProHCardRestartAction OBJECT-TYPE
+    SYNTAX  RestartType 
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+             "Allows to perform specified action on the Ethernet NTE GE102 Pro H card."
+    ::= { ethernetNTEGE102ProHCardEntry 8 }
+
+ethernetNTEGE102ProHCardFineGrainedPmInterval   OBJECT-TYPE 
+    SYNTAX  CmPmIntervalType 
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+             "Allows specification of the fine-grained PM interval at the card level.
+              This applies to all monitored PM entities. The default value of this
+              attribute is interval-15min.  Valid values are interval-5min and interval-15min.
+              interval-1day and rollover are not considered fine-grained intervals."
+    ::= { ethernetNTEGE102ProHCardEntry 9 }
+
+ethernetNTEGE102ProHCardSwitchPortActionPort OBJECT-TYPE
+    SYNTAX  VariablePointer
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+             "Which port to perform specified switch action on the Ethernet NTE GE102 Pro H card."
+    ::= { ethernetNTEGE102ProHCardEntry 10 }
+
+ethernetNTEGE102ProHCardSwitchPortAction OBJECT-TYPE
+    SYNTAX  SwitchPortAction
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+             "Allows to perform specified action on the Ethernet NTE GE102 Pro H card."
+    ::= { ethernetNTEGE102ProHCardEntry 11 }
+
+ethernetNTEGE102ProHCardPSU1State OBJECT-TYPE
+    SYNTAX  OperationalState 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+         "Operational State of Power Supply Unit 1 on Ethernet NTE GE102Pro H card."
+    ::= { ethernetNTEGE102ProHCardEntry 12 }
+
+ethernetNTEGE102ProHCardPSU2State OBJECT-TYPE
+    SYNTAX  OperationalState 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+         "Operational State of Power Supply Unit 2 on Ethernet NTE GE102Pro H card."
+    ::= { ethernetNTEGE102ProHCardEntry 13 }
+
+ethernetNTEGE102ProHCardFAN1State OBJECT-TYPE
+    SYNTAX  OperationalState 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+         "Operational State of FAN 1 on Ethernet NTE GE102Pro H card."
+    ::= { ethernetNTEGE102ProHCardEntry 14 }
+
+ethernetNTEGE102ProHCardFAN2State OBJECT-TYPE
+    SYNTAX  OperationalState 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+         "Operational State of FAN 2 on Ethernet NTE GE102Pro H card."
+    ::= { ethernetNTEGE102ProHCardEntry 15 }
+
+ethernetNTEGE102ProHCardPsuType OBJECT-TYPE
+    SYNTAX  PsuType 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+         "PSU Type on Ethernet NTE GE102Pro H card."
+    ::= { ethernetNTEGE102ProHCardEntry 16 }
+
+
+--
+--Card - Ethernet NTE - GE 102ProEFMH Card 
+--
+ethernetNTEGE102ProEFMHCardTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF EthernetNTEGE102ProEFMHCardEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+         "Contains information on Ethernet NTE GE102 Pro EFMH Cards.
+          These are supported on the FSP150CC GE102 Pro EFMH product." 
+    ::= { cmEntityObjects 89 }
+
+ethernetNTEGE102ProEFMHCardEntry  OBJECT-TYPE
+    SYNTAX      EthernetNTEGE102ProEFMHCardEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A conceptual row in the ethernetNTEGE102ProEFMHCardTable."
+    INDEX { neIndex, shelfIndex, slotIndex }
+    ::= { ethernetNTEGE102ProEFMHCardTable 1 }
+
+EthernetNTEGE102ProEFMHCardEntry ::= SEQUENCE {
+    ethernetNTEGE102ProEFMHCardEntityIndex             PhysicalIndex,
+    ethernetNTEGE102ProEFMHCardAdminState              AdminState,
+    ethernetNTEGE102ProEFMHCardOperationalState        OperationalState,
+    ethernetNTEGE102ProEFMHCardSecondaryState          SecondaryState,
+    ethernetNTEGE102ProEFMHCardVoltage                 Integer32,
+    ethernetNTEGE102ProEFMHCardTemperature             Integer32,
+    ethernetNTEGE102ProEFMHCardRestartAction           RestartType,
+    ethernetNTEGE102ProEFMHCardPSU1State               OperationalState,
+    ethernetNTEGE102ProEFMHCardPSU2State               OperationalState,
+    ethernetNTEGE102ProEFMHCardFAN1State               OperationalState,
+    ethernetNTEGE102ProEFMHCardFAN2State               OperationalState,
+    ethernetNTEGE102ProEFMHCardPsuType                 PsuType,
+    ethernetNTEGE102ProEFMHCardLLFMode                 CmCPMRLinkLossFwdMode,
+    ethernetNTEGE102ProEFMHCardLLFModeAction           CmCPMRLinkLossFwdMode
+}
+
+ethernetNTEGE102ProEFMHCardEntityIndex OBJECT-TYPE
+    SYNTAX  PhysicalIndex 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "Entity Index from ENTITY-MIB for the Ethernet NTE GE102 Pro EFMH Card."
+    ::= { ethernetNTEGE102ProEFMHCardEntry 1 }
+
+ethernetNTEGE102ProEFMHCardAdminState OBJECT-TYPE
+    SYNTAX  AdminState 
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+             "Administrative State of the Ethernet NTE GE102 Pro EFMH Card."
+    ::= { ethernetNTEGE102ProEFMHCardEntry 2 }
+
+ethernetNTEGE102ProEFMHCardOperationalState OBJECT-TYPE
+    SYNTAX  OperationalState 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+             "Operational State of the Ethernet NTE GE102 Pro EFMH Card."
+    ::= { ethernetNTEGE102ProEFMHCardEntry 3 }
+
+ethernetNTEGE102ProEFMHCardSecondaryState OBJECT-TYPE
+    SYNTAX  SecondaryState 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+             "Secondary State of the Ethernet NTE GE102 Pro EFMHCard."
+    ::= { ethernetNTEGE102ProEFMHCardEntry 4 }
+
+ethernetNTEGE102ProEFMHCardVoltage OBJECT-TYPE
+    SYNTAX  Integer32 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+             "Voltage of the Ethernet NTE GE102 Pro EFMH Card."
+    ::= { ethernetNTEGE102ProEFMHCardEntry 5 }
+
+ethernetNTEGE102ProEFMHCardTemperature OBJECT-TYPE
+    SYNTAX  Integer32 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+             "Temperature of the Ethernet NTE GE102 Pro EFMH Card."
+    ::= { ethernetNTEGE102ProEFMHCardEntry 6 }
+
+ethernetNTEGE102ProEFMHCardRestartAction OBJECT-TYPE
+    SYNTAX  RestartType 
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+             "Allows to perform specified action on the Ethernet NTE GE102Pro EFMH card."
+    ::= { ethernetNTEGE102ProEFMHCardEntry 7 }
+
+ethernetNTEGE102ProEFMHCardPSU1State OBJECT-TYPE
+    SYNTAX  OperationalState 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+         "Operational State of Power Supply Unit 1 on Ethernet NTE GE102Pro EFMH card."
+    ::= { ethernetNTEGE102ProEFMHCardEntry 8 }
+
+ethernetNTEGE102ProEFMHCardPSU2State OBJECT-TYPE
+    SYNTAX  OperationalState 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+         "Operational State of Power Supply Unit 2 on Ethernet NTE GE102Pro EFMH card."
+    ::= { ethernetNTEGE102ProEFMHCardEntry 9 }
+
+ethernetNTEGE102ProEFMHCardFAN1State OBJECT-TYPE
+    SYNTAX  OperationalState 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+         "Operational State of FAN 1 on Ethernet NTE GE102Pro EFMH card."
+    ::= { ethernetNTEGE102ProEFMHCardEntry 10 }
+
+ethernetNTEGE102ProEFMHCardFAN2State OBJECT-TYPE
+    SYNTAX  OperationalState 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+         "Operational State of FAN 2 on Ethernet NTE GE102Pro EFMH card."
+    ::= { ethernetNTEGE102ProEFMHCardEntry 11 }
+
+ethernetNTEGE102ProEFMHCardPsuType OBJECT-TYPE
+    SYNTAX  PsuType 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+         "PSU Type on Ethernet NTE GE102Pro EFMH card."
+    ::= { ethernetNTEGE102ProEFMHCardEntry 12 }
+
+ethernetNTEGE102ProEFMHCardLLFMode OBJECT-TYPE
+    SYNTAX      CmCPMRLinkLossFwdMode 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+         "Current Link Loss Forwarding Mode on CPMR."
+    ::= { ethernetNTEGE102ProEFMHCardEntry 13 }
+
+ethernetNTEGE102ProEFMHCardLLFModeAction OBJECT-TYPE
+    SYNTAX      CmCPMRLinkLossFwdMode 
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+         "Operation to set the appropriate mode on CPMR."
+    ::= { ethernetNTEGE102ProEFMHCardEntry 14 }
+
+--  Management Card for OSA3350
+
+ethernetOsa3350MgntCardTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF EthernetOsa3350MgntCardEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+         "Contains information on Ethernet Osa3350 Mgnt Cards." 
+    ::= { cmEntityObjects 90 }
+
+ethernetOsa3350MgntCardEntry  OBJECT-TYPE
+    SYNTAX      EthernetOsa3350MgntCardEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A conceptual row in the ethernetOsa3350MgntCardTable."
+    INDEX { neIndex, shelfIndex, slotIndex }
+    ::= { ethernetOsa3350MgntCardTable 1 }
+
+EthernetOsa3350MgntCardEntry ::= SEQUENCE {
+    ethernetOsa3350MgntCardEntityIndex             PhysicalIndex,
+    ethernetOsa3350MgntCardAdminState              AdminState,
+    ethernetOsa3350MgntCardOperationalState        OperationalState,
+    ethernetOsa3350MgntCardSecondaryState          SecondaryState,
+    ethernetOsa3350MgntCardRestartAction           RestartType,
+    ethernetOsa3350MgntCardResyncAction            ResyncType
+}
+
+ethernetOsa3350MgntCardEntityIndex OBJECT-TYPE
+    SYNTAX  PhysicalIndex 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "Entity Index from ENTITY-MIB for the Ethernet Osa3350 Mgnt Card."
+    ::= { ethernetOsa3350MgntCardEntry 1 }
+
+ethernetOsa3350MgntCardAdminState OBJECT-TYPE
+    SYNTAX  AdminState 
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+             "Administrative State of the Ethernet Osa3350 Mgnt Card."
+    ::= { ethernetOsa3350MgntCardEntry 2 }
+
+ethernetOsa3350MgntCardOperationalState OBJECT-TYPE
+    SYNTAX  OperationalState 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+             "Operational State of the Ethernet Osa3350 Mgnt Card."
+    ::= { ethernetOsa3350MgntCardEntry 3 }
+
+ethernetOsa3350MgntCardSecondaryState OBJECT-TYPE
+    SYNTAX  SecondaryState 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+             "Secondary State of the Ethernet Osa3350 Mgnt Card."
+    ::= { ethernetOsa3350MgntCardEntry 4 }
+
+ethernetOsa3350MgntCardRestartAction OBJECT-TYPE
+    SYNTAX  RestartType 
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+             "Allows to perform specified restart action on the 
+              Ethernet Osa3350 Mgnt card."
+    ::= { ethernetOsa3350MgntCardEntry 5 }
+
+ethernetOsa3350MgntCardResyncAction OBJECT-TYPE
+    SYNTAX  ResyncType 
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+             "Allows to perform specified resync action on the 
+              Ethernet Osa3350 Mgnt card."
+    ::= { ethernetOsa3350MgntCardEntry 6 }
+
+--
+-- Card - Ethernet NTE - XG116PRO (H) Card 
+--
+ethernetNTEXG116PROHCardTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF EthernetNTEXG116PROHCardEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+         "Contains information on Ethernet NTE XG116PRO (H) Card.
+          These are supported on the FSP150CC XG116PRO (H) product." 
+    ::= { cmEntityObjects 91 }
+
+ethernetNTEXG116PROHCardEntry  OBJECT-TYPE
+    SYNTAX      EthernetNTEXG116PROHCardEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A conceptual row in the ethernetNTEXG116PROHCardTable."
+    INDEX { neIndex, shelfIndex, slotIndex }
+    ::= { ethernetNTEXG116PROHCardTable 1 }
+
+EthernetNTEXG116PROHCardEntry ::= SEQUENCE {
+    ethernetNTEXG116PROHCardEntityIndex             PhysicalIndex,
+    ethernetNTEXG116PROHCardAdminState              AdminState,
+    ethernetNTEXG116PROHCardOperationalState        OperationalState,
+    ethernetNTEXG116PROHCardSecondaryState          SecondaryState,
+    ethernetNTEXG116PROHCardVoltage                 Integer32,
+    ethernetNTEXG116PROHCardTemperature             Integer32,
+    ethernetNTEXG116PROHCardSnmpDyingGaspEnabled    TruthValue,
+    ethernetNTEXG116PROHCardRestartAction           RestartType,
+    ethernetNTEXG116PROHCardFineGrainedPmInterval   CmPmIntervalType
+}
+
+ethernetNTEXG116PROHCardEntityIndex OBJECT-TYPE
+    SYNTAX  PhysicalIndex 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+           "Entity Index from ENTITY-MIB for the Ethernet NTE XG116PRO (H) Card."
+    ::= { ethernetNTEXG116PROHCardEntry 1 }
+
+ethernetNTEXG116PROHCardAdminState OBJECT-TYPE
+    SYNTAX  AdminState 
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+             "Administrative State of the Ethernet NTE XG116PRO (H) Card."
+    ::= { ethernetNTEXG116PROHCardEntry 2 }
+
+ethernetNTEXG116PROHCardOperationalState OBJECT-TYPE
+    SYNTAX  OperationalState 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+             "Operational State of the Ethernet NTE XG116PRO (H) Card."
+    ::= { ethernetNTEXG116PROHCardEntry 3 }
+
+ethernetNTEXG116PROHCardSecondaryState OBJECT-TYPE
+    SYNTAX  SecondaryState 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+             "Secondary State of the Ethernet NTE XG116PRO (H) Card."
+    ::= { ethernetNTEXG116PROHCardEntry 4 }
+
+ethernetNTEXG116PROHCardVoltage OBJECT-TYPE
+    SYNTAX  Integer32 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+             "Voltage of the Ethernet NTE XG116PRO (H) Card."
+    ::= { ethernetNTEXG116PROHCardEntry 5 }
+
+ethernetNTEXG116PROHCardTemperature OBJECT-TYPE
+    SYNTAX  Integer32 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+             "Temperature of the Ethernet NTE XG116PRO (H) Card."
+    ::= { ethernetNTEXG116PROHCardEntry 6 }
+
+ethernetNTEXG116PROHCardSnmpDyingGaspEnabled OBJECT-TYPE
+    SYNTAX  TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+          "Whether or not SNMP dying gasp is enabled 
+           on the Ethernet NTE XG116PRO (H) Card."
+    ::= { ethernetNTEXG116PROHCardEntry 7 }
+
+ethernetNTEXG116PROHCardRestartAction OBJECT-TYPE
+    SYNTAX  RestartType 
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+             "Allows to perform specified action on the 
+              Ethernet NTE XG116PRO (H) card."
+    ::= { ethernetNTEXG116PROHCardEntry 8 }
+
+ethernetNTEXG116PROHCardFineGrainedPmInterval   OBJECT-TYPE 
+    SYNTAX  CmPmIntervalType 
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+             "Allows specification of the fine-grained PM interval at the 
+              card level.  This applies to all monitored PM entities. 
+              The default value of this attribute is interval-15min.  
+              Valid values are interval-5min and interval-15min.
+              interval-1day and rollover are not considered 
+              fine-grained intervals."
+    ::= { ethernetNTEXG116PROHCardEntry 9 }
+
+
+--
+--Card - Ethernet NTE - GO102Pro-S Mini Card 
+--
+ethernetNTEGO102ProSMCardTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF EthernetNTEGO102ProSMCardEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+         "Contains information on Ethernet NTE Pro GO102Pro-S Mini Cards.
+          These are supported on the FSP150CC GO102Pro-S Mini product." 
+    ::= { cmEntityObjects 92 }
+
+ethernetNTEGO102ProSMCardEntry  OBJECT-TYPE
+    SYNTAX      EthernetNTEGO102ProSMCardEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A conceptual row in the ethernetNTEGO102ProSMCardTable."
+    INDEX { neIndex, shelfIndex, slotIndex }
+    ::= { ethernetNTEGO102ProSMCardTable 1 }
+
+EthernetNTEGO102ProSMCardEntry ::= SEQUENCE {
+    ethernetNTEGO102ProSMCardEntityIndex             PhysicalIndex,
+    ethernetNTEGO102ProSMCardAdminState              AdminState,
+    ethernetNTEGO102ProSMCardOperationalState        OperationalState,
+    ethernetNTEGO102ProSMCardSecondaryState          SecondaryState,
+    ethernetNTEGO102ProSMCardVoltage                 Integer32,
+    ethernetNTEGO102ProSMCardTemperature             Integer32,
+    ethernetNTEGO102ProSMCardSnmpDyingGaspEnabled    TruthValue,
+    ethernetNTEGO102ProSMCardRestartAction           RestartType,
+    ethernetNTEGO102ProSMCardFineGrainedPmInterval   CmPmIntervalType,
+    ethernetNTEGO102ProSMCardSwitchPortActionPort    VariablePointer,
+    ethernetNTEGO102ProSMCardSwitchPortAction        SwitchPortAction
+}
+
+ethernetNTEGO102ProSMCardEntityIndex OBJECT-TYPE
+    SYNTAX  PhysicalIndex 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "Entity Index from ENTITY-MIB for the Ethernet NTE GO102Pro-SM Card."
+    ::= { ethernetNTEGO102ProSMCardEntry 1 }
+
+ethernetNTEGO102ProSMCardAdminState OBJECT-TYPE
+    SYNTAX  AdminState 
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+             "Administrative State of the Ethernet NTE GO102Pro-SM Card."
+    ::= { ethernetNTEGO102ProSMCardEntry 2 }
+
+ethernetNTEGO102ProSMCardOperationalState OBJECT-TYPE
+    SYNTAX  OperationalState 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+             "Operational State of the Ethernet NTE GO102Pro-SM Card."
+    ::= { ethernetNTEGO102ProSMCardEntry 3 }
+
+ethernetNTEGO102ProSMCardSecondaryState OBJECT-TYPE
+    SYNTAX  SecondaryState 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+             "Secondary State of the Ethernet NTE GO102Pro-SM Card."
+    ::= { ethernetNTEGO102ProSMCardEntry 4 }
+
+ethernetNTEGO102ProSMCardVoltage OBJECT-TYPE
+    SYNTAX  Integer32 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+             "Voltage of the Ethernet NTE GO102Pro-SM Card."
+    ::= { ethernetNTEGO102ProSMCardEntry 5 }
+
+ethernetNTEGO102ProSMCardTemperature OBJECT-TYPE
+    SYNTAX  Integer32 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+             "Temperature of the Ethernet NTE GO102Pro-SM Card."
+    ::= { ethernetNTEGO102ProSMCardEntry 6 }
+
+ethernetNTEGO102ProSMCardSnmpDyingGaspEnabled OBJECT-TYPE
+    SYNTAX  TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+          "Whether or not SNMP dying gasp is enabled 
+           on the Ethernet NTE GO102Pro-SM Card."
+    ::= { ethernetNTEGO102ProSMCardEntry 7 }
+
+ethernetNTEGO102ProSMCardRestartAction OBJECT-TYPE
+    SYNTAX  RestartType 
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+             "Allows to perform specified action on the Ethernet NTE GO102Pro-SM card."
+    ::= { ethernetNTEGO102ProSMCardEntry 8 }
+
+ethernetNTEGO102ProSMCardFineGrainedPmInterval   OBJECT-TYPE 
+    SYNTAX  CmPmIntervalType 
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+             "Allows specification of the fine-grained PM interval at the card level.
+              This applies to all monitored PM entities. The default value of this
+              attribute is interval-15min.  Valid values are interval-5min and interval-15min.
+              interval-1day and rollover are not considered fine-grained intervals."
+    ::= { ethernetNTEGO102ProSMCardEntry 9 }
+
+ethernetNTEGO102ProSMCardSwitchPortActionPort OBJECT-TYPE
+    SYNTAX  VariablePointer
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+             "Which port to perform specified switch action on the Ethernet NTE GO102Pro-SM card."
+    ::= { ethernetNTEGO102ProSMCardEntry 10 }
+
+ethernetNTEGO102ProSMCardSwitchPortAction OBJECT-TYPE
+    SYNTAX  SwitchPortAction
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+             "Allows to perform specified action on the Ethernet NTE GO102Pro-SM card."
+    ::= { ethernetNTEGO102ProSMCardEntry 11 }
+
+
+--
+-- Card - Ethernet NTE - XG118PRO (SH) Card 
+--
+ethernetNTEXG118PROSHCardTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF EthernetNTEXG118PROSHCardEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+         "Contains information on Ethernet NTE XG118PRO (SH) Card.
+          These are supported on the FSP150CC XG118PRO (SH) product." 
+    ::= { cmEntityObjects 93 }
+
+ethernetNTEXG118PROSHCardEntry  OBJECT-TYPE
+    SYNTAX      EthernetNTEXG118PROSHCardEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A conceptual row in the ethernetNTEXG118PROSHCardTable."
+    INDEX { neIndex, shelfIndex, slotIndex }
+    ::= { ethernetNTEXG118PROSHCardTable 1 }
+
+EthernetNTEXG118PROSHCardEntry ::= SEQUENCE {
+    ethernetNTEXG118PROSHCardEntityIndex             PhysicalIndex,
+    ethernetNTEXG118PROSHCardAdminState              AdminState,
+    ethernetNTEXG118PROSHCardOperationalState        OperationalState,
+    ethernetNTEXG118PROSHCardSecondaryState          SecondaryState,
+    ethernetNTEXG118PROSHCardVoltage                 Integer32,
+    ethernetNTEXG118PROSHCardTemperature             Integer32,
+    ethernetNTEXG118PROSHCardSnmpDyingGaspEnabled    TruthValue,
+    ethernetNTEXG118PROSHCardRestartAction           RestartType,
+    ethernetNTEXG118PROSHCardFineGrainedPmInterval   CmPmIntervalType
+}
+
+ethernetNTEXG118PROSHCardEntityIndex OBJECT-TYPE
+    SYNTAX  PhysicalIndex 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+           "Entity Index from ENTITY-MIB for the Ethernet NTE XG118PRO (SH) Card."
+    ::= { ethernetNTEXG118PROSHCardEntry 1 }
+
+ethernetNTEXG118PROSHCardAdminState OBJECT-TYPE
+    SYNTAX  AdminState 
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+             "Administrative State of the Ethernet NTE XG118PRO (SH) Card."
+    ::= { ethernetNTEXG118PROSHCardEntry 2 }
+
+ethernetNTEXG118PROSHCardOperationalState OBJECT-TYPE
+    SYNTAX  OperationalState 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+             "Operational State of the Ethernet NTE XG118PRO (SH) Card."
+    ::= { ethernetNTEXG118PROSHCardEntry 3 }
+
+ethernetNTEXG118PROSHCardSecondaryState OBJECT-TYPE
+    SYNTAX  SecondaryState 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+             "Secondary State of the Ethernet NTE XG118PRO (SH) Card."
+    ::= { ethernetNTEXG118PROSHCardEntry 4 }
+
+ethernetNTEXG118PROSHCardVoltage OBJECT-TYPE
+    SYNTAX  Integer32 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+             "Voltage of the Ethernet NTE XG118PRO (SH) Card."
+    ::= { ethernetNTEXG118PROSHCardEntry 5 }
+
+ethernetNTEXG118PROSHCardTemperature OBJECT-TYPE
+    SYNTAX  Integer32 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+             "Temperature of the Ethernet NTE XG118PRO (SH) Card."
+    ::= { ethernetNTEXG118PROSHCardEntry 6 }
+
+ethernetNTEXG118PROSHCardSnmpDyingGaspEnabled OBJECT-TYPE
+    SYNTAX  TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+          "Whether or not SNMP dying gasp is enabled 
+           on the Ethernet NTE XG118PRO (SH) Card."
+    ::= { ethernetNTEXG118PROSHCardEntry 7 }
+
+ethernetNTEXG118PROSHCardRestartAction OBJECT-TYPE
+    SYNTAX  RestartType 
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+             "Allows to perform specified action on the 
+              Ethernet NTE XG118PRO (SH) card."
+    ::= { ethernetNTEXG118PROSHCardEntry 8 }
+
+ethernetNTEXG118PROSHCardFineGrainedPmInterval   OBJECT-TYPE 
+    SYNTAX  CmPmIntervalType 
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+             "Allows specification of the fine-grained PM interval at the 
+              card level.  This applies to all monitored PM entities. 
+              The default value of this attribute is interval-15min.  
+              Valid values are interval-5min and interval-15min.
+              interval-1day and rollover are not considered 
+              fine-grained intervals."
+    ::= { ethernetNTEXG118PROSHCardEntry 9 }
+
+--
+-- Card - Ethernet NTE - XG118PROAC (SH) Card 
+--
+ethernetNTEXG118PROACSHCardTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF EthernetNTEXG118PROACSHCardEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+         "Contains information on Ethernet NTE XG118PROAC (SH) Card.
+          These are supported on the FSP150CC XG118PROAC (SH) product." 
+    ::= { cmEntityObjects 94 }
+
+ethernetNTEXG118PROACSHCardEntry  OBJECT-TYPE
+    SYNTAX      EthernetNTEXG118PROACSHCardEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A conceptual row in the ethernetNTEXG118PROACSHCardTable."
+    INDEX { neIndex, shelfIndex, slotIndex }
+    ::= { ethernetNTEXG118PROACSHCardTable 1 }
+
+EthernetNTEXG118PROACSHCardEntry ::= SEQUENCE {
+    ethernetNTEXG118PROACSHCardEntityIndex             PhysicalIndex,
+    ethernetNTEXG118PROACSHCardAdminState              AdminState,
+    ethernetNTEXG118PROACSHCardOperationalState        OperationalState,
+    ethernetNTEXG118PROACSHCardSecondaryState          SecondaryState,
+    ethernetNTEXG118PROACSHCardVoltage                 Integer32,
+    ethernetNTEXG118PROACSHCardTemperature             Integer32,
+    ethernetNTEXG118PROACSHCardSnmpDyingGaspEnabled    TruthValue,
+    ethernetNTEXG118PROACSHCardRestartAction           RestartType,
+    ethernetNTEXG118PROACSHCardFineGrainedPmInterval   CmPmIntervalType
+}
+
+ethernetNTEXG118PROACSHCardEntityIndex OBJECT-TYPE
+    SYNTAX  PhysicalIndex 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION 
+           "Entity Index from ENTITY-MIB for the Ethernet NTE XG118PROAC (SH) Card."
+    ::= { ethernetNTEXG118PROACSHCardEntry 1 }
+
+ethernetNTEXG118PROACSHCardAdminState OBJECT-TYPE
+    SYNTAX  AdminState 
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+             "Administrative State of the Ethernet NTE XG118PROAC (SH) Card."
+    ::= { ethernetNTEXG118PROACSHCardEntry 2 }
+
+ethernetNTEXG118PROACSHCardOperationalState OBJECT-TYPE
+    SYNTAX  OperationalState 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+             "Operational State of the Ethernet NTE XG118PROAC (SH) Card."
+    ::= { ethernetNTEXG118PROACSHCardEntry 3 }
+
+ethernetNTEXG118PROACSHCardSecondaryState OBJECT-TYPE
+    SYNTAX  SecondaryState 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+             "Secondary State of the Ethernet NTE XG118PROAC (SH) Card."
+    ::= { ethernetNTEXG118PROACSHCardEntry 4 }
+
+ethernetNTEXG118PROACSHCardVoltage OBJECT-TYPE
+    SYNTAX  Integer32 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+             "Voltage of the Ethernet NTE XG118PROAC (SH) Card."
+    ::= { ethernetNTEXG118PROACSHCardEntry 5 }
+
+ethernetNTEXG118PROACSHCardTemperature OBJECT-TYPE
+    SYNTAX  Integer32 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+             "Temperature of the Ethernet NTE XG118PROAC (SH) Card."
+    ::= { ethernetNTEXG118PROACSHCardEntry 6 }
+
+ethernetNTEXG118PROACSHCardSnmpDyingGaspEnabled OBJECT-TYPE
+    SYNTAX  TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+          "Whether or not SNMP dying gasp is enabled 
+           on the Ethernet NTE XG118PROAC (SH) Card."
+    ::= { ethernetNTEXG118PROACSHCardEntry 7 }
+
+ethernetNTEXG118PROACSHCardRestartAction OBJECT-TYPE
+    SYNTAX  RestartType 
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+             "Allows to perform specified action on the 
+              Ethernet NTE XG118PROAC (SH) card."
+    ::= { ethernetNTEXG118PROACSHCardEntry 8 }
+
+ethernetNTEXG118PROACSHCardFineGrainedPmInterval   OBJECT-TYPE 
+    SYNTAX  CmPmIntervalType 
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+             "Allows specification of the fine-grained PM interval at the 
+              card level.  This applies to all monitored PM entities. 
+              The default value of this attribute is interval-15min.  
+              Valid values are interval-5min and interval-15min.
+              interval-1day and rollover are not considered 
+              fine-grained intervals."
+    ::= { ethernetNTEXG118PROACSHCardEntry 9 }
+
+--
+--Card - Ethernet NTE - GE 114ProVM-CH Card 
+--
+ethernetNTEGE114ProVmSHCardTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF EthernetNTEGE114ProVmSHCardEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+         "Contains information on Ethernet NTE GE114 Pro VM-CH Cards.
+          These are supported on the FSP150CC GE114 Pro VM-CH product." 
+    ::= { cmEntityObjects 95 }
+
+ethernetNTEGE114ProVmSHCardEntry  OBJECT-TYPE
+    SYNTAX      EthernetNTEGE114ProVmSHCardEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A conceptual row in the ethernetNTEGE114ProVmSHCardTable."
+    INDEX { neIndex, shelfIndex, slotIndex }
+    ::= { ethernetNTEGE114ProVmSHCardTable 1 }
+
+EthernetNTEGE114ProVmSHCardEntry ::= SEQUENCE {
+    ethernetNTEGE114ProVmSHCardEntityIndex             PhysicalIndex,
+    ethernetNTEGE114ProVmSHCardAdminState              AdminState,
+    ethernetNTEGE114ProVmSHCardOperationalState        OperationalState,
+    ethernetNTEGE114ProVmSHCardSecondaryState          SecondaryState,
+    ethernetNTEGE114ProVmSHCardVoltage                 Integer32,
+    ethernetNTEGE114ProVmSHCardTemperature             Integer32,
+    ethernetNTEGE114ProVmSHCardSnmpDyingGaspEnabled    TruthValue,
+    ethernetNTEGE114ProVmSHCardRestartAction           RestartType,
+    ethernetNTEGE114ProVmSHCardFineGrainedPmInterval   CmPmIntervalType,
+    ethernetNTEGE114ProVmSHCardSwitchPortActionPort    VariablePointer,
+    ethernetNTEGE114ProVmSHCardSwitchPortAction        SwitchPortAction
+}
+
+ethernetNTEGE114ProVmSHCardEntityIndex OBJECT-TYPE
+    SYNTAX  PhysicalIndex 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "Entity Index from ENTITY-MIB for the Ethernet NTE GE114 Pro VM-CH Card."
+    ::= { ethernetNTEGE114ProVmSHCardEntry 1 }
+
+ethernetNTEGE114ProVmSHCardAdminState OBJECT-TYPE
+    SYNTAX  AdminState 
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+             "Administrative State of the Ethernet NTE GE114 Pro VM-CH Card."
+    ::= { ethernetNTEGE114ProVmSHCardEntry 2 }
+
+ethernetNTEGE114ProVmSHCardOperationalState OBJECT-TYPE
+    SYNTAX  OperationalState 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+             "Operational State of the Ethernet NTE GE114ProVmSH Card."
+    ::= { ethernetNTEGE114ProVmSHCardEntry 3 }
+
+ethernetNTEGE114ProVmSHCardSecondaryState OBJECT-TYPE
+    SYNTAX  SecondaryState 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+             "Secondary State of the Ethernet NTE GE114ProVmSH Card."
+    ::= { ethernetNTEGE114ProVmSHCardEntry 4 }
+
+ethernetNTEGE114ProVmSHCardVoltage OBJECT-TYPE
+    SYNTAX  Integer32 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+             "Voltage of the Ethernet NTE GE114ProVmSH Card."
+    ::= { ethernetNTEGE114ProVmSHCardEntry 5 }
+
+ethernetNTEGE114ProVmSHCardTemperature OBJECT-TYPE
+    SYNTAX  Integer32 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+             "Temperature of the Ethernet NTE GE114ProVmSH Card."
+    ::= { ethernetNTEGE114ProVmSHCardEntry 6 }
+
+ethernetNTEGE114ProVmSHCardSnmpDyingGaspEnabled OBJECT-TYPE
+    SYNTAX  TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+          "Whether or not SNMP dying gasp is enabled 
+           on the Ethernet NTE GE114ProVmSH Card."
+    ::= { ethernetNTEGE114ProVmSHCardEntry 7 }
+
+ethernetNTEGE114ProVmSHCardRestartAction OBJECT-TYPE
+    SYNTAX  RestartType 
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+             "Allows to perform specified action on the Ethernet NTE GE114ProVmSH card."
+    ::= { ethernetNTEGE114ProVmSHCardEntry 8 }
+
+ethernetNTEGE114ProVmSHCardFineGrainedPmInterval   OBJECT-TYPE 
+    SYNTAX  CmPmIntervalType 
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+             "Allows specification of the fine-grained PM interval at the card level.
+              This applies to all monitored PM entities. The default value of this
+              attribute is interval-15min.  Valid values are interval-5min and interval-15min.
+              interval-1day and rollover are not considered fine-grained intervals."
+    ::= { ethernetNTEGE114ProVmSHCardEntry 9 }
+
+ethernetNTEGE114ProVmSHCardSwitchPortActionPort OBJECT-TYPE
+    SYNTAX  VariablePointer
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+             "Which port to perform specified switch action on the Ethernet NTE GE114ProVmSH card."
+    ::= { ethernetNTEGE114ProVmSHCardEntry 10 }
+
+ethernetNTEGE114ProVmSHCardSwitchPortAction OBJECT-TYPE
+    SYNTAX  SwitchPortAction
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+             "Allows to perform specified action on the Ethernet NTE GE114ProVmSH card."
+    ::= { ethernetNTEGE114ProVmSHCardEntry 11 }
+
+
+--
+--Card - Ethernet NTE - GE 104 Card 
+--
+ethernetNTEGE104CardTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF EthernetNTEGE104CardEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+         "Contains information on Ethernet NTE GE104 Cards.
+          These are supported on the FSP150CC GE104 product." 
+    ::= { cmEntityObjects 96 }
+
+ethernetNTEGE104CardEntry  OBJECT-TYPE
+    SYNTAX      EthernetNTEGE104CardEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A conceptual row in the ethernetNTEGE104CardTable."
+    INDEX { neIndex, shelfIndex, slotIndex }
+    ::= { ethernetNTEGE104CardTable 1 }
+
+EthernetNTEGE104CardEntry ::= SEQUENCE {
+    ethernetNTEGE104CardEntityIndex             PhysicalIndex,
+    ethernetNTEGE104CardAdminState              AdminState,
+    ethernetNTEGE104CardOperationalState        OperationalState,
+    ethernetNTEGE104CardSecondaryState          SecondaryState,
+    ethernetNTEGE104CardVoltage                 Integer32,
+    ethernetNTEGE104CardTemperature             Integer32,
+    ethernetNTEGE104CardSnmpDyingGaspEnabled    TruthValue,
+    ethernetNTEGE104CardRestartAction           RestartType,
+    ethernetNTEGE104CardFineGrainedPmInterval   CmPmIntervalType,
+    ethernetNTEGE104CardSwitchPortActionPort    VariablePointer,
+    ethernetNTEGE104CardSwitchPortAction        SwitchPortAction
+}
+
+ethernetNTEGE104CardEntityIndex OBJECT-TYPE
+    SYNTAX  PhysicalIndex 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "Entity Index from ENTITY-MIB for the Ethernet NTE GE104 Card."
+    ::= { ethernetNTEGE104CardEntry 1 }
+
+ethernetNTEGE104CardAdminState OBJECT-TYPE
+    SYNTAX  AdminState 
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+             "Administrative State of the Ethernet NTE GE104 Card."
+    ::= { ethernetNTEGE104CardEntry 2 }
+
+ethernetNTEGE104CardOperationalState OBJECT-TYPE
+    SYNTAX  OperationalState 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+             "Operational State of the Ethernet NTE GE104 Card."
+    ::= { ethernetNTEGE104CardEntry 3 }
+
+ethernetNTEGE104CardSecondaryState OBJECT-TYPE
+    SYNTAX  SecondaryState 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+             "Secondary State of the Ethernet NTE GE104 Card."
+    ::= { ethernetNTEGE104CardEntry 4 }
+
+ethernetNTEGE104CardVoltage OBJECT-TYPE
+    SYNTAX  Integer32 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+             "Voltage of the Ethernet NTE GE102 Card."
+    ::= { ethernetNTEGE104CardEntry 5 }
+
+ethernetNTEGE104CardTemperature OBJECT-TYPE
+    SYNTAX  Integer32 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+             "Temperature of the Ethernet NTE GE104 Card."
+    ::= { ethernetNTEGE104CardEntry 6 }
+
+ethernetNTEGE104CardSnmpDyingGaspEnabled OBJECT-TYPE
+    SYNTAX  TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+          "Whether or not SNMP dying gasp is enabled 
+           on the Ethernet NTE GE104 Card."
+    ::= { ethernetNTEGE104CardEntry 7 }
+
+ethernetNTEGE104CardRestartAction OBJECT-TYPE
+    SYNTAX  RestartType 
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+             "Allows to perform specified action on the Ethernet NTE GE104 card."
+    ::= { ethernetNTEGE104CardEntry 8 }
+
+ethernetNTEGE104CardFineGrainedPmInterval   OBJECT-TYPE 
+    SYNTAX  CmPmIntervalType 
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+             "Allows specification of the fine-grained PM interval at the card level.
+              This applies to all monitored PM entities. The default value of this
+              attribute is interval-15min.  Valid values are interval-5min and interval-15min.
+              interval-1day and rollover are not considered fine-grained intervals."
+    ::= { ethernetNTEGE104CardEntry 9 }
+
+ethernetNTEGE104CardSwitchPortActionPort OBJECT-TYPE
+    SYNTAX  VariablePointer
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+             "Which port to perform specified switch action on the Ethernet NTE GE104 card."
+    ::= { ethernetNTEGE104CardEntry 10 }
+
+ethernetNTEGE104CardSwitchPortAction OBJECT-TYPE
+    SYNTAX  SwitchPortAction
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+             "Allows to perform specified action on the Ethernet NTE GE104 card."
+    ::= { ethernetNTEGE104CardEntry 11 }
+
+
+
+--
+-- Card - Ethernet NTE - XG120PROSH Card 
+--
+ethernetNTEXG120PROSHCardTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF EthernetNTEXG120PROSHCardEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+         "Contains information on Ethernet NTE XG120PROSH Card.
+          These are supported on the FSP150CC XG120PROSH product." 
+    ::= { cmEntityObjects 97 }
+
+ethernetNTEXG120PROSHCardEntry  OBJECT-TYPE
+    SYNTAX      EthernetNTEXG120PROSHCardEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A conceptual row in the ethernetNTEXG120PROSHCardTable."
+    INDEX { neIndex, shelfIndex, slotIndex }
+    ::= { ethernetNTEXG120PROSHCardTable 1 }
+
+EthernetNTEXG120PROSHCardEntry ::= SEQUENCE {
+    ethernetNTEXG120PROSHCardEntityIndex             PhysicalIndex,
+    ethernetNTEXG120PROSHCardAdminState              AdminState,
+    ethernetNTEXG120PROSHCardOperationalState        OperationalState,
+    ethernetNTEXG120PROSHCardSecondaryState          SecondaryState,
+    ethernetNTEXG120PROSHCardVoltage                 Integer32,
+    ethernetNTEXG120PROSHCardTemperature             Integer32,
+    ethernetNTEXG120PROSHCardSnmpDyingGaspEnabled    TruthValue,
+    ethernetNTEXG120PROSHCardRestartAction           RestartType,
+    ethernetNTEXG120PROSHCardFineGrainedPmInterval   CmPmIntervalType
+}
+
+ethernetNTEXG120PROSHCardEntityIndex OBJECT-TYPE
+    SYNTAX  PhysicalIndex 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "Entity Index from ENTITY-MIB for the Ethernet NTE XG120PROSH Card."
+    ::= { ethernetNTEXG120PROSHCardEntry 1 }
+
+ethernetNTEXG120PROSHCardAdminState OBJECT-TYPE
+    SYNTAX  AdminState 
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+             "Administrative State of the Ethernet NTE XG120PROSH Card."
+    ::= { ethernetNTEXG120PROSHCardEntry 2 }
+
+ethernetNTEXG120PROSHCardOperationalState OBJECT-TYPE
+    SYNTAX  OperationalState 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+             "Operational State of the Ethernet NTE XG120PROSH Card."
+    ::= { ethernetNTEXG120PROSHCardEntry 3 }
+
+ethernetNTEXG120PROSHCardSecondaryState OBJECT-TYPE
+    SYNTAX  SecondaryState 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+             "Secondary State of the Ethernet NTE XG120PROSH Card."
+    ::= { ethernetNTEXG120PROSHCardEntry 4 }
+
+ethernetNTEXG120PROSHCardVoltage OBJECT-TYPE
+    SYNTAX  Integer32 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+             "Voltage of the Ethernet NTE XG120PROSH Card."
+    ::= { ethernetNTEXG120PROSHCardEntry 5 }
+
+ethernetNTEXG120PROSHCardTemperature OBJECT-TYPE
+    SYNTAX  Integer32 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+             "Temperature of the Ethernet NTE XG120PROSH Card."
+    ::= { ethernetNTEXG120PROSHCardEntry 6 }
+
+ethernetNTEXG120PROSHCardSnmpDyingGaspEnabled OBJECT-TYPE
+    SYNTAX  TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+          "Whether or not SNMP dying gasp is enabled 
+           on the Ethernet NTE XG120PROSH Card."
+    ::= { ethernetNTEXG120PROSHCardEntry 7 }
+
+ethernetNTEXG120PROSHCardRestartAction OBJECT-TYPE
+    SYNTAX  RestartType 
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+             "Allows to perform specified action on the 
+              Ethernet NTE XG120PROSH card."
+    ::= { ethernetNTEXG120PROSHCardEntry 8 }
+
+ethernetNTEXG120PROSHCardFineGrainedPmInterval   OBJECT-TYPE 
+    SYNTAX  CmPmIntervalType 
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+             "Allows specification of the fine-grained PM interval at the 
+              card level.  This applies to all monitored PM entities. 
+              The default value of this attribute is interval-15min.  
+              Valid values are interval-5min and interval-15min.
+              interval-1day and rollover are not considered 
+              fine-grained intervals."
+    ::= { ethernetNTEXG120PROSHCardEntry 9 }
+
+
+
+--
+--  Mb Gnss Expansion Card (Building Integrated Timing System) 
+--
+mbGnssCardTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF MbGnssCardEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A list of entries corresponding to MB GNSS  Expansion Card 
+             Facilities for configuration purposes."
+    ::= { cmEntityObjects 98 }
+
+mbGnssCardEntry OBJECT-TYPE
+    SYNTAX      MbGnssCardEntry 
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A conceptual row in the mbGnssCardTable"
+    INDEX { neIndex, shelfIndex, slotIndex }
+    ::= { mbGnssCardTable 1 }
+
+MbGnssCardEntry ::= SEQUENCE {
+    -- Port Indices 
+    mbGnssCardEntityIndex                PhysicalIndex,
+
+    -- State Management params
+    mbGnssCardAdminState                 AdminState,
+    mbGnssCardOperationalState           OperationalState,
+    mbGnssCardSecondaryState             SecondaryState,
+    mbGnssCardRowStatus                  RowStatus,
+    mbGnssCardAlias                      DisplayString
+
+}
+    
+-- mbGnssCard Indices 
+
+
+
+mbGnssCardEntityIndex OBJECT-TYPE
+    SYNTAX      PhysicalIndex 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "Entity Index from ENTITY-MIB for this card"
+    ::= { mbGnssCardEntry 1 }
+
+-- State Management params
+mbGnssCardAdminState OBJECT-TYPE
+    SYNTAX      AdminState 
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "This object represents the Administrative State of the BITS 16 Port Expansion Card."
+    ::= { mbGnssCardEntry 2 }
+
+mbGnssCardOperationalState OBJECT-TYPE
+    SYNTAX      OperationalState 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This object represents the Operational State of the BITS 16 Port Expansion Card."
+    ::= { mbGnssCardEntry 3 }
+
+mbGnssCardSecondaryState OBJECT-TYPE
+    SYNTAX      SecondaryState 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This object represents the Secondary State of the BITS 16 Port Expansion Card."
+    ::= { mbGnssCardEntry 4 }
+
+mbGnssCardRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+           "The status of this row.  An entry MUST NOT exist in the 
+            active state unless all objects in the entry have an 
+            appropriate value, as described
+            in the description clause for each writable object.
+
+            The values of mbGnssCardRowStatus supported are
+            createAndGo(4) and destroy(6).  All mandatory attributes
+            must be specified in a single SNMP SET request with
+            mbGnssCardRowStatus value as createAndGo(4).
+            Upon successful row creation, this object has a
+            value of active(1).
+
+            The mbGnssCardRowStatus object may be modified if
+            the associated instance of this object is equal to active(1)."
+    ::= { mbGnssCardEntry 5 }
+
+mbGnssCardAlias OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..256))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "This object allows SNMP management entities to provide an 
+             alias to the MB GNSS Expansion Card."
+    ::= { mbGnssCardEntry 6 }
+
+--
+--  IRIG Card
+--
+f3IrigCardTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF F3IrigCardEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A list of entries corresponding to IRIG Card 
+             Facilities for configuration purposes."
+    ::= { cmEntityObjects 99 }
+
+f3IrigCardEntry OBJECT-TYPE
+    SYNTAX      F3IrigCardEntry 
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A conceptual row in the f3IrigCardTable"
+    INDEX { neIndex, shelfIndex, slotIndex }
+    ::= { f3IrigCardTable 1 }
+
+F3IrigCardEntry ::= SEQUENCE {
+    -- Port indices 
+    f3IrigCardEntityIndex                PhysicalIndex,
+
+    -- Management params
+    f3IrigCardAlias                      DisplayString,
+    f3IrigCardAdminState                 AdminState,
+    f3IrigCardOperationalState           OperationalState,
+    f3IrigCardSecondaryState             SecondaryState,
+    f3IrigCardTemperature                Integer32,
+    f3IrigCardStorageType                StorageType,
+    f3IrigCardRowStatus                  RowStatus
+}
+    
+-- Card indices 
+f3IrigCardEntityIndex OBJECT-TYPE
+    SYNTAX      PhysicalIndex 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "Entity Index from ENTITY-MIB for this card"
+    ::= { f3IrigCardEntry 1 }
+
+-- Management params
+f3IrigCardAlias OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..256))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "This object allows SNMP management entities to provide an 
+             alias to the GE 4 Port Expansion Card."
+    ::= { f3IrigCardEntry 2 }
+
+f3IrigCardAdminState OBJECT-TYPE
+    SYNTAX      AdminState 
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "This object represents the Administrative State of the GE 4 Port Expansion Card."
+    ::= { f3IrigCardEntry 3 }
+
+f3IrigCardOperationalState OBJECT-TYPE
+    SYNTAX      OperationalState 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This object represents the Operational State of the GE 4 Port Expansion Card."
+    ::= { f3IrigCardEntry 4 }
+
+f3IrigCardSecondaryState OBJECT-TYPE
+    SYNTAX      SecondaryState 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This object represents the Secondary State of the GE 4 Port Expansion Card."
+    ::= { f3IrigCardEntry 5 }
+
+f3IrigCardTemperature OBJECT-TYPE
+    SYNTAX  Integer32 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+             "Temperature of the GE 4 Port Expansion Card."
+    ::= { f3IrigCardEntry 6 }
+
+f3IrigCardStorageType OBJECT-TYPE
+    SYNTAX  StorageType
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+             "Storage Type of the IRIG Card."
+    ::= { f3IrigCardEntry 7 }
+
+f3IrigCardRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+           "The status of this row.  An entry MUST NOT exist in the 
+            active state unless all objects in the entry have an 
+            appropriate value, as described
+            in the description clause for each writable object.
+
+            The values of f3IrigCardRowStatus supported are
+            createAndGo(4) and destroy(6).  All mandatory attributes
+            must be specified in a single SNMP SET request with
+            f3IrigCardRowStatus value as createAndGo(4).
+            Upon successful row creation, this object has a
+            value of active(1).
+
+            The f3IrigCardRowStatus object may be modified if
+            the associated instance of this object is equal to active(1)."
+    ::= { f3IrigCardEntry 8 }
+
+--
+--  Composite Clock Expansion Card (Building Integrated Timing System) 
+--
+compositeClockCardTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF CompositeClockCardEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A list of entries corresponding to Composite Clock Expansion Card 
+             Facilities for configuration purposes."
+    ::= { cmEntityObjects 100 }
+
+compositeClockCardEntry OBJECT-TYPE
+    SYNTAX      CompositeClockCardEntry 
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A conceptual row in the compositeClockCardTable"
+    INDEX { neIndex, shelfIndex, slotIndex }
+    ::= { compositeClockCardTable 1 }
+
+CompositeClockCardEntry ::= SEQUENCE {
+    -- Port Indices 
+    compositeClockCardEntityIndex                PhysicalIndex,
+
+    -- State Management params
+    compositeClockCardAdminState                 AdminState,
+    compositeClockCardOperationalState           OperationalState,
+    compositeClockCardSecondaryState             SecondaryState,
+    compositeClockCardRowStatus                  RowStatus,
+    compositeClockCardAlias                      DisplayString
+
+}
+    
+-- compositeClockCard Indices 
+
+
+
+compositeClockCardEntityIndex OBJECT-TYPE
+    SYNTAX      PhysicalIndex 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+           "Entity Index from ENTITY-MIB for this card"
+    ::= { compositeClockCardEntry 1 }
+
+-- State Management params
+compositeClockCardAdminState OBJECT-TYPE
+    SYNTAX      AdminState 
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "This object represents the Administrative State of the BITS 16 Port Expansion Card."
+    ::= { compositeClockCardEntry 2 }
+
+compositeClockCardOperationalState OBJECT-TYPE
+    SYNTAX      OperationalState 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This object represents the Operational State of the BITS 16 Port Expansion Card."
+    ::= { compositeClockCardEntry 3 }
+
+compositeClockCardSecondaryState OBJECT-TYPE
+    SYNTAX      SecondaryState 
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "This object represents the Secondary State of the BITS 16 Port Expansion Card."
+    ::= { compositeClockCardEntry 4 }
+
+compositeClockCardRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+           "The status of this row.  An entry MUST NOT exist in the 
+            active state unless all objects in the entry have an 
+            appropriate value, as described
+            in the description clause for each writable object.
+
+            The values of compositeClockCardRowStatus supported are
+            createAndGo(4) and destroy(6).  All mandatory attributes
+            must be specified in a single SNMP SET request with
+            compositeClockCardRowStatus value as createAndGo(4).
+            Upon successful row creation, this object has a
+            value of active(1).
+
+            The compositeClockCardRowStatus object may be modified if
+            the associated instance of this object is equal to active(1)."
+    ::= { compositeClockCardEntry 5 }
+
+compositeClockCardAlias OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE(0..256))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+            "This object allows SNMP management entities to provide an 
+             alias to the COMPOSITE CLOCK Expansion Card."
+    ::= { compositeClockCardEntry 6 }
+
+--
+--Card - StorageDevice
+--
+f3StorageDeviceTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF F3StorageDeviceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+     "Contains information on storage devices within the server card."
+::= { cmEntityObjects 101 }
+
+f3StorageDeviceEntry  OBJECT-TYPE
+    SYNTAX      F3StorageDeviceEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A conceptual row in the f3StorageDeviceTable."
+    AUGMENTS { serverCardEntry }
+    ::= { f3StorageDeviceTable 1 }
+
+F3StorageDeviceEntry ::= SEQUENCE {
+    f3StorageDeviceInternalSsdHealth         TruthValue,
+    f3StorageDeviceExternalSsdStatus         StorageStatus,
+    f3StorageDeviceWearoutLevel              Integer32
+}
+
+f3StorageDeviceInternalSsdHealth OBJECT-TYPE
+    SYNTAX  TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+             "Indicates health of internal SSD on server card."
+    ::= { f3StorageDeviceEntry 1 }
+
+f3StorageDeviceExternalSsdStatus OBJECT-TYPE
+    SYNTAX  StorageStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+             "Indicates status of external SSD on server card."
+    ::= { f3StorageDeviceEntry 2 }
+
+f3StorageDeviceWearoutLevel OBJECT-TYPE
+    SYNTAX  Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+             "Indicated wearout level of internal SSD on server card."
+    ::= { f3StorageDeviceEntry 3 }
 
 --
 -- Conformance
@@ -10569,9 +12780,12 @@ cmEntityCompliance MODULE-COMPLIANCE
               nteGe206CardGroup, nteGe201SyncECardGroup, nteGe201NonSyncECardGroup,
               nteGe206FCardGroup, nteGe206VCardGroup, nteXg210CardGroup, neLLDPParamsGroup,
               nteSh1PcsCardGroup, nteXg210CCardGroup, geGE8SCryptoConnectorCardGroup,
-	      nteOsa5420CardGroup, nteOsa5421CardGroup, bits16PortCardGroup, pps16PortCardGroup,
+              nteOsa5420CardGroup, nteOsa5421CardGroup, bits16PortCardGroup, pps16PortCardGroup,
               clk16PortCardGroup, todPps16PortCardGroup,ge4PortCardGroup, nteXg116ProCardGroup, 
-              nteXg120ProCardGroup
+              nteXg120ProCardGroup, nteOsa5401CardGroup, nteOsa5405CardGroup, csmCardGroup,
+              auxPortCardGroup, nteGe102ProHCardGroup, nteGe102ProEFMHCardGroup,
+              nteXg116ProHCardGroup, nteXg118ProSHCardGroup, nteXg118ProacSHCardGroup,
+              nteXg120ProSHCardGroup
         }
     ::= { cmEntityCompliances 1 }
 
@@ -10583,7 +12797,7 @@ cmEntityObjectGroup OBJECT-GROUP
         shelfIndex, shelfEntityIndex, shelfType, shelfbackplaneRev,
         shelfbackplaneDOM, shelfbackplaneSerialNo, shelfAction,
         shelfAdminState, shelfOperationalState, shelfSecondaryState,
-        shelfMfgSite,shelfOscillatorType,
+        shelfMfgSite, shelfOscillatorType, shelfLedControl,
         slotIndex, slotEntityIndex, slotType, slotCardType, slotCardUnitName,
         slotCardFormatVersion, slotCardCLEICode, slotCardPartNumber,
         slotCardHwRev, slotCardSwRev, slotCardSerialNum,
@@ -10681,6 +12895,7 @@ cmEntityObjectGroup OBJECT-GROUP
         f3UsbHostSerialNum, f3UsbHostMfgName,
         f3UsbHostMfgDate, f3UsbHostMfgSite,
         f3UsbHostSecondaryState, f3UsbHostPhysicalAddress,
+        f3UsbHostMuxOperationalMode,
 
         ethernetNTEGE112CardEntityIndex, ethernetNTEGE112CardAdminState,
         ethernetNTEGE112CardOperationalState, ethernetNTEGE112CardSecondaryState,
@@ -10729,7 +12944,7 @@ commonEntityGroup OBJECT-GROUP
         shelfIndex, shelfEntityIndex, shelfType, shelfbackplaneRev,
         shelfbackplaneDOM, shelfbackplaneSerialNo, shelfAction,
         shelfAdminState, shelfOperationalState, shelfSecondaryState,
-        shelfMfgSite,shelfOscillatorType,
+        shelfMfgSite, shelfOscillatorType, shelfLedControl,
         slotIndex, slotEntityIndex, slotType, slotCardType, slotCardUnitName,
         slotCardFormatVersion, slotCardCLEICode, slotCardPartNumber,
         slotCardHwRev, slotCardSwRev, slotCardSerialNum,
@@ -11366,7 +13581,7 @@ nteXg210CCardGroup OBJECT-GROUP
 
 
 geGE8SCryptoConnectorCardGroup OBJECT-GROUP
-	OBJECTS {
+    OBJECTS {
         ethernetGE8SCryptoConnectorCardEntityIndex,
         ethernetGE8SCryptoConnectorCardAdminState,
         ethernetGE8SCryptoConnectorCardOperationalState,
@@ -11437,7 +13652,8 @@ bits16PortCardGroup OBJECT-GROUP
         bits16PortCardOperationalState, 
         bits16PortCardSecondaryState,
         bits16PortCardRowStatus,    
-        bits16PortCardAlias
+        bits16PortCardAlias,
+        bits16PortCardTemperature
     }
     STATUS  current
     DESCRIPTION
@@ -11494,7 +13710,8 @@ serverCardGroup OBJECT-GROUP
         serverCardVirtualCpuTotal, serverCardVirtualCpuAvailiable,
         serverCardMemoryTotal, serverCardMemoryAvailiable,
         serverCardStorageTotal, serverCardStorageAvailiable, serverCardHvVersion,
-        serverCardHostName
+        serverCardHostName, serverCardRestartAction, serverCardRowStatus, serverCardIgnoreWatchdog,
+        f3StorageDeviceInternalSsdHealth, f3StorageDeviceExternalSsdStatus, f3StorageDeviceWearoutLevel
     }
     STATUS  current
     DESCRIPTION
@@ -11508,7 +13725,7 @@ pps16PortCardGroup OBJECT-GROUP
         pps16PortCardOperationalState, 
         pps16PortCardSecondaryState,
         pps16PortCardRowStatus,    
-	pps16PortCardAlias
+    pps16PortCardAlias
     }
     STATUS  current
     DESCRIPTION
@@ -11523,7 +13740,7 @@ clk16PortCardGroup OBJECT-GROUP
         clk16PortCardOperationalState, 
         clk16PortCardSecondaryState,
         clk16PortCardRowStatus,    
-	clk16PortCardAlias
+        clk16PortCardAlias
     }
     STATUS  current
     DESCRIPTION
@@ -11538,7 +13755,7 @@ todPps16PortCardGroup OBJECT-GROUP
         todPps16PortCardOperationalState, 
         todPps16PortCardSecondaryState,
         todPps16PortCardRowStatus,    
-	todPps16PortCardAlias
+        todPps16PortCardAlias
     }
     STATUS  current
     DESCRIPTION
@@ -11625,7 +13842,8 @@ ge4PortCardGroup OBJECT-GROUP
         ge4PortCardOperationalState, 
         ge4PortCardSecondaryState,
         ge4PortCardRowStatus,    
-	ge4PortCardAlias
+        ge4PortCardAlias,
+        ge4PortCardTemperature
     }
     STATUS  current
     DESCRIPTION
@@ -11679,5 +13897,252 @@ nteGE112ProVmCardGroup OBJECT-GROUP
     DESCRIPTION
             "A collection of objects used to manage the GE112ProVm Card."
     ::= { cmEntityGroups 64 }
+        
+nteOsa5401CardGroup OBJECT-GROUP
+    OBJECTS {
+        ethernetNTEOSA5401CardEntityIndex, ethernetNTEOSA5401CardAdminState,
+        ethernetNTEOSA5401CardOperationalState, ethernetNTEOSA5401CardTableRestartAction
+    }
+    STATUS  current
+    DESCRIPTION
+            "A collection of objects used to manage the OSA5401 Card."
+    ::= { cmEntityGroups 65 }
+
+nteOsa5405CardGroup OBJECT-GROUP
+    OBJECTS {
+        ethernetNTEOSA5405CardEntityIndex, ethernetNTEOSA5405CardAdminState,
+        ethernetNTEOSA5405CardOperationalState, ethernetNTEOSA5405CardVoltage,
+        ethernetNTEOSA5405CardTemperature, ethernetNTEOSA5405CardTableRestartAction
+    }
+    STATUS  current
+    DESCRIPTION
+            "A collection of objects used to manage the OSA5405 Card."
+    ::= { cmEntityGroups 66 }
+
+csmCardGroup OBJECT-GROUP
+    OBJECTS {
+        ethernetCSMCardEntityIndex, ethernetCSMCardAdminState,
+        ethernetCSMCardOperationalState, ethernetCSMCardSecondaryState,
+        ethernetCSMCardVoltage, ethernetCSMCardTemperature,
+        ethernetCSMCardSnmpDyingGaspEnabled, ethernetCSMCardRestartAction,
+        ethernetCSMCardFineGrainedPmInterval,ethernetCSMCardOscillatorType
+    }
+    STATUS  current
+    DESCRIPTION
+            "A collection of objects used to manage the CSM Card."
+    ::= { cmEntityGroups 67 }
+
+auxPortCardGroup OBJECT-GROUP
+    OBJECTS {
+        auxPortCardEntityIndex, 
+        auxPortCardAdminState,
+        auxPortCardOperationalState, 
+        auxPortCardSecondaryState,
+        auxPortCardRowStatus,    
+        auxPortCardAlias,
+        auxPortCardTemperature
+    }
+    STATUS  current
+    DESCRIPTION
+            "A collection of objects used to manage the Auxiliary Port Expansion Card."
+    ::= { cmEntityGroups 68 }
+
+nteGe102ProHCardGroup OBJECT-GROUP
+    OBJECTS {
+        ethernetNTEGE102ProHCardEntityIndex, ethernetNTEGE102ProHCardAdminState,
+        ethernetNTEGE102ProHCardOperationalState, ethernetNTEGE102ProHCardSecondaryState,
+        ethernetNTEGE102ProHCardVoltage, ethernetNTEGE102ProHCardTemperature,
+        ethernetNTEGE102ProHCardSnmpDyingGaspEnabled, ethernetNTEGE102ProHCardRestartAction,
+        ethernetNTEGE102ProHCardFineGrainedPmInterval, ethernetNTEGE102ProHCardSwitchPortActionPort,
+        ethernetNTEGE102ProHCardSwitchPortAction, ethernetNTEGE102ProHCardPSU1State,
+        ethernetNTEGE102ProHCardPSU2State, ethernetNTEGE102ProHCardFAN1State,
+        ethernetNTEGE102ProHCardFAN2State, ethernetNTEGE102ProHCardPsuType
+    }
+    STATUS  current
+    DESCRIPTION
+            "A collection of objects used to manage the GE102Pro H Card."
+    ::= { cmEntityGroups 69 }
+
+nteGe102ProEFMHCardGroup OBJECT-GROUP
+    OBJECTS {
+        ethernetNTEGE102ProEFMHCardEntityIndex, ethernetNTEGE102ProEFMHCardAdminState,
+        ethernetNTEGE102ProEFMHCardOperationalState, ethernetNTEGE102ProEFMHCardSecondaryState,
+        ethernetNTEGE102ProEFMHCardVoltage, ethernetNTEGE102ProEFMHCardTemperature,
+        ethernetNTEGE102ProEFMHCardRestartAction, ethernetNTEGE102ProEFMHCardPSU1State,
+        ethernetNTEGE102ProEFMHCardPSU2State, ethernetNTEGE102ProEFMHCardFAN1State,
+        ethernetNTEGE102ProEFMHCardFAN2State, ethernetNTEGE102ProEFMHCardPsuType,
+        ethernetNTEGE102ProEFMHCardLLFMode, ethernetNTEGE102ProEFMHCardLLFModeAction
+    }
+    STATUS  current
+    DESCRIPTION
+            "A collection of objects used to manage the GE102Pro EFMH Card."
+    ::= { cmEntityGroups 70 }
+
+ethernetOsa3350MgntCardGroup OBJECT-GROUP
+    OBJECTS {
+        ethernetOsa3350MgntCardEntityIndex,
+        ethernetOsa3350MgntCardAdminState,
+        ethernetOsa3350MgntCardOperationalState,
+        ethernetOsa3350MgntCardSecondaryState,
+        ethernetOsa3350MgntCardRestartAction
+    }
+    STATUS  current
+    DESCRIPTION
+            "A collection of objects used to manage the OSA3350 Mgnt Card."
+    ::= { cmEntityGroups 71 }
+
+nteXg116ProHCardGroup OBJECT-GROUP
+    OBJECTS {
+        ethernetNTEXG116PROHCardEntityIndex,
+        ethernetNTEXG116PROHCardAdminState,
+        ethernetNTEXG116PROHCardOperationalState,
+        ethernetNTEXG116PROHCardSecondaryState,
+        ethernetNTEXG116PROHCardVoltage,
+        ethernetNTEXG116PROHCardTemperature,
+        ethernetNTEXG116PROHCardSnmpDyingGaspEnabled,
+        ethernetNTEXG116PROHCardRestartAction,
+        ethernetNTEXG116PROHCardFineGrainedPmInterval
+    }
+    STATUS  current
+    DESCRIPTION
+            "A collection of objects used to manage the XG116PRO (H) Card."
+    ::= { cmEntityGroups 72 }
+
+nteGo102ProSMCardGroup OBJECT-GROUP
+    OBJECTS {
+        ethernetNTEGO102ProSMCardEntityIndex, ethernetNTEGO102ProSMCardAdminState,
+        ethernetNTEGO102ProSMCardOperationalState, ethernetNTEGO102ProSMCardSecondaryState,
+        ethernetNTEGO102ProSMCardVoltage, ethernetNTEGO102ProSMCardTemperature,
+        ethernetNTEGO102ProSMCardSnmpDyingGaspEnabled, ethernetNTEGO102ProSMCardRestartAction,
+        ethernetNTEGO102ProSMCardFineGrainedPmInterval, ethernetNTEGO102ProSMCardSwitchPortActionPort,
+        ethernetNTEGO102ProSMCardSwitchPortAction
+    }
+    STATUS  current
+    DESCRIPTION
+            "A collection of objects used to manage the GO102ProSM Card."
+    ::= { cmEntityGroups 73 }
+
+nteXg118ProSHCardGroup OBJECT-GROUP
+    OBJECTS {
+        ethernetNTEXG118PROSHCardEntityIndex,
+        ethernetNTEXG118PROSHCardAdminState,
+        ethernetNTEXG118PROSHCardOperationalState,
+        ethernetNTEXG118PROSHCardSecondaryState,
+        ethernetNTEXG118PROSHCardVoltage,
+        ethernetNTEXG118PROSHCardTemperature,
+        ethernetNTEXG118PROSHCardSnmpDyingGaspEnabled,
+        ethernetNTEXG118PROSHCardRestartAction,
+        ethernetNTEXG118PROSHCardFineGrainedPmInterval
+    }
+    STATUS  current
+    DESCRIPTION
+            "A collection of objects used to manage the XG118PRO (SH) Card."
+    ::= { cmEntityGroups 74 }
+
+nteXg118ProacSHCardGroup OBJECT-GROUP
+    OBJECTS {
+        ethernetNTEXG118PROACSHCardEntityIndex,
+        ethernetNTEXG118PROACSHCardAdminState,
+        ethernetNTEXG118PROACSHCardOperationalState,
+        ethernetNTEXG118PROACSHCardSecondaryState,
+        ethernetNTEXG118PROACSHCardVoltage,
+        ethernetNTEXG118PROACSHCardTemperature,
+        ethernetNTEXG118PROACSHCardSnmpDyingGaspEnabled,
+        ethernetNTEXG118PROACSHCardRestartAction,
+        ethernetNTEXG118PROACSHCardFineGrainedPmInterval
+    }
+    STATUS  current
+    DESCRIPTION
+            "A collection of objects used to manage the XG118PROAC (SH) Card."
+    ::= { cmEntityGroups 75 }
+
+nteGE114ProVmSHCardGroup OBJECT-GROUP
+    OBJECTS {
+        ethernetNTEGE114ProVmSHCardEntityIndex, ethernetNTEGE114ProVmSHCardAdminState,
+        ethernetNTEGE114ProVmSHCardOperationalState, ethernetNTEGE114ProVmSHCardSecondaryState,
+        ethernetNTEGE114ProVmSHCardVoltage, ethernetNTEGE114ProVmSHCardTemperature,
+        ethernetNTEGE114ProVmSHCardSnmpDyingGaspEnabled, ethernetNTEGE114ProVmSHCardRestartAction,
+        ethernetNTEGE114ProVmSHCardFineGrainedPmInterval, ethernetNTEGE114ProVmSHCardSwitchPortActionPort,
+        ethernetNTEGE114ProVmSHCardSwitchPortAction
+    }
+    STATUS  current
+    DESCRIPTION
+            "A collection of objects used to manage the GE114ProVmSH Card."
+    ::= { cmEntityGroups 76 }
+
+nteGE104CardGroup OBJECT-GROUP
+    OBJECTS {
+        ethernetNTEGE104CardEntityIndex, ethernetNTEGE104CardAdminState,
+        ethernetNTEGE104CardOperationalState, ethernetNTEGE104CardSecondaryState,
+        ethernetNTEGE104CardVoltage, ethernetNTEGE104CardTemperature,
+        ethernetNTEGE104CardSnmpDyingGaspEnabled, ethernetNTEGE104CardRestartAction,
+        ethernetNTEGE104CardFineGrainedPmInterval, ethernetNTEGE104CardSwitchPortActionPort,
+        ethernetNTEGE104CardSwitchPortAction
+    }
+    STATUS  current
+    DESCRIPTION
+            "A collection of objects used to manage the GE104 Card."
+    ::= { cmEntityGroups 77 }
+
+nteXg120ProSHCardGroup OBJECT-GROUP
+    OBJECTS {
+        ethernetNTEXG120PROSHCardEntityIndex,
+        ethernetNTEXG120PROSHCardAdminState,
+        ethernetNTEXG120PROSHCardOperationalState,
+        ethernetNTEXG120PROSHCardSecondaryState,
+        ethernetNTEXG120PROSHCardVoltage,
+        ethernetNTEXG120PROSHCardTemperature,
+        ethernetNTEXG120PROSHCardSnmpDyingGaspEnabled,
+        ethernetNTEXG120PROSHCardRestartAction,
+        ethernetNTEXG120PROSHCardFineGrainedPmInterval
+    }
+    STATUS  current
+    DESCRIPTION
+            "A collection of objects used to manage the XG120PROSH Card."
+    ::= { cmEntityGroups 78 }
+
+mbGnssCardGroup OBJECT-GROUP
+    OBJECTS {
+        mbGnssCardEntityIndex, 
+        mbGnssCardAdminState,
+        mbGnssCardOperationalState, 
+        mbGnssCardSecondaryState,
+        mbGnssCardRowStatus,    
+        mbGnssCardAlias
+    }
+    STATUS  current
+    DESCRIPTION
+            "A collection of objects used to manage the MB GNSS EXP Card."
+    ::= { cmEntityGroups 79 }
+
+f3IrigCardGroup OBJECT-GROUP
+    OBJECTS {
+        f3IrigCardEntityIndex, 
+        f3IrigCardAlias,
+        f3IrigCardAdminState,
+        f3IrigCardOperationalState, 
+        f3IrigCardSecondaryState,
+        f3IrigCardTemperature,
+        f3IrigCardStorageType,
+        f3IrigCardRowStatus
+    }
+    STATUS  current
+    DESCRIPTION
+            "A collection of objects used to manage the IRIG Card."
+    ::= { cmEntityGroups 80 }
+
+compositeClockCardGroup OBJECT-GROUP
+    OBJECTS {
+        compositeClockCardEntityIndex, 
+        compositeClockCardAdminState,
+        compositeClockCardOperationalState, 
+        compositeClockCardSecondaryState,
+        compositeClockCardRowStatus,    
+        compositeClockCardAlias
+    }
+    STATUS  current
+    DESCRIPTION
+            "A collection of objects used to manage the COMPOSITE CLOCK EXP Card."
+    ::= { cmEntityGroups 81 }
 
 END

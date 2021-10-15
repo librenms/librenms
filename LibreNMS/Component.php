@@ -18,6 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2015 Aaron Daniels <aaron@daniels.id.au>
  * @author     Aaron Daniels <aaron@daniels.id.au>
  */
@@ -278,8 +279,8 @@ class Component
      * Get the component id for the first component in the array
      * Only set $device_id if using the array from getCompenents(), which is keyed by device_id
      *
-     * @param array $component_array
-     * @param int $device_id
+     * @param  array  $component_array
+     * @param  int  $device_id
      * @return int the component id
      */
     public function getFirstComponentID($component_array, $device_id = null)

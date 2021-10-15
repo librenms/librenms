@@ -18,6 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @author     peca.nesovanovic@sattrakt.com
  * @author     mtammasss@gmail.com
  * @author     PipoCanaja
@@ -29,26 +30,21 @@
 // tested on: T1600G-28TS 3.0; T2600G-18TS 2.0;
 //
 // todo: detect LAG ports ??? now parser assume that there is no LAG port
+// 2021-06-07: Added Vlan parsing on LAG ports
 //
+//SNMP input example STRING: '1/0/1-2,1/0/4-6,1/0/25,LAG1-3,LAG5'
 
 if (! function_exists('jetstreamExpand')) {
     function jetstreamExpand($var)
     {
-        $arr = explode(',', trim($var)); //array of x/y/a-z
+        $result = [];
 
-        unset($result);
-        foreach ($arr as $element) {
-            $element = trim($element);
-            if (strpos($element, '-') !== false) {
-                $tmp = explode('-', $element); // left part is a fully defined port, right is the end number of the serie
-                $port_start_array = explode('/', $tmp[0]);
-                $port_id = trim(array_pop($port_start_array)); // $port_start_array is "[x, y]", $port_id is "a";
+        preg_match_all('#(LAG|\d+/\d+/)(\d+)(?:-(\d+))?#', $var, $lags);
 
-                for ($i = $port_id; $i <= $tmp[1]; $i++) {
-                    $result[] = implode('/', array_merge($port_start_array, [$i]));
-                }
-            } else {
-                $result[] = $element;
+        foreach ($lags[2] as $index => $start) {
+            $end = $lags[3][$index] ?: $start;
+            for ($i = $start; $i <= $end; $i++) {
+                $result[] = $lags[1][$index] . $i; //need to be in form LAGx or 1/0/x
             }
         }
 
@@ -78,7 +74,7 @@ if ($vlanversion == 'version1' || $vlanversion == '2') {
 
             if ($vlan_data['vlan_name'] != $jet_vlan_data['dot1qVlanDescription']) {
                 $vlan_upd['vlan_name'] = $jet_vlan_data['dot1qVlanDescription'];
-                dbUpdate($vlan_upd, 'vlans', '`vlan_id` = ?', [$vlan_data['jet_vlan_id']]);
+                dbUpdate($vlan_upd, 'vlans', '`vlan_id` = ?', [$vlan_data['vlan_id']]);
                 log_event("VLAN $vlan_id changed name {$vlan_data['vlan_name']} -> " . $jet_vlan_data['dot1qVlanDescription'], $device, 'vlan');
                 echo 'U';
             } else {

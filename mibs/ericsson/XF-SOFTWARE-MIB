@@ -1,0 +1,1400 @@
+	XF-SOFTWARE-MIB DEFINITIONS ::= BEGIN
+
+		IMPORTS
+			entPhysicalIndex
+				FROM ENTITY-MIB
+			SnmpAdminString
+				FROM SNMP-FRAMEWORK-MIB
+			OBJECT-GROUP, MODULE-COMPLIANCE
+				FROM SNMPv2-CONF
+			Integer32, OBJECT-TYPE, MODULE-IDENTITY, OBJECT-IDENTITY
+				FROM SNMPv2-SMI
+			DateAndTime, TEXTUAL-CONVENTION
+				FROM SNMPv2-TC
+			xfPlatform, XfProductnumber, XfProductRevision
+				FROM XF-TOP-MIB;
+
+
+		-- 1.3.6.1.4.1.193.81.2.7
+		xfSoftwareMIB MODULE-IDENTITY
+			LAST-UPDATED "200803060000Z"		-- March 06, 2008 at 00:00 GMT
+			ORGANIZATION
+				"Ericsson-Norway"
+			CONTACT-INFO
+				" "
+			DESCRIPTION
+				"This MIB contains the objects which support software
+				inventory information."
+			REVISION "200803051803Z"		-- March 05, 2008 at 18:03 GMT
+			DESCRIPTION
+				"N : Removed BITS"
+			REVISION "200711261244Z"		-- November 26, 2007 at 12:44 GMT
+			DESCRIPTION
+				"M   Extended xfSwLmUpgradeOperStatus and
+				    xfSwReleaseOperStatus with ftp error codes"
+			REVISION "200706110912Z"		-- June 11, 2007 at 09:12 GMT
+			DESCRIPTION
+				" K added preparingForTest(9) to
+				   xfSwGlobalState"
+			REVISION "200704100909Z"		-- April 10, 2007 at 09:09 GMT
+			DESCRIPTION
+				"J Added extra value testingFromManual(8) to
+				    xfSwReleaseOperStatus
+				    Added xfSwGlobalState
+				"
+			REVISION "200306191030Z"		-- June 19, 2003 at 10:30 GMT
+			DESCRIPTION
+				"D
+				Changed description of xfSwNpuPassiveSwitch
+				  to state that a warm restart is required to
+				  activate the fallback
+				Added noFailure(3) to
+				 xfSwLoadModuleFailure"
+			REVISION "200203080841Z"		-- March 08, 2002 at 08:41 GMT
+			DESCRIPTION
+				"C
+				Changed contact info
+				Added one state to the xfSWBoardStatus
+				Added objects for multiple load modules
+				per board and type of the load module.
+				"
+			REVISION "200201140911Z"		-- January 14, 2002 at 09:11 GMT
+			DESCRIPTION
+				"B write to xfSwReleaseAdminStatus
+				for active release has no effect
+				Added conformance
+				Change syntax for product number
+				and revision
+				Change name to xfSwBoardStatus"
+			REVISION "200110101215Z"		-- October 10, 2001 at 12:15 GMT
+			DESCRIPTION
+				"A Initial Revision"
+			REVISION "200401301351Z"		-- January 30, 2004 at 13:51 GMT
+			DESCRIPTION
+				"E Added objects for progress indication,
+				Better fault indication.
+				New release handling."
+			REVISION "200408030823Z"		-- August 03, 2004 at 08:23 GMT
+			DESCRIPTION
+				"F   due to new scope in Neptune
+				removed ..AdditionalInfo,
+				xfSwLmUpgradeNewProductNumber and
+				xfSwLmUpgrade/xfSwLoadModuleDescription.
+				added xfSwReleaseSBLType and
+				xfBoardTrafficDisturbance
+
+				changed the values of xfSwLmUpgradeOper and
+				AdminStatus. Removed not used values and
+				removed 'holes' in the enum values."
+			REVISION "200501310826Z"		-- January 31, 2005 at 08:26 GMT
+			DESCRIPTION
+				"G Added xfSwLoadModuleDescription,
+				minSoftwareRevision(5)to xfSwBoardStatus
+				and xfSuLmUpgradeDescription"
+			REVISION "200502090813Z"		-- February 09, 2005 at 08:13 GMT
+			DESCRIPTION
+				"H reintroduced xfSwBoardLoadModuleIndex as index"
+			::= { xfPlatform 7 }
+
+
+
+--
+-- Textual conventions
+--
+
+--  Textual conventions
+--
+--
+--
+		XfSwRelease ::= TEXTUAL-CONVENTION
+			STATUS current
+			DESCRIPTION
+				"Indication of one of the two software releases."
+			SYNTAX Integer32 (1..2)
+
+		XfSwEnableDisable ::= TEXTUAL-CONVENTION
+			STATUS current
+			DESCRIPTION
+				"This TC is used for objects that can have these values."
+			SYNTAX INTEGER
+				{
+				enable(1),
+				disable(2)
+				}
+
+
+--
+-- Node definitions
+--
+
+--  Node definitions
+--
+		-- 1.3.6.1.4.1.193.81.2.7.1
+		xfSwObjects OBJECT IDENTIFIER ::= { xfSoftwareMIB 1 }
+
+
+		-- 1.3.6.1.4.1.193.81.2.7.1.1
+		xfSwLoadModuleTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF XfSwLoadModuleEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"This table contains information about the load modules
+				that are part of the system releases as described by
+				the xfSwReleaseTable."
+			::= { xfSwObjects 1 }
+
+
+		-- 1.3.6.1.4.1.193.81.2.7.1.1.1
+		xfSwLoadModuleEntry OBJECT-TYPE
+			SYNTAX XfSwLoadModuleEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Information about 1 software load module."
+			INDEX { xfSwRelease, xfSwLoadModuleIndex }
+			::= { xfSwLoadModuleTable 1 }
+
+
+		XfSwLoadModuleEntry ::=
+			SEQUENCE {
+				xfSwRelease
+					XfSwRelease,
+				xfSwLoadModuleIndex
+					Integer32,
+				xfSwLoadModuleProductNumber
+					XfProductnumber,
+				xfSwLoadModuleRevision
+					XfProductRevision,
+				xfSwLoadModuleOperStatus
+					INTEGER,
+				xfSwLoadModuleFailure
+					INTEGER,
+				xfSwLoadModuleProgress
+					Integer32,
+				xfSwLoadModuleDescription
+					SnmpAdminString
+			 }
+
+		-- 1.3.6.1.4.1.193.81.2.7.1.1.1.1
+		xfSwRelease OBJECT-TYPE
+			SYNTAX XfSwRelease
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"There are two software releases present on the node:
+				- an active release, normally the most recent release
+				  and the one that is running
+				- a passive release, that is the previous release or
+				  the one that is currently being download to upgrade
+				  the active release.
+				xfSwRelease is an index into the active or passive
+				release. xfSwActiveRelease indicates which release is
+				active."
+			::= { xfSwLoadModuleEntry 1 }
+
+
+		-- 1.3.6.1.4.1.193.81.2.7.1.1.1.2
+		xfSwLoadModuleIndex OBJECT-TYPE
+			SYNTAX Integer32 (1..100)
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Unique value within one release for each load module."
+			::= { xfSwLoadModuleEntry 2 }
+
+
+		-- 1.3.6.1.4.1.193.81.2.7.1.1.1.3
+		xfSwLoadModuleProductNumber OBJECT-TYPE
+			SYNTAX XfProductnumber
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Product number of the load module. Normally something
+				like 'CAXR102_012/1'."
+			::= { xfSwLoadModuleEntry 3 }
+
+
+		-- 1.3.6.1.4.1.193.81.2.7.1.1.1.4
+		xfSwLoadModuleRevision OBJECT-TYPE
+			SYNTAX XfProductRevision
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Revision of the load module. Normally something like
+				'R1A'."
+			::= { xfSwLoadModuleEntry 4 }
+
+
+		-- 1.3.6.1.4.1.193.81.2.7.1.1.1.5
+		xfSwLoadModuleOperStatus OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				passive(1),
+				upgradeStarted(2),
+				upgradeFinished(3),
+				upgradeFailed(4),
+				upgradeAborted(5)
+				}
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Indicates the status of the software upgrade process
+				for this load module.
+				passive(1)
+				   the load module is not involved in a upgrade
+				   process and is not active. I.e.it is part of
+				   the previous software release.
+
+				upgradeStarted(2)
+				   a load module will have this status directly
+				   after the SBDF info for this module is loaded
+				   and the xfSwLoadModuleAdminStatus of the
+				   release was set to upgradeStarted.
+
+				upgradeFinished(3)
+				   indicates that this load modules has been retrieved
+				   and burned into the flash memories. This is the state
+				   of load modules that are part of an active release.
+
+				upgradeFailed(4)
+				   upgraded has failed for a reason, e.g. file transfer
+				   checksum was wrong, see xfSwLoadModuleFailure.
+
+				upgradeAborted(5)
+				   when the manager has aborted the upgrade of the
+				   complete release whilst this load module wasn't
+				   upgradedFinished yet this will be its status.
+				"
+			::= { xfSwLoadModuleEntry 5 }
+
+
+--
+		-- 1.3.6.1.4.1.193.81.2.7.1.1.1.6
+		xfSwLoadModuleFailure OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				downloadFailure(1),
+				programFailure(2),
+				noFailure(3)
+				}
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The objects specifies the cause of a software upgrade
+				failure for this load module. "
+			::= { xfSwLoadModuleEntry 6 }
+
+
+		-- 1.3.6.1.4.1.193.81.2.7.1.1.1.8
+		xfSwLoadModuleProgress OBJECT-TYPE
+			SYNTAX Integer32 (0..100)
+			UNITS "percent"
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the progress in downloading
+				the respective load module when part of an upgrade
+				of an NE to a software baseline."
+			::= { xfSwLoadModuleEntry 8 }
+
+
+		-- 1.3.6.1.4.1.193.81.2.7.1.1.1.9
+		xfSwLoadModuleDescription OBJECT-TYPE
+			SYNTAX SnmpAdminString (SIZE (0..30))
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates a textual
+				description of the load module, indicating PIU type
+				as stated by the entPhysicalDescription MO."
+			::= { xfSwLoadModuleEntry 9 }
+
+
+		-- 1.3.6.1.4.1.193.81.2.7.1.2
+		xfSwReleaseTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF XfSwReleaseEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"This contains the information on the active and passive
+				software releases."
+			::= { xfSwObjects 2 }
+
+
+		-- 1.3.6.1.4.1.193.81.2.7.1.2.1
+		xfSwReleaseEntry OBJECT-TYPE
+			SYNTAX XfSwReleaseEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Information about a software release. There are always
+				only two releases. For the active release write is
+				possible but will have no impact and will result in a
+				inconsistentValue error response."
+			INDEX { xfSwReleaseIndex }
+			::= { xfSwReleaseTable 1 }
+
+
+		XfSwReleaseEntry ::=
+			SEQUENCE {
+				xfSwReleaseIndex
+					XfSwRelease,
+				xfSwReleaseProductNumber
+					XfProductnumber,
+				xfSwReleaseRevision
+					XfProductRevision,
+				xfSwReleaseAdminStatus
+					INTEGER,
+				xfSwReleaseOperStatus
+					INTEGER,
+				xfSwReleaseSBLType
+					INTEGER
+			 }
+
+		-- 1.3.6.1.4.1.193.81.2.7.1.2.1.1
+		xfSwReleaseIndex OBJECT-TYPE
+			SYNTAX XfSwRelease
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Indicates the Release the info for which this row is
+				applicable."
+			::= { xfSwReleaseEntry 1 }
+
+
+		-- 1.3.6.1.4.1.193.81.2.7.1.2.1.2
+		xfSwReleaseProductNumber OBJECT-TYPE
+			SYNTAX XfProductnumber
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Product number of the installed software package in
+				this release. Normally something like 'CAXR102 012/1'.
+				For the active release this is a read-only object."
+			::= { xfSwReleaseEntry 2 }
+
+
+		-- 1.3.6.1.4.1.193.81.2.7.1.2.1.3
+		xfSwReleaseRevision OBJECT-TYPE
+			SYNTAX XfProductRevision
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Revision of the installed software package in this
+				Release. Normally something like 'R1A'.
+				For the active release this is a read-only object."
+			::= { xfSwReleaseEntry 3 }
+
+
+		-- 1.3.6.1.4.1.193.81.2.7.1.2.1.4
+		xfSwReleaseAdminStatus OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				upgradeStarted(1),
+				upgradeAborted(2),
+				activeAndRunning(5),
+				upgradeTest(6)
+				}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Indicates the desired status for this release. To start
+				a software upgrade the manager has to set
+				xfSwReleaseProductNumber and xfSwReleaseRevision. After
+				that it will set this object to upgradeStarted. Which
+				will lead to downloading the SBDF-file from the FTP
+				Server.
+				For the active release this is a read-only object."
+			::= { xfSwReleaseEntry 4 }
+
+
+		-- 1.3.6.1.4.1.193.81.2.7.1.2.1.5
+		xfSwReleaseOperStatus OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				passive(1),
+				upgradeStarted(2),
+				upgradeFinished(3),
+				testing(4),
+				upgradeFailed(5),
+				upgradeAborted(6),
+				running(7),
+				testingFromManual(8),
+				errorInternal(50),
+				errorFileStorage(51),
+				ftpPingFailed(52),
+				ftpNoAccess(53),
+				ftpConnectionDetailsMissing(54),
+				ftpConnectionDetailsInvalid(55),
+				ftpConnectionTimeout(56),
+				ftpNoSuchRemoteFile(57),
+				ftpNoSuchRemoteDir(58),
+				ftpServiceNotAvailable(421),
+				ftpUnableToOpenDataConnection(425),
+				ftpConnectionClosed(426),
+				ftpFileBusy(450),
+				ftpLocalError(451),
+				ftpInsufficientStorageSpace(452),
+				ftpSyntaxError(501),
+				ftpCommandNotImplemented(502),
+				ftpBadSequenceCommands(503),
+				ftpParameterNotImplemented(504),
+				ftpNoLoggedIn(530),
+				ftpNeedAccount(532),
+				ftpFileUnavailable(550),
+				ftpExceededStorageAllocation(552),
+				ftpFileNameNotAllowed(553)
+				}
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Indicates the status of this release.
+				passive(1)
+				  release not involved in upgrade and currently not
+				  running.
+
+				upgradeStarted(2)
+				  the release is in the process of being upgraded
+
+				upgradeFinished(3)
+				  All load modules of the release are downloaded and
+				  burned in the respective flash memories.
+
+				testing(4)
+				  This release is running as test and not committed yet.
+
+				upgradeFailed(5)
+				  The upgrade to this release failed, e.g. due to FTP
+				  server failure.
+
+				upgradeAborted(6)
+				  The manager has order to abort the upgrade to this
+				  release.
+
+				running(7)
+				  This is the release that is running now and all new
+				  boards should upgrade to.
+
+				testingFromManual(8)
+				  Same as value testing(4) but indicating that this a test phase
+				  after a SBL from Manual mode. As such a fall-back will result in manual mode,
+				  i.e. no SBL.
+
+
+				The 50 series errors are reported by the FTP client on
+				the node.
+
+
+				errorInternalError(50)
+				   An internal error detected before FTP operation.
+
+				errorFileStorage(51)
+				   Error when erasing flash to store the downloaded
+				   file at the node.
+
+				ftpPingFailed(52)
+				   FTP ping failed.
+
+				ftpNoAccess(53)
+				   Not able to send the FTP commands.
+
+				ftpConnectionDetailsMissing(54)
+				   FTP connection details are missing.
+
+				ftpConnectionDetailsInvalid(55)
+				   FTP connection details are invalid.
+
+				ftpConnectionTimeout(56)
+				   FTP connection timeout is detected.
+
+				ftpNoSuchRemoteFile(57)
+				   No such remote file exists.
+
+				ftpNoSuchRemoteDir(58)
+				   No such remote directory exists.
+
+
+				The 400 series errors occur when the command was not accepted
+				and the requested action did not take place, but the error
+				condition is temporary and the action may be requested again.
+
+
+				ftpServiceNotAvailable(421)
+				   Service not available, closing control connection. This
+				   may be a reply to any command if the service knows it
+				   must shut down. Possible causes are transfer timeouts
+				   and/or FTP server resets.
+
+				ftpUnableToOpenDataConnection(425)
+				  Can't open data connection. Try changing from PASV to
+				  PORT mode.
+
+				ftpConnectionClosed(426)
+				  Connection closed and file transfer is aborted. Possible
+				  causes are out of local diskspace and loss of connection.
+
+
+				ftpFileBusy(450)
+				  Requested file action not taken. File
+				  unavailable (e.g file busy).
+
+				ftpLocalError(451)
+				  Requested action aborted due to local error in processing.
+
+				ftpInsufficienStorageSpace(452)
+				  Requested action not taken due to insufficient
+				  storage space on the server.
+
+
+				The 500 series errors occur when the command was not accepted
+				and the requested action did not take place.
+
+
+				ftpSyntaxError(501)
+				  FTP Syntax error in parameters or arguments.
+
+				ftpCommandNotImplemented(502)
+				  FTP Command not implemented.
+
+				ftpBadSequenceCommands(503)
+				  Bad sequence of the FTP commands.
+
+				ftpParameterNotImplemented(504)
+				  FTP command not implemented for that parameter.
+
+				ftpNotLoggedIn(530)
+				  Not logged in. Your username and/or password is being
+				  rejected, contact the server adminstrator.
+
+				ftpNeedAccount(532)
+				  Need account for storing files.
+
+				ftpFileUnavailable(550)
+				  Requested action not taken. File unavailable
+				  (e.g.file not found, no access). Contact the server
+				  adminstrator.
+
+				ftpExceededStorageAllocation(552)
+				  Requested file action aborted.Exceeded storage allocation (for
+				  current directory or data set). Contact the server adminstrator.
+
+				ftpFileNameNotAllowed(553)
+				  Requested action not taken. File name not allowed. Try changing
+				  the file name or getting rid of spaces in the file name."
+			::= { xfSwReleaseEntry 5 }
+
+
+		-- 1.3.6.1.4.1.193.81.2.7.1.2.1.6
+		xfSwReleaseSBLType OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				definedByEricsson(1),
+				definedByOperator(2)
+				}
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates whether the SBL information in
+				the SBDF is generated by Ericsson or by an operator.
+				This is based on a check of the SBDF.
+				Of course this will only be a reliable object when the
+				software can distinguish between Ericsson and operator
+				defined SBDFs, i.e. upgrading from R2A."
+			::= { xfSwReleaseEntry 6 }
+
+
+		-- 1.3.6.1.4.1.193.81.2.7.1.3
+		xfSwActiveRelease OBJECT-TYPE
+			SYNTAX XfSwRelease
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Indicates which of the two Releases is active at the
+				moment, i.e. active is the software actually running."
+			::= { xfSwObjects 3 }
+
+
+		-- 1.3.6.1.4.1.193.81.2.7.1.4
+		xfSwBootTime OBJECT-TYPE
+			SYNTAX DateAndTime
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Indicates when the XF NE will warm restart to test the
+				new software release. If all fields have value 0 an
+				immediate boot will be performed."
+			::= { xfSwObjects 4 }
+
+
+		-- 1.3.6.1.4.1.193.81.2.7.1.5
+		xfSwCommitType OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				operatorCommit(1),
+				nodeCommit(2)
+				}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"In case of a scheduled restart, i.e. valid date and
+				time in xfSwBootTime, two different commit procedures
+				can be followed:
+				operatorCommit(1)
+				  The manager commits the software release
+				  under test by setting the xfSwRelease-
+				  AdminState to activeAndRunning.
+
+				nodeCommit(2)
+				  The release under test is accepted when
+				  the node is able to establish contact
+				  through the DCN with an external IP-address.
+
+				Default values is operatorCommit(1)."
+			::= { xfSwObjects 5 }
+
+
+		-- 1.3.6.1.4.1.193.81.2.7.1.6
+		xfSwBoardTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF XfSwBoardEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"This table holds the information about software present
+				on the boards in the XF-NE. Boards without software will
+				not be in this table."
+			::= { xfSwObjects 6 }
+
+
+		-- 1.3.6.1.4.1.193.81.2.7.1.6.1
+		xfSwBoardEntry OBJECT-TYPE
+			SYNTAX XfSwBoardEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Entry in the table."
+			INDEX { entPhysicalIndex, xfSwLoadModuleIndex }
+			::= { xfSwBoardTable 1 }
+
+
+		XfSwBoardEntry ::=
+			SEQUENCE {
+				xfSwBoardLoadModuleIndex
+					Integer32,
+				xfSwBoardLoadModuleType
+					OBJECT IDENTIFIER,
+				xfSwBoardProductNumber
+					XfProductnumber,
+				xfSwBoardRevision
+					XfProductRevision,
+				xfSwBoardStatus
+					INTEGER,
+				xfSwBoardSuProgress
+					Integer32,
+				xfSwBoardMinProductNumber
+					XfProductnumber,
+				xfSwBoardMinRevision
+					XfProductRevision,
+				xfSwBoardTrafficDisturbance
+					INTEGER
+			 }
+
+		-- 1.3.6.1.4.1.193.81.2.7.1.6.1.1
+		xfSwBoardLoadModuleIndex OBJECT-TYPE
+			SYNTAX Integer32 (1..10)
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Index to the load module on the board. A board may
+				contain more than one load module.
+				"
+			::= { xfSwBoardEntry 1 }
+
+
+		-- 1.3.6.1.4.1.193.81.2.7.1.6.1.2
+		xfSwBoardLoadModuleType OBJECT-TYPE
+			SYNTAX OBJECT IDENTIFIER
+			MAX-ACCESS read-only
+			STATUS obsolete
+			DESCRIPTION
+				"This object indicates of what type the software is,
+				like DP (Device Processor) or FPGA (Field Programmable
+				Gate Array) or another type. New type can be defined by
+				defining a new OID in a other MIB.
+				 "
+			::= { xfSwBoardEntry 2 }
+
+
+		-- 1.3.6.1.4.1.193.81.2.7.1.6.1.3
+		xfSwBoardProductNumber OBJECT-TYPE
+			SYNTAX XfProductnumber
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This is a string indicating the product number of the
+				software in the active flash memory.
+				"
+			::= { xfSwBoardEntry 3 }
+
+
+		-- 1.3.6.1.4.1.193.81.2.7.1.6.1.4
+		xfSwBoardRevision OBJECT-TYPE
+			SYNTAX XfProductRevision
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This is a string indicating the revision of the
+				software in the active flash memory."
+			::= { xfSwBoardEntry 4 }
+
+
+		-- 1.3.6.1.4.1.193.81.2.7.1.6.1.5
+		xfSwBoardStatus OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				unknown(1),
+				active(2),
+				upgrading(3),
+				wrongSoftware(4),
+				minSoftwareRevision(5)
+				}
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Indicates the status of the software on the board:
+				Unknown(1)
+				  The status of the software is unknown for example
+				  at startup.
+
+				Active(2)
+				  Software on the board is OK and running
+
+				Upgrading(3)
+				  Software is in the process of being upgraded
+
+				WrongSoftware(4)
+				  Wrong software on the board and for some reason
+				  not being upgraded yet.
+
+				MinSoftware revision(5)
+				  The board was tried to downgrade to a software revision that
+				  is not compatible with the hardware.
+
+				The xfSwBoardStatus is only of use in case version control is
+				enabled. If version control is not enabled the unit will always
+				runs its software."
+			::= { xfSwBoardEntry 5 }
+
+
+		-- 1.3.6.1.4.1.193.81.2.7.1.6.1.6
+		xfSwBoardSuProgress OBJECT-TYPE
+			SYNTAX Integer32 (0..100)
+			UNITS "percent"
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the progress of the software
+				upgrade process for each individual PIU. This indicates
+				both flash erasing and programming.
+				This object indicates this for both upgrade to a
+				baseline as well as for inserted PIUs.
+				In case the software upgrade of the board takes less
+				than 10 seconds this objects will directly go to 100%."
+			::= { xfSwBoardEntry 6 }
+
+
+		-- 1.3.6.1.4.1.193.81.2.7.1.6.1.7
+		xfSwBoardMinProductNumber OBJECT-TYPE
+			SYNTAX XfProductnumber
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This is a string indicating the product number of the
+				minimally acceptable software revision for this unit
+				type/variant.
+				"
+			::= { xfSwBoardEntry 7 }
+
+
+		-- 1.3.6.1.4.1.193.81.2.7.1.6.1.8
+		xfSwBoardMinRevision OBJECT-TYPE
+			SYNTAX XfProductRevision
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This is a string indicating the revision of the
+				minimally acceptable software revision for this unit
+				type/variant."
+			::= { xfSwBoardEntry 8 }
+
+
+		-- 1.3.6.1.4.1.193.81.2.7.1.6.1.9
+		xfSwBoardTrafficDisturbance OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				unknown(1),
+				disturbing(2),
+				notDisturbing(3)
+				}
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates that software upgrade of this
+				load module on this unit might lead to traffic
+				disturbance. This could for example happen in the
+				exceptional case where the load module includes FPGA
+				code for the traffic system."
+			::= { xfSwBoardEntry 9 }
+
+
+		-- 1.3.6.1.4.1.193.81.2.7.1.7
+		xfSwNpuObjects OBJECT IDENTIFIER ::= { xfSwObjects 7 }
+
+
+--  Software related objects specific for NPU. The NPU is the only PIU
+-- for which the passive memory bank is of interest to external
+-- management, since a fall-back to it can be performed.
+--
+		-- 1.3.6.1.4.1.193.81.2.7.1.7.1
+		xfSwNpuPassiveProductNumber OBJECT-TYPE
+			SYNTAX XfProductnumber
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Product number of NPU software in passive bank."
+			::= { xfSwNpuObjects 1 }
+
+
+		-- 1.3.6.1.4.1.193.81.2.7.1.7.2
+		xfSwNpuPassiveRevision OBJECT-TYPE
+			SYNTAX XfProductRevision
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Revision of software in passive bank on NPU."
+			::= { xfSwNpuObjects 2 }
+
+
+		-- 1.3.6.1.4.1.193.81.2.7.1.7.3
+		xfSwNpuPassiveSwitch OBJECT-TYPE
+			SYNTAX INTEGER { switch(1) }
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"This object can be used to switch the NPU passive
+				software.
+				As a safety precaution this object is
+				only available when the node is in installation mode
+				or when the node is accessed through the USB port
+				(if present).
+				A warm restart is required to activate the fallback.
+				A switch leads to all xfSwUpgradePreferences being set
+				to their default values, i.e. no version control."
+			::= { xfSwNpuObjects 3 }
+
+
+		-- 1.3.6.1.4.1.193.81.2.7.1.8
+		xfSwLoadModuleTypes OBJECT IDENTIFIER ::= { xfSwObjects 8 }
+
+
+--   The following software types where known at time of definition
+-- of this MIB.
+--
+		-- 1.3.6.1.4.1.193.81.2.7.1.8.1
+		xfDeviceProcessorSoftware OBJECT-IDENTITY
+			STATUS obsolete
+			DESCRIPTION
+				"Used for DP software load modules."
+			::= { xfSwLoadModuleTypes 1 }
+
+
+		-- 1.3.6.1.4.1.193.81.2.7.1.8.2
+		xfPciFpgaCode OBJECT-IDENTITY
+			STATUS obsolete
+			DESCRIPTION
+				"Used for PCI FPGA load modules."
+			::= { xfSwLoadModuleTypes 2 }
+
+
+		-- 1.3.6.1.4.1.193.81.2.7.1.9
+		xfSwUpgradePreferences OBJECT IDENTIFIER ::= { xfSwObjects 9 }
+
+
+--   These objects are used to configure the software
+-- upgrade process, i.e. all from only informing to
+-- total control.
+--
+		-- 1.3.6.1.4.1.193.81.2.7.1.9.1
+		xfSwVersionControl OBJECT-TYPE
+			SYNTAX XfSwEnableDisable
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Used to enable/disable version control.
+				Default: disable."
+			::= { xfSwUpgradePreferences 1 }
+
+
+		-- 1.3.6.1.4.1.193.81.2.7.1.9.2
+		xfSwAutoUpgrade OBJECT-TYPE
+			SYNTAX XfSwEnableDisable
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Used to enable/disable automatic software upgrade.
+				In case xfSwVersionControl is enabled a change of the
+				value will cause all PIUs to be checked again.
+
+				Default: disable."
+			::= { xfSwUpgradePreferences 2 }
+
+
+		-- 1.3.6.1.4.1.193.81.2.7.1.9.3
+		xfSwAutoDowngrade OBJECT-TYPE
+			SYNTAX XfSwEnableDisable
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Used to enable/disable automatic software downgrade.
+				In case xfSwVersionControl is enabled a change of the
+				value will cause all PIUs to be checked again.
+				Default: disable."
+			::= { xfSwUpgradePreferences 3 }
+
+
+		-- 1.3.6.1.4.1.193.81.2.7.1.9.4
+		xfSwAcceptFailure OBJECT-TYPE
+			SYNTAX XfSwEnableDisable
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Used to enable/disable setting of new PIUs, that fail
+				to up/downgrade, in  'out of service'. PIUs that are
+				out of service will not be taken into service on the
+				disable/enable transistion.
+				Default: enable."
+			::= { xfSwUpgradePreferences 4 }
+
+
+		-- 1.3.6.1.4.1.193.81.2.7.1.10
+		xfSwLmUpgradeTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF XfSwLmUpgradeEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"This table is used to upgrade a single load module. For
+				each known load module an entry is present."
+			::= { xfSwObjects 10 }
+
+
+		-- 1.3.6.1.4.1.193.81.2.7.1.10.1
+		xfSwLmUpgradeEntry OBJECT-TYPE
+			SYNTAX XfSwLmUpgradeEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Entry in the table."
+			INDEX { xfSwLmUpgradeIndex }
+			::= { xfSwLmUpgradeTable 1 }
+
+
+		XfSwLmUpgradeEntry ::=
+			SEQUENCE {
+				xfSwLmUpgradeIndex
+					Integer32,
+				xfSwLmUpgradeProductNumber
+					XfProductnumber,
+				xfSwLmUpgradeRevision
+					XfProductRevision,
+				xfSwLmUpgradeAdminStatus
+					INTEGER,
+				xfSwLmUpgradeOperStatus
+					INTEGER,
+				xfSwLmUpgradeProgress
+					Integer32,
+				xfSwLmUpgradeFailure
+					INTEGER,
+				xfSwLmUpgradeDescription
+					SnmpAdminString
+			 }
+
+		-- 1.3.6.1.4.1.193.81.2.7.1.10.1.1
+		xfSwLmUpgradeIndex OBJECT-TYPE
+			SYNTAX Integer32 (1..100)
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Objects used to index the table."
+			::= { xfSwLmUpgradeEntry 1 }
+
+
+		-- 1.3.6.1.4.1.193.81.2.7.1.10.1.3
+		xfSwLmUpgradeProductNumber OBJECT-TYPE
+			SYNTAX XfProductnumber
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Product number of the load module. Normally something
+				like 'CAXR102_012/1'."
+			::= { xfSwLmUpgradeEntry 3 }
+
+
+		-- 1.3.6.1.4.1.193.81.2.7.1.10.1.4
+		xfSwLmUpgradeRevision OBJECT-TYPE
+			SYNTAX XfProductRevision
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Revision to which the load module should be upgraded.
+				Normally something like 'R1A'."
+			::= { xfSwLmUpgradeEntry 4 }
+
+
+		-- 1.3.6.1.4.1.193.81.2.7.1.10.1.6
+		xfSwLmUpgradeAdminStatus OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				upgradeStarted(1),
+				upgradeAborted(2),
+				activeAndRunning(3),
+				upgradeTest(4)
+				}
+			MAX-ACCESS read-write
+			STATUS current
+			DESCRIPTION
+				"Indicates the desired status for this release. To start
+				a software upgrade the manager has to set
+				xfSwLmUpgradeRevision. After that it will set this
+				object to upgradeStarted. Which will lead to downloading
+				the SBDF-file from the FTP Server. For the active release
+				write is possible but will have no impact."
+			::= { xfSwLmUpgradeEntry 6 }
+
+
+		-- 1.3.6.1.4.1.193.81.2.7.1.10.1.7
+		xfSwLmUpgradeOperStatus OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				active(1),
+				upgradeStarted(2),
+				upgradeFinished(3),
+				upgradeTested(4),
+				upgradeFailed(5),
+				upgradeAborted(6),
+				errorInternalError(50),
+				errorFileStorage(51),
+				ftpPingFailed(52),
+				ftpNoAccess(53),
+				ftpConnectionDetailsMissing(54),
+				ftpConnectionDetailsInvalid(55),
+				ftpConnectionTimeout(56),
+				ftpNoSuchRemoteFile(57),
+				ftpNoSuchRemoteDir(58),
+				ftpServiceNotAvailable(421),
+				ftpUnableToOpenDataConnection(425),
+				ftpConnectionClosed(426),
+				ftpFileBusy(450),
+				ftpLocalError(451),
+				ftpInsufficienStorageSpace(452),
+				ftpSyntaxError(501),
+				ftpCommandNotImplemented(502),
+				ftpBadSequenceCommands(503),
+				ftpParameterNotImplemented(504),
+				ftpNotLoggedIn(530),
+				ftpNeedAccount(532),
+				ftpFileUnavailable(550),
+				ftpExceededStorageAllocation(552),
+				ftpFileNameNotAllowed(553)
+				}
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Indicates the status of the software upgrade process
+				for this load module.
+				active(1)
+				   the load module is active and running on the PIU.
+
+				upgradeStarted(2)
+				   a load module will have this status directly
+				   after the SRDF info for this module is loaded
+				   and the xfSwLmUpgradeAdminStatus of the
+				   release was set to upgradeStarted.
+
+				upgradeFinished(3)
+				   indicates that this load modules has been retreived
+				   and burned into the flash memories.This is the
+				   state of load modules that are part of an active
+				   release.
+
+				upgradeTested(4)
+				  This release is running as test and not committed
+				  yet.
+
+				upgradeFailed(5)
+				   upgraded has failed for a reason, e.g. file transfer
+				   checksum was wrong, see xfSwLmUpgradeFailure.
+
+				upgradeAborted(6)
+				   when the manager has aborted the upgrade of the
+				   complete release whilst this load module wasn't
+				   upgradedFinished yet this will be its status.
+
+
+
+				The 50 series errors are reported by the FTP client on
+				the node.
+
+
+				errorInternalError(50)
+				   An internal error detected before FTP operation.
+
+				errorFileStorage(51)
+				   Error when erasing flash to store the downloaded
+				   file at the node.
+
+				ftpPingFailed(52)
+				   FTP ping failed.
+
+				ftpNoAccess(53)
+				   Not able to send the FTP commands.
+
+				ftpConnectionDetailsMissing(54)
+				   FTP connection details are missing.
+
+				ftpConnectionDetailsInvalid(55)
+				   FTP connection details are invalid.
+
+				ftpConnectionTimeout(56)
+				   FTP connection timeout is detected.
+
+				ftpNoSuchRemoteFile(57)
+				   No such remote file exists.
+
+				ftpNoSuchRemoteDir(58)
+				   No such remote directory exists.
+
+
+				The 400 series errors occur when the command was not accepted
+				and the requested action did not take place, but the error
+				condition is temporary and the action may be requested again.
+
+
+				ftpServiceNotAvailable(421)
+				   Service not available, closing control connection. This
+				   may be a reply to any command if the service knows it
+				   must shut down. Possible causes are transfer timeouts
+				   and/or FTP server resets.
+
+				ftpUnableToOpenDataConnection(425)
+				  Can't open data connection. Try changing from PASV to
+				  PORT mode.
+
+				ftpConnectionClosed(426)
+				  Connection closed and file transfer is aborted. Possible
+				  causes are out of local diskspace and loss of connection.
+
+
+				ftpFileBusy(450)
+				  Requested file action not taken. File
+				  unavailable (e.g file busy).
+
+				ftpLocalError(451)
+				  Requested action aborted due to local error in processing.
+
+				ftpInsufficienStorageSpace(452)
+				  Requested action not taken due to insufficient
+				  storage space on the server.
+
+
+				The 500 series errors occur when the command was not accepted
+				and the requested action did not take place.
+
+
+				ftpSyntaxError(501)
+				  FTP Syntax error in parameters or arguments.
+
+				ftpCommandNotImplemented(502)
+				  FTP Command not implemented.
+
+				ftpBadSequenceCommands(503)
+				  Bad sequence of the FTP commands.
+
+				ftpParameterNotImplemented(504)
+				  FTP command not implemented for that parameter.
+
+				ftpNotLoggedIn(530)
+				  Not logged in. Your username and/or password is being
+				  rejected, contact the server adminstrator.
+
+				ftpNeedAccount(532)
+				  Need account for storing files.
+
+				ftpFileUnavailable(550)
+				  Requested action not taken. File unavailable
+				  (e.g.file not found, no access). Contact the server
+				  adminstrator.
+
+				ftpExceededStorageAllocation(552)
+				  Requested file action aborted.Exceeded storage allocation (for
+				  current directory or data set). Contact the server adminstrator.
+
+				ftpFileNameNotAllowed(553)
+				  Requested action not taken. File name not allowed. Try changing
+				  the file name or getting rid of spaces in the file name.
+				"
+			::= { xfSwLmUpgradeEntry 7 }
+
+
+		-- 1.3.6.1.4.1.193.81.2.7.1.10.1.8
+		xfSwLmUpgradeProgress OBJECT-TYPE
+			SYNTAX Integer32 (0..100)
+			UNITS "percent"
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the progress in downloading
+				the respective load module when part of an upgrade of
+				an inserted PIU."
+			::= { xfSwLmUpgradeEntry 8 }
+
+
+		-- 1.3.6.1.4.1.193.81.2.7.1.10.1.9
+		xfSwLmUpgradeFailure OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				downloadFailure(1),
+				programFailure(2),
+				noFailure(3)
+				}
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object specifies the cause of a software
+				upgrade failure. "
+			::= { xfSwLmUpgradeEntry 9 }
+
+
+		-- 1.3.6.1.4.1.193.81.2.7.1.10.1.10
+		xfSwLmUpgradeDescription OBJECT-TYPE
+			SYNTAX SnmpAdminString (SIZE (0..30))
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates a textual
+				description of the load module, indicating PIU type
+				as stated by the entPhysicalDescription MO."
+			::= { xfSwLmUpgradeEntry 10 }
+
+
+		-- 1.3.6.1.4.1.193.81.2.7.1.11
+		xfSwGlobalState OBJECT-TYPE
+			SYNTAX BITS
+				{
+				noUpgrade(0),
+				sblStarted(1),
+				sblWaitForActivate(2),
+				sblWaitForCommit(3),
+				manualStarted(4),
+				manualWaitForActivate(5),
+				manualWaitForCommit(6),
+				unitUpgrade(7),
+				cachingLoadModules(8),
+				preparingForTest(9)
+				}
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This objecty indicates the global state of the
+				Software Upgrade process.
+				noUpgrade(0), no Software upgrade ongoing
+
+				sblStarted(1), a SBL upgrade is started and SBDF and Load Modules are downloading
+
+				sblWaitForActivate(2), a SBL upgrade is finished and waiting for an activation
+
+				sblWaitForCommit(3), a SBL upgrade is in test phase and waiting for commit
+
+				manualStarted(4), a manual upgrade is started and Load Modules are downloading
+
+				manualWaitForActivate(5), a manual upgrade is finished and waiting for an activation
+
+
+				manualWaitForCommit(6), a manual upgrade is in test phase and waiting for commit
+
+				unitUpgrade(7), an unit is inserted and in the process of upgrading
+
+				cachingLoadModules(8), software upgrade is in the process of downloading the load
+				                       modules for cache.
+
+				preparingForTest(9),   a period after a power-up/restart the node prepares to enter
+				                       the test phase. During this period some units might restart
+				                       and it is not possible to commit the software upgrade."
+			::= { xfSwObjects 11 }
+
+
+		-- 1.3.6.1.4.1.193.81.2.7.2
+		xfSwConformance OBJECT IDENTIFIER ::= { xfSoftwareMIB 2 }
+
+
+		-- 1.3.6.1.4.1.193.81.2.7.2.1
+		xfSwCompliances OBJECT IDENTIFIER ::= { xfSwConformance 1 }
+
+
+--  this module
+-- this module
+		-- 1.3.6.1.4.1.193.81.2.7.2.1.1
+		xfSwFullCompliance MODULE-COMPLIANCE
+			STATUS current
+			DESCRIPTION
+				"The compliance statement for SNMP entities which
+				implement everything."
+			MODULE -- this module
+				MANDATORY-GROUPS { xfSwGroup, xSwGroupR2 }
+			::= { xfSwCompliances 1 }
+
+
+		-- 1.3.6.1.4.1.193.81.2.7.2.2
+		xfSwGroups OBJECT IDENTIFIER ::= { xfSwConformance 2 }
+
+
+		-- 1.3.6.1.4.1.193.81.2.7.2.2.1
+		xfSwGroup OBJECT-GROUP
+			OBJECTS { xfSwRelease, xfSwLoadModuleIndex, xfSwLoadModuleProductNumber, xfSwLoadModuleRevision, xfSwLoadModuleOperStatus,
+				xfSwReleaseIndex, xfSwReleaseProductNumber, xfSwReleaseRevision, xfSwReleaseAdminStatus, xfSwReleaseOperStatus,
+				xfSwActiveRelease, xfSwBootTime, xfSwCommitType, xfSwBoardProductNumber, xfSwBoardRevision,
+				xfSwNpuPassiveProductNumber, xfSwNpuPassiveSwitch, xfSwLoadModuleFailure, xfSwNpuPassiveRevision, xfSwBoardStatus
+				 }
+			STATUS current
+			DESCRIPTION
+				"Group of all software related objects."
+			::= { xfSwGroups 1 }
+
+
+		-- 1.3.6.1.4.1.193.81.2.7.2.2.2
+		xSwGroupR2 OBJECT-GROUP
+			OBJECTS { xfSwBoardSuProgress, xfSwLmUpgradeIndex, xfSwLmUpgradeProductNumber, xfSwLmUpgradeRevision, xfSwLmUpgradeAdminStatus,
+				xfSwLmUpgradeOperStatus, xfSwBoardMinProductNumber, xfSwBoardMinRevision, xfSwVersionControl, xfSwLoadModuleProgress,
+				xfSwLmUpgradeFailure, xfSwBoardTrafficDisturbance, xfSwReleaseSBLType, xfSwLmUpgradeProgress, xfSwAutoUpgrade,
+				xfSwAutoDowngrade, xfSwGlobalState, xfSwAcceptFailure, xfSwLoadModuleDescription, xfSwLmUpgradeDescription
+				 }
+			STATUS current
+			DESCRIPTION
+				"All objects added for MINI-LINK Traffic Node R2."
+			::= { xfSwGroups 2 }
+
+
+		-- 1.3.6.1.4.1.193.81.2.7.2.2.3
+		xfSwObsoleteGroup OBJECT-GROUP
+			OBJECTS { xfSwBoardLoadModuleIndex, xfSwBoardLoadModuleType }
+			STATUS obsolete
+			DESCRIPTION
+				"Description."
+			::= { xfSwGroups 3 }
+
+
+
+	END
+
+--
+-- 10_19603-crxr10201_1_software.mi2
+--

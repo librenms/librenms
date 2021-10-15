@@ -1,0 +1,2550 @@
+
+-- Each module definition could be in its own file.
+-- They have been concatenated and placed in this file.
+-- They can be separated if this file grows too big.
+--
+-- This document should be viewed using tab-stops 4 spaces wide.
+-- When updating this document, please use tabs, not spaces, for indents.
+
+-- ========================================================================
+-- Start - JUNIPER-WX-GLOBAL-REG Module
+
+-- WX OID infrastructure layout.
+--
+-- The convention described in "Understanding SNMP MIBs"
+-- (David Perkins, Evan McGinnis), Chapter 8, has generally been followed.
+
+JUNIPER-WX-GLOBAL-REG DEFINITIONS ::= BEGIN
+
+	IMPORTS
+		MODULE-IDENTITY, OBJECT-IDENTITY,
+		enterprises
+			FROM SNMPv2-SMI;
+
+	jnxWxGlobalRegModule MODULE-IDENTITY
+		LAST-UPDATED			"200107292200Z"
+		ORGANIZATION			"Juniper Networks, Inc"
+		CONTACT-INFO			"
+					Customer Support
+					Juniper Networks, Inc.
+					1194 North Mathilda Avenue
+					Sunnyvale, CA  94089
+
+					+1 888-314-JTAC
+					support@juniper.net"
+
+		DESCRIPTION				"
+			A MIB module containing top-level OID definitions
+			for various sub-trees for Juniper Networks' enterprise MIB modules."
+
+		REVISION				"200711171000Z"
+		DESCRIPTION				"
+			Add wxc1800, wxc2600, wxc3400 product OID"
+
+		REVISION				"200711171000Z"
+		DESCRIPTION				"
+			Change ISM200 product identity to jnxIsm200Wxc"
+
+		REVISION				"200711140130Z"
+		DESCRIPTION				"
+			Add ISM200 product OID."
+
+		REVISION				"200606081800Z"
+		DESCRIPTION				"
+			Update contact and MIB with Juniper information
+			Add wxc590 and wx60 product OID."
+
+		REVISION				"200505091012Z"
+		DESCRIPTION				"
+			Added wxc250 product OID."
+
+		REVISION				"200403151400Z"
+		DESCRIPTION				"
+			Add wx100 product OID."
+
+		REVISION				"200306262000Z"
+		DESCRIPTION				"
+			Add wx80 product OID."
+
+		REVISION				"200107292200Z"
+		DESCRIPTION				"
+			Rev 1.0
+			Initial version of MIB module JUNIPER-WX-GLOBAL-REG."
+
+		::= { jnxWxModules 1 }
+
+	juniperWxRoot OBJECT-IDENTITY
+		STATUS					current
+		DESCRIPTION				"
+			The root of the OID sub-tree assigned to Juniper Networks assigned by
+			the Internet Assigned Numbers Authority (IANA)."
+		::= { enterprises 8239 }
+
+	jnxWxReg OBJECT-IDENTITY
+		STATUS					current
+		DESCRIPTION				"
+			Sub-tree for registrations - identification of modules and logical and
+			physical components."
+		::= { juniperWxRoot 1 }
+
+	jnxWxModules OBJECT-IDENTITY
+		STATUS					current
+		DESCRIPTION				"
+			Sub-tree for module registrations."
+		::= { jnxWxReg 1 }
+
+	jnxWxMibs OBJECT-IDENTITY
+		STATUS					current
+		DESCRIPTION				"
+			Sub-tree for all WX object and event definitions."
+		::= { juniperWxRoot 2 }
+
+	jnxWxCaps OBJECT-IDENTITY
+		STATUS					current
+		DESCRIPTION				"
+			Sub-tree for agent profiles."
+		::= { juniperWxRoot 3 }
+
+	jnxWxReqs OBJECT-IDENTITY
+		STATUS					current
+		DESCRIPTION				"
+			Sub-tree for management application requirements."
+		::= { juniperWxRoot 4 }
+
+	jnxWxExpr OBJECT-IDENTITY
+		STATUS					current
+		DESCRIPTION				"
+			Sub-tree for experimental definitions."
+		::= { juniperWxRoot 5 }
+
+	-- Sub-trees for WX managed objects
+
+	jnxWxCommonMib OBJECT-IDENTITY
+		STATUS					current
+		DESCRIPTION				"
+			Sub-tree for common WX object and event definitions.
+			These would be implemented by all WX products."
+		::= { jnxWxMibs 1 }
+
+	jnxWxSpecificMib OBJECT-IDENTITY
+		STATUS					current
+		DESCRIPTION				"
+			Sub-tree for specific WX object and event definitions."
+		::= { jnxWxMibs 2 }
+
+	-- OID registrations for WX product lines
+	-- These OIDs are never queried by management stations.
+	-- They can be returned as product identifiers in responses.
+
+	jnxWxProduct OBJECT-IDENTITY
+		STATUS					current
+		DESCRIPTION				"
+			The WAN Acceleration product family."
+		::= { jnxWxReg 2 }
+
+		jnxWxProductWx50 OBJECT-IDENTITY
+			STATUS					current
+			DESCRIPTION				"
+				WAN Acceleration Model 50"
+			::= { jnxWxProduct 1 }
+
+		jnxWxProductWx55 OBJECT-IDENTITY
+			STATUS					current
+			DESCRIPTION				"
+				WAN Acceleration Model 55"
+			::= { jnxWxProduct 2 }
+
+		jnxWxProductWx20 OBJECT-IDENTITY
+			STATUS					current
+			DESCRIPTION				"
+				WAN Acceleration Model 20"
+			::= { jnxWxProduct 3 }
+
+		jnxWxProductWx80 OBJECT-IDENTITY
+			STATUS					current
+			DESCRIPTION				"
+				WAN Acceleration Model 80"
+			::= { jnxWxProduct 4 }
+
+		jnxWxProductWx100 OBJECT-IDENTITY
+			STATUS					current
+			DESCRIPTION				"
+				WAN Acceleration Model 100"
+			::= { jnxWxProduct 5 }
+
+		jnxWxProductWxc500 OBJECT-IDENTITY
+			STATUS					current
+			DESCRIPTION				"
+				Sequence Caching Model 500"
+			::= { jnxWxProduct 6 }
+
+		jnxWxProductWx15 OBJECT-IDENTITY
+			STATUS					current
+			DESCRIPTION				"
+				WAN Acceleration Model 15"
+			::= { jnxWxProduct 7 }
+
+		jnxWxProductWxc250 OBJECT-IDENTITY
+			STATUS					current
+			DESCRIPTION				"
+				Sequence Caching Model 250"
+			::= { jnxWxProduct 8 }
+
+		jnxWxProductWx60 OBJECT-IDENTITY
+			STATUS					current
+			DESCRIPTION				"
+				WAN Acceleration Model 60"
+			::= { jnxWxProduct 9 }
+
+		jnxWxProductWxc590 OBJECT-IDENTITY
+			STATUS					current
+			DESCRIPTION				"
+				Sequence Caching Model 590"
+			::= { jnxWxProduct 10 }
+
+		jnxWxProductIsm200Wxc OBJECT-IDENTITY
+			STATUS					current
+			DESCRIPTION				"
+				WAN Acceleration Model ISM200"
+			::= { jnxWxProduct 11 }
+
+		jnxWxProductWxc1800 OBJECT-IDENTITY
+			STATUS					current
+			DESCRIPTION				"
+				WAN Acceleration Model 1800"
+			::= { jnxWxProduct 12 }
+
+		jnxWxProductWxc2600 OBJECT-IDENTITY
+			STATUS					current
+			DESCRIPTION				"
+				WAN Acceleration Model 2600"
+			::= { jnxWxProduct 13 }
+
+		jnxWxProductWxc3400 OBJECT-IDENTITY
+			STATUS					current
+			DESCRIPTION				"
+				WAN Acceleration Model 3400"
+			::= { jnxWxProduct 14 }
+
+END
+
+-- End - JUNIPER-WX-GLOBAL-REG Module
+
+-- ========================================================================
+-- Start - JUNIPER-WX-GLOBAL-TC Module
+
+-- WX Global Textual Conventions
+--
+-- The convention described in "Understanding SNMP MIBs"
+-- (David Perkins, Evan McGinnis), Chapter 8, has generally been followed.
+
+JUNIPER-WX-GLOBAL-TC DEFINITIONS ::= BEGIN
+
+	IMPORTS
+		MODULE-IDENTITY
+			FROM SNMPv2-SMI
+		TEXTUAL-CONVENTION
+			FROM SNMPv2-TC
+		jnxWxModules
+			FROM JUNIPER-WX-GLOBAL-REG;
+
+	jnxWxGlobalTcModule MODULE-IDENTITY
+		LAST-UPDATED			"200107292200Z"
+		ORGANIZATION			"Juniper Networks, Inc"
+		CONTACT-INFO			"
+					Customer Support
+					Juniper Networks, Inc.
+					1194 North Mathilda Avenue
+					Sunnyvale, CA  94089
+
+					+1 888-314-JTAC
+					support@juniper.net"
+
+		DESCRIPTION				"
+			A MIB module containing textual conventions
+			for Juniper Networks' enterprise MIB modules.
+			These textual conventions are used across all WX products."
+
+		REVISION				"200606081800Z"
+		DESCRIPTION				"
+			Update contact and MIB with Juniper information
+			Add wxc590 and wx60 chassis type."
+
+		REVISION				"200505091010Z"
+		DESCRIPTION				"
+			Add wxc250 chassis type."
+
+		REVISION				"200403151400Z"
+		DESCRIPTION				"
+			Add wx100 chassis type."
+
+		REVISION				"200306262000Z"
+		DESCRIPTION				"
+			Add wx80 chassis type."
+
+		REVISION				"200211071900Z"
+		DESCRIPTION				"
+			Add wx20 chassis type."
+
+		REVISION				"200107292200Z"
+		DESCRIPTION				"
+			Rev 1.0
+			Initial version of MIB module JUNIPER-WX-GLOBAL-TC."
+
+		::= { jnxWxModules 2 }
+
+	-- No WX textual conventions yet!
+
+	TcAppName ::= TEXTUAL-CONVENTION
+		DISPLAY-HINT			"64a"
+		STATUS					current
+		DESCRIPTION				"
+			Represents the name of an application.
+
+			This has all the restrictions of the DisplayString textual
+			convention with the following additional ones:
+
+			- Only the following characters/character ranges are allowed:
+				0-9
+				A-Z
+				a-z
+				:./#$&_-+()'
+				<space>
+
+			Any object defined using this syntax may not exceed 64
+			characters in length."
+		SYNTAX       OCTET STRING (SIZE (0..64))
+
+	TcQosIdentifier ::= TEXTUAL-CONVENTION
+		DISPLAY-HINT			"24a"
+		STATUS					current
+		DESCRIPTION				"
+			Represents the name of a QoS class, a tunnel or
+			a tunnel ip address encoded as a string.
+
+			This has all the restrictions of the DisplayString textual
+			convention with the following additional ones:
+
+			- Only the following characters/character ranges are allowed:
+				0-9
+				A-Z
+				a-z
+				:./#$&_-+()'
+				<space>
+
+			Any object defined using this syntax may not exceed 24
+			characters in length."
+		SYNTAX       OCTET STRING (SIZE (0..24))
+
+	TcChassisType ::= TEXTUAL-CONVENTION
+		STATUS					current
+		DESCRIPTION				"
+			Enumerates all possible chassis types for WX devices."
+		SYNTAX
+			INTEGER
+			{
+				jnxWxOther(1),
+				jnxWx50(2),
+				jnxWx20(3),
+				jnxWx80(4),
+				jnxWx100(5),
+				jnxWxc500(6),
+				jnxWx15(7),
+				jnxWxc250(8),
+				jnxWx100V3(9),
+				jnxWx60(10),
+				jnxWxc590(11),
+				jnxIsm200Wxc(12),
+				jnxWxc1800(13),
+				jnxWxc2600(14),
+				jnxWxc3400(15)
+			}
+END
+
+-- End - JUNIPER-WX-GLOBAL-TC Module
+
+-- ========================================================================
+-- Start - JUNIPER-WX-COMMON-MIB Module
+
+-- MIB for the common MIB objects implemented by all
+-- WX devices.
+--
+-- The convention described in "Understanding SNMP MIBs"
+-- (David Perkins, Evan McGinnis), Chapter 8, has generally been followed.
+
+JUNIPER-WX-COMMON-MIB DEFINITIONS ::= BEGIN
+
+	IMPORTS
+		MODULE-IDENTITY, OBJECT-IDENTITY,
+		OBJECT-TYPE, NOTIFICATION-TYPE,
+		Integer32
+			FROM SNMPv2-SMI
+--		MODULE-COMPLIANCE, OBJECT-GROUP
+--			FROM SNMPv2-CONF
+		DisplayString, TruthValue
+			FROM SNMPv2-TC
+		TcChassisType
+			FROM JUNIPER-WX-GLOBAL-TC
+		jnxWxModules, jnxWxCommonMib
+			FROM JUNIPER-WX-GLOBAL-REG;
+
+	jnxWxCommonMibModule MODULE-IDENTITY
+		LAST-UPDATED			"200206030000Z"
+		ORGANIZATION			"Juniper Networks, Inc"
+		CONTACT-INFO			"
+					Customer Support
+					Juniper Networks, Inc.
+					1194 North Mathilda Avenue
+					Sunnyvale, CA  94089
+
+					+1 888-314-JTAC
+					support@juniper.net"
+
+		DESCRIPTION				"
+			A MIB module containing definitions of managed objects
+			implemented by all Juniper Networks' products."
+
+		REVISION				"200309300845Z"
+		DESCRIPTION				"
+			Fix minor error in description of jnxWxSysDaylightSaving."
+
+		REVISION				"200304010000Z"
+		DESCRIPTION				"
+			Add interface duplex mismatch notification."
+
+		REVISION				"200303100000Z"
+		DESCRIPTION				"
+			Add interface speed mismatch notifications."
+
+		REVISION				"200206030000Z"
+		DESCRIPTION				"
+			Add Fan notifications."
+
+		REVISION				"200203270000Z"
+		DESCRIPTION				"
+			Add FaultTolerantPassthrough notification."
+
+		REVISION				"200202220000Z"
+		DESCRIPTION				"
+			Add LoginFailure notification."
+
+		REVISION				"200201230000Z"
+		DESCRIPTION				"
+			Add LicenseWillExpire notification."
+
+		REVISION				"200201170000Z"
+		DESCRIPTION				"
+			Add ThruputLimitExceeded notification."
+
+		REVISION				"200108070000Z"
+		DESCRIPTION				"
+			Rev 1.0
+			Initial version of MIB module JUNIPER-WX-COMMON-MIB."
+
+		::= { jnxWxModules 3 }
+
+	jnxWxCommonConfMib OBJECT-IDENTITY
+		STATUS					current
+		DESCRIPTION				"
+			Sub-tree for WAN Acceleration MIB conformance statements."
+		::= { jnxWxCommonMib 1 }
+
+	jnxWxCommonObjs OBJECT-IDENTITY
+		STATUS					current
+		DESCRIPTION				"
+			Sub-tree for common MIB objects."
+		::= { jnxWxCommonMib 2 }
+
+	jnxWxCommonEvents OBJECT-IDENTITY
+		STATUS					current
+		DESCRIPTION				"
+			Sub-tree for common MIB events."
+		::= { jnxWxCommonMib 3 }
+
+	-- Top level groups
+
+	jnxWxSys OBJECT-IDENTITY
+		STATUS					current
+		DESCRIPTION				"
+			Sub-tree for common system objects."
+		::= { jnxWxCommonObjs 1 }
+
+	jnxWxChassis OBJECT-IDENTITY
+		STATUS					current
+		DESCRIPTION				"
+			Sub-tree for common chassis information."
+		::= { jnxWxCommonObjs 2 }
+
+	----------------------------------------------------------------------
+	-- System objects
+
+	jnxWxSysSwVersion OBJECT-TYPE
+		SYNTAX      DisplayString (SIZE(0..32))
+		MAX-ACCESS  read-only
+		STATUS      current
+		DESCRIPTION
+			"Full software version. The first two components of the full
+			version are the major and minor versions. The third component
+			indicates the maintenance release number and the fourth,
+			the build number."
+		::= { jnxWxSys 1 }
+
+	jnxWxSysHwVersion OBJECT-TYPE
+		SYNTAX      DisplayString (SIZE(0..32))
+		MAX-ACCESS  read-only
+		STATUS      current
+		DESCRIPTION
+			"Hardware version of the unit."
+		::= { jnxWxSys 2 }
+
+	jnxWxSysSerialNumber OBJECT-TYPE
+		SYNTAX      DisplayString (SIZE(0..128))
+		MAX-ACCESS  read-only
+		STATUS      current
+		DESCRIPTION
+			"The serial number of the unit. If not available,
+			an empty string is returned."
+		::= { jnxWxSys 3 }
+
+	jnxWxSysTimeZoneOffset OBJECT-TYPE
+		SYNTAX      Integer32
+		MAX-ACCESS  read-only
+		STATUS      current
+		DESCRIPTION
+			"The offset in seconds from UTC of the system's time zone.
+			Values are negative for locations west of UTC and positive
+			for locations east of UTC."
+		::= { jnxWxSys 4 }
+
+	jnxWxSysDaylightSaving OBJECT-TYPE
+		SYNTAX      TruthValue
+		MAX-ACCESS  read-only
+		STATUS      current
+		DESCRIPTION
+			"Whether daylight savings are currently in effect for the
+			system's time zone."
+		::= { jnxWxSys 5 }
+
+	----------------------------------------------------------------------
+	-- Chassis
+
+	jnxWxChassisType OBJECT-TYPE
+		SYNTAX      TcChassisType
+		MAX-ACCESS  read-only
+		STATUS      current
+		DESCRIPTION
+			"Chassis type for this WX device."
+		::= { jnxWxChassis 1 }
+
+	----------------------------------------------------------------------
+	-- Events
+
+	jnxWxCommonEventObjs OBJECT-IDENTITY
+		STATUS					current
+		DESCRIPTION				"
+			Branch for objects meant only to be sent in event varbinds."
+		::= { jnxWxCommonEvents 1 }
+
+	jnxWxCommonEventEvents OBJECT-IDENTITY
+		STATUS					current
+		DESCRIPTION				"
+			Branch for the events themselves."
+		::= { jnxWxCommonEvents 2 }
+
+	jnxWxCommonEventEventsV2 OBJECT-IDENTITY
+		STATUS					current
+		DESCRIPTION				"
+			Branch for SNMPv2 events. The OIDs for SNMPv2 events should
+			have a zero as the next-to-last sub-identifier (as specified
+			in RFC1902)."
+		::= { jnxWxCommonEventEvents 0 }
+
+	-- Objects sent only in events
+
+	jnxWxCommonEventDescr OBJECT-TYPE
+		SYNTAX					DisplayString
+		MAX-ACCESS				accessible-for-notify
+		STATUS					current
+		DESCRIPTION
+			"String that provides a textual description of the event."
+		::= { jnxWxCommonEventObjs 1 }
+
+	-- Event descriptions
+
+	jnxWxCommonEventInFailSafeMode NOTIFICATION-TYPE
+		STATUS  current
+		DESCRIPTION
+			"This trap is sent when the device boots up in fail-safe mode.
+			This can happen for one of the following reasons:
+			o Fail-safe reboot was explicitly initiated by the user.
+			o The device rebooted automatically too many times because of
+			  the failure of internal consistency checks or the failure of
+			  tests that verify proper operation of the device."
+		::= { jnxWxCommonEventEventsV2 1 }
+
+	jnxWxCommonEventPowerSupplyFailure NOTIFICATION-TYPE
+		STATUS  current
+		DESCRIPTION
+			"One or more sources of power to the system has failed.
+			A redundant power-supply has presumably taken over.
+
+			NOTE: This trap is for future use.
+			      WX devices currently do not generate this trap."
+		::= { jnxWxCommonEventEventsV2 2 }
+
+	jnxWxCommonEventPowerSupplyOk NOTIFICATION-TYPE
+		STATUS  current
+		DESCRIPTION
+			"One or more previously failed sources of power is now
+			working normally. The transition to normal condition happened
+			without the system having to be restarted.
+
+			NOTE: This trap is for future use.
+			      WX devices currently do not generate this trap."
+		::= { jnxWxCommonEventEventsV2 3 }
+
+	jnxWxCommonEventLicenseExpired NOTIFICATION-TYPE
+		OBJECTS { jnxWxCommonEventDescr }
+		STATUS  current
+		DESCRIPTION
+			"The license for the system expired.
+			As a result, the system will switch over to
+			and stay in pass-through mode."
+		::= { jnxWxCommonEventEventsV2 4 }
+
+	jnxWxCommonEventThruputLimitExceeded NOTIFICATION-TYPE
+		OBJECTS { jnxWxCommonEventDescr }
+		STATUS  current
+		DESCRIPTION
+			"The throughput of traffic through the device
+			has exceeded the limit for which it has
+			been licensed."
+		::= { jnxWxCommonEventEventsV2 5 }
+
+	jnxWxCommonEventLicenseWillExpire NOTIFICATION-TYPE
+		OBJECTS { jnxWxCommonEventDescr }
+		STATUS  current
+		DESCRIPTION
+			"The license for the system is about to
+			expire shortly. When it eventually does
+			expire, the system will switch over to
+			and stay in pass-through mode."
+		::= { jnxWxCommonEventEventsV2 6 }
+
+	jnxWxCommonEventLoginFailure NOTIFICATION-TYPE
+		OBJECTS { jnxWxCommonEventDescr }
+		STATUS  current
+		DESCRIPTION
+			"A user's login attempt via the console/ssh/web server
+			failed due to incorrect username or password."
+		::= { jnxWxCommonEventEventsV2 7 }
+
+	jnxWxCommonEventFaultTolerantPassThrough NOTIFICATION-TYPE
+		OBJECTS { jnxWxCommonEventDescr }
+		STATUS  current
+		DESCRIPTION
+			"An anomalous health condition was detected.
+			It would have subsequently triggered hardware
+			pass through mode followed by a reboot."
+		::= { jnxWxCommonEventEventsV2 8 }
+
+	jnxWxCommonEventFanFailure NOTIFICATION-TYPE
+		OBJECTS { jnxWxCommonEventDescr }
+		STATUS  current
+		DESCRIPTION
+			"A cooling fan inside the device has failed.
+			The 'jnxWxCommonEventDescr' object has the name of
+			the fan that failed.
+			
+            This trap is currently unused"
+		::= { jnxWxCommonEventEventsV2 9 }
+
+	jnxWxCommonEventFanSpeedVariation NOTIFICATION-TYPE
+		OBJECTS { jnxWxCommonEventDescr }
+		STATUS  current
+		DESCRIPTION
+			"The speed of a cooling fan inside the device is either
+			too low or too high. The 'jnxWxCommonEventDescr' object
+			has the name of the fan that has the problem.
+			
+			This trap is currently unused."
+		::= { jnxWxCommonEventEventsV2 10 }
+
+	jnxWxCommonEventFanOk NOTIFICATION-TYPE
+		OBJECTS { jnxWxCommonEventDescr }
+		STATUS  current
+		DESCRIPTION
+			"A cooling fan inside the device that had previously
+			failed or whose speed variation was high is now
+			working properly. The 'jnxWxCommonEventDescr' object
+			has the name of the fan that has recovered.
+			
+			This trap is currently unused."
+		::= { jnxWxCommonEventEventsV2 11 }
+
+	jnxWxCommonEventInterfaceSpeedMismatch NOTIFICATION-TYPE
+		OBJECTS { jnxWxCommonEventDescr }
+		STATUS  current
+		DESCRIPTION
+			"A mismatch is detected between the local and remote
+			interface settings. This can happen due to a mismatch
+			in the local and remote interface speed or mode. "
+		::= { jnxWxCommonEventEventsV2 12 }
+
+	jnxWxCommonEventInterfaceSpeedOk NOTIFICATION-TYPE
+		OBJECTS { jnxWxCommonEventDescr }
+		STATUS  current
+		DESCRIPTION
+			"A mismatch previously detected between the local and remote
+			interface settings is now resolved. The local and remote interface
+			speed and mode are matched. "
+		::= { jnxWxCommonEventEventsV2 13 }
+
+	jnxWxCommonEventInterfaceDuplexMismatch NOTIFICATION-TYPE
+		OBJECTS { jnxWxCommonEventDescr }
+		STATUS  current
+		DESCRIPTION
+			"A possible mismatch was detected between the duplex setting
+			of either the local or remote interface and that of the
+			device attached to that interface. The interface (local
+			or remote) is identified by the 'jnxWxCommonEventDescr' object.
+
+			Note that this notification is quite different from
+			jnxWxCommonEventInterfaceSpeedMismatch, which compares the
+			local and remote interfaces on the same WX device."
+		::= { jnxWxCommonEventEventsV2 14 }
+
+    jnxWxCommonEventIpsecSecurityAssociationAdded NOTIFICATION-TYPE
+        OBJECTS { jnxWxCommonEventDescr }
+        STATUS  current
+        DESCRIPTION
+            "An IPSec security association has been negotiated and added
+            to security association database."
+        ::= { jnxWxCommonEventEventsV2 15 }
+
+    jnxWxCommonEventIpsecSecurityAssociationExpired NOTIFICATION-TYPE
+        OBJECTS { jnxWxCommonEventDescr }
+        STATUS  current
+        DESCRIPTION
+            "An IPSec security association has been deleted from the
+            security association database."
+        ::= { jnxWxCommonEventEventsV2 16 }
+
+    jnxWxCommonEventIpsecSecurityAssociationDeleted NOTIFICATION-TYPE
+        OBJECTS { jnxWxCommonEventDescr }
+        STATUS  current
+        DESCRIPTION
+            "An IPSec security association has been deleted from the
+            security association database."
+        ::= { jnxWxCommonEventEventsV2 17 }
+END
+
+-- End - JUNIPER-WX-COMMON-MIB Module
+
+-- ========================================================================
+-- Start - JUNIPER-WX-MIB Module
+
+-- WX MIB for the WAN Acceleration
+--
+-- The convention described in "Understanding SNMP MIBs"
+-- (David Perkins, Evan McGinnis), Chapter 8, has generally been followed.
+
+JUNIPER-WX-MIB DEFINITIONS ::= BEGIN
+
+	IMPORTS
+		MODULE-IDENTITY, OBJECT-IDENTITY,
+		OBJECT-TYPE, NOTIFICATION-TYPE,
+		Integer32, Unsigned32, Gauge32, Counter64, IpAddress
+			FROM SNMPv2-SMI
+--		MODULE-COMPLIANCE, OBJECT-GROUP
+--			FROM SNMPv2-CONF
+		TimeStamp
+			FROM SNMPv2-TC
+		jnxWxModules, jnxWxSpecificMib
+			FROM JUNIPER-WX-GLOBAL-REG
+		TcAppName, TcQosIdentifier
+			FROM JUNIPER-WX-GLOBAL-TC
+		jnxWxCommonEventDescr
+			FROM JUNIPER-WX-COMMON-MIB;
+
+	jnxWxMibModule MODULE-IDENTITY
+		LAST-UPDATED			"200203280000Z"
+		ORGANIZATION			"Juniper Networks, Inc"
+		CONTACT-INFO			"
+					Customer Support
+					Juniper Networks, Inc.
+					1194 North Mathilda Avenue
+					Sunnyvale, CA  94089
+
+					+1 888-314-JTAC
+					support@juniper.net"
+
+		DESCRIPTION				"
+			A MIB module containing definitions of managed objects
+			for Juniper Networks' WAN Acceleration family of products."
+
+		REVISION				"200405240000Z"
+		DESCRIPTION				"
+			Add jnxWxEventMultiPathStatusChange notification."
+
+		REVISION				"200306230000Z"
+		DESCRIPTION				"
+			o Add compression and throughput statistics
+			  to the jnxWxSysStats group.
+			o Add bytes counts to jnxWxAsmStatsTable.
+			o Add bytes counts and bytes-in percentage
+			  to jnxWxAppStatsTable.
+			o Add jnxWxAppAggrStatsTable."
+
+		REVISION				"200203280000Z"
+		DESCRIPTION				"
+			Add SessionOpened, RegServerUnreachable notifications."
+
+		REVISION				"200203270000Z"
+		DESCRIPTION				"
+			Add SessionClosed, BufferOverflow notifications."
+
+		REVISION				"200112191200Z"
+		DESCRIPTION				"
+			Rev 1.0
+			Initial version of MIB module JUNIPER-WX-MIB."
+
+		::= { jnxWxModules 4 }
+
+	jnxWxMib OBJECT-IDENTITY
+		STATUS					current
+		DESCRIPTION				"
+			Sub-tree for WAN Acceleration MIB."
+		::= { jnxWxSpecificMib 1 }
+
+	jnxWxConfMib OBJECT-IDENTITY
+		STATUS					current
+		DESCRIPTION				"
+			Sub-tree for WAN Acceleration MIB conformance statements."
+		::= { jnxWxMib 1 }
+
+	jnxWxObjs OBJECT-IDENTITY
+		STATUS					current
+		DESCRIPTION				"
+			Sub-tree for WAN Acceleration MIB objects."
+		::= { jnxWxMib 2 }
+
+	jnxWxEvents OBJECT-IDENTITY
+		STATUS					current
+		DESCRIPTION				"
+			Sub-tree for WAN Acceleration MIB events."
+		::= { jnxWxMib 3 }
+
+	----------------------------------------------------------------------
+	-- Stats update time
+
+	jnxWxStatsUpdateTime OBJECT-TYPE
+		SYNTAX  TimeStamp
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"This is the value of sysUpTime when the WX stats (jnxWxSysStats,
+			jnxWxAsm, jnxWxApp) were last updated. The management station
+			can use this information to tell if it's downloading a consistent set
+			of stats."
+		::= { jnxWxObjs 1 }
+
+	jnxWxStatsAsmCount OBJECT-TYPE
+		SYNTAX      Integer32
+		MAX-ACCESS  read-only
+		STATUS      current
+		DESCRIPTION
+			"The number of Decompressors this Compressor has had a session
+			with at any time during the last two months."
+		::= { jnxWxObjs 2 }
+
+	jnxWxStatsVirtEndptCount OBJECT-TYPE
+		SYNTAX      Integer32
+		MAX-ACCESS  read-only
+		STATUS      current
+		DESCRIPTION
+			"The number of virtual endpoints configured
+			on this WX"
+		::= { jnxWxObjs 9 }
+
+	jnxWxStatsAppCount OBJECT-TYPE
+		SYNTAX      Integer32
+		MAX-ACCESS  read-only
+		STATUS      current
+		DESCRIPTION
+			"The number of applications currently being monitored on this Compressor."
+		::= { jnxWxObjs 3 }
+
+	jnxWxStatsAccelAppCount OBJECT-TYPE
+		SYNTAX      Integer32
+		MAX-ACCESS  read-only
+		STATUS      current
+		DESCRIPTION
+			"The number of applications currently being accelerated on this Compressor."
+		::= { jnxWxObjs 8 }
+
+	jnxWxStatsQosClassCount OBJECT-TYPE
+		SYNTAX      Integer32
+		MAX-ACCESS  read-only
+		STATUS      current
+		DESCRIPTION
+			"The number of QoS classes currently being monitored on this Compressor."
+		::= { jnxWxObjs 11 }
+
+	jnxWxStatsQosEndptCount OBJECT-TYPE
+		SYNTAX      Integer32
+		MAX-ACCESS  read-only
+		STATUS      current
+		DESCRIPTION
+			"The number of QoS endpoints currently being monitored on this Compressor."
+		::= { jnxWxObjs 12 }
+
+	jnxWxStatsWpEndptCount OBJECT-TYPE
+		SYNTAX      Integer32
+		MAX-ACCESS  read-only
+		STATUS      current
+		DESCRIPTION
+			"Number of endpoints with WAN performance monitoring
+			enabled"
+		::= { jnxWxObjs 13 }
+
+	----------------------------------------------------------------------
+	-- The WX System group
+
+	jnxWxSysStats OBJECT-IDENTITY
+		STATUS					current
+		DESCRIPTION				"
+			Sub-tree for WAN Acceleration system statistics."
+	::= { jnxWxObjs 4 }
+
+	-- Decompression stats
+
+	jnxWxSysStatsBytesInAe OBJECT-TYPE
+		SYNTAX  Counter64
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"Total number of bytes that entered the WX Assembly Engine
+			since the system was started."
+		::= { jnxWxSysStats 1 }
+
+	jnxWxSysStatsBytesOutAe OBJECT-TYPE
+		SYNTAX  Counter64
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"Total number of bytes that exited the WX Assembly Engine
+			after assembly since the system was started."
+		::= { jnxWxSysStats 2 }
+
+	jnxWxSysStatsPktsInAe OBJECT-TYPE
+		SYNTAX  Counter64
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"Total number of packets that entered the WX Assembly Engine
+			since the system was started."
+		::= { jnxWxSysStats 3 }
+
+	jnxWxSysStatsPktsOutAe OBJECT-TYPE
+		SYNTAX  Counter64
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"Total number of packets that exited the WX Assembly Engine
+			after assembly since the system was started."
+		::= { jnxWxSysStats 4 }
+
+	-- Out-of-band stats
+
+	jnxWxSysStatsBytesOutOob OBJECT-TYPE
+		SYNTAX  Counter64
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"Total number of out-of-band bytes sent to the control channel
+			since the system was started."
+		::= { jnxWxSysStats 5 }
+
+	-- Pass-through stats
+
+	jnxWxSysStatsBytesPtNoAe OBJECT-TYPE
+		SYNTAX  Counter64
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"Total number of bytes that passed through the WX Compression Engine
+			because there was no corresponding Assembly Engine WX, since the
+			system was started."
+		::= { jnxWxSysStats 6 }
+
+	jnxWxSysStatsPktsPtNoAe OBJECT-TYPE
+		SYNTAX  Counter64
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"Total number of packets that passed through the WX Compression Engine
+			because there was no corresponding Assembly Engine WX, since the
+			system was started."
+		::= { jnxWxSysStats 7 }
+
+	jnxWxSysStatsBytesPtFilter OBJECT-TYPE
+		SYNTAX  Counter64
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"Total number of bytes that passed through the WX Compression Engine
+			due to a manually configured filter (such as an application
+			filter), since the system was started."
+		::= { jnxWxSysStats 8 }
+
+	jnxWxSysStatsPktsPtFilter OBJECT-TYPE
+		SYNTAX  Counter64
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"Total number of packets that passed through the WX Compression Engine
+			due to a manually configured filter (such as an application
+			filter), since the system was started."
+		::= { jnxWxSysStats 9 }
+
+	jnxWxSysStatsBytesOfPt OBJECT-TYPE
+		SYNTAX  Counter64
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"Total number of bytes that passed through the WX Compression Engine
+			due to device buffer overflow, since the system was started."
+		::= { jnxWxSysStats 10 }
+
+	jnxWxSysStatsPktsOfPt OBJECT-TYPE
+		SYNTAX  Counter64
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"Total number of packets that passed through the WX Compression Engine
+			due to device buffer overflow, since the system was started."
+		::= { jnxWxSysStats 11 }
+
+	-- Peak stats
+
+	jnxWxSysStatsBytesTpIn OBJECT-TYPE
+		SYNTAX  Counter64
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"The number of bytes into the WX Compression Engine at the peak
+			five-second interval of data input, since the system was started."
+		::= { jnxWxSysStats 12 }
+
+	jnxWxSysStatsPktsTpIn OBJECT-TYPE
+		SYNTAX  Counter64
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"The number of packets into the WX Compression Engine at the peak
+			five-second interval of data input, since the system was started."
+		::= { jnxWxSysStats 13 }
+
+	jnxWxSysStatsBytesTpOut OBJECT-TYPE
+		SYNTAX  Counter64
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"The number of bytes out of the WX Compression Engine at the peak
+			five-second interval of data input, since the system was started."
+		::= { jnxWxSysStats 14 }
+
+	jnxWxSysStatsPktsTpOut OBJECT-TYPE
+		SYNTAX  Counter64
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"The number of packets out of the WX Compression Engine at the peak
+			five-second interval of data input, since the system was started."
+		::= { jnxWxSysStats 15 }
+
+	jnxWxSysStatsBytesTpPt OBJECT-TYPE
+		SYNTAX  Counter64
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"The number of bytes that passed through the WX Compression Engine
+			at the peak five-second interval of data input, since the system
+			was started."
+		::= { jnxWxSysStats 16 }
+
+	jnxWxSysStatsPktsTpPt OBJECT-TYPE
+		SYNTAX  Counter64
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"The number of packets that passed through the WX Compression Engine
+			at the peak five-second interval of data input, since the system
+			was started."
+		::= { jnxWxSysStats 17 }
+
+	jnxWxSysStatsPeakRdn OBJECT-TYPE
+		SYNTAX  Unsigned32
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"The maximum data reduction rate for a five second interval
+			in the last minute.
+
+			The value returned is (percentage * 1000). Applications should
+			divide the returned value by 1000."
+		::= { jnxWxSysStats 18 }
+
+	-- Througput stats
+
+	jnxWxSysStatsThruputIn OBJECT-TYPE
+		SYNTAX  Gauge32
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"Average throughput of incoming data in Kbps since the
+			system was started."
+		::= { jnxWxSysStats 19 }
+
+	jnxWxSysStatsThruputOut OBJECT-TYPE
+		SYNTAX  Gauge32
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"Average throughput of outgoing data in Kbps since the
+			system was started."
+		::= { jnxWxSysStats 20 }
+
+	-- Compression stats
+
+	jnxWxSysStatsBytesInRe OBJECT-TYPE
+		SYNTAX  Counter64
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"Total number of bytes that entered the WX Compression Engine
+			since the system was started."
+		::= { jnxWxSysStats 21 }
+
+	jnxWxSysStatsBytesOutRe OBJECT-TYPE
+		SYNTAX  Counter64
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"Total number of bytes that exited the WX Compression Engine
+			after reduction since the system was started."
+		::= { jnxWxSysStats 22 }
+
+	jnxWxSysStatsPktsInRe OBJECT-TYPE
+		SYNTAX  Counter64
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"Total number of packets that entered the WX Compression Engine
+			since the system was started."
+		::= { jnxWxSysStats 23 }
+
+	jnxWxSysStatsPktsOutRe OBJECT-TYPE
+		SYNTAX  Counter64
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"Total number of packets that exited the WX Compression Engine
+			after reduction since the system was started."
+		::= { jnxWxSysStats 24 }
+
+	jnxWxSysStatsPktSizeIn1 OBJECT-TYPE
+		SYNTAX  Counter64
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			""
+		::= { jnxWxSysStats 25 }
+
+	jnxWxSysStatsPktSizeIn2 OBJECT-TYPE
+		SYNTAX  Counter64
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			""
+		::= { jnxWxSysStats 26 }
+
+	jnxWxSysStatsPktSizeIn3 OBJECT-TYPE
+		SYNTAX  Counter64
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			""
+		::= { jnxWxSysStats 27 }
+
+	jnxWxSysStatsPktSizeIn4 OBJECT-TYPE
+		SYNTAX  Counter64
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			""
+		::= { jnxWxSysStats 28 }
+
+	jnxWxSysStatsPktSizeIn5 OBJECT-TYPE
+		SYNTAX  Counter64
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			""
+		::= { jnxWxSysStats 29 }
+
+	jnxWxSysStatsPktSizeIn6 OBJECT-TYPE
+		SYNTAX  Counter64
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			""
+		::= { jnxWxSysStats 30 }
+
+	jnxWxSysStatsPktSizeOut1 OBJECT-TYPE
+		SYNTAX  Counter64
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			""
+		::= { jnxWxSysStats 31 }
+
+	jnxWxSysStatsPktSizeOut2 OBJECT-TYPE
+		SYNTAX  Counter64
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			""
+		::= { jnxWxSysStats 32 }
+
+	jnxWxSysStatsPktSizeOut3 OBJECT-TYPE
+		SYNTAX  Counter64
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			""
+		::= { jnxWxSysStats 33 }
+
+	jnxWxSysStatsPktSizeOut4 OBJECT-TYPE
+		SYNTAX  Counter64
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			""
+		::= { jnxWxSysStats 34 }
+
+	jnxWxSysStatsPktSizeOut5 OBJECT-TYPE
+		SYNTAX  Counter64
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			""
+		::= { jnxWxSysStats 35 }
+
+	jnxWxSysStatsPktSizeOut6 OBJECT-TYPE
+		SYNTAX  Counter64
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			""
+		::= { jnxWxSysStats 36 }
+
+	----------------------------------------------------------------------
+	-- Information maintained by a Compressor about each Decompressor it has
+	-- a session with.
+
+	jnxWxAsm OBJECT-IDENTITY
+		STATUS					current
+		DESCRIPTION				"
+			Information maintained by a Compressor for each Decompressor it has
+			a session with."
+		::= { jnxWxObjs 5 }
+
+	jnxWxAsmTable OBJECT-TYPE
+		SYNTAX  SEQUENCE OF JuniperWxAsmEntry
+		MAX-ACCESS  not-accessible
+		STATUS  current
+		DESCRIPTION
+			"List of Decompressors the Compressor has sessions with."
+		::= { jnxWxAsm 1 }
+
+	jnxWxAsmEntry OBJECT-TYPE
+		SYNTAX  JuniperWxAsmEntry
+		MAX-ACCESS  not-accessible
+		STATUS  current
+		DESCRIPTION
+			"A row in jnxWxAsmTable."
+		INDEX   { jnxWxAsmIndex }
+		::= { jnxWxAsmTable 1 }
+
+	JuniperWxAsmEntry ::=
+		SEQUENCE
+		{
+			jnxWxAsmIndex
+				Integer32,
+			jnxWxAsmIpAddress
+				IpAddress
+		}
+
+	jnxWxAsmIndex OBJECT-TYPE
+		SYNTAX  Integer32
+		MAX-ACCESS not-accessible
+		STATUS  current
+		DESCRIPTION
+			"This row's number, with range (1..jnxWxStatsAsmCount)."
+		::= { jnxWxAsmEntry 1 }
+
+	jnxWxAsmIpAddress OBJECT-TYPE
+		SYNTAX  IpAddress
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"The IP address of the Decompressor."
+		::= { jnxWxAsmEntry 2 }
+
+	----------------------------------------------------------------------
+	-- Stats maintained by a Compressor for each Decompressor it has
+	-- a session with.
+
+	jnxWxAsmStatsTable OBJECT-TYPE
+		SYNTAX  SEQUENCE OF JuniperWxAsmStatsEntry
+		MAX-ACCESS  not-accessible
+		STATUS  current
+		DESCRIPTION
+			"Statistics maintained by a Compressor for each Decompressor it has
+			a session with."
+		::= { jnxWxAsm 2 }
+
+	jnxWxAsmStatsEntry OBJECT-TYPE
+		SYNTAX  JuniperWxAsmStatsEntry
+		MAX-ACCESS  not-accessible
+		STATUS  current
+		DESCRIPTION
+			"A row in jnxWxAsmStatsTable."
+		AUGMENTS   { jnxWxAsmEntry }
+		::= { jnxWxAsmStatsTable 1 }
+
+	JuniperWxAsmStatsEntry ::=
+		SEQUENCE
+		{
+			jnxWxAsmStatsPktsIn
+				Counter64,
+			jnxWxAsmStatsPktsOut
+				Counter64,
+			jnxWxAsmStatsBytesIn
+				Counter64,
+			jnxWxAsmStatsBytesOut
+				Counter64
+		}
+
+	jnxWxAsmStatsPktsIn OBJECT-TYPE
+		SYNTAX  Counter64
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"The total number of packets into this WX, since
+			the system was started, that were identified for
+			reduction and addressed to the WX whose IP address
+			is in the row in jnxWxAsmTable that matches
+			this row."
+
+		::= { jnxWxAsmStatsEntry 1 }
+
+	jnxWxAsmStatsPktsOut OBJECT-TYPE
+		SYNTAX  Counter64
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"The total number of packets out of this WX, since
+			the system was started, that were identified for
+			reduction and addressed to the WX whose IP address
+			is in the row in jnxWxAsmTable that matches
+			this row."
+		::= { jnxWxAsmStatsEntry 2 }
+
+	jnxWxAsmStatsBytesIn OBJECT-TYPE
+		SYNTAX  Counter64
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"The total number of bytes into this WX, since
+			the system was started, that were identified for
+			reduction and addressed to the WX whose IP address
+			is in the row in jnxWxAsmTable that matches
+			this row."
+		::= { jnxWxAsmStatsEntry 3 }
+
+	jnxWxAsmStatsBytesOut OBJECT-TYPE
+		SYNTAX  Counter64
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"The total number of bytes out of this WX, since
+			the system was started, that were identified for
+			reduction and addressed to the WX whose IP address
+			is in the row in jnxWxAsmTable that matches
+			this row."
+		::= { jnxWxAsmStatsEntry 4 }
+
+	----------------------------------------------------------------------
+	-- Virtual Endpoint definitions configured on the compressor
+
+	jnxWxVirtEndptTable OBJECT-TYPE
+		SYNTAX  SEQUENCE OF JnxWxVirtEndptEntry
+		MAX-ACCESS  not-accessible
+		STATUS  current
+		DESCRIPTION
+			"Virtual Endpoints defined in this WX"
+		::= { jnxWxAsm 3 }
+
+	jnxWxVirtEndptEntry OBJECT-TYPE
+		SYNTAX  JnxWxVirtEndptEntry
+		MAX-ACCESS  not-accessible
+		STATUS  current
+		DESCRIPTION
+			"A row in jnxWxVirtEndptTable."
+		INDEX   { jnxWxVirtEndptIndex }
+		::= { jnxWxVirtEndptTable 1 }
+
+	JnxWxVirtEndptEntry ::=
+		SEQUENCE
+		{
+			jnxWxVirtEndptIndex
+				Integer32,
+			jnxWxVirtEndptName
+				TcAppName,
+			jnxWxVirtEndptSubnetCount
+				Integer32
+		}
+
+	jnxWxVirtEndptIndex OBJECT-TYPE
+		SYNTAX  Integer32
+		MAX-ACCESS not-accessible
+		STATUS  current
+		DESCRIPTION
+			"A row's number, with range (1..jnxWxStatsVirtEndptCount)"
+		::= { jnxWxVirtEndptEntry 1 }
+
+	jnxWxVirtEndptName OBJECT-TYPE
+		SYNTAX  TcAppName
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"The name of the configured virtual endpoint"
+		::= { jnxWxVirtEndptEntry 2 }
+
+	jnxWxVirtEndptSubnetCount OBJECT-TYPE
+		SYNTAX  Integer32
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"The number of subnets associated with this
+			virtual endpoint"
+		::= { jnxWxVirtEndptEntry 3 }
+
+	----------------------------------------------------------------------
+	-- Application information maintained by a Compressor
+
+	jnxWxApp OBJECT-IDENTITY
+		STATUS					current
+		DESCRIPTION				"
+			Information maintained by a Compressor for each application
+			that is monitored."
+	::= { jnxWxObjs 6 }
+
+	jnxWxAppTable OBJECT-TYPE
+		SYNTAX  SEQUENCE OF JuniperWxAppEntry
+		MAX-ACCESS  not-accessible
+		STATUS  current
+		DESCRIPTION
+			"List of applications currently monitored."
+		::= { jnxWxApp 1 }
+
+	jnxWxAppEntry OBJECT-TYPE
+		SYNTAX  JuniperWxAppEntry
+		MAX-ACCESS  not-accessible
+		STATUS  current
+		DESCRIPTION
+			"A row in jnxWxAppTable."
+		INDEX   { jnxWxAppIndex }
+		::= { jnxWxAppTable 1 }
+
+	JuniperWxAppEntry ::=
+		SEQUENCE
+		{
+			jnxWxAppIndex
+				Integer32,
+			jnxWxAppAppName
+				TcAppName
+		}
+
+	jnxWxAppIndex OBJECT-TYPE
+		SYNTAX  Integer32
+		MAX-ACCESS not-accessible
+		STATUS  current
+		DESCRIPTION
+			"This row's number, with range (1..jnxWxStatsAppCount)."
+		::= { jnxWxAppEntry 1 }
+
+	jnxWxAppAppName OBJECT-TYPE
+		SYNTAX  TcAppName
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"The name of the application from which the data was
+			received (e.g., FTP, HTTP, Lotus Notes)."
+		::= { jnxWxAppEntry 2 }
+
+	----------------------------------------------------------------------
+	-- Application stats maintained by a Compressor for each Decompressor
+	-- it has a session with.
+
+	jnxWxAppStatsTable OBJECT-TYPE
+		SYNTAX  SEQUENCE OF JuniperWxAppStatsEntry
+		MAX-ACCESS  not-accessible
+		STATUS  current
+		DESCRIPTION
+			"Statistics maintained by a Compressor for each application
+			that is monitored."
+		::= { jnxWxApp 2 }
+
+	jnxWxAppStatsEntry OBJECT-TYPE
+		SYNTAX  JuniperWxAppStatsEntry
+		MAX-ACCESS  not-accessible
+		STATUS  current
+		DESCRIPTION
+			"A row in jnxWxAppStatsTable.
+			Note that the indices are from jnxWxAsmTable and
+			jnxWxAppTable. For each Decompressor this compressor has
+			a session with (indexed by jnxWxAsmIndex), statistics
+			are maintained for each application that is monitored
+			(indexed by jnxWxAppIndex)."
+		INDEX   { jnxWxAsmIndex, jnxWxAppIndex }
+		::= { jnxWxAppStatsTable 1 }
+
+	JuniperWxAppStatsEntry ::=
+		SEQUENCE
+		{
+			jnxWxAppStatsBytesIn
+				Counter64,
+			jnxWxAppStatsBytesOut
+				Counter64,
+			jnxWxAppStatsBytesInPercent
+				Gauge32,
+			jnxWxAppStatsAppName
+				TcAppName,
+			jnxWxAppStatsAccelBytesIn
+				Counter64,
+			jnxWxAppStatsActiveSessionTime
+				Counter64,
+			jnxWxAppStatsEstBoostBytes
+				Counter64,
+			jnxWxAppStatsBytesOutWxc
+				Counter64
+		}
+
+	jnxWxAppStatsBytesIn OBJECT-TYPE
+		SYNTAX  Counter64
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"The total number of bytes into the WX, since the system
+			was started, that were identified for reduction,
+			and addressed to the WX whose IP address is in the
+			row in jnxWxAsmTable that matches the index
+			jnxWxAsmIndex, and that was received from the
+			application whose name is in the row in jnxWxAppTable
+			that matches the index jnxWxAppIndex."
+		::= { jnxWxAppStatsEntry 1 }
+
+	jnxWxAppStatsBytesOut OBJECT-TYPE
+		SYNTAX  Counter64
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"The total number of bytes out of the WX, since the
+			system was started, that were identified for reduction,
+			and addressed to the WX whose IP address is in the
+			row in jnxWxAsmTable that matches the index
+			jnxWxAsmIndex, and that was received from the
+			application whose name is in the row in jnxWxAppTable."
+		::= { jnxWxAppStatsEntry 2 }
+
+	jnxWxAppStatsBytesInPercent OBJECT-TYPE
+		SYNTAX  Gauge32
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"The percentage of the bytes in for this application
+			over the total bytes into the WX, since the system
+			was started, that were identified for reduction,
+			and addressed to the WX whose IP address is in the
+			row in jnxWxAsmTable that matches the index
+			jnxWxAsmIndex, and that was received from the
+			application whose name is in the row in jnxWxAppTable
+			that matches the index jnxWxAppIndex.
+
+			The value returned is (percentage * 1000). Applications should
+			divide the returned value by 1000."
+		::= { jnxWxAppStatsEntry 3 }
+
+	jnxWxAppStatsAppName OBJECT-TYPE
+		SYNTAX  TcAppName
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"The name of the application from which the data was
+			received (e.g., FTP, HTTP, Lotus Notes).
+
+			NOTE: This object is here even though it's also in
+			jnxWxAppTable. This is for the convenience of network
+			monitoring tools that require all columns to be from the
+			same table."
+		::= { jnxWxAppStatsEntry 4 }
+
+	jnxWxAppStatsAccelBytesIn OBJECT-TYPE
+		SYNTAX  Counter64
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			""
+		::= { jnxWxAppStatsEntry 5 }
+
+	jnxWxAppStatsActiveSessionTime OBJECT-TYPE
+		SYNTAX  Counter64
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			""
+		::= { jnxWxAppStatsEntry 6 }
+
+	jnxWxAppStatsEstBoostBytes OBJECT-TYPE
+		SYNTAX  Counter64
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			""
+		::= { jnxWxAppStatsEntry 7 }
+
+	jnxWxAppStatsBytesOutWxc OBJECT-TYPE
+		SYNTAX  Counter64
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			""
+		::= { jnxWxAppStatsEntry 8 }
+
+	----------------------------------------------------------------------
+	-- Aggregate application stats (across all Decompressors)
+	-- maintained by a Compressor. This table augments jnxWxAppTable.
+
+	jnxWxAppAggrStatsTable OBJECT-TYPE
+		SYNTAX  SEQUENCE OF JuniperWxAppAggrStatsEntry
+		MAX-ACCESS  not-accessible
+		STATUS  current
+		DESCRIPTION
+			"Aggregate statistics maintained by a Compressor for each application
+			that is monitored. These statistics apply to the compressor as a whole
+			and are summed over all decompressor sessions maintained by the compressor."
+		::= { jnxWxApp 3 }
+
+	jnxWxAppAggrStatsEntry OBJECT-TYPE
+		SYNTAX  JuniperWxAppAggrStatsEntry
+		MAX-ACCESS  not-accessible
+		STATUS  current
+		DESCRIPTION
+			"A row in jnxWxAppAggrStatsTable."
+		AUGMENTS   { jnxWxAppEntry }
+		::= { jnxWxAppAggrStatsTable 1 }
+
+	JuniperWxAppAggrStatsEntry ::=
+		SEQUENCE
+		{
+			jnxWxAppAggrStatsBytesInRe
+				Counter64,
+			jnxWxAppAggrStatsBytesOutRe
+				Counter64,
+			jnxWxAppAggrStatsBytesInPercent
+				Gauge32
+		}
+
+	jnxWxAppAggrStatsBytesInRe OBJECT-TYPE
+		SYNTAX  Counter64
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"Total number of bytes that entered the WX Compression Engine
+			for this application since the system was started."
+		::= { jnxWxAppAggrStatsEntry 1 }
+
+	jnxWxAppAggrStatsBytesOutRe OBJECT-TYPE
+		SYNTAX  Counter64
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"Total number of bytes that exited the WX Compression Engine
+			after reduction for this application since the system was started."
+		::= { jnxWxAppAggrStatsEntry 2 }
+
+	jnxWxAppAggrStatsBytesInPercent OBJECT-TYPE
+		SYNTAX  Gauge32
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"The percentage of the bytes in for this application over the
+			total bytes into the WX Compression Engine.
+
+			The value returned is (percentage * 1000). Applications should
+			divide the returned value by 1000."
+		::= { jnxWxAppAggrStatsEntry 3 }
+
+	----------------------------------------------------------------------
+	-- WAN stats per application
+
+	jnxWxWanStatsTable OBJECT-TYPE
+		SYNTAX  SEQUENCE OF JuniperWxWanStatsEntry
+		MAX-ACCESS  not-accessible
+		STATUS  current
+		DESCRIPTION
+			"Per application WAN performance statistics"
+		::= { jnxWxApp 4 }
+
+	jnxWxWanStatsEntry OBJECT-TYPE
+		SYNTAX  JuniperWxWanStatsEntry
+		MAX-ACCESS  not-accessible
+		STATUS  current
+		DESCRIPTION
+			"A row in jnxWxWanStatsTable.
+			Note that the indices are from jnxWxAsmTable and
+			jnxWxAppTable. For each Decompressor this compressor has
+			a session with (indexed by jnxWxAsmIndex), statistics
+			are maintained for each application that is monitored
+			(indexed by jnxWxAppIndex)."
+		INDEX   { jnxWxAsmIndex, jnxWxAppIndex }
+		::= { jnxWxWanStatsTable 1 }
+
+	JuniperWxWanStatsEntry ::=
+		SEQUENCE
+		{
+			jnxWxWanStatsBytesToWan
+				Counter64,
+			jnxWxWanStatsBytesFromWan
+				Counter64
+		}
+
+	jnxWxWanStatsBytesToWan OBJECT-TYPE
+		SYNTAX  Counter64
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"Total number of bytes sent to the wan on a per
+			 application basis"
+		::= { jnxWxWanStatsEntry 1 }
+
+	jnxWxWanStatsBytesFromWan OBJECT-TYPE
+		SYNTAX  Counter64
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"Total number of bytes received from the WAN
+			on a per application basis"
+		::= { jnxWxWanStatsEntry 2 }
+
+	----------------------------------------------------------------------
+	-- A list of Applications that can be Accelerated
+
+	jnxWxAccelAppNameTable OBJECT-TYPE
+		SYNTAX  SEQUENCE OF JnxWxAccelAppNameEntry
+		MAX-ACCESS  not-accessible
+		STATUS  current
+		DESCRIPTION
+			"List of applications that can be accelerated by
+			the WX device."
+		::= { jnxWxApp 5 }
+
+	jnxWxAccelAppNameEntry OBJECT-TYPE
+		SYNTAX JnxWxAccelAppNameEntry
+		MAX-ACCESS  not-accessible
+		STATUS  current
+		DESCRIPTION
+			"A row in jnxWxAccelAppNameTable. Each row contains
+			the name of an application that can be accelerated."
+		INDEX   { jnxWxAccelAppIndex }
+		::= { jnxWxAccelAppNameTable 1 }
+
+	JnxWxAccelAppNameEntry ::=
+		SEQUENCE
+		{
+			jnxWxAccelAppIndex
+				Integer32,
+			jnxWxAccelAppName
+				TcAppName
+		}
+
+	jnxWxAccelAppIndex OBJECT-TYPE
+		SYNTAX  Integer32
+		MAX-ACCESS not-accessible
+		STATUS  current
+		DESCRIPTION
+			"This row's number, with range (1..jnxWxStatsAccelAppCount)."
+		::= { jnxWxAccelAppNameEntry 1 }
+
+	jnxWxAccelAppName OBJECT-TYPE
+		SYNTAX  TcAppName
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"The name of the application from which the data was
+			received (e.g., FTP, HTTP, Lotus Notes)."
+		::= { jnxWxAccelAppNameEntry 2 }
+
+	----------------------------------------------------------------------
+	-- Application Acceleration Statistics. Lists time with and without
+	-- acceleration in seconds.
+
+	jnxWxAccelAppStatsTable OBJECT-TYPE
+		SYNTAX  SEQUENCE OF JnxWxAccelAppStatsEntry
+		MAX-ACCESS  not-accessible
+		STATUS  current
+		DESCRIPTION
+			"Accelerated application performance statistics. Includes
+			 time with and without acceleration in seconds"
+		::= { jnxWxApp 6 }
+
+	jnxWxAccelAppStatsEntry OBJECT-TYPE
+		SYNTAX JnxWxAccelAppStatsEntry
+		MAX-ACCESS  not-accessible
+		STATUS  current
+		DESCRIPTION
+			"A row in jnxWxAccelAppStatsTable. Indices are from
+			jnxWxAsmTable and jnxWxAccelAppNameTable. For each Decompressor
+			this compressor has a session with (indexed by jnxWxAsmIndex),
+			statistics are maintained for each application that is
+			accelereated (indexed by jnxWxAccelAppIndex)"
+		INDEX   { jnxWxAsmIndex, jnxWxAccelAppIndex }
+		::= { jnxWxAccelAppStatsTable 1 }
+
+	JnxWxAccelAppStatsEntry ::=
+		SEQUENCE
+		{
+			jnxWxAccelAppTimeWithAccel
+				Unsigned32,
+			jnxWxAccelAppTimeWithoutAccel
+				Unsigned32
+		}
+
+	jnxWxAccelAppTimeWithAccel OBJECT-TYPE
+		SYNTAX  Unsigned32
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"Total number of seconds required to complete all
+			 transactions with acceleration enabled."
+		::= { jnxWxAccelAppStatsEntry 3 }
+
+	jnxWxAccelAppTimeWithoutAccel OBJECT-TYPE
+		SYNTAX  Unsigned32
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"Total number of seconds that would be required to
+			complete all transactions if acceleration was disabled."
+		::= { jnxWxAccelAppStatsEntry 4 }
+
+	----------------------------------------------------------------------
+	-- The burst stats over the past minute.
+	-- NOTE: jnxWxStatsUpdateTime does not apply to this group.
+
+	jnxWxBurstStats OBJECT-IDENTITY
+		STATUS					current
+		DESCRIPTION				"
+			Sub-tree for WAN Acceleration system statistics."
+		::= { jnxWxObjs 7 }
+
+	jnxWxBurstStatsStartTime OBJECT-TYPE
+		SYNTAX  Integer32
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"The start of the minute in seconds since
+			midnight (00:00:00), January 1, 1970, UTC
+			over which the burst stats apply."
+		::= { jnxWxBurstStats 1 }
+
+	jnxWxBurstStatsBpsIn OBJECT-TYPE
+		SYNTAX  Gauge32
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"Burst bits per second into reduction engine for the past minute."
+		::= { jnxWxBurstStats 2 }
+
+	jnxWxBurstStatsBpsOut OBJECT-TYPE
+		SYNTAX  Gauge32
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"Burst bits per second out of reduction engine for the past minute."
+		::= { jnxWxBurstStats 3 }
+
+	jnxWxBurstStatsBpsPt OBJECT-TYPE
+		SYNTAX  Gauge32
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"Burst pass-through bits per second for the past minute."
+		::= { jnxWxBurstStats 4 }
+
+	----------------------------------------------------------------------
+	-- Information about endpoints being managed by QoS
+
+ 	jnxWxQos OBJECT-IDENTITY
+		STATUS					current
+		DESCRIPTION				"
+			Information maintained by a Compressor for each QoS class
+			that is monitored."
+	::= { jnxWxObjs 10 }
+
+	jnxWxQosEndptTable OBJECT-TYPE
+		SYNTAX  SEQUENCE OF JuniperWxQosEndptEntry
+		MAX-ACCESS  not-accessible
+		STATUS  current
+		DESCRIPTION
+			"List of endpoints managed by QoS."
+		::= { jnxWxQos 1 }
+
+	jnxWxQosEndptEntry OBJECT-TYPE
+		SYNTAX  JuniperWxQosEndptEntry
+		MAX-ACCESS  not-accessible
+		STATUS  current
+		DESCRIPTION
+			"A row in jnxWxQosEndptTable."
+		INDEX   { jnxWxQosEndptIndex }
+		::= { jnxWxQosEndptTable 1 }
+
+	JuniperWxQosEndptEntry ::=
+		SEQUENCE
+		{
+			jnxWxQosEndptIndex
+				Integer32,
+			jnxWxQosEndptIdentifier
+				TcQosIdentifier
+		}
+
+	jnxWxQosEndptIndex OBJECT-TYPE
+		SYNTAX  Integer32
+		MAX-ACCESS not-accessible
+		STATUS  current
+		DESCRIPTION
+			"This row's number, with range (1..jnxWxStatsQosEndptCount)."
+		::= { jnxWxQosEndptEntry 1 }
+
+	jnxWxQosEndptIdentifier OBJECT-TYPE
+		SYNTAX  TcQosIdentifier
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"The IP address of an Decompressor or the name
+			of a virtual endpoint."
+		::= { jnxWxQosEndptEntry 2 }
+
+	----------------------------------------------------------------------
+	-- Qos Class information maintained by a Compressor
+
+	jnxWxQosClassTable OBJECT-TYPE
+		SYNTAX  SEQUENCE OF JuniperWxQosClassEntry
+		MAX-ACCESS  not-accessible
+		STATUS  current
+		DESCRIPTION
+			"List of QoS classes currently monitored."
+		::= { jnxWxQos 2 }
+
+	jnxWxQosClassEntry OBJECT-TYPE
+		SYNTAX  JuniperWxQosClassEntry
+		MAX-ACCESS  not-accessible
+		STATUS  current
+		DESCRIPTION
+			"A row in the jnxWxQosClassTable"
+		INDEX   { jnxWxQosClassIndex }
+		::= { jnxWxQosClassTable 1 }
+
+	JuniperWxQosClassEntry ::=
+		SEQUENCE
+		{
+			jnxWxQosClassIndex
+				Integer32,
+			jnxWxQosClassName
+				TcQosIdentifier
+		}
+
+	jnxWxQosClassIndex OBJECT-TYPE
+		SYNTAX  Integer32
+		MAX-ACCESS not-accessible
+		STATUS  current
+		DESCRIPTION
+			"This row's number, with range (1..jnxWxStatsQosClassCount)."
+		::= { jnxWxQosClassEntry 1 }
+
+	jnxWxQosClassName OBJECT-TYPE
+		SYNTAX  TcQosIdentifier
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"The name of the QoS class"
+		::= { jnxWxQosClassEntry 2 }
+
+	----------------------------------------------------------------------
+	-- Qos performance stats per class
+
+	jnxWxQosStatsTable OBJECT-TYPE
+		SYNTAX  SEQUENCE OF JuniperWxQosStatsEntry
+		MAX-ACCESS  not-accessible
+		STATUS  current
+		DESCRIPTION
+			"Per class QoS performance statistics"
+		::= { jnxWxQos 3 }
+
+	jnxWxQosStatsEntry OBJECT-TYPE
+		SYNTAX  JuniperWxQosStatsEntry
+		MAX-ACCESS  not-accessible
+		STATUS  current
+		DESCRIPTION
+			"A row in the jnxWxQosStatsTable. Indexed by
+			decompressor and the corresponding QoS class.
+			Statistics are maintained per endpoint
+			(indexed by jnxWxQosEndptIndex) and per QoS
+			class associated with the endpoint (indexed
+			by jnxWxQosClassIndex)"
+		INDEX   { jnxWxQosEndptIndex, jnxWxQosClassIndex }
+		::= { jnxWxQosStatsTable 1 }
+
+	JuniperWxQosStatsEntry ::=
+		SEQUENCE
+		{
+			jnxWxQosStatsBytesIn
+				Counter64,
+			jnxWxQosStatsBytesOut
+				Counter64,
+			jnxWxQosStatsBytesDropped
+				Counter64,
+			jnxWxQosStatsPktsIn
+				Counter64,
+			jnxWxQosStatsPktsOut
+				Counter64,
+			jnxWxQosStatsPktsDropped
+				Counter64
+		}
+
+	jnxWxQosStatsBytesIn OBJECT-TYPE
+		SYNTAX  Counter64
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"Total number of bytes received from the WAN
+			on a per class basis"
+		::= { jnxWxQosStatsEntry 3 }
+
+	jnxWxQosStatsBytesOut OBJECT-TYPE
+		SYNTAX  Counter64
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"Total number of bytes sent to the WAN on a per
+			 class basis"
+		::= { jnxWxQosStatsEntry 4 }
+
+	jnxWxQosStatsBytesDropped OBJECT-TYPE
+		SYNTAX  Counter64
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"Total number of bytes dropped on a per
+			 class basis"
+		::= { jnxWxQosStatsEntry 5 }
+
+	jnxWxQosStatsPktsIn OBJECT-TYPE
+		SYNTAX  Counter64
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"Total number of packets received from the WAN
+			on a per class basis"
+		::= { jnxWxQosStatsEntry 6 }
+
+	jnxWxQosStatsPktsOut OBJECT-TYPE
+		SYNTAX  Counter64
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"Total number of packets sent to the wan on a per
+			 class basis"
+		::= { jnxWxQosStatsEntry 7 }
+
+	jnxWxQosStatsPktsDropped OBJECT-TYPE
+		SYNTAX  Counter64
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"Total number of packets dropped
+			on a per class basis"
+		::= { jnxWxQosStatsEntry 8 }
+
+	----------------------------------------------------------------------
+	-- WAN performance statistics for monitored endpoints
+
+ 	jnxWxWanPerf OBJECT-IDENTITY
+		STATUS					current
+		DESCRIPTION				"
+			"
+	::= { jnxWxObjs 14 }
+
+	jnxWxWpEndptTable OBJECT-TYPE
+		SYNTAX  SEQUENCE OF JuniperWxWpEndptEntry
+		MAX-ACCESS  not-accessible
+		STATUS  current
+		DESCRIPTION
+			"List of endpoints managed by Multi-path"
+		::= { jnxWxWanPerf 1 }
+
+	jnxWxWpEndptEntry OBJECT-TYPE
+		SYNTAX  JuniperWxWpEndptEntry
+		MAX-ACCESS  not-accessible
+		STATUS  current
+		DESCRIPTION
+			""
+		INDEX   { jnxWxWpEndptIndex }
+		::= { jnxWxWpEndptTable 1 }
+
+	JuniperWxWpEndptEntry ::=
+		SEQUENCE
+		{
+			jnxWxWpEndptIndex
+				Integer32,
+			jnxWxWpEndptIp
+				IpAddress
+		}
+
+	jnxWxWpEndptIndex OBJECT-TYPE
+		SYNTAX  Integer32
+		MAX-ACCESS not-accessible
+		STATUS  current
+		DESCRIPTION
+			""
+		::= { jnxWxWpEndptEntry 1 }
+
+	jnxWxWpEndptIp OBJECT-TYPE
+		SYNTAX  IpAddress
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			""
+		::= { jnxWxWpEndptEntry 2 }
+
+	----------------------------------------------------------------------
+	-- Multi-path performance stats per class
+
+	jnxWxWpStatsTable OBJECT-TYPE
+		SYNTAX  SEQUENCE OF JuniperWxWpStatsEntry
+		MAX-ACCESS  not-accessible
+		STATUS  current
+		DESCRIPTION
+			""
+		::= { jnxWxWanPerf 2 }
+
+	jnxWxWpStatsEntry OBJECT-TYPE
+		SYNTAX  JuniperWxWpStatsEntry
+		MAX-ACCESS  not-accessible
+		STATUS  current
+		DESCRIPTION
+			""
+		INDEX   { jnxWxWpEndptIndex }
+		::= { jnxWxWpStatsTable 1 }
+
+	JuniperWxWpStatsEntry ::=
+		SEQUENCE
+		{
+			jnxWxWpStatsLatencyThresh
+				Unsigned32,
+			jnxWxWpStatsAvgLatency
+				Unsigned32,
+			jnxWxWpStatsLatencyCount
+				Unsigned32,
+			jnxWxWpStatsLatencyAboveThresh
+				Unsigned32,
+			jnxWxWpStatsLatencyAboveThreshCount
+				Unsigned32,
+			jnxWxWpStatsLossPercent
+				Unsigned32,
+			jnxWxWpStatsLossCount
+				Unsigned32,
+			jnxWxWpStatsEventCount
+				Unsigned32,
+			jnxWxWpStatsDiversionCount
+				Unsigned32,
+			jnxWxWpStatsReturnCount
+				Unsigned32,
+			jnxWxWpStatsLastDown
+				Unsigned32,
+			jnxWxWpStatsUnavailableCount
+				Unsigned32,
+			jnxWxWpStatsMinuteCount
+				Unsigned32
+		}
+
+	jnxWxWpStatsLatencyThresh OBJECT-TYPE
+		SYNTAX  Unsigned32
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			""
+		::= { jnxWxWpStatsEntry 3 }
+
+	jnxWxWpStatsAvgLatency OBJECT-TYPE
+		SYNTAX  Unsigned32
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			""
+		::= { jnxWxWpStatsEntry 4 }
+
+	jnxWxWpStatsLatencyCount OBJECT-TYPE
+		SYNTAX  Unsigned32
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			""
+		::= { jnxWxWpStatsEntry 5 }
+
+	jnxWxWpStatsLatencyAboveThresh OBJECT-TYPE
+		SYNTAX  Unsigned32
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			""
+		::= { jnxWxWpStatsEntry 6 }
+
+	jnxWxWpStatsLatencyAboveThreshCount OBJECT-TYPE
+		SYNTAX  Unsigned32
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			""
+		::= { jnxWxWpStatsEntry 7 }
+
+	jnxWxWpStatsLossPercent OBJECT-TYPE
+		SYNTAX  Unsigned32
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			""
+		::= { jnxWxWpStatsEntry 8 }
+
+	jnxWxWpStatsLossCount OBJECT-TYPE
+		SYNTAX  Unsigned32
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			""
+		::= { jnxWxWpStatsEntry 9 }
+
+	jnxWxWpStatsEventCount OBJECT-TYPE
+		SYNTAX  Unsigned32
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			""
+		::= { jnxWxWpStatsEntry 10 }
+
+	jnxWxWpStatsDiversionCount OBJECT-TYPE
+		SYNTAX  Unsigned32
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			""
+		::= { jnxWxWpStatsEntry 11 }
+
+	jnxWxWpStatsReturnCount OBJECT-TYPE
+		SYNTAX  Unsigned32
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			""
+		::= { jnxWxWpStatsEntry 12 }
+
+	jnxWxWpStatsLastDown OBJECT-TYPE
+		SYNTAX  Unsigned32
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			""
+		::= { jnxWxWpStatsEntry 13 }
+
+	jnxWxWpStatsUnavailableCount OBJECT-TYPE
+		SYNTAX  Unsigned32
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			""
+		::= { jnxWxWpStatsEntry 14 }
+
+	jnxWxWpStatsMinuteCount OBJECT-TYPE
+		SYNTAX  Unsigned32
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			""
+		::= { jnxWxWpStatsEntry 15 }
+
+	----------------------------------------------------------------------
+	-- Events
+
+	jnxWxEventObjs OBJECT-IDENTITY
+		STATUS					current
+		DESCRIPTION				"
+			Branch for objects meant only to be sent in event varbinds."
+		::= { jnxWxEvents 1 }
+
+	jnxWxEventEvents OBJECT-IDENTITY
+		STATUS					current
+		DESCRIPTION				"
+			Branch for the events themselves."
+		::= { jnxWxEvents 2 }
+
+	jnxWxEventEventsV2 OBJECT-IDENTITY
+		STATUS					current
+		DESCRIPTION				"
+			Branch for SNMPv2 events. The OIDs for SNMPv2 events should
+			have a zero as the next-to-last sub-identifier (as specified
+			in RFC1902)."
+		::= { jnxWxEventEvents 0 }
+
+	-- Objects sent only in events
+	-- None so far.
+
+	-- Event descriptions
+
+	jnxWxEventRipAuthFailure NOTIFICATION-TYPE
+		OBJECTS { jnxWxCommonEventDescr }
+		STATUS  current
+		DESCRIPTION
+			"RIP authentication failure"
+		::= { jnxWxEventEventsV2 1 }
+
+	jnxWxEventCompressionBufferOverflow NOTIFICATION-TYPE
+		OBJECTS { jnxWxCommonEventDescr }
+		STATUS  current
+		DESCRIPTION
+			"The compressor's input buffer is approaching full capacity.
+			
+			This trap is currently unused."
+		::= { jnxWxEventEventsV2 2 }
+
+	jnxWxEventCompressionSessionClosed NOTIFICATION-TYPE
+		OBJECTS { jnxWxCommonEventDescr }
+		STATUS  current
+		DESCRIPTION
+			"The compressor's session to the device described in
+			jnxWxCommonEventDescr was terminated."
+		::= { jnxWxEventEventsV2 3 }
+
+	jnxWxEventDecompressionSessionClosed NOTIFICATION-TYPE
+		OBJECTS { jnxWxCommonEventDescr }
+		STATUS  current
+		DESCRIPTION
+			"The decompressor's session to the device described in
+			jnxWxCommonEventDescr was terminated."
+		::= { jnxWxEventEventsV2 4 }
+
+	jnxWxEventCompressionSessionOpened NOTIFICATION-TYPE
+		OBJECTS { jnxWxCommonEventDescr }
+		STATUS  current
+		DESCRIPTION
+			"The compressor's session to the device described in
+			jnxWxCommonEventDescr was opened."
+		::= { jnxWxEventEventsV2 5 }
+
+	jnxWxEventDecompressionSessionOpened NOTIFICATION-TYPE
+		OBJECTS { jnxWxCommonEventDescr }
+		STATUS  current
+		DESCRIPTION
+			"The decompressor's session to the device described in
+			jnxWxCommonEventDescr was opened."
+		::= { jnxWxEventEventsV2 6 }
+
+	jnxWxEventPrimaryRegServerUnreachable NOTIFICATION-TYPE
+		OBJECTS { jnxWxCommonEventDescr }
+		STATUS  current
+		DESCRIPTION
+			"The primary registration server is
+			currently unreachable."
+		::= { jnxWxEventEventsV2 7 }
+
+	jnxWxEventSecondaryRegServerUnreachable NOTIFICATION-TYPE
+		OBJECTS { jnxWxCommonEventDescr }
+		STATUS  current
+		DESCRIPTION
+			"The secondary registration server is
+			currently unreachable."
+		::= { jnxWxEventEventsV2 8 }
+
+	jnxWxEventMultiNodeMasterUp NOTIFICATION-TYPE
+		OBJECTS { jnxWxCommonEventDescr }
+		STATUS  current
+		DESCRIPTION
+			"The system designated as the 'master' of a multi-node
+			came up. This notification is generated by the
+			system that's designated as the 'master' of the
+			multi-node.
+
+			Note that the corresponding Down notification is
+			generated by the designated 'master-backup' of the
+			same multi-node.
+			
+			This trap is currently unused."
+		::= { jnxWxEventEventsV2 9 }
+
+	jnxWxEventMultiNodeMasterDown NOTIFICATION-TYPE
+		OBJECTS { jnxWxCommonEventDescr }
+		STATUS  current
+		DESCRIPTION
+			"The system designated as the 'master' of a multi-node
+			is currently down. This notification is generated by the
+			system that's designated as the 'master-backup' of the
+			same multi-node.
+
+			Note that the corresponding Up notification is
+			generated by the designated 'master' of the same
+			multi-node.
+			
+			This trap is currently unused."
+		::= { jnxWxEventEventsV2 10 }
+
+	jnxWxEventMultiNodeLastUp NOTIFICATION-TYPE
+		OBJECTS { jnxWxCommonEventDescr }
+		STATUS  current
+		DESCRIPTION
+			"The system designated as the 'last-node' of a multi-node
+			came up. This notification is generated by the
+			system that's designated as the 'last-node' of the
+			multi-node.
+
+			Note that the corresponding Down notification is
+			generated by the designated 'master' of the
+			same multi-node.
+			
+			This trap is currently unused."
+		::= { jnxWxEventEventsV2 11 }
+
+	jnxWxEventMultiNodeLastDown NOTIFICATION-TYPE
+		OBJECTS { jnxWxCommonEventDescr }
+		STATUS  current
+		DESCRIPTION
+			"The system designated as the 'last-node' of a multi-node
+			is currently down. This notification is generated by the
+			system that's designated as the 'master' of the
+			same multi-node.
+
+			Note that the corresponding Up notification is
+			generated by the designated 'last-node' of the same
+			multi-node.
+			
+			This trap is currently unused."
+		::= { jnxWxEventEventsV2 12 }
+	jnxWxEventPrimaryDownBackupEngaged NOTIFICATION-TYPE
+		OBJECTS { jnxWxCommonEventDescr }
+		STATUS  current
+		DESCRIPTION
+			"The system designated as the 'primary' is currently
+			unreachable. This notification is generated by the
+			system that's designated as the 'backup' device.
+			The backup device is engaged for the primary device."
+		::= { jnxWxEventEventsV2 13 }
+	jnxWxEventPrimaryDownBackupEngageFailed NOTIFICATION-TYPE
+		OBJECTS { jnxWxCommonEventDescr }
+		STATUS  current
+		DESCRIPTION
+			"The system designated as the 'primary' is currently
+			unreachable. This notification is generated by the
+			system that's designated as the 'backup' device.
+			The backup device failed to engage for the primary device."
+		::= { jnxWxEventEventsV2 14 }
+	jnxWxEventPrimaryUpBackupDisengaged NOTIFICATION-TYPE
+		OBJECTS { jnxWxCommonEventDescr }
+		STATUS  current
+		DESCRIPTION
+			"The system designated as the 'primary' is currently
+			reachable. This notification is generated by the
+			system that's designated as the 'backup' device.
+			The backup device has disengaged itself."
+		::= { jnxWxEventEventsV2 15 }
+
+	jnxWxEventMultiPathStatusChange NOTIFICATION-TYPE
+		OBJECTS { jnxWxCommonEventDescr }
+		STATUS  current
+		DESCRIPTION
+			"The status of the primary or secondary path to another
+			multi-path enabled system changed. The path became inactive
+			or failed after previously being active or vice versa.
+			This might have caused traffic designated to flow over
+			this path to be switched from or to this path."
+		::= { jnxWxEventEventsV2 16 }
+
+	jnxWxEventDiskFailure NOTIFICATION-TYPE
+		OBJECTS { jnxWxCommonEventDescr }
+		STATUS  current
+		DESCRIPTION
+			"A hard disk failed on the system. The system was rebooted,
+			and will now operate without the downed disk, at a degraded
+			performance. Dictionary accumulated until this point was lost."
+		::= { jnxWxEventEventsV2 17 }
+
+	jnxWxEventWanPerfStatusChange NOTIFICATION-TYPE
+		OBJECTS { jnxWxCommonEventDescr }
+		STATUS  current
+		DESCRIPTION
+			"The status of the Path on which WAN Performance Monitoring is
+ 			enabled has changed. The performance of the path has changed either
+			from acceptable to unacceptable or vice versa."
+		::= { jnxWxEventEventsV2 18 }
+
+	jnxWxEventDCQAboveHiWatermark NOTIFICATION-TYPE
+		OBJECTS { jnxWxCommonEventDescr }
+		STATUS  current
+		DESCRIPTION
+			"The decompression queue has reached the high watermark."
+		::= { jnxWxEventEventsV2 19 }
+
+	jnxWxEventDCQBelowHiWatermark NOTIFICATION-TYPE
+		OBJECTS { jnxWxCommonEventDescr }
+		STATUS  current
+		DESCRIPTION
+			"The decompression queue has fallen below the high watermark."
+		::= { jnxWxEventEventsV2 20 }
+
+	jnxWxEventPerformanceThreshCrossed NOTIFICATION-TYPE
+		OBJECTS { jnxWxCommonEventDescr }
+		STATUS  current
+		DESCRIPTION
+			"The threshold for a configured perfromance event has been
+            crossed. This notification indicates that some system parameter
+            being measured has reached a critical value."
+		::= { jnxWxEventEventsV2 21 }
+	
+	jnxWxEventClientLinkDown NOTIFICATION-TYPE
+		OBJECTS { jnxWxCommonEventDescr }
+		STATUS  current
+		DESCRIPTION
+			"Link to the Client went down."
+		::= { jnxWxEventEventsV2 22 }
+
+	jnxWxEventClientLinkUp NOTIFICATION-TYPE
+		OBJECTS { jnxWxCommonEventDescr }
+		STATUS  current
+		DESCRIPTION
+			"Link to the client came up."
+		::= { jnxWxEventEventsV2 23 }
+
+END
+
+-- End - JUNIPER-WX-MIB Module

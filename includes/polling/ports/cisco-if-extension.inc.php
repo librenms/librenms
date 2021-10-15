@@ -7,6 +7,7 @@
  * the source code distribution for details.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2019 LibreNMS
  * @author     Pavle Obradovic <pobradovic08@gmail.com>
  */

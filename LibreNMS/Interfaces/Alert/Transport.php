@@ -18,6 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2017 Robrecht Plaisier
  * @author     Robbrecht Plaisier <librenms@mcq8.be>
  */
@@ -27,10 +28,15 @@ namespace LibreNMS\Interfaces\Alert;
 interface Transport
 {
     /**
+     * @return string The display name of this transport.
+     */
+    public function name(): string;
+
+    /**
      * Gets called when an alert is sent
      *
-     * @param array $alert_data An array created by DescribeAlert
-     * @param array|true $opts The options from the alert_transports transport_config column
+     * @param  array  $alert_data  An array created by DescribeAlert
+     * @param  array|true  $opts  The options from the alert_transports transport_config column
      * @return mixed Returns if the call was successful
      */
     public function deliverAlert($alert_data, $opts);
@@ -39,4 +45,11 @@ interface Transport
      * @return array
      */
     public static function configTemplate();
+
+    /**
+     * Display the configuration details of this alert transport
+     *
+     * @return string
+     */
+    public function displayDetails(): string;
 }

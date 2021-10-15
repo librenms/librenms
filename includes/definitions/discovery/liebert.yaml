@@ -1,4 +1,4 @@
-mib: LIEBERT-GP-AGENT-MIB:LIEBERT-GP-PDU-MIB:LIEBERT-GP-ENVIRONMENTAL-MIB
+mib: LIEBERT-GP-AGENT-MIB:LIEBERT-GP-PDU-MIB:LIEBERT-GP-ENVIRONMENTAL-MIB:LIEBERT-GP-POWER-MIB
 modules:
     sensors:
         temperature:
@@ -33,6 +33,12 @@ modules:
                     low_warn_limit: lgpPduAuxMeasHumThrshldUndrWarn
                     warn_limit: lgpPduAuxMeasHumThrshldOvrWarn
                     high_limit: lgpPduAuxMeasHumThrshldOvrAlm
+                -
+                    oid: lgpEnvHumidityTableRel
+                    value: lgpEnvHumiditySetPoint
+                    num_oid: '.1.3.6.1.4.1.476.1.42.3.4.2.2.3.1.6.{{ $index }}'
+                    descr: 'Setpoint for {{ $lgpEnvHumidityDescrRel }}'
+                    index: 'lgpEnvHumiditySetPoint.{{ $index }}'
         voltage:
             data:
                 -
@@ -236,27 +242,41 @@ modules:
                     num_oid: '.1.3.6.1.4.1.476.1.42.3.4.3.9.{{ $index }}'
                     descr: 'Cooling Capacity Usage'
                     index: 'lgpEnvStateCoolingCapacity.{{ $index }}'
+                    skip_values: 4294967295
                 -
                     oid: lgpEnvStateFanCapacity
                     value: lgpEnvStateFanCapacity
                     num_oid: '.1.3.6.1.4.1.476.1.42.3.4.3.16.{{ $index }}'
                     descr: 'Fan Capacity Usage'
                     index: 'lgpEnvStateFanCapacity.{{ $index }}'
+                    skip_values: 4294967295
                 -
                     oid: lgpEnvStateFreeCoolingCapacity
                     value: lgpEnvStateFreeCoolingCapacity
                     num_oid: '.1.3.6.1.4.1.476.1.42.3.4.3.17.{{ $index }}'
                     descr: 'Free Cooling Capacity Usage'
                     index: 'lgpEnvStateFreeCoolingCapacity.{{ $index }}'
+                    skip_values: 4294967295
                 -
                     oid: lgpEnvStateDehumidifyingCapacity
                     value: lgpEnvStateDehumidifyingCapacity
                     num_oid: '.1.3.6.1.4.1.476.1.42.3.4.3.18.{{ $index }}'
                     descr: 'Dehumidifying Capacity Usage'
                     index: 'lgpEnvStateDehumidifyingCapacity.{{ $index }}'
+                    skip_values: 4294967295
                 -
                     oid: lgpEnvStateHumidifyingCapacity
                     value: lgpEnvStateHumidifyingCapacity
                     num_oid: '.1.3.6.1.4.1.476.1.42.3.4.3.19.{{ $index }}'
                     descr: 'Humidifying Capacity Usage'
                     index: 'lgpEnvStateHumidifyingCapacity.{{ $index }}'
+                    skip_values: 4294967295
+        power_factor:
+            data:
+                -
+                    oid: lgpPwrLineMeasurementTable
+                    value: lgpPwrLineMeasurementPowerFactor
+                    divisor: 100
+                    num_oid: '.1.3.6.1.4.1.476.1.42.3.5.2.3.1.14.{{ $index }}'
+                    descr: '{{ $lgpPwrMeasurementPoint }}.{{ $index }}'
+                    index: 'lgpPwrLineMeasurementPowerFactor.{{ $index }}'

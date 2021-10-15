@@ -1,6 +1,7 @@
 <?php
 
 use LibreNMS\Util\GitHub;
+use Symfony\Component\Process\Process;
 
 Artisan::command('release:tag
                             {tag : The new tag / version}
@@ -9,14 +10,17 @@ Artisan::command('release:tag
                             {--pr= : The last PR to include in this release if not master branch}', function () {
     $tag = $this->argument('tag');
     $this->info("Creating release $tag.....");
+
+    $file = $this->option('file') ?: 'doc/General/Changelog.md';
+    $gh = new GitHub(
+        $tag,
+        $this->argument('from'),
+        $file,
+        getenv('GH_TOKEN') ?: $this->secret('Enter a GitHub Token?'),
+        $this->option('pr')
+    );
+
     try {
-        $gh = new GitHub(
-            $tag,
-            $this->argument('from'),
-            $this->option('file') ?: 'doc/General/Changelog.md',
-            getenv('GH_TOKEN') ?: $this->secret('Enter a GitHub Token?'),
-            $this->option('pr')
-        );
         $gh->createChangelog();
         $this->info("Changelog generated for $tag");
 
@@ -34,4 +38,7 @@ Artisan::command('release:tag
     } catch (\Exception $e) {
         $this->error($e->getMessage());
     }
+
+    // remove changelog modifications
+    (new Process(['git', 'checkout', base_path($file)]))->run();
 })->purpose('Create a new LibreNMS release including changelog');

@@ -1,6 +1,13 @@
 {
-    "name": "LibreNMS",
+    "short_name": "LibreNMS",
+    "name": "LibreNMS: Network Monitoring",
+    "description": "A fully featured network monitoring system that provides a wealth of features and device support",
     "icons": [
+        {
+            "src": "/images/mstile-144x144.png",
+            "sizes": "144x144",
+            "type": "image/png"
+        },
         {
             "src": "/images/android-chrome-192x192.png",
             "sizes": "192x192",
@@ -14,5 +21,34 @@
     ],
     "theme_color": "#ffffff",
     "background_color": "#ffffff",
-    "display": "standalone"
+    "display_override": ["window-control-overlay", "minimal-ui"],
+    "display": "standalone",
+    "start_url": "/overview",
+    "scope": "/",
+    "shortcuts": [
+        {
+            "name": "Alerts",
+            "description": "View active alerts",
+            "url": "/alerts",
+            "icons": [{ "src": "/images/icons/bell.svg", "purpose": "any maskable", "type": "image/svg+xml", "sizes": "256x256" }]
+        },
+       {
+            "name": "Devices",
+            "description": "View device list",
+            "url": "/devices",
+            "icons": [{ "src": "/images/icons/server.svg", "purpose": "any maskable", "type": "image/svg+xml", "sizes": "256x256" }]
+        },
+       {
+            "name": "Status",
+            "description": "View overview of device availability",
+            "url": "/availability-map",
+            "icons": [{ "src": "/images/icons/arrow-circle-up.svg", "purpose": "any maskable", "type": "image/svg+xml", "sizes": "256x256" }]
+        },
+       {
+            "name": "Map",
+            "description": "View geographical map",
+            "url": "/fullscreenmap",
+           "icons": [{ "src": "/images/icons/map-marked.svg", "purpose": "any maskable", "type": "image/svg+xml", "sizes": "256x256" }]
+        }
+    ]
 }

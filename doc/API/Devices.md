@@ -1103,6 +1103,32 @@ Output:
 }
 ```
 
+### `maintenance_device`
+
+Set a device into maintenance mode.
+
+Route: `/api/v0/devices/:hostname/maintenance`
+
+Input (JSON):
+
+- notes: Some description for the Maintenance
+- duration: Duration of Maintenance in format H:m
+
+Example:
+
+```curl
+curl -X POST -d '{"notes":"A 2 hour Maintenance triggered via API","duration":"2:00"}' -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/localhost/maintenance
+```
+
+Output:
+
+```json
+{
+    "status": "ok",
+    "message": "Device localhost.localdomain (57) moved into maintenance mode for 2:00 h"
+}
+```
+
 ### `add_device`
 
 Add a new device.
@@ -1151,7 +1177,15 @@ Output:
 ```json
 {
     "status": "ok",
-    "message": "Device localhost.localdomain (57) has been added successfully"
+    "message": "Device localhost.localdomain (57) has been added successfully",
+    "devices": [
+        {
+            "device_id": "57",
+            "hostname": "localhost",
+            ...
+            "serial": null,
+            "icon": null
+        }
 }
 ```
 
@@ -1310,7 +1344,7 @@ search all oxidized device configs for a string.
 Route: `api/v0/oxidized/config/search/:searchstring`
 
   - searchstring is the specific string you would like to search for.
-  
+
 Input:
 
 -
@@ -1345,7 +1379,7 @@ Returns a specific device's config from oxidized.
 Route: `api/v0/oxidized/config/:device_name`
 
   - device_name is the full dns name of the device used when adding the device to librenms.
-  
+
 Input:
 
 -
