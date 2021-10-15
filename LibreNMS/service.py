@@ -369,7 +369,7 @@ class Service:
         return time.time() - self.start_time
 
     def attach_signals(self):
-        logger.info(
+        logger.debug(
             "Attaching signal handlers on thread %s", threading.current_thread().name
         )
         signal(SIGTERM, self.terminate)  # capture sigterm and exit gracefully
@@ -451,6 +451,23 @@ class Service:
                 "redis" if isinstance(self._lm, LibreNMS.RedisLock) else "internal",
             )
         )
+        logger.info(
+            "Queue Workers: Discovery={} Poller={} Services={} Alerting={} Billing={} Ping={}".format(
+                self.config.discovery.workers
+                if self.config.discovery.enabled
+                else "disabled",
+                self.config.poller.workers
+                if self.config.poller.enabled
+                else "disabled",
+                self.config.services.workers
+                if self.config.services.enabled
+                else "disabled",
+                "enabled" if self.config.alerting.enabled else "disabled",
+                "enabled" if self.config.billing.enabled else "disabled",
+                "enabled" if self.config.ping.enabled else "disabled",
+            )
+        )
+
         if self.config.update_enabled:
             logger.info(
                 "Maintenance tasks will be run every {}".format(

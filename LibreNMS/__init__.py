@@ -222,9 +222,9 @@ class DB:
             import pymysql
 
             pymysql.install_as_MySQLdb()
-            logger.info("Using pure python SQL client")
+            logger.debug("Using pure python SQL client")
         except ImportError:
-            logger.info("Using other SQL client")
+            logger.debug("Using other SQL client")
 
         try:
             import MySQLdb
@@ -421,7 +421,7 @@ class RedisLock(Lock):
             self._redis = redis.Redis(**kwargs)
         self._redis.ping()
         self._namespace = namespace
-        logger.info(
+        logger.debug(
             "Created redis lock manager with socket_timeout of {}s".format(
                 redis_kwargs["socket_timeout"]
             )
@@ -503,7 +503,7 @@ class RedisUniqueQueue(object):
             self._redis = redis.Redis(**kwargs)
         self._redis.ping()
         self.key = "{}:{}".format(namespace, name)
-        logger.info(
+        logger.debug(
             "Created redis queue with socket_timeout of {}s".format(
                 redis_kwargs["socket_timeout"]
             )
