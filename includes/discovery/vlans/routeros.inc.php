@@ -31,14 +31,14 @@ $oids = snmp_walk($device, '.1.3.6.1.4.1.14988.1.1.8.1.1.2', '-Osqn', '');
 $oids = trim($oids);
 
 if ($oids) {
-    echo 'Mikrotik VLANs '."\n";
+    echo 'Mikrotik VLANs ' . "\n";
 
     foreach (explode("\n", $oids) as $data) {
         if ($data) {
             $split = trim(explode(' ', $data)[0]);
             $value = trim(explode(' ', $data)[1]);
             $si = explode('.', $split)[14]; //Script Index
-	    // Script name is "LNMS_vlans"
+            // Script name is "LNMS_vlans"
             if ($value == 'LNMS_vlans') {
                 $sIndex = $si;
             }
@@ -49,14 +49,14 @@ if ($oids) {
 if (isset($sIndex)) {
     d_echo('Mikrotik script found');
     $vlanversion = 1;
-    $data = snmp_get($device, '.1.3.6.1.4.1.14988.1.1.18.1.1.2.'.$sIndex, '-Ovq', '');
+    $data = snmp_get($device, '.1.3.6.1.4.1.14988.1.1.18.1.1.2.' . $sIndex, '-Ovq', '');
     $data = trim($data);
     $oldId = 0;
     foreach (preg_split("/((\r?\n)|(\r\n?))/", $data) as $line) {
         $vType = trim(explode(',', $line)[0]);
         $vId = trim(explode(',', $line)[1]);
         $vIf = trim(explode(',', $line)[2]);
-        $vName = 'Vlan_'.$vId;
+        $vName = 'Vlan_' . $vId;
         if ($oldId != $vId) {
             $oldId = $vId;
             $device['vlans'][1][$vId] = $vId;
