@@ -41,8 +41,8 @@ class QueueManager:
 
         self._stop_event = threading.Event()
 
-        logger.info("Groups: {}".format(self.config.group))
-        logger.info(
+        logger.debug("Groups: {}".format(self.config.group))
+        logger.debug(
             "{} QueueManager created: {} workers, {}s frequency".format(
                 self.type.title(),
                 self.get_poller_config().workers,
@@ -126,6 +126,7 @@ class QueueManager:
             if hasattr(self.config.group, "__iter__")
             else [self.config.group]
         )
+        logger.debug("Starting {} workers for {}".format(workers, self.type))
         if self.uses_groups:
             for group in groups:
                 group_workers = max(int(workers / len(groups)), 1)
@@ -198,7 +199,7 @@ class QueueManager:
         :param group:
         :return:
         """
-        logger.info("Creating queue {}".format(self.queue_name(queue_type, group)))
+        logger.debug("Creating queue {}".format(self.queue_name(queue_type, group)))
         try:
             return LibreNMS.RedisUniqueQueue(
                 self.queue_name(queue_type, group),
@@ -373,7 +374,7 @@ class PingQueueManager(TimedQueueManager):
         :param lock_manager: the single instance of lock manager
         """
         TimedQueueManager.__init__(
-            self, config, lock_manager, "ping", config.ping.enabled
+            self, config, lock_manager, "ping", False, config.ping.enabled
         )
         self._db = LibreNMS.DB(self.config)
 
@@ -409,7 +410,7 @@ class ServicesQueueManager(TimedQueueManager):
         :param lock_manager: the single instance of lock manager
         """
         TimedQueueManager.__init__(
-            self, config, lock_manager, "services", config.services.enabled
+            self, config, lock_manager, "services", False, config.services.enabled
         )
         self._db = LibreNMS.DB(self.config)
 
@@ -459,7 +460,7 @@ class AlertQueueManager(TimedQueueManager):
         :param lock_manager: the single instance of lock manager
         """
         TimedQueueManager.__init__(
-            self, config, lock_manager, "alerting", config.alerting.enabled
+            self, config, lock_manager, "alerting", False, config.alerting.enabled
         )
         self._db = LibreNMS.DB(self.config)
 
@@ -526,7 +527,7 @@ class DiscoveryQueueManager(TimedQueueManager):
         :param lock_manager: the single instance of lock manager
         """
         TimedQueueManager.__init__(
-            self, config, lock_manager, "discovery", config.discovery.enabled
+            self, config, lock_manager, "discovery", False, config.discovery.enabled
         )
         self._db = LibreNMS.DB(self.config)
 
