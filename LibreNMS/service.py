@@ -789,13 +789,12 @@ class Service:
         try:
             # Report on the poller instance as a whole
             self._db.query(
-                "INSERT INTO poller_cluster(node_id, poller_name, poller_version, poller_groups, last_report, master) "
-                'values("{0}", "{1}", "{2}", "{3}", NOW(), {4}) '
-                'ON DUPLICATE KEY UPDATE poller_version="{2}", poller_groups="{3}", last_report=NOW(), master={4}; '.format(
+                "INSERT INTO poller_cluster(node_id, poller_name, poller_version, last_report, master) "
+                'values("{0}", "{1}", "{2}", NOW(), {3}) '
+                'ON DUPLICATE KEY UPDATE poller_version="{2}", last_report=NOW(), master={3}; '.format(
                     self.config.node_id,
                     self.config.name,
                     "librenms-service",
-                    ",".join(str(g) for g in self.config.group),
                     1 if self.is_master else 0,
                 )
             )
