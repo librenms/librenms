@@ -451,14 +451,22 @@ class Service:
                 "redis" if isinstance(self._lm, LibreNMS.RedisLock) else "internal",
             )
         )
-        logger.info("Queue Workers: Discovery={} Poller={} Services={} Alerting={} Billing={} Ping={}".format(
-            self.config.discovery.workers if self.config.discovery.enabled else 'disabled',
-            self.config.poller.workers if self.config.poller.enabled else 'disabled',
-            self.config.services.workers if self.config.services.enabled else 'disabled',
-            'enabled' if self.config.alerting.enabled else 'disabled',
-            'enabled' if self.config.billing.enabled else 'disabled',
-            'enabled' if self.config.ping.enabled else 'disabled',
-        ))
+        logger.info(
+            "Queue Workers: Discovery={} Poller={} Services={} Alerting={} Billing={} Ping={}".format(
+                self.config.discovery.workers
+                if self.config.discovery.enabled
+                else "disabled",
+                self.config.poller.workers
+                if self.config.poller.enabled
+                else "disabled",
+                self.config.services.workers
+                if self.config.services.enabled
+                else "disabled",
+                "enabled" if self.config.alerting.enabled else "disabled",
+                "enabled" if self.config.billing.enabled else "disabled",
+                "enabled" if self.config.ping.enabled else "disabled",
+            )
+        )
 
         if self.config.update_enabled:
             logger.info(
