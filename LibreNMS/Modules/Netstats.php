@@ -37,7 +37,7 @@ use LibreNMS\RRD\RrdDefinition;
 class Netstats implements \LibreNMS\Interfaces\Module
 {
     /**
-     * @var \string[][]
+     * @var string[][]
      */
     private $oids = [
         'icmp' => [
@@ -141,7 +141,7 @@ class Netstats implements \LibreNMS\Interfaces\Module
     ];
 
     /**
-     * @var \string[][]
+     * @var string[][]
      */
     private $graphs = [
         'icmp' => ['netstat_icmp', 'netstat_icmp_info'],
