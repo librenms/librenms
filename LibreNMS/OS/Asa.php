@@ -1,6 +1,6 @@
 <?php
 /**
- * netstats.inc.php
+ * Asa.php
  *
  * -Description-
  *
@@ -23,9 +23,28 @@
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
-use LibreNMS\OS;
+namespace LibreNMS\OS;
 
-if (! $os instanceof OS) {
-    $os = OS::make($device);
+class Asa extends Shared\Cisco
+{
+    // disable unsupported netstats
+    public function pollIcmpNetstats(array $oids): array
+    {
+        return [];
+    }
+
+    public function pollIpNetstats(array $oids): array
+    {
+        return [];
+    }
+
+    public function pollUdpNetstats(array $oids): array
+    {
+        return [];
+    }
+
+    public function pollTcpNetstats(array $oids): array
+    {
+        return [];
+    }
 }
-(new \LibreNMS\Modules\Netstats())->poll($os);

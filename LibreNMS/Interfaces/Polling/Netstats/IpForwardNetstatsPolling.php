@@ -1,6 +1,6 @@
 <?php
 /**
- * netstats.inc.php
+ * IpForwardNetstatsPolling.php
  *
  * -Description-
  *
@@ -23,9 +23,9 @@
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
-use LibreNMS\OS;
+namespace LibreNMS\Interfaces\Polling\Netstats;
 
-if (! $os instanceof OS) {
-    $os = OS::make($device);
+interface IpForwardNetstatsPolling
+{
+    public function pollIpForwardNetstats(array $oids): array;
 }
-(new \LibreNMS\Modules\Netstats())->poll($os);
