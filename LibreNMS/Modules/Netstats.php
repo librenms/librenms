@@ -36,6 +36,9 @@ use LibreNMS\RRD\RrdDefinition;
 
 class Netstats implements \LibreNMS\Interfaces\Module
 {
+    /**
+     * @var \string[][]
+     */
     private $oids = [
         'icmp' => [
             'IP-MIB::icmpInMsgs.0',
@@ -137,6 +140,9 @@ class Netstats implements \LibreNMS\Interfaces\Module
         ],
     ];
 
+    /**
+     * @var \string[][]
+     */
     private $graphs = [
         'icmp' => ['netstat_icmp', 'netstat_icmp_info'],
         'ip' => ['netstat_ip', 'netstat_ip_frag'],
@@ -146,6 +152,9 @@ class Netstats implements \LibreNMS\Interfaces\Module
         'udp' => ['netstat_udp'],
     ];
 
+    /**
+     * @var string[]
+     */
     private $types = [
         'icmp' => IcmpNetstatsPolling::class,
         'ip' => IpNetstatsPolling::class,
@@ -158,7 +167,7 @@ class Netstats implements \LibreNMS\Interfaces\Module
     /**
      * @inheritDoc
      */
-    public function discover(OS $os)
+    public function discover(OS $os): void
     {
         // no discovery
     }
@@ -166,7 +175,7 @@ class Netstats implements \LibreNMS\Interfaces\Module
     /**
      * @inheritDoc
      */
-    public function poll(OS $os)
+    public function poll(OS $os): void
     {
         foreach ($this->types as $type => $interface) {
             if ($os instanceof $interface) {
@@ -199,7 +208,7 @@ class Netstats implements \LibreNMS\Interfaces\Module
     /**
      * @inheritDoc
      */
-    public function cleanup(OS $os)
+    public function cleanup(OS $os): void
     {
         // no cleanup
     }
