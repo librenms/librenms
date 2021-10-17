@@ -18,6 +18,12 @@ use LibreNMS\Tests\DuskTestCase;
  */
 class LoginTest extends DuskTestCase
 {
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->artisan('migrate');
+    }
+
     /**
      * @throws \Throwable
      */
