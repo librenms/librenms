@@ -12231,7 +12231,7 @@
                     "processor_index": "0",
                     "processor_type": "junos",
                     "processor_usage": 4,
-                    "processor_descr": "single",
+                    "processor_descr": "single SPU 0/0",
                     "processor_precision": 1,
                     "processor_perc_warn": 75
                 }
