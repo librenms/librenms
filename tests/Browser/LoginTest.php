@@ -4,7 +4,7 @@ namespace LibreNMS\Tests\Browser;
 
 use App\Models\User;
 use App\Models\UserPref;
-use Illuminate\Foundation\Testing\DatabaseMigrations;
+use Hash;
 use Laravel\Dusk\Browser;
 use LibreNMS\Config;
 use LibreNMS\Tests\Browser\Pages\LoginPage;
@@ -18,8 +18,6 @@ use LibreNMS\Tests\DuskTestCase;
  */
 class LoginTest extends DuskTestCase
 {
-    use DatabaseMigrations;
-
     /**
      * @throws \Throwable
      */
@@ -28,8 +26,7 @@ class LoginTest extends DuskTestCase
         $this->browse(function (Browser $browser) {
             $password = 'some_password';
             $user = User::factory()->create([
-                /** @phpstan-ignore-next-line */
-                'password' => password_hash($password, PASSWORD_DEFAULT),
+                'password' => Hash::make($password),
             ]); /** @var User $user */
             $browser->visit(new LoginPage())
                 ->type('username', $user->username)
@@ -54,8 +51,7 @@ class LoginTest extends DuskTestCase
         $this->browse(function (Browser $browser) {
             $password = 'another_password';
             $user = User::factory()->create([
-                /** @phpstan-ignore-next-line */
-                'password' => password_hash($password, PASSWORD_DEFAULT),
+                'password' => Hash::make($password),
             ]); /** @var User $user */
             Config::persist('twofactor', true); // set to db
             UserPref::setPref($user, 'twofactor', [
@@ -78,6 +74,7 @@ class LoginTest extends DuskTestCase
                 ->logout();
 
             $user->delete();
+            \App\Models\Config::where('config_name', 'twofactor')->delete();
         });
     }
 }
