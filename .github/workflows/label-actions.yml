@@ -19,3 +19,5 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: dessant/label-actions@v2
+        with:
+          github-token: ${{ secrets.LABELS_TOKEN }}
