@@ -3,7 +3,7 @@ name: 'Label Actions'
 on:
   issues:
     types: [labeled, unlabeled]
-  pull_request:
+  pull_request_target:
     types: [labeled, unlabeled]
   discussion:
     types: [labeled, unlabeled]
@@ -19,5 +19,3 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: dessant/label-actions@v2
-        with:
-          github-token: ${{ secrets.LABELS_TOKEN }}
