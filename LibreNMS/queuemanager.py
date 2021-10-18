@@ -527,7 +527,7 @@ class DiscoveryQueueManager(TimedQueueManager):
         :param lock_manager: the single instance of lock manager
         """
         TimedQueueManager.__init__(
-            self, config, lock_manager, "discovery", False, config.discovery.enabled
+            self, config, lock_manager, "discovery", True, config.discovery.enabled
         )
         self._db = LibreNMS.DB(self.config)
 
