@@ -1,13 +1,6 @@
 mib: ENVIROMUX-1W-MIB
 modules:
     sensors:
-        pre-cache:
-            data:
-                -
-                    oid:
-                        - alertEnabled
-                        - alertThreshold
-                        - alertThresholdType
         temperature:
             data:
                 -
@@ -18,69 +11,10 @@ modules:
                    descr: "{{ $extSensorDescription }}"
                    divisor: 10
                    skip_values:
-                       -
-                           oid: extSensorType
-                           op: '=='
-                           value: 0
-                       -
+                      -
                            oid: extSensorType
                            op: 'not_in_array'
                            value: ['1', '24']
-                       -
-                           oid: alertEnabled
-                           op: '=='
-                           value: 1
-                -
-                   oid: extSensorTable
-                   value: extSensorValue
-                   num_oid: '.1.3.6.1.4.1.3699.1.1.12.1.2.1.1.4.{{ $index }}'
-                   index: 'extSensorValue.{{ $index }}'
-                   descr: "{{ $extSensorDescription }}"
-                   low_limit: alertThreshold
-                   divisor: 10
-                   skip_values:
-                       -
-                           oid: extSensorType
-                           op: '=='
-                           value: 0
-                       -
-                           oid: extSensorType
-                           op: 'not_in_array'
-                           value: ['1', '24']
-                       -
-                           oid: alertEnabled
-                           op: '!='
-                           value: 1
-                       -
-                           oid: alertThresholdType
-                           op: '!='
-                           value: 1
-                -
-                   oid: extSensorTable
-                   value: extSensorValue
-                   num_oid: '.1.3.6.1.4.1.3699.1.1.12.1.2.1.1.4.{{ $index }}'
-                   index: 'extSensorValue.{{ $index }}'
-                   descr: "{{ $extSensorDescription }}"
-                   high_limit: alertThreshold
-                   divisor: 10
-                   skip_values:
-                       -
-                           oid: extSensorType
-                           op: '=='
-                           value: 0
-                       -
-                           oid: extSensorType
-                           op: 'not_in_array'
-                           value: ['1', '24']
-                       -
-                           oid: alertEnabled
-                           op: '!='
-                           value: 1
-                       -
-                           oid: alertThresholdType
-                           op: '!='
-                           value: 0
-
         humidity:
             data:
                 -
@@ -93,59 +27,5 @@ modules:
                    skip_values:
                        -
                            oid: extSensorType
-                           op: '='
-                           value: 0
-                       -
-                           oid: extSensorType
                            op: 'not_in_array'
                            value: ['2']
-                -
-                   oid: extSensorTable
-                   value: extSensorValue
-                   num_oid: '.1.3.6.1.4.1.3699.1.1.12.1.2.1.1.4.{{ $index }}'
-                   index: 'extSensorValue.{{ $index }}'
-                   descr: "{{ $extSensorDescription }}"
-                   low_limit: alertThreshold
-                   divisor: 10
-                   skip_values:
-                       -
-                           oid: extSensorType
-                           op: '=='
-                           value: 0
-                       -
-                           oid: extSensorType
-                           op: 'not_in_array'
-                           value: ['2']
-                       -
-                           oid: alertEnabled
-                           op: '=='
-                           value: 1
-                       -
-                           oid: alertThresholdType
-                           op: '!='
-                           value: 1
-                -
-                   oid: extSensorTable
-                   value: extSensorValue
-                   num_oid: '.1.3.6.1.4.1.3699.1.1.12.1.2.1.1.4.{{ $index }}'
-                   index: 'extSensorValue.{{ $index }}'
-                   descr: "{{ $extSensorDescription }}"
-                   high_limit: alertThreshold
-                   divisor: 10
-                   skip_values:
-                       -
-                           oid: extSensorType
-                           op: '=='
-                           value: 0
-                       -
-                           oid: extSensorType
-                           op: 'not_in_array'
-                           value: ['2']
-                       -
-                           oid: alertEnabled
-                           op: '=='
-                           value: 1
-                       -
-                           oid: alertThresholdType
-                           op: '!='
-                           value: 0
