@@ -1,11 +1,6 @@
 mib: POWER-ETHERNET-MIB:CISCO-POWER-ETHERNET-EXT-MIB
 modules:
     sensors:
-        pre-cache:
-            data:
-                -
-                    oid:
-                        - pethMainPsePower
         power:
             data:
                 -
