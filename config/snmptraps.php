@@ -109,6 +109,7 @@ return [
         'OCCAM-KERNEL-MIB::thresholdExceededNotification' => \LibreNMS\Snmptrap\Handlers\OccamThresholdExceededNotification::class,
         'OCCAM-NOTIFICATION-MIB::ecfmNotification' => \LibreNMS\Snmptrap\Handlers\OccamEcfmNotification::class,
         'OCCAM-LEPS-MIB::epsLoopNotification' => \LibreNMS\Snmptrap\Handlers\OccamEpsLoopNotification::class,
+        'OCCAM-SENSOR-MIB::sensorThresholdNotification' => \LibreNMS\Snmptrap\Handlers\OccamSensorThresholdNotification::class,
         'OSPF-TRAP-MIB::ospfIfStateChange' => \LibreNMS\Snmptrap\Handlers\OspfIfStateChange::class,
         'OSPF-TRAP-MIB::ospfNbrStateChange' => \LibreNMS\Snmptrap\Handlers\OspfNbrStateChange::class,
         'UPS-MIB::upsTraps.0.1' => \LibreNMS\Snmptrap\Handlers\UpsTrapsOnBattery::class,
