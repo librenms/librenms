@@ -34,6 +34,32 @@ continue to function as normal.
 $config['prometheus']['enable'] = true;
 $config['prometheus']['url'] = 'http://127.0.0.1:9091';
 $config['prometheus']['job'] = 'librenms'; # Optional
+$config['prometheus']['prefix'] = 'librenms'; # Optional
+```
+
+## Prefix
+
+Setting the 'prefix' option will cause all metric names to begin with 
+the configured value.
+
+For instance without setting this option metric names will be something 
+like this:
+
+```
+OUTUCASTPKTS
+ifOutUcastPkts_rate
+INOCTETS
+ifInErrors_rate
+```
+
+Configuring a prefix name, for example 'librenms', instead caused those 
+metrics to be exposed with the following names:
+
+```
+librenms_OUTUCASTPKTS
+librenms_ifOutUcastPkts_rate
+librenms_INOCTETS
+librenms_ifInErrors_rate
 ```
 
 ## Sample Prometheus Scrape Config (for scraping the Push Gateway)

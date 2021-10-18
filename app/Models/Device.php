@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Illuminate\Database\Query\JoinClause;
 use Illuminate\Support\Str;
@@ -35,7 +36,37 @@ class Device extends BaseModel
 
     public $timestamps = false;
     protected $primaryKey = 'device_id';
-    protected $fillable = ['hostname', 'ip', 'status', 'status_reason', 'sysName', 'sysDescr', 'sysObjectID', 'hardware', 'version', 'features', 'serial', 'icon'];
+    protected $fillable = [
+        'hostname',
+        'ip',
+        'status',
+        'status_reason',
+        'sysName',
+        'sysDescr',
+        'sysObjectID',
+        'hardware',
+        'version',
+        'features',
+        'serial',
+        'icon',
+        'overwrite_ip',
+        'os',
+        'community',
+        'port',
+        'transport',
+        'snmpver',
+        'poller_group',
+        'port_association_mode',
+        'snmp_disable',
+        // ---- snmpV3 fields ----
+        'authlevel',
+        'authname',
+        'authpass',
+        'authalgo',
+        'cryptopass',
+        'cryptoalgo',
+    ];
+
     protected $casts = [
         'last_polled' => 'datetime',
         'status' => 'boolean',
@@ -601,6 +632,11 @@ class Device extends BaseModel
         return $this->hasMany(HrDevice::class, 'device_id');
     }
 
+    public function hostResourceValues(): HasOne
+    {
+        return $this->hasOne(HrSystem::class, 'device_id');
+    }
+
     public function entityPhysical(): HasMany
     {
         return $this->hasMany(EntPhysical::class, 'device_id');
@@ -789,6 +825,11 @@ class Device extends BaseModel
     public function mplsTunnelCHops(): HasMany
     {
         return $this->hasMany(\App\Models\MplsTunnelCHop::class, 'device_id');
+    }
+
+    public function outages(): HasMany
+    {
+        return $this->hasMany(DeviceOutage::class, 'device_id');
     }
 
     public function printerSupplies(): HasMany

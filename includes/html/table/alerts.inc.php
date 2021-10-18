@@ -26,6 +26,11 @@ $alert_states = [
 
 $show_recovered = false;
 
+if (is_numeric($vars['alert_id']) && $vars['alert_id'] > 0) {
+    $where .= ' AND `alerts`.`id` = ?';
+    $param[] = $vars['alert_id'];
+}
+
 if (is_numeric($vars['device_id']) && $vars['device_id'] > 0) {
     $where .= ' AND `alerts`.`device_id`=' . $vars['device_id'];
 }
@@ -110,7 +115,7 @@ $format = $vars['format'];
 foreach (dbFetchRows($sql, $param) as $alert) {
     $log = dbFetchCell('SELECT details FROM alert_log WHERE rule_id = ? AND device_id = ? ORDER BY id DESC LIMIT 1', [$alert['rule_id'], $alert['device_id']]);
     $alert_log_id = dbFetchCell('SELECT id FROM alert_log WHERE rule_id = ? AND device_id = ? ORDER BY id DESC LIMIT 1', [$alert['rule_id'], $alert['device_id']]);
-    $fault_detail = alert_details($log);
+    [$fault_detail, $max_row_length] = alert_details($log);
     $info = json_decode($alert['info'], true);
 
     $alert_to_ack = '<button type="button" class="btn btn-danger command-ack-alert fa fa-eye" aria-hidden="true" title="Mark as acknowledged" data-target="ack-alert" data-state="' . $alert['state'] . '" data-alert_id="' . $alert['id'] . '" data-alert_state="' . $alert['state'] . '" name="ack-alert"></button>';
@@ -135,7 +140,13 @@ foreach (dbFetchRows($sql, $param) as $alert) {
         }
     }
 
-    $hostname = '<div class="incident">' . generate_device_link($alert, format_hostname($alert, shorthost($alert['hostname']))) . '<div id="incident' . ($alert['id']) . '" class="collapse">' . $fault_detail . '</div></div>';
+    $hostname = '<div class="incident">' . generate_device_link($alert, format_hostname($alert, shorthost($alert['hostname']))) . '<div id="incident' . ($alert['id']) . '"';
+    if (is_numeric($vars['uncollapse_key_count'])) {
+        $hostname .= $max_row_length < (int) $vars['uncollapse_key_count'] ? '' : ' class="collapse"';
+    } else {
+        $hostname .= ' class="collapse"';
+    }
+    $hostname .= '>' . $fault_detail . '</div></div>';
 
     $severity = $alert['severity'];
     $severity_ico = '<span class="alert-status label-' . alert_layout($severity)['background_color'] . '">&nbsp;</span>';

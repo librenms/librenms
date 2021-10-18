@@ -107,10 +107,11 @@ abstract class LnmsCommand extends Command
      */
     protected function validate(array $rules, array $messages = []): array
     {
+        $error_messages = trans('commands.' . $this->getName() . '.validation-errors');
         $validator = Validator::make(
             $this->arguments() + $this->options(),
             $rules,
-            array_merge(trans('commands.' . $this->getName() . '.validation-errors'), $messages)
+            is_array($error_messages) ? array_merge($error_messages, $messages) : $messages
         );
 
         try {

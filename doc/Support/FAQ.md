@@ -26,7 +26,7 @@ path: blob/master/doc/
 - [What do the values mean in my graphs?](#faq21)
 - [Why does a device show as a warning?](#faq22)
 - [Why do I not see all interfaces in the Overall traffic graph for a device?](#faq23)
-- [How do I move my LibreNMS install to another server?](#faq24)
+- [How do I migrate my LibreNMS install to another server?](#faq24)
 - [Why is my EdgeRouter device not detected?](#faq25)
 - [Why are some of my disks not showing?](#faq26)
 - [Why are my disks reporting an incorrect size?](#faq27)
@@ -301,12 +301,12 @@ $config['device_traffic_iftype'][] = '/ieee8023adLag/';
 $config['device_traffic_iftype'][] = '/ppp/';
 ```
 
-## <a name="faq24"> How do I move my LibreNMS install to another server?</a>
+## <a name="faq24"> How do I migrate my LibreNMS install to another server?</a>
 
 If you are moving from one CPU architecture to another then you will
 need to dump the rrd files and re-create them. If you are in this
 scenario then you can use [Dan Brown's migration
-scripts](https://vlan50.com/2015/04/17/migrating-from-observium-to-librenms/).
+scripts](https://web.archive.org/web/20180815212723/https://vlan50.com/2015/04/17/migrating-from-observium-to-librenms/).
 
 If you are just moving to another server with the same CPU
 architecture then the following steps should be all that's needed:

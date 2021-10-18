@@ -1176,6 +1176,10 @@ return [
                 'description' => 'Attach Device sysName',
                 'help' => 'Attach sysName information put to Prometheus.',
             ],
+            'prefix' => [
+                'description' => 'Prefix',
+                'help' => 'Optional text to prepend to exported metric names',
+            ],
         ],
         'public_status' => [
             'description' => 'Show status publicly',
@@ -1233,6 +1237,10 @@ return [
         'rrdtool_tune' => [
             'description' => 'Tune all rrd port files to use max values',
             'help' => 'Auto tune maximum value for rrd port files',
+        ],
+        'rrdtool_version' => [
+            'description' => 'Sets the version of rrdtool on your server',
+            'help' => 'Anything over 1.5.5 supports all features LibreNMS uses, do not set higher than your installed version',
         ],
         'sfdp' => [
             'description' => 'Path to sfdp',
