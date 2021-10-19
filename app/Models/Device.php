@@ -67,6 +67,7 @@ class Device extends BaseModel
         'timeout',
         'transport',
         'version',
+        'uptime',
     ];
 
     protected $casts = [
