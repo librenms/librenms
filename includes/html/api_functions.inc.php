@@ -1977,6 +1977,28 @@ function get_port_groups(Illuminate\Http\Request $request)
     return api_success($groups->makeHidden('pivot')->toArray(), 'groups', 'Found ' . $groups->count() . ' port groups');
 }
 
+function get_ports_by_group(Illuminate\Http\Request $request)
+{
+    $name = $request->route('name');
+    if (! $name) {
+        return api_error(400, 'No port group name provided');
+    }
+
+    $port_group = ctype_digit($name) ? PortGroup::find($name) : PortGroup::where('name', $name)->first();
+
+    if (empty($port_group)) {
+        return api_error(404, 'Port group not found');
+    }
+
+    $ports = $port_group->ports()->get($request->get('full') ? ['*'] : ['ports.port_id']);
+
+    if ($ports->isEmpty()) {
+        return api_error(404, 'No ports found in group ' . $name);
+    }
+
+    return api_success($ports->makeHidden('pivot')->toArray(), 'ports');
+}
+
 function assign_port_group(Illuminate\Http\Request $request)
 {
     $port_group_id = $request->route('port_group_id');
