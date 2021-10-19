@@ -1349,6 +1349,8 @@ plugins:
     - { Field: plugin_id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
     - { Field: plugin_name, Type: varchar(60), 'Null': false, Extra: '' }
     - { Field: plugin_active, Type: int, 'Null': false, Extra: '' }
+    - { Field: version, Type: int, 'Null': false, Extra: '', Default: '1' }
+    - { Field: settings, Type: longtext, 'Null': true, Extra: '' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [plugin_id], Unique: true, Type: BTREE }
 pollers:
