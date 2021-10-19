@@ -468,11 +468,7 @@ if (\LibreNMS\Config::get('enable_bgp')) {
                 if ($vrfId) {
                     dbUpdate($peer['update'], 'bgpPeers', '`device_id` = ? AND `bgpPeerIdentifier` = ? AND `vrf_id` = ?', [$device['device_id'], $peer['bgpPeerIdentifier'], $vrfId]);
                 } else {
-                    if ($device['os'] == 'timos') {
-                        d_echo('*****ERROR***** Nokia BGP Peers must have a vrfId to be valid');
-                    } else {
-                        dbUpdate($peer['update'], 'bgpPeers', '`device_id` = ? AND `bgpPeerIdentifier` = ?', [$device['device_id'], $peer['bgpPeerIdentifier']]);
-                    }
+                    dbUpdate($peer['update'], 'bgpPeers', '`device_id` = ? AND `bgpPeerIdentifier` = ?', [$device['device_id'], $peer['bgpPeerIdentifier']]);
                 }
             }
 
