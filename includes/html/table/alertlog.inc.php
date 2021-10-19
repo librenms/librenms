@@ -13,6 +13,8 @@
  * @author     LibreNMS Contributors
 */
 
+use App\Models\Device;
+
 $alert_severities = [
     // alert_rules.status is enum('ok','warning','critical')
     'ok' => 1,
@@ -38,6 +40,11 @@ if ($vars['state'] >= 0) {
 
 if (isset($vars['min_severity'])) {
     $where .= get_sql_filter_min_severity($vars['min_severity'], 'R');
+}
+
+if (is_numeric($vars['device_group'])) {
+    $where .= ' AND D.device_id IN (SELECT `device_id` FROM `device_group_device` WHERE `device_group_id` = ?)';
+    $param[] = $vars['device_group'];
 }
 
 if (! Auth::user()->hasGlobalRead()) {
