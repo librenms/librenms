@@ -18,6 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2020 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -79,11 +80,10 @@ class DatabaseController extends InstallationController implements InstallerStep
             (new Database())->validateSystem($validator);
             $results = $validator->getResults('database');
 
-            /** @var \LibreNMS\ValidationResult $result */
             foreach ($results as $result) {
                 if ($result->getStatus() == ValidationResult::FAILURE) {
                     $ok = false;
-                    $messages[] = $result->getMessage();
+                    $messages[] = $result->getMessage() . '  ' . $result->getFix();
                 }
             }
         } catch (\Exception $e) {

@@ -5,6 +5,7 @@ namespace Database\Factories;
 use App\Models\Sensor;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
+/** @extends Factory<Sensor> */
 class SensorFactory extends Factory
 {
     /**
@@ -25,9 +26,9 @@ class SensorFactory extends Factory
         $sensor_oid = '.1.3.6.1.4.1.4115.1.4.3.3.' . $this->faker->numberBetween(0, 10) . '.' . $this->faker->numberBetween(0, 10) . '.' . $this->faker->numberBetween(0, 10);
 
         return [
-            'sensor_index' => $this->faker->randomDigit,
+            'sensor_index' => $this->faker->randomDigit(),
             'sensor_class' => $this->faker->randomElement($sensor_class),
-            'sensor_current' => $this->faker->randomDigit,
+            'sensor_current' => $this->faker->randomDigit(),
             'sensor_oid' => $sensor_oid,
         ];
     }

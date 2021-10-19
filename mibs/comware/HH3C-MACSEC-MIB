@@ -1,0 +1,88 @@
+-- ==========================================================================
+-- Copyright (c) 2004-2015 New H3C Tech. Co., Ltd.  All rights reserved.
+--
+-- Description: The file defines a MIB to provide MACSEC configuration
+-- Reference:
+-- Version: V1.0
+-- History:
+--   V1.0 2015-09-01 created by liubo
+-- ==========================================================================
+HH3C-MACSEC-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE
+        FROM SNMPv2-SMI
+    InterfaceIndex
+        FROM IF-MIB
+    hh3cCommon
+        FROM HH3C-OID-MIB;
+
+hh3cMACsec MODULE-IDENTITY
+    LAST-UPDATED "201509011615Z"
+    ORGANIZATION
+        "New H3C Technologies Co., Ltd."
+    CONTACT-INFO
+        "Platform Team New H3C Technologies Co., Ltd.
+         Hai-Dian District Beijing P.R. China
+         http://www.h3c.com
+         Zip: 100085"
+    DESCRIPTION
+        "This MIB provides information for MACSEC configuration.
+        MACSEC presents secure communication method."
+    REVISION "201509011615Z"
+    DESCRIPTION
+        "Initial version."
+    ::= { hh3cCommon 163 }
+
+hh3cMACsecCFGObjects OBJECT IDENTIFIER ::= { hh3cMACsec 1 }
+
+-- ==========================================================================
+-- hh3cMACsecCFGPortTable OBJECT
+-- ==========================================================================
+hh3cMACsecCFGPortTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Hh3cMACsecCFGPortEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+    "The MACsec port table."
+::= { hh3cMACsecCFGObjects 1 }
+
+hh3cMACsecCFGPortEntry OBJECT-TYPE
+    SYNTAX Hh3cMACsecCFGPortEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+    "The MACsec port entry."
+    INDEX { hh3cMACsecCFGPortIndex }
+::= { hh3cMACsecCFGPortTable 1 }
+
+Hh3cMACsecCFGPortEntry ::= SEQUENCE {
+    hh3cMACsecCFGPortIndex         InterfaceIndex,
+    hh3cMACsecCFGPortPSKCKNName    OCTET STRING,
+    hh3cMACsecCFGPortPSKCAKValue   OCTET STRING }
+
+hh3cMACsecCFGPortIndex OBJECT-TYPE
+    SYNTAX      InterfaceIndex
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+    "An interface index indicates the port number associated with this port."
+::= { hh3cMACsecCFGPortEntry 1 }
+
+hh3cMACsecCFGPortPSKCKNName OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(0..128))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "The connectivity asociation key name."
+::= { hh3cMACsecCFGPortEntry 2 }
+
+hh3cMACsecCFGPortPSKCAKValue OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE(0..128))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+    "The connectivity asociation key value."
+::= { hh3cMACsecCFGPortEntry 3 }
+
+END

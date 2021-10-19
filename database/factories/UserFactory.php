@@ -5,6 +5,7 @@ namespace Database\Factories;
 use App\Models\User;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
+/** @extends Factory<User> */
 class UserFactory extends Factory
 {
     /**
@@ -21,14 +22,12 @@ class UserFactory extends Factory
      */
     public function definition()
     {
-        static $password;
-
         return [
             'auth_type' => 'mysql',
             'username' => $this->faker->unique()->userName,
             'realname' => $this->faker->name,
             'email' => $this->faker->safeEmail,
-            'password' => $password ?: $password = bcrypt('secret'),
+            'password' => '$2y$10$92IXUNpkjO0rOQ5byMi.Ye4oKoEa3Ro9llC/.og/at2.uheWG/igi', // password
             'level' => 1,
         ];
     }

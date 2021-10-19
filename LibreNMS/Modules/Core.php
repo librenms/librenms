@@ -33,9 +33,10 @@ class Core
     /**
      * Detect the os of the given device.
      *
-     * @param array $device device to check
-     * @param bool $fetch fetch sysDescr and sysObjectID fresh from the device
+     * @param  array  $device  device to check
+     * @param  bool  $fetch  fetch sysDescr and sysObjectID fresh from the device
      * @return string the name of the os
+     *
      * @throws \Exception
      */
     public static function detectOS($device, $fetch = true)
@@ -95,9 +96,9 @@ class Core
      *
      * Appending _except to any condition will invert the match.
      *
-     * @param array $device
-     * @param array $array Array of items, keys should be sysObjectID, sysDescr, or sysDescr_regex
-     * @param string|array $mibdir MIB directory for evaluated OS
+     * @param  array  $device
+     * @param  array  $array  Array of items, keys should be sysObjectID, sysDescr, or sysDescr_regex
+     * @param  string|array  $mibdir  MIB directory for evaluated OS
      * @return bool the result (all items passed return true)
      */
     protected static function checkDiscovery($device, $array, $mibdir)

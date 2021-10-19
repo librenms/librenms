@@ -1,0 +1,285 @@
+-- =============================================================================
+-- Copyright (c) 2004-2016 New H3C Tech. Co., Ltd. All rights reserved.
+--
+-- Description:
+--   The file defines a MIB to provide WLAN configuration extended.
+-- Reference:
+-- Version: V1.3
+-- History:
+--   V1.0 2007-04-25 Initial version, created by shiyang (Richard)
+--   V1.1 2008-07-17 Changed by chenwei
+--        Add hh3cDot11LoadBalanceTrafficGap and
+--        hh3cDot11LoadBalanceSessionGap to hh3cDot11LBGlobalGroup.
+--   V1.2 2010-02-22 Changed by Wang Chunsheng
+--        Add new table of hh3cDot11LBRadioGroupTable for hh3cDot11LoadBalance.
+--        2010-06-02 Changed by Yin Junjie
+--        Add new node hh3cDot11LBTrafficThresKbps and
+--        hh3cDot11LBTrafficGapKbps to hh3cDot11LBGlobalGroup.
+--   V1.3 2016-03-11 add by yubo 04460
+--        Add hh3cDot11LoadBalanceEnable to hh3cDot11LBGlobalGroup
+-- =============================================================================
+HH3C-DOT11-CFGEXT-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+        TruthValue,
+        RowStatus
+    FROM SNMPv2-TC
+        MODULE-IDENTITY,
+        OBJECT-TYPE,
+        Integer32,
+        Unsigned32
+    FROM SNMPv2-SMI
+        hh3cDot11
+    FROM HH3C-DOT11-REF-MIB;
+
+hh3cDot11CFGEXT MODULE-IDENTITY
+    LAST-UPDATED "201603111800Z"        -- Mar 11, 2016 at 18:00 GMT
+    ORGANIZATION
+        "New H3C Technologies Co., Ltd."
+    CONTACT-INFO
+        "Platform Team New H3C Technologies Co., Ltd.
+         Hai-Dian District Beijing P.R. China
+         Http://www.h3c.com
+         Zip:100085"
+    DESCRIPTION
+        "This MIB provides information for WLAN configuration extended.
+        The HH3C-DOT11-CFG-MIB define MIB objects for WLAN basic configuration,
+        while this MIB will define MIB objects for load balance these kinds
+        feature.
+
+        GLOSSARY
+
+        IEEE 802.11
+        Standard to encourage interoperability among
+        wireless networking equipment.
+
+        Access point (AP)
+        Transmitter/receiver (transceiver) device
+        that commonly connects and transports data
+        between a wireless network and a wired network.
+
+        Access control (AC)
+        To control and manage multi-APs, it will bridge
+        wireless and wired network.
+
+        Fat AP
+        Applied in the home, SOHO and so on, and it could
+        work independently without help from AC.
+
+        Fit AP
+        Applied in the enterprise environment, it will work
+        under the control and management from AC.
+
+        Control And Provisioning of Wireless Access Points Protocol
+        The short name of protocol is CAPWAP. AC will control
+        and manage AP by CAPWAP tunnel protocol defined by IETF.
+        Also, a data tunnel will be set up between AC and AP.
+
+        BSS
+        IEEE 802.11 Basic Service Set (Radio Cell).  The
+        BSS of an AP comprises of the stations directly
+        associating with the AP.
+
+        Radio
+        The chip set to receive and send wireless signal.
+
+        Association
+        The service used to establish access point
+        or station mapping and enable station invocation
+        of the distribution system services.
+        (Wireless clients attempt to connect to
+        access points.)
+
+        Basic Rate
+        A data rate that is mandatory for client
+        devices to support in order for them to achieve
+        successful association.
+
+        MSDU
+        MAC Service Data Unit, it is frame format defined by
+        802.11.
+
+        TU
+        It is 1,024 microseconds (ms), which is about 1
+        millisecond.
+
+        AKM
+        The authentication and key management method defined by
+        802.11i, and which includes 802.1x and pre-shared key."
+    REVISION "201603111800Z"        -- Mar 11, 2016 at 18:00 GMT
+    DESCRIPTION
+        "Modified to add new nodes."
+    REVISION "201006021400Z"        -- Jun 02, 2010 at 14:00 GMT
+    DESCRIPTION
+        "Modified to add new nodes."
+    REVISION "200704252000Z"        -- Apr. 25, 2007 at 20:00 GMT
+    DESCRIPTION
+        "The initial revision of this MIB module."
+    ::= { hh3cDot11 6 }
+
+-- *****************************************************************************
+-- *  Major sections
+-- *****************************************************************************
+--  Load Balancing Group
+--  DEFINED AS "The group to provide the configuration information
+--  for load balancing feature.
+hh3cDot11LoadBalance OBJECT IDENTIFIER   ::= { hh3cDot11CFGEXT 1 }
+hh3cDot11LBGlobalGroup OBJECT IDENTIFIER ::= { hh3cDot11LoadBalance 1 }
+
+-- *****************************************************************************
+-- *  hh3cDot11LBGlobalGroup Definition
+-- *****************************************************************************
+hh3cDot11LoadBalanceTrafficEnable OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Represents whether enable load balancing according to station
+        traffic."
+    ::= { hh3cDot11LBGlobalGroup 1 }
+
+hh3cDot11LoadBalanceTrafficThres OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Represents the threshold value for Traffic based load balancing."
+    ::= { hh3cDot11LBGlobalGroup 2 }
+
+hh3cDot11LoadBalanceSessionEnable OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Represents whether enable load balancing according to station
+        session number."
+    ::= { hh3cDot11LBGlobalGroup 3 }
+
+hh3cDot11LoadBalanceSessionThres OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Represents the threshold value for session number based
+        load balancing."
+    ::= { hh3cDot11LBGlobalGroup 4 }
+
+hh3cDot11LoadBalanceTrafficGap OBJECT-TYPE
+    SYNTAX      Integer32 (10..40)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Traffic gap threshold.  Load balancing is carried out for a radio
+        when the traffic threshold and session gap are exceeded."
+    DEFVAL { 20 }
+    ::= { hh3cDot11LBGlobalGroup 5 }
+
+hh3cDot11LoadBalanceSessionGap OBJECT-TYPE
+    SYNTAX      Integer32 (1..8)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Session gap threshold.  Load balancing is carried out for a radio
+        when the session threshold and session gap are exceeded."
+    DEFVAL { 4 }
+    ::= { hh3cDot11LBGlobalGroup 6 }
+
+hh3cDot11LBTrafficThresKbps OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "kbps"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Represents the threshold value for Traffic based load balancing."
+    ::= { hh3cDot11LBGlobalGroup 7 }
+
+hh3cDot11LBTrafficGapKbps OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "kbps"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Traffic gap threshold.  Load balancing is carried out for a radio
+        when the traffic threshold gap are exceeded."
+    ::= { hh3cDot11LBGlobalGroup 8 }
+
+hh3cDot11LoadBalanceEnable OBJECT-TYPE
+    SYNTAX      INTEGER
+    {
+        none(0),
+        trafficBased(1),
+        userBased(2)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Represents whether to enable load balancing.
+         0    - none
+         1    - enable load balancing according to station traffic
+         2    - enable load balancing according to station session number."
+    DEFVAL      { none }
+    ::= { hh3cDot11LBGlobalGroup 9 }
+
+-- *****************************************************************************
+-- *  End of hh3cDot11LBGlobalGroup Definition
+-- *****************************************************************************
+
+-- *****************************************************************************
+-- *  hh3cDot11LBRadioGroup Definition
+-- *****************************************************************************
+hh3cDot11LBRadioGroupTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Hh3cDot11LBRadioGroupEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "This table defines load balance radio group."
+    ::= { hh3cDot11LoadBalance 2 }
+
+hh3cDot11LBRadioGroupEntry OBJECT-TYPE
+    SYNTAX      Hh3cDot11LBRadioGroupEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry contains information of one load balance radio group."
+    INDEX
+        {
+            hh3cDot11LBRadioGroupId
+        }
+    ::= { hh3cDot11LBRadioGroupTable 1 }
+
+Hh3cDot11LBRadioGroupEntry ::= SEQUENCE
+    {
+        hh3cDot11LBRadioGroupId        Unsigned32,
+        hh3cDot11LBRadioGroupDesc      OCTET STRING,
+        hh3cDot11LBRadioGroupRowStatus RowStatus
+    }
+
+hh3cDot11LBRadioGroupId OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Represents load balance radio group ID."
+    ::= { hh3cDot11LBRadioGroupEntry 1 }
+
+hh3cDot11LBRadioGroupDesc OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Represents the description of load balance radio group."
+    ::= { hh3cDot11LBRadioGroupEntry 2 }
+
+hh3cDot11LBRadioGroupRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The row status of this table entry."
+    ::= { hh3cDot11LBRadioGroupEntry 3 }
+
+-- *****************************************************************************
+-- *  End of hh3cDot11LBRadioGroup Definition
+-- *****************************************************************************
+
+END

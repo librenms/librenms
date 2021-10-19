@@ -51,7 +51,7 @@ $config['nets'][] = '192.168.0.0/24';
 $config['nets'][] = '172.2.4.0/22';
 ```
 
-## Exclusions
+### Exclusions
 
 If you have added a network as above but a single device exists within
 it that you can't auto add, then you can exclude this with the following:
@@ -60,9 +60,9 @@ it that you can't auto add, then you can exclude this with the following:
 $config['autodiscovery']['nets-exclude'][] = '192.168.0.1/32';
 ```
 
-# Additional Options
+## Additional Options
 
-## Discovering devices by IP
+### Discovering devices by IP
 
 By default we don't add devices by IP address, we look for a reverse
 dns name to be found and add with that. If this fails
@@ -82,12 +82,12 @@ returned over snmp by your devices). If you would like to allow
 devices to be added with duplicate sysNames then please set
 `$config['allow_duplicate_sysName'] = true;`.
 
-# Discovery Methods
+## Discovery Methods
 
 Below are the methods for auto discovering devices.  Each one can be
 enabled or disabled and may have additional configuration options.
 
-## ARP
+### ARP
 
 Disabled by default.
 
@@ -99,7 +99,7 @@ To enable, switch on globally the
 `$config['discovery_modules']['discovery-arp'] = true;` or per device
 within the Modules section.
 
-## XDP
+### XDP
 
 Enabled by default.
 
@@ -108,7 +108,7 @@ Enabled by default.
 This includes FDP, CDP and LLDP support based on the device type.
 
 The LLDP/xDP links with neighbours will always be discovered as soon as the discovery module is enabled.
-However, LibreNMS will only try to add the new devices discovered with LLDP/xDP if `$config['autodiscovery']['xdp'] = true`; 
+However, LibreNMS will only try to add the new devices discovered with LLDP/xDP if `$config['autodiscovery']['xdp'] = true;`.
 
 Devices may be excluded from xdp discovery by sysName and sysDescr.
 
@@ -136,13 +136,13 @@ $config['autodiscovery']['xdp_exclude']['sysdesc_regexp'][] = '/-K9W8-/'; // Cis
 $config['autodiscovery']['cdp_exclude']['platform_regexp'][] = '/^Cisco IP Phone/'; //Cisco IP Phone
 ```
 
-## OSPF
+### OSPF
 
 Enabled by default.
 
 `$config['autodiscovery']['ospf'] = false;` to disable.
 
-## BGP
+### BGP
 
 Enabled by default.
 
@@ -150,7 +150,7 @@ Enabled by default.
 
 This module is invoked from bgp-peers discovery module.
 
-## SNMP Scan
+### SNMP Scan
 
 Apart from the aforementioned Auto-Discovery options, LibreNMS is also
 able to proactively scan a network for SNMP-enabled devices using the
@@ -184,7 +184,8 @@ optional arguments:
 
 ```
 
-# Discovered devices
+### Discovered devices
 
 Newly discovered devices will be added to the `default_poller_group`, this value defaults to 0 if unset.
-When using distributed polling, this value can be changed locally by setting `$config['default_poller_group`]` in config.php or globally by using `lnms config:set`.
+
+When using distributed polling, this value can be changed locally by setting `$config['default_poller_group']` in config.php or globally by using `lnms config:set`.

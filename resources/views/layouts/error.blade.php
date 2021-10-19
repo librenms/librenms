@@ -46,6 +46,8 @@
         .trace-method { color: #B0413E; font-weight: bold; }
         .trace-arguments { color: #777; font-weight: normal; padding-left: 2px; }
 
+        .message-block { margin: 30px 0; }
+
         hr.separator { border: 0; margin: 1.8em 0; height: 1px; background: #333 linear-gradient(to right, #ccc, #333, #ccc); }
 
         @media (min-width: 575px) {
@@ -65,7 +67,9 @@
 </div>
 
 <div class="container">
-    @yield('content')
+    <div class="message-block">
+        @yield('content')
+    </div>
 
     <hr class="separator"/>
     <p>@lang("Check your log for more details.") ({{ isset($log_file) ? $log_file : 'librenms.log' }})</p>

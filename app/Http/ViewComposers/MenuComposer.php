@@ -18,6 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -36,17 +37,20 @@ use App\Models\User;
 use App\Models\UserPref;
 use App\Models\Vminfo;
 use App\Models\WirelessSensor;
+use App\Plugins\Hooks\MenuEntryHook;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
 use LibreNMS\Config;
+use LibreNMS\Plugins;
 use LibreNMS\Util\ObjectCache;
+use PluginManager;
 
 class MenuComposer
 {
     /**
      * Bind data to the view.
      *
-     * @param  View $view
+     * @param  View  $view
      * @return void
      */
     public function compose(View $view)
@@ -162,6 +166,16 @@ class MenuComposer
                 ];
             }
 
+            if ($routing_count['isis']) {
+                $routing_menu[] = [
+                    [
+                        'url' => 'isis',
+                        'icon' => 'arrows-alt',
+                        'text' => 'ISIS Adjacencies',
+                    ],
+                ];
+            }
+
             if ($routing_count['cisco-otv']) {
                 $routing_menu[] = [
                     [
@@ -238,6 +252,14 @@ class MenuComposer
 
         // Search bar
         $vars['typeahead_limit'] = Config::get('webui.global_search_result_limit');
+
+        // Plugins
+        $vars['has_v1_plugins'] = Plugins::count() != 0;
+        $vars['v1_plugin_menu'] = Plugins::call('menu');
+        $vars['has_v2_plugins'] = PluginManager::hasHooks(MenuEntryHook::class);
+        $vars['menu_hooks'] = PluginManager::call(MenuEntryHook::class);
+
+        $vars['browser_push'] = $user->hasBrowserPushTransport();
 
         $view->with($vars);
     }

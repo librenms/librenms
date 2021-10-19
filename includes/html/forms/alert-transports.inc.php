@@ -18,16 +18,10 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2018 Vivia Nguyen-Tran
  * @author     Vivia Nguyen-Tran <vivia@ualberta.ca>
  */
-
-use Illuminate\Container\Container;
-use Illuminate\Filesystem\Filesystem;
-use Illuminate\Translation\FileLoader;
-use Illuminate\Translation\Translator;
-use Illuminate\Validation\Factory;
-
 header('Content-type: application/json');
 
 if (! Auth::user()->hasGlobalAdmin()) {
@@ -78,10 +72,7 @@ if (empty($name)) {
 
         // Build config values
         $result = call_user_func_array($class . '::configTemplate', []);
-        $loader = new FileLoader(new Filesystem, "$install_dir/resources/lang");
-        $translator = new Translator($loader, 'en');
-        $validation = new Factory($translator, new Container);
-        $validator = $validation->make($vars, $result['validation']);
+        $validator = Validator::make($vars, $result['validation']);
         if ($validator->fails()) {
             $errors = $validator->errors();
             foreach ($errors->all() as $error) {

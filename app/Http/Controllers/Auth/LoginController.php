@@ -6,6 +6,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Device;
 use App\Providers\RouteServiceProvider;
 use Illuminate\Foundation\Auth\AuthenticatesUsers;
+use Illuminate\Http\Request;
 use LibreNMS\Config;
 
 class LoginController extends Controller
@@ -54,5 +55,10 @@ class LoginController extends Controller
         }
 
         return view('auth.login');
+    }
+
+    protected function loggedOut(Request $request)
+    {
+        return redirect(Config::get('auth_logout_handler', $this->redirectTo));
     }
 }

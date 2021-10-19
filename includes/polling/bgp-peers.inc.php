@@ -325,25 +325,23 @@ if (\LibreNMS\Config::get('enable_bgp')) {
                                 'os10bgp4V2PeerLastErrorSubCodeReceived' => 'bgpPeerLastErrorSubCode',
                                 'os10bgp4V2PeerLastErrorReceivedText' => 'bgpPeerLastErrorText',
                             ];
-                        } elseif ($device['os'] === 'aos7') {
+                        } elseif ($device['os'] == 'aos7') {
                             $peer_identifier = $peer['bgpPeerIdentifier'];
-                            $mib = 'BGP4-MIB';
-                            $oid_map = [
-                                'bgpPeerState' => 'bgpPeerState',
-                                'bgpPeerAdminStatus' => 'bgpPeerAdminStatus',
-                                'bgpPeerInUpdates' => 'bgpPeerInUpdates',
-                                'bgpPeerOutUpdates' => 'bgpPeerOutUpdates',
-                                'bgpPeerInTotalMessages' => 'bgpPeerInTotalMessages',
-                                'bgpPeerOutTotalMessages' => 'bgpPeerOutTotalMessages',
-                                'bgpPeerFsmEstablishedTime' => 'bgpPeerFsmEstablishedTime',
-                                'bgpPeerInUpdateElapsedTime' => 'bgpPeerInUpdateElapsedTime',
-                                'bgpPeerLocalAddr' => 'bgpLocalAddr',
-                                'bgpPeerLastError' => 'bgpPeerLastErrorCode',
-                            ];
-
                             $peer_data = [];
                             $al_descr = snmpwalk_cache_multi_oid($device, 'alaBgpPeerName', $al_descr, 'ALCATEL-IND1-BGP-MIB', 'aos7', '-OQUs');
+                            $al_peer = snmpwalk_cache_multi_oid($device, 'BgpPeerEntry', [], 'BGP4-MIB', 'aos7', '-OQUs');
                             $peer_data['bgpPeerDescr'] = $al_descr[$peer_identifier]['alaBgpPeerName'];
+                            $peer_data['bgpPeerState'] = $al_peer[$peer_identifier]['bgpPeerState'];
+                            $peer_data['bgpPeerAdminStatus'] = $al_peer[$peer_identifier]['bgpPeerAdminStatus'];
+                            $peer_data['bgpPeerInUpdates'] = $al_peer[$peer_identifier]['bgpPeerInUpdates'];
+                            $peer_data['bgpPeerOutUpdates'] = $al_peer[$peer_identifier]['bgpPeerOutUpdates'];
+                            $peer_data['bgpPeerInTotalMessages'] = $al_peer[$peer_identifier]['bgpPeerInTotalMessages'];
+                            $peer_data['bgpPeerOutTotalMessages'] = $al_peer[$peer_identifier]['bgpPeerOutTotalMessages'];
+                            $peer_data['bgpPeerFsmEstablishedTime'] = $al_peer[$peer_identifier]['bgpPeerFsmEstablishedTime'];
+                            $peer_data['bgpPeerInUpdateElapsedTime'] = $al_peer[$peer_identifier]['bgpPeerInUpdateElapsedTime'];
+                            $error_data = explode(' ', $al_peer[$peer_identifier]['bgpPeerLastError']);
+                            $peer_data['bgpPeerLastErrorCode'] = intval($error_data[0]);
+                            $peer_data['bgpPeerLastErrorSubCode'] = intval($error_data[1]);
                         } elseif ($device['os_group'] == 'cisco') {
                             $peer_identifier = $ip_type . '.' . $ip_len . '.' . $bgp_peer_ident;
                             $mib = 'CISCO-BGP4-MIB';

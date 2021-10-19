@@ -18,6 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -35,6 +36,7 @@ class SyslogController extends WidgetController
         'device' => null,
         'device_group' => null,
         'hidenavigation' => 0,
+        'level' => null,
     ];
 
     public function getSettingsView(Request $request)
@@ -42,6 +44,8 @@ class SyslogController extends WidgetController
         $data = $this->getSettings(true);
 
         $data['device'] = Device::hasAccess($request->user())->find($data['device']);
+
+        $data['priorities'] = app('translator')->get('syslog.severity');
 
         return view('widgets.settings.syslog', $data);
     }

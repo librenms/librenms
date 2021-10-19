@@ -5,6 +5,7 @@ namespace Database\Factories;
 use App\Models\Port;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
+/** @extends Factory<Port> */
 class PortFactory extends Factory
 {
     /**

@@ -9,6 +9,8 @@ modules:
             data:
                 -
                     oid:
+                        - tunnelPeerIpAddr
+                        - tunnelPeerObjName
                         - tempertureSensorName
                         - fanSpeedSensorName
                         - voltageSensorName
@@ -80,6 +82,21 @@ modules:
                         - { value: 1, descr: Attention, graph: 1, generic: 3 }
                         - { value: 2, descr: Down, graph: 0, generic: 1 }
                 -
+                    oid: tunnelState
+                    num_oid: '.1.3.6.1.4.1.2620.500.9002.1.3.{{ $index }}'
+                    index: 'tunnelStateIndex.{{ $index }}'
+                    descr: "{{ $tunnelPeerObjName }} ({{ $tunnelPeerIpAddr }})"
+                    group: IPSEC VPN
+                    value: tunnelState
+                    states:
+                        - { value: 0, descr: Unknown, graph: 1, generic: 3 }
+                        - { value: 3, descr: Up, graph: 1, generic: 0 }
+                        - { value: 4, descr: Destroyed, graph: 1, generic: 3 }
+                        - { value: 129, descr: Idle, graph: 1, generic: 3 }
+                        - { value: 130, descr: Phase1, graph: 1, generic: 1 }
+                        - { value: 131, descr: Down, graph: 1, generic: 2 }
+                        - { value: 132, descr: Init, graph: 1, generic: 1 }                        
+                -                
                     oid: mglsGWState
                     num_oid: '.1.3.6.1.4.1.2620.1.7.14.4.1.3.{{ $index }}'
                     index: 'mglsGWState.{{ $index }}'

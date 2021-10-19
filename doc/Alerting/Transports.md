@@ -174,6 +174,15 @@ website and setup the transport.
 | ------ | ------- |
 | Access Token | i23f23mr23rwerw |
 
+## Browser Push
+
+Browser push notifications can send a notification to the user's device even when the browser is not open.
+This requires HTTPS, the PHP GMP extension, [Push API](https://developer.mozilla.org/en-US/docs/Web/API/Push_API) support, 
+and permissions on each device to send alerts.
+
+Simply configure an alert transport and allow notification permission on the device(s) you
+wish to receive alerts on.  You may disable alerts on a browser on the user preferences page.
+
 ## Canopsis
 
 Canopsis is a hypervision tool. LibreNMS can send alerts to Canopsis
@@ -261,11 +270,11 @@ The index pattern uses strftime() formatting.
 | Port | 9200 |
 | Index Patter | librenms-%Y.%m.%d |
 
-## Gitlab
+## GitLab
 
 LibreNMS will create issues for warning and critical level alerts
 however only title and description are set. Uses Personal access
-tokens to authenticate with Gitlab and will store the token in cleartext.
+tokens to authenticate with GitLab and will store the token in cleartext.
 
 **Example:**
 
@@ -359,9 +368,9 @@ As a small reminder, here is it's configuration directives including defaults:
 ## Matrix
 
 For using the Matrix transports, you have to create a room on the Matrix-server.
-The provided Auth_token belongs to an user, which is member of this room. 
+The provided Auth_token belongs to an user, which is member of this room.
 The Message, sent to the matrix-room can be built from the variables defined in
-[Template-Syntax](Templates.md#syntax) but without the 'alert->' prefix. 
+[Template-Syntax](Templates.md#syntax) but without the 'alert->' prefix.
 See API-Transport. The variable ``` $msg ``` is contains the result of the Alert template.
 The Matrix-Server URL is cutted before the beginning of the ``_matrix/client/r0/...`` API-part.
 
@@ -376,9 +385,9 @@ The Matrix-Server URL is cutted before the beginning of the ``_matrix/client/r0/
 
 ## Microsoft Teams
 
-LibreNMS can send alerts to Microsoft Teams [Incoming Webhooks](https://docs.microsoft.com/en-us/microsoftteams/platform/webhooks-and-connectors/how-to/add-incoming-webhook) which are 
-then posted to a specific channel. Microsoft recommends using 
-[markdown](https://docs.microsoft.com/en-us/microsoftteams/platform/task-modules-and-cards/cards/cards-format#markdown-formatting-for-connector-cards) formatting for connector cards. 
+LibreNMS can send alerts to Microsoft Teams [Incoming Webhooks](https://docs.microsoft.com/en-us/microsoftteams/platform/webhooks-and-connectors/how-to/add-incoming-webhook) which are
+then posted to a specific channel. Microsoft recommends using
+[markdown](https://docs.microsoft.com/en-us/microsoftteams/platform/task-modules-and-cards/cards/cards-format#markdown-formatting-for-connector-cards) formatting for connector cards.
 Administrators can opt to [compose](https://messagecardplayground.azurewebsites.net/)
 the [MessageCard](https://docs.microsoft.com/en-us/outlook/actionable-messages/message-card-reference)
 themselves using JSON to get the full functionality.
@@ -658,7 +667,10 @@ You need a token you can find on your personnal space.
 LibreNMS can send alerts to a Splunk instance and provide all device
 and alert details.
 
-Example output: `Feb 21 15:21:52 nms  hostname="localhost", sysName="localhost", 
+Example output:
+
+```
+Feb 21 15:21:52 nms  hostname="localhost", sysName="localhost", 
 sysDescr="", sysContact="", os="fortigate", type="firewall", ip="localhost", 
 hardware="FGT_50E", version="v5.6.9", serial="", features="", location="", 
 uptime="387", uptime_short=" 6m 27s", uptime_long=" 6 minutes 27 seconds", 
@@ -838,6 +850,20 @@ connect to servicedesk
 | Kayako API Key | 8cc02f38-7465-4a0c-8730-bb3af122167b |
 | Kayako API Secret | Y2NhZDIxNDMtNjVkMi0wYzE0LWExYTUtZGUwMjJiZDI0ZWEzMmRhOGNiYWMtNTU2YS0yODk0LTA1MTEtN2VhN2YzYzgzZjk5 |
 | Kayako Department | 1 |
+
+## Signal CLI
+
+Use the Signal Mesenger for Alerts. Run the Signal CLI with the D-Bus option.
+
+[GitHub Project](https://github.com/AsamK/signal-cli)
+
+**Example:**
+
+| Config | Example |
+| ------ | ------- |
+| Path | /opt/signal-cli/bin/signal-cli |
+| Recipient type | Group |
+| Recipient | dfgjsdkgljior4345== |
 
 ## SMSFeedback
 

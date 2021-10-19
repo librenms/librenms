@@ -69,9 +69,10 @@ if (isset($_REQUEST['search'])) {
                               OR `L`.`location` LIKE ?
                               OR `D`.`sysName` LIKE ?
                               OR `D`.`purpose` LIKE ?
+                              OR `D`.`serial` LIKE ?
                               OR `D`.`notes` LIKE ?';
             $query_args_list = array_merge($query_args_list, ["%$search%", "%$search%", "%$search%",
-                "%$search%", "%$search%", ]);
+                "%$search%", "%$search%", "%$search%", ]);
 
             if (\LibreNMS\Util\IPv4::isValid($search, false)) {
                 $query .= ' LEFT JOIN `ports` AS `P` ON `P`.`device_id` = `D`.`device_id`

@@ -278,7 +278,7 @@ main () {
     if [[ -z "$arg" ]]; then
         up=$(php daily.php -f update >&2; echo $?)
         if [[ "$up" == "0" ]]; then
-            ${DAILY_SCRIPT} no-code-update
+            "${DAILY_SCRIPT}" no-code-update
             set_notifiable_result update 1  # make sure there are no update notifications if update is disabled
             exit
         fi
@@ -333,14 +333,14 @@ main () {
         fi
 
         # Call ourself again in case above pull changed or added something to daily.sh
-        ${DAILY_SCRIPT} post-pull "${old_ver}" "${new_ver}"
+        "${DAILY_SCRIPT}" post-pull "${old_ver}" "${new_ver}"
     else
         case $arg in
             no-code-update)
                 # Updates of the code are disabled, just check for schema updates
                 # and clean up the db.
                 status_run 'Updating SQL-Schema' 'php includes/sql-schema/update.php'
-                status_run 'Cleaning up DB' "$DAILY_SCRIPT cleanup"
+                status_run 'Cleaning up DB' "'$DAILY_SCRIPT' cleanup"
             ;;
             post-pull)
                 # re-check dependencies after pull with the new code

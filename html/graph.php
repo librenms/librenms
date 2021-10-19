@@ -34,5 +34,5 @@ if (Debug::isEnabled()) {
     echo '<br />';
     printf('Runtime %.3fs', microtime(true) - $start);
     echo '<br />';
-    printStats();
+    app(\App\Polling\Measure\MeasurementManager::class)->printStats();
 }

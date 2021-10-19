@@ -1,4 +1,4 @@
---- ArubaOS 8.5.0.0_70258
+--- ArubaOS 8.8.0.1_80393
 ARUBA-MIB DEFINITIONS ::= BEGIN
 
    IMPORTS
@@ -134,6 +134,8 @@ mm-hw-1K   OBJECT IDENTIFIER ::= { switchProducts 53 }
 mm-hw-5K   OBJECT IDENTIFIER ::= { switchProducts 54 }
 mm-hw-10K   OBJECT IDENTIFIER ::= { switchProducts 55 }
 a9004   OBJECT IDENTIFIER ::= { switchProducts 56 }
+a9012   OBJECT IDENTIFIER ::= { switchProducts 57 }
+a9004-lte   OBJECT IDENTIFIER ::= { switchProducts 58 }
 
 
 --Undefined switch.
@@ -499,6 +501,12 @@ ap534 OBJECT IDENTIFIER ::= {apProducts 101}
 --ap535, this object is the SYSOID
 ap535 OBJECT IDENTIFIER ::= {apProducts 102}
 
+--ap387, this object is the SYSOID
+ap387 OBJECT IDENTIFIER ::= {apProducts 104}
+
+--ap303P, this object is the SYSOID
+ap303P OBJECT IDENTIFIER ::= {apProducts 105}
+
 --ap514, this object is the SYSOID
 ap514 OBJECT IDENTIFIER ::= {apProducts 106}
 
@@ -510,6 +518,51 @@ ap544 OBJECT IDENTIFIER ::= {apProducts 108}
 
 --ap545, this object is the SYSOID
 ap545 OBJECT IDENTIFIER ::= {apProducts 109}
+
+--ap504, this object is the SYSOID
+ap504 OBJECT IDENTIFIER ::= {apProducts 110}
+
+--ap505, this object is the SYSOID
+ap505 OBJECT IDENTIFIER ::= {apProducts 111}
+
+--ap505H, this object is the SYSOID
+ap505H OBJECT IDENTIFIER ::= {apProducts 112}
+
+--ap574, this object is the SYSOID
+ap574 OBJECT IDENTIFIER ::= {apProducts 113}
+
+--ap575, this object is the SYSOID
+ap575 OBJECT IDENTIFIER ::= {apProducts 114}
+
+--ap577, this object is the SYSOID
+ap577 OBJECT IDENTIFIER ::= {apProducts 115}
+
+--ap518, this object is the SYSOID
+ap518 OBJECT IDENTIFIER ::= {apProducts 116}
+
+--ap503H, this object is the SYSOID
+ap503H OBJECT IDENTIFIER ::= {apProducts 117}
+
+--ap565, this object is the SYSOID
+ap565 OBJECT IDENTIFIER ::= {apProducts 118}
+
+--ap567, this object is the SYSOID
+ap567 OBJECT IDENTIFIER ::= {apProducts 119}
+
+--ap575EX, this object is the SYSOID
+ap575EX OBJECT IDENTIFIER ::= {apProducts 120}
+
+--ap577EX, this object is the SYSOID
+ap577EX OBJECT IDENTIFIER ::= {apProducts 121}
+
+--ap565EX, this object is the SYSOID
+ap565EX OBJECT IDENTIFIER ::= {apProducts 122}
+
+--ap567EX, this object is the SYSOID
+ap567EX OBJECT IDENTIFIER ::= {apProducts 123}
+
+--ap375ATEX, this object is the SYSOID
+ap375ATEX OBJECT IDENTIFIER ::= {apProducts 124}
 
 --Undefined ap.
 apUndefined OBJECT IDENTIFIER ::= { apProducts 9999}
@@ -528,6 +581,12 @@ ecsENSM   OBJECT IDENTIFIER ::= {partnerProducts 4}
 
 --Amigopod
 amigopodProducts OBJECT IDENTIFIER ::= { products 5 }
+
+-- ClearPass
+clearpassProducts OBJECT IDENTIFIER ::= { products 6 }
+
+-- ClearPass Policy Manager
+clearpass OBJECT IDENTIFIER ::= { clearpassProducts 1 }
 
 -- List of all the Enterprise MIB Modules.
 

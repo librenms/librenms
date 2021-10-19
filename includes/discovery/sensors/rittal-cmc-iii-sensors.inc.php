@@ -18,6 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link      https://www.librenms.org
+ *
  * @copyright 2020 Denny Friebe
  * @author    Denny Friebe <denny.friebe@icera-network.de>
  */
@@ -31,18 +32,18 @@ foreach ($cmc_iii_var_table as $index => $entry) {
     $var_type = $entry['cmcIIIVarType'];
     $sensor_id = count($cmc_iii_sensors);
 
-    switch ($var_type) {
-        case 'description':
-            // Every new sensor starts with their description.
-            if ($sensor_id == 0) {
-                $sensor_id = 1;
-            } else {
-                $sensor_id++;
-            }
+    if ($cmc_iii_sensors[$sensor_id]['name'] != $sensor_name) {
+        if ($sensor_id == 0) {
+            $sensor_id = 1;
+        } else {
+            $sensor_id++;
+        }
 
-            $cmc_iii_sensors[$sensor_id]['name'] = $sensor_name;
-            $cmc_iii_sensors[$sensor_id]['desc'] = $entry['cmcIIIVarValueStr'];
-            break;
+        $cmc_iii_sensors[$sensor_id]['name'] = $sensor_name;
+        $cmc_iii_sensors[$sensor_id]['desc'] = $entry['cmcIIIVarValueStr'] ?: $sensor_name;
+    }
+
+    switch ($var_type) {
         case 'setHigh':
             $cmc_iii_sensors[$sensor_id]['high_limit'] = $entry['cmcIIIVarValueInt'];
             break;
@@ -84,18 +85,26 @@ foreach ($cmc_iii_var_table as $index => $entry) {
                 $cmc_iii_sensors[$sensor_id]['divisor'] = 1000;
             } elseif ($unit == 'A') {
                 $type = 'current';
-            } elseif ($unit == 'degree C' or $unit == 'degree F') {
+            } elseif ($unit == 'Wh' || $unit == 'VAh') {
+                $cmc_iii_sensors[$sensor_id]['divisor'] = 1000;
+                $type = 'power_consumed';
+            } elseif ($unit == 'kWh' || $unit == 'kVAh') {
+                $type = 'power_consumed';
+            } elseif ($unit == 'Hz') {
+                $type = 'frequency';
+            } elseif ($unit == 'degree C' || $unit == 'degree F') {
                 $type = 'temperature';
             } elseif ($unit == 'l/min') {
                 $type = 'waterflow';
             } elseif ($unit == 'V') {
                 $type = 'voltage';
-            } elseif ($unit == 'W') {
+            } elseif ($unit == 'W' || $unit == 'VA' || $unit == 'var') {
                 $type = 'power';
+            } elseif ($unit == '%') {
+                $type = 'percent';
             }
-
-            $cmc_iii_sensors[$sensor_id]['type'] = $type;
-            break;
+        $cmc_iii_sensors[$sensor_id]['type'] = $type;
+        break;
     }
 }
 
@@ -108,7 +117,12 @@ if (! $device['serial']) {
 
 foreach ($cmc_iii_sensors as $sensor_id => $sensor_data) {
     // Some sensors provide either no useful data at all or only partially useful data.
-    if (! isset($sensor_data['oid']) || $sensor_data['name'] == 'System V24 Port' || $sensor_data['name'] == 'Memory USB-Stick' || $sensor_data['name'] == 'Memory SD-Card' || $sensor_data['name'] == 'Login') {
+    if (! isset($sensor_data['oid'])
+    || $sensor_data['name'] == 'System V24 Port'
+    || $sensor_data['name'] == 'Memory USB-Stick'
+    || $sensor_data['name'] == 'Memory SD-Card'
+    || $sensor_data['name'] == 'Login'
+    || preg_match('/(Power Factor)|(Runtime)/', $sensor_data['name'])) {
         echo "\n" . $sensor_data['name'] . " skipped!\n";
         continue;
     }
@@ -174,8 +188,7 @@ foreach ($cmc_iii_sensors as $sensor_id => $sensor_data) {
 
         $sensor_data['value'] = ($sensor_data['value'] * $sensor_data['multiplier']);
     }
-
-    discover_sensor($valid['sensor'], $sensor_data['type'], $device, $sensor_data['oid'], $sensor_id, $sensor_data['name'], $sensor_data['desc'], $sensor_data['divisor'], $sensor_data['multiplier'], $sensor_data['low_limit'], $sensor_data['low_warn_limit'], $sensor_data['warn_limit'], $sensor_data['high_limit'], $sensor_data['value']);
+    discover_sensor($valid['sensor'], $sensor_data['type'], $device, $sensor_data['oid'], $sensor_id, $sensor_data['name'], $sensor_data['desc'], $sensor_data['divisor'] ?? null, $sensor_data['multiplier'] ?? null, $sensor_data['low_limit'] ?? null, $sensor_data['low_warn_limit'] ?? null, $sensor_data['warn_limit'] ?? null, $sensor_data['high_limit'] ?? null, $sensor_data['value']);
 
     if (isset($sensor_data['logic'])) {
         create_sensor_to_state_index($device, $sensor_data['name'], $sensor_id);

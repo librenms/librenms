@@ -81,17 +81,21 @@
                                     </a></li>
                             </ul>
                         </li>
-                        @if(auth()->user()->isAdmin() || \LibreNMS\Plugins::count())
+                        @if(auth()->user()->isAdmin() || $has_v1_plugins || $has_v2_plugins)
                         <li class="dropdown-submenu">
                             <a><i class="fa fa-plug fa-fw fa-lg" aria-hidden="true"></i> @lang('Plugins')</a>
                             <ul class="dropdown-menu">
-                                {!! \LibreNMS\Plugins::call('menu') !!}
+                                {!! $v1_plugin_menu !!}
+                                @foreach($menu_hooks as [$view, $data])
+                                    <li>@include($view, $data)</li>
+                                @endforeach
                                 @admin
-                                    @if(\LibreNMS\Plugins::count())
-                                        <li role="presentation" class="divider"></li>
-                                    @endif
-                                <li><a href="{{ url('plugin/view=admin') }}"> <i class="fa fa-lock fa-fw fa-lg"
-                                                                                 aria-hidden="true"></i>@lang('Plugin Admin')
+                                @if($has_v1_plugins || $has_v2_plugins)
+                                    <li role="presentation" class="divider"></li>
+                                @endif
+                                <li>
+                                    <a href="{{ route('plugin.admin') }}">
+                                        <i class="fa fa-lock fa-fw fa-lg" aria-hidden="true"></i>@lang('Plugin Admin')
                                     </a>
                                 </li>
                                 @endadmin
@@ -274,13 +278,13 @@
                                                             aria-hidden="true"></i> @lang('All Ports')</a></li>
 
                         @if($port_counts['errored'] > 0)
-                            <li><a href="{{ url('ports/errors=yes') }}"><i class="fa fa-exclamation-circle fa-fw fa-lg"
+                            <li><a href="{{ url('ports/errors=1') }}"><i class="fa fa-exclamation-circle fa-fw fa-lg"
                                                                            aria-hidden="true"></i> @lang('Errored :port_count', ['port_count' => $port_counts['errored']])
                                 </a></li>
                         @endif
 
                         @if($port_counts['ignored'] > 0)
-                            <li><a href="{{ url('ports/ignore=yes') }}"><i class="fa fa-question-circle fa-fw fa-lg"
+                            <li><a href="{{ url('ports/ignore=1') }}"><i class="fa fa-question-circle fa-fw fa-lg"
                                                                            aria-hidden="true"></i> @lang('Ignored :port_count', ['port_count' => $port_counts['ignored']])
                                 </a></li>
                         @endif
@@ -341,7 +345,7 @@
 
                             <li role="presentation" class="divider"></li>
                             @if($port_counts['alerted'])
-                                <li><a href="{{ url('ports/alerted=yes') }}"><i
+                                <li><a href="{{ url('ports/alerted=1') }}"><i
                                             class="fa fa-exclamation-circle fa-fw fa-lg"
                                             aria-hidden="true"></i> @lang('Alerts :port_count', ['port_count' => $port_counts['alerted']])
                                     </a></li>
@@ -356,7 +360,7 @@
                                 </a></li>
 
                             @if($port_counts['deleted'])
-                                <li><a href="{{ url('ports/deleted=yes') }}"><i class="fa fa-minus-circle fa-fw fa-lg"
+                                <li><a href="{{ url('ports/deleted=1') }}"><i class="fa fa-minus-circle fa-fw fa-lg"
                                                                                 aria-hidden="true"></i> @lang('Deleted :port_count', ['port_count' => $port_counts['deleted']])
                                     </a></li>
                             @endif
@@ -420,7 +424,7 @@
                                         <a href="{{ url('apps/app=' . $app_type) }}"><i class="fa fa-server fa-fw fa-lg" aria-hidden="true"></i> {{ $app_instances->first()->displayName() }}</a>
                                         <ul class="dropdown-menu scrollable-menu">
                                             @foreach($app_instances as $app_instance)
-                                            <li><a href="{{ url("apps/app=$app_type/instance=$app_instance") }}"><i class="fa fa-angle-double-right fa-fw fa-lg" aria-hidden="true"></i> {{ ucfirst($app_instance->app_instance) }}</a></li>
+                                            <li><a href="{{ url("apps/app=$app_type/instance=$app_instance->app_instance") }}"><i class="fa fa-angle-double-right fa-fw fa-lg" aria-hidden="true"></i> {{ ucfirst($app_instance->app_instance) }}</a></li>
                                             @endforeach
                                         </ul>
                                     </li>
@@ -748,4 +752,14 @@
             }
         });
     }
+
+    @if($browser_push)
+        if (localStorage.getItem('notifications') !== 'disabled') {
+            Notification.requestPermission().then(function (permission) {
+                if (permission === "denied") {
+                    localStorage.setItem('notifications', 'disabled');
+                }
+            });
+        }
+    @endif
 </script>

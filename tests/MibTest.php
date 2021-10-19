@@ -18,6 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2017 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -41,7 +42,8 @@ class MibTest extends TestCase
      *
      * @group mibs
      * @dataProvider mibDirs
-     * @param string $dir
+     *
+     * @param  string  $dir
      */
     public function testMibDirectory($dir)
     {
@@ -56,9 +58,10 @@ class MibTest extends TestCase
      *
      * @group mibs
      * @dataProvider mibFiles
-     * @param string $path
-     * @param string $file
-     * @param string $mib_name
+     *
+     * @param  string  $path
+     * @param  string  $file
+     * @param  string  $mib_name
      */
     public function testDuplicateMibs($path, $file, $mib_name)
     {
@@ -86,9 +89,10 @@ class MibTest extends TestCase
      *
      * @group mibs
      * @dataProvider mibFiles
-     * @param string $path
-     * @param string $file
-     * @param string $mib_name
+     *
+     * @param  string  $path
+     * @param  string  $file
+     * @param  string  $mib_name
      */
     public function testMibNameMatches($path, $file, $mib_name)
     {
@@ -104,9 +108,10 @@ class MibTest extends TestCase
      *
      * @group mibs
      * @dataProvider mibFiles
-     * @param string $path
-     * @param string $file
-     * @param string $mib_name
+     *
+     * @param  string  $path
+     * @param  string  $file
+     * @param  string  $mib_name
      */
     public function testMibContents($path, $file, $mib_name)
     {
@@ -123,6 +128,7 @@ class MibTest extends TestCase
     /**
      * Get a list of all mib files with the name of the mib.
      * Called for each test that uses it before class setup.
+     *
      * @return array path, filename, mib_name
      */
     public function mibFiles()
@@ -146,6 +152,7 @@ class MibTest extends TestCase
 
     /**
      * List all directories inside the mib directory
+     *
      * @return array
      */
     public function mibDirs()
@@ -165,8 +172,9 @@ class MibTest extends TestCase
     /**
      * Extract the mib name from a file
      *
-     * @param string $file
+     * @param  string  $file
      * @return mixed
+     *
      * @throws Exception
      */
     private function extractMibName($file)

@@ -18,6 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @link       http://librenms.org
+ *
  * @copyright  2021 Thomas Berberich
  * @author     Thomas Berberch <sourcehhdoctor@gmail.com>
  */
@@ -36,9 +37,9 @@ class Dns implements Geocoder
     }
 
     /**
-     * @param string $domain  Domain which has to be parsed
-     * @param string $record  DNS Record which should be searched
-     * @return array   List of matching records
+     * @param  string  $domain  Domain which has to be parsed
+     * @param  string  $record  DNS Record which should be searched
+     * @return array List of matching records
      */
     public function getRecord($domain, $record = 'A')
     {

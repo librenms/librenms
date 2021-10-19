@@ -2,7 +2,7 @@
 
 if ($vars['id']) {
     $sla = dbFetchRow('SELECT `tag`, `sla_nr`,`rtt_type` FROM `slas` WHERE `sla_id` = ?', [$vars['id']]);
-    $name = 'SLA #' . $sla['sla_nr'] . ' - ' . \LibreNMS\Config::get("sla_type_labels.{$sla['rtt_type']}", ucfirst($sla['rtt_type']));
+    $name = 'SLA #' . $sla['sla_nr'] . ' - ' . trans_fb("modules.slas.{$sla['rtt_type']}", ucfirst($sla['rtt_type']));
     if ($sla['tag']) {
         $name .= ': ' . $sla['tag'];
     }
@@ -40,8 +40,7 @@ if ($vars['id']) {
     $sla_types = ['all' => 'All'];
     foreach ($slas as $sla) {
         $sla_type = $sla['rtt_type'];
-
-        $sla_types[$sla_type] = ! in_array($sla_type, $sla_types) ? \LibreNMS\Config::get("sla_type_labels.$sla_type", 'Unknown') : ucfirst($sla_type);
+        $sla_types[$sla_type] = trans_fb("modules.slas.{$sla_type}", ucfirst($sla_type));
     }
     asort($sla_types);
 
@@ -118,7 +117,7 @@ if ($vars['id']) {
         }
 
         // These Types have more graphs. Display a sub-page
-        if (($sla['rtt_type'] == 'jitter') || ($sla['rtt_type'] == 'icmpjitter')) {
+        if (($sla['rtt_type'] == 'jitter') || ($sla['rtt_type'] == 'icmpjitter') || ($sla['rtt_type'] == 'IcmpEcho') || ($sla['rtt_type'] == 'IcmpTimeStamp') || ($sla['rtt_type'] == 'icmpAppl')) {
             $name = '<a href="' . \LibreNMS\Util\Url::generate($vars, ['tab' => 'slas', 'id' => $sla['sla_id']]) . '">' . $name . '</a>';
         } else {
             $name = htmlentities($name);

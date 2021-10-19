@@ -25,6 +25,10 @@
     "extra": "{\"count\": 1}"
   },
   {
+    "builder": {"condition":"AND","rules":[{"id":"isis_adjacencies.isisISAdjState","field":"isis_adjacencies.isisISAdjState","type":"string","input":"text","operator":"equal","value":"down"},{"condition":"AND","rules":[{"id":"component.type","field":"component.type","type":"string","input":"text","operator":"equal","value":"ISIS"},{"condition":"AND","rules":[{"id":"component.ignore","field":"component.ignore","type":"string","input":"text","operator":"equal","value":"0"},{"id":"component.disabled","field":"component.disabled","type":"string","input":"text","operator":"equal","value":"0"}]}]},{"id":"macros.device_up","field":"macros.device_up","type":"integer","input":"radio","operator":"equal","value":"1"}],"valid":true},
+    "name": "ISIS Adjacency down"
+  },
+  {
     "rule": "bgpPeers.bgpPeerFsmEstablishedTime < \"300\" && bgpPeers.bgpPeerState = \"established\" && macros.device_up = \"1\"",
     "name": "BGP Session established",
     "extra": "{\"count\": 1}"
@@ -522,5 +526,9 @@
   {
     "name": "Unpolled Devices",
     "builder": "{\"condition\":\"AND\",\"rules\":[{\"id\":\"macros.device\",\"field\":\"macros.device\",\"type\":\"integer\",\"input\":\"radio\",\"operator\":\"equal\",\"value\":\"1\"},{\"id\":\"devices.last_polled\",\"field\":\"devices.last_polled\",\"type\":\"datetime\",\"input\":\"text\",\"operator\":\"less\",\"value\":\"`DATE_SUB(NOW(), INTERVAL 6 MINUTE)`\"}],\"valid\":true}"
-   }
+  },
+  {
+    "builder": {"condition":"AND","rules":[{"id":"ports.ifSpeed","field":"ports.ifSpeed","type":"string","input":"text","operator":"greater","value":"0"},{"id":"ports.ifSpeed","field":"ports.ifSpeed","type":"string","input":"text","operator":"less","value":"`ports.ifSpeed_prev`"},{"id":"eventlog.message","field":"eventlog.message","type":"string","input":"text","operator":"begins_with","value":"ifSpeed:"},{"id":"eventlog.datetime","field":"eventlog.datetime","type":"datetime","input":"text","operator":"greater_or_equal","value":"`macros.past_10m`"},{"id":"ports.port_id","field":"ports.port_id","type":"string","input":"text","operator":"equal","value":"`eventlog.reference`"},{"id":"ports.ifOperStatus","field":"ports.ifOperStatus","type":"string","input":"text","operator":"equal","value":"up"},{"id":"ports.disabled","field":"ports.disabled","type":"string","input":"text","operator":"equal","value":"0"}],"valid":true},
+    "name": "Port Speed Degraded"
+  }
 ]

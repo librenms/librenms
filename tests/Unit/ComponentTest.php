@@ -18,6 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2020 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -37,8 +38,7 @@ class ComponentTest extends DBTestCase
 
     public function testDeleteComponent()
     {
-        $target = \App\Models\Component::factory()->create();
-
+        $target = \App\Models\Component::factory()->create(); /** @var \App\Models\Component $target */
         $this->assertTrue(\App\Models\Component::where('id', $target->id)->exists(), 'Failed to create component, this shouldn\'t happen');
 
         $component = new Component();
@@ -54,7 +54,7 @@ class ComponentTest extends DBTestCase
 
     public function testGetComponentsOptionsType()
     {
-        $target = \App\Models\Component::factory()->create();
+        $target = \App\Models\Component::factory()->create(); /** @var \App\Models\Component $target */
         $component = new Component();
 
         $actual = $component->getComponents($target->device_id, ['type' => $target->type]);
@@ -67,7 +67,7 @@ class ComponentTest extends DBTestCase
     public function testGetComponentsOptionsFilterNotIgnore()
     {
         \App\Models\Component::factory()->create(['device_id' => 1, 'ignore' => 1]);
-        $target = \App\Models\Component::factory()->times(2)->create(['device_id' => 1, 'ignore' => 0]);
+        $target = \App\Models\Component::factory()->times(2)->create(['device_id' => 1, 'ignore' => 0]); /** @var \Illuminate\Support\Collection $target */
         $component = new Component();
 
         $actual = $component->getComponents(1, ['filter' => ['ignore' => ['=', 0]]]);
@@ -79,7 +79,7 @@ class ComponentTest extends DBTestCase
     {
         \App\Models\Component::factory()->create(['label' => 'Search Phrase']);
         \App\Models\Component::factory()->times(2)->create(['label' => 'Something Else']);
-        $target = \App\Models\Component::factory()->times(2)->create(['label' => 'Search Phrase']);
+        $target = \App\Models\Component::factory()->times(2)->create(['label' => 'Search Phrase']); /** @var \Illuminate\Support\Collection $target */
         \App\Models\Component::factory()->create(['label' => 'Search Phrase']);
         $component = new Component();
 
@@ -119,7 +119,7 @@ class ComponentTest extends DBTestCase
     public function testSetComponentPrefs()
     {
         // Nightmare function, no where near exhaustive
-        $base = \App\Models\Component::factory()->create();
+        $base = \App\Models\Component::factory()->create(); /** @var \App\Models\Component $base */
         $component = new Component();
 
         \Log::shouldReceive('event')->withArgs(["Component: $base->type($base->id). Attribute: null_val, was added with value: ", $base->device_id, 'component', 3, $base->id]);
@@ -182,7 +182,7 @@ class ComponentTest extends DBTestCase
         $this->assertEquals(0, $component->createStatusLogEntry(434242, 0, 'failed'), 'incorrectly added log');
 
         $message = Str::random(8);
-        $model = \App\Models\Component::factory()->create();
+        $model = \App\Models\Component::factory()->create(); /** @var \App\Models\Component $model */
         $log_id = $component->createStatusLogEntry($model->id, 1, $message);
         $this->assertNotEquals(0, $log_id, ' failed to create log');
 

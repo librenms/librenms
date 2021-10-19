@@ -1,8 +1,7 @@
 source: Extensions/IRC-Bot.md
 path: blob/master/doc/
-[TOC]
 
-# About
+# IRC Bot
 
 LibreNMS has an easy to use IRC-Interface for basic tasks like viewing
 last log-entry, current device/port status and such.
@@ -37,10 +36,10 @@ Option | Default-Value | Notes
 `$config['irc_pass']` |  | Optional; This sends the IRC-PASS Sequence to IRC-Servers that require Password on Connect
 `$config['irc_port']` | `6667` | Required; To enable SSL append a `+` before the Port. (Example: `+6697`)
 `$config['irc_ctcp']` | `false` | Optional; Enable/disable ctcp-replies from the bot (currently VERSION, PING and TIME).
-`$config['irc_ctcp_version']` | `LibreNMS IRCbot. https://www.librenms.org/` | Optional: Reply-string to CTCP VERSION requests
-`$config['irc_auth']` |  | Optional: Array of hostmasks that are automatically authenticated.
+`$config['irc_ctcp_version']` | `LibreNMS IRCbot. https://www.librenms.org/` | Optional; Reply-string to CTCP VERSION requests
+`$config['irc_auth']` |  | Optional; Array of hostmasks that are automatically authenticated.
 
-### IRC-Commands
+## IRC-Commands
 
 Command | Description
 --- | ---
@@ -57,26 +56,26 @@ Command | Description
 `.status <type>` | Prints status information for given `type`. Type can be `devices`, `services`, `ports`. Shorthands are: `dev`,`srv`,`prt`
 `.version` | Prints `$this->config['project_name_version']`.
 
-( __/!\__ All commands are case-_insensitive_ but their arguments are case-_sensitive_)
+( __/!\\__ All commands are case-_insensitive_ but their arguments are case-_sensitive_)
 
-# Examples
+## Examples
 
-## Server examples
+### Server examples
 
-Unencrypted Connection to `irc.freenode.org`:
+Unencrypted Connection to `irc.libera.chat`:
 
 ```php
    ...
-   $config['irc_host'] = "irc.freenode.org";
+   $config['irc_host'] = "irc.libera.chat";
    $config['irc_port'] = 6667;
    ...
 ```
 
-SSL-Encrypted Connection to `irc.freenode.org`:
+SSL-Encrypted Connection to `irc.libera.chat`:
 
 ```php
    ...
-   $config['irc_host'] = "irc.freenode.org";
+   $config['irc_host'] = "irc.libera.chat";
    $config['irc_port'] = "+6697";
    ...
 ```
@@ -91,7 +90,7 @@ SSL-Encrypted Connection to `irc.localdomain` with Server-Password and odd port:
    ...
 ```
 
-## Channel notations
+### Channel notations
 
 Channels can be defined using Array-Notation like:
 
@@ -111,7 +110,7 @@ Or using a single string using `,` as delimiter between various channels:
    ...
 ```
 
-## Hostmask authentication
+### Hostmask authentication
 
 ```php
    ...
@@ -126,7 +125,7 @@ be authenticated as the "admin" user in LibreNMS, and clients matching
 the last line will be authenticated as the user "john" in LibreNMS,
 without using .auth and a waiting for a valid token.
 
-# Extensions?!
+## Extensions?!
 
 The bot is coded in a unified way.
 This makes writing extensions by far less painful.
@@ -161,7 +160,7 @@ File: includes/ircbot/echo.inc.php
    }
 ```
 
-# Systemd start up script
+## Systemd start up script
 
 Basic systemd start up script to be placed in /etc/systemd/system/ to
 start irc service at boot.

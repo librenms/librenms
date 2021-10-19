@@ -2,10 +2,10 @@ os: hwg-ste
 text: 'HWg STE'
 type: environment
 icon: hwg
+mib_dir: hwg
 over:
     - { graph: device_temperature, text: Temperature }
-mib_dir: hwg
-nobulk: true
+snmp_bulk: false
 poller_modules:
     applications: false
     bgp-peers: false
@@ -38,3 +38,5 @@ discovery:
     -
         sysObjectID:
             - .1.3.6.1.4.1.21796.4.1
+        sysDescr_except:
+            - 'HWg-WLD'

@@ -19,7 +19,7 @@ $rrd_list[4]['colour_area_in'] = 'FACF5A';
 $rrd_list[4]['colour_area_out'] = 'FF5959';
 
 $units = '';
-$units_descr = 'Packets';
+$units_descr = 'Packets/sec';
 $total_units = 'pps';
 $colours_in = 'purples';
 $multiplier = '1';

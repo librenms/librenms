@@ -4,6 +4,10 @@ return [
     'database_connect' => [
         'title' => 'Error connecting to database',
     ],
+    'database_inconsistent' => [
+        'title' => 'Database inconsistent',
+        'header' => 'Database inconsistencies found during a database error, please fix to continue.',
+    ],
     'dusk_unsafe' => [
         'title' => 'It is unsafe to run Dusk in production',
         'message' => 'Run ":command" to remove Dusk or if you are a developer set the appropriate APP_ENV',

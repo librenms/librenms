@@ -18,6 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2019 Heath Barnhart
  * @author     Heath Barnhart <hbarnhart@kanren.net>
  */
@@ -32,8 +33,7 @@ class AdvaAttributeChangeTest extends SnmpTrapTestCase
 {
     public function testSyslogIPVersionModified()
     {
-        $device = Device::factory()->create();
-
+        $device = Device::factory()->create(); /** @var Device $device */
         $trapText = "$device->hostname
 UDP: [$device->ip]:57602->[192.168.5.5]:162
 DISMAN-EVENT-MIB::sysUpTimeInstance 26:19:43:37.24
@@ -53,8 +53,7 @@ ADVA-MIB::neEventLogTimeStamp.150 2018-12-10,9:11:40.5,-6:0";
 
     public function testSyslogIP6AddrModified()
     {
-        $device = Device::factory()->create();
-
+        $device = Device::factory()->create(); /** @var Device $device */
         $trapText = "$device->hostname
 UDP: [$device->ip]:57602->[192.168.5.5]:162
 DISMAN-EVENT-MIB::sysUpTimeInstance 26:19:43:37.24
@@ -74,8 +73,7 @@ ADVA-MIB::neEventLogTimeStamp.150 2018-12-10,9:11:40.5,-6:0";
 
     public function testSyslogIPAddrModified()
     {
-        $device = Device::factory()->create();
-
+        $device = Device::factory()->create(); /** @var Device $device */
         $trapText = "$device->hostname
 UDP: [$device->ip]:57602->[192.168.5.5]:162
 DISMAN-EVENT-MIB::sysUpTimeInstance 26:19:43:37.24
@@ -95,8 +93,7 @@ ADVA-MIB::neEventLogTimeStamp.150 2018-12-10,9:11:40.5,-6:0";
 
     public function testSyslogPortModified()
     {
-        $device = Device::factory()->create();
-
+        $device = Device::factory()->create(); /** @var Device $device */
         $trapText = "$device->hostname
 UDP: [$device->ip]:57602->[192.168.5.5]:162
 DISMAN-EVENT-MIB::sysUpTimeInstance 26:19:43:37.24
@@ -116,8 +113,7 @@ ADVA-MIB::neEventLogTimeStamp.150 2018-12-10,9:11:40.5,-6:0";
 
     public function testAclModified()
     {
-        $device = Device::factory()->create();
-
+        $device = Device::factory()->create(); /** @var Device $device */
         $trapText = "$device->hostname
 UDP: [$device->ip]:57602->[192.168.5.5]:162
 DISMAN-EVENT-MIB::sysUpTimeInstance 26:19:43:37.24
@@ -137,8 +133,7 @@ ADVA-MIB::neEventLogTimeStamp.155 2018-12-10,9:17:22.5,-6:0";
 
     public function testBannerModified()
     {
-        $device = Device::factory()->create();
-
+        $device = Device::factory()->create(); /** @var Device $device */
         $trapText = "$device->hostname
 UDP: [$device->ip]:57602->[192.168.5.5]:162
 DISMAN-EVENT-MIB::sysUpTimeInstance 26:19:43:37.24
@@ -158,8 +153,7 @@ ADVA-MIB::neEventLogTimeStamp.157 2018-12-10,9:18:43.6,-6:0";
 
     public function testTimeSourceModified()
     {
-        $device = Device::factory()->create();
-
+        $device = Device::factory()->create(); /** @var Device $device */
         $trapText = "$device->hostname
 UDP: [$device->ip]:57602->[192.168.5.5]:162
 DISMAN-EVENT-MIB::sysUpTimeInstance 26:19:43:37.24
@@ -197,8 +191,7 @@ ADVA-MIB::neEventLogTimeStamp.169 2018-12-10,9:28:57.1,-6:0";
 
     public function testTimeZoneModified()
     {
-        $device = Device::factory()->create();
-
+        $device = Device::factory()->create(); /** @var Device $device */
         $trapText = "$device->hostname
 UDP: [$device->ip]:57602->[192.168.5.5]:162
 DISMAN-EVENT-MIB::sysUpTimeInstance 26:19:43:37.24
@@ -250,8 +243,7 @@ ADVA-MIB::neEventLogTimeStamp.160 2018-12-10,10:21:30.3,-5:0";
 
     public function testNtpModified()
     {
-        $device = Device::factory()->create();
-
+        $device = Device::factory()->create(); /** @var Device $device */
         $trapText = "$device->hostname
 UDP: [$device->ip]:57602->[192.168.5.5]:162
 DISMAN-EVENT-MIB::sysUpTimeInstance 26:19:43:37.24
@@ -289,8 +281,7 @@ ADVA-MIB::neEventLogTimeStamp.170 2018-12-10,9:30:17.0,-6:0";
 
     public function testAuthServerModified()
     {
-        $device = Device::factory()->create();
-
+        $device = Device::factory()->create(); /** @var Device $device */
         $trapText = "$device->hostname
 UDP: [$device->ip]:57602->[192.168.5.5]:162
 DISMAN-EVENT-MIB::sysUpTimeInstance 26:19:43:37.24
@@ -336,8 +327,7 @@ ADVA-MIB::neEventLogTimeStamp.173 2018-12-10,9:32:18.1,-6:0";
 
     public function testNeModified()
     {
-        $device = Device::factory()->create();
-
+        $device = Device::factory()->create(); /** @var Device $device */
         $trapText = "$device->hostname
 UDP: [$device->ip]:57602->[192.168.5.5]:162
 DISMAN-EVENT-MIB::sysUpTimeInstance 26:19:43:37.24
@@ -361,8 +351,7 @@ ADVA-MIB::neEventLogTimeStamp.175 2018-12-10,9:34:23.0,-6:0";
 
     public function testSnmpDyingGaspStateModified()
     {
-        $device = Device::factory()->create();
-
+        $device = Device::factory()->create(); /** @var Device $device */
         $trapText = "$device->hostname
 UDP: [$device->ip]:57602->[192.168.5.5]:162
 DISMAN-EVENT-MIB::sysUpTimeInstance 26:19:43:37.24
@@ -398,8 +387,7 @@ ADVA-MIB::neEventLogTimeStamp.177 2018-12-10,9:36:14.5,-6:0";
 
     public function testNetPortModified()
     {
-        $device = Device::factory()->create();
-
+        $device = Device::factory()->create(); /** @var Device $device */
         $trapText = "$device->hostname
 UDP: [$device->ip]:57602->[192.168.5.5]:162
 DISMAN-EVENT-MIB::sysUpTimeInstance 26:19:43:37.24
@@ -456,8 +444,7 @@ ADVA-MIB::neEventLogTimeStamp.188 2018-12-10,9:41:49.0,-6:0";
 
     public function testAccPortModied()
     {
-        $device = Device::factory()->create();
-
+        $device = Device::factory()->create(); /** @var Device $device */
         $trapText = "$device->hostname
 UDP: [$device->ip]:57602->[192.168.5.5]:162
 DISMAN-EVENT-MIB::sysUpTimeInstance 26:19:43:37.24
@@ -515,8 +502,7 @@ ADVA-MIB::neEventLogTimeStamp.214 2018-12-10,9:43:22.3,-6:0";
 
     public function testAccFlowModified()
     {
-        $device = Device::factory()->create();
-
+        $device = Device::factory()->create(); /** @var Device $device */
         $trapText = "$device->hostname
 UDP: [$device->ip]:57602->[192.168.5.5]:162
 DISMAN-EVENT-MIB::sysUpTimeInstance 26:19:43:37.24
@@ -539,8 +525,7 @@ ADVA-MIB::neEventLogTimeStamp.147 2018-12-10,9:7:28.1,-6:0";
 
     public function testLagModified()
     {
-        $device = Device::factory()->create();
-
+        $device = Device::factory()->create(); /** @var Device $device */
         $trapText = "$device->hostname
 UDP: [$device->ip]:57602->[192.168.5.5]:162
 DISMAN-EVENT-MIB::sysUpTimeInstance 26:19:43:37.24
@@ -560,8 +545,7 @@ ADVA-MIB::neEventLogTimeStamp.113 2018-12-10,8:58:43.7,-6:0";
 
     public function testQosFlowPolicerModfied()
     {
-        $device = Device::factory()->create();
-
+        $device = Device::factory()->create(); /** @var Device $device */
         $trapText = "$device->hostname
 UDP: [$device->ip]:57602->[192.168.5.5]:162
 DISMAN-EVENT-MIB::sysUpTimeInstance 26:19:43:37.24
@@ -584,8 +568,7 @@ ADVA-MIB::neEventLogTimeStamp.217 2018-12-10,9:47:51.0,-6:0";
 
     public function testQosShaperModified()
     {
-        $device = Device::factory()->create();
-
+        $device = Device::factory()->create(); /** @var Device $device */
         $trapText = "$device->hostname
 UDP: [$device->ip]:57602->[192.168.5.5]:162
 DISMAN-EVENT-MIB::sysUpTimeInstance 26:19:43:37.24
@@ -606,8 +589,7 @@ ADVA-MIB::neEventLogTimeStamp.218 2018-12-10,9:47:51.0,-6:0";
 
     public function testAccShaper()
     {
-        $device = Device::factory()->create();
-
+        $device = Device::factory()->create(); /** @var Device $device */
         $trapText = "$device->hostname
 UDP: [$device->ip]:57602->[192.168.5.5]:162
 DISMAN-EVENT-MIB::sysUpTimeInstance 26:19:43:37.24

@@ -98,7 +98,6 @@ if (Config::get('enable_vrf_lite_cisco')) {
     //get all vrf_lite_cisco, this will used where the value depend of the context, be careful with the order that you call this module, if the module is disabled the context search will not work
     $tmpVrfC = dbFetchRows('SELECT * FROM vrf_lite_cisco WHERE device_id = ? ', [
         $device['device_id'], ]);
-    $device['vrf_lite_cisco'] = $tmpVrfC;
 
     //Delete all vrf that chaged
     foreach ($tmpVrfC as $vrfC) {

@@ -1,4 +1,4 @@
---- ArubaOS 8.5.0.0_70258
+--- ArubaOS 8.8.0.1_80393
 -- vim:set ts=4 sw=4:
 WLSX-AUTH-MIB DEFINITIONS ::= BEGIN
 
@@ -39,18 +39,19 @@ WLSX-AUTH-MIB DEFINITIONS ::= BEGIN
 	   		FROM ARUBA-TC;
 
    wlsxAuthMIB MODULE-IDENTITY 
-       LAST-UPDATED "0611272030Z"
-       ORGANIZATION "Aruba Wireless Networks"
+       LAST-UPDATED "202008141745Z"
+       ORGANIZATION "Aruba, a Hewlett Packard Enterprise company"
        CONTACT-INFO
-            "Postal:    1322 Crossman Avenue
-                        Sunnyvale, CA 94089	
-            E-mail:     dl-support@arubanetworks.com
-            Phone:      +1 408 227 4500"
+            "Postal:    3333 Scott Blvd,
+						Santa Clara, CA 95054
+            E-mail:     aruba-ext-eng-reg@hpe.com
+            Phone:      408 227 4500
+	    	Fax:		408 752 0626"
        DESCRIPTION
            "This MIB module defines MIB objects which provide
             information about the authentication servers known to an 
 			Aruba controller."
-       REVISION        "0611272030Z"
+       REVISION        "202008141745Z"
        DESCRIPTION
            "The initial revision."
        ::= { wlsxEnterpriseMibModules 8 }

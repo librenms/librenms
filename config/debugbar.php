@@ -25,6 +25,7 @@ return [
     'enabled' => env('DEBUGBAR_ENABLED', null),
     'except' => [
         'api*',
+        'push*',
     ],
 
     /*

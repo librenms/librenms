@@ -18,6 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2016 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -58,7 +59,8 @@ class OSDiscoveryTest extends TestCase
      *
      * @group os
      * @dataProvider osProvider
-     * @param string $os_name
+     *
+     * @param  string  $os_name
      */
     public function testOSDetection($os_name)
     {
@@ -97,8 +99,8 @@ class OSDiscoveryTest extends TestCase
      * Set up and test an os
      * If $filename is not set, it will use the snmprec file matching $expected_os
      *
-     * @param string $expected_os The os we should get back from getHostOS()
-     * @param string $filename the name of the snmprec file to use
+     * @param  string  $expected_os  The os we should get back from getHostOS()
+     * @param  string  $filename  the name of the snmprec file to use
      */
     private function checkOS($expected_os, $filename = null)
     {
@@ -116,7 +118,7 @@ class OSDiscoveryTest extends TestCase
     /**
      * Generate a fake $device array
      *
-     * @param string $community The snmp community to set
+     * @param  string  $community  The snmp community to set
      * @return array resulting device array
      */
     private function genDevice($community)

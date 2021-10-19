@@ -12,18 +12,12 @@ if (Config::get('enable_bgp')) {
         include Config::get('install_dir') . "/includes/discovery/bgp-peers/{$device['os']}.inc.php";
     }
 
-    if (key_exists('vrf_lite_cisco', $device) && (count($device['vrf_lite_cisco']) != 0)) {
-        $vrfs_lite_cisco = $device['vrf_lite_cisco'];
-    } else {
-        $vrfs_lite_cisco = [['context_name'=>'']];
-    }
-
     if (empty($bgpLocalAs)) {
         $bgpLocalAs = snmp_getnext($device, 'bgpLocalAs', '-OQUsv', 'BGP4-MIB');
     }
 
-    foreach ($vrfs_lite_cisco as $vrf) {
-        $device['context_name'] = $vrf['context_name'];
+    foreach (DeviceCache::getPrimary()->getVrfContexts() as $context_name) {
+        $device['context_name'] = $context_name;
         if (is_numeric($bgpLocalAs)) {
             echo "AS$bgpLocalAs ";
             if ($bgpLocalAs != $device['bgpLocalAs']) {
@@ -180,7 +174,8 @@ if (Config::get('enable_bgp')) {
         'SELECT DISTINCT context_name FROM bgpPeers WHERE device_id=?',
         [$device['device_id']]
     );
-    $existing_contexts = array_column($vrfs_lite_cisco, 'context_name');
+
+    $existing_contexts = DeviceCache::getPrimary()->getVrfContexts();
     foreach ($contexts as $context) {
         if (! in_array($context, $existing_contexts)) {
             dbDelete('bgpPeers', 'device_id=? and context_name=?', [$device['device_id'], $context]);
@@ -191,10 +186,8 @@ if (Config::get('enable_bgp')) {
 
     unset(
         $device['context_name'],
-        $vrfs_lite_cisco,
         $peers_data,
         $af_data,
-        $contexts,
-        $vrfs_c
+        $contexts
     );
 }

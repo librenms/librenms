@@ -29,6 +29,7 @@
 
 /**
  * Boxcar API Transport
+ *
  * @author trick77 <jan@trick77.com>
  * @copyright 2015 trick77, neokjames, f0o, LibreNMS
  * @license GPL
@@ -39,6 +40,7 @@ namespace LibreNMS\Alert\Transport;
 use LibreNMS\Alert\Transport;
 use LibreNMS\Config;
 use LibreNMS\Enum\AlertState;
+use LibreNMS\Util\Proxy;
 
 class Boxcar extends Transport
 {
@@ -100,7 +102,7 @@ class Boxcar extends Transport
         }
         $data['notification[long_message]'] = $message_text;
         $curl = curl_init();
-        set_curl_proxy($curl);
+        Proxy::applyToCurl($curl);
         curl_setopt($curl, CURLOPT_URL, 'https://new.boxcar.io/api/notifications');
         curl_setopt($curl, CURLOPT_SAFE_UPLOAD, true);
         curl_setopt($curl, CURLOPT_POSTFIELDS, $data);

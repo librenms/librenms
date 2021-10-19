@@ -20,6 +20,7 @@
  * Tests JnxDomAlertSet and JnxDomAlertCleared traps from Juniper devices.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2019 KanREN, Inc
  * @author     Heath Barnhart <hbarnhart@kanren.net>
  */
@@ -35,9 +36,8 @@ class JnxDomAlarmTest extends SnmpTrapTestCase
 {
     public function testJnxDomAlarmSetTrap()
     {
-        $device = Device::factory()->create();
-        $port = Port::factory()->make();
-
+        $device = Device::factory()->create(); /** @var Device $device */
+        $port = Port::factory()->make(); /** @var Port $port */
         $trapText = "$device->hostname
 UDP: [$device->ip]:64610->[192.168.5.5]:162
 DISMAN-EVENT-MIB::sysUpTimeInstance 198:2:10:48.91
@@ -57,9 +57,8 @@ SNMPv2-MIB::snmpTrapEnterprise.0 JUNIPER-CHASSIS-DEFINES-MIB::jnxProductNameMX48
 
     public function testJnxDomAlarmClearTrap()
     {
-        $device = Device::factory()->create();
-        $port = Port::factory()->make();
-
+        $device = Device::factory()->create(); /** @var Device $device */
+        $port = Port::factory()->make(); /** @var Port $port */
         $trapText = "$device->hostname
 UDP: [$device->ip]:64610->[192.168.5.5]:162
 DISMAN-EVENT-MIB::sysUpTimeInstance 198:2:10:48.91

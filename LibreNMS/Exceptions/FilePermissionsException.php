@@ -18,6 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2019 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -34,7 +35,7 @@ class FilePermissionsException extends \Exception implements UpgradeableExceptio
     /**
      * Try to convert the given Exception to a FilePermissionsException
      *
-     * @param \Exception $exception
+     * @param  \Exception  $exception
      * @return static|null
      */
     public static function upgrade($exception)
@@ -78,7 +79,7 @@ class FilePermissionsException extends \Exception implements UpgradeableExceptio
     }
 
     /**
-     * @param string $log_file
+     * @param  string  $log_file
      * @return array
      */
     private function generateCommands($log_file): array
@@ -113,7 +114,7 @@ class FilePermissionsException extends \Exception implements UpgradeableExceptio
         }
 
         // always print chwon/setfacl/chmod commands
-        $commands[] = "sudo chown -R $user:$group $install_dir";
+        $commands[] = "sudo chown -R $user:$group '$install_dir'";
         $commands[] = 'sudo setfacl -d -m g::rwx ' . implode(' ', $dirs);
         $commands[] = 'sudo chmod -R ug=rwX ' . implode(' ', $dirs);
 

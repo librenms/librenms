@@ -15,6 +15,7 @@
 
 /**
  * SMSEagle API Transport
+ *
  * @author Barry O'Donovan <barry@lightnet.ie>
  * @copyright 2017 Barry O'Donovan, LibreNMS
  * @license GPL
@@ -24,9 +25,12 @@ namespace LibreNMS\Alert\Transport;
 
 use Illuminate\Support\Str;
 use LibreNMS\Alert\Transport;
+use LibreNMS\Util\Proxy;
 
 class Smseagle extends Transport
 {
+    protected $name = 'SMSEagle';
+
     public function deliverAlert($obj, $opts)
     {
         $smseagle_opts['url'] = $this->config['smseagle-url'];
@@ -49,7 +53,7 @@ class Smseagle extends Transport
         $url .= $opts['url'] . '/index.php/http_api/send_sms?' . http_build_query($params);
         $curl = curl_init($url);
 
-        set_curl_proxy($curl);
+        Proxy::applyToCurl($curl);
         curl_setopt($curl, CURLOPT_CUSTOMREQUEST, 'GET');
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
 

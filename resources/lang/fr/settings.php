@@ -17,57 +17,57 @@ return [
     ],
     'sections' => [
         'alerting' => [
-            'general' => 'Réglages généraux d\'Alertes',
-            'email' => 'Options des emails',
-            'rules' => 'Réglages généraux des Règles d\'Alertes',
+            'general' => ['name' => 'Réglages généraux d\'Alertes'],
+            'email' => ['name' => 'Options des emails'],
+            'rules' => ['name' => 'Réglages généraux des Règles d\'Alertes'],
         ],
         'api' => [
-            'cors' => 'CORS',
+            'cors' => ['name' => 'CORS'],
         ],
         'auth' => [
-            'general' => 'Réglages généraux d\'Accès',
-            'ad' => 'Réglages Active Directory',
-            'ldap' => 'Réglages LDAP',
+            'general' => ['name' => 'Réglages généraux d\'Accès'],
+            'ad' => ['name' => 'Réglages Active Directory'],
+            'ldap' => ['name' => 'Réglages LDAP'],
         ],
         'authorization' => [
-            'device-group' => 'Réglages de Groupes d\'équipements',
+            'device-group' => ['name' => 'Réglages de Groupes d\'équipements'],
         ],
         'discovery' => [
-            'general' => 'Réglages généraux de Découverte',
-            'route' => 'Module: Routes',
-            'discovery_modules' => 'Activation des Modules de Découverte',
-            'storage' => 'Module: Stockage',
+            'general' => ['name' => 'Réglages généraux de Découverte'],
+            'route' => ['name' => 'Module: Routes'],
+            'discovery_modules' => ['name' => 'Activation des Modules de Découverte'],
+            'storage' => ['name' => 'Module: Stockage'],
         ],
         'external' => [
-            'binaries' => 'Emplacements des Exécutables',
-            'location' => 'Cartes',
-            'graylog' => 'Intégration Graylog',
-            'oxidized' => 'Intégration Oxidized',
-            'mac_oui' => 'Intégration des prefixes OUI d\'adresses mac',
-            'peeringdb' => 'Intégration PeeringDB',
-            'nfsen' => 'Intégration NfSen',
-            'unix-agent' => 'Intégration Unix-Agent',
-            'smokeping' => 'Intégration Smokeping',
-            'snmptrapd' => 'Intégration des traps SNMP',
+            'binaries' => ['name' => 'Emplacements des Exécutables'],
+            'location' => ['name' => 'Cartes'],
+            'graylog' => ['name' => 'Intégration Graylog'],
+            'oxidized' => ['name' => 'Intégration Oxidized'],
+            'mac_oui' => ['name' => 'Intégration des prefixes OUI d\'adresses mac'],
+            'peeringdb' => ['name' => 'Intégration PeeringDB'],
+            'nfsen' => ['name' => 'Intégration NfSen'],
+            'unix-agent' => ['name' => 'Intégration Unix-Agent'],
+            'smokeping' => ['name' => 'Intégration Smokeping'],
+            'snmptrapd' => ['name' => 'Intégration des traps SNMP'],
         ],
         'poller' => [
-            'distributed' => 'Sondeurs distribués',
-            'ping' => 'Ping',
-            'rrdtool' => 'Configuration de RRDTool',
-            'snmp' => 'SNMP',
+            'distributed' => ['name' => 'Sondeurs distribués'],
+            'ping' => ['name' => 'Ping'],
+            'rrdtool' => ['name' => 'Configuration de RRDTool'],
+            'snmp' => ['name' => 'SNMP'],
         ],
         'system' => [
-            'cleanup' => 'Nettoyage',
-            'proxy' => 'Proxy',
-            'updates' => 'Mises à jour',
-            'server' => 'Serveur',
+            'cleanup' => ['name' => 'Nettoyage'],
+            'proxy' => ['name' => 'Proxy'],
+            'updates' => ['name' => 'Mises à jour'],
+            'server' => ['name' => 'Serveur'],
         ],
         'webui' => [
-            'availability-map' => 'Disponibilités et cartes',
-            'graph' => 'Graphiques',
-            'dashboard' => 'Tableaux de Bord',
-            'search' => 'Recherche',
-            'style' => 'Style',
+            'availability-map' => ['name' => 'Disponibilités et cartes'],
+            'graph' => ['name' => 'Graphiques'],
+            'dashboard' => ['name' => 'Tableaux de Bord'],
+            'search' => ['name' => 'Recherche'],
+            'style' => ['name' => 'Style'],
         ],
     ],
     'settings' => [
@@ -355,11 +355,11 @@ return [
             'help' => 'Durée de conservation de l\'utilisateur quand la case "Se souvenir de moi" est cochée',
         ],
         'authlog_purge' => [
-            'description' => 'Journaux de connexions plus anciens que (jours)',
+            'description' => 'Journaux de connexions plus anciens que',
             'help' => 'Nettoyage effectué par daily.sh',
         ],
         'device_perf_purge' => [
-            'description' => 'Stats de performances plus anciennes que (jours)',
+            'description' => 'Stats de performances plus anciennes que',
             'help' => 'Statistiques de performances des équipements. Le nettoyage effectué par daily.sh',
         ],
         'discovery_modules' => [
@@ -565,7 +565,7 @@ return [
             'help' => 'Nom utilisé dans le champ "from" de l\'adresse',
         ],
         'eventlog_purge' => [
-            'description' => 'Journaux d\'évenements plus anciens que (jours)',
+            'description' => 'Journaux d\'évenements plus anciens que',
             'help' => 'Nettoyage effectué par daily.sh',
         ],
         'favicon' => [
@@ -774,7 +774,7 @@ return [
             'help' => 'Nettoyage effectué par daily.sh',
         ],
         'ports_purge' => [
-            'description' => 'Interfaces, entrées plus anciennes que (jours)',
+            'description' => 'Interfaces, entrées plus anciennes que',
             'help' => 'Nettoyage effectué par daily.sh',
         ],
         'public_status' => [
@@ -798,7 +798,7 @@ return [
             'help' => 'Emplacement des fichiers rrd.  Défaut: fichiers rrd dans le répertoire de LibreNMS. La modification de cette valeur ne déplace pas les fichiers RRD.',
         ],
         'rrd_purge' => [
-            'description' => 'RRD, fichiers non modifiés depuis plus de (jours)',
+            'description' => 'RRD, fichiers non modifiés depuis plus de',
             'help' => 'Nettoyage effectué par daily.sh',
         ],
         'rrd_rra' => [
@@ -898,7 +898,7 @@ return [
             'description' => 'Filtrer les messages syslog contenant',
         ],
         'syslog_purge' => [
-            'description' => 'Entrées syslogs plus anciennes que (jours)',
+            'description' => 'Entrées syslogs plus anciennes que',
             'help' => 'Nettoyage effectué par daily.sh',
         ],
         'title_image' => [

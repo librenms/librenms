@@ -269,6 +269,9 @@
                                                     "array"
                                                 ]
                                             },
+                                            "snmp_bulk": {
+                                                "type": "boolean"
+                                            },
                                             "entPhysicalIndex": {
                                                 "type": ["integer", "string"]
                                             },
@@ -432,6 +435,9 @@
                                     "string",
                                     "array"
                                 ]
+                            },
+                            "snmp_bulk": {
+                                "type": "boolean"
                             },
                             "entPhysicalIndex": {
                                 "type": ["integer", "string"]

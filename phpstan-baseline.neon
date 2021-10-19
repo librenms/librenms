@@ -16,12 +16,12 @@ parameters:
 			path: LibreNMS/Alerting/QueryBuilderParser.php
 
 		-
-			message: "#^Parameter \\#1 \\$ldap of function ldap_error expects resource, false given\\.$#"
+			message: "#^Parameter \\#1 \\$link_identifier of function ldap_error expects resource, false given\\.$#"
 			count: 1
 			path: LibreNMS/Authentication/ADAuthorizationAuthorizer.php
 
 		-
-			message: "#^Parameter \\#1 \\$ldap of function ldap_error expects resource, false given\\.$#"
+			message: "#^Parameter \\#1 \\$link_identifier of function ldap_error expects resource, false given\\.$#"
 			count: 1
 			path: LibreNMS/Authentication/LdapAuthorizationAuthorizer.php
 
@@ -46,12 +46,12 @@ parameters:
 			path: LibreNMS/Authentication/SSOAuthorizer.php
 
 		-
-			message: "#^Parameter \\#1 \\$num of function base_convert expects string, int given\\.$#"
+			message: "#^Parameter \\#1 \\$input of function str_pad expects string, int given\\.$#"
 			count: 1
 			path: LibreNMS/Authentication/TwoFactor.php
 
 		-
-			message: "#^Parameter \\#1 \\$string of function str_pad expects string, int given\\.$#"
+			message: "#^Parameter \\#1 \\$number of function base_convert expects string, int given\\.$#"
 			count: 1
 			path: LibreNMS/Authentication/TwoFactor.php
 
