@@ -87,7 +87,7 @@ class PluginManager
      *
      * @param  string  $hookType
      * @param  array  $args
-     * @param  string|null  $plugin only for this plugin if set
+     * @param  string|null  $plugin  only for this plugin if set
      * @return bool
      */
     public function hasHooks(string $hookType, array $args = [], ?string $plugin = null): bool
@@ -102,7 +102,7 @@ class PluginManager
      *
      * @param  string  $hookType
      * @param  array  $args
-     * @param  string|null  $plugin only for this plugin if set
+     * @param  string|null  $plugin  only for this plugin if set
      * @return \Illuminate\Support\Collection
      */
     public function call(string $hookType, array $args = [], ?string $plugin = null): Collection
@@ -123,7 +123,7 @@ class PluginManager
      * Get the settings stored in the database for a plugin.
      * One plugin shares the settings across all hooks
      *
-     * @param  string $pluginName
+     * @param  string  $pluginName
      * @return array
      */
     public function getSettings(string $pluginName): array
@@ -134,7 +134,7 @@ class PluginManager
     /**
      * Save settings array to the database for the given plugin
      *
-     * @param  string $pluginName
+     * @param  string  $pluginName
      * @param  array  $settings
      * @return bool
      */
