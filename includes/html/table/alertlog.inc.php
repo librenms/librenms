@@ -13,8 +13,6 @@
  * @author     LibreNMS Contributors
 */
 
-use App\Models\Device;
-
 $alert_severities = [
     // alert_rules.status is enum('ok','warning','critical')
     'ok' => 1,
