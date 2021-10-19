@@ -7,7 +7,7 @@
             <div class="panel-body">
                 <div class="row">
                     <div class="col-sm-12">
-                        {!! Str::markdown($device->notes) !!}
+                        {!! Str::markdown($device->notes ?? '') !!}
                     </div>
 		</div>
 	    </div>
