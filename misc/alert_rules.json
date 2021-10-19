@@ -520,7 +520,7 @@
     "name": "A Device sensor has been deleted"
   },
   {
-    "rule": "devices.status != \"1\"",
-    "name": "Unpolled Devices"
+    "name": "Unpolled Devices",
+    "builder": "{"condition":"AND","rules":[{"id":"macros.device","field":"macros.device","type":"integer","input":"radio","operator":"equal","value":"1"},{"id":"devices.last_polled","field":"devices.last_polled","type":"datetime","input":"text","operator":"less","value":"`DATE_SUB(NOW(), INTERVAL 6 MINUTE)`"}],"valid":true}"
    }
 ]
