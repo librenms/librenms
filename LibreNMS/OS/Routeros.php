@@ -284,20 +284,6 @@ class Routeros extends OS implements
             );
         }
 
-        $data = $this->getCacheTable('MIKROTIK-MIB::mtxrWl60GStaTable');
-        foreach ($data as $index => $entry) {
-            $sensors[] = new WirelessSensor(
-                'rate',
-                $this->getDeviceId(),
-                '.1.3.6.1.4.1.14988.1.1.1.9.1.8.' . $index,
-                'mikrotik-60g-tx',
-                $index,
-                '60G: Sta > ' . $entry['mtxrWl60GStaRemote'],
-                $entry['mtxrWl60GStaPhyRate'],
-                1000000
-            );
-        }
-
         return $sensors;
     }
 
