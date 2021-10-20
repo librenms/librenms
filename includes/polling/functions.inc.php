@@ -406,7 +406,10 @@ function poll_device($device, $force_module = false)
             echo PHP_EOL;
         }
 
-        $updated = dbUpdate($update_array, 'devices', '`device_id` = ?', [$device['device_id']]);
+        $updated = false;
+        if (! empty($update_array)) {
+            $updated = dbUpdate($update_array, 'devices', '`device_id` = ?', [$device['device_id']]);
+        }
         if ($updated) {
             d_echo('Updating ' . $device['hostname'] . PHP_EOL);
         }

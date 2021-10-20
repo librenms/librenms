@@ -78,51 +78,19 @@ class Core implements Module
 
     public function poll(OS $os)
     {
-        global $agent_data;
-
         $snmpdata = SnmpQuery::numeric()
             ->get(['SNMPv2-MIB::sysDescr.0', 'SNMPv2-MIB::sysObjectID.0', 'SNMPv2-MIB::sysUpTime.0', 'SNMPv2-MIB::sysName.0'])
             ->values();
 
         $device = $os->getDevice();
         $device->fill([
-            'uptime' => $snmpdata['.1.3.6.1.2.1.1.3.0'],
-            'sysName' => str_replace("\n", '', strtolower($snmpdata['.1.3.6.1.2.1.1.5.0'])),
-            'sysObjectID' => $snmpdata['.1.3.6.1.2.1.1.2.0'],
-            'sysDescr' => str_replace(chr(218), "\n", $snmpdata['.1.3.6.1.2.1.1.1.0']),
+            'sysName' => str_replace("\n", '', strtolower($snmpdata['.1.3.6.1.2.1.1.5.0'] ?? '')),
+            'sysObjectID' => $snmpdata['.1.3.6.1.2.1.1.2.0'] ?? null,
+            'sysDescr' => str_replace(chr(218), "\n", $snmpdata['.1.3.6.1.2.1.1.1.0'] ?? ''),
         ]);
 
-        if (! empty($agent_data['uptime'])) {
-            [$uptime] = explode(' ', $agent_data['uptime']);
-            $uptime = round((float) $uptime);
-            echo "Using UNIX Agent Uptime ($uptime)\n";
-        } else {
-            $uptime_data = SnmpQuery::make()->get(['SNMP-FRAMEWORK-MIB::snmpEngineTime.0', 'HOST-RESOURCES-MIB::hrSystemUptime.0'])->values();
-
-            $uptime = max(
-                round($device->uptime / 100),
-                Config::get("os.$device->os.bad_snmpEngineTime") ? 0 : $uptime_data['SNMP-FRAMEWORK-MIB::snmpEngineTime.0'],
-                Config::get("os.$device->os.bad_hrSystemUptime") ? 0 : round($uptime_data['HOST-RESOURCES-MIB::hrSystemUptime.0'] / 100)
-            );
-            Log::debug("Uptime seconds: $uptime\n");
-        }
-
-        if ($uptime != 0 && Config::get("os.$device->os.bad_uptime") !== true) {
-            if ($uptime < $device->uptime) {
-                Log::event('Device rebooted after ' . Time::formatInterval($device->uptime) . " -> {$uptime}s", $device, 'reboot', 4, $device->uptime);
-            }
-
-            app('Datastore')->put($os->getDeviceArray(), 'uptime', [
-                'rrd_def' => RrdDefinition::make()->addDataset('uptime', 'GAUGE', 0),
-            ], $uptime);
-
-            $os->enableGraph('uptime');
-
-            echo 'Uptime: ' . Time::formatInterval($uptime) . PHP_EOL;
-            $device->uptime = $uptime;
-
-            $device->save();
-        }
+        $this->calculateUptime($os, $snmpdata['.1.3.6.1.2.1.1.3.0'] ?? null);
+        $device->save();
     }
 
     public function cleanup(OS $os)
@@ -247,6 +215,46 @@ class Core implements Module
         }
 
         return true;
+    }
+
+    private function calculateUptime(OS $os, ?string $sysUpTime): void
+    {
+        global $agent_data;
+        $device = $os->getDevice();
+
+        if (Config::get("os.$device->os.bad_uptime")) {
+            return;
+        }
+
+        if (! empty($agent_data['uptime'])) {
+            $uptime = round((float) substr($agent_data['uptime'], 0, strpos($agent_data['uptime'], ' ')));
+            echo "Using UNIX Agent Uptime ($uptime)\n";
+        } else {
+            $uptime_data = SnmpQuery::make()->get(['SNMP-FRAMEWORK-MIB::snmpEngineTime.0', 'HOST-RESOURCES-MIB::hrSystemUptime.0'])->values();
+
+            $uptime = max(
+                round($sysUpTime / 100),
+                Config::get("os.$device->os.bad_snmpEngineTime") ? 0 : $uptime_data['SNMP-FRAMEWORK-MIB::snmpEngineTime.0'],
+                Config::get("os.$device->os.bad_hrSystemUptime") ? 0 : round($uptime_data['HOST-RESOURCES-MIB::hrSystemUptime.0'] / 100)
+            );
+            Log::debug("Uptime seconds: $uptime\n");
+        }
+
+        // set it if unless it is wrong
+        if ($uptime > 0) {
+            if ($uptime < $device->uptime) {
+                Log::event('Device rebooted after ' . Time::formatInterval($device->uptime) . " -> {$uptime}s", $device, 'reboot', 4, $device->uptime);
+            }
+
+            app('Datastore')->put($os->getDeviceArray(), 'uptime', [
+                'rrd_def' => RrdDefinition::make()->addDataset('uptime', 'GAUGE', 0),
+            ], $uptime);
+
+            $os->enableGraph('uptime');
+
+            echo 'Uptime: ' . Time::formatInterval($uptime) . PHP_EOL;
+            $device->uptime = $uptime;
+        }
     }
 
     protected static function discoveryIsSlow($def): bool
