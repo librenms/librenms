@@ -55,7 +55,6 @@ class Routeros extends OS implements
     WirelessSinrDiscovery,
     WirelessQualityDiscovery
 {
-
     /**
      * Returns an array of LibreNMS\Device\Sensor objects that have been discovered
      *
@@ -128,7 +127,6 @@ class Routeros extends OS implements
                 continue;
             }
             $freq = substr($entry['mtxrWlApFreq'], 0, 1) . 'G';
-
 
             $sensors[] = new WirelessSensor(
                 'frequency',
@@ -299,6 +297,7 @@ class Routeros extends OS implements
                 1000000
             );
         }
+
         return $sensors;
     }
 
