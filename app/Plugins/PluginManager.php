@@ -191,7 +191,7 @@ class PluginManager
             try {
                 $plugin = Plugin::create([
                     'plugin_name' => $name,
-                    'plugin_active' => 1,
+                    'plugin_active' => $name !== 'ExamplePlugin',
                     'version' => 2,
                 ]);
                 $this->getPlugins()->put($name, $plugin);
