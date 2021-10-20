@@ -324,10 +324,10 @@ class Routeros extends OS implements
     public function discoverWirelessRsrq()
     {
         $data = $this->getCacheTable('MIKROTIK-MIB::mtxrLTEModemTable');
-        $name = $this->getCacheByIndex('MIKROTIK-MIB::mtxrInterfaceStatsName');
 
         $sensors = [];
         foreach ($data as $index => $entry) {
+            $name = $this->getCacheByIndex('MIKROTIK-MIB::mtxrInterfaceStatsName');
             $sensors[] = new WirelessSensor(
                 'rsrq',
                 $this->getDeviceId(),
@@ -351,10 +351,10 @@ class Routeros extends OS implements
     public function discoverWirelessRsrp()
     {
         $data = $this->getCacheTable('MIKROTIK-MIB::mtxrLTEModemTable');
-        $name = $this->getCacheByIndex('MIKROTIK-MIB::mtxrInterfaceStatsName');
 
         $sensors = [];
         foreach ($data as $index => $entry) {
+            $name = $this->getCacheByIndex('MIKROTIK-MIB::mtxrInterfaceStatsName');
             $sensors[] = new WirelessSensor(
                 'rsrp',
                 $this->getDeviceId(),
@@ -378,10 +378,10 @@ class Routeros extends OS implements
     public function discoverWirelessSinr()
     {
         $data = $this->getCacheTable('MIKROTIK-MIB::mtxrLTEModemTable');
-        $name = $this->getCacheByIndex('MIKROTIK-MIB::mtxrInterfaceStatsName');
 
         $sensors = [];
         foreach ($data as $index => $entry) {
+            $name = $this->getCacheByIndex('MIKROTIK-MIB::mtxrInterfaceStatsName');
             $sensors[] = new WirelessSensor(
                 'sinr',
                 $this->getDeviceId(),
