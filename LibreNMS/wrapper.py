@@ -311,7 +311,7 @@ def poll_worker(
                             command,
                             shell=True,
                             stdin=subprocess.PIPE,
-                            stdout=subprocess.PIPE
+                            stdout=subprocess.PIPE,
                         )
 
                 # This is the string that will signify the end of the poller process
