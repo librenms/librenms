@@ -72,6 +72,8 @@ class ValidationTest extends TestCase
 
     public function testDiskValidation(): void
     {
+        Config::set('rrd_dir', base_path('rrd')); // for some reason this is wrong when testing on GHA
+
         $results = $this->validateGroup('disk');
 
         $this->assertCount(0, $results, var_export($results, true));
