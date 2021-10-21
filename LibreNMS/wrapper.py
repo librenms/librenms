@@ -364,7 +364,6 @@ def poll_worker(
                         with open(device_log, "w", encoding="utf-8") as dev_log_file:
                             dev_log_file.write(output)
 
-
                 elapsed_time = int(time.time() - start_time)
                 print_queue.put(
                     [
@@ -388,7 +387,6 @@ def poll_worker(
         poller.stdout.close()
         while poller.returncode is None:
             poller.wait()
-
 
 class DBConfig:
     """
