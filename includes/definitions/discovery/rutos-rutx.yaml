@@ -105,16 +105,3 @@ modules:
                     index: "mSignal.{{ $index }}"
                     low_warn_limit: -85
                     low_limit: -95
-        snr:
-            data:
-                -
-                    oid: mSINR
-                    num_oid: ".1.3.6.1.4.1.48690.2.2.1.19.{{ $index }}"
-                    entPhysicalIndex: "{{ $index }}"
-                    entPhysicalIndex_measured: "Signal"
-                    descr: "Signal Level - SINR"
-                    group: Mobile
-                    index: "mSINR.{{ $index }}"
-                    low_limit: 0
-                    low_warn_limit: 5
-                    high_limit: 30
