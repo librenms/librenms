@@ -121,7 +121,7 @@ class ValidationTest extends TestCase
         $this->assertCount(0, $results, var_export($results, true));
     }
 
-    public function testRrdValidation()
+    public function testRrdValidation(): void
     {
         $results = $this->validateGroup('rrd');
 
@@ -170,7 +170,11 @@ class ValidationTest extends TestCase
         $this->assertLessThan(2, count($results), var_export($results, true));
     }
 
-    private function validateGroup($group)
+    /**
+     * @param  string  $group
+     * @return \LibreNMS\ValidationResult[]
+     */
+    private function validateGroup(string $group): array
     {
         $validator = new Validator(true);
         $validator->validate([$group]);
