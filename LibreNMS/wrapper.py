@@ -44,6 +44,7 @@
 import logging
 import os
 import queue
+import subprocess
 import sys
 import threading
 import time
@@ -236,6 +237,21 @@ def poll_worker(
 
     global ERRORS
 
+    if not DISTRIBUTED_POLLING:
+        executable = os.path.join(
+            os.path.dirname(os.path.dirname(os.path.realpath(__file__))),
+            wrappers[wrapper_type]["executable"],
+        )
+        command = "/usr/bin/env php {} -h - ".format(executable)
+        if debug:
+            command = command + " -d"
+        else:
+            command = command + " -Q";
+
+        command = command + " 2>&1";
+        poller = subprocess.Popen(command, shell=True, stdin=subprocess.PIPE, stdout=subprocess.PIPE)
+        logger.debug("Launched poller sub-process using command {}".format(command))
+
     while True:
         device_id = poll_queue.get()
         #  <<<EOC
@@ -277,30 +293,40 @@ def poll_worker(
                     os.path.dirname(os.path.dirname(os.path.realpath(__file__))),
                     wrappers[wrapper_type]["executable"],
                 )
-                command = "/usr/bin/env php {} -h {}".format(executable, device_id)
+                # Keep trying to write the device ID to the poller.php process until we succeed
+                while True:
+                    try:
+                        poller.stdin.write(str(device_id).encode())
+                        poller.stdin.write("\n".encode())
+                        poller.stdin.flush()
+                        break
+                    except:
+                        # Clean up the child process and re-start on error
+                        while poller.returncode is None:
+                            poller.wait()
+
+                        poller = subprocess.Popen(command, shell=True, stdin=subprocess.PIPE, stdout=subprocess.PIPE)
+
+                # This is the string that will signify the end of the poller process
+                endofinput = "### Poll of " + str(device_id) + " complete ###"
+
                 if debug:
-                    command = command + " -d"
-                exit_code, output = command_runner(
-                    command,
-                    shell=True,
-                    timeout=PER_DEVICE_TIMEOUT,
-                    valid_exit_codes=VALID_EXIT_CODES,
-                )
-                if exit_code not in [0, 6]:
-                    logger.error(
-                        "Thread {} exited with code {}".format(
-                            threading.current_thread().name, exit_code
-                        )
-                    )
-                    ERRORS += 1
-                    logger.error(output)
-                elif exit_code == 5:
-                    logger.info("Unreachable device {}".format(device_id))
-                else:
-                    logger.debug(output)
+                    dev_log_file = open(device_log, "w", encoding="utf-8")
+
+                while True:
+                    line = poller.stdout.readline()
+                    if not line or line.decode().rstrip('\r\n') == endofinput:
+                        break
+
+                    logger.debug(line.decode())
+                    if debug:
+                        dev_log_file.write(line.decode())
+
                 if debug:
-                    with open(device_log, "w", encoding="utf-8") as dev_log_file:
-                        dev_log_file.write(output)
+                    dev_log_file.close()
+
+                # The persistent process does not give a valid exit code
+                exit_code = 0
 
                 elapsed_time = int(time.time() - start_time)
                 print_queue.put(
@@ -318,6 +344,14 @@ def poll_worker(
                 logger.error("Unknown problem happened: ")
                 logger.error("Traceback:", exc_info=True)
         poll_queue.task_done()
+
+    # Close and clean up the poller process
+    if not DISTRIBUTED_POLLING:
+        poller.stdin.close()
+        poller.stdout.close()
+        while poller.returncode is None:
+            poller.wait()
+
 
 
 class DBConfig:
@@ -423,19 +457,20 @@ def wrapper(
 
     s_time = time.time()
 
-    devices_list = []
+    fast_devices_list = []
+    slow_devices_list = []
 
     if wrapper_type == "service":
         #  <<<EOC
         if poller_group is not False:
             query = (
-                "SELECT DISTINCT(services.device_id) FROM services LEFT JOIN devices ON "
+                "SELECT DISTINCT(services.device_id),1 FROM services LEFT JOIN devices ON "
                 "services.device_id = devices.device_id WHERE devices.poller_group IN({}) AND "
                 "devices.disabled = 0".format(poller_group)
             )
         else:
             query = (
-                "SELECT DISTINCT(services.device_id) FROM services LEFT JOIN devices ON "
+                "SELECT DISTINCT(services.device_id),1 FROM services LEFT JOIN devices ON "
                 "services.device_id = devices.device_id WHERE devices.disabled = 0"
             )
         # EOC
@@ -449,11 +484,11 @@ def wrapper(
         #  <<<EOC
         if poller_group is not False:
             query = (
-                "SELECT device_id FROM devices WHERE poller_group IN ({}) AND "
+                "SELECT device_id,last_polled_timetaken FROM devices WHERE poller_group IN ({}) AND "
                 "disabled = 0 ORDER BY last_polled_timetaken DESC".format(poller_group)
             )
         else:
-            query = "SELECT device_id FROM devices WHERE disabled = 0 ORDER BY last_polled_timetaken DESC"
+            query = "SELECT device_id,last_polled_timetaken FROM devices WHERE disabled = 0 ORDER BY last_polled_timetaken DESC"
         # EOC
     else:
         logger.critical("Bogus wrapper type called")
@@ -463,8 +498,59 @@ def wrapper(
     db_connection = LibreNMS.DB(sconfig)
     cursor = db_connection.query(query)
     devices = cursor.fetchall()
-    for row in devices:
-        devices_list.append(int(row[0]))
+
+    all_poll_time=0
+    fast_poll_time=0
+
+    # We want to split the workload in half.  Find the time of the middle item
+    amount_of_devices = len(devices)
+    device_mid = amount_of_devices>>1
+
+    # Add the first half as slow devices
+    for row in devices[:device_mid]:
+        # Use try/except in case the time is null
+        try:
+            this_poll_time=float(row[1])
+        except:
+            this_poll_time=float(0)
+
+        slow_devices_list.append(int(row[0]))
+        all_poll_time+=this_poll_time
+        logger.debug("Appended slow device {} with run time {}".format(row[0], this_poll_time))
+
+    # Add the second half as fast devices
+    for row in devices[device_mid:]:
+        # Use try/except in case the time is null
+        try:
+            this_poll_time=float(row[1])
+        except:
+            this_poll_time=float(0)
+
+        fast_devices_list.insert(0,int(row[0]))
+        all_poll_time+=this_poll_time
+        fast_poll_time+=this_poll_time
+        logger.debug("Inserted fast device {} with run time {}".format(row[0], this_poll_time))
+
+    # Estimated number of workers is the total poll time / stepping, plus 1
+    # minimum fast and slow workers.  Allow a 5% margin to avoid overlaps
+    if wrapper_type in ["discovery", "poller"]:
+        est_workers = 2 + int(all_poll_time / (STEPPING * 0.95))
+        if est_workers > amount_of_workers:
+            logger.warning("Estimated minimum workers of {} is more than the maximum of {}. You either need to increase the maximum workers, get a faster machine".format(est_workers, amount_of_workers))
+        else:
+            amount_of_workers = est_workers
+
+    # Work out how many fast workers are needed as a percent of the total time
+    amount_of_fast_workers=int(amount_of_workers * fast_poll_time / all_poll_time) + 1
+    if amount_of_fast_workers == 0:
+        amount_of_fast_workers = 1
+    if amount_of_fast_workers > amount_of_workers:
+        amount_of_fast_workers = amount_of_workers
+
+    # Remainder are slow workers, with a minimum of 1
+    amount_of_slow_workers=amount_of_workers - amount_of_fast_workers
+    if amount_of_slow_workers == 0:
+        amount_of_slow_workers = 1
 
     #  <<<EOC
     if DISTRIBUTED_POLLING and not IS_NODE:
@@ -477,13 +563,9 @@ def wrapper(
         minlocks = devices[0][1] or 0
     # EOC
 
-    poll_queue = queue.Queue()
+    slow_poll_queue = queue.Queue()
+    fast_poll_queue = queue.Queue()
     print_queue = queue.Queue()
-
-    # Don't have more threads than workers
-    amount_of_devices = len(devices_list)
-    if amount_of_workers > amount_of_devices:
-        amount_of_workers = amount_of_devices
 
     logger.info(
         "starting the {} check at {} with {} threads for {} devices".format(
@@ -494,14 +576,32 @@ def wrapper(
         )
     )
 
-    for device_id in devices_list:
-        poll_queue.put(device_id)
+    for device_id in slow_devices_list:
+        slow_poll_queue.put(device_id)
 
-    for _ in range(amount_of_workers):
+    for device_id in fast_devices_list:
+        fast_poll_queue.put(device_id)
+
+    for _ in range(amount_of_slow_workers):
         worker = threading.Thread(
             target=poll_worker,
             kwargs={
-                "poll_queue": poll_queue,
+                "poll_queue": slow_poll_queue,
+                "print_queue": print_queue,
+                "config": config,
+                "log_dir": log_dir,
+                "wrapper_type": wrapper_type,
+                "debug": _debug,
+            },
+        )
+        worker.setDaemon(True)
+        worker.start()
+
+    for _ in range(amount_of_fast_workers):
+        worker = threading.Thread(
+            target=poll_worker,
+            kwargs={
+                "poll_queue": fast_poll_queue,
                 "print_queue": print_queue,
                 "config": config,
                 "log_dir": log_dir,
@@ -520,7 +620,8 @@ def wrapper(
     pworker.start()
 
     try:
-        poll_queue.join()
+        slow_poll_queue.join()
+        fast_poll_queue.join()
         print_queue.join()
     except (KeyboardInterrupt, SystemExit):
         raise
