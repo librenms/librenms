@@ -16,12 +16,20 @@ abstract class TestCase extends BaseTestCase
         $this->getSnmpsim();
     }
 
+    protected static function dbRequired(): bool
+    {
+        $db = (bool) getenv('DBTEST');
+        if (! $db) {
+            static::markTestSkipped('Database tests not enabled.  Set DBTEST=1 to enable.');
+        }
+
+        return $db;
+    }
+
     public function dbSetUp()
     {
-        if (getenv('DBTEST')) {
+        if (self::dbRequired()) {
             \LibreNMS\DB\Eloquent::DB()->beginTransaction();
-        } else {
-            $this->markTestSkipped('Database tests not enabled.  Set DBTEST=1 to enable.');
         }
     }
 

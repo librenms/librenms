@@ -33,43 +33,55 @@ use LibreNMS\Validator;
 
 class ValidationTest extends TestCase
 {
-    public function testConfigurationValidation()
+    public function testConfigurationValidation(): void
     {
+        config(['app.debug' => true]);
         $results = $this->validateGroup('configuration');
 
-        $this->assertCount(1, $results);
+        $this->assertCount(2, $results, var_export($results, true));
+
+        $this->assertEquals('Debug enabled.  This is a security risk.', $results[0]->getMessage());
         $this->assertEquals(ValidationResult::WARNING, $results[0]->getStatus());
+
+        $this->assertEquals('You have no devices.', $results[1]->getMessage());
+        $this->assertEquals(ValidationResult::WARNING, $results[1]->getStatus());
+
+        config(['app.debug' => false]);
     }
 
-    public function testDatabaseValidation()
+    public function testDatabaseValidation(): void
     {
+        self::dbRequired();
+
         $results = $this->validateGroup('database');
 
-        $this->assertCount(1, $results);
+        $this->assertCount(1, $results, 'something' . var_export($results, true));
+
         $this->assertEquals(ValidationResult::SUCCESS, $results[0]->getStatus());
     }
 
-    public function testDependenciesValidation()
+    public function testDependenciesValidation(): void
     {
         $results = $this->validateGroup('dependencies');
 
-        $this->assertCount(2, $results);
+        $this->assertCount(2, $results, var_export($results, true));
+
         $this->assertEquals(ValidationResult::SUCCESS, $results[0]->getStatus());
         $this->assertEquals(ValidationResult::SUCCESS, $results[1]->getStatus());
     }
 
-    public function testDiskValidation()
+    public function testDiskValidation(): void
     {
         $results = $this->validateGroup('disk');
 
-        $this->assertCount(0, $results);
+        $this->assertCount(0, $results, var_export($results, true));
     }
 
-    public function testDistributedPollerValidation()
+    public function testDistributedPollerValidation(): void
     {
         Config::set('distributed_poller', true);
         $results = $this->validateGroup('distributedpoller');
-        $this->assertCount(3, $results);
+        $this->assertCount(3, $results, var_export($results, true));
         $this->assertEquals(ValidationResult::FAILURE, $results[0]->getStatus());
         $this->assertEquals(ValidationResult::INFO, $results[1]->getStatus());
         $this->assertEquals(ValidationResult::FAILURE, $results[2]->getStatus());
@@ -77,61 +89,61 @@ class ValidationTest extends TestCase
         Config::set('distributed_poller', false);
         $results = $this->validateGroup('distributedpoller');
 
-        $this->assertCount(1, $results);
+        $this->assertCount(1, $results, var_export($results, true));
         $this->assertEquals(ValidationResult::FAILURE, $results[0]->getStatus());
     }
 
-    public function testMailValidation()
+    public function testMailValidation(): void
     {
         $results = $this->validateGroup('mail');
 
-        $this->assertCount(0, $results);
+        $this->assertCount(0, $results, var_export($results, true));
     }
 
-    public function testPhpValidation()
+    public function testPhpValidation(): void
     {
         $results = $this->validateGroup('php');
 
-        $this->assertCount(0, $results);
+        $this->assertCount(0, $results, var_export($results, true));
     }
 
-    public function testProgramsValidation()
+    public function testProgramsValidation(): void
     {
         $results = $this->validateGroup('programs');
 
-        $this->assertCount(0, $results);
+        $this->assertCount(0, $results, var_export($results, true));
     }
 
-    public function testPythonValidation()
+    public function testPythonValidation(): void
     {
         $results = $this->validateGroup('python');
 
-        $this->assertCount(0, $results);
+        $this->assertCount(0, $results, var_export($results, true));
     }
 
     public function testRrdValidation()
     {
         $results = $this->validateGroup('rrd');
 
-        $this->assertCount(0, $results);
+        $this->assertCount(0, $results, var_export($results, true));
     }
 
-    public function testRrdCheckValidation()
+    public function testRrdCheckValidation(): void
     {
         $this->assertTrue(true, 'Skipped');
 //        $results = $this->validateGroup('rrdcheck');
 //
-//        $this->assertCount(0, $results);
+//        $this->assertCount(0, $results, var_export($results, true));
     }
 
-    public function testSystemValidation()
+    public function testSystemValidation(): void
     {
         $results = $this->validateGroup('system');
 
-        $this->assertCount(0, $results);
+        $this->assertCount(0, $results, var_export($results, true));
     }
 
-    public function testUpdatesValidation()
+    public function testUpdatesValidation(): void
     {
         // github api call is slow, fake it
         Http::fake([
@@ -143,19 +155,19 @@ class ValidationTest extends TestCase
         $results = $this->validateGroup('updates');
 
         $this->assertIsArray($results);
-        $this->assertLessThan(3, count($results));
+        $this->assertLessThan(3, count($results), var_export($results, true));
         // all should be warning only
         foreach ($results as $result) {
             $this->assertEquals(ValidationResult::WARNING, $result->getStatus());
         }
     }
 
-    public function testUserValidation()
+    public function testUserValidation(): void
     {
         $results = $this->validateGroup('user');
 
         $this->assertIsArray($results);
-        $this->assertLessThan(2, count($results));
+        $this->assertLessThan(2, count($results), var_export($results, true));
     }
 
     private function validateGroup($group)
