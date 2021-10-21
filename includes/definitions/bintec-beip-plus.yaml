@@ -1,6 +1,5 @@
 os: bintec-beip-plus
 snmp_bulk: false
-snmp_out_of_order_oids: true
 text: 'Bintec Be.IP Plus'
 type: network
 icon: bintec
