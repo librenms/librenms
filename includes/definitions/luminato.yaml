@@ -4,6 +4,8 @@ type: network
 icon: teleste
 group: luminato
 mib_dir: teleste
+bad_snmpEngineTime: true
+bad_hrSystemUptime: true
 over:
     - { graph: device_bits, text: 'Device Traffic' }
 discovery:
