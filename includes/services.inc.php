@@ -1,9 +1,9 @@
 <?php
 
 use App\Models\Device;
+use LibreNMS\Alert\AlertRules;
 use LibreNMS\Config;
 use LibreNMS\RRD\RrdDefinition;
-use LibreNMS\Alert\AlertRules;
 
 function get_service_status($device = null)
 {
