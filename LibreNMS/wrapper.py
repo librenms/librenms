@@ -246,10 +246,12 @@ def poll_worker(
         if debug:
             command = command + " -d"
         else:
-            command = command + " -Q";
+            command = command + " -Q"
 
-        command = command + " 2>&1";
-        poller = subprocess.Popen(command, shell=True, stdin=subprocess.PIPE, stdout=subprocess.PIPE)
+        command = command + " 2>&1"
+        poller = subprocess.Popen(
+            command, shell=True, stdin=subprocess.PIPE, stdout=subprocess.PIPE
+        )
         logger.debug("Launched poller sub-process using command {}".format(command))
 
     while True:
@@ -305,7 +307,12 @@ def poll_worker(
                         while poller.returncode is None:
                             poller.wait()
 
-                        poller = subprocess.Popen(command, shell=True, stdin=subprocess.PIPE, stdout=subprocess.PIPE)
+                        poller = subprocess.Popen(
+                            command,
+                            shell=True,
+                            stdin=subprocess.PIPE,
+                            stdout=subprocess.PIPE
+                        )
 
                 # This is the string that will signify the end of the poller process
                 endofinput = "### Poll of " + str(device_id) + " complete ###"
@@ -315,7 +322,7 @@ def poll_worker(
 
                 while True:
                     line = poller.stdout.readline()
-                    if not line or line.decode().rstrip('\r\n') == endofinput:
+                    if not line or line.decode().rstrip("\r\n") == endofinput:
                         break
 
                     logger.debug(line.decode())
@@ -351,7 +358,6 @@ def poll_worker(
         poller.stdout.close()
         while poller.returncode is None:
             poller.wait()
-
 
 
 class DBConfig:
@@ -499,56 +505,64 @@ def wrapper(
     cursor = db_connection.query(query)
     devices = cursor.fetchall()
 
-    all_poll_time=0
-    fast_poll_time=0
+    all_poll_time = 0
+    fast_poll_time = 0
 
     # We want to split the workload in half.  Find the time of the middle item
     amount_of_devices = len(devices)
-    device_mid = amount_of_devices>>1
+    device_mid = amount_of_devices >> 1
 
     # Add the first half as slow devices
     for row in devices[:device_mid]:
         # Use try/except in case the time is null
         try:
-            this_poll_time=float(row[1])
+            this_poll_time = float(row[1])
         except:
-            this_poll_time=float(0)
+            this_poll_time = float(0)
 
         slow_devices_list.append(int(row[0]))
-        all_poll_time+=this_poll_time
-        logger.debug("Appended slow device {} with run time {}".format(row[0], this_poll_time))
+        all_poll_time += this_poll_time
+        logger.debug(
+            "Appended slow device {} with run time {}".format(row[0], this_poll_time)
+        )
 
     # Add the second half as fast devices
     for row in devices[device_mid:]:
         # Use try/except in case the time is null
         try:
-            this_poll_time=float(row[1])
+            this_poll_time = float(row[1])
         except:
-            this_poll_time=float(0)
+            this_poll_time = float(0)
 
-        fast_devices_list.insert(0,int(row[0]))
-        all_poll_time+=this_poll_time
-        fast_poll_time+=this_poll_time
-        logger.debug("Inserted fast device {} with run time {}".format(row[0], this_poll_time))
+        fast_devices_list.insert(0, int(row[0]))
+        all_poll_time += this_poll_time
+        fast_poll_time += this_poll_time
+        logger.debug(
+            "Inserted fast device {} with run time {}".format(row[0], this_poll_time)
+        )
 
     # Estimated number of workers is the total poll time / stepping, plus 1
     # minimum fast and slow workers.  Allow a 5% margin to avoid overlaps
     if wrapper_type in ["discovery", "poller"]:
         est_workers = 2 + int(all_poll_time / (STEPPING * 0.95))
         if est_workers > amount_of_workers:
-            logger.warning("Estimated minimum workers of {} is more than the maximum of {}. You either need to increase the maximum workers, get a faster machine".format(est_workers, amount_of_workers))
+            logger.warning(
+                "Estimated minimum workers of {} is more than the maximum of {}. You either need to increase the maximum workers, get a faster machine".format(
+                    est_workers, amount_of_workers
+                )
+            )
         else:
             amount_of_workers = est_workers
 
     # Work out how many fast workers are needed as a percent of the total time
-    amount_of_fast_workers=int(amount_of_workers * fast_poll_time / all_poll_time) + 1
+    amount_of_fast_workers = int(amount_of_workers * fast_poll_time / all_poll_time) + 1
     if amount_of_fast_workers == 0:
         amount_of_fast_workers = 1
     if amount_of_fast_workers > amount_of_workers:
         amount_of_fast_workers = amount_of_workers
 
     # Remainder are slow workers, with a minimum of 1
-    amount_of_slow_workers=amount_of_workers - amount_of_fast_workers
+    amount_of_slow_workers = amount_of_workers - amount_of_fast_workers
     if amount_of_slow_workers == 0:
         amount_of_slow_workers = 1
 
