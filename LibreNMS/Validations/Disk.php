@@ -46,6 +46,12 @@ class Disk extends BaseValidation
         }
 
         $rrd_dir = Config::get('rrd_dir');
+        if (! is_dir($rrd_dir)) {
+            $validator->fail("RRD directory $rrd_dir does not exist.");
+
+            return;
+        }
+
         $space_check = (disk_free_space($rrd_dir) / 1024 / 1024);
         if ($space_check < 512 && $space_check > 1) {
             $validator->warn("Disk space where $rrd_dir is located is less than 512Mb");
