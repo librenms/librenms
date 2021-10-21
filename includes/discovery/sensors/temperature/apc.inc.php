@@ -9,7 +9,7 @@ if (! $oids) {
     // upsAdvBatteryTemperature, used in case high precision is not available
     $oids = snmp_get($device, '.1.3.6.1.4.1.318.1.1.1.2.2.2.0', '-OsqnU', '');
     d_echo($oids . "\n");
-    $divisor = 1;
+    $precision = 1;
 }
 
 if ($oids) {
