@@ -3,7 +3,7 @@ text: 'West Mountain RMCU'
 type: power
 mib_dir: westmountainradio
 icon: westmountainradio
-nobulk: true
+snmp_bulk: false
 bad_snmpEngineTime: true
 bad_hrSystemUptime: true
 over:
