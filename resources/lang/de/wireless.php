@@ -54,7 +54,7 @@ return [
     'distance' => [
         'short' => 'Distanz',
         'long' => 'Distanz',
-        'unit' => 'km',
+        'unit' => 'm',
     ],
     'mse' => [
         'short' => 'MSE',
