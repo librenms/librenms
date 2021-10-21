@@ -63,6 +63,8 @@ if ($device['os_group'] == 'unix' || $device['os'] == 'windows') {
             'gpsd',
         ];
 
+        global $agent_data;
+        $agent_data = [];
         foreach (explode('<<<', $agent_raw) as $section) {
             [$section, $data] = explode('>>>', $section);
             [$sa, $sb] = explode('-', $section, 2);

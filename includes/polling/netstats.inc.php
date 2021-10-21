@@ -1,7 +1,8 @@
 <?php
 
-$include_dir = 'includes/polling/netstats';
-require 'includes/include-dir.inc.php';
+use LibreNMS\OS;
 
-echo "\n";
-unset($oid_ds);
+if (! $os instanceof OS) {
+    $os = OS::make($device);
+}
+(new \LibreNMS\Modules\Netstats())->poll($os);

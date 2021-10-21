@@ -2,7 +2,7 @@
 /**
  * OS.php
  *
- * Base OS class
+ * -Description-
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,7 +19,7 @@
  *
  * @link       https://www.librenms.org
  *
- * @copyright  2017 Tony Murray
+ * @copyright  2021 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
@@ -34,13 +34,30 @@ use LibreNMS\Device\YamlDiscovery;
 use LibreNMS\Interfaces\Discovery\MempoolsDiscovery;
 use LibreNMS\Interfaces\Discovery\OSDiscovery;
 use LibreNMS\Interfaces\Discovery\ProcessorDiscovery;
+use LibreNMS\Interfaces\Polling\Netstats\IcmpNetstatsPolling;
+use LibreNMS\Interfaces\Polling\Netstats\IpForwardNetstatsPolling;
+use LibreNMS\Interfaces\Polling\Netstats\IpNetstatsPolling;
+use LibreNMS\Interfaces\Polling\Netstats\SnmpNetstatsPolling;
+use LibreNMS\Interfaces\Polling\Netstats\TcpNetstatsPolling;
+use LibreNMS\Interfaces\Polling\Netstats\UdpNetstatsPolling;
 use LibreNMS\OS\Generic;
 use LibreNMS\OS\Traits\HostResources;
+use LibreNMS\OS\Traits\NetstatsPolling;
 use LibreNMS\OS\Traits\UcdResources;
 use LibreNMS\OS\Traits\YamlMempoolsDiscovery;
 use LibreNMS\OS\Traits\YamlOSDiscovery;
+use LibreNMS\Util\StringHelpers;
 
-class OS implements ProcessorDiscovery, OSDiscovery, MempoolsDiscovery
+class OS implements
+    ProcessorDiscovery,
+    OSDiscovery,
+    MempoolsDiscovery,
+    IcmpNetstatsPolling,
+    IpNetstatsPolling,
+    IpForwardNetstatsPolling,
+    SnmpNetstatsPolling,
+    TcpNetstatsPolling,
+    UdpNetstatsPolling
 {
     use HostResources {
         HostResources::discoverProcessors as discoverHrProcessors;
@@ -52,6 +69,7 @@ class OS implements ProcessorDiscovery, OSDiscovery, MempoolsDiscovery
     }
     use YamlOSDiscovery;
     use YamlMempoolsDiscovery;
+    use NetstatsPolling;
 
     private $device; // annoying use of references to make sure this is in sync with global $device variable
     private $graphs; // stores device graphs
@@ -212,7 +230,7 @@ class OS implements ProcessorDiscovery, OSDiscovery, MempoolsDiscovery
                 unset($device['os_group']);
             }
 
-            $class = str_to_class($device['os'], 'LibreNMS\\OS\\');
+            $class = StringHelpers::toClass($device['os'], 'LibreNMS\\OS\\');
             d_echo('Attempting to initialize OS: ' . $device['os'] . PHP_EOL);
             if (class_exists($class)) {
                 d_echo("OS initialized: $class\n");
@@ -221,9 +239,9 @@ class OS implements ProcessorDiscovery, OSDiscovery, MempoolsDiscovery
             }
 
             // If not a specific OS, check for a group one.
-            if ($os_group) {
-                $class = str_to_class($device['os_group'], 'LibreNMS\\OS\\Shared\\');
-                d_echo('Attempting to initialize OS: ' . $device['os_group'] . PHP_EOL);
+            if ($os_group = Config::get("os.{$device['os']}.group")) {
+                $class = StringHelpers::toClass($os_group, 'LibreNMS\\OS\\Shared\\');
+                d_echo("Attempting to initialize Group OS: $os_group\n");
                 if (class_exists($class)) {
                     d_echo("OS initialized: $class\n");
 

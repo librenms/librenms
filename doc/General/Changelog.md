@@ -1,3 +1,153 @@
+## 21.10.0
+*(2021-10-16)*
+
+A big thank you to the following 21 contributors this last month:
+
+  - [murrant](https://github.com/murrant) (40)
+  - [SourceDoctor](https://github.com/SourceDoctor) (9)
+  - [Jellyfrog](https://github.com/Jellyfrog) (5)
+  - [loopodoopo](https://github.com/loopodoopo) (3)
+  - [Cupidazul](https://github.com/Cupidazul) (3)
+  - [maxnz](https://github.com/maxnz) (3)
+  - [mpikzink](https://github.com/mpikzink) (3)
+  - [ottorei](https://github.com/ottorei) (2)
+  - [gs-kamnas](https://github.com/gs-kamnas) (2)
+  - [topranks](https://github.com/topranks) (2)
+  - [mctaguma](https://github.com/mctaguma) (1)
+  - [DanielMuller-TN](https://github.com/DanielMuller-TN) (1)
+  - [hjcday](https://github.com/hjcday) (1)
+  - [dependabot](https://github.com/apps/dependabot) (1)
+  - [calvinthefreak](https://github.com/calvinthefreak) (1)
+  - [si458](https://github.com/si458) (1)
+  - [Laplacence](https://github.com/Laplacence) (1)
+  - [peelman](https://github.com/peelman) (1)
+  - [noaheroufus](https://github.com/noaheroufus) (1)
+  - [deajan](https://github.com/deajan) (1)
+  - [lutfisan](https://github.com/lutfisan) (1)
+
+Thanks to maintainers and others that helped with pull requests this month:
+
+  - [murrant](https://github.com/murrant) (36)
+  - [Jellyfrog](https://github.com/Jellyfrog) (29)
+  - [SourceDoctor](https://github.com/SourceDoctor) (7)
+  - [ottorei](https://github.com/ottorei) (1)
+  - [PipoCanaja](https://github.com/PipoCanaja) (1)
+
+#### Feature
+* New SNMP code and lnms snmp:fetch command ([#13303](https://github.com/librenms/librenms/pull/13303)) - [murrant](https://github.com/murrant)
+* Add eventlog on_create device version 2 w/deps ([#13302](https://github.com/librenms/librenms/pull/13302)) - [Cupidazul](https://github.com/Cupidazul)
+* Push Notifications (Mobile and PC) ([#13277](https://github.com/librenms/librenms/pull/13277)) - [murrant](https://github.com/murrant)
+* Modified Prometheus extension to support adding a prefix to metric names ([#13272](https://github.com/librenms/librenms/pull/13272)) - [topranks](https://github.com/topranks)
+* Config seeder ([#13259](https://github.com/librenms/librenms/pull/13259)) - [murrant](https://github.com/murrant)
+* Infer character encoding for ifAlias and sysLocation ([#13248](https://github.com/librenms/librenms/pull/13248)) - [murrant](https://github.com/murrant)
+* Log count of logged in users in database from HOST-RESOURCES-MIB ([#13137](https://github.com/librenms/librenms/pull/13137)) - [SourceDoctor](https://github.com/SourceDoctor)
+
+#### Security
+* Use the same error message for different kind of authentiction errors ([#13306](https://github.com/librenms/librenms/pull/13306)) - [Jellyfrog](https://github.com/Jellyfrog)
+
+#### Device
+* Added support for Teltonika RUTX series routers ([#13350](https://github.com/librenms/librenms/pull/13350)) - [hjcday](https://github.com/hjcday)
+* Ericsson TN - Wireless MSE ([#13328](https://github.com/librenms/librenms/pull/13328)) - [loopodoopo](https://github.com/loopodoopo)
+* Ciena 6500 Optics sensors ([#13324](https://github.com/librenms/librenms/pull/13324)) - [loopodoopo](https://github.com/loopodoopo)
+* Ericsson Traffic Node support ([#13299](https://github.com/librenms/librenms/pull/13299)) - [loopodoopo](https://github.com/loopodoopo)
+* Procurve E model prefix fix ([#13261](https://github.com/librenms/librenms/pull/13261)) - [maxnz](https://github.com/maxnz)
+* Fix axis cam discovery ([#13258](https://github.com/librenms/librenms/pull/13258)) - [maxnz](https://github.com/maxnz)
+* Wireless and GSM Basic Monitoring ([#13255](https://github.com/librenms/librenms/pull/13255)) - [Cupidazul](https://github.com/Cupidazul)
+* Added SAF Integra-X OS Support ([#13236](https://github.com/librenms/librenms/pull/13236)) - [noaheroufus](https://github.com/noaheroufus)
+* Arubaos cx hardware ([#13045](https://github.com/librenms/librenms/pull/13045)) - [maxnz](https://github.com/maxnz)
+* MegaRaid controller in Linux (Broadcom/LSI) ([#12999](https://github.com/librenms/librenms/pull/12999)) - [mpikzink](https://github.com/mpikzink)
+* Add Ericsson IPOS router support ([#12625](https://github.com/librenms/librenms/pull/12625)) - [lutfisan](https://github.com/lutfisan)
+
+#### Webui
+* Alert detail display fix ([#13335](https://github.com/librenms/librenms/pull/13335)) - [SourceDoctor](https://github.com/SourceDoctor)
+* Show Detail by default Option on Alert Widget ([#13309](https://github.com/librenms/librenms/pull/13309)) - [SourceDoctor](https://github.com/SourceDoctor)
+* Fix various port links ([#13296](https://github.com/librenms/librenms/pull/13296)) - [murrant](https://github.com/murrant)
+* Add ORDER BY to the ports query when showing the ports list on device… ([#13276](https://github.com/librenms/librenms/pull/13276)) - [peelman](https://github.com/peelman)
+* Use local timezone for outages pages ([#13274](https://github.com/librenms/librenms/pull/13274)) - [ottorei](https://github.com/ottorei)
+* Remove device dark mode detection ([#13273](https://github.com/librenms/librenms/pull/13273)) - [murrant](https://github.com/murrant)
+* Linkable graph component ([#13263](https://github.com/librenms/librenms/pull/13263)) - [murrant](https://github.com/murrant)
+* Improve tailwind dark theme colors ([#13262](https://github.com/librenms/librenms/pull/13262)) - [murrant](https://github.com/murrant)
+* Workaround for dashboard widgets showing over popups. ([#13257](https://github.com/librenms/librenms/pull/13257)) - [murrant](https://github.com/murrant)
+
+#### Alerting
+* Fix alert transport api with POST method ([#13288](https://github.com/librenms/librenms/pull/13288)) - [Laplacence](https://github.com/Laplacence)
+
+#### Graphs
+* Fix graphs showing bps instead of pps ([#13266](https://github.com/librenms/librenms/pull/13266)) - [Cupidazul](https://github.com/Cupidazul)
+
+#### Snmp Traps
+* HP Fault Traps ([#13254](https://github.com/librenms/librenms/pull/13254)) - [mpikzink](https://github.com/mpikzink)
+* Veeam backup SNMP Traps ([#13170](https://github.com/librenms/librenms/pull/13170)) - [mpikzink](https://github.com/mpikzink)
+
+#### Api
+* Added conditional check for rules parameter on add_device_group ([#13353](https://github.com/librenms/librenms/pull/13353)) - [DanielMuller-TN](https://github.com/DanielMuller-TN)
+* API add_device: respond with more device array ([#13251](https://github.com/librenms/librenms/pull/13251)) - [SourceDoctor](https://github.com/SourceDoctor)
+* API Call to assign/remove a Portgroup to Ports ([#13245](https://github.com/librenms/librenms/pull/13245)) - [SourceDoctor](https://github.com/SourceDoctor)
+* API Call to set instant Maintenance mode ([#13237](https://github.com/librenms/librenms/pull/13237)) - [SourceDoctor](https://github.com/SourceDoctor)
+* API port search by arbitrary field ([#13231](https://github.com/librenms/librenms/pull/13231)) - [SourceDoctor](https://github.com/SourceDoctor)
+
+#### Settings
+* Automatically set rrdtool_version once ([#13327](https://github.com/librenms/librenms/pull/13327)) - [murrant](https://github.com/murrant)
+
+#### Discovery
+* Quick fix for route discovery on PHP8 ([#13284](https://github.com/librenms/librenms/pull/13284)) - [murrant](https://github.com/murrant)
+
+#### Polling
+* Dispatcher bugfix queues not being disabled properly ([#13364](https://github.com/librenms/librenms/pull/13364)) - [murrant](https://github.com/murrant)
+* Fix for cimc polling on PHP8 ([#13357](https://github.com/librenms/librenms/pull/13357)) - [murrant](https://github.com/murrant)
+* Dispatch Service: Don't stop dispatching if master moves to a node with a queue disabled ([#13355](https://github.com/librenms/librenms/pull/13355)) - [murrant](https://github.com/murrant)
+* Fix device query when last_polled_timetaken is null ([#13331](https://github.com/librenms/librenms/pull/13331)) - [murrant](https://github.com/murrant)
+* Restore accidentally removed code ([#13330](https://github.com/librenms/librenms/pull/13330)) - [murrant](https://github.com/murrant)
+* Allow non-snmp modules to run when snmp disabled ([#13321](https://github.com/librenms/librenms/pull/13321)) - [murrant](https://github.com/murrant)
+* Fix python config fetch disrupted by stderr output ([#13295](https://github.com/librenms/librenms/pull/13295)) - [murrant](https://github.com/murrant)
+* Fix poller wrapper error ([#13290](https://github.com/librenms/librenms/pull/13290)) - [murrant](https://github.com/murrant)
+
+#### Oxidized
+* Added OneOS map for Oxidized ([#13313](https://github.com/librenms/librenms/pull/13313)) - [calvinthefreak](https://github.com/calvinthefreak)
+
+#### Authentication
+* Improvements to SSO Authorization and logout handling ([#13311](https://github.com/librenms/librenms/pull/13311)) - [gs-kamnas](https://github.com/gs-kamnas)
+
+#### Bug
+* Fix poller groups reverting when setting via the Web UI. ([#13363](https://github.com/librenms/librenms/pull/13363)) - [murrant](https://github.com/murrant)
+* Rename config var auth_redirect_handler -\> auth_logout_handler ([#13329](https://github.com/librenms/librenms/pull/13329)) - [gs-kamnas](https://github.com/gs-kamnas)
+* HrSystem Columns have to be optional ([#13316](https://github.com/librenms/librenms/pull/13316)) - [SourceDoctor](https://github.com/SourceDoctor)
+* Hrsystem write fix ([#13314](https://github.com/librenms/librenms/pull/13314)) - [SourceDoctor](https://github.com/SourceDoctor)
+* Check if vlan-\>port exists ([#13305](https://github.com/librenms/librenms/pull/13305)) - [Jellyfrog](https://github.com/Jellyfrog)
+* Fix html.device.links validation ([#13269](https://github.com/librenms/librenms/pull/13269)) - [murrant](https://github.com/murrant)
+* Fix lnms some commands throwing errors ([#13265](https://github.com/librenms/librenms/pull/13265)) - [murrant](https://github.com/murrant)
+
+#### Refactor
+* SnmpQuery updates and more tests ([#13359](https://github.com/librenms/librenms/pull/13359)) - [murrant](https://github.com/murrant)
+* Remove load_os and load_discovery functions ([#13345](https://github.com/librenms/librenms/pull/13345)) - [murrant](https://github.com/murrant)
+* Rename NetSnmp to SnmpQuery ([#13344](https://github.com/librenms/librenms/pull/13344)) - [murrant](https://github.com/murrant)
+* Use Measurements for all statistic collection ([#13333](https://github.com/librenms/librenms/pull/13333)) - [murrant](https://github.com/murrant)
+* Use built in trusted proxy functionality ([#13318](https://github.com/librenms/librenms/pull/13318)) - [murrant](https://github.com/murrant)
+* Connectivity Helper to check and record device reachability ([#13315](https://github.com/librenms/librenms/pull/13315)) - [murrant](https://github.com/murrant)
+* Cleanup config.php.default ([#13297](https://github.com/librenms/librenms/pull/13297)) - [murrant](https://github.com/murrant)
+* SNMP Capabilities ([#13289](https://github.com/librenms/librenms/pull/13289)) - [murrant](https://github.com/murrant)
+* Cleanup device type override code ([#13256](https://github.com/librenms/librenms/pull/13256)) - [murrant](https://github.com/murrant)
+* Full Python code fusion / refactor and hardening 2nd edition ([#13188](https://github.com/librenms/librenms/pull/13188)) - [deajan](https://github.com/deajan)
+* Convert all ports backend to Laravel style ajax table ([#13184](https://github.com/librenms/librenms/pull/13184)) - [murrant](https://github.com/murrant)
+
+#### Documentation
+* Change "move" to "migrate" to make it easier to find ([#13365](https://github.com/librenms/librenms/pull/13365)) - [murrant](https://github.com/murrant)
+* Updated link to Dan Brown's migration scripts ([#13354](https://github.com/librenms/librenms/pull/13354)) - [mctaguma](https://github.com/mctaguma)
+* Edit existing install url ([#13342](https://github.com/librenms/librenms/pull/13342)) - [murrant](https://github.com/murrant)
+* Oxidized doc update, links and ignore groups ([#13341](https://github.com/librenms/librenms/pull/13341)) - [murrant](https://github.com/murrant)
+* Update docs: Update Dispatcher service documentation ([#13339](https://github.com/librenms/librenms/pull/13339)) - [ottorei](https://github.com/ottorei)
+* Send security researchers to Discord ([#13319](https://github.com/librenms/librenms/pull/13319)) - [murrant](https://github.com/murrant)
+* Fix to puppet snmp extend formatting ([#13312](https://github.com/librenms/librenms/pull/13312)) - [si458](https://github.com/si458)
+* Update formatting of Prometheus extension doc ([#13291](https://github.com/librenms/librenms/pull/13291)) - [topranks](https://github.com/topranks)
+
+#### Tests
+* Disallow usage of deprecated functions ([#13267](https://github.com/librenms/librenms/pull/13267)) - [Jellyfrog](https://github.com/Jellyfrog)
+
+#### Dependencies
+* Bump composer/composer from 2.1.8 to 2.1.9 ([#13336](https://github.com/librenms/librenms/pull/13336)) - [dependabot](https://github.com/apps/dependabot)
+* Update dependencies ([#13310](https://github.com/librenms/librenms/pull/13310)) - [Jellyfrog](https://github.com/Jellyfrog)
+
+
 ## 21.9.0
 *(2021-09-16)*
 

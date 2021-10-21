@@ -48,12 +48,12 @@ foreach ($ports_mapped['maps']['ifIndex'] as $ifIndex => $port_id) {
 
 // Fill ifAlias for fibrechannel ports
 if ($device['os'] == 'fabos') {
-    require_once 'ports/brocade.inc.php';
+    require base_path('includes/discovery/ports/brocade.inc.php');
 }
 
 //Shorten Ekinops Interfaces
 if ($device['os'] == 'ekinops') {
-    require_once 'ports/ekinops.inc.php';
+    require base_path('includes/discovery/ports/ekinops.inc.php');
 }
 
 $default_port_group = Config::get('default_port_group');
