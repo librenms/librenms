@@ -25,12 +25,9 @@ namespace LibreNMS\Alert\Transport;
 
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
-use Illuminate\Http\Request;
 use LibreNMS\Alert\Transport;
 use LibreNMS\Enum\AlertState;
 use LibreNMS\Util\Proxy;
-use Log;
-use Validator;
 
 class Pagerduty extends Transport
 {
