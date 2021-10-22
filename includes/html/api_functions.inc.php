@@ -1442,8 +1442,8 @@ function list_oxidized(Illuminate\Http\Request $request)
     $return = [];
     $device_groups = DeviceGroup::whereIn('name', Config::get('oxidized.explicit_device_groups', []))->get();
 
-    if(! empty($device_groups)) {
-        foreach($device_groups as $dev_grp) {
+    if (! empty($device_groups)) {
+        foreach ($device_groups as $dev_grp) {
             foreach ($dev_grp->devices as $device) {
                 $output = [
                     'group' => $dev_grp->name,
@@ -1454,6 +1454,7 @@ function list_oxidized(Illuminate\Http\Request $request)
                 $return[] = $output;
             }
         }
+
         return response()->json($return, 200, [], JSON_PRETTY_PRINT);
     }
 
