@@ -1440,6 +1440,23 @@ function get_oxidized_config(Illuminate\Http\Request $request)
 function list_oxidized(Illuminate\Http\Request $request)
 {
     $return = [];
+    $device_groups = DeviceGroup::whereIn('name', Config::get('oxidized.explicit_device_groups', []))->get();
+
+    if(! empty($device_groups)) {
+        foreach($device_groups as $dev_grp) {
+            foreach ($dev_grp->devices as $device) {
+                $output = [
+                    'group' => $dev_grp->name,
+                    'hostname' => $device->hostname,
+                    'ip' => $device->ip,
+                    'os' => $os_map[$device->os] ?? $device->os,
+                ];
+                $return[] = $output;
+            }
+        }
+        return response()->json($return, 200, [], JSON_PRETTY_PRINT);
+    }
+
     $devices = Device::query()
              ->where('disabled', 0)
              ->when($request->route('hostname'), function ($query, $hostname) {
