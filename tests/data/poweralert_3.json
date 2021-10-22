@@ -1,0 +1,23 @@
+{
+    "os": {
+        "discovery": {
+            "devices": [
+                {
+                    "sysName": "<private>",
+                    "sysObjectID": ".1.3.6.1.4.1.850.1.1.1",
+                    "sysDescr": "Ubuntu 18.04 Linux 4.4.31 flash: 3.34G ram: 247204kB processor: armv7l software: PowerAlert 20.0.1 (Build 118)",
+                    "sysContact": "<private>",
+                    "version": null,
+                    "hardware": null,
+                    "features": null,
+                    "os": "poweralert",
+                    "type": "power",
+                    "serial": null,
+                    "icon": "tripplite.svg",
+                    "location": "<private>"
+                }
+            ]
+        },
+        "poller": "matches discovery"
+    }
+}
