@@ -109,16 +109,6 @@ class Pagerduty extends Transport
                     ],
                 ],
                 [
-                    'title' => 'Account',
-                    'type'  => 'hidden',
-                    'name'  => 'account',
-                ],
-                [
-                    'title' => 'Service',
-                    'type'  => 'hidden',
-                    'name'  => 'service_name',
-                ],
-                [
                     'title' => 'Routing Key',
                     'type'  => 'text',
                     'name'  => 'service_key',
