@@ -103,22 +103,6 @@ class Pagerduty extends Transport
         return [
             'config' => [
                 [
-                    'title' => 'Authorize (EU)',
-                    'descr' => 'Alert with PagerDuty',
-                    'type'  => 'oauth',
-                    'icon'  => 'pagerduty-white.svg',
-                    'class' => 'btn-success',
-                    'url'   => 'https://connect.eu.pagerduty.com/connect?vendor=' . self::$integrationKey . '&callback=',
-                ],
-                [
-                    'title' => 'Authorize (US)',
-                    'descr' => 'Alert with PagerDuty',
-                    'type'  => 'oauth',
-                    'icon'  => 'pagerduty-white.svg',
-                    'class' => 'btn-success',
-                    'url'   => 'https://connect.pagerduty.com/connect?vendor=' . self::$integrationKey . '&callback=',
-                ],
-                [
                     'title' => 'Service Region',
                     'name' => 'region',
                     'descr' => 'Service Region of the PagerDuty account',
