@@ -35,7 +35,6 @@ use Validator;
 class Pagerduty extends Transport
 {
     protected $name = 'PagerDuty';
-    public static $integrationKey = '2fc7c9f3c8030e74aae6';
 
     public function deliverAlert($obj, $opts)
     {
@@ -132,33 +131,5 @@ class Pagerduty extends Transport
                 'region' => 'in:EU,US',
             ],
         ];
-    }
-
-    public function handleOauth(Request $request)
-    {
-        $validator = Validator::make($request->all(), [
-            'account' => 'alpha_dash',
-            'service_key' => 'regex:/^[a-fA-F0-9]+$/',
-            'service_name' => 'string',
-        ]);
-
-        if ($validator->fails()) {
-            Log::error('Pagerduty oauth failed validation.', ['request' => $request->all()]);
-
-            return false;
-        }
-
-        $config = json_encode($request->only('account', 'service_key', 'service_name'));
-
-        if ($id = $request->get('id')) {
-            return (bool) dbUpdate(['transport_config' => $config], 'alert_transports', 'transport_id=?', [$id]);
-        } else {
-            return (bool) dbInsert([
-                'transport_name' => $request->get('service_name', 'PagerDuty'),
-                'transport_type' => 'pagerduty',
-                'is_default' => 0,
-                'transport_config' => $config,
-            ], 'alert_transports');
-        }
     }
 }
