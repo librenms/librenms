@@ -123,7 +123,7 @@ class Pagerduty extends Transport
                     'name'  => 'service_name',
                 ],
                 [
-                    'title' => 'Integration Key',
+                    'title' => 'Routing Key',
                     'type'  => 'text',
                     'name'  => 'service_key',
                 ],
