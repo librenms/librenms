@@ -1,0 +1,523 @@
+-- MIB.  Import this into your MIB Browser software.
+-- This is for West Mountain Radio RIGrunner 4005i
+
+RMCU DEFINITIONS ::= BEGIN
+
+IMPORTS
+   --enterprises, IpAddress, Gauge, TimeTicks     FROM RFC1155-SMI
+   DisplayString                                FROM RFC1213-MIB
+   OBJECT-TYPE                                  FROM RFC-1212
+   TEXTUAL-CONVENTION                           FROM SNMPv2-TC
+   NOTIFICATION-TYPE, Gauge32, Integer32, enterprises, MODULE-IDENTITY                   FROM SNMPv2-SMI
+   TRAP-TYPE                                    FROM RFC-1215;
+
+rr4005i MODULE-IDENTITY
+    LAST-UPDATED "201710111300Z"
+    ORGANIZATION "West Mountain Radio"
+    CONTACT-INFO "www.westmountainradio.com"
+    DESCRIPTION  "West Mountain Radio RIGrunner 4005i"
+    REVISION     "201710111300Z"
+    DESCRIPTION  "Revision"
+    ::= { enterprises 15117 1 }
+   
+wmr                           OBJECT IDENTIFIER ::=  { enterprises 15117 }
+
+product                            OBJECT IDENTIFIER ::=  { rr4005i 1 }
+control                             OBJECT IDENTIFIER ::=  { rr4005i 2 }
+control-ints                        OBJECT IDENTIFIER ::=  { rr4005i 4 }
+traps 			OBJECT IDENTIFIER ::=  { rr4005i 3 }
+
+-- ON-OFF          ::=   INTEGER { ON(1), OFF(0) }
+
+FixedDiv1000 ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d-3"
+    STATUS       current
+    DESCRIPTION  "Fixed point, thousandths"
+    SYNTAX       Integer32
+
+name    OBJECT-TYPE
+   SYNTAX DisplayString
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+      "Unit name"
+   ::= { product 1 }
+   
+
+version    OBJECT-TYPE
+   SYNTAX DisplayString
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+      "Software and hardware version"
+   ::= { product 2 }
+   
+build-date    OBJECT-TYPE
+   SYNTAX DisplayString
+   MAX-ACCESS read-only
+   STATUS current
+   DESCRIPTION
+      "Date of software was built"
+   ::= { product 3 }
+
+   
+   
+analog1name OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION 
+        "Name of analog input #1"
+    ::= { control 1 }
+    
+analog1val OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION 
+        "Value of analog input #1"
+    ::= { control 2 }
+    
+analog2name OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION 
+        "Name of analog input #2"
+    ::= { control 3 }
+    
+analog2val OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION 
+        "Value of analog input #2"
+    ::= { control 4 }
+    
+analog3name OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION 
+        "Name of analog input #3"
+    ::= { control 5 }
+    
+analog3val OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION 
+        "Value of analog input #3"
+    ::= { control 6 }
+    
+analog4name OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION 
+        "Name of analog input #4"
+    ::= { control 7 }
+    
+analog4val OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION 
+        "Value of analog input #4"
+    ::= { control 8 }
+    
+analog5name OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION 
+        "Name of analog input #5"
+    ::= { control 9 }
+    
+analog5val OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION 
+        "Value of analog input #5"
+    ::= { control 10 }
+    
+analog6name OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION 
+        "Name of analog input #6"
+    ::= { control 11 }
+    
+analog6val OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION 
+        "Value of analog input #6"
+    ::= { control 12 }
+
+
+
+
+
+digout1name OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION 
+        "Name of digital output #1"
+    ::= { control 65 }
+    
+digout1val OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "Value of digital output #1"
+    ::= { control 66 }
+    
+digout2name OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION 
+        "Name of digital output #2"
+    ::= { control 67 }
+    
+digout2val OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "Value of digital output #2"
+    ::= { control 68 }
+    
+digout3name OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION 
+        "Name of digital output #3"
+    ::= { control 69 }
+    
+digout3val OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "Value of digital output #3"
+    ::= { control 70 }
+    
+digout4name OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION 
+        "Name of digital output #4"
+    ::= { control 71 }
+    
+digout4val OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "Value of digital output #4"
+    ::= { control 72 }
+
+digout5name OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION 
+        "Name of digital output #5"
+    ::= { control 73 }
+    
+digout5val OBJECT-TYPE
+    SYNTAX INTEGER
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION 
+        "Value of digital output #5"
+    ::= { control 74 }
+
+
+    
+
+
+
+
+
+
+
+analog1val-int OBJECT-TYPE
+    SYNTAX FixedDiv1000
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION 
+        "Value of analog input #1"
+    ::= { control-ints 1 }
+    
+analog2val-int OBJECT-TYPE
+    SYNTAX FixedDiv1000
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION 
+        "Value of analog input #2"
+    ::= { control-ints 2 }
+    
+analog3val-int OBJECT-TYPE
+    SYNTAX FixedDiv1000
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION 
+        "Value of analog input #3"
+    ::= { control-ints 3 }
+    
+analog4val-int OBJECT-TYPE
+    SYNTAX FixedDiv1000
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION 
+        "Value of analog input #4"
+    ::= { control-ints 4 }
+    
+analog5val-int OBJECT-TYPE
+    SYNTAX FixedDiv1000
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION 
+        "Value of analog input #5"
+    ::= { control-ints 5 }
+    
+analog6val-int OBJECT-TYPE
+    SYNTAX FixedDiv1000
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION 
+        "Value of analog input #6"
+    ::= { control-ints 6 }
+    
+
+
+
+
+
+
+
+trap-auth NOTIFICATION-TYPE
+	STATUS current
+	DESCRIPTION 
+		"Trap caused by authorization failure"
+	::= {traps 1}
+   
+trap-analog-over1 NOTIFICATION-TYPE
+	OBJECTS {name, analog1val}
+	STATUS current
+	DESCRIPTION 
+		"Trap caused by analog input #1 being over threshold"
+	::= {traps 2}
+
+trap-analog-over2 NOTIFICATION-TYPE
+	OBJECTS {name, analog2val}
+	STATUS current
+	DESCRIPTION 
+		"Trap caused by analog input #2 being over threshold"
+	::= {traps 3}
+
+trap-analog-over3 NOTIFICATION-TYPE
+	OBJECTS {name, analog3val}
+	STATUS current
+	DESCRIPTION 
+		"Trap caused by analog input #3 being over threshold"
+	::= {traps 4}
+   
+trap-analog-over4 NOTIFICATION-TYPE
+	OBJECTS {name, analog4val}
+	STATUS current
+	DESCRIPTION 
+		"Trap caused by analog input #4 being over threshold"
+	::= {traps 5}
+
+trap-analog-over5 NOTIFICATION-TYPE
+	OBJECTS {name, analog5val}
+	STATUS current
+	DESCRIPTION 
+		"Trap caused by analog input #5 being over threshold"
+	::= {traps 6}
+
+trap-analog-over6 NOTIFICATION-TYPE
+	OBJECTS {name, analog6val}
+	STATUS current
+	DESCRIPTION 
+		"Trap caused by analog input #6 being over threshold"
+	::= {traps 7}
+
+
+
+
+
+
+trap-analog-under6 NOTIFICATION-TYPE
+	OBJECTS {name, analog6val}
+	STATUS current
+	DESCRIPTION 
+		"Trap caused by analog input #6 being under threshold"
+	::= {traps 23}
+
+   
+trap-poweron NOTIFICATION-TYPE
+	OBJECTS {name}
+	STATUS current
+	DESCRIPTION 
+		"Trap caused by power-on"
+	::= {traps 34}
+
+
+
+
+trap-test NOTIFICATION-TYPE
+	OBJECTS {name}
+	STATUS current
+	DESCRIPTION 
+		"Trap caused by user test"
+	::= {traps 52}  
+
+
+
+
+
+trap-digout-inactive1 NOTIFICATION-TYPE
+	OBJECTS {name}
+	STATUS current
+	DESCRIPTION 
+		"Trap caused by digitout output #1 going inactive"
+	::= {traps 72}
+   
+trap-digout-inactive2 NOTIFICATION-TYPE
+	OBJECTS {name}
+	STATUS current
+	DESCRIPTION 
+		"Trap caused by digitout output #2 going inactive"
+	::= {traps 73}
+   
+trap-digout-inactive3 NOTIFICATION-TYPE
+	OBJECTS {name}
+	STATUS current
+	DESCRIPTION 
+		"Trap caused by digitout output #3 going inactive"
+	::= {traps 74}
+   
+trap-digout-inactive4 NOTIFICATION-TYPE
+	OBJECTS {name}
+	STATUS current
+	DESCRIPTION 
+		"Trap caused by digitout output #4 going inactive"
+	::= {traps 75}
+
+trap-digout-inactive5 NOTIFICATION-TYPE
+	OBJECTS {name}
+	STATUS current
+	DESCRIPTION 
+		"Trap caused by digitout output #5 going inactive"
+	::= {traps 76}
+
+
+
+trap-digout-active1 NOTIFICATION-TYPE
+	OBJECTS {name}
+	STATUS current
+	DESCRIPTION 
+		"Trap caused by digitout output #1 going active"
+	::= {traps 88}
+   
+trap-digout-active2 NOTIFICATION-TYPE
+	OBJECTS {name}
+	STATUS current
+	DESCRIPTION 
+		"Trap caused by digitout output #2 going active"
+	::= {traps 89}
+   
+trap-digout-active3 NOTIFICATION-TYPE
+	OBJECTS {name}
+	STATUS current
+	DESCRIPTION 
+		"Trap caused by digitout output #3 going active"
+	::= {traps 90}
+   
+trap-digout-active4 NOTIFICATION-TYPE
+	OBJECTS {name}
+	STATUS current
+	DESCRIPTION 
+		"Trap caused by digitout output #4 going active"
+	::= {traps 91}
+
+trap-digout-active5 NOTIFICATION-TYPE
+	OBJECTS {name}
+	STATUS current
+	DESCRIPTION 
+		"Trap caused by digitout output #5 going active"
+	::= {traps 92}
+
+
+
+
+
+
+trap-analog-urecover6 NOTIFICATION-TYPE
+	OBJECTS {name, analog6val}
+	STATUS current
+	DESCRIPTION 
+		"Trap caused by analog input #6 recovering from under alarm"
+	::= {traps 109}
+
+   
+trap-analog-orecover1 NOTIFICATION-TYPE
+	OBJECTS {name, analog1val}
+	STATUS current
+	DESCRIPTION 
+		"Trap caused by analog input #1 recovering from over alarm"
+	::= {traps 120}
+
+trap-analog-orecover2 NOTIFICATION-TYPE
+	OBJECTS {name, analog2val}
+	STATUS current
+	DESCRIPTION 
+		"Trap caused by analog input #2 recovering from over alarm"
+	::= {traps 121}
+   
+trap-analog-orecover3 NOTIFICATION-TYPE
+	OBJECTS {name, analog3val}
+	STATUS current
+	DESCRIPTION 
+		"Trap caused by analog input #3 recovering from over alarm"
+	::= {traps 122}
+   
+trap-analog-orecover4 NOTIFICATION-TYPE
+	OBJECTS {name, analog4val}
+	STATUS current
+	DESCRIPTION 
+		"Trap caused by analog input #4 recovering from over alarm"
+	::= {traps 123}
+
+trap-analog-orecover5 NOTIFICATION-TYPE
+	OBJECTS {name, analog5val}
+	STATUS current
+	DESCRIPTION 
+		"Trap caused by analog input #5 recovering from over alarm"
+	::= {traps 124}
+   
+trap-analog-orecover6 NOTIFICATION-TYPE
+	OBJECTS {name, analog6val}
+	STATUS current
+	DESCRIPTION 
+		"Trap caused by analog input #6 recovering from over alarm"
+	::= {traps 125}
+
+
+
+
+
+
+END

@@ -554,7 +554,7 @@ devices_attribs:
   Columns:
     - { Field: attrib_id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
     - { Field: device_id, Type: 'int unsigned', 'Null': false, Extra: '' }
-    - { Field: attrib_type, Type: varchar(32), 'Null': false, Extra: '' }
+    - { Field: attrib_type, Type: varchar(64), 'Null': false, Extra: '' }
     - { Field: attrib_value, Type: text, 'Null': false, Extra: '' }
     - { Field: updated, Type: timestamp, 'Null': false, Extra: 'on update CURRENT_TIMESTAMP', Default: CURRENT_TIMESTAMP }
   Indexes:
