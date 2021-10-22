@@ -338,7 +338,7 @@ TmnxPortClass                    ::= TEXTUAL-CONVENTION
         xlgige     (10),
         cgige      (11),
         vsme       (12),
-        reserved13 (13),
+        gnss       (13),
         vspeede    (14),
         serial     (17),
         wireless   (18),
@@ -347,7 +347,8 @@ TmnxPortClass                    ::= TEXTUAL-CONVENTION
         cdgige     (21),
         reserved22 (22),
         reserved23 (23),
-        lgige      (24)
+        lgige      (24),
+        reserved25 (25)
     }
 
 TmnxPortConnectorType            ::= TEXTUAL-CONVENTION
@@ -1115,7 +1116,8 @@ TmnxCoherentOpticalDefectPoint   ::= TEXTUAL-CONVENTION
              hostTxLaneFifoErr  - Lane TX FIFO error.
              hostTxDeskew       - Deskew lock fault.
              hostRxCorr         - Host Rx FEC corrected bits detected.
-             hostRxUncorr       - Host Rx FEC uncorrectable error detected."
+             hostRxUncorr       - Host Rx FEC uncorrectable error detected.
+             commFail           - Communication failure."
     SYNTAX      BITS {
         overTemp          (0),
         hwPost            (1),
@@ -1143,7 +1145,8 @@ TmnxCoherentOpticalDefectPoint   ::= TEXTUAL-CONVENTION
         hostTxLaneFifoErr (23),
         hostTxDeskew      (24),
         hostRxCorr        (25),
-        hostRxUncorr      (26)
+        hostRxUncorr      (26),
+        commFail          (27)
     }
 
 TmnxCoherentOpticalAlarm         ::= TEXTUAL-CONVENTION
@@ -1155,7 +1158,7 @@ TmnxCoherentOpticalAlarm         ::= TEXTUAL-CONVENTION
 
          moduleFault  - logical OR of defect points 'overTemp(0)',
                         'hwPost(1)', 'pldFlashInit(2)', 'powerSupply(3)',
-                        'chkSum(4)'
+                        'chkSum(4)', 'commFail(27)'
 
          module       - logical OR of defect points 'refClkIn(5)',
                         'txJitPllLol(6)', 'txCmuLol(7)', 'txLossFunc(8)',
@@ -1322,6 +1325,46 @@ TmnxCrcPolynomial                ::= TEXTUAL-CONVENTION
         poly4 (4),
         poly5 (5),
         poly6 (6)
+    }
+
+TmnxPortGnssConstellation        ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "TmnxPortGnssConstellation specifies or indicates which constellation
+         types the installed GNSS receiver module shall process.
+
+         gps      - Global Positioning System. Owned by the United States government.
+
+         glonass  - GLObal NAvigation Satellite System. Owned by the Russian
+                    government."
+    SYNTAX      BITS {
+        gps     (0),
+        glonass (1)
+    }
+
+TmnxPortGnssAntennaStatus        ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "TmnxPortGnssAntennaStatus indicates the status of the GNSS receiver
+         module's antenna."
+    SYNTAX      INTEGER {
+        unknown       (0),
+        unsupported   (1),
+        ok            (2),
+        overCurrent   (3),
+        underCurrent  (4),
+        noBiasVoltage (5)
+    }
+
+TmnxPortGnssSyncStatus           ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "TmnxPortGnssSyncStatus indicates the status of the GNSS receiver
+         module with respect to generating a sync-worthy clock signal."
+    SYNTAX      INTEGER {
+        unknown   (0),
+        locked    (1),
+        notLocked (2)
     }
 
 tmnxPortConformance              OBJECT IDENTIFIER ::= { tmnxHwConformance 2 }
@@ -2437,6 +2480,7 @@ tmnxPortComplianceV19v0          MODULE-COMPLIANCE
             tmnxPortEtherLoopbackGroup,
             tmnxPortTDMGroupV19v0,
             tmnxPortNotificationV19v0Group,
+            tmnxPortAdapterGroupV19v0,
             tmnxPortEtherPhysStatsV19v0Group
         }
     ::= { tmnxPortCompliances 14 }
@@ -2545,7 +2589,19 @@ tmnxPortComplianceV20v0          MODULE-COMPLIANCE
             tmnxRS232PortNotifyGroup,
             tmnxPortVsrGroup,
             tmnxPortTransceiverGroupV15v0,
-            tmnxNamedPoolGroupV20v0
+            tmnxPortStatsGroupV20v0,
+            tmnxPortRxPauseFramesV20v0Group,
+            tmnxPortGNSSGroupV20v0,
+            tmnxPortGnssNotifV20v0Group,
+            tmnxPortPoolGroupV20v0,
+            tmnxPortNetEgrQMonQDepthV20v0Grp,
+            tPortNetEgrPortQMonQDepV20v0Grp,
+            tmnxPortEsmcTunV20v0Group,
+            tPortEgrPSAggStatsV20v0Group,
+            tmnxPortNotifyObjsGroupV20v0,
+            tmnxDDMLaneGroupV20v0,
+            tmnxPortTransceiverGroupV20v0,
+            tmnxPortNotificationGroupV20v0
         }
     ::= { tmnxPortCompliances 15 }
 
@@ -5074,7 +5130,7 @@ tmnxPortNotifyObjsGroupV8v9      OBJECT-GROUP
         tmnxObjAppResvCbsNew,
         tmnxObjAppResvSizeOld
     }
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The group of objects supporting physical port notifications for
          revision 8.0R9 on Nokia SROS series systems."
@@ -6465,6 +6521,33 @@ tmnxPortTransceiverGroupV15v0    OBJECT-GROUP
 
 tmnxPortGnssGroups               OBJECT IDENTIFIER ::= { tmnxPortGroups 141 }
 
+tmnxPortGNSSGroupV20v0           OBJECT-GROUP
+    OBJECTS     {
+        tmnxPortGnssTableLastChanged,
+        tmnxPortGnssLastChanged,
+        tmnxPortGnssConstellation,
+        tmnxPortGnssAntennaCableDelay,
+        tmnxPortGnssElevationMaskAngle,
+        tmnxPortGnssVisibleSatelliteCnt,
+        tmnxPortGnssUsedSatelliteCount,
+        tmnxPortGnssAntennaStatus,
+        tmnxPortGnssSyncStatus,
+        tmnxPortGnssPositionLatitude,
+        tmnxPortGnssPositionLongitude,
+        tmnxPortGnssPositionAltitude,
+        tmnxPortGnssPositionValid,
+        tmnxPortGnssDateAndTime,
+        tmnxPortGnssReceiverStatus,
+        tmnxPortGnssCurUtcOffset,
+        tmnxPortGnssCurUtcOffsetValid,
+        tmnxPortGnssReceiverFwVersion
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting the management of Global Navigation
+         Satellite System (GNSS) ports on Nokia SROS series systems."
+    ::= { tmnxPortGnssGroups 3 }
+
 tmnxPortSerialGroups             OBJECT IDENTIFIER ::= { tmnxPortGroups 142 }
 
 tmnxRS232PortGroup               OBJECT-GROUP
@@ -6750,6 +6833,21 @@ tmnxPortNotificationV19v0Group   NOTIFICATION-GROUP
          19.0 on Nokia SROS series systems."
     ::= { tmnxPortV19v0Groups 8 }
 
+tmnxPortAdapterGroupV19v0        OBJECT-GROUP
+    OBJECTS     {
+        tmnxPortAdapterType,
+        tmnxPortAdapterModelNumber,
+        tmnxPortAdapterOUI,
+        tmnxPortAdapterManufactureDate,
+        tmnxPortAdapterSerialNumber,
+        tmnxPortAdapterPartNumber
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting the management of port adapters in
+         release 19.0 of Nokia SROS series systems."
+    ::= { tmnxPortV19v0Groups 9 }
+
 tmnxPortEtherPhysStatsV19v0Group OBJECT-GROUP
     OBJECTS     {
         tmnxPortEtherAccessAcctPolicyId,
@@ -6764,12 +6862,47 @@ tmnxPortEtherPhysStatsV19v0Group OBJECT-GROUP
 
 tmnxPortV20v0Groups              OBJECT IDENTIFIER ::= { tmnxPortGroups 146 }
 
+tmnxPortStatsGroupV20v0          OBJECT-GROUP
+    OBJECTS     {
+        tmnxPortInErrors,
+        tmnxPortOutErrors,
+        tmnxPortInDiscards,
+        tmnxPortOutDiscards,
+        tmnxPortInUnknownProtos
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting the management port statistics in
+         release 20.0 on Nokia SROS series systems."
+    ::= { tmnxPortV20v0Groups 1 }
+
+tmnxPortRxPauseFramesV20v0Group  OBJECT-GROUP
+    OBJECTS     {
+        tmnxPortEtherDiscardRxPauseFrame
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting the management of received pause
+         frames on physical ethernet ports in release 20.0 of Nokia SROS series
+         systems."
+    ::= { tmnxPortV20v0Groups 2 }
+
+tmnxPortGnssNotifV20v0Group      NOTIFICATION-GROUP
+    NOTIFICATIONS {
+        tmnxPortGnssStatusChange
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of notifications extending port GNSS capabilities for
+         revision 20.0 on Nokia SROS series systems."
+    ::= { tmnxPortV20v0Groups 3 }
+
 tmnxNamedPoolGroupV20v0          OBJECT-GROUP
     OBJECTS     {
         tmnxPortIngPoolPercentRate,
         tmnxPortEgrPoolPercentRate
     }
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The group of objects supporting the Named Pool feature for revision
          20.0 on Nokia SROS series systems."
@@ -6785,6 +6918,158 @@ tmnxPortV20v0ObsoleteGroup       OBJECT-GROUP
         "The group of objects supporting the management of named-pool objects
          obsoleted in release 20.0 on Nokia SROS series systems."
     ::= { tmnxPortV20v0Groups 5 }
+
+tmnxPortNotifyObjsGroupV20v0     OBJECT-GROUP
+    OBJECTS     {
+        tmnxObjType,
+        tmnxObjPortId,
+        tmnxObjMdaId,
+        tmnxObjAppType,
+        tmnxObjAppPool,
+        tmnxObjAppResvSize,
+        tmnxObjAppSumOfQResvSize,
+        tmnxObjAppResvCbsOld,
+        tmnxObjAppResvCbsNew,
+        tmnxObjAppResvSizeOld,
+        tmnxPortNotifyAUIResetSource
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting physical port notifications for
+         revision 20.0 on Nokia SROS series systems."
+    ::= { tmnxPortV20v0Groups 6 }
+
+tmnxPortNPV20v0ObsoleteGroup     OBJECT-GROUP
+    OBJECTS     {
+        tmnxObjNamedPoolPolicy
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting the management of additional
+         named-pool objects obsoleted in release 20.0 on Nokia SROS series
+         systems."
+    ::= { tmnxPortV20v0Groups 7 }
+
+tmnxPortPoolGroupV20v0           OBJECT-GROUP
+    OBJECTS     {
+        tmnxPortIngPoolPercentRate,
+        tmnxPortEgrPoolPercentRate
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting the pool feature for revision 20.0 on
+         Nokia SROS series systems."
+    ::= { tmnxPortV20v0Groups 8 }
+
+tmnxPortNetEgrQMonQDepthV20v0Grp OBJECT-GROUP
+    OBJECTS     {
+        tPortNetEgrQOverMonQueueDepth,
+        tPortNetEgrQOverQFastPolling,
+        tPortNetEgrQOverQViolationThres,
+        tPortAccEgrQOverMonQueueDepth,
+        tPortAccEgrQOverQFastPolling,
+        tPortAccEgrQOverQViolationThres
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting Faster Polling Queue Depth Monitoring
+         with Telemetry on Nokia SROS release 20 series systems."
+    ::= { tmnxPortV20v0Groups 9 }
+
+tPortNetEgrPortQMonQDepV20v0Grp  OBJECT-GROUP
+    OBJECTS     {
+        tPortNetEgrPortQOverTblLastChgd,
+        tPortNetEgrPortQOverRowStatus,
+        tPortNetEgrPortQOverLastChanged,
+        tPortNetEgrPortQOverMonQDepth,
+        tPortNetEgrPortQOverQFastPolling,
+        tPortNetEgrPortQOverQVioThres,
+        tPortNetEgrPortQOverQueuePolicy,
+        tPortNetEgrPortQDepthPollPrcnt1,
+        tPortNetEgrPortQDepthPollPrcnt2,
+        tPortNetEgrPortQDepthPollPrcnt3,
+        tPortNetEgrPortQDepthPollPrcnt4,
+        tPortNetEgrPortQDepthPollPrcnt5,
+        tPortNetEgrPortQDepthPollPrcnt6,
+        tPortNetEgrPortQDepthPollPrcnt7,
+        tPortNetEgrPortQDepthPollPrcnt8,
+        tPortNetEgrPortQDepthPollPrcnt9,
+        tPortNetEgrPortQDepthPollPrcnt10,
+        tPortNetEgrPortQDepthAvgPollInt,
+        tPortNetEgrPortQDepthAvgElpsdTme,
+        tPortNetEgrPortQDepthViolTotCnt,
+        tPortNetEgrPortQDepthViolLast,
+        tPortNetEgrPortQDepthHWMPollInt,
+        tPortAccEgrQGrpQDepthViolTotCnt,
+        tPortAccEgrQGrpQDepthViolLast,
+        tPortAccEgrQGrpQDepthHWMPollInt,
+        tPortNetEgrQGrpQDepthViolTotCnt,
+        tPortNetEgrQGrpQDepthViolLast,
+        tPortNetEgrQGrpQDepthHWMPollInt
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting network egress port queue overrides
+         objects for Faster Polling Queue Depth Monitoring with Telemetry on
+         Nokia SROS release 20 series systems."
+    ::= { tmnxPortV20v0Groups 10 }
+
+tmnxPortEsmcTunV20v0Group        OBJECT-GROUP
+    OBJECTS     {
+        tmnxPortEtherSSMEsmcTunnel
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of additional objects supporting ESMC tunnel port
+         capabilities in release 20 of Nokia SROS series systems."
+    ::= { tmnxPortV20v0Groups 12 }
+
+tPortEgrPSAggStatsV20v0Group     OBJECT-GROUP
+    OBJECTS     {
+        tPortEgrPSStLstClrdTime,
+        tPortEgrPSStLvlFwdPkt,
+        tPortEgrPSStLvlFwdOct,
+        tPortEgrPSStLvlDpdPkt,
+        tPortEgrPSStLvlDpdOct
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting the packet and octet counters for
+         traffic exiting the specified port with an applied port scheduler
+         policy in release 20 of Nokia SROS series systems."
+    ::= { tmnxPortV20v0Groups 13 }
+
+tmnxDDMLaneGroupV20v0            OBJECT-GROUP
+    OBJECTS     {
+        tmnxDDMLaneISHErrors
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of additional objects enhancing the management of Digital
+         Diagnostic Monitoring SFFs in release 20.0 of Nokia SROS series
+         systems."
+    ::= { tmnxPortV20v0Groups 14 }
+
+tmnxPortTransceiverGroupV20v0    OBJECT-GROUP
+    OBJECTS     {
+        tmnxPortTransAUIResets,
+        tmnxPortTransLastAUIReset
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting port transceiver information on Nokia
+         SROS series systems introduced in release 20.0."
+    ::= { tmnxPortV20v0Groups 15 }
+
+tmnxPortNotificationGroupV20v0   NOTIFICATION-GROUP
+    NOTIFICATIONS {
+        tmnxPortAUIReset
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of notifications extending port capabilities for revision
+         20.0 on Nokia SROS series systems."
+    ::= { tmnxPortV20v0Groups 16 }
 
 tmnxPortDCCompliances            OBJECT IDENTIFIER ::= { tmnxPortConformance 3 }
 
@@ -7486,13 +7771,11 @@ tmnxResvCbsPoolThreshAmber       NOTIFICATION-TYPE
     DESCRIPTION
         "The notification tmnxResvCbsPoolThreshAmber is generated when a
          reserved-CBS of an object (MDA or port) has crossed threshold value
-         specified by tmnxObjectAppAmbrAlrmThresh or
-         tQ1NamedPoolAmbrAlrmThresh.
+         specified by tmnxObjectAppAmbrAlrmThresh.
 
          [EFFECT] This is warning event but the traffic is not yet affected.
 
-         [RECOVERY] The value of tmnxObjectAppResvCbs or
-         TIMETRA-QOS-MIB::tQ1NamedPoolReservedCbs may need to be adjusted."
+         [RECOVERY] The value of tmnxObjectAppResvCbs may need to be adjusted."
     ::= { tmnxPortNotification 50 }
 
 tmnxResvCbsPoolThreshRed         NOTIFICATION-TYPE
@@ -7512,13 +7795,11 @@ tmnxResvCbsPoolThreshRed         NOTIFICATION-TYPE
     DESCRIPTION
         "The notification tmnxResvCbsPoolThreshRed is generated when a
          reserved-CBS of an object (MDA or port) has crossed the threshold
-         value specified by tmnxObjectAppRedAlrmThresh or
-         tQ1NamedPoolRedAlrmThresh.
+         value specified by tmnxObjectAppRedAlrmThresh.
 
          [EFFECT] This is a critical event and the traffic may be affected.
 
-         [RECOVERY] The value of tmnxObjectAppResvCbs or
-         TIMETRA-QOS-MIB::tQ1NamedPoolReservedCbs may need to be adjusted."
+         [RECOVERY] The value of tmnxObjectAppResvCbs may need to be adjusted."
     ::= { tmnxPortNotification 51 }
 
 tmnxEqPortEtherCrcAlarm          NOTIFICATION-TYPE
@@ -7737,6 +8018,53 @@ tmnxPortEtherLoopbackStopped     NOTIFICATION-TYPE
 
          [RECOVERY] No recovery is required."
     ::= { tmnxPortNotification 64 }
+
+tmnxPortGnssStatusChange         NOTIFICATION-TYPE
+    OBJECTS     {
+        tmnxPortGnssSyncStatus,
+        tmnxPortGnssAntennaStatus,
+        tmnxPortGnssReceiverStatus
+    }
+    STATUS      current
+    DESCRIPTION
+        "The tmnxPortGnssStatusChange notification is generated when there is a
+         change in the status of the GNSS receiver. This notification is a
+         point-in-time status change event.
+
+         [CAUSE] This notification may be triggered for a variety of reasons
+         including (but not limited to):
+
+         1) The antenna is experiencing fault issues 2) The number of visible
+         satellites is too low
+
+         [EFFECT] The GNSS receiver is not able to provide a sync-worthy clock
+         signal.
+
+         [RECOVERY] If the customer is expecting the GNSS receiver to be
+         locked, the customer will need to determine the root cause (for
+         example, insufficient visible satellites) and resolve the issue (for
+         example, ensure tmnxPortGnssElevationMaskAngle is set accordingly)"
+    ::= { tmnxPortNotification 65 }
+
+tmnxPortAUIReset                 NOTIFICATION-TYPE
+    OBJECTS     {
+        tmnxPortNotifyPortId,
+        tmnxPortNotifyAUIResetSource
+    }
+    STATUS      current
+    DESCRIPTION
+        "[CAUSE] This log event is used only for connectorized ports where a
+         CAUI reset is not expected. This may indicate an issue with the
+         optical line feeding into the SFF that is passed through to the
+         system.
+
+         [EFFECT] A reset of the AUI will impact all connector-ports on the
+         connector. Generally, AUI resets are recovered immediately but there
+         can be impact to the traffic flow.
+
+         [RECOVERY] As this is reporting an unexpected condition related to the
+         external optical line, the line and the SFF should be investigated."
+    ::= { tmnxPortNotification 66 }
 
 tmnxPortObjs                     OBJECT IDENTIFIER ::= { tmnxHwObjs 4 }
 
@@ -8156,7 +8484,8 @@ tmnxPortTransceiverType          OBJECT-TYPE
         cdfp3Transceiver                     (22),
         microQsfpTransceiver                 (23),
         qsfpDdTransceiver                    (24),
-        cfp2DcoTransceiver                   (25)
+        cfp2DcoTransceiver                   (25),
+        sfpDdTransceiver                     (26)
     }
     MAX-ACCESS  read-only
     STATUS      current
@@ -8258,7 +8587,12 @@ tmnxPortSFPConnectorCode         OBJECT-TYPE
         hssdcII                             (32),
         copperPigtail                       (33),
         rj45                                (34),
+        noSepConn                           (35),
+        mxc2x16                             (36),
         cs                                  (37),
+        snOptConn                           (38),
+        mpo2x12                             (39),
+        mpo1x16                             (40),
         opticalTransceiver                  (51),
         copperGigE                          (128),
         rjp5                                (129)
@@ -9290,7 +9624,9 @@ TmnxPortEtherEntry               ::= SEQUENCE
     tmnxPortEtherLoopback            INTEGER,
     tmnxPortEtherLoopbackSwapMac     TruthValue,
     tmnxPortEtherAccessAcctPolicyId  Unsigned32,
-    tmnxPortEtherAccessCollectStats  TruthValue
+    tmnxPortEtherAccessCollectStats  TruthValue,
+    tmnxPortEtherDiscardRxPauseFrame TruthValue,
+    tmnxPortEtherSSMEsmcTunnel       TruthValue
 }
 
 tmnxPortEtherMTU                 OBJECT-TYPE
@@ -10235,6 +10571,34 @@ tmnxPortEtherAccessCollectStats  OBJECT-TYPE
     DEFVAL      { false }
     ::= { tmnxPortEtherEntry 64 }
 
+tmnxPortEtherDiscardRxPauseFrame OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPortEtherDiscardRxPauseFrame specifies whether or not
+         the processing of received pause frames is enabled.
+
+         When the value of tmnxPortEtherDiscardRxPauseFrame is 'false (2)', the
+         port will operate as before this feature, where a pause frame triggers
+         a delay on sending any frames on the transmit side of the port.
+
+         When the value of tmnxPortEtherDiscardRxPauseFrame is 'true (1), the
+         port wull extract and drop the pause frames, and will not perform any
+         delay processing on the transmit side of the port."
+    DEFVAL      { false }
+    ::= { tmnxPortEtherEntry 65 }
+
+tmnxPortEtherSSMEsmcTunnel       OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPortEtherSSMEsmcTunnel specifies whether or not the
+         MEF EPL Option 2 rules are applied and the ESMC frames are tunneled."
+    DEFVAL      { false }
+    ::= { tmnxPortEtherEntry 66 }
+
 tmnxSonetTable                   OBJECT-TYPE
     SYNTAX      SEQUENCE OF TmnxSonetEntry
     MAX-ACCESS  not-accessible
@@ -11054,12 +11418,14 @@ tmnxSonetPathReportAlarmStatus   OBJECT-TYPE
     ::= { tmnxSonetPathEntry 13 }
 
 tmnxSonetPathMonC2Byte           OBJECT-TYPE
-    SYNTAX      Unsigned32 (0..255)
+    SYNTAX      Unsigned32 (0..255 | 256)
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
         "The tmnxSonetPathC2Byte variable reports the value in the SONET/SDH C2
-         header byte."
+         header byte.
+
+         A value of 256 represents the C2 header byte is unknown."
     ::= { tmnxSonetPathEntry 14 }
 
 tmnxSonetPathMonJ1String         OBJECT-TYPE
@@ -18475,7 +18841,10 @@ TPortAccEgrQOverEntry            ::= SEQUENCE
     tPortAccEgrQOverCIRWeight        TWeightOverride,
     tPortAccEgrQOverMonitorDepth     TruthValue,
     tPortAccEgrQDrpTailLowReductnMbs TBurstPercentOrDefaultOverride,
-    tPortAccEgrQOverBurstLimit       TBurstLimitOverride
+    tPortAccEgrQOverBurstLimit       TBurstLimitOverride,
+    tPortAccEgrQOverMonQueueDepth    TruthValue,
+    tPortAccEgrQOverQFastPolling     TruthValue,
+    tPortAccEgrQOverQViolationThres  Unsigned32
 }
 
 tPortAccEgrQOverQueue            OBJECT-TYPE
@@ -18718,6 +19087,39 @@ tPortAccEgrQOverBurstLimit       OBJECT-TYPE
          shaping burst size of a queue."
     DEFVAL      { -2 }
     ::= { tPortAccEgrQOverEntry 19 }
+
+tPortAccEgrQOverMonQueueDepth    OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tPortAccEgrQOverMonQueueDepth specifies whether to enable
+         queue depth monitoring for this specified queue."
+    DEFVAL      { false }
+    ::= { tPortAccEgrQOverEntry 20 }
+
+tPortAccEgrQOverQFastPolling     OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tPortAccEgrQOverQFastPolling indicates that the depth
+         monitoring should use the new Embedded Control Processor fast-polling."
+    DEFVAL      { false }
+    ::= { tPortAccEgrQOverEntry 21 }
+
+tPortAccEgrQOverQViolationThres  OBJECT-TYPE
+    SYNTAX      Unsigned32 (0 | 1..9999)
+    UNITS       "centipercent"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tPortAccEgrQOverQViolationThres indicates percent of the
+         depth of the queue above which a violation is registered. This is
+         applicable to both the existing queue depth monitoring feature and the
+         fast-polling feature."
+    DEFVAL      { 0 }
+    ::= { tPortAccEgrQOverEntry 22 }
 
 tPortNetEgrQGrpTableLastChgd     OBJECT-TYPE
     SYNTAX      TimeStamp
@@ -18999,7 +19401,10 @@ TPortNetEgrQOverEntry            ::= SEQUENCE
     tPortNetEgrQOverAdminCIRPercent  TCIRPercentOverride,
     tPortNetEgrQOverRateType         TRateType,
     tPortNetEgrQOverMonitorDepth     TruthValue,
-    tPortNetEgrQDrpTailLowReductnMbs TBurstPercentOrDefaultOverride
+    tPortNetEgrQDrpTailLowReductnMbs TBurstPercentOrDefaultOverride,
+    tPortNetEgrQOverMonQueueDepth    TruthValue,
+    tPortNetEgrQOverQFastPolling     TruthValue,
+    tPortNetEgrQOverQViolationThres  Unsigned32
 }
 
 tPortNetEgrQOverQueue            OBJECT-TYPE
@@ -19206,6 +19611,39 @@ tPortNetEgrQDrpTailLowReductnMbs OBJECT-TYPE
          tPortNetEgrQOverMBSBytes."
     DEFVAL      { -2 }
     ::= { tPortNetEgrQOverEntry 16 }
+
+tPortNetEgrQOverMonQueueDepth    OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tPortNetEgrQOverMonQueueDepth specifies whether to enable
+         queue depth monitoring for this specified queue."
+    DEFVAL      { false }
+    ::= { tPortNetEgrQOverEntry 17 }
+
+tPortNetEgrQOverQFastPolling     OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tPortNetEgrQOverQFastPolling indicates that the depth
+         monitoring should use the new Embedded Control Processor fast-polling."
+    DEFVAL      { false }
+    ::= { tPortNetEgrQOverEntry 18 }
+
+tPortNetEgrQOverQViolationThres  OBJECT-TYPE
+    SYNTAX      Unsigned32 (0 | 1..9999)
+    UNITS       "centipercent"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tPortNetEgrQOverQViolationThres indicates percent of the
+         depth of the queue above which a violation is registered. This is
+         applicable to both the existing queue depth monitoring feature and the
+         fast-polling feature."
+    DEFVAL      { 0 }
+    ::= { tPortNetEgrQOverEntry 19 }
 
 tmnxBundleMlfrTable              OBJECT-TYPE
     SYNTAX      SEQUENCE OF TmnxBundleMlfrEntry
@@ -19762,7 +20200,7 @@ tmnxWaveTrackerInUse             OBJECT-TYPE
 
 tmnxWaveTrackerTargetPower       OBJECT-TYPE
     SYNTAX      Integer32 (-2200..300)
-    UNITS       "millibels per milliwatt"
+    UNITS       "millibel-milliwatts"
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
@@ -19945,7 +20383,7 @@ tmnxWaveTrackerAlarmState        OBJECT-TYPE
 
 tmnxWaveTrackerMeasuredPower     OBJECT-TYPE
     SYNTAX      Integer32
-    UNITS       "millibels per milliwatt"
+    UNITS       "millibel-milliwatts"
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
@@ -19959,7 +20397,7 @@ tmnxWaveTrackerMeasuredPower     OBJECT-TYPE
 
 tmnxWaveTrackerMaxAttainablePwr  OBJECT-TYPE
     SYNTAX      Integer32
-    UNITS       "millibels per milliwatt"
+    UNITS       "millibel-milliwatts"
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
@@ -19973,7 +20411,7 @@ tmnxWaveTrackerMaxAttainablePwr  OBJECT-TYPE
 
 tmnxWaveTrackerMinAttainablePwr  OBJECT-TYPE
     SYNTAX      Integer32
-    UNITS       "millibels per milliwatt"
+    UNITS       "millibel-milliwatts"
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
@@ -21030,7 +21468,7 @@ tmnxOpticalPortHasRxTdcm         OBJECT-TYPE
 
 tmnxOpticalPortAmpPowerIn        OBJECT-TYPE
     SYNTAX      Integer32
-    UNITS       "millibels per milliwatt"
+    UNITS       "millibel-milliwatts"
     MAX-ACCESS  read-only
     STATUS      obsolete
     DESCRIPTION
@@ -21065,7 +21503,7 @@ tmnxOpticalPortAmpGain           OBJECT-TYPE
 
 tmnxOpticalPortAmpPowerOut       OBJECT-TYPE
     SYNTAX      Integer32
-    UNITS       "millibels per milliwatt"
+    UNITS       "millibel-milliwatts"
     MAX-ACCESS  read-only
     STATUS      obsolete
     DESCRIPTION
@@ -21168,7 +21606,7 @@ tmnxOpticalPortAmpCtrlState      OBJECT-TYPE
 
 tmnxOpticalPortTdcmPowerIn       OBJECT-TYPE
     SYNTAX      Integer32
-    UNITS       "millibels per milliwatt"
+    UNITS       "millibel-milliwatts"
     MAX-ACCESS  read-only
     STATUS      obsolete
     DESCRIPTION
@@ -21203,7 +21641,7 @@ tmnxOpticalPortTdcmLoss          OBJECT-TYPE
 
 tmnxOpticalPortTdcmPowerOut      OBJECT-TYPE
     SYNTAX      Integer32
-    UNITS       "millibels per milliwatt"
+    UNITS       "millibel-milliwatts"
     MAX-ACCESS  read-only
     STATUS      obsolete
     DESCRIPTION
@@ -21429,7 +21867,8 @@ tmnxOpticalPortLaserTunability   OBJECT-TYPE
     SYNTAX      INTEGER {
         unequipped   (0),
         notTunable   (1),
-        fullyTunable (2)
+        fullyTunable (2),
+        tunable100g  (3)
     }
     MAX-ACCESS  read-only
     STATUS      current
@@ -23040,7 +23479,8 @@ TmnxDDMLaneEntry                 ::= SEQUENCE
     tmnxDDMLaneRxOpticalPwrHiWarn    Integer32,
     tmnxDDMLaneRxOpticalPwrHiAlarm   Integer32,
     tmnxDDMLaneRxOpticalPowerType    INTEGER,
-    tmnxDDMLaneFailedThresholds      TmnxDigitalDiagnosticFailureBits
+    tmnxDDMLaneFailedThresholds      TmnxDigitalDiagnosticFailureBits,
+    tmnxDDMLaneISHErrors             Counter64
 }
 
 tmnxDDMLaneId                    OBJECT-TYPE
@@ -23291,6 +23731,15 @@ tmnxDDMLaneFailedThresholds      OBJECT-TYPE
          state. A set bit indicates that the specified threshold has been
          exceeded."
     ::= { tmnxDDMLaneEntry 23 }
+
+tmnxDDMLaneISHErrors             OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxDDMLaneISHErrors indicates the number of sync header
+         errors (ISH) that occurred on this lane of the optic."
+    ::= { tmnxDDMLaneEntry 24 }
 
 tmnxPortPlcyObjs                 OBJECT IDENTIFIER ::= { tmnxPortObjs 67 }
 
@@ -23711,7 +24160,7 @@ tmnxCohOptPortDispSwpEnd         OBJECT-TYPE
 
 tmnxCohOptPortCfgTxPower         OBJECT-TYPE
     SYNTAX      Integer32 (-2000..300)
-    UNITS       "millibels per milliwatt"
+    UNITS       "millibel-milliwatts"
     MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
@@ -23744,7 +24193,7 @@ tmnxCohOptPortCfgCprWinSize      OBJECT-TYPE
 
 tmnxCohOptPortCfgRxLosThresh     OBJECT-TYPE
     SYNTAX      Integer32 (-3000..-1300)
-    UNITS       "millibels per milliwatt"
+    UNITS       "millibel-milliwatts"
     MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
@@ -25363,7 +25812,10 @@ TPortAccEgrQGrpQDepthInfoEntry   ::= SEQUENCE
     tPortAccEgrQGrpQDepthPollPrcnt9  Unsigned32,
     tPortAccEgrQGrpQDepthPollPrcnt10 Unsigned32,
     tPortAccEgrQGrpQDepthAvgPollInt  Unsigned32,
-    tPortAccEgrQGrpQDepthAvgElpsdTme TimeStamp
+    tPortAccEgrQGrpQDepthAvgElpsdTme TimeStamp,
+    tPortAccEgrQGrpQDepthViolTotCnt  Unsigned32,
+    tPortAccEgrQGrpQDepthViolLast    TimeStamp,
+    tPortAccEgrQGrpQDepthHWMPollInt  Unsigned32
 }
 
 tPortAccEgrQGrpQDepthPollPrcnt1  OBJECT-TYPE
@@ -25496,6 +25948,34 @@ tPortAccEgrQGrpQDepthAvgElpsdTme OBJECT-TYPE
          monitoring clear."
     ::= { tPortAccEgrQGrpQDepthInfoEntry 12 }
 
+tPortAccEgrQGrpQDepthViolTotCnt  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tPortAccEgrQGrpQDepthViolTotCnt represents the total
+         number of per hardware queue violation counts of the component queues."
+    ::= { tPortAccEgrQGrpQDepthInfoEntry 13 }
+
+tPortAccEgrQGrpQDepthViolLast    OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tPortAccEgrQGrpQDepthViolLast represents the most recent
+         violation last seen timestamp of the component queues."
+    ::= { tPortAccEgrQGrpQDepthInfoEntry 14 }
+
+tPortAccEgrQGrpQDepthHWMPollInt  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "microseconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tPortAccEgrQGrpQDepthHWMPollInt represents the weighted
+         average high-watermark polling interval for the elapsed time."
+    ::= { tPortAccEgrQGrpQDepthInfoEntry 15 }
+
 tPortNetEgrQGrpQDepthInfoTable   OBJECT-TYPE
     SYNTAX      SEQUENCE OF TPortNetEgrQGrpQDepthInfoEntry
     MAX-ACCESS  not-accessible
@@ -25537,7 +26017,10 @@ TPortNetEgrQGrpQDepthInfoEntry   ::= SEQUENCE
     tPortNetEgrQGrpQDepthPollPrcnt9  Unsigned32,
     tPortNetEgrQGrpQDepthPollPrcnt10 Unsigned32,
     tPortNetEgrQGrpQDepthAvgPollInt  Unsigned32,
-    tPortNetEgrQGrpQDepthAvgElpsdTme TimeStamp
+    tPortNetEgrQGrpQDepthAvgElpsdTme TimeStamp,
+    tPortNetEgrQGrpQDepthViolTotCnt  Unsigned32,
+    tPortNetEgrQGrpQDepthViolLast    TimeStamp,
+    tPortNetEgrQGrpQDepthHWMPollInt  Unsigned32
 }
 
 tPortNetEgrQGrpQDepthPollPrcnt1  OBJECT-TYPE
@@ -25641,7 +26124,7 @@ tPortNetEgrQGrpQDepthPollPrcnt9  OBJECT-TYPE
 
 tPortNetEgrQGrpQDepthPollPrcnt10 OBJECT-TYPE
     SYNTAX      Unsigned32 (0..10000)
-    UNITS       "hundredths of a percent"
+    UNITS       "centipercent"
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
@@ -25669,6 +26152,34 @@ tPortNetEgrQGrpQDepthAvgElpsdTme OBJECT-TYPE
          elapsed time since the start of queue depth monitoring or the last
          monitoring clear."
     ::= { tPortNetEgrQGrpQDepthInfoEntry 12 }
+
+tPortNetEgrQGrpQDepthViolTotCnt  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tPortNetEgrQGrpQDepthViolTotCnt represents the total
+         number of per hardware queue violation counts of the component queues."
+    ::= { tPortNetEgrQGrpQDepthInfoEntry 13 }
+
+tPortNetEgrQGrpQDepthViolLast    OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tPortNetEgrQGrpQDepthViolLast represents the most recent
+         violation last seen timestamp of the component queues."
+    ::= { tPortNetEgrQGrpQDepthInfoEntry 14 }
+
+tPortNetEgrQGrpQDepthHWMPollInt  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "microseconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tPortNetEgrQGrpQDepthHWMPollInt represents the weighted
+         average high-watermark polling interval for the elapsed time."
+    ::= { tPortNetEgrQGrpQDepthInfoEntry 15 }
 
 tPortEgrVPortMonThrTable         OBJECT-TYPE
     SYNTAX      SEQUENCE OF TPortEgrVPortMonThrEntry
@@ -27437,6 +27948,93 @@ tmnxPortEtherDampStatsMaxPens    OBJECT-TYPE
          possible value of the accumulated penalties against the port."
     ::= { tmnxPortEtherDampeningStatsEntry 3 }
 
+tmnxPortGnssTable                OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxPortGnssEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The tmnxPortGnssTable contains information for physical Global
+         Navigation Satellite System (GNSS) ports."
+    ::= { tmnxPortObjs 105 }
+
+tmnxPortGnssEntry                OBJECT-TYPE
+    SYNTAX      TmnxPortGnssEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each tmnxPortGnssEntry row represents a physical GNSS port in the
+         system.
+
+         Entries in this table are created automatically by the system and
+         cannot be created or destroyed via SNMP SET operations.
+
+         For each tmnxPortGnssEntry, there will be a corresponding entry in the
+         tmnxPortTable and the ifTable."
+    INDEX       {
+        tmnxChassisIndex,
+        tmnxPortPortID
+    }
+    ::= { tmnxPortGnssTable 1 }
+
+TmnxPortGnssEntry                ::= SEQUENCE
+{
+    tmnxPortGnssLastChanged          TimeStamp,
+    tmnxPortGnssConstellation        TmnxPortGnssConstellation,
+    tmnxPortGnssAntennaCableDelay    Unsigned32,
+    tmnxPortGnssElevationMaskAngle   Unsigned32
+}
+
+tmnxPortGnssLastChanged          OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPortGnssLastChanged indicates the value of sysUpTime
+         at the time of the most recent management change to this row."
+    ::= { tmnxPortGnssEntry 1 }
+
+tmnxPortGnssConstellation        OBJECT-TYPE
+    SYNTAX      TmnxPortGnssConstellation
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPortGnssConstellation specifies which constellation
+         types the installed GNSS receiver module shall process."
+    DEFVAL      { {gps} }
+    ::= { tmnxPortGnssEntry 2 }
+
+tmnxPortGnssAntennaCableDelay    OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..32767)
+    UNITS       "nanoseconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPortGnssAntennaCableDelay specifies the expected
+         signal delay, in nanoseconds, resulting from the length of the antenna
+         cable."
+    DEFVAL      { 0 }
+    ::= { tmnxPortGnssEntry 3 }
+
+tmnxPortGnssElevationMaskAngle   OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..89)
+    UNITS       "degrees"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tmnxPortGnssElevationMaskAngle specifies the
+         the elevation mask angle. It provides a method of filtering satellites
+         to be used by the system.
+
+         Elevation angle is the angle above the horizon. When satellites are
+         close to horizon, there is more atmosphere, troposphere, and
+         ionosphere for the signals to go through (ie. more noise). Elevation
+         angle mask determines the minimum elevation angle below which the GNSS
+         receiver module will not use a satellite in its computations.
+
+         Typical values are 10 and 15 degrees."
+    DEFVAL      { 10 }
+    ::= { tmnxPortGnssEntry 4 }
+
 tmnxPortConnectorTblLastChanged  OBJECT-TYPE
     SYNTAX      TimeStamp
     MAX-ACCESS  read-only
@@ -28413,12 +29011,13 @@ tmnxPortStateLicensed            OBJECT-TYPE
 
 tmnxPortRsFecOperMode            OBJECT-TYPE
     SYNTAX      INTEGER {
-        none       (0),
-        cl91514528 (1),
-        cl91514544 (2),
-        cl74       (3),
-        cl108      (4),
-        cl119      (5)
+        none        (0),
+        cl91514528  (1),
+        cl91514544  (2),
+        cl74        (3),
+        cl108       (4),
+        cl119       (5),
+        cl134514544 (6)
     }
     MAX-ACCESS  read-only
     STATUS      current
@@ -28434,7 +29033,8 @@ tmnxPortRsFecOperMode            OBJECT-TYPE
          IEEE 802.3bm, Clause 91, RS-FEC 514/544 encoding
          IEEE 802.3, Clause 74
          IEEE 802.3, Clause 108
-         IEEE 802.3, Clause 119."
+         IEEE 802.3, Clause 119.
+         IEEE 802.3cd, Clause 134, RS-FEC 514/544 encoding."
     ::= { tmnxPortStateEntry 4 }
 
 tmnxPortTransceiverTblLastChgd   OBJECT-TYPE
@@ -28500,6 +29100,784 @@ tmnxPortTransDco                 OBJECT-TYPE
          Coherent Optics (DCO) is enabled on the transceiver."
     DEFVAL      { disabled }
     ::= { tmnxPortTransceiverEntry 2 }
+
+tmnxPortAdapterTable             OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxPortAdapterEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The tmnxPortAdapterTable contains information for port adapters."
+    ::= { tmnxPortObjs 121 }
+
+tmnxPortAdapterEntry             OBJECT-TYPE
+    SYNTAX      TmnxPortAdapterEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each tmnxPortAdapterEntry row represents a port adapter in the system.
+
+         Entries in this table are created automatically by the system and
+         cannot be created or destroyed via SNMP SET operations."
+    INDEX       { tmnxPortPortID }
+    ::= { tmnxPortAdapterTable 1 }
+
+TmnxPortAdapterEntry             ::= SEQUENCE
+{
+    tmnxPortAdapterType              INTEGER,
+    tmnxPortAdapterModelNumber       TNamedItemOrEmpty,
+    tmnxPortAdapterOUI               Unsigned32,
+    tmnxPortAdapterManufactureDate   DateAndTime,
+    tmnxPortAdapterSerialNumber      TNamedItemOrEmpty,
+    tmnxPortAdapterPartNumber        TNamedItemOrEmpty
+}
+
+tmnxPortAdapterType              OBJECT-TYPE
+    SYNTAX      INTEGER {
+        unknown                (0),
+        qsfp28ToSfpPlusOrSfp28 (1),
+        cfpToQsfp28            (2)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPortAdapterType indicates the type of adapter that is
+         equipped."
+    ::= { tmnxPortAdapterEntry 1 }
+
+tmnxPortAdapterModelNumber       OBJECT-TYPE
+    SYNTAX      TNamedItemOrEmpty
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPortAdapterModelNumber indicates the model
+         information for the adapter, as read from the adapter EEPROM.
+
+         The string is expected to contain printable ASCII characters, but
+         unprintable ASCII characters read from the EEPROM are not filtered
+         out."
+    ::= { tmnxPortAdapterEntry 2 }
+
+tmnxPortAdapterOUI               OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPortAdapterOUI indicates the vendor organizationally
+         unique identifier field (OUI) which contains the IEEE company
+         identifier for the vendor. A value of all zero indicates that the
+         vendor OUI is unspecified."
+    ::= { tmnxPortAdapterEntry 3 }
+
+tmnxPortAdapterManufactureDate   OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPortAdapterManufactureDate indicates the vendor's
+         date code."
+    ::= { tmnxPortAdapterEntry 4 }
+
+tmnxPortAdapterSerialNumber      OBJECT-TYPE
+    SYNTAX      TNamedItemOrEmpty
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPortAdapterSerialNumber indicates the adapter's
+         vendor serial number in ASCII characters, as read from the adapter
+         EEPROM.
+
+         An empty string indicates the vendor serial number is unspecified.
+
+         The string is expected to contain printable ASCII characters, but
+         unprintable ASCII characters read from the EEPROM are not filtered
+         out."
+    ::= { tmnxPortAdapterEntry 5 }
+
+tmnxPortAdapterPartNumber        OBJECT-TYPE
+    SYNTAX      TNamedItemOrEmpty
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPortAdapterPartNumber indicates the adapter's vendor
+         part number (or product name) in ASCII characters, as read from the
+         transceiver EEPROM.
+
+         An empty string indicates the vendor part number is unspecified.
+
+         The string is expected to contain printable ASCII characters, but
+         unprintable ASCII characters read from the EEPROM are not filtered
+         out."
+    ::= { tmnxPortAdapterEntry 6 }
+
+tmnxPortGnssTableLastChanged     OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPortGnssTableLastChanged indicate the time, since
+         system startup, when tmnxPortGnssTable last changed configuration.
+
+         If no changes were made to the table since the last re-initialization
+         of the local network management subsystem, then this object contains a
+         zero value."
+    ::= { tmnxPortObjs 122 }
+
+tmnxPortGnssStateTable           OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxPortGnssStateEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The tmnxPortGnssStateTable contains operational information for GNSS
+         ports in the system."
+    ::= { tmnxPortObjs 123 }
+
+tmnxPortGnssStateEntry           OBJECT-TYPE
+    SYNTAX      TmnxPortGnssStateEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each tmnxPortGnssStateEntry row represents a GNSS port in the system
+         and contains GNSS related state information.
+
+         Entries in this table are created automatically by the system and
+         cannot be created or destroyed via SNMP SET operations."
+    INDEX       {
+        tmnxChassisIndex,
+        tmnxPortPortID
+    }
+    ::= { tmnxPortGnssStateTable 1 }
+
+TmnxPortGnssStateEntry           ::= SEQUENCE
+{
+    tmnxPortGnssVisibleSatelliteCnt  Unsigned32,
+    tmnxPortGnssUsedSatelliteCount   Unsigned32,
+    tmnxPortGnssAntennaStatus        TmnxPortGnssAntennaStatus,
+    tmnxPortGnssSyncStatus           TmnxPortGnssSyncStatus,
+    tmnxPortGnssPositionLatitude     Integer32,
+    tmnxPortGnssPositionLongitude    Integer32,
+    tmnxPortGnssPositionAltitude     Integer32,
+    tmnxPortGnssPositionValid        TruthValue,
+    tmnxPortGnssDateAndTime          DateAndTime,
+    tmnxPortGnssReceiverStatus       DisplayString,
+    tmnxPortGnssCurUtcOffset         Integer32,
+    tmnxPortGnssCurUtcOffsetValid    TruthValue,
+    tmnxPortGnssReceiverFwVersion    DisplayString
+}
+
+tmnxPortGnssVisibleSatelliteCnt  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tmnxPortGnssVisibleSatelliteCnt indicates the
+         number of satellites currently 'seen' by the GNSS receiver module."
+    ::= { tmnxPortGnssStateEntry 1 }
+
+tmnxPortGnssUsedSatelliteCount   OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tmnxPortGnssUsedSatelliteCount indicates the
+         number of satellites currently 'used' in computations by the GNSS
+         receiver module."
+    ::= { tmnxPortGnssStateEntry 2 }
+
+tmnxPortGnssAntennaStatus        OBJECT-TYPE
+    SYNTAX      TmnxPortGnssAntennaStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tmnxPortGnssAntennaStatus indicates the status
+         of the antenna."
+    ::= { tmnxPortGnssStateEntry 3 }
+
+tmnxPortGnssSyncStatus           OBJECT-TYPE
+    SYNTAX      TmnxPortGnssSyncStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tmnxPortGnssSyncStatus indicates the sync
+         status of the GNSS receiver module."
+    ::= { tmnxPortGnssStateEntry 4 }
+
+tmnxPortGnssPositionLatitude     OBJECT-TYPE
+    SYNTAX      Integer32 (-9000000..9000000)
+    UNITS       "0.00001 decimal degrees"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tmnxPortGnssPositionLatitude indicates the
+         latitude of the antenna.
+
+         Encoding:
+            < 0: west of prime meridian
+            = 0: at prime meridian
+            > 0: east of prime meridian
+         The unit corresponds to a resolution of approximately 1.11 metres.
+
+         The value can be valid or invalid. See tmnxPortGnssPositionValid."
+    ::= { tmnxPortGnssStateEntry 5 }
+
+tmnxPortGnssPositionLongitude    OBJECT-TYPE
+    SYNTAX      Integer32 (-18000000..18000000)
+    UNITS       "0.00001 decimal degrees"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tmnxPortGnssPositionLongitude indicates the
+         longitude of the antenna.
+
+         Encoding:
+            < 0: south of equator
+            = 0: at equator
+            > 0: north of equator
+         The unit corresponds to a resolution of approximately 1.11 metres.
+
+         The value can be valid or invalid. See tmnxPortGnssPositionValid."
+    ::= { tmnxPortGnssStateEntry 6 }
+
+tmnxPortGnssPositionAltitude     OBJECT-TYPE
+    SYNTAX      Integer32 (-1000..10000)
+    UNITS       "meters"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tmnxPortGnssPositionAltitude indicates the
+         altitude of the antenna.
+
+         Encoding:
+            < 0: below sea level
+            = 0: at sea level
+            > 0: above sea level
+
+         The value can be valid or invalid. See tmnxPortGnssPositionValid."
+    ::= { tmnxPortGnssStateEntry 7 }
+
+tmnxPortGnssPositionValid        OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tmnxPortGnssPositionValid indicates 'true (1)'
+         if the values of tmnxPortGnssPositionLatitude,
+         tmnxPortGnssPositionLongitude, and tmnxPortGnssPositionAltitude are
+         known to be correct.
+
+         The values are known to be correct when the GNSS receiver has acquired
+         a valid position fix."
+    ::= { tmnxPortGnssStateEntry 8 }
+
+tmnxPortGnssDateAndTime          OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tmnxPortGnssDateAndTime indicates the current
+         date and time as provided by the receiver module.
+
+         If the receiver has not obtained a fix, tmnxPortGnssDateAndTime has a
+         value of '0000000000000000'H."
+    ::= { tmnxPortGnssStateEntry 9 }
+
+tmnxPortGnssReceiverStatus       OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tmnxPortGnssReceiverStatus indicates the
+         status of the GNSS receiver module."
+    ::= { tmnxPortGnssStateEntry 10 }
+
+tmnxPortGnssCurUtcOffset         OBJECT-TYPE
+    SYNTAX      Integer32 (-65536..65535)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tmnxPortGnssCurUtcOffset indicates the current
+         offset between GPS time and UTC in seconds, as provided by the GNSS
+         receiver module.
+
+         The value can be valid or invalid. See tmnxPortGnssCurUtcOffsetValid."
+    ::= { tmnxPortGnssStateEntry 11 }
+
+tmnxPortGnssCurUtcOffsetValid    OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tmnxPortGnssCurUtcOffsetValid indicates 'true
+         (1)' if the tmnxPortGnssCurUtcOffset is known to be correct."
+    ::= { tmnxPortGnssStateEntry 12 }
+
+tmnxPortGnssReceiverFwVersion    OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tmnxPortGnssReceiverFwVersion indicates the
+         firmware version of the GNSS receiver module.
+
+         The format of the value may differ between receiver modules. For
+         example, one may return 2.28, another may return 2.02.0."
+    ::= { tmnxPortGnssStateEntry 13 }
+
+tPortNetEgrPortQOverTblLastChgd  OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tPortNetEgrPortQOverTblLastChgd indicates the timestamp
+         of last change to the tPortNetEgrPortQOverTable."
+    ::= { tmnxPortObjs 134 }
+
+tPortNetEgrPortQOverTable        OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TPortNetEgrPortQOverEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The tPortNetEgrPortQOverTable has an entry for each port queue
+         override configured on this system."
+    ::= { tmnxPortObjs 135 }
+
+tPortNetEgrPortQOverEntry        OBJECT-TYPE
+    SYNTAX      TPortNetEgrPortQOverEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each row represents a particular network egress port queue override.
+         Entries are created and deleted by the user."
+    INDEX       {
+        tmnxChassisIndex,
+        tmnxPortPortID,
+        tmnxPortNetEgrQueueId
+    }
+    ::= { tPortNetEgrPortQOverTable 1 }
+
+TPortNetEgrPortQOverEntry        ::= SEQUENCE
+{
+    tmnxPortNetEgrQueueId            TQueueId,
+    tPortNetEgrPortQOverRowStatus    RowStatus,
+    tPortNetEgrPortQOverLastChanged  TimeStamp,
+    tPortNetEgrPortQOverMonQDepth    TruthValue,
+    tPortNetEgrPortQOverQFastPolling TruthValue,
+    tPortNetEgrPortQOverQVioThres    Unsigned32,
+    tPortNetEgrPortQOverQueuePolicy  TNamedItemOrEmpty
+}
+
+tmnxPortNetEgrQueueId            OBJECT-TYPE
+    SYNTAX      TQueueId (1..16)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPortNetEgrQueueId specifies the queue ID which is
+         used as the fourth index to the table entry."
+    ::= { tPortNetEgrPortQOverEntry 1 }
+
+tPortNetEgrPortQOverRowStatus    OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tPortNetEgrPortQOverRowStatus is used for the creation
+         and deletion of network egress port queue overrides."
+    ::= { tPortNetEgrPortQOverEntry 2 }
+
+tPortNetEgrPortQOverLastChanged  OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tPortNetEgrPortQOverLastChanged indicates the value of
+         sysUpTime at the time of the most recent management change to this
+         row."
+    ::= { tPortNetEgrPortQOverEntry 3 }
+
+tPortNetEgrPortQOverMonQDepth    OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tPortNetEgrPortQOverMonQDepth specifies whether to enable
+         queue depth monitoring for this specified queue."
+    DEFVAL      { false }
+    ::= { tPortNetEgrPortQOverEntry 4 }
+
+tPortNetEgrPortQOverQFastPolling OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tPortNetEgrPortQOverQFastPolling indicates that the depth
+         monitoring should use the new Embedded Control Processor fast-polling."
+    DEFVAL      { false }
+    ::= { tPortNetEgrPortQOverEntry 5 }
+
+tPortNetEgrPortQOverQVioThres    OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..9999)
+    UNITS       "centipercent"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tPortNetEgrPortQOverQVioThres indicates percent of the
+         depth of the queue above which a violation is registered. This is
+         applicable to both the existing queue depth monitoring feature and the
+         fast-polling feature."
+    DEFVAL      { 0 }
+    ::= { tPortNetEgrPortQOverEntry 6 }
+
+tPortNetEgrPortQOverQueuePolicy  OBJECT-TYPE
+    SYNTAX      TNamedItemOrEmpty
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tPortNetEgrPortQOverQueuePolicy indicates the network
+         egress queue policy if the tmnxPortMode is network."
+    DEFVAL      { "" }
+    ::= { tPortNetEgrPortQOverEntry 7 }
+
+tPortNetEgrPortQDepthInfoTable   OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TPortNetEgrPortQDepthInfoEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of tPortNetEgrPortQDepthInfoTable has an entry for each
+         network egress port queue for which the value of
+         tPortNetEgrPortQOverMonQDepth is set to 'true (1)'."
+    ::= { tmnxPortObjs 136 }
+
+tPortNetEgrPortQDepthInfoEntry   OBJECT-TYPE
+    SYNTAX      TPortNetEgrPortQDepthInfoEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of tPortNetEgrPortQDepthInfoEntry represents queue depth
+         monitoring information for each network egress port queue for which
+         the value of tPortNetEgrPortQOverMonQDepth is set to 'true (1)'."
+    INDEX       {
+        tmnxChassisIndex,
+        tmnxPortPortID,
+        tmnxPortNetEgrQueueId
+    }
+    ::= { tPortNetEgrPortQDepthInfoTable 1 }
+
+TPortNetEgrPortQDepthInfoEntry   ::= SEQUENCE
+{
+    tPortNetEgrPortQDepthPollPrcnt1  Unsigned32,
+    tPortNetEgrPortQDepthPollPrcnt2  Unsigned32,
+    tPortNetEgrPortQDepthPollPrcnt3  Unsigned32,
+    tPortNetEgrPortQDepthPollPrcnt4  Unsigned32,
+    tPortNetEgrPortQDepthPollPrcnt5  Unsigned32,
+    tPortNetEgrPortQDepthPollPrcnt6  Unsigned32,
+    tPortNetEgrPortQDepthPollPrcnt7  Unsigned32,
+    tPortNetEgrPortQDepthPollPrcnt8  Unsigned32,
+    tPortNetEgrPortQDepthPollPrcnt9  Unsigned32,
+    tPortNetEgrPortQDepthPollPrcnt10 Unsigned32,
+    tPortNetEgrPortQDepthAvgPollInt  Unsigned32,
+    tPortNetEgrPortQDepthAvgElpsdTme TimeStamp,
+    tPortNetEgrPortQDepthViolTotCnt  Unsigned32,
+    tPortNetEgrPortQDepthViolLast    TimeStamp,
+    tPortNetEgrPortQDepthHWMPollInt  Unsigned32
+}
+
+tPortNetEgrPortQDepthPollPrcnt1  OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..10000)
+    UNITS       "centipercent"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tPortNetEgrPortQDepthPollPrcnt1 represents the percentage
+         of polls in occupancy range of 0 to 10 percent for the queue depths
+         seen during the polling elapsed time."
+    ::= { tPortNetEgrPortQDepthInfoEntry 1 }
+
+tPortNetEgrPortQDepthPollPrcnt2  OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..10000)
+    UNITS       "centipercent"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tPortNetEgrPortQDepthPollPrcnt2 represents the percentage
+         of polls in occupancy range of 11 to 20 percent for the queue depths
+         seen during the polling elapsed time."
+    ::= { tPortNetEgrPortQDepthInfoEntry 2 }
+
+tPortNetEgrPortQDepthPollPrcnt3  OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..10000)
+    UNITS       "centipercent"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tPortNetEgrPortQDepthPollPrcnt3 represents the percentage
+         of polls in occupancy range of 21 to 30 percent for the queue depths
+         seen during the polling elapsed time."
+    ::= { tPortNetEgrPortQDepthInfoEntry 3 }
+
+tPortNetEgrPortQDepthPollPrcnt4  OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..10000)
+    UNITS       "centipercent"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tPortNetEgrPortQDepthPollPrcnt4 represents the percentage
+         of polls in occupancy range of 31 to 40 percent for the queue depths
+         seen during the polling elapsed time."
+    ::= { tPortNetEgrPortQDepthInfoEntry 4 }
+
+tPortNetEgrPortQDepthPollPrcnt5  OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..10000)
+    UNITS       "centipercent"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tPortNetEgrPortQDepthPollPrcnt5 represents the percentage
+         of polls in occupancy range of 41 to 50 percent for the queue depths
+         seen during the polling elapsed time."
+    ::= { tPortNetEgrPortQDepthInfoEntry 5 }
+
+tPortNetEgrPortQDepthPollPrcnt6  OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..10000)
+    UNITS       "centipercent"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tPortNetEgrPortQDepthPollPrcnt6 represents the percentage
+         of polls in occupancy range of 51 to 60 percent for the queue depths
+         seen during the polling elapsed time."
+    ::= { tPortNetEgrPortQDepthInfoEntry 6 }
+
+tPortNetEgrPortQDepthPollPrcnt7  OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..10000)
+    UNITS       "centipercent"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tPortNetEgrPortQDepthPollPrcnt7 represents the percentage
+         of polls in occupancy range of 61 to 70 percent for the queue depths
+         seen during the polling elapsed time."
+    ::= { tPortNetEgrPortQDepthInfoEntry 7 }
+
+tPortNetEgrPortQDepthPollPrcnt8  OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..10000)
+    UNITS       "centipercent"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tPortNetEgrPortQDepthPollPrcnt8 represents the percentage
+         of polls in occupancy range of 71 to 80 percent for the queue depths
+         seen during the polling elapsed time."
+    ::= { tPortNetEgrPortQDepthInfoEntry 8 }
+
+tPortNetEgrPortQDepthPollPrcnt9  OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..10000)
+    UNITS       "centipercent"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tPortNetEgrPortQDepthPollPrcnt9 represents the percentage
+         of polls in occupancy range of 81 to 90 percent for the queue depths
+         seen during the polling elapsed time."
+    ::= { tPortNetEgrPortQDepthInfoEntry 9 }
+
+tPortNetEgrPortQDepthPollPrcnt10 OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..10000)
+    UNITS       "centipercent"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tPortNetEgrPortQDepthPollPrcnt10 represents the
+         percentage of polls in occupancy range of 91 to 100 percent for the
+         queue depths seen during the polling elapsed time."
+    ::= { tPortNetEgrPortQDepthInfoEntry 10 }
+
+tPortNetEgrPortQDepthAvgPollInt  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "milliseconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tPortNetEgrPortQDepthAvgPollInt represents the weighted
+         average polling interval for the elapsed time."
+    ::= { tPortNetEgrPortQDepthInfoEntry 11 }
+
+tPortNetEgrPortQDepthAvgElpsdTme OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tPortNetEgrPortQDepthAvgElpsdTme represents the average
+         elapsed time since the start of queue depth monitoring or the last
+         monitoring clear."
+    ::= { tPortNetEgrPortQDepthInfoEntry 12 }
+
+tPortNetEgrPortQDepthViolTotCnt  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tPortNetEgrPortQDepthViolTotCnt represents the total
+         number of per hardware queue violation counts of the component queues."
+    ::= { tPortNetEgrPortQDepthInfoEntry 13 }
+
+tPortNetEgrPortQDepthViolLast    OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tPortNetEgrPortQDepthViolLast represents the most recent
+         violation last seen timestamp of the component queues."
+    ::= { tPortNetEgrPortQDepthInfoEntry 14 }
+
+tPortNetEgrPortQDepthHWMPollInt  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "microseconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tPortNetEgrPortQDepthHWMPollInt represents the weighted
+         average high-watermark polling interval for the elapsed time."
+    ::= { tPortNetEgrPortQDepthInfoEntry 15 }
+
+tPortEgrPSAggStatsTable          OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TPortEgrPSAggStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The tPortEgrPSAggStatsTable contains the statistics for traffic
+         exiting each physical port at the port egress level with an applied
+         port scheduler policy configured on this system."
+    ::= { tmnxPortObjs 137 }
+
+tPortEgrPSAggStatsEntry          OBJECT-TYPE
+    SYNTAX      TPortEgrPSAggStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each row in tPortEgrPSAggStatsEntry represents the packet and octet
+         counters for traffic exiting a particular physical port with an applied
+         port scheduler policy at the port egress level specified  by tPortEgrPSStLvl."
+    INDEX       {
+        tmnxChassisIndex,
+        tmnxPortPortID,
+        tPortEgrPSStLvl
+    }
+    ::= { tPortEgrPSAggStatsTable 1 }
+
+TPortEgrPSAggStatsEntry          ::= SEQUENCE
+{
+    tPortEgrPSStLvl                  Unsigned32,
+    tPortEgrPSStLstClrdTime          TimeStamp,
+    tPortEgrPSStLvlFwdPkt            Counter64,
+    tPortEgrPSStLvlFwdOct            Counter64,
+    tPortEgrPSStLvlDpdPkt            Counter64,
+    tPortEgrPSStLvlDpdOct            Counter64
+}
+
+tPortEgrPSStLvl                  OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..8 | 4294967295)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of tPortEgrPSStLvl indicates the priority level for the port
+         scheduler to which a subscriber host queue can be port-parented. When
+         the value of tPortEgrPSStLvl is specified as '0xffffffff H', snmp GET
+         on this table returns aggregate statistics."
+    ::= { tPortEgrPSAggStatsEntry 1 }
+
+tPortEgrPSStLstClrdTime          OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tPortEgrPSStLstClrdTime indicates the sysUpTime when the
+         counters in this table were last cleared."
+    ::= { tPortEgrPSAggStatsEntry 2 }
+
+tPortEgrPSStLvlFwdPkt            OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tPortEgrPSStLvlFwdPkt indicates the number of packets
+         forwarded by the physical port for the priority level specified by
+         tPortEgrPSStLvl."
+    ::= { tPortEgrPSAggStatsEntry 3 }
+
+tPortEgrPSStLvlFwdOct            OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tPortEgrPSStLvlFwdOct indicates the number of octets
+         forwarded by the physical port for the priority level specified by
+         tPortEgrPSStLvl."
+    ::= { tPortEgrPSAggStatsEntry 4 }
+
+tPortEgrPSStLvlDpdPkt            OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tPortEgrPSStLvlDpdPkt indicates the number of packets
+         dropped by the physical port for the priority level specified by
+         tPortEgrPSStLvl."
+    ::= { tPortEgrPSAggStatsEntry 5 }
+
+tPortEgrPSStLvlDpdOct            OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tPortEgrPSStLvlDpdOct indicates the number of octets
+         dropped by the physical port for the priority level specified by
+         tPortEgrPSStLvl."
+    ::= { tPortEgrPSAggStatsEntry 6 }
+
+tmnxPortTransceiverStatsTable    OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxPortTransceiverStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The tmnxPortTransceiverStatsTable contains status and statistics
+         information for port transceivers."
+    ::= { tmnxPortObjs 138 }
+
+tmnxPortTransceiverStatsEntry    OBJECT-TYPE
+    SYNTAX      TmnxPortTransceiverStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each tmnxPortTransceiverStatsEntry row represents a port transceiver
+         in the system and contains status and statistics information.
+
+         Entries in this table are created automatically by the system and
+         cannot be created or destroyed via SNMP SET operations."
+    AUGMENTS    { tmnxPortTransceiverEntry }
+    ::= { tmnxPortTransceiverStatsTable 1 }
+
+TmnxPortTransceiverStatsEntry    ::= SEQUENCE
+{
+    tmnxPortTransAUIResets           Counter64,
+    tmnxPortTransLastAUIReset        DateAndTime
+}
+
+tmnxPortTransAUIResets           OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPortTransAUIResets indicates the number of AUI resets
+         that occurred on the transceiver."
+    ::= { tmnxPortTransceiverStatsEntry 1 }
+
+tmnxPortTransLastAUIReset        OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPortTransLastAUIReset indicates the time the last AUI
+         reset occurred on the transceiver."
+    ::= { tmnxPortTransceiverStatsEntry 2 }
 
 tmnxPortNotificationObjects      OBJECT IDENTIFIER ::= { tmnxHwObjs 7 }
 
@@ -28859,7 +30237,7 @@ tmnxObjAppPool                   OBJECT-TYPE
 tmnxObjNamedPoolPolicy           OBJECT-TYPE
     SYNTAX      TNamedItemOrEmpty
     MAX-ACCESS  accessible-for-notify
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The value of tmnxObjNamedPoolPolicy indicates the name of the
          tmnxPortIngNamedPoolPlcy or tmnxPortEgrNamedPoolPlcy object to which
@@ -28955,6 +30333,19 @@ tmnxPortNotifyLeadsSignalChg     OBJECT-TYPE
         "The object tmnxPortNotifyLeadsSignalChg is a printable character
          string."
     ::= { tmnxPortNotificationObjects 35 }
+
+tmnxPortNotifyAUIResetSource     OBJECT-TYPE
+    SYNTAX      TmnxPortID
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPortNotifyAUIResetSource indicates the port that is
+         likely responsible for causing the reset of the attachment user
+         interface on the connector.
+
+         When the source is not known, an invalid port identifier value is
+         used."
+    ::= { tmnxPortNotificationObjects 36 }
 
 tmnxFRObjs                       OBJECT IDENTIFIER ::= { tmnxHwObjs 9 }
 
@@ -31475,7 +32866,7 @@ tmnxCohOptPortRxQMax             OBJECT-TYPE
 
 tmnxCohOptPortRxPower            OBJECT-TYPE
     SYNTAX      Integer32
-    UNITS       "millibels per milliwatt"
+    UNITS       "millibel-milliwatts"
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
@@ -31485,7 +32876,7 @@ tmnxCohOptPortRxPower            OBJECT-TYPE
 
 tmnxCohOptPortRxPowerAvg         OBJECT-TYPE
     SYNTAX      Integer32
-    UNITS       "millibels per milliwatt"
+    UNITS       "millibel-milliwatts"
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
@@ -31495,7 +32886,7 @@ tmnxCohOptPortRxPowerAvg         OBJECT-TYPE
 
 tmnxCohOptPortRxPowerMin         OBJECT-TYPE
     SYNTAX      Integer32
-    UNITS       "millibels per milliwatt"
+    UNITS       "millibel-milliwatts"
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
@@ -31505,7 +32896,7 @@ tmnxCohOptPortRxPowerMin         OBJECT-TYPE
 
 tmnxCohOptPortRxPowerMax         OBJECT-TYPE
     SYNTAX      Integer32
-    UNITS       "millibels per milliwatt"
+    UNITS       "millibel-milliwatts"
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
@@ -31515,7 +32906,7 @@ tmnxCohOptPortRxPowerMax         OBJECT-TYPE
 
 tmnxCohOptPortTxPower            OBJECT-TYPE
     SYNTAX      Integer32
-    UNITS       "millibels per milliwatt"
+    UNITS       "millibel-milliwatts"
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
@@ -31525,7 +32916,7 @@ tmnxCohOptPortTxPower            OBJECT-TYPE
 
 tmnxCohOptPortTxPowerAvg         OBJECT-TYPE
     SYNTAX      Integer32
-    UNITS       "millibels per milliwatt"
+    UNITS       "millibel-milliwatts"
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
@@ -31535,7 +32926,7 @@ tmnxCohOptPortTxPowerAvg         OBJECT-TYPE
 
 tmnxCohOptPortTxPowerMin         OBJECT-TYPE
     SYNTAX      Integer32
-    UNITS       "millibels per milliwatt"
+    UNITS       "millibel-milliwatts"
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
@@ -31545,7 +32936,7 @@ tmnxCohOptPortTxPowerMin         OBJECT-TYPE
 
 tmnxCohOptPortTxPowerMax         OBJECT-TYPE
     SYNTAX      Integer32
-    UNITS       "millibels per milliwatt"
+    UNITS       "millibel-milliwatts"
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
@@ -31909,5 +33300,103 @@ tFwdEngDRNeedsICMP               OBJECT-TYPE
          within a subnet assigned to that same link (other than one of the
          receiving router's own addresses) as described in RFC 4443."
     ::= { tPortIngressFwdEngDRStatsEntry 13 }
+
+tmnxPortStatsTable               OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxPortStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The tmnxPortStatsTable contains statistics for every port."
+    ::= { tmnxPortStatsObjs 12 }
+
+tmnxPortStatsEntry               OBJECT-TYPE
+    SYNTAX      TmnxPortStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The tmnxPortStatsEntry contains statistics for the port."
+    AUGMENTS    { tmnxPortEntry }
+    ::= { tmnxPortStatsTable 1 }
+
+TmnxPortStatsEntry               ::= SEQUENCE
+{
+    tmnxPortInErrors                 Counter64,
+    tmnxPortOutErrors                Counter64,
+    tmnxPortInDiscards               Counter64,
+    tmnxPortOutDiscards              Counter64,
+    tmnxPortInUnknownProtos          Counter64
+}
+
+tmnxPortInErrors                 OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPortInErrors indicates the number of inbound packets
+         that contained errors preventing them from being deliverable to a
+         higher-layer protocol.
+
+         Discontinuities in the value of this counter can occur at
+         re-initialization of the management system, and at other times as
+         indicated by the value of ifCounterDiscontinuityTime."
+    ::= { tmnxPortStatsEntry 1 }
+
+tmnxPortOutErrors                OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPortOutErrors indicates the number of outbound
+         packets that could not be transmitted because of errors.
+
+         Discontinuities in the value of this counter can occur at
+         re-initialization of the management system, and at other times as
+         indicated by the value of ifCounterDiscontinuityTime."
+    ::= { tmnxPortStatsEntry 2 }
+
+tmnxPortInDiscards               OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPortInDiscards indicates the number of inbound
+         packets which were chosen to be discarded even though no errors had
+         been detected to prevent their being deliverable to a higher-layer
+         protocol. One possible reason for discarding such a packet could be to
+         free up buffer space.
+
+         Discontinuities in the value of this counter can occur at
+         re-initialization of the management system, and at other times as
+         indicated by the value of ifCounterDiscontinuityTime."
+    ::= { tmnxPortStatsEntry 3 }
+
+tmnxPortOutDiscards              OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPortOutDiscards indicates the number of outbound
+         packets which were chosen to be discarded even though no errors had
+         been detected to prevent their being transmitted. One possible reason
+         for discarding such a packet could be to free up buffer space.
+
+         Discontinuities in the value of this counter can occur at
+         re-initialization of the management system, and at other times as
+         indicated by the value of ifCounterDiscontinuityTime."
+    ::= { tmnxPortStatsEntry 4 }
+
+tmnxPortInUnknownProtos          OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPortInUnknownProtos indicates the number of packets
+         received via the interface which were discarded because of an unknown
+         or unsupported protocol.
+
+         Discontinuities in the value of this counter can occur at
+         re-initialization of the management system, and at other times as
+         indicated by the value of ifCounterDiscontinuityTime."
+    ::= { tmnxPortStatsEntry 5 }
 
 END

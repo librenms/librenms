@@ -47,7 +47,7 @@ IMPORTS
     ;
 
 timetraLogMIBModule              MODULE-IDENTITY
-    LAST-UPDATED "201904010000Z"
+    LAST-UPDATED "202007140000Z"
     ORGANIZATION "Nokia"
     CONTACT-INFO
         "Nokia SROS Support
@@ -56,7 +56,7 @@ timetraLogMIBModule              MODULE-IDENTITY
         "This document is the SNMP MIB module to manage and provision the Nokia
          SROS Logging utility.
 
-         Copyright 2003-2018 Nokia.  All rights reserved.
+         Copyright 2003-2020 Nokia.  All rights reserved.
          Reproduction of this document is authorized on the condition that
          the foregoing copyright notice is included.
 
@@ -73,6 +73,11 @@ timetraLogMIBModule              MODULE-IDENTITY
          This Specification is supplied 'as is', and Nokia makes no warranty,
          either express or implied, as to the use, operation, condition, or
          performance of the Specification."
+
+    REVISION    "202007140000Z"
+    DESCRIPTION
+        "Rev 20               14 Jul 2020 00:00
+         Release 20 of the TIMETRA-LOG-MIB."
 
     REVISION    "201904010000Z"
     DESCRIPTION
@@ -1294,7 +1299,10 @@ tmnxLogIdFileId                  OBJECT-TYPE
 
          tmnxLogIdOperStatus will not transition to 'inService' until a
          valid value has been set for tmnxLogIdFileId.  This object is
-         valid only if tmnxLogIdDestination is set to 'file'."
+         valid only if tmnxLogIdDestination is set to 'file'.
+
+         This object can be set only once together with tmnxLogIdDestination
+         value of 'file'. "
     ::= { tmnxLogIdEntry 10 }
 
 tmnxLogIdSyslogId                OBJECT-TYPE
@@ -1308,7 +1316,10 @@ tmnxLogIdSyslogId                OBJECT-TYPE
 
          This object is valid only when tmnxLogIdDestination has a value of
          'syslog'.  If this object has a value of zero (0), then no collector
-         is specified and no messages are sent."
+         is specified and no messages are sent.
+
+         This object can be set only once together with tmnxLogIdDestination
+         value of 'syslog'."
     DEFVAL      { 0 }
     ::= { tmnxLogIdEntry 11 }
 
@@ -1319,8 +1330,8 @@ tmnxLogIdMaxMemorySize           OBJECT-TYPE
     STATUS      current
     DESCRIPTION
         "The value of tmnxLogIdMaxMemorySize specifies the amount of memory to
-         allocate for this log.  This object is valid only when
-         tmnxLogIdDestination has a value of 'memory', 'snmpTraps' or 'subscribedCli'.
+         allocate for this log.  This object can be set only once together with
+         tmnxLogIdDestination has a value of 'memory', 'netconf', 'snmpTraps' or 'subscribedCli'.
          For any other value of tmnxLogIdDestination, a read of this object will return zero (0).
 
          Once a memory size has been specified and the log created, any attempt

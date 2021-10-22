@@ -593,8 +593,11 @@ TmnxAddPathSendLimit             ::= TEXTUAL-CONVENTION
     STATUS      current
     DESCRIPTION
         "The value of TmnxAddPathSendLimit specifies the maximum number of
-         paths that can be advertised to ADD-PATH peers per prefix."
-    SYNTAX      Integer32 (0..16)
+         paths that can be advertised to ADD-PATH peers per prefix.
+
+         The value -1 indicates that BGP must send exactly the number of best
+         multipaths it has for each NLRI."
+    SYNTAX      Integer32 (-1 | 0..16)
 
 TmnxBgpFlowRouteExtCommAction    ::= TEXTUAL-CONVENTION
     STATUS      current
@@ -3642,7 +3645,8 @@ TBgpShortcutTunnelEntry          ::= SEQUENCE
     tBgpShortcutTunnelSrPolicy       TruthValue,
     tBgpShortcutTunnelRibApi         TruthValue,
     tBgpShortcutTunnelMplsFwdPlcy    TruthValue,
-    tBgpShortcutTunnelSrOspf3        TruthValue
+    tBgpShortcutTunnelSrOspf3        TruthValue,
+    tBgpShortcutTunnelFlexAlgoFb     TruthValue
 }
 
 tBgpShortcutTunnelFamily         OBJECT-TYPE
@@ -3828,6 +3832,16 @@ tBgpShortcutTunnelSrOspf3        OBJECT-TYPE
     DEFVAL      { false }
     ::= { tBgpShortcutTunnelEntry 15 }
 
+tBgpShortcutTunnelFlexAlgoFb     OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Allow the use of routes with another flex-algo-id than configured as a
+         fallback option"
+    DEFVAL      { false }
+    ::= { tBgpShortcutTunnelEntry 16 }
+
 tBgpLabelRtTunnelTblLstCh        OBJECT-TYPE
     SYNTAX      TimeStamp
     MAX-ACCESS  read-only
@@ -3881,7 +3895,8 @@ TBgpLabelRtTunnelEntry           ::= SEQUENCE
     tBgpLabelRtTunnelSrPolicy        TruthValue,
     tBgpLabelRtTunnelRibApi          TruthValue,
     tBgpLabelRtTunnelMplsFwdPlcy     TruthValue,
-    tBgpLabelRtTunnelSrOspf3         TruthValue
+    tBgpLabelRtTunnelSrOspf3         TruthValue,
+    tBgpLabelRtTunnelFlexAlgoFb      TruthValue
 }
 
 tBgpLabelRtTunnelFamily          OBJECT-TYPE
@@ -4058,6 +4073,16 @@ tBgpLabelRtTunnelSrOspf3         OBJECT-TYPE
          specific family type."
     DEFVAL      { false }
     ::= { tBgpLabelRtTunnelEntry 15 }
+
+tBgpLabelRtTunnelFlexAlgoFb      OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Allow the use of routes with another flex-algo-id than configured as a
+         fallback option"
+    DEFVAL      { false }
+    ::= { tBgpLabelRtTunnelEntry 16 }
 
 tBgpInstanceMultiPathTable       OBJECT-TYPE
     SYNTAX      SEQUENCE OF TBgpInstanceMultiPathEntry
@@ -4581,10 +4606,10 @@ TBgpInstanceAddPathEntry         ::= SEQUENCE
     tBgpInstanceAddPathVpnIpv6Limit  TmnxAddPathSendLimit,
     tBgpInstanceAddPathLblIpv4Limit  TmnxAddPathSendLimit,
     tBgpInstanceAddPathLblIpv6Limit  TmnxAddPathSendLimit,
-    tBgpInstanceAddPathMvpnIpv4Limit TmnxAddPathSendLimit,
-    tBgpInstanceAddPathMvpnIpv6Limit TmnxAddPathSendLimit,
-    tBgpInstanceAddPathMCVpnV4Limit  TmnxAddPathSendLimit,
-    tBgpInstanceAddPathMCVpnV6Limit  TmnxAddPathSendLimit
+    tBgpInstanceAddPathMvpnIpv4Limit Integer32,
+    tBgpInstanceAddPathMvpnIpv6Limit Integer32,
+    tBgpInstanceAddPathMCVpnV4Limit  Integer32,
+    tBgpInstanceAddPathMCVpnV6Limit  Integer32
 }
 
 tBgpInstanceAddPathEnable        OBJECT-TYPE
@@ -4708,7 +4733,7 @@ tBgpInstanceAddPathLblIpv6Limit  OBJECT-TYPE
     ::= { tBgpInstanceAddPathEntry 8 }
 
 tBgpInstanceAddPathMvpnIpv4Limit OBJECT-TYPE
-    SYNTAX      TmnxAddPathSendLimit
+    SYNTAX      Integer32 (0..16)
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
@@ -4722,7 +4747,7 @@ tBgpInstanceAddPathMvpnIpv4Limit OBJECT-TYPE
     ::= { tBgpInstanceAddPathEntry 9 }
 
 tBgpInstanceAddPathMvpnIpv6Limit OBJECT-TYPE
-    SYNTAX      TmnxAddPathSendLimit
+    SYNTAX      Integer32 (0..16)
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
@@ -4736,7 +4761,7 @@ tBgpInstanceAddPathMvpnIpv6Limit OBJECT-TYPE
     ::= { tBgpInstanceAddPathEntry 10 }
 
 tBgpInstanceAddPathMCVpnV4Limit  OBJECT-TYPE
-    SYNTAX      TmnxAddPathSendLimit
+    SYNTAX      Integer32 (0..16)
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
@@ -4750,7 +4775,7 @@ tBgpInstanceAddPathMCVpnV4Limit  OBJECT-TYPE
     ::= { tBgpInstanceAddPathEntry 11 }
 
 tBgpInstanceAddPathMCVpnV6Limit  OBJECT-TYPE
-    SYNTAX      TmnxAddPathSendLimit
+    SYNTAX      Integer32 (0..16)
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
@@ -4830,7 +4855,11 @@ TBgpInstanceParamsExtEntry       ::= SEQUENCE
     tBgpPrefixSidRangeMaxIdx         Unsigned32,
     tBgpSrAdminState                 TmnxAdminState,
     tBgpSegmentRouting               TruthValue,
-    tBgpSelLabelIpv4Inst             TruthValue
+    tBgpDisableExplicitNull          TruthValue,
+    tBgpSelLabelIpv4Inst             TruthValue,
+    tBgpInstBgpTunnelMetric          Unsigned32,
+    tBgpInstBgpTunnelMetricPrefAigp  TruthValue,
+    tBgpInstanceNHResVpnFamPolicy    TLPolicyStatementNameOrEmpty
 }
 
 tBgpInstanceEnforceFirstAS       OBJECT-TYPE
@@ -5174,7 +5203,7 @@ tBgpPrefixSidRangeStartLabel     OBJECT-TYPE
     ::= { tBgpInstanceParamsExtEntry 30 }
 
 tBgpPrefixSidRangeMaxIdx         OBJECT-TYPE
-    SYNTAX      Unsigned32 (1..524287)
+    SYNTAX      Unsigned32 (0..524287)
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
@@ -5207,6 +5236,17 @@ tBgpSegmentRouting               OBJECT-TYPE
     DEFVAL      { false }
     ::= { tBgpInstanceParamsExtEntry 33 }
 
+tBgpDisableExplicitNull          OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tBgpDisableExplicitNull specifies whether or not
+         advertised label and associated programming rules are enabled  on this
+         instance of BGP."
+    DEFVAL      { false }
+    ::= { tBgpInstanceParamsExtEntry 34 }
+
 tBgpSelLabelIpv4Inst             OBJECT-TYPE
     SYNTAX      TruthValue
     MAX-ACCESS  read-create
@@ -5216,6 +5256,38 @@ tBgpSelLabelIpv4Inst             OBJECT-TYPE
          selective download of label-ipv4 routes"
     DEFVAL      { false }
     ::= { tBgpInstanceParamsExtEntry 35 }
+
+tBgpInstBgpTunnelMetric          OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tBgpInstBgpTunnelMetric determines the metric of the
+         route installed in RTM"
+    DEFVAL      { 1000 }
+    ::= { tBgpInstanceParamsExtEntry 36 }
+
+tBgpInstBgpTunnelMetricPrefAigp  OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "If tBgpInstBgpTunnelMetricPrefAigp is enabled the metric of the route
+         installed in RTM is the aigp-metric of the route if no aigp-metric is
+         available the value of tBgpInstBgpTunnelMetric is used"
+    DEFVAL      { false }
+    ::= { tBgpInstanceParamsExtEntry 37 }
+
+tBgpInstanceNHResVpnFamPolicy    OBJECT-TYPE
+    SYNTAX      TLPolicyStatementNameOrEmpty
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tBgpInstanceNHResVpnFamPolicy specifies the policy to be
+         applied for filtering the routes to be considered for next-hop
+         resolution process."
+    DEFVAL      { "" }
+    ::= { tBgpInstanceParamsExtEntry 40 }
 
 tBgpInstanceLLGRFamilyTblLstCh   OBJECT-TYPE
     SYNTAX      TimeStamp
@@ -5624,6 +5696,196 @@ tBgpInstMultipathNgUnequalCost   OBJECT-TYPE
          path."
     DEFVAL      { false }
     ::= { tBgpInstMultipathNgEntry 8 }
+
+tBgpLUStatsTblLstCh              OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tBgpLUStatsTblLstCh indicates the last timestamp when an
+         entry in the tBgpLUStatsTable was last changed."
+    ::= { tBgpInstanceObjects 30 }
+
+tBgpLUStatsTable                 OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TBgpLUStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The tBgpLUStatsTable is traffic stats for BGP-LU tunnels on egress and
+         ingress data path.
+
+         The table entries are indexed by BGP instance family type  and prefix."
+    ::= { tBgpInstanceObjects 31 }
+
+tBgpLUStatsEntry                 OBJECT-TYPE
+    SYNTAX      TBgpLUStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry (conceptual row) in the tBgpLUStatsTable.
+
+         An entry is created when an entry in tBgpInstanceEntry is. When
+         created, all objects are initialized to their default values."
+    INDEX       {
+        tBgpInstanceIndex,
+        tBgpLUStatsFamily,
+        tBgpLUStatsPrefixType,
+        tBgpLUStatsPrefix,
+        tBgpLUStatsPrefixLength
+    }
+    ::= { tBgpLUStatsTable 1 }
+
+TBgpLUStatsEntry                 ::= SEQUENCE
+{
+    tBgpLUStatsFamily                TmnxIpFamilyIdentifier,
+    tBgpLUStatsPrefixType            InetAddressType,
+    tBgpLUStatsPrefix                InetAddress,
+    tBgpLUStatsPrefixLength          InetAddressPrefixLength,
+    tBgpLUStatsLstCh                 TimeStamp,
+    tBgpLUStatsNextHopType           InetAddressType,
+    tBgpLUStatsNextHopAddress        InetAddress,
+    tBgpLUStatsIngressOperState      TmnxOperState,
+    tBgpLUStatsIngressLabel          Unsigned32,
+    tBgpLUIngressStatsPktCnt         Counter64,
+    tBgpLUIngressStatsOctetsCnt      Counter64,
+    tBgpLUStatsEgressOperState       TmnxOperState,
+    tBgpLUStatsEgressLabel           Unsigned32,
+    tBgpLUEgressStatsPktCnt          Counter64,
+    tBgpLUEgressStatsOctetsCnt       Counter64
+}
+
+tBgpLUStatsFamily                OBJECT-TYPE
+    SYNTAX      TmnxIpFamilyIdentifier
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tBgpLUStatsFamily specifies the address family for which
+         the BGP-LU stats applies."
+    ::= { tBgpLUStatsEntry 1 }
+
+tBgpLUStatsPrefixType            OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tBgpLUStatsPrefixType specifies the address type of
+         tBgpLUStatsPrefix prefix."
+    ::= { tBgpLUStatsEntry 2 }
+
+tBgpLUStatsPrefix                OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (4|16|20))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tBgpLUStatsPrefix specifies the prefix for LU Stats
+         Table."
+    ::= { tBgpLUStatsEntry 3 }
+
+tBgpLUStatsPrefixLength          OBJECT-TYPE
+    SYNTAX      InetAddressPrefixLength (0..128)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tBgpLUStatsPrefixLength specifies the value of the prefix
+         length for tBgpLUStatsPrefix"
+    ::= { tBgpLUStatsEntry 4 }
+
+tBgpLUStatsLstCh                 OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value tBgpLUStatsLstCh indicates when an entry in tBgpLUStatsTable
+         was last changed."
+    ::= { tBgpLUStatsEntry 5 }
+
+tBgpLUStatsNextHopType           OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tBgpLUStatsNextHopType indicates the  address type of the
+         nexthop."
+    ::= { tBgpLUStatsEntry 6 }
+
+tBgpLUStatsNextHopAddress        OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (0|4|16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tBgpLUStatsNextHopAddress indicates the address of the
+         nexthop."
+    ::= { tBgpLUStatsEntry 7 }
+
+tBgpLUStatsIngressOperState      OBJECT-TYPE
+    SYNTAX      TmnxOperState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tBgpLUStatsIngressOperState indicates the operational
+         state."
+    ::= { tBgpLUStatsEntry 8 }
+
+tBgpLUStatsIngressLabel          OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tBgpLUStatsIngressLabel indicates the label on ingress."
+    ::= { tBgpLUStatsEntry 9 }
+
+tBgpLUIngressStatsPktCnt         OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tBgpLUIngressStatsPktCnt indicates the number of packets
+         on ingress."
+    ::= { tBgpLUStatsEntry 10 }
+
+tBgpLUIngressStatsOctetsCnt      OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tBgpLUIngressStatsOctetsCnt indicates the number of
+         octets on ingress."
+    ::= { tBgpLUStatsEntry 11 }
+
+tBgpLUStatsEgressOperState       OBJECT-TYPE
+    SYNTAX      TmnxOperState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tBgpLUStatsEgressOperState indicates the operational
+         state."
+    ::= { tBgpLUStatsEntry 12 }
+
+tBgpLUStatsEgressLabel           OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tBgpLUStatsEgressLabel indicates the label on egress."
+    ::= { tBgpLUStatsEntry 13 }
+
+tBgpLUEgressStatsPktCnt          OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tBgpLUEgressStatsPktCnt indicates the number of packets
+         on egress."
+    ::= { tBgpLUStatsEntry 14 }
+
+tBgpLUEgressStatsOctetsCnt       OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tBgpLUEgressStatsOctetsCnt indicates the number of octets
+         on egress."
+    ::= { tBgpLUStatsEntry 15 }
 
 tBgpPeerGroupObjects             OBJECT IDENTIFIER ::= { tBgpObjects 3 }
 
@@ -6855,10 +7117,10 @@ TBgpPeerGroupParamsEntry         ::= SEQUENCE
     tBgpPGORRLocation                Unsigned32,
     tBgpPGORRAllowLocalFallbk        TruthValue,
     tBgpPGEnforceFirstAS             TruthValue,
-    tBgpPGMvpnIpv4AddPathLimit       TmnxAddPathSendLimit,
-    tBgpPGMvpnIpv6AddPathLimit       TmnxAddPathSendLimit,
-    tBgpPGMcastVpnV4AddPathLimit     TmnxAddPathSendLimit,
-    tBgpPGMcastVpnV6AddPathLimit     TmnxAddPathSendLimit,
+    tBgpPGMvpnIpv4AddPathLimit       Integer32,
+    tBgpPGMvpnIpv6AddPathLimit       Integer32,
+    tBgpPGMcastVpnV4AddPathLimit     Integer32,
+    tBgpPGMcastVpnV6AddPathLimit     Integer32,
     tBgpPGLLGRAdvStaleTime           Unsigned32,
     tBgpPGLLGROvrideStaleTime        Unsigned32,
     tBgpPGLLGROvrideResTime          Unsigned32,
@@ -7690,7 +7952,7 @@ tBgpPGEnforceFirstAS             OBJECT-TYPE
     ::= { tBgpPeerGroupParamsEntry 48 }
 
 tBgpPGMvpnIpv4AddPathLimit       OBJECT-TYPE
-    SYNTAX      TmnxAddPathSendLimit
+    SYNTAX      Integer32 (0..16)
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
@@ -7704,7 +7966,7 @@ tBgpPGMvpnIpv4AddPathLimit       OBJECT-TYPE
     ::= { tBgpPeerGroupParamsEntry 49 }
 
 tBgpPGMvpnIpv6AddPathLimit       OBJECT-TYPE
-    SYNTAX      TmnxAddPathSendLimit
+    SYNTAX      Integer32 (0..16)
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
@@ -7718,7 +7980,7 @@ tBgpPGMvpnIpv6AddPathLimit       OBJECT-TYPE
     ::= { tBgpPeerGroupParamsEntry 50 }
 
 tBgpPGMcastVpnV4AddPathLimit     OBJECT-TYPE
-    SYNTAX      TmnxAddPathSendLimit
+    SYNTAX      Integer32 (0..16)
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
@@ -7732,7 +7994,7 @@ tBgpPGMcastVpnV4AddPathLimit     OBJECT-TYPE
     ::= { tBgpPeerGroupParamsEntry 51 }
 
 tBgpPGMcastVpnV6AddPathLimit     OBJECT-TYPE
-    SYNTAX      TmnxAddPathSendLimit
+    SYNTAX      Integer32 (0..16)
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
@@ -13489,10 +13751,10 @@ TBgpPeerNgParamsEntry            ::= SEQUENCE
     tBgpPeerNgORRLocation            Unsigned32,
     tBgpPeerNgORRAllowLocalFallbk    TruthValue,
     tBgpPeerNgEnforceFirstAS         TruthValue,
-    tBgpPeerNgMvpnIpv4AddPathLimit   TmnxAddPathSendLimit,
-    tBgpPeerNgMvpnIpv6AddPathLimit   TmnxAddPathSendLimit,
-    tBgpPeerNgMcastVpnV4AddPathLimit TmnxAddPathSendLimit,
-    tBgpPeerNgMcastVpnV6AddPathLimit TmnxAddPathSendLimit,
+    tBgpPeerNgMvpnIpv4AddPathLimit   Integer32,
+    tBgpPeerNgMvpnIpv6AddPathLimit   Integer32,
+    tBgpPeerNgMcastVpnV4AddPathLimit Integer32,
+    tBgpPeerNgMcastVpnV6AddPathLimit Integer32,
     tBgpPeerLLGRAdvStaleTime         Unsigned32,
     tBgpPeerLLGROvrideStaleTime      Unsigned32,
     tBgpPeerLLGROvrideResTime        Unsigned32,
@@ -14354,7 +14616,7 @@ tBgpPeerNgEnforceFirstAS         OBJECT-TYPE
     ::= { tBgpPeerNgParamsEntry 48 }
 
 tBgpPeerNgMvpnIpv4AddPathLimit   OBJECT-TYPE
-    SYNTAX      TmnxAddPathSendLimit
+    SYNTAX      Integer32 (0..16)
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
@@ -14368,7 +14630,7 @@ tBgpPeerNgMvpnIpv4AddPathLimit   OBJECT-TYPE
     ::= { tBgpPeerNgParamsEntry 49 }
 
 tBgpPeerNgMvpnIpv6AddPathLimit   OBJECT-TYPE
-    SYNTAX      TmnxAddPathSendLimit
+    SYNTAX      Integer32 (0..16)
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
@@ -14382,7 +14644,7 @@ tBgpPeerNgMvpnIpv6AddPathLimit   OBJECT-TYPE
     ::= { tBgpPeerNgParamsEntry 50 }
 
 tBgpPeerNgMcastVpnV4AddPathLimit OBJECT-TYPE
-    SYNTAX      TmnxAddPathSendLimit
+    SYNTAX      Integer32 (0..16)
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
@@ -14396,7 +14658,7 @@ tBgpPeerNgMcastVpnV4AddPathLimit OBJECT-TYPE
     ::= { tBgpPeerNgParamsEntry 51 }
 
 tBgpPeerNgMcastVpnV6AddPathLimit OBJECT-TYPE
-    SYNTAX      TmnxAddPathSendLimit
+    SYNTAX      Integer32 (0..16)
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
@@ -17716,6 +17978,21 @@ tmnxBgpSegRoutingV19Compliance   MODULE-COMPLIANCE
             tmnxBgpSegRoutingV19Group
         }
     ::= { tmnxBgpCompliances 18 }
+
+tmnxBgpV20v0Compliance           MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The complaince statement for revision 20 of TIMETRA-BGP-MIB for
+         management of extended BGP features of Nokia SROS series systems."
+    MODULE
+        MANDATORY-GROUPS {
+            tmnxBgpLabelIpv6V20Group,
+            tmnxBgpTunnelMetric,
+            tmnxBgpNHV20v0Group,
+            tmnxBgpTunnelFlexAlgoFb,
+            tmnxBgpLUStats
+        }
+    ::= { tmnxBgpCompliances 19 }
 
 tmnxBgpGroups                    OBJECT IDENTIFIER ::= { tmnxBgpConformance 2 }
 
@@ -21853,6 +22130,70 @@ tmnxBgpSrTePolicyIpv6Group       OBJECT-GROUP
         "The group of objects supporting management of extended BGP peers on
          Nokia SROS series systems since release 19."
     ::= { tmnxBgpGroups 164 }
+
+tmnxBgpLabelIpv6V20Group         OBJECT-GROUP
+    OBJECTS     {
+        tBgpDisableExplicitNull
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting management of extended BGP disable
+         explict null on Nokia SROS series systems since release 20."
+    ::= { tmnxBgpGroups 165 }
+
+tmnxBgpTunnelMetric              OBJECT-GROUP
+    OBJECTS     {
+        tBgpInstBgpTunnelMetric,
+        tBgpInstBgpTunnelMetricPrefAigp
+    }
+    STATUS      current
+    DESCRIPTION
+        ""
+    ::= { tmnxBgpGroups 166 }
+
+tmnxBgpNHV20v0Group              OBJECT-GROUP
+    OBJECTS     {
+        tBgpInstanceNHResVpnFamPolicy
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting management of BGP next-hop-resolution
+         policy feature on SROS series systems since release 20.0."
+    ::= { tmnxBgpGroups 169 }
+
+tmnxBgpTunnelFlexAlgoFb          OBJECT-GROUP
+    OBJECTS     {
+        tBgpShortcutTunnelFlexAlgoFb,
+        tBgpLabelRtTunnelFlexAlgoFb
+    }
+    STATUS      current
+    DESCRIPTION
+        ""
+    ::= { tmnxBgpGroups 171 }
+
+tmnxBgpLUStats                   OBJECT-GROUP
+    OBJECTS     {
+        tBgpLUStatsTblLstCh,
+        tBgpLUStatsFamily,
+        tBgpLUStatsPrefixType,
+        tBgpLUStatsPrefix,
+        tBgpLUStatsPrefixLength,
+        tBgpLUStatsLstCh,
+        tBgpLUStatsNextHopType,
+        tBgpLUStatsNextHopAddress,
+        tBgpLUStatsIngressOperState,
+        tBgpLUStatsIngressLabel,
+        tBgpLUIngressStatsPktCnt,
+        tBgpLUIngressStatsOctetsCnt,
+        tBgpLUStatsEgressOperState,
+        tBgpLUStatsEgressLabel,
+        tBgpLUEgressStatsPktCnt,
+        tBgpLUEgressStatsOctetsCnt
+    }
+    STATUS      current
+    DESCRIPTION
+        ""
+    ::= { tmnxBgpGroups 172 }
 
 tBgpNotificationsPrefix          OBJECT IDENTIFIER ::= { tmnxSRNotifyPrefix 14 }
 

@@ -22,8 +22,8 @@ IMPORTS
     timetraSRMIBModules, tmnxSRConfs,
     tmnxSRNotifyPrefix, tmnxSRObjs
                                                          FROM TIMETRA-GLOBAL-MIB
-    Dot1PPriority, IPv6FlowLabel,
-    IPv6FlowLabelMask,
+    ClassIndexOrNone, Dot1PPriority,
+    IPv6FlowLabel, IPv6FlowLabelMask,
     IpAddressPrefixLength, QTagFullRange,
     QTagFullRangeOrNone, SdpBindId,
     ServiceAccessPoint, SvcISID,
@@ -31,11 +31,11 @@ IMPORTS
     TDSCPNameOrEmpty, TFCTypeOrNone,
     TFrameType, TIcmpCodeOrNone,
     TIcmpTypeOrNone, TIpOption, TIpProtocol,
-    TItemDescription, TLNamedItem,
-    TLNamedItemOrEmpty, TMacFilterType,
-    TNamedItem, TNamedItemOrEmpty,
-    TOperator, TRegularExpression,
-    TTcpUdpPort,
+    TIpProtocolNumber, TItemDescription,
+    TLNamedItem, TLNamedItemOrEmpty,
+    TMacFilterType, TNamedItem,
+    TNamedItemOrEmpty, TOperator,
+    TRegularExpression, TTcpUdpPort,
     TmnxAddressAndPrefixAddress,
     TmnxAddressAndPrefixPrefix,
     TmnxAddressAndPrefixType,
@@ -1144,20 +1144,31 @@ TIPvXFilterType                  ::= TEXTUAL-CONVENTION
     DESCRIPTION
         "Specifies the set of available match criteria for a filter policy.
 
-         - normal                  (0): Allows all match criteria except of:
-                                        - Source MAC, Packet length.
-         - srcMac                  (1): Allows matching Source MAC and all match criteria for type normal except of:
+         - normal                  (0): Allows all match criteria except:
+                                        - Source MAC, Packet Length and Destination class.
+         - srcMac                  (1): Allows matching Source MAC and all match criteria for type normal except:
                                         - Source IP, DSCP and all IP Options in IPv4 filters.
                                         - Source IP in IPv6 filters.
-         - pktLen                  (2): Allows matching Packet length and all match criteria for type normal except of:
-                                        - DSCP and IP Options in IPv4 filters.
+         - pktLen                  (2): Allows matching Packet length and all match criteria for type normal except:
+                                        - DSCP and all IP Options in IPv4 filters.
+                                        - Flow Label in IPv6 filters.
+         - destClass               (3): Allows matching Destination class and all match criteria for type normal except:
+                                        - DSCP and all IP Options in IPv4 filters.
                                         - Flow Label in IPv6 filters."
     SYNTAX      INTEGER {
         normal    (0),
         srcMac    (1),
         pktLen    (2),
-        reserved3 (3)
+        destClass (3)
     }
+
+TmnxFilterCflowdSampleProfileId  ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Specifies a unique number that identifies a row in the
+         tmnxCflowdSampleProfileEntry. Default value 0 means that no sample
+         profile is applied with the given filter entry."
+    SYNTAX      Unsigned32 (0 | 1..5)
 
 tFilterObjects                   OBJECT IDENTIFIER ::= { tmnxSRObjs 21 }
 
@@ -9309,7 +9320,10 @@ TIPv6FilterParamsExtEntry        ::= SEQUENCE
     tIPv6FilterParamsExtSrcMacMask   MacAddress,
     tIPv6FilterParamsExtMxPktLenVal1 TFilterIpv6MatchPacketLength,
     tIPv6FilterParamsExtMxPktLenVal2 TFilterIpv6MatchPacketLength,
-    tIPv6FilterParamsExtMxPktLenOper TOperator
+    tIPv6FilterParamsExtMxPktLenOper TOperator,
+    tIPv6FilterParamsExtProtocolList TNamedItemOrEmpty,
+    tIPv6FilterParamsExtDestClass    ClassIndexOrNone,
+    tIPv6FilterParamsExtSampleProf   TmnxFilterCflowdSampleProfileId
 }
 
 tIPv6FilterParamsExtLastChanged  OBJECT-TYPE
@@ -10072,6 +10086,38 @@ tIPv6FilterParamsExtMxPktLenOper OBJECT-TYPE
     DEFVAL      { none }
     ::= { tIPv6FilterParamsExtEntry 32 }
 
+tIPv6FilterParamsExtProtocolList OBJECT-TYPE
+    SYNTAX      TNamedItemOrEmpty
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "."
+    DEFVAL      { ''H }
+    ::= { tIPv6FilterParamsExtEntry 33 }
+
+tIPv6FilterParamsExtDestClass    OBJECT-TYPE
+    SYNTAX      ClassIndexOrNone
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tIPv6FilterParamsExtDestClass specifies
+         destination class to match."
+    DEFVAL      { 0 }
+    ::= { tIPv6FilterParamsExtEntry 34 }
+
+tIPv6FilterParamsExtSampleProf   OBJECT-TYPE
+    SYNTAX      TmnxFilterCflowdSampleProfileId
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Specifies the sample profile to be applied to packets matching this
+         IPv6 filter entry.
+
+         Setting tIPv6FilterParamsExtSampleProf to a non-default value, will
+         set tIPv6FilterParamsCflowdSample to its default value and vice versa."
+    DEFVAL      { 0 }
+    ::= { tIPv6FilterParamsExtEntry 35 }
+
 tFilterEmbedOpenflowTableLstChg  OBJECT-TYPE
     SYNTAX      TimeStamp
     MAX-ACCESS  read-only
@@ -10481,7 +10527,10 @@ TIPFilterParamsExtEntry          ::= SEQUENCE
     tIPFilterParamsExtSrcMacMask     MacAddress,
     tIPFilterParamsExtMxPktLenVal1   TFilterPacketLength,
     tIPFilterParamsExtMxPktLenVal2   TFilterPacketLength,
-    tIPFilterParamsExtMxPktLenOper   TOperator
+    tIPFilterParamsExtMxPktLenOper   TOperator,
+    tIPFilterParamsExtProtocolList   TNamedItemOrEmpty,
+    tIPFilterParamsExtDestClass      ClassIndexOrNone,
+    tIPFilterParamsExtSampleProf     TmnxFilterCflowdSampleProfileId
 }
 
 tIPFilterParamsExtLastChanged    OBJECT-TYPE
@@ -11198,6 +11247,38 @@ tIPFilterParamsExtMxPktLenOper   OBJECT-TYPE
          gt(4)                   |    0..65534         |      N/A"
     DEFVAL      { none }
     ::= { tIPFilterParamsExtEntry 29 }
+
+tIPFilterParamsExtProtocolList   OBJECT-TYPE
+    SYNTAX      TNamedItemOrEmpty
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "."
+    DEFVAL      { ''H }
+    ::= { tIPFilterParamsExtEntry 30 }
+
+tIPFilterParamsExtDestClass      OBJECT-TYPE
+    SYNTAX      ClassIndexOrNone
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tIPFilterParamsExtDestClass specifies
+         destination class to match."
+    DEFVAL      { 0 }
+    ::= { tIPFilterParamsExtEntry 31 }
+
+tIPFilterParamsExtSampleProf     OBJECT-TYPE
+    SYNTAX      TmnxFilterCflowdSampleProfileId
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Specifies the sample profile to be applied to packets matching this IP
+         filter entry.
+
+         Setting tIPFilterParamsExtSampleProf to a non-default value, will set
+         tIPFilterParamsCflowdSample to its default value and vice versa."
+    DEFVAL      { 0 }
+    ::= { tIPFilterParamsExtEntry 32 }
 
 tFilterRPlcyDstTableLastChg      OBJECT-TYPE
     SYNTAX      TimeStamp
@@ -14223,7 +14304,8 @@ TIPvXFltrEntryActionEntry        ::= SEQUENCE
     tIPvXFltrFwdMplsPlcyEndptAddr    InetAddress,
     tIPvXFltrFwdSrtePlcyEndptAddrTp  InetAddressType,
     tIPvXFltrFwdSrtePlcyEndptAddr    InetAddress,
-    tIPvXFltrFwdSrtePlcyColor        Unsigned32
+    tIPvXFltrFwdSrtePlcyColor        Unsigned32,
+    tIPvXFltrActL2AwareNatBypass     TruthValue
 }
 
 tIPvXFltrEntryActFltrType        OBJECT-TYPE
@@ -15518,6 +15600,26 @@ tIPvXFltrFwdSrtePlcyColor        OBJECT-TYPE
          tIPvXFltrEntryActAction is 'forwardSrtePlcyEndptColor'."
     ::= { tIPvXFltrEntryActionEntry 57 }
 
+tIPvXFltrActL2AwareNatBypass     OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tIPvXFltrActL2AwareNatBypass specifies whether
+         filter classified traffic bypasses L2aware NAT.
+
+         This action is only applicable to L2aware NAT subscribers and it must
+         be configured together with action forward. Traffic identified in the
+         match condition will bypass L2aware NAT. A common use case is to
+         bypass NAT for on-net traffic which terminates within the customer
+         network.
+
+         The remaining traffic that is not classified for bypass will
+         automatically be diverted to L2aware NAT, unless it is explicitly
+         configured to be dropped."
+    DEFVAL      { false }
+    ::= { tIPvXFltrEntryActionEntry 58 }
+
 tFltrEntryStatTable              OBJECT-TYPE
     SYNTAX      SEQUENCE OF TFltrEntryStatEntry
     MAX-ACCESS  not-accessible
@@ -16436,6 +16538,24 @@ fltrMdAutoIdMacFilterCount       OBJECT-TYPE
          in model-driven CLI."
     ::= { fltrMdAutoIdGroup 5 }
 
+fltrMdAutoIdIPv4ExceptionCount   OBJECT-TYPE
+    SYNTAX      TFilterID
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The fltrMdAutoIdIPv4ExceptionCount indicates Ipv4 exception filter
+         identifiers in-use in model-driven CLI."
+    ::= { fltrMdAutoIdGroup 6 }
+
+fltrMdAutoIdIPv6ExceptionCount   OBJECT-TYPE
+    SYNTAX      TFilterID
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The fltrMdAutoIdIPv6ExceptionCount indicates Ipv6 exception filter
+         identifiers in-use in model-driven CLI."
+    ::= { fltrMdAutoIdGroup 7 }
+
 tIPv6ExceptionTable              OBJECT-TYPE
     SYNTAX      SEQUENCE OF TIPv6ExceptionEntry
     MAX-ACCESS  not-accessible
@@ -17022,6 +17142,145 @@ tIPv6ExcParamsEgrHitByteCount    OBJECT-TYPE
          number of bytes of all egress packets that matched this entry."
     ::= { tIPv6ExceptionParamsEntry 27 }
 
+tFltrProtocolListTableLstChng    OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The object tFltrProtocolListTableLstChng indicates the sysUpTime at
+         the time of the last modification of tFltrProtocolListTable.
+
+         If no changes were made to the table since the last re-initialization
+         of the local network management subsystem, this object contains the
+         value zero."
+    ::= { tFilterObjects 109 }
+
+tFltrProtocolListTable           OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TFltrProtocolListEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The table tFltrProtocolListTable contains an entry for each Protocol
+         list defined in the filter area."
+    ::= { tFilterObjects 110 }
+
+tFltrProtocolListEntry           OBJECT-TYPE
+    SYNTAX      TFltrProtocolListEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry in the tFltrProtocolListTable."
+    INDEX       { IMPLIED tFltrProtocolListName }
+    ::= { tFltrProtocolListTable 1 }
+
+TFltrProtocolListEntry           ::= SEQUENCE
+{
+    tFltrProtocolListName            TNamedItem,
+    tFltrProtocolListRowStatus       RowStatus,
+    tFltrProtocolListLastChanged     TimeStamp,
+    tFltrProtocolListDescription     TItemDescription
+}
+
+tFltrProtocolListName            OBJECT-TYPE
+    SYNTAX      TNamedItem
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The object tFltrProtocolListName specifies the name of this Protocol
+         list."
+    ::= { tFltrProtocolListEntry 1 }
+
+tFltrProtocolListRowStatus       OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The object tFltrProtocolListRowStatus specifies the status of this
+         row."
+    ::= { tFltrProtocolListEntry 2 }
+
+tFltrProtocolListLastChanged     OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The object tFltrProtocolListLastChanged indicates the sysUpTime at the
+         time of the last modification of this row.
+
+         If no changes were made to the row since the last re-initialization of
+         the local network management subsystem, then this object contains the
+         value zero."
+    ::= { tFltrProtocolListEntry 3 }
+
+tFltrProtocolListDescription     OBJECT-TYPE
+    SYNTAX      TItemDescription
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The object tFltrProtocolListDescription specifies a description for
+         this row."
+    DEFVAL      { ''H }
+    ::= { tFltrProtocolListEntry 4 }
+
+tFltrProtocolListItemTblLstChg   OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The object tFltrProtocolListItemTblLstChg indicates the sysUpTime at
+         the time of the last modification of tFltrProtocolListItemTable.
+
+         If no changes were made to the table since the last re-initialization
+         of the local network management subsystem, this object contains the
+         value zero."
+    ::= { tFilterObjects 111 }
+
+tFltrProtocolListItemTable       OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TFltrProtocolListItemEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The table tFltrProtocolListItemTable contains an entry for each
+         Protocol defined in any Protocol list defined in the filter area."
+    ::= { tFilterObjects 112 }
+
+tFltrProtocolListItemEntry       OBJECT-TYPE
+    SYNTAX      TFltrProtocolListItemEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Specifies an entry in the tFltrProtocolListItemTable."
+    INDEX       {
+        tFltrProtocolListName,
+        tFltrProtocolListItemProtocol
+    }
+    ::= { tFltrProtocolListItemTable 1 }
+
+TFltrProtocolListItemEntry       ::= SEQUENCE
+{
+    tFltrProtocolListItemProtocol    TIpProtocolNumber,
+    tFltrProtocolListItemRowStatus   RowStatus
+}
+
+tFltrProtocolListItemProtocol    OBJECT-TYPE
+    SYNTAX      TIpProtocolNumber
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tFltrProtocolListItemProtocol specifies a
+         value to be be matched against IP protocol/IPv6 next-header value of
+         the IP packet."
+    ::= { tFltrProtocolListItemEntry 1 }
+
+tFltrProtocolListItemRowStatus   OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tFltrProtocolListItemRowStatus specifies the
+         status of this row."
+    ::= { tFltrProtocolListItemEntry 2 }
+
 tFilterMIBConformance            OBJECT IDENTIFIER ::= { tmnxSRConfs 21 }
 
 tFilterMIBCompliances            OBJECT IDENTIFIER ::= { tFilterMIBConformance 1 }
@@ -17598,7 +17857,13 @@ tFilterV20v0Compliance           MODULE-COMPLIANCE
             tFltrIPv6ExceptionV19v0Group,
             tFltrFwdMplsPlcyEndptGrp,
             tFltrFwdSrtePlcyEndptColorGrp,
-            tLiFltrMatchFragmentGroup
+            tLiFltrMatchFragmentGroup,
+            fltrMdAutoIdV20v0Group,
+            tFilterMatchProtocolListGroup,
+            tFilterMatchDestClassGroup,
+            tFilterL2AwareNatBypassGroup,
+            tFltrLiRsvdBlockRangeChgNotifGrp,
+            tFltrCflowdSampleProfileGroup
         }
     ::= { tFilterMIBCompliances 21 }
 
@@ -20398,6 +20663,76 @@ tLiFltrMatchFragmentGroup        OBJECT-GROUP
          SROS series systems in release 20.2."
     ::= { tFilterMIBGroups 106 }
 
+fltrMdAutoIdV20v0Group           OBJECT-GROUP
+    OBJECTS     {
+        fltrMdAutoIdIPv4ExceptionCount,
+        fltrMdAutoIdIPv6ExceptionCount
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting management of model-driven CLI auto
+         range of identifiers in Nokia SROS series systems in release 20.2."
+    ::= { tFilterMIBGroups 107 }
+
+tFilterMatchProtocolListGroup    OBJECT-GROUP
+    OBJECTS     {
+        tFltrProtocolListTableLstChng,
+        tFltrProtocolListRowStatus,
+        tFltrProtocolListLastChanged,
+        tFltrProtocolListDescription,
+        tFltrProtocolListItemTblLstChg,
+        tFltrProtocolListItemRowStatus,
+        tIPFilterParamsExtProtocolList,
+        tIPv6FilterParamsExtProtocolList
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting the management of protocol lists for
+         filters on Nokia SROS series systems."
+    ::= { tFilterMIBGroups 108 }
+
+tFilterMatchDestClassGroup       OBJECT-GROUP
+    OBJECTS     {
+        tIPFilterParamsExtDestClass,
+        tIPv6FilterParamsExtDestClass
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting the management of BGP destination
+         class filtering on Nokia SROS series systems."
+    ::= { tFilterMIBGroups 109 }
+
+tFilterL2AwareNatBypassGroup     OBJECT-GROUP
+    OBJECTS     {
+        tIPvXFltrActL2AwareNatBypass
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting the l2-aware-nat-bypass filter action
+         on Nokia SROS series systems."
+    ::= { tFilterMIBGroups 110 }
+
+tFltrLiRsvdBlockRangeChgNotifGrp NOTIFICATION-GROUP
+    NOTIFICATIONS {
+        tFltrLiRsvdBlockRangeChangeEvent
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of notifications supporting filter LI reserved block range
+         change on Nokia 7x50 ESS/SR series systems 20.0 release."
+    ::= { tFilterMIBGroups 111 }
+
+tFltrCflowdSampleProfileGroup    OBJECT-GROUP
+    OBJECTS     {
+        tIPFilterParamsExtSampleProf,
+        tIPv6FilterParamsExtSampleProf
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting filter cflowd sample profile on Nokia
+         7x50 ESS/SR series systems 20.7 release."
+    ::= { tFilterMIBGroups 112 }
+
 tFilterNotificationsPrefix       OBJECT IDENTIFIER ::= { tmnxSRNotifyPrefix 21 }
 
 tFilterNotifications             OBJECT IDENTIFIER ::= { tFilterNotificationsPrefix 0 }
@@ -20520,7 +20855,16 @@ tFilterApplyPathProblem          NOTIFICATION-TYPE
     STATUS      current
     DESCRIPTION
         "The tFilterApplyPathProblem notification is generated when a problem
-         is encountered for a configured apply-path rule."
+         is encountered for a configured apply-path rule.
+
+         [CAUSE] Failed to add prefix/prefixes specified by the apply-path rule
+         to the prefix list likely due to insufficient resources.
+
+         [EFFECT] Prefix list does not contain all prefixes specified by the
+         apply-path rule.
+
+         [RECOVERY] Release resources by removing unnecessary prefixes or
+         specify more specific apply-path rule."
     ::= { tFilterNotifications 8 }
 
 tFilterRadSharedFltrAlarmRaised  NOTIFICATION-TYPE
@@ -20746,5 +21090,24 @@ tFilterRPActiveDestChangeEvent   NOTIFICATION-TYPE
 
          [RECOVERY] No recovery action is required."
     ::= { tFilterNotifications 16 }
+
+tFltrLiRsvdBlockRangeChangeEvent NOTIFICATION-TYPE
+    OBJECTS     {
+        tLiReservedBlockStart,
+        tLiReservedBlockSize
+    }
+    STATUS      current
+    DESCRIPTION
+        "The tFltrLiRsvdBlockRangeChangeEvent notification is generated when
+         the LI reserved block range changes.
+
+         [CAUSE] This notification was triggered because LI reserved block
+         range has changed.
+
+         [EFFECT] This change may rearrange filters entries and may temporarily
+         disrupt current interception.
+
+         [RECOVERY] No recovery action is required."
+    ::= { tFilterNotifications 17 }
 
 END

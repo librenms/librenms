@@ -569,7 +569,8 @@ vRtrMplsLspType                  OBJECT-TYPE
         srTe           (10),
         meshP2pSrTe    (11),
         oneHopP2pSrTe  (12),
-        pceInitP2pSrTe (13)
+        pceInitP2pSrTe (13),
+        reserved15     (15)
     }
     MAX-ACCESS  read-create
     STATUS      current
@@ -623,7 +624,8 @@ vRtrMplsLspType                  OBJECT-TYPE
          that the point-to-point segment routing LSP is created dynamically on
          receiving a PCE-Initiated Message from PCC, using pceInitP2pSrTe LSP
          Template values configured in the associated row entry of
-         vRtrMplsLspTemplateTable."
+         vRtrMplsLspTemplateTable.
+         "
     DEFVAL      { dynamic }
     ::= { vRtrMplsLspEntry 9 }
 
@@ -1123,7 +1125,7 @@ vRtrMplsLspFRObject              OBJECT-TYPE
     ::= { vRtrMplsLspEntry 38 }
 
 vRtrMplsLspHoldTimer             OBJECT-TYPE
-    SYNTAX      Unsigned32 (0..10)
+    SYNTAX      Unsigned32 (0..1000)
     UNITS       "seconds"
     MAX-ACCESS  read-only
     STATUS      current
@@ -1734,7 +1736,8 @@ VRtrMplsLspStatEntry             ::= SEQUENCE
     vRtrMplsLspOperationalPaths      Integer32,
     vRtrMplsLspConfP2mpInstances     Gauge32,
     vRtrMplsLspStatsEgrIndexUnAvail  TruthValue,
-    vRtrMplsLspSelfPingTimeouts      Counter32
+    vRtrMplsLspSelfPingTimeouts      Counter32,
+    vRtrMplsLspSelfPingOamNoRsc      Counter32
 }
 
 vRtrMplsLspOctets                OBJECT-TYPE
@@ -1892,6 +1895,15 @@ vRtrMplsLspSelfPingTimeouts      OBJECT-TYPE
          self-ping has timed out for paths in this LSP."
     ::= { vRtrMplsLspStatEntry 16 }
 
+vRtrMplsLspSelfPingOamNoRsc      OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsLspSelfPingOamNoRsc indicates the number of times
+         self-ping failed due to oam resource limitations for this LSP."
+    ::= { vRtrMplsLspStatEntry 17 }
+
 vRtrMplsLspPathTableSpinlock     OBJECT-TYPE
     SYNTAX      TestAndIncr
     MAX-ACCESS  read-write
@@ -2013,7 +2025,8 @@ VRtrMplsLspPathEntry             ::= SEQUENCE
     vRtrMplsLspPathBfdState          INTEGER,
     vRtrMplsLspPathBfdStartFailRsn   DisplayString,
     vRtrMplsLspPathBfdOperUpWaitTmr  Unsigned32,
-    vRtrMplsLspPathSelfPingOprState  TmnxOperState
+    vRtrMplsLspPathSelfPingOprState  TmnxOperState,
+    vRtrMplsLspPathLastMBBFailCode   TmnxMplsLspFailCode
 }
 
 vRtrMplsLspPathRowStatus         OBJECT-TYPE
@@ -3002,7 +3015,7 @@ vRtrMplsLspPathBfdUpWaitTimer    OBJECT-TYPE
          seconds the software will wait for the BFD session to come up.
 
          The timer object is applicable for LSPs with vRtrMplsLspType set to
-         'srTe'.
+         'srTe' or 'dynamic'.
 
          The timer is started when BFD is first enabled on a path or BFD
          transitions from up to down. When this timer expires and if BFD
@@ -3075,6 +3088,16 @@ vRtrMplsLspPathSelfPingOprState  OBJECT-TYPE
         "The current operational state for self-ping for this LSP path."
     ::= { vRtrMplsLspPathEntry 78 }
 
+vRtrMplsLspPathLastMBBFailCode   OBJECT-TYPE
+    SYNTAX      TmnxMplsLspFailCode
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsLspPathLastMBBFailCode indicates the reason code
+         for last MBB failure before retry limit exceeded. A value of 0
+         indicates that no failure has occurred."
+    ::= { vRtrMplsLspPathEntry 79 }
+
 vRtrMplsLspPathStatTable         OBJECT-TYPE
     SYNTAX      SEQUENCE OF VRtrMplsLspPathStatEntry
     MAX-ACCESS  not-accessible
@@ -3100,15 +3123,15 @@ vRtrMplsLspPathStatEntry         OBJECT-TYPE
 
 VRtrMplsLspPathStatEntry         ::= SEQUENCE
 {
-    vRtrMplsLspPathTimeUp            TimeInterval,
-    vRtrMplsLspPathTimeDown          TimeInterval,
+    vRtrMplsLspPathTimeUp            TmnxTimeInterval,
+    vRtrMplsLspPathTimeDown          TmnxTimeInterval,
     vRtrMplsLspPathRetryAttempts     Unsigned32,
     vRtrMplsLspPathTransitionCount   Counter32,
     vRtrMplsLspPathCspfQueries       Counter32
 }
 
 vRtrMplsLspPathTimeUp            OBJECT-TYPE
-    SYNTAX      TimeInterval
+    SYNTAX      TmnxTimeInterval
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
@@ -3118,7 +3141,7 @@ vRtrMplsLspPathTimeUp            OBJECT-TYPE
     ::= { vRtrMplsLspPathStatEntry 1 }
 
 vRtrMplsLspPathTimeDown          OBJECT-TYPE
-    SYNTAX      TimeInterval
+    SYNTAX      TmnxTimeInterval
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
@@ -3346,7 +3369,9 @@ VRtrMplsGeneralEntry             ::= SEQUENCE
     vRtrMplsGenSrTeResigOnIgpEvent   TruthValue,
     vRtrMplsGeneralV6OperState       TmnxOperState,
     vRtrMplsGeneralV6OperDownReason  TmnxMplsOperDownReasonCode,
-    vRtrMplsGenSrteNextResignal      Unsigned32
+    vRtrMplsGenSrteNextResignal      Unsigned32,
+    vRtrMplsLspSelfPingTimeoutAction INTEGER,
+    vRtrMplsGenResignalOnIgpOverload TruthValue
 }
 
 vRtrMplsGeneralLastChange        OBJECT-TYPE
@@ -3494,7 +3519,7 @@ vRtrMplsGeneralResignalTimer     OBJECT-TYPE
     ::= { vRtrMplsGeneralEntry 9 }
 
 vRtrMplsGeneralHoldTimer         OBJECT-TYPE
-    SYNTAX      Unsigned32 (0..10)
+    SYNTAX      Unsigned32 (0..1000)
     UNITS       "seconds"
     MAX-ACCESS  read-create
     STATUS      current
@@ -3915,7 +3940,7 @@ vRtrMplsGenMbbPrefCurrentHops    OBJECT-TYPE
     ::= { vRtrMplsGeneralEntry 42 }
 
 vRtrMplsGeneralBypassResigTimer  OBJECT-TYPE
-    SYNTAX      Unsigned32 (0 | 30..10080)
+    SYNTAX      Unsigned32 (0..10080)
     UNITS       "minutes"
     MAX-ACCESS  read-create
     STATUS      current
@@ -4167,6 +4192,44 @@ vRtrMplsGenSrteNextResignal      OBJECT-TYPE
          in minutes, for the vRtrMplsGenSrTeResignalTimer to expire."
     ::= { vRtrMplsGeneralEntry 58 }
 
+vRtrMplsLspSelfPingTimeoutAction OBJECT-TYPE
+    SYNTAX      INTEGER {
+        retry  (1),
+        switch (2)
+    }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsLspSelfPingTimeoutAction specifies the timeout
+         action  of Self Ping for RSVP-TE LSPs.
+
+         When the value of vRtrMplsLspSelfPingTimeoutAction is set to retry,
+         the application tears down the LSP path, and starts resignaling the
+         LSP path  after the resignal timer expiry.
+
+         When the value of vRtrMplsLspSelfPingTimeoutAction is set to switch,
+         the application switches over to the candidate LSP path."
+    DEFVAL      { retry }
+    ::= { vRtrMplsGeneralEntry 59 }
+
+vRtrMplsGenResignalOnIgpOverload OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsGenResignalOnIgpOverload specifies whether or not
+          RSVP-TE LSPs will be resignaled when IGP overload bit is received.
+
+         When the value of vRtrMplsGenResignalOnIgpOverload is set to 'true'
+         and a node reports that it is in IGP overload state, MPLS will force
+         the  expiry of P2P and/or P2MP resignal timers for RSVP-TE LSPs.
+
+         When the value of vRtrMplsGenResignalOnIgpOverload is set to 'false'
+         and a node reports that it is in IGP overload state, MPLS will not
+         force the  expiry of P2P and/or P2MP resignal timers for RSVP-TE LSPs."
+    DEFVAL      { false }
+    ::= { vRtrMplsGeneralEntry 60 }
+
 vRtrMplsGeneralStatTable         OBJECT-TYPE
     SYNTAX      SEQUENCE OF VRtrMplsGeneralStatEntry
     MAX-ACCESS  not-accessible
@@ -4216,7 +4279,8 @@ VRtrMplsGeneralStatEntry         ::= SEQUENCE
     vRtrMplsGenMeshP2PSrTeLspOrig    Gauge32,
     vRtrMplsGenOneHopP2PSrTeLspOrig  Gauge32,
     vRtrMplsGenPceInitP2PSrTeLspOrig Gauge32,
-    vRtrMplsGenLspSelfPingTimeouts   Counter32
+    vRtrMplsGenLspSelfPingTimeouts   Counter32,
+    vRtrMplsGenLspSelfPingOamNoRsc   Counter32
 }
 
 vRtrMplsGeneralStaticLspOriginate OBJECT-TYPE
@@ -4466,6 +4530,15 @@ vRtrMplsGenLspSelfPingTimeouts   OBJECT-TYPE
          self-ping timeouts for LSPs originating at this virtual router."
     ::= { vRtrMplsGeneralStatEntry 27 }
 
+vRtrMplsGenLspSelfPingOamNoRsc   OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsGenLspSelfPingOamNoRsc indicates the number of
+         failed LSP self-ping due to oam resource limitations."
+    ::= { vRtrMplsGeneralStatEntry 28 }
+
 vRtrMplsIfTable                  OBJECT-TYPE
     SYNTAX      SEQUENCE OF VRtrMplsIfEntry
     MAX-ACCESS  not-accessible
@@ -4695,7 +4768,8 @@ VRtrMplsTunnelARHopEntry         ::= SEQUENCE
     vRtrMplsTunnelARHopRouterId      IpAddress,
     vRtrMplsTunnelARHopUnnumIfID     Unsigned32,
     vRtrMplsTunnelARHopSIDType       INTEGER,
-    vRtrMplsTunnelARHopNgRouterId    InetAddress
+    vRtrMplsTunnelARHopNgRouterId    InetAddress,
+    vRtrMplsTunnelARHopNgRtrIdType   InetAddressType
 }
 
 vRtrMplsTunnelARHopProtection    OBJECT-TYPE
@@ -4806,6 +4880,23 @@ vRtrMplsTunnelARHopNgRouterId    OBJECT-TYPE
          the value of mplsTunnelARHopAddrType. Currently value of 'ipv6' is
          supported."
     ::= { vRtrMplsTunnelARHopEntry 6 }
+
+vRtrMplsTunnelARHopNgRtrIdType   OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsTunnelARHopNgRtrIdType indicates the type of
+         address for this router-id.
+
+         When the value of vRtrMplsTunnelARHopNgRtrIdType is 'ipv4', it
+         indicates that vRtrMplsTunnelARHopNgRouterId of this hop is of ipv4
+         type.
+
+         When the value of vRtrMplsTunnelARHopNgRtrIdType is 'ipv6', it
+         indicates that vRtrMplsTunnelARHopNgRouterId of this hop is of ipv6
+         type."
+    ::= { vRtrMplsTunnelARHopEntry 7 }
 
 vRtrMplsTunnelCHopTable          OBJECT-TYPE
     SYNTAX      SEQUENCE OF VRtrMplsTunnelCHopEntry
@@ -5392,7 +5483,8 @@ vRtrMplsLspSwitchStbyReasonCode  OBJECT-TYPE
         lspActivePathIsPrimary        (12),
         currentActivePathIsBest       (13),
         betterPathFound               (14),
-        currentActivePathWentDown     (15)
+        currentActivePathWentDown     (15),
+        lspPathIsDegraded             (16)
     }
     MAX-ACCESS  accessible-for-notify
     STATUS      current
@@ -6506,15 +6598,15 @@ vRtrMplsP2mpInstStatEntry        OBJECT-TYPE
 VRtrMplsP2mpInstStatEntry        ::= SEQUENCE
 {
     vRtrMplsP2mpInstStatS2lChanges   Counter32,
-    vRtrMplsP2mpInstStatLastS2lChange TimeInterval,
+    vRtrMplsP2mpInstStatLastS2lChange TmnxTimeInterval,
     vRtrMplsP2mpInstStatConfiguredS2ls Gauge32,
     vRtrMplsP2mpInstStatOperationalS2ls Gauge32,
-    vRtrMplsP2mpInstStatLastS2lTimeUp TimeInterval,
-    vRtrMplsP2mpInstStatLastS2lTimeDown TimeInterval,
-    vRtrMplsP2mpInstStatTimeUp       TimeInterval,
-    vRtrMplsP2mpInstStatTimeDown     TimeInterval,
+    vRtrMplsP2mpInstStatLastS2lTimeUp TmnxTimeInterval,
+    vRtrMplsP2mpInstStatLastS2lTimeDown TmnxTimeInterval,
+    vRtrMplsP2mpInstStatTimeUp       TmnxTimeInterval,
+    vRtrMplsP2mpInstStatTimeDown     TmnxTimeInterval,
     vRtrMplsP2mpInstStatTransitions  Counter32,
-    vRtrMplsP2mpInstStatLastTrans    TimeInterval
+    vRtrMplsP2mpInstStatLastTrans    TmnxTimeInterval
 }
 
 vRtrMplsP2mpInstStatS2lChanges   OBJECT-TYPE
@@ -6529,7 +6621,7 @@ vRtrMplsP2mpInstStatS2lChanges   OBJECT-TYPE
     ::= { vRtrMplsP2mpInstStatEntry 1 }
 
 vRtrMplsP2mpInstStatLastS2lChange OBJECT-TYPE
-    SYNTAX      TimeInterval
+    SYNTAX      TmnxTimeInterval
     UNITS       "centiseconds"
     MAX-ACCESS  read-only
     STATUS      current
@@ -6558,7 +6650,7 @@ vRtrMplsP2mpInstStatOperationalS2ls OBJECT-TYPE
     ::= { vRtrMplsP2mpInstStatEntry 4 }
 
 vRtrMplsP2mpInstStatLastS2lTimeUp OBJECT-TYPE
-    SYNTAX      TimeInterval
+    SYNTAX      TmnxTimeInterval
     UNITS       "centiseconds"
     MAX-ACCESS  read-only
     STATUS      current
@@ -6568,7 +6660,7 @@ vRtrMplsP2mpInstStatLastS2lTimeUp OBJECT-TYPE
     ::= { vRtrMplsP2mpInstStatEntry 5 }
 
 vRtrMplsP2mpInstStatLastS2lTimeDown OBJECT-TYPE
-    SYNTAX      TimeInterval
+    SYNTAX      TmnxTimeInterval
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
@@ -6577,7 +6669,7 @@ vRtrMplsP2mpInstStatLastS2lTimeDown OBJECT-TYPE
     ::= { vRtrMplsP2mpInstStatEntry 6 }
 
 vRtrMplsP2mpInstStatTimeUp       OBJECT-TYPE
-    SYNTAX      TimeInterval
+    SYNTAX      TmnxTimeInterval
     UNITS       "centiseconds"
     MAX-ACCESS  read-only
     STATUS      current
@@ -6587,7 +6679,7 @@ vRtrMplsP2mpInstStatTimeUp       OBJECT-TYPE
     ::= { vRtrMplsP2mpInstStatEntry 7 }
 
 vRtrMplsP2mpInstStatTimeDown     OBJECT-TYPE
-    SYNTAX      TimeInterval
+    SYNTAX      TmnxTimeInterval
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
@@ -6606,7 +6698,7 @@ vRtrMplsP2mpInstStatTransitions  OBJECT-TYPE
     ::= { vRtrMplsP2mpInstStatEntry 9 }
 
 vRtrMplsP2mpInstStatLastTrans    OBJECT-TYPE
-    SYNTAX      TimeInterval
+    SYNTAX      TmnxTimeInterval
     UNITS       "ten-milliseconds"
     MAX-ACCESS  read-only
     STATUS      current
@@ -8763,7 +8855,8 @@ VRtrMplsLspTemplateEntry         ::= SEQUENCE
     vRtrMplsLspTempLocalSrProt       INTEGER,
     vRtrMplsLspTempLabelStackRed     TruthValue,
     vRtrMplsLspTempBfdUpWaitTimer    Unsigned32,
-    vRtrMplsLspTempSelfPing          INTEGER
+    vRtrMplsLspTempSelfPing          INTEGER,
+    vRtrMplsLspTempAddrFamily        INTEGER
 }
 
 vRtrMplsLspTemplateName          OBJECT-TYPE
@@ -8812,7 +8905,8 @@ vRtrMplsLspTemplateType          OBJECT-TYPE
         meshP2P        (3),
         onehopP2PSrTe  (4),
         meshP2PSrTe    (5),
-        pceInitP2PSrTe (6)
+        pceInitP2PSrTe (6),
+        reserved8      (8)
     }
     MAX-ACCESS  read-create
     STATUS      current
@@ -9776,6 +9870,26 @@ vRtrMplsLspTempSelfPing          OBJECT-TYPE
          The default value for vRtrMplsLspTempSelfPing is 'inherit'."
     DEFVAL      { inherit }
     ::= { vRtrMplsLspTemplateEntry 66 }
+
+vRtrMplsLspTempAddrFamily        OBJECT-TYPE
+    SYNTAX      INTEGER {
+        notApplicable (0),
+        ipv4          (1),
+        ipv6          (2)
+    }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsLspTempAddrFamily specifies the address family
+         type used for SR-TE LSP templates.
+
+         If the value of vRtrMplsLspTempAddrFamily is 'ipv4' for an LSP
+         template entry is using an ipv4 address.
+
+         If the value of vRtrMplsLspTempAddrFamily is 'ipv6' for an LSP
+         template entry is using an ipv6 address."
+    DEFVAL      { ipv4 }
+    ::= { vRtrMplsLspTemplateEntry 67 }
 
 vRtrMplsLspAutoBWTableLastChg    OBJECT-TYPE
     SYNTAX      TimeStamp
@@ -11987,7 +12101,7 @@ vRtrMplsLspExtBfdUpWaitTimer     OBJECT-TYPE
          vRtrMplsLspExtBfdFailureAction  is set to 'failoverOrDown'.
 
          The timer object is applicable for LSPs with vRtrMplsLspType set to
-         'srTe'.
+         'srTe' or 'dynamic'.
 
          The timer is started when BFD is first enabled on a path or BFD
          transitions from up to down. When this timer expires and if BFD has
@@ -15325,7 +15439,12 @@ tmnxMplsV20v0Compliance          MODULE-COMPLIANCE
             tmnxMplsEntropyLabelSrteGroup,
             tmnxMplsNotifyObjsLspResource,
             tmnxMplsNotifyV20v0Group,
-            tmnxMplsV20v0Group
+            tmnxMplsV20v0Group,
+            tmnxMplsLspSelfPingV20v0Group,
+            tmnxMplsSrTeIpv6LspTempGroup,
+            tmnxMplsTunnelARHopIdTypeGroup,
+            tmnxMplsGenV20Group,
+            tmnxMplsGenLspSelfPingV20Group
         }
     ::= { tmnxMplsCompliances 18 }
 
@@ -17910,7 +18029,8 @@ tmnxMplsV20v0Group               OBJECT-GROUP
         vRtrMplsLspPathOperPropAdminGrp,
         vRtrMplsLspPathOperFRHopLimit,
         vRtrMplsLspClassFwdingEnabled,
-        vRtrMplsLspTempClassFwdEnabled
+        vRtrMplsLspTempClassFwdEnabled,
+        vRtrMplsLspPathLastMBBFailCode
     }
     STATUS      current
     DESCRIPTION
@@ -17936,6 +18056,16 @@ tmnxMplsObsoletedV20v0Group      OBJECT-GROUP
          20.0 release."
     ::= { tmnxMplsGroups 115 }
 
+tmnxMplsLspSelfPingV20v0Group    OBJECT-GROUP
+    OBJECTS     {
+        vRtrMplsLspSelfPingTimeoutAction
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects in MPLS supporting management of SR-TE SBFD on
+         Nokia SROS series systems 20.0 release."
+    ::= { tmnxMplsGroups 116 }
+
 tmnxMplsClassFwdObsoleteGroup    OBJECT-GROUP
     OBJECTS     {
         vRtrMplsLspFC,
@@ -17946,6 +18076,47 @@ tmnxMplsClassFwdObsoleteGroup    OBJECT-GROUP
         "The group of objects supporting management of class forwarding on
          Nokia SROS series systems obsoleted in release 20.0."
     ::= { tmnxMplsGroups 117 }
+
+tmnxMplsSrTeIpv6LspTempGroup     OBJECT-GROUP
+    OBJECTS     {
+        vRtrMplsLspTempAddrFamily
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects in MPLS supporting management of LSP Template
+         Ipv6 on Nokia SROS series systems 20.0 release."
+    ::= { tmnxMplsGroups 118 }
+
+tmnxMplsTunnelARHopIdTypeGroup   OBJECT-GROUP
+    OBJECTS     {
+        vRtrMplsTunnelARHopNgRtrIdType
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects in MPLS supporting management of MPLS tunnel AR
+         Hop table on Nokia SROS series systems."
+    ::= { tmnxMplsGroups 119 }
+
+tmnxMplsGenV20Group              OBJECT-GROUP
+    OBJECTS     {
+        vRtrMplsGenResignalOnIgpOverload
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting management of extended MPLS interfaces
+         on Nokia SROS series systems 20.0 Release."
+    ::= { tmnxMplsGroups 121 }
+
+tmnxMplsGenLspSelfPingV20Group   OBJECT-GROUP
+    OBJECTS     {
+        vRtrMplsLspSelfPingOamNoRsc,
+        vRtrMplsGenLspSelfPingOamNoRsc
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of operational objects in MPLS  supporting management of LSP
+         self-ping  on Nokia SROS series systems 20.0 Release."
+    ::= { tmnxMplsGroups 122 }
 
 tmnxMplsNotifyPrefix             OBJECT IDENTIFIER ::= { tmnxSRNotifyPrefix 6 }
 

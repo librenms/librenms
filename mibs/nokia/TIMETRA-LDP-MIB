@@ -12127,8 +12127,8 @@ vRtrLdpPeerTemplTunneling        OBJECT-TYPE
     STATUS      current
     DESCRIPTION
         "The value of vRtrLdpPeerTemplTunneling specifies whether tunneling of
-         LDP over tunnels is enabled. When this object has a value of 'true',
-         tunneling is enabled. When its value is 'false', tunneling is
+         LDP over prefix tunnels is enabled. When this object has a value of
+         'true', tunneling is enabled. When its value is 'false', tunneling is
          disabled."
     DEFVAL      { false }
     ::= { vRtrLdpPeerTemplEntry 10 }

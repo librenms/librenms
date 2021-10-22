@@ -329,6 +329,20 @@ tmnxModelIXReReg                 OBJECT-IDENTITY
          Nokia 7250 IXR-e device."
     ::= { timetraServiceRouters 25 }
 
+tmnxModelIXRr4Reg                OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "This objectId is to be used as the mib-2 sysObjectID to identify the
+         Nokia 7250 IXR r4 device."
+    ::= { timetraServiceRouters 26 }
+
+tmnxModelIXRx1Reg                OBJECT-IDENTITY
+    STATUS      current
+    DESCRIPTION
+        "This objectId is to be used as the mib-2 sysObjectID to identify the
+         Nokia 7250 IXR-x1 and IXR-xs device."
+    ::= { timetraServiceRouters 27 }
+
 timetraServiceSwitches           OBJECT IDENTIFIER ::= { timetraReg 6 }
 
 tmnxModelESS1Reg                 OBJECT-IDENTITY
@@ -409,11 +423,11 @@ alcatelMGVMExtRoutingSystems     OBJECT IDENTIFIER ::= { timetraReg 13 }
 
 alcatelMobileSbaSystems          OBJECT IDENTIFIER ::= { timetraReg 14 }
 
-tmnxModelNrfReg                  OBJECT-IDENTITY
+tmnxModelNrdReg                  OBJECT-IDENTITY
     STATUS      current
     DESCRIPTION
         "This objectId is to be used as the mib-2 sysObjectID to identify the
-         Nokia Network Repository Function (NRF) device."
+         Nokia Network Repository Discovery (NRD) device."
     ::= { alcatelMobileSbaSystems 1 }
 
 alcatel7950ExtRoutingSystems     OBJECT IDENTIFIER ::= { timetraReg 15 }

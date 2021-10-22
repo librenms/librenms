@@ -42,6 +42,7 @@ IMPORTS
     svcDhcpLseStatePopulateError,
     svcDhcpPacketProblem, svcDhcpProxyError,
     svcDhcpSubAuthError, svcId,
+    svcTlsBackboneVplsSvcId,
     svcTlsMacMoveMaxRate,
     svcTlsStpDesignatedRoot, svcVpnId,
     tlsDhcpPacketProblem, tlsFdbType,
@@ -2746,7 +2747,8 @@ SdpBindTlsEntry                  ::= SEQUENCE
     sdpBindTlsAutoLearnMacProtect    TruthValue,
     sdpBindDisableSendBvplsEvpnFlush TruthValue,
     sdpBindTlsRestProtSrcMacOper     TruthValue,
-    sdpBindTlsRestProtSrcMacOperAct  INTEGER
+    sdpBindTlsRestProtSrcMacOperAct  INTEGER,
+    sdpBindTlsAutoLrnMacPrtExcList   TNamedItemOrEmpty
 }
 
 sdpBindTlsStpAdminStatus         OBJECT-TYPE
@@ -3441,6 +3443,17 @@ sdpBindTlsRestProtSrcMacOperAct  OBJECT-TYPE
          operational state of the Restrict Protected Source MAC action."
     ::= { sdpBindTlsEntry 57 }
 
+sdpBindTlsAutoLrnMacPrtExcList   OBJECT-TYPE
+    SYNTAX      TNamedItemOrEmpty
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of sdpBindTlsAutoLrnMacPrtExcList specifies mac-list name
+         which contains MAC addresses to be excluded from auto learn mac
+         protect"
+    DEFVAL      { "" }
+    ::= { sdpBindTlsEntry 58 }
+
 sdpBindMeshTlsTable              OBJECT-TYPE
     SYNTAX      SEQUENCE OF SdpBindMeshTlsEntry
     MAX-ACCESS  not-accessible
@@ -3471,7 +3484,8 @@ SdpBindMeshTlsEntry              ::= SEQUENCE
     sdpBindMeshTlsRestProtSrcMacAct  INTEGER,
     sdpBindMeshTlsAutoLearnMacProt   TruthValue,
     sdpBindMeshTlsRPSMacOper         TruthValue,
-    sdpBindMeshTlsRPSMacOperAct      INTEGER
+    sdpBindMeshTlsRPSMacOperAct      INTEGER,
+    sdpBindMeshTlsAutLrnMacPrtExcLs  TNamedItemOrEmpty
 }
 
 sdpBindMeshTlsPortState          OBJECT-TYPE
@@ -3615,6 +3629,17 @@ sdpBindMeshTlsRPSMacOperAct      OBJECT-TYPE
         "The value of the object sdpBindMeshTlsRPSMacOperAct indicates the
          operational state of the Restrict Protected Source MAC action."
     ::= { sdpBindMeshTlsEntry 9 }
+
+sdpBindMeshTlsAutLrnMacPrtExcLs  OBJECT-TYPE
+    SYNTAX      TNamedItemOrEmpty
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of sdpBindMeshTlsAutLrnMacPrtExcLs specifies mac-list name
+         which contains MAC addresses to be excluded from auto learn mac
+         protect"
+    DEFVAL      { "" }
+    ::= { sdpBindMeshTlsEntry 10 }
 
 sdpBindApipeTable                OBJECT-TYPE
     SYNTAX      SEQUENCE OF SdpBindApipeEntry
@@ -8657,7 +8682,8 @@ PwTemplateAugEntry               ::= SEQUENCE
     pwTemplateAugL2ptProtocols       L2ptProtocols,
     pwTemplateAugGreAllowFrag        TruthValue,
     pwTemplateAugAluNgeKeyGroupIn    AluNgeKeygroupIdOrZero,
-    pwTemplateAugAluNgeKeyGroupOut   AluNgeKeygroupIdOrZero
+    pwTemplateAugAluNgeKeyGroupOut   AluNgeKeygroupIdOrZero,
+    pwTemplateAugAtLnMacPrtExcList   TNamedItemOrEmpty
 }
 
 pwTemplateAugLastChgd            OBJECT-TYPE
@@ -8816,6 +8842,17 @@ pwTemplateAugAluNgeKeyGroupOut   OBJECT-TYPE
          the outbound direction."
     DEFVAL      { 0 }
     ::= { pwTemplateAugEntry 13 }
+
+pwTemplateAugAtLnMacPrtExcList   OBJECT-TYPE
+    SYNTAX      TNamedItemOrEmpty
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of pwTemplateAugAtLnMacPrtExcList specifies mac-list name
+         which contains MAC addresses to be excluded from auto learn mac
+         protect"
+    DEFVAL      { "" }
+    ::= { pwTemplateAugEntry 14 }
 
 sdpSegRouteTableLastChgd         OBJECT-TYPE
     SYNTAX      TimeStamp
@@ -9192,6 +9229,64 @@ sdpMplsLspLastChanged            OBJECT-TYPE
         "The value of sysUpTime at the time of the most recent change to this
          entry."
     ::= { sdpMplsLspEntry 3 }
+
+sdpBindExt2TableLastChgd         OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of sdpBindExt2TableLastChgd indicates the sysUpTime at the
+         time of the last modification of sdpBindExt2Table.
+
+         If no changes were made to the entry since the last re-initialization
+         of the local network management subsystem, then this object contains a
+         zero value."
+    ::= { tmnxSdpObjs 74 }
+
+sdpBindExt2Table                 OBJECT-TYPE
+    SYNTAX      SEQUENCE OF SdpBindExt2Entry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table that extends sdpBindTable."
+    ::= { tmnxSdpObjs 75 }
+
+sdpBindExt2Entry                 OBJECT-TYPE
+    SYNTAX      SdpBindExt2Entry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "sdpBindExt2Entry extends sdpBindEntry."
+    INDEX       {
+        svcId,
+        sdpBindId
+    }
+    ::= { sdpBindExt2Table 1 }
+
+SdpBindExt2Entry                 ::= SEQUENCE
+{
+    sdpBindExt2LastMgmtChange        TimeStamp,
+    sdpBindExt2AdvSvcMtu             Integer32
+}
+
+sdpBindExt2LastMgmtChange        OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of sysUpTime at the time of the most recent
+         management-initiated change to this Service-SDP binding."
+    ::= { sdpBindExt2Entry 1 }
+
+sdpBindExt2AdvSvcMtu             OBJECT-TYPE
+    SYNTAX      Integer32 (-1 | 0..9782)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The sdpBindExt2AdvSvcMtu specifies the service-mtu value which
+         overrides service MTU value for the service."
+    DEFVAL      { -1 }
+    ::= { sdpBindExt2Entry 2 }
 
 tmnxSdpNotifyObjs                OBJECT IDENTIFIER ::= { tmnxSdpObjs 100 }
 
@@ -10509,7 +10604,8 @@ tmnxSdp7450V16v0Compliance       MODULE-COMPLIANCE
             pwTemplateGreGroup,
             pwTemplateQosV16v0Group,
             pwTemplateFilterNameV16v0Group,
-            tmnxSdpBindQinqV16v0Group
+            tmnxSdpBindQinqV16v0Group,
+            sdpBindSvcMtuGroup
         }
     ::= { tmnxSdpCompliances 31 }
 
@@ -10525,6 +10621,18 @@ tmnxSdpV19v0Compliance           MODULE-COMPLIANCE
             sdpBindMcastSrcV19v0Group
         }
     ::= { tmnxSdpCompliances 32 }
+
+tmnxSdpV20v0Compliance           MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for management of services SDPs on Nokia SROS
+         series systems release 20.0"
+    MODULE
+        MANDATORY-GROUPS {
+            sdpNotifyV20v0Group,
+            sdpBindTlsMacListV20v0Group
+        }
+    ::= { tmnxSdpCompliances 33 }
 
 tmnxSdpGroups                    OBJECT IDENTIFIER ::= { tmnxSdpConformance 2 }
 
@@ -12607,6 +12715,40 @@ sdpBindMcastSrcV19v0Group        OBJECT-GROUP
          feature on Nokia SROS series systems in release 19.0."
     ::= { tmnxSdpGroups 568 }
 
+sdpNotifyV20v0Group              NOTIFICATION-GROUP
+    NOTIFICATIONS {
+        sdpBindReceivedPbbProtSrcMac
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of SDP notifications on Nokia SROS series systems 20.0
+         release."
+    ::= { tmnxSdpGroups 569 }
+
+sdpBindTlsMacListV20v0Group      OBJECT-GROUP
+    OBJECTS     {
+        sdpBindTlsAutoLrnMacPrtExcList,
+        sdpBindMeshTlsAutLrnMacPrtExcLs,
+        pwTemplateAugAtLnMacPrtExcList
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting management of the auto learn Mac list
+         exclusion feature on Nokia SROS series systems in release 20.0."
+    ::= { tmnxSdpGroups 570 }
+
+sdpBindSvcMtuGroup               OBJECT-GROUP
+    OBJECTS     {
+        sdpBindExt2LastMgmtChange,
+        sdpBindExt2AdvSvcMtu,
+        sdpBindExt2TableLastChgd
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting service MTU override feature on Nokia
+         SROS series systems."
+    ::= { tmnxSdpGroups 573 }
+
 sdpTrapsPrefix                   OBJECT IDENTIFIER ::= { tmnxServNotifications 4 }
 
 sdpTraps                         OBJECT IDENTIFIER ::= { sdpTrapsPrefix 0 }
@@ -13178,6 +13320,23 @@ sdpControlPwActiveStateChg       NOTIFICATION-TYPE
 
          [RECOVERY] A change in the configuration may be required."
     ::= { sdpTraps 36 }
+
+sdpBindReceivedPbbProtSrcMac     NOTIFICATION-TYPE
+    OBJECTS     {
+        svcTlsBackboneVplsSvcId,
+        sdpBindId,
+        protectedMacForNotify
+    }
+    STATUS      current
+    DESCRIPTION
+        "[CAUSE] The sdpBindReceivedPbbProtSrcMac notification is generated
+         when a source MAC is protected in a i-vpls is received on SDP-BIND of
+         a b-vpls (svcTlsBackboneVplsSvcId) service.
+
+         [EFFECT] The frame will be discarded.
+
+         [RECOVERY] No action is required."
+    ::= { sdpTraps 37 }
 
 unacknowledgedTCN                NOTIFICATION-TYPE
     OBJECTS     {

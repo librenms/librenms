@@ -256,7 +256,7 @@ TmnxPhysChassisClass             ::= TEXTUAL-CONVENTION
         routerChassis (3),
         ethSatChassis (5),
         tdmSatChassis (6),
-        reserved7     (7)
+        esaChassis    (7)
     }
 
 TmnxPhysChassisRole              ::= TEXTUAL-CONVENTION
@@ -275,19 +275,13 @@ TmnxPhysChassisRole              ::= TEXTUAL-CONVENTION
                                   system
             sat-ethernet   (6)  - An Ethernet satellite chassis
             sat-tdm        (7)  - A Time Division Multiplexing satellite chassis
-            primary        (8)  - The primary router chassis in a paired chassis
-                                  system
-            secondary      (9)  - The secondary router chassis in a paired chassis
-                                  system
             "
     SYNTAX      INTEGER {
         standalone   (1),
         master       (2),
         extension    (3),
         sat-ethernet (6),
-        sat-tdm      (7),
-        primary      (8),
-        secondary    (9)
+        sat-tdm      (7)
     }
 
 TmnxCardType                     ::= TEXTUAL-CONVENTION
@@ -417,7 +411,21 @@ TmnxCardSuppType                 ::= TEXTUAL-CONVENTION
         supp-card-type-102 (102),
         supp-card-type-103 (103),
         supp-card-type-104 (104),
-        supp-card-type-105 (105)
+        supp-card-type-105 (105),
+        supp-card-type-106 (106),
+        supp-card-type-107 (107),
+        supp-card-type-108 (108),
+        supp-card-type-109 (109),
+        supp-card-type-110 (110),
+        supp-card-type-111 (111),
+        supp-card-type-112 (112),
+        supp-card-type-113 (113),
+        supp-card-type-114 (114),
+        supp-card-type-115 (115),
+        supp-card-type-116 (116),
+        supp-card-type-117 (117),
+        supp-card-type-118 (118),
+        supp-card-type-119 (119)
     }
 
 TmnxPEQType                      ::= TEXTUAL-CONVENTION
@@ -992,7 +1000,9 @@ TmnxSETSRefSource                ::= TEXTUAL-CONVENTION
         ptp         (5),
         noReference (6),
         synce       (7),
-        synce2      (8)
+        synce2      (8),
+        gnss        (9),
+        gnss2       (10)
     }
 
 TmnxSETSRefQualified             ::= TEXTUAL-CONVENTION
@@ -1566,7 +1576,7 @@ TmnxHwEventType                  ::= TEXTUAL-CONVENTION
     SYNTAX      INTEGER {
         soft-error          (1),
         internal-frame-loss (2),
-        reserved3           (3)
+        memory-error        (3)
     }
 
 TmnxHwEventAction                ::= TEXTUAL-CONVENTION
@@ -2136,8 +2146,7 @@ tmnxChassisOperNumSlots          OBJECT-TYPE
 tmnxChassisOperTopology          OBJECT-TYPE
     SYNTAX      INTEGER {
         standalone (1),
-        extended   (2),
-        paired     (3)
+        extended   (2)
     }
     MAX-ACCESS  read-only
     STATUS      current
@@ -2153,11 +2162,7 @@ tmnxChassisOperTopology          OBJECT-TYPE
          router chassis are connected together in a 'back-to-back' topology
          with no additional switch fabric chassis. An extended chassis topology
          is comprised of two XRS-20 chassis and is also known as an XRS-40
-         system.
-
-         A value of 'paired(3)' in a 7750 SR based system indicates that two
-         router chassis are connected together using one or more Ethernet ports
-         as fabric interconnects between the two chassis."
+         system."
     ::= { tmnxChassisEntry 30 }
 
 tmnxChassisFabricSpeed           OBJECT-TYPE
@@ -4257,7 +4262,9 @@ TChassisResEntry                 ::= SEQUENCE
     tChassisResVplsSapTotal          Unsigned32,
     tChassisResVplsSapAlloc          Unsigned32,
     tChassisResVprnSapTotal          Unsigned32,
-    tChassisResVprnSapAlloc          Unsigned32
+    tChassisResVprnSapAlloc          Unsigned32,
+    tChassisResFastDepthMQueuesTotal Unsigned32,
+    tChassisResFastDepthMQueuesAlloc Unsigned32
 }
 
 tChassisResSapIngQosPolTotal     OBJECT-TYPE
@@ -4829,6 +4836,29 @@ tChassisResVprnSapAlloc          OBJECT-TYPE
          instances that are currently allocated on this chassis."
     ::= { tChassisResEntry 50 }
 
+tChassisResFastDepthMQueuesTotal OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tChassisResFastDepthMQueuesTotal represents the total
+         number of fast polled queue depth monitored queue resources that are
+         allowed to provisioned on this chassis.
+
+         When the value of tChassisResFastDepthMQueuesTotal is zero, it
+         indicates that this resource type is not supported on this chassis."
+    ::= { tChassisResEntry 51 }
+
+tChassisResFastDepthMQueuesAlloc OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tChassisResFastDepthMQueuesAlloc represents the total
+         number of fast polled queue depth monitored queue resources that are
+         instances that are currently allocated on this chassis."
+    ::= { tChassisResEntry 52 }
+
 tmnxPhysChassisTable             OBJECT-TYPE
     SYNTAX      SEQUENCE OF TmnxPhysChassisEntry
     MAX-ACCESS  not-accessible
@@ -5299,7 +5329,8 @@ TmnxPhysChassisFanEntry          ::= SEQUENCE
     tmnxPhysChassisFanSpeed          INTEGER,
     tmnxPhysChassisFanRevision       INTEGER,
     tmnxPhysChassisFanSpeedPercent   Unsigned32,
-    tmnxPhysChassisFanType           INTEGER
+    tmnxPhysChassisFanType           INTEGER,
+    tmnxPhysChassisFanDirection      INTEGER
 }
 
 tmnxPhysChassisFanIndex          OBJECT-TYPE
@@ -5380,6 +5411,19 @@ tmnxPhysChassisFanType           OBJECT-TYPE
             chassis (1) - The fan tray is cooling the physical chassis
             pcm     (2) - The fan tray is cooling the Power Connection Modules (PCM)"
     ::= { tmnxPhysChassisFanEntry 6 }
+
+tmnxPhysChassisFanDirection      OBJECT-TYPE
+    SYNTAX      INTEGER {
+        unknown     (0),
+        frontToBack (1),
+        backToFront (2)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxPhysChassisFanDirection indicates the airflow
+         direction of the fans equipped by the tray represented in this row."
+    ::= { tmnxPhysChassisFanEntry 7 }
 
 tmnxPhysChassisPowerSupplyTable  OBJECT-TYPE
     SYNTAX      SEQUENCE OF TmnxPhysChassisPowerSupplyEntry
@@ -5500,8 +5544,9 @@ tmnxPhysChassPowerSup1Status     OBJECT-TYPE
          of the equipped power supply in the physical chassis.
 
          For AC multiple power supplies, this represents the overall status of
-         the first power supply in the tray. For any other type, this
-         represents the overall status of the power supply.
+         the first power supply in the tray. For DC multiple power supplies,
+         this represents the status of the first input feed. For any other
+         type, this represents the overall status of the power supply.
 
          If the value is 'deviceStateOk (3)', then all monitored statuses are
          'deviceStateOk (3)'. A value of 'deviceStateFailed (4)' represents a
@@ -5517,8 +5562,10 @@ tmnxPhysChassPowerSup2Status     OBJECT-TYPE
          of the equipped power supply in the physical chassis.
 
          For AC multiple power supplies, this represents the overall status of
-         the second power supply in the tray. For any other type, this object
-         is not applicable and set to 'deviceNotEquipped (2)'.
+         the second power supply in the tray. For DC multiple power supplies,
+         this represents the status of the second input feed. For any other
+         type, this object is not applicable and set to 'deviceNotEquipped
+         (2)'.
 
          If the value is 'deviceStateOk (3)', then all monitored statuses are
          'deviceStateOk (3)'. A value of 'deviceStateFailed (4)' represents a
@@ -6590,21 +6637,22 @@ tmnxCardSoftReset                OBJECT-TYPE
 
 tmnxCardLastBootupReason         OBJECT-TYPE
     SYNTAX      INTEGER {
-        hardReboot     (0),
-        softReset      (1),
-        powerCycle     (2),
-        clearCard      (3),
-        activitySwitch (4),
-        configChange   (5),
-        runtimeFail    (6),
-        bootFail       (7),
-        unexpected     (8),
-        issuTimeout    (9),
-        reinserted     (10),
-        issuHardReboot (11),
-        ccmFail        (12),
-        powerChange    (13),
-        levelChange    (14)
+        hardReboot      (0),
+        softReset       (1),
+        powerCycle      (2),
+        clearCard       (3),
+        activitySwitch  (4),
+        configChange    (5),
+        runtimeFail     (6),
+        bootFail        (7),
+        unexpected      (8),
+        issuTimeout     (9),
+        reinserted      (10),
+        issuHardReboot  (11),
+        ccmFail         (12),
+        powerChange     (13),
+        levelChange     (14),
+        sfmFailRecovery (15)
     }
     MAX-ACCESS  read-only
     STATUS      current
@@ -6614,22 +6662,23 @@ tmnxCardLastBootupReason         OBJECT-TYPE
 
          Not all reasons exist in all software versions.
 
-         hardReboot     - new/different card inserted for first time
-         softReset      - user initiated soft reset
-         powerCycle     - user initiated power cycle
-         clearCard      - user initiated clear card
-         activitySwitch - card rebooted during activity switch
-         configChange   - configuration change forced a reboot
-         runtimeFail    - card failed while running and was rebooted
-         bootFail       - card failed during boot and was rebooted
-         unexpected     - card unexpectedly rebooted
-         issuTimeout    - ISSU timeout timer expired
-         reinserted     - card was removed and reinserted
-         issuHardReboot - card rebooted during ISSU upgrade
-                             (soft reset ineligible)
-         ccmFail        - Chassis Control Module (CCM) failed.
-         powerChange    - Power availability changed.
-         levelChange    - Licensed level changed."
+         hardReboot      - new/different card inserted for first time
+         softReset       - user initiated soft reset
+         powerCycle      - user initiated power cycle
+         clearCard       - user initiated clear card
+         activitySwitch  - card rebooted during activity switch
+         configChange    - configuration change forced a reboot
+         runtimeFail     - card failed while running and was rebooted
+         bootFail        - card failed during boot and was rebooted
+         unexpected      - card unexpectedly rebooted
+         issuTimeout     - ISSU timeout timer expired
+         reinserted      - card was removed and reinserted
+         issuHardReboot  - card rebooted during ISSU upgrade
+                              (soft reset ineligible)
+         ccmFail         - Chassis Control Module (CCM) failed.
+         powerChange     - Power availability changed.
+         levelChange     - Licensed level changed.
+         sfmFailRecovery - SFM failure recovery rebooted the card."
     ::= { tmnxCardEntry 18 }
 
 tmnxCardCmplx1IngrFcsOccur       OBJECT-TYPE
@@ -8980,7 +9029,10 @@ tmnxMDAIsaTunnelGroup            OBJECT-TYPE
         "The value of tmnxMDAIsaTunnelGroup specifies the tunnel group
          identifier associated with this MDA.
 
-         The tunnel groups are configured by tmnxIPsecIsaGrpTable."
+         The tunnel groups are configured by tmnxIPsecIsaGrpTable.
+
+         When the object is set to a non-default value, the value of
+         'tmnxMDAIsaMemberPoolAssoc' must be default."
     DEFVAL      { 0 }
     ::= { tmnxMDAEntry 46 }
 
@@ -9376,7 +9428,20 @@ TmnxSyncIfTimingEntry            ::= SEQUENCE
     tmnxSyncIfTimingSyncE2Alarm      TmnxSETSRefAlarm,
     tmnxSyncIfTimingSyncE2RxQltyLevl TmnxSSMQualityLevel,
     tmnxSyncIfTimingSyncE2State      TmnxRefInState,
-    tmnxSyncIfTimingRefOrder5        TmnxSETSRefSource
+    tmnxSyncIfTimingRefOrder5        TmnxSETSRefSource,
+    tmnxSyncIfTimingGnssAdminStatus  TmnxPortAdminStatus,
+    tmnxSyncIfTimingGnssInUse        TruthValue,
+    tmnxSyncIfTimingGnssQualified    TmnxSETSRefQualified,
+    tmnxSyncIfTimingGnssAlarm        TmnxSETSRefAlarm,
+    tmnxSyncIfTimingGnssCfgQltyLevel TmnxSSMQualityLevel,
+    tmnxSyncIfTimingGnssRxQltyLevel  TmnxSSMQualityLevel,
+    tmnxSyncIfTimingGnssState        TmnxRefInState,
+    tmnxSyncIfTimingGnss2AdminStatus TmnxPortAdminStatus,
+    tmnxSyncIfTimingGnss2InUse       TruthValue,
+    tmnxSyncIfTimingGnss2Qualified   TmnxSETSRefQualified,
+    tmnxSyncIfTimingGnss2Alarm       TmnxSETSRefAlarm,
+    tmnxSyncIfTimingGnss2RxQltyLevel TmnxSSMQualityLevel,
+    tmnxSyncIfTimingGnss2State       TmnxRefInState
 }
 
 tmnxSyncIfTimingRevert           OBJECT-TYPE
@@ -9620,39 +9685,47 @@ tmnxSyncIfTimingBITSAlarm        OBJECT-TYPE
 tmnxSyncIfTimingRef1SrcHw        OBJECT-TYPE
     SYNTAX      TmnxHwIndexOrZero
     MAX-ACCESS  read-only
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The value of tmnxSyncIfTimingRef1SrcHw indicates the source HW index
-         of the first timing reference if source is not a port."
+         of the first timing reference if source is not a port.
+
+         This object was obsoleted in release 20.5."
     ::= { tmnxSyncIfTimingEntry 22 }
 
 tmnxSyncIfTimingRef1BITSIfType   OBJECT-TYPE
     SYNTAX      TmnxBITSIfType
     MAX-ACCESS  read-only
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The value of tmnxSyncIfTimingRef1BITSIfType indicates the interface
          type of the first timing reference if the source is BITS.  It also
-         indicates the framing type of the interface."
+         indicates the framing type of the interface.
+
+         This object was obsoleted in release 20.5."
     ::= { tmnxSyncIfTimingEntry 23 }
 
 tmnxSyncIfTimingRef2SrcHw        OBJECT-TYPE
     SYNTAX      TmnxHwIndexOrZero
     MAX-ACCESS  read-only
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The value of tmnxSyncIfTimingRef2SrcHw indicates the source HW index
-         of the second timing reference if source is not a port."
+         of the second timing reference if source is not a port.
+
+         This object was obsoleted in release 20.5."
     ::= { tmnxSyncIfTimingEntry 24 }
 
 tmnxSyncIfTimingRef2BITSIfType   OBJECT-TYPE
     SYNTAX      TmnxBITSIfType
     MAX-ACCESS  read-only
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The value of tmnxSyncIfTimingRef2BITSIfType indicates the interface
          type of the second timing reference if the source is BITS. It also
-         indicates the framing type of the interface."
+         indicates the framing type of the interface.
+
+         This object was obsoleted in release 20.5."
     ::= { tmnxSyncIfTimingEntry 25 }
 
 tmnxSyncIfTimingBITSOutAdmStatus OBJECT-TYPE
@@ -9832,22 +9905,26 @@ tmnxSyncIfTimingBITS2State       OBJECT-TYPE
 tmnxSyncIfTimingRef1NationalUse  OBJECT-TYPE
     SYNTAX      Unsigned32 (4..8)
     MAX-ACCESS  read-only
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The value of tmnxSyncIfTimingRef1NationalUse indicates the national
          use bit to carry SSM Messages. This applies only to E1 BITS
-         interfaces."
+         interfaces.
+
+         This object was obsoleted in release 20.5."
     DEFVAL      { 8 }
     ::= { tmnxSyncIfTimingEntry 42 }
 
 tmnxSyncIfTimingRef2NationalUse  OBJECT-TYPE
     SYNTAX      Unsigned32 (4..8)
     MAX-ACCESS  read-only
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The value of tmnxSyncIfTimingRef2NationalUse indicates the national
          use bit to carry SSM Messages. This applies only to E1 BITS
-         interfaces."
+         interfaces.
+
+         This object was obsoleted in release 20.5."
     DEFVAL      { 8 }
     ::= { tmnxSyncIfTimingEntry 43 }
 
@@ -10231,8 +10308,8 @@ tmnxSyncIfTimingSyncE2Alarm      OBJECT-TYPE
     DESCRIPTION
         "The value of tmnxSyncIfTimingSyncE2Alarm indicates the alarms on the
          Synchronous Ethernet 2 (SyncE) reference.  If any of the bits is set to '1',
-         then the SyncE reference is disqualified by the timing subsystem and the value of
-         tmnxSyncIfTimingSyncE2Qualified is set to 'not-qualified'.
+         then the SyncE 2 reference is disqualified by the timing subsystem and the value
+         of tmnxSyncIfTimingSyncE2Qualified is set to 'not-qualified'.
          los    - loss of signal
          oof    - out of frequency range
          oopir  - out of pull in range"
@@ -10265,6 +10342,145 @@ tmnxSyncIfTimingRefOrder5        OBJECT-TYPE
         "The value of tmnxSyncIfTimingRefOrder5 is the fifth most preferred
          timing reference for the synchronous equipment timing subsystem."
     ::= { tmnxSyncIfTimingEntry 81 }
+
+tmnxSyncIfTimingGnssAdminStatus  OBJECT-TYPE
+    SYNTAX      TmnxPortAdminStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSyncIfTimingGnssAdminStatus indicates the
+         administrative status of the Global Navigation Satellite System (GNSS)
+         timing reference."
+    ::= { tmnxSyncIfTimingEntry 82 }
+
+tmnxSyncIfTimingGnssInUse        OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSyncIfTimingGnssInUse indicates whether the GNSS
+         timing reference is presently being used by the synchronous timing
+         subsystem. If it is in use, tmnxSyncIfTimingFreqOffset indicates the
+         frequency offset for this reference."
+    ::= { tmnxSyncIfTimingEntry 83 }
+
+tmnxSyncIfTimingGnssQualified    OBJECT-TYPE
+    SYNTAX      TmnxSETSRefQualified
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSyncIfTimingGnssQualified indicates whether the GNSS
+         timing reference is qualified for use by the synchronous timing
+         subsystem. If tmnxSyncIfTimingGnssQualified is set to 'not-qualified',
+         then the object tmnxSyncIfTimingGnssAlarm gives the reason for
+         disqualification."
+    ::= { tmnxSyncIfTimingEntry 84 }
+
+tmnxSyncIfTimingGnssAlarm        OBJECT-TYPE
+    SYNTAX      TmnxSETSRefAlarm
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSyncIfTimingGnssAlarm indicates the alarms on the GNSS timing
+         reference.  If any of the bits is set to '1', then the GNSS reference is
+         disqualified by the timing subsystem and the value of
+         tmnxSyncIfTimingGnssQualified is set to 'not-qualified'.
+         los    - loss of signal
+         oof    - out of frequency range
+         oopir  - out of pull in range"
+    ::= { tmnxSyncIfTimingEntry 85 }
+
+tmnxSyncIfTimingGnssCfgQltyLevel OBJECT-TYPE
+    SYNTAX      TmnxSSMQualityLevel
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSyncIfTimingGnssCfgQltyLevel indicates the configured
+         Quality Level of the GNSS timing reference. A value of 'unknown (0)'
+         indicates Gnss is not forced to a specific quality level."
+    ::= { tmnxSyncIfTimingEntry 86 }
+
+tmnxSyncIfTimingGnssRxQltyLevel  OBJECT-TYPE
+    SYNTAX      TmnxSSMQualityLevel
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSyncIfTimingGnssRxQltyLevel indicates the received
+         SSM Quality Level of the GNSS timing reference."
+    ::= { tmnxSyncIfTimingEntry 87 }
+
+tmnxSyncIfTimingGnssState        OBJECT-TYPE
+    SYNTAX      TmnxRefInState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSyncIfTimingGnssState indicates the operational state
+         of the GNSS timing reference."
+    ::= { tmnxSyncIfTimingEntry 88 }
+
+tmnxSyncIfTimingGnss2AdminStatus OBJECT-TYPE
+    SYNTAX      TmnxPortAdminStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSyncIfTimingGnss2AdminStatus indicates the
+         administrative status of the GNSS 2 timing reference."
+    ::= { tmnxSyncIfTimingEntry 89 }
+
+tmnxSyncIfTimingGnss2InUse       OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSyncIfTimingGnss2InUse indicates whether the GNSS 2
+         timing reference is presently being used by the synchronous timing
+         subsystem. If it is in use, tmnxSyncIfTimingFreqOffset indicates the
+         frequency offset for this reference."
+    ::= { tmnxSyncIfTimingEntry 90 }
+
+tmnxSyncIfTimingGnss2Qualified   OBJECT-TYPE
+    SYNTAX      TmnxSETSRefQualified
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSyncIfTimingGnss2Qualified indicates whether the GNSS
+         2 timing reference is qualified for use by the synchronous timing
+         subsystem. If tmnxSyncIfTimingGnss2Qualified is set to
+         'not-qualified', then the object tmnxSyncIfTimingGnss2Alarm gives the
+         reason for disqualification."
+    ::= { tmnxSyncIfTimingEntry 91 }
+
+tmnxSyncIfTimingGnss2Alarm       OBJECT-TYPE
+    SYNTAX      TmnxSETSRefAlarm
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSyncIfTimingGnss2Alarm indicates the alarms on the GNSS 2
+         timing reference.  If any of the bits is set to '1', then the GNSS 2 reference
+         is disqualified by the timing subsystem and the value of
+         tmnxSyncIfTimingGnss2Qualified is set to 'not-qualified'.
+         los    - loss of signal
+         oof    - out of frequency range
+         oopir  - out of pull in range"
+    ::= { tmnxSyncIfTimingEntry 92 }
+
+tmnxSyncIfTimingGnss2RxQltyLevel OBJECT-TYPE
+    SYNTAX      TmnxSSMQualityLevel
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSyncIfTimingGnss2RxQltyLevel indicates the received
+         SSM Quality Level of the GNSS 2 timing reference."
+    ::= { tmnxSyncIfTimingEntry 93 }
+
+tmnxSyncIfTimingGnss2State       OBJECT-TYPE
+    SYNTAX      TmnxRefInState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSyncIfTimingGnss2State indicates the operational
+         state of the GNSS 2 timing reference."
+    ::= { tmnxSyncIfTimingEntry 94 }
 
 tmnxCcagTable                    OBJECT-TYPE
     SYNTAX      SEQUENCE OF TmnxCcagEntry
@@ -11675,7 +11891,9 @@ TmnxFPEntry                      ::= SEQUENCE
     tmnxFPMcPathMgmtBlkHoleInUseBw   Gauge32,
     tmnxFPGeneration                 TmnxFpGeneration,
     tmnxFPIngNetQueuePolicy          TNamedItem,
-    tmnxFPQosFPResourcePolicy        TLNamedItemOrEmpty
+    tmnxFPQosFPResourcePolicy        TLNamedItemOrEmpty,
+    tmnxFPPlcyAcctPolicerLimit       Unsigned32,
+    tmnxFPPlcyAcctPolicerInUse       Unsigned32
 }
 
 tmnxFPNum                        OBJECT-TYPE
@@ -12037,6 +12255,29 @@ tmnxFPQosFPResourcePolicy        OBJECT-TYPE
          FPs."
     DEFVAL      { "" }
     ::= { tmnxFPEntry 29 }
+
+tmnxFPPlcyAcctPolicerLimit       OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..64000)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxFPPlcyAcctPolicerLimit specifies the number of
+         policer resources to allocate for policy-accounting on this forwarding
+         plane (FP).
+
+         The value of zero indicates no resources are allocated to policy
+         accounting."
+    DEFVAL      { 0 }
+    ::= { tmnxFPEntry 30 }
+
+tmnxFPPlcyAcctPolicerInUse       OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxFPPlcyAcctPolicerInUse indicates the total number of
+         policer resources currently in use."
+    ::= { tmnxFPEntry 31 }
 
 tmnxFPAccIngQGrpTableLastChgd    OBJECT-TYPE
     SYNTAX      TimeStamp
@@ -15158,7 +15399,11 @@ TFPResEntry                      ::= SEQUENCE
     tFPResEgrExpRemarkMapTotal       Unsigned32,
     tFPResEgrExpRemarkMapAlloc       Unsigned32,
     tFPResIPv6McastEntryTotal        Unsigned32,
-    tFPResIPv6McastEntryAlloc        Unsigned32
+    tFPResIPv6McastEntryAlloc        Unsigned32,
+    tFPResEgrDot1pDscpRemarkMapTotal Unsigned32,
+    tFPResEgrDot1pDscpRemarkMapAlloc Unsigned32,
+    tFPResFastDepthMQueuesTotal      Unsigned32,
+    tFPResFastDepthMQueuesAlloc      Unsigned32
 }
 
 tFPResSapIngQosPolTotal          OBJECT-TYPE
@@ -15814,7 +16059,7 @@ tFPResDynSvcEntryTotal           OBJECT-TYPE
          this resource type is not supported on this FP.
 
          The value of tFPResDynSvcEntryTotal will always equal to the sum of
-         tFPResSubHostTotal, tFPResEncapGrpMemberTotal and
+         tFPResSubHostTotal, tFPResEncapGrpMemberTotal,
          tFPResEgrNetQGrpMapTotal since subscriber host resources, encap-group
          members resources and egress network queue-group mappings resources
          are subsets of dynamic service entry resources."
@@ -15829,7 +16074,7 @@ tFPResDynSvcEntryAlloc           OBJECT-TYPE
          dynamic services that are currently allocated on this FP.
 
          The value of tFPResDynSvcEntryAlloc will always equal to the sum of
-         tFPResSubHostAlloc, tFPResEncapGrpMemberAlloc and
+         tFPResSubHostAlloc, tFPResEncapGrpMemberAlloc,
          tFPResEgrNetQGrpMapAlloc since subscriber host resources, encap-group
          members resources and egress network queue-group mappings resources
          are subsets of dynamic service entry resources."
@@ -16639,6 +16884,52 @@ tFPResIPv6McastEntryAlloc        OBJECT-TYPE
          IPv6 multicast CAM entries that are currently allocated on this FP."
     ::= { tFPResEntry 134 }
 
+tFPResEgrDot1pDscpRemarkMapTotal OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tFPResEgrDot1pDscpRemarkMapTotal represents the total
+         number of egress dot1p and dscp remark maps that are supported on this
+         FP.
+
+         When the value of tFPResEgrDot1pDscpRemarkMapTotal is zero, it
+         indicates that this resource type is not supported on this FP."
+    ::= { tFPResEntry 135 }
+
+tFPResEgrDot1pDscpRemarkMapAlloc OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tFPResEgrDot1pDscpRemarkMapAlloc represents the total
+         number of egress dot1p and dscp remark maps that are currently
+         allocated on this FP."
+    ::= { tFPResEntry 136 }
+
+tFPResFastDepthMQueuesTotal      OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tFPResFastDepthMQueuesTotal represents the total number
+         of fast polled queue depth monitored queue resources that are allowed
+         to be provisioned on this FP.
+
+         When the value of tFPResFastDepthMQueuesTotal is zero, it indicates
+         that this resource type is not supported on this FP."
+    ::= { tFPResEntry 139 }
+
+tFPResFastDepthMQueuesAlloc      OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tFPResFastDepthMQueuesAlloc represents the total number
+         of fast polled queue depth monitored queue resources that are
+         currently provisioned on this FP."
+    ::= { tFPResEntry 140 }
+
 tMDAResTable                     OBJECT-TYPE
     SYNTAX      SEQUENCE OF TMDAResEntry
     MAX-ACCESS  not-accessible
@@ -17427,10 +17718,10 @@ tmnxGnssNmeaAdminState           OBJECT-TYPE
 
 tmnxGnssNmeaSentenceTypes        OBJECT-TYPE
     SYNTAX      BITS {
-        gpgga (0),
-        gprmc (1),
-        gpvtg (2),
-        gngns (3)
+        gga (0),
+        rmc (1),
+        vtg (2),
+        gns (3)
     }
     MAX-ACCESS  read-write
     STATUS      current
@@ -17443,7 +17734,7 @@ tmnxGnssNmeaSentenceTypes        OBJECT-TYPE
          types."
     REFERENCE
         "'NMEA 0183', National Marine Electronics Assocation, March 1983."
-    DEFVAL      { { gpgga } }
+    DEFVAL      { { gga } }
     ::= { tmnxGnssEntry 5 }
 
 tmnxGnssNmeaSentenceInterval     OBJECT-TYPE
@@ -18085,6 +18376,666 @@ tmnxMDAIsaTnlStatsCryptoAcc      OBJECT-TYPE
          accelerator information."
     ::= { tmnxMDAIsaTnlStatsEntry 1 }
 
+tmnxEsaTable                     OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxEsaEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The tmnxEsaTable contains configuration information for Extended
+         Services Appliance (ESA) entries."
+    ::= { tmnxCardObjs 70 }
+
+tmnxEsaEntry                     OBJECT-TYPE
+    SYNTAX      TmnxEsaEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each tmnxEsaEntry represents an ESA in the system and contains its
+         configuration information.
+
+         Entries in this table are created and destroyed via SNMP set
+         operations to tmnxEsaRowStatus."
+    INDEX       { tmnxEsaId }
+    ::= { tmnxEsaTable 1 }
+
+TmnxEsaEntry                     ::= SEQUENCE
+{
+    tmnxEsaId                        TmnxEsaId,
+    tmnxEsaLastChanged               TimeStamp,
+    tmnxEsaRowStatus                 RowStatus,
+    tmnxEsaAdminState                TmnxAdminState,
+    tmnxEsaDescription               TItemDescription,
+    tmnxEsaHwIndex                   TmnxHwIndex,
+    tmnxEsaReboot                    TmnxActionType
+}
+
+tmnxEsaId                        OBJECT-TYPE
+    SYNTAX      TmnxEsaId
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxEsaId specifies the ID of the ESA."
+    ::= { tmnxEsaEntry 1 }
+
+tmnxEsaLastChanged               OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxEsaLastChanged indicates the time, since system
+         startup, that the configuration of the row was last modified."
+    ::= { tmnxEsaEntry 2 }
+
+tmnxEsaRowStatus                 OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxEsaRowStatus specifies the status of the row. It also
+         controls the creation and deletion of the row."
+    ::= { tmnxEsaEntry 3 }
+
+tmnxEsaAdminState                OBJECT-TYPE
+    SYNTAX      TmnxAdminState
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxEsaAdminState specifies the admin state of the ESA."
+    DEFVAL      { outOfService }
+    ::= { tmnxEsaEntry 4 }
+
+tmnxEsaDescription               OBJECT-TYPE
+    SYNTAX      TItemDescription
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxEsaDescription specifies the description of the ESA."
+    DEFVAL      { "" }
+    ::= { tmnxEsaEntry 5 }
+
+tmnxEsaHwIndex                   OBJECT-TYPE
+    SYNTAX      TmnxHwIndex
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxEsaHwIndex specifies the tmnxHwIndex  into the
+         tmnxHwTable to locate the row entry that represents the hardware
+         component information for this ESA."
+    ::= { tmnxEsaEntry 6 }
+
+tmnxEsaReboot                    OBJECT-TYPE
+    SYNTAX      TmnxActionType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Setting the value of tmnxEsaReboot to 'doAction' causes the ESA to
+         execute a reboot."
+    DEFVAL      { notApplicable }
+    ::= { tmnxEsaEntry 7 }
+
+tmnxEsaHostPortTable             OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxEsaHostPortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The tmnxEsaHostPortTable contains entries for the host ports of each
+         ESA."
+    ::= { tmnxCardObjs 71 }
+
+tmnxEsaHostPortEntry             OBJECT-TYPE
+    SYNTAX      TmnxEsaHostPortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each tmnxEsaHostPortEntry represents a host port for an ESA in the
+         system and contains its configuration information.
+
+         Entries in this table are created and destroyed via SNMP set
+         operations to tmnxEsaHostPortRowStatus."
+    INDEX       {
+        tmnxEsaId,
+        tmnxEsaHostPortId
+    }
+    ::= { tmnxEsaHostPortTable 1 }
+
+TmnxEsaHostPortEntry             ::= SEQUENCE
+{
+    tmnxEsaHostPortId                TmnxPortID,
+    tmnxEsaHostPortRowStatus         RowStatus
+}
+
+tmnxEsaHostPortId                OBJECT-TYPE
+    SYNTAX      TmnxPortID
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxEsaHostPortId specifies the port identifier of the
+         ESA host port."
+    ::= { tmnxEsaHostPortEntry 1 }
+
+tmnxEsaHostPortRowStatus         OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxEsaHostPortRowStatus specifies the status of the row.
+         It also controls the creation and deletion of the row."
+    ::= { tmnxEsaHostPortEntry 2 }
+
+tmnxEsaVmTable                   OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxEsaVmEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The tmnxEsaVmTable contains entries for the VMs of each ESA."
+    ::= { tmnxCardObjs 72 }
+
+tmnxEsaVmEntry                   OBJECT-TYPE
+    SYNTAX      TmnxEsaVmEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each tmnxEsaVmEntry represents a VM on an ESA in the system and
+         contains its configuration information.
+
+         Entries in this table are created and destroyed via SNMP set
+         operations to tmnxEsaVmRowStatus."
+    INDEX       {
+        tmnxEsaId,
+        tmnxEsaVmId
+    }
+    ::= { tmnxEsaVmTable 1 }
+
+TmnxEsaVmEntry                   ::= SEQUENCE
+{
+    tmnxEsaVmId                      TmnxEsaVmId,
+    tmnxEsaVmLastChanged             TimeStamp,
+    tmnxEsaVmRowStatus               RowStatus,
+    tmnxEsaVmAdminState              TmnxAdminState,
+    tmnxEsaVmDescription             TItemDescription,
+    tmnxEsaVmType                    INTEGER,
+    tmnxEsaVmHostPortId              TmnxPortID,
+    tmnxEsaVmCoreNumber              Unsigned32,
+    tmnxEsaVmMemorySize              Unsigned32,
+    tmnxEsaVmReboot                  TmnxActionType
+}
+
+tmnxEsaVmId                      OBJECT-TYPE
+    SYNTAX      TmnxEsaVmId
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxEsaVmId specifies the ID of the VM on this ESA."
+    ::= { tmnxEsaVmEntry 1 }
+
+tmnxEsaVmLastChanged             OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxEsaVmLastChanged indicates the time, since system
+         startup, that the configuration of the row was last modified."
+    ::= { tmnxEsaVmEntry 2 }
+
+tmnxEsaVmRowStatus               OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxEsaVmRowStatus specifies the status of the row. It
+         also controls the creation and deletion of the row."
+    ::= { tmnxEsaVmEntry 3 }
+
+tmnxEsaVmAdminState              OBJECT-TYPE
+    SYNTAX      TmnxAdminState
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxEsaVmAdminState specifies the admin state of the ESA
+         VM."
+    DEFVAL      { outOfService }
+    ::= { tmnxEsaVmEntry 4 }
+
+tmnxEsaVmDescription             OBJECT-TYPE
+    SYNTAX      TItemDescription
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxEsaVmDescription specifies the description of the ESA
+         VM."
+    DEFVAL      { "" }
+    ::= { tmnxEsaVmEntry 5 }
+
+tmnxEsaVmType                    OBJECT-TYPE
+    SYNTAX      INTEGER {
+        none   (0),
+        aa     (1),
+        bb     (2),
+        tunnel (3)
+    }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxEsaVmType specifies to the type of the ESA VM."
+    DEFVAL      { none }
+    ::= { tmnxEsaVmEntry 6 }
+
+tmnxEsaVmHostPortId              OBJECT-TYPE
+    SYNTAX      TmnxPortID
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxEsaVmHostPortId specifies the port identifier of the
+         ESA VM host port. This port must be configured for use on in the
+         tmnxEsaHostPortTable."
+    DEFVAL      { '1e000000'H }
+    ::= { tmnxEsaVmEntry 7 }
+
+tmnxEsaVmCoreNumber              OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..128)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxEsaVmCoreNumber specifies the number of cores given
+         to the ESA VM."
+    DEFVAL      { 0 }
+    ::= { tmnxEsaVmEntry 8 }
+
+tmnxEsaVmMemorySize              OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..256)
+    UNITS       "gigabyte"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxEsaVmMemorySize specifies the amount of memory, in
+         gigabytes, given to the ESA VM."
+    DEFVAL      { 0 }
+    ::= { tmnxEsaVmEntry 9 }
+
+tmnxEsaVmReboot                  OBJECT-TYPE
+    SYNTAX      TmnxActionType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Setting the value of tmnxEsaVmReboot to 'doAction' causes the esa-vm
+         to execute a reboot."
+    DEFVAL      { notApplicable }
+    ::= { tmnxEsaVmEntry 10 }
+
+tmnxTunnelGrpEsaVmTable          OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxTunnelGrpEsaVmEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The tmnxTunnelGrpEsaVmTable contains configuration information that
+         associates tunnel-capable ESA virtual machines to tunnel groups.
+
+         A tunnel group, configured in tmnxIPsecIsaGrpTable, defines a
+         collection of tunnel-capable service devices. A tunnel-capable ESA
+         virtual machine, configured in tmnxEsaVmTable, is one such service
+         device. Examples of services supported by tunnel groups include IPsec
+         tunnels, IP-in-IP tunnels, and GRE tunnels."
+    ::= { tmnxCardObjs 73 }
+
+tmnxTunnelGrpEsaVmEntry          OBJECT-TYPE
+    SYNTAX      TmnxTunnelGrpEsaVmEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each tmnxTunnelGrpEsaVmEntry represents an ESA virtual machine
+         association to a tunnel group.
+
+         Rows are created or destroyed by SNMP Set operations on
+         tmnxTunnelGrpEsaVmRowStatus."
+    INDEX       {
+        tmnxEsaId,
+        tmnxEsaVmId
+    }
+    ::= { tmnxTunnelGrpEsaVmTable 1 }
+
+TmnxTunnelGrpEsaVmEntry          ::= SEQUENCE
+{
+    tmnxTunnelGrpEsaVmRowStatus      RowStatus,
+    tmnxTunnelGrpEsaVmLastChgd       TimeStamp,
+    tmnxTunnelGrpEsaVmGroupAssoc     TmnxTunnelGroupIdOrZero,
+    tmnxTunnelGrpEsaVmActive         TruthValue
+}
+
+tmnxTunnelGrpEsaVmRowStatus      OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxTunnelGrpEsaVmRowStatus specifies the status of the
+         configuration row for the specified ESA virtual machine tunnel group
+         member.
+
+         A row in this table may not be created unless the corresponding ESA
+         virtual machine exists in the tmnxEsaVmTable with tmnxEsaVmType of
+         'tunnel'. The row in tmnxEsaVmTable may not be destroyed or have its
+         tmnxEsaVmType changed from 'tunnel' while a corresponding association
+         exists in this table."
+    ::= { tmnxTunnelGrpEsaVmEntry 1 }
+
+tmnxTunnelGrpEsaVmLastChgd       OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxTunnelGrpEsaVmLastChgd indicates the time, since
+         system startup, when the configuration of the tmnxTunnelGrpEsaVmEntry
+         was last modified."
+    ::= { tmnxTunnelGrpEsaVmEntry 2 }
+
+tmnxTunnelGrpEsaVmGroupAssoc     OBJECT-TYPE
+    SYNTAX      TmnxTunnelGroupIdOrZero
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxTunnelGrpEsaVmGroupAssoc specifies the tunnel group
+         to which the ESA virtual machine is associated.
+
+         During row creation, one of tmnxTunnelGrpEsaVmGroupAssoc or
+         'tmnxTunnelGrpEsaVmPoolAssoc' must be set to a non-default value.
+         These associations can be removed only by destroying the row. When
+         this object is set to a non-default value, the value of
+         'tmnxTunnelGrpEsaVmPoolAssoc' must be default.
+
+         The tunnel group specified must exist in tmnxIPsecIsaGrpTable. Removal
+         of the tunnel group from tmnxIPsecIsaGrpTable will not be allowed
+         while this association exists."
+    DEFVAL      { 0 }
+    ::= { tmnxTunnelGrpEsaVmEntry 3 }
+
+tmnxTunnelGrpEsaVmActive         OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxTunnelGrpEsaVmActive indicates whether the ESA
+         virtual machine is active in the tunnel group indicated by
+         tmnxTunnelGrpEsaVmGroupAssoc."
+    ::= { tmnxTunnelGrpEsaVmEntry 4 }
+
+tmnxEsaStatsTable                OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxEsaStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The tmnxEsaStatsTable contains statistical information for Extended
+         Services Appliance (ESA) entries."
+    ::= { tmnxCardObjs 74 }
+
+tmnxEsaStatsEntry                OBJECT-TYPE
+    SYNTAX      TmnxEsaStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each tmnxEsaStatsEntry represents an ESA in the system and contains
+         its statistical information.
+
+         Entries in this table are created and destroyed automatically by the
+         system."
+    INDEX       { tmnxEsaId }
+    ::= { tmnxEsaStatsTable 1 }
+
+TmnxEsaStatsEntry                ::= SEQUENCE
+{
+    tmnxEsaStatsOperState            INTEGER,
+    tmnxEsaStatsCoresAvailable       Unsigned32,
+    tmnxEsaStatsCoresAllocated       Unsigned32,
+    tmnxEsaStatsMemoryAvailable      Unsigned32,
+    tmnxEsaStatsMemoryAllocated      Unsigned32,
+    tmnxEsaStatsSoftwareVersion      DisplayString,
+    tmnxEsaStatsOperFlags            BITS,
+    tmnxEsaStatsTimeOfBoot           DateAndTime,
+    tmnxEsaStatsSystemManufacturer   DisplayString,
+    tmnxEsaStatsSystemProductName    DisplayString,
+    tmnxEsaStatsSystemSerialNumber   DisplayString,
+    tmnxEsaStatsPerformanceEnabled   TruthValue,
+    tmnxEsaStatsExportRestricted     TruthValue
+}
+
+tmnxEsaStatsOperState            OBJECT-TYPE
+    SYNTAX      INTEGER {
+        unknown       (1),
+        inService     (2),
+        outOfService  (3),
+        booting       (4),
+        failed        (5),
+        provisioned   (6),
+        unprovisioned (7),
+        upgrade       (8),
+        fwUpgrade     (9)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxEsaStatsOperState indicates the operational state of
+         the ESA."
+    ::= { tmnxEsaStatsEntry 1 }
+
+tmnxEsaStatsCoresAvailable       OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxEsaStatsCoresAvailable indicates the total number of
+         cores on the ESA."
+    ::= { tmnxEsaStatsEntry 2 }
+
+tmnxEsaStatsCoresAllocated       OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxEsaStatsCoresAllocated indicates the total number of
+         allocated cores on the ESA."
+    ::= { tmnxEsaStatsEntry 3 }
+
+tmnxEsaStatsMemoryAvailable      OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "gigabyte"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxEsaStatsMemoryAvailable indicates the total amount of
+         available memory (in GigaBytes) on the ESA."
+    ::= { tmnxEsaStatsEntry 4 }
+
+tmnxEsaStatsMemoryAllocated      OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "gigabyte"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxEsaStatsMemoryAllocated indicates the total amount of
+         allocated memory (in GigaBytes) on the ESA."
+    ::= { tmnxEsaStatsEntry 5 }
+
+tmnxEsaStatsSoftwareVersion      OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The vlaue of tmnxEsaStatsSoftwareVersion indicates the software
+         version currently running on the ESA."
+    ::= { tmnxEsaStatsEntry 6 }
+
+tmnxEsaStatsOperFlags            OBJECT-TYPE
+    SYNTAX      BITS {
+        adminDown      (0),
+        noHostPort     (1),
+        esaMismatch    (2),
+        connectFailed  (3),
+        fwUpdateFailed (4),
+        bootFailed     (5)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxEsaStatsOperFlags indicates the operational flags
+         that determine the status of the ESA."
+    ::= { tmnxEsaStatsEntry 7 }
+
+tmnxEsaStatsTimeOfBoot           OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxEsaStatsTimeOfBoot indicates date and time the
+         software running on this ESA was last rebooted."
+    ::= { tmnxEsaStatsEntry 8 }
+
+tmnxEsaStatsSystemManufacturer   OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxEsaStatsSystemManufacturer indicates the system
+         manufacturer of the ESA."
+    ::= { tmnxEsaStatsEntry 9 }
+
+tmnxEsaStatsSystemProductName    OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxEsaStatsSystemProductName indicates the system
+         product name of the ESA."
+    ::= { tmnxEsaStatsEntry 10 }
+
+tmnxEsaStatsSystemSerialNumber   OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxEsaStatsSystemSerialNumber indicates the system
+         serial number of the ESA."
+    ::= { tmnxEsaStatsEntry 11 }
+
+tmnxEsaStatsPerformanceEnabled   OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxEsaStatsPerformanceEnabled indicates whether the ESA
+         is in performance (true) or functional (false) mode."
+    ::= { tmnxEsaStatsEntry 12 }
+
+tmnxEsaStatsExportRestricted     OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxEsaStatsExportRestricted indicates whether the ESA is
+         in export restricted mode or not. In this mode, some restrictions
+         apply to certain vapp types."
+    ::= { tmnxEsaStatsEntry 13 }
+
+tmnxEsaVmStatsTable              OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxEsaVmStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The tmnxEsaVmStatsTable contains entries for the host ports of each
+         ESA."
+    ::= { tmnxCardObjs 75 }
+
+tmnxEsaVmStatsEntry              OBJECT-TYPE
+    SYNTAX      TmnxEsaVmStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each tmnxEsaVmStatsEntry represents a VM on an ESA in the system and
+         contains its statistical information.
+
+         Entries in this table are created and destroyed automatically by the
+         system."
+    INDEX       {
+        tmnxEsaId,
+        tmnxEsaVmId
+    }
+    ::= { tmnxEsaVmStatsTable 1 }
+
+TmnxEsaVmStatsEntry              ::= SEQUENCE
+{
+    tmnxEsaVmStatsOperState          INTEGER,
+    tmnxEsaVmStatsOperFlags          BITS,
+    tmnxEsaVmStatsTimeOfBoot         DateAndTime,
+    tmnxEsaVmStatsSoftwareVersion    DisplayString,
+    tmnxEsaVmStatsUtilLastChanged    DateAndTime
+}
+
+tmnxEsaVmStatsOperState          OBJECT-TYPE
+    SYNTAX      INTEGER {
+        unknown       (1),
+        inService     (2),
+        outOfService  (3),
+        booting       (4),
+        failed        (5),
+        provisioned   (6),
+        unprovisioned (7),
+        upgrade       (8)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxEsaVmStatsOperState specifies the  operational state
+         of the ESA VM."
+    ::= { tmnxEsaVmStatsEntry 1 }
+
+tmnxEsaVmStatsOperFlags          OBJECT-TYPE
+    SYNTAX      BITS {
+        adminDown                    (0),
+        bootFailure                  (1),
+        outOfEsaRsrcs                (2),
+        connectFailed                (3),
+        provisionFail                (4),
+        coreFailure                  (5),
+        forcedFailure                (6),
+        iccFailure                   (7),
+        exportRestricted             (8),
+        swVerMismatch                (9),
+        insufficientCoreAllocation   (10),
+        insufficientMemoryAllocation (11),
+        hostPortConnFail             (12)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxEsaVmStatsOperFlags indicates the operational flags
+         that determine the status of the ESA VM."
+    ::= { tmnxEsaVmStatsEntry 2 }
+
+tmnxEsaVmStatsTimeOfBoot         OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxEsaVmStatsTimeOfBoot indicates date and time the
+         software running on this ESA VM was last rebooted."
+    ::= { tmnxEsaVmStatsEntry 3 }
+
+tmnxEsaVmStatsSoftwareVersion    OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The vlaue of tmnxEsaVmStatsSoftwareVersion indicates the software
+         version currently running on the ESA VM."
+    ::= { tmnxEsaVmStatsEntry 4 }
+
+tmnxEsaVmStatsUtilLastChanged    OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxEsaVmStatsUtilLastChanged indicates  the time since
+         system startup, when the core utilization  statistics were last
+         collected."
+    ::= { tmnxEsaVmStatsEntry 5 }
+
 tCoreResTable                    OBJECT-TYPE
     SYNTAX      SEQUENCE OF TCoreResEntry
     MAX-ACCESS  not-accessible
@@ -18123,7 +19074,9 @@ TCoreResEntry                    ::= SEQUENCE
     tCoreResIngDdctdPolicerStatTotal Unsigned32,
     tCoreResIngDdctdPolicerStatAlloc Unsigned32,
     tCoreResVlanVoqTotal             Unsigned32,
-    tCoreResVlanVoqAlloc             Unsigned32
+    tCoreResVlanVoqAlloc             Unsigned32,
+    tCoreResSapTotal                 Unsigned32,
+    tCoreResSapAlloc                 Unsigned32
 }
 
 tmnxCoreNum                      OBJECT-TYPE
@@ -18248,6 +19201,24 @@ tCoreResVlanVoqAlloc             OBJECT-TYPE
         "The value of tCoreResVlanVoqAlloc represents the total number of VLAN
          Voqs that are currently allocated on this core."
     ::= { tCoreResEntry 11 }
+
+tCoreResSapTotal                 OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tCoreResSapTotal represents the total number of
+         provisioned SAP entries supported on this core."
+    ::= { tCoreResEntry 12 }
+
+tCoreResSapAlloc                 OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tCoreResSapAlloc represents the total number of
+         provisioned SAP entries currently in use on this core."
+    ::= { tCoreResEntry 13 }
 
 tmnxXiomConfigTableLastChanged   OBJECT-TYPE
     SYNTAX      TimeStamp
@@ -18749,6 +19720,171 @@ tmnxXiomUpgradeRequiresReboot    OBJECT-TYPE
          this chassis."
     ::= { tmnxXiomLevelUpgradeTypeEntry 4 }
 
+tmnxEsaVmCoreUtilStatsTable      OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxEsaVmCoreUtilStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The tmnxEsaVmCoreUtilStatsTable contains entries for the core
+         utilization  of each esa-vm."
+    ::= { tmnxCardObjs 85 }
+
+tmnxEsaVmCoreUtilStatsEntry      OBJECT-TYPE
+    SYNTAX      TmnxEsaVmCoreUtilStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each tmnxEsaVmCoreUtilStatsEntry represents a VM core instance on an
+         esa-vm and contains its utilization information.
+
+         Entries in this table are created and destroyed  automatically by the
+         system."
+    INDEX       {
+        tmnxEsaId,
+        tmnxEsaVmId,
+        tmnxEsaVmVirtualCoreId
+    }
+    ::= { tmnxEsaVmCoreUtilStatsTable 1 }
+
+TmnxEsaVmCoreUtilStatsEntry      ::= SEQUENCE
+{
+    tmnxEsaVmVirtualCoreId           Unsigned32,
+    tmnxEsaVmVirtualCoreRoleName     TNamedItem,
+    tmnxEsaVmVirtCoreCurUtilization  Unsigned32,
+    tmnxEsaVmVirtCoreAvgUtilization  Unsigned32,
+    tmnxEsaVmVirtCorePeakUtilization Unsigned32
+}
+
+tmnxEsaVmVirtualCoreId           OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..62)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxEsaVmVirtualCoreId indicates the virtual core number
+         for the given VM."
+    ::= { tmnxEsaVmCoreUtilStatsEntry 1 }
+
+tmnxEsaVmVirtualCoreRoleName     OBJECT-TYPE
+    SYNTAX      TNamedItem
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxEsaVmVirtualCoreRoleName specifies the esa-vm virtual
+         core role."
+    ::= { tmnxEsaVmCoreUtilStatsEntry 2 }
+
+tmnxEsaVmVirtCoreCurUtilization  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "hundredths of a percent"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxEsaVmVirtCoreCurUtilization indicates the current
+         utilization of this virtual core on the esa-vm. For management virtual
+         cores, the current utilization is the percentage of time spent during
+         a 10 second interval running tasks other than the idle task. For
+         worker, nic, and scheduler virtual cores, the current utilization is
+         the percentage of time spent during a 10 second interval performing
+         packet processing tasks and/or housekeeping operations."
+    ::= { tmnxEsaVmCoreUtilStatsEntry 3 }
+
+tmnxEsaVmVirtCoreAvgUtilization  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "hundredths of a percent"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxEsaVmVirtCoreAvgUtilization indicates the average
+         utilization of this virtual core on the esa-vm. For management virtual
+         cores, the average utilization is the percentage of time spent during
+         a 15-minute interval running tasks other than the idle task. For
+         worker, nic, and scheduler virtual cores, the average utilization is
+         the percentage of time spent during a 15-minute interval performing
+         packet processing tasks and/or housekeeping operations."
+    ::= { tmnxEsaVmCoreUtilStatsEntry 4 }
+
+tmnxEsaVmVirtCorePeakUtilization OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "hundredths of a percent"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxEsaVmVirtCorePeakUtilization indicates the  all-time
+         peak 10-second utilization of this virtual core on  the esa-vm."
+    ::= { tmnxEsaVmCoreUtilStatsEntry 5 }
+
+tCoreDdctdPolicerResTable        OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TCoreDdctdPolicerResEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "tCoreDdctdPolicerResTable contains entries for direct-mapped policer
+         resource information on a core"
+    ::= { tmnxCardObjs 92 }
+
+tCoreDdctdPolicerResEntry        OBJECT-TYPE
+    SYNTAX      TCoreDdctdPolicerResEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry represents core specific direct-mapped policer resource
+         information.
+
+         Entries in this table are created and destroyed automatically by the
+         system."
+    INDEX       {
+        tmnxChassisIndex,
+        tmnxCardSlotNum,
+        tmnxFPNum,
+        tmnxCoreNum,
+        tCoreDdctdPolicerPartition
+    }
+    ::= { tCoreDdctdPolicerResTable 1 }
+
+TCoreDdctdPolicerResEntry        ::= SEQUENCE
+{
+    tCoreDdctdPolicerPartition       INTEGER,
+    tCoreDdctdPolicersTotal          Unsigned32,
+    tCoreDdctdPolicersAlloc          Unsigned32
+}
+
+tCoreDdctdPolicerPartition       OBJECT-TYPE
+    SYNTAX      INTEGER {
+        per-fc                                     (1),
+        per-fc-unicast-multicast-or-multipoint     (2),
+        per-fc-unicast-broadcast-unknown-multicast (3)
+    }
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of tCoreDdctdPolicerPartition identifies the policer pool.
+         per-fc
+         per-fc-unicast-multicast-or-multipoint - used for both per-fc-unicast-multicast
+            and per-fc-unicast-multipoint policer allocations
+         per-fc-unicast-broadcast-unknown-multicast"
+    ::= { tCoreDdctdPolicerResEntry 1 }
+
+tCoreDdctdPolicersTotal          OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tCoreDdctdPolicersTotal represents the total number of
+         policers in the partition
+
+         When the value of tCoreResIngFloatPolicerTotal is zero, it indicates
+         that this resource type is not supported on this core."
+    ::= { tCoreDdctdPolicerResEntry 2 }
+
+tCoreDdctdPolicersAlloc          OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tCoreDdctdPolicersAlloc represents the total number of
+         policers allocated from the partition."
+    ::= { tCoreDdctdPolicerResEntry 3 }
+
 tmnxChassisNotificationObjects   OBJECT IDENTIFIER ::= { tmnxHwObjs 6 }
 
 tmnxEqNotificationRow            OBJECT-TYPE
@@ -19019,7 +20155,10 @@ tmnxIomResourceType              OBJECT-TYPE
         arpEntry      (4),
         ecmp          (5),
         ecmpNextHop   (6),
-        ecmpTunnel    (7)
+        ecmpTunnel    (7),
+        ecmpMpls      (8),
+        ecmpIp        (9),
+        ecmpIpLevel2  (10)
     }
     MAX-ACCESS  accessible-for-notify
     STATUS      current
@@ -19130,6 +20269,23 @@ tmnxEqNotifyHwEventAction        OBJECT-TYPE
         "Used by tmnx equipment event Notifications, indicates the action taken
          when event detected for the hardware component."
     ::= { tmnxChassisNotificationObjects 42 }
+
+tmnxEsaNotifyId                  OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Used by traps to indicate the ESA ID that triggered the notification."
+    ::= { tmnxChassisNotificationObjects 43 }
+
+tmnxEsaVmNotifyId                OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Used by traps to indicate the ESA VM ID that triggered the
+         notification."
+    ::= { tmnxChassisNotificationObjects 44 }
 
 tmnxChassisAdminObjects          OBJECT IDENTIFIER ::= { tmnxHwObjs 8 }
 
@@ -19297,7 +20453,9 @@ TSyncIfTimingAdmEntry            ::= SEQUENCE
     tSyncIfTimingAdmChangedMask      BITS,
     tSyncIfTimingAdmSyncECfgQltyLevl TmnxSSMQualityLevel,
     tSyncIfTimingAdmSyncEAdminStatus TmnxPortAdminStatus,
-    tSyncIfTimingAdmRefOrder5        TmnxSETSRefSource
+    tSyncIfTimingAdmRefOrder5        TmnxSETSRefSource,
+    tSyncIfTimingAdmGnssCfgQltyLevel TmnxSSMQualityLevel,
+    tSyncIfTimingAdmGnssAdminStatus  TmnxPortAdminStatus
 }
 
 tSyncIfTimingAdmRevert           OBJECT-TYPE
@@ -19355,10 +20513,7 @@ tSyncIfTimingAdmRef1SrcPort      OBJECT-TYPE
     STATUS      current
     DESCRIPTION
         "The value of tSyncIfTimingAdmRef1SrcPort specifies the source port of
-         the first timing reference.
-
-         This can only be set to a valid TmnxPortID if the value of
-         tSyncIfTimingAdmRef1SrcHw is 0."
+         the first timing reference."
     DEFVAL      { '1e000000'H }
     ::= { tSyncIfTimingAdmEntry 4 }
 
@@ -19378,10 +20533,7 @@ tSyncIfTimingAdmRef2SrcPort      OBJECT-TYPE
     STATUS      current
     DESCRIPTION
         "The value of tSyncIfTimingAdmRef2SrcPort specifies the source port of
-         the second timing reference.
-
-         This can only be set to a valid TmnxPortID if the value of
-         tSyncIfTimingAdmRef2SrcHw is 0."
+         the second timing reference."
     DEFVAL      { '1e000000'H }
     ::= { tSyncIfTimingAdmEntry 6 }
 
@@ -19458,7 +20610,7 @@ tSyncIfTimingAdmBITSAdminStatus  OBJECT-TYPE
 tSyncIfTimingAdmRef1SrcHw        OBJECT-TYPE
     SYNTAX      TmnxHwIndexOrZero
     MAX-ACCESS  read-create
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The value of tSyncIfTimingAdmRef1SrcHw specifies the source HW Index
          of the first timing reference if the source is not a port.
@@ -19468,27 +20620,31 @@ tSyncIfTimingAdmRef1SrcHw        OBJECT-TYPE
 
          Setting the value of tSyncIfTimingAdmRef1SrcHw from non-zero to zero
          will cause the value of tSyncIfTimingAdmRef1BITSIfType to be reset to
-         its default value of 't1-esf'."
+         its default value of 't1-esf'.
+
+         This object was obsoleted in release 20.5."
     DEFVAL      { 0 }
     ::= { tSyncIfTimingAdmEntry 12 }
 
 tSyncIfTimingAdmRef1BITSIfType   OBJECT-TYPE
     SYNTAX      TmnxBITSIfType
     MAX-ACCESS  read-create
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The value of tSyncIfTimingAdmRef1BITSIfType specifies the interface
          type of the first timing reference if the source is BITS.
 
          This can only be changed if the value of tSyncIfTimingAdmRef1SrcHw is
-         not 0."
+         not 0.
+
+         This object was obsoleted in release 20.5."
     DEFVAL      { t1-esf }
     ::= { tSyncIfTimingAdmEntry 13 }
 
 tSyncIfTimingAdmRef2SrcHw        OBJECT-TYPE
     SYNTAX      TmnxHwIndexOrZero
     MAX-ACCESS  read-create
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The value of tSyncIfTimingAdmRef2SrcHw specifies the source HW Index
          of the second timing reference if the source is not a port.
@@ -19498,20 +20654,24 @@ tSyncIfTimingAdmRef2SrcHw        OBJECT-TYPE
 
          Setting the value of tSyncIfTimingAdmRef2SrcHw from non-zero to zero
          will cause the value of tSyncIfTimingAdmRef2BITSIfType to be reset to
-         its default value of 't1-esf'."
+         its default value of 't1-esf'.
+
+         This object was obsoleted in release 20.5."
     DEFVAL      { 0 }
     ::= { tSyncIfTimingAdmEntry 14 }
 
 tSyncIfTimingAdmRef2BITSIfType   OBJECT-TYPE
     SYNTAX      TmnxBITSIfType
     MAX-ACCESS  read-create
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The value of tSyncIfTimingAdmRef2BITSIfType specifies the interface
          type of the second timing reference if the source is BITS.
 
          This can only be changed if the value of tSyncIfTimingAdmRef2SrcHw is
-         not 0."
+         not 0.
+
+         This object was obsoleted in release 20.5."
     DEFVAL      { t1-esf }
     ::= { tSyncIfTimingAdmEntry 15 }
 
@@ -19598,22 +20758,26 @@ tSyncIfTimingAdmBITSCfgQltyLevel OBJECT-TYPE
 tSyncIfTimingAdmRef1NationalUse  OBJECT-TYPE
     SYNTAX      Unsigned32 (4..8)
     MAX-ACCESS  read-create
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The value of tSyncIfTimingAdmRef1NationalUse specifies the national
          use bit to carry SSM Messages. This applies only to E1 BITS
-         interfaces."
+         interfaces.
+
+         This object was obsoleted in release 20.5."
     DEFVAL      { 8 }
     ::= { tSyncIfTimingAdmEntry 21 }
 
 tSyncIfTimingAdmRef2NationalUse  OBJECT-TYPE
     SYNTAX      Unsigned32 (4..8)
     MAX-ACCESS  read-create
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The value of tSyncIfTimingAdmRef2NationalUse specifies the national
          use bit to carry SSM Messages. This applies only to E1 BITS
-         interfaces."
+         interfaces.
+
+         This object was obsoleted in release 20.5."
     DEFVAL      { 8 }
     ::= { tSyncIfTimingAdmEntry 22 }
 
@@ -19808,7 +20972,9 @@ tSyncIfTimingAdmChangedMask      OBJECT-TYPE
         tSyncIfTimingAdmChangedMask      (33),
         tSyncIfTimingAdmSyncECfgQltyLevl (34),
         tSyncIfTimingAdmSyncEAdminStatus (35),
-        tSyncIfTimingAdmRefOrder5        (36)
+        tSyncIfTimingAdmRefOrder5        (36),
+        tSyncIfTimingAdmGnssCfgQltyLevel (37),
+        tSyncIfTimingAdmGnssAdminStatus  (38)
     }
     MAX-ACCESS  read-only
     STATUS      current
@@ -19858,6 +21024,29 @@ tSyncIfTimingAdmRefOrder5        OBJECT-TYPE
          subsystem."
     DEFVAL      { noReference }
     ::= { tSyncIfTimingAdmEntry 37 }
+
+tSyncIfTimingAdmGnssCfgQltyLevel OBJECT-TYPE
+    SYNTAX      TmnxSSMQualityLevel
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tSyncIfTimingAdmGnssCfgQltyLevel specifies the configured
+         Quality Level of the GNSS (Global Navigation Satellite System) timing
+         reference. A value of 'unknown (0)' specifies GNSS is not forced to a
+         specific quality level."
+    DEFVAL      { unknown }
+    ::= { tSyncIfTimingAdmEntry 38 }
+
+tSyncIfTimingAdmGnssAdminStatus  OBJECT-TYPE
+    SYNTAX      TmnxPortAdminStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tSyncIfTimingAdmGnssAdminStatus specifies the desired
+         administrative status of the GNSS (Global Navigation Satellite System)
+         timing reference."
+    DEFVAL      { outOfService }
+    ::= { tSyncIfTimingAdmEntry 39 }
 
 tmnxHwConformance                OBJECT IDENTIFIER ::= { tmnxSRConfs 2 }
 
@@ -21056,10 +22245,12 @@ tmnxChassisV19Compliance         MODULE-COMPLIANCE
             tmnxCardV16v0FpgaSoftErrNotifGrp,
             tmnxMDAIsaTnlStatsV16v0Group,
             tmnxCardPowerSaveGroupV16v0,
+            tmnxEsaGroup,
             tmnxFPNetworkIngressGroupV19v5,
             tmnxCardV19v5Group,
             tmnxSyncIfTimingV19v0Group,
             tmnxMDAV19v0Group,
+            tmnxTunnelGrpEsaVmGroupV19v0,
             tmnxChassisResEgrV19v0Group,
             tmnxChassisResEgrRmrkV19v0Group,
             tmnxChassisResIngClassV19v0Group,
@@ -21070,10 +22261,14 @@ tmnxChassisV19Compliance         MODULE-COMPLIANCE
             tmnxHwEventGroupV19v0,
             tmnxHwEventNotifyObjsGrpV19v0,
             tmnxHwEventNotifGroupV19v0,
+            tmnxTunnelGrpEsaVmNotifGrpV19v0,
+            tmnxEsaNotificationObjectGroup,
+            tmnxEsaNotificationGroup,
             tmnxCardSapInstV19v0Group,
             tmnxChassisResQMgmtV19v0Group,
             tmnxSapResourceUsageV19v0Group,
-            tmnxIPv6MCastCamV19v0Group
+            tmnxIPv6MCastCamV19v0Group,
+            tmnxChassisCoreResPlcrV19v0Group
         }
     ::= { tmnxChassisCompliances 24 }
 
@@ -21209,10 +22404,12 @@ tmnxChassisV20Compliance         MODULE-COMPLIANCE
             tmnxCardV16v0FpgaSoftErrNotifGrp,
             tmnxMDAIsaTnlStatsV16v0Group,
             tmnxCardPowerSaveGroupV16v0,
+            tmnxEsaGroup,
             tmnxFPNetworkIngressGroupV19v5,
             tmnxCardV19v5Group,
             tmnxSyncIfTimingV19v0Group,
             tmnxMDAV19v0Group,
+            tmnxTunnelGrpEsaVmGroupV19v0,
             tmnxChassisResEgrV19v0Group,
             tmnxChassisResEgrRmrkV19v0Group,
             tmnxChassisResIngClassV19v0Group,
@@ -21223,6 +22420,9 @@ tmnxChassisV20Compliance         MODULE-COMPLIANCE
             tmnxHwEventGroupV19v0,
             tmnxHwEventNotifyObjsGrpV19v0,
             tmnxHwEventNotifGroupV19v0,
+            tmnxTunnelGrpEsaVmNotifGrpV19v0,
+            tmnxEsaNotificationObjectGroup,
+            tmnxEsaNotificationGroup,
             tmnxCardSapInstV19v0Group,
             tmnxCardFPQosPolicyV20v0Group,
             tmnxChassisResQMgmtV19v0Group,
@@ -21230,9 +22430,30 @@ tmnxChassisV20Compliance         MODULE-COMPLIANCE
             tmnxChassisV20v0ObsoleteGroup,
             tmnx77x0CESMDAV20v0Group,
             tmnxIPv6MCastCamV19v0Group,
-            tmnxChassisResourceV20v0Group
+            tmnxChassisResourceV20v0Group,
+            tmnxSyncIfTimingV20v0ObsoleteGrp,
+            tmnxSyncIfTimingGnssV20v0Group,
+            tmnxChassisResEgrRmrkV20v0Group,
+            tmnxSyncIfTimingV20v0NotifGroup,
+            tmnxChassisResDepthMQV20v0Group,
+            tmnxChassisFPQppbPolV20v0Group,
+            tmnxChassisCoreResV20v0Group,
+            tmnxFPNotificationV20Group,
+            tmnxChassisCoreResPlcrV19v0Group,
+            tmnxChassisIxrXFanV20v0Group
         }
     ::= { tmnxChassisCompliances 25 }
+
+tmnxChassisV21Compliance         MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for management of chassis features on SROS
+         series systems in the TIMETRA-CHASSIS-MIB release 21."
+    MODULE
+        MANDATORY-GROUPS {
+            tmnxCoreDdctdPolicerResGroupV21
+        }
+    ::= { tmnxChassisCompliances 26 }
 
 tmnxChassisGroups                OBJECT IDENTIFIER ::= { tmnxChassisConformance 2 }
 
@@ -24933,6 +26154,52 @@ tmnxFPResourceV15v1Group         OBJECT-GROUP
 
 tmnxChassisV19Groups             OBJECT IDENTIFIER ::= { tmnxChassisGroups 81 }
 
+tmnxEsaGroup                     OBJECT-GROUP
+    OBJECTS     {
+        tmnxEsaLastChanged,
+        tmnxEsaRowStatus,
+        tmnxEsaAdminState,
+        tmnxEsaDescription,
+        tmnxEsaHwIndex,
+        tmnxEsaReboot,
+        tmnxEsaHostPortRowStatus,
+        tmnxEsaVmRowStatus,
+        tmnxEsaVmLastChanged,
+        tmnxEsaVmAdminState,
+        tmnxEsaVmDescription,
+        tmnxEsaVmType,
+        tmnxEsaVmHostPortId,
+        tmnxEsaVmCoreNumber,
+        tmnxEsaVmMemorySize,
+        tmnxEsaVmReboot,
+        tmnxEsaStatsOperState,
+        tmnxEsaStatsCoresAvailable,
+        tmnxEsaStatsCoresAllocated,
+        tmnxEsaStatsMemoryAvailable,
+        tmnxEsaStatsMemoryAllocated,
+        tmnxEsaStatsSoftwareVersion,
+        tmnxEsaVmStatsOperState,
+        tmnxEsaStatsOperFlags,
+        tmnxEsaStatsTimeOfBoot,
+        tmnxEsaVmStatsOperFlags,
+        tmnxEsaVmStatsTimeOfBoot,
+        tmnxEsaVmStatsSoftwareVersion,
+        tmnxEsaVmStatsUtilLastChanged,
+        tmnxEsaStatsSystemManufacturer,
+        tmnxEsaStatsSystemProductName,
+        tmnxEsaStatsSystemSerialNumber,
+        tmnxEsaStatsPerformanceEnabled,
+        tmnxEsaStatsExportRestricted,
+        tmnxEsaVmVirtualCoreRoleName,
+        tmnxEsaVmVirtCoreCurUtilization,
+        tmnxEsaVmVirtCoreAvgUtilization,
+        tmnxEsaVmVirtCorePeakUtilization
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects for ESA support on Nokia systems."
+    ::= { tmnxChassisV19Groups 1 }
+
 tmnxFPNetworkIngressGroupV19v5   OBJECT-GROUP
     OBJECTS     {
         tmnxFPIngNetQueuePolicy
@@ -25042,6 +26309,19 @@ tmnxMDAV19v0Group                OBJECT-GROUP
          Nokia SROS series systems."
     ::= { tmnxChassisV19Groups 7 }
 
+tmnxTunnelGrpEsaVmGroupV19v0     OBJECT-GROUP
+    OBJECTS     {
+        tmnxTunnelGrpEsaVmRowStatus,
+        tmnxTunnelGrpEsaVmLastChgd,
+        tmnxTunnelGrpEsaVmGroupAssoc,
+        tmnxTunnelGrpEsaVmActive
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting IPsec tunnel group ESA virtual machine
+         members in release 19.10 on Nokia SROS series systems."
+    ::= { tmnxChassisV19Groups 8 }
+
 tmnxChassisResEgrV19v0Group      OBJECT-GROUP
     OBJECTS     {
         tChassisResEgrStatVlanVoQTotal,
@@ -25122,14 +26402,6 @@ tmnxChassisResIpMacCAMV19v0Group OBJECT-GROUP
 
 tmnxChassisCoreResV19v0Group     OBJECT-GROUP
     OBJECTS     {
-        tCoreResIngFloatPolicerTotal,
-        tCoreResIngFloatPolicerAlloc,
-        tCoreResIngFloatPolicerStatTotal,
-        tCoreResIngFloatPolicerStatAlloc,
-        tCoreResIngDdctdPolicerTotal,
-        tCoreResIngDdctdPolicerAlloc,
-        tCoreResIngDdctdPolicerStatTotal,
-        tCoreResIngDdctdPolicerStatAlloc,
         tCoreResVlanVoqTotal,
         tCoreResVlanVoqAlloc
     }
@@ -25188,6 +26460,47 @@ tmnxHwEventNotifGroupV19v0       NOTIFICATION-GROUP
         "The group of additional notifications supporting management of
          hardware events in release 19.0 of Nokia SROS series systems."
     ::= { tmnxChassisV19Groups 18 }
+
+tmnxTunnelGrpEsaVmNotifGrpV19v0  NOTIFICATION-GROUP
+    NOTIFICATIONS {
+        tmnxTunnelGrpEsaVmActivity
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of notifications supporting management of tunnel group ESA
+         virtual machine members in release 19.0 of Nokia SROS series systems."
+    ::= { tmnxChassisV19Groups 19 }
+
+tmnxEsaNotificationObjectGroup   OBJECT-GROUP
+    OBJECTS     {
+        tmnxEsaNotifyId,
+        tmnxEsaVmNotifyId
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting ESA notifications on Nokia systems."
+    ::= { tmnxChassisV19Groups 20 }
+
+tmnxEsaNotificationGroup         NOTIFICATION-GROUP
+    NOTIFICATIONS {
+        tmnxEsaDiscovered,
+        tmnxEsaConnected,
+        tmnxEsaDisconnected,
+        tmnxEsaFailure,
+        tmnxEsaCleared,
+        tmnxEsaVmCreated,
+        tmnxEsaVmBooted,
+        tmnxEsaVmRemoved,
+        tmnxEsaVmCleared,
+        tmnxEsaVmFailure,
+        tIPsecEsaVmMemLowWatermark,
+        tIPsecEsaVmMemHighWatermark,
+        tmnxEsaFirmwareUpgradeStarted
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of notifications for ESA on Nokia systems."
+    ::= { tmnxChassisV19Groups 21 }
 
 tmnxCardSapInstV19v0Group        OBJECT-GROUP
     OBJECTS     {
@@ -25306,6 +26619,38 @@ tmnxIPv6MCastCamV19v0Group       OBJECT-GROUP
          allocation."
     ::= { tmnxChassisV19Groups 26 }
 
+tmnxSyncIfTimingV20v0NotifGroup  NOTIFICATION-GROUP
+    NOTIFICATIONS {
+        tmnxEqSyncIfTimingGnssQuality,
+        tmnxEqSyncIfTimingGnss2Quality,
+        tmnxEqSyncIfTimingGnssAlarm,
+        tmnxEqSyncIfTimingGnssAlarmClr,
+        tmnxEqSyncIfTimingGnss2Alarm,
+        tmnxEqSyncIfTimingGnss2AlarmClr
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of additional notifications supporting management of
+         sync-if-timing in release 20.0 of Nokia SROS series systems."
+    ::= { tmnxChassisV19Groups 27 }
+
+tmnxChassisCoreResPlcrV19v0Group OBJECT-GROUP
+    OBJECTS     {
+        tCoreResIngFloatPolicerTotal,
+        tCoreResIngFloatPolicerAlloc,
+        tCoreResIngFloatPolicerStatTotal,
+        tCoreResIngFloatPolicerStatAlloc,
+        tCoreResIngDdctdPolicerTotal,
+        tCoreResIngDdctdPolicerAlloc,
+        tCoreResIngDdctdPolicerStatTotal,
+        tCoreResIngDdctdPolicerStatAlloc
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting management of Resource Information on
+         a core. This is for release 19.5 of Nokia IXR systems."
+    ::= { tmnxChassisV19Groups 28 }
+
 tmnxChassisV20Groups             OBJECT IDENTIFIER ::= { tmnxChassisGroups 82 }
 
 tmnxChassisV20v0ObsoleteGroup    OBJECT-GROUP
@@ -25336,7 +26681,11 @@ tmnxChassisNotifGroupV20v0       NOTIFICATION-GROUP
     NOTIFICATIONS {
         tmnxPeKernelVersionMismatch,
         tmnxFPResourcePolicyModified,
-        tmnxFPResourcePolicyModifiedClr
+        tmnxFPResourcePolicyModifiedClr,
+        tChassisAirflowDirMismatch,
+        tChassisAirflowDirMismatchClr,
+        tChassisPowerSupplyMismatch,
+        tChassisPowerSupplyMismatchClr
     }
     STATUS      current
     DESCRIPTION
@@ -25495,6 +26844,134 @@ tmnxCardFPQosPolicyV20v0Group    OBJECT-GROUP
         "The group of objects supporting management of Qos Forwarding Plane
          (FP) resource policy in release 20.0 on Nokia SROS series systems."
     ::= { tmnxChassisV20Groups 6 }
+
+tmnxSyncIfTimingV20v0ObsoleteGrp OBJECT-GROUP
+    OBJECTS     {
+        tmnxSyncIfTimingRef1SrcHw,
+        tmnxSyncIfTimingRef1BITSIfType,
+        tmnxSyncIfTimingRef2SrcHw,
+        tmnxSyncIfTimingRef2BITSIfType,
+        tSyncIfTimingAdmRef1SrcHw,
+        tSyncIfTimingAdmRef1BITSIfType,
+        tSyncIfTimingAdmRef2SrcHw,
+        tSyncIfTimingAdmRef2BITSIfType,
+        tmnxSyncIfTimingRef1NationalUse,
+        tmnxSyncIfTimingRef2NationalUse,
+        tSyncIfTimingAdmRef1NationalUse,
+        tSyncIfTimingAdmRef2NationalUse
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting Sync-if-timing features obsoleted in
+         20.0 release on Nokia SROS series systems."
+    ::= { tmnxChassisV20Groups 7 }
+
+tmnxSyncIfTimingGnssV20v0Group   OBJECT-GROUP
+    OBJECTS     {
+        tSyncIfTimingAdmGnssCfgQltyLevel,
+        tSyncIfTimingAdmGnssAdminStatus,
+        tmnxSyncIfTimingGnssAdminStatus,
+        tmnxSyncIfTimingGnssInUse,
+        tmnxSyncIfTimingGnssQualified,
+        tmnxSyncIfTimingGnssAlarm,
+        tmnxSyncIfTimingGnssCfgQltyLevel,
+        tmnxSyncIfTimingGnssRxQltyLevel,
+        tmnxSyncIfTimingGnssState,
+        tmnxSyncIfTimingGnss2AdminStatus,
+        tmnxSyncIfTimingGnss2InUse,
+        tmnxSyncIfTimingGnss2Qualified,
+        tmnxSyncIfTimingGnss2Alarm,
+        tmnxSyncIfTimingGnss2RxQltyLevel,
+        tmnxSyncIfTimingGnss2State
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group on objects supporting the GNSS (Global Navigation Satellite
+         System) timing reference in 20.0 on Nokia SROS series systems."
+    ::= { tmnxChassisV20Groups 8 }
+
+tmnxChassisResEgrRmrkV20v0Group  OBJECT-GROUP
+    OBJECTS     {
+        tFPResEgrDot1pDscpRemarkMapTotal,
+        tFPResEgrDot1pDscpRemarkMapAlloc
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting management of Resource Information
+         related to Egress remark policy. This is for release 20.0 of Nokia IXR
+         systems."
+    ::= { tmnxChassisV20Groups 9 }
+
+tmnxChassisResDepthMQV20v0Group  OBJECT-GROUP
+    OBJECTS     {
+        tChassisResFastDepthMQueuesTotal,
+        tChassisResFastDepthMQueuesAlloc,
+        tFPResFastDepthMQueuesTotal,
+        tFPResFastDepthMQueuesAlloc
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting management of Resource Information
+         related to fast polled queue depth monitored queue. This is for
+         release 20.10 of Nokia SROS series systems."
+    ::= { tmnxChassisV20Groups 11 }
+
+tmnxChassisFPQppbPolV20v0Group   OBJECT-GROUP
+    OBJECTS     {
+        tmnxFPPlcyAcctPolicerLimit,
+        tmnxFPPlcyAcctPolicerInUse
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting management of FP policy-accounting
+         resources on forwarding plane. This is for release 20.10 of Nokia SROS
+         series systems."
+    ::= { tmnxChassisV20Groups 12 }
+
+tmnxChassisCoreResV20v0Group     OBJECT-GROUP
+    OBJECTS     {
+        tCoreResSapTotal,
+        tCoreResSapAlloc
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting management of Resource Information on
+         a core. This is for release 20.10 of Nokia IXR systems."
+    ::= { tmnxChassisV20Groups 14 }
+
+tmnxFPNotificationV20Group       NOTIFICATION-GROUP
+    NOTIFICATIONS {
+        tmnxPlcyAcctPlcrPoolExcResource,
+        tmnxPlcyAcctPlcrPoolLowResource
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of notifications for FP on Nokia systems."
+    ::= { tmnxChassisV20Groups 15 }
+
+tmnxChassisIxrXFanV20v0Group     OBJECT-GROUP
+    OBJECTS     {
+        tmnxPhysChassisFanDirection
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting management of IXR-x chassis fans in
+         release 20.10 of Nokia IXR systems."
+    ::= { tmnxChassisV20Groups 16 }
+
+tmnxChassisV21Groups             OBJECT IDENTIFIER ::= { tmnxChassisGroups 83 }
+
+tmnxCoreDdctdPolicerResGroupV21  OBJECT-GROUP
+    OBJECTS     {
+        tCoreDdctdPolicersTotal,
+        tCoreDdctdPolicersAlloc
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting management of entries for
+         direct-mapped policer resource information on a core capabilities in
+         release 21.0 on Nokia SROS series systems."
+    ::= { tmnxChassisV21Groups 3 }
 
 tmnxChassisDCCompliances         OBJECT IDENTIFIER ::= { tmnxChassisConformance 3 }
 
@@ -26514,7 +27991,11 @@ tmnxEqSyncIfTimingRefSwitch      NOTIFICATION-TYPE
         tmnxSyncIfTimingRef2InUse,
         tmnxSyncIfTimingBITSInUse,
         tmnxSyncIfTimingBITS2InUse,
-        tmnxSyncIfTimingPTPInUse
+        tmnxSyncIfTimingPTPInUse,
+        tmnxSyncIfTimingSyncEInUse,
+        tmnxSyncIfTimingSyncE2InUse,
+        tmnxSyncIfTimingGnssInUse,
+        tmnxSyncIfTimingGnss2InUse
     }
     STATUS      current
     DESCRIPTION
@@ -28898,6 +30379,162 @@ tmnxEqHwEventDetected            NOTIFICATION-TYPE
          [RECOVERY] Check hardware component."
     ::= { tmnxChassisNotification 218 }
 
+tmnxTunnelGrpEsaVmActivity       NOTIFICATION-TYPE
+    OBJECTS     {
+        tmnxTunnelGrpEsaVmGroupAssoc,
+        tmnxTunnelGrpEsaVmActive
+    }
+    STATUS      current
+    DESCRIPTION
+        "The tmnxTunnelGrpEsaVmActivity notification is generated when a
+         tunnel-capable ESA virtual machine that is associated with a tunnel
+         group becomes active or inactive within its group."
+    ::= { tmnxChassisNotification 219 }
+
+tmnxEsaDiscovered                NOTIFICATION-TYPE
+    OBJECTS     {
+        tmnxEsaNotifyId
+    }
+    STATUS      current
+    DESCRIPTION
+        "The tmnxEsaDiscovered notification is generated when a new ESA is
+         discovered by the system. This happens when an initial dhcp request is
+         received on the configured ESA host port."
+    ::= { tmnxChassisNotification 220 }
+
+tmnxEsaConnected                 NOTIFICATION-TYPE
+    OBJECTS     {
+        tmnxEsaNotifyId
+    }
+    STATUS      current
+    DESCRIPTION
+        "The tmnxEsaConnected notification is generated when the ESA boots
+         successfully and the system can communicate with the ESA."
+    ::= { tmnxChassisNotification 221 }
+
+tmnxEsaDisconnected              NOTIFICATION-TYPE
+    OBJECTS     {
+        tmnxEsaNotifyId
+    }
+    STATUS      current
+    DESCRIPTION
+        "The tmnxEsaDisconnected notification is generated when the ESA is
+         unprovisioned (i.e. host port unassigned)."
+    ::= { tmnxChassisNotification 222 }
+
+tmnxEsaFailure                   NOTIFICATION-TYPE
+    OBJECTS     {
+        tmnxEsaNotifyId,
+        tmnxEsaStatsOperFlags
+    }
+    STATUS      current
+    DESCRIPTION
+        "The tmnxEsaFailure notification is generated when a failure occurs on
+         an ESA. There are several reasons that cause a failure, including
+         losing communications with the ESA, detecting an incompatible ESA, or
+         firmware upgrade failure."
+    ::= { tmnxChassisNotification 223 }
+
+tmnxEsaCleared                   NOTIFICATION-TYPE
+    OBJECTS     {
+        tmnxEsaNotifyId
+    }
+    STATUS      current
+    DESCRIPTION
+        "The tmnxEsaCleared notification is generated when an ESA is cleared or
+         rebooted. A manual clear of the ESA will generate this notification."
+    ::= { tmnxChassisNotification 224 }
+
+tmnxEsaVmCreated                 NOTIFICATION-TYPE
+    OBJECTS     {
+        tmnxEsaNotifyId,
+        tmnxEsaVmNotifyId
+    }
+    STATUS      current
+    DESCRIPTION
+        "The tmnxEsaVmCreated notification is generated when an ESA VM is
+         created."
+    ::= { tmnxChassisNotification 225 }
+
+tmnxEsaVmBooted                  NOTIFICATION-TYPE
+    OBJECTS     {
+        tmnxEsaNotifyId,
+        tmnxEsaVmNotifyId
+    }
+    STATUS      current
+    DESCRIPTION
+        "The tmnxEsaVmBooted notification is generated when an ESA VM is
+         booted."
+    ::= { tmnxChassisNotification 226 }
+
+tmnxEsaVmRemoved                 NOTIFICATION-TYPE
+    OBJECTS     {
+        tmnxEsaNotifyId,
+        tmnxEsaVmNotifyId
+    }
+    STATUS      current
+    DESCRIPTION
+        "The tmnxEsaVmRemoved notification is generated when an ESA VM is
+         removed from the ESA, as a result of it being unprovisioned (i.e. host
+         port or type unassigned) or unequipped (i.e. memory or cores
+         unassigned)."
+    ::= { tmnxChassisNotification 227 }
+
+tmnxEsaVmCleared                 NOTIFICATION-TYPE
+    OBJECTS     {
+        tmnxEsaNotifyId,
+        tmnxEsaVmNotifyId
+    }
+    STATUS      current
+    DESCRIPTION
+        "The tmnxEsaVmCleared notification is generated when an ESA VM is
+         cleared or restarted. A manual clear of the esa-vm will generate this
+         notification."
+    ::= { tmnxChassisNotification 228 }
+
+tmnxEsaVmFailure                 NOTIFICATION-TYPE
+    OBJECTS     {
+        tmnxEsaNotifyId,
+        tmnxEsaVmNotifyId,
+        tmnxEsaVmStatsOperFlags
+    }
+    STATUS      current
+    DESCRIPTION
+        "The tmnxEsaVmFailure notification is generated when an ESA VM is
+         declared failed. This could be for any of the reasons listed in
+         tmnxEsaVmStatsOperFlags, other than adminDown."
+    ::= { tmnxChassisNotification 229 }
+
+tIPsecEsaVmMemLowWatermark       NOTIFICATION-TYPE
+    OBJECTS     {
+        tmnxEsaNotifyId,
+        tmnxEsaVmNotifyId
+    }
+    STATUS      current
+    DESCRIPTION
+        "[CAUSE] A tIPsecEsaVmMemLowWatermark notification is generated when
+         the ESA VM memory usage ratio has dropped back to the normal level.
+
+         [EFFECT] The system accepts new IKE states.
+
+         [RECOVERY] There is no recovery required for this notification."
+    ::= { tmnxChassisNotification 230 }
+
+tIPsecEsaVmMemHighWatermark      NOTIFICATION-TYPE
+    OBJECTS     {
+        tmnxEsaNotifyId,
+        tmnxEsaVmNotifyId
+    }
+    STATUS      current
+    DESCRIPTION
+        "[CAUSE] A tIPsecEsaVmMemHighWatermark notification is generated when
+         the ESA VM memory usage ratio has almost reached the maximum value.
+
+         [EFFECT] The system may stop accepting new IKE states shortly.
+
+         [RECOVERY] Use fewer SAs for each IKE tunnel."
+    ::= { tmnxChassisNotification 231 }
+
 tmnxPeKernelVersionMismatch      NOTIFICATION-TYPE
     OBJECTS     {
         tmnxChassisNotifyHwIndex,
@@ -28964,5 +30601,213 @@ tmnxFPResourcePolicyModifiedClr  NOTIFICATION-TYPE
 
          [RECOVERY] None."
     ::= { tmnxChassisNotification 234 }
+
+tmnxEqSyncIfTimingGnssQuality    NOTIFICATION-TYPE
+    OBJECTS     {
+        tmnxSyncIfTimingGnssRxQltyLevel
+    }
+    STATUS      current
+    DESCRIPTION
+        "Generated when there is a change of the received quality level on
+         timing reference gnss."
+    ::= { tmnxChassisNotification 235 }
+
+tmnxEqSyncIfTimingGnss2Quality   NOTIFICATION-TYPE
+    OBJECTS     {
+        tmnxSyncIfTimingGnss2RxQltyLevel
+    }
+    STATUS      current
+    DESCRIPTION
+        "Generated when there is a change of the received quality level on
+         timing reference gnss2."
+    ::= { tmnxChassisNotification 236 }
+
+tmnxEqSyncIfTimingGnssAlarm      NOTIFICATION-TYPE
+    OBJECTS     {
+        tmnxChassisNotifyHwIndex,
+        tmnxHwID,
+        tmnxHwClass,
+        tmnxSyncIfTimingNotifyAlarm
+    }
+    STATUS      current
+    DESCRIPTION
+        "[CAUSE] Generated when an alarm condition on the gnss timing reference
+         is detected. The type of alarm (los, oof, etc) is indicated in the
+         details of the log event or alarm, and is also available in the
+         tmnxSyncIfTimingNotifyAlarm attribute included in the SNMP
+         notification. The SNMP notification will have the same indices as
+         those of the tmnxCpmCardTable.
+
+         [EFFECT] Timing reference gnss cannot be used as a source of timing
+         into the central clock.
+
+         [RECOVERY] Address issues with the signal associated with timing
+         reference gnss."
+    ::= { tmnxChassisNotification 237 }
+
+tmnxEqSyncIfTimingGnss2Alarm     NOTIFICATION-TYPE
+    OBJECTS     {
+        tmnxChassisNotifyHwIndex,
+        tmnxHwID,
+        tmnxHwClass,
+        tmnxSyncIfTimingNotifyAlarm
+    }
+    STATUS      current
+    DESCRIPTION
+        "[CAUSE] Generated when an alarm condition on the gnss2 timing
+         reference is detected. The type of alarm (los, oof, etc) is indicated
+         in the details of the log event or alarm, and is also available in the
+         tmnxSyncIfTimingNotifyAlarm attribute included in the SNMP
+         notification. The SNMP notification will have the same indices as
+         those of the tmnxCpmCardTable.
+
+         [EFFECT] Timing reference gnss2 cannot be used as a source of timing
+         into the central clock.
+
+         [RECOVERY] Address issues with the signal associated with timing
+         reference gnss2."
+    ::= { tmnxChassisNotification 238 }
+
+tmnxEqSyncIfTimingGnssAlarmClr   NOTIFICATION-TYPE
+    OBJECTS     {
+        tmnxChassisNotifyHwIndex,
+        tmnxHwID,
+        tmnxHwClass,
+        tmnxSyncIfTimingNotifyAlarm
+    }
+    STATUS      current
+    DESCRIPTION
+        "Generated when an alarm condition on the gnss timing reference is
+         cleared. This notification will have the same indices as those of the
+         tmnxCpmCardTable."
+    ::= { tmnxChassisNotification 239 }
+
+tmnxEqSyncIfTimingGnss2AlarmClr  NOTIFICATION-TYPE
+    OBJECTS     {
+        tmnxChassisNotifyHwIndex,
+        tmnxHwID,
+        tmnxHwClass,
+        tmnxSyncIfTimingNotifyAlarm
+    }
+    STATUS      current
+    DESCRIPTION
+        "Generated when an alarm condition on the gnss2 timing reference is
+         cleared. This notification will have the same indices as those of the
+         tmnxCpmCardTable."
+    ::= { tmnxChassisNotification 240 }
+
+tmnxEsaFirmwareUpgradeStarted    NOTIFICATION-TYPE
+    OBJECTS     {
+        tmnxEsaNotifyId
+    }
+    STATUS      current
+    DESCRIPTION
+        "The tmnxEsaFirmwareUpgradeStarted notification is generated when an
+         ESA requests a firmware upgrade and is in progress."
+    ::= { tmnxChassisNotification 241 }
+
+tmnxPlcyAcctPlcrPoolExcResource  NOTIFICATION-TYPE
+    OBJECTS     {
+        tmnxFPPlcyAcctPolicerLimit,
+        tmnxFPPlcyAcctPolicerInUse
+    }
+    STATUS      current
+    DESCRIPTION
+        "[CAUSE] The tmnxPlcyAcctPlcrPoolExcResource notification is generated
+         when the number of in-use policer resource usage as specified by
+         tmnxFPPlcyAcctPolicerInUse exceeds 95 percent of the policer limit as
+         specified by tmnxFPPlcyAcctPolicerLimit.
+
+         [EFFECT] The affected device may not provide accurate and complete
+         statistics.
+
+         [RECOVERY] There is no recovery required for this notification."
+    ::= { tmnxChassisNotification 242 }
+
+tmnxPlcyAcctPlcrPoolLowResource  NOTIFICATION-TYPE
+    OBJECTS     {
+        tmnxFPPlcyAcctPolicerLimit,
+        tmnxFPPlcyAcctPolicerInUse
+    }
+    STATUS      current
+    DESCRIPTION
+        "[CAUSE] The tmnxPlcyAcctPlcrPoolLowResource notification is generated
+         when the number of in-use policer resource as specified by
+         tmnxFPPlcyAcctPolicerInUse is below 85 percent of the policer limit as
+         specified by tmnxFPPlcyAcctPolicerLimit.
+
+         [EFFECT] The configured policer limit is cleared when the number of
+         in-use policer resources falls below 85 percent of the policer limit.
+
+         [RECOVERY] There is no recovery required for this notification."
+    ::= { tmnxChassisNotification 243 }
+
+tChassisAirflowDirMismatch       NOTIFICATION-TYPE
+    OBJECTS     {
+        tmnxChassisNotifyHwIndex,
+        tmnxHwID,
+        tmnxHwClass
+    }
+    STATUS      current
+    DESCRIPTION
+        "[CAUSE] The tChassisAirflowDirMismatch notification is generated when
+         airflow direction is not identical for all chassis fans and
+         power-supply fans equipped by the physical chassis.
+
+         [EFFECT] Mismatched airflow direction among fans may cause increased
+         temperature, intermittent errors, and could damage components.
+
+         [RECOVERY] The operator must identify a single preferred airflow
+         direction, remove any chassis fans and power-supply fans which do not
+         match it, and replace them with equipment having fans of the preferred
+         airflow direction."
+    ::= { tmnxChassisNotification 244 }
+
+tChassisAirflowDirMismatchClr    NOTIFICATION-TYPE
+    OBJECTS     {
+        tmnxChassisNotifyHwIndex,
+        tmnxHwID,
+        tmnxHwClass
+    }
+    STATUS      current
+    DESCRIPTION
+        "The tChassisAirflowDirMismatchClr notification is generated to
+         indicate that all chassis fans and power-supply fans with mismatched
+         airflow directions have been replaced, and all chassis-fans and
+         power-supply fans share the same direction."
+    ::= { tmnxChassisNotification 245 }
+
+tChassisPowerSupplyMismatch      NOTIFICATION-TYPE
+    OBJECTS     {
+        tmnxChassisNotifyHwIndex,
+        tmnxHwID,
+        tmnxHwClass
+    }
+    STATUS      current
+    DESCRIPTION
+        "[CAUSE] The tChassisPowerSupplyMismatch notification is generated when
+         power-supply elements equipped to the physical chassis are not all of
+         the same type.
+
+         [EFFECT] There is an increased risk of power-supply failure.
+         Intermittent error or damage to components may also result.
+
+         [RECOVERY] The operator must identify a single preferred or required
+         power-supply type, remove any power-supply elements of other types,
+         and replace them with equipment of the preferred power-supply type."
+    ::= { tmnxChassisNotification 246 }
+
+tChassisPowerSupplyMismatchClr   NOTIFICATION-TYPE
+    OBJECTS     {
+        tmnxChassisNotifyHwIndex,
+        tmnxHwID,
+        tmnxHwClass
+    }
+    STATUS      current
+    DESCRIPTION
+        "The tChassisPowerSupplyMismatchClr notification is generated to
+         indicate that all power-supply elements of mismatched types have been
+         replaced, and all power-supply elements now share the same type."
+    ::= { tmnxChassisNotification 247 }
 
 END

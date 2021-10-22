@@ -21,6 +21,7 @@ IMPORTS
     TEXTUAL-CONVENTION, TimeStamp,
     TruthValue
                                                          FROM SNMPv2-TC
+    TmnxEsaIdOrZero, TmnxEsaVmIdOrZero,
     TmnxHwIndexOrZero, tmnxCardSlotNum,
     tmnxChassisIndex, tmnxFPNum
                                                          FROM TIMETRA-CHASSIS-MIB
@@ -61,6 +62,7 @@ IMPORTS
     svcDhcpLseStatePopulateError,
     svcDhcpPacketProblem, svcDhcpProxyError,
     svcDhcpSubAuthError, svcId,
+    svcTlsBackboneVplsSvcId,
     svcTlsMacMoveMaxRate, svcVpnId,
     tlsDHCPClientLease,
     tlsDhcpLseStateNewChAddr,
@@ -79,9 +81,10 @@ IMPORTS
     tmnxServNotifications, tmnxServObjs,
     tstpTraps
                                                          FROM TIMETRA-SERV-MIB
-    QTag, QTagFullRangeOrNone,
-    ServiceAdminStatus, ServiceOperStatus,
-    SvcISID, TAdaptationRule, TBurstLimit,
+    DateAndTimeOrEmpty, QTag,
+    QTagFullRangeOrNone, ServiceAdminStatus,
+    ServiceOperStatus, SvcISID,
+    TAdaptationRule, TBurstLimit,
     TBurstPercentOrDefault, TBurstSize,
     TBurstSizeBytes, TCIRPercentOverride,
     TCpmProtPolicyID,
@@ -149,7 +152,8 @@ IMPORTS
     TmnxSubShcvAction, TmnxSubShcvInterval,
     TmnxSubShcvRetryCount,
     TmnxSubShcvRetryTimeout, TmnxVRtrID,
-    TmnxVRtrIDOrZero, TmnxVcIdOrNone
+    TmnxVRtrIDOrZero, TmnxVcIdOrNone,
+    TmnxVeId
                                                          FROM TIMETRA-TC-MIB
     ;
 
@@ -5957,7 +5961,10 @@ SapEgrQosQueueInfoEntry          ::= SEQUENCE
     sapEgrQosQHsWrrWeight            Unsigned32,
     sapEgrQosQHsClassWeight          Unsigned32,
     sapEgrQosQHsWredQSlopePlcy       TNamedItemOrEmpty,
-    sapEgrQosQBurstLimit             TBurstLimit
+    sapEgrQosQBurstLimit             TBurstLimit,
+    sapEgrQosQMonitorQueueDepth      TruthValue,
+    sapEgrQosQFastPolling            TruthValue,
+    sapEgrQosQViolationThreshold     Unsigned32
 }
 
 sapEgrQosQId                     OBJECT-TYPE
@@ -5996,7 +6003,12 @@ sapEgrQosQOverrideFlags          OBJECT-TYPE
         "The value of sapEgrQosQOverrideFlags specifies the set of attributes
          whose values have been overridden via management on this queue.
          Clearing a given flag will return the corresponding overridden
-         attribute to the value defined on the SAP's ingress QoS policy."
+         attribute to the value defined on the SAP's ingress QoS policy.
+
+         The sapEgrQosQMonitorQueueDepth, sapEgrQosQFastPolling and
+         sapEgrQosQViolationThreshold objects are not set in
+         sapEgrQosQOverrideFlags when overridden on this queue and can not be
+         cleared using sapEgrQosQOverrideFlags flag."
     ::= { sapEgrQosQueueInfoEntry 4 }
 
 sapEgrQosQCBS                    OBJECT-TYPE
@@ -6284,6 +6296,45 @@ sapEgrQosQBurstLimit             OBJECT-TYPE
          size of a queue."
     DEFVAL      { -1 }
     ::= { sapEgrQosQueueInfoEntry 27 }
+
+sapEgrQosQMonitorQueueDepth      OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of sapEgrQosQMonitorQueueDepth specifies whether to enable
+         queue depth monitoring for this specified queue.
+
+         When overridden this object does not update sapEgrQosQOverrideFlags."
+    DEFVAL      { false }
+    ::= { sapEgrQosQueueInfoEntry 28 }
+
+sapEgrQosQFastPolling            OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of sapEgrQosQFastPolling indicates that the depth monitoring
+         should use the new Embedded Control Processor fast-polling.
+
+         When overridden this object does not update sapEgrQosQOverrideFlags."
+    DEFVAL      { false }
+    ::= { sapEgrQosQueueInfoEntry 29 }
+
+sapEgrQosQViolationThreshold     OBJECT-TYPE
+    SYNTAX      Unsigned32 (0 | 1..9999)
+    UNITS       "centipercent"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of sapEgrQosQViolationThreshold indicates percent of the
+         depth of the queue above which a violation is registered. This is
+         applicable to both the existing queue depth monitoring feature and the
+         fast-polling feature.
+
+         When overridden this object does not update sapEgrQosQOverrideFlags."
+    DEFVAL      { 0 }
+    ::= { sapEgrQosQueueInfoEntry 30 }
 
 sapIngQosSchedInfoTable          OBJECT-TYPE
     SYNTAX      SEQUENCE OF SapIngQosSchedInfoEntry
@@ -9791,7 +9842,8 @@ MsapPlcyEntry                    ::= SEQUENCE
     msapPlcyIgmpTrkMaxNbrGrpSrcs     Unsigned32,
     msapPlcyDCpuProtPolicy           TNamedItemOrEmpty,
     msapPlcyCpmProtMonitorIP         TruthValue,
-    msapPlcySticky                   TruthValue
+    msapPlcySticky                   TruthValue,
+    msapPlcyStickyTimeout            Unsigned32
 }
 
 msapPlcyName                     OBJECT-TYPE
@@ -10243,12 +10295,27 @@ msapPlcySticky                   OBJECT-TYPE
         "The value of msapPlcySticky specifies if the associated managed SAPs
          are sticky.
 
-         The system does not remove a sticky managed SAP automatically.
+         The system does not remove a sticky managed SAP automatically  when it
+         becomes idle.
 
-         A sticky managed SAP is only removed upon explicit request of a
-         management client."
+         A sticky managed SAP is only removed upon explicit request of  a
+         management client  or when the timeout specified in
+         msapPlcyStickyTimeout expires ."
     DEFVAL      { false }
     ::= { msapPlcyEntry 33 }
+
+msapPlcyStickyTimeout            OBJECT-TYPE
+    SYNTAX      Unsigned32 (0 | 5..604800)
+    UNITS       "seconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of msapPlcyStickyTimeout specifies the timeout period  to be
+         used for sticky managed SAPs.
+
+         The value '0' has the meaning of 'infinite'"
+    DEFVAL      { 0 }
+    ::= { msapPlcyEntry 34 }
 
 msapTlsPlcyTable                 OBJECT-TYPE
     SYNTAX      SEQUENCE OF MsapTlsPlcyEntry
@@ -11048,7 +11115,8 @@ MsapInfoEntry                    ::= SEQUENCE
     msapInfoReEvalPolicy             TmnxActionType,
     msapInfoLastChanged              TimeStamp,
     msapInfoIsIdle                   TruthValue,
-    msapInfoIsSticky                 TruthValue
+    msapInfoIsSticky                 TruthValue,
+    msapInfoStickyExpiryTime         DateAndTimeOrEmpty
 }
 
 msapInfoCreationSapPortEncapVal  OBJECT-TYPE
@@ -11123,6 +11191,15 @@ msapInfoIsSticky                 OBJECT-TYPE
          The system will remove a 'sticky' managed SAP only upon explicit
          request of a management client."
     ::= { msapInfoEntry 6 }
+
+msapInfoStickyExpiryTime         OBJECT-TYPE
+    SYNTAX      DateAndTimeOrEmpty
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of msapInfoStickyExpiryTime indicates when this  sticky
+         managed SAP will be removed."
+    ::= { msapInfoEntry 7 }
 
 msapCaptureSapStatsTable         OBJECT-TYPE
     SYNTAX      SEQUENCE OF MsapCaptureSapStatsEntry
@@ -21368,7 +21445,9 @@ TmnxIpTunnelEntry                ::= SEQUENCE
     tmnxIpTunnelOperChanged          TimeStamp,
     tmnxIpTunnelPubTcpMssAdjust      Integer32,
     tmnxIpTunnelPrivTcpMssAdjust     Integer32,
-    tmnxIpTunnelDeliverySvcName      TLNamedItemOrEmpty
+    tmnxIpTunnelDeliverySvcName      TLNamedItemOrEmpty,
+    tmnxIpTunnelHostEsa              TmnxEsaIdOrZero,
+    tmnxIpTunnelHostEsaVm            TmnxEsaVmIdOrZero
 }
 
 tmnxIpTunnelName                 OBJECT-TYPE
@@ -21536,7 +21615,12 @@ tmnxIpTunnelOperFlags            OBJECT-TYPE
         unresolvedDeliverySvc (3),
         unregisteredLocalIp   (4),
         remIpUnreachable      (5),
-        unresolvedDstIp       (6)
+        unresolvedDstIp       (6),
+        reserved7             (7),
+        reserved8             (8),
+        reserved9             (9),
+        reserved10            (10),
+        reserved11            (11)
     }
     MAX-ACCESS  read-only
     STATUS      current
@@ -21608,8 +21692,10 @@ tmnxIpTunnelHostISA              OBJECT-TYPE
         "The value of tmnxIpTunnelHostISA indicates the active ISA MDA that is
          being used to host this tunnel.
 
-         This object will have a value of zero when this tunnel is
-         operationally down."
+         This object will contain a nonzero value only when the tunnel is
+         both operationally up and being hosted by an MDA.  When the tunnel
+         is being hosted by an ESA virtual machine, the host will be indicated
+         by the tmnxIpTunnelHostEsa and tmnxIpTunnelHostEsaVm objects."
     ::= { tmnxIpTunnelEntry 22 }
 
 tmnxIpTunnelEncapIpMtu           OBJECT-TYPE
@@ -21782,6 +21868,34 @@ tmnxIpTunnelDeliverySvcName      OBJECT-TYPE
          tmnxIpTunnelDeliverySvcId is not default and vice-versa."
     DEFVAL      { ''H }
     ::= { tmnxIpTunnelEntry 34 }
+
+tmnxIpTunnelHostEsa              OBJECT-TYPE
+    SYNTAX      TmnxEsaIdOrZero
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxIpTunnelHostEsa indicates the active ESA that is
+         being used to host this tunnel.
+
+         This object will contain a nonzero value only when the tunnel is both
+         operationally up and being hosted by an ESA virtual machine. When the
+         tunnel is being hosted by an ISA MDA, the host will be indicated by
+         the tmnxIpTunnelHostISA object."
+    ::= { tmnxIpTunnelEntry 35 }
+
+tmnxIpTunnelHostEsaVm            OBJECT-TYPE
+    SYNTAX      TmnxEsaVmIdOrZero
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxIpTunnelHostEsaVm indicates the active ESA virtual
+         machine that is being used to host this tunnel.
+
+         This object will contain a nonzero value only when the tunnel is both
+         operationally up and being hosted by an ESA virtual machine. When the
+         tunnel is being hosted by an ISA MDA, the host will be indicated by
+         the tmnxIpTunnelHostISA object."
+    ::= { tmnxIpTunnelEntry 36 }
 
 tmnxIpTnlDstAddrTableLastChanged OBJECT-TYPE
     SYNTAX      TimeStamp
@@ -22354,7 +22468,12 @@ SapExtEntry                      ::= SEQUENCE
     sapEgressAggRateCIRLmt           Integer32,
     sapIngressAggregatePolicerRateHi TmnxHigh32,
     sapIngressAggregatePolicerRateLo TmnxLow32,
-    sapIngressAggregatePolicerBurst  Integer32
+    sapIngressAggregatePolicerBurst  Integer32,
+    sapIngressAggregatePolicerCIRHi  TmnxHigh32,
+    sapIngressAggregatePolicerCIRLo  TmnxLow32,
+    sapIngressAggregatePolicerCBS    Integer32,
+    sapIngressIPCriteriaOvrTag       Integer32,
+    sapIngressIPv6CriteriaOvrTag     Integer32
 }
 
 sapExtLastChanged                OBJECT-TYPE
@@ -22655,7 +22774,7 @@ sapEgressQosEgrRemarkPlcy        OBJECT-TYPE
     ::= { sapExtEntry 22 }
 
 sapEgressAggRateCIRLmt           OBJECT-TYPE
-    SYNTAX      Integer32 (-1..100000000)
+    SYNTAX      Integer32 (-1..400000000)
     UNITS       "kilobps"
     MAX-ACCESS  read-create
     STATUS      current
@@ -22685,7 +22804,7 @@ sapIngressAggregatePolicerRateHi OBJECT-TYPE
     ::= { sapExtEntry 82 }
 
 sapIngressAggregatePolicerRateLo OBJECT-TYPE
-    SYNTAX      TmnxLow32 (144..400000000 | 4294967295)
+    SYNTAX      TmnxLow32 (144..1000000000 | 4294967295)
     UNITS       "kilobps"
     MAX-ACCESS  read-create
     STATUS      current
@@ -22712,6 +22831,121 @@ sapIngressAggregatePolicerBurst  OBJECT-TYPE
          used. The value -1 means maximum burst."
     DEFVAL      { -1 }
     ::= { sapExtEntry 84 }
+
+sapIngressAggregatePolicerCIRHi  OBJECT-TYPE
+    SYNTAX      TmnxHigh32 (0 | 4294967295)
+    UNITS       "kilobps"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of sapIngressAggregatePolicerCIRHi specifies the upper 32
+         bits of the rate to be used in kbps.
+
+         This value should always be set along with
+         sapIngressAggregatePolicerCIRLo, otherwise an 'inconsistentValue'
+         error is returned.
+
+         When the value of sapIngressAggregatePolicerCIRHi along with the value
+         of sapIngressAggregatePolicerCIRLo is set to 4294967295 (0xFFFFFFFF),
+         cir for this policer indicates maximum cir.
+
+         When the value of sapIngressAggregatePolicerCIRHi is set to a value of
+         4294967295 (0xFFFFFFFF) along with sapIngressAggregatePolicerCIRLo is
+         set to 4294967294 (0xFFFFFFFE), cir is not configured for this
+         policer.
+
+         Operational cir:
+         +------------------+-------------+
+         |   cir Hi/Lo      | Oper cir    |
+         +------------------+-------------+
+         | 0xFFFFFFFF (Hi)  |  max rate   |
+         | 0xFFFFFFFF (Lo)  |             |
+         +------------------+-------------+
+         | 0xFFFFFFFF (Hi)  |  cir = pir  |
+         | 0xFFFFFFFE (Lo)  |             |
+         +------------------+-------------+"
+    DEFVAL      { 4294967295 }
+    ::= { sapExtEntry 85 }
+
+sapIngressAggregatePolicerCIRLo  OBJECT-TYPE
+    SYNTAX      TmnxLow32 (0..1000000000 | 4294967295 | 4294967294)
+    UNITS       "kilobps"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of sapIngressAggregatePolicerCIRLo specifies the lower 32
+         bits of the rate to be used in kbps.
+
+         This value should always be set along with
+         sapIngressAggregatePolicerCIRLo, otherwise an 'inconsistentValue'
+         error is returned.
+
+         When the value of sapIngressAggregatePolicerCIRHi along with the value
+         of sapIngressAggregatePolicerCIRLo is set to 4294967295 (0xFFFFFFFF),
+         cir for this policer indicates maximum cir.
+
+         When the value of sapIngressAggregatePolicerCIRHi is set to a value of
+         4294967295 (0xFFFFFFFF) along with sapIngressAggregatePolicerCIRLo is
+         set to 4294967294 (0xFFFFFFFE), cir is not configured for this
+         policer.
+
+         Operational cir:
+         +------------------+-------------+
+         |   cir Hi/Lo      | Oper cir    |
+         +------------------+-------------+
+         | 0xFFFFFFFF (Hi)  |  max rate   |
+         | 0xFFFFFFFF (Lo)  |             |
+         +------------------+-------------+
+         | 0xFFFFFFFF (Hi)  |  cir = pir  |
+         | 0xFFFFFFFE (Lo)  |             |
+         +------------------+-------------+"
+    DEFVAL      { 4294967294 }
+    ::= { sapExtEntry 86 }
+
+sapIngressAggregatePolicerCBS    OBJECT-TYPE
+    SYNTAX      Integer32 (-2 | -1 | 1..33292)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of sapIngressAggregatePolicerCBS specifies the cbs to be
+         used. The value -1 means maximum cbs, value -2 means
+         sapIngressAggregatePolicerCBS is not configured for this policer
+
+
+         Operational cbs:
+         +------------------+-------------+
+         |      cbs         | Oper cbs    |
+         +------------------+-------------+
+         |      -1          |  max rate   |
+         +------------------+-------------+
+         |      -2          |  cbs = mbs  |
+         +------------------+-------------+"
+    DEFVAL      { -2 }
+    ::= { sapExtEntry 87 }
+
+sapIngressIPCriteriaOvrTag       OBJECT-TYPE
+    SYNTAX      Integer32 (0..255)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of sapIngressIPCriteriaOvrTag specifies the tag-id for the
+         IP Criteria override.
+
+         A value of 0 means no ip-criteria override."
+    DEFVAL      { 0 }
+    ::= { sapExtEntry 88 }
+
+sapIngressIPv6CriteriaOvrTag     OBJECT-TYPE
+    SYNTAX      Integer32 (0..255)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of sapIngressIPv6CriteriaOvrTag specifies the tag-id for the
+         IPv6 Criteria override.
+
+         A value of 0 means no ipv6-criteria override."
+    DEFVAL      { 0 }
+    ::= { sapExtEntry 89 }
 
 sapDcpFpStaticStatTable          OBJECT-TYPE
     SYNTAX      SEQUENCE OF SapDcpFpStaticStatEntry
@@ -23490,7 +23724,9 @@ TmnxSapTlsExInfoEntry            ::= SEQUENCE
     tmnxSapTlsExPppoePythonPolicy    TNamedItemOrEmpty,
     tmnxSapTlsExAllowDot1qMsap       TruthValue,
     tmnxSapTlsExEgressDestMac        MacAddress,
-    sapTlsDisableSendBvplsEvpnFlush  TruthValue
+    sapTlsDisableSendBvplsEvpnFlush  TruthValue,
+    sapTlsAutoLrnMacProtectExcList   TNamedItemOrEmpty,
+    sapTlsExBgpVplsMhVeId            TmnxVeId
 }
 
 tmnxSapTlsExLastChanged          OBJECT-TYPE
@@ -23658,6 +23894,27 @@ sapTlsDisableSendBvplsEvpnFlush  OBJECT-TYPE
          an ISID based CMAC flush indication when the sap goes oper-down."
     DEFVAL      { false }
     ::= { tmnxSapTlsExInfoEntry 11 }
+
+sapTlsAutoLrnMacProtectExcList   OBJECT-TYPE
+    SYNTAX      TNamedItemOrEmpty
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of sapTlsAutoLrnMacProtectExcList specifies mac-list name
+         which contains MAC addresses to be excluded from auto learn mac
+         protect"
+    DEFVAL      { "" }
+    ::= { tmnxSapTlsExInfoEntry 12 }
+
+sapTlsExBgpVplsMhVeId            OBJECT-TYPE
+    SYNTAX      TmnxVeId
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The sapTlsExBgpVplsMhVeId specifies BGP-VPLS multi-homing virtual edge
+         identifier range."
+    DEFVAL      { -1 }
+    ::= { tmnxSapTlsExInfoEntry 13 }
 
 sapLagPerLinkHashTableLastChgd   OBJECT-TYPE
     SYNTAX      TimeStamp
@@ -24536,7 +24793,10 @@ SapEgrQosQueueDepthInfoEntry     ::= SEQUENCE
     sapEgrQosQueueDepthPollPrcnt9    Unsigned32,
     sapEgrQosQueueDepthPollPrcnt10   Unsigned32,
     sapEgrQosQueueDepthAvgPollInt    Unsigned32,
-    sapEgrQosQueueDepthAvgElpsdTme   TimeStamp
+    sapEgrQosQueueDepthAvgElpsdTme   TimeStamp,
+    sapEgrQosQueueDepthViolTotCnt    Unsigned32,
+    sapEgrQosQueueDepthViolLast      TimeStamp,
+    sapEgrQosQueueDepthHWMPollInt    Unsigned32
 }
 
 sapEgrQosQueueDepthPollPrcnt1    OBJECT-TYPE
@@ -24668,6 +24928,34 @@ sapEgrQosQueueDepthAvgElpsdTme   OBJECT-TYPE
          elapsed time since the start of queue depth monitoring or the last
          monitoring clear."
     ::= { sapEgrQosQueueDepthInfoEntry 12 }
+
+sapEgrQosQueueDepthViolTotCnt    OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of sapEgrQosQueueDepthViolTotCnt represents the total number
+         of per hardware queue violation counts of the component queues."
+    ::= { sapEgrQosQueueDepthInfoEntry 13 }
+
+sapEgrQosQueueDepthViolLast      OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of sapEgrQosQueueDepthViolLast represents the most recent
+         violation last seen timestamp of the component queues."
+    ::= { sapEgrQosQueueDepthInfoEntry 14 }
+
+sapEgrQosQueueDepthHWMPollInt    OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "microseconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of sapEgrQosQueueDepthHWMPollInt represents the weighted
+         average high-watermark polling interval for the elapsed time."
+    ::= { sapEgrQosQueueDepthInfoEntry 15 }
 
 sapStaticHostRipTable            OBJECT-TYPE
     SYNTAX      SEQUENCE OF SapStaticHostRipEntry
@@ -25364,6 +25652,66 @@ sapEgrQosHsWrrGrpClassWeight     OBJECT-TYPE
          This object overrides TIMETRA-QOS-MIB::tSapEgressHsWrrGrpClassWeight."
     DEFVAL      { -2 }
     ::= { sapEgrQosHsWrrGrpEntry 6 }
+
+tmnxSapPfcpTableLastChanged      OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSapPfcpTableLastChanged indicates the sysUpTime at
+         the time of the most recent change to the tmnxSapPfcpTable."
+    ::= { tmnxSapObjs 177 }
+
+tmnxSapPfcpTable                 OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxSapPfcpEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The table tmnxSapPfcpTable  contains Packet Forwarding Control Plane information related
+         to a SAP with a sapSubType value of 'capture'."
+    ::= { tmnxSapObjs 178 }
+
+tmnxSapPfcpEntry                 OBJECT-TYPE
+    SYNTAX      TmnxSapPfcpEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each row entry represents information related to PFCP for a SAP with a
+         sapSubType value of 'capture'."
+    INDEX       {
+        svcId,
+        sapPortId,
+        sapEncapValue
+    }
+    ::= { tmnxSapPfcpTable 1 }
+
+TmnxSapPfcpEntry                 ::= SEQUENCE
+{
+    tmnxSapPfcpLastChanged           TimeStamp,
+    tmnxSapPfcpAssociation           TNamedItemOrEmpty
+}
+
+tmnxSapPfcpLastChanged           OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSapPfcpLastChanged indicates the sysUpTime at the
+         time of the most recent change to this table row."
+    ::= { tmnxSapPfcpEntry 1 }
+
+tmnxSapPfcpAssociation           OBJECT-TYPE
+    SYNTAX      TNamedItemOrEmpty
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSapPfcpAssociation specifies the PFCP association for
+         this SAP.
+
+         A non-empty value must correspond to a conceptual row in the
+         TIMETRA-SUBSCRIBER-MGMT-MIB::tmnxPfcpAssocTable."
+    DEFVAL      { "" }
+    ::= { tmnxSapPfcpEntry 3 }
 
 tmnxSapOperStatusTable           OBJECT-TYPE
     SYNTAX      SEQUENCE OF TmnxSapOperStatusEntry
@@ -27828,6 +28176,7 @@ tmnxSap7xxxV19v0Compliance       MODULE-COMPLIANCE
             tmnxSapTmplFilterNameV16v0Group,
             tmnxSapL2tpv3ExtGroup,
             tmnxSapIngressQinqV16v0Group,
+            tmnxSapPfcpV19v0Group,
             tmnxSapBaseStatsAggregateGroup,
             tmnxSapOperStatusGroup,
             tmnxSapBWGroup,
@@ -27836,10 +28185,28 @@ tmnxSap7xxxV19v0Compliance       MODULE-COMPLIANCE
             tmnxSapEgrAggRateCIRV19v0Group,
             tmnxSapIgPlcyPlcerStatV19v0Group,
             tmnxSapIngressAggRateV19v0Group,
+            tmnxIpTunnelEsaVmV19v0Group,
             sapNotifyObjsPortStateGroup,
             tmnxSapQosStatsV19v0Group
         }
     ::= { tmnxSapCompliances 132 }
+
+tmnxSap7xxxV20v0Compliance       MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for management of services SAPs on Nokia SROS
+         series systems release 20.0."
+    MODULE
+        MANDATORY-GROUPS {
+            sapNotifyV20v0Group,
+            sapTlsMacListV20v0Group,
+            sapTlsBgpVplsEvpnV20v0Group,
+            tmnxSapStickyMsapV20v0Group,
+            tmnxSapEgrQMonQDepthV20v0Group,
+            sapIngTrtcm2AggRateV20v10Group,
+            sapIngressIPCritOvrV20v10Group
+        }
+    ::= { tmnxSapCompliances 133 }
 
 tmnxSapGroups                    OBJECT IDENTIFIER ::= { tmnxSapConformance 2 }
 
@@ -33358,6 +33725,18 @@ tmnxSapL2tpv3ObsoletedGroup      OBJECT-GROUP
          feature on Nokia SROS series systems in release 16.0."
     ::= { tmnxSapGroups 531 }
 
+tmnxSapPfcpV19v0Group            OBJECT-GROUP
+    OBJECTS     {
+        tmnxSapPfcpTableLastChanged,
+        tmnxSapPfcpLastChanged,
+        tmnxSapPfcpAssociation
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting management of Qinq preserve and
+         translation feature on Nokia SROS series systems in release 19.0."
+    ::= { tmnxSapGroups 532 }
+
 tmnxSapBaseStatsAggregateGroup   OBJECT-GROUP
     OBJECTS     {
         sapBaseStatsIngAggregateOffPkts,
@@ -33527,6 +33906,17 @@ tmnxSapIngressAggRateV19v0Group  OBJECT-GROUP
          Aggregate Rate on Nokia SROS series systems in release 19.0."
     ::= { tmnxSapGroups 542 }
 
+tmnxIpTunnelEsaVmV19v0Group      OBJECT-GROUP
+    OBJECTS     {
+        tmnxIpTunnelHostEsa,
+        tmnxIpTunnelHostEsaVm
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting management of IP tunnel functions on
+         ESA virtual machines in release 19.0"
+    ::= { tmnxSapGroups 543 }
+
 sapNotifyObjsPortStateGroup      OBJECT-GROUP
     OBJECTS     {
         sapNotifyPortState
@@ -33557,6 +33947,85 @@ tmnxSapQosStatsV19v0Group        OBJECT-GROUP
         "The group of objects supporting management of SAP Ingress/Egress QoS
          capabilities on Nokia SROS series systems in release 19.0."
     ::= { tmnxSapGroups 545 }
+
+sapNotifyV20v0Group              NOTIFICATION-GROUP
+    NOTIFICATIONS {
+        sapReceivedPbbProtSrcMac
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group notification supporting Auto learn mac protect
+         feature for EVPN  feature on Nokia SROS series systems release 20.0."
+    ::= { tmnxSapGroups 546 }
+
+sapTlsMacListV20v0Group          OBJECT-GROUP
+    OBJECTS     {
+        sapTlsAutoLrnMacProtectExcList
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting management of the auto learn Mac list
+         exclusion feature on Nokia SROS series systems in release 20.0."
+    ::= { tmnxSapGroups 547 }
+
+sapTlsBgpVplsEvpnV20v0Group      OBJECT-GROUP
+    OBJECTS     {
+        sapTlsExBgpVplsMhVeId
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting management of the BGP-VPLS EVPN
+         interworking feature on Nokia SROS series systems in release 20.0."
+    ::= { tmnxSapGroups 548 }
+
+tmnxSapStickyMsapV20v0Group      OBJECT-GROUP
+    OBJECTS     {
+        msapPlcyStickyTimeout,
+        msapInfoStickyExpiryTime
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting management of sticky managed SAPs on
+         Nokia SROS release 20 series systems."
+    ::= { tmnxSapGroups 549 }
+
+tmnxSapEgrQMonQDepthV20v0Group   OBJECT-GROUP
+    OBJECTS     {
+        sapEgrQosQMonitorQueueDepth,
+        sapEgrQosQFastPolling,
+        sapEgrQosQViolationThreshold,
+        sapEgrQosQueueDepthViolTotCnt,
+        sapEgrQosQueueDepthViolLast,
+        sapEgrQosQueueDepthHWMPollInt
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting Faster Polling Queue Depth Monitoring
+         with Telemetry on Nokia SROS release 20 series systems."
+    ::= { tmnxSapGroups 550 }
+
+sapIngTrtcm2AggRateV20v10Group   OBJECT-GROUP
+    OBJECTS     {
+        sapIngressAggregatePolicerCIRHi,
+        sapIngressAggregatePolicerCIRLo,
+        sapIngressAggregatePolicerCBS
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting management of the SAP Ingress trtcm2
+         aggregate policers on Nokia SROS series systems in release 20.10."
+    ::= { tmnxSapGroups 551 }
+
+sapIngressIPCritOvrV20v10Group   OBJECT-GROUP
+    OBJECTS     {
+        sapIngressIPCriteriaOvrTag,
+        sapIngressIPv6CriteriaOvrTag
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting IP Criteria overrides for SAP ingress
+         on Nokia SROS series systems."
+    ::= { tmnxSapGroups 554 }
 
 tmnxDCSapCompliances             OBJECT IDENTIFIER ::= { tmnxSapConformance 3 }
 
@@ -34697,6 +35166,24 @@ sapIfIgnorePortStateStop         NOTIFICATION-TYPE
 
          [RECOVERY] None required."
     ::= { sapTraps 62 }
+
+sapReceivedPbbProtSrcMac         NOTIFICATION-TYPE
+    OBJECTS     {
+        svcTlsBackboneVplsSvcId,
+        sapPortId,
+        sapEncapValue,
+        protectedMacForNotify
+    }
+    STATUS      current
+    DESCRIPTION
+        "[CAUSE] The sapReceivedPbbProtSrcMac notification is generated when a
+         protected source MAC protected in i-vpls is received on SAP in b-vpls
+         (svcTlsBackboneVplsSvcId) service.
+
+         [EFFECT] The frame is discarded.
+
+         [RECOVERY] None needed."
+    ::= { sapTraps 63 }
 
 sapMgNotification                OBJECT IDENTIFIER ::= { sapTrapsPrefix 1 }
 

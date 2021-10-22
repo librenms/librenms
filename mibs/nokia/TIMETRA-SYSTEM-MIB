@@ -31,7 +31,7 @@ IMPORTS
     tmnxChassisIndex,
     tmnxChassisNotifyHwIndex,
     tmnxCpmCardNum, tmnxCpmCardSlotNum,
-    tmnxHwClass, tmnxHwID
+    tmnxFabricSlotNum, tmnxHwClass, tmnxHwID
                                                          FROM TIMETRA-CHASSIS-MIB
     timetraSRMIBModules, tmnxSRConfs,
     tmnxSRNotifyPrefix, tmnxSRObjs
@@ -53,6 +53,7 @@ IMPORTS
     TmnxAdminStateTruthValue, TmnxCliEngine,
     TmnxDisplayStringURL,
     TmnxEnabledDisabled,
+    TmnxEnabledDisabledAdminState,
     TmnxLongDisplayString, TmnxOperState,
     TmnxScriptAuthType, TmnxServId,
     TmnxUuid, TmnxVRtrID, TmnxVRtrIDOrZero
@@ -251,14 +252,16 @@ TmnxSysLicensingGroup            ::= TEXTUAL-CONVENTION
          nsp      - Network Management Licenses
          isa      - Integrated Services Licenses
          iom      - IOM Card Licenses
-         mda      - MDA Licenses"
+         mda      - MDA Licenses
+         ports    - Port Licenses"
     SYNTAX      INTEGER {
         system   (0),
         services (1),
         nsp      (2),
         isa      (3),
         iom      (4),
-        mda      (5)
+        mda      (5),
+        ports    (6)
     }
 
 TmnxSysMonSampleTime             ::= TEXTUAL-CONVENTION
@@ -289,7 +292,7 @@ TmnxSysNeid                      ::= TEXTUAL-CONVENTION
     DISPLAY-HINT "1x:"
     STATUS      current
     DESCRIPTION
-        "The textual convention TmnxSysNeid represents the  Network Element
+        "The textual convention TmnxSysNeid represents the Network Element
          Identifier.
 
          The first 8 high-order bits indicate the subnet ID and the 16
@@ -304,6 +307,50 @@ TmnxConfigFileFormatType         ::= TEXTUAL-CONVENTION
     SYNTAX      INTEGER {
         classicCli (1),
         mdCli      (2)
+    }
+
+TmnxSchemaPathState              ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "A value that represents a state of schema path.
+
+         ok(0)            schema path value is valid
+
+         errConnection(1) system was unable to determine the value of
+                          the schema path due to network connection error
+
+         errTooLong(2)    resulting schema path value is too long
+
+         errInvalid(3)    resulting schema path value is invalid"
+    SYNTAX      INTEGER {
+        ok            (0),
+        errConnection (1),
+        errTooLong    (2),
+        errInvalid    (3)
+    }
+
+TmnxSysRmtMgmtLastRegStatus      ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Status of device remote registration attempt."
+    SYNTAX      INTEGER {
+        unknown             (0),
+        succeeded           (1),
+        cancelled           (2),
+        unreachable         (3),
+        refused             (4),
+        dnsResolutionFailed (5),
+        outOfResources      (6),
+        internal            (100)
+    }
+
+TmnxSysRmtMgmtSrcDefaultPort     ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Used default system port."
+    SYNTAX      INTEGER {
+        none (0),
+        grpc (-1)
     }
 
 tmnxSysObjs                      OBJECT IDENTIFIER ::= { tmnxSRObjs 1 }
@@ -568,6 +615,15 @@ sgiSnmpFailedSets                OBJECT-TYPE
          interface (such as NETCONF) exclusively reserving the system
          resources."
     ::= { sysGenInfo 14 }
+
+sgiCryptoModVersion              OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of sgiCryptoModVersion indicates the version of the
+         cryptographic module software running on the system."
+    ::= { sysGenInfo 15 }
 
 sysTimeInfo                      OBJECT IDENTIFIER ::= { tmnxSysObjs 2 }
 
@@ -2572,14 +2628,13 @@ sbiAutoNegotiate                 OBJECT-TYPE
     ::= { sysBofInfo 13 }
 
 sbiSpeed                         OBJECT-TYPE
-    SYNTAX      Unsigned32 (10 | 100)
+    SYNTAX      Unsigned32 (10 | 100 | 1000)
     UNITS       "megabps"
     MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
         "The value of sbiSpeed specifies the speed of the CPM ethernet port.
          This value is ignored if auto-negotiation is enabled."
-    DEFVAL      { 100 }
     ::= { sysBofInfo 14 }
 
 sbiDuplex                        OBJECT-TYPE
@@ -2989,7 +3044,7 @@ sbiAutoBoot                      OBJECT-TYPE
     MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
-        "The value of sbiAutoBoot specifies whether or not the system will  run
+        "The value of sbiAutoBoot specifies whether or not the system will run
          the auto-provisioning agent."
     DEFVAL      { false }
     ::= { sysBofInfo 38 }
@@ -3043,7 +3098,7 @@ sbiAutoBootUsingInband           OBJECT-TYPE
     STATUS      current
     DESCRIPTION
         "The value of sbiAutoBootUsingInband specifies whether or not the
-         system  will auto-boot using the inband ports."
+         system will auto-boot using the inband ports."
     DEFVAL      { false }
     ::= { sysBofInfo 42 }
 
@@ -3087,6 +3142,18 @@ sbiAutoBootIncludeUserClass      OBJECT-TYPE
     DEFVAL      { false }
     ::= { sysBofInfo 46 }
 
+sbiAutoBootVlanDiscovery         OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of sbiAutoBootVlanDiscovery specifies whether or not the
+         system will use VLAN discovery."
+    DEFVAL      { false }
+    ::= { sysBofInfo 47 }
+
+sbiAutoBootInfo                  OBJECT IDENTIFIER ::= { sysBofInfo 49 }
+
 sbiAutoConfigure                 OBJECT IDENTIFIER ::= { sysBofInfo 54 }
 
 sbiAutoIpv4                      OBJECT IDENTIFIER ::= { sbiAutoConfigure 1 }
@@ -3096,7 +3163,7 @@ sbiAutoIpv4Dhcp                  OBJECT-TYPE
     MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
-        "The value of sbiAutoIpv4Dhcp specifies if the system  sends IPv4 DHCP
+        "The value of sbiAutoIpv4Dhcp specifies if the system sends IPv4 DHCP
          Discovery requests."
     DEFVAL      { false }
     ::= { sbiAutoIpv4 1 }
@@ -3132,7 +3199,7 @@ sbiAutoIpv4DhcpOptUserClass      OBJECT-TYPE
     MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
-        "The value of sbiAutoIpv4DhcpOptUserClass specifies if the system  DHCP
+        "The value of sbiAutoIpv4DhcpOptUserClass specifies if the system DHCP
          client sends the User Class option."
     DEFVAL      { false }
     ::= { sbiAutoIpv4 5 }
@@ -3158,7 +3225,7 @@ sbiAutoIpv6Dhcp                  OBJECT-TYPE
     MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
-        "The value of sbiAutoIpv6Dhcp specifies if the system  sends IPv6 DHCP
+        "The value of sbiAutoIpv6Dhcp specifies if the system sends IPv6 DHCP
          Solicit requests."
     DEFVAL      { false }
     ::= { sbiAutoIpv6 1 }
@@ -3191,8 +3258,8 @@ sbiAutoIpv6DhcpClientIdDuidType  OBJECT-TYPE
     MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
-        "The value of sbiAutoIpv6DhcpClientIdDuidType specifies how  the DUID
-         in the sbiAutoIpv6DhcpClientIdDuid has to be interpreted.
+        "The value of sbiAutoIpv6DhcpClientIdDuidType specifies how the DUID in
+         the sbiAutoIpv6DhcpClientIdDuid has to be interpreted.
 
          When the value of sbiAutoIpv6DhcpClientIdType is equal to
          'duidEnterprise', a value other than 'none' must be specified.
@@ -4396,7 +4463,7 @@ TmnxSysRollbackFileEntry         ::= SEQUENCE
     tmnxSysRollbackFileIndex         Unsigned32,
     tmnxSysRollbackFileCreationTime  DateAndTime,
     tmnxSysRollbackFileComment       DisplayString,
-    tmnxSysRollbackFileUserName      TNamedItem,
+    tmnxSysRollbackFileUserName      TNamedItemOrEmpty,
     tmnxSysRollbackFileVersion       DisplayString
 }
 
@@ -4434,7 +4501,7 @@ tmnxSysRollbackFileComment       OBJECT-TYPE
     ::= { tmnxSysRollbackFileEntry 3 }
 
 tmnxSysRollbackFileUserName      OBJECT-TYPE
-    SYNTAX      TNamedItem
+    SYNTAX      TNamedItemOrEmpty
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
@@ -4886,6 +4953,36 @@ tmnxSysNetconfPort               OBJECT-TYPE
          server listening for connections."
     DEFVAL      { 830 }
     ::= { tmnxSysNetconfInfo 26 }
+
+tmnxSysNetconfGetSchemaRequests  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSysNetconfGetSchemaRequests indicates the total
+         number of get-schema NETCONF requests which have been accepted and
+         processed by the NETCONF server."
+    ::= { tmnxSysNetconfInfo 27 }
+
+tmnxSysNetconfGetDataRequests    OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSysNetconfGetDataRequests indicates the total number
+         of get-data NETCONF requests which have been accepted and processed by
+         the NETCONF server."
+    ::= { tmnxSysNetconfInfo 28 }
+
+tmnxSysNetconfActionRequests     OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSysNetconfActionRequests indicates the total number
+         of action NETCONF requests which have been accepted and processed by
+         the NETCONF server."
+    ::= { tmnxSysNetconfInfo 29 }
 
 tmnxDCSysObjs                    OBJECT IDENTIFIER ::= { tmnxSysObjs 24 }
 
@@ -5736,7 +5833,7 @@ tmnxSysFpCamAllocAdmnV6Multicast OBJECT-TYPE
     STATUS      current
     DESCRIPTION
         "The value of tmnxSysFpCamAllocAdmnV6Multicast specifies the maximum
-         number of number of IPv6 multicast routes allowed to be installed  in
+         number of number of IPv6 multicast routes allowed to be installed in
          the system/FP"
     DEFVAL      { 0 }
     ::= { tmnxSysFpCamAllocation 1 }
@@ -5749,6 +5846,33 @@ tmnxSysFpCamAllocOperV6Multicast OBJECT-TYPE
         "The value of tmnxSysFpCamAllocOperV6Multicast specifies the total
          number of IPv6 multicast routes installed in the system/FP"
     ::= { tmnxSysFpCamAllocation 2 }
+
+tmnxSysFpResAlloc                OBJECT IDENTIFIER ::= { tmnxSysResInfo 5 }
+
+tmnxSysFpResAllocation           OBJECT IDENTIFIER ::= { tmnxSysFpResAlloc 1 }
+
+tmnxSysFpResAllocG8032Sap        OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..4096)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The tmnxSysFpResAllocG8032Sap specifies the number of G8032 saps
+         resources allocated for forwarding path:
+           IXR-e Ux - 700 max
+           IXR-e Ax - 2048 max
+           IXR-R6/s - 4096 max
+         This value takes effect after system has rebooted."
+    DEFVAL      { 0 }
+    ::= { tmnxSysFpResAllocation 1 }
+
+tmnxSysFpResAllocOperG8032Sap    OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..4096)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The tmnxSysFpResAllocOperG8032Sap indicates the number of G8032 saps
+         resources allocated for forwarding path."
+    ::= { tmnxSysFpResAllocation 2 }
 
 tmnxSysDhcp                      OBJECT IDENTIFIER ::= { tmnxSysObjs 28 }
 
@@ -7470,7 +7594,7 @@ TmnxSmRunArgsEntry               ::= SEQUENCE
 {
     tmnxSmRunEventArgIndex           Unsigned32,
     tmnxSmRunEventArgName            TLNamedItem,
-    tmnxSmRunEventArgValue           TItemDescription
+    tmnxSmRunEventArgValue           DisplayString
 }
 
 tmnxSmRunEventArgIndex           OBJECT-TYPE
@@ -7492,7 +7616,7 @@ tmnxSmRunEventArgName            OBJECT-TYPE
     ::= { tmnxSmRunArgsEntry 2 }
 
 tmnxSmRunEventArgValue           OBJECT-TYPE
-    SYNTAX      TItemDescription
+    SYNTAX      DisplayString (SIZE (0..255))
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
@@ -7802,6 +7926,44 @@ tmnxSysGrpcGnoiCertMgmtVersion   OBJECT-TYPE
          'gNOI CertificateManagement' service provided by gRPC server."
     ::= { tmnxSysGrpcInfo 17 }
 
+tmnxSysGrpcMdCliAdminState       OBJECT-TYPE
+    SYNTAX      TmnxAdminState
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSysGrpcMdCliAdminState specifies the desired
+         administrative state of the MD-CLI service."
+    DEFVAL      { outOfService }
+    ::= { tmnxSysGrpcInfo 18 }
+
+tmnxSysGrpcMdCliVersion          OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (1..10))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSysGrpcMdCliVersion indicates the version of MD-CLI
+         service provided by gRPC server."
+    ::= { tmnxSysGrpcInfo 19 }
+
+tmnxSysGrpcGnoiSystemAdminState  OBJECT-TYPE
+    SYNTAX      TmnxAdminState
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSysGrpcGnoiSystemAdminState specifies the desired
+         administrative state of the 'gNOI System' service."
+    DEFVAL      { outOfService }
+    ::= { tmnxSysGrpcInfo 22 }
+
+tmnxSysGrpcGnoiSystemVersion     OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (1..10))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSysGrpcGnoiSystemVersion indicates the version of
+         'gNOI System' service provided by gRPC server."
+    ::= { tmnxSysGrpcInfo 23 }
+
 tmnxSysMgmtInterfaceMDCli        OBJECT IDENTIFIER ::= { tmnxSysObjs 40 }
 
 tmnxSysMgmtIfMDCliAutoCfgSave    OBJECT-TYPE
@@ -8052,6 +8214,15 @@ tmnxSysMgmtIfYangNokiaCombined   OBJECT-TYPE
          tmnxSysMgmtIfYangNokiaCombined and tmnxSysMgmtIfYangNokia are mutually
          exclusive and cannot be both set to true at the same time."
     ::= { tmnxSysMgmtInterfaceYangModules 4 }
+
+tmnxSysMgmtIfYangNmdaSupport     OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Enable / disable Network Management Datastores Architecture support."
+    DEFVAL      { false }
+    ::= { tmnxSysMgmtInterfaceYangModules 5 }
 
 tmnxSysMgmtInterfaces            OBJECT IDENTIFIER ::= { tmnxSysObjs 43 }
 
@@ -8325,10 +8496,8 @@ tmnxSysMgmtIfSchemaPath          OBJECT-TYPE
     STATUS      current
     DESCRIPTION
         "The value of tmnxSysMgmtIfSchemaPath specifies the path to schema
-         files used by the system.
-
-         The value of this object defaults to 'cf3:/YANG'."
-    DEFVAL      { '6366333a2f59414e47'H }
+         files used by the system."
+    DEFVAL      { "" }
     ::= { tmnxSysMgmtInterfaces 6 }
 
 tmnxSysMgmtIfWriteSwitchReason   OBJECT-TYPE
@@ -8348,6 +8517,101 @@ tmnxSysMgmtIfWriteSwitchReason   OBJECT-TYPE
             validation (2)  - Validation failure was detected,
                               causing the mode switch."
     ::= { tmnxSysMgmtInterfaces 7 }
+
+tmnxSysMgmtIfPriSchemaPathState  OBJECT-TYPE
+    SYNTAX      TmnxSchemaPathState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tmnxSysMgmtIfPriSchemaPathState indicates the
+         state of tmnxSysMgmtIfPriSchemaPathValue.
+
+         The value can be either 'ok', 'errConnection', 'errTooLong' or
+         'errInvalid'."
+    ::= { tmnxSysMgmtInterfaces 8 }
+
+tmnxSysMgmtIfPriSchemaPathValue  OBJECT-TYPE
+    SYNTAX      TmnxDisplayStringURL
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tmnxSysMgmtIfPriSchemaPathValue indicates the
+         path to schema files derived from the value of sbiPrimaryImage.
+
+         The value of this object is valid only if the vaule of
+         tmnxSysMgmtIfPriSchemaPathState is 'ok'."
+    ::= { tmnxSysMgmtInterfaces 9 }
+
+tmnxSysMgmtIfSecSchemaPathState  OBJECT-TYPE
+    SYNTAX      TmnxSchemaPathState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tmnxSysMgmtIfSecSchemaPathState indicates the
+         state of tmnxSysMgmtIfSecSchemaPathValue.
+
+         The value can be either 'ok', 'errConnection', 'errTooLong' or
+         'errInvalid'."
+    ::= { tmnxSysMgmtInterfaces 10 }
+
+tmnxSysMgmtIfSecSchemaPathValue  OBJECT-TYPE
+    SYNTAX      TmnxDisplayStringURL
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tmnxSysMgmtIfSecSchemaPathValue indicates the
+         path to schema files derived from the value of sbiSecondaryImage.
+
+         The value of this object is valid only if the vaule of
+         tmnxSysMgmtIfSecSchemaPathState is 'ok'."
+    ::= { tmnxSysMgmtInterfaces 11 }
+
+tmnxSysMgmtIfTerSchemaPathState  OBJECT-TYPE
+    SYNTAX      TmnxSchemaPathState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tmnxSysMgmtIfTerSchemaPathState indicates the
+         state of tmnxSysMgmtIfTerSchemaPathValue.
+
+         The value can be either 'ok', 'connectionEror' or 'errorTooLong'."
+    ::= { tmnxSysMgmtInterfaces 12 }
+
+tmnxSysMgmtIfTerSchemaPathValue  OBJECT-TYPE
+    SYNTAX      TmnxDisplayStringURL
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tmnxSysMgmtIfTerSchemaPathValue indicates the
+         path to schema files derived from the value of sbiTertiaryImage.
+
+         The value of this object is valid only if the vaule of
+         tmnxSysMgmtIfTerSchemaPathState is 'ok'."
+    ::= { tmnxSysMgmtInterfaces 13 }
+
+tmnxSysMgmtIfOperSchemaPathState OBJECT-TYPE
+    SYNTAX      TmnxSchemaPathState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tmnxSysMgmtIfOperSchemaPathState indicates the
+         state of tmnxSysMgmtIfOperSchemaPathValue.
+
+         The value can be either 'ok', 'errConnection', 'errTooLong' or
+         'errInvalid'."
+    ::= { tmnxSysMgmtInterfaces 14 }
+
+tmnxSysMgmtIfOperSchemaPathValue OBJECT-TYPE
+    SYNTAX      TmnxDisplayStringURL
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tmnxSysMgmtIfOperSchemaPathValue indicates the
+         path to schema files used by the system.
+
+         The value of this object is valid only if the vaule of
+         tmnxSysMgmtIfOperSchemaPathState is 'ok'."
+    ::= { tmnxSysMgmtInterfaces 15 }
 
 tmnxSysGrpcConnTable             OBJECT-TYPE
     SYNTAX      SEQUENCE OF TmnxSysGrpcConnEntry
@@ -8730,7 +8994,7 @@ tmnxSysNEProfNeipV4              OBJECT-TYPE
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
-        "The value of tmnxSysNEProfNeipV4 indicates the IPv4 address  of the
+        "The value of tmnxSysNEProfNeipV4 indicates the IPv4 address of the
          Network Element."
     DEFVAL      { ''H }
     ::= { tmnxSysNEProfEntry 6 }
@@ -8904,6 +9168,45 @@ tmnxSysFpoQosFc4ProfOperState    OBJECT-TYPE
          state of the four color mode forwarding path option."
     ::= { tmnxSysFwdPathOptsObjs 10 }
 
+tmnxSysFpoMplsFastSwOvAdminState OBJECT-TYPE
+    SYNTAX      TmnxAdminState
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSysFpoMplsFastSwOvAdminState specifies the
+         administrative state of the MPLS fast switchover forwarding path
+         option."
+    DEFVAL      { inService }
+    ::= { tmnxSysFwdPathOptsObjs 11 }
+
+tmnxSysFpoMplsFastSwOvOperState  OBJECT-TYPE
+    SYNTAX      TmnxOperState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSysFpoMplsFastSwOvOperState indicates the operational
+         state of the MPLS fast switchover forwarding path option."
+    ::= { tmnxSysFwdPathOptsObjs 12 }
+
+tmnxSysFpoRouterEcmpAdminState   OBJECT-TYPE
+    SYNTAX      TmnxAdminState
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSysFpoRouterEcmpAdminState specifies the
+         administrative state of the router ECMP forwarding path option."
+    DEFVAL      { inService }
+    ::= { tmnxSysFwdPathOptsObjs 13 }
+
+tmnxSysFpoRouterEcmpOperState    OBJECT-TYPE
+    SYNTAX      TmnxOperState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSysFpoRouterEcmpOperState indicates the operational
+         state of the router ECMP forwarding path option."
+    ::= { tmnxSysFwdPathOptsObjs 14 }
+
 tmnxSysFpoQosMacCritAdminState   OBJECT-TYPE
     SYNTAX      TmnxAdminState
     MAX-ACCESS  read-write
@@ -8960,6 +9263,712 @@ tmnxSysFpoQosBumPolOperState     OBJECT-TYPE
         "The value of tmnxSysFpoQosBumPolOperState indicates the operational
          state of the BUM policers for forwarding path option."
     ::= { tmnxSysFwdPathOptsObjs 20 }
+
+tmnxSysSwitchFabricObjs          OBJECT IDENTIFIER ::= { tmnxSysObjs 49 }
+
+tmnxSysSwFabSfmLossThresh        OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..7)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSysSwFabSfmLossThresh specifies the number of SFMs
+         which are allowed to fail before the system goes into SFM overload
+         state."
+    ::= { tmnxSysSwitchFabricObjs 1 }
+
+tmnxSysSwFabFailRecAdminState    OBJECT-TYPE
+    SYNTAX      TmnxEnabledDisabledAdminState
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSysSwFabFailRecAdminState specifies the
+         administrative state of the automatic switch fabric recovery process."
+    DEFVAL      { disabled }
+    ::= { tmnxSysSwitchFabricObjs 2 }
+
+tmnxSysSwFabFailRecOperState     OBJECT-TYPE
+    SYNTAX      INTEGER {
+        disabled                  (0),
+        holdDown                  (1),
+        ready                     (2),
+        recoveryInProgress        (3),
+        detectedDisabled          (4),
+        detectedHoldDown          (5),
+        detectedXRS40Migration    (6),
+        detectedSFMUpgradePending (7)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSysSwFabFailRecOperState specifies the operational
+         state of the automatic switch fabric recovery process."
+    ::= { tmnxSysSwitchFabricObjs 3 }
+
+tmnxSysRemoteMgmt                OBJECT IDENTIFIER ::= { tmnxSysObjs 52 }
+
+tmnxSysRmtMgmtAdminState         OBJECT-TYPE
+    SYNTAX      TmnxAdminState
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSysRmtMgmtAdminState specifies the desired
+         administrative state of the remote-management."
+    DEFVAL      { outOfService }
+    ::= { tmnxSysRemoteMgmt 1 }
+
+tmnxSysRmtMgmtOperState          OBJECT-TYPE
+    SYNTAX      TmnxOperState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSysRmtMgmtOperState indicates the current operational
+         state of remote-management."
+    ::= { tmnxSysRemoteMgmt 2 }
+
+tmnxSysRmtMgmtOperDownReason     OBJECT-TYPE
+    SYNTAX      INTEGER {
+        unknown   (0),
+        adminDown (1),
+        noManager (2)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSysRmtMgmtOperDownReason indicates the reason why
+         remote-management is operationaly down."
+    ::= { tmnxSysRemoteMgmt 3 }
+
+tmnxSysRmtMgmtAllowUnsecure      OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSysRmtMgmtAllowUnsecure specifies whether remote
+         management will run without secured transport protocol."
+    DEFVAL      { false }
+    ::= { tmnxSysRemoteMgmt 4 }
+
+tmnxSysRmtMgmtTlsClientProf      OBJECT-TYPE
+    SYNTAX      TNamedItemOrEmpty
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSysRmtMgmtTlsClientProf specifies the name of the TLS
+         client profile to be used. The value must be valid active row in
+         tTlsClntProfileTable."
+    DEFVAL      { ''H }
+    ::= { tmnxSysRemoteMgmt 5 }
+
+tmnxSysRmtMgmtTimeout            OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..3600)
+    UNITS       "seconds"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSysRmtMgmtTimeout specifies the remote-management
+         connection timeout."
+    DEFVAL      { 60 }
+    ::= { tmnxSysRemoteMgmt 6 }
+
+tmnxSysRmtMgmtVRtrId             OBJECT-TYPE
+    SYNTAX      TmnxVRtrID
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSysRmtMgmtVRtrId specifies the virtual router
+         identifier used to configure this device. The value must be valid
+         active row in vRtrConfTable."
+    DEFVAL      { 4095 }
+    ::= { tmnxSysRemoteMgmt 7 }
+
+tmnxSysRmtMgmtSrcIpAddType       OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tmnxSysRmtMgmtSrcIpAddType indicates the type
+         of IP address stored in tmnxSysRmtMgmtSrcIpAddress. The value can be
+         either 'unknown', 'ipv4' or 'ipv6."
+    ::= { tmnxSysRemoteMgmt 8 }
+
+tmnxSysRmtMgmtSrcIpAddress       OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (0|4|16))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tmnxSysRmtMgmtSrcIpAddress indicates the
+         source IP address of this device."
+    ::= { tmnxSysRemoteMgmt 9 }
+
+tmnxSysRmtMgmtSrcPort            OBJECT-TYPE
+    SYNTAX      InetPortNumber
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tmnxSysRmtMgmtSrcPort indicates the source
+         port of this device. Setting non-zero value overrides
+         tmnxSysRmtMgmtSrcDefaultPort to 'none'."
+    DEFVAL      { 0 }
+    ::= { tmnxSysRemoteMgmt 10 }
+
+tmnxSysRmtMgmtSrcDefaultPort     OBJECT-TYPE
+    SYNTAX      TmnxSysRmtMgmtSrcDefaultPort
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tmnxSysRmtMgmtSrcDefaultPort indicates the
+         source port of this device uses default configured port. Setting value
+         other than 'none' value overrides tmnxSysRmtMgmtSrcPort to zero."
+    DEFVAL      { grpc }
+    ::= { tmnxSysRemoteMgmt 11 }
+
+tmnxSysRmtMgmtDeviceLabel        OBJECT-TYPE
+    SYNTAX      TLNamedItemOrEmpty
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSysRmtMgmtDeviceLabel specifies a label that helps to
+         identify this device."
+    DEFVAL      { ''H }
+    ::= { tmnxSysRemoteMgmt 12 }
+
+tmnxSysRmtMgmtDeviceName         OBJECT-TYPE
+    SYNTAX      TLNamedItemOrEmpty
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSysRmtMgmtDeviceName specifies the name that
+         identifies this device."
+    DEFVAL      { ''H }
+    ::= { tmnxSysRemoteMgmt 13 }
+
+tmnxSysRmtMgmtLastRegStatus      OBJECT-TYPE
+    SYNTAX      TmnxSysRmtMgmtLastRegStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSysRmtMgmtLastRegStatus specifies a status of last
+         registration."
+    ::= { tmnxSysRemoteMgmt 14 }
+
+tmnxSysRmtMgmtLastRegTime        OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSysRmtMgmtLastRegTime specifies a last time the
+         remote-management client tried to register."
+    ::= { tmnxSysRemoteMgmt 15 }
+
+tmnxSysRmtMgmtRegsCancelled      OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSysRmtMgmtRegsCancelled specifies a number of
+         cancelled registrations."
+    ::= { tmnxSysRemoteMgmt 16 }
+
+tmnxSysRmtMgmtRegsFailed         OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSysRmtMgmtRegsFailed specifies a number of failed
+         registrations."
+    ::= { tmnxSysRemoteMgmt 17 }
+
+tmnxSysRmtMgmtRegsSent           OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSysRmtMgmtRegsSent specifies a number of sucessfull
+         registrations."
+    ::= { tmnxSysRemoteMgmt 18 }
+
+tmnxSysRmtMgmtHelloInterval      OBJECT-TYPE
+    SYNTAX      Unsigned32 (10..3600)
+    UNITS       "minutes"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSysRmtMgmtHelloInterval specifies the name of the TLS
+         client profile to be used."
+    DEFVAL      { 10 }
+    ::= { tmnxSysRemoteMgmt 19 }
+
+tmnxSysRmtMgmtLastHelloTime      OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSysRmtMgmtLastHelloTime specifies a last time the
+         remote-management client sucessfully registered."
+    ::= { tmnxSysRemoteMgmt 20 }
+
+tmnxSysRmtMgmtManagerTable       OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxSysRmtMgmtManagerEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The tmnxSysRmtMgmtManagerTable has an entry for each configured
+         manager."
+    ::= { tmnxSysRemoteMgmt 21 }
+
+tmnxSysRmtMgmtManagerEntry       OBJECT-TYPE
+    SYNTAX      TmnxSysRmtMgmtManagerEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each row entry contains remote-management manager configuration."
+    INDEX       { tmnxSysRmtMgmtMgrName }
+    ::= { tmnxSysRmtMgmtManagerTable 1 }
+
+TmnxSysRmtMgmtManagerEntry       ::= SEQUENCE
+{
+    tmnxSysRmtMgmtMgrName            TLNamedItem,
+    tmnxSysRmtMgmtMgrRowStatus       RowStatus,
+    tmnxSysRmtMgmtMgrAdminState      TmnxAdminState,
+    tmnxSysRmtMgmtMgrOperState       TmnxOperState,
+    tmnxSysRmtMgmtMgrOperDownReason  INTEGER,
+    tmnxSysRmtMgmtMgrFQDN            DisplayString,
+    tmnxSysRmtMgmtMgrIpAddType       InetAddressType,
+    tmnxSysRmtMgmtMgrIpAddress       InetAddress,
+    tmnxSysRmtMgmtMgrPort            InetPortNumber,
+    tmnxSysRmtMgmtMgrAllowUnsecure   TruthValue,
+    tmnxSysRmtMgmtMgrTlsClientProf   TNamedItemOrEmpty,
+    tmnxSysRmtMgmtMgrDescription     TItemDescription,
+    tmnxSysRmtMgmtMgrTimeout         Unsigned32,
+    tmnxSysRmtMgmtMgrVRtrId          TmnxVRtrIDOrZero,
+    tmnxSysRmtMgmtMgrSrcIpAddType    InetAddressType,
+    tmnxSysRmtMgmtMgrSrcIpAddress    InetAddress,
+    tmnxSysRmtMgmtMgrSrcPort         InetPortNumber,
+    tmnxSysRmtMgmtMgrSrcDefaultPort  TmnxSysRmtMgmtSrcDefaultPort,
+    tmnxSysRmtMgmtMgrDeviceLabel     TLNamedItemOrEmpty,
+    tmnxSysRmtMgmtMgrDeviceName      TLNamedItemOrEmpty,
+    tmnxSysRmtMgmtMgrLastRegStatus   TmnxSysRmtMgmtLastRegStatus,
+    tmnxSysRmtMgmtMgrLastRegTime     DateAndTime,
+    tmnxSysRmtMgmtMgrRegsCancelled   Counter64,
+    tmnxSysRmtMgmtMgrRegsFailed      Counter64,
+    tmnxSysRmtMgmtMgrRegsSent        Counter64,
+    tmnxSysRmtMgmtMgrOperTlsProf     TNamedItemOrEmpty,
+    tmnxSysRmtMgmtMgrOperTranspType  INTEGER,
+    tmnxSysRmtMgmtMgrOperTimeout     Unsigned32,
+    tmnxSysRmtMgmtMgrOperVRtrId      TmnxVRtrIDOrZero,
+    tmnxSysRmtMgmtMgrOperDevName     TLNamedItemOrEmpty,
+    tmnxSysRmtMgmtMgrOperDevLabel    TLNamedItemOrEmpty,
+    tmnxSysRmtMgmtMgrOperSrcIpAdType InetAddressType,
+    tmnxSysRmtMgmtMgrOperSrcIpAddr   InetAddress,
+    tmnxSysRmtMgmtMgrOperSrcPort     InetPortNumber
+}
+
+tmnxSysRmtMgmtMgrName            OBJECT-TYPE
+    SYNTAX      TLNamedItem
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The name for a remote-management manager"
+    ::= { tmnxSysRmtMgmtManagerEntry 1 }
+
+tmnxSysRmtMgmtMgrRowStatus       OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The row status used to create and delete rows in this table."
+    ::= { tmnxSysRmtMgmtManagerEntry 2 }
+
+tmnxSysRmtMgmtMgrAdminState      OBJECT-TYPE
+    SYNTAX      TmnxAdminState
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSysRmtMgmtMgrAdminState specifies the desired
+         administrative state of the remote-management."
+    DEFVAL      { outOfService }
+    ::= { tmnxSysRmtMgmtManagerEntry 3 }
+
+tmnxSysRmtMgmtMgrOperState       OBJECT-TYPE
+    SYNTAX      TmnxOperState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSysRmtMgmtMgrOperState indicates the current
+         operational state of remote-management."
+    ::= { tmnxSysRmtMgmtManagerEntry 4 }
+
+tmnxSysRmtMgmtMgrOperDownReason  OBJECT-TYPE
+    SYNTAX      INTEGER {
+        unknown               (0),
+        adminDown             (1),
+        noTransportType       (2),
+        noSourceAddress       (3),
+        invalidManagerAddress (4),
+        registration-failed   (5)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSysRmtMgmtMgrOperDownReason indicates the reason why
+         remote-management manager is down."
+    ::= { tmnxSysRmtMgmtManagerEntry 5 }
+
+tmnxSysRmtMgmtMgrFQDN            OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..255))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSysRmtMgmtMgrFQDN specifies the Fully Qualified
+         Domain Name (FQDN) associated with the manager. Setting value other
+         than '' resets tmnxSysRmtMgmtMgrIpAddress."
+    DEFVAL      { ''H }
+    ::= { tmnxSysRmtMgmtManagerEntry 6 }
+
+tmnxSysRmtMgmtMgrIpAddType       OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tmnxSysRmtMgmtMgrIpAddType indicates the type
+         of IP address stored in tmnxSysRmtMgmtMgrIpAddress. The value can be
+         either 'unknown', 'ipv4' or 'ipv6."
+    ::= { tmnxSysRmtMgmtManagerEntry 7 }
+
+tmnxSysRmtMgmtMgrIpAddress       OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (0|4|16))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tmnxSysRmtMgmtMgrIpAddress indicates the
+         manager IP address where registrations will be sent. Setting value
+         other than '' resets tmnxSysRmtMgmtMgrFQDN."
+    ::= { tmnxSysRmtMgmtManagerEntry 8 }
+
+tmnxSysRmtMgmtMgrPort            OBJECT-TYPE
+    SYNTAX      InetPortNumber
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tmnxSysRmtMgmtMgrPort indicates the port where
+         registrations will be sent."
+    DEFVAL      { 57400 }
+    ::= { tmnxSysRmtMgmtManagerEntry 9 }
+
+tmnxSysRmtMgmtMgrAllowUnsecure   OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSysRmtMgmtMgrAllowUnsecure specifies whether remote
+         management will run without secured transport protocol."
+    DEFVAL      { false }
+    ::= { tmnxSysRmtMgmtManagerEntry 10 }
+
+tmnxSysRmtMgmtMgrTlsClientProf   OBJECT-TYPE
+    SYNTAX      TNamedItemOrEmpty
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSysRmtMgmtMgrTlsClientProf specifies the name of the
+         TLS client profile to be used. The value must be valid active row in
+         tTlsClntProfileTable."
+    DEFVAL      { ''H }
+    ::= { tmnxSysRmtMgmtManagerEntry 11 }
+
+tmnxSysRmtMgmtMgrDescription     OBJECT-TYPE
+    SYNTAX      TItemDescription
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSysRmtMgmtMgrDescription specifies the
+         remote-management manager description."
+    DEFVAL      { ''H }
+    ::= { tmnxSysRmtMgmtManagerEntry 12 }
+
+tmnxSysRmtMgmtMgrTimeout         OBJECT-TYPE
+    SYNTAX      Unsigned32 (0 | 1..3600)
+    UNITS       "seconds"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSysRmtMgmtMgrTimeout specifies the remote-management
+         connection timeout. If set to 0 the value is inherited from
+         tmnxSysRmtMgmtTimeout."
+    DEFVAL      { 0 }
+    ::= { tmnxSysRmtMgmtManagerEntry 13 }
+
+tmnxSysRmtMgmtMgrVRtrId          OBJECT-TYPE
+    SYNTAX      TmnxVRtrIDOrZero
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSysRmtMgmtMgrVRtrId specifies the virtual router
+         identifier used to configure this device. If set the value must be
+         valid active row in vRtrConfTable. Else the value is inherited from
+         tmnxSysRmtMgmtVRtrId."
+    DEFVAL      { 0 }
+    ::= { tmnxSysRmtMgmtManagerEntry 14 }
+
+tmnxSysRmtMgmtMgrSrcIpAddType    OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tmnxSysRmtMgmtMgrSrcIpAddType indicates the
+         type of IP address stored in tmnxSysRmtMgmtMgrSrcIpAddress. The value
+         can be either 'unknown', 'ipv4' or 'ipv6."
+    ::= { tmnxSysRmtMgmtManagerEntry 15 }
+
+tmnxSysRmtMgmtMgrSrcIpAddress    OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (0|4|16))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tmnxSysRmtMgmtMgrSrcIpAddress indicates the
+         source IP address of this device. If not set the value is inherited
+         from tmnxSysRmtMgmtSrcIpAddress."
+    ::= { tmnxSysRmtMgmtManagerEntry 16 }
+
+tmnxSysRmtMgmtMgrSrcPort         OBJECT-TYPE
+    SYNTAX      InetPortNumber
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tmnxSysRmtMgmtMgrSrcPort indicates the source
+         port of this device."
+    DEFVAL      { 0 }
+    ::= { tmnxSysRmtMgmtManagerEntry 17 }
+
+tmnxSysRmtMgmtMgrSrcDefaultPort  OBJECT-TYPE
+    SYNTAX      TmnxSysRmtMgmtSrcDefaultPort
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tmnxSysRmtMgmtMgrSrcDefaultPort indicates the
+         source port of this device uses default configured port. if
+         tmnxSysRmtMgmtMgrSrcDefaultPort equals to 'none' and
+         tmnxSysRmtMgmtMgrSrcPort equals to zero the configuration is
+         inheritted form either tmnxSysRmtMgmtSrcDefaultPort or
+         tmnxSysRmtMgmtMgrSrcPort"
+    DEFVAL      { none }
+    ::= { tmnxSysRmtMgmtManagerEntry 18 }
+
+tmnxSysRmtMgmtMgrDeviceLabel     OBJECT-TYPE
+    SYNTAX      TLNamedItemOrEmpty
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSysRmtMgmtMgrDeviceLabel specifies a label that helps
+         to identify this device. If not set the value is inherited from
+         tmnxSysRmtMgmtDeviceLabel."
+    DEFVAL      { ''H }
+    ::= { tmnxSysRmtMgmtManagerEntry 19 }
+
+tmnxSysRmtMgmtMgrDeviceName      OBJECT-TYPE
+    SYNTAX      TLNamedItemOrEmpty
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSysRmtMgmtMgrDeviceName specifies the name that
+         identifies this device. If not set the value is inherited from
+         tmnxSysRmtMgmtDeviceName."
+    DEFVAL      { ''H }
+    ::= { tmnxSysRmtMgmtManagerEntry 20 }
+
+tmnxSysRmtMgmtMgrLastRegStatus   OBJECT-TYPE
+    SYNTAX      TmnxSysRmtMgmtLastRegStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSysRmtMgmtMgrLastRegStatus specifies a status of last
+         registration."
+    ::= { tmnxSysRmtMgmtManagerEntry 21 }
+
+tmnxSysRmtMgmtMgrLastRegTime     OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSysRmtMgmtMgrLastRegTime specifies a last time the
+         remote-management client tied to register."
+    ::= { tmnxSysRmtMgmtManagerEntry 22 }
+
+tmnxSysRmtMgmtMgrRegsCancelled   OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSysRmtMgmtMgrRegsCancelled specifies a number of
+         cancelled registrations."
+    ::= { tmnxSysRmtMgmtManagerEntry 23 }
+
+tmnxSysRmtMgmtMgrRegsFailed      OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSysRmtMgmtMgrRegsFailed specifies a number of failed
+         registrations."
+    ::= { tmnxSysRmtMgmtManagerEntry 24 }
+
+tmnxSysRmtMgmtMgrRegsSent        OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSysRmtMgmtMgrRegsSent specifies a number of
+         sucessfull registrations."
+    ::= { tmnxSysRmtMgmtManagerEntry 25 }
+
+tmnxSysRmtMgmtMgrOperTlsProf     OBJECT-TYPE
+    SYNTAX      TNamedItemOrEmpty
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSysRmtMgmtMgrOperTlsProf declares which client tls
+         profile is in use."
+    ::= { tmnxSysRmtMgmtManagerEntry 26 }
+
+tmnxSysRmtMgmtMgrOperTranspType  OBJECT-TYPE
+    SYNTAX      INTEGER {
+        none      (0),
+        tls       (1),
+        unsecured (2)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSysRmtMgmtMgrOperTranspType specifies whether the
+         remote-management registers using tls or tcp."
+    ::= { tmnxSysRmtMgmtManagerEntry 27 }
+
+tmnxSysRmtMgmtMgrOperTimeout     OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "seconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSysRmtMgmtMgrOperTimeout specifies used connection
+         timeout."
+    ::= { tmnxSysRmtMgmtManagerEntry 28 }
+
+tmnxSysRmtMgmtMgrOperVRtrId      OBJECT-TYPE
+    SYNTAX      TmnxVRtrIDOrZero
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSysRmtMgmtMgrOperVRtrId specifies used virtual router
+         id."
+    ::= { tmnxSysRmtMgmtManagerEntry 29 }
+
+tmnxSysRmtMgmtMgrOperDevName     OBJECT-TYPE
+    SYNTAX      TLNamedItemOrEmpty
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSysRmtMgmtMgrOperDevName specifies operational name
+         that identifies this device."
+    ::= { tmnxSysRmtMgmtManagerEntry 30 }
+
+tmnxSysRmtMgmtMgrOperDevLabel    OBJECT-TYPE
+    SYNTAX      TLNamedItemOrEmpty
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSysRmtMgmtMgrOperDevLabel specifies operational label
+         that helps to identify this device."
+    ::= { tmnxSysRmtMgmtManagerEntry 31 }
+
+tmnxSysRmtMgmtMgrOperSrcIpAdType OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tmnxSysRmtMgmtMgrOperSrcIpAdType indicates the
+         type of IP address stored in tmnxSysRmtMgmtMgrOperSrcIpAddr. The value
+         can be either 'unknown', 'ipv4' or 'ipv6."
+    ::= { tmnxSysRmtMgmtManagerEntry 32 }
+
+tmnxSysRmtMgmtMgrOperSrcIpAddr   OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (0|4|16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tmnxSysRmtMgmtMgrOperSrcIpAddr indicates
+         operational source IP address of this device."
+    ::= { tmnxSysRmtMgmtManagerEntry 33 }
+
+tmnxSysRmtMgmtMgrOperSrcPort     OBJECT-TYPE
+    SYNTAX      InetPortNumber
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tmnxSysRmtMgmtMgrOperSrcPort indicates
+         operational source port of this device."
+    ::= { tmnxSysRmtMgmtManagerEntry 34 }
+
+tmnxSysSwFabFailRecSfmStatsTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxSysSwFabFailRecSfmStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The tmnxSysSwFabFailRecSfmStatsTable contains status information for
+         the automatic switch fabric failure recovery process for all SFMs.
+         This table is ordered based on the order in which the SFMs are to be
+         reset during the recovery process."
+    ::= { tmnxSysObjs 54 }
+
+tmnxSysSwFabFailRecSfmStatsEntry OBJECT-TYPE
+    SYNTAX      TmnxSysSwFabFailRecSfmStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each tmnxSysSwFabFailRecSfmStatsEntry consists of status information
+         for the automatic switch fabric failure recovery process for a
+         specific SFM. Rows in this table are created by the system when the
+         automatic recovery process starts."
+    INDEX       { tmnxFabricSlotNum }
+    ::= { tmnxSysSwFabFailRecSfmStatsTable 1 }
+
+TmnxSysSwFabFailRecSfmStatsEntry ::= SEQUENCE
+{
+    tmnxSysSwFabFailRecSfmState      INTEGER,
+    tmnxSysSwFabFailRecSfmStateTime  TimeStamp
+}
+
+tmnxSysSwFabFailRecSfmState      OBJECT-TYPE
+    SYNTAX      INTEGER {
+        complete   (0),
+        inProgress (1),
+        pending    (2),
+        aborted    (3),
+        failed     (4)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSysSwFabFailRecSfmState indicates the current state
+         of the SFM in the automatic switch fabric recovery process.
+
+         Values:
+             complete   - this SFM has already been reset as part of the
+                          recovery process
+             inProgress - this SFM is currently being reset
+             pending    - this SFM has not yet been reset
+             aborted    - the recovery was aborted before this SFM
+                          was processed
+             failed     - the SFM has not successfully completed"
+    ::= { tmnxSysSwFabFailRecSfmStatsEntry 1 }
+
+tmnxSysSwFabFailRecSfmStateTime  OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxSysSwFabFailRecSfmStateTime indicates the time, since
+         system startup, when tmnxSysSwFabFailRecSfmState changed."
+    ::= { tmnxSysSwFabFailRecSfmStatsEntry 2 }
 
 tmnxSysConformance               OBJECT IDENTIFIER ::= { tmnxSRConfs 1 }
 
@@ -9392,7 +10401,9 @@ tmnxSysV16v0Compliance           MODULE-COMPLIANCE
             tmnxSysLicensingV16v0Group,
             tmnxSysMgmtInterfaceV16v0Group,
             tmnxSysMgmtIfNotifyObjsGroup,
-            tmnxSysNetworkElementV16v0Group
+            tmnxSysNetworkElementV16v0Group,
+            tmnxSysSwitchFabricV16v0Group,
+            tmnxSysSwFabNotifV16v0Group
         }
     ::= { tmnxSysCompliances 18 }
 
@@ -9427,7 +10438,15 @@ tmnxSysV20v0Compliance           MODULE-COMPLIANCE
          on Nokia SROS series systems in release 20."
     MODULE
         MANDATORY-GROUPS {
-            tmnxSysNotificationV20v0Group
+            tmnxSysNotificationV20v0Group,
+            tmnxSysFwdPathOptsV20v0Group,
+            tmnxSysAutoBootV20v0Group,
+            tmnxSysSwitchFabricV20v0Group,
+            tmnxSysGeneralV20v0Group,
+            tmnxSysMgmtInterfaceV20v0Group,
+            tmnxSysFpResAllocV20v0Group,
+            tmnxSysRemoteMgmtV20v0Group,
+            tmnxSysNetconfCountersExtension
         }
     ::= { tmnxSysCompliances 20 }
 
@@ -10804,6 +11823,10 @@ tmnxSysGrpcV15v0Group            OBJECT-GROUP
         tmnxSysGrpcRibApiVersion,
         tmnxSysGrpcGnoiCertMgmtAdmnState,
         tmnxSysGrpcGnoiCertMgmtVersion,
+        tmnxSysGrpcMdCliAdminState,
+        tmnxSysGrpcMdCliVersion,
+        tmnxSysGrpcGnoiSystemAdminState,
+        tmnxSysGrpcGnoiSystemVersion,
         tmnxSysGrpcConnStartTime,
         tmnxSysGrpcConnActRpcCnt,
         tmnxSysGrpcConnTotRpcCnt,
@@ -10931,7 +11954,8 @@ tmnxSysMgmtIfYangModulesGroup    OBJECT-GROUP
         tmnxSysMgmtIfYangBaseR13,
         tmnxSysMgmtIfYangNokia,
         tmnxSysMgmtIfYangOpenConfig,
-        tmnxSysMgmtIfYangNokiaCombined
+        tmnxSysMgmtIfYangNokiaCombined,
+        tmnxSysMgmtIfYangNmdaSupport
     }
     STATUS      current
     DESCRIPTION
@@ -11083,6 +12107,32 @@ tmnxSysNetworkElementV16v0Group  OBJECT-GROUP
         "The group of objects supporting Network Element info on Nokia SROS
          series system added in SROS release 16.0."
     ::= { tmnxSysV16v0Groups 7 }
+
+tmnxSysSwitchFabricV16v0Group    OBJECT-GROUP
+    OBJECTS     {
+        tmnxSysSwFabFailRecAdminState,
+        tmnxSysSwFabFailRecOperState,
+        tmnxSysSwFabFailRecSfmState,
+        tmnxSysSwFabFailRecSfmStateTime
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting management of system switch fabric
+         capabilities on Nokia SROS series system added in SROS release 16."
+    ::= { tmnxSysV16v0Groups 8 }
+
+tmnxSysSwFabNotifV16v0Group      NOTIFICATION-GROUP
+    NOTIFICATIONS {
+        tmnxSysSwFabFailRecStarted,
+        tmnxSysSwFabFailRecCompleted,
+        tmnxSysSwFabFailRecAborted,
+        tmnxSysSwFabFailRecDetected
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of notifications supporting system switch fabric
+         capabilities on Nokia SROS series systems added in SROS release 16.0."
+    ::= { tmnxSysV16v0Groups 9 }
 
 tmnxSysV19v0Groups               OBJECT IDENTIFIER ::= { tmnxSysGroups 79 }
 
@@ -11308,13 +12358,161 @@ tmnxSysV20v0Groups               OBJECT IDENTIFIER ::= { tmnxSysGroups 80 }
 
 tmnxSysNotificationV20v0Group    NOTIFICATION-GROUP
     NOTIFICATIONS {
-        tmnxEqOperStateChange
+        tmnxEqOperStateChange,
+        stiDateAndTimeChanging
     }
     STATUS      current
     DESCRIPTION
         "The group of notifications supporting the general system capabilities
          on Nokia SROS series systems added in SROS release 20."
     ::= { tmnxSysV20v0Groups 1 }
+
+tmnxSysFwdPathOptsV20v0Group     OBJECT-GROUP
+    OBJECTS     {
+        tmnxSysFpoMplsFastSwOvAdminState,
+        tmnxSysFpoMplsFastSwOvOperState,
+        tmnxSysFpoRouterEcmpAdminState,
+        tmnxSysFpoRouterEcmpOperState
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting management of system forwarding path
+         options on Nokia SROS series system added in SROS release 20."
+    ::= { tmnxSysV20v0Groups 2 }
+
+tmnxSysAutoBootV20v0Group        OBJECT-GROUP
+    OBJECTS     {
+        sbiAutoBootVlanDiscovery
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting management of system zero touch
+         provisioning on Nokia SROS series system added in SROS release 20."
+    ::= { tmnxSysV20v0Groups 3 }
+
+tmnxSysSwitchFabricV20v0Group    OBJECT-GROUP
+    OBJECTS     {
+        tmnxSysSwFabSfmLossThresh
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting management of system switch fabric
+         capabilities on Nokia SROS series system added in SROS release 20."
+    ::= { tmnxSysV20v0Groups 4 }
+
+tmnxSysGeneralV20v0Group         OBJECT-GROUP
+    OBJECTS     {
+        sgiCryptoModVersion
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting management of general system
+         capabilities on Nokia SROS series system added in SROS release 20."
+    ::= { tmnxSysV20v0Groups 7 }
+
+tmnxSysMgmtInterfaceV20v0Group   OBJECT-GROUP
+    OBJECTS     {
+        tmnxSysMgmtIfPriSchemaPathState,
+        tmnxSysMgmtIfPriSchemaPathValue,
+        tmnxSysMgmtIfSecSchemaPathState,
+        tmnxSysMgmtIfSecSchemaPathValue,
+        tmnxSysMgmtIfTerSchemaPathState,
+        tmnxSysMgmtIfTerSchemaPathValue,
+        tmnxSysMgmtIfOperSchemaPathState,
+        tmnxSysMgmtIfOperSchemaPathValue
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting configuration of management interface
+         on Nokia SROS series system added in SROS release 20.0."
+    ::= { tmnxSysV20v0Groups 9 }
+
+tmnxSysFpResAllocV20v0Group      OBJECT-GROUP
+    OBJECTS     {
+        tmnxSysFpResAllocG8032Sap,
+        tmnxSysFpResAllocOperG8032Sap
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of additional FP options supporting the general system
+         capabilities on Nokia SROS series systems."
+    ::= { tmnxSysV20v0Groups 10 }
+
+tmnxSysRemoteMgmtV20v0Group      OBJECT-GROUP
+    OBJECTS     {
+        tmnxSysRmtMgmtAdminState,
+        tmnxSysRmtMgmtOperState,
+        tmnxSysRmtMgmtAllowUnsecure,
+        tmnxSysRmtMgmtDeviceLabel,
+        tmnxSysRmtMgmtDeviceName,
+        tmnxSysRmtMgmtHelloInterval,
+        tmnxSysRmtMgmtLastHelloTime,
+        tmnxSysRmtMgmtLastRegStatus,
+        tmnxSysRmtMgmtLastRegTime,
+        tmnxSysRmtMgmtOperDownReason,
+        tmnxSysRmtMgmtRegsCancelled,
+        tmnxSysRmtMgmtRegsFailed,
+        tmnxSysRmtMgmtRegsSent,
+        tmnxSysRmtMgmtSrcIpAddType,
+        tmnxSysRmtMgmtSrcIpAddress,
+        tmnxSysRmtMgmtSrcPort,
+        tmnxSysRmtMgmtSrcDefaultPort,
+        tmnxSysRmtMgmtTimeout,
+        tmnxSysRmtMgmtTlsClientProf,
+        tmnxSysRmtMgmtVRtrId,
+        tmnxSysRmtMgmtMgrAdminState,
+        tmnxSysRmtMgmtMgrAllowUnsecure,
+        tmnxSysRmtMgmtMgrDescription,
+        tmnxSysRmtMgmtMgrDeviceLabel,
+        tmnxSysRmtMgmtMgrDeviceName,
+        tmnxSysRmtMgmtMgrFQDN,
+        tmnxSysRmtMgmtMgrIpAddType,
+        tmnxSysRmtMgmtMgrPort,
+        tmnxSysRmtMgmtMgrIpAddress,
+        tmnxSysRmtMgmtMgrLastRegStatus,
+        tmnxSysRmtMgmtMgrLastRegTime,
+        tmnxSysRmtMgmtMgrOperDownReason,
+        tmnxSysRmtMgmtMgrOperState,
+        tmnxSysRmtMgmtMgrRegsCancelled,
+        tmnxSysRmtMgmtMgrRegsFailed,
+        tmnxSysRmtMgmtMgrRegsSent,
+        tmnxSysRmtMgmtMgrRowStatus,
+        tmnxSysRmtMgmtMgrSrcIpAddType,
+        tmnxSysRmtMgmtMgrSrcIpAddress,
+        tmnxSysRmtMgmtMgrSrcPort,
+        tmnxSysRmtMgmtMgrSrcDefaultPort,
+        tmnxSysRmtMgmtMgrTimeout,
+        tmnxSysRmtMgmtMgrTlsClientProf,
+        tmnxSysRmtMgmtMgrVRtrId,
+        tmnxSysRmtMgmtMgrOperDevLabel,
+        tmnxSysRmtMgmtMgrOperDevName,
+        tmnxSysRmtMgmtMgrOperSrcIpAdType,
+        tmnxSysRmtMgmtMgrOperSrcIpAddr,
+        tmnxSysRmtMgmtMgrOperSrcPort,
+        tmnxSysRmtMgmtMgrOperTimeout,
+        tmnxSysRmtMgmtMgrOperTlsProf,
+        tmnxSysRmtMgmtMgrOperVRtrId,
+        tmnxSysRmtMgmtMgrOperTranspType
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting configuration of management interface
+         on Nokia SROS series system added in SROS release 20.0."
+    ::= { tmnxSysV20v0Groups 13 }
+
+tmnxSysNetconfCountersExtension  OBJECT-GROUP
+    OBJECTS     {
+        tmnxSysNetconfGetSchemaRequests,
+        tmnxSysNetconfGetDataRequests,
+        tmnxSysNetconfActionRequests
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting management of the NETCONF on Nokia
+         SROS series system added in SROS release 20.0."
+    ::= { tmnxSysV20v0Groups 14 }
+
+tmnxSysV21v0Groups               OBJECT IDENTIFIER ::= { tmnxSysGroups 81 }
 
 tmnxSysMGGroups                  OBJECT IDENTIFIER ::= { tmnxSysConformance 3 }
 
@@ -11338,9 +12536,12 @@ stiDateAndTimeChanged            NOTIFICATION-TYPE
     }
     STATUS      current
     DESCRIPTION
-        "The date and time changed  event is generated when the time on the
-         system is modified either by explicit setting or automatic update in
-         case of SNTP."
+        "[CAUSE] The stiDateAndTimeChanged notification is generated when the
+         time on the system is explicitly set.
+
+         [EFFECT] The time on the system is being changed.
+
+         [RECOVERY] No recovery is necessary."
     ::= { tmnxSysNotifications 1 }
 
 ssiSaveConfigSucceeded           NOTIFICATION-TYPE
@@ -12604,6 +13805,84 @@ tmnxEqOperStateChange            NOTIFICATION-TYPE
          [RECOVERY] Investigation is required to determine the cause of the
          change."
     ::= { tmnxSysNotifications 85 }
+
+stiDateAndTimeChanging           NOTIFICATION-TYPE
+    OBJECTS     {
+        stiDateAndTime
+    }
+    STATUS      current
+    DESCRIPTION
+        "[CAUSE] The stiDateAndTimeChanging notification is generated when the
+         time on the node is explicitly set. It is raised before the time is
+         changed so that the time of the change can be related to the original
+         timescale. It shall be followed by the stiDateAndTimeChanged
+         notification.
+
+         [EFFECT] The time on the system is being changed.
+
+         [RECOVERY] No recovery is necessary."
+    ::= { tmnxSysNotifications 86 }
+
+tmnxSysSwFabFailRecStarted       NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION
+        "[CAUSE] The tmnxSysSwFabFailRecStarted notification is generated when
+         the router has initiated an automatic switch fabric recovery process
+         based on detecting frequent failures to multiple IOM/XCMs. Such
+         multiple failures could be caused by issues on the SFM so this process
+         involves the sequential reset of the SFMs to attempt to clear the
+         cause of the failures.
+
+         [EFFECT] The router shall operate at reduced switch fabric capacity
+         while each individual SFM is reset in turn.
+
+         [RECOVERY] This process will run until all the SFMs have been
+         processed. No recovery is necessary."
+    ::= { tmnxSysNotifications 87 }
+
+tmnxSysSwFabFailRecCompleted     NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION
+        "[CAUSE] The tmnxSysSwFabFailRecCompleted notification is generated
+         when the automatic switch fabric recovery process has completed
+         successfully.
+
+         [EFFECT] The switch fabric has been returned to normal operation.
+
+         [RECOVERY] No recovery is necessary."
+    ::= { tmnxSysNotifications 88 }
+
+tmnxSysSwFabFailRecAborted       NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION
+        "[CAUSE] The tmnxSysSwFabFailRecAborted notification is generated when
+         the automatic switch fabric recovery process was aborted.
+
+         [EFFECT] This may have been due to a problem with one of the SFMs
+         resetting and may have left the router with reduced switch fabric
+         capacity.
+
+         [RECOVERY] Check to ensure all SFMs are fully operational. For any
+         SFMs that are not operational, investigate manual recovery."
+    ::= { tmnxSysNotifications 89 }
+
+tmnxSysSwFabFailRecDetected      NOTIFICATION-TYPE
+    STATUS      current
+    DESCRIPTION
+        "[CAUSE] The tmnxSysSwFabFailRecDetected notification is generated when
+         a condition has been detected within the router that might be resolved
+         by the running of the automatic switch fabric recovery process.
+
+         [EFFECT] If the automatic switch fabric recovery process is enabled
+         and all the required prerequisites are met, then the recovery process
+         will start. If the automatic process is enabled but the recovery does
+         not start, then the prerequisite conditions should be checked to
+         determine what needs to be corrected to allow the process to run.
+
+         [RECOVERY] If the automatic switch fabric recovery process is
+         disabled, then contact Nokia support to determine if it should be
+         enabled for this router. Otherwise, no recovery is necessary."
+    ::= { tmnxSysNotifications 90 }
 
 tmnxSysMGNotifications           OBJECT IDENTIFIER ::= { tmnxSysMIBNotifyPrefix 1 }
 

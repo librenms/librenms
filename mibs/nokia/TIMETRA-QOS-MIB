@@ -81,8 +81,10 @@ IMPORTS
     TNetIngPolicerIdOrNone,
     TNetworkPolicyID, TNonZeroWeight,
     TPIRRate, TPIRRatePercent, TPSPRateType,
-    TPerPacketOffset, TPlcrBurstSizeBytes,
+    TPerPacketOffset, TPktByteOffset,
+    TPlcrBurstSizeBytes,
     TPolRateTypeRefOrLocalLimit,
+    TPolicerRateType,
     TPolicerRateTypeWithRefLimit,
     TPolicerWeight, TPortQosCIRRate,
     TPortQosPIRRate, TPortSchedLevel,
@@ -464,7 +466,8 @@ TSapIngressEntry                 ::= SEQUENCE
     tSapIngressIPCritType            TIPFilterType,
     tSapIngressIPv6CritType          TIPFilterType,
     tSapIngressIsPolicyActive        TruthValue,
-    tSapIngressIngClassPlcy          TLNamedItemOrEmpty
+    tSapIngressIngClassPlcy          TLNamedItemOrEmpty,
+    tSapIngressPlcrAlloc             INTEGER
 }
 
 tSapIngressIndex                 OBJECT-TYPE
@@ -650,17 +653,21 @@ tSapIngressIPCritType            OBJECT-TYPE
     STATUS      current
     DESCRIPTION
         "The value of tSapIngressIPCritType specifies whether Vxlan Vni
-         classification parameters can be configured within an IP Criteria.
+         classification parameters can be configured, or whether tags can be
+         configured, within an IP Criteria.
 
          If tSapIngressIPCritType is set to 'normal(1)', all match criteria are
          accepted except the criteria mentioned below that belong to type
-         'vxlanVni (2)'.
+         'vxlanVni (2)'. Also, tags may not be applied to entries.
 
          If tSapIngressIPCritType is set to 'vxlanVni (2)', all match criteria
          including the following criteria can also be configured:
          - tSapIngressIPCritVxlanVniVal1,
          - tSapIngressIPCritVxlanVniVal2,
          - tSapIngressIPCritVxlanVniOper
+
+         If tSapIngressIPCritType is set to 'tagged-entries (3)', criteria
+         entries may be tagged.
 
          tSapIngressIPCritType can only be changed if the IP criteria has no
          entries and no references exists for qos policy.
@@ -677,17 +684,21 @@ tSapIngressIPv6CritType          OBJECT-TYPE
     STATUS      current
     DESCRIPTION
         "The value of tSapIngressIPv6CritType specifies whether Vxlan Vni
-         classification parameters can be configured within an IPv6 Criteria.
+         classification parameters can be configured, or whether tags can be
+         configured, within an IPv6 Criteria.
 
          If tSapIngressIPv6CritType is set to 'normal(1)', all match criteria
          are accepted except the criteria mentioned below that belong to type
-         'vxlanVni (2)'.
+         'vxlanVni (2)'. Also, tags may not be applied to entries.
 
          If tSapIngressIPv6CritType is set to 'vxlanVni (2)', all match criteria
          including the following criteria can also be configured:
          - tSapIngressIPv6CritVxlanVniVal1,
          - tSapIngressIPv6CritVxlanVniVal2,
          - tSapIngressIPv6CritVxlanVniOper
+
+         If tSapIngressIPv6CritType is set to 'tagged-entries (3)', criteria
+         entries may be tagged.
 
          tSapIngressIPCritType can only be changed if the IP criteria has no
          entries and no references exists for qos policy.
@@ -717,6 +728,23 @@ tSapIngressIngClassPlcy          OBJECT-TYPE
          classification policy to apply on this sap ingress entry"
     DEFVAL      { "default" }
     ::= { tSapIngressEntry 16 }
+
+tSapIngressPlcrAlloc             OBJECT-TYPE
+    SYNTAX      INTEGER {
+        none                                       (1),
+        per-fc                                     (2),
+        per-fc-unicast-multipoint                  (3),
+        per-fc-unicast-multicast                   (4),
+        per-fc-unicast-broadcast-unknown-multicast (5)
+    }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tSapIngressPlcrAlloc determines the number of policers to
+         be created at the time of sap-ingress policy creation and the
+         fc-policer mappings"
+    DEFVAL      { none }
+    ::= { tSapIngressEntry 17 }
 
 tSapIngressQueueTable            OBJECT-TYPE
     SYNTAX      SEQUENCE OF TSapIngressQueueEntry
@@ -1545,7 +1573,8 @@ TSapIngressIPCriteriaEntry       ::= SEQUENCE
     tSapIngressIPCritDstIpPrefixList TNamedItemOrEmpty,
     tSapIngressIPCritVxlanVniVal1    Unsigned32,
     tSapIngressIPCritVxlanVniVal2    Unsigned32,
-    tSapIngressIPCritVxlanVniOper    INTEGER
+    tSapIngressIPCritVxlanVniOper    INTEGER,
+    tSapIngressIPCriteriaTagId       Unsigned32
 }
 
 tSapIngressIPCriteriaIndex       OBJECT-TYPE
@@ -2092,6 +2121,16 @@ tSapIngressIPCritVxlanVniOper    OBJECT-TYPE
          tSapIngressIPCriteriaDestPortOperator is set to non-default values."
     DEFVAL      { none }
     ::= { tSapIngressIPCriteriaEntry 30 }
+
+tSapIngressIPCriteriaTagId       OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..255)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tSapIngressIPCriteriaTagId specifies tag identification
+         associatied with the entry."
+    DEFVAL      { 0 }
+    ::= { tSapIngressIPCriteriaEntry 31 }
 
 tSapIngressMacCriteriaTable      OBJECT-TYPE
     SYNTAX      SEQUENCE OF TSapIngressMacCriteriaEntry
@@ -3161,7 +3200,8 @@ TSapIngressIPv6CriteriaEntry     ::= SEQUENCE
     tSapIngressIPv6CritVxlanVniVal2  Unsigned32,
     tSapIngressIPv6CritVxlanVniOper  INTEGER,
     tSapIngIPv6CritSrcIpPrefixList   TNamedItemOrEmpty,
-    tSapIngIPv6CritDstIpPrefixList   TNamedItemOrEmpty
+    tSapIngIPv6CritDstIpPrefixList   TNamedItemOrEmpty,
+    tSapIngressIPv6CriteriaTagId     Unsigned32
 }
 
 tSapIngressIPv6CriteriaIndex     OBJECT-TYPE
@@ -3696,6 +3736,16 @@ tSapIngIPv6CritDstIpPrefixList   OBJECT-TYPE
          to (a) non-default value(s) is rejected by the system"
     DEFVAL      { ''H }
     ::= { tSapIngressIPv6CriteriaEntry 33 }
+
+tSapIngressIPv6CriteriaTagId     OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..255)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tSapIngressIPv6CriteriaTagId specifies tag identification
+         associatied with the entry."
+    DEFVAL      { 0 }
+    ::= { tSapIngressIPv6CriteriaEntry 34 }
 
 tSapIngressHsmdaQueueTable       OBJECT-TYPE
     SYNTAX      SEQUENCE OF TSapIngressHsmdaQueueEntry
@@ -9850,7 +9900,9 @@ TNetworkEgrIPCritEntry           ::= SEQUENCE
     tNetworkEgrIPCritDstPortOperator TTcpUdpPortOperator,
     tNetworkEgrIPCritDSCP            TDSCPNameOrEmpty,
     tNetworkEgrIPCritFragment        INTEGER,
-    tNetworkEgrIPCritIcmpType        TIcmpTypeOrNone
+    tNetworkEgrIPCritIcmpType        TIcmpTypeOrNone,
+    tNetworkEgrIPCritSrcPortList     TNamedItemOrEmpty,
+    tNetworkEgrIPCritDstPortList     TNamedItemOrEmpty
 }
 
 tNetworkEgrIPCritType            OBJECT-TYPE
@@ -10216,6 +10268,74 @@ tNetworkEgrIPCritIcmpType        OBJECT-TYPE
     DEFVAL      { -1 }
     ::= { tNetworkEgrIPCritEntry 27 }
 
+tNetworkEgrIPCritSrcPortList     OBJECT-TYPE
+    SYNTAX      TNamedItemOrEmpty
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of this object specifies the port-list used as match
+         criterion for the source port.
+
+         The value specified for this object must correspond to a port-list
+         defined in tQosPortListTable.
+
+         If the value of this object is empty then the values of the objects
+         tNetworkEgrIPCritSrcPortValue1, tNetworkEgrIPCritSrcPortValue2, and
+         tNetworkEgrIPCritSrcPortOperator are used as source port match
+         criterion.
+
+         When this object is set to a non-empty value then the objects
+         tNetworkEgrIPCritSrcPortValue1, tNetworkEgrIPCritSrcPortValue2, and
+         tNetworkEgrIPCritSrcPortOperator are reset to their default values by
+         the system.
+
+         Vice versa, when a new (non-default) value is provided for one of the
+         objects tNetworkEgrIPCritSrcPortValue1,
+         tNetworkEgrIPCritSrcPortValue2, tNetworkEgrIPCritSrcPortOperator then
+         tNetworkEgrIPCritSrcPortList  is reset to its default (empty) value by
+         the system.
+
+         Setting any one of the objects tNetworkEgrIPCritSrcPortValue1,
+         tNetworkEgrIPCritSrcPortValue2, or tNetworkEgrIPCritSrcPortOperator to
+         a non-default value in combination with a non-default value for the
+         object tNetworkEgrIPCritSrcPortList is rejected by the system."
+    DEFVAL      { ''H }
+    ::= { tNetworkEgrIPCritEntry 28 }
+
+tNetworkEgrIPCritDstPortList     OBJECT-TYPE
+    SYNTAX      TNamedItemOrEmpty
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of this object specifies the port-list used as match
+         criterion for the destination port.
+
+         The value specified for this object must correspond to a port-list
+         defined in tQosPortListTable.
+
+         If the value of this object is empty then the values of the objects
+         tNetworkEgrIPCritDstPortValue1, tNetworkEgrIPCritDstPortValue2, and
+         tNetworkEgrIPCritDstPortOperator are used as destination port match
+         criterion.
+
+         When this object is set to a non-empty value then the objects
+         tNetworkEgrIPCritDstPortValue1, tNetworkEgrIPCritDstPortValue2, and
+         tNetworkEgrIPCritDstPortOperator are reset to their default values by
+         the system.
+
+         Vice versa, when a new (non-default) value is provided for one of the
+         objects tNetworkEgrIPCritDstPortValue1,
+         tNetworkEgrIPCritDstPortValue2, or tNetworkEgrIPCritDstPortOperator
+         then tNetworkEgrIPCritDstPortList is reset to its default (empty)
+         value by the system.
+
+         Setting any one of the objects tNetworkEgrIPCritDstPortValue1,
+         tNetworkEgrIPCritDstPortValue2, tNetworkEgrIPCritDstPortOperator  to a
+         non-default value in combination with a non-default value for the
+         object tNetworkEgrIPCritDstPortList is rejected by the system."
+    DEFVAL      { ''H }
+    ::= { tNetworkEgrIPCritEntry 29 }
+
 tNetIngPlcyTable                 OBJECT-TYPE
     SYNTAX      SEQUENCE OF TNetIngPlcyEntry
     MAX-ACCESS  not-accessible
@@ -10254,7 +10374,8 @@ TNetIngPlcyEntry                 ::= SEQUENCE
     tNetIngPlcyScope                 TItemScope,
     tNetIngPlcyDescription           TItemDescription,
     tNetIngPlcyLastChanged           TimeStamp,
-    tNetIngPlcyIngressClassPolicy    TLNamedItemOrEmpty
+    tNetIngPlcyIngressClassPolicy    TLNamedItemOrEmpty,
+    tNetIngPlcyPlcrAlloc             INTEGER
 }
 
 tNetIngPlcyName                  OBJECT-TYPE
@@ -10310,6 +10431,21 @@ tNetIngPlcyIngressClassPolicy    OBJECT-TYPE
         "Attach ingress classification policy"
     DEFVAL      { "default" }
     ::= { tNetIngPlcyEntry 6 }
+
+tNetIngPlcyPlcrAlloc             OBJECT-TYPE
+    SYNTAX      INTEGER {
+        none                     (1),
+        per-fc                   (2),
+        per-fc-unicast-multicast (3)
+    }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tNetIngPlcyPlcrAlloc determines the number of policers to
+         be created at the time of network-ingress policy creation and the
+         fc-policer mappings"
+    DEFVAL      { none }
+    ::= { tNetIngPlcyEntry 7 }
 
 tNetIngPlcyFCTable               OBJECT-TYPE
     SYNTAX      SEQUENCE OF TNetIngPlcyFCEntry
@@ -10480,7 +10616,7 @@ tNetIngPlcyPolicerPIRHi          OBJECT-TYPE
     ::= { tNetIngPlcyPolicerEntry 3 }
 
 tNetIngPlcyPolicerPIRLo          OBJECT-TYPE
-    SYNTAX      TmnxLow32 (144..400000000 | 4294967295)
+    SYNTAX      TmnxLow32 (144..1000000000 | 4294967295)
     UNITS       "kilobps"
     MAX-ACCESS  read-create
     STATUS      current
@@ -10516,7 +10652,7 @@ tNetIngPlcyPolicerCIRHi          OBJECT-TYPE
     ::= { tNetIngPlcyPolicerEntry 5 }
 
 tNetIngPlcyPolicerCIRLo          OBJECT-TYPE
-    SYNTAX      TmnxLow32 (0..400000000 | 4294967295)
+    SYNTAX      TmnxLow32 (0..1000000000 | 4294967295)
     UNITS       "kilobps"
     MAX-ACCESS  read-create
     STATUS      current
@@ -12008,7 +12144,11 @@ TQosIngQueueEntry                ::= SEQUENCE
     tQosIngQDrpTailLowReductnMbs     TBurstPercentOrDefault,
     tQosIngQueueFIRAdaptation        TAdaptationRule,
     tQosIngQueueAdminFIR             TQosQueueCIRRate,
-    tQosIngQueueCIRNonProfiling      TruthValue
+    tQosIngQueueCIRNonProfiling      TruthValue,
+    tQosIngQueueAdminPIRPercent      Unsigned32,
+    tQosIngQueueAdminCIRPercent      Unsigned32,
+    tQosIngQueueAdminFIRPercent      Unsigned32,
+    tQosIngQueueAdminRateType        TPolicerRateTypeWithRefLimit
 }
 
 tQosIngQueue                     OBJECT-TYPE
@@ -12345,6 +12485,64 @@ tQosIngQueueCIRNonProfiling      OBJECT-TYPE
          depending on the specified CIR."
     DEFVAL      { false }
     ::= { tQosIngQueueEntry 28 }
+
+tQosIngQueueAdminPIRPercent      OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..10000)
+    UNITS       "centipercent"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tQosIngQueueAdminPIRPercent specifies the administrative
+         PIR percentage, in centipercent of this queue. An 'inconsistentValue'
+         error is returned if tQosIngQueueAdminPIRPercent is set to non-default
+         value when the object tQosIngQueueAdminRateType is set to 'kbps'."
+    DEFVAL      { 10000 }
+    ::= { tQosIngQueueEntry 29 }
+
+tQosIngQueueAdminCIRPercent      OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..10000)
+    UNITS       "centipercent"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tQosIngQueueAdminCIRPercent specifies the administrative
+         CIR percentage, in centipercent of this queue. An 'inconsistentValue'
+         error is returned if tQosIngQueueAdminCIRPercent is set to non-default
+         value when the object tQosIngQueueAdminRateType is set to 'kbps'."
+    DEFVAL      { 0 }
+    ::= { tQosIngQueueEntry 30 }
+
+tQosIngQueueAdminFIRPercent      OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..10000)
+    UNITS       "centipercent"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tQosIngQueueAdminFIRPercent specifies the administrative
+         FIR percentage, in centipercent of this queue. An 'inconsistentValue'
+         error is returned if tQosIngQueueAdminFIRPercent is set to non-default
+         value when the object tQosIngQueueAdminRateType is set to 'kbps'."
+    DEFVAL      { 0 }
+    ::= { tQosIngQueueEntry 31 }
+
+tQosIngQueueAdminRateType        OBJECT-TYPE
+    SYNTAX      TPolicerRateTypeWithRefLimit
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tQosIngQueueAdminRateType specifies the type of rate for
+         this queue.
+
+         When the value of the object is set to 'kbps', the queue rates are
+         specified in kbps. The objects tQosIngQueueAdminPIRPercent and
+         tQosIngQueueAdminCIRPercent will be set to their default values.
+
+         When the value of the object is set to 'percentPortLimit' or
+         'percentOfLocalLimit' or 'percentReferPortLimit', the rates for this
+         queue are specified in percentage. The objects tQosIngQueueAdminPIR
+         and tQosIngQueueAdminCIR will be set to their default values."
+    DEFVAL      { kbps }
+    ::= { tQosIngQueueEntry 32 }
 
 tQosEgrQGroupTable               OBJECT-TYPE
     SYNTAX      SEQUENCE OF TQosEgrQGroupEntry
@@ -14021,7 +14219,10 @@ TVirtualSchedulerEntry           ::= SEQUENCE
     tVirtualSchedulerPIRLo           TmnxQosRateLow32,
     tVirtualSchedulerCIRHi           TmnxQosRateHigh32,
     tVirtualSchedulerCIRLo           TmnxQosRateLow32,
-    tVirtualSchedulerRateLUB         TruthValue
+    tVirtualSchedulerRateLUB         TruthValue,
+    tVirtualSchedulerPIRPercent      Unsigned32,
+    tVirtualSchedulerCIRPercent      Unsigned32,
+    tVirtualSchedulerRateType        TPolRateTypeRefOrLocalLimit
 }
 
 tVirtualSchedulerTier            OBJECT-TYPE
@@ -14321,6 +14522,55 @@ tVirtualSchedulerRateLUB         OBJECT-TYPE
          scheduling algorithm."
     DEFVAL      { false }
     ::= { tVirtualSchedulerEntry 23 }
+
+tVirtualSchedulerPIRPercent      OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..10000)
+    UNITS       "centipercent"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tVirtualSchedulerPIRPercent specifies the PIR percentage,
+         in centipercent of a scheduler. An 'inconsistentValue' error is
+         returned if tVirtualSchedulerPIRPercent is set to non-default value
+         when the object tVirtualSchedulerRateType is set to 'kbps'."
+    DEFVAL      { 10000 }
+    ::= { tVirtualSchedulerEntry 25 }
+
+tVirtualSchedulerCIRPercent      OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..10000)
+    UNITS       "centipercent"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tVirtualSchedulerCIRPercent specifies the  CIR
+         percentage, in centipercent of a scheduler.
+         An 'inconsistentValue' error is returned if
+         tVirtualSchedulerCIRPercent is set to non-default value when the
+         object tVirtualSchedulerRateType is set to 'kbps'.
+         An 'inconsistentValue' error is returned if the value of
+         tVirtualSchedulerCIRPercent is set to non-default value
+         when tVirtualSchedulerSummedCIR is set to 'true'."
+    DEFVAL      { 0 }
+    ::= { tVirtualSchedulerEntry 26 }
+
+tVirtualSchedulerRateType        OBJECT-TYPE
+    SYNTAX      TPolRateTypeRefOrLocalLimit
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tVirtualSchedulerRateType specifies the type of rate for
+         this scheduler.
+
+         When the value of the object is set to 'kbps', the scheduler rates are
+         specified in kbps. The objects tVirtualSchedulerPIRPercent and
+         tVirtualSchedulerCIRPercent will be set to their default values.
+
+         When the value of the object is set to 'percentOfLocalLimit' or
+         'percentReferPortLimit', the rates for this scheduler are specified in
+         percentage. The objects tVirtualSchedulerPIR and tVirtualSchedulerCIR
+         will be set to their default values."
+    DEFVAL      { kbps }
+    ::= { tVirtualSchedulerEntry 27 }
 
 tPortSchedulerPlcyTable          OBJECT-TYPE
     SYNTAX      SEQUENCE OF TPortSchedulerPlcyEntry
@@ -16850,7 +17100,8 @@ TPortQosPlcyEntry                ::= SEQUENCE
     tPortQosPlcyRowStatus            RowStatus,
     tPortQosPlcyDescription          TItemDescription,
     tPortQosPlcyScope                TItemScope,
-    tPortQosPlcyLastChanged          TimeStamp
+    tPortQosPlcyLastChanged          TimeStamp,
+    tPortQosPlcyPktByteOffset        TPktByteOffset
 }
 
 tPortQosPlcyName                 OBJECT-TYPE
@@ -16895,6 +17146,17 @@ tPortQosPlcyLastChanged          OBJECT-TYPE
     DESCRIPTION
         "Timestamp of last change to this row in tPortQosPlcyTable."
     ::= { tPortQosPlcyEntry 6 }
+
+tPortQosPlcyPktByteOffset        OBJECT-TYPE
+    SYNTAX      TPktByteOffset
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tPortQosPlcyPktByteOffset specifies the number of bytes
+         to add to accommodate for non-default MPLS header depth or
+         asymmetrical VLAN operations."
+    DEFVAL      { 0 }
+    ::= { tPortQosPlcyEntry 7 }
 
 tPortQosPlcyQueueTable           OBJECT-TYPE
     SYNTAX      SEQUENCE OF TPortQosPlcyQueueEntry
@@ -17152,7 +17414,8 @@ TQueueMgmtPlcyEntry              ::= SEQUENCE
     tQueueMgmtPlcyHiPlusAdminStatus  TmnxAdminStateUpDown,
     tQueueMgmtPlcyHiPlusStartAverage Unsigned32,
     tQueueMgmtPlcyHiPlusMaxAverage   Unsigned32,
-    tQMgmtPlcyHiPlusMaxProbability   Unsigned32
+    tQMgmtPlcyHiPlusMaxProbability   Unsigned32,
+    tQMgmtPlcyPortSpeed              Unsigned32
 }
 
 tQueueMgmtPlcyName               OBJECT-TYPE
@@ -17399,6 +17662,19 @@ tQMgmtPlcyHiPlusMaxProbability   OBJECT-TYPE
     DEFVAL      { 75 }
     ::= { tQueueMgmtPlcyEntry 23 }
 
+tQMgmtPlcyPortSpeed              OBJECT-TYPE
+    SYNTAX      Unsigned32 (10 | 25 | 40 | 50 | 100 | 200 | 400)
+    UNITS       "gigabps"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tQMgmtPlcyPortSpeed for which the queue-mgmt policy is
+         optimized. It must match the configured physical
+         speed(port>ethernet>speed) of the underlying port, not it's
+         egress-rate(port>ethernet>egress-rate)."
+    DEFVAL      { 100 }
+    ::= { tQueueMgmtPlcyEntry 24 }
+
 tVlanQosPlcyTable                OBJECT-TYPE
     SYNTAX      SEQUENCE OF TVlanQosPlcyEntry
     MAX-ACCESS  not-accessible
@@ -17434,7 +17710,8 @@ TVlanQosPlcyEntry                ::= SEQUENCE
     tVlanQosPlcyDescription          TItemDescription,
     tVlanQosPlcyScope                TItemScope,
     tVlanQosPlcyLastChanged          TimeStamp,
-    tVlanQosPlcyStatMode             INTEGER
+    tVlanQosPlcyStatMode             INTEGER,
+    tVlanQosPlcyPktByteOffset        TPktByteOffset
 }
 
 tVlanQosPlcyName                 OBJECT-TYPE
@@ -17492,6 +17769,17 @@ tVlanQosPlcyStatMode             OBJECT-TYPE
         "The statistics mode of this policy."
     DEFVAL      { no-stats }
     ::= { tVlanQosPlcyEntry 6 }
+
+tVlanQosPlcyPktByteOffset        OBJECT-TYPE
+    SYNTAX      TPktByteOffset
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tVlanQosPlcyPktByteOffset specifies the number of bytes
+         to add to accommodate for non-default MPLS header depth or
+         asymmetrical VLAN operations."
+    DEFVAL      { 0 }
+    ::= { tVlanQosPlcyEntry 7 }
 
 tVlanQosPlcyCirWtProfTable       OBJECT-TYPE
     SYNTAX      SEQUENCE OF TVlanQosPlcyCirWtProfEntry
@@ -17577,7 +17865,8 @@ TVlanQosPlcyQueueEntry           ::= SEQUENCE
     tVlanQosPlcyQueueQueueType       INTEGER,
     tVlanQosPlcyQueueCirWtProfId     Unsigned32,
     tVlanQosPlcyQueuePIR             TPortQosPIRRate,
-    tVlanQosPlcyQueueCIR             TPortQosCIRRate
+    tVlanQosPlcyQueueCIR             TPortQosCIRRate,
+    tVlanQosPlcyQueuePirWeight       Unsigned32
 }
 
 tVlanQosPlcyQueueId              OBJECT-TYPE
@@ -17673,6 +17962,16 @@ tVlanQosPlcyQueueCIR             OBJECT-TYPE
          maximum rate for this queue."
     DEFVAL      { 0 }
     ::= { tVlanQosPlcyQueueEntry 10 }
+
+tVlanQosPlcyQueuePirWeight       OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..253)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Specifies the weight that needs to be used by the arbiter to which
+         this queue would be feeding to."
+    DEFVAL      { 1 }
+    ::= { tVlanQosPlcyQueueEntry 11 }
 
 tPortQosPlcyFCTable              OBJECT-TYPE
     SYNTAX      SEQUENCE OF TPortQosPlcyFCEntry
@@ -18880,6 +19179,32 @@ tQosFpResourcePolicyTblLastChgd  OBJECT-TYPE
         "The value of the object tQosFpResourcePolicyTblLastChgd indicates the
          timestamp of last change to the FP Resource Policy Table."
     ::= { tQosTimeStampObjects 138 }
+
+tQosPortListTableLstChng         OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The object tQosPortListTableLstChng indicates the sysUpTime at the
+         time of the last modification of tQosPortListTable.
+
+         If no changes were made to the table since the last re-initialization
+         of the local network management subsystem, this object contains the
+         value zero."
+    ::= { tQosTimeStampObjects 139 }
+
+tQosPortListEntryTblLstChg       OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The object tQosPortListEntryTblLstChg indicates the sysUpTime at the
+         time of the last modification of tQosPortListEntryTable.
+
+         If no changes were made to the table since the last re-initialization
+         of the local network management subsystem, this object contains the
+         value zero."
+    ::= { tQosTimeStampObjects 140 }
 
 tAtmTdpObjects                   OBJECT IDENTIFIER ::= { tQosObjects 21 }
 
@@ -20647,7 +20972,9 @@ TQosPolicerCtrlPolEntry          ::= SEQUENCE
     tQosPolicerCtrlPolMinMBSSep      TPlcrBurstSizeBytes,
     tQosPolicerCtrlPolProfPref       TruthValue,
     tQosPolicerCtrlPolRootMaxRateHi  TmnxQosRateHigh32,
-    tQosPolicerCtrlPolRootMaxRateLo  TmnxQosRateLow32
+    tQosPolicerCtrlPolRootMaxRateLo  TmnxQosRateLow32,
+    tQosPolicerCtrlRootMaxPrcntRate  Unsigned32,
+    tQosPolicerCtrlRootMaxRateType   TPolicerRateType
 }
 
 tQosPolicerCtrlPolName           OBJECT-TYPE
@@ -20764,6 +21091,39 @@ tQosPolicerCtrlPolRootMaxRateLo  OBJECT-TYPE
     DEFVAL      { 4294967295 }
     ::= { tQosPolicerCtrlPolEntry 9 }
 
+tQosPolicerCtrlRootMaxPrcntRate  OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..10000)
+    UNITS       "centipercent"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tQosPolicerCtrlRootMaxPrcntRate specifies the explicit
+         maximum frame based bandwidth percentage, in centipercent for this
+         policer. An 'inconsistentValue' error is returned if
+         tQosPolicerCtrlRootMaxPrcntRate is set to non-default value when the
+         object tQosPolicerCtrlRootMaxRateType is set to 'kbps'."
+    DEFVAL      { 10000 }
+    ::= { tQosPolicerCtrlPolEntry 10 }
+
+tQosPolicerCtrlRootMaxRateType   OBJECT-TYPE
+    SYNTAX      TPolicerRateType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tQosPolicerCtrlRootMaxRateType specifies the rate type of
+         this policer.
+
+         When the value of tQosPolicerCtrlRootMaxRateType is set to 'kbps', the
+         policer root max-rate is specified in 'kbps'. The value of
+         tQosPolicerCtrlRootMaxRateType will be set to default value.
+
+         When the value of tQosPolicerCtrlRootMaxRateType is set to
+         'percentLocalLimit', the policer max-rate are specified in percentage.
+         The objects tQosPolicerCtrlPolRootMaxRateHi and
+         tQosPolicerCtrlPolRootMaxRateLo will be set to their default values"
+    DEFVAL      { kbps }
+    ::= { tQosPolicerCtrlPolEntry 11 }
+
 tQosPolicerLevelTable            OBJECT-TYPE
     SYNTAX      SEQUENCE OF TQosPolicerLevelEntry
     MAX-ACCESS  not-accessible
@@ -20878,7 +21238,9 @@ TQosPolicerArbiterEntry          ::= SEQUENCE
     tQosPolicerArbiterLevel          TLevel,
     tQosPolicerArbiterWeight         TPolicerWeight,
     tQosPolicerArbiterRateHi         TmnxQosRateHigh32,
-    tQosPolicerArbiterRateLo         TmnxQosRateLow32
+    tQosPolicerArbiterRateLo         TmnxQosRateLow32,
+    tQosPolicerArbiterPercentRate    Unsigned32,
+    tQosPolicerArbiterRateType       TPolRateTypeRefOrLocalLimit
 }
 
 tQosPolicerArbiterTier           OBJECT-TYPE
@@ -21013,6 +21375,40 @@ tQosPolicerArbiterRateLo         OBJECT-TYPE
     DEFVAL      { 4294967295 }
     ::= { tQosPolicerArbiterEntry 11 }
 
+tQosPolicerArbiterPercentRate    OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..10000)
+    UNITS       "centipercent"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tQosPolicerArbiterPercentRate specifies the explicit
+         maximum frame based bandwidth percentage, in centipercent for this
+         policer control policy arbiter for the given tier. An
+         'inconsistentValue' error is returned if tQosPolicerArbiterPercentRate
+         is set to non-default value when the object tQosPolicerArbiterRateType
+         is set to 'kbps'."
+    DEFVAL      { 10000 }
+    ::= { tQosPolicerArbiterEntry 12 }
+
+tQosPolicerArbiterRateType       OBJECT-TYPE
+    SYNTAX      TPolRateTypeRefOrLocalLimit
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tQosPolicerArbiterRateType specifies the rate type of
+         this policer control policy arbiter for the given tier.
+
+         When the value of tQosPolicerArbiterRateType is set to 'kbps', the
+         policer arbiter rate is specified in 'kbps'. The value of
+         tQosPolicerArbiterRateType will be set to default value.
+
+         When the value of tQosPolicerArbiterRateType is set to
+         'percentLocalLimit' or 'percentReferPortLimit', the policer max-rate
+         are specified in percentage. The objects tQosPolicerArbiterRateHi and
+         tQosPolicerArbiterRateLo will be set to their default values."
+    DEFVAL      { kbps }
+    ::= { tQosPolicerArbiterEntry 13 }
+
 tQosIngPolicerTable              OBJECT-TYPE
     SYNTAX      SEQUENCE OF TQosIngPolicerEntry
     MAX-ACCESS  not-accessible
@@ -21065,7 +21461,10 @@ TQosIngPolicerEntry              ::= SEQUENCE
     tQosIngPolicerSlopeMaxDepth      Unsigned32,
     tQosIngPolicerSlopeMaxProb       Unsigned32,
     tQosIngPolicerSlopeMap           TmnxSlopeMap,
-    tQosIngPolicerAdvCfgPolicy       TNamedItemOrEmpty
+    tQosIngPolicerAdvCfgPolicy       TNamedItemOrEmpty,
+    tQosIngPolicerAdminPIRPercent    Unsigned32,
+    tQosIngPolicerAdminCIRPercent    Unsigned32,
+    tQosIngPolicerAdminRateType      TRateType
 }
 
 tQosIngPolicerId                 OBJECT-TYPE
@@ -21322,6 +21721,53 @@ tQosIngPolicerAdvCfgPolicy       OBJECT-TYPE
     DEFVAL      { ''H }
     ::= { tQosIngPolicerEntry 22 }
 
+tQosIngPolicerAdminPIRPercent    OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..10000)
+    UNITS       "centipercent"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tQosIngPolicerAdminPIRPercent specifies the
+         administrative PIR percentage, in centipercent of this policer. An
+         'inconsistentValue' error is returned if tQosIngPolicerAdminPIRPercent
+         is set to non-default value when the object
+         tQosIngPolicerAdminRateType is set to 'kbps'."
+    DEFVAL      { 10000 }
+    ::= { tQosIngPolicerEntry 23 }
+
+tQosIngPolicerAdminCIRPercent    OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..10000)
+    UNITS       "centipercent"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tQosIngPolicerAdminCIRPercent specifies the
+         administrative CIR percentage, in centipercent of this policer. An
+         'inconsistentValue' error is returned if tQosIngPolicerAdminCIRPercent
+         is set to non-default value when the object
+         tQosIngPolicerAdminRateType is set to 'kbps'."
+    DEFVAL      { 0 }
+    ::= { tQosIngPolicerEntry 24 }
+
+tQosIngPolicerAdminRateType      OBJECT-TYPE
+    SYNTAX      TRateType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tQosIngPolicerAdminRateType specifies the type of rate
+         for this policer.
+
+         When the value of the object is set to 'kbps', the policer rates are
+         specified in kbps. The objects tQosIngPolicerAdminPIRPercent and
+         tQosIngPolicerAdminCIRPercent will be set to their default values.
+
+         When the value of the object is set to 'percent', the rates for this
+         policer are specified in percentage. The objects
+         tQosIngPolicerAdminPIR and tQosIngPolicerAdminCIR will be set to their
+         default values."
+    DEFVAL      { kbps }
+    ::= { tQosIngPolicerEntry 25 }
+
 tQosEgrPolicerTable              OBJECT-TYPE
     SYNTAX      SEQUENCE OF TQosEgrPolicerEntry
     MAX-ACCESS  not-accessible
@@ -21375,7 +21821,10 @@ TQosEgrPolicerEntry              ::= SEQUENCE
     tQosEgrPolicerSlopeMaxProb       Unsigned32,
     tQosEgrPolicerSlopeMap           TmnxSlopeMap,
     tQosEgrPolicerAdvCfgPolicy       TNamedItemOrEmpty,
-    tQosEgrPolicerEnableExceedPir    TruthValue
+    tQosEgrPolicerEnableExceedPir    TruthValue,
+    tQosEgrPolicerAdminPIRPercent    Unsigned32,
+    tQosEgrPolicerAdminCIRPercent    Unsigned32,
+    tQosEgrPolicerAdminRateType      TPolRateTypeRefOrLocalLimit
 }
 
 tQosEgrPolicerId                 OBJECT-TYPE
@@ -21643,6 +22092,53 @@ tQosEgrPolicerEnableExceedPir    OBJECT-TYPE
          should be forwarded as exceed-profile instead of being dropped."
     DEFVAL      { false }
     ::= { tQosEgrPolicerEntry 24 }
+
+tQosEgrPolicerAdminPIRPercent    OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..10000)
+    UNITS       "centipercent"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tQosEgrPolicerAdminPIRPercent specifies the
+         administrative PIR percentage, in centipercent of this policer. An
+         'inconsistentValue' error is returned if tQosEgrPolicerAdminPIRPercent
+         is set to non-default value when the object
+         tQosEgrPolicerAdminRateType is set to 'kbps'."
+    DEFVAL      { 10000 }
+    ::= { tQosEgrPolicerEntry 25 }
+
+tQosEgrPolicerAdminCIRPercent    OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..10000)
+    UNITS       "centipercent"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tQosEgrPolicerAdminCIRPercent specifies the
+         administrative CIR percentage, in centipercent of this policer. An
+         'inconsistentValue' error is returned if tQosEgrPolicerAdminCIRPercent
+         is set to non-default value when the object
+         tQosEgrPolicerAdminRateType is set to 'kbps'."
+    DEFVAL      { 0 }
+    ::= { tQosEgrPolicerEntry 26 }
+
+tQosEgrPolicerAdminRateType      OBJECT-TYPE
+    SYNTAX      TPolRateTypeRefOrLocalLimit
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tQosEgrPolicerAdminRateType specifies the type of rate
+         for this policer.
+
+         When the value of the object is set to 'kbps', the policer rates are
+         specified in kbps. The objects tQosEgrPolicerAdminPIRPercent and
+         tQosEgrPolicerAdminCIRPercent will be set to their default values.
+
+         When the value of the object is set to 'percentOfLocalLimit' or
+         'percentReferPortLimit', the rates for this policer are specified in
+         percentage. The objects tQosEgrPolicerAdminPIR and
+         tQosEgrPolicerAdminCIR will be set to their default values."
+    DEFVAL      { kbps }
+    ::= { tQosEgrPolicerEntry 27 }
 
 tAdvCfgPolicyTable               OBJECT-TYPE
     SYNTAX      SEQUENCE OF TAdvCfgPolicyEntry
@@ -24931,6 +25427,145 @@ tQosFpResPlcyQIngPrcntOfTotal    OBJECT-TYPE
     DEFVAL      { 5000 }
     ::= { tQosFpResourcePolicyEntry 5 }
 
+tQosPortListObjects              OBJECT IDENTIFIER ::= { tQosObjects 38 }
+
+tQosPortListTable                OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TQosPortListEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The table tQosPortListTable contains an entry for each port list
+         defined in the qos area."
+    ::= { tQosPortListObjects 1 }
+
+tQosPortListEntry                OBJECT-TYPE
+    SYNTAX      TQosPortListEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry in the tQosPortListTable."
+    INDEX       { IMPLIED tQosPortListName }
+    ::= { tQosPortListTable 1 }
+
+TQosPortListEntry                ::= SEQUENCE
+{
+    tQosPortListName                 TNamedItem,
+    tQosPortListRowStatus            RowStatus,
+    tQosPortListLastChanged          TimeStamp,
+    tQosPortListDescription          TItemDescription
+}
+
+tQosPortListName                 OBJECT-TYPE
+    SYNTAX      TNamedItem
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The object tQosPortListName specifies the name given to this port
+         list."
+    ::= { tQosPortListEntry 1 }
+
+tQosPortListRowStatus            OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The object tQosPortListRowStatus specifies the status of this row."
+    ::= { tQosPortListEntry 2 }
+
+tQosPortListLastChanged          OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The object tQosPortListLastChanged indicates the sysUpTime at the time
+         of the last modification of this row.
+
+         If no changes were made to the row since the last re-initialization of
+         the local network management subsystem, then this object contains the
+         value zero."
+    ::= { tQosPortListEntry 3 }
+
+tQosPortListDescription          OBJECT-TYPE
+    SYNTAX      TItemDescription
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The object tQosPortListDescription specifies a description for this
+         row."
+    DEFVAL      { ''H }
+    ::= { tQosPortListEntry 4 }
+
+tQosPortListEntryTable           OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TQosPortListEntryEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The table tQosPortListEntryTable contains an entry for each port
+         defined in any port list defined in the qos area."
+    ::= { tQosPortListObjects 2 }
+
+tQosPortListEntryEntry           OBJECT-TYPE
+    SYNTAX      TQosPortListEntryEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Specifies an entry in the tQosPortListEntryTable. Two entries for the
+         same port list must not overlap."
+    INDEX       {
+        tQosPortListName,
+        tQosPortListEntryPortLow,
+        tQosPortListEntryPortHigh
+    }
+    ::= { tQosPortListEntryTable 1 }
+
+TQosPortListEntryEntry           ::= SEQUENCE
+{
+    tQosPortListEntryPortLow         TTcpUdpPort,
+    tQosPortListEntryPortHigh        TTcpUdpPort,
+    tQosPortListEntryRowStatus       RowStatus
+}
+
+tQosPortListEntryPortLow         OBJECT-TYPE
+    SYNTAX      TTcpUdpPort
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This object specifies the lower value for the TCP/UDP port range. A
+         value assigned to this object must be less than or equal to the value
+         assigned to the corresponding object tQosPortListEntryPortHigh."
+    ::= { tQosPortListEntryEntry 1 }
+
+tQosPortListEntryPortHigh        OBJECT-TYPE
+    SYNTAX      TTcpUdpPort
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This object specifies the higher value for the TCP/UDP port range. A
+         value assigned to this object must be greater than or equal to the
+         value assigned to the corresponding object tQosPortListEntryPortLow."
+    ::= { tQosPortListEntryEntry 2 }
+
+tQosPortListEntryRowStatus       OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The object tQosPortListEntryRowStatus specifies the status of this
+         row."
+    ::= { tQosPortListEntryEntry 3 }
+
+tPktByteOffsetObjects            OBJECT IDENTIFIER ::= { tQosObjects 39 }
+
+tPktByteOffsetAdminStatus        OBJECT-TYPE
+    SYNTAX      TmnxAdminStateUpDown
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tPktByteOffsetAdminStatus indicates the
+         administrative status of internal header byte offset."
+    DEFVAL      { down }
+    ::= { tPktByteOffsetObjects 1 }
+
 tmnxQosConformance               OBJECT IDENTIFIER ::= { tmnxSRConfs 16 }
 
 tmnxQosCompliances               OBJECT IDENTIFIER ::= { tmnxQosConformance 1 }
@@ -26146,12 +26781,21 @@ tmnxQosV20v0Compliance           MODULE-COMPLIANCE
             tQosFpResourcePolicyV20v0Group,
             tQosFourWredSlopesV19v0Group,
             tQosPortSchedHQoSAlgoV19v0Group,
+            tQosPercentRateV20v0Group,
             tQosSapIpPrefixListV20v0Group,
             tmnxQosSapEgressV20v0Group,
             tmnxQosSapIngressV20v0Group,
             tQosNetworkV20v0Group,
             tmnxQosQueueObjV20v0Group,
-            tQosSharedQueueV20v0Group
+            tQosSharedQueueV20v0Group,
+            tQosPortListV20v0Group,
+            tQosVlanQosPlcyPIRV20Group,
+            tQosSapIngIPCriteriaV20v0Group,
+            tmnxQosSapIngPlcrCntV20v0Group,
+            tNetIngressPlcyGroupV20v0Group,
+            tQosPktByteOffsetV20Group,
+            tQosNetEgrPortListV20v0Group,
+            tQueueMgmtPlcyV20v0Group
         }
     ::= { tmnxQosCompliances 30 }
 
@@ -30515,6 +31159,33 @@ tQosFpResourcePolicyV20v0Group   OBJECT-GROUP
          configuration on Nokia SROS series systems in release 20.0."
     ::= { tmnxQosConformance 21 }
 
+tQosPercentRateV20v0Group        OBJECT-GROUP
+    OBJECTS     {
+        tQosPolicerCtrlRootMaxPrcntRate,
+        tQosPolicerCtrlRootMaxRateType,
+        tQosPolicerArbiterPercentRate,
+        tQosPolicerArbiterRateType,
+        tVirtualSchedulerPIRPercent,
+        tVirtualSchedulerCIRPercent,
+        tVirtualSchedulerRateType,
+        tQosEgrPolicerAdminPIRPercent,
+        tQosEgrPolicerAdminCIRPercent,
+        tQosEgrPolicerAdminRateType,
+        tQosIngPolicerAdminPIRPercent,
+        tQosIngPolicerAdminCIRPercent,
+        tQosIngPolicerAdminRateType,
+        tQosIngQueueAdminPIRPercent,
+        tQosIngQueueAdminCIRPercent,
+        tQosIngQueueAdminFIRPercent,
+        tQosIngQueueAdminRateType
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting management of Qos Policer Control
+         Policy root max-percentage configuration on Nokia SROS series systems
+         in release 20.0."
+    ::= { tmnxQosConformance 22 }
+
 tQosFourWredSlopesV19v0Group     OBJECT-GROUP
     OBJECTS     {
         tQueueMgmtPlcyExcdAdminStatus,
@@ -30898,6 +31569,95 @@ tQosNamedPoolObsoletedV20v0Grp   OBJECT-GROUP
         "The group of obsoleted objects for the named pool policy on Nokia SROS
          series systems."
     ::= { tmnxQosConformance 31 }
+
+tQosPortListV20v0Group           OBJECT-GROUP
+    OBJECTS     {
+        tQosPortListTableLstChng,
+        tQosPortListRowStatus,
+        tQosPortListLastChanged,
+        tQosPortListDescription,
+        tQosPortListEntryTblLstChg,
+        tQosPortListEntryRowStatus
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting management of Qos Port List
+         configuration on Nokia SROS series systems in release 20.10."
+    ::= { tmnxQosConformance 32 }
+
+tQosVlanQosPlcyPIRV20Group       OBJECT-GROUP
+    OBJECTS     {
+        tVlanQosPlcyQueuePirWeight
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting management of Qos Vlan Policy Queue
+         PIR weight configuration on Nokia SROS series systems."
+    ::= { tmnxQosConformance 33 }
+
+tQosSapIngIPCriteriaV20v0Group   OBJECT-GROUP
+    OBJECTS     {
+        tSapIngressIPCriteriaTagId,
+        tSapIngressIPv6CriteriaTagId
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting management of Qos SAPs IP criteria
+         configuration on Nokia SROS series systems."
+    ::= { tmnxQosConformance 34 }
+
+tmnxQosSapIngPlcrCntV20v0Group   OBJECT-GROUP
+    OBJECTS     {
+        tSapIngressPlcrAlloc
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting management of SAP ingress QoS policies
+         on Nokia SROS series systems release 20.0."
+    ::= { tmnxQosConformance 35 }
+
+tNetIngressPlcyGroupV20v0Group   OBJECT-GROUP
+    OBJECTS     {
+        tNetIngPlcyPlcrAlloc
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting management of Qos Network Ingress
+         Policy configuration on Nokia SROS series systems."
+    ::= { tmnxQosConformance 36 }
+
+tQosPktByteOffsetV20Group        OBJECT-GROUP
+    OBJECTS     {
+        tPktByteOffsetAdminStatus,
+        tPortQosPlcyPktByteOffset,
+        tVlanQosPlcyPktByteOffset
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting management of Qos internel packet byte
+         offset configuration on Nokia SROS series systems."
+    ::= { tmnxQosConformance 37 }
+
+tQosNetEgrPortListV20v0Group     OBJECT-GROUP
+    OBJECTS     {
+        tNetworkEgrIPCritSrcPortList,
+        tNetworkEgrIPCritDstPortList
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting management of Qos Port List
+         configuration on Nokia SROS series systems in release 20.10."
+    ::= { tmnxQosConformance 38 }
+
+tQueueMgmtPlcyV20v0Group         OBJECT-GROUP
+    OBJECTS     {
+        tQMgmtPlcyPortSpeed
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting management of Qos Queue Management
+         Policy configuration on Nokia SROS series systems."
+    ::= { tmnxQosConformance 39 }
 
 tQosNotifyPrefix                 OBJECT IDENTIFIER ::= { tmnxSRNotifyPrefix 16 }
 
