@@ -30,6 +30,7 @@ use App\Models\Device;
 use App\Models\DeviceGraph;
 use App\Polling\Measure\Measurement;
 use App\Polling\Measure\MeasurementManager;
+use Carbon\Carbon;
 use DB;
 use Exception;
 use Illuminate\Database\Eloquent\Builder;
@@ -103,7 +104,7 @@ class Poller
             if (empty($this->module_override)) {
                 // record performance
                 $measurement->manager()->record('device', $measurement);
-                $this->device->last_polled = time();
+                $this->device->last_polled = Carbon::now();
                 $this->device->last_ping_timetaken = $measurement->getDuration();
                 app('Datastore')->put($this->deviceArray, 'poller-perf', [
                     'rrd_def' => RrdDefinition::make()->addDataset('poller', 'GAUGE', 0),
@@ -219,19 +220,19 @@ class Poller
         $os_module_status = Config::get("os.{$this->device->os}.poller_modules.$module");
         $device_attrib = $this->device->getAttrib('poll_' . $module);
         Log::debug(sprintf('Modules status: Global %s OS %s Device %s',
-            isset($module_status) ? ($module_status ? '+' : '-') : ' ',
-            isset($os_module_status) ? ($os_module_status ? '+' : '-') : ' ',
-            isset($device_attrib) ? ($device_attrib ? '+' : '-') : ' '
+            $global_status ? '+' : '-',
+            $os_module_status === null ? ' ' : ($os_module_status ? '+' : '-'),
+            $device_attrib === null ? ' ' : ($device_attrib ? '+' : '-')
         ));
 
         if ($device_attrib
-            || ($os_module_status && ! isset($device_attrib))
-            || ($global_status && ! isset($os_module_status) && ! isset($device_attrib))) {
+            || ($os_module_status && $device_attrib === null)
+            || ($global_status && $os_module_status === null && $device_attrib === null)) {
             return true;
         }
 
-        $reason = (isset($device_attrib) && ! $device_attrib) ? 'by device'
-                : (isset($os_module_status) && ! $os_module_status ? 'by OS' : 'globally');
+        $reason = $device_attrib !== null ? 'by device'
+                : ($os_module_status === null || $os_module_status ? 'globally' : 'by OS');
         Log::debug("Module [ $module ] disabled $reason");
 
         return false;
