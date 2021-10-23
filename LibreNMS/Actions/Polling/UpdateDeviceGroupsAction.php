@@ -27,5 +27,4 @@ namespace LibreNMS\Actions\Polling;
 
 class UpdateDeviceGroupsAction
 {
-
 }

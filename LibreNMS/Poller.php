@@ -161,7 +161,6 @@ class Poller
         include_once base_path('includes/snmp.inc.php');
         include_once base_path('includes/datastore.inc.php');  // remove me
 
-
         foreach (Config::get('poller_modules') as $module => $module_status) {
             if ($this->isModuleEnabled($module, $module_status)) {
                 $start_memory = memory_get_usage();
@@ -210,6 +209,7 @@ class Poller
         if (! empty($this->module_override)) {
             if (in_array($module, $this->module_override)) {
                 Log::debug("Module $module manually enabled");
+
                 return true;
             }
 
@@ -233,6 +233,7 @@ class Poller
         $reason = (isset($device_attrib) && ! $device_attrib) ? 'by device'
                 : (isset($os_module_status) && ! $os_module_status ? 'by OS' : 'globally');
         Log::debug("Module [ $module ] disabled $reason");
+
         return false;
     }
 
@@ -326,7 +327,7 @@ class Poller
 
     private function printDeviceInfo($group)
     {
-        $this->output->writeln(sprintf(<<<EOH
+        $this->output->writeln(sprintf(<<<'EOH'
 Hostname:  %s %s
 ID:        %s
 OS:        %s
@@ -341,16 +342,16 @@ EOH, $this->device->hostname, $group ? " ($group)" : '', $this->device->device_i
             $submodules = Config::get("poller_submodules.$module");
 
             return $module . ($submodules ? '(' . implode(',', $submodules) . ')' : '');
-        }, array_keys(Config::get("poller_modules", [])));
+        }, array_keys(Config::get('poller_modules', [])));
 
-        Log::debug("Override poller modules: " . implode(', ', $modules));
+        Log::debug('Override poller modules: ' . implode(', ', $modules));
     }
 
     private function printHeader()
     {
         if (Debug::isEnabled() || Debug::isVerbose()) {
             $version = \LibreNMS\Util\Version::get();
-            $this->output->writeln(sprintf(<<<EOH
+            $this->output->writeln(sprintf(<<<'EOH'
 ===================================
 Version info:
 Commit SHA: %s
@@ -370,7 +371,6 @@ EOH,
                 $version->rrdtool(),
                 $version->netSnmp()
             ));
-
         }
     }
 }

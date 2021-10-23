@@ -5,8 +5,6 @@ namespace App\Listeners;
 use App\Action;
 use App\Actions\Device\UpdateDeviceGroupsAction;
 use App\Events\DevicePolled;
-use Illuminate\Contracts\Queue\ShouldQueue;
-use Illuminate\Queue\InteractsWithQueue;
 use Log;
 
 class UpdateDeviceGroups

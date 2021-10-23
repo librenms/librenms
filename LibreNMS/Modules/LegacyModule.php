@@ -31,7 +31,6 @@ use LibreNMS\Util\Debug;
 
 class LegacyModule implements Module
 {
-
     /**
      * @var string
      */

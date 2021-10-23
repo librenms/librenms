@@ -20,7 +20,7 @@ class EventServiceProvider extends ServiceProvider
         \App\Events\DevicePolled::class => [
             \App\Listeners\CheckAlerts::class,
             \App\Listeners\UpdateDeviceGroups::class,
-        ]
+        ],
     ];
 
     /**

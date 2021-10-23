@@ -27,7 +27,6 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use LibreNMS\Alerting\QueryBuilderFluentParser;
-use Log;
 use Permissions;
 
 class DeviceGroup extends BaseModel

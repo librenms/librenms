@@ -46,7 +46,7 @@ class DevicePoll extends LnmsCommand
                 if (! $this->output->isQuiet()) {
                     if ($polled > 1) {
                         $this->output->newLine();
-                        $this->line(sprintf("Polled %d devices in %0.3fs", $polled, $measurements->getCategory('device')->getSummary('poll')->getDuration()));
+                        $this->line(sprintf('Polled %d devices in %0.3fs', $polled, $measurements->getCategory('device')->getSummary('poll')->getDuration()));
                     }
                     $this->output->newLine();
                     $measurements->printStats();
@@ -54,17 +54,20 @@ class DevicePoll extends LnmsCommand
 
                 return 0;
             }
-        } catch (QueryException $e){
+        } catch (QueryException $e) {
             if ($e->getCode() == 2002) {
                 $this->error(trans('commands.device:poll.errors.db_connect'));
+
                 return 1;
-            } elseif($e->getCode() == 1045) {
+            } elseif ($e->getCode() == 1045) {
                 // auth failed, don't need to include the query
                 $this->error(trans('commands.device:poll.errors.db_auth', ['error' => $e->getPrevious()->getMessage()]));
+
                 return 1;
             }
 
             $this->error($e->getMessage());
+
             return 1;
         }
 

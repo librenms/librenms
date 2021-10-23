@@ -33,7 +33,7 @@ class AppServiceProvider extends ServiceProvider
             return new \LibreNMS\Cache\Device();
         });
 
-        $this->app->bind(\App\Models\Device::class, function() {
+        $this->app->bind(\App\Models\Device::class, function () {
             /** @var \LibreNMS\Cache\Device $cache */
             $cache = $this->app->make('device-cache');
 
