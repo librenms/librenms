@@ -31,7 +31,9 @@
 
 namespace LibreNMS\Alert;
 
+use App\Actions\Alerts\IsDeviceUnderMaintenanceAction;
 use Carbon\Carbon;
+use DeviceCache;
 use LibreNMS\Enum\AlertState;
 
 class AlertRules
@@ -40,7 +42,7 @@ class AlertRules
     {
 
         //Check to see if under maintenance
-        if (AlertUtil::isMaintenance($device_id) > 0) {
+        if ((new IsDeviceUnderMaintenanceAction(DeviceCache::get($device_id)))->execute() > 0) {
             echo "Under Maintenance, skipping alert rules check.\r\n";
 
             return false;

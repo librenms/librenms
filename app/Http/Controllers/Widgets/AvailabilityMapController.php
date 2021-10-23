@@ -25,6 +25,7 @@
 
 namespace App\Http\Controllers\Widgets;
 
+use App\Actions\Alerts\IsDeviceUnderMaintenanceAction;
 use App\Models\Device;
 use App\Models\DeviceGroup;
 use App\Models\Service;
@@ -133,7 +134,7 @@ class AvailabilityMapController extends WidgetController
                 $row['labelClass'] = 'label-danger';
             }
 
-            if ($device->isUnderMaintenance()) {
+            if ((new IsDeviceUnderMaintenanceAction($device))->execute()) {
                 $row['labelClass'] = 'label-default';
                 $totals['maintenance']++;
             }

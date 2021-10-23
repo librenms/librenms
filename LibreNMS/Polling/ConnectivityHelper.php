@@ -25,6 +25,7 @@
 
 namespace LibreNMS\Polling;
 
+use App\Actions\Alerts\IsDeviceUnderMaintenanceAction;
 use App\Models\Device;
 use App\Models\DeviceOutage;
 use LibreNMS\Config;
@@ -175,7 +176,7 @@ class ConnectivityHelper
 
     private function updateAvailability(bool $previous, bool $status): void
     {
-        if (Config::get('graphing.availability_consider_maintenance') && $this->device->isUnderMaintenance()) {
+        if (Config::get('graphing.availability_consider_maintenance') && (new IsDeviceUnderMaintenanceAction($this->device))->execute()) {
             return;
         }
 

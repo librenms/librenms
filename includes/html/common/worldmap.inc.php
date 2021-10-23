@@ -21,8 +21,8 @@
  * @license GPL
  */
 
+use App\Actions\Alerts\IsDeviceUnderMaintenanceAction;
 use Illuminate\Support\Facades\Auth;
-use LibreNMS\Alert\AlertUtil;
 use LibreNMS\Config;
 
 $install_dir = Config::get('install_dir');
@@ -113,7 +113,7 @@ var greenMarker = L.AwesomeMarkers.icon({
             $map_devices['lng'] = $tmp_loc['lng'];
         }
         if ($map_devices['status'] == 0) {
-            if (AlertUtil::isMaintenance($map_devices['device_id'])) {
+            if ((new IsDeviceUnderMaintenanceAction(DeviceCache::get($map_devices['device_id'])))->execute()) {
                 if ($show_status == 0) { // Don't show icon if only down devices should be shown
                     continue;
                 } else {

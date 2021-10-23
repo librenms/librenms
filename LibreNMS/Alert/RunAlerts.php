@@ -30,7 +30,9 @@
 
 namespace LibreNMS\Alert;
 
+use App\Actions\Alerts\IsDeviceUnderMaintenanceAction;
 use App\Models\DevicePerf;
+use DeviceCache;
 use LibreNMS\Config;
 use LibreNMS\Enum\Alert;
 use LibreNMS\Enum\AlertState;
@@ -459,7 +461,7 @@ class RunAlerts
                 $noacc = false;
             }
 
-            if (AlertUtil::isMaintenance($alert['device_id'])) {
+            if ((new IsDeviceUnderMaintenanceAction(DeviceCache::get($alert['device_id'])))->execute()) {
                 $noiss = true;
                 $noacc = true;
             }

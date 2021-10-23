@@ -75,6 +75,11 @@ class Device extends BaseModel
         'status' => 'boolean',
     ];
 
+    /**
+     * @var array Simple storage for runtime properties
+     */
+    public $properties = [];
+
     // ---- Helper Functions ----
 
     public static function findByHostname($hostname)
@@ -187,34 +192,6 @@ class Device extends BaseModel
         }
 
         return '';
-    }
-
-    public function isUnderMaintenance()
-    {
-        if (! $this->device_id) {
-            return false;
-        }
-
-        $query = AlertSchedule::isActive()
-            ->where(function (Builder $query) {
-                $query->whereHas('devices', function (Builder $query) {
-                    $query->where('alert_schedulables.alert_schedulable_id', $this->device_id);
-                });
-
-                if ($this->groups->isNotEmpty()) {
-                    $query->orWhereHas('deviceGroups', function (Builder $query) {
-                        $query->whereIn('alert_schedulables.alert_schedulable_id', $this->groups->pluck('id'));
-                    });
-                }
-
-                if ($this->location) {
-                    $query->orWhereHas('locations', function (Builder $query) {
-                        $query->where('alert_schedulables.alert_schedulable_id', $this->location->id);
-                    });
-                }
-            });
-
-        return $query->exists();
     }
 
     /**

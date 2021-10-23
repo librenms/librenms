@@ -25,6 +25,7 @@
 
 namespace App\Http\Controllers\Widgets;
 
+use App\Actions\Alerts\IsDeviceUnderMaintenanceAction;
 use App\Models\Device;
 use Illuminate\Http\Request;
 use LibreNMS\Config;
@@ -78,7 +79,7 @@ class WorldMapController extends WidgetController
                     $device->markerIcon = 'redMarker';
                     $device->zOffset = 10000;
 
-                    if ($device->isUnderMaintenance()) {
+                    if ((new IsDeviceUnderMaintenanceAction($device))->execute()) {
                         if (in_array(0, $status)) {
                             return false;
                         }

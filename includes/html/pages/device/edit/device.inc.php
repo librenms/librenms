@@ -1,10 +1,10 @@
 <?php
 
-use App\Models\Device;
+use App\Actions\Alerts\IsDeviceUnderMaintenanceAction;
 
 require_once 'includes/html/modal/device_maintenance.inc.php';
 
-$device_model = Device::find($device['device_id']);
+$device_model = DeviceCache::get($device['device_id']);
 
 if ($_POST['editing']) {
     if (Auth::user()->hasGlobalAdmin()) {
@@ -275,7 +275,7 @@ if (\LibreNMS\Config::get('distributed_poller') === true) {
     <div class="form-group">
       <label for="maintenance" class="col-sm-2 control-label"></label>
       <div class="col-sm-6">
-      <button type="button" id="maintenance" data-device_id="<?php echo $device['device_id']; ?>" <?php echo \LibreNMS\Alert\AlertUtil::isMaintenance($device['device_id']) ? 'disabled class="btn btn-warning"' : 'class="btn btn-success"'?> name="maintenance"><i class="fa fa-wrench"></i> Maintenance Mode</button>
+      <button type="button" id="maintenance" data-device_id="<?php echo $device['device_id']; ?>" <?php echo (new IsDeviceUnderMaintenanceAction($device_model))->execute() ? 'disabled class="btn btn-warning"' : 'class="btn btn-success"'?>name="maintenance"><i class="fa fa-wrench"></i> Maintenance Mode</button>
       </div>
     </div>
 

@@ -22,6 +22,9 @@
  * @copyright  2020 Thomas Berberich
  * @author     Thomas Berberich <sourcehhdoctor@gmail.com>
  */
+
+use App\Actions\Alerts\IsDeviceUnderMaintenanceAction;
+
 if (! Auth::user()->hasGlobalAdmin()) {
     exit('ERROR: You need to be admin');
 }
@@ -77,7 +80,7 @@ foreach ($hour_steps as $hour) {
                     <div class="form-group">
                         <label for="maintenance-submit" class="col-sm-4 control-label"></label>
                         <div class="col-sm-8">
-                            <button type="submit" id="maintenance-submit" data-device_id="<?php echo $device['device_id']; ?>" <?php echo \LibreNMS\Alert\AlertUtil::isMaintenance($device['device_id']) ? 'disabled class="btn btn-warning"' : 'class="btn btn-success"'?> name="maintenance-submit">Start Maintenance</button>
+                            <button type="submit" id="maintenance-submit" data-device_id="<?php echo $device['device_id']; ?>" <?php echo (new IsDeviceUnderMaintenanceAction(DeviceCache::get($device['device_id'])))->execute() ? 'disabled class="btn btn-warning"' : 'class="btn btn-success"'?>name="maintenance-submit">Start Maintenance</button>
                         </div>
                     </div>
                 </form>

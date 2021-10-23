@@ -12,7 +12,7 @@
  * the source code distribution for details.
  */
 
-use LibreNMS\Alert\AlertUtil;
+use App\Actions\Alerts\IsDeviceUnderMaintenanceAction;
 use LibreNMS\Config;
 
 $mode = Session::get('map_view', 0);
@@ -226,7 +226,7 @@ if (defined('SHOW_SETTINGS')) {
                 $updowntime = ($device['last_polled'] ? ' - ' . \LibreNMS\Util\Time::formatInterval(time() - strtotime($device['last_polled'])) : '');
             }
 
-            if (AlertUtil::isMaintenance($device['device_id'])) {
+            if ((new IsDeviceUnderMaintenanceAction(DeviceCache::get($device['device_id'])))->execute()) {
                 $deviceLabel = 'label-default';
                 $host_maintenance_count++;
             }
