@@ -15,7 +15,11 @@ if __name__ == "__main__":
         description="LibreNMS Service - manages polling and other periodic processes"
     )
     parser.add_argument(
-        "-g", "--group", nargs="+", type=int, help="Set the poller group for this poller"
+        "-g",
+        "--group",
+        nargs="+",
+        type=int,
+        help="Set the poller group for this poller",
     )
     parser.add_argument("-v", "--verbose", action="count", help="Show verbose output.")
     parser.add_argument("-d", "--debug", action="store_true", help="Show debug output.")
