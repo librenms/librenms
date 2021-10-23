@@ -102,7 +102,7 @@ class Poller
 
             if (empty($this->module_override)) {
                 // record performance
-                $measurement->manager()->record('poller', $measurement);
+                $measurement->manager()->record('device', $measurement);
                 $this->device->last_polled = time();
                 $this->device->last_ping_timetaken = $measurement->getDuration();
                 app('Datastore')->put($this->deviceArray, 'poller-perf', [
@@ -124,6 +124,7 @@ class Poller
                     $this->output->write('+');
                 });
                 $this->os->persistGraphs();
+                $this->output->newLine(2);
             }
 
             $this->device->save();
@@ -131,8 +132,9 @@ class Poller
 
             DevicePolled::dispatch($this->device);
 
-            $this->output->newLine(2);
-            $this->output->writeln(sprintf('Polled in %s seconds', $measurement->getDuration()));
+            $this->output->newLine(1);
+            $name = $this->device->displayName();
+            $this->output->writeln(sprintf(">>> Polled $name ({$this->device->device_id}) in %0.3f seconds <<<", $measurement->getDuration()));
 
             // check if the poll took too long and log an event
             if ($measurement->getDuration() > Config::get('rrd.step')) {
@@ -178,8 +180,8 @@ class Poller
                     Log::error("Error in $module module. " . $e->getMessage() . PHP_EOL . $e->getTraceAsString() . PHP_EOL);
                 }
 
-                $this->saveModulePerformance($module, $module_start, $start_memory);
                 app(MeasurementManager::class)->printChangedStats();
+                $this->saveModulePerformance($module, $module_start, $start_memory);
                 $this->output->writeln("#### Unload poller module $module ####");
                 $this->output->newLine();
             }
@@ -191,7 +193,6 @@ class Poller
         $module_time = microtime(true) - $start_time;
         $module_mem = (memory_get_usage() - $start_memory);
 
-        $this->output->newLine();
         $this->output->writeln(sprintf(">> Runtime for poller module '%s': %.4f seconds with %s bytes", $module, $module_time, $module_mem));
 
         app('Datastore')->put($this->deviceArray, 'poller-perf', [

@@ -32,7 +32,7 @@ class CheckAlerts
         Action::execute(RunAlertRulesAction::class, $event->device);
 
         $end = round(microtime(true) - $start, 4);
-        Log::info("#### End Alerts ({$end}s) ####");
+        Log::info("#### End Alerts ({$end}s) ####\n");
 
     }
 }

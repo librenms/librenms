@@ -133,7 +133,7 @@ class MeasurementManager
         });
     }
 
-    private function getCategory(string $category): MeasurementCollection
+    public function getCategory(string $category): MeasurementCollection
     {
         if (! self::$categories->has($category)) {
             self::$categories->put($category, new MeasurementCollection());
@@ -142,7 +142,7 @@ class MeasurementManager
         return self::$categories->get($category);
     }
 
-    private function printSummary(string $name, MeasurementCollection $collection, string $color = ''): void
+    public function printSummary(string $name, MeasurementCollection $collection, string $color = ''): void
     {
         printf('%s%s%s [%d/%.2fs]:', $color, $name, $color ? self::NO_COLOR : '', $collection->getTotalCount(), $collection->getTotalDuration());
 

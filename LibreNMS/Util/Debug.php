@@ -105,14 +105,14 @@ class Debug
     public static function enableCliDebugOutput()
     {
         if (Laravel::isBooted() && App::runningInConsole()) {
-            Log::setDefaultDriver('console');
+            Log::setDefaultDriver('console_debug');
         }
     }
 
     public static function disableCliDebugOutput()
     {
         if (Laravel::isBooted()) {
-            Log::setDefaultDriver('stack');
+            Log::setDefaultDriver(app()->runningInConsole() ? 'console' : 'stack');
         }
     }
 

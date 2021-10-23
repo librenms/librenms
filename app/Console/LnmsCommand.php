@@ -127,8 +127,9 @@ abstract class LnmsCommand extends Command
         }
     }
 
-    protected function parseDebug()
+    protected function configureOutputOptions()
     {
+        \Log::setDefaultDriver($this->getOutput()->isQuiet() ? 'stack' : 'console');
         if (($verbosity = $this->getOutput()->getVerbosity()) >= 128) {
             Debug::set();
             if ($verbosity >= 256) {

@@ -40,6 +40,6 @@ class UpdateDeviceGroups
         $elapsed = round(microtime(true) - $dg_start, 4);
 
         Log::debug("Groups Added: $added  Removed: $removed");
-        Log::info("### End Device Groups, runtime: {$elapsed}s ### \n");
+        Log::info("### End Device Groups ({$elapsed}s) ### \n");
     }
 }

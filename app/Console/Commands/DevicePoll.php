@@ -3,6 +3,7 @@
 namespace App\Console\Commands;
 
 use App\Console\LnmsCommand;
+use App\Polling\Measure\MeasurementManager;
 use Illuminate\Database\QueryException;
 use LibreNMS\Config;
 use LibreNMS\Poller;
@@ -26,14 +27,9 @@ class DevicePoll extends LnmsCommand
         $this->addOption('no-data', 'x', InputOption::VALUE_NONE);
     }
 
-    /**
-     * Execute the console command.
-     *
-     * @return int
-     */
-    public function handle()
+    public function handle(MeasurementManager $measurements): int
     {
-        $this->parseDebug();
+        $this->configureOutputOptions();
 
         if ($this->option('no-data')) {
             Config::set('rrd.enable', false);
@@ -47,6 +43,15 @@ class DevicePoll extends LnmsCommand
             $polled = $poller->poll();
 
             if ($polled > 0) {
+                if (! $this->output->isQuiet()) {
+                    if ($polled > 1) {
+                        $this->output->newLine();
+                        $this->line(sprintf("Polled %d devices in %0.3fs", $polled, $measurements->getCategory('device')->getSummary('poll')->getDuration()));
+                    }
+                    $this->output->newLine();
+                    $measurements->printStats();
+                }
+
                 return 0;
             }
         } catch (QueryException $e){
