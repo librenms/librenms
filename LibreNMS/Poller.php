@@ -25,6 +25,7 @@
 
 namespace LibreNMS;
 
+use App\Events\DevicePolled;
 use App\Models\Device;
 use App\Models\DeviceGraph;
 use App\Polling\Measure\Measurement;
@@ -43,7 +44,7 @@ use LibreNMS\Util\Git;
 use LibreNMS\Util\StringHelpers;
 use Log;
 
-class Poller extends PollingCommon
+class Poller
 {
     /** @var string */
     private $device_spec;
@@ -127,6 +128,8 @@ class Poller extends PollingCommon
 
             $this->device->save();
             $polled++;
+
+            DevicePolled::dispatch($this->device);
 
             $this->output->newLine(2);
             $this->output->writeln(sprintf('Polled in %s seconds', $measurement->getDuration()));
