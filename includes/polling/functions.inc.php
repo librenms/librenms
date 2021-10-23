@@ -534,6 +534,7 @@ function update_application($app, $response, $metrics = [], $status = '')
 
         echo ': ';
         foreach ($metrics as $metric_name => $value) {
+            $value = (float) $value; // cast
             if (! isset($db_metrics[$metric_name])) {
                 // insert new metric
                 dbInsert(

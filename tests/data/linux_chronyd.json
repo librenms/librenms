@@ -1,26 +1,31 @@
 {
     "applications": {
         "discovery": {
-            "applications": [{
-                "app_type": "chronyd",
-                "app_state": "UNKNOWN",
-                "discovered": 1,
-                "app_state_prev": null,
-                "app_status": "",
-                "app_instance": ""
-            }],
+            "applications": [
+                {
+                    "app_type": "chronyd",
+                    "app_state": "UNKNOWN",
+                    "discovered": 1,
+                    "app_state_prev": null,
+                    "app_status": "",
+                    "app_instance": ""
+                }
+            ],
             "application_metrics": []
         },
         "poller": {
-            "applications": [{
-                "app_type": "chronyd",
-                "app_state": "OK",
-                "discovered": 1,
-                "app_state_prev": "UNKNOWN",
-                "app_status": "",
-                "app_instance": ""
-            }],
-            "application_metrics": [{
+            "applications": [
+                {
+                    "app_type": "chronyd",
+                    "app_state": "OK",
+                    "discovered": 1,
+                    "app_state_prev": "UNKNOWN",
+                    "app_status": "",
+                    "app_instance": ""
+                }
+            ],
+            "application_metrics": [
+                {
                     "metric": "tracking_frequency",
                     "value": -9.845,
                     "value_prev": null,
@@ -46,7 +51,7 @@
                 },
                 {
                     "metric": "tracking_reference_time",
-                    "value": 1613135374.765365,
+                    "value": 1613135374.7654,
                     "value_prev": null,
                     "app_type": "chronyd"
                 },
