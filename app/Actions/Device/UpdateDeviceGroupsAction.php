@@ -41,7 +41,10 @@ class UpdateDeviceGroupsAction
         $this->device = $device;
     }
 
-    public function execute()
+    /**
+     * @return array[]
+     */
+    public function execute(): array
     {
         if (! $this->device->exists) {
             // Device not saved to DB, cowardly refusing

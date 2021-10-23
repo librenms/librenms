@@ -41,12 +41,12 @@ class LegacyModule implements Module
         $this->name = $name;
     }
 
-    public function discover(OS $os)
+    public function discover(OS $os): void
     {
         // TODO: Implement discover() method.
     }
 
-    public function poll(OS $os)
+    public function poll(OS $os): void
     {
         $device = &$os->getDeviceArray();
         $device['attribs'] = $os->getDevice()->attribs->toArray();
@@ -57,7 +57,7 @@ class LegacyModule implements Module
         include base_path("includes/polling/$this->name.inc.php");
     }
 
-    public function cleanup(OS $os)
+    public function cleanup(OS $os): void
     {
         // TODO: Implement cleanup() method.
     }

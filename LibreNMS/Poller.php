@@ -51,6 +51,9 @@ class Poller
     private $device_spec;
     /** @var array */
     private $module_override;
+    /**
+     * @var \Illuminate\Console\OutputStyle
+     */
     private $output;
 
     /**
@@ -147,7 +150,7 @@ class Poller
         return $polled;
     }
 
-    private function pollModules()
+    private function pollModules(): void
     {
         $this->filterModules();
 
@@ -188,7 +191,7 @@ class Poller
         }
     }
 
-    private function saveModulePerformance($module, $start_time, $start_memory): void
+    private function saveModulePerformance(string $module, float $start_time, int $start_memory): void
     {
         $module_time = microtime(true) - $start_time;
         $module_mem = (memory_get_usage() - $start_memory);
@@ -265,7 +268,7 @@ class Poller
         return $query->where('hostname', $this->device_spec);
     }
 
-    private function initDevice($device_id)
+    private function initDevice(int $device_id): void
     {
         \DeviceCache::setPrimary($device_id);
         $this->device = \DeviceCache::getPrimary();
@@ -289,7 +292,7 @@ class Poller
         }
     }
 
-    private function parseModules()
+    private function parseModules(): void
     {
         foreach ($this->module_override as $index => $module) {
             // parse submodules (only supported by some modules)
@@ -326,7 +329,7 @@ class Poller
         }
     }
 
-    private function printDeviceInfo($group)
+    private function printDeviceInfo(?string $group): void
     {
         $this->output->writeln(sprintf(<<<'EOH'
 Hostname:  %s %s
@@ -337,7 +340,7 @@ EOH, $this->device->hostname, $group ? " ($group)" : '', $this->device->device_i
         $this->output->newLine();
     }
 
-    private function printModules()
+    private function printModules(): void
     {
         $modules = array_map(function ($module) {
             $submodules = Config::get("poller_submodules.$module");
@@ -348,7 +351,7 @@ EOH, $this->device->hostname, $group ? " ($group)" : '', $this->device->device_i
         Log::debug('Override poller modules: ' . implode(', ', $modules));
     }
 
-    private function printHeader()
+    private function printHeader(): void
     {
         if (Debug::isEnabled() || Debug::isVerbose()) {
             $version = \LibreNMS\Util\Version::get();

@@ -45,7 +45,7 @@ class RunAlertRulesAction
         $this->device = $device;
     }
 
-    public function execute()
+    public function execute(): void
     {
         // TODO inline logic
         $this->rules->runRules($this->device->device_id);
