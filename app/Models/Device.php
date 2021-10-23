@@ -78,7 +78,7 @@ class Device extends BaseModel
     /**
      * @var array Simple storage for runtime properties
      */
-    public $properties = [];
+    private $properties = [];
 
     // ---- Helper Functions ----
 
@@ -218,6 +218,30 @@ class Device extends BaseModel
         }
 
         return $name;
+    }
+
+    /**
+     * Set a runtime property.
+     * Use this to store small device related memory for the life of this object.
+     *
+     *
+     * @param  string  $name
+     * @param  mixed  $value
+     */
+    public function setRuntimeProperty(string $name, $value): void
+    {
+        $this->properties[$name] = $value;
+    }
+
+    /**
+     * Get a runtime property
+     *
+     * @param  string  $name
+     * @return mixed|null
+     */
+    public function getRuntimeProperty(string $name)
+    {
+        return $this->properties[$name] ?? null;
     }
 
     /**

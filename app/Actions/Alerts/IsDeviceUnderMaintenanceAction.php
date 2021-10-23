@@ -47,7 +47,7 @@ class IsDeviceUnderMaintenanceAction
             return false;
         }
 
-        if (! isset($this->device->properties['maintenance'])) {
+        if ($this->device->getRuntimeProperty('maintenance') === null) {
             $query = AlertSchedule::isActive()
                 ->where(function (Builder $query) {
                     $query->whereHas('devices', function (Builder $query) {
@@ -67,9 +67,9 @@ class IsDeviceUnderMaintenanceAction
                     }
                 });
 
-            $this->device->properties['maintenance'] = $query->exists();
+            $this->device->setRuntimeProperty('maintenance', $query->exists());
         }
 
-        return $this->device->properties['maintenance'];
+        return $this->device->getRuntimeProperty('maintenance');
     }
 }
