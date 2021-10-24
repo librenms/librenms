@@ -212,12 +212,19 @@
             "section": "rules",
             "order": 7
         },
+        "discovery_on_reboot": {
+            "default": true,
+            "type": "boolean",
+            "group": "discovery",
+            "section": "general",
+            "order": 0
+        },
         "allow_duplicate_sysName": {
             "default": false,
             "type": "boolean",
             "group": "discovery",
             "section": "general",
-            "order": 0
+            "order": 1
         },
         "allow_entity_sensor.amperes": {
             "default": true,

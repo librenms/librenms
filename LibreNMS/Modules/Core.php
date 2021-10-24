@@ -244,6 +244,10 @@ class Core implements Module
         if ($uptime > 0) {
             if ($uptime < $device->uptime) {
                 Log::event('Device rebooted after ' . Time::formatInterval($device->uptime) . " -> {$uptime}s", $device, 'reboot', 4, $device->uptime);
+                if (Config::get('discovery_on_reboot')) {
+                    $device->last_discovered = null;
+                    $device->save();
+                }
             }
 
             app('Datastore')->put($os->getDeviceArray(), 'uptime', [
