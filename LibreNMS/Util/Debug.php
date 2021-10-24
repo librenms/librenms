@@ -111,7 +111,7 @@ class Debug
 
     public static function disableCliDebugOutput(bool $silence): void
     {
-        if (Laravel::isBooted()) {
+        if (Laravel::isBooted() && Log::getDefaultDriver() !== 'stack') {
             Log::setDefaultDriver(app()->runningInConsole() && ! $silence ? 'console' : 'stack');
         }
     }
