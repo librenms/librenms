@@ -58,6 +58,11 @@ class Os implements Module
         } else {
             // legacy poller files
             global $graphs, $device;
+
+            if (empty($device)) {
+                $device = $os->getDeviceArray();
+            }
+
             $location = null;
 
             if (is_file(base_path('/includes/polling/os/' . $device['os'] . '.inc.php'))) {
