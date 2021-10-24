@@ -12,7 +12,7 @@
                     "features": "24-port 10/100/1000 Gigabit Switch",
                     "os": "powerconnect",
                     "type": "network",
-                    "serial": null,
+                    "serial": "CN000000000000000000000",
                     "icon": "dell.svg",
                     "location": "<private>"
                 }
