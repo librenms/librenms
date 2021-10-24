@@ -22,9 +22,5 @@ if (! isset($module) && validate_device_id($device['device_id']) === false) {
         $state = 0;
     }
 
-    if (isset($attribs['poll_' . $module]) && $attribs['poll_' . $module] != \LibreNMS\Config::get("poller_modules.$module")) {
-        del_dev_attrib($device, $module);
-    } else {
-        set_dev_attrib($device, $module, $state);
-    }
+    set_dev_attrib($device, $module, $state);
 }
