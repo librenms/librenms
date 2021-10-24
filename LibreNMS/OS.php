@@ -34,6 +34,7 @@ use LibreNMS\Device\YamlDiscovery;
 use LibreNMS\Interfaces\Discovery\MempoolsDiscovery;
 use LibreNMS\Interfaces\Discovery\OSDiscovery;
 use LibreNMS\Interfaces\Discovery\ProcessorDiscovery;
+use LibreNMS\Interfaces\Discovery\StorageDiscovery;
 use LibreNMS\Interfaces\Polling\Netstats\IcmpNetstatsPolling;
 use LibreNMS\Interfaces\Polling\Netstats\IpForwardNetstatsPolling;
 use LibreNMS\Interfaces\Polling\Netstats\IpNetstatsPolling;
@@ -52,6 +53,7 @@ class OS implements
     ProcessorDiscovery,
     OSDiscovery,
     MempoolsDiscovery,
+    StorageDiscovery,
     IcmpNetstatsPolling,
     IpNetstatsPolling,
     IpForwardNetstatsPolling,
