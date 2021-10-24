@@ -18,7 +18,6 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
- * 
  * @author     H. DAY
  */
 
@@ -38,7 +37,6 @@ class RutosRutx extends OS implements
     WirelessRsrqDiscovery,
     WirelessSinrDiscovery,
     WirelessCellDiscovery
-
 {    
     public function discoverWirelessRssi()
     {
@@ -59,7 +57,6 @@ class RutosRutx extends OS implements
         }
 
         return $sensors;
-
     }
     
     public function discoverWirelessRsrp()
@@ -81,7 +78,6 @@ class RutosRutx extends OS implements
         }
 
         return $sensors;
-        
     }
     
     public function discoverWirelessRsrq()
