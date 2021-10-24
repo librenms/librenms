@@ -62,7 +62,7 @@ class Debug
             ini_set('log_errors', '1');
             error_reporting($silence ? 0 : E_ERROR);
 
-            self::disableCliDebugOutput();
+            self::disableCliDebugOutput($silence);
             self::disableQueryDebug();
         }
 
@@ -92,7 +92,7 @@ class Debug
         return self::$verbose;
     }
 
-    public static function disableQueryDebug()
+    public static function disableQueryDebug(): void
     {
         $db = Eloquent::DB();
 
@@ -102,21 +102,21 @@ class Debug
         }
     }
 
-    public static function enableCliDebugOutput()
+    public static function enableCliDebugOutput(): void
     {
         if (Laravel::isBooted() && App::runningInConsole()) {
             Log::setDefaultDriver('console_debug');
         }
     }
 
-    public static function disableCliDebugOutput()
+    public static function disableCliDebugOutput(bool $silence): void
     {
         if (Laravel::isBooted()) {
-            Log::setDefaultDriver(app()->runningInConsole() ? 'console' : 'stack');
+            Log::setDefaultDriver(app()->runningInConsole() && ! $silence ? 'console' : 'stack');
         }
     }
 
-    public static function enableQueryDebug()
+    public static function enableQueryDebug(): void
     {
         static $sql_debug_enabled;
         $db = Eloquent::DB();

@@ -28,6 +28,7 @@ namespace App\Polling\Measure;
 use DB;
 use Illuminate\Database\Events\QueryExecuted;
 use Illuminate\Support\Collection;
+use Log;
 
 class MeasurementManager
 {
@@ -82,8 +83,12 @@ class MeasurementManager
      */
     public function printChangedStats(): void
     {
-        printf(
-            '>> %sSNMP%s: [%d/%.2fs] %sMySQL%s: [%d/%.2fs]',
+        $dsStats = app('Datastore')->getStats()->map(function (MeasurementCollection $stats, $datastore) {
+            return sprintf('%s%s%s: [%d/%.2fs]', self::DATASTORE_COLOR, $datastore, self::NO_COLOR, $stats->getCountDiff(), $stats->getDurationDiff());
+        });
+
+        Log::info(sprintf(
+            '>> %sSNMP%s: [%d/%.2fs] %sMySQL%s: [%d/%.2fs] %s',
             self::SNMP_COLOR,
             self::NO_COLOR,
             $this->getCategory('snmp')->getCountDiff(),
@@ -91,16 +96,11 @@ class MeasurementManager
             self::DB_COLOR,
             self::NO_COLOR,
             $this->getCategory('db')->getCountDiff(),
-            $this->getCategory('db')->getDurationDiff()
-        );
-
-        app('Datastore')->getStats()->each(function (MeasurementCollection $stats, $datastore) {
-            printf(' %s%s%s: [%d/%.2fs]', self::DATASTORE_COLOR, $datastore, self::NO_COLOR, $stats->getCountDiff(), $stats->getDurationDiff());
-        });
+            $this->getCategory('db')->getDurationDiff(),
+            $dsStats->implode(' ')
+        ));
 
         $this->checkpoint();
-
-        echo PHP_EOL;
     }
 
     /**
@@ -144,12 +144,17 @@ class MeasurementManager
 
     public function printSummary(string $name, MeasurementCollection $collection, string $color = ''): void
     {
-        printf('%s%s%s [%d/%.2fs]:', $color, $name, $color ? self::NO_COLOR : '', $collection->getTotalCount(), $collection->getTotalDuration());
-
-        $collection->each(function (MeasurementSummary $stat) {
-            printf(' %s[%d/%.2fs]', ucfirst($stat->getType()), $stat->getCount(), $stat->getDuration());
+        $summaries = $collection->map(function (MeasurementSummary $stat) {
+            return sprintf('%s[%d/%.2fs]', ucfirst($stat->getType()), $stat->getCount(), $stat->getDuration());
         });
 
-        echo PHP_EOL;
+        Log::info(sprintf('%s%s%s [%d/%.2fs]: %s',
+            $color,
+            $name,
+            $color ? self::NO_COLOR : '',
+            $collection->getTotalCount(),
+            $collection->getTotalDuration(),
+            $summaries->implode(' ')
+        ));
     }
 }

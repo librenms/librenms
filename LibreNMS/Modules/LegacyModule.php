@@ -50,7 +50,7 @@ class LegacyModule implements Module
     {
         $device = &$os->getDeviceArray();
         $device['attribs'] = $os->getDevice()->attribs->toArray();
-        Debug::set(Debug::isEnabled());
+        Debug::set(Debug::isEnabled(), \Log::getDefaultDriver() == 'stack');
 
         include_once base_path('includes/dbFacile.php');
 
