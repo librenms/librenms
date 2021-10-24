@@ -30,7 +30,7 @@ use LibreNMS\Interfaces\Module;
 use LibreNMS\Interfaces\Polling\OSPolling;
 use LibreNMS\Util\Url;
 
-class OS implements Module
+class Os implements Module
 {
     public function discover(\LibreNMS\OS $os)
     {
