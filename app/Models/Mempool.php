@@ -4,6 +4,7 @@ namespace App\Models;
 
 use Illuminate\Support\Str;
 use LibreNMS\Interfaces\Models\Keyable;
+use LibreNMS\Util\Number;
 
 class Mempool extends DeviceRelatedModel implements Keyable
 {
@@ -50,9 +51,9 @@ class Mempool extends DeviceRelatedModel implements Keyable
     public function fillUsage($used = null, $total = null, $free = null, $percent = null)
     {
         try {
-            $total = $this->correctNegative($total);
-            $used = $this->correctNegative($used, $total);
-            $free = $this->correctNegative($free, $total);
+            $total = Number::correctIntegerOverflow($total);
+            $used = Number::correctIntegerOverflow($used, $total);
+            $free = Number::correctIntegerOverflow($free, $total);
         } catch (\Exception $e) {
             d_echo($e->getMessage());
 
@@ -145,20 +146,6 @@ class Mempool extends DeviceRelatedModel implements Keyable
     public function getCompositeKey()
     {
         return "$this->mempool_type-$this->mempool_index";
-    }
-
-    private function correctNegative($value, $max = null)
-    {
-        $int_max = 4294967296;
-        if ($value < 0) {
-            // assume unsigned/signed issue
-            $value = $int_max + $value;
-            if (($max && $value > $max) || $value > $int_max) {
-                throw new \Exception('Uncorrectable negative value');
-            }
-        }
-
-        return $value;
     }
 
     private function calculateTotal($total, $used, $free)
