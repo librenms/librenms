@@ -39,7 +39,7 @@ class DevicePoll extends LnmsCommand
         }
 
         try {
-            $poller = new Poller($this->argument('device spec'), explode(',', $this->option('modules')), $this->output);
+            $poller = app(Poller::class, ['device_spec' => $this->argument('device spec'), 'module_override' => explode(',', $this->option('modules'))]);
             $polled = $poller->poll();
 
             if ($polled > 0) {

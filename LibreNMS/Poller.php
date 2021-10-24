@@ -27,13 +27,13 @@ namespace LibreNMS;
 
 use App\Events\DevicePolled;
 use App\Models\Device;
-use App\Models\DeviceGraph;
 use App\Polling\Measure\Measurement;
 use App\Polling\Measure\MeasurementManager;
 use Carbon\Carbon;
 use DB;
 use Exception;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Log\LogManager;
 use Illuminate\Support\Str;
 use LibreNMS\Exceptions\PollerException;
 use LibreNMS\Modules\LegacyModule;
@@ -43,7 +43,6 @@ use LibreNMS\Util\Debug;
 use LibreNMS\Util\Dns;
 use LibreNMS\Util\Git;
 use LibreNMS\Util\StringHelpers;
-use Log;
 
 class Poller
 {
@@ -51,10 +50,6 @@ class Poller
     private $device_spec;
     /** @var array */
     private $module_override;
-    /**
-     * @var \Illuminate\Console\OutputStyle
-     */
-    private $output;
 
     /**
      * @var Device
@@ -68,12 +63,16 @@ class Poller
      * @var \LibreNMS\OS|\LibreNMS\OS\Generic
      */
     private $os;
+    /**
+     * @var \Illuminate\Log\LogManager
+     */
+    private $logger;
 
-    public function __construct(string $device_spec, array $module_override, \Illuminate\Console\OutputStyle $output)
+    public function __construct(string $device_spec, array $module_override, LogManager $logger)
     {
         $this->device_spec = $device_spec;
         $this->module_override = $module_override;
-        $this->output = $output;
+        $this->logger = $logger;
         $this->parseModules();
     }
 
@@ -86,8 +85,7 @@ class Poller
             \LibreNMS\Util\OS::updateCache(true); // Force update of OS Cache
         }
 
-        $this->output->writeln('Starting polling run:');
-        $this->output->newLine();
+        $this->logger->info("Starting polling run:\n");
 
         foreach ($this->buildDeviceQuery()->pluck('device_id') as $device_id) {
             $this->initDevice($device_id);
@@ -117,18 +115,15 @@ class Poller
                 ]);
                 $this->os->enableGraph('poller_perf');
 
-                $this->output->write('Enabling graphs: ');
                 if ($helper->canPing()) {
                     $this->os->enableGraph('ping_perf');
                 }
-                DeviceGraph::deleted(function ($graph) {
-                    $this->output->write('-');
-                });
-                DeviceGraph::created(function ($graph) {
-                    $this->output->write('+');
-                });
+
                 $this->os->persistGraphs();
-                $this->output->newLine(2);
+                $this->logger->info(sprintf("Enabled graphs (%s): %s\n\n",
+                    $this->device->graphs->count(),
+                    $this->device->graphs->pluck('graph')->implode(' ')
+                ));
             }
 
             $this->device->save();
@@ -136,13 +131,14 @@ class Poller
 
             DevicePolled::dispatch($this->device);
 
-            $this->output->newLine(1);
-            $name = $this->device->displayName();
-            $this->output->writeln(sprintf(">>> Polled $name ({$this->device->device_id}) in %0.3f seconds <<<", $measurement->getDuration()));
+            $this->logger->info(sprintf("\n>>> Polled %s (%s) in %0.3f seconds <<<",
+                $this->device->displayName(),
+                $this->device->device_id,
+                $measurement->getDuration()));
 
             // check if the poll took too long and log an event
             if ($measurement->getDuration() > Config::get('rrd.step')) {
-                Log::event('Polling took longer than ' . round(Config::get('rrd.step') / 60, 2) .
+                $this->logger->event('Polling took longer than ' . round(Config::get('rrd.step') / 60, 2) .
                     ' minutes!  This will cause gaps in graphs.', $this->device, 'system', 5);
             }
         }
@@ -169,8 +165,7 @@ class Poller
             if ($this->isModuleEnabled($module, $module_status)) {
                 $start_memory = memory_get_usage();
                 $module_start = microtime(true);
-                $this->output->newLine();
-                $this->output->writeln("#### Load poller module $module ####");
+                $this->logger->info("\n#### Load poller module $module ####");
 
                 try {
                     $module_class = StringHelpers::toClass($module, '\\LibreNMS\\Modules\\');
@@ -178,15 +173,12 @@ class Poller
                     $instance->poll($this->os);
                 } catch (Exception $e) {
                     // isolate module exceptions so they don't disrupt the polling process
-                    $this->output->writeln($e->getTraceAsString());
-                    $this->output->error("Error in $module module. " . $e->getMessage());
-                    Log::error("Error in $module module. " . $e->getMessage() . PHP_EOL . $e->getTraceAsString() . PHP_EOL);
+                    $this->logger->error("Error in $module module. " . $e->getMessage() . PHP_EOL . $e->getTraceAsString() . PHP_EOL);
                 }
 
                 app(MeasurementManager::class)->printChangedStats();
                 $this->saveModulePerformance($module, $module_start, $start_memory);
-                $this->output->writeln("#### Unload poller module $module ####");
-                $this->output->newLine();
+                $this->logger->info("#### Unload poller module $module ####\n");
             }
         }
     }
@@ -196,7 +188,7 @@ class Poller
         $module_time = microtime(true) - $start_time;
         $module_mem = (memory_get_usage() - $start_memory);
 
-        $this->output->writeln(sprintf(">> Runtime for poller module '%s': %.4f seconds with %s bytes", $module, $module_time, $module_mem));
+        $this->logger->info(sprintf(">> Runtime for poller module '%s': %.4f seconds with %s bytes", $module, $module_time, $module_mem));
 
         app('Datastore')->put($this->deviceArray, 'poller-perf', [
             'module' => $module,
@@ -212,7 +204,7 @@ class Poller
     {
         if (! empty($this->module_override)) {
             if (in_array($module, $this->module_override)) {
-                Log::debug("Module $module manually enabled");
+                $this->logger->debug("Module $module manually enabled");
 
                 return true;
             }
@@ -222,7 +214,7 @@ class Poller
 
         $os_module_status = Config::get("os.{$this->device->os}.poller_modules.$module");
         $device_attrib = $this->device->getAttrib('poll_' . $module);
-        Log::debug(sprintf('Modules status: Global %s OS %s Device %s',
+        $this->logger->debug(sprintf('Modules status: Global %s OS %s Device %s',
             $global_status ? '+' : '-',
             $os_module_status === null ? ' ' : ($os_module_status ? '+' : '-'),
             $device_attrib === null ? ' ' : ($device_attrib ? '+' : '-')
@@ -236,7 +228,7 @@ class Poller
 
         $reason = $device_attrib !== null ? 'by device'
                 : ($os_module_status === null || $os_module_status ? 'globally' : 'by OS');
-        Log::debug("Module [ $module ] disabled $reason");
+        $this->logger->debug("Module [ $module ] disabled $reason");
 
         return false;
     }
@@ -288,7 +280,7 @@ class Poller
         $host_rrd = \Rrd::name($this->device->hostname, '', '');
         if (Config::get('rrd.enable', true) && ! is_dir($host_rrd)) {
             mkdir($host_rrd);
-            $this->output->writeln("Created directory : $host_rrd");
+            $this->logger->info("Created directory : $host_rrd");
         }
     }
 
@@ -331,13 +323,13 @@ class Poller
 
     private function printDeviceInfo(?string $group): void
     {
-        $this->output->writeln(sprintf(<<<'EOH'
+        $this->logger->info(sprintf(<<<'EOH'
 Hostname:  %s %s
 ID:        %s
 OS:        %s
 IP:        %s
+
 EOH, $this->device->hostname, $group ? " ($group)" : '', $this->device->device_id, $this->device->os, $this->device->ip));
-        $this->output->newLine();
     }
 
     private function printModules(): void
@@ -348,14 +340,14 @@ EOH, $this->device->hostname, $group ? " ($group)" : '', $this->device->device_i
             return $module . ($submodules ? '(' . implode(',', $submodules) . ')' : '');
         }, array_keys(Config::get('poller_modules', [])));
 
-        Log::debug('Override poller modules: ' . implode(', ', $modules));
+        $this->logger->debug('Override poller modules: ' . implode(', ', $modules));
     }
 
     private function printHeader(): void
     {
         if (Debug::isEnabled() || Debug::isVerbose()) {
             $version = \LibreNMS\Util\Version::get();
-            $this->output->writeln(sprintf(<<<'EOH'
+            $this->logger->info(sprintf(<<<'EOH'
 ===================================
 Version info:
 Commit SHA: %s
