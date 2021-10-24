@@ -18,6 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ * 
  * @author     H. DAY
  */
 
@@ -25,9 +26,9 @@ namespace LibreNMS\OS;
 
 use LibreNMS\Device\WirelessSensor;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessCellDiscovery;
-use LibreNMS\Interfaces\Discovery\Sensors\WirelessRssiDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessRsrpDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessRsrqDiscovery;
+use LibreNMS\Interfaces\Discovery\Sensors\WirelessRssiDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessSinrDiscovery;
 use LibreNMS\OS;
 
@@ -37,6 +38,7 @@ class RutosRutx extends OS implements
     WirelessRsrqDiscovery,
     WirelessSinrDiscovery,
     WirelessCellDiscovery
+
 {    
     public function discoverWirelessRssi()
     {
@@ -57,6 +59,7 @@ class RutosRutx extends OS implements
         }
 
         return $sensors;
+
     }
     
     public function discoverWirelessRsrp()
@@ -78,6 +81,7 @@ class RutosRutx extends OS implements
         }
 
         return $sensors;
+        
     }
     
     public function discoverWirelessRsrq()
