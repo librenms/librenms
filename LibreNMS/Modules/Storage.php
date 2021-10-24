@@ -41,7 +41,9 @@ class Storage implements \LibreNMS\Interfaces\Module
     public function discover(OS $os): void
     {
         if ($os instanceof StorageDiscovery) {
-            $data = $os->discoverStorage();
+            $data = $os->discoverStorage()->filter->isValid($os->getName());
+
+            dd($data->toArray());
 
             ModuleModelObserver::observe(\App\Models\Storage::class);
             $this->syncModels($os->getDevice(), 'storage', $data);
