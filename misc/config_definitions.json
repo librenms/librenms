@@ -1,4 +1,4 @@
-{
+{" \
     "Warning!": "Please don't edit this file -- make changes to the config database table or the configuration array in config.php",
     "config": {
         "active_directory.users_purge": {
@@ -213,7 +213,7 @@
             "order": 7
         },
         "discovery_on_reboot": {
-            "default": true,
+            "default": false,
             "type": "boolean",
             "group": "discovery",
             "section": "general",
