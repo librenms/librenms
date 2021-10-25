@@ -35,7 +35,7 @@ $oids = snmp_walk($device, '.1.3.6.1.4.1.14988.1.1.8.1.1.2', '-Osqn', '');
 $oids = trim($oids);
 
 if ($oids) {
-    echo 'Mikrotik VLANs '."\n";
+    echo 'Mikrotik VLANs ' . "\n";
 
     foreach (explode("\n", $oids) as $data) {
         if ($data) {
@@ -61,7 +61,7 @@ if (isset($sIndex)) {
         $vType = trim(explode(',', $line)[0]);
         $vId = trim(explode(',', $line)[1]);
         $vIf = trim(explode(',', $line)[2]);
-        $vName = 'Vlan_'.$vId;
+        $vName = 'Vlan_' . $vId;
 
         if ($oldId != $vId) {
             $oldId = $vId;
