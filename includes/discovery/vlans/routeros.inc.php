@@ -27,40 +27,20 @@
 // data format is: type,vlanId,ifName <cr>
 // i.e: T,254,ether1 is translated to: tagged vlan 254 on ether1
 
-use App\Models\Port;
 use App\Models\Vlan;
-use log;
 
-$oids = snmp_walk($device, '.1.3.6.1.4.1.14988.1.1.8.1.1.2', '-Osqn', '');
-$oids = trim($oids);
-
-if ($oids) {
-    echo 'Mikrotik VLANs ' . "\n";
-
-    foreach (explode("\n", $oids) as $data) {
-        if ($data) {
-            $split = trim(explode(' ', $data)[0]);
-            $value = trim(explode(' ', $data)[1]);
-            $si = explode('.', $split)[14]; //Script Index
-            // Script name is "LNMS_vlans"
-            if ($value == 'LNMS_vlans') {
-                $sIndex = $si;
-            }
-        }
-    }
-}
+$scripts = SnmpQuery::walk('MIKROTIK-MIB::mtxrScriptName')->table();
+$sIndex = array_flip($scripts['MIKROTIK-MIB::mtxrScriptName'] ?? [])['LNMS_vlans'] ?? null;
 
 if (isset($sIndex)) {
-    d_echo('Mikrotik script found');
+    echo "Mikrotik VLANs \n";
     $vlanversion = 1;
-    $data = snmp_get($device, '.1.3.6.1.4.1.14988.1.1.18.1.1.2.' . $sIndex, '-Ovq', '');
-    $data = trim($data);
+    $data = SnmpQuery::get('MIKROTIK-MIB::mtxrScriptRunOutput.' . $sIndex)->value();
+    $ifNames = array_flip($os->getCacheByIndex('ifName', 'IF-MIB'));
     $oldId = 0;
 
     foreach (preg_split("/((\r?\n)|(\r\n?))/", $data) as $line) {
-        $vType = trim(explode(',', $line)[0]);
-        $vId = trim(explode(',', $line)[1]);
-        $vIf = trim(explode(',', $line)[2]);
+        [$vType, $vId, $vIf] = array_map('trim', explode(',', $line));
         $vName = 'Vlan_' . $vId;
 
         if ($oldId != $vId) {
@@ -70,35 +50,31 @@ if (isset($sIndex)) {
             $device['vlans'][1][$vId] = $vId;
 
             //try to get existing data
-            $old_data = Vlan::where('device_id', $device['device_id'])->where('vlan_vlan', $vId)->get()->first->toArray();
+            $vlan = Vlan::firstOrNew([
+                'device_id' => $device['device_id'],
+                'vlan_vlan' => $vId,
+            ], [
+                'vlan_domain' => 1,
+                'vlan_name' => $vName,
+            ]);
 
-            if (isset($old_data)) {
-                if ($old_data->vlan_name != $vName) {
-                    Vlan::where('device_id', $device['device_id'])->where('vlan_vlan', $vId)->update(['vlan_name'=>$vName]);
-                    Log::event('Vlan id: ' . $vId . ' changed name to: ' . $vName, $device['device_id'], 'vlan', 4);
-                }
-            } else {
-                //vlan does not exist, create new entry
-                $new_data = new Vlan();
-                $new_data->device_id = $device['device_id'];
-                $new_data->vlan_domain = 1;
-                $new_data->vlan_vlan = $vId;
-                $new_data->vlan_name = $vName;
-                $new_data->save();
-                Log::event('Vlan id: ' . $vId . ' added', $device['device_id'], 'vlan', 4);
+            if ($vlan->isDirty('vlan_name')) {
+                Log::event("Vlan id: $vId changed name to: $vName from " . $vlan->getOriginal('vlan_name'), $device['device_id'], 'vlan', 4);
             }
+
+            if (! $vlan->exists) {
+                Log::event("Vlan id: $vId: $vName added", $device['device_id'], 'vlan', 4);
+            }
+
+            $vlan->save();
         }
 
         //find ifIndex connected to ifName on current device
-        $port = Port::where('device_id', $device['device_id'])->where('ifName', $vIf)->get()->first->toArray();
-        $ifIndex = $port->ifIndex;
+
+        $ifIndex = $ifNames[$vIf];
         d_echo("\n ifIndex from DB: $ifIndex \n");
 
         //populate per_vlan_data
-        if ($vType == 'U') {
-            $per_vlan_data[$vId][$ifIndex]['untagged'] = 1;
-        } else {
-            $per_vlan_data[$vId][$ifIndex]['untagged'] = 0;
-        }
+        $per_vlan_data[$vId][$ifIndex]['untagged'] = $vType == 'U' ? 1 : 0;
     }
 }
