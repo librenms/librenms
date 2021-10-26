@@ -10,5 +10,25 @@ over:
 discovery:
     -
         sysObjectID:
-            - .1.3.6.1.4.1.1872.1.13.3.5
-            - .1.3.6.1.4.1.1872.2.
+            - .1.3.6.1.4.1.1872.1.13.1.1      # Nortel Alteon Application Switch 2424
+            - .1.3.6.1.4.1.1872.1.13.1.2      # Nortel Alteon Application Switch 2448
+            - .1.3.6.1.4.1.1872.1.13.1.3      # Nortel Alteon Application Switch 2224
+            - .1.3.6.1.4.1.1872.1.13.1.4	    # Nortel Alteon Application Switch 2424-SSL
+            - .1.3.6.1.4.1.1872.1.13.1.5	    # Nortel Alteon Application Switch 2208	
+            - .1.3.6.1.4.1.1872.1.13.1.6      # Nortel Alteon Application Switch 2216	
+            - .1.3.6.1.4.1.1872.1.13.1.7      # Nortel Alteon Application Switch 2424 E
+            - .1.3.6.1.4.1.1872.1.13.1.8      # Nortel Alteon Application Switch 2424s E5
+            - .1.3.6.1.4.1.1872.1.13.1.9      # Nortel Alteon Application Switch 2208 E
+            - .1.3.6.1.4.1.1872.1.13.1.10     # Nortel Alteon Application Switch 2216 E
+            - .1.3.6.1.4.1.1872.1.13.2.1	    # Nortel Alteon Application Switch 3408
+            - .1.3.6.1.4.1.1872.1.13.2.2	    # Nortel Alteon Application Switch 3416
+            - .1.3.6.1.4.1.1872.1.13.2.3      # Nortel Alteon Application Switch 3408 E
+            - .1.3.6.1.4.1.1872.1.13.3.1      # Radware Alteon Application Switch 4416
+            - .1.3.6.1.4.1.1872.1.13.3.2      # Radware Alteon Application Switch 5412
+            - .1.3.6.1.4.1.1872.1.13.3.3      # Radware Alteon Application Switch 4408
+            - .1.3.6.1.4.1.1872.1.13.3.4      # Radware Alteon Virtual Appliance
+            - .1.3.6.1.4.1.1872.1.13.3.5      # Radware Alteon Application Switch 5224XL
+            - .1.3.6.1.4.1.1872.1.13.3.6      # Radware Alteon Application Switch 10000
+            -  1.3.6.1.4.1.1872.1.13.3.9      # Radware Alteon Application Switch 6420
+            - .1.3.6.1.4.1.1872.1.13.3.10 	  # Radware Alteon Application Switch 5208
+            - .1.3.6.1.4.1.1872.1.13.3.12     # Radware Alteon Application Switch 6024XL
