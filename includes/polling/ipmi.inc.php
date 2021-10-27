@@ -8,11 +8,12 @@ $ipmi_rows = dbFetchRows("SELECT * FROM sensors WHERE device_id = ? AND poller_t
 if (is_array($ipmi_rows)) {
     d_echo($ipmi_rows);
 
-    if ($ipmi['host'] = $attribs['ipmi_hostname']) {
-        $ipmi['port'] = filter_var($attribs['ipmi_port'], FILTER_VALIDATE_INT) ? $attribs['ipmi_port'] : '623';
-        $ipmi['user'] = $attribs['ipmi_username'];
-        $ipmi['password'] = $attribs['ipmi_password'];
-        $ipmi['type'] = $attribs['ipmi_type'];
+    if (isset($device['attribs']['ipmi_hostname'])) {
+        $ipmi['host'] = $device['attribs']['ipmi_hostname'];
+        $ipmi['port'] = filter_var($device['attribs']['ipmi_port'], FILTER_VALIDATE_INT) ? $device['attribs']['ipmi_port'] : '623';
+        $ipmi['user'] = $device['attribs']['ipmi_username'];
+        $ipmi['password'] = $device['attribs']['ipmi_password'];
+        $ipmi['type'] = $device['attribs']['ipmi_type'];
 
         echo 'Fetching IPMI sensor data...';
 

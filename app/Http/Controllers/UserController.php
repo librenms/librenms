@@ -31,6 +31,7 @@ use App\Models\AuthLog;
 use App\Models\Dashboard;
 use App\Models\User;
 use App\Models\UserPref;
+use Auth;
 use Illuminate\Support\Str;
 use LibreNMS\Authentication\LegacyAuth;
 use LibreNMS\Config;
@@ -168,6 +169,15 @@ class UserController extends Controller
     {
         if ($request->get('new_password') && $user->canSetPassword($request->user())) {
             $user->setPassword($request->new_password);
+            /** @var User $current_user */
+            $current_user = Auth::user();
+            Auth::setUser($user); // make sure new password is loaded, can only logout other sessions for the active user
+            Auth::logoutOtherDevices($request->new_password);
+
+            // when setting the password on another account, restore back to the user's account.
+            if ($current_user->user_id !== $user->user_id) {
+                Auth::setUser($current_user);
+            }
         }
 
         $user->fill($request->all());
@@ -176,17 +186,15 @@ class UserController extends Controller
             Toastr::success(__('Updated dashboard for :username', ['username' => $user->username]));
         }
 
-        if ($user->isDirty()) {
-            if ($user->save()) {
-                Toastr::success(__('User :username updated', ['username' => $user->username]));
-            } else {
-                Toastr::error(__('Failed to update user :username', ['username' => $user->username]));
+        if ($user->save()) {
+            Toastr::success(__('User :username updated', ['username' => $user->username]));
 
-                return redirect()->back();
-            }
+            return redirect(route(Str::contains(URL::previous(), 'preferences') ? 'preferences.index' : 'users.index'));
         }
 
-        return redirect(route(Str::contains(URL::previous(), 'preferences') ? 'preferences.index' : 'users.index'));
+        Toastr::error(__('Failed to update user :username', ['username' => $user->username]));
+
+        return redirect()->back();
     }
 
     /**

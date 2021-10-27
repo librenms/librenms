@@ -374,7 +374,7 @@ class PingQueueManager(TimedQueueManager):
         :param lock_manager: the single instance of lock manager
         """
         TimedQueueManager.__init__(
-            self, config, lock_manager, "ping", False, config.ping.enabled
+            self, config, lock_manager, "ping", True, config.ping.enabled
         )
         self._db = LibreNMS.DB(self.config)
 
@@ -410,7 +410,7 @@ class ServicesQueueManager(TimedQueueManager):
         :param lock_manager: the single instance of lock manager
         """
         TimedQueueManager.__init__(
-            self, config, lock_manager, "services", False, config.services.enabled
+            self, config, lock_manager, "services", True, config.services.enabled
         )
         self._db = LibreNMS.DB(self.config)
 
@@ -527,7 +527,7 @@ class DiscoveryQueueManager(TimedQueueManager):
         :param lock_manager: the single instance of lock manager
         """
         TimedQueueManager.__init__(
-            self, config, lock_manager, "discovery", False, config.discovery.enabled
+            self, config, lock_manager, "discovery", True, config.discovery.enabled
         )
         self._db = LibreNMS.DB(self.config)
 

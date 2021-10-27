@@ -227,7 +227,6 @@ class AuthSSOTest extends DBTestCase
         $a = LegacyAuth::reset();
 
         $this->assertFalse($a->canUpdatePasswords());
-        $this->assertFalse($a->changePassword(null, null));
         $this->assertTrue($a->canManageUsers());
         $this->assertTrue($a->canUpdateUsers());
         $this->assertTrue($a->authIsExternal());

@@ -20,6 +20,7 @@
             return {
                 id: "alertlog",
                 device_id: "",
+                device_group: "{{ $device_group }}",
                 state: '{{ $state }}',
                 min_severity: '{{ $min_severity }}',
             };

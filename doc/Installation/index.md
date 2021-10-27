@@ -17,7 +17,7 @@ This document includes instructions for:
 
  - Ubuntu 20.04
  - RHEL / CentOS 8
- - Debian 10
+ - Debian 11
 
 ** [Install LibreNMS](Install-LibreNMS.md) **
 
@@ -34,7 +34,7 @@ These install docs are no longer updated and may result in an unsuccessful insta
 
 - [Ubuntu 18.04 Apache](Installation-Ubuntu-1804-Apache/)
 - [Ubuntu 18.04 Nginx](Installation-Ubuntu-1804-Nginx/)
-- [Debian 10 Nginx](Installation-Debian-10-Nginx/)
+- [Debian 11 Nginx](Installation-Debian-11-Nginx/)
 - [RHEL / CentOS 7 Apache](Installation-CentOS-7-Apache/)
 - [RHEL / CentOS 7 Nginx](Installation-CentOS-7-Nginx/)
 - [Ubuntu 16.04 Apache](Installation-Ubuntu-1604-Apache/)

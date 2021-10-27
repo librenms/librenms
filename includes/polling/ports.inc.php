@@ -213,7 +213,7 @@ $port_stats = [];
 if ($device['os'] === 'f5' && (version_compare($device['version'], '11.2.0', '>=') && version_compare($device['version'], '11.7', '<'))) {
     require 'ports/f5.inc.php';
 } else {
-    if (Config::getOsSetting($device['os'], 'polling.selected_ports') || $device['attribs']['selected_ports'] == 'true') {
+    if (Config::getOsSetting($device['os'], 'polling.selected_ports') || (isset($device['attribs']['selected_ports']) && $device['attribs']['selected_ports'] == 'true')) {
         echo 'Selected ports polling ';
 
         // remove the deleted and disabled ports and mark them skipped
@@ -321,7 +321,7 @@ if (file_exists($os_file)) {
 }
 
 if (Config::get('enable_ports_adsl')) {
-    $device['xdsl_count'] = dbFetchCell("SELECT COUNT(*) FROM `ports` WHERE `device_id` = ? AND `ifType` in ('adsl','vdsl')", [$device['device_id']]);
+    $device['xdsl_count'] = dbFetchCell("SELECT COUNT(*) FROM `ports` WHERE `device_id` = ? AND `ifType` in ('adsl','vdsl','vdsl2')", [$device['device_id']]);
 }
 
 if ($device['xdsl_count'] > '0') {
@@ -667,14 +667,14 @@ foreach ($ports as $port) {
         $tune_port = false;
         foreach ($data_oids as $oid) {
             if ($oid == 'ifAlias') {
-                if ($attribs['ifName:' . $port['ifName']]) {
+                if ($device['attribs']['ifName:' . $port['ifName']]) {
                     $this_port['ifAlias'] = $port['ifAlias'];
                 } else {
                     $this_port['ifAlias'] = \LibreNMS\Util\StringHelpers::inferEncoding($this_port['ifAlias']);
                 }
             }
             if ($oid == 'ifSpeed') {
-                if ($attribs['ifSpeed:' . $port['ifName']]) {
+                if ($device['attribs']['ifSpeed:' . $port['ifName']]) {
                     $this_port['ifSpeed'] = $port['ifSpeed'];
                 }
             }
@@ -691,8 +691,8 @@ foreach ($ports as $port) {
                 // if the value is different, update it
 
                 // rrdtune if needed
-                $port_tune = $attribs['ifName_tune:' . $port['ifName']];
-                $device_tune = $attribs['override_rrdtool_tune'];
+                $port_tune = $device['attribs']['ifName_tune:' . $port['ifName']];
+                $device_tune = $device['attribs']['override_rrdtool_tune'];
                 if ($port_tune == 'true' ||
                     ($device_tune == 'true' && $port_tune != 'false') ||
                     (Config::get('rrdtool_tune') == 'true' && $port_tune != 'false' && $device_tune != 'false')) {

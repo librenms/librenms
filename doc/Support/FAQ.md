@@ -119,7 +119,7 @@ it then it could be that the php memory limit needs to be increased in
 ## <a name="faq10"> Why do I not see any graphs?</a>
 
 The easiest way to check if all is well is to run `./validate.php` as
-root from within your install directory. This should give you info on
+librenms from within your install directory. This should give you info on
 why things aren't working.
 
 One other reason could be a restricted snmpd.conf file or snmp view
@@ -231,7 +231,7 @@ We have a few things you can try:
 
 ## <a name="faq18"> Things aren't working correctly?</a>
 
-Run `./validate.php` as root from within your install.
+Run `./validate.php` as librenms from within your install.
 
 Re-run `./validate.php` once you've resolved any issues raised.
 
