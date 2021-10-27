@@ -414,6 +414,26 @@ if (Config::get('enable_ports_poe')) {
             $if_id = $port_ent_to_if[$p_index];
             $port_stats[$if_id] = array_merge($port_stats[$if_id], $p_stats);
         }
+    } elseif ($device['os'] == 'netgear') {
+
+        echo 'agentPethPsePortEntry';
+
+        $port_stats_poe = snmpwalk_cache_oid($device, 'agentPethPsePortEntry', [], 'NETGEAR-POWER-ETHERNET-MIB');
+        $port_stats_poe_std_oid = snmpwalk_cache_oid($device, 'pethPsePortEntry', [], 'POWER-ETHERNET-MIB');
+        $ifTable_ifDescr = snmpwalk_cache_oid($device, 'ifDescr', [], 'IF-MIB');
+
+        $port_ent_to_if = [];
+        foreach ($ifTable_ifDescr as $if_index => $if_descr) {
+           $port_ent_to_if["1.$if_index"] = $if_index;
+        }
+        foreach ($port_stats_poe as $p_index => $p_stats) {
+            $if_id = $port_ent_to_if[$p_index];
+            $port_stats[$if_id] = array_merge($port_stats[$if_id], $p_stats);
+        }
+        foreach ($port_stats_poe_std_oid as $p_index => $p_stats) {
+            $if_id = $port_ent_to_if[$p_index];
+            $port_stats[$if_id] = array_merge($port_stats[$if_id], $p_stats);
+        }
     }
 }
 

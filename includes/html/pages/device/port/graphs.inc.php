@@ -55,6 +55,42 @@ if (Rrd::checkRrdExists(get_port_rrdfile_path($device['hostname'], $port['port_i
         echo '</div></div>';
     }
 
+    if (Rrd::checkRrdExists(get_port_rrdfile_path($device['hostname'], $port['port_id'], 'poe-netgear-voltage'))) {
+        echo '<div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title">PoE-Netgear-Voltage-Delivery</h3>
+            </div>';
+        $graph_type = 'port_poe_netgear_voltage';
+
+        echo '<div class="panel-body">';
+        include 'includes/html/print-interface-graphs.inc.php';
+        echo '</div></div>';
+    }
+
+    if (Rrd::checkRrdExists(get_port_rrdfile_path($device['hostname'], $port['port_id'], 'poe-netgear-current'))) {
+        echo '<div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title">PoE-Netgear-Current-Delivery</h3>
+            </div>';
+        $graph_type = 'port_poe_netgear_current';
+
+        echo '<div class="panel-body">';
+        include 'includes/html/print-interface-graphs.inc.php';
+        echo '</div></div>';
+    }
+
+    if (Rrd::checkRrdExists(get_port_rrdfile_path($device['hostname'], $port['port_id'], 'poe-netgear-dev-class'))) {
+        echo '<div class="panel panel-default">
+            <div class="panel-heading">
+                <h3 class="panel-title">PoE-Netgear-Device-Class-Detected</h3>
+            </div>';
+        $graph_type = 'port_poe_netgear_dev_class';
+
+        echo '<div class="panel-body">';
+        include 'includes/html/print-interface-graphs.inc.php';
+        echo '</div></div>';
+    }
+
     if (Rrd::checkRrdExists(get_port_rrdfile_path($device['hostname'], $port['port_id'], 'dot3'))) {
         echo '<div class="panel panel-default">
             <div class="panel-heading">

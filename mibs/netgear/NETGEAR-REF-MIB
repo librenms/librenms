@@ -190,6 +190,19 @@ m4100-d12g-poe          OBJECT IDENTIFIER ::= { l2Rswitch 25 }
 m4100-12g-poe           OBJECT IDENTIFIER ::= { l2Rswitch 26 }
 m4100-24g-poe           OBJECT IDENTIFIER ::= { l2Rswitch 27 }
 
+m4300-8x8f              OBJECT IDENTIFIER ::= { stackswitch 27 }
+m4300-12x12f            OBJECT IDENTIFIER ::= { stackswitch 28 }
+m4300-24x24f            OBJECT IDENTIFIER ::= { stackswitch 29 }
+m4300-28g               OBJECT IDENTIFIER ::= { stackswitch 30 }
+m4300-52g               OBJECT IDENTIFIER ::= { stackswitch 31 }
+m4300-28g-poe           OBJECT IDENTIFIER ::= { stackswitch 32 }
+m4300-52g-poe           OBJECT IDENTIFIER ::= { stackswitch 33 }
+m4300-24x               OBJECT IDENTIFIER ::= { stackswitch 34 }
+m4300-48x               OBJECT IDENTIFIER ::= { stackswitch 35 }
+m4300-96x               OBJECT IDENTIFIER ::= { stackswitch 36 }
+m4300-16x               OBJECT IDENTIFIER ::= { stackswitch 37 }
+m4300-24xf              OBJECT IDENTIFIER ::= { stackswitch 38 }
+m4300-48xf              OBJECT IDENTIFIER ::= { stackswitch 39 }
 -- 
 -- GSM7324, GSM7312, FSM7326P, and GSM7224, are using two different styles
 -- of FP private MIB: dedicate and generic. For those using dedicated one, the sysOID
