@@ -10,5 +10,46 @@ over:
 discovery:
     -
         sysObjectID:
-            - .1.3.6.1.4.1.1872.1.13.3.5
-            - .1.3.6.1.4.1.1872.2.
+            - .1.3.6.1.4.1.1872.1.13.1.1      # Nortel Alteon Application Switch 2424
+            - .1.3.6.1.4.1.1872.1.13.1.2      # Nortel Alteon Application Switch 2448
+            - .1.3.6.1.4.1.1872.1.13.1.3      # Nortel Alteon Application Switch 2224
+            - .1.3.6.1.4.1.1872.1.13.1.4      # Nortel Alteon Application Switch 2424-SSL
+            - .1.3.6.1.4.1.1872.1.13.1.5      # Nortel Alteon Application Switch 2208
+            - .1.3.6.1.4.1.1872.1.13.1.6      # Nortel Alteon Application Switch 2216
+            - .1.3.6.1.4.1.1872.1.13.1.7      # Nortel Alteon Application Switch 2424 E
+            - .1.3.6.1.4.1.1872.1.13.1.8      # Nortel Alteon Application Switch 2424s E5
+            - .1.3.6.1.4.1.1872.1.13.1.9      # Nortel Alteon Application Switch 2208 E
+            - .1.3.6.1.4.1.1872.1.13.1.10     # Nortel Alteon Application Switch 2216 E
+            - .1.3.6.1.4.1.1872.1.13.2.1      # Nortel Alteon Application Switch 3408
+            - .1.3.6.1.4.1.1872.1.13.2.2      # Nortel Alteon Application Switch 3416
+            - .1.3.6.1.4.1.1872.1.13.2.3      # Nortel Alteon Application Switch 3408 E
+            - .1.3.6.1.4.1.1872.1.13.3.1      # Radware Alteon Application Switch 4416
+            - .1.3.6.1.4.1.1872.1.13.3.2.1    # Radware Alteon Application Switch 5412 (ADC-VX)
+            - .1.3.6.1.4.1.1872.1.13.3.2.2    # Radware Alteon Application Switch 5412 (vADC)
+            - .1.3.6.1.4.1.1872.1.13.3.3      # Radware Alteon Application Switch 4408
+            - .1.3.6.1.4.1.1872.1.13.3.4      # Radware Alteon Virtual Appliance
+            - .1.3.6.1.4.1.1872.1.13.3.5.1    # Radware Alteon Application Switch 5224XL (ADC-VX)
+            - .1.3.6.1.4.1.1872.1.13.3.5.2    # Radware Alteon Application Switch 5224XL (vADC)
+            - .1.3.6.1.4.1.1872.1.13.3.6.1    # Radware Alteon Application Switch 10000 (ADC-VX)
+            - .1.3.6.1.4.1.1872.1.13.3.6.2    # Radware Alteon Application Switch 10000 (vADC)
+            - .1.3.6.1.4.1.1872.1.13.3.7.1    # Radware Alteon Application Switch 4024 (ADC-VX)
+            - .1.3.6.1.4.1.1872.1.13.3.7.2    # Radware Alteon Application Switch 4024 (vADC)
+            - .1.3.6.1.4.1.1872.1.13.3.8.1    # Radware Alteon Application Switch 6420P (ADC-VX)
+            - .1.3.6.1.4.1.1872.1.13.3.8.2    # Radware Alteon Application Switch 6420p (vADC)
+            -  1.3.6.1.4.1.1872.1.13.3.9.1    # Radware Alteon Application Switch 6420 (ADC-VX)
+            -  1.3.6.1.4.1.1872.1.13.3.9.2    # Radware Alteon Application Switch 6420 (vADC)
+            - .1.3.6.1.4.1.1872.1.13.3.10.1   # Radware Alteon Application Switch 5208 (ADC-VX)
+            - .1.3.6.1.4.1.1872.1.13.3.10.2   # Radware Alteon Application Switch 5208 (vADC)
+            - .1.3.6.1.4.1.1872.1.13.3.11.1   # Radware Alteon Application Switch 8420 (ADC-VX)
+            - .1.3.6.1.4.1.1872.1.13.3.11.2   # Radware Alteon Application Switch 8420 (vADC)
+            - .1.3.6.1.4.1.1872.1.13.3.12.1   # Radware Alteon Application Switch 6024 (ADC-VX)
+            - .1.3.6.1.4.1.1872.1.13.3.12.2   # Radware Alteon Application Switch 6024 (vADC)
+            - .1.3.6.1.4.1.1872.1.13.3.13     # Radware Alteon Application Switch 8820
+            - .1.3.6.1.4.1.1872.1.13.3.14     # Radware Alteon Application Switch 4208
+            - .1.3.6.1.4.1.1872.1.13.3.15     # Radware Alteon Application Switch 7612
+            - .1.3.6.1.4.1.1872.1.13.3.16     # Radware Alteon Application Switch 7720
+            - .1.3.6.1.4.1.1872.1.13.3.17     # Radware Alteon Application Switch 9800
+            - .1.3.6.1.4.1.1872.1.13.3.18     # Radware Alteon Application Switch 5208-16
+            - .1.3.6.1.4.1.1872.1.13.3.19     # Radware Alteon Application Switch 5820
+            - .1.3.6.1.4.1.1872.1.13.3.20     # Radware Alteon Application Switch 5424
+            - .1.3.6.1.4.1.1872.1.13.3.21     # Radware Alteon Application Switch 4028
