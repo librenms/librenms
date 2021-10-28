@@ -36,12 +36,12 @@ use Symfony\Component\Process\Process;
 final class IPMICommand
 {
     /**
-     * @var array $command The command used passed to the executing process.
+     * @var array The command used passed to the executing process.
      */
     private $command;
 
     /**
-     * @var Process $proc The process used for executing the command.
+     * @var Process The process used for executing the command.
      */
     private $proc;
 

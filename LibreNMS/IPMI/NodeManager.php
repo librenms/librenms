@@ -55,17 +55,17 @@ final class NodeManager
     ];
 
     /**
-     * @var IPMIClient $client The IPMIClient object used for communicating with the host.
+     * @var IPMIClient The IPMIClient object used for communicating with the host.
      */
     private $client;
 
     /**
-     * @var string $slaveChannelPrefix The slave channel and address prefix for Intel Node Manager. Resolved by querying the SDR. Passed to ipmitool.
+     * @var string The slave channel and address prefix for Intel Node Manager. Resolved by querying the SDR. Passed to ipmitool.
      */
     private $slaveChannelPrefix = '';
 
     /**
-     * @var float|null $nmVersion The maximum Node Manager version supported by the host.
+     * @var float|null The maximum Node Manager version supported by the host.
      */
     private $nmVersion = null;
 

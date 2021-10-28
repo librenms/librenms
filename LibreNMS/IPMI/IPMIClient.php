@@ -34,39 +34,38 @@ use ErrorException;
 class IPMIClient
 {
     /**
-     * @var string $ipmiToolPath Absolute path to ipmitool binary.
+     * @var string Absolute path to ipmitool binary.
      */
     private $ipmiToolPath;
 
     /**
-     * @var string $host Hostname or address to connect to.
+     * @var string Hostname or address to connect to.
      */
     private $host;
 
     /**
-     * @var string $user IPMI username.
+     * @var string IPMI username.
      */
     private $user;
 
     /**
-     * @var string $password IPMI password.
+     * @var string IPMI password.
      */
     private $password;
 
     /**
-     * @var string|null $port IPMI port.
-     * @optio
+     * @var string|null IPMI port.
      */
     private $port = null;
 
     /**
-     * @var string $privLvl IPMI privilege level.
+     * @var string IPMI privilege level.
      */
     private $privLvl = 'USER';
 
     /**
-     * @var string $interface Connection interface to the BMC.
-     * 
+     * @var string Connection interface to the BMC.
+     *
      * @see https://linux.die.net/man/1/ipmitool ipmitool man pages.
      */
     private $interface = 'lanplus';
@@ -105,8 +104,8 @@ class IPMIClient
 
     /**
      * Sets the IPMI interface driver.
-     * 
-     * @param string $interface The connection interface passed to ipmitool.
+     *
+     * @param  string  $interface The connection interface passed to ipmitool.
      */
     public function setDriver(string $interface): void
     {
@@ -125,8 +124,8 @@ class IPMIClient
 
     /**
      * Set the port used by the client.
-     * 
-     * @param string|null $port The port used by ipmitool, or null for default.
+     *
+     * @param  string|null  $port The port used by ipmitool, or null for default.
      */
     public function setPort(?string $port): void
     {
@@ -153,7 +152,7 @@ class IPMIClient
 
     /**
      * Gets a list of sensors and threshold values reported by ipmitool.
-     * 
+     *
      * @return array A list of available sensors from ipmitool.
      */
     public function getSensors(): array
@@ -164,7 +163,7 @@ class IPMIClient
     /**
      * Gets a comma-separated list of sensor values from the
      * Sensor Data Repository (SDR).
-     * 
+     *
      * @return array Sensor readings from ipmitool.
      */
     public function getSensorDataRepository(): array
