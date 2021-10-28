@@ -105,7 +105,7 @@ class IPMIClient
     /**
      * Sets the IPMI interface driver.
      *
-     * @param  string  $interface The connection interface passed to ipmitool.
+     * @param  string  $interface  The connection interface passed to ipmitool.
      */
     public function setDriver(string $interface): void
     {
@@ -125,7 +125,7 @@ class IPMIClient
     /**
      * Set the port used by the client.
      *
-     * @param  string|null  $port The port used by ipmitool, or null for default.
+     * @param  string|null  $port  The port used by ipmitool, or null for default.
      */
     public function setPort(?string $port): void
     {

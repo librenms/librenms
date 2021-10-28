@@ -32,7 +32,7 @@ namespace LibreNMS\IPMI;
  * Intel Intelligent Power Node Manager is an IPMI OEM extension
  * which allows for power and thermal monitoring on supported platforms.
  * See spec. v1.5 sect. 1.3 for more information.
- * 
+ *
  * @see https://www.intel.com/content/dam/doc/technical-specification/intelligent-power-node-manager-1-5-specification.pdf v1.5 spec.
  * @see https://www.intel.com/content/dam/www/public/us/en/documents/technical-specifications/intelligent-power-node-manager-specification.pdf v2.0 spec.
  * @see https://www.intel.com/content/dam/www/public/us/en/documents/technical-specifications/intel-power-node-manager-v3-spec.pdf v3.0 spec.
