@@ -43,12 +43,12 @@ class NodeManagerTest extends TestCase
         // '2.5' => MISSING DATA. Please add test data if you access to Intel Node Manager 2.0+ equipment.
         // '3.0' => MISSING DATA. Please add test data if you access to Intel Node Manager 2.0+ equipment.
     ];
-    
+
     /**
      * @var string|null
      */
     private $sdr;
-    
+
     /**
      * @var array|null
      */

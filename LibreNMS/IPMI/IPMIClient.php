@@ -37,7 +37,7 @@ class IPMIClient
      * @var string
      */
     private $ipmiToolPath;
-    
+
     /**
      * @var string
      */
