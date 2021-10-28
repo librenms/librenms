@@ -146,7 +146,12 @@ final class NodeManager
     private function discoverNodeManager(): void
     {
         // See spec. v3 sect. 4.5 BMC requirements for Intel® NM Discovery
-        $sdr = bin2hex($this->client->getRawSDR());
+        $rawSdr = $this->client->getRawSDR();
+        if (! $rawSdr) {
+            return;
+        }
+
+        $sdr = bin2hex($rawSdr);
         if (! $sdr) {
             d_echo('SDR is empty!!');
 

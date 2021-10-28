@@ -44,6 +44,9 @@ class NodeManagerTest extends TestCase
         // '3.0' => MISSING DATA. Please add test data if you access to Intel Node Manager 2.0+ equipment.
     ];
 
+    /**
+     * @
+     */
     private ?string $sdr;
     private ?array $schema;
 
@@ -62,7 +65,7 @@ class NodeManagerTest extends TestCase
     {
         $expected = false;
         $client = $this->getMock('corrupt');
-        $this->sdr = false;
+        $this->sdr = null;
 
         $sut = new NodeManager($client);
         $actual = $sut->isPlatformSupported();

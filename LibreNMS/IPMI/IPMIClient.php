@@ -100,7 +100,7 @@ class IPMIClient
     /**
      * Gets a binary representation of the SDR record for this host.
      *
-     * @return string|false The SDR binary or false on failure.
+     * @return string|null The SDR binary or null on failure.
      */
     public function getRawSDR()
     {
@@ -111,7 +111,7 @@ class IPMIClient
         } catch (\Throwable $th) {
             echo 'Failed to fetch SDR: ' . $th->getMessage() . "\n";
 
-            return false;
+            return null;
         }
     }
 
