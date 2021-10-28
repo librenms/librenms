@@ -44,8 +44,8 @@ class NodeManagerTest extends TestCase
         // '3.0' => MISSING DATA. Please add test data if you access to Intel Node Manager 2.0+ equipment.
     ];
 
-    private mixed $sdr;
-    private mixed $schema;
+    private ?string $sdr;
+    private ?array $schema;
 
     public function testIsPlatformSupported_SDRNoIntelRecord_IsFalse(): void
     {
@@ -196,7 +196,7 @@ class NodeManagerTest extends TestCase
         return $mock;
     }
 
-    private static function validateSlaveAndChannel(mixed $schema, mixed $command): void
+    private static function validateSlaveAndChannel(?array $schema, ?string $command): void
     {
         if (! preg_match('/-t ' . $schema['slave'] . '/', $command)) {
             throw new Exception('IPMI command has an incorrect slave address.');
