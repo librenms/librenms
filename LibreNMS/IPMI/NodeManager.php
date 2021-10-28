@@ -64,7 +64,7 @@ final class NodeManager
         if (! isset($version) && ! isset($slaveChannelPrefix)) {
             $this->discoverNodeManager();
         } else {
-            $this->version = $version;
+            $this->nmVersion = $version;
             $this->slaveChannelPrefix = $slaveChannelPrefix;
         }
     }
