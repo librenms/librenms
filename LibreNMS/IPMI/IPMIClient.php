@@ -110,6 +110,7 @@ class IPMIClient
             return base64_decode($b64);
         } catch (\Throwable $th) {
             echo 'Failed to fetch SDR: ' . $th->getMessage() . "\n";
+
             return false;
         }
     }
