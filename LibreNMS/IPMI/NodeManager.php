@@ -55,24 +55,19 @@ final class NodeManager
     /**
      * Creates a new instance of the Intel Node Manager class.
      * @param IPMIClient $client The IPMI client for the host.
-     */
-    public function __construct(IPMIClient $client)
-    {
-        $this->client = $client;
-        $this->discoverNodeManager();
-    }
-
-        /**
-     * Creates a new instance of the Intel Node Manager class.
-     * @param IPMIClient $client The IPMI client for the host.
      * @param float $version Intel Node Manager version.
      * @param string $slaveChannelPrefix I2C connection channel for sensor readings.
      */
-    public function __construct(IPMIClient $client, ?float $version, string $slaveChannelPrefix)
+    public function __construct(IPMIClient $client, ?float $version = null, string $slaveChannelPrefix = null)
     {
         $this->client = $client;
-        $this->version = $version;
-        $this->slaveChannelPrefix = $slaveChannelPrefix;
+        if (! isset($version) && ! isset($slaveChannelPrefix)) {
+            $this->discoverNodeManager();
+        }
+        else {
+            $this->version = $version;
+            $this->slaveChannelPrefix = $slaveChannelPrefix;
+        }
     }
 
     public function discoverAttributes(): array {
@@ -88,6 +83,29 @@ final class NodeManager
     public function isPlatformSupported(): bool
     {
         return $this->nmVersion != null;
+    }
+
+    /**
+     * Gets a list of available power reading sensors.
+     * @return array A 2-dim array of available sensors. First index is the name, second index is description.
+     */
+    public function discoverSensors(): array
+    {
+        if ($this->nmVersion == null) {
+            return [];
+        }
+
+        // TODO: cross check with Get Node Manager Capabilities command (0xc9)
+        $result = [];
+        if ($this->nmVersion >= 2.0) {
+            array_push($result, ['memory', 'Intel ME Memory']);
+            array_push($result, ['cpu', 'Intel ME CPU']);
+        }
+        if ($this->nmVersion >= 1.5) {
+            array_push($result, ['platform', 'Intel ME Platform']);
+        }
+
+        return $result;
     }
 
     /**
@@ -115,29 +133,6 @@ final class NodeManager
             if ($platform = NodeManager::decodePowerReadings($this->sendRawCommand('platform_global_power'))) {
                 $result['Intel ME Platform'] = $platform;
             }
-        }
-
-        return $result;
-    }
-
-    /**
-     * Gets a list of available power reading sensors.
-     * @return array A 2-dim array of available sensors. First index is the name, second index is description.
-     */
-    public function discoverSensors(): array
-    {
-        if ($this->nmVersion == null) {
-            return [];
-        }
-
-        // TODO: cross check with Get Node Manager Capabilities command (0xc9)
-        $result = [];
-        if ($this->nmVersion >= 2.0) {
-            array_push($result, ['memory', 'Intel ME Memory']);
-            array_push($result, ['cpu', 'Intel ME CPU']);
-        }
-        if ($this->nmVersion >= 1.5) {
-            array_push($result, ['platform', 'Intel ME Platform']);
         }
 
         return $result;
