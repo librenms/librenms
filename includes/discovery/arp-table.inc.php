@@ -31,8 +31,13 @@ foreach (DeviceCache::getPrimary()->getVrfContexts() as $context_name) {
     if (file_exists(Config::get('install_dir') . "/includes/discovery/arp-table/{$device['os']}.inc.php")) {
         include Config::get('install_dir') . "/includes/discovery/arp-table/{$device['os']}.inc.php";
     } else {
+        $netToMediaPhysAddressSnmpFlags = '-OQUsetX';
+        if ($device['os'] == 'bintec-beip-plus') {
+            $netToMediaPhysAddressSnmpFlags = ['-OQUsetX', '-Cc'];
+        }
+
         $arp_data = snmpwalk_group($device, 'ipNetToPhysicalPhysAddress', 'IP-MIB');
-        $arp_data = snmpwalk_group($device, 'ipNetToMediaPhysAddress', 'IP-MIB', 1, $arp_data);
+        $arp_data = snmpwalk_group($device, 'ipNetToMediaPhysAddress', 'IP-MIB', 1, $arp_data, null, null, $netToMediaPhysAddressSnmpFlags);
     }
 
     $sql = 'SELECT * from `ipv4_mac` WHERE `device_id`=? AND `context_name`=?';
