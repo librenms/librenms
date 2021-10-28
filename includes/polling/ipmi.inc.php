@@ -10,19 +10,19 @@ $ipmi_rows = dbFetchRows("SELECT * FROM sensors WHERE device_id = ? AND poller_t
 if (is_array($ipmi_rows)) {
     d_echo($ipmi_rows);
 
-    if (isset($attribs['ipmi_hostname'])) {
+    if (isset($device['attribs']['ipmi_hostname'])) {
         $ipmi = [];
-        $ipmi['host'] = $attribs['ipmi_hostname'];
+        $ipmi['host'] = $device['attribs']['ipmi_hostname'];
         $ipmi['tool'] = Config::get('ipmitool', 'ipmitool');
-        $ipmi['user'] = $attribs['ipmi_username'];
-        $ipmi['password'] = $attribs['ipmi_password'];
-        $ipmi['type'] = $attribs['ipmi_type'];
+        $ipmi['user'] = $device['attribs']['ipmi_username'];
+        $ipmi['password'] = $device['attribs']['ipmi_password'];
+        $ipmi['type'] = $device['attribs']['ipmi_type'];
         if (Config::get('own_hostname') == $device['hostname']) {
             $ipmi['host'] = 'localhost';
         }
 
         $client = new IPMIClient($ipmi['tool'], $ipmi['host'], $ipmi['user'], $ipmi['password']);
-        $client->setPort(filter_var($attribs['ipmi_port'], FILTER_VALIDATE_INT) ? $attribs['ipmi_port'] : '623');
+        $client->setPort(filter_var($device['attribs']['ipmi_port'], FILTER_VALIDATE_INT) ? $device['attribs']['ipmi_port'] : '623');
 
         echo 'Fetching IPMI sensor data...';
 
@@ -53,8 +53,8 @@ if (is_array($ipmi_rows)) {
         }
 
         // Fetch Intel Node Manager readings if available.
-        if (isset($attribs['node_manager_version']) && isset($attribs['node_manager_slave_channel_prefix'])) {
-            $nmClient = new NodeManager($client, $attribs['node_manager_version'], $attribs['node_manager_slave_channel_prefix']);
+        if (isset($device['attribs']['node_manager_version']) && isset($device['attribs']['node_manager_slave_channel_prefix'])) {
+            $nmClient = new NodeManager($client, $device['attribs']['node_manager_version'], $device['attribs']['node_manager_slave_channel_prefix']);
             if ($nmClient->isPlatformSupported()) {
                 $ipmi_unit_type = Config::get('ipmi_unit.Watts');
                 foreach ($nmClient->pollSeonsors() as $nmSensorKey => $nmSensorValue) {
