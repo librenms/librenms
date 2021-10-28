@@ -33,8 +33,6 @@ use Illuminate\Support\Facades\Cache;
  */
 class IPMIClient
 {
-    const SDR_TTL = 60 * 15;
-
     private $ipmiToolPath;
     private $host;
     private $user;
@@ -105,6 +103,7 @@ class IPMIClient
     {
         try {
             $b64 = base64_encode($this->fetchSDR());
+
             return base64_decode($b64);
         } catch (\Throwable $th) {
             echo 'Failed to fetch SDR: ' . $th->getMessage() . "\n";

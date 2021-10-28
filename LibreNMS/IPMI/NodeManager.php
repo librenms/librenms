@@ -63,17 +63,18 @@ final class NodeManager
         $this->client = $client;
         if (! isset($version) && ! isset($slaveChannelPrefix)) {
             $this->discoverNodeManager();
-        }
-        else {
+        } else {
             $this->version = $version;
             $this->slaveChannelPrefix = $slaveChannelPrefix;
         }
     }
 
-    public function discoverAttributes(): array {
+    public function discoverAttributes(): array
+    {
         $attributes = [];
         $attributes['version'] = $this->nmVersion;
         $attributes['slave_channel_prefix'] = $this->slaveChannelPrefix;
+
         return $attributes;
     }
 
