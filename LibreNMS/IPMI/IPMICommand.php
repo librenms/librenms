@@ -35,8 +35,15 @@ use Symfony\Component\Process\Process;
  */
 final class IPMICommand
 {
-    private array $command;
-    private ?Process $proc;
+    /**
+     * @var  array
+     */
+    private $command;
+
+    /**
+     * @var  Process
+     */
+    private $proc;
 
     /**
      * Create a new instance of the IPMICommand class.

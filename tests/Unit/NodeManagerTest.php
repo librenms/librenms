@@ -43,12 +43,16 @@ class NodeManagerTest extends TestCase
         // '2.5' => MISSING DATA. Please add test data if you access to Intel Node Manager 2.0+ equipment.
         // '3.0' => MISSING DATA. Please add test data if you access to Intel Node Manager 2.0+ equipment.
     ];
-
+    
     /**
-     * @
+     * @var  string|null
      */
-    private ?string $sdr;
-    private ?array $schema;
+    private $sdr;
+    
+    /**
+     * @var  array|null
+     */
+    private $schema;
 
     public function testIsPlatformSupported_SDRNoIntelRecord_IsFalse(): void
     {

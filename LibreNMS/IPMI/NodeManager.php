@@ -49,9 +49,20 @@ final class NodeManager
         'memory_global_power' => 'raw 0x2e 0xc8 0x57 0x01 0x00 0x01 0x02 0x00',
     ];
 
-    private IPMIClient $client;
-    private string $slaveChannelPrefix = '';
-    private ?float $nmVersion = null;
+    /**
+     * @var  IPMIClient
+     */
+    private $client;
+
+    /**
+     * @var  string
+     */
+    private $slaveChannelPrefix = '';
+
+    /**
+     * @var  float|null
+     */
+    private $nmVersion = null;
 
     /**
      * Creates a new instance of the Intel Node Manager class.
