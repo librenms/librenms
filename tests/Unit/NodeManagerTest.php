@@ -95,38 +95,38 @@ class NodeManagerTest extends TestCase
         $this->assertEquals($expected, $actual, 'Expected the platform to be supported, but returned false.');
     }
 
-    public function testPollSeonsors_PlatformNotSupported_EmptyArray(): void
+    public function testPollSensors_PlatformNotSupported_EmptyArray(): void
     {
         $expected = [];
         $client = $this->getMock('-1');
 
         $sut = new NodeManager($client);
-        $actual = $sut->pollSeonsors();
+        $actual = $sut->pollSensors();
 
         $this->assertEquals(0, sizeof($actual), 'Expected power readings to be an empty array, but was not empty.');
         $this->assertEquals($expected, $actual);
     }
 
-    public function testPollSeonsors_Version15_PlatformReadingOnly(): void
+    public function testPollSensors_Version15_PlatformReadingOnly(): void
     {
         $expectedKey = ['Intel ME Platform'];
         $client = $this->getMock('1.5');
 
         $sut = new NodeManager($client);
-        $response = $sut->pollSeonsors();
+        $response = $sut->pollSensors();
         $actualKeys = array_keys($response);
 
         $this->assertEquals(sizeof($expectedKey), sizeof($actualKeys), 'Expected one sensor to be returned.');
         $this->assertEquals($expectedKey[0], $actualKeys[0], 'Expected only platform sensor to be returned.');
     }
 
-    public function testPollSeonsors_Version15_PlatformReadingCorrect(): void
+    public function testPollSensors_Version15_PlatformReadingCorrect(): void
     {
         $client = $this->getMock('1.5');
         $expectedValue = $this->schema['platform_global_power']['expected'];
 
         $sut = new NodeManager($client);
-        $response = $sut->pollSeonsors();
+        $response = $sut->pollSensors();
         $actualValue = $response['Intel ME Platform'];
 
         $this->assertEquals($expectedValue, $actualValue, "Expected power reading to be $expectedValue watts.");

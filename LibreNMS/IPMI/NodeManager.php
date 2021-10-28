@@ -136,7 +136,7 @@ final class NodeManager
      *
      * @return array An array of power reading values with sensor descriptions as the key.
      */
-    public function pollSeonsors(): array
+    public function pollSensors(): array
     {
         if ($this->nmVersion == null) {
             return [];

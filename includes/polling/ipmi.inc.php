@@ -57,7 +57,7 @@ if (is_array($ipmi_rows)) {
             $nmClient = new NodeManager($client, $device['attribs']['node_manager_version'], $device['attribs']['node_manager_slave_channel_prefix']);
             if ($nmClient->isPlatformSupported()) {
                 $ipmi_unit_type = Config::get('ipmi_unit.Watts');
-                foreach ($nmClient->pollSeonsors() as $nmSensorKey => $nmSensorValue) {
+                foreach ($nmClient->pollSensors() as $nmSensorKey => $nmSensorValue) {
                     $ipmi_sensor[$nmSensorKey][$ipmi_unit_type]['value'] = $nmSensorValue;
                     $ipmi_sensor[$nmSensorKey][$ipmi_unit_type]['unit'] = 'Watts';
                 }
