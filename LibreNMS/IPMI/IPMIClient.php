@@ -19,6 +19,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2021 Trym Lund Flogard
  * @author     Trym Lund Flogard <trym@flogard.no>
  */
@@ -132,8 +133,8 @@ class IPMIClient
     /**
      * Sends an ipmitool command with specified parameters.
      *
-     * @param  string $command the command to send.
-     * @param  bool $escalatePrivileges a boolean indicating whether to use 'USER' or 'ADMINISTRATOR' privilege.
+     * @param  string  $command  the command to send.
+     * @param  bool  $escalatePrivileges  a boolean indicating whether to use 'USER' or 'ADMINISTRATOR' privilege.
      * @return null|string The stdout of the command as reported by ipmitool.
      */
     public function sendCommand(string $command, bool $escalatePrivileges = false): ?string
