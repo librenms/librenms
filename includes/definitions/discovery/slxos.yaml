@@ -1,0 +1,58 @@
+mib: Brocade-REG-MIB
+modules:
+    os:
+        serial: ENTITY-MIB::entPhysicalSerialNum.1
+        hardware: ENTITY-MIB::entPhysicalName.1
+        sysDescr_regex: '/SLX.*Version (?<version>\S+)\./'
+    mempools:
+        data:
+            -
+                total: BROCADE-MODULE-MEM-UTIL-MIB::bcsiModuleMemTotal
+                free: BROCADE-MODULE-MEM-UTIL-MIB::bcsiModuleMemAvailable
+                precision: 1024
+    processors:
+        data:
+            -
+                oid: SYSTEM-MIB::swCpuUsage
+                num_oid: '.1.3.6.1.4.1.1588.2.1.1.1.26.1.{{ $index }}'
+                descr: CPU
+    sensors:
+        temperature:
+            data:
+            -
+                oid: SYSTEM-MIB::swSensorTable
+                value: SYSTEM-MIB::swSensorValue
+                num_oid: '.1.3.6.1.4.1.1588.2.1.1.1.1.22.1.4.{{ $index }}'
+                descr: SYSTEM-MIB::swSensorInfo
+                skip_values:
+                -
+                    oid: SYSTEM-MIB::swSensorType
+                    op: '!='
+                    value: 1
+        fanspeed:
+            data:
+            -
+                oid: SYSTEM-MIB::swSensorTable
+                value: SYSTEM-MIB::swSensorValue
+                num_oid: '.1.3.6.1.4.1.1588.2.1.1.1.1.22.1.4.{{ $index }}'
+                descr: SYSTEM-MIB::swSensorInfo
+                skip_values:
+                -
+                    oid: SYSTEM-MIB::swSensorType
+                    op: '!='
+                    value: 2
+        state:
+            data:
+            -
+                oid: SYSTEM-MIB::swSensorTable
+                value: SYSTEM-MIB::swSensorStatus
+                num_oid: '.1.3.6.1.4.1.1588.2.1.1.1.1.22.1.3.{{ $index }}'
+                descr: SYSTEM-MIB::swSensorInfo
+                states:
+                    - { value: 1, generic: 3, graph: 0, descr: unknown }
+                    - { value: 2, generic: 2, graph: 0, descr: faulty }
+                    - { value: 3, generic: 1, graph: 0, descr: below-min }
+                    - { value: 4, generic: 0, graph: 0, descr: nominal }
+                    - { value: 5, generic: 1, graph: 0, descr: above-max }
+                    - { value: 6, generic: 3, graph: 0, descr: absent }
+
