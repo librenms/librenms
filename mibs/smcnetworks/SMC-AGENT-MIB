@@ -1,0 +1,325 @@
+SMC-AGENT-MIB DEFINITIONS ::= BEGIN
+
+
+IMPORTS
+    enterprises, NetworkAddress, IpAddress, Counter, Gauge,
+	TimeTicks                              FROM RFC1155-SMI
+    DisplayString                              FROM RFC1213-MIB
+    OBJECT-TYPE                                FROM RFC-1212;
+
+MacAddress ::= OCTET STRING (SIZE (6))    -- a 6 octet address in
+                                          -- the "canonical" order
+
+smc OBJECT IDENTIFIER ::= { enterprises 202 }
+smcDosWs OBJECT IDENTIFIER ::= { smc 2}
+
+-- SMC PROPRIETARY GROUP
+
+  smcDosWsPcTyp OBJECT-TYPE
+      SYNTAX    DisplayString
+      ACCESS    read-only
+      STATUS    mandatory
+      DESCRIPTION
+        "Make and model of the PC.  This may have to be entered in the
+         configuration disk file.  It may or may not be detectable via
+         signature strings in the BIOS."
+      ::= { smcDosWs 1 }
+
+  smcDosWsPcProc OBJECT-TYPE
+      SYNTAX    DisplayString
+      ACCESS    read-only
+      STATUS    mandatory
+      DESCRIPTION
+        "This is a text string showing the processor type and
+         indicating whether a math coprocessor exists, e.g. '80286
+         w/math coprocessor'."
+      ::= { smcDosWs 2 }
+
+  smcDosWsPcBios OBJECT-TYPE
+      SYNTAX    DisplayString
+      ACCESS    read-only
+      STATUS    mandatory
+      DESCRIPTION
+        "This is a text signature string identifying the PC bios, e.g.
+         'Phoenix 80386SX ROM BIOS PLUS Version 1.10'."
+      ::= { smcDosWs 3 }
+
+  smcDosWsPcRam OBJECT-TYPE
+      SYNTAX    DisplayString
+      ACCESS    read-only
+      STATUS    mandatory
+      DESCRIPTION
+        "This is a text string listing the PC's ram configuration,
+         base, EMS, XMS, e.g. '640K base, 1024K EMS, 3072K XMS'."
+      ::= { smcDosWs 4 }
+
+  smcDosWsPcDisk OBJECT-TYPE
+      SYNTAX    DisplayString
+      ACCESS    read-only
+      STATUS    mandatory
+      DESCRIPTION
+        "This is a text string listing the PC's disk configuration,
+         number and size of drives, e.g. '1.25M Fpy, 1.44M Fpy, 79M
+         HD'."
+      ::= { smcDosWs 5 }
+
+  smcDosWsPcVideo OBJECT-TYPE
+      SYNTAX    DisplayString
+      ACCESS    read-only
+      STATUS    mandatory
+      DESCRIPTION
+        "This is a text string listing the PC's video interface type
+         and monitor type, e.g. 'VGA Color'."
+      ::= { smcDosWs 6 }
+
+  smcDosWsPcIo OBJECT-TYPE
+      SYNTAX    DisplayString
+      ACCESS    read-only
+      STATUS    mandatory
+      DESCRIPTION
+        "This is a text string listing the parallel and serial ports
+         installed on the PC, e.g. 'LPT1, COM1, COM2'."
+      ::= { smcDosWs 7 }
+
+  smcDosWsDosVer OBJECT-TYPE
+      SYNTAX    DisplayString
+      ACCESS    read-only
+      STATUS    mandatory
+      DESCRIPTION
+        "This is a text string listing the version of DOS, e.g. 'DOS
+         3.3'."
+      ::= { smcDosWs 8 }
+
+  smcDosWsDrvId OBJECT-TYPE
+      SYNTAX    DisplayString
+      ACCESS    read-only
+      STATUS    mandatory
+      DESCRIPTION
+        "This is the signature string from the network driver.  It is
+         similar to the string that is displayed by the NetWare server
+         MONITOR nlm."
+      ::= { smcDosWs 9 }
+
+  smcDosWsNicBasIo OBJECT-TYPE
+      SYNTAX    DisplayString
+      ACCESS    read-only
+      STATUS    mandatory
+      DESCRIPTION
+        "This is the I/O base address of the adapter card."
+      ::= { smcDosWs 10 }
+
+  smcDosWsNicIrq OBJECT-TYPE
+      SYNTAX    DisplayString
+      ACCESS    read-only
+      STATUS    mandatory
+      DESCRIPTION
+        "This is the adapter IRQ number."
+      ::= { smcDosWs 11 }
+
+  smcDosWsNicRam OBJECT-TYPE
+      SYNTAX    DisplayString
+      ACCESS    read-only
+      STATUS    mandatory
+      DESCRIPTION
+        "This is the adapter card packet ram address."
+      ::= { smcDosWs 12 }
+
+  smcDosWsNodId OBJECT-TYPE
+      SYNTAX    MacAddress
+      ACCESS    read-only
+      STATUS    mandatory
+      DESCRIPTION
+        "This is the adapter card 48 bit node ID."
+      ::= { smcDosWs 13 }
+
+  smcDosWsIpAdr OBJECT-TYPE
+      SYNTAX    IpAddress
+      ACCESS    read-only
+      STATUS    mandatory
+      DESCRIPTION
+        "This is the IP address of the PC.  The agent takes this
+         information from a configuration disk file.  If the PC is also
+         running a TCP/IP stack, it is up to the installer to specify
+         in the agent configuration file the same IP address that the
+         PC's TCP/IP stack has."
+      ::= { smcDosWs 14 }
+
+  smcDosWsComment OBJECT-TYPE
+      SYNTAX    DisplayString
+      ACCESS    read-write
+      STATUS    mandatory
+      DESCRIPTION
+        "This is a text string which is set from a configuration disk
+         file that contains comments about the PC that the network
+         manager feels is meaningful.  For example 'Motherboard
+         replaced 3 times in the last year'."
+      ::= { smcDosWs 15 }
+
+  smcDosWsPcDate OBJECT-TYPE
+      SYNTAX    DisplayString
+      ACCESS    read-only
+      STATUS    mandatory
+      DESCRIPTION
+        "This shows the current date set into the PC to alert the
+         network manager of potential problems with software that
+         decides configuration currency based on file dates and times."
+      ::= { smcDosWs 16 }
+
+  smcDosWsPcTime OBJECT-TYPE
+      SYNTAX    DisplayString
+      ACCESS    read-only
+      STATUS    mandatory
+      DESCRIPTION
+        "This shows the current time set into the PC to alert the
+         network manager of potential problems with software that
+         decides configuration currency based on file dates and times. 
+         Note that because of polling times this time may be erratic
+         within a window of a few seconds."
+
+      ::= { smcDosWs 17 }
+
+  smcDosWsRst OBJECT-TYPE
+      SYNTAX    INTEGER
+      ACCESS    read-write
+      STATUS    mandatory
+      DESCRIPTION
+        "This variable always reports value = 1. Setting it to 2 results
+         in an adapter reset, after which it will contain value = 1 again."
+      ::= { smcDosWs 18 }
+
+  smcDosWsProtoMix OBJECT-TYPE
+      SYNTAX    DisplayString
+      ACCESS    read-only
+      STATUS    mandatory
+      DESCRIPTION
+        "This text string reports the most frequent transport protocols 
+	and their approximate percentages of traffic load."
+      ::= { smcDosWs 19 }
+
+  smcDosWsRcvPkts OBJECT-TYPE
+      SYNTAX    Counter
+      ACCESS    read-only
+      STATUS    mandatory
+      DESCRIPTION
+        "Number of packets received by the workstation"
+      ::= { smcDosWs 20 }
+
+  smcDosWsXmtPkts OBJECT-TYPE
+      SYNTAX    Counter
+      ACCESS    read-only
+      STATUS    mandatory
+      DESCRIPTION
+        "Number of packets sent by the workstation"
+      ::= { smcDosWs 21 }
+
+
+-- Driver Specific Table
+
+smcDosWsDrvSpcTable OBJECT-TYPE
+  SYNTAX SEQUENCE OF SmcDosWsDrvSpcEntry
+  ACCESS    not-accessible
+  STATUS    mandatory
+  ::= { smcDosWs 22 }
+
+  smcDosWsDrvSpcEntry OBJECT-TYPE
+    SYNTAX    SmcDosWsDrvSpcEntry
+    ACCESS    not-accessible
+    STATUS    mandatory
+    INDEX    { smcDosWsDrvSpcId }
+    ::= { smcDosWsDrvSpcTable  1 }
+
+    SmcDosWsDrvSpcEntry ::= SEQUENCE {
+      smcDosWsDrvSpcId	INTEGER,
+      smcDosWsDrvSpcTxt	DisplayString,
+      smcDosWsDrvSpcCnt	Counter
+    }
+
+  smcDosWsDrvSpcId OBJECT-TYPE
+      SYNTAX    INTEGER
+      ACCESS    read-only
+      STATUS    mandatory
+      DESCRIPTION
+        "Number of Driver Specific entry. 1 for first entry, 2 for second
+	entry, etc."
+      ::= { smcDosWsDrvSpcEntry 1 }
+
+  smcDosWsDrvSpcTxt OBJECT-TYPE
+     SYNTAX    DisplayString
+      ACCESS    read-only
+      STATUS    mandatory
+      DESCRIPTION
+        "Textual name of driver specific diagnostic counter"
+      ::= { smcDosWsDrvSpcEntry 2 }
+
+  smcDosWsDrvSpcCnt OBJECT-TYPE
+      SYNTAX    Counter
+      ACCESS    read-only
+      STATUS    mandatory
+      DESCRIPTION
+        "Numeric value of driver specific diagnostic counter"
+      ::= { smcDosWsDrvSpcEntry 3 }
+
+-- Trap Destination Table
+
+smcDosWsTrapDestTable OBJECT-TYPE
+  SYNTAX    SEQUENCE OF SmcDosWsTrapDestEntry
+  ACCESS    not-accessible
+  STATUS    mandatory
+  ::= { smcDosWs 23 }
+
+  smcDosWsTrapDestEntry OBJECT-TYPE
+    SYNTAX    SmcDosWsTrapDestEntry
+    ACCESS    not-accessible
+    STATUS    mandatory
+    INDEX    { smcDosWsTrapId }
+    ::= { smcDosWsTrapDestTable 1 }
+
+    SmcDosWsTrapDestEntry ::= SEQUENCE {
+      smcDosWsTrapId		INTEGER,
+      smcDosWsTrapDstAdr	IpAddress,
+      smcDosWsTrapDstPro	INTEGER
+    }
+
+    smcDosWsTrapId OBJECT-TYPE
+      SYNTAX    INTEGER (1..127)
+      ACCESS    read-only
+      STATUS    mandatory
+      DESCRIPTION
+        "Number of Trap Destination entry. 1 for first entry, 2 for second
+	entry, etc."
+      ::= { smcDosWsTrapDestEntry 1 }
+
+    smcDosWsTrapDstAdr OBJECT-TYPE
+      SYNTAX    IpAddress
+      ACCESS    read-write
+      STATUS    mandatory
+      DESCRIPTION
+     "This is an IP address to which alerts (traps) should be sent when
+     significant events occur."
+      ::= { smcDosWsTrapDestEntry 2 }
+
+    smcDosWsTrapDstPro OBJECT-TYPE
+      SYNTAX    INTEGER
+      ACCESS    read-write
+      STATUS    mandatory
+      DESCRIPTION
+        "This is a code indicating the protocol to use when sending alerts.
+        1 means disabled, i.e. the corresponding smcDosWsTrapDstAdr
+        variable is not really intended to receive traps.  2 means use
+        TCP/IP protocol.  3,4,5,6 mean use IPX protocol using Ethernet II,
+        RAW 802.2, 802.2 SNAP or 802.3 physical layer."
+      ::= { smcDosWsTrapDestEntry 3 }
+
+  smcDosWsApiTrap OBJECT-TYPE
+      SYNTAX    DisplayString
+      ACCESS    read-only
+      STATUS    mandatory
+      DESCRIPTION
+        "This is a string set by external applications 
+	which use the PC Agent API to send an SNMP trap "
+
+      ::= { smcDosWs 24 }
+
+END
+
+
