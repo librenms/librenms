@@ -39,7 +39,7 @@ final class IPMICommand
 
     /**
      * Create a new instance of the IPMICommand class.
-     * 
+     *
      * @param  array  $command The command to run and its arguments.
      */
     public function __construct(array $command)

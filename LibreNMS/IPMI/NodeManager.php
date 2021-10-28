@@ -89,7 +89,7 @@ final class NodeManager
 
     /**
      * Gets a list of available power reading sensors.
-     * 
+     *
      * @return array A 2-dim array of available sensors. First index is the name, second index is description.
      */
     public function discoverSensors(): array
@@ -113,7 +113,7 @@ final class NodeManager
 
     /**
      * Gets sensor readings for this device.
-     * 
+     *
      * @return array An array of power reading values with sensor descriptions as the key.
      */
     public function pollSeonsors(): array

@@ -80,7 +80,7 @@ class IPMIClient
 
     /**
      * Gets the port used by the client.
-     * 
+     *
      * @return ?string The port currently used. Null if not specified.
      */
     public function getPort(): ?string
@@ -98,7 +98,7 @@ class IPMIClient
 
     /**
      * Gets a binary representation of the SDR record for this host.
-     * 
+     *
      * @return string|false The SDR binary or false on failure.
      */
     public function getRawSDR()
@@ -131,7 +131,7 @@ class IPMIClient
 
     /**
      * Sends an ipmitool command with specified parameters.
-     * 
+     *
      * @param  string $command the command to send.
      * @param  bool $escalatePrivileges a boolean indicating whether to use 'USER' or 'ADMINISTRATOR' privilege.
      * @return null|string The stdout of the command as reported by ipmitool.
