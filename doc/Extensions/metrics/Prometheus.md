@@ -8,7 +8,7 @@ extensively tested and is still in development All it provides is the
 sending of data to a a Prometheus PushGateway. Please be careful when
 enabling this support you use it at your own risk!
 
-# Requirements (Older versions may work but haven't been tested
+## Requirements (Older versions may work but haven't been tested
 
 - Prometheus >= 2.0
 - PushGateway >= 0.4.0
@@ -18,7 +18,7 @@ enabling this support you use it at your own risk!
 The setup of the above is completely out of scope here and we aren't
 really able to provide any help with this side of things.
 
-# What you don't get
+## What you don't get
 
 - Pretty graphs, this is why at present you need Grafana. You need to
   build your own graphs within Grafana.
@@ -28,15 +28,41 @@ really able to provide any help with this side of things.
 RRD will continue to function as normal so LibreNMS itself should
 continue to function as normal.
 
-# Configuration
+## Configuration
 
 ```php
 $config['prometheus']['enable'] = true;
 $config['prometheus']['url'] = 'http://127.0.0.1:9091';
 $config['prometheus']['job'] = 'librenms'; # Optional
+$config['prometheus']['prefix'] = 'librenms'; # Optional
 ```
 
-# Sample Prometheus Scrape Config (for scraping the Push Gateway)
+## Prefix
+
+Setting the 'prefix' option will cause all metric names to begin with 
+the configured value.
+
+For instance without setting this option metric names will be something 
+like this:
+
+```
+OUTUCASTPKTS
+ifOutUcastPkts_rate
+INOCTETS
+ifInErrors_rate
+```
+
+Configuring a prefix name, for example 'librenms', instead caused those 
+metrics to be exposed with the following names:
+
+```
+librenms_OUTUCASTPKTS
+librenms_ifOutUcastPkts_rate
+librenms_INOCTETS
+librenms_ifInErrors_rate
+```
+
+## Sample Prometheus Scrape Config (for scraping the Push Gateway)
 
 ```yml
 - job_name: pushgateway

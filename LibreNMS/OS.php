@@ -2,7 +2,7 @@
 /**
  * OS.php
  *
- * Base OS class
+ * -Description-
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,7 +18,8 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
- * @copyright  2017 Tony Murray
+ *
+ * @copyright  2021 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
@@ -33,13 +34,30 @@ use LibreNMS\Device\YamlDiscovery;
 use LibreNMS\Interfaces\Discovery\MempoolsDiscovery;
 use LibreNMS\Interfaces\Discovery\OSDiscovery;
 use LibreNMS\Interfaces\Discovery\ProcessorDiscovery;
+use LibreNMS\Interfaces\Polling\Netstats\IcmpNetstatsPolling;
+use LibreNMS\Interfaces\Polling\Netstats\IpForwardNetstatsPolling;
+use LibreNMS\Interfaces\Polling\Netstats\IpNetstatsPolling;
+use LibreNMS\Interfaces\Polling\Netstats\SnmpNetstatsPolling;
+use LibreNMS\Interfaces\Polling\Netstats\TcpNetstatsPolling;
+use LibreNMS\Interfaces\Polling\Netstats\UdpNetstatsPolling;
 use LibreNMS\OS\Generic;
 use LibreNMS\OS\Traits\HostResources;
+use LibreNMS\OS\Traits\NetstatsPolling;
 use LibreNMS\OS\Traits\UcdResources;
 use LibreNMS\OS\Traits\YamlMempoolsDiscovery;
 use LibreNMS\OS\Traits\YamlOSDiscovery;
+use LibreNMS\Util\StringHelpers;
 
-class OS implements ProcessorDiscovery, OSDiscovery, MempoolsDiscovery
+class OS implements
+    ProcessorDiscovery,
+    OSDiscovery,
+    MempoolsDiscovery,
+    IcmpNetstatsPolling,
+    IpNetstatsPolling,
+    IpForwardNetstatsPolling,
+    SnmpNetstatsPolling,
+    TcpNetstatsPolling,
+    UdpNetstatsPolling
 {
     use HostResources {
         HostResources::discoverProcessors as discoverHrProcessors;
@@ -51,6 +69,7 @@ class OS implements ProcessorDiscovery, OSDiscovery, MempoolsDiscovery
     }
     use YamlOSDiscovery;
     use YamlMempoolsDiscovery;
+    use NetstatsPolling;
 
     private $device; // annoying use of references to make sure this is in sync with global $device variable
     private $graphs; // stores device graphs
@@ -60,7 +79,7 @@ class OS implements ProcessorDiscovery, OSDiscovery, MempoolsDiscovery
     /**
      * OS constructor. Not allowed to be created directly.  Use OS::make()
      *
-     * @param array $device
+     * @param  array  $device
      */
     private function __construct(&$device)
     {
@@ -101,7 +120,7 @@ class OS implements ProcessorDiscovery, OSDiscovery, MempoolsDiscovery
     /**
      * Enable a graph for this device
      *
-     * @param string $name
+     * @param  string  $name
      */
     public function enableGraph($name)
     {
@@ -135,9 +154,9 @@ class OS implements ProcessorDiscovery, OSDiscovery, MempoolsDiscovery
      * If the data is cached, return the cached data.
      * DO NOT use numeric oids with this function! The snmp result must contain only one oid.
      *
-     * @param string $oid textual oid
-     * @param string $mib mib for this oid
-     * @param string $snmpflags snmpflags for this oid
+     * @param  string  $oid  textual oid
+     * @param  string  $mib  mib for this oid
+     * @param  string  $snmpflags  snmpflags for this oid
      * @return array|null array indexed by the snmp index with the value as the data returned by snmp
      */
     public function getCacheByIndex($oid, $mib = null, $snmpflags = '-OQUs')
@@ -161,9 +180,9 @@ class OS implements ProcessorDiscovery, OSDiscovery, MempoolsDiscovery
      * If the data is cached, return the cached data.
      * DO NOT use numeric oids with this function! The snmp result must contain only one oid.
      *
-     * @param string $oid textual oid
-     * @param string $mib mib for this oid (optional)
-     * @param int $depth depth for snmpwalk_group (optional)
+     * @param  string  $oid  textual oid
+     * @param  string  $mib  mib for this oid (optional)
+     * @param  int  $depth  depth for snmpwalk_group (optional)
      * @return array|null array indexed by the snmp index with the value as the data returned by snmp
      */
     public function getCacheTable($oid, $mib = null, $depth = 1)
@@ -184,7 +203,7 @@ class OS implements ProcessorDiscovery, OSDiscovery, MempoolsDiscovery
     /**
      * Check if an OID has been cached
      *
-     * @param string $oid
+     * @param  string  $oid
      * @return bool
      */
     public function isCached($oid)
@@ -197,27 +216,37 @@ class OS implements ProcessorDiscovery, OSDiscovery, MempoolsDiscovery
      * If no specific OS is found, Try the OS group.
      * Otherwise, returns Generic
      *
-     * @param array $device device array, must have os set
+     * @param  array  $device  device array, must have os set
      * @return OS
      */
     public static function make(&$device)
     {
-        $class = str_to_class($device['os'], 'LibreNMS\\OS\\');
-        d_echo('Attempting to initialize OS: ' . $device['os'] . PHP_EOL);
-        if (class_exists($class)) {
-            d_echo("OS initialized: $class\n");
+        if (isset($device['os'])) {
+            // load os definition and populate os_group
+            \LibreNMS\Util\OS::loadDefinition($device['os']);
+            if ($os_group = Config::get("os.{$device['os']}.group")) {
+                $device['os_group'] = $os_group;
+            } else {
+                unset($device['os_group']);
+            }
 
-            return new $class($device);
-        }
-
-        // If not a specific OS, check for a group one.
-        if (isset($device['os_group'])) {
-            $class = str_to_class($device['os_group'], 'LibreNMS\\OS\\Shared\\');
-            d_echo('Attempting to initialize OS: ' . $device['os_group'] . PHP_EOL);
+            $class = StringHelpers::toClass($device['os'], 'LibreNMS\\OS\\');
+            d_echo('Attempting to initialize OS: ' . $device['os'] . PHP_EOL);
             if (class_exists($class)) {
                 d_echo("OS initialized: $class\n");
 
                 return new $class($device);
+            }
+
+            // If not a specific OS, check for a group one.
+            if ($os_group = Config::get("os.{$device['os']}.group")) {
+                $class = StringHelpers::toClass($os_group, 'LibreNMS\\OS\\Shared\\');
+                d_echo("Attempting to initialize Group OS: $os_group\n");
+                if (class_exists($class)) {
+                    d_echo("OS initialized: $class\n");
+
+                    return new $class($device);
+                }
             }
         }
 
@@ -242,8 +271,8 @@ class OS implements ProcessorDiscovery, OSDiscovery, MempoolsDiscovery
     /**
      * Poll a channel based OID, but return data in MHz
      *
-     * @param array $sensors
-     * @param callable $callback Function to modify the value before converting it to a frequency
+     * @param  array  $sensors
+     * @param  callable  $callback  Function to modify the value before converting it to a frequency
      * @return array
      */
     protected function pollWirelessChannelAsFrequency($sensors, $callback = null)

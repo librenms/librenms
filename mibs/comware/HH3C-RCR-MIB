@@ -1,0 +1,710 @@
+-- =================================================================
+-- Copyright (C) 2002 New H3C Tech. Co., Ltd. All rights reserved.
+--
+-- Description: Resilient Controllable Routing MIB
+-- Reference:
+-- Version: V1.1
+-- History:
+--   V1.0 2005-04-06 created by ZhangQiang
+--     Initial version
+--   V1.1 2005-06-28 modified by TanZhi and DaiRuiqiang
+--     Rewrite the whole MIB
+-- =================================================================
+HH3C-RCR-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        hh3cCommon
+            FROM HH3C-OID-MIB
+        InterfaceIndex
+            FROM IF-MIB
+        InetAddressType, InetAddress
+            FROM INET-ADDRESS-MIB
+        Integer32, OBJECT-TYPE, MODULE-IDENTITY, NOTIFICATION-TYPE
+            FROM SNMPv2-SMI;
+
+    hh3cRcr MODULE-IDENTITY
+        LAST-UPDATED "200506281936Z"        -- June 28, 2005 at 19:36 GMT
+        ORGANIZATION
+            "New H3C Tech. Co., Ltd."
+        CONTACT-INFO
+            "Platform Team New H3C Tech. Co., Ltd.
+            Hai-Dian District Beijing P.R. China
+            http://www.h3c.com
+            Zip:100085
+            "
+        DESCRIPTION
+            "This MIB is applicable to router-devices. It's made for RCR
+            (Resilient Controllable Routing).
+            RCR provides an effective resolution which can dynamically auto-adjust
+            outbound traffic to the optimal external interface by monitoring the 
+            performance and traffic load of each external interface. It provides 
+            the functions of intelligentized traffic load distribution and the optimal external interface
+            selection. This can optimally utilize the external interfaces. Furthermore,
+            RCR realized the function which can select the optimal external interface
+            based on different classes of operation flow."
+        REVISION "200506281936Z"        -- June 28, 2005 at 19:36 GMT
+        DESCRIPTION
+            "The modified revision of this MIB module. Rewrite the whole MIB."
+        ::= { hh3cCommon 48 }
+--
+-- Node definitions
+--
+
+
+-- The member router-device(MR) information is defined here.
+    hh3cRcrMR OBJECT IDENTIFIER ::= { hh3cRcr 1 }
+
+-- Scalar MIB objects, which are considered as global variables
+-- to all member router-devices, are defined in this section.
+-- This group contains global variables of all member router-devices which
+-- are controlled by RCR.
+
+    hh3cRcrMRGroup OBJECT IDENTIFIER ::= {   hh3cRcrMR 1  }
+
+    hh3cRcrMRAllMaxUsedBandRate OBJECT-TYPE
+        SYNTAX Integer32 (1..100)
+        UNITS "%"
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The max used band rate of all external interfaces on member
+            router-devices(MRs) which are controlled by RCR."
+        ::= { hh3cRcrMRGroup 1 }
+
+    hh3cRcrMRAllMinUsedBandRate OBJECT-TYPE
+        SYNTAX Integer32 (0..100)
+        UNITS "%"
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The min used band rate of all external interfaces on MRs
+            which are controlled by RCR."
+        ::= { hh3cRcrMRGroup 2 }
+
+
+    hh3cRcrMRListenTime OBJECT-TYPE
+        SYNTAX Integer32 (1..1440)
+        UNITS "minute"
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The persistent time of a probe on member router-device(MR) which is
+            controlled by RCR."
+        ::= { hh3cRcrMRGroup 3 }
+
+
+    hh3cRcrMRStateTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF Hh3cRcrMRStateEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "This table contains state information of each MR
+            which is controlled by RCR."
+        ::= { hh3cRcrMR 2 }
+
+    hh3cRcrMRStateEntry OBJECT-TYPE
+        SYNTAX Hh3cRcrMRStateEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Entry items"
+        INDEX { hh3cRcrMRName }
+        ::= { hh3cRcrMRStateTable 1 }
+
+    Hh3cRcrMRStateEntry ::=
+        SEQUENCE {
+            hh3cRcrMRName
+                OCTET STRING,
+            hh3cRcrMRState
+                INTEGER,
+            hh3cRcrMRAuthType
+                INTEGER,
+            hh3cRcrMRAuthPwd
+                OCTET STRING
+                 }
+
+    hh3cRcrMRName OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE(1..32))
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "The name of MR which is controlled by RCR."
+        ::= { hh3cRcrMRStateEntry 1 }
+
+    hh3cRcrMRState OBJECT-TYPE
+        SYNTAX INTEGER
+            {
+            down(1),
+            up(2),
+            controlled(3)
+            }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The state of MR where identified on the controller
+            router-device(CR).
+            down: The MR has been enabled but has not connected
+                  to the CR with TCP connection.
+            up: The MR has already successfully connected to
+                the CR but has not been ready for adjusting
+                route.
+            controlled: The MR has already passed the
+                        consultation with the CR and could
+                        be controlled by it."
+        ::= { hh3cRcrMRStateEntry 2 }
+
+     hh3cRcrMRAuthType OBJECT-TYPE
+        SYNTAX INTEGER
+            {
+            simple(1),
+            md5(2)
+            }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The authentication type of communication packet between CR and MR."
+        ::= { hh3cRcrMRStateEntry 3 }
+
+    hh3cRcrMRAuthPwd OBJECT-TYPE
+        SYNTAX OCTET STRING
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The authentication password of communication packet between CR
+            and MR.
+            Reading this object always results in an OCTET STRING of length zero;
+            authentication may not be bypassed by reading the MIB object."
+        ::= { hh3cRcrMRStateEntry 4 }
+
+    hh3cRcrMROutIfStateTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF Hh3cRcrMROutIfStateEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "This table contains the external interface states of each MR
+            which is controlled by RCR."
+        ::= { hh3cRcrMR 3 }
+
+    hh3cRcrMROutIfStateEntry OBJECT-TYPE
+        SYNTAX Hh3cRcrMROutIfStateEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Entry items"
+        INDEX { hh3cRcrMRName, hh3cRcrMROutIfName }
+        ::= { hh3cRcrMROutIfStateTable 1 }
+
+    Hh3cRcrMROutIfStateEntry ::=
+        SEQUENCE {
+            hh3cRcrMROutIfName
+                OCTET STRING,
+            hh3cRcrMROutIfState
+                INTEGER,
+            hh3cRcrMROutIfMaxUsedBandRate
+                Integer32,
+            hh3cRcrMROutIfMinUsedBandRate
+                Integer32,
+            hh3cRcrMROutIfUsedBandRate
+                Integer32
+                 }
+
+    hh3cRcrMROutIfName OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE(1..48))
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "The name of external interface on each MR."
+        ::= { hh3cRcrMROutIfStateEntry 1 }
+
+    hh3cRcrMROutIfState OBJECT-TYPE
+        SYNTAX INTEGER
+            {
+            down(1),
+            up(2),
+            notExist(3)
+            }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The state of external interface on each MR."
+        ::= { hh3cRcrMROutIfStateEntry 2 }
+
+    hh3cRcrMROutIfMaxUsedBandRate OBJECT-TYPE
+        SYNTAX Integer32 (1..100)
+        UNITS "%"
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The max spendable bandwidth rate on external interface."
+        ::= { hh3cRcrMROutIfStateEntry 3 }
+
+    hh3cRcrMROutIfMinUsedBandRate OBJECT-TYPE
+        SYNTAX Integer32 (0..100)
+        UNITS "%"
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The min spendable bandwidth rate on external interface."
+        ::= { hh3cRcrMROutIfStateEntry 4 }
+
+    hh3cRcrMROutIfUsedBandRate  OBJECT-TYPE
+        SYNTAX Integer32 (0..100)
+        UNITS "%"
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The used bandwidth rate on external interface."
+        ::= { hh3cRcrMROutIfStateEntry 5 }
+
+-- The controller router-device information are defined here.
+   hh3cRcrCR OBJECT IDENTIFIER ::= { hh3cRcr 2 }
+
+-- Scalar MIB objects, which are considered as global variables
+-- to all member router-devices, are defined in this section.
+    hh3cRcrCRGroup OBJECT IDENTIFIER ::= {   hh3cRcrCR 1  }
+
+    hh3cRcrCRState OBJECT-TYPE
+        SYNTAX INTEGER
+            {
+            down(1),
+            init(2),
+            active(3)
+            }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The state of the CR which is controlled
+            by RCR.
+            down: The CR has been enabled but has not
+                  started a TCP connection server.
+            init: The CR has started a TCP connection
+                  server and has been waiting for MR
+                  connection, but has not been ready for adjusting route.
+            active: The CR is ready for adjusting route."
+        ::= { hh3cRcrCRGroup 1 }
+
+    hh3cRcrCRPortNum OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The communication port number between CR and MR."
+        ::= { hh3cRcrCRGroup 2 }
+
+     hh3cRcrCRCtrlMode OBJECT-TYPE
+        SYNTAX INTEGER
+            {
+            control(1),
+            observe(2)
+            }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+
+            "The observe mode or control mode is configured to operate in the CR.
+             observe: The CR monitors prefixes and external interfaces based on default
+                      and user-defined policies and then reports the status of
+                      the network and the decisions that should be made but does
+                      not implement any changes.
+             controlled: The CR monitors prefixes and external interfaces based on default
+                         and user-defined policies and then reports the status
+                         of the network and the decisions that should be made
+                         and implement any changes."
+       ::= { hh3cRcrCRGroup 3 }
+
+    hh3cRcrCRChooseMode OBJECT-TYPE
+        SYNTAX INTEGER
+        {
+        good(1),
+        best(2)
+        }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The algorithm used to choose an alternative external interface for a prefix.
+             good: The first external interface that conforms to the policy is selected as
+                   the new external interface.
+             best: Information is collected from all external interfaces and the best one
+                   is selected even though the best external interface may not be in-policy."
+        ::= { hh3cRcrCRGroup 4 }
+
+    hh3cRcrCRKeepaliveTime OBJECT-TYPE
+        SYNTAX Integer32 (1..1000)
+        UNITS "second"
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The interval time of the transmission of the keepalive communication
+             packet between CR and MR."
+        ::= { hh3cRcrCRGroup 5 }
+
+
+    hh3cRcrCRPolicyMode OBJECT-TYPE
+        SYNTAX INTEGER
+            {
+            prefix(1),
+            operation(2),
+            study(3)
+            }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The chosen policy mode which decides to change what prefix.
+            prefix: An RCR policy is designed to select IP prefixes or to
+                     select RCR learn policies using a match clause and then to
+                     apply RCR policy configurations using a set clause.
+            operation: To deside to adjusted prefixes based on operation
+                        which user configured.
+            study: To learn and optimize prefixes based on the highest
+                    throughput or the highest delay."
+        ::= { hh3cRcrCRGroup 6 }
+
+    hh3cRcrCRStudyMode OBJECT-TYPE
+        SYNTAX INTEGER
+            {
+            maxThoughout(1),
+            maxDelay(2)
+            }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The mode of collecting prefix in studying configuration mode.
+            It's to collect either the prefix of max thoughtout or the prefix
+            of max delay time. It doesn't have a value when CR isn't in studying
+            configuration mode."
+        ::= { hh3cRcrCRGroup 7 }
+
+    hh3cRcrCRStudyIpPrefixNum OBJECT-TYPE
+        SYNTAX Integer32 (1..2500)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The max number of collecting prefix in studying configuration mode."
+        ::= { hh3cRcrCRGroup 8 }
+
+	hh3cRcrCRIpPrefixLen OBJECT-TYPE
+        SYNTAX Integer32 (1..32)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The mask length of collecting prefix in configuration mode."
+        DEFVAL { 24 }
+        ::= { hh3cRcrCRGroup 9 }
+
+--RCR policy table is defined here.
+    hh3cRcrCRRcrPolicyTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF Hh3cRcrCRRcrPolicyEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "This table contains objects to get statistic information
+            of interfaces on a device."
+        ::= { hh3cRcrCR 2 }
+
+    hh3cRcrCRRcrPolicyEntry OBJECT-TYPE
+        SYNTAX Hh3cRcrCRRcrPolicyEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Entry items"
+        INDEX { hh3cRcrCRRcrPlyID }
+        ::= { hh3cRcrCRRcrPolicyTable 1 }
+
+    Hh3cRcrCRRcrPolicyEntry ::=
+        SEQUENCE {
+            hh3cRcrCRRcrPlyID
+                Integer32,
+            hh3cRcrCRRcrPlyMatchIPListName
+                OCTET STRING,
+            hh3cRcrCRRcrPlyMatchStudyEnable
+                INTEGER,
+            hh3cRcrCRRcrPlyMatchOperPlyName
+                OCTET STRING,
+            hh3cRcrCRRcrAclNumber
+                Integer32,
+            hh3cRcrCRRcrPlyDelayTime
+                Integer32,
+            hh3cRcrCRRcrPlyLossRate
+                Integer32
+                  }
+
+    hh3cRcrCRRcrPlyID OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "The ID of RCR policy which the user has configured."
+        ::= { hh3cRcrCRRcrPolicyEntry 1 }
+
+    hh3cRcrCRRcrPlyMatchIPListName OBJECT-TYPE
+        SYNTAX OCTET STRING  (SIZE(1..19))
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The matched IP prefix list name of RCR policy which the user has
+            configured."
+        ::= { hh3cRcrCRRcrPolicyEntry 2 }
+
+    hh3cRcrCRRcrPlyMatchStudyEnable OBJECT-TYPE
+        SYNTAX INTEGER
+            {
+            disable(1),
+            enable(2)
+            }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Whether the RCR policy which the user has configured is matched
+            for studying prefix mode."
+        ::= { hh3cRcrCRRcrPolicyEntry 3 }
+
+    hh3cRcrCRRcrPlyMatchOperPlyName OBJECT-TYPE
+        SYNTAX OCTET STRING  (SIZE(1..19))
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The matched operation policy name of RCR policy which the user
+            has configured."
+        ::= { hh3cRcrCRRcrPolicyEntry 4 }
+
+   hh3cRcrCRRcrAclNumber OBJECT-TYPE
+        SYNTAX Integer32 (3000..3999)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The matched acl number of RCR operation policy which the user
+            has configured."
+        ::= { hh3cRcrCRRcrPolicyEntry 5 }
+
+    hh3cRcrCRRcrPlyDelayTime OBJECT-TYPE
+        SYNTAX Integer32  (1..10000)
+        UNITS "millisecond"
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The absolute maximum delay time. The range of values that can be
+            configured is from 1 to 10000."
+        ::= { hh3cRcrCRRcrPolicyEntry 6 }
+
+    hh3cRcrCRRcrPlyLossRate OBJECT-TYPE
+        SYNTAX Integer32 (1..100)
+        UNITS "%"
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "The packet loss percent of prefix which the CR concerns."
+        ::= { hh3cRcrCRRcrPolicyEntry 7 }
+
+--Matched prefix performance table define
+    hh3cRcrCRMatPrefixPerfTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF Hh3cRcrCRMatPrefixPerfEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "This table contains the matched prefix performance
+            information."
+        ::= { hh3cRcrCR 3 }
+
+    hh3cRcrCRMatPrefixPerfEntry OBJECT-TYPE
+        SYNTAX Hh3cRcrCRMatPrefixPerfEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Entry items"
+        INDEX { hh3cRcrCRMatPrefPerfAddrType, hh3cRcrCRMatPrefPerfDestIPAddr,
+                hh3cRcrCRMatPrefPerfDestMaskLen }
+        ::= { hh3cRcrCRMatPrefixPerfTable 1 }
+
+    Hh3cRcrCRMatPrefixPerfEntry ::=
+        SEQUENCE {
+            hh3cRcrCRMatPrefPerfAddrType
+                InetAddressType,
+            hh3cRcrCRMatPrefPerfDestIPAddr
+                InetAddress,
+            hh3cRcrCRMatPrefPerfDestMaskLen
+                Integer32,
+            hh3cRcrCRMatPrefPerfDelayTime
+                Integer32,
+            hh3cRcrCRMatPrefPerfLossRate
+                Integer32,
+            hh3cRcrCRMatPrefPerfThroughput
+                Integer32
+                    }
+
+    hh3cRcrCRMatPrefPerfAddrType OBJECT-TYPE
+        SYNTAX InetAddressType
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "The destination IP addresses type of matched prefix which the CR
+            wants (IPv4 or IPv6)."
+        ::= { hh3cRcrCRMatPrefixPerfEntry 1 }
+
+    hh3cRcrCRMatPrefPerfDestIPAddr OBJECT-TYPE
+        SYNTAX InetAddress
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "The destination IP address of matched prefix which the CR wants."
+        ::= { hh3cRcrCRMatPrefixPerfEntry 2 }
+
+    hh3cRcrCRMatPrefPerfDestMaskLen OBJECT-TYPE
+        SYNTAX Integer32 (0..32)
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "The destination IP address mask length of matched prefix which
+            the CR wants."
+        ::= { hh3cRcrCRMatPrefixPerfEntry 3 }
+
+    hh3cRcrCRMatPrefPerfDelayTime OBJECT-TYPE
+        SYNTAX Integer32  (1..10000)
+        UNITS "second"
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The absolute maximum delay time of prefix which the CR has
+            configured."
+        ::= { hh3cRcrCRMatPrefixPerfEntry 4 }
+
+    hh3cRcrCRMatPrefPerfLossRate OBJECT-TYPE
+        SYNTAX Integer32 (1..100)
+        UNITS "%"
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The packet loss percent of prefix which the CR has configured."
+        ::= { hh3cRcrCRMatPrefixPerfEntry 5 }
+
+    hh3cRcrCRMatPrefPerfThroughput OBJECT-TYPE
+        SYNTAX Integer32
+        UNITS "kb"
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The bandwidth of prefix which the CR has monitored."
+        ::= { hh3cRcrCRMatPrefixPerfEntry 6 }
+
+--Adjusted prefix table define
+    hh3cRcrCRAdjustPrefixTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF Hh3cRcrCRAdjustPrefixEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "This table contains objects to get adjusted prefix information
+            which the CR controlled."
+        ::= { hh3cRcrCR 4 }
+
+    hh3cRcrCRAdjustPrefixEntry OBJECT-TYPE
+        SYNTAX Hh3cRcrCRAdjustPrefixEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "Entry items"
+        INDEX { hh3cRcrCRAdjuPrefDestAddrType, hh3cRcrCRAdjuPrefDestAddr,
+        	   hh3cRcrCRAdjuPrefMaskLen, hh3cRcrCRAdjuPrefPreMRName,
+        	   hh3cRcrCRAdjuPrefPreOutIfName }
+        ::= { hh3cRcrCRAdjustPrefixTable 1 }
+
+    Hh3cRcrCRAdjustPrefixEntry ::=
+        SEQUENCE {
+            hh3cRcrCRAdjuPrefDestAddrType
+                InetAddressType,
+            hh3cRcrCRAdjuPrefDestAddr
+                InetAddress,
+            hh3cRcrCRAdjuPrefMaskLen
+                Integer32,
+            hh3cRcrCRAdjuPrefPreMRName
+                OCTET STRING,
+            hh3cRcrCRAdjuPrefPreOutIfName
+                OCTET STRING,
+            hh3cRcrCRAdjuPrefCurMRName
+                OCTET STRING,
+            hh3cRcrCRAdjuPrefCurOutIfName
+                OCTET STRING,
+            hh3cRcrCRAdjuPrefPersistTime
+                Integer32,
+            hh3cRcrCRAdjuPrefAgeTime
+                Integer32
+                    }
+
+    hh3cRcrCRAdjuPrefDestAddrType OBJECT-TYPE
+        SYNTAX InetAddressType
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "The IP address type of the adjusted prefix which CR controlled
+            (IPv4 or IPv6)."
+        ::= { hh3cRcrCRAdjustPrefixEntry 1 }
+
+    hh3cRcrCRAdjuPrefDestAddr OBJECT-TYPE
+        SYNTAX InetAddress
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "The IP address of the adjusted prefix which CR controlled."
+        ::= { hh3cRcrCRAdjustPrefixEntry 2 }
+
+    hh3cRcrCRAdjuPrefMaskLen OBJECT-TYPE
+        SYNTAX Integer32  (0..32)
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "The IP address mask length of the adjusted prefix which CR
+            controlled."
+        ::= { hh3cRcrCRAdjustPrefixEntry 3 }
+
+    hh3cRcrCRAdjuPrefPreMRName OBJECT-TYPE
+        SYNTAX OCTET STRING   (SIZE(1..32))
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "The name of the MR which the previous outbound traffic
+            flows through."
+        ::= { hh3cRcrCRAdjustPrefixEntry 4 }
+
+    hh3cRcrCRAdjuPrefPreOutIfName OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE(1..48))
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "The name of the external interface on the MR which the previous
+            outbound traffic flows through."
+        ::= { hh3cRcrCRAdjustPrefixEntry 5 }
+
+    hh3cRcrCRAdjuPrefCurMRName OBJECT-TYPE
+        SYNTAX OCTET STRING   (SIZE(1..32))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The name of the MR which the current outbound traffic flows through."
+        ::= { hh3cRcrCRAdjustPrefixEntry 6 }
+
+    hh3cRcrCRAdjuPrefCurOutIfName OBJECT-TYPE
+        SYNTAX OCTET STRING
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The name of the external interface on the MR which the current outbound
+            traffic flows through."
+        ::= { hh3cRcrCRAdjustPrefixEntry 7 }
+
+    hh3cRcrCRAdjuPrefPersistTime OBJECT-TYPE
+        SYNTAX Integer32
+        UNITS "second"
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The persisting time from the time which the adjusted outbound
+            traffic has been adjusted by CR to now."
+        ::= { hh3cRcrCRAdjustPrefixEntry 8 }
+
+    hh3cRcrCRAdjuPrefAgeTime OBJECT-TYPE
+        SYNTAX Integer32
+        UNITS "second"
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "The time which the adjusted prefix remains."
+        ::= { hh3cRcrCRAdjustPrefixEntry 9 }
+END

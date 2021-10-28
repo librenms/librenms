@@ -16,12 +16,12 @@ parameters:
 			path: LibreNMS/Alerting/QueryBuilderParser.php
 
 		-
-			message: "#^Parameter \\#1 \\$ldap of function ldap_error expects resource, false given\\.$#"
+			message: "#^Parameter \\#1 \\$link_identifier of function ldap_error expects resource, false given\\.$#"
 			count: 1
 			path: LibreNMS/Authentication/ADAuthorizationAuthorizer.php
 
 		-
-			message: "#^Parameter \\#1 \\$ldap of function ldap_error expects resource, false given\\.$#"
+			message: "#^Parameter \\#1 \\$link_identifier of function ldap_error expects resource, false given\\.$#"
 			count: 1
 			path: LibreNMS/Authentication/LdapAuthorizationAuthorizer.php
 
@@ -31,27 +31,17 @@ parameters:
 			path: LibreNMS/Authentication/MysqlAuthorizer.php
 
 		-
-			message: "#^If condition is always true\\.$#"
-			count: 1
-			path: LibreNMS/Authentication/MysqlAuthorizer.php
-
-		-
-			message: "#^Unreachable statement \\- code above always terminates\\.$#"
-			count: 1
-			path: LibreNMS/Authentication/MysqlAuthorizer.php
-
-		-
 			message: "#^Parameter \\#2 \\$password of method LibreNMS\\\\Authentication\\\\MysqlAuthorizer\\:\\:addUser\\(\\) expects string, null given\\.$#"
 			count: 1
 			path: LibreNMS/Authentication/SSOAuthorizer.php
 
 		-
-			message: "#^Parameter \\#1 \\$num of function base_convert expects string, int given\\.$#"
+			message: "#^Parameter \\#1 \\$input of function str_pad expects string, int given\\.$#"
 			count: 1
 			path: LibreNMS/Authentication/TwoFactor.php
 
 		-
-			message: "#^Parameter \\#1 \\$string of function str_pad expects string, int given\\.$#"
+			message: "#^Parameter \\#1 \\$number of function base_convert expects string, int given\\.$#"
 			count: 1
 			path: LibreNMS/Authentication/TwoFactor.php
 
@@ -139,11 +129,6 @@ parameters:
 			message: "#^Parameter \\#16 \\$entPhysicalIndex of class LibreNMS\\\\Device\\\\WirelessSensor constructor expects float\\|int\\|null, string given\\.$#"
 			count: 1
 			path: LibreNMS/OS/Ios.php
-
-		-
-			message: "#^Parameter \\#8 \\$multiplier of class LibreNMS\\\\Device\\\\WirelessSensor constructor expects int, null given\\.$#"
-			count: 1
-			path: LibreNMS/OS/Routeros.php
 
 		-
 			message: "#^Parameter \\#8 \\$warn_percent of static method LibreNMS\\\\Device\\\\Processor\\:\\:discover\\(\\) expects int, null given\\.$#"
@@ -266,16 +251,6 @@ parameters:
 			path: tests/AddHostTest.php
 
 		-
-			message: "#^Parameter \\#1 \\$username of method LibreNMS\\\\Interfaces\\\\Authentication\\\\Authorizer\\:\\:changePassword\\(\\) expects string, null given\\.$#"
-			count: 1
-			path: tests/AuthHTTPTest.php
-
-		-
-			message: "#^Parameter \\#2 \\$newpassword of method LibreNMS\\\\Interfaces\\\\Authentication\\\\Authorizer\\:\\:changePassword\\(\\) expects string, null given\\.$#"
-			count: 1
-			path: tests/AuthHTTPTest.php
-
-		-
 			message: "#^Parameter \\#1 \\$attr of method LibreNMS\\\\Authentication\\\\SSOAuthorizer\\:\\:authSSOGetAttr\\(\\) expects string, int given\\.$#"
 			count: 2
 			path: tests/AuthSSOTest.php
@@ -283,16 +258,6 @@ parameters:
 		-
 			message: "#^Parameter \\#1 \\$attr of method LibreNMS\\\\Authentication\\\\SSOAuthorizer\\:\\:authSSOGetAttr\\(\\) expects string, null given\\.$#"
 			count: 2
-			path: tests/AuthSSOTest.php
-
-		-
-			message: "#^Parameter \\#1 \\$username of method LibreNMS\\\\Interfaces\\\\Authentication\\\\Authorizer\\:\\:changePassword\\(\\) expects string, null given\\.$#"
-			count: 1
-			path: tests/AuthSSOTest.php
-
-		-
-			message: "#^Parameter \\#2 \\$newpassword of method LibreNMS\\\\Interfaces\\\\Authentication\\\\Authorizer\\:\\:changePassword\\(\\) expects string, null given\\.$#"
-			count: 1
 			path: tests/AuthSSOTest.php
 
 		-

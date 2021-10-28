@@ -433,7 +433,7 @@
     "rule": "%applications.app_type='portactivity' && %applications_metrics.imaps_total_from>'0'",
     "name": "IRCD Connections From"
   },
- {
+  {
     "rule": "customoids.customoid_current >= `customoids.customoid_limit` && customoids.customoid_alert = \"1\" && macros.device_up = \"1\"",
     "name": "CustomOID over limit"
   },
@@ -522,5 +522,13 @@
   {
     "rule": "eventlog.message ~ \"Deleted\" && eventlog.datetime >= `DATE_SUB(NOW(),INTERVAL 12 Hour)`",
     "name": "A Device sensor has been deleted"
+  },
+  {
+    "name": "Unpolled Devices",
+    "builder": {"condition":"AND","rules":[{"id":"macros.device","field":"macros.device","type":"integer","input":"radio","operator":"equal","value":"1"},{"id":"devices.last_polled","field":"devices.last_polled","type":"datetime","input":"text","operator":"less","value":"`DATE_SUB(NOW(), INTERVAL 6 MINUTE)`"}],"valid":true}
+  },
+  {
+    "builder": {"condition":"AND","rules":[{"id":"ports.ifSpeed","field":"ports.ifSpeed","type":"string","input":"text","operator":"greater","value":"0"},{"id":"ports.ifSpeed","field":"ports.ifSpeed","type":"string","input":"text","operator":"less","value":"`ports.ifSpeed_prev`"},{"id":"eventlog.message","field":"eventlog.message","type":"string","input":"text","operator":"begins_with","value":"ifSpeed:"},{"id":"eventlog.datetime","field":"eventlog.datetime","type":"datetime","input":"text","operator":"greater_or_equal","value":"`macros.past_10m`"},{"id":"ports.port_id","field":"ports.port_id","type":"string","input":"text","operator":"equal","value":"`eventlog.reference`"},{"id":"ports.ifOperStatus","field":"ports.ifOperStatus","type":"string","input":"text","operator":"equal","value":"up"},{"id":"ports.disabled","field":"ports.disabled","type":"string","input":"text","operator":"equal","value":"0"}],"valid":true},
+    "name": "Port Speed Degraded"
   }
 ]

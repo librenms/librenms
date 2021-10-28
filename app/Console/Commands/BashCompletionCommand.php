@@ -60,7 +60,7 @@ class BashCompletionCommand extends Command
                 if (method_exists($command, 'completeArgument')) {
                     foreach ($input->getArguments() as $name => $value) {
                         if ($current == $value) {
-                            $values = $command->completeArgument($name, $value);
+                            $values = $command->completeArgument($name, $value, $previous);
                             if (! empty($values)) {
                                 echo implode(PHP_EOL, $values);
 
@@ -91,9 +91,9 @@ class BashCompletionCommand extends Command
     }
 
     /**
-     * @param string $current
-     * @param string $previous
-     * @param InputDefinition $command_def
+     * @param  string  $current
+     * @param  string  $previous
+     * @param  InputDefinition  $command_def
      * @return false|InputOption
      */
     private function optionExpectsValue($current, $previous, $command_def)
@@ -135,7 +135,7 @@ class BashCompletionCommand extends Command
     /**
      * Complete a command
      *
-     * @param string $partial
+     * @param  string  $partial
      * @return \Illuminate\Support\Collection
      */
     private function completeCommand($partial)
@@ -161,9 +161,9 @@ class BashCompletionCommand extends Command
     /**
      * Complete options for the given command
      *
-     * @param InputDefinition $command
-     * @param string $partial
-     * @param array $prev_options Previous words in the command
+     * @param  InputDefinition  $command
+     * @param  string  $partial
+     * @param  array  $prev_options  Previous words in the command
      * @return \Illuminate\Support\Collection
      */
     private function completeOption($command, $partial, $prev_options)
@@ -217,8 +217,8 @@ class BashCompletionCommand extends Command
     /**
      * Complete options with values (if a list is enumerate in the description)
      *
-     * @param InputOption $option
-     * @param string $partial
+     * @param  InputOption  $option
+     * @param  string  $partial
      * @return \Illuminate\Support\Collection
      */
     private function completeOptionValue($option, $partial)
@@ -239,9 +239,9 @@ class BashCompletionCommand extends Command
     /**
      * Complete commands with arguments
      *
-     * @param string $command Name of the current command
-     * @param string $partial
-     * @param string $current_word
+     * @param  string  $command  Name of the current command
+     * @param  string  $partial
+     * @param  string  $current_word
      * @return \Illuminate\Support\Collection
      */
     private function completeArguments($command, $partial, $current_word)

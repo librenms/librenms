@@ -1,0 +1,242 @@
+-- =================================================================
+-- Copyright (c) 2004-2014 New H3C Tech. Co., Ltd. All rights reserved.
+--
+-- Description:  The Dynamic Host Configuration Protocol for IPv6 (DHCPv6)
+-- provides a framework to assign IPv6 prefixes, IPv6 addresses,
+-- and other configuration parameters to hosts.
+-- Reference:
+-- Version: V1.0
+-- History:
+-- V1.0 2014-10-30 Initial version Created by c09672
+-- =================================================================
+HH3C-DHCP6-SERVER-MIB DEFINITIONS ::= BEGIN
+IMPORTS
+    hh3cCommon
+        FROM HH3C-OID-MIB
+    OBJECT-TYPE, MODULE-IDENTITY, Integer32, TimeTicks
+        FROM SNMPv2-SMI
+    RowStatus
+        FROM SNMPv2-TC
+    InetAddressIPv6
+        FROM INET-ADDRESS-MIB;
+
+hh3cDHCP6Server MODULE-IDENTITY
+    LAST-UPDATED "201410300000Z"            -- Oct 30th, 2014 at 00:00 GMT
+    ORGANIZATION
+        "New H3C Technologies Co., Ltd."
+    CONTACT-INFO
+        "Platform Team New H3C Technologies Co., Ltd.
+         Hai-Dian District Beijing P.R. China
+         http://www.h3c.com
+         Zip: 100085"
+    DESCRIPTION
+        "The MIB module is used for DHCPv6 server."
+    REVISION    "201410300000Z"
+    DESCRIPTION
+        "Initial version"
+    ::= { hh3cCommon 159 }
+
+--
+-- Define the DHCPv6 Server Tables.
+--
+    hh3cDHCP6ServerTables OBJECT IDENTIFIER ::= { hh3cDHCP6Server 1 }
+
+-- =================================================================
+-- 1st Table of hh3cDHCP6ServerTables: hh3cDHCP6PoolTable
+-- =================================================================
+hh3cDHCPS6PoolTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cDHCPS6PoolEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table for creating DHCPv6 address pools."
+    ::= { hh3cDHCP6ServerTables 1 }
+
+hh3cDHCPS6PoolEntry OBJECT-TYPE
+    SYNTAX      Hh3cDHCPS6PoolEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry containing objects for creating or
+        deleting a DHCPv6 address pool."
+    INDEX { hh3cDHCPS6PoolName }
+    ::= { hh3cDHCPS6PoolTable 1 }
+
+Hh3cDHCPS6PoolEntry ::=
+    SEQUENCE
+        {
+            hh3cDHCPS6PoolName      OCTET STRING,
+            hh3cDHCPS6PoolRowStatus RowStatus
+        }
+
+hh3cDHCPS6PoolName OBJECT-TYPE
+    SYNTAX      OCTET STRING(SIZE(0..10))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "DHCPv6 address pool name.  The name must be integer."
+    ::= { hh3cDHCPS6PoolEntry 1 }
+
+hh3cDHCPS6PoolRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "RowStatus.  Three actions are used: active,
+        createAndGo, destroy."
+    ::= { hh3cDHCPS6PoolEntry 2 }
+
+-- =================================================================
+-- 2nd Table of hh3cDHCP6ServerTables: hh3cDHCPS6PoolConfigTable
+-- =================================================================
+hh3cDHCPS6PoolConfigTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cDHCPS6PoolConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table for configuring parameters for DHCPv6 address pools."
+    ::= { hh3cDHCP6ServerTables 2 }
+
+hh3cDHCPS6PoolConfigEntry OBJECT-TYPE
+    SYNTAX      Hh3cDHCPS6PoolConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry containing the objects for the parameter
+        configurations of DHCPv6 address pools."
+    INDEX { hh3cDHCPS6PoolName }
+    ::= { hh3cDHCPS6PoolConfigTable 1 }
+
+Hh3cDHCPS6PoolConfigEntry ::=
+    SEQUENCE
+        {
+            hh3cDHCPS6PoolPrimaryDNSIP InetAddressIPv6,
+            hh3cDHCPS6PoolSecondDNSIP  InetAddressIPv6
+        }
+
+hh3cDHCPS6PoolPrimaryDNSIP OBJECT-TYPE
+    SYNTAX      InetAddressIPv6
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The Primary DNS server IPv6 address to be assigned to the
+        client.  To delete a configured Primary DNS server IP, please
+        set hh3cDHCP6ServerPoolPrimaryDNSIP to '0x00 0x00 0x00 0x00
+        0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00'."
+    ::= { hh3cDHCPS6PoolConfigEntry 1 }
+
+hh3cDHCPS6PoolSecondDNSIP OBJECT-TYPE
+    SYNTAX      InetAddressIPv6
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The Secondary DNS server IPv6 address to be assigned to the
+        client.  To delete a configured Secondary DNS server IP, please
+        set hh3cDHCP6ServerPoolSecondDNSIP to '0x00 0x00 0x00 0x00 0x00
+        0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00'."
+    ::= { hh3cDHCPS6PoolConfigEntry 2 }
+
+-- =================================================================
+-- 3rd Table of hh3cDHCP6ServerTables: hh3cDHCPS6PoolNetworkTable
+-- =================================================================
+hh3cDHCPS6PoolNetworkTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cDHCPS6PoolNetworkEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table containing the network configurations of DHCPv6
+        address pools."
+    ::= { hh3cDHCP6ServerTables 3 }
+
+hh3cDHCPS6PoolNetworkEntry OBJECT-TYPE
+    SYNTAX      Hh3cDHCPS6PoolNetworkEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry containing the objects for configuring
+        the network ip or host ip etc. to pools for
+        DHCPv6 server.  Hh3cDHCPS6PoolStartAddr and hh3cDHCPS6PoolStopAddr
+        must be set with hh3cDHCPS6PoolNetPrefixLen, and must be on the
+        same network."
+    INDEX { hh3cDHCPS6PoolName }
+    ::= { hh3cDHCPS6PoolNetworkTable 1 }
+
+Hh3cDHCPS6PoolNetworkEntry ::=
+    SEQUENCE
+        {
+            hh3cDHCPS6PoolStartAddr      InetAddressIPv6,
+            hh3cDHCPS6PoolStopAddr       InetAddressIPv6,
+            hh3cDHCPS6PoolNetPrefixLen   Integer32,
+            hh3cDHCPS6PoolLeaseTime      TimeTicks
+        }
+
+hh3cDHCPS6PoolStartAddr OBJECT-TYPE
+    SYNTAX      InetAddressIPv6
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Start IP of a DHCPv6 address pool.
+        To delete a configured start IP, please set
+        hh3cDHCP6ServerPoolStartAddr to '0x00 0x00 0x00 0x00 0x00
+        0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00 0x00'."
+    ::= { hh3cDHCPS6PoolNetworkEntry 1 }
+
+hh3cDHCPS6PoolStopAddr OBJECT-TYPE
+    SYNTAX      InetAddressIPv6
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "End IP of a DHCPv6 address pool."
+    ::= { hh3cDHCPS6PoolNetworkEntry 2 }
+
+hh3cDHCPS6PoolNetPrefixLen OBJECT-TYPE
+    SYNTAX      Integer32(1..128)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "A prefix length of DHCPv6 address pool."
+    ::= { hh3cDHCPS6PoolNetworkEntry 3 }
+
+hh3cDHCPS6PoolLeaseTime OBJECT-TYPE
+    SYNTAX      TimeTicks
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Number of time ticks of the lease."
+    ::= { hh3cDHCPS6PoolNetworkEntry 4 }
+
+-- =================================================================
+-- 4th Table of hh3cDHCP6ServerTables: hh3cDHCPS6PoolStatTable
+-- =================================================================
+hh3cDHCPS6PoolStatTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cDHCPS6PoolStatEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The statistics of each DHCPv6 address pool."
+    ::= { hh3cDHCP6ServerTables 4 }
+
+hh3cDHCPS6PoolStatEntry OBJECT-TYPE
+    SYNTAX      Hh3cDHCPS6PoolStatEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry containing the statistics of each DHCPv6 address pool."
+    INDEX { hh3cDHCPS6PoolName }
+    ::= { hh3cDHCPS6PoolStatTable 1 }
+
+Hh3cDHCPS6PoolStatEntry ::=
+    SEQUENCE
+        {
+            hh3cDHCPS6PoolIPPoolUsage     Integer32
+        }
+
+hh3cDHCPS6PoolIPPoolUsage OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Utilization rate of IPv6 addresses in each DHCPv6 address pool, in percentage."
+    ::= { hh3cDHCPS6PoolStatEntry 1 }
+
+END

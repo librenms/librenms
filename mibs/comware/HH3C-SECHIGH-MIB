@@ -1,0 +1,454 @@
+-- ==========================================================================
+-- Copyright (c) 2004-2021 New H3C Tech. Co., Ltd.  All rights reserved.
+--
+-- Description: The MIB is designed to show information on high-end driver products.
+-- Reference:
+-- Version: V1.3
+-- History:
+-- V1.0  2017-09 Initial version created by meirongjun 14958.
+-- V1.1  2020-05 Added hh3cSecHighFaultMonitor by sunlibing 21109.
+-- V1.2  2021-01 Added hh3cSecHighTemperMonitor by sunlibing 21109.
+-- V1.3  2021-02 Added hh3cSecHighParityErrorMonitor by sunlibing 21109.
+-- ==========================================================================
+HH3C-SECHIGH-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    hh3cCommon
+        FROM HH3C-OID-MIB
+    MODULE-IDENTITY, OBJECT-TYPE, Integer32, NOTIFICATION-TYPE
+        FROM SNMPv2-SMI;         -- [RFC2578]
+
+hh3cSecHigh MODULE-IDENTITY
+    LAST-UPDATED "202102030000Z"
+    ORGANIZATION
+        "New H3C Technologies Co., Ltd."
+    CONTACT-INFO
+        "Platform Team New H3C Tech. Co., Ltd.
+        Hai-Dian District Beijing P.R. China
+        http://www.h3c.com
+        Zip:100085
+        "
+    DESCRIPTION
+        "The private MIB file includes the information on high-end driver products."
+    REVISION      "202102030000Z"
+    DESCRIPTION
+        "Add hh3cSecHighParityErrorMonitor."
+    REVISION      "202101060000Z"
+    DESCRIPTION
+        "Add hh3cSecHighTemperMonitor."
+    REVISION      "202005290000Z"
+    DESCRIPTION
+        "Added hh3cSecHighFaultMonitor."
+    REVISION      "201709162020Z"
+    DESCRIPTION
+        "Initial revision of this MIB module."
+    ::= { hh3cCommon 171 }
+--
+-- Node definitions
+--
+hh3cSecHighMonitor OBJECT IDENTIFIER ::= { hh3cSecHigh 1 }
+
+
+--
+-- hh3cSecHighHgMonitorAlarm context table definitions
+--
+hh3cSecHighHgMonitorAlarmVar OBJECT IDENTIFIER   ::= { hh3cSecHighMonitor 1 }
+
+hh3cSecHighHgMonitorAlarmType OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+            "Type of the alarm,0 represent recovery normal,1 represent link status error,
+            2 represent Some packets were dropped on the link."
+    ::= { hh3cSecHighHgMonitorAlarmVar 1 }
+
+hh3cSecHighHgMonitorAlarmSrcChassis OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+            "Number of the chassis where the source end of the alarmed link resides."
+    ::= { hh3cSecHighHgMonitorAlarmVar 2 }
+
+hh3cSecHighHgMonitorAlarmSrcSlot OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+            "Number of the slot where the source end of the alarmed link resides."
+    ::= { hh3cSecHighHgMonitorAlarmVar 3 }
+
+hh3cSecHighHgMonitorAlarmSrcChip OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+            "Number of the chip where the source end of the alarmed link resides."
+    ::= { hh3cSecHighHgMonitorAlarmVar 4 }
+
+hh3cSecHighHgMonitorAlarmSrcPort OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+            "Number of the port where the source end of the alarmed link resides."
+    ::= { hh3cSecHighHgMonitorAlarmVar 5 }
+
+hh3cSecHighHgMonitorAlarmDstChassis OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+            "Number of the chassis where the destination end of the alarmed link resides."
+    ::= { hh3cSecHighHgMonitorAlarmVar 6 }
+
+hh3cSecHighHgMonitorAlarmDstSlot OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+            "Number of the slot where the destination end of the alarmed link resides."
+    ::= { hh3cSecHighHgMonitorAlarmVar 7 }
+
+hh3cSecHighHgMonitorAlarmDstChip OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+            "Number of the chip where the destination end of the alarmed link resides."
+    ::= { hh3cSecHighHgMonitorAlarmVar 8 }
+
+hh3cSecHighHgMonitorAlarmDstPort OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+            "Number of the port where the destination end of the alarmed link resides."
+    ::= { hh3cSecHighHgMonitorAlarmVar 9 }
+
+hh3cSecHighHgMonitorAlarmReason OBJECT-TYPE
+    SYNTAX      OCTET STRING(SIZE(0..512))
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+            "Cause of the alarm."
+    ::= { hh3cSecHighHgMonitorAlarmVar 10 }
+
+
+
+-- ===============================================
+-- Definition of traps.
+-- ===============================================
+hh3cSecHighHgMonitorAlarmTrap OBJECT IDENTIFIER ::= { hh3cSecHighMonitor 2 }
+hh3cSecHighHgMonitorAlarmNotifications OBJECT IDENTIFIER ::= { hh3cSecHighHgMonitorAlarmTrap 0 }
+
+hh3cSecHighHgMonitorAlarmNotification NOTIFICATION-TYPE
+    OBJECTS {
+                hh3cSecHighHgMonitorAlarmType,
+                hh3cSecHighHgMonitorAlarmSrcChassis,
+                hh3cSecHighHgMonitorAlarmSrcSlot,
+                hh3cSecHighHgMonitorAlarmSrcChip,
+                hh3cSecHighHgMonitorAlarmSrcPort,
+                hh3cSecHighHgMonitorAlarmDstChassis,
+                hh3cSecHighHgMonitorAlarmDstSlot,
+                hh3cSecHighHgMonitorAlarmDstChip,
+                hh3cSecHighHgMonitorAlarmDstPort,
+                hh3cSecHighHgMonitorAlarmReason
+            }
+    STATUS     current
+    DESCRIPTION
+           "This notification is generated when an HgMonitor alarm is generated."
+    ::= { hh3cSecHighHgMonitorAlarmNotifications 1 }
+
+
+
+-- ===============================================
+-- Definition of hh3cSecHighFaultMonitor.
+-- ===============================================
+hh3cSecHighFaultMonitor OBJECT IDENTIFIER ::= { hh3cSecHighMonitor 3 }
+
+-- ============
+-- hh3cSecHighFaultAlm context variables definition
+-- ============
+hh3cSecHighFaultAlmVar OBJECT IDENTIFIER ::= { hh3cSecHighFaultMonitor 1 }
+
+
+hh3cSecHighFaultAlmType OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+            "Type of the alarm, 1 represents Hg link status error,
+            2 represents Hg packet loss error, 3 represents back board E2PROM error,
+            4 represents board E2PROM error, 5 represents CPLD chip error,
+            101 to 200 represent FPGA errors."
+    ::= { hh3cSecHighFaultAlmVar 1 }
+
+hh3cSecHighFaultAlmChassis OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+            "Number of the chassis in which error occurs."
+    ::= { hh3cSecHighFaultAlmVar 2 }
+
+hh3cSecHighFaultAlmSlot OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+            "Number of the slot in which error occurs."
+    ::= { hh3cSecHighFaultAlmVar 3 }
+
+hh3cSecHighFaultAlmDstChassis OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+            "Number of the destination chassis in which Hg error occurs."
+    ::= { hh3cSecHighFaultAlmVar 4 }
+
+hh3cSecHighFaultAlmDstSlot OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+            "Number of the destination slot in which Hg error occurs."
+    ::= { hh3cSecHighFaultAlmVar 5 }
+
+
+hh3cSecHighFaultAlmChip OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+            "Id of the error chip."
+    ::= { hh3cSecHighFaultAlmVar 6 }
+
+hh3cSecHighFaultAlmInfo OBJECT-TYPE
+    SYNTAX      OCTET STRING(SIZE(0..512))
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+            "Details of the alarm notification."
+    ::= { hh3cSecHighFaultAlmVar 7 }
+
+
+-- ===============================================
+-- Definition of Fault monitor traps.
+-- ===============================================
+hh3cSecHighFaultAlmTrap OBJECT IDENTIFIER ::= { hh3cSecHighFaultMonitor 2 }
+
+-- ===============================================
+-- Definition of Fault monitor traps Pre.
+-- ===============================================
+hh3cSecHighFaultAlmTrapPre OBJECT IDENTIFIER ::= { hh3cSecHighFaultAlmTrap 0 }
+
+
+-- ============
+-- hh3cSecHighFaultMonitorChipAlarm trap definition
+-- ============
+
+hh3cSecHighFaultMonChipAlmNotifi NOTIFICATION-TYPE
+    OBJECTS {
+                hh3cSecHighFaultAlmType,
+                hh3cSecHighFaultAlmChassis,
+                hh3cSecHighFaultAlmSlot,
+                hh3cSecHighFaultAlmChip,
+                hh3cSecHighFaultAlmInfo
+            }
+    STATUS     current
+    DESCRIPTION
+           "This notification is generated when a chip error occurs."
+    ::= { hh3cSecHighFaultAlmTrapPre 1 }
+
+-- ============
+-- hh3cSecHighFaultMonChipAlm resume trap definition
+-- ============
+
+hh3cSecHighFaultMonChipAlmResu NOTIFICATION-TYPE
+    OBJECTS {
+                hh3cSecHighFaultAlmType,
+                hh3cSecHighFaultAlmChassis,
+                hh3cSecHighFaultAlmSlot,
+                hh3cSecHighFaultAlmChip,
+                hh3cSecHighFaultAlmInfo
+            }
+    STATUS     current
+    DESCRIPTION
+           "This notification is generated when a chip error is recovered."
+    ::= { hh3cSecHighFaultAlmTrapPre 2 }
+
+-- ============
+-- hh3cSecHighFaultMonitorHgAlarm trap definition
+-- ============
+
+hh3cSecHighFaultMonHgAlmNotifi NOTIFICATION-TYPE
+    OBJECTS {
+                hh3cSecHighFaultAlmType,
+                hh3cSecHighFaultAlmChassis,
+                hh3cSecHighFaultAlmSlot,
+                hh3cSecHighFaultAlmDstChassis,
+                hh3cSecHighFaultAlmDstSlot,
+                hh3cSecHighFaultAlmInfo
+            }
+    STATUS     current
+    DESCRIPTION
+           "This notification is generated when an Hg error occurs."
+    ::= { hh3cSecHighFaultAlmTrapPre 3 }
+
+-- ============
+-- hh3cSecHighFaultMonHgAlm resume trap definition
+-- ============
+
+hh3cSecHighFaultMonHgAlmResu NOTIFICATION-TYPE
+    OBJECTS {
+                hh3cSecHighFaultAlmType,
+                hh3cSecHighFaultAlmChassis,
+                hh3cSecHighFaultAlmSlot,
+                hh3cSecHighFaultAlmDstChassis,
+                hh3cSecHighFaultAlmDstSlot,
+                hh3cSecHighFaultAlmInfo
+            }
+    STATUS     current
+    DESCRIPTION
+           "This notification is generated when an Hg error is recovered."
+    ::= { hh3cSecHighFaultAlmTrapPre 4 }
+
+-- ============
+-- hh3cSecHighTemperMonitor definition
+-- ============
+hh3cSecHighTemperMonitor OBJECT IDENTIFIER ::= { hh3cSecHigh 2 }
+
+-- ============
+-- hh3cSecHighTemperAlarmVar definition
+-- ============
+hh3cSecHighTemperAlarmVar OBJECT IDENTIFIER ::= { hh3cSecHighTemperMonitor 1 }
+
+hh3cSecHighTemperAlarmChassis OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+            "Number of the chassis in which temperature exdceeds the shutdown threshold."
+    ::= { hh3cSecHighTemperAlarmVar 1 }
+
+hh3cSecHighTemperAlarmSlot OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+            "Number of the slot in which temperature exdceeds the shutdown threshold."
+    ::= { hh3cSecHighTemperAlarmVar 2 }
+
+hh3cSecHighTemperAlarmHotspotIndx OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+            "Index of the hotspot of which temperature exdceeds the shutdown threshold."
+    ::= { hh3cSecHighTemperAlarmVar 3 }
+
+hh3cSecHighTemperAlarmCurTemper OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+            "Current temperature of the hotspot that exceeds the high temperature shutdown threshold."
+    ::= { hh3cSecHighTemperAlarmVar 4 }
+
+hh3cSecHighTemperAlarmLimit OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+            "The power down threshold of ehe equipment."
+    ::= { hh3cSecHighTemperAlarmVar 5 }
+
+-- ===============================================
+-- Definition of Temperature monitor trap.
+-- ===============================================
+hh3cSecHighTemperAlarmTrap OBJECT IDENTIFIER ::= { hh3cSecHighTemperMonitor 2 }
+
+-- ===============================================
+-- Definition of Temperature monitor trap Pre.
+-- ===============================================
+hh3cSecHighTemperAlmTrapPre OBJECT IDENTIFIER ::= { hh3cSecHighTemperAlarmTrap 0 }
+
+-- ============
+-- hh3cSecHighTemperAlarm trap definition
+-- ============
+
+hh3cSecHighTemperAlarmNotify NOTIFICATION-TYPE
+    OBJECTS {
+                hh3cSecHighTemperAlarmChassis,
+                hh3cSecHighTemperAlarmSlot,
+                hh3cSecHighTemperAlarmHotspotIndx,
+                hh3cSecHighTemperAlarmCurTemper,
+                hh3cSecHighTemperAlarmLimit
+            }
+    STATUS     current
+    DESCRIPTION
+           "This notification is generated when a hotspot's temperature exceeds its power down threshold."
+    ::= { hh3cSecHighTemperAlmTrapPre 1 }
+
+-- ============
+-- hh3cSecHighParityErrorMonitor definition
+-- ============
+hh3cSecHighParityErrorMonitor OBJECT IDENTIFIER ::= { hh3cSecHigh 3 }
+
+-- ============
+-- hh3cSecHighParityErrorAlarmVar definition
+-- ============
+hh3cSecHighParityErrorAlarmVar OBJECT IDENTIFIER ::= { hh3cSecHighParityErrorMonitor 1 }
+
+hh3cSecHighParityErrorAlarmChassis OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+            "Number of the chassis in which Parity Error occurs."
+    ::= { hh3cSecHighParityErrorAlarmVar 1 }
+
+hh3cSecHighParityErrorAlarmSlot OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+            "Number of the slot in which Parity Error occurs."
+    ::= { hh3cSecHighParityErrorAlarmVar 2 }
+
+hh3cSecHighParityErrorAlarmChipUnit OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+            "Number of the ChipUnit of which Parity Error occurs."
+    ::= { hh3cSecHighParityErrorAlarmVar 3 }
+
+-- ===============================================
+-- Definition of Parity Error monitor trap.
+-- ===============================================
+hh3cSecHighParityErrorAlarmTrap OBJECT IDENTIFIER ::= { hh3cSecHighParityErrorMonitor 2 }
+
+-- ===============================================
+-- Definition of Parity Error trap Pre.
+-- ===============================================
+hh3cSecHighParityErrorAlarmTrapPre OBJECT IDENTIFIER ::= { hh3cSecHighParityErrorAlarmTrap 0 }
+
+-- ============
+-- hh3cSecHighParityError trap definition
+-- ============
+
+hh3cSecHighParityErrorAlarmNotify NOTIFICATION-TYPE
+    OBJECTS {
+                hh3cSecHighParityErrorAlarmChassis,
+                hh3cSecHighParityErrorAlarmSlot,
+                hh3cSecHighParityErrorAlarmChipUnit
+            }
+    STATUS     current
+    DESCRIPTION
+           "This notification is generated when a severe parity error occurs."
+    ::= { hh3cSecHighParityErrorAlarmTrapPre 1 }
+END

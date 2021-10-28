@@ -81,7 +81,6 @@ modules:
                     descr: '{{ $ifDescr }} Rx Power'
                     entPhysicalIndex: '{{ $index }}'
                     entPhysicalIndex_measured: ports
-                    user_func: '\LibreNMS\OS\Packetlight::offsetSfpDbm'
                     divisor: 10
                     group: '{{ $edfaFreeDescription }}'
                 -
@@ -92,7 +91,6 @@ modules:
                     entPhysicalIndex: '{{ $index }}'
                     entPhysicalIndex_measured: ports
                     index: 'edfaAdminOutputPower-{{ $index }}'
-                    user_func: '\LibreNMS\OS\Packetlight::offsetSfpDbm'
                     divisor: 10
                     group: '{{ $edfaFreeDescription }}'
                 -

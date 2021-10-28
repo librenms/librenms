@@ -301,7 +301,7 @@ if (Auth::user()->hasGlobalAdmin()) {
     }
     if (! empty($text)) {
         $language = isset($previous_config) ? 'diff' : Config::getOsSetting($device['os'], 'config_highlighting', 'ios');
-        $geshi = new GeSHi(htmlspecialchars_decode($text), $language);
+        $geshi = new GeSHi(htmlspecialchars_decode($text, ENT_QUOTES | ENT_HTML5), $language);
         $geshi->enable_line_numbers(GESHI_FANCY_LINE_NUMBERS);
         $geshi->set_overall_style('color: black;');
         // $geshi->set_line_style('color: #999999');

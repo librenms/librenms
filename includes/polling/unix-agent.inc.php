@@ -12,7 +12,7 @@ if ($device['os_group'] == 'unix' || $device['os'] == 'windows') {
     }
 
     $agent_start = microtime(true);
-    $poller_target = Device::pollerTarget($device['hostname']);
+    $poller_target = \LibreNMS\Util\Rewrite::addIpv6Brackets(Device::pollerTarget($device['hostname']));
     $agent = fsockopen($poller_target, $agent_port, $errno, $errstr, \LibreNMS\Config::get('unix-agent.connection-timeout'));
 
     if (! $agent) {
@@ -63,6 +63,8 @@ if ($device['os_group'] == 'unix' || $device['os'] == 'windows') {
             'gpsd',
         ];
 
+        global $agent_data;
+        $agent_data = [];
         foreach (explode('<<<', $agent_raw) as $section) {
             [$section, $data] = explode('>>>', $section);
             [$sa, $sb] = explode('-', $section, 2);

@@ -16,5 +16,6 @@ class DatabaseSeeder extends Seeder
         $this->call(DefaultAlertTemplateSeeder::class);
         $this->call(DefaultWidgetSeeder::class);
         $this->call(DefaultLegacySchemaSeeder::class);
+        $this->call(ConfigSeeder::class);
     }
 }

@@ -18,6 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2017 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -29,7 +30,7 @@ interface ProcessorPolling
     /**
      * Poll processor data.  This can be implemented if custom polling is needed.
      *
-     * @param array $processors Array of processor entries from the database that need to be polled
+     * @param  array  $processors  Array of processor entries from the database that need to be polled
      * @return array of polled data
      */
     public function pollProcessors(array $processors);

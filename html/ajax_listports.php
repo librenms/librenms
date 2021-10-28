@@ -20,7 +20,7 @@ if (! Auth::check()) {
 Debug::set($_REQUEST['debug']);
 
 if (is_numeric($_GET['device_id'])) {
-    foreach (dbFetch('SELECT * FROM ports WHERE device_id = ?', [$_GET['device_id']]) as $interface) {
+    foreach (dbFetch('SELECT * FROM ports WHERE device_id = ? ORDER BY portName,ifAlias', [$_GET['device_id']]) as $interface) {
         $interface = cleanPort($interface);
         $string = addslashes(html_entity_decode($interface['label'] . ' - ' . $interface['ifAlias']));
         echo "obj.options[obj.options.length] = new Option('" . $string . "','" . $interface['port_id'] . "');\n";

@@ -1,0 +1,1793 @@
+-- =============================================================================
+-- Copyright (c) 2004-2017 New H3C Tech. Co., Ltd.  All rights reserved.
+--
+-- Description:
+--   The file defines a MIB to provide 802.11 MAC information such
+--   as station statistic and notification events.
+-- Reference:
+-- Version: V3.0
+-- History:
+--   V1.0 created by shiyang (Richard)
+--     Initial version 2006-05-10
+--   V1.1 2007-04-27 modified by shiyang(Richard)
+--        The data type of object hh3cDot11StationRxFrameBytes,
+--        hh3cDot11StationTxFrameBytes and hh3cDot11StationDropFrameBytes
+--        was changed from counter32 to counter64.
+--   V1.2 2007-06-21 modified by Vikas K
+--        Added 4 new Station Traps and also new objects for the traps.
+--   V1.3 2007-12-21 modified by wanghao (Kumar)
+--        Added hh3cDot11StationRxSNR, hh3cDot11StationTxRate,
+--        hh3cDot11StationRxRate to hh3cDot11StationAssociateTable.
+--        Added hh3cDot11StationSessionDuration to hh3cDot11StationDeAssocTrap
+--        Added hh3cDot11StationSessionDuration to hh3cDot11StationTrapVarObjects.
+--        Added hh3cDot11StationVendorName and hh3cDot11StationRadioMode to
+--        Hh3cDot11StationAssociateEntry.
+--   V1.4 2008-02-25 modified by wanghao (Kumar)
+--        Add hh3cDot11StationRoamingTrap and add hh3cDot11StationRxNoise to
+--        hh3cDot11StationAssociateTable.
+--   V1.5 2008-08-01 modified by Wang Lu
+--        Change description of hh3cDot11StationMAC, hh3cDot11CurrWlanID and
+--        hh3cDot11StationAid.
+--        Change SYNTAX of hh3cDot11StationSessionStartTime
+--        Change OBJECTS of hh3cDot11StationAuthorFailTrap,
+--        hh3cDot11StationAssocFailTrap, hh3cDot11StationDeAssocTrap and
+--        hh3cDot11StationAuthorSuccTrap
+--   V1.6 2008-11-07 modified by Wang Lu and Li Yugang
+--        Add hh3cDot11StationRxRetryPkts, hh3cDot11StationTxRetryPkts,
+--        hh3cDot11StationRxRetryBytes and hh3cDot11StationTxRetryBytes
+--        to hh3cDot11StationStatisTable.
+--        Add new variable bindings hh3cDot11StationAPName and
+--        hh3cDot11StationBSSID to hh3cDot11StationAuthorSuccTrap and
+--        hh3cDot11StationDeAssocTrap.
+--        Add new notification hh3cDot11StationDisconnectTrap.
+--        Add hh3cDot11StationThroughput to hh3cDot11StationStatisTable.
+--   V1.7 2009-05-07 modified by Wang Shaojie
+--        Add hh3cDot11StationMACAddress to hh3cDot11StationAssociateTable
+--   V1.8 2009-04-14 modified by Heziqi
+--        Add new node hh3cDot11StationSuccessTxCnt, hh3cDot11StationRxFragCnt
+--        and hh3cDot11StationSuccessTxDataCnt for hh3cDot11StationStatisTable.
+--        Add new node hh3cDot11StationTxSpeed, hh3cDot11StationRxSpeed
+--        and hh3cDot11StationWmmMode for hh3cDot11StationAssociateTable.
+--        Add new node hh3cDot11StationRxDataFrameCnt,
+--        hh3cDot11StationTxDataFrameCnt, hh3cDot11StationRxDataFrameBytes
+--        hh3cDot11StationTxDataFrameBytes for hh3cDot11StationAssociateTable.
+--   V1.9 2009-08-07 modified by Wang Shaojie
+--        Modify description of hh3cDot11StationTxSpeed, hh3cDot11StationRxSpeed
+--   V2.0 2010-02-23 Add new node hh3cDot11StaRxErrDataFrameCnt and
+--        hh3cDot11StaTxRetryDataFrameCnt to hh3cDot11StationStatisTable.
+--        Add new node hh3cDot11StationUpTimeTicks, hh3cDot11StationSecIEStatus
+--        to hh3cDot11StationAssociateTable.
+--        Add hh3cDot11StationAuthMode to hh3cDot11StationTrapVarObjects.
+--        2010-08-07 modified by Wang Shaojie
+--        Add hh3cDot11StationACIPv6Add to hh3cDot11StationTrapVarObjects.
+--        2010-09-02 modified by Yin junjie
+--        Modify hh3cDot11StationDisconnectTrap.
+--   V2.1 2011-08-10 modified by limingjin
+--        Add hh3cDot11StationRadioMode2 to hh3cDot11StationAssociateTable
+--   V2.2 2011-09-28 modified by zhanghu
+--        Add hh3cDot11StaTxDataRatePkts, hh3cDot11StaRxDataRatePkts,
+--        hh3cDot11StaTxSignalStrengthPkts to hh3cDot11StationStatisTable
+--        2012-02-08 modified by d07436
+--        Add hh3cDot11StationAssTime to  hh3cDot11StationAssociateEntry
+--        Add hh3cDot11UserDisconnectTrap to hh3cDot11StationTraps
+--        Add hh3cDot11UserName to hh3cDot11StationTrapVarObjects
+--   V2.3 2012-05-16 modified by lihonghao
+--        Add hh3cDot11StationUserAuthType to hh3cDot11StationAssociateTable
+--        2012-08-13 modified by wangminghui
+--        Add new node   hh3cDot11StationTrapAPMacAddress to hh3cDot11StationTrapVarObjects
+--        Add new object hh3cDot11StationTrapAPMacAddress to hh3cDot11StationAuthorFailTrap
+--        Add new object hh3cDot11StationTrapAPMacAddress to hh3cDot11StationAssocFailTrap
+--        modified by niujian
+--        Add hh3cDot11StationRfPingTest to hh3cDot11StationAssociateTable.
+--        Add hh3cDot11StationRfPingTable.
+--   V2.4 2013-04-10 modified by huashuyuan
+--        Add hh3cDot11StationMaxRate to hh3cDot11StationAssociateTable
+--   V2.5 2013-08-21 modified by zhangsiyu
+--        Add hh3cDot11CurrAntennaID to hh3cDot11StationAPRelationTable
+--   V2.6 2014-02-13 modified by xiaomin
+--        Add hh3cDot11StationPowerSaveModeCM, hh3cDot11StationAuthenModeCM,
+--        hh3cDot11StationAKMModeCM, hh3cDot11StationSecurityCiphersCM
+--        and hh3cDot11StationSecIEStatusCM to hh3cDot11StationAssociateTable
+--   V2.7 2014-05-08 modified by yubo
+--        Add hh3cDot11StaInternetRxFrameBytes,hh3cDot11StaInternetTxFrameBytes,
+--        hh3cDot11StaLocalRxFrameBytes,hh3cDot11StaLocalTxFrameBytes to
+--        hh3cDot11StationStatisTable.
+--   V2.8 2014-11-19 modified by yubo
+--        Add hh3cDot11StationIPv6Address to hh3cDot11StationAssociateTable
+--   V2.9 2015-04-13 modified by limingjin
+--        Add hh3cDot11StaAntennaChgTrap to hh3cDot11StationTraps
+--        Add new node   hh3cDot11StationTrapOldAntennaID to hh3cDot11StationTrapVarObjects
+--        Add new node   hh3cDot11StationTrapNewAntennaID to hh3cDot11StationTrapVarObjects
+--   V3.0 2016-3-11 modified by xiaomin
+--        Add hh3cDot11StationAssociateAPMACAddressCM to hh3cDot11StationAssociateTable
+--        2017-2-24 modified by jiaohaina
+--        Add hh3cDot11StationAuditTrap to hh3cDot11StationTraps
+--        Add new node    hh3cDot11StationTrapAPIPAddress to hh3cDot11StationTrapVarObjects
+--        Add new node    hh3cDot11StationTrapStartTime to hh3cDot11StationTrapVarObjects
+--        Add new node    hh3cDot11StationAuditTrapOpType to hh3cDot11StationTrapVarObjects
+--        Add new node    hh3cDot11StationTrapStaIPAddress to hh3cDot11StationTrapVarObjects
+--        Add new node    hh3cDot11StationTrapRadioID to hh3cDot11StationTrapVarObjects
+--        Add new node    hh3cDot11StationTrapRadioMode to hh3cDot11StationTrapVarObjects
+--        Add new node    hh3cDot11StationTrapWlanID to hh3cDot11StationTrapVarObjects
+--        Add new node    hh3cDot11StationTrapSSIDName hh3cDot11StationTrapVarObjects
+--        Add new node    hh3cDot11StationTrapVlan to hh3cDot11StationTrapVarObjects
+--        Add new node    hh3cDot11StationTrapChannel to hh3cDot11StationTrapVarObjects
+--        Add new node    hh3cDot11StationTrapRSSI to hh3cDot11StationTrapVarObjects
+--        Add new node    hh3cDot11StationTrapRxFrameKbit to hh3cDot11StationTrapVarObjects
+--        Add new node    hh3cDot11StationTrapTxFrameKbit to hh3cDot11StationTrapVarObjects
+--        Add new node    hh3cDot11StationTrapVlan to hh3cDot11StationTrapVarObjects
+--        Add new node    hh3cDot11StationTrapChannel to hh3cDot11StationTrapVarObjects
+--        2017-10-09 modified by jiaohaina
+--        Add hh3cDot11StationDeviceType,hh3cDot11StationTxRateCM,hh3cDot11StationRxRateCM to
+--        hh3cDot11StationAssociateTable
+--        Add hh3cDot11StationBSSID to hh3cDot11StationAssocFailTrap
+-- =============================================================================
+HH3C-DOT11-STATION-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+        MacAddress, DateAndTime, TruthValue
+    FROM SNMPv2-TC
+        MODULE-IDENTITY,
+        OBJECT-TYPE,
+        NOTIFICATION-TYPE,
+        Integer32,
+        Unsigned32,
+        Counter32,
+        Counter64,
+        IpAddress,
+        TimeTicks
+    FROM SNMPv2-SMI
+        hh3cDot11,
+        Hh3cDot11RadioType,
+        Hh3cDot11ObjectIDType,
+        Hh3cDot11ChannelScopeType,
+        Hh3cDot11SSIDStringType,
+        Hh3cDot11AuthenType,
+        Hh3cDot11AKMType,
+        Hh3cDot11CipherType,
+        Hh3cDot11RadioScopeType,
+        Hh3cDot11SSIDEncryptModeType,
+        Hh3cDot11AssocFailType,
+        Hh3cDot11AuthorFailType,
+        Hh3cDot11SecIEStatusType,
+        Hh3cDot11RadioType2
+    FROM HH3C-DOT11-REF-MIB;
+
+hh3cDot11STATION MODULE-IDENTITY
+    LAST-UPDATED "201710091800Z"        -- Oct 09, 2017 at 18:00 GMT
+    ORGANIZATION
+        "New H3C Technologies Co., Ltd."
+    CONTACT-INFO
+        "Platform Team New H3C Technologies Co., Ltd.
+         Hai-Dian District Beijing P.R. China
+         http://www.h3c.com
+         Zip: 100085"
+    DESCRIPTION
+        "This MIB defines the configuration and statistic information of
+        stations.
+
+        GLOSSARY
+
+        IEEE 802.11
+        Standard to encourage interoperability among
+        wireless networking equipment.
+
+        Access point (AP)
+        Transmitter/receiver (transceiver) device
+        that commonly connects and transports data
+        between a wireless network and a wired network.
+
+        Access control (AC)
+        To control and manage multi-APs, it will bridge
+        wireless and wired network.
+
+        Control And Provisioning of Wireless Access Points Protocol
+        The short name of protocol is CAPWAP.  AC will control
+        and manage AP by CAPWAP tunnel protocol defined by IETF.
+        Also, a data tunnel will be set up between AC and AP.
+
+        BSS
+        IEEE 802.11 Basic Service Set (Radio Cell).  The
+        BSS of an AP comprises of the stations directly
+        associated with the AP.
+
+        station (Client Station)
+        A wireless device in a wireless network
+        associated with an access point.
+
+        MIC
+        Message Integrity Check.  A MIC can, optionally,
+        be added to WEP-encrypted 802.11 frames.
+
+        SSID
+        Radio Service Set ID.  It is used for identification
+        during association.
+
+        STA  (WSTA)
+        A non-AP 802.11 wireless station.
+
+        WEP
+        Wired Equivalent Privacy.  'WEP' is generally used
+        to refer to 802.11 encryption.
+
+        RSSI
+        It is the received signal strength indication.
+        It suggests the quality of received signal.
+
+        RTS
+        Request to Send, it is used to gain control of the medium
+        for the transmission of 'large' frames, in which 'large'
+        is defined by the RTS threshold in the network card driver.
+
+        CTS
+        Clear to Send, it is used to answer RTS frames.
+
+        AKM
+        The authentication and key management method defined by
+        802.11i, and which includes 802.1x and pre-shared key."
+  REVISION "201710091800Z"        -- Oct 09, 2017 at 18:00 GMT
+    DESCRIPTION
+         "Modified to add new nodes."
+  REVISION "201702241800Z"        -- Feb 24, 2017 at 18:00 GMT
+    DESCRIPTION
+        "Add hh3cDot11StationAuditTrap to hh3cDot11StationTraps
+         Add new node     hh3cDot11StationTrapAPIPAddress to hh3cDot11StationTrapVarObjects
+         Add new node     hh3cDot11StationTrapStartTime to hh3cDot11StationTrapVarObjects
+         Add new node     hh3cDot11StationAuditTrapOpType to hh3cDot11StationTrapVarObjects
+         Add new node     hh3cDot11StationTrapStaIPAddress to hh3cDot11StationTrapVarObjects
+         Add new node     hh3cDot11StationTrapRadioID to hh3cDot11StationTrapVarObjects
+         Add new node     hh3cDot11StationTrapRadioMode to hh3cDot11StationTrapVarObjects
+         Add new node     hh3cDot11StationTrapWlanID to hh3cDot11StationTrapVarObjects
+         Add new node     hh3cDot11StationTrapSSIDName hh3cDot11StationTrapVarObjects
+         Add new node     hh3cDot11StationTrapVlan to hh3cDot11StationTrapVarObjects
+         Add new node     hh3cDot11StationTrapChannel to hh3cDot11StationTrapVarObjects
+         Add new node     hh3cDot11StationTrapRSSI to hh3cDot11StationTrapVarObjects
+         Add new node     hh3cDot11StationTrapRxFrameKbit to hh3cDot11StationTrapVarObjects
+         Add new node     hh3cDot11StationTrapTxFrameKbit to hh3cDot11StationTrapVarObjects
+         Add new node     hh3cDot11StationTrapVlan to hh3cDot11StationTrapVarObjects
+         Add new node     hh3cDot11StationTrapChannel to hh3cDot11StationTrapVarObjects"
+    REVISION "201603111800Z"        -- Mar 11, 2016 at 18:00 GMT
+    DESCRIPTION
+        "Modified to add new nodes."
+    REVISION "201504131800Z"        -- Apr 13, 2015 at 18:00 GMT
+    DESCRIPTION
+        "Add hh3cDot11StaAntennaChgTrap to hh3cDot11StationTraps
+         Add new node hh3cDot11StationTrapOldAntennaID to hh3cDot11StationTrapVarObjects
+         Add new node hh3cDot11StationTrapNewAntennaID to hh3cDot11StationTrapVarObjects"
+    REVISION "201009021800Z"        -- Sep 2, 2010 at 18:00 GMT
+    DESCRIPTION
+        "Modify hh3cDot11StationDisconnectTrap."
+    REVISION "201002231800Z"        -- Feb 23, 2010 at 18:00 GMT
+    DESCRIPTION
+        "Add new node hh3cDot11StationUpTimeTicks, hh3cDot11StationSecIEStatus
+         to hh3cDot11StationAssociateTable."
+    REVISION "200912011800Z"        -- Aug 07, 2009 at 18:00 GMT
+    DESCRIPTION
+        "Add new node hh3cDot11StaRxErrDataFrameCnt and hh3cDot11StaTxRetryDataFrameCnt
+         to hh3cDot11StationStatisTable"
+    REVISION "200908071800Z"        -- Aug 07, 2009 at 18:00 GMT
+    DESCRIPTION
+        "Modify description of hh3cDot11StationTxSpeed, hh3cDot11StationRxSpeed"
+    REVISION "200907291800Z"        -- Jul 29, 2009 at 18:00 GMT
+    DESCRIPTION
+        "Modified to add new nodes."
+    REVISION "200905072000Z"        -- May 7, 2009 at 20:00 GMT
+    DESCRIPTION
+        "Modified to add new nodes."
+    REVISION "200811071730Z"        -- Nov 07, 2008 at 17:30 GMT
+    DESCRIPTION
+        "Modified to add new nodes."
+    REVISION "200802251800Z"        -- Feb 25, 2008 at 18:00 GMT
+    DESCRIPTION
+        "Modified to add new trap and add hh3cDot11StationRxNoise to hh3cDot11StationAssociateTable."
+    REVISION "200712211800Z"        -- Dec 21, 2007 at 18:00 GMT
+    DESCRIPTION
+        "Modified to add new nodes."
+    REVISION "200706212000Z"        -- Jun 21, 2007 at 20:00 GMT
+    DESCRIPTION
+        "Changes made for new requirements."
+    REVISION "200704272000Z"        -- Apr 27, 2007 at 20:00 GMT
+    DESCRIPTION
+        "Modified to fix some issue."
+    REVISION "200605101600Z"        -- May 10, 2006 at 19:00 GMT
+    DESCRIPTION
+        "The initial revision of this MIB module."
+    ::= { hh3cDot11 3 }
+
+-- *****************************************************************************
+-- *  Major sections
+-- *****************************************************************************
+--  Station Management Group
+--  DEFINED AS "The group to provide the basic information for station,
+--  for example, associated station, performance data and so on."
+
+hh3cDot11StationMtGroup OBJECT IDENTIFIER     ::= { hh3cDot11STATION 1 }
+--  Station Management Group has the following children:
+--  hh3cDot11StationAssociateTable            ::= { hh3cDot11APMtGroup 1 }
+--  hh3cDot11StationAPRelationTable           ::= { hh3cDot11APMtGroup 2 }
+--  hh3cDot11StationStatisTable               ::= { hh3cDot11APMtGroup 3 }
+--  hh3cDot11StationRfPingTable               ::= { hh3cDot11APMtGroup 4 }
+
+--  MAC Event Notification
+--  DEFINED AS "The group to provide station notification information"
+hh3cDot11StationNotifyGroup OBJECT IDENTIFIER ::= { hh3cDot11STATION 2 }
+
+-- *****************************************************************************
+-- *  hh3cDot11StaAssociateTable Definition
+-- *****************************************************************************
+hh3cDot11StationAssociateTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cDot11StationAssociateEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains the information of stations which are
+        associating with the wireless network (current AC)."
+    ::= { hh3cDot11StationMtGroup 1 }
+
+hh3cDot11StationAssociateEntry OBJECT-TYPE
+    SYNTAX      Hh3cDot11StationAssociateEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry contains association information of each station."
+    INDEX
+        {
+            hh3cDot11StationMAC
+        }
+    ::= { hh3cDot11StationAssociateTable 1 }
+
+Hh3cDot11StationAssociateEntry ::= SEQUENCE
+    {
+        hh3cDot11StationMAC                MacAddress,
+        hh3cDot11StationIPAddress          IpAddress,
+        hh3cDot11StationUserName           OCTET STRING,
+        hh3cDot11StationTxRateSet          OCTET STRING,
+        hh3cDot11StationUpTime             Unsigned32,
+        hh3cDot11StationSignalStrength     Integer32,
+        hh3cDot11StationRSSI               Integer32,
+        hh3cDot11StationChannel            Hh3cDot11ChannelScopeType,
+        hh3cDot11StationPowerSaveMode      INTEGER,
+        hh3cDot11StationAid                Integer32,
+        hh3cDot11StationVlanId             Integer32,
+        hh3cDot11StationSSIDName           Hh3cDot11SSIDStringType,
+        hh3cDot11StationAuthenMode         Hh3cDot11AuthenType,
+        hh3cDot11StationAKMMode            Hh3cDot11AKMType,
+        hh3cDot11StationSecurityCiphers    Hh3cDot11CipherType,
+        hh3cDot11StationSSIDEncryptMode    Hh3cDot11SSIDEncryptModeType,
+        hh3cDot11StationRxSNR              Integer32,
+        hh3cDot11StationTxRate             Integer32,
+        hh3cDot11StationRxRate             Integer32,
+        hh3cDot11StationVendorName         OCTET STRING,
+        hh3cDot11StationRadioMode          Hh3cDot11RadioType,
+        hh3cDot11StationRxNoise            Integer32,
+        hh3cDot11StationMACAddress         MacAddress,
+        hh3cDot11StationTxSpeed            Integer32,
+        hh3cDot11StationRxSpeed            Integer32,
+        hh3cDot11StationWmmMode            INTEGER,
+        hh3cDot11StationSecIEStatus        Hh3cDot11SecIEStatusType,
+        hh3cDot11StationUpTimeTicks        TimeTicks,
+        hh3cDot11StationRadioMode2         Hh3cDot11RadioType2,
+        hh3cDot11StationAssTime            DateAndTime,
+        hh3cDot11StationUserAuthType       INTEGER,
+        hh3cDot11StationRfPingTest         TruthValue,
+        hh3cDot11StationMaxRate            Integer32,
+        hh3cDot11StationPowerSaveModeCM    INTEGER,
+        hh3cDot11StationAuthenModeCM       INTEGER,
+        hh3cDot11StationAKMModeCM          INTEGER,
+        hh3cDot11StationSecurityCiphersCM  INTEGER,
+        hh3cDot11StationSecIEStatusCM      INTEGER,
+        hh3cDot11StationIPv6Address        OCTET STRING,
+        hh3cDot11StationAssociateAPMACAddressCM   MacAddress,
+        hh3cDot11StationDeviceType         OCTET STRING,
+        hh3cDot11StationTxRateCM           OCTET STRING,
+        hh3cDot11StationRxRateCM           OCTET STRING
+    }
+
+hh3cDot11StationMAC OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Represents the unique MAC Address of station."
+    ::= { hh3cDot11StationAssociateEntry 1 }
+
+hh3cDot11StationIPAddress OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the IP address of the station."
+    ::= { hh3cDot11StationAssociateEntry 2 }
+
+hh3cDot11StationUserName OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the user name of the station."
+    ::= { hh3cDot11StationAssociateEntry 3 }
+
+hh3cDot11StationTxRateSet OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    UNITS       "Mbps"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the current transmit data rates for this station.
+        Each byte will represent one rate.  If the MSB(Most significant bit)
+        is set, then this rate is a mandantory rate.  Otherwise,
+        it is optional."
+    ::= { hh3cDot11StationAssociateEntry 4 }
+
+hh3cDot11StationUpTime OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "second"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The time in seconds, how long this station has been associated
+        with this device."
+    ::= { hh3cDot11StationAssociateEntry 5 }
+
+hh3cDot11StationSignalStrength OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "dBm"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents a device-dependent measure of the signal strength
+        of latest packet received from this station."
+    ::= { hh3cDot11StationAssociateEntry 6 }
+
+hh3cDot11StationRSSI OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents a device-dependent measure of the RSSI.
+        It is the received signal strength indication.
+        The maximum value is defined by chip set vendors"
+    ::= { hh3cDot11StationAssociateEntry 7 }
+
+hh3cDot11StationChannel OBJECT-TYPE
+    SYNTAX      Hh3cDot11ChannelScopeType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents current radio channel used by station."
+    ::= { hh3cDot11StationAssociateEntry 8 }
+
+hh3cDot11StationPowerSaveMode OBJECT-TYPE
+    SYNTAX      INTEGER
+        {
+            active(1),
+            powersave(2)
+        }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the power management mode of this station.
+        The following values are supported:
+        active    - This station is not in power-save
+        mode and it is actively sending or
+        receiving data.
+        powersave - This station is in power-save mode and
+        it wakes up after sometime to check for
+        buffer data."
+    DEFVAL      { active }
+    ::= { hh3cDot11StationAssociateEntry 9 }
+
+hh3cDot11StationAid OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the association identification number of station."
+    ::= { hh3cDot11StationAssociateEntry 10 }
+
+hh3cDot11StationVlanId OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents Vlan ID to which the station is associated."
+    ::= { hh3cDot11StationAssociateEntry 11 }
+
+hh3cDot11StationSSIDName OBJECT-TYPE
+    SYNTAX      Hh3cDot11SSIDStringType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the ESS name."
+    ::= { hh3cDot11StationAssociateEntry 12 }
+
+hh3cDot11StationAuthenMode OBJECT-TYPE
+    SYNTAX      Hh3cDot11AuthenType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the Authentication mode defined by 802.11."
+    ::= { hh3cDot11StationAssociateEntry 13 }
+
+hh3cDot11StationAKMMode OBJECT-TYPE
+    SYNTAX      Hh3cDot11AKMType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the key management mode defined by 802.11i."
+    ::= { hh3cDot11StationAssociateEntry 14 }
+
+hh3cDot11StationSecurityCiphers OBJECT-TYPE
+    SYNTAX      Hh3cDot11CipherType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the frame encryption cipher type used by
+        station."
+    ::= { hh3cDot11StationAssociateEntry 15 }
+
+hh3cDot11StationSSIDEncryptMode OBJECT-TYPE
+    SYNTAX      Hh3cDot11SSIDEncryptModeType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the encryption mode for this ESS."
+    DEFVAL      { cipher }
+    ::= { hh3cDot11StationAssociateEntry 16 }
+
+hh3cDot11StationRxSNR OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "One Percent"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the signal and noise strength ratio of frame reception."
+    ::= { hh3cDot11StationAssociateEntry 17 }
+
+hh3cDot11StationTxRate OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "Mbps"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the transmission rate of frame."
+    ::= { hh3cDot11StationAssociateEntry 18 }
+
+hh3cDot11StationRxRate OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "Mbps"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the reception rate of frame."
+    ::= { hh3cDot11StationAssociateEntry 19 }
+
+hh3cDot11StationVendorName OBJECT-TYPE
+    SYNTAX      OCTET STRING(SIZE(0..127))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the vendor name of the station."
+    ::= { hh3cDot11StationAssociateEntry 20 }
+
+hh3cDot11StationRadioMode OBJECT-TYPE
+    SYNTAX      Hh3cDot11RadioType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents which radio type supported by the station.
+        The WLAN system support the following possible radio types.
+        dot11a(1),
+        dot11b(2),
+        dot11g(4),
+        dot11n(8),
+        dot11gn(16),
+        dot11an(32),
+        dot11ac(64),
+        dot11gac(128)
+        For a station,it could support only one radio type at
+        the same time."
+    ::= { hh3cDot11StationAssociateEntry 21 }
+
+hh3cDot11StationRxNoise OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the received noise of the station."
+    ::= { hh3cDot11StationAssociateEntry 22 }
+
+
+hh3cDot11StationMACAddress OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents MAC Address of station."
+    ::= { hh3cDot11StationAssociateEntry 23 }
+
+hh3cDot11StationTxSpeed OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "byte/s"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the bytes of transmitted data frames to the
+        station per second in sample interval."
+    ::= { hh3cDot11StationAssociateEntry 24 }
+
+hh3cDot11StationRxSpeed OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "byte/s"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the bytes of received data frames from the
+        station per second in sample interval."
+    ::= { hh3cDot11StationAssociateEntry 25 }
+
+hh3cDot11StationWmmMode  OBJECT-TYPE
+    SYNTAX      INTEGER
+        {
+            wmm(1),
+            nonwmm(2)
+        }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the QoS mode of station.
+        The following values are supported:
+        wmm    - This QoS function is supported by this station.
+        nonwmm - This QoS function is not supported by this station."
+    ::= { hh3cDot11StationAssociateEntry 26 }
+
+hh3cDot11StationSecIEStatus OBJECT-TYPE
+    SYNTAX      Hh3cDot11SecIEStatusType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the security Information element for this station."
+    ::= { hh3cDot11StationAssociateEntry 27 }
+
+hh3cDot11StationUpTimeTicks OBJECT-TYPE
+    SYNTAX      TimeTicks
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents how long this station has been associated
+         with this device."
+    ::= { hh3cDot11StationAssociateEntry 28 }
+
+hh3cDot11StationRadioMode2 OBJECT-TYPE
+    SYNTAX      Hh3cDot11RadioType2
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents which radio type supported by the station.
+        The WLAN system support the following possible radio types.
+        dot11a(1),
+        dot11b(2),
+        dot11g(4),
+        dot11an(8),
+        dot11gn(16),
+        dot11ac(32),
+        dot11gac(64)
+        For a station,it could support only one radio type at
+        the same time."
+    ::= { hh3cDot11StationAssociateEntry 29 }
+
+hh3cDot11StationAssTime OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the time at which the station connected."
+    ::= { hh3cDot11StationAssociateEntry 30 }
+
+hh3cDot11StationUserAuthType OBJECT-TYPE
+    SYNTAX      INTEGER
+        {
+            portalAuth(1),
+            authFree(2),
+            associateAuth(3),
+            macAuth(4)
+        }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the type of user authentication with this station.
+        portalAuth    - The authentication lunched by portal pop-up program
+        which is need input username and passward,exclude MAC authentication.
+        authFree      - There is no need others authentiaction,user will
+        surf internet after association.
+        associateAuth - Include WEP PSK 802.1X authentication.
+        macAuth       - MAC Authentication apply with access device,
+        a Remote Authentication Dial-In User Service (RADIUS) server or
+        message netgate to realize fast authentication."
+    ::= { hh3cDot11StationAssociateEntry 31 }
+
+hh3cDot11StationRfPingTest OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object is used to start rfping test of the station.
+         It will return false for get operation."
+    ::= { hh3cDot11StationAssociateEntry 32 }
+
+hh3cDot11StationMaxRate OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "Mbps"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the max negotiation rate of the station."
+    ::= { hh3cDot11StationAssociateEntry 33 }
+
+hh3cDot11StationPowerSaveModeCM OBJECT-TYPE
+    SYNTAX      INTEGER
+        {
+            active(0),
+            powersave(1)
+        }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the power management mode of the client.
+        The following values are supported:
+        active    - This client is not in power-save
+        mode and it is actively sending or receiving data.
+        powersave - This client is in power-save mode and
+        it wakes up after some time to check for buffer data."
+    DEFVAL      { active }
+    ::= { hh3cDot11StationAssociateEntry 34 }
+
+hh3cDot11StationAuthenModeCM OBJECT-TYPE
+    SYNTAX      INTEGER
+        {
+            opensystem(0),
+            sharedkey(1)
+        }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the authentication mode defined by 802.11.
+        The following values are supported:
+        opensystem   - Do not authenticate.
+        sharedkey    - System will use challenge message to
+        authenticate the client."
+    ::= { hh3cDot11StationAssociateEntry 35 }
+
+hh3cDot11StationAKMModeCM OBJECT-TYPE
+    SYNTAX      INTEGER
+        {
+            none(0),
+            psk(1),
+            radius(2),
+            wlanex(3)
+        }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the key management mode defined by 802.11i.
+        The following values are supported:
+        none         - no key management mode configured,
+        psk          - pre-shared key authentication,
+        radius       - 802.1x authentication,
+        wlanex       - wlanex."
+    ::= { hh3cDot11StationAssociateEntry 36 }
+
+hh3cDot11StationSecurityCiphersCM OBJECT-TYPE
+    SYNTAX      INTEGER
+        {
+            none(0),
+            wep40(1),
+            wep104(2),
+            tkip(3),
+            aesccmp(4),
+            wpisms4(5)
+        }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the frame encryption cipher type used by
+        station.
+        The following values are supported:
+        none     - clear text or no cipher method is configure,
+        wep40    - 40-bit WEP key,
+        wep104   - 104-bit WEP key,
+        tkip     - WPA Temporal Key encryption,
+        aesccmp  - WPA AES CCMP encryption,
+        wpisms4  - ext encryption."
+    ::= { hh3cDot11StationAssociateEntry 37 }
+
+hh3cDot11StationSecIEStatusCM OBJECT-TYPE
+    SYNTAX      INTEGER
+        {
+            none(0),
+            wpa(1),
+            wpa2(2),
+            wlanex(3)
+        }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the security Information element for this station.
+        The following values are supported:
+        none    - both wpa and wpa2 are disabled,
+        wpa     - only enable wpa,
+        wpa2    - only enable wpa2,
+        wlanex  - only enable wlanex."
+    ::= { hh3cDot11StationAssociateEntry 38 }
+
+hh3cDot11StationIPv6Address OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the IPv6 address of the station."
+    ::= { hh3cDot11StationAssociateEntry 39 }
+
+hh3cDot11StationAssociateAPMACAddressCM OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents MAC address of the AP to be associated."
+    ::= { hh3cDot11StationAssociateEntry 40 }
+
+hh3cDot11StationDeviceType OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the device type of stations to be associated."
+    ::= { hh3cDot11StationAssociateEntry 41 }
+
+hh3cDot11StationTxRateCM OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the transmit rate of frames."
+    ::= { hh3cDot11StationAssociateEntry 42 }
+
+hh3cDot11StationRxRateCM OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the receive rate of frames."
+    ::= { hh3cDot11StationAssociateEntry 43 }
+
+-- *****************************************************************************
+-- *  End of hh3cDot11StaAssociateTable Definition
+-- *****************************************************************************
+
+-- *****************************************************************************
+-- *  hh3cDot11StationAPRelationTable Definition
+-- *****************************************************************************
+hh3cDot11StationAPRelationTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cDot11StationAPRelationEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains relation-ship between station, AP, Radio
+        and WLANID, and the detailed information of station is kept in
+        the hh3cDot11StaAssociateTable table."
+    ::= { hh3cDot11StationMtGroup 2 }
+
+hh3cDot11StationAPRelationEntry OBJECT-TYPE
+    SYNTAX      Hh3cDot11StationAPRelationEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry contains relation-ship information
+        with AP, Radio and WLANID of each station."
+    INDEX
+        {
+            hh3cDot11StationMAC
+        }
+    ::= { hh3cDot11StationAPRelationTable 1 }
+
+Hh3cDot11StationAPRelationEntry ::= SEQUENCE
+    {
+        hh3cDot11CurrAPID       Hh3cDot11ObjectIDType,
+        hh3cDot11CurrRadioID    Hh3cDot11RadioScopeType,
+        hh3cDot11CurrWlanID     Integer32,
+        hh3cDot11CurrAntennaID  Integer32
+    }
+
+hh3cDot11CurrAPID OBJECT-TYPE
+    SYNTAX      Hh3cDot11ObjectIDType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "To uniquely identify each AP, and relation-ship
+        between hh3cDot11CurrAPID and AP device will be static."
+    ::= { hh3cDot11StationAPRelationEntry 1 }
+
+hh3cDot11CurrRadioID OBJECT-TYPE
+    SYNTAX      Hh3cDot11RadioScopeType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents each radio."
+    ::= { hh3cDot11StationAPRelationEntry 2 }
+
+hh3cDot11CurrWlanID OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents WLAN ID of the BSS the station associated to."
+    ::= { hh3cDot11StationAPRelationEntry 3 }
+
+hh3cDot11CurrAntennaID OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents Antenna ID of the station associated to."
+    ::= { hh3cDot11StationAPRelationEntry 4 }
+-- *****************************************************************************
+-- *  End of hh3cDot11StationAPRelationTable Definition
+-- *****************************************************************************
+
+-- *****************************************************************************
+-- *  hh3cDot11StationStatisTable Definition
+-- *****************************************************************************
+hh3cDot11StationStatisTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cDot11StationStatisEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains statistics and status of all
+        stations in the hh3cDot11StaAssociateTable."
+    ::= { hh3cDot11StationMtGroup 3 }
+
+hh3cDot11StationStatisEntry OBJECT-TYPE
+    SYNTAX      Hh3cDot11StationStatisEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This entry contains statistics and status for each station."
+    INDEX
+        {
+            hh3cDot11StationMAC
+        }
+    ::= { hh3cDot11StationStatisTable 1 }
+
+Hh3cDot11StationStatisEntry ::= SEQUENCE
+    {
+        hh3cDot11StationRxFrameCnt        Counter32,
+        hh3cDot11StationTxFrameCnt        Counter32,
+        hh3cDot11StationDropFrameCnt      Counter32,
+        hh3cDot11StationRxFrameBytes      Counter64,
+        hh3cDot11StationTxFrameBytes      Counter64,
+        hh3cDot11StationDropFrameBytes    Counter64,
+        hh3cDot11StationRxRetryPkts       Counter32,
+        hh3cDot11StationTxRetryPkts       Counter32,
+        hh3cDot11StationRxRetryBytes      Counter64,
+        hh3cDot11StationTxRetryBytes      Counter64,
+        hh3cDot11StationThroughput        Counter64,
+        hh3cDot11StationSuccessTxCnt      Counter32,
+        hh3cDot11StationSuccessTxDataCnt  Counter32,
+        hh3cDot11StationRxDataFrameCnt    Counter32,
+        hh3cDot11StationTxDataFrameCnt    Counter32,
+        hh3cDot11StationRxDataFrameBytes  Counter64,
+        hh3cDot11StationTxDataFrameBytes  Counter64,
+        hh3cDot11StationRxFragCnt         Counter32,
+        hh3cDot11StaRxErrDataFrameCnt     Counter64,
+        hh3cDot11StaTxRetryDataFrameCnt   Counter64,
+        hh3cDot11StaTxDataRatePkts        OCTET STRING,
+        hh3cDot11StaRxDataRatePkts        OCTET STRING,
+        hh3cDot11StaTxSignalStrengthPkts  OCTET STRING,
+        hh3cDot11StaInternetRxFrameBytes  Counter64,
+        hh3cDot11StaInternetTxFrameBytes  Counter64,
+        hh3cDot11StaLocalRxFrameBytes     Counter64,
+        hh3cDot11StaLocalTxFrameBytes     Counter64
+    }
+
+hh3cDot11StationRxFrameCnt OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the count of frames that are received by AP from station."
+    ::= { hh3cDot11StationStatisEntry 1 }
+
+hh3cDot11StationTxFrameCnt OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the count of frames that are sent to station from AP."
+    ::= { hh3cDot11StationStatisEntry 2 }
+
+hh3cDot11StationDropFrameCnt OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the count of frames that are dropped."
+    ::= { hh3cDot11StationStatisEntry 3 }
+
+hh3cDot11StationRxFrameBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "bytes"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the count of bytes that are received by AP from station."
+    ::= { hh3cDot11StationStatisEntry 4 }
+
+hh3cDot11StationTxFrameBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "bytes"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the count of bytes that are sent to station from AP."
+    ::= { hh3cDot11StationStatisEntry 5 }
+
+hh3cDot11StationDropFrameBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "bytes"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents how many bytes are dropped."
+    ::= { hh3cDot11StationStatisEntry 6 }
+
+hh3cDot11StationRxRetryPkts OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the count of frames that are retransmitted to AP from station."
+    ::= { hh3cDot11StationStatisEntry 7 }
+
+hh3cDot11StationTxRetryPkts OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the count of frames that are retransmitted to station from AP."
+    ::= { hh3cDot11StationStatisEntry 8 }
+
+hh3cDot11StationRxRetryBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the count of bytes that are retransmitted to AP from station."
+    ::= { hh3cDot11StationStatisEntry 9 }
+
+hh3cDot11StationTxRetryBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the count of bytes that are retransmitted to station from AP."
+    ::= { hh3cDot11StationStatisEntry 10 }
+
+hh3cDot11StationThroughput OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "bytes"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents how many payload bytes of data frame are sent and received
+         by station."
+    ::= { hh3cDot11StationStatisEntry 11 }
+
+hh3cDot11StationSuccessTxCnt OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents how many frames have been successfully sent to station."
+    ::= { hh3cDot11StationStatisEntry 12 }
+
+hh3cDot11StationSuccessTxDataCnt  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents how many data frames have been successfully sent to
+        station."
+    ::= { hh3cDot11StationStatisEntry 13 }
+
+hh3cDot11StationRxDataFrameCnt OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents how many data frames have been received from station."
+    ::= { hh3cDot11StationStatisEntry 14 }
+
+hh3cDot11StationTxDataFrameCnt OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents how many data frames have been sent to station."
+    ::= { hh3cDot11StationStatisEntry 15 }
+
+hh3cDot11StationRxDataFrameBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents how many bytes of data frames have been received
+        from station."
+    ::= { hh3cDot11StationStatisEntry 16 }
+
+hh3cDot11StationTxDataFrameBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents how many bytes of data frames have been sent to
+        station."
+    ::= { hh3cDot11StationStatisEntry 17 }
+
+hh3cDot11StationRxFragCnt  OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the number of fragmented data frames that received
+         from station."
+    ::= { hh3cDot11StationStatisEntry 18 }
+
+hh3cDot11StaRxErrDataFrameCnt  OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "Represents the count of error data frames that are received by AP
+                 from station."
+    ::= { hh3cDot11StationStatisEntry 19 }
+
+hh3cDot11StaTxRetryDataFrameCnt  OBJECT-TYPE
+        SYNTAX      Counter64
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "Represents the count of data frames that are retransmitted to station
+                 from AP."
+    ::= { hh3cDot11StationStatisEntry 20 }
+hh3cDot11StaTxDataRatePkts  OBJECT-TYPE
+        SYNTAX      OCTET STRING
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "Represents how many data frames of each rate have been received
+                from station."
+    ::= { hh3cDot11StationStatisEntry 21 }
+
+hh3cDot11StaRxDataRatePkts  OBJECT-TYPE
+        SYNTAX      OCTET STRING
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "Represents how many data frames of each rate have been sent to
+                station."
+    ::= { hh3cDot11StationStatisEntry 22 }
+
+hh3cDot11StaTxSignalStrengthPkts  OBJECT-TYPE
+        SYNTAX      OCTET STRING
+        MAX-ACCESS  read-only
+        STATUS      current
+        DESCRIPTION
+                "Represents how many data frames of different signal strength have been
+                 received from station."
+    ::= { hh3cDot11StationStatisEntry 23 }
+
+hh3cDot11StaInternetRxFrameBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Internet traffic bytes received from station."
+    ::= { hh3cDot11StationStatisEntry 24 }
+
+hh3cDot11StaInternetTxFrameBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Internet traffic bytes sent to station."
+    ::= { hh3cDot11StationStatisEntry 25 }
+
+hh3cDot11StaLocalRxFrameBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Local traffic bytes received from station."
+    ::= { hh3cDot11StationStatisEntry 26 }
+
+hh3cDot11StaLocalTxFrameBytes OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Local traffic bytes sent to station."
+    ::= { hh3cDot11StationStatisEntry 27 }
+-- *****************************************************************************
+-- *  End of hh3cDot11StationStatisTable Definition
+-- *****************************************************************************
+
+-- *****************************************************************************
+-- *  hh3cDot11StationRfPingTable Definition
+-- *****************************************************************************
+hh3cDot11StationRfPingTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cDot11StationRfPingEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains statistics of all
+        stations in the hh3cDot11StationRfPingTable."
+    ::= { hh3cDot11StationMtGroup 4 }
+
+hh3cDot11StationRfPingEntry OBJECT-TYPE
+    SYNTAX      Hh3cDot11StationRfPingEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This entry contains statistics for each station's RfPing results."
+    INDEX
+        {
+            hh3cDot11StationMAC,
+            hh3cDot11StationRfPingIndex
+        }
+    ::= { hh3cDot11StationRfPingTable 1 }
+Hh3cDot11StationRfPingEntry ::= SEQUENCE
+    {
+        hh3cDot11StationRfPingIndex       Integer32,
+        hh3cDot11StationRfPingRate        OCTET STRING,
+        hh3cDot11StationRfPingTxCnt       Integer32,
+        hh3cDot11StationRfPingRxCnt       Integer32,
+        hh3cDot11StationRfPingRssi        Integer32,
+        hh3cDot11StationRfPingRetries     Integer32,
+        hh3cDot11StationRfPingRtt         Integer32
+    }
+
+hh3cDot11StationRfPingIndex OBJECT-TYPE
+    SYNTAX      Integer32(0..214783647)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Represents the rate index for the station."
+    ::= { hh3cDot11StationRfPingEntry 1 }
+
+hh3cDot11StationRfPingRate OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    UNITS       "Mbps"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the rate at which the radio interface sends wireless ping frames."
+    ::= { hh3cDot11StationRfPingEntry 2 }
+
+hh3cDot11StationRfPingTxCnt OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the number of wireless ping frames that the radio interface sent."
+    ::= { hh3cDot11StationRfPingEntry 3 }
+
+hh3cDot11StationRfPingRxCnt OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the number of wireless ping frames that
+         the radio interface received from the client."
+    ::= { hh3cDot11StationRfPingEntry 4 }
+
+hh3cDot11StationRfPingRssi OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the client signal strength detected by the AP."
+    ::= { hh3cDot11StationRfPingEntry 5 }
+
+hh3cDot11StationRfPingRetries OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Represents the total number of retransmitted ping frames."
+    ::= { hh3cDot11StationRfPingEntry 6 }
+
+hh3cDot11StationRfPingRtt OBJECT-TYPE
+    SYNTAX      Integer32
+    UNITS       "ms"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Round-trip time (RTT) from the time when the radio interface send a
+         ping packet to the time when it receives a response from the client."
+    ::= { hh3cDot11StationRfPingEntry 7 }
+-- *****************************************************************************
+-- *  End of hh3cDot11StationRfPingTable Definition
+-- *****************************************************************************
+
+-- *****************************************************************************
+-- *     Notifications OF hh3cDot11StationNotifyGroup
+-- *****************************************************************************
+-- 802.11 MAC Notification
+
+hh3cDot11StationTraps OBJECT IDENTIFIER    ::= { hh3cDot11StationNotifyGroup 0 }
+
+hh3cDot11StationMICErrorTrap NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cDot11CurrAPID,
+            hh3cDot11CurrRadioID,
+            hh3cDot11StationTrapBSSID,
+            hh3cDot11StationSSIDName,
+            hh3cDot11StationTrapStaMAC
+        }
+    STATUS      current
+    DESCRIPTION
+        "This notification is to indicate the occurrence of a MIC
+        failure in a certain station."
+    ::= { hh3cDot11StationTraps 1 }
+
+hh3cDot11StationAuthenErrorTrap NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cDot11CurrAPID,
+            hh3cDot11CurrRadioID,
+            hh3cDot11StationTrapBSSID,
+            hh3cDot11StationSSIDName,
+            hh3cDot11StationTrapStaMAC,
+            hh3cDot11StationAuthenMode,
+            hh3cDot11StationAKMMode
+        }
+    STATUS      current
+    DESCRIPTION
+        "This notification is to indicate which station happened
+        authentication failure."
+    ::= { hh3cDot11StationTraps 2 }
+
+hh3cDot11StationAuthorFailTrap NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cDot11StationUserName,
+            hh3cDot11StationTrapStaMAC,
+            hh3cDot11CurrRadioID,
+            hh3cDot11StationSSIDName,
+            hh3cDot11StationAuthorFailCause,
+            hh3cDot11StationFailCauseDesc,
+            hh3cDot11CurrAPID,
+            hh3cDot11StationBSSID,
+            hh3cDot11StationAuthMode,
+            hh3cDot11StationTrapAPMacAddress
+        }
+    STATUS      current
+    DESCRIPTION
+        "This trap is sent if a station authorization fails."
+    ::= { hh3cDot11StationTraps 3 }
+
+hh3cDot11StationAssocFailTrap NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cDot11StationTrapStaMAC,
+            hh3cDot11CurrRadioID,
+            hh3cDot11StationSSIDName,
+            hh3cDot11StationAssocFailCause,
+            hh3cDot11StationFailCauseDesc,
+            hh3cDot11CurrAPID,
+            hh3cDot11StationTrapAPMacAddress,
+            hh3cDot11StationBSSID
+        }
+    STATUS      current
+    DESCRIPTION
+        "This trap is sent if a station association fails."
+    ::= { hh3cDot11StationTraps 4 }
+
+hh3cDot11StationDeAssocTrap NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cDot11StationUserName,
+            hh3cDot11StationTrapStaMAC,
+            hh3cDot11StationVlanId,
+            hh3cDot11CurrRadioID,
+            hh3cDot11StationSSIDName,
+            hh3cDot11StationSessionDuration,
+            hh3cDot11CurrAPID,
+            hh3cDot11StationAPName,
+            hh3cDot11StationBSSID
+        }
+    STATUS      current
+    DESCRIPTION
+        "This trap is sent if a station de-association occurred."
+    ::= { hh3cDot11StationTraps 5 }
+
+hh3cDot11StationAuthorSuccTrap NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cDot11StationUserName,
+            hh3cDot11StationTrapStaMAC,
+            hh3cDot11StationVlanId,
+            hh3cDot11StationSessionStartTime,
+            hh3cDot11CurrRadioID,
+            hh3cDot11StationSSIDName,
+            hh3cDot11CurrAPID,
+            hh3cDot11StationAPName,
+            hh3cDot11StationBSSID
+        }
+    STATUS      current
+    DESCRIPTION
+        "This trap is sent when a station is authorized successfully."
+    ::= { hh3cDot11StationTraps 6 }
+
+hh3cDot11StationRoamingTrap NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cDot11CurrAPID,
+            hh3cDot11StationUserName,
+            hh3cDot11StationTrapStaMAC,
+            hh3cDot11StationVlanId,
+            hh3cDot11StationRoamingTime,
+            hh3cDot11CurrRadioID,
+            hh3cDot11StationSSIDName,
+            hh3cDot11StationACIPAddress,
+            hh3cDot11StationACIPv6Add
+        }
+    STATUS      current
+    DESCRIPTION
+        "This trap is sent when a station roamed successfully."
+    ::= { hh3cDot11StationTraps 7 }
+
+hh3cDot11StationDisconnectTrap NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cDot11StationAPName,
+            hh3cDot11StationBSSID,
+            hh3cDot11StationSSIDName,
+            hh3cDot11StationSessionDuration,
+            hh3cDot11StationVlanId,
+            hh3cDot11CurrAPID,
+            hh3cDot11CurrRadioID,
+            hh3cDot11StaDisconnectReason,
+            hh3cDot11StationTrapStaMAC
+        }
+    STATUS      current
+    DESCRIPTION
+        "This notification is sent when station disconnects with AP."
+    ::= { hh3cDot11StationTraps 8 }
+
+hh3cDot11UserDisconnectTrap NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cDot11StationAPName,
+            hh3cDot11StationTrapStaMAC,
+            hh3cDot11UserName
+        }
+    STATUS      current
+    DESCRIPTION
+        "This notification is sent when user disconnects with AP."
+    ::= { hh3cDot11StationTraps 9 }
+
+hh3cDot11StaAntennaChgTrap NOTIFICATION-TYPE
+    OBJECTS
+        {
+            hh3cDot11CurrAPID,
+            hh3cDot11CurrRadioID,
+            hh3cDot11StationTrapBSSID,
+            hh3cDot11StationSSIDName,
+            hh3cDot11StationTrapStaMAC,
+            hh3cDot11StationTrapOldAntennaID,
+            hh3cDot11StationTrapNewAntennaID
+        }
+    STATUS      current
+    DESCRIPTION
+        "This notification is to indicate the station has connected to a new antenna."
+    ::= { hh3cDot11StationTraps 10 }
+
+hh3cDot11StationAuditTrap NOTIFICATION-TYPE
+    OBJECTS
+      {
+          hh3cDot11StationAuditTrapOpType,
+          hh3cDot11StationTrapStaMAC,
+          hh3cDot11StationTrapStaIPAddress,
+          hh3cDot11StationTrapAPMacAddress,
+          hh3cDot11StationTrapAPIPAddress,
+          hh3cDot11StationTrapRadioID,
+          hh3cDot11StationTrapRadioMode,
+          hh3cDot11StationTrapWlanID,
+          hh3cDot11StationTrapSSIDName,
+          hh3cDot11StationTrapVlan,
+          hh3cDot11StationTrapChannel,
+          hh3cDot11StationTrapRSSI,
+          hh3cDot11StationTrapStartTime,
+          hh3cDot11StationSessionDuration,
+          hh3cDot11StationTrapRxFrameKbit,
+          hh3cDot11StationTrapTxFrameKbit
+      }
+    STATUS      current
+    DESCRIPTION
+      "This notification is to indicate the station event."
+  ::= { hh3cDot11StationTraps 11 }
+
+-- 802.11 station Notify variable object
+
+        hh3cDot11StationTrapVarObjects OBJECT IDENTIFIER
+    ::= { hh3cDot11StationNotifyGroup 1 }
+
+hh3cDot11StationTrapBSSID OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Represents on which BSSID of AP the event happened."
+    ::= { hh3cDot11StationTrapVarObjects 1 }
+
+hh3cDot11StationTrapStaMAC OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Represents the MAC address of station which happened message
+        integrity check (MIC) errors."
+    ::= { hh3cDot11StationTrapVarObjects 2 }
+
+hh3cDot11StationSessionStartTime OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Represents the time at which the station connected."
+    ::= { hh3cDot11StationTrapVarObjects 3 }
+
+hh3cDot11StationAssocFailCause OBJECT-TYPE
+    SYNTAX      Hh3cDot11AssocFailType
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Represents the cause of the station association failure."
+    ::= { hh3cDot11StationTrapVarObjects 4 }
+
+hh3cDot11StationAuthorFailCause OBJECT-TYPE
+    SYNTAX      Hh3cDot11AuthorFailType
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Represents the cause of the station authorization failure."
+    ::= { hh3cDot11StationTrapVarObjects 5 }
+
+hh3cDot11StationFailCauseDesc OBJECT-TYPE
+    SYNTAX      OCTET STRING(SIZE(0..255))
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Represents the failure description of the station."
+    ::= { hh3cDot11StationTrapVarObjects 6 }
+
+hh3cDot11StationSessionDuration OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "second"
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Represents the duration of the station sesssion."
+    ::= { hh3cDot11StationTrapVarObjects 7 }
+
+hh3cDot11StationRoamingTime OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "second"
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Represents the time at which the station roamed."
+    ::= { hh3cDot11StationTrapVarObjects 8 }
+
+hh3cDot11StationACIPAddress OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "For roam-in station, it represents the ip address of home AC.
+         For roam-out station, it represents the ip address of foreign AC."
+    ::= { hh3cDot11StationTrapVarObjects 9 }
+
+hh3cDot11StationAPName OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Name of the AP which the station connects to."
+    ::= { hh3cDot11StationTrapVarObjects 10 }
+
+hh3cDot11StationBSSID OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "BSSID which the station connects to."
+    ::= { hh3cDot11StationTrapVarObjects 11 }
+
+hh3cDot11StaDisconnectReason OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Reason why the station disconnects with the AP."
+    ::= { hh3cDot11StationTrapVarObjects 12 }
+
+hh3cDot11StationAuthMode OBJECT-TYPE
+    SYNTAX      INTEGER
+    {
+        opensystem(1),
+        sharedkey(2)
+    }
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Represents station's authentication mode."
+    ::= { hh3cDot11StationTrapVarObjects 13 }
+
+hh3cDot11StationACIPv6Add OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "For roam-in station, it represents the IPv6 address of home AC.
+         For roam-out station, it represents the IPv6 address of foreign AC."
+    ::= { hh3cDot11StationTrapVarObjects 14 }
+
+hh3cDot11UserName OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Represents the user name."
+    ::= { hh3cDot11StationTrapVarObjects 15 }
+
+hh3cDot11StationTrapAPMacAddress OBJECT-TYPE
+    SYNTAX      MacAddress
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Represents the MAC address of an AP."
+    ::= { hh3cDot11StationTrapVarObjects 16 }
+
+hh3cDot11StationTrapOldAntennaID OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Represents the ID of the old antenna to which the station is associated."
+    ::= { hh3cDot11StationTrapVarObjects 17 }
+
+hh3cDot11StationTrapNewAntennaID OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Represents the ID of the new antenna to which the station is associated."
+    ::= { hh3cDot11StationTrapVarObjects 18 }
+
+hh3cDot11StationTrapAPIPAddress OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Represents the IP address of an AP."
+    ::= { hh3cDot11StationTrapVarObjects 19 }
+
+hh3cDot11StationTrapStartTime OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "second"
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Represents the time at which the device started to connect to a station."
+    ::= { hh3cDot11StationTrapVarObjects 20 }
+
+hh3cDot11StationAuditTrapOpType OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Represents the station operation type."
+    ::= { hh3cDot11StationTrapVarObjects 21 }
+
+hh3cDot11StationTrapStaIPAddress  OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Represents the IP address of the station."
+    ::= { hh3cDot11StationTrapVarObjects 22 }
+
+hh3cDot11StationTrapRadioID OBJECT-TYPE
+    SYNTAX      Hh3cDot11RadioScopeType
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Represents each radio."
+    ::= { hh3cDot11StationTrapVarObjects 23 }
+
+hh3cDot11StationTrapRadioMode OBJECT-TYPE
+    SYNTAX      Hh3cDot11RadioType2
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Represents the radio type supported by the station."
+    ::= { hh3cDot11StationTrapVarObjects 24 }
+
+hh3cDot11StationTrapWlanID OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Represents the WLAN ID of the BSS to which the station is associated."
+    ::= { hh3cDot11StationTrapVarObjects 25 }
+
+hh3cDot11StationTrapSSIDName OBJECT-TYPE
+    SYNTAX      Hh3cDot11SSIDStringType
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Represents the ESS name."
+    ::= { hh3cDot11StationTrapVarObjects 26 }
+
+hh3cDot11StationTrapVlan OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Represents the VLAN ID with which the station is associated."
+    ::= { hh3cDot11StationTrapVarObjects 27 }
+
+hh3cDot11StationTrapChannel OBJECT-TYPE
+    SYNTAX      Hh3cDot11ChannelScopeType
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Represents the current radio channel used by the station."
+    ::= { hh3cDot11StationTrapVarObjects 28 }
+
+hh3cDot11StationTrapRSSI OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Represents a device-dependent measure of the RSSI.
+        It is the received signal strength indication.
+        The maximum value is defined by chip set vendors"
+    ::= { hh3cDot11StationTrapVarObjects 29 }
+
+hh3cDot11StationTrapRxFrameKbit OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "kbit"
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Represents how many bits of data frames have been received
+        from the station."
+    ::= { hh3cDot11StationTrapVarObjects 30 }
+
+hh3cDot11StationTrapTxFrameKbit OBJECT-TYPE
+    SYNTAX      Counter64
+    UNITS       "kbit"
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Represents how many bits of data frames have been sent to
+        the station."
+    ::= { hh3cDot11StationTrapVarObjects 31 }
+-- *****************************************************************************
+-- *     End OF NotifyGroup
+-- *****************************************************************************
+END

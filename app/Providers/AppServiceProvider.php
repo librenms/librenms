@@ -3,6 +3,7 @@
 namespace App\Providers;
 
 use App\Models\Sensor;
+use App\Polling\Measure\MeasurementManager;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Log;
@@ -38,8 +39,9 @@ class AppServiceProvider extends ServiceProvider
      *
      * @return void
      */
-    public function boot()
+    public function boot(MeasurementManager $measure)
     {
+        $measure->listenDb();
         \Illuminate\Pagination\Paginator::useBootstrap();
 
         $this->app->booted('\LibreNMS\DB\Eloquent::initLegacyListeners');
@@ -63,16 +65,8 @@ class AppServiceProvider extends ServiceProvider
             return auth()->check() && auth()->user()->isAdmin();
         });
 
-        Blade::directive('deviceLink', function ($arguments) {
-            return "<?php echo \LibreNMS\Util\Url::deviceLink($arguments); ?>";
-        });
-
         Blade::directive('deviceUrl', function ($arguments) {
             return "<?php echo \LibreNMS\Util\Url::deviceUrl($arguments); ?>";
-        });
-
-        Blade::directive('portLink', function ($arguments) {
-            return "<?php echo \LibreNMS\Util\Url::portLink($arguments); ?>";
         });
     }
 
@@ -131,6 +125,7 @@ class AppServiceProvider extends ServiceProvider
     {
         \App\Models\Device::observe(\App\Observers\DeviceObserver::class);
         \App\Models\Service::observe(\App\Observers\ServiceObserver::class);
+        \App\Models\User::observe(\App\Observers\UserObserver::class);
     }
 
     private function bootCustomValidators()
@@ -163,7 +158,7 @@ class AppServiceProvider extends ServiceProvider
         });
 
         Validator::extend('zero_or_exists', function ($attribute, $value, $parameters, $validator) {
-            if ($value === 0) {
+            if ($value === 0 || $value === '0') {
                 return true;
             }
 

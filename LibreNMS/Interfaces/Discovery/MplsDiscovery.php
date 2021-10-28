@@ -18,6 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2019 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -34,7 +35,7 @@ interface MplsDiscovery
     public function discoverMplsLsps();
 
     /**
-     * @param Collection $lsps collecton of synchronized lsp objects from discoverMplsLsps()
+     * @param  Collection  $lsps  collecton of synchronized lsp objects from discoverMplsLsps()
      * @return Collection MplsLspPath objects
      */
     public function discoverMplsPaths($lsps);
@@ -50,14 +51,14 @@ interface MplsDiscovery
     public function discoverMplsServices();
 
     /**
-     * @param Collection $svcs collecton of synchronized lsp objects from discoverMplsServices()
+     * @param  Collection  $svcs  collecton of synchronized lsp objects from discoverMplsServices()
      * @return Collection MplsSap objects
      */
     public function discoverMplsSaps($svcs);
 
     /**
-     * @param Collection $sdps collecton of synchronized sdp objects from discoverMplsSdps()
-     * @param Collection $svcs collecton of synchronized service objects from discoverMplsServices()
+     * @param  Collection  $sdps  collecton of synchronized sdp objects from discoverMplsSdps()
+     * @param  Collection  $svcs  collecton of synchronized service objects from discoverMplsServices()
      * @return Collection MplsSdpBind objects
      */
     public function discoverMplsSdpBinds($sdps, $svcs);

@@ -18,6 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -32,7 +33,7 @@ class DatabaseConnectException extends \Exception implements UpgradeableExceptio
     /**
      * Try to convert the given Exception to a DatabaseConnectException
      *
-     * @param \Exception $exception
+     * @param  \Exception  $exception
      * @return static|null
      */
     public static function upgrade($exception)

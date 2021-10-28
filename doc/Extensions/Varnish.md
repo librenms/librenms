@@ -12,17 +12,19 @@ cache it directs the request to the HTTP Server. This type of HTTP
 caching is called a reverse proxy server. Caching your HTTP server can
 decrease page load times significantly.
 
-# Simplified block diagram of an Apache HTTP server with Varnish 4.0 Reverse Proxy
+## Architecture
+
+Simplified block diagram of an Apache HTTP server with Varnish 4.0 Reverse Proxy
 
 ![Block Diagram 1](/img/varnish_block.png)
 
-# CentOS 7 Varnish Installation
+## CentOS 7 Varnish Installation
 
 In this example we will assume your Apache 2.4.X HTTP server is working and
 configured to process HTTP requests on port 80.  If not, please see
 [Installing LibreNMS](../Installation/Installation-CentOS-7-Apache.md)
 
-# Install Varnish 4.0 RPM
+## Install Varnish 4.0 RPM
 
 - Enable the Varnish CentOS 7 repo and install
 
@@ -39,7 +41,7 @@ By default Varnish listens for HTTP requests on port 6081.
 firewall-cmd --zone=public --add-port=6081/tcp
 ```
 
-# Test Varnish
+## Test Varnish
 
 - Start Varnish
 
@@ -64,7 +66,7 @@ Varnish cache server
 
 ```
 
-# Edit Varnish Parameters
+## Edit Varnish Parameters
 
 Now we need to configure Varnish to listen to HTTP requests on port 80 and
 relay those requests to the Apache HTTP server on port 8080 (see block diagram).
@@ -135,11 +137,11 @@ VARNISH_GROUP=varnish
 DAEMON_OPTS="-p thread_pool_min=5 -p thread_pool_max=500 -p thread_pool_timeout=300"
 ```
 
-# Configure Apache for Varnish
+## Configure Apache for Varnish
 
 Edit librenms.conf and modify the Apache Virtual Host listening port.
 
-- Modify:`<VirtualHost *:80>` to: `<VirtualHost *:8080>`
+- Modify: `<VirtualHost *:80>` to `<VirtualHost *:8080>`
 
 ```bash
 vim /etc/httpd/conf.d/librenms.conf
@@ -147,7 +149,7 @@ vim /etc/httpd/conf.d/librenms.conf
 
 Varnish can not share a port with Apache. Change the Apache listening port to 8080.
 
-- Modify:`Listen 80` to:`Listen 8080`
+- Modify: `Listen 80` to `Listen 8080`
 
 ```bash
 vim /etc/httpd/conf/httpd.conf

@@ -153,6 +153,12 @@ if (! $auth) {
     }
 
     if ($vars['type'] == 'port_bits') {
+        echo ' | ';
+        if ($vars['port_speed_zoom'] ?? Config::get('graphs.port_speed_zoom')) {
+            echo generate_link('Zoom to Traffic', $vars, ['page' => 'graphs', 'port_speed_zoom' => 0]);
+        } else {
+            echo generate_link('Zoom to Port Speed', $vars, ['page' => 'graphs', 'port_speed_zoom' => 1]);
+        }
         echo ' | To show trend, set to future date';
     }
 

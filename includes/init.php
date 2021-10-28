@@ -18,12 +18,13 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2016 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
 /**
- * @param array $modules Which modules to initialize
+ * @param  array  $modules  Which modules to initialize
  */
 
 use LibreNMS\Authentication\LegacyAuth;
@@ -59,11 +60,7 @@ require_once $install_dir . '/includes/dbFacile.php';
 require_once $install_dir . '/includes/datastore.inc.php';
 require_once $install_dir . '/includes/billing.php';
 require_once $install_dir . '/includes/syslog.php';
-if (module_selected('mocksnmp', $init_modules)) {
-    require_once $install_dir . '/tests/mocks/mock.snmp.inc.php';
-} elseif (! in_array($install_dir . '/tests/mocks/mock.snmp.inc.php', get_included_files())) {
-    require_once $install_dir . '/includes/snmp.inc.php';
-}
+require_once $install_dir . '/includes/snmp.inc.php';
 require_once $install_dir . '/includes/services.inc.php';
 require_once $install_dir . '/includes/functions.php';
 require_once $install_dir . '/includes/rewrites.php';

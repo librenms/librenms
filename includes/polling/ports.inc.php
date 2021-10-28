@@ -15,7 +15,6 @@ $data_oids = [
     'ifOperStatus',
     'ifMtu',
     'ifSpeed',
-    'ifHighSpeed',
     'ifType',
     'ifPhysAddress',
     'ifPromiscuousMode',
@@ -214,7 +213,7 @@ $port_stats = [];
 if ($device['os'] === 'f5' && (version_compare($device['version'], '11.2.0', '>=') && version_compare($device['version'], '11.7', '<'))) {
     require 'ports/f5.inc.php';
 } else {
-    if (Config::getOsSetting($device['os'], 'polling.selected_ports') || $device['attribs']['selected_ports'] == 'true') {
+    if (Config::getOsSetting($device['os'], 'polling.selected_ports') || (isset($device['attribs']['selected_ports']) && $device['attribs']['selected_ports'] == 'true')) {
         echo 'Selected ports polling ';
 
         // remove the deleted and disabled ports and mark them skipped
@@ -322,7 +321,7 @@ if (file_exists($os_file)) {
 }
 
 if (Config::get('enable_ports_adsl')) {
-    $device['xdsl_count'] = dbFetchCell("SELECT COUNT(*) FROM `ports` WHERE `device_id` = ? AND `ifType` in ('adsl','vdsl')", [$device['device_id']]);
+    $device['xdsl_count'] = dbFetchCell("SELECT COUNT(*) FROM `ports` WHERE `device_id` = ? AND `ifType` in ('adsl','vdsl','vdsl2')", [$device['device_id']]);
 }
 
 if ($device['xdsl_count'] > '0') {
@@ -390,6 +389,22 @@ if (Config::get('enable_ports_poe')) {
             //remove the group index and only keep the ifIndex
             [$group_id, $if_id] = explode('.', $key);
             $port_stats[$if_id] = array_merge($port_stats[$if_id], $value);
+        }
+    } elseif ($device['os'] == 'jetstream') {
+        echo 'tpPoePortConfigEntry';
+        $port_stats_poe = snmpwalk_cache_oid($device, 'tpPoePortConfigEntry', [], 'TPLINK-POWER-OVER-ETHERNET-MIB');
+        $ifTable_ifDescr = snmpwalk_cache_oid($device, 'ifDescr', [], 'IF-MIB');
+
+        $port_ent_to_if = [];
+        foreach ($ifTable_ifDescr as $if_index => $if_descr) {
+            if (preg_match('/^[a-z]+ethernet \d+\/\d+\/(\d+)$/i', $if_descr['ifDescr'], $matches)) {
+                $port_ent_to_if[$matches[1]] = $if_index;
+            }
+        }
+
+        foreach ($port_stats_poe as $p_index => $p_stats) {
+            $if_id = $port_ent_to_if[$p_index];
+            $port_stats[$if_id] = array_merge($port_stats[$if_id], $p_stats);
         }
     }
 }
@@ -596,10 +611,10 @@ foreach ($ports as $port) {
         }
 
         if (isset($this_port['ifHighSpeed']) && is_numeric($this_port['ifHighSpeed'])) {
-            d_echo('ifHighSpeed ');
-            $this_port['ifSpeed'] = ($this_port['ifHighSpeed'] * 1000000);
+            d_echo("ifHighSpeed ({$this_port['ifHighSpeed']}) ");
+            $this_port['ifSpeed'] = $this_port['ifHighSpeed'] . '000000'; // * 1000000, but handle in sql
         } elseif (isset($this_port['ifSpeed']) && is_numeric($this_port['ifSpeed'])) {
-            d_echo('ifSpeed ');
+            d_echo("ifSpeed ({$this_port['ifSpeed']}) ");
         } else {
             d_echo('No ifSpeed ');
             $this_port['ifSpeed'] = 0;
@@ -652,13 +667,15 @@ foreach ($ports as $port) {
         $tune_port = false;
         foreach ($data_oids as $oid) {
             if ($oid == 'ifAlias') {
-                if ($attribs['ifName:' . $port['ifName']]) {
+                if ($device['attribs']['ifName:' . $port['ifName']]) {
                     $this_port['ifAlias'] = $port['ifAlias'];
+                } else {
+                    $this_port['ifAlias'] = \LibreNMS\Util\StringHelpers::inferEncoding($this_port['ifAlias']);
                 }
             }
-            if ($oid == 'ifSpeed' || $oid == 'ifHighSpeed') {
-                if ($attribs['ifSpeed:' . $port['ifName']]) {
-                    $this_port[$oid] = $port[$oid];
+            if ($oid == 'ifSpeed') {
+                if ($device['attribs']['ifSpeed:' . $port['ifName']]) {
+                    $this_port['ifSpeed'] = $port['ifSpeed'];
                 }
             }
 
@@ -674,8 +691,8 @@ foreach ($ports as $port) {
                 // if the value is different, update it
 
                 // rrdtune if needed
-                $port_tune = $attribs['ifName_tune:' . $port['ifName']];
-                $device_tune = $attribs['override_rrdtool_tune'];
+                $port_tune = $device['attribs']['ifName_tune:' . $port['ifName']];
+                $device_tune = $device['attribs']['override_rrdtool_tune'];
                 if ($port_tune == 'true' ||
                     ($device_tune == 'true' && $port_tune != 'false') ||
                     (Config::get('rrdtool_tune') == 'true' && $port_tune != 'false' && $device_tune != 'false')) {
@@ -688,18 +705,26 @@ foreach ($ports as $port) {
                 $port['update'][$oid] = $this_port[$oid];
 
                 // store the previous values for alerting
-                if (in_array($oid, ['ifOperStatus', 'ifAdminStatus', 'ifSpeed', 'ifHighSpeed'])) {
+                if (in_array($oid, ['ifOperStatus', 'ifAdminStatus', 'ifSpeed'])) {
                     $port['update'][$oid . '_prev'] = $port[$oid];
                 }
 
-                log_event($oid . ': ' . $port[$oid] . ' -> ' . $this_port[$oid], $device, 'interface', 3, $port['port_id']);
+                if ($oid == 'ifSpeed') {
+                    $old = Number::formatSi($port[$oid], 2, 3, 'bps');
+                    $new = Number::formatSi($this_port[$oid], 2, 3, 'bps');
+                } else {
+                    $old = $port[$oid];
+                    $new = $this_port[$oid];
+                }
+
+                log_event($oid . ': ' . $old . ' -> ' . $new, $device, 'interface', 3, $port['port_id']);
                 if (Debug::isEnabled()) {
-                    d_echo($oid . ': ' . $port[$oid] . ' -> ' . $this_port[$oid] . ' ');
+                    d_echo($oid . ': ' . $old . ' -> ' . $new . ' ');
                 } else {
                     echo $oid . ' ';
                 }
             } else {
-                if (in_array($oid, ['ifOperStatus', 'ifAdminStatus', 'ifSpeed', 'ifHighSpeed'])) {
+                if (in_array($oid, ['ifOperStatus', 'ifAdminStatus', 'ifSpeed'])) {
                     if ($port[$oid . '_prev'] == null) {
                         $port['update'][$oid . '_prev'] = $this_port[$oid];
                     }

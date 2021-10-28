@@ -15,6 +15,7 @@
 
 /**
  * SMSEagle API Transport
+ *
  * @author Barry O'Donovan <barry@lightnet.ie>
  * @copyright 2017 Barry O'Donovan, LibreNMS
  * @license GPL
@@ -23,9 +24,12 @@
 namespace LibreNMS\Alert\Transport;
 
 use LibreNMS\Alert\Transport;
+use LibreNMS\Util\Proxy;
 
 class Smsfeedback extends Transport
 {
+    protected $name = 'SMSfeedback';
+
     public function deliverAlert($obj, $opts)
     {
         $smsfeedback_opts['user'] = $this->config['smsfeedback-user'];
@@ -48,7 +52,7 @@ class Smsfeedback extends Transport
         $url = 'http://' . $opts['user'] . ':' . $opts['token'] . '@' . 'api.smsfeedback.ru/messages/v2/send/?' . http_build_query($params);
         $curl = curl_init($url);
 
-        set_curl_proxy($curl);
+        Proxy::applyToCurl($curl);
         curl_setopt($curl, CURLOPT_CUSTOMREQUEST, 'GET');
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
 

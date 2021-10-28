@@ -1,0 +1,692 @@
+--          *****************************
+--          *                           *
+--          *         ONEOS MIB         *
+--          *                           *
+--          *****************************
+--
+--          ONEOS_MIB_STD_V05.1.R005_E001
+--
+--          Creation date : 07/08/2010
+--
+--          update OneOs V5.1 capabilities 07/08/2010
+--
+     ONEACCESS-SHDSL-MIB DEFINITIONS ::= BEGIN 
+
+     IMPORTS
+		MODULE-IDENTITY, OBJECT-TYPE,Counter32,Counter64,Integer32
+			FROM SNMPv2-SMI
+--		MODULE-COMPLIANCE, OBJECT-GROUP
+--			FROM SNMPv2-CONF
+		ifIndex
+			FROM IF-MIB
+		oacExpIMSystem	  
+			FROM ONEACCESS-GLOBAL-REG
+        hdsl2ShdslSpanStatusEntry,hdsl2ShdslEndpointCurrEntry,hdsl2ShdslSpanConfProfileEntry
+			FROM HDSL2-SHDSL-LINE-MIB;
+
+     oacSHDSLMIBModule MODULE-IDENTITY
+	 LAST-UPDATED    "201106150000Z"
+        ORGANIZATION    " OneAccess "
+         CONTACT-INFO
+           "Pascal KESTELOOT
+            Postal: ONE ACCESS
+                    381 Avenue du General de Gaulle
+                    92140 Clamart, France
+		    FRANCE
+
+            Tel: (+33) 01 41 87 70 00
+            Fax: (+33) 01 41 87 74 00
+
+            E-mail: pascal.kesteloot@oneaccess-net.com"
+
+         DESCRIPTION
+                        "Contact updated"
+        REVISION        "201106150000Z"
+
+        DESCRIPTION
+              "This MIB module describes private extensions to the RFC4319 MIB."
+--  Revision history 
+        REVISION      "201008200001Z"
+        DESCRIPTION   "Added oacSHDSLSpanConfProfileEocManagement,
+                       oacSHDSLSpanConfProfileEocStatusPollDelay and
+                       oacSHDSLSpanConfProfileEocStatusPollInterval."
+        REVISION      "201007300001Z"
+        DESCRIPTION   "Added oacSHDSLSpanConfProfileTable."
+        REVISION      "201007080001Z"
+        DESCRIPTION   "Initial version."
+	
+	::= { oacExpIMSystem 3 }
+
+oacSHDSLObjects OBJECT IDENTIFIER ::= { oacSHDSLMIBModule 1 }
+
+
+oacSHDSLSpanStatusTable OBJECT-TYPE
+      SYNTAX     SEQUENCE OF OacSHDSLSpanStatusEntry
+      MAX-ACCESS not-accessible
+      STATUS     current
+      DESCRIPTION
+        "This table provides overall status information of
+         HDSL2/SHDSL spans.  This table contains live data from
+         equipment.  As such, it is NOT persistent."
+      ::= { oacSHDSLObjects 2 }
+
+ oacSHDSLSpanStatusEntry OBJECT-TYPE
+      SYNTAX      OacSHDSLSpanStatusEntry
+      MAX-ACCESS  not-accessible
+      STATUS      current
+      DESCRIPTION
+        "An entry in the oacSHDSLSpanStatusTable.  Each entry
+         represents the complete span in a single HDSL2/SHDSL line.
+         It is indexed by the ifIndex of the associated HDSL2/SHDSL
+         line."
+      AUGMENTS { hdsl2ShdslSpanStatusEntry }
+      ::= { oacSHDSLSpanStatusTable 1 }
+
+   OacSHDSLSpanStatusEntry ::=
+      SEQUENCE
+      {
+      oacSHDSLSpanStatusUpDown        		Counter32,
+	  oacSHDSLSpanStatusCurrStatus			OCTET STRING,
+	  oacSHDSLSpanStatusCurrShowtimeStart	Counter32,
+	  oacSHDSLSpanStatusCurrCellDelin		Counter32,
+	  oacSHDSLSpanStatusCurrCRCanomalies	Counter32,
+	  oacSHDSLSpanStatusCurrHECErrors		Counter32,
+	  oacSHDSLSpanStatusCurrRxCells			Counter32,
+	  oacSHDSLSpanStatusCurrTxCells			Counter32,
+	  oacSHDSLSpanStatusCurrRxDrops			Counter32,
+	  oacSHDSLSpanStatusCurrES				Counter32,
+	  oacSHDSLSpanStatusCurrSES				Counter32,
+	  oacSHDSLSpanStatusCurrLOSWS			Counter32,
+      oacSHDSLSpanStatusCurrUAS             Counter32,
+      oacSHDSLSpanStatusCurrConstellation   INTEGER
+      }
+
+   oacSHDSLSpanStatusUpDown OBJECT-TYPE
+      SYNTAX      Counter32
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+        "Contains the Global Up/Down Counter for the span."
+      ::= { oacSHDSLSpanStatusEntry 1 }
+
+   oacSHDSLSpanStatusCurrStatus OBJECT-TYPE
+      SYNTAX      OCTET STRING(SIZE(30))
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+        "Contains the current G.SHDSL Status."
+      ::= { oacSHDSLSpanStatusEntry 2 }
+	  
+   oacSHDSLSpanStatusCurrShowtimeStart OBJECT-TYPE
+      SYNTAX      Counter32
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+        "Contains the current Showtime Start."
+      ::= { oacSHDSLSpanStatusEntry 3 }
+
+   oacSHDSLSpanStatusCurrCellDelin OBJECT-TYPE
+      SYNTAX      Counter32
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+        "Contains the current Cell Delin counter."
+      ::= { oacSHDSLSpanStatusEntry 4 }
+	  
+   oacSHDSLSpanStatusCurrCRCanomalies OBJECT-TYPE
+      SYNTAX      Counter32
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+        "Contains the current CRC counter."
+      ::= { oacSHDSLSpanStatusEntry 5 }
+
+   oacSHDSLSpanStatusCurrHECErrors OBJECT-TYPE
+      SYNTAX      Counter32
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+        "Contains the current HEC counter."
+      ::= { oacSHDSLSpanStatusEntry 6 }
+	  
+   oacSHDSLSpanStatusCurrRxCells OBJECT-TYPE
+      SYNTAX      Counter32
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+        "Contains the current Rx Cells counter."
+      ::= { oacSHDSLSpanStatusEntry 7 }
+
+   oacSHDSLSpanStatusCurrTxCells OBJECT-TYPE
+      SYNTAX      Counter32
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+        "Contains the current Tx Cells counter."
+      ::= { oacSHDSLSpanStatusEntry 8 }
+	  
+   oacSHDSLSpanStatusCurrRxDrops OBJECT-TYPE
+      SYNTAX      Counter32
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+        "Contains the current Rx Drops counter."
+      ::= { oacSHDSLSpanStatusEntry 9 }
+
+   oacSHDSLSpanStatusCurrES OBJECT-TYPE
+      SYNTAX      Counter32
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+        "Contains the current ES counter."
+      ::= { oacSHDSLSpanStatusEntry 10 }
+	  
+   oacSHDSLSpanStatusCurrSES OBJECT-TYPE
+      SYNTAX      Counter32
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+        "Contains the current SES counter."
+      ::= { oacSHDSLSpanStatusEntry 11 }
+
+   oacSHDSLSpanStatusCurrLOSWS OBJECT-TYPE
+      SYNTAX      Counter32
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+        "Contains the current LOSWS counter."
+      ::= { oacSHDSLSpanStatusEntry 12 }
+	  
+   oacSHDSLSpanStatusCurrUAS OBJECT-TYPE
+      SYNTAX      Counter32
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+        "Contains the current UAS counter."
+      ::= { oacSHDSLSpanStatusEntry 13 }
+
+   oacSHDSLSpanStatusCurrConstellation OBJECT-TYPE
+      SYNTAX      INTEGER 
+                  {
+                  tcPam16(2),
+                  tcPam32(3)
+                  }
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+        "The current constellation (line coding) for the span."
+      ::= { oacSHDSLSpanStatusEntry 14 }
+
+
+oacSHDSLEndpointCurrTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF OacSHDSLEndpointCurrEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION 
+		"This table contains current status and performance information
+         for segment endpoints in HDSL2/SHDSL lines.  As with other
+         tables in this MIB module indexed by ifIndex, entries in this
+         table MUST be maintained in a persistent manner."
+	 ::= { oacSHDSLObjects 5 }
+
+oacSHDSLEndpointCurrEntry OBJECT-TYPE
+    SYNTAX     OacSHDSLEndpointCurrEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Defines an entry in the oacSHDSLEndpointCurrTable."
+    AUGMENTS {hdsl2ShdslEndpointCurrEntry}
+    ::= { oacSHDSLEndpointCurrTable 1 }
+
+ OacSHDSLEndpointCurrEntry ::=
+    SEQUENCE {
+        oacSHDSLEndpointCurrAtn              	Integer32,
+	oacSHDSLEndpointCurrSnrMgn		Integer32,
+	oacSHDSLEndpointCurrTxPwr		Integer32,
+	oacSHDSLEndpointCurrRxGain					Integer32,
+    oacSHDSLEndpointCurrMaxAttainableLineRate	Integer32,
+	oacSHDSLEndpointCurrCommands				Integer32,
+	oacSHDSLEndpointCurrResponses				Integer32,
+	oacSHDSLEndpointCurrdiscardedCommands		Integer32,
+    oacSHDSLEndpointCurrerroredCommands       Integer32,
+	oacSHDSLEndpointCurrReceivedFrames		Integer32,
+	oacSHDSLEndpointCurrBadTransparency		Integer32,
+	oacSHDSLEndpointCurrBadFCS				Integer32,
+	oacSHDSLEndpointCurrEOCStatus				OCTET STRING
+     }
+
+   oacSHDSLEndpointCurrAtn OBJECT-TYPE
+      SYNTAX      Integer32(-1270..1280)
+      UNITS       "dB/10"
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+        "The current loop attenuation for this endpoint as reported in
+         a Network or Customer Side Performance Status message. In tenths of dB."
+      ::= { oacSHDSLEndpointCurrEntry 1 }
+
+  oacSHDSLEndpointCurrSnrMgn OBJECT-TYPE
+      SYNTAX      Integer32(-1270..1280)
+      UNITS       "dB/10"
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+        "The current SNR margin for this endpoint as reported in a
+         Status Response/SNR message. In tenths of dB."
+      ::= { oacSHDSLEndpointCurrEntry 2 }
+
+ oacSHDSLEndpointCurrTxPwr OBJECT-TYPE
+      SYNTAX      Integer32
+      UNITS       "dB/10"
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+        "The current transmit power for this endpoint. In tenths of dB."
+      ::= { oacSHDSLEndpointCurrEntry 3 }
+
+ oacSHDSLEndpointCurrRxGain OBJECT-TYPE
+      SYNTAX      Integer32
+      UNITS       "dB/10"
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+        "The current receiver gain for this endpoint. In tenths of dB."
+      ::= { oacSHDSLEndpointCurrEntry 4 }
+
+   oacSHDSLEndpointCurrMaxAttainableLineRate OBJECT-TYPE
+      SYNTAX      Integer32
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+        "The current Max Attainable LineRate for this endpoint."
+      ::= { oacSHDSLEndpointCurrEntry 5 }
+
+  oacSHDSLEndpointCurrCommands OBJECT-TYPE
+      SYNTAX      Integer32
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+        "The current Commands for this endpoint."
+      ::= { oacSHDSLEndpointCurrEntry 6 }
+
+ oacSHDSLEndpointCurrResponses OBJECT-TYPE
+      SYNTAX      Integer32
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+        "The current Responses for this endpoint."
+      ::= { oacSHDSLEndpointCurrEntry 7 }
+
+ oacSHDSLEndpointCurrdiscardedCommands OBJECT-TYPE
+      SYNTAX      Integer32
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+        "The current discarded Commands for this endpoint."
+      ::= { oacSHDSLEndpointCurrEntry 8 }
+	  
+ oacSHDSLEndpointCurrerroredCommands OBJECT-TYPE
+      SYNTAX      Integer32
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+        "The current errored Commands for this endpoint."
+      ::= { oacSHDSLEndpointCurrEntry 9 }
+	  
+   oacSHDSLEndpointCurrReceivedFrames OBJECT-TYPE
+      SYNTAX      Integer32
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+        "The current Received Frames for this endpoint."
+      ::= { oacSHDSLEndpointCurrEntry 10 }
+
+  oacSHDSLEndpointCurrBadTransparency OBJECT-TYPE
+      SYNTAX      Integer32
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+        "The current Bad Transparency for this endpoint."
+      ::= { oacSHDSLEndpointCurrEntry 11 }
+
+ oacSHDSLEndpointCurrBadFCS OBJECT-TYPE
+      SYNTAX      Integer32
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+        "The current Bad FCS for this endpoint."
+      ::= { oacSHDSLEndpointCurrEntry 12 }
+
+ oacSHDSLEndpointCurrEOCStatus OBJECT-TYPE
+      SYNTAX      OCTET STRING(SIZE(50))
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+        "The current EOC Status for this endpoint."
+      ::= { oacSHDSLEndpointCurrEntry 13 }
+	  	 
+	  --
+	  --
+oacSHDSLEndpointCurrretrainTable OBJECT-TYPE
+	SYNTAX SEQUENCE OF OacSHDSLEndpointCurrretrainEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION 
+		"This table contains current status and performance information
+         for segment endpoints in HDSL2/SHDSL lines.  As with other
+         tables in this MIB module indexed by ifIndex, entries in this
+         table MUST be maintained in a persistent manner."
+	 ::= { oacSHDSLObjects 7 }
+oacSHDSLEndpointCurrretrainEntry OBJECT-TYPE
+    SYNTAX     OacSHDSLEndpointCurrretrainEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Defines an entry in the oacSHDSLEndpointCurrretrainTable."
+    AUGMENTS {hdsl2ShdslEndpointCurrEntry}
+    ::= { oacSHDSLEndpointCurrretrainTable 1 }
+
+ OacSHDSLEndpointCurrretrainEntry ::=
+    SEQUENCE {
+    oacSHDSLEndpointCurrretrainSQPAIR        Integer32,
+    oacSHDSLEndpointCurrretrainSQLINE       Integer32,
+	oacSHDSLEndpointCurrretrainCRCPAIR		 Integer32,
+	oacSHDSLEndpointCurrretrainCRCLINE		 Integer32,
+    oacSHDSLEndpointCurrretrainFsyncPAIR     Integer32,
+	oacSHDSLEndpointCurrretrainFsyncLINE	 Integer32,
+    oacSHDSLEndpointCurrretrainFSyncSQPAIR  Integer32,
+	oacSHDSLEndpointCurrretrainFSyncSQLINE	 Integer32
+     }
+   oacSHDSLEndpointCurrretrainSQPAIR OBJECT-TYPE
+      SYNTAX      Integer32
+      UNITS       "SQPAIR"
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+        "The current retrain SQ for this endpoint as reported in
+         a Network or Customer Side Performance Status message."
+      ::= { oacSHDSLEndpointCurrretrainEntry 1 }
+	  
+   oacSHDSLEndpointCurrretrainSQLINE OBJECT-TYPE
+      SYNTAX      Integer32
+      UNITS       "SQLINE"
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+        "The current retrain SQ for this endpoint as reported in
+         a Network or Customer Side Performance Status message."
+      ::= { oacSHDSLEndpointCurrretrainEntry 2 }
+
+   oacSHDSLEndpointCurrretrainCRCPAIR OBJECT-TYPE
+      SYNTAX      Integer32
+      UNITS       "CRCPAIR"
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+        "The current retrain CRC for this endpoint as reported in
+         a Network or Customer Side Performance Status message."
+      ::= { oacSHDSLEndpointCurrretrainEntry 3 }
+	
+   oacSHDSLEndpointCurrretrainCRCLINE OBJECT-TYPE
+      SYNTAX      Integer32
+      UNITS       "CRCLINE"
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+        "The current retrain CRC for this endpoint as reported in
+         a Network or Customer Side Performance Status message."
+      ::= { oacSHDSLEndpointCurrretrainEntry 4 }
+	  
+   oacSHDSLEndpointCurrretrainFsyncPAIR OBJECT-TYPE
+      SYNTAX      Integer32
+      UNITS       "FsyncPAIR"
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+        "The current retrain Fsync for this endpoint as reported in
+         a Network or Customer Side Performance Status message."
+      ::= { oacSHDSLEndpointCurrretrainEntry 5 }
+
+   oacSHDSLEndpointCurrretrainFsyncLINE OBJECT-TYPE
+      SYNTAX      Integer32
+      UNITS       "FsyncLINE"
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+        "The current retrain Fsync for this endpoint as reported in
+         a Network or Customer Side Performance Status message."
+      ::= { oacSHDSLEndpointCurrretrainEntry 6 }
+	  
+   oacSHDSLEndpointCurrretrainFSyncSQPAIR OBJECT-TYPE
+      SYNTAX      Integer32
+      UNITS       "FSync&SQPAIR"
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+        "The current retrain FSync&SQ for this endpoint as reported in
+         a Network or Customer Side Performance Status message."
+      ::= { oacSHDSLEndpointCurrretrainEntry 7 }
+
+   oacSHDSLEndpointCurrretrainFSyncSQLINE OBJECT-TYPE
+      SYNTAX      Integer32
+      UNITS       "FSync&SQLINE"
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+        "The current retrain FSync&SQ for this endpoint as reported in
+         a Network or Customer Side Performance Status message."
+      ::= { oacSHDSLEndpointCurrretrainEntry 8 }
+	  
+-- OneAccess SHDSL MIB Trap Definitions
+oacSHDSLTraps      OBJECT IDENTIFIER ::= { oacSHDSLMIBModule 2 }
+oacSHDSLTrapPrefix OBJECT IDENTIFIER ::= { oacSHDSLTraps 0 }
+
+oacSHDSLHardDownTrap NOTIFICATION-TYPE
+    STATUS             current
+    DESCRIPTION
+            "this notification indicate that the shdsl line speed is lower than the threshold configured in efm interface. 
+  as consequence, the interface ethernet which the hard-down option is enable will be shutdown, 
+it will be UP if the shdsl line recovered the good linerate."
+   ::= { oacSHDSLTrapPrefix 1 }	 
+ 
+--   ****************************   --
+--   oacSHDSLSpanConfProfileTable   --
+--   ****************************   --
+oacSHDSLSpanConfProfileTable OBJECT-TYPE
+      SYNTAX SEQUENCE OF OacSHDSLSpanConfProfileEntry
+      MAX-ACCESS not-accessible
+      STATUS current
+      DESCRIPTION
+        "This table supports definitions of span configuration
+         profiles for SHDSL lines.  This table MUST be maintained
+         in a persistent manner"
+     ::= { oacSHDSLObjects 10 }
+
+ oacSHDSLSpanConfProfileEntry OBJECT-TYPE
+      SYNTAX      OacSHDSLSpanConfProfileEntry
+      MAX-ACCESS  not-accessible
+      STATUS      current
+      DESCRIPTION
+        "Each entry corresponds to a single span configuration
+         profile.  Each profile contains a set of span configuration
+         parameters.  The configuration parameters in a profile are
+         applied to those lines referencing that profile (see the
+         hdsl2ShdslSpanConfProfile object).  "
+      AUGMENTS {hdsl2ShdslSpanConfProfileEntry}
+    ::= { oacSHDSLSpanConfProfileTable 1 }
+
+  OacSHDSLSpanConfProfileEntry ::=
+      SEQUENCE 
+      {
+      oacSHDSLSpanConfProfileConstellation         INTEGER,
+      oacSHDSLSpanConfProfileAutoConfig            INTEGER,
+      oacSHDSLSpanConfProfileCaplist               INTEGER,
+      oacSHDSLSpanConfProfileEfmAggregation        INTEGER,
+      oacSHDSLSpanConfProfileCrcCheck              Integer32,
+      oacSHDSLSpanConfProfileMeansqCheck           Integer32,
+      oacSHDSLSpanConfProfileMeansqThreshold       Integer32,
+      oacSHDSLSpanConfProfileLineProbing           INTEGER,
+      oacSHDSLSpanConfProfileEocManagement         INTEGER,
+      oacSHDSLSpanConfProfileEocStatusPollDelay    Integer32,
+      oacSHDSLSpanConfProfileEocStatusPollInterval Integer32
+      }
+
+   oacSHDSLSpanConfProfileConstellation OBJECT-TYPE
+      SYNTAX      INTEGER
+                  {  
+                  auto(1),
+                  tcPam16(2),
+                  tcPam32(3)
+                  }
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+        "The configured constellation (line coding) for the span.
+         Corresponds to cli command (controller shdsl 0, dsl-group 0):
+         annex ... tc-pam <value>"
+      ::= { oacSHDSLSpanConfProfileEntry 1 }
+
+   oacSHDSLSpanConfProfileAutoConfig OBJECT-TYPE
+      SYNTAX      INTEGER
+                  {
+                  enabled(1),
+                  disabled(2)
+                  }
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+        "The configured auto configuration mode (enabled or disabled) for the span.
+         Corresponds to cli command (controller shdsl 0, dsl-group 0):
+            autoconfig / no autoconfig"
+      ::= { oacSHDSLSpanConfProfileEntry 2 }
+
+
+   oacSHDSLSpanConfProfileCaplist OBJECT-TYPE
+      SYNTAX      INTEGER
+                  {
+                  newstyle(1),
+                  oldstyle(2),
+                  auto(3)                 
+                  }
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+        "The configured capability list style for the span.
+         Corresponds to cli command (controller shdsl 0, dsl-group 0):
+            caplist <value>"
+      ::= { oacSHDSLSpanConfProfileEntry 3 }
+
+   oacSHDSLSpanConfProfileEfmAggregation OBJECT-TYPE
+      SYNTAX      INTEGER
+                  {
+                  disabled(1),
+                  auto(2),
+                  negotiated(3),
+                  static(4)                 
+                  }
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+        "The configured efm aggregation mode for the span.
+         Corresponds to cli command (controller shdsl 0, dsl-group 0):
+            efmaggregation <value>"
+      ::= { oacSHDSLSpanConfProfileEntry 4 }
+
+   oacSHDSLSpanConfProfileCrcCheck OBJECT-TYPE
+      SYNTAX      Integer32(0..30)
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+        "The configured numbered of consecutive seconds with crc errors after which the link will be retrained.
+         If the value is set to 0, than no retrain will occur based on crc errors.
+         Corresponds to cli command (controller shdsl 0, dsl-group 0):
+            value 0 :         crc no 
+            all other values: crc check <value> "
+      ::= { oacSHDSLSpanConfProfileEntry 5 }
+
+   oacSHDSLSpanConfProfileMeansqCheck OBJECT-TYPE
+      SYNTAX      Integer32(0..30)
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+        "The configured numbered of consecutive seconds where the noise margin is below 
+         the configured threshold (oacSHDSLSpanConfProfileMeansqThreshold) after which the link will be retrained.
+         If the value is set to 0, than no retrain will occur based on noise margin verification.
+         Corresponds to cli command (controller shdsl 0, dsl-group 0):
+            value 0 :         meansq no 
+            all other values: meansq check <value> "
+      ::= { oacSHDSLSpanConfProfileEntry 6 }
+
+   oacSHDSLSpanConfProfileMeansqThreshold OBJECT-TYPE
+      SYNTAX      Integer32(-2..10)
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+        "The configured threshold (in dB) for retrain check based on the noise margin.
+        If the noise margin drops below the configured threshold for the configured time
+        (oacSHDSLSpanConfProfileMeansqCheck) than the link will be retrained.
+         Corresponds to cli command (controller shdsl 0, dsl-group 0):
+            meansq check <time> <value> "
+      ::= { oacSHDSLSpanConfProfileEntry 7 }
+
+   oacSHDSLSpanConfProfileLineProbing OBJECT-TYPE
+      SYNTAX      INTEGER
+                  {
+                  adaptive(1), 
+                  normal(2)
+                  }
+      MAX-ACCESS  read-only
+      STATUS      current
+      DESCRIPTION
+        "The configured linprobing mechanism. 
+         - normal corresponds to the standard line probing (pmms) as defined in the standard (G.991.2).
+         - adaptive has to be used in situations where there is cross-talk between the lines of the same span.
+           A propriatary algorithm will be activated that will limit the maximum speed if the normal line probing
+           mechanism cannot reach a stable sync due to it's limitations (cross-talk is not taken into account in the 
+           standard line probing mechanism). The disadvantage of the adaptive mode is that it can take a long time 
+           before a stable sync is reached.
+        
+        Corresponds to cli command (controller shdsl 0, dsl-group 0):
+            lineprobing <value> "
+      ::= { oacSHDSLSpanConfProfileEntry 8 }
+
+   oacSHDSLSpanConfProfileEocManagement OBJECT-TYPE
+      SYNTAX      INTEGER
+                  {
+                  enabled(1),
+                  disabled(2)
+                  }
+      MAX-ACCESS  read-write
+      STATUS      current
+      DESCRIPTION
+        "This object enables/disables the EOC management of the SHDSL line in this unit."
+
+      DEFVAL      { enabled }
+      ::= { oacSHDSLSpanConfProfileEntry 9 }
+
+   oacSHDSLSpanConfProfileEocStatusPollDelay OBJECT-TYPE
+      SYNTAX      Integer32(0..29)
+      UNITS       "seconds"
+      MAX-ACCESS  read-write
+      STATUS      current
+      DESCRIPTION
+        "The delay in seconds after the start of the full quarter of an hour when an EOC full status request
+        is sent to the devices in the span. Periodically after this start point full status request will
+        be sent with a configured interval (oacSHDSLSpanConfProfileEocStatusPollInterval)."
+
+      DEFVAL      { 0 }
+      ::= { oacSHDSLSpanConfProfileEntry 10 }
+
+   oacSHDSLSpanConfProfileEocStatusPollInterval OBJECT-TYPE
+      SYNTAX      Integer32(30|60|90|120)
+      UNITS       "seconds"
+      MAX-ACCESS  read-write
+      STATUS      current
+      DESCRIPTION
+        "The delay in seconds between 2 EOC full status requests to the same device in the shdsl span."
+
+      DEFVAL      { 30 }
+      ::= { oacSHDSLSpanConfProfileEntry 11 }
+
+END
+

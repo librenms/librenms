@@ -28,7 +28,7 @@ if (Auth::user()->hasGlobalRead()) {
         print_message('Device Settings Saved');
     }
 
-    echo '<div class="col-sm-6">';
+    echo '<div class="col-sm-6 col-sm-offset-3">';
 
     include_once 'includes/html/print-service-add.inc.php';
 } else {

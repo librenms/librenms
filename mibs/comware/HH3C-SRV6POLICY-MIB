@@ -1,0 +1,624 @@
+-- =================================================================
+-- Copyright (c) 2004-2020 New H3C Tech. Co., Ltd. All rights reserved.
+--
+-- Description: Segment Routing VERSION6 Traffic Engineering (SRv6-TE)
+-- policy MIB
+-- Reference:
+-- Version: V1.0
+-- History:
+-- V1.0 2020-06-06 The initial version, created by Xu Jing
+-- =================================================================
+HH3C-SRV6POLICY-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, Integer32, Unsigned32,OBJECT-TYPE, NOTIFICATION-TYPE
+        FROM SNMPv2-SMI
+    InetAddressIPv6
+        FROM INET-ADDRESS-MIB
+    hh3cCommon
+        FROM HH3C-OID-MIB;
+
+hh3cSrv6Policy MODULE-IDENTITY
+    LAST-UPDATED "202006110000Z"
+    ORGANIZATION
+        "New H3C Tech. Co., Ltd."
+    CONTACT-INFO
+                "Platform Team New H3C Tech. Co., Ltd.
+                Hai-Dian District Beijing P.R. China
+                http://www.h3c.com
+                Zip:100085
+                "
+
+    DESCRIPTION
+        "This MIB file provides information about SRv6-TE policies."
+    REVISION "202006110000Z"
+    DESCRIPTION
+        "The initial version of this MIB file."
+    ::= { hh3cCommon 189 }
+
+-- Top-level structure of MIB
+hh3cSrv6PolicyNotifications  OBJECT IDENTIFIER ::= { hh3cSrv6Policy 0 }
+hh3cSrv6PolicyObjects    OBJECT IDENTIFIER ::= { hh3cSrv6Policy 1 }
+
+hh3cSrv6PolicyResourceTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cSrv6PolicyResourceEntry
+    MAX-ACCESS      not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table provides information about SRv6-TE policy resources."
+    ::= { hh3cSrv6PolicyObjects 1 }
+
+hh3cSrv6PolicyResourceEntry OBJECT-TYPE
+    SYNTAX      Hh3cSrv6PolicyResourceEntry
+    MAX-ACCESS      not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Information of the SRv6-TE policy resource."
+    INDEX       { hh3cSrv6PolicyResourceType }
+    ::= { hh3cSrv6PolicyResourceTable 1 }
+
+Hh3cSrv6PolicyResourceEntry ::= SEQUENCE {
+    hh3cSrv6PolicyResourceType
+        INTEGER,
+    hh3cSrv6PolicyResCurrentCnt
+        Unsigned32,
+    hh3cSrv6PolicyResUpperLimit
+        Unsigned32,
+    hh3cSrv6PolicyResLowerLimit
+        Unsigned32,
+    hh3cSrv6PolicyResourceTotalCnt
+        Unsigned32
+    }
+
+hh3cSrv6PolicyResourceType OBJECT-TYPE
+    SYNTAX      INTEGER {
+            unknown(1),
+            srv6Policy(2),
+            srv6PolicySegmentList(3),
+            srv6PolicyGroup(4),
+            srv6PolicyFwdPath(5)
+      }
+    MAX-ACCESS      accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "SRv6-TE policy resource type."
+    ::= { hh3cSrv6PolicyResourceEntry 1 }
+
+hh3cSrv6PolicyResCurrentCnt OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS      read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of used SRv6-TE policy resources."
+    ::= { hh3cSrv6PolicyResourceEntry 2 }
+
+hh3cSrv6PolicyResUpperLimit OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..100)
+    MAX-ACCESS      read-only
+    STATUS      current
+    DESCRIPTION
+        "The upper threshold of SRv6-TE policy resources."
+    ::= { hh3cSrv6PolicyResourceEntry 3 }
+
+hh3cSrv6PolicyResLowerLimit OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..100)
+    MAX-ACCESS      read-only
+    STATUS      current
+    DESCRIPTION
+        "The lower threshold of SRv6-TE policy resources."
+    ::= { hh3cSrv6PolicyResourceEntry 4 }
+
+hh3cSrv6PolicyResourceTotalCnt OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS      read-only
+    STATUS      current
+    DESCRIPTION
+        "The maximum number of SRv6-TE policy resources
+         that can be used."
+    ::= { hh3cSrv6PolicyResourceEntry 5 }
+
+-- SRv6-TE policy table.
+
+hh3cSrv6PolicyTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cSrv6PolicyEntry
+    MAX-ACCESS      not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table provides information about SRv6-TE policies."
+    ::= { hh3cSrv6PolicyObjects 2 }
+
+hh3cSrv6PolicyEntry OBJECT-TYPE
+    SYNTAX      Hh3cSrv6PolicyEntry
+    MAX-ACCESS      not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry contains information about a policy."
+    INDEX       { hh3cSrv6PolicyColor, hh3cSrv6PolicyEndPoint }
+    ::= { hh3cSrv6PolicyTable 1 }
+
+Hh3cSrv6PolicyEntry ::= SEQUENCE {
+    hh3cSrv6PolicyColor
+        Unsigned32,
+    hh3cSrv6PolicyEndPoint
+        InetAddressIPv6,
+    hh3cSrv6PolicyName
+        OCTET STRING,
+    hh3cSrv6PolicyBsid
+        InetAddressIPv6,
+    hh3cSrv6PolicyStatus
+        OCTET STRING,
+    hh3cSrv6PolicyDownReason
+        OCTET STRING,
+    hh3cSrv6PolicyBsidFailReason
+        OCTET STRING,
+    hh3cSrv6PolicyBsidConflictState
+        INTEGER
+    }
+
+hh3cSrv6PolicyColor OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..4294967295)
+    MAX-ACCESS      accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The color associates the SRv6-TE policy with certain intent."
+    ::= { hh3cSrv6PolicyEntry 1 }
+
+hh3cSrv6PolicyEndPoint OBJECT-TYPE
+    SYNTAX      InetAddressIPv6
+    MAX-ACCESS      accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The endpoint is the destination of the SRv6-TE policy."
+    ::= { hh3cSrv6PolicyEntry 2 }
+
+hh3cSrv6PolicyName OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE (0..128))
+    MAX-ACCESS      read-only
+    STATUS      current
+    DESCRIPTION
+        "Name of the SRv6-TE policy."
+    ::= { hh3cSrv6PolicyEntry 3 }
+
+hh3cSrv6PolicyBsid OBJECT-TYPE
+    SYNTAX      InetAddressIPv6
+    MAX-ACCESS      read-only
+    STATUS      current
+    DESCRIPTION
+        "Binding segment ID value of the SRv6-TE policy."
+    ::= { hh3cSrv6PolicyEntry 4 }
+
+hh3cSrv6PolicyStatus OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE (0..31))
+    MAX-ACCESS      read-only
+    STATUS      current
+    DESCRIPTION
+        "Status of the SRv6-TE policy."
+    ::= { hh3cSrv6PolicyEntry 5 }
+
+hh3cSrv6PolicyDownReason OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE (0..51))
+    MAX-ACCESS      read-only
+    STATUS      current
+    DESCRIPTION
+        "Base identity for the reasons why SRv6-TE policy is operationally down."
+    ::= { hh3cSrv6PolicyEntry 6 }
+
+hh3cSrv6PolicyBsidFailReason OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE (0..255))
+    MAX-ACCESS      read-only
+    STATUS      current
+    DESCRIPTION
+        "Reason why the binding SID is unavailable."
+    ::= { hh3cSrv6PolicyEntry 7 }
+
+hh3cSrv6PolicyBsidConflictState OBJECT-TYPE
+    SYNTAX      INTEGER {
+            inConflict(1),
+            conflictResolved(2)
+            }
+    MAX-ACCESS      read-only
+    STATUS      current
+    DESCRIPTION
+        "The conflict state of the binding SID."
+    ::= { hh3cSrv6PolicyEntry 8 }
+
+-- SRv6-TE policy path table.
+
+hh3cSrv6PolicyPathTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cSrv6PolicyPathEntry
+    MAX-ACCESS      not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table provides information about SRv6-TE policy candidate paths."
+    ::= { hh3cSrv6PolicyObjects 3 }
+
+hh3cSrv6PolicyPathEntry OBJECT-TYPE
+    SYNTAX      Hh3cSrv6PolicyPathEntry
+    MAX-ACCESS      not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each entry contains information about candidate paths of a policy."
+    INDEX       { hh3cSrv6PolicyPathColor, hh3cSrv6PolicyPathEndPoint,
+                  hh3cSrv6PolicyPathProto, hh3cSrv6PolicyPathInst,
+          hh3cSrv6PolicyPathOri,
+          hh3cSrv6PolicyPathDis }
+    ::= { hh3cSrv6PolicyPathTable 1 }
+
+Hh3cSrv6PolicyPathEntry ::= SEQUENCE {
+    hh3cSrv6PolicyPathColor
+        Unsigned32,
+    hh3cSrv6PolicyPathEndPoint
+        InetAddressIPv6,
+    hh3cSrv6PolicyPathProto
+        INTEGER,
+    hh3cSrv6PolicyPathInst
+        Integer32,
+    hh3cSrv6PolicyPathOri
+        OCTET STRING,
+    hh3cSrv6PolicyPathDis
+        Unsigned32,
+    hh3cSrv6PolicyPathPref
+        Unsigned32,
+    hh3cSrv6PolicyPathPreviousRole
+        OCTET STRING,
+    hh3cSrv6PolicyPathDownReason
+        OCTET STRING
+    }
+
+hh3cSrv6PolicyPathColor OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..4294967295)
+    MAX-ACCESS      accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The color associates the SRv6-TE policy with certain intent."
+    ::= { hh3cSrv6PolicyPathEntry 1 }
+
+hh3cSrv6PolicyPathEndPoint OBJECT-TYPE
+    SYNTAX      InetAddressIPv6
+    MAX-ACCESS      accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The endpoint is the destination of the SRv6-TE policy."
+    ::= { hh3cSrv6PolicyPathEntry 2 }
+
+hh3cSrv6PolicyPathProto OBJECT-TYPE
+    SYNTAX      INTEGER{
+                   pcep(10),
+                   bgp(20),
+                   cli(30)
+               }
+    MAX-ACCESS      accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Protocol-Origin of a candidate path identifies the protocol that
+         originates or signals the candidate path."
+    ::= { hh3cSrv6PolicyPathEntry 3 }
+
+hh3cSrv6PolicyPathInst OBJECT-TYPE
+    SYNTAX      Integer32 (0..65535)
+    MAX-ACCESS      accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The instance is a value of BGP instance number, when
+         the candidate path is originated by BGP."
+    ::= { hh3cSrv6PolicyPathEntry 4 }
+
+hh3cSrv6PolicyPathOri OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE (1..63))
+    MAX-ACCESS      accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Originator is the identifier of the node that instantiated or
+         signalled the candidate path on the headend."
+    ::= { hh3cSrv6PolicyPathEntry 5 }
+
+hh3cSrv6PolicyPathDis OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS      accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The discriminator uniquely identifies a candidate path from a
+         specific Protocol-Origin."
+    ::= { hh3cSrv6PolicyPathEntry 6 }
+
+hh3cSrv6PolicyPathPref OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS      read-only
+    STATUS      current
+    DESCRIPTION
+        "The preference of the SRv6-TE policy candidate path."
+    ::= { hh3cSrv6PolicyPathEntry 7 }
+
+hh3cSrv6PolicyPathPreviousRole OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE (0..31))
+    MAX-ACCESS      read-only
+    STATUS      current
+    DESCRIPTION
+        "The previous role of an SRv6-TE policy candidate path.
+         The value may be primary or backup."
+    ::= { hh3cSrv6PolicyPathEntry 8 }
+
+hh3cSrv6PolicyPathDownReason OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE (0..51))
+    MAX-ACCESS      read-only
+    STATUS      current
+    DESCRIPTION
+        "Base identity for the reasons why SRv6-TE policy candidate path
+         is operationally down."
+    ::= { hh3cSrv6PolicyPathEntry 9 }
+
+-- Segment list information table for the policy
+hh3cSrv6PolicySeglistTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF Hh3cSrv6PolicySeglistEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "This table provides information about the segment lists for the
+         SRv6-TE policy."
+    ::= { hh3cSrv6PolicyObjects 4 }
+
+hh3cSrv6PolicySeglistEntry OBJECT-TYPE
+    SYNTAX Hh3cSrv6PolicySeglistEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Each entry contains information about segment lists."
+    INDEX { hh3cSrv6PolicySeglistColor, hh3cSrv6PolicySeglistEndPoint,
+            hh3cSrv6PolicySeglistPathProto,  hh3cSrv6PolicySeglistPathInst,
+            hh3cSrv6PolicySeglistPathOri, hh3cSrv6PolicySeglistPathDis,
+            hh3cSrv6PolicySeglistId }
+    ::= { hh3cSrv6PolicySeglistTable 1 }
+
+Hh3cSrv6PolicySeglistEntry ::=
+    SEQUENCE {
+        hh3cSrv6PolicySeglistColor
+            Unsigned32,
+        hh3cSrv6PolicySeglistEndPoint
+            InetAddressIPv6,
+        hh3cSrv6PolicySeglistPathProto
+            INTEGER,
+        hh3cSrv6PolicySeglistPathInst
+            Integer32,
+        hh3cSrv6PolicySeglistPathOri
+            OCTET STRING,
+        hh3cSrv6PolicySeglistPathDis
+            Unsigned32,
+        hh3cSrv6PolicySeglistId
+            Unsigned32,
+        hh3cSrv6PolicySeglistName
+            OCTET STRING,
+        hh3cSrv6PolicySeglistStatus
+           OCTET STRING,
+        hh3cSrv6PolicySeglistDownReason
+            OCTET STRING
+     }
+
+hh3cSrv6PolicySeglistColor OBJECT-TYPE
+    SYNTAX Unsigned32 (0..4294967295)
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "The color associates the SRv6-TE policy with certain intent."
+    ::= { hh3cSrv6PolicySeglistEntry 1 }
+
+hh3cSrv6PolicySeglistEndPoint OBJECT-TYPE
+    SYNTAX InetAddressIPv6
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "The endpoint is the destination of the SRv6-TE policy."
+    ::= { hh3cSrv6PolicySeglistEntry 2 }
+
+hh3cSrv6PolicySeglistPathProto OBJECT-TYPE
+    SYNTAX INTEGER{
+                   pcep(10),
+                   bgp(20),
+                   cli(30)
+               }
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "Protocol-Origin of a candidate path identifies the protocol that
+         originates or signals the candidate path."
+    ::= { hh3cSrv6PolicySeglistEntry 3 }
+
+hh3cSrv6PolicySeglistPathInst OBJECT-TYPE
+    SYNTAX Integer32 (0..65535)
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "The instance is a BGP instance number when
+         the candidate path is originated by BGP."
+    ::= { hh3cSrv6PolicySeglistEntry 4 }
+
+hh3cSrv6PolicySeglistPathOri OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE (1..63))
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "Originator is the identifier of the node that instantiated or
+         signalled the candidate path on the headend."
+    ::= { hh3cSrv6PolicySeglistEntry 5 }
+
+hh3cSrv6PolicySeglistPathDis OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "The discriminator uniquely identifies a candidate path from a
+         specific Protocol-Origin."
+    ::= { hh3cSrv6PolicySeglistEntry 6 }
+
+hh3cSrv6PolicySeglistId OBJECT-TYPE
+    SYNTAX Unsigned32 (1..4294967295)
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        "The ID uniquely identifies the segment list."
+    ::= { hh3cSrv6PolicySeglistEntry 7 }
+
+hh3cSrv6PolicySeglistName OBJECT-TYPE
+    SYNTAX OCTET STRING (SIZE (0..128))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The name of the segment list."
+    ::= { hh3cSrv6PolicySeglistEntry 8 }
+
+hh3cSrv6PolicySeglistStatus OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE (0..31))
+    MAX-ACCESS      read-only
+    STATUS      current
+    DESCRIPTION
+        "The status of segment list."
+    ::= { hh3cSrv6PolicySeglistEntry 9 }
+
+hh3cSrv6PolicySeglistDownReason OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE (0..51))
+    MAX-ACCESS      read-only
+    STATUS      current
+    DESCRIPTION
+        "Base identity for the reasons why segment list is down."
+    ::= { hh3cSrv6PolicySeglistEntry 10 }
+
+-- Notification Definitions
+
+-- The notifications need to be throttled so as to not overwhelm the
+-- management agent in case of rapid changes to the SR-TE Policy module.
+
+hh3cSrv6PolicyStatusChange NOTIFICATION-TYPE
+    OBJECTS { hh3cSrv6PolicyColor,
+        hh3cSrv6PolicyEndPoint,
+        hh3cSrv6PolicyStatus,
+        hh3cSrv6PolicyDownReason
+        }
+    STATUS       current
+    DESCRIPTION
+        "An hh3cSrv6PolicyStatusChange trap signifies that there
+         has been a change in the state of a policy.
+         This trap should be generated when the policy
+         state regresses (e.g., goes from active to Down)
+         or progresses to a terminal state
+         (i.e., down)."
+    ::= { hh3cSrv6PolicyNotifications 1 }
+
+hh3cSrv6PolicyBsidConflict NOTIFICATION-TYPE
+    OBJECTS { hh3cSrv6PolicyColor,
+        hh3cSrv6PolicyEndPoint,
+        hh3cSrv6PolicyBsid,
+        hh3cSrv6PolicyBsidFailReason,
+        hh3cSrv6PolicyBsidConflictState
+        }
+    STATUS       current
+    DESCRIPTION
+        "BSID conflicts."
+    ::= { hh3cSrv6PolicyNotifications 2 }
+
+hh3cSrv6PolicyBsidConflictClear NOTIFICATION-TYPE
+    OBJECTS  { hh3cSrv6PolicyColor,
+        hh3cSrv6PolicyEndPoint,
+        hh3cSrv6PolicyBsid,
+        hh3cSrv6PolicyBsidFailReason,
+        hh3cSrv6PolicyBsidConflictState
+        }
+    STATUS  current
+    DESCRIPTION
+        "BSID conflicts resolved"
+    ::= { hh3cSrv6PolicyNotifications 3 }
+
+hh3cSrv6PolicyDown NOTIFICATION-TYPE
+    OBJECTS { hh3cSrv6PolicyColor,
+        hh3cSrv6PolicyEndPoint,
+        hh3cSrv6PolicyDownReason
+        }
+    STATUS  current
+    DESCRIPTION
+        "Policy down"
+    ::= { hh3cSrv6PolicyNotifications 4 }
+
+hh3cSrv6PolicyDownClear NOTIFICATION-TYPE
+    OBJECTS { hh3cSrv6PolicyColor,
+        hh3cSrv6PolicyEndPoint
+    }
+    STATUS  current
+    DESCRIPTION
+              "Policy down cleared"
+    ::= { hh3cSrv6PolicyNotifications 5 }
+
+hh3cSrv6PolicyResExdUppLimit NOTIFICATION-TYPE
+    OBJECTS { hh3cSrv6PolicyResourceType,
+        hh3cSrv6PolicyResCurrentCnt,
+        hh3cSrv6PolicyResUpperLimit,
+        hh3cSrv6PolicyResLowerLimit,
+        hh3cSrv6PolicyResourceTotalCnt }
+    STATUS  current
+    DESCRIPTION
+        "The number of used SRv6-TE policy resources exceeded the upper
+               threshold."
+    ::= { hh3cSrv6PolicyNotifications 6 }
+
+hh3cSrv6PolicyResExceedClear NOTIFICATION-TYPE
+    OBJECTS { hh3cSrv6PolicyResourceType,
+        hh3cSrv6PolicyResCurrentCnt,
+        hh3cSrv6PolicyResUpperLimit,
+        hh3cSrv6PolicyResLowerLimit,
+        hh3cSrv6PolicyResourceTotalCnt
+        }
+    STATUS  current
+    DESCRIPTION
+        "The number of used SRv6-TE policy resources fell below the lower
+               threshold."
+    ::= { hh3cSrv6PolicyNotifications 7 }
+
+hh3cSrv6PathDown NOTIFICATION-TYPE
+    OBJECTS { hh3cSrv6PolicyPathColor,
+        hh3cSrv6PolicyPathEndPoint,
+        hh3cSrv6PolicyPathProto,
+        hh3cSrv6PolicyPathInst,
+        hh3cSrv6PolicyPathOri,
+        hh3cSrv6PolicyPathDis,
+        hh3cSrv6PolicyPathPref,
+        hh3cSrv6PolicyPathPreviousRole,
+        hh3cSrv6PolicyPathDownReason
+        }
+    STATUS       current
+    DESCRIPTION
+        "An hh3cSrv6PathDown trap signifies that there
+         has been a change in the state of a policy primary
+         or backup path."
+    ::= { hh3cSrv6PolicyNotifications 8 }
+
+hh3cSrv6PolicySeglistDown NOTIFICATION-TYPE
+    OBJECTS { hh3cSrv6PolicySeglistColor,
+        hh3cSrv6PolicySeglistEndPoint,
+        hh3cSrv6PolicySeglistPathProto,
+        hh3cSrv6PolicySeglistPathInst,
+        hh3cSrv6PolicySeglistPathOri,
+        hh3cSrv6PolicySeglistPathDis,
+        hh3cSrv6PolicySeglistId,
+        hh3cSrv6PolicySeglistStatus,
+        hh3cSrv6PolicySeglistDownReason
+        }
+    STATUS       current
+    DESCRIPTION
+        "An hh3cSrv6PolicySeglistDown trap signifies that there
+         has been a change in the state of a segment list."
+    ::= { hh3cSrv6PolicyNotifications 9 }
+
+hh3cSrv6SeglistDownClear NOTIFICATION-TYPE
+    OBJECTS { hh3cSrv6PolicySeglistColor,
+        hh3cSrv6PolicySeglistEndPoint,
+        hh3cSrv6PolicySeglistPathProto,
+        hh3cSrv6PolicySeglistPathInst,
+        hh3cSrv6PolicySeglistPathOri,
+        hh3cSrv6PolicySeglistPathDis,
+        hh3cSrv6PolicySeglistId,
+        hh3cSrv6PolicySeglistStatus
+        }
+    STATUS       current
+    DESCRIPTION
+        "An hh3cSrv6SeglistDownClear trap signifies that there
+         has been a change in the state of a segment list."
+    ::= { hh3cSrv6PolicyNotifications 10 }
+
+END

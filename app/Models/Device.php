@@ -10,6 +10,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Illuminate\Database\Query\JoinClause;
 use Illuminate\Support\Str;
@@ -26,6 +27,7 @@ use Permissions;
  * @property-read int|null $ports_count
  * @property-read int|null $sensors_count
  * @property-read int|null $wirelessSensors_count
+ *
  * @method static \Database\Factories\DeviceFactory factory(...$parameters)
  */
 class Device extends BaseModel
@@ -34,7 +36,40 @@ class Device extends BaseModel
 
     public $timestamps = false;
     protected $primaryKey = 'device_id';
-    protected $fillable = ['hostname', 'ip', 'status', 'status_reason', 'sysName', 'sysDescr', 'sysObjectID', 'hardware', 'version', 'features', 'serial', 'icon'];
+    protected $fillable = [
+        'authalgo',
+        'authlevel',
+        'authname',
+        'authpass',
+        'community',
+        'cryptoalgo',
+        'cryptopass',
+        'features',
+        'hardware',
+        'hostname',
+        'icon',
+        'ip',
+        'os',
+        'overwrite_ip',
+        'poller_group',
+        'port',
+        'port_association_mode',
+        'retries',
+        'serial',
+        'snmp_disable',
+        'snmp_max_repeaters',
+        'snmpver',
+        'status',
+        'status_reason',
+        'sysDescr',
+        'sysName',
+        'sysObjectID',
+        'timeout',
+        'transport',
+        'version',
+        'uptime',
+    ];
+
     protected $casts = [
         'last_polled' => 'datetime',
         'status' => 'boolean',
@@ -50,8 +85,8 @@ class Device extends BaseModel
     /**
      * Returns IP/Hostname where polling will be targeted to
      *
-     * @param string|array $device hostname which will be triggered
-     *        array  $device associative array with device data
+     * @param  string|array  $device  hostname which will be triggered
+     *                                array  $device associative array with device data
      * @return string IP/Hostname to which Device polling is targeted
      */
     public static function pollerTarget($device)
@@ -117,6 +152,17 @@ class Device extends BaseModel
     }
 
     /**
+     * Get VRF contexts to poll.
+     * If no contexts are found, return the default context ''
+     *
+     * @return array
+     */
+    public function getVrfContexts(): array
+    {
+        return $this->vrfLites->isEmpty() ? [''] : $this->vrfLites->pluck('context_name')->all();
+    }
+
+    /**
      * Get the display name of this device (hostname) unless force_ip_to_sysname is set
      * and hostname is an IP and sysName is set
      *
@@ -175,7 +221,7 @@ class Device extends BaseModel
      * Get the shortened display name of this device.
      * Length is always overridden by shorthost_target_length.
      *
-     * @param int $length length to shorten to, will not break up words so may be longer
+     * @param  int  $length  length to shorten to, will not break up words so may be longer
      * @return string
      */
     public function shortDisplayName($length = 12)
@@ -200,7 +246,7 @@ class Device extends BaseModel
     /**
      * Check if user can access this device.
      *
-     * @param User $user
+     * @param  User  $user
      * @return bool
      */
     public function canAccess($user)
@@ -249,7 +295,7 @@ class Device extends BaseModel
      * Update the max_depth field based on parents
      * Performs SQL query, so make sure all parents are saved first
      *
-     * @param int $exclude exclude a device_id from being considered (used for deleting)
+     * @param  int  $exclude  exclude a device_id from being considered (used for deleting)
      */
     public function updateMaxDepth($exclude = null)
     {
@@ -339,7 +385,7 @@ class Device extends BaseModel
      * Update the location to the correct location and update GPS if needed
      *
      * @param  \App\Models\Location|string  $new_location  location data
-     * @param  bool  $doLookup try to lookup the GPS coordinates
+     * @param  bool  $doLookup  try to lookup the GPS coordinates
      */
     public function setLocation($new_location, bool $doLookup = false)
     {
@@ -589,6 +635,11 @@ class Device extends BaseModel
         return $this->hasMany(HrDevice::class, 'device_id');
     }
 
+    public function hostResourceValues(): HasOne
+    {
+        return $this->hasOne(HrSystem::class, 'device_id');
+    }
+
     public function entityPhysical(): HasMany
     {
         return $this->hasMany(EntPhysical::class, 'device_id');
@@ -777,6 +828,11 @@ class Device extends BaseModel
     public function mplsTunnelCHops(): HasMany
     {
         return $this->hasMany(\App\Models\MplsTunnelCHop::class, 'device_id');
+    }
+
+    public function outages(): HasMany
+    {
+        return $this->hasMany(DeviceOutage::class, 'device_id');
     }
 
     public function printerSupplies(): HasMany

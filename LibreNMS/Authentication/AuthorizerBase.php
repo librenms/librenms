@@ -18,6 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2017 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -36,12 +37,6 @@ abstract class AuthorizerBase implements Authorizer
     public function canUpdatePasswords($username = '')
     {
         return static::$CAN_UPDATE_PASSWORDS;
-    }
-
-    public function changePassword($username, $newpassword)
-    {
-        //not supported by default
-        return false;
     }
 
     public function canManageUsers()

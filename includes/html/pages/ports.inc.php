@@ -81,7 +81,7 @@ if (isset($vars['bare']) && $vars['bare'] == 'yes') {
 $displayLists .= ' | ';
 $displayLists .= '<span style="font-weight: bold;">Bulk actions</span> &#187';
 
-$displayLists .= '<a href="ports/deleted=yes/purge=all" title="Delete ports"> Purge all deleted</a>';
+$displayLists .= '<a href="ports/deleted=1/purge=all" title="Delete ports"> Purge all deleted</a>';
 
 $displayLists .= '</div>';
 

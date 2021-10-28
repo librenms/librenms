@@ -11,7 +11,7 @@ be added later on.
 The ultimate goal is to be able to create traffic bills for VMs, no
 matter on which physical machine that VM runs.
 
-# Enabling Proxmox graphs
+## Enabling Proxmox graphs
 
 To enable Proxmox graphs, do the following:
 
@@ -43,7 +43,7 @@ flag for the device you are monitoring. You should now see an
 application in LibreNMS, as well as a new menu-item in the topmenu,
 allowing you to choose which cluster you want to look at.
 
-# Note, if you want to use use xinetd instead of systemd
+## Note, if you want to use use xinetd instead of systemd
 
 Its possible to use the librenms-agent started by xinetd instead of
 systemd. One use case is if you are forced to use a old Proxmox

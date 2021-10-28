@@ -18,6 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2020 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -96,7 +97,8 @@ class LatencyController implements DeviceTab
 
     /**
      * Data ready for json export
-     * @param \Illuminate\Support\Collection $data
+     *
+     * @param  \Illuminate\Support\Collection  $data
      * @return array
      */
     private function formatPerfData($data)

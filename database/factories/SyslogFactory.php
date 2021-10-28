@@ -6,6 +6,7 @@ use App\Models\Syslog;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\Factory;
 
+/** @extends Factory<Syslog> */
 class SyslogFactory extends Factory
 {
     /**

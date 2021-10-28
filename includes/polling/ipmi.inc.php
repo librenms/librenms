@@ -10,7 +10,8 @@ $ipmi_rows = dbFetchRows("SELECT * FROM sensors WHERE device_id = ? AND poller_t
 if (is_array($ipmi_rows)) {
     d_echo($ipmi_rows);
 
-    if ($ipmi['host'] = $attribs['ipmi_hostname']) {
+    if (isset($attribs['ipmi_hostname'])) {
+        $ipmi['host'] = $attribs['ipmi_hostname']
         $ipmi['tool'] = Config::get('ipmitool', 'ipmitool');
         $ipmi['user'] = $attribs['ipmi_username'];
         $ipmi['password'] = $attribs['ipmi_password'];

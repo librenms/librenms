@@ -15,6 +15,7 @@
 
 /**
  * UKFastPSS Transport
+ *
  * @author Lee Spottiswood (github.com/0x4c6565)
  * @copyright 2021, LibreNMS
  * @license GPL
@@ -23,9 +24,12 @@
 namespace LibreNMS\Alert\Transport;
 
 use LibreNMS\Alert\Transport;
+use LibreNMS\Util\Proxy;
 
 class Ukfastpss extends Transport
 {
+    protected $name = 'UKFast PSS';
+
     public function deliverAlert($obj, $opts)
     {
         return $this->contactUkfastpss($obj, $opts);
@@ -56,7 +60,7 @@ class Ukfastpss extends Transport
         $request_headers['Accept'] = 'application/json';
 
         $client = new \GuzzleHttp\Client();
-        $request_opts['proxy'] = get_guzzle_proxy();
+        $request_opts['proxy'] = Proxy::forGuzzle();
         $request_opts['headers'] = $request_headers;
         $request_opts['body'] = json_encode($body);
 

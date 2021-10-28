@@ -37,8 +37,8 @@ if (Auth::user()->hasGlobalAdmin()) {
                         </div>
                         <div class="form-group" title="The type of transport.">
                             <label for='transport-choice' class='col-sm-3 col-md-2 control-label'>Transport type: </label>
-                            <div class="col-sm-3">
-                                <select name='transport-choice' id='transport-choice' class='form-control'>
+                            <div class="col-sm-9 col-md-10">
+                                <select name='transport-choice' id='transport-choice' class='form-control' style="width: auto">
     <?php
 
 // Create list of transport
@@ -49,10 +49,12 @@ if (Auth::user()->hasGlobalAdmin()) {
         if (empty($transport)) {
             continue;
         }
-        $transports_list[] = $transport;
+        $class = "\LibreNMS\Alert\Transport\\$transport";
+        $instance = new $class;
+        $transports_list[$transport] = $instance->name();
     }
-    foreach ($transports_list as $transport) {
-        echo '<option value="' . strtolower($transport) . '-form">' . $transport . '</option>';
+    foreach ($transports_list as $transport => $name) {
+        echo '<option value="' . strtolower($transport) . '-form">' . $name . '</option>';
     } ?>
                                 </select>
                             </div>
@@ -67,7 +69,7 @@ if (Auth::user()->hasGlobalAdmin()) {
     <?php
 
     $switches = []; // store names of bootstrap switches
-    foreach ($transports_list as $transport) {
+    foreach ($transports_list as $transport => $name) {
         $class = 'LibreNMS\\Alert\\Transport\\' . $transport;
 
         if (! method_exists($class, 'configTemplate')) {
@@ -77,7 +79,7 @@ if (Auth::user()->hasGlobalAdmin()) {
 
         echo '<form method="post" role="form" id="' . strtolower($transport) . '-form" class="form-horizontal transport">';
         echo csrf_field();
-        echo '<input type="hidden" name="transport-type" id="transport-type" value="' . strtolower($transport) . '">';
+        echo '<input type="hidden" name="transport-type" value="' . strtolower($transport) . '">';
 
         $tmp = call_user_func($class . '::configTemplate');
 

@@ -1,7 +1,9 @@
 <?php
 
 // Build SNMP Cache Array
+use App\Models\PortGroup;
 use LibreNMS\Config;
+use LibreNMS\Util\StringHelpers;
 
 $port_stats = [];
 $port_stats = snmpwalk_cache_oid($device, 'ifDescr', $port_stats, 'IF-MIB');
@@ -46,17 +48,20 @@ foreach ($ports_mapped['maps']['ifIndex'] as $ifIndex => $port_id) {
 
 // Fill ifAlias for fibrechannel ports
 if ($device['os'] == 'fabos') {
-    require_once 'ports/brocade.inc.php';
+    require base_path('includes/discovery/ports/brocade.inc.php');
 }
 
 //Shorten Ekinops Interfaces
 if ($device['os'] == 'ekinops') {
-    require_once 'ports/ekinops.inc.php';
+    require base_path('includes/discovery/ports/ekinops.inc.php');
 }
+
+$default_port_group = Config::get('default_port_group');
 
 // New interface detection
 foreach ($port_stats as $ifIndex => $snmp_data) {
     $snmp_data['ifIndex'] = $ifIndex; // Store ifIndex in port entry
+    $snmp_data['ifAlias'] = StringHelpers::inferEncoding($snmp_data['ifAlias']);
 
     // Get port_id according to port_association_mode used for this device
     $port_id = get_port_id($ports_mapped, $snmp_data, $port_association_mode);
@@ -68,6 +73,15 @@ foreach ($port_stats as $ifIndex => $snmp_data) {
         if (! is_array($ports_db[$port_id])) {
             $snmp_data['device_id'] = $device['device_id'];
             $port_id = dbInsert($snmp_data, 'ports');
+
+            //default Port Group for new Ports defined?
+            if (! empty($default_port_group)) {
+                $port_group = PortGroup::find($default_port_group);
+                if (isset($port_group)) {
+                    $port_group->ports()->attach([$port_id]);
+                }
+            }
+
             $ports[$port_id] = dbFetchRow('SELECT * FROM `ports` WHERE `device_id` = ? AND `port_id` = ?', [$device['device_id'], $port_id]);
             echo 'Adding: ' . $snmp_data['ifName'] . '(' . $ifIndex . ')(' . $port_id . ')';
         } elseif ($ports_db[$port_id]['deleted'] == 1) {
