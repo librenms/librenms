@@ -54,9 +54,10 @@ final class NodeManager
 
     /**
      * Creates a new instance of the Intel Node Manager class.
-     * @param IPMIClient $client The IPMI client for the host.
-     * @param float $version Intel Node Manager version.
-     * @param string $slaveChannelPrefix I2C connection channel for sensor readings.
+     *
+     * @param  IPMIClient  $client  The IPMI client for the host.
+     * @param  float  $version  Intel Node Manager version.
+     * @param  string  $slaveChannelPrefix  I2C connection channel for sensor readings.
      */
     public function __construct(IPMIClient $client, ?float $version = null, string $slaveChannelPrefix = null)
     {
@@ -88,6 +89,7 @@ final class NodeManager
 
     /**
      * Gets a list of available power reading sensors.
+     * 
      * @return array A 2-dim array of available sensors. First index is the name, second index is description.
      */
     public function discoverSensors(): array
@@ -111,6 +113,7 @@ final class NodeManager
 
     /**
      * Gets sensor readings for this device.
+     * 
      * @return array An array of power reading values with sensor descriptions as the key.
      */
     public function pollSeonsors(): array

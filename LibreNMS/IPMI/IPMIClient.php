@@ -26,7 +26,6 @@
 namespace LibreNMS\IPMI;
 
 use ErrorException;
-use Illuminate\Support\Facades\Cache;
 
 /**
  * Represents an IPMI connection with a host machine.
@@ -44,10 +43,11 @@ class IPMIClient
 
     /**
      * Creates a new instance of the IPMIClient class.
-     * @param string $ipmiToolPath The absolute path to ipmitool.
-     * @param string $host The hostname or IP of the endpoint. Set to 'localhost' to connect via in-band driver.
-     * @param string $user
-     * @param string $password
+     *
+     * @param  string  $ipmiToolPath  The absolute path to ipmitool.
+     * @param  string  $host  The hostname or IP of the endpoint. Set to 'localhost' to connect via in-band driver.
+     * @param  string  $user
+     * @param  string  $password
      */
     public function __construct(string $ipmiToolPath, string $host, string $user, string $password)
     {
@@ -80,6 +80,7 @@ class IPMIClient
 
     /**
      * Gets the port used by the client.
+     * 
      * @return ?string The port currently used. Null if not specified.
      */
     public function getPort(): ?string
@@ -97,6 +98,7 @@ class IPMIClient
 
     /**
      * Gets a binary representation of the SDR record for this host.
+     * 
      * @return string|false The SDR binary or false on failure.
      */
     public function getRawSDR()
@@ -129,8 +131,9 @@ class IPMIClient
 
     /**
      * Sends an ipmitool command with specified parameters.
-     * @param string $command the command to send.
-     * @param bool $escalatePrivileges a boolean indicating whether to use 'USER' or 'ADMINISTRATOR' privilege.
+     * 
+     * @param  string $command the command to send.
+     * @param  bool $escalatePrivileges a boolean indicating whether to use 'USER' or 'ADMINISTRATOR' privilege.
      * @return null|string The stdout of the command as reported by ipmitool.
      */
     public function sendCommand(string $command, bool $escalatePrivileges = false): ?string
