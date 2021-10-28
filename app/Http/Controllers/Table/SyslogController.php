@@ -26,6 +26,7 @@
 namespace App\Http\Controllers\Table;
 
 use App\Models\Syslog;
+use LibreNMS\Enum\SyslogSeverity;
 
 class SyslogController extends TableController
 {
@@ -85,18 +86,8 @@ class SyslogController extends TableController
                     return;  // include everything
                 }
 
-                $levels = array_slice([
-                    'emerg',
-                    'alert',
-                    'crit',
-                    'error',
-                    'warning',
-                    'notice',
-                    'info',
-                    'debug',
-                ], 0, $level + 1);
-
-                    $query->whereIn('level', $levels);
+                $levels = array_slice(SyslogSeverity::LEVELS, 0, $level + 1);
+                $query->whereIn('level', $levels);
             });
     }
 
