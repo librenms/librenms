@@ -98,16 +98,13 @@ class IPMIClient
     }
 
     /**
-     * Gets a binary representation of the cached SDR record for this host.
+     * Gets a binary representation of the SDR record for this host.
      * @return string|false The SDR binary or false on failure.
      */
-    public function getSDR()
+    public function getRawSDR()
     {
         try {
-            $b64 = Cache::remember(".ipmi.sdr.$this->host", IPMIClient::SDR_TTL, function () {
-                return base64_encode($this->fetchSDR());
-            });
-
+            $b64 = base64_encode($this->fetchSDR());
             return base64_decode($b64);
         } catch (\Throwable $th) {
             echo 'Failed to fetch SDR: ' . $th->getMessage() . "\n";

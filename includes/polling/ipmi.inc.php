@@ -11,6 +11,7 @@ if (is_array($ipmi_rows)) {
     d_echo($ipmi_rows);
 
     if (isset($attribs['ipmi_hostname'])) {
+        $ipmi = [];
         $ipmi['host'] = $attribs['ipmi_hostname']
         $ipmi['tool'] = Config::get('ipmitool', 'ipmitool');
         $ipmi['user'] = $attribs['ipmi_username'];
@@ -51,12 +52,15 @@ if (is_array($ipmi_rows)) {
             $ipmi_sensor[$desc][$ipmi_unit_type]['unit'] = $type;
         }
 
-        $nmClient = new NodeManager($client);
-        if ($nmClient->isPlatformSupported()) {
-            $ipmi_unit_type = Config::get('ipmi_unit.Watts');
-            foreach ($nmClient->getPowerReadings() as $nmSensorKey => $nmSensorValue) {
-                $ipmi_sensor[$nmSensorKey][$ipmi_unit_type]['value'] = $nmSensorValue;
-                $ipmi_sensor[$nmSensorKey][$ipmi_unit_type]['unit'] = 'Watts';
+        // Fetch Intel Node Manager readings if available.
+        if (isset($attribs['node_manager_version']) && isset($attribs['node_manager_slave_channel_prefix'])) {
+            $nmClient = new NodeManager($client, $attribs['node_manager_version'], $attribs['node_manager_slave_channel_prefix']));
+            if ($nmClient->isPlatformSupported()) {
+                $ipmi_unit_type = Config::get('ipmi_unit.Watts');
+                foreach ($nmClient->pollSeonsors() as $nmSensorKey => $nmSensorValue) {
+                    $ipmi_sensor[$nmSensorKey][$ipmi_unit_type]['value'] = $nmSensorValue;
+                    $ipmi_sensor[$nmSensorKey][$ipmi_unit_type]['unit'] = 'Watts';
+                }
             }
         }
 

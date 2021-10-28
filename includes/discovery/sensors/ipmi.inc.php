@@ -62,8 +62,13 @@ if ($ipmi['host'] = get_dev_attrib($device, 'ipmi_hostname')) {
 
     $nmClient = new NodeManager($client);
     if ($nmClient->isPlatformSupported()) {
+        // Set Node Manager connection properties.
+        foreach ($nmClient->discoverAttributes() as $nmAttribKey => $nmAttribValue) {
+            set_dev_attrib($device, "node_manager_$nmAttribKey", $nmAttribValue);
+        }
+
         $ipmi_unit_type = Config::get('ipmi_unit.Watts');
-        foreach ($nmClient->getAvailablePowerSensors() as $nmSensor) {
+        foreach ($nmClient->discoverSensors() as $nmSensor) {
             discover_sensor(
                 $valid['sensor'],
                 $ipmi_unit_type,

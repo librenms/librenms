@@ -59,6 +59,27 @@ final class NodeManager
     public function __construct(IPMIClient $client)
     {
         $this->client = $client;
+        $this->discoverNodeManager();
+    }
+
+        /**
+     * Creates a new instance of the Intel Node Manager class.
+     * @param IPMIClient $client The IPMI client for the host.
+     * @param float $version Intel Node Manager version.
+     * @param string $slaveChannelPrefix I2C connection channel for sensor readings.
+     */
+    public function __construct(IPMIClient $client, ?float $version, string $slaveChannelPrefix)
+    {
+        $this->client = $client;
+        $this->version = $version;
+        $this->slaveChannelPrefix = $slaveChannelPrefix;
+    }
+
+    public function discoverAttributes(): array {
+        $attributes = [];
+        $attributes['version'] = $this->nmVersion;
+        $attributes['slave_channel_prefix'] = $this->slaveChannelPrefix;
+        return $attributes;
     }
 
     /**
@@ -66,18 +87,15 @@ final class NodeManager
      */
     public function isPlatformSupported(): bool
     {
-        $this->discoverNodeManager();
-
         return $this->nmVersion != null;
     }
 
     /**
-     * Gets power readings for this device.
+     * Gets sensor readings for this device.
      * @return array An array of power reading values with sensor descriptions as the key.
      */
-    public function getPowerReadings(): array
+    public function pollSeonsors(): array
     {
-        $this->discoverNodeManager();
         if ($this->nmVersion == null) {
             return [];
         }
@@ -106,9 +124,8 @@ final class NodeManager
      * Gets a list of available power reading sensors.
      * @return array A 2-dim array of available sensors. First index is the name, second index is description.
      */
-    public function getAvailablePowerSensors(): array
+    public function discoverSensors(): array
     {
-        $this->discoverNodeManager();
         if ($this->nmVersion == null) {
             return [];
         }
@@ -128,12 +145,8 @@ final class NodeManager
 
     private function discoverNodeManager(): void
     {
-        if ($this->nmVersion != null) {
-            return;
-        }
-
         // See spec. v3 sect. 4.5 BMC requirements for Intel® NM Discovery
-        $sdr = bin2hex($this->client->getSDR());
+        $sdr = bin2hex($this->client->getRawSDR());
         if (! $sdr) {
             d_echo('SDR is empty!!');
 

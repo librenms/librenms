@@ -80,62 +80,62 @@ class NodeManagerTest extends TestCase
         $this->assertEquals($expected, $actual, 'Expected the platform to be supported, but returned false.');
     }
 
-    public function testGetPowerReadings_PlatformNotSupported_EmptyArray()
+    public function testPollSeonsors_PlatformNotSupported_EmptyArray()
     {
         $expected = [];
         $client = $this->getMock('-1');
 
         $sut = new NodeManager($client);
-        $actual = $sut->getPowerReadings();
+        $actual = $sut->pollSeonsors();
 
         $this->assertEquals(0, sizeof($actual), 'Expected power readings to be an empty array, but was not empty.');
         $this->assertEquals($expected, $actual);
     }
 
-    public function testGetPowerReadings_Version15_PlatformReadingOnly()
+    public function testPollSeonsors_Version15_PlatformReadingOnly()
     {
         $expectedKey = ['Intel ME Platform'];
         $client = $this->getMock('1.5');
 
         $sut = new NodeManager($client);
-        $response = $sut->getPowerReadings();
+        $response = $sut->pollSeonsors();
         $actualKeys = array_keys($response);
 
         $this->assertEquals(sizeof($expectedKey), sizeof($actualKeys), 'Expected one sensor to be returned.');
         $this->assertEquals($expectedKey[0], $actualKeys[0], 'Expected only platform sensor to be returned.');
     }
 
-    public function testGetPowerReadings_Version15_PlatformReadingCorrect()
+    public function testPollSeonsors_Version15_PlatformReadingCorrect()
     {
         $client = $this->getMock('1.5');
         $expectedValue = $this->schema['platform_global_power']['expected'];
 
         $sut = new NodeManager($client);
-        $response = $sut->getPowerReadings();
+        $response = $sut->pollSeonsors();
         $actualValue = $response['Intel ME Platform'];
 
         $this->assertEquals($expectedValue, $actualValue, "Expected power reading to be $expectedValue watts.");
     }
 
-    public function testGetAvailablePowerSensors_PlatformNotSupported_EmptyArray()
+    public function testDiscoverSensors_PlatformNotSupported_EmptyArray()
     {
         $expected = [];
         $client = $this->getMock('-1');
 
         $sut = new NodeManager($client);
-        $actual = $sut->getAvailablePowerSensors();
+        $actual = $sut->discoverSensors();
 
         $this->assertEquals(0, sizeof($actual), 'Expected no available sensors to be returned.');
         $this->assertEquals($expected, $actual, 'Expected no available sensors to be returned.');
     }
 
-    public function testGetAvailablePowerSensors_Version15_PlatformSensorOnly()
+    public function testDiscoverSensors_Version15_PlatformSensorOnly()
     {
         $expectedOid = 'platform';
         $client = $this->getMock('1.5');
 
         $sut = new NodeManager($client);
-        $response = $sut->getAvailablePowerSensors();
+        $response = $sut->discoverSensors();
 
         $this->assertEquals(1, sizeof($response), 'Expected one sensor to be returned.');
         $this->assertEquals($expectedOid, $response[0][0], 'Expected platform sensor to be the only available sensor.');
@@ -177,7 +177,7 @@ class NodeManagerTest extends TestCase
     private function createIPMIMock(): IPMIClient
     {
         $mock = \Mockery::mock('LibreNMS\IPMI\IPMIClient');
-        $mock->shouldReceive('getSDR')->andReturn($this->sdr);
+        $mock->shouldReceive('getRawSDR')->andReturn($this->sdr);
         $sendCommand = function ($command, $escalatePrivileges) {
             foreach ($this->schema as $key => $value) {
                 if (preg_match($value['requestPattern'], $command)) {
