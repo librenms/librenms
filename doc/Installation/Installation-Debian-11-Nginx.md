@@ -1,4 +1,4 @@
-source: Installation/Installation-Debian-10-Nginx.md
+source: Installation/Installation-Debian-11-Nginx.md
 path: blob/master/doc/
 
 > NOTE: These instructions assume you are the **root** user.  If you
@@ -11,7 +11,7 @@ path: blob/master/doc/
 # Install Required Packages
 
 ```bash
-apt install acl curl composer fping git graphviz imagemagick mariadb-client mariadb-server mtr-tiny nginx-full nmap php7.3-cli php7.3-curl php7.3-fpm php7.3-gd php7.3-json php7.3-mbstring php7.3-mysql php7.3-snmp php7.3-xml php7.3-zip python-memcache python-mysqldb rrdtool snmp snmpd whois python3-pymysql python3-dotenv python3-redis python3-setuptools
+apt install acl curl composer fping git graphviz imagemagick mariadb-client mariadb-server mtr-tiny nginx-full nmap php7.4-cli php7.4-curl php7.4-fpm php7.4-gd php7.4-json php7.4-mbstring php7.4-mysql php7.4-snmp php7.4-xml php7.4-zip python-memcache python-mysqldb rrdtool snmp snmpd whois python3-pymysql python3-dotenv python3-redis python3-setuptools
 ```
 
 # Add librenms user
@@ -89,12 +89,12 @@ timezones.  Valid examples are: "America/New_York",
 "Australia/Brisbane", "Etc/UTC".
 
 ```bash
-nano /etc/php/7.3/fpm/php.ini
-nano /etc/php/7.3/cli/php.ini
+nano /etc/php/7.4/fpm/php.ini
+nano /etc/php/7.4/cli/php.ini
 ```
 
 ```bash
-service php7.3-fpm restart
+service php7.4-fpm restart
 ```
 
 ## Configure NGINX
@@ -130,7 +130,7 @@ server {
  location ~ \.php {
   include fastcgi.conf;
   fastcgi_split_path_info ^(.+\.php)(/.+)$;
-  fastcgi_pass unix:/var/run/php/php7.3-fpm.sock;
+  fastcgi_pass unix:/var/run/php/php7.4-fpm.sock;
  }
  location ~ /\.ht {
   deny all;

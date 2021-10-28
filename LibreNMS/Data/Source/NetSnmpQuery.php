@@ -37,7 +37,7 @@ use LibreNMS\Util\Rewrite;
 use Log;
 use Symfony\Component\Process\Process;
 
-class SnmpQuery implements SnmpQueryInterface
+class NetSnmpQuery implements SnmpQueryInterface
 {
     /**
      * @var array

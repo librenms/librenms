@@ -25,6 +25,8 @@ modules:
                     group: Modem
                     index: "mTemperature.{{ $index }}"
                     divisor: 10
+                    low_limit: -40
+                    high_limit: 75
         state:
             data:
                 -
@@ -104,3 +106,5 @@ modules:
                     descr: "Signal Level"
                     group: Mobile
                     index: "mSignal.{{ $index }}"
+                    low_warn_limit: -85
+                    low_limit: -95
