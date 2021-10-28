@@ -331,7 +331,9 @@
             }
         },
         "api.cors.origin": {
-            "default": ["*"],
+            "default": [
+                "*"
+            ],
             "group": "api",
             "section": "cors",
             "order": 3,
@@ -784,7 +786,9 @@
             "type": "directory"
         },
         "core_descr": {
-            "default": ["core"],
+            "default": [
+                "core"
+            ],
             "type": "array",
             "group": "webui",
             "section": "port-descr",
@@ -795,11 +799,15 @@
             "type": "boolean"
         },
         "custom_descr": {
-            "default": [""],
+            "default": [
+                ""
+            ],
             "type": "array"
         },
         "customers_descr": {
-            "default": ["cust"],
+            "default": [
+                "cust"
+            ],
             "type": "array",
             "group": "webui",
             "section": "port-descr",
@@ -1428,7 +1436,7 @@
             "order": 13,
             "type": "password",
             "when": {
-                "and" : [
+                "and": [
                     {
                         "setting": "email_backend",
                         "operator": "equals",
@@ -4164,7 +4172,7 @@
         },
         "oxidized.ignore_groups": {
             "default": [],
-            "type" : "array",
+            "type": "array",
             "group": "external",
             "section": "oxidized",
             "order": 5
@@ -4210,7 +4218,7 @@
                 "value.*": "exists:devices,type"
             }
         },
-        "oxidized.explicit_device_groups": {
+        "oxidized.only_device_groups": {
             "default": [],
             "type": "array",
             "group": "external",
@@ -4221,16 +4229,46 @@
             "default": {
                 "os": {
                     "os": [
-                        {"match": "airos-af-ltu", "value": "airfiber"},
-                        {"match": "airos-af", "value": "airfiber"},
-                        {"match": "arista_eos", "value": "eos"},
-                        {"match": "ciscosb", "value": "ciscosmb"},
-                        {"match": "f5", "value": "tmos"},
-                        {"match": "fireware", "value": "firewareos"},
-                        {"match": "fortigate", "value": "fortios"},
-                        {"match": "vyos", "value": "vyatta"},
-                        {"match": "slms", "value": "zhoneolt"},
-                        {"match": "oneaccess", "value": "oneos"}
+                        {
+                            "match": "airos-af-ltu",
+                            "value": "airfiber"
+                        },
+                        {
+                            "match": "airos-af",
+                            "value": "airfiber"
+                        },
+                        {
+                            "match": "arista_eos",
+                            "value": "eos"
+                        },
+                        {
+                            "match": "ciscosb",
+                            "value": "ciscosmb"
+                        },
+                        {
+                            "match": "f5",
+                            "value": "tmos"
+                        },
+                        {
+                            "match": "fireware",
+                            "value": "firewareos"
+                        },
+                        {
+                            "match": "fortigate",
+                            "value": "fortios"
+                        },
+                        {
+                            "match": "vyos",
+                            "value": "vyatta"
+                        },
+                        {
+                            "match": "slms",
+                            "value": "zhoneolt"
+                        },
+                        {
+                            "match": "oneaccess",
+                            "value": "oneos"
+                        }
                     ]
                 }
             },
@@ -4448,7 +4486,6 @@
         "poller_modules.customoid": {
             "default": true,
             "type": "boolean"
-
         },
         "poller_modules.bgp-peers": {
             "order": 30,
@@ -4703,7 +4740,7 @@
         "ports_page_default": {
             "default": "details",
             "type": "select",
-            "options":{
+            "options": {
                 "basic": "Basic",
                 "details": "Details",
                 "arp": "ARP",
@@ -5321,7 +5358,9 @@
             "type": "executable"
         },
         "transit_descr": {
-            "default": ["transit"],
+            "default": [
+                "transit"
+            ],
             "type": "array",
             "group": "webui",
             "section": "port-descr",

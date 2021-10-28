@@ -1440,18 +1440,26 @@ function get_oxidized_config(Illuminate\Http\Request $request)
 function list_oxidized(Illuminate\Http\Request $request)
 {
     $return = [];
-    $device_groups = DeviceGroup::whereIn('name', Config::get('oxidized.explicit_device_groups', []))->get();
+    $device_groups = DeviceGroup::whereIn('name', Config::get('oxidized.only_device_groups', []))->get();
 
     if (! empty($device_groups)) {
+        $os_maps = [];
+        for ($os as Config::get('oxidized.maps.os.os', [])) {
+            $os_maps[$os["match"]] = $os_maps[$os["value"]];
+        }
+        $processed_devices = [];
         foreach ($device_groups as $dev_grp) {
             foreach ($dev_grp->devices as $device) {
+                $processed_devices[] = $device->hostname;
                 $output = [
                     'group' => $dev_grp->name,
                     'hostname' => $device->hostname,
                     'ip' => $device->ip,
-                    'os' => $os_map[$device->os] ?? $device->os,
+                    'os' => $os_maps[$device->os] ?? $device->os,
                 ];
-                $return[] = $output;
+                if(! in_array($device->hostname, $processed_devices)) {
+                    $return[] = $output;
+                } 
             }
         }
 
