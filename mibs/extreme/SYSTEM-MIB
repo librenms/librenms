@@ -1,0 +1,561 @@
+-- MIB File: System.mib
+--
+-- Title: Switch System MIB.
+--
+
+SYSTEM-MIB DEFINITIONS ::= BEGIN
+
+  IMPORTS
+      DisplayString, TEXTUAL-CONVENTION, TruthValue
+      FROM SNMPv2-TC
+      Integer32, OBJECT-TYPE, OBJECT-IDENTITY,
+      MODULE-IDENTITY
+      FROM SNMPv2-SMI
+	  SwSensorIndex, SwPortIndex
+      FROM Brocade-TC
+      sw
+      FROM SWBASE-MIB;
+
+  swSystem MODULE-IDENTITY
+    LAST-UPDATED "201805291200Z" -- May 29, 2018 12:00pm
+    ORGANIZATION "Extreme Networks, Inc."
+    CONTACT-INFO
+         "Postal:  Extreme Networks, Inc.
+                   6480 Via Del Oro
+                   San Jose, CA 95119 USA
+          Phone:   +1 408 579-2800
+          E-mail:  support@extremenetworks.com
+          WWW:     http://www.extremenetworks.com"
+
+    DESCRIPTION "The MIB module is for system information.
+                 Copyright (c) 2018 Extreme Networks, Inc.
+         All rights reserved."
+    REVISION   "201805291200Z" -- May 29, 2018 12:00pm
+    DESCRIPTION	"Updated ORGANIZATION and CONTACT-INFO with Extreme Networks"
+    REVISION   "1104151830Z" -- Apr 15, 2011 6:30pm 
+    DESCRIPTION "Initial version of this module."
+	REVISION   "1204301800Z" -- Apr 30, 2012 6:00pm 
+    DESCRIPTION "Added swID mib object."
+	REVISION   "1609231030Z" -- Sept 23, 2016 10:30am 
+    DESCRIPTION "Removed implementation of swFCPort, swFabric, swFlashDL*."
+
+    ::= { sw 1 }
+
+  -- 3..7 are reserved; should not be used for new features.
+	
+  swEvent	OBJECT-IDENTITY
+     STATUS  current
+     DESCRIPTION   "The OID sub-tree for swEvent group."
+     ::= { sw 8 }
+
+  swCpuOrMemoryUsage  OBJECT-IDENTITY
+     STATUS  current
+     DESCRIPTION   "The OID sub-tree for cpu or mem usage group."
+	 ::= { sw 26 }
+
+  FcPortFlag        ::= TEXTUAL-CONVENTION
+     STATUS  current
+     DESCRIPTION   "Represents the port status for a FC Flag. Currently this will indicate
+                    if the port is virtual or physical."
+     SYNTAX  BITS {
+            physical           (0),
+            virtual            (1)
+           }
+  --
+  -- the System Group (sw)
+  --
+
+  swCurrentDate		OBJECT-TYPE
+	SYNTAX		DisplayString(SIZE (0..64))
+	MAX-ACCESS		read-only
+	STATUS		current
+	DESCRIPTION	"The current date information in displayable textual
+		format."
+  ::= { swSystem 1 }
+
+  swBootDate		OBJECT-TYPE
+	SYNTAX		DisplayString(SIZE (0..64))
+	MAX-ACCESS		read-only
+	STATUS		current
+	DESCRIPTION	"The date and time when the system last booted, in
+		displayable textual format."
+  ::= { swSystem 2 }
+
+  swFWLastUpdated	OBJECT-TYPE
+	SYNTAX		DisplayString(SIZE (0..64))
+	MAX-ACCESS		read-only
+	STATUS		current
+	DESCRIPTION	"The information indicates the date when the firmware
+		was last updated, in displayable textual format."
+  ::= { swSystem 3 }
+
+  swFlashLastUpdated	OBJECT-TYPE
+	SYNTAX		DisplayString(SIZE (0..64))
+	MAX-ACCESS		read-only
+	STATUS		current
+	DESCRIPTION	"The information indicates the date when the FLASH
+		was last updated, in displayable textual format."
+  ::= { swSystem 4 }
+
+  swBootPromLastUpdated	OBJECT-TYPE
+	SYNTAX		DisplayString(SIZE (0..64))
+	MAX-ACCESS		read-only
+	STATUS		current
+	DESCRIPTION	"The information indicates the date when the boot PROM
+		was last updated, in displayable textual format."
+  ::= { swSystem 5 }
+
+  swFirmwareVersion	OBJECT-TYPE
+	SYNTAX		DisplayString(SIZE (0..24))
+	MAX-ACCESS		read-only
+	STATUS		current
+	DESCRIPTION	"The current version of the firwmare."
+  ::= { swSystem 6 }
+
+  swOperStatus		OBJECT-TYPE
+	SYNTAX		INTEGER {
+			  online	(1),
+			  offline	(2),
+			  testing	(3),
+			  faulty	(4)
+			}
+	MAX-ACCESS		read-only
+	STATUS		current
+	DESCRIPTION	"The current operational status of the switch.
+		The states are as follow:
+		o online(1) means the switch is accessible by an external
+		  port;
+		o offline(2) means the switch is not accessible;
+		o testing(3) means the switch is in a built-in test mode
+		  and is not accessible by an external port;
+		o faulty(4) means the switch is not operational."
+  ::= { swSystem 7 }
+
+  -- 8..9 are reserved; should not be used for new features.
+
+  swSsn			OBJECT-TYPE
+        SYNTAX          DisplayString(SIZE (0..128))
+        MAX-ACCESS          read-only
+        STATUS          current
+        DESCRIPTION     "The soft serial number of the switch."
+  ::= { swSystem 10 }
+
+   -- 11..17 are reserved
+
+  swBeaconOperStatus	OBJECT-TYPE
+	SYNTAX		INTEGER {
+				on	(1),
+				off	(2)
+			}
+	MAX-ACCESS		read-only
+	STATUS		current
+	DESCRIPTION	"The current operational status of the switch beacon.
+			 When the beacon is on, the LEDs on the front panel
+			 of the switch run alternately from left to right
+			 and right to left. The color is yellow.
+			 When the beacon is off, each LED will be in their
+			 its regular status indicating color and state."
+  ::= { swSystem 18 }
+
+  swBeaconAdmStatus	OBJECT-TYPE
+	SYNTAX		INTEGER {
+				on	(1),
+				off	(2)
+			}
+	MAX-ACCESS		read-only
+	STATUS		current
+	DESCRIPTION	"The desired status of the switch beacon.
+			 When the beacon is set to on, the LEDs on the front
+			 panel of the switch run alternately from left to right
+			 and right to left. The color is yellow.
+			 When the beacon is set to off, each LED will be in
+			 its regular status indicating color and state."
+  ::= { swSystem 19 }
+
+  swDiagResult	OBJECT-TYPE
+	SYNTAX		INTEGER {
+				sw-ok			(1),
+				sw-faulty	    (2),
+				sw-embedded-port-fault	(3)
+			}
+	MAX-ACCESS		read-only
+	STATUS		current
+	DESCRIPTION	"The result of the power-on startup (POST)
+			 diagnostics."
+  ::= { swSystem 20 }
+
+  -- operating environment sensors (temperature, fan, power supply...)
+  swNumSensors		OBJECT-TYPE
+	SYNTAX		Integer32 (0..2147483647)
+	MAX-ACCESS		read-only
+	STATUS		current
+	DESCRIPTION	"The number of sensors inside the switch."
+  ::= { swSystem 21 }
+
+  swSensorTable	OBJECT-TYPE
+	SYNTAX		SEQUENCE OF SwSensorEntry
+	MAX-ACCESS		not-accessible
+	STATUS		current
+	DESCRIPTION	"The table of sensor entries."
+  ::= { swSystem 22 }
+
+  swSensorEntry		OBJECT-TYPE
+	SYNTAX		SwSensorEntry
+	MAX-ACCESS		not-accessible
+	STATUS		current
+	DESCRIPTION	"An entry of the sensor information."
+	INDEX		{ swSensorIndex }
+  ::= { swSensorTable 1 }
+
+  SwSensorEntry	::= SEQUENCE {
+	swSensorIndex	SwSensorIndex,
+	swSensorType	INTEGER,
+	swSensorStatus	INTEGER,
+	swSensorValue	Integer32,
+	swSensorInfo	DisplayString
+  }
+
+  swSensorIndex		OBJECT-TYPE
+	SYNTAX		SwSensorIndex
+	MAX-ACCESS		read-only
+	STATUS		current
+	DESCRIPTION	"This object identifies the sensor."
+  ::= { swSensorEntry 1 }
+
+  swSensorType		OBJECT-TYPE
+	SYNTAX		INTEGER {
+			  temperature	(1),
+			  fan		(2),
+			  power-supply	(3)
+			}
+	MAX-ACCESS		read-only
+	STATUS		current
+	DESCRIPTION	"This object identifies the sensor type."
+  ::= { swSensorEntry 2 }
+
+  swSensorStatus	OBJECT-TYPE
+	SYNTAX		INTEGER {
+			  unknown	(1),
+			  faulty	(2),
+			  below-min	(3),
+			  nominal	(4),
+			  above-max	(5),
+			  absent	(6)
+			}
+	MAX-ACCESS		read-only
+	STATUS		current
+	DESCRIPTION	"The current status of the sensor."
+  ::= { swSensorEntry 3 }
+
+  swSensorValue		OBJECT-TYPE
+	SYNTAX		Integer32
+	MAX-ACCESS		read-only
+	STATUS		current
+	DESCRIPTION	"The current value (reading) of the sensor.
+		The value, -2147483648, represents an unknown quantity.
+		It also means that the sensor does not have the capability to
+		measure the actual value. In V2.0, the temperature sensor
+		value will be in Celsius; the fan value will be in RPM
+		(revolution per minute); and the power supply sensor reading
+		will be unknown."
+  ::= { swSensorEntry 4 }
+
+  swSensorInfo		OBJECT-TYPE
+	SYNTAX		DisplayString(SIZE(0..255))
+	MAX-ACCESS		read-only
+	STATUS		current
+	DESCRIPTION	"Additional displayable information on the sensor.
+		In V2.x, it contains the sensor type and number
+		in textual format. For example, 'Temp 3', 'Fan 6'."
+  ::= { swSensorEntry 5 }
+
+  -- 23 is reserved
+
+  swID     OBJECT-TYPE
+	SYNTAX  Integer32
+	MAX-ACCESS  read-only
+	STATUS  current
+	DESCRIPTION
+    "The number of the logical switch (0/1)."
+    ::= { swSystem 24 }
+
+  swEtherIPAddress     OBJECT-TYPE
+        SYNTAX  IpAddress
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+        "The IP Address of the Ethernet interface of this logical
+        switch."
+    ::= { swSystem 25 }
+
+  swEtherIPMask OBJECT-TYPE
+        SYNTAX  IpAddress
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+        "The IP Mask of the Ethernet interface of this logical switch."
+    ::= { swSystem 26}
+
+  -- 27..28 are reserved
+
+  swIPv6Address OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS not-accessible 
+        STATUS  current
+        DESCRIPTION
+        "IPV6 address."
+    ::= { swSystem 29 }
+
+  swIPv6Status  OBJECT-TYPE
+    SYNTAX      INTEGER {
+              tentative (1),
+              preferred (2),
+              ipdeprecated (3),
+              inactive  (4)
+            }
+    MAX-ACCESS     not-accessible 
+    STATUS      current
+    DESCRIPTION "The current status of ipv6 address."
+  ::= { swSystem 30 }
+
+  --
+  -- End of System Group
+  --
+
+  --
+  -- swEventTable is defined to gather event info for trap
+  -- SNMP GET/SET is not supported on this 	
+  --
+
+  swEventTrapLevel      OBJECT-TYPE
+        SYNTAX          INTEGER {
+			  none		(0),
+                          critical      (1),
+                          error         (2),
+                          warning       (3),
+                          informational (4),
+                          debug         (5)
+                        }
+        MAX-ACCESS          read-write
+        STATUS          deprecated
+        DESCRIPTION     "swAgtTrapSeverityLevel, in absence of
+		swEventTrapLevel, specifies the Trap Severity Level of each
+		defined trap recipient host.
+		This object specifies the swEventTrap level in
+		conjunction with an event's severity level. When an event
+		occurs and if its severity level is at or below the value
+		specified by this object instance, the agent will send
+		the associated swEventTrap to configured recipients."
+  ::= { swEvent 1 }
+ 
+  -- { swEvent 2..3 are reserved }
+ 
+  swEventNumEntries     OBJECT-TYPE
+        SYNTAX          Integer32 (0..2147483647)
+        MAX-ACCESS          read-only
+        STATUS          current
+        DESCRIPTION     "The number of entries in the Event Table."
+  ::= { swEvent 4 }
+ 
+  -- possible events available, included her for lib/thresh/fwd.c compilation 
+  SwFwEvent ::= INTEGER {
+                started(1),
+                changed(2),
+                exceeded(3),
+                below(4),
+                above(5),
+                inBetween(6),
+                lowBufferCrsd(7)
+                }
+
+
+  swEventTable          OBJECT-TYPE
+        SYNTAX          SEQUENCE OF SwEventEntry
+        MAX-ACCESS          not-accessible
+        STATUS          current
+        DESCRIPTION     "The table of event entries."
+  ::= { swEvent 5 }
+ 
+  swEventEntry          OBJECT-TYPE
+        SYNTAX          SwEventEntry
+        MAX-ACCESS          not-accessible
+        STATUS          current
+        DESCRIPTION     "An entry of the event table."
+        INDEX           { swEventIndex }
+ 
+  ::= { swEventTable 1 }
+ 
+  SwEventEntry          ::= SEQUENCE {
+        swEventIndex		Integer32,
+        swEventTimeInfo		DisplayString,
+        swEventLevel		INTEGER,
+	swEventRepeatCount	Integer32,
+        swEventDescr		DisplayString,
+        swEventVfId         Integer32
+  }
+
+  swEventIndex          OBJECT-TYPE
+        SYNTAX          Integer32 (0..2147483647)
+        MAX-ACCESS          read-only
+        STATUS          current
+        DESCRIPTION     "This object identifies the event entry."
+  ::= { swEventEntry 1 }
+ 
+  swEventTimeInfo       OBJECT-TYPE
+        SYNTAX          DisplayString(SIZE (0..64))
+        MAX-ACCESS          read-only
+        STATUS          current
+        DESCRIPTION     "This object identifies the date and time when this
+                event occurred, in textual format."
+  ::= { swEventEntry 2 }
+ 
+  swEventLevel          OBJECT-TYPE
+        SYNTAX          INTEGER {
+                          critical      (1),
+                          error         (2),
+                          warning       (3),
+			  informational	(4),
+                          debug         (5)
+                        }
+        MAX-ACCESS          read-only
+        STATUS          current
+        DESCRIPTION     "This object identifies the severity level of this
+		event entry."
+  ::= { swEventEntry 3 }
+ 
+  swEventRepeatCount	OBJECT-TYPE
+        SYNTAX          Integer32 (0..2147483647)
+        MAX-ACCESS          read-only
+        STATUS          current
+        DESCRIPTION     "This object identifies how many times this particular
+		event has occurred."
+  ::= { swEventEntry 4 }
+ 
+  swEventDescr          OBJECT-TYPE
+        SYNTAX          DisplayString
+        MAX-ACCESS          read-only
+        STATUS          current
+         DESCRIPTION     "This object identifies the textual description of
+                the event."
+  ::= { swEventEntry 5 }
+
+  swEventVfId           OBJECT-TYPE
+        SYNTAX          Integer32 (0..255)
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "This object identifies the Virtual fabric id."
+  ::= { swEventEntry 6 }
+ 
+
+  --
+  -- System CPU usage and Memory usage
+  --
+	swCpuUsage   OBJECT-TYPE
+    SYNTAX      Integer32(0..100)
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "System's cpu usage."
+     ::= { swCpuOrMemoryUsage 1 }
+
+    swCpuNoOfRetries         OBJECT-TYPE
+    SYNTAX      Integer32 (1..100)
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "Number of times system should take cpu utilization sample before sending the CPU utilization trap."
+     ::= { swCpuOrMemoryUsage 2 }
+
+    swCpuUsageLimit         OBJECT-TYPE
+    SYNTAX      Integer32 (1..100)
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "CPU usage limit"
+     ::= { swCpuOrMemoryUsage 3 }
+
+    swCpuPollingInterval  OBJECT-TYPE
+    SYNTAX      Integer32 (10..3600)
+    UNITS           "seconds"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "Time interval between two memory samples."
+     ::= { swCpuOrMemoryUsage 4 }
+
+    swCpuAction  OBJECT-TYPE
+    SYNTAX        Integer32 (0..3)
+    UNITS           "seconds"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "Specifies  the  actions to be taken if system
+                     resources  exceed  the  specified  threshold."
+     ::= { swCpuOrMemoryUsage 5 }
+
+    swMemUsage   OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "System's memory usage."
+     ::= { swCpuOrMemoryUsage 6 }
+
+    swMemNoOfRetries         OBJECT-TYPE
+    SYNTAX      Integer32 (1..100)
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "Number of times system should take memory usage sample before sending the memory usage trap."
+     ::= { swCpuOrMemoryUsage 7 }
+
+    swMemUsageLimit         OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "Memory usage limit"
+     ::= { swCpuOrMemoryUsage 8 }
+
+    swMemPollingInterval  OBJECT-TYPE
+    SYNTAX      Integer32 (10..3600)
+    UNITS           "seconds"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "Time interval between two memory samples."
+     ::= { swCpuOrMemoryUsage 9 }
+
+    swMemAction  OBJECT-TYPE
+    SYNTAX      Integer32 (0..3)
+    UNITS           "seconds"
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION     "Specifies  the  actions to be taken if system
+                     resources  exceed  the  specified  threshold."
+     ::= { swCpuOrMemoryUsage 10 }
+
+			
+--
+-- Enterprise Specific Traps for Switch (sw).
+--
+
+  swTrapsV2 OBJECT-IDENTITY
+    STATUS     current
+	DESCRIPTION	"The Traps for Extreme's Switch."
+	::= { sw 0 }
+
+   swEventTrap           NOTIFICATION-TYPE
+        OBJECTS       { swEventIndex, swEventTimeInfo, swEventLevel,
+                        swEventRepeatCount, swEventDescr, swSsn }
+        STATUS      current
+        DESCRIPTION     "This trap is generated when an event whose
+                level at or below swEventTrapLevel occurs."
+	--#TYPE		"A firmware event has been logged"
+	--#SUMMARY	"Event %d: %s (severity level %d) - %s SSN is #%s"
+	--#ARGUMENTS	{ 0, 1, 2, 4, 5 }
+	--#SEVERITY	INFORMATIONAL
+	--#TIMEINDEX	1
+	--#STATE	OPERATIONAL
+	::= { swTrapsV2 4 }
+
+  swStateChangeTrap  NOTIFICATION-TYPE
+    OBJECTS { swOperStatus }
+    STATUS current
+    DESCRIPTION "This trap is sent whenever switch state changes to online/offline"
+    ::= { swTrapsV2 12 }
+
+END
+
+
