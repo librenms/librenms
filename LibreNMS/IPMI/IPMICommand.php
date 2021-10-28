@@ -35,8 +35,8 @@ use Symfony\Component\Process\Process;
  */
 final class IPMICommand
 {
-    private $command;
-    private $proc;
+    private array $command;
+    private ?Process $proc;
 
     /**
      * Create a new instance of the IPMICommand class.
@@ -53,7 +53,7 @@ final class IPMICommand
      *
      * @return null|string The standard output of the command. Null if exit code is greater than 0.
      */
-    public function execute()
+    public function execute(): ?string
     {
         if ($this->proc != null) {
             throw new Exception('The command has already been executed.');
@@ -78,7 +78,7 @@ final class IPMICommand
             && $this->proc->getExitCode() > 0;
     }
 
-    private static function printInput(array $input)
+    private static function printInput(array $input): void
     {
         if (! (Debug::isVerbose() || Debug::isEnabled())) {
             return;
@@ -99,7 +99,7 @@ final class IPMICommand
         c_echo('IPMI[%c' . $filtered . "%n]\n");
     }
 
-    private function printOutput(array $outErr)
+    private function printOutput(array $outErr): void
     {
         d_echo($outErr[0] . PHP_EOL);
 

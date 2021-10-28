@@ -44,10 +44,10 @@ class NodeManagerTest extends TestCase
         // '3.0' => MISSING DATA. Please add test data if you access to Intel Node Manager 2.0+ equipment.
     ];
 
-    private $sdr;
-    private $schema;
+    private mixed $sdr;
+    private mixed $schema;
 
-    public function testIsPlatformSupported_SDRNoIntelRecord_IsFalse()
+    public function testIsPlatformSupported_SDRNoIntelRecord_IsFalse(): void
     {
         $expected = false;
         $client = $this->getMock('-1');
@@ -58,7 +58,7 @@ class NodeManagerTest extends TestCase
         $this->assertEquals($expected, $actual, 'Expected the platform to be unsupported, but returned true.');
     }
 
-    public function testIsPlatformSupported_SDRMissing_IsFalse()
+    public function testIsPlatformSupported_SDRMissing_IsFalse(): void
     {
         $expected = false;
         $client = $this->getMock('corrupt');
@@ -70,7 +70,7 @@ class NodeManagerTest extends TestCase
         $this->assertEquals($expected, $actual, 'Expected the platform to be unsupported, but returned true.');
     }
 
-    public function testIsPlatformSupported_SDRContainsIntelRecord_IsTrue()
+    public function testIsPlatformSupported_SDRContainsIntelRecord_IsTrue(): void
     {
         $expected = true;
         $client = $this->getMock('1.5');
@@ -81,7 +81,7 @@ class NodeManagerTest extends TestCase
         $this->assertEquals($expected, $actual, 'Expected the platform to be supported, but returned false.');
     }
 
-    public function testPollSeonsors_PlatformNotSupported_EmptyArray()
+    public function testPollSeonsors_PlatformNotSupported_EmptyArray(): void
     {
         $expected = [];
         $client = $this->getMock('-1');
@@ -93,7 +93,7 @@ class NodeManagerTest extends TestCase
         $this->assertEquals($expected, $actual);
     }
 
-    public function testPollSeonsors_Version15_PlatformReadingOnly()
+    public function testPollSeonsors_Version15_PlatformReadingOnly(): void
     {
         $expectedKey = ['Intel ME Platform'];
         $client = $this->getMock('1.5');
@@ -106,7 +106,7 @@ class NodeManagerTest extends TestCase
         $this->assertEquals($expectedKey[0], $actualKeys[0], 'Expected only platform sensor to be returned.');
     }
 
-    public function testPollSeonsors_Version15_PlatformReadingCorrect()
+    public function testPollSeonsors_Version15_PlatformReadingCorrect(): void
     {
         $client = $this->getMock('1.5');
         $expectedValue = $this->schema['platform_global_power']['expected'];
@@ -118,7 +118,7 @@ class NodeManagerTest extends TestCase
         $this->assertEquals($expectedValue, $actualValue, "Expected power reading to be $expectedValue watts.");
     }
 
-    public function testDiscoverSensors_PlatformNotSupported_EmptyArray()
+    public function testDiscoverSensors_PlatformNotSupported_EmptyArray(): void
     {
         $expected = [];
         $client = $this->getMock('-1');
@@ -130,7 +130,7 @@ class NodeManagerTest extends TestCase
         $this->assertEquals($expected, $actual, 'Expected no available sensors to be returned.');
     }
 
-    public function testDiscoverSensors_Version15_PlatformSensorOnly()
+    public function testDiscoverSensors_Version15_PlatformSensorOnly(): void
     {
         $expectedOid = 'platform';
         $client = $this->getMock('1.5');
@@ -148,14 +148,14 @@ class NodeManagerTest extends TestCase
         $this->schema = null;
     }
 
-    private static function loadData($name)
+    private static function loadData(string $name): string
     {
         $path = Config::get('install_dir') . '/' . NodeManagerTest::DATA_DIR . $name;
 
         return file_get_contents($path);
     }
 
-    private function getMock($version): IPMIClient
+    private function getMock(string $version): IPMIClient
     {
         switch ($version) {
             case '-1':
@@ -196,7 +196,7 @@ class NodeManagerTest extends TestCase
         return $mock;
     }
 
-    private static function validateSlaveAndChannel($schema, $command)
+    private static function validateSlaveAndChannel(mixed $schema, mixed $command): void
     {
         if (! preg_match('/-t ' . $schema['slave'] . '/', $command)) {
             throw new Exception('IPMI command has an incorrect slave address.');

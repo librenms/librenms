@@ -33,14 +33,14 @@ use ErrorException;
  */
 class IPMIClient
 {
-    private $ipmiToolPath;
-    private $host;
-    private $user;
-    private $password;
-    private $port = null;
+    private string $ipmiToolPath;
+    private string $host;
+    private string $user;
+    private string $password;
+    private ?string $port = null;
 
-    private $privLvl = 'USER';
-    private $interface = 'lanplus';
+    private string $privLvl = 'USER';
+    private string $interface = 'lanplus';
 
     /**
      * Creates a new instance of the IPMIClient class.
@@ -74,7 +74,7 @@ class IPMIClient
     /**
      * Sets the IPMI interface driver.
      */
-    public function setDriver(string $interface)
+    public function setDriver(string $interface): void
     {
         $this->interface = $interface;
     }
@@ -92,7 +92,7 @@ class IPMIClient
     /**
      * Set the port used by the client.
      */
-    public function setPort(?string $port)
+    public function setPort(?string $port): void
     {
         $this->port = $port;
     }
@@ -110,6 +110,7 @@ class IPMIClient
             return base64_decode($b64);
         } catch (\Throwable $th) {
             echo 'Failed to fetch SDR: ' . $th->getMessage() . "\n";
+            return false;
         }
     }
 
@@ -142,7 +143,7 @@ class IPMIClient
         return $this->send($command, $escalatePrivileges);
     }
 
-    private function send(string $command, bool $escalate = false)
+    private function send(string $command, bool $escalate = false): ?string
     {
         $cmd = [$this->ipmiToolPath];
         if ($this->host != 'localhost') {

@@ -49,9 +49,9 @@ final class NodeManager
         'memory_global_power' => 'raw 0x2e 0xc8 0x57 0x01 0x00 0x01 0x02 0x00',
     ];
 
-    private $client;
-    private $slaveChannelPrefix = '';
-    private $nmVersion = null;
+    private IPMIClient $client;
+    private string $slaveChannelPrefix = '';
+    private ?float $nmVersion = null;
 
     /**
      * Creates a new instance of the Intel Node Manager class.
@@ -181,7 +181,7 @@ final class NodeManager
      *
      * Slave channel is 7-bit I2C Slave Address of NM controller on channel.
      */
-    private static function decodeNMSDRRecord($sdrHex): array
+    private static function decodeNMSDRRecord(string $sdrHex): array
     {
         // See NM spec. v3 sect 4.5 table 4-13.
         $headerOffset = strpos($sdrHex, NodeManager::INTEL_MANUFACTURER_ID);
