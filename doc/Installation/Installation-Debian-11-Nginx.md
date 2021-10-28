@@ -1,4 +1,4 @@
-source: Installation/Installation1Debian-11-Nginx.md
+source: Installation/Installation-Debian-11-Nginx.md
 path: blob/master/doc/
 
 > NOTE: These instructions assume you are the **root** user.  If you

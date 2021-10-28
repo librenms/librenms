@@ -60,7 +60,7 @@ class DocsTest extends TestCase
         'Installation/Installation-Ubuntu-1604-Nginx.md',
         'Installation/Installation-Ubuntu-1804-Nginx.md',
         'Installation/Installation-Ubuntu-1804-Apache.md',
-        'Installation/Installation-Debian-10-Nginx.md',
+        'Installation/Installation-Debian-11-Nginx.md',
         'Installation/Installation-CentOS-7-Nginx.md',
         'Installation/Installation-CentOS-7-Apache.md',
         'Installation/Installing-LibreNMS.md',
