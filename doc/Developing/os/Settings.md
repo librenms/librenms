@@ -128,17 +128,6 @@ snmp_bulk: false
 snmp_max_oid: 8
 ```
 
-#### Allow to get OIDs out of order
-
-Some devices deliver OIDs out of order, which leads to an error during 
-snmpwalk (`Error: OID not increasing`). Set this flag to allow getting OIDs
-out of order. This could cause snmp to loop indefinitely.  This effectifely
-sets the `-Cc` flag for the snmp command.
-
-```yaml
-snmp_out_of_order_oids: true
-```
-
 ### Storage Settings
 
 See also: [Global Storage Config](../../Support/Configuration.md#storage-configuration)
