@@ -34,7 +34,14 @@ use LibreNMS\Tests\TestCase;
 
 class NodeManagerTest extends TestCase
 {
+    /**
+     * @var string Relative path to test data.
+     */
     private const DATA_DIR = 'tests/data/IPMI/NodeManager/';
+
+    /**
+     * @var array Key-value collection of test SDRs and schema names.
+     */
     private const DATA = [
         '-1' => ['version_unsupported.sdr.bin', 'version_unsupported.json'],
         'corrupt' => ['empty.sdr.bin', 'version_unsupported.json'],
@@ -45,12 +52,12 @@ class NodeManagerTest extends TestCase
     ];
 
     /**
-     * @var string|null
+     * @var string|null Mock SDR dump.
      */
     private $sdr;
 
     /**
-     * @var array|null
+     * @var array|null The current schema for validating NM command input.
      */
     private $schema;
 

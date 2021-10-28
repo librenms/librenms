@@ -32,16 +32,21 @@ namespace LibreNMS\IPMI;
  * Intel Intelligent Power Node Manager is an IPMI OEM extension
  * which allows for power and thermal monitoring on supported platforms.
  * See spec. v1.5 sect. 1.3 for more information.
+ * 
+ * @see https://www.intel.com/content/dam/doc/technical-specification/intelligent-power-node-manager-1-5-specification.pdf v1.5 spec.
+ * @see https://www.intel.com/content/dam/www/public/us/en/documents/technical-specifications/intelligent-power-node-manager-specification.pdf v2.0 spec.
+ * @see https://www.intel.com/content/dam/www/public/us/en/documents/technical-specifications/intel-power-node-manager-v3-spec.pdf v3.0 spec.
  */
 final class NodeManager
 {
-    /*
-     * Relevant documentation:
-     * spec. v1.5: https://www.intel.com/content/dam/doc/technical-specification/intelligent-power-node-manager-1-5-specification.pdf
-     * spec. v2.0: https://www.intel.com/content/dam/www/public/us/en/documents/technical-specifications/intelligent-power-node-manager-specification.pdf
-     * spec. v3.0: https://www.intel.com/content/dam/www/public/us/en/documents/technical-specifications/intel-power-node-manager-v3-spec.pdf
+    /**
+     * @var string Intel manufacturer ID hex string.
      */
     private const INTEL_MANUFACTURER_ID = '570100'; // 000157h
+
+    /**
+     * @var array A collection of IPMI raw command for reading Node Manager values. Passed to ipmitool.
+     */
     private const IPMI_NM_RAW_CMD = [
         'get_nm_version' => 'raw 0x2e 0xca 0x57 0x01 0x00',
         'platform_global_power' => 'raw 0x2e 0xc8 0x57 0x01 0x00 0x01 0x00 0x00',
@@ -50,17 +55,17 @@ final class NodeManager
     ];
 
     /**
-     * @var IPMIClient
+     * @var IPMIClient $client The IPMIClient object used for communicating with the host.
      */
     private $client;
 
     /**
-     * @var string
+     * @var string $slaveChannelPrefix The slave channel and address prefix for Intel Node Manager. Resolved by querying the SDR. Passed to ipmitool.
      */
     private $slaveChannelPrefix = '';
 
     /**
-     * @var float|null
+     * @var float|null $nmVersion The maximum Node Manager version supported by the host.
      */
     private $nmVersion = null;
 
@@ -68,7 +73,7 @@ final class NodeManager
      * Creates a new instance of the Intel Node Manager class.
      *
      * @param  IPMIClient  $client  The IPMI client for the host.
-     * @param  float  $version  Intel Node Manager version.
+     * @param  float  $version  The maximum Node Manager version supported by the host.
      * @param  string  $slaveChannelPrefix  I2C connection channel for sensor readings.
      */
     public function __construct(IPMIClient $client, ?float $version = null, string $slaveChannelPrefix = null)
@@ -82,6 +87,9 @@ final class NodeManager
         }
     }
 
+    /**
+     * Gets the connection variables used to communicate with Intel Node Manager.
+     */
     public function discoverAttributes(): array
     {
         $attributes = [];
