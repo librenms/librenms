@@ -45,12 +45,12 @@ class NodeManagerTest extends TestCase
     ];
     
     /**
-     * @var  string|null
+     * @var string|null
      */
     private $sdr;
     
     /**
-     * @var  array|null
+     * @var array|null
      */
     private $schema;
 

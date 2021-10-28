@@ -50,17 +50,17 @@ final class NodeManager
     ];
 
     /**
-     * @var  IPMIClient
+     * @var IPMIClient
      */
     private $client;
 
     /**
-     * @var  string
+     * @var string
      */
     private $slaveChannelPrefix = '';
 
     /**
-     * @var  float|null
+     * @var float|null
      */
     private $nmVersion = null;
 

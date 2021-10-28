@@ -34,37 +34,37 @@ use ErrorException;
 class IPMIClient
 {
     /**
-     * @var  string
+     * @var string
      */
     private $ipmiToolPath;
     
     /**
-     * @var  string
+     * @var string
      */
     private $host;
 
     /**
-     * @var  string
+     * @var string
      */
     private $user;
 
     /**
-     * @var  string
+     * @var string
      */
     private $password;
 
     /**
-     * @var  string|null
+     * @var string|null
      */
     private $port = null;
 
     /**
-     * @var  string
+     * @var string
      */
     private $privLvl = 'USER';
 
     /**
-     * @var  string
+     * @var string
      */
     private $interface = 'lanplus';
 
