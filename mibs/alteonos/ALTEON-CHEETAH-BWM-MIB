@@ -1,156 +1,6 @@
 -- COPYRIGHT NOTICE
--- Copyright (c) Alteon WebSystems, Inc. 2001
+-- Copyright (c) Radware Ltd. 2009
 -- All rights reserved
--- 
--- HISTORY
--- $Log: aosbwm.mib,v $
--- Revision 1.1  2007/10/17 01:09:52  jeneric
--- 10/07 mib updates
---
--- Revision submit_cheetah_21390/1 2006/10/24 21:56:40 ramude
--- Added sessions rejected mib object.
--- 
--- Revision submit_cheetah_15409/2 2005/10/28 09:45:59 rvakkala
--- Corrected check in comment.
--- 
--- Revision submit_cheetah_15409/1 2005/10/28 09:45:06 rvakkala
--- Added SNMP support for /c/bwm/cont<x>/maxsess.
--- 
--- Revision submit_cheetah_13563/1 2005/08/05 17:39:17 rrekha
--- Moved all the BWM related flags into the raw files.
--- 
--- Revision submit_cheetah_12078/1 2005/05/17 08:55:22 rvakkala
--- Added MIB support for /cfg/bwm/report
--- 
--- Revision submit_cheetah_11383/2 2005/04/20 15:24:30 angamuth
--- Merged with previous submit changes.
--- 
--- Revision submit_cheetah_11564/2 2005/04/20 07:22:24 hponnuru
--- Merged with previous changes.
--- 
--- Revision submit_cheetah_11504/1 2005/04/13 09:02:08 hponnuru
--- Added SNMP support for /c/bwm/cont #/iptcpwin.
--- 
--- $Log: aosbwm.mib,v $
--- Revision 1.1  2007/10/17 01:09:52  jeneric
--- 10/07 mib updates
---
--- Revision submit_cheetah_11564/1 2005/04/20 04:32:14 hponnuru
--- Added SNMP support for IPSoft.
--- 
--- $Log: aosbwm.mib,v $
--- Revision 1.1  2007/10/17 01:09:52  jeneric
--- 10/07 mib updates
---
--- Revision submit_cheetah_11383/1 2005/04/20 14:18:36 angamuth
--- Added OIDs for Total Packets (BWM_PKT_COUNT) in BWM Contract Stats Tables.
--- 
--- Revision submit_cheetah_11091/1 2005/03/02 23:49:08 rrekha
--- Added SNMP support for /c/bwm/email command.
--- 
--- Revision submit_cheetah_10393/1 2005/01/05 21:01:25 mmacnt
--- code reorg - moved from lib/agent
--- 
--- Revision submit_cheetah_9196/1 2004/09/01 21:50:06 rrekha
--- Minor changes for SMIv2 compliance.
--- 
--- Revision submit_cheetah_8759/1 2004/08/06 00:27:17 abhijitk
--- Added new MIB variable requested by Wendell.
--- 
--- Revision submit_cheetah_8731/1 2004/08/05 02:27:11 abhijitk
--- Extended MIB support asked for by Wendell & Mike.
--- 
--- Revision submit_cheetah_8691/1 2004/08/04 18:31:22 abhijitk
--- Added support for contract group name via SNMP.
--- 
--- Revision submit_cheetah_8677/1 2004/08/03 20:16:00 abhijitk
--- Brought back bwmNewCfgContractGroupDelete to the MIB.
--- 
--- Revision submit_cheetah_8219/1 2004/07/08 07:15:17 dillibab
--- Added format for bwm ip user table entries.
--- 
--- Revision submit_cheetah_8078/1 2004/07/07 15:27:36 dillibab
--- Added mib objects for entries,frequency,monitor-only mode.
--- 
--- Revision submit_cheetah_7764/1 2004/06/09 22:07:54 kanil
--- size of bwmCur/New CfgContractName objects are set to 31 
--- 
--- Revision submit_cheetah_5839/1 2003/12/05 02:10:08 abhijitk
--- Changed BWM contract name to be 32 characters long (effectively 31           
--- characters as the last character is '\0') from 16 characters.
--- 
--- Revision submit_cheetah_5753/1 2003/11/21 03:08:13 abhijitk
--- Removed bwmNewCfgContractGroupDelete from the MIB.
--- 
--- Revision submit_cheetah_5749/1 2003/11/20 23:52:13 abhijitk
--- Removed bwmCurCfgContractGroupState and bwmNewCfgContractGroupState from
--- the MIB - as they did not make any sense and because of which the EMS
--- is not able to configure BWM contract group.
--- 
--- Revision submit_cheetah_5693/1 2003/11/16 19:34:29 rrekha
--- Converted MIBs to SMIv2.
--- 
--- Revision submit_cheetah_5111/1 2003/09/23 18:15:35 rrekha
--- Fixed Q00753762: Remove the range for bwmCurCfgContractPolicy and
--- bwmNewCfgContractPolicy. They should be obtained using mib object
--- bwmPolicyTableMaxEnt.
--- 
--- Revision submit_cheetah_4435/1 2003/08/12 22:59:48 rrekha
--- Changed name of mib file for cheetah*.mib to aos*.mib.
--- 
--- Revision submit_cheetah_3132/1 2003/05/15 01:54:29 abhijitk
--- Updated MIB to reflect changes as suggested by Wendell.
--- 
--- Revision submit_cheetah_2911/1 2003/05/06 01:38:01 abhijitk
--- Added MIBs for the time policy and the contract group tables.
--- 
--- Revision submit_cheetah_2846/1 2003/04/30 00:23:03 abhijitk
--- Added the MIB for some of the new 21.0 BWM features.
--- 
--- Revision submit_cheetah_1919/1 2003/02/05 20:02:16 rrekha
--- Changed the include paths for integrating support
--- for SNMP V3 Windmanage Stack.
--- 
--- Revision submit_cheetah_1402/1 2002/10/29 22:43:24 rrekha
--- bwmStatTcBufferUsed/bwmStatTcrBufferUsed and 
--- bwmStatPortTcBufferUsed/bwmStatPortTcrBufferUsed should be of type
--- integer instead of counter.
--- 
--- Revision submit_cheetah_796/1 2002/08/29 18:33:30 rrekha
--- BWM contract and contract rate statistics are per port not
--- per SP.
--- 
--- Revision submit_cheetah_776/1 2002/08/28 01:15:59 rrekha
--- Added bwmCurCfgContractShaping/bwmNewCfgContractShaping.
--- Modified some mib descriptions to better explain the variables.
--- 
--- Revision submit_cheetah_181/1 2002/06/24 18:23:45 rrekha
--- Added mib object to clear BWM statistics.
--- 
--- Revision ch_1_0_0_dev/1 2002/04/23 21:46:59 smiao
--- Renamed node cheetah to aws-switches.
--- 
--- Revision ch10latest_smiao/2 2002/02/13 01:41:23 smiao
--- 	Initial checked in for cheetah MIB files.
--- 
--- Revision genie_rekha/8 2001/05/25 00:11:10 rekha
--- 	Removed 'other' from enumerations.
--- 
--- Revision genie_rekha/6 2001/05/01 18:18:06 rekha
--- 	Fixed CR11426: Modified policy buffer limit range to 8192-128000.
--- 
--- Revision genie_rekha/4 2001/05/01 00:27:35 rekha
--- 	Fixed CR11422: Remove incorrect range for contract and policy
--- 	tables. The range for these tables should be obtained via the 
--- 	respective MaxEnt MIB objects.
--- 
--- Revision genie_rekha/2 2001/02/08 18:18:02 rekha
--- 	As part of the code cleanup split the Tigon MIB into smaller
--- 	modules. Instead of altswitch.mib these 5 new modules should be
--- 	used.
--- 
--- $EndLog$
--- 
 
 ALTEON-CHEETAH-BWM-MIB DEFINITIONS ::= BEGIN
 
@@ -163,22 +13,16 @@ IMPORTS
         FROM ALTEON-ROOT-MIB;
 
 bwm MODULE-IDENTITY
-    LAST-UPDATED "200409010000Z" --  1 September, 2004
-    ORGANIZATION "Nortel Networks"
-    CONTACT-INFO "Rekha Singamsetty
-                  Suresh Batchu
-
-                  Nortel Networks
-                  4655 Great America Parkway
-                  Santa Clara CA 95054
-
-                  +1 408 495 2400
-                  rrekha@nortelnetworks.com
-                  sbatchu@nortelnetworks.com"
+    LAST-UPDATED "200908050000Z" --  5 August, 2009
+    ORGANIZATION "Radware Ltd"
+    CONTACT-INFO "Lobby 1 (Visitors) and Lobby 2 (Deliveries)
+                  575 Corporate Drive
+                  Mahwah, NJ 07430
+                  support@radware.com"
     DESCRIPTION
-        "The MIB module for the Alteon OS BWM configuration, statistics and 
+        "The MIB module for the Alteon OS BWM configuration, statistics and
          information ."
-    REVISION "200409010000Z"     -- 1 September, 2004
+    REVISION "200908050000Z" --  5 August, 2009 
     DESCRIPTION
         "Added revision clause for SMIv2 compliance."
     ::= { aws-switch 6 }
@@ -196,79 +40,91 @@ bwmContractGroupConfig  OBJECT IDENTIFIER ::= { bwmConfigs 5 }
 bwmCurCfgGenState OBJECT-TYPE
     SYNTAX INTEGER {
 	on(2),
-	off(3)
+	off(3),
+        unsupported(2147483647)
         }
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION
-        "The state of BWM on the switch."
+        "The state of BWM on the switch.
+         Note:This mib is not supported for VX instance of virtualization."
     ::= { bwmGeneralConfig 1 }
 
 bwmNewCfgGenState OBJECT-TYPE
     SYNTAX INTEGER {
 	on(2),
-	off(3)
+	off(3),
+        unsupported(2147483647)
 	}
     MAX-ACCESS read-write
     STATUS current
     DESCRIPTION
-        "The state of BWM in the switch."
+        "The state of BWM in the switch.
+         Note:This mib is not supported for VX instance of virtualization."
     ::= { bwmGeneralConfig 2 }
 
 bwmCurCfgGenEnforcePolicy OBJECT-TYPE
     SYNTAX INTEGER {
 	enabled(2),
-	disabled(3)
+	disabled(3),
+        unsupported(2147483647)
 	}
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION
         "The state of BWM enforce policies. When disabled, no bandwidth limits
-         will be applied on the queues."
+         will be applied on the queues.
+         Note:This mib is not supported for VX instance of virtualization."
     ::= { bwmGeneralConfig 3 }
 
 bwmNewCfgGenEnforcePolicy OBJECT-TYPE
     SYNTAX INTEGER {
 	enabled(2),
-	disabled(3)
+	disabled(3),
+        unsupported(2147483647)
 	}
     MAX-ACCESS read-write
     STATUS current
     DESCRIPTION
         "The state of BWM enforce policies. When disabled, no bandwidth limits
-         will be applied on the queues."
+         will be applied on the queues.
+         Note:This mib is not supported for VX instance of virtualization."
     ::= { bwmGeneralConfig 4 }
 
 bwmCurCfgGenSmtpUser OBJECT-TYPE
     SYNTAX DisplayString (SIZE(0..127))
     MAX-ACCESS read-only
-    STATUS current
+    STATUS obsolete
     DESCRIPTION
-        "The SMTP user name tp whom the history statistics will be mailed."
+        "The SMTP user name tp whom the history statistics will be mailed.
+         Note:This mib is not supported for VX instance of virtualization."
     ::= { bwmGeneralConfig 5 }
  
 bwmNewCfgGenSmtpUser OBJECT-TYPE
     SYNTAX DisplayString (SIZE(0..127))
     MAX-ACCESS read-write
-    STATUS current
+    STATUS obsolete
     DESCRIPTION
-        "The SMTP user name tp whom the history statistics will be mailed."
+        "The SMTP user name tp whom the history statistics will be mailed.
+         Note:This mib is not supported for VX instance of virtualization."
     ::= { bwmGeneralConfig 6 }
 
 bwmCurCfgGenEmailFrequency OBJECT-TYPE
     SYNTAX INTEGER (0..1440) 
     MAX-ACCESS read-only
-    STATUS current
+    STATUS obsolete
     DESCRIPTION
-        "The frequency of BWM email in minutes." 
+        "The frequency of BWM email in minutes.
+         Note:This mib is not supported for VX instance of virtualization."
     ::= { bwmGeneralConfig 7 }
 
 bwmNewCfgGenEmailFrequency OBJECT-TYPE
     SYNTAX INTEGER (0..1440) 
     MAX-ACCESS read-write
-    STATUS current
+    STATUS obsolete
     DESCRIPTION
-        "The frequency of BWM email in minutes." 
+        "The frequency of BWM email in minutes.
+         Note:This mib is not supported for VX instance of virtualization."
     ::= { bwmGeneralConfig 8 }
 
 bwmCurCfgGenIPUserLimit OBJECT-TYPE
@@ -276,7 +132,8 @@ bwmCurCfgGenIPUserLimit OBJECT-TYPE
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION
-        "The number of entries in the BWM IP user table in 64k|128k|256k|512k format." 
+        "The number of entries in the BWM IP user table in 64k|128k|256k|512k format.
+         Note:This mib is not supported for VX instance of virtualization."
     ::= { bwmGeneralConfig 9 }
  
 bwmNewCfgGenIPUserLimit OBJECT-TYPE
@@ -284,57 +141,138 @@ bwmNewCfgGenIPUserLimit OBJECT-TYPE
     MAX-ACCESS read-write
     STATUS current
     DESCRIPTION
-        "The number of entries in the BWM IP user table in 64k|128k|256k|512k format." 
+        "The number of entries in the BWM IP user table in 64k|128k|256k|512k format.
+         Note:This mib is not supported for VX instance of virtualization."
     ::= { bwmGeneralConfig 10 }
  
 bwmCurCfgGenEmail OBJECT-TYPE
     SYNTAX INTEGER {
 	enabled(2),
-	disabled(3)
+	disabled(3),
+        unsupported(2147483647)
 	}
     MAX-ACCESS read-only
-    STATUS current
+    STATUS obsolete
     DESCRIPTION
         "Specifies whether BWM history statistics are sent using email. 
          When disabled, the history statistics are sent using socket based 
-         mechanism."
+         mechanism.
+         Note:This mib is not supported for VX instance of virtualization."
     ::= { bwmGeneralConfig 11 }
 
 bwmNewCfgGenEmail OBJECT-TYPE
     SYNTAX INTEGER {
 	enabled(2),
-	disabled(3)
+	disabled(3),
+        unsupported(2147483647)
 	}
     MAX-ACCESS read-write
-    STATUS current
+    STATUS obsolete
     DESCRIPTION
         "Specifies whether BWM history statistics are sent using email. 
          When disabled, the history statistics are sent using socket based 
-         mechanism."
+         mechanism.
+         Note:This mib is not supported for VX instance of virtualization."
     ::= { bwmGeneralConfig 12 }
 
 bwmCurCfgGenReport OBJECT-TYPE
     SYNTAX  IpAddress
     MAX-ACCESS  read-only
-    STATUS  current
+    STATUS  obsolete
     DESCRIPTION
-        "IP address of the reporting server."
+        "IP address of the reporting server.
+         Note:This mib is not supported for VX instance of virtualization."
     ::= { bwmGeneralConfig 13 }
 
 bwmNewCfgGenReport OBJECT-TYPE
     SYNTAX  IpAddress
     MAX-ACCESS  read-write
+    STATUS  obsolete
+    DESCRIPTION
+        "IP address of the reporting server.
+         Note:This mib is not supported for VX instance of virtualization."
+    ::= { bwmGeneralConfig 14 }
+
+bwmCurCfgGenReportStr OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS  read-only
     STATUS  current
     DESCRIPTION
-        "IP address of the reporting server."
-    ::= { bwmGeneralConfig 14 }
+        "IP address or Hostname of the reporting server.
+         Note:This mib is not supported for VX instance of virtualization."
+    ::= { bwmGeneralConfig 15 }
+
+bwmNewCfgGenReportStr OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "IP address or Hostname of the reporting server.
+         Note:This mib is not supported for VX instance of virtualization."
+    ::= { bwmGeneralConfig 16 }
+
+bwmCurCfgGenAlarmsPerSec OBJECT-TYPE
+    SYNTAX INTEGER (0..1000) 
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The amount of BWM alarms can be send per second.
+         Note:This mib is not supported for VX instance of virtualization."
+    ::= { bwmGeneralConfig 17 }
+
+bwmNewCfgGenAlarmsPerSec OBJECT-TYPE
+    SYNTAX INTEGER (0..1000) 
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The amount of BWM alarms can be send per second.
+         Note:This mib is not supported for VX instance of virtualization."
+    ::= { bwmGeneralConfig 18 }
+
+bwmCurCfgGenAlarmsUpdateRate OBJECT-TYPE
+    SYNTAX INTEGER (5..100) 
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The BWM alarms update rate in seconds.
+         Note:This mib is not supported for VX instance of virtualization."
+    ::= { bwmGeneralConfig 19 }
+
+bwmNewCfgGenAlarmsUpdateRate OBJECT-TYPE
+    SYNTAX INTEGER (5..100) 
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The BWM alarms update rate in seconds.
+         Note:This mib is not supported for VX instance of virtualization." 
+    ::= { bwmGeneralConfig 20 }
+
+bwmCurCfgGenIPPrefixLimit OBJECT-TYPE
+    SYNTAX DisplayString (SIZE(0..4))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The number of entries in the BWM IP Prefix table in 1k|16k|64k|128k|256k format.
+         Note:This mib is not supported for VX instance of virtualization." 
+    ::= { bwmGeneralConfig 21 }
+ 
+bwmNewCfgGenIPPrefixLimit OBJECT-TYPE
+    SYNTAX DisplayString (SIZE(0..4))
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The number of entries in the BWM IP Prefix table in 1k|16k|64k|128k|256k format.
+         Note:This mib is not supported for VX instance of virtualization." 
+    ::= { bwmGeneralConfig 22 }
+ 
 
 bwmPolicyTableMaxEnt OBJECT-TYPE
     SYNTAX Integer32
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION
-        "The maximum number of rows in the BWM policy configuration table."
+        "The maximum number of rows in the BWM policy configuration table.
+         Note:This mib is not supported for VX instance of virtualization."
     ::= { bwmPolicyConfig 1 }
 
 bwmCurCfgPolicyTable OBJECT-TYPE
@@ -342,7 +280,8 @@ bwmCurCfgPolicyTable OBJECT-TYPE
     MAX-ACCESS not-accessible
     STATUS current
     DESCRIPTION
-        "The table of BWM traffic policy configuration."
+        "The table of BWM traffic policy configuration.
+         Note:This mib is not supported for VX instance of virtualization."
     ::= { bwmPolicyConfig 2 }
  
 bwmCurCfgPolicyTableEntry OBJECT-TYPE
@@ -350,7 +289,8 @@ bwmCurCfgPolicyTableEntry OBJECT-TYPE
     MAX-ACCESS not-accessible
     STATUS current
     DESCRIPTION
-        "A row in the BWM traffic policy configuration table."
+        "A row in the BWM traffic policy configuration table.
+         Note:This mib is not supported for VX instance of virtualization."
     INDEX { bwmCurCfgPolicyIndx }
     ::= { bwmCurCfgPolicyTable 1 }
  
@@ -362,7 +302,10 @@ BwmCurCfgPolicyTableEntry ::= SEQUENCE {
     bwmCurCfgPolicySoft       DisplayString,
     bwmCurCfgPolicyResv       DisplayString,
     bwmCurCfgPolicyUserLimit  DisplayString,
-    bwmCurCfgPolicyBuffer     INTEGER
+    bwmCurCfgPolicyBuffer     INTEGER,
+    bwmCurCfgPolicyType	      INTEGER,
+    bwmCurCfgPolicyHardPPS    INTEGER,
+    bwmCurCfgPolicyUserPPS    INTEGER
     }
  
 bwmCurCfgPolicyIndx OBJECT-TYPE
@@ -427,7 +370,7 @@ bwmCurCfgPolicyBuffer OBJECT-TYPE
     DESCRIPTION
         "The buffer limit for the traffic policy."
     ::= { bwmCurCfgPolicyTableEntry 7 }
- 
+
 bwmCurCfgPolicyUserLimit OBJECT-TYPE
     SYNTAX DisplayString (SIZE(0..5))
     MAX-ACCESS read-only
@@ -438,13 +381,41 @@ bwmCurCfgPolicyUserLimit OBJECT-TYPE
 	 user (IP address) if the contract performs per user rate limiting."
     ::= { bwmCurCfgPolicyTableEntry 8 }
 
+bwmCurCfgPolicyType OBJECT-TYPE
+    SYNTAX INTEGER {
+        throughput(1),
+        pps(2),
+        unsupported(2147483647)
+	}
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "policy type pps or throughput."
+    ::= { bwmCurCfgPolicyTableEntry 9 }
+
+bwmCurCfgPolicyHardPPS OBJECT-TYPE
+    SYNTAX INTEGER (10..1000000)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "pps hard limit."
+    ::= { bwmCurCfgPolicyTableEntry 10 }
+
+bwmCurCfgPolicyUserPPS OBJECT-TYPE
+    SYNTAX INTEGER (10..1000000)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "pps user limit."
+    ::= { bwmCurCfgPolicyTableEntry 11 }
 
 bwmNewCfgPolicyTable OBJECT-TYPE
     SYNTAX SEQUENCE OF BwmNewCfgPolicyTableEntry
     MAX-ACCESS not-accessible
     STATUS current
     DESCRIPTION
-        "The table of BWM traffi policy configuration."
+        "The table of BWM traffic policy configuration.
+         Note:This mib is not supported for VX instance of virtualization."
     ::= { bwmPolicyConfig 3 }
  
 bwmNewCfgPolicyTableEntry OBJECT-TYPE
@@ -452,7 +423,8 @@ bwmNewCfgPolicyTableEntry OBJECT-TYPE
     MAX-ACCESS not-accessible
     STATUS current
     DESCRIPTION
-        "A row in the BWM traffic policy configuration table."
+        "A row in the BWM traffic policy configuration table.
+         Note:This mib is not supported for VX instance of virtualization."
     INDEX   { bwmNewCfgPolicyIndx }
     ::= { bwmNewCfgPolicyTable 1 }
  
@@ -464,8 +436,12 @@ BwmNewCfgPolicyTableEntry ::= SEQUENCE {
     bwmNewCfgPolicySoft       DisplayString,
     bwmNewCfgPolicyResv       DisplayString,
     bwmNewCfgPolicyBuffer     INTEGER,
+ 
     bwmNewCfgPolicyUserLimit  DisplayString,
-    bwmNewCfgPolicyDelete     INTEGER
+    bwmNewCfgPolicyDelete     INTEGER,
+    bwmNewCfgPolicyType	      INTEGER, 		
+    bwmNewCfgPolicyHardPPS    INTEGER, 		
+    bwmNewCfgPolicyUserPPS    INTEGER
     }
 
 bwmNewCfgPolicyIndx OBJECT-TYPE
@@ -498,7 +474,7 @@ bwmNewCfgPolicyTosOut OBJECT-TYPE
     ::= { bwmNewCfgPolicyTableEntry 3 }
 
 bwmNewCfgPolicyHard OBJECT-TYPE
-    SYNTAX DisplayString (SIZE(0..5)) 
+    SYNTAX DisplayString (SIZE(0..6)) 
     MAX-ACCESS read-create
     STATUS current
     DESCRIPTION
@@ -507,7 +483,7 @@ bwmNewCfgPolicyHard OBJECT-TYPE
 ::= { bwmNewCfgPolicyTableEntry 4 }
  
 bwmNewCfgPolicySoft OBJECT-TYPE
-    SYNTAX DisplayString (SIZE(0..5))
+    SYNTAX DisplayString (SIZE(0..6))
     MAX-ACCESS read-create
     STATUS current
     DESCRIPTION
@@ -515,7 +491,7 @@ bwmNewCfgPolicySoft OBJECT-TYPE
     ::= { bwmNewCfgPolicyTableEntry 5 }
  
 bwmNewCfgPolicyResv OBJECT-TYPE
-    SYNTAX DisplayString (SIZE(0..5))
+    SYNTAX DisplayString (SIZE(0..6))
     MAX-ACCESS read-create
     STATUS current
     DESCRIPTION
@@ -534,7 +510,8 @@ bwmNewCfgPolicyBuffer OBJECT-TYPE
 bwmNewCfgPolicyDelete OBJECT-TYPE
     SYNTAX INTEGER { 
         other(1),
-        delete(2)
+        delete(2),
+        unsupported(2147483647)
         }
     MAX-ACCESS read-create
     STATUS current
@@ -546,7 +523,7 @@ bwmNewCfgPolicyDelete OBJECT-TYPE
     ::= { bwmNewCfgPolicyTableEntry 8 }
 
 bwmNewCfgPolicyUserLimit OBJECT-TYPE
-    SYNTAX DisplayString (SIZE(0..5))
+    SYNTAX DisplayString (SIZE(0..6))
     MAX-ACCESS read-create
     STATUS current
     DESCRIPTION
@@ -555,7 +532,35 @@ bwmNewCfgPolicyUserLimit OBJECT-TYPE
 	 user (IP address) if the contract performs per user rate limiting."
     ::= { bwmNewCfgPolicyTableEntry 9 }
 
- 
+
+bwmNewCfgPolicyType OBJECT-TYPE
+    SYNTAX INTEGER {
+        throughput(1),
+        pps(2),
+        unsupported(2147483647)
+	}
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "policy type pps or throughput."
+    ::= { bwmNewCfgPolicyTableEntry 10 }
+
+bwmNewCfgPolicyHardPPS OBJECT-TYPE
+    SYNTAX INTEGER (10..1000000)
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "pps hard limit."
+    ::= { bwmNewCfgPolicyTableEntry 11 }
+
+bwmNewCfgPolicyUserPPS OBJECT-TYPE
+    SYNTAX INTEGER (10..1000000)
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "pps user limit."
+    ::= { bwmNewCfgPolicyTableEntry 12 }
+
 -- BWM Contract Config Table
  
 bwmContractTableMaxEnt OBJECT-TYPE
@@ -563,7 +568,8 @@ bwmContractTableMaxEnt OBJECT-TYPE
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION
-        "The maximum number of rows in the BWM contract configuration table."
+        "The maximum number of rows in the BWM contract configuration table.
+         Note:This mib is not supported for VX instance of virtualization."
     ::= { bwmContractConfig 1 }
  
 bwmCurCfgContractTable OBJECT-TYPE
@@ -571,7 +577,8 @@ bwmCurCfgContractTable OBJECT-TYPE
     MAX-ACCESS not-accessible
     STATUS current
     DESCRIPTION
-        "The table of BWM traffic contract configuration."
+        "The table of BWM traffic contract configuration.
+         Note:This mib is not supported for VX instance of virtualization."
     ::= { bwmContractConfig 2 }
  
 bwmCurCfgContractTableEntry OBJECT-TYPE
@@ -579,7 +586,8 @@ bwmCurCfgContractTableEntry OBJECT-TYPE
     MAX-ACCESS not-accessible
     STATUS current
     DESCRIPTION
-        "A row in the BWM traffic contract configuration table."
+        "A row in the BWM traffic contract configuration table.
+         Note:This mib is not supported for VX instance of virtualization."
     INDEX   { bwmCurCfgContractIndx }
     ::= { bwmCurCfgContractTable 1 }
  
@@ -597,7 +605,11 @@ BwmContractCurCfgTableEntry ::= SEQUENCE {
     bwmCurCfgContractIpType      INTEGER,
     bwmCurCfgContractMonitorMode INTEGER,
     bwmCurCfgContractMaxSess     INTEGER,
-    bwmCurCfgContractGroup       Integer32
+    bwmCurCfgContractGroup       Integer32,
+    bwmCurCfgContractRowType     INTEGER,
+    bwmCurCfgContractOperMode    INTEGER,
+    bwmCurCfgContractAlarmsPerSec INTEGER,
+    bwmCurCfgContractPrefixLength  INTEGER
     }
  
 bwmCurCfgContractIndx OBJECT-TYPE
@@ -619,7 +631,8 @@ bwmCurCfgContractName   OBJECT-TYPE
 bwmCurCfgContractState OBJECT-TYPE
     SYNTAX INTEGER {
         enabled(2),
-        disabled(3)
+        disabled(3),
+        unsupported(2147483647)
         }
     MAX-ACCESS read-only
     STATUS current
@@ -646,7 +659,8 @@ bwmCurCfgContractPrec OBJECT-TYPE
 bwmCurCfgContractUseTos OBJECT-TYPE
     SYNTAX INTEGER {
         enabled(2),
-        disabled(3)
+        disabled(3),
+        unsupported(2147483647)
         }
     MAX-ACCESS read-only
     STATUS current
@@ -658,7 +672,8 @@ bwmCurCfgContractUseTos OBJECT-TYPE
 bwmCurCfgContractHistory OBJECT-TYPE
     SYNTAX INTEGER {
         enabled(2),
-        disabled(3)
+        disabled(3),
+        unsupported(2147483647)
         }
     MAX-ACCESS read-only
     STATUS current
@@ -670,7 +685,8 @@ bwmCurCfgContractHistory OBJECT-TYPE
 bwmCurCfgContractShaping OBJECT-TYPE
     SYNTAX INTEGER {
         enabled(1),
-        disabled(2)
+        disabled(2),
+        unsupported(2147483647)
         }
     MAX-ACCESS read-only
     STATUS current
@@ -681,7 +697,8 @@ bwmCurCfgContractShaping OBJECT-TYPE
 bwmCurCfgContractResizeTcp OBJECT-TYPE
     SYNTAX INTEGER {
         enabled(2),
-        disabled(3)
+        disabled(3),
+        unsupported(2147483647)
         }
     MAX-ACCESS read-only
     STATUS current
@@ -693,7 +710,8 @@ bwmCurCfgContractResizeTcp OBJECT-TYPE
 bwmCurCfgContractIpLimit OBJECT-TYPE
     SYNTAX INTEGER {
         enabled(2),
-        disabled(3)
+        disabled(3),
+        unsupported(2147483647)
         }
     MAX-ACCESS read-only
     STATUS current
@@ -705,7 +723,8 @@ bwmCurCfgContractIpLimit OBJECT-TYPE
 bwmCurCfgContractIpType OBJECT-TYPE
     SYNTAX INTEGER {
 	sip(1),
-	dip(2)
+	dip(2),
+        unsupported(2147483647)
 	}
     MAX-ACCESS read-only
     STATUS current
@@ -717,7 +736,8 @@ bwmCurCfgContractIpType OBJECT-TYPE
 bwmCurCfgContractMonitorMode OBJECT-TYPE
     SYNTAX INTEGER {
         enabled(1),
-        disabled(2)
+        disabled(2),
+        unsupported(2147483647)
         }
     MAX-ACCESS read-only
     STATUS current
@@ -733,7 +753,6 @@ bwmCurCfgContractGroup OBJECT-TYPE
         "The group number of the contract (zero if not part of a group)"
     ::= { bwmCurCfgContractTableEntry 13 }
 
-
 bwmCurCfgContractMaxSess OBJECT-TYPE
     SYNTAX INTEGER(0..65534) 
     MAX-ACCESS read-only 
@@ -741,13 +760,58 @@ bwmCurCfgContractMaxSess OBJECT-TYPE
     DESCRIPTION
         "Maximum number of sessions per user or contract."
     ::= { bwmCurCfgContractTableEntry 15 }
+
+bwmCurCfgContractRowType OBJECT-TYPE
+    SYNTAX INTEGER {
+        regular(1),
+        reserved(2),
+        unsupported(2147483647)
+        }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The Row Type: Regular or Reserved"
+    ::= { bwmCurCfgContractTableEntry 16 }
+
+bwmCurCfgContractOperMode OBJECT-TYPE
+    SYNTAX INTEGER {
+        ratelimiting(1),
+        shaping(2),
+        monitor(3),
+        unsupported(2147483647)
+        }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Operation mode of a contract."
+    ::= { bwmCurCfgContractTableEntry 17 }
  
+
+bwmCurCfgContractAlarmsPerSec OBJECT-TYPE
+    SYNTAX INTEGER (0..1000) 
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The amount of Contract alarms can be send per second." 
+    ::= { bwmCurCfgContractTableEntry 18 }
+
+bwmCurCfgContractPrefixLength OBJECT-TYPE
+    SYNTAX INTEGER (0..127) 
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "Prefix len to use 0 - use user limit !=0 use prefix." 
+    ::= { bwmCurCfgContractTableEntry 19 }
+
+
+
 bwmNewCfgContractTable OBJECT-TYPE
     SYNTAX SEQUENCE OF BwmContractNewCfgTableEntry
     MAX-ACCESS not-accessible
     STATUS current
     DESCRIPTION
-        "The table of BWM traffic contract configuration."
+        "The table of BWM traffic contract configuration.
+         Note:This mib is not supported for VX instance of virtualization."
     ::= { bwmContractConfig 3 }
  
 bwmNewCfgContractTableEntry OBJECT-TYPE
@@ -755,7 +819,8 @@ bwmNewCfgContractTableEntry OBJECT-TYPE
     MAX-ACCESS not-accessible
     STATUS current
     DESCRIPTION
-        "A row in the BWM traffic contract configuration table."
+        "A row in the BWM traffic contract configuration table.
+         Note:This mib is not supported for VX instance of virtualization."
     INDEX { bwmNewCfgContractIndx }
     ::= { bwmNewCfgContractTable 1 }
  
@@ -774,7 +839,11 @@ BwmContractNewCfgTableEntry ::= SEQUENCE {
     bwmNewCfgContractIpType      INTEGER,
     bwmNewCfgContractMonitorMode INTEGER,
     bwmNewCfgContractMaxSess     INTEGER,
-    bwmNewCfgContractGroup       Integer32
+    bwmNewCfgContractGroup       Integer32,
+    bwmNewCfgContractRowType     INTEGER,
+    bwmNewCfgContractOperMode    INTEGER,
+    bwmNewCfgContractAlarmsPerSec INTEGER,
+    bwmNewCfgContractPrefixLength INTEGER
     }
  
 bwmNewCfgContractIndx OBJECT-TYPE
@@ -796,7 +865,8 @@ bwmNewCfgContractName   OBJECT-TYPE
 bwmNewCfgContractState OBJECT-TYPE
     SYNTAX INTEGER {
         enabled(2),
-        disabled(3)
+        disabled(3),
+        unsupported(2147483647)
         }
     MAX-ACCESS read-create
     STATUS current
@@ -815,7 +885,8 @@ bwmNewCfgContractPolicy OBJECT-TYPE
 bwmNewCfgContractDelete OBJECT-TYPE
     SYNTAX INTEGER  {
         other(1),
-        delete(2)
+        delete(2),
+        unsupported(2147483647)
         }
     MAX-ACCESS read-create
     STATUS current
@@ -837,7 +908,8 @@ bwmNewCfgContractPrec OBJECT-TYPE
 bwmNewCfgContractUseTos OBJECT-TYPE
     SYNTAX INTEGER {
         enabled(2),
-        disabled(3)
+        disabled(3),
+        unsupported(2147483647)
         }
     MAX-ACCESS read-create
     STATUS current
@@ -849,7 +921,8 @@ bwmNewCfgContractUseTos OBJECT-TYPE
 bwmNewCfgContractHistory OBJECT-TYPE
     SYNTAX INTEGER {
         enabled(2),
-        disabled(3)
+        disabled(3),
+        unsupported(2147483647)
     }
     MAX-ACCESS read-create
     STATUS current
@@ -861,7 +934,8 @@ bwmNewCfgContractHistory OBJECT-TYPE
 bwmNewCfgContractShaping OBJECT-TYPE
     SYNTAX INTEGER {
         enabled(1),
-        disabled(2)
+        disabled(2),
+        unsupported(2147483647)
         }
     MAX-ACCESS read-create
     STATUS current
@@ -872,7 +946,8 @@ bwmNewCfgContractShaping OBJECT-TYPE
 bwmNewCfgContractResizeTcp OBJECT-TYPE
     SYNTAX INTEGER {
         enabled(2),
-        disabled(3)
+        disabled(3),
+        unsupported(2147483647)
         }
     MAX-ACCESS read-create
     STATUS current
@@ -884,7 +959,8 @@ bwmNewCfgContractResizeTcp OBJECT-TYPE
 bwmNewCfgContractIpLimit OBJECT-TYPE
     SYNTAX INTEGER {
         enabled(2),
-        disabled(3)
+        disabled(3),
+        unsupported(2147483647)
         }
     MAX-ACCESS read-create
     STATUS current
@@ -896,7 +972,8 @@ bwmNewCfgContractIpLimit OBJECT-TYPE
 bwmNewCfgContractIpType OBJECT-TYPE
     SYNTAX INTEGER {
 	sip(1),
-	dip(2)
+	dip(2),
+        unsupported(2147483647)
 	}
     MAX-ACCESS read-create
     STATUS current
@@ -908,7 +985,8 @@ bwmNewCfgContractIpType OBJECT-TYPE
 bwmNewCfgContractMonitorMode OBJECT-TYPE
     SYNTAX INTEGER {
         enabled(1),
-        disabled(2)
+        disabled(2),
+        unsupported(2147483647)
         }
     MAX-ACCESS read-create
     STATUS current
@@ -924,7 +1002,6 @@ bwmNewCfgContractGroup OBJECT-TYPE
         "The group number of the contract (zero if not part of a group)"
     ::= { bwmNewCfgContractTableEntry 14 }
 
-
 bwmNewCfgContractMaxSess OBJECT-TYPE
     SYNTAX INTEGER(0..65534)
     MAX-ACCESS read-create
@@ -932,7 +1009,92 @@ bwmNewCfgContractMaxSess OBJECT-TYPE
     DESCRIPTION
         "Maximum number of sessions per user or contract."
     ::= { bwmNewCfgContractTableEntry 16 }
+
+bwmNewCfgContractRowType OBJECT-TYPE
+    SYNTAX INTEGER {
+        regular(1),
+        reserved(2),
+        unsupported(2147483647)
+        }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The Row Type: Regular or Reserved"
+    ::= { bwmNewCfgContractTableEntry 17 }
+
+bwmNewCfgContractOperMode OBJECT-TYPE
+    SYNTAX INTEGER {
+        ratelimiting(1),
+        shaping(2),
+        monitor(3),
+        unsupported(2147483647)
+        }
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Operation mode of a contract."
+    ::= { bwmNewCfgContractTableEntry 18 }
  
+
+bwmNewCfgContractAlarmsPerSec OBJECT-TYPE
+    SYNTAX INTEGER (0..1000) 
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "The amount of Contract alarms can be send per second." 
+    ::= { bwmNewCfgContractTableEntry 19 }
+
+bwmNewCfgContractPrefixLength OBJECT-TYPE
+    SYNTAX INTEGER (0..127) 
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Prefix len to use 0 - use user limit !=0 use prefix." 
+    ::= { bwmNewCfgContractTableEntry 20 }
+
+
+
+bwmAvailableContractsTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF BwmAvailableContractsTableEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "The table of BWM traffic contracts that are available and 
+         can be added to BWM contract Group.
+         Note:This mib is not supported for VX instance of virtualization."
+    ::= { bwmContractConfig 4 }
+
+bwmAvailableContractsTableEntry OBJECT-TYPE
+    SYNTAX BwmAvailableContractsTableEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "A row in the BWM traffic contract configuration table.
+         Note:This mib is not supported for VX instance of virtualization."
+    INDEX { bwmContractIndx }
+    ::= { bwmAvailableContractsTable 1 }
+
+BwmAvailableContractsTableEntry ::= SEQUENCE {
+    bwmContractIndx        Integer32,
+    bwmContractName        DisplayString
+}
+
+bwmContractIndx OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The index of the row in the available BWM traffic contract table."
+    ::= { bwmAvailableContractsTableEntry 1 }
+
+bwmContractName   OBJECT-TYPE
+    SYNTAX DisplayString (SIZE(0..31))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The traffic contract name."
+    ::= { bwmAvailableContractsTableEntry 2 }
+
 -- BWM Contract Time Policy Config Table
  
 bwmContTimePolicyTableMaxEnt OBJECT-TYPE
@@ -940,7 +1102,8 @@ bwmContTimePolicyTableMaxEnt OBJECT-TYPE
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION
-        "The maximum number of rows in the BWM contract configuration table."
+        "The maximum number of rows in the BWM contract configuration table.
+         Note:This mib is not supported for VX instance of virtualization."
     ::= { bwmContTimePolicyConfig 1 }
  
 bwmCurCfgContTimePolicyTable OBJECT-TYPE
@@ -948,7 +1111,8 @@ bwmCurCfgContTimePolicyTable OBJECT-TYPE
     MAX-ACCESS not-accessible
     STATUS current
     DESCRIPTION
-        "The table of BWM traffic contract time policy configuration."
+        "The table of BWM traffic contract time policy configuration.
+         Note:This mib is not supported for VX instance of virtualization."
     ::= { bwmContTimePolicyConfig 2 }
  
 bwmCurCfgContTimePolicyTableEntry OBJECT-TYPE
@@ -997,7 +1161,8 @@ bwmCurCfgContTimePolicyDay OBJECT-TYPE
         saturday(7),
         weekday(8),
         weekend(9),
-        everyday(10)
+        everyday(10),
+        unsupported(2147483647)
         }
     MAX-ACCESS read-only
     STATUS current
@@ -1032,7 +1197,8 @@ bwmCurCfgContTimePolicyPol OBJECT-TYPE
 bwmCurCfgContTimePolicyState OBJECT-TYPE
     SYNTAX INTEGER {
         enabled(1),
-        disabled(2)
+        disabled(2),
+        unsupported(2147483647)
         }
     MAX-ACCESS read-only
     STATUS current
@@ -1045,7 +1211,8 @@ bwmNewCfgContTimePolicyTable OBJECT-TYPE
     MAX-ACCESS not-accessible
     STATUS current
     DESCRIPTION
-        "The table of BWM traffic contract time policy configuration."
+        "The table of BWM traffic contract time policy configuration.
+         Note:This mib is not supported for VX instance of virtualization."
     ::= { bwmContTimePolicyConfig 3 }
  
 bwmNewCfgContTimePolicyTableEntry OBJECT-TYPE
@@ -1053,7 +1220,8 @@ bwmNewCfgContTimePolicyTableEntry OBJECT-TYPE
     MAX-ACCESS not-accessible
     STATUS current
     DESCRIPTION
-        "A row in the BWM contract time policy configuration table."
+        "A row in the BWM contract time policy configuration table.
+         Note:This mib is not supported for VX instance of virtualization."
     INDEX   { bwmNewCfgContTimePolicyContIndx, bwmNewCfgContTimePolicyIndx }
     ::= { bwmNewCfgContTimePolicyTable 1 }
  
@@ -1095,7 +1263,8 @@ bwmNewCfgContTimePolicyDay OBJECT-TYPE
         saturday(7),
         weekday(8),
         weekend(9),
-        everyday(10)
+        everyday(10),
+        unsupported(2147483647)
         }
     MAX-ACCESS read-create
     STATUS current
@@ -1130,7 +1299,8 @@ bwmNewCfgContTimePolicyPol OBJECT-TYPE
 bwmNewCfgContTimePolicyState OBJECT-TYPE
     SYNTAX INTEGER {
         enabled(1),
-        disabled(2)
+        disabled(2),
+        unsupported(2147483647)
         }
     MAX-ACCESS read-create
     STATUS current
@@ -1141,7 +1311,8 @@ bwmNewCfgContTimePolicyState OBJECT-TYPE
 bwmNewCfgContTimePolicyDelete OBJECT-TYPE
     SYNTAX INTEGER  {
         other(1),
-        delete(2)
+        delete(2),
+        unsupported(2147483647)
         }
     MAX-ACCESS read-create
     STATUS current
@@ -1159,7 +1330,8 @@ bwmContractGroupTableMaxEnt OBJECT-TYPE
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION
-        "The maximum number of rows in BWM contract group configuration table."
+        "The maximum number of rows in BWM contract group configuration table.
+         Note:This mib is not supported for VX instance of virtualization."
     ::= { bwmContractGroupConfig 1 }
  
 bwmCurCfgContractGroupTable OBJECT-TYPE
@@ -1167,7 +1339,8 @@ bwmCurCfgContractGroupTable OBJECT-TYPE
     MAX-ACCESS not-accessible
     STATUS current
     DESCRIPTION
-        "The table of BWM traffic contract group configuration."
+        "The table of BWM traffic contract group configuration.
+         Note:This mib is not supported for VX instance of virtualization."
     ::= { bwmContractGroupConfig 2 }
  
 bwmCurCfgContractGroupTableEntry OBJECT-TYPE
@@ -1175,7 +1348,8 @@ bwmCurCfgContractGroupTableEntry OBJECT-TYPE
     MAX-ACCESS not-accessible
     STATUS current
     DESCRIPTION
-        "A row in the BWM contract group configuration table."
+        "A row in the BWM contract group configuration table.
+         Note:This mib is not supported for VX instance of virtualization."
     INDEX   { bwmCurCfgContractGroupIndx }
     ::= { bwmCurCfgContractGroupTable 1 }
  
@@ -1229,7 +1403,8 @@ bwmNewCfgContractGroupTable OBJECT-TYPE
     MAX-ACCESS not-accessible
     STATUS current
     DESCRIPTION
-        "The table of BWM traffic contract group configuration."
+        "The table of BWM traffic contract group configuration.
+         Note:This mib is not supported for VX instance of virtualization."
     ::= { bwmContractGroupConfig 3 }
  
 bwmNewCfgContractGroupTableEntry OBJECT-TYPE
@@ -1237,7 +1412,8 @@ bwmNewCfgContractGroupTableEntry OBJECT-TYPE
     MAX-ACCESS not-accessible
     STATUS current
     DESCRIPTION
-        "A row in the BWM contract group configuration table."
+        "A row in the BWM contract group configuration table.
+         Note:This mib is not supported for VX instance of virtualization."
     INDEX   { bwmNewCfgContractGroupIndx }
     ::= { bwmNewCfgContractGroupTable 1 }
  
@@ -1303,7 +1479,8 @@ bwmNewCfgContractGroupRemCont OBJECT-TYPE
 bwmNewCfgContractGroupDelete OBJECT-TYPE
     SYNTAX INTEGER  {
         other(1),
-        delete(2)
+        delete(2),
+        unsupported(2147483647)
         }
     MAX-ACCESS read-create
     STATUS current
@@ -1327,7 +1504,8 @@ bwmContractGroupTableMaxCont OBJECT-TYPE
     MAX-ACCESS read-only
     STATUS current
     DESCRIPTION
-        "The maximum number of contracts in any BWM contract group."
+        "The maximum number of contracts in any BWM contract group.
+         Note:This mib is not supported for VX instance of virtualization."
     ::= { bwmContractGroupConfig 4 }
 
 -- Statistics
@@ -1339,7 +1517,8 @@ bwmStatTcTable  OBJECT-TYPE
     MAX-ACCESS not-accessible
     STATUS current
     DESCRIPTION
-        "The table of Bandwidth Management Traffic Contract statistics." 
+        "The table of Bandwidth Management Traffic Contract statistics.
+         Note:This mib is not supported for VX instance of virtualization." 
     ::= { bwmStats 1 }
  
 bwmStatTcEntry OBJECT-TYPE
@@ -1347,7 +1526,8 @@ bwmStatTcEntry OBJECT-TYPE
     MAX-ACCESS not-accessible
     STATUS current
     DESCRIPTION
-        "A row in the BWM traffic contract table."
+        "A row in the BWM traffic contract table.
+         Note:This mib is not supported for VX instance of virtualization."
     INDEX { bwmStatTcContractIndex }
     ::= { bwmStatTcTable 1 }
 
@@ -1434,7 +1614,8 @@ bwmStatTcrTable  OBJECT-TYPE
     MAX-ACCESS not-accessible
     STATUS current
     DESCRIPTION
-        "The table of Bandwidth Management Traffic Contract Rate statistics."
+        "The table of Bandwidth Management Traffic Contract Rate statistics.
+         Note:This mib is not supported for VX instance of virtualization."
     ::= { bwmStats 2 }
  
 bwmStatTcrEntry OBJECT-TYPE
@@ -1442,7 +1623,8 @@ bwmStatTcrEntry OBJECT-TYPE
     MAX-ACCESS not-accessible
     STATUS current
     DESCRIPTION
-        "A row in the BWM traffic contract rate table."
+        "A row in the BWM traffic contract rate table.
+         Note:This mib is not supported for VX instance of virtualization."
     INDEX { bwmStatTcrContractIndex }
     ::= { bwmStatTcrTable 1 }
  
@@ -1528,7 +1710,8 @@ bwmStatPortTcTable  OBJECT-TYPE
     MAX-ACCESS not-accessible
     STATUS current
     DESCRIPTION
-        "The table of BWM Switch Port Traffic Contract statistics."
+        "The table of BWM Switch Port Traffic Contract statistics.
+         Note:This mib is not supported for VX instance of virtualization."
     ::= { bwmStats 3 }
  
 bwmStatPortTcEntry OBJECT-TYPE
@@ -1536,7 +1719,8 @@ bwmStatPortTcEntry OBJECT-TYPE
     MAX-ACCESS not-accessible
     STATUS current
     DESCRIPTION
-         "A row in the BWM SP traffic contract table."
+         "A row in the BWM SP traffic contract table.
+          Note:This mib is not supported for VX instance of virtualization."
     INDEX   { bwmStatPortTcPortIndex, bwmStatPortTcContractIndex }
     ::= { bwmStatPortTcTable 1 }
  
@@ -1623,7 +1807,8 @@ bwmStatPortTcrTable  OBJECT-TYPE
     STATUS current
     DESCRIPTION
         "The table of Bandwidth Management Switch Port Traffic Contract Rate 
-         statistics."
+         statistics.
+         Note:This mib is not supported for VX instance of virtualization."
     ::= { bwmStats 4 }
  
 bwmStatPortTcrEntry OBJECT-TYPE
@@ -1631,7 +1816,8 @@ bwmStatPortTcrEntry OBJECT-TYPE
     MAX-ACCESS not-accessible
     STATUS current
     DESCRIPTION
-        "A row in the BWM traffic contract rate table."
+        "A row in the BWM traffic contract rate table.
+         Note:This mib is not supported for VX instance of virtualization."
     INDEX { bwmStatPortTcrPortIndex, bwmStatPortTcrContractIndex }
     ::= { bwmStatPortTcrTable 1 }
  
@@ -1722,13 +1908,15 @@ bwmStatPortTcrTotalPackets OBJECT-TYPE
 bwmStatsClear OBJECT-TYPE
     SYNTAX INTEGER {
 	ok(1),
-	clear(2)
+	clear(2),
+        unsupported(2147483647)
 	}
     MAX-ACCESS read-write
     STATUS current
     DESCRIPTION
         "This is an action object to clear the BWM statistics. 
-         ok(1) is returned when read."
+         ok(1) is returned when read.
+         Note:This mib is not supported for VX instance of virtualization."
     ::= { bwmStats 5 }
 
 
@@ -1737,13 +1925,31 @@ bwmStatsClear OBJECT-TYPE
 bwmOperSendSMTP OBJECT-TYPE
     SYNTAX INTEGER {
 	other(1),
-	send(2)
+	send(2),
+        unsupported(2147483647)
 	}
     MAX-ACCESS read-write
     STATUS current
     DESCRIPTION
         "This is an action object to send BWM history to SMTP server. 
-         other(1) is returned when read."
+         other(1) is returned when read.
+         Note:This mib is not supported for VX instance of virtualization."
     ::= { bwmOpers 1 }
+
+bwmOperClearUsrEntry OBJECT-TYPE
+    SYNTAX  INTEGER {
+        ok(1),
+        clear(2),
+        unsupported(2147483647)
+        }
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "This is an action object to clear the BWM IP user entry table.
+         When we set this to a value of clear(2) will clear the user entry table.
+         ok(1) is returned when object is read.
+         Note:This mib is not supported for VX instance of virtualization."
+    ::= { bwmOpers 2 }
+
 
 END
