@@ -1458,7 +1458,7 @@ function list_oxidized(Illuminate\Http\Request $request)
                     'ip' => $device->ip,
                     'os' => $os_maps[$device->os] ?? $device->os,
                 ];
-                if(! $processed_devices->contains($device) {
+                if(! $processed_devices->contains($device)) {
                     $return[] = $output;
                 } 
             }
