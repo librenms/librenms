@@ -36,7 +36,7 @@ class StringHelperTest extends TestCase
      *
      * @return void
      */
-    public function testInferEncoding()
+    public function testInferEncoding(): void
     {
         $this->assertEquals(null, StringHelpers::inferEncoding(null));
         $this->assertEquals('', StringHelpers::inferEncoding(''));
@@ -50,13 +50,14 @@ class StringHelperTest extends TestCase
         $this->assertEquals('コンサート', StringHelpers::inferEncoding(base64_decode('g1KDk4NUgVuDZw==')));
     }
 
-    public function testIsStringable()
+    public function testIsStringable(): void
     {
         $this->assertTrue(StringHelpers::isStringable(null));
         $this->assertTrue(StringHelpers::isStringable(''));
         $this->assertTrue(StringHelpers::isStringable('string'));
         $this->assertTrue(StringHelpers::isStringable(-1));
         $this->assertTrue(StringHelpers::isStringable(1.0));
+        $this->assertTrue(StringHelpers::isStringable(false));
         $this->assertTrue(StringHelpers::isStringable(new SimpleTemplate('')));
 
         $this->assertFalse(StringHelpers::isStringable([]));

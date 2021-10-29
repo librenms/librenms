@@ -52,14 +52,25 @@ class SimpleTemplate
         $this->variables = $variables;
     }
 
-    public function setVariable(string $key, string $value): void
+    /**
+     * Add a variable to the set of possible substitutions
+     */
+    public function setVariable(string $key, string $value): SimpleTemplate
     {
         $this->variables[$key] = $value;
+
+        return $this;
     }
 
-    public function replaceWith(callable $callback): void
+    /**
+     * Instead of using the given variables to replace {{ var }}
+     * send the matched variable to this callback, which will return a string to replace it
+     */
+    public function replaceWith(callable $callback): SimpleTemplate
     {
         $this->callback = $callback;
+
+        return $this;
     }
 
     /**
@@ -85,5 +96,4 @@ class SimpleTemplate
             return $replacement;
         }, $this->template);
     }
-
 }

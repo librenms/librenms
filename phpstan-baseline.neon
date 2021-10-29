@@ -3821,21 +3821,6 @@ parameters:
 			path: LibreNMS/OS.php
 
 		-
-			message: "#^Method LibreNMS\\\\OS\\:\\:parseTemplate\\(\\) has no return typehint specified\\.$#"
-			count: 1
-			path: LibreNMS/OS.php
-
-		-
-			message: "#^Method LibreNMS\\\\OS\\:\\:parseTemplate\\(\\) has parameter \\$data with no typehint specified\\.$#"
-			count: 1
-			path: LibreNMS/OS.php
-
-		-
-			message: "#^Method LibreNMS\\\\OS\\:\\:parseTemplate\\(\\) has parameter \\$template with no typehint specified\\.$#"
-			count: 1
-			path: LibreNMS/OS.php
-
-		-
 			message: "#^Method LibreNMS\\\\OS\\:\\:persistGraphs\\(\\) has no return typehint specified\\.$#"
 			count: 1
 			path: LibreNMS/OS.php
@@ -4376,21 +4361,6 @@ parameters:
 			path: LibreNMS/OS/Shared/Cisco.php
 
 		-
-			message: "#^Method LibreNMS\\\\OS\\\\Shared\\\\Cisco\\:\\:parseTemplate\\(\\) has no return typehint specified\\.$#"
-			count: 1
-			path: LibreNMS/OS/Shared/Cisco.php
-
-		-
-			message: "#^Method LibreNMS\\\\OS\\\\Shared\\\\Cisco\\:\\:parseTemplate\\(\\) has parameter \\$data with no typehint specified\\.$#"
-			count: 1
-			path: LibreNMS/OS/Shared/Cisco.php
-
-		-
-			message: "#^Method LibreNMS\\\\OS\\\\Shared\\\\Cisco\\:\\:parseTemplate\\(\\) has parameter \\$template with no typehint specified\\.$#"
-			count: 1
-			path: LibreNMS/OS/Shared/Cisco.php
-
-		-
 			message: "#^Method LibreNMS\\\\OS\\\\Shared\\\\Cisco\\:\\:pollSlas\\(\\) has no return typehint specified\\.$#"
 			count: 1
 			path: LibreNMS/OS/Shared/Cisco.php
@@ -4531,21 +4501,6 @@ parameters:
 			path: LibreNMS/OS/Shared/Unix.php
 
 		-
-			message: "#^Method LibreNMS\\\\OS\\\\Shared\\\\Unix\\:\\:parseTemplate\\(\\) has no return typehint specified\\.$#"
-			count: 1
-			path: LibreNMS/OS/Shared/Unix.php
-
-		-
-			message: "#^Method LibreNMS\\\\OS\\\\Shared\\\\Unix\\:\\:parseTemplate\\(\\) has parameter \\$data with no typehint specified\\.$#"
-			count: 1
-			path: LibreNMS/OS/Shared/Unix.php
-
-		-
-			message: "#^Method LibreNMS\\\\OS\\\\Shared\\\\Unix\\:\\:parseTemplate\\(\\) has parameter \\$template with no typehint specified\\.$#"
-			count: 1
-			path: LibreNMS/OS/Shared/Unix.php
-
-		-
 			message: "#^Method LibreNMS\\\\OS\\\\Shared\\\\Unix\\:\\:translateSysObjectID\\(\\) has no return typehint specified\\.$#"
 			count: 1
 			path: LibreNMS/OS/Shared/Unix.php
@@ -4622,21 +4577,6 @@ parameters:
 
 		-
 			message: "#^Method LibreNMS\\\\OS\\\\Shared\\\\Zyxel\\:\\:parseRegex\\(\\) has parameter \\$subject with no typehint specified\\.$#"
-			count: 1
-			path: LibreNMS/OS/Shared/Zyxel.php
-
-		-
-			message: "#^Method LibreNMS\\\\OS\\\\Shared\\\\Zyxel\\:\\:parseTemplate\\(\\) has no return typehint specified\\.$#"
-			count: 1
-			path: LibreNMS/OS/Shared/Zyxel.php
-
-		-
-			message: "#^Method LibreNMS\\\\OS\\\\Shared\\\\Zyxel\\:\\:parseTemplate\\(\\) has parameter \\$data with no typehint specified\\.$#"
-			count: 1
-			path: LibreNMS/OS/Shared/Zyxel.php
-
-		-
-			message: "#^Method LibreNMS\\\\OS\\\\Shared\\\\Zyxel\\:\\:parseTemplate\\(\\) has parameter \\$template with no typehint specified\\.$#"
 			count: 1
 			path: LibreNMS/OS/Shared/Zyxel.php
 

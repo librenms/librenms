@@ -175,7 +175,7 @@ class YamlDiscovery
             foreach (explode('.', $index) as $pos => $subindex) {
                 $variables['subindex' . $pos] = $subindex;
             }
-            $value = SimpleTemplate::parse($value, $variables);
+            $value = SimpleTemplate::parse($def[$name] ?? '', $variables);
 
             // search discovery data for values
             $template = new SimpleTemplate($value);
