@@ -28,7 +28,7 @@ namespace LibreNMS\Tests;
 use App\Models\Device;
 use Illuminate\Support\Str;
 use LibreNMS\Config;
-use LibreNMS\Data\Source\SnmpQuery;
+use LibreNMS\Data\Source\NetSnmpQuery;
 use LibreNMS\Modules\Core;
 use LibreNMS\Tests\Mocks\SnmpQueryMock;
 use LibreNMS\Util\Debug;
@@ -68,7 +68,7 @@ class OSDiscoveryTest extends TestCase
     public function testOSDetection($os_name)
     {
         if (! getenv('SNMPSIM')) {
-            $this->app->bind(SnmpQuery::class, SnmpQueryMock::class);
+            $this->app->bind(NetSnmpQuery::class, SnmpQueryMock::class);
         }
 
         $glob = Config::get('install_dir') . "/tests/snmpsim/$os_name*.snmprec";
