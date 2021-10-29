@@ -44,7 +44,8 @@ class AlertTransportController extends Controller
                 return response()->json(['status' => 'ok']);
             }
         } catch (\Exception $e) {
-            $result = $e->getMessage();
+            \Log::error($e);
+            $result = basename($e->getFile(), '.php') . ':' . $e->getLine() . ' ' . $e->getMessage();
         }
 
         return response()->json([
