@@ -29,7 +29,7 @@
         <label for="level-{{ $id }}" class="control-label">@lang('Priority')</label>
         <select class="form-control" name="level" id="level-{{ $id }}">
             @foreach($priorities as $val => $name)
-                <option value="{{ $val }}" @if($level == $val) selected @endif>{{ $name }}</option>
+                <option value="{{ $val }}" @if($level ? $level == $val : $val == 7) selected @endif>{{ $name }}</option>
             @endforeach
         </select>
     </div>
