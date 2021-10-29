@@ -14,7 +14,6 @@ use App\Models\Widget;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use LibreNMS\Config;
-use Toastr;
 
 class OverviewController extends Controller
 {
@@ -66,11 +65,11 @@ class OverviewController extends Controller
 
             // specific dashboard was requested, but doesn't exist
             if (isset($dashboard) && ! empty($request->dashboard)) {
-                Toastr::error(
-                    "Dashboard <code>#$request->dashboard</code> does not exist! Loaded <code>
-                    " . htmlentities($dashboard->dashboard_name) . '</code> instead.',
-                    'Requested Dashboard Not Found!'
-                );
+                flash()
+                    ->using('template.librenms')
+                    ->title('Requested Dashboard Not Found!')
+                    ->addError("Dashboard <code>#$request->dashboard</code> does not exist! Loaded <code>
+                    " . htmlentities($dashboard->dashboard_name) . '</code> instead.');
             }
         }
 

@@ -241,7 +241,6 @@ return [
         'Validator' => Illuminate\Support\Facades\Validator::class,
         'View' => Illuminate\Support\Facades\View::class,
         'Debugbar' => Barryvdh\Debugbar\Facade::class,
-        'Toastr' => Kamaln7\Toastr\Facades\Toastr::class,
 
         // LibreNMS
         'Permissions' => \App\Facades\Permissions::class,
