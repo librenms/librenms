@@ -1444,7 +1444,7 @@ function list_oxidized(Illuminate\Http\Request $request)
 
     if (! empty($device_groups)) {
         $os_maps = [];
-        for (Config::get('oxidized.maps.os.os', []) as $os) {
+        foreach (Config::get('oxidized.maps.os.os', []) as $os) {
             $os_maps[$os["match"]] = $os_maps[$os["value"]];
         }
         $processed_devices = [];
