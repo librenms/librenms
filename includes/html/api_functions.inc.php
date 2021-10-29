@@ -16,6 +16,7 @@ use App\Models\Availability;
 use App\Models\Device;
 use App\Models\DeviceGroup;
 use App\Models\DeviceOutage;
+use Illuminate\Support\Collection;
 use App\Models\OspfPort;
 use App\Models\Port;
 use App\Models\PortGroup;
@@ -1442,27 +1443,26 @@ function list_oxidized(Illuminate\Http\Request $request)
     $return = [];
     $device_groups = DeviceGroup::whereIn('name', Config::get('oxidized.only_device_groups', []))->get();
 
-    if (! empty($device_groups)) {
+    if ($device_groups->isNotEmpty()) {
         $os_maps = [];
-        for ($os as Config::get('oxidized.maps.os.os', [])) {
-            $os_maps[$os["match"]] = $os_maps[$os["value"]];
+        foreach (Config::get('oxidized.maps.os.os', []) as $os) {
+            $os_maps[$os["match"]] = $os["value"];
         }
-        $processed_devices = [];
+        $processed_devices = new Collection;
         foreach ($device_groups as $dev_grp) {
-            foreach ($dev_grp->devices as $device) {
-                $processed_devices[] = $device->hostname;
+            foreach ($dev_grp->devices as $device) { 
                 $output = [
                     'group' => $dev_grp->name,
                     'hostname' => $device->hostname,
                     'ip' => $device->ip,
                     'os' => $os_maps[$device->os] ?? $device->os,
                 ];
-                if(! in_array($device->hostname, $processed_devices)) {
+                if(! $processed_devices->contains($device)) {
                     $return[] = $output;
-                } 
+                }
+                $processed_devices->push($device);
             }
         }
-
         return response()->json($return, 200, [], JSON_PRETTY_PRINT);
     }
 
