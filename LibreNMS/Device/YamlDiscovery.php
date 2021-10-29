@@ -25,6 +25,7 @@
 
 namespace LibreNMS\Device;
 
+use App\View\SimpleTemplate;
 use Cache;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
@@ -166,35 +167,29 @@ class YamlDiscovery
         $value = static::getValueFromData($name, $index, $def, $pre_cache);
 
         if (is_null($value)) {
-            // built in replacements
-            $search = [
-                '{{ $index }}',
-                '{{ $count }}',
+            // basic replacements
+            $variables = [
+                'index' => $index,
+                'count' => $count,
             ];
-            $replace = [
-                $index,
-                $count,
-            ];
-
-            // prepare the $subindexX match variable replacement
             foreach (explode('.', $index) as $pos => $subindex) {
-                $search[] = '{{ $subindex' . $pos . ' }}';
-                $replace[] = $subindex;
+                $variables['subindex' . $pos] = $subindex;
             }
-
-            $value = str_replace($search, $replace, $def[$name] ?? '');
+            $value = SimpleTemplate::parse($value, $variables);
 
             // search discovery data for values
-            $value = preg_replace_callback('/{{ \$?([a-zA-Z0-9\-.:]+) }}/', function ($matches) use ($index, $def, $pre_cache) {
-                $replace = static::getValueFromData($matches[1], $index, $def, $pre_cache, null);
+            $template = new SimpleTemplate($value);
+            $template->replaceWith(function ($matches) use ($index, $def, $pre_cache) {
+                $replace = static::getValueFromData($matches[1], $index, $def, $pre_cache);
                 if (is_null($replace)) {
-                    d_echo('Warning: No variable available to replace ' . $matches[1] . ".\n");
+                    \Log::warning('YamlDiscovery: No variable available to replace ' . $matches[1]);
 
                     return ''; // remove the unavailable variable
                 }
 
                 return $replace;
-            }, $value);
+            });
+            $value = (string) $template;
         }
 
         return $value;

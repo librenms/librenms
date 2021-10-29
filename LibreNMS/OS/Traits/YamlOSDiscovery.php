@@ -27,6 +27,7 @@ namespace LibreNMS\OS\Traits;
 
 use App\Models\Device;
 use App\Models\Location;
+use App\View\SimpleTemplate;
 use Illuminate\Support\Arr;
 use LibreNMS\Util\StringHelpers;
 use Log;
@@ -75,7 +76,7 @@ trait YamlOSDiscovery
                 }
 
                 $device->$field = isset($os_yaml["{$field}_template"])
-                    ? $this->parseTemplate($os_yaml["{$field}_template"], $data)
+                    ? SimpleTemplate::parse($os_yaml["{$field}_template"], $data)
                     : $value;
             }
         }
@@ -129,13 +130,6 @@ trait YamlOSDiscovery
                 }
             }
         }
-    }
-
-    private function parseTemplate($template, $data)
-    {
-        return trim(preg_replace_callback('/{{ ([^ ]+) }}/', function ($matches) use ($data) {
-            return $data[$matches[1]] ?? '';
-        }, $template));
     }
 
     private function translateSysObjectID($mib, $regex)

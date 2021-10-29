@@ -25,6 +25,7 @@
 
 namespace LibreNMS\Tests\Unit\Util;
 
+use App\View\SimpleTemplate;
 use LibreNMS\Tests\TestCase;
 use LibreNMS\Util\StringHelpers;
 
@@ -47,5 +48,18 @@ class StringHelperTest extends TestCase
 
         config(['app.charset' => 'Shift_JIS']);
         $this->assertEquals('コンサート', StringHelpers::inferEncoding(base64_decode('g1KDk4NUgVuDZw==')));
+    }
+
+    public function testIsStringable()
+    {
+        $this->assertTrue(StringHelpers::isStringable(null));
+        $this->assertTrue(StringHelpers::isStringable(''));
+        $this->assertTrue(StringHelpers::isStringable('string'));
+        $this->assertTrue(StringHelpers::isStringable(-1));
+        $this->assertTrue(StringHelpers::isStringable(1.0));
+        $this->assertTrue(StringHelpers::isStringable(new SimpleTemplate('')));
+
+        $this->assertFalse(StringHelpers::isStringable([]));
+        $this->assertFalse(StringHelpers::isStringable((object) []));
     }
 }

@@ -25,6 +25,8 @@
 
 namespace LibreNMS\Util;
 
+use Stringable;
+
 class StringHelpers
 {
     /**
@@ -145,5 +147,16 @@ class StringHelpers
         }, $class);
 
         return $namespace . $class;
+    }
+
+    /**
+     * Check if variable can be cast to a string
+     *
+     * @param  mixed  $var
+     * @return bool
+     */
+    public static function isStringable($var): bool
+    {
+        return $var === null || is_scalar($var) || $var instanceof Stringable;
     }
 }
