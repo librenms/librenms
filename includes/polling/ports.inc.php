@@ -296,7 +296,11 @@ if ($device['os'] === 'f5' && (version_compare($device['version'], '11.2.0', '>=
         // If the device doesn't have ifXentry data, fetch ifEntry instead.
         if ((! isset($hc_test[0]['ifHCInOctets']) && ! is_numeric($hc_test[0]['ifHCInOctets'])) ||
             ((! isset($hc_test[0]['ifHighSpeed']) && ! is_numeric($hc_test[0]['ifHighSpeed'])))) {
-            $port_stats = snmpwalk_cache_oid($device, 'ifEntry', $port_stats, 'IF-MIB', null, '-OQUst');
+            $ifEntrySnmpFlags = ['-OQUst'];
+            if ($device['os'] == 'bintec-beip-plus') {
+                $ifEntrySnmpFlags = ['-OQUs', '-Cc'];
+            }
+            $port_stats = snmpwalk_cache_oid($device, 'ifEntry', $port_stats, 'IF-MIB', null, $ifEntrySnmpFlags);
         } else {
             // For devices with ifXentry data, only specific ifEntry keys are fetched to reduce SNMP load
             foreach ($ifmib_oids as $oid) {
@@ -309,7 +313,11 @@ if ($device['os'] === 'f5' && (version_compare($device['version'], '11.2.0', '>=
             if (Config::get('enable_ports_poe') || Config::get('enable_ports_etherlike')) {
                 $port_stats = snmpwalk_cache_oid($device, 'dot3StatsIndex', $port_stats, 'EtherLike-MIB');
             }
-            $port_stats = snmpwalk_cache_oid($device, 'dot3StatsDuplexStatus', $port_stats, 'EtherLike-MIB');
+            $dot3StatsDuplexStatusSnmpFlags = null;
+            if ($device['os'] == 'bintec-beip-plus') {
+                $dot3StatsDuplexStatusSnmpFlags = '-Cc';
+            }
+            $port_stats = snmpwalk_cache_oid($device, 'dot3StatsDuplexStatus', $port_stats, 'EtherLike-MIB', null, $dot3StatsDuplexStatusSnmpFlags);
             $port_stats = snmpwalk_cache_oid($device, 'dot1qPvid', $port_stats, 'Q-BRIDGE-MIB');
         }
     }
