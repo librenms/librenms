@@ -25,7 +25,6 @@
 
 namespace LibreNMS\Tests\Unit\Util;
 
-use App\View\SimpleTemplate;
 use LibreNMS\Tests\TestCase;
 use LibreNMS\Util\StringHelpers;
 
@@ -58,9 +57,20 @@ class StringHelperTest extends TestCase
         $this->assertTrue(StringHelpers::isStringable(-1));
         $this->assertTrue(StringHelpers::isStringable(1.0));
         $this->assertTrue(StringHelpers::isStringable(false));
-        $this->assertTrue(StringHelpers::isStringable(new SimpleTemplate('')));
 
         $this->assertFalse(StringHelpers::isStringable([]));
         $this->assertFalse(StringHelpers::isStringable((object) []));
+
+        $stringable = new class {
+            public function __toString()
+            {
+                return '';
+            }
+        };
+        $this->assertTrue(StringHelpers::isStringable($stringable));
+
+        $nonstringable = new class {
+        };
+        $this->assertFalse(StringHelpers::isStringable($nonstringable));
     }
 }
