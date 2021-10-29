@@ -1451,7 +1451,7 @@ function list_oxidized(Illuminate\Http\Request $request)
         $processed_devices = new Collection;
         foreach ($device_groups as $dev_grp) {
             foreach ($dev_grp->devices as $device) {
-                $processed_devices->push($device)
+                $processed_devices->push($device);
                 $output = [
                     'group' => $dev_grp->name,
                     'hostname' => $device->hostname,
