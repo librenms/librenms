@@ -13,9 +13,9 @@ if ($request->has('oauthtransport')) {
         if (class_exists($class)) {
             $transport = app($class);
             if ($transport->handleOauth($request)) {
-                Toastr::success("$transport_name added successfully.");
+                flash()->addSuccess("$transport_name added successfully.");
             } else {
-                Toastr::error("$transport_name was not added. Check the log for details.");
+                flash()->addError("$transport_name was not added. Check the log for details.");
             }
         }
     }
