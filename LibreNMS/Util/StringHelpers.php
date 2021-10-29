@@ -25,8 +25,6 @@
 
 namespace LibreNMS\Util;
 
-use Stringable;
-
 class StringHelpers
 {
     /**
@@ -157,6 +155,6 @@ class StringHelpers
      */
     public static function isStringable($var): bool
     {
-        return $var === null || is_scalar($var) || $var instanceof Stringable;
+        return $var === null || is_scalar($var) || (is_object($var) && method_exists($var, '__toString'));
     }
 }
