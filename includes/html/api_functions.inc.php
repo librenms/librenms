@@ -1464,7 +1464,7 @@ function list_oxidized(Illuminate\Http\Request $request)
             }
         }
 
-        return response()->json($os, 200, [], JSON_PRETTY_PRINT);
+        return response()->json($os_maps, 200, [], JSON_PRETTY_PRINT);
     }
 
     $devices = Device::query()
