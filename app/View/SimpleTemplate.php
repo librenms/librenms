@@ -45,11 +45,25 @@ class SimpleTemplate
      * @var callable
      */
     private $callback;
+    /**
+     * @var bool
+     */
+    private $keepEmpty = false;
 
     public function __construct(string $template, array $variables = [])
     {
         $this->template = $template;
         $this->variables = $variables;
+    }
+
+    /**
+     * By default, unmatched templates will be removed from the output, set this to keep them
+     */
+    public function keepEmptyTemplates(): SimpleTemplate
+    {
+        $this->keepEmpty = true;
+
+        return $this;
     }
 
     /**
@@ -88,7 +102,7 @@ class SimpleTemplate
     public function __toString()
     {
         return preg_replace_callback($this->regex, $this->callback ?? function ($matches) {
-            $replacement = $this->variables[$matches[1]] ?? $matches[0];
+            $replacement = $this->variables[$matches[1]] ?? ($this->keepEmpty ? $matches[0] : '');
             if (! StringHelpers::isStringable($replacement)) {
                 return '';
             }
