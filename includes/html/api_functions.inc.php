@@ -1442,7 +1442,7 @@ function list_oxidized(Illuminate\Http\Request $request)
     $return = [];
     $device_groups = DeviceGroup::whereIn('name', Config::get('oxidized.only_device_groups', []))->get();
 
-    if (! empty($device_groups)) {
+    if ($device_groups->isNotEmpty()) {
         $os_maps = [];
         foreach (Config::get('oxidized.maps.os.os', []) as $os) {
             $os_maps[$os["match"]] = $os_maps[$os["value"]];
