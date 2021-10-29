@@ -1,0 +1,22 @@
+-- This file is corresponding to Release 10.2.3.100 from 2018/07/18 00:00:00
+
+
+---------------------------------------------------------------------------
+-- (C)opyright 2004-2014 bintec elmeg GmbH
+-- $RCSfile: mib-standards,v $
+-- $Revision: 1.19 $
+-- $Date: 2017-03-10 16:15:21 $
+---------------------------------------------------------------------------
+
+-- INFO for importing MIB files into SNMP manager
+-- 
+-- if MIBcompiler dont like multiple modules or redefinitions of standard MIBs
+-- listed in this file, remove everything with except of last BINTEC-MIB:
+--   keep only lines from:
+--     from : BINTEC-MIB DEFINITIONS ::= BEGIN
+--     to   : END
+
+RFC1158-MIB DEFINITIONS ::= BEGIN
+    DisplayString ::=
+	OCTET STRING (SIZE(0..255))
+END

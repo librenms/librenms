@@ -36,7 +36,7 @@ modules:
                 -
                     oid: inpTable
                     value: inpValue
-                    num_oid: '.1.3.6.1.4.1.21796.4.1.1.1.2.{{ $index }}'
+                    num_oid: '.1.3.6.1.4.1.21796.3.3.1.1.2.{{ $index }}'
                     descr: inpName
                     index: 'inpValue.{{ $index }}'
                     state_name: inpValue
@@ -46,7 +46,7 @@ modules:
                 -
                     oid: inpTable
                     value: inpAlarmState
-                    num_oid: '.1.3.6.1.4.1.21796.4.1.1.1.4.{{ $index }}'
+                    num_oid: '.1.3.6.1.4.1.21796.3.3.1.1.5.{{ $index }}'
                     descr: 'alarm : {{ $inpName }}'
                     index: 'inpAlarmState.{{ $index }}'
                     state_name: inpAlarmState
@@ -56,7 +56,7 @@ modules:
                 -
                     oid: sensTable
                     value: sensState
-                    num_oid: '.1.3.6.1.4.1.21796.4.1.3.1.3.{{ $index }}'
+                    num_oid: '.1.3.6.1.4.1.21796.3.3.3.1.4.{{ $index }}'
                     descr: sensName
                     index: 'sensState.{{ $index }}'
                     state_name: sensName
@@ -65,5 +65,3 @@ modules:
                         - { descr: normal, graph: 0, value: 1, generic: 0 }
                         - { descr: alarmstate, graph: 0, value: 2, generic: 2 }
                         - { descr: alarm, graph: 0, value: 3, generic: 2 }
-
-

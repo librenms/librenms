@@ -40,6 +40,11 @@ if (isset($vars['min_severity'])) {
     $where .= get_sql_filter_min_severity($vars['min_severity'], 'R');
 }
 
+if (is_numeric($vars['device_group'])) {
+    $where .= ' AND D.device_id IN (SELECT `device_id` FROM `device_group_device` WHERE `device_group_id` = ?)';
+    $param[] = $vars['device_group'];
+}
+
 if (! Auth::user()->hasGlobalRead()) {
     $device_ids = Permissions::devicesForUser()->toArray() ?: [0];
     $where .= ' AND `E`.`device_id` IN ' . dbGenPlaceholders(count($device_ids));
@@ -85,7 +90,7 @@ foreach (dbFetchRows($sql, $param) as $alertlog) {
     logfile($alertlog['rule_id']);
     $log = dbFetchCell('SELECT details FROM alert_log WHERE rule_id = ? AND device_id = ? AND `state` = 1 ORDER BY id DESC LIMIT 1', [$alertlog['rule_id'], $alertlog['device_id']]);
     $alert_log_id = dbFetchCell('SELECT id FROM alert_log WHERE rule_id = ? AND device_id = ? ORDER BY id DESC LIMIT 1', [$alertlog['rule_id'], $alertlog['device_id']]);
-    $fault_detail = alert_details($log);
+    [$fault_detail, $max_row_length] = alert_details($log);
 
     if (empty($fault_detail)) {
         $fault_detail = 'Rule created, no faults found';

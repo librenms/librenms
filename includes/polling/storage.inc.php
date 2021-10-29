@@ -37,7 +37,7 @@ foreach (dbFetchRows('SELECT * FROM storage WHERE device_id = ?', [$device['devi
     data_update($device, 'storage', $tags, $fields);
 
     // NOTE: casting to string for mysqli bug (fixed by mysqlnd)
-    $update = dbUpdate(['storage_used' => (string) $storage['used'], 'storage_free' => (string) $storage['free'], 'storage_size' => (string) $storage['size'], 'storage_units' => $storage['units'], 'storage_perc' => $percent], 'storage', '`storage_id` = ?', [$storage['storage_id']]);
+    $update = dbUpdate(['storage_used' => (string) $storage['used'], 'storage_free' => (string) $storage['free'], 'storage_size' => (string) $storage['size'], 'storage_units' => (int) $storage['units'], 'storage_perc' => (int) $percent], 'storage', '`storage_id` = ?', [$storage['storage_id']]);
 
     echo "\n";
 }//end foreach

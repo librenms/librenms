@@ -37,10 +37,13 @@ use App\Models\User;
 use App\Models\UserPref;
 use App\Models\Vminfo;
 use App\Models\WirelessSensor;
+use App\Plugins\Hooks\MenuEntryHook;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\View\View;
 use LibreNMS\Config;
+use LibreNMS\Plugins;
 use LibreNMS\Util\ObjectCache;
+use PluginManager;
 
 class MenuComposer
 {
@@ -249,6 +252,14 @@ class MenuComposer
 
         // Search bar
         $vars['typeahead_limit'] = Config::get('webui.global_search_result_limit');
+
+        // Plugins
+        $vars['has_v1_plugins'] = Plugins::count() != 0;
+        $vars['v1_plugin_menu'] = Plugins::call('menu');
+        $vars['has_v2_plugins'] = PluginManager::hasHooks(MenuEntryHook::class);
+        $vars['menu_hooks'] = PluginManager::call(MenuEntryHook::class);
+
+        $vars['browser_push'] = $user->hasBrowserPushTransport();
 
         $view->with($vars);
     }

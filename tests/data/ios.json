@@ -13235,7 +13235,7 @@
                 {
                     "sysName": "<private>",
                     "sysObjectID": ".1.3.6.1.4.1.9.1.359",
-                    "sysDescr": "Cisco Internetwork Operating System Software\nIOS (tm) C2950 Software (C2950-I6K2L2Q4-M), Version 12.1(22)EA14, RELEASE SOFTWARE (fc1)\r\nTechnical Support: http://www.cisco.com/techsupport\r\nCopyright (c) 1986-2010 by cisco Systems, Inc.\r\nCompiled Tue 26-O",
+                    "sysDescr": "Cisco Internetwork Operating System Software \r\nIOS (tm) C2950 Software (C2950-I6K2L2Q4-M), Version 12.1(22)EA14, RELEASE SOFTWARE (fc1)\r\nTechnical Support: http://www.cisco.com/techsupport\r\nCopyright (c) 1986-2010 by cisco Systems, Inc.\r\nCompiled Tue 26-O",
                     "sysContact": "<private>",
                     "version": "12.1(22)EA14",
                     "hardware": "catalyst2950t24",

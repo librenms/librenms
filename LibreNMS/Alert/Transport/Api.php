@@ -25,9 +25,12 @@
 namespace LibreNMS\Alert\Transport;
 
 use LibreNMS\Alert\Transport;
+use LibreNMS\Util\Proxy;
 
 class Api extends Transport
 {
+    protected $name = 'API';
+
     public function deliverAlert($obj, $opts)
     {
         $url = $this->config['api-url'];
@@ -70,7 +73,7 @@ class Api extends Transport
         }
 
         $client = new \GuzzleHttp\Client();
-        $request_opts['proxy'] = get_guzzle_proxy();
+        $request_opts['proxy'] = Proxy::forGuzzle();
         if (isset($auth) && ! empty($auth[0])) {
             $request_opts['auth'] = $auth;
         }
@@ -85,8 +88,8 @@ class Api extends Transport
             $request_opts['body'] = $body;
             $res = $client->request('PUT', $host, $request_opts);
         } else { //Method POST
-            $request_opts['form_params'] = $query;
-            foreach ($query as $metric => $value) { // replace all variables defined in Options and found in Body for their values
+            $request_opts['query'] = $query;
+            foreach ($obj as $metric => $value) {
                 $body = str_replace('{{ $' . $metric . ' }}', $value, $body);
             }
             $request_opts['body'] = $body;
@@ -144,7 +147,7 @@ class Api extends Transport
                 [
                     'title' => 'body',
                     'name' => 'api-body',
-                    'descr' => 'Enter the body (only used by PUT method, discarded otherwise)',
+                    'descr' => 'Enter the body (only used by PUT/POST method, discarded GET)',
                     'type' => 'textarea',
                 ],
                 [

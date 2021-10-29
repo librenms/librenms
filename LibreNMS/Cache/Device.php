@@ -46,7 +46,7 @@ class Device
      *
      * @param  int  $device_id
      */
-    public function setPrimary(int $device_id)
+    public function setPrimary(int $device_id): void
     {
         $this->primary = $device_id;
     }
@@ -99,12 +99,20 @@ class Device
     /**
      * Flush the cache
      */
-    public function flush()
+    public function flush(): void
     {
         $this->devices = [];
     }
 
-    private function load($value, $field = 'device_id')
+    /**
+     * Check if the device id is currently loaded into cache
+     */
+    public function has(int $device_id): bool
+    {
+        return isset($this->devices[$device_id]);
+    }
+
+    private function load($value, $field = 'device_id'): \App\Models\Device
     {
         $device = \App\Models\Device::query()->where($field, $value)->first();
 

@@ -25,41 +25,6 @@ use LibreNMS\Util\IP;
 use LibreNMS\Util\Laravel;
 use Symfony\Component\Process\Process;
 
-function generate_priority_status($priority)
-{
-    $map = [
-        'emerg'     => 2,
-        'alert'     => 2,
-        'crit'      => 2,
-        'err'       => 2,
-        'warning'   => 1,
-        'notice'    => 0,
-        'info'      => 0,
-        'debug'     => 3,
-        ''          => 0,
-    ];
-
-    return isset($map[$priority]) ? $map[$priority] : 0;
-}
-
-function graylog_severity_label($severity)
-{
-    $map = [
-        '0' => 'label-danger',
-        '1' => 'label-danger',
-        '2' => 'label-danger',
-        '3' => 'label-danger',
-        '4' => 'label-warning',
-        '5' => 'label-info',
-        '6' => 'label-info',
-        '7' => 'label-default',
-        ''  => 'label-info',
-    ];
-    $barColor = isset($map[$severity]) ? $map[$severity] : 'label-info';
-
-    return '<span class="alert-status ' . $barColor . '" style="margin-right:8px;float:left;"></span>';
-}
-
 /**
  * Execute and snmp command, filter debug output unless -v is specified
  *
@@ -671,23 +636,6 @@ function version_info($remote = false)
 }//end version_info()
 
 /**
- * Checks SNMPv3 capabilities
- *
- * SHA2 for Auth Algorithms (SHA-224,SHA-256,SHA-384,SHA-512)
- * AES-192, AES-256 for Privacy Algorithms
- */
-function snmpv3_capabilities(): array
-{
-    $process = new Process([Config::get('snmpget', 'snmpget'), '--help']);
-    $process->run();
-
-    $ret['sha2'] = Str::contains($process->getErrorOutput(), 'SHA-512');
-    $ret['aes256'] = Str::contains($process->getErrorOutput(), 'AES-256');
-
-    return $ret;
-}
-
-/**
  * Convert a MySQL binary v4 (4-byte) or v6 (16-byte) IP address to a printable string.
  *
  * @param  string  $ip  A binary string containing an IP address, as returned from MySQL's INET6_ATON function
@@ -977,38 +925,6 @@ function get_sql_filter_min_severity($min_severity, $alert_rules_name)
 }
 
 /**
- * Load the os definition for the device and set type and os_group
- * $device['os'] must be set
- *
- * @param  array  $device
- */
-function load_os(&$device)
-{
-    if (! isset($device['os'])) {
-        d_echo("No OS to load\n");
-
-        return;
-    }
-
-    \LibreNMS\Util\OS::loadDefinition($device['os']);
-
-    // Set type to a predefined type for the OS if it's not already set
-    $loaded_os_type = Config::get("os.{$device['os']}.type");
-    if ((! isset($device['attribs']['override_device_type']) && $device['attribs']['override_device_type'] != 1) && array_key_exists('type', $device) && $loaded_os_type != $device['type']) {
-        log_event('Device type changed ' . $device['type'] . ' => ' . $loaded_os_type, $device, 'system', 3);
-        $device['type'] = $loaded_os_type;
-        dbUpdate(['type' => $loaded_os_type], 'devices', 'device_id=?', [$device['device_id']]);
-        d_echo("Device type changed to $loaded_os_type!\n");
-    }
-
-    if ($os_group = Config::get("os.{$device['os']}.group")) {
-        $device['os_group'] = $os_group;
-    } else {
-        unset($device['os_group']);
-    }
-}
-
-/**
  * Converts fahrenheit to celsius (with 2 decimal places)
  * if $scale is not fahrenheit, it assumes celsius and  returns the value
  *
@@ -1124,15 +1040,7 @@ function get_vm_parent_id($device)
  */
 function str_to_class($name, $namespace = null)
 {
-    $pre_format = str_replace(['-', '_'], ' ', $name);
-    $class = str_replace(' ', '', ucwords(strtolower($pre_format)));
-    $class = preg_replace_callback('/^(\d)(.)/', function ($matches) {
-        $numbers = ['Zero', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine'];
-
-        return $numbers[$matches[1]] . strtoupper($matches[2]);
-    }, $class);
-
-    return $namespace . $class;
+    return \LibreNMS\Util\StringHelpers::toClass($name, $namespace);
 }
 
 /**

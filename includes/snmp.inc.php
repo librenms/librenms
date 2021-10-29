@@ -16,6 +16,7 @@
  */
 
 use App\Models\Device;
+use App\Polling\Measure\Measurement;
 use Illuminate\Support\Str;
 use LibreNMS\Config;
 use LibreNMS\Util\Debug;
@@ -185,7 +186,7 @@ function gen_snmp_cmd($cmd, $device, $oids, $options = null, $mib = null, $mibdi
 
 function snmp_get_multi($device, $oids, $options = '-OQUs', $mib = null, $mibdir = null, $array = [])
 {
-    $time_start = microtime(true);
+    $measure = Measurement::start('snmpget');
 
     if (! is_array($oids)) {
         $oids = explode(' ', $oids);
@@ -212,14 +213,14 @@ function snmp_get_multi($device, $oids, $options = '-OQUs', $mib = null, $mibdir
         }
     }
 
-    recordSnmpStatistic('snmpget', $time_start);
+    $measure->manager()->recordSnmp($measure->end());
 
     return $array;
 }//end snmp_get_multi()
 
 function snmp_get_multi_oid($device, $oids, $options = '-OUQn', $mib = null, $mibdir = null)
 {
-    $time_start = microtime(true);
+    $measure = Measurement::start('snmpget');
     $oid_limit = get_device_oid_limit($device);
 
     if (! is_array($oids)) {
@@ -255,7 +256,7 @@ function snmp_get_multi_oid($device, $oids, $options = '-OUQn', $mib = null, $mi
         }
     }
 
-    recordSnmpStatistic('snmpget', $time_start);
+    $measure->manager()->recordSnmp($measure->end());
 
     return $array;
 }//end snmp_get_multi_oid()
@@ -272,7 +273,7 @@ function snmp_get_multi_oid($device, $oids, $options = '-OUQn', $mib = null, $mi
  */
 function snmp_get($device, $oid, $options = null, $mib = null, $mibdir = null)
 {
-    $time_start = microtime(true);
+    $measure = Measurement::start('snmpget');
 
     if (strstr($oid, ' ')) {
         throw new Exception("snmp_get called for multiple OIDs: $oid");
@@ -282,7 +283,7 @@ function snmp_get($device, $oid, $options = null, $mib = null, $mibdir = null)
     $output = str_replace('Wrong Type (should be OBJECT IDENTIFIER): ', '', $output);
     $data = trim($output, "\\\" \n\r");
 
-    recordSnmpStatistic('snmpget', $time_start);
+    $measure->manager()->recordSnmp($measure->end());
     if (preg_match('/(No Such Instance|No Such Object|No more variables left|Authentication failure)/i', $data)) {
         return false;
     } elseif ($data || $data === '0') {
@@ -305,13 +306,13 @@ function snmp_get($device, $oid, $options = null, $mib = null, $mibdir = null)
  */
 function snmp_getnext($device, $oid, $options = null, $mib = null, $mibdir = null)
 {
-    $time_start = microtime(true);
+    $measure = Measurement::start('snmpgetnext');
 
     $snmpcmd = [Config::get('snmpgetnext', 'snmpgetnext')];
     $cmd = gen_snmp_cmd($snmpcmd, $device, $oid, $options, $mib, $mibdir);
     $data = trim(external_exec($cmd), "\" \n\r");
 
-    recordSnmpStatistic('snmpgetnext', $time_start);
+    $measure->manager()->recordSnmp($measure->end());
     if (preg_match('/(No Such Instance|No Such Object|No more variables left|Authentication failure)/i', $data)) {
         return false;
     } elseif ($data || $data === '0') {
@@ -334,7 +335,7 @@ function snmp_getnext($device, $oid, $options = null, $mib = null, $mibdir = nul
  */
 function snmp_getnext_multi($device, $oids, $options = '-OQUs', $mib = null, $mibdir = null, $array = [])
 {
-    $time_start = microtime(true);
+    $measure = Measurement::start('snmpgetnext');
     if (! is_array($oids)) {
         $oids = explode(' ', $oids);
     }
@@ -355,7 +356,7 @@ function snmp_getnext_multi($device, $oids, $options = '-OQUs', $mib = null, $mi
             }
         }
     }
-    recordSnmpStatistic('snmpgetnext', $time_start);
+    $measure->manager()->recordSnmp($measure->end());
 
     return $array;
 }//end snmp_getnext_multi()
@@ -366,7 +367,7 @@ function snmp_getnext_multi($device, $oids, $options = '-OQUs', $mib = null, $mi
  */
 function snmp_check($device)
 {
-    $time_start = microtime(true);
+    $measure = Measurement::start('snmpget');
 
     try {
         $oid = '.1.3.6.1.2.1.1.2.0';
@@ -379,7 +380,7 @@ function snmp_check($device)
         Log::debug("Device didn't respond to snmpget before {$e->getExceededTimeout()}s timeout");
     }
 
-    recordSnmpStatistic('snmpget', $time_start);
+    $measure->manager()->recordSnmp($measure->end());
 
     if ($code === 0) {
         return true;
@@ -390,7 +391,7 @@ function snmp_check($device)
 
 function snmp_walk($device, $oid, $options = null, $mib = null, $mibdir = null)
 {
-    $time_start = microtime(true);
+    $measure = Measurement::start('snmpwalk');
 
     $cmd = gen_snmpwalk_cmd($device, $oid, $options, $mib, $mibdir);
     $data = trim(external_exec($cmd));
@@ -410,7 +411,7 @@ function snmp_walk($device, $oid, $options = null, $mib = null, $mibdir = null)
         }
     }
 
-    recordSnmpStatistic('snmpwalk', $time_start);
+    $measure->manager()->recordSnmp($measure->end());
 
     return $data;
 }//end snmp_walk()
@@ -649,12 +650,13 @@ function snmpwalk_cache_triple_oid($device, $oid, $array, $mib = null, $mibdir =
  * @param  int  $depth  how many indexes to group
  * @param  array  $array  optionally insert the entries into an existing array (helpful for grouping multiple walks)
  * @param  string  $mibdir  custom mib dir to search for mib
+ * @param  mixed  $snmpFlags  flags to use for the snmp command
  * @return array grouped array of data
  */
-function snmpwalk_group($device, $oid, $mib = '', $depth = 1, $array = [], $mibdir = null, $strIndexing = null)
+function snmpwalk_group($device, $oid, $mib = '', $depth = 1, $array = [], $mibdir = null, $strIndexing = null, $snmpFlags = '-OQUsetX')
 {
     d_echo("communityStringIndexing $strIndexing\n");
-    $cmd = gen_snmpwalk_cmd($device, $oid, '-OQUsetX', $mib, $mibdir, $strIndexing);
+    $cmd = gen_snmpwalk_cmd($device, $oid, $snmpFlags, $mib, $mibdir, $strIndexing);
     $data = rtrim(external_exec($cmd));
 
     $line = strtok($data, "\n");
@@ -786,6 +788,7 @@ function snmp_gen_auth(&$device, $cmd = [], $strIndexing = null)
  */
 function snmp_translate($oid, $mib = 'ALL', $mibdir = null, $options = null, $device = null)
 {
+    $measure = Measurement::start('snmptranslate');
     $cmd = [Config::get('snmptranslate', 'snmptranslate'), '-M', mibdir($mibdir, $device), '-m', $mib];
 
     if (oid_is_numeric($oid)) {
@@ -800,7 +803,11 @@ function snmp_translate($oid, $mib = 'ALL', $mibdir = null, $options = null, $de
     $cmd = array_merge($cmd, (array) $options);
     $cmd[] = $oid;
 
-    return trim(external_exec($cmd));
+    $result = trim(external_exec($cmd));
+
+    $measure->manager()->recordSnmp($measure->end());
+
+    return $result;
 }
 
 /**

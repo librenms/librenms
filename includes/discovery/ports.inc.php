@@ -5,12 +5,21 @@ use App\Models\PortGroup;
 use LibreNMS\Config;
 use LibreNMS\Util\StringHelpers;
 
+$descrSnmpFlags = '-OQUs';
+$typeSnmpFlags = '-OQUs';
+$operStatusSnmpFlags = '-OQUs';
+if ($device['os'] == 'bintec-beip-plus') {
+    $descrSnmpFlags = ['-OQUs', '-Cc'];
+    $typeSnmpFlags = ['-OQUs', '-Cc'];
+    $operStatusSnmpFlags = ['-OQUs', '-Cc'];
+}
+
 $port_stats = [];
-$port_stats = snmpwalk_cache_oid($device, 'ifDescr', $port_stats, 'IF-MIB');
+$port_stats = snmpwalk_cache_oid($device, 'ifDescr', $port_stats, 'IF-MIB', null, $descrSnmpFlags);
 $port_stats = snmpwalk_cache_oid($device, 'ifName', $port_stats, 'IF-MIB');
 $port_stats = snmpwalk_cache_oid($device, 'ifAlias', $port_stats, 'IF-MIB');
-$port_stats = snmpwalk_cache_oid($device, 'ifType', $port_stats, 'IF-MIB');
-$port_stats = snmpwalk_cache_oid($device, 'ifOperStatus', $port_stats, 'IF-MIB');
+$port_stats = snmpwalk_cache_oid($device, 'ifType', $port_stats, 'IF-MIB', null, $typeSnmpFlags);
+$port_stats = snmpwalk_cache_oid($device, 'ifOperStatus', $port_stats, 'IF-MIB', null, $operStatusSnmpFlags);
 
 // Get correct eth0 port status for AirFiber 5XHD devices
 if ($device['os'] == 'airos-af-ltu') {
@@ -48,12 +57,12 @@ foreach ($ports_mapped['maps']['ifIndex'] as $ifIndex => $port_id) {
 
 // Fill ifAlias for fibrechannel ports
 if ($device['os'] == 'fabos') {
-    require_once 'ports/brocade.inc.php';
+    require base_path('includes/discovery/ports/brocade.inc.php');
 }
 
 //Shorten Ekinops Interfaces
 if ($device['os'] == 'ekinops') {
-    require_once 'ports/ekinops.inc.php';
+    require base_path('includes/discovery/ports/ekinops.inc.php');
 }
 
 $default_port_group = Config::get('default_port_group');

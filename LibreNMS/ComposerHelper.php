@@ -28,6 +28,7 @@ namespace LibreNMS;
 use Composer\Script\Event;
 use LibreNMS\Exceptions\FileWriteFailedException;
 use LibreNMS\Util\EnvHelper;
+use Minishlink\WebPush\VAPID;
 
 class ComposerHelper
 {
@@ -94,6 +95,8 @@ class ComposerHelper
 
         try {
             EnvHelper::init();
+            $vapid = VAPID::createVapidKeys();
+
             EnvHelper::writeEnv([
                 'NODE_ID' => uniqid(),
                 'DB_HOST' => $config['db_host'],
@@ -105,6 +108,8 @@ class ComposerHelper
                 'APP_URL' => $config['base_url'],
                 'LIBRENMS_USER' => $config['user'],
                 'LIBRENMS_GROUP' => $config['group'],
+                'VAPID_PUBLIC_KEY' => $vapid['publicKey'],
+                'VAPID_PRIVATE_KEY' => $vapid['privateKey'],
             ]);
         } catch (FileWriteFailedException $exception) {
             echo $exception->getMessage() . PHP_EOL;

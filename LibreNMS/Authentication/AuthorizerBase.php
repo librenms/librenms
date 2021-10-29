@@ -39,12 +39,6 @@ abstract class AuthorizerBase implements Authorizer
         return static::$CAN_UPDATE_PASSWORDS;
     }
 
-    public function changePassword($username, $newpassword)
-    {
-        //not supported by default
-        return false;
-    }
-
     public function canManageUsers()
     {
         return static::$HAS_AUTH_USERMANAGEMENT;

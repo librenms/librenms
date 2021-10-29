@@ -25,6 +25,7 @@ Route::group(['prefix' => 'v0', 'namespace' => '\App\Api\Controllers'], function
         Route::get('devicegroups/{name}', 'LegacyApiController@get_devices_by_group')->name('get_devices_by_group');
         Route::get('devicegroups', 'LegacyApiController@get_device_groups')->name('get_device_groups');
         Route::get('port_groups', 'LegacyApiController@get_port_groups')->name('get_port_groups');
+        Route::get('port_groups/{name}', 'LegacyApiController@get_ports_by_group')->name('get_ports_by_group');
         Route::get('portgroups/multiport/bits/{id}', 'LegacyApiController@get_graph_by_portgroup')->name('get_graph_by_portgroup_multiport_bits');
         Route::get('portgroups/{group}', 'LegacyApiController@get_graph_by_portgroup')->name('get_graph_by_portgroup');
         Route::get('alerts/{id}', 'LegacyApiController@list_alerts')->name('get_alert');
@@ -63,6 +64,7 @@ Route::group(['prefix' => 'v0', 'namespace' => '\App\Api\Controllers'], function
             Route::post('{hostname}/components/{type}', 'LegacyApiController@add_components')->name('add_components');
             Route::put('{hostname}/components', 'LegacyApiController@edit_components')->name('edit_components');
             Route::delete('{hostname}/components/{component}', 'LegacyApiController@delete_components')->name('delete_components');
+            Route::post('{hostname}/maintenance', 'LegacyApiController@maintenance_device')->name('maintenance_device');
         });
 
         Route::post('bills', 'LegacyApiController@create_edit_bill')->name('create_bill');

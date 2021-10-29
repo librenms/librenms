@@ -18,6 +18,8 @@
 */
 
 use LibreNMS\Config;
+use LibreNMS\Enum\CheckStatus;
+use LibreNMS\Enum\SyslogSeverity;
 
 $filter_hostname = $vars['hostname'];
 $filter_range = $vars['range'];
@@ -67,6 +69,12 @@ $context = stream_context_create([
 ]);
 
 $messages = json_decode(file_get_contents($graylog_url, false, $context), true);
+$labels = [
+    CheckStatus::OK => 'label-info',
+    CheckStatus::UNKNOWN => 'label-default',
+    CheckStatus::WARNING => 'label-warning',
+    CheckStatus::ERROR => 'label-danger',
+];
 
 foreach ($messages['messages'] as $message) {
     if (Config::has('graylog.timezone')) {
@@ -81,8 +89,11 @@ foreach ($messages['messages'] as $message) {
         $displayTime = $message['message']['timestamp'];
     }
 
+    $color = $labels[SyslogSeverity::STATUS[$message['message']['level']] ?? CheckStatus::UNKNOWN];
+    $label = "<span class=\"alert-status $color\" style=\"margin-right:8px;float:left;\"></span>";
+
     $response[] = [
-        'timestamp' => graylog_severity_label($message['message']['level']) . $displayTime,
+        'timestamp' => $label . $displayTime,
         'source'    => '<a href="' . \LibreNMS\Util\Url::generate(['page' => 'device', 'device' => $message['message']['source']]) . '">' . $message['message']['source'] . '</a>',
         'message'    => $message['message']['message'],
         'facility'  => $message['message']['facility'],
