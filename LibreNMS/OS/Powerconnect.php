@@ -52,6 +52,7 @@ class Powerconnect extends OS implements ProcessorDiscovery, ProcessorPolling
         if (Str::startsWith($device['sysObjectID'], [
             '.1.3.6.1.4.1.674.10895.3020',
             '.1.3.6.1.4.1.674.10895.3021',
+            '.1.3.6.1.4.1.674.10895.3028',
             '.1.3.6.1.4.1.674.10895.3030',
             '.1.3.6.1.4.1.674.10895.3031',
         ])) {
