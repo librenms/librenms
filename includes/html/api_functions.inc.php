@@ -1446,7 +1446,6 @@ function list_oxidized(Illuminate\Http\Request $request)
     if ($device_groups->isNotEmpty()) {
         $os_maps = [];
         foreach (Config::get('oxidized.maps.os.os', []) as $os) {
-            $os = json_decode($os);
             $os_maps[$os["match"]] = $os_maps[$os["value"]];
         }
         $processed_devices = new Collection;
@@ -1465,7 +1464,7 @@ function list_oxidized(Illuminate\Http\Request $request)
             }
         }
 
-        return response()->json($return, 200, [], JSON_PRETTY_PRINT);
+        return response()->json($os, 200, [], JSON_PRETTY_PRINT);
     }
 
     $devices = Device::query()
