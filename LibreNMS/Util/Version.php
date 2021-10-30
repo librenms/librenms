@@ -25,6 +25,7 @@
 
 namespace LibreNMS\Util;
 
+use LibreNMS\Config;
 use LibreNMS\DB\Eloquent;
 use Symfony\Component\Process\Process;
 
@@ -108,15 +109,19 @@ class Version
 
     public function rrdtool(): string
     {
-        return str_replace('1.7.01.7.0', '1.7.0', implode(' ', array_slice(explode(' ', shell_exec(
-            \LibreNMS\Config::get('rrdtool', 'rrdtool') . ' --version |head -n1'
-        )), 1, 1)));
+        $process = new Process([Config::get('rrdtool', 'rrdtool'), '--version']);
+        $process->run();
+        preg_match('/^RRDtool ([\w.]+) /', $process->getOutput(), $matches);
+
+        return str_replace('1.7.01.7.0', '1.7.0', $matches[1] ?? '');
     }
 
     public function netSnmp(): string
     {
-        return str_replace('version: ', '', rtrim(shell_exec(
-            \LibreNMS\Config::get('snmpget', 'snmpget') . ' -V 2>&1'
-        )));
+        $process = new Process([Config::get('snmpget', 'snmpget'), '-V']);
+        $process->run();
+        preg_match('/[\w.]+$/', $process->getErrorOutput(), $matches);
+
+        return $matches[0] ?? '';
     }
 }

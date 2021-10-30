@@ -80,8 +80,6 @@ class ModuleTestHelper
      */
     public function __construct($modules, $os, $variant = '')
     {
-        global $influxdb;
-
         $this->modules = self::resolveModuleDependencies((array) $modules);
         $this->os = strtolower($os);
         $this->variant = strtolower($variant);
