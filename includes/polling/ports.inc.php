@@ -313,7 +313,7 @@ if ($device['os'] === 'f5' && (version_compare($device['version'], '11.2.0', '>=
             if (Config::get('enable_ports_poe') || Config::get('enable_ports_etherlike')) {
                 $port_stats = snmpwalk_cache_oid($device, 'dot3StatsIndex', $port_stats, 'EtherLike-MIB');
             }
-            $dot3StatsDuplexStatusSnmpFlags = null;
+            $dot3StatsDuplexStatusSnmpFlags = '-OQUs';
             if ($device['os'] == 'bintec-beip-plus') {
                 $dot3StatsDuplexStatusSnmpFlags = '-Cc';
             }
