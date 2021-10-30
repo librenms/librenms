@@ -93,19 +93,19 @@ class AlertUtil
         $uids = [];
         foreach ($results as $result) {
             $tmp = null;
-            if (is_numeric($result['bill_id'])) {
+            if (isset($result['bill_id']) && is_numeric($result['bill_id'])) {
                 $tmpa = dbFetchRows('SELECT user_id FROM bill_perms WHERE bill_id = ?', [$result['bill_id']]);
                 foreach ($tmpa as $tmp) {
                     $uids[$tmp['user_id']] = $tmp['user_id'];
                 }
             }
-            if (is_numeric($result['port_id'])) {
+            if (isset($result['port_id']) && is_numeric($result['port_id'])) {
                 $tmpa = dbFetchRows('SELECT user_id FROM ports_perms WHERE port_id = ?', [$result['port_id']]);
                 foreach ($tmpa as $tmp) {
                     $uids[$tmp['user_id']] = $tmp['user_id'];
                 }
             }
-            if (is_numeric($result['device_id'])) {
+            if (isset($result['device_id']) && is_numeric($result['device_id'])) {
                 if (Config::get('alert.syscontact') == true) {
                     if (dbFetchCell("SELECT attrib_value FROM devices_attribs WHERE attrib_type = 'override_sysContact_bool' AND device_id = ?", [$result['device_id']])) {
                         $tmpa = dbFetchCell("SELECT attrib_value FROM devices_attribs WHERE attrib_type = 'override_sysContact_string' AND device_id = ?", [$result['device_id']]);
