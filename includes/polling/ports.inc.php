@@ -298,7 +298,7 @@ if ($device['os'] === 'f5' && (version_compare($device['version'], '11.2.0', '>=
             ((! isset($hc_test[0]['ifHighSpeed']) && ! is_numeric($hc_test[0]['ifHighSpeed'])))) {
             $ifEntrySnmpFlags = ['-OQUst'];
             if ($device['os'] == 'bintec-beip-plus') {
-                $ifEntrySnmpFlags = ['-OQUs', '-Cc'];
+                $ifEntrySnmpFlags = ['-OQUst', '-Cc'];
             }
             $port_stats = snmpwalk_cache_oid($device, 'ifEntry', $port_stats, 'IF-MIB', null, $ifEntrySnmpFlags);
         } else {
