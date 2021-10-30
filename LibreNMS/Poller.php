@@ -34,7 +34,6 @@ use Carbon\Carbon;
 use DB;
 use Exception;
 use Illuminate\Database\Eloquent\Builder;
-use Illuminate\Log\LogManager;
 use Illuminate\Support\Str;
 use LibreNMS\Exceptions\PollerException;
 use LibreNMS\Modules\LegacyModule;
@@ -44,6 +43,7 @@ use LibreNMS\Util\Debug;
 use LibreNMS\Util\Dns;
 use LibreNMS\Util\Git;
 use LibreNMS\Util\StringHelpers;
+use Psr\Log\LoggerInterface;
 
 class Poller
 {
@@ -65,11 +65,11 @@ class Poller
      */
     private $os;
     /**
-     * @var \Illuminate\Log\LogManager
+     * @var LoggerInterface
      */
     private $logger;
 
-    public function __construct(string $device_spec, array $module_override, LogManager $logger)
+    public function __construct(string $device_spec, array $module_override, LoggerInterface $logger)
     {
         $this->device_spec = $device_spec;
         $this->module_override = $module_override;

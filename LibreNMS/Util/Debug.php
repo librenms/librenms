@@ -49,19 +49,11 @@ class Debug
         restore_error_handler(); // disable Laravel error handler
 
         if (self::$debug) {
-            ini_set('display_errors', '1');
-            ini_set('display_startup_errors', '1');
-            ini_set('log_errors', '0');
-            error_reporting(E_ALL & ~E_NOTICE);
-
+            self::enableErrorReporting();
             self::enableCliDebugOutput();
             self::enableQueryDebug();
         } else {
-            ini_set('display_errors', '0');
-            ini_set('display_startup_errors', '0');
-            ini_set('log_errors', '1');
-            error_reporting($silence ? 0 : E_ERROR);
-
+            self::disableErrorReporting($silence);
             self::disableCliDebugOutput($silence);
             self::disableQueryDebug();
         }
@@ -140,5 +132,28 @@ class Debug
             });
             $sql_debug_enabled = true;
         }
+    }
+
+    /**
+     * Disable error reporting, do not use with new code
+     */
+    public static function disableErrorReporting(bool $silence = false): void
+    {
+        ini_set('display_errors', '0');
+        ini_set('display_startup_errors', '0');
+        ini_set('log_errors', '1');
+        error_reporting($silence ? 0 : E_ERROR);
+    }
+
+
+    /**
+     * Enable error reporting. Please call after disabling for legacy code
+     */
+    public static function enableErrorReporting(): void
+    {
+        ini_set('display_errors', '1');
+        ini_set('display_startup_errors', '1');
+        ini_set('log_errors', '0');
+        error_reporting(E_ALL & ~E_NOTICE);
     }
 }

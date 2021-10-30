@@ -50,11 +50,12 @@ class LegacyModule implements Module
     {
         $device = &$os->getDeviceArray();
         $device['attribs'] = $os->getDevice()->attribs->toArray();
-        Debug::set(Debug::isEnabled(), \Log::getDefaultDriver() == 'stack');
+        Debug::disableErrorReporting(); // ignore errors in legacy code
 
         include_once base_path('includes/dbFacile.php');
-
         include base_path("includes/polling/$this->name.inc.php");
+
+        Debug::enableErrorReporting(); // and back to normal
     }
 
     public function cleanup(OS $os): void
