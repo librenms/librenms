@@ -534,6 +534,7 @@ class ModuleTestHelper
     {
         global $device;
         Config::set('rrd.enable', false); // disable rrd
+        Config::set('rrdtool_version', '1.7.2'); // don't detect rrdtool version, rrdtool is not install on ci
 
         if (! is_file($this->snmprec_file)) {
             throw new FileNotFoundException("$this->snmprec_file does not exist!");
