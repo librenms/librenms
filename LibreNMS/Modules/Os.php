@@ -32,7 +32,7 @@ use LibreNMS\Util\Url;
 
 class Os implements Module
 {
-    public function discover(\LibreNMS\OS $os)
+    public function discover(\LibreNMS\OS $os): void
     {
         $this->updateLocation($os);
         $this->sysContact($os);
@@ -50,7 +50,7 @@ class Os implements Module
         $this->handleChanges($os);
     }
 
-    public function poll(\LibreNMS\OS $os)
+    public function poll(\LibreNMS\OS $os): void
     {
         $deviceModel = $os->getDevice(); /** @var \App\Models\Device $deviceModel */
         if ($os instanceof OSPolling) {
@@ -90,12 +90,12 @@ class Os implements Module
         $this->handleChanges($os);
     }
 
-    public function cleanup(\LibreNMS\OS $os)
+    public function cleanup(\LibreNMS\OS $os): void
     {
         // no cleanup needed?
     }
 
-    private function handleChanges(\LibreNMS\OS $os)
+    private function handleChanges(\LibreNMS\OS $os): void
     {
         $device = $os->getDevice();
 
@@ -109,7 +109,7 @@ class Os implements Module
         $device->save();
     }
 
-    private function updateLocation(\LibreNMS\OS $os)
+    private function updateLocation(\LibreNMS\OS $os): void
     {
         $device = $os->getDevice();
         $new_location = $device->override_sysLocation ? new Location() : $os->fetchLocation(); // fetch location data from device
@@ -117,7 +117,7 @@ class Os implements Module
         optional($device->location)->save();
     }
 
-    private function sysContact(\LibreNMS\OS $os)
+    private function sysContact(\LibreNMS\OS $os): void
     {
         $device = $os->getDevice();
         $device->sysContact = snmp_get($os->getDeviceArray(), 'sysContact.0', '-Ovq', 'SNMPv2-MIB');
