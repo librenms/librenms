@@ -65,12 +65,12 @@ abstract class Transport implements TransportInterface
      * @param  string  $input
      * @return array
      */
-    protected function parseUserOptions($input)
+    protected function parseUserOptions(string $input): array
     {
         $options = [];
-        foreach (explode(PHP_EOL, $input) as $option) {
+        foreach (preg_split('/\\r\\n|\\r|\\n/', $input, -1, PREG_SPLIT_NO_EMPTY) as $option) {
             if (Str::contains($option, '=')) {
-                [$k,$v] = explode('=', $option, 2);
+                [$k, $v] = explode('=', $option, 2);
                 $options[$k] = trim($v);
             }
         }
