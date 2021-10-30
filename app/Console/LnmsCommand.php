@@ -46,7 +46,7 @@ abstract class LnmsCommand extends Command
         $this->setDescription(__('commands.' . $this->getName() . '.description'));
     }
 
-    public function isHidden()
+    public function isHidden(): bool
     {
         $env = $this->getLaravel() ? $this->getLaravel()->environment() : getenv('APP_ENV');
 
@@ -127,7 +127,7 @@ abstract class LnmsCommand extends Command
         }
     }
 
-    protected function configureOutputOptions()
+    protected function configureOutputOptions(): void
     {
         \Log::setDefaultDriver($this->getOutput()->isQuiet() ? 'stack' : 'console');
         if (($verbosity = $this->getOutput()->getVerbosity()) >= 128) {

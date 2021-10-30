@@ -140,7 +140,7 @@ class Poller
 
             // check if the poll took too long and log an event
             if ($measurement->getDuration() > Config::get('rrd.step')) {
-                $this->logger->event('Polling took longer than ' . round(Config::get('rrd.step') / 60, 2) .
+                \Log::event('Polling took longer than ' . round(Config::get('rrd.step') / 60, 2) .
                     ' minutes!  This will cause gaps in graphs.', $this->device, 'system', 5);
             }
         }

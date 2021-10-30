@@ -32,7 +32,13 @@ use Log;
 
 class Debug
 {
+    /**
+     * @var bool
+     */
     private static $debug = false;
+    /**
+     * @var bool
+     */
     private static $verbose = false;
 
     /**

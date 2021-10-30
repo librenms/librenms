@@ -33,6 +33,9 @@ class Version
     // Update this on release
     const VERSION = '21.11.0';
 
+    /**
+     * @var bool
+     */
     protected $is_git_install = false;
 
     public function __construct()
