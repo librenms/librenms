@@ -26,6 +26,7 @@
 namespace LibreNMS;
 
 use App\Events\DevicePolled;
+use App\Events\PollingDevice;
 use App\Models\Device;
 use App\Polling\Measure\Measurement;
 use App\Polling\Measure\MeasurementManager;
@@ -89,6 +90,7 @@ class Poller
 
         foreach ($this->buildDeviceQuery()->pluck('device_id') as $device_id) {
             $this->initDevice($device_id);
+            PollingDevice::dispatch($this->device);
             $this->os = OS::make($this->deviceArray);
 
             $helper = new ConnectivityHelper($this->device);

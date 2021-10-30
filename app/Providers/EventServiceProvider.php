@@ -17,6 +17,8 @@ class EventServiceProvider extends ServiceProvider
         \App\Events\UserCreated::class => [
             \App\Listeners\MarkNotificationsRead::class,
         ],
+        \App\Events\PollingDevice::class => [
+        ],
         \App\Events\DevicePolled::class => [
             \App\Listeners\CheckAlerts::class,
             \App\Listeners\UpdateDeviceGroups::class,
