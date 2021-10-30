@@ -142,7 +142,7 @@ abstract class WidgetController extends Controller
 
         return response()->json([
             'status' => $status,
-            'title' => __($title),
+            'title' => htmlentities(__($title)),
             'html' => $html,
             'show_settings' => $show_settings,
             'settings' => $settings,

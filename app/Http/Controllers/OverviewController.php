@@ -103,7 +103,7 @@ class OverviewController extends Controller
         $data = serialize(json_encode($data));
         $dash_config = unserialize($data);
         $hide_dashboard_editor = UserPref::getPref($user, 'hide_dashboard_editor');
-        $widgets = Widget::select('widget_id', 'widget_title')->orderBy('widget_title')->get();
+        $widgets = Widget::select(['widget_id', 'widget_title'])->orderBy('widget_title')->get();
 
         $user_list = [];
         if ($user->can('manage', User::class)) {
