@@ -168,6 +168,7 @@ class OSModulesTest extends DBTestCase
         $this->app->bind('log', function ($app) {
             $mock = \Mockery::mock('\App\Facades\LogManager[event]', [$app]);
             $mock->shouldReceive('event');
+
             return $mock;
         });
 
