@@ -75,7 +75,8 @@ class Airos extends OS implements
 
         // fix longitude having an extra - in the middle after the decimal point
         $location->lng = (float) preg_replace('/(-?\d+)\.-?(\d+)/', '$1.$2', $location->getAttributes()['lng']);
-
+        // fix latitude having an extra - in the middle after the decimal point
+        $location->lat = (float) preg_replace('/(-?\d+)\.-?(\d+)/', '$1.$2', $location->getAttributes()['lat']);
         return $location;
     }
 
