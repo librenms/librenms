@@ -196,6 +196,14 @@ function snmp_get_multi($device, $oids, $options = '-OQUs', $mib = null, $mibdir
     $data = trim(external_exec($cmd));
 
     foreach (explode("\n", $data) as $entry) {
+        if (! Str::contains($entry, ' =')) {
+            if (! empty($entry) && isset($index, $oid)) {
+                $array[$index][$oid] .= "\n$entry";
+            }
+
+            continue;
+        }
+
         [$oid,$value] = explode('=', $entry, 2);
         $oid = trim($oid);
         $value = trim($value, "\" \n\r");

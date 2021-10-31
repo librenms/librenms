@@ -130,8 +130,8 @@ class Cisco extends OS implements OSDiscovery, SlaDiscovery, ProcessorDiscovery,
         foreach (Arr::wrap($cemp) as $index => $entry) {
             if (is_numeric($entry['cempMemPoolUsed']) && $entry['cempMemPoolValid'] == 'true') {
                 [$entPhysicalIndex] = explode('.', $index);
-                $entPhysicalName = $this->getCacheByIndex('entPhysicalName', 'ENTITY-MIB')[$entPhysicalIndex];
-                $descr = ucwords($entPhysicalName . ' - ' . $entry['cempMemPoolName']);
+                $entPhysicalName = $this->getCacheByIndex('entPhysicalName', 'ENTITY-MIB');
+                $descr = ucwords((isset($entPhysicalName[$entPhysicalIndex]) ? "{$entPhysicalName[$entPhysicalIndex]} - " : '') . $entry['cempMemPoolName']);
                 $descr = trim(str_replace(['Cisco ', 'Network Processing Engine'], '', $descr), ' -');
 
                 $mempools->push((new Mempool([
@@ -180,7 +180,7 @@ class Cisco extends OS implements OSDiscovery, SlaDiscovery, ProcessorDiscovery,
         $count = 0;
         foreach (Arr::wrap($cpm) as $index => $entry) {
             $count++;
-            if (is_numeric($entry['cpmCPUMemoryFree']) && is_numeric($entry['cpmCPUMemoryFree'])) {
+            if (isset($entry['cpmCPUMemoryFree']) && is_numeric($entry['cpmCPUMemoryFree'])) {
                 $cpu = $this->getCacheByIndex('entPhysicalName', 'ENTITY-MIB')[$entry['cpmCPUTotalPhysicalIndex'] ?? 'none'] ?? "Processor $index";
 
                 $mempools->push((new Mempool([

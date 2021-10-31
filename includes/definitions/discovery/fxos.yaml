@@ -1,0 +1,4 @@
+modules:
+  os:
+    serial: ENTITY-MIB::entPhysicalSerialNum.10
+    sysDescr_regex: '/Version (?<version>[^,]+)/'
