@@ -58,7 +58,7 @@ class Junos extends \LibreNMS\OS implements SlaDiscovery, OSPolling, SlaPolling
     {
         $data = snmp_get_multi($this->getDeviceArray(), 'jnxJsSPUMonitoringCurrentFlowSession.0', '-OUQs', 'JUNIPER-SRX5000-SPU-MONITORING-MIB');
 
-        if (is_numeric($data[0]['jnxJsSPUMonitoringCurrentFlowSession'])) {
+        if (is_numeric($data[0]['jnxJsSPUMonitoringCurrentFlowSession'] ?? null)) {
             data_update($this->getDeviceArray(), 'junos_jsrx_spu_sessions', [
                 'rrd_def' => RrdDefinition::make()->addDataset('spu_flow_sessions', 'GAUGE', 0),
             ], [
@@ -115,8 +115,8 @@ class Junos extends \LibreNMS\OS implements SlaDiscovery, OSPolling, SlaPolling
             // Use DISMAN-PING Status codes. 0=Good 2=Critical
             $sla->opstatus = $data[$owner][$test]['pingCtlRowStatus'] == '1' ? 0 : 2;
 
-            $sla->rtt = $data[$owner][$test]['jnxPingLastTestResultAvgRttUs'] / 1000;
-            $time = Carbon::parse($data[$owner][$test]['jnxPingLastTestResultTime'])->toDateTimeString();
+            $sla->rtt = $data[$owner][$test]['jnxPingLastTestResultAvgRttUs'] ?? 0 / 1000;
+            $time = Carbon::parse($data[$owner][$test]['jnxPingLastTestResultTime'] ?? null)->toDateTimeString();
             echo 'SLA : ' . $rtt_type . ' ' . $owner . ' ' . $test . '... ' . $sla->rtt . 'ms at ' . $time . "\n";
 
             $fields = [
@@ -138,11 +138,11 @@ class Junos extends \LibreNMS\OS implements SlaDiscovery, OSPolling, SlaPolling
                 case 'IcmpEcho':
                 case 'IcmpTimeStamp':
                     $icmp = [
-                        'MinRttUs' => $data[$owner][$test]['jnxPingLastTestResultMinRttUs'] / 1000,
-                        'MaxRttUs' => $data[$owner][$test]['jnxPingLastTestResultMaxRttUs'] / 1000,
-                        'StdDevRttUs' => $data[$owner][$test]['jnxPingLastTestResultStdDevRttUs'] / 1000,
-                        'ProbeResponses' => $data[$owner][$test]['jnxPingLastTestResultProbeResponses'],
-                        'ProbeLoss' => (int) $data[$owner][$test]['jnxPingLastTestResultSentProbes'] - (int) $data[$owner][$test]['jnxPingLastTestResultProbeResponses'],
+                        'MinRttUs' => $data[$owner][$test]['jnxPingLastTestResultMinRttUs'] ?? 0 / 1000,
+                        'MaxRttUs' => $data[$owner][$test]['jnxPingLastTestResultMaxRttUs'] ?? 0 / 1000,
+                        'StdDevRttUs' => $data[$owner][$test]['jnxPingLastTestResultStdDevRttUs'] ?? 0 / 1000,
+                        'ProbeResponses' => $data[$owner][$test]['jnxPingLastTestResultProbeResponses'] ?? null,
+                        'ProbeLoss' => (int) ($data[$owner][$test]['jnxPingLastTestResultSentProbes'] ?? 0) - (int) ($data[$owner][$test]['jnxPingLastTestResultProbeResponses'] ?? 0),
                     ];
                     $rrd_name = ['sla', $sla_nr, $rtt_type];
                     $rrd_def = RrdDefinition::make()

@@ -70,8 +70,8 @@ class PrinterSupplies implements Module
         foreach ($toner_data as $toner) {
             echo 'Checking toner ' . $toner['supply_descr'] . '... ';
 
-            $raw_toner = $toner_snmp[$toner['supply_oid']];
-            $tonerperc = self::getTonerLevel($device, $raw_toner, $toner['supply_capacity']);
+            $raw_toner = $toner_snmp[$toner['supply_oid']] ?? null;
+            $tonerperc = self::getTonerLevel($device, $raw_toner, $toner['supply_capacity'] ?? null);
             echo $tonerperc . " %\n";
 
             $tags = [

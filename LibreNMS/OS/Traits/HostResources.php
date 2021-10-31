@@ -172,7 +172,7 @@ trait HostResources
                     'mempool_used_oid' => ".1.3.6.1.2.1.25.2.3.1.6.$index",
                     'mempool_total_oid' => null,
                 ]))->setClass(null, $storage['hrStorageType'] == 'hrStorageVirtualMemory' ? 'virtual' : 'system')
-                    ->fillUsage($storage['hrStorageUsed'], $total);
+                    ->fillUsage($storage['hrStorageUsed'] ?? null, $total);
             });
     }
 

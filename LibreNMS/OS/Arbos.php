@@ -1,6 +1,6 @@
 <?php
 /**
- * Aix.php
+ * Arbos.php
  *
  * -Description-
  *
@@ -19,30 +19,32 @@
  *
  * @link       https://www.librenms.org
  *
- * @copyright  2020 Tony Murray
+ * @copyright  2021 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
 namespace LibreNMS\OS;
 
-use App\Models\Device;
-use LibreNMS\Interfaces\Discovery\OSDiscovery;
+use LibreNMS\Interfaces\Polling\OSPolling;
 use LibreNMS\OS;
+use LibreNMS\RRD\RrdDefinition;
+use SnmpQuery;
 
-class Aix extends OS implements OSDiscovery
+class Arbos extends OS implements OSPolling
 {
-    public function discoverOS(Device $device): void
+
+    public function pollOS()
     {
-        $aix_descr = explode("\n", $device->sysDescr);
-        // AIX standard snmp deamon
-        if (! empty($aix_descr[1])) {
-            $device->serial = explode('Processor id: ', $aix_descr[1])[1];
-            $aix_long_version = explode(' version: ', $aix_descr[2])[1];
-            [$device->version, $aix_version_min] = array_map('intval', explode('.', $aix_long_version));
-        // AIX net-snmp
-        } else {
-            [, , $aix_version_min, $device->version, $device->serial] = explode(' ', $aix_descr[0]);
+        $flows = SnmpQuery::get('PEAKFLOW-SP-MIB::deviceTotalFlows.0')->value();
+
+        if (is_numeric($flows)) {
+            app('Datastore')->put($this->getDeviceArray(), 'arbos_flows', [
+                'rrd_def' => RrdDefinition::make()->addDataset('flows', 'GAUGE', 0, 3000000)
+            ], [
+                'flows' => $flows,
+            ]);
+
+            $this->enableGraph('arbos_flows');
         }
-        $device->version .= '.' . $aix_version_min;
     }
 }

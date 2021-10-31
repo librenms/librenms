@@ -534,10 +534,10 @@ class Vrp extends OS implements
             $divisor = 1; //values are already returned in ms, and RRD expects them in ms
 
             // Use DISMAN-PING Status codes. 0=Good 2=Critical
-            $sla->opstatus = $data[$owner][$test]['pingCtlRowStatus'] == '1' ? 0 : 2;
+            $sla->opstatus = ($data[$owner][$test]['pingCtlRowStatus'] ?? null) == '1' ? 0 : 2;
 
-            $sla->rtt = $data[$owner][$test]['pingResultsAverageRtt'] / $divisor;
-            $time = Carbon::parse($data[$owner][$test]['pingResultsLastGoodProbe'])->toDateTimeString();
+            $sla->rtt = $data[$owner][$test]['pingResultsAverageRtt'] ?? 0 / $divisor;
+            $time = Carbon::parse($data[$owner][$test]['pingResultsLastGoodProbe'] ?? null)->toDateTimeString();
             echo 'SLA : ' . $rtt_type . ' ' . $owner . ' ' . $test . '... ' . $sla->rtt . 'ms at ' . $time . "\n";
 
             $fields = [
@@ -556,8 +556,8 @@ class Vrp extends OS implements
                     $icmp = [
                         //'MinRtt' => $data[$owner][$test]['pingResultsMinRtt'] / $divisor,
                         //'MaxRtt' => $data[$owner][$test]['pingResultsMaxRtt'] / $divisor,
-                        'ProbeResponses' => $data[$owner][$test]['pingResultsProbeResponses'],
-                        'ProbeLoss' => (int) $data[$owner][$test]['pingResultsSentProbes'] - (int) $data[$owner][$test]['pingResultsProbeResponses'],
+                        'ProbeResponses' => $data[$owner][$test]['pingResultsProbeResponses'] ?? null,
+                        'ProbeLoss' => (int) ($data[$owner][$test]['pingResultsSentProbes'] ?? 0) - (int) ($data[$owner][$test]['pingResultsProbeResponses'] ?? 0),
                     ];
                     $rrd_name = ['sla', $sla_nr, $rtt_type];
                     $rrd_def = RrdDefinition::make()
