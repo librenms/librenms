@@ -178,6 +178,10 @@ trait HostResources
 
     protected function memValid($storage)
     {
+        if (empty($storage['hrStorageType']) || empty($storage['hrStorageDescr'])) {
+            return false;
+        }
+
         if (! in_array($storage['hrStorageType'], $this->memoryStorageTypes)) {
             return false;
         }

@@ -10,7 +10,7 @@ $oids = ['entPhysicalModelName.1', 'entPhysicalContainedIn.1', 'entPhysicalName.
 
 $data = snmp_get_multi($device, $oids, '-OQUs', 'ENTITY-MIB:OLD-CISCO-CHASSIS-MIB');
 
-if ($data[1]['entPhysicalContainedIn'] == '0') {
+if (isset($data[1]['entPhysicalContainedIn']) && $data[1]['entPhysicalContainedIn'] == '0') {
     if (! empty($data[1]['entPhysicalSoftwareRev'])) {
         $version = $data[1]['entPhysicalSoftwareRev'];
     }

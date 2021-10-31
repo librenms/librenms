@@ -179,7 +179,7 @@ class PrinterSupplies implements Module
                     'supply_oid' => $supply_oid,
                     'supply_capacity_oid' => $capacity_oid,
                     'supply_index' => $last_index,
-                    'supply_type' => $data['prtMarkerSuppliesType'] ?: 'markerSupply',
+                    'supply_type' => $data['prtMarkerSuppliesType'] ?? 'markerSupply',
                     'supply_descr' => $descr,
                     'supply_capacity' => $capacity,
                     'supply_current' => $current,

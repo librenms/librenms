@@ -347,7 +347,7 @@ function snmp_getnext_multi($device, $oids, $options = '-OQUs', $mib = null, $mi
         [$oid,$value] = explode('=', $entry, 2);
         $oid = trim($oid);
         $value = trim($value, "\" \n\r");
-        [$oid, $index] = explode('.', $oid, 2);
+        $oid = explode('.', $oid, 2)[0] ?? null;
         if (! Str::contains($value, 'at this OID')) {
             if (empty($oid)) {
                 continue; // no index or oid
