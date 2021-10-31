@@ -151,7 +151,6 @@ class Debug
         error_reporting($silence ? 0 : E_ERROR);
     }
 
-
     /**
      * Enable error reporting. Please call after disabling for legacy code
      */

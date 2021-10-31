@@ -100,7 +100,7 @@ class OSModulesTest extends DBTestCase
             $filename = $helper->getJsonFilepath(true);
             $expected_data = $helper->getTestData();
             $results = $helper->generateTestData($this->getSnmpsim(), true);
-        } catch (FileNotFoundException | InvalidModuleException $e) {
+        } catch (FileNotFoundException|InvalidModuleException $e) {
             $this->fail($e->getMessage());
         }
 
