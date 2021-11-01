@@ -30,7 +30,7 @@ if ($device['os'] == 'himoinsa-gensets') {
                 // Check if CEA7/CEM7 info is available and retrieve data
                 $status = SnmpQuery::get('HIMOINSAv14-MIB::status.0')->value();
                 define('BT', 0b0001000000);
-                if (intval('0b'.decbin($status), 2) & BT) {
+                if (intval('0b' . decbin($status), 2) & BT) {
                     $tpump = 1;
                 } else {
                     $tpump = 0;
@@ -42,7 +42,7 @@ if ($device['os'] == 'himoinsa-gensets') {
                 // Check if CEA7/CEM7 info is available and retrieve data
                 $status = SnmpQuery::get('HIMOINSAv14-MIB::status.0')->value();
                 define('AL', 0b0010000000);
-                if (intval('0b'.decbin($status), 2) & AL) {
+                if (intval('0b' . decbin($status), 2) & AL) {
                     $alarm = 1;
                 } else {
                     $alarm = 0;
@@ -57,13 +57,13 @@ if ($device['os'] == 'himoinsa-gensets') {
                 define('MN', 0b0000001000);
                 define('T', 0b0000010000);
                 define('B', 0b0000100000);
-                if (intval('0b'.decbin($status), 2) & AU) {
+                if (intval('0b' . decbin($status), 2) & AU) {
                     $mode = 1;
-                } elseif (intval('0b'.decbin($status), 2) & MN) {
+                } elseif (intval('0b' . decbin($status), 2) & MN) {
                     $mode = 2;
-                } elseif (intval('0b'.decbin($status), 2) & T) {
+                } elseif (intval('0b' . decbin($status), 2) & T) {
                     $mode = 3;
-                } elseif (intval('0b'.decbin($status), 2) & B) {
+                } elseif (intval('0b' .  decbin($status), 2) & B) {
                     $mode = 4;
                 } else {
                     $mode = 9;
@@ -83,20 +83,20 @@ if ($device['os'] == 'himoinsa-gensets') {
                     define('G', 0b0100000000);
                     define('R', 0b1000000000);
                 }
-                if (!is_numeric($statusConm)) {
+                if (! is_numeric($statusConm)) {
                     d_echo('No CEC7 installed');
-                    if (intval('0b'.decbin($status), 2) & R) {
+                    if (intval('0b' . decbin($status), 2) & R) {
                         $switch = 0;
-                    } elseif (intval('0b'.decbin($status), 2) & G) {
+                    } elseif (intval('0b' . decbin($status), 2) & G) {
                         $switch = 1;
                     } else {
                         $switch = 9;
                     }
                 } else {
                     d_echo('CEC7 installed');
-                    if (intval('0b'.decbin($statusConm), 2) & R) {
+                    if (intval('0b' . decbin($statusConm), 2) & R) {
                         $switch = 0;
-                    } elseif (intval('0b'.decbin($statusConm), 2) & G) {
+                    } elseif (intval('0b' . decbin($statusConm), 2) & G) {
                         $switch = 1;
                     } else {
                         $switch = 9;
@@ -110,7 +110,7 @@ if ($device['os'] == 'himoinsa-gensets') {
                 $statusConm = SnmpQuery::get('HIMOINSAv14-MIB::statusConm.0')->value();
                 if (is_numeric($statusConm)) {
                     define('SWAL', 0b0000001);
-                    if (intval('0b'.decbin($statusConm), 2) & SWAL) {
+                    if (intval('0b' . decbin($statusConm), 2) & SWAL) {
                         $switchalarm = 1;
                     } else {
                         $switchalarm = 0;
@@ -124,9 +124,9 @@ if ($device['os'] == 'himoinsa-gensets') {
                 $status = SnmpQuery::get('HIMOINSAv14-MIB::status.0')->value();
                 define('A', 0b0000000001);
                 define('P', 0b0000000010);
-                if (intval('0b'.decbin($status), 2) & A) {
+                if (intval('0b' .  decbin($status), 2) & A) {
                     $engine = 1;
-                } elseif (intval('0b'.decbin($status), 2) & P) {
+                } elseif (intval('0b' . decbin($status), 2) & P) {
                     $engine = 0;
                 } else {
                     $engine = 9;
