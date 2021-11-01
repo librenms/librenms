@@ -85,69 +85,69 @@ if (is_numeric($status)) {
     }
 }
 
-if (intval("0b".decbin($status), 2) & A) {
+if (intval('0b'.decbin($status), 2) & A) {
     $engine = 1;
-} elseif (intval("0b".decbin($status), 2) & P) {
+} elseif (intval('0b'.decbin($status), 2) & P) {
     $engine = 0;
 } else {
     $engine = 9;
 }
-if (intval("0b".decbin($status), 2) & AU) {
+if (intval('0b'.decbin($status), 2) & AU) {
     $mode = 1;
-} elseif (intval("0b".decbin($status), 2) & MN) {
+} elseif (intval('0b'.decbin($status), 2) & MN) {
     $mode = 2;
-} elseif (intval("0b".decbin($status), 2) & T) {
+} elseif (intval('0b'.decbin($status), 2) & T) {
     $mode = 3;
-} elseif (intval("0b".decbin($status), 2) & B) {
+} elseif (intval('0b'.decbin($status), 2) & B) {
     $mode = 4;
 } else {
     $mode = 9;
 }
-if (intval("0b".decbin($status), 2) & BT) {
+if (intval('0b'.decbin($status), 2) & BT) {
     $tpump = 1;
 } else {
     $tpump = 0;
 }
-if (intval("0b".decbin($status), 2) & AL) {
+if (intval('0b'.decbin($status), 2) & AL) {
     $alarm = 1;
 } else {
     $alarm = 0;
 }
 if (!is_numeric($statusConm)) {
-    d_echo("No CEC7 installed");
-    if (intval("0b".decbin($status), 2) & R) {
+    d_echo('No CEC7 installed');
+    if (intval('0b'.decbin($status), 2) & R) {
         $switch = 0;
-    } elseif (intval("0b".decbin($status), 2) & G) {
+    } elseif (intval('0b'.decbin($status), 2) & G) {
         $switch = 1;
     } else {
         $switch = 9;
     }
 } else {
-    d_echo("CEC7 installed");
+    d_echo('CEC7 installed');
     $cec7 = true;
-    if (intval("0b".decbin($statusConm), 2) & R) {
+    if (intval('0b'.decbin($statusConm), 2) & R) {
         $switch = 0;
-    } elseif (intval("0b".decbin($statusConm), 2) & G) {
+    } elseif (intval('0b'.decbin($statusConm), 2) & G) {
         $switch = 1;
     } else {
         $switch = 9;
     }
-    if (intval("0b".decbin($statusConm), 2) & SWAL) {
+    if (intval('0b'.decbin($statusConm), 2) & SWAL) {
         $switchalarm = 1;
     } else {
         $switchalarm = 0;
     }
 }
 
-d_echo("Engine: " . $engine);
-d_echo("Mode: " . $mode);
-d_echo("Switch: " . $switch);
-d_echo("Alarm: " . $alarm);
-d_echo("SWAlarm: " . $switchalarm);
-d_echo("Transfer Pump: " . $tpump);
+d_echo('Engine: ' . $engine);
+d_echo('Mode: ' . $mode);
+d_echo('Switch: ' . $switch);
+d_echo('Alarm: ' . $alarm);
+d_echo('SWAlarm: ' . $switchalarm);
+d_echo('Transfer Pump: ' . $tpump);
 
 // Engine state
-$state_name = "statusEngine";
+$state_name = 'statusEngine';
 $states = [
     ['value' => 1, 'generic' => 2, 'graph' => 0, 'descr' => 'Running'],
     ['value' => 0, 'generic' => 0, 'graph' => 0, 'descr' => 'Stopped'],
