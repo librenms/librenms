@@ -38,7 +38,7 @@ class Arbos extends OS implements OSPolling
 
         if (is_numeric($flows)) {
             app('Datastore')->put($this->getDeviceArray(), 'arbos_flows', [
-                'rrd_def' => RrdDefinition::make()->addDataset('flows', 'GAUGE', 0, 3000000)
+                'rrd_def' => RrdDefinition::make()->addDataset('flows', 'GAUGE', 0, 3000000),
             ], [
                 'flows' => $flows,
             ]);

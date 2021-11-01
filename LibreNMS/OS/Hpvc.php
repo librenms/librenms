@@ -37,5 +37,4 @@ class Hpvc extends OS
         // Serial number is in sysName after string "VCEX"
         $device->serial = substr($device->sysName, 4);
     }
-
 }

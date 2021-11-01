@@ -23,9 +23,10 @@
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
-namespace LibreNMS;
+namespace LibreNMS\OS;
 
 use LibreNMS\Interfaces\Polling\OSPolling;
+use LibreNMS\OS;
 use LibreNMS\RRD\RrdDefinition;
 
 class Asyncos extends OS implements OSPolling
@@ -38,7 +39,7 @@ class Asyncos extends OS implements OSPolling
 
             if (is_numeric($connections)) {
                 data_update($this->getDeviceArray(), 'asyncos_conns', [
-                    'rrd_def' => RrdDefinition::make()->addDataset('connections', 'GAUGE', 0, 50000)
+                    'rrd_def' => RrdDefinition::make()->addDataset('connections', 'GAUGE', 0, 50000),
                 ], [
                     'connections' => $connections,
                 ]);

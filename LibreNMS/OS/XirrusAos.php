@@ -79,7 +79,6 @@ class XirrusAos extends OS implements
             }
             $this->enableGraph('xirrus_stations');
         }
-
     }
 
     /**

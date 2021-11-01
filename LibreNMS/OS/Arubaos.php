@@ -56,7 +56,7 @@ class Arubaos extends OS implements
             'WLSX-SWITCH-MIB::wlsxSwitchLicenseSerialNumber.0',
         ])->values();
 
-        $device->features = ($aruba_info['WLSX-SWITCH-MIB::wlsxSwitchRole.0'] ?? null) == 'master' ? 'Master Controller' : "Local Controller for " . ($aruba_info['WLSX-SWITCH-MIB::wlsxSwitchMasterIp.0'] ?? null);
+        $device->features = ($aruba_info['WLSX-SWITCH-MIB::wlsxSwitchRole.0'] ?? null) == 'master' ? 'Master Controller' : 'Local Controller for ' . ($aruba_info['WLSX-SWITCH-MIB::wlsxSwitchMasterIp.0'] ?? null);
         $device->serial = $aruba_info['WLSX-SWITCH-MIB::wlsxSwitchLicenseSerialNumber.0'] ?? null;
     }
 

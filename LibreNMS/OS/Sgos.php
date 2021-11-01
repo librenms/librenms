@@ -144,7 +144,6 @@ class Sgos extends OS implements ProcessorDiscovery, OSPolling
             $this->enableGraph('sgos_server_connections_idle');
             echo ' Server Conn Idle';
         }
-
     }
 
     /**

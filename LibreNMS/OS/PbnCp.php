@@ -30,11 +30,11 @@ use LibreNMS\OS;
 
 class PbnCp extends OS
 {
-public function discoverOS(Device $device): void
-{
-    parent::discoverOS($device); // yaml
+    public function discoverOS(Device $device): void
+    {
+        parent::discoverOS($device); // yaml
 
-    // normalize MAC address (serial)
-    $device->serial = str_replace([' ', ':', '-', '"'], '', $device->serial);
-}
+        // normalize MAC address (serial)
+        $device->serial = str_replace([' ', ':', '-', '"'], '', $device->serial);
+    }
 }

@@ -33,6 +33,7 @@ class Junose extends \LibreNMS\OS
     {
         if (strpos($device->sysDescr, 'olive')) {
             $device->hardware = 'Olive';
+
             return;
         }
 
