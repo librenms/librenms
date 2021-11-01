@@ -67,8 +67,8 @@ class Vrp extends OS implements
         $mempools_array = snmpwalk_cache_multi_oid($this->getDeviceArray(), 'entPhysicalName', $mempools_array, 'HUAWEI-ENTITY-EXTENT-MIB', 'huawei');
 
         foreach (Arr::wrap($mempools_array) as $index => $entry) {
-            $size = empty($entry['hwEntityMemSizeMega']) ? $entry['hwEntityMemSize'] : $entry['hwEntityMemSizeMega'];
-            $descr = empty($entry['entPhysicalName']) ? $entry['hwEntityBomEnDesc'] : $entry['entPhysicalName'];
+            $size = empty($entry['hwEntityMemSizeMega']) ? ($entry['hwEntityMemSize'] ?? null) : $entry['hwEntityMemSizeMega'];
+            $descr = empty($entry['entPhysicalName']) ? ($entry['hwEntityBomEnDesc'] ?? null) : $entry['entPhysicalName'];
 
             if ($size != 0 && $descr && ! Str::contains($descr, 'No') && ! Str::contains($entry['hwEntityMemUsage'], 'No')) {
                 $mempools->push((new Mempool([
@@ -143,8 +143,8 @@ class Vrp extends OS implements
                 //$a_index_oid = implode(".", array_map("hexdec", explode(":", $ap_id)));
                 foreach ($ap as $r_id => $radio) {
                     foreach ($radio as $s_index => $ssid) {
-                        $clientPerRadio[$ap_id][$r_id] += $ssid['hwWlanVapStaOnlineCnt'];
-                        $numClients += $ssid['hwWlanVapStaOnlineCnt'];
+                        $clientPerRadio[$ap_id][$r_id] = ($clientPerRadio[$ap_id][$r_id] ?? 0) + $ssid['hwWlanVapStaOnlineCnt'] ?? 0;
+                        $numClients += $ssid['hwWlanVapStaOnlineCnt'] ?? 0;
                     }
                 }
             }
@@ -167,16 +167,16 @@ class Vrp extends OS implements
 
             foreach ($radioTable as $ap_id => $ap) {
                 foreach ($ap as $r_id => $radio) {
-                    $channel = $radio['hwWlanRadioWorkingChannel'];
-                    $mac = $radio['hwWlanRadioMac'];
-                    $name = $apTable[$ap_id]['hwWlanApName'] . ' Radio ' . $r_id;
+                    $channel = $radio['hwWlanRadioWorkingChannel'] ?? null;
+                    $mac = $radio['hwWlanRadioMac'] ?? null;
+                    $name = ($apTable[$ap_id]['hwWlanApName'] ?? '') . ' Radio ' . $r_id;
                     $radionum = $r_id;
-                    $txpow = $radio['hwWlanRadioActualEIRP'];
-                    $interference = $radio['hwWlanRadioChInterferenceRate'];
-                    $radioutil = $radio['hwWlanRadioChUtilizationRate'];
-                    $numasoclients = $clientPerRadio[$ap_id][$r_id];
+                    $txpow = $radio['hwWlanRadioActualEIRP'] ?? null;
+                    $interference = $radio['hwWlanRadioChInterferenceRate'] ?? null;
+                    $radioutil = $radio['hwWlanRadioChUtilizationRate'] ?? null;
+                    $numasoclients = $clientPerRadio[$ap_id][$r_id] ?? null;
 
-                    switch ($radio['hwWlanRadioFreqType']) {
+                    switch ($radio['hwWlanRadioFreqType'] ?? null) {
                         case 1:
                             $type = '2.4Ghz';
                             break;
@@ -184,7 +184,7 @@ class Vrp extends OS implements
                             $type = '5Ghz';
                             break;
                         default:
-                            $type = 'unknown (huawei ' . $radio['hwWlanRadioFreqType'] . ')';
+                            $type = 'unknown (huawei ' . ($radio['hwWlanRadioFreqType'] ?? null) . ')';
                     }
 
                     // TODO
@@ -369,20 +369,20 @@ class Vrp extends OS implements
                     continue; //this would happen for an SSH session for instance
                 }
                 $nac->put($mac_address, new PortsNac([
-                    'port_id' => $ifName_map->get($portAuthSessionEntryParameters['hwAccessInterface'], 0),
+                    'port_id' => $ifName_map->get($portAuthSessionEntryParameters['hwAccessInterface'] ?? null, 0),
                     'mac_address' => $mac_address,
                     'auth_id' => $authId,
-                    'domain' => $portAuthSessionEntryParameters['hwAccessDomain'],
-                    'username' => '' . $portAuthSessionEntryParameters['hwAccessUserName'],
-                    'ip_address' => $portAuthSessionEntryParameters['hwAccessIPAddress'],
-                    'authz_by' => '' . $portAuthSessionEntryParameters['hwAccessType'],
-                    'authz_status' => '' . $portAuthSessionEntryParameters['hwAccessAuthorizetype'],
-                    'host_mode' => is_null($portAuthSessionEntryParameters['hwAccessAuthType']) ? 'default' : $portAuthSessionEntryParameters['hwAccessAuthType'],
-                    'timeout' => $portAuthSessionEntryParameters['hwAccessSessionTimeout'],
-                    'time_elapsed' => $portAuthSessionEntryParameters['hwAccessOnlineTime'],
-                    'authc_status' => $portAuthSessionEntryParameters['hwAccessCurAuthenPlace'],
-                    'method' => '' . $portAuthSessionEntryParameters['hwAccessAuthtype'],
-                    'vlan' => $portAuthSessionEntryParameters['hwAccessVLANID'],
+                    'domain' => $portAuthSessionEntryParameters['hwAccessDomain'] ?? null,
+                    'username' => '' . $portAuthSessionEntryParameters['hwAccessUserName'] ?? null,
+                    'ip_address' => $portAuthSessionEntryParameters['hwAccessIPAddress'] ?? null,
+                    'authz_by' => '' . $portAuthSessionEntryParameters['hwAccessType'] ?? null,
+                    'authz_status' => '' . $portAuthSessionEntryParameters['hwAccessAuthorizetype'] ?? null,
+                    'host_mode' => $portAuthSessionEntryParameters['hwAccessAuthType'] ?? 'default',
+                    'timeout' => $portAuthSessionEntryParameters['hwAccessSessionTimeout'] ?? null,
+                    'time_elapsed' => $portAuthSessionEntryParameters['hwAccessOnlineTime'] ?? null,
+                    'authc_status' => $portAuthSessionEntryParameters['hwAccessCurAuthenPlace'] ?? null,
+                    'method' => '' . $portAuthSessionEntryParameters['hwAccessAuthtype'] ?? null,
+                    'vlan' => $portAuthSessionEntryParameters['hwAccessVLANID'] ?? null,
                 ]));
             }
         }
