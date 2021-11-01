@@ -61,30 +61,20 @@ class FindWarnings extends Command
                 $this->info($community);
 
                 $process = new Process(['./discovery.php', '-d', '-h', 'snmpsim', '-m', $modules]);
-                $process->run(function ($type, $buffer) {
-                    if (Str::contains($buffer, 'Warning:')) {
-                        $this->error($buffer);
-                        $this->found = true;
-                    }
-                });
+                $process->run([$this, 'find']);
 
                 $process = new Process(['./poller.php', '-d', '-h', 'snmpsim', '-m', $modules]);
-                $process->run(function ($type, $buffer) {
-                    if (Str::contains($buffer, 'Warning:')) {
-                        $this->error($buffer);
-                        $this->found = true;
-                    }
-                });
-
+                $process->run([$this, 'find']);
             }
         }
 
         return Command::SUCCESS;
     }
 
-    private function findWarning(string $buffer) {
-        if (Str::contains($buffer, 'Warning:')) {
-            preg_match_all('/^Warning: .*$/', $buffer, $matches);
+    public function find(string $type, string $buffer): void
+    {
+        if (Str::contains($buffer, ['Warning:', 'Error:'])) {
+            preg_match_all('/^(Warning|\S*Error): .*$/', $buffer, $matches);
 
             $this->error(implode(PHP_EOL, $matches[0]));
             $this->found = true;

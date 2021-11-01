@@ -44,7 +44,7 @@ class DellLaser extends Printer
             '1.3.6.1.4.1.641.2.1.2.1.3.1',
         ])->values();
 
-        $dell_laser = $this->parseDeviceId($data);
+        $dell_laser = $this->parseDeviceId(implode(PHP_EOL, $data));
 
         $device->hardware = $dell_laser['MDL'] ?? $dell_laser['MODEL'] ?? null;
     }
