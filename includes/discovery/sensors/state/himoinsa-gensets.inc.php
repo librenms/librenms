@@ -113,7 +113,7 @@ if (intval('0b' . decbin($status), 2) & AL) {
 } else {
     $alarm = 0;
 }
-if (!is_numeric($statusConm)) {
+if (! is_numeric($statusConm)) {
     d_echo('No CEC7 installed');
     if (intval('0b' . decbin($status), 2) & R) {
         $switch = 0;

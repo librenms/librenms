@@ -63,7 +63,7 @@ if ($device['os'] == 'himoinsa-gensets') {
                     $mode = 2;
                 } elseif (intval('0b' . decbin($status), 2) & T) {
                     $mode = 3;
-                } elseif (intval('0b' .  decbin($status), 2) & B) {
+                } elseif (intval('0b' . decbin($status), 2) & B) {
                     $mode = 4;
                 } else {
                     $mode = 9;
@@ -124,7 +124,7 @@ if ($device['os'] == 'himoinsa-gensets') {
                 $status = SnmpQuery::get('HIMOINSAv14-MIB::status.0')->value();
                 define('A', 0b0000000001);
                 define('P', 0b0000000010);
-                if (intval('0b' .  decbin($status), 2) & A) {
+                if (intval('0b' . decbin($status), 2) & A) {
                     $engine = 1;
                 } elseif (intval('0b' . decbin($status), 2) & P) {
                     $engine = 0;
