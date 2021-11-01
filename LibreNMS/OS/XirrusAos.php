@@ -49,7 +49,7 @@ class XirrusAos extends OS implements
     WirelessRssiDiscovery,
     WirelessSnrDiscovery
 {
-    public function pollOS()
+    public function pollOS(): void
     {
         $associations = [];
 

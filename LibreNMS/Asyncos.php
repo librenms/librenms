@@ -30,7 +30,7 @@ use LibreNMS\RRD\RrdDefinition;
 
 class Asyncos extends OS implements OSPolling
 {
-    public function pollOS()
+    public function pollOS(): void
     {
         // Get stats only if device is web proxy
         if ($this->getDevice()->sysObjectID == '.1.3.6.1.4.1.15497.1.2') {

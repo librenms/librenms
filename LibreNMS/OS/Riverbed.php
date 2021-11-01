@@ -31,8 +31,7 @@ use LibreNMS\RRD\RrdDefinition;
 
 class Riverbed extends OS implements OSPolling
 {
-
-    public function pollOS()
+    public function pollOS(): void
     {
         /* optimisation oids
          *

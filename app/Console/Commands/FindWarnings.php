@@ -81,7 +81,7 @@ class FindWarnings extends Command
         }
     }
 
-    private function addDevice($community)
+    private function addDevice(string $community): void
     {
         $device = Device::firstOrNew(['hostname' => 'snmpsim']);
         $device->overwrite_ip = '127.1.6.1';

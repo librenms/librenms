@@ -30,7 +30,7 @@ use LibreNMS\RRD\RrdDefinition;
 
 class Waas extends OS implements OSPolling
 {
-    public function pollOS()
+    public function pollOS(): void
     {
         $connections = \SnmpQuery::get('CISCO-WAN-OPTIMIZATION-MIB::cwoTfoStatsActiveOptConn.0')->value();
 

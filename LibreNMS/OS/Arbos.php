@@ -32,8 +32,7 @@ use SnmpQuery;
 
 class Arbos extends OS implements OSPolling
 {
-
-    public function pollOS()
+    public function pollOS(): void
     {
         $flows = SnmpQuery::get('PEAKFLOW-SP-MIB::deviceTotalFlows.0')->value();
 
