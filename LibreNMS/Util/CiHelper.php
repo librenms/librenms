@@ -273,6 +273,10 @@ class CiHelper
             $php_lint_cmd = array_merge($php_lint_cmd, $files);
 
             $return += $this->execute('PHP lint', $php_lint_cmd);
+
+            $phpstan_cmd = [$this->checkPhpExec('phpstan'), 'analyze', '--no-interaction', '--error-format=github',  '--memory-limit=2G'];
+            $return += $this->execute('PHPStan Deprecated', $phpstan_cmd + ['--configuration=phpstan-deprecated.neon']);
+            $return += $this->execute('PHPStan', $phpstan_cmd);
         }
 
         if (! $this->flags['lint_skip_python']) {

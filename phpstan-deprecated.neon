@@ -6,6 +6,7 @@ parameters:
 
     customRulesetUsed: true
     reportUnmatchedIgnoredErrors: false
+    resultCachePath: %tmpDir%/resultCache-deprecated.php
 
     paths:
         - LibreNMS
