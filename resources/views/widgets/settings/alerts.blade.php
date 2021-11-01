@@ -63,6 +63,7 @@
     <div class="form-group">
         <label for="uncollapse_key_count-{{ $id }}" class="control-label">@lang('Automatic uncollapse Alert if length below characters'):</label>
         <input class="form-control" type="uncollapse_key_count" min="1" step="1" name="uncollapse_key_count" id="uncollapse_key_count-{{ $id }}" value="{{ $uncollapse_key_count }}">
+    </div>
     <div class="form-group">
         <label for="sort-{{ $id }}" class="control-label">@lang('Sort alerts by'):</label>
         <select class="form-control" name="sort" id="sort-{{ $id }}">
