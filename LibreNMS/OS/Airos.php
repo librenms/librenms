@@ -77,6 +77,7 @@ class Airos extends OS implements
         $regex = '/(-?\d+)\.-?(\d+)/';
         $location->lng = (float) preg_replace($regex, '$1.$2', $location->getAttributes()['lng']);
         $location->lat = (float) preg_replace($regex, '$1.$2', $location->getAttributes()['lat']);
+
         return $location;
     }
 
