@@ -536,7 +536,7 @@ class Vrp extends OS implements
             // Use DISMAN-PING Status codes. 0=Good 2=Critical
             $sla->opstatus = ($data[$owner][$test]['pingCtlRowStatus'] ?? null) == '1' ? 0 : 2;
 
-            $sla->rtt = $data[$owner][$test]['pingResultsAverageRtt'] ?? 0 / $divisor;
+            $sla->rtt = ($data[$owner][$test]['pingResultsAverageRtt'] ?? 0) / $divisor;
             $time = Carbon::parse($data[$owner][$test]['pingResultsLastGoodProbe'] ?? null)->toDateTimeString();
             echo 'SLA : ' . $rtt_type . ' ' . $owner . ' ' . $test . '... ' . $sla->rtt . 'ms at ' . $time . "\n";
 

@@ -115,7 +115,7 @@ class Junos extends \LibreNMS\OS implements SlaDiscovery, OSPolling, SlaPolling
             // Use DISMAN-PING Status codes. 0=Good 2=Critical
             $sla->opstatus = $data[$owner][$test]['pingCtlRowStatus'] == '1' ? 0 : 2;
 
-            $sla->rtt = $data[$owner][$test]['jnxPingLastTestResultAvgRttUs'] ?? 0 / 1000;
+            $sla->rtt = ($data[$owner][$test]['jnxPingLastTestResultAvgRttUs'] ?? 0) / 1000;
             $time = Carbon::parse($data[$owner][$test]['jnxPingLastTestResultTime'] ?? null)->toDateTimeString();
             echo 'SLA : ' . $rtt_type . ' ' . $owner . ' ' . $test . '... ' . $sla->rtt . 'ms at ' . $time . "\n";
 
@@ -138,9 +138,9 @@ class Junos extends \LibreNMS\OS implements SlaDiscovery, OSPolling, SlaPolling
                 case 'IcmpEcho':
                 case 'IcmpTimeStamp':
                     $icmp = [
-                        'MinRttUs' => $data[$owner][$test]['jnxPingLastTestResultMinRttUs'] ?? 0 / 1000,
-                        'MaxRttUs' => $data[$owner][$test]['jnxPingLastTestResultMaxRttUs'] ?? 0 / 1000,
-                        'StdDevRttUs' => $data[$owner][$test]['jnxPingLastTestResultStdDevRttUs'] ?? 0 / 1000,
+                        'MinRttUs' => ($data[$owner][$test]['jnxPingLastTestResultMinRttUs'] ?? 0) / 1000,
+                        'MaxRttUs' => ($data[$owner][$test]['jnxPingLastTestResultMaxRttUs'] ?? 0) / 1000,
+                        'StdDevRttUs' => ($data[$owner][$test]['jnxPingLastTestResultStdDevRttUs'] ?? 0) / 1000,
                         'ProbeResponses' => $data[$owner][$test]['jnxPingLastTestResultProbeResponses'] ?? null,
                         'ProbeLoss' => (int) ($data[$owner][$test]['jnxPingLastTestResultSentProbes'] ?? 0) - (int) ($data[$owner][$test]['jnxPingLastTestResultProbeResponses'] ?? 0),
                     ];
