@@ -59,6 +59,7 @@ class CiHelper
         'unit_skip' => false,
         'web_skip' => false,
         'lint_skip_php' => false,
+        'lint_skip_phpstan' => false,
         'lint_skip_python' => false,
         'lint_skip_bash' => false,
         'unit_os' => false,
