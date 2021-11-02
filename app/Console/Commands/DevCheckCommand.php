@@ -100,7 +100,14 @@ class DevCheckCommand extends LnmsCommand
         }
 
         if ($check == 'ci') {
-            $this->helper->setFlags(['ci' => true, 'fail-fast' => true]);
+            $this->helper->setFlags([
+                'ci' => true,
+                'fail-fast' => true,
+                // checked in lint workflow
+                'lint_skip_phpstan' => true,
+                'lint_skip_python' => true,
+                'lint_skip_bash' => true,
+            ]);
             $this->helper->duskHeadless();
             $this->helper->enableSnmpsim();
             $this->helper->enableDb();
