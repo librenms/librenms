@@ -798,11 +798,11 @@ function get_device_divisor($device, $os_version, $sensor_type, $oid)
         }
 
         if (Str::startsWith($oid, '.1.3.6.1.2.1.33.1.2.3.')) {
-            if ($device['os'] == 'routeros') {
+            if ($device['os'] == 'routeros' && version_compare($os_version, '6.47', '<')) {
                 return 60;
-            } else {
-                return 1;
             }
+
+            return 1;
         }
     }
 
