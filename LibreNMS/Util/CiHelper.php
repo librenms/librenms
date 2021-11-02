@@ -274,9 +274,11 @@ class CiHelper
 
             $return += $this->execute('PHP lint', $php_lint_cmd);
 
-            $phpstan_cmd = [$this->checkPhpExec('phpstan'), 'analyze', '--no-interaction', '--error-format=github',  '--memory-limit=2G'];
-            $return += $this->execute('PHPStan Deprecated', $phpstan_cmd + ['--configuration=phpstan-deprecated.neon']);
-            $return += $this->execute('PHPStan', $phpstan_cmd);
+            if (! $this->flags['lint_skip_phpstan']) {
+                $phpstan_cmd = [$this->checkPhpExec('phpstan'), 'analyze', '--no-interaction', '--error-format=github',  '--memory-limit=2G'];
+                $return += $this->execute('PHPStan Deprecated', $phpstan_cmd + ['--configuration=phpstan-deprecated.neon']);
+                $return += $this->execute('PHPStan', $phpstan_cmd);
+            }
         }
 
         if (! $this->flags['lint_skip_python']) {
@@ -439,7 +441,7 @@ class CiHelper
 
         $this->setFlags([
             'unit_skip' => empty($this->changed['php']) && ! array_sum(Arr::only($this->getFlags(), ['unit_os', 'unit_docs', 'unit_svg', 'unit_modules', 'docs_changed'])),
-            'lint_skip' => array_sum(Arr::only($this->getFlags(), ['lint_skip_php', 'lint_skip_python', 'lint_skip_bash'])) === 3,
+            'lint_skip' => array_sum(Arr::only($this->getFlags(), ['lint_skip_php', 'lint_skip_phpstan', 'lint_skip_python', 'lint_skip_bash'])) === 4,
             'style_skip' => ! $this->flags['ci'] && empty($this->changed['php']),
             'web_skip' => empty($this->changed['php']) && empty($this->changed['resources']),
         ]);
