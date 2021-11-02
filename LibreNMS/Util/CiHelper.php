@@ -432,6 +432,7 @@ class CiHelper
 
         $this->setFlags([
             'lint_skip_php' => empty($this->changed['php']),
+            'lint_skip_phpstan' => empty($this->changed['php']),
             'lint_skip_python' => empty($this->changed['python']),
             'lint_skip_bash' => empty($this->changed['bash']),
             'unit_os' => $this->getFlag('unit_os') || (! empty($this->changed['os']) && empty(array_diff($this->changed['php'], $this->changed['os-files']))),
