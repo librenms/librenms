@@ -12,7 +12,9 @@ modules:
             - ALTEON-CHEETAH-SWITCH-MIB::hwMainBoardNumber.0
             - ALTEON-CHEETAH-SWITCH-MIB::hwMainBoardRevision.0
         hardware_template: '{{ ALTEON-CHEETAH-SWITCH-MIB::hwMainBoardNumber.0 }} Vers. {{ ALTEON-CHEETAH-SWITCH-MIB::hwMainBoardRevision.0 }}'
-        serial: ALTEON-CHEETAH-SWITCH-MIB::hwSerialNumber.0
+        serial:
+            - ALTEON-CHEETAH-SWITCH-MIB::hwChassisSerialNumber.0
+            - ALTEON-CHEETAH-SWITCH-MIB::hwSerialNumber.0
         version: ALTEON-CHEETAH-SWITCH-MIB::agSoftwareVersion.0
     processors:
         data:

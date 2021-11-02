@@ -24033,6 +24033,22 @@ hwEthernetBoardRevision OBJECT-TYPE
          available, a zero length string should be returned."
     ::= { hardware 9 }
 
+hwChassisSerialNumber OBJECT-TYPE
+    SYNTAX DisplayString (SIZE(0..16))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The switch serial number."
+    ::= { hardware 10 }
+
+hwChassisRevision OBJECT-TYPE
+    SYNTAX DisplayString (SIZE(0..16))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The chassis revision.  If the revision is not
+         available, a zero length string should be returned."
+    ::= { hardware 11 }
 
 hwMACAddress OBJECT-TYPE
     SYNTAX DisplayString (SIZE(0..48))
