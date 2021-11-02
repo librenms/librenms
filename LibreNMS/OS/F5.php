@@ -63,9 +63,9 @@ class F5 extends OS implements OSPolling
 
         // fetch data
         $data = \SnmpQuery::get(array_keys($metadata) + [
-                'F5-BIGIP-SYSTEM-MIB::sysClientsslStatTotNativeConns.0',
-                'F5-BIGIP-SYSTEM-MIB::sysClientsslStatTotCompatConns.0',
-            ])->values();
+            'F5-BIGIP-SYSTEM-MIB::sysClientsslStatTotNativeConns.0',
+            'F5-BIGIP-SYSTEM-MIB::sysClientsslStatTotCompatConns.0',
+        ])->values();
 
         // connections
         foreach ($metadata as $key => $info) {

@@ -37,7 +37,7 @@ class Poweralert extends \LibreNMS\OS implements OSPolling
         $this->customSysName($device);
     }
 
-    public function pollOs()
+    public function pollOs(): void
     {
         $this->customSysName($this->getDevice());
     }
