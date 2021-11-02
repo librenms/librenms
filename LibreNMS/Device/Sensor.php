@@ -412,11 +412,11 @@ class Sensor implements DiscoveryModule, PollerModule
             }
 
             if ($sensor['sensor_divisor'] && $sensor_value !== 0) {
-                $sensor_value = ($sensor_value / $sensor['sensor_divisor']);
+                $sensor_value = (cast_number($sensor_value) / $sensor['sensor_divisor']);
             }
 
             if ($sensor['sensor_multiplier']) {
-                $sensor_value = ($sensor_value * $sensor['sensor_multiplier']);
+                $sensor_value = (cast_number($sensor_value) * $sensor['sensor_multiplier']);
             }
 
             $sensor_data[$sensor['sensor_id']] = $sensor_value;
