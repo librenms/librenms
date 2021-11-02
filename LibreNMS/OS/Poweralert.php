@@ -26,13 +26,27 @@
 namespace LibreNMS\OS;
 
 use App\Models\Device;
+use LibreNMS\Interfaces\Polling\OSPolling;
 
-class Poweralert extends \LibreNMS\OS
+class Poweralert extends \LibreNMS\OS implements OSPolling
 {
     public function discoverOS(Device $device): void
     {
         parent::discoverOS($device); // yaml
 
+        $this->customSysName($device);
+    }
+
+    public function pollOs()
+    {
+        $this->customSysName($this->getDevice());
+    }
+
+    /**
+     * @param  \App\Models\Device  $device
+     */
+    private function customSysName(Device $device): void
+    {
         $device->sysName = \SnmpQuery::get('.1.3.6.1.2.1.33.1.1.5.0')->value() ?: $device->sysName;
     }
 }
