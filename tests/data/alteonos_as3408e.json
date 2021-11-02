@@ -12,7 +12,11 @@
                     "features": "Layer 4: SLB + WCR",
                     "os": "alteonos",
                     "type": "network",
+<<<<<<< HEAD
                     "serial": "SSCMC802GK",
+=======
+                    "serial": null,
+>>>>>>> 3100d8927... Add test data for AlteonOS AS3408E
                     "icon": "radware.svg",
                     "location": null
                 }
@@ -1645,11 +1649,19 @@
                     "pagpEthcOperationMode": null,
                     "pagpDeviceId": null,
                     "pagpGroupIfIndex": null,
+<<<<<<< HEAD
                     "ifInUcastPkts": 1108476381,
                     "ifInUcastPkts_prev": 0,
                     "ifInUcastPkts_delta": null,
                     "ifInUcastPkts_rate": null,
                     "ifOutUcastPkts": 2729037382,
+=======
+                    "ifInUcastPkts": 1099997289,
+                    "ifInUcastPkts_prev": 0,
+                    "ifInUcastPkts_delta": null,
+                    "ifInUcastPkts_rate": null,
+                    "ifOutUcastPkts": 2724731303,
+>>>>>>> 3100d8927... Add test data for AlteonOS AS3408E
                     "ifOutUcastPkts_prev": 0,
                     "ifOutUcastPkts_delta": null,
                     "ifOutUcastPkts_rate": null,
@@ -1661,11 +1673,19 @@
                     "ifOutErrors_prev": 0,
                     "ifOutErrors_delta": null,
                     "ifOutErrors_rate": null,
+<<<<<<< HEAD
                     "ifInOctets": 7236143459843,
                     "ifInOctets_prev": 0,
                     "ifInOctets_delta": null,
                     "ifInOctets_rate": null,
                     "ifOutOctets": 298805152699,
+=======
+                    "ifInOctets": 7224858785982,
+                    "ifInOctets_prev": 0,
+                    "ifInOctets_delta": null,
+                    "ifInOctets_rate": null,
+                    "ifOutOctets": 298342653226,
+>>>>>>> 3100d8927... Add test data for AlteonOS AS3408E
                     "ifOutOctets_prev": 0,
                     "ifOutOctets_delta": null,
                     "ifOutOctets_rate": null,
@@ -1694,7 +1714,11 @@
                     "ifInBroadcastPkts_prev": 0,
                     "ifInBroadcastPkts_delta": null,
                     "ifInBroadcastPkts_rate": null,
+<<<<<<< HEAD
                     "ifOutBroadcastPkts": 99696184,
+=======
+                    "ifOutBroadcastPkts": 99468645,
+>>>>>>> 3100d8927... Add test data for AlteonOS AS3408E
                     "ifOutBroadcastPkts_prev": 0,
                     "ifOutBroadcastPkts_delta": null,
                     "ifOutBroadcastPkts_rate": null,
@@ -1702,7 +1726,11 @@
                     "ifInMulticastPkts_prev": 0,
                     "ifInMulticastPkts_delta": null,
                     "ifInMulticastPkts_rate": null,
+<<<<<<< HEAD
                     "ifOutMulticastPkts": 631999,
+=======
+                    "ifOutMulticastPkts": 630074,
+>>>>>>> 3100d8927... Add test data for AlteonOS AS3408E
                     "ifOutMulticastPkts_prev": 0,
                     "ifOutMulticastPkts_delta": null,
                     "ifOutMulticastPkts_rate": null
@@ -1750,11 +1778,19 @@
                     "pagpEthcOperationMode": null,
                     "pagpDeviceId": null,
                     "pagpGroupIfIndex": null,
+<<<<<<< HEAD
                     "ifInUcastPkts": 110685750,
                     "ifInUcastPkts_prev": 0,
                     "ifInUcastPkts_delta": null,
                     "ifInUcastPkts_rate": null,
                     "ifOutUcastPkts": 2229116101,
+=======
+                    "ifInUcastPkts": 103939778,
+                    "ifInUcastPkts_prev": 0,
+                    "ifInUcastPkts_delta": null,
+                    "ifInUcastPkts_rate": null,
+                    "ifOutUcastPkts": 2225686118,
+>>>>>>> 3100d8927... Add test data for AlteonOS AS3408E
                     "ifOutUcastPkts_prev": 0,
                     "ifOutUcastPkts_delta": null,
                     "ifOutUcastPkts_rate": null,
@@ -1766,11 +1802,19 @@
                     "ifOutErrors_prev": 0,
                     "ifOutErrors_delta": null,
                     "ifOutErrors_rate": null,
+<<<<<<< HEAD
                     "ifInOctets": 5755863523656,
                     "ifInOctets_prev": 0,
                     "ifInOctets_delta": null,
                     "ifInOctets_rate": null,
                     "ifOutOctets": 262922672238,
+=======
+                    "ifInOctets": 5747183366881,
+                    "ifInOctets_prev": 0,
+                    "ifInOctets_delta": null,
+                    "ifInOctets_rate": null,
+                    "ifOutOctets": 262517753504,
+>>>>>>> 3100d8927... Add test data for AlteonOS AS3408E
                     "ifOutOctets_prev": 0,
                     "ifOutOctets_delta": null,
                     "ifOutOctets_rate": null,
@@ -1799,7 +1843,11 @@
                     "ifInBroadcastPkts_prev": 0,
                     "ifInBroadcastPkts_delta": null,
                     "ifInBroadcastPkts_rate": null,
+<<<<<<< HEAD
                     "ifOutBroadcastPkts": 99696121,
+=======
+                    "ifOutBroadcastPkts": 99468582,
+>>>>>>> 3100d8927... Add test data for AlteonOS AS3408E
                     "ifOutBroadcastPkts_prev": 0,
                     "ifOutBroadcastPkts_delta": null,
                     "ifOutBroadcastPkts_rate": null,
@@ -1807,7 +1855,11 @@
                     "ifInMulticastPkts_prev": 0,
                     "ifInMulticastPkts_delta": null,
                     "ifInMulticastPkts_rate": null,
+<<<<<<< HEAD
                     "ifOutMulticastPkts": 631999,
+=======
+                    "ifOutMulticastPkts": 630074,
+>>>>>>> 3100d8927... Add test data for AlteonOS AS3408E
                     "ifOutMulticastPkts_prev": 0,
                     "ifOutMulticastPkts_delta": null,
                     "ifOutMulticastPkts_rate": null
@@ -1855,11 +1907,19 @@
                     "pagpEthcOperationMode": null,
                     "pagpDeviceId": null,
                     "pagpGroupIfIndex": null,
+<<<<<<< HEAD
                     "ifInUcastPkts": 1119511421,
                     "ifInUcastPkts_prev": 0,
                     "ifInUcastPkts_delta": null,
                     "ifInUcastPkts_rate": null,
                     "ifOutUcastPkts": 2732100198,
+=======
+                    "ifInUcastPkts": 1111282665,
+                    "ifInUcastPkts_prev": 0,
+                    "ifInUcastPkts_delta": null,
+                    "ifInUcastPkts_rate": null,
+                    "ifOutUcastPkts": 2727893095,
+>>>>>>> 3100d8927... Add test data for AlteonOS AS3408E
                     "ifOutUcastPkts_prev": 0,
                     "ifOutUcastPkts_delta": null,
                     "ifOutUcastPkts_rate": null,
@@ -1871,11 +1931,19 @@
                     "ifOutErrors_prev": 0,
                     "ifOutErrors_delta": null,
                     "ifOutErrors_rate": null,
+<<<<<<< HEAD
                     "ifInOctets": 7253837766014,
                     "ifInOctets_prev": 0,
                     "ifInOctets_delta": null,
                     "ifInOctets_rate": null,
                     "ifOutOctets": 299037786662,
+=======
+                    "ifInOctets": 7242920451917,
+                    "ifInOctets_prev": 0,
+                    "ifInOctets_delta": null,
+                    "ifInOctets_rate": null,
+                    "ifOutOctets": 298564240184,
+>>>>>>> 3100d8927... Add test data for AlteonOS AS3408E
                     "ifOutOctets_prev": 0,
                     "ifOutOctets_delta": null,
                     "ifOutOctets_rate": null,
@@ -1904,7 +1972,11 @@
                     "ifInBroadcastPkts_prev": 0,
                     "ifInBroadcastPkts_delta": null,
                     "ifInBroadcastPkts_rate": null,
+<<<<<<< HEAD
                     "ifOutBroadcastPkts": 99696186,
+=======
+                    "ifOutBroadcastPkts": 99468647,
+>>>>>>> 3100d8927... Add test data for AlteonOS AS3408E
                     "ifOutBroadcastPkts_prev": 0,
                     "ifOutBroadcastPkts_delta": null,
                     "ifOutBroadcastPkts_rate": null,
@@ -1912,7 +1984,11 @@
                     "ifInMulticastPkts_prev": 0,
                     "ifInMulticastPkts_delta": null,
                     "ifInMulticastPkts_rate": null,
+<<<<<<< HEAD
                     "ifOutMulticastPkts": 631998,
+=======
+                    "ifOutMulticastPkts": 630073,
+>>>>>>> 3100d8927... Add test data for AlteonOS AS3408E
                     "ifOutMulticastPkts_prev": 0,
                     "ifOutMulticastPkts_delta": null,
                     "ifOutMulticastPkts_rate": null
@@ -1960,11 +2036,19 @@
                     "pagpEthcOperationMode": null,
                     "pagpDeviceId": null,
                     "pagpGroupIfIndex": null,
+<<<<<<< HEAD
                     "ifInUcastPkts": 1040739027,
                     "ifInUcastPkts_prev": 0,
                     "ifInUcastPkts_delta": null,
                     "ifInUcastPkts_rate": null,
                     "ifOutUcastPkts": 2694412529,
+=======
+                    "ifInUcastPkts": 1032401537,
+                    "ifInUcastPkts_prev": 0,
+                    "ifInUcastPkts_delta": null,
+                    "ifInUcastPkts_rate": null,
+                    "ifOutUcastPkts": 2690188917,
+>>>>>>> 3100d8927... Add test data for AlteonOS AS3408E
                     "ifOutUcastPkts_prev": 0,
                     "ifOutUcastPkts_delta": null,
                     "ifOutUcastPkts_rate": null,
@@ -1976,11 +2060,19 @@
                     "ifOutErrors_prev": 0,
                     "ifOutErrors_delta": null,
                     "ifOutErrors_rate": null,
+<<<<<<< HEAD
                     "ifInOctets": 7144278413221,
                     "ifInOctets_prev": 0,
                     "ifInOctets_delta": null,
                     "ifInOctets_rate": null,
                     "ifOutOctets": 294031958042,
+=======
+                    "ifInOctets": 7133193587712,
+                    "ifInOctets_prev": 0,
+                    "ifInOctets_delta": null,
+                    "ifInOctets_rate": null,
+                    "ifOutOctets": 293575429140,
+>>>>>>> 3100d8927... Add test data for AlteonOS AS3408E
                     "ifOutOctets_prev": 0,
                     "ifOutOctets_delta": null,
                     "ifOutOctets_rate": null,
@@ -2005,11 +2097,19 @@
                     "ifInUnknownProtos_prev": 0,
                     "ifInUnknownProtos_delta": null,
                     "ifInUnknownProtos_rate": null,
+<<<<<<< HEAD
                     "ifInBroadcastPkts": 136377,
                     "ifInBroadcastPkts_prev": 0,
                     "ifInBroadcastPkts_delta": null,
                     "ifInBroadcastPkts_rate": null,
                     "ifOutBroadcastPkts": 99559807,
+=======
+                    "ifInBroadcastPkts": 136017,
+                    "ifInBroadcastPkts_prev": 0,
+                    "ifInBroadcastPkts_delta": null,
+                    "ifInBroadcastPkts_rate": null,
+                    "ifOutBroadcastPkts": 99332628,
+>>>>>>> 3100d8927... Add test data for AlteonOS AS3408E
                     "ifOutBroadcastPkts_prev": 0,
                     "ifOutBroadcastPkts_delta": null,
                     "ifOutBroadcastPkts_rate": null,
@@ -2017,7 +2117,11 @@
                     "ifInMulticastPkts_prev": 0,
                     "ifInMulticastPkts_delta": null,
                     "ifInMulticastPkts_rate": null,
+<<<<<<< HEAD
                     "ifOutMulticastPkts": 631993,
+=======
+                    "ifOutMulticastPkts": 630068,
+>>>>>>> 3100d8927... Add test data for AlteonOS AS3408E
                     "ifOutMulticastPkts_prev": 0,
                     "ifOutMulticastPkts_delta": null,
                     "ifOutMulticastPkts_rate": null
@@ -2065,11 +2169,19 @@
                     "pagpEthcOperationMode": null,
                     "pagpDeviceId": null,
                     "pagpGroupIfIndex": null,
+<<<<<<< HEAD
                     "ifInUcastPkts": 2251484405,
                     "ifInUcastPkts_prev": 0,
                     "ifInUcastPkts_delta": null,
                     "ifInUcastPkts_rate": null,
                     "ifOutUcastPkts": 2262907362,
+=======
+                    "ifInUcastPkts": 2247912371,
+                    "ifInUcastPkts_prev": 0,
+                    "ifInUcastPkts_delta": null,
+                    "ifInUcastPkts_rate": null,
+                    "ifOutUcastPkts": 2261052557,
+>>>>>>> 3100d8927... Add test data for AlteonOS AS3408E
                     "ifOutUcastPkts_prev": 0,
                     "ifOutUcastPkts_delta": null,
                     "ifOutUcastPkts_rate": null,
@@ -2081,11 +2193,19 @@
                     "ifOutErrors_prev": 0,
                     "ifOutErrors_delta": null,
                     "ifOutErrors_rate": null,
+<<<<<<< HEAD
                     "ifInOctets": 2311956783615,
                     "ifInOctets_prev": 0,
                     "ifInOctets_delta": null,
                     "ifInOctets_rate": null,
                     "ifOutOctets": 2212603599553,
+=======
+                    "ifInOctets": 2307338787530,
+                    "ifInOctets_prev": 0,
+                    "ifInOctets_delta": null,
+                    "ifInOctets_rate": null,
+                    "ifOutOctets": 2212016519095,
+>>>>>>> 3100d8927... Add test data for AlteonOS AS3408E
                     "ifOutOctets_prev": 0,
                     "ifOutOctets_delta": null,
                     "ifOutOctets_rate": null,
@@ -2114,7 +2234,11 @@
                     "ifInBroadcastPkts_prev": 0,
                     "ifInBroadcastPkts_delta": null,
                     "ifInBroadcastPkts_rate": null,
+<<<<<<< HEAD
                     "ifOutBroadcastPkts": 99696182,
+=======
+                    "ifOutBroadcastPkts": 99468643,
+>>>>>>> 3100d8927... Add test data for AlteonOS AS3408E
                     "ifOutBroadcastPkts_prev": 0,
                     "ifOutBroadcastPkts_delta": null,
                     "ifOutBroadcastPkts_rate": null,
@@ -2122,7 +2246,11 @@
                     "ifInMulticastPkts_prev": 0,
                     "ifInMulticastPkts_delta": null,
                     "ifInMulticastPkts_rate": null,
+<<<<<<< HEAD
                     "ifOutMulticastPkts": 631998,
+=======
+                    "ifOutMulticastPkts": 630073,
+>>>>>>> 3100d8927... Add test data for AlteonOS AS3408E
                     "ifOutMulticastPkts_prev": 0,
                     "ifOutMulticastPkts_delta": null,
                     "ifOutMulticastPkts_rate": null
@@ -2380,11 +2508,19 @@
                     "pagpEthcOperationMode": null,
                     "pagpDeviceId": null,
                     "pagpGroupIfIndex": null,
+<<<<<<< HEAD
                     "ifInUcastPkts": 3976755265,
                     "ifInUcastPkts_prev": 0,
                     "ifInUcastPkts_delta": null,
                     "ifInUcastPkts_rate": null,
                     "ifOutUcastPkts": 1293881661,
+=======
+                    "ifInUcastPkts": 3958930400,
+                    "ifInUcastPkts_prev": 0,
+                    "ifInUcastPkts_delta": null,
+                    "ifInUcastPkts_rate": null,
+                    "ifOutUcastPkts": 1258611121,
+>>>>>>> 3100d8927... Add test data for AlteonOS AS3408E
                     "ifOutUcastPkts_prev": 0,
                     "ifOutUcastPkts_delta": null,
                     "ifOutUcastPkts_rate": null,
@@ -2396,11 +2532,19 @@
                     "ifOutErrors_prev": 0,
                     "ifOutErrors_delta": null,
                     "ifOutErrors_rate": null,
+<<<<<<< HEAD
                     "ifInOctets": 3334196764161,
                     "ifInOctets_prev": 0,
                     "ifInOctets_delta": null,
                     "ifInOctets_rate": null,
                     "ifOutOctets": 29533476555081,
+=======
+                    "ifInOctets": 3331888759953,
+                    "ifInOctets_prev": 0,
+                    "ifInOctets_delta": null,
+                    "ifInOctets_rate": null,
+                    "ifOutOctets": 29486985968729,
+>>>>>>> 3100d8927... Add test data for AlteonOS AS3408E
                     "ifOutOctets_prev": 0,
                     "ifOutOctets_delta": null,
                     "ifOutOctets_rate": null,
@@ -2425,6 +2569,7 @@
                     "ifInUnknownProtos_prev": 0,
                     "ifInUnknownProtos_delta": null,
                     "ifInUnknownProtos_rate": null,
+<<<<<<< HEAD
                     "ifInBroadcastPkts": 99505681,
                     "ifInBroadcastPkts_prev": 0,
                     "ifInBroadcastPkts_delta": null,
@@ -2434,6 +2579,17 @@
                     "ifOutBroadcastPkts_delta": null,
                     "ifOutBroadcastPkts_rate": null,
                     "ifInMulticastPkts": 604287,
+=======
+                    "ifInBroadcastPkts": 99278627,
+                    "ifInBroadcastPkts_prev": 0,
+                    "ifInBroadcastPkts_delta": null,
+                    "ifInBroadcastPkts_rate": null,
+                    "ifOutBroadcastPkts": 190020,
+                    "ifOutBroadcastPkts_prev": 0,
+                    "ifOutBroadcastPkts_delta": null,
+                    "ifOutBroadcastPkts_rate": null,
+                    "ifInMulticastPkts": 602362,
+>>>>>>> 3100d8927... Add test data for AlteonOS AS3408E
                     "ifInMulticastPkts_prev": 0,
                     "ifInMulticastPkts_delta": null,
                     "ifInMulticastPkts_rate": null,
@@ -2979,7 +3135,11 @@
                     "processor_oid": ".1.3.6.1.4.1.1872.2.5.1.2.2.1.0",
                     "processor_index": "0",
                     "processor_type": "alteonos",
+<<<<<<< HEAD
                     "processor_usage": 40,
+=======
+                    "processor_usage": 29,
+>>>>>>> 3100d8927... Add test data for AlteonOS AS3408E
                     "processor_descr": "Processor",
                     "processor_precision": 1,
                     "processor_perc_warn": 75
