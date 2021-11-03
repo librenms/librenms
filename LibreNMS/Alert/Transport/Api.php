@@ -56,7 +56,7 @@ class Api extends Transport
         //get each line of key-values and process the variables for Options;
         $query = $this->parseUserOptions($options, $obj);
 
-        $client = new \GuzzleHttp\Client();
+        $client = app(\GuzzleHttp\Client::class);
         $request_opts['proxy'] = Proxy::forGuzzle();
         if (isset($auth) && ! empty($auth[0])) {
             $request_opts['auth'] = $auth;

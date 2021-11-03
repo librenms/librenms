@@ -26,6 +26,23 @@ abstract class Transport implements TransportInterface
     }
 
     /**
+     * Returns a list of all available transports
+     * @return array
+     */
+    public static function list(): array
+    {
+        $list = [];
+        foreach (glob(base_path('LibreNMS/Alert/Transport/*.php')) as $file) {
+            $transport = strtolower(basename($file, '.php'));
+            $class = self::getClass($transport);
+            $instance = new $class;
+            $list[$transport] = $instance->name();
+        }
+
+        return $list;
+    }
+
+    /**
      * Transport constructor.
      *
      * @param  null  $transport

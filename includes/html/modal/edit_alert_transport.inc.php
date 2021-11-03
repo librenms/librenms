@@ -11,6 +11,7 @@
  * the source code distribution for details.
  */
 
+use LibreNMS\Alert\Transport;
 use LibreNMS\Config;
 
 if (Auth::user()->hasGlobalAdmin()) {
@@ -42,19 +43,9 @@ if (Auth::user()->hasGlobalAdmin()) {
     <?php
 
 // Create list of transport
-    $transport_dir = Config::get('install_dir') . '/LibreNMS/Alert/Transport';
-    $transports_list = [];
-    foreach (scandir($transport_dir) as $transport) {
-        $transport = strstr($transport, '.', true);
-        if (empty($transport)) {
-            continue;
-        }
-        $class = "\LibreNMS\Alert\Transport\\$transport";
-        $instance = new $class;
-        $transports_list[$transport] = $instance->name();
-    }
+    $transports_list = Transport::list();
     foreach ($transports_list as $transport => $name) {
-        echo '<option value="' . strtolower($transport) . '-form">' . $name . '</option>';
+        echo '<option value="' . $transport . '-form">' . $name . '</option>';
     } ?>
                                 </select>
                             </div>
@@ -70,16 +61,16 @@ if (Auth::user()->hasGlobalAdmin()) {
 
     $switches = []; // store names of bootstrap switches
     foreach ($transports_list as $transport => $name) {
-        $class = 'LibreNMS\\Alert\\Transport\\' . $transport;
+        $class = Transport::getClass($transport);
 
         if (! method_exists($class, 'configTemplate')) {
             // Skip since support has not been added
             continue;
         }
 
-        echo '<form method="post" role="form" id="' . strtolower($transport) . '-form" class="form-horizontal transport">';
+        echo '<form method="post" role="form" id="' . $transport . '-form" class="form-horizontal transport">';
         echo csrf_field();
-        echo '<input type="hidden" name="transport-type" value="' . strtolower($transport) . '">';
+        echo '<input type="hidden" name="transport-type" value="' . $transport . '">';
 
         $tmp = call_user_func($class . '::configTemplate');
 
