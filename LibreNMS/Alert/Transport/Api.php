@@ -72,12 +72,8 @@ class Api extends Transport
             $request_opts['body'] = $body;
             $res = $client->request('PUT', $host, $request_opts);
         } else { //Method POST
-//            if ($body) {
-                $request_opts['query'] = $query;
-                $request_opts['body'] = SimpleTemplate::parse($body, $obj);
-//            } else {
-//                $request_opts['form_params'] = $query;
-//            }
+            $request_opts['query'] = $query;
+            $request_opts['body'] = SimpleTemplate::parse($body, $obj);
             $res = $client->request('POST', $host, $request_opts);
         }
 

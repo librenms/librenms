@@ -3,7 +3,6 @@
 namespace LibreNMS\Tests\Unit;
 
 use App\Models\AlertTransport;
-use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\Psr7\Response;
 use LibreNMS\Config;
 use LibreNMS\Tests\TestCase;
