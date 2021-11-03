@@ -52,9 +52,9 @@ class Api extends Transport
         $host = explode('?', $api, 2)[0]; //we don't use the parameter part, cause we build it out of options.
 
         //get each line of key-values and process the variables for Headers;
-        $request_heads = $this->parseUserOptions(SimpleTemplate::parse($headers, $obj));
+        $request_heads = $this->parseUserOptions($headers, $obj);
         //get each line of key-values and process the variables for Options;
-        $query = $this->parseUserOptions(SimpleTemplate::parse($options, $obj));
+        $query = $this->parseUserOptions($options, $obj);
 
         $client = new \GuzzleHttp\Client();
         $request_opts['proxy'] = Proxy::forGuzzle();
