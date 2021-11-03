@@ -27,6 +27,7 @@ abstract class Transport implements TransportInterface
 
     /**
      * Returns a list of all available transports
+     *
      * @return array
      */
     public static function list(): array
@@ -81,7 +82,7 @@ abstract class Transport implements TransportInterface
      * Helper function to parse free form text box defined in ini style to key value pairs
      *
      * @param  string  $input
-     * @param  array  $replacements for SimpleTemplate if desired
+     * @param  array  $replacements  for SimpleTemplate if desired
      * @return array
      */
     protected function parseUserOptions(string $input, array $replacements = []): array

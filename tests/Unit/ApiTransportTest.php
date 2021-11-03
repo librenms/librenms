@@ -13,7 +13,7 @@ class ApiTransportTest extends TestCase
 {
     use MockGuzzleClient;
 
-    public function testGetMultilineVariables()
+    public function testGetMultilineVariables(): void
     {
         $transport = AlertTransport::factory()->api('text={{ $msg }}')->make();
 
@@ -33,7 +33,7 @@ class ApiTransportTest extends TestCase
         $this->assertEquals('text=This%20is%20a%20multi-line%0Aalert.', $history[0]->getUri()->getQuery());
     }
 
-    public function testPostMultilineVariables()
+    public function testPostMultilineVariables(): void
     {
         $transport = AlertTransport::factory()->api(
             'text={{ $msg }}',

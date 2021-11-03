@@ -6,7 +6,6 @@ use GuzzleHttp\Client;
 use GuzzleHttp\Handler\MockHandler;
 use GuzzleHttp\HandlerStack;
 use GuzzleHttp\Middleware;
-use function array_merge;
 
 /**
  * @mixin \LibreNMS\Tests\TestCase
@@ -29,8 +28,10 @@ trait MockGuzzleClient
     private $guzzleHistory = [];
 
     /**
-     * @param  array  $queue Sequential Responses to give to the client.
-     * @param  array  $config Guzzle config settings.
+     * Create a Guzzle MockHandler and bind Client with the handler to the Laravel container
+     *
+     * @param  array  $queue  Sequential Responses to give to the client.
+     * @param  array  $config  Guzzle config settings.
      */
     public function mockGuzzleClient(array $queue, array $config = []): MockHandler
     {
@@ -49,6 +50,7 @@ trait MockGuzzleClient
 
     /**
      * Get the request and response history to inspect
+     *
      * @return array
      */
     public function guzzleHistory(): array
@@ -58,6 +60,7 @@ trait MockGuzzleClient
 
     /**
      * Get the request history to inspect
+     *
      * @return \GuzzleHttp\Psr7\Request[]
      */
     public function guzzleRequestHistory(): array
@@ -67,6 +70,7 @@ trait MockGuzzleClient
 
     /**
      * Get the response history to inspect
+     *
      * @return \GuzzleHttp\Psr7\Response[]
      */
     public function guzzleResponseHistory(): array

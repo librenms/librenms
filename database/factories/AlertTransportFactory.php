@@ -8,19 +8,9 @@ use LibreNMS\Alert\Transport;
 
 class AlertTransportFactory extends Factory
 {
-    /**
-     * The name of the factory's corresponding model.
-     *
-     * @var string
-     */
     protected $model = AlertTransport::class;
 
-    /**
-     * Define the model's default state.
-     *
-     * @return array
-     */
-    public function definition()
+    public function definition(): array
     {
         return [
             'transport_name' => $this->faker->text(30),
@@ -38,8 +28,7 @@ class AlertTransportFactory extends Factory
         string $headers = 'test=header',
         string $username = '',
         string $password = ''
-    )
-    {
+    ): AlertTransportFactory {
         $config = [
             'api-method' => $method,
             'api-url' => $url,

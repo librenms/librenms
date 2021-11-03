@@ -12,7 +12,6 @@
  */
 
 use LibreNMS\Alert\Transport;
-use LibreNMS\Config;
 
 if (Auth::user()->hasGlobalAdmin()) {
     ?>
