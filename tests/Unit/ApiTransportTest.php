@@ -14,6 +14,7 @@ class ApiTransportTest extends TestCase
 
     public function testGetMultilineVariables(): void
     {
+        /** @var AlertTransport $transport */
         $transport = AlertTransport::factory()->api('text={{ $msg }}')->make();
 
         $this->mockGuzzleClient([
@@ -34,6 +35,7 @@ class ApiTransportTest extends TestCase
 
     public function testPostMultilineVariables(): void
     {
+        /** @var AlertTransport $transport */
         $transport = AlertTransport::factory()->api(
             'text={{ $msg }}',
             'post',
