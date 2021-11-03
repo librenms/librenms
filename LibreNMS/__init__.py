@@ -21,6 +21,8 @@ from .queuemanager import (
     AlertQueueManager,
     PollerQueueManager,
     DiscoveryQueueManager,
+    WinRMPollerQueueManager,
+    # WinRMDiscoveryQueueManager,
 )
 from .service import Service, ServiceConfig
 

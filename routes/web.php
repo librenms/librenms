@@ -46,6 +46,17 @@ Route::group(['middleware' => ['auth'], 'guard' => 'auth'], function () {
     Route::get('overview', 'OverviewController@index')->name('overview');
     Route::get('/', 'OverviewController@index')->name('home');
     Route::view('vminfo', 'vminfo');
+    
+    Route::get('winrm/applications', 'WinRMController@applications');
+
+    // Route::group(['prefix' => 'winrm'], function () {
+    //     Route::get('', 'WinRMController@applications')->name('winrm.applications');
+    //     Route::get('log', 'PollerController@logTab')->name('poller.log');
+    //     Route::get('groups', 'PollerController@groupsTab')->name('poller.groups');
+    //     Route::get('settings', 'PollerController@settingsTab')->name('poller.settings');
+    //     Route::get('performance', 'PollerController@performanceTab')->name('poller.performance');
+    //     Route::resource('{id}/settings', 'PollerSettingsController', ['as' => 'poller'])->only(['update', 'destroy']);
+    // });
 
     // Device Tabs
     Route::group(['prefix' => 'device/{device}', 'namespace' => 'Device\Tabs', 'as' => 'device.'], function () {

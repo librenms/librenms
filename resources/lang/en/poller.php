@@ -75,6 +75,30 @@ return [
                 'description' => 'Ping Frequency',
                 'help' => 'How often to check ping on this node.  Warning! If you change this you must make additional changes.  Check the Fast Ping docs.',
             ],
+            'winrmpoller_enabled' => [
+                'description' => 'WinRM Poller Enabled',
+                'help' => 'Scan Windows hosts with WinRM to get services and applications',
+            ],
+            'winrmpoller_workers' => [
+                'description' => 'WinRM Poller Workers',
+                'help' => 'Amount of WinRM workers to spawn on this node.',
+            ],
+            'winrmpoller_frequency' => [
+                'description' => 'WinRM Poller Frequency',
+                'help' => 'How often WinRM checks services on windows machines on this node.',
+            ],
+            'winrmdiscovery_enabled' => [
+                'description' => 'WinRM Discovery Enabled',
+                'help' => 'Scan Windows hosts with WinRM to get services and applications',
+            ],
+            'winrmdiscovery_workers' => [
+                'description' => 'WinRM Discovery Workers',
+                'help' => 'Amount of WinRM workers to spawn on this node.',
+            ],
+            'winrmdiscovery_frequency' => [
+                'description' => 'WinRM Discovery Frequency',
+                'help' => 'How often WinRM checks installed applications on windows machines on this node.',
+            ],
             'update_enabled' => [
                 'description' => 'Daily Maintenance Enabled',
                 'help' => 'Run daily.sh maintenance script and restart the dispatcher service afterwards.',

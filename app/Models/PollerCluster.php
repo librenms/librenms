@@ -2,7 +2,8 @@
 /**
  * PollerCluster.php
  *
- * -Description-
+ * -Description- 
+ * Settings > Poller > Settings: Poller Settings Menu
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -216,6 +217,46 @@ class PollerCluster extends Model
                 'type' => 'integer',
                 'units' => 'seconds',
                 'advanced' => true,
+            ],
+            [
+                'name' => 'winrmpoller_enabled',
+                'default' => \LibreNMS\Config::get('service_winrmpoller_enabled'),
+                'value' => (bool) ($this->winrmpoller_enabled ?? \LibreNMS\Config::get('service_winrmpoller_enabled')),
+                'type' => 'boolean',
+            ],
+            [
+                'name' => 'winrmpoller_workers',
+                'default' => \LibreNMS\Config::get('service_winrmpoller_workers'),
+                'value' => $this->winrmpoller_workers ?? \LibreNMS\Config::get('service_winrmpoller_workers'),
+                'type' => 'integer',
+                'units' => 'workers',
+            ],
+            [
+                'name' => 'winrmpoller_frequency',
+                'default' => \LibreNMS\Config::get('service_winrmpoller_frequency'),
+                'value' => $this->winrmpoller_frequency ?? \LibreNMS\Config::get('service_winrmpoller_frequency'),
+                'type' => 'integer',
+                'units' => 'seconds',
+            ],
+            [
+                'name' => 'winrmdiscovery_enabled',
+                'default' => \LibreNMS\Config::get('service_winrmdiscovery_enabled'),
+                'value' => (bool) ($this->winrmdiscovery_enabled ?? \LibreNMS\Config::get('service_winrmdiscovery_enabled')),
+                'type' => 'boolean',
+            ],
+            [
+                'name' => 'winrmdiscovery_workers',
+                'default' => \LibreNMS\Config::get('service_winrmdiscovery_workers'),
+                'value' => $this->winrmdiscovery_workers ?? \LibreNMS\Config::get('service_winrmdiscovery_workers'),
+                'type' => 'integer',
+                'units' => 'workers',
+            ],
+            [
+                'name' => 'winrmdiscovery_frequency',
+                'default' => \LibreNMS\Config::get('service_winrmdiscovery_frequency'),
+                'value' => $this->winrmdiscovery_frequency ?? \LibreNMS\Config::get('service_winrmdiscovery_frequency'),
+                'type' => 'integer',
+                'units' => 'seconds',
             ],
             [
                 'name' => 'update_enabled',

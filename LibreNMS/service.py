@@ -50,6 +50,11 @@ class ServiceConfig:
             self.frequency = frequency
             self.calculate = calculate
 
+    class WinRMUser:
+        def __init__(self, username=None, password=None):
+            self.username = username
+            self.password = password
+
     # config variables with defaults
     BASE_DIR = os.path.abspath(
         os.path.join(os.path.dirname(os.path.realpath(__file__)), os.pardir)
@@ -72,6 +77,9 @@ class ServiceConfig:
     discovery = PollerConfig(16, 21600)
     billing = PollerConfig(2, 300, 60)
     ping = PollerConfig(1, 60)
+    winrm = WinRMUser()
+    winrmpoller = PollerConfig(8, 300)
+    winrmdiscovery = PollerConfig(8, 3600)
     down_retry = 60
     update_enabled = True
     update_frequency = 86400
@@ -159,6 +167,31 @@ class ServiceConfig:
         )
         self.ping.enabled = config.get("service_ping_enabled", False)
         self.ping.frequency = config.get("ping_rrd_step", ServiceConfig.ping.frequency)
+        self.winrmpoller.enabled = config.get(
+            "service_winrmpoller_enabled", False
+        )
+        self.winrmpoller.workers = config.get(
+            "service_winrmpoller_workers", ServiceConfig.winrmpoller.workers
+        )
+        self.winrmpoller.frequency = config.get(
+            "services_winrmpoller_frequency", ServiceConfig.winrmpoller.frequency
+        )
+        self.winrmdiscovery.enabled = config.get(
+            "service_winrmdiscovery_enabled", False
+        )
+        self.winrmdiscovery.workers = config.get(
+            "service_wwinrmdiscovery_workers", ServiceConfig.winrmdiscovery.workers
+        )
+        self.winrmdiscovery.frequency = config.get(
+            "services_winrmdiscovery_frequency", ServiceConfig.winrmdiscovery.frequency
+        )
+        self.winrm.username = config["winrm"].get(
+            "username", ServiceConfig.winrm.username
+        )
+        self.winrm.password = config["winrm"].get(
+            "password", ServiceConfig.winrm.password
+        )
+        
         self.down_retry = config.get(
             "service_poller_down_retry", ServiceConfig.down_retry
         )
@@ -290,6 +323,21 @@ class ServiceConfig:
                 self.ping.enabled = settings["ping_enabled"]
             if settings["ping_frequency"] is not None:
                 self.ping.frequency = settings["ping_frequency"]
+
+            if settings["winrmpoller_enabled"] is not None:
+                self.winrmpoller.enabled = settings["winrmpoller_enabled"]
+            if settings["winrmpoller_workers"] is not None:
+                self.winrmpoller.frequency = settings["winrmpoller_workers"]
+            if settings["winrmpoller_frequency"] is not None:
+                self.winrmpoller.frequency = settings["winrmpoller_frequency"]
+
+            if settings["winrmdiscovery_enabled"] is not None:
+                self.winrmdiscovery.enabled = settings["winrmdiscovery_enabled"]
+            if settings["winrmdiscovery_workers"] is not None:
+                self.winrmdiscovery.frequency = settings["winrmdiscovery_workers"]
+            if settings["winrmdiscovery_frequency"] is not None:
+                self.winrmdiscovery.frequency = settings["winrmdiscovery_frequency"]
+
             if settings["update_enabled"] is not None:
                 self.update_enabled = settings["update_enabled"]
             if settings["update_frequency"] is not None:
@@ -336,6 +384,7 @@ class Service:
     def __init__(self):
         self.start_time = time.time()
         self.config.populate()
+        
         self._db = LibreNMS.DB(self.config)
         self.config.load_poller_config(self._db)
 
@@ -436,6 +485,10 @@ class Service:
         )
         self.queue_managers["ping"] = LibreNMS.PingQueueManager(self.config, self._lm)
 
+        self.queue_managers["winrmpoller"] = LibreNMS.WinRMPollerQueueManager(self.config, self._lm)
+
+        # self.queue_managers["winrmdiscovery"] = LibreNMS.WinRMDiscoveryQueueManager(self.config, self._lm)
+
         if self.config.update_enabled:
             self.daily_timer.start()
         self.stats_timer.start()
@@ -452,7 +505,7 @@ class Service:
             )
         )
         logger.info(
-            "Queue Workers: Discovery={} Poller={} Services={} Alerting={} Billing={} Ping={}".format(
+            "Queue Workers: Discovery={} Poller={} Services={} Alerting={} Billing={} Ping={} WinRM Polling={} WinRM Discovery={}".format(
                 self.config.discovery.workers
                 if self.config.discovery.enabled
                 else "disabled",
@@ -465,6 +518,8 @@ class Service:
                 "enabled" if self.config.alerting.enabled else "disabled",
                 "enabled" if self.config.billing.enabled else "disabled",
                 "enabled" if self.config.ping.enabled else "disabled",
+                "enabled" if self.config.winrmpoller.enabled else "disabled",
+                "enabled" if self.config.winrmdiscovery.enabled else "disabled",
             )
         )
 

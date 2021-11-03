@@ -5035,18 +5035,64 @@
             "type": "integer",
             "units": "Seconds"
         },
+        "service_winrmpoller_enabled": {
+            "default": false,
+            "group": "poller",
+            "section": "distributed",
+            "order": 22,
+            "type": "boolean"
+        },
+        "service_winrmpoller_workers": {
+            "default": 6,
+            "group": "poller",
+            "section": "distributed",
+            "order": 23,
+            "type": "integer",
+            "units": "Workers"
+        },
+        "service_winrmpoller_frequency": {
+            "default": 300,
+            "group": "poller",
+            "section": "distributed",
+            "order": 24,
+            "type": "integer",
+            "units": "Seconds"
+        },
+        "service_winrmdiscovery_enabled": {
+            "default": false,
+            "group": "poller",
+            "section": "distributed",
+            "order": 25,
+            "type": "boolean"
+        },
+        "service_winrmdiscovery_workers": {
+            "default": 6,
+            "group": "poller",
+            "section": "distributed",
+            "order": 26,
+            "type": "integer",
+            "units": "Workers"
+        },
+        "service_winrmdiscovery_frequency": {
+            "default": 3600,
+            "group": "poller",
+            "section": "distributed",
+            "order": 27,
+            "type": "integer",
+            "units": "Seconds"
+        },
         "service_update_enabled": {
             "default": true,
             "group": "poller",
             "section": "distributed",
-            "order": 22,
+            "order": 28,
             "type": "boolean"
         },
         "service_update_frequency": {
             "default": 86400,
             "group": "poller",
             "section": "distributed",
-            "order": 23,
+            "order": 29,
             "type": "integer",
             "units": "Seconds"
         },
@@ -5054,7 +5100,7 @@
             "default": "INFO",
             "group": "poller",
             "section": "distributed",
-            "order": 24,
+            "order": 30,
             "type": "select",
             "options": {
                 "DEBUG": "DEBUG",
@@ -5068,8 +5114,21 @@
             "default": false,
             "group": "poller",
             "section": "distributed",
-            "order": 25,
+            "order": 31,
             "type": "boolean"
+        },
+        "winrm.username": {
+            "default": "domain\\username",
+            "type": "text",
+            "group": "poller",
+            "section": "winrm",
+            "order": 1
+        },
+        "winrm.password": {
+            "type": "password",
+            "group": "poller",
+            "section": "winrm",
+            "order": 2
         },
         "sfdp": {
             "default": "/usr/bin/sfdp",

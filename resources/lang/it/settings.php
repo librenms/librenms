@@ -47,6 +47,7 @@ return [
             'distributed' => ['name' => 'Distributed Poller'],
             'graphite' => ['name' => 'Datastore: Graphite'],
             'influxdb' => ['name' => 'Datastore: InfluxDB'],
+            'winrm' => ['name' => 'Poller: WinRM'],
             'opentsdb' => ['name' => 'Datastore: OpenTSDB'],
             'ping' => ['name' => 'Ping'],
             'prometheus' => ['name' => 'Datastore: Prometheus'],
@@ -743,6 +744,16 @@ return [
             'verifySSL' => [
                 'description' => 'Verify SSL',
                 'help' => 'Verify the SSL certificate is valid and trusted',
+            ],
+        ],
+        'winrm' => [
+            'username' => [
+                'description' => 'Username',
+                'help' => 'Username to login to Windows Machines Using Windows Remote Management.',
+            ],
+            'password' => [
+                'description' => 'Password',
+                'help' => 'Password to login to Windows Machines Using Windows Remote Management.',
             ],
         ],
         'ipmitool' => [

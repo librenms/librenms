@@ -7,6 +7,7 @@ from subprocess import CalledProcessError
 import pymysql
 
 import LibreNMS
+import LibreNMS.WinRMScan as WinRMScan
 
 logger = logging.getLogger(__name__)
 
@@ -566,3 +567,53 @@ class DiscoveryQueueManager(TimedQueueManager):
                         )
                     )
                     self.unlock(device_id)
+
+
+class WinRMPollerQueueManager(TimedQueueManager):
+    def __init__(self, config, lock_manager):
+        logger.info("Polling WinRM Starting")
+        """
+        A TimedQueueManager to manage dispatch and workers for WinRM Services
+
+        :param config: LibreNMS.ServiceConfig reference to the service config object
+        :param lock_manager: the single instance of lock manager
+        """
+        TimedQueueManager.__init__(
+            self, config, lock_manager, "winrmpoller", True, config.winrmpoller.enabled
+        )
+        self._db = LibreNMS.DB(self.config)
+
+    def do_dispatch(self):
+        try:
+            devices = self._db.query(
+                "SELECT `device_id`, `poller_group` FROM `devices` WHERE (`disabled` = 0) AND (`os` = 'windows') AND (`status` = 1)"
+            )
+            for device in devices:
+                # self.post_work(device[0], device[1])
+                # Need to send object to worker for device name and process id.
+                self.post_work(device[0], device[1])
+
+        except pymysql.err.Error as e:
+            logger.critical("DB Exception ({})".format(e))
+
+    def do_work(self, device_id, group):
+        if self.lock(device_id, timeout=LibreNMS.normalize_wait(self.config.winrmpoller.frequency)):
+            logger.info("Polling WinRM device {}".format(device_id))
+            exit_code, output = WinRMScan.process_polling(self, device_id)
+            exit_code, output = WinRMScan.process_discovery(self, device_id)
+            if exit_code == 0:
+                self.unlock(device_id)
+            elif exit_code == 1:
+                logger.info(
+                    "Unable to login to device {}, waiting {}s for retry".format(
+                        device_id, self.config.down_retry
+                    )
+                )
+                self.unlock(device_id)
+            else:
+                logger.error(
+                    "Polling device {} failed with exit code {}: {}".format(
+                        device_id, exit_code, output
+                    )
+                )
+                self.unlock(device_id)
