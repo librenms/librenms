@@ -1,0 +1,716 @@
+-- =============================================================================
+-- Copyright (c) 2004-2018 New H3C Tech.  Co.  , Ltd.  All rights reserved.
+--
+-- Description: Multiprotocol Label Switching MIB
+-- Reference:
+-- Version: V1.4
+-- History:
+--   V1.0 2013-06-13 Initial version Created by Neng Yan
+--   V1.1 2014-12-17 Modified by Neng Yan, Added hh3cMplsExtBfdTable
+--   V1.2 2015-06-16 Modified by Li Yun, Added hh3cMplsExtVpnStatsTable
+--   V1.3 2017-02-17 Modified by Liu Qingye, Added hh3cMplsExtVpnTable
+--   V1.4 2018-08-04 Modified by Lin jiang, Added hh3cMplsExtStaticLspTable
+-- =============================================================================
+HH3C-MPLSEXT-MIB DEFINITIONS ::= BEGIN
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Unsigned32
+        FROM SNMPv2-SMI
+    RowStatus, TruthValue, DisplayString
+        FROM SNMPv2-TC
+    InetAddressType,InetAddress,InetAddressIPv4
+        FROM INET-ADDRESS-MIB
+    InterfaceIndexOrZero
+        FROM IF-MIB
+    hh3cCommon
+        FROM HH3C-OID-MIB
+    Counter64
+        FROM SNMPv2-SMI
+    ;
+
+-- =============================================================================
+-- module identity part
+-- =============================================================================
+hh3cMplsExt MODULE-IDENTITY
+    LAST-UPDATED
+        "201808041800Z"   -- Aug 04, 2018 at 18:00 GMT
+    ORGANIZATION
+        "New H3C Technologies Co., Ltd."
+    CONTACT-INFO
+        "Platform Team New H3C Technologies Co., Ltd.
+         Hai-Dian District Beijing P.R.  China
+         http://www.h3c.com
+         Zip:100085"
+    DESCRIPTION
+        "Multiprotocol Label Switching MIB"
+    REVISION
+        "201808041800Z"   -- Aug 04, 2018 at 18:00 GMT
+    DESCRIPTION
+        "Added hh3cMplsExtStaticLspTable."
+    REVISION
+        "201702171800Z"   -- Feb 17, 2017 at 18:00 GMT
+    DESCRIPTION
+        "Added hh3cMplsExtVpnTable."
+    REVISION
+        "201506161800Z"   -- Jun 16, 2015 at 18:00 GMT
+    DESCRIPTION
+        "Added hh3cMplsExtVpnStatsTable."
+    REVISION
+        "201412171200Z"   -- Dec 17, 2014 at 18:00 GMT
+    DESCRIPTION
+        "Added hh3cMplsExtBfdTable."
+    REVISION
+        "201306131800Z"   -- Jan 13, 2013 at 18:00 GMT
+    DESCRIPTION
+        "Initial version of this MIB."
+    ::= { hh3cCommon 142 }
+
+-- =============================================================================
+-- object definition begin
+-- =============================================================================
+hh3cMplsExtObjects      OBJECT IDENTIFIER ::= { hh3cMplsExt 1 }
+
+hh3cMplsExtScalarGroup  OBJECT IDENTIFIER ::= { hh3cMplsExtObjects 1 }
+
+hh3cMplsExtLsrID    OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE (0..32))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The Label Switching Router's Identifier."
+    ::= { hh3cMplsExtScalarGroup 1 }
+
+hh3cMplsExtLdpStatus    OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The global configuration of Label Distribution Protocol(LDP)."
+    ::= { hh3cMplsExtScalarGroup 2 }
+
+-- =============================================================================
+-- hh3cMplsExtTable Definition
+-- =============================================================================
+hh3cMplsExtTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cMplsExtEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table for configuring
+        Multiprotocol Label Switching(MPLS) parameters."
+    ::= { hh3cMplsExtObjects 2 }
+
+hh3cMplsExtEntry   OBJECT-TYPE
+    SYNTAX      Hh3cMplsExtEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry for configuring MPLS parameters."
+    INDEX
+    {
+        hh3cMplsExtIndex
+    }
+    ::= { hh3cMplsExtTable 1 }
+
+Hh3cMplsExtEntry ::=
+    SEQUENCE
+    {
+        hh3cMplsExtIndex               Unsigned32,
+        hh3cMplsExtCapability          TruthValue,
+        hh3cMplsExtMtu                 Unsigned32,
+        hh3cMplsExtRowStatus           RowStatus
+    }
+
+hh3cMplsExtIndex   OBJECT-TYPE
+    SYNTAX      Unsigned32(1..4294967295)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Index of MPLS interface."
+    ::= { hh3cMplsExtEntry 1 }
+
+hh3cMplsExtCapability    OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The MPLS capability of an interface."
+    DEFVAL { false }
+    ::= { hh3cMplsExtEntry 2 }
+
+hh3cMplsExtMtu     OBJECT-TYPE
+    SYNTAX      Unsigned32(46..65535)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The MPLS Maximum Transmission Unit(MTU) of an interface."
+    ::= { hh3cMplsExtEntry 3 }
+
+hh3cMplsExtRowStatus     OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Operation status of this table entry."
+    ::= { hh3cMplsExtEntry 4 }
+-- =============================================================================
+-- End of hh3cMplsExtTable Definition
+-- =============================================================================
+
+-- =============================================================================
+-- hh3cMplsExtLdpTable Definition
+-- =============================================================================
+hh3cMplsExtLdpTable     OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cMplsExtLdpEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table for configuring LDP parameters."
+    ::= { hh3cMplsExtObjects 3 }
+
+hh3cMplsExtLdpEntry     OBJECT-TYPE
+    SYNTAX      Hh3cMplsExtLdpEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry for configuring LDP parameters."
+    INDEX
+    {
+        hh3cMplsExtLdpIndex
+    }
+    ::= { hh3cMplsExtLdpTable 1 }
+
+Hh3cMplsExtLdpEntry ::=
+    SEQUENCE
+    {
+        hh3cMplsExtLdpIndex                 Unsigned32,
+        hh3cMplsExtLdpCapability            TruthValue,
+        hh3cMplsExtLdpRowStatus             RowStatus
+    }
+
+hh3cMplsExtLdpIndex     OBJECT-TYPE
+    SYNTAX      Unsigned32(1..4294967295)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Index of LDP interface."
+    ::= { hh3cMplsExtLdpEntry 1 }
+
+hh3cMplsExtLdpCapability    OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The LDP capability of an interface."
+    DEFVAL { false }
+    ::= { hh3cMplsExtLdpEntry 2 }
+
+hh3cMplsExtLdpRowStatus     OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Operation status of this table entry.  A row entry cannot
+        be modified when the value of this object is 'active'."
+    ::= { hh3cMplsExtLdpEntry 3 }
+-- =============================================================================
+-- End of hh3cMplsExtLdpTable Definition
+-- =============================================================================
+
+-- =============================================================================
+-- hh3cMplsExtBfdTable Definition
+-- =============================================================================
+hh3cMplsExtBfdTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cMplsExtBfdEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table of MPLS Bidirectional Forwarding Detection(BFD) sessions."
+    ::= { hh3cMplsExtObjects 4 }
+
+hh3cMplsExtBfdEntry   OBJECT-TYPE
+    SYNTAX      Hh3cMplsExtBfdEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry in this table represents information on a single session."
+    INDEX
+    {
+        hh3cMplsExtBfdLocalDiscr
+    }
+    ::= { hh3cMplsExtBfdTable 1 }
+
+Hh3cMplsExtBfdEntry ::=
+    SEQUENCE
+    {
+        hh3cMplsExtBfdLocalDiscr            Unsigned32,
+        hh3cMplsExtBfdType                  INTEGER,
+        hh3cMplsExtBfdBindIfIndex           InterfaceIndexOrZero,
+        hh3cMplsExtBfdBindIfName            DisplayString,
+        hh3cMplsExtBfdXcIndex               OCTET STRING,
+        hh3cMplsExtBfdPwBackupFlag          INTEGER,
+        hh3cMplsExtBfdPwId                  Unsigned32,
+        hh3cMplsExtBfdVsiIndex              Unsigned32,
+        hh3cMplsExtBfdPwPeerIpType          InetAddressType,
+        hh3cMplsExtBfdPwPeerIp              InetAddress,
+        hh3cMplsExtBfdPwSPE                 INTEGER,
+        hh3cMplsExtBfdPwEncapType           INTEGER
+    }
+
+hh3cMplsExtBfdLocalDiscr   OBJECT-TYPE
+    SYNTAX      Unsigned32(1..4294967295)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The local discriminator of the BFD session."
+    ::= { hh3cMplsExtBfdEntry 1 }
+
+hh3cMplsExtBfdType    OBJECT-TYPE
+    SYNTAX      INTEGER {
+                        unknown(1),
+                        lsp(2),
+                        vpwsPw(3),
+                        vplsPw(4),
+                        te(5)
+                     }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The type of the BFD session."
+    ::= { hh3cMplsExtBfdEntry 2 }
+
+hh3cMplsExtBfdBindIfIndex   OBJECT-TYPE
+    SYNTAX      InterfaceIndexOrZero
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object displays tunnel interface index when the value of
+         hh3cMplsExtBfdType is te(5), and displays interface index of
+         an Attachment Circuit(AC) which is bound to a Pseudowire(PW) when
+         the value of hh3cMplsExtBfdType is vpwsPw(3).  This object is
+         invalid when the value of hh3cMplsExtBfdType is not te(5) or
+         vpwsPw(3), then this object contains a zero value."
+    ::= { hh3cMplsExtBfdEntry 3 }
+
+hh3cMplsExtBfdBindIfName   OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object displays tunnel interface name when the value of
+         hh3cMplsExtBfdType is te(5), and displays interface name of
+         an AC which is bound to a PW when the value of hh3cMplsExtBfdType
+         is vpwsPw(3).  This object is invalid when the value of
+         hh3cMplsExtBfdType is not te(5) or vpwsPw(3), then this object
+         contains a zero-length string."
+    ::= { hh3cMplsExtBfdEntry 4 }
+
+hh3cMplsExtBfdXcIndex   OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE (0..24))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Primary index for MplsOutSegmentEntry.  This object is invalid when
+        the value of hh3cMplsExtBfdType is not lsp(2), then this object
+        contains a zero-length string."
+    ::= { hh3cMplsExtBfdEntry 5 }
+
+hh3cMplsExtBfdPwBackupFlag     OBJECT-TYPE
+    SYNTAX      INTEGER {
+                        none(1),
+                        primary(2),
+                        backup(3)
+                     }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "PW flag."
+    ::= { hh3cMplsExtBfdEntry 6 }
+
+hh3cMplsExtBfdPwId     OBJECT-TYPE
+    SYNTAX      Unsigned32(0..4294967295)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "PW Identifier."
+    DEFVAL { 0 }
+    ::= { hh3cMplsExtBfdEntry 7 }
+
+hh3cMplsExtBfdVsiIndex     OBJECT-TYPE
+    SYNTAX      Unsigned32(1..4294967295)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Virtual Switch Instance(VSI) index."
+    DEFVAL { 4294967295 }
+    ::= { hh3cMplsExtBfdEntry 8 }
+
+hh3cMplsExtBfdPwPeerIpType     OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The type of peer address.  Typically, this
+        address type is IPv4 or IPv6, with a prefix length
+        of 32 or 128, respectively."
+    ::= { hh3cMplsExtBfdEntry 9 }
+
+hh3cMplsExtBfdPwPeerIp     OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Peer address of the PW."
+    ::= { hh3cMplsExtBfdEntry 10 }
+
+hh3cMplsExtBfdPwSPE     OBJECT-TYPE
+    SYNTAX      INTEGER {
+                        none(1),
+                        upe(2),
+                        spe(3)
+                     }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Node information of the Virtual Private Wire Service(VPWS) PW,
+        User facing-Provider Edge(UPE) or Switching Provider Edge(SPE)."
+    ::= { hh3cMplsExtBfdEntry 11 }
+
+hh3cMplsExtBfdPwEncapType     OBJECT-TYPE
+    SYNTAX      INTEGER {
+                        unknown(1),
+                        frDlciMartini(2),
+                        atmAal5Sdu(3),
+                        atmTransCell(4),
+                        vlan(5),
+                        ethernet(6),
+                        hdlc(7),
+                        ppp(8),
+                        cesom(9),
+                        atmNto1Vcc(10),
+                        atmNto1Vpc(11),
+                        ipInterworking(12),
+                        atm1to1Vcc(13),
+                        atm1to1Vpc(14),
+                        atmAal5Pdu(15),
+                        frPort(16),
+                        cep(17),
+                        satopE1(18),
+                        satopT1(19),
+                        satopE3(20),
+                        satopT3(21),
+                        esopsnBasic(22),
+                        tdmoipAal1Mode(23),
+                        tdmCesopsnWithCas(24),
+                        tdmoipAal2Mode(25),
+                        frDlci(26)
+                     }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Encapsulation type of the PW."
+    ::= { hh3cMplsExtBfdEntry 12 }
+-- =============================================================================
+-- End of hh3cMplsExtBfdTable Definition
+-- =============================================================================
+
+-- =============================================================================
+-- hh3cMplsExtVpnStatsTable Definition
+-- =============================================================================
+hh3cMplsExtVpnStatsTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cMplsExtVpnStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A table contains statistical information about packets
+         received from and sent by each VPN."
+    ::= { hh3cMplsExtObjects 5 }
+
+hh3cMplsExtVpnStatsEntry   OBJECT-TYPE
+    SYNTAX      Hh3cMplsExtVpnStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry in this table contains statistical
+        information about packets received from and sent by a VPN."
+    INDEX
+    {
+        hh3cMplsExtVpnStatsVrfIndex
+    }
+    ::= { hh3cMplsExtVpnStatsTable 1 }
+
+Hh3cMplsExtVpnStatsEntry ::=
+    SEQUENCE
+    {
+        hh3cMplsExtVpnStatsVrfIndex            Unsigned32,
+        hh3cMplsExtVpnStatsVpnName             OCTET STRING,
+        hh3cMplsExtVpnStatsInOctets            Counter64,
+        hh3cMplsExtVpnStatsInPackets           Counter64,
+        hh3cMplsExtVpnStatsInErrors            Counter64,
+        hh3cMplsExtVpnStatsInDiscards          Counter64,
+        hh3cMplsExtVpnStatsOutOctets           Counter64,
+        hh3cMplsExtVpnStatsOutPackets          Counter64,
+        hh3cMplsExtVpnStatsOutErrors           Counter64,
+        hh3cMplsExtVpnStatsOutDiscards         Counter64
+    }
+
+hh3cMplsExtVpnStatsVrfIndex   OBJECT-TYPE
+    SYNTAX      Unsigned32(1..4294967295)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The index of a VPN."
+    ::= { hh3cMplsExtVpnStatsEntry 1 }
+
+hh3cMplsExtVpnStatsVpnName   OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE (1..31))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The name of a VPN."
+    ::= { hh3cMplsExtVpnStatsEntry 2 }
+
+hh3cMplsExtVpnStatsInOctets     OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of octets received from a VPN."
+    ::= { hh3cMplsExtVpnStatsEntry 3 }
+
+hh3cMplsExtVpnStatsInPackets   OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of packets received from a VPN."
+    ::= { hh3cMplsExtVpnStatsEntry 4 }
+
+hh3cMplsExtVpnStatsInErrors     OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of error packets received from a VPN."
+    ::= { hh3cMplsExtVpnStatsEntry 5 }
+
+hh3cMplsExtVpnStatsInDiscards   OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of incoming packets,
+        which were chosen to be discarded by a VPN even
+        though no errors had been detected to prevent their
+        being transmitted."
+    ::= { hh3cMplsExtVpnStatsEntry 6 }
+
+hh3cMplsExtVpnStatsOutOctets     OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of octets sent by a VPN."
+    ::= { hh3cMplsExtVpnStatsEntry 7 }
+
+hh3cMplsExtVpnStatsOutPackets     OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of packets sent by a VPN."
+    ::= { hh3cMplsExtVpnStatsEntry 8 }
+
+hh3cMplsExtVpnStatsOutErrors     OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of packets that could not be sent by a VPN
+        due to errors."
+    ::= { hh3cMplsExtVpnStatsEntry 9 }
+
+hh3cMplsExtVpnStatsOutDiscards     OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Number of outgoing packets which were chosen to be discarded
+        by a VPN even though no errors had been detected to prevent
+        their being transmitted.  One possible reason for
+        discarding such a packet could be to free up
+        buffer space."
+    ::= { hh3cMplsExtVpnStatsEntry 10 }
+
+-- =============================================================================
+-- End of hh3cMplsExtVpnStatsTable Definition
+-- =============================================================================
+
+-- =============================================================================
+-- hh3cMplsExtVpnTable Definition
+-- =============================================================================
+hh3cMplsExtVpnTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cMplsExtVpnEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains MPLS VPN information."
+    ::= { hh3cMplsExtObjects 6 }
+
+hh3cMplsExtVpnEntry   OBJECT-TYPE
+    SYNTAX      Hh3cMplsExtVpnEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry in this table represents information on a single VPN instance."
+    INDEX
+    {
+        hh3cMplsExtVpnName
+    }
+    ::= { hh3cMplsExtVpnTable 1 }
+
+Hh3cMplsExtVpnEntry ::=
+    SEQUENCE
+    {
+        hh3cMplsExtVpnName                  OCTET STRING,
+        hh3cMplsExtVrfIndex                 Unsigned32
+    }
+
+hh3cMplsExtVpnName   OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE (1..31))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The name of a VPN instance."
+    ::= { hh3cMplsExtVpnEntry 1 }
+
+hh3cMplsExtVrfIndex   OBJECT-TYPE
+    SYNTAX      Unsigned32(0..4294967295)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The index of a VPN instance."
+    ::= { hh3cMplsExtVpnEntry 2 }
+
+-- =============================================================================
+-- End of hh3cMplsExtVpnTable Definition
+-- =============================================================================
+
+-- =============================================================================
+-- hh3cMplsExtStaticLspTable Definition
+-- =============================================================================
+hh3cMplsExtStaticLspTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cMplsExtStaticLspEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains MPLS static LSP information."
+    ::= { hh3cMplsExtObjects 7 }
+
+hh3cMplsExtStaticLspEntry   OBJECT-TYPE
+    SYNTAX      Hh3cMplsExtStaticLspEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry in this table represents information on a single static LSP."
+    INDEX
+    {
+        hh3cMplsExtStaticLspName
+    }
+    ::= { hh3cMplsExtStaticLspTable 1 }
+
+Hh3cMplsExtStaticLspEntry ::=
+   SEQUENCE
+    {
+        hh3cMplsExtStaticLspName             OCTET STRING,
+        hh3cMplsExtStaticLspType             INTEGER,
+        hh3cMplsExtStaticLspInLabel          Unsigned32,
+        hh3cMplsExtStaticLspOutLabel         Unsigned32,
+        hh3cMplsExtStaticLspDestAddr         InetAddressIPv4,
+        hh3cMplsExtStaticLspDestAddrMaskLen  Unsigned32,
+        hh3cMplsExtStaticLspNextHopAddr      InetAddressIPv4,
+        hh3cMplsExtStaticLspOutIfIndex       InterfaceIndexOrZero
+    }
+
+hh3cMplsExtStaticLspName   OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE (1..15))
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The name of the static LSP."
+    ::= { hh3cMplsExtStaticLspEntry 1 }
+
+hh3cMplsExtStaticLspType    OBJECT-TYPE
+    SYNTAX      INTEGER {
+                        ingress(1),
+                        transit(2),
+                        egress(3)
+                     }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The type of the static LSP."
+    ::= { hh3cMplsExtStaticLspEntry 2 }
+
+hh3cMplsExtStaticLspInLabel   OBJECT-TYPE
+    SYNTAX      Unsigned32(16..1048575)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object represents the incoming label for the static LSP.  This
+         object is invalid when the value of hh3cMplsExtStaticLspType is
+         ingress."
+    ::= { hh3cMplsExtStaticLspEntry 3 }
+
+hh3cMplsExtStaticLspOutLabel   OBJECT-TYPE
+    SYNTAX      Unsigned32(0..1048575)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object represents the outgoing label for the static LSP.  This
+         object is invalid when the value of hh3cMplsExtStaticLspType is
+         egress."
+    ::= { hh3cMplsExtStaticLspEntry 4 }
+
+hh3cMplsExtStaticLspDestAddr   OBJECT-TYPE
+    SYNTAX      InetAddressIPv4
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The destination address of the static LSP.  This object is invalid when
+         the value of hh3cMplsExtStaticLspType is transit."
+    ::= { hh3cMplsExtStaticLspEntry 5 }
+
+hh3cMplsExtStaticLspDestAddrMaskLen   OBJECT-TYPE
+    SYNTAX      Unsigned32(0..32)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The mask length of the destination address.  This object is invalid when
+         the value of hh3cMplsExtStaticLspType is transit."
+    ::= { hh3cMplsExtStaticLspEntry 6 }
+
+hh3cMplsExtStaticLspNextHopAddr   OBJECT-TYPE
+    SYNTAX      InetAddressIPv4
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The nexthop address of the static LSP.  This object is invalid when the
+         value of hh3cMplsExtStaticLspType is egress."
+    ::= { hh3cMplsExtStaticLspEntry 7 }
+
+hh3cMplsExtStaticLspOutIfIndex   OBJECT-TYPE
+    SYNTAX      InterfaceIndexOrZero
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The index of the outgoing interface for this static LSP.  This object
+         is invalid when the value of hh3cMplsExtStaticLspType is egress, then
+         this object contains a zero value."
+    ::= { hh3cMplsExtStaticLspEntry 8 }
+
+-- =============================================================================
+-- End of hh3cMplsExtStaticLspTable Definition
+-- =============================================================================
+
+END
+

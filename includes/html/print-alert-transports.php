@@ -31,54 +31,21 @@ if (Auth::user()->hasGlobalAdmin()) {
 <?php
 
 // Iterate through each alert transport
-$query = 'SELECT `transport_id` AS `id`, `transport_name` AS `name`, `transport_type` AS `type`, `is_default`, `transport_config` AS `config` FROM `alert_transports` order by `name`';
-foreach (dbFetchRows($query) as $transport) {
-    echo "<tr id=\"alert-transport-{$transport['id']}\">";
-    echo '<td>' . $transport['name'] . '</td>';
-    echo '<td>' . $transport['type'] . '</td>';
-    if ($transport['is_default'] == true) {
-        echo '<td>Yes</td>';
-    } else {
-        echo '<td>No</td>';
-    }
+foreach (\App\Models\AlertTransport::all() as $transport) {
+    $instance = $transport->instance();
+    echo "<tr id=\"alert-transport-{$transport->transport_id}\">";
+    echo '<td>' . $transport->transport_name . '</td>';
+    echo '<td>' . $instance->name() . '</td>';
+    echo $transport->is_default ? '<td>Yes</td>' : '<td>No</td>';
+    echo '<td class="col-sm-4"><i>' . nl2br($instance->displayDetails()) . '</i></td>';
 
-    echo "<td class='col-sm-4'>";
-
-    // Iterate through transport config template to display config details
-    $class = 'LibreNMS\\Alert\\Transport\\' . ucfirst($transport['type']);
-    if (! method_exists($class, 'configTemplate')) {
-        //skip
-        continue;
-    }
-    $tmp = call_user_func($class . '::configTemplate');
-    $transport_config = json_decode($transport['config'], true);
-
-    foreach ($tmp['config'] as $item) {
-        if ($item['type'] == 'oauth') {
-            continue;
-        }
-
-        $val = $transport_config[$item['name']];
-        if ($item['type'] == 'password') {
-            $val = '<b>&bull;&bull;&bull;&bull;&bull;&bull;&bull;&bull;</b>';
-        }
-        // Match value to key name for select inputs
-        if ($item['type'] == 'select') {
-            $val = array_search($val, $item['options']);
-        }
-
-        echo '<i>' . $item['title'] . ': ' . $val . '<br/></i>';
-    }
-
-    echo '</td>';
     echo '<td>';
-
     // Add action buttons for admin users only
     if (Auth::user()->hasGlobalAdmin()) {
         echo "<div class='btn-group btn-group-sm' role='group'>";
-        echo "<button type='button' class='btn btn-primary btn-sm' data-toggle='modal' data-target='#edit-alert-transport' data-transport_id='" . $transport['id'] . "' name='edit-alert-rule' data-container='body' data-toggle='popover' data-content='Edit transport'><i class='fa fa-lg fa-pencil' aria-hidden='true'></i></button> ";
-        echo "<button type='button' class='btn btn-danger btn-sm' aria-label='Delete' data-toggle='modal' data-target='#delete-alert-transport' data-transport_id='" . $transport['id'] . "' name='delete-alert-transport' data-container='body' data-toggle='popover' data-content='Delete transport'><i class='fa fa-lg fa-trash' aria-hidden='true'></i></button>";
-        echo "<button type='button' class='btn btn-warning btn-sm' data-transport_id='" . $transport['id'] . "' data-transport='{$transport['type']}' name='test-transport' id='test-transport' data-toggle='popover' data-content='Test transport'><i class='fa fa-lg fa-check' aria-hidden='true'></i></button> ";
+        echo "<button type='button' class='btn btn-primary btn-sm' data-toggle='modal' data-target='#edit-alert-transport' data-transport_id='" . $transport->transport_id . "' name='edit-alert-rule' data-container='body' data-toggle='popover' data-content='Edit transport'><i class='fa fa-lg fa-pencil' aria-hidden='true'></i></button> ";
+        echo "<button type='button' class='btn btn-danger btn-sm' aria-label='Delete' data-toggle='modal' data-target='#delete-alert-transport' data-transport_id='" . $transport->transport_id . "' name='delete-alert-transport' data-container='body' data-toggle='popover' data-content='Delete transport'><i class='fa fa-lg fa-trash' aria-hidden='true'></i></button>";
+        echo "<button type='button' class='btn btn-warning btn-sm' data-transport_id='" . $transport->transport_id . "' data-transport='{$transport->transport_type}' name='test-transport' id='test-transport' data-toggle='popover' data-content='Test transport'><i class='fa fa-lg fa-check' aria-hidden='true'></i></button> ";
         echo '</div>';
     }
     echo '</td>';
@@ -140,7 +107,7 @@ foreach (dbFetchRows($query) as $group) {
         var transport = $this.data("transport");
         $.ajax({
             type: 'POST',
-            url: 'ajax_form.php',
+            url: '<?php echo route('alert.transports.test', ['transport' => ':transport_id']) ?>'.replace(':transport_id', transport_id),
             data: { type: "test-transport", transport_id: transport_id },
             dataType: "json",
             success: function(data){

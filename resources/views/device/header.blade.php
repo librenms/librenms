@@ -7,7 +7,7 @@
         @if($device->isUnderMaintenance())
             <span title="@lang('Scheduled Maintenance')" class="fa fa-wrench fa-fw fa-lg"></span>
         @endif
-        <span style="font-size: 20px;">@deviceLink($device)</span><br/>
+        <span style="font-size: 20px;"><x-device-link :device="$device" /></span><br/>
         <a href="{{ url('/devices/location=' . urlencode($device->location)) }}">{{ $device->location }}</a>
     </div>
     <div class="pull-right">

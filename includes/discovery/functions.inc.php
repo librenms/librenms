@@ -17,6 +17,7 @@ use LibreNMS\Config;
 use LibreNMS\Device\YamlDiscovery;
 use LibreNMS\Exceptions\HostExistsException;
 use LibreNMS\Exceptions\InvalidIpException;
+use LibreNMS\OS;
 use LibreNMS\Util\IP;
 use LibreNMS\Util\IPv6;
 
@@ -101,60 +102,48 @@ function discover_new_device($hostname, $device = [], $method = '', $interface =
 //end discover_new_device()
 
 /**
- * @param $device
- */
-function load_discovery(&$device)
-{
-    $yaml_discovery = Config::get('install_dir') . '/includes/definitions/discovery/' . $device['os'] . '.yaml';
-    if (file_exists($yaml_discovery)) {
-        $device['dynamic_discovery'] = Symfony\Component\Yaml\Yaml::parse(
-            file_get_contents($yaml_discovery)
-        );
-    } else {
-        unset($device['dynamic_discovery']);
-    }
-}
-
-/**
- * @param array $device The device to poll
- * @param bool $force_module Ignore device module overrides
+ * @param  array  $device  The device to poll
+ * @param  bool  $force_module  Ignore device module overrides
  * @return bool if the device was discovered or skipped
  */
 function discover_device(&$device, $force_module = false)
 {
     if ($device['snmp_disable'] == '1') {
-        return false;
+        return true;
     }
 
     global $valid;
 
     $valid = [];
     // Reset $valid array
-    $attribs = DeviceCache::getPrimary()->getAttribs();
-    $device['attribs'] = $attribs;
+    $device['attribs'] = DeviceCache::getPrimary()->getAttribs();
 
     $device_start = microtime(true);
     // Start counting device poll time
     echo $device['hostname'] . ' ' . $device['device_id'] . ' ' . $device['os'] . ' ';
 
-    $response = device_is_up($device, true);
+    $helper = new \LibreNMS\Polling\ConnectivityHelper(DeviceCache::getPrimary());
 
-    if ($response['status'] !== '1') {
+    if (! $helper->isUp()) {
         return false;
     }
 
     $discovery_devices = Config::get('discovery_modules', []);
     $discovery_devices = ['core' => true] + $discovery_devices;
 
+    /** @var \App\Polling\Measure\MeasurementManager $measurements */
+    $measurements = app(\App\Polling\Measure\MeasurementManager::class);
+    $measurements->checkpoint(); // don't count previous stats
+
     foreach ($discovery_devices as $module => $module_status) {
         $os_module_status = Config::getOsSetting($device['os'], "discovery_modules.$module");
         d_echo('Modules status: Global' . (isset($module_status) ? ($module_status ? '+ ' : '- ') : '  '));
         d_echo('OS' . (isset($os_module_status) ? ($os_module_status ? '+ ' : '- ') : '  '));
-        d_echo('Device' . (isset($attribs['discover_' . $module]) ? ($attribs['discover_' . $module] ? '+ ' : '- ') : '  '));
+        d_echo('Device' . (isset($device['attribs']['discover_' . $module]) ? ($device['attribs']['discover_' . $module] ? '+ ' : '- ') : '  '));
         if ($force_module === true ||
-            ! empty($attribs['discover_' . $module]) ||
-            ($os_module_status && ! isset($attribs['discover_' . $module])) ||
-            ($module_status && ! isset($os_module_status) && ! isset($attribs['discover_' . $module]))
+            ! empty($device['attribs']['discover_' . $module]) ||
+            ($os_module_status && ! isset($device['attribs']['discover_' . $module])) ||
+            ($module_status && ! isset($os_module_status) && ! isset($device['attribs']['discover_' . $module]))
         ) {
             $module_start = microtime(true);
             $start_memory = memory_get_usage();
@@ -173,9 +162,9 @@ function discover_device(&$device, $force_module = false)
             $module_time = substr($module_time, 0, 5);
             $module_mem = (memory_get_usage() - $start_memory);
             printf("\n>> Runtime for discovery module '%s': %.4f seconds with %s bytes\n", $module, $module_time, $module_mem);
-            printChangedStats();
+            $measurements->printChangedStats();
             echo "#### Unload disco module $module ####\n\n";
-        } elseif (isset($attribs['discover_' . $module]) && $attribs['discover_' . $module] == '0') {
+        } elseif (isset($device['attribs']['discover_' . $module]) && $device['attribs']['discover_' . $module] == '0') {
             echo "Module [ $module ] disabled on host.\n\n";
         } elseif (isset($os_module_status) && $os_module_status == '0') {
             echo "Module [ $module ] disabled on os.\n\n";
@@ -751,10 +740,10 @@ function check_entity_sensor($string, $device)
  * Get the device divisor, account for device specific quirks
  * The default divisor is 10
  *
- * @param array $device device array
- * @param string $os_version firmware version poweralert quirks
- * @param string $sensor_type the type of this sensor
- * @param string $oid the OID of this sensor
+ * @param  array  $device  device array
+ * @param  string  $os_version  firmware version poweralert quirks
+ * @param  string  $sensor_type  the type of this sensor
+ * @param  string  $oid  the OID of this sensor
  * @return int
  */
 function get_device_divisor($device, $os_version, $sensor_type, $oid)
@@ -809,11 +798,11 @@ function get_device_divisor($device, $os_version, $sensor_type, $oid)
         }
 
         if (Str::startsWith($oid, '.1.3.6.1.2.1.33.1.2.3.')) {
-            if ($device['os'] == 'routeros') {
+            if ($device['os'] == 'routeros' && version_compare($os_version, '6.47', '<')) {
                 return 60;
-            } else {
-                return 1;
             }
+
+            return 1;
         }
     }
 
@@ -823,8 +812,8 @@ function get_device_divisor($device, $os_version, $sensor_type, $oid)
 /**
  * Should we ignore this storage device based on teh description? (usually the mount path or drive)
  *
- * @param string $os The OS of the device
- * @param string $descr The description of the storage
+ * @param  string  $os  The OS of the device
+ * @param  string  $descr  The description of the storage
  * @return bool
  */
 function ignore_storage($os, $descr)
@@ -858,22 +847,25 @@ function ignore_storage($os, $descr)
 
 /**
  * @param $valid
- * @param $device
+ * @param  OS  $os
  * @param $sensor_type
  * @param $pre_cache
  */
-function discovery_process(&$valid, $device, $sensor_class, $pre_cache)
+function discovery_process(&$valid, $os, $sensor_class, $pre_cache)
 {
-    if (! empty($device['dynamic_discovery']['modules']['sensors'][$sensor_class]) && ! can_skip_sensor($device, $sensor_class, '')) {
+    $discovery = $os->getDiscovery('sensors');
+    $device = $os->getDeviceArray();
+
+    if (! empty($discovery[$sensor_class]) && ! can_skip_sensor($device, $sensor_class, '')) {
         $sensor_options = [];
-        if (isset($device['dynamic_discovery']['modules']['sensors'][$sensor_class]['options'])) {
-            $sensor_options = $device['dynamic_discovery']['modules']['sensors'][$sensor_class]['options'];
+        if (isset($discovery[$sensor_class]['options'])) {
+            $sensor_options = $discovery[$sensor_class]['options'];
         }
 
         d_echo("Dynamic Discovery ($sensor_class): ");
-        d_echo($device['dynamic_discovery']['modules']['sensors'][$sensor_class]);
+        d_echo($discovery[$sensor_class]);
 
-        foreach ($device['dynamic_discovery']['modules']['sensors'][$sensor_class]['data'] as $data) {
+        foreach ($discovery[$sensor_class]['data'] as $data) {
             $tmp_name = $data['oid'];
             $raw_data = (array) $pre_cache[$tmp_name];
 
@@ -917,7 +909,7 @@ function discovery_process(&$valid, $device, $sensor_class, $pre_cache)
                 // Check if we have a "num_oid" value. If not, we'll try to compute it from textual OIDs with snmptranslate.
                 if (empty($data['num_oid'])) {
                     try {
-                        $data['num_oid'] = YamlDiscovery::computeNumericalOID($device, $data);
+                        $data['num_oid'] = YamlDiscovery::computeNumericalOID($os, $data);
                     } catch (\Exception $e) {
                         d_echo('Error: We cannot find a numerical OID for ' . $data['value'] . '. Skipping this one...');
                         $skippedFromYaml = true;
@@ -990,11 +982,12 @@ function discovery_process(&$valid, $device, $sensor_class, $pre_cache)
 
 /**
  * @param $types
- * @param $device
- * @param array $pre_cache
+ * @param  OS  $os
+ * @param  array  $pre_cache
  */
-function sensors($types, $device, $valid, $pre_cache = [])
+function sensors($types, $os, $valid, $pre_cache = [])
 {
+    $device = &$os->getDeviceArray();
     foreach ((array) $types as $sensor_class) {
         echo ucfirst($sensor_class) . ': ';
         $dir = Config::get('install_dir') . '/includes/discovery/sensors/' . $sensor_class . '/';
@@ -1010,7 +1003,7 @@ function sensors($types, $device, $valid, $pre_cache = [])
                 include $dir . '/rfc1628.inc.php';
             }
         }
-        discovery_process($valid, $device, $sensor_class, $pre_cache);
+        discovery_process($valid, $os, $sensor_class, $pre_cache);
         d_echo($valid['sensor'][$sensor_class] ?? []);
         check_valid_sensors($device, $sensor_class, $valid['sensor']);
         echo "\n";
@@ -1184,9 +1177,10 @@ function add_cbgp_peer($device, $peer, $afi, $safi)
 
 /**
  * check if we should skip this sensor from discovery
+ *
  * @param $device
- * @param string $sensor_class
- * @param string $sensor_descr
+ * @param  string  $sensor_class
+ * @param  string  $sensor_descr
  * @return bool
  */
 function can_skip_sensor($device, $sensor_class = '', $sensor_descr = '')
@@ -1210,9 +1204,10 @@ function can_skip_sensor($device, $sensor_class = '', $sensor_descr = '')
 
 /**
  * check if we should skip this device from discovery
- * @param string $sysName
- * @param string $sysDescr
- * @param string $platform
+ *
+ * @param  string  $sysName
+ * @param  string  $sysDescr
+ * @param  string  $platform
  * @return bool
  */
 function can_skip_discovery($sysName, $sysDescr = '', $platform = '')
@@ -1254,9 +1249,9 @@ function can_skip_discovery($sysName, $sysDescr = '', $platform = '')
  * Try to find a device by sysName, hostname, ip, or mac_address
  * If a device cannot be found, returns 0
  *
- * @param string $name sysName or hostname
- * @param string $ip May be an IP or hex string
- * @param string $mac_address
+ * @param  string  $name  sysName or hostname
+ * @param  string  $ip  May be an IP or hex string
+ * @param  string  $mac_address
  * @return int the device_id or 0
  */
 function find_device_id($name = '', $ip = '', $mac_address = '')
@@ -1335,10 +1330,10 @@ function find_device_id($name = '', $ip = '', $mac_address = '')
 /**
  * Try to find a port by ifDescr, ifName, ifAlias, or MAC
  *
- * @param string $description matched against ifDescr, ifName, and ifAlias
- * @param string $identifier matched against ifDescr, ifName, and ifAlias
- * @param int $device_id restrict search to ports on a specific device
- * @param string $mac_address check against ifPhysAddress (should be in lowercase hexadecimal)
+ * @param  string  $description  matched against ifDescr, ifName, and ifAlias
+ * @param  string  $identifier  matched against ifDescr, ifName, and ifAlias
+ * @param  int  $device_id  restrict search to ports on a specific device
+ * @param  string  $mac_address  check against ifPhysAddress (should be in lowercase hexadecimal)
  * @return int
  */
 function find_port_id($description, $identifier = '', $device_id = 0, $mac_address = null)

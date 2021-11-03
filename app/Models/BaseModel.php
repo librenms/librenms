@@ -18,6 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -32,8 +33,8 @@ abstract class BaseModel extends Model
     /**
      * Check if query is already joined with a table
      *
-     * @param Builder $query
-     * @param string $table
+     * @param  Builder  $query
+     * @param  string  $table
      * @return bool
      */
     public static function isJoined($query, $table)
@@ -54,9 +55,9 @@ abstract class BaseModel extends Model
     /**
      * Helper function to determine if user has access based on device permissions
      *
-     * @param Builder $query
-     * @param User $user
-     * @param string $table
+     * @param  Builder  $query
+     * @param  User  $user
+     * @param  string  $table
      * @return Builder
      */
     protected function hasDeviceAccess($query, User $user, $table = null)
@@ -75,9 +76,9 @@ abstract class BaseModel extends Model
     /**
      * Helper function to determine if user has access based on port permissions
      *
-     * @param Builder $query
-     * @param User $user
-     * @param string $table
+     * @param  Builder  $query
+     * @param  User  $user
+     * @param  string  $table
      * @return Builder
      */
     protected function hasPortAccess($query, User $user, $table = null)

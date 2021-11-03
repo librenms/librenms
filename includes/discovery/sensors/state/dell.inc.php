@@ -12,10 +12,10 @@
 
 $tables = [
     // One could add more entrys from deviceGroup, but this will do as a start
-    ['processorDeviceStatusTable', '.1.3.6.1.4.1.674.10892.1.1100.32.1.5.', 'processorDeviceStatusStatus', 'processorDeviceStatusLocationName', 'MIB-Dell-10892'],
-    ['memoryDeviceTable', '.1.3.6.1.4.1.674.10892.1.1100.50.1.5.', 'memoryDeviceStatus', 'memoryDeviceLocationName', 'MIB-Dell-10892'],
-    ['powerSupplyTable', '.1.3.6.1.4.1.674.10892.1.600.12.1.5.', 'powerSupplyStatus', 'powerSupplyLocationName', 'MIB-Dell-10892'],
-    ['intrusionTable', '.1.3.6.1.4.1.674.10892.1.300.70.1.5.', 'intrusionStatus', 'Intrusion', 'MIB-Dell-10892'],
+    ['processorDeviceStatusTable', '.1.3.6.1.4.1.674.10892.1.1100.32.1.5.', 'processorDeviceStatusStatus', 'processorDeviceStatusLocationName', 'MIB-Dell-10892', 'dell'],
+    ['memoryDeviceTable', '.1.3.6.1.4.1.674.10892.1.1100.50.1.5.', 'memoryDeviceStatus', 'memoryDeviceLocationName', 'MIB-Dell-10892', 'dell'],
+    ['powerSupplyTable', '.1.3.6.1.4.1.674.10892.1.600.12.1.5.', 'powerSupplyStatus', 'powerSupplyLocationName', 'MIB-Dell-10892', 'dell'],
+    ['intrusionTable', '.1.3.6.1.4.1.674.10892.1.300.70.1.5.', 'intrusionStatus', 'Intrusion', 'MIB-Dell-10892', 'dell'],
     ['controllerTable', '.1.3.6.1.4.1.674.10893.1.20.130.1.1.5.', 'controllerState', 'controllerName', 'StorageManagement-MIB', 'dell'],
     ['arrayDiskTable', '.1.3.6.1.4.1.674.10893.1.20.130.4.1.4.', 'arrayDiskState', 'arrayDiskName', 'StorageManagement-MIB', 'dell'],
     ['virtualDiskTable', '.1.3.6.1.4.1.674.10893.1.20.140.1.1.4.', 'virtualDiskState', 'virtualDiskDeviceName', 'StorageManagement-MIB', 'dell'],
@@ -23,7 +23,7 @@ $tables = [
 ];
 
 foreach ($tables as $tablevalue) {
-    $temp = snmpwalk_cache_multi_oid($device, $tablevalue[0], [], $tablevalue[4]);
+    $temp = snmpwalk_cache_multi_oid($device, $tablevalue[0], [], $tablevalue[4], $tablevalue[5]);
     $cur_oid = $tablevalue[1];
 
     if (is_array($temp)) {

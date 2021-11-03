@@ -22,6 +22,7 @@
                     <tr>
                         <th>@lang('Name')</th>
                         <th>@lang('Description')</th>
+                        <th>@lang('Ports')</th>
                         <th>@lang('Actions')</th>
                     </tr>
                     </thead>
@@ -30,6 +31,7 @@
                         <tr id="row_{{ $port_group->id }}">
                             <td>{{ $port_group->name }}</td>
                             <td>{{ $port_group->desc }}</td>
+                            <td>{{ $port_group->ports_count }}</td>
                             <td>
                                 <a type="button" title="@lang('edit Port Group')" class="btn btn-primary btn-sm" aria-label="@lang('Edit')"
                                    href="{{ route('port-groups.edit', $port_group->id) }}">

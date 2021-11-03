@@ -112,7 +112,7 @@ if (! empty(\LibreNMS\Config::get('distributed_poller_group'))) {
 }
 
 global $device;
-foreach (dbFetch("SELECT * FROM `devices` WHERE disabled = 0 AND snmp_disable = 0 $where ORDER BY device_id DESC", $sqlparams) as $device) {
+foreach (dbFetch("SELECT * FROM `devices` WHERE disabled = 0 $where ORDER BY device_id DESC", $sqlparams) as $device) {
     DeviceCache::setPrimary($device['device_id']);
     $discovered_devices += (int) discover_device($device, $module_override);
 }
@@ -136,7 +136,8 @@ $string = $argv[0] . " $doing " . date(\LibreNMS\Config::get('dateformat.compact
 d_echo("$string\n");
 
 if (! isset($options['q'])) {
-    printStats();
+    echo PHP_EOL;
+    app(\App\Polling\Measure\MeasurementManager::class)->printStats();
 }
 
 logfile($string);

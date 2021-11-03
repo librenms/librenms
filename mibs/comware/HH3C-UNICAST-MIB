@@ -1,0 +1,130 @@
+-- ============================================================================
+-- Copyright (C) 2003 New H3C Tech. Co., Ltd. All rights reserved.
+--
+-- Description: This MIB is a framework MIB for unicast technology
+-- Reference:
+-- Version: V1.0
+-- History:
+-- V1.0 2005-04-20 created by fuzhenyu
+-- ============================================================================
+HH3C-UNICAST-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS
+        hh3cCommon
+            FROM HH3C-OID-MIB
+        Integer32, Counter64, OBJECT-TYPE, MODULE-IDENTITY
+            FROM SNMPv2-SMI
+        TruthValue
+            FROM SNMPv2-TC;
+
+
+    hh3cUnicast MODULE-IDENTITY
+        LAST-UPDATED "200501311454Z"        -- January 31, 2005 at 14:54 GMT
+        ORGANIZATION
+            "New H3C Tech. Co., Ltd."
+        CONTACT-INFO
+            "Platform Team New H3C Tech. Co., Ltd.
+            Hai-Dian District Beijing P.R. China
+            http://www.h3c.com
+            Zip:100085
+            "
+        DESCRIPTION
+            " This MIB is a framework MIB for unicast related features."
+        REVISION      "200503241454Z"
+        DESCRIPTION
+                " Revisions made by MIB team."
+        ::= { hh3cCommon 44 }
+
+
+    hh3cURPFTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF Hh3cURPFEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            " Unicast Reverse Path Forwarding (URPF) is used to prevent the network
+            attacks caused by source address spoofing. This table is used to configure
+            URPF on specific interfaces."
+        ::= { hh3cUnicast 1 }
+
+
+    hh3cURPFEntry OBJECT-TYPE
+        SYNTAX Hh3cURPFEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            " The entry of hh3cURPFTable, indexed by vlan interface index."
+        INDEX { hh3cURPFIfIndex }
+        ::= { hh3cURPFTable 1 }
+
+
+    Hh3cURPFEntry ::=
+        SEQUENCE {
+            hh3cURPFIfIndex
+                Integer32,
+            hh3cURPFEnabled
+                TruthValue,
+            hh3cURPFSlotID
+                Integer32,
+            hh3cURPFTotalReceivedPacket
+                Counter64,
+            hh3cURPFDroppedPacket
+                Counter64,
+            hh3cURPFClearStat
+                INTEGER
+         }
+
+    hh3cURPFIfIndex OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            " The ifIndex of vlan interface."
+        ::= { hh3cURPFEntry 1 }
+
+    hh3cURPFEnabled OBJECT-TYPE
+        SYNTAX TruthValue
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            " This object is used to enable or disable URPF on certain vlan interfaces."
+        DEFVAL { false }
+        ::= { hh3cURPFEntry 2 }
+
+    hh3cURPFSlotID OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            " This object specifies to which slot packets are redirected in order to
+            perform URPF check."
+        ::= { hh3cURPFEntry 3 }
+
+    hh3cURPFTotalReceivedPacket OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            " This object provides total received packets number."
+        ::= { hh3cURPFEntry 4 }
+
+    hh3cURPFDroppedPacket OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            " This object provides total dropped invalid packets number."
+        ::= { hh3cURPFEntry 5 }
+
+    hh3cURPFClearStat OBJECT-TYPE
+        SYNTAX INTEGER { reserved(0),reset(1) }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            " This object is used to clear the URPF statistics on certain
+            vlan interfaces. This object is actually a write-only object.
+            When read, it always returns 0. When set to 1, the objects
+            hh3cURPFTotalReceivedPacket and hh3cURPFDroppedPacket are reset
+            to 0."
+        ::= { hh3cURPFEntry 6 }
+
+END

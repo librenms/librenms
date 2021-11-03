@@ -18,6 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2016 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -28,10 +29,6 @@ use LibreNMS\Util\Snmpsim;
 $install_dir = realpath(__DIR__ . '/..');
 
 $init_modules = ['web', 'discovery', 'polling', 'nodb'];
-
-if (! getenv('SNMPSIM')) {
-    $init_modules[] = 'mocksnmp';
-}
 
 require $install_dir . '/includes/init.php';
 chdir($install_dir);

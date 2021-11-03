@@ -27,6 +27,7 @@ class MplsTunnelCHop extends Model implements Keyable
 
     /**
      * Get a string that can identify a unique instance of this model
+     *
      * @return string
      */
     public function getCompositeKey()

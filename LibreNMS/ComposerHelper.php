@@ -18,6 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2016 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -27,6 +28,7 @@ namespace LibreNMS;
 use Composer\Script\Event;
 use LibreNMS\Exceptions\FileWriteFailedException;
 use LibreNMS\Util\EnvHelper;
+use Minishlink\WebPush\VAPID;
 
 class ComposerHelper
 {
@@ -93,6 +95,8 @@ class ComposerHelper
 
         try {
             EnvHelper::init();
+            $vapid = VAPID::createVapidKeys();
+
             EnvHelper::writeEnv([
                 'NODE_ID' => uniqid(),
                 'DB_HOST' => $config['db_host'],
@@ -104,6 +108,8 @@ class ComposerHelper
                 'APP_URL' => $config['base_url'],
                 'LIBRENMS_USER' => $config['user'],
                 'LIBRENMS_GROUP' => $config['group'],
+                'VAPID_PUBLIC_KEY' => $vapid['publicKey'],
+                'VAPID_PRIVATE_KEY' => $vapid['privateKey'],
             ]);
         } catch (FileWriteFailedException $exception) {
             echo $exception->getMessage() . PHP_EOL;
@@ -123,7 +129,7 @@ class ComposerHelper
     /**
      * Run a command or array of commands and echo the command and output
      *
-     * @param string|array $cmds
+     * @param  string|array  $cmds
      */
     private static function exec($cmds)
     {

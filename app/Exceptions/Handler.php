@@ -8,7 +8,7 @@ use Throwable;
 class Handler extends ExceptionHandler
 {
     /**
-     * A list of the exception types that should not be reported.
+     * A list of the exception types that are not reported.
      *
      * @var array
      */
@@ -22,7 +22,7 @@ class Handler extends ExceptionHandler
     ];
 
     /**
-     * A list of the exceptions that can be upgraded. Checked in order.
+     * A list of the inputs that are never flashed for validation exceptions.
      *
      * @var array
      */

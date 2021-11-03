@@ -11,4 +11,4 @@ discovery:
         sysObjectID:
             - .1.3.6.1.4.1.8072.3.2.10
         sysDescr_regex:
-            - '/^Linux HT/'
+            - '/^Linux HT\d/'

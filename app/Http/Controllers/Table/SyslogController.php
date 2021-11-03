@@ -18,6 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -25,6 +26,7 @@
 namespace App\Http\Controllers\Table;
 
 use App\Models\Syslog;
+use LibreNMS\Enum\SyslogSeverity;
 
 class SyslogController extends TableController
 {
@@ -37,6 +39,7 @@ class SyslogController extends TableController
             'priority' => 'nullable|string',
             'to' => 'nullable|date',
             'from' => 'nullable|date',
+            'level' => 'nullable|string',
         ];
     }
 
@@ -62,26 +65,34 @@ class SyslogController extends TableController
     /**
      * Defines the base query for this resource
      *
-     * @param \Illuminate\Http\Request $request
+     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Query\Builder
      */
     public function baseQuery($request)
     {
         return Syslog::hasAccess($request->user())
             ->with('device')
-            ->when($request->device_group, function ($query) use ($request) {
-                $query->inDeviceGroup($request->device_group);
+            ->when($request->device_group, function ($query, $group) {
+                $query->inDeviceGroup($group);
             })
-            ->when($request->from, function ($query) use ($request) {
-                $query->where('timestamp', '>=', $request->from);
+            ->when($request->from, function ($query, $from) {
+                $query->where('timestamp', '>=', $from);
             })
-            ->when($request->to, function ($query) use ($request) {
-                $query->where('timestamp', '<=', $request->to);
+            ->when($request->to, function ($query, $to) {
+                $query->where('timestamp', '<=', $to);
+            })
+            ->when($request->level, function ($query, $level) {
+                if ($level >= 7) {
+                    return;  // include everything
+                }
+
+                $levels = array_slice(SyslogSeverity::LEVELS, 0, $level + 1);
+                $query->whereIn('level', $levels);
             });
     }
 
     /**
-     * @param Syslog $syslog
+     * @param  Syslog  $syslog
      */
     public function formatItem($syslog)
     {
@@ -109,7 +120,7 @@ class SyslogController extends TableController
     }
 
     /**
-     * @param int $syslog_priority
+     * @param  int  $syslog_priority
      * @return string
      */
     private function priorityLabel($syslog_priority)

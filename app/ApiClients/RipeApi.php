@@ -18,6 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2019 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -37,8 +38,9 @@ class RipeApi extends BaseApi
     /**
      * Get whois info
      *
-     * @param string $resource ASN/IPv4/IPv6
+     * @param  string  $resource  ASN/IPv4/IPv6
      * @return array
+     *
      * @throws ApiException
      */
     public function getWhois($resource)
@@ -53,8 +55,9 @@ class RipeApi extends BaseApi
     /**
      * Get Abuse contact
      *
-     * @param string $resource prefix, single IP address or ASN
+     * @param  string  $resource  prefix, single IP address or ASN
      * @return array|mixed
+     *
      * @throws ApiException
      */
     public function getAbuseContact($resource)
@@ -68,6 +71,7 @@ class RipeApi extends BaseApi
 
     /**
      * @return array|mixed
+     *
      * @throws ApiException
      */
     private function makeApiCall(string $uri, array $options)

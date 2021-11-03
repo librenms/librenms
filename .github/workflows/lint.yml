@@ -33,7 +33,9 @@ jobs:
     name: PHP Static Analysis
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
+      -
+        name: Checkout Code
+        uses: actions/checkout@v2
 
       -
         name: Set up PHP
@@ -68,5 +70,9 @@ jobs:
         run: composer install --prefer-dist --no-interaction --no-progress
 
       -
-        name: Run phpstan
+        name: Run PHPStan (Deprecated functions)
+        run: ./vendor/bin/phpstan analyze --no-interaction --no-progress --error-format=github --memory-limit=4G --configuration=phpstan-deprecated.neon
+
+      -
+        name: Run PHPStan
         run: ./vendor/bin/phpstan analyze --no-interaction --no-progress --error-format=github --memory-limit=4G

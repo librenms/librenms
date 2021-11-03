@@ -36,4 +36,12 @@ rlTraceRouteMibVersion OBJECT-TYPE
         "MIB's version, the current version is 1."
     ::= { rlTraceRoute 1 }
 
+rlTraceRouteWebLastTestName OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-write
+    STATUS  current
+    DESCRIPTION
+        "The last index of Traceroute WEB requests. Used to configure traceRouteCtlTestName by WEB user."
+    ::= { rlTraceRoute 2 }
+
 END

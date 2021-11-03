@@ -33,8 +33,8 @@ function rewrite_entity_descr($descr)
  * Clean port values for html display
  * Add label to the port array (usually one of ifAlias, ifName, ifDescr)
  *
- * @param array $interface
- * @param null|array $device
+ * @param  array  $interface
+ * @param  null|array  $device
  * @return mixed
  */
 function cleanPort($interface, $device = null)

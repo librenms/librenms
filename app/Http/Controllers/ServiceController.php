@@ -4,14 +4,13 @@ namespace App\Http\Controllers;
 
 use App\Models\Service;
 use Illuminate\Http\Request;
-use Toastr;
 
 class ServiceController extends Controller
 {
     /**
      * Store a newly created resource in storage.
      *
-     * @param  \Illuminate\Http\Request $request
+     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\Response|\Illuminate\View\View
      */
     public function store(Request $request)
@@ -45,7 +44,7 @@ class ServiceController extends Controller
         );
         $service->save();
 
-        Toastr::success(__('Service :name created', ['name' => $service->service_name]));
+        flash()->addSuccess(__('Service :name created', ['name' => $service->service_name]));
 
         return redirect()->route('services.templates.index');
     }

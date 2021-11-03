@@ -1,0 +1,29 @@
+modules:
+    os:
+        version: BIANCA-BRICK-MIB::biboAdmSWVersion.0
+        version_regex: '/(?<version>[V]{1}[.0-9]+)/'
+        serial: BIANCA-BRICK-MIB::biboABrdSerialNo.0.0.0
+        hardware: 
+            - BIANCA-BRICK-MIB::biboABrdPartNo.0.0.0
+            - BIANCA-BRICK-MIB::biboABrdHWRelease.0.0.0
+        hardware_template: '{{ BIANCA-BRICK-MIB::biboABrdPartNo.0.0.0 }} {{ BIANCA-BRICK-MIB::biboABrdHWRelease.0.0.0 }}'
+    mempools:
+        data:
+            -
+                oid: BIANCA-BRICK-MIBRES-MIB::memoryTable
+                total: BIANCA-BRICK-MIBRES-MIB::memoryTotal
+                used: BIANCA-BRICK-MIBRES-MIB::memoryInuse
+                descr: Main Memory
+                skip_values:
+                    -
+                        oid: BIANCA-BRICK-MIBRES-MIB::memoryType
+                        op: '!='
+                        value: 'dram' # Only include DRAM in mempools
+    processors:
+        data:
+            -
+                oid: BIANCA-BRICK-MIBRES-MIB::cpuLoadIdle60s
+                num_oid: '.1.3.6.1.4.1.272.4.17.4.1.1.18.1.0'
+                precision: -1
+                descr: 'Load Average'
+                type: bintec-cpu

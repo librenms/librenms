@@ -18,7 +18,6 @@
  */
 
 use Illuminate\Database\QueryException;
-use LibreNMS\Config;
 use LibreNMS\DB\Eloquent;
 use LibreNMS\Exceptions\DatabaseConnectException;
 use LibreNMS\Util\Laravel;
@@ -32,13 +31,14 @@ function dbIsConnected()
  * Connect to the database.
  * Will use global config variables if they are not sent: db_host, db_user, db_pass, db_name, db_port, db_socket
  *
- * @param string $db_host
- * @param string $db_user
- * @param string $db_pass
- * @param string $db_name
- * @param string $db_port
- * @param string $db_socket
+ * @param  string  $db_host
+ * @param  string  $db_user
+ * @param  string  $db_pass
+ * @param  string  $db_name
+ * @param  string  $db_port
+ * @param  string  $db_socket
  * @return \Illuminate\Database\Connection
+ *
  * @throws DatabaseConnectException
  */
 function dbConnect($db_host = null, $db_user = '', $db_pass = '', $db_name = '', $db_port = null, $db_socket = null)
@@ -81,8 +81,9 @@ function dbConnect($db_host = null, $db_user = '', $db_pass = '', $db_name = '',
 
 /**
  * Performs a query using the given string.
- * @param string $sql
- * @param array $parameters
+ *
+ * @param  string  $sql
+ * @param  array  $parameters
  * @return bool if query was successful or not
  */
 function dbQuery($sql, $parameters = [])
@@ -102,14 +103,12 @@ function dbQuery($sql, $parameters = [])
 }
 
 /**
- * @param array $data
- * @param string $table
+ * @param  array  $data
+ * @param  string  $table
  * @return null|int
  */
 function dbInsert($data, $table)
 {
-    $time_start = microtime(true);
-
     $sql = 'INSERT IGNORE INTO `' . $table . '` (`' . implode('`,`', array_keys($data)) . '`)  VALUES (' . implode(',', dbPlaceHolders($data)) . ')';
 
     try {
@@ -118,7 +117,6 @@ function dbInsert($data, $table)
         dbHandleException(new QueryException($sql, $data, $pdoe));
     }
 
-    recordDbStatistic('insert', $time_start);
     if ($result) {
         return Eloquent::DB()->getPdo()->lastInsertId();
     } else {
@@ -131,14 +129,12 @@ function dbInsert($data, $table)
  * $data is an array (rows) of key value pairs.  keys are fields.  Rows need to have same fields.
  * Check for boolean false to determine whether insert failed
  *
- * @param array $data
- * @param string $table
+ * @param  array  $data
+ * @param  string  $table
  * @return bool
  */
 function dbBulkInsert($data, $table)
 {
-    $time_start = microtime(true);
-
     // check that data isn't an empty array
     if (empty($data)) {
         return false;
@@ -158,8 +154,6 @@ function dbBulkInsert($data, $table)
         try {
             $result = Eloquent::DB()->table($table)->insert((array) $data_chunk);
 
-            recordDbStatistic('insert', $time_start);
-
             return $result;
         } catch (PDOException $pdoe) {
             // FIXME query?
@@ -174,16 +168,14 @@ function dbBulkInsert($data, $table)
  * Passed an array, table name, WHERE clause, and placeholder parameters, it attempts to update a record.
  * Returns the number of affected rows
  *
- * @param array $data
- * @param string $table
- * @param string $where
- * @param array $parameters
+ * @param  array  $data
+ * @param  string  $table
+ * @param  string  $where
+ * @param  array  $parameters
  * @return bool|int
  */
 function dbUpdate($data, $table, $where = null, $parameters = [])
 {
-    $time_start = microtime(true);
-
     // need field name and placeholder value
     // but how merge these field placeholders with actual $parameters array for the WHERE clause
     $sql = 'UPDATE `' . $table . '` set ';
@@ -211,8 +203,6 @@ function dbUpdate($data, $table, $where = null, $parameters = [])
     try {
         $result = Eloquent::DB()->update($sql, (array) $data);
 
-        recordDbStatistic('update', $time_start);
-
         return $result;
     } catch (PDOException $pdoe) {
         dbHandleException(new QueryException($sql, $data, $pdoe));
@@ -223,8 +213,6 @@ function dbUpdate($data, $table, $where = null, $parameters = [])
 
 function dbDelete($table, $where = null, $parameters = [])
 {
-    $time_start = microtime(true);
-
     $sql = 'DELETE FROM `' . $table . '`';
     if ($where) {
         $sql .= ' WHERE ' . $where;
@@ -236,8 +224,6 @@ function dbDelete($table, $where = null, $parameters = [])
         dbHandleException(new QueryException($sql, $parameters, $pdoe));
     }
 
-    recordDbStatistic('delete', $time_start);
-
     return $result;
 }//end dbDelete()
 
@@ -245,14 +231,12 @@ function dbDelete($table, $where = null, $parameters = [])
  * Delete orphaned entries from a table that no longer have a parent in parent_table
  * Format of parents array is as follows table.table_key_column<.target_key_column>
  *
- * @param string $target_table The table to delete entries from
- * @param array $parents an array of parent tables to check.
+ * @param  string  $target_table  The table to delete entries from
+ * @param  array  $parents  an array of parent tables to check.
  * @return bool|int
  */
 function dbDeleteOrphans($target_table, $parents)
 {
-    $time_start = microtime(true);
-
     if (empty($parents)) {
         // don't delete all entries if parents is missing
         return false;
@@ -286,8 +270,6 @@ function dbDeleteOrphans($target_table, $parents)
         dbHandleException(new QueryException($query, [], $pdoe));
     }
 
-    recordDbStatistic('delete', $time_start);
-
     return $result;
 }
 
@@ -299,13 +281,10 @@ function dbDeleteOrphans($target_table, $parents)
 function dbFetchRows($sql, $parameters = [])
 {
     global $PDO_FETCH_ASSOC;
-    $time_start = microtime(true);
 
     try {
         $PDO_FETCH_ASSOC = true;
         $rows = Eloquent::DB()->select($sql, (array) $parameters);
-
-        recordDbStatistic('fetchrows', $time_start);
 
         return $rows;
     } catch (PDOException $pdoe) {
@@ -345,13 +324,10 @@ function dbFetch($sql, $parameters = [])
 function dbFetchRow($sql = null, $parameters = [])
 {
     global $PDO_FETCH_ASSOC;
-    $time_start = microtime(true);
 
     try {
         $PDO_FETCH_ASSOC = true;
         $row = Eloquent::DB()->selectOne($sql, (array) $parameters);
-
-        recordDbStatistic('fetchrow', $time_start);
 
         return $row;
     } catch (PDOException $pdoe) {
@@ -370,12 +346,10 @@ function dbFetchRow($sql = null, $parameters = [])
 function dbFetchCell($sql, $parameters = [])
 {
     global $PDO_FETCH_ASSOC;
-    $time_start = microtime(true);
 
     try {
         $PDO_FETCH_ASSOC = true;
         $row = Eloquent::DB()->selectOne($sql, (array) $parameters);
-        recordDbStatistic('fetchcell', $time_start);
         if ($row) {
             return reset($row);
             // shift first field off first row
@@ -397,7 +371,6 @@ function dbFetchCell($sql, $parameters = [])
 function dbFetchColumn($sql, $parameters = [])
 {
     global $PDO_FETCH_ASSOC;
-    $time_start = microtime(true);
 
     $cells = [];
 
@@ -407,8 +380,6 @@ function dbFetchColumn($sql, $parameters = [])
             $cells[] = reset($row);
         }
         $PDO_FETCH_ASSOC = false;
-
-        recordDbStatistic('fetchcolumn', $time_start);
 
         return $cells;
     } catch (PDOException $pdoe) {
@@ -448,7 +419,7 @@ function dbFetchKeyValue($sql, $parameters = [])
 /**
  * Legacy dbFacile indicates DB::raw() as a value wrapped in an array
  *
- * @param array $data
+ * @param  array  $data
  * @return array
  */
 function dbArrayToRaw($data)
@@ -494,7 +465,7 @@ function dbHandleException(QueryException $exception)
  * Given a data array, this returns an array of placeholders
  * These may be question marks, or ":email" type
  *
- * @param array $values
+ * @param  array  $values
  * @return array
  */
 function dbPlaceHolders(&$values)
@@ -543,65 +514,13 @@ function dbGenPlaceholders($count)
 }
 
 /**
- * Update statistics for db operations
- *
- * @param string $stat fetchcell, fetchrow, fetchrows, fetchcolumn, update, insert, delete
- * @param float $start_time The time the operation started with 'microtime(true)'
- * @return float  The calculated run time
- */
-function recordDbStatistic($stat, $start_time)
-{
-    global $db_stats, $db_stats_last;
-
-    if (! isset($db_stats)) {
-        $db_stats = [
-            'ops' => [
-                'insert' => 0,
-                'update' => 0,
-                'delete' => 0,
-                'fetchcell' => 0,
-                'fetchcolumn' => 0,
-                'fetchrow' => 0,
-                'fetchrows' => 0,
-            ],
-            'time' => [
-                'insert' => 0.0,
-                'update' => 0.0,
-                'delete' => 0.0,
-                'fetchcell' => 0.0,
-                'fetchcolumn' => 0.0,
-                'fetchrow' => 0.0,
-                'fetchrows' => 0.0,
-            ],
-        ];
-        $db_stats_last = $db_stats;
-    }
-
-    $runtime = microtime(true) - $start_time;
-    $db_stats['ops'][$stat]++;
-    $db_stats['time'][$stat] += $runtime;
-
-    //double accounting corrections
-    if ($stat == 'fetchcolumn') {
-        $db_stats['ops']['fetchrows']--;
-        $db_stats['time']['fetchrows'] -= $runtime;
-    }
-    if ($stat == 'fetchcell') {
-        $db_stats['ops']['fetchrow']--;
-        $db_stats['time']['fetchrow'] -= $runtime;
-    }
-
-    return $runtime;
-}
-
-/**
  * Synchronize a relationship to a list of related ids
  *
- * @param string $table
- * @param string $target_column column name for the target
- * @param int $target column target id
- * @param string $list_column related column names
- * @param array $list list of related ids
+ * @param  string  $table
+ * @param  string  $target_column  column name for the target
+ * @param  int  $target  column target id
+ * @param  string  $list_column  related column names
+ * @param  array  $list  list of related ids
  * @return array [$inserted, $deleted]
  */
 function dbSyncRelationship($table, $target_column = null, $target = null, $list_column = null, $list = null)
@@ -630,8 +549,8 @@ function dbSyncRelationship($table, $target_column = null, $target = null, $list
 /**
  * Synchronize a relationship to a list of relations
  *
- * @param string $table
- * @param array $relationships array of relationship pairs with columns as keys and ids as values
+ * @param  string  $table
+ * @param  array  $relationships  array of relationship pairs with columns as keys and ids as values
  * @return array [$inserted, $deleted]
  */
 function dbSyncRelationships($table, $relationships = [])

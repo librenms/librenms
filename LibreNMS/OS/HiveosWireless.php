@@ -18,6 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2018 Ryan Finney
  * @author     https://github.com/theherodied/
  */
@@ -161,7 +162,7 @@ class HiveosWireless extends OS implements
      * Poll wireless noise floor
      * The returned array should be sensor_id => value pairs
      *
-     * @param array $sensors Array of sensors needed to be polled
+     * @param  array  $sensors  Array of sensors needed to be polled
      * @return array of polled data
      */
     public function pollWirelessNoiseFloor(array $sensors)

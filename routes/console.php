@@ -1,5 +1,11 @@
 <?php
 
+use App\Models\Device;
+use Illuminate\Support\Facades\Artisan;
+use LibreNMS\Exceptions\HostUnreachableException;
+use LibreNMS\Util\Debug;
+use Symfony\Component\Process\Process;
+
 /*
 |--------------------------------------------------------------------------
 | Console Routes
@@ -11,11 +17,6 @@
 |
 */
 
-use App\Models\Device;
-use LibreNMS\Exceptions\HostUnreachableException;
-use LibreNMS\Util\Debug;
-use Symfony\Component\Process\Process;
-
 Artisan::command('device:rename
     {old hostname : ' . __('The existing hostname, IP, or device id') . '}
     {new hostname : ' . __('The new hostname or IP') . '}
@@ -25,7 +26,7 @@ Artisan::command('device:rename
         base_path('renamehost.php'),
         $this->argument('old hostname'),
         $this->argument('new hostname'),
-    ]))->setTty(true)->run();
+    ]))->setTimeout(null)->setIdleTimeout(null)->setTty(true)->run();
 })->purpose(__('Rename a device, this can be used to change the hostname or IP of a device'));
 
 Artisan::command('device:add
@@ -42,8 +43,8 @@ Artisan::command('device:add
     {--r|port=161 : ' . __('SNMP transport port') . '}
     {--u|security-name=root : ' . __('SNMPv3 security username') . '}
     {--A|auth-password= : ' . __('SNMPv3 authentication password') . '}
-    {--a|auth-protocol=md5 : ' . __('SNMPv3 authentication protocol') . ' [md5, sha, sha-512, sha-384, sha-256, sha-224]}
-    {--x|privacy-protocol=aes : ' . __('SNMPv3 privacy protocol') . ' [des, aes]}
+    {--a|auth-protocol=md5 : ' . __('SNMPv3 authentication protocol') . ' [' . implode(', ', \LibreNMS\SNMPCapabilities::supportedAuthAlgorithms()) . ']}
+    {--x|privacy-protocol=aes : ' . __('SNMPv3 privacy protocol') . ' [' . implode(', ', \LibreNMS\SNMPCapabilities::supportedCryptoAlgorithms()) . ']}
     {--X|privacy-password= : ' . __('SNMPv3 privacy password') . '}
     {--P|ping-only : ' . __('Add a ping only device') . '}
     {--o|os=ping : ' . __('Ping only: specify OS') . '}
@@ -60,11 +61,11 @@ Artisan::command('device:add
         $this->error(__('Invalid SNMP transport'));
     }
 
-    if (! in_array($this->option('auth-protocol'), ['md5', 'sha', 'sha-512', 'sha-384', 'sha-256', 'sha-224'])) {
+    if (! in_array($this->option('auth-protocol'), \LibreNMS\SNMPCapabilities::supportedAuthAlgorithms())) {
         $this->error(__('Invalid authentication protocol'));
     }
 
-    if (! in_array($this->option('privacy-protocol'), ['des', 'aes'])) {
+    if (! in_array($this->option('privacy-protocol'), \LibreNMS\SNMPCapabilities::supportedCryptoAlgorithms())) {
         $this->error(__('Invalid privacy protocol'));
     }
 
@@ -147,11 +148,11 @@ Artisan::command('device:remove
     (new Process([
         base_path('delhost.php'),
         $this->argument('device spec'),
-    ]))->setTty(true)->run();
+    ]))->setTimeout(null)->setIdleTimeout(null)->setTty(true)->run();
 })->purpose('Remove a device');
 
 Artisan::command('update', function () {
-    (new Process([base_path('daily.sh')]))->setTty(true)->run();
+    (new Process([base_path('daily.sh')]))->setTimeout(null)->setIdleTimeout(null)->setTty(true)->run();
 })->purpose(__('Update LibreNMS and run maintenance routines'));
 
 Artisan::command('poller:ping
@@ -169,7 +170,7 @@ Artisan::command('poller:ping
             $command[] = '-v';
         }
     }
-    (new Process($command))->setTty(true)->run();
+    (new Process($command))->setTimeout(null)->setIdleTimeout(null)->setTty(true)->run();
 })->purpose(__('Check if devices are up or down via icmp'));
 
 Artisan::command('poller:discovery
@@ -197,7 +198,7 @@ Artisan::command('poller:discovery
             $command[] = '-v';
         }
     }
-    (new Process($command))->setTty(true)->run();
+    (new Process($command))->setTimeout(null)->setIdleTimeout(null)->setTty(true)->run();
 })->purpose(__('Discover information about existing devices, defines what will be polled'));
 
 Artisan::command('poller:poll
@@ -219,7 +220,7 @@ Artisan::command('poller:poll
             $command[] = '-v';
         }
     }
-    (new Process($command))->setTty(true)->run();
+    (new Process($command))->setTimeout(null)->setIdleTimeout(null)->setTty(true)->run();
 })->purpose(__('Poll data from devices as defined by discovery'));
 
 Artisan::command('poller:alerts', function () {
@@ -231,7 +232,7 @@ Artisan::command('poller:alerts', function () {
         }
     }
 
-    (new Process($command))->setTty(true)->run();
+    (new Process($command))->setTimeout(null)->setIdleTimeout(null)->setTty(true)->run();
 })->purpose(__('Check for any pending alerts and deliver them via defined transports'));
 
 Artisan::command('poller:billing
@@ -250,7 +251,7 @@ Artisan::command('poller:billing
             $command[] = '-v';
         }
     }
-    (new Process($command))->setTty(true)->run();
+    (new Process($command))->setTimeout(null)->setIdleTimeout(null)->setTty(true)->run();
 })->purpose(__('Collect billing data'));
 
 Artisan::command('poller:services
@@ -273,7 +274,7 @@ Artisan::command('poller:services
             $command[] = '-v';
         }
     }
-    (new Process($command))->setTty(true)->run();
+    (new Process($command))->setTimeout(null)->setIdleTimeout(null)->setTty(true)->run();
 })->purpose(__('Update LibreNMS and run maintenance routines'));
 
 Artisan::command('poller:billing-calculate
@@ -285,7 +286,7 @@ Artisan::command('poller:billing-calculate
         $command[] = '-r';
     }
 
-    (new Process($command))->setTty(true)->run();
+    (new Process($command))->setTimeout(null)->setIdleTimeout(null)->setTty(true)->run();
 })->purpose(__('Run billing calculations'));
 
 Artisan::command('scan
@@ -297,7 +298,7 @@ Artisan::command('scan
     /** @var \Illuminate\Console\Command $this */
     $command = [base_path('snmp-scan.py')];
 
-    if (empty($this->argument('network')) && ! Config::has('nets')) {
+    if (empty($this->argument('network')) && ! \LibreNMS\Config::has('nets')) {
         $this->error(__('Network is required if \'nets\' is not set in the config'));
 
         return 1;
@@ -327,5 +328,5 @@ Artisan::command('scan
 
     $command = array_merge($command, $this->argument('network'));
 
-    (new Process($command))->setTty(true)->run();
+    (new Process($command))->setTimeout(null)->setIdleTimeout(null)->setTty(true)->run();
 })->purpose(__('Scan the network for hosts and try to add them to LibreNMS'));

@@ -1,0 +1,32 @@
+includes:
+    - phpstan-baseline-deprecated.neon
+    - vendor/spaze/phpstan-disallowed-calls/extension.neon
+
+parameters:
+
+    customRulesetUsed: true
+    reportUnmatchedIgnoredErrors: false
+    resultCachePath: %tmpDir%/resultCache-deprecated.php
+
+    paths:
+        - LibreNMS
+        - bootstrap
+        - cache
+        - html
+        - storage
+        - app
+        - config
+        - database
+        - doc
+        - includes
+        - licenses
+        - misc
+        - resources
+        - routes
+        - sql-schema
+        - tests
+
+    disallowedFunctionCalls:
+        -
+            function: 'db*()'
+            message: 'use Eloquent instead; https://laravel.com/docs/8.x/eloquent'

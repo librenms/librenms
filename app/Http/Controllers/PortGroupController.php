@@ -3,9 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\PortGroup;
+use Flasher\Prime\FlasherInterface;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
-use Toastr;
 
 class PortGroupController extends Controller
 {
@@ -17,7 +17,7 @@ class PortGroupController extends Controller
     public function index()
     {
         return view('port-group.index', [
-            'port_groups' => PortGroup::orderBy('name')->get(),
+            'port_groups' => PortGroup::orderBy('name')->withCount('ports')->get(),
         ]);
     }
 
@@ -36,10 +36,10 @@ class PortGroupController extends Controller
     /**
      * Store a newly created resource in storage.
      *
-     * @param \Illuminate\Http\Request $request
+     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\RedirectResponse
      */
-    public function store(Request $request)
+    public function store(Request $request, FlasherInterface $flasher)
     {
         $this->validate($request, [
             'name' => 'required|string|unique:port_groups',
@@ -48,7 +48,7 @@ class PortGroupController extends Controller
         $portGroup = PortGroup::make($request->only(['name', 'desc']));
         $portGroup->save();
 
-        Toastr::success(__('Port Group :name created', ['name' => $portGroup->name]));
+        $flasher->addSuccess(__('Port Group :name created', ['name' => $portGroup->name]));
 
         return redirect()->route('port-groups.index');
     }
@@ -56,7 +56,7 @@ class PortGroupController extends Controller
     /**
      * Show the form for editing the specified resource.
      *
-     * @param \App\Models\PortGroup $portGroup
+     * @param  \App\Models\PortGroup  $portGroup
      * @return \Illuminate\View\View
      */
     public function edit(PortGroup $portGroup)
@@ -69,11 +69,11 @@ class PortGroupController extends Controller
     /**
      * Update the specified resource in storage.
      *
-     * @param \Illuminate\Http\Request $request
-     * @param \App\Models\PortGroup $portGroup
+     * @param  \Illuminate\Http\Request  $request
+     * @param  \App\Models\PortGroup  $portGroup
      * @return \Illuminate\Http\RedirectResponse
      */
-    public function update(Request $request, PortGroup $portGroup)
+    public function update(Request $request, PortGroup $portGroup, FlasherInterface $flasher)
     {
         $this->validate($request, [
             'name' => [
@@ -90,9 +90,9 @@ class PortGroupController extends Controller
         $portGroup->fill($request->only(['name', 'desc']));
 
         if ($portGroup->save()) {
-            Toastr::success(__('Port Group :name updated', ['name' => $portGroup->name]));
+            $flasher->addSuccess(__('Port Group :name updated', ['name' => $portGroup->name]));
         } else {
-            Toastr::error(__('Failed to save'));
+            $flasher->addError(__('Failed to save'));
 
             return redirect()->back()->withInput();
         }
@@ -103,7 +103,7 @@ class PortGroupController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param \App\Models\PortGroup $portGroup
+     * @param  \App\Models\PortGroup  $portGroup
      * @return \Illuminate\Http\Response
      */
     public function destroy(PortGroup $portGroup)

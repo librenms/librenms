@@ -18,6 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2020 Thomas Berberich
  * @author     Thomas Berberich <sourcehhdoctor@gmail.com>
  */
@@ -66,9 +67,9 @@ class Availability
     /**
      * addition of all recorded outages in seconds
      *
-     * @param object $found_outages filtered database object with all recorded outages
-     * @param int $duration time period to calculate for
-     * @param int $now timestamp for 'now'
+     * @param  object  $found_outages  filtered database object with all recorded outages
+     * @param  int  $duration  time period to calculate for
+     * @param  int  $now  timestamp for 'now'
      * @return int sum of all matching outages in seconds
      */
     protected static function outageSummary($found_outages, $duration, $now = null)
@@ -101,9 +102,9 @@ class Availability
      * means, starting with 100% as default
      * substracts recorded outages
      *
-     * @param array $device device to be looked at
-     * @param int $duration time period to calculate for
-     * @param int $precision float precision for calculated availability
+     * @param  array  $device  device to be looked at
+     * @param  int  $duration  time period to calculate for
+     * @param  int  $precision  float precision for calculated availability
      * @return float calculated availability
      */
     public static function availability($device, $duration, $precision = 3, $now = null)

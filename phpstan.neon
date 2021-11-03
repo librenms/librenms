@@ -5,6 +5,8 @@ includes:
 
 parameters:
 
+    phpVersion: 70300
+
     paths:
         - app
         - config
@@ -16,7 +18,7 @@ parameters:
     scanDirectories:
         - includes
 
-    level: 5
+    level: 6
 
     checkMissingIterableValueType: false
     treatPhpDocTypesAsCertain: false

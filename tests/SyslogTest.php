@@ -18,6 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2016 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -52,8 +53,8 @@ class SyslogTest extends TestCase
     /**
      * Test an input line with the modified fields
      *
-     * @param string $inputline The line from the syslog daemon including the ||'s
-     * @param array $modified of the modified fields, most likely containging the keys program and msg
+     * @param  string  $inputline  The line from the syslog daemon including the ||'s
+     * @param  array  $modified  of the modified fields, most likely containging the keys program and msg
      */
     private function checkSyslog($inputline, $modified)
     {

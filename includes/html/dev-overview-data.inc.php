@@ -147,16 +147,21 @@ if ($device['location_id']) {
     <script>
         var device_marker, device_location, device_map;
         $("#toggle-map").on("shown.bs.collapse", function () {
-            if (device_marker == null) {
+             if (device_marker == null) {
+
                 device_location = new L.LatLng(' . (float) $location->lat . ', ' . (float) $location->lng . ');
                 config = {"tile_url": "' . Config::get('leaflet.tile_url', '{s}.tile.openstreetmap.org') . '"};
                 device_map = init_map("location-map", "' . $maps_engine . '", "' . $maps_api . '", config);
-                device_marker = init_map_marker(device_map, device_location);
+                device_marker = L.marker(device_location).addTo(device_map);
+                device_map.setView(device_location);
                 device_map.setZoom(18);
+                device_marker.dragging.enable();
+
+
                 ';
 
     if (Auth::user()->isAdmin()) {
-        echo '  device_map.on("dragend", function () {
+        echo '  device_marker.on("dragend", function () {
                     var new_location = device_marker.getLatLng();
                     if (confirm("Update location to " + new_location + "? This will update this location for all devices!")) {
                         update_location(' . $location->id . ', new_location, function(success) {

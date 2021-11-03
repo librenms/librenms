@@ -534,7 +534,7 @@
     function widget_dom(data) {
         dom = '<li id="'+data.user_widget_id+'" data-type="'+data.widget+'" data-settings="0">'+
               '<header class="widget_header"><span id="widget_title_'+data.user_widget_id+'">'+data.title+
-              '</span>'+
+              '</span><span id="widget_title_counter_'+data.user_widget_id+'"></span>'+
               '<span class="fade-edit pull-right">'+
 
                 @if (
@@ -583,18 +583,18 @@
             if(this.contains(data)) {
                 widget_id = $(this).parent().attr('id');
                 widget_type = $(this).parent().data('type');
-                $(this).parent().data('settings','0');
+                $(this).parent().data('settings', '0');
             }
         });
-        if( widget_id > 0 && widget_settings != {} ) {
+        if(widget_id > 0 && widget_settings != {}) {
             $.ajax({
                 type: 'PUT',
                 url: '{{ url('/ajax/form/widget-settings/') }}/' + widget_id,
-                data: {settings: widget_settings},
+                data: { settings: widget_settings },
                 dataType: "json",
                 success: function (data) {
                     if( data.status == "ok" ) {
-                        widget_reload(widget_id, widget_type);
+                        widget_reload(widget_id, widget_type, true);
                         toastr.success(data.message);
                     }
                     else {
@@ -609,57 +609,54 @@
     return false;
     }
 
-    function widget_reload(id, data_type) {
-        $("#widget_body_"+id+" .bootgrid-table").bootgrid("destroy");
-        $("#widget_body_"+id+" *").off();
-        var $widget_body = $("#widget_body_"+id);
-        if ($widget_body.parent().data('settings') == 1 ) {
-            settings = 1;
-        } else {
-            settings = 0;
+    function widget_reload(id, data_type, forceDomInject) {
+        const $widget_body = $('#widget_body_' + id);
+        const $widget_bootgrid = $('#widget_body_' + id + ' .bootgrid-table');
+        const settings = $widget_body.parent().data('settings') == 1 ? 1 : 0;
+
+        if (settings === 1 || forceDomInject) {
+            $widget_bootgrid.bootgrid('destroy');
+            $('#widget_body_' + id + ' *').off();
+        } else if ($widget_bootgrid[0] && $widget_bootgrid.data('ajax') === true) {
+            // Check to see if a bootgrid already exists and has ajax reloading enabled.
+            // If so, use bootgrid to refresh the data instead of injecting the DOM in request.
+            return $widget_bootgrid.bootgrid('reload');
         }
+
         $.ajax({
             type: 'POST',
             url: ajax_url + '/dash/' + data_type,
             data: {
                 id: id,
-                dimensions: {x:$widget_body.width(), y:$widget_body.height()},
-                settings:settings
+                dimensions: {x: $widget_body.width(), y: $widget_body.height()},
+                settings: settings
             },
-            dataType: "json",
+            dataType: 'json',
             success: function (data) {
-                var $widget_body = $("#widget_body_"+id);
-                $widget_body.empty();
                 if (data.status === 'ok') {
-                    $("#widget_title_"+id).html(data.title);
-                    $widget_body.html(data.html).parent().data('settings', data.show_settings);
-                    $widget_body.html(data.html).parent().data('refresh', data.settings.refresh);
+                    $('#widget_title_' + id).html(data.title);
+                    $widget_body.html(data.html);
+                    $widget_body.parent().data('settings', data.show_settings).data('refresh', data.settings.refresh);
                 } else {
                     $widget_body.html('<div class="alert alert-info">' + data.message + '</div>');
                 }
             },
             error: function (data) {
-                var $widget_body = $("#widget_body_"+id);
-                $widget_body.empty();
-                if (data.responseJSON.error) {
-                    $widget_body.html('<div class="alert alert-info">' + data.responseJSON.error + '</div>');
-                } else {
-                    $widget_body.html('<div class="alert alert-info">{{ __('Problem with backend') }}</div>');
-                }
+                $widget_body.html('<div class="alert alert-info">' + (data.responseJSON.error || '{{ __('Problem with backend') }}') + '</div>');
             }
         });
     }
 
     function grab_data(id, data_type) {
-        var parent = $("#widget_body_"+id).parent();
+        const $parent = $('#widget_body_' + id).parent();
 
-        if( parent.data('settings') == 0 ) {
+        if($parent.data('settings') == 0) {
             widget_reload(id, data_type);
         }
 
-        setTimeout(function() {
+        setTimeout(function () {
             grab_data(id, data_type);
-        }, (parent.data('refresh') > 0 ? parent.data('refresh') : 60) * 1000);
+        }, ($parent.data('refresh') > 0 ? $parent.data('refresh') : 60) * 1000);
     }
 
     $('#new-widget').popover();

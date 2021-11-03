@@ -15,6 +15,7 @@
 
 /**
  * GitLab API Transport
+ *
  * @author Drew Hynes <drew.hynes@gmail.com>
  * @copyright 2018 Drew Hynes, LibreNMS
  * @license GPL
@@ -24,6 +25,7 @@ namespace LibreNMS\Alert\Transport;
 
 use LibreNMS\Alert\Transport;
 use LibreNMS\Enum\AlertState;
+use LibreNMS\Util\Proxy;
 
 class Gitlab extends Transport
 {
@@ -42,8 +44,6 @@ class Gitlab extends Transport
     {
         // Don't create tickets for resolutions
         if ($obj['state'] != AlertState::CLEAR) {
-            $device = device_by_id_cache($obj['device_id']); // for event logging
-
             $project_id = $opts['project-id'];
             $project_key = $opts['key'];
             $details = 'Librenms alert for: ' . $obj['hostname'];
@@ -59,7 +59,7 @@ class Gitlab extends Transport
             $postdata = ['fields' => $data];
             $datastring = json_encode($postdata);
 
-            set_curl_proxy($curl);
+            Proxy::applyToCurl($curl);
 
             $headers = ['Accept: application/json', 'Content-Type: application/json', 'PRIVATE-TOKEN: ' . $project_key];
 
@@ -74,7 +74,7 @@ class Gitlab extends Transport
             $code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
             if ($code == 200) {
                 $gitlabout = json_decode($ret, true);
-                d_echo('Created GitLab issue ' . $gitlabout['key'] . ' for ' . $device);
+                d_echo('Created GitLab issue ' . $gitlabout['key'] . ' for ' . $obj['hostname']);
 
                 return true;
             } else {

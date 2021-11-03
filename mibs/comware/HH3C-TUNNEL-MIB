@@ -1,0 +1,1283 @@
+-- =================================================================
+-- Copyright (c) 2004-2019 New H3C Tech. Co., Ltd. All rights reserved.
+--
+-- Description: Generic Routing Encapsulation configuration MIB
+-- Reference: INET-ADDRESS-MIB, IPV6-FLOW-LABEL-MIB, IF-MIB
+-- Version: V1.4
+-- History:
+-- V1.0 created by Sun Ludong
+--   2005-06-04 Initial version
+-- V1.1 modified by Zhao Chongri
+--   2012-10-23 add table hh3cTunnelEviTable and hh3cTunnelEviLinkTable
+--      modified by Zhao Wenpeng
+--   2013-02-28 add table hh3cTunnelGreTable
+-- V1.2 modified by Yang Chao
+--   2013-11-22 added tables hh3cTunnelVxlanIfTable, hh3cTunnelVxlanConfigGroup,
+--      hh3cTunnelAvailableIDGroup and hh3cTunnelTotalNumTable
+--      modified by Zhao Chongri
+--   2014-4-9 added table hh3cTunnelNvgreIfTable
+-- V1.3 modified by Lei Lei
+--   2018-6-13 added table hh3cTunnelDestinationTable
+-- V1.4 modified by Geng Shi Xin
+--   2019-04-08 added table hh3cTunnelGrep2mpStatsTable
+-- =================================================================
+HH3C-TUNNEL-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    hh3cCommon
+        FROM HH3C-OID-MIB
+    MODULE-IDENTITY, OBJECT-TYPE, Integer32, Unsigned32, Counter64
+        FROM SNMPv2-SMI
+    RowStatus, TruthValue, TEXTUAL-CONVENTION
+        FROM SNMPv2-TC
+    InetAddressType, InetAddress, InetAddressIPv4
+        FROM INET-ADDRESS-MIB
+    IPv6FlowLabelOrAny
+        FROM IPV6-FLOW-LABEL-MIB
+    ifIndex, InterfaceIndexOrZero, InterfaceIndex
+        FROM IF-MIB;
+
+hh3cTunnel MODULE-IDENTITY
+    LAST-UPDATED
+        "201806130000Z"                              -- Jun 13, 2018 at 00:00 GMT
+    ORGANIZATION
+        "New H3C Tech. Co., Ltd."
+    CONTACT-INFO
+        "Platform Team New H3C Tech. Co., Ltd.
+        Hai-Dian District Beijing P.R. China
+        http://www.h3c.com
+        Zip:100085
+        "
+    DESCRIPTION
+        "Added hh3cTunnelDestinationTable."
+    REVISION
+        "201806130000Z"                              -- Jun 13, 2018 at 00:00 GMT
+    DESCRIPTION
+        "This MIB contains objects to Manage configuration and Monitor tunnel.
+        "
+    REVISION
+        "201302280000Z"                              -- Feb 28, 2013 at 00:00 GMT
+    DESCRIPTION
+        "The initial revision of this MIB module.
+        "
+    ::= { hh3cCommon 53 }
+
+Hh3cTunnelType ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "Tunnel type definition.
+        "
+    SYNTAX INTEGER {
+        other(1),                            -- none of the following
+        direct(2),                           -- no intermediate header
+        gre(3),                              -- GRE encapsulation
+        minimal(4),                          -- Minimal encapsulation
+        l2tp(5),                             -- L2TP encapsulation
+        pptp(6),                             -- PPTP encapsulation
+        l2f(7),                              -- L2F encapsulation
+        udp(8),                              -- UDP encapsulation
+        atmp(9),                             -- ATMP encapsulation
+        msdp(10),                            -- MSDP encapsulation
+        sixToFour(11),                       -- 6to4 encapsulation
+        sixOverFour(12),                     -- 6over4 encapsulation
+        isatap(13),                          -- ISATAP encapsulation
+        teredo(14),                          -- Teredo encapsulation
+        tunnelModeReserve(35),               -- 15 to 35 are reserved
+        tunnelModeIPv4Gre(36),               -- GRE tunnel, IPv4 as transport protocol
+        tunnelModeIPv6Gre(37),               -- GRE tunnel, IPv6 as transport protocol
+        tunnelModeIPv4IPv4(38),             -- IPv4 over IPv4 tunnel
+        tunnelModeIPv4IPv6Config(39),        -- IPv6 over IPv4 manual tunnel
+        tunnelModeIPv4IPv6Auto(40),          -- IPv6 over IPv4 auto tunnel
+        tunnelModeIPv4IPv66to4(41),          -- IPv6 over IPv4 6to4 tunnel
+        tunnelModeIPv4IPv6Isatap(42),        -- IPv6 over IPv4 isatap tunnel
+        tunnelModeIPv6IPv4(43),              -- IPv4 over IPv6
+        tunnelModeIPv6IPv6(44),              -- IPv6 over IPv6 tunnel
+        tunnelModeIPv4UdpDVPN(45),           -- IPv4 DVPN tunnel£¬UDP method
+        tunnelModeIPv4GreDVPN(46),           -- IPv4 DVPN tunnel£¬GRE method
+        tunnelModeIPv6UdpDVPN(47),           -- IPv6 DVPN tunnel£¬UDP method
+        tunnelModeIPv6GreDVPN(48),           -- IPv6 DVPN tunnel£¬GRE method
+        tunnelModeCrLsp(49),                 -- IPv4 CRLSP tunnel
+        tunnelModeMax(50),
+        tunnelModeIPv4UdpVxlan(51),          -- IPv4 VXLAN tunnel, UDP method
+        tunnelModeIPv6UdpVxlan(52),          -- IPv6 VXLAN tunnel, UDP method
+        tunnelModeIPv4NVGRE(53),             -- IPv4 NVGRE tunnel
+        tunnelModeIPv6NVGRE(54)              -- IPv6 NVGRE tunnel
+    }
+
+hh3cTunnelMIBObjects OBJECT IDENTIFIER ::= { hh3cTunnel 1 }
+
+hh3cTunnelTables      OBJECT IDENTIFIER ::= { hh3cTunnelMIBObjects 1 }
+
+hh3cTunnelIfTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF Hh3cTunnelIfEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "The (conceptual) table containing information on configured tunnels.
+        "
+    ::= { hh3cTunnelTables 1 }
+
+hh3cTunnelIfEntry OBJECT-TYPE
+    SYNTAX     Hh3cTunnelIfEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "An entry (conceptual row) containing the information on a
+        particular configured tunnel.
+        "
+    INDEX      { ifIndex }
+    ::= { hh3cTunnelIfTable 1 }
+
+Hh3cTunnelIfEntry ::= SEQUENCE {
+    hh3cTunnelIfEncapsMethod         Hh3cTunnelType,
+    hh3cTunnelIfHopLimit             Integer32,
+    hh3cTunnelIfSecurity             INTEGER,
+    hh3cTunnelIfTOS                  Integer32,
+    hh3cTunnelIfFlowLabel            IPv6FlowLabelOrAny,
+    hh3cTunnelIfAddressType          InetAddressType,
+    hh3cTunnelIfLocalInetAddress     InetAddress,
+    hh3cTunnelIfRemoteInetAddress    InetAddress,
+    hh3cTunnelIfEncapsLimit          Integer32
+}
+
+hh3cTunnelIfEncapsMethod OBJECT-TYPE
+    SYNTAX     Hh3cTunnelType
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "The encapsulation method used by the tunnel.
+        "
+    ::= { hh3cTunnelIfEntry 3 }
+
+hh3cTunnelIfHopLimit OBJECT-TYPE
+    SYNTAX     Integer32 (0 | 1..255)
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The IPv4 TTL or IPv6 Hop Limit to use in the outer IP
+        header.  A value of 0 indicates that the value is
+        copied from the payload's header.
+        "
+    ::= { hh3cTunnelIfEntry 4 }
+
+hh3cTunnelIfSecurity OBJECT-TYPE
+    SYNTAX     INTEGER {
+        none(1),   -- no security
+        ipsec(2),  -- IPsec security
+        other(3)
+    }
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The method used by the tunnel to secure the outer IP
+        header.  The value ipsec indicates that IPsec is used
+        between the tunnel endpoints for authentication or
+        encryption or both.  More specific security-related
+        information may be available in a MIB module for the
+        security protocol in use.
+        "
+    ::= { hh3cTunnelIfEntry 5 }
+
+hh3cTunnelIfTOS OBJECT-TYPE
+    SYNTAX     Integer32 (-2..63)
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The method used to set the high 6 bits (the
+        differentiated services codepoint) of the IPv4 TOS or
+        IPv6 Traffic Class in the outer IP header.  A value of
+        -1 indicates that the bits are copied from the
+        payload's header.  A value of -2 indicates that a
+        traffic conditioner is invoked and more information
+        may be available in a traffic conditioner MIB module.
+        A value between 0 and 63 inclusive indicates that the
+        bit field is set to the indicated value.
+        "
+    ::= { hh3cTunnelIfEntry 6 }
+
+hh3cTunnelIfFlowLabel OBJECT-TYPE
+    SYNTAX     IPv6FlowLabelOrAny
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The method used to set the IPv6 Flow Label value.
+        This object need not be present in rows where
+        hh3cTunnelIfAddressType indicates the tunnel is not over
+        IPv6.  A value of -1 indicates that a traffic
+        conditioner is invoked and more information may be
+        available in a traffic conditioner MIB.  Any other
+        value indicates that the Flow Label field is set to
+        the indicated value.
+        "
+    ::= { hh3cTunnelIfEntry 7 }
+
+hh3cTunnelIfAddressType OBJECT-TYPE
+    SYNTAX     InetAddressType
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "The type of address in the corresponding
+        hh3cTunnelIfLocalInetAddress and hh3cTunnelIfRemoteInetAddress
+        objects.
+        "
+    ::= { hh3cTunnelIfEntry 8 }
+
+hh3cTunnelIfLocalInetAddress OBJECT-TYPE
+    SYNTAX     InetAddress
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "The address of the local endpoint of the tunnel
+        (i.e., the source address used in the outer IP
+        header).  If the address is unknown, the value is
+        0.0.0.0 for IPv4 or :: for IPv6.  The type of this
+        object is given by hh3cTunnelIfAddressType.
+        "
+    ::= { hh3cTunnelIfEntry 9 }
+
+hh3cTunnelIfRemoteInetAddress OBJECT-TYPE
+    SYNTAX     InetAddress
+    MAX-ACCESS read-write
+    STATUS     current
+    DESCRIPTION
+        "The address of the remote endpoint of the tunnel
+        (i.e., the destination address used in the outer IP
+        header).  If the address is unknown or the tunnel is
+        not a point-to-point link (e.g., if it is a 6to4
+        tunnel), the value is 0.0.0.0 for tunnels over IPv4 or
+        :: for tunnels over IPv6.  The type of this object is
+        given by hh3cTunnelIfAddressType.
+        "
+    ::= { hh3cTunnelIfEntry 10 }
+
+hh3cTunnelIfEncapsLimit OBJECT-TYPE
+    SYNTAX     Integer32 (-1 | 0..255)
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The maximum number of additional encapsulations
+        permitted for packets undergoing encapsulation at this
+        node.  A value of -1 indicates that no limit is
+        present (except as a result of the packet size).
+        "
+    REFERENCE
+        "RFC 2473, section 4.1.1
+        "
+    ::= { hh3cTunnelIfEntry 11 }
+
+hh3cTunnelInetConfigTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF Hh3cTunnelInetConfigEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "The (conceptual) table containing information on
+        configured tunnels.  This table can be used to map a
+        set of tunnel endpoints to the associated ifIndex
+        value.  It can also be used for row creation.  Note
+        that every row in the hh3cTunnelIfTable with a fixed
+        destination address should have a corresponding row in
+        the hh3cTunnelInetConfigTable, regardless of whether it
+        was created via SNMP.
+        "
+    ::= { hh3cTunnelTables 3 }
+
+hh3cTunnelInetConfigEntry OBJECT-TYPE
+    SYNTAX     Hh3cTunnelInetConfigEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "An entry (conceptual row) containing the information
+        on a particular configured tunnel.
+        "
+    INDEX {
+        hh3cTunnelInetConfigSlot,
+        hh3cTunnelInetConfigSubSlot,
+        hh3cTunnelInetConfigTunnNum
+    }
+    ::= { hh3cTunnelInetConfigTable 1 }
+
+Hh3cTunnelInetConfigEntry ::= SEQUENCE {
+    hh3cTunnelInetConfigSlot                Integer32,
+    hh3cTunnelInetConfigSubSlot             Integer32,
+    hh3cTunnelInetConfigTunnNum             Integer32,
+    hh3cTunnelInetConfigIfIndex             InterfaceIndexOrZero,
+    hh3cTunnelInetConfigStatus              RowStatus
+}
+
+hh3cTunnelInetConfigSlot OBJECT-TYPE
+    SYNTAX     Integer32 (0..255)
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "Slot number.  hh3cTunnelInetConfigSlot, hh3cTunnelInetConfigSubSlot
+        and hh3cTunnelInetConfigTunnNum describe a tunnel interface.
+        For Example, interface tunnel 0/0/25 would be configured as:
+        hh3cTunnelInetConfigSlot          0
+        hh3cTunnelInetConfigSubSlot       0
+        hh3cTunnelInetConfigTunnNum      25
+        "
+    ::= { hh3cTunnelInetConfigEntry 1 }
+
+hh3cTunnelInetConfigSubSlot OBJECT-TYPE
+    SYNTAX     Integer32 (0..255)
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "Sub slot number.  As described in hh3cTunnelInetConfigSlot's description.
+        "
+    ::= { hh3cTunnelInetConfigEntry 2 }
+
+hh3cTunnelInetConfigTunnNum OBJECT-TYPE
+    SYNTAX     Integer32 (0..65535)
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "Tunnel number.  As described in hh3cTunnelInetConfigSlot's description.
+        "
+    ::= { hh3cTunnelInetConfigEntry 3 }
+
+hh3cTunnelInetConfigIfIndex OBJECT-TYPE
+    SYNTAX     InterfaceIndexOrZero
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "If the value of hh3cTunnelInetConfigStatus for this row
+        is active, then this object contains the value of
+        ifIndex corresponding to the tunnel interface.  A
+        value of 0 is not legal in the active state, and means
+        that the interface index has not yet been assigned.
+        "
+    ::= { hh3cTunnelInetConfigEntry 6 }
+
+hh3cTunnelInetConfigStatus OBJECT-TYPE
+    SYNTAX     RowStatus
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+        "The status of this row, by which new entries may be
+        created, or old entries deleted from this table.  The
+        agent need not support setting this object to
+        createAndWait or notInService since there are no other
+        writable objects in this table, and writable objects
+        in rows of corresponding tables such as the
+        hh3cTunnelIfTable may be modified while this row is
+        active.
+
+        To create a row in this table, the management
+        station should set hh3cTunnelInetConfigSlot,
+        hh3cTunnelInetConfigSubSlot, hh3cTunnelInetConfigTunnNum,
+        and set hh3cTunnelInetConfigStatus to createAndGo.
+
+        Creating a row in this table will cause an interface
+        index to be assigned by the agent in an
+        implementation-dependent manner, and corresponding
+        rows will be instantiated in the ifTable and the
+        hh3cTunnelIfTable.  The status of this row will become
+        active as soon as the agent assigns the interface
+        index, regardless of whether the interface is
+        operationally up.
+
+        Deleting a row in this table will likewise delete the
+        corresponding row in the ifTable and in the hh3cTunnelIfTable.
+        "
+    ::= { hh3cTunnelInetConfigEntry 7 }
+
+hh3cTunnelEviTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF Hh3cTunnelEviEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "The (conceptual) table containing information on configured EVI-Tunnel.
+        "
+    ::= { hh3cTunnelTables 4 }
+
+hh3cTunnelEviEntry OBJECT-TYPE
+    SYNTAX     Hh3cTunnelEviEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "An entry (conceptual row) containing the information on a
+        particular configured EVI-Tunnel.
+        "
+    INDEX      { hh3cTunnelEviTunnNum }
+    ::= { hh3cTunnelEviTable 1 }
+
+Hh3cTunnelEviEntry ::= SEQUENCE {
+    hh3cTunnelEviTunnNum              Integer32,
+    hh3cTunnelEviIfIndex              InterfaceIndex,
+    hh3cTunnelEviStatus               RowStatus,
+    hh3cTunnelEviAddressType          InetAddressType,
+    hh3cTunnelEviLocalAddr            InetAddress,
+    hh3cTunnelEviNetworkID            Integer32,
+    hh3cTunnelEviKeepaliveInterval    Integer32,
+    hh3cTunnelEviKeepaliveTimes       Integer32
+}
+
+hh3cTunnelEviTunnNum OBJECT-TYPE
+    SYNTAX     Integer32 (1..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "Tunnel number.  An identifier used to distinguish
+         between multiple tunnels.
+        "
+    ::= { hh3cTunnelEviEntry 1 }
+
+hh3cTunnelEviIfIndex OBJECT-TYPE
+    SYNTAX     InterfaceIndex
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "A unique value, greater than zero, for each
+         interface.  It is recommended that values are assigned
+         contiguously starting from 1.  The value for each
+         interface sub-layer must remain constant at least from
+         one re-initialization of the entity's network
+         management system to the next re-initialization.
+        "
+    ::= { hh3cTunnelEviEntry 2 }
+
+hh3cTunnelEviStatus OBJECT-TYPE
+    SYNTAX     RowStatus
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+        "The status of this row, by which new entries may be
+        created, or old entries deleted from this table.  The
+        agent need not support setting this object to
+        createAndWait or notInService since there are no other
+        writable objects in this table, and writable objects
+        in rows of corresponding tables such as the
+        hh3cTunnelEviTable may be modified while this row is
+        active.
+
+        Creating a row in this table will cause an interface
+        index to be assigned by the agent in an
+        implementation-dependent manner, and corresponding
+        rows will be instantiated in the ifTable.
+        The status of this row will become
+        active as soon as the agent assigns the interface
+        index, regardless of whether the interface is
+        operationally up.
+
+        Deleting a row in this table will likewise delete the
+        corresponding row in the ifTable.
+        "
+    ::= { hh3cTunnelEviEntry 3 }
+
+hh3cTunnelEviAddressType OBJECT-TYPE
+    SYNTAX     InetAddressType
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+        "The type of address in the corresponding
+         hh3cTunnelEviLocalAddr objects.
+         Can not be modified after creation.
+        "
+    ::= { hh3cTunnelEviEntry 4 }
+
+hh3cTunnelEviLocalAddr OBJECT-TYPE
+    SYNTAX     InetAddress
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+        "The address of the local endpoint of the tunnel
+        (i.e., the source address used in the outer IP
+        header).  The type of this object is given by
+        hh3cTunnelEviAddressType.
+        "
+    ::= { hh3cTunnelEviEntry 5 }
+
+hh3cTunnelEviNetworkID OBJECT-TYPE
+    SYNTAX     Integer32 (0..16777215)
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+        "The method used to assign a network ID to an EVI-Tunnel interface.
+         Assign the same network ID to the EVI-Tunnel interfaces of
+         all edge devices in an EVI network.  A value of 0 indicates that
+         no network ID is assigned to any EVI-Tunnel interface.
+        "
+    ::= { hh3cTunnelEviEntry 6 }
+
+hh3cTunnelEviKeepaliveInterval OBJECT-TYPE
+    SYNTAX     Integer32 (1..32767)
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+        "The method used to assign the keepalive interval.
+        "
+    ::= { hh3cTunnelEviEntry 7 }
+
+hh3cTunnelEviKeepaliveTimes OBJECT-TYPE
+    SYNTAX     Integer32 (1..255)
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+        "The method used to assign the keepalive maximum number
+         of consecutive keepalive failures that are allowed.
+        "
+    ::= { hh3cTunnelEviEntry 8 }
+
+hh3cTunnelEviLinkTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF Hh3cTunnelEviLinkEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "The (conceptual) table containing information on configured EVI-Link.
+        "
+    ::= { hh3cTunnelTables 5 }
+
+hh3cTunnelEviLinkEntry OBJECT-TYPE
+    SYNTAX     Hh3cTunnelEviLinkEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "An entry (conceptual row) containing the information on a
+        particular configured EVI-Link.
+        "
+    INDEX      { hh3cTunnelEviTunnNum, hh3cTunnelEviLinkNum }
+    ::= { hh3cTunnelEviLinkTable 1 }
+
+Hh3cTunnelEviLinkEntry ::= SEQUENCE {
+    hh3cTunnelEviLinkNum                Integer32,
+    hh3cTunnelEviLinkIfIndex            InterfaceIndex,
+    hh3cTunnelEviLinkAddressType        InetAddressType,
+    hh3cTunnelEviLinkRemoteAddr         InetAddress
+}
+
+hh3cTunnelEviLinkNum OBJECT-TYPE
+    SYNTAX     Integer32 (1..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "EVI-Link number.
+        "
+    ::= { hh3cTunnelEviLinkEntry 1 }
+
+hh3cTunnelEviLinkIfIndex OBJECT-TYPE
+    SYNTAX     InterfaceIndex
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "A unique value, greater than zero, for each
+         interface.  It is recommended that values are assigned
+         contiguously starting from 1.  The value for each
+         interface sub-layer must remain constant at least from
+         one re-initialization of the entity's network
+         management system to the next re-initialization.
+        "
+    ::= { hh3cTunnelEviLinkEntry 2 }
+
+    hh3cTunnelEviLinkAddressType OBJECT-TYPE
+    SYNTAX     InetAddressType
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The type of address in the corresponding
+         hh3cTunnelEviLinkRemoteAddr objects.
+         Can not be modified after creation.
+        "
+    ::= { hh3cTunnelEviLinkEntry 3 }
+
+hh3cTunnelEviLinkRemoteAddr OBJECT-TYPE
+    SYNTAX     InetAddress
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The address of the remote endpoint of the tunnel
+        (i.e., the destination address used in the outer IP
+        header).
+        "
+    ::= { hh3cTunnelEviLinkEntry 4}
+
+hh3cTunnelGreTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF Hh3cTunnelGreEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "The (conceptual) table containing information on configured Gre-Tunnel.
+        "
+    ::= { hh3cTunnelTables 6 }
+
+hh3cTunnelGreEntry OBJECT-TYPE
+    SYNTAX     Hh3cTunnelGreEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "An entry (conceptual row) containing the information on a
+        particular configured Gre-Tunnel.
+        "
+    INDEX      { hh3cTunnelGreTunnNum }
+    ::= { hh3cTunnelGreTable 1 }
+
+Hh3cTunnelGreEntry ::= SEQUENCE {
+    hh3cTunnelGreTunnNum                  Integer32,
+    hh3cTunnelGreTunnIfIndex              InterfaceIndex,
+    hh3cTunnelGreAddressType              InetAddressType,
+    hh3cTunnelGreLocalAddr                InetAddress,
+    hh3cTunnelGreRemoteAddr               InetAddress,
+    hh3cTunnelGreKeepaliveEnabled         TruthValue,
+    hh3cTunnelGreKeepaliveInterval        Integer32,
+    hh3cTunnelGreKeepaliveTimes           Integer32,
+    hh3cTunnelGreSlbgGroupNum             Unsigned32,
+    hh3cTunnelGreTunnStatus               RowStatus
+}
+
+hh3cTunnelGreTunnNum OBJECT-TYPE
+    SYNTAX     Integer32 (1..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "Tunnel number.  An identifier used to distinguish
+         between multiple tunnels.
+        "
+    ::= { hh3cTunnelGreEntry 1 }
+
+hh3cTunnelGreTunnIfIndex OBJECT-TYPE
+    SYNTAX     InterfaceIndex
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "A unique value, greater than zero, for each
+         interface.  It is recommended that values are assigned
+         contiguously starting from 1.  The value for each
+         interface sub-layer must remain constant at least from
+         one re-initialization of the entity's network
+         management system to the next re-initialization.
+        "
+    ::= { hh3cTunnelGreEntry 2 }
+
+hh3cTunnelGreAddressType OBJECT-TYPE
+    SYNTAX     InetAddressType
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+        "The type of address in the corresponding
+         hh3cTunnelGreLocalAddr and hh3cTunnelGreRemoteAddr objects.
+        "
+    ::= { hh3cTunnelGreEntry 3 }
+
+hh3cTunnelGreLocalAddr OBJECT-TYPE
+    SYNTAX     InetAddress
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+        "The address of the local endpoint of the tunnel
+         (i.e., the source address used in the outer IP
+         header).
+        "
+    ::= { hh3cTunnelGreEntry 4 }
+
+hh3cTunnelGreRemoteAddr OBJECT-TYPE
+    SYNTAX     InetAddress
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+        "The address of the remote endpoint of the tunnel
+         (i.e., the destination address used in the outer IP
+         header).
+        "
+    ::= { hh3cTunnelGreEntry 5 }
+
+hh3cTunnelGreKeepaliveEnabled OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "This MIB object specifies whether or not keepalive is used.
+         A value of true indicates that keepalive SHOULD be used.
+         When keepalive is not be used, the value of
+         hh3cTunnelGreKeepaliveInterval and hh3cTunnelGreKeepaliveTimes
+         MUST be zero.
+        "
+    DEFVAL { false }
+    ::= { hh3cTunnelGreEntry 6 }
+
+hh3cTunnelGreKeepaliveInterval OBJECT-TYPE
+    SYNTAX     Integer32 (0..32767)
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+        "The method used to assign the keepalive interval.
+         The value is zero when keepalive is not used.
+         The valid value is from 1 to 32767, when keepalive is used.
+        "
+    DEFVAL { 0 }
+    ::= { hh3cTunnelGreEntry 7 }
+
+hh3cTunnelGreKeepaliveTimes OBJECT-TYPE
+    SYNTAX     Integer32 (0..255)
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+        "The method used to assign the keepalive maximum number
+         of consecutive keepalive failures that are allowed.
+         The value is zero when keepalive is not used.
+         The valid value is from 1 to 255, when keepalive is used.
+        "
+    DEFVAL { 0 }
+    ::= { hh3cTunnelGreEntry 8 }
+
+hh3cTunnelGreSlbgGroupNum OBJECT-TYPE
+    SYNTAX     Unsigned32 (0..4294967295)
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+        "The method used to assign the service-loopback-group.
+        "
+    ::= { hh3cTunnelGreEntry 9 }
+
+hh3cTunnelGreTunnStatus OBJECT-TYPE
+    SYNTAX     RowStatus
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+        "The status of this row, by which new entries may be
+         created, or old entries deleted from this table.  The
+         agent need not support setting this object to
+         createAndWait or notInService since there are no other
+         writable objects in this table, and writable objects
+         in rows of corresponding tables such as the
+         hh3cTunnelGreTable may be modified while this row is
+         active.
+
+         Creating a row in this table will cause an interface
+         index to be assigned by the agent in an
+         implementation-dependent manner, and corresponding
+         rows will be instantiated in the ifTable.
+         The status of this row will become
+         active as soon as the agent assigns the interface
+         index, regardless of whether the interface is
+         operationally up.
+
+         Deleting a row in this table will likewise delete the
+         corresponding row in the ifTable.
+        "
+    ::= { hh3cTunnelGreEntry 10 }
+
+hh3cTunnelVxlanIfTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF Hh3cTunnelVxlanIfEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "The (conceptual) table containing information on configured Vxlan-Tunnel.
+        "
+    ::= { hh3cTunnelTables 7 }
+
+hh3cTunnelVxlanIfEntry OBJECT-TYPE
+    SYNTAX     Hh3cTunnelVxlanIfEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "An entry (conceptual row) containing the information on a
+        particular configured Vxlan-Tunnel.
+        "
+    INDEX      { hh3cTunnelVxlanIfTunnNum }
+    ::= { hh3cTunnelVxlanIfTable 1 }
+
+Hh3cTunnelVxlanIfEntry ::= SEQUENCE {
+    hh3cTunnelVxlanIfTunnNum              Integer32,
+    hh3cTunnelVxlanTunnIfIndex            InterfaceIndex,
+    hh3cTunnelVxlanIfAddressType          InetAddressType,
+    hh3cTunnelVxlanIfLocalAddr            InetAddress,
+    hh3cTunnelVxlanIfRemoteAddr           InetAddress,
+    hh3cTunnelVxlanIfStatus               RowStatus
+}
+
+hh3cTunnelVxlanIfTunnNum OBJECT-TYPE
+    SYNTAX     Integer32 (1..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "Tunnel number.  An identifier used to distinguish
+         between multiple tunnels.
+        "
+    ::= { hh3cTunnelVxlanIfEntry 1 }
+
+hh3cTunnelVxlanTunnIfIndex OBJECT-TYPE
+    SYNTAX     InterfaceIndex
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "A unique value, greater than zero, for each
+         interface.  It is recommended that values are assigned
+         contiguously starting from 1.  The value for each
+         interface sub-layer must remain constant at least from
+         one re-initialization of the entity's network
+         management system to the next re-initialization.
+        "
+    ::= { hh3cTunnelVxlanIfEntry 2 }
+
+hh3cTunnelVxlanIfAddressType OBJECT-TYPE
+    SYNTAX     InetAddressType
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+        "The type of address in the corresponding
+         hh3cTunnelVxlanIfLocalAddr and hh3cTunnelVxlanIfRemoteAddr objects.
+        "
+    ::= { hh3cTunnelVxlanIfEntry 3 }
+
+hh3cTunnelVxlanIfLocalAddr OBJECT-TYPE
+    SYNTAX     InetAddress
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+        "The address of the local endpoint of the tunnel
+         (i.e., the source address used in the outer IP
+         header).
+        "
+    ::= { hh3cTunnelVxlanIfEntry 4 }
+
+hh3cTunnelVxlanIfRemoteAddr OBJECT-TYPE
+    SYNTAX     InetAddress
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+        "The address of the remote endpoint of the tunnel
+         (i.e., the destination address used in the outer IP
+         header).
+        "
+    ::= { hh3cTunnelVxlanIfEntry 5 }
+
+hh3cTunnelVxlanIfStatus OBJECT-TYPE
+    SYNTAX     RowStatus
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+        "The status of this row, by which new entries may be
+         created, or old entries deleted from this table.  The
+         agent need not support setting this object to
+         createAndWait or notInService since there are no other
+         writable objects in this table, and writable objects
+         in rows of corresponding tables such as the
+         hh3cTunnelVxlanIfTable may be modified while this row is
+         active.
+
+         Creating a row in this table will cause an interface
+         index to be assigned by the agent in an
+         implementation-dependent manner, and corresponding
+         rows will be instantiated in the ifTable.
+         The status of this row will become
+         active as soon as the agent assigns the interface
+         index, regardless of whether the interface is
+         operationally up.
+
+         Deleting a row in this table will likewise delete the
+         corresponding row in the ifTable.
+        "
+    ::= { hh3cTunnelVxlanIfEntry 6 }
+
+hh3cTunnelVxlanConfigGroup OBJECT IDENTIFIER ::= { hh3cTunnelTables 8 }
+
+hh3cTunnelVxlanUdpPort OBJECT-TYPE
+    SYNTAX Integer32 (1..65535)
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "The UDP port number for Vxlan Tunnels."
+    ::= { hh3cTunnelVxlanConfigGroup 1 }
+
+hh3cTunnelVxlanDropWrongCksmPkt OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Whether or not dropping invalid UDP chesksum Vxlan packet."
+    ::= { hh3cTunnelVxlanConfigGroup 2 }
+
+hh3cTunnelVxlanDropVlanTagPkt OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Whether or not dropping Vxlan packet with inner VLAN tag."
+    ::= { hh3cTunnelVxlanConfigGroup 3 }
+
+hh3cTunnelAvailableIDGroup OBJECT IDENTIFIER ::= { hh3cTunnelTables 9 }
+
+hh3cTunnelAvailableID OBJECT-TYPE
+    SYNTAX Integer32 (-1 | 1..2147483647)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The available tunnel ID.  A value of -1 indicates that
+         there is no available tunnel ID."
+    ::= { hh3cTunnelAvailableIDGroup 1 }
+
+hh3cTunnelTotalNumTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF Hh3cTunnelTotalNumEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "Total number of a particular method tunnel."
+    ::= { hh3cTunnelTables 10 }
+
+hh3cTunnelTotalNumEntry OBJECT-TYPE
+    SYNTAX     Hh3cTunnelTotalNumEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "Total number of a particular method tunnel."
+    INDEX      { hh3cTunnelEncapsMethod }
+    ::= { hh3cTunnelTotalNumTable 1 }
+
+Hh3cTunnelTotalNumEntry ::= SEQUENCE {
+    hh3cTunnelEncapsMethod              Hh3cTunnelType,
+    hh3cTunnelTotalNum                  Unsigned32
+}
+
+hh3cTunnelEncapsMethod OBJECT-TYPE
+    SYNTAX     Hh3cTunnelType
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "The encapsulation method used by the tunnel."
+    ::= { hh3cTunnelTotalNumEntry 1 }
+
+hh3cTunnelTotalNum OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Total number of a particular method tunnel.
+        "
+    ::= { hh3cTunnelTotalNumEntry 2 }
+
+hh3cTunnelNvgreIfTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF Hh3cTunnelNvgreIfEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "The (conceptual) table containing information on configured Nvgre-Tunnel.
+        "
+    ::= { hh3cTunnelTables 11 }
+
+hh3cTunnelNvgreIfEntry OBJECT-TYPE
+    SYNTAX     Hh3cTunnelNvgreIfEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "An entry (conceptual row) containing the information on a
+        particular configured Nvgre-Tunnel.
+        "
+    INDEX      { hh3cTunnelNvgreIfTunnNum }
+    ::= { hh3cTunnelNvgreIfTable 1 }
+
+Hh3cTunnelNvgreIfEntry ::= SEQUENCE {
+    hh3cTunnelNvgreIfTunnNum              Integer32,
+    hh3cTunnelNvgreTunnIfIndex            InterfaceIndex,
+    hh3cTunnelNvgreIfAddressType          InetAddressType,
+    hh3cTunnelNvgreIfLocalAddr            InetAddress,
+    hh3cTunnelNvgreIfRemoteAddr           InetAddress,
+    hh3cTunnelNvgreIfStatus               RowStatus
+}
+
+hh3cTunnelNvgreIfTunnNum OBJECT-TYPE
+    SYNTAX     Integer32 (1..2147483647)
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "Tunnel number.  An identifier used to distinguish
+         between multiple tunnels.
+        "
+    ::= { hh3cTunnelNvgreIfEntry 1 }
+
+hh3cTunnelNvgreTunnIfIndex OBJECT-TYPE
+    SYNTAX     InterfaceIndex
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "A unique value, greater than zero, for each
+         interface.  It is recommended that values are assigned
+         contiguously starting from 1.  The value for each
+         interface sub-layer must remain constant at least from
+         one re-initialization of the entity's network
+         management system to the next re-initialization.
+        "
+    ::= { hh3cTunnelNvgreIfEntry 2 }
+
+hh3cTunnelNvgreIfAddressType OBJECT-TYPE
+    SYNTAX     InetAddressType
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+        "The type of address in the corresponding
+         hh3cTunnelNvgreIfLocalAddr and hh3cTunnelNvgreIfRemoteAddr objects.
+        "
+    ::= { hh3cTunnelNvgreIfEntry 3 }
+
+hh3cTunnelNvgreIfLocalAddr OBJECT-TYPE
+    SYNTAX     InetAddress
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+        "The address of the local endpoint of the tunnel
+         (i.e., the source address used in the outer IP
+         header).
+        "
+    ::= { hh3cTunnelNvgreIfEntry 4 }
+
+hh3cTunnelNvgreIfRemoteAddr OBJECT-TYPE
+    SYNTAX     InetAddress
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+        "The address of the remote endpoint of the tunnel
+         (i.e., the destination address used in the outer IP
+         header).
+        "
+    ::= { hh3cTunnelNvgreIfEntry 5 }
+
+hh3cTunnelNvgreIfStatus OBJECT-TYPE
+    SYNTAX     RowStatus
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+        "The status of this row, by which new entries may be
+         created, or old entries deleted from this table.  The
+         agent need not support setting this object to
+         createAndWait or notInService since there are no other
+         writable objects in this table, and writable objects
+         in rows of corresponding tables such as the
+         hh3cTunnelNvgreIfTable may be modified while this row is
+         active.
+
+         Creating a row in this table will cause an interface
+         index to be assigned by the agent in an
+         implementation-dependent manner, and corresponding
+         rows will be instantiated in the ifTable.
+         The status of this row will become
+         active as soon as the agent assigns the interface
+         index, regardless of whether the interface is
+         operationally up.
+
+         Deleting a row in this table will likewise delete the
+         corresponding row in the ifTable.
+        "
+    ::= { hh3cTunnelNvgreIfEntry 6 }
+
+hh3cTunnelDestinationTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF Hh3cTunnelDestinationEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+       "The (conceptual) table containing information on tunnels.
+       "
+    ::= { hh3cTunnelTables 12 }
+
+hh3cTunnelDestinationEntry OBJECT-TYPE
+    SYNTAX     Hh3cTunnelDestinationEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "An entry (conceptual row) containing the information on a
+         particular tunnel.
+        "
+    INDEX      { hh3cTunnelDestinationDstAddr,
+               hh3cTunnelDestinationDstType,
+         hh3cTunnelDestinationTunNum}
+    ::= { hh3cTunnelDestinationTable 1 }
+
+Hh3cTunnelDestinationEntry ::= SEQUENCE {
+    hh3cTunnelDestinationDstAddr           InetAddress,
+    hh3cTunnelDestinationDstType           InetAddressType,
+    hh3cTunnelDestinationTunNum            Integer32,
+    hh3cTunnelDestinationTunIfindex        InterfaceIndex
+}
+
+hh3cTunnelDestinationDstAddr OBJECT-TYPE
+    SYNTAX     InetAddress
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "Destination address of a tunnel.
+        "
+    ::= { hh3cTunnelDestinationEntry 1 }
+
+hh3cTunnelDestinationDstType OBJECT-TYPE
+    SYNTAX     InetAddressType
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "Type of the destination address.
+        "
+    ::= { hh3cTunnelDestinationEntry 2 }
+
+hh3cTunnelDestinationTunNum OBJECT-TYPE
+    SYNTAX     Integer32 (0..65535)
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "Tunnel number, an identifier used to distinguish
+         between multiple tunnels.
+        "
+    ::= { hh3cTunnelDestinationEntry 3 }
+
+hh3cTunnelDestinationTunIfindex OBJECT-TYPE
+    SYNTAX     InterfaceIndex
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "A unique value greater than zero, for each interface.
+        "
+    ::= { hh3cTunnelDestinationEntry 4 }
+
+
+hh3cTunnelGrep2mpStatsTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF Hh3cTunnelGrep2mpStatsEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "The table contains GRE P2MP tunnel mapping statistics."
+    ::= { hh3cTunnelTables 13 }
+
+hh3cTunnelGrep2mpStatsEntry OBJECT-TYPE
+    SYNTAX     Hh3cTunnelGrep2mpStatsEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+           "GRE P2MP tunnel mapping statistics entry."
+    INDEX { hh3cTunnelGrep2mpStatsTunnelNo,
+            hh3cTunnelGrep2mpStatsVrf,
+            hh3cTunnelGrep2mpStatsVPCID,
+            hh3cTunnelGrep2mpStatsBraAddr,
+            hh3cTunnelGrep2mpStatsBraMask,
+            hh3cTunnelGrep2mpStatsAddrType,
+            hh3cTunnelGrep2mpStatsDestAddr}
+    ::= { hh3cTunnelGrep2mpStatsTable 1 }
+
+Hh3cTunnelGrep2mpStatsEntry ::= SEQUENCE {
+        hh3cTunnelGrep2mpStatsTunnelNo              Integer32,
+        hh3cTunnelGrep2mpStatsVrf                   Integer32,
+        hh3cTunnelGrep2mpStatsVPCID                 Integer32,
+        hh3cTunnelGrep2mpStatsBraAddr               InetAddress,
+        hh3cTunnelGrep2mpStatsBraMask               InetAddress,
+        hh3cTunnelGrep2mpStatsAddrType              InetAddressType,
+        hh3cTunnelGrep2mpStatsDestAddr              InetAddressIPv4,
+        hh3cTunnelGrep2mpStatsInPkts                Counter64,
+        hh3cTunnelGrep2mpStatsInOctets              Counter64,
+        hh3cTunnelGrep2mpStatsInDis                 Counter64,
+        hh3cTunnelGrep2mpStatsOutPkts               Counter64,
+        hh3cTunnelGrep2mpStatsOutOctets             Counter64,
+        hh3cTunnelGrep2mpStatsOutDis                Counter64
+
+    }
+hh3cTunnelGrep2mpStatsTunnelNo OBJECT-TYPE
+    SYNTAX     Integer32
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+           "Tunnel interfacenumber."
+    ::= { hh3cTunnelGrep2mpStatsEntry 1 }
+
+
+hh3cTunnelGrep2mpStatsVrf OBJECT-TYPE
+    SYNTAX     Integer32
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+           "VPN instance index."
+    ::= { hh3cTunnelGrep2mpStatsEntry 2 }
+
+hh3cTunnelGrep2mpStatsVPCID OBJECT-TYPE
+    SYNTAX     Integer32
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+           "VPC ID."
+    ::= { hh3cTunnelGrep2mpStatsEntry 3 }
+
+
+hh3cTunnelGrep2mpStatsBraAddr OBJECT-TYPE
+    SYNTAX     InetAddress
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+           "Branch network IP address."
+    ::= { hh3cTunnelGrep2mpStatsEntry 4 }
+
+hh3cTunnelGrep2mpStatsBraMask OBJECT-TYPE
+    SYNTAX     InetAddress
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+           "Branch network mask."
+    ::= { hh3cTunnelGrep2mpStatsEntry 5 }
+
+hh3cTunnelGrep2mpStatsAddrType OBJECT-TYPE
+    SYNTAX     InetAddressType
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "Type of address in the corresponding
+        hh3cTunnelGrep2mpStatsBraAddr and hh3cTunnelGrep2mpStatsBraMask
+        objects.
+        "
+    ::= { hh3cTunnelGrep2mpStatsEntry 6 }
+
+hh3cTunnelGrep2mpStatsDestAddr OBJECT-TYPE
+    SYNTAX     InetAddressIPv4
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+           "Tunnel destination address."
+    ::= { hh3cTunnelGrep2mpStatsEntry 7 }
+
+
+
+hh3cTunnelGrep2mpStatsInPkts OBJECT-TYPE
+    SYNTAX     Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "Total number of IP datagrams received."
+    ::= { hh3cTunnelGrep2mpStatsEntry 8 }
+
+hh3cTunnelGrep2mpStatsInOctets OBJECT-TYPE
+    SYNTAX     Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "Total number of octets received in IP datagrams."
+    ::= { hh3cTunnelGrep2mpStatsEntry 9 }
+
+hh3cTunnelGrep2mpStatsInDis OBJECT-TYPE
+    SYNTAX     Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "The number of input IP datagrams for which no problems were
+            encountered to prevent their continued processing, but
+            were discarded."
+    ::= { hh3cTunnelGrep2mpStatsEntry 10 }
+
+hh3cTunnelGrep2mpStatsOutPkts OBJECT-TYPE
+    SYNTAX     Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "Total number IP datagrams sent."
+    ::= { hh3cTunnelGrep2mpStatsEntry 11 }
+
+hh3cTunnelGrep2mpStatsOutOctets OBJECT-TYPE
+    SYNTAX     Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "Total number of octets in IP datagrams sent."
+    ::= { hh3cTunnelGrep2mpStatsEntry 12 }
+
+hh3cTunnelGrep2mpStatsOutDis OBJECT-TYPE
+    SYNTAX     Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "The number of output IP datagrams which no problem was
+            encountered to prevent their transmission to their
+            destination, but were discarded ."
+    ::= { hh3cTunnelGrep2mpStatsEntry 13 }
+
+
+END

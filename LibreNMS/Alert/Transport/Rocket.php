@@ -15,6 +15,7 @@
 
 /**
  * API Transport
+ *
  * @author ToeiRei <vbauer@stargazer.at>
  * @copyright 2017 ToeiRei, LibreNMS work based on the work of f0o. It's his work.
  * @license GPL
@@ -23,9 +24,12 @@
 namespace LibreNMS\Alert\Transport;
 
 use LibreNMS\Alert\Transport;
+use LibreNMS\Util\Proxy;
 
 class Rocket extends Transport
 {
+    protected $name = 'Rocket Chat';
+
     public function deliverAlert($obj, $opts)
     {
         $rocket_opts = $this->parseUserOptions($this->config['rocket-options']);
@@ -49,14 +53,14 @@ class Rocket extends Transport
                     'text' => $rocket_msg,
                 ],
             ],
-            'channel' => $api['channel'],
-            'username' => $api['username'],
-            'icon_url' => $api['icon_url'],
-            'icon_emoji' => $api['icon_emoji'],
+            'channel' => $api['channel'] ?? null,
+            'username' => $api['username'] ?? null,
+            'icon_url' => $api['icon_url'] ?? null,
+            'icon_emoji' => $api['icon_emoji'] ?? null,
         ];
         $alert_message = json_encode($data);
         curl_setopt($curl, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);
-        set_curl_proxy($curl);
+        Proxy::applyToCurl($curl);
         curl_setopt($curl, CURLOPT_URL, $host);
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
         curl_setopt($curl, CURLOPT_POST, true);

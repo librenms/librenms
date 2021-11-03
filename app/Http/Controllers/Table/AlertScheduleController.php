@@ -18,6 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2020 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -58,7 +59,7 @@ class AlertScheduleController extends TableController
     }
 
     /**
-     * @param AlertSchedule $schedule
+     * @param  AlertSchedule  $schedule
      * @return array
      */
     public function formatItem($schedule)

@@ -18,6 +18,7 @@
  * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
  * @link       http://librenms.org
+ *
  * @copyright  2020 Thomas Berberich
  * @author     Thomas Berberich <sourcehhdoctor@gmail.com>
  */
@@ -38,8 +39,21 @@ class PortGroupController extends SelectController
         return PortGroup::hasAccess($request->user())->select(['id', 'name']);
     }
 
+    protected function formatResponse($paginator)
+    {
+        // prepend the default group, unless filtered out
+        if ($this->includeGeneral()) {
+            $general = new PortGroup;
+            $general->id = 0;
+            $general->name = 'no default Port Group';
+            $paginator->prepend($general);
+        }
+
+        return parent::formatResponse($paginator);
+    }
+
     /**
-     * @param PortGroup $port_group
+     * @param  PortGroup  $port_group
      */
     public function formatItem($port_group)
     {

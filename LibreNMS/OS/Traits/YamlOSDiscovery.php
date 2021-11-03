@@ -27,7 +27,9 @@ namespace LibreNMS\OS\Traits;
 
 use App\Models\Device;
 use App\Models\Location;
+use App\View\SimpleTemplate;
 use Illuminate\Support\Arr;
+use LibreNMS\Util\StringHelpers;
 use Log;
 
 trait YamlOSDiscovery
@@ -74,7 +76,7 @@ trait YamlOSDiscovery
                 }
 
                 $device->$field = isset($os_yaml["{$field}_template"])
-                    ? $this->parseTemplate($os_yaml["{$field}_template"], $data)
+                    ? trim(SimpleTemplate::parse($os_yaml["{$field}_template"], $data))
                     : $value;
             }
         }
@@ -93,8 +95,10 @@ trait YamlOSDiscovery
 
         Log::debug('Yaml location data:', $data);
 
+        $location = $this->findFirst($data, $name, $numeric) ?? snmp_get($this->getDeviceArray(), 'SNMPv2-MIB::sysLocation.0', '-Oqv');
+
         return new Location([
-            'location' => $this->findFirst($data, $name, $numeric) ?? snmp_get($this->getDeviceArray(), 'SNMPv2-MIB::sysLocation.0', '-Oqv'),
+            'location' => StringHelpers::inferEncoding($location),
             'lat' => $this->findFirst($data, $lat, $numeric),
             'lng' => $this->findFirst($data, $lng, $numeric),
         ]);
@@ -126,13 +130,6 @@ trait YamlOSDiscovery
                 }
             }
         }
-    }
-
-    private function parseTemplate($template, $data)
-    {
-        return trim(preg_replace_callback('/{{ ([^ ]+) }}/', function ($matches) use ($data) {
-            return $data[$matches[1]] ?? '';
-        }, $template));
     }
 
     private function translateSysObjectID($mib, $regex)

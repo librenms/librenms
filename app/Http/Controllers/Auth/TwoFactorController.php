@@ -18,6 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -33,7 +34,6 @@ use LibreNMS\Authentication\TwoFactor;
 use LibreNMS\Config;
 use LibreNMS\Exceptions\AuthenticationException;
 use Session;
-use Toastr;
 
 class TwoFactorController extends Controller
 {
@@ -54,7 +54,7 @@ class TwoFactorController extends Controller
             UserPref::forgetPref(auth()->user(), 'twofactor');
             $request->session()->forget(['twofactor', 'twofactorremove']);
 
-            \Toastr::info(__('TwoFactor auth removed.'));
+            flash()->addInfo(__('TwoFactor auth removed.'));
 
             return redirect('preferences');
         }
@@ -95,7 +95,7 @@ class TwoFactorController extends Controller
     /**
      * Show the form for creating a new resource.
      *
-     * @param Request $request
+     * @param  Request  $request
      * @return \Illuminate\Http\RedirectResponse.
      */
     public function create(Request $request)
@@ -122,7 +122,7 @@ class TwoFactorController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param Request $request
+     * @param  Request  $request
      * @return \Illuminate\Http\RedirectResponse.
      */
     public function destroy(Request $request)
@@ -136,7 +136,7 @@ class TwoFactorController extends Controller
     /**
      * Remove the specified resource from storage.
      *
-     * @param Request $request
+     * @param  Request  $request
      * @return \Illuminate\Http\RedirectResponse.
      */
     public function cancelAdd(Request $request)
@@ -147,9 +147,10 @@ class TwoFactorController extends Controller
     }
 
     /**
-     * @param User $user
-     * @param int $token
+     * @param  User  $user
+     * @param  int  $token
      * @return true
+     *
      * @throws AuthenticationException
      */
     private function checkToken($user, $token)
@@ -191,7 +192,7 @@ class TwoFactorController extends Controller
 
         // notify if added
         if (Session::has('twofactoradd')) {
-            Toastr::success(__('TwoFactor auth added.'));
+            flash()->addSuccess(__('TwoFactor auth added.'));
             Session::forget('twofactoradd');
         }
 

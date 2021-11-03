@@ -18,6 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -94,12 +95,12 @@ class Dnos extends OS implements ProcessorDiscovery
     /**
      * Find processors and append them to the $processors array
      *
-     * @param array $processors
-     * @param string $oid Textual OIDf
-     * @param string $mib MIB
-     * @param string $num_oid Numerical OID
-     * @param string $name Name prefix to display to user
-     * @param string $type custom type (if there are multiple in one chassis)
+     * @param  array  $processors
+     * @param  string  $oid  Textual OIDf
+     * @param  string  $mib  MIB
+     * @param  string  $num_oid  Numerical OID
+     * @param  string  $name  Name prefix to display to user
+     * @param  string  $type  custom type (if there are multiple in one chassis)
      */
     private function findProcessors(&$processors, $oid, $mib, $num_oid, $name, $type = null)
     {

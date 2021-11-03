@@ -15,6 +15,7 @@
 
 /**
  * Matrix Transport
+ *
  * @author Raphael Dannecker (github.com/raphael247)
  * @copyright 2020 , LibreNMS
  * @license GPL
@@ -22,7 +23,9 @@
 
 namespace LibreNMS\Alert\Transport;
 
+use App\View\SimpleTemplate;
 use LibreNMS\Alert\Transport;
+use LibreNMS\Util\Proxy;
 
 class Matrix extends Transport
 {
@@ -49,14 +52,12 @@ class Matrix extends Transport
         $request_heads['Content-Type'] = 'application/json';
         $request_heads['Accept'] = 'application/json';
 
-        foreach ($obj as $p_key => $p_val) {
-            $message = str_replace('{{ $' . $p_key . ' }}', $p_val, $message);
-        }
+        $message = SimpleTemplate::parse($message, $obj);
 
         $body = ['body'=>$message, 'msgtype'=>'m.text'];
 
         $client = new \GuzzleHttp\Client();
-        $request_opts['proxy'] = get_guzzle_proxy();
+        $request_opts['proxy'] = Proxy::forGuzzle();
         $request_opts['headers'] = $request_heads;
         $request_opts['body'] = json_encode($body);
         $res = $client->request('PUT', $host, $request_opts);

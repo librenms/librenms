@@ -18,6 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -44,13 +45,13 @@ abstract class WidgetController extends Controller
     protected $settings = null;
 
     /**
-     * @param Request $request
+     * @param  Request  $request
      * @return View|string
      */
     abstract public function getView(Request $request);
 
     /**
-     * @param Request $request
+     * @param  Request  $request
      * @return View
      */
     public function getSettingsView(Request $request)
@@ -98,7 +99,7 @@ abstract class WidgetController extends Controller
     /**
      * Get the settings (with defaults applied)
      *
-     * @param bool $settingsView
+     * @param  bool  $settingsView
      * @return array
      */
     public function getSettings($settingsView = false)
@@ -123,10 +124,10 @@ abstract class WidgetController extends Controller
     }
 
     /**
-     * @param View|string $view
-     * @param string $title
-     * @param array $settings
-     * @param string $status
+     * @param  View|string  $view
+     * @param  string  $title
+     * @param  array  $settings
+     * @param  string  $status
      * @return \Illuminate\Http\JsonResponse
      */
     private function formatResponse($view, $title, $settings, $status = 'ok')
@@ -141,7 +142,7 @@ abstract class WidgetController extends Controller
 
         return response()->json([
             'status' => $status,
-            'title' => __($title),
+            'title' => htmlentities(__($title)),
             'html' => $html,
             'show_settings' => $show_settings,
             'settings' => $settings,

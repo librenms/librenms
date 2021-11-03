@@ -18,17 +18,19 @@ class MysqlAuthorizer extends AuthorizerBase
         $username = $credentials['username'] ?? null;
         $password = $credentials['password'] ?? null;
 
-        $user_data = User::thisAuth()->where(['username' => $username])->select('password', 'enabled')->first();
+        $user_data = User::thisAuth()->firstWhere(['username' => $username]);
         $hash = $user_data->password;
         $enabled = $user_data->enabled;
 
         if (! $enabled) {
-            throw new AuthenticationException($message = 'login denied');
+            throw new AuthenticationException();
         }
 
         if (Hash::check($password, $hash)) {
+            // Check if hash algorithm is current and update it if it is not
             if (Hash::needsRehash($hash)) {
-                $this->changePassword($username, $password);
+                $user_data->setPassword($password);
+                $user_data->save();
             }
 
             return true;
@@ -51,25 +53,6 @@ class MysqlAuthorizer extends AuthorizerBase
         } else {
             return User::thisAuth()->where('username', $username)->value('can_modify_passwd');
         }
-    }
-
-    public function changePassword($username, $password)
-    {
-        // check if updating passwords is allowed (mostly for classes that extend this)
-        if (! static::$CAN_UPDATE_PASSWORDS) {
-            return false;
-        }
-
-        /** @var User $user */
-        $user = User::thisAuth()->where('username', $username)->first();
-
-        if ($user) {
-            $user->setPassword($password);
-
-            return $user->save();
-        }
-
-        return false;
     }
 
     public function addUser($username, $password, $level = 0, $email = '', $realname = '', $can_modify_passwd = 1, $descr = '')

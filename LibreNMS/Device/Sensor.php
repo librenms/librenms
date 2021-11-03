@@ -18,6 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2017 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -61,22 +62,22 @@ class Sensor implements DiscoveryModule, PollerModule
     /**
      * Sensor constructor. Create a new sensor to be discovered.
      *
-     * @param string $type Class of this sensor, must be a supported class
-     * @param int $device_id the device_id of the device that owns this sensor
-     * @param array|string $oids an array or single oid that contains the data for this sensor
-     * @param string $subtype the type of sensor an additional identifier to separate out sensors of the same class, generally this is the os name
-     * @param int|string $index the index of this sensor, must be stable, generally the index of the oid
-     * @param string $description A user visible description of this sensor, may be truncated in some places (like graphs)
-     * @param int|float $current The current value of this sensor, will seed the db and may be used to guess limits
-     * @param int $multiplier a number to multiply the value(s) by
-     * @param int $divisor a number to divide the value(s) by
-     * @param string $aggregator an operation to combine multiple numbers. Supported: sum, avg
-     * @param int|float $high_limit Alerting: Maximum value
-     * @param int|float $low_limit Alerting: Minimum value
-     * @param int|float $high_warn Alerting: High warning value
-     * @param int|float $low_warn Alerting: Low warning value
-     * @param int|float $entPhysicalIndex The entPhysicalIndex this sensor is associated, often a port
-     * @param int|float $entPhysicalMeasured the table to look for the entPhysicalIndex, for example 'ports' (maybe unused)
+     * @param  string  $type  Class of this sensor, must be a supported class
+     * @param  int  $device_id  the device_id of the device that owns this sensor
+     * @param  array|string  $oids  an array or single oid that contains the data for this sensor
+     * @param  string  $subtype  the type of sensor an additional identifier to separate out sensors of the same class, generally this is the os name
+     * @param  int|string  $index  the index of this sensor, must be stable, generally the index of the oid
+     * @param  string  $description  A user visible description of this sensor, may be truncated in some places (like graphs)
+     * @param  int|float  $current  The current value of this sensor, will seed the db and may be used to guess limits
+     * @param  int  $multiplier  a number to multiply the value(s) by
+     * @param  int  $divisor  a number to divide the value(s) by
+     * @param  string  $aggregator  an operation to combine multiple numbers. Supported: sum, avg
+     * @param  int|float  $high_limit  Alerting: Maximum value
+     * @param  int|float  $low_limit  Alerting: Minimum value
+     * @param  int|float  $high_warn  Alerting: High warning value
+     * @param  int|float  $low_warn  Alerting: Low warning value
+     * @param  int|float  $entPhysicalIndex  The entPhysicalIndex this sensor is associated, often a port
+     * @param  int|float  $entPhysicalMeasured  the table to look for the entPhysicalIndex, for example 'ports' (maybe unused)
      */
     public function __construct(
         $type,
@@ -202,6 +203,7 @@ class Sensor implements DiscoveryModule, PollerModule
 
     /**
      * Get the table for this sensor
+     *
      * @return string
      */
     public function getTable()
@@ -241,7 +243,7 @@ class Sensor implements DiscoveryModule, PollerModule
      * Escape null values so dbFacile doesn't mess them up
      * honestly, this should be the default, but could break shit
      *
-     * @param array $array
+     * @param  array  $array
      * @return array
      */
     private function escapeNull($array)
@@ -254,7 +256,7 @@ class Sensor implements DiscoveryModule, PollerModule
     /**
      * Run Sensors discovery for the supplied OS (device)
      *
-     * @param OS $os
+     * @param  OS  $os
      */
     public static function runDiscovery(OS $os)
     {
@@ -264,7 +266,7 @@ class Sensor implements DiscoveryModule, PollerModule
     /**
      * Poll sensors for the supplied OS (device)
      *
-     * @param OS $os
+     * @param  OS  $os
      */
     public static function poll(OS $os)
     {
@@ -318,10 +320,10 @@ class Sensor implements DiscoveryModule, PollerModule
     /**
      * Poll all sensors of a specific class
      *
-     * @param OS $os
-     * @param string $type
-     * @param array $sensors
-     * @param array $prefetch
+     * @param  OS  $os
+     * @param  string  $type
+     * @param  array  $sensors
+     * @param  array  $prefetch
      */
     protected static function pollSensorType($os, $type, $sensors, $prefetch = [])
     {
@@ -346,8 +348,8 @@ class Sensor implements DiscoveryModule, PollerModule
      * Fetch snmp data from the device
      * Return an array keyed by oid
      *
-     * @param array $device
-     * @param array $sensors
+     * @param  array  $device
+     * @param  array  $sensors
      * @return array
      */
     private static function fetchSnmpData($device, $sensors)
@@ -377,9 +379,10 @@ class Sensor implements DiscoveryModule, PollerModule
      * Process the snmp data for the specified sensors
      * Returns an array sensor_id => value
      *
-     * @param array $sensors
-     * @param array $prefetch
+     * @param  array  $sensors
+     * @param  array  $prefetch
      * @return array
+     *
      * @internal param $device
      */
     protected static function processSensorData($sensors, $prefetch)
@@ -409,11 +412,11 @@ class Sensor implements DiscoveryModule, PollerModule
             }
 
             if ($sensor['sensor_divisor'] && $sensor_value !== 0) {
-                $sensor_value = ($sensor_value / $sensor['sensor_divisor']);
+                $sensor_value = (cast_number($sensor_value) / $sensor['sensor_divisor']);
             }
 
             if ($sensor['sensor_multiplier']) {
-                $sensor_value = ($sensor_value * $sensor['sensor_multiplier']);
+                $sensor_value = (cast_number($sensor_value) * $sensor['sensor_multiplier']);
             }
 
             $sensor_data[$sensor['sensor_id']] = $sensor_value;
@@ -425,8 +428,8 @@ class Sensor implements DiscoveryModule, PollerModule
     /**
      * Get a list of unique oids from an array of sensors and break it into chunks.
      *
-     * @param array $sensors
-     * @param int $chunk How many oids per chunk.  Default 10.
+     * @param  array  $sensors
+     * @param  int  $chunk  How many oids per chunk.  Default 10.
      * @return array
      */
     private static function getOidsFromSensors($sensors, $chunk = 10)
@@ -536,9 +539,9 @@ class Sensor implements DiscoveryModule, PollerModule
      * This the sensors array should contain all the sensors of a specific class
      * It may contain sensors from multiple tables and devices, but that isn't the primary use
      *
-     * @param int $device_id
-     * @param string $type
-     * @param array $sensors
+     * @param  int  $device_id
+     * @param  string  $type
+     * @param  array  $sensors
      */
     final public static function sync($device_id, $type, array $sensors)
     {
@@ -558,9 +561,9 @@ class Sensor implements DiscoveryModule, PollerModule
     /**
      * Remove invalid sensors.  Passing an empty array will remove all sensors of that class
      *
-     * @param int $device_id
-     * @param string $type
-     * @param array $sensor_ids valid sensor ids
+     * @param  int  $device_id
+     * @param  string  $type
+     * @param  array  $sensor_ids  valid sensor ids
      */
     private static function clean($device_id, $type, $sensor_ids)
     {
@@ -594,8 +597,9 @@ class Sensor implements DiscoveryModule, PollerModule
      *  'unit'  - units used by this class 'dBm' for example
      *  'icon'  - font awesome icon used by this class
      * )
-     * @param bool $valid filter this list by valid types in the database
-     * @param int $device_id when filtering, only return types valid for this device_id
+     *
+     * @param  bool  $valid  filter this list by valid types in the database
+     * @param  int  $device_id  when filtering, only return types valid for this device_id
      * @return array
      */
     public static function getTypes($valid = false, $device_id = null)
@@ -606,9 +610,9 @@ class Sensor implements DiscoveryModule, PollerModule
     /**
      * Record sensor data in the database and data stores
      *
-     * @param OS $os
-     * @param array $sensors
-     * @param array $data
+     * @param  OS  $os
+     * @param  array  $sensors
+     * @param  array  $data
      */
     protected static function recordSensorData(OS $os, $sensors, $data)
     {

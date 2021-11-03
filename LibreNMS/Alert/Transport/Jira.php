@@ -15,6 +15,7 @@
 
 /**
  * Jira API Transport
+ *
  * @author  Aldemir Akpinar <aldemir.akpinar@gmail.com>
  * @copyright 2017 Aldemir Akpinar, LibreNMS
  * @license GPL
@@ -23,6 +24,7 @@
 namespace LibreNMS\Alert\Transport;
 
 use LibreNMS\Alert\Transport;
+use LibreNMS\Util\Proxy;
 
 class Jira extends Transport
 {
@@ -46,8 +48,6 @@ class Jira extends Transport
             return true;
         }
 
-        $device = device_by_id_cache($obj['device_id']); // for event logging
-
         $username = $opts['username'];
         $password = $opts['password'];
         $prjkey = $opts['prjkey'];
@@ -64,7 +64,7 @@ class Jira extends Transport
         $postdata = ['fields' => $data];
         $datastring = json_encode($postdata);
 
-        set_curl_proxy($curl);
+        Proxy::applyToCurl($curl);
 
         $headers = ['Accept: application/json', 'Content-Type: application/json'];
 
@@ -80,7 +80,7 @@ class Jira extends Transport
         $code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
         if ($code == 200) {
             $jiraout = json_decode($ret, true);
-            d_echo('Created jira issue ' . $jiraout['key'] . ' for ' . $device);
+            d_echo('Created jira issue ' . $jiraout['key'] . ' for ' . $obj['hostname']);
 
             return true;
         } else {
