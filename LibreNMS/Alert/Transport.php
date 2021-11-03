@@ -3,6 +3,7 @@
 namespace LibreNMS\Alert;
 
 use App\Models\AlertTransport;
+use App\View\SimpleTemplate;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
 use Illuminate\Support\Str;
 use LibreNMS\Config;
@@ -22,6 +23,24 @@ abstract class Transport implements TransportInterface
         $class = self::getClass($type);
 
         return new $class();
+    }
+
+    /**
+     * Returns a list of all available transports
+     *
+     * @return array
+     */
+    public static function list(): array
+    {
+        $list = [];
+        foreach (glob(base_path('LibreNMS/Alert/Transport/*.php')) as $file) {
+            $transport = strtolower(basename($file, '.php'));
+            $class = self::getClass($transport);
+            $instance = new $class;
+            $list[$transport] = $instance->name();
+        }
+
+        return $list;
     }
 
     /**
@@ -63,15 +82,16 @@ abstract class Transport implements TransportInterface
      * Helper function to parse free form text box defined in ini style to key value pairs
      *
      * @param  string  $input
+     * @param  array  $replacements  for SimpleTemplate if desired
      * @return array
      */
-    protected function parseUserOptions(string $input): array
+    protected function parseUserOptions(string $input, array $replacements = []): array
     {
         $options = [];
         foreach (preg_split('/\\r\\n|\\r|\\n/', $input, -1, PREG_SPLIT_NO_EMPTY) as $option) {
             if (Str::contains($option, '=')) {
                 [$k, $v] = explode('=', $option, 2);
-                $options[$k] = trim($v);
+                $options[$k] = empty($replacements) ? trim($v) : SimpleTemplate::parse(trim($v), $replacements);
             }
         }
 
