@@ -10,12 +10,6 @@ modules:
                 -
                     oid:
                         - mOperator
-                -
-                    oid:
-                        - mConnectionState
-                -
-                    oid:
-                        - mCellID
         temperature:
             data:
                 -
