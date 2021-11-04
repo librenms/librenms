@@ -457,9 +457,9 @@ class Rewrite
      * If given input is an IPv6 address, wrap it in [] for use in applications that require it
      *
      * @param  string  $ip
-     * @return string
+     * @return string|null
      */
-    public static function addIpv6Brackets($ip): string
+    public static function addIpv6Brackets($ip): ?string
     {
         return IPv6::isValid($ip) ? "[$ip]" : $ip;
     }
