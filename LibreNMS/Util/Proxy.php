@@ -30,13 +30,24 @@ use LibreNMS\Config;
 class Proxy
 {
     /**
+     * Check if if the proxy should be used.
+     * (it should not be used for connections to localhost)
+     */
+    public static function shouldBeUsed(string $target_url): bool
+    {
+        return (bool) preg_match('#//:(localhost|127\.|::1)#', $target_url);
+    }
+
+    /**
      * Return the proxy url
      *
      * @return array|bool|false|string
      */
-    public static function get()
+    public static function get(?string $target_url = null)
     {
-        if (getenv('http_proxy')) {
+        if ($target_url && ! self::shouldBeUsed($target_url)) {
+            return false;
+        } elseif (getenv('http_proxy')) {
             return getenv('http_proxy');
         } elseif (getenv('https_proxy')) {
             return getenv('https_proxy');

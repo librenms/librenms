@@ -23,6 +23,7 @@
 
 namespace LibreNMS\Alert\Transport;
 
+use App\View\SimpleTemplate;
 use LibreNMS\Alert\Transport;
 use LibreNMS\Util\Proxy;
 
@@ -51,9 +52,7 @@ class Matrix extends Transport
         $request_heads['Content-Type'] = 'application/json';
         $request_heads['Accept'] = 'application/json';
 
-        foreach ($obj as $p_key => $p_val) {
-            $message = str_replace('{{ $' . $p_key . ' }}', $p_val, $message);
-        }
+        $message = SimpleTemplate::parse($message, $obj);
 
         $body = ['body'=>$message, 'msgtype'=>'m.text'];
 

@@ -6,11 +6,11 @@ use App\Models\Device;
 use App\Models\DeviceGroup;
 use App\Models\Service;
 use App\Models\ServiceTemplate;
+use Flasher\Prime\FlasherInterface;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
 use LibreNMS\Alerting\QueryBuilderFilter;
 use LibreNMS\Services;
-use Toastr;
 
 class ServiceTemplateController extends Controller
 {
@@ -60,7 +60,7 @@ class ServiceTemplateController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\Response|\Illuminate\View\View
      */
-    public function store(Request $request)
+    public function store(Request $request, FlasherInterface $flasher)
     {
         $this->validate(
             $request, [
@@ -105,7 +105,7 @@ class ServiceTemplateController extends Controller
         }
 
         $template->groups()->sync($request->groups);
-        Toastr::success(__('Service Template :name created', ['name' => $template->name]));
+        $flasher->addSuccess(__('Service Template :name created', ['name' => $template->name]));
 
         return redirect()->route('services.templates.index');
     }
@@ -146,7 +146,7 @@ class ServiceTemplateController extends Controller
      * @param  \App\Models\ServiceTemplate  $template
      * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\Response|\Illuminate\View\View
      */
-    public function update(Request $request, ServiceTemplate $template)
+    public function update(Request $request, ServiceTemplate $template, FlasherInterface $flasher)
     {
         $this->validate(
             $request, [
@@ -214,9 +214,9 @@ class ServiceTemplateController extends Controller
         if ($template->isDirty() || $devices_updated || isset($device_groups_updated)) {
             try {
                 if ($template->save() || $devices_updated || isset($device_groups_updated)) {
-                    Toastr::success(__('Service Template :name updated', ['name' => $template->name]));
+                    $flasher->addSuccess(__('Service Template :name updated', ['name' => $template->name]));
                 } else {
-                    Toastr::error(__('Failed to save'));
+                    $flasher->addError(__('Failed to save'));
 
                     return redirect()->back()->withInput();
                 }
@@ -226,7 +226,7 @@ class ServiceTemplateController extends Controller
                 ]);
             }
         } else {
-            Toastr::info(__('No changes made'));
+            $flasher->addInfo(__('No changes made'));
         }
 
         return redirect()->route('services.templates.index');
