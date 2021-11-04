@@ -339,7 +339,7 @@ class NetSnmpQuery implements SnmpQueryInterface
         }
 
         // os group
-        if ($os_group = Config::get("os.{$this->device->os}.os_group")) {
+        if ($os_group = Config::get("os.{$this->device->os}.group")) {
             if (file_exists("$base/$os_group")) {
                 $dirs[] = "$base/$os_group";
             }
