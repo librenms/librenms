@@ -60,218 +60,285 @@ Au = Auto mode
 P = Motor Stopped
 A = Motor Running
 */
+$status = SnmpQuery::get(['HIMOINSAv14-MIB::status.0', 'HIMOINSAv14-MIB::statusConm.0'])->values();
+var_dump($status);
+// map of bits
+if (isset($status['HIMOINSAv14-MIB::status.0'])) {
+    $map = [
+        'Mains commutator closed' => 512,
+        'Gens commutator closed' => 256,
+        'Active Alarm' => 128,
+        'Transfer Pump' => 64,
+        'Blocked mode' => 32,
+        'Test mode' => 16,
+        'Manual mode' => 8,
+        'Auto mode' => 4,
+        'Motor Stopped' => 2,
+        'Motor Running' => 1,
+    ];
 
-// Check if CEC7 info is available and retrieve data
-$statusConm = SnmpQuery::get('HIMOINSAv14-MIB::statusConm.0')->value();
-// Check if CEA7/CEM7 info is available and retrieve data
-$status = SnmpQuery::get('HIMOINSAv14-MIB::status.0')->value();
+    $statusMotor = 0;
+    $statusMode = 0;
+    $statusAlarm = 0;
+    $statusComm = 0;
+    $statusTransferPump = 0;
+    $statusCommAlarm = 0;
 
-if (is_numeric($status)) {
-    define('A', 0b0000000001);
-    define('P', 0b0000000010);
-    define('AU', 0b0000000100);
-    define('MN', 0b0000001000);
-    define('T', 0b0000010000);
-    define('B', 0b0000100000);
-    define('BT', 0b0001000000);
-    define('AL', 0b0010000000);
-    if (is_numeric($statusConm)) {
-        define('SWAL', 0b0000001);
-        define('G', 0b0100000);
-        define('R', 0b1000000);
-    } else {
-        define('G', 0b0100000000);
-        define('R', 0b1000000000);
+    foreach ($map as $descr => $mask) {
+        if ($status['HIMOINSAv14-MIB::status.0'] & $mask) {
+            // Get Motor Status
+            if (in_array($descr, ['Motor Running', 'Motor Stopped'])) {
+                $statusMotor = $mask;
+            }
+            // Get Control Unit Status
+            if (in_array($descr, ['Auto mode', 'Manual mode', 'Test mode', 'Blocked mode'])) {
+                $statusMode = $mask;
+            }
+            // Get Transfer Pump Status
+            if (in_array($descr, ['Transfer Pump'])) {
+                $statusMode = $mask;
+            }
+            // Get Alarm Status
+            if (in_array($descr, ['Transfer Pump'])) {
+                $statusAlarm = $mask;
+            }
+            // Get Comm status (only if CEA7)
+            if (in_array($descr, ['Mains commutator closed', 'Gen commutator closed'])) {
+                $statusComm = $mask;
+                $commgroup = 'CEA7/CEM7';
+            }
+        }
     }
-}
+    // Check CEC7 and override Commutator status if valid. Also get CEC7 alarm state.
+    if (isset($status['HIMOINSAv14-MIB::statusConm[0]'])) {
+        $map = [
+            'Mains commutator closed' => 32,
+            'Gen commutator closed' => 64,
+            'Active commutator alarm' => 1,
+        ];
+        foreach ($map as $descr => $mask) {
+            if ($status['HIMOINSAv14-MIB::statusConm[0]'] & $mask) {
+                // Get comm status (CEC7)
+                if (in_array($descr, ['Mains commutator closed', 'Gen commutator closed'])) {
+                    $statusComm = $mask;
+                    $commgroup = 'CEC7';
+                }
+                // Get Commutator Alarm
+                if (in_array($descr, ['Active commutator alarm'])) {
+                    $statusCommAlarm = $mask;
+                }
+            }
+        }
+        // CEC7 Commutator Alarm
+        $state_name = 'statusCommAlarm';
+        $states = [
+            ['value' => 0, 'generic' => 0, 'graph' => 0, 'descr' => 'No Alarm'],
+            ['value' => 1, 'generic' => 2, 'graph' => 0, 'descr' => 'Alarm'],
+        ];
+        create_state_index($state_name, $states);
 
-if (intval('0b' . decbin($status), 2) & A) {
-    $engine = 1;
-} elseif (intval('0b' . decbin($status), 2) & P) {
-    $engine = 0;
-} else {
-    $engine = 9;
-}
-if (intval('0b' . decbin($status), 2) & AU) {
-    $mode = 1;
-} elseif (intval('0b' . decbin($status), 2) & MN) {
-    $mode = 2;
-} elseif (intval('0b' . decbin($status), 2) & T) {
-    $mode = 3;
-} elseif (intval('0b' . decbin($status), 2) & B) {
-    $mode = 4;
-} else {
-    $mode = 9;
-}
-if (intval('0b' . decbin($status), 2) & BT) {
-    $tpump = 1;
-} else {
-    $tpump = 0;
-}
-if (intval('0b' . decbin($status), 2) & AL) {
-    $alarm = 1;
-} else {
-    $alarm = 0;
-}
-if (! is_numeric($statusConm)) {
-    d_echo('No CEC7 installed');
-    if (intval('0b' . decbin($status), 2) & R) {
-        $switch = 0;
-    } elseif (intval('0b' . decbin($status), 2) & G) {
-        $switch = 1;
-    } else {
-        $switch = 9;
+        $descr = 'Alarm';
+        $sensor_index = 0;
+        //Discover Sensors
+        discover_sensor(
+            $valid['sensor'],
+            'state',
+            $device,
+            null,
+            $sensor_index,
+            $state_name,
+            $descr,
+            1,
+            1,
+            null,
+            null,
+            null,
+            null,
+            $statusCommAlarm,
+            'snmp',
+            null,
+            null,
+            null,
+            'CEC7'
+        );
+
+        //Create Sensor To State Index
+        create_sensor_to_state_index($device, $state_name, $sensor_index);
+        // End CEC7 Commutator Alarm
     }
-} else {
-    d_echo('CEC7 installed');
-    $cec7 = true;
-    if (intval('0b' . decbin($statusConm), 2) & R) {
-        $switch = 0;
-    } elseif (intval('0b' . decbin($statusConm), 2) & G) {
-        $switch = 1;
-    } else {
-        $switch = 9;
-    }
-    if (intval('0b' . decbin($statusConm), 2) & SWAL) {
-        $switchalarm = 1;
-    } else {
-        $switchalarm = 0;
-    }
-}
 
-d_echo('Engine: ' . $engine);
-d_echo('Mode: ' . $mode);
-d_echo('Switch: ' . $switch);
-d_echo('Alarm: ' . $alarm);
-d_echo('SWAlarm: ' . $switchalarm);
-d_echo('Transfer Pump: ' . $tpump);
-
-// Engine state
-$state_name = 'statusEngine';
-$states = [
-    ['value' => 1, 'generic' => 2, 'graph' => 0, 'descr' => 'Running'],
-    ['value' => 0, 'generic' => 0, 'graph' => 0, 'descr' => 'Stopped'],
-    ['value' => 9, 'generic' => 3, 'graph' => 0, 'descr' => 'Unknown'],
-];
-create_state_index($state_name, $states);
-
-$descr = 'Engine';
-$sensor_index = 0;
-//Discover Sensors
-discover_sensor(
-    $valid['sensor'],
-    'state',
-    $device,
-    null,
-    $sensor_index,
-    $state_name,
-    $descr,
-    1,
-    1,
-    null,
-    null,
-    null,
-    null,
-    $engine,
-    'snmp',
-    null,
-    null,
-    null,
-    'CEA7/CEM7'
-);
-//Create Sensor To State Index
-create_sensor_to_state_index($device, $state_name, $sensor_index);
-
-// CE Mode
-$state_name = 'statusMode';
-$states = [
-    ['value' => 1, 'generic' => 0, 'graph' => 0, 'descr' => 'Auto'],
-    ['value' => 2, 'generic' => 2, 'graph' => 0, 'descr' => 'Manual'],
-    ['value' => 3, 'generic' => 1, 'graph' => 0, 'descr' => 'Test'],
-    ['value' => 4, 'generic' => 2, 'graph' => 0, 'descr' => 'Blocked'],
-    ['value' => 9, 'generic' => 3, 'graph' => 0, 'descr' => 'Unknown'],
-];
-create_state_index($state_name, $states);
-
-$descr = 'Mode';
-$sensor_index = 0;
-//Discover Sensors
-discover_sensor(
-    $valid['sensor'],
-    'state',
-    $device,
-    null,
-    $sensor_index,
-    $state_name,
-    $descr,
-    1,
-    1,
-    null,
-    null,
-    null,
-    null,
-    $mode,
-    'snmp',
-    null,
-    null,
-    null,
-    'CEA7/CEM7'
-);
-
-//Create Sensor To State Index
-create_sensor_to_state_index($device, $state_name, $sensor_index);
-
-// Switch Mode
-$state_name = 'statusSW';
-$states = [
-    ['value' => 1, 'generic' => 2, 'graph' => 0, 'descr' => 'Genset'],
-    ['value' => 0, 'generic' => 0, 'graph' => 0, 'descr' => 'Mains'],
-    ['value' => 9, 'generic' => 3, 'graph' => 0, 'descr' => 'Unknown'],
-];
-create_state_index($state_name, $states);
-
-// Switch Mode
-$group = $cec7 = true ? 'CEC7' : 'CEA7/CEM7';
-$descr = 'Switch Mode';
-$sensor_index = 0;
-
-//Discover Sensors
-discover_sensor(
-    $valid['sensor'],
-    'state',
-    $device,
-    null,
-    $sensor_index,
-    $state_name,
-    $descr,
-    1,
-    1,
-    null,
-    null,
-    null,
-    null,
-    $switch,
-    'snmp',
-    null,
-    null,
-    null,
-    $group
-);
-
-//Create Sensor To State Index
-create_sensor_to_state_index($device, $state_name, $sensor_index);
-
-// SW Alarm
-if ($cec7) {
-    $state_name = 'statusSWAL';
+    // Motor Status
+    $state_name = 'statusMotor';
     $states = [
-        ['value' => 0, 'generic' => 0, 'graph' => 0, 'descr' => 'No Alarm'],
-        ['value' => 1, 'generic' => 2, 'graph' => 0, 'descr' => 'Alarm'],
+        ['value' => 1, 'generic' => 2, 'graph' => 0, 'descr' => 'Running'],
+        ['value' => 2, 'generic' => 0, 'graph' => 0, 'descr' => 'Stopped'],
+        ['value' => 0, 'generic' => 3, 'graph' => 0, 'descr' => 'Unknown'],
     ];
     create_state_index($state_name, $states);
 
-    $descr = 'SW Alarm';
+    $descr = 'Motor';
     $sensor_index = 0;
+    // Discover Sensor
+    discover_sensor(
+        $valid['sensor'],
+        'state',
+        $device,
+        null,
+        $sensor_index,
+        $state_name,
+        $descr,
+        1,
+        1,
+        null,
+        null,
+        null,
+        null,
+        $statusMotor,
+        'snmp',
+        null,
+        null,
+        null,
+        'CEA7/CEM7'
+    );
+    // Create Sensor To State Index
+    create_sensor_to_state_index($device, $state_name, $sensor_index);
+    // End Motor Status
+
+    // Control Unit mode
+    $state_name = 'statusMode';
+    $states = [
+        ['value' => 4, 'generic' => 0, 'graph' => 0, 'descr' => 'Auto'],
+        ['value' => 8, 'generic' => 2, 'graph' => 0, 'descr' => 'Manual'],
+        ['value' => 16, 'generic' => 1, 'graph' => 0, 'descr' => 'Test'],
+        ['value' => 32, 'generic' => 2, 'graph' => 0, 'descr' => 'Blocked'],
+        ['value' => 0, 'generic' => 3, 'graph' => 0, 'descr' => 'Unknown'],
+    ];
+    create_state_index($state_name, $states);
+
+    $descr = 'Mode';
+    $sensor_index = 0;
+    // Discover Sensors
+    discover_sensor(
+        $valid['sensor'],
+        'state',
+        $device,
+        null,
+        $sensor_index,
+        $state_name,
+        $descr,
+        1,
+        1,
+        null,
+        null,
+        null,
+        null,
+        $statusMode,
+        'snmp',
+        null,
+        null,
+        null,
+        'CEA7/CEM7'
+    );
+
+    // Create Sensor To State Index
+    create_sensor_to_state_index($device, $state_name, $sensor_index);
+    // End Control Unit mode
+
+    // Transfer Pump Status
+    $state_name = 'statusBT';
+    $states = [
+        ['value' => 0, 'generic' => 0, 'graph' => 0, 'descr' => 'Off'],
+        ['value' => 64, 'generic' => 1, 'graph' => 0, 'descr' => 'On'],
+    ];
+    create_state_index($state_name, $states);
+
+    $descr = 'Transfer Pump';
+    $sensor_index = 0;
+    //Discover Sensor
+    discover_sensor(
+        $valid['sensor'],
+        'state',
+        $device,
+        null,
+        $sensor_index,
+        $state_name,
+        $descr,
+        1,
+        1,
+        null,
+        null,
+        null,
+        null,
+        $statusTransferPump,
+        'snmp',
+        null,
+        null,
+        null,
+        'CEA7/CEM7'
+    );
+
+    //Create Sensor To State Index
+    create_sensor_to_state_index($device, $state_name, $sensor_index);
+    // End Transfer Pump
+
+    // CEA7/CEM7 Alarm
+    $state_name = 'statusAL';
+    $states = [
+        ['value' => 0, 'generic' => 0, 'graph' => 0, 'descr' => 'No Alarm'],
+        ['value' => 128, 'generic' => 2, 'graph' => 0, 'descr' => 'Alarm'],
+    ];
+    create_state_index($state_name, $states);
+
+    $descr = 'Alarm';
+    $sensor_index = 0;
+    //Discover Sensor
+    discover_sensor(
+        $valid['sensor'],
+        'state',
+        $device,
+        null,
+        $sensor_index,
+        $state_name,
+        $descr,
+        1,
+        1,
+        null,
+        null,
+        null,
+        null,
+        $statusAlarm,
+        'snmp',
+        null,
+        null,
+        null,
+        'CEA7/CEM7'
+    );
+
+    //Create Sensor To State Index
+    create_sensor_to_state_index($device, $state_name, $sensor_index);
+    // End CEA7/CEM7 Alarm
+    
+    // Commutator Mode
+    $state_name = 'statusComm';
+    if (isset($status['HIMOINSAv14-MIB::statusConm[0]']) && $status['HIMOINSAv14-MIB::statusConm[0]'] != 0) {
+        $states = [
+            ['value' => 32, 'generic' => 2, 'graph' => 0, 'descr' => 'Genset'],
+            ['value' => 64, 'generic' => 0, 'graph' => 0, 'descr' => 'Mains'],
+            ['value' => 0, 'generic' => 3, 'graph' => 0, 'descr' => 'Unknown'],
+        ];
+    } else {
+        $states = [
+            ['value' => 512, 'generic' => 2, 'graph' => 0, 'descr' => 'Genset'],
+            ['value' => 256, 'generic' => 0, 'graph' => 0, 'descr' => 'Mains'],
+            ['value' => 0, 'generic' => 3, 'graph' => 0, 'descr' => 'Unknown'],
+        ];
+    }
+    
+    create_state_index($state_name, $states);
+
+    $descr = 'Commutator Mode';
+    $sensor_index = 0;
+
     //Discover Sensors
     discover_sensor(
         $valid['sensor'],
@@ -287,85 +354,15 @@ if ($cec7) {
         null,
         null,
         null,
-        $switchalarm,
+        $statusComm,
         'snmp',
         null,
         null,
         null,
-        'CEC7'
+        $commgroup
     );
-
-    //Create Sensor To State Index
-    create_sensor_to_state_index($device, $state_name, $sensor_index);
+    
+        //Create Sensor To State Index
+        create_sensor_to_state_index($device, $state_name, $sensor_index);
+        // End Commutator Mode
 }
-// CEA7/CEM7 Alarm
-$state_name = 'statusAL';
-$states = [
-    ['value' => 0, 'generic' => 0, 'graph' => 0, 'descr' => 'No Alarm'],
-    ['value' => 1, 'generic' => 2, 'graph' => 0, 'descr' => 'Alarm'],
-];
-create_state_index($state_name, $states);
-
-$descr = 'Alarm';
-$sensor_index = 0;
-//Discover Sensor
-discover_sensor(
-    $valid['sensor'],
-    'state',
-    $device,
-    null,
-    $sensor_index,
-    $state_name,
-    $descr,
-    1,
-    1,
-    null,
-    null,
-    null,
-    null,
-    $alarm,
-    'snmp',
-    null,
-    null,
-    null,
-    'CEA7/CEM7'
-);
-
-//Create Sensor To State Index
-create_sensor_to_state_index($device, $state_name, $sensor_index);
-
-// Transfer Pump
-$state_name = 'statusBT';
-$states = [
-    ['value' => 0, 'generic' => 0, 'graph' => 0, 'descr' => 'Off'],
-    ['value' => 1, 'generic' => 1, 'graph' => 0, 'descr' => 'On'],
-];
-create_state_index($state_name, $states);
-
-$descr = 'Transfer Pump';
-$sensor_index = 0;
-//Discover Sensor
-discover_sensor(
-    $valid['sensor'],
-    'state',
-    $device,
-    null,
-    $sensor_index,
-    $state_name,
-    $descr,
-    1,
-    1,
-    null,
-    null,
-    null,
-    null,
-    $tpump,
-    'snmp',
-    null,
-    null,
-    null,
-    'CEA7/CEM7'
-);
-
-//Create Sensor To State Index
-create_sensor_to_state_index($device, $state_name, $sensor_index);
