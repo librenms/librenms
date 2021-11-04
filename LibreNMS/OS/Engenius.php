@@ -51,7 +51,7 @@ class Engenius extends OS
         } else {
             $device->version = isset($data['.1.3.6.1.4.1.14125.2.1.1.5.0']) ? 'Firmware ' . $data['.1.3.6.1.4.1.14125.2.1.1.5.0'] : null;
         }
-        $data->serial = $data['.1.3.6.1.4.1.14125.100.1.7.0'] ?? null;
+        $device->serial = $data['.1.3.6.1.4.1.14125.100.1.7.0'] ?? null;
 
         // There doesn't seem to be a real hardware identification.. sysName will have to do?
         if (! empty($data['.1.3.6.1.4.1.14125.100.1.6.0'])) {
@@ -80,6 +80,5 @@ class Engenius extends OS
                 $device->features = 'WDS Bridge mode';
                 break;
         }
-
     }
 }

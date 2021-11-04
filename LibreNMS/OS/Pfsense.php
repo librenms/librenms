@@ -31,7 +31,7 @@ use LibreNMS\RRD\RrdDefinition;
 
 class Pfsense extends Unix implements OSPolling
 {
-    public function pollOS()
+    public function pollOS(): void
     {
         $oids = snmp_get_multi($this->getDeviceArray(), [
             'pfStateTableCount.0',

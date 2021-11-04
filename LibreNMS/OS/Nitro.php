@@ -46,5 +46,4 @@ class Nitro extends OS
             $device->features = 'Unknown';
         }
     }
-
 }

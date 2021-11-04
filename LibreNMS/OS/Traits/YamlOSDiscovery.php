@@ -76,7 +76,6 @@ trait YamlOSDiscovery
                     $value = $device->$field;
                 }
 
-
                 $device->$field = isset($os_yaml["{$field}_template"])
                     ? trim(SimpleTemplate::parse($os_yaml["{$field}_template"], $template_data))
                     : $value;

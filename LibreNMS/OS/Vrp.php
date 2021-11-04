@@ -106,7 +106,7 @@ class Vrp extends OS implements
         }
     }
 
-    public function pollOS()
+    public function pollOS(): void
     {
         // Polling the Wireless data TODO port to module
         $apTable = snmpwalk_group($this->getDeviceArray(), 'hwWlanApName', 'HUAWEI-WLAN-AP-MIB', 2);

@@ -54,7 +54,7 @@ class Junos extends \LibreNMS\OS implements SlaDiscovery, OSPolling, SlaPolling
         $device->version = $data[0]['jnxVirtualChassisMemberSWVersion'] ?? $parsedVersion[1] ?? $parsed['version'] ?? null;
     }
 
-    public function pollOS()
+    public function pollOS(): void
     {
         $data = snmp_get_multi($this->getDeviceArray(), 'jnxJsSPUMonitoringCurrentFlowSession.0', '-OUQs', 'JUNIPER-SRX5000-SPU-MONITORING-MIB');
 

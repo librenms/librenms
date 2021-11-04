@@ -93,7 +93,7 @@ class Pmp extends OS implements
         $device->hardware = $hardware;
     }
 
-    public function pollOS()
+    public function pollOS(): void
     {
         // Migrated to Wireless Sensor
         $fec = snmp_get_multi_oid($this->getDeviceArray(), ['fecInErrorsCount.0', 'fecOutErrorsCount.0', 'fecCRCError.0'], '-OQUs', 'WHISP-BOX-MIBV2-MIB');

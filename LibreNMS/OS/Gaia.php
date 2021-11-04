@@ -7,7 +7,7 @@ use LibreNMS\RRD\RrdDefinition;
 
 class Gaia extends \LibreNMS\OS implements OSPolling
 {
-    public function pollOS()
+    public function pollOS(): void
     {
         $oids = ['fwLoggingHandlingRate.0', 'mgLSLogReceiveRate.0', 'fwNumConn.0', 'fwAccepted.0', 'fwRejected.0', 'fwDropped.0', 'fwLogged.0'];
 

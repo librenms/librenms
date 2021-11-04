@@ -40,7 +40,7 @@ class Topvision extends \LibreNMS\OS implements OSPolling
         }
     }
 
-    public function pollOS()
+    public function pollOS(): void
     {
         $cmstats = snmp_get_multi_oid($this->getDeviceArray(), ['.1.3.6.1.4.1.32285.11.1.1.2.2.3.1.0', '.1.3.6.1.4.1.32285.11.1.1.2.2.3.6.0', '.1.3.6.1.4.1.32285.11.1.1.2.2.3.5.0']);
         if (is_numeric($cmstats['.1.3.6.1.4.1.32285.11.1.1.2.2.3.1.0'])) {

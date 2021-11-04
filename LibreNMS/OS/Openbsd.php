@@ -31,7 +31,7 @@ use LibreNMS\RRD\RrdDefinition;
 
 class Openbsd extends Unix implements OSPolling
 {
-    public function pollOS()
+    public function pollOS(): void
     {
         $oids = snmp_get_multi($this->getDeviceArray(), ['pfStateCount.0', 'pfStateSearches.0', 'pfStateInserts.0', 'pfStateRemovals.0'], '-OQUs', 'OPENBSD-PF-MIB');
 

@@ -30,7 +30,7 @@ use LibreNMS\RRD\RrdDefinition;
 
 class Nios extends \LibreNMS\OS implements OSPolling
 {
-    public function pollOS()
+    public function pollOS(): void
     {
         //#############
         // Create ddns update rrd

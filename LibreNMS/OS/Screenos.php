@@ -30,7 +30,7 @@ use LibreNMS\RRD\RrdDefinition;
 
 class Screenos extends \LibreNMS\OS implements OSPolling
 {
-    public function pollOS()
+    public function pollOS(): void
     {
         $sess_data = snmp_get_multi_oid($this->getDeviceArray(), [
             '.1.3.6.1.4.1.3224.16.3.2.0',

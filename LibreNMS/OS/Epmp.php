@@ -50,6 +50,7 @@ class Epmp extends OS implements
             'CAMBIUM-PMP80211-MIB::wirelessInterfaceMode.0',
             'CAMBIUM-PMP80211-MIB::cambiumSubModeType.0',
         ])->values();
+
         $epmp_ap = $data['CAMBIUM-PMP80211-MIB::wirelessInterfaceMode.0'] ?? null;
         $epmp_number = $data['CAMBIUM-PMP80211-MIB::cambiumSubModeType.0'] ?? null;
 
@@ -60,7 +61,7 @@ class Epmp extends OS implements
         }
     }
 
-    public function pollOS()
+    public function pollOS(): void
     {
         $device = $this->getDeviceArray();
 
@@ -120,8 +121,8 @@ class Epmp extends OS implements
         $dlWLanTotalUsedFrameTimePerSecond = $multi_get_array[0]['CAMBIUM-PMP80211-MIB::dlWLanTotalUsedFrameTimePerSecond'] ?? null;
 
         if (is_numeric($ulWLanTotalAvailableFrameTimePerSecond) && is_numeric($ulWLanTotalUsedFrameTimePerSecond) && $ulWLanTotalAvailableFrameTimePerSecond && $ulWLanTotalUsedFrameTimePerSecond) {
-            $ulWlanFrameUtilization = round((($ulWLanTotalUsedFrameTimePerSecond / $ulWLanTotalAvailableFrameTimePerSecond) * 100), 2);
-            $dlWlanFrameUtilization = round((($dlWLanTotalUsedFrameTimePerSecond / $dlWLanTotalAvailableFrameTimePerSecond) * 100), 2);
+            $ulWlanFrameUtilization = round(($ulWLanTotalUsedFrameTimePerSecond / $ulWLanTotalAvailableFrameTimePerSecond) * 100, 2);
+            $dlWlanFrameUtilization = round(($dlWLanTotalUsedFrameTimePerSecond / $dlWLanTotalAvailableFrameTimePerSecond) * 100, 2);
             d_echo($dlWlanFrameUtilization);
             d_echo($ulWlanFrameUtilization);
             $rrd_def = RrdDefinition::make()
@@ -135,7 +136,6 @@ class Epmp extends OS implements
             data_update($device, 'cambium-epmp-frameUtilization', $tags, $fields);
             $this->enableGraph('cambium-epmp-frameUtilization');
         }
-
     }
 
     /**

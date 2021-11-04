@@ -39,7 +39,7 @@ class Ciscowlc extends Cisco implements
     WirelessClientsDiscovery,
     WirelessApCountDiscovery
 {
-    public function pollOS()
+    public function pollOS(): void
     {
         $device = $this->getDeviceArray();
         $stats = snmpwalk_cache_oid($device, 'bsnAPEntry', [], 'AIRESPACE-WIRELESS-MIB', null, '-OQUsb');
@@ -51,7 +51,7 @@ class Ciscowlc extends Cisco implements
         $numAccessPoints = is_countable($stats) ? count($stats) : 0;
         $numClients = 0;
 
-        foreach (Arr::wrap($APstats) as $key => $value) {
+        foreach (Arr::wrap($APstats) as $value) {
             $numClients += $value['bsnApIfNoOfUsers'];
         }
 
