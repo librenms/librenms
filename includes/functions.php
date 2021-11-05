@@ -1432,7 +1432,8 @@ function cache_mac_oui()
     if ($lock->get()) {
         echo 'Caching Mac OUI' . PHP_EOL;
         try {
-            $mac_oui_url = 'https://raw.githubusercontent.com/wireshark/wireshark/master/manuf';
+            $mac_oui_url = 'https://gitlab.com/wireshark/wireshark/-/raw/master/manuf';
+            //$mac_oui_url_mirror = 'https://raw.githubusercontent.com/wireshark/wireshark/master/manuf';
             echo '  -> Downloading ...' . PHP_EOL;
             $get = Requests::get($mac_oui_url, [], ['proxy' => get_proxy()]);
             echo '  -> Processing CSV ...' . PHP_EOL;
