@@ -1440,18 +1440,22 @@ function cache_mac_oui()
             foreach (explode("\n", $csv_data) as $csv_line) {
                 unset($oui);
                 $entry = str_getcsv($csv_line, "\t");
-                if (is_array($entry) && count($entry) >= 3 && strlen($entry[0]) == 8) {
+
+                $length = strlen($entry[0]);
+                $prefix = strtolower(str_replace(':', '', $entry[0]));
+
+                if (is_array($entry) && count($entry) >= 3 && $length == 8) {
                     // We have a standard OUI xx:xx:xx
-                    $oui = strtolower(str_replace(':', '', $entry[0]));
-                } elseif (is_array($entry) && count($entry) >= 3 && strlen($entry[0]) == 20) {
+                    $oui = $prefix;
+                } elseif (is_array($entry) && count($entry) >= 3 && $length == 20) {
                     // We have a smaller range (xx:xx:xx:X or xx:xx:xx:xx:X)
-                    if (substr($entry[0], -2) == '28') {
-                        $oui = strtolower(str_replace(':', '', substr($entry[0], 0, 10)));
-                    } elseif (substr($entry[0], -2) == '36') {
-                        $oui = strtolower(str_replace(':', '', substr($entry[0], 0, 13)));
+                    if (substr($prefix, -2) == '28') {
+                        $oui = substr($prefix, 0, 7);
+                    } elseif (substr($prefix, -2) == '36') {
+                        $oui = substr($prefix, 0, 9);
                     }
                 }
-                if ($oui) {
+                if (isset($oui)) {
                     echo "Adding $oui, $entry[2]\n";
                     $key = 'OUIDB-' . $oui;
                     Cache::put($key, $entry[2], $mac_oui_cache_time);
