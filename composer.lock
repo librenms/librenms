@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "c57b725a8b55eda2e119496d6d41522c",
+    "content-hash": "643563ebf8b7fae69a556ac42e20bbf8",
     "packages": [
         {
             "name": "amenadiel/jpgraph",
@@ -9692,16 +9692,16 @@
         },
         {
             "name": "nunomaduro/larastan",
-            "version": "v0.7.13",
+            "version": "1.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/nunomaduro/larastan.git",
-                "reference": "60f19f8ffaaf1cbabcc127d94fc8d41e7bf7ecb2"
+                "reference": "a5a6bdae060c72a5909479fb37c04a7f9fd84533"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nunomaduro/larastan/zipball/60f19f8ffaaf1cbabcc127d94fc8d41e7bf7ecb2",
-                "reference": "60f19f8ffaaf1cbabcc127d94fc8d41e7bf7ecb2",
+                "url": "https://api.github.com/repos/nunomaduro/larastan/zipball/a5a6bdae060c72a5909479fb37c04a7f9fd84533",
+                "reference": "a5a6bdae060c72a5909479fb37c04a7f9fd84533",
                 "shasum": ""
             },
             "require": {
@@ -9716,11 +9716,11 @@
                 "illuminate/support": "^6.0 || ^7.0 || ^8.0 || ^9.0",
                 "mockery/mockery": "^0.9 || ^1.0",
                 "php": "^7.2 || ^8.0",
-                "phpstan/phpstan": "^0.12.90",
+                "phpstan/phpstan": "^1.0",
                 "symfony/process": "^4.3 || ^5.0 || ^6.0"
             },
             "require-dev": {
-                "nikic/php-parser": "4.12.0",
+                "nikic/php-parser": "^4.13.0",
                 "orchestra/testbench": "^4.0 || ^5.0 || ^6.0 || ^7.0",
                 "phpunit/phpunit": "^7.3 || ^8.2 || ^9.3"
             },
@@ -9730,7 +9730,7 @@
             "type": "phpstan-extension",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "0.7-dev"
+                    "dev-master": "1.0-dev"
                 },
                 "phpstan": {
                     "includes": [
@@ -9766,7 +9766,7 @@
             ],
             "support": {
                 "issues": "https://github.com/nunomaduro/larastan/issues",
-                "source": "https://github.com/nunomaduro/larastan/tree/v0.7.13"
+                "source": "https://github.com/nunomaduro/larastan/tree/1.0.0"
             },
             "funding": [
                 {
@@ -9786,7 +9786,7 @@
                     "type": "patreon"
                 }
             ],
-            "time": "2021-10-14T07:30:49+00:00"
+            "time": "2021-11-01T12:39:49+00:00"
         },
         {
             "name": "phar-io/manifest",
@@ -10305,16 +10305,16 @@
         },
         {
             "name": "phpstan/phpstan",
-            "version": "0.12.99",
+            "version": "1.0.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/phpstan/phpstan.git",
-                "reference": "b4d40f1d759942f523be267a1bab6884f46ca3f7"
+                "reference": "0eb6ecdfbcebf2207668087dfb2e215581a75023"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phpstan/phpstan/zipball/b4d40f1d759942f523be267a1bab6884f46ca3f7",
-                "reference": "b4d40f1d759942f523be267a1bab6884f46ca3f7",
+                "url": "https://api.github.com/repos/phpstan/phpstan/zipball/0eb6ecdfbcebf2207668087dfb2e215581a75023",
+                "reference": "0eb6ecdfbcebf2207668087dfb2e215581a75023",
                 "shasum": ""
             },
             "require": {
@@ -10330,7 +10330,7 @@
             "type": "library",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "0.12-dev"
+                    "dev-master": "1.0-dev"
                 }
             },
             "autoload": {
@@ -10345,7 +10345,7 @@
             "description": "PHPStan - PHP Static Analysis Tool",
             "support": {
                 "issues": "https://github.com/phpstan/phpstan/issues",
-                "source": "https://github.com/phpstan/phpstan/tree/0.12.99"
+                "source": "https://github.com/phpstan/phpstan/tree/1.0.1"
             },
             "funding": [
                 {
@@ -10365,37 +10365,38 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2021-09-12T20:09:55+00:00"
+            "time": "2021-11-02T10:25:31+00:00"
         },
         {
             "name": "phpstan/phpstan-mockery",
-            "version": "0.12.14",
+            "version": "1.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/phpstan/phpstan-mockery.git",
-                "reference": "7cc74bf434b3c2190f7f4cfc08c74f7c0b65667f"
+                "reference": "1767581e025d830d9288702761ad3cc7b72ecca4"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phpstan/phpstan-mockery/zipball/7cc74bf434b3c2190f7f4cfc08c74f7c0b65667f",
-                "reference": "7cc74bf434b3c2190f7f4cfc08c74f7c0b65667f",
+                "url": "https://api.github.com/repos/phpstan/phpstan-mockery/zipball/1767581e025d830d9288702761ad3cc7b72ecca4",
+                "reference": "1767581e025d830d9288702761ad3cc7b72ecca4",
                 "shasum": ""
             },
             "require": {
                 "php": "^7.1 || ^8.0",
-                "phpstan/phpstan": "^0.12.60"
+                "phpstan/phpstan": "^1.0"
             },
             "require-dev": {
                 "mockery/mockery": "^1.2.4",
+                "nikic/php-parser": "^4.13.0",
                 "php-parallel-lint/php-parallel-lint": "^1.2",
-                "phpstan/phpstan-phpunit": "^0.12.16",
-                "phpstan/phpstan-strict-rules": "^0.12.5",
+                "phpstan/phpstan-phpunit": "^1.0",
+                "phpstan/phpstan-strict-rules": "^1.0",
                 "phpunit/phpunit": "^9.5"
             },
             "type": "phpstan-extension",
             "extra": {
                 "branch-alias": {
-                    "dev-master": "0.12-dev"
+                    "dev-master": "1.0-dev"
                 },
                 "phpstan": {
                     "includes": [
@@ -10415,9 +10416,9 @@
             "description": "PHPStan Mockery extension",
             "support": {
                 "issues": "https://github.com/phpstan/phpstan-mockery/issues",
-                "source": "https://github.com/phpstan/phpstan-mockery/tree/0.12.14"
+                "source": "https://github.com/phpstan/phpstan-mockery/tree/1.0.0"
             },
-            "time": "2021-06-10T12:12:36+00:00"
+            "time": "2021-09-20T16:03:58+00:00"
         },
         {
             "name": "phpunit/php-code-coverage",
@@ -12016,24 +12017,25 @@
         },
         {
             "name": "spaze/phpstan-disallowed-calls",
-            "version": "v1.9.0",
+            "version": "v2.0.0",
             "source": {
                 "type": "git",
                 "url": "https://github.com/spaze/phpstan-disallowed-calls.git",
-                "reference": "2f5402fd88a2a7345a5cca28e98b84f559cdc0f2"
+                "reference": "ff9fa0a0202badc83894168442ca8d323d408d61"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/spaze/phpstan-disallowed-calls/zipball/2f5402fd88a2a7345a5cca28e98b84f559cdc0f2",
-                "reference": "2f5402fd88a2a7345a5cca28e98b84f559cdc0f2",
+                "url": "https://api.github.com/repos/spaze/phpstan-disallowed-calls/zipball/ff9fa0a0202badc83894168442ca8d323d408d61",
+                "reference": "ff9fa0a0202badc83894168442ca8d323d408d61",
                 "shasum": ""
             },
             "require": {
                 "php": "^7.1 || ^8.0",
-                "phpstan/phpstan": "^0.12"
+                "phpstan/phpstan": "^1.0"
             },
             "require-dev": {
                 "nette/neon": "^3.2",
+                "nikic/php-parser": "^4.13",
                 "php-parallel-lint/php-console-highlighter": "^0.5.0",
                 "php-parallel-lint/php-parallel-lint": "^1.2",
                 "phpunit/phpunit": "^7.0 || ^9.4.2",
@@ -12066,9 +12068,9 @@
             "description": "Disallowed method and function calls plug-in for PHPStan",
             "support": {
                 "issues": "https://github.com/spaze/phpstan-disallowed-calls/issues",
-                "source": "https://github.com/spaze/phpstan-disallowed-calls/tree/v1.9.0"
+                "source": "https://github.com/spaze/phpstan-disallowed-calls/tree/v2.0.0"
             },
-            "time": "2021-08-18T22:45:42+00:00"
+            "time": "2021-11-01T07:25:01+00:00"
         },
         {
             "name": "staudenmeir/dusk-updater",

@@ -63,7 +63,7 @@ if (! empty($agent_data['dpkg'])) {
         $pkgs[$manager][$name][$arch][$version][$build]['arch'] = $arch;
         $pkgs[$manager][$name][$arch][$version][$build]['version'] = $version;
         $pkgs[$manager][$name][$arch][$version][$build]['build'] = $build;
-        $pkgs[$manager][$name][$arch][$version][$build]['size'] = ($size * 1024);
+        $pkgs[$manager][$name][$arch][$version][$build]['size'] = (cast_number($size) * 1024);
         $pkgs[$manager][$name][$arch][$version][$build]['status'] = '1';
         $text = $manager . '-' . $name . '-' . $arch . '-' . $version . '-' . $build;
         $pkgs_id[] = $pkgs[$manager][$name][$arch][$version][$build];
@@ -100,7 +100,7 @@ foreach ($pkgs_id as $pkg) {
 
         unset($pkgs_db_id[$id]);
     } else {
-        if (count($pkgs[$manager][$name][$arch], 1) > '10' || count($pkgs_db[$manager][$name][$arch], 1) == '0') {
+        if (count($pkgs[$manager][$name][$arch], 1) > '10' || (is_countable($pkgs_db[$manager][$name][$arch]) && count($pkgs_db[$manager][$name][$arch], 1) == '0')) {
             dbInsert(
                 [
                     'device_id' => $device['device_id'],
@@ -122,7 +122,7 @@ foreach ($pkgs_id as $pkg) {
 
             echo '+' . $name . '-' . $version . $dbuild . '-' . $arch;
             log_event('Package installed: ' . $name . ' (' . $arch . ') version ' . $version . $dbuild, $device, 'package', 3);
-        } elseif (count($pkgs_db[$manager][$name][$arch], 1)) {
+        } elseif (is_countable($pkgs_db[$manager][$name][$arch]) && count($pkgs_db[$manager][$name][$arch], 1)) {
             $pkg_c = dbFetchRow('SELECT * FROM `packages` WHERE `device_id` = ? AND `manager` = ? AND `name` = ? and `arch` = ? ORDER BY version DESC, build DESC', [$device['device_id'], $manager, $name, $arch]);
             if ($pkg_c['build'] != '') {
                 $pkg_c_dbuild = '-' . $pkg_c['build'];
