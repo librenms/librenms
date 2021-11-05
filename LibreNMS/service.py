@@ -5,6 +5,7 @@ import threading
 import time
 
 import pymysql
+import redis.exceptions
 
 import LibreNMS
 
@@ -844,7 +845,7 @@ class Service:
                         getattr(self.config, worker_type).frequency,
                     )
                 )
-        except (pymysql.err.Error, ConnectionResetError):
+        except (pymysql.err.Error, ConnectionResetError, redis.exceptions.ConnectionError):
             logger.critical(
                 "Unable to log performance statistics - is the database still online?",
                 exc_info=True,
