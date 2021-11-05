@@ -156,10 +156,11 @@ class Rewrite
     public static function readableOUI($mac)
     {
         $cached = Cache::get('OUIDB-' . (substr($mac, 0, 6)), '');
-        if ($cached == "IEEE Registration Authority") {
+        if ($cached == 'IEEE Registration Authority') {
             // Then we may have a shorter prefix, so let's try them one ater the other, ordered by probability
             return Cache::get('OUIDB-' . (substr($mac, 0, 7)), Cache::get('OUIDB-' . (substr($mac, 0, 9))));
         }
+
         return $cached;
     }
 

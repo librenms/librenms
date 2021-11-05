@@ -1445,9 +1445,9 @@ function cache_mac_oui()
                     $oui = strtolower(str_replace(':', '', $entry[0]));
                 } elseif (is_array($entry) && count($entry) >= 3 && strlen($entry[0]) == 20) {
                     // We have a smaller range (xx:xx:xx:X or xx:xx:xx:xx:X)
-                    if (substr($entry[0], -2) == "28") {
+                    if (substr($entry[0], -2) == '28') {
                         $oui = strtolower(str_replace(':', '', substr($entry[0], 0, 10)));
-                    } elseif (substr($entry[0], -2) == "36") {
+                    } elseif (substr($entry[0], -2) == '36') {
                         $oui = strtolower(str_replace(':', '', substr($entry[0], 0, 13)));
                     }
                 }
