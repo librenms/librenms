@@ -28,11 +28,13 @@ namespace LibreNMS\OS;
 use LibreNMS\Device\WirelessSensor;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessApCountDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessClientsDiscovery;
+use LibreNMS\Interfaces\Polling\WirelessAccessPointPolling;
 use LibreNMS\OS\Shared\Cisco;
 
 class Ciscowlc extends Cisco implements
     WirelessClientsDiscovery,
-    WirelessApCountDiscovery
+    WirelessApCountDiscovery,
+    WirelessAccessPointPolling
 {
     /**
      * Discover wireless client counts. Type is clients.
@@ -114,5 +116,89 @@ class Ciscowlc extends Cisco implements
         }
 
         return [];
+    }
+
+    public function getWirelessControllerDatastorePrefix()
+    {
+        // Prefix used to name RRD-files for AccessPoints
+        return 'cisco-controller';
+    }
+
+    public function getAccessPointDatastorePrefix()
+    {
+        // Prefix used to name RRD-files for AccessPoints
+        return 'cisco-ap';
+    }
+
+    /**
+     * Poll wireless access points data from the controller
+     * Return collection of AccessPoints
+     */
+    public function pollWirelessAccessPoints()
+    {
+        $access_points = new Collection;
+        
+        $stats = snmpwalk_cache_oid($device, 'bsnAPEntry', $stats, 'AIRESPACE-WIRELESS-MIB', null, '-OQUsb');
+        $radios = snmpwalk_cache_oid($device, 'bsnAPIfEntry', $radios, 'AIRESPACE-WIRELESS-MIB', null, '-OQUsb');
+        $APstats = snmpwalk_cache_oid($device, 'bsnApIfNoOfUsers', $APstats, 'AIRESPACE-WIRELESS-MIB', null, '-OQUsxb');
+        $loadParams = snmpwalk_cache_oid($device, 'bsnAPIfLoadChannelUtilization', $loadParams, 'AIRESPACE-WIRELESS-MIB', null, '-OQUsb');
+        $interferences = snmpwalk_cache_oid($device, 'bsnAPIfInterferencePower', $interferences, 'AIRESPACE-WIRELESS-MIB', null, '-OQUsb');
+   
+        // Loop through the polled data.
+        foreach ($radios as $key => $value) {
+            $indexName = substr($key, 0, -2);
+            $channel = str_replace('ch', '', $value['bsnAPIfPhyChannelNumber']);
+            $mac = str_replace(' ', ':', $stats[$indexName]['bsnAPDot3MacAddress']);
+            $name = $stats[$indexName]['bsnAPName'];
+            $numasoclients = $value['bsnApIfNoOfUsers'];
+            $radioArray = explode('.', $key);
+            $radionum = array_pop($radioArray);
+            $txpow = $value['bsnAPIfPhyTxPowerLevel'];
+            $type = $value['bsnAPIfType'];
+            $interference = 128 + $interferences[$key . '.' . $channel]['bsnAPIfInterferencePower'];
+            $radioutil = $loadParams[$key]['bsnAPIfLoadChannelUtilization'];
+        
+            // TODO
+            $numactbssid = 0;
+            $nummonbssid = 0;
+            $nummonclients = 0;
+        
+            d_echo("  name: $name\n");
+            d_echo("  radionum: $radionum\n");
+            d_echo("  type: $type\n");
+            d_echo("  channel: $channel\n");
+            d_echo("  txpow: $txpow\n");
+            d_echo("  radioutil: $radioutil\n");
+            d_echo("  numasoclients: $numasoclients\n");
+            d_echo("  interference: $interference\n");
+        
+            // TODO: Is this really needed?
+            // if there is a numeric channel, assume the rest of the data is valid, I guess
+            if (! is_numeric($channel)) {
+                continue;
+            }
+
+            $attributes = [
+                'device_id' => $this->getDeviceId(),
+                'name' => $wlsxWlanRadioTable[$ap]['wlanAPRadioAPName'][$radio_id],
+                'radio_number' => $radio_id,
+                'type' => $wlsxWlanRadioTable[$ap]['wlanAPRadioType'][$radio_id],
+                'mac_addr' => $ap,
+                'channel' => $wlsxWlanRadioTable[$ap]['wlanAPRadioChannel'][$radio_id],
+                'txpow' => $wlsxWlanRadioTable[$ap]['wlanAPRadioUtilization'][$radio_id] / 2,
+                'radioutil' => $wlsxWlanRadioTable[$ap]['wlanAPRadioUtilization'][$radio_id],
+                'numasoclients' => $wlsxWlanRadioTable[$ap]['wlanAPRadioNumAssociatedClients'][$radio_id],
+                'nummonclients' => $wlsxWlanRadioTable[$ap]['wlanAPRadioNumMonitoredClients'][$radio_id],
+                'numactbssid' => $wlsxWlanRadioTable[$ap]['wlanAPRadioNumActiveBSSIDs'][$radio_id],
+                'nummonbssid' => $wlsxWlanRadioTable[$ap]['wlanAPRadioNumMonitoredBSSIDs'][$radio_id],
+                'interference' => $wlsxWlanAPChStatsTable[$ap]['wlanAPChInterferenceIndex'][$radio_id],
+            ];
+
+            // Create AccessPoint models
+            $access_points->push(new AccessPoint($attributes));
+        }
+
+        // Return the collection of AccessPoint models
+        return $access_points;
     }
 }
