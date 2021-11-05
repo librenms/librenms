@@ -19,8 +19,8 @@
  *
  * @link       https://www.librenms.org
  *
- * @copyright  2021 Daniel Baeza
- * @author     TheGreatDoc <doctoruve@gmail.com>
+ * @copyright  2021 Daniel Baeza & Tony Murray
+ * @author     TheGreatDoc <doctoruve@gmail.com> & murrant <murraytony@gmail.com>
  */
 
 /*
@@ -61,74 +61,37 @@ P = Motor Stopped
 A = Motor Running
 */
 $status = SnmpQuery::get(['HIMOINSAv14-MIB::status.0', 'HIMOINSAv14-MIB::statusConm.0'])->values();
-var_dump($status);
-// map of bits
+
 if (isset($status['HIMOINSAv14-MIB::status.0'])) {
-    $map = [
-        'Mains commutator closed' => 512,
-        'Gens commutator closed' => 256,
-        'Active Alarm' => 128,
-        'Transfer Pump' => 64,
-        'Blocked mode' => 32,
-        'Test mode' => 16,
-        'Manual mode' => 8,
-        'Auto mode' => 4,
-        'Motor Stopped' => 2,
-        'Motor Running' => 1,
-    ];
-
-    $statusMotor = 0;
-    $statusMode = 0;
-    $statusAlarm = 0;
-    $statusComm = 0;
-    $statusTransferPump = 0;
-    $statusCommAlarm = 0;
-
-    foreach ($map as $descr => $mask) {
-        if ($status['HIMOINSAv14-MIB::status.0'] & $mask) {
-            // Get Motor Status
-            if (in_array($descr, ['Motor Running', 'Motor Stopped'])) {
-                $statusMotor = $mask;
-            }
-            // Get Control Unit Status
-            if (in_array($descr, ['Auto mode', 'Manual mode', 'Test mode', 'Blocked mode'])) {
-                $statusMode = $mask;
-            }
-            // Get Transfer Pump Status
-            if (in_array($descr, ['Transfer Pump'])) {
-                $statusMode = $mask;
-            }
-            // Get Alarm Status
-            if (in_array($descr, ['Transfer Pump'])) {
-                $statusAlarm = $mask;
-            }
-            // Get Comm status (only if CEA7)
-            if (in_array($descr, ['Mains commutator closed', 'Gen commutator closed'])) {
-                $statusComm = $mask;
-                $commgroup = 'CEA7/CEM7';
-            }
-        }
+    $statusMotor = ($status['HIMOINSAv14-MIB::status.0'] & 1) | ($status['HIMOINSAv14-MIB::status.0'] & 2);
+    $statusMode =
+        ($status['HIMOINSAv14-MIB::status.0'] & 4) |
+        ($status['HIMOINSAv14-MIB::status.0'] & 8) |
+        ($status['HIMOINSAv14-MIB::status.0'] & 16) |
+        ($status['HIMOINSAv14-MIB::status.0'] & 32);
+    $statusAlarm = ($status['HIMOINSAv14-MIB::status.0'] & 128) ?? 0;
+    $statusTransferPump = ($status['HIMOINSAv14-MIB::status.0'] & 64) ?? 0;
+    if (isset($status['HIMOINSAv14-MIB::statusConm[0]']) && ($status['HIMOINSAv14-MIB::statusConm[0]'] != 0)) {
+        $statusComm =
+            ($status['HIMOINSAv14-MIB::statusConm[0]'] & 32) |
+            ($status['HIMOINSAv14-MIB::statusConm[0]'] & 64);
+        $commgroup = 'CEC7';
+        $statusCommAlarm = ($status['HIMOINSAv14-MIB::statusConm[0]'] & 1) ?? 0;
+    } else {
+        $statusComm = ($status['HIMOINSAv14-MIB::status.0'] & 512) | ($status['HIMOINSAv14-MIB::status.0'] & 256);
+        $commgroup = 'CEA7/CEM7';
     }
-    // Check CEC7 and override Commutator status if valid. Also get CEC7 alarm state.
-    if (isset($status['HIMOINSAv14-MIB::statusConm[0]'])) {
-        $map = [
-            'Mains commutator closed' => 32,
-            'Gen commutator closed' => 64,
-            'Active commutator alarm' => 1,
-        ];
-        foreach ($map as $descr => $mask) {
-            if ($status['HIMOINSAv14-MIB::statusConm[0]'] & $mask) {
-                // Get comm status (CEC7)
-                if (in_array($descr, ['Mains commutator closed', 'Gen commutator closed'])) {
-                    $statusComm = $mask;
-                    $commgroup = 'CEC7';
-                }
-                // Get Commutator Alarm
-                if (in_array($descr, ['Active commutator alarm'])) {
-                    $statusCommAlarm = $mask;
-                }
-            }
-        }
+    
+    d_echo("Motor " . $statusMotor);
+    d_echo("Mode " . $statusMode);
+    d_echo("TPump " . $statusTransferPump);
+    d_echo("Comm " . $statusComm);
+    d_echo("Alarm " . $statusAlarm);
+    d_echo("CommAlarm " . $statusCommAlarm);
+    d_echo("Comm Group " . $commgroup);
+
+    // Check for CEC7 and get CEC7 alarm state.
+    if ($commgroup === 'CEC7') {
         // CEC7 Commutator Alarm
         $state_name = 'statusCommAlarm';
         $states = [
@@ -317,10 +280,10 @@ if (isset($status['HIMOINSAv14-MIB::status.0'])) {
     //Create Sensor To State Index
     create_sensor_to_state_index($device, $state_name, $sensor_index);
     // End CEA7/CEM7 Alarm
-    
+
     // Commutator Mode
     $state_name = 'statusComm';
-    if (isset($status['HIMOINSAv14-MIB::statusConm[0]']) && $status['HIMOINSAv14-MIB::statusConm[0]'] != 0) {
+    if ($commgroup === 'CEC7') {
         $states = [
             ['value' => 32, 'generic' => 2, 'graph' => 0, 'descr' => 'Genset'],
             ['value' => 64, 'generic' => 0, 'graph' => 0, 'descr' => 'Mains'],
@@ -333,13 +296,13 @@ if (isset($status['HIMOINSAv14-MIB::status.0'])) {
             ['value' => 0, 'generic' => 3, 'graph' => 0, 'descr' => 'Unknown'],
         ];
     }
-    
+
     create_state_index($state_name, $states);
 
     $descr = 'Commutator Mode';
     $sensor_index = 0;
 
-    //Discover Sensors
+    // Discover Sensors
     discover_sensor(
         $valid['sensor'],
         'state',
@@ -362,7 +325,7 @@ if (isset($status['HIMOINSAv14-MIB::status.0'])) {
         $commgroup
     );
     
-        //Create Sensor To State Index
-        create_sensor_to_state_index($device, $state_name, $sensor_index);
-        // End Commutator Mode
+    // Create Sensor To State Index
+    create_sensor_to_state_index($device, $state_name, $sensor_index);
+    // End Commutator Mode
 }
