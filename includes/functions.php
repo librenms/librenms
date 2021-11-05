@@ -1434,6 +1434,7 @@ function cache_mac_oui()
         try {
             $mac_oui_url = 'https://gitlab.com/wireshark/wireshark/-/raw/master/manuf';
             //$mac_oui_url_mirror = 'https://raw.githubusercontent.com/wireshark/wireshark/master/manuf';
+
             echo '  -> Downloading ...' . PHP_EOL;
             $get = Requests::get($mac_oui_url, [], ['proxy' => get_proxy()]);
             echo '  -> Processing CSV ...' . PHP_EOL;
@@ -1457,7 +1458,7 @@ function cache_mac_oui()
                     }
                 }
                 if (isset($oui)) {
-                    echo "Adding $oui, $entry[2]\n";
+                    echo "Adding $oui, $entry[2]" . PHP_EOL;
                     $key = 'OUIDB-' . $oui;
                     Cache::put($key, $entry[2], $mac_oui_cache_time);
                 }
