@@ -1,6 +1,6 @@
 <?php
 /**
- * Wireless.php
+ * WirelessController.php
  *
  * -Description-
  *
@@ -34,7 +34,7 @@ use LibreNMS\Interfaces\Polling\WirelessAccessPointPolling;
 use LibreNMS\OS;
 use LibreNMS\RRD\RrdDefinition;
 
-class Wireless implements Module
+class WirelessController implements Module
 {
     use SyncsModels;
 
