@@ -844,7 +844,7 @@ class Service:
                         getattr(self.config, worker_type).frequency,
                     )
                 )
-        except pymysql.err.Error:
+        except (pymysql.err.Error, ConnectionResetError):
             logger.critical(
                 "Unable to log performance statistics - is the database still online?",
                 exc_info=True,
