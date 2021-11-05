@@ -33,6 +33,10 @@ class RrdDefinition
     private static $types = ['GAUGE', 'DERIVE', 'COUNTER', 'ABSOLUTE', 'DCOUNTER', 'DDERIVE'];
     private $dataSets = [];
     private $skipNameCheck = false;
+    /**
+     * @var array
+     */
+    private $source_files = [];
 
     /**
      * Make a new empty RrdDefinition
@@ -51,15 +55,29 @@ class RrdDefinition
      * @param  int  $min  Minimum allowed value.  null means undefined.
      * @param  int  $max  Maximum allowed value.  null means undefined.
      * @param  int  $heartbeat  Heartbeat for this dataset. Uses the global setting if null.
+     * @param  string  $file  File containing source
+     * @param  string  $source  Source DS inside source file
      * @return RrdDefinition
      */
-    public function addDataset($name, $type, $min = null, $max = null, $heartbeat = null)
+    public function addDataset($name, $type, $min = null, $max = null, $heartbeat = null, $file = null, $source = null)
     {
         if (empty($name)) {
             d_echo('DS must be set to a non-empty string.');
         }
 
         $name = $this->escapeName($name);
+
+        // migrate from source file
+        if ($file && $source) {
+            $source = $this->escapeName($source);
+
+            // see if file is already in the file list, otherwise append at the next index
+            $found = array_search($source, $this->source_files);
+            $index = $found !== false ? $found : count($this->source_files);
+            $this->source_files[$index] = $file;
+            $name .= "=$source[$index]";
+        }
+
         $this->dataSets[$name] = [
             $name,
             $this->checkType($type),
@@ -78,9 +96,11 @@ class RrdDefinition
      */
     public function __toString()
     {
+        $initial = empty($this->source_files) ? '' : ('--source ' . implode(',', $this->source_files) . ' ');
+
         return array_reduce($this->dataSets, function ($carry, $ds) {
             return $carry . 'DS:' . implode(':', $ds) . ' ';
-        }, '');
+        }, $initial);
     }
 
     /**
