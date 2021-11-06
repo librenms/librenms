@@ -5,7 +5,6 @@ import threading
 import time
 
 import pymysql
-import redis.exceptions
 
 import LibreNMS
 
@@ -26,6 +25,12 @@ try:
     from systemd.daemon import notify
 except ImportError:
     pass
+
+try:
+    from redis.exceptions import ConnectionError as RedisConnectionError
+except ImportError:
+    class RedisConnectionError(Exception):
+        pass
 
 logger = logging.getLogger(__name__)
 
@@ -845,7 +850,7 @@ class Service:
                         getattr(self.config, worker_type).frequency,
                     )
                 )
-        except (pymysql.err.Error, ConnectionResetError, redis.exceptions.ConnectionError):
+        except (pymysql.err.Error, ConnectionResetError, RedisConnectionError):
             logger.critical(
                 "Unable to log performance statistics - is the database still online?",
                 exc_info=True,
