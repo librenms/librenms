@@ -29,8 +29,10 @@ except ImportError:
 try:
     from redis.exceptions import ConnectionError as RedisConnectionError
 except ImportError:
+
     class RedisConnectionError(Exception):
         pass
+
 
 logger = logging.getLogger(__name__)
 
