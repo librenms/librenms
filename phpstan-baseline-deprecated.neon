@@ -71,21 +71,6 @@ parameters:
 			path: LibreNMS/Alert/RunAlerts.php
 
 		-
-			message: "#^Calling dbFetchCell\\(\\) is forbidden, use Eloquent instead; https\\://laravel\\.com/docs/8\\.x/eloquent \\[dbFetchCell\\(\\) matches db\\*\\(\\)\\]$#"
-			count: 1
-			path: LibreNMS/Alert/Transport.php
-
-		-
-			message: "#^Calling dbInsert\\(\\) is forbidden, use Eloquent instead; https\\://laravel\\.com/docs/8\\.x/eloquent \\[dbInsert\\(\\) matches db\\*\\(\\)\\]$#"
-			count: 1
-			path: LibreNMS/Alert/Transport/Pagerduty.php
-
-		-
-			message: "#^Calling dbUpdate\\(\\) is forbidden, use Eloquent instead; https\\://laravel\\.com/docs/8\\.x/eloquent \\[dbUpdate\\(\\) matches db\\*\\(\\)\\]$#"
-			count: 1
-			path: LibreNMS/Alert/Transport/Pagerduty.php
-
-		-
 			message: "#^Calling dbFetchRow\\(\\) is forbidden, use Eloquent instead; https\\://laravel\\.com/docs/8\\.x/eloquent \\[dbFetchRow\\(\\) matches db\\*\\(\\)\\]$#"
 			count: 3
 			path: LibreNMS/Component.php
@@ -343,11 +328,6 @@ parameters:
 		-
 			message: "#^Calling dbFetchRows\\(\\) is forbidden, use Eloquent instead; https\\://laravel\\.com/docs/8\\.x/eloquent \\[dbFetchRows\\(\\) matches db\\*\\(\\)\\]$#"
 			count: 4
-			path: includes/common.php
-
-		-
-			message: "#^Calling dbUpdate\\(\\) is forbidden, use Eloquent instead; https\\://laravel\\.com/docs/8\\.x/eloquent \\[dbUpdate\\(\\) matches db\\*\\(\\)\\]$#"
-			count: 1
 			path: includes/common.php
 
 		-
@@ -1267,7 +1247,7 @@ parameters:
 
 		-
 			message: "#^Calling dbDelete\\(\\) is forbidden, use Eloquent instead; https\\://laravel\\.com/docs/8\\.x/eloquent \\[dbDelete\\(\\) matches db\\*\\(\\)\\]$#"
-			count: 9
+			count: 8
 			path: includes/functions.php
 
 		-
@@ -1277,17 +1257,12 @@ parameters:
 
 		-
 			message: "#^Calling dbFetchCell\\(\\) is forbidden, use Eloquent instead; https\\://laravel\\.com/docs/8\\.x/eloquent \\[dbFetchCell\\(\\) matches db\\*\\(\\)\\]$#"
-			count: 10
-			path: includes/functions.php
-
-		-
-			message: "#^Calling dbFetchColumn\\(\\) is forbidden, use Eloquent instead; https\\://laravel\\.com/docs/8\\.x/eloquent \\[dbFetchColumn\\(\\) matches db\\*\\(\\)\\]$#"
-			count: 1
+			count: 8
 			path: includes/functions.php
 
 		-
 			message: "#^Calling dbFetchRow\\(\\) is forbidden, use Eloquent instead; https\\://laravel\\.com/docs/8\\.x/eloquent \\[dbFetchRow\\(\\) matches db\\*\\(\\)\\]$#"
-			count: 6
+			count: 5
 			path: includes/functions.php
 
 		-
@@ -1302,7 +1277,7 @@ parameters:
 
 		-
 			message: "#^Calling dbInsert\\(\\) is forbidden, use Eloquent instead; https\\://laravel\\.com/docs/8\\.x/eloquent \\[dbInsert\\(\\) matches db\\*\\(\\)\\]$#"
-			count: 9
+			count: 5
 			path: includes/functions.php
 
 		-
@@ -1312,7 +1287,7 @@ parameters:
 
 		-
 			message: "#^Calling dbUpdate\\(\\) is forbidden, use Eloquent instead; https\\://laravel\\.com/docs/8\\.x/eloquent \\[dbUpdate\\(\\) matches db\\*\\(\\)\\]$#"
-			count: 10
+			count: 7
 			path: includes/functions.php
 
 		-
@@ -1399,21 +1374,6 @@ parameters:
 			message: "#^Calling dbFetchRows\\(\\) is forbidden, use Eloquent instead; https\\://laravel\\.com/docs/8\\.x/eloquent \\[dbFetchRows\\(\\) matches db\\*\\(\\)\\]$#"
 			count: 1
 			path: includes/html/dev-groups-overview-data.inc.php
-
-		-
-			message: "#^Calling dbFetchCell\\(\\) is forbidden, use Eloquent instead; https\\://laravel\\.com/docs/8\\.x/eloquent \\[dbFetchCell\\(\\) matches db\\*\\(\\)\\]$#"
-			count: 1
-			path: includes/html/forms/ack-alert.inc.php
-
-		-
-			message: "#^Calling dbFetchRow\\(\\) is forbidden, use Eloquent instead; https\\://laravel\\.com/docs/8\\.x/eloquent \\[dbFetchRow\\(\\) matches db\\*\\(\\)\\]$#"
-			count: 1
-			path: includes/html/forms/ack-alert.inc.php
-
-		-
-			message: "#^Calling dbUpdate\\(\\) is forbidden, use Eloquent instead; https\\://laravel\\.com/docs/8\\.x/eloquent \\[dbUpdate\\(\\) matches db\\*\\(\\)\\]$#"
-			count: 1
-			path: includes/html/forms/ack-alert.inc.php
 
 		-
 			message: "#^Calling dbInsert\\(\\) is forbidden, use Eloquent instead; https\\://laravel\\.com/docs/8\\.x/eloquent \\[dbInsert\\(\\) matches db\\*\\(\\)\\]$#"
@@ -1764,16 +1724,6 @@ parameters:
 			message: "#^Calling dbUpdate\\(\\) is forbidden, use Eloquent instead; https\\://laravel\\.com/docs/8\\.x/eloquent \\[dbUpdate\\(\\) matches db\\*\\(\\)\\]$#"
 			count: 1
 			path: includes/html/forms/storage-update.inc.php
-
-		-
-			message: "#^Calling dbFetchCell\\(\\) is forbidden, use Eloquent instead; https\\://laravel\\.com/docs/8\\.x/eloquent \\[dbFetchCell\\(\\) matches db\\*\\(\\)\\]$#"
-			count: 1
-			path: includes/html/forms/test-transport.inc.php
-
-		-
-			message: "#^Calling dbFetchRow\\(\\) is forbidden, use Eloquent instead; https\\://laravel\\.com/docs/8\\.x/eloquent \\[dbFetchRow\\(\\) matches db\\*\\(\\)\\]$#"
-			count: 1
-			path: includes/html/forms/test-transport.inc.php
 
 		-
 			message: "#^Calling dbInsert\\(\\) is forbidden, use Eloquent instead; https\\://laravel\\.com/docs/8\\.x/eloquent \\[dbInsert\\(\\) matches db\\*\\(\\)\\]$#"
@@ -2761,21 +2711,6 @@ parameters:
 			path: includes/html/pages/peering/as-selection.inc.php
 
 		-
-			message: "#^Calling dbFetchRow\\(\\) is forbidden, use Eloquent instead; https\\://laravel\\.com/docs/8\\.x/eloquent \\[dbFetchRow\\(\\) matches db\\*\\(\\)\\]$#"
-			count: 1
-			path: includes/html/pages/plugin.inc.php
-
-		-
-			message: "#^Calling dbFetchRows\\(\\) is forbidden, use Eloquent instead; https\\://laravel\\.com/docs/8\\.x/eloquent \\[dbFetchRows\\(\\) matches db\\*\\(\\)\\]$#"
-			count: 1
-			path: includes/html/pages/plugin/admin.inc.php
-
-		-
-			message: "#^Calling dbUpdate\\(\\) is forbidden, use Eloquent instead; https\\://laravel\\.com/docs/8\\.x/eloquent \\[dbUpdate\\(\\) matches db\\*\\(\\)\\]$#"
-			count: 1
-			path: includes/html/pages/plugin/admin.inc.php
-
-		-
 			message: "#^Calling dbFetchRows\\(\\) is forbidden, use Eloquent instead; https\\://laravel\\.com/docs/8\\.x/eloquent \\[dbFetchRows\\(\\) matches db\\*\\(\\)\\]$#"
 			count: 4
 			path: includes/html/pages/ports.inc.php
@@ -2952,7 +2887,7 @@ parameters:
 
 		-
 			message: "#^Calling dbFetchRows\\(\\) is forbidden, use Eloquent instead; https\\://laravel\\.com/docs/8\\.x/eloquent \\[dbFetchRows\\(\\) matches db\\*\\(\\)\\]$#"
-			count: 3
+			count: 2
 			path: includes/html/print-alert-transports.php
 
 		-

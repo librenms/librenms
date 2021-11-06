@@ -78,6 +78,10 @@ ports:
         joins:
             - { left: ports.port_id, right: ports_statistics.port_id }
         order_by: ports.ifIndex, ports.ifDescr, ports.ifName
+cipsec-tunnels:
+    ipsec_tunnels:
+        excluded_fields: [tunnel_id, device_id]
+        order_by: peer_addr
 cisco-pw:
     pseudowires:
         excluded_fields: [pseudowire_id, device_id, port_id, peer_device_id]
