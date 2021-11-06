@@ -25,7 +25,11 @@
 
 namespace LibreNMS\OS;
 
+use App\Models\AccessPoint;
+use App\Models\Device;
+use Illuminate\Support\Collection;
 use LibreNMS\Device\WirelessSensor;
+use LibreNMS\Interfaces\Discovery\OSDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessApCountDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessClientsDiscovery;
 use LibreNMS\Interfaces\Polling\WirelessAccessPointPolling;
