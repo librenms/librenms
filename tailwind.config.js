@@ -21,6 +21,9 @@ module.exports = {
           'white-300': '#bebfbf',
           'white-400': '#acb6bf',
         }
+      },
+      borderWidth: {
+        '0.5': '0.5px',
       }
     },
     screens: {
