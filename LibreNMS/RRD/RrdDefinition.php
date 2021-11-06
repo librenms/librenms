@@ -34,9 +34,13 @@ class RrdDefinition
     private $dataSets = [];
     private $skipNameCheck = false;
     /**
+     * @var string the current DS for fluent style operators
+     */
+    private $current;
+    /**
      * @var array
      */
-    private $source_files = [];
+    private $sources = [];
 
     /**
      * Make a new empty RrdDefinition
@@ -55,36 +59,35 @@ class RrdDefinition
      * @param  int  $min  Minimum allowed value.  null means undefined.
      * @param  int  $max  Maximum allowed value.  null means undefined.
      * @param  int  $heartbeat  Heartbeat for this dataset. Uses the global setting if null.
-     * @param  string  $file  File containing source
-     * @param  string  $source  Source DS inside source file
      * @return RrdDefinition
      */
-    public function addDataset($name, $type, $min = null, $max = null, $heartbeat = null, $file = null, $source = null)
+    public function addDataset($name, $type, $min = null, $max = null, $heartbeat = null)
     {
         if (empty($name)) {
             d_echo('DS must be set to a non-empty string.');
         }
 
-        $name = $this->escapeName($name);
-
-        // migrate from source file
-        if ($file && $source) {
-            $source = $this->escapeName($source);
-
-            // see if file is already in the file list, otherwise append at the next index
-            $found = array_search($source, $this->source_files);
-            $index = $found !== false ? $found : count($this->source_files);
-            $this->source_files[$index] = $file;
-            $name .= "=$source[$index]";
-        }
-
-        $this->dataSets[$name] = [
-            $name,
+        $this->current = $this->escapeName($name);
+        $this->dataSets[$this->current] = [
+            $this->current,
             $this->checkType($type),
             is_null($heartbeat) ? Config::get('rrd.heartbeat') : $heartbeat,
             is_null($min) ? 'U' : $min,
             is_null($max) ? 'U' : $max,
         ];
+
+        return $this;
+    }
+
+    /**
+     * Set an rrd file and ds to prefill data from
+     * @param  string  $file  File containing source
+     * @param  string  $ds  Source DS inside source file
+     * @return $this
+     */
+    public function from(string $file, string $ds): RrdDefinition
+    {
+        $this->sources[$this->current] = [$file, $ds];
 
         return $this;
     }
@@ -96,7 +99,22 @@ class RrdDefinition
      */
     public function __toString()
     {
-        $initial = empty($this->source_files) ? '' : ('--source ' . implode(',', $this->source_files) . ' ');
+        // migrate from source file
+        $files = [];
+        foreach ($this->sources as $name => $source) {
+            $file = $source[0];
+            if (\Rrd::checkRrdExists($file)) {
+                $found = array_search($file, $files);
+                $index = $found !== false ? $found : count($files);
+                $files[$index] = $file;
+
+                $this->dataSets[$name][0] .= '=' . $source . '[' . ($index + 1) . ']'; // add to definition
+            } else {
+                \Log::error("Rrd source file does not exist $source[0]");
+            }
+        }
+
+        $initial = empty($files) ? '' : (' -r ' . implode(' -r ', $files) . ' ');
 
         return array_reduce($this->dataSets, function ($carry, $ds) {
             return $carry . 'DS:' . implode(':', $ds) . ' ';
