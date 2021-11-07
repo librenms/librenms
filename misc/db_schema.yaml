@@ -2187,7 +2187,7 @@ winrm_software:
     - { Field: description, Type: text, 'Null': true, Extra: '' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
-    winrm_software_name_vendor_unique: { Name: winrm_software_name_vendor_unique, Columns: [name, vendor], Unique: true, Type: HASH }
+    winrm_software_name_unique: { Name: winrm_software_name_unique, Columns: [name], Unique: true, Type: BTREE }
 wireless_sensors:
   Columns:
     - { Field: sensor_id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }

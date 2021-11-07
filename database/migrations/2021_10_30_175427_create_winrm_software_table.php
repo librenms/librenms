@@ -18,7 +18,7 @@ class CreateWinRMSoftwareTable extends Migration
             $table->string('name', 250);
             $table->string('vendor', 1000)->nullable();
             $table->text('description')->nullable();
-            $table->unique(['name','vendor']);
+            $table->unique(['name']);
         });
     }
 
