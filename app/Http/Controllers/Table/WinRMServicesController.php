@@ -72,7 +72,7 @@ class WinRMServicesController extends TableController
 
     /**
      * @param  WinRMServices  $services
-     * @return array
+     * @return WinRMProcesses
      */
     public function formatItem($services)
     {

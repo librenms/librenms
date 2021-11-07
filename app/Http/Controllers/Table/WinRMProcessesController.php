@@ -70,7 +70,7 @@ class WinRMProcessesController extends TableController
 
     /**
      * @param  WinRMProcesses  $processes
-     * @return array
+     * @return WinRMProcesses
      */
     public function formatItem($processes)
     {

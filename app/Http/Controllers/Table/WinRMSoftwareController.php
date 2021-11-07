@@ -77,7 +77,7 @@ class WinRMSoftwareController extends TableController
 
     /**
      * @param  WinRMDeviceSoftware  $software
-     * @return array
+     * @return WinRMProcesses
      */
     public function formatItem($software)
     {
