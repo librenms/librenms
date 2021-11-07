@@ -578,9 +578,9 @@ devices_perms:
     devices_perms_user_id_index: { Name: devices_perms_user_id_index, Columns: [user_id], Unique: false, Type: BTREE }
 device_graphs:
   Columns:
+    - { Field: id, Type: 'bigint unsigned', 'Null': false, Extra: auto_increment }
     - { Field: device_id, Type: 'int unsigned', 'Null': false, Extra: '' }
     - { Field: graph, Type: varchar(255), 'Null': true, Extra: '' }
-    - { Field: id, Type: 'bigint unsigned', 'Null': false, Extra: auto_increment }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
     device_graphs_device_id_index: { Name: device_graphs_device_id_index, Columns: [device_id], Unique: false, Type: BTREE }
@@ -2044,13 +2044,13 @@ users:
     - { Field: username, Type: varchar(255), 'Null': false, Extra: '' }
     - { Field: password, Type: varchar(255), 'Null': true, Extra: '' }
     - { Field: realname, Type: varchar(64), 'Null': false, Extra: '' }
-    - { Field: remember_token, Type: varchar(100), 'Null': true, Extra: '' }
     - { Field: email, Type: varchar(64), 'Null': false, Extra: '' }
     - { Field: descr, Type: char(30), 'Null': false, Extra: '' }
     - { Field: level, Type: tinyint, 'Null': false, Extra: '', Default: '0' }
     - { Field: can_modify_passwd, Type: tinyint, 'Null': false, Extra: '', Default: '1' }
     - { Field: created_at, Type: timestamp, 'Null': false, Extra: '', Default: '1970-01-02 00:00:01' }
     - { Field: updated_at, Type: timestamp, 'Null': false, Extra: '', Default: CURRENT_TIMESTAMP }
+    - { Field: remember_token, Type: varchar(100), 'Null': true, Extra: '' }
     - { Field: enabled, Type: tinyint, 'Null': false, Extra: '', Default: '1' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [user_id], Unique: true, Type: BTREE }

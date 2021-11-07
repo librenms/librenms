@@ -167,9 +167,7 @@ class ServiceConfig:
         )
         self.ping.enabled = config.get("service_ping_enabled", False)
         self.ping.frequency = config.get("ping_rrd_step", ServiceConfig.ping.frequency)
-        self.winrmpoller.enabled = config.get(
-            "service_winrmpoller_enabled", False
-        )
+        self.winrmpoller.enabled = config.get("service_winrmpoller_enabled", False)
         self.winrmpoller.workers = config.get(
             "service_winrmpoller_workers", ServiceConfig.winrmpoller.workers
         )
@@ -191,7 +189,7 @@ class ServiceConfig:
         self.winrm.password = config["winrm"].get(
             "password", ServiceConfig.winrm.password
         )
-        
+
         self.down_retry = config.get(
             "service_poller_down_retry", ServiceConfig.down_retry
         )
@@ -384,7 +382,7 @@ class Service:
     def __init__(self):
         self.start_time = time.time()
         self.config.populate()
-        
+
         self._db = LibreNMS.DB(self.config)
         self.config.load_poller_config(self._db)
 
@@ -485,9 +483,13 @@ class Service:
         )
         self.queue_managers["ping"] = LibreNMS.PingQueueManager(self.config, self._lm)
 
-        self.queue_managers["winrmpoller"] = LibreNMS.WinRMPollerQueueManager(self.config, self._lm)
+        self.queue_managers["winrmpoller"] = LibreNMS.WinRMPollerQueueManager(
+            self.config, self._lm
+        )
 
-        self.queue_managers["winrmdiscovery"] = LibreNMS.WinRMDiscoveryQueueManager(self.config, self._lm)
+        self.queue_managers["winrmdiscovery"] = LibreNMS.WinRMDiscoveryQueueManager(
+            self.config, self._lm
+        )
 
         if self.config.update_enabled:
             self.daily_timer.start()
