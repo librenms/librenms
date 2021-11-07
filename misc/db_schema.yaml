@@ -554,7 +554,7 @@ devices_attribs:
   Columns:
     - { Field: attrib_id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
     - { Field: device_id, Type: 'int unsigned', 'Null': false, Extra: '' }
-    - { Field: attrib_type, Type: varchar(64), 'Null': false, Extra: '' }
+    - { Field: attrib_type, Type: varchar(32), 'Null': false, Extra: '' }
     - { Field: attrib_value, Type: text, 'Null': false, Extra: '' }
     - { Field: updated, Type: timestamp, 'Null': false, Extra: 'on update CURRENT_TIMESTAMP', Default: CURRENT_TIMESTAMP }
   Indexes:
@@ -578,9 +578,9 @@ devices_perms:
     devices_perms_user_id_index: { Name: devices_perms_user_id_index, Columns: [user_id], Unique: false, Type: BTREE }
 device_graphs:
   Columns:
-    - { Field: id, Type: 'bigint unsigned', 'Null': false, Extra: auto_increment }
     - { Field: device_id, Type: 'int unsigned', 'Null': false, Extra: '' }
     - { Field: graph, Type: varchar(255), 'Null': true, Extra: '' }
+    - { Field: id, Type: 'bigint unsigned', 'Null': false, Extra: auto_increment }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
     device_graphs_device_id_index: { Name: device_graphs_device_id_index, Columns: [device_id], Unique: false, Type: BTREE }
@@ -613,7 +613,7 @@ device_outages:
     - { Field: going_down, Type: bigint, 'Null': false, Extra: '' }
     - { Field: up_again, Type: bigint, 'Null': true, Extra: '' }
   Indexes:
-    PRIMARY: { Name: PRIMARY, Columns: [ id ], Unique: true, Type: BTREE }
+    PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
     device_outages_device_id_going_down_unique: { Name: device_outages_device_id_going_down_unique, Columns: [device_id, going_down], Unique: true, Type: BTREE }
     device_outages_device_id_index: { Name: device_outages_device_id_index, Columns: [device_id], Unique: false, Type: BTREE }
 device_perf:
@@ -1349,8 +1349,6 @@ plugins:
     - { Field: plugin_id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
     - { Field: plugin_name, Type: varchar(60), 'Null': false, Extra: '' }
     - { Field: plugin_active, Type: int, 'Null': false, Extra: '' }
-    - { Field: version, Type: int, 'Null': false, Extra: '', Default: '1' }
-    - { Field: settings, Type: longtext, 'Null': true, Extra: '' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [plugin_id], Unique: true, Type: BTREE }
 pollers:
@@ -1394,6 +1392,12 @@ poller_cluster:
     - { Field: loglevel, Type: varchar(8), 'Null': true, Extra: '' }
     - { Field: watchdog_enabled, Type: tinyint, 'Null': true, Extra: '' }
     - { Field: watchdog_log, Type: varchar(255), 'Null': true, Extra: '' }
+    - { Field: winrmpoller_enabled, Type: tinyint, 'Null': true, Extra: '' }
+    - { Field: winrmpoller_workers, Type: int, 'Null': true, Extra: '' }
+    - { Field: winrmpoller_frequency, Type: int, 'Null': true, Extra: '' }
+    - { Field: winrmdiscovery_enabled, Type: tinyint, 'Null': true, Extra: '' }
+    - { Field: winrmdiscovery_workers, Type: int, 'Null': true, Extra: '' }
+    - { Field: winrmdiscovery_frequency, Type: int, 'Null': true, Extra: '' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
     poller_cluster_node_id_unique: { Name: poller_cluster_node_id_unique, Columns: [node_id], Unique: true, Type: BTREE }
@@ -1993,12 +1997,12 @@ syslog:
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [seq], Unique: true, Type: BTREE }
     syslog_device_id_index: { Name: syslog_device_id_index, Columns: [device_id], Unique: false, Type: BTREE }
+    syslog_device_id_priority_index: { Name: syslog_device_id_priority_index, Columns: [device_id, priority], Unique: false, Type: BTREE }
+    syslog_device_id_program_index: { Name: syslog_device_id_program_index, Columns: [device_id, program], Unique: false, Type: BTREE }
     syslog_device_id_timestamp_index: { Name: syslog_device_id_timestamp_index, Columns: [device_id, timestamp], Unique: false, Type: BTREE }
     syslog_priority_level_index: { Name: syslog_priority_level_index, Columns: [priority, level], Unique: false, Type: BTREE }
     syslog_program_index: { Name: syslog_program_index, Columns: [program], Unique: false, Type: BTREE }
     syslog_timestamp_index: { Name: syslog_timestamp_index, Columns: [timestamp], Unique: false, Type: BTREE }
-    syslog_device_id_program_index: { Name: syslog_device_id_program_index, Columns: [device_id, program], Unique: false, Type: BTREE }
-    syslog_device_id_priority_index: { Name: syslog_device_id_priority_index, Columns: [device_id, priority], Unique: false, Type: BTREE }
 tnmsneinfo:
   Columns:
     - { Field: id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
@@ -2038,13 +2042,13 @@ users:
     - { Field: username, Type: varchar(255), 'Null': false, Extra: '' }
     - { Field: password, Type: varchar(255), 'Null': true, Extra: '' }
     - { Field: realname, Type: varchar(64), 'Null': false, Extra: '' }
+    - { Field: remember_token, Type: varchar(100), 'Null': true, Extra: '' }
     - { Field: email, Type: varchar(64), 'Null': false, Extra: '' }
     - { Field: descr, Type: char(30), 'Null': false, Extra: '' }
     - { Field: level, Type: tinyint, 'Null': false, Extra: '', Default: '0' }
     - { Field: can_modify_passwd, Type: tinyint, 'Null': false, Extra: '', Default: '1' }
     - { Field: created_at, Type: timestamp, 'Null': false, Extra: '', Default: '1970-01-02 00:00:01' }
     - { Field: updated_at, Type: timestamp, 'Null': false, Extra: '', Default: CURRENT_TIMESTAMP }
-    - { Field: remember_token, Type: varchar(100), 'Null': true, Extra: '' }
     - { Field: enabled, Type: tinyint, 'Null': false, Extra: '', Default: '1' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [user_id], Unique: true, Type: BTREE }
@@ -2133,6 +2137,57 @@ widgets:
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [widget_id], Unique: true, Type: BTREE }
     widgets_widget_unique: { Name: widgets_widget_unique, Columns: [widget], Unique: true, Type: BTREE }
+winrm_device_software:
+  Columns:
+    - { Field: id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
+    - { Field: device_id, Type: 'int unsigned', 'Null': false, Extra: '' }
+    - { Field: software_id, Type: 'int unsigned', 'Null': false, Extra: '' }
+    - { Field: version, Type: varchar(250), 'Null': true, Extra: '' }
+    - { Field: install_date, Type: date, 'Null': true, Extra: '' }
+    - { Field: disabled, Type: tinyint, 'Null': false, Extra: '' }
+  Indexes:
+    PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
+    winrm_device_software_device_id_software_id_unique: { Name: winrm_device_software_device_id_software_id_unique, Columns: [device_id, software_id], Unique: true, Type: BTREE }
+winrm_processes:
+  Columns:
+    - { Field: device_id, Type: 'int unsigned', 'Null': false, Extra: '' }
+    - { Field: pid, Type: int, 'Null': false, Extra: '' }
+    - { Field: name, Type: varchar(250), 'Null': false, Extra: '' }
+    - { Field: process_name, Type: varchar(250), 'Null': true, Extra: '' }
+    - { Field: username, Type: varchar(250), 'Null': true, Extra: '' }
+    - { Field: npm, Type: bigint, 'Null': true, Extra: '' }
+    - { Field: pm, Type: bigint, 'Null': true, Extra: '' }
+    - { Field: ws, Type: bigint, 'Null': true, Extra: '' }
+    - { Field: vm, Type: bigint, 'Null': true, Extra: '' }
+    - { Field: cpu, Type: 'decimal(18,6)', 'Null': true, Extra: '' }
+  Indexes:
+    winrm_processes_device_id_pid_unique: { Name: winrm_processes_device_id_pid_unique, Columns: [device_id, pid], Unique: true, Type: BTREE }
+winrm_services:
+  Columns:
+    - { Field: id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
+    - { Field: device_id, Type: 'int unsigned', 'Null': false, Extra: '' }
+    - { Field: service_name, Type: varchar(250), 'Null': false, Extra: '' }
+    - { Field: display_name, Type: varchar(1000), 'Null': true, Extra: '' }
+    - { Field: status, Type: int, 'Null': true, Extra: '' }
+    - { Field: service_type, Type: int, 'Null': true, Extra: '' }
+    - { Field: alerts, Type: tinyint, 'Null': false, Extra: '', Default: '0' }
+    - { Field: start_type, Type: int, 'Null': true, Extra: '' }
+    - { Field: can_pause_and_continue, Type: tinyint, 'Null': true, Extra: '' }
+    - { Field: can_shutdown, Type: tinyint, 'Null': true, Extra: '' }
+    - { Field: can_stop, Type: tinyint, 'Null': true, Extra: '' }
+    - { Field: disabled, Type: tinyint, 'Null': false, Extra: '', Default: '0' }
+  Indexes:
+    PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
+    winrm_services_device_id_service_name_unique: { Name: winrm_services_device_id_service_name_unique, Columns: [device_id, service_name], Unique: true, Type: BTREE }
+winrm_software:
+  Columns:
+    - { Field: id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
+    - { Field: name, Type: varchar(250), 'Null': false, Extra: '' }
+    - { Field: vendor, Type: varchar(1000), 'Null': true, Extra: '' }
+    - { Field: description, Type: text, 'Null': true, Extra: '' }
+  Indexes:
+    PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
+    winrm_software_name_vendor_unique: { Name: winrm_software_name_vendor_unique, Columns: [name, vendor], Unique: true, Type: HASH }
 wireless_sensors:
   Columns:
     - { Field: sensor_id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
