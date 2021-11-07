@@ -22,7 +22,7 @@ from .queuemanager import (
     PollerQueueManager,
     DiscoveryQueueManager,
     WinRMPollerQueueManager,
-    # WinRMDiscoveryQueueManager,
+    WinRMDiscoveryQueueManager,
 )
 from .service import Service, ServiceConfig
 

@@ -487,7 +487,7 @@ class Service:
 
         self.queue_managers["winrmpoller"] = LibreNMS.WinRMPollerQueueManager(self.config, self._lm)
 
-        # self.queue_managers["winrmdiscovery"] = LibreNMS.WinRMDiscoveryQueueManager(self.config, self._lm)
+        self.queue_managers["winrmdiscovery"] = LibreNMS.WinRMDiscoveryQueueManager(self.config, self._lm)
 
         if self.config.update_enabled:
             self.daily_timer.start()
