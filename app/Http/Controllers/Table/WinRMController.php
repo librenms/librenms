@@ -59,6 +59,7 @@ class WinRMController extends TableController
                 ];
                 break;
         }
+
         return $searchFields;
         // return ['winrm_software.name', 'winrm_software.vendor', 'winrm_software.description', 'winrm_device_software.version'];
     }
@@ -83,6 +84,7 @@ class WinRMController extends TableController
                 ];
                 break;
         }
+
         return $sortFields;
     }
 
@@ -136,14 +138,16 @@ class WinRMController extends TableController
                 });
                 break;
         }
+
         return $response;
     }
 
     /**
-     * @param  winrsoftware  $winrsoftware
+     * @param  array  $winrdata
+     * @return array
      */
-    public function formatItem($winrsoftware)
+    public function formatItem($winrdata)
     {
-        return $winrsoftware;
+        return $winrdata;
     }
 }

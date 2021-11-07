@@ -78,8 +78,8 @@ class ServiceConfig:
     billing = PollerConfig(2, 300, 60)
     ping = PollerConfig(1, 60)
     winrm = WinRMUser()
-    winrmpoller = PollerConfig(8, 300)
-    winrmdiscovery = PollerConfig(8, 3600)
+    winrmpoller = PollerConfig(6, 300)
+    winrmdiscovery = PollerConfig(6, 3600)
     down_retry = 60
     update_enabled = True
     update_frequency = 86400
@@ -172,16 +172,16 @@ class ServiceConfig:
             "service_winrmpoller_workers", ServiceConfig.winrmpoller.workers
         )
         self.winrmpoller.frequency = config.get(
-            "services_winrmpoller_frequency", ServiceConfig.winrmpoller.frequency
+            "service_winrmpoller_frequency", ServiceConfig.winrmpoller.frequency
         )
         self.winrmdiscovery.enabled = config.get(
             "service_winrmdiscovery_enabled", False
         )
         self.winrmdiscovery.workers = config.get(
-            "service_wwinrmdiscovery_workers", ServiceConfig.winrmdiscovery.workers
+            "service_winrmdiscovery_workers", ServiceConfig.winrmdiscovery.workers
         )
         self.winrmdiscovery.frequency = config.get(
-            "services_winrmdiscovery_frequency", ServiceConfig.winrmdiscovery.frequency
+            "service_winrmdiscovery_frequency", ServiceConfig.winrmdiscovery.frequency
         )
         self.winrm.username = config["winrm"].get(
             "username", ServiceConfig.winrm.username
