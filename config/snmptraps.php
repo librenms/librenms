@@ -106,6 +106,6 @@ return [
         'VEEAM-MIB::onBackupJobCompleted' => \LibreNMS\Snmptrap\Handlers\VeeamBackupJobCompleted::class,
         'VEEAM-MIB::onVmBackupJobCompleted' => \LibreNMS\Snmptrap\Handlers\VeeamVmBackupJobCompleted::class,
         'HP-ICF-FAULT-FINDER-MIB::hpicfFaultFinderTrap' => \LibreNMS\Snmptrap\Handlers\HpFault::class,
-        'UPS-MIB::upsTrapOnBattery' => \LibreNMS\Snmptrap\Handlers\upsTrapOnBattery::class,
+        'UPS-MIB::upsTrapOnBattery' => \LibreNMS\Snmptrap\Handlers\UpsTrapOnBattery::class,
     ],
 ];
