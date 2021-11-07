@@ -97,7 +97,7 @@ class WinRMController extends TableController
         $response = [];
         switch ($request->page_id) {
             case 'processes':
-                $response =  WinRMProcesses::join('devices', 'winrm_processes.device_id', '=', 'devices.device_id')
+                $response = WinRMProcesses::join('devices', 'winrm_processes.device_id', '=', 'devices.device_id')
                 ->select('winrm_processes.device_id', 'devices.hostname', 'devices.sysName', 'winrm_processes.name', 'winrm_processes.username', 'winrm_processes.ws', 'winrm_processes.vm', 'winrm_processes.cpu')
                 ->when($request->device_id, function ($query, $device_id) {
                     $query->where('winrm_processes.device_id', '=', $device_id);
@@ -107,7 +107,7 @@ class WinRMController extends TableController
                 });
                 break;
             case 'services':
-                $response =  WinRMServices::join('devices', 'winrm_services.device_id', '=', 'devices.device_id')
+                $response = WinRMServices::join('devices', 'winrm_services.device_id', '=', 'devices.device_id')
                 ->select('winrm_services.id', 'winrm_services.device_id', 'devices.hostname', 'devices.sysName', 'winrm_services.display_name', 'winrm_services.service_name', 'winrm_services.status', 'winrm_services.alerts', 'winrm_services.service_type')
                 ->where('winrm_services.disabled', '=', false)
                 ->when($request->device_id, function ($query, $device_id) {
@@ -119,7 +119,7 @@ class WinRMController extends TableController
                 });
                 break;
             case 'software':
-                $response =  WinRMDeviceSoftware::join('winrm_software', 'winrm_device_software.software_id', '=', 'winrm_software.id')
+                $response = WinRMDeviceSoftware::join('winrm_software', 'winrm_device_software.software_id', '=', 'winrm_software.id')
                 ->join('devices', 'winrm_device_software.device_id', '=', 'devices.device_id')
                 ->select('winrm_device_software.device_id', 'devices.hostname', 'devices.sysName', 'winrm_device_software.software_id', 'winrm_software.name', 'winrm_software.vendor', 'winrm_software.description', 'winrm_device_software.version')
                 ->when($request->device_id, function ($query, $device_id) {
@@ -137,14 +137,6 @@ class WinRMController extends TableController
                 break;
         }
         return $response;
-        
-        // return WinRMDeviceSoftware::hasAccess($request->user())
-        //     ->with('winrm_device_software')
-        //     ->join('winrm_software', 'winrm_device_software.software_id', '=', 'winrm_software.id')
-        //     ->select('name', 'vendor', 'description', 'version')
-        //     ->when($request->device_id, function ($query, $device_id) {
-        //         $query->where('device_id', '=', $device_id);
-        //     });
     }
 
     /**
