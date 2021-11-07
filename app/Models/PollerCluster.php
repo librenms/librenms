@@ -2,7 +2,7 @@
 /**
  * PollerCluster.php
  *
- * -Description- 
+ * -Description-
  * Settings > Poller > Settings: Poller Settings Menu
  *
  * This program is free software: you can redistribute it and/or modify
