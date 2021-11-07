@@ -23,7 +23,6 @@
  * @author     Thomas Ford <tford@thomasaford.com>
  */
 
- 
 namespace App\Http\Controllers;
 
 use App\Models\WinRMServices;
@@ -41,6 +40,7 @@ class WinRMServicesController extends Controller
         $data = [
             'service_name' => $service_name ? $service_name : '',
         ];
+
         return view('winrm.services', $data);
     }
 
@@ -53,22 +53,22 @@ class WinRMServicesController extends Controller
      *
      * @throws \Illuminate\Auth\Access\AuthorizationException
      */
-    public function update(Request $request, string $id) // Why is update(Request $request, WinRMServices $service)  not working? 
+    public function update(Request $request, string $id) // Why is update(Request $request, WinRMServices $service)  not working?
     {
         $service = WinRMServices::find($id);
         // $this->authorize('admin', $request->user());
-        
+
         if ($request->has('alerts')) {
             $this->validate($request, [
                 'alerts' => 'boolean',
             ]);
-            
+
             $service->fill($request->only(['alerts']));
             $service->save();
-        }
-        else {
+        } else {
             return response()->json(['status' => 'invalid']);
         }
+
         return response()->json(['status' => 'success']);
     }
 }

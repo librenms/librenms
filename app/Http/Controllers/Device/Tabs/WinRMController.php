@@ -40,10 +40,11 @@ class WinRMController implements DeviceTab
         $show_services = $device->winrmservices()->exists();
         $show_software = $device->winrmdevicesoftware()->exists();
         $show_processes = $device->winrmprocesses()->exists();
-        // Need to look at tables and see if we should show this. 
-        if($show_services || $show_software  || $show_processes){
+        // Need to look at tables and see if we should show this.
+        if ($show_services || $show_software || $show_processes) {
             return true;
         }
+
         return false;
     }
 
@@ -61,7 +62,7 @@ class WinRMController implements DeviceTab
     {
         return __('WinRM');
     }
-    
+
     public function data(Device $device): array
     {
         return [];
@@ -78,5 +79,3 @@ class WinRMController implements DeviceTab
         ];
     }
 }
-
-

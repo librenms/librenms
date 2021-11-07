@@ -46,8 +46,8 @@ Route::group(['middleware' => ['auth'], 'guard' => 'auth'], function () {
     Route::get('overview', 'OverviewController@index')->name('overview');
     Route::get('/', 'OverviewController@index')->name('home');
     Route::view('vminfo', 'vminfo');
-    
-    Route::get('winrm/applications', 'WinRMController@applications'); 
+
+    Route::get('winrm/applications', 'WinRMController@applications');
 
     Route::group(['prefix' => 'winrm'], function () {
         Route::get('processes/{process_name?}', 'WinRMProcessesController@index')->name('winrm.processes');

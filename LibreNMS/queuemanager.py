@@ -597,7 +597,10 @@ class WinRMPollerQueueManager(TimedQueueManager):
             logger.critical("DB Exception ({})".format(e))
 
     def do_work(self, device_id, group):
-        if self.lock(device_id, timeout=LibreNMS.normalize_wait(self.config.winrmpoller.frequency)):
+        if self.lock(
+            device_id,
+            timeout=LibreNMS.normalize_wait(self.config.winrmpoller.frequency),
+        ):
             logger.info("Polling WinRM device {}".format(device_id))
             exit_code, output = WinRMScan.process_polling(self, device_id)
             if exit_code == 0:
@@ -628,7 +631,12 @@ class WinRMDiscoveryQueueManager(TimedQueueManager):
         :param lock_manager: the single instance of lock manager
         """
         TimedQueueManager.__init__(
-            self, config, lock_manager, "winrmdiscovery", True, config.winrmdiscovery.enabled
+            self,
+            config,
+            lock_manager,
+            "winrmdiscovery",
+            True,
+            config.winrmdiscovery.enabled,
         )
         self._db = LibreNMS.DB(self.config)
 
@@ -646,7 +654,10 @@ class WinRMDiscoveryQueueManager(TimedQueueManager):
             logger.critical("DB Exception ({})".format(e))
 
     def do_work(self, device_id, group):
-        if self.lock(device_id, timeout=LibreNMS.normalize_wait(self.config.winrmdiscovery.frequency)):
+        if self.lock(
+            device_id,
+            timeout=LibreNMS.normalize_wait(self.config.winrmdiscovery.frequency),
+        ):
             logger.info("Discovery WinRM device {}".format(device_id))
             exit_code, output = WinRMScan.process_discovery(self, device_id)
             if exit_code == 0:

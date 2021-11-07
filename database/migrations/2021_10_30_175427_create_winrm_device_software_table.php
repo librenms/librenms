@@ -20,7 +20,7 @@ class CreateWinRMDeviceSoftwareTable extends Migration
             $table->string('version', 250)->nullable();
             $table->date('install_date')->nullable();
             $table->boolean('disabled');
-            $table->unique(['device_id','software_id']);
+            $table->unique(['device_id', 'software_id']);
         });
     }
 

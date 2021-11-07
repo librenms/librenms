@@ -23,7 +23,6 @@
  * @author     Thomas Ford <tford@thomasaford.com>
  */
 
- 
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
@@ -40,6 +39,7 @@ class WinRMProcessesController extends Controller
         $data = [
             'process_name' => $process_name ? $process_name : '',
         ];
+
         return view('winrm.processes', $data);
     }
 }

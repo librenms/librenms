@@ -23,7 +23,6 @@
  * @author     Thomas Ford <tford@thomasaford.com>
  */
 
- 
 namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
@@ -37,7 +36,7 @@ class WinRMSoftwareController extends Controller
      */
     public function index(Request $request, string $software_detail = null, string $software_filter = null)
     {
-        switch($software_detail){
+        switch ($software_detail) {
             case 'vend':
                 $data = [
                     'software_id' => null,
@@ -53,6 +52,7 @@ class WinRMSoftwareController extends Controller
                 ];
                 break;
         }
+
         return view('winrm.software', $data);
     }
 }
