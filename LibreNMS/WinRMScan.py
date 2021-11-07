@@ -80,26 +80,29 @@ def process_services(self, session, device_id):
                     (device_id)
                 )
                 for service in services:
-                    self._db.query("INSERT INTO `winrm_services` (`device_id`, `service_name`, `display_name`, `status`, `service_type`, `start_type`, `can_pause_and_continue`, `can_shutdown`, `can_stop`, `disabled`) "
-                        'values(%s, %s, %s, %s, %s, %s, %s, %s, %s, 0) ON DUPLICATE KEY UPDATE '
-                        '`display_name`=%s, `status`=%s, `service_type`=%s, `start_type`=%s, `can_pause_and_continue`=%s, `can_shutdown`=%s, `can_stop`=%s, `disabled`=0;',
-                        (device_id, 
-                        service["ServiceName"], 
-                        service["DisplayName"], 
-                        service["Status"], 
-                        service["ServiceType"], 
-                        service["StartType"], 
-                        service["CanPauseAndContinue"], 
-                        service["CanShutdown"], 
-                        service["CanStop"],
-                        service["DisplayName"], 
-                        service["Status"], 
-                        service["ServiceType"], 
-                        service["StartType"], 
-                        service["CanPauseAndContinue"], 
-                        service["CanShutdown"], 
-                        service["CanStop"])
-                    )
+                    try:
+                        self._db.query("INSERT INTO `winrm_services` (`device_id`, `service_name`, `display_name`, `status`, `service_type`, `start_type`, `can_pause_and_continue`, `can_shutdown`, `can_stop`, `disabled`) "
+                            'values(%s, %s, %s, %s, %s, %s, %s, %s, %s, 0) ON DUPLICATE KEY UPDATE '
+                            '`display_name`=%s, `status`=%s, `service_type`=%s, `start_type`=%s, `can_pause_and_continue`=%s, `can_shutdown`=%s, `can_stop`=%s, `disabled`=0;',
+                            (device_id, 
+                            service["ServiceName"], 
+                            service["DisplayName"], 
+                            service["Status"], 
+                            service["ServiceType"], 
+                            service["StartType"], 
+                            service["CanPauseAndContinue"], 
+                            service["CanShutdown"], 
+                            service["CanStop"],
+                            service["DisplayName"], 
+                            service["Status"], 
+                            service["ServiceType"], 
+                            service["StartType"], 
+                            service["CanPauseAndContinue"], 
+                            service["CanShutdown"], 
+                            service["CanStop"])
+                        )
+                    except Exception as e:
+                        print(e)
                 return 0, NULL
             else:
                 return result.status_code, result.std_err
@@ -122,22 +125,25 @@ def process_processes(self, session, device_id):
                 )
                 
                 for processe in processes:
-                    UserName = NULL
-                    if processe["UserName"] is not None:
-                        UserName = processe["UserName"].replace("/", "//")
-                    self._db.query('INSERT INTO `winrm_processes` (`device_id`, `pid`, `name`, `process_name`, `username`, `npm`, `pm`, `ws`, `vm`, `cpu`) '
-                        'values(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s);',
-                        (device_id, 
-                        processe["Id"], 
-                        processe["Name"], 
-                        processe["ProcessName"], 
-                        UserName, 
-                        processe["NPM"], 
-                        processe["PM"],
-                        processe["WS"], 
-                        processe["VM"], 
-                        processe["CPU"])
-                    )
+                    try:
+                        UserName = NULL
+                        if processe["UserName"] is not None:
+                            UserName = processe["UserName"].replace("/", "//")
+                        self._db.query('INSERT INTO `winrm_processes` (`device_id`, `pid`, `name`, `process_name`, `username`, `npm`, `pm`, `ws`, `vm`, `cpu`) '
+                            'values(%s, %s, %s, %s, %s, %s, %s, %s, %s, %s);',
+                            (device_id, 
+                            processe["Id"], 
+                            processe["Name"], 
+                            processe["ProcessName"], 
+                            UserName, 
+                            processe["NPM"], 
+                            processe["PM"],
+                            processe["WS"], 
+                            processe["VM"], 
+                            processe["CPU"])
+                        )
+                    except Exception as e:
+                        print(e)
                 return 0, NULL
             else:
                 return result.status_code, result.std_err
@@ -157,39 +163,42 @@ def process_software(self, session, device_id):
                     (device_id)
                 )
                 for application in software:
-                    if application["Name"] is not None:
-                        self._db.query('INSERT INTO `winrm_software` (`name`, `vendor`, `description`) '
-                            'values(%s, %s, %s) ON DUPLICATE KEY UPDATE '
-                            '`description`=%s; ',
-                            (application["Name"], 
-                            application["Vendor"],
-                            application["Description"],
-                            application["Description"])
-                        )
-
-                        application_id = self._db.query('SELECT `id` FROM `winrm_software` '
-                            'WHERE (`name` = %s) AND (`vendor` = %s);',
-                            (application["Name"], 
-                            application["Vendor"])
-                        )
-                        
-                        install_date = NULL
-                        if application["InstallDate"] is not None:
-                            install_date = datetime.strptime(application["InstallDate"], '%Y%m%d').strftime('%Y/%m/%d')
-                        
-                        for software_id in application_id:
-                            self._db.query("INSERT INTO `winrm_device_software` (`device_id`, `software_id`, `version`, `install_date`, `disabled`) "
-                                'values(%s, %s, %s, %s, %s) ON DUPLICATE KEY UPDATE '
-                                '`version`=%s, `install_date`=%s, `disabled`=%s;',
-                                (device_id, 
-                                software_id[0], 
-                                application["Version"], 
-                                install_date, 
-                                0,
-                                application["Version"], 
-                                install_date,
-                                0)
+                    try:
+                        if application["Name"] is not None:
+                            self._db.query('INSERT INTO `winrm_software` (`name`, `vendor`, `description`) '
+                                'values(%s, %s, %s) ON DUPLICATE KEY UPDATE '
+                                '`description`=%s; ',
+                                (application["Name"], 
+                                application["Vendor"],
+                                application["Description"],
+                                application["Description"])
                             )
+
+                            application_id = self._db.query('SELECT `id` FROM `winrm_software` '
+                                'WHERE (`name` = %s) AND (`vendor` = %s);',
+                                (application["Name"], 
+                                application["Vendor"])
+                            )
+                            
+                            install_date = NULL
+                            if application["InstallDate"] is not None:
+                                install_date = datetime.strptime(application["InstallDate"], '%Y%m%d').strftime('%Y/%m/%d')
+                            
+                            for software_id in application_id:
+                                self._db.query("INSERT INTO `winrm_device_software` (`device_id`, `software_id`, `version`, `install_date`, `disabled`) "
+                                    'values(%s, %s, %s, %s, %s) ON DUPLICATE KEY UPDATE '
+                                    '`version`=%s, `install_date`=%s, `disabled`=%s;',
+                                    (device_id, 
+                                    software_id[0], 
+                                    application["Version"], 
+                                    install_date, 
+                                    0,
+                                    application["Version"], 
+                                    install_date,
+                                    0)
+                                )
+                    except Exception as e:
+                        print(e)
                 return 0, NULL
             else:
                 return result.status_code, result.std_err

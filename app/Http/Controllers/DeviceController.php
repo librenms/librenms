@@ -54,6 +54,7 @@ class DeviceController extends Controller
         'mib' => \App\Http\Controllers\Device\Tabs\MibController::class,
         'edit' => \App\Http\Controllers\Device\Tabs\EditController::class,
         'capture' => \App\Http\Controllers\Device\Tabs\CaptureController::class,
+        'winrm' => \App\Http\Controllers\Device\Tabs\WinRMController::class,
     ];
 
     public function index(Request $request, $device, $current_tab = 'overview', $vars = '')
@@ -76,6 +77,7 @@ class DeviceController extends Controller
             $port = $device->ports()->findOrFail($vars->get('port'));
             $this->authorize('view', $port);
         } else {
+            $device->pageVars = $vars;
             $this->authorize('view', $device);
         }
 

@@ -20,11 +20,12 @@ class CreateWinrmServicesTable extends Migration
             $table->string('display_name', 1000)->nullable();
             $table->integer('status')->nullable();
             $table->integer('service_type')->nullable();
+            $table->boolean('alerts')->default(0);
             $table->integer('start_type')->nullable();
             $table->boolean('can_pause_and_continue')->nullable();
             $table->boolean('can_shutdown')->nullable();
             $table->boolean('can_stop')->nullable();
-            $table->boolean('disabled');
+            $table->boolean('disabled')->default(0);
             $table->unique(['device_id', 'service_name']);
         });
     }

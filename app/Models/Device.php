@@ -895,4 +895,19 @@ class Device extends BaseModel
     {
         return $this->hasMany(\App\Models\WirelessSensor::class, 'device_id');
     }
+
+    public function winrmdevicesoftware(): HasMany
+    {
+        return $this->hasMany(\App\Models\WinRMDeviceSoftware::class, 'device_id');
+    }
+
+    public function winrmservices(): HasMany
+    {
+        return $this->hasMany(\App\Models\WinRMServices::class, 'device_id');
+    }
+
+    public function winrmprocesses(): HasMany
+    {
+        return $this->hasMany(\App\Models\WinRMProcesses::class, 'device_id');
+    }
 }

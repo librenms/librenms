@@ -47,16 +47,13 @@ Route::group(['middleware' => ['auth'], 'guard' => 'auth'], function () {
     Route::get('/', 'OverviewController@index')->name('home');
     Route::view('vminfo', 'vminfo');
     
-    Route::get('winrm/applications', 'WinRMController@applications');
+    Route::get('winrm/applications', 'WinRMController@applications'); 
 
-    // Route::group(['prefix' => 'winrm'], function () {
-    //     Route::get('', 'WinRMController@applications')->name('winrm.applications');
-    //     Route::get('log', 'PollerController@logTab')->name('poller.log');
-    //     Route::get('groups', 'PollerController@groupsTab')->name('poller.groups');
-    //     Route::get('settings', 'PollerController@settingsTab')->name('poller.settings');
-    //     Route::get('performance', 'PollerController@performanceTab')->name('poller.performance');
-    //     Route::resource('{id}/settings', 'PollerSettingsController', ['as' => 'poller'])->only(['update', 'destroy']);
-    // });
+    Route::group(['prefix' => 'winrm'], function () {
+        Route::get('processes/{process_name?}', 'WinRMProcessesController@index')->name('winrm.processes');
+        Route::get('services/{service_name?}', 'WinRMServicesController@index')->name('winrm.services');
+        Route::get('software/{software_id?}/{software_version?}', 'WinRMSoftwareController@index')->name('winrm.software');
+    });
 
     // Device Tabs
     Route::group(['prefix' => 'device/{device}', 'namespace' => 'Device\Tabs', 'as' => 'device.'], function () {
@@ -117,6 +114,7 @@ Route::group(['middleware' => ['auth'], 'guard' => 'auth'], function () {
         // page ajax controllers
         Route::resource('location', 'LocationController', ['only' => ['update', 'destroy']]);
         Route::resource('pollergroup', 'PollerGroupController', ['only' => ['destroy']]);
+        Route::resource('winrmservices', 'WinRMServicesController', ['only' => ['update']]);
         // misc ajax controllers
         Route::group(['namespace' => 'Ajax'], function () {
             Route::post('set_map_group', 'AvailabilityMapController@setGroup');
@@ -175,6 +173,7 @@ Route::group(['middleware' => ['auth'], 'guard' => 'auth'], function () {
             Route::post('routes', 'RoutesTablesController');
             Route::post('syslog', 'SyslogController');
             Route::post('vminfo', 'VminfoController');
+            Route::post('winrm', 'WinRMController');
         });
 
         // dashboard widgets
