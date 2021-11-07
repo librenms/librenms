@@ -34,9 +34,9 @@ class WinRMServicesController extends Controller
     /**
      * Display a listing of the resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\Response|\Illuminate\View\View
      */
-    public function index(Request $request, $service_name = null)
+    public function index(Request $request, string $service_name = null)
     {
         $data = [
             'service_name' => $service_name ? $service_name : '',
@@ -53,7 +53,7 @@ class WinRMServicesController extends Controller
      *
      * @throws \Illuminate\Auth\Access\AuthorizationException
      */
-    public function update(Request $request, $id) // Why is update(Request $request, WinRMServices $service)  not working? 
+    public function update(Request $request, string $id) // Why is update(Request $request, WinRMServices $service)  not working? 
     {
         $service = WinRMServices::find($id);
         // $this->authorize('admin', $request->user());

@@ -33,9 +33,9 @@ class WinRMSoftwareController extends Controller
     /**
      * Display a listing of the resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\Response|\Illuminate\View\View
      */
-    public function index(Request $request, $software_detail = null, $software_filter = null)
+    public function index(Request $request, string $software_detail = null, string $software_filter = null)
     {
         switch($software_detail){
             case 'vend':

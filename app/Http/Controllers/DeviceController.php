@@ -77,7 +77,6 @@ class DeviceController extends Controller
             $port = $device->ports()->findOrFail($vars->get('port'));
             $this->authorize('view', $port);
         } else {
-            $device->pageVars = $vars;
             $this->authorize('view', $device);
         }
 
@@ -89,7 +88,12 @@ class DeviceController extends Controller
             return app()->make($class);
         }, array_filter($this->tabs, 'class_exists')); // TODO remove filter
         $title = $tabs[$current_tab]->name();
-        $data = $tabs[$current_tab]->data($device);
+
+        if ($current_tab == 'winrm') {
+            $data = $tabs[$current_tab]->subtabdata($device, $vars);
+        } else {
+            $data = $tabs[$current_tab]->data($device);
+        }
 
         // Device Link Menu, select the primary link
         $device_links = $this->deviceLinkMenu($device);

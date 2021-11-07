@@ -61,14 +61,19 @@ class WinRMController implements DeviceTab
     {
         return __('WinRM');
     }
-
+    
     public function data(Device $device): array
+    {
+        return [];
+    }
+
+    public function subtabdata(Device $device, string $pageVars): array
     {
         return [
             'show_services' => $device->winrmservices()->exists(),
             'show_software' => $device->winrmdevicesoftware()->exists(),
             'show_processes' => $device->winrmprocesses()->exists(),
-            'page_id' => (empty($device->pageVars) ? 'software' : $device->pageVars),
+            'page_id' => (empty($pageVars) ? 'software' : $pageVars),
             'device_id' => $device->device_id,
         ];
     }

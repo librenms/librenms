@@ -33,9 +33,9 @@ class WinRMProcessesController extends Controller
     /**
      * Display a listing of the resource.
      *
-     * @return \Illuminate\Http\Response
+     * @return \Illuminate\Http\RedirectResponse|\Illuminate\Http\Response|\Illuminate\View\View
      */
-    public function index(Request $request, $process_name = null)
+    public function index(Request $request, string $process_name = null)
     {
         $data = [
             'process_name' => $process_name ? $process_name : '',

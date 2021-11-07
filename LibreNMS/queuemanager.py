@@ -647,7 +647,7 @@ class WinRMDiscoveryQueueManager(TimedQueueManager):
 
     def do_work(self, device_id, group):
         if self.lock(device_id, timeout=LibreNMS.normalize_wait(self.config.winrmdiscovery.frequency)):
-            logger.info("Polling WinRM device {}".format(device_id))
+            logger.info("Discovery WinRM device {}".format(device_id))
             exit_code, output = WinRMScan.process_discovery(self, device_id)
             if exit_code == 0:
                 self.unlock(device_id)
@@ -660,7 +660,7 @@ class WinRMDiscoveryQueueManager(TimedQueueManager):
                 self.unlock(device_id)
             else:
                 logger.error(
-                    "Polling device {} failed with exit code {}: {}".format(
+                    "Discovery device {} failed with exit code {}: {}".format(
                         device_id, exit_code, output
                     )
                 )
