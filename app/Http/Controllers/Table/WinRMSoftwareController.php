@@ -25,7 +25,6 @@
 
 namespace App\Http\Controllers\Table;
 
-use App\Models\Device;
 use App\Models\WinRMDeviceSoftware;
 
 class WinRMSoftwareController extends TableController
@@ -77,7 +76,7 @@ class WinRMSoftwareController extends TableController
     }
 
     /**
-     * @param  WinRMDeviceSoftware $software
+     * @param  WinRMDeviceSoftware  $software
      * @return array
      */
     public function formatItem($software)

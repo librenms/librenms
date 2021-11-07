@@ -25,7 +25,6 @@
 
 namespace App\Http\Controllers\Table;
 
-use App\Models\Device;
 use App\Models\WinRMProcesses;
 
 class WinRMProcessesController extends TableController
