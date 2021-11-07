@@ -41,45 +41,49 @@ class WinRMController extends TableController
      */
     public function searchFields($request)
     {
+        $searchFields = [];
         switch ($request->page_id) {
             case 'processes':
-                return [
+                $searchFields = [
                     'name', 'username', 'ws', 'vm', 'cpu',
                 ];
                 break;
             case 'services':
-                return [
+                $searchFields = [
                     'display_name', 'service_name', 'status', 'service_type',
                 ];
                 break;
             case 'software':
-                return [
+                $searchFields = [
                     'name', 'vendor', 'description', 'version',
                 ];
                 break;
         }
+        return $searchFields;
         // return ['winrm_software.name', 'winrm_software.vendor', 'winrm_software.description', 'winrm_device_software.version'];
     }
 
     protected function sortFields($request)
     {
+        $searchFields = [];
         switch ($request->page_id) {
             case 'processes':
-                return [
+                $sortFields = [
                     'name', 'username', 'ws', 'vm', 'cpu',
                 ];
                 break;
             case 'services':
-                return [
+                $sortFields = [
                     'display_name', 'service_name', 'status', 'service_type',
                 ];
                 break;
             case 'software':
-                return [
+                $sortFields = [
                     'name', 'vendor', 'description', 'version',
                 ];
                 break;
         }
+        return $sortFields;
     }
 
     /**
@@ -90,9 +94,10 @@ class WinRMController extends TableController
      */
     public function baseQuery($request)
     {
+        $response = [];
         switch ($request->page_id) {
             case 'processes':
-                return  WinRMProcesses::join('devices', 'winrm_processes.device_id', '=', 'devices.device_id')
+                $response =  WinRMProcesses::join('devices', 'winrm_processes.device_id', '=', 'devices.device_id')
                 ->select('winrm_processes.device_id', 'devices.hostname', 'devices.sysName', 'winrm_processes.name', 'winrm_processes.username', 'winrm_processes.ws', 'winrm_processes.vm', 'winrm_processes.cpu')
                 ->when($request->device_id, function ($query, $device_id) {
                     $query->where('winrm_processes.device_id', '=', $device_id);
@@ -102,7 +107,7 @@ class WinRMController extends TableController
                 });
                 break;
             case 'services':
-                return  WinRMServices::join('devices', 'winrm_services.device_id', '=', 'devices.device_id')
+                $response =  WinRMServices::join('devices', 'winrm_services.device_id', '=', 'devices.device_id')
                 ->select('winrm_services.id', 'winrm_services.device_id', 'devices.hostname', 'devices.sysName', 'winrm_services.display_name', 'winrm_services.service_name', 'winrm_services.status', 'winrm_services.alerts', 'winrm_services.service_type')
                 ->where('winrm_services.disabled', '=', false)
                 ->when($request->device_id, function ($query, $device_id) {
@@ -114,7 +119,7 @@ class WinRMController extends TableController
                 });
                 break;
             case 'software':
-                return  WinRMDeviceSoftware::join('winrm_software', 'winrm_device_software.software_id', '=', 'winrm_software.id')
+                $response =  WinRMDeviceSoftware::join('winrm_software', 'winrm_device_software.software_id', '=', 'winrm_software.id')
                 ->join('devices', 'winrm_device_software.device_id', '=', 'devices.device_id')
                 ->select('winrm_device_software.device_id', 'devices.hostname', 'devices.sysName', 'winrm_device_software.software_id', 'winrm_software.name', 'winrm_software.vendor', 'winrm_software.description', 'winrm_device_software.version')
                 ->when($request->device_id, function ($query, $device_id) {
@@ -131,7 +136,8 @@ class WinRMController extends TableController
                 });
                 break;
         }
-
+        return $response;
+        
         // return WinRMDeviceSoftware::hasAccess($request->user())
         //     ->with('winrm_device_software')
         //     ->join('winrm_software', 'winrm_device_software.software_id', '=', 'winrm_software.id')
@@ -144,8 +150,8 @@ class WinRMController extends TableController
     /**
      * @param  winrsoftware  $winrsoftware
      */
-    public function formatItem($model)
+    public function formatItem($winrsoftware)
     {
-        return $model;
+        return $winrsoftware;
     }
 }

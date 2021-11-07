@@ -26,12 +26,7 @@
 namespace App\Http\Controllers\Device\Tabs;
 
 use App\Models\Device;
-use App\Models\WinRMSoftware;
-use Carbon\Carbon;
-use DB;
-use LibreNMS\Config;
 use LibreNMS\Interfaces\UI\DeviceTab;
-use Request;
 
 class WinRMController implements DeviceTab
 {
