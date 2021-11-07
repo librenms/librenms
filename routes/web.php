@@ -47,8 +47,6 @@ Route::group(['middleware' => ['auth'], 'guard' => 'auth'], function () {
     Route::get('/', 'OverviewController@index')->name('home');
     Route::view('vminfo', 'vminfo');
 
-    Route::get('winrm/applications', 'WinRMController@applications');
-
     Route::group(['prefix' => 'winrm'], function () {
         Route::get('processes/{process_name?}', 'WinRMProcessesController@index')->name('winrm.processes');
         Route::get('services/{service_name?}', 'WinRMServicesController@index')->name('winrm.services');
@@ -173,7 +171,9 @@ Route::group(['middleware' => ['auth'], 'guard' => 'auth'], function () {
             Route::post('routes', 'RoutesTablesController');
             Route::post('syslog', 'SyslogController');
             Route::post('vminfo', 'VminfoController');
-            Route::post('winrm', 'WinRMController');
+            Route::post('winrmprocesses', 'WinRMProcessesController');
+            Route::post('winrmservices', 'WinRMServicesController');
+            Route::post('winrmsoftware', 'WinRMSoftwareController');
         });
 
         // dashboard widgets

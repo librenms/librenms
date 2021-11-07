@@ -37,10 +37,9 @@ var WinRM = (function () {
         $("#winrm").bootgrid({
             ajax: true,
             rowCount: [50, 100, 200, -1],
-            url: baseURL + '/ajax/table/winrm',
+            url: baseURL + '/ajax/table/winrmprocesses',
             post: function () {
                 return {
-                    page_id: "processes",
                     device_id: deviceID,
                     process_name: processName,
                 };
@@ -63,10 +62,9 @@ var WinRM = (function () {
         $("#winrm").bootgrid({
             ajax: true,
             rowCount: [50, 100, 200, -1],
-            url: baseURL + '/ajax/table/winrm',
+            url: baseURL + '/ajax/table/winrmservices',
             post: function () {
                 return {
-                    page_id: "services",
                     device_id: deviceID,
                     service_name: serviceName,
                 };
@@ -176,10 +174,9 @@ var WinRM = (function () {
         $("#winrm").bootgrid({
             ajax: true,
             rowCount: [50, 100, 200, -1],
-            url: baseURL + '/ajax/table/winrm',
+            url: baseURL + '/ajax/table/winrmsoftware',
             post: function () {
                 return {
-                    page_id: "software",
                     device_id: deviceID,
                     software_id: softwareID,
                     software_version: softwareVersion,
