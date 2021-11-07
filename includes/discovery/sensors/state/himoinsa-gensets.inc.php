@@ -82,13 +82,13 @@ if (isset($status['HIMOINSAv14-MIB::status.0'])) {
         $commgroup = 'CEA7/CEM7';
     }
     
-    d_echo("Motor " . $statusMotor);
-    d_echo("Mode " . $statusMode);
-    d_echo("TPump " . $statusTransferPump);
-    d_echo("Comm " . $statusComm);
-    d_echo("Alarm " . $statusAlarm);
-    d_echo("CommAlarm " . $statusCommAlarm);
-    d_echo("Comm Group " . $commgroup);
+    d_echo('Motor ' . $statusMotor);
+    d_echo('Mode ' . $statusMode);
+    d_echo('TPump ' . $statusTransferPump);
+    d_echo('Comm ' . $statusComm);
+    d_echo('Alarm ' . $statusAlarm);
+    d_echo('CommAlarm ' . $statusCommAlarm);
+    d_echo('Comm Group ' . $commgroup);
 
     // Check for CEC7 and get CEC7 alarm state.
     if ($commgroup === 'CEC7') {
@@ -324,7 +324,7 @@ if (isset($status['HIMOINSAv14-MIB::status.0'])) {
         null,
         $commgroup
     );
-    
+
     // Create Sensor To State Index
     create_sensor_to_state_index($device, $state_name, $sensor_index);
     // End Commutator Mode
