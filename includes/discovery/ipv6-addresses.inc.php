@@ -1,6 +1,7 @@
 <?php
 /**
  * added Jetstream OS IPv6 address discovery
+ *
  * @author     Peca Nesovanovic <peca.nesovanovic@sattrakt.com>
  */
 
@@ -26,7 +27,7 @@ foreach (DeviceCache::getPrimary()->getVrfContexts() as $context_name) {
             }
             if ($param == 'ipv6ParaConfigPrefixLength') {
                 $prefixlen = intval($value);
-                discover_process_ipv6($valid, $v6data[$link]['index'], $v6data[$link]['addr'], $prefixlen,  $v6data[$link]['origin'], $device['context_name']);
+                discover_process_ipv6($valid, $v6data[$link]['index'], $v6data[$link]['addr'], $prefixlen, $v6data[$link]['origin'], $device['context_name']);
             }
         } //end foreach
     } else {
