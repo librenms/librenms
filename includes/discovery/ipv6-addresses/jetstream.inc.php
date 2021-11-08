@@ -39,6 +39,6 @@ foreach (explode("\n", $oids) as $data) {
     }
     if ($param == 'ipv6ParaConfigPrefixLength') {
         $prefixlen = intval($value);
-	discover_process_ipv6($valid, $v6data[$link]['index'], $v6data[$link]['addr'], $prefixlen, $v6data[$link]['origin'], $device['context_name']);
+        discover_process_ipv6($valid, $v6data[$link]['index'], $v6data[$link]['addr'], $prefixlen, $v6data[$link]['origin'], $device['context_name']);
     }
 } //end foreach
