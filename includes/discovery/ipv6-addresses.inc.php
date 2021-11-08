@@ -1,34 +1,12 @@
 <?php
-/**
- * added Jetstream OS IPv6 address discovery
- *
- * @author     Peca Nesovanovic <peca.nesovanovic@sattrakt.com>
- */
+
+use LibreNMS\Config;
+
 foreach (DeviceCache::getPrimary()->getVrfContexts() as $context_name) {
     $device['context_name'] = $context_name;
 
-    if ($device['os'] == 'jetstream') {
-        $oids = snmp_walk($device, 'ipv6ParaConfigAddrTable', ['-OsQ', '-Ln', '-Cc'], 'TPLINK-IPV6ADDR-MIB');
-        $oids = trim($oids);
-        $v6data = [];
-        foreach (explode("\n", $oids) as $data) {
-            $param = explode('.', $data)[0];
-            $index = explode('.', $data)[1]; //if index
-            $atype = explode('.', $data)[3];
-            $erase = $param . '.' . $index . '.ipv6.' . $atype . '.'; //this will be erased from line
-            $link = trim(explode('=', str_replace($erase, '', $data))[0]);
-            $value = trim(explode('=', $data)[1]);
-            if ($param == 'ipv6ParaConfigAddress') {
-                $v6data[$link]['index'] = $index;
-                $split = str_split(str_replace(' ', '', strtolower($value)), 4); //convert space delimited hex IPv6 address to array, every forth char
-                $v6data[$link]['addr'] = implode(':', $split); //assemble array in 0000:1111 format
-                $v6data[$link]['origin'] = ($atype == 'autoIp' ? 'linklayer' : 'manual'); //address type
-            }
-            if ($param == 'ipv6ParaConfigPrefixLength') {
-                $prefixlen = intval($value);
-                discover_process_ipv6($valid, $v6data[$link]['index'], $v6data[$link]['addr'], $prefixlen, $v6data[$link]['origin'], $device['context_name']);
-            }
-        } //end foreach
+    if (file_exists(Config::get('install_dir') . "/includes/discovery/ipv6-addresses/{$device['os']}.inc.php")) {
+        include Config::get('install_dir') . "/includes/discovery/ipv6-addresses/{$device['os']}.inc.php";
     } else {
         $oids = snmp_walk($device, 'ipAddressIfIndex.ipv6', ['-Osq', '-Ln'], 'IP-MIB');
         $oids = str_replace('ipAddressIfIndex.ipv6.', '', $oids);
