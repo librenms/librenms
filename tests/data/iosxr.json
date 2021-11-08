@@ -28500,7 +28500,7 @@
                 {
                     "sysName": "<private>",
                     "sysObjectID": ".1.3.6.1.4.1.9.1.1018",
-                    "sysDescr": "Cisco IOS XR Software (Cisco ASR9K Series),  Version 5.3.4[Default]\nCopyright (c) 2017 by Cisco Systems, Inc.",
+                    "sysDescr": "Cisco IOS XR Software (Cisco ASR9K Series),  Version 5.3.4[Default]\r\nCopyright (c) 2017 by Cisco Systems, Inc.",
                     "sysContact": "<private>",
                     "version": "5.3.4",
                     "hardware": "ASR9K Series",

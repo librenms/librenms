@@ -34,7 +34,6 @@ use LibreNMS\Authentication\TwoFactor;
 use LibreNMS\Config;
 use LibreNMS\Exceptions\AuthenticationException;
 use Session;
-use Toastr;
 
 class TwoFactorController extends Controller
 {
@@ -55,7 +54,7 @@ class TwoFactorController extends Controller
             UserPref::forgetPref(auth()->user(), 'twofactor');
             $request->session()->forget(['twofactor', 'twofactorremove']);
 
-            \Toastr::info(__('TwoFactor auth removed.'));
+            flash()->addInfo(__('TwoFactor auth removed.'));
 
             return redirect('preferences');
         }
@@ -193,7 +192,7 @@ class TwoFactorController extends Controller
 
         // notify if added
         if (Session::has('twofactoradd')) {
-            Toastr::success(__('TwoFactor auth added.'));
+            flash()->addSuccess(__('TwoFactor auth added.'));
             Session::forget('twofactoradd');
         }
 

@@ -1,5 +1,5 @@
 <?php
-/*
+/**
  * SnmpResponse.php
  *
  * Responsible for parsing net-snmp output into usable PHP data structures.
@@ -15,10 +15,10 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
+ *
  * @copyright  2021 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -31,7 +31,7 @@ use Log;
 
 class SnmpResponse
 {
-    const DELIMITER = ' = ';
+    protected const DELIMITER = ' = ';
     /**
      * @var string
      */
@@ -117,7 +117,11 @@ class SnmpResponse
                 continue;
             }
 
-            [$oid, $value] = explode(self::DELIMITER, $line, 2);
+            $parts = explode(self::DELIMITER, $line, 2);
+            if (count($parts) == 1) {
+                array_unshift($parts, '');
+            }
+            [$oid, $value] = $parts;
 
             $line = strtok(PHP_EOL); // get the next line and concatenate multi-line values
             while ($line !== false && ! Str::contains($line, self::DELIMITER)) {
@@ -125,7 +129,7 @@ class SnmpResponse
                 $line = strtok(PHP_EOL);
             }
 
-            $values[$oid] = $value;
+            $values[$oid] = trim($value, "\\\" \n\r");
         }
 
         return $values;
@@ -147,7 +151,7 @@ class SnmpResponse
             $tmp = $value; // assign the value as the leaf
         }
 
-        return $array;
+        return Arr::wrap($array); // if no parts, wrap the value
     }
 
     /**

@@ -125,4 +125,36 @@ class StringHelpers
 
         return $string;
     }
+
+    /**
+     * Generate a class name from a lowercase string containing - or _
+     * Remove - and _ and camel case words
+     *
+     * @param  string  $name  The string to convert to a class name
+     * @param  string|null  $namespace  namespace to prepend to the name for example: LibreNMS\
+     * @return string Class name
+     */
+    public static function toClass(string $name, ?string $namespace = null): string
+    {
+        $pre_format = str_replace(['-', '_'], ' ', $name);
+        $class = str_replace(' ', '', ucwords(strtolower($pre_format)));
+        $class = preg_replace_callback('/^(\d)(.)/', function ($matches) {
+            $numbers = ['Zero', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine'];
+
+            return $numbers[$matches[1]] . strtoupper($matches[2]);
+        }, $class);
+
+        return $namespace . $class;
+    }
+
+    /**
+     * Check if variable can be cast to a string
+     *
+     * @param  mixed  $var
+     * @return bool
+     */
+    public static function isStringable($var): bool
+    {
+        return $var === null || is_scalar($var) || (is_object($var) && method_exists($var, '__toString'));
+    }
 }

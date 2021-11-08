@@ -186,6 +186,7 @@ return [
          * LibreNMS Service Providers...
          */
         App\Providers\SnmptrapProvider::class,
+        App\Providers\PluginProvider::class,
     ],
 
     /*
@@ -240,10 +241,10 @@ return [
         'Validator' => Illuminate\Support\Facades\Validator::class,
         'View' => Illuminate\Support\Facades\View::class,
         'Debugbar' => Barryvdh\Debugbar\Facade::class,
-        'Toastr' => Kamaln7\Toastr\Facades\Toastr::class,
 
         // LibreNMS
         'Permissions' => \App\Facades\Permissions::class,
+        'PluginManager' => \App\Facades\PluginManager::class,
         'DeviceCache' => \App\Facades\DeviceCache::class,
         'Rrd' => \App\Facades\Rrd::class,
         'SnmpQuery' => \App\Facades\FacadeAccessorSnmp::class,

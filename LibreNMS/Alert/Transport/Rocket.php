@@ -28,6 +28,8 @@ use LibreNMS\Util\Proxy;
 
 class Rocket extends Transport
 {
+    protected $name = 'Rocket Chat';
+
     public function deliverAlert($obj, $opts)
     {
         $rocket_opts = $this->parseUserOptions($this->config['rocket-options']);
@@ -51,10 +53,10 @@ class Rocket extends Transport
                     'text' => $rocket_msg,
                 ],
             ],
-            'channel' => $api['channel'],
-            'username' => $api['username'],
-            'icon_url' => $api['icon_url'],
-            'icon_emoji' => $api['icon_emoji'],
+            'channel' => $api['channel'] ?? null,
+            'username' => $api['username'] ?? null,
+            'icon_url' => $api['icon_url'] ?? null,
+            'icon_emoji' => $api['icon_emoji'] ?? null,
         ];
         $alert_message = json_encode($data);
         curl_setopt($curl, CURLOPT_HTTPHEADER, ['Content-Type: application/json']);

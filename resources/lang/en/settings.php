@@ -188,6 +188,10 @@ return [
             'description' => 'Alert log entries older than',
             'help' => 'Cleanup done by daily.sh',
         ],
+        'discovery_on_reboot' => [
+            'description' => 'Discovery on Reboot',
+            'help' => 'Do a Discovery on a rebooted Device',
+        ],
         'allow_duplicate_sysName' => [
             'description' => 'Allow Duplicate sysName',
             'help' => 'By default duplicate sysNames are disabled from being added to prevent a device with multiple interfaces from being added multiple times',

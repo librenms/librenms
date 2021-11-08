@@ -237,8 +237,7 @@ function poll_device($device, $force_module = false)
     $device_start = microtime(true);
 
     $deviceModel = DeviceCache::getPrimary();
-    $attribs = $deviceModel->getAttribs();
-    $device['attribs'] = $attribs;
+    $device['attribs'] = $deviceModel->getAttribs();
 
     $os = \LibreNMS\OS::make($device);
 
@@ -317,11 +316,11 @@ function poll_device($device, $force_module = false)
             $os_module_status = Config::get("os.{$device['os']}.poller_modules.$module");
             d_echo('Modules status: Global' . (isset($module_status) ? ($module_status ? '+ ' : '- ') : '  '));
             d_echo('OS' . (isset($os_module_status) ? ($os_module_status ? '+ ' : '- ') : '  '));
-            d_echo('Device' . (isset($attribs['poll_' . $module]) ? ($attribs['poll_' . $module] ? '+ ' : '- ') : '  '));
+            d_echo('Device' . (isset($device['attribs']['poll_' . $module]) ? ($device['attribs']['poll_' . $module] ? '+ ' : '- ') : '  '));
             if ($force_module === true ||
-                $attribs['poll_' . $module] ||
-                ($os_module_status && ! isset($attribs['poll_' . $module])) ||
-                ($module_status && ! isset($os_module_status) && ! isset($attribs['poll_' . $module]))) {
+                $device['attribs']['poll_' . $module] ||
+                ($os_module_status && ! isset($device['attribs']['poll_' . $module])) ||
+                ($module_status && ! isset($os_module_status) && ! isset($device['attribs']['poll_' . $module]))) {
                 $start_memory = memory_get_usage();
                 $module_start = microtime(true);
                 echo "\n#### Load poller module $module ####\n";
@@ -359,7 +358,7 @@ function poll_device($device, $force_module = false)
                     unlink($oldrrd);
                 }
                 unset($tags, $fields, $oldrrd);
-            } elseif (isset($attribs['poll_' . $module]) && $attribs['poll_' . $module] == '0') {
+            } elseif (isset($device['attribs']['poll_' . $module]) && $device['attribs']['poll_' . $module] == '0') {
                 echo "Module [ $module ] disabled on host.\n\n";
             } elseif (isset($os_module_status) && $os_module_status == '0') {
                 echo "Module [ $module ] disabled on os.\n\n";
@@ -406,7 +405,10 @@ function poll_device($device, $force_module = false)
             echo PHP_EOL;
         }
 
-        $updated = dbUpdate($update_array, 'devices', '`device_id` = ?', [$device['device_id']]);
+        $updated = false;
+        if (! empty($update_array)) {
+            $updated = dbUpdate($update_array, 'devices', '`device_id` = ?', [$device['device_id']]);
+        }
         if ($updated) {
             d_echo('Updating ' . $device['hostname'] . PHP_EOL);
         }
@@ -531,6 +533,7 @@ function update_application($app, $response, $metrics = [], $status = '')
 
         echo ': ';
         foreach ($metrics as $metric_name => $value) {
+            $value = (float) $value; // cast
             if (! isset($db_metrics[$metric_name])) {
                 // insert new metric
                 dbInsert(

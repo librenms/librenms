@@ -650,12 +650,13 @@ function snmpwalk_cache_triple_oid($device, $oid, $array, $mib = null, $mibdir =
  * @param  int  $depth  how many indexes to group
  * @param  array  $array  optionally insert the entries into an existing array (helpful for grouping multiple walks)
  * @param  string  $mibdir  custom mib dir to search for mib
+ * @param  mixed  $snmpFlags  flags to use for the snmp command
  * @return array grouped array of data
  */
-function snmpwalk_group($device, $oid, $mib = '', $depth = 1, $array = [], $mibdir = null, $strIndexing = null)
+function snmpwalk_group($device, $oid, $mib = '', $depth = 1, $array = [], $mibdir = null, $strIndexing = null, $snmpFlags = '-OQUsetX')
 {
     d_echo("communityStringIndexing $strIndexing\n");
-    $cmd = gen_snmpwalk_cmd($device, $oid, '-OQUsetX', $mib, $mibdir, $strIndexing);
+    $cmd = gen_snmpwalk_cmd($device, $oid, $snmpFlags, $mib, $mibdir, $strIndexing);
     $data = rtrim(external_exec($cmd));
 
     $line = strtok($data, "\n");
@@ -787,6 +788,7 @@ function snmp_gen_auth(&$device, $cmd = [], $strIndexing = null)
  */
 function snmp_translate($oid, $mib = 'ALL', $mibdir = null, $options = null, $device = null)
 {
+    $measure = Measurement::start('snmptranslate');
     $cmd = [Config::get('snmptranslate', 'snmptranslate'), '-M', mibdir($mibdir, $device), '-m', $mib];
 
     if (oid_is_numeric($oid)) {
@@ -801,7 +803,11 @@ function snmp_translate($oid, $mib = 'ALL', $mibdir = null, $options = null, $de
     $cmd = array_merge($cmd, (array) $options);
     $cmd[] = $oid;
 
-    return trim(external_exec($cmd));
+    $result = trim(external_exec($cmd));
+
+    $measure->manager()->recordSnmp($measure->end());
+
+    return $result;
 }
 
 /**
