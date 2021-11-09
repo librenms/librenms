@@ -65,6 +65,7 @@ class ModuleTestHelper
         'ospf' => ['ports', 'ospf'],
         'vlans' => ['ports', 'vlans'],
         'vrf' => ['ports', 'vrf'],
+        'bgp-peers' => ['ports', 'vrf', 'bgp-peers'],
     ];
 
     /**
