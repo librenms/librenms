@@ -2182,6 +2182,60 @@ function get_vrf(Illuminate\Http\Request $request)
     return api_success($vrf, 'vrf');
 }
 
+function list_mpls_services(Illuminate\Http\Request $request)
+{
+    $sql = '';
+    $sql_params = [];
+    $hostname = $request->get('hostname');
+    $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
+    if (is_numeric($device_id)) {
+        $permission = check_device_permission($device_id);
+        if ($permission !== true) {
+            return $permission;
+        }
+        $sql = ' AND `devices`.`device_id`=?';
+        $sql_params = [$device_id];
+    }
+    
+    if (! Auth::user()->hasGlobalRead()) {
+        $sql .= ' AND `mpls_services`.`device_id` IN (SELECT device_id FROM devices_perms WHERE user_id = ?)';
+        $sql_params[] = Auth::id();
+    }
+
+    $services = dbFetchRows("SELECT `mpls_services`.*, `devices`.`hostname` FROM `mpls_services` LEFT JOIN `devices` ON `mpls_services`.`device_id` = `devices`.`device_id` WHERE `mpls_services`.`svc_oid` IS NOT NULL $sql", $sql_params);
+    $total_services = count($services);
+    if ($total_services == 0) {
+        return api_error(404, 'MPLS Services do not exist');
+    }
+
+    return api_success($services, 'mpls_services');
+}
+
+function list_mpls_saps(Illuminate\Http\Request $request)
+{
+    $hostname = $request->get('hostname');
+    $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
+    if (is_numeric($device_id)) {
+        $permission = check_device_permission($device_id);
+        if ($permission !== true) {
+            return $permission;
+        }
+        $sql = ' AND `mpls_saps`.`device_id`=?';
+        $sql_params = [$device_id];
+    }
+    if (! Auth::user()->hasGlobalRead()) {
+        $sql .= ' AND `mpls_saps`.`device_id` IN (SELECT device_id FROM devices_perms WHERE user_id = ?)';
+        $sql_params[] = Auth::id();
+    }
+    $saps = dbFetchRows("SELECT `mpls_saps`.*, `devices`.`hostname` FROM `mpls_saps` LEFT JOIN `devices` ON `mpls_saps`.`device_id` = `devices`.`device_id` WHERE `mpls_saps`.`svc_oid` IS NOT NULL $sql", $sql_params);
+    $total_saps = count($saps);
+    if ($total_saps == 0) {
+        return api_error(404, 'SAPs do not exist');
+    }
+    return api_success($saps, 'saps');
+
+}
+
 function list_ipsec(Illuminate\Http\Request $request)
 {
     $hostname = $request->route('hostname');

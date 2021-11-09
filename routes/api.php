@@ -139,6 +139,8 @@ Route::group(['prefix' => 'v0', 'namespace' => '\App\Api\Controllers'], function
     Route::group(['prefix' => 'routing'], function () {
         Route::get('bgp/cbgp', 'LegacyApiController@list_cbgp')->name('list_cbgp');
         Route::get('vrf', 'LegacyApiController@list_vrf')->name('list_vrf');
+        Route::get('mpls/services', 'LegacyApiController@list_mpls_services')->name('list_mpls_services');
+        Route::get('mpls/saps', 'LegacyApiController@list_mpls_saps')->name('list_mpls_saps');
     });
 
     Route::group(['prefix' => 'resources'], function () {
