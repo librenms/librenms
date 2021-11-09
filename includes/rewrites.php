@@ -1,7 +1,6 @@
 <?php
 
 use LibreNMS\Config;
-use LibreNMS\Util\Rewrite;
 
 function rewrite_entity_descr($descr)
 {
@@ -42,9 +41,9 @@ function cleanPort($interface, $device = null)
     if (! $interface) {
         return $interface;
     }
-    $interface['ifAlias'] = \LibreNMS\Util\Clean::html($interface['ifAlias'], []);
-    $interface['ifName'] = \LibreNMS\Util\Clean::html($interface['ifName'], []);
-    $interface['ifDescr'] = \LibreNMS\Util\Clean::html($interface['ifDescr'], []);
+    $interface['ifAlias'] = htmlentities($interface['ifAlias']);
+    $interface['ifName'] = htmlentities($interface['ifName']);
+    $interface['ifDescr'] = htmlentities($interface['ifDescr']);
 
     if (! $device) {
         $device = device_by_id_cache($interface['device_id']);
