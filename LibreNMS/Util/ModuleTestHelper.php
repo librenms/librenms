@@ -173,7 +173,7 @@ class ModuleTestHelper
                 $data = \SnmpQuery::options($snmp_options)->mibDir($oid_data['mibdir'])->next($oid_data['oid']);
             }
 
-            if ($data->isValid()) {
+            if (isset($data) && $data->isValid()) {
                 $snmprec_data[] = $this->convertSnmpToSnmprec($data);
             }
         }
@@ -368,7 +368,7 @@ class ModuleTestHelper
         }
     }
 
-    private function convertSnmpToSnmprec(SnmpResponse $snmp_data)
+    private function convertSnmpToSnmprec(SnmpResponse $snmp_data): array
     {
         $result = [];
         foreach (explode(PHP_EOL, $snmp_data->raw()) as $line) {

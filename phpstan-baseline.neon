@@ -6211,16 +6211,6 @@ parameters:
 			path: LibreNMS/Util/ModuleTestHelper.php
 
 		-
-			message: "#^Method LibreNMS\\\\Util\\\\ModuleTestHelper\\:\\:convertSnmpToSnmprec\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: LibreNMS/Util/ModuleTestHelper.php
-
-		-
-			message: "#^Method LibreNMS\\\\Util\\\\ModuleTestHelper\\:\\:convertSnmpToSnmprec\\(\\) has parameter \\$snmp_data with no type specified\\.$#"
-			count: 1
-			path: LibreNMS/Util/ModuleTestHelper.php
-
-		-
 			message: "#^Method LibreNMS\\\\Util\\\\ModuleTestHelper\\:\\:dataIsEmpty\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: LibreNMS/Util/ModuleTestHelper.php
