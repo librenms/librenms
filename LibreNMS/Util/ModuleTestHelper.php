@@ -30,6 +30,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use LibreNMS\Component;
 use LibreNMS\Config;
+use LibreNMS\Data\Source\SnmpResponse;
 use LibreNMS\Exceptions\FileNotFoundException;
 use LibreNMS\Exceptions\InvalidModuleException;
 use Symfony\Component\Yaml\Yaml;
@@ -157,23 +158,22 @@ class ModuleTestHelper
             $snmp_oids = $this->collectOids($device_id);
         }
 
-        $device = device_by_id_cache($device_id, true);
         DeviceCache::setPrimary($device_id);
 
         $snmprec_data = [];
         foreach ($snmp_oids as $oid_data) {
             $this->qPrint(' ' . $oid_data['oid']);
 
-            $snmp_options = ['-OUneb', '-Ih'];
+            $snmp_options = ['-OUneb', '-Ih', '-m', '+' . $oid_data['mib']];
             if ($oid_data['method'] == 'walk') {
-                $data = snmp_walk($device, $oid_data['oid'], $snmp_options, $oid_data['mib'], $oid_data['mibdir']);
+                $data = \SnmpQuery::options($snmp_options)->mibDir($oid_data['mibdir'])->walk($oid_data['oid']);
             } elseif ($oid_data['method'] == 'get') {
-                $data = snmp_get($device, $oid_data['oid'], $snmp_options, $oid_data['mib'], $oid_data['mibdir']);
+                $data = \SnmpQuery::options($snmp_options)->mibDir($oid_data['mibdir'])->get($oid_data['oid']);
             } elseif ($oid_data['method'] == 'getnext') {
-                $data = snmp_getnext($device, $oid_data['oid'], $snmp_options, $oid_data['mib'], $oid_data['mibdir']);
+                $data = \SnmpQuery::options($snmp_options)->mibDir($oid_data['mibdir'])->next($oid_data['oid']);
             }
 
-            if (isset($data) && $data !== false) {
+            if ($data->isValid()) {
                 $snmprec_data[] = $this->convertSnmpToSnmprec($data);
             }
         }
@@ -368,10 +368,10 @@ class ModuleTestHelper
         }
     }
 
-    private function convertSnmpToSnmprec($snmp_data)
+    private function convertSnmpToSnmprec(SnmpResponse $snmp_data)
     {
         $result = [];
-        foreach (explode(PHP_EOL, $snmp_data) as $line) {
+        foreach (explode(PHP_EOL, $snmp_data->raw()) as $line) {
             if (empty($line)) {
                 continue;
             }
@@ -381,7 +381,7 @@ class ModuleTestHelper
                 $oid = ltrim($oid, '.');
                 $raw_data = trim($raw_data);
 
-                if (empty($raw_data)) {
+                if (empty($raw_data) || $raw_data == '""') {
                     $result[] = "$oid|4|"; // empty data, we don't know type, put string
                 } else {
                     [$raw_type, $data] = explode(':', $raw_data, 2);
@@ -389,8 +389,14 @@ class ModuleTestHelper
                         // device returned the wrong type, save the wrong type to emulate the device behavior
                         [$raw_type, $data] = explode(':', ltrim($data), 2);
                     }
-                    $data = ltrim($data, ' "');
+
                     $type = $this->getSnmprecType($raw_type);
+
+                    $data = ltrim($data, ' ');
+                    if (Str::startsWith($data, '"') && Str::endsWith($data, '"')) {
+                        // raw string surrounded by quotes, strip extra escapes
+                        $data = stripslashes(substr($data, 1, -1));
+                    }
 
                     if ($type == '6') {
                         // remove leading . from oid data
