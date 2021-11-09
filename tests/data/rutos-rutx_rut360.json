@@ -264,7 +264,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "state_name": "Pinstate"
+                    "state_name": "pinState"
                 },
                 {
                     "sensor_deleted": 0,
