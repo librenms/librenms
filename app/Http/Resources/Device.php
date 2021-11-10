@@ -2,9 +2,11 @@
 
 namespace App\Http\Resources;
 
+use App\Models\Secret;
 use App\Models\Vminfo;
 use Illuminate\Http\Request;
 use Illuminate\Http\Resources\Json\JsonResource;
+use LibreNMS\Enum\PortAssociationMode;
 
 /**
  * @mixin \App\Models\Device
@@ -18,25 +20,28 @@ class Device extends JsonResource
      */
     public function toArray(Request $request): array
     {
+        $snmp = $this->polling()->snmp();
+        $canUnmask = (bool) $request->user()?->can('unmask', Secret::class);
+
         $data = [
             'device_id' => $this->device_id,
             'hostname' => $this->hostname,
             'sysName' => $this->sysName,
             'ip' => $this->ip,
             'overwrite_ip' => $this->overwrite_ip,
-            'community' => $this->community,
-            'authlevel' => $this->authlevel,
-            'authname' => $this->authname,
-            'authpass' => $this->authpass,
-            'authalgo' => $this->authalgo,
-            'cryptopass' => $this->cryptopass,
-            'cryptoalgo' => $this->cryptoalgo,
-            'snmpver' => $this->snmpver,
-            'port' => $this->port,
-            'transport' => $this->transport,
-            'timeout' => $this->timeout,
-            'retries' => $this->retries,
-            'snmp_disable' => (int) $this->snmp_disable,
+            'community' => $canUnmask ? $snmp->community : null,
+            'authlevel' => $snmp->authlevel,
+            'authname' => $snmp->authname,
+            'authpass' => $canUnmask ? $snmp->authpass : null,
+            'authalgo' => $snmp->authalgo,
+            'cryptopass' => $canUnmask ? $snmp->cryptopass : null,
+            'cryptoalgo' => $snmp->cryptoalgo,
+            'snmpver' => $snmp->version,
+            'port' => $snmp->port,
+            'transport' => $snmp->transport,
+            'timeout' => $snmp->timeout,
+            'retries' => $snmp->retries,
+            'snmp_disable' => (int) ! $snmp->enabled,
             'bgpLocalAs' => $this->bgpLocalAs,
             'sysObjectID' => $this->sysObjectID,
             'sysDescr' => $this->sysDescr,
@@ -66,7 +71,7 @@ class Device extends JsonResource
             'poller_group' => $this->poller_group,
             'override_sysLocation' => (int) $this->override_sysLocation,
             'notes' => $this->notes,
-            'port_association_mode' => $this->port_association_mode,
+            'port_association_mode' => PortAssociationMode::getId($snmp->portAssociationMode) ?? 1,
             'max_depth' => $this->max_depth,
             'disable_notify' => (int) $this->disable_notify,
             'inserted' => $this->inserted?->toDateTimeString(),
