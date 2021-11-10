@@ -3,9 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\PortGroup;
+use Flasher\Prime\FlasherInterface;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
-use Toastr;
 
 class PortGroupController extends Controller
 {
@@ -39,7 +39,7 @@ class PortGroupController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\RedirectResponse
      */
-    public function store(Request $request)
+    public function store(Request $request, FlasherInterface $flasher)
     {
         $this->validate($request, [
             'name' => 'required|string|unique:port_groups',
@@ -48,7 +48,7 @@ class PortGroupController extends Controller
         $portGroup = PortGroup::make($request->only(['name', 'desc']));
         $portGroup->save();
 
-        Toastr::success(__('Port Group :name created', ['name' => $portGroup->name]));
+        $flasher->addSuccess(__('Port Group :name created', ['name' => $portGroup->name]));
 
         return redirect()->route('port-groups.index');
     }
@@ -73,7 +73,7 @@ class PortGroupController extends Controller
      * @param  \App\Models\PortGroup  $portGroup
      * @return \Illuminate\Http\RedirectResponse
      */
-    public function update(Request $request, PortGroup $portGroup)
+    public function update(Request $request, PortGroup $portGroup, FlasherInterface $flasher)
     {
         $this->validate($request, [
             'name' => [
@@ -90,9 +90,9 @@ class PortGroupController extends Controller
         $portGroup->fill($request->only(['name', 'desc']));
 
         if ($portGroup->save()) {
-            Toastr::success(__('Port Group :name updated', ['name' => $portGroup->name]));
+            $flasher->addSuccess(__('Port Group :name updated', ['name' => $portGroup->name]));
         } else {
-            Toastr::error(__('Failed to save'));
+            $flasher->addError(__('Failed to save'));
 
             return redirect()->back()->withInput();
         }

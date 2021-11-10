@@ -369,7 +369,7 @@ class Service:
         return time.time() - self.start_time
 
     def attach_signals(self):
-        logger.info(
+        logger.debug(
             "Attaching signal handlers on thread %s", threading.current_thread().name
         )
         signal(SIGTERM, self.terminate)  # capture sigterm and exit gracefully
@@ -451,6 +451,23 @@ class Service:
                 "redis" if isinstance(self._lm, LibreNMS.RedisLock) else "internal",
             )
         )
+        logger.info(
+            "Queue Workers: Discovery={} Poller={} Services={} Alerting={} Billing={} Ping={}".format(
+                self.config.discovery.workers
+                if self.config.discovery.enabled
+                else "disabled",
+                self.config.poller.workers
+                if self.config.poller.enabled
+                else "disabled",
+                self.config.services.workers
+                if self.config.services.enabled
+                else "disabled",
+                "enabled" if self.config.alerting.enabled else "disabled",
+                "enabled" if self.config.billing.enabled else "disabled",
+                "enabled" if self.config.ping.enabled else "disabled",
+            )
+        )
+
         if self.config.update_enabled:
             logger.info(
                 "Maintenance tasks will be run every {}".format(
@@ -789,13 +806,12 @@ class Service:
         try:
             # Report on the poller instance as a whole
             self._db.query(
-                "INSERT INTO poller_cluster(node_id, poller_name, poller_version, poller_groups, last_report, master) "
-                'values("{0}", "{1}", "{2}", "{3}", NOW(), {4}) '
-                'ON DUPLICATE KEY UPDATE poller_version="{2}", poller_groups="{3}", last_report=NOW(), master={4}; '.format(
+                "INSERT INTO poller_cluster(node_id, poller_name, poller_version, last_report, master) "
+                'values("{0}", "{1}", "{2}", NOW(), {3}) '
+                'ON DUPLICATE KEY UPDATE poller_version="{2}", last_report=NOW(), master={3}; '.format(
                     self.config.node_id,
                     self.config.name,
                     "librenms-service",
-                    ",".join(str(g) for g in self.config.group),
                     1 if self.is_master else 0,
                 )
             )

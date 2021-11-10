@@ -21,6 +21,7 @@ use LibreNMS\Modules\Core;
 use LibreNMS\Util\Debug;
 use LibreNMS\Util\IPv4;
 use LibreNMS\Util\IPv6;
+use LibreNMS\Util\Proxy;
 
 function array_sort_by_column($array, $on, $order = SORT_ASC)
 {
@@ -572,7 +573,7 @@ function createHost(
         $port_assoc_mode = get_port_assoc_mode_id($port_assoc_mode);
     }
 
-    $device = [
+    $device = new Device(array_merge([
         'hostname' => $host,
         'overwrite_ip' => $overwrite_ip,
         'sysName' => $additional['sysName'] ?? $host,
@@ -587,22 +588,18 @@ function createHost(
         'status_reason' => '',
         'port_association_mode' => $port_assoc_mode,
         'snmp_disable' => $additional['snmp_disable'] ?? 0,
-    ];
-
-    $device = array_merge($device, $v3);  // merge v3 settings
+    ], $v3));
 
     if ($force_add !== true) {
-        $device['os'] = Core::detectOS($device);
+        $device->os = Core::detectOS($device);
 
-        $snmphost = snmp_get($device, 'sysName.0', '-Oqv', 'SNMPv2-MIB');
-        if (host_exists($host, $snmphost)) {
-            throw new HostExistsException("Already have host $host ($snmphost) due to duplicate sysName");
+        $device->sysName = SnmpQuery::device($device)->get('SNMPv2-MIB::sysName.0')->value();
+        if (host_exists($host, $device->sysName)) {
+            throw new HostExistsException("Already have host $host ({$device->sysName}) due to duplicate sysName");
         }
     }
-
-    $deviceModel = Device::create($device);
-    if ($deviceModel->device_id) {
-        return $deviceModel->device_id;
+    if ($device->save()) {
+        return $device->device_id;
     }
 
     throw new \Exception('Failed to add host to the database, please run ./validate.php');
@@ -882,51 +879,6 @@ function port_fill_missing(&$port, $device)
         $port['ifName'] = $port['ifDescr'];
         d_echo(' Using ifDescr as ifName');
     }
-}
-
-function scan_new_plugins()
-{
-    $installed = 0; // Track how many plugins we install.
-
-    if (file_exists(Config::get('plugin_dir'))) {
-        $plugin_files = scandir(Config::get('plugin_dir'));
-        foreach ($plugin_files as $name) {
-            if (is_dir(Config::get('plugin_dir') . '/' . $name)) {
-                if ($name != '.' && $name != '..') {
-                    if (is_file(Config::get('plugin_dir') . '/' . $name . '/' . $name . '.php') && is_file(Config::get('plugin_dir') . '/' . $name . '/' . $name . '.inc.php')) {
-                        $plugin_id = dbFetchRow('SELECT `plugin_id` FROM `plugins` WHERE `plugin_name` = ?', [$name]);
-                        if (empty($plugin_id)) {
-                            if (dbInsert(['plugin_name' => $name, 'plugin_active' => '0'], 'plugins')) {
-                                $installed++;
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
-
-    return $installed;
-}
-
-function scan_removed_plugins()
-{
-    $removed = 0; // Track how many plugins will be removed from database
-
-    if (file_exists(Config::get('plugin_dir'))) {
-        $plugin_files = scandir(Config::get('plugin_dir'));
-        $installed_plugins = dbFetchColumn('SELECT `plugin_name` FROM `plugins`');
-        foreach ($installed_plugins as $name) {
-            if (in_array($name, $plugin_files)) {
-                continue;
-            }
-            if (dbDelete('plugins', '`plugin_name` = ?', $name)) {
-                $removed++;
-            }
-        }
-    }
-
-    return  $removed;
 }
 
 function validate_device_id($id)
@@ -1480,17 +1432,35 @@ function cache_mac_oui()
     if ($lock->get()) {
         echo 'Caching Mac OUI' . PHP_EOL;
         try {
-            $mac_oui_url = 'https://macaddress.io/database/macaddress.io-db.json';
+            $mac_oui_url = 'https://gitlab.com/wireshark/wireshark/-/raw/master/manuf';
+            //$mac_oui_url_mirror = 'https://raw.githubusercontent.com/wireshark/wireshark/master/manuf';
+
             echo '  -> Downloading ...' . PHP_EOL;
             $get = Requests::get($mac_oui_url, [], ['proxy' => get_proxy()]);
-            echo '  -> Processing ...' . PHP_EOL;
-            $json_data = $get->body;
-            foreach (explode("\n", $json_data) as $json_line) {
-                $entry = json_decode($json_line);
-                if ($entry && $entry->{'assignmentBlockSize'} == 'MA-L') {
-                    $oui = strtolower(str_replace(':', '', $entry->{'oui'}));
+            echo '  -> Processing CSV ...' . PHP_EOL;
+            $csv_data = $get->body;
+            foreach (explode("\n", $csv_data) as $csv_line) {
+                unset($oui);
+                $entry = str_getcsv($csv_line, "\t");
+
+                $length = strlen($entry[0]);
+                $prefix = strtolower(str_replace(':', '', $entry[0]));
+
+                if (is_array($entry) && count($entry) >= 3 && $length == 8) {
+                    // We have a standard OUI xx:xx:xx
+                    $oui = $prefix;
+                } elseif (is_array($entry) && count($entry) >= 3 && $length == 20) {
+                    // We have a smaller range (xx:xx:xx:X or xx:xx:xx:xx:X)
+                    if (substr($prefix, -2) == '28') {
+                        $oui = substr($prefix, 0, 7);
+                    } elseif (substr($prefix, -2) == '36') {
+                        $oui = substr($prefix, 0, 9);
+                    }
+                }
+                if (isset($oui)) {
+                    echo "Adding $oui, $entry[2]" . PHP_EOL;
                     $key = 'OUIDB-' . $oui;
-                    Cache::put($key, $entry->{'companyName'}, $mac_oui_cache_time);
+                    Cache::put($key, $entry[2], $mac_oui_cache_time);
                 }
             }
         } catch (Exception $e) {
@@ -1736,7 +1706,7 @@ function oxidized_node_update($hostname, $msg, $username = 'not_provided')
     $postdata = ['user' => $username, 'msg' => $msg];
     $oxidized_url = Config::get('oxidized.url');
     if (! empty($oxidized_url)) {
-        Requests::put("$oxidized_url/node/next/$hostname", [], json_encode($postdata), ['proxy' => get_proxy()]);
+        Requests::put("$oxidized_url/node/next/$hostname", [], json_encode($postdata), ['proxy' => Proxy::get($oxidized_url)]);
 
         return true;
     }

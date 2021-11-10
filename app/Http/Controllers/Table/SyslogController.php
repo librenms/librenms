@@ -26,6 +26,7 @@
 namespace App\Http\Controllers\Table;
 
 use App\Models\Syslog;
+use LibreNMS\Enum\SyslogSeverity;
 
 class SyslogController extends TableController
 {
@@ -71,17 +72,22 @@ class SyslogController extends TableController
     {
         return Syslog::hasAccess($request->user())
             ->with('device')
-            ->when($request->device_group, function ($query) use ($request) {
-                $query->inDeviceGroup($request->device_group);
+            ->when($request->device_group, function ($query, $group) {
+                $query->inDeviceGroup($group);
             })
-            ->when($request->from, function ($query) use ($request) {
-                $query->where('timestamp', '>=', $request->from);
+            ->when($request->from, function ($query, $from) {
+                $query->where('timestamp', '>=', $from);
             })
-            ->when($request->to, function ($query) use ($request) {
-                $query->where('timestamp', '<=', $request->to);
+            ->when($request->to, function ($query, $to) {
+                $query->where('timestamp', '<=', $to);
             })
-            ->when($request->level, function ($query) use ($request) {
-                $query->where('level', '<=', $request->level);
+            ->when($request->level, function ($query, $level) {
+                if ($level >= 7) {
+                    return;  // include everything
+                }
+
+                $levels = array_slice(SyslogSeverity::LEVELS, 0, $level + 1);
+                $query->whereIn('level', $levels);
             });
     }
 

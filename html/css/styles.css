@@ -2271,10 +2271,6 @@ label {
   width: auto !important;
 }
 
-.toast-top-right {
-  top: 34px;
-}
-
 .tooltip {
     display: block !important;
     z-index: 10000;
