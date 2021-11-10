@@ -26,8 +26,6 @@ return [
         'unpingable' => 'Kunde inte pinga :hostname (:ip)',
         'unsnmpable' => 'Det gick inte att ansluta till :hostname, kontrollera snmp-detaljerna och snmp-nåbarheten',
         'unresolvable' => 'Värdnamn löstes inte till IP',
-        'no_reply_community' => 'SNMP :version: Inget svar med communityn :credentials',
-        'no_reply_credentials' => 'SNMP :version: Inget svar med referenser :credentials',
     ],
     'ldap_missing' => [
         'title' => 'PHP LDAP-stöd saknas',

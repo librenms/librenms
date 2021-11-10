@@ -32,44 +32,33 @@ use App\Models\Device;
 use Illuminate\Contracts\Process\ProcessResult;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Process;
+use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Exceptions\IpmiConnectionFailed;
-use LibreNMS\Polling\ConnectivityHelper;
+use LibreNMS\Polling\Method\Config\IpmiConfig;
 
 class Ipmitool
 {
     private readonly string $binary;
-    private readonly string $hostname;
-    private readonly int $port;
-    private readonly string $username;
-    private readonly string $password;
-    private readonly ?string $kg_key;
-    private readonly ?int $ciphersuite;
-    private readonly int $timeout;
     private ?string $type;
 
     public function __construct(
         private readonly Device $device,
+        private readonly IpmiConfig $method,
     ) {
         $this->binary = LibrenmsConfig::get('ipmitool', 'ipmitool');
-        $this->hostname = $device->getAttrib('ipmi_hostname', $device->hostname);
-        $this->port = filter_var($device->getAttrib('ipmi_port'), FILTER_VALIDATE_INT) ?: 0;
-        $this->username = $device->getAttrib('ipmi_username', '');
-        $this->password = $device->getAttrib('ipmi_password', '');
-        $this->kg_key = $device->getAttrib('ipmi_kg_key');
-        $this->ciphersuite = $device->getAttrib('ipmi_ciphersuite');
-        $this->timeout = filter_var($device->getAttrib('ipmi_timeout'), FILTER_VALIDATE_INT) ?: 0;
-        $this->type = $device->getAttrib('ipmi_type');
+        $this->type = $this->method->type;
     }
 
-    public static function init(?Device $device = null): ?self
+    public static function init(?Device $device = null, ?IpmiConfig $config = null): ?self
     {
         $device ??= DeviceCache::getPrimary();
+        $ipmi = $config ?? $device->polling()->ipmi();
 
-        if (! (new ConnectivityHelper($device))->ipmiIsEnabled()) {
+        if (! $ipmi->enabled || ! $ipmi->hostname) {
             return null;
         }
 
-        return new static($device);
+        return new static($device, $ipmi);
     }
 
     /**
@@ -96,8 +85,15 @@ class Ipmitool
                 $result = $this->runCommand($commands, $ipmi_type);
 
                 if ($result->successful()) {
-                    $this->device->setAttrib('ipmi_type', $ipmi_type);
                     $this->type = $ipmi_type;
+
+                    $method = $this->device->pollingMethod(PollingMethodType::Ipmi);
+                    if ($method) {
+                        $settings = $method->settings ?? [];
+                        $settings['type'] = $ipmi_type;
+                        $method->settings = $settings;
+                        $method->save();
+                    }
 
                     return $result->output();
                 }
@@ -153,22 +149,22 @@ class Ipmitool
         $cmd = [$this->binary];
 
         if (! $this->isLocalhost()) {
-            array_push($cmd, '-H', $this->hostname, '-U', $this->username, '-P', $this->password, '-L', 'USER');
+            array_push($cmd, '-H', $this->method->hostname, '-U', $this->method->username, '-P', $this->method->password, '-L', 'USER');
 
-            if ($this->port) {
-                array_push($cmd, '-p', $this->port);
+            if ($this->method->port) {
+                array_push($cmd, '-p', $this->method->port);
             }
 
-            if ($this->kg_key) {
-                array_push($cmd, '-y', $this->kg_key);
+            if ($this->method->kgKey) {
+                array_push($cmd, '-y', $this->method->kgKey);
             }
 
-            if ($this->ciphersuite) {
-                array_push($cmd, '-C', $this->ciphersuite);
+            if ($this->method->cipherSuite) {
+                array_push($cmd, '-C', $this->method->cipherSuite);
             }
 
-            if ($this->timeout) {
-                array_push($cmd, '-N', $this->timeout);
+            if ($this->method->timeout) {
+                array_push($cmd, '-N', $this->method->timeout);
             }
         }
 
@@ -184,7 +180,7 @@ class Ipmitool
 
     private function isLocalhost(): bool
     {
-        return in_array($this->hostname, [
+        return in_array($this->method->hostname, [
             'localhost',
             '127.0.0.1',
             '::1',
