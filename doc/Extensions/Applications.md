@@ -1069,12 +1069,14 @@ wget https://github.com/librenms/librenms-agent/raw/master/snmp/mysql -O /etc/sn
 chmod +x /etc/snmp/mysql
 ```
 
-3. Edit your snmpd.conf file and add:
+3. Edit /etc/snmp/mysql to set your MySQL connection constants or declare them in /etc/snmp/mysql.cnf (new file)
+
+4. Edit your snmpd.conf file and add:
 ```
 extend mysql /etc/snmp/mysql
 ```
 
-4. Restart snmpd.
+5. Restart snmpd.
 
 The application should be auto-discovered as described at the top of
 the page. If it is not, please follow the steps set out under `SNMP
