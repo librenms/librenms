@@ -1,0 +1,698 @@
+<?php
+
+namespace LibreNMS\Tests\Feature\Http;
+
+use App\Models\Device;
+use App\Models\DevicePollingMethod;
+use App\Models\User;
+use LibreNMS\Enum\PollingMethodType;
+use LibreNMS\Enum\PortAssociationMode;
+use LibreNMS\Tests\TestCase;
+use PHPUnit\Framework\Attributes\PreserveGlobalState;
+use PHPUnit\Framework\Attributes\RunTestsInSeparateProcesses;
+use Spatie\Permission\Models\Permission;
+use Spatie\Permission\Models\Role;
+
+#[RunTestsInSeparateProcesses]
+#[PreserveGlobalState(false)]
+class EditPollingControllerTest extends TestCase
+{
+    protected function setUp(): void
+    {
+        parent::setUp();
+        $this->dbSetUp();
+
+        Role::findOrCreate('admin');
+        Permission::findOrCreate('device.update');
+        Permission::findOrCreate('secret.create');
+        Permission::findOrCreate('secret.update');
+        Permission::findOrCreate('secret.view');
+        Permission::findOrCreate('secret.delete');
+    }
+
+    protected function tearDown(): void
+    {
+        $this->dbTearDown();
+        parent::tearDown();
+    }
+
+    public function testUpdateSnmpPollingMethodUpdatesPortAssociationMode(): void
+    {
+        $admin = User::factory()->create(['enabled' => 1]);
+        $admin->assignRole('admin');
+        $admin->givePermissionTo('device.update');
+
+        $device = Device::factory()->create([
+            'port_association_mode' => PortAssociationMode::getId('ifIndex'),
+        ]);
+
+        DevicePollingMethod::factory()->create([
+            'device_id' => $device->device_id,
+            'method_type' => PollingMethodType::Snmp,
+            'enabled' => true,
+            'settings' => [
+                'transport' => 'udp',
+                'port' => 161,
+                'timeout' => 1,
+                'retries' => 0,
+                'max_repeaters' => 0,
+                'max_oid' => 10,
+                'port_association_mode' => 'ifIndex',
+            ],
+        ]);
+
+        $response = $this->actingAs($admin)->put(
+            route('device.edit.polling.update', ['device' => $device, 'methodType' => 'snmp']),
+            [
+                'enabled' => '1',
+                'affects_availability' => '1',
+                'force_save' => '1',
+                'settings' => [
+                    'transport' => 'udp',
+                    'port' => 161,
+                    'timeout' => 1,
+                    'retries' => 0,
+                    'max_repeaters' => 0,
+                    'max_oid' => 10,
+                    'port_association_mode' => 'ifName',
+                ],
+            ]
+        );
+
+        $response->assertRedirect();
+        $this->assertEquals(PortAssociationMode::getId('ifName'), $device->fresh()->port_association_mode);
+    }
+
+    public function testStorePollingMethodRejectsDuplicateDefaultSecretDescription(): void
+    {
+        $admin = User::factory()->create(['enabled' => 1]);
+        $admin->assignRole('admin');
+
+        $device = Device::factory()->create(['hostname' => 'test-device.example.com']);
+
+        // Pre-create a secret that has the exact default description
+        \App\Models\Secret::create([
+            'description' => 'SNMP test-device.example.com',
+            'secret_type' => \LibreNMS\Enum\SecretType::Snmp,
+            'default' => false,
+            'data' => ['version' => 'v2c', 'community' => 'public'],
+        ]);
+
+        $response = $this->actingAs($admin)->post(
+            route('device.edit.polling.store', ['device' => $device]),
+            [
+                'method_type' => 'snmp',
+                'credential_mode' => 'new',
+                'description' => 'SNMP test-device.example.com',
+                'secret_data' => [
+                    'version' => 'v2c',
+                    'community' => 'private',
+                ],
+                'settings' => [
+                    'transport' => 'udp',
+                    'port' => 161,
+                    'timeout' => 1,
+                    'retries' => 0,
+                    'max_repeaters' => 0,
+                    'max_oid' => 10,
+                    'port_association_mode' => 'ifIndex',
+                ],
+            ]
+        );
+
+        $response->assertSessionHasErrors(['description']);
+    }
+
+    public function testStorePollingMethodRejectsDuplicateCustomSecretDescription(): void
+    {
+        $admin = User::factory()->create(['enabled' => 1]);
+        $admin->assignRole('admin');
+
+        $device = Device::factory()->create(['hostname' => 'test-device2.example.com']);
+
+        \App\Models\Secret::create([
+            'description' => 'Existing Custom Description',
+            'secret_type' => \LibreNMS\Enum\SecretType::Snmp,
+            'default' => false,
+            'data' => ['version' => 'v2c', 'community' => 'public'],
+        ]);
+
+        $response = $this->actingAs($admin)->post(
+            route('device.edit.polling.store', ['device' => $device]),
+            [
+                'method_type' => 'snmp',
+                'credential_mode' => 'new',
+                'description' => 'Existing Custom Description',
+                'secret_data' => [
+                    'version' => 'v2c',
+                    'community' => 'private',
+                ],
+                'settings' => [
+                    'transport' => 'udp',
+                    'port' => 161,
+                    'timeout' => 1,
+                    'retries' => 0,
+                    'max_repeaters' => 0,
+                    'max_oid' => 10,
+                    'port_association_mode' => 'ifIndex',
+                ],
+            ]
+        );
+
+        $response->assertSessionHasErrors(['description']);
+    }
+
+    public function testIndexRendersPollingViewWithPreservedSecretKeys(): void
+    {
+        $admin = User::factory()->create(['enabled' => 1]);
+        $admin->assignRole('admin');
+        $admin->givePermissionTo('device.update');
+
+        $secret = \App\Models\Secret::create([
+            'description' => 'SNMP Secret 123',
+            'secret_type' => \LibreNMS\Enum\SecretType::Snmp,
+            'default' => false,
+            'data' => ['version' => 'v2c', 'community' => 'public'],
+        ]);
+
+        $device = Device::factory()->create(['hostname' => 'test-device.example.com']);
+
+        DevicePollingMethod::factory()->create([
+            'device_id' => $device->device_id,
+            'method_type' => PollingMethodType::Snmp,
+            'secret_id' => $secret->id,
+            'enabled' => true,
+        ]);
+
+        DevicePollingMethod::factory()->create([
+            'device_id' => $device->device_id,
+            'method_type' => PollingMethodType::Icmp,
+            'enabled' => true,
+        ]);
+
+        $response = $this->actingAs($admin)->get(route('device.edit.polling', ['device' => $device]));
+        $response->assertOk();
+        $response->assertSee('SNMP Secret 123');
+        $response->assertViewHas('allMethods', function ($allMethods) use ($secret) {
+            $snmp = $allMethods->firstWhere('type', 'snmp');
+            $this->assertArrayHasKey((string) $secret->id, $snmp['secret_meta']);
+            $this->assertArrayHasKey((string) $secret->id, $snmp['secret_form_data_by_id']);
+
+            return true;
+        });
+    }
+
+    public function testUpdateReturnsJsonResponseWhenRequested(): void
+    {
+        $admin = User::factory()->create(['enabled' => 1]);
+        $admin->assignRole('admin');
+        $admin->givePermissionTo('device.update');
+
+        $device = Device::factory()->create();
+        DevicePollingMethod::factory()->create([
+            'device_id' => $device->device_id,
+            'method_type' => PollingMethodType::Icmp,
+            'enabled' => true,
+        ]);
+
+        $response = $this->actingAs($admin)->putJson(
+            route('device.edit.polling.update', ['device' => $device, 'methodType' => 'icmp']),
+            [
+                'enabled' => '1',
+                'affects_availability' => '1',
+                'force_save' => '1',
+                'settings' => [],
+            ]
+        );
+
+        $response->assertOk();
+        $response->assertJson([
+            'status' => 'ok',
+            'message' => __('poller.method_updated'),
+        ]);
+        $response->assertJsonPath('method.type', 'icmp');
+        $response->assertJsonPath('method.affects_availability', true);
+    }
+
+    public function testDestroyReturnsJsonResponseWhenRequested(): void
+    {
+        $admin = User::factory()->create(['enabled' => 1]);
+        $admin->assignRole('admin');
+        $admin->givePermissionTo('device.update');
+
+        $device = Device::factory()->create();
+        DevicePollingMethod::factory()->create([
+            'device_id' => $device->device_id,
+            'method_type' => PollingMethodType::UnixAgent,
+            'enabled' => true,
+        ]);
+
+        $response = $this->actingAs($admin)->deleteJson(
+            route('device.edit.polling.destroy', ['device' => $device, 'methodType' => 'unix-agent'])
+        );
+
+        $response->assertOk();
+        $response->assertJson([
+            'status' => 'ok',
+            'message' => __('poller.method_removed'),
+        ]);
+    }
+
+    public function testUpdateSecretDataPersistsToDatabase(): void
+    {
+        $admin = User::factory()->create(['enabled' => 1]);
+        $admin->assignRole('admin');
+        $admin->givePermissionTo('device.update');
+        $admin->givePermissionTo('secret.update');
+
+        $secret = \App\Models\Secret::create([
+            'description' => 'Original SNMP Secret',
+            'secret_type' => \LibreNMS\Enum\SecretType::Snmp,
+            'default' => false,
+            'data' => ['version' => 'v2c', 'community' => 'public'],
+        ]);
+
+        $device = Device::factory()->create();
+        DevicePollingMethod::factory()->create([
+            'device_id' => $device->device_id,
+            'method_type' => PollingMethodType::Snmp,
+            'secret_id' => $secret->id,
+            'enabled' => true,
+        ]);
+
+        $response = $this->actingAs($admin)->putJson(
+            route('device.edit.polling.update', ['device' => $device, 'methodType' => 'snmp']),
+            [
+                'enabled' => '1',
+                'affects_availability' => '1',
+                'force_save' => '1',
+                'secret_id' => (string) $secret->id,
+                'is_editing_secret' => '1',
+                'description' => 'Updated SNMP Secret',
+                'secret_data' => [
+                    'version' => 'v2c',
+                    'community' => 'supersecret',
+                    'port' => 161,
+                    'retries' => 0,
+                    'timeout' => 1,
+                ],
+                'settings' => [
+                    'transport' => 'udp',
+                    'port' => 161,
+                    'timeout' => 1,
+                    'retries' => 0,
+                    'max_repeaters' => 0,
+                    'max_oid' => 10,
+                    'port_association_mode' => 'ifIndex',
+                ],
+            ]
+        );
+
+        $response->assertOk();
+        $this->assertEquals('Updated SNMP Secret', $secret->fresh()->description);
+        $this->assertEquals('supersecret', $secret->fresh()->data['community']);
+    }
+
+    public function testUpdateSecretWithCreateModeCreatesNewSecret(): void
+    {
+        $admin = User::factory()->create(['enabled' => 1]);
+        $admin->assignRole('admin');
+        $admin->givePermissionTo('device.update');
+        $admin->givePermissionTo('secret.create');
+        $admin->givePermissionTo('secret.update');
+
+        $originalSecret = \App\Models\Secret::create([
+            'description' => 'Shared SNMP Secret',
+            'secret_type' => \LibreNMS\Enum\SecretType::Snmp,
+            'default' => false,
+            'data' => ['version' => 'v2c', 'community' => 'public'],
+        ]);
+
+        $device = Device::factory()->create();
+        $pollingMethod = DevicePollingMethod::factory()->create([
+            'device_id' => $device->device_id,
+            'method_type' => PollingMethodType::Snmp,
+            'secret_id' => $originalSecret->id,
+            'enabled' => true,
+        ]);
+
+        $otherDevice = Device::factory()->create();
+        DevicePollingMethod::factory()->create([
+            'device_id' => $otherDevice->device_id,
+            'method_type' => PollingMethodType::Snmp,
+            'secret_id' => $originalSecret->id,
+            'enabled' => true,
+        ]);
+
+        $response = $this->actingAs($admin)->putJson(
+            route('device.edit.polling.update', ['device' => $device, 'methodType' => 'snmp']),
+            [
+                'enabled' => '1',
+                'affects_availability' => '1',
+                'force_save' => '1',
+                'secret_id' => (string) $originalSecret->id,
+                'is_editing_secret' => '1',
+                'secret_update_mode' => 'create',
+                'description' => 'New Dedicated Secret',
+                'secret_data' => [
+                    'version' => 'v2c',
+                    'community' => 'brandnew',
+                    'port' => 161,
+                    'retries' => 0,
+                    'timeout' => 1,
+                ],
+                'settings' => [
+                    'transport' => 'udp',
+                    'port' => 161,
+                    'timeout' => 1,
+                    'retries' => 0,
+                    'max_repeaters' => 0,
+                    'max_oid' => 10,
+                    'port_association_mode' => 'ifIndex',
+                ],
+            ]
+        );
+
+        $response->assertOk();
+        $this->assertEquals('public', $originalSecret->fresh()->data['community']);
+        $newSecretId = $pollingMethod->fresh()->secret_id;
+        $this->assertNotEquals($originalSecret->id, $newSecretId);
+        $newSecret = \App\Models\Secret::find($newSecretId);
+        $this->assertEquals('New Dedicated Secret', $newSecret->description);
+        $this->assertEquals('brandnew', $newSecret->data['community']);
+    }
+
+    public function testUpdateSecretWithCreateModeRejectsDuplicateDescription(): void
+    {
+        $admin = User::factory()->create(['enabled' => 1]);
+        $admin->assignRole('admin');
+        $admin->givePermissionTo('device.update');
+        $admin->givePermissionTo('secret.create');
+        $admin->givePermissionTo('secret.update');
+
+        $originalSecret = \App\Models\Secret::create([
+            'description' => 'Shared SNMP Secret',
+            'secret_type' => \LibreNMS\Enum\SecretType::Snmp,
+            'default' => false,
+            'data' => ['version' => 'v2c', 'community' => 'public'],
+        ]);
+
+        $device = Device::factory()->create();
+        DevicePollingMethod::factory()->create([
+            'device_id' => $device->device_id,
+            'method_type' => PollingMethodType::Snmp,
+            'secret_id' => $originalSecret->id,
+            'enabled' => true,
+        ]);
+
+        $otherDevice = Device::factory()->create();
+        DevicePollingMethod::factory()->create([
+            'device_id' => $otherDevice->device_id,
+            'method_type' => PollingMethodType::Snmp,
+            'secret_id' => $originalSecret->id,
+            'enabled' => true,
+        ]);
+
+        // Attempting to create a new secret with the exact same description as the existing one
+        $response = $this->actingAs($admin)->putJson(
+            route('device.edit.polling.update', ['device' => $device, 'methodType' => 'snmp']),
+            [
+                'enabled' => '1',
+                'affects_availability' => '1',
+                'secret_id' => (string) $originalSecret->id,
+                'is_editing_secret' => '1',
+                'secret_update_mode' => 'create',
+                'description' => 'Shared SNMP Secret',
+                'secret_data' => [
+                    'version' => 'v2c',
+                    'community' => 'newcommunity',
+                    'port' => 161,
+                    'retries' => 0,
+                    'timeout' => 1,
+                ],
+                'settings' => [
+                    'transport' => 'udp',
+                    'port' => 161,
+                    'timeout' => 1,
+                    'retries' => 0,
+                    'max_repeaters' => 0,
+                    'max_oid' => 10,
+                    'port_association_mode' => 'ifIndex',
+                ],
+            ]
+        );
+
+        $response->assertUnprocessable();
+        $response->assertJsonValidationErrors(['description']);
+    }
+
+    public function testUpdateUnsharedSecretWithSameDescriptionUpdatesInPlace(): void
+    {
+        $admin = User::factory()->create(['enabled' => 1]);
+        $admin->assignRole('admin');
+        $admin->givePermissionTo('device.update');
+        $admin->givePermissionTo('secret.update');
+
+        $secret = \App\Models\Secret::create([
+            'description' => 'Solo SNMP Secret',
+            'secret_type' => \LibreNMS\Enum\SecretType::Snmp,
+            'default' => false,
+            'data' => ['version' => 'v2c', 'community' => 'public'],
+        ]);
+
+        $device = Device::factory()->create();
+        $pollingMethod = DevicePollingMethod::factory()->create([
+            'device_id' => $device->device_id,
+            'method_type' => PollingMethodType::Snmp,
+            'secret_id' => $secret->id,
+            'enabled' => true,
+        ]);
+
+        $response = $this->actingAs($admin)->putJson(
+            route('device.edit.polling.update', ['device' => $device, 'methodType' => 'snmp']),
+            [
+                'enabled' => '1',
+                'affects_availability' => '1',
+                'force_save' => '1',
+                'secret_id' => (string) $secret->id,
+                'is_editing_secret' => '1',
+                'secret_update_mode' => 'create',
+                'description' => 'Solo SNMP Secret',
+                'secret_data' => [
+                    'version' => 'v2c',
+                    'community' => 'updated_community',
+                    'port' => 161,
+                    'retries' => 0,
+                    'timeout' => 1,
+                ],
+                'settings' => [
+                    'transport' => 'udp',
+                    'port' => 161,
+                    'timeout' => 1,
+                    'retries' => 0,
+                    'max_repeaters' => 0,
+                    'max_oid' => 10,
+                    'port_association_mode' => 'ifIndex',
+                ],
+            ]
+        );
+
+        $response->assertOk();
+        $this->assertEquals($secret->id, $pollingMethod->fresh()->secret_id);
+        $this->assertEquals('updated_community', $secret->fresh()->data['community']);
+        $this->assertEquals('Solo SNMP Secret', $secret->fresh()->description);
+    }
+
+    public function testUpdatePollingMethodUnreachableReturns422WithDetails(): void
+    {
+        $admin = User::factory()->create(['enabled' => 1]);
+        $admin->assignRole('admin');
+        $admin->givePermissionTo('device.update');
+
+        $device = Device::factory()->create(['hostname' => 'unreachable-device.invalid']);
+        DevicePollingMethod::factory()->create([
+            'device_id' => $device->device_id,
+            'method_type' => PollingMethodType::Icmp,
+            'enabled' => true,
+        ]);
+
+        $response = $this->actingAs($admin)->putJson(
+            route('device.edit.polling.update', ['device' => $device, 'methodType' => 'icmp']),
+            [
+                'enabled' => '1',
+                'affects_availability' => '1',
+                'settings' => [],
+            ]
+        );
+
+        $response->assertStatus(422);
+        $response->assertJson([
+            'status' => 'unreachable',
+            'message' => __('poller.reachability_failed', [
+                'hostname' => 'unreachable-device.invalid',
+                'method' => 'ICMP',
+            ]),
+        ]);
+    }
+
+    public function testUpdatePollingMethodForceSaveBypassesUnreachable(): void
+    {
+        $admin = User::factory()->create(['enabled' => 1]);
+        $admin->assignRole('admin');
+        $admin->givePermissionTo('device.update');
+
+        $device = Device::factory()->create(['hostname' => 'unreachable-device.invalid']);
+        $method = DevicePollingMethod::factory()->create([
+            'device_id' => $device->device_id,
+            'method_type' => PollingMethodType::Icmp,
+            'enabled' => true,
+            'affects_availability' => false,
+        ]);
+
+        $response = $this->actingAs($admin)->putJson(
+            route('device.edit.polling.update', ['device' => $device, 'methodType' => 'icmp']),
+            [
+                'enabled' => '1',
+                'affects_availability' => '1',
+                'force_save' => '1',
+                'settings' => [],
+            ]
+        );
+
+        $response->assertOk();
+        $this->assertTrue($method->fresh()->affects_availability);
+        $this->assertFalse($method->fresh()->last_check_successful);
+    }
+
+    public function testStorePollingMethodUnreachableReturns422(): void
+    {
+        $admin = User::factory()->create(['enabled' => 1]);
+        $admin->assignRole('admin');
+        $admin->givePermissionTo('device.update');
+
+        $device = Device::factory()->create(['hostname' => 'unreachable-device2.invalid']);
+
+        $response = $this->actingAs($admin)->postJson(
+            route('device.edit.polling.store', ['device' => $device]),
+            [
+                'method_type' => 'icmp',
+                'settings' => [],
+            ]
+        );
+
+        $response->assertStatus(422);
+        $response->assertJson([
+            'status' => 'unreachable',
+            'message' => __('poller.reachability_failed', [
+                'hostname' => 'unreachable-device2.invalid',
+                'method' => 'ICMP',
+            ]),
+        ]);
+        $this->assertDatabaseMissing('device_polling_methods', [
+            'device_id' => $device->device_id,
+            'method_type' => 'icmp',
+        ]);
+    }
+
+    public function testStorePollingMethodForceSaveBypassesUnreachable(): void
+    {
+        $admin = User::factory()->create(['enabled' => 1]);
+        $admin->assignRole('admin');
+        $admin->givePermissionTo('device.update');
+
+        $device = Device::factory()->create(['hostname' => 'unreachable-device3.invalid']);
+
+        $response = $this->actingAs($admin)->postJson(
+            route('device.edit.polling.store', ['device' => $device]),
+            [
+                'method_type' => 'icmp',
+                'force_save' => '1',
+                'settings' => [],
+            ]
+        );
+
+        $response->assertOk();
+        $this->assertDatabaseHas('device_polling_methods', [
+            'device_id' => $device->device_id,
+            'method_type' => 'icmp',
+            'last_check_successful' => 0,
+        ]);
+    }
+
+    public function testUpdatePollingMethodSettingsOnlyStoresOverridesAndFallsBackToDefaults(): void
+    {
+        $admin = User::factory()->create(['enabled' => 1]);
+        $admin->assignRole('admin');
+        $admin->givePermissionTo('device.update');
+
+        $device = Device::factory()->create();
+
+        $method = DevicePollingMethod::factory()->create([
+            'device_id' => $device->device_id,
+            'method_type' => PollingMethodType::UnixAgent,
+            'enabled' => true,
+            'settings' => [],
+        ]);
+
+        // 1. Update with empty port/timeout (should store empty array, not fallback values)
+        $response = $this->actingAs($admin)->putJson(
+            route('device.edit.polling.update', ['device' => $device, 'methodType' => 'unix-agent']),
+            [
+                'enabled' => '1',
+                'affects_availability' => '0',
+                'force_save' => '1',
+                'settings' => [
+                    'port' => '',
+                    'timeout' => '',
+                ],
+            ]
+        );
+        $response->assertOk();
+
+        $freshMethod = $method->fresh();
+        $this->assertEquals([], $freshMethod->settings);
+        $config = $freshMethod->toConfig();
+        $this->assertEquals(6556, $config->port);
+        $this->assertEquals(10, $config->timeout);
+
+        // 2. Update with custom port override
+        $response2 = $this->actingAs($admin)->putJson(
+            route('device.edit.polling.update', ['device' => $device, 'methodType' => 'unix-agent']),
+            [
+                'enabled' => '1',
+                'affects_availability' => '0',
+                'force_save' => '1',
+                'settings' => [
+                    'port' => 6557,
+                    'timeout' => '',
+                ],
+            ]
+        );
+        $response2->assertOk();
+
+        $freshMethod = $method->fresh();
+        $this->assertEquals(['port' => 6557], $freshMethod->settings);
+        $config = $freshMethod->toConfig();
+        $this->assertEquals(6557, $config->port);
+
+        // 3. Clear the override by submitting empty port
+        $response3 = $this->actingAs($admin)->putJson(
+            route('device.edit.polling.update', ['device' => $device, 'methodType' => 'unix-agent']),
+            [
+                'enabled' => '1',
+                'affects_availability' => '0',
+                'force_save' => '1',
+                'settings' => [
+                    'port' => '',
+                    'timeout' => '',
+                ],
+            ]
+        );
+        $response3->assertOk();
+
+        $freshMethod = $method->fresh();
+        $this->assertEquals([], $freshMethod->settings);
+        $config = $freshMethod->toConfig();
+        $this->assertEquals(6556, $config->port);
+    }
+}
