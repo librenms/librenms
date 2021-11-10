@@ -7,9 +7,8 @@ use App\Models\Eventlog;
 use LibreNMS\Data\Source\Icmp\Fping;
 use LibreNMS\Data\Source\Icmp\FpingResponse;
 use LibreNMS\Enum\Severity;
-use LibreNMS\Polling\ConnectivityHelper;
 
-class DeviceIsPingable
+class DeviceIcmpIsAvailable
 {
     public function __construct(
         private readonly Fping $fping,
@@ -18,9 +17,6 @@ class DeviceIsPingable
 
     public function execute(Device $device): FpingResponse
     {
-        if (! (new ConnectivityHelper($device))->icmpIsEnabled()) {
-            return FpingResponse::artificialUp($device->pollerTarget());
-        }
 
         $status = $this->fping->ping($device->pollerTarget(), $device->ipFamily());
 

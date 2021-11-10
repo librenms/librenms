@@ -3,51 +3,52 @@
 namespace App\Actions\Device;
 
 use App\Models\Device;
-use Carbon\Carbon;
-use LibreNMS\Polling\ConnectivityHelper;
+use LibreNMS\Enum\PollingMethodType;
 
 readonly class CheckDeviceAvailability
 {
     public function __construct(
-        private SetDeviceAvailability $setDeviceAvailability,
-        private DeviceIsPingable $deviceIsPingable,
-        private DeviceIsSnmpable $deviceIsSnmpable,
-        private DeviceMtuTest $deviceMtuTest,
-        private UpdateDeviceOutage $updateDeviceOutage,
+        private readonly SetDeviceAvailability $setDeviceAvailability,
+        private readonly DeviceIcmpIsAvailable $deviceIcmpIsAvailable,
+        private readonly DeviceSnmpIsAvailable $deviceSnmpIsAvailable,
+        private readonly DeviceMtuTest $deviceMtuTest,
     ) {
     }
 
     public function execute(Device $device, bool $commit = false): bool
     {
-        $connectivity = new ConnectivityHelper($device);
-        $ping_response = $this->deviceIsPingable->execute($device);
+        $icmpMethod = $device->getPollingMethod(PollingMethodType::Icmp);
+        if ($icmpMethod?->enabled) {
+            $ping_response = $this->deviceIcmpIsAvailable->execute($device);
+            $icmpMethod->last_check_successful = $ping_response->isAlive();
+            $icmpMethod->last_checked_at = now();
 
-        $results = [];
-        if ($connectivity->icmpIsEnabled()) {
-            $results['icmp'] = $ping_response->isAlive();
-            $device->last_ping = Carbon::now();
-            $device->last_ping_timetaken = $ping_response->avg_latency ?: $device->last_ping_timetaken;
-        }
-        if ($connectivity->snmpIsEnabled()) {
-            $results['snmp'] = $this->deviceIsSnmpable->execute($device);
-        }
-
-        $changed = $this->setDeviceAvailability->execute($device, $results);
-
-        if ($ping_response->isAlive()) {
-            $device->mtu_status = $this->deviceMtuTest->execute($device);
-        }
-
-        if ($commit) {
-            if ($connectivity->icmpIsEnabled()) {
+            if ($commit) {
                 $ping_response->saveStats($device);
             }
 
-            $device->save();
-
-            if ($changed) {
-                $this->updateDeviceOutage->execute($device);
+            if ($icmpMethod->last_check_successful) {
+                $device->mtu_status = $this->deviceMtuTest->execute($device);
             }
+        }
+
+        $snmpMethod = $device->getPollingMethod(PollingMethodType::Snmp);
+        if ($snmpMethod?->enabled) {
+            $icmp_success = ! $icmpMethod?->enabled || $icmpMethod->last_check_successful || ! $icmpMethod->affects_availability;
+            if ($icmp_success) {
+                $snmpMethod->last_check_successful = $this->deviceSnmpIsAvailable->execute($device);
+                $snmpMethod->last_checked_at = now();
+            } else {
+                $snmpMethod->last_check_successful = false;
+            }
+        }
+
+        $this->setDeviceAvailability->execute($device, $commit);
+
+        if ($commit) {
+            $icmpMethod?->save();
+            $snmpMethod?->save();
+            $device->save(); // confirm device is saved
         }
 
         return $device->status;
