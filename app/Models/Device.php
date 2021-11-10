@@ -443,6 +443,16 @@ class Device extends BaseModel
         $this->attributes['status'] = (int) $status;
     }
 
+    public function setSysDescrAttribute($sysDescr)
+    {
+        $this->attributes['sysDescr'] = $sysDescr === null ? null : trim(str_replace(chr(218), "\n", $sysDescr), "\\\" \r\n\t\0");
+    }
+
+    public function setSysNameAttribute($sysName)
+    {
+        $this->attributes['sysName'] = $sysName === null ? null : str_replace("\n", '', strtolower(trim($sysName)));
+    }
+
     // ---- Query scopes ----
 
     public function scopeIsUp($query)
