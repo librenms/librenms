@@ -1,7 +1,7 @@
 <?php
 
 /**
- * HostUnreachableSnmpException.php
+ * IpmiSecretDefinition.php
  *
  * -Description-
  *
@@ -20,25 +20,33 @@
  *
  * @link       https://www.librenms.org
  *
- * @copyright  2016 Tony Murray
+ * @copyright  2026 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
-namespace LibreNMS\Exceptions;
+namespace LibreNMS\Polling\Secrets\Definitions;
 
-class HostUnreachableSnmpException extends HostUnreachableException
+use App\View\FieldSchema\FieldDefinition;
+
+class IpmiSecretDefinition extends SecretDefinition
 {
     /**
-     * @var string
+     * @inheritDoc
      */
-    public $hostname;
-
-    public function __construct(string $hostname)
+    public function fields(): array
     {
-        $this->hostname = $hostname;
-        $message = trans('exceptions.host_unreachable.unsnmpable', [
-            'hostname' => $hostname,
-        ]);
-        parent::__construct($message);
+        return [
+            'username' => FieldDefinition::make('username', 'text')
+                ->label('Username')
+                ->rules(['nullable', 'string']),
+
+            'password' => FieldDefinition::make('password', 'password')
+                ->label('Password')
+                ->rules(['nullable', 'string']),
+
+            'kg_key' => FieldDefinition::make('kg_key', 'password')
+                ->label('KG/BMC Key')
+                ->rules(['nullable', 'string', 'size:40', 'regex:/^[a-fA-F0-9]+$/']),
+        ];
     }
 }
