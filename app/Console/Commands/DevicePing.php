@@ -2,7 +2,7 @@
 
 namespace App\Console\Commands;
 
-use App\Actions\Device\DeviceIsPingable;
+use App\Actions\Device\DeviceIcmpIsAvailable;
 use App\Console\LnmsCommand;
 use App\Facades\LibrenmsConfig;
 use App\Jobs\PingCheck;
@@ -32,7 +32,7 @@ class DevicePing extends LnmsCommand
      *
      * @return int
      */
-    public function handle(DeviceIsPingable $deviceIsPingable): int
+    public function handle(DeviceIcmpIsAvailable $deviceIsPingable): int
     {
         $spec = $this->argument('device spec');
 

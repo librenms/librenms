@@ -3,7 +3,7 @@
 /*
  * ConnectivityHelper.php
  *
- * Helper to check the connectivity to a device and optionally save metrics about that connectivity
+ * Helper to check polling method availability and module gating for a device.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -26,63 +26,90 @@
 
 namespace LibreNMS\Polling;
 
-use App\Facades\LibrenmsConfig;
 use App\Models\Device;
+use LibreNMS\Enum\PollingMethodType;
 
 readonly class ConnectivityHelper
 {
     public function __construct(
         private Device $device,
-    ) {
-    }
+    ) {}
 
     public function isAvailable(): bool
     {
-        return $this->device->status;
+        if (! $this->device->exists || $this->device->pollingMethods->isEmpty()) {
+            return true;
+        }
+
+        foreach ($this->device->pollingMethods as $method) {
+            if ($method->enabled && $method->affects_availability && ! $method->last_check_successful) {
+                return true;
+            }
+        }
+
+        return false;
     }
 
     public function hasAvailability(): bool
     {
-        return $this->icmpIsEnabled() || $this->snmpIsAvailable();
+        foreach ($this->device->pollingMethods as $method) {
+            if ($method->enabled && $method->affects_availability) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    public function methodIsEnabled(PollingMethodType $type): bool
+    {
+        return (bool) $this->device->getPollingMethod($type)?->enabled;
+    }
+
+    public function methodIsAvailable(PollingMethodType $type): bool
+    {
+        $method = $this->device->getPollingMethod($type);
+
+        return $method?->enabled && $method?->last_check_successful;
     }
 
     public function snmpIsEnabled(): bool
     {
-        return $this->device->snmp_disable === false;
-    }
-
-    public function icmpIsEnabled(): bool
-    {
-        return LibrenmsConfig::get('icmp_check') && ! ($this->device->exists && $this->device->getAttrib('override_icmp_disable') === 'true');
+        return $this->methodIsEnabled(PollingMethodType::Snmp);
     }
 
     public function snmpIsAvailable(): bool
     {
-        return $this->snmpIsEnabled() && $this->isAvailable() && ! str_contains($this->device->status_reason, 'snmp');
-    }
-
-    public function icmpIsAvailable(): bool
-    {
-        return $this->icmpIsEnabled() && $this->isAvailable() && ! str_contains($this->device->status_reason, 'icmp');
+        return $this->methodIsAvailable(PollingMethodType::Snmp);
     }
 
     public function ipmiIsEnabled(): bool
     {
-        return $this->device->exists && $this->device->getAttrib('ipmi_hostname');
+        return $this->methodIsEnabled(PollingMethodType::Ipmi);
     }
 
     public function ipmiIsAvailable(): bool
     {
-        return $this->ipmiIsEnabled();
+        return $this->methodIsAvailable(PollingMethodType::Ipmi);
+    }
+
+    public function icmpIsEnabled(): bool
+    {
+        return $this->methodIsEnabled(PollingMethodType::Icmp);
+    }
+
+    public function icmpIsAvailable(): bool
+    {
+        return $this->methodIsAvailable(PollingMethodType::Icmp);
     }
 
     public function unixAgentIsEnabled(): bool
     {
-        return false;
+        return $this->methodIsEnabled(PollingMethodType::UnixAgent);
     }
 
     public function unixAgentIsAvailable(): bool
     {
-        return $this->unixAgentIsEnabled();
+        return $this->methodIsAvailable(PollingMethodType::UnixAgent);
     }
 }

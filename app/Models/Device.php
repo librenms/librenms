@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\Data\DeviceCredentialRepository;
 use App\Facades\LibrenmsConfig;
 use App\Models\Traits\Filterable;
 use App\View\SimpleTemplate;
@@ -22,6 +23,7 @@ use Illuminate\Support\Str;
 use LibreNMS\Enum\AddressFamily;
 use LibreNMS\Enum\DeviceStatus;
 use LibreNMS\Enum\MaintenanceStatus;
+use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Exceptions\InvalidIpException;
 use LibreNMS\Util\IP;
 use LibreNMS\Util\IPv4;
@@ -46,13 +48,6 @@ class Device extends BaseModel
     public $timestamps = false;
     protected $primaryKey = 'device_id';
     protected $fillable = [
-        'authalgo',
-        'authlevel',
-        'authname',
-        'authpass',
-        'community',
-        'cryptoalgo',
-        'cryptopass',
         'disable_notify',
         'disabled',
         'features',
@@ -69,22 +64,15 @@ class Device extends BaseModel
         'override_sysLocation',
         'overwrite_ip',
         'poller_group',
-        'port',
         'port_association_mode',
         'purpose',
-        'retries',
         'serial',
-        'snmp_disable',
-        'snmp_max_repeaters',
-        'snmpver',
         'status',
         'status_reason',
         'sysDescr',
         'sysName',
         'sysObjectID',
         'snmpEngineID',
-        'timeout',
-        'transport',
         'type',
         'version',
         'uptime',
@@ -108,6 +96,7 @@ class Device extends BaseModel
         'poller_group',
         'groups.id',
         'serviceTemplates.id',
+        'secrets.secret_id',
         'search',
         'state',
     ];
@@ -127,7 +116,6 @@ class Device extends BaseModel
             'ignore' => 'boolean',
             'ignore_status' => 'boolean',
             'disabled' => 'boolean',
-            'snmp_disable' => 'boolean',
             'disable_notify' => 'boolean',
             'override_sysLocation' => 'boolean',
         ];
@@ -138,6 +126,15 @@ class Device extends BaseModel
     public static function findByHostname(string $hostname): ?Device
     {
         return static::where('hostname', $hostname)->first();
+    }
+
+    public function getPollingMethod(PollingMethodType $method): ?DevicePollingMethod
+    {
+        if ($this->exists || $this->relationLoaded('pollingMethods')) {
+            return $this->pollingMethods->firstWhere('method_type', $method);
+        }
+
+        return null;
     }
 
     public function pollerTarget(): string
@@ -191,26 +188,33 @@ class Device extends BaseModel
 
     public function hasSnmpInfo(): bool
     {
-        if ($this->snmpver == 'v3') {
-            if ($this->authlevel == 'authNoPriv') {
-                return ! empty($this->authname) && ! empty($this->authpass);
+        $snmp = $this->getPollingMethods()->snmp();
+
+        if ($snmp->version == 'v3') {
+            if ($snmp->authlevel == 'authNoPriv') {
+                return ! empty($snmp->authname) && ! empty($snmp->authpass);
             }
 
-            if ($this->authlevel == 'authPriv') {
-                return ! empty($this->authname)
-                    && ! empty($this->authpass)
-                    && ! empty($this->cryptoalgo)
-                    && ! empty($this->cryptopass);
+            if ($snmp->authlevel == 'authPriv') {
+                return ! empty($snmp->authname)
+                    && ! empty($snmp->authpass)
+                    && ! empty($snmp->cryptoalgo)
+                    && ! empty($snmp->cryptopass);
             }
 
-            return $this->authlevel !== 'noAuthNoPriv'; // reject if not noAuthNoPriv
+            return $snmp->authlevel !== 'noAuthNoPriv'; // reject if not noAuthNoPriv
         }
 
-        if ($this->snmpver == 'v2c' || $this->snmpver == 'v1') {
-            return ! empty($this->community);
+        if ($snmp->version == 'v2c' || $snmp->version == 'v1') {
+            return ! empty($snmp->community);
         }
 
         return false; // no known snmpver
+    }
+
+    public function getPollingMethods(): \LibreNMS\Polling\Method\PollingMethodRepository
+    {
+        return new \LibreNMS\Polling\Method\PollingMethodRepository($this);
     }
 
     /**
@@ -337,7 +341,7 @@ class Device extends BaseModel
             return $name;
         }
 
-        $length = \App\Facades\LibrenmsConfig::get('shorthost_target_length', $length);
+        $length = LibrenmsConfig::get('shorthost_target_length', $length);
         if ($length < strlen($name)) {
             $take = max(substr_count($name, '.', 0, $length), 1);
 
@@ -448,12 +452,17 @@ class Device extends BaseModel
         $this->save();
     }
 
-    public function getAttrib($name, $default = null)
+    public function hasAttrib($name): bool
+    {
+        return $this->attribs->contains('attrib_type', $name);
+    }
+
+    public function getAttrib($name, $default = null): mixed
     {
         return $this->attribs->pluck('attrib_value', 'attrib_type')->get($name, $default);
     }
 
-    public function setAttrib($name, $value)
+    public function setAttrib($name, $value): bool
     {
         $attrib = $this->attribs->first(fn ($item) => $item->attrib_type === $name);
 
@@ -839,8 +848,14 @@ class Device extends BaseModel
     }
 
     /**
-     * @return HasMany<HrDevice, $this>
+     * @return BelongsToMany<Secret, $this>
      */
+    public function secrets(): BelongsToMany
+    {
+        return $this->belongsToMany(Secret::class, 'device_polling_methods', 'device_id', 'secret_id')
+            ->withPivot('method_type');
+    }
+
     public function hostResources(): HasMany
     {
         return $this->hasMany(HrDevice::class, 'device_id');
@@ -943,7 +958,7 @@ class Device extends BaseModel
     }
 
     /**
-     * @return \Illuminate\Support\Collection<int, \App\Models\Link>
+     * @return \Illuminate\Support\Collection<int, Link>
      */
     public function allLinks(): \Illuminate\Support\Collection
     {
@@ -960,7 +975,7 @@ class Device extends BaseModel
 
     /**
      * @return HasMany<Ipv4Mac, $this>
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\MacAccounting, $this>
+     * @return HasMany<MacAccounting, $this>
      */
     public function macAccounting(): HasMany
     {
@@ -968,7 +983,7 @@ class Device extends BaseModel
     }
 
     /**
-     * @return \Illuminate\Database\Eloquent\Relations\HasMany<\App\Models\Ipv4Mac, $this>
+     * @return HasMany<Ipv4Mac, $this>
      */
     public function macs(): HasMany
     {
@@ -1094,6 +1109,11 @@ class Device extends BaseModel
     public function parents(): BelongsToMany
     {
         return $this->belongsToMany(self::class, 'device_relationships', 'child_device_id', 'parent_device_id');
+    }
+
+    public function pollingMethods(): HasMany
+    {
+        return $this->hasMany(DevicePollingMethod::class, 'device_id');
     }
 
     /**

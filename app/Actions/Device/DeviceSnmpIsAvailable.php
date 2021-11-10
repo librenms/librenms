@@ -5,7 +5,7 @@ namespace App\Actions\Device;
 use App\Models\Device;
 use SnmpQuery;
 
-class DeviceIsSnmpable
+class DeviceSnmpIsAvailable
 {
     public function execute(Device $device): bool
     {

@@ -351,7 +351,13 @@ class SnmpQueryMock implements SnmpQueryInterface
 
     private function community(): string
     {
-        $community = $this->device->community;
+        $snmpMethod = $this->device->getPollingMethods()->snmp();
+        $community = $snmpMethod ? ($snmpMethod->community ?? '') : '';
+
+        // Fallback for older mocks that might manually set attributes
+        if (empty($community)) {
+            $community = $this->device->getAttribute('community') ?? '';
+        }
 
         if (! empty($this->context)) {
             $community .= '_' . $this->context;
