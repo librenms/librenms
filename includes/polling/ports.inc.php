@@ -424,7 +424,7 @@ if (Config::get('enable_ports_poe')) {
 
         $port_ent_to_if = [];
         foreach ($ifTable_ifDescr as $if_index => $if_descr) {
-           $port_ent_to_if["1.$if_index"] = $if_index;
+            $port_ent_to_if["1.$if_index"] = $if_index;
         }
         foreach ($port_stats_poe as $p_index => $p_stats) {
             $if_id = $port_ent_to_if[$p_index];

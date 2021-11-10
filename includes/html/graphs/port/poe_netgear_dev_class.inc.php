@@ -18,7 +18,7 @@ if (Rrd::checkRrdExists($rrd_filename)) {
 
 $colours = 'mixed';
 $nototal = 1;
-#$unit_text = 'W';
+//$unit_text = 'W';
 $divider = 1;
 $scale_min = -1;
 
