@@ -170,8 +170,8 @@ final class OSDiscoveryTest extends TestCase
         Debug::set(false);
         Debug::setVerbose(false);
         Debug::disableCliDebugOutput();
-
-        $this->assertLessThan(60, microtime(true) - $start, "OS $expected_os took longer than 60s to detect");
+        $duration = microtime(true) - $start;
+        $this->assertLessThan(180, $duration, "OS $expected_os took longer than 180s to detect");
         $this->assertEquals($expected_os, $os, "Test file: $community.snmprec\n$output");
     }
 
@@ -183,16 +183,36 @@ final class OSDiscoveryTest extends TestCase
      */
     private function genDevice($community): Device
     {
-        return new Device([
+        $device = new Device([
             'hostname' => $this->getSnmpsimIp(),
-            'snmpver' => 'v2c',
+            'os' => 'generic',
+        ]);
+        
+        $device->setRelation('pollingMethods', collect([
+            new \App\Models\DevicePollingMethod([
+                'method_type' => \LibreNMS\Enum\PollingMethodType::Snmp,
+                'enabled' => true,
+                'affects_availability' => true,
+            ])
+        ]));
+        
+        $secret = new \App\Models\Secret([
+            'secret_type' => \LibreNMS\Enum\SecretType::Snmp,
+            'data' => [
+                'version' => 'v2c',
+                'community' => $community,
+            ],
+        ]);
+        $device->pollingMethods->first()->setRelation('secret', $secret);
+
+        $device->pollingMethods->first()->settings = [
             'port' => $this->getSnmpsimPort(),
             'timeout' => 3,
             'retries' => 0,
             'snmp_max_repeaters' => 10,
-            'community' => $community,
-            'os' => 'generic',
-        ]);
+        ];
+
+        return $device;
     }
 
     /**

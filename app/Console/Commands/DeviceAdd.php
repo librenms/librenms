@@ -6,10 +6,14 @@ use App\Actions\Device\ValidateDeviceAndCreate;
 use App\Console\LnmsCommand;
 use App\Facades\LibrenmsConfig;
 use App\Models\Device;
+use App\Models\DevicePollingMethod;
 use App\Models\PollerGroup;
+use App\Models\Secret;
 use Exception;
 use Illuminate\Validation\Rule;
+use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Enum\PortAssociationMode;
+use LibreNMS\Enum\SecretType;
 use LibreNMS\Exceptions\HostExistsException;
 use LibreNMS\Exceptions\HostnameExistsException;
 use LibreNMS\Exceptions\HostUnreachableException;
@@ -89,26 +93,64 @@ class DeviceAdd extends LnmsCommand
         $device = new Device([
             'hostname' => $this->argument('device spec'),
             'display_template' => $this->option('display-name'),
-            'snmpver' => $this->option('v3') ? 'v3' : ($this->option('v2c') ? 'v2c' : ($this->option('v1') ? 'v1' : '')),
-            'port' => $this->option('port'),
-            'transport' => $this->option('transport'),
             'poller_group' => $this->option('poller-group'),
             'port_association_mode' => PortAssociationMode::getId($this->option('port-association-mode')),
-            'community' => $this->option('community'),
-            'authlevel' => ($auth ? 'auth' : 'noAuth') . (($priv && $auth) ? 'Priv' : 'NoPriv'),
-            'authname' => $this->option('security-name'),
-            'authpass' => $this->option('auth-password'),
-            'authalgo' => $this->option('auth-protocol'),
-            'cryptopass' => $this->option('privacy-password'),
-            'cryptoalgo' => $this->option('privacy-protocol'),
         ]);
 
+        $pollingMethods = collect();
+
+        // ICMP polling method is always added
+        $pollingMethods->push(new DevicePollingMethod([
+            'method_type' => PollingMethodType::Icmp,
+            'enabled' => true,
+            'affects_availability' => false,
+        ]));
+
         if ($this->option('ping-only')) {
-            $device->snmp_disable = true;
             $device->os = $this->option('os');
             $device->hardware = $this->option('hardware');
             $device->sysName = $this->option('sysName');
+        } else {
+            // SNMP polling method is added if not ping-only
+            $snmpPollingMethod = new DevicePollingMethod([
+                'method_type' => PollingMethodType::Snmp,
+                'enabled' => true,
+                'affects_availability' => true,
+                'settings' => array_filter([
+                    'port' => $this->option('port'),
+                    'transport' => $this->option('transport'),
+                ]),
+            ]);
+
+            // Build SnmpSecret if custom credentials were provided
+            $snmpver = $this->option('v3') ? 'v3' : ($this->option('v2c') ? 'v2c' : ($this->option('v1') ? 'v1' : ''));
+            $community = $this->option('community');
+
+            if ($snmpver || $community || $auth || $priv) {
+                $snmpData = [
+                    'version' => $snmpver ?: 'v2c',
+                    'community' => $community,
+                    'authlevel' => ($auth ? 'auth' : 'noAuth') . (($priv && $auth) ? 'Priv' : 'NoPriv'),
+                    'authname' => $this->option('security-name') ?: 'root',
+                    'authpass' => $auth,
+                    'authalgo' => $this->option('auth-protocol') ?: 'MD5',
+                    'cryptopass' => $priv,
+                    'cryptoalgo' => $this->option('privacy-protocol') ?: 'AES',
+                ];
+
+                $secret = new Secret([
+                    'secret_type' => SecretType::Snmp,
+                    'description' => 'SNMP ' . $device->hostname,
+                    'default' => false,
+                    'data' => $snmpData,
+                ]);
+                $snmpPollingMethod->setRelation('secret', $secret);
+            }
+
+            $pollingMethods->push($snmpPollingMethod);
         }
+
+        $device->setRelation('pollingMethods', $pollingMethods);
 
         try {
             $result = (new ValidateDeviceAndCreate($device, $this->option('force'), $this->option('ping-fallback')))->execute();

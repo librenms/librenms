@@ -3,8 +3,7 @@
 namespace LibreNMS\Tests\Unit;
 
 use App\Actions\Device\CheckDeviceAvailability;
-use App\Actions\Device\DeviceIsSnmpable;
-use App\Facades\LibrenmsConfig;
+use App\Actions\Device\DeviceSnmpIsAvailable;
 use App\Models\Device;
 use LibreNMS\Data\Source\Icmp\Fping;
 use LibreNMS\Data\Source\Icmp\FpingResponse;
@@ -38,15 +37,13 @@ final class ConnectivityHelperTest extends TestCase
             return $mock;
         });
 
-        // not called when snmp is disabled
+        // not called when snmp is disabled or ping up
         $up = new SnmpResponse('SNMPv2-MIB::sysObjectID.0 = .1');
         $down = new SnmpResponse('', '', 1);
         SnmpQuery::partialMock()->shouldReceive('get')
-            ->times(8)
+            ->times(6)
             ->andReturn(
                 $up,
-                $up,
-                $down,
                 $down,
                 $up,
                 $up,
@@ -55,10 +52,21 @@ final class ConnectivityHelperTest extends TestCase
             );
 
         $device = new Device();
+        $icmpMethod = new \App\Models\DevicePollingMethod([
+            'method_type' => \LibreNMS\Enum\PollingMethodType::Icmp,
+            'enabled' => true,
+            'affects_availability' => true,
+        ]);
+        $snmpMethod = new \App\Models\DevicePollingMethod([
+            'method_type' => \LibreNMS\Enum\PollingMethodType::Snmp,
+            'enabled' => true,
+            'affects_availability' => true,
+        ]);
+        $device->setRelation('pollingMethods', collect([$icmpMethod, $snmpMethod]));
 
         /** ping and snmp enabled */
-        LibrenmsConfig::set('icmp_check', true);
-        $device->snmp_disable = false;
+        $icmpMethod->enabled = true;
+        $snmpMethod->enabled = true;
 
         // ping up, snmp up
         $this->assertTrue(app(CheckDeviceAvailability::class)->execute($device));
@@ -68,7 +76,7 @@ final class ConnectivityHelperTest extends TestCase
         // ping down, snmp up
         $this->assertFalse(app(CheckDeviceAvailability::class)->execute($device));
         $this->assertFalse($device->status);
-        $this->assertEquals('icmp', $device->status_reason);
+        $this->assertEquals('icmp,snmp', $device->status_reason);
 
         // ping up, snmp down
         $this->assertFalse(app(CheckDeviceAvailability::class)->execute($device));
@@ -81,8 +89,10 @@ final class ConnectivityHelperTest extends TestCase
         $this->assertEquals('icmp,snmp', $device->status_reason);
 
         /** ping disabled and snmp enabled */
-        LibrenmsConfig::set('icmp_check', false);
-        $device->snmp_disable = false;
+        $device->status = true;
+        $device->status_reason = '';
+        $icmpMethod->enabled = false;
+        $snmpMethod->enabled = true;
 
         // ping up, snmp up
         $this->assertTrue(app(CheckDeviceAvailability::class)->execute($device));
@@ -105,8 +115,10 @@ final class ConnectivityHelperTest extends TestCase
         $this->assertEquals('snmp', $device->status_reason);
 
         /** ping enabled and snmp disabled */
-        LibrenmsConfig::set('icmp_check', true);
-        $device->snmp_disable = true;
+        $device->status = true;
+        $device->status_reason = '';
+        $icmpMethod->enabled = true;
+        $snmpMethod->enabled = false;
 
         // ping up, snmp up
         $this->assertTrue(app(CheckDeviceAvailability::class)->execute($device));
@@ -129,8 +141,10 @@ final class ConnectivityHelperTest extends TestCase
         $this->assertEquals('icmp', $device->status_reason);
 
         /** ping and snmp disabled */
-        LibrenmsConfig::set('icmp_check', false);
-        $device->snmp_disable = true;
+        $device->status = true;
+        $device->status_reason = '';
+        $icmpMethod->enabled = false;
+        $snmpMethod->enabled = false;
 
         // ping up, snmp up
         $this->assertTrue(app(CheckDeviceAvailability::class)->execute($device));
@@ -166,9 +180,9 @@ final class ConnectivityHelperTest extends TestCase
 
         $device = new Device;
 
-        $this->assertTrue((new DeviceIsSnmpable)->execute($device));
-        $this->assertTrue((new DeviceIsSnmpable)->execute($device));
-        $this->assertTrue((new DeviceIsSnmpable)->execute($device));
-        $this->assertFalse((new DeviceIsSnmpable)->execute($device));
+        $this->assertTrue((new DeviceSnmpIsAvailable)->execute($device));
+        $this->assertTrue((new DeviceSnmpIsAvailable)->execute($device));
+        $this->assertTrue((new DeviceSnmpIsAvailable)->execute($device));
+        $this->assertFalse((new DeviceSnmpIsAvailable)->execute($device));
     }
 }
