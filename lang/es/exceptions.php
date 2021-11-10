@@ -26,8 +26,6 @@ return [
         'unpingable' => 'No se pudo hacer ping a :hostname (:ip)',
         'unsnmpable' => 'No se pudo conectar a :hostname, verifique los datos SNMP y la accesibilidad SNMP',
         'unresolvable' => 'El nombre de host no pudo resolverse a una IP',
-        'no_reply_community' => 'SNMP :version: Sin respuesta con comunidad :credentials',
-        'no_reply_credentials' => 'SNMP :version: Sin respuesta con credenciales :credentials',
     ],
     'ldap_missing' => [
         'title' => 'Soporte PHP LDAP faltante',

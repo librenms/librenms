@@ -154,7 +154,6 @@ final class OSDiscoveryTest extends TestCase
 
         $community = $filename ?: $expected_os;
         $os = Core::detectOS($this->genDevice($community));
-
         if ($os !== $expected_os) {
             // Re-run with full debug output only on mismatch to capture diagnostics
             $log_driver = Log::getDefaultDriver();
@@ -186,16 +185,38 @@ final class OSDiscoveryTest extends TestCase
      */
     private function genDevice($community): Device
     {
-        return new Device([
+        $device = new Device([
             'hostname' => $this->getSnmpsimIp(),
-            'snmpver' => 'v2c',
-            'port' => $this->getSnmpsimPort(),
-            'timeout' => 3,
-            'retries' => 0,
-            'snmp_max_repeaters' => 10,
-            'community' => $community,
             'os' => 'generic',
         ]);
+
+        $device->setRelation('pollingMethods', collect([
+            new \App\Models\DevicePollingMethod([
+                'method_type' => \LibreNMS\Enum\PollingMethodType::Snmp,
+                'enabled' => true,
+                'affects_availability' => true,
+            ]),
+        ]));
+
+        $secret = new \App\Models\Secret([
+            'secret_type' => \LibreNMS\Enum\SecretType::Snmp,
+            'data' => [
+                'version' => 'v2c',
+                'community' => $community,
+            ],
+        ]);
+        $snmpMethod = $device->pollingMethods->first();
+        if ($snmpMethod) {
+            $snmpMethod->setRelation('secret', $secret);
+            $snmpMethod->settings = [
+                'port' => $this->getSnmpsimPort(),
+                'timeout' => 3,
+                'retries' => 0,
+                'snmp_max_repeaters' => 10,
+            ];
+        }
+
+        return $device;
     }
 
     /**

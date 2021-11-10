@@ -27,10 +27,13 @@
 namespace LibreNMS\Util;
 
 use App\Models\Callback;
+use App\Models\Secret;
 use Illuminate\Database\Query\Builder;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
+use LibreNMS\Exceptions\SecretDecryptionException;
+use LibreNMS\Polling\Secrets\Data\SnmpSecretData;
 
 class Stats
 {
@@ -107,7 +110,7 @@ class Stats
         return [
             'alert_rules' => $this->selectTotal(DB::table('alert_rules')->where('disabled', 0), ['severity']),
             'alert_templates' => $this->selectTotal('alert_templates'),
-            'api_tokens' => $this->selectTotal('personal_access_tokens')->where(fn ($query) => $query->whereNull('expires_at')->orWhere('expires_at', '>', now())),
+            'api_tokens' => $this->selectTotal(DB::table('personal_access_tokens')->where(fn ($query) => $query->whereNull('expires_at')->orWhere('expires_at', '>', now()))),
             'applications' => $this->selectTotal('applications', ['app_type']),
             'bgppeer_state' => $this->selectTotal('bgpPeers', ['bgpPeerState']),
             'bgppeer_status' => $this->selectTotal('bgpPeers', ['bgpPeerAdminStatus']),
@@ -115,7 +118,7 @@ class Stats
             'cef' => $this->selectTotal('cef_switching'),
             'mempool' => $this->selectTotal('mempools', ['mempool_descr']),
             'dbschema' => $this->selectStatic(DB::table('migrations')->count()),
-            'snmp_version' => $this->selectTotal('devices', ['snmpver']),
+            'snmp_version' => $this->selectSnmpVersions(),
             'os' => $this->selectTotal('devices', ['os']),
             'type' => $this->selectTotal('devices', ['type']),
             'hardware' => $this->selectTotal('devices', ['hardware']),
@@ -132,7 +135,7 @@ class Stats
             'ospfv3_links' => $this->selectTotal('ospfv3_ports', ['ospfv3IfType']),
             'arch' => $this->selectTotal('packages', ['arch']),
             'pollers' => $this->selectTotal('pollers'),
-            'port_assoc' => $this->selectTotal('devices', ['port_association_mode']),
+            'port_assoc' => DB::table('device_polling_methods')->where('method_type', 'snmp')->selectRaw('JSON_UNQUOTE(JSON_EXTRACT(settings, "$.port_association_mode")) AS port_association_mode, COUNT(*) AS total')->groupBy('port_association_mode')->get(),
             'port_type' => $this->selectTotal('ports', ['ifType']),
             'port_ifspeed' => DB::table('ports')->select([DB::raw('COUNT(*) AS `total`'), DB::raw('ROUND(`ifSpeed`/1000/1000) as ifSpeed')])->groupBy(['ifSpeed'])->get(),
             'port_vlans' => $this->selectTotal('ports_vlans', ['state']),
@@ -189,6 +192,33 @@ class Stats
      * @param  array  $groups
      * @return Collection
      */
+    /**
+     * The SNMP version is stored in the encrypted secret, so it can't be grouped in SQL.
+     */
+    private function selectSnmpVersions(): Collection
+    {
+        $methodsPerSecret = DB::table('device_polling_methods')
+            ->where('method_type', 'snmp')
+            ->whereNotNull('secret_id')
+            ->groupBy('secret_id')
+            ->selectRaw('secret_id, COUNT(*) AS total')
+            ->pluck('total', 'secret_id');
+
+        $totals = [];
+        foreach (Secret::whereIn('id', $methodsPerSecret->keys())->get() as $secret) {
+            try {
+                $version = SnmpSecretData::fromArray($secret->data)->version;
+            } catch (SecretDecryptionException) {
+                $version = 'unknown';
+            }
+            $totals[$version] = ($totals[$version] ?? 0) + $methodsPerSecret[$secret->id];
+        }
+
+        return collect($totals)
+            ->map(fn (int $total, string $version) => (object) ['total' => $total, 'snmpver' => $version])
+            ->values();
+    }
+
     private function selectTotal($table, array $groups = []): Collection
     {
         $query = $table instanceof Builder ? $table : DB::table($table);

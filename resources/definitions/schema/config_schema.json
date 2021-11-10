@@ -79,13 +79,32 @@
                         "properties": {
                             "type": {"const": "select-dynamic"},
                             "options": {
-                                "type": "object",
                                 "properties": {
                                     "allowClear": {"type": "boolean"},
                                     "callback": {"type": "string"},
                                     "placeholder": {"type": "string"},
                                     "target": {"type": "string"}
                                 },
+                                "type": "object",
+                                "minProperties": 1,
+                                "required": ["target"],
+                                "additionalProperties": false
+                            },
+                            "validate": {
+                                "minProperties": 1
+                            }
+                        },
+                        "required": ["options", "validate"]
+                    },
+                    {
+                        "properties": {
+                            "type": {"const": "array-dynamic"},
+                            "options": {
+                                "properties": {
+                                    "placeholder": {"type": "string"},
+                                    "target": {"type": "string"}
+                                },
+                                "type": "object",
                                 "minProperties": 1,
                                 "required": ["target"],
                                 "additionalProperties": false
@@ -126,8 +145,6 @@
                                     "color",
                                     "float",
                                     "graph",
-                                    "snmp3auth",
-                                    "password-array",
                                     "ad-groups",
                                     "oxidized-maps",
                                     "executable",

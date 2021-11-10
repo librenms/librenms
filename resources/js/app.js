@@ -8,10 +8,10 @@ import "../css/app.css";
 import "./bootstrap";
 
 // Gridstack (bundled by Vite)
-import 'gridstack/dist/gridstack.min.css';
-import {GridStack} from 'gridstack';
+import "gridstack/dist/gridstack.min.css";
+import { GridStack } from "gridstack";
 import Vue from "vue";
-import {i18n} from "./plugins/i18n.js"; // translation
+import { i18n } from "./plugins/i18n.js"; // translation
 import ToggleButton from "vue-js-toggle-button";
 import VTooltip from "v-tooltip";
 import vSelect from "vue-select";
@@ -28,7 +28,7 @@ import portLink from "./components/alpine/portLink.js";
 import filterBarComponent from "./components/alpine/filterBarComponent.js";
 import remoteDropdown from "./components/alpine/remoteDropdown.js";
 import LibreNMSDate from "./datetime.js";
-import LibreNMSUrl from './url.js';
+import LibreNMSUrl from "./url.js";
 
 window.GridStack = GridStack;
 
