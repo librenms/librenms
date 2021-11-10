@@ -45,6 +45,7 @@ use LibreNMS\Alerting\QueryBuilderParser;
 use LibreNMS\Enum\AlertRuleOperationPhase;
 use LibreNMS\Enum\AlertState;
 use LibreNMS\Enum\MaintenanceStatus;
+use LibreNMS\Enum\PollingMethodType;
 use LibreNMS\Enum\Severity;
 use LibreNMS\Exceptions\AlertTransportDeliveryException;
 use LibreNMS\Exceptions\RrdException;
@@ -128,7 +129,6 @@ class RunAlerts
         $obj['proc'] = $alert['proc'];
         $obj['status'] = $device->status;
         $obj['status_reason'] = $device->status_reason;
-
         if ((new ConnectivityHelper($device))->icmpIsEnabled()) {
             try {
                 $last_ping = Rrd::lastUpdate(Rrd::name($device->hostname, 'icmp-perf'));

@@ -47,9 +47,9 @@ class EditTabs extends Component
                 'text' => __('Device Settings'),
                 'link' => route('device.edit', $this->device->device_id),
             ],
-            'snmp' => [
-                'text' => 'SNMP',
-                'link' => url('/device/device=' . $this->device->device_id . '/tab=edit/section=snmp/'),
+            'polling' => [
+                'text' => __('Polling'),
+                'link' => route('device.edit.polling', $this->device->device_id),
             ],
         ];
 
@@ -99,11 +99,6 @@ class EditTabs extends Component
                 'link' => url('/device/device=' . $this->device->device_id . '/tab=edit/section=services/'),
             ];
         }
-
-        $this->tabs['ipmi'] = [
-            'text' => __('IPMI'),
-            'link' => url('/device/device=' . $this->device->device_id . '/tab=edit/section=ipmi/'),
-        ];
 
         if ($this->device->sensors()->exists()) {
             $this->tabs['health'] = [
