@@ -22717,8 +22717,8 @@
                     "ifName": "ve55",
                     "portName": null,
                     "ifIndex": 16777271,
-                    "ifSpeed": null,
-                    "ifSpeed_prev": 0,
+                    "ifSpeed": 0,
+                    "ifSpeed_prev": null,
                     "ifConnectorPresent": "false",
                     "ifPromiscuousMode": "true",
                     "ifOperStatus": "up",
@@ -22822,8 +22822,8 @@
                     "ifName": "ve66",
                     "portName": null,
                     "ifIndex": 16777282,
-                    "ifSpeed": null,
-                    "ifSpeed_prev": 0,
+                    "ifSpeed": 0,
+                    "ifSpeed_prev": null,
                     "ifConnectorPresent": "false",
                     "ifPromiscuousMode": "true",
                     "ifOperStatus": "up",
@@ -22927,8 +22927,8 @@
                     "ifName": "loopback1",
                     "portName": null,
                     "ifIndex": 33554433,
-                    "ifSpeed": null,
-                    "ifSpeed_prev": 0,
+                    "ifSpeed": 0,
+                    "ifSpeed_prev": null,
                     "ifConnectorPresent": "false",
                     "ifPromiscuousMode": "true",
                     "ifOperStatus": "up",
@@ -24255,6 +24255,9 @@
                     "bgpPeerRemoteAs": 23456,
                     "bgpPeerState": "idle",
                     "bgpPeerAdminStatus": "stop",
+                    "bgpPeerLastErrorCode": null,
+                    "bgpPeerLastErrorSubCode": null,
+                    "bgpPeerLastErrorText": null,
                     "bgpLocalAddr": "0.0.0.0",
                     "bgpPeerRemoteAddr": "0.0.0.0",
                     "bgpPeerDescr": "",
@@ -24266,10 +24269,7 @@
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": "",
                     "bgpLocalAs": 65065,
-                    "vrfLocalAs": null,
-                    "bgpPeerLastErrorCode": null,
-                    "bgpPeerLastErrorSubCode": null,
-                    "bgpPeerLastErrorText": null
+                    "vrfLocalAs": null
                 },
                 {
                     "astext": "",
@@ -24277,6 +24277,9 @@
                     "bgpPeerRemoteAs": 65065,
                     "bgpPeerState": "idle",
                     "bgpPeerAdminStatus": "stop",
+                    "bgpPeerLastErrorCode": null,
+                    "bgpPeerLastErrorSubCode": null,
+                    "bgpPeerLastErrorText": null,
                     "bgpLocalAddr": "0.0.0.0",
                     "bgpPeerRemoteAddr": "0.0.0.0",
                     "bgpPeerDescr": "",
@@ -24288,10 +24291,7 @@
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": "",
                     "bgpLocalAs": 65065,
-                    "vrfLocalAs": null,
-                    "bgpPeerLastErrorCode": null,
-                    "bgpPeerLastErrorSubCode": null,
-                    "bgpPeerLastErrorText": null
+                    "vrfLocalAs": null
                 },
                 {
                     "astext": "",
@@ -24299,6 +24299,9 @@
                     "bgpPeerRemoteAs": 65065,
                     "bgpPeerState": "idle",
                     "bgpPeerAdminStatus": "stop",
+                    "bgpPeerLastErrorCode": null,
+                    "bgpPeerLastErrorSubCode": null,
+                    "bgpPeerLastErrorText": null,
                     "bgpLocalAddr": "0.0.0.0",
                     "bgpPeerRemoteAddr": "0.0.0.0",
                     "bgpPeerDescr": "",
@@ -24310,10 +24313,7 @@
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": "",
                     "bgpLocalAs": 65065,
-                    "vrfLocalAs": null,
-                    "bgpPeerLastErrorCode": null,
-                    "bgpPeerLastErrorSubCode": null,
-                    "bgpPeerLastErrorText": null
+                    "vrfLocalAs": null
                 },
                 {
                     "astext": "",
@@ -24321,6 +24321,9 @@
                     "bgpPeerRemoteAs": 23456,
                     "bgpPeerState": "idle",
                     "bgpPeerAdminStatus": "stop",
+                    "bgpPeerLastErrorCode": null,
+                    "bgpPeerLastErrorSubCode": null,
+                    "bgpPeerLastErrorText": null,
                     "bgpLocalAddr": "0.0.0.0",
                     "bgpPeerRemoteAddr": "0.0.0.0",
                     "bgpPeerDescr": "",
@@ -24332,10 +24335,7 @@
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": "",
                     "bgpLocalAs": 65065,
-                    "vrfLocalAs": null,
-                    "bgpPeerLastErrorCode": null,
-                    "bgpPeerLastErrorSubCode": null,
-                    "bgpPeerLastErrorText": null
+                    "vrfLocalAs": null
                 },
                 {
                     "astext": "",
@@ -24343,6 +24343,9 @@
                     "bgpPeerRemoteAs": 23456,
                     "bgpPeerState": "idle",
                     "bgpPeerAdminStatus": "stop",
+                    "bgpPeerLastErrorCode": null,
+                    "bgpPeerLastErrorSubCode": null,
+                    "bgpPeerLastErrorText": null,
                     "bgpLocalAddr": "0.0.0.0",
                     "bgpPeerRemoteAddr": "0.0.0.0",
                     "bgpPeerDescr": "",
@@ -24354,10 +24357,7 @@
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": "",
                     "bgpLocalAs": 65065,
-                    "vrfLocalAs": null,
-                    "bgpPeerLastErrorCode": null,
-                    "bgpPeerLastErrorSubCode": null,
-                    "bgpPeerLastErrorText": null
+                    "vrfLocalAs": null
                 }
             ],
             "bgpPeers_cbgp": []
@@ -24370,6 +24370,9 @@
                     "bgpPeerRemoteAs": 23456,
                     "bgpPeerState": "established",
                     "bgpPeerAdminStatus": "start",
+                    "bgpPeerLastErrorCode": null,
+                    "bgpPeerLastErrorSubCode": null,
+                    "bgpPeerLastErrorText": null,
                     "bgpLocalAddr": "172.31.31.20",
                     "bgpPeerRemoteAddr": "0.0.0.0",
                     "bgpPeerDescr": "",
@@ -24381,10 +24384,7 @@
                     "bgpPeerInUpdateElapsedTime": 836,
                     "context_name": "",
                     "bgpLocalAs": 65065,
-                    "vrfLocalAs": null,
-                    "bgpPeerLastErrorCode": null,
-                    "bgpPeerLastErrorSubCode": null,
-                    "bgpPeerLastErrorText": null
+                    "vrfLocalAs": null
                 },
                 {
                     "astext": "",
@@ -24392,6 +24392,9 @@
                     "bgpPeerRemoteAs": 65065,
                     "bgpPeerState": "connect",
                     "bgpPeerAdminStatus": "start",
+                    "bgpPeerLastErrorCode": null,
+                    "bgpPeerLastErrorSubCode": null,
+                    "bgpPeerLastErrorText": null,
                     "bgpLocalAddr": "192.0.2.5",
                     "bgpPeerRemoteAddr": "0.0.0.0",
                     "bgpPeerDescr": "",
@@ -24403,10 +24406,7 @@
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": "",
                     "bgpLocalAs": 65065,
-                    "vrfLocalAs": null,
-                    "bgpPeerLastErrorCode": null,
-                    "bgpPeerLastErrorSubCode": null,
-                    "bgpPeerLastErrorText": null
+                    "vrfLocalAs": null
                 },
                 {
                     "astext": "",
@@ -24414,6 +24414,9 @@
                     "bgpPeerRemoteAs": 65065,
                     "bgpPeerState": "idle",
                     "bgpPeerAdminStatus": "stop",
+                    "bgpPeerLastErrorCode": null,
+                    "bgpPeerLastErrorSubCode": null,
+                    "bgpPeerLastErrorText": null,
                     "bgpLocalAddr": "0.0.0.0",
                     "bgpPeerRemoteAddr": "0.0.0.0",
                     "bgpPeerDescr": "",
@@ -24425,10 +24428,7 @@
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": "",
                     "bgpLocalAs": 65065,
-                    "vrfLocalAs": null,
-                    "bgpPeerLastErrorCode": null,
-                    "bgpPeerLastErrorSubCode": null,
-                    "bgpPeerLastErrorText": null
+                    "vrfLocalAs": null
                 },
                 {
                     "astext": "",
@@ -24436,6 +24436,9 @@
                     "bgpPeerRemoteAs": 23456,
                     "bgpPeerState": "connect",
                     "bgpPeerAdminStatus": "start",
+                    "bgpPeerLastErrorCode": null,
+                    "bgpPeerLastErrorSubCode": null,
+                    "bgpPeerLastErrorText": null,
                     "bgpLocalAddr": "192.0.2.5",
                     "bgpPeerRemoteAddr": "0.0.0.0",
                     "bgpPeerDescr": "",
@@ -24447,10 +24450,7 @@
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": "",
                     "bgpLocalAs": 65065,
-                    "vrfLocalAs": null,
-                    "bgpPeerLastErrorCode": null,
-                    "bgpPeerLastErrorSubCode": null,
-                    "bgpPeerLastErrorText": null
+                    "vrfLocalAs": null
                 },
                 {
                     "astext": "",
@@ -24458,6 +24458,9 @@
                     "bgpPeerRemoteAs": 23456,
                     "bgpPeerState": "idle",
                     "bgpPeerAdminStatus": "stop",
+                    "bgpPeerLastErrorCode": null,
+                    "bgpPeerLastErrorSubCode": null,
+                    "bgpPeerLastErrorText": null,
                     "bgpLocalAddr": "0.0.0.0",
                     "bgpPeerRemoteAddr": "0.0.0.0",
                     "bgpPeerDescr": "",
@@ -24469,10 +24472,7 @@
                     "bgpPeerInUpdateElapsedTime": 0,
                     "context_name": "",
                     "bgpLocalAs": 65065,
-                    "vrfLocalAs": null,
-                    "bgpPeerLastErrorCode": null,
-                    "bgpPeerLastErrorSubCode": null,
-                    "bgpPeerLastErrorText": null
+                    "vrfLocalAs": null
                 }
             ],
             "bgpPeers_cbgp": []

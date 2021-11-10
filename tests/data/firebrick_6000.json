@@ -667,8 +667,8 @@
                     "ifName": "Port-1",
                     "portName": null,
                     "ifIndex": 2,
-                    "ifSpeed": null,
-                    "ifSpeed_prev": 0,
+                    "ifSpeed": 0,
+                    "ifSpeed_prev": null,
                     "ifConnectorPresent": "true",
                     "ifPromiscuousMode": "false",
                     "ifOperStatus": "down",
@@ -1950,6 +1950,20 @@
                 }
             ],
             "bgpPeers_cbgp": []
+        }
+    },
+    "vrf": {
+        "discovery": {
+            "vrfs": [
+                {
+                    "vrf_oid": "firebrick.44",
+                    "vrf_name": "44",
+                    "bgpLocalAs": null,
+                    "mplsVpnVrfRouteDistinguisher": null,
+                    "mplsVpnVrfDescription": "",
+                    "ifIndices": null
+                }
+            ]
         }
     }
 }
