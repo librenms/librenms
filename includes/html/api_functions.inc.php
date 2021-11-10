@@ -22,6 +22,7 @@ use App\Models\BgpPeer;
 use App\Models\Device;
 use App\Models\DeviceGroup;
 use App\Models\DeviceOutage;
+use App\Models\DevicePollingMethod;
 use App\Models\Eventlog;
 use App\Models\Ipv4Address;
 use App\Models\Ipv4Mac;
@@ -43,6 +44,7 @@ use App\Models\PortGroup;
 use App\Models\PortSecurity;
 use App\Models\PortsFdb;
 use App\Models\PortsNac;
+use App\Models\Secret;
 use App\Models\Sensor;
 use App\Models\ServiceTemplate;
 use App\Models\UserPref;
@@ -61,6 +63,8 @@ use LibreNMS\Alert\AlertData;
 use LibreNMS\Alerting\QueryBuilderParser;
 use LibreNMS\Billing;
 use LibreNMS\Enum\MaintenanceBehavior;
+use LibreNMS\Enum\PollingMethodType;
+use LibreNMS\Enum\SecretType;
 use LibreNMS\Enum\Severity;
 use LibreNMS\Exceptions\InvalidIpException;
 use LibreNMS\Exceptions\InvalidTableColumnException;
@@ -443,25 +447,21 @@ function add_device(Illuminate\Http\Request $request)
             'port',
             'transport',
             'poller_group',
-            'snmpver',
             'port_association_mode',
-            'community',
-            'authlevel',
-            'authname',
-            'authpass',
-            'authalgo',
-            'cryptopass',
-            'cryptoalgo',
         ]));
 
         if (! empty($data['location'])) {
             $device->location_id = \App\Models\Location::firstOrCreate(['location' => $data['location']])->id;
         }
 
-        // uses different name in legacy call
-        if (! empty($data['version'])) {
-            $device->snmpver = $data['version'];
-        }
+        $pollingMethods = collect();
+
+        // ICMP polling method is always added
+        $pollingMethods->push(new DevicePollingMethod([
+            'method_type' => PollingMethodType::Icmp,
+            'enabled' => true,
+            'affects_availability' => false,
+        ]));
 
         $force_add = ! empty($data['force_add']);
 
@@ -470,7 +470,52 @@ function add_device(Illuminate\Http\Request $request)
             $device->sysName = $data['sysName'] ?? '';
             $device->hardware = $data['hardware'] ?? '';
             $device->snmp_disable = 1;
-        } elseif ($force_add && ! $device->hasSnmpInfo()) {
+        } else {
+            $device->snmp_disable = 0;
+            // SNMP polling method is added if not snmp_disable
+            $snmpPollingMethod = new DevicePollingMethod([
+                'method_type' => PollingMethodType::Snmp,
+                'enabled' => true,
+                'affects_availability' => true,
+            ]);
+
+            // Build SnmpSecret if custom credentials were provided
+            $snmpver = $data['snmpver'] ?? $data['version'] ?? null;
+            $community = $data['community'] ?? null;
+            $authlevel = $data['authlevel'] ?? null;
+            $authname = $data['authname'] ?? null;
+            $authpass = $data['authpass'] ?? null;
+            $authalgo = $data['authalgo'] ?? null;
+            $cryptopass = $data['cryptopass'] ?? null;
+            $cryptoalgo = $data['cryptoalgo'] ?? null;
+
+            if ($snmpver || $community || $authlevel || $authname || $authpass || $authalgo || $cryptopass || $cryptoalgo) {
+                $snmpData = [
+                    'version' => $snmpver ?: 'v2c',
+                    'community' => $community,
+                    'authlevel' => $authlevel ?: 'noAuthNoPriv',
+                    'authname' => $authname,
+                    'authpass' => $authpass,
+                    'authalgo' => $authalgo ?: 'SHA',
+                    'cryptopass' => $cryptopass,
+                    'cryptoalgo' => $cryptoalgo ?: 'AES',
+                ];
+
+                $secret = new Secret([
+                    'secret_type' => SecretType::Snmp,
+                    'description' => 'SNMP ' . $device->hostname,
+                    'default' => false,
+                    'data' => $snmpData,
+                ]);
+                $snmpPollingMethod->setRelation('secret', $secret);
+            }
+
+            $pollingMethods->push($snmpPollingMethod);
+        }
+
+        $device->setRelation('pollingMethods', $pollingMethods);
+
+        if ($force_add && empty($data['snmp_disable']) && ! $device->hasSnmpInfo()) {
             return api_error(400, 'SNMP information is required when force adding a device');
         }
 
