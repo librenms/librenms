@@ -1,4 +1,6 @@
-onTn.php
+<?php
+/**
+ * EricssonTn.php
  *
  *
  *
@@ -154,4 +156,3 @@ class EricssonTn extends OS implements
         return $sensors;
     }
 }
-
