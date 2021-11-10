@@ -23,6 +23,7 @@
  * user is "root".
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2021 paulierco
  * @author     Paul Iercosan <mail@paulierco.ro>
  */
@@ -40,13 +41,13 @@ class Aos6StackMgrDuplicateSlot implements SnmptrapHandler
      * Handle snmptrap.
      * Data is pre-parsed and delivered as a Trap.
      *
-     * @param Device $device
-     * @param Trap $trap
+     * @param  Device  $device
+     * @param  Trap  $trap
      * @return void
      */
     public function handle(Device $device, Trap $trap)
     {
         $slot_nr = $trap->getOidData($trap->findOid('ALCATEL-IND1-STACK-MANAGER-MIB::alaStackMgrSlotNINumber'));
         Log::event("Stack member $slot_nr is duplicated.", $device->device_id, 'trap', 5);
-        }
     }
+}

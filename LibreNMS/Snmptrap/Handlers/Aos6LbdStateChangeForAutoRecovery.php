@@ -23,6 +23,7 @@
  * user is "root".
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2021 Paulierco
  * @author     Paul Iercosan <mail@paulierco.ro>
  */
@@ -40,8 +41,8 @@ class Aos6LbdStateChangeForAutoRecovery implements SnmptrapHandler
      * Handle snmptrap.
      * Data is pre-parsed and delivered as a Trap.
      *
-     * @param Device $device
-     * @param Trap $trap
+     * @param  Device  $device
+     * @param  Trap  $trap
      * @return void
      */
     public function handle(Device $device, Trap $trap)
@@ -51,5 +52,5 @@ class Aos6LbdStateChangeForAutoRecovery implements SnmptrapHandler
         $ifIndex = $trap->getOidData($trap->findOid('ALCATEL-IND1-LBD-MIB::alaLbdPortIfIndex'));
         $port = $device->ports()->where('ifIndex', $ifIndex)->first();
         Log::event("Loopback detection has been recovered on the port $port->ifDescr. Status of the port before was $before and now is $current.", $device->device_id, 'trap', 1);
-        }
     }
+}

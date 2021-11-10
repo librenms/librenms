@@ -23,6 +23,7 @@
  * user is "root".
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2021 Paulierco
  * @author     Paul Iercosan <mail@paulierco.ro>
  */
@@ -40,13 +41,13 @@ class Aos6HicServerTrap implements SnmptrapHandler
      * Handle snmptrap.
      * Data is pre-parsed and delivered as a Trap.
      *
-     * @param Device $device
-     * @param Trap $trap
+     * @param  Device  $device
+     * @param  Trap  $trap
      * @return void
      */
     public function handle(Device $device, Trap $trap)
     {
         $ip = $trap->getOidData($trap->findOid('ALCATEL-IND1-AAA-MIB::aaaHSvrIpAddress'));
         Log::event("Radius server with the IP: $ip might be unreachable or recovered.", $device->device_id, 'trap', 2);
-        }
     }
+}

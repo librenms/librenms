@@ -23,6 +23,7 @@
  * user is "root".
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2021 paulierco
  * @author     Paul Iercosan <mail@paulierco.ro>
  */
@@ -40,8 +41,8 @@ class Aos6DoSTrap implements SnmptrapHandler
      * Handle snmptrap.
      * Data is pre-parsed and delivered as a Trap.
      *
-     * @param Device $device
-     * @param Trap $trap
+     * @param  Device  $device
+     * @param  Trap  $trap
      * @return void
      */
     public function handle(Device $device, Trap $trap)
@@ -53,5 +54,5 @@ class Aos6DoSTrap implements SnmptrapHandler
         $port = $trap->getOidData($trap->findOid('ALCATEL-IND1-IP-MIB::alaDoSPort'));
         $mac = $trap->getOidData($trap->findOid('ALCATEL-IND1-IP-MIB::alaDoSMac'));
         Log::event("There has been detected a Denial of Service (DoS) attack. Type of the attack is: $type. Number of attacks are: $detected. Slot where was received is: $slot. Source IP is: $ip. Mac address is: $mac.", $device->device_id, 'trap', 2);
-        }
     }
+}

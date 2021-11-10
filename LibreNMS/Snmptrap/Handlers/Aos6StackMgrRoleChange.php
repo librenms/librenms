@@ -23,6 +23,7 @@
  * user is "root".
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2021 paulierco
  * @author     Paul Iercosan <mail@paulierco.ro>
  */
@@ -40,8 +41,8 @@ class Aos6StackMgrRoleChange implements SnmptrapHandler
      * Handle snmptrap.
      * Data is pre-parsed and delivered as a Trap.
      *
-     * @param Device $device
-     * @param Trap $trap
+     * @param  Device  $device
+     * @param  Trap  $trap
      * @return void
      */
     public function handle(Device $device, Trap $trap)
@@ -49,5 +50,5 @@ class Aos6StackMgrRoleChange implements SnmptrapHandler
         $p_nr = $trap->getOidData($trap->findOid('ALCATEL-IND1-STACK-MANAGER-MIB::alaStackMgrPrimary'));
         $s_nr = $trap->getOidData($trap->findOid('ALCATEL-IND1-STACK-MANAGER-MIB::alaStackMgrSecondary'));
         Log::event("Stack management change.Primary unit of the stack is now chassis: $p_nr. Secondary unit of the stack is now chassis: $s_nr.", $device->device_id, 'trap', 2);
-        }
     }
+}

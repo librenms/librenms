@@ -23,6 +23,7 @@
  * user is "root".
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2021 paulierco
  * @author     Paul Iercosan <mail@paulierco.ro>
  */
@@ -40,8 +41,8 @@ class Aos7portViolationNotification implements SnmptrapHandler
      * Handle snmptrap.
      * Data is pre-parsed and delivered as a Trap.
      *
-     * @param Device $device
-     * @param Trap $trap
+     * @param  Device  $device
+     * @param  Trap  $trap
      * @return void
      */
     public function handle(Device $device, Trap $trap)
@@ -51,7 +52,5 @@ class Aos7portViolationNotification implements SnmptrapHandler
         $ifIndex = $trap->getOidData($trap->findOid('IF-MIB::ifIndex'));
         $port = $device->ports()->where('ifIndex', $ifIndex)->first();
         Log::event("There has been a loop detected on the port $port->ifDescr. The current status code is: $reason.", $device->device_id, 'trap', 5);
-        }
     }
-
-
+}
