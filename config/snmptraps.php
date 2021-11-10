@@ -15,6 +15,7 @@ return [
         'ALCATEL-IND1-PORT-MIB::portViolationTrap' => \LibreNMS\Snmptrap\Handlers\Aos7portViolation::class,
         'ALCATEL-IND1-PORT-MIB::portViolationNotificationTrap' => \LibreNMS\Snmptrap\Handlers\Aos7portViolationNotification::class,
         'ALCATEL-IND1-CONFIG-MGR-MIB::alcatelIND1ConfigMgrMIB.3.0.1' => \LibreNMS\Snmptrap\Handlers\Aos6CfgSavedTrap::class,
+        'ALCATEL-IND1-CHASSIS-MIB::chassisTrapsAlert' => \LibreNMS\Snmptrap\Handlers\AlechassisTrapsAlert::class,
         'ALCATEL-IND1-STACK-MANAGER-MIB::alaStackMgrDuplicateSlotTrap' => \LibreNMS\Snmptrap\Handlers\Aos6StackMgrDuplicateSlot::class,
         'ALCATEL-IND1-STACK-MANAGER-MIB::alaStackMgrRoleChangeTrap' => \LibreNMS\Snmptrap\Handlers\Aos6StackMgrRoleChange::class,
         'ALCATEL-IND1-IP-MIB::alaDoSTrap' => \LibreNMS\Snmptrap\Handlers\Aos6DoSTrap::class,
