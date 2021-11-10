@@ -62523,7 +62523,7 @@
                     "ifDuplex": null,
                     "ifMtu": 0,
                     "ifType": "ieee8023adLag",
-                    "ifAlias": "rox-lugoj1-1 <-> rox-lugoj1-10\\\\Canteen",
+                    "ifAlias": "rox-lugoj1-1 <-> rox-lugoj1-10\\\\\\\\Canteen",
                     "ifPhysAddress": "e8e73242e6e1",
                     "ifHardType": null,
                     "ifLastChange": 0,
