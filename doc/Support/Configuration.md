@@ -167,6 +167,7 @@ lnms config:set fping6 fping6
 lnms config:set fping_options.timeout 500
 lnms config:set fping_options.count 3
 lnms config:set fping_options.interval 500
+lnms config:set fping_options.tos 184
 ```
 
 `fping` configuration options:
@@ -178,6 +179,7 @@ lnms config:set fping_options.interval 500
   to each target.
 * `interval` (`fping` parameter `-p`): Time in milliseconds that fping
   waits between successive packets to an individual target.
+* `tos` (`fping`parameter `-O`): TOS marking in decimal or hex to be used
 
 > NOTE: Setting a higher timeout value than the interval value can
 > lead to slowing down poller. Example:
