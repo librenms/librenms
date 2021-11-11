@@ -78744,5 +78744,11 @@
             "ospf_areas": [],
             "ospf_nbrs": []
         }
+    },
+    "vrf": {
+        "discovery": {
+            "vrfs": []
+        },
+        "poller": "matches discovery"
     }
 }
