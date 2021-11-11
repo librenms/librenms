@@ -179,6 +179,7 @@ class SnmpResponse
         return collect($this->values())
             ->map(function ($value, $oid) {
                 $parts = explode('[', rtrim($oid, ']'), 2);
+
                 return [
                     '_index' => $parts[1] ?? '',
                     $parts[0] => $value,
@@ -189,7 +190,7 @@ class SnmpResponse
                 $values = array_merge(...$values);
                 unset($values['_index']);
 
-                return call_user_func($callback, $values, ...explode('][', $index));
+                return call_user_func($callback, $values, ...explode('][', (string) $index));
             });
     }
 
