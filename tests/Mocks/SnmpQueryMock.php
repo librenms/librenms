@@ -59,6 +59,10 @@ class SnmpQueryMock implements SnmpQueryInterface
      */
     private $numeric = false;
     /**
+     * @var bool
+     */
+    private $hideMib = false;
+    /**
      * @var array|mixed
      */
     private $options = [];
@@ -99,6 +103,9 @@ class SnmpQueryMock implements SnmpQueryInterface
         if ($this->numeric) {
             $options[] = '-On';
         }
+        if ($this->hideMib) {
+            $options[] = '-Os';
+        }
 
         return NetSnmpQuery::make()
             ->mibDir($this->mibDir)
@@ -109,6 +116,13 @@ class SnmpQueryMock implements SnmpQueryInterface
     public function numeric(): SnmpQueryInterface
     {
         $this->numeric = true;
+
+        return $this;
+    }
+
+    public function hideMib(): SnmpQueryInterface
+    {
+        $this->hideMib = true;
 
         return $this;
     }
