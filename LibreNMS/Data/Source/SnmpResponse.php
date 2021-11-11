@@ -129,7 +129,12 @@ class SnmpResponse
                 $line = strtok(PHP_EOL);
             }
 
-            $values[$oid] = trim($value, "\\\" \n\r");
+            if (Str::startsWith($value, '"') && Str::endsWith($value, '"')) {
+                // unformatted string from net-snmp, remove extra escapes
+                $values[$oid] = stripslashes(trim($value, "\\\" \n\r"));
+            } else {
+                $values[$oid] = trim($value);
+            }
         }
 
         return $values;
