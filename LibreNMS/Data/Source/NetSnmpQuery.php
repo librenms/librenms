@@ -134,10 +134,14 @@ class NetSnmpQuery implements SnmpQueryInterface
     /**
      * Set a context for the snmp query
      * This is most commonly used to fetch alternate sets of data, such as different VRFs
+     *
+     * @param  string  $v2  Version 2/3 context name
+     * @param  string|null  $v3  Version 3 context name if different from v2 context name
+     * @return \LibreNMS\Data\Source\SnmpQueryInterface
      */
-    public function context(string $context): SnmpQueryInterface
+    public function context(string $v2, string $v3 = null): SnmpQueryInterface
     {
-        $this->context = $context;
+        $this->context = $this->device->snmpver === 'v3' && $v3 !== null ? $v3 : $v2;
 
         return $this;
     }
