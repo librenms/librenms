@@ -26,6 +26,10 @@ if ($device['os'] == 'airos-af-ltu') {
     require 'ports/airos-af-ltu.inc.php';
 }
 
+if ($device['os'] == 'jetstream') {
+    require 'ports/jetstream.inc.php';
+}
+
 // End Building SNMP Cache Array
 d_echo($port_stats);
 

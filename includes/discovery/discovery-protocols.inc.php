@@ -204,7 +204,15 @@ if (($device['os'] == 'routeros')) {
         $IndexId = key($lldp['lldpNeighborPortIndexId']);
 
         $local_ifName = $lldp['lldpNeighborPortId'][$IndexId];
+
+        //jetstream port names variations
         $local_port_id = find_port_id('gigabitEthernet ' . $local_ifName, null, $device['device_id']);
+        if (!$local_port_id) {
+            $local_port_id = find_port_id('gigabitEthernet' . $local_ifName, null, $device['device_id']);
+        }
+        if (!$local_port_id) {
+            $local_port_id = find_port_id('FiberEthernet' . $local_ifName, null, $device['device_id']);
+        }
 
         $remote_device_id = find_device_id($lldp['lldpNeighborDeviceName'][$IndexId]);
         $remote_device_name = $lldp['lldpNeighborDeviceName'][$IndexId];
