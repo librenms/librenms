@@ -31,7 +31,7 @@ use LibreNMS\Snmptrap\Trap;
 
 class UpsTrapOnBatteryTest extends SnmpTrapTestCase
 {
-    public function testOnBattery()
+    public function testOnBattery(): void
     {
         $device = Device::factory()->create(); /** @var Device $device */
         $state = Sensor::factory()->make(['sensor_class' => 'state', 'sensor_type' => 'upsOutputSourceState', 'sensor_current' => '2']); /** @var Sensor $state */
