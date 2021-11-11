@@ -207,10 +207,10 @@ if (($device['os'] == 'routeros')) {
 
         //jetstream port names variations
         $local_port_id = find_port_id('gigabitEthernet ' . $local_ifName, null, $device['device_id']);
-        if (!$local_port_id) {
+        if (! $local_port_id) {
             $local_port_id = find_port_id('gigabitEthernet' . $local_ifName, null, $device['device_id']);
         }
-        if (!$local_port_id) {
+        if (! $local_port_id) {
             $local_port_id = find_port_id('FiberEthernet' . $local_ifName, null, $device['device_id']);
         }
 
