@@ -26,6 +26,7 @@
 namespace LibreNMS\Data\Source;
 
 use Illuminate\Support\Arr;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use Log;
 
@@ -140,6 +141,16 @@ class SnmpResponse
         return $values;
     }
 
+    public function valuesByIndex(array &$array = []): array
+    {
+        foreach ($this->values() as $oid => $value) {
+            [$name, $index] = array_pad(explode('.', $oid, 2), 2, '');
+            $array[$index][$name] = $value;
+        }
+
+        return $array;
+    }
+
     public function table(int $group = 0, array &$array = []): array
     {
         foreach ($this->values() as $key => $value) {
@@ -157,6 +168,29 @@ class SnmpResponse
         }
 
         return Arr::wrap($array); // if no parts, wrap the value
+    }
+
+    /**
+     * Map an snmp table with callback.
+     * Variables passed to the callback will be an array of row values followed by each individual index.
+     */
+    public function mapTable(callable $callback): Collection
+    {
+        return collect($this->values())
+            ->map(function ($value, $oid) {
+                $parts = explode('[', rtrim($oid, ']'), 2);
+                return [
+                    '_index' => $parts[1] ?? '',
+                    $parts[0] => $value,
+                ];
+            })
+            ->groupBy('_index')
+            ->map(function ($values, $index) use ($callback) {
+                $values = array_merge(...$values);
+                unset($values['_index']);
+
+                return call_user_func($callback, $values, ...explode('][', $index));
+            });
     }
 
     /**

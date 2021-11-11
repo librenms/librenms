@@ -160,6 +160,16 @@ class NetSnmpQuery implements SnmpQueryInterface
     }
 
     /**
+     * Hide MIB in output
+     */
+    public function hideMib(): SnmpQueryInterface
+    {
+        $this->options = array_merge($this->options, ['-Os']);
+
+        return $this;
+    }
+
+    /**
      * Set option(s) for net-snmp command line. Overrides the default options.
      * Some options may break parsing, but you can manually parse the raw output if needed.
      * This will override other options set such as setting numeric.
