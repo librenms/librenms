@@ -158,6 +158,17 @@ class NetSnmpQuery implements SnmpQueryInterface
     }
 
     /**
+     * Do not error on out of order indexes.
+     * Use with caution as we could get stuck in an infinite loop.
+     */
+    public function allowUnordered(): SnmpQueryInterface
+    {
+        $this->options = array_merge($this->options, ['-Cc']);
+
+        return $this;
+    }
+
+    /**
      * Output all OIDs numerically
      */
     public function numeric(): SnmpQueryInterface
