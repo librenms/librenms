@@ -60,28 +60,25 @@ Au = Auto mode
 P = Motor Stopped
 A = Motor Running
 */
+use LibreNMS\OS\HimoinsaGensets;
+
 $status = SnmpQuery::get(['HIMOINSAv14-MIB::status.0', 'HIMOINSAv14-MIB::statusConm.0'])->values();
 
 if (isset($status['HIMOINSAv14-MIB::status.0'])) {
-    $statusMotor = ($status['HIMOINSAv14-MIB::status.0'] & 1) | ($status['HIMOINSAv14-MIB::status.0'] & 2);
-    $statusMode =
-        ($status['HIMOINSAv14-MIB::status.0'] & 4) |
-        ($status['HIMOINSAv14-MIB::status.0'] & 8) |
-        ($status['HIMOINSAv14-MIB::status.0'] & 16) |
-        ($status['HIMOINSAv14-MIB::status.0'] & 32);
-    $statusAlarm = ($status['HIMOINSAv14-MIB::status.0'] & 128) ?? 0;
-    $statusTransferPump = ($status['HIMOINSAv14-MIB::status.0'] & 64) ?? 0;
+    $statusMotor = HimoinsaGensets::dectostate('status.0', $status['HIMOINSAv14-MIB::status.0'], 'Motor');
+    $statusMode = HimoinsaGensets::dectostate('status.0', $status['HIMOINSAv14-MIB::status.0'], 'Mode');
+    $statusAlarm = HimoinsaGensets::dectostate('status.0', $status['HIMOINSAv14-MIB::status.0'], 'Alarm');
+    $statusTransferPump = HimoinsaGensets::dectostate('status.0', $status['HIMOINSAv14-MIB::status.0'], 'TransferPump');
+    
     if (isset($status['HIMOINSAv14-MIB::statusConm[0]']) && ($status['HIMOINSAv14-MIB::statusConm[0]'] != 0)) {
-        $statusComm =
-            ($status['HIMOINSAv14-MIB::statusConm[0]'] & 32) |
-            ($status['HIMOINSAv14-MIB::statusConm[0]'] & 64);
+        $statusComm = HimoinsaGensets::dectostate('statusConm.0', $status['HIMOINSAv14-MIB::statusConm[0]'], 'Comm');
+        $statusCommAlarm = HimoinsaGensets::dectostate('statusConm.0', $status['HIMOINSAv14-MIB::statusConm[0]'], 'CommAlarm');
         $commgroup = 'CEC7';
-        $statusCommAlarm = ($status['HIMOINSAv14-MIB::statusConm[0]'] & 1) ?? 0;
     } else {
-        $statusComm = ($status['HIMOINSAv14-MIB::status.0'] & 512) | ($status['HIMOINSAv14-MIB::status.0'] & 256);
+        $statusComm = HimoinsaGensets::dectostate('status.0', $status['HIMOINSAv14-MIB::status.0'], 'Comm');
         $commgroup = 'CEA7/CEM7';
     }
-    
+
     d_echo('Motor ' . $statusMotor);
     d_echo('Mode ' . $statusMode);
     d_echo('TPump ' . $statusTransferPump);
@@ -208,7 +205,7 @@ if (isset($status['HIMOINSAv14-MIB::status.0'])) {
     // End Control Unit mode
 
     // Transfer Pump Status
-    $state_name = 'statusBT';
+    $state_name = 'statusTransferPump';
     $states = [
         ['value' => 0, 'generic' => 0, 'graph' => 0, 'descr' => 'Off'],
         ['value' => 64, 'generic' => 1, 'graph' => 0, 'descr' => 'On'],
@@ -245,7 +242,7 @@ if (isset($status['HIMOINSAv14-MIB::status.0'])) {
     // End Transfer Pump
 
     // CEA7/CEM7 Alarm
-    $state_name = 'statusAL';
+    $state_name = 'statusAlarm';
     $states = [
         ['value' => 0, 'generic' => 0, 'graph' => 0, 'descr' => 'No Alarm'],
         ['value' => 128, 'generic' => 2, 'graph' => 0, 'descr' => 'Alarm'],

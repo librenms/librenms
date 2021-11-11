@@ -22,32 +22,30 @@
  * @copyright  2021 Daniel Baeza
  * @author     TheGreatDoc <doctoruve@gmail.com>
  */
+use LibreNMS\OS\HimoinsaGensets;
+
 if ($device['os'] == 'himoinsa-gensets') {
     d_echo('Polling Himoinsa Gensets State Sensor \n');
-    if (in_array($sensor['sensor_type'], ['statusCommAlarm', 'statusMotor', 'statusMode', 'statusBT', 'statusAL', 'statusComm'])) {
+    if (in_array($sensor['sensor_type'], ['statusCommAlarm', 'statusMotor', 'statusMode', 'statusTransferPump', 'statusAlarm', 'statusComm'])) {
         switch ($sensor['sensor_type']) {
-            case 'statusBT':
+            case 'statusTransferPump':
                 // Check if CEA7/CEM7 info is available and retrieve data
                 $status = SnmpQuery::get('HIMOINSAv14-MIB::status.0')->value();
-                $statusTransferPump = ($status & 64) ?? 0;
+                $statusTransferPump = HimoinsaGensets::dectostate('status.0', $status['HIMOINSAv14-MIB::status.0'], 'TransferPump');
                 d_echo('Transfer Pump: ' . $statusTransferPump);
                 $sensor_value = $statusTransferPump;
                 break;
-            case 'statusAL':
+            case 'statusAlarm':
                 // Check if CEA7/CEM7 info is available and retrieve data
                 $status = SnmpQuery::get('HIMOINSAv14-MIB::status.0')->value();
-                $statusAlarm = ($status & 128) ?? 0;
+                $statusAlarm = HimoinsaGensets::dectostate('status.0', $status['HIMOINSAv14-MIB::status.0'], 'Alarm');
                 d_echo('Alarm: ' . $statusAlarm);
                 $sensor_value = $statusAlarm;
                 break;
             case 'statusMode':
                 // Check if CEA7/CEM7 info is available and retrieve data
                 $status = SnmpQuery::get('HIMOINSAv14-MIB::status.0')->value();
-                $statusMode =
-                    ($status & 4) |
-                    ($status & 8) |
-                    ($status & 16) |
-                    ($status & 32);
+                $statusMode = HimoinsaGensets::dectostate('status.0', $status['HIMOINSAv14-MIB::status.0'], 'Mode');
                 d_echo('Mode: ' . $statusMode);
                 $sensor_value = $statusMode;
                 break;
@@ -55,11 +53,9 @@ if ($device['os'] == 'himoinsa-gensets') {
                 // Check if CEA7/CEM7 and CEC7 info is available and retrieve data
                 $status = SnmpQuery::get(['HIMOINSAv14-MIB::status.0', 'HIMOINSAv14-MIB::statusConm.0'])->values();
                 if (isset($status['HIMOINSAv14-MIB::statusConm[0]']) && ($status['HIMOINSAv14-MIB::statusConm[0]'] != 0)) {
-                    $statusComm =
-                        ($status['HIMOINSAv14-MIB::statusConm[0]'] & 32) |
-                        ($status['HIMOINSAv14-MIB::statusConm[0]'] & 64);
+                    $statusComm = HimoinsaGensets::dectostate('statusConm.0', $status['HIMOINSAv14-MIB::statusConm[0]'], 'Comm');
                 } else {
-                    $statusComm = ($status['HIMOINSAv14-MIB::status.0'] & 512) | ($status['HIMOINSAv14-MIB::status.0'] & 256);
+                    $statusComm = HimoinsaGensets::dectostate('status.0', $status['HIMOINSAv14-MIB::status.0'], 'Comm');
                 }
                 d_echo('Switch: ' . $statusComm);
                 $sensor_value = $statusComm;
@@ -67,14 +63,14 @@ if ($device['os'] == 'himoinsa-gensets') {
             case 'statusCommAlarm':
                 // Check if CEC7 info is available and retrieve data
                 $statusConm = SnmpQuery::get('HIMOINSAv14-MIB::statusConm.0')->value();
-                $statusCommAlarm = ($statusConm & 1) ?? 0;
+                $statusCommAlarm = HimoinsaGensets::dectostate('statusConm.0', $status['HIMOINSAv14-MIB::statusConm[0]'], 'CommAlarm');
                 d_echo('SWAlarm: ' . $statusCommAlarm);
                 $sensor_value = $statusCommAlarm;
                 break;
             case 'statusMotor':
                 // Check if CEA7/CEM7 info is available and retrieve data
                 $status = SnmpQuery::get('HIMOINSAv14-MIB::status.0')->value();
-                $statusMotor = ($status & 1) | ($status & 2);
+                $statusMotor = HimoinsaGensets::dectostate('status.0', $status['HIMOINSAv14-MIB::status.0'], 'Motor');
                 d_echo('Engine: ' . $statusMotor);
                 $sensor_value = $statusMotor;
                 break;
