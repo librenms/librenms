@@ -106,6 +106,11 @@ class SnmpQueryMock implements SnmpQueryInterface
             ->translate($oid, $mib);
     }
 
+    public function allowUnordered(): SnmpQueryInterface
+    {
+        return $this;
+    }
+
     public function numeric(): SnmpQueryInterface
     {
         $this->numeric = true;
