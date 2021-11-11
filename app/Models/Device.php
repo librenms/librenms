@@ -419,12 +419,12 @@ class Device extends BaseModel
 
     // ---- Accessors/Mutators ----
 
-    public function getIconAttribute($icon)
+    public function getIconAttribute($icon): string
     {
         return Str::start(Url::findOsImage($this->os, $this->features, $icon), 'images/os/');
     }
 
-    public function getIpAttribute($ip)
+    public function getIpAttribute($ip): ?string
     {
         if (empty($ip)) {
             return null;
@@ -433,14 +433,24 @@ class Device extends BaseModel
         return @inet_ntop($ip) ?: null;
     }
 
-    public function setIpAttribute($ip)
+    public function setIpAttribute($ip): void
     {
         $this->attributes['ip'] = inet_pton($ip);
     }
 
-    public function setStatusAttribute($status)
+    public function setStatusAttribute($status): void
     {
         $this->attributes['status'] = (int) $status;
+    }
+
+    public function setSysDescrAttribute(?string $sysDescr): void
+    {
+        $this->attributes['sysDescr'] = $sysDescr === null ? null : trim(str_replace(chr(218), "\n", $sysDescr), "\\\" \r\n\t\0");
+    }
+
+    public function setSysNameAttribute(?string $sysName): void
+    {
+        $this->attributes['sysName'] = $sysName === null ? null : str_replace("\n", '', strtolower(trim($sysName)));
     }
 
     // ---- Query scopes ----

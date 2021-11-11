@@ -9491,17 +9491,7 @@ parameters:
 			path: app/Models/Device.php
 
 		-
-			message: "#^Method App\\\\Models\\\\Device\\:\\:getIconAttribute\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/Models/Device.php
-
-		-
 			message: "#^Method App\\\\Models\\\\Device\\:\\:getIconAttribute\\(\\) has parameter \\$icon with no type specified\\.$#"
-			count: 1
-			path: app/Models/Device.php
-
-		-
-			message: "#^Method App\\\\Models\\\\Device\\:\\:getIpAttribute\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: app/Models/Device.php
 
@@ -9706,22 +9696,12 @@ parameters:
 			path: app/Models/Device.php
 
 		-
-			message: "#^Method App\\\\Models\\\\Device\\:\\:setIpAttribute\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/Models/Device.php
-
-		-
 			message: "#^Method App\\\\Models\\\\Device\\:\\:setIpAttribute\\(\\) has parameter \\$ip with no type specified\\.$#"
 			count: 1
 			path: app/Models/Device.php
 
 		-
 			message: "#^Method App\\\\Models\\\\Device\\:\\:setLocation\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/Models/Device.php
-
-		-
-			message: "#^Method App\\\\Models\\\\Device\\:\\:setStatusAttribute\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: app/Models/Device.php
 
