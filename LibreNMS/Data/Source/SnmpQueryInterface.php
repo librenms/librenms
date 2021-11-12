@@ -70,6 +70,16 @@ interface SnmpQueryInterface
     public function numeric(): SnmpQueryInterface;
 
     /**
+     * Hide MIB in output
+     */
+    public function hideMib(): SnmpQueryInterface;
+
+    /**
+     * Output enum values as strings instead of values. This could affect index output.
+     */
+    public function enumStrings(): SnmpQueryInterface;
+
+    /**
      * Set option(s) for net-snmp command line.
      * Some options may break parsing, but you can manually parse the raw output if needed.
      * This will override other options set such as setting numeric.  Call with no options to reset to default.
