@@ -103,15 +103,7 @@ if (($device['os'] == 'routeros')) {
             }
 
             if (stripos($lldp['lldpRemSysDesc'], 'jetstream') !== false) { //if target system is jetstream
-                if (preg_match("/^gigabitethernet([\d][\/][\d][\/][\d]+)/i", $lldp['lldpRemPortId'], $jsport)) { //match only [nospace] naming scheme
-                    $lldp['lldpRemPortId'] = 'gigabitEthernet ' . $jsport[1] . ' : copper'; //rewrite
-                }
-                if (preg_match("/^fiberethernet([\d][\/][\d][\/][\d]+)/i", $lldp['lldpRemPortId'], $jsport)) { //match only [nospace] naming scheme
-                    $lldp['lldpRemPortId'] = 'gigabitEthernet ' . $jsport[1] . ' : fiber'; //rewrite
-                }
-
-                $lldp['lldpRemSysName'] = str_replace(['.MP.', '.TS.'], '', $lldp['lldpRemSysName']); //strip artefacts from device name, jetstream LLDP extension
-                $lldp['lldpRemSysName'] = rtrim($lldp['lldpRemSysName'], '.'); //strip artefacts from device name, jetstream LLDP extension
+                list($lldp['lldpRemPortId'], $lldp['lldpRemSysName']) = normalize_jetstream_data($lldp['lldpRemPortId'], $lldp['lldpRemSysName']);
             }
 
             $remote_device_id = find_device_id($lldp['lldpRemSysName'], $lldp['lldpRemManAddr'], $remote_port_mac);
@@ -218,13 +210,8 @@ if (($device['os'] == 'routeros')) {
         $local_ifName = $lldp['lldpNeighborPortId'][$IndexId];
 
         //try to find our local port
-        $local_port_id = find_port_id('gigabitEthernet ' . $local_ifName, null, $device['device_id']); //normal port name
-        if (! $local_port_id) {
-            $local_port_id = find_port_id('gigabitEthernet ' . $local_ifName . ' : copper', null, $device['device_id']); // : copper
-        }
-        if (! $local_port_id) {
-            $local_port_id = find_port_id('gigabitEthernet ' . $local_ifName . ' : fiber', null, $device['device_id']); // : fiber
-        }
+        $local_port_id = find_jetstream_port_id($local_ifName, $device['device_id']);
+
         $remote_device_id = find_device_id($lldp['lldpNeighborDeviceName'][$IndexId]);
         $remote_device_name = $lldp['lldpNeighborDeviceName'][$IndexId];
         $remote_device_sysDescr = $lldp['lldpNeighborDeviceDescr'][$IndexId];
@@ -234,21 +221,16 @@ if (($device['os'] == 'routeros')) {
             $remote_device_mac = strtolower(str_replace(':', '', $lldp['lldpNeighborChassisId'][$IndexId]));
         }
 
-        //need to use PortIdDescr first but it is broken on few older device
-        //if PortIdDescr is valid, then PortDescr is invalid and vice versa
-        if (strlen($lldp['lldpNeighborPortIdDescr'][$IndexId]) > 3) {
+        //need to use PortIdDescr first but it is specific for T1600G-28TS 2.0 and maybe few other
+        //if PortIdDescr is valid, then PortDescr is invalid (contains ' interface' sufix) and could not be used for match DB
+        if (strlen($lldp['lldpNeighborPortIdDescr'][$IndexId]) >= 3) {
             $remote_port_descr = $lldp['lldpNeighborPortIdDescr'][$IndexId];
         } else {
             $remote_port_descr = $lldp['lldpNeighborPortDescr'][$IndexId];
         }
 
         if (stripos($remote_device_sysDescr, 'jetstream') !== false) { //if target system is jetstream
-            if (preg_match("/^gigabitethernet([\d][\/][\d][\/][\d]+)/i", $remote_port_descr, $jsport)) { //match only [nospace] naming scheme
-                $remote_port_descr = 'gigabitEthernet ' . $jsport[1] . ' : copper'; //rewrite
-            }
-            if (preg_match("/^fiberethernet([\d][\/][\d][\/][\d]+)/i", $remote_port_descr, $jsport)) { //match only [nospace] naming scheme
-                $remote_port_descr = 'gigabitEthernet ' . $jsport[1] . ' : fiber'; //rewrite
-            }
+            list($remote_port_descr, $remote_port_sysDescr) = normalize_jetstream_data($remote_port_descr, $remote_port_sysDescr);
         }
 
         $remote_port_id = find_port_id($remote_port_descr, null, $remote_device_id, $remote_device_mac);
@@ -328,15 +310,7 @@ if (($device['os'] == 'routeros')) {
 
             foreach ($lldp_instance as $entry_instance => $lldp) {
                 if (stripos($lldp['lldpRemSysDesc'], 'jetstream') !== false) { //if target system is jetstream
-                    if (preg_match("/^gigabitethernet([\d][\/][\d][\/][\d]+)/i", $lldp['lldpRemPortId'], $jsport)) { //match only [nospace] naming scheme
-                        $lldp['lldpRemPortId'] = 'gigabitEthernet ' . $jsport[1] . ' : copper'; //rewrite
-                    }
-                    if (preg_match("/^fiberethernet([\d][\/][\d][\/][\d]+)/i", $lldp['lldpRemPortId'], $jsport)) { //match only [nospace] naming scheme
-                        $lldp['lldpRemPortId'] = 'gigabitEthernet ' . $jsport[1] . ' : fiber'; //rewrite
-                    }
-
-                    $lldp['lldpRemSysName'] = str_replace(['.MP.', '.TS.'], '', $lldp['lldpRemSysName']); //strip artefacts from device name, jetstream LLDP extension
-                    $lldp['lldpRemSysName'] = rtrim($lldp['lldpRemSysName'], '.'); //strip artefacts from device name, jetstream LLDP extension
+                    list($lldp['lldpRemPortId'], $lldp['lldpRemSysName']) = normalize_jetstream_data($lldp['lldpRemPortId'], $lldp['lldpRemSysName']);
                 }
                 // normalize MAC address if present
                 $remote_port_mac = '';

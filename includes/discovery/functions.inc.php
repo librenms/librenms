@@ -1394,3 +1394,46 @@ function find_port_id($description, $identifier = '', $device_id = 0, $mac_addre
 
     return (int) dbFetchCell($sql, $params);
 }
+
+//functio specific for Jetstream OS, find port id from DB
+function find_jetstream_port_id($description = '', $device_id = 0)
+{
+    if (! ($device_id || $description)) {
+        return 0;
+    }
+
+    $statements = [];
+    $params = [];
+
+    $statements[] = 'SELECT `port_id` FROM `ports` WHERE `device_id`=? AND (`ifDescr`=? OR `ifDescr`=? OR `ifDescr`=?)';
+    $params[] = $device_id;
+    //jetstream specific port name variations
+    $params[] = 'gigabitEthernet ' . $description;
+    $params[] = 'gigabitEthernet ' . $description . ' : copper';
+    $params[] = 'gigabitEthernet ' . $description . ' : fiber';
+
+    $queries = implode(' UNION ', $statements);
+    $sql = "SELECT * FROM ($queries LIMIT 1) p";
+
+    return (int) dbFetchCell($sql, $params);
+}
+
+//functio specific for Jetstream OS, rewrite port and system name
+function normalize_jetstream_data($portName = '', $sysName = '')
+{
+    if (! ($portName || $sysName)) {
+        return 0;
+    }
+
+    if (preg_match("/^gigabitethernet([\d][\/][\d][\/][\d]+)/i", $portName, $jsport)) { //match only [nospace] naming scheme
+        $portName = 'gigabitEthernet ' . $jsport[1] . ' : copper'; //rewrite
+    }
+    if (preg_match("/^fiberethernet([\d][\/][\d][\/][\d]+)/i", $portName, $jsport)) { //match only [nospace] naming scheme
+        $portName = 'gigabitEthernet ' . $jsport[1] . ' : fiber'; //rewrite
+    }
+
+    $sysName = str_replace(['.MP.', '.TS.'], '', $sysName); //strip artefacts from device name, jetstream LLDP extension
+    $sysName = rtrim($sysName, '.'); //strip artefacts from device name, jetstream LLDP extension
+
+    return array($portName, $sysName);
+}
