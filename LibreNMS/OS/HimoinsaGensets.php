@@ -30,7 +30,7 @@ class HimoinsaGensets extends OS
                     $status = ($value & 512) | ($value & 256);
                     break;
             }
-            
+
             return $status;
         }
         if ($oid === 'statusConm.0') {

@@ -69,7 +69,7 @@ if (isset($status['HIMOINSAv14-MIB::status.0'])) {
     $statusMode = HimoinsaGensets::dectostate('status.0', $status['HIMOINSAv14-MIB::status.0'], 'Mode');
     $statusAlarm = HimoinsaGensets::dectostate('status.0', $status['HIMOINSAv14-MIB::status.0'], 'Alarm');
     $statusTransferPump = HimoinsaGensets::dectostate('status.0', $status['HIMOINSAv14-MIB::status.0'], 'TransferPump');
-    
+
     if (isset($status['HIMOINSAv14-MIB::statusConm[0]']) && ($status['HIMOINSAv14-MIB::statusConm[0]'] != 0)) {
         $statusComm = HimoinsaGensets::dectostate('statusConm.0', $status['HIMOINSAv14-MIB::statusConm[0]'], 'Comm');
         $statusCommAlarm = HimoinsaGensets::dectostate('statusConm.0', $status['HIMOINSAv14-MIB::statusConm[0]'], 'CommAlarm');
