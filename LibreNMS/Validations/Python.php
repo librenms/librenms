@@ -74,7 +74,7 @@ class Python extends BaseValidation
 
     private function checkExtensions(Validator $validator)
     {
-        $pythonExtensions = '/scripts/check_requirements.py';
+        $pythonExtensions = '/scripts/dynamic_check_requirements.py';
         $process = new Process([Config::get('install_dir') . $pythonExtensions, '-v']);
         $process->run();
 

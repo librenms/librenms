@@ -45,8 +45,8 @@ class Core implements Module
         $device = $os->getDevice();
         $device->fill([
             'sysObjectID' => $snmpdata['.1.3.6.1.2.1.1.2.0'] ?? null,
-            'sysName' => strtolower(trim($snmpdata['.1.3.6.1.2.1.1.5.0'] ?? '')),
-            'sysDescr' => isset($snmpdata['.1.3.6.1.2.1.1.1.0']) ? str_replace(chr(218), "\n", $snmpdata['.1.3.6.1.2.1.1.1.0']) : null,
+            'sysName' => $snmpdata['.1.3.6.1.2.1.1.5.0'] ?? null,
+            'sysDescr' => $snmpdata['.1.3.6.1.2.1.1.1.0'] ?? null,
         ]);
 
         foreach ($device->getDirty() as $attribute => $value) {
@@ -84,9 +84,9 @@ class Core implements Module
 
         $device = $os->getDevice();
         $device->fill([
-            'sysName' => str_replace("\n", '', strtolower($snmpdata['.1.3.6.1.2.1.1.5.0'] ?? '')),
+            'sysName' => $snmpdata['.1.3.6.1.2.1.1.5.0'] ?? null,
             'sysObjectID' => $snmpdata['.1.3.6.1.2.1.1.2.0'] ?? null,
-            'sysDescr' => str_replace(chr(218), "\n", $snmpdata['.1.3.6.1.2.1.1.1.0'] ?? ''),
+            'sysDescr' => $snmpdata['.1.3.6.1.2.1.1.1.0'] ?? null,
         ]);
 
         $this->calculateUptime($os, $snmpdata['.1.3.6.1.2.1.1.3.0'] ?? null);
@@ -195,7 +195,7 @@ class Core implements Module
                 }
             } elseif ($key == 'snmpget') {
                 $get_value = SnmpQuery::device($device)
-                    ->options($value['options'] ?? [])
+                    ->options($value['options'] ?? null)
                     ->mibDir($value['mib_dir'] ?? $mibdir)
                     ->get(isset($value['mib']) ? "{$value['mib']}::{$value['oid']}" : $value['oid'])
                     ->value();
@@ -204,7 +204,7 @@ class Core implements Module
                 }
             } elseif ($key == 'snmpwalk') {
                 $walk_value = SnmpQuery::device($device)
-                    ->options($value['options'] ?? [])
+                    ->options($value['options'] ?? null)
                     ->mibDir($value['mib_dir'] ?? $mibdir)
                     ->walk(isset($value['mib']) ? "{$value['mib']}::{$value['oid']}" : $value['oid'])
                     ->raw();

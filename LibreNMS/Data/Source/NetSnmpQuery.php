@@ -80,11 +80,7 @@ class NetSnmpQuery implements SnmpQueryInterface
     /**
      * @var array|string
      */
-    private $options = [];
-    /**
-     * @var string[]
-     */
-    private $defaultOptions = ['-OQXUte'];
+    private $options = ['-OQXUte'];
     /**
      * @var \App\Models\Device
      */
@@ -164,17 +160,20 @@ class NetSnmpQuery implements SnmpQueryInterface
     }
 
     /**
-     * Set option(s) for net-snmp command line.
+     * Set option(s) for net-snmp command line. Overrides the default options.
      * Some options may break parsing, but you can manually parse the raw output if needed.
-     * This will override other options set such as setting numeric.  Call with no options to reset to default.
+     * This will override other options set such as setting numeric.
+     * Calling with null will reset to the default options (-OQXUte).
      * Try to avoid setting options this way to keep the API generic.
      *
-     * @param  array|string  $options
+     * @param  array|string|null  $options
      * @return $this
      */
     public function options($options = []): SnmpQueryInterface
     {
-        $this->options = Arr::wrap($options);
+        $this->options = $options !== null
+            ? Arr::wrap($options)
+            : ['-OQXUte'];
 
         return $this;
     }
@@ -241,7 +240,7 @@ class NetSnmpQuery implements SnmpQueryInterface
         // authentication
         $this->buildAuth($cmd);
 
-        $cmd = array_merge($cmd, $this->defaultOptions, $this->options);
+        $cmd = array_merge($cmd, $this->options);
 
         $timeout = $this->device->timeout ?? Config::get('snmp.timeout');
         if ($timeout && $timeout !== 1) {

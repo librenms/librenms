@@ -138,6 +138,6 @@ class AddHostCliTest extends DBTestCase
         $this->assertEquals(1, $device->snmp_disable, 'snmp is not disabled');
         $this->assertEquals('hardware', $device->hardware, 'Wrong hardware name');
         $this->assertEquals('nameOfOS', $device->os, 'Wrong os name');
-        $this->assertEquals('System', $device->sysName, 'Wrong system name');
+        $this->assertEquals('system', $device->sysName, 'Wrong system name');
     }
 }
