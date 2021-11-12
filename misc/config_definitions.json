@@ -4915,7 +4915,7 @@
             "order": 2,
             "type": "integer"
         },
-        "sensors.temperature_low_guess": {
+        "sensors.temperature_high_guess": {
             "default": 70,
             "group": "discovery",
             "section": "sensors"
