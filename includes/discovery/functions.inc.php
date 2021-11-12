@@ -359,7 +359,7 @@ function sensor_low_limit($class, $current)
     // matching an empty case executes code until a break is reached
     switch ($class) {
         case 'temperature':
-            $limit = $current - 10;
+            $limit = Config::get('sensors.temperature_low_guess', 18);
             break;
         case 'voltage':
             $limit = $current * 0.85;
@@ -397,7 +397,7 @@ function sensor_limit($class, $current)
     // matching an empty case executes code until a break is reached
     switch ($class) {
         case 'temperature':
-            $limit = $current + 20;
+            $limit = Config::get('sensors.temperature_high_guess', 70);
             break;
         case 'voltage':
             $limit = $current * 1.15;
