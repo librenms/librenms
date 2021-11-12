@@ -1435,5 +1435,5 @@ function normalize_jetstream_data($portName = '', $sysName = '')
     $sysName = str_replace(['.MP.', '.TS.'], '', $sysName); //strip artefacts from device name, jetstream LLDP extension
     $sysName = rtrim($sysName, '.'); //strip artefacts from device name, jetstream LLDP extension
 
-    return array($portName, $sysName);
+    return [$portName, $sysName];
 }

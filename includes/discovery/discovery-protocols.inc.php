@@ -103,7 +103,7 @@ if (($device['os'] == 'routeros')) {
             }
 
             if (stripos($lldp['lldpRemSysDesc'], 'jetstream') !== false) { //if target system is jetstream
-                list($lldp['lldpRemPortId'], $lldp['lldpRemSysName']) = normalize_jetstream_data($lldp['lldpRemPortId'], $lldp['lldpRemSysName']);
+                [$lldp['lldpRemPortId'], $lldp['lldpRemSysName']] = normalize_jetstream_data($lldp['lldpRemPortId'], $lldp['lldpRemSysName']);
             }
 
             $remote_device_id = find_device_id($lldp['lldpRemSysName'], $lldp['lldpRemManAddr'], $remote_port_mac);
@@ -230,7 +230,7 @@ if (($device['os'] == 'routeros')) {
         }
 
         if (stripos($remote_device_sysDescr, 'jetstream') !== false) { //if target system is jetstream
-            list($remote_port_descr, $remote_port_sysDescr) = normalize_jetstream_data($remote_port_descr, $remote_port_sysDescr);
+            [$lldp['lldpRemPortId'], $lldp['lldpRemSysName']] = normalize_jetstream_data($remote_port_descr, $remote_port_sysDescr);
         }
 
         $remote_port_id = find_port_id($remote_port_descr, null, $remote_device_id, $remote_device_mac);
@@ -310,7 +310,7 @@ if (($device['os'] == 'routeros')) {
 
             foreach ($lldp_instance as $entry_instance => $lldp) {
                 if (stripos($lldp['lldpRemSysDesc'], 'jetstream') !== false) { //if target system is jetstream
-                    list($lldp['lldpRemPortId'], $lldp['lldpRemSysName']) = normalize_jetstream_data($lldp['lldpRemPortId'], $lldp['lldpRemSysName']);
+                    [$lldp['lldpRemPortId'], $lldp['lldpRemSysName']] = normalize_jetstream_data($lldp['lldpRemPortId'], $lldp['lldpRemSysName']);
                 }
                 // normalize MAC address if present
                 $remote_port_mac = '';
