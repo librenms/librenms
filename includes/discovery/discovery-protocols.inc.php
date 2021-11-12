@@ -230,7 +230,7 @@ if (($device['os'] == 'routeros')) {
         }
 
         if (stripos($remote_device_sysDescr, 'jetstream') !== false) { //if target system is jetstream
-            [$lldp['lldpRemPortId'], $lldp['lldpRemSysName']] = normalize_jetstream_data($remote_port_descr, $remote_port_sysDescr);
+            [$remote_port_descr, $remote_device_sysDescr] = normalize_jetstream_data($remote_port_descr, $remote_device_sysDescr);
         }
 
         $remote_port_id = find_port_id($remote_port_descr, null, $remote_device_id, $remote_device_mac);
