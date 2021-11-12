@@ -3476,7 +3476,7 @@ parameters:
 			path: LibreNMS/Interfaces/Polling/MplsPolling.php
 
 		-
-			message: "#^Method LibreNMS\\\\Interfaces\\\\Polling\\\\PollerModule\\:\\:poll\\(\\) has no return typehint specified\\.$#"
+			message: "#^Method LibreNMS\\\\Interfaces\\\\Polling\\\\PollerModule\\:\\:poll\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: LibreNMS/Interfaces/Polling/PollerModule.php
 
@@ -4101,7 +4101,7 @@ parameters:
 			path: LibreNMS/OS/AsuswrtMerlin.php
 
 		-
-			message: "#^Method LibreNMS\\\\OS\\\\Ceraos\\:\\:fetchHardware\\(\\) has no return typehint specified\\.$#"
+			message: "#^Method LibreNMS\\\\OS\\\\Ceraos\\:\\:fetchHardware\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: LibreNMS/OS/Ceraos.php
 
@@ -4121,7 +4121,7 @@ parameters:
 			path: LibreNMS/OS/Comware.php
 
 		-
-			message: "#^Method LibreNMS\\\\OS\\\\Dnos\\:\\:findProcessors\\(\\) has no return typehint specified\\.$#"
+			message: "#^Method LibreNMS\\\\OS\\\\Dnos\\:\\:findProcessors\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: LibreNMS/OS/Dnos.php
 
@@ -4141,7 +4141,7 @@ parameters:
 			path: LibreNMS/OS/Fabos.php
 
 		-
-			message: "#^Method LibreNMS\\\\OS\\\\Ftos\\:\\:getHardware\\(\\) has no return typehint specified\\.$#"
+			message: "#^Method LibreNMS\\\\OS\\\\Ftos\\:\\:getHardware\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: LibreNMS/OS/Ftos.php
 
@@ -4211,7 +4211,7 @@ parameters:
 			path: LibreNMS/OS/Junos.php
 
 		-
-			message: "#^Method LibreNMS\\\\OS\\\\Junos\\:\\:pollSlas\\(\\) has no return typehint specified\\.$#"
+			message: "#^Method LibreNMS\\\\OS\\\\Junos\\:\\:pollSlas\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: LibreNMS/OS/Junos.php
 
@@ -4236,7 +4236,7 @@ parameters:
 			path: LibreNMS/OS/Mimosa.php
 
 		-
-			message: "#^Method LibreNMS\\\\OS\\\\Openwrt\\:\\:getSensorData\\(\\) has parameter \\$query with no typehint specified\\.$#"
+			message: "#^Method LibreNMS\\\\OS\\\\Openwrt\\:\\:getSensorData\\(\\) has parameter \\$query with no type specified\\.$#"
 			count: 1
 			path: LibreNMS/OS/Openwrt.php
 
@@ -4296,17 +4296,17 @@ parameters:
 			path: LibreNMS/OS/Panos.php
 
 		-
-			message: "#^Property LibreNMS\\\\OS\\\\Panos\\:\\:\\$validNetBufferMemory has no typehint specified\\.$#"
+			message: "#^Property LibreNMS\\\\OS\\\\Panos\\:\\:\\$validNetBufferMemory has no type specified\\.$#"
 			count: 1
 			path: LibreNMS/OS/Panos.php
 
 		-
-			message: "#^Method LibreNMS\\\\OS\\\\Pmp\\:\\:freqDivisor\\(\\) has no return typehint specified\\.$#"
+			message: "#^Method LibreNMS\\\\OS\\\\Pmp\\:\\:freqDivisor\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: LibreNMS/OS/Pmp.php
 
 		-
-			message: "#^Method LibreNMS\\\\OS\\\\Shared\\\\Cisco\\:\\:discoverSlas\\(\\) has no return typehint specified\\.$#"
+			message: "#^If condition is always false\\.$#"
 			count: 1
 			path: LibreNMS/OS/Shared/Cisco.php
 
@@ -4726,7 +4726,7 @@ parameters:
 			path: LibreNMS/OS/Timos.php
 
 		-
-			message: "#^Property LibreNMS\\\\OS\\\\Unifi\\:\\:\\$ccqDivisor has no typehint specified\\.$#"
+			message: "#^Property LibreNMS\\\\OS\\\\Unifi\\:\\:\\$ccqDivisor has no type specified\\.$#"
 			count: 1
 			path: LibreNMS/OS/Unifi.php
 
@@ -4746,7 +4746,7 @@ parameters:
 			path: LibreNMS/OS/Vrp.php
 
 		-
-			message: "#^Method LibreNMS\\\\OS\\\\Vrp\\:\\:pollSlas\\(\\) has no return typehint specified\\.$#"
+			message: "#^Method LibreNMS\\\\OS\\\\Vrp\\:\\:pollSlas\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: LibreNMS/OS/Vrp.php
 
@@ -4846,7 +4846,7 @@ parameters:
 			path: LibreNMS/OS/Zxdsl.php
 
 		-
-			message: "#^Property LibreNMS\\\\ObjectCache\\:\\:\\$data has no typehint specified\\.$#"
+			message: "#^Property LibreNMS\\\\ObjectCache\\:\\:\\$data has no type specified\\.$#"
 			count: 1
 			path: LibreNMS/ObjectCache.php
 
