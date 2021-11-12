@@ -11,6 +11,6 @@ $colour_area_max = '9999cc';
 
 $graph_max = 1;
 
-$unit_text = 'MemDropped';
+$unit_text = 'Matches';
 
 require 'includes/html/graphs/generic_simplex.inc.php';
