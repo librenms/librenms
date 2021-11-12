@@ -1427,8 +1427,8 @@ function find_jetstream_port_id($description = '', $device_id = 0)
 /**
  * function specific for Jetstream OS, rewrite port and system name
  *
- * @param  string  $portName which should be rewritten
- * @param  string  $sysName which should be cleared
+ * @param  string  $portName  which should be rewritten
+ * @param  string  $sysName  which should be cleared
  * @return array $portName, $sysName
  */
 function normalize_jetstream_data($portName = '', $sysName = '')
