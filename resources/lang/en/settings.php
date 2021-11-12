@@ -1271,9 +1271,11 @@ return [
             'temperature_low_guess' => [
                 'description' => 'Low temperature threshold',
                 'help' => 'Estimate for low temperature threshold if not specified by device.',
+            ],
             'temperature_high_guess' => [
                 'description' => 'Low temperature threshold',
                 'help' => 'Estimate for high temperature threshold if not specified by device.',
+            ],
          ],
         'snmp' => [
             'transports' => [
