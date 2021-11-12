@@ -1267,7 +1267,7 @@ return [
             'guess_limits' => [
                 'description' => 'Guess sensor thresholds',
                 'help' => 'Attempt to pick minimum/maximum values for sensors if not provided using various methods.',
-             ],
+            ],
             'temperature_low_guess' => [
                 'description' => 'Low temperature threshold',
                 'help' => 'Estimate for low temperature threshold if not specified by device.',
@@ -1276,7 +1276,7 @@ return [
                 'description' => 'Low temperature threshold',
                 'help' => 'Estimate for high temperature threshold if not specified by device.',
             ],
-         ],
+        ],
         'snmp' => [
             'transports' => [
                 'description' => 'Transport (priority)',
