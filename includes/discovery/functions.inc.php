@@ -1398,7 +1398,7 @@ function find_port_id($description, $identifier = '', $device_id = 0, $mac_addre
 /**
  * function specific for Jetstream OS, find port_id from DB
  *
- * @param  string  $description matched against ifDescr in various forms
+ * @param  string  $description  matched against ifDescr in various forms
  * @param  int  $device_id  restrict search to ports on a specific device
  * @return int
  */
@@ -1415,10 +1415,10 @@ function find_jetstream_port_id($description = '', $device_id = 0)
     $pn[] = 'gigabitEthernet ' . $description . ' : fiber';
 
     $res = \App\Models\Port::where('device_id', $device_id)->whereIn('ifDescr', $pn)->first('port_id');
-    if (isset($res) ) {
+    if (isset($res)) {
         $pid = $res->port_id;
 
-        return ($pid);
+        return $pid;
     } else {
         return 0;
     }
