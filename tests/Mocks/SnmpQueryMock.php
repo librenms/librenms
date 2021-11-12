@@ -127,6 +127,14 @@ class SnmpQueryMock implements SnmpQueryInterface
         return $this;
     }
 
+    public function enumStrings(): SnmpQueryInterface
+    {
+        // TODO: Implement enumStrings() method, no idea how
+        Log::error('enumStrings not implemented in SnmpQueryMock');
+
+        return $this;
+    }
+
     public function options($options = []): SnmpQueryInterface
     {
         $this->options = $options;

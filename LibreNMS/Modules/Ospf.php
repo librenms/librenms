@@ -56,7 +56,9 @@ class Ospf implements Module
             ModuleModelObserver::observe(OspfInstance::class);
 
             // Pull data from device
-            $ospf_instances_poll = SnmpQuery::context($context_name)->hideMib()->walk('OSPF-MIB::ospfGeneralGroup')->valuesByIndex();
+            $ospf_instances_poll = SnmpQuery::context($context_name)
+                ->hideMib()->enumStrings()
+                ->walk('OSPF-MIB::ospfGeneralGroup')->valuesByIndex();
 
             $ospf_instances = collect();
             foreach ($ospf_instances_poll as $ospf_instance_id => $ospf_entry) {
@@ -85,7 +87,8 @@ class Ospf implements Module
             ModuleModelObserver::observe(OspfArea::class);
 
             // Pull data from device
-            $ospf_areas = SnmpQuery::context($context_name)->hideMib()
+            $ospf_areas = SnmpQuery::context($context_name)
+                ->hideMib()->enumStrings()
                 ->walk('OSPF-MIB::ospfAreaTable')
                 ->mapTable(function ($ospf_area, $ospf_area_id) use ($context_name, $os) {
                     return OspfArea::updateOrCreate([
@@ -106,7 +109,8 @@ class Ospf implements Module
             ModuleModelObserver::observe(OspfPort::class);
 
             // Pull data from device
-            $ospf_ports = SnmpQuery::context($context_name)->hideMib()
+            $ospf_ports = SnmpQuery::context($context_name)
+                ->hideMib()->enumStrings()
                 ->walk('OSPF-MIB::ospfIfTable')
                 ->mapTable(function ($ospf_port, $ip, $ifIndex) use ($context_name, $os) {
                     // find port_id
@@ -136,7 +140,8 @@ class Ospf implements Module
             ModuleModelObserver::observe(OspfNbr::class);
 
             // Pull data from device
-            $ospf_neighbours = SnmpQuery::context($context_name)->hideMib()
+            $ospf_neighbours = SnmpQuery::context($context_name)
+                ->hideMib()->enumStrings()
                 ->walk('OSPF-MIB::ospfNbrTable')
                 ->mapTable(function ($ospf_nbr, $ip, $ifIndex) use ($context_name, $os) {
                     // get neighbor port_id
@@ -162,7 +167,8 @@ class Ospf implements Module
             echo ' TOS Metrics: ';
 
             // Pull data from device
-            $ospf_tos_metrics = SnmpQuery::context($context_name)->hideMib()
+            $ospf_tos_metrics = SnmpQuery::context($context_name)
+                ->hideMib()->enumStrings()
                 ->walk('OSPF-MIB::ospfIfMetricTable')
                 ->mapTable(function ($ospf_tos, $ip) use ($context_name, $os) {
                     $ospf_tos['ospf_port_id'] = OspfPort::query()
