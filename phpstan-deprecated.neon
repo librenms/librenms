@@ -29,4 +29,4 @@ parameters:
     disallowedFunctionCalls:
         -
             function: 'db*()'
-            message: 'use Eloquent instead; https://laravel.com/docs/8.x/eloquent'
+            message: 'because it is deprecated use Eloquent instead; https://laravel.com/docs/eloquent#building-queries'
