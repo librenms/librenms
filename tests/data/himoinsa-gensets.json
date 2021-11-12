@@ -173,7 +173,7 @@
                     "poller_type": "snmp",
                     "sensor_oid": "",
                     "sensor_index": "0",
-                    "sensor_type": "statusAL",
+                    "sensor_type": "statusAlarm",
                     "sensor_descr": "Alarm",
                     "group": "CEA7/CEM7",
                     "sensor_divisor": 1,
@@ -189,7 +189,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "state_name": "statusAL"
+                    "state_name": "statusAlarm"
                 },
                 {
                     "sensor_deleted": 0,
@@ -197,9 +197,33 @@
                     "poller_type": "snmp",
                     "sensor_oid": "",
                     "sensor_index": "0",
-                    "sensor_type": "statusBT",
-                    "sensor_descr": "Transfer Pump",
-                    "group": "CEA7/CEM7",
+                    "sensor_type": "statusComm",
+                    "sensor_descr": "Commutator Mode",
+                    "group": "CEC7",
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 64,
+                    "sensor_limit": null,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": null,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "state_name": "statusComm"
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "state",
+                    "poller_type": "snmp",
+                    "sensor_oid": "",
+                    "sensor_index": "0",
+                    "sensor_type": "statusCommAlarm",
+                    "sensor_descr": "Alarm",
+                    "group": "CEC7",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 0,
@@ -213,31 +237,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "state_name": "statusBT"
-                },
-                {
-                    "sensor_deleted": 0,
-                    "sensor_class": "state",
-                    "poller_type": "snmp",
-                    "sensor_oid": "",
-                    "sensor_index": "0",
-                    "sensor_type": "statusEngine",
-                    "sensor_descr": "Engine",
-                    "group": "CEA7/CEM7",
-                    "sensor_divisor": 1,
-                    "sensor_multiplier": 1,
-                    "sensor_current": 0,
-                    "sensor_limit": null,
-                    "sensor_limit_warn": null,
-                    "sensor_limit_low": null,
-                    "sensor_limit_low_warn": null,
-                    "sensor_alert": 1,
-                    "sensor_custom": "No",
-                    "entPhysicalIndex": null,
-                    "entPhysicalIndex_measured": null,
-                    "sensor_prev": null,
-                    "user_func": null,
-                    "state_name": "statusEngine"
+                    "state_name": "statusCommAlarm"
                 },
                 {
                     "sensor_deleted": 0,
@@ -250,7 +250,7 @@
                     "group": "CEA7/CEM7",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
-                    "sensor_current": 1,
+                    "sensor_current": 4,
                     "sensor_limit": null,
                     "sensor_limit_warn": null,
                     "sensor_limit_low": null,
@@ -269,12 +269,12 @@
                     "poller_type": "snmp",
                     "sensor_oid": "",
                     "sensor_index": "0",
-                    "sensor_type": "statusSW",
-                    "sensor_descr": "Switch Mode",
-                    "group": "CEC7",
+                    "sensor_type": "statusMotor",
+                    "sensor_descr": "Motor",
+                    "group": "CEA7/CEM7",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
-                    "sensor_current": 0,
+                    "sensor_current": 2,
                     "sensor_limit": null,
                     "sensor_limit_warn": null,
                     "sensor_limit_low": null,
@@ -285,7 +285,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "state_name": "statusSW"
+                    "state_name": "statusMotor"
                 },
                 {
                     "sensor_deleted": 0,
@@ -293,9 +293,9 @@
                     "poller_type": "snmp",
                     "sensor_oid": "",
                     "sensor_index": "0",
-                    "sensor_type": "statusSWAL",
-                    "sensor_descr": "SW Alarm",
-                    "group": "CEC7",
+                    "sensor_type": "statusTransferPump",
+                    "sensor_descr": "Transfer Pump",
+                    "group": "CEA7/CEM7",
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
                     "sensor_current": 0,
@@ -309,7 +309,7 @@
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
                     "user_func": null,
-                    "state_name": "statusSWAL"
+                    "state_name": "statusTransferPump"
                 },
                 {
                     "sensor_deleted": 0,
@@ -602,123 +602,123 @@
             ],
             "state_indexes": [
                 {
-                    "state_name": "statusAL",
+                    "state_name": "statusAlarm",
                     "state_descr": "No Alarm",
                     "state_draw_graph": 0,
                     "state_value": 0,
                     "state_generic_value": 0
                 },
                 {
-                    "state_name": "statusAL",
+                    "state_name": "statusAlarm",
+                    "state_descr": "Alarm",
+                    "state_draw_graph": 0,
+                    "state_value": 128,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "statusComm",
+                    "state_descr": "Unknown",
+                    "state_draw_graph": 0,
+                    "state_value": 0,
+                    "state_generic_value": 3
+                },
+                {
+                    "state_name": "statusComm",
+                    "state_descr": "Genset",
+                    "state_draw_graph": 0,
+                    "state_value": 32,
+                    "state_generic_value": 2
+                },
+                {
+                    "state_name": "statusComm",
+                    "state_descr": "Mains",
+                    "state_draw_graph": 0,
+                    "state_value": 64,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "statusCommAlarm",
+                    "state_descr": "No Alarm",
+                    "state_draw_graph": 0,
+                    "state_value": 0,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "statusCommAlarm",
                     "state_descr": "Alarm",
                     "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 2
                 },
                 {
-                    "state_name": "statusBT",
-                    "state_descr": "Off",
-                    "state_draw_graph": 0,
-                    "state_value": 0,
-                    "state_generic_value": 0
-                },
-                {
-                    "state_name": "statusBT",
-                    "state_descr": "On",
-                    "state_draw_graph": 0,
-                    "state_value": 1,
-                    "state_generic_value": 1
-                },
-                {
-                    "state_name": "statusEngine",
-                    "state_descr": "Stopped",
-                    "state_draw_graph": 0,
-                    "state_value": 0,
-                    "state_generic_value": 0
-                },
-                {
-                    "state_name": "statusEngine",
-                    "state_descr": "Running",
-                    "state_draw_graph": 0,
-                    "state_value": 1,
-                    "state_generic_value": 2
-                },
-                {
-                    "state_name": "statusEngine",
+                    "state_name": "statusMode",
                     "state_descr": "Unknown",
                     "state_draw_graph": 0,
-                    "state_value": 9,
+                    "state_value": 0,
                     "state_generic_value": 3
                 },
                 {
                     "state_name": "statusMode",
                     "state_descr": "Auto",
                     "state_draw_graph": 0,
-                    "state_value": 1,
+                    "state_value": 4,
                     "state_generic_value": 0
                 },
                 {
                     "state_name": "statusMode",
                     "state_descr": "Manual",
                     "state_draw_graph": 0,
-                    "state_value": 2,
+                    "state_value": 8,
                     "state_generic_value": 2
                 },
                 {
                     "state_name": "statusMode",
                     "state_descr": "Test",
                     "state_draw_graph": 0,
-                    "state_value": 3,
+                    "state_value": 16,
                     "state_generic_value": 1
                 },
                 {
                     "state_name": "statusMode",
                     "state_descr": "Blocked",
                     "state_draw_graph": 0,
-                    "state_value": 4,
+                    "state_value": 32,
                     "state_generic_value": 2
                 },
                 {
-                    "state_name": "statusMode",
+                    "state_name": "statusMotor",
                     "state_descr": "Unknown",
                     "state_draw_graph": 0,
-                    "state_value": 9,
+                    "state_value": 0,
                     "state_generic_value": 3
                 },
                 {
-                    "state_name": "statusSW",
-                    "state_descr": "Mains",
-                    "state_draw_graph": 0,
-                    "state_value": 0,
-                    "state_generic_value": 0
-                },
-                {
-                    "state_name": "statusSW",
-                    "state_descr": "Genset",
+                    "state_name": "statusMotor",
+                    "state_descr": "Running",
                     "state_draw_graph": 0,
                     "state_value": 1,
                     "state_generic_value": 2
                 },
                 {
-                    "state_name": "statusSW",
-                    "state_descr": "Unknown",
+                    "state_name": "statusMotor",
+                    "state_descr": "Stopped",
                     "state_draw_graph": 0,
-                    "state_value": 9,
-                    "state_generic_value": 3
+                    "state_value": 2,
+                    "state_generic_value": 0
                 },
                 {
-                    "state_name": "statusSWAL",
-                    "state_descr": "No Alarm",
+                    "state_name": "statusTransferPump",
+                    "state_descr": "Off",
                     "state_draw_graph": 0,
                     "state_value": 0,
                     "state_generic_value": 0
                 },
                 {
-                    "state_name": "statusSWAL",
-                    "state_descr": "Alarm",
+                    "state_name": "statusTransferPump",
+                    "state_descr": "On",
                     "state_draw_graph": 0,
-                    "state_value": 1,
-                    "state_generic_value": 2
+                    "state_value": 64,
+                    "state_generic_value": 1
                 }
             ]
         },
