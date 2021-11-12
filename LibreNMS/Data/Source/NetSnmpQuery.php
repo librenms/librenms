@@ -39,6 +39,8 @@ use Symfony\Component\Process\Process;
 
 class NetSnmpQuery implements SnmpQueryInterface
 {
+    private const DEFAULT_FLAGS = '-OQXUte';
+
     /**
      * @var array
      */
@@ -80,7 +82,7 @@ class NetSnmpQuery implements SnmpQueryInterface
     /**
      * @var array|string
      */
-    private $options = ['-OQXUte'];
+    private $options = [self::DEFAULT_FLAGS];
     /**
      * @var \App\Models\Device
      */
@@ -175,6 +177,29 @@ class NetSnmpQuery implements SnmpQueryInterface
     }
 
     /**
+     * Hide MIB in output
+     */
+    public function hideMib(): SnmpQueryInterface
+    {
+        $this->options = array_merge($this->options, ['-Os']);
+
+        return $this;
+    }
+
+    /**
+     * Output enum values as strings instead of values. This could affect index output.
+     */
+    public function enumStrings(): SnmpQueryInterface
+    {
+        // remove -Oe from the default flags
+        if (isset($this->options[0]) && Str::contains($this->options[0], 'e')) {
+            $this->options[0] = str_replace('e', '', $this->options[0]);
+        }
+
+        return $this;
+    }
+
+    /**
      * Set option(s) for net-snmp command line. Overrides the default options.
      * Some options may break parsing, but you can manually parse the raw output if needed.
      * This will override other options set such as setting numeric.
@@ -188,7 +213,7 @@ class NetSnmpQuery implements SnmpQueryInterface
     {
         $this->options = $options !== null
             ? Arr::wrap($options)
-            : ['-OQXUte'];
+            : [self::DEFAULT_FLAGS];
 
         return $this;
     }
