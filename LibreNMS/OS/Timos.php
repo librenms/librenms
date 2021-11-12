@@ -40,11 +40,16 @@ use Illuminate\Support\Collection;
 use LibreNMS\Device\WirelessSensor;
 use LibreNMS\Interfaces\Discovery\MplsDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessPowerDiscovery;
+use LibreNMS\Interfaces\Discovery\Sensors\WirelessRsrqDiscovery;
+use LibreNMS\Interfaces\Discovery\Sensors\WirelessChannelDiscovery;
+use LibreNMS\Interfaces\Discovery\Sensors\WirelessRsrpDiscovery;
+use LibreNMS\Interfaces\Discovery\Sensors\WirelessRssiDiscovery;
+use LibreNMS\Interfaces\Discovery\Sensors\WirelessSnrDiscovery;
 use LibreNMS\Interfaces\Polling\MplsPolling;
 use LibreNMS\OS;
 use LibreNMS\RRD\RrdDefinition;
 
-class Timos extends OS implements MplsDiscovery, MplsPolling, WirelessPowerDiscovery
+class Timos extends OS implements MplsDiscovery, MplsPolling, WirelessPowerDiscovery, WirelessSnrDiscovery, WirelessRsrqDiscovery, WirelessRssiDiscovery, WirelessRsrpDiscovery, WirelessChannelDiscovery
 {
     public function discoverOS(Device $device): void
     {
@@ -823,5 +828,119 @@ class Timos extends OS implements MplsDiscovery, MplsPolling, WirelessPowerDisco
         return $chops;
     }
 
+    public function discoverWirelessSnr()
+    {
+        $sensors = [];
+
+        $data = snmpwalk_cache_oid($this->getDeviceArray(), 'tmnxCellPortSinr', [], 'TIMETRA-CELLULAR-MIB');
+        $carrier = $this->getCacheTable('ifName', 'IF-MIB');
+        foreach ($data as $index => $entry) {
+            $sensors[] = new WirelessSensor(
+                'snr',
+                $this->getDeviceId(),
+                '.1.3.6.1.4.1.6527.3.1.2.109.3.1.1.1.12.' . $index,
+                'timos',
+                $index,
+                'SNR: ' . $carrier[$index]['ifName'],
+                null,
+                1,
+                10
+            );
+        }
+
+        return $sensors;
+    }
+
+    public function discoverWirelessRsrq()
+    {
+        $sensors = [];
+
+        $data = snmpwalk_cache_oid($this->getDeviceArray(), 'tmnxCellPortRsrq', [], 'TIMETRA-CELLULAR-MIB');
+        $carrier = $this->getCacheTable('ifName', 'IF-MIB');
+        foreach ($data as $index => $entry) {
+            $sensors[] = new WirelessSensor(
+                'rsrq',
+                $this->getDeviceId(),
+                '.1.3.6.1.4.1.6527.3.1.2.109.3.1.1.1.11.' . $index,
+                'timos',
+                $index,
+                'RSRQ: ' . $carrier[$index]['ifName'],
+                null,
+                1,
+                1
+            );
+        }
+
+        return $sensors;
+    }
+
+    public function discoverWirelessRssi()
+    {
+        $sensors = [];
+
+        $data = snmpwalk_cache_oid($this->getDeviceArray(), 'tmnxCellPortRssi', [], 'TIMETRA-CELLULAR-MIB');
+        $carrier = $this->getCacheTable('ifName', 'IF-MIB');
+        foreach ($data as $index => $entry) {
+            $sensors[] = new WirelessSensor(
+                'rssi',
+                $this->getDeviceId(),
+                '.1.3.6.1.4.1.6527.3.1.2.109.3.1.1.1.8.' . $index,
+                'timos',
+                $index,
+                'RSSI: ' . $carrier[$index]['ifName'],
+                null,
+                1,
+                10
+            );
+        }
+
+        return $sensors;
+    }
+
+    public function discoverWirelessRsrp()
+    {
+        $sensors = [];
+
+        $data = snmpwalk_cache_oid($this->getDeviceArray(), 'tmnxCellPortRsrp', [], 'TIMETRA-CELLULAR-MIB');
+        $carrier = $this->getCacheTable('ifName', 'IF-MIB');
+        foreach ($data as $index => $entry) {
+            $sensors[] = new WirelessSensor(
+                'rsrp',
+                $this->getDeviceId(),
+                '.1.3.6.1.4.1.6527.3.1.2.109.3.1.1.1.9.' . $index,
+                'timos',
+                $index,
+                'RSRP: ' . $carrier[$index]['ifName'],
+                null,
+                1,
+                10
+            );
+        }
+
+        return $sensors;
+    }
+
+    public function discoverWirelessChannel()
+    {
+        $sensors = [];
+
+        $data = snmpwalk_cache_oid($this->getDeviceArray(), 'tmnxCellPortChannelNumber', [], 'TIMETRA-CELLULAR-MIB');
+        $carrier = $this->getCacheTable('ifName', 'IF-MIB');
+        foreach ($data as $index => $entry) {
+            $sensors[] = new WirelessSensor(
+                'channel',
+                $this->getDeviceId(),
+                '.1.3.6.1.4.1.6527.3.1.2.109.3.1.1.1.5.' . $index,
+                'timos',
+                $index,
+                'CHANNEL: ' . $carrier[$index]['ifName'],
+                null,
+                1,
+                1
+            );
+        }
+
+        return $sensors;
+    }
     // End Class Timos
 }
