@@ -1,4 +1,4 @@
-PyMySQL
+PyMySQL!=1.0.0
 python-dotenv
 redis>=3.0
 setuptools
