@@ -120,7 +120,7 @@ class SnmpQueryMock implements SnmpQueryInterface
 
     public function options($options = []): SnmpQueryInterface
     {
-        $this->options = $options;
+        $this->options = $options ?? [];
 
         return $this;
     }
