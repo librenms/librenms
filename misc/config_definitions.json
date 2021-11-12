@@ -4904,21 +4904,21 @@
         "sensors.guess_limits": {
             "default": true,
             "group": "discovery",
-            "section": "sensors"
+            "section": "sensors",
             "order": 1,
             "type": "boolean"
         },
         "sensors.temperature_low_guess": {
             "default": 18,
             "group": "discovery",
-            "section": "sensors"
+            "section": "sensors",
             "order": 2,
             "type": "integer"
         },
         "sensors.temperature_high_guess": {
             "default": 70,
             "group": "discovery",
-            "section": "sensors"
+            "section": "sensors",
             "order": 3,
             "type": "integer"
         },
