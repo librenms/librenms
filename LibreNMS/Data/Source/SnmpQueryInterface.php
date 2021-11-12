@@ -59,6 +59,12 @@ interface SnmpQueryInterface
     public function mibDir(?string $dir): SnmpQueryInterface;
 
     /**
+     * Do not error on out of order indexes.
+     * Use with caution as we could get stuck in an infinite loop.
+     */
+    public function allowUnordered(): SnmpQueryInterface;
+
+    /**
      * Output all OIDs numerically
      */
     public function numeric(): SnmpQueryInterface;
