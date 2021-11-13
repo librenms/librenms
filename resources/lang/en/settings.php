@@ -593,6 +593,94 @@ return [
             'description' => 'Memcached port',
             'help' => 'The port for the memcached server. Default is 11211',
         ],
+        'service_poller_enabled' => [
+            'description' => 'Poller Enabled',
+            'help' => 'Enable poller workers on this node.',
+        ],
+        'service_poller_workers' => [
+            'description' => 'Poller Workers',
+            'help' => 'Amount of poller workers to spawn on this node.',
+        ],
+        'service_poller_frequency' => [
+            'description' => 'Poller Frequency (Warning!)',
+            'help' => 'How often to poll devices on this node.  Warning! Changing this without fixing rrd files will break graphs. See docs for more info.',
+        ],
+        'service_poller_down_retry' => [
+            'description' => 'Device Down Retry',
+            'help' => 'If a device is down when polling is attempted on this node. This is the amount of time to wait before retrying.',
+        ],
+        'service_discovery_enabled' => [
+            'description' => 'Discovery Enabled',
+            'help' => 'Enable discovery workers on this node.',
+        ],
+        'service_discovery_workers' => [
+            'description' => 'Discovery Workers',
+            'help' => 'Amount of discovery workers to run on this node.  Setting too high can cause overload.',
+        ],
+        'service_discovery_frequency' => [
+            'description' => 'Discovery Frequency',
+            'help' => 'How often to run device discovery on this node.  Default is 4 times a day.',
+        ],
+        'service_services_enabled' => [
+            'description' => 'Services Enabled',
+            'help' => 'Enable services workers on this node.',
+        ],
+        'service_services_workers' => [
+            'description' => 'Services Workers',
+            'help' => 'Amount of services workers on this node.',
+        ],
+        'service_services_frequency' => [
+            'description' => 'Services Frequency',
+            'help' => 'How often to run services on this node.  This should match poller frequency.',
+        ],
+        'service_billing_enabled' => [
+            'description' => 'Billing Enabled',
+            'help' => 'Enable billing workers on this node.',
+        ],
+        'service_billing_frequency' => [
+            'description' => 'Billing Frequency',
+            'help' => 'How often to collect billing data on this node.',
+        ],
+        'service_billing_calculate_frequency' => [
+            'description' => 'Billing Calculate Frequency',
+            'help' => 'How often to calculate bill usage on this node.',
+        ],
+        'service_alerting_enabled' => [
+            'description' => 'Alerting Enabled',
+            'help' => 'Enable the alerting worker on this node.',
+        ],
+        'service_alerting_frequency' => [
+            'description' => 'Alerting Frequency',
+            'help' => 'How often alert rules are checked on this node.  Note that data is only updated based on poller frequency.',
+        ],
+        'service_ping_enabled' => [
+            'description' => 'Fast Ping Enabled',
+            'help' => 'Fast Ping just pings devices to check if they are up or down',
+        ],
+        'ping_rrd_step' => [
+            'description' => 'Ping Frequency',
+            'help' => 'How often to check ping on this node.  Warning! If you change this you must make additional changes.  Check the Fast Ping docs.',
+        ],
+        'service_update_enabled' => [
+            'description' => 'Daily Maintenance Enabled',
+            'help' => 'Run daily.sh maintenance script and restart the dispatcher service afterwards.',
+        ],
+        'service_update_frequency' => [
+            'description' => 'Maintenance Frequency',
+            'help' => 'How often to run daily maintenance on this node. Default is 1 Day. It is highly suggested not to change this.',
+        ],
+        'service_loglevel' => [
+            'description' => 'Log Level',
+            'help' => 'Log level of the dispatch service.',
+        ],
+        'service_watchdog_enabled' => [
+            'description' => 'Watchdog Enabled',
+            'help' => 'Watchdog monitors the log file and restarts the service it it has not been updated',
+        ],
+        'service_watchdog_log' => [
+            'description' => 'Log File to Watch',
+            'help' => 'Default is the LibreNMS log file.',
+        ],
         'email_auto_tls' => [
             'description' => 'Auto TLS support',
             'help' => 'Tries to use TLS before falling back to un-encrypted',
