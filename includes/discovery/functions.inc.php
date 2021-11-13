@@ -1414,9 +1414,8 @@ function find_jetstream_port_id($description = '', $device_id = 0)
     $pn[] = 'gigabitEthernet ' . $description . ' : copper';
     $pn[] = 'gigabitEthernet ' . $description . ' : fiber';
 
-    $res = \App\Models\Port::where('device_id', $device_id)->whereIn('ifDescr', $pn)->first('port_id');
-    if (isset($res)) {
-        $pid = $res->port_id;
+    $pid = \App\Models\Port::where('device_id', $device_id)->whereIn('ifDescr', $pn)->value('port_id');
+    if (isset($pid)) {
 
         return $pid;
     } else {
