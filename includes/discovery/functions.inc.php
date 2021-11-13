@@ -1416,7 +1416,6 @@ function find_jetstream_port_id($description = '', $device_id = 0)
 
     $pid = \App\Models\Port::where('device_id', $device_id)->whereIn('ifDescr', $pn)->value('port_id');
     if (isset($pid)) {
-
         return $pid;
     } else {
         return 0;
