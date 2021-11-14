@@ -15,7 +15,7 @@ class PollingDevice
     /**
      * @var \App\Models\Device
      */
-    private $device;
+    public $device;
 
     /**
      * Create a new event instance.
@@ -24,7 +24,6 @@ class PollingDevice
      */
     public function __construct(Device $device)
     {
-        //
         $this->device = $device;
     }
 
