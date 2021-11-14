@@ -34,7 +34,7 @@ class Qnap extends OS implements OSDiscovery
     public function discoverOS(Device $device): void
     {
         $info = snmp_getnext_multi($this->getDeviceArray(), ['enclosureModel', 'enclosureSerialNum', 'entPhysicalFirmwareRev'], '-OQUs', 'NAS-MIB:ENTITY-MIB');
-        $device->version = trim($info['entPhysicalFirmwareRev'], '\"');
+        $device->version = trim($info['entPhysicalFirmwareRev'] ?? '', '\"');
         $device->hardware = $info['enclosureModel'];
         $device->serial = $info['enclosureSerialNum'];
     }

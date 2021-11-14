@@ -85,7 +85,7 @@ interface SnmpQueryInterface
      * This will override other options set such as setting numeric.  Call with no options to reset to default.
      * Try to avoid setting options this way to keep the API generic.
      *
-     * @param  array|string  $options
+     * @param  array|string|null  $options
      * @return $this
      */
     public function options($options = []): SnmpQueryInterface;

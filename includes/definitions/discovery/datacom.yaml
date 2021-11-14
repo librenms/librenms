@@ -1,5 +1,9 @@
 mib: DMswitch-MIB
 modules:
+    os:
+        hardware: DMswitch-MIB::swChassisModel.0
+        version: DMswitch-MIB::swFirmwareVer.1
+        serial: DMswitch-MIB::swSerialNumber.1
     processors:
         data:
             -

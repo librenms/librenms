@@ -35,15 +35,16 @@ class Windows extends \LibreNMS\OS
     public function discoverOS(Device $device): void
     {
         if (preg_match('/Hardware: (?<hardware>.*) +- Software: .* Version (?<nt>\S+) +\(Build( Number:)? (?<build>\S+) (?<smp>\S+)/', $device->sysDescr, $matches)) {
-            $device->hardware = $this->parseHardware($matches['hardware']);
-            $device->features = $matches['smp'];
+            $device->hardware = $this->parseHardware($matches['hardware'] ?? null);
+            $device->features = $matches['smp'] ?? null;
 
+            $build = $matches['build'] ?? null;
             if ($device->sysObjectID == '.1.3.6.1.4.1.311.1.1.3.1.1') {
-                $device->version = $this->getClientVersion($matches['build'], $matches['version']);
+                $device->version = $this->getClientVersion($build, $matches['version'] ?? null);
             } elseif ($device->sysObjectID == '.1.3.6.1.4.1.311.1.1.3.1.2') {
-                $device->version = $this->getServerVersion($matches['build']);
+                $device->version = $this->getServerVersion($build);
             } elseif ($device->sysObjectID == '.1.3.6.1.4.1.311.1.1.3.1.3') {
-                $device->version = $this->getDatacenterVersion($matches['build']);
+                $device->version = $this->getDatacenterVersion($build);
             }
         }
 
