@@ -614,7 +614,6 @@ class ModuleTestHelper
         // Dump polled data
         $data = array_merge_recursive($data, $this->dumpDb($device['device_id'], $polled_modules, 'poller'));
         $data = array_filter($data, [$this, 'moduleHasData']); // remove modules with empty data
-        dd($data, array_keys($data));
 
         // Remove the test device, we don't need the debug from this
         if ($device['hostname'] == $snmpsim->getIp()) {
