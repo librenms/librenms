@@ -613,6 +613,8 @@ class ModuleTestHelper
 
         // Dump polled data
         $data = array_merge_recursive($data, $this->dumpDb($device['device_id'], $polled_modules, 'poller'));
+        $data = array_filter($data, [$this, 'moduleHasData']); // remove modules with empty data
+        dd($data, array_keys($data));
 
         // Remove the test device, we don't need the debug from this
         if ($device['hostname'] == $snmpsim->getIp()) {
@@ -628,10 +630,6 @@ class ModuleTestHelper
 
             // insert new data, don't store duplicate data
             foreach ($data as $module => $module_data) {
-                // skip saving modules with no data
-                if ($this->dataIsEmpty($module_data['discovery']) && $this->dataIsEmpty($module_data['poller'])) {
-                    continue;
-                }
                 if ($module_data['discovery'] == $module_data['poller']) {
                     $existing_data[$module] = [
                         'discovery' => $module_data['discovery'],
@@ -862,14 +860,16 @@ class ModuleTestHelper
         return array_values($components);
     }
 
-    private function dataIsEmpty($data)
+    private function moduleHasData(array $data): bool
     {
-        foreach ($data as $table_data) {
-            if (! empty($table_data)) {
-                return false;
+        foreach (['discovery', 'poller'] as $type) {
+            foreach ($data[$type] ?? [] as $table_data) {
+                if (! empty($table_data)) {
+                    return true;
+                }
             }
         }
 
-        return true;
+        return false;
     }
 }
