@@ -290,6 +290,7 @@ function poll_device($device, $force_module = false)
 
     $helper = new \LibreNMS\Polling\ConnectivityHelper($deviceModel);
     $helper->saveMetrics();
+
     if ($helper->isUp()) {
         if ($device['snmp_disable']) {
             // only non-snmp modules
