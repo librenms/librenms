@@ -28,6 +28,7 @@ namespace LibreNMS\Tests\Mocks;
 use App\Models\Device;
 use DeviceCache;
 use Exception;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use LibreNMS\Data\Source\NetSnmpQuery;
 use LibreNMS\Data\Source\SnmpQueryInterface;
@@ -142,7 +143,7 @@ class SnmpQueryMock implements SnmpQueryInterface
 
     public function options($options = []): SnmpQueryInterface
     {
-        $this->options = $options;
+        $this->options = $options === null ? [] : Arr::wrap($options);
 
         return $this;
     }

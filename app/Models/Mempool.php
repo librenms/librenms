@@ -164,7 +164,7 @@ class Mempool extends DeviceRelatedModel implements Keyable
     private function calculateTotal($total, $used, $free)
     {
         if ($total !== null) {
-            return $total * $this->mempool_precision;
+            return (int) $total * $this->mempool_precision;
         }
 
         if ($used !== null && $free !== null) {

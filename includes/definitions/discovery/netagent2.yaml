@@ -1,5 +1,8 @@
 mib: UPS-MIB:XPPC-MIB
 modules:
+    os:
+        version: UPS-MIB::upsIdentAgentSoftwareVersion.0
+        hardware: UPS-MIB::upsIdentModel.0
     sensors:
         state:
             data:

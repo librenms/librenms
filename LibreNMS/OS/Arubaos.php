@@ -50,14 +50,14 @@ class Arubaos extends OS implements
     public function discoverOS(Device $device): void
     {
         parent::discoverOS($device); // yaml
-        $aruba_info = snmp_get_multi($this->getDeviceArray(), [
-            'wlsxSwitchRole.0',
-            'wlsxSwitchMasterIp.0',
-            'wlsxSwitchLicenseSerialNumber.0',
-        ], '-OQUs', 'WLSX-SWITCH-MIB');
+        $aruba_info = \SnmpQuery::get([
+            'WLSX-SWITCH-MIB::wlsxSwitchRole.0',
+            'WLSX-SWITCH-MIB::wlsxSwitchMasterIp.0',
+            'WLSX-SWITCH-MIB::wlsxSwitchLicenseSerialNumber.0',
+        ])->values();
 
-        $device->features = $aruba_info[0]['wlsxSwitchRole'] == 'master' ? 'Master Controller' : "Local Controller for {$aruba_info[0]['wlsxSwitchMasterIp']}";
-        $device->serial = $aruba_info[0]['wlsxSwitchLicenseSerialNumber'];
+        $device->features = ($aruba_info['WLSX-SWITCH-MIB::wlsxSwitchRole.0'] ?? null) == 'master' ? 'Master Controller' : 'Local Controller for ' . ($aruba_info['WLSX-SWITCH-MIB::wlsxSwitchMasterIp.0'] ?? null);
+        $device->serial = $aruba_info['WLSX-SWITCH-MIB::wlsxSwitchLicenseSerialNumber.0'] ?? null;
     }
 
     /**

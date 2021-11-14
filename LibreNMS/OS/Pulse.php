@@ -30,7 +30,7 @@ use LibreNMS\RRD\RrdDefinition;
 
 class Pulse extends \LibreNMS\OS implements OSPolling
 {
-    public function pollOS()
+    public function pollOS(): void
     {
         $users = snmp_get($this->getDeviceArray(), 'iveConcurrentUsers.0', '-OQv', 'PULSESECURE-PSG-MIB');
 
