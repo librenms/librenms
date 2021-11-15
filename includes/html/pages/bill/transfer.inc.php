@@ -60,7 +60,7 @@ $out['data'] = format_bytes_billing($bill_data['total_data_out']);
 $out['allow'] = $total['allow'];
 $out['ave'] = format_bytes_billing(($bill_data['total_data_out'] / $cur_days));
 $out['est'] = format_bytes_billing(($bill_data['total_data_out'] / $cur_days * $total_days));
-$out['per'] = ! empty($bill_data['total_data']) ?round(($bill_data['total_data_out'] / $bill_data['total_data'] * 100), 2) : 0;
+$out['per'] = ! empty($bill_data['total_data']) ? round(($bill_data['total_data_out'] / $bill_data['total_data'] * 100), 2) : 0;
 $out['bg'] = \LibreNMS\Util\Colors::percentage($out['per'], null);
 
 $ousage['over'] = ($bill_data['total_data'] - ($bill_data['bill_quota']));
