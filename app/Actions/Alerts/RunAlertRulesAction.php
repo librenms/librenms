@@ -48,6 +48,7 @@ class RunAlertRulesAction
     public function execute(): void
     {
         // TODO inline logic
+        include_once base_path('includes/common.php');
         include_once base_path('includes/dbFacile.php');
         $this->rules->runRules($this->device->device_id);
     }
