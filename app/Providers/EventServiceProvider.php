@@ -2,7 +2,6 @@
 
 namespace App\Providers;
 
-use App\Listeners\MarkNotificationsRead;
 use Illuminate\Foundation\Support\Providers\EventServiceProvider as ServiceProvider;
 
 class EventServiceProvider extends ServiceProvider
@@ -15,7 +14,15 @@ class EventServiceProvider extends ServiceProvider
     protected $listen = [
         \Illuminate\Auth\Events\Login::class => ['App\Listeners\AuthEventListener@login'],
         \Illuminate\Auth\Events\Logout::class => ['App\Listeners\AuthEventListener@logout'],
-        \App\Events\UserCreated::class => [MarkNotificationsRead::class],
+        \App\Events\UserCreated::class => [
+            \App\Listeners\MarkNotificationsRead::class,
+        ],
+        \App\Events\PollingDevice::class => [
+        ],
+        \App\Events\DevicePolled::class => [
+            \App\Listeners\CheckAlerts::class,
+            \App\Listeners\UpdateDeviceGroups::class,
+        ],
     ];
 
     /**

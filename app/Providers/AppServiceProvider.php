@@ -32,6 +32,13 @@ class AppServiceProvider extends ServiceProvider
         $this->app->singleton('device-cache', function ($app) {
             return new \LibreNMS\Cache\Device();
         });
+
+        $this->app->bind(\App\Models\Device::class, function () {
+            /** @var \LibreNMS\Cache\Device $cache */
+            $cache = $this->app->make('device-cache');
+
+            return $cache->hasPrimary() ? $cache->getPrimary() : new \App\Models\Device;
+        });
     }
 
     /**
