@@ -167,7 +167,7 @@ class PluginManager
      */
     public function pluginEnabled(string $pluginName): bool
     {
-        return $this->getPlugin($pluginName)->plugin_active;
+        return (bool) optional($this->getPlugin($pluginName))->plugin_active;
     }
 
     /**
