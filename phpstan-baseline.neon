@@ -9371,6 +9371,11 @@ parameters:
 			path: app/Models/Device.php
 
 		-
+			message: "#^Method App\\\\Models\\\\Device\\:\\:name\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: app/Models/Device.php
+
+		-
 			message: "#^Method App\\\\Models\\\\Device\\:\\:scopeHasAccess\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: app/Models/Device.php
