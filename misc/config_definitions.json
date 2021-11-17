@@ -881,10 +881,10 @@
             "default": null,
             "type": "select",
             "options": {
-                "{{ $hostname }}": "Hostname / IP",
-                "{{ $sysName_fallback }}":  "Hostname or sysName",
+                "{{ $hostname }}": "hostname",
+                "{{ $sysName_fallback }}":  "sysName_fallback",
                 "{{ $sysName }}":  "sysName",
-                "{{ $ip }}":  "IP"
+                "{{ $ip }}":  "ip"
             }
         },
         "device_perf_purge": {

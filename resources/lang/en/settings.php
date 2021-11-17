@@ -1437,8 +1437,14 @@ return [
             ],
         ],
         'device_display_default' => [
-            'description' => 'Set the default device display string',
+            'description' => 'Default device display name template',
             'help' => 'Sets the default display name for all devices (can be overridden per-device).  Hostname/IP: Just show the hostname or IP the device was added with. sysName: Just show the sysName from snmp. Hostname or sysName: Show hostname, but if it is an IP, show sysName.',
+            'options' => [
+                'hostname' => 'Hostname / IP',
+                'sysName_fallback' => 'Hostname, fallback to sysName for IPs',
+                'sysName' => 'sysName',
+                'ip' => 'IP (from hostname IP or resolved)',
+            ],
         ],
         'device_location_map_open' => [
             'description' => 'Location Map open',
