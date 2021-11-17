@@ -25,32 +25,21 @@
 
 namespace LibreNMS\Util;
 
-use Carbon\Carbon;
 use LibreNMS\Config;
 
 class Git
 {
-    public static function repoPresent(): bool
+    public static function repoPresent()
     {
         $install_dir = Config::get('install_dir', realpath(__DIR__ . '/../..'));
 
         return file_exists("$install_dir/.git");
     }
 
-    public static function binaryExists(): bool
+    public static function binaryExists()
     {
         exec('git > /dev/null 2>&1', $response, $exit_code);
 
         return $exit_code === 1;
-    }
-
-    public static function localCommit(): string
-    {
-        return rtrim(exec("git show --pretty='%H' -s HEAD"));
-    }
-
-    public static function localDate(): Carbon
-    {
-        return \Date::createFromTimestamp(exec("git show --pretty='%ct' -s HEAD"));
     }
 }

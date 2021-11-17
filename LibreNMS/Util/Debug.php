@@ -32,13 +32,7 @@ use Log;
 
 class Debug
 {
-    /**
-     * @var bool
-     */
     private static $debug = false;
-    /**
-     * @var bool
-     */
     private static $verbose = false;
 
     /**
@@ -55,12 +49,20 @@ class Debug
         restore_error_handler(); // disable Laravel error handler
 
         if (self::$debug) {
-            self::enableErrorReporting();
+            ini_set('display_errors', '1');
+            ini_set('display_startup_errors', '1');
+            ini_set('log_errors', '0');
+            error_reporting(E_ALL & ~E_NOTICE);
+
             self::enableCliDebugOutput();
             self::enableQueryDebug();
         } else {
-            self::disableErrorReporting($silence);
-            self::disableCliDebugOutput($silence);
+            ini_set('display_errors', '0');
+            ini_set('display_startup_errors', '0');
+            ini_set('log_errors', '1');
+            error_reporting($silence ? 0 : E_ERROR);
+
+            self::disableCliDebugOutput();
             self::disableQueryDebug();
         }
 
@@ -90,7 +92,7 @@ class Debug
         return self::$verbose;
     }
 
-    public static function disableQueryDebug(): void
+    public static function disableQueryDebug()
     {
         $db = Eloquent::DB();
 
@@ -100,21 +102,21 @@ class Debug
         }
     }
 
-    public static function enableCliDebugOutput(): void
+    public static function enableCliDebugOutput()
     {
         if (Laravel::isBooted() && App::runningInConsole()) {
-            Log::setDefaultDriver('console_debug');
+            Log::setDefaultDriver('console');
         }
     }
 
-    public static function disableCliDebugOutput(bool $silence): void
+    public static function disableCliDebugOutput()
     {
-        if (Laravel::isBooted() && Log::getDefaultDriver() !== 'stack') {
-            Log::setDefaultDriver(app()->runningInConsole() && ! $silence ? 'console' : 'stack');
+        if (Laravel::isBooted()) {
+            Log::setDefaultDriver('stack');
         }
     }
 
-    public static function enableQueryDebug(): void
+    public static function enableQueryDebug()
     {
         static $sql_debug_enabled;
         $db = Eloquent::DB();
@@ -138,27 +140,5 @@ class Debug
             });
             $sql_debug_enabled = true;
         }
-    }
-
-    /**
-     * Disable error reporting, do not use with new code
-     */
-    public static function disableErrorReporting(bool $silence = false): void
-    {
-        ini_set('display_errors', '0');
-        ini_set('display_startup_errors', '0');
-        ini_set('log_errors', '1');
-        error_reporting($silence ? 0 : E_ERROR);
-    }
-
-    /**
-     * Enable error reporting. Please call after disabling for legacy code
-     */
-    public static function enableErrorReporting(): void
-    {
-        ini_set('display_errors', '1');
-        ini_set('display_startup_errors', '1');
-        ini_set('log_errors', '0');
-        error_reporting(E_ALL & ~E_NOTICE);
     }
 }
