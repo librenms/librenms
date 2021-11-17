@@ -198,7 +198,6 @@ class CommonFunctionsTest extends TestCase
         $this->assertEquals('256.168.1.2', format_hostname($invalid_ip));
         $this->assertEquals('Custom Display (test.librenms.org sysName)', format_hostname($custom_display));
 
-
         // ip to sysname
         Config::set('device_display_default', '{{ $sysName_fallback }}');
         $this->assertEquals('test.librenms.org', format_hostname($device_dns));

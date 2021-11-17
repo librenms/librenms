@@ -663,6 +663,7 @@ function format_hostname($device): string
     $hostname = $device['hostname'] ?? 'invalid hostname';
     $hostname_is_ip = IP::isValid($hostname);
     $sysName = empty($device['sysName']) ? $hostname : $device['sysName'];
+
     return \App\View\SimpleTemplate::parse(empty($device['display']) ? Config::get('device_display_default', '{{ $hostname }}') : $device['display'], [
         'hostname' => $hostname,
         'sysName' => $sysName,

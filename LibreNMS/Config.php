@@ -447,7 +447,7 @@ class Config
         self::deprecatedVariable('oxidized.group', 'oxidized.maps.group');
 
         // migrate device display
-        if(! self::has('device_display_default')) {
+        if (! self::has('device_display_default')) {
             $display_value = '{{ $hostname }}';
             if (self::get('force_hostname_to_sysname')) {
                 $display_value = '{{ $sysName }}';
