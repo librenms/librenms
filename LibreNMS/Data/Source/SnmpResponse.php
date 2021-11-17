@@ -112,7 +112,7 @@ class SnmpResponse
         $values = [];
         $line = strtok($this->raw, PHP_EOL);
         while ($line !== false) {
-            if (Str::contains($line, ['at this OID', 'this MIB View'])) {
+            if (Str::contains($line, ['at this OID', 'this MIB View', 'End of MIB'])) {
                 // these occur when we seek past the end of data, usually the end of the response, but grab the next line and continue
                 $line = strtok(PHP_EOL);
                 continue;
@@ -171,11 +171,15 @@ class SnmpResponse
     }
 
     /**
-     * Map an snmp table with callback.
+     * Map an snmp table with callback. If invalid data is encountered, an empty collection is returned.
      * Variables passed to the callback will be an array of row values followed by each individual index.
      */
     public function mapTable(callable $callback): Collection
     {
+        if (! $this->isValid()) {
+            return new Collection;
+        }
+
         return collect($this->values())
             ->map(function ($value, $oid) {
                 $parts = explode('[', rtrim($oid, ']'), 2);
