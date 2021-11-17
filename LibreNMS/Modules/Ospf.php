@@ -112,7 +112,7 @@ class Ospf implements Module
             $ospf_ports = SnmpQuery::context($context_name)
                 ->hideMib()->enumStrings()
                 ->walk('OSPF-MIB::ospfIfTable')
-                ->mapTable(function ($ospf_port, $ip, $ifIndex = null) use ($context_name, $os) {
+                ->mapTable(function ($ospf_port, $ip, $ifIndex) use ($context_name, $os) {
                     // find port_id
                     $ospf_port['port_id'] = (int) $os->getDevice()->ports()->where('ifIndex', $ifIndex)->value('port_id');
                     if ($ospf_port['port_id'] == 0) {
