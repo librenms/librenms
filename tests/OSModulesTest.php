@@ -100,8 +100,10 @@ class OSModulesTest extends DBTestCase
             $filename = $helper->getJsonFilepath(true);
             $expected_data = $helper->getTestData();
             $results = $helper->generateTestData($this->getSnmpsim(), true);
-        } catch (FileNotFoundException|InvalidModuleException $e) {
-            $this->fail($e->getMessage());
+        } catch (FileNotFoundException $e) {
+            return $this->fail($e->getMessage());
+        } catch (InvalidModuleException $e) {
+            return $this->fail($e->getMessage());
         }
 
         if (is_null($results)) {
@@ -166,10 +168,8 @@ class OSModulesTest extends DBTestCase
     private function stubClasses(): void
     {
         $this->app->bind('log', function ($app) {
-            $mock = \Mockery::mock('\App\Facades\LogManager[event]', [$app]);
-            $mock->shouldReceive('event');
-
-            return $mock;
+            return \Mockery::mock('\App\Facades\LogManager[event]', [$app])
+                ->shouldReceive('event');
         });
 
         $this->app->bind(Fping::class, function ($app) {

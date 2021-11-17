@@ -1,6 +1,6 @@
 <?php
 /**
- * StringHelpers.php
+ * Text.php
  *
  * -Description-
  *
@@ -19,7 +19,7 @@
  *
  * @link       https://www.librenms.org
  *
- * @copyright  2021 Tony Murray
+ * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
 

@@ -74,7 +74,7 @@ function parse_modules($type, $options)
 {
     $override = false;
 
-    if (! empty($options['m'])) {
+    if ($options['m']) {
         Config::set("{$type}_modules", []);
         foreach (explode(',', $options['m']) as $module) {
             // parse submodules (only supported by some modules)

@@ -3666,29 +3666,59 @@ parameters:
 			path: LibreNMS/Modules/Nac.php
 
 		-
+			message: "#^Method LibreNMS\\\\Modules\\\\OS\\:\\:cleanup\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: LibreNMS/Modules/OS.php
+
+		-
+			message: "#^Method LibreNMS\\\\Modules\\\\OS\\:\\:discover\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: LibreNMS/Modules/OS.php
+
+		-
+			message: "#^Method LibreNMS\\\\Modules\\\\OS\\:\\:handleChanges\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: LibreNMS/Modules/OS.php
+
+		-
+			message: "#^Method LibreNMS\\\\Modules\\\\OS\\:\\:poll\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: LibreNMS/Modules/OS.php
+
+		-
+			message: "#^Method LibreNMS\\\\Modules\\\\OS\\:\\:sysContact\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: LibreNMS/Modules/OS.php
+
+		-
+			message: "#^Method LibreNMS\\\\Modules\\\\OS\\:\\:updateLocation\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: LibreNMS/Modules/OS.php
+
+		-
 			message: "#^Variable \\$features on left side of \\?\\? is never defined\\.$#"
 			count: 1
-			path: LibreNMS/Modules/Os.php
+			path: LibreNMS/Modules/OS.php
 
 		-
 			message: "#^Variable \\$hardware on left side of \\?\\? is never defined\\.$#"
 			count: 1
-			path: LibreNMS/Modules/Os.php
+			path: LibreNMS/Modules/OS.php
 
 		-
 			message: "#^Variable \\$location in empty\\(\\) always exists and is always falsy\\.$#"
 			count: 1
-			path: LibreNMS/Modules/Os.php
+			path: LibreNMS/Modules/OS.php
 
 		-
 			message: "#^Variable \\$serial on left side of \\?\\? is never defined\\.$#"
 			count: 1
-			path: LibreNMS/Modules/Os.php
+			path: LibreNMS/Modules/OS.php
 
 		-
 			message: "#^Variable \\$version on left side of \\?\\? is never defined\\.$#"
 			count: 1
-			path: LibreNMS/Modules/Os.php
+			path: LibreNMS/Modules/OS.php
 
 		-
 			message: "#^Method LibreNMS\\\\Modules\\\\PrinterSupplies\\:\\:cleanup\\(\\) has no return type specified\\.$#"
@@ -3882,6 +3912,11 @@ parameters:
 
 		-
 			message: "#^Method LibreNMS\\\\OS\\:\\:parseRegex\\(\\) has parameter \\$subject with no type specified\\.$#"
+			count: 1
+			path: LibreNMS/OS.php
+
+		-
+			message: "#^Method LibreNMS\\\\OS\\:\\:persistGraphs\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: LibreNMS/OS.php
 
@@ -5406,6 +5441,36 @@ parameters:
 			path: LibreNMS/Util/Colors.php
 
 		-
+			message: "#^Method LibreNMS\\\\Util\\\\Debug\\:\\:disableCliDebugOutput\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: LibreNMS/Util/Debug.php
+
+		-
+			message: "#^Method LibreNMS\\\\Util\\\\Debug\\:\\:disableQueryDebug\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: LibreNMS/Util/Debug.php
+
+		-
+			message: "#^Method LibreNMS\\\\Util\\\\Debug\\:\\:enableCliDebugOutput\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: LibreNMS/Util/Debug.php
+
+		-
+			message: "#^Method LibreNMS\\\\Util\\\\Debug\\:\\:enableQueryDebug\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: LibreNMS/Util/Debug.php
+
+		-
+			message: "#^Property LibreNMS\\\\Util\\\\Debug\\:\\:\\$debug has no type specified\\.$#"
+			count: 1
+			path: LibreNMS/Util/Debug.php
+
+		-
+			message: "#^Property LibreNMS\\\\Util\\\\Debug\\:\\:\\$verbose has no type specified\\.$#"
+			count: 1
+			path: LibreNMS/Util/Debug.php
+
+		-
 			message: "#^Property LibreNMS\\\\Util\\\\Dns\\:\\:\\$resolver has no type specified\\.$#"
 			count: 1
 			path: LibreNMS/Util/Dns.php
@@ -5699,6 +5764,16 @@ parameters:
 			message: "#^Method LibreNMS\\\\Util\\\\FileCategorizer\\:\\:validateOs\\(\\) has parameter \\$os with no type specified\\.$#"
 			count: 1
 			path: LibreNMS/Util/FileCategorizer.php
+
+		-
+			message: "#^Method LibreNMS\\\\Util\\\\Git\\:\\:binaryExists\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: LibreNMS/Util/Git.php
+
+		-
+			message: "#^Method LibreNMS\\\\Util\\\\Git\\:\\:repoPresent\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: LibreNMS/Util/Git.php
 
 		-
 			message: "#^Method LibreNMS\\\\Util\\\\GitHub\\:\\:__construct\\(\\) has parameter \\$file with no type specified\\.$#"
@@ -6769,6 +6844,46 @@ parameters:
 			message: "#^Method LibreNMS\\\\Util\\\\Validate\\:\\:ascDesc\\(\\) has parameter \\$direction with no type specified\\.$#"
 			count: 1
 			path: LibreNMS/Util/Validate.php
+
+		-
+			message: "#^Method LibreNMS\\\\Util\\\\Version\\:\\:database\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: LibreNMS/Util/Version.php
+
+		-
+			message: "#^Method LibreNMS\\\\Util\\\\Version\\:\\:fromGit\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: LibreNMS/Util/Version.php
+
+		-
+			message: "#^Method LibreNMS\\\\Util\\\\Version\\:\\:get\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: LibreNMS/Util/Version.php
+
+		-
+			message: "#^Method LibreNMS\\\\Util\\\\Version\\:\\:gitChangelog\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: LibreNMS/Util/Version.php
+
+		-
+			message: "#^Method LibreNMS\\\\Util\\\\Version\\:\\:gitDate\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: LibreNMS/Util/Version.php
+
+		-
+			message: "#^Method LibreNMS\\\\Util\\\\Version\\:\\:local\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: LibreNMS/Util/Version.php
+
+		-
+			message: "#^Method LibreNMS\\\\Util\\\\Version\\:\\:python\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: LibreNMS/Util/Version.php
+
+		-
+			message: "#^Property LibreNMS\\\\Util\\\\Version\\:\\:\\$is_git_install has no type specified\\.$#"
+			count: 1
+			path: LibreNMS/Util/Version.php
 
 		-
 			message: "#^Method LibreNMS\\\\ValidationResult\\:\\:consolePrint\\(\\) has no return type specified\\.$#"

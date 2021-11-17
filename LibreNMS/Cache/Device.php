@@ -52,14 +52,6 @@ class Device
     }
 
     /**
-     * Check if a primary device is set
-     */
-    public function hasPrimary(): bool
-    {
-        return $this->primary !== null;
-    }
-
-    /**
      * Get a device by device_id
      *
      * @param  int  $device_id

@@ -1,3 +1,3 @@
 <?php
 
-(new \LibreNMS\Modules\Os())->discover($os);
+(new \LibreNMS\Modules\OS())->discover($os);
