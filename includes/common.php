@@ -656,15 +656,11 @@ function inet6_ntop($ip)
  * If hostname is an ip, use return sysName
  *
  * @param  array  $device  (uses hostname and sysName fields)
- * @param  string  $hostname
  * @return string
  */
-function format_hostname($device, $hostname = null): string
+function format_hostname($device): string
 {
-    if (empty($hostname)) {
-        $hostname = $device['hostname'];
-    }
-
+    $hostname = $device['hostname'] ?? 'invalid hostname';
     $hostname_is_ip = IP::isValid($hostname);
     $sysName = empty($device['sysName']) ? $hostname : $device['sysName'];
     return \App\View\SimpleTemplate::parse(empty($device['display']) ? Config::get('device_display_default', '{{ $hostname }}') : $device['display'], [
