@@ -55,12 +55,6 @@ return [
             'ignore_exceptions' => false,
         ],
 
-        'console_debug' => [
-            'driver' => 'stack',
-            'channels' => ['single', 'stdout_debug'],
-            'ignore_exceptions' => false,
-        ],
-
         'single' => [
             'driver' => 'single',
             'path' => env('APP_LOG', \LibreNMS\Config::get('log_file', base_path('logs/librenms.log'))),
@@ -102,16 +96,6 @@ return [
             'level' => 'debug',
         ],
 
-        'stdout_debug' => [
-            'driver' => 'monolog',
-            'handler' => StreamHandler::class,
-            'formatter' => \LibreNMS\Util\CliColorFormatter::class,
-            'with' => [
-                'stream' => 'php://output',
-            ],
-            'level' => 'debug',
-        ],
-
         'stdout' => [
             'driver' => 'monolog',
             'handler' => StreamHandler::class,
@@ -119,7 +103,7 @@ return [
             'with' => [
                 'stream' => 'php://output',
             ],
-            'level' => 'info',
+            'level' => 'debug',
         ],
 
         'syslog' => [

@@ -30,9 +30,9 @@ use LibreNMS\Interfaces\Module;
 use LibreNMS\Interfaces\Polling\OSPolling;
 use LibreNMS\Util\Url;
 
-class Os implements Module
+class OS implements Module
 {
-    public function discover(\LibreNMS\OS $os): void
+    public function discover(\LibreNMS\OS $os)
     {
         $this->updateLocation($os);
         $this->sysContact($os);
@@ -50,7 +50,7 @@ class Os implements Module
         $this->handleChanges($os);
     }
 
-    public function poll(\LibreNMS\OS $os): void
+    public function poll(\LibreNMS\OS $os)
     {
         $deviceModel = $os->getDevice(); /** @var \App\Models\Device $deviceModel */
         if ($os instanceof OSPolling) {
@@ -58,11 +58,6 @@ class Os implements Module
         } else {
             // legacy poller files
             global $graphs, $device;
-
-            if (empty($device)) {
-                $device = $os->getDeviceArray();
-            }
-
             $location = null;
 
             if (is_file(base_path('/includes/polling/os/' . $device['os'] . '.inc.php'))) {
@@ -90,12 +85,12 @@ class Os implements Module
         $this->handleChanges($os);
     }
 
-    public function cleanup(\LibreNMS\OS $os): void
+    public function cleanup(\LibreNMS\OS $os)
     {
         // no cleanup needed?
     }
 
-    private function handleChanges(\LibreNMS\OS $os): void
+    private function handleChanges(\LibreNMS\OS $os)
     {
         $device = $os->getDevice();
 
@@ -109,7 +104,7 @@ class Os implements Module
         $device->save();
     }
 
-    private function updateLocation(\LibreNMS\OS $os): void
+    private function updateLocation(\LibreNMS\OS $os)
     {
         $device = $os->getDevice();
         $new_location = $device->override_sysLocation ? new Location() : $os->fetchLocation(); // fetch location data from device
@@ -117,7 +112,7 @@ class Os implements Module
         optional($device->location)->save();
     }
 
-    private function sysContact(\LibreNMS\OS $os): void
+    private function sysContact(\LibreNMS\OS $os)
     {
         $device = $os->getDevice();
         $device->sysContact = snmp_get($os->getDeviceArray(), 'sysContact.0', '-Ovq', 'SNMPv2-MIB');

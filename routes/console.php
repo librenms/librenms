@@ -111,7 +111,8 @@ Artisan::command('device:add
         if (($verbosity = $this->getOutput()->getVerbosity()) >= 128) {
             Debug::set();
             if ($verbosity >= 256) {
-                Debug::setVerbose();
+                global $verbose;
+                $verbose = true;
             }
         }
 

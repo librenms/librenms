@@ -25,7 +25,6 @@
 
 namespace LibreNMS\Util;
 
-use App\Models\Device;
 use LibreNMS\Interfaces\Geocoder;
 
 class Dns implements Geocoder
@@ -35,19 +34,6 @@ class Dns implements Geocoder
     public function __construct()
     {
         $this->resolver = new \Net_DNS2_Resolver();
-    }
-
-    public static function lookupIp(Device $device): ?string
-    {
-        if (IP::isValid($device->hostname)) {
-            return $device->hostname;
-        }
-
-        if ($device->transport == 'udp6' || $device->transport == 'tcp6') {
-            return dns_get_record($device['hostname'], DNS_AAAA)[0]['ipv6'] ?? null;
-        }
-
-        return dns_get_record($device['hostname'], DNS_A)[0]['ip'] ?? null;
     }
 
     /**

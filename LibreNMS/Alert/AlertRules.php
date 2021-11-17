@@ -33,7 +33,6 @@ namespace LibreNMS\Alert;
 
 use Carbon\Carbon;
 use LibreNMS\Enum\AlertState;
-use Log;
 
 class AlertRules
 {
@@ -58,7 +57,7 @@ class AlertRules
         }
         //Checks each rule.
         foreach (AlertUtil::getRules($device_id) as $rule) {
-            Log::info('Rule %p#' . $rule['id'] . ' (' . $rule['name'] . '):%n ', ['color' => true]);
+            c_echo('Rule %p#' . $rule['id'] . ' (' . $rule['name'] . '):%n ');
             $extra = json_decode($rule['extra'], true);
             if (isset($extra['invert'])) {
                 $inv = (bool) $extra['invert'];
@@ -91,9 +90,9 @@ class AlertRules
             $current_state = dbFetchCell('SELECT state FROM alerts WHERE rule_id = ? AND device_id = ? ORDER BY id DESC LIMIT 1', [$rule['id'], $device_id]);
             if ($doalert) {
                 if ($current_state == AlertState::ACKNOWLEDGED) {
-                    Log::info('Status: %ySKIP%n', ['color' => true]);
+                    c_echo('Status: %ySKIP');
                 } elseif ($current_state >= AlertState::ACTIVE) {
-                    Log::info('Status: %bNOCHG%n', ['color' => true]);
+                    c_echo('Status: %bNOCHG');
                     // NOCHG here doesn't mean no change full stop. It means no change to the alert state
                     // So we update the details column with any fresh changes to the alert output we might have.
                     $alert_log = dbFetchRow('SELECT alert_log.id, alert_log.details FROM alert_log,alert_rules WHERE alert_log.rule_id = alert_rules.id && alert_log.device_id = ? && alert_log.rule_id = ? && alert_rules.disabled = 0
@@ -114,12 +113,12 @@ class AlertRules
                         } else {
                             dbUpdate(['state' => AlertState::ACTIVE, 'open' => 1, 'timestamp' => Carbon::now()], 'alerts', 'device_id = ? && rule_id = ?', [$device_id, $rule['id']]);
                         }
-                        Log::info(PHP_EOL . 'Status: %rALERT%n', ['color' => true]);
+                        c_echo(PHP_EOL . 'Status: %rALERT');
                     }
                 }
             } else {
                 if (! is_null($current_state) && $current_state == AlertState::RECOVERED) {
-                    Log::info('Status: %bNOCHG%n', ['color' => true]);
+                    c_echo('Status: %bNOCHG');
                 } else {
                     if (dbInsert(['state' => AlertState::RECOVERED, 'device_id' => $device_id, 'rule_id' => $rule['id']], 'alert_log')) {
                         if (is_null($current_state)) {
@@ -128,10 +127,11 @@ class AlertRules
                             dbUpdate(['state' => AlertState::RECOVERED, 'open' => 1, 'note' => '', 'timestamp' => Carbon::now()], 'alerts', 'device_id = ? && rule_id = ?', [$device_id, $rule['id']]);
                         }
 
-                        Log::info(PHP_EOL . 'Status: %gOK%n', ['color' => true]);
+                        c_echo(PHP_EOL . 'Status: %gOK');
                     }
                 }
             }
+            c_echo('%n' . PHP_EOL);
         }
     }
 }
