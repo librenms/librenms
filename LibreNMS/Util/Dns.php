@@ -43,11 +43,15 @@ class Dns implements Geocoder
             return $device->hostname;
         }
 
-        if ($device->transport == 'udp6' || $device->transport == 'tcp6') {
-            return dns_get_record($device['hostname'], DNS_AAAA)[0]['ipv6'] ?? null;
-        }
+        try {
+            if ($device->transport == 'udp6' || $device->transport == 'tcp6') {
+                return dns_get_record($device['hostname'], DNS_AAAA)[0]['ipv6'] ?? null;
+            }
 
-        return dns_get_record($device['hostname'], DNS_A)[0]['ip'] ?? null;
+            return dns_get_record($device['hostname'], DNS_A)[0]['ip'] ?? null;
+        } catch (\Exception $e) {
+            return null;
+        }
     }
 
     /**
