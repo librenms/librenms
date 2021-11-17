@@ -14,7 +14,7 @@ class DeviceAddDisplayField extends Migration
     public function up()
     {
         Schema::table('devices', function (Blueprint $table) {
-            $table->string('display')->nullable()->after('sysName');
+            $table->string('display', 128)->nullable()->after('sysName');
         });
     }
 
