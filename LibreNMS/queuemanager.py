@@ -493,7 +493,7 @@ class PollerQueueManager(QueueManager):
         if self.lock(device_id, timeout=self.config.poller.frequency):
             logger.info("Polling device {}".format(device_id))
 
-            exit_code, output = LibreNMS.call_script("poller.php", ("-h", device_id))
+            exit_code, output = LibreNMS.call_script("lnms", ("device:poll", device_id))
             if exit_code == 0:
                 self.unlock(device_id)
             else:
