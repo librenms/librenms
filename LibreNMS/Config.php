@@ -446,6 +446,18 @@ class Config
         self::deprecatedVariable('poller_modules.cisco-sla', 'poller_modules.slas');
         self::deprecatedVariable('oxidized.group', 'oxidized.maps.group');
 
+        // migrate device display
+        if(! self::has('device_display_default')) {
+            $display_value = '{{ $hostname }}';
+            if (self::get('force_hostname_to_sysname')) {
+                $display_value = '{{ $sysName }}';
+            } elseif (self::get('force_ip_to_sysname')) {
+                $display_value = '{{ $sysName_fallback }}';
+            }
+
+            self::persist('device_display_default', $display_value);
+        }
+
         $persist = Eloquent::isConnected();
         // make sure we have full path to binaries in case PATH isn't set
         foreach (['fping', 'fping6', 'snmpgetnext', 'rrdtool', 'traceroute', 'traceroute6'] as $bin) {

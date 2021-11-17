@@ -659,25 +659,20 @@ function inet6_ntop($ip)
  * @param  string  $hostname
  * @return string
  */
-function format_hostname($device, $hostname = null)
+function format_hostname($device, $hostname = null): string
 {
     if (empty($hostname)) {
         $hostname = $device['hostname'];
     }
 
-    if (Config::get('force_hostname_to_sysname') && ! empty($device['sysName'])) {
-        if (\LibreNMS\Util\Validate::hostname($hostname) && ! IP::isValid($hostname)) {
-            return $device['sysName'];
-        }
-    }
-
-    if (Config::get('force_ip_to_sysname') && ! empty($device['sysName'])) {
-        if (IP::isValid($hostname)) {
-            return $device['sysName'];
-        }
-    }
-
-    return $hostname;
+    $hostname_is_ip = IP::isValid($hostname);
+    $sysName = empty($device['sysName']) ? $hostname : $device['sysName'];
+    return \App\View\SimpleTemplate::parse(empty($device['display']) ? Config::get('device_display_default', '{{ $hostname }}') : $device['display'], [
+        'hostname' => $hostname,
+        'sysName' => $sysName,
+        'sysName_fallback' => $hostname_is_ip ? $sysName : $hostname,
+        'ip' => empty($device['overwrite_ip']) ? ($hostname_is_ip ? $device['hostname'] : $device['ip'] ?? '') : $device['overwrite_ip'],
+    ]);
 }
 
 /**
