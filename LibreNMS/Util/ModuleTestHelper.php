@@ -33,6 +33,7 @@ use LibreNMS\Config;
 use LibreNMS\Data\Source\SnmpResponse;
 use LibreNMS\Exceptions\FileNotFoundException;
 use LibreNMS\Exceptions\InvalidModuleException;
+use LibreNMS\Poller;
 use Symfony\Component\Yaml\Yaml;
 
 class ModuleTestHelper
@@ -79,8 +80,6 @@ class ModuleTestHelper
      */
     public function __construct($modules, $os, $variant = '')
     {
-        global $influxdb;
-
         $this->modules = self::resolveModuleDependencies((array) $modules);
         $this->os = strtolower($os);
         $this->variant = strtolower($variant);
@@ -196,8 +195,10 @@ class ModuleTestHelper
         $save_vdebug = Debug::isVerbose();
         Debug::set();
         Debug::setVerbose(false);
+        \Log::setDefaultDriver('console');
         discover_device($device, $this->parseArgs('discovery'));
-        poll_device($device, $this->parseArgs('poller'));
+        $poller = app(Poller::class, ['device_spec' => $device_id, 'module_override' => $this->modules]);
+        $poller->poll();
         Debug::set($save_debug);
         Debug::setVerbose($save_vdebug);
         $collection_output = ob_get_contents();
@@ -533,6 +534,7 @@ class ModuleTestHelper
     {
         global $device;
         Config::set('rrd.enable', false); // disable rrd
+        Config::set('rrdtool_version', '1.7.2'); // don't detect rrdtool version, rrdtool is not install on ci
 
         if (! is_file($this->snmprec_file)) {
             throw new FileNotFoundException("$this->snmprec_file does not exist!");
@@ -592,7 +594,7 @@ class ModuleTestHelper
 
         // Dump the discovered data
         $data = array_merge_recursive($data, $this->dumpDb($device['device_id'], $discovered_modules, 'discovery'));
-        $device = device_by_id_cache($device_id, true); // refresh the device array
+        DeviceCache::get($device_id)->refresh(); // refresh the device
 
         // Run the poller
         if ($this->quiet) {
@@ -601,7 +603,9 @@ class ModuleTestHelper
         }
         ob_start();
 
-        poll_device($device, $this->parseArgs('poller'));
+        \Log::setDefaultDriver('console');
+        $poller = app(Poller::class, ['device_spec' => $device_id, 'module_override' => $this->modules]);
+        $poller->poll();
 
         $this->poller_output = ob_get_contents();
         if ($this->quiet) {
@@ -617,12 +621,12 @@ class ModuleTestHelper
         $polled_modules = array_keys($this->poller_module_output);
 
         // Dump polled data
-        $data = array_merge_recursive($data, $this->dumpDb($device['device_id'], $polled_modules, 'poller'));
+        $data = array_merge_recursive($data, $this->dumpDb($device_id, $polled_modules, 'poller'));
 
         // Remove the test device, we don't need the debug from this
         if ($device['hostname'] == $snmpsim->getIp()) {
             Debug::set(false);
-            delete_device($device['device_id']);
+            delete_device($device_id);
         }
 
         if (! $no_save) {
@@ -721,7 +725,7 @@ class ModuleTestHelper
                 // build joins
                 $join = '';
                 $select = ["`$table`.*"];
-                foreach ($info['joins'] ?: [] as $join_info) {
+                foreach ($info['joins'] ?? [] as $join_info) {
                     if (isset($join_info['custom'])) {
                         $join .= ' ' . $join_info['custom'];
 
