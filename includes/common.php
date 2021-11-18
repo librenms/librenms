@@ -623,14 +623,10 @@ function version_info($remote = false)
     }
     $output['db_schema'] = vsprintf('%s (%s)', $version->database());
     $output['php_ver'] = phpversion();
-    $output['python_ver'] = \LibreNMS\Util\Version::python();
+    $output['python_ver'] = $version->python();
     $output['mysql_ver'] = \LibreNMS\DB\Eloquent::isConnected() ? \LibreNMS\DB\Eloquent::version() : '?';
-    $output['rrdtool_ver'] = str_replace('1.7.01.7.0', '1.7.0', implode(' ', array_slice(explode(' ', shell_exec(
-        Config::get('rrdtool', 'rrdtool') . ' --version |head -n1'
-    )), 1, 1)));
-    $output['netsnmp_ver'] = str_replace('version: ', '', rtrim(shell_exec(
-        Config::get('snmpget', 'snmpget') . ' -V 2>&1'
-    )));
+    $output['rrdtool_ver'] = $version->rrdtool();
+    $output['netsnmp_ver'] = $version->netSnmp();
 
     return $output;
 }//end version_info()

@@ -27,6 +27,7 @@ namespace App\Console;
 
 use Illuminate\Console\Command;
 use Illuminate\Validation\ValidationException;
+use LibreNMS\Util\Debug;
 use Symfony\Component\Console\Exception\InvalidArgumentException;
 use Validator;
 
@@ -45,7 +46,7 @@ abstract class LnmsCommand extends Command
         $this->setDescription(__('commands.' . $this->getName() . '.description'));
     }
 
-    public function isHidden()
+    public function isHidden(): bool
     {
         $env = $this->getLaravel() ? $this->getLaravel()->environment() : getenv('APP_ENV');
 
@@ -123,6 +124,17 @@ abstract class LnmsCommand extends Command
                 $this->error($message);
             });
             exit(1);
+        }
+    }
+
+    protected function configureOutputOptions(): void
+    {
+        \Log::setDefaultDriver($this->getOutput()->isQuiet() ? 'stack' : 'console');
+        if (($verbosity = $this->getOutput()->getVerbosity()) >= 128) {
+            Debug::set();
+            if ($verbosity >= 256) {
+                Debug::setVerbose();
+            }
         }
     }
 }

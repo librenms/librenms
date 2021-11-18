@@ -27,6 +27,8 @@ namespace App\Polling\Measure;
 
 use DB;
 use Illuminate\Database\Events\QueryExecuted;
+use Illuminate\Support\Collection;
+use Log;
 
 class MeasurementManager
 {
@@ -36,20 +38,16 @@ class MeasurementManager
     const NO_COLOR = "\e[0m";
 
     /**
-     * @var MeasurementCollection
+     * @var \Illuminate\Support\Collection<MeasurementCollection>
      */
-    private static $snmp;
-
-    /**
-     * @var MeasurementCollection
-     */
-    private static $db;
+    private static $categories;
 
     public function __construct()
     {
-        if (self::$snmp === null) {
-            self::$snmp = new MeasurementCollection();
-            self::$db = new MeasurementCollection();
+        if (self::$categories === null) {
+            self::$categories = new Collection;
+            self::$categories->put('snmp', new MeasurementCollection());
+            self::$categories->put('db', new MeasurementCollection());
         }
     }
 
@@ -65,11 +63,19 @@ class MeasurementManager
     }
 
     /**
+     * Update statistics for the given category
+     */
+    public function record(string $category, Measurement $measurement): void
+    {
+        $this->getCategory($category)->record($measurement);
+    }
+
+    /**
      * Update statistics for db operations
      */
     public function recordDb(Measurement $measurement): void
     {
-        self::$db->record($measurement);
+        $this->record('db', $measurement);
     }
 
     /**
@@ -77,25 +83,24 @@ class MeasurementManager
      */
     public function printChangedStats(): void
     {
-        printf(
-            '>> %sSNMP%s: [%d/%.2fs] %sMySQL%s: [%d/%.2fs]',
-            self::SNMP_COLOR,
-            self::NO_COLOR,
-            self::$snmp->getCountDiff(),
-            self::$snmp->getDurationDiff(),
-            self::DB_COLOR,
-            self::NO_COLOR,
-            self::$db->getCountDiff(),
-            self::$db->getDurationDiff()
-        );
-
-        app('Datastore')->getStats()->each(function (MeasurementCollection $stats, $datastore) {
-            printf(' %s%s%s: [%d/%.2fs]', self::DATASTORE_COLOR, $datastore, self::NO_COLOR, $stats->getCountDiff(), $stats->getDurationDiff());
+        $dsStats = app('Datastore')->getStats()->map(function (MeasurementCollection $stats, $datastore) {
+            return sprintf('%s%s%s: [%d/%.2fs]', self::DATASTORE_COLOR, $datastore, self::NO_COLOR, $stats->getCountDiff(), $stats->getDurationDiff());
         });
 
-        $this->checkpoint();
+        Log::info(sprintf(
+            '>> %sSNMP%s: [%d/%.2fs] %sMySQL%s: [%d/%.2fs] %s',
+            self::SNMP_COLOR,
+            self::NO_COLOR,
+            $this->getCategory('snmp')->getCountDiff(),
+            $this->getCategory('snmp')->getDurationDiff(),
+            self::DB_COLOR,
+            self::NO_COLOR,
+            $this->getCategory('db')->getCountDiff(),
+            $this->getCategory('db')->getDurationDiff(),
+            $dsStats->implode(' ')
+        ));
 
-        echo PHP_EOL;
+        $this->checkpoint();
     }
 
     /**
@@ -103,8 +108,7 @@ class MeasurementManager
      */
     public function checkpoint(): void
     {
-        self::$snmp->checkpoint();
-        self::$db->checkpoint();
+        self::$categories->each->checkpoint();
         app('Datastore')->getStats()->each->checkpoint();
     }
 
@@ -113,7 +117,7 @@ class MeasurementManager
      */
     public function recordSnmp(Measurement $measurement): void
     {
-        self::$snmp->record($measurement);
+        $this->record('snmp', $measurement);
     }
 
     /**
@@ -121,22 +125,36 @@ class MeasurementManager
      */
     public function printStats(): void
     {
-        $this->printSummary('SNMP', self::$snmp, self::SNMP_COLOR);
-        $this->printSummary('SQL', self::$db, self::DB_COLOR);
+        $this->printSummary('SNMP', $this->getCategory('snmp'), self::SNMP_COLOR);
+        $this->printSummary('SQL', $this->getCategory('db'), self::DB_COLOR);
 
         app('Datastore')->getStats()->each(function (MeasurementCollection $stats, string $datastore) {
             $this->printSummary($datastore, $stats, self::DATASTORE_COLOR);
         });
     }
 
-    private function printSummary(string $name, MeasurementCollection $collection, string $color = ''): void
+    public function getCategory(string $category): MeasurementCollection
     {
-        printf('%s%s%s [%d/%.2fs]:', $color, $name, $color ? self::NO_COLOR : '', $collection->getTotalCount(), $collection->getTotalDuration());
+        if (! self::$categories->has($category)) {
+            self::$categories->put($category, new MeasurementCollection());
+        }
 
-        $collection->each(function (MeasurementSummary $stat) {
-            printf(' %s[%d/%.2fs]', ucfirst($stat->getType()), $stat->getCount(), $stat->getDuration());
+        return self::$categories->get($category);
+    }
+
+    public function printSummary(string $name, MeasurementCollection $collection, string $color = ''): void
+    {
+        $summaries = $collection->map(function (MeasurementSummary $stat) {
+            return sprintf('%s[%d/%.2fs]', ucfirst($stat->getType()), $stat->getCount(), $stat->getDuration());
         });
 
-        echo PHP_EOL;
+        Log::info(sprintf('%s%s%s [%d/%.2fs]: %s',
+            $color,
+            $name,
+            $color ? self::NO_COLOR : '',
+            $collection->getTotalCount(),
+            $collection->getTotalDuration(),
+            $summaries->implode(' ')
+        ));
     }
 }

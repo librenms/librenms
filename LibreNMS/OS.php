@@ -127,7 +127,7 @@ class OS implements
         $this->graphs[$name] = true;
     }
 
-    public function persistGraphs()
+    public function persistGraphs(): void
     {
         $device = $this->getDevice();
         $graphs = collect(array_keys($this->graphs));
