@@ -44,8 +44,8 @@ class SnmpFetch extends LnmsCommand
         ]);
 
         $spec = $this->argument('device spec');
-        $device_ids = Device::when($spec !== 'all', function (Builder $query) use ($spec) {
-            $query->where('device_id', $spec)
+        $device_ids = Device::query()->when($spec !== 'all', function (Builder $query) use ($spec) {
+            return $query->where('device_id', $spec)
                 ->orWhere('hostname', 'regex', $spec);
         })->pluck('device_id');
 
