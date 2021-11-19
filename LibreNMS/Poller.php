@@ -177,7 +177,7 @@ class Poller
                 } catch (Throwable $e) {
                     // isolate module exceptions so they don't disrupt the polling process
                     $this->logger->error("%rError polling $module module for {$this->device->hostname}.%n " . $e->getMessage() . PHP_EOL . $e->getTraceAsString(), ['color' => true]);
-                    $this->logger->event("Error polling $module module. Check log file for more details.", $this->device, 'poller', Alert::ERROR);
+                    \Log::event("Error polling $module module. Check log file for more details.", $this->device, 'poller', Alert::ERROR);
                 }
 
                 app(MeasurementManager::class)->printChangedStats();
