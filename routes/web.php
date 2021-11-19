@@ -83,7 +83,7 @@ Route::group(['middleware' => ['auth'], 'guard' => 'auth'], function () {
     Route::get('plugin', 'PluginLegacyController@redirect');
     Route::redirect('plugin/view=admin', '/plugin/admin');
     Route::get('plugin/p={pluginName}', 'PluginLegacyController@redirect');
-    Route::any('plugin/v1/{plugin:plugin_name}', 'PluginLegacyController')->name('plugin.legacy');
+    Route::any('plugin/v1/{plugin:plugin_name}/{other?}', 'PluginLegacyController')->where('other', '(.*)')->name('plugin.legacy');
     Route::get('plugin/{plugin:plugin_name}', 'PluginPageController')->name('plugin.page');
 
     // old route redirects

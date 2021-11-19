@@ -1,0 +1,2544 @@
+TIMETRA-CELLULAR-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    InetAddress, InetAddressType
+                                                         FROM INET-ADDRESS-MIB
+    MODULE-COMPLIANCE, NOTIFICATION-GROUP,
+    OBJECT-GROUP
+                                                         FROM SNMPv2-CONF
+    Integer32, MODULE-IDENTITY,
+    NOTIFICATION-TYPE, OBJECT-TYPE,
+    Unsigned32
+                                                         FROM SNMPv2-SMI
+    DateAndTime, DisplayString, RowStatus,
+    TEXTUAL-CONVENTION, TimeStamp,
+    TruthValue
+                                                         FROM SNMPv2-TC
+    tmnxCardSlotNum, tmnxMDASlotNum
+                                                         FROM TIMETRA-CHASSIS-MIB
+    timetraSRMIBModules, tmnxSRConfs,
+    tmnxSRNotifyPrefix, tmnxSRObjs
+                                                         FROM TIMETRA-GLOBAL-MIB
+    tmnxPortNotifyPortId, tmnxPortPortID
+                                                         FROM TIMETRA-PORT-MIB
+    TItemDescription, TNamedItemOrEmpty,
+    TmnxAuthPassword, TmnxEnabledDisabled,
+    TmnxEnabledDisabledAdminState
+                                                         FROM TIMETRA-TC-MIB
+    ;
+
+timetraCellularMIBModule         MODULE-IDENTITY
+    LAST-UPDATED "201607180000Z"
+    ORGANIZATION "Nokia"
+    CONTACT-INFO
+        "Nokia SROS Support
+         Web: http://www.nokia.com"
+    DESCRIPTION
+        "This document is the SNMP MIB module for the Nokia SROS implementation
+         of cellular ports.
+
+         Copyright 2016-2018 Nokia. All rights reserved. Reproduction of this
+         document is authorized on the condition that the foregoing copyright
+         notice is included.
+
+         This SNMP MIB module (Specification) embodies Nokia's
+         proprietary intellectual property.  Nokia retains all
+         title and ownership in the Specification, including any
+         revisions.
+
+         Nokia grants all interested parties a non-exclusive license to use and
+         distribute an unmodified copy of this Specification in connection with
+         management of Nokia products, and without fee, provided this copyright
+         notice and license appear on all copies.
+
+         This Specification is supplied `as is', and Nokia makes no warranty,
+         either express or implied, as to the use, operation, condition, or
+         performance of the Specification."
+
+    REVISION    "201607180000Z"
+    DESCRIPTION
+        "Rev 1.0               18 Jul 2016 00:00
+         Initial version of the TIMETRA-PORT-CELLULAR-MIB."
+
+    ::= { timetraSRMIBModules 109 }
+
+TmnxCellularPdnProfileId         ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "TmnxCellularPdnProfileId identifies a specific Packet Data Network
+         profile in the system."
+    SYNTAX      Unsigned32 (0..15)
+
+TmnxCellularAccessPointName      ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The data type TmnxCellularAccessPointName represents a cellular Access
+         Point Name (APN)."
+    REFERENCE
+        "3GPP TS 23.003 version 14.0.0 Release 14, '3rd Generation
+         Partnership Project; Technical Specification Group Core Network
+         and Terminals; Numbering, addressing and identification',
+         3GPP, June 2016, Section 9, 'Definition of Access Point Name'"
+    SYNTAX      DisplayString (SIZE (0..100))
+
+TmnxCellularImei                 ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "2a-6a-6a-2a"
+    STATUS      current
+    DESCRIPTION
+        "The data type TmnxCellularImei represents an International Mobile
+         Station Equipment Identity (IMEI) number."
+    REFERENCE
+        "3GPP TS 23.003 version 14.0.0 Release 14, '3rd Generation
+         Partnership Project; Technical Specification Group Core Network
+         and Terminals; Numbering, addressing and identification',
+         3GPP, June 2016, Section 6, 'International Mobile Station
+         Equipment Identity and Software Version Number'"
+    SYNTAX      DisplayString (SIZE (0|15..16))
+
+TmnxCellularSimCardNumber        ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "TmnxCellularSimCardNumber identifies a specific cellular Subscriber
+         Identity Module (SIM) card in a system."
+    SYNTAX      Unsigned32 (1..2)
+
+TmnxCellularSimCardIccid         ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The data type TmnxCellularSimCardIccid represents an Integrated
+         Circuit Card Identifier (ICCID).  Each SIM card has a unique
+         ICCID."
+    REFERENCE
+        "ITU-T E.118, 'The international telecommunication charge card',
+         ITU-T, May 2006, Section 4, 'Numbering system'"
+    SYNTAX      DisplayString (SIZE (0..20))
+
+TmnxCellularImsi                 ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The data type TmnxCellularImsi represents an International
+         Mobile Subscriber Identity.  An IMSI uniquely identifies a
+         mobile subscriber."
+    REFERENCE
+        "3GPP TS 23.003 version 14.0.0 Release 14, '3rd Generation
+         Partnership Project; Technical Specification Group Core Network
+         and Terminals; Numbering, addressing and identification',
+         3GPP, June 2016, Section 2, 'Identification of mobile subscribers'"
+    SYNTAX      DisplayString (SIZE (0..15))
+
+TmnxCellularPdnId                ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "TmnxCellularPdnId identifies a specific Packet Data Network (PDN) on a
+         cellular port."
+    SYNTAX      Unsigned32 (1)
+
+TmnxCellularChannelNumber        ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "TmnxCellularChannelNumber identifies an channel number.  For LTE,
+         this is an E-UTRA Absolute Radio Frequency Channel Number (EARFCN),
+         as described in 3GPP TS 36.101."
+    REFERENCE
+        "3GPP TS 36.101 version 14.1.0 Release 14, '3rd Generation
+         Partnership Project; Technical Specification Group Radio Access
+         Network; Evolved Universal Terrestrial Radio Access (E-UTRA);
+         User Equipment (UE) radio transmission and reception (Release 14),
+         3GPP, September 2016, Table 5.7.3-1, 'E-UTRA channel numbers"
+    SYNTAX      Unsigned32 (0..262143)
+
+TmnxCellularBearerRate           ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "TmnxCellularBearerRate identifies a bit rate of a bearer on a cellular
+         interface, in kbit/s."
+    SYNTAX      Unsigned32 (0..100000)
+
+tmnxCellularObjs                 OBJECT IDENTIFIER ::= { tmnxSRObjs 109 }
+
+tmnxCellularConfigObjs           OBJECT IDENTIFIER ::= { tmnxCellularObjs 2 }
+
+tmnxCellularConfigTimestamps     OBJECT IDENTIFIER ::= { tmnxCellularConfigObjs 1 }
+
+tmnxCellPdnProfileTblLastChanged OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCellPdnProfileTblLastChanged indicates the sysUpTime
+         at the time of the most recent management-initiated change to the
+         table tmnxCellularPdnProfileTable."
+    ::= { tmnxCellularConfigTimestamps 1 }
+
+tmnxCellSimCardTableLastChanged  OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCellSimCardTableLastChanged indicates the sysUpTime
+         at the time of the most recent management-initiated change to the
+         table tmnxCellularSimCardTable."
+    ::= { tmnxCellularConfigTimestamps 2 }
+
+tmnxCellPdnTblLastChanged        OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCellPdnTblLastChanged indicates the sysUpTime at the
+         time of the most recent management-initiated change to the table
+         tmnxCellularPdnTable."
+    ::= { tmnxCellularConfigTimestamps 3 }
+
+tmnxCellPortTblLastChanged       OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCellPortTblLastChanged indicates the sysUpTime at the
+         time of the most recent management-initiated change to the table
+         tmnxCellularPortTable."
+    ::= { tmnxCellularConfigTimestamps 4 }
+
+tmnxCellPortCbsdAuthCfgTblLstChg OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCellPortCbsdAuthCfgTblLstChg indicates the sysUpTime
+         at the time of the most recent management-initiated change to the
+         table tmnxCellPortCbsdAuthCfgTable."
+    ::= { tmnxCellularConfigTimestamps 5 }
+
+tmnxCellularSystemConfigObjs     OBJECT IDENTIFIER ::= { tmnxCellularConfigObjs 2 }
+
+tmnxCellularPdnProfileTable      OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxCellPdnProfileEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The tmnxCellularPdnProfileTable has a series of configurations,
+         applicable to cellular Packet Data Networks, which are indexed by a
+         PDN profile number."
+    ::= { tmnxCellularSystemConfigObjs 1 }
+
+tmnxCellPdnProfileEntry          OBJECT-TYPE
+    SYNTAX      TmnxCellPdnProfileEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each row entry represents a specific PDN profile.
+
+         The system automatically creates one entry, at index 0, to represent
+         the default PDN profile.  The user cannot modify the configuration
+         of this default profile.
+
+         Other entries can be created and deleted via SNMP SET operations, and
+         the user can modify the configuration of those entries."
+    INDEX       { tmnxCellPdnProfileId }
+    ::= { tmnxCellularPdnProfileTable 1 }
+
+TmnxCellPdnProfileEntry          ::= SEQUENCE
+{
+    tmnxCellPdnProfileId             TmnxCellularPdnProfileId,
+    tmnxCellPdnProfRowStatus         RowStatus,
+    tmnxCellPdnProfLastChanged       TimeStamp,
+    tmnxCellPdnProfDescription       TItemDescription,
+    tmnxCellPdnProfApn               TmnxCellularAccessPointName,
+    tmnxCellPdnProfAuthType          INTEGER,
+    tmnxCellPdnProfUsername          DisplayString,
+    tmnxCellPdnProfPassword          TmnxAuthPassword,
+    tmnxCellPdnProfProtocol          INTEGER
+}
+
+tmnxCellPdnProfileId             OBJECT-TYPE
+    SYNTAX      TmnxCellularPdnProfileId
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCellPdnProfileId specifies the number of a specific
+         PDN profile configured in the system.
+
+         The value 0 is reserved for a default profile, which is automatically
+         created by the system, and cannot be modified or deleted by the user."
+    ::= { tmnxCellPdnProfileEntry 1 }
+
+tmnxCellPdnProfRowStatus         OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCellPdnProfRowStatus specifies the row status of the
+         PDN profile entry.  It is used to control the creation and deletion of
+         PDN profiles.
+
+         The user cannot delete the PDN profile whose tmnxCellPdnProfileId has
+         a value of 0."
+    ::= { tmnxCellPdnProfileEntry 2 }
+
+tmnxCellPdnProfLastChanged       OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCellPdnProfLastChanged indicates the sysUpTime at the
+         time of the most recent management-initiated change to this table row.
+
+         For the default PDN profile, tmnxCellPdnProfLastChanged has a value of
+         0"
+    ::= { tmnxCellPdnProfileEntry 3 }
+
+tmnxCellPdnProfDescription       OBJECT-TYPE
+    SYNTAX      TItemDescription
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCellPdnProfDescription specifies a user provided
+         description for this PDN profile.
+
+         For the default PDN profile, tmnxCellPdnProfDescription has a value of
+         'default profile'"
+    DEFVAL      { ''H }
+    ::= { tmnxCellPdnProfileEntry 4 }
+
+tmnxCellPdnProfApn               OBJECT-TYPE
+    SYNTAX      TmnxCellularAccessPointName
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCellPdnProfApn specifies the APN for this PDN.
+
+         The cellular service provider may require the user to program the APN
+         value in order to use the service.
+
+         For the default PDN profile, tmnxCellPdnProfApn has a value of the
+         empty string"
+    DEFVAL      { ''H }
+    ::= { tmnxCellPdnProfileEntry 5 }
+
+tmnxCellPdnProfAuthType          OBJECT-TYPE
+    SYNTAX      INTEGER {
+        none (0),
+        pap  (1),
+        chap (2)
+    }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCellPdnProfAuthType specifies the method of
+         authentication used on the PDN.
+
+         For the default PDN profile, tmnxCellPdnProfAuthType has a value of
+         'none (0)'."
+    DEFVAL      { none }
+    ::= { tmnxCellPdnProfileEntry 6 }
+
+tmnxCellPdnProfUsername          OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..255))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCellPdnProfUsername specifies the username when
+         authenticating the PDN.
+
+         For the default PDN profile, tmnxCellPdnProfUsername has a value of
+         the empty string."
+    DEFVAL      { ''H }
+    ::= { tmnxCellPdnProfileEntry 7 }
+
+tmnxCellPdnProfPassword          OBJECT-TYPE
+    SYNTAX      TmnxAuthPassword
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCellPdnProfPassword specifies the password when
+         authenticating the PDN.
+
+         A get request on this object always returns an empty string.
+
+         For the default PDN profile, tmnxCellPdnProfPassword has a value of
+         the empty string."
+    DEFVAL      { ''H }
+    ::= { tmnxCellPdnProfileEntry 8 }
+
+tmnxCellPdnProfProtocol          OBJECT-TYPE
+    SYNTAX      INTEGER {
+        ipv4 (1),
+        ipv6 (2)
+    }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCellPdnProfProtocol specifies whether the PDN shall
+         use IPv4 or IPv6 addresses.
+
+         For the default PDN profile, tmnxCellPdnProfProtocol has a value of
+         ipv4."
+    DEFVAL      { ipv4 }
+    ::= { tmnxCellPdnProfileEntry 9 }
+
+tmnxCellularPortConfigObjs       OBJECT IDENTIFIER ::= { tmnxCellularConfigObjs 3 }
+
+tmnxCellularSimCardTable         OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxCellularSimCardEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The tmnxCellularSimCardTable has an entry for each SIM card in the
+         system."
+    ::= { tmnxCellularPortConfigObjs 1 }
+
+tmnxCellularSimCardEntry         OBJECT-TYPE
+    SYNTAX      TmnxCellularSimCardEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each row entry represents a SIM card for a cellular port in the
+         system. Entries are automatically created by the system, and cannot be
+         created or deleted via SNMP SET operations.
+
+         The system creates an entry for each possible SIM card that can
+         be installed into the system.  Each SIM card is associated with a
+         specific cellular port in the system."
+    INDEX       {
+        tmnxPortPortID,
+        tmnxCellSimCardId
+    }
+    ::= { tmnxCellularSimCardTable 1 }
+
+TmnxCellularSimCardEntry         ::= SEQUENCE
+{
+    tmnxCellSimCardId                TmnxCellularSimCardNumber,
+    tmnxCellSimCardLastChanged       TimeStamp,
+    tmnxCellSimCardDescription       TItemDescription,
+    tmnxCellSimCardPin               OCTET STRING,
+    tmnxCellSimCardFailureDuration   Unsigned32,
+    tmnxCellSimCardPortStateSwitch   TruthValue,
+    tmnxCellSimCardBgpStateSwitch    TruthValue
+}
+
+tmnxCellSimCardId                OBJECT-TYPE
+    SYNTAX      TmnxCellularSimCardNumber
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCellSimCardId specifies a SIM card on a cellular
+         port."
+    ::= { tmnxCellularSimCardEntry 1 }
+
+tmnxCellSimCardLastChanged       OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCellSimCardLastChanged indicates the sysUpTime at the
+         time of the most recent management-initiated change to this table row."
+    ::= { tmnxCellularSimCardEntry 2 }
+
+tmnxCellSimCardDescription       OBJECT-TYPE
+    SYNTAX      TItemDescription
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCellSimCardDescription specifies a user provided
+         description for this SIM card."
+    DEFVAL      { ''H }
+    ::= { tmnxCellularSimCardEntry 3 }
+
+tmnxCellSimCardPin               OBJECT-TYPE
+    SYNTAX      OCTET STRING (SIZE (0|4..8))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCellSimCardPin specifies the Personal
+         Identification Number of the SIM card.  This is required
+         in order to access a locked SIM card.
+
+         A get request on this object always returns an empty string."
+    DEFVAL      { ''H }
+    ::= { tmnxCellularSimCardEntry 4 }
+
+tmnxCellSimCardFailureDuration   OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..60)
+    UNITS       "minutes"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCellSimCardFailureDuration specifies the amount or
+         time that the system will wait before switching SIM cards.
+
+         The system will only automatically switch SIM cards if
+         tmnxCellMdaAdminActiveSim is set to 'automatic', and
+         if the failover criteria is met.  The value of
+         tmnxCellSimCardPortStateSwitch and tmnxCellSimCardBgpStateSwitch
+         control the failover criteria."
+    DEFVAL      { 5 }
+    ::= { tmnxCellularSimCardEntry 5 }
+
+tmnxCellSimCardPortStateSwitch   OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCellSimCardPortStateSwitch specifies whether or not
+         the system will automatically switch to the other SIM card if the port
+         corresponding to this SIM card remains operationally down for the
+         duration specified by tmnxCellSimCardFailureDuration.
+
+         The system will only automatically switch SIM cards if
+         tmnxCellMdaAdminActiveSim is set to 'automatic'.
+
+         At least one of the SIM switch criteria tmnxCellSimCardPortStateSwitch
+         or tmnxCellSimCardBgpStateSwitch must be enabled for a given SIM card."
+    DEFVAL      { true }
+    ::= { tmnxCellularSimCardEntry 6 }
+
+tmnxCellSimCardBgpStateSwitch    OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCellSimCardBgpStateSwitch specifies whether or not
+         the system will automatically switch to the other SIM card if all BGP
+         sessions corresponding to this SIM card are not established for the
+         duration specified by tmnxCellSimCardFailureDuration.
+
+         The system will only automatically switch SIM cards if
+         tmnxCellMdaAdminActiveSim is set to 'automatic'.
+
+         At least one of the SIM switch criteria tmnxCellSimCardPortStateSwitch
+         or tmnxCellSimCardBgpStateSwitch must be enabled for a given SIM card."
+    DEFVAL      { false }
+    ::= { tmnxCellularSimCardEntry 7 }
+
+tmnxCellularPdnTable             OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxCellularPdnEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The tmnxCellularPdnTable has a series of configurations for Packet
+         Data Networks (PDNs), which are configured against a cellular port and
+         associated with a specific SIM card."
+    ::= { tmnxCellularPortConfigObjs 2 }
+
+tmnxCellularPdnEntry             OBJECT-TYPE
+    SYNTAX      TmnxCellularPdnEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each row entry represents a specific Packet Data Network.
+
+         A Packet Data Network is associated with a specific cellular port and
+         SIM card.
+
+         Entries can be created and deleted via SNMP SET operations."
+    INDEX       {
+        tmnxPortPortID,
+        tmnxCellPdnId
+    }
+    ::= { tmnxCellularPdnTable 1 }
+
+TmnxCellularPdnEntry             ::= SEQUENCE
+{
+    tmnxCellPdnId                    TmnxCellularPdnId,
+    tmnxCellPdnRowStatus             RowStatus,
+    tmnxCellPdnLastChanged           TimeStamp,
+    tmnxCellPdnProfile               TmnxCellularPdnProfileId
+}
+
+tmnxCellPdnId                    OBJECT-TYPE
+    SYNTAX      TmnxCellularPdnId
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCellPdnId specifies a Packet Data Network on a
+         cellular port."
+    ::= { tmnxCellularPdnEntry 1 }
+
+tmnxCellPdnRowStatus             OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCellPdnRowStatus specifies the row status of the PDN
+         entry.  It is used to control the creation and deletion of Packet Data
+         Networks on a cellular port."
+    ::= { tmnxCellularPdnEntry 2 }
+
+tmnxCellPdnLastChanged           OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCellPdnLastChanged indicates the sysUpTime at the
+         time of the most recent management-initiated change to this table row."
+    ::= { tmnxCellularPdnEntry 3 }
+
+tmnxCellPdnProfile               OBJECT-TYPE
+    SYNTAX      TmnxCellularPdnProfileId
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCellPdnProfile specifies the PDN profile that
+         is associated with this Packet Data Network.  The configuration of a
+         PDN is contained corresponding table row of
+         tmnxCellularPdnProfileTable."
+    DEFVAL      { 0 }
+    ::= { tmnxCellularPdnEntry 4 }
+
+tmnxCellularPortTable            OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxCellularPortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The tmnxCellularPortTable has an entry for each cellular port in the
+         system."
+    ::= { tmnxCellularPortConfigObjs 3 }
+
+tmnxCellularPortEntry            OBJECT-TYPE
+    SYNTAX      TmnxCellularPortEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each row entry represents a cellular port in the system. Entries are
+         automatically created by the system, and cannot be created or deleted
+         via SNMP SET operations."
+    INDEX       { tmnxPortPortID }
+    ::= { tmnxCellularPortTable 1 }
+
+TmnxCellularPortEntry            ::= SEQUENCE
+{
+    tmnxCellPortLastChanged          TimeStamp,
+    tmnxCellPortBand125MaxPowerLevel Unsigned32,
+    tmnxCellPortSyncSysTime          TruthValue
+}
+
+tmnxCellPortLastChanged          OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCellPortLastChanged indicates the sysUpTime at the
+         time of the most recent management-initiated change to this table row."
+    ::= { tmnxCellularPortEntry 1 }
+
+tmnxCellPortBand125MaxPowerLevel OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..20)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCellPortBand125MaxPowerLevel specifies the maximum
+         power level that may be transmitted by the band 125 LTE radio on some
+         variants of the SAR-Hm.
+
+         A value of 1 specifies that the radio may transmit at its maximum
+         power level.  Higher values reduce the maximum transmitted power
+         level of the band 125 radio, with a value of 20 specifying the lowest
+         maximum power level."
+    REFERENCE
+        "7705 SAR-Hm, Release 15.0.R4, 'SAR-Hm Chassis Installation Guide',
+         Nokia, October 2017, Section 4.9 'Site Preparation and Engineering
+         Guidelines for 7705 SAR-Hm B125 Antennas'"
+    DEFVAL      { 1 }
+    ::= { tmnxCellularPortEntry 2 }
+
+tmnxCellPortSyncSysTime          OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCellPortSyncSysTime specifies whether the system time
+         is synchronized on the cellular port."
+    DEFVAL      { false }
+    ::= { tmnxCellularPortEntry 3 }
+
+tmnxCellularMdaTable             OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxCellularMdaEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The tmnxCellularMdaTable has an entry for each cellular MDA in the
+         system."
+    ::= { tmnxCellularPortConfigObjs 4 }
+
+tmnxCellularMdaEntry             OBJECT-TYPE
+    SYNTAX      TmnxCellularMdaEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each row entry represents a cellular MDA in the system. Entries are
+         automatically created by the system, and cannot be created or deleted
+         via SNMP SET operations."
+    INDEX       {
+        tmnxCardSlotNum,
+        tmnxMDASlotNum
+    }
+    ::= { tmnxCellularMdaTable 1 }
+
+TmnxCellularMdaEntry             ::= SEQUENCE
+{
+    tmnxCellMdaLastChanged           TimeStamp,
+    tmnxCellMdaAdminActiveSim        INTEGER,
+    tmnxCellMdaDownResetInterval     Unsigned32,
+    tmnxCellMdaDownResetCriteria     BITS,
+    tmnxCellMdaDownResetPending      TruthValue,
+    tmnxCellMdaDownResetTime         Unsigned32,
+    tmnxCellMdaPreferredSim          TmnxCellularSimCardNumber,
+    tmnxCellMdaOperActiveSim         TmnxCellularSimCardNumber,
+    tmnxCellMdaSimCardSwitchPending  TruthValue,
+    tmnxCellMdaSimCardSwitchTime     Unsigned32,
+    tmnxCellMdaSimCardLastSwitchTime TimeStamp,
+    tmnxCellMdaSimLastSwitchReason   INTEGER,
+    tmnxCellMdaSpecFirmwareVersion   DisplayString,
+    tmnxCellMdaMaxTxPower            Integer32
+}
+
+tmnxCellMdaLastChanged           OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCellMdaLastChanged indicates the sysUpTime at the
+         time of the most recent management-initiated change to this table row."
+    ::= { tmnxCellularMdaEntry 1 }
+
+tmnxCellMdaAdminActiveSim        OBJECT-TYPE
+    SYNTAX      INTEGER {
+        sim-1     (1),
+        sim-2     (2),
+        automatic (3)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCellMdaAdminActiveSim specifies which SIM card shall
+         be active on the MDA.
+
+         A value of 'sim-1' or 'sim-2' specifies that the system will use the SIM card
+         in that slot as the active SIM card.   If there is no SIM card in that
+         slot, or if the system cannot establish service using that SIM card, the
+         system will continue to use that SIM card, regardless of the contents of
+         the other SIM card slot.
+
+         A value of 'automatic' specifies that the system will automatically
+         switch between SIM cards if it cannot establish service."
+    DEFVAL      { sim-1 }
+    ::= { tmnxCellularMdaEntry 2 }
+
+tmnxCellMdaDownResetInterval     OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..240)
+    UNITS       "minutes"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCellMdaDownResetInterval specifies the interval, in
+         minutes, after which the system will reset if it cannot establish
+         service over the cellular interface.
+
+         A value of 0 specifies that the system will not reset if it cannot
+         establish service over the cellular interface."
+    DEFVAL      { 0 }
+    ::= { tmnxCellularMdaEntry 3 }
+
+tmnxCellMdaDownResetCriteria     OBJECT-TYPE
+    SYNTAX      BITS {
+        port (0),
+        bgp  (1)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCellMdaDownResetCriteria specifies the criteria to
+         decide whether or not service is operational over the cellular
+         interface.
+
+         If the 'port' bit is set, cellular service is deemed inoperational if
+         no cellular port is operationally up.
+
+         If the 'bgp' bit is set, cellular service is deemed inoperational if
+         there is no BGP peer established with a configured local address
+         corresponding to a cellular interface.
+
+         Multiple bits may be set simultaneously.  If so, the system evaluates
+         each criterion independently."
+    DEFVAL      { { port } }
+    ::= { tmnxCellularMdaEntry 4 }
+
+tmnxCellMdaDownResetPending      OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCellMdaDownResetPending indicates if the current
+         state of the system will cause the system to reset, due to the
+         criteria configured by tmnxCellMdaDownResetCriteria.
+
+         If the system remains in this state for the duration indicated by
+         tmnxCellMdaDownResetInterval, it will automatically reset.
+
+         This value will only be true if tmnxCellMdaDownResetInterval is
+         configured to a non-zero value."
+    ::= { tmnxCellularMdaEntry 5 }
+
+tmnxCellMdaDownResetTime         OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..14400)
+    UNITS       "seconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCellMdaDownResetTime indicates the amount of time
+         remaining before the system will reset, due to the criteria specified
+         by tmnxCellMdaDownResetCriteria.
+
+         If tmnxCellMdaDownResetPending is false, tmnxCellMdaDownResetTime will
+         have a value of 0."
+    ::= { tmnxCellularMdaEntry 6 }
+
+tmnxCellMdaPreferredSim          OBJECT-TYPE
+    SYNTAX      TmnxCellularSimCardNumber
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCellMdaPreferredSim specifies which SIM card shall be
+         used as the active SIM upon system initialization when
+         tmnxCellMdaAdminActiveSim is set to 'automatic'."
+    DEFVAL      { 1 }
+    ::= { tmnxCellularMdaEntry 7 }
+
+tmnxCellMdaOperActiveSim         OBJECT-TYPE
+    SYNTAX      TmnxCellularSimCardNumber
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCellMdaOperActiveSim indicates which SIM card is
+         active on the MDA."
+    ::= { tmnxCellularMdaEntry 8 }
+
+tmnxCellMdaSimCardSwitchPending  OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCellMdaSimCardSwitchPending indicates if the current
+         state of the system will cause a SIM switch.
+
+         If the system remains in this state for the duration indicated by
+         tmnxCellMdaSimCardSwitchTime, it will automatically switch the MDA to
+         use the other SIM card.
+
+         This value will only be true if tmnxCellMdaAdminActiveSim is set to
+         'automatic'."
+    ::= { tmnxCellularMdaEntry 9 }
+
+tmnxCellMdaSimCardSwitchTime     OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..3600)
+    UNITS       "seconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCellMdaSimCardSwitchTime indicates the amount of time
+         remaining before the system will automatically switch SIM cards if the
+         system remains in its current state.
+
+         If tmnxCellMdaSimCardSwitchPending is false,
+         tmnxCellMdaSimCardSwitchTime will have a value of 0."
+    ::= { tmnxCellularMdaEntry 10 }
+
+tmnxCellMdaSimCardLastSwitchTime OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCellMdaSimCardLastSwitchTime indicates the value of
+         sysUpTime the last time that the system switched the operationally
+         active SIM card on the cellular MDA.
+
+         If the system has not switched the active SIM card,
+         tmnxCellMdaSimCardLastSwitchTime will have a value of 0."
+    ::= { tmnxCellularMdaEntry 11 }
+
+tmnxCellMdaSimLastSwitchReason   OBJECT-TYPE
+    SYNTAX      INTEGER {
+        none                 (0),
+        manual-configuration (1),
+        forced-switch        (2),
+        cellular-port-down   (3),
+        no-bgp-neighbor      (4)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCellMdaSimLastSwitchReason indicates the reason why
+         the system last switched the operationally active SIM card on the
+         cellular MDA.
+
+         If the system has not switched the active SIM card,
+         tmnxCellMdaSimLastSwitchReason will have a value of 'none'."
+    ::= { tmnxCellularMdaEntry 12 }
+
+tmnxCellMdaSpecFirmwareVersion   OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCellMdaSpecFirmwareVersion indicates the firmware
+         version that the system is configured to use on the cellular modem.
+
+         An empty string indicates that the user has not specified that the
+         system should use different modem firmware than the version that is
+         bundled within SROS."
+    ::= { tmnxCellularMdaEntry 13 }
+
+tmnxCellMdaMaxTxPower            OBJECT-TYPE
+    SYNTAX      Integer32 (1..23)
+    UNITS       "decibel-milliwatts"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCellMdaMaxTxPower specifies the maximum transmit
+         power of the cellular interface on the MDA.  This object only applies
+         to platforms with cellular interfaces that support Citizen's Broadband
+         Radio Service (CBRS) frequency bands.  On those platforms, this value
+         specifies the maximum transmit power regardless of the frequency band.
+         On platforms that do not support CBRS frequency bands, the value of
+         tmnxCellMdaMaxTxPower has no effect."
+    DEFVAL      { 23 }
+    ::= { tmnxCellularMdaEntry 14 }
+
+tmnxCellPortCbsdAuthCfgTable     OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxCellPortCbsdAuthCfgEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The tmnxCellPortCbsdAuthCfgTable has an entry for each cellular port
+         in the system pertaining to CBSD authorization configuration."
+    ::= { tmnxCellularPortConfigObjs 5 }
+
+tmnxCellPortCbsdAuthCfgEntry     OBJECT-TYPE
+    SYNTAX      TmnxCellPortCbsdAuthCfgEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each row entry represents the CBSD authorization configuration for a
+         cellular port in the system. Entries are automatically created by the
+         system, and cannot be created or deleted via SNMP SET operations."
+    AUGMENTS    { tmnxCellularPortEntry }
+    ::= { tmnxCellPortCbsdAuthCfgTable 1 }
+
+TmnxCellPortCbsdAuthCfgEntry     ::= SEQUENCE
+{
+    tmnxCellPortCbsdAuthCfgLstChange TimeStamp,
+    tmnxCellPortCbsdAuthAdminState   TmnxEnabledDisabledAdminState,
+    tmnxCellPortCbsdAuthUserId       DisplayString,
+    tmnxCellPortCbsdAuthAntennaGain  Unsigned32,
+    tmnxCellPortCbsdAuthClntTlsProf  TNamedItemOrEmpty,
+    tmnxCellPortCbsdAuthPriSasSvrUrl DisplayString,
+    tmnxCellPortCbsdAuthSecSasSvrUrl DisplayString,
+    tmnxCellPortCbsdAuthCategory     INTEGER
+}
+
+tmnxCellPortCbsdAuthCfgLstChange OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCellPortCbsdAuthCfgLstChange indicates the sysUpTime
+         at the time of the most recent management-initiated change to this
+         table row."
+    ::= { tmnxCellPortCbsdAuthCfgEntry 1 }
+
+tmnxCellPortCbsdAuthAdminState   OBJECT-TYPE
+    SYNTAX      TmnxEnabledDisabledAdminState
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCellPortCbsdAuthAdminState specifies the
+         administrative state of the CBSD authorization for the cellular port."
+    DEFVAL      { disabled }
+    ::= { tmnxCellPortCbsdAuthCfgEntry 2 }
+
+tmnxCellPortCbsdAuthUserId       OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..253))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCellPortCbsdAuthUserId specifies the CBSD
+         authorization user ID for the cellular port."
+    DEFVAL      { "" }
+    ::= { tmnxCellPortCbsdAuthCfgEntry 3 }
+
+tmnxCellPortCbsdAuthAntennaGain  OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..14)
+    UNITS       "decibel-milliwatts"
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCellPortCbsdAuthAntennaGain specifies the CBSD
+         authorization antenna gain for the cellular port."
+    DEFVAL      { 0 }
+    ::= { tmnxCellPortCbsdAuthCfgEntry 4 }
+
+tmnxCellPortCbsdAuthClntTlsProf  OBJECT-TYPE
+    SYNTAX      TNamedItemOrEmpty
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCellPortCbsdAuthClntTlsProf specifies the CBSD
+         authorization client TLS profile name for the cellular port."
+    DEFVAL      { "" }
+    ::= { tmnxCellPortCbsdAuthCfgEntry 5 }
+
+tmnxCellPortCbsdAuthPriSasSvrUrl OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCellPortCbsdAuthPriSasSvrUrl specifies the CBSD
+         authorization primary SAS server for the cellular port."
+    DEFVAL      { "" }
+    ::= { tmnxCellPortCbsdAuthCfgEntry 6 }
+
+tmnxCellPortCbsdAuthSecSasSvrUrl OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCellPortCbsdAuthSecSasSvrUrl specifies the CBSD
+         authorization secondary SAS server for the cellular port."
+    DEFVAL      { "" }
+    ::= { tmnxCellPortCbsdAuthCfgEntry 7 }
+
+tmnxCellPortCbsdAuthCategory     OBJECT-TYPE
+    SYNTAX      INTEGER {
+        a (1),
+        b (2)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCellPortCbsdAuthCategory specifies the CBSD
+         authorization category."
+    DEFVAL      { a }
+    ::= { tmnxCellPortCbsdAuthCfgEntry 8 }
+
+tmnxCellularStatusObjs           OBJECT IDENTIFIER ::= { tmnxCellularObjs 3 }
+
+tmnxCellularPortStatusObjs       OBJECT IDENTIFIER ::= { tmnxCellularStatusObjs 1 }
+
+tmnxCellularPortStatusTable      OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxCellularPortStatusEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The tmnxCellularPortStatusTable has an entry for each cellular port in
+         the system."
+    ::= { tmnxCellularPortStatusObjs 1 }
+
+tmnxCellularPortStatusEntry      OBJECT-TYPE
+    SYNTAX      TmnxCellularPortStatusEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each row entry represents a cellular port in the system.  Entries
+         are automatically created by the system, and cannot be created or
+         deleted via SNMP SET operations.
+
+         The tmnxCellularPortStatusEntry contains attributes that are unique to
+         the Cellular TmnxPortType."
+    INDEX       { tmnxPortPortID }
+    ::= { tmnxCellularPortStatusTable 1 }
+
+TmnxCellularPortStatusEntry      ::= SEQUENCE
+{
+    tmnxCellPortImei                 TmnxCellularImei,
+    tmnxCellPortRegistrationStatus   INTEGER,
+    tmnxCellPortWirelessTechnology   INTEGER,
+    tmnxCellPortFrequencyBand        Unsigned32,
+    tmnxCellPortChannelNumber        TmnxCellularChannelNumber,
+    tmnxCellPortAreaCode             DisplayString,
+    tmnxCellPortCellIdentity         DisplayString,
+    tmnxCellPortRssi                 Integer32,
+    tmnxCellPortRsrp                 Integer32,
+    tmnxCellPortRscp                 Integer32,
+    tmnxCellPortRsrq                 Integer32,
+    tmnxCellPortSinr                 Integer32
+}
+
+tmnxCellPortImei                 OBJECT-TYPE
+    SYNTAX      TmnxCellularImei
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCellPortImei indicates the International Mobile
+         Station Equipment Identity number assigned to this cellular port."
+    ::= { tmnxCellularPortStatusEntry 1 }
+
+tmnxCellPortRegistrationStatus   OBJECT-TYPE
+    SYNTAX      INTEGER {
+        not-registered             (0),
+        registered-home            (1),
+        searching                  (2),
+        denied                     (3),
+        no-network                 (4),
+        registered-roaming         (5),
+        sms-only-home              (6),
+        sms-only-roaming           (7),
+        emergency-only             (8),
+        csfb-not-preferred-home    (9),
+        csfb-not-preferred-roaming (10)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCellPortRegistrationStatus indicates the Evolved
+         Packet System (EPS) network registration status of the cellular port."
+    REFERENCE
+        "3GPP TS 27.007 version 14.0.0 Release 14, '3rd Generation Partnership Project;
+         Technical Specification Group Core Network and Terminals; AT command
+         set for User Equipment (UE)', 3GPP, December 2016, Section 10.1.22,
+         'EPS network registration status +CEREG'"
+    ::= { tmnxCellularPortStatusEntry 2 }
+
+tmnxCellPortWirelessTechnology   OBJECT-TYPE
+    SYNTAX      INTEGER {
+        none  (0),
+        lte   (1),
+        wcdma (2),
+        gsm   (3)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCellPortWirelessTechnology indicates the wireless
+         technology currently in use on the cellular port."
+    ::= { tmnxCellularPortStatusEntry 3 }
+
+tmnxCellPortFrequencyBand        OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCellPortFrequencyBand indicates the frequency band
+         currently in use by the cellular port.
+
+         For LTE, this is an E-UTRA Operating Band, as listed in Table 5.5-1 of
+         3GPP TS 36.101."
+    REFERENCE
+        "3GPP TS 36.101 version 14.1.0 (2016-09), '3rd Generation
+         Partnership Project; Technical Specification Group Radio Access
+         Network; Evolved Universal Terrestrial Radio Access (E-UTRA);
+         User Equipment (UE) radio transmission and reception,
+         3GPP, September 2016, Table 5.5-1, 'E-UTRA operating bands'"
+    ::= { tmnxCellularPortStatusEntry 4 }
+
+tmnxCellPortChannelNumber        OBJECT-TYPE
+    SYNTAX      TmnxCellularChannelNumber
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCellPortChannelNumber indicates the channel number
+         currently in use."
+    ::= { tmnxCellularPortStatusEntry 5 }
+
+tmnxCellPortAreaCode             OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..4))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCellPortAreaCode indicates the tracking area code or
+         location area code currently in use."
+    REFERENCE
+        "3GPP TS 23.003 version 14.0.0 Release 14, '3rd Generation
+         Partnership Project; Technical Specification Group Core Network
+         and Terminals; Numbering, addressing and identification',
+         3GPP, June 2016, Section 19.4.2.3 'Tracking Area Identity (TAI)';
+         Section 4.1, 'Composition of the Location Area Identification (LAI)'"
+    ::= { tmnxCellularPortStatusEntry 6 }
+
+tmnxCellPortCellIdentity         OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (8))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCellPortCellIdentity indicates the
+         GERAN/UTRAN/E-UTRAN cell identity of the cell currently in use."
+    REFERENCE
+        "3GPP TS 23.003 version 14.0.0 Release 14, '3rd Generation
+         Partnership Project; Technical Specification Group Core Network
+         and Terminals; Numbering, addressing and identification',
+         3GPP, June 2016, Section 4.3.1 'Cell Identity (CI) and Cell Global
+         Identification (CGI)'"
+    ::= { tmnxCellularPortStatusEntry 7 }
+
+tmnxCellPortRssi                 OBJECT-TYPE
+    SYNTAX      Integer32 (-113..-51 | 0)
+    UNITS       "decibel-milliwatts"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCellPortRssi indicates the received signal strength,
+         in decibel-milliwatts.
+
+         A value of -113 indicates that the signal strength is -113 dBm or
+         less, while a value of -51 indicates that the signal strength is -51
+         dBm or greater.
+
+         A value of 0 indicates that the signal strength is not known or not
+         detectable."
+    ::= { tmnxCellularPortStatusEntry 8 }
+
+tmnxCellPortRsrp                 OBJECT-TYPE
+    SYNTAX      Integer32 (-140..-44 | 0)
+    UNITS       "decibel-milliwatts"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCellPortRsrp indicates the reference signal received
+         power, in decibel-milliwatts.
+
+         A value of -140 indicates that the received power is -140 dBm or less,
+         while a value of -44 indicates that the received power is -44 dBm or
+         greater.
+
+         A value of 0 indicates that the reference signal received power has
+         not been measured."
+    REFERENCE
+        "3GPP TS 36.133 version 14.3.0 Release 14, '3rd Generation
+         Partnership Project; Technical Specification Group Radio
+         Access Network; Evolved Universal Terrestrial Radio Access
+         (E-UTRA); Requirements for support of radio resource management',
+         3GPP, March 2017, Section 9.1.4 'RSRP Measurement Report Mapping'"
+    ::= { tmnxCellularPortStatusEntry 9 }
+
+tmnxCellPortRscp                 OBJECT-TYPE
+    SYNTAX      Integer32 (-120..-25 | 0)
+    UNITS       "decibel-milliwatts"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCellPortRscp indicates the received signal code
+         power, in decibel-milliwatts.
+
+         A value of -120 indicates that the received power is -120 dBm or less,
+         while a value of -25 indicates that the received power is -25 dBm or
+         greater.
+
+         A value of 0 indicates that the received signal code power is not
+         known or not detectable."
+    REFERENCE
+        "3GPP TS 27.007 version 14.0.0 Release 14, '3rd Generation Partnership Project;
+         Technical Specification Group Core Network and Terminals; AT command
+         set for User Equipment (UE)', 3GPP, December 2016, Section 8.69,
+         'Extended signal quality +CESQ'"
+    ::= { tmnxCellularPortStatusEntry 10 }
+
+tmnxCellPortRsrq                 OBJECT-TYPE
+    SYNTAX      Integer32 (-20..-3 | 0)
+    UNITS       "decibel"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCellPortRsrq indicates the reference signal received
+         quality, in decibel.
+
+         A value of -20 indicates that the received signal quality is
+         -20 dBm or less, while a value of -3 indicates that the
+         received signal quality is -3 dBm or greater.
+
+         A value of 0 indicates that the reference signal received quality has
+         not been measured."
+    REFERENCE
+        "3GPP TS 36.133 version 14.3.0 Release 14, '3rd Generation
+         Partnership Project; Technical Specification Group Radio
+         Access Network; Evolved Universal Terrestrial Radio Access
+         (E-UTRA); Requirements for support of radio resource management',
+         3GPP, March 2017, Section 9.1.7 'RSRQ Measurement Report Mapping'"
+    ::= { tmnxCellularPortStatusEntry 11 }
+
+tmnxCellPortSinr                 OBJECT-TYPE
+    SYNTAX      Integer32 (-200..400)
+    UNITS       "0.1 decibel"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCellPortSinr indicates the signal to interface and
+         noise ratio, in tenths of decibel.
+
+         A value of -200 indicates that the signal to noise and  interface
+         ratio is -20 dBm or less, while a value of 400 indicates that the
+         signal to noise and interface ratio is 40 dBm or greater."
+    ::= { tmnxCellularPortStatusEntry 12 }
+
+tmnxCellularSimCardStatusTable   OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxCellularSimCardStatusEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The tmnxCellularSimCardStatusTable has an entry for each SIM card in
+         the system."
+    ::= { tmnxCellularPortStatusObjs 3 }
+
+tmnxCellularSimCardStatusEntry   OBJECT-TYPE
+    SYNTAX      TmnxCellularSimCardStatusEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each row entry represents a SIM card in the system.  Entries
+         are automatically created by the system, and cannot be created or
+         deleted via SNMP SET operations."
+    AUGMENTS    { tmnxCellularSimCardEntry }
+    ::= { tmnxCellularSimCardStatusTable 1 }
+
+TmnxCellularSimCardStatusEntry   ::= SEQUENCE
+{
+    tmnxCellSimCardEquipped          TruthValue,
+    tmnxCellSimCardIccid             TmnxCellularSimCardIccid,
+    tmnxCellSimCardImsi              TmnxCellularImsi,
+    tmnxCellSimCardLocked            TruthValue,
+    tmnxCellSimCardPinStatus         INTEGER,
+    tmnxCellSimCardPinRetries        Unsigned32,
+    tmnxCellSimCardPukRetries        Unsigned32,
+    tmnxCellSimCardFirmwareVersion   DisplayString
+}
+
+tmnxCellSimCardEquipped          OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCellSimCardEquipped indicates whether or not the SIM
+         card is installed in the system."
+    ::= { tmnxCellularSimCardStatusEntry 1 }
+
+tmnxCellSimCardIccid             OBJECT-TYPE
+    SYNTAX      TmnxCellularSimCardIccid
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCellSimCardIccid indicates the International
+         Integrated Circuit Card Identifier assigned to this SIM card by the
+         manufacturer."
+    ::= { tmnxCellularSimCardStatusEntry 2 }
+
+tmnxCellSimCardImsi              OBJECT-TYPE
+    SYNTAX      TmnxCellularImsi
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCellSimCardImsi indicates the International Mobile
+         Subscriber Identity (IMSI) assigned to the SIM card."
+    ::= { tmnxCellularSimCardStatusEntry 3 }
+
+tmnxCellSimCardLocked            OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCellSimCardLocked indicates whether the SIM card is
+         locked and requires a PIN."
+    ::= { tmnxCellularSimCardStatusEntry 4 }
+
+tmnxCellSimCardPinStatus         OBJECT-TYPE
+    SYNTAX      INTEGER {
+        unknown         (0),
+        waiting-for-pin (1),
+        waiting-for-puk (2),
+        ready           (3)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCellSimCardPinStatus indicates whether the SIM card
+         is waiting for a password, which could be either the PIN or the PIN
+         Unlock Key (PUK)."
+    REFERENCE
+        "3GPP TS 27.007 version 14.0.0 Release 14, '3rd Generation Partnership Project;
+         Technical Specification Group Core Network and Terminals; AT command
+         set for User Equipment (UE)', 3GPP, December 2016, Section 8.3,
+         'Enter PIN +CPIN'"
+    ::= { tmnxCellularSimCardStatusEntry 5 }
+
+tmnxCellSimCardPinRetries        OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCellSimCardPinRetries indicates the number of
+         remaining times the PIN can be attempted before the SIM card will be
+         locked and require a PIN Unlock Key (PUK) to unlock."
+    ::= { tmnxCellularSimCardStatusEntry 6 }
+
+tmnxCellSimCardPukRetries        OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCellSimCardPukRetries indicates the number of
+         remaining times the PIN Unlock Key (PUK) can be attempted before the
+         SIM card is rendered inoperational."
+    ::= { tmnxCellularSimCardStatusEntry 7 }
+
+tmnxCellSimCardFirmwareVersion   OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCellSimCardFirmwareVersion indicates the firmware
+         version that the system will use on the cellular modem when this SIM
+         card is the active sim card.
+
+         If the user has not specified a version of firmware to use with a SIM
+         card, tmnxCellSimCardFirmwareVersion has a value of an empty string."
+    ::= { tmnxCellularSimCardStatusEntry 8 }
+
+tmnxCellularPdnStatusTable       OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxCellularPdnStatusEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The tmnxCellularPdnStatusTable has an entry for each cellular Packet
+         Data Network in the system."
+    ::= { tmnxCellularPortStatusObjs 4 }
+
+tmnxCellularPdnStatusEntry       OBJECT-TYPE
+    SYNTAX      TmnxCellularPdnStatusEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each row entry represents a cellular PDN in the system.  Entries
+         are automatically created by the system, and cannot be created or
+         deleted via SNMP SET operations."
+    AUGMENTS    { tmnxCellularPdnEntry }
+    ::= { tmnxCellularPdnStatusTable 1 }
+
+TmnxCellularPdnStatusEntry       ::= SEQUENCE
+{
+    tmnxCellPdnConnectionState       INTEGER,
+    tmnxCellPdnIpAddrType            InetAddressType,
+    tmnxCellPdnIpAddress             InetAddress,
+    tmnxCellPdnPrimaryDnsAddrType    InetAddressType,
+    tmnxCellPdnPrimaryDnsAddress     InetAddress,
+    tmnxCellPdnSecondaryDnsAddrType  InetAddressType,
+    tmnxCellPdnSecondaryDnsAddress   InetAddress,
+    tmnxCellPdnApn                   TmnxCellularAccessPointName,
+    tmnxCellPdnMtu                   Unsigned32
+}
+
+tmnxCellPdnConnectionState       OBJECT-TYPE
+    SYNTAX      INTEGER {
+        notConnected (0),
+        connected    (1)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCellPdnConnectionState indicates whether or not the
+         packet data network connection has been successfully established."
+    ::= { tmnxCellularPdnStatusEntry 1 }
+
+tmnxCellPdnIpAddrType            OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCellPdnIpAddrType indicates, along with
+         tmnxCellPdnIpAddress, the IP address assigned to the PDN by the
+         cellular network."
+    ::= { tmnxCellularPdnStatusEntry 2 }
+
+tmnxCellPdnIpAddress             OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (0|4|16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCellPdnIpAddress indicates, along with
+         tmnxCellPdnIpAddrType, the IP address assigned to the PDN by the
+         cellular network."
+    ::= { tmnxCellularPdnStatusEntry 3 }
+
+tmnxCellPdnPrimaryDnsAddrType    OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCellPdnPrimaryDnsAddrType indicates, along with
+         tmnxCellPdnPrimaryDnsAddress, the IP address assigned of the primary
+         DNS server in the PDN."
+    ::= { tmnxCellularPdnStatusEntry 4 }
+
+tmnxCellPdnPrimaryDnsAddress     OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (0|4|16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCellPdnPrimaryDnsAddress indicates, along with
+         tmnxCellPdnPrimaryDnsAddrType, the IP address assigned of the primary
+         DNS server in the PDN."
+    ::= { tmnxCellularPdnStatusEntry 5 }
+
+tmnxCellPdnSecondaryDnsAddrType  OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCellPdnSecondaryDnsAddrType indicates, along with
+         tmnxCellPdnSecondaryDnsAddress, the IP address assigned of the
+         secondary DNS server in the PDN."
+    ::= { tmnxCellularPdnStatusEntry 6 }
+
+tmnxCellPdnSecondaryDnsAddress   OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (0|4|16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCellPdnSecondaryDnsAddress indicates, along with
+         tmnxCellPdnSecondaryDnsAddrType, the IP address assigned of the
+         secondary DNS server in the PDN."
+    ::= { tmnxCellularPdnStatusEntry 7 }
+
+tmnxCellPdnApn                   OBJECT-TYPE
+    SYNTAX      TmnxCellularAccessPointName
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCellPdnApn indicates the APN in use by the PDN."
+    ::= { tmnxCellularPdnStatusEntry 8 }
+
+tmnxCellPdnMtu                   OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "bytes"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCellPdnMtu indicates the operational value of the IP
+         MTU on this PDN."
+    ::= { tmnxCellularPdnStatusEntry 9 }
+
+tmnxCellularPortBearerTable      OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxCellularPortBearerEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The tmnxCellularPortBearerTable has an entry for each bearer created
+         on a cellular port in the system."
+    ::= { tmnxCellularPortStatusObjs 5 }
+
+tmnxCellularPortBearerEntry      OBJECT-TYPE
+    SYNTAX      TmnxCellularPortBearerEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each row entry represents a bearer created on a cellular port in the system.
+         Entries are automatically created and deleted by the system as the cellular
+         network creates and deletes bearers on the cellular port.  Entries cannot be
+         created or deleted via SNMP SET operations."
+    INDEX       {
+        tmnxPortPortID,
+        tmnxCellPortBearerId
+    }
+    ::= { tmnxCellularPortBearerTable 1 }
+
+TmnxCellularPortBearerEntry      ::= SEQUENCE
+{
+    tmnxCellPortBearerId             Unsigned32,
+    tmnxCellPortBearerType           INTEGER,
+    tmnxCellPortBearerQci            Unsigned32,
+    tmnxCellPortBearerUlGbr          TmnxCellularBearerRate,
+    tmnxCellPortBearerUlMbr          TmnxCellularBearerRate,
+    tmnxCellPortBearerDlGbr          TmnxCellularBearerRate,
+    tmnxCellPortBearerDlMbr          TmnxCellularBearerRate
+}
+
+tmnxCellPortBearerId             OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..15)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCellPortBearerId indicates the Evolved Packet System
+         (EPS) Bearer Id of this bearer."
+    REFERENCE
+        "3GPP TS 23.401 version 11.11.0 Release 11, '3rd Generation Partnership Project;
+         Technical Specification Group Core Services and System Aspects;
+         General Packet Radio Service (GPRS) enhancements for Evolved Universal
+         Terrestrial Radio Access Network (E-UTRAN) access', 3GPP, December 2014,
+         Section 5.2.1, 'EPS bearer identity'"
+    ::= { tmnxCellularPortBearerEntry 1 }
+
+tmnxCellPortBearerType           OBJECT-TYPE
+    SYNTAX      INTEGER {
+        default   (1),
+        dedicated (2)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCellPortBearerType indicates the type of this bearer."
+    ::= { tmnxCellularPortBearerEntry 2 }
+
+tmnxCellPortBearerQci            OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..254)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCellPortBearerQci indicates the Quality of Service
+         (QoS) Class Identifier of this bearer."
+    REFERENCE
+        "3GPP TS 23.401 version 11.11.0 Release 11, '3rd Generation Partnership Project;
+         Technical Specification Group Core Services and System Aspects;
+         General Packet Radio Service (GPRS) enhancements for Evolved Universal
+         Terrestrial Radio Access Network (E-UTRAN) access', 3GPP, December 2014,
+         Section 4.7.3, 'Bearer level QoS parameters'"
+    ::= { tmnxCellularPortBearerEntry 3 }
+
+tmnxCellPortBearerUlGbr          OBJECT-TYPE
+    SYNTAX      TmnxCellularBearerRate
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCellPortBearerUlGbr indicates the Guaranteed Bit Rate
+         of the uplink for this bearer.  For a non-GBR bearer,
+         tmnxCellPortBearerUlGbr has a value of zero."
+    ::= { tmnxCellularPortBearerEntry 4 }
+
+tmnxCellPortBearerUlMbr          OBJECT-TYPE
+    SYNTAX      TmnxCellularBearerRate
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCellPortBearerUlMbr indicates the Maximum Bit Rate
+         of the uplink for this bearer.  For a non-GBR bearer,
+         tmnxCellPortBearerUlMbr has a value of zero."
+    ::= { tmnxCellularPortBearerEntry 5 }
+
+tmnxCellPortBearerDlGbr          OBJECT-TYPE
+    SYNTAX      TmnxCellularBearerRate
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCellPortBearerDlGbr indicates the Guaranteed Bit Rate
+         of the downlink for this bearer.  For a non-GBR bearer,
+         tmnxCellPortBearerDlGbr has a value of zero."
+    ::= { tmnxCellularPortBearerEntry 6 }
+
+tmnxCellPortBearerDlMbr          OBJECT-TYPE
+    SYNTAX      TmnxCellularBearerRate
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCellPortBearerDlMbr indicates the Maximum Bit Rate
+         of the downlink for this bearer.  For a non-GBR bearer,
+         tmnxCellPortBearerDlMbr has a value of zero."
+    ::= { tmnxCellularPortBearerEntry 7 }
+
+tmnxCellularPortTftTable         OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxCellularPortTftEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The tmnxCellularPortTftTable contains information about the traffic
+         flow templates (TFTs) created on the cellular port."
+    ::= { tmnxCellularPortStatusObjs 6 }
+
+tmnxCellularPortTftEntry         OBJECT-TYPE
+    SYNTAX      TmnxCellularPortTftEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each row entry represents a packet filter created on a specific bearer.
+         Entries are automatically created and deleted by the system as the cellular
+         network creates and deletes bearers on the cellular port.  Entries cannot be
+         created or deleted via SNMP SET operations."
+    INDEX       {
+        tmnxPortPortID,
+        tmnxCellPortBearerId,
+        tmnxCellPortTftPacketFilterId
+    }
+    ::= { tmnxCellularPortTftTable 1 }
+
+TmnxCellularPortTftEntry         ::= SEQUENCE
+{
+    tmnxCellPortTftPacketFilterId    Unsigned32,
+    tmnxCellPortTftEvalPrecedence    Unsigned32,
+    tmnxCellPortTftDirection         INTEGER,
+    tmnxCellPortTftTos               Unsigned32,
+    tmnxCellPortTftTosMask           Unsigned32
+}
+
+tmnxCellPortTftPacketFilterId    OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..16)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCellPortTftPacketFilterId identifies a packet filter
+         on a particular bearer."
+    REFERENCE
+        "3GPP TS 27.007 version 11.8.0 Release 11, '3rd Generation Partnership Project;
+         Technical Specification Group Core Network and Terminals; AT command
+         set for User Equipment (UE)', 3GPP, September 2013, Section 10.1.25,
+         'Traffic flow template read dynamic parameters +CGTFTRDP'
+
+         3GPP TS 24.008 version 11.17.1 Release 11, '3rd Generation Partnership Project;
+         Technical Specification Group Core Network and Terminals;
+         Mobile radio interface Layer 3 specification;
+         Core network protocols; Stage 3', 3GPP, January 2018,
+         Section 10.5.6.12, 'Traffic Flow Template'"
+    ::= { tmnxCellularPortTftEntry 1 }
+
+tmnxCellPortTftEvalPrecedence    OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..255)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCellPortTftEvalPrecedence indicates the evaluation
+         precedence index of the packet filter."
+    REFERENCE
+        "3GPP TS 27.007 version 11.8.0 Release 11, '3rd Generation Partnership Project;
+         Technical Specification Group Core Network and Terminals; AT command
+         set for User Equipment (UE)', 3GPP, September 2013, Section 10.1.25,
+         'Traffic flow template read dynamic parameters +CGTFTRDP'
+
+         3GPP TS 23.060 version 11.12.0 Release 11, '3rd Generation Partnership Project;
+         Technical Specification Group Services and System Aspects; General
+         Packet Radio Service (GPRS); Service description; Stage 2', 3GPP, December 2014,
+         Section 9.3, 'Packet Routeing and Transfer Function'"
+    ::= { tmnxCellularPortTftEntry 2 }
+
+tmnxCellPortTftDirection         OBJECT-TYPE
+    SYNTAX      INTEGER {
+        pre-release-7 (0),
+        uplink        (1),
+        downlink      (2),
+        bidirectional (3)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCellPortTftDirection indicates the direction to apply
+         this packet filter."
+    REFERENCE
+        "3GPP TS 27.007 version 11.8.0 Release 11, '3rd Generation Partnership Project;
+         Technical Specification Group Core Network and Terminals; AT command
+         set for User Equipment (UE)', 3GPP, September 2013, Section 10.1.25,
+         'Traffic flow template read dynamic parameters +CGTFTRDP'"
+    ::= { tmnxCellularPortTftEntry 3 }
+
+tmnxCellPortTftTos               OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..255)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCellPortTftTos indicates, along with
+         tmnxCellPortTftTosMask, the values of the IPv4 Type of Service (ToS)
+         that match this packet filter."
+    ::= { tmnxCellularPortTftEntry 4 }
+
+tmnxCellPortTftTosMask           OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..255)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCellPortTftTosMask indicates, along with
+         tmnxCellPortTftTos, the values of the IPv4 Type of Service (ToS) that
+         match this packet filter."
+    ::= { tmnxCellularPortTftEntry 5 }
+
+tmnxCellPortCbsdAuthStatsTable   OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxCellPortCbsdAuthStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The tmnxCellPortCbsdAuthStatsTable has an entry for each cellular port
+         in the system and pertains to CBSD authorization status and statistic
+         information."
+    ::= { tmnxCellularPortStatusObjs 7 }
+
+tmnxCellPortCbsdAuthStatsEntry   OBJECT-TYPE
+    SYNTAX      TmnxCellPortCbsdAuthStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each row entry represents the CBSD authorization status and statistics
+         information for a cellular port in the system. Entries are
+         automatically created by the system, and cannot be created or deleted
+         via SNMP SET operations."
+    AUGMENTS    { tmnxCellPortCbsdAuthCfgEntry }
+    ::= { tmnxCellPortCbsdAuthStatsTable 1 }
+
+TmnxCellPortCbsdAuthStatsEntry   ::= SEQUENCE
+{
+    tmnxCellPortCbsdAuthOperState    TmnxEnabledDisabled,
+    tmnxCellPortCbsdAuthId           DisplayString,
+    tmnxCellPortCbsdAuthGrantId      DisplayString,
+    tmnxCellPortCbsdAuthFccId        DisplayString,
+    tmnxCellPortCbsdAuthRegState     INTEGER,
+    tmnxCellPortCbsdAuthGrantState   INTEGER,
+    tmnxCellPortCbsdAuthGrantExpTime DateAndTime,
+    tmnxCellPortCbsdAuthTxExpTime    DateAndTime,
+    tmnxCellPortCbsdAuthHeartbeatInt Unsigned32,
+    tmnxCellPortCbsdAuthChanType     INTEGER,
+    tmnxCellPortCbsdAuthCurSasSvr    INTEGER,
+    tmnxCellPortCbsdAuthCurSasSvrIpT InetAddressType,
+    tmnxCellPortCbsdAuthCurSasSvrIp  InetAddress,
+    tmnxCellPortCbsdAuthRegRequest   Unsigned32,
+    tmnxCellPortCbsdAuthRegRspSuc    Unsigned32,
+    tmnxCellPortCbsdAuthRegRspFail   Unsigned32,
+    tmnxCellPortCbsdAuthGrantRequest Unsigned32,
+    tmnxCellPortCbsdAuthGrantRspSuc  Unsigned32,
+    tmnxCellPortCbsdAuthGrantRspFail Unsigned32,
+    tmnxCellPortCbsdAuthHrtbtRequest Unsigned32,
+    tmnxCellPortCbsdAuthHrtbtRspSuc  Unsigned32,
+    tmnxCellPortCbsdAuthHrtbtRspFail Unsigned32
+}
+
+tmnxCellPortCbsdAuthOperState    OBJECT-TYPE
+    SYNTAX      TmnxEnabledDisabled
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCellPortCbsdAuthOperState indicates the operational
+         state of the CBSD authorization for the cellular port."
+    ::= { tmnxCellPortCbsdAuthStatsEntry 1 }
+
+tmnxCellPortCbsdAuthId           OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCellPortCbsdAuthId indicates the CBSD authorization
+         identifier."
+    ::= { tmnxCellPortCbsdAuthStatsEntry 2 }
+
+tmnxCellPortCbsdAuthGrantId      OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCellPortCbsdAuthGrantId indicates the CBSD
+         authorization grant identifier."
+    ::= { tmnxCellPortCbsdAuthStatsEntry 3 }
+
+tmnxCellPortCbsdAuthFccId        OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCellPortCbsdAuthFccId indicates the CBSD
+         authorization Federal Communications Commission identifier."
+    ::= { tmnxCellPortCbsdAuthStatsEntry 4 }
+
+tmnxCellPortCbsdAuthRegState     OBJECT-TYPE
+    SYNTAX      INTEGER {
+        unregistered (0),
+        registered   (1)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCellPortCbsdAuthRegState indicates the CBSD
+         authorization registration state."
+    ::= { tmnxCellPortCbsdAuthStatsEntry 5 }
+
+tmnxCellPortCbsdAuthGrantState   OBJECT-TYPE
+    SYNTAX      INTEGER {
+        idle       (1),
+        granted    (2),
+        authorized (3)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCellPortCbsdAuthGrantState indicates the CBSD
+         authorization grant state."
+    ::= { tmnxCellPortCbsdAuthStatsEntry 6 }
+
+tmnxCellPortCbsdAuthGrantExpTime OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCellPortCbsdAuthGrantExpTime indicates the CBSD
+         authorization time the grant will expire."
+    ::= { tmnxCellPortCbsdAuthStatsEntry 7 }
+
+tmnxCellPortCbsdAuthTxExpTime    OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCellPortCbsdAuthTxExpTime indicates the CBSD
+         authorization time the transmission will expire."
+    ::= { tmnxCellPortCbsdAuthStatsEntry 8 }
+
+tmnxCellPortCbsdAuthHeartbeatInt OBJECT-TYPE
+    SYNTAX      Unsigned32
+    UNITS       "seconds"
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCellPortCbsdAuthHeartbeatInt indicates the CBSD
+         authorization heartbeat interval."
+    ::= { tmnxCellPortCbsdAuthStatsEntry 9 }
+
+tmnxCellPortCbsdAuthChanType     OBJECT-TYPE
+    SYNTAX      INTEGER {
+        gaa (1),
+        pal (2)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCellPortCbsdAuthChanType indicates the CBSD
+         authorization channel type."
+    ::= { tmnxCellPortCbsdAuthStatsEntry 10 }
+
+tmnxCellPortCbsdAuthCurSasSvr    OBJECT-TYPE
+    SYNTAX      INTEGER {
+        none      (0),
+        primary   (1),
+        secondary (2)
+    }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCellPortCbsdAuthCurSasSvr indicates the CBSD
+         authorization SAS server that is currently being used."
+    ::= { tmnxCellPortCbsdAuthStatsEntry 11 }
+
+tmnxCellPortCbsdAuthCurSasSvrIpT OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCellPortCbsdAuthCurSasSvrIpT indicates the IP address
+         type of the current SAS server being used in CBSD authorization ."
+    ::= { tmnxCellPortCbsdAuthStatsEntry 12 }
+
+tmnxCellPortCbsdAuthCurSasSvrIp  OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (0|4|16))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCellPortCbsdAuthCurSasSvrIp indicates the IP address
+         of the current SAS server being used in CBSD authorization ."
+    ::= { tmnxCellPortCbsdAuthStatsEntry 13 }
+
+tmnxCellPortCbsdAuthRegRequest   OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCellPortCbsdAuthRegRequest indicates the number of
+         CBSD authorization registration requests attempted."
+    ::= { tmnxCellPortCbsdAuthStatsEntry 14 }
+
+tmnxCellPortCbsdAuthRegRspSuc    OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCellPortCbsdAuthRegRspSuc indicates the number of
+         successful CBSD authorization registration responses."
+    ::= { tmnxCellPortCbsdAuthStatsEntry 15 }
+
+tmnxCellPortCbsdAuthRegRspFail   OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCellPortCbsdAuthRegRspFail indicates the number of
+         failed CBSD authorization registration responses."
+    ::= { tmnxCellPortCbsdAuthStatsEntry 16 }
+
+tmnxCellPortCbsdAuthGrantRequest OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCellPortCbsdAuthGrantRequest indicates the number of
+         CBSD authorization grant requests attempted."
+    ::= { tmnxCellPortCbsdAuthStatsEntry 17 }
+
+tmnxCellPortCbsdAuthGrantRspSuc  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCellPortCbsdAuthGrantRspSuc indicates the number of
+         successful CBSD authorization grant responses."
+    ::= { tmnxCellPortCbsdAuthStatsEntry 18 }
+
+tmnxCellPortCbsdAuthGrantRspFail OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCellPortCbsdAuthGrantRspFail indicates the number of
+         failed CBSD authorization grant responses."
+    ::= { tmnxCellPortCbsdAuthStatsEntry 19 }
+
+tmnxCellPortCbsdAuthHrtbtRequest OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCellPortCbsdAuthHrtbtRequest indicates the number of
+         CBSD authorization heartbeat requests."
+    ::= { tmnxCellPortCbsdAuthStatsEntry 20 }
+
+tmnxCellPortCbsdAuthHrtbtRspSuc  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCellPortCbsdAuthHrtbtRspSuc indicates the number of
+         successful CBSD authorization heartbeat responses."
+    ::= { tmnxCellPortCbsdAuthStatsEntry 21 }
+
+tmnxCellPortCbsdAuthHrtbtRspFail OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCellPortCbsdAuthHrtbtRspFail indicates the number of
+         failed CBSD authorization heartbeat responses."
+    ::= { tmnxCellPortCbsdAuthStatsEntry 22 }
+
+tmnxCellularNotifyObjects        OBJECT IDENTIFIER ::= { tmnxCellularObjs 4 }
+
+tmnxCellularNotifyPdnId          OBJECT-TYPE
+    SYNTAX      TmnxCellularPdnId
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCellularNotifyPdnId indicates the PDN for the
+         notification."
+    ::= { tmnxCellularNotifyObjects 1 }
+
+tmnxCellMdaNoServiceResetReason  OBJECT-TYPE
+    SYNTAX      INTEGER {
+        cellular-port-down (1),
+        no-bgp-neighbor    (2)
+    }
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCellMdaNoServiceResetReason indicates the specific
+         reason why the system reset due to failure to establish service over
+         the cellular interface."
+    ::= { tmnxCellularNotifyObjects 2 }
+
+tmnxCellCbsdAuthFailReason       OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..100))
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCellCbsdAuthFailReason indicates the specific reason
+         why CBSD authorization request failed."
+    ::= { tmnxCellularNotifyObjects 3 }
+
+tmnxCellCbsdAuthRespCode         OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..100))
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCellCbsdAuthRespCode indicates the CBSD authorization
+         response code."
+    ::= { tmnxCellularNotifyObjects 4 }
+
+tmnxCellCbsdAuthPrevTransState   OBJECT-TYPE
+    SYNTAX      INTEGER {
+        idle       (1),
+        authorized (2),
+        granted    (3)
+    }
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCellCbsdAuthPrevTransState indicates the previous
+         state when transitioning states during the CBSD authorization process."
+    ::= { tmnxCellularNotifyObjects 5 }
+
+tmnxCellCbsdAuthNewTransState    OBJECT-TYPE
+    SYNTAX      INTEGER {
+        idle       (1),
+        authorized (2),
+        granted    (3)
+    }
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCellCbsdAuthNewTransState indicates the new state
+         when transitioning states during the CBSD authorization process."
+    ::= { tmnxCellularNotifyObjects 6 }
+
+tmnxCellularConformance          OBJECT IDENTIFIER ::= { tmnxSRConfs 109 }
+
+tmnxCellularCompliances          OBJECT IDENTIFIER ::= { tmnxCellularConformance 1 }
+
+tmnxCellularCompliance           MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for the management of the cellular
+         feature-set for Release 15.0 on Nokia SROS series systems."
+    MODULE
+        MANDATORY-GROUPS {
+            tmnxCellularConfigGroup,
+            tmnxCellularStatusGroup
+        }
+    ::= { tmnxCellularCompliances 1 }
+
+tmnxCellularComplianceV16v0      MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for the management of the cellular
+         feature-set for Release 16.0 on Nokia SROS series systems."
+    MODULE
+        MANDATORY-GROUPS {
+            tmnxCellularV16v0ConfigGroup,
+            tmnxCellularV16v0StatusGroup,
+            tmnxCellNotificationV16v0Group
+        }
+    ::= { tmnxCellularCompliances 2 }
+
+tmnxCellularComplianceV19        MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for the management of the cellular
+         feature-set for Release 19 on Nokia SROS series systems."
+    MODULE
+        MANDATORY-GROUPS {
+            tmnxCellularV19ConfigGroup
+        }
+    ::= { tmnxCellularCompliances 3 }
+
+tmnxCellularComplianceV20        MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for the management of the cellular
+         feature-set for Release 20 on Nokia SROS series systems."
+    MODULE
+        MANDATORY-GROUPS {
+            tmnxCellularV20ConfigGroup
+        }
+    ::= { tmnxCellularCompliances 4 }
+
+tmnxCellularComplianceV21        MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for the management of the cellular
+         feature-set for Release 21 on Nokia SROS series systems."
+    MODULE
+        MANDATORY-GROUPS {
+            tmnxCellPortCbsdAuthGroupV21,
+            tmnxCellularNotifyObjsGroupV21,
+            tmnxCellNotificationGroupV21,
+            tmnxCellularStatusGroupV21,
+            tmnxCellularConfigGroupV21
+        }
+    ::= { tmnxCellularCompliances 5 }
+
+tmnxCellularGroups               OBJECT IDENTIFIER ::= { tmnxCellularConformance 2 }
+
+tmnxCellularV15v0Groups          OBJECT IDENTIFIER ::= { tmnxCellularGroups 1 }
+
+tmnxCellularConfigGroup          OBJECT-GROUP
+    OBJECTS     {
+        tmnxCellPdnProfileTblLastChanged,
+        tmnxCellPdnProfRowStatus,
+        tmnxCellPdnProfLastChanged,
+        tmnxCellPdnProfDescription,
+        tmnxCellPdnProfApn,
+        tmnxCellPdnProfAuthType,
+        tmnxCellPdnProfUsername,
+        tmnxCellPdnProfPassword,
+        tmnxCellSimCardTableLastChanged,
+        tmnxCellSimCardLastChanged,
+        tmnxCellSimCardDescription,
+        tmnxCellSimCardPin,
+        tmnxCellPdnTblLastChanged,
+        tmnxCellPdnRowStatus,
+        tmnxCellPdnLastChanged,
+        tmnxCellPdnProfile,
+        tmnxCellPortTblLastChanged,
+        tmnxCellPortLastChanged,
+        tmnxCellPortBand125MaxPowerLevel
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects maintaining cellular port configuration on Nokia
+         SROS series systems.  This group was introduced in Release 15.0."
+    ::= { tmnxCellularV15v0Groups 1 }
+
+tmnxCellularStatusGroup          OBJECT-GROUP
+    OBJECTS     {
+        tmnxCellPortImei,
+        tmnxCellPortRegistrationStatus,
+        tmnxCellPortWirelessTechnology,
+        tmnxCellPortFrequencyBand,
+        tmnxCellPortChannelNumber,
+        tmnxCellPortAreaCode,
+        tmnxCellPortCellIdentity,
+        tmnxCellPortRssi,
+        tmnxCellPortRsrp,
+        tmnxCellPortRscp,
+        tmnxCellSimCardEquipped,
+        tmnxCellSimCardIccid,
+        tmnxCellSimCardImsi,
+        tmnxCellSimCardLocked,
+        tmnxCellSimCardPinStatus,
+        tmnxCellSimCardPinRetries,
+        tmnxCellSimCardPukRetries,
+        tmnxCellPdnConnectionState,
+        tmnxCellPdnIpAddrType,
+        tmnxCellPdnIpAddress,
+        tmnxCellPdnPrimaryDnsAddrType,
+        tmnxCellPdnPrimaryDnsAddress,
+        tmnxCellPdnSecondaryDnsAddrType,
+        tmnxCellPdnSecondaryDnsAddress,
+        tmnxCellPdnApn,
+        tmnxCellPdnMtu
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects maintaining cellular port status on Nokia
+         SROS series systems.  This group was introduced in Release 15.0."
+    ::= { tmnxCellularV15v0Groups 2 }
+
+tmnxCellularV16v0Groups          OBJECT IDENTIFIER ::= { tmnxCellularGroups 2 }
+
+tmnxCellularV16v0ConfigGroup     OBJECT-GROUP
+    OBJECTS     {
+        tmnxCellMdaLastChanged,
+        tmnxCellMdaAdminActiveSim,
+        tmnxCellMdaDownResetInterval,
+        tmnxCellMdaDownResetCriteria,
+        tmnxCellMdaDownResetPending,
+        tmnxCellMdaDownResetTime,
+        tmnxCellSimCardFailureDuration,
+        tmnxCellSimCardPortStateSwitch,
+        tmnxCellSimCardBgpStateSwitch
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects maintaining cellular port configuration on Nokia
+         SROS series systems, introduced in Release 16.0."
+    ::= { tmnxCellularV16v0Groups 1 }
+
+tmnxCellularV16v0StatusGroup     OBJECT-GROUP
+    OBJECTS     {
+        tmnxCellPortBearerId,
+        tmnxCellPortBearerType,
+        tmnxCellPortBearerQci,
+        tmnxCellPortBearerUlGbr,
+        tmnxCellPortBearerUlMbr,
+        tmnxCellPortBearerDlGbr,
+        tmnxCellPortBearerDlMbr,
+        tmnxCellPortTftPacketFilterId,
+        tmnxCellPortTftEvalPrecedence,
+        tmnxCellPortTftDirection,
+        tmnxCellPortTftTos,
+        tmnxCellPortTftTosMask,
+        tmnxCellSimCardFirmwareVersion,
+        tmnxCellMdaPreferredSim,
+        tmnxCellMdaOperActiveSim,
+        tmnxCellMdaSimCardSwitchPending,
+        tmnxCellMdaSimCardSwitchTime,
+        tmnxCellMdaSimCardLastSwitchTime,
+        tmnxCellMdaSimLastSwitchReason
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects maintaining status of cellular ports on Nokia
+         SROS series systems, introduced in Release 16.0."
+    ::= { tmnxCellularV16v0Groups 2 }
+
+tmnxCellularNotifyObjsGroup      OBJECT-GROUP
+    OBJECTS     {
+        tmnxCellularNotifyPdnId,
+        tmnxCellMdaNoServiceResetReason
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects used in notifications generated on cellular ports
+         on Nokia SROS series systems.  This group was introduced in Release 16.0."
+    ::= { tmnxCellularV16v0Groups 3 }
+
+tmnxCellNotificationV16v0Group   NOTIFICATION-GROUP
+    NOTIFICATIONS {
+        tmnxCellularBearerCreated,
+        tmnxCellularBearerDeleted,
+        tmnxCellularBearerModified,
+        tmnxCellularNoServiceReset,
+        tmnxCellularActiveSimChange
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of notifications for cellular ports on Nokia SROS series
+         systems, introduced in Release 16.0."
+    ::= { tmnxCellularV16v0Groups 4 }
+
+tmnxCellularV19Groups            OBJECT IDENTIFIER ::= { tmnxCellularGroups 3 }
+
+tmnxCellularV19ConfigGroup       OBJECT-GROUP
+    OBJECTS     {
+        tmnxCellPdnProfProtocol
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects maintaining cellular port configuration on Nokia
+         SROS series systems, introduced in Release 19."
+    ::= { tmnxCellularV19Groups 1 }
+
+tmnxCellularV20Groups            OBJECT IDENTIFIER ::= { tmnxCellularGroups 4 }
+
+tmnxCellularV20ConfigGroup       OBJECT-GROUP
+    OBJECTS     {
+        tmnxCellMdaSpecFirmwareVersion,
+        tmnxCellMdaMaxTxPower
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects maintaining cellular port configuration and
+         status on Nokia SROS series systems, introduced in Release 20."
+    ::= { tmnxCellularV20Groups 1 }
+
+tmnxCellularV21Groups            OBJECT IDENTIFIER ::= { tmnxCellularGroups 5 }
+
+tmnxCellPortCbsdAuthGroupV21     OBJECT-GROUP
+    OBJECTS     {
+        tmnxCellPortCbsdAuthCfgTblLstChg,
+        tmnxCellPortCbsdAuthCfgLstChange,
+        tmnxCellPortCbsdAuthAdminState,
+        tmnxCellPortCbsdAuthUserId,
+        tmnxCellPortCbsdAuthAntennaGain,
+        tmnxCellPortCbsdAuthClntTlsProf,
+        tmnxCellPortCbsdAuthPriSasSvrUrl,
+        tmnxCellPortCbsdAuthSecSasSvrUrl,
+        tmnxCellPortCbsdAuthOperState,
+        tmnxCellPortCbsdAuthCategory,
+        tmnxCellPortCbsdAuthId,
+        tmnxCellPortCbsdAuthGrantId,
+        tmnxCellPortCbsdAuthFccId,
+        tmnxCellPortCbsdAuthRegState,
+        tmnxCellPortCbsdAuthGrantState,
+        tmnxCellPortCbsdAuthGrantExpTime,
+        tmnxCellPortCbsdAuthTxExpTime,
+        tmnxCellPortCbsdAuthHeartbeatInt,
+        tmnxCellPortCbsdAuthChanType,
+        tmnxCellPortCbsdAuthCurSasSvr,
+        tmnxCellPortCbsdAuthCurSasSvrIp,
+        tmnxCellPortCbsdAuthCurSasSvrIpT,
+        tmnxCellPortCbsdAuthRegRequest,
+        tmnxCellPortCbsdAuthRegRspSuc,
+        tmnxCellPortCbsdAuthRegRspFail,
+        tmnxCellPortCbsdAuthGrantRequest,
+        tmnxCellPortCbsdAuthGrantRspSuc,
+        tmnxCellPortCbsdAuthGrantRspFail,
+        tmnxCellPortCbsdAuthHrtbtRequest,
+        tmnxCellPortCbsdAuthHrtbtRspSuc,
+        tmnxCellPortCbsdAuthHrtbtRspFail
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects maintaining cellular port CBSD authorization
+         capabilities on Nokia SROS series systems, introduced in release 21."
+    ::= { tmnxCellularV21Groups 1 }
+
+tmnxCellularNotifyObjsGroupV21   OBJECT-GROUP
+    OBJECTS     {
+        tmnxCellCbsdAuthFailReason,
+        tmnxCellCbsdAuthRespCode,
+        tmnxCellCbsdAuthPrevTransState,
+        tmnxCellCbsdAuthNewTransState
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects used in notifications generated on cellular ports
+         Nokia SROS series systems, introduced in release 21."
+    ::= { tmnxCellularV21Groups 2 }
+
+tmnxCellNotificationGroupV21     NOTIFICATION-GROUP
+    NOTIFICATIONS {
+        tmnxCellPortCbsdRegistered,
+        tmnxCellPortCbsdUnregistered,
+        tmnxCellPortCbsdGranted,
+        tmnxCellPortCbsdAuthorized,
+        tmnxCellPortCbsdTransDown
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of notifications for cellular ports on Nokia SROS series
+         systems, introduced in release 21."
+    ::= { tmnxCellularV21Groups 3 }
+
+tmnxCellularStatusGroupV21       OBJECT-GROUP
+    OBJECTS     {
+        tmnxCellPortRsrq,
+        tmnxCellPortSinr
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects maintaining cellular port status on Nokia SROS
+         series systems, introduced in release 21."
+    ::= { tmnxCellularV21Groups 4 }
+
+tmnxCellularConfigGroupV21       OBJECT-GROUP
+    OBJECTS     {
+        tmnxCellPortSyncSysTime
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects maintaining cellular port configuration on Nokia
+         SROS series systems, introduced in release 21."
+    ::= { tmnxCellularV21Groups 5 }
+
+tmnxCellularNotifyPrefix         OBJECT IDENTIFIER ::= { tmnxSRNotifyPrefix 109 }
+
+tmnxCellularNotifications        OBJECT IDENTIFIER ::= { tmnxCellularNotifyPrefix 0 }
+
+tmnxCellularBearerCreated        NOTIFICATION-TYPE
+    OBJECTS     {
+        tmnxCellularNotifyPdnId,
+        tmnxCellPortBearerId
+    }
+    STATUS      current
+    DESCRIPTION
+        "The tmnxCellularBearerCreated notification is generated when the
+         network creates a dedicated bearer on a cellular port."
+    ::= { tmnxCellularNotifications 1 }
+
+tmnxCellularBearerDeleted        NOTIFICATION-TYPE
+    OBJECTS     {
+        tmnxCellularNotifyPdnId,
+        tmnxCellPortBearerId
+    }
+    STATUS      current
+    DESCRIPTION
+        "The tmnxCellularBearerDeleted notification is generated when the
+         network removes a dedicated bearer on a cellular port."
+    ::= { tmnxCellularNotifications 2 }
+
+tmnxCellularBearerModified       NOTIFICATION-TYPE
+    OBJECTS     {
+        tmnxCellularNotifyPdnId,
+        tmnxCellPortBearerId
+    }
+    STATUS      current
+    DESCRIPTION
+        "The tmnxCellularBearerModified notification is generated when the
+         network modifies a bearer on a cellular port."
+    ::= { tmnxCellularNotifications 3 }
+
+tmnxCellularNoServiceReset       NOTIFICATION-TYPE
+    OBJECTS     {
+        tmnxPortNotifyPortId,
+        tmnxCellMdaNoServiceResetReason
+    }
+    STATUS      current
+    DESCRIPTION
+        "The tmnxCellularNoServiceReset notification is generated before the
+         system resets because it could not establish service over the cellular
+         interface."
+    ::= { tmnxCellularNotifications 4 }
+
+tmnxCellularActiveSimChange      NOTIFICATION-TYPE
+    OBJECTS     {
+        tmnxCellMdaAdminActiveSim,
+        tmnxCellMdaOperActiveSim,
+        tmnxCellMdaSimLastSwitchReason
+    }
+    STATUS      current
+    DESCRIPTION
+        "The tmnxCellularActiveSimChange notification is generated when the
+         active SIM card on the cellular MDA changes."
+    ::= { tmnxCellularNotifications 5 }
+
+tmnxCellPortCbsdRegistered       NOTIFICATION-TYPE
+    OBJECTS     {
+        tmnxCellPortCbsdAuthId,
+        tmnxCellPortCbsdAuthCurSasSvrIp,
+        tmnxCellPortCbsdAuthCurSasSvrIpT
+    }
+    STATUS      current
+    DESCRIPTION
+        "[CAUSE] The tmnxCellPortCbsdRegistered notification is generated when
+         the CBSD successfully registers with the SAS.
+
+         [EFFECT] After this notification is generated the CBSD continues the
+         CBSD authorization procedures.
+
+         [RECOVERY] Not applicable."
+    ::= { tmnxCellularNotifications 6 }
+
+tmnxCellPortCbsdUnregistered     NOTIFICATION-TYPE
+    OBJECTS     {
+        tmnxCellPortCbsdAuthId,
+        tmnxCellCbsdAuthFailReason,
+        tmnxCellCbsdAuthRespCode
+    }
+    STATUS      current
+    DESCRIPTION
+        "[CAUSE] The tmnxCellPortCbsdUnregistered notification is generated
+         when the CBSD is declared unregistered with the SAS.
+
+         [EFFECT] The CBSD restarts the registration procedures with the SAS.
+
+         [RECOVERY] Not applicable."
+    ::= { tmnxCellularNotifications 7 }
+
+tmnxCellPortCbsdGranted          NOTIFICATION-TYPE
+    OBJECTS     {
+        tmnxCellPortCbsdAuthId,
+        tmnxCellPortCbsdAuthGrantId,
+        tmnxCellPortCbsdAuthGrantExpTime,
+        tmnxCellPortCbsdAuthHeartbeatInt
+    }
+    STATUS      current
+    DESCRIPTION
+        "[CAUSE] The tmnxCellPortCbsdGranted notification is generated when the
+         CBSD has received a grant Id from the SAS. The CBSD is not authorized
+         until after the authorized notification is generated.
+
+         [EFFECT] The CBSD is awaiting authorization from the SAS.
+
+         [RECOVERY] Not applicable."
+    ::= { tmnxCellularNotifications 8 }
+
+tmnxCellPortCbsdAuthorized       NOTIFICATION-TYPE
+    OBJECTS     {
+        tmnxCellPortCbsdAuthId,
+        tmnxCellPortCbsdAuthGrantId,
+        tmnxCellPortCbsdAuthGrantExpTime,
+        tmnxCellPortCbsdAuthHeartbeatInt
+    }
+    STATUS      current
+    DESCRIPTION
+        "[CAUSE] The tmnxCellPortCbsdAuthorized notification is generated when
+         the CBSD is authorized by the SAS.
+
+         [EFFECT] The CBSD enables SR-OS on the cellular interface.
+
+         [RECOVERY] Not applicable."
+    ::= { tmnxCellularNotifications 9 }
+
+tmnxCellPortCbsdTransDown        NOTIFICATION-TYPE
+    OBJECTS     {
+        tmnxCellPortCbsdAuthId,
+        tmnxCellPortCbsdAuthGrantId,
+        tmnxCellCbsdAuthPrevTransState,
+        tmnxCellCbsdAuthNewTransState,
+        tmnxCellCbsdAuthFailReason,
+        tmnxCellCbsdAuthRespCode
+    }
+    STATUS      current
+    DESCRIPTION
+        "[CAUSE] The tmnxCellPortCbsdTransDown notification is generated when
+         the CBSD is transitioning to a lower state.
+
+         [EFFECT] The CBSD proceeds to complete authorization with the SAS from
+         the state the CBSD has transitioned to.
+
+         [RECOVERY] Not applicable."
+    ::= { tmnxCellularNotifications 10 }
+
+END

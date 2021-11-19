@@ -3476,11 +3476,6 @@ parameters:
 			path: LibreNMS/Interfaces/Polling/MplsPolling.php
 
 		-
-			message: "#^Method LibreNMS\\\\Interfaces\\\\Polling\\\\OSPolling\\:\\:pollOS\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: LibreNMS/Interfaces/Polling/OSPolling.php
-
-		-
 			message: "#^Method LibreNMS\\\\Interfaces\\\\Polling\\\\PollerModule\\:\\:poll\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: LibreNMS/Interfaces/Polling/PollerModule.php
@@ -3671,59 +3666,29 @@ parameters:
 			path: LibreNMS/Modules/Nac.php
 
 		-
-			message: "#^Method LibreNMS\\\\Modules\\\\OS\\:\\:cleanup\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: LibreNMS/Modules/OS.php
-
-		-
-			message: "#^Method LibreNMS\\\\Modules\\\\OS\\:\\:discover\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: LibreNMS/Modules/OS.php
-
-		-
-			message: "#^Method LibreNMS\\\\Modules\\\\OS\\:\\:handleChanges\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: LibreNMS/Modules/OS.php
-
-		-
-			message: "#^Method LibreNMS\\\\Modules\\\\OS\\:\\:poll\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: LibreNMS/Modules/OS.php
-
-		-
-			message: "#^Method LibreNMS\\\\Modules\\\\OS\\:\\:sysContact\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: LibreNMS/Modules/OS.php
-
-		-
-			message: "#^Method LibreNMS\\\\Modules\\\\OS\\:\\:updateLocation\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: LibreNMS/Modules/OS.php
-
-		-
 			message: "#^Variable \\$features on left side of \\?\\? is never defined\\.$#"
 			count: 1
-			path: LibreNMS/Modules/OS.php
+			path: LibreNMS/Modules/Os.php
 
 		-
 			message: "#^Variable \\$hardware on left side of \\?\\? is never defined\\.$#"
 			count: 1
-			path: LibreNMS/Modules/OS.php
+			path: LibreNMS/Modules/Os.php
 
 		-
 			message: "#^Variable \\$location in empty\\(\\) always exists and is always falsy\\.$#"
 			count: 1
-			path: LibreNMS/Modules/OS.php
+			path: LibreNMS/Modules/Os.php
 
 		-
 			message: "#^Variable \\$serial on left side of \\?\\? is never defined\\.$#"
 			count: 1
-			path: LibreNMS/Modules/OS.php
+			path: LibreNMS/Modules/Os.php
 
 		-
 			message: "#^Variable \\$version on left side of \\?\\? is never defined\\.$#"
 			count: 1
-			path: LibreNMS/Modules/OS.php
+			path: LibreNMS/Modules/Os.php
 
 		-
 			message: "#^Method LibreNMS\\\\Modules\\\\PrinterSupplies\\:\\:cleanup\\(\\) has no return type specified\\.$#"
@@ -3921,11 +3886,6 @@ parameters:
 			path: LibreNMS/OS.php
 
 		-
-			message: "#^Method LibreNMS\\\\OS\\:\\:persistGraphs\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: LibreNMS/OS.php
-
-		-
 			message: "#^Method LibreNMS\\\\OS\\:\\:preCache\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: LibreNMS/OS.php
@@ -4106,16 +4066,6 @@ parameters:
 			path: LibreNMS/OS/AsuswrtMerlin.php
 
 		-
-			message: "#^Method LibreNMS\\\\OS\\\\Barracudangfirewall\\:\\:pollOS\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: LibreNMS/OS/Barracudangfirewall.php
-
-		-
-			message: "#^Expression on left side of \\?\\? is not nullable\\.$#"
-			count: 1
-			path: LibreNMS/OS/Boss.php
-
-		-
 			message: "#^Method LibreNMS\\\\OS\\\\Ceraos\\:\\:fetchHardware\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: LibreNMS/OS/Ceraos.php
@@ -4134,11 +4084,6 @@ parameters:
 			message: "#^Parameter \\#8 \\$warn_percent of static method LibreNMS\\\\Device\\\\Processor\\:\\:discover\\(\\) expects int, null given\\.$#"
 			count: 1
 			path: LibreNMS/OS/Comware.php
-
-		-
-			message: "#^Method LibreNMS\\\\OS\\\\Coriant\\:\\:pollOS\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: LibreNMS/OS/Coriant.php
 
 		-
 			message: "#^Method LibreNMS\\\\OS\\\\Dnos\\:\\:findProcessors\\(\\) has no return type specified\\.$#"
@@ -4161,24 +4106,9 @@ parameters:
 			path: LibreNMS/OS/Fabos.php
 
 		-
-			message: "#^Method LibreNMS\\\\OS\\\\Fortigate\\:\\:pollOS\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: LibreNMS/OS/Fortigate.php
-
-		-
-			message: "#^Method LibreNMS\\\\OS\\\\Fortios\\:\\:pollOS\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: LibreNMS/OS/Fortios.php
-
-		-
 			message: "#^Method LibreNMS\\\\OS\\\\Ftos\\:\\:getHardware\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: LibreNMS/OS/Ftos.php
-
-		-
-			message: "#^Method LibreNMS\\\\OS\\\\Gaia\\:\\:pollOS\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: LibreNMS/OS/Gaia.php
 
 		-
 			message: "#^Parameter \\#8 \\$multiplier of class LibreNMS\\\\Device\\\\WirelessSensor constructor expects int, null given\\.$#"
@@ -4246,11 +4176,6 @@ parameters:
 			path: LibreNMS/OS/Junos.php
 
 		-
-			message: "#^Method LibreNMS\\\\OS\\\\Junos\\:\\:pollOS\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: LibreNMS/OS/Junos.php
-
-		-
 			message: "#^Method LibreNMS\\\\OS\\\\Junos\\:\\:pollSlas\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: LibreNMS/OS/Junos.php
@@ -4274,21 +4199,6 @@ parameters:
 			message: "#^Method LibreNMS\\\\OS\\\\Mimosa\\:\\:getPolarization\\(\\) has parameter \\$polarization with no type specified\\.$#"
 			count: 1
 			path: LibreNMS/OS/Mimosa.php
-
-		-
-			message: "#^Method LibreNMS\\\\OS\\\\Netscaler\\:\\:pollOS\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: LibreNMS/OS/Netscaler.php
-
-		-
-			message: "#^Method LibreNMS\\\\OS\\\\Nios\\:\\:pollOS\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: LibreNMS/OS/Nios.php
-
-		-
-			message: "#^Method LibreNMS\\\\OS\\\\Openbsd\\:\\:pollOS\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: LibreNMS/OS/Openbsd.php
 
 		-
 			message: "#^Method LibreNMS\\\\OS\\\\Openwrt\\:\\:getSensorData\\(\\) has parameter \\$query with no type specified\\.$#"
@@ -4351,59 +4261,14 @@ parameters:
 			path: LibreNMS/OS/Panos.php
 
 		-
-			message: "#^Method LibreNMS\\\\OS\\\\Panos\\:\\:pollOS\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: LibreNMS/OS/Panos.php
-
-		-
 			message: "#^Property LibreNMS\\\\OS\\\\Panos\\:\\:\\$validNetBufferMemory has no type specified\\.$#"
 			count: 1
 			path: LibreNMS/OS/Panos.php
 
 		-
-			message: "#^Method LibreNMS\\\\OS\\\\Pfsense\\:\\:pollOS\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: LibreNMS/OS/Pfsense.php
-
-		-
 			message: "#^Method LibreNMS\\\\OS\\\\Pmp\\:\\:freqDivisor\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: LibreNMS/OS/Pmp.php
-
-		-
-			message: "#^Method LibreNMS\\\\OS\\\\Pmp\\:\\:pollOS\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: LibreNMS/OS/Pmp.php
-
-		-
-			message: "#^Method LibreNMS\\\\OS\\\\Procurve\\:\\:pollOS\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: LibreNMS/OS/Procurve.php
-
-		-
-			message: "#^Method LibreNMS\\\\OS\\\\Pulse\\:\\:pollOS\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: LibreNMS/OS/Pulse.php
-
-		-
-			message: "#^Method LibreNMS\\\\OS\\\\Routeros\\:\\:pollOS\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: LibreNMS/OS/Routeros.php
-
-		-
-			message: "#^Method LibreNMS\\\\OS\\\\Rutos2xx\\:\\:pollOS\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: LibreNMS/OS/Rutos2xx.php
-
-		-
-			message: "#^Method LibreNMS\\\\OS\\\\Screenos\\:\\:pollOS\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: LibreNMS/OS/Screenos.php
-
-		-
-			message: "#^Method LibreNMS\\\\OS\\\\Secureplatform\\:\\:pollOS\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: LibreNMS/OS/Secureplatform.php
 
 		-
 			message: "#^If condition is always false\\.$#"
@@ -4766,11 +4631,6 @@ parameters:
 			path: LibreNMS/OS/SmOs.php
 
 		-
-			message: "#^Method LibreNMS\\\\OS\\\\Sonicwall\\:\\:pollOS\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: LibreNMS/OS/Sonicwall.php
-
-		-
 			message: "#^Offset 'sonicCurrentConnCac…' does not exist on string\\.$#"
 			count: 1
 			path: LibreNMS/OS/Sonicwall.php
@@ -4831,16 +4691,6 @@ parameters:
 			path: LibreNMS/OS/Timos.php
 
 		-
-			message: "#^Expression on left side of \\?\\? is not nullable\\.$#"
-			count: 2
-			path: LibreNMS/OS/Topvision.php
-
-		-
-			message: "#^Method LibreNMS\\\\OS\\\\Topvision\\:\\:pollOS\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: LibreNMS/OS/Topvision.php
-
-		-
 			message: "#^Property LibreNMS\\\\OS\\\\Unifi\\:\\:\\$ccqDivisor has no type specified\\.$#"
 			count: 1
 			path: LibreNMS/OS/Unifi.php
@@ -4857,11 +4707,6 @@ parameters:
 
 		-
 			message: "#^Method LibreNMS\\\\OS\\\\Vrp\\:\\:discoverSlas\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: LibreNMS/OS/Vrp.php
-
-		-
-			message: "#^Method LibreNMS\\\\OS\\\\Vrp\\:\\:pollOS\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: LibreNMS/OS/Vrp.php
 
@@ -4964,11 +4809,6 @@ parameters:
 			message: "#^Method LibreNMS\\\\OS\\\\Zxdsl\\:\\:parseVariant\\(\\) has parameter \\$oid with no type specified\\.$#"
 			count: 1
 			path: LibreNMS/OS/Zxdsl.php
-
-		-
-			message: "#^Method LibreNMS\\\\OS\\\\Zywall\\:\\:pollOS\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: LibreNMS/OS/Zywall.php
 
 		-
 			message: "#^Property LibreNMS\\\\ObjectCache\\:\\:\\$data has no type specified\\.$#"
@@ -5566,36 +5406,6 @@ parameters:
 			path: LibreNMS/Util/Colors.php
 
 		-
-			message: "#^Method LibreNMS\\\\Util\\\\Debug\\:\\:disableCliDebugOutput\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: LibreNMS/Util/Debug.php
-
-		-
-			message: "#^Method LibreNMS\\\\Util\\\\Debug\\:\\:disableQueryDebug\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: LibreNMS/Util/Debug.php
-
-		-
-			message: "#^Method LibreNMS\\\\Util\\\\Debug\\:\\:enableCliDebugOutput\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: LibreNMS/Util/Debug.php
-
-		-
-			message: "#^Method LibreNMS\\\\Util\\\\Debug\\:\\:enableQueryDebug\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: LibreNMS/Util/Debug.php
-
-		-
-			message: "#^Property LibreNMS\\\\Util\\\\Debug\\:\\:\\$debug has no type specified\\.$#"
-			count: 1
-			path: LibreNMS/Util/Debug.php
-
-		-
-			message: "#^Property LibreNMS\\\\Util\\\\Debug\\:\\:\\$verbose has no type specified\\.$#"
-			count: 1
-			path: LibreNMS/Util/Debug.php
-
-		-
 			message: "#^Property LibreNMS\\\\Util\\\\Dns\\:\\:\\$resolver has no type specified\\.$#"
 			count: 1
 			path: LibreNMS/Util/Dns.php
@@ -5889,16 +5699,6 @@ parameters:
 			message: "#^Method LibreNMS\\\\Util\\\\FileCategorizer\\:\\:validateOs\\(\\) has parameter \\$os with no type specified\\.$#"
 			count: 1
 			path: LibreNMS/Util/FileCategorizer.php
-
-		-
-			message: "#^Method LibreNMS\\\\Util\\\\Git\\:\\:binaryExists\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: LibreNMS/Util/Git.php
-
-		-
-			message: "#^Method LibreNMS\\\\Util\\\\Git\\:\\:repoPresent\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: LibreNMS/Util/Git.php
 
 		-
 			message: "#^Method LibreNMS\\\\Util\\\\GitHub\\:\\:__construct\\(\\) has parameter \\$file with no type specified\\.$#"
@@ -6969,46 +6769,6 @@ parameters:
 			message: "#^Method LibreNMS\\\\Util\\\\Validate\\:\\:ascDesc\\(\\) has parameter \\$direction with no type specified\\.$#"
 			count: 1
 			path: LibreNMS/Util/Validate.php
-
-		-
-			message: "#^Method LibreNMS\\\\Util\\\\Version\\:\\:database\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: LibreNMS/Util/Version.php
-
-		-
-			message: "#^Method LibreNMS\\\\Util\\\\Version\\:\\:fromGit\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: LibreNMS/Util/Version.php
-
-		-
-			message: "#^Method LibreNMS\\\\Util\\\\Version\\:\\:get\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: LibreNMS/Util/Version.php
-
-		-
-			message: "#^Method LibreNMS\\\\Util\\\\Version\\:\\:gitChangelog\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: LibreNMS/Util/Version.php
-
-		-
-			message: "#^Method LibreNMS\\\\Util\\\\Version\\:\\:gitDate\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: LibreNMS/Util/Version.php
-
-		-
-			message: "#^Method LibreNMS\\\\Util\\\\Version\\:\\:local\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: LibreNMS/Util/Version.php
-
-		-
-			message: "#^Method LibreNMS\\\\Util\\\\Version\\:\\:python\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: LibreNMS/Util/Version.php
-
-		-
-			message: "#^Property LibreNMS\\\\Util\\\\Version\\:\\:\\$is_git_install has no type specified\\.$#"
-			count: 1
-			path: LibreNMS/Util/Version.php
 
 		-
 			message: "#^Method LibreNMS\\\\ValidationResult\\:\\:consolePrint\\(\\) has no return type specified\\.$#"
@@ -9492,11 +9252,6 @@ parameters:
 
 		-
 			message: "#^Method App\\\\Models\\\\Device\\:\\:isUnderMaintenance\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/Models/Device.php
-
-		-
-			message: "#^Method App\\\\Models\\\\Device\\:\\:name\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: app/Models/Device.php
 

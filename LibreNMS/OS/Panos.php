@@ -36,7 +36,7 @@ class Panos extends \LibreNMS\OS implements OSPolling
         'Packet Buffers',
     ];
 
-    public function pollOS()
+    public function pollOS(): void
     {
         $data = snmp_get_multi($this->getDeviceArray(), [
             'panSessionActive.0',

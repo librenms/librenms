@@ -1,4 +1,4 @@
-mib: TIMETRA-SYSTEM-MIB:TIMETRA-CHASSIS-MIB:TIMETRA-SUBSCRIBER-MGMT-MIB
+mib: TIMETRA-SYSTEM-MIB:TIMETRA-CHASSIS-MIB:TIMETRA-SUBSCRIBER-MGMT-MIB:TIMETRA-CELLULAR-MIB:IF-MIB
 modules:
     mempools:
         data:
@@ -19,6 +19,12 @@ modules:
                 num_oid: '.1.3.6.1.4.1.6527.3.1.2.1.1.1.{{ $index }}'
 
     sensors:
+        pre-cache:
+            data:
+                -
+                    oid:
+                        - ifName
+                        - tmnxCellPdnApn
         state:
             data:
                 -
@@ -96,7 +102,58 @@ modules:
                     states:
                         - { value: 1, generic: 0, graph: 0, descr: Ok }
                         - { value: 2, generic: 2, graph: 0, descr: OverTemp }
-
+                -
+                    oid: tmnxCellPortRegistrationStatus
+                    num_oid: '.1.3.6.1.4.1.6527.3.1.2.109.3.1.1.1.2.{{ $index }}'
+                    descr: 'Registration state {{ $ifName }}'
+                    index: 'tmnxCellPortRegistrationStatus.{{ $index }}'
+                    state_name: tmnxCellPortRegistrationStatus
+                    states:
+                        - { value: 0, generic: 0, graph: 0, descr: Not-registered }
+                        - { value: 1, generic: 0, graph: 0, descr: Registered-home }
+                        - { value: 2, generic: 0, graph: 0, descr: Searching }
+                        - { value: 3, generic: 0, graph: 0, descr: Denied }
+                        - { value: 4, generic: 0, graph: 0, descr: No-network }
+                        - { value: 5, generic: 0, graph: 0, descr: Registered-roaming }
+                        - { value: 6, generic: 0, graph: 0, descr: Sms-only-home }
+                        - { value: 7, generic: 0, graph: 0, descr: Sms-only-roaming }
+                        - { value: 8, generic: 0, graph: 0, descr: Emergency-only }
+                        - { value: 9, generic: 0, graph: 0, descr: Csfb-not-preferred-home }
+                        - { value: 10, generic: 0, graph: 0, descr: Csfb-not-preferred-roaming }
+                    group: 'Cellular status'
+                -
+                    oid: tmnxCellPortWirelessTechnology
+                    num_oid: '.1.3.6.1.4.1.6527.3.1.2.109.3.1.1.1.3.{{ $index }}'
+                    descr: 'Wireless technology {{ $ifName }}'
+                    index: 'tmnxCellPortWirelessTechnology.{{ $index }}'
+                    state_name: tmnxCellPortWirelessTechnology
+                    states:
+                        - { value: 0, generic: 0, graph: 0, descr: None }
+                        - { value: 1, generic: 0, graph: 0, descr: Lte }
+                        - { value: 2, generic: 0, graph: 0, descr: Wcdma }
+                        - { value: 3, generic: 0, graph: 0, descr: Gsm }
+                    group: 'Cellular status'
+                -
+                    oid: tmnxCellSimCardEquipped
+                    num_oid: '.1.3.6.1.4.1.6527.3.1.2.109.3.1.3.1.1.{{ $index }}'
+                    descr: 'Simcard {{ $ifName }}'
+                    index: 'tmnxCellSimCardEquipped.{{ $index }}'
+                    state_name: tmnxCellSimCardEquipped
+                    states:
+                        - { value: 1, generic: 0, graph: 0, descr: Installed }
+                        - { value: 2, generic: 0, graph: 0, descr: Not installed }
+                    group: 'Cellular status'
+                -
+                    
+                    oid: tmnxCellPdnConnectionState
+                    num_oid: '.1.3.6.1.4.1.6527.3.1.2.109.3.1.4.1.1.{{ $index }}'
+                    descr: 'Pdn state {{ $ifName }} {{ $tmnxCellPdnApn }}'
+                    index: 'tmnxCellPdnConnectionState.{{ $index }}'
+                    state_name: tmnxCellPdnConnectionState 
+                    states:
+                        - { value: 0, generic: 0, graph: 0, descr: Not connected }
+                        - { value: 1, generic: 0, graph: 0, descr: Connected }
+                    group: 'Cellular status'
         temperature:
             data:
                 -
@@ -149,3 +206,16 @@ modules:
                     descr: 'Total hosts on this system'
                     index: 'tmnxSubMgmtSystSTotal.{{ $index }}'
                     group: 'Subscribers'
+                -
+                    oid: tmnxCellPortFrequencyBand
+                    num_oid: '.1.3.6.1.4.1.6527.3.1.2.109.3.1.1.1.4.{{ $index }}'
+                    descr: 'Interface {{ $ifName }}'
+                    index: 'tmnxCellPortFrequencyBand.{{ $index }}'
+                    group: 'Frequency band'
+                -
+                    oid: tmnxCellularPortBearerTable
+                    value: tmnxCellPortBearerQci
+                    num_oid: '.1.3.6.1.4.1.6527.3.1.2.109.3.1.5.1.3.{{ $index }}'
+                    descr: 'Interface {{ $ifName }}'
+                    index: 'tmnxCellularPortBearerTable.{{ $index }}'
+                    group: 'QoS Class Identifier'

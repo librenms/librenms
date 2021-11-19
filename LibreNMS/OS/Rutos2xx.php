@@ -37,7 +37,7 @@ class Rutos2xx extends OS implements
     WirelessSnrDiscovery,
     WirelessRssiDiscovery
 {
-    public function pollOS()
+    public function pollOS(): void
     {
         // Mobile Data Usage
         $usage = snmp_get_multi_oid($this->getDeviceArray(), [

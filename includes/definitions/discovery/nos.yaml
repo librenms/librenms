@@ -1,5 +1,9 @@
 mib: SW-MIB
 modules:
+    os:
+        hardware: ENTITY-MIB::entPhysicalDescr.1
+        version: SYSTEM-MIB::swFirmwareVersion.0
+        serial: ENTITY-MIB::entPhysicalSerialNum.1
     mempools:
         data:
             -

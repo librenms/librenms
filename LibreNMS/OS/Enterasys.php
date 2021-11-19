@@ -36,7 +36,7 @@ class Enterasys extends \LibreNMS\OS implements MempoolsDiscovery
         $mem = snmpwalk_group($this->getDeviceArray(), 'etsysResourceStorageTable', 'ENTERASYS-RESOURCE-UTILIZATION-MIB', 3);
 
         foreach ($mem as $index => $mem_data) {
-            foreach ($mem_data['ram'] as $mem_id => $ram) {
+            foreach ($mem_data['ram'] ?? [] as $mem_id => $ram) {
                 $descr = $ram['etsysResourceStorageDescr'];
                 if ($index > 1000) {
                     $descr = 'Slot #' . substr($index, -1) . " $descr";
@@ -50,7 +50,7 @@ class Enterasys extends \LibreNMS\OS implements MempoolsDiscovery
                     'mempool_precision' => 1024,
                     'mempool_free_oid' => ".1.3.6.1.4.1.5624.1.2.49.1.3.1.1.5.$index.2.$mem_id",
                     'mempool_perc_warn' => 90,
-                ]))->fillUsage(null, $ram['etsysResourceStorageSize'], $ram['etsysResourceStorageAvailable']));
+                ]))->fillUsage(null, $ram['etsysResourceStorageSize'] ?? null, $ram['etsysResourceStorageAvailable'] ?? null));
             }
         }
 

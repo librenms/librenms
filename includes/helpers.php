@@ -31,7 +31,7 @@ if (! function_exists('d_echo')) {
      * Legacy convenience function - please use this instead of 'if (Debug::isEnabled()) { echo ...; }'
      * Use Log directly in pure Laravel code!
      *
-     * @param  string|array  $text  The error message or array to print
+     * @param  string|array|float|int  $text  The error message or array to print
      * @param  string  $no_debug_text  Text to print if debug is disabled
      */
     function d_echo($text, $no_debug_text = null)

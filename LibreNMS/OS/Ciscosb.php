@@ -43,7 +43,7 @@ class Ciscosb extends OS implements OSDiscovery
             } elseif ($device->sysObjectID == '.1.3.6.1.4.1.9.6.1.89.26.1') {
                 $hardware = 'SG220-26';
             } else {
-                $hardware = str_replace(' ', '', $data['1']['rlPhdUnitGenParamModelName']);
+                $hardware = str_replace(' ', '', $data['1']['rlPhdUnitGenParamModelName'] ?? '');
             }
             $device->hardware = $hardware;
         }
@@ -54,8 +54,8 @@ class Ciscosb extends OS implements OSDiscovery
         }
 
         $device->version = isset($data['1']['rlPhdUnitGenParamSoftwareVersion']) ? ('Software ' . $data['1']['rlPhdUnitGenParamSoftwareVersion']) : null;
-        $boot = $data['0']['rndBaseBootVersion'];
-        $firmware = $data['1']['rlPhdUnitGenParamFirmwareVersion'];
+        $boot = $data['0']['rndBaseBootVersion'] ?? null;
+        $firmware = $data['1']['rlPhdUnitGenParamFirmwareVersion'] ?? null;
         if ($boot) {
             $device->version .= ", Bootldr $boot";
         }

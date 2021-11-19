@@ -30,29 +30,32 @@ use LibreNMS\RRD\RrdDefinition;
 
 class Screenos extends \LibreNMS\OS implements OSPolling
 {
-    public function pollOS()
+    public function pollOS(): void
     {
         $sess_data = snmp_get_multi_oid($this->getDeviceArray(), [
             '.1.3.6.1.4.1.3224.16.3.2.0',
             '.1.3.6.1.4.1.3224.16.3.3.0',
             '.1.3.6.1.4.1.3224.16.3.4.0',
         ]);
-        [$sessalloc, $sessmax, $sessfailed] = array_values($sess_data);
 
-        $rrd_def = RrdDefinition::make()
-            ->addDataset('allocate', 'GAUGE', 0, 3000000)
-            ->addDataset('max', 'GAUGE', 0, 3000000)
-            ->addDataset('failed', 'GAUGE', 0, 1000);
+        if (! empty($sess_data)) {
+            [$sessalloc, $sessmax, $sessfailed] = array_values($sess_data);
 
-        $fields = [
-            'allocate' => $sessalloc,
-            'max' => $sessmax,
-            'failed' => $sessfailed,
-        ];
+            $rrd_def = RrdDefinition::make()
+                ->addDataset('allocate', 'GAUGE', 0, 3000000)
+                ->addDataset('max', 'GAUGE', 0, 3000000)
+                ->addDataset('failed', 'GAUGE', 0, 1000);
 
-        $tags = compact('rrd_def');
-        data_update($this->getDeviceArray(), 'screenos_sessions', $tags, $fields);
+            $fields = [
+                'allocate' => $sessalloc,
+                'max' => $sessmax,
+                'failed' => $sessfailed,
+            ];
 
-        $this->enableGraph('screenos_sessions');
+            $tags = compact('rrd_def');
+            data_update($this->getDeviceArray(), 'screenos_sessions', $tags, $fields);
+
+            $this->enableGraph('screenos_sessions');
+        }
     }
 }
