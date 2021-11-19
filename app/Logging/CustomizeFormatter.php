@@ -2,7 +2,7 @@
 /**
  * CustomizeFormatter.php
  *
- * -Description-
+ * Set the formatter for this log output
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -33,7 +33,7 @@ class CustomizeFormatter
      * @param  \Illuminate\Log\Logger  $logger
      * @return void
      */
-    public function __invoke($logger)
+    public function __invoke($logger): void
     {
         foreach ($logger->getHandlers() as $handler) {
             $stdout = substr($handler->getUrl(), 0, 6) === 'php://';

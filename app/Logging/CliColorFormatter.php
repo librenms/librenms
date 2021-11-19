@@ -27,7 +27,13 @@ namespace App\Logging;
 
 class CliColorFormatter extends \Monolog\Formatter\LineFormatter
 {
+    /**
+     * @var \Console_Color2
+     */
     private $console_color;
+    /**
+     * @var bool
+     */
     private $console;
 
     public function __construct($stdout = true)
