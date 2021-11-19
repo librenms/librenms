@@ -1,7 +1,7 @@
 <?php
 /*
  *
- * LibreNMS storage poller module for Eltex-MES.
+ * LibreNMS storage poller module for Eltex-MES23xx
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,7 +22,7 @@
  * @author     Peca Nesovanovic <peca.nesovanovic@sattrakt.com>
  */
 
-if ($device['os'] == 'eltex-mes') {
+if ($device['os'] == 'eltex-mes23xx') {
     $storage['units'] = 1024;
     $storage['free'] = snmp_get($device, 'rlFileFreeSizeOfFlash.0', '-Oqv', 'RADLAN-File');
     $storage['size'] = snmp_get($device, 'rlFileTotalSizeOfFlash.0', '-Oqv', 'RADLAN-File');

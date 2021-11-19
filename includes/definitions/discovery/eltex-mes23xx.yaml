@@ -1,10 +1,9 @@
-mib: RADLAN-rndMng:RADLAN-HWENVIROMENT:ELTEX-MES-HWENVIROMENT-MIB:RADLAN-Physicaldescription-MIB
+mib: RADLAN-rndMng:RADLAN-HWENVIROMENT:ELTEX-MES-HWENVIROMENT-MIB:RADLAN-Physicaldescription-MIB:RADLAN-PHY-MIB
 modules:
     os:
-        version: .1.3.6.1.2.1.47.1.1.1.1.10.67108992
-        hardware: .1.3.6.1.2.1.47.1.1.1.1.13.67108992
-        serial: .1.3.6.1.2.1.47.1.1.1.1.11.67108992
-
+        features: RADLAN-Physicaldescription-MIB::rlPhdUnitGenParamSoftwareVersion.1
+        hardware: RADLAN-Physicaldescription-MIB::rlPhdUnitGenParamModelName.1
+        serial: RADLAN-Physicaldescription-MIB::rlPhdUnitGenParamSerialNum.1
     processors:
         data:
             -
@@ -16,6 +15,7 @@ modules:
             -
                 total: .1.3.6.1.4.1.35265.41.1.2.1.1.3.0
                 free: .1.3.6.1.4.1.35265.41.1.2.1.1.7.0
+                descr: 'System Memory'
 
     sensors:
         state:
@@ -35,6 +35,7 @@ modules:
                     num_oid: '.1.3.6.1.4.1.35265.1.23.11.1.1.2.{{ $index }}'
                     descr: 'Backup battery status'
                     index: 'mesBattStatus.{{ $index }}'
+                    skip_values: 255
                     states:
                         - { value: 1, descr: Charged, graph: 1, generic: 0 }
                         - { value: 2, descr: Discharged, graph: 1, generic: 2 }

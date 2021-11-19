@@ -1,6 +1,6 @@
 <?php
 /*
- * LibreNMS discovery module for Eltex-MES SFP current
+ * LibreNMS discovery module for Eltex-mes23xx SFP Dbm
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,31 +21,38 @@
  * @author     Peca Nesovanovic <peca.nesovanovic@sattrakt.com>
  */
 
-$low_limit = $low_warn_limit = 15;
+$low_limit = $low_warn_limit = -15;
 $high_warn_limit = $high_limit = 0;
-$divisor = 1000000;
+$divisor = 1000;
 
-$oids = snmp_walk($device, '1.3.6.1.4.1.89.90.1.2.1.3', '-Osqn', '');
-$oids = trim($oids);
-
+$oids = $pre_cache['eltex-mes23xx_rlPhyTestGetResult'];
 if ($oids) {
-    echo "Eltex-MES SFP TX Current:\n";
-
+    d_echo("Eltex-MES SFP dBm");
     foreach (explode("\n", $oids) as $data) {
         if ($data) {
-            print_r($data);
-            echo "\n";
             $split = trim(explode(' ', $data)[0]);
             $value = trim(explode(' ', $data)[1]);
             $ifIndex = explode('.', $split)[13];
             $type = explode('.', $split)[14];
 
-            //type 7 = bias
-            if ($type == 7) {
-                $descr_oid = '1.0.8802.1.1.2.1.3.7.1.3.' . $ifIndex;
-                $descr = trim(snmp_get($device, $descr_oid, '-Oqv', ''), '"');
+            //type8 = tx dBm
+            if ($type == 8) {
                 $value = $value / $divisor;
-                discover_sensor($valid['sensor'], 'current', $device, $split, 'txbias' . $ifIndex, 'eltex-mes', 'SfpTxBias-' . $descr, $divisor, '1', $low_limit, $low_warn_limit, $high_warn_limit, $high_limit, $value);
+                $tmp = get_port_by_index_cache($device['device_id'], $ifIndex);
+                $descr = $tmp['ifName'];
+                discover_sensor(
+                    $valid['sensor'], 'dbm', $device, $split, 'txdbm' . $ifIndex, 'rlPhyTestTableTxOutput', 'SfpTxdBm-' . $descr, $divisor, '1', $low_limit, $low_warn_limit, $high_warn_limit, $high_limit, $value
+                );
+            }
+
+            //type9 = rx dBm
+            if ($type == 9) {
+                $value = $value / $divisor;
+                $tmp = get_port_by_index_cache($device['device_id'], $ifIndex);
+                $descr = $tmp['ifName'];
+                discover_sensor(
+                    $valid['sensor'], 'dbm', $device, $split, 'rxdbm' . $ifIndex, 'rlPhyTestTableRxOpticalPower', 'SfpRxdBm-' . $descr, $divisor, '1', $low_limit, $low_warn_limit, $high_warn_limit, $high_limit, $value
+                );
             }
         }
     }
