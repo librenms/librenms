@@ -25,7 +25,7 @@ $oids = snmp_walk($device, 'eltEnvMonBatteryStatusCharge', '-Osqn', 'ELTEX-MES-H
 $oids = trim($oids);
 
 if ($oids) {
-    d_echo ("Eltex-MES charge");
+    d_echo('Eltex-MES charge');
     foreach (explode("\n", $oids) as $data) {
         if ($data) {
             $oid = trim(explode(' ', $data)[0]);

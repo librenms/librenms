@@ -43,8 +43,8 @@ modules:
                     states:
                         - { value: 2, generic: 0, graph: 0, descr: 'AC' }
                         - { value: 3, generic: 0, graph: 0, descr: 'DC' }
-                        - { value: 4, generic: 3, graph: 0, desdr: '' }
-                        - { value: 5, generic: 3, graph: 0, desdr: '' }
+                        - { value: 4, generic: 3, graph: 0, descr: '' }
+                        - { value: 5, generic: 3, graph: 0, descr: '' }
 
                 -
                     oid: rlEnvMonFanStatusTable

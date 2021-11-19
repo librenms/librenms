@@ -27,7 +27,7 @@ $divisor = 1;
 
 $oids = $pre_cache['eltex-mes21xx_rlPhyTestGetResult'];
 if ($oids) {
-    d_echo("Eltex-MES SFP temperature");
+    d_echo('Eltex-MES SFP temperature');
     foreach (explode("\n", $oids) as $data) {
         if ($data) {
             $split = trim(explode(' ', $data)[0]);

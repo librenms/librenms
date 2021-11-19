@@ -27,7 +27,7 @@ $divisor = 1000;
 
 $oids = $pre_cache['eltex-mes21xx_rlPhyTestGetResult'];
 if ($oids) {
-    d_echo("Eltex-MES SFP dBm");
+    d_echo('Eltex-MES SFP dBm');
     foreach (explode("\n", $oids) as $data) {
         if ($data) {
             $split = trim(explode(' ', $data)[0]);
