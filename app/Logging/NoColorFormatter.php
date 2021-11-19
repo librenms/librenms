@@ -1,8 +1,8 @@
 <?php
 /**
- * CustomizeFormatter.php
+ * FileColorFormatter.php
  *
- * Set the formatter for this log output
+ * Always strip colors from the output.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,24 +25,27 @@
 
 namespace App\Logging;
 
-use Monolog\Handler\FormattableHandlerInterface;
-use Monolog\Handler\StreamHandler;
-
-class CustomizeFormatter
+class NoColorFormatter extends \Monolog\Formatter\LineFormatter
 {
     /**
-     * Customize the given logger instance.
-     *
-     * @param  \Illuminate\Log\Logger  $logger
-     * @return void
+     * @var \Console_Color2
      */
-    public function __invoke($logger): void
+    private $console_color;
+
+    public function __construct()
     {
-        foreach ($logger->getHandlers() as $handler) {
-            if ($handler instanceof  FormattableHandlerInterface) {
-                $stdout = $handler instanceof  StreamHandler && substr($handler->getUrl(), 0, 6) === 'php://';
-                $handler->setFormatter(new CliColorFormatter($stdout));
-            }
+        parent::__construct(null, null, true, true);
+        $this->console_color = new \Console_Color2();
+    }
+
+    public function format(array $record): string
+    {
+        // only format messages where color is enabled
+        if (isset($record['context']['color']) && $record['context']['color']) {
+            $record['message'] = $this->console_color->convert($record['message'], false);
+            unset($record['context']['color']);
         }
+
+        return parent::format($record);
     }
 }

@@ -36,27 +36,24 @@ class CliColorFormatter extends \Monolog\Formatter\LineFormatter
      */
     private $console;
 
-    public function __construct(bool $stdout = true)
+    public function __construct()
     {
-        $this->console_color = new \Console_Color2();
-        $this->console = $stdout && \App::runningInConsole();
-
         parent::__construct(
             "%message% %context% %extra%\n",
             null,
             true,
             true
         );
+
+        $this->console_color = new \Console_Color2();
+        $this->console = \App::runningInConsole();
     }
 
     public function format(array $record): string
     {
         // only format messages where color is enabled
         if (isset($record['context']['color']) && $record['context']['color']) {
-            $record['message'] = $this->console_color->convert($record['message']);
-            if (! $this->console) {
-                $record['message'] = $this->console_color->strip($record['message']);
-            }
+            $record['message'] = $this->console_color->convert($record['message'], $this->console);
             unset($record['context']['color']);
         }
 
