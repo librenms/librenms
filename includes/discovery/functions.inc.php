@@ -151,11 +151,9 @@ function discover_device(&$device, $force_module = false)
 
             try {
                 include "includes/discovery/$module.inc.php";
-            } catch (Exception $e) {
+            } catch (Throwable $e) {
                 // isolate module exceptions so they don't disrupt the polling process
-                echo $e->getTraceAsString() . PHP_EOL;
-                c_echo("%rError in $module module.%n " . $e->getMessage() . PHP_EOL);
-                logfile("Error in $module module. " . $e->getMessage() . PHP_EOL . $e->getTraceAsString() . PHP_EOL);
+                Log::error("%rError in $module module.%n " . $e->getMessage() . PHP_EOL . $e->getTraceAsString(), ['color' => true]);
             }
 
             $module_time = microtime(true) - $module_start;
