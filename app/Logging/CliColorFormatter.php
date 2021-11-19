@@ -19,21 +19,21 @@
  *
  * @link       https://www.librenms.org
  *
- * @copyright  2018 Tony Murray
+ * @copyright  2021 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
-namespace LibreNMS\Util;
+namespace App\Logging;
 
 class CliColorFormatter extends \Monolog\Formatter\LineFormatter
 {
     private $console_color;
     private $console;
 
-    public function __construct()
+    public function __construct($stdout = true)
     {
         $this->console_color = new \Console_Color2();
-        $this->console = \App::runningInConsole();
+        $this->console = $stdout && \App::runningInConsole();
 
         parent::__construct(
             "%message% %context% %extra%\n",
@@ -47,9 +47,8 @@ class CliColorFormatter extends \Monolog\Formatter\LineFormatter
     {
         // only format messages where color is enabled
         if (isset($record['context']['color']) && $record['context']['color']) {
-            if ($this->console) {
-                $record['message'] = $this->console_color->convert($record['message']);
-            } else {
+            $record['message'] = $this->console_color->convert($record['message']);
+            if (! $this->console) {
                 $record['message'] = $this->console_color->strip($record['message']);
             }
             unset($record['context']['color']);
