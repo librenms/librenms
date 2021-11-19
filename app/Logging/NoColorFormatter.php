@@ -40,7 +40,7 @@ class NoColorFormatter extends \Monolog\Formatter\LineFormatter
 
     public function format(array $record): string
     {
-        // only format messages where color is enabled
+        // only strip messages where color is enabled
         if (isset($record['context']['color']) && $record['context']['color']) {
             $record['message'] = $this->console_color->convert($record['message'], false);
             unset($record['context']['color']);
