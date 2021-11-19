@@ -36,7 +36,7 @@ class CliColorFormatter extends \Monolog\Formatter\LineFormatter
      */
     private $console;
 
-    public function __construct($stdout = true)
+    public function __construct(bool $stdout = true)
     {
         $this->console_color = new \Console_Color2();
         $this->console = $stdout && \App::runningInConsole();

@@ -25,6 +25,9 @@
 
 namespace App\Logging;
 
+use Monolog\Handler\FormattableHandlerInterface;
+use Monolog\Handler\StreamHandler;
+
 class CustomizeFormatter
 {
     /**
@@ -36,8 +39,10 @@ class CustomizeFormatter
     public function __invoke($logger): void
     {
         foreach ($logger->getHandlers() as $handler) {
-            $stdout = substr($handler->getUrl(), 0, 6) === 'php://';
-            $handler->setFormatter(new CliColorFormatter($stdout));
+            if ($handler instanceof  FormattableHandlerInterface) {
+                $stdout = $handler instanceof  StreamHandler && substr($handler->getUrl(), 0, 6) === 'php://';
+                $handler->setFormatter(new CliColorFormatter($stdout));
+            }
         }
     }
 }
