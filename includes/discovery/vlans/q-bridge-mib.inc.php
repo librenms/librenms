@@ -37,6 +37,20 @@ if ($vlanversion == 'version1' || $vlanversion == '2') {
         }, []);
     }
 
+    //if 'VlanStaticName' is not set, LNMS won't discover Vlan although Vlan is functional on device
+    foreach ($untag as $vId => $tmp) {
+        if (! $vlans[$vtpdomain_id]['dot1qVlanStaticName']) {
+            $vlans[$vtpdomain_id] = ['dot1qVlanStaticName' => 'Vlan_' . $vId];
+            d_echo("Vlans: assigned generic Vlan_$vId name");
+        }
+    }
+    foreach ($tagoruntag as $vId => $tmp) {
+        if (! $vlans[$vtpdomain_id]['dot1qVlanStaticName']) {
+            $vlans[$vtpdomain_id] = ['dot1qVlanStaticName' => 'Vlan_' . $vId];
+            d_echo("Vlans: assigned generic Vlan_$vId name");
+        }
+    }
+
     foreach ($vlans as $vlan_id => $vlan) {
         d_echo(" $vlan_id");
         if (is_array($vlans_db[$vtpdomain_id][$vlan_id])) {
