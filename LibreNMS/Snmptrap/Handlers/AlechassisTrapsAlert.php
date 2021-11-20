@@ -41,8 +41,8 @@ class AlechassisTrapsAlert implements SnmptrapHandler
      * Handle snmptrap.
      * Data is pre-parsed and delivered as a Trap.
      *
-     * @param Device $device
-     * @param Trap $trap
+     * @param  Device  $device
+     * @param  Trap  $trap
      * @return void
      */
     public function handle(Device $device, Trap $trap)
@@ -51,10 +51,8 @@ class AlechassisTrapsAlert implements SnmptrapHandler
         $descr_aos7 = $trap->getOidData($trap->findOid('ALCATEL-IND1-CHASSIS-MIB::chassisTrapsAlertDescr.0'));
 
         if (! empty($descr_aos6)) {
-        Log::event("$descr_aos6", $device->device_id, 'trap', 2);
-        }
-        elseif (! empty($descr_aos7)) {
-        Log::event("$descr_aos7", $device->device_id, 'trap', 2);
+            Log::event("$descr_aos6", $device->device_id, 'trap', 2);
+        } elseif (! empty($descr_aos7)) {
+            Log::event("$descr_aos7", $device->device_id, 'trap', 2);
     }
-  }
 }
