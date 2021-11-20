@@ -54,7 +54,6 @@ class AlechassisTrapsAlert implements SnmptrapHandler
             Log::event("$descr_aos6", $device->device_id, 'trap', 2);
         } elseif (! empty($descr_aos7)) {
             Log::event("$descr_aos7", $device->device_id, 'trap', 2);
+        }
     }
-    }
-
 }
