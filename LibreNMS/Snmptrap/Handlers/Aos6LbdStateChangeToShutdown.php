@@ -17,7 +17,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * Juniper configuration change trap. Includes interface used to affect
+ * Alcatel configuration change trap. Includes interface used to affect
  * the change, the user, and the system time when the change was made.
  * If a commit confirmed is rolled back the source is "other" and the
  * user is "root".

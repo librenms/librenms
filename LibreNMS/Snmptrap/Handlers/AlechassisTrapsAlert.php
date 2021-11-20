@@ -17,7 +17,7 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * Juniper configuration change trap. Includes interface used to affect
+ * Alcatel configuration change trap. Includes interface used to affect
  * the change, the user, and the system time when the change was made.
  * If a commit confirmed is rolled back the source is "other" and the
  * user is "root".
@@ -50,10 +50,10 @@ class AlechassisTrapsAlert implements SnmptrapHandler
         $descr_aos6 = $trap->getOidData($trap->findOid('ALCATEL-IND1-CHASSIS-MIB::chassisTrapsAlertDescr'));
         $descr_aos7 = $trap->getOidData($trap->findOid('ALCATEL-IND1-CHASSIS-MIB::chassisTrapsAlertDescr.0'));
 
-        if (!empty($descr_aos6)) {
+        if (! empty($descr_aos6)) {
         Log::event("$descr_aos6", $device->device_id, 'trap', 2);
         }
-        elseif (!empty($descr_aos7)) {
+        elseif (! empty($descr_aos7)) {
         Log::event("$descr_aos7", $device->device_id, 'trap', 2);
     }
   }
