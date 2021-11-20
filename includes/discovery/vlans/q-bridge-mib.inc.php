@@ -37,7 +37,7 @@ if ($vlanversion == 'version1' || $vlanversion == '2') {
         }, []);
     }
 
-    //if 'VlanStaticName' is not set, LNMS won't discover Vlan although Vlan is functional on device
+
     foreach ($untag as $vlan_id => $tmp) {
         if (! $vlans[$vlan_id]['dot1qVlanStaticName']) {
             $vlans[$vlan_id] = ['dot1qVlanStaticName' => 'Vlan_' . $vlan_id];
