@@ -37,7 +37,6 @@ if ($vlanversion == 'version1' || $vlanversion == '2') {
         }, []);
     }
 
-
     foreach ($untag as $vlan_id => $tmp) {
         if (! $vlans[$vlan_id]['dot1qVlanStaticName']) {
             $vlans[$vlan_id] = ['dot1qVlanStaticName' => 'Vlan_' . $vlan_id];
