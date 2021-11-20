@@ -1,5 +1,8 @@
 mib: BENU-HOST-MIB
 modules:
+    os:
+        serial: BENU-CHASSIS-MIB::benuChassisId.0
+        sysDescr_regex: '/BenuOS\, (?<version>.*)\n.Product\:(?<features>.*)\n.*\n.*\n Chassis Type \:(?<hardware>.*)/'
     mempools:
         data:
             -

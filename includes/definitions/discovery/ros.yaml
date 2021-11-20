@@ -1,5 +1,9 @@
 mib: RUGGEDCOM-SYS-INFO-MIB
 modules:
+    os:
+        version: RUGGEDCOM-SYS-INFO-MIB::rcDeviceInfoMainSwVersion.0
+        serial: RUGGEDCOM-SYS-INFO-MIB::rcDeviceInfoSerialNumber.0
+        sysDescr_regex: '/(?<hardware>.*?)-/'
     sensors:
         state:
             data:

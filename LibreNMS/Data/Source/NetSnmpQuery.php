@@ -39,6 +39,8 @@ use Symfony\Component\Process\Process;
 
 class NetSnmpQuery implements SnmpQueryInterface
 {
+    private const DEFAULT_FLAGS = '-OQXUte';
+
     /**
      * @var array
      */
@@ -80,7 +82,7 @@ class NetSnmpQuery implements SnmpQueryInterface
     /**
      * @var array|string
      */
-    private $options = ['-OQXUte'];
+    private $options = [self::DEFAULT_FLAGS];
     /**
      * @var \App\Models\Device
      */
@@ -130,10 +132,14 @@ class NetSnmpQuery implements SnmpQueryInterface
     /**
      * Set a context for the snmp query
      * This is most commonly used to fetch alternate sets of data, such as different VRFs
+     *
+     * @param  string  $v2  Version 2/3 context name
+     * @param  string|null  $v3  Version 3 context name if different from v2 context name
+     * @return \LibreNMS\Data\Source\SnmpQueryInterface
      */
-    public function context(string $context): SnmpQueryInterface
+    public function context(string $v2, string $v3 = null): SnmpQueryInterface
     {
-        $this->context = $context;
+        $this->context = $this->device->snmpver === 'v3' && $v3 !== null ? $v3 : $v2;
 
         return $this;
     }
@@ -150,11 +156,45 @@ class NetSnmpQuery implements SnmpQueryInterface
     }
 
     /**
+     * Do not error on out of order indexes.
+     * Use with caution as we could get stuck in an infinite loop.
+     */
+    public function allowUnordered(): SnmpQueryInterface
+    {
+        $this->options = array_merge($this->options, ['-Cc']);
+
+        return $this;
+    }
+
+    /**
      * Output all OIDs numerically
      */
     public function numeric(): SnmpQueryInterface
     {
         $this->options = array_merge($this->options, ['-On']);
+
+        return $this;
+    }
+
+    /**
+     * Hide MIB in output
+     */
+    public function hideMib(): SnmpQueryInterface
+    {
+        $this->options = array_merge($this->options, ['-Os']);
+
+        return $this;
+    }
+
+    /**
+     * Output enum values as strings instead of values. This could affect index output.
+     */
+    public function enumStrings(): SnmpQueryInterface
+    {
+        // remove -Oe from the default flags
+        if (isset($this->options[0]) && Str::contains($this->options[0], 'e')) {
+            $this->options[0] = str_replace('e', '', $this->options[0]);
+        }
 
         return $this;
     }
@@ -173,7 +213,7 @@ class NetSnmpQuery implements SnmpQueryInterface
     {
         $this->options = $options !== null
             ? Arr::wrap($options)
-            : ['-OQXUte'];
+            : [self::DEFAULT_FLAGS];
 
         return $this;
     }

@@ -40,7 +40,7 @@ class Barracudangfirewall extends OS implements OSDiscovery, OSPolling
         }
     }
 
-    public function pollOS()
+    public function pollOS(): void
     {
         // TODO move to count sensor
         $sessions = snmp_get($this->getDeviceArray(), 'firewallSessions64.8.102.119.83.116.97.116.115.0', '-OQv', 'PHION-MIB');

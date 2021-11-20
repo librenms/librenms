@@ -67,8 +67,8 @@ class Vrp extends OS implements
         $mempools_array = snmpwalk_cache_multi_oid($this->getDeviceArray(), 'entPhysicalName', $mempools_array, 'HUAWEI-ENTITY-EXTENT-MIB', 'huawei');
 
         foreach (Arr::wrap($mempools_array) as $index => $entry) {
-            $size = empty($entry['hwEntityMemSizeMega']) ? $entry['hwEntityMemSize'] : $entry['hwEntityMemSizeMega'];
-            $descr = empty($entry['entPhysicalName']) ? $entry['hwEntityBomEnDesc'] : $entry['entPhysicalName'];
+            $size = empty($entry['hwEntityMemSizeMega']) ? ($entry['hwEntityMemSize'] ?? null) : $entry['hwEntityMemSizeMega'];
+            $descr = empty($entry['entPhysicalName']) ? ($entry['hwEntityBomEnDesc'] ?? null) : $entry['entPhysicalName'];
 
             if ($size != 0 && $descr && ! Str::contains($descr, 'No') && ! Str::contains($entry['hwEntityMemUsage'], 'No')) {
                 $mempools->push((new Mempool([
@@ -106,7 +106,7 @@ class Vrp extends OS implements
         }
     }
 
-    public function pollOS()
+    public function pollOS(): void
     {
         // Polling the Wireless data TODO port to module
         $apTable = snmpwalk_group($this->getDeviceArray(), 'hwWlanApName', 'HUAWEI-WLAN-AP-MIB', 2);
@@ -143,8 +143,8 @@ class Vrp extends OS implements
                 //$a_index_oid = implode(".", array_map("hexdec", explode(":", $ap_id)));
                 foreach ($ap as $r_id => $radio) {
                     foreach ($radio as $s_index => $ssid) {
-                        $clientPerRadio[$ap_id][$r_id] += $ssid['hwWlanVapStaOnlineCnt'];
-                        $numClients += $ssid['hwWlanVapStaOnlineCnt'];
+                        $clientPerRadio[$ap_id][$r_id] = ($clientPerRadio[$ap_id][$r_id] ?? 0) + ($ssid['hwWlanVapStaOnlineCnt'] ?? 0);
+                        $numClients += ($ssid['hwWlanVapStaOnlineCnt'] ?? 0);
                     }
                 }
             }
@@ -167,16 +167,16 @@ class Vrp extends OS implements
 
             foreach ($radioTable as $ap_id => $ap) {
                 foreach ($ap as $r_id => $radio) {
-                    $channel = $radio['hwWlanRadioWorkingChannel'];
-                    $mac = $radio['hwWlanRadioMac'];
-                    $name = $apTable[$ap_id]['hwWlanApName'] . ' Radio ' . $r_id;
+                    $channel = $radio['hwWlanRadioWorkingChannel'] ?? null;
+                    $mac = $radio['hwWlanRadioMac'] ?? null;
+                    $name = ($apTable[$ap_id]['hwWlanApName'] ?? '') . ' Radio ' . $r_id;
                     $radionum = $r_id;
-                    $txpow = $radio['hwWlanRadioActualEIRP'];
-                    $interference = $radio['hwWlanRadioChInterferenceRate'];
-                    $radioutil = $radio['hwWlanRadioChUtilizationRate'];
-                    $numasoclients = $clientPerRadio[$ap_id][$r_id];
+                    $txpow = $radio['hwWlanRadioActualEIRP'] ?? null;
+                    $interference = $radio['hwWlanRadioChInterferenceRate'] ?? null;
+                    $radioutil = $radio['hwWlanRadioChUtilizationRate'] ?? null;
+                    $numasoclients = $clientPerRadio[$ap_id][$r_id] ?? null;
 
-                    switch ($radio['hwWlanRadioFreqType']) {
+                    switch ($radio['hwWlanRadioFreqType'] ?? null) {
                         case 1:
                             $type = '2.4Ghz';
                             break;
@@ -184,7 +184,7 @@ class Vrp extends OS implements
                             $type = '5Ghz';
                             break;
                         default:
-                            $type = 'unknown (huawei ' . $radio['hwWlanRadioFreqType'] . ')';
+                            $type = 'unknown (huawei ' . ($radio['hwWlanRadioFreqType'] ?? null) . ')';
                     }
 
                     // TODO
@@ -369,20 +369,20 @@ class Vrp extends OS implements
                     continue; //this would happen for an SSH session for instance
                 }
                 $nac->put($mac_address, new PortsNac([
-                    'port_id' => $ifName_map->get($portAuthSessionEntryParameters['hwAccessInterface'], 0),
+                    'port_id' => $ifName_map->get($portAuthSessionEntryParameters['hwAccessInterface'] ?? null, 0),
                     'mac_address' => $mac_address,
                     'auth_id' => $authId,
-                    'domain' => $portAuthSessionEntryParameters['hwAccessDomain'],
-                    'username' => '' . $portAuthSessionEntryParameters['hwAccessUserName'],
-                    'ip_address' => $portAuthSessionEntryParameters['hwAccessIPAddress'],
-                    'authz_by' => '' . $portAuthSessionEntryParameters['hwAccessType'],
-                    'authz_status' => '' . $portAuthSessionEntryParameters['hwAccessAuthorizetype'],
-                    'host_mode' => is_null($portAuthSessionEntryParameters['hwAccessAuthType']) ? 'default' : $portAuthSessionEntryParameters['hwAccessAuthType'],
-                    'timeout' => $portAuthSessionEntryParameters['hwAccessSessionTimeout'],
-                    'time_elapsed' => $portAuthSessionEntryParameters['hwAccessOnlineTime'],
-                    'authc_status' => $portAuthSessionEntryParameters['hwAccessCurAuthenPlace'],
-                    'method' => '' . $portAuthSessionEntryParameters['hwAccessAuthtype'],
-                    'vlan' => $portAuthSessionEntryParameters['hwAccessVLANID'],
+                    'domain' => $portAuthSessionEntryParameters['hwAccessDomain'] ?? null,
+                    'username' => $portAuthSessionEntryParameters['hwAccessUserName'] ?? '',
+                    'ip_address' => $portAuthSessionEntryParameters['hwAccessIPAddress'] ?? null,
+                    'authz_by' => $portAuthSessionEntryParameters['hwAccessType'] ?? '',
+                    'authz_status' => $portAuthSessionEntryParameters['hwAccessAuthorizetype'] ?? '',
+                    'host_mode' => $portAuthSessionEntryParameters['hwAccessAuthType'] ?? 'default',
+                    'timeout' => $portAuthSessionEntryParameters['hwAccessSessionTimeout'] ?? null,
+                    'time_elapsed' => $portAuthSessionEntryParameters['hwAccessOnlineTime'] ?? null,
+                    'authc_status' => $portAuthSessionEntryParameters['hwAccessCurAuthenPlace'] ?? null,
+                    'method' => $portAuthSessionEntryParameters['hwAccessAuthtype'] ?? '',
+                    'vlan' => $portAuthSessionEntryParameters['hwAccessVLANID'] ?? null,
                 ]));
             }
         }
@@ -534,10 +534,10 @@ class Vrp extends OS implements
             $divisor = 1; //values are already returned in ms, and RRD expects them in ms
 
             // Use DISMAN-PING Status codes. 0=Good 2=Critical
-            $sla->opstatus = $data[$owner][$test]['pingCtlRowStatus'] == '1' ? 0 : 2;
+            $sla->opstatus = ($data[$owner][$test]['pingCtlRowStatus'] ?? null) == '1' ? 0 : 2;
 
-            $sla->rtt = $data[$owner][$test]['pingResultsAverageRtt'] / $divisor;
-            $time = Carbon::parse($data[$owner][$test]['pingResultsLastGoodProbe'])->toDateTimeString();
+            $sla->rtt = ($data[$owner][$test]['pingResultsAverageRtt'] ?? 0) / $divisor;
+            $time = Carbon::parse($data[$owner][$test]['pingResultsLastGoodProbe'] ?? null)->toDateTimeString();
             echo 'SLA : ' . $rtt_type . ' ' . $owner . ' ' . $test . '... ' . $sla->rtt . 'ms at ' . $time . "\n";
 
             $fields = [
@@ -556,8 +556,8 @@ class Vrp extends OS implements
                     $icmp = [
                         //'MinRtt' => $data[$owner][$test]['pingResultsMinRtt'] / $divisor,
                         //'MaxRtt' => $data[$owner][$test]['pingResultsMaxRtt'] / $divisor,
-                        'ProbeResponses' => $data[$owner][$test]['pingResultsProbeResponses'],
-                        'ProbeLoss' => (int) $data[$owner][$test]['pingResultsSentProbes'] - (int) $data[$owner][$test]['pingResultsProbeResponses'],
+                        'ProbeResponses' => $data[$owner][$test]['pingResultsProbeResponses'] ?? null,
+                        'ProbeLoss' => (int) ($data[$owner][$test]['pingResultsSentProbes'] ?? 0) - (int) ($data[$owner][$test]['pingResultsProbeResponses'] ?? 0),
                     ];
                     $rrd_name = ['sla', $sla_nr, $rtt_type];
                     $rrd_def = RrdDefinition::make()

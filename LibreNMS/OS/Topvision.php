@@ -34,13 +34,13 @@ class Topvision extends \LibreNMS\OS implements OSPolling
     public function discoverOS(Device $device): void
     {
         parent::discoverOS($device); // yaml
-        $device->serial = snmp_getnext($this->getDeviceArray(), '.1.3.6.1.4.1.32285.11.1.1.2.1.1.1.16', '-OQv') ?? null;
+        $device->serial = snmp_getnext($this->getDeviceArray(), '.1.3.6.1.4.1.32285.11.1.1.2.1.1.1.16', '-OQv') ?: null;
         if (empty($device->hardware)) {
-            $device->hardware = snmp_getnext($this->getDeviceArray(), '.1.3.6.1.4.1.32285.11.1.1.2.1.1.1.18', '-OQv') ?? null;
+            $device->hardware = snmp_getnext($this->getDeviceArray(), '.1.3.6.1.4.1.32285.11.1.1.2.1.1.1.18', '-OQv') ?: null;
         }
     }
 
-    public function pollOS()
+    public function pollOS(): void
     {
         $cmstats = snmp_get_multi_oid($this->getDeviceArray(), ['.1.3.6.1.4.1.32285.11.1.1.2.2.3.1.0', '.1.3.6.1.4.1.32285.11.1.1.2.2.3.6.0', '.1.3.6.1.4.1.32285.11.1.1.2.2.3.5.0']);
         if (is_numeric($cmstats['.1.3.6.1.4.1.32285.11.1.1.2.2.3.1.0'])) {

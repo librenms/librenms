@@ -31,7 +31,7 @@ use LibreNMS\RRD\RrdDefinition;
 
 class Pfsense extends Unix implements OSPolling
 {
-    public function pollOS()
+    public function pollOS(): void
     {
         $oids = snmp_get_multi($this->getDeviceArray(), [
             'pfStateTableCount.0',
@@ -46,7 +46,7 @@ class Pfsense extends Unix implements OSPolling
             'pfCounterMemDrop.0',
         ], '-OQUs', 'BEGEMOT-PF-MIB');
 
-        if (is_numeric($oids[0]['pfStateTableCount'])) {
+        if (is_numeric($oids[0]['pfStateTableCount'] ?? null)) {
             $rrd_def = RrdDefinition::make()->addDataset('states', 'GAUGE', 0);
 
             $fields = [
@@ -59,7 +59,7 @@ class Pfsense extends Unix implements OSPolling
             $this->enableGraph('pf_states');
         }
 
-        if (is_numeric($oids[0]['pfStateTableSearches'])) {
+        if (is_numeric($oids[0]['pfStateTableSearches'] ?? null)) {
             $rrd_def = RrdDefinition::make()->addDataset('searches', 'COUNTER', 0);
 
             $fields = [
@@ -72,7 +72,7 @@ class Pfsense extends Unix implements OSPolling
             $this->enableGraph('pf_searches');
         }
 
-        if (is_numeric($oids[0]['pfStateTableInserts'])) {
+        if (is_numeric($oids[0]['pfStateTableInserts'] ?? null)) {
             $rrd_def = RrdDefinition::make()->addDataset('inserts', 'COUNTER', 0);
 
             $fields = [
@@ -85,7 +85,7 @@ class Pfsense extends Unix implements OSPolling
             $this->enableGraph('pf_inserts');
         }
 
-        if (is_numeric($oids[0]['pfStateTableCount'])) {
+        if (is_numeric($oids[0]['pfStateTableCount'] ?? null)) {
             $rrd_def = RrdDefinition::make()->addDataset('removals', 'COUNTER', 0);
 
             $fields = [
@@ -98,7 +98,7 @@ class Pfsense extends Unix implements OSPolling
             $this->enableGraph('pf_removals');
         }
 
-        if (is_numeric($oids[0]['pfCounterMatch'])) {
+        if (is_numeric($oids[0]['pfCounterMatch'] ?? null)) {
             $rrd_def = RrdDefinition::make()->addDataset('matches', 'COUNTER', 0);
 
             $fields = [
@@ -111,7 +111,7 @@ class Pfsense extends Unix implements OSPolling
             $this->enableGraph('pf_matches');
         }
 
-        if (is_numeric($oids[0]['pfCounterBadOffset'])) {
+        if (is_numeric($oids[0]['pfCounterBadOffset'] ?? null)) {
             $rrd_def = RrdDefinition::make()->addDataset('badoffset', 'COUNTER', 0);
 
             $fields = [
@@ -124,7 +124,7 @@ class Pfsense extends Unix implements OSPolling
             $this->enableGraph('pf_badoffset');
         }
 
-        if (is_numeric($oids[0]['pfCounterFragment'])) {
+        if (is_numeric($oids[0]['pfCounterFragment'] ?? null)) {
             $rrd_def = RrdDefinition::make()->addDataset('fragmented', 'COUNTER', 0);
 
             $fields = [
@@ -137,7 +137,7 @@ class Pfsense extends Unix implements OSPolling
             $this->enableGraph('pf_fragmented');
         }
 
-        if (is_numeric($oids[0]['pfCounterShort'])) {
+        if (is_numeric($oids[0]['pfCounterShort'] ?? null)) {
             $rrd_def = RrdDefinition::make()->addDataset('short', 'COUNTER', 0);
 
             $fields = [
@@ -150,7 +150,7 @@ class Pfsense extends Unix implements OSPolling
             $this->enableGraph('pf_short');
         }
 
-        if (is_numeric($oids[0]['pfCounterNormalize'])) {
+        if (is_numeric($oids[0]['pfCounterNormalize'] ?? null)) {
             $rrd_def = RrdDefinition::make()->addDataset('normalized', 'COUNTER', 0);
 
             $fields = [
@@ -163,7 +163,7 @@ class Pfsense extends Unix implements OSPolling
             $this->enableGraph('pf_normalized');
         }
 
-        if (is_numeric($oids[0]['pfCounterMemDrop'])) {
+        if (is_numeric($oids[0]['pfCounterMemDrop'] ?? null)) {
             $rrd_def = RrdDefinition::make()->addDataset('memdropped', 'COUNTER', 0);
 
             $fields = [

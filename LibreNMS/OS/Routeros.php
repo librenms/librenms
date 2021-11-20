@@ -396,7 +396,7 @@ class Routeros extends OS implements
         return $sensors;
     }
 
-    public function pollOS()
+    public function pollOS(): void
     {
         $leases = snmp_get($this->getDeviceArray(), 'mtxrDHCPLeaseCount.0', '-OQv', 'MIKROTIK-MIB');
 

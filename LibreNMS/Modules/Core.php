@@ -234,8 +234,8 @@ class Core implements Module
 
             $uptime = max(
                 round($sysUpTime / 100),
-                Config::get("os.$device->os.bad_snmpEngineTime") ? 0 : $uptime_data['SNMP-FRAMEWORK-MIB::snmpEngineTime.0'],
-                Config::get("os.$device->os.bad_hrSystemUptime") ? 0 : round($uptime_data['HOST-RESOURCES-MIB::hrSystemUptime.0'] / 100)
+                Config::get("os.$device->os.bad_snmpEngineTime") ? 0 : $uptime_data['SNMP-FRAMEWORK-MIB::snmpEngineTime.0'] ?? 0,
+                Config::get("os.$device->os.bad_hrSystemUptime") ? 0 : round(($uptime_data['HOST-RESOURCES-MIB::hrSystemUptime.0'] ?? 0) / 100)
             );
             Log::debug("Uptime seconds: $uptime\n");
         }
