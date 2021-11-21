@@ -22,7 +22,7 @@ class VeeamCdpRpoReport implements SnmptrapHandler
         $policy_name = $trap->getOidData('VEEAM-MIB::cdpPolicyName');
         $vm_name = $trap->getOidData('VEEAM-MIB::vmName');
         $result = $trap->getOidData('VEEAM-MIB::cdpRpoStatus');
-        $color = ["Success" => 1, "Warning" => 4, "Failed" => 5];
+        $color = ['Success' => 1, 'Warning' => 4, 'Failed' => 5];
 
         Log::event('SNMP Trap: CDP policy RPO status change' . $result . ' - ' . $policy_name . ' ' . $vm_name . ' - ' . $comment, $device->device_id, 'policy', $color[$result]);
     }

@@ -23,6 +23,6 @@ class VeeamWinFLRCopyToStarted implements SnmptrapHandler
         $vm_name = $trap->getOidData('VEEAM-MIB::vmName');
         $target_dir = $trap->getOidData('VEEAM-MIB::targetDir');
 
-	Log::event('SNMP Trap: FLR job started - ' . $vm_name . ' - ' . $initiator_name . ' - ' . $target_dir, $device->device_id, 'backup', 2);
+        Log::event('SNMP Trap: FLR job started - ' . $vm_name . ' - ' . $initiator_name . ' - ' . $target_dir, $device->device_id, 'backup', 2);
     }
 }

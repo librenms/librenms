@@ -22,6 +22,6 @@ class VeeamWinFLRToOriginalStarted implements SnmptrapHandler
         $initiator_name = $trap->getOidData('VEEAM-MIB::initiatorName');
         $vm_name = $trap->getOidData('VEEAM-MIB::vmName');
 
-	Log::event('SNMP Trap: FLR job started - ' . $vm_name . ' - ' . $initiator_name, $device->device_id, 'backup', 2);
+        Log::event('SNMP Trap: FLR job started - ' . $vm_name . ' - ' . $initiator_name, $device->device_id, 'backup', 2);
     }
 }

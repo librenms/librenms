@@ -21,10 +21,10 @@ class VeeamLinuxFLRToOriginalFinished implements SnmptrapHandler
     {
 
         $initiator_name = $trap->getOidData('VEEAM-MIB::initiatorName');
-	$vm_name = $trap->getOidData('VEEAM-MIB::vmName');
+        $vm_name = $trap->getOidData('VEEAM-MIB::vmName');
         $time = $trap->getOidData('VEEAM-MIB::transferTime');
         $result = $trap->getOidData('VEEAM-MIB::transferStatus');
-        $color = ["Success" => 1, "Warning" => 4, "Failed" => 5];
+        $color = ['Success' => 1, 'Warning' => 4, 'Failed' => 5];
 
         Log::event('SNMP Trap: FLR job ' . $result . ' - ' . $vm_name . ' - ' . $initiator_name . ' Time taken: ' . $time, $device->device_id, 'backup', $color[$result]);
     }
