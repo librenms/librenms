@@ -74,7 +74,7 @@ function parse_modules($type, $options)
 {
     $override = false;
 
-    if ($options['m']) {
+    if (! empty($options['m'])) {
         Config::set("{$type}_modules", []);
         foreach (explode(',', $options['m']) as $module) {
             // parse submodules (only supported by some modules)
@@ -1432,17 +1432,35 @@ function cache_mac_oui()
     if ($lock->get()) {
         echo 'Caching Mac OUI' . PHP_EOL;
         try {
-            $mac_oui_url = 'https://macaddress.io/database/macaddress.io-db.json';
+            $mac_oui_url = 'https://gitlab.com/wireshark/wireshark/-/raw/master/manuf';
+            //$mac_oui_url_mirror = 'https://raw.githubusercontent.com/wireshark/wireshark/master/manuf';
+
             echo '  -> Downloading ...' . PHP_EOL;
             $get = Requests::get($mac_oui_url, [], ['proxy' => get_proxy()]);
-            echo '  -> Processing ...' . PHP_EOL;
-            $json_data = $get->body;
-            foreach (explode("\n", $json_data) as $json_line) {
-                $entry = json_decode($json_line);
-                if ($entry && $entry->{'assignmentBlockSize'} == 'MA-L') {
-                    $oui = strtolower(str_replace(':', '', $entry->{'oui'}));
+            echo '  -> Processing CSV ...' . PHP_EOL;
+            $csv_data = $get->body;
+            foreach (explode("\n", $csv_data) as $csv_line) {
+                unset($oui);
+                $entry = str_getcsv($csv_line, "\t");
+
+                $length = strlen($entry[0]);
+                $prefix = strtolower(str_replace(':', '', $entry[0]));
+
+                if (is_array($entry) && count($entry) >= 3 && $length == 8) {
+                    // We have a standard OUI xx:xx:xx
+                    $oui = $prefix;
+                } elseif (is_array($entry) && count($entry) >= 3 && $length == 20) {
+                    // We have a smaller range (xx:xx:xx:X or xx:xx:xx:xx:X)
+                    if (substr($prefix, -2) == '28') {
+                        $oui = substr($prefix, 0, 7);
+                    } elseif (substr($prefix, -2) == '36') {
+                        $oui = substr($prefix, 0, 9);
+                    }
+                }
+                if (isset($oui)) {
+                    echo "Adding $oui, $entry[2]" . PHP_EOL;
                     $key = 'OUIDB-' . $oui;
-                    Cache::put($key, $entry->{'companyName'}, $mac_oui_cache_time);
+                    Cache::put($key, $entry[2], $mac_oui_cache_time);
                 }
             }
         } catch (Exception $e) {

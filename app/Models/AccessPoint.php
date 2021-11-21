@@ -13,7 +13,7 @@ class AccessPoint extends DeviceRelatedModel implements Keyable
 
     public $primaryKey = 'accesspoint_id';
     public $timestamps = false;
-
+    
     protected $fillable = [
         'device_id',
         'name',

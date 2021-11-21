@@ -1,5 +1,8 @@
 mib: DPS-MIB-CG-V1
 modules:
+    os:
+        hardware: DPS-MIB-V38::dpsRTUModel.0
+        version: DPS-MIB-V38::dpsRTUFirmwareVersion.0
     sensors:
         voltage:
             data:

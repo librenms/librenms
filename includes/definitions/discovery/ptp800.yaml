@@ -1,5 +1,7 @@
 mib: CAMBIUM-PTP800-MIB
 modules:
+    os:
+        sysDescr_regex: '/Cambium (?<hardware>.*) Wireless.* (?<version>\S+)$/'
     sensors:
         state:
             data:

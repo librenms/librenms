@@ -179,6 +179,10 @@ HOST-RESOURCES-MIB::hrStorageUsed.36 = 127044934
         $this->assertTrue($response->isValid());
         $this->assertEquals('4958', $response->value());
         $this->assertEquals(['.1.3.6.1.2.1.2.2.1.10.1' => '4958', '.1.3.6.1.2.1.2.2.1.10.2' => '349'], $response->values());
+
+        $response = new SnmpResponse(".1.3.6.1.2.1.31.1.1.1.18.1 = \"internal\\\\backslash\"\n");
+        $this->assertTrue($response->isValid());
+        $this->assertEquals('internal\\backslash', $response->value());
     }
 
     public function testErrorHandling(): void

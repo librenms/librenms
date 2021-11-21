@@ -168,7 +168,7 @@ class Rrd extends BaseDatastore
             $fields = array_filter($fields, function ($key) use ($rrd_def) {
                 $valid = $rrd_def->isValidDataset($key);
                 if (! $valid) {
-                    Log::warning("RRD warning: unused data sent $key");
+                    Log::debug("RRD warning: unused data sent $key");
                 }
 
                 return $valid;

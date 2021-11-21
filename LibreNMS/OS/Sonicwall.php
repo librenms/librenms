@@ -26,7 +26,7 @@ use LibreNMS\RRD\RrdDefinition;
 
 class Sonicwall extends OS implements OSPolling, ProcessorDiscovery
 {
-    public function pollOS()
+    public function pollOS(): void
     {
         $data = snmp_get_multi($this->getDeviceArray(), [
             'sonicCurrentConnCacheEntries.0',

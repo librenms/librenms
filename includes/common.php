@@ -623,14 +623,10 @@ function version_info($remote = false)
     }
     $output['db_schema'] = vsprintf('%s (%s)', $version->database());
     $output['php_ver'] = phpversion();
-    $output['python_ver'] = \LibreNMS\Util\Version::python();
+    $output['python_ver'] = $version->python();
     $output['mysql_ver'] = \LibreNMS\DB\Eloquent::isConnected() ? \LibreNMS\DB\Eloquent::version() : '?';
-    $output['rrdtool_ver'] = str_replace('1.7.01.7.0', '1.7.0', implode(' ', array_slice(explode(' ', shell_exec(
-        Config::get('rrdtool', 'rrdtool') . ' --version |head -n1'
-    )), 1, 1)));
-    $output['netsnmp_ver'] = str_replace('version: ', '', rtrim(shell_exec(
-        Config::get('snmpget', 'snmpget') . ' -V 2>&1'
-    )));
+    $output['rrdtool_ver'] = $version->rrdtool();
+    $output['netsnmp_ver'] = $version->netSnmp();
 
     return $output;
 }//end version_info()
@@ -656,28 +652,20 @@ function inet6_ntop($ip)
  * If hostname is an ip, use return sysName
  *
  * @param  array  $device  (uses hostname and sysName fields)
- * @param  string  $hostname
  * @return string
  */
-function format_hostname($device, $hostname = null)
+function format_hostname($device): string
 {
-    if (empty($hostname)) {
-        $hostname = $device['hostname'];
-    }
+    $hostname = $device['hostname'] ?? 'invalid hostname';
+    $hostname_is_ip = IP::isValid($hostname);
+    $sysName = empty($device['sysName']) ? $hostname : $device['sysName'];
 
-    if (Config::get('force_hostname_to_sysname') && ! empty($device['sysName'])) {
-        if (\LibreNMS\Util\Validate::hostname($hostname) && ! IP::isValid($hostname)) {
-            return $device['sysName'];
-        }
-    }
-
-    if (Config::get('force_ip_to_sysname') && ! empty($device['sysName'])) {
-        if (IP::isValid($hostname)) {
-            return $device['sysName'];
-        }
-    }
-
-    return $hostname;
+    return \App\View\SimpleTemplate::parse(empty($device['display']) ? Config::get('device_display_default', '{{ $hostname }}') : $device['display'], [
+        'hostname' => $hostname,
+        'sysName' => $sysName,
+        'sysName_fallback' => $hostname_is_ip ? $sysName : $hostname,
+        'ip' => empty($device['overwrite_ip']) ? ($hostname_is_ip ? $device['hostname'] : $device['ip'] ?? '') : $device['overwrite_ip'],
+    ]);
 }
 
 /**

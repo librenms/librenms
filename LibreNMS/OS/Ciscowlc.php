@@ -28,18 +28,22 @@ namespace LibreNMS\OS;
 use App\Models\AccessPoint;
 use App\Models\Device;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Arr;
 use LibreNMS\Device\WirelessSensor;
 use LibreNMS\Interfaces\Discovery\OSDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessApCountDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessClientsDiscovery;
 use LibreNMS\Interfaces\Polling\WirelessAccessPointPolling;
+use LibreNMS\Interfaces\Polling\OSPolling;
 use LibreNMS\OS\Shared\Cisco;
+use LibreNMS\RRD\RrdDefinition;
 
 class Ciscowlc extends Cisco implements
     WirelessClientsDiscovery,
     WirelessApCountDiscovery,
     WirelessAccessPointPolling
 {
+
     /**
      * Discover wireless client counts. Type is clients.
      * Returns an array of LibreNMS\Device\Sensor objects that have been discovered
@@ -141,7 +145,7 @@ class Ciscowlc extends Cisco implements
     public function pollWirelessAccessPoints()
     {
         $access_points = new Collection;
-        
+        $device = $this->getDeviceArray();
         $stats = snmpwalk_cache_oid($device, 'bsnAPEntry', $stats, 'AIRESPACE-WIRELESS-MIB', null, '-OQUsb');
         $radios = snmpwalk_cache_oid($device, 'bsnAPIfEntry', $radios, 'AIRESPACE-WIRELESS-MIB', null, '-OQUsb');
         $APstats = snmpwalk_cache_oid($device, 'bsnApIfNoOfUsers', $APstats, 'AIRESPACE-WIRELESS-MIB', null, '-OQUsxb');
@@ -184,18 +188,18 @@ class Ciscowlc extends Cisco implements
 
             $attributes = [
                 'device_id' => $this->getDeviceId(),
-                'name' => $wlsxWlanRadioTable[$ap]['wlanAPRadioAPName'][$radio_id],
-                'radio_number' => $radio_id,
-                'type' => $wlsxWlanRadioTable[$ap]['wlanAPRadioType'][$radio_id],
-                'mac_addr' => $ap,
-                'channel' => $wlsxWlanRadioTable[$ap]['wlanAPRadioChannel'][$radio_id],
-                'txpow' => $wlsxWlanRadioTable[$ap]['wlanAPRadioUtilization'][$radio_id] / 2,
-                'radioutil' => $wlsxWlanRadioTable[$ap]['wlanAPRadioUtilization'][$radio_id],
-                'numasoclients' => $wlsxWlanRadioTable[$ap]['wlanAPRadioNumAssociatedClients'][$radio_id],
-                'nummonclients' => $wlsxWlanRadioTable[$ap]['wlanAPRadioNumMonitoredClients'][$radio_id],
-                'numactbssid' => $wlsxWlanRadioTable[$ap]['wlanAPRadioNumActiveBSSIDs'][$radio_id],
-                'nummonbssid' => $wlsxWlanRadioTable[$ap]['wlanAPRadioNumMonitoredBSSIDs'][$radio_id],
-                'interference' => $wlsxWlanAPChStatsTable[$ap]['wlanAPChInterferenceIndex'][$radio_id],
+                'name' => $name,
+                'radio_number' => $radionum,
+                'type' => $type,
+                'mac_addr' => $mac,
+                'channel' => $channel,
+                'txpow' => $txpow / 2,
+                'radioutil' => $radioutil,
+                'numasoclients' => $numasoclients,
+                'nummonclients' => $nummonclients,
+                'numactbssid' => $numactbssid,
+                'nummonbssid' => $nummonbssid,
+                'interference' => $interference,
             ];
 
             // Create AccessPoint models

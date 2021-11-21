@@ -16,7 +16,7 @@ try {
     $legacy = $e->getOutput();
 
     $ntp = [
-        data => [],
+        'data' => [],
     ];
 
     [$ntp['data']['stratum'], $ntp['data']['offset'], $ntp['data']['frequency'], $ntp['data']['jitter'],

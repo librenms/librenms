@@ -494,6 +494,7 @@ devices:
     - { Field: inserted, Type: timestamp, 'Null': true, Extra: '', Default: CURRENT_TIMESTAMP }
     - { Field: hostname, Type: varchar(128), 'Null': false, Extra: '' }
     - { Field: sysName, Type: varchar(128), 'Null': true, Extra: '' }
+    - { Field: display, Type: varchar(128), 'Null': true, Extra: '' }
     - { Field: ip, Type: varbinary(16), 'Null': true, Extra: '' }
     - { Field: overwrite_ip, Type: varchar(40), 'Null': true, Extra: '' }
     - { Field: community, Type: varchar(255), 'Null': true, Extra: '' }
@@ -1731,7 +1732,7 @@ pseudowires:
     - { Field: port_id, Type: 'int unsigned', 'Null': false, Extra: '' }
     - { Field: peer_device_id, Type: 'int unsigned', 'Null': false, Extra: '' }
     - { Field: peer_ldp_id, Type: int, 'Null': false, Extra: '' }
-    - { Field: cpwVcID, Type: int, 'Null': false, Extra: '' }
+    - { Field: cpwVcID, Type: 'int unsigned', 'Null': false, Extra: '' }
     - { Field: cpwOid, Type: int, 'Null': false, Extra: '' }
     - { Field: pw_type, Type: varchar(32), 'Null': false, Extra: '' }
     - { Field: pw_psntype, Type: varchar(32), 'Null': false, Extra: '' }

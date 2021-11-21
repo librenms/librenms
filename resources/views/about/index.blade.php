@@ -68,6 +68,7 @@
             <a target="_blank" href="https://docs.librenms.org/">@lang('Docs')</a> |
             <a target="_blank" href="https://github.com/librenms/">@lang('GitHub')</a> |
             <a target="_blank" href="https://community.librenms.org/c/help">@lang('Bug tracker')</a> |
+            <a target="_blank" href="https://www.librenms.org/shop">@lang('Merch Shop')</a> |
             <a target="_blank" href="https://community.librenms.org">@lang('Community Forum')</a> |
             <a target="_blank" href="https://twitter.com/librenms">@lang('Twitter')</a> |
             <a target="_blank" href="https://www.librenms.org/changelog.html">@lang('Changelog')</a> |

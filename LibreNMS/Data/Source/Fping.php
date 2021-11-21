@@ -46,6 +46,7 @@ class Fping
         $interval = max($interval, 20);
 
         $fping = Config::get('fping');
+        $fping_tos = Config::get('fping_options.tos', 0);
         $cmd = [$fping];
         if ($address_family == 'ipv6') {
             $fping6 = Config::get('fping6');
@@ -62,6 +63,8 @@ class Fping
             $interval,
             '-t',
             max($timeout, $interval),
+            '-O',
+            $fping_tos,
             $host,
         ]);
 

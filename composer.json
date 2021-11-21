@@ -137,7 +137,7 @@
             "@php artisan key:generate --ansi"
         ],
         "python-requirements": [
-            "scripts/check_requirements.py || pip3 install --user -r requirements.txt || :"
+            "scripts/dynamic_check_requirements.py || pip3 install --user -r requirements.txt || :"
         ]
     },
     "support": {
