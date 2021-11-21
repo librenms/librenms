@@ -19,7 +19,6 @@ class VeeamWinFLRCopyToFinished implements SnmptrapHandler
      */
     public function handle(Device $device, Trap $trap)
     {
-
         $initiator_name = $trap->getOidData('VEEAM-MIB::initiatorName');
         $vm_name = $trap->getOidData('VEEAM-MIB::vmName');
         $target_dir = $trap->getOidData('VEEAM-MIB::targetDir');
