@@ -116,7 +116,7 @@ return [
         'OSPF-TRAP-MIB::ospfNbrStateChange' => \LibreNMS\Snmptrap\Handlers\OspfNbrStateChange::class,
         'UPS-MIB::upsTraps.0.1' => \LibreNMS\Snmptrap\Handlers\UpsTrapsOnBattery::class,
         'VEEAM-MIB::onBackupJobCompleted' => \LibreNMS\Snmptrap\Handlers\VeeamBackupJobCompleted::class,
-        'VEEAM-MIB::onVmBackupJobCompleted' => \LibreNMS\Snmptrap\Handlers\VeeamVmBackupJobCompleted::class,
+        'VEEAM-MIB::onVmBackupCompleted' => \LibreNMS\Snmptrap\Handlers\VeeamVmBackupCompleted::class,
         'HP-ICF-FAULT-FINDER-MIB::hpicfFaultFinderTrap' => \LibreNMS\Snmptrap\Handlers\HpFault::class,
         'UPS-MIB::upsTrapOnBattery' => \LibreNMS\Snmptrap\Handlers\UpsTrapOnBattery::class,
     ],
