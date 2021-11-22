@@ -310,9 +310,8 @@ def poll_worker(
                                 command,
                                 shell=True,
                                 stdin=subprocess.PIPE,
-                                stdout=subprocess.PIPE
+                                stdout=subprocess.PIPE,
                             )
-
 
                     # This is the string that will signify the end of the poller process
                     endofinput = "### Poll of " + str(device_id) + " complete ###"
@@ -497,8 +496,9 @@ def wrapper(
     target_polltime = STEPPING * 0.95
     if _lockfile != None:
         import fcntl
+
         try:
-            lockfd = open(_lockfile, mode='w')
+            lockfd = open(_lockfile, mode="w")
             fcntl.lockf(lockfd, fcntl.LOCK_EX)
 
             # Do not proceed if it took too long to acquire the lock
@@ -506,13 +506,19 @@ def wrapper(
             if (c_time - s_time) > (STEPPING * _lockwait / 100):
                 fcntl.lockf(lockfd, fcntl.LOCK_UN)
                 lockfd.close()
-                logger.critical("It took too long ({}) to acquire the file lock - exiting.".format(c_time - s_time))
+                logger.critical(
+                    "It took too long ({}) to acquire the file lock - exiting.".format(
+                        c_time - s_time
+                    )
+                )
                 sys.exit(2)
 
             # Re-calculate the target poll time by subtracting the lock time from the stepping
             target_polltime = (s_time - c_time + STEPPING) * 0.95
         except Exception:
-            logger.critical("Could not open lock file {} for writing.".format(_lockfile))
+            logger.critical(
+                "Could not open lock file {} for writing.".format(_lockfile)
+            )
             raise
             sys.exit(2)
 
@@ -702,6 +708,7 @@ def wrapper(
     # Unlock and close the lockfile if needed
     if _lockfile != None:
         import fcntl
+
         fcntl.lockf(lockfd, fcntl.LOCK_UN)
         lockfd.close()
 

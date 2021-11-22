@@ -92,17 +92,13 @@ try:
 except (IndexError, ValueError):
     lockwait = DEFAULT_LOCKWAIT
     logger.warning(
-        "Bogus lock wait time given. Using default {}% of step time.".format(
-            lockwait
-        )
+        "Bogus lock wait time given. Using default {}% of step time.".format(lockwait)
     )
 
 if lockwait < 0 or lockwait >= 100:
     lockwait = DEFAULT_LOCKWAIT
     logger.warning(
-        "Bogus lock wait time given. Using default {}% of step time.".format(
-            lockwait
-        )
+        "Bogus lock wait time given. Using default {}% of step time.".format(lockwait)
     )
 
 wrapper.wrapper(
