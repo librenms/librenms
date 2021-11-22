@@ -19,8 +19,6 @@
  *
  * @link       https://www.librenms.org
  *
- * @copyright  2017 Tony Murray
- * @author     Tony Murray <murraytony@gmail.com>
  */
 
 namespace LibreNMS\OS;
