@@ -267,7 +267,7 @@ if (Auth::user()->hasGlobalAdmin()) {
                             <div class="form-group">
                                 <div class="col-sm-offset-2 col-sm-6">
                                       <input type="hidden" name="prevconfig" value="';
-                echo implode('|', $current_config);
+                echo htmlspecialchars(implode('|', $current_config));
                 echo '">
                                       <button type="submit" class="btn btn-primary btn-sm" name="show">Show version</button>
                                       <button type="submit" class="btn btn-primary btn-sm" name="diff">Show diff</button>

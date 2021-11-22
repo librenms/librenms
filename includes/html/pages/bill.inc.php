@@ -253,21 +253,21 @@ if (bill_permitted($bill_id)) {
 <div class="panel-heading">
     <h3 class="panel-title">Billing View</h3>
 </div>
-        <?php echo $bi ?>
+        <?php echo htmlspecialchars($bi) ?>
 </div>
 
 <div class="panel panel-default">
 <div class="panel-heading">
     <h3 class="panel-title">24 Hour View</h3>
 </div>
-        <?php echo $di ?>
+        <?php echo htmlspecialchars($di) ?>
 </div>
 
 <div class="panel panel-default">
 <div class="panel-heading">
     <h3 class="panel-title">Monthly View</h3>
 </div>
-        <?php echo $mi ?>
+        <?php echo htmlspecialchars($mi) ?>
 </div>
         <?php
     } //end if
