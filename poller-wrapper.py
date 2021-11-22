@@ -13,6 +13,7 @@ import LibreNMS.wrapper as wrapper
 
 WRAPPER_TYPE = "poller"
 DEFAULT_WORKERS = 16
+DEFAULT_LOCKWAIT = 20
 
 """
     Take the amount of threads we want to run in parallel from the commandline
@@ -32,6 +33,38 @@ parser.add_argument(
     action="store_true",
     default=False,
     help="Enable debug output. WARNING: Leaving this enabled will consume a lot of disk space.",
+)
+parser.add_argument(
+    "-p",
+    "--persistent",
+    dest="persistent",
+    action="store_true",
+    default=False,
+    help="Use persistent poller processes to avoid the overhead of forking for each device.",
+)
+parser.add_argument(
+    "-a",
+    "--adaptive",
+    dest="adaptive",
+    action="store_true",
+    default=False,
+    help="Use a dynamic number of workers up to a maximum of <amount of workers> to try and spread the CPU load evenly over the polling cycle.",
+)
+parser.add_argument(
+    "-l",
+    "--lockfile",
+    dest="lockfile",
+    action="store",
+    default=None,
+    help="Specify a lockfile to ensure that only 1 process runs at a time.",
+)
+parser.add_argument(
+    "-w",
+    "--max-wait",
+    dest="maxwait",
+    action="store",
+    default=DEFAULT_LOCKWAIT,
+    help="Maximu wait time for the file lock as a percentage of the stepping interval.",
 )
 args = parser.parse_args()
 
@@ -54,10 +87,32 @@ except (IndexError, ValueError):
         )
     )
 
+try:
+    lockwait = int(args.maxwait)
+except (IndexError, ValueError):
+    lockwait = DEFAULT_LOCKWAIT
+    logger.warning(
+        "Bogus lock wait time given. Using default {}% of step time.".format(
+            lockwait
+        )
+    )
+
+if lockwait < 0 or lockwait >= 100:
+    lockwait = DEFAULT_LOCKWAIT
+    logger.warning(
+        "Bogus lock wait time given. Using default {}% of step time.".format(
+            lockwait
+        )
+    )
+
 wrapper.wrapper(
     WRAPPER_TYPE,
     amount_of_workers=amount_of_workers,
     config=config,
     log_dir=log_dir,
     _debug=args.debug,
+    _lockfile=args.lockfile,
+    _lockwait=lockwait,
+    _persistent=args.persistent,
+    _adaptive=args.adaptive,
 )

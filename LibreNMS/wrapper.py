@@ -229,6 +229,7 @@ def poll_worker(
     log_dir,  # Type: str
     wrapper_type,  # Type: str
     debug,  # Type: bool
+    persistent,  # Type: bool
 ):
     """
     This function will fork off single instances of the php process, record
@@ -237,7 +238,7 @@ def poll_worker(
 
     global ERRORS
 
-    if not DISTRIBUTED_POLLING:
+    if persistent and not DISTRIBUTED_POLLING:
         executable = os.path.join(
             os.path.dirname(os.path.dirname(os.path.realpath(__file__))),
             wrappers[wrapper_type]["executable"],
@@ -291,49 +292,78 @@ def poll_worker(
                 device_log = os.path.join(
                     log_dir, "{}_device_{}.log".format(wrapper_type, device_id)
                 )
-                executable = os.path.join(
-                    os.path.dirname(os.path.dirname(os.path.realpath(__file__))),
-                    wrappers[wrapper_type]["executable"],
-                )
-                # Keep trying to write the device ID to the poller.php process until we succeed
-                while True:
-                    try:
-                        poller.stdin.write(str(device_id).encode())
-                        poller.stdin.write("\n".encode())
-                        poller.stdin.flush()
-                        break
-                    except:
-                        # Clean up the child process and re-start on error
-                        while poller.returncode is None:
-                            poller.wait()
 
-                        poller = subprocess.Popen(
-                            command,
-                            shell=True,
-                            stdin=subprocess.PIPE,
-                            stdout=subprocess.PIPE,
-                        )
+                if persistent:
+                    # Keep trying to write the device ID to the poller.php process until we succeed
+                    while True:
+                        try:
+                            poller.stdin.write(str(device_id).encode())
+                            poller.stdin.write("\n".encode())
+                            poller.stdin.flush()
+                            break
+                        except:
+                            # Clean up the child process and re-start on error
+                            while poller.returncode is None:
+                                poller.wait()
 
-                # This is the string that will signify the end of the poller process
-                endofinput = "### Poll of " + str(device_id) + " complete ###"
+                            poller = subprocess.Popen(
+                                command,
+                                shell=True,
+                                stdin=subprocess.PIPE,
+                                stdout=subprocess.PIPE
+                            )
 
-                if debug:
-                    dev_log_file = open(device_log, "w", encoding="utf-8")
 
-                while True:
-                    line = poller.stdout.readline()
-                    if not line or line.decode().rstrip("\r\n") == endofinput:
-                        break
+                    # This is the string that will signify the end of the poller process
+                    endofinput = "### Poll of " + str(device_id) + " complete ###"
 
-                    logger.debug(line.decode())
                     if debug:
-                        dev_log_file.write(line.decode())
+                        dev_log_file = open(device_log, "w", encoding="utf-8")
 
-                if debug:
-                    dev_log_file.close()
+                    while True:
+                        line = poller.stdout.readline()
+                        if not line or line.decode().rstrip("\r\n") == endofinput:
+                            break
 
-                # The persistent process does not give a valid exit code
-                exit_code = 0
+                        logger.debug(line.decode())
+                        if debug:
+                            dev_log_file.write(line.decode())
+
+                    if debug:
+                        dev_log_file.close()
+
+                    # The persistent process does not give a valid exit code
+                    exit_code = 0
+                else:
+                    executable = os.path.join(
+                        os.path.dirname(os.path.dirname(os.path.realpath(__file__))),
+                        wrappers[wrapper_type]["executable"],
+                    )
+                    command = "/usr/bin/env php {} -h {}".format(executable, device_id)
+                    if debug:
+                        command = command + " -d"
+                    exit_code, output = command_runner(
+                        command,
+                        shell=True,
+                        timeout=PER_DEVICE_TIMEOUT,
+                        valid_exit_codes=VALID_EXIT_CODES,
+                    )
+                    if exit_code not in [0, 6]:
+                        logger.error(
+                            "Thread {} exited with code {}".format(
+                                threading.current_thread().name, exit_code
+                            )
+                        )
+                        ERRORS += 1
+                        logger.error(output)
+                    elif exit_code == 5:
+                        logger.info("Unreachable device {}".format(device_id))
+                    else:
+                        logger.debug(output)
+                    if debug:
+                        with open(device_log, "w", encoding="utf-8") as dev_log_file:
+                            dev_log_file.write(output)
+
 
                 elapsed_time = int(time.time() - start_time)
                 print_queue.put(
@@ -353,7 +383,7 @@ def poll_worker(
         poll_queue.task_done()
 
     # Close and clean up the poller process
-    if not DISTRIBUTED_POLLING:
+    if persistent and not DISTRIBUTED_POLLING:
         poller.stdin.close()
         poller.stdout.close()
         while poller.returncode is None:
@@ -380,6 +410,10 @@ def wrapper(
     config,  # Type: dict
     log_dir,  # Type: str
     _debug=False,  # Type: bool
+    _lockfile=None,  # Type: string
+    _lockwait=20,  # Type: int
+    _persistent=False,  # Type: bool
+    _adaptive=False,  # Type: bool
 ):  # -> None
     """
     Actual code that runs various php scripts, in single node mode or distributed poller mode
@@ -462,6 +496,27 @@ def wrapper(
     # EOC
 
     s_time = time.time()
+    target_polltime = STEPPING * 0.95
+    if _lockfile != None:
+        import fcntl
+        try:
+            lockfd = open(_lockfile, mode='w')
+            fcntl.lockf(lockfd, fcntl.LOCK_EX)
+
+            # Do not proceed if it took too long to acquire the lock
+            c_time = time.time()
+            if (c_time - s_time) > (STEPPING * _lockwait / 100):
+                fcntl.lockf(lockfd, fcntl.LOCK_UN)
+                lockfd.close()
+                logger.critical("It took too long ({}) to acquire the file lock - exiting.".format(c_time - s_time))
+                sys.exit(2)
+
+            # Re-calculate the target poll time by subtracting the lock time from the stepping
+            target_polltime = (s_time - c_time + STEPPING) * 0.95
+        except Exception:
+            logger.critical("Could not open lock file {} for writing.".format(_lockfile))
+            raise
+            sys.exit(2)
 
     fast_devices_list = []
     slow_devices_list = []
@@ -512,6 +567,10 @@ def wrapper(
     amount_of_devices = len(devices)
     device_mid = amount_of_devices >> 1
 
+    # Don't have more threads than workers
+    if amount_of_workers > amount_of_devices:
+        amount_of_workers = amount_of_devices
+
     # Add the first half as slow devices
     for row in devices[:device_mid]:
         # Use try/except in case the time is null
@@ -541,10 +600,10 @@ def wrapper(
             "Inserted fast device {} with run time {}".format(row[0], this_poll_time)
         )
 
-    # Estimated number of workers is the total poll time / stepping, plus 1
-    # minimum fast and slow workers.  Allow a 5% margin to avoid overlaps
-    if wrapper_type in ["discovery", "poller"]:
-        est_workers = 2 + int(all_poll_time / (STEPPING * 0.95))
+    # If we are in adaptive mode, estimated number of workers as the total poll
+    # time / target, plus 1 minimum fast and slow workers.
+    if _adaptive and wrapper_type in ["discovery", "poller"]:
+        est_workers = 2 + int(all_poll_time / target_polltime)
         if est_workers > amount_of_workers:
             logger.warning(
                 "Estimated minimum workers of {} is more than the maximum of {}. You either need to increase the maximum workers, get a faster machine".format(
@@ -606,6 +665,7 @@ def wrapper(
                 "log_dir": log_dir,
                 "wrapper_type": wrapper_type,
                 "debug": _debug,
+                "persistent": _persistent,
             },
         )
         worker.setDaemon(True)
@@ -621,6 +681,7 @@ def wrapper(
                 "log_dir": log_dir,
                 "wrapper_type": wrapper_type,
                 "debug": _debug,
+                "persistent": _persistent,
             },
         )
         worker.setDaemon(True)
@@ -639,6 +700,12 @@ def wrapper(
         print_queue.join()
     except (KeyboardInterrupt, SystemExit):
         raise
+
+    # Unlock and close the lockfile if needed
+    if _lockfile != None:
+        import fcntl
+        fcntl.lockf(lockfd, fcntl.LOCK_UN)
+        lockfd.close()
 
     total_time = int(time.time() - s_time)
 
