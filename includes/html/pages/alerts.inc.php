@@ -28,7 +28,7 @@ $page_title = 'Alerts';
     require_once 'includes/html/modal/alert_notes.inc.php';
     require_once 'includes/html/modal/alert_ack.inc.php';
     require_once 'includes/html/common/alerts.inc.php';
-    echo implode('', $common_output);
+    echo htmlspecialchars(implode('', $common_output));
     unset($device['device_id']);
     ?>
 </div>

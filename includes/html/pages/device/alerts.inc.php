@@ -51,14 +51,14 @@ switch ($vars['section']) {
         include 'includes/html/modal/alert_notes.inc.php';
         include 'includes/html/modal/alert_ack.inc.php';
         include 'includes/html/common/alerts.inc.php';
-        echo implode('', $common_output);
+        echo htmlspecialchars(implode('', $common_output));
         break;
     case 'alert-log':
         $vars['fromdevice'] = true;
         $device_id = (int) $vars['device'];
         include 'includes/html/modal/alert_details.php';
         include 'includes/html/common/alert-log.inc.php';
-        echo implode('', $common_output);
+        echo htmlspecialchars(implode('', $common_output));
         break;
 
     default:
