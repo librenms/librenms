@@ -7,7 +7,7 @@ use LibreNMS\Interfaces\SnmptrapHandler;
 use LibreNMS\Snmptrap\Trap;
 use Log;
 
-class VeeamFLRToOriginalStarted implements SnmptrapHandler
+class VeeamLinuxFLRToOriginalStarted implements SnmptrapHandler
 {
     /**
      * Handle snmptrap.
