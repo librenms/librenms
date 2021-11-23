@@ -21,8 +21,6 @@
  */
 
 namespace LibreNMS\OS;
-
-use LibreNMS\Device\Processor;
 use LibreNMS\Device\WirelessSensor;
 use LibreNMS\Interfaces\Discovery\ProcessorDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessFrequencyDiscovery;
@@ -33,7 +31,6 @@ use LibreNMS\Interfaces\Discovery\Sensors\WirelessSnrDiscovery;
 use LibreNMS\OS;
 
 class Ray extends OS implements
-    ProcessorDiscovery,
     WirelessFrequencyDiscovery,
     WirelessPowerDiscovery,
     WirelessRssiDiscovery,
