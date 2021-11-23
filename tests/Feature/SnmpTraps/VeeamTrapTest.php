@@ -25,13 +25,13 @@ VEEAM-MIB::backupJobResult Success";
 
         $trap = new Trap($trapText);
 
-        $message = 'SNMP Trap: Backup Job success - SureBackup Job 1 ';
+        $message = 'SNMP Trap: Backup Job Success - SureBackup Job 1';
         Log::shouldReceive('event')->once()->with($message, $device->device_id, 'backup', 1);
 
         $this->assertTrue(Dispatcher::handle($trap), 'Could not handle VEEAM-MIB::traps');
     }
 
-    public function testVeeamOnBackupJobCompletedWarning(): void
+    public function testVeeamBackupJobCompletedWarning(): void
     {
         $device = Device::factory()->create();
 
@@ -47,13 +47,13 @@ VEEAM-MIB::backupJobResult Warning";
 
         $trap = new Trap($trapText);
 
-        $message = 'SNMP Trap: Backup Job warning - SureBackup Job 1 ';
+        $message = 'SNMP Trap: Backup Job Warning - SureBackup Job 1';
         Log::shouldReceive('event')->once()->with($message, $device->device_id, 'backup', 4);
 
         $this->assertTrue(Dispatcher::handle($trap), 'Could not handle VEEAM-MIB::traps');
     }
 
-    public function testVeeamOnBackupJobCompletedFailed(): void
+    public function testVeeamBackupJobCompletedFailed(): void
     {
         $device = Device::factory()->create();
 
@@ -69,13 +69,13 @@ VEEAM-MIB::vmBackupResult Failed";
 
         $trap = new Trap($trapText);
 
-        $message = 'SNMP Trap: Backup Job failed - SureBackup Job 1 ';
+        $message = 'SNMP Trap: Backup Job Failed - SureBackup Job 1';
         Log::shouldReceive('event')->once()->with($message, $device->device_id, 'backup', 5);
 
         $this->assertTrue(Dispatcher::handle($trap), 'Could not handle VEEAM-MIB::traps');
     }
 
-    public function testVeeamOnVmBackupCompleted(): void
+    public function testVeeamVmBackupCompleted(): void
     {
         $device = Device::factory()->create();
 
@@ -91,13 +91,13 @@ VEEAM-MIB::vmBackupResult Success";
 
         $trap = new Trap($trapText);
 
-        $message = 'SNMP Trap: VM Backup Success - Linux taeglich low vmname1';
+        $message = 'SNMP Trap: VM Backup Success - vmname1 Job: Linux taeglich low';
         Log::shouldReceive('event')->once()->with($message, $device->device_id, 'backup', 1);
 
         $this->assertTrue(Dispatcher::handle($trap), 'Could not handle VEEAM-MIB::traps');
     }
 
-    public function testVeeamOnVmBackupCompletedWarning(): void
+    public function testVeeamVmBackupCompletedWarning(): void
     {
         $device = Device::factory()->create();
 
@@ -113,13 +113,13 @@ VEEAM-MIB::vmBackupResult Warning";
 
         $trap = new Trap($trapText);
 
-        $message = 'SNMP Trap: VM Backup Warning - Linux taeglich low vmname1';
+        $message = 'SNMP Trap: VM Backup Warning - vmname1 Job: Linux taeglich low';
         Log::shouldReceive('event')->once()->with($message, $device->device_id, 'backup', 4);
 
         $this->assertTrue(Dispatcher::handle($trap), 'Could not handle VEEAM-MIB::traps');
     }
 
-    public function testVeeamOnVmBackupCompletedFail(): void
+    public function testVeeamVmBackupCompletedFail(): void
     {
         $device = Device::factory()->create();
 
@@ -135,7 +135,7 @@ VEEAM-MIB::vmBackupResult Failed";
 
         $trap = new Trap($trapText);
 
-        $message = 'SNMP Trap: VM Backup Failed - Linux taeglich low vmname1';
+        $message = 'SNMP Trap: VM Backup Failed - vmname1 Job: Linux taeglich low';
         Log::shouldReceive('event')->once()->with($message, $device->device_id, 'backup', 5);
 
         $this->assertTrue(Dispatcher::handle($trap), 'Could not handle VEEAM-MIB::traps');
