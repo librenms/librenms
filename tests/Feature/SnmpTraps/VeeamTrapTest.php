@@ -9,7 +9,7 @@ use Log;
 
 class VeeamTrapTest extends SnmpTrapTestCase
 {
-    public function testVeeamOnBackupJobCompleted(): void
+    public function testVeeamBackupJobCompleted(): void
     {
         $device = Device::factory()->create();
 
