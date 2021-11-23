@@ -41,26 +41,6 @@ class Ray extends OS implements
     WirelessSnrDiscovery
 {
     /**
-     * Discover processors.
-     * Returns an array of LibreNMS\Device\Processor objects that have been discovered
-     *
-     * @return array Processors
-     */
-    public function discoverProcessors()
-    {
-        // RAY-MIB::useCpu has no index, so it won't work in yaml
-
-        return [
-            Processor::discover(
-                $this->getName(),
-                $this->getDeviceId(),
-                '.1.3.6.1.4.1.33555.1.1.5.1',
-                0
-            ),
-        ];
-    }
-
-    /**
      * Discover wireless frequency.  This is in GHz. Type is frequency.
      * Returns an array of LibreNMS\Device\Sensor objects that have been discovered
      *
