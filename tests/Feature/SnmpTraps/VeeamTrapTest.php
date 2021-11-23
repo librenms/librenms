@@ -20,7 +20,7 @@ SNMPv2-MIB::snmpTrapOID.0 VEEAM-MIB::onBackupJobCompleted
 VEEAM-MIB::backupJobId 7a1b3549-c4c7-4629-84d6-74e24fee8011
 VEEAM-MIB::backupJobName SureBackup Job 1
 VEEAM-MIB::sourceHostName hostname
-VEEAM-MIB::vmBackupComment comment
+VEEAM-MIB::backupJobComment comment
 VEEAM-MIB::backupJobResult Success";
 
         $trap = new Trap($trapText);
