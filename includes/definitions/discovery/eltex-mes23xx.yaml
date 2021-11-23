@@ -1,4 +1,4 @@
-mib: RADLAN-rndMng:RADLAN-HWENVIROMENT:ELTEX-MES-HWENVIROMENT-MIB:RADLAN-Physicaldescription-MIB:RADLAN-PHY-MIB
+mib: RADLAN-Physicaldescription-MIB:RADLAN-HWENVIROMENT:RADLAN-PHY-MIB:RADLAN-rndMng:ELTEX-MES-HWENVIROMENT-MIB
 modules:
     os:
         features: RADLAN-Physicaldescription-MIB::rlPhdUnitGenParamSoftwareVersion.1
@@ -25,6 +25,7 @@ modules:
                     value: rlEnvMonFanState
                     num_oid: '.1.3.6.1.4.1.89.83.1.1.1.3.{{ $index }}'
                     descr: '{{ rlEnvMonFanStatusDescr }} status'
+                    group: 'Switch fan'
                     index: 'mesFanStatus.{{ $index }}'
                     states:
                         - { value: 1, descr: OK, graph: 1, generic: 0 }

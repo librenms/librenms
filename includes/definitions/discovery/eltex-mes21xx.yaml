@@ -1,4 +1,4 @@
-mib: RADLAN-Physicaldescription-MIB:ELTEX-MES-HWENVIROMENT-MIB:RADLAN-HWENVIROMENT:RADLAN-PHY-MIB:RADLAN-rndMng
+mib: RADLAN-Physicaldescription-MIB:RADLAN-HWENVIROMENT:RADLAN-PHY-MIB:RADLAN-rndMng
 modules:
     os:
         features: RADLAN-Physicaldescription-MIB::rlPhdUnitGenParamSoftwareVersion.1
