@@ -20,12 +20,12 @@ SNMPv2-MIB::snmpTrapOID.0 VEEAM-MIB::onBackupJobCompleted
 VEEAM-MIB::backupJobId 7a1b3549-c4c7-4629-84d6-74e24fee8011
 VEEAM-MIB::backupJobName SureBackup Job 1
 VEEAM-MIB::sourceHostName hostname
-VEEAM-MIB::vmBackupComment 
+VEEAM-MIB::vmBackupComment comment
 VEEAM-MIB::backupJobResult Success";
 
         $trap = new Trap($trapText);
 
-        $message = 'SNMP Trap: Backup Job Success - SureBackup Job 1';
+        $message = 'SNMP Trap: Backup Job Success - SureBackup Job 1 - comment';
         Log::shouldReceive('event')->once()->with($message, $device->device_id, 'backup', 1);
 
         $this->assertTrue(Dispatcher::handle($trap), 'Could not handle VEEAM-MIB::traps');
