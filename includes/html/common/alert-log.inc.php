@@ -62,14 +62,14 @@ if (isset($_POST['device_id'])) {
     $_POST['device_id'] = $device_id;
 }
 if (isset($_POST['state'])) {
-    $selected_state = '<option value="' . $_POST['state'] . '" selected="selected">';
+    $selected_state = '<option value="' . htmlspecialchars($_POST['state']) . '" selected="selected">';
     $selected_state .= array_search((int) $_POST['state'], $alert_states) . '</option>';
 } else {
     $selected_state = '';
     $_POST['state'] = -1;
 }
 if (isset($_POST['min_severity'])) {
-    $selected_min_severity = '<option value="' . $_POST['min_severity'] . '" selected="selected">';
+    $selected_min_severity = '<option value="' . htmlspecialchars($_POST['min_severity']) . '" selected="selected">';
     $selected_min_severity .= array_search((int) $_POST['min_severity'], $alert_severities) . '</option>';
 } else {
     $selected_min_severity = '';
@@ -167,7 +167,7 @@ $common_output[] = '<div class="form-group"> \
         max = high - low;
         search = $(\'.search-field\').val();
 
-        $(".pdf-export").html("<a href=\'pdf.php?report=alert-log&device_id=' . $_POST['device_id'] . '&string=" + search + "&results=" + max + "&start=" + low + "\'><i class=\'fa fa-heartbeat fa-lg icon-theme\' aria-hidden=\'true\'></i> Export to pdf</a>");
+        $(".pdf-export").html("<a href=\'pdf.php?report=alert-log&device_id=' . htmlspecialchars($_POST['device_id']) . '&string=" + search + "&results=" + max + "&start=" + low + "\'><i class=\'fa fa-heartbeat fa-lg icon-theme\' aria-hidden=\'true\'></i> Export to pdf</a>");
 
         grid.find(".incident-toggle").each(function () {
             $(this).parent().addClass(\'incident-toggle-td\');

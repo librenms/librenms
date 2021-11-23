@@ -166,7 +166,7 @@ if (Auth::user()->hasGlobalAdmin()) {
         if ($config_total > 1) {
             // populate current_version
             if (isset($_POST['config'])) {
-                [$oid,$date,$version] = explode('|', $_POST['config']);
+                [$oid,$date,$version] = explode('|', htmlspecialchars($_POST['config']));
                 $current_config = ['oid'=>$oid, 'date'=>$date, 'version'=>$version];
             } else { // no version selected
                 $current_config = ['oid' => $config_versions[0]['oid'], 'date' => $config_versions[0]['date'], 'version' => $config_total];
@@ -267,7 +267,7 @@ if (Auth::user()->hasGlobalAdmin()) {
                             <div class="form-group">
                                 <div class="col-sm-offset-2 col-sm-6">
                                       <input type="hidden" name="prevconfig" value="';
-                echo htmlspecialchars(implode('|', $current_config));
+                echo implode('|', $current_config);
                 echo '">
                                       <button type="submit" class="btn btn-primary btn-sm" name="show">Show version</button>
                                       <button type="submit" class="btn btn-primary btn-sm" name="diff">Show diff</button>

@@ -211,7 +211,7 @@ if (bill_permitted($bill_id)) {
         $rightnow = date('U');
 
         if ($vars['view'] == 'accurate') {
-            $bi = "<img src='billing-graph.php?bill_id=" . $bill_id . '&amp;bill_code=' . $_GET['bill_code'];
+            $bi = "<img src='billing-graph.php?bill_id=" . $bill_id . '&amp;bill_code=' . htmlspecialchars($_GET['bill_code']);
             $bi .= '&amp;from=' . $unixfrom . '&amp;to=' . $unixto;
             $bi .= '&amp;x=1190&amp;y=250';
             $bi .= "$type'>";
@@ -221,12 +221,12 @@ if (bill_permitted($bill_id)) {
             $li .= '&amp;x=1190&amp;y=250';
             $li .= "$type'>";
 
-            $di = "<img src='billing-graph.php?bill_id=" . $bill_id . '&amp;bill_code=' . $_GET['bill_code'];
+            $di = "<img src='billing-graph.php?bill_id=" . $bill_id . '&amp;bill_code=' . htmlspecialchars($_GET['bill_code']);
             $di .= '&amp;from=' . \LibreNMS\Config::get('time.day') . '&amp;to=' . \LibreNMS\Config::get('time.now');
             $di .= '&amp;x=1190&amp;y=250';
             $di .= "$type'>";
 
-            $mi = "<img src='billing-graph.php?bill_id=" . $bill_id . '&amp;bill_code=' . $_GET['bill_code'];
+            $mi = "<img src='billing-graph.php?bill_id=" . $bill_id . '&amp;bill_code=' . htmlspecialchars($_GET['bill_code']);
             $mi .= '&amp;from=' . $lastmonth . '&amp;to=' . $rightnow;
             $mi .= '&amp;x=1190&amp;y=250';
             $mi .= "$type'>";
@@ -253,21 +253,21 @@ if (bill_permitted($bill_id)) {
 <div class="panel-heading">
     <h3 class="panel-title">Billing View</h3>
 </div>
-        <?php echo htmlspecialchars($bi) ?>
+        <?php echo $bi ?>
 </div>
 
 <div class="panel panel-default">
 <div class="panel-heading">
     <h3 class="panel-title">24 Hour View</h3>
 </div>
-        <?php echo htmlspecialchars($di) ?>
+        <?php echo $di ?>
 </div>
 
 <div class="panel panel-default">
 <div class="panel-heading">
     <h3 class="panel-title">Monthly View</h3>
 </div>
-        <?php echo htmlspecialchars($mi) ?>
+        <?php echo $mi ?>
 </div>
         <?php
     } //end if
