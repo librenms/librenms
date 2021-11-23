@@ -23,6 +23,6 @@ class VeeamSobrOffloadFinished implements SnmptrapHandler
         $result = $trap->getOidData('VEEAM-MIB::repositoryStatus');
         $color = ['Success' => 1, 'Warning' => 4, 'Failed' => 5];
 
-        Log::event('SNMP Trap: Scale-out offload job ' . $result . ' - ' . $name . ' - ' . $comment, $device->device_id, 'backup', $color[$result]);
+        Log::event('SNMP Trap: Scale-out offload job ' . $result . ' - ' . $name, $device->device_id, 'backup', $color[$result]);
     }
 }
