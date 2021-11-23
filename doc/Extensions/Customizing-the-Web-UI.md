@@ -41,9 +41,10 @@ The url value is parsed by the [Laravel Blade](https://laravel.com/docs/blade) t
 can access device variables such as `$device->hostname`, `$device->sysName` and use full PHP.
 
 !!! setting "webui/device"
-    ```bash
-    lnms config:set html.device.links.+ '{"url": "http://atssrv/open-audit/index/devices/{{ $device->sysName }}", "title": "Open-AudIT"}'
-    ```
+
+```bash
+lnms config:set html.device.links.+ '{"url": "http://atssrv/open-audit/index/devices/{{ $device->sysName }}", "title": "Open-AudIT"}'
+```
 
 | Field | Description |
 | ---- | ----------- |
@@ -56,19 +57,16 @@ can access device variables such as `$device->hostname`, `$device->sysName` and 
 ### Launching Windows programs from the LibreNMS device menu
 
 You can launch windows programs from links in LibreNMS, but it does take
-some registry entries on the client device. Save the following as winbox.reg and double click to add to your registry:
+some registry entries on the client device. Save the following as winbox.reg, 
+edit for your winbox.exe path and double click to add to your registry.
 
-```
+```registry
 Windows Registry Editor Version 5.00
-
 [HKEY_CLASSES_ROOT\winbox]
 @="URL:Winbox Protocol"
 "URL Protocol"=""
-
 [HKEY_CLASSES_ROOT\winbox\shell]
-
 [HKEY_CLASSES_ROOT\winbox\shell\open]
-
 [HKEY_CLASSES_ROOT\winbox\shell\open\command]
 @="C:\\Windows\\System32\\WindowsPowerShell\\v1.0\\powershell.exe -Command \"$val='%l'; $val = $val.TrimEnd('/');if ($val.StartsWith('winbox://')) { $val = $val.SubString(9) }; & 'C:\\Program Files\\winbox64.exe' \"$val\"\""
 ```
@@ -76,14 +74,10 @@ Windows Registry Editor Version 5.00
 Now we can use that in the device menu entry to open winbox
 
 !!! setting "webui/device"
-    ```bash
-    lnms config:set html.device.links.+ '{"url": "winbox://{{ $device->ip }}", "title": "Winbox"}'
-    ```
-    
-    If your devices were added by IP address rather than hostname:
-    ```bash
-    lnms config:set html.device.links.+ '{"url": "winbox://{{ $device->hostname }}", "title": "Winbox"}'
-    ```
+
+```bash
+lnms config:set html.device.links.+ '{"url": "winbox://{{ $device->hostname }}", "title": "Winbox"}'
+```
 
 ## Setting the primary device menu action
 
@@ -93,9 +87,10 @@ The primary button is edit device by default.
 Web UI <span class="setting-link">/webui/device</span>
 
 !!! setting "webui/device"
-    ```bash
-    lnms config:set html.device.primary_link web
-    ```
+
+```bash
+lnms config:set html.device.primary_link web
+```
 
 | Value | Description |
 | ----- | ----------- |
