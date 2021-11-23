@@ -223,7 +223,7 @@ HOST-RESOURCES-MIB::hrStorageUsed.36 = 127044934
         $this->assertFalse($response->isValid());
         $this->assertEquals('Authentication failure', $response->getErrorMessage());
 
-        // Authentication failure
+        // OID not increasing
         $response = new SnmpResponse(".1.3.6.1.2.1.2.2.1.1.1 = INTEGER: 1\n", "Error: OID not increasing: .1.3.6.1.2.100.2.2.1.1\n >= .1.3.6.1.2.1.2.2.1.1.1\n", 1);
         $this->assertFalse($response->isValid());
         $this->assertEquals('Error: OID not increasing: .1.3.6.1.2.100.2.2.1.1', $response->getErrorMessage());
