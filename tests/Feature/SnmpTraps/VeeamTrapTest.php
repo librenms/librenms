@@ -65,7 +65,7 @@ VEEAM-MIB::backupJobId 7a1b3549-c4c7-4629-84d6-74e24fee8011
 VEEAM-MIB::backupJobName SureBackup Job 1
 VEEAM-MIB::sourceHostName hostname
 VEEAM-MIB::backupJobComment comment
-VEEAM-MIB::vmBackupResult Failed";
+VEEAM-MIB::backupJobResult Failed";
 
         $trap = new Trap($trapText);
 
@@ -119,7 +119,7 @@ VEEAM-MIB::vmBackupResult Warning";
         $this->assertTrue(Dispatcher::handle($trap), 'Could not handle VEEAM-MIB::traps');
     }
 
-    public function testVeeamVmBackupCompletedFail(): void
+    public function testVeeamVmBackupCompletedFailed(): void
     {
         $device = Device::factory()->create();
 
