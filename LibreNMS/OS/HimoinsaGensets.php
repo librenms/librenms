@@ -72,10 +72,7 @@ class HimoinsaGensets extends OS
 
     public static function modeStatus($value): int
     {
-        return ($value & 4) |
-            ($value & 8) |
-            ($value & 16) |
-            ($value & 32);
+        return ($value & 4) | ($value & 8) | ($value & 16) | ($value & 32);
     }
 
     public static function alarmStatus($value): int
@@ -95,8 +92,7 @@ class HimoinsaGensets extends OS
 
     public static function cec7CommStatus($value): int
     {
-        return ($value & 32) |
-            ($value & 64);
+        return ($value & 32) | ($value & 64);
     }
 
     public static function cec7CommAlarmStatus($value): int
