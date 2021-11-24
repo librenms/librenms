@@ -74,6 +74,7 @@ class Ciscowlc extends Cisco implements
             $channel = str_replace('ch', '', $value['bsnAPIfPhyChannelNumber'] ?? '');
 
             $ap = new AccessPoint([
+                'device_id' => $device['device_id'],
                 'name' => $stats[$indexName]['bsnAPName'] ?? '',
                 'radio_number' => Arr::first(explode('.', $key)),
                 'type' => $value['bsnAPIfType'] ?? '',
