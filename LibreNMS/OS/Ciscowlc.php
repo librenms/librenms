@@ -120,7 +120,7 @@ class Ciscowlc extends Cisco implements
             ]));
 
             /** @var AccessPoint $db_ap */
-            if ($db_ap = $db_aps->get($ap->getCompositeKey())) {
+            if ($db_aps->get($ap->getCompositeKey())) {
                 $db_aps->forget($ap->getCompositeKey());
                 $ap = $db_ap->fill($ap->getAttributes());
             }
