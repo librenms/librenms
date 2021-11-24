@@ -27,9 +27,9 @@ if (Auth::user()->isDemo()) {
   <form name="form1" method="post" action="" class="form-horizontal" role="form">
             <?php echo csrf_field() ?>
     <div class="form-group">
-      <input type="hidden" name="id" value="<?php echo $_REQUEST['id'] ?>" />
+      <input type="hidden" name="id" value="<?php echo htmlspecialchars($_REQUEST['id']) ?>" />
       <input type="hidden" name="confirm" value="1" />
-      <!--<input type="hidden" name="remove_rrd" value="<?php echo $_POST['remove_rrd']; ?>">-->
+      <!--<input type="hidden" name="remove_rrd" value="<?php echo htmlspecialchars($_POST['remove_rrd']); ?>">-->
       <button type="submit" class="btn btn-danger">Confirm device deletion</button>
     </div>
   </form>
