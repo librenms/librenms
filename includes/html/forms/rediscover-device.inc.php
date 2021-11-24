@@ -48,10 +48,10 @@ if (isset($_POST['device_id'])) {
 
         if (! empty($update) || $update == '0') {
             $status = 'ok';
-            $message = 'Devices of group ' . $_POST['device_group_id'] . ' will be rediscovered';
+            $message = 'Devices of group ' . htmlspecialchars($_POST['device_group_id']) . ' will be rediscovered';
         } else {
             $status = 'error';
-            $message = 'Error rediscovering devices of group ' . $_POST['device_group_id'];
+            $message = 'Error rediscovering devices of group ' . htmlspecialchars($_POST['device_group_id']);
         }
     }
 } else {
