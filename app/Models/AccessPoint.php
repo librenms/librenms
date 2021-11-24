@@ -26,6 +26,6 @@ class AccessPoint extends DeviceRelatedModel implements Keyable
 
     public function getCompositeKey()
     {
-        return "{$this->name}_{$this->radio_number}";
+        return "{$this->device_id}_{$this->mac_addr}_{$this->radio_number}";
     }
 }
