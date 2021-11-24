@@ -5381,16 +5381,6 @@ parameters:
 			path: LibreNMS/Util/CiHelper.php
 
 		-
-			message: "#^Property LibreNMS\\\\Util\\\\CliColorFormatter\\:\\:\\$console has no type specified\\.$#"
-			count: 1
-			path: LibreNMS/Util/CliColorFormatter.php
-
-		-
-			message: "#^Property LibreNMS\\\\Util\\\\CliColorFormatter\\:\\:\\$console_color has no type specified\\.$#"
-			count: 1
-			path: LibreNMS/Util/CliColorFormatter.php
-
-		-
 			message: "#^Method LibreNMS\\\\Util\\\\Colors\\:\\:percentage\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: LibreNMS/Util/Colors.php

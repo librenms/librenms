@@ -64,12 +64,14 @@ return [
         'single' => [
             'driver' => 'single',
             'path' => env('APP_LOG', \LibreNMS\Config::get('log_file', base_path('logs/librenms.log'))),
+            'formatter' => \App\Logging\NoColorFormatter::class,
             'level' => env('LOG_LEVEL', 'error'),
         ],
 
         'daily' => [
             'driver' => 'daily',
             'path' => env('APP_LOG', \LibreNMS\Config::get('log_file', base_path('logs/librenms.log'))),
+            'formatter' => \App\Logging\NoColorFormatter::class,
             'level' => env('LOG_LEVEL', 'error'),
             'days' => 14,
         ],
@@ -95,7 +97,7 @@ return [
         'stderr' => [
             'driver' => 'monolog',
             'handler' => StreamHandler::class,
-            'formatter' => \LibreNMS\Util\CliColorFormatter::class,
+            'formatter' => \App\Logging\CliColorFormatter::class,
             'with' => [
                 'stream' => 'php://stderr',
             ],
@@ -105,7 +107,7 @@ return [
         'stdout_debug' => [
             'driver' => 'monolog',
             'handler' => StreamHandler::class,
-            'formatter' => \LibreNMS\Util\CliColorFormatter::class,
+            'formatter' => \App\Logging\CliColorFormatter::class,
             'with' => [
                 'stream' => 'php://output',
             ],
@@ -115,7 +117,7 @@ return [
         'stdout' => [
             'driver' => 'monolog',
             'handler' => StreamHandler::class,
-            'formatter' => \LibreNMS\Util\CliColorFormatter::class,
+            'formatter' => \App\Logging\CliColorFormatter::class,
             'with' => [
                 'stream' => 'php://output',
             ],

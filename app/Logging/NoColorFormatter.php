@@ -1,8 +1,8 @@
 <?php
 /**
- * CliColorFormatter.php
+ * FileColorFormatter.php
  *
- * -Description-
+ * Always strip colors from the output.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -19,39 +19,30 @@
  *
  * @link       https://www.librenms.org
  *
- * @copyright  2018 Tony Murray
+ * @copyright  2021 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
-namespace LibreNMS\Util;
+namespace App\Logging;
 
-class CliColorFormatter extends \Monolog\Formatter\LineFormatter
+class NoColorFormatter extends \Monolog\Formatter\LineFormatter
 {
+    /**
+     * @var \Console_Color2
+     */
     private $console_color;
-    private $console;
 
     public function __construct()
     {
+        parent::__construct(null, null, true, true);
         $this->console_color = new \Console_Color2();
-        $this->console = \App::runningInConsole();
-
-        parent::__construct(
-            "%message% %context% %extra%\n",
-            null,
-            true,
-            true
-        );
     }
 
     public function format(array $record): string
     {
-        // only format messages where color is enabled
+        // only strip messages where color is enabled
         if (isset($record['context']['color']) && $record['context']['color']) {
-            if ($this->console) {
-                $record['message'] = $this->console_color->convert($record['message']);
-            } else {
-                $record['message'] = $this->console_color->strip($record['message']);
-            }
+            $record['message'] = $this->console_color->convert($record['message'], false);
             unset($record['context']['color']);
         }
 
