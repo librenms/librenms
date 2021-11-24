@@ -1,6 +1,6 @@
 <?php
 /*
- * LibreNMS discovery module for Eltex-MES Battery charge
+ * LibreNMS discovery module for Eltex-MES21xx SFP current
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -21,28 +21,29 @@
  * @author     Peca Nesovanovic <peca.nesovanovic@sattrakt.com>
  */
 
-$oids = snmp_walk($device, '1.3.6.1.4.1.35265.1.23.11.1.1.3', '-Osqn', '');
-$oids = trim($oids);
+$low_limit = $low_warn_limit = 15;
+$high_warn_limit = $high_limit = 0;
+$divisor = 1000000;
 
+$oids = $pre_cache['eltex-mes21xx_rlPhyTestGetResult'];
 if ($oids) {
-    echo "Eltex-MES charge:\n";
-
+    d_echo('Eltex-MES SFP txBias');
     foreach (explode("\n", $oids) as $data) {
         if ($data) {
-            print_r($data);
-            echo "\n";
-            $oid = trim(explode(' ', $data)[0]);
+            $split = trim(explode(' ', $data)[0]);
             $value = trim(explode(' ', $data)[1]);
-            $index = trim(explode('.', $oid)[14]);
+            $ifIndex = explode('.', $split)[13];
+            $type = explode('.', $split)[14];
 
-            $type = 'eltex-mes';
-            $limit = 101;
-            $limitwarn = 100;
-            $lowlimit = 0;
-            $lowwarnlimit = 10;
-            $descr = 'Battery Charge';
-
-            discover_sensor($valid['sensor'], 'charge', $device, $oid, $index, $type, $descr, 1, 1, $lowlimit, $lowwarnlimit, $limitwarn, $limit, $value);
+            //type 7 = bias
+            if ($type == 7) {
+                $value = $value / $divisor;
+                $tmp = get_port_by_index_cache($device['device_id'], $ifIndex);
+                $descr = $tmp['ifName'];
+                discover_sensor(
+                    $valid['sensor'], 'current', $device, $split, 'txbias' . $ifIndex, 'rlPhyTestTableTxBias', 'SfpTxBias-' . $descr, $divisor, '1', $low_limit, $low_warn_limit, $high_warn_limit, $high_limit, $value
+                );
+            }
         }
     }
 }

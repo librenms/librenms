@@ -1,7 +1,7 @@
 <?php
 /*
  *
- * LibreNMS storage discovery module for Eltex-MES.
+ * LibreNMS storage discovery module for Eltex-MES21xx
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -22,7 +22,7 @@
  * @author     Peca Nesovanovic <peca.nesovanovic@sattrakt.com>
  */
 
-if ($device['os'] == 'eltex-mes') {
+if ($device['os'] == 'eltex-mes21xx') {
     $fstype = 'Flash';
     $descr = 'Internal Flash';
     $units = 1024;
@@ -32,6 +32,6 @@ if ($device['os'] == 'eltex-mes') {
     $used = $total - $free;
 
     if (is_numeric($free) && is_numeric($total)) {
-        discover_storage($valid_storage, $device, $index, $fstype, 'eltex-mes', $descr, $total, $units, $used);
+        discover_storage($valid_storage, $device, $index, $fstype, 'eltex-mes21xx', $descr, $total, $units, $used);
     }
 }
