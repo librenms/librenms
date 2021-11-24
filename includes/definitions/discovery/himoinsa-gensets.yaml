@@ -153,3 +153,88 @@ modules:
                     descr: Fuel level
                     divisor: 10
                     group: Genset
+        state:
+            data:
+                -
+                    oid: status
+                    num_oid: '.1.3.6.1.4.1.41809.1.46.{{ $index }}'
+                    user_func: \LibreNMS\OS\HimoinsaGensets::motorStatus
+                    index: motor
+                    descr: Motor
+                    group: 'CEA7/CEM7'
+                    state_name: HimoinsaMotorStatus
+                    states:
+                        - {value: 1, generic: 2, graph: 0, descr: Running}
+                        - {value: 2, generic: 0, graph: 0, descr: Stopped}
+                        - {value: 0, generic: 3, graph: 0, descr: Unknown}
+                -
+                    oid: status
+                    num_oid: '.1.3.6.1.4.1.41809.1.46.{{ $index }}'
+                    user_func: \LibreNMS\OS\HimoinsaGensets::modeStatus
+                    index: mode
+                    descr: Motor
+                    group: 'CEA7/CEM7'
+                    state_name: HimoinsaModeStatus
+                    states:
+                        - {value: 4, generic: 0, graph: 0, descr: Auto}
+                        - {value: 8, generic: 2, graph: 0, descr: Manual}
+                        - {value: 16, generic: 1, graph: 0, descr: Test}
+                        - {value: 32, generic: 2, graph: 0, descr: Blocked}
+                        - {value: 0, generic: 3, graph: 0, descr: Unknown}
+                -
+                    oid: status
+                    num_oid: '.1.3.6.1.4.1.41809.1.46.{{ $index }}'
+                    user_func: \LibreNMS\OS\HimoinsaGensets::transferPumpStatus
+                    index: transfer_pump
+                    descr: Transfer Pump
+                    group: 'CEA7/CEM7'
+                    state_name: HimoinsaTransferPumpStatus
+                    states:
+                        - {value: 0, generic: 0, graph: 0, descr: Off}
+                        - {value: 64, generic: 1, graph: 0, descr: On}
+                -
+                    oid: status
+                    num_oid: '.1.3.6.1.4.1.41809.1.46.{{ $index }}'
+                    user_func: \LibreNMS\OS\HimoinsaGensets::alarmStatus
+                    index: alarm
+                    descr: Alarm
+                    group: 'CEA7/CEM7'
+                    state_name: HimoinsaAlarmStatus
+                    states:
+                        - {value: 0, generic: 0, graph: 0, descr: No Alarm}
+                        - {value: 128, generic: 2, graph: 0, descr: Alarm}
+                -
+                    oid: status
+                    num_oid: '.1.3.6.1.4.1.41809.1.46.{{ $index }}'
+                    user_func: \LibreNMS\OS\HimoinsaGensets::commStatus
+                    index: 'comm_mode.0'
+                    descr: Commutator Mode
+                    group: 'CEA7/CEM7'
+                    state_name: HimoinsaCommStatus
+                    states:
+                        - {value: 512, generic: 2, graph: 0, descr: Genset}
+                        - {value: 256, generic: 0, graph: 0, descr: Mains}
+                        - {value: 0, generic: 3, graph: 0, descr: Unknown}
+                -
+                    oid: statusConm
+                    num_oid: '.1.3.6.1.4.1.41809.1.55.1.28.{{ $index }}'
+                    user_func: \LibreNMS\OS\HimoinsaGensets::cec7CommStatus
+                    index: 'comm_mode.{{ $index }}'
+                    descr: Commutator Mode
+                    group: 'CEC7'
+                    state_name: HimoinsaCec7CommStatus
+                    states:
+                        - {value: 32, generic: 2, graph: 0, descr: Genset}
+                        - {value: 64, generic: 0, graph: 0, descr: Mains}
+                        - {value: 0, generic: 3, graph: 0, descr: Unknown}
+                -
+                    oid: statusConm
+                    num_oid: '.1.3.6.1.4.1.41809.1.55.1.28.{{ $index }}'
+                    user_func: \LibreNMS\OS\HimoinsaGensets::cec7CommAlarmStatus
+                    index: 'comm_alarm.{{ $index }}'
+                    descr: Commutator Alarm
+                    group: 'CEC7'
+                    state_name: HimoinsaCec7AlarmStatus
+                    states:
+                        - {value: 0, generic: 0, graph: 0, descr: No Alarm}
+                        - {value: 1, generic: 2, graph: 0, descr: Alarm}
