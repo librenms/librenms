@@ -7,7 +7,7 @@ use LibreNMS\Interfaces\SnmptrapHandler;
 use LibreNMS\Snmptrap\Trap;
 use Log;
 
-class VeeamBackupJobCompleted implements SnmptrapHandler
+class VeeamWebDownloadFinished implements SnmptrapHandler
 {
     /**
      * Handle snmptrap.
@@ -19,11 +19,11 @@ class VeeamBackupJobCompleted implements SnmptrapHandler
      */
     public function handle(Device $device, Trap $trap)
     {
-        $name = $trap->getOidData('VEEAM-MIB::backupJobName');
-        $comment = $trap->getOidData('VEEAM-MIB::backupJobComment');
-        $result = $trap->getOidData('VEEAM-MIB::backupJobResult');
+        $initiator_name = $trap->getOidData('VEEAM-MIB::initiatorName');
+        $vm_name = $trap->getOidData('VEEAM-MIB::vmName');
+        $result = $trap->getOidData('VEEAM-MIB::transferStatus');
         $color = ['Success' => 1, 'Warning' => 4, 'Failed' => 5];
 
-        Log::event('SNMP Trap: Backup Job ' . $result . ' - ' . $name . ' - ' . $comment, $device->device_id, 'backup', $color[$result]);
+        Log::event('SNMP Trap: 1 click FLR job ' . $result . ' - ' . $vm_name . ' - ' . $initiator_name, $device->device_id, 'backup', $color[$result]);
     }
 }
