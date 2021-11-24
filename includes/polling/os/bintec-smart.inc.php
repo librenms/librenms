@@ -1,3 +1,0 @@
-<?php
-
-$hardware = $device['sysDescr'];

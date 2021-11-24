@@ -30,8 +30,10 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use LibreNMS\Component;
 use LibreNMS\Config;
+use LibreNMS\Data\Source\SnmpResponse;
 use LibreNMS\Exceptions\FileNotFoundException;
 use LibreNMS\Exceptions\InvalidModuleException;
+use LibreNMS\Poller;
 use Symfony\Component\Yaml\Yaml;
 
 class ModuleTestHelper
@@ -78,8 +80,6 @@ class ModuleTestHelper
      */
     public function __construct($modules, $os, $variant = '')
     {
-        global $influxdb;
-
         $this->modules = self::resolveModuleDependencies((array) $modules);
         $this->os = strtolower($os);
         $this->variant = strtolower($variant);
@@ -157,23 +157,22 @@ class ModuleTestHelper
             $snmp_oids = $this->collectOids($device_id);
         }
 
-        $device = device_by_id_cache($device_id, true);
         DeviceCache::setPrimary($device_id);
 
         $snmprec_data = [];
         foreach ($snmp_oids as $oid_data) {
             $this->qPrint(' ' . $oid_data['oid']);
 
-            $snmp_options = ['-OUneb', '-Ih'];
+            $snmp_options = ['-OUneb', '-Ih', '-m', '+' . $oid_data['mib']];
             if ($oid_data['method'] == 'walk') {
-                $data = snmp_walk($device, $oid_data['oid'], $snmp_options, $oid_data['mib'], $oid_data['mibdir']);
+                $data = \SnmpQuery::options($snmp_options)->mibDir($oid_data['mibdir'])->walk($oid_data['oid']);
             } elseif ($oid_data['method'] == 'get') {
-                $data = snmp_get($device, $oid_data['oid'], $snmp_options, $oid_data['mib'], $oid_data['mibdir']);
+                $data = \SnmpQuery::options($snmp_options)->mibDir($oid_data['mibdir'])->get($oid_data['oid']);
             } elseif ($oid_data['method'] == 'getnext') {
-                $data = snmp_getnext($device, $oid_data['oid'], $snmp_options, $oid_data['mib'], $oid_data['mibdir']);
+                $data = \SnmpQuery::options($snmp_options)->mibDir($oid_data['mibdir'])->next($oid_data['oid']);
             }
 
-            if (isset($data) && $data !== false) {
+            if (isset($data) && $data->isValid()) {
                 $snmprec_data[] = $this->convertSnmpToSnmprec($data);
             }
         }
@@ -196,8 +195,10 @@ class ModuleTestHelper
         $save_vdebug = Debug::isVerbose();
         Debug::set();
         Debug::setVerbose(false);
+        \Log::setDefaultDriver('console');
         discover_device($device, $this->parseArgs('discovery'));
-        poll_device($device, $this->parseArgs('poller'));
+        $poller = app(Poller::class, ['device_spec' => $device_id, 'module_override' => $this->modules]);
+        $poller->poll();
         Debug::set($save_debug);
         Debug::setVerbose($save_vdebug);
         $collection_output = ob_get_contents();
@@ -368,10 +369,10 @@ class ModuleTestHelper
         }
     }
 
-    private function convertSnmpToSnmprec($snmp_data)
+    private function convertSnmpToSnmprec(SnmpResponse $snmp_data): array
     {
         $result = [];
-        foreach (explode(PHP_EOL, $snmp_data) as $line) {
+        foreach (explode(PHP_EOL, $snmp_data->raw()) as $line) {
             if (empty($line)) {
                 continue;
             }
@@ -381,7 +382,7 @@ class ModuleTestHelper
                 $oid = ltrim($oid, '.');
                 $raw_data = trim($raw_data);
 
-                if (empty($raw_data)) {
+                if (empty($raw_data) || $raw_data == '""') {
                     $result[] = "$oid|4|"; // empty data, we don't know type, put string
                 } else {
                     [$raw_type, $data] = explode(':', $raw_data, 2);
@@ -389,8 +390,14 @@ class ModuleTestHelper
                         // device returned the wrong type, save the wrong type to emulate the device behavior
                         [$raw_type, $data] = explode(':', ltrim($data), 2);
                     }
-                    $data = ltrim($data, ' "');
+
                     $type = $this->getSnmprecType($raw_type);
+
+                    $data = ltrim($data, ' ');
+                    if (Str::startsWith($data, '"') && Str::endsWith($data, '"')) {
+                        // raw string surrounded by quotes, strip extra escapes
+                        $data = stripslashes(substr($data, 1, -1));
+                    }
 
                     if ($type == '6') {
                         // remove leading . from oid data
@@ -527,6 +534,7 @@ class ModuleTestHelper
     {
         global $device;
         Config::set('rrd.enable', false); // disable rrd
+        Config::set('rrdtool_version', '1.7.2'); // don't detect rrdtool version, rrdtool is not install on ci
 
         if (! is_file($this->snmprec_file)) {
             throw new FileNotFoundException("$this->snmprec_file does not exist!");
@@ -586,7 +594,7 @@ class ModuleTestHelper
 
         // Dump the discovered data
         $data = array_merge_recursive($data, $this->dumpDb($device['device_id'], $discovered_modules, 'discovery'));
-        $device = device_by_id_cache($device_id, true); // refresh the device array
+        DeviceCache::get($device_id)->refresh(); // refresh the device
 
         // Run the poller
         if ($this->quiet) {
@@ -595,7 +603,9 @@ class ModuleTestHelper
         }
         ob_start();
 
-        poll_device($device, $this->parseArgs('poller'));
+        \Log::setDefaultDriver('console');
+        $poller = app(Poller::class, ['device_spec' => $device_id, 'module_override' => $this->modules]);
+        $poller->poll();
 
         $this->poller_output = ob_get_contents();
         if ($this->quiet) {
@@ -611,12 +621,12 @@ class ModuleTestHelper
         $polled_modules = array_keys($this->poller_module_output);
 
         // Dump polled data
-        $data = array_merge_recursive($data, $this->dumpDb($device['device_id'], $polled_modules, 'poller'));
+        $data = array_merge_recursive($data, $this->dumpDb($device_id, $polled_modules, 'poller'));
 
         // Remove the test device, we don't need the debug from this
         if ($device['hostname'] == $snmpsim->getIp()) {
             Debug::set(false);
-            delete_device($device['device_id']);
+            delete_device($device_id);
         }
 
         if (! $no_save) {
@@ -715,7 +725,7 @@ class ModuleTestHelper
                 // build joins
                 $join = '';
                 $select = ["`$table`.*"];
-                foreach ($info['joins'] ?: [] as $join_info) {
+                foreach ($info['joins'] ?? [] as $join_info) {
                     if (isset($join_info['custom'])) {
                         $join .= ' ' . $join_info['custom'];
 

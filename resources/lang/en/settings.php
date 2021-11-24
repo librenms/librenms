@@ -1436,17 +1436,19 @@ return [
                 'help' => 'Minimum Graph Height (default: 300)',
             ],
         ],
+        'device_display_default' => [
+            'description' => 'Default device display name template',
+            'help' => 'Sets the default display name for all devices (can be overridden per-device).  Hostname/IP: Just show the hostname or IP the device was added with. sysName: Just show the sysName from snmp. Hostname or sysName: Show hostname, but if it is an IP, show sysName.',
+            'options' => [
+                'hostname' => 'Hostname / IP',
+                'sysName_fallback' => 'Hostname, fallback to sysName for IPs',
+                'sysName' => 'sysName',
+                'ip' => 'IP (from hostname IP or resolved)',
+            ],
+        ],
         'device_location_map_open' => [
             'description' => 'Location Map open',
             'help' => 'Location Map is shown by default',
-        ],
-        'force_hostname_to_sysname' => [
-            'description' => 'show SysName instead of Hostname',
-            'help' => 'When using a dynamic DNS hostname or one that does not resolve, this option would allow you to make use of the sysName instead as the preferred reference to the device',
-        ],
-        'force_ip_to_sysname' => [
-            'description' => 'show SysName instead of IP Address',
-            'help' => 'When using IP addresses as a hostname you can instead represent the devices on the WebUI by its sysName resulting in an easier to read overview of your network. This would apply on networks where you don\'t have DNS records for most of your devices',
         ],
         'whois' => [
             'description' => 'Path to whois',

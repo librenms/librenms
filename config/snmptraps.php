@@ -10,6 +10,18 @@
 
 return [
     'trap_handlers' => [
+        'ALCATEL-IND1-VLAN-STP-MIB::stpNewRoot' => \LibreNMS\Snmptrap\Handlers\Aos7stpNewRoot::class,
+        'ALCATEL-IND1-VLAN-STP-MIB::stpRootPortChange' => \LibreNMS\Snmptrap\Handlers\Aos7stpRootPortChange::class,
+        'ALCATEL-IND1-PORT-MIB::portViolationTrap' => \LibreNMS\Snmptrap\Handlers\Aos7portViolation::class,
+        'ALCATEL-IND1-PORT-MIB::portViolationNotificationTrap' => \LibreNMS\Snmptrap\Handlers\Aos7portViolationNotification::class,
+        'ALCATEL-IND1-CONFIG-MGR-MIB::alcatelIND1ConfigMgrMIB.3.0.1' => \LibreNMS\Snmptrap\Handlers\Aos6CfgSavedTrap::class,
+        'ALCATEL-IND1-CHASSIS-MIB::chassisTrapsAlert' => \LibreNMS\Snmptrap\Handlers\AlechassisTrapsAlert::class,
+        'ALCATEL-IND1-STACK-MANAGER-MIB::alaStackMgrDuplicateSlotTrap' => \LibreNMS\Snmptrap\Handlers\Aos6StackMgrDuplicateSlot::class,
+        'ALCATEL-IND1-STACK-MANAGER-MIB::alaStackMgrRoleChangeTrap' => \LibreNMS\Snmptrap\Handlers\Aos6StackMgrRoleChange::class,
+        'ALCATEL-IND1-IP-MIB::alaDoSTrap' => \LibreNMS\Snmptrap\Handlers\Aos6DoSTrap::class,
+        'ALCATEL-IND1-LBD-MIB::alaLbdStateChangeToShutdown' => \LibreNMS\Snmptrap\Handlers\Aos6LbdStateChangeToShutdown::class,
+        'ALCATEL-IND1-LBD-MIB::alaLbdStateChangeForAutoRecovery' => \LibreNMS\Snmptrap\Handlers\Aos6LbdStateChangeForAutoRecovery::class,
+        'ALCATEL-IND1-AAA-MIB::aaaHicServerTrap' => \LibreNMS\Snmptrap\Handlers\Aos6HicServerTrap::class,
         'BGP4-MIB::bgpBackwardTransition' => \LibreNMS\Snmptrap\Handlers\BgpBackwardTransition::class,
         'BGP4-MIB::bgpEstablished' => \LibreNMS\Snmptrap\Handlers\BgpEstablished::class,
         'BGP4-V2-MIB-JUNIPER::jnxBgpM2BackwardTransition' => \LibreNMS\Snmptrap\Handlers\JnxBgpM2BackwardTransition::class,
@@ -106,5 +118,6 @@ return [
         'VEEAM-MIB::onBackupJobCompleted' => \LibreNMS\Snmptrap\Handlers\VeeamBackupJobCompleted::class,
         'VEEAM-MIB::onVmBackupJobCompleted' => \LibreNMS\Snmptrap\Handlers\VeeamVmBackupJobCompleted::class,
         'HP-ICF-FAULT-FINDER-MIB::hpicfFaultFinderTrap' => \LibreNMS\Snmptrap\Handlers\HpFault::class,
+        'UPS-MIB::upsTrapOnBattery' => \LibreNMS\Snmptrap\Handlers\UpsTrapOnBattery::class,
     ],
 ];

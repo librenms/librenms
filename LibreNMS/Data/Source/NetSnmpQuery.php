@@ -39,6 +39,8 @@ use Symfony\Component\Process\Process;
 
 class NetSnmpQuery implements SnmpQueryInterface
 {
+    private const DEFAULT_FLAGS = '-OQXUte';
+
     /**
      * @var array
      */
@@ -80,11 +82,7 @@ class NetSnmpQuery implements SnmpQueryInterface
     /**
      * @var array|string
      */
-    private $options = [];
-    /**
-     * @var string[]
-     */
-    private $defaultOptions = ['-OQXUte'];
+    private $options = [self::DEFAULT_FLAGS];
     /**
      * @var \App\Models\Device
      */
@@ -134,10 +132,14 @@ class NetSnmpQuery implements SnmpQueryInterface
     /**
      * Set a context for the snmp query
      * This is most commonly used to fetch alternate sets of data, such as different VRFs
+     *
+     * @param  string  $v2  Version 2/3 context name
+     * @param  string|null  $v3  Version 3 context name if different from v2 context name
+     * @return \LibreNMS\Data\Source\SnmpQueryInterface
      */
-    public function context(string $context): SnmpQueryInterface
+    public function context(string $v2, string $v3 = null): SnmpQueryInterface
     {
-        $this->context = $context;
+        $this->context = $this->device->snmpver === 'v3' && $v3 !== null ? $v3 : $v2;
 
         return $this;
     }
@@ -154,6 +156,17 @@ class NetSnmpQuery implements SnmpQueryInterface
     }
 
     /**
+     * Do not error on out of order indexes.
+     * Use with caution as we could get stuck in an infinite loop.
+     */
+    public function allowUnordered(): SnmpQueryInterface
+    {
+        $this->options = array_merge($this->options, ['-Cc']);
+
+        return $this;
+    }
+
+    /**
      * Output all OIDs numerically
      */
     public function numeric(): SnmpQueryInterface
@@ -164,17 +177,43 @@ class NetSnmpQuery implements SnmpQueryInterface
     }
 
     /**
-     * Set option(s) for net-snmp command line.
+     * Hide MIB in output
+     */
+    public function hideMib(): SnmpQueryInterface
+    {
+        $this->options = array_merge($this->options, ['-Os']);
+
+        return $this;
+    }
+
+    /**
+     * Output enum values as strings instead of values. This could affect index output.
+     */
+    public function enumStrings(): SnmpQueryInterface
+    {
+        // remove -Oe from the default flags
+        if (isset($this->options[0]) && Str::contains($this->options[0], 'e')) {
+            $this->options[0] = str_replace('e', '', $this->options[0]);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Set option(s) for net-snmp command line. Overrides the default options.
      * Some options may break parsing, but you can manually parse the raw output if needed.
-     * This will override other options set such as setting numeric.  Call with no options to reset to default.
+     * This will override other options set such as setting numeric.
+     * Calling with null will reset to the default options (-OQXUte).
      * Try to avoid setting options this way to keep the API generic.
      *
-     * @param  array|string  $options
+     * @param  array|string|null  $options
      * @return $this
      */
     public function options($options = []): SnmpQueryInterface
     {
-        $this->options = Arr::wrap($options);
+        $this->options = $options !== null
+            ? Arr::wrap($options)
+            : [self::DEFAULT_FLAGS];
 
         return $this;
     }
@@ -241,7 +280,7 @@ class NetSnmpQuery implements SnmpQueryInterface
         // authentication
         $this->buildAuth($cmd);
 
-        $cmd = array_merge($cmd, $this->defaultOptions, $this->options);
+        $cmd = array_merge($cmd, $this->options);
 
         $timeout = $this->device->timeout ?? Config::get('snmp.timeout');
         if ($timeout && $timeout !== 1) {

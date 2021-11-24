@@ -42,7 +42,7 @@ class Python extends BaseValidation
      */
     public function validate(Validator $validator)
     {
-        $version = Version::python();
+        $version = Version::get()->python();
 
         if (empty($version)) {
             $validator->fail('python3 not found', 'Install Python 3 for your system.');
@@ -74,7 +74,7 @@ class Python extends BaseValidation
 
     private function checkExtensions(Validator $validator)
     {
-        $pythonExtensions = '/scripts/check_requirements.py';
+        $pythonExtensions = '/scripts/dynamic_check_requirements.py';
         $process = new Process([Config::get('install_dir') . $pythonExtensions, '-v']);
         $process->run();
 
@@ -83,7 +83,10 @@ class Python extends BaseValidation
             $user_mismatch = function_exists('posix_getpwuid') ? (posix_getpwuid(posix_geteuid())['name'] ?? null) !== $user : false;
 
             if ($user_mismatch) {
-                $validator->warn("Could not check Python dependencies because this script is not running as $user");
+                $validator->warn(
+                    "Could not check Python dependencies because this script is not running as $user",
+                    'The install docs show how this is done on a new install: https://docs.librenms.org/Installation/Install-LibreNMS/#configure-php-fpm'
+                );
             } else {
                 $validator->fail("Python3 module issue found: '" . $process->getOutput() . "'", 'pip3 install -r ' . Config::get('install_dir') . '/requirements.txt');
             }

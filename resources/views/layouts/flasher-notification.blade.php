@@ -20,7 +20,7 @@ switch ($envelope->getType()) {
         break;
 }
 ?>
-<div class="{{ $class }} {{ $color }} tw-border-current tw-flex tw-flex-col tw-justify-between tw-bg-white dark:tw-bg-dark-gray-300 tw-opacity-80 hover:tw-opacity-100 tw-rounded-md tw-shadow-lg hover:tw-shadow-xl tw-border-l-8 tw-mt-2 tw-cursor-pointer">
+<div class="{{ $class }} {{ $color }} tw-border-current tw-flex tw-flex-col tw-justify-between tw-bg-white dark:tw-bg-dark-gray-300 tw-opacity-80 hover:tw-opacity-100 tw-rounded-md tw-shadow-lg hover:tw-shadow-xl tw-border-l-8 tw-border-t-0.5 tw-border-r-0.5 tw-border-b-0.5 tw-mt-2 tw-cursor-pointer">
     <div class="tw-pl-20 tw-py-4 tw-pr-2 tw-overflow-hidden">
         @if($title)
             <div class="tw-text-xl tw-leading-7 tw-font-semibold tw-capitalize">
@@ -31,7 +31,7 @@ switch ($envelope->getType()) {
             {!! clean(stripslashes($envelope->getMessage()), 'notifications') !!}
         </div>
     </div>
-    <div class="tw-h-1 tw-flex tw-mr-1">
+    <div class="tw-h-1 tw-flex tw-mr-0.5">
         <span class="flasher-progress tw-bg-current"></span>
     </div>
 </div>

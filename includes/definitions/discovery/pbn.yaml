@@ -1,4 +1,6 @@
 modules:
+    os:
+        sysDescr_regex: '/Software\s+(?<hardware>.*) Series Software, Version (?<version>[^,]+), .*Serial num:(?<serial>[^,]+),/s'
     mempools:
         data:
             -

@@ -113,7 +113,7 @@ if (! Auth::user()->hasGlobalAdmin()) {
             }
 
             if (! $done) {
-                echo "<option value='" . $device['device_id'] . "'>" . format_hostname($device, $device['hostname']) . '</option>';
+                echo "<option value='" . $device['device_id'] . "'>" . format_hostname($device) . '</option>';
             }
         }
 
@@ -233,7 +233,7 @@ if (! Auth::user()->hasGlobalAdmin()) {
             }
 
             if (! $done) {
-                echo "<option value='" . $device['device_id'] . "'>" . format_hostname($device, $device['hostname']) . '</option>';
+                echo "<option value='" . $device['device_id'] . "'>" . format_hostname($device) . '</option>';
             }
         }
 
