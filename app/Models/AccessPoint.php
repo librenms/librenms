@@ -14,6 +14,7 @@ class AccessPoint extends DeviceRelatedModel implements Keyable
         'radio_number',
         'type',
         'mac_addr',
+        'deleted',
         'channel',
         'txpow',
         'radioutil',

@@ -79,6 +79,7 @@ class Ciscowlc extends Cisco implements
                 'radio_number' => Arr::first(explode('.', $key)),
                 'type' => $value['bsnAPIfType'] ?? '',
                 'mac_addr' => str_replace(' ', ':', $stats[$indexName]['bsnAPDot3MacAddress'] ?? ''),
+                'deleted' => 0,
                 'channel' => $channel,
                 'txpow' => $value['bsnAPIfPhyTxPowerLevel'] ?? 0,
                 'radioutil' => $loadParams[$key]['bsnAPIfLoadChannelUtilization'] ?? 0,
@@ -120,15 +121,13 @@ class Ciscowlc extends Cisco implements
             ]));
 
             /** @var AccessPoint $db_ap */
-            if ($db_aps->get($ap->getCompositeKey())) {
-                $db_aps->forget($ap->getCompositeKey());
-                $ap = $db_ap->fill($ap->getAttributes());
+            if (! $db_aps->get($ap->getCompositeKey())) {
+                // Previously seen AP was not present during the poll, mark it as deleted
+                $ap->deleted = 1;
             }
-
             $ap->save(); // persist ap
         }
 
-        $db_aps->each->delete(); // delete those not removed
     }
 
     /**
