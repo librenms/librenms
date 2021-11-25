@@ -43,6 +43,7 @@ use LibreNMS\Interfaces\Polling\Netstats\UdpNetstatsPolling;
 use LibreNMS\OS\Generic;
 use LibreNMS\OS\Traits\HostResources;
 use LibreNMS\OS\Traits\NetstatsPolling;
+use LibreNMS\OS\Traits\ResolvesPortIds;
 use LibreNMS\OS\Traits\UcdResources;
 use LibreNMS\OS\Traits\YamlMempoolsDiscovery;
 use LibreNMS\OS\Traits\YamlOSDiscovery;
@@ -70,6 +71,7 @@ class OS implements
     use YamlOSDiscovery;
     use YamlMempoolsDiscovery;
     use NetstatsPolling;
+    use ResolvesPortIds;
 
     private $device; // annoying use of references to make sure this is in sync with global $device variable
     private $graphs; // stores device graphs

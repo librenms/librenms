@@ -65,6 +65,7 @@ class ModuleTestHelper
         'mpls' => ['ports', 'vrf', 'mpls'],
         'nac' => ['ports', 'nac'],
         'ospf' => ['ports', 'ospf'],
+        'stp' => ['ports', 'stp'],
         'vlans' => ['ports', 'vlans'],
         'vrf' => ['ports', 'vrf'],
     ];

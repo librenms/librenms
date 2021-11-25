@@ -32,7 +32,7 @@ class StpController implements DeviceTab
 {
     public function visible(Device $device): bool
     {
-        return $device->stpInstances()->exists();
+        return $device->stpConfig()->exists();
     }
 
     public function slug(): string
