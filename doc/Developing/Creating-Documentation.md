@@ -121,7 +121,7 @@ If you are building on a different machine you can use the following directive
 to listen on all interfaces:
 
 ```
-mkdocs serve --dev-addr=http://0.0.0.0:8000
+mkdocs serve --dev-addr=0.0.0.0:8000
 ```
 
 WARNING: this is not a secure webserver, do this at your own risk, with
