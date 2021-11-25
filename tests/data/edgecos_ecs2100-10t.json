@@ -3010,7 +3010,7 @@
                 {
                     "vlan_vlan": 3,
                     "vlan_domain": 1,
-                    "vlan_name": "",
+                    "vlan_name": "Vlan_3",
                     "vlan_type": null,
                     "vlan_mtu": null
                 }
