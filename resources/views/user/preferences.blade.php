@@ -141,8 +141,8 @@
                     <label for="twofactortype" class="col-sm-4 control-label">{{ __('TwoFactor Type') }}</label>
                     <div class="col-sm-4">
                         <select name="twofactortype" class="select form-control">
-                            <option value="time">{{ __('Time Based (TOTP) }}')</option>
-                            <option value="counter">{{ __('Counter Based (HOTP) }}')</option>
+                            <option value="time">{{ __('Time Based (TOTP)') }}</option>
+                            <option value="counter">{{ __('Counter Based (HOTP)') }}</option>
                         </select>
                     </div>
                 </div>

@@ -29,7 +29,7 @@
         <input class="form-control" name="device_count" id="device_count-{{ $id }}" value="{{ $device_count }}">
     </div>
     <div class="form-group">
-        <label for="time_interval-{{ $id }}" class="control-label">{{ __('Last Polled (minutes) }}')</label>
+        <label for="time_interval-{{ $id }}" class="control-label">{{ __('Last Polled (minutes)') }}</label>
         <input class="form-control" name="time_interval" id="time_interval-{{ $id }}" value="{{ $time_interval }}">
     </div>
     <div class="form-group">

@@ -87,7 +87,7 @@
         </select>
     </div>
     <div class="form-group graph_select_extra-{{ $id }}" id="graph_select_custom-{{ $id }}" style="display: none;">
-        <label for="graph_custom-{{ $id }}" class="control-label">{{ __('Custom Aggregator(s) }}')</label>
+        <label for="graph_custom-{{ $id }}" class="control-label">{{ __('Custom Aggregator(s)') }}</label>
         <select class="form-control" id="graph_custom-{{ $id }}" name="graph_custom[]" data-tags="true" multiple="multiple" data-placeholder="{{ __('Select or add one or more') }}">
             @foreach($graph_custom as $custom)
                 <option value="{{ $custom }}" selected>{{ ucwords($custom) }}</option>

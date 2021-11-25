@@ -6,7 +6,7 @@
         <input class="form-control" type="number" min="1" step="1" name="interface_count" id="interface_count-{{ $id }}" value="{{ $interface_count }}">
     </div>
     <div class="form-group">
-        <label for="time_interval-{{ $id }}" class="control-label">{{ __('Last polled (minutes) }}'):</label>
+        <label for="time_interval-{{ $id }}" class="control-label">{{ __('Last polled (minutes)') }}:</label>
         <input class="form-control" type="number" min="1" step="1" name="time_interval" id="time_interval-{{ $id }}" value="{{ $time_interval }}">
     </div>
     <div class="form-group">

@@ -9,7 +9,7 @@
                 </div>
                 <div class="modal-body">
                     <div class='form-group'>
-                        <label for='ack_msg' class='col-sm-4 col-md-3 control-label' title="{{ __('Add a message to the acknowledgement') }}">{{ __('(Un) }}Acknowledgement note:')</label>
+                        <label for='ack_msg' class='col-sm-4 col-md-3 control-label' title="{{ __('Add a message to the acknowledgement') }}">{{ __('(Un) Acknowledgement note:') }}</label>
                         <div class="col-sm-8 col-md-9">
                             <input type='text' id='ack_msg' name='ack_msg' class='form-control' autofocus>
                         </div>
