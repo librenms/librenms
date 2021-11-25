@@ -1443,3 +1443,31 @@ Output:
     "message": "All device dependencies have been removed"
 }
 ```
+
+### `list_parents_of_host`
+
+This is not a seperate API call.  Instead, you obtain the list of parents
+from `list_devices`.  See that entry point for more detailed information.
+
+Example:
+
+```curl
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' 'http://librenms.org/api/v0/devices?type=device_id&query=34'
+```
+
+Output:
+
+```json
+{
+    "status": "ok",
+    "devices": [
+        {
+            ...
+            "dependency_parent_id": "98,99",
+            "dependency_parent_hostname": "HOSTNAME1,HOSTNAME2",
+            ...
+        }
+    ],
+    "count": 1
+}
+```
