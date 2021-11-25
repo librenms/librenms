@@ -305,6 +305,8 @@ function list_devices(Illuminate\Http\Request $request)
 
     if ($type == 'all' || empty($type)) {
         $sql = '1';
+    } elseif ($type == 'device_id') {
+        $sql = "`d`.`device_id` = $query";
     } elseif ($type == 'active') {
         $sql = "`d`.`ignore`='0' AND `d`.`disabled`='0'";
     } elseif ($type == 'location') {
