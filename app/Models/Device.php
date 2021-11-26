@@ -802,9 +802,9 @@ class Device extends BaseModel
         return $this->hasMany(\App\Models\Storage::class, 'device_id');
     }
 
-    public function stpConfig(): HasOne
+    public function stpInstances(): HasMany
     {
-        return $this->hasOne(Stp::class, 'device_id');
+        return $this->hasMany(Stp::class, 'device_id');
     }
 
     public function stpPorts(): HasMany

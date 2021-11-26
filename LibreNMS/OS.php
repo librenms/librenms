@@ -76,7 +76,7 @@ class OS implements
     /**
      * @var float
      */
-    protected $stpTimeFactor; // for stp time quirks
+    public $stpTimeFactor; // for stp time quirks
     private $device; // annoying use of references to make sure this is in sync with global $device variable
     private $graphs; // stores device graphs
     private $cache; // data cache

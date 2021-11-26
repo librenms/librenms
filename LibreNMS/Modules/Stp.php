@@ -86,15 +86,15 @@ class Stp implements Module
             'bridgeForwardDelay' => $stp['BRIDGE-MIB::dot1dStpBridgeForwardDelay.0'] * $timeFactor,
         ]);
 
-        $os->getDevice()->setRelation('stpConfig', $stpConfig); // save sql query below
+        $os->getDevice()->setRelation('stpInstances', collect([$stpConfig])); // save sql query below
         $this->poll($os);  // poll ports
     }
 
     public function poll(OS $os): void
     {
-        $config = $os->getDevice()->stpConfig;
+        $instances = $os->getDevice()->stpInstances;
 
-        if ($config === null) {
+        if (! $instances || $instances->isEmpty()) {
             return;
         }
 
