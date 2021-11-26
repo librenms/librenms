@@ -66,7 +66,7 @@ class HimoinsaGensets extends OS
     */
 
     /**
-     * @param int $value
+     * @param  int  $value
      */
     public static function motorStatus($value): int
     {
@@ -74,7 +74,7 @@ class HimoinsaGensets extends OS
     }
 
     /**
-     * @param int $value
+     * @param  int  $value
      */
     public static function modeStatus($value): int
     {
@@ -82,7 +82,7 @@ class HimoinsaGensets extends OS
     }
 
     /**
-     * @param int $value
+     * @param  int  $value
      */
     public static function alarmStatus($value): int
     {
@@ -90,7 +90,7 @@ class HimoinsaGensets extends OS
     }
 
     /**
-     * @param int $value
+     * @param  int  $value
      */
     public static function transferPumpStatus($value): int
     {
@@ -98,7 +98,7 @@ class HimoinsaGensets extends OS
     }
 
     /**
-     * @param int $value
+     * @param  int  $value
      */
     public static function commStatus($value): int
     {
@@ -106,7 +106,7 @@ class HimoinsaGensets extends OS
     }
 
     /**
-     * @param int $value
+     * @param  int  $value
      */
     public static function cec7CommStatus($value): int
     {
@@ -114,7 +114,7 @@ class HimoinsaGensets extends OS
     }
 
     /**
-     * @param int $value
+     * @param  int  $value
      */
     public static function cec7CommAlarmStatus($value): int
     {
@@ -122,7 +122,7 @@ class HimoinsaGensets extends OS
     }
 
     /**
-     * @param int $value
+     * @param  int  $value
      */
     public static function cec7ModeStatus($value): int
     {
