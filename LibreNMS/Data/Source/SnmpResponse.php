@@ -68,7 +68,7 @@ class SnmpResponse
     {
         $this->errorMessage = '';
         // not checking exitCode because I think it may lead to false negatives
-        $invalid = preg_match('/(Timeout: No Response from .*|Unknown user name|Authentication failure)/', $this->stderr, $errors)
+        $invalid = preg_match('/(Timeout: No Response from .*|Unknown user name|Authentication failure|Error: OID not increasing: .*)/', $this->stderr, $errors)
             || empty($this->raw)
             || preg_match('/(No Such Instance|No Such Object|No more variables left).*/', $this->raw, $errors);
 

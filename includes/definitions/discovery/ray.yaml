@@ -1,6 +1,80 @@
+mib: RAY-MIB
 modules:
     os:
-        features: RAY-MIB::unitType
-        hardware: RAY-MIB::productName
-        serial: RAY-MIB::serialNumber
-        version: RAY-MIB::swVer
+        features: RAY-MIB::unitType.0
+        hardware: RAY-MIB::productName.0
+        serial: RAY-MIB::serialNumber.0
+        version: RAY-MIB::swVer.0
+
+    mempools:
+        data:
+            -
+                percent_used: RAY-MIB::useMemory
+
+    processors:
+        data:
+            -
+                oid: useCpu
+                num_oid: '.1.3.6.1.4.1.33555.1.1.5.1.{{ $index }}'
+
+    sensors:
+        voltage:
+            data:
+                -
+                    oid: voltageUnit
+                    num_oid: '.1.3.6.1.4.1.33555.1.1.4.3.{{ $index }}'
+                    descr: Voltage
+                    divisor: 10
+
+        temperature:
+            data:
+                -
+                    oid: temperatureRadio
+                    num_oid: '.1.3.6.1.4.1.33555.1.1.4.2.{{ $index }}'
+                    descr: Temperature
+                    divisor: 100
+
+        state:
+            data:
+                -
+                    oid: systemStatus
+                    value: systemStatus
+                    num_oid: '.1.3.6.1.4.1.33555.1.1.3.1.{{ $index }}'
+                    descr: System Status
+                    states:
+                        - { value: 0, descr: Unknown, graph: 0, generic: 3 }
+                        - { value: 1, descr: Ok, graph: 0, generic: 0 }
+                        - { value: 2, descr: Warning, graph: 0, generic: 2 }
+                        - { value: 3, descr: Alarm, graph: 0, generic: 3 }
+
+                -
+                    oid: rfPowerStatus
+                    value: rfPowerStatus
+                    num_oid: '.1.3.6.1.4.1.33555.1.1.3.4.{{ $index }}'
+                    descr: RF Power Status
+                    states:
+                        - { value: 0, descr: Unknown, graph: 0, generic: 3 }
+                        - { value: 1, descr: Ok, graph: 0, generic: 0 }
+                        - { value: 2, descr: Failure, graph: 0, generic: 3 }
+
+                -
+                    oid: lineStatus
+                    value: lineStatus
+                    num_oid: '.1.3.6.1.4.1.33555.1.1.3.2.{{ $index }}'
+                    descr: Radio Link Status
+                    states:
+                        - { value: 0, descr: Unknown, graph: 0, generic: 3 }
+                        - { value: 1, descr: Ok, graph: 0, generic: 0 }
+                        - { value: 2, descr: Analyzer, graph: 0, generic: 2 }
+                        - { value: 3, descr: Connecting, graph: 0, generic: 2 }
+                        - { value: 4, descr: Searching, graph: 0, generic: 3 }
+
+                -
+                    oid: ethPeer
+                    value: ethPeer
+                    num_oid: '.1.3.6.1.4.1.33555.1.1.3.6.{{ $index }}'
+                    descr: Peer Station Ethernet Status
+                    states:
+                        - { value: 0, descr: Unknown, graph: 0, generic: 3 }
+                        - { value: 1, descr: Up, graph: 0, generic: 0 }
+                        - { value: 2, descr: Down, graph: 0, generic: 3 }

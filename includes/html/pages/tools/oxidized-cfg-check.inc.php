@@ -23,7 +23,7 @@ if (isset($_POST['config'])) {
         <?php echo csrf_field() ?>
         <div class="form-group">
             <label for="exampleInputEmail1">Paste your Oxidized yaml config:</label>
-            <textarea name="config" value="config" rows="20" class="form-control" placeholder="Paste your Oxidized yaml config"><?php echo $_POST['config']; ?></textarea>
+            <textarea name="config" value="config" rows="20" class="form-control" placeholder="Paste your Oxidized yaml config"><?php echo htmlspecialchars($_POST['config']); ?></textarea>
         </div>
         <button type="submit" class="btn btn-default btn-primary">Validate YAML</button>
     </form>

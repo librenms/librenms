@@ -26,7 +26,7 @@ if (! Auth::user()->hasGlobalAdmin()) {
 
                     // FIXME: missing email field here on the form
                     if (LegacyAuth::get()->addUser($_POST['new_username'], $_POST['new_password'], $_POST['new_level'], $_POST['new_email'], $_POST['new_realname'], $_POST['can_modify_passwd'])) {
-                        echo '<span class=info>User ' . $_POST['new_username'] . ' added!</span>';
+                        echo '<span class=info>User ' . htmlspecialchars($_POST['new_username']) . ' added!</span>';
                     }
                 } else {
                     echo '<div class="red">User with this name already exists!</div>';
