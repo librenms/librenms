@@ -83,7 +83,7 @@ class OS implements
      *
      * @param  array  $device
      */
-    private function __construct(&$device)
+    protected function __construct(&$device)
     {
         $this->device = &$device;
         $this->graphs = [];

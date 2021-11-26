@@ -45,6 +45,8 @@ class Stp implements Module
             return;
         }
 
+        $timeFactor = $os->stpTimeFactor ?? 0.01;
+
         // fetch STP config and store it
         $stp = \SnmpQuery::enumStrings()->get([
             'BRIDGE-MIB::dot1dBaseBridgeAddress.0',
@@ -62,27 +64,27 @@ class Stp implements Module
             'BRIDGE-MIB::dot1dStpBridgeMaxAge.0',
             'BRIDGE-MIB::dot1dStpBridgeHelloTime.0',
             'BRIDGE-MIB::dot1dStpBridgeForwardDelay.0',
-        ])->table(1);
+        ])->values();
 
         // TODO log root changes
         $bridge = Rewrite::macToHex($stp['BRIDGE-MIB::dot1dBaseBridgeAddress.0']);
         $stpConfig = \App\Models\Stp::updateOrCreate(['device_id' => $os->getDeviceId()], [
-            'rootBridge'                                            => $bridge == $this->rootToMac($stp['BRIDGE-MIB::dot1dStpDesignatedRoot.0']) ? 1 : 0,
-            'bridgeAddress'                                         => $bridge,
-            'protocolSpecification'                                 => $stp['BRIDGE-MIB::dot1dStpProtocolSpecification.0'],
-            'priority'                                              => $stp['BRIDGE-MIB::dot1dStpPriority.0'],
-            'timeSinceTopologyChange'                               => substr($stp['BRIDGE-MIB::dot1dStpTimeSinceTopologyChange.0'], 0, -2) ?: 0,
-            'topChanges'                                            => $stp['BRIDGE-MIB::dot1dStpTopChanges.0'],
-            'designatedRoot'                                        => $stp['BRIDGE-MIB::dot1dStpDesignatedRoot.0'],
-            'rootCost'                                              => $stp['BRIDGE-MIB::dot1dStpRootCost.0'],
-            'rootPort'                                              => $stp['BRIDGE-MIB::dot1dStpRootPort.0'],
-            'maxAge'                                                => $stp['BRIDGE-MIB::dot1dStpMaxAge.0'],
-            'helloTime'                                             => $stp['BRIDGE-MIB::dot1dStpHelloTime.0'],
-            'holdTime'                                              => $stp['BRIDGE-MIB::dot1dStpHoldTime.0'],
-            'forwardDelay'                                          => $stp['BRIDGE-MIB::dot1dStpForwardDelay.0'],
-            'bridgeMaxAge'                                          => $stp['BRIDGE-MIB::dot1dStpBridgeMaxAge.0'],
-            'bridgeHelloTime'                                       => $stp['BRIDGE-MIB::dot1dStpBridgeHelloTime.0'],
-            'bridgeForwardDelay'                                    => $stp['BRIDGE-MIB::dot1dStpBridgeForwardDelay.0'],
+            'rootBridge' => $bridge == $this->rootToMac($stp['BRIDGE-MIB::dot1dStpDesignatedRoot.0']) ? 1 : 0,
+            'bridgeAddress' => $bridge,
+            'protocolSpecification' => $stp['BRIDGE-MIB::dot1dStpProtocolSpecification.0'],
+            'priority' => $stp['BRIDGE-MIB::dot1dStpPriority.0'],
+            'timeSinceTopologyChange' => substr($stp['BRIDGE-MIB::dot1dStpTimeSinceTopologyChange.0'], 0, -2) ?: 0,
+            'topChanges' => $stp['BRIDGE-MIB::dot1dStpTopChanges.0'],
+            'designatedRoot' => $this->rootToMac($stp['BRIDGE-MIB::dot1dStpDesignatedRoot.0']),
+            'rootCost' => $stp['BRIDGE-MIB::dot1dStpRootCost.0'],
+            'rootPort' => $stp['BRIDGE-MIB::dot1dStpRootPort.0'],
+            'maxAge' => $stp['BRIDGE-MIB::dot1dStpMaxAge.0'] * $timeFactor,
+            'helloTime' => $stp['BRIDGE-MIB::dot1dStpHelloTime.0'] * $timeFactor,
+            'holdTime' => $stp['BRIDGE-MIB::dot1dStpHoldTime.0'] * $timeFactor,
+            'forwardDelay' => $stp['BRIDGE-MIB::dot1dStpForwardDelay.0'] * $timeFactor,
+            'bridgeMaxAge' => $stp['BRIDGE-MIB::dot1dStpBridgeMaxAge.0'] * $timeFactor,
+            'bridgeHelloTime' => $stp['BRIDGE-MIB::dot1dStpBridgeHelloTime.0'] * $timeFactor,
+            'bridgeForwardDelay' => $stp['BRIDGE-MIB::dot1dStpBridgeForwardDelay.0'] * $timeFactor,
         ]);
 
         $os->getDevice()->setRelation('stpConfig', $stpConfig); // save sql query below
@@ -111,15 +113,17 @@ class Stp implements Module
                     'designatedPort' => $this->designatedPort($data['BRIDGE-MIB::dot1dStpPortDesignatedPort']),
                     'forwardTransitions' => $data['BRIDGE-MIB::dot1dStpPortForwardTransitions'],
                 ]);
-        });
+            });
 
         ModuleModelObserver::observe(PortStp::class);
         $this->syncModels($os->getDevice(), 'stpPorts', $ports);
+        echo PHP_EOL;
     }
 
     public function cleanup(OS $os): void
     {
-        // TODO: Implement cleanup() method.
+        $os->getDevice()->stpConfig()->delete();
+        $os->getDevice()->stpPorts()->delete();
     }
 
     /**
@@ -130,7 +134,7 @@ class Stp implements Module
         $dr = str_replace(['.', ' ', ':', '-'], '', strtolower($root));
         return substr($dr, -12); //remove first two octets
     }
-    
+
     public function designatedPort(string $dp): string
     {
         if (preg_match('/-(\d+)/', $dp, $matches)) {
