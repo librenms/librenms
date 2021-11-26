@@ -230,6 +230,9 @@
                                                     "string"
                                                 ]
                                             },
+                                            "user_func": {
+                                                "type": "string"
+                                            },
                                             "states": {
                                                 "type": "array",
                                                 "items": {
