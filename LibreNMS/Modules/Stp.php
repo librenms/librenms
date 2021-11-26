@@ -133,6 +133,7 @@ class Stp implements Module
     public function rootToMac(string $root): string
     {
         $dr = str_replace(['.', ' ', ':', '-'], '', strtolower($root));
+
         return substr($dr, -12); //remove first two octets
     }
 
@@ -145,6 +146,7 @@ class Stp implements Module
 
         // Port saved in format priority+port (ieee 802.1d-1998: clause 8.5.5.1)
         $dp = substr($dp, -2); //discard the first octet (priority part)
+
         return hexdec($dp);
     }
 }
