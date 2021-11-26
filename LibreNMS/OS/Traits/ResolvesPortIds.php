@@ -37,6 +37,8 @@ trait ResolvesPortIds
     private $basePortIdMap;
 
     /**
+     * Figure out the port_id from the BRIDGE-MIB::dot1dBasePort
+     *
      * @param  int|string  $port
      * @return  int
      */
@@ -46,6 +48,8 @@ trait ResolvesPortIds
     }
 
     /**
+     * Figure out the port_id from IF-MIB::ifIndex
+     *
      * @param  int|string  $ifIndex
      * @return  int
      */
@@ -54,7 +58,7 @@ trait ResolvesPortIds
         return $this->ifIndexToPortIdMap()[$ifIndex] ?? 0;
     }
 
-    public function ifIndexToPortIdMap(): array
+    private function ifIndexToPortIdMap(): array
     {
         if ($this->ifIndexPortIdMap === null) {
             $this->ifIndexPortIdMap = $this->getDevice()->ports()->pluck('port_id', 'ifIndex')->all();
@@ -63,7 +67,7 @@ trait ResolvesPortIds
         return $this->ifIndexPortIdMap;
     }
 
-    public function basePortToPortIdMap(): array
+    private function basePortToPortIdMap(): array
     {
         if ($this->basePortIdMap === null) {
             $base = $this->getCacheByIndex('BRIDGE-MIB::dot1dBasePortIfIndex');
