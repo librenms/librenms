@@ -99,4 +99,8 @@ class HimoinsaGensets extends OS
     {
         return $value & 1;
     }
+    public static function cec7ModeStatus($value): int
+    {
+        return ($value & 2) | ($value & 4) | ($value & 8) | ($value & 16);
+    }
 }

@@ -207,7 +207,7 @@ modules:
                     oid: status
                     num_oid: '.1.3.6.1.4.1.41809.1.46.{{ $index }}'
                     user_func: \LibreNMS\OS\HimoinsaGensets::commStatus
-                    index: 'comm_mode.0'
+                    index: 'comm'
                     descr: Commutator Mode
                     group: 'CEA7/CEM7'
                     state_name: HimoinsaCommStatus
@@ -219,7 +219,7 @@ modules:
                     oid: statusConm
                     num_oid: '.1.3.6.1.4.1.41809.1.55.1.28.{{ $index }}'
                     user_func: \LibreNMS\OS\HimoinsaGensets::cec7CommStatus
-                    index: 'comm_mode.{{ $index }}'
+                    index: 'comm'
                     descr: Commutator Mode
                     group: 'CEC7'
                     state_name: HimoinsaCec7CommStatus
@@ -231,10 +231,24 @@ modules:
                     oid: statusConm
                     num_oid: '.1.3.6.1.4.1.41809.1.55.1.28.{{ $index }}'
                     user_func: \LibreNMS\OS\HimoinsaGensets::cec7CommAlarmStatus
-                    index: 'comm_alarm.{{ $index }}'
-                    descr: Commutator Alarm
+                    index: 'alarm'
+                    descr: Alarm
                     group: 'CEC7'
                     state_name: HimoinsaCec7AlarmStatus
                     states:
                         - {value: 0, generic: 0, graph: 0, descr: No Alarm}
                         - {value: 1, generic: 2, graph: 0, descr: Alarm}
+                -
+                    oid: statusConm
+                    num_oid: '.1.3.6.1.4.1.41809.1.55.1.28.{{ $index }}'
+                    user_func: \LibreNMS\OS\HimoinsaGensets::cec7ModeStatus
+                    index: mode
+                    descr: Mode
+                    group: 'CEC7'
+                    state_name: HimoinsaCec7ModeStatus
+                    states:
+                        - {value: 2, generic: 0, graph: 0, descr: Auto}
+                        - {value: 4, generic: 2, graph: 0, descr: Manual}
+                        - {value: 8, generic: 1, graph: 0, descr: Test}
+                        - {value: 16, generic: 2, graph: 0, descr: Blocked}
+                        - {value: 0, generic: 3, graph: 0, descr: Unknown}
