@@ -207,7 +207,7 @@ modules:
                     oid: status
                     num_oid: '.1.3.6.1.4.1.41809.1.46.{{ $index }}'
                     user_func: \LibreNMS\OS\HimoinsaGensets::commStatus
-                    index: 'comm'
+                    index: comm
                     descr: Commutator Mode
                     group: 'CEA7/CEM7'
                     state_name: HimoinsaCommStatus
@@ -219,7 +219,7 @@ modules:
                     oid: statusConm
                     num_oid: '.1.3.6.1.4.1.41809.1.55.1.28.{{ $index }}'
                     user_func: \LibreNMS\OS\HimoinsaGensets::cec7CommStatus
-                    index: 'comm'
+                    index: 'cec7_comm.{{ $index }}'
                     descr: Commutator Mode
                     group: 'CEC7'
                     state_name: HimoinsaCec7CommStatus
@@ -231,7 +231,7 @@ modules:
                     oid: statusConm
                     num_oid: '.1.3.6.1.4.1.41809.1.55.1.28.{{ $index }}'
                     user_func: \LibreNMS\OS\HimoinsaGensets::cec7CommAlarmStatus
-                    index: 'alarm'
+                    index: 'cec7_alarm.{{ $index }}'
                     descr: Alarm
                     group: 'CEC7'
                     state_name: HimoinsaCec7AlarmStatus
@@ -242,7 +242,7 @@ modules:
                     oid: statusConm
                     num_oid: '.1.3.6.1.4.1.41809.1.55.1.28.{{ $index }}'
                     user_func: \LibreNMS\OS\HimoinsaGensets::cec7ModeStatus
-                    index: mode
+                    index: 'cec7_mode.{{ $index }}'
                     descr: Mode
                     group: 'CEC7'
                     state_name: HimoinsaCec7ModeStatus
