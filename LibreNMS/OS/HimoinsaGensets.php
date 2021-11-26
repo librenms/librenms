@@ -65,40 +65,65 @@ class HimoinsaGensets extends OS
         A = Motor Running
     */
 
+    /**
+     * @param int $value
+     */
     public static function motorStatus($value): int
     {
         return ($value & 1) | ($value & 2);
     }
 
+    /**
+     * @param int $value
+     */
     public static function modeStatus($value): int
     {
         return ($value & 4) | ($value & 8) | ($value & 16) | ($value & 32);
     }
 
+    /**
+     * @param int $value
+     */
     public static function alarmStatus($value): int
     {
         return $value & 128;
     }
 
+    /**
+     * @param int $value
+     */
     public static function transferPumpStatus($value): int
     {
         return $value & 64;
     }
 
+    /**
+     * @param int $value
+     */
     public static function commStatus($value): int
     {
         return ($value & 512) | ($value & 256);
     }
 
+    /**
+     * @param int $value
+     */
     public static function cec7CommStatus($value): int
     {
         return ($value & 32) | ($value & 64);
     }
 
+    /**
+     * @param int $value
+     */
     public static function cec7CommAlarmStatus($value): int
     {
         return $value & 1;
     }
+
+    /**
+     * @param int $value
+     */
     public static function cec7ModeStatus($value): int
     {
         return ($value & 2) | ($value & 4) | ($value & 8) | ($value & 16);
