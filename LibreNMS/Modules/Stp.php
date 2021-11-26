@@ -123,7 +123,7 @@ class Stp implements Module
 
     public function cleanup(OS $os): void
     {
-        $os->getDevice()->stpConfig()->delete();
+        $os->getDevice()->stpInstances()->delete();
         $os->getDevice()->stpPorts()->delete();
     }
 
