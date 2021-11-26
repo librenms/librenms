@@ -121,11 +121,9 @@ if ($uptime) {
     echo "<div class='row'><div class='col-sm-4'>$uptime_text</div><div class='col-sm-8'>$uptime</div></div>";
 }
 
-if ($device['location_id']) {
+if ($device['location_id'] && $location = Location::find($device['location_id'])) {
     $maps_api = Config::get('geoloc.api_key');
     $maps_engine = $maps_api ? Config::get('geoloc.engine') : '';
-
-    $location = Location::find($device['location_id']);
     $location_valid = ($location && $location->coordinatesValid());
     $location_coords = $location_valid ? $location->lat . ', ' . $location->lng : 'N/A';
 
