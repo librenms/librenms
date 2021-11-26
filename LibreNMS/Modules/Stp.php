@@ -66,7 +66,6 @@ class Stp implements Module
             'BRIDGE-MIB::dot1dStpBridgeForwardDelay.0',
         ])->values();
 
-        // TODO log root changes
         $bridge = Rewrite::macToHex($stp['BRIDGE-MIB::dot1dBaseBridgeAddress.0']);
         $stpConfig = \App\Models\Stp::updateOrCreate(['device_id' => $os->getDeviceId()], [
             'rootBridge' => $bridge == $this->rootToMac($stp['BRIDGE-MIB::dot1dStpDesignatedRoot.0']) ? 1 : 0,
@@ -99,7 +98,7 @@ class Stp implements Module
             return;
         }
 
-        $ports = \SnmpQuery::walk('BRIDGE-MIB::dot1dStpPortTable')
+        $ports = \SnmpQuery::enumStrings()->walk('BRIDGE-MIB::dot1dStpPortTable')
             ->mapTable(function ($data, $port) use ($os) {
                 return new PortStp([
                     'port_id' => $os->basePortToId($port),
@@ -113,6 +112,8 @@ class Stp implements Module
                     'designatedPort' => $this->designatedPort($data['BRIDGE-MIB::dot1dStpPortDesignatedPort']),
                     'forwardTransitions' => $data['BRIDGE-MIB::dot1dStpPortForwardTransitions'],
                 ]);
+            })->filter(function (PortStp $port) {
+                return $port->state !== 'disabled';
             });
 
         ModuleModelObserver::observe(PortStp::class);
