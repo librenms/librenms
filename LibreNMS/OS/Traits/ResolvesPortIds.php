@@ -40,7 +40,7 @@ trait ResolvesPortIds
      * Figure out the port_id from the BRIDGE-MIB::dot1dBasePort
      *
      * @param  int|string  $port
-     * @return  int
+     * @return int
      */
     public function basePortToId($port): int
     {
@@ -51,7 +51,7 @@ trait ResolvesPortIds
      * Figure out the port_id from IF-MIB::ifIndex
      *
      * @param  int|string  $ifIndex
-     * @return  int
+     * @return int
      */
     public function ifIndexToId($ifIndex): int
     {
