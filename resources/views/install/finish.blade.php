@@ -15,7 +15,7 @@
     <div id="env-file-text" class="card-body collapse @if(!$success) show @endif">
         <button class="btn btn-primary float-right" onclick="location.reload()">{{ __('install.finish.retry') }}</button>
         <strong>
-            {{ __('install.finish.env_manual', ['file' => base_path('.env') }}])
+            {{ __('install.finish.env_manual', ['file' => base_path('.env')]) }}
         </strong>
         <div class="text-right mt-3">
             <button

@@ -590,7 +590,7 @@
                         <li role="presentation" class="divider"></li>
                         @endif
                         <li><a href="{{ url('about') }}"><i class="fa fa-info-circle fa-fw fa-lg"
-                                                            aria-hidden="true"></i> {{ __('About :project_name', ['project_name' => \LibreNMS\Config::get('project_name') }}])
+                                                            aria-hidden="true"></i> {{ __('About :project_name', ['project_name' => \LibreNMS\Config::get('project_name')]) }}
                             </a></li>
                     </ul>
                 </li>
