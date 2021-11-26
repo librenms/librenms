@@ -27,14 +27,28 @@ namespace LibreNMS\OS\Traits;
 
 trait ResolvesPortIds
 {
+    /**
+     * @var array
+     */
     private $ifIndexPortIdMap;
+    /**
+     * @var array
+     */
     private $basePortIdMap;
 
+    /**
+     * @param  int|string  $port
+     * @return  int
+     */
     public function basePortToId($port): int
     {
         return $this->basePortToPortIdMap()[$port] ?? 0;
     }
 
+    /**
+     * @param  int|string  $ifIndex
+     * @return  int
+     */
     public function ifIndexToId($ifIndex): int
     {
         return $this->ifIndexToPortIdMap()[$ifIndex] ?? 0;

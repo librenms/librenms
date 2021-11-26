@@ -137,16 +137,16 @@ class Stp implements Module
         return substr($dr, -12); //remove first two octets
     }
 
-    public function designatedPort(string $dp): string
+    public function designatedPort(string $dp): int
     {
         if (preg_match('/-(\d+)/', $dp, $matches)) {
             // Syntax with "priority" dash "portID" like so : 32768-54, both in decimal
-            return $matches[1];
+            return (int) $matches[1];
         }
 
         // Port saved in format priority+port (ieee 802.1d-1998: clause 8.5.5.1)
         $dp = substr($dp, -2); //discard the first octet (priority part)
 
-        return hexdec($dp);
+        return (int) hexdec($dp);
     }
 }
