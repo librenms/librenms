@@ -79,7 +79,7 @@ class WirelessController implements Module
 
             // Update RRD-files for AccessPoints and calculate total counters for the controller
             foreach ($access_points as $ap) {
-                $rrd_name = [$os->getAccessPointDatastorePrefix(),  $ap->name . $ap->radionum];
+                $rrd_name = [$os->getName(),  $ap->name . $ap->radionum];
 
                 $rrd_def = RrdDefinition::make()
                     ->addDataset('channel', 'GAUGE', 0, 200)
@@ -107,7 +107,7 @@ class WirelessController implements Module
                     'rrd_def' => $rrd_def,
                 ];
 
-                data_update($os->getDeviceArray(), $os->getDatastoreMeasurementName(), $tags, $fields);
+                data_update($os->getDeviceArray(), $os->getName(), $tags, $fields);
             }
 
             echo PHP_EOL;

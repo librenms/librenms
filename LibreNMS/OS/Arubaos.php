@@ -219,24 +219,6 @@ class Arubaos extends OS implements
         return $this->pollWirelessChannelAsFrequency($sensors, [$this, 'decodeChannel']);
     }
 
-    public function getDatastoreMeasurementName()
-    {
-        // Datastore measurement name
-        return 'aruba';
-    }
-
-    public function getWirelessControllerDatastorePrefix()
-    {
-        // Prefix used to name RRD-files for AccessPoints
-        return 'aruba-controller';
-    }
-
-    public function getAccessPointDatastorePrefix()
-    {
-        // Prefix used to name RRD-files for AccessPoints
-        return 'arubaap';
-    }
-
     /**
      * Poll wireless access points data from the controller
      * Return collection of AccessPoints

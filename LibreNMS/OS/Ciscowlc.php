@@ -126,18 +126,6 @@ class Ciscowlc extends Cisco implements
         return [];
     }
 
-    public function getWirelessControllerDatastorePrefix()
-    {
-        // Prefix used to name RRD-files for AccessPoints
-        return 'cisco-controller';
-    }
-
-    public function getAccessPointDatastorePrefix()
-    {
-        // Prefix used to name RRD-files for AccessPoints
-        return 'cisco-ap';
-    }
-
     /**
      * Poll wireless access points data from the controller
      * Return collection of AccessPoints
