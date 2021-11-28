@@ -25,13 +25,13 @@
 
 namespace LibreNMS\OS;
 
-use Illuminate\Support\Collection;
 use App\Models\Device;
 use App\Models\Mempool;
 use App\Models\PortsNac;
 use App\Models\Sla;
 use Carbon\Carbon;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use LibreNMS\Device\Processor;
 use LibreNMS\Device\WirelessSensor;
@@ -44,9 +44,9 @@ use LibreNMS\Interfaces\Discovery\SlaDiscovery;
 use LibreNMS\Interfaces\Polling\NacPolling;
 use LibreNMS\Interfaces\Polling\OSPolling;
 use LibreNMS\Interfaces\Polling\SlaPolling;
+use LibreNMS\Interfaces\Polling\WirelessAccessPointPolling;
 use LibreNMS\OS;
 use LibreNMS\RRD\RrdDefinition;
-use LibreNMS\Interfaces\Polling\WirelessAccessPointPolling;
 
 class Vrp extends OS implements
     MempoolsDiscovery,
@@ -111,9 +111,8 @@ class Vrp extends OS implements
 
     public function pollOS(): void
     {
-
     }
-    
+
     /**
      * Discover processors.
      * Returns an array of LibreNMS\Device\Processor objects that have been discovered
@@ -454,7 +453,6 @@ class Vrp extends OS implements
 
             foreach ($radioTable as $ap_id => $ap) {
                 foreach ($ap as $radio_id => $radio) {
-
                     switch ($radio['hwWlanRadioFreqType'] ?? null) {
                         case 1:
                             $type = '2.4Ghz';
@@ -482,7 +480,7 @@ class Vrp extends OS implements
                         'nummonbssid' => '0',
                         'interference' => $radio['hwWlanRadioChInterferenceRate'] ?? null,
                     ];
-                    
+
                     // Create AccessPoint models
                     $access_points->push(new AccessPoint($attributes));
                 }

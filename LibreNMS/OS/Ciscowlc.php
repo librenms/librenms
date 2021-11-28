@@ -26,24 +26,18 @@
 namespace LibreNMS\OS;
 
 use App\Models\AccessPoint;
-use App\Models\Device;
 use Illuminate\Support\Collection;
-use Illuminate\Support\Arr;
 use LibreNMS\Device\WirelessSensor;
-use LibreNMS\Interfaces\Discovery\OSDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessApCountDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessClientsDiscovery;
 use LibreNMS\Interfaces\Polling\WirelessAccessPointPolling;
-use LibreNMS\Interfaces\Polling\OSPolling;
 use LibreNMS\OS\Shared\Cisco;
-use LibreNMS\RRD\RrdDefinition;
 
 class Ciscowlc extends Cisco implements
     WirelessClientsDiscovery,
     WirelessApCountDiscovery,
     WirelessAccessPointPolling
 {
-
     /**
      * Discover wireless client counts. Type is clients.
      * Returns an array of LibreNMS\Device\Sensor objects that have been discovered
@@ -139,7 +133,7 @@ class Ciscowlc extends Cisco implements
         $APstats = snmpwalk_cache_oid($device, 'bsnApIfNoOfUsers', $APstats, 'AIRESPACE-WIRELESS-MIB', null, '-OQUsxb');
         $loadParams = snmpwalk_cache_oid($device, 'bsnAPIfLoadChannelUtilization', $loadParams, 'AIRESPACE-WIRELESS-MIB', null, '-OQUsb');
         $interferences = snmpwalk_cache_oid($device, 'bsnAPIfInterferencePower', $interferences, 'AIRESPACE-WIRELESS-MIB', null, '-OQUsb');
-   
+
         // Loop through the polled data.
         foreach ($radios as $key => $value) {
             $indexName = substr($key, 0, -2);
@@ -153,12 +147,12 @@ class Ciscowlc extends Cisco implements
             $type = $value['bsnAPIfType'];
             $interference = 128 + $interferences[$key . '.' . $channel]['bsnAPIfInterferencePower'];
             $radioutil = $loadParams[$key]['bsnAPIfLoadChannelUtilization'];
-        
+
             // TODO
             $numactbssid = 0;
             $nummonbssid = 0;
             $nummonclients = 0;
-        
+
             d_echo("  name: $name\n");
             d_echo("  radionum: $radionum\n");
             d_echo("  type: $type\n");
@@ -167,7 +161,7 @@ class Ciscowlc extends Cisco implements
             d_echo("  radioutil: $radioutil\n");
             d_echo("  numasoclients: $numasoclients\n");
             d_echo("  interference: $interference\n");
-        
+
             // TODO: Is this really needed?
             // if there is a numeric channel, assume the rest of the data is valid, I guess
             if (! is_numeric($channel)) {
