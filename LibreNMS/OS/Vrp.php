@@ -25,6 +25,7 @@
 
 namespace LibreNMS\OS;
 
+use Illuminate\Support\Collection;
 use App\Models\Device;
 use App\Models\Mempool;
 use App\Models\PortsNac;
@@ -45,6 +46,7 @@ use LibreNMS\Interfaces\Polling\OSPolling;
 use LibreNMS\Interfaces\Polling\SlaPolling;
 use LibreNMS\OS;
 use LibreNMS\RRD\RrdDefinition;
+use LibreNMS\Interfaces\Polling\WirelessAccessPointPolling;
 
 class Vrp extends OS implements
     MempoolsDiscovery,
@@ -55,7 +57,8 @@ class Vrp extends OS implements
     WirelessClientsDiscovery,
     SlaDiscovery,
     SlaPolling,
-    OSDiscovery
+    OSDiscovery,
+    WirelessAccessPointPolling
 {
     public function discoverMempools()
     {
@@ -108,182 +111,9 @@ class Vrp extends OS implements
 
     public function pollOS(): void
     {
-        // Polling the Wireless data TODO port to module
-        $apTable = snmpwalk_group($this->getDeviceArray(), 'hwWlanApName', 'HUAWEI-WLAN-AP-MIB', 2);
 
-        //Check for existence of at least 1 AP to continue the polling)
-        if (! empty($apTable)) {
-            $apTableOids = [
-                'hwWlanApSn',
-                'hwWlanApTypeInfo',
-            ];
-            foreach ($apTableOids as $apTableOid) {
-                $apTable = snmpwalk_group($this->getDeviceArray(), $apTableOid, 'HUAWEI-WLAN-AP-MIB', 2, $apTable);
-            }
-
-            $apRadioTableOids = [ // hwWlanRadioInfoTable
-                'hwWlanRadioMac',
-                'hwWlanRadioChUtilizationRate',
-                'hwWlanRadioChInterferenceRate',
-                'hwWlanRadioActualEIRP',
-                'hwWlanRadioFreqType',
-                'hwWlanRadioWorkingChannel',
-            ];
-
-            $clientPerRadio = [];
-            $radioTable = [];
-            foreach ($apRadioTableOids as $apRadioTableOid) {
-                $radioTable = snmpwalk_group($this->getDeviceArray(), $apRadioTableOid, 'HUAWEI-WLAN-AP-RADIO-MIB', 2, $radioTable);
-            }
-
-            $numClients = 0;
-            $vapInfoTable = snmpwalk_group($this->getDeviceArray(), 'hwWlanVapStaOnlineCnt', 'HUAWEI-WLAN-VAP-MIB', 3);
-            foreach ($vapInfoTable as $ap_id => $ap) {
-                //Convert mac address (hh:hh:hh:hh:hh:hh) to dec OID (ddd.ddd.ddd.ddd.ddd.ddd)
-                //$a_index_oid = implode(".", array_map("hexdec", explode(":", $ap_id)));
-                foreach ($ap as $r_id => $radio) {
-                    foreach ($radio as $s_index => $ssid) {
-                        $clientPerRadio[$ap_id][$r_id] = ($clientPerRadio[$ap_id][$r_id] ?? 0) + ($ssid['hwWlanVapStaOnlineCnt'] ?? 0);
-                        $numClients += ($ssid['hwWlanVapStaOnlineCnt'] ?? 0);
-                    }
-                }
-            }
-
-            $numRadios = count($radioTable);
-
-            $rrd_def = RrdDefinition::make()
-                ->addDataset('NUMAPS', 'GAUGE', 0, 12500000000)
-                ->addDataset('NUMCLIENTS', 'GAUGE', 0, 12500000000);
-
-            $fields = [
-                'NUMAPS' => $numRadios,
-                'NUMCLIENTS' => $numClients,
-            ];
-
-            $tags = compact('rrd_def');
-            data_update($this->getDeviceArray(), 'vrp', $tags, $fields);
-
-            $ap_db = dbFetchRows('SELECT * FROM `access_points` WHERE `device_id` = ?', [$this->getDeviceArray()['device_id']]);
-
-            foreach ($radioTable as $ap_id => $ap) {
-                foreach ($ap as $r_id => $radio) {
-                    $channel = $radio['hwWlanRadioWorkingChannel'] ?? null;
-                    $mac = $radio['hwWlanRadioMac'] ?? null;
-                    $name = ($apTable[$ap_id]['hwWlanApName'] ?? '') . ' Radio ' . $r_id;
-                    $radionum = $r_id;
-                    $txpow = $radio['hwWlanRadioActualEIRP'] ?? null;
-                    $interference = $radio['hwWlanRadioChInterferenceRate'] ?? null;
-                    $radioutil = $radio['hwWlanRadioChUtilizationRate'] ?? null;
-                    $numasoclients = $clientPerRadio[$ap_id][$r_id] ?? null;
-
-                    switch ($radio['hwWlanRadioFreqType'] ?? null) {
-                        case 1:
-                            $type = '2.4Ghz';
-                            break;
-                        case 2:
-                            $type = '5Ghz';
-                            break;
-                        default:
-                            $type = 'unknown (huawei ' . ($radio['hwWlanRadioFreqType'] ?? null) . ')';
-                    }
-
-                    // TODO
-                    $numactbssid = 0;
-                    $nummonbssid = 0;
-                    $nummonclients = 0;
-
-                    d_echo("  name: $name\n");
-                    d_echo("  radionum: $radionum\n");
-                    d_echo("  type: $type\n");
-                    d_echo("  channel: $channel\n");
-                    d_echo("  txpow: $txpow\n");
-                    d_echo("  radioutil: $radioutil\n");
-                    d_echo("  numasoclients: $numasoclients\n");
-                    d_echo("  interference: $interference\n");
-
-                    $rrd_name = ['arubaap', $name . $radionum];
-                    $rrd_def = RrdDefinition::make()
-                        ->addDataset('channel', 'GAUGE', 0, 200)
-                        ->addDataset('txpow', 'GAUGE', 0, 200)
-                        ->addDataset('radioutil', 'GAUGE', 0, 100)
-                        ->addDataset('nummonclients', 'GAUGE', 0, 500)
-                        ->addDataset('nummonbssid', 'GAUGE', 0, 200)
-                        ->addDataset('numasoclients', 'GAUGE', 0, 500)
-                        ->addDataset('interference', 'GAUGE', 0, 2000);
-
-                    $fields = [
-                        'channel' => $channel,
-                        'txpow' => $txpow,
-                        'radioutil' => $radioutil,
-                        'nummonclients' => $nummonclients,
-                        'nummonbssid' => $nummonbssid,
-                        'numasoclients' => $numasoclients,
-                        'interference' => $interference,
-                    ];
-
-                    $tags = compact('name', 'radionum', 'rrd_name', 'rrd_def');
-                    data_update($this->getDeviceArray(), 'arubaap', $tags, $fields);
-
-                    $foundid = 0;
-
-                    for ($z = 0; $z < sizeof($ap_db); $z++) {
-                        if ($ap_db[$z]['name'] == $name && $ap_db[$z]['radio_number'] == $radionum) {
-                            $foundid = $ap_db[$z]['accesspoint_id'];
-                            $ap_db[$z]['seen'] = 1;
-                            continue;
-                        }
-                    }
-
-                    if ($foundid == 0) {
-                        $ap_id = dbInsert(
-                            [
-                                'device_id' => $this->getDeviceArray()['device_id'],
-                                'name' => $name,
-                                'radio_number' => $radionum,
-                                'type' => $type,
-                                'mac_addr' => $mac,
-                                'channel' => $channel,
-                                'txpow' => $txpow,
-                                'radioutil' => $radioutil,
-                                'numasoclients' => $numasoclients,
-                                'nummonclients' => $nummonclients,
-                                'numactbssid' => $numactbssid,
-                                'nummonbssid' => $nummonbssid,
-                                'interference' => $interference,
-                            ],
-                            'access_points'
-                        );
-                    } else {
-                        dbUpdate(
-                            [
-                                'mac_addr' => $mac,
-                                'type' => $type,
-                                'deleted' => 0,
-                                'channel' => $channel,
-                                'txpow' => $txpow,
-                                'radioutil' => $radioutil,
-                                'numasoclients' => $numasoclients,
-                                'nummonclients' => $nummonclients,
-                                'numactbssid' => $numactbssid,
-                                'nummonbssid' => $nummonbssid,
-                                'interference' => $interference,
-                            ],
-                            'access_points',
-                            '`accesspoint_id` = ?',
-                            [$foundid]
-                        );
-                    }
-                }//end foreach 1
-            }//end foreach 2
-
-            for ($z = 0; $z < sizeof($ap_db); $z++) {
-                if (! isset($ap_db[$z]['seen']) && $ap_db[$z]['deleted'] == 0) {
-                    dbUpdate(['deleted' => 1], 'access_points', '`accesspoint_id` = ?', [$ap_db[$z]['accesspoint_id']]);
-                }
-            }
-        }
     }
-
+    
     /**
      * Discover processors.
      * Returns an array of LibreNMS\Device\Processor objects that have been discovered
@@ -574,5 +404,91 @@ class Vrp extends OS implements
             d_echo('The following datasources were collected for #' . $sla['sla_nr'] . ":\n");
             d_echo($fields);
         }
+    }
+
+    public function pollWirelessAccessPoints()
+    {
+        $access_points = new Collection;
+
+        // Polling the Wireless data
+        $apTable = snmpwalk_group($this->getDeviceArray(), 'hwWlanApName', 'HUAWEI-WLAN-AP-MIB', 2);
+
+        // Check for existence of at least 1 AP to continue the polling)
+        if (! empty($apTable)) {
+            $apTableOids = [
+                'hwWlanApSn',
+                'hwWlanApTypeInfo',
+            ];
+
+            foreach ($apTableOids as $apTableOid) {
+                $apTable = snmpwalk_group($this->getDeviceArray(), $apTableOid, 'HUAWEI-WLAN-AP-MIB', 2, $apTable);
+            }
+
+            $apRadioTableOids = [ // hwWlanRadioInfoTable
+                'hwWlanRadioMac',
+                'hwWlanRadioChUtilizationRate',
+                'hwWlanRadioChInterferenceRate',
+                'hwWlanRadioActualEIRP',
+                'hwWlanRadioFreqType',
+                'hwWlanRadioWorkingChannel',
+            ];
+
+            $clientPerRadio = [];
+            $radioTable = [];
+            foreach ($apRadioTableOids as $apRadioTableOid) {
+                $radioTable = snmpwalk_group($this->getDeviceArray(), $apRadioTableOid, 'HUAWEI-WLAN-AP-RADIO-MIB', 2, $radioTable);
+            }
+
+            $numClients = 0;
+            $vapInfoTable = snmpwalk_group($this->getDeviceArray(), 'hwWlanVapStaOnlineCnt', 'HUAWEI-WLAN-VAP-MIB', 3);
+            foreach ($vapInfoTable as $ap_id => $ap) {
+                //Convert mac address (hh:hh:hh:hh:hh:hh) to dec OID (ddd.ddd.ddd.ddd.ddd.ddd)
+                //$a_index_oid = implode(".", array_map("hexdec", explode(":", $ap_id)));
+                foreach ($ap as $r_id => $radio) {
+                    foreach ($radio as $s_index => $ssid) {
+                        $clientPerRadio[$ap_id][$r_id] = ($clientPerRadio[$ap_id][$r_id] ?? 0) + ($ssid['hwWlanVapStaOnlineCnt'] ?? 0);
+                        $numClients += ($ssid['hwWlanVapStaOnlineCnt'] ?? 0);
+                    }
+                }
+            }
+
+            foreach ($radioTable as $ap_id => $ap) {
+                foreach ($ap as $radio_id => $radio) {
+
+                    switch ($radio['hwWlanRadioFreqType'] ?? null) {
+                        case 1:
+                            $type = '2.4Ghz';
+                            break;
+                        case 2:
+                            $type = '5Ghz';
+                            break;
+                        default:
+                            $type = 'unknown (huawei ' . ($radio['hwWlanRadioFreqType'] ?? null) . ')';
+                    }
+
+                    $attributes = [
+                        'device_id' => $this->getDeviceId(),
+                        'name' => ($apTable[$ap_id]['hwWlanApName'] ?? '') . ' Radio ' . $radio_id,
+                        'radio_number' => $radio_id,
+                        'type' => $type,
+                        'mac_addr' => $radio['hwWlanRadioMac'] ?? null,
+                        'channel' => $radio['hwWlanRadioWorkingChannel'] ?? null,
+                        'txpow' => $radio['hwWlanRadioActualEIRP'] ?? null,
+                        'radioutil' => $radio['hwWlanRadioChUtilizationRate'] ?? null,
+                        'numasoclients' => $clientPerRadio[$ap_id][$radio_id] ?? null,
+                        // TODO the next three fields...
+                        'nummonclients' => '0',
+                        'numactbssid' => '0',
+                        'nummonbssid' => '0',
+                        'interference' => $radio['hwWlanRadioChInterferenceRate'] ?? null,
+                    ];
+                    
+                    // Create AccessPoint models
+                    $access_points->push(new AccessPoint($attributes));
+                }
+            }
+        }
+        // Return the collection of AccessPoint models
+        return $access_points;
     }
 }
