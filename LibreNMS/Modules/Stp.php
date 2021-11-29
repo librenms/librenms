@@ -94,7 +94,7 @@ class Stp implements Module
     {
         $instances = $os->getDevice()->stpInstances;
 
-        if (! $instances || $instances->isEmpty()) {
+        if ($instances->isEmpty()) {
             return;
         }
 

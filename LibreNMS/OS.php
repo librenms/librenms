@@ -74,7 +74,7 @@ class OS implements
     use ResolvesPortIds;
 
     /**
-     * @var float
+     * @var float|null
      */
     public $stpTimeFactor; // for stp time quirks
     private $device; // annoying use of references to make sure this is in sync with global $device variable
