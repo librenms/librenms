@@ -14611,49 +14611,49 @@
                 {
                     "vlan_vlan": 1,
                     "vlan_domain": 1,
-                    "vlan_name": "Vlan_1",
+                    "vlan_name": "VLAN 1",
                     "vlan_type": null,
                     "vlan_mtu": null
                 },
                 {
                     "vlan_vlan": 60,
                     "vlan_domain": 1,
-                    "vlan_name": "Vlan_60",
+                    "vlan_name": "VLAN 60",
                     "vlan_type": null,
                     "vlan_mtu": null
                 },
                 {
                     "vlan_vlan": 210,
                     "vlan_domain": 1,
-                    "vlan_name": "Vlan_210",
+                    "vlan_name": "VLAN 210",
                     "vlan_type": null,
                     "vlan_mtu": null
                 },
                 {
                     "vlan_vlan": 2501,
                     "vlan_domain": 1,
-                    "vlan_name": "Vlan_2501",
+                    "vlan_name": "VLAN 2501",
                     "vlan_type": null,
                     "vlan_mtu": null
                 },
                 {
                     "vlan_vlan": 2502,
                     "vlan_domain": 1,
-                    "vlan_name": "Vlan_2502",
+                    "vlan_name": "VLAN 2502",
                     "vlan_type": null,
                     "vlan_mtu": null
                 },
                 {
                     "vlan_vlan": 2503,
                     "vlan_domain": 1,
-                    "vlan_name": "Vlan_2503",
+                    "vlan_name": "VLAN 2503",
                     "vlan_type": null,
                     "vlan_mtu": null
                 },
                 {
                     "vlan_vlan": 2835,
                     "vlan_domain": 1,
-                    "vlan_name": "Vlan_2835",
+                    "vlan_name": "VLAN 2835",
                     "vlan_type": null,
                     "vlan_mtu": null
                 }

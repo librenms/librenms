@@ -6133,7 +6133,7 @@
                 {
                     "vlan_vlan": 4093,
                     "vlan_domain": 1,
-                    "vlan_name": "Vlan_4093",
+                    "vlan_name": "VLAN 4093",
                     "vlan_type": null,
                     "vlan_mtu": null
                 }

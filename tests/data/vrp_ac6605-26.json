@@ -7248,56 +7248,56 @@
                 {
                     "vlan_vlan": 1,
                     "vlan_domain": 1,
-                    "vlan_name": "Vlan_1",
+                    "vlan_name": "VLAN 1",
                     "vlan_type": null,
                     "vlan_mtu": null
                 },
                 {
                     "vlan_vlan": 70,
                     "vlan_domain": 1,
-                    "vlan_name": "Vlan_70",
+                    "vlan_name": "VLAN 70",
                     "vlan_type": null,
                     "vlan_mtu": null
                 },
                 {
                     "vlan_vlan": 71,
                     "vlan_domain": 1,
-                    "vlan_name": "Vlan_71",
+                    "vlan_name": "VLAN 71",
                     "vlan_type": null,
                     "vlan_mtu": null
                 },
                 {
                     "vlan_vlan": 391,
                     "vlan_domain": 1,
-                    "vlan_name": "Vlan_391",
+                    "vlan_name": "VLAN 391",
                     "vlan_type": null,
                     "vlan_mtu": null
                 },
                 {
                     "vlan_vlan": 392,
                     "vlan_domain": 1,
-                    "vlan_name": "Vlan_392",
+                    "vlan_name": "VLAN 392",
                     "vlan_type": null,
                     "vlan_mtu": null
                 },
                 {
                     "vlan_vlan": 393,
                     "vlan_domain": 1,
-                    "vlan_name": "Vlan_393",
+                    "vlan_name": "VLAN 393",
                     "vlan_type": null,
                     "vlan_mtu": null
                 },
                 {
                     "vlan_vlan": 395,
                     "vlan_domain": 1,
-                    "vlan_name": "Vlan_395",
+                    "vlan_name": "VLAN 395",
                     "vlan_type": null,
                     "vlan_mtu": null
                 },
                 {
                     "vlan_vlan": 419,
                     "vlan_domain": 1,
-                    "vlan_name": "Vlan_419",
+                    "vlan_name": "VLAN 419",
                     "vlan_type": null,
                     "vlan_mtu": null
                 }
