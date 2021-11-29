@@ -160,7 +160,14 @@ class SnmpResponse
     public function table(int $group = 0, array &$array = []): array
     {
         foreach ($this->values() as $key => $value) {
-            preg_match_all('/([^[\].]+)/', $key, $parts);
+            if (Str::contains($key, '[')) {
+                // table
+                preg_match_all('/([^[\]]+)/', $key, $parts);
+            } else {
+                // regular oid
+                $parts = explode('.', $key);
+            }
+
             $parts = $parts[1];
             array_splice($parts, $group, 0, array_shift($parts)); // move the oid name to the correct depth
 
