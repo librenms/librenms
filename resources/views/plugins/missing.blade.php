@@ -1,1 +1,1 @@
-<h2>@lang('plugins.errors.view_missing')</h2>
+<h2>{{ __('plugins.errors.view_missing') }}</h2>

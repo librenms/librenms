@@ -1,5 +1,5 @@
 <div class="form-group @if($errors->has('name')) has-error @endif">
-    <label for="name" class="control-label col-sm-3 col-md-2 text-nowrap">@lang('Name')</label>
+    <label for="name" class="control-label col-sm-3 col-md-2 text-nowrap">{{ __('Name') }}</label>
     <div class="col-sm-9 col-md-10">
         <input type="text" class="form-control" id="name" name="name" value="{{ old('name', $template->name) }}">
         <span class="help-block">{{ $errors->first('name') }}</span>
@@ -7,20 +7,20 @@
 </div>
 
 <div class="form-group @if($errors->has('type')) has-error @endif">
-    <label for="type" class="control-label col-sm-3 col-md-2">@lang('Device Type')</label>
+    <label for="type" class="control-label col-sm-3 col-md-2">{{ __('Device Type') }}</label>
     <div class="col-sm-9 col-md-10">
         <select class="form-control" id="type" name="type" onchange="change_st_dtype(this)">
             <option value="static"
-                    @if(old('type', $template->type) == 'static') selected @endif>@lang('Static')</option>
+                    @if(old('type', $template->type) == 'static') selected @endif>{{ __('Static') }}</option>
             <option value="dynamic"
-                    @if(old('type', $template->type) == 'dynamic') selected @endif>@lang('Dynamic')</option>
+                    @if(old('type', $template->type) == 'dynamic') selected @endif>{{ __('Dynamic') }}</option>
         </select>
         <span class="help-block">{{ $errors->first('type') }}</span>
     </div>
 </div>
 
 <div id="dynamic-st-d-form" class="form-group @if($errors->has('rules')) has-error @endif" style="display: none">
-    <label for="rules" class="control-label col-sm-3 col-md-2 text-wrap">@lang('Define Device Rules')</label>
+    <label for="rules" class="control-label col-sm-3 col-md-2 text-wrap">{{ __('Define Device Rules') }}</label>
     <div class="col-sm-9 col-md-10">
         <div id="builder"></div>
         <span class="help-block">{{ $errors->first('rules') }}</span>
@@ -28,7 +28,7 @@
 </div>
 
 <div id="static-st-d-form" class="form-group @if($errors->has('devices')) has-error @endif">
-    <label for="devices" class="control-label col-sm-3 col-md-2 text-nowrap">@lang('Select Devices')</label>
+    <label for="devices" class="control-label col-sm-3 col-md-2 text-nowrap">{{ __('Select Devices') }}</label>
     <div class="col-sm-9 col-md-10">
         <select class="form-control" id="devices" name="devices[]" multiple>
             @foreach($template->devices as $device)
@@ -40,7 +40,7 @@
 </div>
 
 <div id="static-st-dg-form" class="form-group @if($errors->has('groups')) has-error @endif">
-    <label for="groups" class="control-label col-sm-3 col-md-2 text-wrap">@lang('Device Groups')</label>
+    <label for="groups" class="control-label col-sm-3 col-md-2 text-wrap">{{ __('Device Groups') }}</label>
     <div class="col-sm-9 col-md-10">
         <select class="form-control" id="groups" name="groups[]" multiple>
             @foreach($template->groups as $group)
@@ -52,7 +52,7 @@
 </div>
 
 <div class="form-group @if($errors->has('check')) has-error @endif">
-    <label for="check" class="control-label col-sm-3 col-md-2">@lang('Check Type')</label>
+    <label for="check" class="control-label col-sm-3 col-md-2">{{ __('Check Type') }}</label>
     <div class="col-sm-9 col-md-10">
         <select class="form-control" id="check" name="check">
             @foreach($services as $current_service)
@@ -64,7 +64,7 @@
 </div>
 
 <div class="form-group @if($errors->has('desc')) has-error @endif">
-    <label for="desc" class="control-label col-sm-3 col-md-2 text-nowrap">@lang('Description')</label>
+    <label for="desc" class="control-label col-sm-3 col-md-2 text-nowrap">{{ __('Description') }}</label>
     <div class="col-sm-9 col-md-10">
         <input type="text" class="form-control" id="desc" name="desc" value="{{ old('desc', $template->desc) }}">
         <span class="help-block">{{ $errors->first('desc') }}</span>
@@ -72,7 +72,7 @@
 </div>
 
 <div class="form-group @if($errors->has('ip')) has-error @endif">
-    <label for="ip" class="control-label col-sm-3 col-md-2 text-nowrap">@lang('Remote Host')</label>
+    <label for="ip" class="control-label col-sm-3 col-md-2 text-nowrap">{{ __('Remote Host') }}</label>
     <div class="col-sm-9 col-md-10">
         <input type="text" class="form-control" id="ip" name="ip" value="{{ old('ip', $template->ip) }}">
         <span class="help-block">{{ $errors->first('ip') }}</span>
@@ -80,7 +80,7 @@
 </div>
 
 <div class="form-group @if($errors->has('param')) has-error @endif">
-    <label for="param" class="control-label col-sm-3 col-md-2 text-nowrap">@lang('Parameters')</label>
+    <label for="param" class="control-label col-sm-3 col-md-2 text-nowrap">{{ __('Parameters') }}</label>
     <div class="col-sm-9 col-md-10">
         <input type="text" class="form-control" id="param" name="param" value="{{ old('param', $template->param) }}">
         <span class="help-block">{{ $errors->first('param') }}</span>
@@ -94,7 +94,7 @@
 </div>
 
 <div class="form-group @if($errors->has('ignore')) has-error @endif">
-    <label for="ignore" class="control-label col-sm-3 col-md-2 text-nowrap">@lang('Ignore alert tag')</label>
+    <label for="ignore" class="control-label col-sm-3 col-md-2 text-nowrap">{{ __('Ignore alert tag') }}</label>
     <div class="col-sm-9 col-md-10">
         <input type="hidden" value="0" name="ignore">
         <input type="checkbox" class="form-control" id="ignore" name="ignore" data-size="small" value="{{ old('ignore', $template->ignore) }}"@if(old('ignore', $template->ignore) == 1) checked @endif>
@@ -103,7 +103,7 @@
 </div>
 
 <div class="form-group @if($errors->has('disabled')) has-error @endif">
-    <label for="disabled" class="control-label col-sm-3 col-md-2 text-wrap">@lang('Disable polling and alerting')</label>
+    <label for="disabled" class="control-label col-sm-3 col-md-2 text-wrap">{{ __('Disable polling and alerting') }}</label>
     <div class="col-sm-9 col-md-10">
         <input type="hidden" value="0" name="disabled">
         <input type="checkbox" class="form-control" id="disabled" name="disabled" data-size="small" value="{{ old('disabled', $template->disabled) }}"@if(old('disabled', $template->disabled) == 1) checked @endif>

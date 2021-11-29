@@ -1,25 +1,25 @@
 @if($device_totals)
 <div class="widget-availability-host">
-    <span>@lang('Total hosts')</span>
+    <span>{{ __('Total hosts') }}</span>
     @if($show_disabled_and_ignored)
-        <a href="{{ url('devices/disable_notify=1') }}"><span class="label label-default label-font-border label-border">@lang('alert-disabled'): {{ $device_totals['ignored'] }}</span></a>
-        <a href="{{ url('devices/disabled=1') }}"><span class="label blackbg label-font-border label-border">@lang('disabled'): {{ $device_totals['disabled'] }}</span></a>
+        <a href="{{ url('devices/disable_notify=1') }}"><span class="label label-default label-font-border label-border">{{ __('alert-disabled') }}: {{ $device_totals['ignored'] }}</span></a>
+        <a href="{{ url('devices/disabled=1') }}"><span class="label blackbg label-font-border label-border">{{ __('disabled') }}: {{ $device_totals['disabled'] }}</span></a>
     @endif
-    <a href="{{ url('devices/state=up') }}@if($device_group){{ '/group='.$device_group }}@endif"><span class="label label-success label-font-border label-border">@lang('up'): {{ $device_totals['up'] }}</span></a>
-    <span class="label label-warning label-font-border label-border">@lang('warn'): {{ $device_totals['warn'] }}</span>
-    <a href="{{ url('devices/state=down') }}@if($device_group){{ '/group='.$device_group }}@endif"><span class="label label-danger label-font-border label-border">@lang('down'): {{ $device_totals['down'] }}</span></a>
+    <a href="{{ url('devices/state=up') }}@if($device_group){{ '/group='.$device_group }}@endif"><span class="label label-success label-font-border label-border">{{ __('up') }}: {{ $device_totals['up'] }}</span></a>
+    <span class="label label-warning label-font-border label-border">{{ __('warn') }}: {{ $device_totals['warn'] }}</span>
+    <a href="{{ url('devices/state=down') }}@if($device_group){{ '/group='.$device_group }}@endif"><span class="label label-danger label-font-border label-border">{{ __('down') }}: {{ $device_totals['down'] }}</span></a>
     @if($device_totals['maintenance'])
-    <span class="label label-default label-font-border label-border">@lang('maintenance'): {{ $device_totals['maintenance'] }}</span>
+    <span class="label label-default label-font-border label-border">{{ __('maintenance') }}: {{ $device_totals['maintenance'] }}</span>
     @endif
 </div>
 @endif
 
 @if($services_totals)
 <div class="widget-availability-service">
-    <span>@lang('Total services')</span>
-    <span class="label label-success label-font-border label-border">@lang('up'): {{ $services_totals['up'] }}</span>
-    <span class="label label-warning label-font-border label-border">@lang('warn'): {{ $services_totals['warn'] }}</span>
-    <span class="label label-danger label-font-border label-border">@lang('down'): {{ $services_totals['down'] }}</span>
+    <span>{{ __('Total services') }}</span>
+    <span class="label label-success label-font-border label-border">{{ __('up') }}: {{ $services_totals['up'] }}</span>
+    <span class="label label-warning label-font-border label-border">{{ __('warn') }}: {{ $services_totals['warn'] }}</span>
+    <span class="label label-danger label-font-border label-border">{{ __('down') }}: {{ $services_totals['down'] }}</span>
 </div>
 @endif
 
@@ -32,12 +32,12 @@
                 <span class="label {{ $row['labelClass'] }} widget-availability-fixed widget-availability label-font-border"> </span>
             @else
             @if($color_only_select == 2)
-                <span class="label {{ $row['labelClass'] }} widget-availability label-font-border">@lang($row['device']->hostname)</span>
+                <span class="label {{ $row['labelClass'] }} widget-availability label-font-border">{{ __($row['device']->hostname) }}</span>
             @else
             @if($color_only_select == 3)
-                <span class="label {{ $row['labelClass'] }} widget-availability label-font-border">@lang($row['device']->sysName)</span>
+                <span class="label {{ $row['labelClass'] }} widget-availability label-font-border">{{ __($row['device']->sysName) }}</span>
             @else
-                <span class="label {{ $row['labelClass'] }} widget-availability label-font-border">@lang($row['stateName'])</span>
+                <span class="label {{ $row['labelClass'] }} widget-availability label-font-border">{{ __($row['stateName']) }}</span>
             @endif
             @endif
             @endif
