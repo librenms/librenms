@@ -33,43 +33,28 @@ if ($vlanversion == 'version1' || $vlanversion == '2') {
 
     $vtpdomain_id = '1';
 
-    //get vlan names
-    $vlans = snmpwalk_cache_oid($device, 'dot1qVlanStaticName', [], 'Q-BRIDGE-MIB');
-
-    //iterate through 'current' then 'static' dot1qVlan table
-    foreach (['Current', 'Static'] as $table) {
-        $oidsu = trim(snmp_walk($device, 'dot1qVlan' . $table . 'UntaggedPorts', ['-OsQ', '--hexOutputLength=0'], 'Q-BRIDGE-MIB'));
-        $oidsm = trim(snmp_walk($device, 'dot1qVlan' . $table . 'EgressPorts', ['-OsQ', '--hexOutputLength=0'], 'Q-BRIDGE-MIB'));
-
-        //vlan untagged ports
-        if ($oidsu) {
-            foreach (explode("\n", $oidsu) as $datau) {
-                $dots = max(array_keys(explode('.', $datau))); //last dot is index
-                $index = trim(explode('=', explode('.', $datau)[$dots])[0]); //vlan index
-                $portsu[$index] = trim(explode('=', $datau)[1]); //untagged ports
+    // fetch vlan data
+    $vlans = SnmpQuery::walk('Q-BRIDGE-MIB::dot1qVlanCurrentUntaggedPorts')->table(2);
+    $vlans = SnmpQuery::walk('Q-BRIDGE-MIB::dot1qVlanCurrentEgressPorts')->table(2, $vlans);
+    if (empty($vlans)) {
+        $vlans = SnmpQuery::walk('Q-BRIDGE-MIB::dot1qVlanStaticUntaggedPorts')->table(2, $vlans);
+        $vlans = SnmpQuery::walk('Q-BRIDGE-MIB::dot1qVlanStaticEgressPorts')->table(2, $vlans);
+    } else {
+        // collapse timefilter from dot1qVlanCurrentTable results to only the newest
+        $vlans = array_reduce($vlans, function ($result, $time_data) {
+            foreach ($time_data as $vlan_id => $vlan_data) {
+                $result[$vlan_id] = isset($result[$vlan_id]) ? array_merge($result[$vlan_id], $vlan_data) : $vlan_data;
             }
-        }
 
-        //vlan member ports (might be tagged)
-        if ($oidsm) {
-            foreach (explode("\n", $oidsm) as $datam) {
-                $dots = max(array_keys(explode('.', $datam))); //last dot is index
-                $index = trim(explode('=', explode('.', $datam)[$dots])[0]); //vlan index
-                $portsm[$index] = trim(explode('=', $datam)[1]); //member ports (might be tagged)
+            return $result;
+        }, []);
+    }
 
-                //check for vlan name and assign generic value if name does not exist
-                if (! $vlans[$index]['dot1qVlanStaticName']) {
-                    $vlans[$index] = ['dot1qVlanStaticName' => 'Vlan_' . $index];
-                    d_echo('Vlans: assigned generic Vlan_' . $index . ' name');
-                }
-            }
-            break; //table exist, do not read next table [current, static]
-        }
-    } //foreach [current,static]
+    $vlans = SnmpQuery::walk('Q-BRIDGE-MIB::dot1qVlanStaticName')->table(1, $vlans);
 
     foreach ($vlans as $vlan_id => $vlan) {
         d_echo('Processing vlan ID: ' . $vlan_id);
-        $vlan_name = $vlan['dot1qVlanStaticName'];
+        $vlan_name = empty($vlan['Q-BRIDGE-MIB::dot1qVlanStaticName']) ? "Vlan_$vlan_id" : $vlan['Q-BRIDGE-MIB::dot1qVlanStaticName'];
 
         //try to get existing data from DB
         $vlanDB = Vlan::firstOrNew([
@@ -94,8 +79,10 @@ if ($vlanversion == 'version1' || $vlanversion == '2') {
 
         $device['vlans'][$vtpdomain_id][$vlan_id] = $vlan_id; //populate device['vlans'] with ID's
 
-        $untagged_ids = q_bridge_bits2indices($portsu[$vlan_id]); //portmap for untagged ports
-        $egress_ids = q_bridge_bits2indices($portsm[$vlan_id]); //portmap for members ports (might be tagged)
+        //portmap for untagged ports
+        $untagged_ids = q_bridge_bits2indices($vlan['Q-BRIDGE-MIB::dot1qVlanCurrentUntaggedPorts'] ?? $vlan['Q-BRIDGE-MIB::dot1qVlanStaticUntaggedPorts']);
+        //portmap for members ports (might be tagged)
+        $egress_ids = q_bridge_bits2indices($vlan['Q-BRIDGE-MIB::dot1qVlanCurrentEgressPorts'] ?? $vlan['Q-BRIDGE-MIB::dot1qVlanStaticEgressPorts']);
         foreach ($egress_ids as $port_id) {
             if (isset($base_to_index[$port_id])) {
                 $ifIndex = $base_to_index[$port_id];
