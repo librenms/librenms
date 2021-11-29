@@ -37,8 +37,9 @@ if ($vlanversion == 'version1' || $vlanversion == '2') {
     $vlans = SnmpQuery::walk('Q-BRIDGE-MIB::dot1qVlanCurrentUntaggedPorts')->table(2);
     $vlans = SnmpQuery::walk('Q-BRIDGE-MIB::dot1qVlanCurrentEgressPorts')->table(2, $vlans);
     if (empty($vlans)) {
-        $vlans = SnmpQuery::walk('Q-BRIDGE-MIB::dot1qVlanStaticUntaggedPorts')->table(2, $vlans);
-        $vlans = SnmpQuery::walk('Q-BRIDGE-MIB::dot1qVlanStaticEgressPorts')->table(2, $vlans);
+        // fall back to static
+        $vlans = SnmpQuery::walk('Q-BRIDGE-MIB::dot1qVlanStaticUntaggedPorts')->table(1, $vlans);
+        $vlans = SnmpQuery::walk('Q-BRIDGE-MIB::dot1qVlanStaticEgressPorts')->table(1, $vlans);
     } else {
         // collapse timefilter from dot1qVlanCurrentTable results to only the newest
         $vlans = array_reduce($vlans, function ($result, $time_data) {

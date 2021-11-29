@@ -764,15 +764,6 @@ class ModuleTestHelper
                     }, $rows);
                 }
 
-                // clean slashes
-                array_walk($rows, function (&$row) {
-                    array_walk($row, function (&$field) {
-                        if (is_string($field) && Str::contains($field, '\\\\')) {
-                            $field = addcslashes($field, '\\');
-                        }
-                    });
-                });
-
                 if (isset($key)) {
                     $data[$module][$key][$table] = $rows;
                 } else {
