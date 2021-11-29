@@ -1,6 +1,6 @@
 <form class="form-inline">
     <div class="input-group">
-        <input id="settings-search" type="search" class="form-control" placeholder="@lang('Search Settings')" style="border-radius: 4px">
+        <input id="settings-search" type="search" class="form-control" placeholder="{{ __('Search Settings') }}" style="border-radius: 4px">
     </div>
 </form>
 

@@ -7,7 +7,7 @@
                 <div class="card-body">
                     <div class="row bg-light check-row">
                         <div class="col-7">
-                            PHP <small>(@lang('install.checks.php_required', ['version' => $php_required]))</small>
+                            PHP <small>({{ __('install.checks.php_required', ['version' => $php_required]) }})</small>
                         </div>
                         <div class="col-5 text-right text-nowrap @if($php_ok) text-success @else text-danger @endif">
                             {{ $php_version }}
