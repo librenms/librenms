@@ -387,6 +387,7 @@ def poll_worker(
         while poller.returncode is None:
             poller.wait()
 
+
 class DBConfig:
     """
     Bare minimal config class for LibreNMS.service.DB class usage
