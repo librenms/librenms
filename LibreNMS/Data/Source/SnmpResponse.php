@@ -163,13 +163,14 @@ class SnmpResponse
             if (Str::contains($key, '[')) {
                 // table
                 preg_match_all('/([^[\]]+)/', $key, $parts);
+                $parts = $parts[1]; // get all group 1 matches
             } else {
                 // regular oid
                 $parts = explode('.', $key);
             }
 
-            $parts = $parts[1];
-            array_splice($parts, $group, 0, array_shift($parts)); // move the oid name to the correct depth
+            // move the oid name to the correct depth
+            array_splice($parts, $group, 0, array_shift($parts));
 
             // merge the parts into an array, creating keys if they don't exist
             $tmp = &$array;
