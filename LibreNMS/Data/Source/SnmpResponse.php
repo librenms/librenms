@@ -132,7 +132,7 @@ class SnmpResponse
 
             if (Str::startsWith($value, '"') && Str::endsWith($value, '"')) {
                 // unformatted string from net-snmp, remove extra escapes
-                $values[$oid] = stripslashes(trim($value, "\\\" \n\r"));
+                $values[$oid] = trim(stripslashes($value), "\" \n\r");
             } else {
                 $values[$oid] = trim($value);
             }
