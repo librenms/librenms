@@ -2,7 +2,7 @@
     <div class="container-fluid">
         <div class="navbar-header">
             <button type="button" class="navbar-toggle" data-toggle="collapse" data-target="#navHeaderCollapse">
-                <span class="sr-only">@lang('Toggle navigation')</span>
+                <span class="sr-only">{{ __('Toggle navigation') }}</span>
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
                 <span class="icon-bar"></span>
@@ -23,10 +23,10 @@
                     <a href="{{ url('overview') }}" class="dropdown-toggle" data-hover="dropdown"
                        data-toggle="dropdown"><i class="fa fa-home fa-fw fa-lg fa-nav-icons hidden-md"
                                                  aria-hidden="true"></i> <span
-                            class="hidden-sm">@lang('Overview')</span></a>
+                            class="hidden-sm">{{ __('Overview') }}</span></a>
                     <ul class="dropdown-menu multi-level" role="menu">
                         <li class="dropdown-submenu">
-                            <a href="{{ route('overview') }}"><i class="fa fa-tv fa-fw fa-lg" aria-hidden="true"></i> @lang('Dashboard')</a>
+                            <a href="{{ route('overview') }}"><i class="fa fa-tv fa-fw fa-lg" aria-hidden="true"></i> {{ __('Dashboard') }}</a>
                             <ul class="dropdown-menu scrollable-menu">
                                 @foreach($dashboards as $dashboard)
                                 <li><a href="{{ route('overview', ['dashboard' => $dashboard->dashboard_id]) }}"><i class="fa fa-tv fa-fw fa-lg" aria-hidden="true"></i> {{ $dashboard->dashboard_name }}</a></li>
@@ -35,7 +35,7 @@
                                 <li>
                                     <a onclick="toggleDashboardEditor()">
                                         <i class="fa fa-bar-chart fa-fw fa-lg" aria-hidden="true"></i>
-                                        <span id="toggle-dashboard-editor-text">@if ($hide_dashboard_editor) @lang('Show Dashboard Editor') @else @lang('Hide Dashboard Editor')@endif</span>
+                                        <span id="toggle-dashboard-editor-text">@if ($hide_dashboard_editor) {{ __('Show Dashboard Editor') }} @else {{ __('Hide Dashboard Editor') }}@endif</span>
                                     </a>
                                 </li>
                             </ul>
@@ -43,16 +43,16 @@
                         <li role="presentation" class="divider"></li>
                         <li class="dropdown-submenu">
                             <a><i class="fa fa-map fa-fw fa-lg"
-                                                               aria-hidden="true"></i> @lang('Maps')</a>
+                                                               aria-hidden="true"></i> {{ __('Maps') }}</a>
                             <ul class="dropdown-menu">
                                 <li><a href="{{ url('availability-map') }}"><i class="fa fa-arrow-circle-up fa-fw fa-lg"
-                                                                               aria-hidden="true"></i> @lang('Availability')
+                                                                               aria-hidden="true"></i> {{ __('Availability') }}
                                     </a></li>
                                 <li><a href="{{ url('maps/devicedependency') }}"><i class="fa fa-chain fa-fw fa-lg"
-                                                                  aria-hidden="true"></i> @lang('Device Dependency')</a></li>
+                                                                  aria-hidden="true"></i> {{ __('Device Dependency') }}</a></li>
                                 @if($device_groups->isNotEmpty())
                                     <li class="dropdown-submenu"><a><i class="fa fa-chain fa-fw fa-lg"
-                                                                                aria-hidden="true"></i> @lang('Device Groups Dependencies')
+                                                                                aria-hidden="true"></i> {{ __('Device Groups Dependencies') }}
                                         </a>
                                         <ul class="dropdown-menu scrollable-menu">
                                         @foreach($device_groups as $group)
@@ -63,10 +63,10 @@
                                     </ul></li>
                                 @endif
                                 <li><a href="{{ url('map') }}"><i class="fa fa-sitemap fa-fw fa-lg"
-                                                                  aria-hidden="true"></i> @lang('Network')</a></li>
+                                                                  aria-hidden="true"></i> {{ __('Network') }}</a></li>
                                 @if($device_groups->isNotEmpty())
                                     <li class="dropdown-submenu"><a><i class="fa fa-th fa-fw fa-lg"
-                                                                                aria-hidden="true"></i> @lang('Device Groups Maps')
+                                                                                aria-hidden="true"></i> {{ __('Device Groups Maps') }}
                                         </a>
                                         <ul class="dropdown-menu scrollable-menu">
                                         @foreach($device_groups as $group)
@@ -77,13 +77,13 @@
                                     </ul></li>
                                 @endif
                                 <li><a href="{{ url('fullscreenmap') }}"><i class="fa fa-expand fa-fw fa-lg"
-                                                                            aria-hidden="true"></i> @lang('Geographical')
+                                                                            aria-hidden="true"></i> {{ __('Geographical') }}
                                     </a></li>
                             </ul>
                         </li>
                         @if(auth()->user()->isAdmin() || $has_v1_plugins || $has_v2_plugins)
                         <li class="dropdown-submenu">
-                            <a><i class="fa fa-plug fa-fw fa-lg" aria-hidden="true"></i> @lang('Plugins')</a>
+                            <a><i class="fa fa-plug fa-fw fa-lg" aria-hidden="true"></i> {{ __('Plugins') }}</a>
                             <ul class="dropdown-menu">
                                 {!! $v1_plugin_menu !!}
                                 @foreach($menu_hooks as [$view, $data])
@@ -95,7 +95,7 @@
                                 @endif
                                 <li>
                                     <a href="{{ route('plugin.admin') }}">
-                                        <i class="fa fa-lock fa-fw fa-lg" aria-hidden="true"></i>@lang('Plugin Admin')
+                                        <i class="fa fa-lock fa-fw fa-lg" aria-hidden="true"></i>{{ __('Plugin Admin') }}
                                     </a>
                                 </li>
                                 @endadmin
@@ -104,65 +104,65 @@
                         @endif
                         <li class="dropdown-submenu">
                             <a><i class="fa fa-wrench fa-fw fa-lg"
-                                                               aria-hidden="true"></i> @lang('Tools')</a>
+                                                               aria-hidden="true"></i> {{ __('Tools') }}</a>
                             <ul class="dropdown-menu">
                                 <li><a href="{{ url('ripenccapi') }}"><i class="fa fa-star fa-fw fa-lg"
-                                                                         aria-hidden="true"></i> @lang('RIPE NCC API')
+                                                                         aria-hidden="true"></i> {{ __('RIPE NCC API') }}
                                     </a></li>
                                 @config('smokeping.integration')
                                 <li><a href="{{ \LibreNMS\Config::get('smokeping.url') }}"><i class="fa fa-line-chart fa-fw fa-lg"
-                                                                       aria-hidden="true"></i> @lang('Smokeping')</a>
+                                                                       aria-hidden="true"></i> {{ __('Smokeping') }}</a>
                                 </li>
                                 @endconfig
                                 @config('oxidized.enabled')
                                 <li><a href="{{ url('oxidized') }}"><i class="fa fa-stack-overflow fa-fw fa-lg"
-                                                                       aria-hidden="true"></i> @lang('Oxidized')</a>
+                                                                       aria-hidden="true"></i> {{ __('Oxidized') }}</a>
                                 </li>
                                 @endconfig
                             </ul>
                         </li>
                         <li role="presentation" class="divider"></li>
                         <li><a href="{{ url('eventlog') }}"><i class="fa fa-bookmark fa-fw fa-lg"
-                                                               aria-hidden="true"></i> @lang('Eventlog')</a></li>
+                                                               aria-hidden="true"></i> {{ __('Eventlog') }}</a></li>
                         @config('enable_syslog')
                         <li><a href="{{ url('syslog') }}"><i class="fa fa-clone fa-fw fa-lg"
-                                                             aria-hidden="true"></i> @lang('syslog.title')</a></li>
+                                                             aria-hidden="true"></i> {{ __('syslog.title') }}</a></li>
                         @endconfig
                         @config('graylog.server')
                         <li><a href="{{ url('graylog') }}"><i class="fa fa-clone fa-fw fa-lg"
-                                                              aria-hidden="true"></i> @lang('Graylog')</a></li>
+                                                              aria-hidden="true"></i> {{ __('Graylog') }}</a></li>
                         @endconfig
 
                         <li><a href="{{ url('inventory') }}"><i class="fa fa-cube fa-fw fa-lg"
-                                                                aria-hidden="true"></i> @lang('Inventory')</a></li>
+                                                                aria-hidden="true"></i> {{ __('Inventory') }}</a></li>
                         <li><a href="{{ url('outages') }}"><i class="fa fa-bar-chart fa-fw fa-lg"
-                                                               aria-hidden="true"></i> @lang('Outages')</a></li>
+                                                               aria-hidden="true"></i> {{ __('Outages') }}</a></li>
                         @if($package_count)
                             <li><a href="{{ url('search/search=packages') }}"><i class="fa fa-archive fa-fw fa-lg"
-                                                                                 aria-hidden="true"></i> @lang('Packages')
+                                                                                 aria-hidden="true"></i> {{ __('Packages') }}
                                 </a></li>
                         @endif
 
                         <li role="presentation" class="divider"></li>
                         <li><a href="{{ url('search/search=ipv4') }}"><i class="fa fa-search fa-fw fa-lg"
-                                                                         aria-hidden="true"></i> @lang('IPv4 Address')
+                                                                         aria-hidden="true"></i> {{ __('IPv4 Address') }}
                             </a></li>
                         <li><a href="{{ url('search/search=ipv6') }}"><i class="fa fa-search fa-fw fa-lg"
-                                                                         aria-hidden="true"></i> @lang('IPv6 Address')
+                                                                         aria-hidden="true"></i> {{ __('IPv6 Address') }}
                             </a></li>
                         <li><a href="{{ url('search/search=mac') }}"><i class="fa fa-search fa-fw fa-lg"
-                                                                        aria-hidden="true"></i> @lang('MAC Address')</a>
+                                                                        aria-hidden="true"></i> {{ __('MAC Address') }}</a>
                         </li>
                         <li><a href="{{ url('search/search=arp') }}"><i class="fa fa-search fa-fw fa-lg"
-                                                                        aria-hidden="true"></i> @lang('ARP Tables')</a>
+                                                                        aria-hidden="true"></i> {{ __('ARP Tables') }}</a>
                         </li>
                         <li><a href="{{ url('search/search=fdb') }}"><i class="fa fa-search fa-fw fa-lg"
-                                                                        aria-hidden="true"></i> @lang('FDB Tables')</a>
+                                                                        aria-hidden="true"></i> {{ __('FDB Tables') }}</a>
                         </li>
                         @config('poller_modules.mib')
                             <li role="presentation" class="divider"></li>
                         <li><a href="{{ url('mibs') }}"><i class="fa fa-file-text-o fa-fw fa-lg"
-                                                           aria-hidden="true"></i> @lang('MIB definitions')</a></li>
+                                                           aria-hidden="true"></i> {{ __('MIB definitions') }}</a></li>
                         @endconfig
                     </ul>
                 </li>
@@ -170,24 +170,24 @@
                 <li class="dropdown">
                     <a href="{{ url('devices/') }}" class="dropdown-toggle" data-hover="dropdown"
                        data-toggle="dropdown"><i class="fa fa-server fa-fw fa-lg fa-nav-icons hidden-md"
-                                                 aria-hidden="true"></i> <span class="hidden-sm">@lang('Devices')</span></a>
+                                                 aria-hidden="true"></i> <span class="hidden-sm">{{ __('Devices') }}</span></a>
                     <ul class="dropdown-menu">
                     @if($device_types->isNotEmpty())
                         <li class="dropdown-submenu">
                             <a href="{{ url('devices') }}"><i class="fa fa-server fa-fw fa-lg"
-                                                              aria-hidden="true"></i> @lang('All Devices')</a>
+                                                              aria-hidden="true"></i> {{ __('All Devices') }}</a>
                             <ul class="dropdown-menu scrollable-menu">
                             @foreach($device_types as $type)
                                 <li><a href="{{ url("devices/type=$type") }}"><i class="fa fa-angle-double-right fa-fw fa-lg" aria-hidden="true"></i> {{ ucfirst($type) }}</a></li>
                             @endforeach
                         </ul></li>
                     @else
-                            <li class="dropdown-submenu"><a href="#">@lang('No devices')</a></li>
+                            <li class="dropdown-submenu"><a href="#">{{ __('No devices') }}</a></li>
                     @endif
 
                     @if($device_groups->isNotEmpty())
                             <li class="dropdown-submenu"><a><i class="fa fa-th fa-fw fa-lg"
-                                                                        aria-hidden="true"></i> @lang('Device Groups')
+                                                                        aria-hidden="true"></i> {{ __('Device Groups') }}
                                 </a>
                             <ul class="dropdown-menu scrollable-menu">
                             @foreach($device_groups as $group)
@@ -200,9 +200,9 @@
                     @if($locations->isNotEmpty())
                         <li role="presentation" class="divider"></li>
                         <li class="dropdown-submenu">
-                            <a href="{{ url('locations') }}"><i class="fa fa-map-marker fa-fw fa-lg" aria-hidden="true"></i> @lang('Geo Locations')</a>
+                            <a href="{{ url('locations') }}"><i class="fa fa-map-marker fa-fw fa-lg" aria-hidden="true"></i> {{ __('Geo Locations') }}</a>
                             <ul class="dropdown-menu scrollable-menu">
-                                <li><a href="{{ url('locations') }}"><i class="fa fa-map-marker fa-fw fa-lg" aria-hidden="true"></i> @lang('All Locations')</a></li>
+                                <li><a href="{{ url('locations') }}"><i class="fa fa-map-marker fa-fw fa-lg" aria-hidden="true"></i> {{ __('All Locations') }}</a></li>
                             @foreach($locations as $location)
                                     <li><a href="{{ url("devices/location=" . $location->id) }}"><i class="fa fa-building fa-fw fa-lg" aria-hidden="true"></i> {{ $location->display() }}</a></li>
                             @endforeach
@@ -213,19 +213,19 @@
                         <li role="presentation" class="divider"></li>
                         @can('manage', \App\Models\DeviceGroup::class)
                             <li><a href="{{ url('device-groups') }}"><i class="fa fa-th fa-fw fa-lg"
-                                                                        aria-hidden="true"></i> @lang('Manage Groups')
+                                                                        aria-hidden="true"></i> {{ __('Manage Groups') }}
                                 </a></li>
                         @endcan
-                        <li><a href="{{ url('device-dependencies') }}"><i class="fa fa-group fa-fw fa-lg"></i> @lang('Device Dependencies')</a></li>
+                        <li><a href="{{ url('device-dependencies') }}"><i class="fa fa-group fa-fw fa-lg"></i> {{ __('Device Dependencies') }}</a></li>
                         @if($show_vmwinfo)
                             <li><a href="{{ url('vminfo') }}"><i
-                                        class="fa fa-cog fa-fw fa-lg"></i> @lang('Virtual Machines')</a></li>
+                                        class="fa fa-cog fa-fw fa-lg"></i> {{ __('Virtual Machines') }}</a></li>
                         @endif
                         <li role="presentation" class="divider"></li>
                         <li><a href="{{ url('addhost') }}"><i class="fa fa-plus fa-fw fa-lg"
-                                                              aria-hidden="true"></i> @lang('Add Device')</a></li>
+                                                              aria-hidden="true"></i> {{ __('Add Device') }}</a></li>
                         <li><a href="{{ url('delhost') }}"><i class="fa fa-trash fa-fw fa-lg"
-                                                              aria-hidden="true"></i> @lang('Delete Device')</a></li>
+                                                              aria-hidden="true"></i> {{ __('Delete Device') }}</a></li>
                     @endadmin
 
                     </ul>
@@ -236,34 +236,34 @@
                         <a href="{{ url('services') }}" class="dropdown-toggle" data-hover="dropdown"
                            data-toggle="dropdown"><i class="fa fa-cogs fa-fw fa-lg fa-nav-icons hidden-md"
                                                      aria-hidden="true"></i> <span
-                                class="hidden-sm">@lang('Services')</span></a>
+                                class="hidden-sm">{{ __('Services') }}</span></a>
                         <ul class="dropdown-menu">
-                            <li><a href="{{ url('services') }}"><i class="fa fa-cogs fa-fw fa-lg" aria-hidden="true"></i> @lang('All Services')</a>
+                            <li><a href="{{ url('services') }}"><i class="fa fa-cogs fa-fw fa-lg" aria-hidden="true"></i> {{ __('All Services') }}</a>
                             </li>
                             <li><a href="{{ route('services.templates.index') }}"><span class="fa-stack" aria-hidden="true" style="font-size: 12px">
                                   <i class="fa fa-square fa-stack-2x"></i>
                                   <i class="fa fa-cogs fa-stack-1x fa-inverse"></i>
-                                </span> @lang('Services Templates')</a>
+                                </span> {{ __('Services Templates') }}</a>
                             </li>
                             @if($service_counts['warning'] || $service_counts['critical'])
                                 <li role="presentation" class="divider"></li>
                                 @if($service_counts['warning'])
                                     <li><a href="{{ url('services/state=warning') }}"><i
                                                 class="fa fa-bell fa-col-warning fa-fw fa-lg"
-                                                aria-hidden="true"></i> @lang('Warning :service_count', ['service_count' => $service_counts['warning']])
+                                                aria-hidden="true"></i> {{ __('Warning :service_count', ['service_count' => $service_counts['warning']]) }}
                                         </a></li>
                                 @endif
                                 @if($service_counts['critical'])
                                     <li><a href="{{ url('services/state=critical') }}"><i
                                                 class="fa fa-bell fa-col-danger fa-fw fa-lg"
-                                                aria-hidden="true"></i> @lang('Critical :service_count', ['service_count' => $service_counts['critical']])
+                                                aria-hidden="true"></i> {{ __('Critical :service_count', ['service_count' => $service_counts['critical']]) }}
                                         </a></li>
                                 @endif
                             @endif
                             @admin
                                 <li role="presentation" class="divider"></li>
                             <li><a href="{{ url('addsrv') }}"><i class="fa fa-plus fa-fw fa-lg"
-                                                                 aria-hidden="true"></i> @lang('Add Service')</a></li>
+                                                                 aria-hidden="true"></i> {{ __('Add Service') }}</a></li>
                             @endadmin
                         </ul>
                     </li>
@@ -272,31 +272,31 @@
                 <li class="dropdown">
                     <a href="{{ url('ports') }}" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown"><i
                             class="fa fa-link fa-fw fa-lg fa-nav-icons hidden-md" aria-hidden="true"></i> <span
-                            class="hidden-sm">@lang('Ports')</span></a>
+                            class="hidden-sm">{{ __('Ports') }}</span></a>
                     <ul class="dropdown-menu">
                         <li><a href="{{ url('ports') }}"><i class="fa fa-link fa-fw fa-lg"
-                                                            aria-hidden="true"></i> @lang('All Ports')</a></li>
+                                                            aria-hidden="true"></i> {{ __('All Ports') }}</a></li>
 
                         @if($port_counts['errored'] > 0)
                             <li><a href="{{ url('ports/errors=1') }}"><i class="fa fa-exclamation-circle fa-fw fa-lg"
-                                                                           aria-hidden="true"></i> @lang('Errored :port_count', ['port_count' => $port_counts['errored']])
+                                                                           aria-hidden="true"></i> {{ __('Errored :port_count', ['port_count' => $port_counts['errored']]) }}
                                 </a></li>
                         @endif
 
                         @if($port_counts['ignored'] > 0)
                             <li><a href="{{ url('ports/ignore=1') }}"><i class="fa fa-question-circle fa-fw fa-lg"
-                                                                           aria-hidden="true"></i> @lang('Ignored :port_count', ['port_count' => $port_counts['ignored']])
+                                                                           aria-hidden="true"></i> {{ __('Ignored :port_count', ['port_count' => $port_counts['ignored']]) }}
                                 </a></li>
                         @endif
 
                         @config('enable_billing')
                         <li><a href="{{ url('bills') }}"><i class="fa fa-money fa-fw fa-lg"
-                                                            aria-hidden="true"></i> @lang('Traffic Bills')</a></li>
+                                                            aria-hidden="true"></i> {{ __('Traffic Bills') }}</a></li>
                         @endconfig
 
                         @if($port_counts['pseudowire'] > 0)
                             <li><a href="{{ url('pseudowires') }}"><i class="fa fa-arrows-alt fa-fw fa-lg"
-                                                                      aria-hidden="true"></i> @lang('Pseudowires')</a>
+                                                                      aria-hidden="true"></i> {{ __('Pseudowires') }}</a>
                             </li>
                         @endif
 
@@ -305,32 +305,32 @@
                                 <li role="presentation" class="divider"></li>
                                 @config('int_customers')
                                 <li><a href="{{ url('customers') }}"><i class="fa fa-users fa-fw fa-lg"
-                                                                        aria-hidden="true"></i> @lang('Customers')</a>
+                                                                        aria-hidden="true"></i> {{ __('Customers') }}</a>
                                 </li>
                                 @endconfig
                                 @config('int_l2tp')
                                 <li><a href="{{ url('iftype/type=l2tp') }}"><i class="fa fa-link fa-fw fa-lg"
-                                                                               aria-hidden="true"></i> @lang('L2TP')</a>
+                                                                               aria-hidden="true"></i> {{ __('L2TP') }}</a>
                                 </li>
                                 @endconfig
                                 @config('int_transit')
                                 <li><a href="{{ url('iftype/type=transit') }}"><i class="fa fa-truck fa-fw fa-lg"
-                                                                                  aria-hidden="true"></i> @lang('Transit')
+                                                                                  aria-hidden="true"></i> {{ __('Transit') }}
                                     </a></li>
                                 @endconfig
                                 @config('int_peering')
                                 <li><a href="{{ url('iftype/type=peering') }}"><i class="fa fa-handshake-o fa-fw fa-lg"
-                                                                                  aria-hidden="true"></i> @lang('Peering')
+                                                                                  aria-hidden="true"></i> {{ __('Peering') }}
                                     </a></li>
                                 @endconfig
                                 @if(\LibreNMS\Config::get('int_peering') && \LibreNMS\Config::get('int_transit'))
                                     <li><a href="{{ url('iftype/type=peering,transit') }}"><i
                                                 class="fa fa-rocket fa-fw fa-lg"
-                                                aria-hidden="true"></i> @lang('Peering + Transit')</a></li>
+                                                aria-hidden="true"></i> {{ __('Peering + Transit') }}</a></li>
                                 @endif
                                 @config('int_core')
                                 <li><a href="{{ url('iftype/type=core') }}"><i class="fa fa-code-fork fa-fw fa-lg"
-                                                                               aria-hidden="true"></i> @lang('Core')</a>
+                                                                               aria-hidden="true"></i> {{ __('Core') }}</a>
                                 </li>
                                 @endconfig
                                 @foreach($custom_port_descr as $custom_descr)
@@ -340,28 +340,28 @@
 
                             <li role="presentation" class="divider"></li>
                             <li><a href="{{ url('port-groups') }}"><i class="fa fa-th fa-fw fa-lg"
-                                                                      aria-hidden="true"></i> @lang('Manage Groups')
+                                                                      aria-hidden="true"></i> {{ __('Manage Groups') }}
                             </a></li>
 
                             <li role="presentation" class="divider"></li>
                             @if($port_counts['alerted'])
                                 <li><a href="{{ url('ports/alerted=1') }}"><i
                                             class="fa fa-exclamation-circle fa-fw fa-lg"
-                                            aria-hidden="true"></i> @lang('Alerts :port_count', ['port_count' => $port_counts['alerted']])
+                                            aria-hidden="true"></i> {{ __('Alerts :port_count', ['port_count' => $port_counts['alerted']]) }}
                                     </a></li>
                             @endif
 
                             <li><a href="{{ url('ports/state=down') }}"><i class="fa fa-arrow-circle-down fa-fw fa-lg"
-                                                                           aria-hidden="true"></i> @lang('Down :port_count', ['port_count' => $port_counts['down']])
+                                                                           aria-hidden="true"></i> {{ __('Down :port_count', ['port_count' => $port_counts['down']]) }}
                                 </a></li>
                             <li><a href="{{ url('ports/state=admindown') }}"><i
                                         class="fa fa-arrow-circle-o-down fa-fw fa-lg"
-                                        aria-hidden="true"></i> @lang('Disabled :port_count', ['port_count' => $port_counts['shutdown']])
+                                        aria-hidden="true"></i> {{ __('Disabled :port_count', ['port_count' => $port_counts['shutdown']]) }}
                                 </a></li>
 
                             @if($port_counts['deleted'])
                                 <li><a href="{{ url('ports/deleted=1') }}"><i class="fa fa-minus-circle fa-fw fa-lg"
-                                                                                aria-hidden="true"></i> @lang('Deleted :port_count', ['port_count' => $port_counts['deleted']])
+                                                                                aria-hidden="true"></i> {{ __('Deleted :port_count', ['port_count' => $port_counts['deleted']]) }}
                                     </a></li>
                             @endif
                         @endif
@@ -371,16 +371,16 @@
                 <li class="dropdown">
                     <a href="{{ url('health') }}" class="dropdown-toggle" data-hover="dropdown"
                        data-toggle="dropdown"><i class="fa fa-heartbeat fa-fw fa-lg fa-nav-icons hidden-md"
-                                                 aria-hidden="true"></i> <span class="hidden-sm">@lang('Health')</span></a>
+                                                 aria-hidden="true"></i> <span class="hidden-sm">{{ __('Health') }}</span></a>
                     <ul class="dropdown-menu">
                         <li><a href="{{ url('health/metric=mempool') }}"><i class="fa fa-braille fa-fw fa-lg"
-                                                                            aria-hidden="true"></i> @lang('Memory')</a>
+                                                                            aria-hidden="true"></i> {{ __('Memory') }}</a>
                         </li>
                         <li><a href="{{ url('health/metric=processor') }}"><i class="fa fa-microchip fa-fw fa-lg"
-                                                                              aria-hidden="true"></i> @lang('Processor')
+                                                                              aria-hidden="true"></i> {{ __('Processor') }}
                             </a></li>
                         <li><a href="{{ url('health/metric=storage') }}"><i class="fa fa-database fa-fw fa-lg"
-                                                                            aria-hidden="true"></i> @lang('Storage')</a>
+                                                                            aria-hidden="true"></i> {{ __('Storage') }}</a>
                         </li>
 
                         @foreach($sensor_menu as $sensor_menu_group)
@@ -400,7 +400,7 @@
                         <a href="{{ url('wireless') }}" class="dropdown-toggle" data-hover="dropdown"
                            data-toggle="dropdown"><i class="fa fa-wifi fa-fw fa-lg fa-nav-icons hidden-md"
                                                      aria-hidden="true"></i> <span
-                                class="hidden-sm">@lang('wireless.title')</span></a>
+                                class="hidden-sm">{{ __('wireless.title') }}</span></a>
                         <ul class="dropdown-menu">
                         @foreach($wireless_menu as $wireless_menu_entry)
                                 <li><a href="{{ url('wireless/metric=' . $wireless_menu_entry->sensor_class) }}"><i class="fa fa-{{ $wireless_menu_entry->icon() }} fa-fw fa-lg" aria-hidden="true"></i> {{ $wireless_menu_entry->classDescr() }}</a></li>
@@ -414,10 +414,10 @@
                         <a href="{{ url('apps') }}" class="dropdown-toggle" data-hover="dropdown"
                            data-toggle="dropdown"><i class="fa fa-tasks fa-fw fa-lg fa-nav-icons hidden-md"
                                                      aria-hidden="true"></i> <span
-                                class="hidden-sm">@lang('Apps')</span></a>
+                                class="hidden-sm">{{ __('Apps') }}</span></a>
                         <ul class="dropdown-menu">
                             <li><a href="{{ url('apps') }}"><i class="fa fa-object-group fa-fw fa-lg"
-                                                               aria-hidden="true"></i> @lang('Overview')</a></li>
+                                                               aria-hidden="true"></i> {{ __('Overview') }}</a></li>
                             @foreach($app_menu as $app_type => $app_instances)
                                 @if($app_instances->filter->app_instance->isNotEmpty())
                                     <li class="dropdown-submenu">
@@ -441,7 +441,7 @@
                         <a href="{{ url('routing') }}" class="dropdown-toggle" data-hover="dropdown"
                            data-toggle="dropdown"><i class="fa fa-random fa-fw fa-lg fa-nav-icons hidden-md"
                                                      aria-hidden="true"></i> <span
-                                class="hidden-sm">@lang('Routing')</span></a>
+                                class="hidden-sm">{{ __('Routing') }}</span></a>
                         <ul class="dropdown-menu">
                         @foreach($routing_menu as $routing_menu_group)
                             @if(!$loop->first)
@@ -456,14 +456,14 @@
                             <li role="presentation" class="divider"></li>
                                 <li><a href="{{ url('routing/protocol=bgp/adminstatus=start/state=down') }}"><i
                                             class="fa fa-exclamation-circle fa-fw fa-lg"
-                                            aria-hidden="true"></i> @lang('Alerted BGP :alert_count', ['alert_count' => $bgp_alerts])
+                                            aria-hidden="true"></i> {{ __('Alerted BGP :alert_count', ['alert_count' => $bgp_alerts]) }}
                                     </a></li>
                         @endif
                         @admin
                             @if($show_peeringdb)
                                 <li role="presentation" class="divider"></li>
                                 <li><a href="{{ url('peering') }}"><i class="fa fa-hand-o-right fa-fw fa-lg"
-                                                                      aria-hidden="true"></i> @lang('PeeringDB')</a>
+                                                                      aria-hidden="true"></i> {{ __('PeeringDB') }}</a>
                                 </li>
                             @endif
                         @endadmin
@@ -474,26 +474,26 @@
                 <li class="dropdown">
                     <a href="#" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown"><i
                             class="fa fa-exclamation-circle fa-col-{{ $alert_menu_class }} fa-fw fa-lg fa-nav-icons hidden-md"
-                            aria-hidden="true"></i> <span class="hidden-sm">@lang('Alerts')</span></a>
+                            aria-hidden="true"></i> <span class="hidden-sm">{{ __('Alerts') }}</span></a>
                     <ul class="dropdown-menu">
                         <li><a href="{{ url('alerts') }}"><i class="fa fa-bell fa-fw fa-lg"
-                                                             aria-hidden="true"></i> @lang('Notifications')</a></li>
+                                                             aria-hidden="true"></i> {{ __('Notifications') }}</a></li>
                         <li><a href="{{ url('alert-log') }}"><i class="fa fa-file-text fa-fw fa-lg"
-                                                                aria-hidden="true"></i> @lang('Alert History')</a></li>
+                                                                aria-hidden="true"></i> {{ __('Alert History') }}</a></li>
                         <li><a href="{{ url('alert-stats') }}"><i class="fa fa-bar-chart fa-fw fa-lg"
-                                                                  aria-hidden="true"></i> @lang('Statistics')</a></li>
+                                                                  aria-hidden="true"></i> {{ __('Statistics') }}</a></li>
                         @admin
                         <li role="presentation" class="divider"></li>
                         <li><a href="{{ url('alert-rules') }}"><i class="fa fa-list fa-fw fa-lg"
-                                                                  aria-hidden="true"></i> @lang('Alert Rules')</a></li>
+                                                                  aria-hidden="true"></i> {{ __('Alert Rules') }}</a></li>
                         <li><a href="{{ url('alert-schedule') }}"><i class="fa fa-calendar fa-fw fa-lg"
-                                                                     aria-hidden="true"></i> @lang('Scheduled Maintenance')
+                                                                     aria-hidden="true"></i> {{ __('Scheduled Maintenance') }}
                             </a></li>
                         <li><a href="{{ url('templates') }}"><i class="fa fa-file fa-fw fa-lg"
-                                                                aria-hidden="true"></i> @lang('Alert Templates')</a>
+                                                                aria-hidden="true"></i> {{ __('Alert Templates') }}</a>
                         </li>
                         <li><a href="{{ url('alert-transports') }}"><i class="fa fa-bus fa-fw fa-lg"
-                                                                       aria-hidden="true"></i> @lang('Alert Transports')
+                                                                       aria-hidden="true"></i> {{ __('Alert Transports') }}
                             </a></li>
                         @endadmin
                     </ul>
@@ -506,7 +506,7 @@
                 @csrf
                 <div class="form-group">
                     <input class="form-control typeahead" type="search" id="gsearch" name="gsearch"
-                           placeholder="@lang('Global Search')" autocomplete="off">
+                           placeholder="{{ __('Global Search') }}" autocomplete="off">
                 </div>
             </form>
             <ul class="nav navbar-nav navbar-right">
@@ -515,18 +515,18 @@
                         <i class="fa fa-user fa-fw fa-lg fa-nav-icons" aria-hidden="true"></i>
                         <span class="badge badge-navbar-user count-notif {{ $notification_count ? 'badge-danger' : 'badge-default' }}">{{ $notification_count ?: '' }}</span>
                         <span class="hidden-sm"><small>{{ Auth::user()->username }}</small></span>
-                        <span class="visible-xs-inline-block">@lang('User')</span>
+                        <span class="visible-xs-inline-block">{{ __('User') }}</span>
                     </a>
                     <ul class="dropdown-menu">
                         <li><a href="{{ url('preferences') }}"><i class="fa fa-cog fa-fw fa-lg"
-                                                                  aria-hidden="true"></i> @lang('My Settings')</a></li>
+                                                                  aria-hidden="true"></i> {{ __('My Settings') }}</a></li>
                         <li><a href="{{ url('notifications') }}"><span
-                                    class="badge count-notif">{{ $notification_count }}</span> @lang('Notifications')
+                                    class="badge count-notif">{{ $notification_count }}</span> {{ __('Notifications') }}
                             </a></li>
                         <li role="presentation" class="divider"></li>
                         <li>
                             <a href="{{ route('logout') }}" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
-                                <i class="fa fa-sign-out fa-fw fa-lg" aria-hidden="true"></i> @lang('Logout')
+                                <i class="fa fa-sign-out fa-fw fa-lg" aria-hidden="true"></i> {{ __('Logout') }}
                             </a>
 
                             <form id="logout-form" action="{{ route('logout') }}" method="POST" style="display: none;">
@@ -538,43 +538,43 @@
                 <li class="dropdown">
                     <a href="#" class="dropdown-toggle" data-hover="dropdown" data-toggle="dropdown"
                        style="margin-left:5px"><i class="fa fa-cog fa-fw fa-lg fa-nav-icons" aria-hidden="true"></i>
-                        <span class="visible-xs-inline-block">@lang('settings.title')</span></a>
+                        <span class="visible-xs-inline-block">{{ __('settings.title') }}</span></a>
                     <ul class="dropdown-menu">
                         @admin
                         <li><a href="{{ url('settings') }}"><i class="fa fa-cogs fa-fw fa-lg"
-                                                               aria-hidden="true"></i> @lang('Global Settings')</a></li>
+                                                               aria-hidden="true"></i> {{ __('Global Settings') }}</a></li>
                         <li><a href="{{ url('validate') }}"><i class="fa fa-check-circle fa-fw fa-lg"
-                                                               aria-hidden="true"></i> @lang('Validate Config')</a></li>
+                                                               aria-hidden="true"></i> {{ __('Validate Config') }}</a></li>
                         <li role="presentation" class="divider"></li>
                         <li><a href="{{ route('users.index') }}"><i class="fa fa-user-circle-o fa-fw fa-lg"
-                                                                    aria-hidden="true"></i> @lang('Manage Users')</a>
+                                                                    aria-hidden="true"></i> {{ __('Manage Users') }}</a>
                         </li>
                         <li><a href="{{ url('authlog') }}"><i class="fa fa-shield fa-fw fa-lg"
-                                                              aria-hidden="true"></i> @lang('Auth History')</a></li>
+                                                              aria-hidden="true"></i> {{ __('Auth History') }}</a></li>
                         <li role="presentation" class="divider"></li>
                         <li class="dropdown-submenu">
-                            <a href="{{ route('poller.index') }}"><i class="fa fa-th-large fa-fw fa-lg" aria-hidden="true"></i> @lang('Poller')</a>
+                            <a href="{{ route('poller.index') }}"><i class="fa fa-th-large fa-fw fa-lg" aria-hidden="true"></i> {{ __('Poller') }}</a>
                             <ul class="dropdown-menu">
-                                <li><a href="{{ route('poller.index') }}"><i class="fa fa-th-large fa-fw fa-lg" aria-hidden="true"></i> @lang('Poller')</a></li>
+                                <li><a href="{{ route('poller.index') }}"><i class="fa fa-th-large fa-fw fa-lg" aria-hidden="true"></i> {{ __('Poller') }}</a></li>
                                 @config('distributed_poller')
-                                <li><a href="{{ route('poller.groups') }}"><i class="fa fa-th fa-fw fa-lg" aria-hidden="true"></i> @lang('Groups')</a></li>
+                                <li><a href="{{ route('poller.groups') }}"><i class="fa fa-th fa-fw fa-lg" aria-hidden="true"></i> {{ __('Groups') }}</a></li>
                                 @endconfig
                                 @if($poller_clusters)
-                                <li><a href="{{ route('poller.settings') }}"><i class="fa fa-gears fa-fw fa-lg" aria-hidden="true"></i> @lang('Settings')</a></li>
+                                <li><a href="{{ route('poller.settings') }}"><i class="fa fa-gears fa-fw fa-lg" aria-hidden="true"></i> {{ __('Settings') }}</a></li>
                                 @endif
-                                <li><a href="{{ route('poller.performance') }}"><i class="fa fa-line-chart fa-fw fa-lg" aria-hidden="true"></i> @lang('Performance')</a></li>
-                                <li><a href="{{ route('poller.log') }}"><i class="fa fa-file-text fa-fw fa-lg" aria-hidden="true"></i> @lang('Log')</a></li>
+                                <li><a href="{{ route('poller.performance') }}"><i class="fa fa-line-chart fa-fw fa-lg" aria-hidden="true"></i> {{ __('Performance') }}</a></li>
+                                <li><a href="{{ route('poller.log') }}"><i class="fa fa-file-text fa-fw fa-lg" aria-hidden="true"></i> {{ __('Log') }}</a></li>
                             </ul>
                         </li>
                         <li role="presentation" class="divider"></li>
                         <li class="dropdown-submenu">
-                            <a href="#"><i class="fa fa-code fa-fw fa-lg" aria-hidden="true"></i> @lang('API')</a>
+                            <a href="#"><i class="fa fa-code fa-fw fa-lg" aria-hidden="true"></i> {{ __('API') }}</a>
                             <ul class="dropdown-menu">
                                 <li><a href="{{ url('api-access') }}"><i class="fa fa-cog fa-fw fa-lg"
-                                                                         aria-hidden="true"></i> @lang('API Settings')
+                                                                         aria-hidden="true"></i> {{ __('API Settings') }}
                                     </a></li>
                                 <li><a href="https://docs.librenms.org/API/" target="_blank" rel="noopener"><i
-                                            class="fa fa-book fa-fw fa-lg" aria-hidden="true"></i> @lang('API Docs')</a>
+                                            class="fa fa-book fa-fw fa-lg" aria-hidden="true"></i> {{ __('API Docs') }}</a>
                                 </li>
                             </ul>
                         </li>
@@ -590,7 +590,7 @@
                         <li role="presentation" class="divider"></li>
                         @endif
                         <li><a href="{{ url('about') }}"><i class="fa fa-info-circle fa-fw fa-lg"
-                                                            aria-hidden="true"></i> @lang('About :project_name', ['project_name' => \LibreNMS\Config::get('project_name')])
+                                                            aria-hidden="true"></i> {{ __('About :project_name', ['project_name' => \LibreNMS\Config::get('project_name')]) }}
                             </a></li>
                     </ul>
                 </li>
@@ -732,7 +732,7 @@
             },
             success: function () {
                 hideDashboardEditor = hideDashboardEditor ? 0 : 1;
-                $('#toggle-dashboard-editor-text').text(hideDashboardEditor ? '@lang('Show Dashboard Editor')' : '@lang('Hide Dashboard Editor')')
+                $('#toggle-dashboard-editor-text').text(hideDashboardEditor ? '{{ __('Show Dashboard Editor') }}' : '{{ __('Hide Dashboard Editor') }}')
 
                 // disable and hide editing
                 if (typeof gridster !== 'undefined') {

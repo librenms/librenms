@@ -44,5 +44,5 @@ if (! empty($group_name)) {
 if (! empty($ok)) {
     exit("$ok");
 } else {
-    exit("ERROR: $error");
+    exit('ERROR: ' . htmlspecialchars($error));
 }

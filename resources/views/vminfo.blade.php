@@ -9,12 +9,12 @@
             <tr>
                 <th data-column-id="deviceid" data-visible="false" data-css-class="deviceid">No</th>
                 <th data-column-id="sysname" data-visible="false">Sysname</th>
-                <th data-column-id="vmwVmDisplayName">@lang('Device')</th>
-                <th data-column-id="vmwVmState">@lang('Power Status')</th>
-                <th data-column-id="hostname">@lang('Host')</th>
-                <th data-column-id="vmwVmGuestOS" data-searchable="false">@lang('Operating System')</th>
-                <th data-column-id="vmwVmMemSize" data-searchable="false">@lang('Memory')</th>
-                <th data-column-id="vmwVmCpus" data-searchable="false">@lang('CPU')</th>
+                <th data-column-id="vmwVmDisplayName">{{ __('Device') }}</th>
+                <th data-column-id="vmwVmState">{{ __('Power Status') }}</th>
+                <th data-column-id="hostname">{{ __('Host') }}</th>
+                <th data-column-id="vmwVmGuestOS" data-searchable="false">{{ __('Operating System') }}</th>
+                <th data-column-id="vmwVmMemSize" data-searchable="false">{{ __('Memory') }}</th>
+                <th data-column-id="vmwVmCpus" data-searchable="false">{{ __('CPU') }}</th>
             </tr>
         </thead>
         <tbody>

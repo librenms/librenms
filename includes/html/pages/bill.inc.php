@@ -211,7 +211,7 @@ if (bill_permitted($bill_id)) {
         $rightnow = date('U');
 
         if ($vars['view'] == 'accurate') {
-            $bi = "<img src='billing-graph.php?bill_id=" . $bill_id . '&amp;bill_code=' . $_GET['bill_code'];
+            $bi = "<img src='billing-graph.php?bill_id=" . $bill_id . '&amp;bill_code=' . htmlspecialchars($_GET['bill_code']);
             $bi .= '&amp;from=' . $unixfrom . '&amp;to=' . $unixto;
             $bi .= '&amp;x=1190&amp;y=250';
             $bi .= "$type'>";
@@ -221,12 +221,12 @@ if (bill_permitted($bill_id)) {
             $li .= '&amp;x=1190&amp;y=250';
             $li .= "$type'>";
 
-            $di = "<img src='billing-graph.php?bill_id=" . $bill_id . '&amp;bill_code=' . $_GET['bill_code'];
+            $di = "<img src='billing-graph.php?bill_id=" . $bill_id . '&amp;bill_code=' . htmlspecialchars($_GET['bill_code']);
             $di .= '&amp;from=' . \LibreNMS\Config::get('time.day') . '&amp;to=' . \LibreNMS\Config::get('time.now');
             $di .= '&amp;x=1190&amp;y=250';
             $di .= "$type'>";
 
-            $mi = "<img src='billing-graph.php?bill_id=" . $bill_id . '&amp;bill_code=' . $_GET['bill_code'];
+            $mi = "<img src='billing-graph.php?bill_id=" . $bill_id . '&amp;bill_code=' . htmlspecialchars($_GET['bill_code']);
             $mi .= '&amp;from=' . $lastmonth . '&amp;to=' . $rightnow;
             $mi .= '&amp;x=1190&amp;y=250';
             $mi .= "$type'>";

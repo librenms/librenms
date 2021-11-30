@@ -7,7 +7,7 @@
     <div class="row">
         <form action="{{ route('users.update', $user->user_id)}}" method="POST" role="form"
               class="form-horizontal col-md-8 col-md-offset-2">
-            <legend>@lang('Edit User'): {{ $user->username }}</legend>
+            <legend>{{ __('Edit User') }}: {{ $user->username }}</legend>
             {{ method_field('PUT') }}
             @csrf
 
@@ -19,23 +19,23 @@
                 @if($twofactor_enabled)
                     @if($twofactor_locked)
                         <div class="form-group" id="twofactor-unlock-form">
-                            <button type="button" id="twofactor-unlock" class="btn btn-default col-sm-4 col-sm-offset-1">@lang('Unlock')</button>
-                            <label for="twofactor-unlock" class="col-sm-7 control-label">@lang('User exceeded failures')</label>
+                            <button type="button" id="twofactor-unlock" class="btn btn-default col-sm-4 col-sm-offset-1">{{ __('Unlock') }}</button>
+                            <label for="twofactor-unlock" class="col-sm-7 control-label">{{ __('User exceeded failures') }}</label>
                         </div>
                     @endif
                     <div class="form-group">
-                        <button type="button" id="twofactor-disable" class="btn btn-danger col-sm-offset-1">@lang('Disable TwoFactor')</button>
+                        <button type="button" id="twofactor-disable" class="btn btn-danger col-sm-offset-1">{{ __('Disable TwoFactor') }}</button>
                     </div>
                 @else
-                    <p>@lang('No TwoFactor key generated for this user, Nothing to do.')</p>
+                    <p>{{ __('No TwoFactor key generated for this user, Nothing to do.') }}</p>
                 @endif
             </x-panel>
             @endconfig
 
             <div class="form-group">
                 <div class="col-sm-9 col-sm-offset-3">
-                    <button type="submit" class="btn btn-primary">@lang('Save')</button>
-                    <a type="button" class="btn btn-danger" href="{{ route('users.index') }}">@lang('Cancel')</a>
+                    <button type="submit" class="btn btn-primary">{{ __('Save') }}</button>
+                    <a type="button" class="btn btn-danger" href="{{ route('users.index') }}">{{ __('Cancel') }}</a>
                 </div>
             </div>
         </form>
@@ -55,13 +55,13 @@
                     success: function(data){
                         if (data.status === 'ok') {
                             $('#twofactor-unlock-form').remove();
-                            toastr.success('@lang('Unlocked Two Factor.')');
+                            toastr.success('{{ __('Unlocked Two Factor.') }}');
                         } else {
-                            toastr.error('@lang('Failed to unlock Two Factor')<br />' + data.message);
+                            toastr.error('{{ __('Failed to unlock Two Factor') }}<br />' + data.message);
                         }
                     },
                     error: function(){
-                        toastr.error('@lang('Failed to unlock Two Factor')');
+                        toastr.error('{{ __('Failed to unlock Two Factor') }}');
                     }
                 });
             });
@@ -73,13 +73,13 @@
                     dataType: "json",
                     success: function(data){
                         if (data.status === 'ok') {
-                            toastr.success('@lang('Removed Two Factor.')');
+                            toastr.success('{{ __('Removed Two Factor.') }}');
                         } else {
-                            toastr.error('@lang('Failed to remove Two Factor')<br />' + data.message);
+                            toastr.error('{{ __('Failed to remove Two Factor') }}<br />' + data.message);
                         }
                     },
                     error: function(){
-                        toastr.error('@lang('Failed to remove Two Factor')');
+                        toastr.error('{{ __('Failed to remove Two Factor') }}');
                     }
                 });
             });

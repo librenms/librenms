@@ -4,9 +4,9 @@
     <table class="table table-hover table-condensed table-striped">
         <thead>
             <tr>
-                <th style="width: 150px;">@lang('VLAN Number')</th>
-                <th style="width: 250px;">@lang('VLAN Name')</th>
-                <th>@lang('Ports')</th>
+                <th style="width: 150px;">{{ __('VLAN Number') }}</th>
+                <th style="width: 250px;">{{ __('VLAN Name') }}</th>
+                <th>{{ __('Ports') }}</th>
             </tr>
         </thead>
         <tbody>
