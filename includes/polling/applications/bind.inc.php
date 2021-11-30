@@ -127,7 +127,7 @@ $fields = [
 ];
 $metrics['incoming'] = $fields;
 
-$tags = ['name' => $name, 'app_id' => $app_id, 'client' => 'incoming_extended', 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
+$tags = ['name' => $name, 'app_id' => $app_id, 'type' => 'incoming_extended', 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
 data_update($device, 'app', $tags, $fields);
 
 //
