@@ -3,7 +3,7 @@
         {{ $title }}
     </div>
 @endisset
-<div class="tw-flex tw-flex-wrap" @if(! $responsive) style="width: {{ $rowWidth }}px;" @endif>
+<div class="tw-flex tw-flex-wrap" @if(! $responsive) style="width: {{ $rowWidth }}px;" @endif {{ $attributes }}>
     @foreach($graphs as $graph)
         <x-graph
                 :type="$type"
