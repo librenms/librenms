@@ -47,6 +47,13 @@ class SnmpResponseTest extends TestCase
         $this->assertEquals(['' => 'IF-MIB::ifDescr'], $response->values());
         $this->assertEquals('IF-MIB::ifDescr', $response->value());
         $this->assertEquals(['IF-MIB::ifDescr'], $response->table());
+
+        // unescaped strings
+        $response = new SnmpResponse("Q-BRIDGE-MIB::dot1qVlanStaticName[1] = \"default\"\nQ-BRIDGE-MIB::dot1qVlanStaticName[9] = \"\\\\Surrounded\\\\\"");
+        $this->assertTrue($response->isValid());
+        $this->assertEquals('default', $response->value());
+        $this->assertEquals(['Q-BRIDGE-MIB::dot1qVlanStaticName[1]' => 'default', 'Q-BRIDGE-MIB::dot1qVlanStaticName[9]' => '\\Surrounded\\'], $response->values());
+        $this->assertEquals(['Q-BRIDGE-MIB::dot1qVlanStaticName' => [1 => 'default', 9 => '\\Surrounded\\']], $response->table());
     }
 
     public function testMultiLine(): void
