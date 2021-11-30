@@ -211,21 +211,6 @@ parameters:
 			path: html/ajax_listports.php
 
 		-
-			message: "#^Calling dbFetchCell\\(\\) is forbidden, use Eloquent instead; https\\://laravel\\.com/docs/8\\.x/eloquent \\[dbFetchCell\\(\\) matches db\\*\\(\\)\\]$#"
-			count: 1
-			path: html/ajax_search.php
-
-		-
-			message: "#^Calling dbFetchRows\\(\\) is forbidden, use Eloquent instead; https\\://laravel\\.com/docs/8\\.x/eloquent \\[dbFetchRows\\(\\) matches db\\*\\(\\)\\]$#"
-			count: 11
-			path: html/ajax_search.php
-
-		-
-			message: "#^Calling dbGenPlaceholders\\(\\) is forbidden, use Eloquent instead; https\\://laravel\\.com/docs/8\\.x/eloquent \\[dbGenPlaceholders\\(\\) matches db\\*\\(\\)\\]$#"
-			count: 1
-			path: html/ajax_search.php
-
-		-
 			message: "#^Calling dbFetch\\(\\) is forbidden, use Eloquent instead; https\\://laravel\\.com/docs/8\\.x/eloquent \\[dbFetch\\(\\) matches db\\*\\(\\)\\]$#"
 			count: 2
 			path: html/network-map.php

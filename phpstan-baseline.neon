@@ -5391,21 +5391,6 @@ parameters:
 			path: LibreNMS/Util/CliColorFormatter.php
 
 		-
-			message: "#^Method LibreNMS\\\\Util\\\\Colors\\:\\:percentage\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: LibreNMS/Util/Colors.php
-
-		-
-			message: "#^Method LibreNMS\\\\Util\\\\Colors\\:\\:percentage\\(\\) has parameter \\$component_perc_warn with no type specified\\.$#"
-			count: 1
-			path: LibreNMS/Util/Colors.php
-
-		-
-			message: "#^Method LibreNMS\\\\Util\\\\Colors\\:\\:percentage\\(\\) has parameter \\$percentage with no type specified\\.$#"
-			count: 1
-			path: LibreNMS/Util/Colors.php
-
-		-
 			message: "#^Property LibreNMS\\\\Util\\\\Dns\\:\\:\\$resolver has no type specified\\.$#"
 			count: 1
 			path: LibreNMS/Util/Dns.php

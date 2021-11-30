@@ -604,7 +604,7 @@
         datumTokenizer: Bloodhound.tokenizers.obj.whitespace('name'),
         queryTokenizer: Bloodhound.tokenizers.whitespace,
         remote: {
-            url: ajax_url + "_search.php?search=%QUERY&type=device",
+            url: ajax_url + "/search/device?search=%QUERY",
             filter: function (devices) {
                 return $.map(devices, function (device) {
                     return {
@@ -627,11 +627,10 @@
         datumTokenizer: Bloodhound.tokenizers.obj.whitespace('name'),
         queryTokenizer: Bloodhound.tokenizers.whitespace,
         remote: {
-            url: ajax_url + "_search.php?search=%QUERY&type=ports",
+            url: ajax_url + "/search/port/?search=%QUERY",
             filter: function (ports) {
                 return $.map(ports, function (port) {
                     return {
-                        count: port.count,
                         url: port.url,
                         name: port.name,
                         description: port.description,
@@ -647,11 +646,10 @@
         datumTokenizer: Bloodhound.tokenizers.obj.whitespace('name'),
         queryTokenizer: Bloodhound.tokenizers.whitespace,
         remote: {
-            url: ajax_url + "_search.php?search=%QUERY&type=bgp",
+            url: ajax_url + "/search/bgp/?search=%QUERY",
             filter: function (bgp_sessions) {
                 return $.map(bgp_sessions, function (bgp) {
                     return {
-                        count: bgp.count,
                         url: bgp.url,
                         name: bgp.name,
                         description: bgp.description,
@@ -679,10 +677,7 @@
     $('#gsearch').typeahead({
             hint: true,
             highlight: true,
-            minLength: 1,
-            classNames: {
-                menu: cssMenu
-            }
+            minLength: 1
         },
         {
             source: devices.ttAdapter(),
@@ -692,7 +687,7 @@
             valueKey: 'name',
             templates: {
                 header: '<h5><strong>&nbsp;Devices</strong></h5>',
-                suggestion: Handlebars.compile('<p><a href="@{{url}}"><img src="@{{device_image}}" border="0"> <small><strong>@{{name}}</strong> | @{{device_os}} | @{{version}} | @{{device_hardware}} with @{{device_ports}} port(s) | @{{location}}</small></a></p>')
+                suggestion: Handlebars.compile('<p><a href="@{{url}}"><img src="@{{device_image}}" style="float: left; min-height: 32px; margin-right: 5px;"> <small><strong>@{{name}}</strong> | @{{device_os}} | @{{version}} <br /> @{{device_hardware}} with @{{device_ports}} port(s) | @{{location}}</small></a></p>')
             }
         },
         {

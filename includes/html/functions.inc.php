@@ -51,7 +51,7 @@ function var_get($v)
 
 function toner2colour($descr, $percent)
 {
-    $colour = \LibreNMS\Util\Colors::percentage(100 - $percent, null);
+    $colour = \LibreNMS\Util\Color::percentage(100 - $percent, null);
 
     if (substr($descr, -1) == 'C' || stripos($descr, 'cyan') !== false) {
         $colour['left'] = '55D6D3';
