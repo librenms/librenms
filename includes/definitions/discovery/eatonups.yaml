@@ -1,8 +1,9 @@
-mib: XUPS-MIB:EATON-OIDS:EATON-EMP-MIB
+mib: XUPS-MIB:EATON-OIDS:EATON-EMP-MIB:UPS-MIB
 modules:
     os:
         hardware: XUPS-MIB::xupsIdentModel.0
         version: XUPS-MIB::xupsIdentSoftwareVersion.0
+        serial: UPS-MIB::upsIdentName.0
     sensors:
         temperature:
             data:
