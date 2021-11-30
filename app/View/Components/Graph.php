@@ -120,6 +120,19 @@ class Graph extends Component
         ]);
     }
 
+    /**
+     * @param mixed $value
+     * @param int|string $key
+     * @return bool
+     */
+    public function filterAttributes($value, $key): bool
+    {
+        return ! in_array($key, [
+            'legend',
+            'height',
+        ]);
+    }
+
     private function getSrc(): string
     {
         return url('graph.php') . '?' . http_build_query($this->vars + [

@@ -1,1 +1,1 @@
-<a href="{{ $link }}"><img width="{{ $width }}" height="{{ $height }}" src="{{ $src }}" alt="{{ $type }}" {{ $attributes->merge(['class' => 'graph-image']) }}></a>
+<a href="{{ $link }}" {{ $attributes->filter($filterAttributes) }}><img width="{{ $width }}" height="{{ $height }}" src="{{ $src }}" alt="{{ $type }}" class="graph-image"></a>
