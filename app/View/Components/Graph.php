@@ -121,8 +121,8 @@ class Graph extends Component
     }
 
     /**
-     * @param mixed $value
-     * @param int|string $key
+     * @param  mixed  $value
+     * @param  int|string  $key
      * @return bool
      */
     public function filterAttributes($value, $key): bool
