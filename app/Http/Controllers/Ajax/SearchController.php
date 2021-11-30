@@ -48,7 +48,7 @@ abstract class SearchController
     abstract public function buildQuery(string $search, Request $request): Builder;
 
     /**
-     * @param \Illuminate\Database\Eloquent\Model $item
+     * @param  \Illuminate\Database\Eloquent\Model  $item
      * @return array
      */
     abstract public function formatItem($item): array;

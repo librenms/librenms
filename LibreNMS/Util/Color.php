@@ -34,7 +34,7 @@ class Color
     /**
      * Get colors for a percentage bar based on current percentage
      *
-     * @param int|float $percentage
+     * @param  int|float  $percentage
      * @param  int|float  $component_perc_warn
      * @return string[]
      */
