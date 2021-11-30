@@ -25,6 +25,7 @@
 
 namespace LibreNMS\Tests\Unit;
 
+use LibreNMS\Config;
 use LibreNMS\Data\Source\SnmpResponse;
 use LibreNMS\Tests\TestCase;
 
@@ -49,11 +50,31 @@ class SnmpResponseTest extends TestCase
         $this->assertEquals(['IF-MIB::ifDescr'], $response->table());
 
         // unescaped strings
-        $response = new SnmpResponse("Q-BRIDGE-MIB::dot1qVlanStaticName[1] = \"default\"\nQ-BRIDGE-MIB::dot1qVlanStaticName[9] = \"\\\\Surrounded\\\\\"");
+        $response = new SnmpResponse("Q-BRIDGE-MIB::dot1qVlanStaticName[1] = \"\\default\\\"\nQ-BRIDGE-MIB::dot1qVlanStaticName[6] = \\single\\\nQ-BRIDGE-MIB::dot1qVlanStaticName[9] = \\\\double\\\\\n");
         $this->assertTrue($response->isValid());
         $this->assertEquals('default', $response->value());
-        $this->assertEquals(['Q-BRIDGE-MIB::dot1qVlanStaticName[1]' => 'default', 'Q-BRIDGE-MIB::dot1qVlanStaticName[9]' => '\\Surrounded\\'], $response->values());
-        $this->assertEquals(['Q-BRIDGE-MIB::dot1qVlanStaticName' => [1 => 'default', 9 => '\\Surrounded\\']], $response->table());
+        Config::set('snmp.unescape', false);
+        $this->assertEquals([
+            'Q-BRIDGE-MIB::dot1qVlanStaticName[1]' => 'default',
+            'Q-BRIDGE-MIB::dot1qVlanStaticName[6]' => '\\single\\',
+            'Q-BRIDGE-MIB::dot1qVlanStaticName[9]' => '\\\\double\\\\',
+        ], $response->values());
+        $this->assertEquals(['Q-BRIDGE-MIB::dot1qVlanStaticName' => [
+            1 => 'default',
+            6 => '\\single\\',
+            9 => '\\\\double\\\\',
+        ]], $response->table());
+        Config::set('snmp.unescape', true); // for buggy versions of net-snmp
+        $this->assertEquals([
+            'Q-BRIDGE-MIB::dot1qVlanStaticName[1]' => 'default',
+            'Q-BRIDGE-MIB::dot1qVlanStaticName[6]' => 'single',
+            'Q-BRIDGE-MIB::dot1qVlanStaticName[9]' => '\\double\\',
+        ], $response->values());
+        $this->assertEquals(['Q-BRIDGE-MIB::dot1qVlanStaticName' => [
+            1 => 'default',
+            6 => 'single',
+            9 => '\\double\\',
+        ]], $response->table());
     }
 
     public function testMultiLine(): void
