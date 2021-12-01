@@ -12,9 +12,9 @@
  * See COPYING for more details.
  */
 
-use App\Models\Port;
 use App\Models\Ipv6Address;
 use App\Models\Ipv6Network;
+use App\Models\Port;
 use Illuminate\Support\Str;
 use LibreNMS\Config;
 use LibreNMS\Device\YamlDiscovery;
@@ -667,61 +667,58 @@ function discover_process_ipv6(&$valid, $ifIndex, $ipv6_address, $ipv6_prefixlen
     $port_id = Port::where([
         ['device_id', $device['device_id']],
         ['ifIndex', $ifIndex],
-        ])->value('port_id');
+    ])->value('port_id');
 
     if ($port_id && $ipv6_prefixlen > '0' && $ipv6_prefixlen < '129' && $ipv6_compressed != '::1') {
+        d_echo('IPV6: Found port id: ' . $port_id);
 
-        if (is_numeric($port_id)) {
-            d_echo('IPV6: Found port id: ' . $port_id);
+        $ipv6netDB = Ipv6Network::firstOrNew([
+            'ipv6_network' => $ipv6_network,
+        ], [
+            'context_name' => $context_name,
+        ]);
 
-            $ipv6netDB = Ipv6Network::firstOrNew([
-                'ipv6_network' => $ipv6_network,
+        //check if DB data match and check for DB NULL
+        if ($ipv6netDB->context_name != $context_name || $ipv6netDB->context_name == null) {
+            $ipv6netDB->context_name = $context_name;
+            d_echo('IPV6: Update DB ipv6_networks');
+        }
+
+        $ipv6netDB->save();
+
+        $ipv6_network_id = Ipv6Network::where('ipv6_network', $ipv6_network)->where('context_name', $context_name)->value('ipv6_network_id');
+
+        if ($ipv6_network_id) {
+            d_echo('IPV6: Found network id: ' . $ipv6_network_id);
+
+            $ipv6adrDB = Ipv6Address::firstOrNew([
+                'ipv6_address' => $ipv6_address,
+                'ipv6_prefixlen' => $ipv6_prefixlen,
+                'port_id' => $port_id,
             ], [
+                'ipv6_compressed' => $ipv6_compressed,
+                'ipv6_origin' => $ipv6_origin,
+                'ipv6_network_id' => $ipv6_network_id,
                 'context_name' => $context_name,
             ]);
 
             //check if DB data match and check for DB NULL
-            if ($ipv6netDB->context_name != $context_name || $ipv6netDB->context_name == null) {
-                $ipv6netDB->context_name = $context_name;
-                d_echo('IPV6: Update DB ipv6_networks');
+            if ($ipv6adrDB->context_name != $context_name || $ipv6adrDB->context_name == null) {
+                $ipv6adrDB->context_name = $context_name;
+                d_echo('IPV6: Update DB ipv6_addresses');
+            }
+            if ($ipv6adrDB->ipv6_network_id != $ipv6_network_id) {
+                $ipv6adrDB->ipv6_network_id = $ipv6_network_id;
+                d_echo('IPV6: Update DB ipv6_addresses');
             }
 
-            $ipv6netDB->save();
+            $ipv6adrDB->save();
 
-            $ipv6_network_id = Ipv6Network::where('ipv6_network', $ipv6_network)->where('context_name', $context_name)->value('ipv6_network_id');
-
-            if ($ipv6_network_id) {
-                d_echo('IPV6: Found network id: ' . $ipv6_network_id);
-
-                $ipv6adrDB = Ipv6Address::firstOrNew([
-                    'ipv6_address' => $ipv6_address,
-                    'ipv6_prefixlen' => $ipv6_prefixlen,
-                    'port_id' => $port_id,
-                ], [
-                    'ipv6_compressed' => $ipv6_compressed,
-                    'ipv6_origin' => $ipv6_origin,
-                    'ipv6_network_id' => $ipv6_network_id,
-                    'context_name' => $context_name,
-                ]);
-
-                //check if DB data match and check for DB NULL
-                if ($ipv6adrDB->context_name != $context_name || $ipv6adrDB->context_name == null) {
-                    $ipv6adrDB->context_name = $context_name;
-                    d_echo('IPV6: Update DB ipv6_addresses');
-                }
-                if ($ipv6adrDB->ipv6_network_id != $ipv6_network_id) {
-                    $ipv6adrDB->ipv6_network_id = $ipv6_network_id;
-                    d_echo('IPV6: Update DB ipv6_addresses');
-                }
-
-                $ipv6adrDB->save();
-
-                $full_address = "$ipv6_address/$ipv6_prefixlen";
-                $valid_address = $full_address . '-' . $port_id;
-                $valid['ipv6'][$valid_address] = 1;
-            }//endif network_id
-        }//endif port_id
-    }//end if
+            $full_address = "$ipv6_address/$ipv6_prefixlen";
+            $valid_address = $full_address . '-' . $port_id;
+            $valid['ipv6'][$valid_address] = 1;
+        }//endif network_id
+    }//endif port_id && others
 }//end discover_process_ipv6()
 
 /*
