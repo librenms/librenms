@@ -1619,6 +1619,7 @@ ports_stp:
     - { Field: port_stp_id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
     - { Field: device_id, Type: 'int unsigned', 'Null': false, Extra: '' }
     - { Field: port_id, Type: 'int unsigned', 'Null': false, Extra: '' }
+    - { Field: dot1dBasePort, Type: 'int unsigned', 'Null': false, Extra: '' }
     - { Field: priority, Type: 'tinyint unsigned', 'Null': false, Extra: '' }
     - { Field: state, Type: varchar(11), 'Null': false, Extra: '' }
     - { Field: enable, Type: varchar(8), 'Null': false, Extra: '' }

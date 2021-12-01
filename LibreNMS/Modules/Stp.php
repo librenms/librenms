@@ -31,6 +31,7 @@ use LibreNMS\DB\SyncsModels;
 use LibreNMS\Interfaces\Module;
 use LibreNMS\OS;
 use LibreNMS\Util\Rewrite;
+use SnmpQuery;
 
 class Stp implements Module
 {
@@ -38,7 +39,7 @@ class Stp implements Module
 
     public function discover(OS $os): void
     {
-        $protocol = \SnmpQuery::get('BRIDGE-MIB::dot1dStpProtocolSpecification.0')->value();
+        $protocol = SnmpQuery::get('BRIDGE-MIB::dot1dStpProtocolSpecification.0')->value();
         // 1 = unknown (mstp?), 3 = ieee8021d
 
         if ($protocol != 1 && $protocol != 3) {
@@ -48,7 +49,7 @@ class Stp implements Module
         $timeFactor = $os->stpTimeFactor ?? 0.01;
 
         // fetch STP config and store it
-        $stp = \SnmpQuery::enumStrings()->get([
+        $stp = SnmpQuery::enumStrings()->get([
             'BRIDGE-MIB::dot1dBaseBridgeAddress.0',
             'BRIDGE-MIB::dot1dStpProtocolSpecification.0',
             'BRIDGE-MIB::dot1dStpPriority.0',
@@ -67,7 +68,7 @@ class Stp implements Module
         ])->values();
 
         $bridge = Rewrite::macToHex($stp['BRIDGE-MIB::dot1dBaseBridgeAddress.0']);
-        $stpConfig = \App\Models\Stp::updateOrCreate(['device_id' => $os->getDeviceId()], [
+        \App\Models\Stp::updateOrCreate(['device_id' => $os->getDeviceId()], [
             'rootBridge' => $bridge == $this->rootToMac($stp['BRIDGE-MIB::dot1dStpDesignatedRoot.0'] ?? 0) ? 1 : 0,
             'bridgeAddress' => $bridge,
             'protocolSpecification' => $stp['BRIDGE-MIB::dot1dStpProtocolSpecification.0'],
@@ -86,26 +87,15 @@ class Stp implements Module
             'bridgeForwardDelay' => ($stp['BRIDGE-MIB::dot1dStpBridgeForwardDelay.0'] ?? 0) * $timeFactor,
         ]);
 
-        $os->getDevice()->setRelation('stpInstances', collect([$stpConfig])); // save sql query below
-        $this->poll($os);  // poll ports
-    }
-
-    public function poll(OS $os): void
-    {
-        $instances = $os->getDevice()->stpInstances;
-
-        if ($instances->isEmpty()) {
-            return;
-        }
-
-        $ports = \SnmpQuery::enumStrings()->walk('BRIDGE-MIB::dot1dStpPortTable')
+        $ports = SnmpQuery::enumStrings()->walk('BRIDGE-MIB::dot1dStpPortTable')
             ->mapTable(function ($data, $port) use ($os) {
                 return new PortStp([
                     'port_id' => $os->basePortToId($port),
+                    'dot1dBasePort' => $port,
                     'priority' => $data['BRIDGE-MIB::dot1dStpPortPriority'],
-                    'state' => $data['BRIDGE-MIB::dot1dStpPortState'],
-                    'enable' => $data['BRIDGE-MIB::dot1dStpPortEnable'],
-                    'pathCost' => $data['BRIDGE-MIB::dot1dStpPortPathCost'] ?? 0,
+                    'state' => $data['BRIDGE-MIB::dot1dStpPortState'] ?? 'unknown',
+                    'enable' => $data['BRIDGE-MIB::dot1dStpPortEnable'] ?? 'unknown',
+                    'pathCost' => $data['BRIDGE-MIB::dot1dStpPortPathCost32'] ?? $data['BRIDGE-MIB::dot1dStpPortPathCost'] ?? 0,
                     'designatedRoot' => $this->rootToMac($data['BRIDGE-MIB::dot1dStpPortDesignatedRoot']),
                     'designatedCost' => $data['BRIDGE-MIB::dot1dStpPortDesignatedCost'],
                     'designatedBridge' => $this->rootToMac($data['BRIDGE-MIB::dot1dStpPortDesignatedBridge']),
@@ -119,6 +109,36 @@ class Stp implements Module
         ModuleModelObserver::observe(PortStp::class);
         $this->syncModels($os->getDevice(), 'stpPorts', $ports);
         echo PHP_EOL;
+    }
+
+    public function poll(OS $os): void
+    {
+        $ports = $os->getDevice()->stpPorts;
+
+        if ($ports->isEmpty()) {
+            return;
+        }
+
+        $oids = $ports->sortBy('dot1dBasePort')->map(function (PortStp $port) {
+            return [
+                'BRIDGE-MIB::dot1dStpPortState.' . $port->dot1dBasePort,
+                'BRIDGE-MIB::dot1dStpPortEnable.' . $port->dot1dBasePort,
+                'BRIDGE-MIB::dot1dStpPortDesignatedRoot.' . $port->dot1dBasePort,
+                'BRIDGE-MIB::dot1dStpPortDesignatedBridge.' . $port->dot1dBasePort,
+            ];
+        })->flatten()->all();
+
+        ModuleModelObserver::observe(PortStp::class);
+        $ports = $ports->keyBy('dot1dBasePort');
+        SnmpQuery::enumStrings()->get($oids)->mapTable(function ($data, $base_port) use ($ports) {
+            $port = $ports->get($base_port);
+            $port->state = $data['BRIDGE-MIB::dot1dStpPortState'] ?? 'unknown';
+            $port->enable = $data['BRIDGE-MIB::dot1dStpPortEnable'] ?? 'unknown';
+            $port->designatedRoot = $this->rootToMac($data['BRIDGE-MIB::dot1dStpPortDesignatedRoot']);
+            $port->designatedBridge = $this->rootToMac($data['BRIDGE-MIB::dot1dStpPortDesignatedBridge']);
+
+            return $port;
+        })->each->save();
     }
 
     public function cleanup(OS $os): void
