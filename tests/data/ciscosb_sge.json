@@ -13250,5 +13250,68 @@
                 }
             ]
         }
+    },
+    "stp": {
+        "discovery": {
+            "stp": [
+                {
+                    "rootBridge": 0,
+                    "bridgeAddress": "f02572867b6a",
+                    "protocolSpecification": "ieee8021d",
+                    "priority": 32768,
+                    "timeSinceTopologyChange": "874313",
+                    "topChanges": 1064,
+                    "designatedRoot": "2cfaa24ab00b",
+                    "rootCost": 2001902,
+                    "rootPort": 47,
+                    "maxAge": 20,
+                    "helloTime": 2,
+                    "holdTime": 1,
+                    "forwardDelay": 15,
+                    "bridgeMaxAge": 20,
+                    "bridgeHelloTime": 2,
+                    "bridgeForwardDelay": 15
+                }
+            ],
+            "ports_stp": [
+                {
+                    "priority": 128,
+                    "state": "forwarding",
+                    "enable": "enabled",
+                    "pathCost": 2000000,
+                    "designatedRoot": "2cfaa24ab00b",
+                    "designatedCost": 65535,
+                    "designatedBridge": "f02572867b6a",
+                    "designatedPort": 1,
+                    "forwardTransitions": 0,
+                    "ifIndex": 1
+                },
+                {
+                    "priority": 128,
+                    "state": "forwarding",
+                    "enable": "enabled",
+                    "pathCost": 200000,
+                    "designatedRoot": "2cfaa24ab00b",
+                    "designatedCost": 65535,
+                    "designatedBridge": "f02572867b6a",
+                    "designatedPort": 25,
+                    "forwardTransitions": 2,
+                    "ifIndex": 25
+                },
+                {
+                    "priority": 128,
+                    "state": "forwarding",
+                    "enable": "enabled",
+                    "pathCost": 2000000,
+                    "designatedRoot": "2cfaa24ab00b",
+                    "designatedCost": 1902,
+                    "designatedBridge": "40b93c52f7f4",
+                    "designatedPort": 12,
+                    "forwardTransitions": 1,
+                    "ifIndex": 47
+                }
+            ]
+        },
+        "poller": "matches discovery"
     }
 }

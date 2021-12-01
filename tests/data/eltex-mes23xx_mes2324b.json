@@ -9862,5 +9862,1523 @@
                 }
             ]
         }
+    },
+    "vlans": {
+        "discovery": {
+            "vlans": [
+                {
+                    "vlan_vlan": 1,
+                    "vlan_domain": 1,
+                    "vlan_name": "VLAN 1",
+                    "vlan_type": null,
+                    "vlan_mtu": null
+                },
+                {
+                    "vlan_vlan": 2,
+                    "vlan_domain": 1,
+                    "vlan_name": "Vlan_2",
+                    "vlan_type": null,
+                    "vlan_mtu": null
+                },
+                {
+                    "vlan_vlan": 19,
+                    "vlan_domain": 1,
+                    "vlan_name": "Vlan_19",
+                    "vlan_type": null,
+                    "vlan_mtu": null
+                },
+                {
+                    "vlan_vlan": 20,
+                    "vlan_domain": 1,
+                    "vlan_name": "Vlan_20",
+                    "vlan_type": null,
+                    "vlan_mtu": null
+                },
+                {
+                    "vlan_vlan": 39,
+                    "vlan_domain": 1,
+                    "vlan_name": "Vlan_39",
+                    "vlan_type": null,
+                    "vlan_mtu": null
+                },
+                {
+                    "vlan_vlan": 40,
+                    "vlan_domain": 1,
+                    "vlan_name": "Vlan_40",
+                    "vlan_type": null,
+                    "vlan_mtu": null
+                },
+                {
+                    "vlan_vlan": 99,
+                    "vlan_domain": 1,
+                    "vlan_name": "Vlan_99",
+                    "vlan_type": null,
+                    "vlan_mtu": null
+                },
+                {
+                    "vlan_vlan": 100,
+                    "vlan_domain": 1,
+                    "vlan_name": "Vlan_100",
+                    "vlan_type": null,
+                    "vlan_mtu": null
+                },
+                {
+                    "vlan_vlan": 200,
+                    "vlan_domain": 1,
+                    "vlan_name": "Vlan_200",
+                    "vlan_type": null,
+                    "vlan_mtu": null
+                },
+                {
+                    "vlan_vlan": 254,
+                    "vlan_domain": 1,
+                    "vlan_name": "Vlan_254",
+                    "vlan_type": null,
+                    "vlan_mtu": null
+                },
+                {
+                    "vlan_vlan": 1000,
+                    "vlan_domain": 1,
+                    "vlan_name": "Vlan_1000",
+                    "vlan_type": null,
+                    "vlan_mtu": null
+                },
+                {
+                    "vlan_vlan": 2600,
+                    "vlan_domain": 1,
+                    "vlan_name": "Vlan_2600_tlk_lpa",
+                    "vlan_type": null,
+                    "vlan_mtu": null
+                },
+                {
+                    "vlan_vlan": 3200,
+                    "vlan_domain": 1,
+                    "vlan_name": "Vlan_3200_tlk_wan",
+                    "vlan_type": null,
+                    "vlan_mtu": null
+                }
+            ],
+            "ports_vlans": [
+                {
+                    "vlan": 1,
+                    "baseport": 49,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 1
+                },
+                {
+                    "vlan": 1,
+                    "baseport": 50,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 1
+                },
+                {
+                    "vlan": 1,
+                    "baseport": 51,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 1
+                },
+                {
+                    "vlan": 1,
+                    "baseport": 52,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 1
+                },
+                {
+                    "vlan": 1,
+                    "baseport": 53,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 1
+                },
+                {
+                    "vlan": 1,
+                    "baseport": 54,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 1
+                },
+                {
+                    "vlan": 1,
+                    "baseport": 55,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 1
+                },
+                {
+                    "vlan": 1,
+                    "baseport": 56,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 1
+                },
+                {
+                    "vlan": 1,
+                    "baseport": 57,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 1
+                },
+                {
+                    "vlan": 1,
+                    "baseport": 58,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 1
+                },
+                {
+                    "vlan": 1,
+                    "baseport": 63,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 1
+                },
+                {
+                    "vlan": 1,
+                    "baseport": 64,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 1
+                },
+                {
+                    "vlan": 1,
+                    "baseport": 65,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 1
+                },
+                {
+                    "vlan": 1,
+                    "baseport": 66,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 1
+                },
+                {
+                    "vlan": 1,
+                    "baseport": 67,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 1
+                },
+                {
+                    "vlan": 1,
+                    "baseport": 70,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 1
+                },
+                {
+                    "vlan": 1,
+                    "baseport": 106,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 1
+                },
+                {
+                    "vlan": 1,
+                    "baseport": 107,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 1
+                },
+                {
+                    "vlan": 1,
+                    "baseport": 108,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 1
+                },
+                {
+                    "vlan": 1,
+                    "baseport": 163,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 1
+                },
+                {
+                    "vlan": 2,
+                    "baseport": 49,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 0
+                },
+                {
+                    "vlan": 2,
+                    "baseport": 50,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 0
+                },
+                {
+                    "vlan": 2,
+                    "baseport": 51,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 0
+                },
+                {
+                    "vlan": 2,
+                    "baseport": 52,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 0
+                },
+                {
+                    "vlan": 2,
+                    "baseport": 53,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 0
+                },
+                {
+                    "vlan": 2,
+                    "baseport": 54,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 0
+                },
+                {
+                    "vlan": 2,
+                    "baseport": 55,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 0
+                },
+                {
+                    "vlan": 2,
+                    "baseport": 56,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 0
+                },
+                {
+                    "vlan": 2,
+                    "baseport": 57,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 0
+                },
+                {
+                    "vlan": 2,
+                    "baseport": 58,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 0
+                },
+                {
+                    "vlan": 2,
+                    "baseport": 106,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 0
+                },
+                {
+                    "vlan": 2,
+                    "baseport": 163,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 1
+                },
+                {
+                    "vlan": 19,
+                    "baseport": 49,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 0
+                },
+                {
+                    "vlan": 19,
+                    "baseport": 50,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 0
+                },
+                {
+                    "vlan": 19,
+                    "baseport": 51,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 0
+                },
+                {
+                    "vlan": 19,
+                    "baseport": 52,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 0
+                },
+                {
+                    "vlan": 19,
+                    "baseport": 53,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 0
+                },
+                {
+                    "vlan": 19,
+                    "baseport": 54,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 0
+                },
+                {
+                    "vlan": 19,
+                    "baseport": 55,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 0
+                },
+                {
+                    "vlan": 19,
+                    "baseport": 56,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 0
+                },
+                {
+                    "vlan": 19,
+                    "baseport": 57,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 0
+                },
+                {
+                    "vlan": 19,
+                    "baseport": 63,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 0
+                },
+                {
+                    "vlan": 19,
+                    "baseport": 106,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 0
+                },
+                {
+                    "vlan": 19,
+                    "baseport": 163,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 1
+                },
+                {
+                    "vlan": 20,
+                    "baseport": 58,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 0
+                },
+                {
+                    "vlan": 20,
+                    "baseport": 163,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 1
+                },
+                {
+                    "vlan": 39,
+                    "baseport": 49,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 0
+                },
+                {
+                    "vlan": 39,
+                    "baseport": 50,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 0
+                },
+                {
+                    "vlan": 39,
+                    "baseport": 51,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 0
+                },
+                {
+                    "vlan": 39,
+                    "baseport": 52,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 0
+                },
+                {
+                    "vlan": 39,
+                    "baseport": 53,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 0
+                },
+                {
+                    "vlan": 39,
+                    "baseport": 54,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 0
+                },
+                {
+                    "vlan": 39,
+                    "baseport": 55,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 0
+                },
+                {
+                    "vlan": 39,
+                    "baseport": 56,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 0
+                },
+                {
+                    "vlan": 39,
+                    "baseport": 57,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 0
+                },
+                {
+                    "vlan": 39,
+                    "baseport": 106,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 0
+                },
+                {
+                    "vlan": 39,
+                    "baseport": 163,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 1
+                },
+                {
+                    "vlan": 40,
+                    "baseport": 49,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 0
+                },
+                {
+                    "vlan": 40,
+                    "baseport": 50,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 0
+                },
+                {
+                    "vlan": 40,
+                    "baseport": 51,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 0
+                },
+                {
+                    "vlan": 40,
+                    "baseport": 52,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 0
+                },
+                {
+                    "vlan": 40,
+                    "baseport": 53,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 0
+                },
+                {
+                    "vlan": 40,
+                    "baseport": 54,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 0
+                },
+                {
+                    "vlan": 40,
+                    "baseport": 55,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 0
+                },
+                {
+                    "vlan": 40,
+                    "baseport": 56,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 0
+                },
+                {
+                    "vlan": 40,
+                    "baseport": 57,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 0
+                },
+                {
+                    "vlan": 40,
+                    "baseport": 63,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 0
+                },
+                {
+                    "vlan": 40,
+                    "baseport": 106,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 0
+                },
+                {
+                    "vlan": 40,
+                    "baseport": 163,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 1
+                },
+                {
+                    "vlan": 99,
+                    "baseport": 49,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 0
+                },
+                {
+                    "vlan": 99,
+                    "baseport": 50,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 0
+                },
+                {
+                    "vlan": 99,
+                    "baseport": 51,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 0
+                },
+                {
+                    "vlan": 99,
+                    "baseport": 52,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 0
+                },
+                {
+                    "vlan": 99,
+                    "baseport": 53,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 0
+                },
+                {
+                    "vlan": 99,
+                    "baseport": 54,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 0
+                },
+                {
+                    "vlan": 99,
+                    "baseport": 55,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 0
+                },
+                {
+                    "vlan": 99,
+                    "baseport": 56,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 0
+                },
+                {
+                    "vlan": 99,
+                    "baseport": 57,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 0
+                },
+                {
+                    "vlan": 99,
+                    "baseport": 106,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 0
+                },
+                {
+                    "vlan": 99,
+                    "baseport": 163,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 1
+                },
+                {
+                    "vlan": 100,
+                    "baseport": 49,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 0
+                },
+                {
+                    "vlan": 100,
+                    "baseport": 50,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 0
+                },
+                {
+                    "vlan": 100,
+                    "baseport": 51,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 0
+                },
+                {
+                    "vlan": 100,
+                    "baseport": 52,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 0
+                },
+                {
+                    "vlan": 100,
+                    "baseport": 53,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 0
+                },
+                {
+                    "vlan": 100,
+                    "baseport": 54,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 0
+                },
+                {
+                    "vlan": 100,
+                    "baseport": 55,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 0
+                },
+                {
+                    "vlan": 100,
+                    "baseport": 56,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 0
+                },
+                {
+                    "vlan": 100,
+                    "baseport": 57,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 0
+                },
+                {
+                    "vlan": 100,
+                    "baseport": 58,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 0
+                },
+                {
+                    "vlan": 100,
+                    "baseport": 106,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 0
+                },
+                {
+                    "vlan": 100,
+                    "baseport": 163,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 1
+                },
+                {
+                    "vlan": 200,
+                    "baseport": 49,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 0
+                },
+                {
+                    "vlan": 200,
+                    "baseport": 50,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 0
+                },
+                {
+                    "vlan": 200,
+                    "baseport": 51,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 0
+                },
+                {
+                    "vlan": 200,
+                    "baseport": 52,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 0
+                },
+                {
+                    "vlan": 200,
+                    "baseport": 53,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 0
+                },
+                {
+                    "vlan": 200,
+                    "baseport": 54,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 0
+                },
+                {
+                    "vlan": 200,
+                    "baseport": 55,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 0
+                },
+                {
+                    "vlan": 200,
+                    "baseport": 56,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 0
+                },
+                {
+                    "vlan": 200,
+                    "baseport": 57,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 0
+                },
+                {
+                    "vlan": 200,
+                    "baseport": 58,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 0
+                },
+                {
+                    "vlan": 200,
+                    "baseport": 63,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 0
+                },
+                {
+                    "vlan": 200,
+                    "baseport": 106,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 0
+                },
+                {
+                    "vlan": 200,
+                    "baseport": 163,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 1
+                },
+                {
+                    "vlan": 254,
+                    "baseport": 49,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 0
+                },
+                {
+                    "vlan": 254,
+                    "baseport": 50,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 0
+                },
+                {
+                    "vlan": 254,
+                    "baseport": 51,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 0
+                },
+                {
+                    "vlan": 254,
+                    "baseport": 52,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 0
+                },
+                {
+                    "vlan": 254,
+                    "baseport": 53,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 0
+                },
+                {
+                    "vlan": 254,
+                    "baseport": 54,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 0
+                },
+                {
+                    "vlan": 254,
+                    "baseport": 55,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 0
+                },
+                {
+                    "vlan": 254,
+                    "baseport": 56,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 0
+                },
+                {
+                    "vlan": 254,
+                    "baseport": 57,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 0
+                },
+                {
+                    "vlan": 254,
+                    "baseport": 58,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 0
+                },
+                {
+                    "vlan": 254,
+                    "baseport": 63,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 0
+                },
+                {
+                    "vlan": 254,
+                    "baseport": 64,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 0
+                },
+                {
+                    "vlan": 254,
+                    "baseport": 65,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 0
+                },
+                {
+                    "vlan": 254,
+                    "baseport": 68,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 1
+                },
+                {
+                    "vlan": 254,
+                    "baseport": 69,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 1
+                },
+                {
+                    "vlan": 254,
+                    "baseport": 106,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 0
+                },
+                {
+                    "vlan": 254,
+                    "baseport": 163,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 1
+                },
+                {
+                    "vlan": 1000,
+                    "baseport": 49,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 0
+                },
+                {
+                    "vlan": 1000,
+                    "baseport": 50,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 0
+                },
+                {
+                    "vlan": 1000,
+                    "baseport": 51,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 0
+                },
+                {
+                    "vlan": 1000,
+                    "baseport": 52,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 0
+                },
+                {
+                    "vlan": 1000,
+                    "baseport": 53,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 0
+                },
+                {
+                    "vlan": 1000,
+                    "baseport": 54,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 0
+                },
+                {
+                    "vlan": 1000,
+                    "baseport": 55,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 0
+                },
+                {
+                    "vlan": 1000,
+                    "baseport": 56,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 0
+                },
+                {
+                    "vlan": 1000,
+                    "baseport": 57,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 0
+                },
+                {
+                    "vlan": 1000,
+                    "baseport": 61,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 1
+                },
+                {
+                    "vlan": 1000,
+                    "baseport": 62,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 1
+                },
+                {
+                    "vlan": 1000,
+                    "baseport": 63,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 0
+                },
+                {
+                    "vlan": 1000,
+                    "baseport": 64,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 0
+                },
+                {
+                    "vlan": 1000,
+                    "baseport": 65,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 0
+                },
+                {
+                    "vlan": 1000,
+                    "baseport": 106,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 0
+                },
+                {
+                    "vlan": 1000,
+                    "baseport": 163,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 1
+                },
+                {
+                    "vlan": 2600,
+                    "baseport": 54,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 0
+                },
+                {
+                    "vlan": 2600,
+                    "baseport": 105,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 0
+                },
+                {
+                    "vlan": 2600,
+                    "baseport": 163,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 1
+                },
+                {
+                    "vlan": 3200,
+                    "baseport": 54,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 0
+                },
+                {
+                    "vlan": 3200,
+                    "baseport": 105,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 0
+                },
+                {
+                    "vlan": 3200,
+                    "baseport": 163,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 1
+                }
+            ]
+        }
+    },
+    "stp": {
+        "discovery": {
+            "stp": [
+                {
+                    "rootBridge": 0,
+                    "bridgeAddress": "e828c126b9c0",
+                    "protocolSpecification": "ieee8021d",
+                    "priority": 8192,
+                    "timeSinceTopologyChange": "29380",
+                    "topChanges": 1249,
+                    "designatedRoot": "0264329fbc02",
+                    "rootCost": 10000,
+                    "rootPort": 1000,
+                    "maxAge": 20,
+                    "helloTime": 2,
+                    "holdTime": 1,
+                    "forwardDelay": 15,
+                    "bridgeMaxAge": 20,
+                    "bridgeHelloTime": 2,
+                    "bridgeForwardDelay": 15
+                }
+            ],
+            "ports_stp": [
+                {
+                    "priority": 128,
+                    "state": "forwarding",
+                    "enable": "enabled",
+                    "pathCost": 20000,
+                    "designatedRoot": "0264329fbc02",
+                    "designatedCost": 10000,
+                    "designatedBridge": "e828c126b9c0",
+                    "designatedPort": 49,
+                    "forwardTransitions": 1,
+                    "ifIndex": 49
+                },
+                {
+                    "priority": 128,
+                    "state": "forwarding",
+                    "enable": "enabled",
+                    "pathCost": 20000,
+                    "designatedRoot": "0264329fbc02",
+                    "designatedCost": 10000,
+                    "designatedBridge": "e828c126b9c0",
+                    "designatedPort": 50,
+                    "forwardTransitions": 1,
+                    "ifIndex": 50
+                },
+                {
+                    "priority": 128,
+                    "state": "forwarding",
+                    "enable": "enabled",
+                    "pathCost": 20000,
+                    "designatedRoot": "0264329fbc02",
+                    "designatedCost": 10000,
+                    "designatedBridge": "e828c126b9c0",
+                    "designatedPort": 51,
+                    "forwardTransitions": 1,
+                    "ifIndex": 51
+                },
+                {
+                    "priority": 128,
+                    "state": "forwarding",
+                    "enable": "enabled",
+                    "pathCost": 20000,
+                    "designatedRoot": "0264329fbc02",
+                    "designatedCost": 10000,
+                    "designatedBridge": "e828c126b9c0",
+                    "designatedPort": 52,
+                    "forwardTransitions": 1,
+                    "ifIndex": 52
+                },
+                {
+                    "priority": 128,
+                    "state": "forwarding",
+                    "enable": "enabled",
+                    "pathCost": 20000,
+                    "designatedRoot": "0264329fbc02",
+                    "designatedCost": 10000,
+                    "designatedBridge": "e828c126b9c0",
+                    "designatedPort": 53,
+                    "forwardTransitions": 1,
+                    "ifIndex": 53
+                },
+                {
+                    "priority": 128,
+                    "state": "forwarding",
+                    "enable": "enabled",
+                    "pathCost": 20000,
+                    "designatedRoot": "0264329fbc02",
+                    "designatedCost": 10000,
+                    "designatedBridge": "e828c126b9c0",
+                    "designatedPort": 54,
+                    "forwardTransitions": 1,
+                    "ifIndex": 54
+                },
+                {
+                    "priority": 128,
+                    "state": "forwarding",
+                    "enable": "enabled",
+                    "pathCost": 20000,
+                    "designatedRoot": "0264329fbc02",
+                    "designatedCost": 10000,
+                    "designatedBridge": "e828c126b9c0",
+                    "designatedPort": 55,
+                    "forwardTransitions": 1,
+                    "ifIndex": 55
+                },
+                {
+                    "priority": 128,
+                    "state": "forwarding",
+                    "enable": "enabled",
+                    "pathCost": 200000,
+                    "designatedRoot": "0264329fbc02",
+                    "designatedCost": 10000,
+                    "designatedBridge": "e828c126b9c0",
+                    "designatedPort": 56,
+                    "forwardTransitions": 1,
+                    "ifIndex": 56
+                },
+                {
+                    "priority": 128,
+                    "state": "forwarding",
+                    "enable": "enabled",
+                    "pathCost": 200000,
+                    "designatedRoot": "0264329fbc02",
+                    "designatedCost": 10000,
+                    "designatedBridge": "e828c126b9c0",
+                    "designatedPort": 57,
+                    "forwardTransitions": 1,
+                    "ifIndex": 57
+                },
+                {
+                    "priority": 128,
+                    "state": "forwarding",
+                    "enable": "enabled",
+                    "pathCost": 20000,
+                    "designatedRoot": "0264329fbc02",
+                    "designatedCost": 10000,
+                    "designatedBridge": "e828c126b9c0",
+                    "designatedPort": 58,
+                    "forwardTransitions": 1,
+                    "ifIndex": 58
+                },
+                {
+                    "priority": 128,
+                    "state": "forwarding",
+                    "enable": "enabled",
+                    "pathCost": 200000,
+                    "designatedRoot": "0264329fbc02",
+                    "designatedCost": 10000,
+                    "designatedBridge": "e828c126b9c0",
+                    "designatedPort": 61,
+                    "forwardTransitions": 1,
+                    "ifIndex": 61
+                },
+                {
+                    "priority": 128,
+                    "state": "forwarding",
+                    "enable": "enabled",
+                    "pathCost": 20000,
+                    "designatedRoot": "0264329fbc02",
+                    "designatedCost": 10000,
+                    "designatedBridge": "e828c126b9c0",
+                    "designatedPort": 62,
+                    "forwardTransitions": 1,
+                    "ifIndex": 62
+                },
+                {
+                    "priority": 128,
+                    "state": "forwarding",
+                    "enable": "enabled",
+                    "pathCost": 20000,
+                    "designatedRoot": "0264329fbc02",
+                    "designatedCost": 10000,
+                    "designatedBridge": "e828c126b9c0",
+                    "designatedPort": 63,
+                    "forwardTransitions": 1,
+                    "ifIndex": 63
+                },
+                {
+                    "priority": 128,
+                    "state": "forwarding",
+                    "enable": "enabled",
+                    "pathCost": 20000,
+                    "designatedRoot": "0264329fbc02",
+                    "designatedCost": 10000,
+                    "designatedBridge": "e828c126b9c0",
+                    "designatedPort": 64,
+                    "forwardTransitions": 1,
+                    "ifIndex": 64
+                },
+                {
+                    "priority": 128,
+                    "state": "forwarding",
+                    "enable": "enabled",
+                    "pathCost": 200000,
+                    "designatedRoot": "0264329fbc02",
+                    "designatedCost": 10000,
+                    "designatedBridge": "e828c126b9c0",
+                    "designatedPort": 65,
+                    "forwardTransitions": 1,
+                    "ifIndex": 65
+                },
+                {
+                    "priority": 128,
+                    "state": "forwarding",
+                    "enable": "enabled",
+                    "pathCost": 200000,
+                    "designatedRoot": "0264329fbc02",
+                    "designatedCost": 10000,
+                    "designatedBridge": "e828c126b9c0",
+                    "designatedPort": 68,
+                    "forwardTransitions": 1,
+                    "ifIndex": 68
+                },
+                {
+                    "priority": 128,
+                    "state": "forwarding",
+                    "enable": "enabled",
+                    "pathCost": 20000,
+                    "designatedRoot": "0264329fbc02",
+                    "designatedCost": 10000,
+                    "designatedBridge": "e828c126b9c0",
+                    "designatedPort": 69,
+                    "forwardTransitions": 1,
+                    "ifIndex": 69
+                },
+                {
+                    "priority": 128,
+                    "state": "forwarding",
+                    "enable": "enabled",
+                    "pathCost": 20000,
+                    "designatedRoot": "0264329fbc02",
+                    "designatedCost": 10000,
+                    "designatedBridge": "e828c126b9c0",
+                    "designatedPort": 105,
+                    "forwardTransitions": 1,
+                    "ifIndex": 105
+                },
+                {
+                    "priority": 128,
+                    "state": "forwarding",
+                    "enable": "enabled",
+                    "pathCost": 10000,
+                    "designatedRoot": "0264329fbc02",
+                    "designatedCost": 0,
+                    "designatedBridge": "0264329fbc02",
+                    "designatedPort": 1,
+                    "forwardTransitions": 1,
+                    "ifIndex": 1000
+                },
+                {
+                    "priority": 128,
+                    "state": "forwarding",
+                    "enable": "enabled",
+                    "pathCost": 10000,
+                    "designatedRoot": "0264329fbc02",
+                    "designatedCost": 10000,
+                    "designatedBridge": "e828c126b9c0",
+                    "designatedPort": 233,
+                    "forwardTransitions": 1,
+                    "ifIndex": 1001
+                }
+            ]
+        },
+        "poller": "matches discovery"
     }
 }

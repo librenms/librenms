@@ -18251,5 +18251,320 @@
                 }
             ]
         }
+    },
+    "stp": {
+        "discovery": {
+            "stp": [
+                {
+                    "rootBridge": 0,
+                    "bridgeAddress": "7072cf66bf10",
+                    "protocolSpecification": "unknown",
+                    "priority": 16384,
+                    "timeSinceTopologyChange": "752102",
+                    "topChanges": 258,
+                    "designatedRoot": "547feea430bc",
+                    "rootCost": 11000,
+                    "rootPort": 24,
+                    "maxAge": 20,
+                    "helloTime": 2,
+                    "holdTime": 1,
+                    "forwardDelay": 15,
+                    "bridgeMaxAge": 20,
+                    "bridgeHelloTime": 2,
+                    "bridgeForwardDelay": 15
+                }
+            ],
+            "ports_stp": [
+                {
+                    "priority": 128,
+                    "state": "forwarding",
+                    "enable": "enabled",
+                    "pathCost": 10000,
+                    "designatedRoot": "547feea430bc",
+                    "designatedCost": 11000,
+                    "designatedBridge": "7072cf66bf10",
+                    "designatedPort": 1,
+                    "forwardTransitions": 3,
+                    "ifIndex": 1
+                },
+                {
+                    "priority": 128,
+                    "state": "forwarding",
+                    "enable": "enabled",
+                    "pathCost": 10000,
+                    "designatedRoot": "547feea430bc",
+                    "designatedCost": 11000,
+                    "designatedBridge": "7072cf66bf10",
+                    "designatedPort": 2,
+                    "forwardTransitions": 3,
+                    "ifIndex": 2
+                },
+                {
+                    "priority": 128,
+                    "state": "forwarding",
+                    "enable": "enabled",
+                    "pathCost": 10000,
+                    "designatedRoot": "547feea430bc",
+                    "designatedCost": 11000,
+                    "designatedBridge": "7072cf66bf10",
+                    "designatedPort": 3,
+                    "forwardTransitions": 26,
+                    "ifIndex": 3
+                },
+                {
+                    "priority": 128,
+                    "state": "forwarding",
+                    "enable": "enabled",
+                    "pathCost": 10000,
+                    "designatedRoot": "547feea430bc",
+                    "designatedCost": 11000,
+                    "designatedBridge": "7072cf66bf10",
+                    "designatedPort": 4,
+                    "forwardTransitions": 42,
+                    "ifIndex": 4
+                },
+                {
+                    "priority": 128,
+                    "state": "forwarding",
+                    "enable": "enabled",
+                    "pathCost": 10000,
+                    "designatedRoot": "547feea430bc",
+                    "designatedCost": 11000,
+                    "designatedBridge": "7072cf66bf10",
+                    "designatedPort": 5,
+                    "forwardTransitions": 55,
+                    "ifIndex": 5
+                },
+                {
+                    "priority": 128,
+                    "state": "broken",
+                    "enable": "enabled",
+                    "pathCost": 10000,
+                    "designatedRoot": "547feea430bc",
+                    "designatedCost": 11000,
+                    "designatedBridge": "7072cf66bf10",
+                    "designatedPort": 6,
+                    "forwardTransitions": 0,
+                    "ifIndex": 6
+                },
+                {
+                    "priority": 128,
+                    "state": "forwarding",
+                    "enable": "enabled",
+                    "pathCost": 10000,
+                    "designatedRoot": "547feea430bc",
+                    "designatedCost": 11000,
+                    "designatedBridge": "7072cf66bf10",
+                    "designatedPort": 7,
+                    "forwardTransitions": 3,
+                    "ifIndex": 7
+                },
+                {
+                    "priority": 128,
+                    "state": "forwarding",
+                    "enable": "enabled",
+                    "pathCost": 10000,
+                    "designatedRoot": "547feea430bc",
+                    "designatedCost": 11000,
+                    "designatedBridge": "7072cf66bf10",
+                    "designatedPort": 8,
+                    "forwardTransitions": 3,
+                    "ifIndex": 8
+                },
+                {
+                    "priority": 128,
+                    "state": "forwarding",
+                    "enable": "enabled",
+                    "pathCost": 10000,
+                    "designatedRoot": "547feea430bc",
+                    "designatedCost": 11000,
+                    "designatedBridge": "7072cf66bf10",
+                    "designatedPort": 9,
+                    "forwardTransitions": 50,
+                    "ifIndex": 9
+                },
+                {
+                    "priority": 128,
+                    "state": "forwarding",
+                    "enable": "enabled",
+                    "pathCost": 10000,
+                    "designatedRoot": "547feea430bc",
+                    "designatedCost": 11000,
+                    "designatedBridge": "7072cf66bf10",
+                    "designatedPort": 10,
+                    "forwardTransitions": 41,
+                    "ifIndex": 10
+                },
+                {
+                    "priority": 128,
+                    "state": "forwarding",
+                    "enable": "enabled",
+                    "pathCost": 10000,
+                    "designatedRoot": "547feea430bc",
+                    "designatedCost": 11000,
+                    "designatedBridge": "7072cf66bf10",
+                    "designatedPort": 11,
+                    "forwardTransitions": 3,
+                    "ifIndex": 11
+                },
+                {
+                    "priority": 128,
+                    "state": "forwarding",
+                    "enable": "enabled",
+                    "pathCost": 10000,
+                    "designatedRoot": "547feea430bc",
+                    "designatedCost": 11000,
+                    "designatedBridge": "7072cf66bf10",
+                    "designatedPort": 12,
+                    "forwardTransitions": 57,
+                    "ifIndex": 12
+                },
+                {
+                    "priority": 128,
+                    "state": "forwarding",
+                    "enable": "enabled",
+                    "pathCost": 10000,
+                    "designatedRoot": "547feea430bc",
+                    "designatedCost": 11000,
+                    "designatedBridge": "7072cf66bf10",
+                    "designatedPort": 13,
+                    "forwardTransitions": 34,
+                    "ifIndex": 13
+                },
+                {
+                    "priority": 128,
+                    "state": "forwarding",
+                    "enable": "enabled",
+                    "pathCost": 10000,
+                    "designatedRoot": "547feea430bc",
+                    "designatedCost": 11000,
+                    "designatedBridge": "7072cf66bf10",
+                    "designatedPort": 14,
+                    "forwardTransitions": 3,
+                    "ifIndex": 14
+                },
+                {
+                    "priority": 128,
+                    "state": "forwarding",
+                    "enable": "enabled",
+                    "pathCost": 10000,
+                    "designatedRoot": "547feea430bc",
+                    "designatedCost": 11000,
+                    "designatedBridge": "7072cf66bf10",
+                    "designatedPort": 15,
+                    "forwardTransitions": 3,
+                    "ifIndex": 15
+                },
+                {
+                    "priority": 128,
+                    "state": "forwarding",
+                    "enable": "enabled",
+                    "pathCost": 10000,
+                    "designatedRoot": "547feea430bc",
+                    "designatedCost": 11000,
+                    "designatedBridge": "7072cf66bf10",
+                    "designatedPort": 16,
+                    "forwardTransitions": 16,
+                    "ifIndex": 16
+                },
+                {
+                    "priority": 128,
+                    "state": "forwarding",
+                    "enable": "enabled",
+                    "pathCost": 10000,
+                    "designatedRoot": "547feea430bc",
+                    "designatedCost": 11000,
+                    "designatedBridge": "7072cf66bf10",
+                    "designatedPort": 17,
+                    "forwardTransitions": 16,
+                    "ifIndex": 17
+                },
+                {
+                    "priority": 128,
+                    "state": "forwarding",
+                    "enable": "enabled",
+                    "pathCost": 10000,
+                    "designatedRoot": "547feea430bc",
+                    "designatedCost": 11000,
+                    "designatedBridge": "7072cf66bf10",
+                    "designatedPort": 18,
+                    "forwardTransitions": 24,
+                    "ifIndex": 18
+                },
+                {
+                    "priority": 128,
+                    "state": "forwarding",
+                    "enable": "enabled",
+                    "pathCost": 10000,
+                    "designatedRoot": "547feea430bc",
+                    "designatedCost": 11000,
+                    "designatedBridge": "7072cf66bf10",
+                    "designatedPort": 19,
+                    "forwardTransitions": 3,
+                    "ifIndex": 19
+                },
+                {
+                    "priority": 128,
+                    "state": "forwarding",
+                    "enable": "enabled",
+                    "pathCost": 10000,
+                    "designatedRoot": "547feea430bc",
+                    "designatedCost": 11000,
+                    "designatedBridge": "7072cf66bf10",
+                    "designatedPort": 20,
+                    "forwardTransitions": 4,
+                    "ifIndex": 20
+                },
+                {
+                    "priority": 128,
+                    "state": "forwarding",
+                    "enable": "enabled",
+                    "pathCost": 10000,
+                    "designatedRoot": "547feea430bc",
+                    "designatedCost": 11000,
+                    "designatedBridge": "7072cf66bf10",
+                    "designatedPort": 21,
+                    "forwardTransitions": 52,
+                    "ifIndex": 21
+                },
+                {
+                    "priority": 128,
+                    "state": "broken",
+                    "enable": "enabled",
+                    "pathCost": 10000,
+                    "designatedRoot": "547feea430bc",
+                    "designatedCost": 11000,
+                    "designatedBridge": "7072cf66bf10",
+                    "designatedPort": 22,
+                    "forwardTransitions": 0,
+                    "ifIndex": 22
+                },
+                {
+                    "priority": 128,
+                    "state": "broken",
+                    "enable": "enabled",
+                    "pathCost": 10000,
+                    "designatedRoot": "547feea430bc",
+                    "designatedCost": 11000,
+                    "designatedBridge": "7072cf66bf10",
+                    "designatedPort": 23,
+                    "forwardTransitions": 0,
+                    "ifIndex": 23
+                },
+                {
+                    "priority": 128,
+                    "state": "forwarding",
+                    "enable": "enabled",
+                    "pathCost": 10000,
+                    "designatedRoot": "547feea430bc",
+                    "designatedCost": 1000,
+                    "designatedBridge": "cc37abf6d10e",
+                    "designatedPort": 3,
+                    "forwardTransitions": 1,
+                    "ifIndex": 24
+                }
+            ]
+        },
+        "poller": "matches discovery"
     }
 }

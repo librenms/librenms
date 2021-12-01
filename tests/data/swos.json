@@ -982,8 +982,8 @@
                     "ifName": "Port4",
                     "portName": null,
                     "ifIndex": 4,
-                    "ifSpeed": null,
-                    "ifSpeed_prev": 0,
+                    "ifSpeed": 0,
+                    "ifSpeed_prev": null,
                     "ifConnectorPresent": "true",
                     "ifPromiscuousMode": "true",
                     "ifOperStatus": "down",
@@ -1087,8 +1087,8 @@
                     "ifName": "Port5",
                     "portName": null,
                     "ifIndex": 5,
-                    "ifSpeed": null,
-                    "ifSpeed_prev": 0,
+                    "ifSpeed": 0,
+                    "ifSpeed_prev": null,
                     "ifConnectorPresent": "true",
                     "ifPromiscuousMode": "true",
                     "ifOperStatus": "down",
@@ -1192,8 +1192,8 @@
                     "ifName": "SFP",
                     "portName": null,
                     "ifIndex": 6,
-                    "ifSpeed": null,
-                    "ifSpeed_prev": 0,
+                    "ifSpeed": 0,
+                    "ifSpeed_prev": null,
                     "ifConnectorPresent": "true",
                     "ifPromiscuousMode": "true",
                     "ifOperStatus": "down",
@@ -1706,6 +1706,105 @@
                     "state_draw_graph": 1,
                     "state_value": 4,
                     "state_generic_value": 2
+                }
+            ]
+        },
+        "poller": "matches discovery"
+    },
+    "stp": {
+        "discovery": {
+            "stp": [
+                {
+                    "rootBridge": 0,
+                    "bridgeAddress": "6c3b6bf624e6",
+                    "protocolSpecification": "ieee8021d",
+                    "priority": 32768,
+                    "timeSinceTopologyChange": "817831",
+                    "topChanges": 20,
+                    "designatedRoot": "6c3b6bf9e55a",
+                    "rootCost": 19,
+                    "rootPort": 1,
+                    "maxAge": 0,
+                    "helloTime": 0,
+                    "holdTime": 0,
+                    "forwardDelay": 0,
+                    "bridgeMaxAge": 0,
+                    "bridgeHelloTime": 0,
+                    "bridgeForwardDelay": 0
+                }
+            ],
+            "ports_stp": [
+                {
+                    "priority": 128,
+                    "state": "forwarding",
+                    "enable": "enabled",
+                    "pathCost": 19,
+                    "designatedRoot": "6c3b6bf9e55a",
+                    "designatedCost": 19,
+                    "designatedBridge": "6c3b6bf9e55a",
+                    "designatedPort": 8,
+                    "forwardTransitions": 20,
+                    "ifIndex": 1
+                },
+                {
+                    "priority": 128,
+                    "state": "forwarding",
+                    "enable": "enabled",
+                    "pathCost": 19,
+                    "designatedRoot": "6c3b6bf9e55a",
+                    "designatedCost": 38,
+                    "designatedBridge": "6c3b6bf624e6",
+                    "designatedPort": 1,
+                    "forwardTransitions": 2,
+                    "ifIndex": 2
+                },
+                {
+                    "priority": 128,
+                    "state": "forwarding",
+                    "enable": "enabled",
+                    "pathCost": 19,
+                    "designatedRoot": "6c3b6bf9e55a",
+                    "designatedCost": 38,
+                    "designatedBridge": "6c3b6bf624e6",
+                    "designatedPort": 2,
+                    "forwardTransitions": 8,
+                    "ifIndex": 3
+                },
+                {
+                    "priority": 128,
+                    "state": "blocking",
+                    "enable": "enabled",
+                    "pathCost": 2,
+                    "designatedRoot": "6c3b6bf9e55a",
+                    "designatedCost": 21,
+                    "designatedBridge": "6c3b6bf624e6",
+                    "designatedPort": 3,
+                    "forwardTransitions": 0,
+                    "ifIndex": 4
+                },
+                {
+                    "priority": 128,
+                    "state": "blocking",
+                    "enable": "enabled",
+                    "pathCost": 2,
+                    "designatedRoot": "6c3b6bf9e55a",
+                    "designatedCost": 21,
+                    "designatedBridge": "6c3b6bf624e6",
+                    "designatedPort": 4,
+                    "forwardTransitions": 0,
+                    "ifIndex": 5
+                },
+                {
+                    "priority": 128,
+                    "state": "blocking",
+                    "enable": "enabled",
+                    "pathCost": 2,
+                    "designatedRoot": "6c3b6bf9e55a",
+                    "designatedCost": 21,
+                    "designatedBridge": "6c3b6bf624e6",
+                    "designatedPort": 5,
+                    "forwardTransitions": 0,
+                    "ifIndex": 6
                 }
             ]
         },

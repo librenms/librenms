@@ -2238,5 +2238,44 @@
                 }
             ]
         }
+    },
+    "stp": {
+        "discovery": {
+            "stp": [
+                {
+                    "rootBridge": 0,
+                    "bridgeAddress": "0012f1ced001",
+                    "protocolSpecification": "ieee8021d",
+                    "priority": 32768,
+                    "timeSinceTopologyChange": "3353",
+                    "topChanges": 1,
+                    "designatedRoot": "00083028eca5",
+                    "rootCost": 20000,
+                    "rootPort": 5,
+                    "maxAge": 20,
+                    "helloTime": 2,
+                    "holdTime": 1,
+                    "forwardDelay": 15,
+                    "bridgeMaxAge": 20,
+                    "bridgeHelloTime": 2,
+                    "bridgeForwardDelay": 15
+                }
+            ],
+            "ports_stp": [
+                {
+                    "priority": 128,
+                    "state": "forwarding",
+                    "enable": "enabled",
+                    "pathCost": 20000,
+                    "designatedRoot": "00083028eca5",
+                    "designatedCost": 20000,
+                    "designatedBridge": "00083028eca5",
+                    "designatedPort": 2,
+                    "forwardTransitions": 1,
+                    "ifIndex": 5
+                }
+            ]
+        },
+        "poller": "matches discovery"
     }
 }

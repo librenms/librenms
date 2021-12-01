@@ -2442,5 +2442,80 @@
                 }
             ]
         }
+    },
+    "stp": {
+        "discovery": {
+            "stp": [
+                {
+                    "rootBridge": 1,
+                    "bridgeAddress": "18e829ba73be",
+                    "protocolSpecification": "ieee8021d",
+                    "priority": 32768,
+                    "timeSinceTopologyChange": "0",
+                    "topChanges": 287,
+                    "designatedRoot": "18e829ba73be",
+                    "rootCost": 0,
+                    "rootPort": 2006143660,
+                    "maxAge": 20,
+                    "helloTime": 2,
+                    "holdTime": 1,
+                    "forwardDelay": 15,
+                    "bridgeMaxAge": 20,
+                    "bridgeHelloTime": 2,
+                    "bridgeForwardDelay": 15
+                }
+            ],
+            "ports_stp": [
+                {
+                    "priority": 128,
+                    "state": "forwarding",
+                    "enable": "disabled",
+                    "pathCost": 20000,
+                    "designatedRoot": "18e829ba73be",
+                    "designatedCost": 0,
+                    "designatedBridge": "18e829ba73be",
+                    "designatedPort": 1,
+                    "forwardTransitions": 0,
+                    "ifIndex": 1
+                },
+                {
+                    "priority": 128,
+                    "state": "forwarding",
+                    "enable": "disabled",
+                    "pathCost": 20000,
+                    "designatedRoot": "18e829ba73be",
+                    "designatedCost": 0,
+                    "designatedBridge": "18e829ba73be",
+                    "designatedPort": 2,
+                    "forwardTransitions": 0,
+                    "ifIndex": 2
+                },
+                {
+                    "priority": 128,
+                    "state": "forwarding",
+                    "enable": "disabled",
+                    "pathCost": 20000,
+                    "designatedRoot": "18e829ba73be",
+                    "designatedCost": 0,
+                    "designatedBridge": "18e829ba73be",
+                    "designatedPort": 5,
+                    "forwardTransitions": 0,
+                    "ifIndex": 5
+                },
+                {
+                    "priority": 128,
+                    "state": "forwarding",
+                    "enable": "enabled",
+                    "pathCost": 10000,
+                    "designatedRoot": "18e829ba73be",
+                    "designatedCost": 0,
+                    "designatedBridge": "18e829ba73be",
+                    "designatedPort": 1000,
+                    "forwardTransitions": 0,
+                    "ifIndex": 1000
+                }
+            ]
+        },
+        "poller": "matches discovery"
     }
 }

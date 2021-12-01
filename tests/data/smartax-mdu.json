@@ -3187,8 +3187,8 @@
                     "ifName": "InLoopBack0",
                     "portName": null,
                     "ifIndex": 128,
-                    "ifSpeed": null,
-                    "ifSpeed_prev": 0,
+                    "ifSpeed": 0,
+                    "ifSpeed_prev": null,
                     "ifConnectorPresent": "false",
                     "ifPromiscuousMode": "false",
                     "ifOperStatus": "up",
@@ -3292,8 +3292,8 @@
                     "ifName": "null0",
                     "portName": null,
                     "ifIndex": 262,
-                    "ifSpeed": null,
-                    "ifSpeed_prev": 0,
+                    "ifSpeed": 0,
+                    "ifSpeed_prev": null,
                     "ifConnectorPresent": "false",
                     "ifPromiscuousMode": "false",
                     "ifOperStatus": "up",
@@ -3397,8 +3397,8 @@
                     "ifName": "meth0",
                     "portName": null,
                     "ifIndex": 390,
-                    "ifSpeed": null,
-                    "ifSpeed_prev": 0,
+                    "ifSpeed": 0,
+                    "ifSpeed_prev": null,
                     "ifConnectorPresent": "true",
                     "ifPromiscuousMode": "false",
                     "ifOperStatus": "down",
@@ -3502,8 +3502,8 @@
                     "ifName": "vlanif30",
                     "portName": null,
                     "ifIndex": 519,
-                    "ifSpeed": null,
-                    "ifSpeed_prev": 0,
+                    "ifSpeed": 0,
+                    "ifSpeed_prev": null,
                     "ifConnectorPresent": "true",
                     "ifPromiscuousMode": "false",
                     "ifOperStatus": "down",
@@ -3607,8 +3607,8 @@
                     "ifName": "vlanif40",
                     "portName": null,
                     "ifIndex": 647,
-                    "ifSpeed": null,
-                    "ifSpeed_prev": 0,
+                    "ifSpeed": 0,
+                    "ifSpeed_prev": null,
                     "ifConnectorPresent": "true",
                     "ifPromiscuousMode": "false",
                     "ifOperStatus": "down",
@@ -3712,8 +3712,8 @@
                     "ifName": "vlanif50",
                     "portName": null,
                     "ifIndex": 775,
-                    "ifSpeed": null,
-                    "ifSpeed_prev": 0,
+                    "ifSpeed": 0,
+                    "ifSpeed_prev": null,
                     "ifConnectorPresent": "true",
                     "ifPromiscuousMode": "false",
                     "ifOperStatus": "up",
@@ -6329,5 +6329,31 @@
                 }
             ]
         }
+    },
+    "stp": {
+        "discovery": {
+            "stp": [
+                {
+                    "rootBridge": 1,
+                    "bridgeAddress": "781dba6b5ecc",
+                    "protocolSpecification": "ieee8021d",
+                    "priority": 32768,
+                    "timeSinceTopologyChange": "8086999",
+                    "topChanges": 0,
+                    "designatedRoot": "781dba6b5ecc",
+                    "rootCost": 0,
+                    "rootPort": null,
+                    "maxAge": 20,
+                    "helloTime": 2,
+                    "holdTime": 0,
+                    "forwardDelay": 15,
+                    "bridgeMaxAge": 20,
+                    "bridgeHelloTime": 2,
+                    "bridgeForwardDelay": 15
+                }
+            ],
+            "ports_stp": []
+        },
+        "poller": "matches discovery"
     }
 }

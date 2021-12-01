@@ -2557,8 +2557,8 @@
                     "ifName": "Console41",
                     "portName": null,
                     "ifIndex": 41,
-                    "ifSpeed": null,
-                    "ifSpeed_prev": 0,
+                    "ifSpeed": 0,
+                    "ifSpeed_prev": null,
                     "ifConnectorPresent": "true",
                     "ifPromiscuousMode": "false",
                     "ifOperStatus": "up",
@@ -2662,8 +2662,8 @@
                     "ifName": "Loopback0",
                     "portName": null,
                     "ifIndex": 1000,
-                    "ifSpeed": null,
-                    "ifSpeed_prev": 0,
+                    "ifSpeed": 0,
+                    "ifSpeed_prev": null,
                     "ifConnectorPresent": "true",
                     "ifPromiscuousMode": "false",
                     "ifOperStatus": "up",
@@ -2767,8 +2767,8 @@
                     "ifName": "VLAN1",
                     "portName": null,
                     "ifIndex": 1001,
-                    "ifSpeed": null,
-                    "ifSpeed_prev": 0,
+                    "ifSpeed": 0,
+                    "ifSpeed_prev": null,
                     "ifConnectorPresent": "true",
                     "ifPromiscuousMode": "true",
                     "ifOperStatus": "up",
@@ -2872,8 +2872,8 @@
                     "ifName": "VLAN3",
                     "portName": null,
                     "ifIndex": 1003,
-                    "ifSpeed": null,
-                    "ifSpeed_prev": 0,
+                    "ifSpeed": 0,
+                    "ifSpeed_prev": null,
                     "ifConnectorPresent": "true",
                     "ifPromiscuousMode": "true",
                     "ifOperStatus": "up",
@@ -3178,5 +3178,152 @@
                 }
             ]
         }
+    },
+    "stp": {
+        "discovery": {
+            "stp": [
+                {
+                    "rootBridge": 1,
+                    "bridgeAddress": "3c2c997a5d80",
+                    "protocolSpecification": "unknown",
+                    "priority": 32768,
+                    "timeSinceTopologyChange": "7967",
+                    "topChanges": 0,
+                    "designatedRoot": "3c2c997a5d80",
+                    "rootCost": 0,
+                    "rootPort": 0,
+                    "maxAge": 20,
+                    "helloTime": 2,
+                    "holdTime": 1,
+                    "forwardDelay": 15,
+                    "bridgeMaxAge": 20,
+                    "bridgeHelloTime": 2,
+                    "bridgeForwardDelay": 15
+                }
+            ],
+            "ports_stp": [
+                {
+                    "priority": 128,
+                    "state": "broken",
+                    "enable": "enabled",
+                    "pathCost": 10000,
+                    "designatedRoot": "3c2c997a5d80",
+                    "designatedCost": 0,
+                    "designatedBridge": "3c2c997a5d80",
+                    "designatedPort": 1,
+                    "forwardTransitions": 0,
+                    "ifIndex": 1
+                },
+                {
+                    "priority": 128,
+                    "state": "broken",
+                    "enable": "enabled",
+                    "pathCost": 10000,
+                    "designatedRoot": "3c2c997a5d80",
+                    "designatedCost": 0,
+                    "designatedBridge": "3c2c997a5d80",
+                    "designatedPort": 2,
+                    "forwardTransitions": 0,
+                    "ifIndex": 2
+                },
+                {
+                    "priority": 128,
+                    "state": "broken",
+                    "enable": "enabled",
+                    "pathCost": 10000,
+                    "designatedRoot": "3c2c997a5d80",
+                    "designatedCost": 0,
+                    "designatedBridge": "3c2c997a5d80",
+                    "designatedPort": 3,
+                    "forwardTransitions": 0,
+                    "ifIndex": 3
+                },
+                {
+                    "priority": 128,
+                    "state": "broken",
+                    "enable": "enabled",
+                    "pathCost": 10000,
+                    "designatedRoot": "3c2c997a5d80",
+                    "designatedCost": 0,
+                    "designatedBridge": "3c2c997a5d80",
+                    "designatedPort": 4,
+                    "forwardTransitions": 0,
+                    "ifIndex": 4
+                },
+                {
+                    "priority": 128,
+                    "state": "broken",
+                    "enable": "enabled",
+                    "pathCost": 10000,
+                    "designatedRoot": "3c2c997a5d80",
+                    "designatedCost": 0,
+                    "designatedBridge": "3c2c997a5d80",
+                    "designatedPort": 5,
+                    "forwardTransitions": 0,
+                    "ifIndex": 5
+                },
+                {
+                    "priority": 128,
+                    "state": "broken",
+                    "enable": "enabled",
+                    "pathCost": 10000,
+                    "designatedRoot": "3c2c997a5d80",
+                    "designatedCost": 0,
+                    "designatedBridge": "3c2c997a5d80",
+                    "designatedPort": 6,
+                    "forwardTransitions": 0,
+                    "ifIndex": 6
+                },
+                {
+                    "priority": 128,
+                    "state": "broken",
+                    "enable": "enabled",
+                    "pathCost": 10000,
+                    "designatedRoot": "3c2c997a5d80",
+                    "designatedCost": 0,
+                    "designatedBridge": "3c2c997a5d80",
+                    "designatedPort": 7,
+                    "forwardTransitions": 0,
+                    "ifIndex": 7
+                },
+                {
+                    "priority": 128,
+                    "state": "forwarding",
+                    "enable": "enabled",
+                    "pathCost": 10000,
+                    "designatedRoot": "3c2c997a5d80",
+                    "designatedCost": 0,
+                    "designatedBridge": "3c2c997a5d80",
+                    "designatedPort": 8,
+                    "forwardTransitions": 1,
+                    "ifIndex": 8
+                },
+                {
+                    "priority": 128,
+                    "state": "broken",
+                    "enable": "enabled",
+                    "pathCost": 10000,
+                    "designatedRoot": "3c2c997a5d80",
+                    "designatedCost": 0,
+                    "designatedBridge": "3c2c997a5d80",
+                    "designatedPort": 9,
+                    "forwardTransitions": 0,
+                    "ifIndex": 9
+                },
+                {
+                    "priority": 128,
+                    "state": "broken",
+                    "enable": "enabled",
+                    "pathCost": 10000,
+                    "designatedRoot": "3c2c997a5d80",
+                    "designatedCost": 0,
+                    "designatedBridge": "3c2c997a5d80",
+                    "designatedPort": 10,
+                    "forwardTransitions": 0,
+                    "ifIndex": 10
+                }
+            ]
+        },
+        "poller": "matches discovery"
     }
 }

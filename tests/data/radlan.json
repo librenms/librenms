@@ -10633,8 +10633,8 @@
                     "ifName": "1",
                     "portName": null,
                     "ifIndex": 100000,
-                    "ifSpeed": null,
-                    "ifSpeed_prev": 0,
+                    "ifSpeed": 0,
+                    "ifSpeed_prev": null,
                     "ifConnectorPresent": "false",
                     "ifPromiscuousMode": "true",
                     "ifOperStatus": "up",
@@ -10765,6 +10765,45 @@
                     "processor_descr": "Processor",
                     "processor_precision": 1,
                     "processor_perc_warn": 75
+                }
+            ]
+        },
+        "poller": "matches discovery"
+    },
+    "stp": {
+        "discovery": {
+            "stp": [
+                {
+                    "rootBridge": 1,
+                    "bridgeAddress": "001577320ea0",
+                    "protocolSpecification": "ieee8021d",
+                    "priority": 32768,
+                    "timeSinceTopologyChange": "504522",
+                    "topChanges": 3,
+                    "designatedRoot": "001577320ea0",
+                    "rootCost": 0,
+                    "rootPort": 0,
+                    "maxAge": 20,
+                    "helloTime": 2,
+                    "holdTime": 1,
+                    "forwardDelay": 15,
+                    "bridgeMaxAge": 20,
+                    "bridgeHelloTime": 2,
+                    "bridgeForwardDelay": 15
+                }
+            ],
+            "ports_stp": [
+                {
+                    "priority": 128,
+                    "state": "forwarding",
+                    "enable": "enabled",
+                    "pathCost": 19,
+                    "designatedRoot": "001577320ea0",
+                    "designatedCost": 0,
+                    "designatedBridge": "001577320ea0",
+                    "designatedPort": 1,
+                    "forwardTransitions": 1,
+                    "ifIndex": 1
                 }
             ]
         },

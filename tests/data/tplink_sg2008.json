@@ -1612,8 +1612,8 @@
                     "ifName": "port 5: Gigabit Copper",
                     "portName": null,
                     "ifIndex": 5,
-                    "ifSpeed": null,
-                    "ifSpeed_prev": 0,
+                    "ifSpeed": 0,
+                    "ifSpeed_prev": null,
                     "ifConnectorPresent": "true",
                     "ifPromiscuousMode": "false",
                     "ifOperStatus": "down",
@@ -2032,8 +2032,8 @@
                     "ifName": "AUX",
                     "portName": null,
                     "ifIndex": 52800,
-                    "ifSpeed": null,
-                    "ifSpeed_prev": 0,
+                    "ifSpeed": 0,
+                    "ifSpeed_prev": null,
                     "ifConnectorPresent": "false",
                     "ifPromiscuousMode": "false",
                     "ifOperStatus": "up",
@@ -2137,8 +2137,8 @@
                     "ifName": "Loopback",
                     "portName": null,
                     "ifIndex": 52801,
-                    "ifSpeed": null,
-                    "ifSpeed_prev": 0,
+                    "ifSpeed": 0,
+                    "ifSpeed_prev": null,
                     "ifConnectorPresent": "false",
                     "ifPromiscuousMode": "false",
                     "ifOperStatus": "up",
@@ -2242,8 +2242,8 @@
                     "ifName": "Vlan-interface99",
                     "portName": null,
                     "ifIndex": 52802,
-                    "ifSpeed": null,
-                    "ifSpeed_prev": 0,
+                    "ifSpeed": 0,
+                    "ifSpeed_prev": null,
                     "ifConnectorPresent": "false",
                     "ifPromiscuousMode": "false",
                     "ifOperStatus": "up",
@@ -2709,5 +2709,116 @@
                 }
             ]
         }
+    },
+    "stp": {
+        "discovery": {
+            "stp": [
+                {
+                    "rootBridge": 0,
+                    "bridgeAddress": "18a6f756203f",
+                    "protocolSpecification": "unknown",
+                    "priority": 32768,
+                    "timeSinceTopologyChange": "242470",
+                    "topChanges": 2357,
+                    "designatedRoot": "f07f06941e24",
+                    "rootCost": 40000,
+                    "rootPort": 1,
+                    "maxAge": 20,
+                    "helloTime": 2,
+                    "holdTime": 0,
+                    "forwardDelay": 15,
+                    "bridgeMaxAge": 20,
+                    "bridgeHelloTime": 2,
+                    "bridgeForwardDelay": 15
+                }
+            ],
+            "ports_stp": [
+                {
+                    "priority": 128,
+                    "state": "forwarding",
+                    "enable": "enabled",
+                    "pathCost": 20000,
+                    "designatedRoot": "f07f06941e24",
+                    "designatedCost": 20000,
+                    "designatedBridge": "f09e6393045c",
+                    "designatedPort": 52,
+                    "forwardTransitions": 1,
+                    "ifIndex": 1
+                },
+                {
+                    "priority": 128,
+                    "state": "forwarding",
+                    "enable": "enabled",
+                    "pathCost": 20000,
+                    "designatedRoot": "f07f06941e24",
+                    "designatedCost": 40000,
+                    "designatedBridge": "18a6f756203f",
+                    "designatedPort": 2,
+                    "forwardTransitions": 7,
+                    "ifIndex": 2
+                },
+                {
+                    "priority": 128,
+                    "state": "forwarding",
+                    "enable": "enabled",
+                    "pathCost": 20000,
+                    "designatedRoot": "f07f06941e24",
+                    "designatedCost": 40000,
+                    "designatedBridge": "18a6f756203f",
+                    "designatedPort": 3,
+                    "forwardTransitions": 1,
+                    "ifIndex": 3
+                },
+                {
+                    "priority": 128,
+                    "state": "forwarding",
+                    "enable": "enabled",
+                    "pathCost": 20000,
+                    "designatedRoot": "f07f06941e24",
+                    "designatedCost": 40000,
+                    "designatedBridge": "18a6f756203f",
+                    "designatedPort": 4,
+                    "forwardTransitions": 27,
+                    "ifIndex": 4
+                },
+                {
+                    "priority": 128,
+                    "state": "forwarding",
+                    "enable": "enabled",
+                    "pathCost": 20000,
+                    "designatedRoot": "f07f06941e24",
+                    "designatedCost": 40000,
+                    "designatedBridge": "18a6f756203f",
+                    "designatedPort": 6,
+                    "forwardTransitions": 3,
+                    "ifIndex": 6
+                },
+                {
+                    "priority": 128,
+                    "state": "forwarding",
+                    "enable": "enabled",
+                    "pathCost": 200000,
+                    "designatedRoot": "f07f06941e24",
+                    "designatedCost": 40000,
+                    "designatedBridge": "18a6f756203f",
+                    "designatedPort": 7,
+                    "forwardTransitions": 1,
+                    "ifIndex": 7
+                },
+                {
+                    "priority": 128,
+                    "state": "forwarding",
+                    "enable": "enabled",
+                    "pathCost": 20000,
+                    "designatedRoot": "f07f06941e24",
+                    "designatedCost": 40000,
+                    "designatedBridge": "18a6f756203f",
+                    "designatedPort": 8,
+                    "forwardTransitions": 776,
+                    "ifIndex": 8
+                }
+            ]
+        },
+        "poller": "matches discovery"
     }
 }
