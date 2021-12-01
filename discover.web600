@@ -1,0 +1,1004 @@
+LibreNMS Discovery
+SQL[[1;33mselect `migration` from `migrations` order by `id` desc limit 1 [0;33m[][0m 6.57ms] 
+  
+SQL[[1;33mselect count(*) as aggregate from `migrations` limit 1 [0;33m[][0m 3.34ms] 
+  
+SQL[[1;33mselect version() [0;33m[][0m 3.13ms] 
+  
+===================================
+Version info:
+Commit SHA: 6fe150bec3d0126916fce6b0274cd66b04987606
+Commit Date: 1633644233
+DB Schema: 2021_25_01_0129_isis_adjacencies_nullable (221)
+PHP: 7.4.3
+MySQL: 10.3.31-MariaDB-0ubuntu0.20.04.1
+RRDTool: 1.7.2
+SNMP: NET-SNMP 5.8
+==================================DEBUG!
+Updating os_def.cache  
+SQL[[1;33mSELECT * FROM `devices` WHERE disabled = 0 AND `hostname` LIKE '10.219.56.150' ORDER BY device_id DESC [0;33m[][0m 2.81ms] 
+  
+SQL[[1;33mselect * from `devices` where `device_id` = ? limit 1 [0;33m[43][0m 0.94ms] 
+  
+SQL[[1;33mselect * from `devices_attribs` where `devices_attribs`.`device_id` = ? and `devices_attribs`.`device_id` is not null [0;33m[43][0m 0.55ms] 
+  
+10.219.56.150 43 generic [FPING] '/usr/bin/fping' '-e' '-q' '-c' '3' '-p' '500' '-t' '500' '10.219.56.150'
+  
+response: xmt/rcv/%loss = 3/3/0%, min/avg/max = 18.5/20.5/23.5  
+SNMP[[0;36m'/usr/bin/snmpget' '-M' '/opt/librenms/mibs' '-v1' '-c' 'COMMUNITY' '-OQXUte' 'udp:HOSTNAME:161' 'SNMPv2-MIB::sysObjectID.0'[0m]  
+SNMPv2-MIB::sysObjectID.0 = SNMPv2-SMI::enterprises.83*
+  
+  
+Modules status: Global+  
+OS  
+Device  
+
+#### Load disco module core ####
+SNMP[[0;36m'/usr/bin/snmpget' '-v1' '-c' 'COMMUNITY' '-OUQn' '-m' 'SNMPv2-MIB' '-M' '/opt/librenms/mibs' 'udp:HOSTNAME:161' 'sysName.0' 'sysObjectID.0' 'sysDescr.0'[0m]
+.*.*.0 = 508 - 151 Front St W  
+  
+SQL[[1;33minsert into `eventlog` (`device_id`, `reference`, `type`, `datetime`, `severity`, `message`, `username`) values (?, ?, ?, ?, ?, ?, ?) [0;33m[43,null,"system","2021-10-26 18:29:19",3,"508 - 151 front st w -> 508 - 151 front st w",""][0m 1.44ms] 
+  
+|  |  |  
+SNMP[[0;36m'/usr/bin/snmpget' '-v1' '-c' 'COMMUNITY' '-Oqv' '-M' '/opt/librenms/mibs:/opt/librenms/mibs/arris' 'udp:HOSTNAME:161' '.1.3.6.1.4.1.1166.1.621.14.2.0'[0m]
+Exitcode: 2  
+Error in packet
+Reason: (noSuchName) There is no such variable name in this MIB.
+Failed object: iso.3.6.1.4.1.1166.1.621.14.2.0  
+  
+Error in packet
+Reason: (noSuchName) There is no such variable name in this MIB.
+Failed object: iso.3.6.1.4.1.1166.1.621.14.2.0  
+SNMP[[0;36m'/usr/bin/snmpget' '-v1' '-c' 'COMMUNITY' '-Oqv' '-M' '/opt/librenms/mibs' 'udp:HOSTNAME:161' '.1.3.6.1.4.1.8072.1.3.2.3.1.2.6.100.105.115.116.114.111'[0m]
+Exitcode: 2  
+Error in packet
+Reason: (noSuchName) There is no such variable name in this MIB.
+Failed object: iso.3.6.1.4.1.8072.1.3.2.3.1.2.6.100.105.115.116.114.111  
+  
+Error in packet
+Reason: (noSuchName) There is no such variable name in this MIB.
+Failed object: iso.3.6.1.4.1.8072.1.3.2.3.1.2.6.100.105.115.116.114.111  
+SNMP[[0;36m'/usr/bin/snmpget' '-v1' '-c' 'COMMUNITY' '-Oqv' '-M' '/opt/librenms/mibs:/opt/librenms/mibs/endrun' 'udp:HOSTNAME:161' '.1.3.6.1.4.1.13827.12.1.16.0'[0m]
+Exitcode: 2  
+Error in packet
+Reason: (noSuchName) There is no such variable name in this MIB.
+Failed object: iso.3.6.1.4.1.13827.12.1.16.0  
+  
+Error in packet
+Reason: (noSuchName) There is no such variable name in this MIB.
+Failed object: iso.3.6.1.4.1.13827.12.1.16.0  
+SNMP[[0;36m'/usr/bin/snmpget' '-v1' '-c' 'COMMUNITY' '-Oqv' '-M' '/opt/librenms/mibs:/opt/librenms/mibs/eltek' 'udp:HOSTNAME:161' '.1.3.6.1.4.1.12148.10.2.6.0'[0m]
+Exitcode: 2  
+Error in packet
+Reason: (noSuchName) There is no such variable name in this MIB.
+Failed object: iso.3.6.1.4.1.12148.10.2.6.0  
+  
+Error in packet
+Reason: (noSuchName) There is no such variable name in this MIB.
+Failed object: iso.3.6.1.4.1.12148.10.2.6.0  
+SNMP[[0;36m'/usr/bin/snmpget' '-v1' '-c' 'COMMUNITY' '-Oqv' '-M' '/opt/librenms/mibs:/opt/librenms/mibs/hikvision' 'udp:HOSTNAME:161' '.1.3.6.1.4.1.39165.1.1.0'[0m]
+Exitcode: 2  
+Error in packet
+Reason: (noSuchName) There is no such variable name in this MIB.
+Failed object: iso.3.6.1.4.1.39165.1.1.0  
+  
+Error in packet
+Reason: (noSuchName) There is no such variable name in this MIB.
+Failed object: iso.3.6.1.4.1.39165.1.1.0  
+SNMP[[0;36m'/usr/bin/snmpget' '-v1' '-c' 'COMMUNITY' '-Oqv' '-M' '/opt/librenms/mibs:/opt/librenms/mibs/orvaldi' 'udp:HOSTNAME:161' '.1.3.6.1.4.1.21111.1.1.1.6.0'[0m]
+Exitcode: 2  
+Error in packet
+Reason: (noSuchName) There is no such variable name in this MIB.
+Failed object: iso.3.6.1.4.1.21111.1.1.1.6.0  
+  
+Error in packet
+Reason: (noSuchName) There is no such variable name in this MIB.
+Failed object: iso.3.6.1.4.1.21111.1.1.1.6.0  
+SNMP[[0;36m'/usr/bin/snmpget' '-v1' '-c' 'COMMUNITY' '-Oqv' '-M' '/opt/librenms/mibs' 'udp:HOSTNAME:161' '1.3.6.1.4.1.4515.1.3.6.1.1.1.2.0'[0m]
+Exitcode: 2  
+Error in packet
+Reason: (noSuchName) There is no such variable name in this MIB.
+Failed object: iso.3.6.1.4.1.4515.1.3.6.1.1.1.2.0  
+  
+Error in packet
+Reason: (noSuchName) There is no such variable name in this MIB.
+Failed object: iso.3.6.1.4.1.4515.1.3.6.1.1.1.2.0  
+SNMP[[0;36m'/usr/bin/snmpget' '-v1' '-c' 'COMMUNITY' '-Oqv' '-M' '/opt/librenms/mibs:/opt/librenms/mibs/wisi' 'udp:HOSTNAME:161' '.1.3.6.1.4.1.7465.20.2.9.1.2.1.3.1.2'[0m]
+Exitcode: 2  
+Error in packet
+Reason: (noSuchName) There is no such variable name in this MIB.
+Failed object: iso.3.6.1.4.1.7465.20.2.9.1.2.1.3.1.2  
+  
+Error in packet
+Reason: (noSuchName) There is no such variable name in this MIB.
+Failed object: iso.3.6.1.4.1.7465.20.2.9.1.2.1.3.1.2  
+SQL[[1;33mupdate `devices` set `sysName` = ? where `device_id` = ? [0;33m["508 - 151 front st w",43][0m 1.08ms] 
+  
+SQL[[1;33minsert into `eventlog` (`device_id`, `reference`, `type`, `datetime`, `severity`, `message`, `username`) values (?, ?, ?, ?, ?, ?, ?) [0;33m[43,null,"system","2021-10-26 18:29:19",3,"sysName: 508 - 151 front st w",""][0m 2.95ms] 
+  
+Attempting to initialize OS: generic  
+OS initialized: LibreNMS\OS\Generic  
+OS: Generic Device (generic)
+
+
+>> Runtime for discovery module 'core': 0.7180 seconds with 560136 bytes
+>> [0;36mSNMP[0m: [9/0.66s] [1;33mMySQL[0m: [3/0.05s] [0;32mRRD[0m: [0/0.00s]
+#### Unload disco module core ####
+
+Modules status: Global+  
+OS  
+Device  
+
+#### Load disco module os ####
+Yaml location data:  
+SNMP[[0;36m'/usr/bin/snmpget' '-v1' '-c' 'COMMUNITY' '-Oqv' '-M' '/opt/librenms/mibs' 'udp:HOSTNAME:161' 'SNMPv2-MIB::sysLocation.0'[0m]
+508 - 151 Front St W  
+  
+SQL[[1;33mselect * from `locations` where (`location` = ?) limit 1 [0;33m["508 - 151 Front St W"][0m 0.28ms] 
+  
+::query() failed: DNS request failed: The domain name referenced in the query does not exist.  
+SNMP[[0;36m'/usr/bin/snmpget' '-v1' '-c' 'COMMUNITY' '-Ovq' '-m' 'SNMPv2-MIB' '-M' '/opt/librenms/mibs' 'udp:HOSTNAME:161' 'sysContact.0'[0m]
+Admin  
+  
+Yaml OS data:  
+Location: 508 - 151 Front St W
+Hardware: 
+OS Version: 
+OS Features: 
+Serial: 
+
+>> Runtime for discovery module 'os': 0.3070 seconds with 557672 bytes
+>> [0;36mSNMP[0m: [4/0.21s] [1;33mMySQL[0m: [1/0.00s] [0;32mRRD[0m: [0/0.00s]
+#### Unload disco module os ####
+
+Modules status: Global+  
+OS  
+Device  
+
+#### Load disco module ports ####
+SNMP[[0;36m'/usr/bin/snmpwalk' '-v1' '-c' 'COMMUNITY' '-OQUs' '-m' 'IF-MIB' '-M' '/opt/librenms/mibs' 'udp:HOSTNAME:161' 'ifDescr'[0m]
+End of MIB  
+  
+SNMP[[0;36m'/usr/bin/snmpwalk' '-v1' '-c' 'COMMUNITY' '-OQUs' '-m' 'IF-MIB' '-M' '/opt/librenms/mibs' 'udp:HOSTNAME:161' 'ifName'[0m]
+End of MIB  
+  
+SNMP[[0;36m'/usr/bin/snmpwalk' '-v1' '-c' 'COMMUNITY' '-OQUs' '-m' 'IF-MIB' '-M' '/opt/librenms/mibs' 'udp:HOSTNAME:161' 'ifAlias'[0m]
+End of MIB  
+  
+SNMP[[0;36m'/usr/bin/snmpwalk' '-v1' '-c' 'COMMUNITY' '-OQUs' '-m' 'IF-MIB' '-M' '/opt/librenms/mibs' 'udp:HOSTNAME:161' 'ifType'[0m]
+End of MIB  
+  
+SNMP[[0;36m'/usr/bin/snmpwalk' '-v1' '-c' 'COMMUNITY' '-OQUs' '-m' 'IF-MIB' '-M' '/opt/librenms/mibs' 'udp:HOSTNAME:161' 'ifOperStatus'[0m]
+End of MIB  
+  
+array (
+)  
+SQL[[1;33mSELECT * FROM `ports` WHERE `device_id` = ? ORDER BY port_id [0;33m[43][0m 0.81ms] 
+  
+
+
+>> Runtime for discovery module 'ports': 0.5240 seconds with 3904 bytes
+>> [0;36mSNMP[0m: [5/0.52s] [1;33mMySQL[0m: [1/0.01s] [0;32mRRD[0m: [0/0.00s]
+#### Unload disco module ports ####
+
+Modules status: Global+  
+OS  
+Device  
+
+#### Load disco module ports-stack ####
+SQL[[1;33mSELECT * FROM `ports_stack` WHERE `device_id` = '43' [0;33m[][0m 0.14ms] 
+  
+SNMP[[0;36m'/usr/bin/snmpwalk' '-v1' '-c' 'COMMUNITY' '-OQUs' '-m' 'IF-MIB' '-M' '/opt/librenms/mibs' 'udp:HOSTNAME:161' 'ifStackStatus'[0m]
+End of MIB  
+  
+
+
+>> Runtime for discovery module 'ports-stack': 0.1050 seconds with 832 bytes
+>> [0;36mSNMP[0m: [0/0.00s] [1;33mMySQL[0m: [1/0.00s] [0;32mRRD[0m: [0/0.00s]
+#### Unload disco module ports-stack ####
+
+Modules status: Global+  
+OS  
+Device  
+
+#### Load disco module entity-physical ####
+
+Caching OIDs: entPhysicalEntrySNMP[[0;36m'/usr/bin/snmpwalk' '-v1' '-c' 'COMMUNITY' '-OQUs' '-m' 'ENTITY-MIB:CISCO-ENTITY-VENDORTYPE-OID-MIB' '-M' '/opt/librenms/mibs' 'udp:HOSTNAME:161' 'entPhysicalEntry'[0m]
+End of MIB  
+MIB search path: /opt/librenms/mibs
+Cannot find module (CISCO-ENTITY-VENDORTYPE-OID-MIB): At line 4 in (none)  
+
+SQL[[1;33mSELECT * FROM `entPhysical` WHERE `device_id` = ? [0;33m[43][0m 0.29ms] 
+  
+
+>> Runtime for discovery module 'entity-physical': 0.0940 seconds with 6040 bytes
+>> [0;36mSNMP[0m: [1/0.09s] [1;33mMySQL[0m: [1/0.00s] [0;32mRRD[0m: [0/0.00s]
+#### Unload disco module entity-physical ####
+
+Modules status: Global-  
+OS  
+Device  
+Module [ entity-state ] disabled globally.
+
+Modules status: Global-  
+OS  
+Device  
+Module [ isis ] disabled globally.
+
+Modules status: Global+  
+OS  
+Device  
+
+#### Load disco module processors ####
+No YAML Discovery data.  
+Host Resources: SNMP[[0;36m'/usr/bin/snmpwalk' '-v1' '-c' 'COMMUNITY' '-OQUs' '-m' 'HOST-RESOURCES-MIB' '-M' '/opt/librenms/mibs' 'udp:HOSTNAME:161' 'hrProcessorLoad'[0m]
+End of MIB  
+  
+UCD Resources: SNMP[[0;36m'/usr/bin/snmpget' '-v1' '-c' 'COMMUNITY' '-Ovq' '-M' '/opt/librenms/mibs' 'udp:HOSTNAME:161' '.1.3.6.1.4.1.2021.11.11.0'[0m]
+Exitcode: 2  
+Error in packet
+Reason: (noSuchName) There is no such variable name in this MIB.
+Failed object: iso.3.6.1.4.1.2021.11.11.0  
+  
+Error in packet
+Reason: (noSuchName) There is no such variable name in this MIB.
+Failed object: iso.3.6.1.4.1.2021.11.11.0  
+SQL[[1;33mSELECT * FROM `processors` WHERE `device_id`=? [0;33m[43][0m 0.59ms] 
+  
+SQL[[1;33mDELETE T FROM `processors` T LEFT JOIN `devices` ON `devices`.`device_id` = T.`device_id` WHERE `devices`.`device_id` IS NULL [0;33m[][0m 0.37ms] 
+  
+
+
+>> Runtime for discovery module 'processors': 0.2090 seconds with 76920 bytes
+>> [0;36mSNMP[0m: [2/0.21s] [1;33mMySQL[0m: [2/0.01s] [0;32mRRD[0m: [0/0.00s]
+#### Unload disco module processors ####
+
+Modules status: Global+  
+OS  
+Device  
+
+#### Load disco module mempools ####
+communityStringIndexing  
+SNMP[[0;36m'/usr/bin/snmpwalk' '-v1' '-c' 'COMMUNITY' '-OQUsetX' '-m' 'HOST-RESOURCES-MIB:HOST-RESOURCES-TYPES' '-M' '/opt/librenms/mibs' 'udp:HOSTNAME:161' 'hrStorageTable'[0m]
+End of MIB  
+  
+SNMP[[0;36m'/usr/bin/snmpget' '-v1' '-c' 'COMMUNITY' '-OQUv' '-m' 'HOST-RESOURCES-MIB' '-M' '/opt/librenms/mibs' 'udp:HOSTNAME:161' 'hrMemorySize.0'[0m]
+Exitcode: 2  
+Error in packet
+Reason: (noSuchName) There is no such variable name in this MIB.
+Failed object: HOST-RESOURCES-MIB::hrMemorySize.0  
+  
+Error in packet
+Reason: (noSuchName) There is no such variable name in this MIB.
+Failed object: HOST-RESOURCES-MIB::hrMemorySize.0  
+
+Warning: Illegal string offset 'hrStorageType' in /opt/librenms/LibreNMS/OS/Traits/HostResources.php on line 181
+SNMP[[0;36m'/usr/bin/snmpget' '-v1' '-c' 'COMMUNITY' '-OQUs' '-m' 'UCD-SNMP-MIB' '-M' '/opt/librenms/mibs' 'udp:HOSTNAME:161' 'memTotalSwap.0' 'memAvailSwap.0' 'memTotalReal.0' 'memAvailReal.0' 'memBuffer.0' 'memCached.0' 'memSysAvail.0'[0m]
+Exitcode: 1  
+Timeout: No Response from udp:10.219.56.150:161.  
+  
+Timeout: No Response from udp:10.219.56.150:161.  
+SQL[[1;33mselect * from `mempools` where `mempools`.`device_id` = ? and `mempools`.`device_id` is not null [0;33m[43][0m 0.41ms] 
+  
+
+
+>> Runtime for discovery module 'mempools': 6.2280 seconds with 92288 bytes
+>> [0;36mSNMP[0m: [2/6.12s] [1;33mMySQL[0m: [1/0.00s] [0;32mRRD[0m: [0/0.00s]
+#### Unload disco module mempools ####
+
+Modules status: Global+  
+OS  
+Device  
+
+#### Load disco module cisco-vrf-lite ####
+SQL[[1;33mSELECT * FROM vrf_lite_cisco WHERE device_id = ?  [0;33m[43][0m 1.32ms] 
+  
+
+>> Runtime for discovery module 'cisco-vrf-lite': 0.0020 seconds with 1632 bytes
+>> [0;36mSNMP[0m: [0/0.00s] [1;33mMySQL[0m: [1/0.01s] [0;32mRRD[0m: [0/0.00s]
+#### Unload disco module cisco-vrf-lite ####
+
+Modules status: Global-  
+OS  
+Device  
+Module [ cisco-mac-accounting ] disabled globally.
+
+Modules status: Global-  
+OS  
+Device  
+Module [ cisco-pw ] disabled globally.
+
+Modules status: Global-  
+OS  
+Device  
+Module [ vrf ] disabled globally.
+
+Modules status: Global-  
+OS  
+Device  
+Module [ cisco-cef ] disabled globally.
+
+Modules status: Global-  
+OS  
+Device  
+Module [ slas ] disabled globally.
+
+Modules status: Global-  
+OS  
+Device  
+Module [ cisco-cbqos ] disabled globally.
+
+Modules status: Global-  
+OS  
+Device  
+Module [ cisco-otv ] disabled globally.
+
+Modules status: Global-  
+OS  
+Device  
+Module [ cisco-qfp ] disabled globally.
+
+Modules status: Global+  
+OS  
+Device  
+
+#### Load disco module ipv4-addresses ####
+SQL[[1;33mselect * from `vrf_lite_cisco` where `vrf_lite_cisco`.`device_id` = ? and `vrf_lite_cisco`.`device_id` is not null [0;33m[43][0m 1.1ms] 
+  
+SNMP[[0;36m'/usr/bin/snmpwalk' '-v1' '-c' 'COMMUNITY' '-Osq' '-m' 'IP-MIB' '-M' '/opt/librenms/mibs' 'udp:HOSTNAME:161' 'ipAdEntIfIndex'[0m]
+End of MIB  
+  
+SNMP[[0;36m'/usr/bin/snmpget' '-v1' '-c' 'COMMUNITY' '-Oqv' '-m' 'IP-MIB' '-M' '/opt/librenms/mibs' 'udp:HOSTNAME:161' 'ipAdEntNetMask.'[0m]
+Exitcode: 2  
+Error in packet
+Reason: (noSuchName) There is no such variable name in this MIB.
+Failed object: IP-MIB::ipAdEntNetMask.0  
+  
+Error in packet
+Reason: (noSuchName) There is no such variable name in this MIB.
+Failed object: IP-MIB::ipAdEntNetMask.0  
+SQL[[1;33mSELECT `ipv4_addresses`.*, `ports`.`device_id`, `ports`.`ifIndex` FROM `ipv4_addresses` LEFT JOIN `ports` ON `ipv4_addresses`.`port_id` = `ports`.`port_id` WHERE `ports`.device_id = ? OR `ports`.`device_id` IS NULL [0;33m[43][0m 0.7ms] 
+  
+
+
+>> Runtime for discovery module 'ipv4-addresses': 0.2590 seconds with 41248 bytes
+>> [0;36mSNMP[0m: [2/0.25s] [1;33mMySQL[0m: [2/0.02s] [0;32mRRD[0m: [0/0.00s]
+#### Unload disco module ipv4-addresses ####
+
+Modules status: Global+  
+OS  
+Device  
+
+#### Load disco module ipv6-addresses ####
+SNMP[[0;36m'/usr/bin/snmpwalk' '-v1' '-c' 'COMMUNITY' '-Osq' '-Ln' '-m' 'IP-MIB' '-M' '/opt/librenms/mibs' 'udp:HOSTNAME:161' 'ipAddressIfIndex.ipv6'[0m]
+End of MIB  
+  
+SNMP[[0;36m'/usr/bin/snmpwalk' '-v1' '-c' 'COMMUNITY' '-OsqnU' '-Ln' '-m' 'IPV6-MIB' '-M' '/opt/librenms/mibs' 'udp:HOSTNAME:161' 'ipv6AddrPfxLength'[0m]
+End of MIB  
+  
+SQL[[1;33mSELECT `ipv6_addresses`.*, `ports`.`device_id`, `ports`.`ifIndex` FROM `ipv6_addresses` LEFT JOIN `ports` ON `ipv6_addresses`.`port_id` = `ports`.`port_id` WHERE `ports`.device_id = ? OR `ports`.`device_id` IS NULL [0;33m[43][0m 0.99ms] 
+  
+
+
+>> Runtime for discovery module 'ipv6-addresses': 0.2310 seconds with 1304 bytes
+>> [0;36mSNMP[0m: [2/0.23s] [1;33mMySQL[0m: [1/0.01s] [0;32mRRD[0m: [0/0.00s]
+#### Unload disco module ipv6-addresses ####
+
+Modules status: Global-  
+OS  
+Device  
+Module [ route ] disabled globally.
+
+Modules status: Global+  
+OS  
+Device  
+
+#### Load disco module sensors ####
+ ENTITY-SENSOR: Caching OIDs: entPhysicalDescrSNMP[[0;36m'/usr/bin/snmpwalk' '-v1' '-c' 'COMMUNITY' '-OQUs' '-m' 'ENTITY-MIB' '-M' '/opt/librenms/mibs' 'udp:HOSTNAME:161' 'entPhysicalDescr'[0m]
+End of MIB  
+  
+
+SQL[[1;33mSELECT * FROM sensors AS S, devices AS D WHERE S.sensor_class=? AND S.device_id = D.device_id AND D.device_id = ? AND S.poller_type = ? [0;33m["voltage",43,"ipmi"][0m 2.49ms] 
+  
+SQL[[1;33mSELECT * FROM sensors AS S, devices AS D WHERE S.sensor_class=? AND S.device_id = D.device_id AND D.device_id = ? AND S.poller_type = ? [0;33m["temperature",43,"ipmi"][0m 0.66ms] 
+  
+SQL[[1;33mSELECT * FROM sensors AS S, devices AS D WHERE S.sensor_class=? AND S.device_id = D.device_id AND D.device_id = ? AND S.poller_type = ? [0;33m["fanspeed",43,"ipmi"][0m 0.96ms] 
+  
+SQL[[1;33mSELECT * FROM sensors AS S, devices AS D WHERE S.sensor_class=? AND S.device_id = D.device_id AND D.device_id = ? AND S.poller_type = ? [0;33m["power",43,"ipmi"][0m 1.9ms] 
+  
+Airflow: array (
+)  
+SQL[[1;33mSELECT * FROM sensors AS S, devices AS D WHERE S.sensor_class=? AND S.device_id = D.device_id AND D.device_id = ? AND S.poller_type = ? [0;33m["airflow",43,"snmp"][0m 5.45ms] 
+  
+
+Current: array (
+)  
+SQL[[1;33mSELECT * FROM sensors AS S, devices AS D WHERE S.sensor_class=? AND S.device_id = D.device_id AND D.device_id = ? AND S.poller_type = ? [0;33m["current",43,"snmp"][0m 7.63ms] 
+  
+
+Charge: array (
+)  
+SQL[[1;33mSELECT * FROM sensors AS S, devices AS D WHERE S.sensor_class=? AND S.device_id = D.device_id AND D.device_id = ? AND S.poller_type = ? [0;33m["charge",43,"snmp"][0m 5.69ms] 
+  
+
+Dbm: array (
+)  
+SQL[[1;33mSELECT * FROM sensors AS S, devices AS D WHERE S.sensor_class=? AND S.device_id = D.device_id AND D.device_id = ? AND S.poller_type = ? [0;33m["dbm",43,"snmp"][0m 13.28ms] 
+  
+
+Fanspeed: array (
+)  
+SQL[[1;33mSELECT * FROM sensors AS S, devices AS D WHERE S.sensor_class=? AND S.device_id = D.device_id AND D.device_id = ? AND S.poller_type = ? [0;33m["fanspeed",43,"snmp"][0m 3.89ms] 
+  
+
+Frequency: array (
+)  
+SQL[[1;33mSELECT * FROM sensors AS S, devices AS D WHERE S.sensor_class=? AND S.device_id = D.device_id AND D.device_id = ? AND S.poller_type = ? [0;33m["frequency",43,"snmp"][0m 5.73ms] 
+  
+
+Humidity: array (
+)  
+SQL[[1;33mSELECT * FROM sensors AS S, devices AS D WHERE S.sensor_class=? AND S.device_id = D.device_id AND D.device_id = ? AND S.poller_type = ? [0;33m["humidity",43,"snmp"][0m 3.19ms] 
+  
+
+Load: array (
+)  
+SQL[[1;33mSELECT * FROM sensors AS S, devices AS D WHERE S.sensor_class=? AND S.device_id = D.device_id AND D.device_id = ? AND S.poller_type = ? [0;33m["load",43,"snmp"][0m 2.7ms] 
+  
+
+Loss: array (
+)  
+SQL[[1;33mSELECT * FROM sensors AS S, devices AS D WHERE S.sensor_class=? AND S.device_id = D.device_id AND D.device_id = ? AND S.poller_type = ? [0;33m["loss",43,"snmp"][0m 4.71ms] 
+  
+
+Power: array (
+)  
+SQL[[1;33mSELECT * FROM sensors AS S, devices AS D WHERE S.sensor_class=? AND S.device_id = D.device_id AND D.device_id = ? AND S.poller_type = ? [0;33m["power",43,"snmp"][0m 2.47ms] 
+  
+
+Power_consumed: array (
+)  
+SQL[[1;33mSELECT * FROM sensors AS S, devices AS D WHERE S.sensor_class=? AND S.device_id = D.device_id AND D.device_id = ? AND S.poller_type = ? [0;33m["power_consumed",43,"snmp"][0m 1.03ms] 
+  
+
+Power_factor: array (
+)  
+SQL[[1;33mSELECT * FROM sensors AS S, devices AS D WHERE S.sensor_class=? AND S.device_id = D.device_id AND D.device_id = ? AND S.poller_type = ? [0;33m["power_factor",43,"snmp"][0m 1.18ms] 
+  
+
+Runtime: array (
+)  
+SQL[[1;33mSELECT * FROM sensors AS S, devices AS D WHERE S.sensor_class=? AND S.device_id = D.device_id AND D.device_id = ? AND S.poller_type = ? [0;33m["runtime",43,"snmp"][0m 9.04ms] 
+  
+
+Signal: array (
+)  
+SQL[[1;33mSELECT * FROM sensors AS S, devices AS D WHERE S.sensor_class=? AND S.device_id = D.device_id AND D.device_id = ? AND S.poller_type = ? [0;33m["signal",43,"snmp"][0m 1.57ms] 
+  
+
+State: array (
+)  
+SQL[[1;33mSELECT * FROM sensors AS S, devices AS D WHERE S.sensor_class=? AND S.device_id = D.device_id AND D.device_id = ? AND S.poller_type = ? [0;33m["state",43,"snmp"][0m 2.5ms] 
+  
+
+Count: array (
+)  
+SQL[[1;33mSELECT * FROM sensors AS S, devices AS D WHERE S.sensor_class=? AND S.device_id = D.device_id AND D.device_id = ? AND S.poller_type = ? [0;33m["count",43,"snmp"][0m 11.49ms] 
+  
+
+Temperature: array (
+)  
+SQL[[1;33mSELECT * FROM sensors AS S, devices AS D WHERE S.sensor_class=? AND S.device_id = D.device_id AND D.device_id = ? AND S.poller_type = ? [0;33m["temperature",43,"snmp"][0m 12.13ms] 
+  
+
+Tv_signal: array (
+)  
+SQL[[1;33mSELECT * FROM sensors AS S, devices AS D WHERE S.sensor_class=? AND S.device_id = D.device_id AND D.device_id = ? AND S.poller_type = ? [0;33m["tv_signal",43,"snmp"][0m 3.91ms] 
+  
+
+Voltage: array (
+)  
+SQL[[1;33mSELECT * FROM sensors AS S, devices AS D WHERE S.sensor_class=? AND S.device_id = D.device_id AND D.device_id = ? AND S.poller_type = ? [0;33m["voltage",43,"snmp"][0m 2.86ms] 
+  
+
+Snr: array (
+)  
+SQL[[1;33mSELECT * FROM sensors AS S, devices AS D WHERE S.sensor_class=? AND S.device_id = D.device_id AND D.device_id = ? AND S.poller_type = ? [0;33m["snr",43,"snmp"][0m 3.17ms] 
+  
+
+Pressure: array (
+)  
+SQL[[1;33mSELECT * FROM sensors AS S, devices AS D WHERE S.sensor_class=? AND S.device_id = D.device_id AND D.device_id = ? AND S.poller_type = ? [0;33m["pressure",43,"snmp"][0m 6.45ms] 
+  
+
+Cooling: array (
+)  
+SQL[[1;33mSELECT * FROM sensors AS S, devices AS D WHERE S.sensor_class=? AND S.device_id = D.device_id AND D.device_id = ? AND S.poller_type = ? [0;33m["cooling",43,"snmp"][0m 2.45ms] 
+  
+
+Delay: array (
+)  
+SQL[[1;33mSELECT * FROM sensors AS S, devices AS D WHERE S.sensor_class=? AND S.device_id = D.device_id AND D.device_id = ? AND S.poller_type = ? [0;33m["delay",43,"snmp"][0m 5.29ms] 
+  
+
+Quality_factor: array (
+)  
+SQL[[1;33mSELECT * FROM sensors AS S, devices AS D WHERE S.sensor_class=? AND S.device_id = D.device_id AND D.device_id = ? AND S.poller_type = ? [0;33m["quality_factor",43,"snmp"][0m 2.42ms] 
+  
+
+Chromatic_dispersion: array (
+)  
+SQL[[1;33mSELECT * FROM sensors AS S, devices AS D WHERE S.sensor_class=? AND S.device_id = D.device_id AND D.device_id = ? AND S.poller_type = ? [0;33m["chromatic_dispersion",43,"snmp"][0m 3.29ms] 
+  
+
+Ber: array (
+)  
+SQL[[1;33mSELECT * FROM sensors AS S, devices AS D WHERE S.sensor_class=? AND S.device_id = D.device_id AND D.device_id = ? AND S.poller_type = ? [0;33m["ber",43,"snmp"][0m 3.56ms] 
+  
+
+Eer: array (
+)  
+SQL[[1;33mSELECT * FROM sensors AS S, devices AS D WHERE S.sensor_class=? AND S.device_id = D.device_id AND D.device_id = ? AND S.poller_type = ? [0;33m["eer",43,"snmp"][0m 2.98ms] 
+  
+
+Waterflow: array (
+)  
+SQL[[1;33mSELECT * FROM sensors AS S, devices AS D WHERE S.sensor_class=? AND S.device_id = D.device_id AND D.device_id = ? AND S.poller_type = ? [0;33m["waterflow",43,"snmp"][0m 2.36ms] 
+  
+
+Percent: array (
+)  
+SQL[[1;33mSELECT * FROM sensors AS S, devices AS D WHERE S.sensor_class=? AND S.device_id = D.device_id AND D.device_id = ? AND S.poller_type = ? [0;33m["percent",43,"snmp"][0m 3.6ms] 
+  
+
+
+>> Runtime for discovery module 'sensors': 0.4390 seconds with 130152 bytes
+>> [0;36mSNMP[0m: [1/0.20s] [1;33mMySQL[0m: [33/1.42s] [0;32mRRD[0m: [0/0.00s]
+#### Unload disco module sensors ####
+
+Modules status: Global+  
+OS  
+Device  
+
+#### Load disco module storage ####
+SNMP[[0;36m'/usr/bin/snmpwalk' '-v1' '-c' 'COMMUNITY' '-OQUs' '-m' 'IBM-AIX-MIB' '-M' '/opt/librenms/mibs' 'udp:HOSTNAME:161' 'aixFsTableEntry'[0m]
+Exitcode: 1  
+MIB search path: /opt/librenms/mibs
+Cannot find module (IBM-AIX-MIB): At line 4 in (none)
+aixFsTableEntry: Unknown Object Identifier (Sub-id not found: (top) -> aixFsTableEntry)  
+  
+MIB search path: /opt/librenms/mibs
+Cannot find module (IBM-AIX-MIB): At line 4 in (none)
+aixFsTableEntry: Unknown Object Identifier (Sub-id not found: (top) -> aixFsTableEntry)  
+aix_filesystem : SNMP[[0;36m'/usr/bin/snmpwalk' '-v1' '-c' 'COMMUNITY' '-OQUs' '-m' 'DATA-DOMAIN-MIB' '-M' '/opt/librenms/mibs:/opt/librenms/mibs/datadomain' 'udp:HOSTNAME:161' 'fileSystemSpaceTable'[0m]
+End of MIB  
+  
+SNMP[[0;36m'/usr/bin/snmpwalk' '-v1' '-c' 'COMMUNITY' '-OQUs' '-m' 'FREENAS-MIB' '-M' '/opt/librenms/mibs' 'udp:HOSTNAME:161' 'datasetTable'[0m]
+Exitcode: 1  
+MIB search path: /opt/librenms/mibs
+Cannot find module (FREENAS-MIB): At line 4 in (none)
+datasetTable: Unknown Object Identifier (Sub-id not found: (top) -> datasetTable)  
+  
+MIB search path: /opt/librenms/mibs
+Cannot find module (FREENAS-MIB): At line 4 in (none)
+datasetTable: Unknown Object Identifier (Sub-id not found: (top) -> datasetTable)  
+SQL[[1;33mSELECT `storage_descr` FROM `storage` WHERE `device_id`  = '43' AND `storage_type` != 'dataset' [0;33m[][0m 2.02ms] 
+  
+SNMP[[0;36m'/usr/bin/snmpwalk' '-v1' '-c' 'COMMUNITY' '-OQUs' '-m' 'FREENAS-MIB' '-M' '/opt/librenms/mibs' 'udp:HOSTNAME:161' 'zpoolTable'[0m]
+Exitcode: 1  
+MIB search path: /opt/librenms/mibs
+Cannot find module (FREENAS-MIB): At line 4 in (none)
+zpoolTable: Unknown Object Identifier (Sub-id not found: (top) -> zpoolTable)  
+  
+MIB search path: /opt/librenms/mibs
+Cannot find module (FREENAS-MIB): At line 4 in (none)
+zpoolTable: Unknown Object Identifier (Sub-id not found: (top) -> zpoolTable)  
+SQL[[1;33mSELECT `storage_descr` FROM `storage` WHERE `device_id`  = '43' AND `storage_type` != 'zpool' [0;33m[][0m 1.33ms] 
+  
+hrStorage : 
+Warning: Illegal string offset 'hrStorageType' in /opt/librenms/includes/discovery/storage/hrstorage.inc.php on line 28
+
+Warning: Illegal string offset 'hrStorageDescr' in /opt/librenms/includes/discovery/storage/hrstorage.inc.php on line 29
+
+Warning: Illegal string offset 'hrStorageSize' in /opt/librenms/includes/discovery/storage/hrstorage.inc.php on line 30
+
+Warning: Illegal string offset 'hrStorageSize' in /opt/librenms/includes/discovery/storage/hrstorage.inc.php on line 30
+
+Warning: Cannot assign an empty string to a string offset in /opt/librenms/includes/discovery/storage/hrstorage.inc.php on line 30
+
+Warning: Illegal string offset 'hrStorageUsed' in /opt/librenms/includes/discovery/storage/hrstorage.inc.php on line 31
+
+Warning: Illegal string offset 'hrStorageUsed' in /opt/librenms/includes/discovery/storage/hrstorage.inc.php on line 31
+
+Warning: Cannot assign an empty string to a string offset in /opt/librenms/includes/discovery/storage/hrstorage.inc.php on line 31
+
+Warning: Illegal string offset 'hrStorageSize' in /opt/librenms/includes/discovery/storage/hrstorage.inc.php on line 32
+
+Warning: Illegal string offset 'hrStorageAllocationUnits' in /opt/librenms/includes/discovery/storage/hrstorage.inc.php on line 32
+
+Warning: A non-numeric value encountered in /opt/librenms/includes/discovery/storage/hrstorage.inc.php on line 32
+
+Warning: A non-numeric value encountered in /opt/librenms/includes/discovery/storage/hrstorage.inc.php on line 32
+
+Warning: Illegal string offset 'hrStorageUsed' in /opt/librenms/includes/discovery/storage/hrstorage.inc.php on line 33
+
+Warning: Illegal string offset 'hrStorageAllocationUnits' in /opt/librenms/includes/discovery/storage/hrstorage.inc.php on line 33
+
+Warning: A non-numeric value encountered in /opt/librenms/includes/discovery/storage/hrstorage.inc.php on line 33
+
+Warning: A non-numeric value encountered in /opt/librenms/includes/discovery/storage/hrstorage.inc.php on line 33
+
+Warning: Illegal string offset 'hrStorageAllocationUnits' in /opt/librenms/includes/discovery/storage/hrstorage.inc.php on line 34
+SNMP[[0;36m'/usr/bin/snmpwalk' '-v1' '-c' 'COMMUNITY' '-OQUs' '-m' 'UCD-SNMP-MIB' '-M' '/opt/librenms/mibs' 'udp:HOSTNAME:161' 'dskTable'[0m]
+End of MIB  
+  
+SQL[[1;33mSELECT `storage_descr` FROM `storage` WHERE `device_id`  = '43' AND `storage_type` != 'dsk' [0;33m[][0m 3.82ms] 
+  
+  
+SQL[[1;33mSELECT * FROM `storage` WHERE `device_id`  = '43' [0;33m[][0m 0.99ms] 
+  
+
+
+>> Runtime for discovery module 'storage': 0.5240 seconds with 14168 bytes
+>> [0;36mSNMP[0m: [5/0.49s] [1;33mMySQL[0m: [4/0.08s] [0;32mRRD[0m: [0/0.00s]
+#### Unload disco module storage ####
+
+Modules status: Global+  
+OS  
+Device  
+
+#### Load disco module hr-device ####
+  
+SNMP[[0;36m'/usr/bin/snmpwalk' '-v1' '-c' 'COMMUNITY' '-OQUs' '-m' 'HOST-RESOURCES-MIB:HOST-RESOURCES-TYPES' '-M' '/opt/librenms/mibs' 'udp:HOSTNAME:161' 'hrDeviceEntry'[0m]
+End of MIB  
+  
+SNMP[[0;36m'/usr/bin/snmpwalk' '-v1' '-c' 'COMMUNITY' '-OQUs' '-m' 'HOST-RESOURCES-MIB:HOST-RESOURCES-TYPES' '-M' '/opt/librenms/mibs' 'udp:HOSTNAME:161' 'hrProcessorEntry'[0m]
+End of MIB  
+  
+array (
+)  
+SQL[[1;33mSELECT * FROM `hrDevice` WHERE `device_id`  = '43' [0;33m[][0m 0.3ms] 
+  
+
+
+>> Runtime for discovery module 'hr-device': 0.2550 seconds with 1448 bytes
+>> [0;36mSNMP[0m: [2/0.25s] [1;33mMySQL[0m: [1/0.00s] [0;32mRRD[0m: [0/0.00s]
+#### Unload disco module hr-device ####
+
+Modules status: Global+  
+OS  
+Device  
+
+#### Load disco module discovery-protocols ####
+ CISCO-CDP-MIB: communityStringIndexing  
+SNMP[[0;36m'/usr/bin/snmpwalk' '-v1' '-c' 'COMMUNITY' '-OQUsetX' '-m' 'CISCO-CDP-MIB' '-M' '/opt/librenms/mibs' 'udp:HOSTNAME:161' 'cdpCache'[0m]
+Exitcode: 1  
+MIB search path: /opt/librenms/mibs
+Cannot find module (CISCO-CDP-MIB): At line 4 in (none)
+cdpCache: Unknown Object Identifier (Sub-id not found: (top) -> cdpCache)  
+  
+MIB search path: /opt/librenms/mibs
+Cannot find module (CISCO-CDP-MIB): At line 4 in (none)
+cdpCache: Unknown Object Identifier (Sub-id not found: (top) -> cdpCache)  
+
+ LLDP-MIB: communityStringIndexing  
+SNMP[[0;36m'/usr/bin/snmpwalk' '-v1' '-c' 'COMMUNITY' '-OQUsetX' '-m' 'LLDP-MIB' '-M' '/opt/librenms/mibs' 'udp:HOSTNAME:161' 'lldpRemTable'[0m]
+End of MIB  
+  
+SNMP[[0;36m'/usr/bin/snmpwalk' '-v1' '-c' 'COMMUNITY' '-OQun' '-m' 'LLDP-MIB' '-M' '/opt/librenms/mibs' 'udp:HOSTNAME:161' '.1.0.8802.1.1.2.1.4.2.1.3'[0m]
+End of MIB  
+  
+communityStringIndexing  
+SNMP[[0;36m'/usr/bin/snmpwalk' '-v1' '-c' 'COMMUNITY' '-OQUsetX' '-m' 'BRIDGE-MIB' '-M' '/opt/librenms/mibs' 'udp:HOSTNAME:161' 'dot1dBasePortIfIndex'[0m]
+End of MIB  
+  
+communityStringIndexing  
+SNMP[[0;36m'/usr/bin/snmpwalk' '-v1' '-c' 'COMMUNITY' '-OQUsetX' '-m' 'LLDP-MIB' '-M' '/opt/librenms/mibs' 'udp:HOSTNAME:161' 'lldpLocPortId'[0m]
+End of MIB  
+  
+
+Warning: Invalid argument supplied for foreach() in /opt/librenms/includes/discovery/discovery-protocols.inc.php on line 272
+
+ OSPF Discovery: SQL[[1;33mSELECT DISTINCT(`ospfNbrIpAddr`),`device_id` FROM `ospf_nbrs` WHERE `device_id`=? [0;33m[43][0m 0.34ms] 
+  
+
+  
+SQL[[1;33mSELECT * FROM `links` AS L, `ports` AS I WHERE L.local_port_id = I.port_id AND I.device_id = ? [0;33m[43][0m 0.95ms] 
+  
+SQL[[1;33mDELETE T FROM `links` T LEFT JOIN `devices` ON `devices`.`device_id` = T.`local_device_id` WHERE `devices`.`device_id` IS NULL [0;33m[][0m 0.39ms] 
+  
+ 0 orphaned links deleted  
+
+>> Runtime for discovery module 'discovery-protocols': 0.6970 seconds with 12296 bytes
+>> [0;36mSNMP[0m: [1/0.18s] [1;33mMySQL[0m: [3/0.02s] [0;32mRRD[0m: [0/0.00s]
+#### Unload disco module discovery-protocols ####
+
+Modules status: Global+  
+OS  
+Device  
+
+#### Load disco module arp-table ####
+communityStringIndexing  
+SNMP[[0;36m'/usr/bin/snmpwalk' '-v1' '-c' 'COMMUNITY' '-OQUsetX' '-m' 'IP-MIB' '-M' '/opt/librenms/mibs' 'udp:HOSTNAME:161' 'ipNetToPhysicalPhysAddress'[0m]
+End of MIB  
+  
+communityStringIndexing  
+SNMP[[0;36m'/usr/bin/snmpwalk' '-v1' '-c' 'COMMUNITY' '-OQUsetX' '-m' 'IP-MIB' '-M' '/opt/librenms/mibs' 'udp:HOSTNAME:161' 'ipNetToMediaPhysAddress'[0m]
+End of MIB  
+  
+SQL[[1;33mSELECT * from `ipv4_mac` WHERE `device_id`=? AND `context_name`=? [0;33m[43,""][0m 0.32ms] 
+  
+SQL[[1;33mSELECT * FROM `ports` WHERE `device_id` = ? AND `ifIndex` = ? [0;33m[43,"End of MIB"][0m 2.7ms] 
+  
+
+Warning: Illegal string offset 'ipNetToMediaPhysAddress' in /opt/librenms/includes/discovery/arp-table.inc.php on line 51
+
+Warning: Illegal string offset 'ipNetToPhysicalPhysAddress' in /opt/librenms/includes/discovery/arp-table.inc.php on line 52
+: 
+
+SQL[[1;33mDELETE T FROM `ipv4_mac` T LEFT JOIN `ports` ON `ports`.`port_id` = T.`port_id` LEFT JOIN `devices` ON `devices`.`device_id` = T.`device_id` WHERE `ports`.`port_id` IS NULL AND `devices`.`device_id` IS NULL [0;33m[][0m 0.5ms] 
+  
+
+
+>> Runtime for discovery module 'arp-table': 0.2800 seconds with 2896 bytes
+>> [0;36mSNMP[0m: [0/0.00s] [1;33mMySQL[0m: [3/0.04s] [0;32mRRD[0m: [0/0.00s]
+#### Unload disco module arp-table ####
+
+Modules status: Global-  
+OS  
+Device  
+Module [ discovery-arp ] disabled globally.
+
+Modules status: Global-  
+OS  
+Device  
+Module [ junose-atm-vp ] disabled globally.
+
+Modules status: Global+  
+OS  
+Device  
+
+#### Load disco module bgp-peers ####
+SNMP[[0;36m'/usr/bin/snmpgetnext' '-v1' '-c' 'COMMUNITY' '-OQUsv' '-m' 'BGP4-MIB' '-M' '/opt/librenms/mibs' 'udp:HOSTNAME:161' 'bgpLocalAs'[0m]
+Exitcode: 2  
+Error in packet.
+Reason: (noSuchName) There is no such variable name in this MIB.
+Failed object: bgpLocalAs.5.0.105.1.1.1.1.2  
+  
+Error in packet.
+Reason: (noSuchName) There is no such variable name in this MIB.
+Failed object: bgpLocalAs.5.0.105.1.1.1.1.2  
+No BGP on hostPeers :  
+SQL[[1;33mDELETE FROM `bgpPeers` WHERE device_id=? AND context_name=? [0;33m[43,""][0m 0.57ms] 
+  
+SQL[[1;33mDELETE FROM `bgpPeers_cbgp` WHERE device_id=? AND context_name=? [0;33m[43,""][0m 0.35ms] 
+  
+
+SQL[[1;33mSELECT DISTINCT context_name FROM bgpPeers WHERE device_id=? [0;33m[43][0m 0.23ms] 
+  
+
+>> Runtime for discovery module 'bgp-peers': 0.0860 seconds with 3584 bytes
+>> [0;36mSNMP[0m: [1/0.08s] [1;33mMySQL[0m: [3/0.01s] [0;32mRRD[0m: [0/0.00s]
+#### Unload disco module bgp-peers ####
+
+Modules status: Global+  
+OS  
+Device  
+
+#### Load disco module vlans ####
+SQL[[1;33mSELECT * FROM `vlans` WHERE `device_id` = ? [0;33m[43][0m 0.16ms] 
+  
+SNMP[[0;36m'/usr/bin/snmpwalk' '-v1' '-c' 'COMMUNITY' '-OQUs' '-m' 'BRIDGE-MIB' '-M' '/opt/librenms/mibs' 'udp:HOSTNAME:161' 'dot1dBasePortIfIndex'[0m]
+End of MIB  
+  
+IEEE8021-Q-BRIDGE-MIB VLANs: SNMP[[0;36m'/usr/bin/snmpget' '-v1' '-c' 'COMMUNITY' '-Oqv' '-m' 'IEEE8021-Q-BRIDGE-MIB' '-M' '/opt/librenms/mibs' 'udp:HOSTNAME:161' 'dot1qVlanVersionNumber.0'[0m]
+Exitcode: 2  
+Error in packet
+Reason: (noSuchName) There is no such variable name in this MIB.
+Failed object: Q-BRIDGE-MIB::dot1qVlanVersionNumber.0  
+  
+Error in packet
+Reason: (noSuchName) There is no such variable name in this MIB.
+Failed object: Q-BRIDGE-MIB::dot1qVlanVersionNumber.0  
+
+
+>> Runtime for discovery module 'vlans': 0.3430 seconds with 7512 bytes
+>> [0;36mSNMP[0m: [2/0.34s] [1;33mMySQL[0m: [1/0.00s] [0;32mRRD[0m: [0/0.00s]
+#### Unload disco module vlans ####
+
+Modules status: Global-  
+OS  
+Device  
+Module [ vmware-vminfo ] disabled globally.
+
+Modules status: Global-  
+OS  
+Device  
+Module [ libvirt-vminfo ] disabled globally.
+
+Modules status: Global-  
+OS  
+Device  
+Module [ printer-supplies ] disabled globally.
+
+Modules status: Global+  
+OS  
+Device  
+
+#### Load disco module ucd-diskio ####
+SNMP[[0;36m'/usr/bin/snmpwalk' '-v1' '-c' 'COMMUNITY' '-OQUs' '-m' 'UCD-DISKIO-MIB' '-M' '/opt/librenms/mibs' 'udp:HOSTNAME:161' 'diskIOEntry'[0m]
+End of MIB  
+  
+array (
+)  
+SQL[[1;33mSELECT * FROM `ucd_diskio` where `device_id`  = '43' [0;33m[][0m 0.93ms] 
+  
+
+
+>> Runtime for discovery module 'ucd-diskio': 0.1090 seconds with 968 bytes
+>> [0;36mSNMP[0m: [1/0.11s] [1;33mMySQL[0m: [1/0.01s] [0;32mRRD[0m: [0/0.00s]
+#### Unload disco module ucd-diskio ####
+
+Modules status: Global-  
+OS  
+Device  
+Module [ applications ] disabled globally.
+
+Modules status: Global+  
+OS  
+Device  
+
+#### Load disco module services ####
+
+>> Runtime for discovery module 'services': 0.0090 seconds with 768 bytes
+>> [0;36mSNMP[0m: [0/0.00s] [1;33mMySQL[0m: [0/0.00s] [0;32mRRD[0m: [0/0.00s]
+#### Unload disco module services ####
+
+Modules status: Global+  
+OS  
+Device  
+
+#### Load disco module stp ####
+SQL[[1;33mSELECT * FROM `stp` WHERE `device_id` = ? [0;33m[43][0m 1.39ms] 
+  
+SNMP[[0;36m'/usr/bin/snmpget' '-v1' '-c' 'COMMUNITY' '-Oqv' '-m' 'RSTP-MIB' '-M' '/opt/librenms/mibs' 'udp:HOSTNAME:161' 'dot1dStpProtocolSpecification.0'[0m]
+Exitcode: 2  
+Error in packet
+Reason: (noSuchName) There is no such variable name in this MIB.
+Failed object: BRIDGE-MIB::dot1dStpProtocolSpecification.0  
+  
+Error in packet
+Reason: (noSuchName) There is no such variable name in this MIB.
+Failed object: BRIDGE-MIB::dot1dStpProtocolSpecification.0  
+
+
+>> Runtime for discovery module 'stp': 0.1010 seconds with 3664 bytes
+>> [0;36mSNMP[0m: [1/0.10s] [1;33mMySQL[0m: [1/0.01s] [0;32mRRD[0m: [0/0.00s]
+#### Unload disco module stp ####
+
+Modules status: Global+  
+OS  
+Device  
+
+#### Load disco module ntp ####
+
+>> Runtime for discovery module 'ntp': 0.0000 seconds with 280 bytes
+>> [0;36mSNMP[0m: [0/0.00s] [1;33mMySQL[0m: [0/0.00s] [0;32mRRD[0m: [0/0.00s]
+#### Unload disco module ntp ####
+
+Modules status: Global-  
+OS  
+Device  
+Module [ loadbalancers ] disabled globally.
+
+Modules status: Global-  
+OS  
+Device  
+Module [ mef ] disabled globally.
+
+Modules status: Global+  
+OS  
+Device  
+
+#### Load disco module wireless ####
+SQL[[1;33mSELECT * FROM `wireless_sensors` WHERE `device_id`=? AND `sensor_class`=? [0;33m[43,"ap-count"][0m 4.17ms] 
+  
+SQL[[1;33mSELECT * FROM `wireless_sensors` WHERE `device_id`=? AND `sensor_class`=? [0;33m[43,"clients"][0m 6.9ms] 
+  
+SQL[[1;33mSELECT * FROM `wireless_sensors` WHERE `device_id`=? AND `sensor_class`=? [0;33m[43,"quality"][0m 2.3ms] 
+  
+SQL[[1;33mSELECT * FROM `wireless_sensors` WHERE `device_id`=? AND `sensor_class`=? [0;33m[43,"capacity"][0m 5.06ms] 
+  
+SQL[[1;33mSELECT * FROM `wireless_sensors` WHERE `device_id`=? AND `sensor_class`=? [0;33m[43,"utilization"][0m 1.11ms] 
+  
+SQL[[1;33mSELECT * FROM `wireless_sensors` WHERE `device_id`=? AND `sensor_class`=? [0;33m[43,"rate"][0m 1.94ms] 
+  
+SQL[[1;33mSELECT * FROM `wireless_sensors` WHERE `device_id`=? AND `sensor_class`=? [0;33m[43,"ccq"][0m 2.31ms] 
+  
+SQL[[1;33mSELECT * FROM `wireless_sensors` WHERE `device_id`=? AND `sensor_class`=? [0;33m[43,"snr"][0m 2.29ms] 
+  
+SQL[[1;33mSELECT * FROM `wireless_sensors` WHERE `device_id`=? AND `sensor_class`=? [0;33m[43,"sinr"][0m 0.58ms] 
+  
+SQL[[1;33mSELECT * FROM `wireless_sensors` WHERE `device_id`=? AND `sensor_class`=? [0;33m[43,"rsrp"][0m 6.63ms] 
+  
+SQL[[1;33mSELECT * FROM `wireless_sensors` WHERE `device_id`=? AND `sensor_class`=? [0;33m[43,"rsrq"][0m 1.9ms] 
+  
+SQL[[1;33mSELECT * FROM `wireless_sensors` WHERE `device_id`=? AND `sensor_class`=? [0;33m[43,"ssr"][0m 0.97ms] 
+  
+SQL[[1;33mSELECT * FROM `wireless_sensors` WHERE `device_id`=? AND `sensor_class`=? [0;33m[43,"mse"][0m 2.04ms] 
+  
+SQL[[1;33mSELECT * FROM `wireless_sensors` WHERE `device_id`=? AND `sensor_class`=? [0;33m[43,"xpi"][0m 2.78ms] 
+  
+SQL[[1;33mSELECT * FROM `wireless_sensors` WHERE `device_id`=? AND `sensor_class`=? [0;33m[43,"rssi"][0m 2.47ms] 
+  
+SQL[[1;33mSELECT * FROM `wireless_sensors` WHERE `device_id`=? AND `sensor_class`=? [0;33m[43,"power"][0m 1.77ms] 
+  
+SQL[[1;33mSELECT * FROM `wireless_sensors` WHERE `device_id`=? AND `sensor_class`=? [0;33m[43,"noise-floor"][0m 2.21ms] 
+  
+SQL[[1;33mSELECT * FROM `wireless_sensors` WHERE `device_id`=? AND `sensor_class`=? [0;33m[43,"errors"][0m 3.53ms] 
+  
+SQL[[1;33mSELECT * FROM `wireless_sensors` WHERE `device_id`=? AND `sensor_class`=? [0;33m[43,"error-ratio"][0m 2.11ms] 
+  
+SQL[[1;33mSELECT * FROM `wireless_sensors` WHERE `device_id`=? AND `sensor_class`=? [0;33m[43,"error-rate"][0m 4.54ms] 
+  
+SQL[[1;33mSELECT * FROM `wireless_sensors` WHERE `device_id`=? AND `sensor_class`=? [0;33m[43,"frequency"][0m 2.56ms] 
+  
+SQL[[1;33mSELECT * FROM `wireless_sensors` WHERE `device_id`=? AND `sensor_class`=? [0;33m[43,"distance"][0m 1.17ms] 
+  
+SQL[[1;33mSELECT * FROM `wireless_sensors` WHERE `device_id`=? AND `sensor_class`=? [0;33m[43,"cell"][0m 1.33ms] 
+  
+SQL[[1;33mSELECT * FROM `wireless_sensors` WHERE `device_id`=? AND `sensor_class`=? [0;33m[43,"channel"][0m 1.65ms] 
+  
+
+>> Runtime for discovery module 'wireless': 0.1500 seconds with 130536 bytes
+>> [0;36mSNMP[0m: [0/0.00s] [1;33mMySQL[0m: [24/0.64s] [0;32mRRD[0m: [0/0.00s]
+#### Unload disco module wireless ####
+
+Modules status: Global+  
+OS  
+Device  
+
+#### Load disco module fdb-table ####
+SQL[[1;33mSELECT `vlan_id`, `vlan_vlan` from `vlans` WHERE `device_id` = ? [0;33m[43][0m 1.63ms] 
+  
+SQL[[1;33mSELECT * FROM `ports_fdb` WHERE `device_id` = ? [0;33m[43][0m 5.72ms] 
+  
+communityStringIndexing  
+SNMP[[0;36m'/usr/bin/snmpwalk' '-v1' '-c' 'COMMUNITY' '-OQUsetX' '-m' 'Q-BRIDGE-MIB' '-M' '/opt/librenms/mibs' 'udp:HOSTNAME:161' 'dot1qTpFdbPort'[0m]
+End of MIB  
+  
+Q-BRIDGE-MIB:communityStringIndexing  
+SNMP[[0;36m'/usr/bin/snmpwalk' '-v1' '-c' 'COMMUNITY' '-OQUsetX' '-m' 'BRIDGE-MIB' '-M' '/opt/librenms/mibs' 'udp:HOSTNAME:161' 'dot1dBasePortIfIndex'[0m]
+End of MIB  
+  
+communityStringIndexing  
+SNMP[[0;36m'/usr/bin/snmpwalk' '-v1' '-c' 'COMMUNITY' '-OQUsetX' '-m' 'Q-BRIDGE-MIB' '-M' '/opt/librenms/mibs' 'udp:HOSTNAME:161' 'dot1qVlanFdbId'[0m]
+End of MIB  
+  
+
+Warning: Invalid argument supplied for foreach() in /opt/librenms/includes/discovery/fdb-table/bridge.inc.php on line 60
+
+
+>> Runtime for discovery module 'fdb-table': 0.5590 seconds with 3016 bytes
+>> [0;36mSNMP[0m: [0/0.00s] [1;33mMySQL[0m: [2/0.07s] [0;32mRRD[0m: [0/0.00s]
+#### Unload disco module fdb-table ####
+
+Modules status: Global+  
+OS  
+Device  
+
+#### Load disco module mpls ####
+
+>> Runtime for discovery module 'mpls': 0.0000 seconds with 23984 bytes
+>> [0;36mSNMP[0m: [0/0.00s] [1;33mMySQL[0m: [0/0.00s] [0;32mRRD[0m: [0/0.00s]
+#### Unload disco module mpls ####
+
+SQL[[1;33mUPDATE `devices` set `last_discovered`=NOW(),`last_discovered_timetaken`=? WHERE `device_id` = ? [0;33m[13.371,43][0m 0.75ms] 
+  
+Discovered in 13.371 seconds
+
+./discovery.php 10.219.56.150 2021-10-26 18:29:31 - 1 devices discovered in 15.91 secs  
+
+[0;36mSNMP[0m [42/10.11s]: Snmpget[20/7.56s] Snmpwalk[21/2.47s] Snmpgetnext[1/0.08s]
+[1;33mSQL[0m [99/2.63s]: Select[90/2.55s] Insert[2/0.04s] Update[2/0.02s] Delete[5/0.02s]
+[0;32mRRD[0m [0/0.00s]:

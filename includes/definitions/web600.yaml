@@ -1,0 +1,16 @@
+os: web600
+text: 'Sensaphone Web600'
+type: environment
+icon: sensaphone
+group: sensaphone
+over:
+    - { graph: device_bits, text: 'Device Traffic' }
+    - { graph: device_processor, text: 'CPU Usage' }
+    - { graph: device_mempool, text: 'Memory Usage' }
+discovery:
+    - sysObjectID:
+        - SNMPv2-SMI::enterprises.8338.1.1.4
+    - snmpget:
+        oid: .1.3.6.1.4.1.8338.1.1.4.1.7.37.0
+        value: Web600
+        

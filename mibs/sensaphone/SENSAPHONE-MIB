@@ -1,0 +1,1264 @@
+--$Author: dramsey $
+--$Date: 2010/12/15 21:20:20 $
+--$Log: Web600.mib,v $
+--Revision 1.24  2010/12/15 21:20:20  dramsey
+--Minor change
+--
+--Revision 1.23  2010/12/15 21:18:45  dramsey
+--Updated the MIB to add the following parameters:
+--    * System: Last programming change timestamp
+--    * System: Reset Data/Event Logs
+--    * System: Reset to Defaults
+--    * System: Reboot
+--    * System: Company Name
+--    * System: Product Name
+--    * System: Voice Activation Code
+--    * System: Is Voice Activated?
+--    * Profile: In Use
+--    * Contact: In Use
+--    * Contact: Index ID
+--
+--Revision 1.22  2010/12/08 21:23:06  dramsey
+--Updated the MIB to reflect access to the following new parameters:
+--   * Input Minimum (String)
+--   * Input Maximum (String)
+--   * Unacknowledged Alarm Status
+--   * Input Alarm Profile Selection
+--
+--Revision 1.21  2010/08/06 15:37:16  jreynolds
+--Added IO_SET_DEFAULTS_C2 entry to MIB and synced up MIB with
+--programming table.
+--
+--Revision 1.20  2009/12/23 15:22:08  dramsey
+--Changed the ID to 3
+--
+--Revision 1.19  2009/12/09 16:18:55  dramsey
+--Changed enumeration syntax of certain fields for greater compatibility across MIB browsers
+--Removed diagnostic traps that were not applicable
+--
+--Revision 1.18  2009/06/03 13:29:45  dramsey
+--Added a new parameter
+--
+--Revision 1.17  2009/05/19 19:57:39  jreynolds
+--Removed some WO enties that were not accessible from the MIB
+--
+--Revision 1.16  2009/05/15 20:03:53  jreynolds
+--Handle updated V2.9 programming
+--
+--Revision 1.15  2009/05/15 18:01:48  jreynolds
+--Programming V2.9 updates
+--
+--Revision 1.14  2009/04/03 14:05:24  jreynolds
+--Fixed syntax errors in MIB borowser
+--
+--Revision 1.13  2009/03/13 19:39:31  jreynolds
+--Added Modbus byte ordering formats
+--
+--Revision 1.12  2009/03/05 15:22:26  jreynolds
+--ioLastAlarm changed to string
+--
+--Revision 1.11  2009/03/04 19:57:29  jreynolds
+--Added sysTimeStr entry
+--
+--Revision 1.10  2009/03/03 20:59:16  jreynolds
+--Added new params to support Modbus etc
+--
+--Revision 1.9  2008/12/18 21:53:09  jreynolds
+--Added new entrys and specify string sizes
+--
+--Revision 1.8  2008/12/18 20:24:13  jreynolds
+--netSMTPsecurity changed to booleans
+--
+--Revision 1.7  2008/12/11 21:51:55  jreynolds
+--Added ioValueInt , ioMinInt and  ioMaxInt
+--
+--Revision 1.6  2008/12/05 16:57:32  jreynolds
+--Syncing with programming table
+--
+--Revision 1.5  2008/12/03 21:11:12  jreynolds
+--Syncing with programming table
+--
+--Revision 1.4  2008/12/02 21:28:14  jreynolds
+--Sections now in sync with programming param table
+--
+--Revision 1.3  2008/12/02 19:11:14  jreynolds
+--Seperated Contacts into their own Table
+--
+--Revision 1.2  2008/11/14 14:50:59  jreynolds
+--Added MIB entrys
+--
+--Revision 1.1  2008/10/31 17:42:03  jreynolds
+--Initial release
+--
+--
+-- SENSAPHONE-MIB
+
+-- Copyright (c) Phonetics, Inc. 2006.
+-- Sensaphone is a Trademark of Phonetics, Inc.
+-- Title: SENSAPHONE TOP LEVEL MIB
+
+-- *************************************************************************
+-- ************************************************************************
+-- SENSAPHONE-MIB { iso org(3) dod(6) internet(1) private(4)
+--    enterprises(1) sensaphone(8338) }
+
+-- Uncomment the #condInclude's to compile with SMICng. 
+-- We must use the windows smicng and place the mibs and rfs in the same dir as
+-- smicng. Syntax: smicng k:\Mercury\src\mib\mercury.mib 
+
+--#condInclude "rfc1155.inc"
+--#condInclude "rfc1213.inc"
+--#condInclude "rfc1212.inc"
+--#condInclude "rfc1215.inc"
+
+SENSAPHONE-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+   enterprises								            FROM RFC1155-SMI
+   DisplayString                          FROM RFC1213-MIB
+   OBJECT-TYPE                            FROM RFC-1212
+   TRAP-TYPE                              FROM RFC-1215;
+
+sensaphone          OBJECT IDENTIFIER ::=  { enterprises 8338 }
+products            OBJECT IDENTIFIER ::=  { sensaphone 1 }
+hardware            OBJECT IDENTIFIER ::=  { products 1 }
+--ims4000             OBJECT IDENTIFIER ::=  { hardware 1 }
+--imsLite             OBJECT IDENTIFIER ::=  { hardware 2 }
+--mercury             OBJECT IDENTIFIER ::=  { hardware 3 }
+web600             OBJECT IDENTIFIER ::=  { hardware 4 }
+--imsTrapArgs         OBJECT IDENTIFIER ::=  { hardware 100 }
+--mercTrapArgs        OBJECT IDENTIFIER ::=  { hardware 101 }
+web600TrapArgs        OBJECT IDENTIFIER ::=  { hardware 102 }
+
+
+-- Units
+
+host                OBJECT IDENTIFIER ::=  { web600 1 }
+
+-- Sections
+
+hostIO	            OBJECT IDENTIFIER ::=  { host 1 }
+hostProfiles        OBJECT IDENTIFIER ::=  { host 4 }
+hostContacts        OBJECT IDENTIFIER ::=  { host 5 }
+hostNet			        OBJECT IDENTIFIER ::=  { host 6 }
+hostSystem					OBJECT IDENTIFIER ::=  { host 7 }
+
+
+-- IO table
+
+ioTable	OBJECT-TYPE
+	SYNTAX	SEQUENCE OF	IoEntry
+	ACCESS	not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"A List of IO entries"
+	::= { hostIO	1 }
+
+ioEntry	OBJECT-TYPE
+	SYNTAX IoEntry
+	ACCESS not-accessible
+	STATUS	mandatory
+	DESCRIPTION
+		"A Io entry"
+	INDEX { ioIndex }
+	::= { ioTable 1 }
+
+IoEntry ::=
+	SEQUENCE {
+		ioIndex
+			INTEGER,
+		ioCalib
+			INTEGER,
+		ioDatalogNormalInt
+			INTEGER,
+		ioDatalogExInt
+			INTEGER,
+		ioAlarmLow
+			DisplayString,
+		ioAlarmHigh
+			DisplayString,
+		ioTblLow
+			DisplayString,
+		ioTblHigh
+			DisplayString,
+		ioName
+			DisplayString,
+		ioRecTime
+			INTEGER,
+		ioResetTime
+			INTEGER,
+		ioType
+			INTEGER,
+		ioUnits
+			DisplayString,
+		ioUnitsType
+			INTEGER,
+		ioPointEnb
+			INTEGER,
+		ioAlarmEnb
+			INTEGER,
+		ioAlarmOnClear
+			INTEGER,
+		ioIndexID
+			INTEGER,
+		ioGaugelLow
+			DisplayString,
+		ioGaugeHigh
+			DisplayString,
+		ioMin
+			DisplayString,
+		ioMax
+			DisplayString,
+		ioLastAlarm
+			DisplayString,
+		ioValue
+			DisplayString,
+		ioValueStr
+			DisplayString,
+		ioStatus
+			INTEGER,
+		ioRange
+			INTEGER,
+		ioUnack
+			INTEGER,
+		ioValueInt
+			INTEGER,
+		ioMinInt
+			INTEGER,
+		ioMaxInt
+			INTEGER,
+		ioResetMin
+			INTEGER,
+		ioResetMax
+			INTEGER,
+		ioSetDefaults
+			INTEGER,
+		ioMinStr
+			DisplayString,
+		ioMaxStr
+			DisplayString,
+		ioProfile
+			INTEGER,
+		ioSchedule
+			DisplayString,
+		ioStatusStr
+			DisplayString,
+		ioTypeStr
+			DisplayString,
+		ioCategory
+			INTEGER,
+		ioADcalib
+			DisplayString,
+		io420calib
+ 			INTEGER,
+		ioLastAlarmStr
+			DisplayString
+		}
+
+ioIndex					OBJECT-TYPE
+	SYNTAX				INTEGER (1..11)
+	ACCESS				read-write
+	STATUS				mandatory
+	DESCRIPTION	"The index of the io entry 1..11"
+	::= { ioEntry 1 }
+
+ioCalib			OBJECT-TYPE
+	SYNTAX		INTEGER ( -300..300 )
+	ACCESS		read-write
+	STATUS		mandatory
+	DESCRIPTION	"Calibration offset"
+	DEFVAL      { 0 }
+	::= { ioEntry 2 }
+
+ioDatalogNormInt	OBJECT-TYPE
+	SYNTAX		INTEGER ( 0..2678400)
+	ACCESS		read-write
+	STATUS		mandatory
+	DESCRIPTION	"Datalog normal interval"
+	DEFVAL      { 0 }
+	::= { ioEntry 4 }
+
+ioDatalogExInt	OBJECT-TYPE
+	SYNTAX		INTEGER ( 0..2678400)
+	ACCESS		read-write
+	STATUS		mandatory
+	DESCRIPTION	"Datalog except interval"
+	DEFVAL      { 0 }
+	::= { ioEntry 5 }
+
+ioAlarmLow	OBJECT-TYPE
+	SYNTAX		DisplayString
+	ACCESS		read-write
+	STATUS		mandatory
+	DESCRIPTION	"Alarm low limt"
+	DEFVAL      { "0" }
+	::= { ioEntry 11 }
+
+ioAlarmHigh	OBJECT-TYPE
+	SYNTAX		DisplayString
+	ACCESS		read-write
+	STATUS		mandatory
+	DESCRIPTION	"Alarm high limt"
+	DEFVAL      { "100" }
+	::= { ioEntry 12 }
+
+ioTblLow		OBJECT-TYPE
+	SYNTAX		DisplayString
+	ACCESS		read-write
+	STATUS		mandatory
+	DESCRIPTION	"Table low limt"
+	DEFVAL      { "0" }
+	::= { ioEntry 13 }
+
+ioTblHigh		OBJECT-TYPE
+	SYNTAX		DisplayString
+	ACCESS		read-write
+	STATUS		mandatory
+	DESCRIPTION	"Table high limt"
+	DEFVAL      { "100" }
+	::= { ioEntry 14 }
+
+ioName					OBJECT-TYPE
+	SYNTAX				DisplayString (SIZE(0..31))
+	ACCESS				read-write
+	STATUS				mandatory
+	DESCRIPTION	"Name for IO"
+	DEFVAL      { "" }
+	::= { ioEntry 15 }
+
+ioRecTime			OBJECT-TYPE
+	SYNTAX		INTEGER (0..28800000)
+	ACCESS		read-write
+	STATUS		mandatory
+	DESCRIPTION	"Time in MS for an alarm to be recognized"
+	DEFVAL      { 3 }
+	::= { ioEntry 16 }
+
+ioResetTime	OBJECT-TYPE
+	SYNTAX		INTEGER (0..28800000)
+	ACCESS		read-write
+	STATUS		mandatory
+	DESCRIPTION	"Reset time in MS"
+	DEFVAL      { 0 }
+	::= { ioEntry 17 }
+
+ioType		OBJECT-TYPE
+	SYNTAX INTEGER {
+			no(1),
+			nc(2),
+			temp28kF(3),
+			temp28kC(4),
+			temp10kF(5),
+			temp10kC(6),
+			4-20ma(7),
+			0-5V(8),
+			water(9),
+			motion(10),
+			humidity(11),
+			unknown(12),
+			battery(13),
+			intPower(14),
+			sound(15),
+			intTemp(16),
+			lcd5V(17),
+			lcdContrast(18),
+			up(19),
+			down(20),
+			extPower(21),
+			unknown(22),
+			unknown(23),
+			unknown(24),
+			unknown(25),
+			unknown(26),
+			unknown(27),
+			unknown(28),
+			unknown(29),
+			none(30)
+	}
+ 	ACCESS		read-write
+  STATUS				mandatory
+	DESCRIPTION	"Type of io point"
+	DEFVAL      { no }
+	::= { ioEntry 18 }
+
+ioUnits	OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE(0..15))
+	ACCESS		read-write
+	STATUS		mandatory
+	DESCRIPTION	"Units of measure"
+	DEFVAL      { "" }
+	::= { ioEntry 19 }
+
+ioUnitsType	OBJECT-TYPE
+	SYNTAX		INTEGER (0..255)
+	ACCESS		read-write
+	STATUS		mandatory
+	DESCRIPTION	"Units type"
+	DEFVAL      { 0 }
+	::= { ioEntry 20 }
+
+ioPointEnb	OBJECT-TYPE
+	SYNTAX		INTEGER {	false(1),true(2) }
+	ACCESS		read-write
+	STATUS		mandatory
+	DESCRIPTION	"IO point Enabled"
+	DEFVAL      { true }
+	::= { ioEntry 21 }
+
+ioAlarmEnb	OBJECT-TYPE
+	SYNTAX		INTEGER {	false(1),true(2) }
+	ACCESS		read-write
+	STATUS		mandatory
+	DESCRIPTION	"IO Alarm enabled"
+	DEFVAL      { true }
+	::= { ioEntry 22 }
+
+ioAlarmOnClear	OBJECT-TYPE
+	SYNTAX		INTEGER { false(1),true(2) }
+	ACCESS		read-write
+	STATUS		mandatory
+	DESCRIPTION	"Allow an alarm to occur when a condition goes back to normal"
+	DEFVAL      { false }
+	::= { ioEntry 25 }
+
+ioIndexID		OBJECT-TYPE
+	SYNTAX		INTEGER (0..255)
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Ordering number for io point"
+	::= { ioEntry 31 }
+
+ioGaugeLow		OBJECT-TYPE
+	SYNTAX		DisplayString
+	ACCESS		read-write
+	STATUS		mandatory
+	DESCRIPTION	"Gauge low limt"
+	DEFVAL      { "0" }
+	::= { ioEntry 33 }
+
+ioGaugeHigh		OBJECT-TYPE
+	SYNTAX		DisplayString
+	ACCESS		read-write
+	STATUS		mandatory
+	DESCRIPTION	"Gauge high limt"
+	DEFVAL      { "100" }
+	::= { ioEntry 34 }
+
+ioMin				OBJECT-TYPE
+	SYNTAX		DisplayString
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Min value reached"
+	DEFVAL      { "0" }
+	::= { ioEntry 40 }
+
+ioMax	OBJECT-TYPE
+	SYNTAX		DisplayString
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Max value reached"
+	DEFVAL      { "0" }
+	::= { ioEntry 41}
+
+ioLastAlarm	OBJECT-TYPE
+	SYNTAX		INTEGER
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Timestamp of the last alarm"
+	DEFVAL      { 0 }
+	::= {  ioEntry 45 }
+
+ioValue			OBJECT-TYPE
+	SYNTAX		DisplayString
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Real time value of this input"
+	DEFVAL      { "0" }
+	::= { ioEntry 48 }
+
+ioValueStr	OBJECT-TYPE
+	SYNTAX		DisplayString
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Real time value of this input"
+	DEFVAL      { "0" }
+	::= { ioEntry 49 }
+
+ioStatus	OBJECT-TYPE
+	SYNTAX				INTEGER	{
+		ok(1),lowAlarm(2),highAlarm(3)
+	}
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"IO status"
+	DEFVAL      { ok }
+	::= { ioEntry 50 }
+
+ioRange	OBJECT-TYPE
+	SYNTAX				INTEGER	{
+				ok(1),lowClosed(2),highOpen(3)
+	 }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"IO status"
+	DEFVAL      { ok }
+	::= { ioEntry 51 }
+
+ioUnack	OBJECT-TYPE
+	SYNTAX				INTEGER	{
+				ok(1),low(2),high(3),lowhigh(4),cleared(5),lowcleared(6),highcleared(7),lowhighcleared(8)
+	 }
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"IO status"
+	DEFVAL      { ok }
+	::= { ioEntry 52 }
+
+ioValueInt	OBJECT-TYPE
+	SYNTAX		INTEGER
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"IO Value as Int"
+	DEFVAL      { 0 }
+	::= { ioEntry 53 }
+
+ioMinInt	OBJECT-TYPE
+	SYNTAX		INTEGER
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"IO Min value as Int"
+	DEFVAL      { 0 }
+	::= { ioEntry 54 }
+
+ioMaxInt	OBJECT-TYPE
+	SYNTAX		INTEGER
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"IO Max value as Int"
+	DEFVAL      { 0 }
+	::= { ioEntry 55 }
+
+ioResetMin	OBJECT-TYPE
+	SYNTAX		INTEGER	
+	ACCESS		write-only
+	STATUS		mandatory
+	DESCRIPTION	"Reset IO min"
+	::= { ioEntry 71 }
+
+ioResetMax	OBJECT-TYPE
+	SYNTAX		INTEGER	
+	ACCESS		write-only
+	STATUS		mandatory
+	DESCRIPTION	"Reset IO max"
+	::= { ioEntry 72 }
+
+ioSetDefaults	OBJECT-TYPE
+	SYNTAX		INTEGER	
+	ACCESS		write-only
+	STATUS		mandatory
+	DESCRIPTION	"Set Defaults"
+	::= { ioEntry 73 }
+
+ioMinStr	OBJECT-TYPE
+	SYNTAX		DisplayString
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Minimum value of this input"
+	DEFVAL      { "0" }
+	::= { ioEntry 74 }
+
+ioMaxStr	OBJECT-TYPE
+	SYNTAX		DisplayString
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Maximum value of this input"
+	DEFVAL      { "0" }
+	::= { ioEntry 75 }
+
+ioProfile	OBJECT-TYPE
+	SYNTAX		INTEGER	
+	ACCESS		write-only
+	STATUS		mandatory
+	DESCRIPTION	"Input Alarm Profile Selection"
+	::= { ioEntry 78 }
+
+ioSchedule	OBJECT-TYPE
+	SYNTAX		DisplayString (SIZE(0..41))
+	ACCESS		read-write
+	STATUS		mandatory
+	DESCRIPTION	"Input schedule"
+	::= { ioEntry 90 }
+
+ioStatusStr	OBJECT-TYPE
+	SYNTAX		DisplayString
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Status"
+	DEFVAL      { "OK" }
+	::= {  ioEntry 91 }
+
+ioTypeStr	OBJECT-TYPE
+	SYNTAX		DisplayString
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Status"
+	DEFVAL      { "None" }
+	::= {  ioEntry 92 }
+
+ioCategory	OBJECT-TYPE
+	SYNTAX		INTEGER
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Input category"
+	::= { ioEntry 95 }
+
+ioADcalib	OBJECT-TYPE
+	SYNTAX		DisplayString
+	ACCESS		write-only
+	STATUS		mandatory
+	DESCRIPTION	"AD calibration"
+	::= {  ioEntry 96 }
+
+io420calib       OBJECT-TYPE
+	SYNTAX		INTEGER
+	ACCESS		write-only
+	STATUS		mandatory
+	DESCRIPTION	"4-20 calibration"
+	::= { ioEntry 97 }
+
+ioLastAlarmStr	OBJECT-TYPE
+	SYNTAX		DisplayString
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION	"Last alarm time"
+	::= {  ioEntry 98 }
+
+ioCalibFloat		OBJECT-TYPE
+	SYNTAX		DisplayString
+	ACCESS		read-write
+	STATUS		mandatory
+	DESCRIPTION	"Calibration offset"
+	DEFVAL      	{ "0" }
+	::= { ioEntry 101 }
+
+-- System
+
+sysName			OBJECT-TYPE
+	SYNTAX				DisplayString (SIZE(0..31))
+	ACCESS				read-write
+	STATUS				mandatory
+	DESCRIPTION		"Unit Name"
+	DEFVAL      { "" }
+	::= { hostSystem 2}
+
+sysDescription	OBJECT-TYPE
+	SYNTAX					DisplayString (SIZE(0..31))
+	ACCESS					read-write
+	STATUS					mandatory
+	DESCRIPTION			"Unit Description"
+	DEFVAL      { "" }
+	::= { hostSystem 3}
+
+sysLocation			OBJECT-TYPE
+	SYNTAX					DisplayString (SIZE(0..31))
+	ACCESS					read-write
+	STATUS					mandatory
+	DESCRIPTION			"Unit Location"
+	DEFVAL      { "" }
+	::= { hostSystem 4}
+
+sysTime					OBJECT-TYPE
+	SYNTAX				INTEGER
+	ACCESS				read-only
+	STATUS				mandatory
+	DESCRIPTION		"System time"
+	::= { hostSystem 5 }
+
+
+sysEscalationTime	OBJECT-TYPE
+	SYNTAX				INTEGER
+	ACCESS				read-write
+	STATUS				mandatory
+	DESCRIPTION		"Alarm inter-round delay (mins)"
+	DEFVAL      { 60 }
+	::= { hostSystem 12 }
+
+sysAutoDaylight	OBJECT-TYPE
+	SYNTAX				INTEGER { false(1), true(2) }
+	ACCESS				read-write
+	STATUS				mandatory
+	DESCRIPTION		"Auto daylight enabled"
+	DEFVAL      { true }
+	::= { hostSystem 13 }
+
+sysSummaryMode	OBJECT-TYPE
+	SYNTAX				INTEGER (0..1)
+	ACCESS				read-only
+	STATUS				mandatory
+	DESCRIPTION		"Web page display mode"
+	DEFVAL      { 0 }
+	::= { hostSystem 14 }
+
+sysTimeStr			OBJECT-TYPE
+	SYNTAX				DisplayString (SIZE(0..63))
+	ACCESS				read-only
+	STATUS				mandatory
+	DESCRIPTION		"Time"
+	DEFVAL        { "" }
+	::= { hostSystem 15 }
+
+sysModbusPort1Mode	OBJECT-TYPE
+	SYNTAX				INTEGER { disabled(1), slaveRO(2), slaveRW(3) }
+	ACCESS				read-write
+	STATUS				mandatory
+	DESCRIPTION		"Modbus TCP op mode"
+	DEFVAL {disabled}
+	::= { hostSystem 17 }
+
+sysModbusPort1ByteOrder	OBJECT-TYPE
+	SYNTAX				INTEGER { modbus(1), bigEndian(2), littleEndian(3) }
+	ACCESS				read-write
+	STATUS				mandatory
+	DESCRIPTION		"Modbus TCP byte order"
+	DEFVAL {modbus}
+	::= { hostSystem 18 }
+
+sysModbusPort1SlavePort	OBJECT-TYPE
+	SYNTAX				INTEGER
+	ACCESS				read-write
+	STATUS				mandatory
+	DESCRIPTION		"Modbus TCP port"
+	DEFVAL      { 502 }
+	::= { hostSystem 19 }
+
+sysResetDataLog	OBJECT-TYPE
+	SYNTAX				INTEGER
+	ACCESS				write-only
+	STATUS				mandatory
+	DESCRIPTION		"Reset Data log"
+	::= { hostSystem 28 }
+
+sysResetEventLog	OBJECT-TYPE
+	SYNTAX				INTEGER
+	ACCESS				write-only
+	STATUS				mandatory
+	DESCRIPTION		"Reset Event log"
+	::= { hostSystem 29 }
+
+sysLastChange	OBJECT-TYPE
+	SYNTAX				INTEGER
+	ACCESS				read-only
+	STATUS				mandatory
+	DESCRIPTION		"Programming Last Change"
+	::= { hostSystem 30 }
+
+sysVersion			OBJECT-TYPE
+	SYNTAX				DisplayString (SIZE(0..47))
+	ACCESS				read-only
+	STATUS				mandatory
+	DESCRIPTION		"Firmware version"
+	::= { hostSystem 31 }
+
+sysStackFree    OBJECT-TYPE
+	SYNTAX				INTEGER
+	ACCESS				read-only
+	STATUS				mandatory
+	DESCRIPTION		"Free stack space"
+	::= { hostSystem 32 }
+
+sysResetLogs	OBJECT-TYPE
+	SYNTAX				INTEGER
+	ACCESS				write-only
+	STATUS				mandatory
+	DESCRIPTION		"Reset Data and Event logs"
+	::= { hostSystem 33 }
+
+sysResetToDefaults	OBJECT-TYPE
+	SYNTAX				INTEGER
+	ACCESS				write-only
+	STATUS				mandatory
+	DESCRIPTION		"Reset the unit to defaults"
+	::= { hostSystem 34 }
+
+sysReboot	OBJECT-TYPE
+	SYNTAX				INTEGER
+	ACCESS				write-only
+	STATUS				mandatory
+	DESCRIPTION		"Reboot the unit"
+	::= { hostSystem 35 }
+
+sysCompanyName			OBJECT-TYPE
+	SYNTAX				DisplayString (SIZE(0..23))
+	ACCESS				read-only
+	STATUS				mandatory
+	DESCRIPTION		"Company Name"
+	::= { hostSystem 36 }
+
+sysProductName			OBJECT-TYPE
+	SYNTAX				DisplayString (SIZE(0..23))
+	ACCESS				read-only
+	STATUS				mandatory
+	DESCRIPTION		"Product Name"
+	::= { hostSystem 37 }
+
+sysVoiceActivation	OBJECT-TYPE
+	SYNTAX				INTEGER
+	ACCESS				write-only
+	STATUS				mandatory
+	DESCRIPTION		"Voice Service Activation Code"
+	::= { hostSystem 38 }
+
+sysIsVoiceActive	OBJECT-TYPE
+	SYNTAX				INTEGER { false(1), true(2) }
+	ACCESS				read-only
+	STATUS				mandatory
+	DESCRIPTION		"Is The Voice Service Activated?"
+	::= { hostSystem 39 }
+
+-- Profile table
+
+proTable	OBJECT-TYPE
+	SYNTAX  SEQUENCE OF ProEntry
+	ACCESS  not-accessible
+	STATUS  mandatory
+  DESCRIPTION	"A list of Profile entries"
+  ::= { hostProfiles 1 }
+
+proEntry OBJECT-TYPE
+	SYNTAX  ProEntry
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION	"A Profile entry"
+	INDEX   {proIndex }
+	::= { proTable 1 }
+
+ProEntry ::=
+	SEQUENCE {
+		proIndex
+			INTEGER,
+		proEnabled
+			INTEGER,
+		proName
+			DisplayString,
+		proUsername
+			DisplayString,
+		proPassword
+			DisplayString,
+		proIndexID
+			INTEGER,
+		proAccessLevel
+			INTEGER,
+		proSchedule
+			DisplayString,
+		proDelete
+			INTEGER,
+		proIsPasswordSet
+			INTEGER,
+ 		proTier
+			INTEGER,
+ 		proInUse
+			INTEGER
+	}
+
+proIndex OBJECT-TYPE
+	SYNTAX  INTEGER(1..8)
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION	"The index of the Profile (1..16)"
+	::= { proEntry 1 }
+
+proEnabled 			OBJECT-TYPE
+	SYNTAX				INTEGER { false(1), true(2) }
+	ACCESS				read-write
+	STATUS				mandatory
+	DESCRIPTION		"Enabled"
+	DEFVAL        { false }
+	::= { proEntry 5}
+
+proName					OBJECT-TYPE
+	SYNTAX				DisplayString (SIZE(0..31))
+	ACCESS				read-write
+	STATUS				mandatory
+	DESCRIPTION		"Name"
+	DEFVAL        { "" }
+	::= { proEntry 6}
+
+proUsername			OBJECT-TYPE
+	SYNTAX				DisplayString (SIZE(0..15))
+	ACCESS				read-write
+	STATUS				mandatory
+	DESCRIPTION		"Username"
+	DEFVAL        { "" }
+	::= { proEntry 7}
+
+proPassword			OBJECT-TYPE
+	SYNTAX				DisplayString (SIZE(0..15))
+	ACCESS				read-write
+	STATUS				mandatory
+	DESCRIPTION		"Password"
+	DEFVAL        { "" }
+	::= { proEntry 8}
+
+proIndexID	OBJECT-TYPE
+	SYNTAX				INTEGER (0..254)
+	ACCESS				read-write
+	STATUS				mandatory
+	DESCRIPTION		"Profile Ordering"
+	::= { proEntry 11}
+
+proAccessLevel	OBJECT-TYPE
+	SYNTAX				INTEGER
+	ACCESS				read-write
+	STATUS				mandatory
+	DESCRIPTION		"Access Level"
+	DEFVAL        { 0 }
+	::= { proEntry 14}
+
+proSchedule			OBJECT-TYPE
+	SYNTAX				DisplayString (SIZE(42))
+	ACCESS				read-write
+	STATUS				mandatory
+	DESCRIPTION		"Schedule"
+	::= { proEntry 15}
+
+proDelete	      OBJECT-TYPE
+	SYNTAX				INTEGER (1)
+	ACCESS				write-only
+	STATUS				mandatory
+	DESCRIPTION		"Delete profile"
+	::= { proEntry 17}
+
+proIsPasswordSet OBJECT-TYPE
+	SYNTAX				INTEGER { false(1), true(2) }
+	ACCESS				read-only
+	STATUS				mandatory
+	DESCRIPTION		"Is Password Set"
+	DEFVAL        { false }
+	::= { proEntry 18}
+
+proTier         OBJECT-TYPE
+	SYNTAX				INTEGER (0..255)
+	ACCESS				read-write
+	STATUS				mandatory
+	DESCRIPTION		"Call priority"
+	::= { proEntry 19}
+
+proInUse         OBJECT-TYPE
+	SYNTAX				INTEGER { false(1), true(2) }
+	ACCESS				read-only
+	STATUS				mandatory
+	DESCRIPTION		"Is the profile in use?"
+	::= { proEntry 20}
+
+--	Contact table
+
+cnTable	OBJECT-TYPE
+	SYNTAX  SEQUENCE OF CnEntry
+	ACCESS  not-accessible
+	STATUS  mandatory
+  DESCRIPTION	"A list of Contacts"
+  ::= { hostContacts 1 }
+
+cnEntry OBJECT-TYPE
+	SYNTAX  CnEntry
+	ACCESS  not-accessible
+	STATUS  mandatory
+	DESCRIPTION	"A Contact entry"
+	INDEX   {cnIndex }
+	::= { cnTable 1 }
+
+CnEntry ::=
+	SEQUENCE {
+		cnIndex
+			INTEGER,
+		cnEmail
+			DisplayString,
+		cnType
+			INTEGER,
+		cnEnable
+			INTEGER,
+		cnIndexID
+			INTEGER,
+		cnSchedule
+			DisplayString,
+		cnDelete
+			INTEGER,
+		cnTest
+			INTEGER,
+		cnInUse
+			INTEGER
+	}
+
+cnIndex OBJECT-TYPE
+	SYNTAX  INTEGER(1..32)
+	ACCESS  read-only
+	STATUS  mandatory
+	DESCRIPTION	"The index of the Contacts (1..32)"
+	::= { cnEntry 1 }
+
+cnString	      OBJECT-TYPE
+	SYNTAX				DisplayString (SIZE(0..63))
+	ACCESS				read-write
+	STATUS				mandatory
+	DESCRIPTION		"Email address"
+	DEFVAL        { "" }
+	::= { cnEntry 2 }
+
+cnType	OBJECT-TYPE
+	SYNTAX				INTEGER {
+							email(3),
+							sms(4),
+							snmp(9)
+						}
+	ACCESS				read-write
+	STATUS				mandatory
+	DESCRIPTION		"Type"
+	DEFVAL        { 0 }
+	::= { cnEntry 3}
+
+cnEnable	OBJECT-TYPE
+	SYNTAX				INTEGER	{	false(1), true(2) }
+	ACCESS				read-only
+	STATUS				mandatory
+	DESCRIPTION		"Enable"
+	DEFVAL        { false }
+	::= { cnEntry 4 }
+
+cnIndexID	OBJECT-TYPE
+	SYNTAX				INTEGER (0..254)
+	ACCESS				read-write
+	STATUS				mandatory
+	DESCRIPTION		"Contact Ordering"
+	::= { cnEntry 5}
+
+cnSchedule			OBJECT-TYPE
+	SYNTAX				DisplayString (SIZE(42))
+	ACCESS				read-write
+	STATUS				mandatory
+	DESCRIPTION		"Schedule"
+	::= { cnEntry 6 }
+
+cnDelete	      OBJECT-TYPE
+	SYNTAX				INTEGER	( 1 )
+	ACCESS				write-only
+	STATUS				mandatory
+	DESCRIPTION		"Delete contact"
+	::= { cnEntry 7 }
+
+cnTest	        OBJECT-TYPE
+	SYNTAX				INTEGER	( 1 )
+	ACCESS				write-only
+	STATUS				mandatory
+	DESCRIPTION		"Test contact"
+	::= { cnEntry 8 }
+
+cnInUse         OBJECT-TYPE
+	SYNTAX				INTEGER { false(1), true(2) }
+	ACCESS				read-only
+	STATUS				mandatory
+	DESCRIPTION		"Is the contact in use?"
+	::= { cnEntry 9}
+
+
+-- Network
+
+netDNS					OBJECT-TYPE
+	SYNTAX				IpAddress
+	ACCESS				read-only
+	STATUS				mandatory
+	DESCRIPTION		"Network domain server"
+	DEFVAL      { 0.0.0.0 }
+	::= { hostNet 1 }
+
+netGateway	OBJECT-TYPE
+	SYNTAX				IpAddress
+	ACCESS				read-only
+	STATUS				mandatory
+	DESCRIPTION		"Network gateway"
+	DEFVAL      { 0.0.0.0 }
+	::= { hostNet 11 }
+
+netIP					OBJECT-TYPE
+	SYNTAX				IpAddress
+	ACCESS				read-only
+	STATUS				mandatory
+	DESCRIPTION		"Unit IP addr"
+	DEFVAL      { 192.168.1.250 }
+	::= { hostNet 12 }
+
+netNetMask			OBJECT-TYPE
+	SYNTAX				IpAddress
+	ACCESS				read-only
+	STATUS				mandatory
+	DESCRIPTION		"Network IP mask"
+	DEFVAL      { 255.255.255.0 }
+	::= { hostNet 13 }
+
+netSMTPUsername			OBJECT-TYPE
+	SYNTAX				DisplayString (SIZE(0..31))
+	ACCESS				read-write
+	STATUS				mandatory
+	DESCRIPTION		"SMTP AUTH username"
+	DEFVAL      { "" }
+	::= { hostNet 14 }
+
+netSMTPpassword			OBJECT-TYPE 
+	SYNTAX				DisplayString (SIZE(0..31))
+	ACCESS				read-write
+	STATUS				mandatory
+	DESCRIPTION		"SMTP AUTH password"
+	DEFVAL      { "" }
+	::= { hostNet 15 }
+
+netSMTPsecurity			OBJECT-TYPE
+	SYNTAX				INTEGER { false(1) , true(2) }
+	ACCESS				read-only
+	STATUS				mandatory
+	DESCRIPTION		"SMTP AUTH enabled"
+	DEFVAL      { false }
+	::= { hostNet 16 }
+
+netSMTPmailReturn		OBJECT-TYPE
+	SYNTAX				DisplayString (SIZE(0..31))
+	ACCESS				read-write
+	STATUS				mandatory
+	DESCRIPTION		"SMTP return address"
+	DEFVAL      { "" }
+	::= { hostNet 17 }
+
+netSMTPserver			OBJECT-TYPE
+	SYNTAX				DisplayString (SIZE(0..31))
+	ACCESS				read-write
+	STATUS				mandatory
+	DESCRIPTION		"SMTP server"
+	DEFVAL      { "" }
+	::= { hostNet 18 }
+
+netSNMPagentEnable					OBJECT-TYPE
+	SYNTAX				INTEGER { false(1) , true(2) }
+	ACCESS				read-only
+	STATUS				mandatory
+	DESCRIPTION		"Enable SNMP MIB agent"
+	DEFVAL      { false }
+	::= { hostNet 19 }
+
+netDHCP					OBJECT-TYPE
+	SYNTAX				INTEGER { false(1) , true(2) }
+	ACCESS				read-only
+	STATUS				mandatory
+	DESCRIPTION		"Enable DHCP"
+	DEFVAL      { true }
+	::= { hostNet 20 }
+
+netSMTPport			OBJECT-TYPE
+	SYNTAX				INTEGER
+	ACCESS				read-write
+	STATUS				mandatory
+	DESCRIPTION		"SMTP port"
+	DEFVAL      { 25 }
+	::= { hostNet 22 }
+
+netHTTPport			OBJECT-TYPE
+	SYNTAX				INTEGER
+	ACCESS				read-only
+	STATUS				mandatory
+	DESCRIPTION		"Web port"
+	DEFVAL      { 80 }
+	::= { hostNet 23 }
+
+netSNMPpublicStr   OBJECT-TYPE
+	SYNTAX				DisplayString (SIZE(0..31))
+	ACCESS				read-only
+	STATUS				mandatory
+	DESCRIPTION		"RO community string"
+	DEFVAL      { "public" }
+	::= { hostNet 24 }
+
+netSNMPprivateStr   OBJECT-TYPE
+	SYNTAX				DisplayString (SIZE(0..31))
+	ACCESS				read-only
+	STATUS				mandatory
+	DESCRIPTION		"RW community string"
+	DEFVAL      { "private" }
+	::= { hostNet 25 }
+
+netSNMPManagerServer   OBJECT-TYPE
+	SYNTAX				DisplayString (SIZE(0..31))
+	ACCESS				read-only
+	STATUS				mandatory
+	DESCRIPTION		"IP address to handle our ColdStart trap"
+	DEFVAL      { "" }
+	::= { hostNet 26 }
+
+netTimeServer		OBJECT-TYPE
+	SYNTAX				DisplayString (SIZE(0..31))
+	ACCESS				read-write
+	STATUS				mandatory
+	DESCRIPTION		"Time server"
+	DEFVAL      { "time-a.nist.gov" }
+	::= { hostNet 27 }
+
+netMACaddress		OBJECT-TYPE
+	SYNTAX				DisplayString (SIZE(0..17))
+	ACCESS				read-only
+	STATUS				mandatory
+	DESCRIPTION		"eth MAC address"
+	::= { hostNet 28 }
+
+netEthernetMode			OBJECT-TYPE
+--	SYNTAX				INTEGER { em10(1), em100(2), emAuto }
+	SYNTAX				INTEGER {
+							 em10(1),
+							 em100(2),
+							 emAuto(3)
+							 }
+
+	ACCESS				read-only
+	STATUS				mandatory
+	DESCRIPTION		"Ethernet speed"
+	DEFVAL      { em10 }
+	::= { hostNet 33 }
+
+
+-- Trap stuff
+
+web600-trap-desc OBJECT-TYPE
+	SYNTAX		DisplayString
+	ACCESS		read-only
+	STATUS		mandatory
+	DESCRIPTION "This OID defines the Trap"
+	::= { web600TrapArgs 1 }
+
+
+
+environment-alarm-trap-major TRAP-TYPE
+	ENTERPRISE sensaphone
+	VARIABLES { web600-trap-desc }
+	DESCRIPTION "Description of environmental input alarm"
+   --#TYPE "WEB600 Environmental Alarm"
+   --#SUMMARY "An Env input is out of range $1"
+   --#SEVERITY MAJOR
+   --#TIMEINDEX 1
+   --#HELP ""
+   --#HELPTAG 0
+   --#STATE OPERATIONAL 
+	::= 1
+
+
+environment-alarm-trap-normal TRAP-TYPE
+	ENTERPRISE sensaphone
+	VARIABLES { web600-trap-desc}
+	DESCRIPTION "Description of environmental input alarm"
+   --#TYPE "WEB600 Environmental Alarm"
+   --#SUMMARY "An Env has returned to normal $1"
+   --#SEVERITY NORMAL
+   --#TIMEINDEX 1
+   --#HELP ""
+   --#HELPTAG 0
+   --#STATE OPERATIONAL 
+	::= 3
+
+
+END
+
+
