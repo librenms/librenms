@@ -3057,63 +3057,63 @@
                 {
                     "vlan_vlan": 1,
                     "vlan_domain": 1,
-                    "vlan_name": "VLAN 1",
+                    "vlan_name": "Vlan_1",
                     "vlan_type": null,
                     "vlan_mtu": null
                 },
                 {
                     "vlan_vlan": 2,
                     "vlan_domain": 1,
-                    "vlan_name": "VLAN 2",
+                    "vlan_name": "Vlan_2",
                     "vlan_type": null,
                     "vlan_mtu": null
                 },
                 {
                     "vlan_vlan": 22,
                     "vlan_domain": 1,
-                    "vlan_name": "VLAN 22",
+                    "vlan_name": "Vlan_22",
                     "vlan_type": null,
                     "vlan_mtu": null
                 },
                 {
                     "vlan_vlan": 33,
                     "vlan_domain": 1,
-                    "vlan_name": "VLAN 33",
+                    "vlan_name": "Vlan_33",
                     "vlan_type": null,
                     "vlan_mtu": null
                 },
                 {
                     "vlan_vlan": 44,
                     "vlan_domain": 1,
-                    "vlan_name": "VLAN 44",
+                    "vlan_name": "Vlan_44",
                     "vlan_type": null,
                     "vlan_mtu": null
                 },
                 {
                     "vlan_vlan": 100,
                     "vlan_domain": 1,
-                    "vlan_name": "VLAN 100",
+                    "vlan_name": "Vlan_100",
                     "vlan_type": null,
                     "vlan_mtu": null
                 },
                 {
                     "vlan_vlan": 200,
                     "vlan_domain": 1,
-                    "vlan_name": "VLAN 200",
+                    "vlan_name": "Vlan_200",
                     "vlan_type": null,
                     "vlan_mtu": null
                 },
                 {
                     "vlan_vlan": 254,
                     "vlan_domain": 1,
-                    "vlan_name": "VLAN 254",
+                    "vlan_name": "Vlan_254",
                     "vlan_type": null,
                     "vlan_mtu": null
                 },
                 {
                     "vlan_vlan": 444,
                     "vlan_domain": 1,
-                    "vlan_name": "VLAN 444",
+                    "vlan_name": "Vlan_444",
                     "vlan_type": null,
                     "vlan_mtu": null
                 }
