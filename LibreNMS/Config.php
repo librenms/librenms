@@ -33,6 +33,7 @@ use Illuminate\Support\Str;
 use LibreNMS\Data\Store\Rrd;
 use LibreNMS\DB\Eloquent;
 use LibreNMS\Util\Debug;
+use LibreNMS\Util\Version;
 use Log;
 
 class Config
@@ -472,6 +473,9 @@ class Config
 
         if (! self::has('rrdtool_version')) {
             self::persist('rrdtool_version', Rrd::version());
+        }
+        if (! self::has('snmp.unescape')) {
+            self::persist('snmp.unescape', version_compare(Version::get()->netSnmp(), '5.8.0', '<'));
         }
 
         self::populateTime();

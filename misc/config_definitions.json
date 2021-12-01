@@ -5130,6 +5130,9 @@
                 "public"
             ]
         },
+        "snmp.unescape": {
+            "type": "boolean"
+        },
         "snmp.exec_timeout": {
             "default": 1200,
             "type": "integer",
