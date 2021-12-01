@@ -12,6 +12,7 @@
  * See COPYING for more details.
  */
 
+use App\Models\Port;
 use App\Models\Ipv6Address;
 use App\Models\Ipv6Network;
 use Illuminate\Support\Str;
@@ -663,8 +664,12 @@ function discover_process_ipv6(&$valid, $ifIndex, $ipv6_address, $ipv6_prefixlen
     $ipv6_network = $ipv6->getNetwork($ipv6_prefixlen);
     $ipv6_compressed = $ipv6->compressed();
 
-    if (dbFetchCell('SELECT COUNT(*) FROM `ports` WHERE device_id = ? AND `ifIndex` = ?', [$device['device_id'], $ifIndex]) != '0' && $ipv6_prefixlen > '0' && $ipv6_prefixlen < '129' && $ipv6_compressed != '::1') {
-        $port_id = dbFetchCell('SELECT port_id FROM `ports` WHERE device_id = ? AND ifIndex = ?', [$device['device_id'], $ifIndex]);
+    $port_id = Port::where([
+        ['device_id', $device['device_id']],
+        ['ifIndex', $ifIndex],
+        ])->value('port_id');
+
+    if ($port_id && $ipv6_prefixlen > '0' && $ipv6_prefixlen < '129' && $ipv6_compressed != '::1') {
 
         if (is_numeric($port_id)) {
             d_echo('IPV6: Found port id: ' . $port_id);
