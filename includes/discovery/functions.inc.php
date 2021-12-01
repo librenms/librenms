@@ -12,6 +12,8 @@
  * See COPYING for more details.
  */
 
+use App\Models\Ipv6Address;
+use App\Models\Ipv6Network;
 use Illuminate\Support\Str;
 use LibreNMS\Config;
 use LibreNMS\Device\YamlDiscovery;
@@ -21,8 +23,6 @@ use LibreNMS\Exceptions\InvalidIpException;
 use LibreNMS\OS;
 use LibreNMS\Util\IP;
 use LibreNMS\Util\IPv6;
-use App\Models\Ipv6Address;
-use App\Models\Ipv6Network;
 
 function discover_new_device($hostname, $device = [], $method = '', $interface = '')
 {
@@ -668,18 +668,22 @@ function discover_process_ipv6(&$valid, $ifIndex, $ipv6_address, $ipv6_prefixlen
 
         if (is_numeric($port_id)) {
             $ipv6netDB = Ipv6Network::firstOrNew([
-                'ipv6_network' => $ipv6_network
+                'ipv6_network' => $ipv6_network,
             ], [
-                'context_name' => $context_name
+                'context_name' => $context_name,
             ]);
 
-            if ($context_name == null) { echo "\nDBG:1 cn is null"; }
+            if ($context_name == null) {
+                echo "\nDBG:1 cn is null";
+            }
 
             if ($ipv6netDB->context_name != $context_name) {
                 $ipv6netDB->context_name = $context_name;
                 echo 'n';
             }
-            if ($context_name == null) { echo "\nDBG:2 cn is null"; }
+            if ($context_name == null) {
+                echo "\nDBG:2 cn is null";
+            }
 
             $ipv6netDB->save();
 
