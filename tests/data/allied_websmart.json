@@ -5095,7 +5095,7 @@
                 {
                     "vlan_vlan": 4001,
                     "vlan_domain": 1,
-                    "vlan_name": "",
+                    "vlan_name": "VLAN 4001",
                     "vlan_type": null,
                     "vlan_mtu": null
                 }

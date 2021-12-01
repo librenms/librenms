@@ -3193,14 +3193,14 @@
                 {
                     "vlan_vlan": 200,
                     "vlan_domain": 1,
-                    "vlan_name": "",
+                    "vlan_name": "VLAN 200",
                     "vlan_type": null,
                     "vlan_mtu": null
                 },
                 {
                     "vlan_vlan": 1170,
                     "vlan_domain": 1,
-                    "vlan_name": "",
+                    "vlan_name": "VLAN 1170",
                     "vlan_type": null,
                     "vlan_mtu": null
                 }
