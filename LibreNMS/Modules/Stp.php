@@ -67,12 +67,12 @@ class Stp implements Module
             'BRIDGE-MIB::dot1dStpBridgeForwardDelay.0',
         ])->values();
 
-        $bridge = Rewrite::macToHex($stp['BRIDGE-MIB::dot1dBaseBridgeAddress.0']);
+        $bridge = Rewrite::macToHex($stp['BRIDGE-MIB::dot1dBaseBridgeAddress.0'] ?? '');
         \App\Models\Stp::updateOrCreate(['device_id' => $os->getDeviceId()], [
             'rootBridge' => $bridge == $this->rootToMac($stp['BRIDGE-MIB::dot1dStpDesignatedRoot.0'] ?? 0) ? 1 : 0,
             'bridgeAddress' => $bridge,
-            'protocolSpecification' => $stp['BRIDGE-MIB::dot1dStpProtocolSpecification.0'],
-            'priority' => $stp['BRIDGE-MIB::dot1dStpPriority.0'],
+            'protocolSpecification' => $stp['BRIDGE-MIB::dot1dStpProtocolSpecification.0'] ?? 'unknown',
+            'priority' => $stp['BRIDGE-MIB::dot1dStpPriority.0'] ?? 0,
             'timeSinceTopologyChange' => substr($stp['BRIDGE-MIB::dot1dStpTimeSinceTopologyChange.0'] ?? '', 0, -2) ?: 0,
             'topChanges' => $stp['BRIDGE-MIB::dot1dStpTopChanges.0'] ?? 0,
             'designatedRoot' => $this->rootToMac($stp['BRIDGE-MIB::dot1dStpDesignatedRoot.0'] ?? ''),
@@ -92,18 +92,18 @@ class Stp implements Module
                 return new PortStp([
                     'port_id' => $os->basePortToId($port),
                     'dot1dBasePort' => $port,
-                    'priority' => $data['BRIDGE-MIB::dot1dStpPortPriority'],
+                    'priority' => $data['BRIDGE-MIB::dot1dStpPortPriority'] ?? 0,
                     'state' => $data['BRIDGE-MIB::dot1dStpPortState'] ?? 'unknown',
                     'enable' => $data['BRIDGE-MIB::dot1dStpPortEnable'] ?? 'unknown',
                     'pathCost' => $data['BRIDGE-MIB::dot1dStpPortPathCost32'] ?? $data['BRIDGE-MIB::dot1dStpPortPathCost'] ?? 0,
-                    'designatedRoot' => $this->rootToMac($data['BRIDGE-MIB::dot1dStpPortDesignatedRoot']),
-                    'designatedCost' => $data['BRIDGE-MIB::dot1dStpPortDesignatedCost'],
-                    'designatedBridge' => $this->rootToMac($data['BRIDGE-MIB::dot1dStpPortDesignatedBridge']),
-                    'designatedPort' => $this->designatedPort($data['BRIDGE-MIB::dot1dStpPortDesignatedPort']),
-                    'forwardTransitions' => $data['BRIDGE-MIB::dot1dStpPortForwardTransitions'],
+                    'designatedRoot' => $this->rootToMac($data['BRIDGE-MIB::dot1dStpPortDesignatedRoot'] ?? ''),
+                    'designatedCost' => $data['BRIDGE-MIB::dot1dStpPortDesignatedCost'] ?? 0,
+                    'designatedBridge' => $this->rootToMac($data['BRIDGE-MIB::dot1dStpPortDesignatedBridge'] ?? ''),
+                    'designatedPort' => $this->designatedPort($data['BRIDGE-MIB::dot1dStpPortDesignatedPort'] ?? ''),
+                    'forwardTransitions' => $data['BRIDGE-MIB::dot1dStpPortForwardTransitions'] ?? 0,
                 ]);
             })->filter(function (PortStp $port) {
-                return $port->state !== 'disabled';
+                return $port->enable !== 'disabled' && $port->state !== 'disabled';
             });
 
         ModuleModelObserver::observe(PortStp::class);
@@ -119,23 +119,23 @@ class Stp implements Module
             return;
         }
 
-        $oids = $ports->sortBy('dot1dBasePort')->map(function (PortStp $port) {
-            return [
-                'BRIDGE-MIB::dot1dStpPortState.' . $port->dot1dBasePort,
-                'BRIDGE-MIB::dot1dStpPortEnable.' . $port->dot1dBasePort,
-                'BRIDGE-MIB::dot1dStpPortDesignatedRoot.' . $port->dot1dBasePort,
-                'BRIDGE-MIB::dot1dStpPortDesignatedBridge.' . $port->dot1dBasePort,
-            ];
-        })->flatten()->all();
+        $ports = $ports->keyBy('dot1dBasePort');
+        $oids = $ports->keys()->sort()->reduce(function ($carry, $base_port) {
+            $carry[] = 'BRIDGE-MIB::dot1dStpPortState.' . $base_port;
+            $carry[] = 'BRIDGE-MIB::dot1dStpPortEnable.' . $base_port;
+            $carry[] = 'BRIDGE-MIB::dot1dStpPortDesignatedRoot.' . $base_port;
+            $carry[] = 'BRIDGE-MIB::dot1dStpPortDesignatedBridge.' . $base_port;
+
+            return $carry;
+        }, []);
 
         ModuleModelObserver::observe(PortStp::class);
-        $ports = $ports->keyBy('dot1dBasePort');
         SnmpQuery::enumStrings()->get($oids)->mapTable(function ($data, $base_port) use ($ports) {
             $port = $ports->get($base_port);
             $port->state = $data['BRIDGE-MIB::dot1dStpPortState'] ?? 'unknown';
             $port->enable = $data['BRIDGE-MIB::dot1dStpPortEnable'] ?? 'unknown';
-            $port->designatedRoot = $this->rootToMac($data['BRIDGE-MIB::dot1dStpPortDesignatedRoot']);
-            $port->designatedBridge = $this->rootToMac($data['BRIDGE-MIB::dot1dStpPortDesignatedBridge']);
+            $port->designatedRoot = $this->rootToMac($data['BRIDGE-MIB::dot1dStpPortDesignatedRoot'] ?? '');
+            $port->designatedBridge = $this->rootToMac($data['BRIDGE-MIB::dot1dStpPortDesignatedBridge'] ?? '');
 
             return $port;
         })->each->save();

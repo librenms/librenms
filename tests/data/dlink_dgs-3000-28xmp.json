@@ -7368,10 +7368,11 @@
             ],
             "ports_stp": [
                 {
+                    "dot1dBasePort": 1,
                     "priority": 128,
                     "state": "forwarding",
                     "enable": "enabled",
-                    "pathCost": 65535,
+                    "pathCost": 200000,
                     "designatedRoot": "000000000000",
                     "designatedCost": 0,
                     "designatedBridge": "000000000000",
@@ -7380,10 +7381,11 @@
                     "ifIndex": 1
                 },
                 {
+                    "dot1dBasePort": 2,
                     "priority": 128,
                     "state": "forwarding",
                     "enable": "enabled",
-                    "pathCost": 65535,
+                    "pathCost": 200000,
                     "designatedRoot": "000000000000",
                     "designatedCost": 0,
                     "designatedBridge": "000000000000",
@@ -7392,10 +7394,11 @@
                     "ifIndex": 2
                 },
                 {
+                    "dot1dBasePort": 3,
                     "priority": 128,
                     "state": "forwarding",
                     "enable": "enabled",
-                    "pathCost": 65535,
+                    "pathCost": 200000,
                     "designatedRoot": "000000000000",
                     "designatedCost": 0,
                     "designatedBridge": "000000000000",
@@ -7404,10 +7407,11 @@
                     "ifIndex": 3
                 },
                 {
+                    "dot1dBasePort": 4,
                     "priority": 128,
                     "state": "forwarding",
                     "enable": "enabled",
-                    "pathCost": 65535,
+                    "pathCost": 200000,
                     "designatedRoot": "000000000000",
                     "designatedCost": 0,
                     "designatedBridge": "000000000000",
@@ -7416,10 +7420,11 @@
                     "ifIndex": 4
                 },
                 {
+                    "dot1dBasePort": 5,
                     "priority": 128,
                     "state": "forwarding",
                     "enable": "enabled",
-                    "pathCost": 65535,
+                    "pathCost": 200000,
                     "designatedRoot": "000000000000",
                     "designatedCost": 0,
                     "designatedBridge": "000000000000",
@@ -7428,10 +7433,11 @@
                     "ifIndex": 5
                 },
                 {
+                    "dot1dBasePort": 6,
                     "priority": 128,
                     "state": "forwarding",
                     "enable": "enabled",
-                    "pathCost": 65535,
+                    "pathCost": 200000,
                     "designatedRoot": "000000000000",
                     "designatedCost": 0,
                     "designatedBridge": "000000000000",
@@ -7440,10 +7446,11 @@
                     "ifIndex": 6
                 },
                 {
+                    "dot1dBasePort": 7,
                     "priority": 128,
                     "state": "forwarding",
                     "enable": "enabled",
-                    "pathCost": 65535,
+                    "pathCost": 200000,
                     "designatedRoot": "000000000000",
                     "designatedCost": 0,
                     "designatedBridge": "000000000000",
@@ -7452,10 +7459,11 @@
                     "ifIndex": 7
                 },
                 {
+                    "dot1dBasePort": 8,
                     "priority": 128,
                     "state": "forwarding",
                     "enable": "enabled",
-                    "pathCost": 65535,
+                    "pathCost": 200000,
                     "designatedRoot": "000000000000",
                     "designatedCost": 0,
                     "designatedBridge": "000000000000",
@@ -7464,10 +7472,11 @@
                     "ifIndex": 8
                 },
                 {
+                    "dot1dBasePort": 9,
                     "priority": 128,
                     "state": "forwarding",
                     "enable": "enabled",
-                    "pathCost": 65535,
+                    "pathCost": 200000,
                     "designatedRoot": "000000000000",
                     "designatedCost": 0,
                     "designatedBridge": "000000000000",
@@ -7476,10 +7485,11 @@
                     "ifIndex": 9
                 },
                 {
+                    "dot1dBasePort": 10,
                     "priority": 128,
                     "state": "forwarding",
                     "enable": "enabled",
-                    "pathCost": 65535,
+                    "pathCost": 200000,
                     "designatedRoot": "000000000000",
                     "designatedCost": 0,
                     "designatedBridge": "000000000000",
@@ -7488,10 +7498,11 @@
                     "ifIndex": 10
                 },
                 {
+                    "dot1dBasePort": 11,
                     "priority": 128,
                     "state": "forwarding",
                     "enable": "enabled",
-                    "pathCost": 65535,
+                    "pathCost": 200000,
                     "designatedRoot": "000000000000",
                     "designatedCost": 0,
                     "designatedBridge": "000000000000",
@@ -7500,10 +7511,11 @@
                     "ifIndex": 11
                 },
                 {
+                    "dot1dBasePort": 12,
                     "priority": 128,
                     "state": "forwarding",
                     "enable": "enabled",
-                    "pathCost": 65535,
+                    "pathCost": 200000,
                     "designatedRoot": "000000000000",
                     "designatedCost": 0,
                     "designatedBridge": "000000000000",
@@ -7512,10 +7524,11 @@
                     "ifIndex": 12
                 },
                 {
+                    "dot1dBasePort": 13,
                     "priority": 128,
                     "state": "forwarding",
                     "enable": "enabled",
-                    "pathCost": 65535,
+                    "pathCost": 200000,
                     "designatedRoot": "000000000000",
                     "designatedCost": 0,
                     "designatedBridge": "000000000000",
@@ -7524,10 +7537,11 @@
                     "ifIndex": 13
                 },
                 {
+                    "dot1dBasePort": 14,
                     "priority": 128,
                     "state": "forwarding",
                     "enable": "enabled",
-                    "pathCost": 65535,
+                    "pathCost": 200000,
                     "designatedRoot": "000000000000",
                     "designatedCost": 0,
                     "designatedBridge": "000000000000",
@@ -7536,10 +7550,11 @@
                     "ifIndex": 14
                 },
                 {
+                    "dot1dBasePort": 15,
                     "priority": 128,
                     "state": "forwarding",
                     "enable": "enabled",
-                    "pathCost": 65535,
+                    "pathCost": 200000,
                     "designatedRoot": "000000000000",
                     "designatedCost": 0,
                     "designatedBridge": "000000000000",
@@ -7548,10 +7563,11 @@
                     "ifIndex": 15
                 },
                 {
+                    "dot1dBasePort": 16,
                     "priority": 128,
                     "state": "forwarding",
                     "enable": "enabled",
-                    "pathCost": 65535,
+                    "pathCost": 200000,
                     "designatedRoot": "000000000000",
                     "designatedCost": 0,
                     "designatedBridge": "000000000000",
@@ -7560,10 +7576,11 @@
                     "ifIndex": 16
                 },
                 {
+                    "dot1dBasePort": 17,
                     "priority": 128,
                     "state": "forwarding",
                     "enable": "enabled",
-                    "pathCost": 65535,
+                    "pathCost": 200000,
                     "designatedRoot": "000000000000",
                     "designatedCost": 0,
                     "designatedBridge": "000000000000",
@@ -7572,10 +7589,11 @@
                     "ifIndex": 17
                 },
                 {
+                    "dot1dBasePort": 18,
                     "priority": 128,
                     "state": "forwarding",
                     "enable": "enabled",
-                    "pathCost": 65535,
+                    "pathCost": 200000,
                     "designatedRoot": "000000000000",
                     "designatedCost": 0,
                     "designatedBridge": "000000000000",
@@ -7584,10 +7602,11 @@
                     "ifIndex": 18
                 },
                 {
+                    "dot1dBasePort": 19,
                     "priority": 128,
                     "state": "forwarding",
                     "enable": "enabled",
-                    "pathCost": 65535,
+                    "pathCost": 200000,
                     "designatedRoot": "000000000000",
                     "designatedCost": 0,
                     "designatedBridge": "000000000000",
@@ -7596,10 +7615,11 @@
                     "ifIndex": 19
                 },
                 {
+                    "dot1dBasePort": 20,
                     "priority": 128,
                     "state": "forwarding",
                     "enable": "enabled",
-                    "pathCost": 65535,
+                    "pathCost": 200000,
                     "designatedRoot": "000000000000",
                     "designatedCost": 0,
                     "designatedBridge": "000000000000",
@@ -7608,10 +7628,11 @@
                     "ifIndex": 20
                 },
                 {
+                    "dot1dBasePort": 21,
                     "priority": 128,
                     "state": "forwarding",
                     "enable": "enabled",
-                    "pathCost": 65535,
+                    "pathCost": 200000,
                     "designatedRoot": "000000000000",
                     "designatedCost": 0,
                     "designatedBridge": "000000000000",
@@ -7620,10 +7641,11 @@
                     "ifIndex": 21
                 },
                 {
+                    "dot1dBasePort": 22,
                     "priority": 128,
                     "state": "forwarding",
                     "enable": "enabled",
-                    "pathCost": 65535,
+                    "pathCost": 200000,
                     "designatedRoot": "000000000000",
                     "designatedCost": 0,
                     "designatedBridge": "000000000000",
@@ -7632,10 +7654,11 @@
                     "ifIndex": 22
                 },
                 {
+                    "dot1dBasePort": 25,
                     "priority": 128,
                     "state": "forwarding",
                     "enable": "enabled",
-                    "pathCost": 65535,
+                    "pathCost": 200000,
                     "designatedRoot": "000000000000",
                     "designatedCost": 0,
                     "designatedBridge": "000000000000",

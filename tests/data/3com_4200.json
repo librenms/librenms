@@ -8454,6 +8454,7 @@
             ],
             "ports_stp": [
                 {
+                    "dot1dBasePort": 24,
                     "priority": 128,
                     "state": "forwarding",
                     "enable": "enabled",

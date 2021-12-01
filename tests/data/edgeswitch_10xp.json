@@ -2467,42 +2467,7 @@
             ],
             "ports_stp": [
                 {
-                    "priority": 128,
-                    "state": "forwarding",
-                    "enable": "disabled",
-                    "pathCost": 20000,
-                    "designatedRoot": "18e829ba73be",
-                    "designatedCost": 0,
-                    "designatedBridge": "18e829ba73be",
-                    "designatedPort": 1,
-                    "forwardTransitions": 0,
-                    "ifIndex": 1
-                },
-                {
-                    "priority": 128,
-                    "state": "forwarding",
-                    "enable": "disabled",
-                    "pathCost": 20000,
-                    "designatedRoot": "18e829ba73be",
-                    "designatedCost": 0,
-                    "designatedBridge": "18e829ba73be",
-                    "designatedPort": 2,
-                    "forwardTransitions": 0,
-                    "ifIndex": 2
-                },
-                {
-                    "priority": 128,
-                    "state": "forwarding",
-                    "enable": "disabled",
-                    "pathCost": 20000,
-                    "designatedRoot": "18e829ba73be",
-                    "designatedCost": 0,
-                    "designatedBridge": "18e829ba73be",
-                    "designatedPort": 5,
-                    "forwardTransitions": 0,
-                    "ifIndex": 5
-                },
-                {
+                    "dot1dBasePort": 1000,
                     "priority": 128,
                     "state": "forwarding",
                     "enable": "enabled",

@@ -36866,22 +36866,11 @@
             ],
             "ports_stp": [
                 {
-                    "priority": 128,
-                    "state": "forwarding",
-                    "enable": "disabled",
-                    "pathCost": 20000,
-                    "designatedRoot": "ecb0e1508be0",
-                    "designatedCost": 0,
-                    "designatedBridge": "ecb0e1508be0",
-                    "designatedPort": 1,
-                    "forwardTransitions": 2,
-                    "ifIndex": 100001
-                },
-                {
+                    "dot1dBasePort": 6,
                     "priority": 128,
                     "state": "forwarding",
                     "enable": "enabled",
-                    "pathCost": 20000,
+                    "pathCost": 0,
                     "designatedRoot": "ecb0e1508be0",
                     "designatedCost": 0,
                     "designatedBridge": "ecb0e1508be0",

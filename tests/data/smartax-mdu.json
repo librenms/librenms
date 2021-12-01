@@ -6342,7 +6342,7 @@
                     "topChanges": 0,
                     "designatedRoot": "781dba6b5ecc",
                     "rootCost": 0,
-                    "rootPort": null,
+                    "rootPort": 0,
                     "maxAge": 20,
                     "helloTime": 2,
                     "holdTime": 0,
