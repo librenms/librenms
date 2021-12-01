@@ -672,26 +672,22 @@ function discover_process_ipv6(&$valid, $ifIndex, $ipv6_address, $ipv6_prefixlen
     if ($port_id && $ipv6_prefixlen > '0' && $ipv6_prefixlen < '129' && $ipv6_compressed != '::1') {
         d_echo('IPV6: Found port id: ' . $port_id);
 
-        $ipv6netDB = Ipv6Network::firstOrNew([
+        $ipv6netDB = Ipv6Network::updateOrCreate([
             'ipv6_network' => $ipv6_network,
         ], [
             'context_name' => $context_name,
         ]);
 
-        //check if DB data match and check for DB NULL
-        if ($ipv6netDB->context_name != $context_name || $ipv6netDB->context_name == null) {
-            $ipv6netDB->context_name = $context_name;
+        if ($ipv6netDB->wasChanged()) {
             d_echo('IPV6: Update DB ipv6_networks');
         }
-
-        $ipv6netDB->save();
 
         $ipv6_network_id = Ipv6Network::where('ipv6_network', $ipv6_network)->where('context_name', $context_name)->value('ipv6_network_id');
 
         if ($ipv6_network_id) {
             d_echo('IPV6: Found network id: ' . $ipv6_network_id);
 
-            $ipv6adrDB = Ipv6Address::firstOrNew([
+            $ipv6adrDB = Ipv6Address::updateOrCreate([
                 'ipv6_address' => $ipv6_address,
                 'ipv6_prefixlen' => $ipv6_prefixlen,
                 'port_id' => $port_id,
@@ -702,17 +698,9 @@ function discover_process_ipv6(&$valid, $ifIndex, $ipv6_address, $ipv6_prefixlen
                 'context_name' => $context_name,
             ]);
 
-            //check if DB data match and check for DB NULL
-            if ($ipv6adrDB->context_name != $context_name || $ipv6adrDB->context_name == null) {
-                $ipv6adrDB->context_name = $context_name;
+            if ($ipv6adrDB->wasChanged()) {
                 d_echo('IPV6: Update DB ipv6_addresses');
             }
-            if ($ipv6adrDB->ipv6_network_id != $ipv6_network_id) {
-                $ipv6adrDB->ipv6_network_id = $ipv6_network_id;
-                d_echo('IPV6: Update DB ipv6_addresses');
-            }
-
-            $ipv6adrDB->save();
 
             $full_address = "$ipv6_address/$ipv6_prefixlen";
             $valid_address = $full_address . '-' . $port_id;
