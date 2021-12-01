@@ -13,7 +13,7 @@ class RewriteTest extends TestCase
      */
     public function testMacToHex(string $from, string $to): void
     {
-        $this->assertEquals(Rewrite::macToHex($from), $to);
+        $this->assertEquals($to, Rewrite::macToHex($from));
     }
 
     public function validMacProvider(): array
@@ -24,13 +24,13 @@ class RewriteTest extends TestCase
             ['000000.000001',     '000000000001'],
             ['000000000001',      '000000000001'],
             ['00:12:34:ab:cd:ef', '001234abcdef'],
-            ['00:12:34:AB:CD:EF', '001234ABCDEF'],
-            ['0:12:34:AB:CD:EF',  '001234ABCDEF'],
-            ['00-12-34-AB-CD-EF', '001234ABCDEF'],
-            ['001234-ABCDEF',     '001234ABCDEF'],
-            ['0012.34AB.CDEF',    '001234ABCDEF'],
-            ['00:02:04:0B:0D:0F', '0002040B0D0F'],
-            ['0:2:4:B:D:F',       '0002040B0D0F'],
+            ['00:12:34:AB:CD:EF', '001234abcdef'],
+            ['0:12:34:AB:CD:EF',  '001234abcdef'],
+            ['00-12-34-AB-CD-EF', '001234abcdef'],
+            ['001234-ABCDEF',     '001234abcdef'],
+            ['0012.34AB.CDEF',    '001234abcdef'],
+            ['00:02:04:0B:0D:0F', '0002040b0d0f'],
+            ['0:2:4:B:D:F',       '0002040b0d0f'],
         ];
     }
 }
