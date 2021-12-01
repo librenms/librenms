@@ -14793,7 +14793,7 @@
                 {
                     "vlan_vlan": 14095,
                     "vlan_domain": 1,
-                    "vlan_name": "",
+                    "vlan_name": "VLAN 14095",
                     "vlan_type": null,
                     "vlan_mtu": null
                 }

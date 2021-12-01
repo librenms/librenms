@@ -75,7 +75,7 @@ class FilePermissionsException extends \Exception implements UpgradeableExceptio
         $content = str_replace('!!!!CONTENT!!!!', '<p>' . implode('</p><p>', $commands) . '</p>', $template);
         $content = str_replace('!!!!LOG_FILE!!!!', $log_file, $content);
 
-        return SymfonyResponse::create($content);
+        return new SymfonyResponse($content);
     }
 
     /**

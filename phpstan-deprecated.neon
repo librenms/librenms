@@ -1,8 +1,9 @@
 includes:
+    - vendor/phpstan/phpstan-deprecation-rules/rules.neon
     - phpstan-baseline-deprecated.neon
-    - vendor/spaze/phpstan-disallowed-calls/extension.neon
 
 parameters:
+    phpVersion: 70300
 
     customRulesetUsed: true
     reportUnmatchedIgnoredErrors: false
@@ -25,8 +26,3 @@ parameters:
         - routes
         - sql-schema
         - tests
-
-    disallowedFunctionCalls:
-        -
-            function: 'db*()'
-            message: 'use Eloquent instead; https://laravel.com/docs/8.x/eloquent'

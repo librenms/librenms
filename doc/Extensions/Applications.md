@@ -499,7 +499,12 @@ chmod +x /etc/snmp/docker-stats.sh
 extend docker /etc/snmp/docker-stats.sh
 ```
 
-5. Restart snmpd on your host
+5. If your run Debian, you need to add the Debian-snmp user to the docker group
+```
+usermod -a -G docker Debian-snmp
+```
+
+6. Restart snmpd on your host
 ```
 systemctl restart snmpd
 ```

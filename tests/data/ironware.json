@@ -24491,14 +24491,14 @@
                 {
                     "vlan_vlan": 55,
                     "vlan_domain": 1,
-                    "vlan_name": "",
+                    "vlan_name": "VLAN 55",
                     "vlan_type": null,
                     "vlan_mtu": null
                 },
                 {
                     "vlan_vlan": 66,
                     "vlan_domain": 1,
-                    "vlan_name": "",
+                    "vlan_name": "VLAN 66",
                     "vlan_type": null,
                     "vlan_mtu": null
                 },
