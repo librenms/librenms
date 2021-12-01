@@ -42,6 +42,6 @@ $colours_in = 'purples';
 $multiplier = '1';
 $colours_out = 'oranges';
 
-$args['nototal'] = 1;
+$nototal = 1;
 
 include 'includes/html/graphs/generic_multi_seperated.inc.php';

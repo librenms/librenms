@@ -65,7 +65,7 @@ foreach ($rrd_list as $rrd) {
     $rrd_options .= ' CDEF:outB' . $i . '_neg=outB' . $i . ',' . $stacked['stacked'] . ',*';
     $rrd_options .= ' CDEF:octets' . $i . '=inB' . $i . ',outB' . $i . ',+';
 
-    if (! $args['nototal']) {
+    if (! $nototal) {
         $in_thing .= $seperator . $in . $i . ',UN,0,' . $in . $i . ',IF';
         $out_thing .= $seperator . $out . $i . ',UN,0,' . $out . $i . ',IF';
         $pluses .= $plus;
