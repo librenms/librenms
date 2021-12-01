@@ -28,6 +28,7 @@ namespace LibreNMS\Data\Source;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
+use LibreNMS\Config;
 use Log;
 
 class SnmpResponse
@@ -128,6 +129,11 @@ class SnmpResponse
             while ($line !== false && ! Str::contains($line, self::DELIMITER)) {
                 $value .= PHP_EOL . $line;
                 $line = strtok(PHP_EOL);
+            }
+
+            // remove extra escapes
+            if (Config::get('snmp.unescape')) {
+                $value = stripslashes($value);
             }
 
             if (Str::startsWith($value, '"') && Str::endsWith($value, '"')) {
