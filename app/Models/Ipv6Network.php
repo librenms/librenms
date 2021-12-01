@@ -32,6 +32,10 @@ class Ipv6Network extends Model
 {
     public $timestamps = false;
     protected $primaryKey = 'ipv6_network_id';
+    protected $fillable = [
+        'ipv6_network',
+        'context_name',
+    ];
 
     // ---- Define Relationships ----
 

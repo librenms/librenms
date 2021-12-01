@@ -29,4 +29,13 @@ class Ipv6Address extends PortRelatedModel
 {
     public $timestamps = false;
     protected $primaryKey = 'ipv6_address_id';
+    protected $fillable = [
+        'ipv6_address',
+        'ipv6_compressed',
+        'ipv6_prefixlen',
+        'ipv6_origin',
+        'ipv6_network_id',
+        'port_id',
+        'context_name',
+    ];
 }
