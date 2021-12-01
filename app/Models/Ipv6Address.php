@@ -17,10 +17,14 @@
  * You should have received a copy of the GNU General Public License
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
+ * Original Code:
  * @link       https://www.librenms.org
  *
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
+ *
+ * Modified by:
+ * @author Peca Nesovanovic <peca.nesovanovic@sattrakt.com>
  */
 
 namespace App\Models;
