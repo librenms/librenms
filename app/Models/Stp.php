@@ -2,15 +2,16 @@
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Model;
+use LibreNMS\Interfaces\Models\Keyable;
 
-class Stp extends Model
+class Stp extends DeviceRelatedModel implements Keyable
 {
     protected $table = 'stp';
     protected $primaryKey = 'stp_id';
     public $timestamps = false;
     protected $fillable = [
         'device_id',
+        'vlan',
         'rootBridge',
         'bridgeAddress',
         'protocolSpecification',
@@ -28,4 +29,9 @@ class Stp extends Model
         'bridgeHelloTime',
         'bridgeForwardDelay',
     ];
+
+    public function getCompositeKey()
+    {
+        return $this->vlan;
+    }
 }

@@ -11,6 +11,7 @@ class PortStp extends PortRelatedModel implements Keyable
     public $timestamps = false;
     protected $fillable = [
         'device_id',
+        'vlan',
         'port_id',
         'port_index',
         'priority',
@@ -26,6 +27,6 @@ class PortStp extends PortRelatedModel implements Keyable
 
     public function getCompositeKey()
     {
-        return $this->port_id; // one per-port
+        return "$this->vlan-$this->port_index";
     }
 }

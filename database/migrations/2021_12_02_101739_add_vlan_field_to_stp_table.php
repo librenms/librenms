@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class AddPortIndexToPortsStpTable extends Migration
+class AddVlanFieldToStpTable extends Migration
 {
     /**
      * Run the migrations.
@@ -13,8 +13,8 @@ class AddPortIndexToPortsStpTable extends Migration
      */
     public function up()
     {
-        Schema::table('ports_stp', function (Blueprint $table) {
-            $table->unsignedInteger('port_index')->after('port_id');
+        Schema::table('stp', function (Blueprint $table) {
+            $table->unsignedInteger('vlan')->nullable()->after('device_id');
         });
     }
 
@@ -25,8 +25,8 @@ class AddPortIndexToPortsStpTable extends Migration
      */
     public function down()
     {
-        Schema::table('ports_stp', function (Blueprint $table) {
-            $table->dropColumn('port_index');
+        Schema::table('stp', function (Blueprint $table) {
+            $table->dropColumn('vlan');
         });
     }
 }
