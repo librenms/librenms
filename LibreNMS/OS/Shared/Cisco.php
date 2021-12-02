@@ -411,6 +411,7 @@ class Cisco extends OS implements OSDiscovery, SlaDiscovery, ProcessorDiscovery,
 
         $data = snmpwalk_group($device, 'rttMonLatestRttOperTable', 'CISCO-RTTMON-MIB');
         $data = snmpwalk_group($device, 'rttMonLatestOper', 'CISCO-RTTMON-MIB', 1, $data);
+        $data = snmpwalk_group($device, 'rttMonEchoAdminNumPackets', 'CISCO-RTTMON-MIB', 1, $data);
 
         $time_offset = time() - $this->getDevice()->uptime;
 
@@ -444,6 +445,7 @@ class Cisco extends OS implements OSDiscovery, SlaDiscovery, ProcessorDiscovery,
             switch ($rtt_type) {
                 case 'jitter':
                     $jitter = [
+                        'NumPackets' => $data[$sla_nr]['rttMonEchoAdminNumPackets'],
                         'PacketLossSD' => $data[$sla_nr]['rttMonLatestJitterOperPacketLossSD'],
                         'PacketLossDS' => $data[$sla_nr]['rttMonLatestJitterOperPacketLossDS'],
                         'PacketOutOfSequence' => $data[$sla_nr]['rttMonLatestJitterOperPacketOutOfSequence'],
@@ -458,6 +460,7 @@ class Cisco extends OS implements OSDiscovery, SlaDiscovery, ProcessorDiscovery,
                     ];
                     $rrd_name = ['sla', $sla_nr, $rtt_type];
                     $rrd_def = RrdDefinition::make()
+                        ->addDataset('NumPackets', 'GAUGE', 0)
                         ->addDataset('PacketLossSD', 'GAUGE', 0)
                         ->addDataset('PacketLossDS', 'GAUGE', 0)
                         ->addDataset('PacketOutOfSequence', 'GAUGE', 0)
