@@ -12,11 +12,12 @@ Input:
 - location: name of the new location
 - lat: latitude
 - lng: longitude
+- fixed_coordinates: 1 if the coordinate is fixed or 0 if updated from the device
 
 Example:
 
 ```curl
-curl -X POST -d '{"location":"Google", "lat":"37.4220041","lng":"-122.0862462"}' -H 'X-Auth-Token:YOUR-API-TOKEN' https://librenms.org/api/v0/locations
+curl -X POST -d '{"location":"Google", "lat":"37.4220041","lng":"-122.0862462", "fixed_coordinates", "1"}' -H 'X-Auth-Token:YOUR-API-TOKEN' https://librenms.org/api/v0/locations
 ```
 
 Output:
