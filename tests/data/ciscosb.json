@@ -1962,7 +1962,7 @@
             ],
             "ports_stp": [
                 {
-                    "dot1dBasePort": 1,
+                    "port_index": 1,
                     "priority": 0,
                     "state": "forwarding",
                     "enable": "enabled",
@@ -1975,7 +1975,7 @@
                     "ifIndex": 4
                 },
                 {
-                    "dot1dBasePort": 2,
+                    "port_index": 2,
                     "priority": 0,
                     "state": "forwarding",
                     "enable": "enabled",
@@ -1988,20 +1988,7 @@
                     "ifIndex": 5
                 },
                 {
-                    "dot1dBasePort": 4,
-                    "priority": 0,
-                    "state": "forwarding",
-                    "enable": "enabled",
-                    "pathCost": 70,
-                    "designatedRoot": "002790b0fe90",
-                    "designatedCost": 74,
-                    "designatedBridge": "002790b10e50",
-                    "designatedPort": 4,
-                    "forwardTransitions": 1,
-                    "ifIndex": 6
-                },
-                {
-                    "dot1dBasePort": 3,
+                    "port_index": 3,
                     "priority": 0,
                     "state": "forwarding",
                     "enable": "enabled",
@@ -2014,7 +2001,20 @@
                     "ifIndex": 8
                 },
                 {
-                    "dot1dBasePort": 7,
+                    "port_index": 4,
+                    "priority": 0,
+                    "state": "forwarding",
+                    "enable": "enabled",
+                    "pathCost": 70,
+                    "designatedRoot": "002790b0fe90",
+                    "designatedCost": 74,
+                    "designatedBridge": "002790b10e50",
+                    "designatedPort": 4,
+                    "forwardTransitions": 1,
+                    "ifIndex": 6
+                },
+                {
+                    "port_index": 7,
                     "priority": 0,
                     "state": "forwarding",
                     "enable": "enabled",

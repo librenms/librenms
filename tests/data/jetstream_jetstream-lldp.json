@@ -6977,7 +6977,7 @@
             ],
             "ports_stp": [
                 {
-                    "dot1dBasePort": 49180,
+                    "port_index": 49180,
                     "priority": 128,
                     "state": "forwarding",
                     "enable": "enabled",

@@ -134,6 +134,7 @@ stp:
         order_by: bridgeAddress
     ports_stp:
         excluded_fields: [port_stp_id, device_id, port_id]
+        order_by: port_index
         joins:
             - { left: ports_stp.port_id, right: ports.port_id, select: [ ifIndex ] }
 printer-supplies:

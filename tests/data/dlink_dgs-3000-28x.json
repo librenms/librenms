@@ -6669,7 +6669,7 @@
             ],
             "ports_stp": [
                 {
-                    "dot1dBasePort": 23,
+                    "port_index": 23,
                     "priority": 128,
                     "state": "forwarding",
                     "enable": "enabled",
@@ -6682,7 +6682,7 @@
                     "ifIndex": 23
                 },
                 {
-                    "dot1dBasePort": 24,
+                    "port_index": 24,
                     "priority": 128,
                     "state": "forwarding",
                     "enable": "enabled",

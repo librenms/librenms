@@ -12,7 +12,7 @@ class PortStp extends PortRelatedModel implements Keyable
     protected $fillable = [
         'device_id',
         'port_id',
-        'dot1dBasePort',
+        'port_index',
         'priority',
         'state',
         'enable',

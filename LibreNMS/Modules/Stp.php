@@ -91,7 +91,7 @@ class Stp implements Module
             ->mapTable(function ($data, $port) use ($os) {
                 return new PortStp([
                     'port_id' => $os->basePortToId($port),
-                    'dot1dBasePort' => $port,
+                    'port_index' => $port,
                     'priority' => $data['BRIDGE-MIB::dot1dStpPortPriority'] ?? 0,
                     'state' => $data['BRIDGE-MIB::dot1dStpPortState'] ?? 'unknown',
                     'enable' => $data['BRIDGE-MIB::dot1dStpPortEnable'] ?? 'unknown',
@@ -119,7 +119,7 @@ class Stp implements Module
             return;
         }
 
-        $ports = $ports->keyBy('dot1dBasePort');
+        $ports = $ports->keyBy('port_index');
         $oids = $ports->keys()->sort()->reduce(function ($carry, $base_port) {
             $carry[] = 'BRIDGE-MIB::dot1dStpPortState.' . $base_port;
             $carry[] = 'BRIDGE-MIB::dot1dStpPortEnable.' . $base_port;

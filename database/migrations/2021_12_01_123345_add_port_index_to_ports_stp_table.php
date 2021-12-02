@@ -4,7 +4,7 @@ use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
 use Illuminate\Support\Facades\Schema;
 
-class AddBasePortToPortsStpTable extends Migration
+class AddPortIndexToPortsStpTable extends Migration
 {
     /**
      * Run the migrations.
@@ -14,7 +14,7 @@ class AddBasePortToPortsStpTable extends Migration
     public function up()
     {
         Schema::table('ports_stp', function (Blueprint $table) {
-            $table->unsignedInteger('dot1dBasePort')->after('port_id');
+            $table->unsignedInteger('port_index')->after('port_id');
         });
     }
 
@@ -26,7 +26,7 @@ class AddBasePortToPortsStpTable extends Migration
     public function down()
     {
         Schema::table('ports_stp', function (Blueprint $table) {
-            $table->dropColumn('dot1dBasePort');
+            $table->dropColumn('port_index');
         });
     }
 }

@@ -6544,7 +6544,7 @@
             ],
             "ports_stp": [
                 {
-                    "dot1dBasePort": 1,
+                    "port_index": 1,
                     "priority": 128,
                     "state": "forwarding",
                     "enable": "enabled",
@@ -6557,7 +6557,7 @@
                     "ifIndex": 1
                 },
                 {
-                    "dot1dBasePort": 11,
+                    "port_index": 11,
                     "priority": 128,
                     "state": "forwarding",
                     "enable": "enabled",
@@ -6570,7 +6570,7 @@
                     "ifIndex": 11
                 },
                 {
-                    "dot1dBasePort": 21,
+                    "port_index": 21,
                     "priority": 128,
                     "state": "forwarding",
                     "enable": "enabled",
@@ -6583,7 +6583,7 @@
                     "ifIndex": 21
                 },
                 {
-                    "dot1dBasePort": 22,
+                    "port_index": 22,
                     "priority": 128,
                     "state": "forwarding",
                     "enable": "enabled",

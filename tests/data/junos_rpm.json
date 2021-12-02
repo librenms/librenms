@@ -13750,7 +13750,7 @@
             ],
             "ports_stp": [
                 {
-                    "dot1dBasePort": 514,
+                    "port_index": 514,
                     "priority": 128,
                     "state": "forwarding",
                     "enable": "enabled",
