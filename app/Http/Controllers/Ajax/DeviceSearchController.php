@@ -44,12 +44,8 @@ class DeviceSearchController extends SearchController
         return $baseQuery
             ->where(function (Builder $query) use ($search, $baseQuery) {
                 // search filter
-                $index_friendly_like_search = "$search%";
                 $like_search = "%$search%";
-                $query->orWhere('hostname', 'LIKE', $index_friendly_like_search)
-                    ->orWhere('sysName', 'LIKE', $index_friendly_like_search)
-                    ->orWhere('display', 'LIKE', $index_friendly_like_search)
-                    ->orWhere('hostname', 'LIKE', $like_search)
+                $query->orWhere('hostname', 'LIKE', $like_search)
                     ->orWhere('sysName', 'LIKE', $like_search)
                     ->orWhere('display', 'LIKE', $like_search)
                     ->orWhere('location', 'LIKE', $like_search)

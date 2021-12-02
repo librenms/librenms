@@ -40,16 +40,9 @@ class PortSearchController extends SearchController
             ->where('deleted', 0)
             ->where(function (Builder $query) use ($request) {
                 $search = $request->get('search');
-                $index_friendly_like_search = "$search%";
                 $like_search = "%$search%";
 
-                return $query->orWhere('ifAlias', 'LIKE', $index_friendly_like_search)
-                    ->orWhere('port_descr_descr', 'LIKE', $index_friendly_like_search)
-                    ->orWhere('portName', 'LIKE', $index_friendly_like_search)
-                    ->orWhere('ifDescr', 'LIKE', $index_friendly_like_search)
-                    ->orWhere('ifName', 'LIKE', $index_friendly_like_search)
-                    ->orWhere('ifName', 'LIKE', $index_friendly_like_search)
-                    ->orWhere('ifAlias', 'LIKE', $like_search)
+                return $query->orWhere('ifAlias', 'LIKE', $like_search)
                     ->orWhere('ifDescr', 'LIKE', $like_search)
                     ->orWhere('ifName', 'LIKE', $like_search)
                     ->orWhere('port_descr_descr', 'LIKE', $like_search)
