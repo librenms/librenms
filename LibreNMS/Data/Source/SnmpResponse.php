@@ -28,6 +28,7 @@ namespace LibreNMS\Data\Source;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
+use LibreNMS\Config;
 use Log;
 
 class SnmpResponse
@@ -68,7 +69,7 @@ class SnmpResponse
     {
         $this->errorMessage = '';
         // not checking exitCode because I think it may lead to false negatives
-        $invalid = preg_match('/(Timeout: No Response from .*|Unknown user name|Authentication failure)/', $this->stderr, $errors)
+        $invalid = preg_match('/(Timeout: No Response from .*|Unknown user name|Authentication failure|Error: OID not increasing: .*)/', $this->stderr, $errors)
             || empty($this->raw)
             || preg_match('/(No Such Instance|No Such Object|No more variables left).*/', $this->raw, $errors);
 
@@ -130,9 +131,14 @@ class SnmpResponse
                 $line = strtok(PHP_EOL);
             }
 
+            // remove extra escapes
+            if (Config::get('snmp.unescape')) {
+                $value = stripslashes($value);
+            }
+
             if (Str::startsWith($value, '"') && Str::endsWith($value, '"')) {
                 // unformatted string from net-snmp, remove extra escapes
-                $values[$oid] = stripslashes(trim($value, "\\\" \n\r"));
+                $values[$oid] = trim(stripslashes($value), "\" \n\r");
             } else {
                 $values[$oid] = trim($value);
             }

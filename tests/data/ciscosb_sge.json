@@ -10117,8 +10117,8 @@
                     "ifName": "stack-port",
                     "portName": null,
                     "ifIndex": 9000,
-                    "ifSpeed": null,
-                    "ifSpeed_prev": 0,
+                    "ifSpeed": 0,
+                    "ifSpeed_prev": null,
                     "ifConnectorPresent": "false",
                     "ifPromiscuousMode": "true",
                     "ifOperStatus": "up",
@@ -10222,8 +10222,8 @@
                     "ifName": "1",
                     "portName": null,
                     "ifIndex": 100000,
-                    "ifSpeed": null,
-                    "ifSpeed_prev": 0,
+                    "ifSpeed": 0,
+                    "ifSpeed_prev": null,
                     "ifConnectorPresent": "false",
                     "ifPromiscuousMode": "true",
                     "ifOperStatus": "up",
@@ -10327,8 +10327,8 @@
                     "ifName": "181",
                     "portName": null,
                     "ifIndex": 100180,
-                    "ifSpeed": null,
-                    "ifSpeed_prev": 0,
+                    "ifSpeed": 0,
+                    "ifSpeed_prev": null,
                     "ifConnectorPresent": "false",
                     "ifPromiscuousMode": "true",
                     "ifOperStatus": "up",
@@ -10432,8 +10432,8 @@
                     "ifName": "999",
                     "portName": null,
                     "ifIndex": 100998,
-                    "ifSpeed": null,
-                    "ifSpeed_prev": 0,
+                    "ifSpeed": 0,
+                    "ifSpeed_prev": null,
                     "ifConnectorPresent": "false",
                     "ifPromiscuousMode": "true",
                     "ifOperStatus": "up",
@@ -12802,6 +12802,13 @@
         "discovery": {
             "vlans": [
                 {
+                    "vlan_vlan": 1,
+                    "vlan_domain": 1,
+                    "vlan_name": "VLAN 1",
+                    "vlan_type": null,
+                    "vlan_mtu": null
+                },
+                {
                     "vlan_vlan": 181,
                     "vlan_domain": 1,
                     "vlan_name": "LAB_REDES",
@@ -12817,6 +12824,30 @@
                 }
             ],
             "ports_vlans": [
+                {
+                    "vlan": 1,
+                    "baseport": 23,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 1
+                },
+                {
+                    "vlan": 1,
+                    "baseport": 24,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 1
+                },
+                {
+                    "vlan": 1,
+                    "baseport": 47,
+                    "priority": 0,
+                    "state": "unknown",
+                    "cost": 0,
+                    "untagged": 1
+                },
                 {
                     "vlan": 181,
                     "baseport": 1,

@@ -1,11 +1,11 @@
 @extends('layouts.error')
 
 @section('title')
-    @lang('exceptions.database_inconsistent.title')
+    {{ __('exceptions.database_inconsistent.title') }}
 @endsection
 
 @section('content')
-    <h3>@lang('exceptions.database_inconsistent.header')</h3>
+    <h3>{{ __('exceptions.database_inconsistent.header') }}</h3>
 
     <div class="message-block">
         @foreach($results as $result)

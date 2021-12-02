@@ -188,9 +188,9 @@ class Device extends BaseModel
         $display = $this->displayName();
 
         if (! Str::contains($display, $this->hostname)) {
-            return $this->hostname;
+            return (string) $this->hostname;
         } elseif (! Str::contains($display, $this->sysName)) {
-            return $this->sysName;
+            return (string) $this->sysName;
         }
 
         return '';

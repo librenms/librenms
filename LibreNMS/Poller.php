@@ -32,9 +32,9 @@ use App\Polling\Measure\Measurement;
 use App\Polling\Measure\MeasurementManager;
 use Carbon\Carbon;
 use DB;
-use Exception;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Str;
+use LibreNMS\Enum\Alert;
 use LibreNMS\Exceptions\PollerException;
 use LibreNMS\Modules\LegacyModule;
 use LibreNMS\Polling\ConnectivityHelper;
@@ -44,6 +44,7 @@ use LibreNMS\Util\Dns;
 use LibreNMS\Util\Git;
 use LibreNMS\Util\StringHelpers;
 use Psr\Log\LoggerInterface;
+use Throwable;
 
 class Poller
 {
@@ -173,9 +174,10 @@ class Poller
                     $module_class = StringHelpers::toClass($module, '\\LibreNMS\\Modules\\');
                     $instance = class_exists($module_class) ? new $module_class : new LegacyModule($module);
                     $instance->poll($this->os);
-                } catch (Exception $e) {
+                } catch (Throwable $e) {
                     // isolate module exceptions so they don't disrupt the polling process
-                    $this->logger->error("Error in $module module. " . $e->getMessage() . PHP_EOL . $e->getTraceAsString() . PHP_EOL);
+                    $this->logger->error("%rError polling $module module for {$this->device->hostname}.%n " . $e->getMessage() . PHP_EOL . $e->getTraceAsString(), ['color' => true]);
+                    \Log::event("Error polling $module module. Check log file for more details.", $this->device, 'poller', Alert::ERROR);
                 }
 
                 app(MeasurementManager::class)->printChangedStats();

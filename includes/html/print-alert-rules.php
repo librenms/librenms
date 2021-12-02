@@ -446,8 +446,8 @@ if (($count % $results) > 0) {
     echo '</div>';
 }
 
-echo '<input type="hidden" name="page_number" id="page_number" value="' . $page_number . '">
-    <input type="hidden" name="results_amount" id="results_amount" value="' . $results . '">
+echo '<input type="hidden" name="page_number" id="page_number" value="' . htmlspecialchars($page_number) . '">
+    <input type="hidden" name="results_amount" id="results_amount" value="' . htmlspecialchars($results) . '">
     </form>';
 
 if ($count < 1) {
