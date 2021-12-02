@@ -1,9 +1,8 @@
-os: vmware-sdwan
+os: velocloud
 text: 'VMware SD-WAN'
 type: appliance
-icon: vmware-sdwan
-group: vmware-sdwan
-mib_dir: vmware-sdwan
+icon: velocloud
+mib_dir: vmware
 over:
     - { graph: device_bits, text: 'Device Traffic' }
     - { graph: device_processor, text: 'CPU Usage' }
