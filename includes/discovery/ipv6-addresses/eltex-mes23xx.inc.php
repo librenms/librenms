@@ -18,6 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2021 Peca Nesovanovic
  * @author     Peca Nesovanovic <peca.nesovanovic@sattrakt.com>
  */
@@ -28,10 +29,10 @@ $oids = SnmpQuery::walk('IP-MIB::ipAddressIfIndex.ipv6')->table(2);
 $oidr = SnmpQuery::walk('RADLAN-IPv6::rlIpAddressTable')->table(2);
 
 if ($oids && $oidr) {
-    d_echo ('Eltex IPv6: discovering ...');
+    d_echo('Eltex IPv6: discovering ...');
 
     foreach ($oids['ipv6'] as $ip => $iparray) {
-        d_echo ('Eltex IPv6: processing ' . $ip);
+        d_echo('Eltex IPv6: processing ' . $ip);
 
         $index = $iparray['IP-MIB::ipAddressIfIndex'];
         $prefixlen = $oidr['ipv6'][$ip]['RADLAN-IPv6::rlIpAddressPrefixLength'];
