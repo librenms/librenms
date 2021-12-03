@@ -144,7 +144,7 @@ class ModuleTestHelper
         $this->json_file = $path;
     }
 
-    public function captureFromDevice($device_id, $write = true, $prefer_new = false, $full = false)
+    public function captureFromDevice($device_id, $prefer_new = false, $full = false): void
     {
         if ($full) {
             $snmp_oids[] = [
@@ -159,27 +159,28 @@ class ModuleTestHelper
 
         DeviceCache::setPrimary($device_id);
 
-        $snmprec_data = [];
-        foreach ($snmp_oids as $oid_data) {
-            $this->qPrint(' ' . $oid_data['oid']);
+        foreach ($snmp_oids as $context => $context_oids) {
+            dump($context, $context_oids);
+            $snmprec_data = [];
+            foreach ($context_oids as $oid_data) {
+                $this->qPrint(' ' . $oid_data['oid']);
 
-            $snmp_options = ['-OUneb', '-Ih', '-m', '+' . $oid_data['mib']];
-            if ($oid_data['method'] == 'walk') {
-                $data = \SnmpQuery::options($snmp_options)->mibDir($oid_data['mibdir'])->walk($oid_data['oid']);
-            } elseif ($oid_data['method'] == 'get') {
-                $data = \SnmpQuery::options($snmp_options)->mibDir($oid_data['mibdir'])->get($oid_data['oid']);
-            } elseif ($oid_data['method'] == 'getnext') {
-                $data = \SnmpQuery::options($snmp_options)->mibDir($oid_data['mibdir'])->next($oid_data['oid']);
+                $snmp_options = ['-OUneb', '-Ih', '-m', '+' . $oid_data['mib']];
+                if ($oid_data['method'] == 'walk') {
+                    $data = \SnmpQuery::options($snmp_options)->context($context)->mibDir($oid_data['mibdir'])->walk($oid_data['oid']);
+                } elseif ($oid_data['method'] == 'get') {
+                    $data = \SnmpQuery::options($snmp_options)->context($context)->mibDir($oid_data['mibdir'])->get($oid_data['oid']);
+                } elseif ($oid_data['method'] == 'getnext') {
+                    $data = \SnmpQuery::options($snmp_options)->context($context)->mibDir($oid_data['mibdir'])->next($oid_data['oid']);
+                }
+
+                if (isset($data) && $data->isValid()) {
+                    $snmprec_data[] = $this->convertSnmpToSnmprec($data);
+                }
             }
 
-            if (isset($data) && $data->isValid()) {
-                $snmprec_data[] = $this->convertSnmpToSnmprec($data);
-            }
+            $this->saveSnmprec($snmprec_data, $context, true, $prefer_new);
         }
-
-        $this->qPrint(PHP_EOL);
-
-        return $this->saveSnmprec($snmprec_data, $write, $prefer_new);
     }
 
     private function collectOids($device_id)
@@ -194,7 +195,7 @@ class ModuleTestHelper
         $save_debug = Debug::isEnabled();
         $save_vdebug = Debug::isVerbose();
         Debug::set();
-        Debug::setVerbose(false);
+        Debug::setVerbose();
         \Log::setDefaultDriver('console');
         discover_device($device, $this->parseArgs('discovery'));
         $poller = app(Poller::class, ['device_spec' => $device_id, 'module_override' => $this->modules]);
@@ -211,24 +212,26 @@ class ModuleTestHelper
         $collection_output = preg_replace('/\033\[[\d;]+m/', '', $collection_output);
 
         // extract snmp queries
-        $snmp_query_regex = '/SNMP\[.*snmp(?:bulk)?([a-z]+)\' .+:HOSTNAME:[0-9]+\' \'(.+)\'\]/';
+        $snmp_query_regex = '/SNMP\[.*snmp(?:bulk)?([a-z]+)\' .+(udp|tcp|tcp6|udp6):[^:]+:[0-9]+\' \'(.+)\']/';
         preg_match_all($snmp_query_regex, $collection_output, $snmp_matches);
 
         // extract mibs and group with oids
-        $snmp_oids = [
+        $snmp_oids = [null => [
             'sysDescr.0_get' => ['oid' => 'sysDescr.0', 'mib' => 'SNMPv2-MIB', 'method' => 'get'],
             'sysObjectID.0_get' => ['oid' => 'sysObjectID.0', 'mib' => 'SNMPv2-MIB', 'method' => 'get'],
-        ];
+        ]];
         foreach ($snmp_matches[0] as $index => $line) {
             preg_match("/'-m' '\+?([a-zA-Z0-9:\-]+)'/", $line, $mib_matches);
             $mib = $mib_matches[1];
             preg_match("/'-M' '\+?([a-zA-Z0-9:\-\/]+)'/", $line, $mibdir_matches);
             $mibdir = $mibdir_matches[1];
             $method = $snmp_matches[1][$index];
-            $oids = explode("' '", trim($snmp_matches[2][$index]));
+            $oids = explode("' '", trim($snmp_matches[3][$index]));
+            preg_match("/('-c' '.*@([^']+)'|'-n' '([^']+)')/", $line, $context_matches);
+            $context = $context_matches[2] ?? $context_matches[3] ?? null;
 
             foreach ($oids as $oid) {
-                $snmp_oids["{$oid}_$method"] = [
+                $snmp_oids[$context]["{$oid}_$method"] = [
                     'oid' => $oid,
                     'mib' => $mib,
                     'mibdir' => $mibdir,
@@ -453,10 +456,16 @@ class ModuleTestHelper
         return $snmpTypes[$text];
     }
 
-    private function saveSnmprec($data, $write = true, $prefer_new = false)
+    private function saveSnmprec($data, $context = null, $write = true, $prefer_new = false)
     {
-        if (is_file($this->snmprec_file)) {
-            $existing_data = $this->indexSnmprec(explode(PHP_EOL, file_get_contents($this->snmprec_file)));
+        $filename = $this->snmprec_file;
+
+        if ($context) {
+            $filename = str_replace('.snmprec', '', $filename) . "@$context.snmprec";
+        }
+
+        if (is_file($filename)) {
+            $existing_data = $this->indexSnmprec(explode(PHP_EOL, file_get_contents($filename)));
         } else {
             $existing_data = [];
         }
@@ -481,9 +490,12 @@ class ModuleTestHelper
         $output = implode(PHP_EOL, $results) . PHP_EOL;
 
         if ($write) {
-            $this->qPrint("\nUpdated snmprec data $this->snmprec_file\n");
-            $this->qPrint("\nVerify this file does not contain any private data before submitting!\n");
-            file_put_contents($this->snmprec_file, $output);
+            if (empty($results)) {
+                $this->qPrint("No data for $filename\n");
+            } else {
+                $this->qPrint("Saved snmprec data $filename\n");
+                file_put_contents($filename, $output);
+            }
         }
 
         return $output;
