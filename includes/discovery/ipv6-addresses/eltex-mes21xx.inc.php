@@ -23,23 +23,24 @@
  * @author     Peca Nesovanovic <peca.nesovanovic@sattrakt.com>
  */
 
-//standard MIB
+//IP-MIB
 $oids = SnmpQuery::walk('IP-MIB::ipAddressIfIndex.ipv6')->table(2);
-//Radlan MIB
-$oidr = SnmpQuery::walk('RADLAN-IPv6::rlIpAddressTable')->table(2);
+//merge Radlan-IPv6 with IP-MIB
+$oidm = SnmpQuery::walk('RADLAN-IPv6::rlIpAddressTable')->table(2, $oids);
 
-if ($oids && $oidr) {
+if ($oidm) {
     d_echo('Eltex IPv6: discovering ...');
 
-    foreach ($oids['ipv6'] as $ip => $iparray) {
+    foreach ($oidm['ipv6'] as $ip => $iparray) {
         d_echo('Eltex IPv6: processing ' . $ip);
 
         $index = $iparray['IP-MIB::ipAddressIfIndex'];
-        $prefixlen = $oidr['ipv6'][$ip]['RADLAN-IPv6::rlIpAddressPrefixLength'];
-        $split = str_split(str_replace(':', '', strtolower($ip)), 4); //convert colon delimited hex IPv6 address to array, every forth char
+        $prefixlen = $iparray['RADLAN-IPv6::rlIpAddressPrefixLength'];
+        $type =  $iparray['RADLAN-IPv6::rlIpAddressType'];
+        $split = str_split(str_replace(':', '', strtolower($ip)), 4); //convert colon delimited hex IPv6 address to array, every fourth char
         $v6addr = implode(':', $split); //assemble array in 0000:1111 format
 
-        if ($oidr['ipv6'][$ip]['RADLAN-IPv6::rlIpAddressType'] == 1 && $index && $prefixlen) {
+        if ($type == 1 && $index && $prefixlen) {
             discover_process_ipv6($valid, $index, $v6addr, $prefixlen, 'manual', $device['context_name']);
         }
     }
