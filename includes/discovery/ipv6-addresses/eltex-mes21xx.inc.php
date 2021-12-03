@@ -36,7 +36,7 @@ if ($oidm) {
 
         $index = $iparray['IP-MIB::ipAddressIfIndex'];
         $prefixlen = $iparray['RADLAN-IPv6::rlIpAddressPrefixLength'];
-        $type =  $iparray['RADLAN-IPv6::rlIpAddressType'];
+        $type = $iparray['RADLAN-IPv6::rlIpAddressType'];
         $split = str_split(str_replace(':', '', strtolower($ip)), 4); //convert colon delimited hex IPv6 address to array, every fourth char
         $v6addr = implode(':', $split); //assemble array in 0000:1111 format
 
