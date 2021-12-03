@@ -144,7 +144,7 @@ class ModuleTestHelper
         $this->json_file = $path;
     }
 
-    public function captureFromDevice($device_id, $prefer_new = false, $full = false): void
+    public function captureFromDevice(int $device_id, bool $prefer_new = false, bool $full = false): void
     {
         if ($full) {
             $snmp_oids[] = [
@@ -456,7 +456,7 @@ class ModuleTestHelper
         return $snmpTypes[$text];
     }
 
-    private function saveSnmprec($data, $context = null, $write = true, $prefer_new = false)
+    private function saveSnmprec(array $data, ?string $context = null, bool $write = true, bool $prefer_new = false): string
     {
         $filename = $this->snmprec_file;
 
