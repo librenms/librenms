@@ -24,15 +24,15 @@ if (Rrd::checkRrdExists($rrd_filename)) {
     $rrd_options .= ' DEF:PacketLossDS=' . $rrd_filename . ':PacketLossDS:AVERAGE ';
     $rrd_options .= ' DEF:NumPackets=' . $rrd_filename . ':NumPackets:AVERAGE ';
 
-    $rrd_options .= " CDEF:PktLossIn=PacketLossDS,NumPackets,/,100,* ";
+    $rrd_options .= ' CDEF:PktLossIn=PacketLossDS,NumPackets,/,100,* ';
     $rrd_options .= " LINE1.25:PktLossIn#FF3300:'Dst to Src (%)  ' ";
     $rrd_options .= " GPRINT:PktLossIn:LAST:'%5.2lf' ";
     $rrd_options .= " GPRINT:PktLossIn:MIN:'%5.2lf' ";
     $rrd_options .= " GPRINT:PktLossIn:MAX:'%5.2lf' ";
     $rrd_options .= " GPRINT:PktLossIn:AVERAGE:'%5.2lf'\\\l ";
 
-    $rrd_options .= " CDEF:PktLossOut=PacketLossSD,NumPackets,/,100,*,-1,* ";
-    $rrd_options .= " LINE1.25:PakcetLossOut#FF6633:'Src to Dst (%)  ' ";
+    $rrd_options .= ' CDEF:PktLossOut=PacketLossSD,NumPackets,/,100,*,-1,* ';
+    $rrd_options .= " LINE1.25:PktLossOut#FF6633:'Src to Dst (%)  ' ";
     $rrd_options .= " GPRINT:PktLossOut:LAST:'%5.2lf' ";
     $rrd_options .= " GPRINT:PktLossOut:MIN:'%5.2lf' ";
     $rrd_options .= " GPRINT:PktLossOut:MAX:'%5.2lf' ";
