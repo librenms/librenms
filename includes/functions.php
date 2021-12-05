@@ -1774,7 +1774,7 @@ function normalize_jetstream_data($array = '', $line = '')
         $portOID = $arg1 . $arg2 . $arg3 . "['lldpRemPortId']";
         $nameOID = $arg1 . $arg2 . $arg3 . "['lldpRemSysName']";
     }
-    $evcom = "\$array";
+    $evcom = "\$" . 'array';
     $portName = eval('return ' . $evcom . $portOID . ';');
     $sysName = eval('return ' . $evcom . $nameOID . ';');
 
@@ -1792,9 +1792,8 @@ function normalize_jetstream_data($array = '', $line = '')
 
     d_echo("LLDP: new data: $portName # $sysName");
 
-    eval($evcom . $portOID . " = \$portName;");
-    eval($evcom . $nameOID . " = \$sysName;");
+    eval($evcom . $portOID . ' = ' . "\$" . 'portName;');
+    eval($evcom . $nameOID . ' = ' . "\$" . 'sysName;');
 
     return $array;
 }
-
