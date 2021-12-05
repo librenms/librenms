@@ -687,6 +687,7 @@ function snmpwalk_group($device, $oid, $mib = '', $depth = 1, $array = [], $mibd
             continue;
         }
 
+        //check if LLDP destination is Jetstream OS and apply fixes
         if (stripos($line, 'jetstream') !== false) { 
             if (Str::contains($line, 'lldp') && Str::contains($line, 'Desc')) {
                 $array = normalize_jetstream_data($array, $line);

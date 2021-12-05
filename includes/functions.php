@@ -1742,12 +1742,12 @@ function describe_bgp_error_code($code, $subcode)
     return $message;
 }
 
-
 /**
  * function specific for Jetstream OS, rewrite port and system name
  *
  * @params array $array which should be rewritten
  * @params string $line
+ *
  * @return array $array rewritten array
  */
 function normalize_jetstream_data($array = '', $line = '')
@@ -1758,7 +1758,7 @@ function normalize_jetstream_data($array = '', $line = '')
 
     d_echo('LLDP: Jetstream quirks');
 
-    preg_match_all('/\[(\d+)\]/', $line, $jsarray);
+    preg_match_all('/\[(\d+)\]/', $line, $jsarray); //extract [index]
 
 
     if (Str::contains($line, 'lldpNeighborDeviceDescr')) { //walking against TPLINK-LLDPINFO-MIB
@@ -1774,9 +1774,9 @@ function normalize_jetstream_data($array = '', $line = '')
         $portOID = $arg1 . $arg2 . $arg3 . "['lldpRemPortId']";
         $nameOID = $arg1 . $arg2 . $arg3 . "['lldpRemSysName']";
     }
-
-    $portName = eval ("return \$array" . $portOID . ";");
-    $sysName = eval ("return \$array" . $nameOID . ";");
+    $evcom = "\$array";
+    $portName = eval('return ' . $evcom . $portOID . ';');
+    $sysName = eval('return ' . $evcom . $nameOID . ';');
 
     d_echo("LLDP: raw data: $portName # $sysName");
 
@@ -1792,8 +1792,8 @@ function normalize_jetstream_data($array = '', $line = '')
 
     d_echo("LLDP: new data: $portName # $sysName");
 
-    eval("\$array" . $portOID . " = \$portName;");
-    eval("\$array" . $nameOID . " = \$sysName;");
+    eval($evcom . $portOID . " = \$portName;");
+    eval($evcom . $nameOID . " = \$sysName;");
 
     return $array;
 }
