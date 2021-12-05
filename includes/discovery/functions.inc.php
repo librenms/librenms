@@ -1418,29 +1418,3 @@ function find_jetstream_port_id($description = '', $device_id = 0)
         return 0;
     }
 }
-
-/**
- * function specific for Jetstream OS, rewrite port and system name
- *
- * @param  string  $portName  which should be rewritten
- * @param  string  $sysName  which should be cleared
- * @return array $portName, $sysName
- */
-function normalize_jetstream_data($portName = '', $sysName = '')
-{
-    if (! ($portName || $sysName)) {
-        return 0;
-    }
-
-    if (preg_match("/^gigabitethernet([\d][\/][\d][\/][\d]+)/i", $portName, $jsport)) { //match only [nospace] naming scheme
-        $portName = 'gigabitEthernet ' . $jsport[1] . ' : copper'; //rewrite
-    }
-    if (preg_match("/^fiberethernet([\d][\/][\d][\/][\d]+)/i", $portName, $jsport)) { //match only [nospace] naming scheme
-        $portName = 'gigabitEthernet ' . $jsport[1] . ' : fiber'; //rewrite
-    }
-
-    $sysName = str_replace(['.MP.', '.TS.'], '', $sysName); //strip artefacts from device name, jetstream LLDP extension
-    $sysName = rtrim($sysName, '.'); //strip artefacts from device name, jetstream LLDP extension
-
-    return [$portName, $sysName];
-}

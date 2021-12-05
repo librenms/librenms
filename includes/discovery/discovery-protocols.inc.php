@@ -102,10 +102,6 @@ if (($device['os'] == 'routeros')) {
                 $remote_port_mac = str_replace([' ', ':', '-'], '', strtolower($lldp['lldpRemPortId']));
             }
 
-            if (stripos($lldp['lldpRemSysDesc'], 'jetstream') !== false) { //if target system is jetstream
-                [$lldp['lldpRemPortId'], $lldp['lldpRemSysName']] = normalize_jetstream_data($lldp['lldpRemPortId'], $lldp['lldpRemSysName']);
-            }
-
             $remote_device_id = find_device_id($lldp['lldpRemSysName'], $lldp['lldpRemManAddr'], $remote_port_mac);
 
             if (! $remote_device_id &&
@@ -221,17 +217,7 @@ if (($device['os'] == 'routeros')) {
             $remote_device_mac = strtolower(str_replace(':', '', $lldp['lldpNeighborChassisId'][$IndexId]));
         }
 
-        //need to use PortIdDescr first but it is specific for T1600G-28TS 2.0 and maybe few other
-        //if PortIdDescr is valid, then PortDescr is invalid (contains ' interface' sufix) and could not be used for match DB
-        if (strlen($lldp['lldpNeighborPortIdDescr'][$IndexId]) >= 3) {
-            $remote_port_descr = $lldp['lldpNeighborPortIdDescr'][$IndexId];
-        } else {
-            $remote_port_descr = $lldp['lldpNeighborPortDescr'][$IndexId];
-        }
-
-        if (stripos($remote_device_sysDescr, 'jetstream') !== false) { //if target system is jetstream
-            [$remote_port_descr, $remote_device_sysDescr] = normalize_jetstream_data($remote_port_descr, $remote_device_sysDescr);
-        }
+        $remote_port_descr = $lldp['lldpNeighborPortDescr'][$IndexId];
 
         $remote_port_id = find_port_id($remote_port_descr, null, $remote_device_id, $remote_device_mac);
 
@@ -309,9 +295,6 @@ if (($device['os'] == 'routeros')) {
             d_echo($lldp_instance);
 
             foreach ($lldp_instance as $entry_instance => $lldp) {
-                if (stripos($lldp['lldpRemSysDesc'], 'jetstream') !== false) { //if target system is jetstream
-                    [$lldp['lldpRemPortId'], $lldp['lldpRemSysName']] = normalize_jetstream_data($lldp['lldpRemPortId'], $lldp['lldpRemSysName']);
-                }
                 // normalize MAC address if present
                 $remote_port_mac = '';
                 $remote_port_name = $lldp['lldpRemPortId'];

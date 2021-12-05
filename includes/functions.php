@@ -1741,3 +1741,60 @@ function describe_bgp_error_code($code, $subcode)
 
     return $message;
 }
+
+
+/**
+ * function specific for Jetstream OS, rewrite port and system name
+ *
+ * @params array $array which should be rewritten
+ * @params string $line
+ * @return array $array rewritten array
+ */
+function normalize_jetstream_data($array = '', $line = '')
+{
+    if (! ($array || $line)) {
+        return 0;
+    }
+
+    d_echo('LLDP: Jetstream quirks');
+
+    preg_match_all('/\[(\d+)\]/', $line, $jsarray);
+
+
+    if (Str::contains($line, 'lldpNeighborDeviceDescr')) { //walking against TPLINK-LLDPINFO-MIB
+        $arg1 = $jsarray[0][0];
+        $arg2 = $jsarray[0][1];
+        $portOID = $arg1 . "['lldpNeighborPortDescr']" . $arg2;
+        $nameOID = $arg1 . "['lldpNeighborDeviceName']" . $arg2;
+    }
+    if (Str::contains($line, 'lldpRemSysDesc')) { //walking against LLDP-MIB
+        $arg1 = $jsarray[0][0];
+        $arg2 = $jsarray[0][1];
+        $arg3 = $jsarray[0][2];
+        $portOID = $arg1 . $arg2 . $arg3 . "['lldpRemPortId']";
+        $nameOID = $arg1 . $arg2 . $arg3 . "['lldpRemSysName']";
+    }
+
+    $portName = eval ("return \$array" . $portOID . ";");
+    $sysName = eval ("return \$array" . $nameOID . ";");
+
+    d_echo("LLDP: raw data: $portName # $sysName");
+
+    if (preg_match("/^gigabitethernet([\d][\/][\d][\/][\d]+)/i", $portName, $jsport)) { //match only [nospace] naming scheme
+        $portName = 'gigabitEthernet ' . $jsport[1] . ' : copper'; //rewrite
+    }
+    if (preg_match("/^fiberethernet([\d][\/][\d][\/][\d]+)/i", $portName, $jsport)) { //match only [nospace] naming scheme
+        $portName = 'gigabitEthernet ' . $jsport[1] . ' : fiber'; //rewrite
+    }
+
+    $sysName = str_replace(['.MP..', '.TS..'], '', $sysName); //strip artefacts from device name, jetstream LLDP extension
+    $sysName = rtrim($sysName, '.'); //strip artefacts from device name, jetstream LLDP extension
+
+    d_echo("LLDP: new data: $portName # $sysName");
+
+    eval("\$array" . $portOID . " = \$portName;");
+    eval("\$array" . $nameOID . " = \$sysName;");
+
+    return $array;
+}
+

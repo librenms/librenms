@@ -687,6 +687,12 @@ function snmpwalk_group($device, $oid, $mib = '', $depth = 1, $array = [], $mibd
             continue;
         }
 
+        if (stripos($line, 'jetstream') !== false) { 
+            if (Str::contains($line, 'lldp') && Str::contains($line, 'Desc')) {
+                $array = normalize_jetstream_data($array, $line);
+            }
+        }
+
         [$address, $value] = explode(' =', $line, 2);
         preg_match_all('/([^[\]]+)/', $address, $parts);
         $parts = $parts[1];
