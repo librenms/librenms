@@ -1760,7 +1760,6 @@ function normalize_jetstream_data($array = '', $line = '')
 
     preg_match_all('/\[(\d+)\]/', $line, $jsarray); //extract [index]
 
-
     if (Str::contains($line, 'lldpNeighborDeviceDescr')) { //walking against TPLINK-LLDPINFO-MIB
         $arg1 = $jsarray[0][0];
         $arg2 = $jsarray[0][1];
@@ -1774,9 +1773,9 @@ function normalize_jetstream_data($array = '', $line = '')
         $portOID = $arg1 . $arg2 . $arg3 . "['lldpRemPortId']";
         $nameOID = $arg1 . $arg2 . $arg3 . "['lldpRemSysName']";
     }
-    $evcom = "\$" . 'array';
-    $portName = eval('return ' . $evcom . $portOID . ';');
-    $sysName = eval('return ' . $evcom . $nameOID . ';');
+
+    $portName = eval('return $array' . $portOID . ';');
+    $sysName = eval('return $array' . $nameOID . ';');
 
     d_echo("LLDP: raw data: $portName # $sysName");
 
@@ -1792,8 +1791,8 @@ function normalize_jetstream_data($array = '', $line = '')
 
     d_echo("LLDP: new data: $portName # $sysName");
 
-    eval($evcom . $portOID . ' = ' . "\$" . 'portName;');
-    eval($evcom . $nameOID . ' = ' . "\$" . 'sysName;');
+    eval('$array' . $portOID . ' = $portName;');
+    eval('$array' . $nameOID . ' = $sysName;');
 
     return $array;
 }
