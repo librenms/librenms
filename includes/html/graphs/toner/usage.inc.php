@@ -14,7 +14,7 @@ if ($colour['left'] == null) {
 
 $descr = \LibreNMS\Data\Store\Rrd::safeDescr(substr(str_pad($toner['supply_descr'], 26), 0, 26));
 
-$background = \LibreNMS\Util\Colors::percentage((100 - $toner['supply_current']));
+$background = \LibreNMS\Util\Color::percentage((100 - $toner['supply_current']));
 
 $rrd_options .= ' DEF:toner' . $toner['supply_id'] . '=' . $rrd_filename . ':toner:AVERAGE ';
 

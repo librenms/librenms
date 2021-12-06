@@ -381,33 +381,6 @@ parameters:
 		-
 			message:
 				"""
-					#^Call to deprecated function dbFetchCell\\(\\)\\:
-					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
-				"""
-			count: 1
-			path: html/ajax_search.php
-
-		-
-			message:
-				"""
-					#^Call to deprecated function dbFetchRows\\(\\)\\:
-					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
-				"""
-			count: 11
-			path: html/ajax_search.php
-
-		-
-			message:
-				"""
-					#^Call to deprecated function dbGenPlaceholders\\(\\)\\:
-					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
-				"""
-			count: 1
-			path: html/ajax_search.php
-
-		-
-			message:
-				"""
 					#^Call to deprecated function dbFetch\\(\\)\\:
 					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
 				"""
