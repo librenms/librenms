@@ -135,7 +135,8 @@ try {
 
     echo 'Capturing Data: ';
     \LibreNMS\Util\OS::updateCache(true); // Force update of OS Cache
-    $capture->captureFromDevice($device['device_id'], true, $prefer_new_snmprec, $full);
+    $capture->captureFromDevice($device['device_id'], $prefer_new_snmprec, $full);
+    echo "\nVerify these file(s) do not contain any private data before sharing!\n";
 } catch (InvalidModuleException $e) {
     echo $e->getMessage() . PHP_EOL;
 }
