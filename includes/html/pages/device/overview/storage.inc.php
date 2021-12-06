@@ -46,7 +46,7 @@ if (count($drives)) {
         $total = Number::formatBi($drive['storage_size']);
         $free = Number::formatBi($drive['storage_free']);
         $used = Number::formatBi($drive['storage_used']);
-        $background = \LibreNMS\Util\Colors::percentage($percent, $drive['storage_perc_warn']);
+        $background = \LibreNMS\Util\Color::percentage($percent, $drive['storage_perc_warn']);
 
         $graph_array = [];
         $graph_array['height'] = '100';
