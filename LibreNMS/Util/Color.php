@@ -1,8 +1,8 @@
 <?php
 /**
- * Colors.php
+ * Color.php
  *
- * -Description-
+ * Misc color generation
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -25,9 +25,20 @@
 
 namespace LibreNMS\Util;
 
-class Colors
+use App\Models\BgpPeer;
+use App\Models\Device;
+use App\Models\Port;
+
+class Color
 {
-    public static function percentage($percentage, $component_perc_warn = null)
+    /**
+     * Get colors for a percentage bar based on current percentage
+     *
+     * @param  int|float  $percentage
+     * @param  int|float  $component_perc_warn
+     * @return string[]
+     */
+    public static function percentage($percentage, $component_perc_warn = null): array
     {
         $perc_warn = 75;
 
@@ -72,5 +83,69 @@ class Colors
             'right' => 'bbd392',
             'middle' => 'afcc7c',
         ];
+    }
+
+    /**
+     * Get highlight color based on device status
+     */
+    public static function forDeviceStatus(Device $device): string
+    {
+        if ($device->disabled) {
+            return '#808080';
+        }
+
+        if ($device->ignore) {
+            return '#000000';
+        }
+
+        return $device->status ? '#008000' : '#ff0000';
+    }
+
+    /**
+     * Get highlight color based on Port status
+     */
+    public static function forPortStatus(Port $port): string
+    {
+        // Ignored ports
+        if ($port->ignore) {
+            return '#000000';
+        }
+
+        // Shutdown ports
+        if ($port->ifAdminStatus === 'down') {
+            return '#808080';
+        }
+
+        // Down Ports
+        if ($port->ifOperStatus !== 'up') {
+            return '#ff0000';
+        }
+
+        // Errored ports
+        if ($port->ifInErrors_delta > 0 || $port->ifOutErrors_delta > 0) {
+            return '#ffa500';
+        }
+
+        // Up ports
+        return '#008000';
+    }
+
+    /**
+     * Get highlight color based on BgpPeer status
+     */
+    public static function forBgpPeerStatus(BgpPeer $peer): string
+    {
+        // Session inactive
+        if ($peer->bgpPeerAdminStatus !== 'start') {
+            return '#000000';
+        }
+
+        // Session active but errored
+        if ($peer->bgpPeerState !== 'established') {
+            return '#ffa500';
+        }
+
+        // Session Up
+        return '#008000';
     }
 }

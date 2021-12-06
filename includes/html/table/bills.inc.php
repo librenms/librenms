@@ -135,7 +135,7 @@ foreach (dbFetchRows($sql, $param) as $bill) {
         $total_data = "<b>$total_data</b>";
     }
 
-    $background = \LibreNMS\Util\Colors::percentage($percent, null);
+    $background = \LibreNMS\Util\Color::percentage($percent, null);
     $right_background = $background['right'];
     $left_background = $background['left'];
     $overuse_formatted = (($overuse <= 0) ? '-' : "<span style='color: #${background['left']}; font-weight: bold;'>$overuse_formatted</span>");
