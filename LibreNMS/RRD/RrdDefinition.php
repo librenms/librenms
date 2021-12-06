@@ -33,14 +33,6 @@ class RrdDefinition
     private static $types = ['GAUGE', 'DERIVE', 'COUNTER', 'ABSOLUTE', 'DCOUNTER', 'DDERIVE'];
     private $dataSets = [];
     private $skipNameCheck = false;
-    /**
-     * @var string the current DS for fluent style operators
-     */
-    private $current;
-    /**
-     * @var array
-     */
-    private $sources = [];
 
     /**
      * Make a new empty RrdDefinition
@@ -67,28 +59,14 @@ class RrdDefinition
             d_echo('DS must be set to a non-empty string.');
         }
 
-        $this->current = $this->escapeName($name);
-        $this->dataSets[$this->current] = [
-            $this->current,
+        $name = $this->escapeName($name);
+        $this->dataSets[$name] = [
+            $name,
             $this->checkType($type),
             is_null($heartbeat) ? Config::get('rrd.heartbeat') : $heartbeat,
             is_null($min) ? 'U' : $min,
             is_null($max) ? 'U' : $max,
         ];
-
-        return $this;
-    }
-
-    /**
-     * Set an rrd file and ds to prefill data from
-     *
-     * @param  string  $file  File containing source
-     * @param  string  $ds  Source DS inside source file
-     * @return $this
-     */
-    public function from(string $file, string $ds): RrdDefinition
-    {
-        $this->sources[$this->current] = [$file, $ds];
 
         return $this;
     }
@@ -100,26 +78,9 @@ class RrdDefinition
      */
     public function __toString()
     {
-        // migrate from source file
-        $files = [];
-        foreach ($this->sources as $name => $source) {
-            $file = $source[0];
-            if (\Rrd::checkRrdExists($file)) {
-                $found = array_search($file, $files);
-                $index = $found !== false ? $found : count($files);
-                $files[$index] = $file;
-
-                $this->dataSets[$name][0] .= '=' . $source . '[' . ($index + 1) . ']'; // add to definition
-            } else {
-                \Log::error("Rrd source file does not exist $source[0]");
-            }
-        }
-
-        $initial = empty($files) ? '' : (' -r ' . implode(' -r ', $files) . ' ');
-
         return array_reduce($this->dataSets, function ($carry, $ds) {
             return $carry . 'DS:' . implode(':', $ds) . ' ';
-        }, $initial);
+        }, '');
     }
 
     /**
