@@ -20,7 +20,7 @@ $descr = \LibreNMS\Data\Store\Rrd::fixedSafeDescr($storage['storage_descr'], 16)
 
 $percentage = round($storage['storage_perc'], 0);
 
-$background = \LibreNMS\Util\Colors::percentage($percentage, $storage['storage_perc_warn']);
+$background = \LibreNMS\Util\Color::percentage($percentage, $storage['storage_perc_warn']);
 
 $rrd_options .= " DEF:used=$rrd_filename:used:AVERAGE";
 $rrd_options .= " DEF:free=$rrd_filename:free:AVERAGE";

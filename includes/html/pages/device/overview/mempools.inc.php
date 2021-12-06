@@ -1,7 +1,7 @@
 <?php
 
 use Illuminate\Support\Arr;
-use LibreNMS\Util\Colors;
+use LibreNMS\Util\Color;
 use LibreNMS\Util\Html;
 use LibreNMS\Util\Number;
 use LibreNMS\Util\Url;
@@ -57,7 +57,7 @@ if ($mempools->isNotEmpty()) {
         $total = Number::formatBi($mempool->mempool_total);
         $used = Number::formatBi($mempool->mempool_used);
         $free = Number::formatBi($mempool->mempool_free);
-        $percent_colors = Colors::percentage($mempool->mempool_perc, $mempool->mempool_perc_warn ?: null);
+        $percent_colors = Color::percentage($mempool->mempool_perc, $mempool->mempool_perc_warn ?: null);
 
         $graph_array = [
             'type' => 'mempool_usage',
