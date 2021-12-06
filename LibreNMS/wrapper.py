@@ -238,7 +238,7 @@ def poll_worker(
 
     global ERRORS
 
-    if persistent and not DISTRIBUTED_POLLING:
+    if persistent:
         executable = os.path.join(
             os.path.dirname(os.path.dirname(os.path.realpath(__file__))),
             wrappers[wrapper_type]["executable"],
@@ -381,7 +381,7 @@ def poll_worker(
         poll_queue.task_done()
 
     # Close and clean up the poller process
-    if persistent and not DISTRIBUTED_POLLING:
+    if persistent:
         poller.stdin.close()
         poller.stdout.close()
         while poller.returncode is None:
