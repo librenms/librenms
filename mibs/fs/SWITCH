@@ -41,7 +41,7 @@ IMPORTS
 -- Child OID declare
 
 switch MODULE-IDENTITY
-	LAST-UPDATED "201006260000Z"        -- June 26, 2008 at 00:00 GMT
+	LAST-UPDATED "200806260000Z"        -- June 26, 2008 at 00:00 GMT
 	ORGANIZATION
 	   ""
 	CONTACT-INFO
@@ -49,7 +49,7 @@ switch MODULE-IDENTITY
 	   "
 	DESCRIPTION
 	       "The System Information of the switch"
-	::= { enterprises 27975 }
+	::= { enterprises 52642 1 }
 
 ------------------------------------------------------------------
 --                      Switch Identifiers                      --
@@ -127,6 +127,11 @@ product                   OBJECT IDENTIFIER ::= { switch 99 }
 l2protocol                OBJECT IDENTIFIER ::= { switch 100 }
 loopbackDetect            OBJECT IDENTIFIER ::= { switch 105 }
 ipsla                     OBJECT IDENTIFIER ::= { switch 106 }
+
+
+
+-- Module declares
+-- Sub Module: product
 
 	e3008TS OBJECT-IDENTITY
 		STATUS	current
@@ -290,6 +295,7 @@ flash                     OBJECT IDENTIFIER ::= { system 5 }
 cf                        OBJECT IDENTIFIER ::= { system 6 }
 sysTrap                   OBJECT IDENTIFIER ::= { system 7 }
 time                      OBJECT IDENTIFIER ::= { system 8 }
+cpuUsage                  OBJECT IDENTIFIER ::= { system 9 }
 
 
 
@@ -15738,6 +15744,9 @@ arpInspLogbuffRowStatus        OBJECT-TYPE
         "The status of this conceptual row.Now only realize CreateAndGo(4) and Destroy(6) and Active(1)."
     ::= { arpInspLogbuffLogsEntry 3 }  
 
+-- Sub Module: PIMSMEXT
+
+
     pimsmMibObject OBJECT-IDENTITY
         STATUS current
         DESCRIPTION
@@ -18934,6 +18943,11 @@ ospfExtAsExtLsaExternalRouteTag         OBJECT-TYPE
     DESCRIPTION
         "OSPF LSA external route tag, used by as_external LSA."
     ::= { ospfExtAsExtLsdbEntry 15 }
+
+--  OSPF General Variables
+
+--      These parameters apply globally to the Router's
+--      OSPF Process.
 
 ospfExtGeneralGroup OBJECT IDENTIFIER ::= { ospfExt 30 }
 
