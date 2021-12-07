@@ -11,7 +11,7 @@ modules:
         hardware: SWITCH::currentRunningImage.0
         hardware_regex: /(.*\/FSOS-)?(?<hardware>\S+)?(-.*)/
         version: SWITCH::currentRunningImage.0
-        version_regex: /(.*)?v(?<version>\S+)\.([^.]*)/
+        version_regex: /(.*)?-(?<version>\S+)\.([^.]*)/
         serial: SWITCH::lswSlotSerialNo.1.1
     processors:
         data:
