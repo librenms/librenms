@@ -8,9 +8,10 @@ modules:
                 used: SWITCH::memTotalUsed
                 precision: 1024
     os:
-        hardware: SWITCH::sysImageName.1
-        hardware_regex: /(FSOS-)?(?<hardware>\S+)?(-.*)/
-        version: SWITCH::sysImageVersion.1
+        hardware: SWITCH::currentRunningImage.0
+        hardware_regex: /(.*\/FSOS-)?(?<hardware>\S+)?(-.*)/
+        version: SWITCH::currentRunningImage.0
+        version_regex: /(.*)?v(?<version>\S+)\.([^.]*)/
         serial: SWITCH::lswSlotSerialNo.1.1
     processors:
         data:
