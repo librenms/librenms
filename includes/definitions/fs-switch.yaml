@@ -1,5 +1,5 @@
 os: fs-switch
-text: 'Fiberstore Switch'
+text: 'FSOS'
 type: network
 icon: fs
 group: fs
