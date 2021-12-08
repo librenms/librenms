@@ -205,7 +205,7 @@ class LegacyUserProvider implements UserProvider
         /** @var User $user */
         $user->fill($new_user); // fill all attributes
         $user->auth_type = $type; // doing this here in case it was null (legacy)
-        $user->auth_id = $auth_id;
+        $user->auth_id = (string) $auth_id;
         $user->save();
 
         return $user;

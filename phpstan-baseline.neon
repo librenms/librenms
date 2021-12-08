@@ -7616,21 +7616,6 @@ parameters:
 			path: app/Http/Controllers/Ajax/RipeNccApiController.php
 
 		-
-			message: "#^Method App\\\\Http\\\\Controllers\\\\Auth\\\\LoginController\\:\\:loggedOut\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/Http/Controllers/Auth/LoginController.php
-
-		-
-			message: "#^Method App\\\\Http\\\\Controllers\\\\Auth\\\\LoginController\\:\\:showLoginForm\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/Http/Controllers/Auth/LoginController.php
-
-		-
-			message: "#^Method App\\\\Http\\\\Controllers\\\\Auth\\\\LoginController\\:\\:username\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/Http/Controllers/Auth/LoginController.php
-
-		-
 			message: "#^Method App\\\\Http\\\\Controllers\\\\Auth\\\\TwoFactorController\\:\\:showTwoFactorForm\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: app/Http/Controllers/Auth/TwoFactorController.php

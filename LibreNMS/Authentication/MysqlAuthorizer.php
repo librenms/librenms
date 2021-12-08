@@ -76,7 +76,7 @@ class MysqlAuthorizer extends AuthorizerBase
             $user_id = $new_user->user_id;
 
             // set auth_id
-            $new_user->auth_id = $this->getUserid($username);
+            $new_user->auth_id = (string) $this->getUserid($username);
             $new_user->save();
 
             if ($user_id) {
