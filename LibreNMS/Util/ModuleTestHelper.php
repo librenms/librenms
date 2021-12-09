@@ -160,7 +160,6 @@ class ModuleTestHelper
         DeviceCache::setPrimary($device_id);
 
         foreach ($snmp_oids as $context => $context_oids) {
-            dump($context, $context_oids);
             $snmprec_data = [];
             foreach ($context_oids as $oid_data) {
                 $this->qPrint(' ' . $oid_data['oid']);
