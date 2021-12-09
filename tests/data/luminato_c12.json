@@ -876,17 +876,31 @@
                 {
                     "entPhysicalIndex": 0,
                     "hrDeviceIndex": 0,
-                    "processor_oid": ".1.3.6.1.4.1.2021.10.1.5.2",
+                    "processor_oid": ".1.3.6.1.4.1.2021.10.1.5.3",
                     "processor_index": "2",
                     "processor_type": "luminato",
-                    "processor_usage": 12,
+                    "processor_usage": 29,
                     "processor_descr": "Chassis CPU",
                     "processor_precision": 1,
                     "processor_perc_warn": 75
                 }
             ]
         },
-        "poller": "matches discovery"
+        "poller": {
+            "processors": [
+                {
+                    "entPhysicalIndex": 0,
+                    "hrDeviceIndex": 0,
+                    "processor_oid": ".1.3.6.1.4.1.2021.10.1.5.3",
+                    "processor_index": "2",
+                    "processor_type": "luminato",
+                    "processor_usage": 10,
+                    "processor_descr": "Chassis CPU",
+                    "processor_precision": 1,
+                    "processor_perc_warn": 75
+                }
+            ]
+        }
     },
     "sensors": {
         "discovery": {
