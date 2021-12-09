@@ -445,7 +445,6 @@ class Cisco extends OS implements OSDiscovery, SlaDiscovery, ProcessorDiscovery,
             switch ($rtt_type) {
                 case 'jitter':
                     $jitter = [
-                        'NumPackets' => $data[$sla_nr]['rttMonEchoAdminNumPackets'],
                         'PacketLossSD' => $data[$sla_nr]['rttMonLatestJitterOperPacketLossSD'],
                         'PacketLossDS' => $data[$sla_nr]['rttMonLatestJitterOperPacketLossDS'],
                         'PacketOutOfSequence' => $data[$sla_nr]['rttMonLatestJitterOperPacketOutOfSequence'],
@@ -460,7 +459,6 @@ class Cisco extends OS implements OSDiscovery, SlaDiscovery, ProcessorDiscovery,
                     ];
                     $rrd_name = ['sla', $sla_nr, $rtt_type];
                     $rrd_def = RrdDefinition::make()
-                        ->addDataset('NumPackets', 'GAUGE', 0)
                         ->addDataset('PacketLossSD', 'GAUGE', 0)
                         ->addDataset('PacketLossDS', 'GAUGE', 0)
                         ->addDataset('PacketOutOfSequence', 'GAUGE', 0)
@@ -475,6 +473,20 @@ class Cisco extends OS implements OSDiscovery, SlaDiscovery, ProcessorDiscovery,
                     $tags = compact('rrd_name', 'rrd_def', 'sla_nr', 'rtt_type');
                     data_update($device, 'sla', $tags, $jitter);
                     $fields = array_merge($fields, $jitter);
+                    // Additional rrd for jitter packet loss percent
+                    $lossPercent = [
+                        'NumPackets' => $data[$sla_nr]['rttMonEchoAdminNumPackets'],
+                        'PacketLossSD' => $data[$sla_nr]['rttMonLatestJitterOperPacketLossSD'],
+                        'PacketLossDS' => $data[$sla_nr]['rttMonLatestJitterOperPacketLossDS'],
+                    ];
+                    $rrd_name = ['sla', $sla_nr, 'loss-percent'];
+                    $rrd_def = RrdDefinition::make()
+                        ->addDataset('NumPackets', 'GAUGE', 0)
+                        ->addDataset('PacketLossSD', 'GAUGE', 0)
+                        ->addDataset('PacketLossDS', 'GAUGE', 0);
+                    $tags = compact('rrd_name', 'rrd_def', 'sla_nr', 'rtt_type');
+                    data_update($device, 'sla', $tags, $lossPercent);
+                    $fields = array_merge($fields, $lossPercent);
                     break;
                 case 'icmpjitter':
                     $icmpjitter = [

@@ -15,7 +15,7 @@ $sla = dbFetchRow('SELECT `sla_nr` FROM `slas` WHERE `sla_id` = ?', [$vars['id']
 
 require 'includes/html/graphs/common.inc.php';
 $rrd_options .= ' -l -100 -u 100 -E -r';
-$rrd_filename = Rrd::name($device['hostname'], ['sla', $sla['sla_nr'], 'jitter']);
+$rrd_filename = Rrd::name($device['hostname'], ['sla', $sla['sla_nr'], 'loss-percent']);
 
 if (Rrd::checkRrdExists($rrd_filename)) {
     $rrd_options .= " COMMENT:'                      Cur    Min    Max    Avg\\n'";
