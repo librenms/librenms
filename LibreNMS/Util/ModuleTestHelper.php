@@ -65,7 +65,7 @@ class ModuleTestHelper
         'mpls' => ['ports', 'vrf', 'mpls'],
         'nac' => ['ports', 'nac'],
         'ospf' => ['ports', 'ospf'],
-        'stp' => ['ports', 'stp'],
+        'stp' => ['ports', 'vlans', 'stp'],
         'vlans' => ['ports', 'vlans'],
         'vrf' => ['ports', 'vrf'],
     ];
@@ -196,7 +196,6 @@ class ModuleTestHelper
         $save_vdebug = Debug::isVerbose();
         Debug::set();
         Debug::setVerbose();
-        \Log::setDefaultDriver('console');
         discover_device($device, $this->parseArgs('discovery'));
         $poller = app(Poller::class, ['device_spec' => $device_id, 'module_override' => $this->modules]);
         $poller->poll();
@@ -493,7 +492,7 @@ class ModuleTestHelper
             if (empty($results)) {
                 $this->qPrint("No data for $filename\n");
             } else {
-                $this->qPrint("Saved snmprec data $filename\n");
+                $this->qPrint("\nSaved snmprec data $filename\n");
                 file_put_contents($filename, $output);
             }
         }
