@@ -618,8 +618,13 @@ def wrapper(
         else:
             amount_of_workers = est_workers
 
+    if all_poll_time > 0:
+        fast_pct = fast_poll_time / all_poll_time
+    else:
+        fast_pct = 0.5
+
     # Work out how many fast workers are needed as a percent of the total time
-    amount_of_fast_workers = int(amount_of_workers * fast_poll_time / all_poll_time) + 1
+    amount_of_fast_workers = int(amount_of_workers * fast_pct) + 1
     if amount_of_fast_workers == 0:
         amount_of_fast_workers = 1
     if amount_of_fast_workers > amount_of_workers:
