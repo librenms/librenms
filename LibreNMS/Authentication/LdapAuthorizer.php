@@ -291,6 +291,7 @@ class LdapAuthorizer extends AuthorizerBase
         $base_dn = preg_replace('/,ou=[^,]+,/', '', Config::get('auth_ldap_suffix'));
         $search = ldap_search($connection, $base_dn, $filter);
         $firstuser = ldap_first_entry($connection, $search);
+
         return ldap_get_dn($connection, $firstuser);
     }
 
