@@ -15,7 +15,6 @@ class UpdatePortsStpUniqueIndex extends Migration
     {
         Schema::table('ports_stp', function (Blueprint $table) {
             $table->unique(['device_id', 'vlan', 'port_index']);
-
         });
     }
 

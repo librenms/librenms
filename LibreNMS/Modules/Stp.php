@@ -156,7 +156,7 @@ class Stp implements Module
                 return $carry;
             }, []);
 
-            SnmpQuery::context($vlan, 'vlan-')->enumStrings()->get($oids)
+            SnmpQuery::context("$vlan", 'vlan-')->enumStrings()->get($oids)
                 ->mapTable(function ($data, $base_port) use ($vlan, $vlan_ports) {
                     $port = $vlan_ports->get($base_port);
                     $port->vlan = $vlan;

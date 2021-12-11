@@ -1632,7 +1632,7 @@ ports_stp:
     - { Field: forwardTransitions, Type: 'int unsigned', 'Null': false, Extra: '' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [port_stp_id], Unique: true, Type: BTREE }
-    ports_stp_device_id_port_id_unique: { Name: ports_stp_device_id_port_id_unique, Columns: [device_id, port_id], Unique: true, Type: BTREE }
+    ports_stp_device_id_vlan_port_index_unique: { Name: ports_stp_device_id_vlan_port_index_unique, Columns: [device_id, vlan, port_index], Unique: true, Type: BTREE }
 ports_vlans:
   Columns:
     - { Field: port_vlan_id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
