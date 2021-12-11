@@ -44,9 +44,11 @@ class OSDiscoveryTest extends TestCase
 
         $glob = Config::get('install_dir') . '/tests/snmpsim/*.snmprec';
 
-        self::$unchecked_files = array_flip(array_map(function ($file) {
+        self::$unchecked_files = array_flip(array_filter(array_map(function ($file) {
             return basename($file, '.snmprec');
-        }, glob($glob)));
+        }, glob($glob)), function ($file) {
+            return ! Str::contains($file, '@');
+        }));
     }
 
     /**
@@ -76,6 +78,10 @@ class OSDiscoveryTest extends TestCase
             return basename($file, '.snmprec');
         }, glob($glob));
         $files = array_filter($files, function ($file) use ($os_name) {
+            if (Str::contains($file, '@')) {
+                return false;
+            }
+
             return $file == $os_name || Str::startsWith($file, $os_name . '_');
         });
 
