@@ -36866,6 +36866,7 @@
             ],
             "ports_stp": [
                 {
+                    "vlan": null,
                     "port_index": 6,
                     "priority": 128,
                     "state": "forwarding",

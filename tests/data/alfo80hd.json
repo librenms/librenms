@@ -2413,6 +2413,7 @@
         "discovery": {
             "stp": [
                 {
+                    "vlan": null,
                     "rootBridge": 0,
                     "bridgeAddress": "00b0ac2098fd",
                     "protocolSpecification": "ieee8021d",

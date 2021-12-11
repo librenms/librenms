@@ -119,7 +119,7 @@ class Stp implements Module
                         'forwardTransitions' => $data['BRIDGE-MIB::dot1dStpPortForwardTransitions'] ?? 0,
                     ]);
                 })->filter(function (PortStp $port) {
-                    return $port->enable !== 'disabled' && $port->state !== 'disabled';
+                    return $port->enable !== 'disabled' && $port->state !== 'disabled' && $port->port_id > 0;
                 }));
         }
 

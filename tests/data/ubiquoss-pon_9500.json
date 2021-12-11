@@ -16855,6 +16855,7 @@
         "discovery": {
             "stp": [
                 {
+                    "vlan": null,
                     "rootBridge": 1,
                     "bridgeAddress": "00244506ef27",
                     "protocolSpecification": "ieee8021d",
@@ -16873,21 +16874,7 @@
                     "bridgeForwardDelay": 15
                 }
             ],
-            "ports_stp": [
-                {
-                    "port_index": 702,
-                    "priority": 128,
-                    "state": "forwarding",
-                    "enable": "enabled",
-                    "pathCost": 2000,
-                    "designatedRoot": "000000000000",
-                    "designatedCost": 0,
-                    "designatedBridge": "000000000000",
-                    "designatedPort": 0,
-                    "forwardTransitions": 536870922,
-                    "ifIndex": null
-                }
-            ]
+            "ports_stp": []
         },
         "poller": "matches discovery"
     }

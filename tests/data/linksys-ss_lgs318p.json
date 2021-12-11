@@ -5602,6 +5602,7 @@
         "discovery": {
             "stp": [
                 {
+                    "vlan": null,
                     "rootBridge": 1,
                     "bridgeAddress": "58ef68e1eef2",
                     "protocolSpecification": "ieee8021d",
@@ -5622,6 +5623,7 @@
             ],
             "ports_stp": [
                 {
+                    "vlan": null,
                     "port_index": 49,
                     "priority": 128,
                     "state": "forwarding",
@@ -5635,6 +5637,7 @@
                     "ifIndex": 49
                 },
                 {
+                    "vlan": null,
                     "port_index": 55,
                     "priority": 128,
                     "state": "forwarding",
@@ -5648,6 +5651,7 @@
                     "ifIndex": 55
                 },
                 {
+                    "vlan": null,
                     "port_index": 56,
                     "priority": 128,
                     "state": "forwarding",
@@ -5661,6 +5665,7 @@
                     "ifIndex": 56
                 },
                 {
+                    "vlan": null,
                     "port_index": 57,
                     "priority": 128,
                     "state": "forwarding",
@@ -5674,6 +5679,7 @@
                     "ifIndex": 57
                 },
                 {
+                    "vlan": null,
                     "port_index": 58,
                     "priority": 128,
                     "state": "forwarding",
@@ -5687,6 +5693,7 @@
                     "ifIndex": 58
                 },
                 {
+                    "vlan": null,
                     "port_index": 62,
                     "priority": 128,
                     "state": "forwarding",
@@ -5700,6 +5707,7 @@
                     "ifIndex": 62
                 },
                 {
+                    "vlan": null,
                     "port_index": 63,
                     "priority": 128,
                     "state": "forwarding",
@@ -5713,6 +5721,7 @@
                     "ifIndex": 63
                 },
                 {
+                    "vlan": null,
                     "port_index": 64,
                     "priority": 128,
                     "state": "forwarding",

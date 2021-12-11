@@ -21927,6 +21927,7 @@
         "discovery": {
             "stp": [
                 {
+                    "vlan": null,
                     "rootBridge": 1,
                     "bridgeAddress": "0000cd3704c1",
                     "protocolSpecification": "ieee8021d",
@@ -21947,6 +21948,7 @@
             ],
             "ports_stp": [
                 {
+                    "vlan": null,
                     "port_index": 13,
                     "priority": 128,
                     "state": "forwarding",
@@ -21960,6 +21962,7 @@
                     "ifIndex": 5013
                 },
                 {
+                    "vlan": null,
                     "port_index": 43,
                     "priority": 128,
                     "state": "forwarding",
@@ -21973,6 +21976,7 @@
                     "ifIndex": 6013
                 },
                 {
+                    "vlan": null,
                     "port_index": 63,
                     "priority": 128,
                     "state": "forwarding",
@@ -21986,6 +21990,7 @@
                     "ifIndex": 4503
                 },
                 {
+                    "vlan": null,
                     "port_index": 64,
                     "priority": 128,
                     "state": "forwarding",
@@ -21999,6 +22004,7 @@
                     "ifIndex": 4504
                 },
                 {
+                    "vlan": null,
                     "port_index": 65,
                     "priority": 128,
                     "state": "forwarding",
@@ -22012,6 +22018,7 @@
                     "ifIndex": 4505
                 },
                 {
+                    "vlan": null,
                     "port_index": 66,
                     "priority": 128,
                     "state": "forwarding",
@@ -22025,6 +22032,7 @@
                     "ifIndex": 4506
                 },
                 {
+                    "vlan": null,
                     "port_index": 67,
                     "priority": 128,
                     "state": "forwarding",
@@ -22038,6 +22046,7 @@
                     "ifIndex": 4507
                 },
                 {
+                    "vlan": null,
                     "port_index": 68,
                     "priority": 128,
                     "state": "forwarding",
@@ -22051,6 +22060,7 @@
                     "ifIndex": 4508
                 },
                 {
+                    "vlan": null,
                     "port_index": 69,
                     "priority": 128,
                     "state": "forwarding",
@@ -22064,6 +22074,7 @@
                     "ifIndex": 4509
                 },
                 {
+                    "vlan": null,
                     "port_index": 70,
                     "priority": 128,
                     "state": "forwarding",
@@ -22077,6 +22088,7 @@
                     "ifIndex": 4510
                 },
                 {
+                    "vlan": null,
                     "port_index": 71,
                     "priority": 128,
                     "state": "forwarding",
@@ -22090,6 +22102,7 @@
                     "ifIndex": 4511
                 },
                 {
+                    "vlan": null,
                     "port_index": 72,
                     "priority": 128,
                     "state": "forwarding",
@@ -22103,6 +22116,7 @@
                     "ifIndex": 4512
                 },
                 {
+                    "vlan": null,
                     "port_index": 73,
                     "priority": 128,
                     "state": "forwarding",
@@ -22116,6 +22130,7 @@
                     "ifIndex": 4514
                 },
                 {
+                    "vlan": null,
                     "port_index": 74,
                     "priority": 128,
                     "state": "forwarding",
@@ -22129,6 +22144,7 @@
                     "ifIndex": 4523
                 },
                 {
+                    "vlan": null,
                     "port_index": 75,
                     "priority": 128,
                     "state": "forwarding",

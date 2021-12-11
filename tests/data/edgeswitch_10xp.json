@@ -2447,6 +2447,7 @@
         "discovery": {
             "stp": [
                 {
+                    "vlan": null,
                     "rootBridge": 1,
                     "bridgeAddress": "18e829ba73be",
                     "protocolSpecification": "ieee8021d",
@@ -2467,6 +2468,7 @@
             ],
             "ports_stp": [
                 {
+                    "vlan": null,
                     "port_index": 1000,
                     "priority": 128,
                     "state": "forwarding",

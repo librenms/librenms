@@ -6457,6 +6457,7 @@
         "discovery": {
             "stp": [
                 {
+                    "vlan": null,
                     "rootBridge": 1,
                     "bridgeAddress": "001fce5e6c18",
                     "protocolSpecification": "ieee8021d",

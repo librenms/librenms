@@ -3283,6 +3283,7 @@
         "discovery": {
             "stp": [
                 {
+                    "vlan": null,
                     "rootBridge": 0,
                     "bridgeAddress": "00b0ac105658",
                     "protocolSpecification": "ieee8021d",
