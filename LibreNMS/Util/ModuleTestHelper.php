@@ -649,7 +649,7 @@ class ModuleTestHelper
             // insert new data, don't store duplicate data
             foreach ($data as $module => $module_data) {
                 // skip saving modules with no data
-                if ($this->dataIsEmpty($module_data['discovery']) && $this->dataIsEmpty($module_data['poller'])) {
+                if (empty($module_data['discovery']) && empty($module_data['poller'])) {
                     continue;
                 }
                 if ($module_data['discovery'] == $module_data['poller']) {
@@ -719,7 +719,7 @@ class ModuleTestHelper
 
         // only dump data for the given modules
         foreach ($modules as $module) {
-            foreach ($module_dump_info[$module] ?: [] as $table => $info) {
+            foreach ($module_dump_info[$module] ?? [] as $table => $info) {
                 if ($table == 'component') {
                     $components = $this->collectComponents($device_id);
                     if (! empty($components)) {
@@ -880,16 +880,5 @@ class ModuleTestHelper
         });
 
         return array_values($components);
-    }
-
-    private function dataIsEmpty(array $data): bool
-    {
-        foreach ($data as $table_data) {
-            if (! empty($table_data)) {
-                return false;
-            }
-        }
-
-        return true;
     }
 }
