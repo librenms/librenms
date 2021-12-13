@@ -32,10 +32,10 @@ if (is_array($pre_cache['transfer'])) {
         if ($data['ifExtDirection'] == 'output') {
             if ($ver < 10) { //v10 and up auto reset transBitrateMax, older version could not use this sensor
                 $value = $data['transBitrate'] / $divisor;
-                $oid = $boid . '2.' . $key ;
+                $oid = $boid . '2.' . $key;
             } else {
                 $value = $data['transBitrateMax'] / $divisor;
-                $oid = $boid . '4.' . $key ;
+                $oid = $boid . '4.' . $key;
             }
 
             unset($defrate);
@@ -56,7 +56,7 @@ if (is_array($pre_cache['transfer'])) {
                 $limitwarn = $defrate * 0.8; //80%
                 $lowlimit = 0;
                 $lowwarnlimit = $defrate * 0.1; //10%
-                discover_sensor($valid['sensor'], 'bitrate', $device, $oid, $key, $type, $descr, $divisor, 1, $lowlimit, $lowwarnlimit, $limitwarn, $limit, $value, 'snmp', NULL, NULL, NULL, $group);
+                discover_sensor($valid['sensor'], 'bitrate', $device, $oid, $key, $type, $descr, $divisor, 1, $lowlimit, $lowwarnlimit, $limitwarn, $limit, $value, 'snmp', null, null, null, $group);
             }
         }
     }

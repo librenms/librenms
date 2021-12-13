@@ -36,7 +36,7 @@ if ($oids) {
             $split = explode('=', $data);
             $value = trim($split[1]);
             $index = trim(explode('.', $split[0])[1]);
-            $name =  trim(explode('.', $split[0])[0]);
+            $name = trim(explode('.', $split[0])[0]);
             $pre_cache['transfer'][$index][$name] = $value;
         }
     }
