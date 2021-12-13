@@ -48,7 +48,7 @@ if (is_array($pre_cache['transfer'])) {
                 $defrate = 60; //default bitrate for AsiOut module
             }
             if (isset($defrate)) {
-                $type = 'Transfer' . $ver . $mname;
+                $type = 'Transfer_' . $mname;
                 $defrate = $defrate * 1000 * 1000;
                 $descr = $mname . ' output ' . $pre_cache['transfer'][$key]['ifExtPhysInterface'];
                 $group = 'Slot ' . $mnr;
