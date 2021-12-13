@@ -71,7 +71,7 @@ class Ciscowlc extends Cisco implements
         $valid_ap_ids = [];
 
         foreach ($radios as $mac => $radio) {
-            foreach($radio as $slot => $value) {
+            foreach ($radio as $slot => $value) {
                 $channel = str_replace('ch', '', $value['AIRESPACE-WIRELESS-MIB::bsnAPIfPhyChannelNumber'] ?? '');
 
                 $ap = new AccessPoint([
