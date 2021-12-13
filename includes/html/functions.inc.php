@@ -1319,6 +1319,14 @@ function get_sensor_label_color($sensor, $type = 'sensors')
         return "<span class='label $label_style'>" . trim($sensor['sensor_current']) . ' ' . $unit . '</span>';
     }
 
+    if ($type == 'wireless' && $sensor['sensor_class'] == 'frequency') {
+        return "<span class='label $label_style'>" . trim(Number::formatSi($sensor['sensor_current'] * 1000000, 2, 3, 'Hz')) . '</span>';
+    }
+
+    if ($type == 'wireless' && $sensor['sensor_class'] == 'distance') {
+        return "<span class='label $label_style'>" . trim(Number::formatSi($sensor['sensor_current'] * 1000, 2, 3, 'm')) . '</span>';
+    }
+
     return "<span class='label $label_style'>" . trim(Number::formatSi($sensor['sensor_current'], 2, 3, $unit)) . '</span>';
 }
 
