@@ -26,6 +26,11 @@ if ($device['os'] == 'airos-af-ltu') {
     require 'ports/airos-af-ltu.inc.php';
 }
 
+//Teleste Luminato ifOperStatus
+if ($device['os'] == 'luminato') {
+    require base_path('includes/discovery/ports/luminato.inc.php');
+}
+
 // End Building SNMP Cache Array
 d_echo($port_stats);
 
@@ -64,6 +69,7 @@ if ($device['os'] == 'fabos') {
 if ($device['os'] == 'ekinops') {
     require base_path('includes/discovery/ports/ekinops.inc.php');
 }
+
 
 $default_port_group = Config::get('default_port_group');
 
