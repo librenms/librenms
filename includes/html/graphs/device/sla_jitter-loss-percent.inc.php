@@ -15,14 +15,15 @@ $sla = dbFetchRow('SELECT `sla_nr` FROM `slas` WHERE `sla_id` = ?', [$vars['id']
 
 require 'includes/html/graphs/common.inc.php';
 $rrd_options .= ' -l -100 -u 100 -E -r';
-$rrd_filename = Rrd::name($device['hostname'], ['sla', $sla['sla_nr'], 'loss-percent']);
+$rrd_filename_1 = Rrd::name($device['hostname'], ['sla', $sla['sla_nr'], 'jitter']);
+$rrd_filename_2 = Rrd::name($device['hostname'], ['sla', $sla['sla_nr'], 'NumPackets']);
 
 if (Rrd::checkRrdExists($rrd_filename)) {
     $rrd_options .= " COMMENT:'                      Cur    Min    Max    Avg\\n'";
 
-    $rrd_options .= ' DEF:PacketLossSD=' . $rrd_filename . ':PacketLossSD:AVERAGE ';
-    $rrd_options .= ' DEF:PacketLossDS=' . $rrd_filename . ':PacketLossDS:AVERAGE ';
-    $rrd_options .= ' DEF:NumPackets=' . $rrd_filename . ':NumPackets:AVERAGE ';
+    $rrd_options .= ' DEF:PacketLossSD=' . $rrd_filename_1 . ':PacketLossSD:AVERAGE ';
+    $rrd_options .= ' DEF:PacketLossDS=' . $rrd_filename_1 . ':PacketLossDS:AVERAGE ';
+    $rrd_options .= ' DEF:NumPackets=' . $rrd_filename_2 . ':NumPackets:AVERAGE ';
 
     $rrd_options .= ' CDEF:PktLossOut=PacketLossSD,NumPackets,/,100,* ';
     $rrd_options .= " LINE1.25:PktLossOut#0000ee:'Src to Dst (%)  ' ";
