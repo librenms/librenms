@@ -37,6 +37,7 @@ the values we expect to see the data in:
 | state                           | #                           |
 | temperature                     | C                           |
 | tv_signal                       | dBmV                        |
+| bitrate                         | bps                         |
 | voltage                         | V                           |
 | waterflow                       | l/m                         |
 | percent                         | %                           |
@@ -468,6 +469,8 @@ Signal:
 State:
 Count:
 Temperature: ..
+Tv_signal:
+Bitrate:
 Voltage: .
 Snr:
 Pressure:
