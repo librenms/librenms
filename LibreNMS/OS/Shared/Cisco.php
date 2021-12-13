@@ -473,20 +473,16 @@ class Cisco extends OS implements OSDiscovery, SlaDiscovery, ProcessorDiscovery,
                     $tags = compact('rrd_name', 'rrd_def', 'sla_nr', 'rtt_type');
                     data_update($device, 'sla', $tags, $jitter);
                     $fields = array_merge($fields, $jitter);
-                    // Additional rrd for jitter packet loss percent
-                    $lossPercent = [
+                    // Additional rrd for total number packet in sla
+                    $numPackets = [
                         'NumPackets' => $data[$sla_nr]['rttMonEchoAdminNumPackets'],
-                        'PacketLossSD' => $data[$sla_nr]['rttMonLatestJitterOperPacketLossSD'],
-                        'PacketLossDS' => $data[$sla_nr]['rttMonLatestJitterOperPacketLossDS'],
                     ];
-                    $rrd_name = ['sla', $sla_nr, 'loss-percent'];
+                    $rrd_name = ['sla', $sla_nr, 'NumPackets'];
                     $rrd_def = RrdDefinition::make()
-                        ->addDataset('NumPackets', 'GAUGE', 0)
-                        ->addDataset('PacketLossSD', 'GAUGE', 0)
-                        ->addDataset('PacketLossDS', 'GAUGE', 0);
+                        ->addDataset('NumPackets', 'GAUGE', 0);
                     $tags = compact('rrd_name', 'rrd_def', 'sla_nr', 'rtt_type');
-                    data_update($device, 'sla', $tags, $lossPercent);
-                    $fields = array_merge($fields, $lossPercent);
+                    data_update($device, 'sla', $tags, $numPackets);
+                    $fields = array_merge($fields, $numPackets);
                     break;
                 case 'icmpjitter':
                     $icmpjitter = [
