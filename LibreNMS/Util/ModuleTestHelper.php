@@ -704,10 +704,10 @@ class ModuleTestHelper
      *
      * @param  int  $device_id  The test device id
      * @param  array  $modules  to capture data for (should be a list of modules that were actually run)
-     * @param  string  $key  a key to store the data under the module key (usually discovery or poller)
+     * @param  string  $type  a key to store the data under the module key (usually discovery or poller)
      * @return array The dumped data keyed by module -> table
      */
-    public function dumpDb($device_id, $modules, $key = null)
+    public function dumpDb($device_id, $modules, $type)
     {
         $data = [];
         $module_dump_info = $this->getTableData();
@@ -721,10 +721,9 @@ class ModuleTestHelper
         foreach ($modules as $module) {
             foreach ($module_dump_info[$module] ?: [] as $table => $info) {
                 if ($table == 'component') {
-                    if (isset($key)) {
-                        $data[$module][$key][$table] = $this->collectComponents($device_id);
-                    } else {
-                        $data[$module][$table] = $this->collectComponents($device_id);
+                    $components = $this->collectComponents($device_id);
+                    if (! empty($components)) {
+                        $data[$module][$type][$table] = $components;
                     }
                     continue;
                 }
@@ -762,6 +761,11 @@ class ModuleTestHelper
                 $fields = implode(', ', $select);
                 $rows = dbFetchRows("SELECT $fields FROM `$table` $join $where $order_by", $params);
 
+                // don't include empty tables
+                if (empty($rows)) {
+                    continue;
+                }
+
                 // remove unwanted fields
                 if (isset($info['included_fields'])) {
                     $keys = array_flip($info['included_fields']);
@@ -775,11 +779,7 @@ class ModuleTestHelper
                     }, $rows);
                 }
 
-                if (isset($key)) {
-                    $data[$module][$key][$table] = $rows;
-                } else {
-                    $data[$module][$table] = $rows;
-                }
+                $data[$module][$type][$table] = $rows;
             }
         }
 
@@ -872,7 +872,7 @@ class ModuleTestHelper
         return $this->json_file;
     }
 
-    private function collectComponents($device_id)
+    private function collectComponents(int $device_id): array
     {
         $components = (new Component())->getComponents($device_id)[$device_id] ?? [];
         $components = Arr::sort($components, function ($item) {
@@ -882,7 +882,7 @@ class ModuleTestHelper
         return array_values($components);
     }
 
-    private function dataIsEmpty($data)
+    private function dataIsEmpty(array $data): bool
     {
         foreach ($data as $table_data) {
             if (! empty($table_data)) {
