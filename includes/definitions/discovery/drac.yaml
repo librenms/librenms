@@ -20,6 +20,8 @@ modules:
                         - { value: 4, descr: nonCritical, graph: 1, generic: 1 }
                         - { value: 5, descr: critical, graph: 1, generic: 2 }
                         - { value: 6, descr: nonRecoverable, graph: 1, generic: 2 }
+                    high_limit: 5 
+                    warn_limit: 4
                 -
                     oid: systemStateIDSDMCardUnitStatusCombined
                     value: systemStateIDSDMCardUnitStatusCombined
@@ -33,6 +35,8 @@ modules:
                         - { value: 4, descr: nonCritical, graph: 1, generic: 1 }
                         - { value: 5, descr: critical, graph: 1, generic: 2 }
                         - { value: 6, descr: nonRecoverable, graph: 1, generic: 2 }
+                    high_limit: 5 
+                    warn_limit: 4
                 -
                     oid: systemStateIDSDMCardDeviceStatusCombined
                     value: systemStateIDSDMCardDeviceStatusCombined
@@ -46,6 +50,8 @@ modules:
                         - { value: 4, descr: nonCritical, graph: 1, generic: 1 }
                         - { value: 5, descr: critical, graph: 1, generic: 2 }
                         - { value: 6, descr: nonRecoverable, graph: 1, generic: 2 }
+                    high_limit: 5 
+                    warn_limit: 4
                 -
                     oid: intrusionStatus
                     value: intrusionStatus
@@ -59,6 +65,8 @@ modules:
                         - { value: 4, descr: nonCritical, graph: 1, generic: 1 }
                         - { value: 5, descr: critical, graph: 1, generic: 2 }
                         - { value: 6, descr: nonRecoverable, graph: 1, generic: 2 }
+                    high_limit: 5 
+                    warn_limit: 4
                 -
                     oid: intrusionReading
                     value: intrusionReading
@@ -70,6 +78,7 @@ modules:
                         - { value: 2, descr: chassisBreached, graph: 1, generic: 2 }
                         - { value: 3, descr: chassisBreachedPrior, graph: 1, generic: 1 }
                         - { value: 4, descr: chassisBreachSensorFailure, graph: 1, generic: 1 }
+                    high_limit: 2 
                 -
                     oid: drsIOMCurrStatus
                     value: drsIOMCurrStatus
@@ -83,6 +92,8 @@ modules:
                         - { value: 4, descr: nonCritical, graph: 1, generic: 1 }
                         - { value: 5, descr: critical, graph: 1, generic: 2 }
                         - { value: 6, descr: nonRecoverable, graph: 1, generic: 2 }
+                    high_limit: 5 
+                    warn_limit: 4
                 -
                     oid: drsKVMCurrStatus
                     value: drsKVMCurrStatus
@@ -96,6 +107,8 @@ modules:
                         - { value: 4, descr: nonCritical, graph: 1, generic: 1 }
                         - { value: 5, descr: critical, graph: 1, generic: 2 }
                         - { value: 6, descr: nonRecoverable, graph: 1, generic: 2 }
+                    high_limit: 5 
+                    warn_limit: 4
                 -
                     oid: drsRedCurrStatus
                     value: drsRedCurrStatus
@@ -109,6 +122,8 @@ modules:
                         - { value: 4, descr: nonCritical, graph: 1, generic: 1 }
                         - { value: 5, descr: critical, graph: 1, generic: 2 }
                         - { value: 6, descr: nonRecoverable, graph: 1, generic: 2 }
+                    high_limit: 5 
+                    warn_limit: 4
                 -
                     oid: drsPowerCurrStatus
                     value: drsPowerCurrStatus
@@ -122,6 +137,8 @@ modules:
                         - { value: 4, descr: nonCritical, graph: 1, generic: 1 }
                         - { value: 5, descr: critical, graph: 1, generic: 2 }
                         - { value: 6, descr: nonRecoverable, graph: 1, generic: 2 }
+                    high_limit: 5 
+                    warn_limit: 4
                 -
                     oid: drsFanCurrStatus
                     value: drsFanCurrStatus
@@ -135,6 +152,8 @@ modules:
                         - { value: 4, descr: nonCritical, graph: 1, generic: 1 }
                         - { value: 5, descr: critical, graph: 1, generic: 2 }
                         - { value: 6, descr: nonRecoverable, graph: 1, generic: 2 }
+                    high_limit: 5 
+                    warn_limit: 4
                 -
                     oid: drsBladeCurrStatus
                     num_oid: '.1.3.6.1.4.1.674.10892.2.3.1.7.{{ $index }}'
@@ -147,6 +166,8 @@ modules:
                         - { value: 4, descr: nonCritical, graph: 1, generic: 1 }
                         - { value: 5, descr: critical, graph: 1, generic: 2 }
                         - { value: 6, descr: nonRecoverable, graph: 1, generic: 2 }
+                    high_limit: 5 
+                    warn_limit: 4
                 -
                     oid: drsTempCurrStatus
                     num_oid: '.1.3.6.1.4.1.674.10892.2.3.1.8.{{ $index }}'
@@ -159,6 +180,8 @@ modules:
                         - { value: 4, descr: nonCritical, graph: 1, generic: 1 }
                         - { value: 5, descr: critical, graph: 1, generic: 2 }
                         - { value: 6, descr: nonRecoverable, graph: 1, generic: 2 }
+                    high_limit: 5 
+                    warn_limit: 4
                 -
                     oid: drsCMCCurrStatus
                     num_oid: '.1.3.6.1.4.1.674.10892.2.3.1.9.{{ $index }}'
@@ -171,6 +194,8 @@ modules:
                         - { value: 4, descr: nonCritical, graph: 1, generic: 1 }
                         - { value: 5, descr: critical, graph: 1, generic: 2 }
                         - { value: 6, descr: nonRecoverable, graph: 1, generic: 2 }
+                    high_limit: 5 
+                    warn_limit: 4
                 -
                     oid: DELL-RAC-MIB::physicalDiskTable
                     value: DELL-RAC-MIB::physicalDiskState
@@ -203,6 +228,8 @@ modules:
                         - { value: 4, descr: nonCritical, graph: 1, generic: 1 }
                         - { value: 5, descr: critical, graph: 1, generic: 2 }
                         - { value: 6, descr: nonrecoverable, graph: 1, generic: 2}
+                    high_limit: 5 
+                    warn_limit: 4
                 -
                     oid: drsCMCServerTable
                     value: drsServerMonitoringCapable
