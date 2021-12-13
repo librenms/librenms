@@ -20,6 +20,7 @@
  * @link       https://www.librenms.org
  *
  * @copyrigh   2021 Peca Nesovanovic
+ *
  * @author     peca.nesovanovic@sattrakt.com
  */
 $ver = intval($device['version']);

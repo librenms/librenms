@@ -70,7 +70,6 @@ if ($device['os'] == 'ekinops') {
     require base_path('includes/discovery/ports/ekinops.inc.php');
 }
 
-
 $default_port_group = Config::get('default_port_group');
 
 // New interface detection
