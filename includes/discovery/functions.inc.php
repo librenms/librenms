@@ -12,6 +12,9 @@
  * See COPYING for more details.
  */
 
+use App\Models\Ipv6Address;
+use App\Models\Ipv6Network;
+use App\Models\Port;
 use Illuminate\Support\Str;
 use LibreNMS\Config;
 use LibreNMS\Device\YamlDiscovery;
@@ -661,55 +664,49 @@ function discover_process_ipv6(&$valid, $ifIndex, $ipv6_address, $ipv6_prefixlen
     $ipv6_network = $ipv6->getNetwork($ipv6_prefixlen);
     $ipv6_compressed = $ipv6->compressed();
 
-    if (dbFetchCell('SELECT COUNT(*) FROM `ports` WHERE device_id = ? AND `ifIndex` = ?', [$device['device_id'], $ifIndex]) != '0' && $ipv6_prefixlen > '0' && $ipv6_prefixlen < '129' && $ipv6_compressed != '::1') {
-        $port_id = dbFetchCell('SELECT port_id FROM `ports` WHERE device_id = ? AND ifIndex = ?', [$device['device_id'], $ifIndex]);
+    $port_id = Port::where([
+        ['device_id', $device['device_id']],
+        ['ifIndex', $ifIndex],
+    ])->value('port_id');
 
-        if (is_numeric($port_id)) {
-            if (dbFetchCell('SELECT COUNT(*) FROM `ipv6_networks` WHERE `ipv6_network` = ?', [$ipv6_network]) < '1') {
-                dbInsert(['ipv6_network' => $ipv6_network, 'context_name' => $context_name], 'ipv6_networks');
-                echo 'N';
-            } else {
-                //Update Context
-                dbUpdate(['context_name' => $device['context_name']], 'ipv6_networks', '`ipv6_network` = ?', [$ipv6_network]);
-                echo 'n';
-            }
+    if ($port_id && $ipv6_prefixlen > '0' && $ipv6_prefixlen < '129' && $ipv6_compressed != '::1') {
+        d_echo('IPV6: Found port id: ' . $port_id);
 
-            if ($context_name == null) {
-                $ipv6_network_id = dbFetchCell('SELECT `ipv6_network_id` FROM `ipv6_networks` WHERE `ipv6_network` = ? AND `context_name` IS NULL', [$ipv6_network]);
-            } else {
-                $ipv6_network_id = dbFetchCell('SELECT `ipv6_network_id` FROM `ipv6_networks` WHERE `ipv6_network` = ? AND `context_name` = ?', [$ipv6_network, $context_name]);
-            }
-            if (dbFetchCell('SELECT COUNT(*) FROM `ipv6_addresses` WHERE `ipv6_address` = ? AND `ipv6_prefixlen` = ? AND `port_id` = ?', [$ipv6_address, $ipv6_prefixlen, $port_id]) == '0') {
-                dbInsert([
-                    'ipv6_address' => $ipv6_address,
-                    'ipv6_compressed' => $ipv6_compressed,
-                    'ipv6_prefixlen' => $ipv6_prefixlen,
-                    'ipv6_origin' => $ipv6_origin,
-                    'ipv6_network_id' => $ipv6_network_id,
-                    'port_id' => $port_id,
-                    'context_name' => $context_name,
-                ], 'ipv6_addresses');
-                echo '+';
-            } elseif (dbFetchCell('SELECT COUNT(*) FROM `ipv6_addresses` WHERE `ipv6_address` = ? AND `ipv6_prefixlen` = ? AND `port_id` = ? AND `ipv6_network_id` = ""', [$ipv6_address, $ipv6_prefixlen, $port_id]) == '1') {
-                // Update IPv6 network ID if not set
-                if ($context_name == null) {
-                    $ipv6_network_id = dbFetchCell('SELECT `ipv6_network_id` FROM `ipv6_networks` WHERE `ipv6_network` = ? AND `context_name` IS NULL', [$ipv6_network]);
-                } else {
-                    $ipv6_network_id = dbFetchCell('SELECT `ipv6_network_id` FROM `ipv6_networks` WHERE `ipv6_network` = ? AND `context_name` = ?', [$ipv6_network, $context_name]);
-                }
-                dbUpdate(['ipv6_network_id' => $ipv6_network_id], 'ipv6_addresses', '`ipv6_address` = ? AND `ipv6_prefixlen` = ? AND `port_id` = ?', [$ipv6_address, $ipv6_prefixlen, $port_id]);
-                echo 'u';
-            } else {
-                //Update Context
-                dbUpdate(['context_name' => $device['context_name']], 'ipv6_addresses', '`ipv6_address` = ? AND `ipv6_prefixlen` = ? AND `port_id` = ?', [$ipv6_address, $ipv6_prefixlen, $port_id]);
-                echo '.';
+        $ipv6netDB = Ipv6Network::updateOrCreate([
+            'ipv6_network' => $ipv6_network,
+        ], [
+            'context_name' => $context_name,
+        ]);
+
+        if ($ipv6netDB->wasChanged()) {
+            d_echo('IPV6: Update DB ipv6_networks');
+        }
+
+        $ipv6_network_id = Ipv6Network::where('ipv6_network', $ipv6_network)->where('context_name', $context_name)->value('ipv6_network_id');
+
+        if ($ipv6_network_id) {
+            d_echo('IPV6: Found network id: ' . $ipv6_network_id);
+
+            $ipv6adrDB = Ipv6Address::updateOrCreate([
+                'ipv6_address' => $ipv6_address,
+                'ipv6_prefixlen' => $ipv6_prefixlen,
+                'port_id' => $port_id,
+            ], [
+                'ipv6_compressed' => $ipv6_compressed,
+                'ipv6_origin' => $ipv6_origin,
+                'ipv6_network_id' => $ipv6_network_id,
+                'context_name' => $context_name,
+            ]);
+
+            if ($ipv6adrDB->wasChanged()) {
+                d_echo('IPV6: Update DB ipv6_addresses');
             }
 
             $full_address = "$ipv6_address/$ipv6_prefixlen";
             $valid_address = $full_address . '-' . $port_id;
             $valid['ipv6'][$valid_address] = 1;
-        }
-    }//end if
+        }//endif network_id
+    }//endif port_id && others
 }//end discover_process_ipv6()
 
 /*
