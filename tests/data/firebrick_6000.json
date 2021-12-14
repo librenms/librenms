@@ -1803,7 +1803,8 @@
                     "user_func": null,
                     "state_name": null
                 }
-            ]
+            ],
+            "state_indexes": []
         },
         "poller": "matches discovery"
     },
@@ -1876,7 +1877,8 @@
                     "bgpLocalAs": 20712,
                     "vrfLocalAs": null
                 }
-            ]
+            ],
+            "bgpPeers_cbgp": []
         },
         "poller": {
             "bgpPeers": [
@@ -1955,7 +1957,7 @@
                 {
                     "peer_port": 0,
                     "peer_addr": "0.0.0.0",
-                    "local_addr": "127.1.6.1",
+                    "local_addr": "127.1.6.2",
                     "local_port": 0,
                     "tunnel_name": "House",
                     "tunnel_status": "waiting"
@@ -1963,7 +1965,7 @@
                 {
                     "peer_port": 0,
                     "peer_addr": "10.2.3.4",
-                    "local_addr": "127.1.6.1",
+                    "local_addr": "127.1.6.2",
                     "local_port": 0,
                     "tunnel_name": "ToToothless",
                     "tunnel_status": "waiting"
