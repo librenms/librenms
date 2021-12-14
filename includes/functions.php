@@ -262,17 +262,22 @@ function getImageName($device, $use_database = true, $dir = 'images/os/')
 function renamehost($id, $new, $source = 'console')
 {
     $host = gethostbyid($id);
+    $host_rrd_dir = Rrd::dirFromHost($host);
+    $is_remote_rrd = false;
 
-    if (! is_dir(Rrd::dirFromHost($new)) && rename(Rrd::dirFromHost($host), Rrd::dirFromHost($new)) === true) {
+    if (! is_dir($host_rrd_dir) && Rrd::checkRrdExists($host_rrd_dir)) { // We're most likely using a remote rrdcached
+        $is_remote_rrd = true;
+    }
+    if ($is_remote_rrd || (! is_dir(Rrd::dirFromHost($new)) && rename(Rrd::dirFromHost($host), Rrd::dirFromHost($new)) === true)) {
         dbUpdate(['hostname' => $new, 'ip' => null], 'devices', 'device_id=?', [$id]);
         log_event("Hostname changed -> $new ($source)", $id, 'system', 3);
 
-        return '';
+        return ['message' => '', 'manual_rrd_rename' => $is_remote_rrd];
     }
 
     log_event("Renaming of $host failed", $id, 'system', 5);
 
-    return "Renaming of $host failed\n";
+    return ['message' => "Renaming of $host failed\n", 'manual_rrd_rename' => false];
 }
 
 function device_discovery_trigger($id)

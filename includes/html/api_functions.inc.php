@@ -1939,8 +1939,13 @@ function rename_device(Illuminate\Http\Request $request)
     } elseif ($new_device) {
         return api_error(500, 'Device failed to rename, new hostname already exists');
     } else {
-        if (renamehost($device_id, $new_hostname, 'api') == '') {
-            return api_success_noresult(200, 'Device has been renamed');
+        $result = renamehost($device_id, $new_hostname, 'api');
+        if ($result['message'] == '') {
+            if ($result['manual_rrd_rename']) {
+                return api_success_noresult(200, 'Device has been renamed but the RRD folder will have to be renamed manually, are you running a remote rrdcached?');
+            } else {
+                return api_success_noresult(200, 'Device has been renamed');
+            }
         } else {
             return api_error(500, 'Device failed to be renamed');
         }

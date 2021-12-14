@@ -26,11 +26,15 @@ if ($argv[1] && $argv[2]) {
             exit(1);
         } else {
             $result = renamehost($id, $tohost, 'console');
-            if ($result == '') {
-                echo "Renamed $host\n";
+            if ($result['message'] == '') {
+                if ($result['manual_rrd_rename']) {
+                    echo "Renamed $host but the RRD folder will have to be renamed manually, are you running a remote rrdcached?\n";
+                } else {
+                    echo "Renamed $host\n";
+                }
                 exit(0);
             } else {
-                echo "NOT renamed: $result";
+                echo "NOT renamed: {$result['message']}";
                 exit(1);
             }
         }

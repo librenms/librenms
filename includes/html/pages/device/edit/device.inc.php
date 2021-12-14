@@ -56,8 +56,12 @@ if ($_POST['editing']) {
         if (isset($_POST['hostname']) && $_POST['hostname'] !== '' && $_POST['hostname'] !== $device['hostname']) {
             if (Auth::user()->hasGlobalAdmin()) {
                 $result = renamehost($device['device_id'], trim($_POST['hostname']), 'webui');
-                if ($result == '') {
-                    flash()->addSuccess("Hostname updated from {$device['hostname']} to {$_POST['hostname']}");
+                if ($result['message'] == '') {
+                    if ($result['manual_rrd_rename']) {
+                        flash()->addSuccess("Hostname updated from {$device['hostname']} to {$_POST['hostname']} but the RRD folder will have to be renamed manually, are you running a remote rrdcached?");
+                    } else {
+                        flash()->addSuccess("Hostname updated from {$device['hostname']} to {$_POST['hostname']}");
+                    }
                     $reload = true;
                 } else {
                     flash()->addError($result . '.  Does your web server have permission to modify the rrd files?');
