@@ -40,8 +40,8 @@ if (isset($options['snmpsim'])) {
 
 if (isset($options['h'])
     || isset($options['help'])
-//    || (isset($options['o']) || isset($options['os'])) && ! (isset($options['v']) || isset($options['variant']))
-//    || ! (isset($options['o']) || isset($options['os']) || isset($options['m']) || isset($options['modules']))
+    || (isset($options['o']) || isset($options['os'])) && ! (isset($options['v']) || isset($options['variant']))
+    || ! (isset($options['o']) || isset($options['os']) || isset($options['m']) || isset($options['modules']))
 ) {
     echo "Script to update test data. Database data is saved in tests/data.
 
