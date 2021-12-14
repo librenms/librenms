@@ -1748,7 +1748,7 @@
                     "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
-                    "sensor_current": -40.0,
+                    "sensor_current": -40,
                     "sensor_limit": null,
                     "sensor_limit_warn": null,
                     "sensor_limit_low": null,
@@ -1820,7 +1820,7 @@
                     "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
-                    "sensor_current": -40.0,
+                    "sensor_current": -40,
                     "sensor_limit": null,
                     "sensor_limit_warn": null,
                     "sensor_limit_low": null,
@@ -1868,8 +1868,8 @@
                     "group": null,
                     "sensor_divisor": 1,
                     "sensor_multiplier": 1,
-                    "sensor_current": 49.0,
-                    "sensor_limit": 80.0,
+                    "sensor_current": 49,
+                    "sensor_limit": 80,
                     "sensor_limit_warn": null,
                     "sensor_limit_low": -30,
                     "sensor_limit_low_warn": null,
@@ -1953,8 +1953,7 @@
                     "user_func": null,
                     "state_name": null
                 }
-            ],
-            "state_indexes": []
+            ]
         },
         "poller": "matches discovery"
     }

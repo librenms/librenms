@@ -1717,8 +1717,8 @@
                     "ifName": "InLoopBack0",
                     "portName": null,
                     "ifIndex": 1,
-                    "ifSpeed": null,
-                    "ifSpeed_prev": 0,
+                    "ifSpeed": 0,
+                    "ifSpeed_prev": null,
                     "ifConnectorPresent": null,
                     "ifPromiscuousMode": null,
                     "ifOperStatus": "up",
@@ -1822,8 +1822,8 @@
                     "ifName": "NULL0",
                     "portName": null,
                     "ifIndex": 2,
-                    "ifSpeed": null,
-                    "ifSpeed_prev": 0,
+                    "ifSpeed": 0,
+                    "ifSpeed_prev": null,
                     "ifConnectorPresent": null,
                     "ifPromiscuousMode": null,
                     "ifOperStatus": "up",
@@ -2977,8 +2977,8 @@
                     "ifName": "LoopBack199",
                     "portName": null,
                     "ifIndex": 15,
-                    "ifSpeed": null,
-                    "ifSpeed_prev": 0,
+                    "ifSpeed": 0,
+                    "ifSpeed_prev": null,
                     "ifConnectorPresent": null,
                     "ifPromiscuousMode": null,
                     "ifOperStatus": "up",
@@ -3582,8 +3582,7 @@
                     "user_func": null,
                     "state_name": null
                 }
-            ],
-            "state_indexes": []
+            ]
         },
         "poller": "matches discovery"
     },

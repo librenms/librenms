@@ -5447,8 +5447,7 @@
                     "user_func": null,
                     "state_name": null
                 }
-            ],
-            "state_indexes": []
+            ]
         },
         "poller": "matches discovery"
     },
@@ -8502,8 +8501,8 @@
                     "ifName": "Management1",
                     "portName": null,
                     "ifIndex": 999001,
-                    "ifSpeed": null,
-                    "ifSpeed_prev": 0,
+                    "ifSpeed": 0,
+                    "ifSpeed_prev": null,
                     "ifConnectorPresent": "true",
                     "ifPromiscuousMode": "false",
                     "ifOperStatus": "down",
@@ -8712,8 +8711,8 @@
                     "ifName": "Vlan13",
                     "portName": null,
                     "ifIndex": 2000013,
-                    "ifSpeed": null,
-                    "ifSpeed_prev": 0,
+                    "ifSpeed": 0,
+                    "ifSpeed_prev": null,
                     "ifConnectorPresent": "false",
                     "ifPromiscuousMode": "false",
                     "ifOperStatus": "up",

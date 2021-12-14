@@ -134,7 +134,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
-                    "ifDescr": "PtP-OC-Loopback, Loopback IP interface, \\\\IP interface",
+                    "ifDescr": "PtP-OC-Loopback, Loopback IP interface, \\IP interface",
                     "ifName": "PtP-OC-Loopback",
                     "portName": null,
                     "ifIndex": 2,
@@ -449,7 +449,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
-                    "ifDescr": "1/3/2, 10/100/Gig Ethernet SFP, \\\\Mob: DPAC-GU-LTE [Tam-Noc-GLTAM010-LTE-66010]",
+                    "ifDescr": "1/3/2, 10/100/Gig Ethernet SFP, \\Mob: DPAC-GU-LTE [Tam-Noc-GLTAM010-LTE-66010]",
                     "ifName": "1/3/2",
                     "portName": null,
                     "ifIndex": 39911424,
@@ -659,7 +659,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
-                    "ifDescr": "1/3/4, 10/100/Gig Ethernet SFP, \\\\Temoprary-to-SITEB-7750 1/1/12",
+                    "ifDescr": "1/3/4, 10/100/Gig Ethernet SFP, \\Temoprary-to-SITEB-7750 1/1/12",
                     "ifName": "1/3/4",
                     "portName": null,
                     "ifIndex": 39976960,
@@ -764,7 +764,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
-                    "ifDescr": "1/3/5, 10/100/Gig Ethernet SFP, \\\\Mob: DPAC-GU-LTE [Tam-NOC-TOYCELL-GLTAM869-LTE-66869]",
+                    "ifDescr": "1/3/5, 10/100/Gig Ethernet SFP, \\Mob: DPAC-GU-LTE [Tam-NOC-TOYCELL-GLTAM869-LTE-66869]",
                     "ifName": "1/3/5",
                     "portName": null,
                     "ifIndex": 40009728,
@@ -869,7 +869,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
-                    "ifDescr": "1/3/6, 10/100/Gig Ethernet SFP, \\\\Mob: DPAC-GU-LTE [PakiPlaza-GLAPAKIPLZA-MRBTS-6123] (TEST)",
+                    "ifDescr": "1/3/6, 10/100/Gig Ethernet SFP, \\Mob: DPAC-GU-LTE [PakiPlaza-GLAPAKIPLZA-MRBTS-6123] (TEST)",
                     "ifName": "1/3/6",
                     "portName": null,
                     "ifIndex": 40042496,
@@ -974,7 +974,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
-                    "ifDescr": "1/3/7, 10/100/Gig Ethernet SFP, \\\\to-TEST-CISCO-2911",
+                    "ifDescr": "1/3/7, 10/100/Gig Ethernet SFP, \\to-TEST-CISCO-2911",
                     "ifName": "1/3/7",
                     "portName": null,
                     "ifIndex": 40075264,
@@ -1079,7 +1079,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
-                    "ifDescr": "1/3/8, 10/100/Gig Ethernet SFP, \\\\SAR: to-SITEA-7750 1/1/8",
+                    "ifDescr": "1/3/8, 10/100/Gig Ethernet SFP, \\SAR: to-SITEA-7750 1/1/8",
                     "ifName": "1/3/8",
                     "portName": null,
                     "ifIndex": 40108032,
@@ -2137,8 +2137,8 @@
                     "ifName": "system",
                     "portName": null,
                     "ifIndex": 1,
-                    "ifSpeed": null,
-                    "ifSpeed_prev": 0,
+                    "ifSpeed": 0,
+                    "ifSpeed_prev": null,
                     "ifConnectorPresent": "false",
                     "ifPromiscuousMode": "false",
                     "ifOperStatus": "up",
@@ -2238,12 +2238,12 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
-                    "ifDescr": "PtP-OC-Loopback, Loopback IP interface, \\\\IP interface",
+                    "ifDescr": "PtP-OC-Loopback, Loopback IP interface, \\IP interface",
                     "ifName": "PtP-OC-Loopback",
                     "portName": null,
                     "ifIndex": 2,
-                    "ifSpeed": null,
-                    "ifSpeed_prev": 0,
+                    "ifSpeed": 0,
+                    "ifSpeed_prev": null,
                     "ifConnectorPresent": "false",
                     "ifPromiscuousMode": "false",
                     "ifOperStatus": "up",
@@ -3393,7 +3393,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": "Tam-Noc-GLTAM010-LTE-66010",
                     "port_descr_notes": null,
-                    "ifDescr": "1/3/2, 10/100/Gig Ethernet SFP, \\\\Mob: DPAC-GU-LTE [Tam-Noc-GLTAM010-LTE-66010]",
+                    "ifDescr": "1/3/2, 10/100/Gig Ethernet SFP, \\Mob: DPAC-GU-LTE [Tam-Noc-GLTAM010-LTE-66010]",
                     "ifName": "1/3/2",
                     "portName": null,
                     "ifIndex": 39911424,
@@ -3603,7 +3603,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
-                    "ifDescr": "1/3/4, 10/100/Gig Ethernet SFP, \\\\Temoprary-to-SITEB-7750 1/1/12",
+                    "ifDescr": "1/3/4, 10/100/Gig Ethernet SFP, \\Temoprary-to-SITEB-7750 1/1/12",
                     "ifName": "1/3/4",
                     "portName": null,
                     "ifIndex": 39976960,
@@ -3708,7 +3708,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": "Tam-NOC-TOYCELL-GLTAM869-LTE-668",
                     "port_descr_notes": null,
-                    "ifDescr": "1/3/5, 10/100/Gig Ethernet SFP, \\\\Mob: DPAC-GU-LTE [Tam-NOC-TOYCELL-GLTAM869-LTE-66869]",
+                    "ifDescr": "1/3/5, 10/100/Gig Ethernet SFP, \\Mob: DPAC-GU-LTE [Tam-NOC-TOYCELL-GLTAM869-LTE-66869]",
                     "ifName": "1/3/5",
                     "portName": null,
                     "ifIndex": 40009728,
@@ -3813,7 +3813,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": "PakiPlaza-GLAPAKIPLZA-MRBTS-6123",
                     "port_descr_notes": "TEST",
-                    "ifDescr": "1/3/6, 10/100/Gig Ethernet SFP, \\\\Mob: DPAC-GU-LTE [PakiPlaza-GLAPAKIPLZA-MRBTS-6123] (TEST)",
+                    "ifDescr": "1/3/6, 10/100/Gig Ethernet SFP, \\Mob: DPAC-GU-LTE [PakiPlaza-GLAPAKIPLZA-MRBTS-6123] (TEST)",
                     "ifName": "1/3/6",
                     "portName": null,
                     "ifIndex": 40042496,
@@ -3918,7 +3918,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
-                    "ifDescr": "1/3/7, 10/100/Gig Ethernet SFP, \\\\to-TEST-CISCO-2911",
+                    "ifDescr": "1/3/7, 10/100/Gig Ethernet SFP, \\to-TEST-CISCO-2911",
                     "ifName": "1/3/7",
                     "portName": null,
                     "ifIndex": 40075264,
@@ -4023,7 +4023,7 @@
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
                     "port_descr_notes": null,
-                    "ifDescr": "1/3/8, 10/100/Gig Ethernet SFP, \\\\SAR: to-SITEA-7750 1/1/8",
+                    "ifDescr": "1/3/8, 10/100/Gig Ethernet SFP, \\SAR: to-SITEA-7750 1/1/8",
                     "ifName": "1/3/8",
                     "portName": null,
                     "ifIndex": 40108032,
@@ -7448,8 +7448,7 @@
                     "bgpLocalAs": 65000,
                     "vrfLocalAs": 65000
                 }
-            ],
-            "bgpPeers_cbgp": []
+            ]
         },
         "poller": {
             "bgpPeers": [
@@ -7497,8 +7496,7 @@
                     "bgpLocalAs": 65000,
                     "vrfLocalAs": 65000
                 }
-            ],
-            "bgpPeers_cbgp": []
+            ]
         }
     },
     "mpls": {
@@ -8257,8 +8255,8 @@
                     "ospfIfMetricTOS": 0,
                     "ospfIfMetricValue": 0,
                     "ospfIfMetricStatus": "active",
-                    "context_name": null,
-                    "ifIndex": null
+                    "context_name": "",
+                    "ifIndex": 1
                 },
                 {
                     "ospf_port_id": "10.18.30.14.0",
@@ -8287,8 +8285,8 @@
                     "ospfIfMetricTOS": 0,
                     "ospfIfMetricValue": 0,
                     "ospfIfMetricStatus": "active",
-                    "context_name": null,
-                    "ifIndex": null
+                    "context_name": "",
+                    "ifIndex": 2
                 },
                 {
                     "ospf_port_id": "10.18.60.86.0",
@@ -8317,8 +8315,8 @@
                     "ospfIfMetricTOS": 0,
                     "ospfIfMetricValue": 100,
                     "ospfIfMetricStatus": "active",
-                    "context_name": null,
-                    "ifIndex": null
+                    "context_name": "",
+                    "ifIndex": 5
                 }
             ],
             "ospf_instances": [
@@ -8338,7 +8336,7 @@
                     "ospfMulticastExtensions": 0,
                     "ospfExitOverflowInterval": 0,
                     "ospfDemandExtensions": "false",
-                    "context_name": null
+                    "context_name": ""
                 }
             ],
             "ospf_areas": [
@@ -8353,7 +8351,7 @@
                     "ospfAreaLsaCksumSum": 27153464,
                     "ospfAreaSummary": "sendAreaSummary",
                     "ospfAreaStatus": "active",
-                    "context_name": null
+                    "context_name": ""
                 }
             ],
             "ospf_nbrs": [
@@ -8371,7 +8369,7 @@
                     "ospfNbmaNbrStatus": "active",
                     "ospfNbmaNbrPermanence": "dynamic",
                     "ospfNbrHelloSuppressed": "false",
-                    "context_name": null
+                    "context_name": ""
                 }
             ]
         }
