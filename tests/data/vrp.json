@@ -1,10 +1,4 @@
 {
-    "processors": {
-        "discovery": {
-            "processors": []
-        },
-        "poller": "matches discovery"
-    },
     "os": {
         "discovery": {
             "devices": [

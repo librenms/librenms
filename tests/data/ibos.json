@@ -13698,12 +13698,6 @@
         },
         "poller": "matches discovery"
     },
-    "mempools": {
-        "discovery": {
-            "mempools": []
-        },
-        "poller": "matches discovery"
-    },
     "sensors": {
         "discovery": {
             "sensors": [

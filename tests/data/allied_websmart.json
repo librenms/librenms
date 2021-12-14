@@ -1,10 +1,4 @@
 {
-    "mempools": {
-        "discovery": {
-            "mempools": []
-        },
-        "poller": "matches discovery"
-    },
     "ports": {
         "discovery": {
             "ports": [
@@ -5073,12 +5067,6 @@
                     "location": "<private>"
                 }
             ]
-        },
-        "poller": "matches discovery"
-    },
-    "processors": {
-        "discovery": {
-            "processors": []
         },
         "poller": "matches discovery"
     },

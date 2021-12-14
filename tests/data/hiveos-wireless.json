@@ -324,12 +324,6 @@
             ]
         }
     },
-    "ports": {
-        "discovery": {
-            "ports": []
-        },
-        "poller": "matches discovery"
-    },
     "processors": {
         "discovery": {
             "processors": [
