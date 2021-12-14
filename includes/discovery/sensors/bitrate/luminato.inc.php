@@ -51,9 +51,9 @@ if (is_array($pre_cache['transfer'])) {
                 $type = 'Transfer_' . $mname;
                 $defrate = $defrate * 1000 * 1000;
                 $descr = $mname . ' output ';
-                $descr.= sprintf('%02d', $pre_cache['transfer'][$key]['ifExtModule']) . '.'; //include module nr
-                $descr.= sprintf('%02d', $pre_cache['transfer'][$key]['ifExtPhysInterface']) . '.';
-                $descr.= sprintf('%02d', $pre_cache['transfer'][$key]['ifExtLogiInterface']);
+                $descr .= sprintf('%02d', $pre_cache['transfer'][$key]['ifExtModule']) . '.'; //include module nr
+                $descr .= sprintf('%02d', $pre_cache['transfer'][$key]['ifExtPhysInterface']) . '.';
+                $descr .= sprintf('%02d', $pre_cache['transfer'][$key]['ifExtLogiInterface']);
                 $group = 'Slot ' . $mnr;
                 $limit = $defrate * 1; //100%
                 $limitwarn = $defrate * 0.8; //80%
