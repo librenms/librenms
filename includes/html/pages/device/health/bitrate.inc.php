@@ -24,6 +24,6 @@
  */
 $class = 'bitrate';
 $unit = 'bps';
-$graph_type = 'sensor_signal';
+$graph_type = 'sensor_bitrate';
 
 require 'sensors.inc.php';

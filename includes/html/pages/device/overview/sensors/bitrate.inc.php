@@ -22,7 +22,7 @@
  * @copyright  2021 Peca Nesovanovic
  * @author     Peca Nesovanovic <peca.nesovanovic@sattrakt.com>
  */
-$graph_type = 'sensor_signal';
+$graph_type = 'sensor_bitrate';
 $sensor_class = 'bitrate';
 $sensor_unit = 'bps';
 $sensor_type = 'Bitrate';
