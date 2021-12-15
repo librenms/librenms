@@ -1876,8 +1876,7 @@
                     "bgpLocalAs": 20712,
                     "vrfLocalAs": null
                 }
-            ],
-            "bgpPeers_cbgp": []
+            ]
         },
         "poller": {
             "bgpPeers": [
