@@ -31,7 +31,7 @@ if (Rrd::checkRrdExists($rrd_filename)) {
     $rrd_options .= " GPRINT:PktLossOut:MIN:'%5.2lf' ";
     $rrd_options .= " GPRINT:PktLossOut:MAX:'%5.2lf' ";
     $rrd_options .= " GPRINT:PktLossOut:AVERAGE:'%5.2lf'\\\l ";
-    
+
     $rrd_options .= ' CDEF:PktLossIn=PacketLossDS,NumPackets,/,100,*,-1,* ';
     $rrd_options .= " LINE1.25:PktLossIn#008C00:'Dst to Src (%)  ' ";
     $rrd_options .= " GPRINT:PktLossIn:LAST:'%5.2lf' ";
