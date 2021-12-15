@@ -12,7 +12,7 @@
                     "features": null,
                     "os": "axiscam",
                     "type": "appliance",
-                    "serial": "AC CC 8E AC 27 C7",
+                    "serial": "ac:cc:8e:ac:27:c7",
                     "icon": "axis.svg",
                     "location": null
                 }
