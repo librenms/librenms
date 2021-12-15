@@ -8702,6 +8702,8 @@
     },
     "mpls": {
         "discovery": {
+            "mpls_lsps": [],
+            "mpls_lsp_paths": [],
             "mpls_sdps": [
                 {
                     "sdp_oid": 1971,
@@ -8775,6 +8777,8 @@
             ]
         },
         "poller": {
+            "mpls_lsps": [],
+            "mpls_lsp_paths": [],
             "mpls_sdps": [
                 {
                     "sdp_oid": 1971,
