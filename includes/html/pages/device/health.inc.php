@@ -48,6 +48,7 @@ $waterflow = dbFetchCell("select count(*) from sensors WHERE sensor_class='water
 $percent = dbFetchCell("select count(*) from sensors WHERE sensor_class='percent' AND device_id = ?", [$device['device_id']]);
 $tv_signal = dbFetchCell("select count(*) from sensors WHERE sensor_class='tv_signal' AND device_id = ?", [$device['device_id']]);
 $bitrate = Sensor::where('sensor_class', 'bitrate')->where('device_id', $device['device_id'])->count();
+
 unset($datas);
 $datas[] = 'overview';
 if ($processor) {
@@ -212,6 +213,7 @@ $type_text['count'] = 'Count';
 $type_text['load'] = 'Load';
 $type_text['signal'] = 'Signal';
 $type_text['tv_signal'] = 'TV signal';
+$type_text['bitrate'] = 'Bitrate';
 $type_text['airflow'] = 'Airflow';
 $type_text['snr'] = 'SNR';
 $type_text['pressure'] = 'Pressure';
