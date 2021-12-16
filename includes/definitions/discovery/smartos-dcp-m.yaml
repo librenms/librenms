@@ -1,7 +1,7 @@
 mib: DCP-INTERFACE-MIB
 modules:
     os:
-        sysDescr_regex: '/Smartoptics, DCP-M40-PAM4-ZR/'
+        sysDescr_regex: '/Smartoptics, (?<hardware>DCP-M[\d]{1,2}-PAM4(-[\w\+]+)?)/'
     sensors:
         state:
             data:
