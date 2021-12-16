@@ -3722,8 +3722,7 @@
                     "bridgeHelloTime": 0,
                     "bridgeForwardDelay": 0
                 }
-            ],
-            "ports_stp": []
+            ]
         },
         "poller": "matches discovery"
     }

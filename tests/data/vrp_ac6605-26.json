@@ -7771,8 +7771,7 @@
                     "bridgeHelloTime": 2,
                     "bridgeForwardDelay": 15
                 }
-            ],
-            "ports_stp": []
+            ]
         },
         "poller": "matches discovery"
     }
