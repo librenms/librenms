@@ -8727,8 +8727,7 @@
                     "vlan_type": null,
                     "vlan_mtu": null
                 }
-            ],
-            "ports_vlans": []
+            ]
         }
     }
 }

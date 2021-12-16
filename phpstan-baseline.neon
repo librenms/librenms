@@ -5926,16 +5926,6 @@ parameters:
 			path: LibreNMS/Util/ModuleTestHelper.php
 
 		-
-			message: "#^Method LibreNMS\\\\Util\\\\ModuleTestHelper\\:\\:collectComponents\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: LibreNMS/Util/ModuleTestHelper.php
-
-		-
-			message: "#^Method LibreNMS\\\\Util\\\\ModuleTestHelper\\:\\:collectComponents\\(\\) has parameter \\$device_id with no type specified\\.$#"
-			count: 1
-			path: LibreNMS/Util/ModuleTestHelper.php
-
-		-
 			message: "#^Method LibreNMS\\\\Util\\\\ModuleTestHelper\\:\\:collectOids\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: LibreNMS/Util/ModuleTestHelper.php
@@ -5957,16 +5947,6 @@ parameters:
 
 		-
 			message: "#^Method LibreNMS\\\\Util\\\\ModuleTestHelper\\:\\:compareOid\\(\\) has parameter \\$b with no type specified\\.$#"
-			count: 1
-			path: LibreNMS/Util/ModuleTestHelper.php
-
-		-
-			message: "#^Method LibreNMS\\\\Util\\\\ModuleTestHelper\\:\\:dataIsEmpty\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: LibreNMS/Util/ModuleTestHelper.php
-
-		-
-			message: "#^Method LibreNMS\\\\Util\\\\ModuleTestHelper\\:\\:dataIsEmpty\\(\\) has parameter \\$data with no type specified\\.$#"
 			count: 1
 			path: LibreNMS/Util/ModuleTestHelper.php
 
