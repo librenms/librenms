@@ -1,0 +1,32 @@
+--
+-- SO-MIB.mib
+-- Smartoptics Enterprise Specific MIB.
+--
+-- Copyright (c) 2018, Smartoptics
+-- All rights reserved
+--
+
+SO-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    enterprises, MODULE-IDENTITY
+        FROM SNMPv2-SMI;
+
+smartoptics MODULE-IDENTITY
+            LAST-UPDATED    "201810081444Z"
+            ORGANIZATION    "Smartoptics"
+            CONTACT-INFO    "http://www.smartoptics.com"
+            DESCRIPTION
+                            "This is the enterprise specific MIB for Smartoptics.
+                              The root of the OID sub-tree assigned to Smartoptics."
+            REVISION        "201810081444Z"
+            DESCRIPTION
+                            "The initial revision."
+
+            ::=  { enterprises  30826 }
+
+END
+
+--
+-- SO-MIB.mib
+--
