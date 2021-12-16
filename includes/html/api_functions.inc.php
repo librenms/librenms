@@ -32,6 +32,7 @@ use LibreNMS\Alerting\QueryBuilderParser;
 use LibreNMS\Config;
 use LibreNMS\Data\Store\Datastore;
 use LibreNMS\Exceptions\InvalidIpException;
+use LibreNMS\Exceptions\RemoteRrdRenameException;
 use LibreNMS\Util\IP;
 use LibreNMS\Util\IPv4;
 use LibreNMS\Util\Rewrite;
@@ -1939,15 +1940,15 @@ function rename_device(Illuminate\Http\Request $request)
     } elseif ($new_device) {
         return api_error(500, 'Device failed to rename, new hostname already exists');
     } else {
-        $result = renamehost($device_id, $new_hostname, 'api');
-        if ($result['message'] == '') {
-            if ($result['manual_rrd_rename']) {
-                return api_success_noresult(200, 'Device has been renamed but the RRD folder will have to be renamed manually, are you running a remote rrdcached?');
-            } else {
+        try {
+            $result = renamehost($device_id, $new_hostname, 'api');
+            if ($result['message'] == '') {
                 return api_success_noresult(200, 'Device has been renamed');
+            } else {
+                return api_error(500, 'Device failed to be renamed');
             }
-        } else {
-            return api_error(500, 'Device failed to be renamed');
+        } catch (RemoteRrdRenameException $e) {
+            return api_success_noresult(200, 'Device has been renamed but the RRD folder will have to be renamed manually, are you running a remote rrdcached?');
         }
     }
 }

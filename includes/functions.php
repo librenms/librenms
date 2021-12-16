@@ -16,6 +16,7 @@ use LibreNMS\Exceptions\HostIpExistsException;
 use LibreNMS\Exceptions\HostUnreachableException;
 use LibreNMS\Exceptions\HostUnreachablePingException;
 use LibreNMS\Exceptions\InvalidPortAssocModeException;
+use LibreNMS\Exceptions\RemoteRrdRenameException;
 use LibreNMS\Exceptions\SnmpVersionUnsupportedException;
 use LibreNMS\Modules\Core;
 use LibreNMS\Util\Debug;
@@ -272,12 +273,16 @@ function renamehost($id, $new, $source = 'console')
         dbUpdate(['hostname' => $new, 'ip' => null], 'devices', 'device_id=?', [$id]);
         log_event("Hostname changed -> $new ($source)", $id, 'system', 3);
 
-        return ['message' => '', 'manual_rrd_rename' => $is_remote_rrd];
+        if ($is_remote_rrd) {
+            throw new RemoteRrdRenameException('Host renamed but the associated RRD folder must be renamed manually');
+        }
+
+        return '';
     }
 
     log_event("Renaming of $host failed", $id, 'system', 5);
 
-    return ['message' => "Renaming of $host failed\n", 'manual_rrd_rename' => false];
+    return "Renaming of $host failed\n";
 }
 
 function device_discovery_trigger($id)

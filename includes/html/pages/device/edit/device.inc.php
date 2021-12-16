@@ -1,6 +1,7 @@
 <?php
 
 use App\Models\Device;
+use LibreNMS\Exceptions\RemoteRrdRenameException;
 
 require_once 'includes/html/modal/device_maintenance.inc.php';
 
@@ -55,16 +56,17 @@ if ($_POST['editing']) {
 
         if (isset($_POST['hostname']) && $_POST['hostname'] !== '' && $_POST['hostname'] !== $device['hostname']) {
             if (Auth::user()->hasGlobalAdmin()) {
-                $result = renamehost($device['device_id'], trim($_POST['hostname']), 'webui');
-                if ($result['message'] == '') {
-                    if ($result['manual_rrd_rename']) {
-                        flash()->addSuccess("Hostname updated from {$device['hostname']} to {$_POST['hostname']} but the RRD folder will have to be renamed manually, are you running a remote rrdcached?");
-                    } else {
+                try {
+                    $result = renamehost($device['device_id'], trim($_POST['hostname']), 'webui');
+                    if ($result['message'] == '') {
                         flash()->addSuccess("Hostname updated from {$device['hostname']} to {$_POST['hostname']}");
+                        $reload = true;
+                    } else {
+                        flash()->addError($result . '.  Does your web server have permission to modify the rrd files?');
                     }
+                } catch (RemoteRrdRenameException $e) {
+                    flash()->addSuccess("Hostname updated from {$device['hostname']} to {$_POST['hostname']} but the RRD folder will have to be renamed manually, are you running a remote rrdcached?");
                     $reload = true;
-                } else {
-                    flash()->addError($result . '.  Does your web server have permission to modify the rrd files?');
                 }
             } else {
                 flash()->addError('Only administrative users may update the device hostname');

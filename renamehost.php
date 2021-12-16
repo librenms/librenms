@@ -11,6 +11,8 @@
  * @copyright  (C) 2006 - 2012 Adam Armstrong
  */
 
+use LibreNMS\Exceptions\RemoteRrdRenameException;
+
 $init_modules = [];
 require __DIR__ . '/includes/init.php';
 
@@ -25,17 +27,18 @@ if ($argv[1] && $argv[2]) {
             echo "NOT renamed. New hostname $tohost already exists.\n";
             exit(1);
         } else {
-            $result = renamehost($id, $tohost, 'console');
-            if ($result['message'] == '') {
-                if ($result['manual_rrd_rename']) {
-                    echo "Renamed $host but the RRD folder will have to be renamed manually, are you running a remote rrdcached?\n";
-                } else {
+            try {
+                $result = renamehost($id, $tohost, 'console');
+                if ($result['message'] == '') {
                     echo "Renamed $host\n";
+                    exit(0);
+                } else {
+                    echo "NOT renamed: {$result['message']}";
+                    exit(1);
                 }
+            } catch (RemoteRrdRenameException $e) {
+                echo "Renamed $host but the RRD folder will have to be renamed manually, are you running a remote rrdcached?\n";
                 exit(0);
-            } else {
-                echo "NOT renamed: {$result['message']}";
-                exit(1);
             }
         }
     } else {
