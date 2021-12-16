@@ -4,9 +4,7 @@ type: network
 icon: smartoptics
 group: smartoptics
 over:
-    - { graph: device_bits, text: 'Device Traffic' }
-    - { graph: device_processor, text: 'CPU Usage' }
-    - { graph: device_mempool, text: 'Memory Usage' }
+    - { graph: device_dbm, text: dbm }
 discovery:
     -
         sysObjectID:
