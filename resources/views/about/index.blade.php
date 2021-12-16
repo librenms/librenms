@@ -77,7 +77,7 @@
 
           <h3>{{ __('Contributors') }}</h3>
 
-          <p>{{ __('See the <a href=":url">list of contributors</a> on GitHub.', ['url' => 'https://github.com/librenms/librenms/blob/master/AUTHORS.md']) }}</p>
+          <p>{!! __('See the <a href=":url">list of contributors</a> on GitHub.', ['url' => 'https://github.com/librenms/librenms/graphs/contributors']) !!}</p>
 
           <h3>{{ __('Acknowledgements') }}</h3>
 
