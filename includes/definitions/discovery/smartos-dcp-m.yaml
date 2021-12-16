@@ -1,7 +1,7 @@
-mib: DCP-INTERFACE-MIB:DCP-LINKVIEW-MIB
+mib: DCP-INTERFACE-MIB
 modules:
     os:
-        sysDescr_regex: '/Smart[Oo]ptics, (M-Series )?(?<hardware>\S+( [^,]+))(, SmartOS (?<version>\S+))?/'
+        sysDescr_regex: '/Smartoptics, DCP-M40-PAM4-ZR/'
     sensors:
         state:
             data:
@@ -16,7 +16,7 @@ modules:
                         - { value: 1, generic: 0, graph: 1, descr: idle }
                         - { value: 2, generic: 2, graph: 1, descr: down }
                         - { value: 3, generic: 0, graph: 1, descr: up }
-        power:
+        dbm:
             data:
                 -
                     oid: dcpInterfaceTable
