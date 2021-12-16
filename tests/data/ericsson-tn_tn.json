@@ -6981,8 +6981,7 @@
                     "vlan_type": null,
                     "vlan_mtu": null
                 }
-            ],
-            "ports_vlans": []
+            ]
         }
     },
     "wireless": {
@@ -7921,7 +7920,6 @@
     },
     "ospf": {
         "poller": {
-            "ospf_ports": [],
             "ospf_instances": [
                 {
                     "ospf_instance_id": 0,
@@ -7941,9 +7939,7 @@
                     "ospfDemandExtensions": "false",
                     "context_name": ""
                 }
-            ],
-            "ospf_areas": [],
-            "ospf_nbrs": []
+            ]
         }
     }
 }

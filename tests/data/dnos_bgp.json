@@ -38927,8 +38927,7 @@
                     "bgpLocalAs": 55832,
                     "vrfLocalAs": null
                 }
-            ],
-            "bgpPeers_cbgp": []
+            ]
         },
         "poller": {
             "bgpPeers": [
@@ -38976,8 +38975,7 @@
                     "bgpLocalAs": 55832,
                     "vrfLocalAs": null
                 }
-            ],
-            "bgpPeers_cbgp": []
+            ]
         }
     },
     "vlans": {

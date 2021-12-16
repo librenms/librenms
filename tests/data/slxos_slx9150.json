@@ -24973,8 +24973,7 @@
                     "bgpLocalAs": 23456,
                     "vrfLocalAs": null
                 }
-            ],
-            "bgpPeers_cbgp": []
+            ]
         },
         "poller": {
             "bgpPeers": [
@@ -25000,8 +24999,7 @@
                     "bgpLocalAs": 23456,
                     "vrfLocalAs": null
                 }
-            ],
-            "bgpPeers_cbgp": []
+            ]
         }
     },
     "vlans": {
