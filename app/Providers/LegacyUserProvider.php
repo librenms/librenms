@@ -136,6 +136,7 @@ class LegacyUserProvider implements UserProvider
                     'timezone' => UserPref::getPref($user, 'timezone'),
                 ]);
             }
+
             return true;
         } catch (AuthenticationException $ae) {
             $auth_message = $ae->getMessage();

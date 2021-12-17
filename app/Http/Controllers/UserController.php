@@ -80,7 +80,7 @@ class UserController extends Controller
             'user' => $tmp_user,
             'dashboard' => null,
             'dashboards' => Dashboard::allAvailable($tmp_user)->get(),
-            'timezone' => "default",
+            'timezone' => 'default',
         ]);
     }
 
@@ -145,7 +145,7 @@ class UserController extends Controller
             'user' => $user,
             'dashboard' => UserPref::getPref($user, 'dashboard'),
             'dashboards' => Dashboard::allAvailable($user)->get(),
-            'timezone' => UserPref::getPref($user, 'timezone') ? UserPref::getPref($user, 'timezone') : "default",
+            'timezone' => UserPref::getPref($user, 'timezone') ? UserPref::getPref($user, 'timezone') : 'default',
         ];
 
         if (Config::get('twofactor')) {
@@ -190,7 +190,7 @@ class UserController extends Controller
         }
 
         if ($request->has('timezone') && $this->updateTimezone($user, $request->get('timezone'))) {
-            if($request->get('timezone') != 'default') {
+            if ($request->get('timezone') != 'default') {
                 $flasher->addSuccess(__('Updated timezone for :username', ['username' => $user->username]));
             } else {
                 $flasher->addSuccess(__('Cleared timezone for :username', ['username' => $user->username]));
@@ -252,14 +252,14 @@ class UserController extends Controller
     protected function updateTimezone(User $user, $timezone)
     {
         $existing = UserPref::getPref($user, 'timezone');
-        if ($timezone != "default") {
+        if ($timezone != 'default') {
             if ($timezone != $existing) {
                 UserPref::setPref($user, 'timezone', $timezone);
 
                 return true;
             }
         } else {
-            if ($existing != "") {
+            if ($existing != '') {
                 UserPref::forgetPref($user, 'timezone');
 
                 return true;

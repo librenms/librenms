@@ -33,7 +33,7 @@ $nototal = ! $graph_params->visible('total');
 $nodetails = ! $graph_params->visible('details');
 $noagg = ! $graph_params->visible('aggregate');
 $rrd_options = '';
-$env = array();
+$env = [];
 
 if (session('timezone')) {
     $env['TZ'] = session('timezone');

@@ -33,7 +33,7 @@ class TimezoneController extends Controller
     public function set(Request $request)
     {
         // laravel session
-        if($request->timezone) {
+        if ($request->timezone) {
             session([
                 'timezone' => $request->timezone,
             ]);
