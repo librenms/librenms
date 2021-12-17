@@ -39,7 +39,7 @@ use Session;
 
 class UserPreferencesController extends Controller
 {
-    private $cachedPreferences = ['locale', 'site_style'];
+    private $cachedPreferences = ['locale', 'site_style', 'timezone'];
 
     public function __construct()
     {
@@ -73,6 +73,7 @@ class UserPreferencesController extends Controller
             'site_style' => UserPref::getPref($user, 'site_style'),
             'site_style_default' => $styles[$default_style] ?? $default_style,
             'site_styles' => $styles,
+            'timezone' => UserPref::getPref($user, 'timezone'),
             'hide_dashboard_editor' => UserPref::getPref($user, 'hide_dashboard_editor') ?? 0,
         ];
 
@@ -110,6 +111,7 @@ class UserPreferencesController extends Controller
                 'required',
                 Rule::in(array_merge(['default'], array_keys($this->getValidStyles()))),
             ],
+            'timezone' => 'required|string',
             'hide_dashboard_editor' => 'required|integer',
         ];
 
