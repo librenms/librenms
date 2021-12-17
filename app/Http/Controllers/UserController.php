@@ -253,6 +253,10 @@ class UserController extends Controller
     {
         $existing = UserPref::getPref($user, 'timezone');
         if ($timezone != 'default') {
+            if (! in_array($timezone, timezone_identifiers_list())) {
+                return false;
+            }
+
             if ($timezone != $existing) {
                 UserPref::setPref($user, 'timezone', $timezone);
 

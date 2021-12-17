@@ -111,7 +111,10 @@ class UserPreferencesController extends Controller
                 'required',
                 Rule::in(array_merge(['default'], array_keys($this->getValidStyles()))),
             ],
-            'timezone' => 'required|string',
+            'timezone' => [
+                'required',
+                Rule::in(array_merge(['default'], timezone_identifiers_list())),
+            ],
             'hide_dashboard_editor' => 'required|integer',
         ];
 

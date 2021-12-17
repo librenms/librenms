@@ -34,6 +34,11 @@ class TimezoneController extends Controller
     {
         // laravel session
         if ($request->timezone) {
+            // Only accept valid timezones
+            if(! in_array($request->timezone, timezone_identifiers_list())) {
+                return session('timezone');
+            }
+
             session([
                 'timezone' => $request->timezone,
             ]);
