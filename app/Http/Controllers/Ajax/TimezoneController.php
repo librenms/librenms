@@ -30,7 +30,7 @@ use Illuminate\Http\Request;
 
 class TimezoneController extends Controller
 {
-    public function set(Request $request) : string
+    public function set(Request $request): string
     {
         // laravel session
         if ($request->timezone) {
