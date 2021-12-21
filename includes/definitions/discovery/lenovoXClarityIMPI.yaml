@@ -8,7 +8,7 @@ modules:
         temperature: 
             data: 
                 - 
-                    oid: temperature 
+                    oid: 'temperature.{{ $index }}'
                     value: tempReading
                     num_oid: '.1.3.6.1.4.1.19046.11.1.1.1.2.{{ $index }}'
                     index: 'tempReading.{{ $index }}'
@@ -22,7 +22,7 @@ modules:
         voltage:
             data:
                 -
-                    oid: voltage
+                    oid: 'voltage.{{ $index }}'
                     value: voltReading
                     num_oid: '.1.3.6.1.4.1.19046.11.1.1.2.2.{{ $index }}'
                     index: 'voltReading.{{ $index }}'
@@ -35,7 +35,7 @@ modules:
         state:
             data:
                 -
-                    oid: systemHealthStat
+                    oid: 'systemHealthStat.{{ $index }}'
                     num_oid: '.1.3.6.1.4.1.19046.11.1.1.4.1.{{ $index }}'
                     index: 'systemHealthStat.{{ $index }}'
                     states:
@@ -58,7 +58,7 @@ modules:
         percent:
             data:
                 -
-                    oid: fans
+                    oid: 'fans.{{ $index }}'
                     value: fanSpeed
                     num_oid: '.1.3.6.1.4.1.19046.11.1.1.3.2.{{ $index }}'
                     index: 'fanSpeed.{{ $index }}'
