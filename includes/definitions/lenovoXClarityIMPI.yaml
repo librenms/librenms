@@ -2,7 +2,6 @@ os: lenovo-XClarity
 text: 'Lenovo XCC IMPI'
 type: appliance
 icon: lenovo
-over:
 discovery:
     -
         sysObjectID:
