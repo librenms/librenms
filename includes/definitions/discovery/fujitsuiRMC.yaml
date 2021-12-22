@@ -98,6 +98,6 @@ modules:
             data:
                 -
                     oid: sc2PowerMonitoringTable
-                    value: sc2pmNominalPowerConsumption
+                    value: sc2pmCurrentPowerConsumption
                     #num_oid: '.1.3.6.1.4.1.674.10892.2.4.1.1.14.{{ $index }}'
                     descr: 'PSU {{ $index }}'
