@@ -2697,7 +2697,7 @@ function add_location(Illuminate\Http\Request $request)
     // Set the location
     $timestamp = date('Y-m-d H:m:s');
     $insert = ['location' => $data['location'], 'lat' => $data['lat'], 'lng' => $data['lng'], 
-        'fixed_coordinates' => $data['fixed_coordinates'], 'timestamp' => $timestamp];
+        'fixed_coordinates' => $data['fixed_coordinates'], 'timestamp' => $timestamp, ];
     $location_id = dbInsert($insert, 'locations');
     if ($location_id != false) {
         return api_success_noresult(201, "Location added with id #$location_id");
