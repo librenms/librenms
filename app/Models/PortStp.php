@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use LibreNMS\Interfaces\Models\Keyable;
 
 class PortStp extends PortRelatedModel implements Keyable
@@ -28,5 +29,12 @@ class PortStp extends PortRelatedModel implements Keyable
     public function getCompositeKey()
     {
         return "$this->vlan-$this->port_index";
+    }
+
+    // ---- Define Relationships ----
+
+    public function device(): BelongsTo
+    {
+        return $this->belongsTo(\App\Models\Device::class, 'device_id', 'device_id');
     }
 }
