@@ -127,9 +127,7 @@ class Stp implements Module
         ModuleModelObserver::observe(\App\Models\Stp::class);
         $this->syncModels($os->getDevice(), 'stpInstances', $instances);
         echo "\nPorts: ";
-//        foreach ($ports as $port) {
-//            dump($port->toArray());
-//        }
+
         ModuleModelObserver::observe(PortStp::class);
         $this->syncModels($os->getDevice(), 'stpPorts', $ports);
         echo PHP_EOL;
