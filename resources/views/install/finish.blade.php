@@ -65,7 +65,11 @@
     <div class="col-12">
         <div class="alert alert-warning">
             <p>{{ __('install.finish.not_finished') }}</p>
-            <p>{{ __('install.finish.validate', ['validate' => '<a href="' . url('validate') . '">' . __('install.finish.validate_link') . '</a>']) }}</p>
+            <p>
+                {{ explode('|', __('install.finish.validate', ['validate' => '|']), 2)[0] }}
+                <a href="{{ url('validate') }}">{{ __('install.finish.validate_link') }}</a>
+                {{ explode('|', __('install.finish.validate', ['validate' => '|']), 2)[1] }}
+            </p>
         </div>
     </div>
 </div>
@@ -73,7 +77,9 @@
     <div class="col-12">
         <div class="alert alert-success">
             <p>{{ __('install.finish.thanks') }}</p>
-            <p>{{ __('install.finish.statistics', ['about' => '<a href="' . url('about') . '">' . __('install.finish.statistics_link') . '</a>']) }}</p>
+            {{ explode('|', __('install.finish.statistics', ['about' => '|']), 2)[0] }}
+            <a href="{{ url('about') }}">{{ __('install.finish.statistics_link') }}</a>
+            {{ explode('|', __('install.finish.statistics', ['about' => '|']), 2)[1] }}
         </div>
     </div>
 </div>

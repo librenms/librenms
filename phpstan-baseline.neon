@@ -5381,21 +5381,6 @@ parameters:
 			path: LibreNMS/Util/CiHelper.php
 
 		-
-			message: "#^Method LibreNMS\\\\Util\\\\Colors\\:\\:percentage\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: LibreNMS/Util/Colors.php
-
-		-
-			message: "#^Method LibreNMS\\\\Util\\\\Colors\\:\\:percentage\\(\\) has parameter \\$component_perc_warn with no type specified\\.$#"
-			count: 1
-			path: LibreNMS/Util/Colors.php
-
-		-
-			message: "#^Method LibreNMS\\\\Util\\\\Colors\\:\\:percentage\\(\\) has parameter \\$percentage with no type specified\\.$#"
-			count: 1
-			path: LibreNMS/Util/Colors.php
-
-		-
 			message: "#^Property LibreNMS\\\\Util\\\\Dns\\:\\:\\$resolver has no type specified\\.$#"
 			count: 1
 			path: LibreNMS/Util/Dns.php
@@ -5931,47 +5916,12 @@ parameters:
 			path: LibreNMS/Util/Laravel.php
 
 		-
-			message: "#^Method LibreNMS\\\\Util\\\\ModuleTestHelper\\:\\:captureFromDevice\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: LibreNMS/Util/ModuleTestHelper.php
-
-		-
-			message: "#^Method LibreNMS\\\\Util\\\\ModuleTestHelper\\:\\:captureFromDevice\\(\\) has parameter \\$device_id with no type specified\\.$#"
-			count: 1
-			path: LibreNMS/Util/ModuleTestHelper.php
-
-		-
-			message: "#^Method LibreNMS\\\\Util\\\\ModuleTestHelper\\:\\:captureFromDevice\\(\\) has parameter \\$full with no type specified\\.$#"
-			count: 1
-			path: LibreNMS/Util/ModuleTestHelper.php
-
-		-
-			message: "#^Method LibreNMS\\\\Util\\\\ModuleTestHelper\\:\\:captureFromDevice\\(\\) has parameter \\$prefer_new with no type specified\\.$#"
-			count: 1
-			path: LibreNMS/Util/ModuleTestHelper.php
-
-		-
-			message: "#^Method LibreNMS\\\\Util\\\\ModuleTestHelper\\:\\:captureFromDevice\\(\\) has parameter \\$write with no type specified\\.$#"
-			count: 1
-			path: LibreNMS/Util/ModuleTestHelper.php
-
-		-
 			message: "#^Method LibreNMS\\\\Util\\\\ModuleTestHelper\\:\\:cleanSnmprecData\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: LibreNMS/Util/ModuleTestHelper.php
 
 		-
 			message: "#^Method LibreNMS\\\\Util\\\\ModuleTestHelper\\:\\:cleanSnmprecData\\(\\) has parameter \\$data with no type specified\\.$#"
-			count: 1
-			path: LibreNMS/Util/ModuleTestHelper.php
-
-		-
-			message: "#^Method LibreNMS\\\\Util\\\\ModuleTestHelper\\:\\:collectComponents\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: LibreNMS/Util/ModuleTestHelper.php
-
-		-
-			message: "#^Method LibreNMS\\\\Util\\\\ModuleTestHelper\\:\\:collectComponents\\(\\) has parameter \\$device_id with no type specified\\.$#"
 			count: 1
 			path: LibreNMS/Util/ModuleTestHelper.php
 
@@ -5997,16 +5947,6 @@ parameters:
 
 		-
 			message: "#^Method LibreNMS\\\\Util\\\\ModuleTestHelper\\:\\:compareOid\\(\\) has parameter \\$b with no type specified\\.$#"
-			count: 1
-			path: LibreNMS/Util/ModuleTestHelper.php
-
-		-
-			message: "#^Method LibreNMS\\\\Util\\\\ModuleTestHelper\\:\\:dataIsEmpty\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: LibreNMS/Util/ModuleTestHelper.php
-
-		-
-			message: "#^Method LibreNMS\\\\Util\\\\ModuleTestHelper\\:\\:dataIsEmpty\\(\\) has parameter \\$data with no type specified\\.$#"
 			count: 1
 			path: LibreNMS/Util/ModuleTestHelper.php
 
@@ -6057,26 +5997,6 @@ parameters:
 
 		-
 			message: "#^Method LibreNMS\\\\Util\\\\ModuleTestHelper\\:\\:qPrint\\(\\) has parameter \\$var with no type specified\\.$#"
-			count: 1
-			path: LibreNMS/Util/ModuleTestHelper.php
-
-		-
-			message: "#^Method LibreNMS\\\\Util\\\\ModuleTestHelper\\:\\:saveSnmprec\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: LibreNMS/Util/ModuleTestHelper.php
-
-		-
-			message: "#^Method LibreNMS\\\\Util\\\\ModuleTestHelper\\:\\:saveSnmprec\\(\\) has parameter \\$data with no type specified\\.$#"
-			count: 1
-			path: LibreNMS/Util/ModuleTestHelper.php
-
-		-
-			message: "#^Method LibreNMS\\\\Util\\\\ModuleTestHelper\\:\\:saveSnmprec\\(\\) has parameter \\$prefer_new with no type specified\\.$#"
-			count: 1
-			path: LibreNMS/Util/ModuleTestHelper.php
-
-		-
-			message: "#^Method LibreNMS\\\\Util\\\\ModuleTestHelper\\:\\:saveSnmprec\\(\\) has parameter \\$write with no type specified\\.$#"
 			count: 1
 			path: LibreNMS/Util/ModuleTestHelper.php
 

@@ -108,6 +108,9 @@ Route::group(['middleware' => ['auth'], 'guard' => 'auth'], function () {
         Route::resource('pollergroup', 'PollerGroupController', ['only' => ['destroy']]);
         // misc ajax controllers
         Route::group(['namespace' => 'Ajax'], function () {
+            Route::get('search/bgp', 'BgpSearchController');
+            Route::get('search/device', 'DeviceSearchController');
+            Route::get('search/port', 'PortSearchController');
             Route::post('set_map_group', 'AvailabilityMapController@setGroup');
             Route::post('set_map_view', 'AvailabilityMapController@setView');
             Route::post('set_resolution', 'ResolutionController@set');

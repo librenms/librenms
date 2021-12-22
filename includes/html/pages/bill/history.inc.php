@@ -78,7 +78,7 @@ foreach (dbFetchRows('SELECT * FROM `bill_history` WHERE `bill_id` = ? ORDER BY 
         $rate_95th = Number::formatSi($history['rate_95th'], 2, 3, 'bps');
         $total_data = Number::formatBase($history['traf_total'], \LibreNMS\Config::get('billing.base'), 2, 3, '');
 
-        $background = \LibreNMS\Util\Colors::percentage($percent, null);
+        $background = \LibreNMS\Util\Color::percentage($percent, null);
 
         if ($type == 'CDR') {
             $allowed = Number::formatSi($history['bill_allowed'], 2, 3, 'bps');

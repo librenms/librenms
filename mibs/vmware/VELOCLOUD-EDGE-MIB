@@ -1,0 +1,1073 @@
+------------------------------------
+-- VeloCloud Edge MIB Definitions --
+------------------------------------
+
+VELOCLOUD-EDGE-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY,
+    OBJECT-TYPE,
+    Integer32,
+    TimeTicks,
+    Counter64
+        FROM SNMPv2-SMI
+     
+    OBJECT-GROUP,
+    MODULE-COMPLIANCE
+        FROM SNMPv2-CONF
+
+    TruthValue, 
+    DisplayString,
+    TEXTUAL-CONVENTION,
+    PhysAddress
+        FROM SNMPv2-TC
+    
+    InetAddress,
+    InetAddressType
+        FROM INET-ADDRESS-MIB
+    
+    InterfaceIndex                     
+        FROM IF-MIB
+
+    UUID
+        FROM UUID-TC-MIB 
+    
+    modules
+        FROM VELOCLOUD-MIB
+;
+
+edge MODULE-IDENTITY
+    LAST-UPDATED        "201908020000Z"
+    ORGANIZATION        "VMware Corporation"
+    CONTACT-INFO        "postal:    VMware Corporation
+                                    World Headquarters
+                                    3401 Hillview Avenue
+                                    Palo Alto, CA 94304
+                                    USA
+
+                         email:     contact@velocloud.com
+                         web:       www.velocloud.com"
+    DESCRIPTION         "VeloCloud Edge MIB Definitions"
+
+    REVISION            "201908020000Z"
+    DESCRIPTION         "Update definition of VeloCloud Edge MIB Objects"
+    
+    REVISION            "201701180000Z"
+    DESCRIPTION         "Implementation of VeloCloud Edge Module MIB Objects"
+
+    REVISION            "201701130000Z"
+    DESCRIPTION         "Inital definition of VeloCloud MIB Objects"
+::= { modules 1 }
+
+
+VceHaAdminStateType ::= TEXTUAL-CONVENTION
+    STATUS              current
+    DESCRIPTION         "VeloCloud specified enumeration type ha adminstration state."
+    SYNTAX              INTEGER {
+        none(1),
+        theVelocloudActiveStandbyPair(2),
+        theVeloCloudCluster(3),
+        nonVeloCloudVrrpPair(4),
+        unknown(5)
+    }
+
+VceHaPeerStateType ::=  TEXTUAL-CONVENTION
+    STATUS              current
+    DESCRIPTION         "VeloCloud specified enumeration type for ha peer state."
+    SYNTAX              INTEGER {
+        initializing(1),
+        active(2),
+        standby(3), 
+        unknown(4)
+    }
+
+VceLinkStateType ::=    TEXTUAL-CONVENTION
+    STATUS              current
+    DESCRIPTION         "VeloCloud specified enumeration type for link state."
+    SYNTAX              INTEGER {
+        initial(1), 
+        dead(2), 
+        unusable(3), 
+        quiet(4), 
+        standby(5),
+        unstable(6),
+        stable(7), 
+        unknown(8)
+    }
+
+VcePathStateType ::=    TEXTUAL-CONVENTION
+    STATUS              current
+    DESCRIPTION         "VeloCloud specified enumeration type for path state."
+    SYNTAX              INTEGER {
+        initial(1), 
+        dead(2), 
+        unusable(3), 
+        quiet(4),
+        unstable(5), 
+        bwUnmeasurable(6),
+        waitingForLinkbw(7),
+        measuringTxBw(8), 
+        measuringRxBw(9),
+        stable(10), 
+        active(11),
+        upHsby(12),
+        idleHsby(13),
+        backup(14),
+        unknown(15)
+    }
+
+VcePathTunlModeType ::= TEXTUAL-CONVENTION
+    STATUS              current
+    DESCRIPTION         "VeloCloud specified enumeration type for path tunnel mode."
+    SYNTAX              INTEGER {
+        default(1),
+        trusted(2),
+        untrustedTransport(3),
+        untrustedTunnel(4),
+        unknown(5)
+    }
+
+VceArpStateType ::=     TEXTUAL-CONVENTION
+    STATUS              current
+    DESCRIPTION         "VeloCloud specified enumeration type for arp state."
+    SYNTAX              INTEGER {
+        reachable(1),
+        stale(2),
+        invalid(5),
+        unknown(6),
+        incomplete(7)
+    }
+
+
+--------------------------------
+-- .edge(1) Top Level         --
+--                            --
+-- Contains OIDs:             --
+--      .vceCompliance(1)     --
+--      .vceEdgeObject(2)     --
+--------------------------------
+vceCompliance           MODULE-COMPLIANCE
+    STATUS              current
+    DESCRIPTION         "Compliance statement for all VeloCloud edge(vce) objects."
+    MODULE
+    MANDATORY-GROUPS {
+        vceHaGroup,
+        vceHealthGroup,
+        vceLinkGroup,
+        vcePathGroup,
+        vceArpGroup
+    }
+::= { edge 1 }
+
+vceEdgeObject           OBJECT IDENTIFIER ::= { edge 2 }
+
+
+--------------------------------
+-- .vceEdgeObject(2)          --
+--                            --
+-- Contains OIDs:             --
+--      .vceHA(1)             --
+--      .vceHealth(2)         --
+--      .vceLink(3)           --
+--      .vcePath(4)           --
+--      .vceARP(5)            --
+--------------------------------
+vceHA                  OBJECT IDENTIFIER ::= { vceEdgeObject 1 }
+vceHealth              OBJECT IDENTIFIER ::= { vceEdgeObject 2 }
+vceLink                OBJECT IDENTIFIER ::= { vceEdgeObject 3 }
+vcePath                OBJECT IDENTIFIER ::= { vceEdgeObject 4 }
+vceARP                 OBJECT IDENTIFIER ::= { vceEdgeObject 5 }
+
+
+--------------------------------
+-- .vceDevice(1)              --
+--                            --
+-- Contains OIDs:             --
+--      .deviceGroup(1)       --
+--      .vceDeviceObject(2)   --
+--------------------------------
+vceHaGroup         OBJECT-GROUP
+    OBJECTS {
+        vceHaAdminState,
+        vceHaPeerState,
+        vceHaActiveWanItfNum, 
+        vceHaActiveLanItfNum, 
+        vceHaStanbyWanItfNum, 
+        vceHaStanbyLanItfNum 
+    }
+    STATUS          current
+    DESCRIPTION     "Conformance group for vceHaGroup objects."
+::= { vceHA 1 }
+vceHAObject         OBJECT IDENTIFIER ::= { vceHA 2 }
+
+
+----------------------------------
+-- .vceHAObject(2)              --
+--                              --
+-- Contains OIDs:               --
+--      .vcehaState(1)          --
+--      .vcehaActiveWanItfNum(2)--
+--      .vcehaActiveLanItfNum(3)--
+--      .vcehaStanbyWanItfNum(4)   --
+--      .vcehaStanbyWLanItfNum(5)  --
+----------------------------------
+vceHaAdminState     OBJECT-TYPE
+    SYNTAX          VceHaAdminStateType 
+    MAX-ACCESS      read-only 
+    STATUS          current 
+    DESCRIPTION     "The state of HA administration."
+::= { vceHAObject 1 }
+
+vceHaPeerState      OBJECT-TYPE
+    SYNTAX          VceHaPeerStateType 
+    MAX-ACCESS      read-only 
+    STATUS          current 
+    DESCRIPTION     "The state of HA peer."
+::= { vceHAObject 2 }
+
+vceHaActiveWanItfNum    OBJECT-TYPE
+    SYNTAX              Integer32 
+    MAX-ACCESS          read-only 
+    STATUS              current 
+    DESCRIPTION         "The total number of WAN interface on this active edge."
+::= { vceHAObject 3 }
+
+vceHaActiveLanItfNum    OBJECT-TYPE
+    SYNTAX              Integer32 
+    MAX-ACCESS          read-only 
+    STATUS              current 
+    DESCRIPTION         "The total number of LAN interface on this active edge."
+::= { vceHAObject 4 }
+
+vceHaStanbyWanItfNum   OBJECT-TYPE
+    SYNTAX          Integer32 
+    MAX-ACCESS      read-only 
+    STATUS          current 
+    DESCRIPTION     "The total number of WAN interface on stanby peer."
+::= { vceHAObject 5 }
+
+vceHaStanbyLanItfNum   OBJECT-TYPE
+    SYNTAX          Integer32 
+    MAX-ACCESS      read-only 
+    STATUS          current 
+    DESCRIPTION     "The total number of LAN interface on stanby peer."
+::= { vceHAObject 6 }
+
+
+--------------------------------
+-- .vceHealth(2)              --
+--                            --
+-- Contains OIDs:             --
+--      .vceHealthGroup(1)    --
+--      .vceHealthObject(2)   --
+--------------------------------
+vceHealthGroup      OBJECT-GROUP
+    OBJECTS {
+        vceCpuUtilPct5min,
+        vceCpuUtilPct30sec,
+        vceMemUsedPct
+    }
+    STATUS          current
+    DESCRIPTION     "Conformance group for vceHealthGroup objects."
+::= { vceHealth 1 }
+vceHealthObject     OBJECT IDENTIFIER ::= { vceHealth 2 }
+
+
+--------------------------------
+-- .vceHealtObject(2)         --
+--                            --
+-- Contains OIDs:             --
+--      .vceCpuUtilPct5min(1) --
+--      .vceCpuUtilPct30sec(2)--
+--      .vceMemUsedPct(3)     --
+--------------------------------
+vceCpuUtilPct5min   OBJECT-TYPE
+    SYNTAX          Integer32
+    MAX-ACCESS      read-only 
+    STATUS          current 
+    DESCRIPTION     "The average CPU utilization percentage of the VeloCloud Edge in 5 minutes."
+::= { vceHealthObject 1 }
+
+vceCpuUtilPct30sec  OBJECT-TYPE
+    SYNTAX          Integer32
+    MAX-ACCESS      read-only 
+    STATUS          current 
+    DESCRIPTION     "The average CPU utilization percentage of the VeloCloud Edge in 30 seconds."
+::= { vceHealthObject 2 }
+
+vceMemUsedPct       OBJECT-TYPE
+    SYNTAX          Integer32
+    MAX-ACCESS      read-only 
+    STATUS          current 
+    DESCRIPTION     "The total used memory percentage of the VeloCloud Edge."
+::= { vceHealthObject 3 }
+
+
+--------------------------------
+-- .vceLink(4)                --
+--------------------------------
+vceLinkGroup        OBJECT-GROUP
+    OBJECTS {
+   		vceLinkNum,
+        vceLinkName,                      
+        vceLinkTxP1Pkt,                      
+        vceLinkRxP1Pkt,                     
+        vceLinkTxP1Bytes,                   
+        vceLinkRxP1Bytes,                 
+        vceLinkTxP2Pkt,                 
+        vceLinkRxP2Pkt,                    
+        vceLinkTxP2Bytes,                   
+        vceLinkRxP2Bytes,                  
+        vceLinkTxP3Pkt,                    
+        vceLinkRxP3Pkt,                     
+        vceLinkTxP3Bytes,                   
+        vceLinkRxP3Bytes,                  
+        vceLinkTxCtlPkt,                
+        vceLinkRxCtlPkt,               
+        vceLinkTxCtlBytes,             
+        vceLinkRxCtlBytes,            
+        vceLinkTxJitter,              
+        vceLinkRxJitter,                   
+        vceLinkTxLatency,                      
+        vceLinkRxLatency,                     
+        vceLinkTxLostPkt,                 
+        vceLinkRxLostPkt,                 
+        vceLinkVpnState,                    
+        vceLinkPublicIpType,                   
+        vceLinkPublicIp,                   
+        vceLinkLocalIpType,                   
+        vceLinkLocalIp,                   
+        vceLinkVlanId,                     
+        vceLinkMtu,
+        vceLinkItf,
+        vceLinkState,
+        vceLinkVeloSvcReachable,
+        vceLinkTotTxPkts,
+        vceLinkTotRxPkts,
+        vceLinkTotTxbytes,
+        vceLinkTotRxBytes,
+        vceLinkIf,
+        vceLinkNextHopType,
+        vceLinkNextHop 
+    }
+    STATUS          current
+    DESCRIPTION     "Conformance group for vceLinkGroup objects."
+::= { vceLink 1 }
+vceLinkObject         OBJECT IDENTIFIER ::= {  vceLink 2 }
+
+vceLinkNum              OBJECT-TYPE
+    SYNTAX              Integer32
+    MAX-ACCESS          read-only
+    STATUS              current
+    DESCRIPTION         "The total number of links presented on the VeloCloud Edge."
+::= { vceLinkObject 1 }
+
+vceLinkTable            OBJECT-TYPE
+    SYNTAX              SEQUENCE OF VceLinkEntry
+    MAX-ACCESS          not-accessible
+    STATUS              current
+    DESCRIPTION         "A list of link entries. The number of entries
+                        is given by the value of vceLinkNum."
+::= { vceLinkObject 2 }
+
+vceLinkEntry            OBJECT-TYPE
+    SYNTAX              VceLinkEntry
+    MAX-ACCESS          not-accessible
+    STATUS              current
+    DESCRIPTION         "An entry containing additional management information
+                        applicable to a particular link"
+    INDEX               { vceLinkIntId }
+::= { vceLinkTable 1 }
+
+VceLinkEntry ::=
+    SEQUENCE {
+        vceLinkIntId           UUID,            
+        vceLinkName            DisplayString,            
+        vceLinkTxP1Pkt         Counter64,             
+        vceLinkRxP1Pkt         Counter64,             
+        vceLinkTxP1Bytes       Counter64,            
+        vceLinkRxP1Bytes       Counter64,           
+        vceLinkTxP2Pkt         Counter64,           
+        vceLinkRxP2Pkt         Counter64,            
+        vceLinkTxP2Bytes       Counter64,            
+        vceLinkRxP2Bytes       Counter64,           
+        vceLinkTxP3Pkt         Counter64,           
+        vceLinkRxP3Pkt         Counter64,            
+        vceLinkTxP3Bytes       Counter64,
+        vceLinkRxP3Bytes       Counter64,           
+        vceLinkTxCtlPkt        Counter64,        
+        vceLinkRxCtlPkt        Counter64,       
+        vceLinkTxCtlBytes      Counter64,       
+        vceLinkRxCtlBytes      Counter64,      
+        vceLinkTxJitter        Counter64,      
+        vceLinkRxJitter        Counter64,           
+        vceLinkTxLatency       Counter64,           
+        vceLinkRxLatency       Counter64,          
+        vceLinkTxLostPkt       Counter64,          
+        vceLinkRxLostPkt       Counter64,          
+        vceLinkVpnState        VceLinkStateType,            
+        vceLinkPublicIpType    InetAddressType,           
+        vceLinkPublicIp        InetAddress,           
+        vceLinkLocalIpType     InetAddressType,          
+        vceLinkLocalIp         InetAddress,          
+        vceLinkVlanId          Integer32,           
+        vceLinkMtu             Integer32,
+        vceLinkItf             DisplayString,
+        vceLinkState           VceLinkStateType,
+        vceLinkVeloSvcReachable TruthValue,
+        vceLinkTotTxPkts       Counter64,
+        vceLinkTotRxPkts       Counter64,
+        vceLinkTotTxbytes      Counter64,
+        vceLinkTotRxBytes      Counter64,
+        vceLinkIf              InterfaceIndex,
+        vceLinkNextHopType     InetAddressType, 
+        vceLinkNextHop         InetAddress 
+    }
+
+--------------------------------
+-- .linkEntry                 --
+--                            --
+-- Contains OIDs:             --
+--      .vceLinkIntId(2)      --
+--      .vceLinkName(3)       --
+--      ...                   --
+--      ...                   --
+--      ...                   --
+--      .vceLinkNextHop(42)   --
+--------------------------------
+vceLinkIntId        OBJECT-TYPE
+    SYNTAX          UUID
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION     "A unique value, greater than zero, for each link." 
+::= { vceLinkEntry 2 }
+
+vceLinkName         OBJECT-TYPE
+    SYNTAX          DisplayString         
+    MAX-ACCESS      read-only 
+    STATUS          current 
+    DESCRIPTION     "The textual name configured for the link."
+::= { vceLinkEntry 3 }
+
+vceLinkTxP1Pkt      OBJECT-TYPE
+    SYNTAX          Counter64 
+    MAX-ACCESS      read-only 
+    STATUS          current 
+    DESCRIPTION     "Total packets transmitted through P1 link."
+::= { vceLinkEntry 4 }
+
+vceLinkRxP1Pkt      OBJECT-TYPE
+    SYNTAX          Counter64 
+    MAX-ACCESS      read-only 
+    STATUS          current 
+    DESCRIPTION     "Total packets received through P1 link."
+::= { vceLinkEntry 5 }
+
+vceLinkTxP1Bytes    OBJECT-TYPE
+    SYNTAX          Counter64 
+    MAX-ACCESS      read-only 
+    STATUS          current 
+    DESCRIPTION     "Total Bytes transmitted through P1 link."
+::= { vceLinkEntry 6 }
+
+vceLinkRxP1Bytes    OBJECT-TYPE
+    SYNTAX          Counter64 
+    MAX-ACCESS      read-only 
+    STATUS          current 
+    DESCRIPTION     "Total Bytes received through P1 link."
+::= { vceLinkEntry 7 }
+
+vceLinkTxP2Pkt      OBJECT-TYPE
+    SYNTAX          Counter64 
+    MAX-ACCESS      read-only 
+    STATUS          current 
+    DESCRIPTION     "Total packets transmitted through P2 link."
+::= { vceLinkEntry 8 }
+
+vceLinkRxP2Pkt      OBJECT-TYPE
+    SYNTAX          Counter64 
+    MAX-ACCESS      read-only 
+    STATUS          current 
+    DESCRIPTION     "Total packets received through P2 link."
+::= { vceLinkEntry 9 }
+
+vceLinkTxP2Bytes    OBJECT-TYPE
+    SYNTAX          Counter64 
+    MAX-ACCESS      read-only 
+    STATUS          current 
+    DESCRIPTION     "Total Bytes transmitted through P2 link."
+::= { vceLinkEntry 10 }
+
+vceLinkRxP2Bytes    OBJECT-TYPE
+    SYNTAX          Counter64 
+    MAX-ACCESS      read-only 
+    STATUS          current 
+    DESCRIPTION     "Total Bytes received through P2 link."
+::= { vceLinkEntry 11 }
+
+vceLinkTxP3Pkt      OBJECT-TYPE
+    SYNTAX          Counter64 
+    MAX-ACCESS      read-only 
+    STATUS          current 
+    DESCRIPTION     "Total packets transmitted through P3 link."
+::= { vceLinkEntry 12 }
+
+vceLinkRxP3Pkt      OBJECT-TYPE
+    SYNTAX          Counter64 
+    MAX-ACCESS      read-only 
+    STATUS          current 
+    DESCRIPTION     "Total packets received through P3 link."
+::= { vceLinkEntry 13 }
+
+vceLinkTxP3Bytes    OBJECT-TYPE
+    SYNTAX          Counter64 
+    MAX-ACCESS      read-only 
+    STATUS          current 
+    DESCRIPTION     "Total Bytes transmitted through P3 link."
+::= { vceLinkEntry 14 }
+
+vceLinkRxP3Bytes    OBJECT-TYPE
+    SYNTAX          Counter64 
+    MAX-ACCESS      read-only 
+    STATUS          current 
+    DESCRIPTION     "Total Bytes received through P3 link."
+::= { vceLinkEntry 15 }
+
+vceLinkTxCtlPkt     OBJECT-TYPE
+    SYNTAX          Counter64 
+    MAX-ACCESS      read-only 
+    STATUS          current 
+    DESCRIPTION     "Total control packets transmitted."
+::= { vceLinkEntry 16 }
+
+vceLinkRxCtlPkt     OBJECT-TYPE
+    SYNTAX          Counter64 
+    MAX-ACCESS      read-only 
+    STATUS          current 
+    DESCRIPTION     "Total control packets received."
+::= { vceLinkEntry 17 }
+
+vceLinkTxCtlBytes   OBJECT-TYPE
+    SYNTAX          Counter64 
+    MAX-ACCESS      read-only 
+    STATUS          current 
+    DESCRIPTION     "Total control bytes transmitted."
+::= { vceLinkEntry 18 }
+
+vceLinkRxCtlBytes   OBJECT-TYPE
+    SYNTAX          Counter64 
+    MAX-ACCESS      read-only 
+    STATUS          current 
+    DESCRIPTION     "Total control bytes received."
+::= { vceLinkEntry 19 }
+
+vceLinkTxJitter     OBJECT-TYPE
+    SYNTAX          Counter64 
+    MAX-ACCESS      read-only 
+    STATUS          current 
+    DESCRIPTION     "Total outbound jitter."
+::= { vceLinkEntry 20 }
+
+vceLinkRxJitter     OBJECT-TYPE
+    SYNTAX          Counter64 
+    MAX-ACCESS      read-only 
+    STATUS          current 
+    DESCRIPTION     "Total inbound jitter."
+::= { vceLinkEntry 21 }
+
+vceLinkTxLatency    OBJECT-TYPE
+    SYNTAX          Counter64 
+    MAX-ACCESS      read-only 
+    STATUS          current 
+    DESCRIPTION     "Total outbound latency."
+::= { vceLinkEntry 22 }
+
+vceLinkRxLatency    OBJECT-TYPE
+    SYNTAX          Counter64 
+    MAX-ACCESS      read-only 
+    STATUS          current 
+    DESCRIPTION     "Total inbound latency."
+::= { vceLinkEntry 23 }
+
+vceLinkTxLostPkt    OBJECT-TYPE
+    SYNTAX          Counter64 
+    MAX-ACCESS      read-only 
+    STATUS          current 
+    DESCRIPTION     "Total outbound loss packets."
+::= { vceLinkEntry 24 }
+
+vceLinkRxLostPkt    OBJECT-TYPE
+    SYNTAX          Counter64 
+    MAX-ACCESS      read-only 
+    STATUS          current 
+    DESCRIPTION     "Total inbound loss packets."
+::= { vceLinkEntry 25 }
+
+vceLinkVpnState     OBJECT-TYPE
+    SYNTAX          VceLinkStateType 
+    MAX-ACCESS      read-only 
+    STATUS          current 
+    DESCRIPTION     "State of VPN connection."
+::= { vceLinkEntry 26 }
+
+vceLinkPublicIpType OBJECT-TYPE
+    SYNTAX          InetAddressType
+    MAX-ACCESS      read-only 
+    STATUS          current 
+    DESCRIPTION     "Type of public IP address of the link."
+::= { vceLinkEntry 27 }
+
+vceLinkPublicIp     OBJECT-TYPE
+    SYNTAX          InetAddress
+    MAX-ACCESS      read-only 
+    STATUS          current 
+    DESCRIPTION     "Public IP address of the link."
+::= { vceLinkEntry 28 }
+
+vceLinkLocalIpType  OBJECT-TYPE
+    SYNTAX          InetAddressType 
+    MAX-ACCESS      read-only 
+    STATUS          current 
+    DESCRIPTION     "Type of local IP address assigned."
+::= { vceLinkEntry 29 }
+
+
+vceLinkLocalIp      OBJECT-TYPE
+    SYNTAX          InetAddress 
+    MAX-ACCESS      read-only 
+    STATUS          current 
+    DESCRIPTION     "Local IP address assigned."
+::= { vceLinkEntry 30 }
+
+vceLinkVlanId       OBJECT-TYPE
+    SYNTAX          Integer32 
+    MAX-ACCESS      read-only 
+    STATUS          current 
+    DESCRIPTION     "VLAN ID assigned."
+::= { vceLinkEntry 31 }
+
+vceLinkMtu          OBJECT-TYPE
+    SYNTAX          Integer32 
+    MAX-ACCESS      read-only 
+    STATUS          current 
+    DESCRIPTION     "MTU set for the link."
+::= { vceLinkEntry 32 }
+
+vceLinkItf          OBJECT-TYPE
+    SYNTAX          DisplayString 
+    MAX-ACCESS      read-only 
+    STATUS          current 
+    DESCRIPTION     "Interface logic name of the link."
+::= { vceLinkEntry 33 }
+
+vceLinkState        OBJECT-TYPE
+    SYNTAX          VceLinkStateType 
+    MAX-ACCESS      read-only 
+    STATUS          current 
+    DESCRIPTION     "State of the Link."
+::= { vceLinkEntry 34 }
+
+vceLinkVeloSvcReachable OBJECT-TYPE
+    SYNTAX              TruthValue
+    MAX-ACCESS          read-only 
+    STATUS              current 
+    DESCRIPTION         "Reachability of the service state."
+::= { vceLinkEntry 35 }
+
+vceLinkTotTxPkts    OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only 
+    STATUS          current 
+    DESCRIPTION     "Total packets transmitted."
+::= { vceLinkEntry 36 } 
+
+vceLinkTotRxPkts    OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only 
+    STATUS          current 
+    DESCRIPTION     "Total packets received."
+::= { vceLinkEntry 37 } 
+
+vceLinkTotTxbytes   OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only 
+    STATUS          current 
+    DESCRIPTION     "Total bytes transmitted."
+::= { vceLinkEntry 38 } 
+
+vceLinkTotRxBytes   OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only 
+    STATUS          current 
+    DESCRIPTION     "Total bytes received."
+::= { vceLinkEntry 39 } 
+
+vceLinkIf           OBJECT-TYPE
+    SYNTAX          InterfaceIndex
+    MAX-ACCESS      read-only 
+    STATUS          current 
+    DESCRIPTION     "Interface Index of the vceLink bounded interface."
+::= { vceLinkEntry 40 }
+
+vceLinkNextHopType  OBJECT-TYPE
+    SYNTAX          InetAddressType
+    MAX-ACCESS      read-only 
+    STATUS          current 
+    DESCRIPTION     "Type of the link Next Hop IP address."
+::= { vceLinkEntry 41 }
+
+vceLinkNextHop      OBJECT-TYPE
+    SYNTAX          InetAddress
+    MAX-ACCESS      read-only 
+    STATUS          current 
+    DESCRIPTION     "The link Next Hop IP address."
+::= { vceLinkEntry 42 }
+
+
+--------------------------------
+-- .vcePath(5)                --
+--------------------------------
+vcePathGroup        OBJECT-GROUP
+    OBJECTS {
+        vcePathNum,
+        vcePathIpType, 
+        vcePathIp, 
+        vcePathPeerName,
+        vcePathState,     
+        vcePathUpTime, 
+        vcePathRxState,         
+        vcePathTxState,       
+        vcePathTunlMode,    
+        vcePathTxAveLatency,  
+        vcePathRxAveLatency,   
+        vcePathRxBytes, 
+        vcePathTxBytes,     
+        vcePathRxLostPkt,   
+        vcePathTxLostPkt, 
+        vcePathRxPkt,
+        vcePathTxPkt,   
+        vcePathRxJitter,
+        vcePathTxJitter      
+    }
+    STATUS              current
+    DESCRIPTION         "Conformance group for vcePathGroup objects."
+::= { vcePath 1 }
+vcePathObject           OBJECT IDENTIFIER ::= {  vcePath 2 }
+
+vcePathNum              OBJECT-TYPE
+    SYNTAX              Integer32
+    MAX-ACCESS          read-only
+    STATUS              current
+    DESCRIPTION         "The total number of path presented on the VeloCloud Edge."
+::= { vcePathObject 1 }
+
+vcePathTable            OBJECT-TYPE
+    SYNTAX              SEQUENCE OF VcePathEntry
+    MAX-ACCESS          not-accessible
+    STATUS              current
+    DESCRIPTION         "A list of path entries. The number of entries
+                        is given by the value of vcePathNum."
+::= { vcePathObject 2 }
+
+vcePathEntry            OBJECT-TYPE
+    SYNTAX              VcePathEntry
+    MAX-ACCESS          not-accessible
+    STATUS              current
+    DESCRIPTION         "An entry containing additional management information
+                        applicable to a particular path"
+    INDEX               { vcePathIfIntId, vcePathGwAddrType, vcePathGwAddr }
+::= { vcePathTable 1 }
+
+VcePathEntry ::=
+    SEQUENCE {
+        vcePathIfIntId          UUID,
+        vcePathIpType           InetAddressType, 
+        vcePathIp               InetAddress, 
+        vcePathGwAddrType       InetAddressType,
+        vcePathGwAddr           InetAddress,
+        vcePathPeerName         DisplayString,
+        vcePathState            VcePathStateType,     
+        vcePathUpTime           TimeTicks, 
+        vcePathRxState          VcePathStateType,         
+        vcePathTxState          VcePathStateType,       
+        vcePathTunlMode         VcePathTunlModeType,    
+        vcePathTxAveLatency     Integer32,  
+        vcePathRxAveLatency     Integer32,   
+        vcePathRxBytes          Counter64, 
+        vcePathTxBytes          Counter64,     
+        vcePathRxLostPkt        Counter64,   
+        vcePathTxLostPkt        Counter64, 
+        vcePathRxPkt            Counter64,
+        vcePathTxPkt            Counter64,   
+        vcePathRxJitter         Counter64,
+        vcePathTxJitter         Counter64       
+    }
+
+--------------------------------
+-- .pathEntry                 --
+--                            --
+-- Contains OIDs:             --
+--      .vcePathIfIntId(1)    --
+--      ...                   --
+--      ...                   --
+--      ...                   --
+--      .vcePathTxJitter(22)  --
+--------------------------------
+vcePathIfIntId      OBJECT-TYPE
+    SYNTAX          UUID
+    MAX-ACCESS      not-accessible
+    STATUS          current 
+    DESCRIPTION     "A unique value, greater than zero, representing the internal id of the
+                    link used by the path." 
+::= { vcePathEntry 1 }
+
+vcePathIpType       OBJECT-TYPE
+    SYNTAX          InetAddressType 
+    MAX-ACCESS      read-only 
+    STATUS          current 
+    DESCRIPTION     "Type of the path IP address."
+::= { vcePathEntry 2 }
+
+vcePathIp           OBJECT-TYPE
+    SYNTAX          InetAddress 
+    MAX-ACCESS      read-only 
+    STATUS          current 
+    DESCRIPTION     "The IP address of the path."
+::= { vcePathEntry 3 }
+
+vcePathGwAddrType   OBJECT-TYPE
+    SYNTAX          InetAddressType
+    MAX-ACCESS      not-accessible
+    STATUS          current 
+    DESCRIPTION     "Type of path gateway IP address."
+::= { vcePathEntry 4 }
+
+vcePathGwAddr       OBJECT-TYPE
+    SYNTAX          InetAddress
+    MAX-ACCESS      not-accessible
+    STATUS          current 
+    DESCRIPTION     "The path gateway IP address."
+::= { vcePathEntry 5 }
+
+vcePathPeerName     OBJECT-TYPE
+    SYNTAX          DisplayString
+    MAX-ACCESS      read-only 
+    STATUS          current 
+    DESCRIPTION     "The textual name configured for the path."
+::= { vcePathEntry 6 }
+
+vcePathState        OBJECT-TYPE
+    SYNTAX          VcePathStateType
+    MAX-ACCESS      read-only 
+    STATUS          current 
+    DESCRIPTION     "The current state of the path."
+::= { vcePathEntry 7 }
+
+vcePathUpTime       OBJECT-TYPE
+    SYNTAX          TimeTicks
+    MAX-ACCESS      read-only 
+    STATUS          current 
+    DESCRIPTION     "Total uptime of the path in miliseconds."
+::= { vcePathEntry 8 }
+
+vcePathRxState      OBJECT-TYPE
+    SYNTAX          VcePathStateType
+    MAX-ACCESS      read-only 
+    STATUS          current 
+    DESCRIPTION     "The receive state of the path."
+::= { vcePathEntry 10 }
+
+vcePathTxState      OBJECT-TYPE
+    SYNTAX          VcePathStateType
+    MAX-ACCESS      read-only 
+    STATUS          current 
+    DESCRIPTION     "The transmit state of the path."
+::= { vcePathEntry 11 }
+
+vcePathTunlMode     OBJECT-TYPE
+    SYNTAX          VcePathTunlModeType
+    MAX-ACCESS      read-only 
+    STATUS          current 
+    DESCRIPTION     "The mode type of the path tunnel."
+::= { vcePathEntry 12 }
+
+vcePathTxAveLatency OBJECT-TYPE
+    SYNTAX          Integer32
+    MAX-ACCESS      read-only 
+    STATUS          current 
+    DESCRIPTION     "The average inbound latency measured on the path."
+::= { vcePathEntry 13 }
+
+vcePathRxAveLatency OBJECT-TYPE
+    SYNTAX          Integer32
+    MAX-ACCESS      read-only 
+    STATUS          current 
+    DESCRIPTION     "The average inbound latency measured on the path."
+::= { vcePathEntry 14 }
+
+vcePathRxBytes      OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only 
+    STATUS          current 
+    DESCRIPTION     "The total number of received bytes."
+::= { vcePathEntry 15 }
+
+vcePathTxBytes      OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only 
+    STATUS          current 
+    DESCRIPTION     "The total number of transmitted bytes."
+::= { vcePathEntry 16 }
+
+vcePathRxLostPkt    OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only 
+    STATUS          current 
+    DESCRIPTION     "The Total number of lost inbound packets."
+::= { vcePathEntry 17 }
+
+vcePathTxLostPkt    OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only 
+    STATUS          current 
+    DESCRIPTION     "The total number of lost outbound packets."
+::= { vcePathEntry 18 }
+
+vcePathRxPkt           OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only 
+    STATUS          current 
+    DESCRIPTION     "Total number of received packets."
+::= { vcePathEntry 19 }
+
+vcePathTxPkt        OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only 
+    STATUS          current 
+    DESCRIPTION     "Total number of transmitted packets."
+::= { vcePathEntry 20 }
+
+vcePathRxJitter     OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only 
+    STATUS          current 
+    DESCRIPTION     "Total inbound jitter."
+::= { vcePathEntry 21 }
+
+vcePathTxJitter     OBJECT-TYPE
+    SYNTAX          Counter64
+    MAX-ACCESS      read-only 
+    STATUS          current 
+    DESCRIPTION     "Total outbound jitter."
+::= { vcePathEntry 22 }
+
+
+--------------------------------
+-- .vceARP(6)                 --
+--------------------------------
+vceArpGroup             OBJECT-GROUP
+    OBJECTS {
+        vceArpNum,
+        vceArpMac,
+        vceArpStag,
+        vceArpCtag,
+        vceArpState
+    }
+    STATUS              current
+    DESCRIPTION         "Conformance group for vceArpGroup objects."
+::= { vceARP 1 }
+vceArpObject           OBJECT IDENTIFIER ::= {  vceARP 2 }
+
+vceArpNum               OBJECT-TYPE
+    SYNTAX              Integer32
+    MAX-ACCESS          read-only
+    STATUS              current
+    DESCRIPTION         "The total number of arp entries presented on the VeloCloud Edge."
+::= { vceArpObject 1 }
+
+vceArpTable             OBJECT-TYPE
+    SYNTAX              SEQUENCE OF VceArpEntry
+    MAX-ACCESS          not-accessible
+    STATUS              current
+    DESCRIPTION         "A list of arp entries. The number of entries
+                        is given by the value of vceArpNum."
+::= { vceArpObject 2 }
+
+vceArpEntry             OBJECT-TYPE
+    SYNTAX              VceArpEntry
+    MAX-ACCESS          not-accessible
+    STATUS              current
+    DESCRIPTION         "An entry containing additional management information
+                        applicable to a particular arp entry"
+    INDEX               { vceArpItf, vceArpIpAddrType, vceArpIpAddr }
+::= { vceArpTable 1 }
+
+VceArpEntry ::=
+    SEQUENCE {
+        vceArpItf          InterfaceIndex,
+        vceArpIpAddrType   InetAddressType,
+        vceArpIpAddr       InetAddress,
+        vceArpMac          PhysAddress,
+        vceArpStag         Integer32,
+        vceArpCtag         Integer32,
+        vceArpState        VceArpStateType
+    }
+
+--------------------------------
+-- .arpEntry                  --
+--                            --
+-- Contains OIDs:             --
+--      .vcerpItf(1)          --
+--      ...                   --
+--      .vceArpState(7)       --
+--------------------------------
+vceArpItf               OBJECT-TYPE
+    SYNTAX              InterfaceIndex
+    MAX-ACCESS          not-accessible
+    STATUS              current 
+    DESCRIPTION         "A unique value, greater than zero, for the interface used by the arp entry."
+::= { vceArpEntry 1 }
+
+vceArpIpAddrType        OBJECT-TYPE
+    SYNTAX              InetAddressType
+    MAX-ACCESS          not-accessible
+    STATUS              current 
+    DESCRIPTION         "The type of arp IP address."
+::= { vceArpEntry 2 }
+
+vceArpIpAddr            OBJECT-TYPE
+    SYNTAX              InetAddress
+    MAX-ACCESS          not-accessible
+    STATUS              current 
+    DESCRIPTION         "The Ip address of the arp entry"
+::= { vceArpEntry 3 }
+
+vceArpMac               OBJECT-TYPE
+    SYNTAX              PhysAddress (SIZE(0..65535))
+    MAX-ACCESS          read-only 
+    STATUS              current 
+    DESCRIPTION         "The MAC address of the arp entry"
+::= { vceArpEntry 4 }
+
+vceArpStag              OBJECT-TYPE
+    SYNTAX              Integer32
+    MAX-ACCESS          read-only 
+    STATUS              current 
+    DESCRIPTION         "S-tag value"
+::= { vceArpEntry 5 }
+
+vceArpCtag              OBJECT-TYPE
+    SYNTAX              Integer32
+    MAX-ACCESS          read-only 
+    STATUS              current 
+    DESCRIPTION         "C-tag value"
+::= { vceArpEntry 6 }
+
+vceArpState             OBJECT-TYPE
+    SYNTAX              VceArpStateType
+    MAX-ACCESS          read-only 
+    STATUS              current 
+    DESCRIPTION         "The State of arp entry"
+::= { vceArpEntry 7 }
+
+END

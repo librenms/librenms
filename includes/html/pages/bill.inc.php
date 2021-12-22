@@ -161,7 +161,7 @@ if (bill_permitted($bill_id)) {
             $percent = round((($total_data) / $bill_data['bill_quota'] * 100), 2);
             $unit = 'MB';
             $total_data = round($total_data, 2);
-            $background = \LibreNMS\Util\Colors::percentage($percent, null);
+            $background = \LibreNMS\Util\Color::percentage($percent, null);
             $type = '&amp;ave=yes'; ?>
         <td>
             <?php echo format_bytes_billing($total_data) ?> of <?php echo format_bytes_billing($bill_data['bill_quota']) . ' (' . $percent . '%)' ?>
@@ -181,7 +181,7 @@ if (bill_permitted($bill_id)) {
             $cdr = $bill_data['bill_cdr'];
             $rate_95th = round($rate_95th, 2);
             $percent = round((($rate_95th) / $cdr * 100), 2);
-            $background = \LibreNMS\Util\Colors::percentage($percent, null);
+            $background = \LibreNMS\Util\Color::percentage($percent, null);
             $type = '&amp;95th=yes'; ?>
         <td>
             <?php echo \LibreNMS\Util\Number::formatSi($rate_95th, 2, 3, '') . 'bps' ?> of <?php echo \LibreNMS\Util\Number::formatSi($cdr, 2, 3, '') . 'bps (' . $percent . '%)' ?> (95th%ile)
