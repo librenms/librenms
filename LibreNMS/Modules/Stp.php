@@ -27,12 +27,13 @@ namespace LibreNMS\Modules;
 
 use App\Models\PortStp;
 use App\Observers\ModuleModelObserver;
-use Illuminate\Support\Collection;
 use LibreNMS\DB\SyncsModels;
+use LibreNMS\Interfaces\Discovery\StpInstanceDiscovery;
+use LibreNMS\Interfaces\Discovery\StpPortDiscovery;
 use LibreNMS\Interfaces\Module;
+use LibreNMS\Interfaces\Polling\StpInstancePolling;
+use LibreNMS\Interfaces\Polling\StpPortPolling;
 use LibreNMS\OS;
-use LibreNMS\Util\Rewrite;
-use SnmpQuery;
 
 class Stp implements Module
 {
@@ -40,131 +41,41 @@ class Stp implements Module
 
     public function discover(OS $os): void
     {
-        $protocol = SnmpQuery::get('BRIDGE-MIB::dot1dStpProtocolSpecification.0')->value();
-        // 1 = unknown (mstp?), 3 = ieee8021d
+        $device = $os->getDevice();
 
-        if ($protocol != 1 && $protocol != 3) {
-            return;
-        }
+        if ($os instanceof StpInstanceDiscovery) {
+            echo 'Instances: ';
+            $instances = $os->discoverStpInstances();
+            ModuleModelObserver::observe(\App\Models\Stp::class);
+            $this->syncModels($device, 'stpInstances', $instances);
 
-        $timeFactor = $os->stpTimeFactor ?? 0.01;
-
-        $vlans = $protocol == 1 ? $os->getDevice()->vlans : new Collection;
-        $ports = new Collection;
-        $instances = new Collection;
-
-        foreach ($vlans->isEmpty() ? [null] : $vlans as $vlan) {
-            // fetch STP config and store it
-            $vlan = $vlan->vlan_vlan ?? null;
-            $instance = SnmpQuery::context($vlan, 'vlan-')->enumStrings()->get([
-                'BRIDGE-MIB::dot1dBaseBridgeAddress.0',
-                'BRIDGE-MIB::dot1dStpProtocolSpecification.0',
-                'BRIDGE-MIB::dot1dStpPriority.0',
-                'BRIDGE-MIB::dot1dStpTimeSinceTopologyChange.0',
-                'BRIDGE-MIB::dot1dStpTopChanges.0',
-                'BRIDGE-MIB::dot1dStpDesignatedRoot.0',
-                'BRIDGE-MIB::dot1dStpRootCost.0',
-                'BRIDGE-MIB::dot1dStpRootPort.0',
-                'BRIDGE-MIB::dot1dStpMaxAge.0',
-                'BRIDGE-MIB::dot1dStpHelloTime.0',
-                'BRIDGE-MIB::dot1dStpHoldTime.0',
-                'BRIDGE-MIB::dot1dStpForwardDelay.0',
-                'BRIDGE-MIB::dot1dStpBridgeMaxAge.0',
-                'BRIDGE-MIB::dot1dStpBridgeHelloTime.0',
-                'BRIDGE-MIB::dot1dStpBridgeForwardDelay.0',
-            ]);
-
-            if (! $instance->isValid()) {
-                continue;
+            if ($os instanceof StpPortDiscovery) {
+                echo "\nPorts: ";
+                $ports = $os->discoverStpPorts($instances);
+                ModuleModelObserver::observe(PortStp::class);
+                $this->syncModels($device, 'stpPorts', $ports);
             }
-
-            $stp = $instance->values();
-
-            $bridge = Rewrite::macToHex($stp['BRIDGE-MIB::dot1dBaseBridgeAddress.0'] ?? '');
-            $instances->push(new \App\Models\Stp([
-                'vlan' => $vlan,
-                'rootBridge' => $bridge == $this->rootToMac($stp['BRIDGE-MIB::dot1dStpDesignatedRoot.0'] ?? 0) ? 1 : 0,
-                'bridgeAddress' => $bridge,
-                'protocolSpecification' => $stp['BRIDGE-MIB::dot1dStpProtocolSpecification.0'] ?? 'unknown',
-                'priority' => $stp['BRIDGE-MIB::dot1dStpPriority.0'] ?? 0,
-                'timeSinceTopologyChange' => substr($stp['BRIDGE-MIB::dot1dStpTimeSinceTopologyChange.0'] ?? '', 0, -2) ?: 0,
-                'topChanges' => $stp['BRIDGE-MIB::dot1dStpTopChanges.0'] ?? 0,
-                'designatedRoot' => $this->rootToMac($stp['BRIDGE-MIB::dot1dStpDesignatedRoot.0'] ?? ''),
-                'rootCost' => $stp['BRIDGE-MIB::dot1dStpRootCost.0'] ?? 0,
-                'rootPort' => $stp['BRIDGE-MIB::dot1dStpRootPort.0'] ?? 0,
-                'maxAge' => ($stp['BRIDGE-MIB::dot1dStpMaxAge.0'] ?? 0) * $timeFactor,
-                'helloTime' => ($stp['BRIDGE-MIB::dot1dStpHelloTime.0'] ?? 0) * $timeFactor,
-                'holdTime' => ($stp['BRIDGE-MIB::dot1dStpHoldTime.0'] ?? 0) * $timeFactor,
-                'forwardDelay' => ($stp['BRIDGE-MIB::dot1dStpForwardDelay.0'] ?? 0) * $timeFactor,
-                'bridgeMaxAge' => ($stp['BRIDGE-MIB::dot1dStpBridgeMaxAge.0'] ?? 0) * $timeFactor,
-                'bridgeHelloTime' => ($stp['BRIDGE-MIB::dot1dStpBridgeHelloTime.0'] ?? 0) * $timeFactor,
-                'bridgeForwardDelay' => ($stp['BRIDGE-MIB::dot1dStpBridgeForwardDelay.0'] ?? 0) * $timeFactor,
-            ]));
-
-            $ports = $ports->merge(SnmpQuery::context($vlan, 'vlan-')
-                ->enumStrings()->walk('BRIDGE-MIB::dot1dStpPortTable')
-                ->mapTable(function ($data, $port) use ($os, $vlan) {
-                    return new PortStp([
-                        'vlan' => $vlan,
-                        'port_id' => $os->basePortToId($port),
-                        'port_index' => $port,
-                        'priority' => $data['BRIDGE-MIB::dot1dStpPortPriority'] ?? 0,
-                        'state' => $data['BRIDGE-MIB::dot1dStpPortState'] ?? 'unknown',
-                        'enable' => $data['BRIDGE-MIB::dot1dStpPortEnable'] ?? 'unknown',
-                        'pathCost' => $data['BRIDGE-MIB::dot1dStpPortPathCost32'] ?? $data['BRIDGE-MIB::dot1dStpPortPathCost'] ?? 0,
-                        'designatedRoot' => $this->rootToMac($data['BRIDGE-MIB::dot1dStpPortDesignatedRoot'] ?? ''),
-                        'designatedCost' => $data['BRIDGE-MIB::dot1dStpPortDesignatedCost'] ?? 0,
-                        'designatedBridge' => $this->rootToMac($data['BRIDGE-MIB::dot1dStpPortDesignatedBridge'] ?? ''),
-                        'designatedPort' => $this->designatedPort($data['BRIDGE-MIB::dot1dStpPortDesignatedPort'] ?? ''),
-                        'forwardTransitions' => $data['BRIDGE-MIB::dot1dStpPortForwardTransitions'] ?? 0,
-                    ]);
-                })->filter(function (PortStp $port) {
-                    return $port->enable !== 'disabled' && $port->state !== 'disabled' && $port->port_id > 0;
-                }));
+            echo PHP_EOL;
         }
-
-        echo 'Instances: ';
-        ModuleModelObserver::observe(\App\Models\Stp::class);
-        $this->syncModels($os->getDevice(), 'stpInstances', $instances);
-        echo "\nPorts: ";
-
-        ModuleModelObserver::observe(PortStp::class);
-        $this->syncModels($os->getDevice(), 'stpPorts', $ports);
-        echo PHP_EOL;
     }
 
     public function poll(OS $os): void
     {
-        $ports = $os->getDevice()->stpPorts;
+        $device = $os->getDevice();
 
-        if ($ports->isEmpty()) {
-            return;
+        if ($os instanceof StpInstancePolling) {
+            echo 'Instances: ';
+            $instances = $device->stpInstances;
+            $instances = $os->pollStpIntances($instances);
+            ModuleModelObserver::observe(\App\Models\Stp::class);
+            $this->syncModels($device, 'stpInstances', $instances);
         }
 
-        ModuleModelObserver::observe(PortStp::class);
-
-        foreach ($ports->groupBy('vlan') as $vlan => $vlan_ports) {
-            $vlan_ports = $vlan_ports->keyBy('port_index');
-            $oids = $vlan_ports->keys()->sort()->reduce(function ($carry, $base_port) {
-                $carry[] = 'BRIDGE-MIB::dot1dStpPortState.' . $base_port;
-                $carry[] = 'BRIDGE-MIB::dot1dStpPortEnable.' . $base_port;
-                $carry[] = 'BRIDGE-MIB::dot1dStpPortDesignatedRoot.' . $base_port;
-                $carry[] = 'BRIDGE-MIB::dot1dStpPortDesignatedBridge.' . $base_port;
-
-                return $carry;
-            }, []);
-
-            SnmpQuery::context("$vlan", 'vlan-')->enumStrings()->get($oids)
-                ->mapTable(function ($data, $base_port) use ($vlan, $vlan_ports) {
-                    $port = $vlan_ports->get($base_port);
-                    $port->vlan = $vlan;
-                    $port->state = $data['BRIDGE-MIB::dot1dStpPortState'] ?? 'unknown';
-                    $port->enable = $data['BRIDGE-MIB::dot1dStpPortEnable'] ?? 'unknown';
-                    $port->designatedRoot = $this->rootToMac($data['BRIDGE-MIB::dot1dStpPortDesignatedRoot'] ?? '');
-                    $port->designatedBridge = $this->rootToMac($data['BRIDGE-MIB::dot1dStpPortDesignatedBridge'] ?? '');
-
-                    return $port;
-                })->each->save();
+        if ($os instanceof StpPortPolling) {
+            echo "\nPorts: ";
+            $ports = $device->stpPorts;
+            ModuleModelObserver::observe(PortStp::class);
+            $this->syncModels($device, 'stpPorts', $ports);
         }
     }
 

@@ -198,10 +198,11 @@ class Rewrite
      */
     public static function macToHex(string $mac): string
     {
-        $mac_array = explode(':', str_replace(['-', '.'], ':', strtolower($mac)));
-        $mac_padding = array_fill(0, count($mac_array), 12 / count($mac_array));
+        $mac_array = explode(':', str_replace(['-', '.', ' '], ':', strtolower(trim($mac))));
+        $len = count($mac_array);
+        $mac_padding = array_fill(0, $len, 12 / $len);
 
-        return implode(array_map('zeropad', $mac_array, $mac_padding));
+        return substr(implode(array_map('zeropad', $mac_array, $mac_padding)), -12);
     }
 
     /**
