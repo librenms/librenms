@@ -13,7 +13,7 @@ modules:
     processors:
         data:
             -
-                oid: extremeCpuMonitorSystemUtilization5mins
-                num_oid: '.1.3.6.1.4.1.1916.1.32.1.4.1.9.{{ $index }}'
+                oid: extremeCpuMonitorTotalUtilization
+                num_oid: '.1.3.6.1.4.1.1916.1.32.1.2.{{ $index }}'
                 index: 0
                 type: extreme-cpu
