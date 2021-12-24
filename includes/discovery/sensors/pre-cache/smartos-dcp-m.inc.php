@@ -22,5 +22,4 @@
  * @copyright  2021 Arnoud Vermeer
  * @author     Arnoud Vermeer <a.vermeer@freshway.biz>
  */
-
 $pre_cache['smartos_oids'] = snmpwalk_cache_multi_oid($device, 'dcpInterfaceEntry', [], 'DCP-INTERFACE-MIB', 'smartos-dcp-m');
