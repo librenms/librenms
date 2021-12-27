@@ -45,7 +45,7 @@ class Fortigate extends Fortinet implements
         $device->hardware = $device->hardware ?: $this->getHardwareName();
     }
 
-    public function pollOS()
+    public function pollOS(): void
     {
         $sessions = snmp_get($this->getDeviceArray(), 'FORTINET-FORTIGATE-MIB::fgSysSesCount.0', '-Ovq');
         if (is_numeric($sessions)) {

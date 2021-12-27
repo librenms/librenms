@@ -1227,7 +1227,129 @@
 				the current interface."
 			::= { proMpegFecEntry 7 }
 	
-			
+
+-- Input service information
+		-- 1.3.6.1.4.1.3715.17.3.4
+		inputServiceTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF InputServiceEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION			
+				""
+			::= { interface 4 }
+
+		
+		-- 1.3.6.1.4.1.3715.17.3.4.1
+		inputServiceEntry OBJECT-TYPE
+			SYNTAX InputServiceEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION			
+				""
+			INDEX { ifExtIndex }
+			::= { inputServiceTable 1 }
+
+
+		InputServiceEntry ::=
+			SEQUENCE { 
+				iSID
+					INTEGER,
+				iServiceName
+					DisplayString,
+				iServiceBitrate
+					INTEGER
+			 }
+
+		-- 1.3.6.1.4.1.3715.17.3.4.1.2
+		iSID OBJECT-TYPE
+			SYNTAX INTEGER (0..65535)
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Unique service id number inside the transport stream."
+			::= { inputServiceEntry 2 }
+
+		-- 1.3.6.1.4.1.3715.17.3.4.1.3
+		iServiceName OBJECT-TYPE
+			SYNTAX DisplayString
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The name of the service."
+			::= { inputServiceEntry 3 }
+
+
+		-- 1.3.6.1.4.1.3715.17.3.4.1.4
+		iServiceBitrate OBJECT-TYPE
+			SYNTAX INTEGER (0..65535)
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The bitrate of service"
+			::= { inputServiceEntry 4 }
+
+		-- Output service information
+
+		-- 1.3.6.1.4.1.3715.17.3.5
+		outputServiceTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF OutputServiceEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION			
+				""
+			::= { interface 5 }
+
+		
+		-- 1.3.6.1.4.1.3715.17.3.5.1
+		outputServiceEntry OBJECT-TYPE
+			SYNTAX OutputServiceEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION			
+				""
+			INDEX { ifExtIndex }
+			::= { outputServiceTable 1 }
+
+
+		OutputServiceEntry ::=
+			SEQUENCE { 
+				oSID
+					INTEGER,
+				oServiceName
+					DisplayString,
+				oServiceBitrate
+					INTEGER
+			 }
+
+		-- 1.3.6.1.4.1.3715.17.3.5.1.2
+		oSID OBJECT-TYPE
+			SYNTAX INTEGER (0..65535)
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Unique service id number inside the transport stream."
+			::= { outputServiceEntry 2 }
+
+		-- 1.3.6.1.4.1.3715.17.3.5.1.2
+		oServiceName OBJECT-TYPE
+			SYNTAX DisplayString
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The name of the service."
+			::= { outputServiceEntry 3 }
+
+
+		-- 1.3.6.1.4.1.3715.17.3.5.1.3
+		oServiceBitrate OBJECT-TYPE
+			SYNTAX INTEGER (0..65535)
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"The bitrate of service"
+			::= { outputServiceEntry 4 }
+----------------------------------------------------------------------
+
 		-- 1.3.6.1.4.1.3715.17.4
 		notifications OBJECT IDENTIFIER ::= { luminato 4 }	
 

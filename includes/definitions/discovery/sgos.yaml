@@ -1,4 +1,7 @@
 modules:
+    os:
+        hardware: BLUECOAT-SG-PROXY-MIB::sgProxySoftware.0
+        version: BLUECOAT-SG-PROXY-MIB::sgProxyVersion.0
     mempools:
         data:
             -

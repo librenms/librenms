@@ -1,20 +1,20 @@
 <div<div x-data="notificationSubscriptionStatus()">
-    <div x-show="! supported">@lang('components.notification-subscription-status.no-support')</div>
+    <div x-show="! supported">{{ __('components.notification-subscription-status.no-support') }}</div>
     @if($userHasTransport)
     <div x-show="supported">
         <div>
-            <span x-text="enabled ? '@lang('components.notification-subscription-status.enabled')' : '@lang('components.notification-subscription-status.disabled')'"></span>
-            <button x-on:click="toggle()" type="button" class="tw-float-right tw-border tw-border-gray-500 tw-text-gray-500 hover:tw-bg-gray-500 hover:tw-text-gray-100 tw-rounded tw-px-4 tw-py-2" x-text="enabled ? '@lang('components.notification-subscription-status.disable')' : '@lang('components.notification-subscription-status.enable')'"></button>
+            <span x-text="enabled ? '{{ __('components.notification-subscription-status.enabled') }}' : '{{ __('components.notification-subscription-status.disabled') }}'"></span>
+            <button x-on:click="toggle()" type="button" class="tw-float-right tw-border tw-border-gray-500 tw-text-gray-500 hover:tw-bg-gray-500 hover:tw-text-gray-100 tw-rounded tw-px-4 tw-py-2" x-text="enabled ? '{{ __('components.notification-subscription-status.disable') }}' : '{{ __('components.notification-subscription-status.enable') }}'"></button>
         </div>
     </div>
     @else
     <div x-show="supported">
         @admin
             <a href="{{ url('alert-transports') }}">
-                @lang('components.notification-subscription-status.no-transport')
+                {{ __('components.notification-subscription-status.no-transport') }}
             </a>
         @else
-            @lang('components.notification-subscription-status.no-transport')
+            {{ __('components.notification-subscription-status.no-transport') }}
         @endadmin
     </div>
     @endif

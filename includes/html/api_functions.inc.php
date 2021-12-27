@@ -305,12 +305,17 @@ function list_devices(Illuminate\Http\Request $request)
 
     if ($type == 'all' || empty($type)) {
         $sql = '1';
+    } elseif ($type == 'device_id') {
+        $sql = '`d`.`device_id` = ?';
+        $param[] = $query;
     } elseif ($type == 'active') {
         $sql = "`d`.`ignore`='0' AND `d`.`disabled`='0'";
     } elseif ($type == 'location') {
-        $sql = "`locations`.`location` LIKE '%" . $query . "%'";
+        $sql = '`locations`.`location` LIKE ?';
+        $param[] = "%$query%";
     } elseif ($type == 'hostname') {
-        $sql = "`d`.`hostname` LIKE '%" . $query . "%'";
+        $sql = '`d`.`hostname` LIKE ?';
+        $param[] = "%$query%";
     } elseif ($type == 'ignored') {
         $sql = "`d`.`ignore`='1' AND `d`.`disabled`='0'";
     } elseif ($type == 'up') {
@@ -2691,7 +2696,7 @@ function add_location(Illuminate\Http\Request $request)
     }
     // Set the location
     $timestamp = date('Y-m-d H:m:s');
-    $insert = ['location' => $data['location'], 'lat' => $data['lat'], 'lng' => $data['lng'], 'timestamp' => $timestamp];
+    $insert = ['location' => $data['location'], 'lat' => $data['lat'], 'lng' => $data['lng'], 'fixed_coordinates' => $data['fixed_coordinates'] ?? 1, 'timestamp' => $timestamp];
     $location_id = dbInsert($insert, 'locations');
     if ($location_id != false) {
         return api_success_noresult(201, "Location added with id #$location_id");

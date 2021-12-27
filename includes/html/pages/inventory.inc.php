@@ -31,7 +31,7 @@ var grid = $("#inventory").bootgrid({
                 "<div class=\"col-sm-9 actionBar\"><span class=\"pull-left\"><form method=\"post\" action=\"\" class=\"form-inline\" role=\"form\">"+
                 "<?php echo addslashes(csrf_field()) ?>"+
                 "<div class=\"form-group\">"+
-                "<input type=\"text\" name=\"string\" id=\"string\" value=\"<?php echo $_POST['string']; ?>\" placeholder=\"Description\" class=\"form-control input-sm\" />"+
+                "<input type=\"text\" name=\"string\" id=\"string\" value=\"<?php echo htmlspecialchars($_POST['string']); ?>\" placeholder=\"Description\" class=\"form-control input-sm\" />"+
                 "</div>"+
                 "<div class=\"form-group\">"+
                 "<strong>&nbsp;Part No&nbsp;</strong>"+
@@ -50,7 +50,7 @@ foreach (dbFetchRows('SELECT `entPhysicalModelName` FROM `entPhysical` GROUP BY 
                  "</select>"+
                  "</div>"+
                  "<div class=\"form-group\">"+
-                 "<input type=\"text\" name=\"serial\" id=\"serial\" value=\"<?php echo $_POST['serial']; ?>\" placeholder=\"Serial\" class=\"form-control input-sm\"/>"+
+                 "<input type=\"text\" name=\"serial\" id=\"serial\" value=\"<?php echo htmlspecialchars($_POST['serial']); ?>\" placeholder=\"Serial\" class=\"form-control input-sm\"/>"+
                  "</div>"+
                  "<div class=\"form-group\">"+
                  "<strong>&nbsp;Device&nbsp;</strong>"+
@@ -64,7 +64,7 @@ foreach (dbFetchRows('SELECT * FROM `devices` ORDER BY `hostname`') as $data) {
             echo '" selected"+';
         }
 
-        echo '">' . format_hostname($data, $data['hostname']) . '</option>"+';
+        echo '">' . format_hostname($data) . '</option>"+';
     }
 }
 ?>
@@ -74,7 +74,7 @@ foreach (dbFetchRows('SELECT * FROM `devices` ORDER BY `hostname`') as $data) {
                  "<input type=\"text\" size=24 name=\"device_string\" id=\"device_string\" value=\""+
                     <?php
                     if ($_POST['device_string']) {
-                        echo $_POST['device_string'];
+                        echo htmlspecialchars($_POST['device_string']);
                     }
                     ?>
                  "\" placeholder=\"Description\" class=\"form-control input-sm\"/>"+
@@ -88,10 +88,10 @@ foreach (dbFetchRows('SELECT * FROM `devices` ORDER BY `hostname`') as $data) {
         return {
             id: "inventory",
             device: '<?php echo htmlspecialchars($_POST['device']); ?>',
-            string: '<?php echo $_POST['string']; ?>',
-            device_string: '<?php echo $_POST['device_string']; ?>',
-            part: '<?php echo $_POST['part']; ?>',
-            serial: '<?php echo $_POST['serial']; ?>'
+            string: '<?php echo htmlspecialchars($_POST['string']); ?>',
+            device_string: '<?php echo htmlspecialchars($_POST['device_string']); ?>',
+            part: '<?php echo htmlspecialchars($_POST['part']); ?>',
+            serial: '<?php echo htmlspecialchars($_POST['serial']); ?>'
         };
     },
     url: "ajax_table.php"

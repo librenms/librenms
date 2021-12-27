@@ -6,7 +6,7 @@
     <div class="container">
         <div class="panel panel-default panel-condensed col-md-6 col-md-offset-3 col-xs-12 col-sm-8 col-sm-offset-2" style="padding: 0">
             <div class="panel-heading">
-                <strong>@lang('plugins.admin_title')</strong>
+                <strong>{{ __('plugins.admin_title') }}</strong>
             </div>
 
             <table class="table table-condensed">
@@ -22,15 +22,15 @@
                                 @csrf
                                 @if($plugin->plugin_active)
                                     <input type="hidden" name="plugin_active" value="0">
-                                    <button type="submit" class="btn btn-sm btn-danger" style="min-width: 66px">@lang('Disable')</button>
+                                    <button type="submit" class="btn btn-sm btn-danger" style="min-width: 66px">{{ __('Disable') }}</button>
                                 @else
                                     <input type="hidden" name="plugin_active" value="1">
-                                    <button type="submit" class="btn btn-sm btn-success" style="min-width: 66px">@lang('Enable')</button>
+                                    <button type="submit" class="btn btn-sm btn-success" style="min-width: 66px">{{ __('Enable') }}</button>
                                 @endif
                                 @if($plugin->version == 1)
-                                    <a href="{{ route('plugin.legacy', $plugin->plugin_name) }}" class="btn btn-sm btn-primary" style="min-width: 72px">@lang('Page')</a>
+                                    <a href="{{ route('plugin.legacy', $plugin->plugin_name) }}" class="btn btn-sm btn-primary" style="min-width: 72px">{{ __('Page') }}</a>
                                 @else
-                                    <a href="{{ route('plugin.settings', $plugin->plugin_name) }}" class="btn btn-sm btn-primary" style="min-width: 72px">@lang('Settings')</a>
+                                    <a href="{{ route('plugin.settings', $plugin->plugin_name) }}" class="btn btn-sm btn-primary" style="min-width: 72px">{{ __('Settings') }}</a>
                                 @endif
                             </form>
                         </td>

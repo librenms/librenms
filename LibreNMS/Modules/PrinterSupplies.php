@@ -39,7 +39,7 @@ class PrinterSupplies implements Module
      * Discover this module. Heavier processes can be run here
      * Run infrequently (default 4 times a day)
      *
-     * @param  OS  $os
+     * @param  \LibreNMS\OS  $os
      */
     public function discover(OS $os)
     {
@@ -58,7 +58,7 @@ class PrinterSupplies implements Module
      * Try to keep this efficient and only run if discovery has indicated there is a reason to run.
      * Run frequently (default every 5 minutes)
      *
-     * @param  OS  $os
+     * @param  \LibreNMS\OS  $os
      */
     public function poll(OS $os)
     {
@@ -70,8 +70,8 @@ class PrinterSupplies implements Module
         foreach ($toner_data as $toner) {
             echo 'Checking toner ' . $toner['supply_descr'] . '... ';
 
-            $raw_toner = $toner_snmp[$toner['supply_oid']];
-            $tonerperc = self::getTonerLevel($device, $raw_toner, $toner['supply_capacity']);
+            $raw_toner = $toner_snmp[$toner['supply_oid']] ?? null;
+            $tonerperc = self::getTonerLevel($device, $raw_toner, $toner['supply_capacity'] ?? null);
             echo $tonerperc . " %\n";
 
             $tags = [
@@ -114,7 +114,7 @@ class PrinterSupplies implements Module
      * Remove all DB data for this module.
      * This will be run when the module is disabled.
      *
-     * @param  OS  $os
+     * @param  Os  $os
      */
     public function cleanup(OS $os)
     {
@@ -179,7 +179,7 @@ class PrinterSupplies implements Module
                     'supply_oid' => $supply_oid,
                     'supply_capacity_oid' => $capacity_oid,
                     'supply_index' => $last_index,
-                    'supply_type' => $data['prtMarkerSuppliesType'] ?: 'markerSupply',
+                    'supply_type' => $data['prtMarkerSuppliesType'] ?? 'markerSupply',
                     'supply_descr' => $descr,
                     'supply_capacity' => $capacity,
                     'supply_current' => $current,

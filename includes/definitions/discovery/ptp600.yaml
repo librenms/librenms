@@ -1,5 +1,9 @@
 mib: CAMBIUM-PTP600-MIB
 modules:
+    os:
+        sysDescr_regex: '/5\d(?<hardware>.*?)( Wireless|,).*Version\s+(?<version>[\d-]+)/'
+        hardware: CAMBIUM-PTP600-MIB::masterSlaveMode.0
+        hardware_template: '{{ $hardware }} {{ CAMBIUM-PTP600-MIB::masterSlaveMode.0 }}'
     sensors:
         state:
             data:

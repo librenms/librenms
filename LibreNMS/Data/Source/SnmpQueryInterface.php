@@ -59,9 +59,25 @@ interface SnmpQueryInterface
     public function mibDir(?string $dir): SnmpQueryInterface;
 
     /**
+     * Do not error on out of order indexes.
+     * Use with caution as we could get stuck in an infinite loop.
+     */
+    public function allowUnordered(): SnmpQueryInterface;
+
+    /**
      * Output all OIDs numerically
      */
     public function numeric(): SnmpQueryInterface;
+
+    /**
+     * Hide MIB in output
+     */
+    public function hideMib(): SnmpQueryInterface;
+
+    /**
+     * Output enum values as strings instead of values. This could affect index output.
+     */
+    public function enumStrings(): SnmpQueryInterface;
 
     /**
      * Set option(s) for net-snmp command line.
@@ -69,7 +85,7 @@ interface SnmpQueryInterface
      * This will override other options set such as setting numeric.  Call with no options to reset to default.
      * Try to avoid setting options this way to keep the API generic.
      *
-     * @param  array|string  $options
+     * @param  array|string|null  $options
      * @return $this
      */
     public function options($options = []): SnmpQueryInterface;

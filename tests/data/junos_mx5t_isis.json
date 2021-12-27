@@ -18,24 +18,7 @@
                 }
             ]
         },
-        "poller": {
-            "devices": [
-                {
-                    "sysName": "<private>",
-                    "sysObjectID": ".1.3.6.1.4.1.2636.1.1.1.2.90",
-                    "sysDescr": "Juniper Networks, Inc. mx5-t internet router, kernel JUNOS 19.4R3.11, Build date: 2020-10-08 21:43:24 UTC Copyright (c) 1996-2020 Juniper Networks, Inc.",
-                    "sysContact": "<private>",
-                    "version": "19.4R3.11",
-                    "hardware": "Juniper MX5-T Internet Backbone Router",
-                    "features": null,
-                    "os": "junos",
-                    "type": "network",
-                    "serial": "F8223",
-                    "icon": "junos.png",
-                    "location": "<private>"
-                }
-            ]
-        }
+        "poller": "matches discovery"
     },
     "ports": {
         "discovery": {
@@ -12972,8 +12955,7 @@
                     "bgpLocalAs": 65534,
                     "vrfLocalAs": null
                 }
-            ],
-            "bgpPeers_cbgp": []
+            ]
         },
         "poller": {
             "bgpPeers": [
@@ -12999,8 +12981,7 @@
                     "bgpLocalAs": 65534,
                     "vrfLocalAs": null
                 }
-            ],
-            "bgpPeers_cbgp": []
+            ]
         }
     },
     "vlans": {
@@ -13013,8 +12994,7 @@
                     "vlan_type": null,
                     "vlan_mtu": null
                 }
-            ],
-            "ports_vlans": []
+            ]
         }
     },
     "isis": {

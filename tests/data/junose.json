@@ -22,11 +22,11 @@
             "devices": [
                 {
                     "sysName": "",
-                    "sysObjectID": ".1.3.6.1.4.1.4874",
+                    "sysObjectID": ".1.3.6.1.4.1.4874.1.1.1.1.1",
                     "sysDescr": null,
                     "sysContact": null,
                     "version": null,
-                    "hardware": null,
+                    "hardware": "Juniper ERX-1400",
                     "features": null,
                     "os": "junose",
                     "type": "network",
@@ -36,23 +36,6 @@
                 }
             ]
         },
-        "poller": {
-            "devices": [
-                {
-                    "sysName": "",
-                    "sysObjectID": ".1.3.6.1.4.1.4874",
-                    "sysDescr": null,
-                    "sysContact": null,
-                    "version": null,
-                    "hardware": "Juniper juniperUni",
-                    "features": null,
-                    "os": "junose",
-                    "type": "network",
-                    "serial": null,
-                    "icon": "junos.png",
-                    "location": null
-                }
-            ]
-        }
+        "poller": "matches discovery"
     }
 }

@@ -3,11 +3,11 @@
     @yield('form')
 
     <div class="form-group">
-        <label for="refresh-{{ $id }}" class="control-label">@lang('Widget refresh interval (s)')</label>
+        <label for="refresh-{{ $id }}" class="control-label">{{ __('Widget refresh interval (s)') }}</label>
         <input type="number" step="1" min="1" class="form-control" name="refresh" id="refresh-{{ $id }}" value="{{ $refresh }}">
     </div>
     <div style="margin-top: 8px;">
-            <button type="submit" class="btn btn-primary pull-right">@lang('Save')</button>
+            <button type="submit" class="btn btn-primary pull-right">{{ __('Save') }}</button>
     </div>
 </form>
 

@@ -30,7 +30,7 @@ use LibreNMS\RRD\RrdDefinition;
 
 class Secureplatform extends \LibreNMS\OS implements OSPolling
 {
-    public function pollOS()
+    public function pollOS(): void
     {
         $connections = snmp_get($this->getDeviceArray(), 'fwNumConn.0', '-OQv', 'CHECKPOINT-MIB');
 

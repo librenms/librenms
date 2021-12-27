@@ -25,6 +25,7 @@
 
 namespace LibreNMS\Tests\Unit;
 
+use LibreNMS\Config;
 use LibreNMS\Data\Source\SnmpResponse;
 use LibreNMS\Tests\TestCase;
 
@@ -47,6 +48,33 @@ class SnmpResponseTest extends TestCase
         $this->assertEquals(['' => 'IF-MIB::ifDescr'], $response->values());
         $this->assertEquals('IF-MIB::ifDescr', $response->value());
         $this->assertEquals(['IF-MIB::ifDescr'], $response->table());
+
+        // unescaped strings
+        $response = new SnmpResponse("Q-BRIDGE-MIB::dot1qVlanStaticName[1] = \"\\default\\\"\nQ-BRIDGE-MIB::dot1qVlanStaticName[6] = \\single\\\nQ-BRIDGE-MIB::dot1qVlanStaticName[9] = \\\\double\\\\\n");
+        $this->assertTrue($response->isValid());
+        $this->assertEquals('default', $response->value());
+        Config::set('snmp.unescape', false);
+        $this->assertEquals([
+            'Q-BRIDGE-MIB::dot1qVlanStaticName[1]' => 'default',
+            'Q-BRIDGE-MIB::dot1qVlanStaticName[6]' => '\\single\\',
+            'Q-BRIDGE-MIB::dot1qVlanStaticName[9]' => '\\\\double\\\\',
+        ], $response->values());
+        $this->assertEquals(['Q-BRIDGE-MIB::dot1qVlanStaticName' => [
+            1 => 'default',
+            6 => '\\single\\',
+            9 => '\\\\double\\\\',
+        ]], $response->table());
+        Config::set('snmp.unescape', true); // for buggy versions of net-snmp
+        $this->assertEquals([
+            'Q-BRIDGE-MIB::dot1qVlanStaticName[1]' => 'default',
+            'Q-BRIDGE-MIB::dot1qVlanStaticName[6]' => 'single',
+            'Q-BRIDGE-MIB::dot1qVlanStaticName[9]' => '\\double\\',
+        ], $response->values());
+        $this->assertEquals(['Q-BRIDGE-MIB::dot1qVlanStaticName' => [
+            1 => 'default',
+            6 => 'single',
+            9 => '\\double\\',
+        ]], $response->table());
     }
 
     public function testMultiLine(): void
@@ -222,5 +250,10 @@ HOST-RESOURCES-MIB::hrStorageUsed.36 = 127044934
         $response = new SnmpResponse('', "snmpget: Authentication failure (incorrect password, community or key) (Sub-id not found: (top) -> sysDescr)\n", 1);
         $this->assertFalse($response->isValid());
         $this->assertEquals('Authentication failure', $response->getErrorMessage());
+
+        // OID not increasing
+        $response = new SnmpResponse(".1.3.6.1.2.1.2.2.1.1.1 = INTEGER: 1\n", "Error: OID not increasing: .1.3.6.1.2.100.2.2.1.1\n >= .1.3.6.1.2.1.2.2.1.1.1\n", 1);
+        $this->assertFalse($response->isValid());
+        $this->assertEquals('Error: OID not increasing: .1.3.6.1.2.100.2.2.1.1', $response->getErrorMessage());
     }
 }

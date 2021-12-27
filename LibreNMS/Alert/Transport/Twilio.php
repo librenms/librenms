@@ -36,7 +36,7 @@ class Twilio extends Transport
             'sid' => $opts['sid'],
             'token' => $opts['token'],
             'phone' => $opts['to'],
-            'text' => $obj['title'],
+            'text' => $obj['msg'],
             'sender' => $opts['sender'],
         ];
 

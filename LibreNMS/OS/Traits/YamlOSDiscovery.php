@@ -67,6 +67,7 @@ trait YamlOSDiscovery
 
         Log::debug('Yaml OS data:', $data);
 
+        $template_data = array_merge($this->getDevice()->only($this->osFields), $data);
         foreach ($oids as $field => $oid_list) {
             if ($value = $this->findFirst($data, $oid_list, $numeric)) {
                 // extract via regex if requested
@@ -76,7 +77,7 @@ trait YamlOSDiscovery
                 }
 
                 $device->$field = isset($os_yaml["{$field}_template"])
-                    ? trim(SimpleTemplate::parse($os_yaml["{$field}_template"], $data))
+                    ? trim(SimpleTemplate::parse($os_yaml["{$field}_template"], $template_data))
                     : $value;
             }
         }

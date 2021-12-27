@@ -28,7 +28,7 @@ var grid = $("#ipv6-search").bootgrid({
                 "<option value=\"\">All Devices</option>"+
 <?php
 
-$sql = 'SELECT `devices`.`device_id`,`hostname`, `sysName` FROM `devices`';
+$sql = 'SELECT `devices`.`device_id`,`hostname`, `sysName`, `display` FROM `devices`';
 $param = [];
 
 if (! Auth::user()->hasGlobalRead()) {
@@ -45,7 +45,7 @@ foreach (dbFetchRows($sql, $param) as $data) {
         echo '" selected"+';
     }
 
-    echo '">' . format_hostname($data, $data['hostname']) . '</option>"+';
+    echo '">' . format_hostname($data) . '</option>"+';
 }
 ?>
                 "</select>"+

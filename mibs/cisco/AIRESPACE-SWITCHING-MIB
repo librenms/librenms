@@ -1,3 +1,25 @@
+-- *******************************************************************
+-- Airespace Switching MIB
+-- Copyright 2001 Airespace, Inc.  All rights reserved.
+
+-- This SNMP Management Information Specification
+-- embodies Airespace's confidential and proprietary
+-- intellectual property.  LVL7 Systems retains all title
+-- and ownership in the Specification including any revisions.
+
+-- This Specification is supplied "AS IS", Airespace
+-- makes no warranty, either expressed or implied,
+-- as to the use, operation, condition, or performance of the
+-- Specification.
+
+
+-- Status: Release
+-- Version: 3.2
+-- Internal Source Code Version:1.75
+-- Date: 19 Dec 2005
+-- *******************************************************************
+
+
 AIRESPACE-SWITCHING-MIB DEFINITIONS ::= BEGIN
 
 IMPORTS
@@ -40,7 +62,7 @@ IMPORTS
                 information such as Inventory, Trap logs, memory and 
                 CPU. This MIB also provides configuration of CLI, 
                 SNMP, LAG, DHCP, Spanning Tree, etc. 
-
+                
                 The relationship between controller and the LWAPP APs
                 can be depicted as follows:
 
@@ -71,6 +93,7 @@ IMPORTS
       +      + +      +     +      +      +      +          +      +
       +......+ +......+     +......+      +......+          +......+
 
+
                 The LWAPP tunnel exists between the controller and
                 the APs.  The MNs communicate with the APs through
                 the protocol defined by the 802.11 standard.
@@ -81,9 +104,9 @@ IMPORTS
                 The APs then encapsulate all the 802.11 frames from
                 wireless clients inside LWAPP frames and forward
                 the LWAPP frames to the controller.
-
+               
                                    GLOSSARY
-
+ 
                 Access Point ( AP )
 
                 An entity that contains an 802.11 medium access
@@ -129,17 +152,20 @@ IMPORTS
                 802.11 protocol operations by the AP to work
                 cooperatively with the other APs and 802.11
                 devices in the network.
+ 
                 REFERENCE
-
+ 
                 [1] Part 11 Wireless LAN Medium Access Control ( MAC )
                 and Physical Layer ( PHY ) Specifications.
-
+  
                 [2] Draft-obara-capwap-lwapp-00.txt, IETF Light 
                 Weight Access Point Protocol. "
 
         REVISION    "200604100000Z"
+
         DESCRIPTION
                    "Updated MIB with description and format"
+
       ::= { airespace 1 }
 
 --********************************************************************
@@ -154,11 +180,14 @@ IMPORTS
     bsnSwitchingGroups       OBJECT IDENTIFIER ::= { bsnSwitching 51 }
     bsnSwitchingCompliances  OBJECT IDENTIFIER ::= { bsnSwitching 52 }
 
+
 --********************************************************************
 -- agentInventoryGroup
 --********************************************************************
 
+
     agentInventoryGroup     OBJECT IDENTIFIER ::= { agentInfoGroup 1 }
+
 
     agentInventorySysDescription OBJECT-TYPE
          SYNTAX      DisplayString
@@ -192,6 +221,7 @@ IMPORTS
                      "Serial number of the switch."
          ::= { agentInventoryGroup 4 }
 
+
     agentInventoryMaintenanceLevel OBJECT-TYPE
          SYNTAX      DisplayString
          MAX-ACCESS  read-only
@@ -200,12 +230,14 @@ IMPORTS
                      "The switch's Inventory Maintenance Level"
          ::= { agentInventoryGroup 6 }
 
+
     agentInventoryBurnedInMacAddress OBJECT-TYPE
          SYNTAX      PhysAddress
          MAX-ACCESS  read-only
          STATUS      current
          DESCRIPTION
                      "Burned-In MAC Address"
+
          ::= { agentInventoryGroup 9 }
 
     agentInventoryOperatingSystem OBJECT-TYPE
@@ -267,6 +299,7 @@ IMPORTS
                      Access Points."
          ::= { agentInventoryGroup 17 }
 
+
     agentInventoryMaxNumberOfAPsSupported OBJECT-TYPE
          SYNTAX      Integer32
          MAX-ACCESS  read-only
@@ -274,6 +307,7 @@ IMPORTS
          DESCRIPTION
                      "Maximum number of APs supported with this
                       Controller."
+
          ::= { agentInventoryGroup 18 }
 
      agentInventoryIsCryptoCard2Present OBJECT-TYPE
@@ -297,6 +331,7 @@ IMPORTS
                      console."
          DEFVAL {false}
          ::= { agentInventoryGroup 20 }
+
 
 --********************************************************************
 -- agentTrapLogGroup
@@ -357,6 +392,7 @@ IMPORTS
                       traps sent since last reset."
          ::= { agentTrapLogGroup 8 }
 
+
     agentApInterferenceProfileFailTrapCount OBJECT-TYPE
          SYNTAX      Integer32
          MAX-ACCESS  read-only
@@ -374,6 +410,7 @@ IMPORTS
                      "The total number of AP Coverge Profile Failure
                       traps sent since last reset."
          ::= { agentTrapLogGroup 10 }
+
 
 --********************************************************************
 -- agentTrapLogTable
@@ -428,11 +465,13 @@ IMPORTS
                      "Description of the trap sent."
          ::= { agentTrapLogEntry 22 }
 
+
 --********************************************************************
 -- agentSwitchInfoGroup
 --********************************************************************
 
     agentSwitchInfoGroup    OBJECT IDENTIFIER ::= { agentInfoGroup 3 }
+
 
     agentSwitchInfoLwappTransportMode OBJECT-TYPE
          SYNTAX      INTEGER {
@@ -504,6 +543,7 @@ IMPORTS
                       earlier device versions."
          ::= { agentSwitchInfoGroup 5 }
 
+
 --********************************************************************
 -- agentResourceInfoGroup
 --********************************************************************
@@ -537,6 +577,7 @@ IMPORTS
 --********************************************************************
 -- agentWcpInfoGroup
 --********************************************************************
+
 
     agentWcpInfoGroup    OBJECT IDENTIFIER ::= { agentInfoGroup 6 }
 
@@ -649,6 +690,7 @@ IMPORTS
          DESCRIPTION
                      "The management IP Address of a controller."
          ::= { agentWcpControllerInfoEntry 10 }
+
 
 --********************************************************************
 -- agentProductGroup
@@ -781,6 +823,7 @@ IMPORTS
                      destroy(6) - Set to this value to disconnect
                                   this user."
          ::= { agentLoginSessionEntry 26 }
+
 
 --********************************************************************
 -- agentTelnetConfigGroup
@@ -981,6 +1024,7 @@ IMPORTS
                      "Agent Lag If Index"
          ::= { agentLagSummaryConfigEntry 2 }
 
+
     agentLagSummaryFlushTimer OBJECT-TYPE
          SYNTAX      Integer32
          MAX-ACCESS  read-create
@@ -1062,6 +1106,7 @@ IMPORTS
                       Lag."
          ::= { agentLagSummaryConfigEntry 30 }
 
+
 --*******************************************************************
 -- agentLagDetailedConfigTable
 --*******************************************************************
@@ -1116,6 +1161,7 @@ IMPORTS
                       description and list of valid values."
          ::= { agentLagDetailedConfigEntry 22 }
 
+
     agentLagConfigMode OBJECT-TYPE
          SYNTAX      INTEGER {
                       off(1),
@@ -1128,6 +1174,7 @@ IMPORTS
                       it is on, all the gigabit ports are bound to one
                       aggregated link."
          ::= { agentLagConfigGroup 4 }
+
 
 --********************************************************************
 -- agentNetworkConfigGroup
@@ -1233,6 +1280,7 @@ IMPORTS
          DESCRIPTION
                      "Sets the idle user timeout."
           ::= { agentNetworkConfigGroup 12 }
+
 
     agentNetworkArpTimeout OBJECT-TYPE
          SYNTAX      Unsigned32(10..2147483647)
@@ -1358,6 +1406,7 @@ IMPORTS
                      "Multicast group address for access points."
          ::= { agentNetworkConfigGroup 25 }
 
+
 --********************************************************************
 -- agentNeworkRouteTable
 --********************************************************************
@@ -1417,6 +1466,8 @@ IMPORTS
          DESCRIPTION
                      "Network Route Row Status."
          ::= { agentNetworkRouteConfigEntry 23 }
+
+
 
 --********************************************************************
 -- agentInterfaceConfigTable
@@ -1667,6 +1718,7 @@ agentInterfaceVlanQuarantine OBJECT-TYPE
                      "The interface entry Row status."
          ::= { agentInterfaceConfigEntry 31 }
 
+
 --********************************************************************
 -- agentNtpConfigGroup - Configuration of Switch Network Time Protocol
 --********************************************************************
@@ -1717,6 +1769,7 @@ agentInterfaceVlanQuarantine OBJECT-TYPE
                      "NTP Server priority index."
          ::= { agentNtpServerEntry 1 }
 
+
     agentNtpServerAddress OBJECT-TYPE
          SYNTAX      IpAddress
          MAX-ACCESS  read-create
@@ -1732,6 +1785,7 @@ agentInterfaceVlanQuarantine OBJECT-TYPE
          DESCRIPTION
                      "NTP server entry row status."
          ::= { agentNtpServerEntry 20 }
+
 
 --********************************************************************
 -- agentDhcpConfigGroup - Configuration of Switch DHCP Server and
@@ -1943,6 +1997,7 @@ agentInterfaceVlanQuarantine OBJECT-TYPE
                      "Dhcp Scope entry row status."
          ::= { agentDhcpScopeEntry 30 }
 
+
 --********************************************************************
 -- agentServicePortConfigGroup
 -- (Interface of type service-port in agentInterfaceConfigTable
@@ -2013,11 +2068,13 @@ agentInterfaceVlanQuarantine OBJECT-TYPE
                        of this group)"
           ::= { agentServicePortConfigGroup 5 }
 
+
 --********************************************************************
 -- agentSnmpConfigGroup
 --********************************************************************
 
     agentSnmpConfigGroup  OBJECT IDENTIFIER  ::=  {agentConfigGroup 5}
+
 
     agentSnmpTrapPortNumber OBJECT-TYPE
          SYNTAX  Unsigned32(1..65534)
@@ -2042,6 +2099,7 @@ agentInterfaceVlanQuarantine OBJECT-TYPE
          DESCRIPTION
         "Snmp Version 2c Status"
          ::= { agentSnmpConfigGroup 3 }
+
 
 --********************************************************************
 -- agentSnmpCommunityConfigTable
@@ -2189,6 +2247,7 @@ agentInterfaceVlanQuarantine OBJECT-TYPE
                      the
                                         community from the agent."
          ::= { agentSnmpCommunityConfigEntry 25 }
+
 
 --********************************************************************
 -- agentSnmpTrapReceiverConfigTable
@@ -2357,6 +2416,7 @@ agentInterfaceVlanQuarantine OBJECT-TYPE
 
  agentSnmpV3ConfigGroup   OBJECT IDENTIFIER  ::=  {agentConfigGroup 6}
 
+
     agentSnmpVersion3Status OBJECT-TYPE
          SYNTAX  INTEGER{disable(0),enable(1)}
          MAX-ACCESS  read-write
@@ -2417,6 +2477,7 @@ agentInterfaceVlanQuarantine OBJECT-TYPE
                      "Agent User Access Mode"
          ::= { agentSnmpV3UserConfigEntry 2 }
 
+
     agentSnmpV3UserAuthenticationType OBJECT-TYPE
          SYNTAX      INTEGER {
                      none(1),
@@ -2475,11 +2536,13 @@ agentInterfaceVlanQuarantine OBJECT-TYPE
                      user account."
          ::= { agentSnmpV3UserConfigEntry 26 }
 
+
 --********************************************************************
 -- agentSpanningTreePortTable
 --********************************************************************
     agentSpanningTreeConfigGroup  OBJECT IDENTIFIER ::=
                                        { agentConfigGroup 7 }
+
 
     agentSpanningTreeMode OBJECT-TYPE
          SYNTAX      INTEGER {
@@ -2491,6 +2554,7 @@ agentInterfaceVlanQuarantine OBJECT-TYPE
          DESCRIPTION
                      "The switch's Spanning Tree Switch Status"
          ::= { agentSpanningTreeConfigGroup 1 }
+
 
 --********************************************************************
 -- agentSwitchConfigGroup
@@ -2581,12 +2645,14 @@ agentInterfaceVlanQuarantine OBJECT-TYPE
                       change to take effect."
          ::= { agentSwitchConfigGroup 5 }
 
+
 --********************************************************************
 -- agentTransferConfigGroup
 --********************************************************************
 
     agentTransferConfigGroup    OBJECT IDENTIFIER ::=
                                        { agentConfigGroup 9 }
+
 
 --*******************************************************************
 -- agentTransferUploadGroup
@@ -2680,6 +2746,7 @@ agentInterfaceVlanQuarantine OBJECT-TYPE
                      "
          ::= { agentTransferUploadGroup 5 }
 
+
     agentTransferUploadStart OBJECT-TYPE
          SYNTAX      INTEGER {
                      enable(1),
@@ -2742,6 +2809,8 @@ agentInterfaceVlanQuarantine OBJECT-TYPE
                       or while decrypting the file after download to
                       the switch."
          ::= { agentTransferConfigGroup 4 }
+
+
 
 --********************************************************************
 -- agentTransferDownloadGroup
@@ -2807,6 +2876,7 @@ agentInterfaceVlanQuarantine OBJECT-TYPE
                       and File Name set to e1r1v1.opr. Note: File
                       Name, File Path, and TFTP Server IP Address are
                       applicable only if the Transfer Mode is TFTP."
+
          ::= { agentTransferDownloadGroup 4 }
 
     agentTransferDownloadDataType OBJECT-TYPE
@@ -2831,6 +2901,7 @@ agentInterfaceVlanQuarantine OBJECT-TYPE
                         -   Signatures
                         -   customWebauth- custom webauth tar ball"
          ::= { agentTransferDownloadGroup 5 }
+
 
     agentTransferDownloadStart OBJECT-TYPE
          SYNTAX      INTEGER {
@@ -2939,6 +3010,7 @@ agentInterfaceVlanQuarantine OBJECT-TYPE
          DESCRIPTION
                      "Enable/disable 802.3ad LACP on this port"
          ::= { agentDot3adAggPortEntry 21 }
+
 
 --********************************************************************
     -- agentPortConfigTable
@@ -3147,6 +3219,7 @@ agentInterfaceVlanQuarantine OBJECT-TYPE
                        dot3MauType100BaseTXFD
                        dot3MauType100BaseFXFD
                        dot3MauType1000BaseSXFD"
+
          REFERENCE "RFC 2668"
          ::= { agentPortConfigEntry 11 }
 
@@ -3184,6 +3257,7 @@ agentInterfaceVlanQuarantine OBJECT-TYPE
                        dot3MauType100BaseTXFD
                        dot3MauType100BaseFXFD
                        dot3MauType1000BaseSXFD"
+
          REFERENCE "RFC 2668"
          ::= { agentPortConfigEntry 12 }
 
@@ -3198,6 +3272,7 @@ agentInterfaceVlanQuarantine OBJECT-TYPE
                  "This object identifies the administration status of
                   auto negotiation for this port."
          ::= { agentPortConfigEntry 13 }
+
 
     agentPortDot3FlowControlMode OBJECT-TYPE
          SYNTAX      INTEGER {
@@ -3315,6 +3390,7 @@ agentInterfaceVlanQuarantine OBJECT-TYPE
                "The current operational state of the port."
        ::= { agentPortConfigEntry 40 }
 
+
 --********************************************************************
 --    agentSystemGroup
 --********************************************************************
@@ -3396,6 +3472,7 @@ agentInterfaceVlanQuarantine OBJECT-TYPE
                      "clear trap log"
          ::= { agentSystemGroup 8 }
 
+
      agentResetSystem OBJECT-TYPE
          SYNTAX      INTEGER {
                      enable(1),
@@ -3406,6 +3483,7 @@ agentInterfaceVlanQuarantine OBJECT-TYPE
          DESCRIPTION
                      "reset the switch"
          ::= { agentSystemGroup 10 }
+
 
 --********************************************************************
  -- portStatsTable
@@ -3548,6 +3626,7 @@ PortStatsEntry ::= SEQUENCE {
          (excluding framing bits but including FCS octets)."
      ::= { portStatsEntry 9 }
 
+
  portStatsPktsTxOversizeOctets      OBJECT-TYPE
      SYNTAX     Counter32
      UNITS      "Packets"
@@ -3559,6 +3638,7 @@ PortStatsEntry ::= SEQUENCE {
          1530 octets in length.
          (excluding framing bits but including FCS octets)."
      ::= { portStatsEntry 30 }
+
 
 --********************************************************************
 --   switchingTraps
@@ -3654,6 +3734,7 @@ PortStatsEntry ::= SEQUENCE {
              "Power Supply Status Change Trap"
          ::= { switchingTraps 12 }
 
+
 --********************************************************************
 --*    Compliance statements
 --********************************************************************
@@ -3724,6 +3805,7 @@ bsnSwitchingAgentInfoGroup OBJECT-GROUP
     DESCRIPTION
         "This collection of objects provide switching information."
     ::= { bsnSwitchingGroups 1}
+
 
 bsnSwitchingAgentConfigGroup OBJECT-GROUP
     OBJECTS {
@@ -3900,6 +3982,7 @@ bsnSwitchingAgentSystemGroup OBJECT-GROUP
          information and config."
     ::= { bsnSwitchingGroups 3 }
 
+
 bsnSwitchingAgentStatsGroup OBJECT-GROUP
     OBJECTS {
         portStatsIndex,
@@ -3980,4 +4063,6 @@ bsnSwitchingTrap NOTIFICATION-GROUP
 --*   End of units of conformance
 --********************************************************************
 
+
 END
+

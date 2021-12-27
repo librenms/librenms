@@ -5,7 +5,7 @@
             <div class="modal-content">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                    <h5 class="modal-title" id="alert_notes">@lang('Alert notes')</h5>
+                    <h5 class="modal-title" id="alert_notes">{{ __('Alert notes') }}</h5>
                 </div>
                 <div class="modal-body">
                     <div class="row">
@@ -19,7 +19,7 @@
                         <div class='col-sm-12'>
                             <div class="form-group">
                                 <input type="hidden" id="alert_id" name="alert_id" value="">
-                                    <button class="btn btn-success" id="save-alert-notes" name="save-alert-notes">@lang('Save notes')</button>
+                                    <button class="btn btn-success" id="save-alert-notes" name="save-alert-notes">{{ __('Save notes') }}</button>
                                 </div>
                             </div>
                         </div>
