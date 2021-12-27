@@ -156,4 +156,3 @@ class EricssonTn extends OS implements
         return $sensors;
     }
 }
-
