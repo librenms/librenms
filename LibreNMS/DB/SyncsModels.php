@@ -41,15 +41,23 @@ trait SyncsModels
     protected function syncModels($device, $relationship, $models): Collection
     {
         $models = $models->keyBy->getCompositeKey();
-        $existing = $device->$relationship->keyBy->getCompositeKey();
+        $existing = $device->$relationship->groupBy->getCompositeKey();
 
-        foreach ($existing as $exist_key => $exist_value) {
+        foreach ($existing as $exist_key => $existing_rows) {
             if ($models->offsetExists($exist_key)) {
                 // update
-                $exist_value->fill($models->get($exist_key)->getAttributes())->save();
+                foreach ($existing_rows as $index => $existing_row) {
+                    if ($index == 0) {
+                        $existing_row->fill($models->get($exist_key)->getAttributes())->save();
+                    } else {
+                        // delete extra rows at this key
+                        $existing_row->delete();
+                        $existing_rows->forget($index);
+                    }
+                }
             } else {
                 // delete
-                $exist_value->delete();
+                $existing_rows->each->delete();
                 $existing->forget($exist_key);
             }
         }
@@ -57,7 +65,7 @@ trait SyncsModels
         $new = $models->diffKeys($existing);
         $device->$relationship()->saveMany($new);
 
-        return $existing->merge($new);
+        return $existing->map->first()->merge($new);
     }
 
     /**

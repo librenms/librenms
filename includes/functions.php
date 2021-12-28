@@ -74,7 +74,7 @@ function parse_modules($type, $options)
 {
     $override = false;
 
-    if ($options['m']) {
+    if (! empty($options['m'])) {
         Config::set("{$type}_modules", []);
         foreach (explode(',', $options['m']) as $module) {
             // parse submodules (only supported by some modules)
@@ -1379,7 +1379,7 @@ function q_bridge_bits2indices($hex_data)
     /* convert hex string to an array of 1-based indices of the nonzero bits
      * ie. '9a00' -> '100110100000' -> array(1, 4, 5, 7)
     */
-    $hex_data = str_replace(' ', '', $hex_data);
+    $hex_data = str_replace([' ', "\n"], '', $hex_data);
 
     // we need an even number of digits for hex2bin
     if (strlen($hex_data) % 2 === 1) {

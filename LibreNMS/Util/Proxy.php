@@ -61,13 +61,13 @@ class Proxy
     }
 
     /**
-     * Return the proxy url in guzzle format "tcp://127.0.0.1:8888"
+     * Return the proxy url in guzzle format "http://127.0.0.1:8888"
      */
     public static function forGuzzle(): string
     {
         $proxy = self::forCurl();
 
-        return empty($proxy) ? '' : ('tcp://' . $proxy);
+        return empty($proxy) ? '' : ('http://' . $proxy);
     }
 
     /**

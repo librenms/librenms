@@ -874,6 +874,19 @@
                 "ifAlias": "ifAlias"
             }
         },
+        "device_display_default": {
+            "group": "webui",
+            "section": "device",
+            "order": 1,
+            "default": null,
+            "type": "select",
+            "options": {
+                "{{ $hostname }}": "hostname",
+                "{{ $sysName_fallback }}":  "sysName_fallback",
+                "{{ $sysName }}":  "sysName",
+                "{{ $ip }}":  "ip"
+            }
+        },
         "device_perf_purge": {
             "default": 7,
             "units": "days",
@@ -1596,20 +1609,6 @@
             "section": "style",
             "order": 2,
             "type": "text"
-        },
-        "force_hostname_to_sysname": {
-            "group": "webui",
-            "section": "device",
-            "order": 0,
-            "default": false,
-            "type": "boolean"
-        },
-        "force_ip_to_sysname": {
-            "group": "webui",
-            "section": "device",
-            "order": 1,
-            "default": false,
-            "type": "boolean"
         },
         "fping": {
             "default": "fping",
@@ -5130,6 +5129,9 @@
             "default": [
                 "public"
             ]
+        },
+        "snmp.unescape": {
+            "type": "boolean"
         },
         "snmp.exec_timeout": {
             "default": 1200,

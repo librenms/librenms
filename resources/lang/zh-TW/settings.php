@@ -980,14 +980,6 @@ return [
             'description' => '開啟位置圖',
             'help' => 'Location Map is shown by default',
         ],
-        'force_hostname_to_sysname' => [
-            'description' => '將 Hostname 改以 SysName 顯示',
-            'help' => 'When using a dynamic DNS hostname or one that does not resolve, this option would allow you to make use of the sysName instead as the preferred reference to the device',
-        ],
-        'force_ip_to_sysname' => [
-            'description' => '將 IP 位址改以 SysName 顯示',
-            'help' => 'When using IP addresses as a hostname you can instead represent the devices on the WebUI by its sysName resulting in an easier to read overview of your network. This would apply on networks where you don\'t have DNS records for most of your devices',
-        ],
         'whois' => [
             'description' => 'whois 路徑',
         ],

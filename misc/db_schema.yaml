@@ -495,6 +495,7 @@ devices:
     - { Field: inserted, Type: timestamp, 'Null': true, Extra: '', Default: CURRENT_TIMESTAMP }
     - { Field: hostname, Type: varchar(128), 'Null': false, Extra: '' }
     - { Field: sysName, Type: varchar(128), 'Null': true, Extra: '' }
+    - { Field: display, Type: varchar(128), 'Null': true, Extra: '' }
     - { Field: ip, Type: varbinary(16), 'Null': true, Extra: '' }
     - { Field: overwrite_ip, Type: varchar(40), 'Null': true, Extra: '' }
     - { Field: community, Type: varchar(255), 'Null': true, Extra: '' }
@@ -544,7 +545,7 @@ devices:
     - { Field: disable_notify, Type: tinyint, 'Null': false, Extra: '', Default: '0' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [device_id], Unique: true, Type: BTREE }
-    devices_hostname_index: { Name: devices_hostname_index, Columns: [hostname], Unique: false, Type: BTREE }
+    devices_hostname_sysname_display_index: { Name: devices_hostname_sysname_display_index, Columns: [hostname, sysName, display], Unique: false, Type: BTREE }
     devices_last_poll_attempted_index: { Name: devices_last_poll_attempted_index, Columns: [last_poll_attempted], Unique: false, Type: BTREE }
     devices_last_polled_index: { Name: devices_last_polled_index, Columns: [last_polled], Unique: false, Type: BTREE }
     devices_os_index: { Name: devices_os_index, Columns: [os], Unique: false, Type: BTREE }
@@ -613,7 +614,7 @@ device_outages:
     - { Field: going_down, Type: bigint, 'Null': false, Extra: '' }
     - { Field: up_again, Type: bigint, 'Null': true, Extra: '' }
   Indexes:
-    PRIMARY: { Name: PRIMARY, Columns: [ id ], Unique: true, Type: BTREE }
+    PRIMARY: { Name: PRIMARY, Columns: [id], Unique: true, Type: BTREE }
     device_outages_device_id_going_down_unique: { Name: device_outages_device_id_going_down_unique, Columns: [device_id, going_down], Unique: true, Type: BTREE }
     device_outages_device_id_index: { Name: device_outages_device_id_index, Columns: [device_id], Unique: false, Type: BTREE }
 device_perf:
@@ -1440,9 +1441,9 @@ ports:
     - { Field: ifAdminStatus_prev, Type: varchar(16), 'Null': true, Extra: '' }
     - { Field: ifDuplex, Type: varchar(12), 'Null': true, Extra: '' }
     - { Field: ifMtu, Type: int, 'Null': true, Extra: '' }
-    - { Field: ifType, Type: text, 'Null': true, Extra: '' }
-    - { Field: ifAlias, Type: text, 'Null': true, Extra: '' }
-    - { Field: ifPhysAddress, Type: text, 'Null': true, Extra: '' }
+    - { Field: ifType, Type: varchar(64), 'Null': true, Extra: '' }
+    - { Field: ifAlias, Type: varchar(255), 'Null': true, Extra: '' }
+    - { Field: ifPhysAddress, Type: varchar(64), 'Null': true, Extra: '' }
     - { Field: ifHardType, Type: varchar(64), 'Null': true, Extra: '' }
     - { Field: ifLastChange, Type: 'bigint unsigned', 'Null': false, Extra: '', Default: '0' }
     - { Field: ifVlan, Type: varchar(8), 'Null': false, Extra: '', Default: '' }
@@ -1494,7 +1495,8 @@ ports:
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [port_id], Unique: true, Type: BTREE }
     ports_device_id_ifindex_unique: { Name: ports_device_id_ifindex_unique, Columns: [device_id, ifIndex], Unique: true, Type: BTREE }
-    ports_ifdescr_index: { Name: ports_ifdescr_index, Columns: [ifDescr], Unique: false, Type: BTREE }
+    ports_ifalias_port_descr_descr_portname_index: { Name: ports_ifalias_port_descr_descr_portname_index, Columns: [ifAlias, port_descr_descr, portName], Unique: false, Type: BTREE }
+    ports_ifdescr_ifname_index: { Name: ports_ifdescr_ifname_index, Columns: [ifDescr, ifName], Unique: false, Type: BTREE }
 ports_adsl:
   Columns:
     - { Field: port_id, Type: 'int unsigned', 'Null': false, Extra: '' }
@@ -1993,12 +1995,12 @@ syslog:
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [seq], Unique: true, Type: BTREE }
     syslog_device_id_index: { Name: syslog_device_id_index, Columns: [device_id], Unique: false, Type: BTREE }
+    syslog_device_id_priority_index: { Name: syslog_device_id_priority_index, Columns: [device_id, priority], Unique: false, Type: BTREE }
+    syslog_device_id_program_index: { Name: syslog_device_id_program_index, Columns: [device_id, program], Unique: false, Type: BTREE }
     syslog_device_id_timestamp_index: { Name: syslog_device_id_timestamp_index, Columns: [device_id, timestamp], Unique: false, Type: BTREE }
     syslog_priority_level_index: { Name: syslog_priority_level_index, Columns: [priority, level], Unique: false, Type: BTREE }
     syslog_program_index: { Name: syslog_program_index, Columns: [program], Unique: false, Type: BTREE }
     syslog_timestamp_index: { Name: syslog_timestamp_index, Columns: [timestamp], Unique: false, Type: BTREE }
-    syslog_device_id_program_index: { Name: syslog_device_id_program_index, Columns: [device_id, program], Unique: false, Type: BTREE }
-    syslog_device_id_priority_index: { Name: syslog_device_id_priority_index, Columns: [device_id, priority], Unique: false, Type: BTREE }
 tnmsneinfo:
   Columns:
     - { Field: id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }

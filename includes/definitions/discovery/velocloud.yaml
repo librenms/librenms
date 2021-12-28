@@ -1,0 +1,91 @@
+mib: VELOCLOUD-EDGE-MIB
+modules:
+    os:
+        sysDescr_regex: '/^VeloCloud (?<hardware>EDGE.*)/'
+    sensors:
+        pre-cache:
+            data:
+                -
+                    oid:
+                        - vceLinkItf
+                        - vceLinkName
+                        - vceLinkVlanId
+        state:
+            data:
+                -
+                    oid: vceHaAdminState
+                    num_oid: '.1.3.6.1.4.1.45346.1.1.2.1.2.1.{{ $index }}'
+                    index: 'vceHaAdminState.{{ $index }}'
+                    descr: 'HA configuration'
+                    group: HA
+                    value: vceHaAdminState
+                    states:
+                        - { value: 1, graph: 0, generic: 0, descr: none }
+                        - { value: 2, graph: 0, generic: 0, descr: ActiveStandbyPair }
+                        - { value: 3, graph: 0, generic: 0, descr: Cluster }
+                        - { value: 4, graph: 0, generic: 0, descr: VrrpPair }
+                        - { value: 5, graph: 0, generic: 3, descr: unknown }
+                -
+                    oid: vceHaPeerState
+                    num_oid: '.1.3.6.1.4.1.45346.1.1.2.1.2.2.{{ $index }}'
+                    index: 'vceHaPeerState.{{ $index }}'
+                    descr: 'HA peer state'
+                    group: HA
+                    value: vceHaPeerState
+                    states:
+                        - { value: 1, graph: 0, generic: 0, descr: initializing }
+                        - { value: 2, graph: 0, generic: 0, descr: active }
+                        - { value: 3, graph: 0, generic: 0, descr: standby }
+                        - { value: 4, graph: 0, generic: 3, descr: unknown }
+                -
+                    oid: vceLinkVpnState
+                    num_oid: '.1.3.6.1.4.1.45346.1.1.2.3.2.2.1.26.{{ $index }}'
+                    index: 'vceLinkVpnState.{{ $index }}'
+                    descr: '{{ $vceLinkItf }} VLAN{{ $vceLinkVlanId }} , {{ $vceLinkName }} VPN link state'
+                    group: 'VCE Links'
+                    value: vceLinkVpnState
+                    states:
+                        - { value: 1, graph: 1, generic: 1, descr: initial }
+                        - { value: 2, graph: 2, generic: 2, descr: dead }
+                        - { value: 3, graph: 3, generic: 2, descr: unusable }
+                        - { value: 4, graph: 4, generic: 0, descr: quiet }
+                        - { value: 5, graph: 5, generic: 0, descr: standby }
+                        - { value: 6, graph: 6, generic: 2, descr: unstable }
+                        - { value: 7, graph: 7, generic: 0, descr: stable }
+                        - { value: 8, graph: 8, generic: 3, descr: unknown }
+                -
+                    oid: vceLinkState
+                    num_oid: '.1.3.6.1.4.1.45346.1.1.2.3.2.2.1.34.{{ $index }}'
+                    index: 'vceLinkState.{{ $index }}'
+                    descr: '{{ $vceLinkItf }} VLAN{{ $vceLinkVlanId }} , {{ $vceLinkName }} WAN link state'
+                    group: 'VCE Links'
+                    value: vceLinkState
+                    states:
+                        - { value: 1, graph: 1, generic: 1, descr: initial }
+                        - { value: 2, graph: 2, generic: 2, descr: dead }
+                        - { value: 3, graph: 3, generic: 2, descr: unusable }
+                        - { value: 4, graph: 4, generic: 0, descr: quiet }
+                        - { value: 5, graph: 5, generic: 0, descr: standby }
+                        - { value: 6, graph: 6, generic: 2, descr: unstable }
+                        - { value: 7, graph: 7, generic: 0, descr: stable }
+                        - { value: 8, graph: 8, generic: 3, descr: unknown }
+        loss:
+            data:
+                -
+                    oid: vceLinkTxLostPkt
+                    num_oid: '.1.3.6.1.4.1.45346.1.1.2.3.2.2.1.24.{{ $index }}'
+                    index: 'vceLinkTxLostPkt.{{ $index }}'
+                    descr: '{{ $vceLinkItf }} VLAN{{ $vceLinkVlanId }} , {{ $vceLinkName }} TX packet loss'
+                    group: 'VCE Links'
+                    value: vceLinkTxLostPkt
+                    warn_limit: '1'
+                    high_limit: '5'
+                -
+                    oid: vceLinkRxLostPkt
+                    num_oid: '.1.3.6.1.4.1.45346.1.1.2.3.2.2.1.25.{{ $index }}'
+                    index: 'vceLinkRxLostPkt.{{ $index }}'
+                    descr: '{{ $vceLinkItf }} VLAN{{ $vceLinkVlanId }} , {{ $vceLinkName }} RX packet loss'
+                    group: 'VCE Links'
+                    value: vceLinkRxLostPkt
+                    warn_limit: '1'
+                    high_limit: '5'

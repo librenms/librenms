@@ -55,15 +55,23 @@ return [
             'ignore_exceptions' => false,
         ],
 
+        'console_debug' => [
+            'driver' => 'stack',
+            'channels' => ['single', 'stdout_debug'],
+            'ignore_exceptions' => false,
+        ],
+
         'single' => [
             'driver' => 'single',
             'path' => env('APP_LOG', \LibreNMS\Config::get('log_file', base_path('logs/librenms.log'))),
+            'formatter' => \App\Logging\NoColorFormatter::class,
             'level' => env('LOG_LEVEL', 'error'),
         ],
 
         'daily' => [
             'driver' => 'daily',
             'path' => env('APP_LOG', \LibreNMS\Config::get('log_file', base_path('logs/librenms.log'))),
+            'formatter' => \App\Logging\NoColorFormatter::class,
             'level' => env('LOG_LEVEL', 'error'),
             'days' => 14,
         ],
@@ -89,9 +97,19 @@ return [
         'stderr' => [
             'driver' => 'monolog',
             'handler' => StreamHandler::class,
-            'formatter' => \LibreNMS\Util\CliColorFormatter::class,
+            'formatter' => \App\Logging\CliColorFormatter::class,
             'with' => [
                 'stream' => 'php://stderr',
+            ],
+            'level' => 'debug',
+        ],
+
+        'stdout_debug' => [
+            'driver' => 'monolog',
+            'handler' => StreamHandler::class,
+            'formatter' => \App\Logging\CliColorFormatter::class,
+            'with' => [
+                'stream' => 'php://output',
             ],
             'level' => 'debug',
         ],
@@ -99,11 +117,11 @@ return [
         'stdout' => [
             'driver' => 'monolog',
             'handler' => StreamHandler::class,
-            'formatter' => \LibreNMS\Util\CliColorFormatter::class,
+            'formatter' => \App\Logging\CliColorFormatter::class,
             'with' => [
                 'stream' => 'php://output',
             ],
-            'level' => 'debug',
+            'level' => 'info',
         ],
 
         'syslog' => [

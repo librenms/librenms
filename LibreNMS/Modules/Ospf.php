@@ -62,6 +62,10 @@ class Ospf implements Module
 
             $ospf_instances = collect();
             foreach ($ospf_instances_poll as $ospf_instance_id => $ospf_entry) {
+                if (empty($ospf_entry['ospfRouterId'])) {
+                    continue; // skip invalid data
+                }
+
                 $instance = OspfInstance::updateOrCreate([
                     'device_id' => $os->getDeviceId(),
                     'ospf_instance_id' => $ospf_instance_id,

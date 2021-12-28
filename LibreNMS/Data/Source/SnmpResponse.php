@@ -28,6 +28,7 @@ namespace LibreNMS\Data\Source;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
+use LibreNMS\Config;
 use Log;
 
 class SnmpResponse
@@ -68,7 +69,7 @@ class SnmpResponse
     {
         $this->errorMessage = '';
         // not checking exitCode because I think it may lead to false negatives
-        $invalid = preg_match('/(Timeout: No Response from .*|Unknown user name|Authentication failure)/', $this->stderr, $errors)
+        $invalid = preg_match('/(Timeout: No Response from .*|Unknown user name|Authentication failure|Error: OID not increasing: .*)/', $this->stderr, $errors)
             || empty($this->raw)
             || preg_match('/(No Such Instance|No Such Object|No more variables left).*/', $this->raw, $errors);
 
@@ -112,7 +113,7 @@ class SnmpResponse
         $values = [];
         $line = strtok($this->raw, PHP_EOL);
         while ($line !== false) {
-            if (Str::contains($line, ['at this OID', 'this MIB View'])) {
+            if (Str::contains($line, ['at this OID', 'this MIB View', 'End of MIB'])) {
                 // these occur when we seek past the end of data, usually the end of the response, but grab the next line and continue
                 $line = strtok(PHP_EOL);
                 continue;
@@ -130,9 +131,14 @@ class SnmpResponse
                 $line = strtok(PHP_EOL);
             }
 
+            // remove extra escapes
+            if (Config::get('snmp.unescape')) {
+                $value = stripslashes($value);
+            }
+
             if (Str::startsWith($value, '"') && Str::endsWith($value, '"')) {
                 // unformatted string from net-snmp, remove extra escapes
-                $values[$oid] = stripslashes(trim($value, "\\\" \n\r"));
+                $values[$oid] = trim(stripslashes($value), "\" \n\r");
             } else {
                 $values[$oid] = trim($value);
             }
@@ -171,11 +177,15 @@ class SnmpResponse
     }
 
     /**
-     * Map an snmp table with callback.
+     * Map an snmp table with callback. If invalid data is encountered, an empty collection is returned.
      * Variables passed to the callback will be an array of row values followed by each individual index.
      */
     public function mapTable(callable $callback): Collection
     {
+        if (! $this->isValid()) {
+            return new Collection;
+        }
+
         return collect($this->values())
             ->map(function ($value, $oid) {
                 $parts = explode('[', rtrim($oid, ']'), 2);

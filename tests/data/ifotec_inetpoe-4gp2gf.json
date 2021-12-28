@@ -1927,8 +1927,8 @@
                     "ifName": "IF1",
                     "portName": null,
                     "ifIndex": 1002,
-                    "ifSpeed": null,
-                    "ifSpeed_prev": 0,
+                    "ifSpeed": 0,
+                    "ifSpeed_prev": null,
                     "ifConnectorPresent": "true",
                     "ifPromiscuousMode": "false",
                     "ifOperStatus": "down",
@@ -2157,8 +2157,7 @@
                     "user_func": null,
                     "state_name": null
                 }
-            ],
-            "state_indexes": []
+            ]
         },
         "poller": "matches discovery"
     },
@@ -2175,7 +2174,7 @@
                 {
                     "vlan_vlan": 200,
                     "vlan_domain": 1,
-                    "vlan_name": "",
+                    "vlan_name": "VLAN 200",
                     "vlan_type": null,
                     "vlan_mtu": null
                 }

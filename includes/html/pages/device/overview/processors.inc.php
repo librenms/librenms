@@ -27,7 +27,7 @@ if (count($processors)) {
 
         $percent = $proc['processor_usage'];
         if (\LibreNMS\Config::get('cpu_details_overview') === true) {
-            $background = \LibreNMS\Util\Colors::percentage($percent, $proc['processor_perc_warn']);
+            $background = \LibreNMS\Util\Color::percentage($percent, $proc['processor_perc_warn']);
 
             $graph_array['id'] = $proc['processor_id'];
 
@@ -95,7 +95,7 @@ if (count($processors)) {
             //Add a row with CPU desc, count and percent graph
             $percent_usage = ceil($values['usage'] / $values['count']);
             $percent_warn = $values['warn'] / $values['count'];
-            $background = \LibreNMS\Util\Colors::percentage($percent_usage, $percent_warn);
+            $background = \LibreNMS\Util\Color::percentage($percent_usage, $percent_warn);
 
             echo '
               <tr>

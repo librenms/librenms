@@ -324,12 +324,6 @@
             ]
         }
     },
-    "ports": {
-        "discovery": {
-            "ports": []
-        },
-        "poller": "matches discovery"
-    },
     "processors": {
         "discovery": {
             "processors": [
@@ -402,8 +396,7 @@
                     "user_func": null,
                     "state_name": null
                 }
-            ],
-            "state_indexes": []
+            ]
         },
         "poller": "matches discovery"
     }
