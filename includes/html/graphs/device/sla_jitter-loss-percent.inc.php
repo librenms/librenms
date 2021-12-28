@@ -10,13 +10,14 @@
  * option) any later version.  Please see LICENSE.txt at the top level of
  * the source code distribution for details.
  */
+use App\Models\Sla;
 
-$sla = dbFetchRow('SELECT `sla_nr` FROM `slas` WHERE `sla_id` = ?', [$vars['id']]);
+$sla_nr = Sla::where('sla_id', $vars['id'])->value('sla_nr');
 
 require 'includes/html/graphs/common.inc.php';
 $rrd_options .= ' -l -100 -u 100 -E -r';
-$rrd_filename_1 = Rrd::name($device['hostname'], ['sla', $sla['sla_nr'], 'jitter']);
-$rrd_filename_2 = Rrd::name($device['hostname'], ['sla', $sla['sla_nr'], 'NumPackets']);
+$rrd_filename_1 = Rrd::name($device['hostname'], ['sla', $sla_nr, 'jitter']);
+$rrd_filename_2 = Rrd::name($device['hostname'], ['sla', $sla_nr, 'NumPackets']);
 
 if (Rrd::checkRrdExists($rrd_filename)) {
     $rrd_options .= " COMMENT:'                      Cur    Min    Max    Avg\\n'";
