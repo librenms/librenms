@@ -359,3 +359,143 @@ parameters:
 			message: "#^Parameter \\#1 \\$new_location of method App\\\\Models\\\\Device\\:\\:setLocation\\(\\) expects App\\\\Models\\\\Location\\|string, null given\\.$#"
 			count: 1
 			path: tests/Unit/LocationTest.php
+
+		-
+			message: "#^Method LibreNMS\\\\Tests\\\\Unit\\\\PermissionsTest\\:\\:devicePermissionData\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: tests/Unit/PermissionsTest.php
+
+		-
+			message: "#^Method LibreNMS\\\\Tests\\\\Unit\\\\PermissionsTest\\:\\:devicePermissionData\\(\\) has parameter \\$user with no type specified\\.$#"
+			count: 1
+			path: tests/Unit/PermissionsTest.php
+
+		-
+			message: "#^Method LibreNMS\\\\Tests\\\\Unit\\\\PermissionsTest\\:\\:testBillsForUser\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: tests/Unit/PermissionsTest.php
+
+		-
+			message: "#^Method LibreNMS\\\\Tests\\\\Unit\\\\PermissionsTest\\:\\:testDevicesForUser\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: tests/Unit/PermissionsTest.php
+
+		-
+			message: "#^Method LibreNMS\\\\Tests\\\\Unit\\\\PermissionsTest\\:\\:testPortsForUser\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: tests/Unit/PermissionsTest.php
+
+		-
+			message: "#^Method LibreNMS\\\\Tests\\\\Unit\\\\PermissionsTest\\:\\:testUserCanAccessBill\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: tests/Unit/PermissionsTest.php
+
+		-
+			message: "#^Method LibreNMS\\\\Tests\\\\Unit\\\\PermissionsTest\\:\\:testUserCanAccessDevice\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: tests/Unit/PermissionsTest.php
+
+		-
+			message: "#^Method LibreNMS\\\\Tests\\\\Unit\\\\PermissionsTest\\:\\:testUserCanAccessPort\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: tests/Unit/PermissionsTest.php
+
+		-
+			message: "#^Method LibreNMS\\\\Tests\\\\Unit\\\\PermissionsTest\\:\\:testUsersForBill\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: tests/Unit/PermissionsTest.php
+
+		-
+			message: "#^Method LibreNMS\\\\Tests\\\\Unit\\\\PermissionsTest\\:\\:testUsersForPort\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: tests/Unit/PermissionsTest.php
+
+		-
+			message: "#^Method LibreNMS\\\\Tests\\\\Unit\\\\SqliteTest\\:\\:testMigrationsRunWithoutError\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: tests/Unit/SqliteTest.php
+
+		-
+			message: "#^Property LibreNMS\\\\Tests\\\\Unit\\\\SqliteTest\\:\\:\\$connection has no type specified\\.$#"
+			count: 1
+			path: tests/Unit/SqliteTest.php
+
+		-
+			message: "#^Method LibreNMS\\\\Tests\\\\Unit\\\\Util\\\\EnvTest\\:\\:testParseArray\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: tests/Unit/Util/EnvTest.php
+
+		-
+			message: "#^Method LibreNMS\\\\Tests\\\\Unit\\\\Util\\\\EnvTest\\:\\:testSetEnv\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: tests/Unit/Util/EnvTest.php
+
+		-
+			message: "#^Method LibreNMS\\\\Tests\\\\YamlSchemaTest\\:\\:listDiscoveryFiles\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: tests/YamlSchemaTest.php
+
+		-
+			message: "#^Method LibreNMS\\\\Tests\\\\YamlSchemaTest\\:\\:listFiles\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: tests/YamlSchemaTest.php
+
+		-
+			message: "#^Method LibreNMS\\\\Tests\\\\YamlSchemaTest\\:\\:listFiles\\(\\) has parameter \\$pattern with no type specified\\.$#"
+			count: 1
+			path: tests/YamlSchemaTest.php
+
+		-
+			message: "#^Method LibreNMS\\\\Tests\\\\YamlSchemaTest\\:\\:listOsDefinitionFiles\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: tests/YamlSchemaTest.php
+
+		-
+			message: "#^Method LibreNMS\\\\Tests\\\\YamlSchemaTest\\:\\:testConfigSchema\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: tests/YamlSchemaTest.php
+
+		-
+			message: "#^Method LibreNMS\\\\Tests\\\\YamlSchemaTest\\:\\:testDiscoveryDefinitionSchema\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: tests/YamlSchemaTest.php
+
+		-
+			message: "#^Method LibreNMS\\\\Tests\\\\YamlSchemaTest\\:\\:testOSDefinitionSchema\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: tests/YamlSchemaTest.php
+
+		-
+			message: "#^Method LibreNMS\\\\Tests\\\\YamlSchemaTest\\:\\:testOSMatchFilename\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: tests/YamlSchemaTest.php
+
+		-
+			message: "#^Method LibreNMS\\\\Tests\\\\YamlSchemaTest\\:\\:validateFileAgainstSchema\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: tests/YamlSchemaTest.php
+
+		-
+			message: "#^Method LibreNMS\\\\Tests\\\\YamlSchemaTest\\:\\:validateYamlFilesAgainstSchema\\(\\) has no return type specified\\.$#"
+			count: 1
+			path: tests/YamlSchemaTest.php
+
+		-
+			message: "#^Method LibreNMS\\\\Tests\\\\YamlSchemaTest\\:\\:validateYamlFilesAgainstSchema\\(\\) has parameter \\$dir with no type specified\\.$#"
+			count: 1
+			path: tests/YamlSchemaTest.php
+
+		-
+			message: "#^Method LibreNMS\\\\Tests\\\\YamlSchemaTest\\:\\:validateYamlFilesAgainstSchema\\(\\) has parameter \\$schema_file with no type specified\\.$#"
+			count: 1
+			path: tests/YamlSchemaTest.php
+
+		-
+			message: "#^Property LibreNMS\\\\Tests\\\\YamlSchemaTest\\:\\:\\$excluded has no type specified\\.$#"
+			count: 1
+			path: tests/YamlSchemaTest.php
+
+		-
+			message: "#^Parameter \\#1 \\$user of static method App\\\\Models\\\\UserPref\\:\\:getPref\\(\\) expects App\\\\Models\\\\User, Illuminate\\\\Contracts\\\\Auth\\\\Authenticatable given.
+			count: 2
+			path: app/Providers/LegacyUserProvider.php
