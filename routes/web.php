@@ -231,14 +231,8 @@ Route::middleware(['auth'])->group(function () {
 });
 
 // routes that don't need authentication
-Route::group([], function () {
-    // Ajax routes
-    Route::group(['prefix' => 'ajax'], function () {
-        // misc ajax controllers
-        Route::group(['namespace' => 'Ajax'], function () {
-            Route::post('set_timezone', 'TimezoneController@set');
-        });
-    });
+Route::group(['prefix' => 'ajax'], function () {
+    Route::post('set_timezone', 'TimezoneController@set');
 });
 
 // installation routes
