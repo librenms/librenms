@@ -495,3 +495,7 @@ parameters:
 			count: 1
 			path: tests/YamlSchemaTest.php
 
+		-
+			message: "#^Parameter \\#1 \\$user of static method App\\\\Models\\\\UserPref\\:\\:getPref\\(\\) expects App\\\\Models\\\\User, Illuminate\\\\Contracts\\\\Auth\\\\Authenticatable given\\.$#"
+			count: 2
+			path: app/Providers/LegacyUserProvider.php
