@@ -42,6 +42,7 @@ class TimezoneController extends Controller
             session([
                 'timezone' => $request->timezone,
             ]);
+
             return $request->timezone;
         }
 
