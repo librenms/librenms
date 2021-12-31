@@ -45,7 +45,7 @@ if (is_numeric($vars['fired'])) {
 }
 
 if (is_numeric($vars['unreachable'])) {
-    # Sub-select to flag if at least one parent is set, and all parents are offline
+    // Sub-select to flag if at least one parent is set, and all parents are offline
     $where .= ' AND (SELECT IF(COUNT(`dr`.`parent_device_id`) > 0 AND COUNT(`dr`.`parent_device_id`)=count(`d`.`device_id`),1,0) FROM `device_relationships` `dr` LEFT JOIN `devices` `d` ON `dr`.`parent_device_id`=`d`.`device_id` AND `d`.`status`=0 WHERE `dr`.`child_device_id`=`devices`.`device_id`)=' . $vars['unreachable'];
 }
 
