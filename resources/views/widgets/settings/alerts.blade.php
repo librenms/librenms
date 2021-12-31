@@ -14,6 +14,14 @@
         </select>
     </div>
     <div class="form-group">
+        <label for="unreachable-{{ $id }}" class="control-label">{{ __('Show unreachable') }}:</label>
+        <select class="form-control" name="unreachable" id="unreachable-{{ $id }}">
+            <option value="">{{ __('not filtered') }}</option>
+            <option value="1" @if($unreachable === '1') selected @endif>{{ __('show only unreachable') }}</option>
+            <option value="0" @if($unreachable === '0') selected @endif>{{ __('hide unreachable') }}</option>
+        </select>
+    </div>
+    <div class="form-group">
         <label for="fired-{{ $id }}" class="control-label">{{ __('Show only fired') }}:</label>
         <select class="form-control" name="fired" id="fired-{{ $id }}">
             <option value="">{{ __('not filtered') }}</option>
