@@ -78,7 +78,7 @@ $pagetitle[] = 'Outages';
                 clear: 'fa fa-trash-o',
                 close: 'fa fa-close'
             },
-            defaultDate: '<?php echo Carbon::now()->subMonth()->format(Config::get('dateformat.byminute', 'Y-m-d H:i')); ?>'
+            defaultDate: '<?php echo Carbon::now(session('timezone'))->subMonth()->format(Config::get('dateformat.byminute', 'Y-m-d H:i')); ?>'
         });
         $("#dtpickerfrom").on("dp.change", function (e) {
             $("#dtpickerto").data("DateTimePicker").minDate(e.date);
@@ -95,7 +95,7 @@ $pagetitle[] = 'Outages';
                 clear: 'fa fa-trash-o',
                 close: 'fa fa-close'
             },
-            defaultDate: '<?php echo Carbon::now()->format(Config::get('dateformat.byminute', 'Y-m-d H:i')); ?>'
+            defaultDate: '<?php echo Carbon::now(session('timezone'))->format(Config::get('dateformat.byminute', 'Y-m-d H:i')); ?>'
         });
         $("#dtpickerto").on("dp.change", function (e) {
             $("#dtpickerfrom").data("DateTimePicker").maxDate(e.date);
@@ -106,7 +106,7 @@ $pagetitle[] = 'Outages';
         if ($("#dtpickerto").val() != "") {
             $("#dtpickerfrom").data("DateTimePicker").maxDate($("#dtpickerto").val());
         } else {
-            $("#dtpickerto").data("DateTimePicker").maxDate('<?php echo Carbon::now()->format(Config::get('dateformat.byminute', 'Y-m-d H:i')); ?>');
+            $("#dtpickerto").data("DateTimePicker").maxDate('<?php echo Carbon::now(session('timezone'))->format(Config::get('dateformat.byminute', 'Y-m-d H:i')); ?>');
         }
     });
 
