@@ -6,6 +6,7 @@ use LibreNMS\RRD\RrdDefinition;
 
 $name = 'docker';
 $app_id = $app['app_id'];
+echo "$name, app_id=$app_id ";
 $output = 'OK';
 
 function convertToBytes(string $from): ?int

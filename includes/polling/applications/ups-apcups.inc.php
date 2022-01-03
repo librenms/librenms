@@ -26,8 +26,7 @@ use LibreNMS\RRD\RrdDefinition;
 //NET-SNMP-EXTEND-MIB::nsExtendOutputFull."ups-apcups"
 $name = 'ups-apcups';
 $app_id = $app['app_id'];
-
-echo ' ' . $name;
+echo "$name, app_id=$app_id ";
 
 try {
     $json_return = json_app_get($device, $name);

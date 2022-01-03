@@ -7,6 +7,7 @@ use LibreNMS\RRD\RrdDefinition;
 
 $name = 'backupninja';
 $app_id = $app['app_id'];
+echo "$name, app_id=$app_id ";
 $output = 'OK';
 
 try {

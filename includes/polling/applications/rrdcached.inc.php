@@ -27,11 +27,10 @@
 
 use LibreNMS\RRD\RrdDefinition;
 
-echo ' rrdcached';
-
 $data = '';
 $name = 'rrdcached';
 $app_id = $app['app_id'];
+echo "$name, app_id=$app_id ";
 
 if ($agent_data['app'][$name]) {
     $data = $agent_data['app'][$name];

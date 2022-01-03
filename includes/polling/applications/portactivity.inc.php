@@ -5,8 +5,7 @@ use LibreNMS\RRD\RrdDefinition;
 
 $name = 'portactivity';
 $app_id = $app['app_id'];
-
-echo $name;
+echo "$name, app_id=$app_id ";
 
 try {
     $returned = json_app_get($device, 'portactivity', 1);

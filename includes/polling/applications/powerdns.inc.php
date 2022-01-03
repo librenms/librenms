@@ -8,8 +8,8 @@ use LibreNMS\RRD\RrdDefinition;
 
 $name = 'powerdns';
 $app_id = $app['app_id'];
+echo "$name, app_id=$app_id ";
 $powerdns = [];
-echo " $name";
 
 // unused metrics:
 // deferred-packetcache-inserts, deferred-packetcache-lookup, dnsupdate-answers, dnsupdate-changes, dnsupdate-queries, dnsupdate-refused, incoming-notifications

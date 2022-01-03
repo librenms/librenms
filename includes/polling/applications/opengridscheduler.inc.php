@@ -17,6 +17,7 @@ use LibreNMS\RRD\RrdDefinition;
 
 $name = 'ogs';
 $app_id = $app['app_id'];
+echo "$name, app_id=$app_id ";
 $oid = '.1.3.6.1.4.1.8072.1.3.2.3.1.2.3.111.103.115';
 
 echo ' ' . $name;

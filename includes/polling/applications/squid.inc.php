@@ -4,6 +4,7 @@ use LibreNMS\RRD\RrdDefinition;
 
 $name = 'squid';
 $app_id = $app['app_id'];
+echo "$name, app_id=$app_id ";
 
 $oids = [
     '.1.3.6.1.4.1.3495.1.2.5.1.0',

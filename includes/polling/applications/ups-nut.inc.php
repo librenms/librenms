@@ -28,6 +28,7 @@ use LibreNMS\RRD\RrdDefinition;
 //NET-SNMP-EXTEND-MIB::nsExtendOutputFull."ups-nut"
 $name = 'ups-nut';
 $app_id = $app['app_id'];
+echo "$name, app_id=$app_id ";
 $oid = '.1.3.6.1.4.1.8072.1.3.2.3.1.2.7.117.112.115.45.110.117.116';
 $ups_nut = snmp_get($device, $oid, '-Oqv');
 
@@ -39,8 +40,6 @@ if (! $ups_nut) {
     $ups_nut = snmp_walk($device, $oid, '-Oqv');
 }
 //print_r(array_values(explode("\n", $ups_nut)));
-
-echo ' ' . $name;
 
 // (2020-05-13, Jon.W) Added ups status data and updated ups-nut.sh script.
 [

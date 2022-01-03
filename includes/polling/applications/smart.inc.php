@@ -2,10 +2,9 @@
 
 use LibreNMS\RRD\RrdDefinition;
 
-echo 'SMART';
-
 $name = 'smart';
 $app_id = $app['app_id'];
+echo "$name, app_id=$app_id ";
 
 $options = '-Oqv';
 $oid = '.1.3.6.1.4.1.8072.1.3.2.3.1.2.5.115.109.97.114.116';

@@ -4,6 +4,8 @@ use LibreNMS\RRD\RrdDefinition;
 
 $name = 'memcached';
 $app_id = $app['app_id'];
+echo "$name, app_id=$app_id ";
+
 if (! empty($agent_data['app']['memcached'])) {
     $data = $agent_data['app']['memcached'][$app['app_instance']];
 } else {

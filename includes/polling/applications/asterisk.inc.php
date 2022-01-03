@@ -4,7 +4,6 @@ use LibreNMS\RRD\RrdDefinition;
 
 $name = 'asterisk';
 $app_id = $app['app_id'];
-
 echo "$name, app_id=$app_id ";
 
 if (! empty($agent_data[$name])) {
