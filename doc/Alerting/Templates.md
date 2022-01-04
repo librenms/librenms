@@ -47,6 +47,7 @@ been up for 30344 seconds`.
 - Hostname of the Device: `$alert->hostname`
 - sysName of the Device: `$alert->sysName`
 - sysDescr of the Device: `$alert->sysDescr`
+- display name of the Device: `$alert->display`
 - sysContact of the Device: `$alert->sysContact`
 - OS of the Device: `$alert->os`
 - Type of Device: `$alert->type`

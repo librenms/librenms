@@ -532,23 +532,6 @@ function object_is_cached($section, $obj)
     }
 } // object_is_cached
 
-/**
- * Checks if config allows us to ping this device
- * $attribs contains an array of all of this devices
- * attributes
- *
- * @param  array  $attribs  Device attributes
- * @return bool
- **/
-function can_ping_device($attribs)
-{
-    if (Config::get('icmp_check') && ! (isset($attribs['override_icmp_disable']) && $attribs['override_icmp_disable'] == 'true')) {
-        return true;
-    } else {
-        return false;
-    }
-} // end can_ping_device
-
 function search_phrase_column($c)
 {
     global $searchPhrase;
