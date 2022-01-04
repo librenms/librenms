@@ -4,7 +4,6 @@ use LibreNMS\RRD\RrdDefinition;
 
 $name = 'proxmox';
 $app_id = $app['app_id'];
-echo "$name, app_id=$app_id ";
 
 if (! function_exists('proxmox_port_exists')) {
     /**

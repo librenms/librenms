@@ -6,7 +6,6 @@ use LibreNMS\RRD\RrdDefinition;
 
 $name = 'pureftpd';
 $app_id = $app['app_id'];
-echo "$name, app_id=$app_id ";
 $output = 'OK';
 
 try {

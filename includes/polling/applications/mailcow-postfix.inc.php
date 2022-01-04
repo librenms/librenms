@@ -24,7 +24,6 @@ use LibreNMS\RRD\RrdDefinition;
 
 $name = 'mailcow-postfix';
 $app_id = $app['app_id'];
-echo "$name, app_id=$app_id ";
 
 try {
     $mailcow_postfix = json_app_get($device, $name);

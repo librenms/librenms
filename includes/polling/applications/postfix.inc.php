@@ -4,7 +4,6 @@ use LibreNMS\RRD\RrdDefinition;
 
 $name = 'postfix';
 $app_id = $app['app_id'];
-echo "$name, app_id=$app_id ";
 
 $options = '-Oqv';
 $queueOID = '.1.3.6.1.4.1.8072.1.3.2.3.1.2.5.109.97.105.108.113';

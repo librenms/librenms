@@ -6,7 +6,6 @@ use LibreNMS\RRD\RrdDefinition;
 
 $name = 'zfs';
 $app_id = $app['app_id'];
-echo "$name, app_id=$app_id ";
 
 // Is set to false later if missing keys are found.
 $not_legacy = 1;

@@ -5,7 +5,6 @@ use LibreNMS\RRD\RrdDefinition;
 
 $name = 'chronyd';
 $app_id = $app['app_id'];
-echo "$name, app_id=$app_id ";
 
 try {
     $chronyd = json_app_get($device, $name, 1)['data'];

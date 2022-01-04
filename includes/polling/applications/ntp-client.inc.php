@@ -6,7 +6,6 @@ use LibreNMS\RRD\RrdDefinition;
 
 $name = 'ntp-client';
 $app_id = $app['app_id'];
-echo "$name, app_id=$app_id ";
 
 try {
     $ntp = json_app_get($device, $name);

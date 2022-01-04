@@ -4,7 +4,6 @@ use LibreNMS\RRD\RrdDefinition;
 
 $name = 'nfsstat';
 $app_id = $app['app_id'];
-echo "$name, app_id=$app_id ";
 $oid = '.1.3.6.1.4.1.8072.1.3.2.4';
 
 $nfsstats = snmp_walk($device, $oid, '-Oqv', 'NET-SNMP-EXTEND-MIB');

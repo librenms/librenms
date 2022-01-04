@@ -5,7 +5,6 @@ use LibreNMS\RRD\RrdDefinition;
 
 $name = 'apache';
 $app_id = $app['app_id'];
-echo "$name, app_id=$app_id ";
 
 if (! empty($agent_data['app'][$name])) {
     $apache = $agent_data['app'][$name];
