@@ -1626,7 +1626,7 @@ ports_stp:
     - { Field: enable, Type: varchar(8), 'Null': false, Extra: '' }
     - { Field: pathCost, Type: 'int unsigned', 'Null': false, Extra: '' }
     - { Field: designatedRoot, Type: varchar(32), 'Null': false, Extra: '' }
-    - { Field: designatedCost, Type: 'mediumint unsigned', 'Null': false, Extra: '' }
+    - { Field: designatedCost, Type: 'int unsigned', 'Null': false, Extra: '' }
     - { Field: designatedBridge, Type: varchar(32), 'Null': false, Extra: '' }
     - { Field: designatedPort, Type: mediumint, 'Null': false, Extra: '' }
     - { Field: forwardTransitions, Type: 'int unsigned', 'Null': false, Extra: '' }
