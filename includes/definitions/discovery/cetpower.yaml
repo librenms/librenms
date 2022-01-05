@@ -4,55 +4,61 @@ modules:
         serial: CET-TSI-MIB::tsiT2SSerialNumber
     sensors:
         load:
+            options:
+                skip_value_lt: 1
             data:
                 -
                     oid: tsiPhaseAvailablePowerRatioW
                     value: tsiPhaseAvailablePowerRatioW
                     num_oid: '.1.3.6.1.4.1.12551.4.1.2.2.1.2.{{ $index }}'
-                    index: 'tsiPhaseAvailablePowerRatioW.{{ $index }}'
-                    descr: 'tsiPhaseAvailablePowerRatio{{ $index }}'
+                    index: 'tsiPhaseAvailablePowerRatio.{{ $index }}'
+                    descr: 'Available Power Ratio {{ $index }}'
         power:
+            options:
+                skip_value_lt: 1
             data:
                 -
                     oid: tsiPhaseCurrentPowerInW
                     value: tsiPhaseCurrentPowerInW
                     num_oid: '.1.3.6.1.4.1.12551.4.1.2.2.1.12.{{ $index }}'
                     index: 'tsiPhaseCurrentPowerInW.{{ $index }}'
-                    descr: 'tsiPhaseCurrentPowerInW{{ $index }}'
+                    descr: 'Current Power In {{ $index }}'
                 -
                     oid: tsiPhaseInstalledPowerInW
                     value: tsiPhaseInstalledPowerInW
                     num_oid: '.1.3.6.1.4.1.12551.4.1.2.2.1.14.{{ $index }}'
                     index: 'tsiPhaseInstalledPowerInW.{{ $index }}'
-                    descr: 'tsiPhaseInstalledPowerInW{{ $index }}'
+                    descr: 'Installed Power In {{ $index }}'
         voltage:
             options:
                 skip_value_lt: 1
+                divisor: 10
             data:
                 -
                     oid: tsiModuleVinAC
+                    value: tsiModuleVinAC
                     num_oid: '.1.3.6.1.4.1.12551.4.1.1.1.1.20.{{ $index }}'
                     index: 'tsiModuleVinAC.{{ $index }}'
-                    descr: 'tsiModuleVinAC{{ $index }}'
-                    divisor: 10
+                    descr: 'Module Voltage in AC {{ $index }}'
                 -
                     oid: tsiModuleVout
+                    value: tsiModuleVout
                     num_oid: '.1.3.6.1.4.1.12551.4.1.1.1.1.16.{{ $index }}'
                     index: 'tsiModuleVout.{{ $index }}'
-                    descr: 'tsiModuleVout{{ $index }}'
-                    divisor: 10
+                    descr: 'Module Voltage Out {{ $index }}'
                 -
                     oid: tsiModuleVinDC
+                    value: tsiModuleVinDC
                     num_oid: '.1.3.6.1.4.1.12551.4.1.1.1.1.25.{{ $index }}'
                     index: 'tsiModuleVinDC.{{ $index }}'
-                    descr: 'tsiModuleVinDC{{ $index }}'
-                    divisor: 10
+                    descr: 'Module Voltage in DC {{ $index }}'
         temperature:
             options:
                 skip_value_lt: 1
             data:
                 -
                     oid: tsiModuleTemperature
+                    value: tsiModuleTemperature
                     num_oid: '.1.3.6.1.4.1.12551.4.1.1.1.1.28.{{ $index }}'
                     index: 'tsiModuleTemperature.{{ $index }}'
-                    descr: 'tsiModuleTemperature{{ $index }}'
+                    descr: 'Module Temperature {{ $index }}'
