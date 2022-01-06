@@ -1,4 +1,4 @@
-os: smartos
+os: smartos-dcp-m
 text: 'SmartOptics DCP-M Series'
 type: network
 icon: smartoptics
