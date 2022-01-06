@@ -5,8 +5,6 @@ use LibreNMS\RRD\RrdDefinition;
 $name = 'bind';
 $app_id = $app['app_id'];
 
-echo " $name";
-
 if (! empty($agent_data['app'][$name])) {
     $bind = $agent_data['app'][$name];
 } else {

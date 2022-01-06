@@ -12,7 +12,6 @@ if (! empty($agent_data['app'][$name])) {
     $mysql = snmp_get($device, '.1.3.6.1.4.1.8072.1.3.2.3.1.2.5.109.121.115.113.108', '-Ovq');
 }
 
-echo ' mysql';
 $metrics = [];
 
 // General Stats

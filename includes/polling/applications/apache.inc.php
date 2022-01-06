@@ -5,6 +5,7 @@ use LibreNMS\RRD\RrdDefinition;
 
 $name = 'apache';
 $app_id = $app['app_id'];
+
 if (! empty($agent_data['app'][$name])) {
     $apache = $agent_data['app'][$name];
 } else {
@@ -12,8 +13,6 @@ if (! empty($agent_data['app'][$name])) {
     $oid = '.1.3.6.1.4.1.8072.1.3.2.3.1.2.6.97.112.97.99.104.101';
     $apache = snmp_get($device, $oid, $options);
 }
-
-echo ' apache';
 
 [$total_access, $total_kbyte, $cpuload, $uptime, $reqpersec, $bytespersec,
     $bytesperreq, $busyworkers, $idleworkers, $score_wait, $score_start,
