@@ -662,7 +662,7 @@ class Timos extends OS implements MplsDiscovery, MplsPolling, WirelessPowerDisco
             $sapEncapValueOid = $this->nokiaEncap($sapEncapValue);
             if (!is_numeric($sapEncapValueOid)) {
                 $sapEncapValueOid = '4095';
-            };
+            }
             $traffic_id = $svcId . '.' . $sapPortId . '.' . $sapEncapValueOid;
 
             $saps->push(new MplsSap([
