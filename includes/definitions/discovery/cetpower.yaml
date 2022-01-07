@@ -8,7 +8,7 @@ modules:
                 skip_value_lt: 1
             data:
                 -
-                    oid: tsiPhaseAvailablePowerRatioW
+                    oid: tsiPhaseTable
                     value: tsiPhaseAvailablePowerRatioW
                     num_oid: '.1.3.6.1.4.1.12551.4.1.2.2.1.2.{{ $index }}'
                     index: 'tsiPhaseAvailablePowerRatio.{{ $index }}'
@@ -18,13 +18,13 @@ modules:
                 skip_value_lt: 1
             data:
                 -
-                    oid: tsiPhaseCurrentPowerInW
+                    oid: tsiPhaseTable
                     value: tsiPhaseCurrentPowerInW
                     num_oid: '.1.3.6.1.4.1.12551.4.1.2.2.1.12.{{ $index }}'
                     index: 'tsiPhaseCurrentPowerInW.{{ $index }}'
                     descr: 'Current Power In {{ $index }}'
                 -
-                    oid: tsiPhaseInstalledPowerInW
+                    oid: tsiPhaseTable
                     value: tsiPhaseInstalledPowerInW
                     num_oid: '.1.3.6.1.4.1.12551.4.1.2.2.1.14.{{ $index }}'
                     index: 'tsiPhaseInstalledPowerInW.{{ $index }}'
@@ -35,19 +35,19 @@ modules:
                 divisor: 10
             data:
                 -
-                    oid: tsiModuleVinAC
+                    oid: tsiModuleTable
                     value: tsiModuleVinAC
                     num_oid: '.1.3.6.1.4.1.12551.4.1.1.1.1.20.{{ $index }}'
                     index: 'tsiModuleVinAC.{{ $index }}'
                     descr: 'Module Voltage in AC {{ $index }}'
                 -
-                    oid: tsiModuleVout
+                    oid: tsiModuleTable
                     value: tsiModuleVout
                     num_oid: '.1.3.6.1.4.1.12551.4.1.1.1.1.16.{{ $index }}'
                     index: 'tsiModuleVout.{{ $index }}'
                     descr: 'Module Voltage Out {{ $index }}'
                 -
-                    oid: tsiModuleVinDC
+                    oid: tsiModuleTable
                     value: tsiModuleVinDC
                     num_oid: '.1.3.6.1.4.1.12551.4.1.1.1.1.25.{{ $index }}'
                     index: 'tsiModuleVinDC.{{ $index }}'
@@ -57,7 +57,7 @@ modules:
                 skip_value_lt: 1
             data:
                 -
-                    oid: tsiModuleTemperature
+                    oid: tsiModuleTable
                     value: tsiModuleTemperature
                     num_oid: '.1.3.6.1.4.1.12551.4.1.1.1.1.28.{{ $index }}'
                     index: 'tsiModuleTemperature.{{ $index }}'
