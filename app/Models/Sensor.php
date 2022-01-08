@@ -39,6 +39,7 @@ class Sensor extends DeviceRelatedModel
         'state'                => 'bullseye',
         'temperature'          => 'thermometer-three-quarters',
         'tv_signal'            => 'signal',
+        'bitrate'              => 'bar-chart',
         'voltage'              => 'bolt',
         'waterflow'            => 'tint',
         'percent'              => 'percent',

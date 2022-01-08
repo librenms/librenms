@@ -50,6 +50,7 @@ $type_text = [
     'count' => 'Count',
     'signal' => 'Signal',
     'tv_signal' => 'TV signal',
+    'bitrate' => 'Bitrate',
     'snr' => 'SNR',
     'pressure' => 'Pressure',
     'cooling' => 'Cooling',
