@@ -659,11 +659,14 @@ class Timos extends OS implements MplsDiscovery, MplsPolling, WirelessPowerDisco
             }
             [$svcId, $sapPortId, $sapEncapValue] = explode('.', $key);
             $svc_id = $svcs->firstWhere('svc_oid', $svcId)->svc_id;
-            $sapEncapValueOid = $this->nokiaEncap($sapEncapValue);
-            if (! is_numeric($sapEncapValueOid)) {
-                $sapEncapValueOid = '4095';
+            $traffic_id = $svcId . '.' . $sapPortId . '.' . $this->nokiaEncap($sapEncapValue);
+
+            // Any unused vlan on a port returns * in sapEncapValue but had OID .4095
+            $specialQinQIdentifier = $this->nokiaEncap($sapEncapValue);
+            if ($specialQinQIdentifier == '*') {
+                $specialQinQIdentifier = '4095';
+                $traffic_id = $svcId . '.' . $sapPortId . '.' . $specialQinQIdentifier;
             }
-            $traffic_id = $svcId . '.' . $sapPortId . '.' . $sapEncapValueOid;
 
             $saps->push(new MplsSap([
                 'svc_id' => $svc_id,

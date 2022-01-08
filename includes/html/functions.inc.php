@@ -440,7 +440,8 @@ function generate_port_url($port, $vars = [])
 
 function generate_sap_url($sap, $vars = [])
 {
-    if (! is_numeric($sap['sapEncapValue'])) {
+    // Overwrite special QinQ sap identifiers
+    if ($sap['sapEncapValue'] == '*') {
         $sap['sapEncapValue'] = '4095';
     }
 
