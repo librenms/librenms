@@ -78,7 +78,7 @@ class VlansController implements DeviceTab
                 ->on('ports_vlans.vlan', 'vlans.vlan_vlan')
                 ->on('vlans.device_id', 'ports_vlans.device_id');
             })
-            ->join('ports', function ($join){
+            ->join('ports', function ($join) {
                 $join
                 ->on('ports_vlans.port_id', 'ports.port_id');
             })
