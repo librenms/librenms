@@ -13,7 +13,7 @@
                     "os": "cetpower",
                     "type": "power",
                     "serial": null,
-                    "icon": "generic.svg",
+                    "icon": "cet.png",
                     "location": "Local"
                 }
             ]
