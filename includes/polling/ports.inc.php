@@ -331,13 +331,35 @@ if (file_exists($os_file)) {
     require $os_file;
 }
 
-if (Config::get('enable_ports_adsl')) {
-    $device['xdsl_count'] = dbFetchCell("SELECT COUNT(*) FROM `ports` WHERE `device_id` = ? AND `ifType` in ('adsl','vdsl','vdsl2')", [$device['device_id']]);
+
+// Check if we have to poll xDSL MIBs, and if yes which ones
+$component = new LibreNMS\Component();
+$components = $component->getComponents($device['device_id'], ['type'=>'ports']);
+$components = $components[$device['device_id']];
+$adsl_id = false;
+$vdsl_id = false;
+
+foreach ($components as $tmp_component_id => $tmp_component) {
+    if ($tmp_component['name'] == 'adsl-port') {
+        $adsl_id = $tmp_component_id;
+    }
+    if ($tmp_component['name'] == 'vdsl-port') {
+        $vdsl_id = $tmp_component_id;
+    }
 }
 
-if ($device['xdsl_count'] > '0') {
+if ($adsl_id) {
     echo 'ADSL ';
-    $port_stats = snmpwalk_cache_oid($device, '.1.3.6.1.2.1.10.94.1', $port_stats, 'ADSL-LINE-MIB');
+    $port_stats = snmpwalk_cache_oid($device, 'adslMibObjects', $port_stats, 'ADSL-LINE-MIB');
+}//end if
+if ($vdsl_id) {
+    echo 'VDSL ';
+    $port_vdsl_tree1 = snmpwalk_group($device, 'xdsl2ChannelStatusTable','VDSL2-LINE-MIB', 2);
+    $port_vdsl_tree2 = snmpwalk_group($device, 'xdsl2LineEntry','VDSL2-LINE-MIB', 2);
+    foreach($port_vdsl_tree1 as $key => $val) {
+        $port_vdsl_tree[$key] = array_merge_recursive($val, $port_vdsl_tree2[$key]);
+    }
+    d_echo ($port_vdsl_tree);
 }//end if
 
 if (Config::get('enable_ports_poe')) {
@@ -914,8 +936,12 @@ foreach ($ports as $port) {
             }
 
             // Do ADSL MIB
-            if (Config::get('enable_ports_adsl')) {
+            if ($adsl_id) {
                 include 'ports/port-adsl.inc.php';
+            }
+            // Do VDSL MIB
+            if ($vdsl_id) {
+                include 'ports/port-vdsl.inc.php';
             }
 
             // Do PoE MIBs
