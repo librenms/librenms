@@ -27,8 +27,6 @@ $options = '-Oqv';
 //NET-SNMP-EXTEND-MIB::nsExtendOutputFull."powerdns-dnsdist"
 $oid = '.1.3.6.1.4.1.8072.1.3.2.3.1.2.16.112.111.119.101.114.100.110.115.45.100.110.115.100.105.115.116';
 
-d_echo($name);
-
 $powerdns_dnsdist = snmp_walk($device, $oid, $options);
 
 if (is_string($powerdns_dnsdist)) {

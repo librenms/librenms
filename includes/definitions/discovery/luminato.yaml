@@ -14,7 +14,7 @@ modules:
                 oid: laLoadInt
                 num_oid: '.1.3.6.1.4.1.2021.10.1.5.{{ $index }}'
                 descr: Chassis CPU
-                index: 2
+                index: 0
     sensors:
         pre-cache:
             data:
@@ -30,7 +30,7 @@ modules:
                     descr: "{{ $entPhysicalName }} ({{ $entPhysicalDescr }}) "
                     index: '{{ $index }}'
                     divisor: 10
-                    skip_value_lt: -50
+                    skip_value_lt: 1
         state:
             data:
                 -

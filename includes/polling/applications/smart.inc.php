@@ -2,8 +2,6 @@
 
 use LibreNMS\RRD\RrdDefinition;
 
-echo 'SMART';
-
 $name = 'smart';
 $app_id = $app['app_id'];
 

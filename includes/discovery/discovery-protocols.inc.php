@@ -299,6 +299,12 @@ if (($device['os'] == 'routeros')) {
                 if ($lldp['lldpRemChassisIdSubtype'] == 6 || $lldp['lldpRemChassisIdSubtype'] == 2) { // 6=ifName 2=ifAlias
                     $remote_port_name = $lldp['lldpRemChassisId'];
                 }
+                // Linksys / Cisco SRW2016/24/48 all have lldpRemSysDesc Ethernet Interface, which makes all lldp mappings go to port g1.
+                // ex:
+                //     'lldpRemSysDesc' => '16-Port 10/100/1000 Gigabit Switch w/WebView',
+                if (str_ends_with($lldp['lldpRemSysDesc'], 'Gigabit Switch w/WebView')) {
+                    $lldp['lldpRemPortDesc'] = '';
+                }
 
                 $remote_device_id = find_device_id($lldp['lldpRemSysName'], $lldp['lldpRemManAddr'], $remote_port_mac);
 

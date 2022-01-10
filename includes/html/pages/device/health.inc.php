@@ -1,5 +1,7 @@
 <?php
 
+use App\Models\Sensor;
+
 $storage = dbFetchCell('select count(*) from storage WHERE device_id = ?', [$device['device_id']]);
 $diskio = dbFetchRows('SELECT * FROM `ucd_diskio` WHERE device_id = ? ORDER BY diskio_descr', [$device['device_id']]);
 $mempools = dbFetchCell('select count(*) from mempools WHERE device_id = ?', [$device['device_id']]);
@@ -45,6 +47,7 @@ $eer = dbFetchCell("select count(*) from sensors WHERE sensor_class='eer' AND de
 $waterflow = dbFetchCell("select count(*) from sensors WHERE sensor_class='waterflow' AND device_id = ?", [$device['device_id']]);
 $percent = dbFetchCell("select count(*) from sensors WHERE sensor_class='percent' AND device_id = ?", [$device['device_id']]);
 $tv_signal = dbFetchCell("select count(*) from sensors WHERE sensor_class='tv_signal' AND device_id = ?", [$device['device_id']]);
+$bitrate = Sensor::where('sensor_class', 'bitrate')->where('device_id', $device['device_id'])->count();
 
 unset($datas);
 $datas[] = 'overview';
@@ -136,6 +139,10 @@ if ($tv_signal) {
     $datas[] = 'tv_signal';
 }
 
+if ($bitrate) {
+    $datas[] = 'bitrate';
+}
+
 if ($airflow) {
     $datas[] = 'airflow';
 }
@@ -206,6 +213,7 @@ $type_text['count'] = 'Count';
 $type_text['load'] = 'Load';
 $type_text['signal'] = 'Signal';
 $type_text['tv_signal'] = 'TV signal';
+$type_text['bitrate'] = 'Bitrate';
 $type_text['airflow'] = 'Airflow';
 $type_text['snr'] = 'SNR';
 $type_text['pressure'] = 'Pressure';
