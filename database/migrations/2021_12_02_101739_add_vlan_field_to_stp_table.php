@@ -14,7 +14,7 @@ class AddVlanFieldToStpTable extends Migration
     public function up()
     {
         Schema::table('stp', function (Blueprint $table) {
-            $table->unsignedInteger('vlan')->after('device_id');
+            $table->unsignedInteger('vlan')->nullable()->after('device_id');
         });
     }
 

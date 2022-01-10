@@ -1618,7 +1618,7 @@ ports_stp:
   Columns:
     - { Field: port_stp_id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
     - { Field: device_id, Type: 'int unsigned', 'Null': false, Extra: '' }
-    - { Field: vlan, Type: 'int unsigned', 'Null': false, Extra: '' }
+    - { Field: vlan, Type: 'int unsigned', 'Null': true, Extra: '' }
     - { Field: port_id, Type: 'int unsigned', 'Null': false, Extra: '' }
     - { Field: port_index, Type: 'int unsigned', 'Null': false, Extra: '' }
     - { Field: priority, Type: 'tinyint unsigned', 'Null': false, Extra: '' }
@@ -1964,7 +1964,7 @@ stp:
   Columns:
     - { Field: stp_id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
     - { Field: device_id, Type: 'int unsigned', 'Null': false, Extra: '' }
-    - { Field: vlan, Type: 'int unsigned', 'Null': false, Extra: '' }
+    - { Field: vlan, Type: 'int unsigned', 'Null': true, Extra: '' }
     - { Field: rootBridge, Type: tinyint, 'Null': false, Extra: '' }
     - { Field: bridgeAddress, Type: varchar(32), 'Null': false, Extra: '' }
     - { Field: protocolSpecification, Type: varchar(16), 'Null': false, Extra: '' }

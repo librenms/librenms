@@ -117,9 +117,9 @@ trait BridgeMib
                         'state' => $data['BRIDGE-MIB::dot1dStpPortState'] ?? 'unknown',
                         'enable' => $data['BRIDGE-MIB::dot1dStpPortEnable'] ?? 'unknown',
                         'pathCost' => $data['BRIDGE-MIB::dot1dStpPortPathCost32'] ?? $data['BRIDGE-MIB::dot1dStpPortPathCost'] ?? 0,
-                        'designatedRoot' => Rewrite::macToHex($stp['BRIDGE-MIB::dot1dStpPortDesignatedRoot'] ?? ''),
+                        'designatedRoot' => Rewrite::macToHex($data['BRIDGE-MIB::dot1dStpPortDesignatedRoot'] ?? ''),
                         'designatedCost' => $data['BRIDGE-MIB::dot1dStpPortDesignatedCost'] ?? 0,
-                        'designatedBridge' => Rewrite::macToHex($stp['BRIDGE-MIB::dot1dStpPortDesignatedBridge'] ?? ''),
+                        'designatedBridge' => Rewrite::macToHex($data['BRIDGE-MIB::dot1dStpPortDesignatedBridge'] ?? ''),
                         'designatedPort' => $this->designatedPort($data['BRIDGE-MIB::dot1dStpPortDesignatedPort'] ?? ''),
                         'forwardTransitions' => $data['BRIDGE-MIB::dot1dStpPortForwardTransitions'] ?? 0,
                     ]);
@@ -159,7 +159,7 @@ trait BridgeMib
                 'BRIDGE-MIB::dot1dStpDesignatedRoot.0',
             ])->values();
 
-            $instance->timeSinceTopologyChange = $data['BRIDGE-MIB::dot1dStpTimeSinceTopologyChange.0'];
+            $instance->timeSinceTopologyChange = substr($data['BRIDGE-MIB::dot1dStpTimeSinceTopologyChange.0'] ?? '', 0, -2) ?: 0;
             $instance->topChanges = $data['BRIDGE-MIB::dot1dStpTopChanges.0'];
             $instance->designatedRoot = Rewrite::macToHex($data['BRIDGE-MIB::dot1dStpDesignatedRoot.0'] ?? '');
         });
