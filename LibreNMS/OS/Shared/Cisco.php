@@ -411,6 +411,7 @@ class Cisco extends OS implements OSDiscovery, SlaDiscovery, ProcessorDiscovery,
 
         $data = snmpwalk_group($device, 'rttMonLatestRttOperTable', 'CISCO-RTTMON-MIB');
         $data = snmpwalk_group($device, 'rttMonLatestOper', 'CISCO-RTTMON-MIB', 1, $data);
+        $data = snmpwalk_group($device, 'rttMonEchoAdminNumPackets', 'CISCO-RTTMON-MIB', 1, $data);
 
         $time_offset = time() - $this->getDevice()->uptime;
 
@@ -472,6 +473,16 @@ class Cisco extends OS implements OSDiscovery, SlaDiscovery, ProcessorDiscovery,
                     $tags = compact('rrd_name', 'rrd_def', 'sla_nr', 'rtt_type');
                     data_update($device, 'sla', $tags, $jitter);
                     $fields = array_merge($fields, $jitter);
+                    // Additional rrd for total number packet in sla
+                    $numPackets = [
+                        'NumPackets' => $data[$sla_nr]['rttMonEchoAdminNumPackets'],
+                    ];
+                    $rrd_name = ['sla', $sla_nr, 'NumPackets'];
+                    $rrd_def = RrdDefinition::make()
+                        ->addDataset('NumPackets', 'GAUGE', 0);
+                    $tags = compact('rrd_name', 'rrd_def', 'sla_nr', 'rtt_type');
+                    data_update($device, 'sla', $tags, $numPackets);
+                    $fields = array_merge($fields, $numPackets);
                     break;
                 case 'icmpjitter':
                     $icmpjitter = [

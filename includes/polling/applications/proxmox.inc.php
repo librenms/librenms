@@ -2,6 +2,9 @@
 
 use LibreNMS\RRD\RrdDefinition;
 
+$name = 'proxmox';
+$app_id = $app['app_id'];
+
 if (! function_exists('proxmox_port_exists')) {
     /**
      * Check if a port on a Proxmox VM exists
@@ -44,9 +47,6 @@ if (! function_exists('proxmox_vm_exists')) {
         return false;
     }
 }
-
-$name = 'proxmox';
-$app_id = $app['app_id'];
 
 if (\LibreNMS\Config::get('enable_proxmox') && ! empty($agent_data['app'][$name])) {
     $proxmox = $agent_data['app'][$name];

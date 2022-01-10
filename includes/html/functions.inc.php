@@ -440,6 +440,11 @@ function generate_port_url($port, $vars = [])
 
 function generate_sap_url($sap, $vars = [])
 {
+    // Overwrite special QinQ sap identifiers
+    if ($sap['sapEncapValue'] == '*') {
+        $sap['sapEncapValue'] = '4095';
+    }
+
     return \LibreNMS\Util\Url::graphPopup(['device' => $sap['device_id'], 'page' => 'graphs', 'type' => 'device_sap', 'tab' => 'routing', 'proto' => 'mpls', 'view' => 'saps', 'traffic_id' => $sap['svc_oid'] . '.' . $sap['sapPortId'] . '.' . $sap['sapEncapValue']], $vars);
 }//end generate_sap_url()
 

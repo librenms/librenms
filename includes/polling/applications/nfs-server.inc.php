@@ -16,13 +16,10 @@
 use LibreNMS\RRD\RrdDefinition;
 
 $name = 'nfs-server';
+$app_id = $app['app_id'];
 $oid = '.1.3.6.1.4.1.8072.1.3.2.3.1.2.10.110.102.115.45.115.101.114.118.101.114';
 
-echo ' ' . $name;
-
 $nfsstats = snmp_get($device, $oid, '-Oqv');
-
-$app_id = $app['app_id'];
 
 // rrd names
 $rrd_name = [];

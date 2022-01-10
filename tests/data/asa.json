@@ -3515,9 +3515,22 @@
                     "user_func": null,
                     "state_name": null
                 }
-            ],
-            "state_indexes": []
+            ]
         },
         "poller": "matches discovery"
+    },
+    "cipsec-tunnels": {
+        "poller": {
+            "ipsec_tunnels": [
+                {
+                    "peer_port": 0,
+                    "peer_addr": "<private>",
+                    "local_addr": "<private>",
+                    "local_port": 0,
+                    "tunnel_name": "<private>",
+                    "tunnel_status": ""
+                }
+            ]
+        }
     }
 }

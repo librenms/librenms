@@ -351,7 +351,7 @@ class NetSnmpQuery implements SnmpQueryInterface
 
     private function initCommand(string $binary): array
     {
-        if ($binary == 'snmpwalk' && $this->device->snmpver !== 'v1' && ! Config::getOsSetting($this->device->os, 'snmp_bulk', true)) {
+        if ($binary == 'snmpwalk' && $this->device->snmpver !== 'v1' && Config::getOsSetting($this->device->os, 'snmp_bulk', true)) {
             $snmpcmd = [Config::get('snmpbulkwalk', 'snmpbulkwalk')];
 
             $max_repeaters = $this->device->getAttrib('snmp_max_repeaters') ?: Config::getOsSetting($this->device->os, 'snmp.max_repeaters', Config::get('snmp.max_repeaters', false));

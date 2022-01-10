@@ -2738,11 +2738,11 @@ function add_location(Illuminate\Http\Request $request)
         return api_error(400, 'Required fields missing (location, lat and lng needed)');
     }
     // Set the location
-    $timestamp = date('Y-m-d H:m:s');
-    $insert = ['location' => $data['location'], 'lat' => $data['lat'], 'lng' => $data['lng'], 'timestamp' => $timestamp];
-    $location_id = dbInsert($insert, 'locations');
-    if ($location_id != false) {
-        return api_success_noresult(201, "Location added with id #$location_id");
+    $location = new \App\Models\Location($data);
+    $location->fixed_coordinates = $data['fixed_coordinates'] ?? $location->coordinatesValid();
+
+    if ($location->save()) {
+        return api_success_noresult(201, "Location added with id #$location->id");
     }
 
     return api_error(500, 'Failed to add the location');

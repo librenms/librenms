@@ -7,8 +7,6 @@ use LibreNMS\RRD\RrdDefinition;
 $name = 'fbsd-nfs-client';
 $app_id = $app['app_id'];
 
-echo $name;
-
 try {
     $nfs = json_app_get($device, 'fbsdnfsclient', 0);
 } catch (JsonAppParsingFailedException $e) {

@@ -1,0 +1,14 @@
+os: zxa10
+text: 'ZTE ZXA10'
+type: network
+icon: zte
+mib_dir: zte
+bad_snmpEngineTime: true
+over:
+    - { graph: device_bits, text: 'Device Traffic' }
+    - { graph: device_processor, text: 'CPU Usage' }
+    - { graph: device_mempool, text: 'Memory Usage' }
+discovery:
+    -
+        sysObjectID:
+            - .1.3.6.1.4.1.3902.1082.

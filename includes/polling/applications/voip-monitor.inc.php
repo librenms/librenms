@@ -5,8 +5,6 @@ use LibreNMS\RRD\RrdDefinition;
 $name = 'voip-monitor';
 $app_id = $app['app_id'];
 
-echo "$name, app_id=$app_id ";
-
 if (! empty($agent_data[$name])) {
     $rawdata = $agent_data[$name];
 } else {

@@ -150,6 +150,12 @@ return [
         'unit' => 'dBmV',
         'unit_long' => 'Decibel-Millivolts',
     ],
+    'bitrate' => [
+        'short' => 'Bitrate',
+        'long' => 'Bitrate',
+        'unit' => 'bps',
+        'unit_long' => 'bits per second',
+    ],
     'snr' => [
         'short' => 'SNR',
         'long' => 'Signal to Noise Ratio',
