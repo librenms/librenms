@@ -2196,13 +2196,9 @@ function list_mpls_services(Illuminate\Http\Request $request)
     $hostname = $request->get('hostname');
     $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
     
-    $mpls_services = MplsService::hasAccess(Auth::user())->get();
-    if($device_id)
-    {
-        $mpls_services = $mpls_services->filter(function($service) use ($device_id) {
-            return $service->device_id == $device_id;
-        })->values();
-    }
+    $mpls_services = MplsService::hasAccess(Auth::user())->when($device_id, function ($query, $device_id) {
+        return $query->where('device_id', $device_id);
+    })->get();
     
     if ($mpls_services->isEmpty()) {
         return api_error(404, 'MPLS Services do not exist');
@@ -2216,13 +2212,10 @@ function list_mpls_saps(Illuminate\Http\Request $request)
     $hostname = $request->get('hostname');
     $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
 
-    $mpls_saps = MplsSap::hasAccess(Auth::user())->get();
-    if($device_id)
-    {
-        $mpls_saps = $mpls_saps->filter(function($sap) use ($device_id) {
-            return $sap->device_id == $device_id;
-        })->values();
-    }
+    $mpls_saps = MplsSap::hasAccess(Auth::user())->when($device_id, function ($query, $device_id) {
+        return $query->where('device_id', $device_id);
+    })->get();
+    
     if ($mpls_saps->isEmpty()) {
         return api_error(404, 'SAPs do not exist');
     }
