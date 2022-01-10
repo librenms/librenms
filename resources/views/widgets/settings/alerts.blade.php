@@ -17,8 +17,8 @@
         <label for="unreachable-{{ $id }}" class="control-label">{{ __('Show unreachable') }}:</label>
         <select class="form-control" name="unreachable" id="unreachable-{{ $id }}">
             <option value="">{{ __('not filtered') }}</option>
-            <option value="1" @if($unreachable === '1') selected @endif>{{ __('show only unreachable') }}</option>
-            <option value="0" @if($unreachable === '0') selected @endif>{{ __('hide unreachable') }}</option>
+            <option value="1" @if($unreachable === '1') selected @endif>{{ __('show only alerts where all parent devices are down') }}</option>
+            <option value="0" @if($unreachable === '0') selected @endif>{{ __('hide alerts where all parent devices are down') }}</option>
         </select>
     </div>
     <div class="form-group">
