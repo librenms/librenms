@@ -72,15 +72,19 @@ function submitCustomRange(frmdata) {
     return true;
 }
 
-function updateTimezone(tz)
+function updateTimezone(tz, static)
 {
     $.post(ajax_url + '/set_timezone',
         {
-            timezone: tz
+            timezone: tz,
+            static: static
         },
         function(data) {
-            location.reload();
-        },'json'
+            if(data === tz) {
+                location.reload();
+            }
+        },
+        'text'
     );
 }
 

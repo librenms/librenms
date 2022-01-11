@@ -249,9 +249,13 @@
                     if (pref === 'site_style') {
                         location.reload();
                     }
-                    if (pref === 'timezone' && value === 'default') {
-                       var tz = window.Intl.DateTimeFormat().resolvedOptions().timeZone;
-                       updateTimezone(tz);
+                    if (pref === 'timezone') {
+                        if(value === 'default') {
+                            var tz = window.Intl.DateTimeFormat().resolvedOptions().timeZone;
+                            updateTimezone(tz, false);
+                        } else {
+                            updateTimezone(value, true);
+                        }
                     }
 
                     $this.data('previous', value);

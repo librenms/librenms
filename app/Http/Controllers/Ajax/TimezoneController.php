@@ -32,6 +32,10 @@ class TimezoneController extends Controller
 {
     public function set(Request $request): string
     {
+        session([
+            'timezone_static' => $request->boolean('static'),
+        ]);
+
         // laravel session
         if ($request->timezone) {
             // Only accept valid timezones

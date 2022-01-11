@@ -134,6 +134,7 @@ class LegacyUserProvider implements UserProvider
             if (UserPref::getPref($user, 'timezone')) {
                 session([
                     'timezone' => UserPref::getPref($user, 'timezone'),
+                    'timezone_static' => true,
                 ]);
             }
 

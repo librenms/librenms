@@ -12,12 +12,3 @@
     @endif
 </div>
 @endsection
-
-@section('scripts')
-<script>
-    $(document).ready(function() {
-        var tz = window.Intl.DateTimeFormat().resolvedOptions().timeZone;
-        updateTimezone(tz);
-    });
-</script>
-@endsection
