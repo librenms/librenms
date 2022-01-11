@@ -200,7 +200,7 @@ function poll_service($service)
 
         // Run alert rules due to status changed
         $rules = new AlertRules;
-        $rules->runRules($service->device_id);
+        $rules->runRules($service['device_id']);
     }
 
     if ($service['service_message'] != $msg) {
