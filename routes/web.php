@@ -1,5 +1,7 @@
 <?php
 
+use Illuminate\Support\Facades\Route;
+
 /*
 |--------------------------------------------------------------------------
 | Web Routes
@@ -18,6 +20,7 @@ Auth::routes(['register' => false, 'reset' => false, 'verify' => false]);
 Route::group(['middleware' => ['auth'], 'guard' => 'auth'], function () {
 
     // pages
+    Route::post('alert/{alert}/ack', [\App\Http\Controllers\AlertController::class, 'ack'])->name('alert.ack');
     Route::resource('device-groups', 'DeviceGroupController');
     Route::resource('port-groups', 'PortGroupController');
     Route::resource('port', 'PortController', ['only' => 'update']);
@@ -57,12 +60,31 @@ Route::group(['middleware' => ['auth'], 'guard' => 'auth'], function () {
         Route::get('devicedependency', 'DeviceDependencyController@dependencyMap');
     });
 
+    // Push notifications
+    Route::group(['prefix' => 'push'], function () {
+        Route::get('token', [\App\Http\Controllers\PushNotificationController::class, 'token'])->name('push.token');
+        Route::get('key', [\App\Http\Controllers\PushNotificationController::class, 'key'])->name('push.key');
+        Route::post('register', [\App\Http\Controllers\PushNotificationController::class, 'register'])->name('push.register');
+        Route::post('unregister', [\App\Http\Controllers\PushNotificationController::class, 'unregister'])->name('push.unregister');
+    });
+
     // admin pages
     Route::group(['middleware' => ['can:admin']], function () {
         Route::get('settings/{tab?}/{section?}', 'SettingsController@index')->name('settings');
         Route::put('settings/{name}', 'SettingsController@update')->name('settings.update');
         Route::delete('settings/{name}', 'SettingsController@destroy')->name('settings.destroy');
+
+        Route::post('alert/transports/{transport}/test', [\App\Http\Controllers\AlertTransportController::class, 'test'])->name('alert.transports.test');
     });
+
+    Route::get('plugin/settings', 'PluginAdminController')->name('plugin.admin');
+    Route::get('plugin/settings/{plugin:plugin_name}', 'PluginSettingsController')->name('plugin.settings');
+    Route::post('plugin/settings/{plugin:plugin_name}', 'PluginSettingsController@update')->name('plugin.update');
+    Route::get('plugin', 'PluginLegacyController@redirect');
+    Route::redirect('plugin/view=admin', '/plugin/admin');
+    Route::get('plugin/p={pluginName}', 'PluginLegacyController@redirect');
+    Route::any('plugin/v1/{plugin:plugin_name}/{other?}', 'PluginLegacyController')->where('other', '(.*)')->name('plugin.legacy');
+    Route::get('plugin/{plugin:plugin_name}', 'PluginPageController')->name('plugin.page');
 
     // old route redirects
     Route::permanentRedirect('poll-log', 'poller/log');
@@ -86,6 +108,9 @@ Route::group(['middleware' => ['auth'], 'guard' => 'auth'], function () {
         Route::resource('pollergroup', 'PollerGroupController', ['only' => ['destroy']]);
         // misc ajax controllers
         Route::group(['namespace' => 'Ajax'], function () {
+            Route::get('search/bgp', 'BgpSearchController');
+            Route::get('search/device', 'DeviceSearchController');
+            Route::get('search/port', 'PortSearchController');
             Route::post('set_map_group', 'AvailabilityMapController@setGroup');
             Route::post('set_map_view', 'AvailabilityMapController@setView');
             Route::post('set_resolution', 'ResolutionController@set');

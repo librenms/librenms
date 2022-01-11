@@ -1,0 +1,8 @@
+modules:
+  os:
+    hardware: UPS-MIB::upsIdentAgentSoftwareVersion.0
+    hardware_regex: '/(?<hardware>WebPower .* Card)/'
+    version: UPS-MIB::upsIdentAgentSoftwareVersion.0
+    version_regex: '/v(?<version>[0-9]+.[0-9]+)/'
+    serial: UPS-MIB::upsIdentAgentSoftwareVersion.0
+    serial_regex: '/SN (?<serial>[0-9]+)/'

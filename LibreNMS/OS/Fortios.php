@@ -40,7 +40,7 @@ class Fortios extends Fortinet implements OSPolling
         $device->features = snmp_get($this->getDeviceArray(), 'fmDeviceEntMode.1', '-OQv', 'FORTINET-FORTIMANAGER-FORTIANALYZER-MIB') == 'fmg-faz' ? 'with Analyzer features' : null;
     }
 
-    public function pollOS()
+    public function pollOS(): void
     {
         // Log rate only for FortiAnalyzer features enabled FortiManagers
         if ($this->getDevice()->features == 'with Analyzer features') {

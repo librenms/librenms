@@ -469,3 +469,8 @@ function humanize_duration(seconds) {
 
     return res;
 }
+
+function popUp(URL)
+{
+    window.open(URL, '_blank', 'toolbar=0,scrollbars=1,location=0,statusbar=0,menubar=0,resizable=1,width=550,height=600');
+}

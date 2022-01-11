@@ -26,10 +26,11 @@
 
 namespace LibreNMS\Data\Store;
 
+use App\Polling\Measure\Measurement;
 use GuzzleHttp\Exception\GuzzleException;
 use Illuminate\Support\Str;
 use LibreNMS\Config;
-use LibreNMS\Data\Measure\Measurement;
+use LibreNMS\Util\Proxy;
 use Log;
 
 class Prometheus extends BaseDatastore
@@ -56,7 +57,7 @@ class Prometheus extends BaseDatastore
         $this->default_opts = [
             'headers' => ['Content-Type' => 'text/plain'],
         ];
-        if ($proxy = get_proxy()) {
+        if ($proxy = Proxy::get($url)) {
             $this->default_opts['proxy'] = $proxy;
         }
 

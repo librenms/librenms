@@ -45,7 +45,7 @@ class Zywall extends Zyxel implements OSDiscovery, OSPolling
         }
     }
 
-    public function pollOS()
+    public function pollOS(): void
     {
         $sessions = snmp_get($this->getDeviceArray(), '.1.3.6.1.4.1.890.1.6.22.1.6.0', '-Ovq');
         if (is_numeric($sessions)) {

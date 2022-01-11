@@ -155,9 +155,13 @@ class Rewrite
      */
     public static function readableOUI($mac)
     {
-        $key = 'OUIDB-' . (substr($mac, 0, 6));
+        $cached = Cache::get('OUIDB-' . (substr($mac, 0, 6)), '');
+        if ($cached == 'IEEE Registration Authority') {
+            // Then we may have a shorter prefix, so let's try them one ater the other, ordered by probability
+            return Cache::get('OUIDB-' . substr($mac, 0, 9)) ?: Cache::get('OUIDB-' . substr($mac, 0, 7));
+        }
 
-        return Cache::get($key, '');
+        return $cached;
     }
 
     /**
@@ -453,9 +457,9 @@ class Rewrite
      * If given input is an IPv6 address, wrap it in [] for use in applications that require it
      *
      * @param  string  $ip
-     * @return string
+     * @return string|null
      */
-    public static function addIpv6Brackets($ip): string
+    public static function addIpv6Brackets($ip): ?string
     {
         return IPv6::isValid($ip) ? "[$ip]" : $ip;
     }

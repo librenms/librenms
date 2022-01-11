@@ -25,6 +25,7 @@
 
 namespace LibreNMS\Device;
 
+use App\View\SimpleTemplate;
 use Cache;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
@@ -90,7 +91,7 @@ class YamlDiscovery
                     // determine numeric oid automatically if not specified
                     if (! isset($data['num_oid'])) {
                         try {
-                            $data['num_oid'] = static::computeNumericalOID($device, $data);
+                            $data['num_oid'] = static::computeNumericalOID($os, $data);
                         } catch (\Exception $e) {
                             d_echo('Error: We cannot find a numerical OID for ' . $data['value'] . '. Skipping this one...');
                             continue;
@@ -126,14 +127,16 @@ class YamlDiscovery
     }
 
     /**
-     * @param  array  $device  Device we are working on
+     * @param  \LibreNMS\OS  $os  OS/device we areworking on
      * @param  array  $data  Array derived from YAML
      * @return string
+     *
+     * @throws \LibreNMS\Exceptions\InvalidOidException
      */
-    public static function computeNumericalOID($device, $data)
+    public static function computeNumericalOID(OS $os, array $data): string
     {
         d_echo('Info: Trying to find a numerical OID for ' . $data['value'] . '.');
-        $search_mib = $device['dynamic_discovery']['mib'];
+        $search_mib = $os->getDiscovery()['mib'];
         $mib_prefix_data_oid = Str::before($data['oid'], '::');
         if (! empty($mib_prefix_data_oid) && empty(Str::before($data['value'], '::'))) {
             // We should search value in this mib first, as it is explicitely specified
@@ -141,7 +144,7 @@ class YamlDiscovery
         }
 
         try {
-            $num_oid = static::oidToNumeric($data['value'], $device, $search_mib, $device['mib_dir']);
+            $num_oid = static::oidToNumeric($data['value'], $os->getDeviceArray(), $search_mib);
         } catch (\Exception $e) {
             throw $e;
         }
@@ -164,35 +167,29 @@ class YamlDiscovery
         $value = static::getValueFromData($name, $index, $def, $pre_cache);
 
         if (is_null($value)) {
-            // built in replacements
-            $search = [
-                '{{ $index }}',
-                '{{ $count }}',
+            // basic replacements
+            $variables = [
+                'index' => $index,
+                'count' => $count,
             ];
-            $replace = [
-                $index,
-                $count,
-            ];
-
-            // prepare the $subindexX match variable replacement
             foreach (explode('.', $index) as $pos => $subindex) {
-                $search[] = '{{ $subindex' . $pos . ' }}';
-                $replace[] = $subindex;
+                $variables['subindex' . $pos] = $subindex;
             }
-
-            $value = str_replace($search, $replace, $def[$name] ?? '');
+            $value = (string) (new SimpleTemplate($def[$name] ?? '', $variables))->keepEmptyTemplates();
 
             // search discovery data for values
-            $value = preg_replace_callback('/{{ \$?([a-zA-Z0-9\-.:]+) }}/', function ($matches) use ($index, $def, $pre_cache) {
-                $replace = static::getValueFromData($matches[1], $index, $def, $pre_cache, null);
+            $template = new SimpleTemplate($value);
+            $template->replaceWith(function ($matches) use ($index, $def, $pre_cache) {
+                $replace = static::getValueFromData($matches[1], $index, $def, $pre_cache);
                 if (is_null($replace)) {
-                    d_echo('Warning: No variable available to replace ' . $matches[1] . ".\n");
+                    \Log::warning('YamlDiscovery: No variable available to replace ' . $matches[1]);
 
                     return ''; // remove the unavailable variable
                 }
 
                 return $replace;
-            }, $value);
+            });
+            $value = (string) $template;
         }
 
         return $value;
@@ -214,7 +211,7 @@ class YamlDiscovery
             $name = $discovery_data[$name];
         }
 
-        if (! is_array($discovery_data['oid']) && isset($pre_cache[$discovery_data['oid']][$index]) && isset($pre_cache[$discovery_data['oid']][$index][$name])) {
+        if (isset($discovery_data['oid']) && ! is_array($discovery_data['oid']) && isset($pre_cache[$discovery_data['oid']][$index]) && isset($pre_cache[$discovery_data['oid']][$index][$name])) {
             return $pre_cache[$discovery_data['oid']][$index][$name];
         }
 
@@ -278,9 +275,9 @@ class YamlDiscovery
             return $pre_cache;
         }
 
-        if (! empty($device['dynamic_discovery']['modules'])) {
+        if (! empty($os->getDiscovery()['modules'])) {
             echo 'Caching data: ';
-            foreach ($device['dynamic_discovery']['modules'] as $module => $discovery_data) {
+            foreach ($os->getDiscovery()['modules'] as $module => $discovery_data) {
                 echo "$module ";
                 foreach ($discovery_data as $key => $data_array) {
                     // find the data array, we could already be at for simple modules
@@ -309,7 +306,7 @@ class YamlDiscovery
                                     Config::set('os.' . $os->getName() . '.snmp_bulk', (bool) $data['snmp_bulk']);
                                 }
 
-                                $mib = $device['dynamic_discovery']['mib'];
+                                $mib = $os->getDiscovery()['mib'];
                                 $pre_cache[$oid] = snmpwalk_cache_oid($device, $oid, $pre_cache[$oid] ?? [], $mib, null, $snmp_flag);
 
                                 Config::set('os.' . $os->getName() . '.snmp_bulk', $saved_nobulk);
@@ -378,22 +375,21 @@ class YamlDiscovery
      * @param  string  $oid
      * @param  array|null  $device
      * @param  string  $mib
-     * @param  string|null  $mibdir
      * @return string numeric oid
      *
      * @throws \LibreNMS\Exceptions\InvalidOidException
      */
-    public static function oidToNumeric($oid, $device = null, $mib = 'ALL', $mibdir = null)
+    public static function oidToNumeric($oid, $device = null, $mib = 'ALL')
     {
         if (self::oidIsNumeric($oid)) {
             return $oid;
         }
-        $key = 'YamlDiscovery:oidToNumeric:' . $mibdir . '/' . $mib . '/' . $oid;
+        $key = 'YamlDiscovery:oidToNumeric:' . $mib . '/' . $oid;
         if (Cache::has($key)) {
             $numeric_oid = Cache::get($key);
         } else {
             foreach (explode(':', $mib) as $mib_name) {
-                $numeric_oid = snmp_translate($oid, $mib_name, $mibdir, null, $device);
+                $numeric_oid = snmp_translate($oid, $mib_name, null, null, $device);
                 if ($numeric_oid) {
                     break;
                 }

@@ -212,12 +212,19 @@
             "section": "rules",
             "order": 7
         },
-        "allow_duplicate_sysName": {
+        "discovery_on_reboot": {
             "default": false,
             "type": "boolean",
             "group": "discovery",
             "section": "general",
             "order": 0
+        },
+        "allow_duplicate_sysName": {
+            "default": false,
+            "type": "boolean",
+            "group": "discovery",
+            "section": "general",
+            "order": 1
         },
         "allow_entity_sensor.amperes": {
             "default": true,
@@ -865,6 +872,19 @@
                 "ifName": "ifName",
                 "ifDescr": "ifDescr",
                 "ifAlias": "ifAlias"
+            }
+        },
+        "device_display_default": {
+            "group": "webui",
+            "section": "device",
+            "order": 1,
+            "default": null,
+            "type": "select",
+            "options": {
+                "{{ $hostname }}": "hostname",
+                "{{ $sysName_fallback }}":  "sysName_fallback",
+                "{{ $sysName }}":  "sysName",
+                "{{ $ip }}":  "ip"
             }
         },
         "device_perf_purge": {
@@ -1589,20 +1609,6 @@
             "section": "style",
             "order": 2,
             "type": "text"
-        },
-        "force_hostname_to_sysname": {
-            "group": "webui",
-            "section": "device",
-            "order": 0,
-            "default": false,
-            "type": "boolean"
-        },
-        "force_ip_to_sysname": {
-            "group": "webui",
-            "section": "device",
-            "order": 1,
-            "default": false,
-            "type": "boolean"
         },
         "fping": {
             "default": "fping",
@@ -4222,7 +4228,8 @@
                         {"match": "fireware", "value": "firewareos"},
                         {"match": "fortigate", "value": "fortios"},
                         {"match": "vyos", "value": "vyatta"},
-                        {"match": "slms", "value": "zhoneolt"}
+                        {"match": "slms", "value": "zhoneolt"},
+                        {"match": "oneaccess", "value": "oneos"}
                     ]
                 }
             },
@@ -4355,6 +4362,13 @@
         },
         "poller_modules.os": {
             "order": 320,
+            "group": "poller",
+            "section": "poller_modules",
+            "default": true,
+            "type": "boolean"
+        },
+        "poller_modules.availability": {
+            "order": 25,
             "group": "poller",
             "section": "poller_modules",
             "default": true,
@@ -4879,6 +4893,13 @@
             "order": 1,
             "type": "boolean"
         },
+        "rrdtool_version": {
+            "default": null,
+            "group": "poller",
+            "section": "rrdtool",
+            "order": 12,
+            "type": "text"
+        },
         "sensors.guess_limits": {
             "default": true,
             "type": "boolean"
@@ -5108,6 +5129,9 @@
             "default": [
                 "public"
             ]
+        },
+        "snmp.unescape": {
+            "type": "boolean"
         },
         "snmp.exec_timeout": {
             "default": 1200,

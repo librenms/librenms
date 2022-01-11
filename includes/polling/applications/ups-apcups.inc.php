@@ -27,8 +27,6 @@ use LibreNMS\RRD\RrdDefinition;
 $name = 'ups-apcups';
 $app_id = $app['app_id'];
 
-echo ' ' . $name;
-
 try {
     $json_return = json_app_get($device, $name);
 } catch (JsonAppParsingFailedException $e) {

@@ -25,6 +25,7 @@
 
 namespace LibreNMS\Data\Store;
 
+use Illuminate\Support\Collection;
 use LibreNMS\Config;
 use LibreNMS\Interfaces\Data\Datastore as DatastoreContract;
 
@@ -151,12 +152,15 @@ class Datastore
         return $this->stores;
     }
 
-    public function getStats()
+    /**
+     * Get the measurements for all datastores, keyed by datastore name
+     *
+     * @return \Illuminate\Support\Collection<\App\Polling\Measure\MeasurementCollection>
+     */
+    public function getStats(): Collection
     {
-        return array_reduce($this->stores, function ($result, DatastoreContract $store) {
-            $result[$store->getName()] = $store->getStats();
-
-            return $result;
-        }, []);
+        return collect($this->stores)->mapWithKeys(function (DatastoreContract $store) {
+            return [$store->getName() => $store->getStats()];
+        });
     }
 }

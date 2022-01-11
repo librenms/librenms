@@ -8,6 +8,7 @@ $device_model = Device::find($device['device_id']);
 
 if ($_POST['editing']) {
     if (Auth::user()->hasGlobalAdmin()) {
+        $reload = false;
         if (isset($_POST['parent_id'])) {
             $parents = array_diff((array) $_POST['parent_id'], ['0']);
             // TODO avoid loops!
@@ -27,6 +28,7 @@ if ($_POST['editing']) {
         }
 
         $device_model->override_sysLocation = $override_sysLocation;
+        $device_model->display = empty($_POST['display']) ? null : $_POST['display'];
         $device_model->purpose = $_POST['descr'];
         $device_model->poller_group = $_POST['poller_group'];
         $device_model->ignore = (int) isset($_POST['ignore']);
@@ -39,30 +41,29 @@ if ($_POST['editing']) {
             set_dev_attrib($device, 'override_device_type', true);
         }
 
+        if ($device_model->isDirty('display')) {
+            $reload = true;
+        }
+
         if ($device_model->isDirty()) {
             if ($device_model->save()) {
-                Toastr::success(__('Device record updated'));
+                flash()->addSuccess(__('Device record updated'));
             } else {
-                Toastr::error(__('Device record update error'));
+                flash()->addError(__('Device record update error'));
             }
         }
 
         if (isset($_POST['hostname']) && $_POST['hostname'] !== '' && $_POST['hostname'] !== $device['hostname']) {
             if (Auth::user()->hasGlobalAdmin()) {
-                $result = renamehost($device['device_id'], $_POST['hostname'], 'webui');
+                $result = renamehost($device['device_id'], trim($_POST['hostname']), 'webui');
                 if ($result == '') {
-                    Toastr::success("Hostname updated from {$device['hostname']} to {$_POST['hostname']}");
-                    echo '
-                        <script>
-                            var loc = window.location;
-                            window.location.replace(loc.protocol + "//" + loc.host + loc.pathname + loc.search);
-                        </script>
-                    ';
+                    flash()->addSuccess("Hostname updated from {$device['hostname']} to {$_POST['hostname']}");
+                    $reload = true;
                 } else {
-                    Toastr::error($result . '.  Does your web server have permission to modify the rrd files?');
+                    flash()->addError($result . '.  Does your web server have permission to modify the rrd files?');
                 }
             } else {
-                Toastr::error('Only administrative users may update the device hostname');
+                flash()->addError('Only administrative users may update the device hostname');
             }
         }
 
@@ -79,6 +80,11 @@ if ($_POST['editing']) {
 
         if (isset($override_sysContact_string)) {
             set_dev_attrib($device, 'override_sysContact_string', $override_sysContact_string);
+        }
+
+        // some changed data not stateful, just reload the page
+        if ($reload) {
+            echo '<script>window.location.reload();</script>';
         }
     } else {
         include 'includes/html/error-no-perm.inc.php';
@@ -119,18 +125,24 @@ $disable_notify = get_dev_attrib($device, 'disable_notify');
 <?php echo csrf_field() ?>
 <input type=hidden name="editing" value="yes">
     <div class="form-group" data-toggle="tooltip" data-container="body" data-placement="bottom" title="Change the hostname used for name resolution" >
-        <label for="edit-hostname-input" class="col-sm-2 control-label" >Hostname:</label>
+        <label for="edit-hostname-input" class="col-sm-2 control-label" >Hostname / IP:</label>
         <div class="col-sm-6">
-            <input type="text" id="edit-hostname-input" name="hostname" class="form-control" disabled value=<?php echo \LibreNMS\Util\Clean::html($device['hostname'], []); ?> />
+            <input type="text" id="edit-hostname-input" name="hostname" class="form-control" disabled value="<?php echo htmlentities($device['hostname']); ?>" />
         </div>
         <div class="col-sm-2">
-            <button name="hostname-edit-button" id="hostname-edit-button" class="btn btn-danger"> <i class="fa fa-pencil"></i> </button>
+            <button type="button" name="hostname-edit-button" id="hostname-edit-button" class="btn btn-danger" onclick="toggleHostnameEdit()"> <i class="fa fa-pencil"></i> </button>
+        </div>
+    </div>
+    <div class="form-group" data-toggle="tooltip" data-container="body" data-placement="bottom" title="Display Name for this device.  Keep short. Available placeholders: hostname, sysName, sysName_fallback, ip" >
+        <label for="edit-display-input" class="col-sm-2 control-label" >Display Name:</label>
+        <div class="col-sm-6">
+            <input type="text" id="edit-display-input" name="display" class="form-control" placeholder="System Default" value="<?php echo htmlentities($device_model->display); ?>">
         </div>
     </div>
     <div class="form-group" data-toggle="tooltip" data-container="body" data-placement="bottom" title="Use this IP instead of resolved one for polling" >
-        <label for="edit-overwrite_ip-input" class="col-sm-2 control-label" >Overwrite IP:</label>
+        <label for="edit-overwrite_ip-input" class="col-sm-2 control-label text-danger" >Overwrite IP (do not use):</label>
         <div class="col-sm-6">
-            <input type="text" id="edit-overwrite_up-input" name="overwrite_ip" class="form-control" value=<?php echo $device_model->overwrite_ip; ?>>
+            <input type="text" id="edit-overwrite_ip-input" name="overwrite_ip" class="form-control" value="<?php echo htmlentities($device_model->overwrite_ip); ?>">
         </div>
     </div>
      <div class="form-group">
@@ -185,7 +197,7 @@ $disable_notify = get_dev_attrib($device, 'disable_notify');
                 if (! $device_model->override_sysLocation) {
                     echo ' disabled="1"';
                 }
-                ?> value="<?php echo \LibreNMS\Util\Clean::html($device_model->location, []); ?>" />
+                ?> value="<?php echo htmlentities($device_model->location); ?>" />
         </div>
     </div>
     <div class="form-group">
@@ -210,7 +222,7 @@ $disable_notify = get_dev_attrib($device, 'disable_notify');
         echo ' disabled="1"';
     }
     ?>
-    value="<?php echo $override_sysContact_string; ?>" />
+    value="<?php echo htmlentities($override_sysContact_string); ?>" />
       </div>
     </div>
     <div class="form-group">
@@ -354,21 +366,9 @@ If `devices.ignore = 0` or `macros.device = 1` condition is is set and ignore al
             }
         });
     });
-    $('#hostname-edit-button').on("click", function(e) {
-        e.preventDefault();
-        disabled_state = document.getElementById('edit-hostname-input').disabled;
-        if (disabled_state == true) {
-            document.getElementById('edit-hostname-input').disabled = false;
-        } else {
-            document.getElementById('edit-hostname-input').disabled = true;
-        }
-    });
-    $('#sysLocation').on('keypress', function (e) {
-        if(e.keyCode === 13) {
-            e.preventDefault();
-            $('#edit').trigger( "submit" );
-        }
-    });
+    function toggleHostnameEdit() {
+        document.getElementById('edit-hostname-input').disabled = ! document.getElementById('edit-hostname-input').disabled;
+    }
     $('#parent_id').select2({
         width: 'resolve'
     });

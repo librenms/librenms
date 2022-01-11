@@ -8,10 +8,10 @@
 &nbsp;<big><b>{{ $group_name }}</b></big>
 <div class="pull-right">
 <input type="checkbox" class="custom-control-input" id="showparentdevicepath" onChange="highlightNode()" @if($showparentdevicepath) checked @endif>
-<label class="custom-control-label" for="showparentdevicepath">@lang('Highlight Dependencies to Root Device')</label>
+<label class="custom-control-label" for="showparentdevicepath">{{ __('Highlight Dependencies to Root Device') }}</label>
 <select name="highlight_node" id="highlight_node" class="input-sm" onChange="highlightNode()";>
 <option value="0">None</option>
-<option value="{{ $isolated_device_id }}">@lang('Isolated Devices')</option>
+<option value="{{ $isolated_device_id }}">{{ __('Isolated Devices') }}</option>
 @foreach($device_list as $device)
 <option value="{{ $device['id'] }}">{{ $device['label'] }}</option>
 @endforeach
@@ -19,7 +19,7 @@
 </div>
 <div id="visualization"></div>
 @else
-<div class="alert alert-success" role="alert">@lang('No devices found')</div>
+<div class="alert alert-success" role="alert">{{ __('No devices found') }}</div>
 @endif
 
 @endsection

@@ -7,8 +7,6 @@ use LibreNMS\RRD\RrdDefinition;
 $name = 'ntp-client';
 $app_id = $app['app_id'];
 
-echo $name;
-
 try {
     $ntp = json_app_get($device, $name);
 } catch (JsonAppParsingFailedException $e) {

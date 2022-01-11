@@ -18,8 +18,8 @@ __intname__ = "command_runner"
 __author__ = "Orsiris de Jong"
 __copyright__ = "Copyright (C) 2015-2021 Orsiris de Jong"
 __licence__ = "BSD 3 Clause"
-__version__ = "1.2.1"
-__build__ = "2021090901"
+__version__ = "1.3.0"
+__build__ = "2021100501"
 
 import io
 import os
@@ -202,8 +202,8 @@ def command_runner(
     timeout=3600,  # type: Optional[int]
     shell=False,  # type: bool
     encoding=None,  # type: Optional[str]
-    stdout=None,  # type: Union[int, str]
-    stderr=None,  # type: Union[int, str]
+    stdout=None,  # type: Optional[Union[int, str]]
+    stderr=None,  # type: Optional[Union[int, str]]
     windows_no_window=False,  # type: bool
     live_output=False,  # type: bool
     method="monitor",  # type: str
@@ -270,25 +270,28 @@ def command_runner(
 
     # Decide whether we write to output variable only (stdout=None), to output variable and stdout (stdout=PIPE)
     # or to output variable and to file (stdout='path/to/file')
+    stdout_to_file = False
     if stdout is None:
         _stdout = PIPE
-        stdout_to_file = False
     elif isinstance(stdout, str):
         # We will send anything to file
         _stdout = open(stdout, "wb")
         stdout_to_file = True
+    elif stdout is False:
+        _stdout = subprocess.DEVNULL
     else:
         # We will send anything to given stdout pipe
         _stdout = stdout
-        stdout_to_file = False
 
     # The only situation where we don't add stderr to stdout is if a specific target file was given
+    stderr_to_file = False
     if isinstance(stderr, str):
         _stderr = open(stderr, "wb")
         stderr_to_file = True
+    elif stderr is False:
+        _stderr = subprocess.DEVNULL
     else:
         _stderr = subprocess.STDOUT
-        stderr_to_file = False
 
     def to_encoding(
         process_output,  # type: Union[str, bytes]
@@ -469,17 +472,19 @@ def command_runner(
                     break
                 # We still need to use process.communicate() in this loop so we don't get stuck
                 # with poll() is not None even after process is finished
-                try:
-                    stdout, _ = process.communicate()
-                # ValueError is raised on closed IO file
-                except (TimeoutExpired, ValueError):
-                    pass
+                if _stdout is not False:
+                    try:
+                        stdout, _ = process.communicate()
+                    # ValueError is raised on closed IO file
+                    except (TimeoutExpired, ValueError):
+                        pass
             exit_code = process.poll()
 
-            try:
-                stdout, _ = process.communicate()
-            except (TimeoutExpired, ValueError):
-                pass
+            if _stdout is not False:
+                try:
+                    stdout, _ = process.communicate()
+                except (TimeoutExpired, ValueError):
+                    pass
             process_output = to_encoding(stdout, encoding, errors)
 
             # On PyPy 3.7 only, we can have a race condition where we try to read the queue before
@@ -537,7 +542,7 @@ def command_runner(
             )
 
         try:
-            if method == "poller" or live_output:
+            if method == "poller" or live_output and _stdout is not False:
                 exit_code, output = _poll_process(process, timeout, encoding, errors)
             else:
                 exit_code, output = _monitor_process(process, timeout, encoding, errors)

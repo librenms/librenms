@@ -172,7 +172,7 @@ foreach ($ports as $port) {
         $port['out_rate'] = \LibreNMS\Util\Number::formatSi(($port['ifOutOctets_rate'] * 8), 2, 3, 'bps');
         $port = cleanPort($port, $device);
         $csv[] = [
-            format_hostname($port, $port['hostname']),
+            format_hostname($port),
             \LibreNMS\Util\Rewrite::normalizeIfName($port['label']),
             $speed,
             $port['in_rate'],

@@ -100,7 +100,7 @@ class AvailabilityMapController extends WidgetController
             $device_query->isNotDisabled();
         }
         $device_query->orderBy($settings['order_by']);
-        $devices = $device_query->select(['devices.device_id', 'hostname', 'sysName', 'status', 'uptime', 'last_polled', 'disabled', 'disable_notify', 'location_id'])->get();
+        $devices = $device_query->select(['devices.device_id', 'hostname', 'sysName', 'display', 'status', 'uptime', 'last_polled', 'disabled', 'disable_notify', 'location_id'])->get();
 
         // process status
         $uptime_warn = Config::get('uptime_warning', 84600);

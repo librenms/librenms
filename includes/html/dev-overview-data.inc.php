@@ -42,10 +42,12 @@ if (! empty($device['overwrite_ip'])) {
     echo "<div class='row'><div class='col-sm-4'>Assigned IP</div><div class='col-sm-8'>{$device['overwrite_ip']}</div></div>";
 } elseif (! empty($device['ip'])) {
     echo "<div class='row'><div class='col-sm-4'>Resolved IP</div><div class='col-sm-8'>{$device['ip']}</div></div>";
-} elseif (Config::get('force_ip_to_sysname') === true) {
+} else {
     try {
-        $ip = IP::parse($device['hostname']);
-        echo "<div class='row'><div class='col-sm-4'>IP Address</div><div class='col-sm-8'>$ip</div></div>";
+        $ip = (string) IP::parse($device['hostname']);
+        if ($ip !== format_hostname($device)) {
+            echo "<div class='row'><div class='col-sm-4'>IP Address</div><div class='col-sm-8'>$ip</div></div>";
+        }
     } catch (InvalidIpException $e) {
         // don't add an ip line
     }
@@ -119,11 +121,9 @@ if ($uptime) {
     echo "<div class='row'><div class='col-sm-4'>$uptime_text</div><div class='col-sm-8'>$uptime</div></div>";
 }
 
-if ($device['location_id']) {
+if ($device['location_id'] && $location = Location::find($device['location_id'])) {
     $maps_api = Config::get('geoloc.api_key');
     $maps_engine = $maps_api ? Config::get('geoloc.engine') : '';
-
-    $location = Location::find($device['location_id']);
     $location_valid = ($location && $location->coordinatesValid());
     $location_coords = $location_valid ? $location->lat . ', ' . $location->lng : 'N/A';
 

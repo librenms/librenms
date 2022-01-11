@@ -39,6 +39,7 @@ namespace LibreNMS\Alert\Transport;
 
 use LibreNMS\Alert\Transport;
 use LibreNMS\Enum\AlertState;
+use LibreNMS\Util\Proxy;
 
 class Pushover extends Transport
 {
@@ -83,7 +84,7 @@ class Pushover extends Transport
             $data = array_merge($data, $api['options']);
         }
         $curl = curl_init();
-        set_curl_proxy($curl);
+        Proxy::applyToCurl($curl);
         curl_setopt($curl, CURLOPT_URL, 'https://api.pushover.net/1/messages.json');
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
         curl_setopt($curl, CURLOPT_SAFE_UPLOAD, true);

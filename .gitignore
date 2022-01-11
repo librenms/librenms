@@ -19,8 +19,6 @@ Thumbs.db
 config.php
 html/css/custom/*
 html/images/custom/*
-html/plugins/*
-!html/plugins/Test/
 includes/custom/*
 junk
 nbproject
@@ -35,6 +33,7 @@ _ide_helper.php
 _ide_helper_models.php
 resources/views/menu/custom.blade.php
 resources/js/vue-i18n-locales.generated.js
+*.code-workspace
 
 # Docs #
 ########

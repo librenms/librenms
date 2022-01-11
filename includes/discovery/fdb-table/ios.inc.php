@@ -19,18 +19,16 @@ foreach ($vtpdomains as $vtpdomain_id => $vtpdomain) {
         }
 
         if (($vlan['vtpVlanState'] === '1') && ($vlan_raw < 1002 || $vlan_raw > 1005)) {
-            $device_vlan = array_merge($device, ['community' => $device['community'] . '@' . $vlan_raw, 'context_name' => "vlan-$vlan_raw"]);
-
-            $fdbPort_table = snmpwalk_group($device_vlan, 'dot1dTpFdbPort', 'BRIDGE-MIB', 0);
+            $fdbPort_table = SnmpQuery::context($vlan_raw, "vlan-$vlan_raw")->walk('BRIDGE-MIB::dot1dTpFdbPort')->table();
 
             $portid_dict = [];
-            $dot1dBasePortIfIndex = snmpwalk_group($device_vlan, 'dot1dBasePortIfIndex', 'BRIDGE-MIB');
+            $dot1dBasePortIfIndex = SnmpQuery::context($vlan_raw, "vlan-$vlan_raw")->walk('BRIDGE-MIB::dot1dBasePortIfIndex')->table(1);
             foreach ($dot1dBasePortIfIndex as $portLocal => $data) {
-                $port = get_port_by_index_cache($device['device_id'], $data['dot1dBasePortIfIndex']);
+                $port = get_port_by_index_cache($device['device_id'], $data['BRIDGE-MIB::dot1dBasePortIfIndex']);
                 $portid_dict[$portLocal] = $port['port_id'];
             }
 
-            foreach ((array) $fdbPort_table['dot1dTpFdbPort'] as $mac => $dot1dBasePort) {
+            foreach ((array) $fdbPort_table['BRIDGE-MIB::dot1dTpFdbPort'] as $mac => $dot1dBasePort) {
                 $mac_address = implode(array_map('zeropad', explode(':', $mac)));
                 if (strlen($mac_address) != 12) {
                     d_echo("MAC address padding failed for $mac\n");
@@ -41,8 +39,6 @@ foreach ($vtpdomains as $vtpdomain_id => $vtpdomain) {
                 $insert[$vlan_id][$mac_address]['port_id'] = $port_id;
                 d_echo("vlan $vlan_id mac $mac_address port ($dot1dBasePort) $port_id\n");
             }
-
-            unset($device_vlan);
         } //end if operational
     } // end for each vlan
     echo PHP_EOL;

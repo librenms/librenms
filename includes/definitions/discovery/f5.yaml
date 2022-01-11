@@ -1,4 +1,8 @@
 modules:
+    os:
+        hardware: F5-BIGIP-SYSTEM-MIB::sysPlatformInfoMarketingName.0
+        serial: F5-BIGIP-SYSTEM-MIB::sysGeneralChassisSerialNum.0
+        version: F5-BIGIP-SYSTEM-MIB::sysProductVersion.0
     mempools:
         data:
             -

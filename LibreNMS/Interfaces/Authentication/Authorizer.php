@@ -86,13 +86,6 @@ interface Authorizer
     public function updateUser($user_id, $realname, $level, $can_modify_passwd, $email);
 
     /**
-     * @param  string  $username  The $username to update
-     * @param  string  $newpassword
-     * @return bool If the update was successful
-     */
-    public function changePassword($username, $newpassword);
-
-    /**
      * Delete a user.
      *
      * @param  int  $user_id

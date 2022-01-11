@@ -1,0 +1,23 @@
+{
+    "os": {
+        "discovery": {
+            "devices": [
+                {
+                    "sysName": "",
+                    "sysObjectID": ".1.3.6.1.4.1.4413",
+                    "sysDescr": "US-24-250W, 5.43.18.12487, Linux 3.6.5",
+                    "sysContact": null,
+                    "version": "5.43.18.12487",
+                    "hardware": "US-24-250W",
+                    "features": null,
+                    "os": "edgeswitch",
+                    "type": "network",
+                    "serial": null,
+                    "icon": "ubiquiti.svg",
+                    "location": null
+                }
+            ]
+        },
+        "poller": "matches discovery"
+    }
+}

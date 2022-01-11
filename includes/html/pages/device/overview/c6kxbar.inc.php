@@ -50,10 +50,10 @@ foreach ($entity_state['group']['c6kxbar'] as $index => $entry) {
             }
 
             $percent_in = $fabric['cc6kxbarStatisticsInUtil'];
-            $background_in = \LibreNMS\Util\Colors::percentage($percent_in, null);
+            $background_in = \LibreNMS\Util\Color::percentage($percent_in, null);
 
             $percent_out = $fabric['cc6kxbarStatisticsOutUtil'];
-            $background_out = \LibreNMS\Util\Colors::percentage($percent_out, null);
+            $background_out = \LibreNMS\Util\Color::percentage($percent_out, null);
 
             $graph_array = [];
             $graph_array['height'] = '100';

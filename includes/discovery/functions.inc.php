@@ -12,11 +12,16 @@
  * See COPYING for more details.
  */
 
+use App\Models\Ipv6Address;
+use App\Models\Ipv6Network;
+use App\Models\Port;
 use Illuminate\Support\Str;
 use LibreNMS\Config;
 use LibreNMS\Device\YamlDiscovery;
+use LibreNMS\Enum\Alert;
 use LibreNMS\Exceptions\HostExistsException;
 use LibreNMS\Exceptions\InvalidIpException;
+use LibreNMS\OS;
 use LibreNMS\Util\IP;
 use LibreNMS\Util\IPv6;
 
@@ -101,21 +106,6 @@ function discover_new_device($hostname, $device = [], $method = '', $interface =
 //end discover_new_device()
 
 /**
- * @param $device
- */
-function load_discovery(&$device)
-{
-    $yaml_discovery = Config::get('install_dir') . '/includes/definitions/discovery/' . $device['os'] . '.yaml';
-    if (file_exists($yaml_discovery)) {
-        $device['dynamic_discovery'] = Symfony\Component\Yaml\Yaml::parse(
-            file_get_contents($yaml_discovery)
-        );
-    } else {
-        unset($device['dynamic_discovery']);
-    }
-}
-
-/**
  * @param  array  $device  The device to poll
  * @param  bool  $force_module  Ignore device module overrides
  * @return bool if the device was discovered or skipped
@@ -130,31 +120,34 @@ function discover_device(&$device, $force_module = false)
 
     $valid = [];
     // Reset $valid array
-    $attribs = DeviceCache::getPrimary()->getAttribs();
-    $device['attribs'] = $attribs;
+    $device['attribs'] = DeviceCache::getPrimary()->getAttribs();
 
     $device_start = microtime(true);
     // Start counting device poll time
     echo $device['hostname'] . ' ' . $device['device_id'] . ' ' . $device['os'] . ' ';
 
-    $response = device_is_up($device, true);
+    $helper = new \LibreNMS\Polling\ConnectivityHelper(DeviceCache::getPrimary());
 
-    if ($response['status'] !== '1') {
+    if (! $helper->isUp()) {
         return false;
     }
 
     $discovery_devices = Config::get('discovery_modules', []);
     $discovery_devices = ['core' => true] + $discovery_devices;
 
+    /** @var \App\Polling\Measure\MeasurementManager $measurements */
+    $measurements = app(\App\Polling\Measure\MeasurementManager::class);
+    $measurements->checkpoint(); // don't count previous stats
+
     foreach ($discovery_devices as $module => $module_status) {
         $os_module_status = Config::getOsSetting($device['os'], "discovery_modules.$module");
         d_echo('Modules status: Global' . (isset($module_status) ? ($module_status ? '+ ' : '- ') : '  '));
         d_echo('OS' . (isset($os_module_status) ? ($os_module_status ? '+ ' : '- ') : '  '));
-        d_echo('Device' . (isset($attribs['discover_' . $module]) ? ($attribs['discover_' . $module] ? '+ ' : '- ') : '  '));
+        d_echo('Device' . (isset($device['attribs']['discover_' . $module]) ? ($device['attribs']['discover_' . $module] ? '+ ' : '- ') : '  '));
         if ($force_module === true ||
-            ! empty($attribs['discover_' . $module]) ||
-            ($os_module_status && ! isset($attribs['discover_' . $module])) ||
-            ($module_status && ! isset($os_module_status) && ! isset($attribs['discover_' . $module]))
+            ! empty($device['attribs']['discover_' . $module]) ||
+            ($os_module_status && ! isset($device['attribs']['discover_' . $module])) ||
+            ($module_status && ! isset($os_module_status) && ! isset($device['attribs']['discover_' . $module]))
         ) {
             $module_start = microtime(true);
             $start_memory = memory_get_usage();
@@ -162,20 +155,19 @@ function discover_device(&$device, $force_module = false)
 
             try {
                 include "includes/discovery/$module.inc.php";
-            } catch (Exception $e) {
+            } catch (Throwable $e) {
                 // isolate module exceptions so they don't disrupt the polling process
-                echo $e->getTraceAsString() . PHP_EOL;
-                c_echo("%rError in $module module.%n " . $e->getMessage() . PHP_EOL);
-                logfile("Error in $module module. " . $e->getMessage() . PHP_EOL . $e->getTraceAsString() . PHP_EOL);
+                Log::error("%rError discovering $module module for {$device['hostname']}.%n " . $e->getMessage() . PHP_EOL . $e->getTraceAsString(), ['color' => true]);
+                Log::event("Error discovering $module module. Check log file for more details.", $device['device_id'], 'discovery', Alert::ERROR);
             }
 
             $module_time = microtime(true) - $module_start;
             $module_time = substr($module_time, 0, 5);
             $module_mem = (memory_get_usage() - $start_memory);
             printf("\n>> Runtime for discovery module '%s': %.4f seconds with %s bytes\n", $module, $module_time, $module_mem);
-            printChangedStats();
+            $measurements->printChangedStats();
             echo "#### Unload disco module $module ####\n\n";
-        } elseif (isset($attribs['discover_' . $module]) && $attribs['discover_' . $module] == '0') {
+        } elseif (isset($device['attribs']['discover_' . $module]) && $device['attribs']['discover_' . $module] == '0') {
             echo "Module [ $module ] disabled on host.\n\n";
         } elseif (isset($os_module_status) && $os_module_status == '0') {
             echo "Module [ $module ] disabled on os.\n\n";
@@ -672,55 +664,49 @@ function discover_process_ipv6(&$valid, $ifIndex, $ipv6_address, $ipv6_prefixlen
     $ipv6_network = $ipv6->getNetwork($ipv6_prefixlen);
     $ipv6_compressed = $ipv6->compressed();
 
-    if (dbFetchCell('SELECT COUNT(*) FROM `ports` WHERE device_id = ? AND `ifIndex` = ?', [$device['device_id'], $ifIndex]) != '0' && $ipv6_prefixlen > '0' && $ipv6_prefixlen < '129' && $ipv6_compressed != '::1') {
-        $port_id = dbFetchCell('SELECT port_id FROM `ports` WHERE device_id = ? AND ifIndex = ?', [$device['device_id'], $ifIndex]);
+    $port_id = Port::where([
+        ['device_id', $device['device_id']],
+        ['ifIndex', $ifIndex],
+    ])->value('port_id');
 
-        if (is_numeric($port_id)) {
-            if (dbFetchCell('SELECT COUNT(*) FROM `ipv6_networks` WHERE `ipv6_network` = ?', [$ipv6_network]) < '1') {
-                dbInsert(['ipv6_network' => $ipv6_network, 'context_name' => $context_name], 'ipv6_networks');
-                echo 'N';
-            } else {
-                //Update Context
-                dbUpdate(['context_name' => $device['context_name']], 'ipv6_networks', '`ipv6_network` = ?', [$ipv6_network]);
-                echo 'n';
-            }
+    if ($port_id && $ipv6_prefixlen > '0' && $ipv6_prefixlen < '129' && $ipv6_compressed != '::1') {
+        d_echo('IPV6: Found port id: ' . $port_id);
 
-            if ($context_name == null) {
-                $ipv6_network_id = dbFetchCell('SELECT `ipv6_network_id` FROM `ipv6_networks` WHERE `ipv6_network` = ? AND `context_name` IS NULL', [$ipv6_network]);
-            } else {
-                $ipv6_network_id = dbFetchCell('SELECT `ipv6_network_id` FROM `ipv6_networks` WHERE `ipv6_network` = ? AND `context_name` = ?', [$ipv6_network, $context_name]);
-            }
-            if (dbFetchCell('SELECT COUNT(*) FROM `ipv6_addresses` WHERE `ipv6_address` = ? AND `ipv6_prefixlen` = ? AND `port_id` = ?', [$ipv6_address, $ipv6_prefixlen, $port_id]) == '0') {
-                dbInsert([
-                    'ipv6_address' => $ipv6_address,
-                    'ipv6_compressed' => $ipv6_compressed,
-                    'ipv6_prefixlen' => $ipv6_prefixlen,
-                    'ipv6_origin' => $ipv6_origin,
-                    'ipv6_network_id' => $ipv6_network_id,
-                    'port_id' => $port_id,
-                    'context_name' => $context_name,
-                ], 'ipv6_addresses');
-                echo '+';
-            } elseif (dbFetchCell('SELECT COUNT(*) FROM `ipv6_addresses` WHERE `ipv6_address` = ? AND `ipv6_prefixlen` = ? AND `port_id` = ? AND `ipv6_network_id` = ""', [$ipv6_address, $ipv6_prefixlen, $port_id]) == '1') {
-                // Update IPv6 network ID if not set
-                if ($context_name == null) {
-                    $ipv6_network_id = dbFetchCell('SELECT `ipv6_network_id` FROM `ipv6_networks` WHERE `ipv6_network` = ? AND `context_name` IS NULL', [$ipv6_network]);
-                } else {
-                    $ipv6_network_id = dbFetchCell('SELECT `ipv6_network_id` FROM `ipv6_networks` WHERE `ipv6_network` = ? AND `context_name` = ?', [$ipv6_network, $context_name]);
-                }
-                dbUpdate(['ipv6_network_id' => $ipv6_network_id], 'ipv6_addresses', '`ipv6_address` = ? AND `ipv6_prefixlen` = ? AND `port_id` = ?', [$ipv6_address, $ipv6_prefixlen, $port_id]);
-                echo 'u';
-            } else {
-                //Update Context
-                dbUpdate(['context_name' => $device['context_name']], 'ipv6_addresses', '`ipv6_address` = ? AND `ipv6_prefixlen` = ? AND `port_id` = ?', [$ipv6_address, $ipv6_prefixlen, $port_id]);
-                echo '.';
+        $ipv6netDB = Ipv6Network::updateOrCreate([
+            'ipv6_network' => $ipv6_network,
+        ], [
+            'context_name' => $context_name,
+        ]);
+
+        if ($ipv6netDB->wasChanged()) {
+            d_echo('IPV6: Update DB ipv6_networks');
+        }
+
+        $ipv6_network_id = Ipv6Network::where('ipv6_network', $ipv6_network)->where('context_name', $context_name)->value('ipv6_network_id');
+
+        if ($ipv6_network_id) {
+            d_echo('IPV6: Found network id: ' . $ipv6_network_id);
+
+            $ipv6adrDB = Ipv6Address::updateOrCreate([
+                'ipv6_address' => $ipv6_address,
+                'ipv6_prefixlen' => $ipv6_prefixlen,
+                'port_id' => $port_id,
+            ], [
+                'ipv6_compressed' => $ipv6_compressed,
+                'ipv6_origin' => $ipv6_origin,
+                'ipv6_network_id' => $ipv6_network_id,
+                'context_name' => $context_name,
+            ]);
+
+            if ($ipv6adrDB->wasChanged()) {
+                d_echo('IPV6: Update DB ipv6_addresses');
             }
 
             $full_address = "$ipv6_address/$ipv6_prefixlen";
             $valid_address = $full_address . '-' . $port_id;
             $valid['ipv6'][$valid_address] = 1;
-        }
-    }//end if
+        }//endif network_id
+    }//endif port_id && others
 }//end discover_process_ipv6()
 
 /*
@@ -809,11 +795,11 @@ function get_device_divisor($device, $os_version, $sensor_type, $oid)
         }
 
         if (Str::startsWith($oid, '.1.3.6.1.2.1.33.1.2.3.')) {
-            if ($device['os'] == 'routeros') {
+            if ($device['os'] == 'routeros' && version_compare($os_version, '6.47', '<')) {
                 return 60;
-            } else {
-                return 1;
             }
+
+            return 1;
         }
     }
 
@@ -858,22 +844,25 @@ function ignore_storage($os, $descr)
 
 /**
  * @param $valid
- * @param $device
+ * @param  OS  $os
  * @param $sensor_type
  * @param $pre_cache
  */
-function discovery_process(&$valid, $device, $sensor_class, $pre_cache)
+function discovery_process(&$valid, $os, $sensor_class, $pre_cache)
 {
-    if (! empty($device['dynamic_discovery']['modules']['sensors'][$sensor_class]) && ! can_skip_sensor($device, $sensor_class, '')) {
+    $discovery = $os->getDiscovery('sensors');
+    $device = $os->getDeviceArray();
+
+    if (! empty($discovery[$sensor_class]) && ! can_skip_sensor($device, $sensor_class, '')) {
         $sensor_options = [];
-        if (isset($device['dynamic_discovery']['modules']['sensors'][$sensor_class]['options'])) {
-            $sensor_options = $device['dynamic_discovery']['modules']['sensors'][$sensor_class]['options'];
+        if (isset($discovery[$sensor_class]['options'])) {
+            $sensor_options = $discovery[$sensor_class]['options'];
         }
 
         d_echo("Dynamic Discovery ($sensor_class): ");
-        d_echo($device['dynamic_discovery']['modules']['sensors'][$sensor_class]);
+        d_echo($discovery[$sensor_class]);
 
-        foreach ($device['dynamic_discovery']['modules']['sensors'][$sensor_class]['data'] as $data) {
+        foreach ($discovery[$sensor_class]['data'] as $data) {
             $tmp_name = $data['oid'];
             $raw_data = (array) $pre_cache[$tmp_name];
 
@@ -917,7 +906,7 @@ function discovery_process(&$valid, $device, $sensor_class, $pre_cache)
                 // Check if we have a "num_oid" value. If not, we'll try to compute it from textual OIDs with snmptranslate.
                 if (empty($data['num_oid'])) {
                     try {
-                        $data['num_oid'] = YamlDiscovery::computeNumericalOID($device, $data);
+                        $data['num_oid'] = YamlDiscovery::computeNumericalOID($os, $data);
                     } catch (\Exception $e) {
                         d_echo('Error: We cannot find a numerical OID for ' . $data['value'] . '. Skipping this one...');
                         $skippedFromYaml = true;
@@ -990,11 +979,12 @@ function discovery_process(&$valid, $device, $sensor_class, $pre_cache)
 
 /**
  * @param $types
- * @param $device
+ * @param  OS  $os
  * @param  array  $pre_cache
  */
-function sensors($types, $device, $valid, $pre_cache = [])
+function sensors($types, $os, $valid, $pre_cache = [])
 {
+    $device = &$os->getDeviceArray();
     foreach ((array) $types as $sensor_class) {
         echo ucfirst($sensor_class) . ': ';
         $dir = Config::get('install_dir') . '/includes/discovery/sensors/' . $sensor_class . '/';
@@ -1010,7 +1000,7 @@ function sensors($types, $device, $valid, $pre_cache = [])
                 include $dir . '/rfc1628.inc.php';
             }
         }
-        discovery_process($valid, $device, $sensor_class, $pre_cache);
+        discovery_process($valid, $os, $sensor_class, $pre_cache);
         d_echo($valid['sensor'][$sensor_class] ?? []);
         check_valid_sensors($device, $sensor_class, $valid['sensor']);
         echo "\n";

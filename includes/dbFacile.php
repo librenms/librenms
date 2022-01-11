@@ -1,6 +1,6 @@
 <?php
 
-/*
+/**
  * dbFacile - A Database API that should have existed from the start
  * Version 0.4.3
  *
@@ -15,14 +15,20 @@
  * 1. Connect to MySQL as you normally would ... this code uses an existing connection
  * 2. Use dbFacile as you normally would, without the object context
  * 3. Oh, and dbFetchAll() is now dbFetchRows()
+ *
+ * @deprecated Please use Eloquent instead; https://laravel.com/docs/eloquent
+ * @see https://laravel.com/docs/eloquent
  */
 
 use Illuminate\Database\QueryException;
-use LibreNMS\Config;
 use LibreNMS\DB\Eloquent;
 use LibreNMS\Exceptions\DatabaseConnectException;
 use LibreNMS\Util\Laravel;
 
+/**
+ * @deprecated Please use Eloquent instead; https://laravel.com/docs/eloquent
+ * @see https://laravel.com/docs/eloquent
+ */
 function dbIsConnected()
 {
     return Eloquent::isConnected();
@@ -41,6 +47,9 @@ function dbIsConnected()
  * @return \Illuminate\Database\Connection
  *
  * @throws DatabaseConnectException
+ *
+ * @deprecated Please use Eloquent instead; https://laravel.com/docs/eloquent
+ * @see https://laravel.com/docs/eloquent
  */
 function dbConnect($db_host = null, $db_user = '', $db_pass = '', $db_name = '', $db_port = null, $db_socket = null)
 {
@@ -86,6 +95,9 @@ function dbConnect($db_host = null, $db_user = '', $db_pass = '', $db_name = '',
  * @param  string  $sql
  * @param  array  $parameters
  * @return bool if query was successful or not
+ *
+ * @deprecated Please use Eloquent instead; https://laravel.com/docs/eloquent#building-queries
+ * @see https://laravel.com/docs/eloquent#building-queries
  */
 function dbQuery($sql, $parameters = [])
 {
@@ -107,11 +119,12 @@ function dbQuery($sql, $parameters = [])
  * @param  array  $data
  * @param  string  $table
  * @return null|int
+ *
+ * @deprecated Please use Eloquent instead; https://laravel.com/docs/eloquent#inserting-and-updating-models
+ * @see https://laravel.com/docs/eloquent#inserting-and-updating-models
  */
 function dbInsert($data, $table)
 {
-    $time_start = microtime(true);
-
     $sql = 'INSERT IGNORE INTO `' . $table . '` (`' . implode('`,`', array_keys($data)) . '`)  VALUES (' . implode(',', dbPlaceHolders($data)) . ')';
 
     try {
@@ -120,7 +133,6 @@ function dbInsert($data, $table)
         dbHandleException(new QueryException($sql, $data, $pdoe));
     }
 
-    recordDbStatistic('insert', $time_start);
     if ($result) {
         return Eloquent::DB()->getPdo()->lastInsertId();
     } else {
@@ -136,11 +148,12 @@ function dbInsert($data, $table)
  * @param  array  $data
  * @param  string  $table
  * @return bool
+ *
+ * @deprecated Please use Eloquent instead; https://laravel.com/docs/eloquent#inserting-and-updating-models
+ * @see https://laravel.com/docs/eloquent#inserting-and-updating-models
  */
 function dbBulkInsert($data, $table)
 {
-    $time_start = microtime(true);
-
     // check that data isn't an empty array
     if (empty($data)) {
         return false;
@@ -159,8 +172,6 @@ function dbBulkInsert($data, $table)
     foreach ($data_chunks as $data_chunk) {
         try {
             $result = Eloquent::DB()->table($table)->insert((array) $data_chunk);
-
-            recordDbStatistic('insert', $time_start);
 
             return $result;
         } catch (PDOException $pdoe) {
@@ -181,11 +192,12 @@ function dbBulkInsert($data, $table)
  * @param  string  $where
  * @param  array  $parameters
  * @return bool|int
+ *
+ * @deprecated Please use Eloquent instead; https://laravel.com/docs/eloquent#inserting-and-updating-models
+ * @see https://laravel.com/docs/eloquent#inserting-and-updating-models
  */
 function dbUpdate($data, $table, $where = null, $parameters = [])
 {
-    $time_start = microtime(true);
-
     // need field name and placeholder value
     // but how merge these field placeholders with actual $parameters array for the WHERE clause
     $sql = 'UPDATE `' . $table . '` set ';
@@ -213,8 +225,6 @@ function dbUpdate($data, $table, $where = null, $parameters = [])
     try {
         $result = Eloquent::DB()->update($sql, (array) $data);
 
-        recordDbStatistic('update', $time_start);
-
         return $result;
     } catch (PDOException $pdoe) {
         dbHandleException(new QueryException($sql, $data, $pdoe));
@@ -223,10 +233,12 @@ function dbUpdate($data, $table, $where = null, $parameters = [])
     return false;
 }//end dbUpdate()
 
+/**
+ * @deprecated Please use Eloquent instead; https://laravel.com/docs/eloquent#deleting-models
+ * @see https://laravel.com/docs/eloquent#deleting-models
+ */
 function dbDelete($table, $where = null, $parameters = [])
 {
-    $time_start = microtime(true);
-
     $sql = 'DELETE FROM `' . $table . '`';
     if ($where) {
         $sql .= ' WHERE ' . $where;
@@ -238,8 +250,6 @@ function dbDelete($table, $where = null, $parameters = [])
         dbHandleException(new QueryException($sql, $parameters, $pdoe));
     }
 
-    recordDbStatistic('delete', $time_start);
-
     return $result;
 }//end dbDelete()
 
@@ -250,11 +260,12 @@ function dbDelete($table, $where = null, $parameters = [])
  * @param  string  $target_table  The table to delete entries from
  * @param  array  $parents  an array of parent tables to check.
  * @return bool|int
+ *
+ * @deprecated Please use Eloquent instead; https://laravel.com/docs/eloquent#deleting-models
+ * @see https://laravel.com/docs/eloquent#deleting-models
  */
 function dbDeleteOrphans($target_table, $parents)
 {
-    $time_start = microtime(true);
-
     if (empty($parents)) {
         // don't delete all entries if parents is missing
         return false;
@@ -288,26 +299,23 @@ function dbDeleteOrphans($target_table, $parents)
         dbHandleException(new QueryException($query, [], $pdoe));
     }
 
-    recordDbStatistic('delete', $time_start);
-
     return $result;
 }
 
-/*
+/**
  * Fetches all of the rows (associatively) from the last performed query.
  * Most other retrieval functions build off this
- * */
-
+ *
+ * @deprecated Please use Eloquent instead; https://laravel.com/docs/eloquent
+ * @see https://laravel.com/docs/eloquent
+ */
 function dbFetchRows($sql, $parameters = [])
 {
     global $PDO_FETCH_ASSOC;
-    $time_start = microtime(true);
 
     try {
         $PDO_FETCH_ASSOC = true;
         $rows = Eloquent::DB()->select($sql, (array) $parameters);
-
-        recordDbStatistic('fetchrows', $time_start);
 
         return $rows;
     } catch (PDOException $pdoe) {
@@ -319,11 +327,13 @@ function dbFetchRows($sql, $parameters = [])
     return [];
 }//end dbFetchRows()
 
-/*
+/**
  * This is intended to be the method used for large result sets.
  * It is intended to return an iterator, and act upon buffered data.
- * */
-
+ *
+ * @deprecated Please use Eloquent instead; https://laravel.com/docs/eloquent
+ * @see https://laravel.com/docs/eloquent
+ */
 function dbFetch($sql, $parameters = [])
 {
     return dbFetchRows($sql, $parameters);
@@ -339,21 +349,20 @@ function dbFetch($sql, $parameters = [])
      */
 }//end dbFetch()
 
-/*
+/**
  * Like fetch(), accepts any number of arguments
  * The first argument is an sprintf-ready query stringTypes
- * */
-
+ *
+ * @deprecated Please use Eloquent instead; https://laravel.com/docs/eloquent
+ * @see https://laravel.com/docs/eloquent
+ */
 function dbFetchRow($sql = null, $parameters = [])
 {
     global $PDO_FETCH_ASSOC;
-    $time_start = microtime(true);
 
     try {
         $PDO_FETCH_ASSOC = true;
         $row = Eloquent::DB()->selectOne($sql, (array) $parameters);
-
-        recordDbStatistic('fetchrow', $time_start);
 
         return $row;
     } catch (PDOException $pdoe) {
@@ -365,19 +374,19 @@ function dbFetchRow($sql = null, $parameters = [])
     return [];
 }//end dbFetchRow()
 
-/*
+/**
  * Fetches the first call from the first row returned by the query
- * */
-
+ *
+ * @deprecated Please use Eloquent instead; https://laravel.com/docs/eloquent
+ * @see https://laravel.com/docs/eloquent
+ */
 function dbFetchCell($sql, $parameters = [])
 {
     global $PDO_FETCH_ASSOC;
-    $time_start = microtime(true);
 
     try {
         $PDO_FETCH_ASSOC = true;
         $row = Eloquent::DB()->selectOne($sql, (array) $parameters);
-        recordDbStatistic('fetchcell', $time_start);
         if ($row) {
             return reset($row);
             // shift first field off first row
@@ -391,15 +400,16 @@ function dbFetchCell($sql, $parameters = [])
     return null;
 }//end dbFetchCell()
 
-/*
+/**
  * This method is quite different from fetchCell(), actually
  * It fetches one cell from each row and places all the values in 1 array
- * */
-
+ *
+ * @deprecated Please use Eloquent instead; https://laravel.com/docs/eloquent
+ * @see https://laravel.com/docs/eloquent
+ */
 function dbFetchColumn($sql, $parameters = [])
 {
     global $PDO_FETCH_ASSOC;
-    $time_start = microtime(true);
 
     $cells = [];
 
@@ -409,8 +419,6 @@ function dbFetchColumn($sql, $parameters = [])
             $cells[] = reset($row);
         }
         $PDO_FETCH_ASSOC = false;
-
-        recordDbStatistic('fetchcolumn', $time_start);
 
         return $cells;
     } catch (PDOException $pdoe) {
@@ -422,12 +430,14 @@ function dbFetchColumn($sql, $parameters = [])
     return [];
 }//end dbFetchColumn()
 
-/*
+/**
  * Should be passed a query that fetches two fields
  * The first will become the array key
  * The second the key's value
+ *
+ * @deprecated Please use Eloquent instead; https://laravel.com/docs/eloquent
+ * @see https://laravel.com/docs/eloquent
  */
-
 function dbFetchKeyValue($sql, $parameters = [])
 {
     $data = [];
@@ -452,6 +462,9 @@ function dbFetchKeyValue($sql, $parameters = [])
  *
  * @param  array  $data
  * @return array
+ *
+ * @deprecated Please use Eloquent instead; https://laravel.com/docs/eloquent
+ * @see https://laravel.com/docs/eloquent
  */
 function dbArrayToRaw($data)
 {
@@ -464,6 +477,10 @@ function dbArrayToRaw($data)
     return $data;
 }
 
+/**
+ * @deprecated Please use Eloquent instead; https://laravel.com/docs/eloquent
+ * @see https://laravel.com/docs/eloquent
+ */
 function dbHandleException(QueryException $exception)
 {
     $message = $exception->getMessage();
@@ -498,6 +515,9 @@ function dbHandleException(QueryException $exception)
  *
  * @param  array  $values
  * @return array
+ *
+ * @deprecated Please use Eloquent instead; https://laravel.com/docs/eloquent
+ * @see https://laravel.com/docs/eloquent
  */
 function dbPlaceHolders(&$values)
 {
@@ -517,16 +537,28 @@ function dbPlaceHolders(&$values)
     return $data;
 }//end dbPlaceHolders()
 
+/**
+ * @deprecated Please use Eloquent instead; https://laravel.com/docs/eloquent
+ * @see https://laravel.com/docs/eloquent
+ */
 function dbBeginTransaction()
 {
     Eloquent::DB()->beginTransaction();
 }//end dbBeginTransaction()
 
+/**
+ * @deprecated Please use Eloquent instead; https://laravel.com/docs/eloquent
+ * @see https://laravel.com/docs/eloquent
+ */
 function dbCommitTransaction()
 {
     Eloquent::DB()->commit();
 }//end dbCommitTransaction()
 
+/**
+ * @deprecated Please use Eloquent instead; https://laravel.com/docs/eloquent
+ * @see https://laravel.com/docs/eloquent
+ */
 function dbRollbackTransaction()
 {
     Eloquent::DB()->rollBack();
@@ -538,62 +570,13 @@ function dbRollbackTransaction()
  *
  * @param $count
  * @return string placholder list
+ *
+ * @deprecated Please use Eloquent instead; https://laravel.com/docs/eloquent
+ * @see https://laravel.com/docs/eloquent
  */
 function dbGenPlaceholders($count)
 {
     return '(' . implode(',', array_fill(0, $count, '?')) . ')';
-}
-
-/**
- * Update statistics for db operations
- *
- * @param  string  $stat  fetchcell, fetchrow, fetchrows, fetchcolumn, update, insert, delete
- * @param  float  $start_time  The time the operation started with 'microtime(true)'
- * @return float The calculated run time
- */
-function recordDbStatistic($stat, $start_time)
-{
-    global $db_stats, $db_stats_last;
-
-    if (! isset($db_stats)) {
-        $db_stats = [
-            'ops' => [
-                'insert' => 0,
-                'update' => 0,
-                'delete' => 0,
-                'fetchcell' => 0,
-                'fetchcolumn' => 0,
-                'fetchrow' => 0,
-                'fetchrows' => 0,
-            ],
-            'time' => [
-                'insert' => 0.0,
-                'update' => 0.0,
-                'delete' => 0.0,
-                'fetchcell' => 0.0,
-                'fetchcolumn' => 0.0,
-                'fetchrow' => 0.0,
-                'fetchrows' => 0.0,
-            ],
-        ];
-        $db_stats_last = $db_stats;
-    }
-
-    $runtime = microtime(true) - $start_time;
-    $db_stats['ops'][$stat]++;
-    $db_stats['time'][$stat] += $runtime;
-
-    //double accounting corrections
-    if ($stat == 'fetchcolumn') {
-        $db_stats['ops']['fetchrows']--;
-        $db_stats['time']['fetchrows'] -= $runtime;
-    }
-    if ($stat == 'fetchcell') {
-        $db_stats['ops']['fetchrow']--;
-        $db_stats['time']['fetchrow'] -= $runtime;
-    }
-
-    return $runtime;
 }
 
 /**
@@ -605,6 +588,9 @@ function recordDbStatistic($stat, $start_time)
  * @param  string  $list_column  related column names
  * @param  array  $list  list of related ids
  * @return array [$inserted, $deleted]
+ *
+ * @deprecated Please use Eloquent instead; https://laravel.com/docs/eloquent
+ * @see https://laravel.com/docs/eloquent
  */
 function dbSyncRelationship($table, $target_column = null, $target = null, $list_column = null, $list = null)
 {
@@ -635,6 +621,9 @@ function dbSyncRelationship($table, $target_column = null, $target = null, $list
  * @param  string  $table
  * @param  array  $relationships  array of relationship pairs with columns as keys and ids as values
  * @return array [$inserted, $deleted]
+ *
+ * @deprecated Please use Eloquent instead; https://laravel.com/docs/eloquent
+ * @see https://laravel.com/docs/eloquent
  */
 function dbSyncRelationships($table, $relationships = [])
 {

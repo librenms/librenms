@@ -5,14 +5,14 @@
         <x-panel class="with-nav-tabs">
             <x-slot name="heading">
                 @if(\LibreNMS\Config::get('smokeping.url'))
-                    <a href="{{ \LibreNMS\Config::get('smokeping.url') }}?target={{ $device->type }}.{{ str_replace('.','_',$device->hostname) }}" target="_blank"><span class="panel-title">@lang('Smokeping') <i class="glyphicon glyphicon-share-alt"></i></span></a>
+                    <a href="{{ \LibreNMS\Config::get('smokeping.url') }}?target={{ $device->type }}.{{ str_replace('.','_',$device->hostname) }}" target="_blank"><span class="panel-title">{{ __('Smokeping') }} <i class="glyphicon glyphicon-share-alt"></i></span></a>
                 @else
-                    <span class="panel-title">@lang('Smokeping')</span>
+                    <span class="panel-title">{{ __('Smokeping') }}</span>
                 @endif
 
                 <ul class="nav nav-tabs" style="display: inline-block">
                     @foreach($data['smokeping_tabs'] as $tab)
-                        <li @if($loop->first) class="active" @endif><a href="#{{ $tab }}" data-toggle="tab">@lang('smokeping.' . $tab)</a></li>
+                        <li @if($loop->first) class="active" @endif><a href="#{{ $tab }}" data-toggle="tab">{{ __('smokeping.' . $tab) }}</a></li>
                     @endforeach
                 </ul>
             </x-slot>
@@ -35,17 +35,17 @@
     @endif
     <x-panel title="{{ __('Performance') }}">
         <x-slot name="heading">
-            <span class="panel-title" style="line-height: 34px">@lang('Performance')</span>
+            <span class="panel-title" style="line-height: 34px">{{ __('Performance') }}</span>
                 <span style="text-align: center">
                     <form method="post" role="form" id="map" class="form-inline">
                             @csrf
                             <div class="form-group">
-                                <label for="dtpickerfrom">@lang('From')</label>
+                                <label for="dtpickerfrom">{{ __('From') }}</label>
                                 <input type="text" class="form-control" id="dtpickerfrom" name="dtpickerfrom" maxlength="16"
                                        value="{{ $data['dtpickerfrom'] }}" data-date-format="YYYY-MM-DD HH:mm">
                             </div>
                             <div class="form-group">
-                                <label for="dtpickerto">@lang('To')</label>
+                                <label for="dtpickerto">{{ __('To') }}</label>
                                 <input type="text" class="form-control" id="dtpickerto" name="dtpickerto" maxlength=16
                                        value="{{ $data['dtpickerto'] }} " data-date-format="YYYY-MM-DD HH:mm">
                             </div>

@@ -47,21 +47,21 @@ if ($bill_data['bill_type'] == 'quota') {
 } else {
     $total['per'] = round(($bill_data['total_data'] / ($bill_data['total_data'] / $cur_days * $total_days) * 100), 2);
 }
-$total['bg'] = \LibreNMS\Util\Colors::percentage($total['per'], null);
+$total['bg'] = \LibreNMS\Util\Color::percentage($total['per'], null);
 
 $in['data'] = format_bytes_billing($bill_data['total_data_in']);
 $in['allow'] = $total['allow'];
 $in['ave'] = format_bytes_billing(($bill_data['total_data_in'] / $cur_days));
 $in['est'] = format_bytes_billing(($bill_data['total_data_in'] / $cur_days * $total_days));
-$in['per'] = round(($bill_data['total_data_in'] / $bill_data['total_data'] * 100), 2);
-$in['bg'] = \LibreNMS\Util\Colors::percentage($in['per'], null);
+$in['per'] = ! empty($bill_data['total_data']) ? round(($bill_data['total_data_in'] / $bill_data['total_data'] * 100), 2) : 0;
+$in['bg'] = \LibreNMS\Util\Color::percentage($in['per'], null);
 
 $out['data'] = format_bytes_billing($bill_data['total_data_out']);
 $out['allow'] = $total['allow'];
 $out['ave'] = format_bytes_billing(($bill_data['total_data_out'] / $cur_days));
 $out['est'] = format_bytes_billing(($bill_data['total_data_out'] / $cur_days * $total_days));
-$out['per'] = round(($bill_data['total_data_out'] / $bill_data['total_data'] * 100), 2);
-$out['bg'] = \LibreNMS\Util\Colors::percentage($out['per'], null);
+$out['per'] = ! empty($bill_data['total_data']) ? round(($bill_data['total_data_out'] / $bill_data['total_data'] * 100), 2) : 0;
+$out['bg'] = \LibreNMS\Util\Color::percentage($out['per'], null);
 
 $ousage['over'] = ($bill_data['total_data'] - ($bill_data['bill_quota']));
 $ousage['over'] = (($ousage['over'] < 0) ? '0' : $ousage['over']);
@@ -71,11 +71,11 @@ $ousage['ave'] = format_bytes_billing(($ousage['over'] / $cur_days));
 $ousage['est'] = format_bytes_billing(($ousage['over'] / $cur_days * $total_days));
 $ousage['per'] = round((($bill_data['total_data'] / $bill_data['bill_quota'] * 100) - 100), 2);
 $ousage['per'] = (($ousage['per'] < 0) ? '0' : $ousage['per']);
-$ousage['bg'] = \LibreNMS\Util\Colors::percentage($ousage['per'], null);
+$ousage['bg'] = \LibreNMS\Util\Color::percentage($ousage['per'], null);
 
 function showPercent($per)
 {
-    $background = \LibreNMS\Util\Colors::percentage($per, null);
+    $background = \LibreNMS\Util\Color::percentage($per, null);
     $right_background = $background['right'];
     $left_background = $background['left'];
     $res = print_percentage_bar(200, 20, $per, null, 'ffffff', $left_background, $per . '%', 'ffffff', $right_background);

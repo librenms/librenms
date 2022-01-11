@@ -59,6 +59,7 @@ class CiHelper
         'unit_skip' => false,
         'web_skip' => false,
         'lint_skip_php' => false,
+        'lint_skip_phpstan' => false,
         'lint_skip_python' => false,
         'lint_skip_bash' => false,
         'unit_os' => false,
@@ -273,6 +274,12 @@ class CiHelper
             $php_lint_cmd = array_merge($php_lint_cmd, $files);
 
             $return += $this->execute('PHP lint', $php_lint_cmd);
+
+            if (! $this->flags['lint_skip_phpstan']) {
+                $phpstan_cmd = [$this->checkPhpExec('phpstan'), 'analyze', '--no-interaction',  '--memory-limit=2G'];
+                $return += $this->execute('PHPStan Deprecated', $phpstan_cmd + ['--configuration=phpstan-deprecated.neon']);
+                $return += $this->execute('PHPStan', $phpstan_cmd);
+            }
         }
 
         if (! $this->flags['lint_skip_python']) {
@@ -425,6 +432,7 @@ class CiHelper
 
         $this->setFlags([
             'lint_skip_php' => empty($this->changed['php']),
+            'lint_skip_phpstan' => $this->flags['ci'] || empty($this->changed['php']),
             'lint_skip_python' => empty($this->changed['python']),
             'lint_skip_bash' => empty($this->changed['bash']),
             'unit_os' => $this->getFlag('unit_os') || (! empty($this->changed['os']) && empty(array_diff($this->changed['php'], $this->changed['os-files']))),
@@ -435,7 +443,7 @@ class CiHelper
 
         $this->setFlags([
             'unit_skip' => empty($this->changed['php']) && ! array_sum(Arr::only($this->getFlags(), ['unit_os', 'unit_docs', 'unit_svg', 'unit_modules', 'docs_changed'])),
-            'lint_skip' => array_sum(Arr::only($this->getFlags(), ['lint_skip_php', 'lint_skip_python', 'lint_skip_bash'])) === 3,
+            'lint_skip' => array_sum(Arr::only($this->getFlags(), ['lint_skip_php', 'lint_skip_phpstan', 'lint_skip_python', 'lint_skip_bash'])) === 4,
             'style_skip' => ! $this->flags['ci'] && empty($this->changed['php']),
             'web_skip' => empty($this->changed['php']) && empty($this->changed['resources']),
         ]);

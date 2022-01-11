@@ -7,16 +7,16 @@
         <div class="row">
             <form action="{{ route('services.templates.store') }}" method="POST" role="form"
                   class="form-horizontal service-template-form col-md-10 col-md-offset-1 col-lg-8 col-lg-offset-2 col-sm-12">
-                <legend><h2>@lang('Create Service Template')</h2></legend>
+                <legend><h2>{{ __('Create Service Template') }}</h2></legend>
                 <div class='alert alert-info'>Service Template will created for the specified Device Group.</div>
                 @csrf
                 <div class='well well-lg'>
                     @include('service-template.form')
                     <div class="form-group">
                     <hr>
-                        <center><button type="submit" class="btn btn-primary">@lang('Save')</button>
+                        <center><button type="submit" class="btn btn-primary">{{ __('Save') }}</button>
                             <a type="button" class="btn btn-danger"
-                            href="{{ route('services.templates.index') }}">@lang('Cancel')</a>
+                            href="{{ route('services.templates.index') }}">{{ __('Cancel') }}</a>
                         </center>
                     </div>
                 </div>

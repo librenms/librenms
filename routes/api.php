@@ -25,6 +25,7 @@ Route::group(['prefix' => 'v0', 'namespace' => '\App\Api\Controllers'], function
         Route::get('devicegroups/{name}', 'LegacyApiController@get_devices_by_group')->name('get_devices_by_group');
         Route::get('devicegroups', 'LegacyApiController@get_device_groups')->name('get_device_groups');
         Route::get('port_groups', 'LegacyApiController@get_port_groups')->name('get_port_groups');
+        Route::get('port_groups/{name}', 'LegacyApiController@get_ports_by_group')->name('get_ports_by_group');
         Route::get('portgroups/multiport/bits/{id}', 'LegacyApiController@get_graph_by_portgroup')->name('get_graph_by_portgroup_multiport_bits');
         Route::get('portgroups/{group}', 'LegacyApiController@get_graph_by_portgroup')->name('get_graph_by_portgroup');
         Route::get('alerts/{id}', 'LegacyApiController@list_alerts')->name('get_alert');

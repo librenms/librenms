@@ -26,9 +26,12 @@ namespace LibreNMS\Alert\Transport;
 
 use LibreNMS\Alert\Transport;
 use LibreNMS\Enum\AlertState;
+use LibreNMS\Util\Proxy;
 
 class Victorops extends Transport
 {
+    protected $name = 'VictorOps';
+
     public function deliverAlert($obj, $opts)
     {
         if (! empty($this->config)) {
@@ -62,7 +65,7 @@ class Victorops extends Transport
         }
 
         $curl = curl_init();
-        set_curl_proxy($curl);
+        Proxy::applyToCurl($curl);
         curl_setopt($curl, CURLOPT_URL, $url);
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
         curl_setopt($curl, CURLOPT_HTTPHEADER, ['Content-type' => 'application/json']);

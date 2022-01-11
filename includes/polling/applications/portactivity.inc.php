@@ -6,8 +6,6 @@ use LibreNMS\RRD\RrdDefinition;
 $name = 'portactivity';
 $app_id = $app['app_id'];
 
-echo $name;
-
 try {
     $returned = json_app_get($device, 'portactivity', 1);
 } catch (JsonAppException $e) { // Only doing the generic one as this has no non-JSON return

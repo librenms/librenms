@@ -352,8 +352,8 @@
                     "ifName": "eth0",
                     "portName": null,
                     "ifIndex": 2,
-                    "ifSpeed": null,
-                    "ifSpeed_prev": 0,
+                    "ifSpeed": 0,
+                    "ifSpeed_prev": null,
                     "ifConnectorPresent": "true",
                     "ifPromiscuousMode": "false",
                     "ifOperStatus": "up",
@@ -734,8 +734,7 @@
                     "app_status": "",
                     "app_instance": ""
                 }
-            ],
-            "application_metrics": []
+            ]
         },
         "poller": {
             "applications": [

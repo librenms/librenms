@@ -1,5 +1,7 @@
 <?php
 
+use App\Plugins\Hooks\DeviceOverviewHook;
+
 $overview = 1;
 
 echo '
@@ -18,6 +20,9 @@ require 'overview/puppet_agent.inc.php';
 require 'overview/tracepath.inc.php';
 
 echo LibreNMS\Plugins::call('device_overview_container', [$device]);
+PluginManager::call(DeviceOverviewHook::class, ['device' => DeviceCache::getPrimary()])->each(function ($view) {
+    echo $view;
+});
 
 require 'overview/ports.inc.php';
 
@@ -60,6 +65,7 @@ require 'overview/sensors/count.inc.php';
 require 'overview/sensors/percent.inc.php';
 require 'overview/sensors/signal.inc.php';
 require 'overview/sensors/tv_signal.inc.php';
+require 'overview/sensors/bitrate.inc.php';
 require 'overview/sensors/airflow.inc.php';
 require 'overview/sensors/snr.inc.php';
 require 'overview/sensors/pressure.inc.php';

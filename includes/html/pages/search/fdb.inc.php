@@ -40,7 +40,7 @@ var grid = $("#fdb-search").bootgrid({
 <?php
 
 // Select the devices only with FDB tables
-$sql = 'SELECT D.device_id AS device_id, `hostname` FROM `ports_fdb` AS F, `ports` AS P, `devices` AS D';
+$sql = 'SELECT D.device_id AS device_id, `hostname`, `sysName`, `display` FROM `ports_fdb` AS F, `ports` AS P, `devices` AS D';
 $param = [];
 
 if (! Auth::user()->hasGlobalRead()) {
@@ -56,7 +56,7 @@ foreach (dbFetchRows($sql, $param) as $data) {
         echo '" selected "+';
     }
 
-    echo '">' . format_hostname($data, $data['hostname']) . '</option>"+';
+    echo '">' . format_hostname($data) . '</option>"+';
 }
 ?>
                 "</select>"+

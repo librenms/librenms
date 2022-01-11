@@ -63,6 +63,26 @@ return [
         'removed' => 'Device :id removed',
         'updated' => 'Device :hostname (:id) updated',
     ],
+    'device:ping' => [
+        'description' => 'Ping device and record data for response',
+        'arguments' => [
+            'device spec' => 'Device to ping one of: <Device ID>, <Hostname/IP>, all',
+        ],
+    ],
+    'device:poll' => [
+        'description' => 'Poll data from device(s) as defined by discovery',
+        'arguments' => [
+            'device spec' => 'Device spec to poll: device_id, hostname, wildcard, odd, even, all',
+        ],
+        'options' => [
+            'modules' => 'Specify single module to be run. Comma separate modules, submodules may be added with /',
+            'no-data' => 'Do not update datastores (RRD, InfluxDB, etc)',
+        ],
+        'errors' => [
+            'db_connect' => 'Failed to connect to database. Verify database service is running and connection settings.',
+            'db_auth' => 'Failed to connect to database. Verify credentials: :error',
+        ],
+    ],
     'key:rotate' => [
         'description' => 'Rotate APP_KEY, this decrypts all encrypted data with the given old key and stores it with the new key in APP_KEY.',
         'arguments' => [
@@ -101,6 +121,22 @@ return [
             'single-process' => 'Only use a single process for smokeping',
             'compat' => '[deprecated] Mimic the behaviour of gen_smokeping.php',
         ],
+    ],
+    'snmp:fetch' => [
+        'description' => 'Run snmp query against a device',
+        'arguments' => [
+            'device spec' => 'Device to query: device_id, hostname/ip, hostname regex, or all',
+            'oid' => 'SNMP OID to fetch.  Should be either MIB::oid or a numeric oid',
+        ],
+        'failed' => 'SNMP command failed!',
+        'oid' => 'OID',
+        'options' => [
+            'type' => 'The type of snmp query to perform :types',
+            'output' => 'Specify the output format :formats',
+            'numeric' => 'Numeric OIDs',
+        ],
+        'not_found' => 'Device not found',
+        'value' => 'Value',
     ],
     'translation:generate' => [
         'description' => 'Generate updated json language files for use in the web frontend',

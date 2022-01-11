@@ -31,8 +31,6 @@ $data = '';
 $name = 'powerdns-recursor';
 $app_id = $app['app_id'];
 
-echo ' ' . $name;
-
 if ($agent_data['app'][$name]) {
     $data = $agent_data['app'][$name];
 } elseif (Config::has('apps.powerdns-recursor.api-key')) {

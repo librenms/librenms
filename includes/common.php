@@ -25,41 +25,6 @@ use LibreNMS\Util\IP;
 use LibreNMS\Util\Laravel;
 use Symfony\Component\Process\Process;
 
-function generate_priority_status($priority)
-{
-    $map = [
-        'emerg'     => 2,
-        'alert'     => 2,
-        'crit'      => 2,
-        'err'       => 2,
-        'warning'   => 1,
-        'notice'    => 0,
-        'info'      => 0,
-        'debug'     => 3,
-        ''          => 0,
-    ];
-
-    return isset($map[$priority]) ? $map[$priority] : 0;
-}
-
-function graylog_severity_label($severity)
-{
-    $map = [
-        '0' => 'label-danger',
-        '1' => 'label-danger',
-        '2' => 'label-danger',
-        '3' => 'label-danger',
-        '4' => 'label-warning',
-        '5' => 'label-info',
-        '6' => 'label-info',
-        '7' => 'label-default',
-        ''  => 'label-info',
-    ];
-    $barColor = isset($map[$severity]) ? $map[$severity] : 'label-info';
-
-    return '<span class="alert-status ' . $barColor . '" style="margin-right:8px;float:left;"></span>';
-}
-
 /**
  * Execute and snmp command, filter debug output unless -v is specified
  *
@@ -567,23 +532,6 @@ function object_is_cached($section, $obj)
     }
 } // object_is_cached
 
-/**
- * Checks if config allows us to ping this device
- * $attribs contains an array of all of this devices
- * attributes
- *
- * @param  array  $attribs  Device attributes
- * @return bool
- **/
-function can_ping_device($attribs)
-{
-    if (Config::get('icmp_check') && ! (isset($attribs['override_icmp_disable']) && $attribs['override_icmp_disable'] == 'true')) {
-        return true;
-    } else {
-        return false;
-    }
-} // end can_ping_device
-
 function search_phrase_column($c)
 {
     global $searchPhrase;
@@ -658,14 +606,10 @@ function version_info($remote = false)
     }
     $output['db_schema'] = vsprintf('%s (%s)', $version->database());
     $output['php_ver'] = phpversion();
-    $output['python_ver'] = \LibreNMS\Util\Version::python();
+    $output['python_ver'] = $version->python();
     $output['mysql_ver'] = \LibreNMS\DB\Eloquent::isConnected() ? \LibreNMS\DB\Eloquent::version() : '?';
-    $output['rrdtool_ver'] = str_replace('1.7.01.7.0', '1.7.0', implode(' ', array_slice(explode(' ', shell_exec(
-        Config::get('rrdtool', 'rrdtool') . ' --version |head -n1'
-    )), 1, 1)));
-    $output['netsnmp_ver'] = str_replace('version: ', '', rtrim(shell_exec(
-        Config::get('snmpget', 'snmpget') . ' -V 2>&1'
-    )));
+    $output['rrdtool_ver'] = $version->rrdtool();
+    $output['netsnmp_ver'] = $version->netSnmp();
 
     return $output;
 }//end version_info()
@@ -691,28 +635,20 @@ function inet6_ntop($ip)
  * If hostname is an ip, use return sysName
  *
  * @param  array  $device  (uses hostname and sysName fields)
- * @param  string  $hostname
  * @return string
  */
-function format_hostname($device, $hostname = null)
+function format_hostname($device): string
 {
-    if (empty($hostname)) {
-        $hostname = $device['hostname'];
-    }
+    $hostname = $device['hostname'] ?? 'invalid hostname';
+    $hostname_is_ip = IP::isValid($hostname);
+    $sysName = empty($device['sysName']) ? $hostname : $device['sysName'];
 
-    if (Config::get('force_hostname_to_sysname') && ! empty($device['sysName'])) {
-        if (\LibreNMS\Util\Validate::hostname($hostname) && ! IP::isValid($hostname)) {
-            return $device['sysName'];
-        }
-    }
-
-    if (Config::get('force_ip_to_sysname') && ! empty($device['sysName'])) {
-        if (IP::isValid($hostname)) {
-            return $device['sysName'];
-        }
-    }
-
-    return $hostname;
+    return \App\View\SimpleTemplate::parse(empty($device['display']) ? Config::get('device_display_default', '{{ $hostname }}') : $device['display'], [
+        'hostname' => $hostname,
+        'sysName' => $sysName,
+        'sysName_fallback' => $hostname_is_ip ? $sysName : $hostname,
+        'ip' => empty($device['overwrite_ip']) ? ($hostname_is_ip ? $device['hostname'] : $device['ip'] ?? '') : $device['overwrite_ip'],
+    ]);
 }
 
 /**
@@ -960,38 +896,6 @@ function get_sql_filter_min_severity($min_severity, $alert_rules_name)
 }
 
 /**
- * Load the os definition for the device and set type and os_group
- * $device['os'] must be set
- *
- * @param  array  $device
- */
-function load_os(&$device)
-{
-    if (! isset($device['os'])) {
-        d_echo("No OS to load\n");
-
-        return;
-    }
-
-    \LibreNMS\Util\OS::loadDefinition($device['os']);
-
-    // Set type to a predefined type for the OS if it's not already set
-    $loaded_os_type = Config::get("os.{$device['os']}.type");
-    $model = DeviceCache::get($device['device_id']);
-    if (! $model->getAttrib('override_device_type') && $loaded_os_type != $model->type) {
-        $model->type = $loaded_os_type;
-        $model->save();
-        Log::debug("Device type changed to $loaded_os_type!");
-    }
-
-    if ($os_group = Config::get("os.{$device['os']}.group")) {
-        $device['os_group'] = $os_group;
-    } else {
-        unset($device['os_group']);
-    }
-}
-
-/**
  * Converts fahrenheit to celsius (with 2 decimal places)
  * if $scale is not fahrenheit, it assumes celsius and  returns the value
  *
@@ -1107,15 +1011,7 @@ function get_vm_parent_id($device)
  */
 function str_to_class($name, $namespace = null)
 {
-    $pre_format = str_replace(['-', '_'], ' ', $name);
-    $class = str_replace(' ', '', ucwords(strtolower($pre_format)));
-    $class = preg_replace_callback('/^(\d)(.)/', function ($matches) {
-        $numbers = ['Zero', 'One', 'Two', 'Three', 'Four', 'Five', 'Six', 'Seven', 'Eight', 'Nine'];
-
-        return $numbers[$matches[1]] . strtoupper($matches[2]);
-    }, $class);
-
-    return $namespace . $class;
+    return \LibreNMS\Util\StringHelpers::toClass($name, $namespace);
 }
 
 /**

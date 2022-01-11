@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\View\SimpleTemplate;
 use Fico7489\Laravel\Pivot\Traits\PivotEventTrait;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -10,6 +11,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasManyThrough;
+use Illuminate\Database\Eloquent\Relations\HasOne;
 use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Illuminate\Database\Query\JoinClause;
 use Illuminate\Support\Str;
@@ -35,7 +37,41 @@ class Device extends BaseModel
 
     public $timestamps = false;
     protected $primaryKey = 'device_id';
-    protected $fillable = ['hostname', 'ip', 'status', 'status_reason', 'sysName', 'sysDescr', 'sysObjectID', 'hardware', 'version', 'features', 'serial', 'icon'];
+    protected $fillable = [
+        'authalgo',
+        'authlevel',
+        'authname',
+        'authpass',
+        'community',
+        'cryptoalgo',
+        'cryptopass',
+        'features',
+        'hardware',
+        'hostname',
+        'display',
+        'icon',
+        'ip',
+        'os',
+        'overwrite_ip',
+        'poller_group',
+        'port',
+        'port_association_mode',
+        'retries',
+        'serial',
+        'snmp_disable',
+        'snmp_max_repeaters',
+        'snmpver',
+        'status',
+        'status_reason',
+        'sysDescr',
+        'sysName',
+        'sysObjectID',
+        'timeout',
+        'transport',
+        'version',
+        'uptime',
+    ];
+
     protected $casts = [
         'last_polled' => 'datetime',
         'status' => 'boolean',
@@ -129,27 +165,32 @@ class Device extends BaseModel
     }
 
     /**
-     * Get the display name of this device (hostname) unless force_ip_to_sysname is set
-     * and hostname is an IP and sysName is set
-     *
-     * @return string
+     * Get the display name of this device based on the display format string
+     * The default is {{ $hostname }} controlled by the device_display_default setting
      */
-    public function displayName()
+    public function displayName(): string
     {
-        if (\LibreNMS\Config::get('force_ip_to_sysname') && $this->sysName && IP::isValid($this->hostname)) {
-            return $this->sysName;
-        }
+        $hostname_is_ip = IP::isValid($this->hostname);
 
-        return $this->hostname;
+        return SimpleTemplate::parse($this->display ?: \LibreNMS\Config::get('device_display_default', '{{ $hostname }}'), [
+            'hostname' => $this->hostname,
+            'sysName' => $this->sysName ?: $this->hostname,
+            'sysName_fallback' => $hostname_is_ip ? $this->sysName : $this->hostname,
+            'ip' => $this->overwrite_ip ?: ($hostname_is_ip ? $this->hostname : $this->ip),
+        ]);
     }
 
-    public function name()
+    /**
+     * Returns the device name if not already displayed
+     */
+    public function name(): string
     {
-        $displayName = $this->displayName();
-        if ($this->sysName !== $displayName) {
-            return $this->sysName;
-        } elseif ($this->hostname !== $displayName && $this->hostname !== $this->ip) {
-            return $this->hostname;
+        $display = $this->displayName();
+
+        if (! Str::contains($display, $this->hostname)) {
+            return (string) $this->hostname;
+        } elseif (! Str::contains($display, $this->sysName)) {
+            return (string) $this->sysName;
         }
 
         return '';
@@ -385,12 +426,12 @@ class Device extends BaseModel
 
     // ---- Accessors/Mutators ----
 
-    public function getIconAttribute($icon)
+    public function getIconAttribute($icon): string
     {
         return Str::start(Url::findOsImage($this->os, $this->features, $icon), 'images/os/');
     }
 
-    public function getIpAttribute($ip)
+    public function getIpAttribute($ip): ?string
     {
         if (empty($ip)) {
             return null;
@@ -399,14 +440,24 @@ class Device extends BaseModel
         return @inet_ntop($ip) ?: null;
     }
 
-    public function setIpAttribute($ip)
+    public function setIpAttribute($ip): void
     {
         $this->attributes['ip'] = inet_pton($ip);
     }
 
-    public function setStatusAttribute($status)
+    public function setStatusAttribute($status): void
     {
         $this->attributes['status'] = (int) $status;
+    }
+
+    public function setSysDescrAttribute(?string $sysDescr): void
+    {
+        $this->attributes['sysDescr'] = $sysDescr === null ? null : trim(str_replace(chr(218), "\n", $sysDescr), "\\\" \r\n\t\0");
+    }
+
+    public function setSysNameAttribute(?string $sysName): void
+    {
+        $this->attributes['sysName'] = $sysName === null ? null : str_replace("\n", '', strtolower(trim($sysName)));
     }
 
     // ---- Query scopes ----
@@ -601,6 +652,11 @@ class Device extends BaseModel
         return $this->hasMany(HrDevice::class, 'device_id');
     }
 
+    public function hostResourceValues(): HasOne
+    {
+        return $this->hasOne(HrSystem::class, 'device_id');
+    }
+
     public function entityPhysical(): HasMany
     {
         return $this->hasMany(EntPhysical::class, 'device_id');
@@ -649,6 +705,11 @@ class Device extends BaseModel
     public function muninPlugins(): HasMany
     {
         return $this->hasMany(\App\Models\MuninPlugin::class, 'device_id');
+    }
+
+    public function ospfAreas(): HasMany
+    {
+        return $this->hasMany(\App\Models\OspfArea::class, 'device_id');
     }
 
     public function ospfInstances(): HasMany
@@ -789,6 +850,11 @@ class Device extends BaseModel
     public function mplsTunnelCHops(): HasMany
     {
         return $this->hasMany(\App\Models\MplsTunnelCHop::class, 'device_id');
+    }
+
+    public function outages(): HasMany
+    {
+        return $this->hasMany(DeviceOutage::class, 'device_id');
     }
 
     public function printerSupplies(): HasMany

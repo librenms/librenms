@@ -6,20 +6,20 @@
 
 @parent
 
-<button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#poller-groups">@lang('Create new poller group')</button>
+<button type="button" class="btn btn-primary btn-sm" data-toggle="modal" data-target="#poller-groups">{{ __('Create new poller group') }}</button>
 <br /><br />
 <div class="table-responsive">
     <table class="table table-striped table-bordered table-hover table-condensed">
         <tr>
-            <th>@lang('ID')</th>
-            <th>@lang('Group Name')</th>
-            <th>@lang('Devices')</th>
-            <th>@lang('Description')</th>
-            <th>@lang('Action')</th>
+            <th>{{ __('ID') }}</th>
+            <th>{{ __('Group Name') }}</th>
+            <th>{{ __('Devices') }}</th>
+            <th>{{ __('Description') }}</th>
+            <th>{{ __('Action') }}</th>
         </tr>
         <tr id="0">
             <td>0</td>
-            <td>General @if($default_group_id == 0) (@lang('default')) @endif</td>
+            <td>General @if($default_group_id == 0) ({{ __('default') }}) @endif</td>
             <td><a href="{{ url('devices/poller_group=0') }}">{{ $ungrouped_count }}</a></td>
             <td></td>
             <td>
@@ -27,12 +27,12 @@
         @foreach ($poller_groups as $group)
         <tr id="{{ $group->id }}">
             <td>{{ $group->id }}</td>
-            <td>{{ $group->group_name }}@if($group->id == $default_group_id) (@lang('default')) @endif</td>
+            <td>{{ $group->group_name }}@if($group->id == $default_group_id) ({{ __('default') }}) @endif</td>
             <td><a href="{{ url('devices/poller_group=' . $group->id) }}">{{ $group->devices_count }}</a></td>
             <td>{{ $group->descr }}</td>
             <td>
-                <button type="button" class="btn btn-success btn-xs" data-group_id="{{ $group->id }}" data-toggle="modal" data-target="#poller-groups">@lang('Edit')</button>
-                <button type="button" class="btn btn-danger btn-xs" data-group_id="{{ $group->id }}" data-toggle="modal" data-target="#confirm-delete">@lang('Delete')</button>
+                <button type="button" class="btn btn-success btn-xs" data-group_id="{{ $group->id }}" data-toggle="modal" data-target="#poller-groups">{{ __('Edit') }}</button>
+                <button type="button" class="btn btn-danger btn-xs" data-group_id="{{ $group->id }}" data-toggle="modal" data-target="#confirm-delete">{{ __('Delete') }}</button>
             </td>
         @endforeach
         </tr>
@@ -45,16 +45,16 @@
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                <h5 class="modal-title" id="Delete">@lang('Confirm Delete')</h5>
+                <h5 class="modal-title" id="Delete">{{ __('Confirm Delete') }}</h5>
             </div>
             <div class="modal-body">
-                <p>@lang('If you would like to remove the Poller Group then please click Delete.')</p>
+                <p>{{ __('If you would like to remove the Poller Group then please click Delete.') }}</p>
             </div>
             <div class="modal-footer">
                 <form role="form" class="remove_group_form">
                     @csrf
-                    <button type="button" class="btn btn-default" data-dismiss="modal">@lang('Cancel')</button>
-                    <button type="submit" class="btn btn-danger danger" id="group-removal" data-target="group-removal">@lang('Delete')</button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal">{{ __('Cancel') }}</button>
+                    <button type="submit" class="btn btn-danger danger" id="group-removal" data-target="group-removal">{{ __('Delete') }}</button>
                     <input type="hidden" name="group_id" id="group_id" value="">
                     <input type="hidden" name="type" id="type" value="poller-group-remove">
                     <input type="hidden" name="confirm" id="confirm" value="yes">
@@ -68,7 +68,7 @@
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                <h4 class="modal-title" id="Create">@lang('Poller Groups')</h4>
+                <h4 class="modal-title" id="Create">{{ __('Poller Groups') }}</h4>
             </div>
             <div class="modal-body">
                 <form method="post" role="form" id="poller_groups" class="form-horizontal poller-groups-form">
@@ -82,20 +82,20 @@
                 <div class="row">
                     <div class="col-md-12">
                         <div class="form-group">
-                            <label for="group_name" class="col-sm-3 control-label">@lang('Group Name'):</label>
+                            <label for="group_name" class="col-sm-3 control-label">{{ __('Group Name') }}:</label>
                             <div class="col-sm-9">
                                 <input type="input" class="form-control" id="group_name" name="group_name" placeholder="Group Name">
                             </div>
                         </div>
                         <div class="form-group">
-                            <label for="descr" class="col-sm-3 control-label">@lang('Description'):</label>
+                            <label for="descr" class="col-sm-3 control-label">{{ __('Description') }}:</label>
                             <div class="col-sm-9">
                                 <input type="input" class="form-control" id="descr" name="descr" placeholder="Description">
                             </div>
                         </div>
                         <div class="form-group">
                              <div class="col-sm-offset-3 col-sm-9">
-                                 <button type="submit" class="btn btn-primary btn-sm" id="create-group" name="create-group">@lang('Add Poller Group')</button>
+                                 <button type="submit" class="btn btn-primary btn-sm" id="create-group" name="create-group">{{ __('Add Poller Group') }}</button>
                              </div>
                         </div>
                     </div>
@@ -123,12 +123,12 @@ $('#group-removal').on("click", function(e) {
         type: 'DELETE',
         url: "ajax/pollergroup/" + groupId,
         success: function(msg) {
-            toastr.success('@lang('Poller Group deleted')');
+            toastr.success('{{ __('Poller Group deleted') }}');
             $("#confirm-delete").modal('hide');
             location.reload(1);
         },
         error: function(e) {
-            toastr.error('@lang('Failed to delete Poller Group'): ' + e.statusText)
+            toastr.error('{{ __('Failed to delete Poller Group') }}: ' + e.statusText)
             $("#confirm-delete").modal('hide');
         }
     });
