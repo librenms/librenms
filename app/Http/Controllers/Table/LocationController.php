@@ -37,7 +37,6 @@ class LocationController extends TableController
      * @return array
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
-
     private $device_types = ['network',
         'server', 'firewall', 'wireless',
         'power', 'environment', 'loadbalancer',
