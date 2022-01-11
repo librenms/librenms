@@ -2338,11 +2338,11 @@
                     "ifOutMulticastPkts_rate": null
                 },
                 {
-                    "port_descr_type": null,
-                    "port_descr_descr": null,
+                    "port_descr_type": "vif0",
+                    "port_descr_descr": "tag=1",
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
-                    "port_descr_notes": null,
+                    "port_descr_notes": "tag=1:ports=1-5",
                     "ifDescr": "vif0(tag=1:ports=1-5)",
                     "ifName": "vif0(tag=1:ports=1-5)",
                     "portName": null,
@@ -2443,11 +2443,11 @@
                     "ifOutMulticastPkts_rate": null
                 },
                 {
-                    "port_descr_type": null,
-                    "port_descr_descr": null,
+                    "port_descr_type": "vif6",
+                    "port_descr_descr": "tag=6",
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
-                    "port_descr_notes": null,
+                    "port_descr_notes": "tag=6:ports=6:IPv6",
                     "ifDescr": "vif6(tag=6:ports=6:IPv6)",
                     "ifName": "vif6(tag=6:ports=6:IPv6)",
                     "portName": null,
@@ -2548,11 +2548,11 @@
                     "ifOutMulticastPkts_rate": null
                 },
                 {
-                    "port_descr_type": null,
-                    "port_descr_descr": null,
+                    "port_descr_type": "vif7",
+                    "port_descr_descr": "tag=7",
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
-                    "port_descr_notes": null,
+                    "port_descr_notes": "tag=7:ports=7:IPv6",
                     "ifDescr": "vif7(tag=7:ports=7:IPv6)",
                     "ifName": "vif7(tag=7:ports=7:IPv6)",
                     "portName": null,
@@ -2653,11 +2653,11 @@
                     "ifOutMulticastPkts_rate": null
                 },
                 {
-                    "port_descr_type": null,
-                    "port_descr_descr": null,
+                    "port_descr_type": "vif8",
+                    "port_descr_descr": "tag=8",
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
-                    "port_descr_notes": null,
+                    "port_descr_notes": "tag=8:ports=8:IPv6",
                     "ifDescr": "vif8(tag=8:ports=8:IPv6)",
                     "ifName": "vif8(tag=8:ports=8:IPv6)",
                     "portName": null,
@@ -2758,11 +2758,11 @@
                     "ifOutMulticastPkts_rate": null
                 },
                 {
-                    "port_descr_type": null,
-                    "port_descr_descr": null,
+                    "port_descr_type": "vif4095",
+                    "port_descr_descr": "agFPGA",
                     "port_descr_circuit": null,
                     "port_descr_speed": null,
-                    "port_descr_notes": null,
+                    "port_descr_notes": "tag=4095",
                     "ifDescr": "vif4095:agFPGA(tag=4095)",
                     "ifName": "vif4095:agFPGA(tag=4095)",
                     "portName": null,
