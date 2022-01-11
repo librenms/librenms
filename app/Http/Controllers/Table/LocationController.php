@@ -53,6 +53,7 @@ class LocationController extends TableController
         $sort_fields = ['location', 'devices'];
         $sort_fields = array_merge($sort_fields, $this->device_types);
         $sort_fields[] = 'down';
+
         return $sort_fields;
     }
 
@@ -96,6 +97,7 @@ class LocationController extends TableController
         foreach ($this->device_types as $device_type) {
             $data[$device_type] = $location->devices()->where('type', $device_type)->count();
         }
+
         return $data;
     }
 
