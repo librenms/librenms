@@ -37,11 +37,11 @@ class AdvaXg300 extends OS implements OSDiscovery
         $serial = snmp_get($this->getDeviceArray(), '.1.3.6.1.4.1.629.1.50.16.4.3.2.0', '-OQv');
         $device->serial = $serial;
 
-        $sysdescr_array = explode(" ", $device->sysDescr);
-        $hardware = $sysdescr_array[0] . " " . $sysdescr_array[1] . " " . $sysdescr_array[2];
+        $sysdescr_array = explode(' ', $device->sysDescr);
+        $hardware = $sysdescr_array[0] . ' ' . $sysdescr_array[1] . ' ' . $sysdescr_array[2];
         $device->hardware = $hardware;
 
-        $version = $sysdescr_array[4] . " " . $sysdescr_array[5];
+        $version = $sysdescr_array[4] . ' ' . $sysdescr_array[5];
         $device->version = $version;
 
     }
