@@ -87,6 +87,10 @@ class NetSnmpQuery implements SnmpQueryInterface
      * @var \App\Models\Device
      */
     private $device;
+    /**
+     * @var bool
+     */
+    private $forcewalk = false;
 
     public function __construct()
     {
@@ -269,6 +273,20 @@ class NetSnmpQuery implements SnmpQueryInterface
 
     private function buildCli(string $command, array $oids): array
     {
+        // look for MIBs which need to use slow snmpwalk
+        $this->forcewalk = false;
+        $cnfsnmp = Config::getOsSetting($this->device['os'], 'snmp');
+        if (isset($cnfsnmp['no_bulk']) && $command === 'snmpwalk') {
+            foreach ($cnfsnmp['no_bulk'] as $wkey => $mnames) {
+                if (array_filter($oids, function ($value) use ($mnames) {
+                    return stripos($value, $mnames) !== false;
+                })) {
+                    d_echo("\n" . 'SNMP: ' . $mnames . ' forced to snmpwalk');
+                    $this->forcewalk = true;
+                }
+            }
+        }
+
         $cmd = $this->initCommand($command);
 
         array_push($cmd, '-M', $this->mibDirectories());
@@ -351,7 +369,7 @@ class NetSnmpQuery implements SnmpQueryInterface
 
     private function initCommand(string $binary): array
     {
-        if ($binary == 'snmpwalk' && $this->device->snmpver !== 'v1' && Config::getOsSetting($this->device->os, 'snmp_bulk', true)) {
+        if ($binary == 'snmpwalk' && $this->device->snmpver !== 'v1' && Config::getOsSetting($this->device->os, 'snmp_bulk', true) && (! $this->forcewalk)) {
             $snmpcmd = [Config::get('snmpbulkwalk', 'snmpbulkwalk')];
 
             $max_repeaters = $this->device->getAttrib('snmp_max_repeaters') ?: Config::getOsSetting($this->device->os, 'snmp.max_repeaters', Config::get('snmp.max_repeaters', false));

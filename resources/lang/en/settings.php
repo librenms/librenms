@@ -192,10 +192,6 @@ return [
             'description' => 'Discovery on Reboot',
             'help' => 'Do a Discovery on a rebooted Device',
         ],
-        'mibs_forcewalk' => [
-            'description' => 'Force snmpwalk on these MIBs',
-            'help' => 'use slow snmpwalk on these MIBs to avoid SNMP timeouts',
-        ],
         'allow_duplicate_sysName' => [
             'description' => 'Allow Duplicate sysName',
             'help' => 'By default duplicate sysNames are disabled from being added to prevent a device with multiple interfaces from being added multiple times',
