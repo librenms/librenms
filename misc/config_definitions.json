@@ -3848,6 +3848,15 @@
         "mib_dir": {
             "type": "directory"
         },
+        "mibs_forcewalk": {
+            "group": "discovery",
+            "section": "general",
+            "default": [
+                "MARVELL-POE-MIB"
+            ],
+            "type": "array",
+            "order": 4
+        },
         "mono_font": {
             "default": "DejaVuSansMono",
             "type": "text"

@@ -130,7 +130,18 @@ function gen_snmpget_cmd($device, $oids, $options = null, $mib = null, $mibdir =
  */
 function gen_snmpwalk_cmd($device, $oids, $options = null, $mib = null, $mibdir = null)
 {
-    if ($device['snmpver'] == 'v1' || (isset($device['os']) && Config::getOsSetting($device['os'], 'snmp_bulk', true) == false)) {
+    // look for MIBs which need to use slow snmpwalk
+    $walkmibs = Config::get('mibs_forcewalk');
+    if (is_array($walkmibs)) {
+        foreach ($walkmibs as $mnames) {
+            if (Str::contains(strtoupper($mnames), strtoupper($mib))) {
+                $flwalk = true;
+                d_echo("SNMP: $mib forced to snmpwalk");
+            }
+        }
+    }
+
+    if ($device['snmpver'] == 'v1' || (isset($device['os']) && Config::getOsSetting($device['os'], 'snmp_bulk', true) == false) || $flwalk) {
         $snmpcmd = [Config::get('snmpwalk')];
     } else {
         $snmpcmd = [Config::get('snmpbulkwalk')];
@@ -401,7 +412,7 @@ function snmp_walk($device, $oid, $options = null, $mib = null, $mibdir = null)
 {
     $measure = Measurement::start('snmpwalk');
 
-    $cmd = gen_snmpwalk_cmd($device, $oid, $options, $mib, $mibdir);
+    $cmd = gen_snmpwalk_cmd($device, $oid, $options, $mib, $mibdir, $forcev1);
     $data = trim(external_exec($cmd));
 
     $data = str_replace('"', '', $data);
