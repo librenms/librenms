@@ -2,6 +2,7 @@ os: lenovoXClarityIMPI
 text: 'Lenovo XCC IMPI'
 type: appliance
 icon: lenovo
+over:
 discovery:
     -
         sysObjectID:
@@ -18,4 +19,4 @@ ignore_mount_string:
     - shm
     - tdm-rw
     - tmp
-mib_dir: lenovoxcc
+mib_dir: lenovo

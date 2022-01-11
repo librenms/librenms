@@ -1,6 +1,3 @@
--- LENOVO-PRODUCTS-MIB: Lenovo product object identifier assignments
--- Copyright (c) 2014-2017 Lenovo Group Ltd.  All rights reserved.
-
 LENOVO-PRODUCTS-MIB DEFINITIONS ::= BEGIN
 
 IMPORTS
@@ -10,29 +7,29 @@ IMPORTS
         FROM LENOVO-SMI-MIB;
 
 lenovoProductsMIB MODULE-IDENTITY
-    LAST-UPDATED    "201705010000Z"
-    ORGANIZATION    "Lenovo"
+    LAST-UPDATED    "201604100000Z"
+    ORGANIZATION "Lenovo"
     CONTACT-INFO
         "Lenovo
-
          Postal: 1009 Think Place
          Morrisville, NC 27560
-		 USA
-
-         Tel: +1 (919) 968-4465
-
-         E-mail: snmp@lenovo.com"
+         USA"
     DESCRIPTION
         "This module defines the object identifiers returned as values for
          sysObjectID for Lenovo hardware."
-        REVISION      "201604200000Z"
-		DESCRIPTION   "Initial version."
-        REVISION      "201705010000Z"
-        DESCRIPTION   "Add sysObjectId for G8332 CNOS product"
-		REVISION      "201705020000Z"
-        DESCRIPTION   "Add sysObjectIDs for NE1032, NE1032T, NE1072, and NE10032 switches."
-
-		    ::= { lenovoModules 1 }
+    REVISION      "201604100000Z"
+    DESCRIPTION
+        "Initial version."
+    REVISION      "201705010000Z"
+    DESCRIPTION
+        "Add sysObjectIDs for G8332 CNOS, NE1032, NE1032T, NE1072, and 10032 switches."
+    REVISION      "201705120000Z"
+    DESCRIPTION
+        "Remove obsolete email address and telephone number."
+    REVISION      "201707190000Z"
+    DESCRIPTION
+        "Add sysObjectIDs for the CE0128T, CE0128P, CE0152T switches."
+   ::= { lenovoModules 1 }
 			
 -- Lenovo Server Products
 lenovoServerProducts OBJECT-IDENTITY
@@ -48,7 +45,7 @@ flex OBJECT-IDENTITY
         "Root object identifier for Lenovo Flex network products."  
     ::= { lenovoProducts 18}	
 
---Lenovo Flex System SI4091 10Gb System Interconnect Module
+-- Lenovo Flex System SI4091 10Gb System Interconnect Module
 si4091 OBJECT IDENTIFIER ::= { flex 23}
 
 
@@ -86,9 +83,6 @@ ne1072t OBJECT IDENTIFIER ::= { tor 34}
 -- Lenovo ThinkSystem NE10032 RackSwitch
 ne10032 OBJECT IDENTIFIER ::= { tor 36}
 
--- Lenovo ThinkSystem NE2572 RackSwitch 
-ne2572 OBJECT IDENTIFIER ::= { tor 41}
-
 -- Lenovo CE0128T Switch
 ce0128t OBJECT IDENTIFIER ::= { tor 37}
 
@@ -100,5 +94,6 @@ ce0152t OBJECT IDENTIFIER ::= { tor 39}
 
 -- Lenovo ThinkSystem NE2572 RackSwitch 
 ne2572 OBJECT IDENTIFIER ::= { tor 41}
+
 
 END
