@@ -42,7 +42,7 @@ class LocationController extends TableController
         'server', 'firewall', 'wireless',
         'power', 'environment', 'loadbalancer',
         'storage', 'printer', 'appliance',
-        'collaboration', 'workstation'];
+        'collaboration', 'workstation', ];
 
     public function searchFields($request)
     {
