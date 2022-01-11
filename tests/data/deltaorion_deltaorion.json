@@ -13,7 +13,7 @@
                     "os": "deltaorion",
                     "type": "environment",
                     "serial": null,
-                    "icon": "delta.png",
+                    "icon": "delta.svg",
                     "location": "<private>"
                 }
             ]

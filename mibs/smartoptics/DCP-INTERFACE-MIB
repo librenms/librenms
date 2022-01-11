@@ -1,0 +1,263 @@
+--
+-- DCP-INTERFACE-MIB.mib
+-- Smartoptics DCP Interface Enterprise Specific MIB.
+--
+-- Copyright (c) 2018, Smartoptics
+-- All rights reserved
+--
+
+DCP-INTERFACE-MIB DEFINITIONS ::= BEGIN
+IMPORTS
+    dcpGeneric
+        FROM DCP-MIB
+    OBJECT-GROUP, MODULE-COMPLIANCE
+        FROM SNMPv2-CONF
+    Unsigned32, OBJECT-TYPE, MODULE-IDENTITY
+        FROM SNMPv2-SMI
+    DisplayString
+        FROM SNMPv2-TC
+    OpticalPower1Decimal, ItuPerceivedSeverity, InterfaceStatus
+        FROM SO-TC-MIB;
+
+-- 1.3.6.1.4.1.30826.2.2.2
+dcpInterface MODULE-IDENTITY
+    LAST-UPDATED "202102251200Z"
+    ORGANIZATION "Smartoptics."
+    CONTACT-INFO "http://www.smartoptics.com"
+    DESCRIPTION "This is the enterprise specific DCP INTERFACE MIB for Smartoptics"
+
+    REVISION "202102251200Z"  -- February 25.
+    DESCRIPTION "Update description for dcpInterfaceRxPower and dcpInterfaceTxPower."
+
+    REVISION "201910291500Z"  -- October 29.
+    DESCRIPTION "Addition of dcpInterfaceDescription attribute."
+
+    REVISION "201810081444Z"
+    DESCRIPTION "The initial revision"
+::= { dcpGeneric 1 }
+
+
+--  Node definitions
+--
+-- 1.3.6.1.4.1.30826.2.2.2.1
+dcpInterfaceObjects OBJECT IDENTIFIER ::= { dcpInterface 1 }
+
+
+-- 1.3.6.1.4.1.30826.2.2.2.1.1
+dcpInterfaceTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF DcpInterfaceEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+    "A table with all optical interfaces of the system."
+::= { dcpInterfaceObjects 1 }
+
+
+-- 1.3.6.1.4.1.30826.2.2.2.1.1.1
+dcpInterfaceEntry OBJECT-TYPE
+    SYNTAX DcpInterfaceEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+    "Description."
+INDEX { dcpInterfaceIndex }
+::= { dcpInterfaceTable 1 }
+
+
+DcpInterfaceEntry ::=
+    SEQUENCE {
+        dcpInterfaceIndex
+        Unsigned32,
+        dcpInterfaceName
+        DisplayString,
+        dcpInterfaceRxPower
+        OpticalPower1Decimal,
+        dcpInterfaceTxPower
+        OpticalPower1Decimal,
+        dcpInterfaceStatus
+        InterfaceStatus,
+        dcpInterfaceAlarm
+        ItuPerceivedSeverity,
+        dcpInterfaceFormat
+        DisplayString,
+        dcpInterfaceWavelength
+        DisplayString,
+        dcpInterfaceChannelId
+        DisplayString,
+        dcpInterfaceDescription
+        DisplayString
+ }
+
+-- 1.3.6.1.4.1.30826.2.2.2.1.1.1.1
+dcpInterfaceIndex OBJECT-TYPE
+    SYNTAX Unsigned32 (1..1000000)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+    "Interface Index in the following format:
+	csiixy where
+
+	c: chassis.
+	s: slot number.
+	ii: Interface number.
+	x: 1 = line, 2 = client.
+	y: 0 = tx+rx port, 1 = tx port, 2 = rx port.
+
+	For DCP-M products Slot is always 0.
+
+	Same Index is used in the IF-MIB."
+::= { dcpInterfaceEntry 1 }
+
+
+-- 1.3.6.1.4.1.30826.2.2.2.1.1.1.2
+dcpInterfaceName OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "The interface name. If no interface this value is empty.
+     if-c/s/i where c = chassis, s = slot, i = interface
+     or
+     if-c/channelid where c = chassis."
+::= { dcpInterfaceEntry 2 }
+
+
+-- 1.3.6.1.4.1.30826.2.2.2.1.1.1.3
+dcpInterfaceRxPower OBJECT-TYPE
+    SYNTAX OpticalPower1Decimal
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "The optical power received at the Rx port in units of 0.1 dBm."
+::= { dcpInterfaceEntry 3 }
+
+
+-- 1.3.6.1.4.1.30826.2.2.2.1.1.1.4
+dcpInterfaceTxPower OBJECT-TYPE
+    SYNTAX OpticalPower1Decimal
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "The optical power transmitted at the Tx port in units of 0.1 dBm."
+::= { dcpInterfaceEntry 4 }
+
+
+-- 1.3.6.1.4.1.30826.2.2.2.1.1.1.5
+dcpInterfaceStatus OBJECT-TYPE
+    SYNTAX InterfaceStatus
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The operational state for a port.
+
+        idle - The port is not activated.
+
+        down - The port traffic is lost.
+
+        up - There is traffic on the port."
+::= { dcpInterfaceEntry 5 }
+
+
+-- 1.3.6.1.4.1.30826.2.2.2.1.1.1.6
+dcpInterfaceAlarm OBJECT-TYPE
+    SYNTAX ItuPerceivedSeverity
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "The highest alarm severity of the interface."
+::= { dcpInterfaceEntry 6 }
+
+
+-- 1.3.6.1.4.1.30826.2.2.2.1.1.1.7
+dcpInterfaceFormat OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "The traffic format of the interface."
+::= { dcpInterfaceEntry 7 }
+
+
+-- 1.3.6.1.4.1.30826.2.2.2.1.1.1.8
+dcpInterfaceWavelength OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "The ITU channel wavelength."
+::= { dcpInterfaceEntry 8 }
+
+
+-- 1.3.6.1.4.1.30826.2.2.2.1.1.1.9
+dcpInterfaceChannelId OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "DWDM or CWDM channel identification."
+::= { dcpInterfaceEntry 9 }
+
+-- 1.3.6.1.4.1.30826.2.2.2.1.1.1.10
+dcpInterfaceDescription OBJECT-TYPE
+    SYNTAX DisplayString (SIZE(0..128))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "User configurable description string for the interface."
+::= { dcpInterfaceEntry 10 }
+
+
+
+-- 1.3.6.1.4.1.30826.2.2.2.2
+dcpInterfaceMIBCompliance OBJECT IDENTIFIER ::= { dcpInterface 2 }
+
+-- 1.3.6.1.4.1.30826.2.2.2.2.1
+dcpInterfaceMIBGroups OBJECT IDENTIFIER ::= { dcpInterfaceMIBCompliance 1 }
+
+-- 1.3.6.1.4.1.30826.2.2.2.2.1.1
+dcpInterfaceTableGroupV1 OBJECT-GROUP
+    OBJECTS { dcpInterfaceName, dcpInterfaceRxPower, dcpInterfaceTxPower, dcpInterfaceStatus,
+    dcpInterfaceAlarm, dcpInterfaceFormat, dcpInterfaceChannelId, dcpInterfaceWavelength }
+    STATUS deprecated
+    DESCRIPTION
+    "The interface table objects V1."
+::= { dcpInterfaceMIBGroups 1 }
+
+-- 1.3.6.1.4.1.30826.2.2.2.2.1.2
+dcpInterfaceTableGroupV2 OBJECT-GROUP
+    OBJECTS { dcpInterfaceName, dcpInterfaceRxPower, dcpInterfaceTxPower, dcpInterfaceStatus,
+    dcpInterfaceAlarm, dcpInterfaceFormat, dcpInterfaceChannelId, dcpInterfaceWavelength, dcpInterfaceDescription }
+    STATUS current
+    DESCRIPTION
+    "The interface table objects V2."
+::= { dcpInterfaceMIBGroups 2 }
+
+-- 1.3.6.1.4.1.30826.2.2.2.2.2
+dcpInterfaceMIBCompliances OBJECT IDENTIFIER ::= { dcpInterfaceMIBCompliance 2 }
+
+-- 1.3.6.1.4.1.30826.2.2.2.2.2.1
+dcpInterfaceBasicComplV1 MODULE-COMPLIANCE
+    STATUS      deprecated
+    DESCRIPTION
+        "Basic implementation requirements for the DCP-INTERFACE-MIB V1."
+    MODULE
+        MANDATORY-GROUPS {
+            dcpInterfaceTableGroupV1 }
+    ::= { dcpInterfaceMIBCompliances 1 }
+
+-- 1.3.6.1.4.1.30826.2.2.2.2.2.2
+dcpInterfaceBasicComplV2 MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "Basic implementation requirements for the DCP-INTERFACE-MIB V2."
+    MODULE
+        MANDATORY-GROUPS {
+            dcpInterfaceTableGroupV2 }
+    ::= { dcpInterfaceMIBCompliances 2 }
+
+
+END
+
+--
+-- DCP-INTERFACE-MIB.mib
+--

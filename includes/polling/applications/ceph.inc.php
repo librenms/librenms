@@ -3,9 +3,10 @@
 use LibreNMS\RRD\RrdDefinition;
 
 $name = 'ceph';
+$app_id = $app['app_id'];
+
 if (! empty($agent_data['app'][$name])) {
     $ceph_data = $agent_data['app'][$name];
-    $app_id = $app['app_id'];
 
     $metrics = [];
     foreach (explode('<', $ceph_data) as $section) {

@@ -56,11 +56,6 @@ parameters:
 			path: LibreNMS/Alert/RunAlerts.php
 
 		-
-			message: "#^Parameter \\#1 \\$json of function json_decode expects string, array\\|null given\\.$#"
-			count: 1
-			path: LibreNMS/Alert/RunAlerts.php
-
-		-
 			message: "#^Method LibreNMS\\\\Alert\\\\Template\\:\\:getBody\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: LibreNMS/Alert/Template.php

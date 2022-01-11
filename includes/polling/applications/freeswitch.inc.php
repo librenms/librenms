@@ -4,6 +4,7 @@ use LibreNMS\RRD\RrdDefinition;
 
 $name = 'freeswitch';
 $app_id = $app['app_id'];
+
 if (! empty($agent_data[$name])) {
     $rawdata = $agent_data[$name];
 } else {

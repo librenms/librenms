@@ -6,8 +6,6 @@ $name = 'nfsstat';
 $app_id = $app['app_id'];
 $oid = '.1.3.6.1.4.1.8072.1.3.2.4';
 
-echo ' ' . $name;
-
 $nfsstats = snmp_walk($device, $oid, '-Oqv', 'NET-SNMP-EXTEND-MIB');
 
 $rrd_name = ['app', $name, $app_id];
