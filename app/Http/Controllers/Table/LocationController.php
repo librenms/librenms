@@ -37,6 +37,13 @@ class LocationController extends TableController
      * @return array
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
+
+    private $device_types = ['network',
+        'server', 'firewall', 'wireless',
+        'power', 'environment', 'loadbalancer',
+        'storage', 'printer', 'appliance',
+        'collaboration', 'workstation'];
+
     public function searchFields($request)
     {
         return ['location'];
@@ -44,7 +51,10 @@ class LocationController extends TableController
 
     protected function sortFields($request)
     {
-        return ['location', 'devices', 'network', 'servers', 'firewalls', 'down'];
+        $sort_fields = ['location', 'devices'];
+        $sort_fields = array_merge($sort_fields, $this->device_types);
+        $sort_fields[] = 'down';
+        return $sort_fields;
     }
 
     /**
@@ -76,21 +86,29 @@ class LocationController extends TableController
      */
     public function formatItem($location)
     {
-        return [
+        $data = [
             'id' => $location->id,
             'location' => $location->location,
             'lat' => $location->lat,
             'lng' => $location->lng,
             'down' => $location->devices()->isDown()->count(),
             'devices' => $location->devices()->count(),
-            'network' => $location->devices()->where('type', 'network')->count(),
-            'servers' => $location->devices()->where('type', 'server')->count(),
-            'firewalls' => $location->devices()->where('type', 'firewall')->count(),
         ];
+        foreach ($this->device_types as $device_type) {
+            $data[$device_type] = $location->devices()->where('type', $device_type)->count();
+        }
+        return $data;
     }
 
     private function getJoinQuery($field)
     {
+        if (in_array($field, $this->device_types)) {
+            return function ($query) {
+                $query->on('devices.location_id', 'locations.id')
+                    ->where('devices.type', $field);
+            };
+        }
+
         switch ($field) {
             case 'devices':
                 return function ($query) {
@@ -100,21 +118,6 @@ class LocationController extends TableController
                 return function ($query) {
                     $query->on('devices.location_id', 'locations.id');
                     (new Device)->scopeIsDown($query);
-                };
-            case 'network':
-                return function ($query) {
-                    $query->on('devices.location_id', 'locations.id')
-                        ->where('devices.type', 'network');
-                };
-            case 'servers':
-                return function ($query) {
-                    $query->on('devices.location_id', 'locations.id')
-                        ->where('devices.type', 'server');
-                };
-            case 'firewalls':
-                return function ($query) {
-                    $query->on('devices.location_id', 'locations.id')
-                        ->where('devices.type', 'firewall');
                 };
             default:
                 return null;
