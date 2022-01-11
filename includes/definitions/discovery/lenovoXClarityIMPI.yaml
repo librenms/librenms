@@ -52,7 +52,6 @@ modules:
                         - { descr: sleep, graph: 1, value: 1, generic: 1 }
                         - { descr: 'power on', graph: 1, value: 255, generic: 0 }
                     descr: 'Power status'
-                -
         percent:
             data:
                 -
