@@ -33,8 +33,9 @@ if (! Auth::user()->hasGlobalRead()) {
 }
 
 if (! empty($_REQUEST['search'])) {
-    $where[] = '(`hostname` LIKE ? OR `sysName` LIKE ?)';
+    $where[] = '(`hostname` LIKE ? OR `sysName` LIKE ? OR `display` LIKE ?)';
     $search = '%' . $_REQUEST['search'] . '%';
+    $params[] = $search;
     $params[] = $search;
     $params[] = $search;
 }
@@ -57,7 +58,7 @@ if (! empty($_REQUEST['limit'])) {
     $offset = 0;
 }
 
-$sql = "SELECT `device_id`, `hostname`, `sysName` FROM `devices` $query";
+$sql = "SELECT `device_id`, `hostname`, `sysName`, `display` FROM `devices` $query";
 $devices = array_map(function ($device) {
     return [
         'id' => $device['device_id'],
