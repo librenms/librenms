@@ -18,40 +18,79 @@
  * @package    LibreNMS
  * @link       https://www.librenms.org
  *
+ * @copyright  2022 Peca Nesovanovic
+ *
  * @author     Peca Nesovanovic <peca.nesovanovic@sattrakt.com>
  */
-
-$low_limit = $low_warn_limit = -15;
-$high_warn_limit = $high_limit = 0;
 $divisor = 1000;
+$multiplier = 1;
 
-$oids = $pre_cache['eltex-mes23xx_rlPhyTestGetResult'];
-if ($oids) {
-    d_echo('Eltex-MES SFP dBm');
-    foreach (explode("\n", $oids) as $data) {
-        if ($data) {
-            $split = trim(explode(' ', $data)[0]);
-            $value = trim(explode(' ', $data)[1]);
-            $ifIndex = explode('.', $split)[13];
-            $type = explode('.', $split)[14];
-
-            //type8 = tx dBm
-            if ($type == 8) {
-                $value = $value / $divisor;
+if ($pre_cache['eltex-mes23xx-sfp']) {
+    foreach($pre_cache['eltex-mes23xx-sfp'] as $ifIndex => $data) {
+        if (isset($data['rlPhyTestTableTxOutput']['rlPhyTestGetResult'])) {
+            $value = $data['rlPhyTestTableTxOutput']['rlPhyTestGetResult'] / $divisor;
+            if ($value) {
+                $high_limit = $data['txOutput']['eltPhdTransceiverThresholdHighAlarm'] / $divisor;
+                $high_warn_limit = $data['txOutput']['eltPhdTransceiverThresholdHighWarning'] / $divisor;
+                $low_warn_limit = $data['txOutput']['eltPhdTransceiverThresholdLowWarning'] / $divisor;
+                $low_limit = $data['txOutput']['eltPhdTransceiverThresholdLowAlarm'] / $divisor;
                 $tmp = get_port_by_index_cache($device['device_id'], $ifIndex);
                 $descr = $tmp['ifName'];
+                $oid = '.1.3.6.1.4.1.89.90.1.2.1.3.' . $ifIndex . '.8';
                 discover_sensor(
-                    $valid['sensor'], 'dbm', $device, $split, 'txdbm' . $ifIndex, 'rlPhyTestTableTxOutput', 'SfpTxdBm-' . $descr, $divisor, '1', $low_limit, $low_warn_limit, $high_warn_limit, $high_limit, $value
+                    $valid['sensor'],
+                    'dbm',
+                    $device,
+                    $oid,
+                    'SfpTxDbm' . $ifIndex,
+                    'rlPhyTestTableTxOutput',
+                    'SfpTxDbm-' . $descr,
+                    $divisor,
+                    $multiplier,
+                    $low_limit,
+                    $low_warn_limit,
+                    $high_warn_limit,
+                    $high_limit,
+                    $value,
+                    'snmp',
+                    null,
+                    null,
+                    null,
+                    'Transceiver TX'
                 );
             }
+        }
 
-            //type9 = rx dBm
-            if ($type == 9) {
-                $value = $value / $divisor;
+        if (isset($data['rlPhyTestTableRxOpticalPower']['rlPhyTestGetResult'])) {
+            $value = $data['rlPhyTestTableRxOpticalPower']['rlPhyTestGetResult'] / $divisor;
+            if ($value) {
+                $high_limit = $data['rxOpticalPower']['eltPhdTransceiverThresholdHighAlarm'] / $divisor;
+                $high_warn_limit = $data['rxOpticalPower']['eltPhdTransceiverThresholdHighWarning'] / $divisor;
+                $low_warn_limit = $data['rxOpticalPower']['eltPhdTransceiverThresholdLowWarning'] / $divisor;
+                $low_limit = $data['rxOpticalPower']['eltPhdTransceiverThresholdLowAlarm'] / $divisor;
                 $tmp = get_port_by_index_cache($device['device_id'], $ifIndex);
                 $descr = $tmp['ifName'];
+                $oid = '.1.3.6.1.4.1.89.90.1.2.1.3.' . $ifIndex . '.9';
                 discover_sensor(
-                    $valid['sensor'], 'dbm', $device, $split, 'rxdbm' . $ifIndex, 'rlPhyTestTableRxOpticalPower', 'SfpRxdBm-' . $descr, $divisor, '1', $low_limit, $low_warn_limit, $high_warn_limit, $high_limit, $value
+                    $valid['sensor'],
+                    'dbm',
+                    $device,
+                    $oid,
+                    'SfpRxDbm' . $ifIndex,
+                    'rlPhyTestTableRxOpticalPower',
+                    'SfpRxDbm-' . $descr,
+                    $divisor,
+                    $multiplier,
+                    $low_limit,
+                    $low_warn_limit,
+                    $high_warn_limit,
+                    $high_limit,
+                    $value,
+                    'snmp',
+                    null,
+                    null,
+                    null,
+                    'Transceiver RX'
                 );
             }
         }

@@ -22,28 +22,29 @@
  *
  * @author     Peca Nesovanovic <peca.nesovanovic@sattrakt.com>
  */
-$divisor = 1;
+$divisor = 1000;
 $multiplier = 1;
-if ($pre_cache['eltex-mes23xx-sfp']) {
-    foreach($pre_cache['eltex-mes23xx-sfp'] as $ifIndex => $data) {
-        if (isset($data['rlPhyTestTableTransceiverTemp']['rlPhyTestGetResult'])) {
-            $value = $data['rlPhyTestTableTransceiverTemp']['rlPhyTestGetResult'] / $divisor;
+if ($pre_cache['eltex-mes23xx-poe']) {
+    foreach($pre_cache['eltex-mes23xx-poe'] as $index => $data) {
+        if (isset($data['rlPethPsePortOutputPower'])) {
+            $value = $data['rlPethPsePortOutputPower'] / $divisor;
             if ($value) {
-                $high_limit = $data['temperature']['eltPhdTransceiverThresholdHighAlarm'] / $divisor;
-                $high_warn_limit = $data['temperature']['eltPhdTransceiverThresholdHighWarning'] / $divisor;
-                $low_warn_limit = $data['temperature']['eltPhdTransceiverThresholdLowWarning'] / $divisor;
-                $low_limit = $data['temperature']['eltPhdTransceiverThresholdLowAlarm'] / $divisor;
+                $high_limit = $data['rlPethPsePortPowerLimit'] / $divisor;
+                $high_warn_limit = ($data['rlPethPsePortPowerLimit'] / $divisor) * 0.8;
+                $low_warn_limit = 0;
+                $low_limit = 0;
+                [$unit, $ifIndex] = explode('.', $index);
                 $tmp = get_port_by_index_cache($device['device_id'], $ifIndex);
                 $descr = $tmp['ifName'];
-                $oid = '.1.3.6.1.4.1.89.90.1.2.1.3.' . $ifIndex . '.5';
+                $oid = '.1.3.6.1.4.1.89.108.1.1.5.' . $unit . '.' . $ifIndex;
                 discover_sensor(
                     $valid['sensor'],
-                    'temperature',
+                    'power',
                     $device,
                     $oid,
-                    'SfpTemp' . $ifIndex,
-                    'rlPhyTestTableTransceiverTemp',
-                    'SfpTemp-' . $descr,
+                    'Poe' . $index, //unit.index
+                    'rlPethPsePortOutputPower',
+                    'PoE-' . $descr,
                     $divisor,
                     $multiplier,
                     $low_limit,
@@ -55,7 +56,7 @@ if ($pre_cache['eltex-mes23xx-sfp']) {
                     null,
                     null,
                     null,
-                    'Transceiver'
+                    'PoE'
                 );
             }
         }
