@@ -1,6 +1,6 @@
 <?php
 /*
- * LibreNMS discovery module for Eltex-MES23xx SFP Temperature
+ * LibreNMS discovery module for Eltex-MES23xx PoE power 
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
