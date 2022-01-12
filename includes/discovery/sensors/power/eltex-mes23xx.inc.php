@@ -25,7 +25,7 @@
 $divisor = 1000;
 $multiplier = 1;
 if ($pre_cache['eltex-mes23xx-poe']) {
-    foreach($pre_cache['eltex-mes23xx-poe'] as $index => $data) {
+    foreach ($pre_cache['eltex-mes23xx-poe'] as $index => $data) {
         if (isset($data['rlPethPsePortOutputPower'])) {
             $value = $data['rlPethPsePortOutputPower'] / $divisor;
             if ($value) {

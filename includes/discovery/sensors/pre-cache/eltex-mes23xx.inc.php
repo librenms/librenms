@@ -44,4 +44,4 @@ if ($oids) {
 echo 'rlPethPsePortPowerLimit ';
 $oidpl = snmpwalk_cache_multi_oid($device, 'rlPethPsePortPowerLimit', [], 'MARVELL-POE-MIB');
 echo 'rlPethPsePortOutputPower ';
-$pre_cache['eltex-mes23xx-poe'] = snmpwalk_cache_multi_oid($device,'rlPethPsePortOutputPower', $oidpl, 'MARVELL-POE-MIB');
+$pre_cache['eltex-mes23xx-poe'] = snmpwalk_cache_multi_oid($device, 'rlPethPsePortOutputPower', $oidpl, 'MARVELL-POE-MIB');

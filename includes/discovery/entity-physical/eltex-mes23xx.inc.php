@@ -25,13 +25,15 @@ echo "\nCaching OIDs:";
 
 $entity_array = [];
 echo ' ELTEX-MES23xx';
-$trans = snmpwalk_cache_multi_oid($device, 'eltPhdTransceiverInfoEntry',[], 'ELTEX-MES-PHYSICAL-DESCRIPTION-MIB');
+$trans = snmpwalk_cache_multi_oid($device, 'eltPhdTransceiverInfoEntry', [], 'ELTEX-MES-PHYSICAL-DESCRIPTION-MIB');
 echo ' entAliasMappingIdentifier';
 $mapping = snmpwalk_cache_multi_oid($device, 'entAliasMappingIdentifier', [], 'ENTITY-MIB:IF-MIB');
 
-function normData($par = null) {
+function normData($par = null)
+{
     $tmp = str_replace([':', ' '], '', trim(strtoupper($par)));
     $ret = preg_match('/^[0-9A-F]+$/', $tmp) ? hex2str($tmp) : $par;
+
     return $ret;
 }
 

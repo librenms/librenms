@@ -25,7 +25,7 @@
 $divisor = 1;
 $multiplier = 1;
 if ($pre_cache['eltex-mes23xx-sfp']) {
-    foreach($pre_cache['eltex-mes23xx-sfp'] as $ifIndex => $data) {
+    foreach ($pre_cache['eltex-mes23xx-sfp'] as $ifIndex => $data) {
         if (isset($data['rlPhyTestTableTransceiverTemp']['rlPhyTestGetResult'])) {
             $value = $data['rlPhyTestTableTransceiverTemp']['rlPhyTestGetResult'] / $divisor;
             if ($value) {
