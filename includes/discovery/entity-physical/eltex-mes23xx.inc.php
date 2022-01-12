@@ -32,7 +32,7 @@ $mapping = snmpwalk_cache_multi_oid($device, 'entAliasMappingIdentifier', [], 'E
 function normData($par = null)
 {
     $tmp = str_replace([':', ' '], '', trim(strtoupper($par)));
-    $ret = preg_match('/^[0-9A-F]+$/', $tmp) ? hex2str($tmp) : $par;
+    $ret = preg_match('/^[0-9A-F]+$/', $tmp) ? hex2str($tmp) : $par; //if string is pure hex, convert to ascii
 
     return $ret;
 }
@@ -61,25 +61,45 @@ foreach ($trans as $index => $data) {
 }
 
 foreach ($entity_array as $entPhysicalIndex => $entry) {
-    $entPhysicalIndex = array_key_exists('entPhysicalIndex', $entry) ? $entry['entPhysicalIndex'] : '';
-    $entPhysicalDescr = array_key_exists('entPhysicalDescr', $entry) ? $entry['entPhysicalDescr'] : '';
-    $entPhysicalClass = array_key_exists('entPhysicalClass', $entry) ? $entry['entPhysicalClass'] : '';
-    $entPhysicalName = array_key_exists('entPhysicalName', $entry) ? $entry['entPhysicalName'] : '';
-    $entPhysicalModelName = array_key_exists('entPhysicalModelName', $entry) ? $entry['entPhysicalModelName'] : '';
-    $entPhysicalSerialNum = array_key_exists('entPhysicalSerialNum', $entry) ? $entry['entPhysicalSerialNum'] : '';
-    $entPhysicalContainedIn = array_key_exists('entPhysicalContainedIn', $entry) ? $entry['entPhysicalContainedIn'] : '';
-    $entPhysicalMfgName = array_key_exists('entPhysicalMfgName', $entry) ? $entry['entPhysicalMfgName'] : '';
-    $entPhysicalParentRelPos = array_key_exists('entPhysicalParentRelPos', $entry) ? $entry['entPhysicalParentRelPos'] : '';
-    $entPhysicalVendorType = array_key_exists('entPhysicalVendorType', $entry) ? $entry['entPhysicalVendorType'] : '';
-    $entPhysicalHardwareRev = array_key_exists('entPhysicalHardwareRev', $entry) ? $entry['entPhysicalHardwareRev'] : '';
-    $entPhysicalFirmwareRev = array_key_exists('entPhysicalFirmwareRev', $entry) ? $entry['entPhysicalFirmwareRev'] : '';
-    $entPhysicalSoftwareRev = array_key_exists('entPhysicalSoftwareRev', $entry) ? $entry['entPhysicalSoftwareRev'] : '';
-    $entPhysicalIsFRU = array_key_exists('entPhysicalIsFRU', $entry) ? $entry['entPhysicalIsFRU'] : '';
-    $entPhysicalAlias = array_key_exists('entPhysicalAlias', $entry) ? $entry['entPhysicalAlias'] : '';
-    $entPhysicalAssetID = array_key_exists('entPhysicalAssetID', $entry) ? $entry['entPhysicalAssetID'] : '';
-    $ifIndex = array_key_exists('ifIndex', $entry) ? $entry['ifIndex'] : '';
+    $entPhysicalIndex = $entry['entPhysicalIndex'] ?? '';
+    $entPhysicalDescr = $entry['entPhysicalDescr'] ?? '';
+    $entPhysicalClass = $entry['entPhysicalClass'] ?? '';
+    $entPhysicalName = $entry['entPhysicalName'] ?? '';
+    $entPhysicalModelName = $entry['entPhysicalModelName'] ?? '';
+    $entPhysicalSerialNum = $entry['entPhysicalSerialNum'] ?? '';
+    $entPhysicalContainedIn = $entry['entPhysicalContainedIn'] ?? '';
+    $entPhysicalMfgName = $entry['entPhysicalMfgName'] ?? '';
+    $entPhysicalParentRelPos = $entry['entPhysicalParentRelPos'] ?? '';
+    $entPhysicalVendorType = $entry['entPhysicalVendorType'] ?? '';
+    $entPhysicalHardwareRev = $entry['entPhysicalHardwareRev'] ?? '';
+    $entPhysicalFirmwareRev = $entry['entPhysicalFirmwareRev'] ?? '';
+    $entPhysicalSoftwareRev = $entry['entPhysicalSoftwareRev'] ?? '';
+    $entPhysicalIsFRU = $entry['entPhysicalIsFRU'] ?? '';
+    $entPhysicalAlias = $entry['entPhysicalAlias'] ?? '';
+    $entPhysicalAssetID = $entry['entPhysicalAssetID'] ?? '';
+    $ifIndex = $entry['ifIndex'] ?? '';
 
-    discover_entity_physical($valid, $device, $entPhysicalIndex, $entPhysicalDescr, $entPhysicalClass, $entPhysicalName, $entPhysicalModelName, $entPhysicalSerialNum, $entPhysicalContainedIn, $entPhysicalMfgName, $entPhysicalParentRelPos, $entPhysicalVendorType, $entPhysicalHardwareRev, $entPhysicalFirmwareRev, $entPhysicalSoftwareRev, $entPhysicalIsFRU, $entPhysicalAlias, $entPhysicalAssetID, $ifIndex);
+    discover_entity_physical(
+        $valid,
+        $device,
+        $entPhysicalIndex,
+        $entPhysicalDescr,
+        $entPhysicalClass,
+        $entPhysicalName,
+        $entPhysicalModelName,
+        $entPhysicalSerialNum,
+        $entPhysicalContainedIn,
+        $entPhysicalMfgName,
+        $entPhysicalParentRelPos,
+        $entPhysicalVendorType,
+        $entPhysicalHardwareRev,
+        $entPhysicalFirmwareRev,
+        $entPhysicalSoftwareRev,
+        $entPhysicalIsFRU,
+        $entPhysicalAlias,
+        $entPhysicalAssetID,
+        $ifIndex
+    );
 }//end foreach
 
 echo "\n";
