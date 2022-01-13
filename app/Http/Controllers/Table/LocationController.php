@@ -37,12 +37,6 @@ class LocationController extends TableController
      * @return array
      * @SuppressWarnings(PHPMD.UnusedFormalParameter)
      */
-    private $device_types = ['network',
-        'server', 'firewall', 'wireless',
-        'power', 'environment', 'loadbalancer',
-        'storage', 'printer', 'appliance',
-        'collaboration', 'workstation', ];
-
     public function searchFields($request)
     {
         return ['location'];
@@ -50,8 +44,13 @@ class LocationController extends TableController
 
     protected function sortFields($request)
     {
+        $device_types = [];
+        foreach (\LibreNMS\Config::get('device_types') as $device_type) {
+            $device_types[] = $device_type['type'];
+        }
+
         $sort_fields = ['location', 'devices'];
-        $sort_fields = array_merge($sort_fields, $this->device_types);
+        $sort_fields = array_merge($sort_fields, $device_types);
         $sort_fields[] = 'down';
 
         return $sort_fields;
@@ -94,8 +93,8 @@ class LocationController extends TableController
             'down' => $location->devices()->isDown()->count(),
             'devices' => $location->devices()->count(),
         ];
-        foreach ($this->device_types as $device_type) {
-            $data[$device_type] = $location->devices()->where('type', $device_type)->count();
+        foreach (\LibreNMS\Config::get('device_types') as $device_type) {
+            $data[$device_type['type']] = $location->devices()->where('type', $device_type['type'])->count();
         }
 
         return $data;
@@ -103,11 +102,13 @@ class LocationController extends TableController
 
     private function getJoinQuery($field)
     {
-        if (in_array($field, $this->device_types)) {
-            return function ($query) {
-                $query->on('devices.location_id', 'locations.id')
-                    ->where('devices.type', $field);
-            };
+        foreach (\LibreNMS\Config::get('device_types') as $device_type) {
+            if ($field == $device_type['type']) {
+                return function ($query) {
+                    $query->on('devices.location_id', 'locations.id')
+                        ->where('devices.type', $field);
+                };
+            }
         }
 
         switch ($field) {
