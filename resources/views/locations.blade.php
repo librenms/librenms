@@ -24,18 +24,9 @@
                     <th data-column-id="location" data-formatter="location" data-order="asc">{{ __('Location') }}</th>
                     <th data-column-id="coordinates" data-formatter="coordinates" data-sortable="false">{{ __('Coordinates') }}</th>
                     <th data-column-id="devices" data-formatter="primaryLabel">{{ __('Devices') }}</th>
-                    <th data-column-id="network" data-formatter="defaultLabel">{{ __('Network') }}</th>
-                    <th data-column-id="server" data-formatter="defaultLabel">{{ __('Servers') }}</th>
-                    <th data-column-id="firewall" data-formatter="defaultLabel">{{ __('Firewalls') }}</th>
-                    <th data-column-id="wireless" data-formatter="defaultLabel">{{ __('Wireless') }}</th>
-                    <th data-column-id="power" data-formatter="defaultLabel">{{ __('Power') }}</th>
-                    <th data-column-id="environment" data-formatter="defaultLabel">{{ __('Environment') }}</th>
-                    <th data-column-id="loadbalancer" data-formatter="defaultLabel">{{ __('Loadbalancer') }}</th>
-                    <th data-column-id="storage" data-formatter="defaultLabel">{{ __('Storage') }}</th>
-                    <th data-column-id="printer" data-formatter="defaultLabel">{{ __('Printer') }}</th>
-                    <th data-column-id="appliance" data-formatter="defaultLabel">{{ __('Appliance') }}</th>
-                    <th data-column-id="collaboration" data-formatter="defaultLabel">{{ __('Collaboration') }}</th>
-                    <th data-column-id="workstation" data-formatter="defaultLabel">{{ __('Workstation') }}</th>
+                    @foreach ($available_device_types as $device_type)
+                    <th data-column-id="{{ $device_type->type }}" data-formatter="defaultLabel">{{ ucfirst($device_type->type) }}</th>
+                    @endforeach
                     <th data-column-id="down" data-formatter="down">{{ __('Down') }}</th>
                     <th data-column-id="actions" data-formatter="actions" data-sortable="false">{{ __('Actions') }}</th>
                 </tr>

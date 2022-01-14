@@ -2,6 +2,7 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Device;
 use App\Models\Location;
 use Illuminate\Http\Request;
 use LibreNMS\Config;
@@ -26,13 +27,22 @@ class LocationController extends Controller
             'legend' => 'no',
             'id' => '{{id}}',
         ];
+
+        $data['available_device_types'] = $this->available_device_types();
+
         foreach (Html::graphRow($graph_array) as $graph) {
             $data['graph_template'] .= "<div class='col-md-3'>";
             $data['graph_template'] .= str_replace('%7B%7Bid%7D%7D', '{{id}}', $graph); // restore handlebars
             $data['graph_template'] .= '</div>';
         }
 
+
         return view('locations', $data);
+    }
+
+    private function available_device_types()
+    {
+        return Device::select('type')->distinct('type')->get();
     }
 
     /**
