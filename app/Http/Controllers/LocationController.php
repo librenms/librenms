@@ -36,7 +36,6 @@ class LocationController extends Controller
             $data['graph_template'] .= '</div>';
         }
 
-
         return view('locations', $data);
     }
 
