@@ -11004,7 +11004,7 @@
                 {
                     "vlan": null,
                     "rootBridge": 0,
-                    "bridgeAddress": "62633a63663a34663a33653a34383a32",
+                    "bridgeAddress": "3a34383a3266",
                     "protocolSpecification": "ieee8021d",
                     "priority": 16384,
                     "timeSinceTopologyChange": "2662338",

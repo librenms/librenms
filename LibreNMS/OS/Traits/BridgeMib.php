@@ -43,9 +43,9 @@ trait BridgeMib
             return new Collection;
         }
 
-        $timeFactor = $os->stpTimeFactor ?? 0.01;
+        $timeFactor = $this->stpTimeFactor ?? 0.01;
 
-        $vlans = $protocol == 1 ? $os->getDevice()->vlans : new Collection;
+        $vlans = $protocol == 1 ? $this->getDevice()->vlans : new Collection;
         $instances = new Collection;
 
         foreach ($vlans->isEmpty() ? [null] : $vlans as $vlan) {
@@ -69,11 +69,10 @@ trait BridgeMib
                 'BRIDGE-MIB::dot1dStpBridgeForwardDelay.0',
             ]);
 
-            if (! $instance->isValid()) {
+            $stp = $instance->values();
+            if (empty($stp)) {
                 continue;
             }
-
-            $stp = $instance->values();
 
             $bridge = Rewrite::macToHex($stp['BRIDGE-MIB::dot1dBaseBridgeAddress.0'] ?? '');
             $drBridge = Rewrite::macToHex($stp['BRIDGE-MIB::dot1dStpDesignatedRoot.0'] ?? '');
