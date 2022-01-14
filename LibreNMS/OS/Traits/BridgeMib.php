@@ -50,8 +50,8 @@ trait BridgeMib
 
         foreach ($vlans->isEmpty() ? [null] : $vlans as $vlan) {
             // fetch STP config and store it
-            $vlan = $vlan->vlan_vlan ?? null;
-            $instance = SnmpQuery::context($vlan == '1' ? null : $vlan, 'vlan-')->enumStrings()->get([
+            $vlan = (empty($vlan->vlan_vlan) || $vlan->vlan_vlan == '1') ? null : $vlan->vlan_vlan;
+            $instance = SnmpQuery::context($vlan, 'vlan-')->enumStrings()->get([
                 'BRIDGE-MIB::dot1dBaseBridgeAddress.0',
                 'BRIDGE-MIB::dot1dStpProtocolSpecification.0',
                 'BRIDGE-MIB::dot1dStpPriority.0',
@@ -105,7 +105,7 @@ trait BridgeMib
     {
         $ports = new Collection;
         foreach ($stpInstances as $instance) {
-            $vlan_ports = SnmpQuery::context($instance->vlan == '1' ? null : $instance->vlan, 'vlan-')
+            $vlan_ports = SnmpQuery::context($instance->vlan, 'vlan-')
                 ->enumStrings()->walk('BRIDGE-MIB::dot1dStpPortTable')
                 ->mapTable(function ($data, $port) use ($instance) {
                     return new PortStp([
@@ -152,7 +152,7 @@ trait BridgeMib
     public function pollStpIntances(Collection $stpInstances)
     {
         return $stpInstances->each(function (Stp $instance) {
-            $data = SnmpQuery::context($instance->vlan == '1' ? null : $instance->vlan, 'vlan-')->enumStrings()->get([
+            $data = SnmpQuery::context($instance->vlan, 'vlan-')->enumStrings()->get([
                 'BRIDGE-MIB::dot1dStpTimeSinceTopologyChange.0',
                 'BRIDGE-MIB::dot1dStpTopChanges.0',
                 'BRIDGE-MIB::dot1dStpDesignatedRoot.0',
@@ -177,7 +177,7 @@ trait BridgeMib
                 return $carry;
             }, []);
 
-            SnmpQuery::context($vlan == '1' ? null : "$vlan", 'vlan-')->enumStrings()->get($oids)
+            SnmpQuery::context("$vlan", 'vlan-')->enumStrings()->get($oids)
                 ->mapTable(function ($data, $base_port) use ($vlan, $vlan_ports) {
                     $port = $vlan_ports->get($base_port);
                     $port->vlan = $vlan;
