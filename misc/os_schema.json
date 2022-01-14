@@ -363,6 +363,21 @@
                 "type": "string"
             }
         },
+        "snmp": {
+            "type": "array",
+            "items": {
+                "type": "object",
+                "properties": {
+                    "no_bulk": {
+                        "type": "array"
+                    },
+                    "text": {
+                        "type": "string"
+                    }
+                },
+                "additionalProperties": false
+            }
+        },
         "snmp_bulk": {
             "type": "boolean"
         },

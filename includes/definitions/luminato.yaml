@@ -27,3 +27,7 @@ poller_modules:
     services: false
     mempools: false
     wireless: false
+
+snmp:
+    no_bulk:
+        - TELESTE-COMMON-MIB
