@@ -104,7 +104,7 @@ class LocationController extends TableController
     {
         foreach (\LibreNMS\Config::get('device_types') as $device_type) {
             if ($field == $device_type['type']) {
-                return function ($query) {
+                return function ($query, $field) {
                     $query->on('devices.location_id', 'locations.id')
                         ->where('devices.type', $field);
                 };

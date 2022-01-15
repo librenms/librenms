@@ -39,7 +39,7 @@ class LocationController extends Controller
         return view('locations', $data);
     }
 
-    private function available_device_types()
+    private function available_device_types() : object
     {
         return Device::select('type')->distinct('type')->get();
     }
