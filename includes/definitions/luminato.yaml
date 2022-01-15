@@ -27,7 +27,3 @@ poller_modules:
     services: false
     mempools: false
     wireless: false
-
-oids:
-    no_bulk:
-        - TELESTE-COMMON-MIB::statusInternalTemperature
