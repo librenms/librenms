@@ -364,19 +364,13 @@
             }
         },
         "oids": {
-            "type": "array",
-            "items": {
-                "type": "object",
-                "properties": {
-                    "no_bulk": {
-                        "type": "array"
-                    },
-                    "text": {
-                        "type": "string"
-                    }
-                },
-                "additionalProperties": false
-            }
+            "type": "object",
+            "properties": {
+                "no_bulk": {
+                    "type": "array"
+                }
+            },
+            "additionalProperties": false
         },
         "snmp_bulk": {
             "type": "boolean"
