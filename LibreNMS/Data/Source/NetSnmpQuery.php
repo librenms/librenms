@@ -269,7 +269,7 @@ class NetSnmpQuery implements SnmpQueryInterface
 
     private function buildCli(string $command, array $oids): array
     {
-        $cmd = $this->initCommand($command);
+        $cmd = $this->initCommand($command, $oids);
 
         array_push($cmd, '-M', $this->mibDirectories());
 
@@ -349,9 +349,13 @@ class NetSnmpQuery implements SnmpQueryInterface
         return new SnmpResponse($output, $stderr, $exitCode);
     }
 
-    private function initCommand(string $binary): array
+    private function initCommand(string $binary, array $oids): array
     {
-        if ($binary == 'snmpwalk' && $this->device->snmpver !== 'v1' && Config::getOsSetting($this->device->os, 'snmp_bulk', true)) {
+        if ($binary == 'snmpwalk'
+            && $this->device->snmpver !== 'v1'
+            && Config::getOsSetting($this->device->os, 'snmp_bulk', true)
+            && empty(array_intersect($oids, Config::getCombined($this->device->os, 'oids.no_bulk'))) // skip for oids that do not work with bulk
+        ) {
             $snmpcmd = [Config::get('snmpbulkwalk', 'snmpbulkwalk')];
 
             $max_repeaters = $this->device->getAttrib('snmp_max_repeaters') ?: Config::getOsSetting($this->device->os, 'snmp.max_repeaters', Config::get('snmp.max_repeaters', false));
