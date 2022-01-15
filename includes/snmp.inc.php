@@ -130,19 +130,10 @@ function gen_snmpget_cmd($device, $oids, $options = null, $mib = null, $mibdir =
  */
 function gen_snmpwalk_cmd($device, $oids, $options = null, $mib = null, $mibdir = null)
 {
-    // look for MIBs which need to use slow snmpwalk (YAML snmp: no_bulk: entry)
-    $flag_nobulk = false; //reset flag
-    $cnfsnmp = Config::getOsSetting($device['os'], 'snmp');
-    if (isset($cnfsnmp['no_bulk'])) {
-        foreach ($cnfsnmp['no_bulk'] as $tmpkeys => $mibname) {
-            if (Str::contains(strtoupper($mib), strtoupper($mibname))) {
-                $flag_nobulk = true; //set flag
-                d_echo("\n" . 'SNMP: ' . $mibname . ' forced to snmpwalk');
-            }
-        }
-    }
-
-    if ($device['snmpver'] == 'v1' || (isset($device['os']) && Config::getOsSetting($device['os'], 'snmp_bulk', true) == false) || $flag_nobulk) {
+    if ($device['snmpver'] == 'v1'
+        || (isset($device['os']) && (Config::getOsSetting($device['os'], 'snmp_bulk', true) == false
+                || ! empty(array_intersect(Arr::wrap($oids), Config::getCombined($device['os'], 'oids.no_bulk'))))) // skip for oids that do not work with bulk
+    ) {
         $snmpcmd = [Config::get('snmpwalk')];
     } else {
         $snmpcmd = [Config::get('snmpbulkwalk')];

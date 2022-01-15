@@ -1279,6 +1279,12 @@ return [
                 'description' => 'Max Repeaters',
                 'help' => 'Set repeaters to use for SNMP bulk requests',
             ],
+            'oids' => [
+                'no_bulk' => [
+                    'description' => 'Disable snmp bulk for OIDs',
+                    'help' => 'Disable snmp bulk operation for certain OIDs. Generally, this should be set on an OS instead. Format should be MIB::OID',
+                ],
+            ],
             'port' => [
                 'description' => 'Port',
                 'help' => 'Set the tcp/udp port to be used for SNMP',

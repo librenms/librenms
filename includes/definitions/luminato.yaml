@@ -28,6 +28,6 @@ poller_modules:
     mempools: false
     wireless: false
 
-snmp:
+oids:
     no_bulk:
-        - TELESTE-COMMON-MIB
+        - TELESTE-COMMON-MIB::statusInternalTemperature

@@ -25,7 +25,7 @@ modules:
         temperature:
             data:
                 -
-                    oid: statusInternalTemperature
+                    oid: TELESTE-COMMON-MIB::statusInternalTemperature
                     num_oid: '.1.3.6.1.4.1.3715.99.2.2.1.1.3.{{ $index }}'
                     descr: "{{ $entPhysicalName }} ({{ $entPhysicalDescr }}) "
                     index: '{{ $index }}'

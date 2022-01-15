@@ -363,7 +363,7 @@
                 "type": "string"
             }
         },
-        "snmp": {
+        "oids": {
             "type": "array",
             "items": {
                 "type": "object",
