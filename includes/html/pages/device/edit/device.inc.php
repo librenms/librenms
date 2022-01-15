@@ -97,7 +97,6 @@ $disable_notify = get_dev_attrib($device, 'disable_notify');
 
 ?>
 
-<h3> Device Settings </h3>
 <div class="row">
     <!-- Bootstrap 3 doesn't support mediaqueries for text aligns (e.g. text-md-left), which makes these buttons stagger on sm or xs screens -->
     <div class="col-md-2 col-md-offset-2">
