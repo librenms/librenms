@@ -178,8 +178,6 @@ $device = dbFetchRow('SELECT * FROM `devices` WHERE `device_id` = ?', [$device['
 $max_oid = get_dev_attrib($device, 'snmp_max_oid');
 $max_repeaters = get_dev_attrib($device, 'snmp_max_repeaters');
 
-echo '<h3> SNMP Settings </h3>';
-
 // use PHP Flasher to print normal (success) messages, similar to Device Settings
 if (isset($update_message)) {
     if (is_array($update_message)) {
