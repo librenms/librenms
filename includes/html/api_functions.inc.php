@@ -2193,11 +2193,11 @@ function list_mpls_services(Illuminate\Http\Request $request)
 {
     $hostname = $request->get('hostname');
     $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
-    
+
     $mpls_services = MplsService::hasAccess(Auth::user())->when($device_id, function ($query, $device_id) {
         return $query->where('device_id', $device_id);
     })->get();
-    
+
     if ($mpls_services->isEmpty()) {
         return api_error(404, 'MPLS Services do not exist');
     }
@@ -2213,7 +2213,7 @@ function list_mpls_saps(Illuminate\Http\Request $request)
     $mpls_saps = MplsSap::hasAccess(Auth::user())->when($device_id, function ($query, $device_id) {
         return $query->where('device_id', $device_id);
     })->get();
-    
+
     if ($mpls_saps->isEmpty()) {
         return api_error(404, 'SAPs do not exist');
     }
