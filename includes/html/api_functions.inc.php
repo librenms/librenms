@@ -2191,8 +2191,6 @@ function get_vrf(Illuminate\Http\Request $request)
 
 function list_mpls_services(Illuminate\Http\Request $request)
 {
-    $sql = '';
-    $sql_params = [];
     $hostname = $request->get('hostname');
     $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
     
