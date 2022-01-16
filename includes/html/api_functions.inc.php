@@ -20,10 +20,10 @@ use App\Models\OspfPort;
 use App\Models\Port;
 use App\Models\PortGroup;
 use App\Models\PortsFdb;
+use App\Models\MplsSap;
+use App\Models\MplsService;
 use App\Models\Sensor;
 use App\Models\ServiceTemplate;
-use App\Models\MplsService;
-use App\Models\MplsSap;
 use App\Models\UserPref;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Routing\Router;
@@ -2218,7 +2218,6 @@ function list_mpls_saps(Illuminate\Http\Request $request)
         return api_error(404, 'SAPs do not exist');
     }
     return api_success($mpls_saps, 'saps', null, 200, $mpls_saps->count());
-
 }
 
 function list_ipsec(Illuminate\Http\Request $request)
