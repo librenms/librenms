@@ -367,6 +367,10 @@ $graphs['docker'] = [
     'mem_used',
     'mem_perc',
 ];
+$graphs['supervisord'] = [
+    'totals',
+    'uptime',
+];
 $graphs['chronyd'] = [
     'time',
     'frequency',

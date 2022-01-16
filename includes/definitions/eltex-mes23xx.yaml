@@ -13,6 +13,7 @@ discovery:
         sysObjectID:
             - .1.3.6.1.4.1.35265.1.112
             - .1.3.6.1.4.1.35265.1.83
+            - .1.3.6.1.4.1.35265.1.78
 
 mib_dir: eltexmes23xx
 group: radlan
