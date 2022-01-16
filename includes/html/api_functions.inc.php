@@ -2217,6 +2217,7 @@ function list_mpls_saps(Illuminate\Http\Request $request)
     if ($mpls_saps->isEmpty()) {
         return api_error(404, 'SAPs do not exist');
     }
+
     return api_success($mpls_saps, 'saps', null, 200, $mpls_saps->count());
 }
 
