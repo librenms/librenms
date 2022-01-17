@@ -30,5 +30,5 @@ bad_iftype:
 
 oids:
     no_bulk:
-        - rlPethPsePortOutputPower
-        - rlPethPsePortPowerLimit
+        - MARVELL-POE-MIB::rlPethPsePortOutputPower
+        - MARVELL-POE-MIB::rlPethPsePortPowerLimit
