@@ -1,0 +1,55 @@
+mib: UI-AF60-MIB
+modules:
+    os:
+        hardware: UI-AF60-MIB::af60DevModel.0
+        version: UI-AF60-MIB::af60FirmwareVersion.0
+        lat: UI-AF60-MIB::af60GpsLat.0
+        long: UI-AF60-MIB::af60GpsLon.0
+    processors:
+        data:
+            -
+                oid: af60CpuUsage
+                num_oid: '.1.3.6.1.4.1.41112.1.11.2.6'
+    sensors:
+        state:
+            data:
+                -
+                    oid: af60Role
+                    num_oid: '.1.3.6.1.4.1.41112.1.11.1.1.1.{{ $index }}'
+                    index: af60Role
+                    descr: Radio Role
+                    state_name: af60Role
+                    states:
+                        - { value: 0, generic: 0, graph: 0, descr: AP }
+                        - { value: 1, generic: 0, graph: 0, descr: CPE }
+                -
+                    oid: af60GpsStatus
+                    value: af60GpsStatus
+                    num_oid: '.1.3.6.1.4.1.41112.1.11.1.4.1.{{ $index }}'
+                    descr: GPS Status
+                    states:
+                        - { value: 0, generic: 1, graph: 0, descr: Absent }
+                        - { value: 1, generic: 1, graph: 0, descr: Off }
+                        - { value: 2, generic: 0, graph: 0, descr: On }
+                -
+                    oid: af60GpsFix
+                    value: af60GpsFix
+                    num_oid: '.1.3.6.1.4.1.41112.1.11.1.4.2.{{ $index }}'
+                    descr: GPS fix
+                    states:
+                        - { value: 0, generic: 1, graph: 0, descr: Unknown }
+                        - { value: 1, generic: 1, graph: 0, descr: Nofix }
+                        - { value: 2, generic: 0, graph: 0, descr: Fix2d }
+                        - { value: 3, generic: 0, graph: 0, descr: Fix3d }
+        count:
+            data:
+                -
+                    oid: af60GpsSatsVisible
+                    num_oid: '.1.3.6.1.4.1.41112.1.11.1.4.7.{{ $index }}'
+                    index: af60GpsSatsVisible
+                    descr: Sat visible
+                -
+                    oid: af60GpsSatsTracked
+                    num_oid: '.1.3.6.1.4.1.41112.1.11.1.4.8.{{ $index }}'
+                    index: af60GpsSatsTracked
+                    descr: Sat tracked
