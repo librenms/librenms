@@ -44,7 +44,7 @@ class AirosAf60 extends OS implements
 
         return [
             new WirelessSensor('frequency', $this->getDeviceId(), $oid, 'airos-af60', 1, 'Radio Frequency'),
-	];
+        ];
     }
 
     /**
@@ -63,6 +63,7 @@ class AirosAf60 extends OS implements
             new WirelessSensor('rate', $this->getDeviceId(), $rx_oid, 'airos-af60-rx', 1, 'Rx Capacity'),
         ];
     }
+
     /**
      * Discover wireless tx or rx power. This is in dBm. Type is power.
      * Returns an array of LibreNMS\Device\Sensor objects that have been discovered
@@ -79,6 +80,7 @@ class AirosAf60 extends OS implements
             new WirelessSensor('power', $this->getDeviceId(), $rx_oid, 'airos-af60-rx', 1, 'Rx Power'),
         ];
     }
+
     /**
      * Discover wireless snr. This is in dBm. Type is snr.
      * Returns an array of LibreNMS\Device\Sensor objects that have been discovered
