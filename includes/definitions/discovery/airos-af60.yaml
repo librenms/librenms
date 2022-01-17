@@ -23,6 +23,40 @@ modules:
                         - { value: 0, generic: 0, graph: 0, descr: AP }
                         - { value: 1, generic: 0, graph: 0, descr: CPE }
                 -
+                    oid: af60StaTxMCS
+                    value: af60StaTxMCS
+                    num_oid: '.1.3.6.1.4.1.41112.1.11.1.3.1.5'
+                    index: '1'
+                    descr: Tx Modulation Rate
+                    states:
+                      - { value: 0, generic: 2, graph: 1, descr: '0x' }
+                      - { value: 1, generic: 2, graph: 1, descr: '1x' }
+                      - { value: 2, generic: 2, graph: 1, descr: '2x' }
+                      - { value: 3, generic: 1, graph: 1, descr: '3x' }
+                      - { value: 4, generic: 1, graph: 1, descr: '4x' }
+                      - { value: 5, generic: 1, graph: 1, descr: '5x' }
+                      - { value: 6, generic: 0, graph: 1, descr: '6x' }
+                      - { value: 7, generic: 0, graph: 1, descr: '7x' }
+                      - { value: 8, generic: 0, graph: 1, descr: '8x' }
+                      - { value: 9, generic: 0, graph: 1, descr: '9x' }
+                -
+                    oid: af60StaRxMCS
+                    value: af60StaRxMCS
+                    num_oid: '.1.3.6.1.4.1.41112.1.11.1.3.1.6'
+                    index: '2'
+                    descr: Rx Modulation Rate
+                    states:
+                      - { value: 0, generic: 2, graph: 1, descr: '0x' }
+                      - { value: 1, generic: 2, graph: 1, descr: '1x' }
+                      - { value: 2, generic: 2, graph: 1, descr: '2x' }
+                      - { value: 3, generic: 1, graph: 1, descr: '3x' }
+                      - { value: 4, generic: 1, graph: 1, descr: '4x' }
+                      - { value: 5, generic: 1, graph: 1, descr: '5x' }
+                      - { value: 6, generic: 0, graph: 1, descr: '6x' }
+                      - { value: 7, generic: 0, graph: 1, descr: '7x' }
+                      - { value: 8, generic: 0, graph: 1, descr: '8x' }
+                      - { value: 9, generic: 0, graph: 1, descr: '9x' }
+                -
                     oid: af60GpsStatus
                     value: af60GpsStatus
                     num_oid: '.1.3.6.1.4.1.41112.1.11.1.4.1.{{ $index }}'
