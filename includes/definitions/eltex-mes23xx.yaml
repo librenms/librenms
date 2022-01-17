@@ -27,3 +27,8 @@ bad_iftype:
     - tunnel
     - softwareLoopback
     - propPointToPointSerial
+
+oids:
+    no_bulk:
+        - rlPethPsePortOutputPower
+        - rlPethPsePortPowerLimit
