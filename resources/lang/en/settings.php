@@ -1012,6 +1012,10 @@ return [
         'ping' => [
             'description' => 'Path to ping',
         ],
+        'ping_rrd_step' => [
+            'description' => 'Ping Frequency',
+            'help' => 'How often to check. Sets the default value for all nodes. Warning! If you change this you must make additional changes.  Check the Fast Ping docs.',
+        ],
         'poller_modules' => [
             'unix-agent' => [
                 'description' => 'Unix Agent',
@@ -1246,6 +1250,90 @@ return [
             'description' => 'Sets the version of rrdtool on your server',
             'help' => 'Anything over 1.5.5 supports all features LibreNMS uses, do not set higher than your installed version',
         ],
+        'service_poller_enabled' => [
+            'description' => 'Enable Polling',
+            'help' => 'Enable poller workers. Sets the default value for all nodes.',
+        ],
+        'service_poller_workers' => [
+            'description' => 'Poller Workers',
+            'help' => 'Amount of poller workers to spawn. Sets the default value for all nodes.',
+        ],
+        'service_poller_frequency' => [
+            'description' => 'Poller Frequency (Warning!)',
+            'help' => 'How often to poll devices. Sets the default value for all nodes. Warning! Changing this without fixing rrd files will break graphs. See docs for more info.',
+        ],
+        'service_poller_down_retry' => [
+            'description' => 'Device Down Retry',
+            'help' => 'If a device is down when polling is attempted. This is the amount of time to wait before retrying. Sets the default value for all nodes.',
+        ],
+        'service_discovery_enabled' => [
+            'description' => 'Discovery Enabled',
+            'help' => 'Enable discovery workers. Sets the default value for all nodes.',
+        ],
+        'service_discovery_workers' => [
+            'description' => 'Discovery Workers',
+            'help' => 'Amount of discovery workers to run. Setting too high can cause overload. Sets the default value for all nodes.',
+        ],
+        'service_discovery_frequency' => [
+            'description' => 'Discovery Frequency',
+            'help' => 'How often to run device discovery. Sets the default value for all nodes. Default is 4 times a day.',
+        ],
+        'service_services_enabled' => [
+            'description' => 'Services Enabled',
+            'help' => 'Enable services workers. Sets the default value for all nodes.',
+        ],
+        'service_services_workers' => [
+            'description' => 'Services Workers',
+            'help' => 'Amount of services workers. Sets the default value for all nodes.',
+        ],
+        'service_services_frequency' => [
+            'description' => 'Services Frequency',
+            'help' => 'How often to run services. This should match poller frequency. Sets the default value for all nodes.',
+        ],
+        'service_billing_enabled' => [
+            'description' => 'Billing Enabled',
+            'help' => 'Enable billing workers. Sets the default value for all nodes.',
+        ],
+        'service_billing_frequency' => [
+            'description' => 'Billing Frequency',
+            'help' => 'How often to collect billing data. Sets the default value for all nodes.',
+        ],
+        'service_billing_calculate_frequency' => [
+            'description' => 'Billing Calculate Frequency',
+            'help' => 'How often to calculate bill usage. Sets the default value for all nodes.',
+        ],
+        'service_alerting_enabled' => [
+            'description' => 'Alerting Enabled',
+            'help' => 'Enable the alerting worker. Sets the default value for all nodes.',
+        ],
+        'service_alerting_frequency' => [
+            'description' => 'Alerting Frequency',
+            'help' => 'How often alert rules are checked. Note that data is only updated based on poller frequency. Sets the default value for all nodes.',
+        ],
+        'service_ping_enabled' => [
+            'description' => 'Fast Ping Enabled',
+            'help' => 'Fast Ping just pings devices to check if they are up or down. Sets the default value for all nodes.',
+        ],
+        'service_update_enabled' => [
+            'description' => 'Daily Maintenance Enabled',
+            'help' => 'Run daily.sh maintenance script and restart the dispatcher service afterwards. Sets the default value for all nodes.',
+        ],
+        'service_update_frequency' => [
+            'description' => 'Maintenance Frequency',
+            'help' => 'How often to run daily maintenance. Default is 1 Day. It is highly suggested not to change this. Sets the default value for all nodes.',
+        ],
+        'service_loglevel' => [
+            'description' => 'Log Level',
+            'help' => 'Log level of the dispatch service. Sets the default value for all nodes.',
+        ],
+        'service_watchdog_enabled' => [
+            'description' => 'Watchdog Enabled',
+            'help' => 'Watchdog monitors the log file and restarts the service it it has not been updated. Sets the default value for all nodes.',
+        ],
+        'service_watchdog_log' => [
+            'description' => 'Log File to Watch',
+            'help' => 'Default is the LibreNMS log file. Sets the default value for all nodes.',
+        ],
         'sfdp' => [
             'description' => 'Path to sfdp',
         ],
@@ -1278,6 +1366,12 @@ return [
             'max_repeaters' => [
                 'description' => 'Max Repeaters',
                 'help' => 'Set repeaters to use for SNMP bulk requests',
+            ],
+            'oids' => [
+                'no_bulk' => [
+                    'description' => 'Disable snmp bulk for OIDs',
+                    'help' => 'Disable snmp bulk operation for certain OIDs. Generally, this should be set on an OS instead. Format should be MIB::OID',
+                ],
             ],
             'port' => [
                 'description' => 'Port',

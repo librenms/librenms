@@ -13,8 +13,6 @@
  */
 
 ?>
-<h3>Routing settings</h3>
-
 <div class="table-responsive">
     <table id="routing" class="table table-hover table-condensed routing">
         <thead>
