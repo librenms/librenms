@@ -76,16 +76,6 @@ parameters:
 			path: LibreNMS/Alert/Template.php
 
 		-
-			message: "#^Parameter \\#1 \\$view of function view expects view\\-string\\|null, array\\<string, mixed\\> given\\.$#"
-			count: 2
-			path: LibreNMS/Alert/Template.php
-
-		-
-			message: "#^Parameter \\#1 \\$view of function view expects view\\-string\\|null, array\\<string, string\\> given\\.$#"
-			count: 2
-			path: LibreNMS/Alert/Template.php
-
-		-
 			message: "#^Property LibreNMS\\\\Alert\\\\Template\\:\\:\\$template has no type specified\\.$#"
 			count: 1
 			path: LibreNMS/Alert/Template.php
@@ -7807,11 +7797,6 @@ parameters:
 
 		-
 			message: "#^Method App\\\\Http\\\\Controllers\\\\DeviceController\\:\\:renderLegacyTab\\(\\) has parameter \\$tab with no type specified\\.$#"
-			count: 1
-			path: app/Http/Controllers/DeviceController.php
-
-		-
-			message: "#^Parameter \\#1 \\$view of function view expects view\\-string\\|null, array\\<string, mixed\\> given\\.$#"
 			count: 1
 			path: app/Http/Controllers/DeviceController.php
 

@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "15408329c31958767d7e83c43760020d",
+    "content-hash": "cba65087f343b0ca7fa81ea5cb3dc1b5",
     "packages": [
         {
             "name": "amenadiel/jpgraph",
@@ -7896,62 +7896,6 @@
                 "source": "https://github.com/webmozarts/assert/tree/1.10.0"
             },
             "time": "2021-03-09T10:59:23+00:00"
-        },
-        {
-            "name": "wpb/string-blade-compiler",
-            "version": "6.0.3",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/TerrePorter/StringBladeCompiler.git",
-                "reference": "89fa88cd782c05d4eabd7b18273a14f6490fba09"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/TerrePorter/StringBladeCompiler/zipball/89fa88cd782c05d4eabd7b18273a14f6490fba09",
-                "reference": "89fa88cd782c05d4eabd7b18273a14f6490fba09",
-                "shasum": ""
-            },
-            "require": {
-                "laravel/framework": "^6.0|^7.0|^8.0",
-                "php": "^7.2|^8.0"
-            },
-            "type": "library",
-            "extra": {
-                "laravel": {
-                    "providers": [
-                        "Wpb\\String_Blade_Compiler\\StringBladeServiceProvider"
-                    ],
-                    "aliases": {
-                        "StringBlade": "Wpb\\String_Blade_Compiler\\Facades\\StringBlade"
-                    }
-                }
-            },
-            "autoload": {
-                "psr-4": {
-                    "Wpb\\String_Blade_Compiler\\": "src/"
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Terre Porter",
-                    "email": "tporter@webpage-builders.com"
-                }
-            ],
-            "description": "Laravel Blade String Compiler, render string as blade templates",
-            "keywords": [
-                "blade",
-                "compiler",
-                "laravel"
-            ],
-            "support": {
-                "issues": "https://github.com/TerrePorter/StringBladeCompiler/issues",
-                "source": "https://github.com/TerrePorter/StringBladeCompiler/tree/6.0.3"
-            },
-            "time": "2020-12-18T14:17:09+00:00"
         }
     ],
     "packages-dev": [
@@ -12542,5 +12486,5 @@
         "ext-xml": "*"
     },
     "platform-dev": [],
-    "plugin-api-version": "2.1.0"
+    "plugin-api-version": "2.2.0"
 }
