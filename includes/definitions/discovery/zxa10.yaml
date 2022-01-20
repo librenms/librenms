@@ -15,11 +15,6 @@ modules:
                         op: '='
                         value: 0
     processors:
-        pre-cache:
-            data:
-                -
-                    oid:
-                        - zxAnCardActualType
         data:
             -
                 oid: zxAnCardTable
