@@ -1973,7 +1973,7 @@ SNMP extend script to monitor your (remote) RRDCached via snmp
 
 1. Download the script onto the desired host
 ```
-wget https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/rrdcached -O /etc/snmp/rrdcached
+wget https://github.com/librenms/librenms-agent/raw/master/agent-local/rrdcached -O /etc/snmp/rrdcached
 ```
 
 2. Make the script executable
