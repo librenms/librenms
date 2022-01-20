@@ -3445,7 +3445,7 @@
                     "sensor_oid": ".1.3.6.1.4.1.2011.5.25.31.1.1.3.1.7.270",
                     "sensor_index": "270",
                     "sensor_type": "vrp",
-                    "sensor_descr": "VRP-GigabitEthernet0/0/4",
+                    "sensor_descr": "GigabitEthernet0/0/4",
                     "group": null,
                     "sensor_divisor": 1000000,
                     "sensor_multiplier": 1,
