@@ -1,4 +1,4 @@
-os: lenovoXClarityIMPI
+os: xclarity
 text: 'Lenovo XCC IMPI'
 type: appliance
 icon: lenovo

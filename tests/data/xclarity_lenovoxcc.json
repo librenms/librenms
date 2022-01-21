@@ -10,7 +10,7 @@
                     "version": "TEI3C0N 4.83",
                     "hardware": "ThinkSystem SR250",
                     "features": null,
-                    "os": "lenovoXClarityIMPI",
+                    "os": "xclarity",
                     "type": "appliance",
                     "serial": "S4AVL151",
                     "icon": "lenovo.svg",
