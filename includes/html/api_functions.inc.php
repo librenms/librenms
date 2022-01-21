@@ -16,6 +16,8 @@ use App\Models\Availability;
 use App\Models\Device;
 use App\Models\DeviceGroup;
 use App\Models\DeviceOutage;
+use App\Models\MplsSap;
+use App\Models\MplsService;
 use App\Models\OspfPort;
 use App\Models\Port;
 use App\Models\PortGroup;
@@ -2185,6 +2187,38 @@ function get_vrf(Illuminate\Http\Request $request)
     }
 
     return api_success($vrf, 'vrf');
+}
+
+function list_mpls_services(Illuminate\Http\Request $request)
+{
+    $hostname = $request->get('hostname');
+    $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
+
+    $mpls_services = MplsService::hasAccess(Auth::user())->when($device_id, function ($query, $device_id) {
+        return $query->where('device_id', $device_id);
+    })->get();
+
+    if ($mpls_services->isEmpty()) {
+        return api_error(404, 'MPLS Services do not exist');
+    }
+
+    return api_success($mpls_services, 'mpls_services', null, 200, $mpls_services->count());
+}
+
+function list_mpls_saps(Illuminate\Http\Request $request)
+{
+    $hostname = $request->get('hostname');
+    $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
+
+    $mpls_saps = MplsSap::hasAccess(Auth::user())->when($device_id, function ($query, $device_id) {
+        return $query->where('device_id', $device_id);
+    })->get();
+
+    if ($mpls_saps->isEmpty()) {
+        return api_error(404, 'SAPs do not exist');
+    }
+
+    return api_success($mpls_saps, 'saps', null, 200, $mpls_saps->count());
 }
 
 function list_ipsec(Illuminate\Http\Request $request)

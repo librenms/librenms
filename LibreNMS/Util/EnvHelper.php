@@ -119,7 +119,7 @@ class EnvHelper
             if (! file_exists($env_file)) {
                 copy(base_path('.env.example'), $env_file);
 
-                $key = trim(exec(PHP_BINDIR . '/php ' . base_path('artisan') . ' key:generate --show'));
+                $key = trim(exec(PHP_BINARY . ' ' . base_path('artisan') . ' key:generate --show'));
 
                 self::writeEnv([
                     'APP_KEY' => $key,

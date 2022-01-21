@@ -507,3 +507,100 @@ Output:
     "count": 1
 }
 ```
+
+### `list_mpls_services`
+
+List MPLS services
+
+Route: `/api/v0/routing/mpls/services`
+
+Input:
+
+- hostname = Either the devices hostname or id
+
+Example:
+
+```curl
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/routing/mpls/services
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/routing/mpls/services?hostname=host.example.com
+
+```
+
+Output:
+
+```json
+{
+    "status": "ok",
+    "mpls_services": [
+        {
+            "svc_id": 1671,
+            "svc_oid": 27,
+            "device_id": 4,
+            "svcRowStatus": "active",
+            "svcType": "tls",
+            "svcCustId": 1,
+            "svcAdminStatus": "up",
+            "svcOperStatus": "up",
+            "svcDescription": "",
+            "svcMtu": 9008,
+            "svcNumSaps": 1,
+            "svcNumSdps": 0,
+            "svcLastMgmtChange": 2,
+            "svcLastStatusChange": 168,
+            "svcVRouterId": 0,
+            "svcTlsMacLearning": "enabled",
+            "svcTlsStpAdminStatus": "disabled",
+            "svcTlsStpOperStatus": "down",
+            "svcTlsFdbTableSize": 250,
+            "svcTlsFdbNumEntries": 0,
+            "hostname": "host.example.com"
+        }
+    ],
+    "count": 1
+}
+```
+
+### `list_mpls_saps`
+
+List MPLS SAPs
+
+Route: `/api/v0/routing/mpls/saps`
+
+Input:
+
+- hostname = Either the devices hostname or id
+
+Example:
+
+```curl
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/routing/mpls/saps
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/routing/mpls/saps?hostname=host.example.com
+```
+
+Output:
+
+```json
+{
+    "status": "ok",
+    "saps": [
+        {
+            "sap_id": 1935,
+            "svc_id": 1660,
+            "svc_oid": 7,
+            "sapPortId": 16108921125,
+            "ifName": "1/1/c2/1",
+            "device_id": 3,
+            "sapEncapValue": "0",
+            "sapRowStatus": "active",
+            "sapType": "epipe",
+            "sapDescription": "",
+            "sapAdminStatus": "up",
+            "sapOperStatus": "down",
+            "sapLastMgmtChange": 2,
+            "sapLastStatusChange": 0,
+            "hostname": "hostname=host.example.com"
+         }
+    ],
+    "count": 1
+}
+```
