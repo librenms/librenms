@@ -27,6 +27,7 @@ bad_iftype:
     - tunnel
     - softwareLoopback
     - propPointToPointSerial
+    - propVirtual
 
 oids:
     no_bulk:
