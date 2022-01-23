@@ -184,7 +184,7 @@ class CiHelper
             array_push($phpunit_cmd, '--stop-on-error', '--stop-on-failure');
         }
 
-        if(Debug::isVerbose()) {
+        if (Debug::isVerbose()) {
             $phpunit_cmd[] = '--debug';
         }
 

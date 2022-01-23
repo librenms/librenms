@@ -96,7 +96,7 @@ class DevCheckCommand extends LnmsCommand
                 'lint_enable' => false,
                 'unit_enable' => true,
                 'web_enable' => false,
-                'os-modules-only' => $this->option('os-modules-only')
+                'os-modules-only' => $this->option('os-modules-only'),
             ]);
             $this->helper->setOS(explode(',', $os));
         }
