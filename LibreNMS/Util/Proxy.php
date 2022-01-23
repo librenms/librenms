@@ -35,7 +35,7 @@ class Proxy
      */
     public static function shouldBeUsed(string $target_url): bool
     {
-        return (bool) preg_match('#//:(localhost|127\.|::1)#', $target_url);
+        return preg_match('#(^|://)(localhost|127\.|::1)#', $target_url) == 0;
     }
 
     /**
@@ -45,7 +45,7 @@ class Proxy
      */
     public static function get(?string $target_url = null)
     {
-        if ($target_url && ! self::shouldBeUsed($target_url)) {
+        if ($target_url && self::shouldBeUsed($target_url)) {
             return false;
         } elseif (getenv('http_proxy')) {
             return getenv('http_proxy');
