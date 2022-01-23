@@ -1,3 +1,113 @@
+## 22.1.0
+*(2022-01-23)*
+
+A big thank you to the following 26 contributors this last month:
+
+  - [murrant](https://github.com/murrant) (9)
+  - [Npeca75](https://github.com/Npeca75) (4)
+  - [loopodoopo](https://github.com/loopodoopo) (3)
+  - [ilGino](https://github.com/ilGino) (2)
+  - [Jellyfrog](https://github.com/Jellyfrog) (2)
+  - [SourceDoctor](https://github.com/SourceDoctor) (2)
+  - [laf](https://github.com/laf) (2)
+  - [aztec102](https://github.com/aztec102) (2)
+  - [twelch24](https://github.com/twelch24) (1)
+  - [tkjaer](https://github.com/tkjaer) (1)
+  - [ssasso](https://github.com/ssasso) (1)
+  - [TechieDylan](https://github.com/TechieDylan) (1)
+  - [hvanoch](https://github.com/hvanoch) (1)
+  - [h-barnhart](https://github.com/h-barnhart) (1)
+  - [gdepeyrot](https://github.com/gdepeyrot) (1)
+  - [k0079898](https://github.com/k0079898) (1)
+  - [efelon](https://github.com/efelon) (1)
+  - [westerterp](https://github.com/westerterp) (1)
+  - [avermeer-tc](https://github.com/avermeer-tc) (1)
+  - [Fehler12](https://github.com/Fehler12) (1)
+  - [bonzo81](https://github.com/bonzo81) (1)
+  - [glance-](https://github.com/glance-) (1)
+  - [VirTechSystems](https://github.com/VirTechSystems) (1)
+  - [iopsthecloud](https://github.com/iopsthecloud) (1)
+  - [blubecks](https://github.com/blubecks) (1)
+  - [thford89](https://github.com/thford89) (1)
+
+Thanks to maintainers and others that helped with pull requests this month:
+
+  - [murrant](https://github.com/murrant) (22)
+  - [Jellyfrog](https://github.com/Jellyfrog) (13)
+  - [laf](https://github.com/laf) (10)
+  - [PipoCanaja](https://github.com/PipoCanaja) (6)
+  - [ottorei](https://github.com/ottorei) (2)
+  - [SourceDoctor](https://github.com/SourceDoctor) (2)
+
+#### Feature
+* Add Sla jitter packet loss percent graph ([#13600](https://github.com/librenms/librenms/pull/13600)) - [bonzo81](https://github.com/bonzo81)
+* Add API-routes for listing MPLS SAPs and services ([#13561](https://github.com/librenms/librenms/pull/13561)) - [blubecks](https://github.com/blubecks)
+
+#### Device
+* Merge enviromux-micro in existing NTI ([#13696](https://github.com/librenms/librenms/pull/13696)) - [Npeca75](https://github.com/Npeca75)
+* Change the variable to detect version for mikrotik ups runtime device divisor ([#13678](https://github.com/librenms/librenms/pull/13678)) - [TechieDylan](https://github.com/TechieDylan)
+* VRP BGP fixes ([#13675](https://github.com/librenms/librenms/pull/13675)) - [murrant](https://github.com/murrant)
+* Added new sensors to mes23xx ([#13671](https://github.com/librenms/librenms/pull/13671)) - [Npeca75](https://github.com/Npeca75)
+* Added initial detection MES2324F or MES2324FB ([#13669](https://github.com/librenms/librenms/pull/13669)) - [aztec102](https://github.com/aztec102)
+* New OS: Adva XG 304 ([#13668](https://github.com/librenms/librenms/pull/13668)) - [h-barnhart](https://github.com/h-barnhart)
+* Basic ZTE ZXA10 detection ([#13658](https://github.com/librenms/librenms/pull/13658)) - [murrant](https://github.com/murrant)
+* Added CET Power T2S TSI ([#13645](https://github.com/librenms/librenms/pull/13645)) - [aztec102](https://github.com/aztec102)
+* Eltek ospf poller disable ([#13635](https://github.com/librenms/librenms/pull/13635)) - [loopodoopo](https://github.com/loopodoopo)
+* Smartoptics dcp m 40 zr ([#13634](https://github.com/librenms/librenms/pull/13634)) - [avermeer-tc](https://github.com/avermeer-tc)
+* Updated XOS (Extreme) processor data to use correct OID ([#13633](https://github.com/librenms/librenms/pull/13633)) - [laf](https://github.com/laf)
+* Initial Support for Fujitsu RX300 with iRMC4 ([#13631](https://github.com/librenms/librenms/pull/13631)) - [Fehler12](https://github.com/Fehler12)
+* Teleste Luminato ports & qam/asi output sensors & yaml ([#13616](https://github.com/librenms/librenms/pull/13616)) - [Npeca75](https://github.com/Npeca75)
+* Workaround linksys always mapping to g1 ([#13595](https://github.com/librenms/librenms/pull/13595)) - [glance-](https://github.com/glance-)
+* Equallogic fix typo on os name in the storage module ([#13580](https://github.com/librenms/librenms/pull/13580)) - [iopsthecloud](https://github.com/iopsthecloud)
+
+#### Webui
+* [WebUI] Removing the colon symbol to the right of a control label ([#13698](https://github.com/librenms/librenms/pull/13698)) - [ilGino](https://github.com/ilGino)
+* Remove unneccessary Section Description ([#13677](https://github.com/librenms/librenms/pull/13677)) - [SourceDoctor](https://github.com/SourceDoctor)
+* Device tracepath using wrong variables to check for traceroute output ([#13674](https://github.com/librenms/librenms/pull/13674)) - [laf](https://github.com/laf)
+* Allow filter by display name in device list ([#13665](https://github.com/librenms/librenms/pull/13665)) - [gdepeyrot](https://github.com/gdepeyrot)
+* Sort Vlan Ports by ifName, ifDescr ([#13657](https://github.com/librenms/librenms/pull/13657)) - [SourceDoctor](https://github.com/SourceDoctor)
+* Fix horizontal scrollbar in device list always visible ([#13653](https://github.com/librenms/librenms/pull/13653)) - [efelon](https://github.com/efelon)
+
+#### Alerting
+* Use display name in alerts ([#13650](https://github.com/librenms/librenms/pull/13650)) - [murrant](https://github.com/murrant)
+
+#### Graphs
+* Timos sap dot1q graphing fix ([#13654](https://github.com/librenms/librenms/pull/13654)) - [loopodoopo](https://github.com/loopodoopo)
+
+#### Applications
+* Add supervisord application ([#13673](https://github.com/librenms/librenms/pull/13673)) - [hvanoch](https://github.com/hvanoch)
+
+#### Api
+* API detect if new location should be fixed by default ([#13637](https://github.com/librenms/librenms/pull/13637)) - [murrant](https://github.com/murrant)
+* Set fixed_coordinates via api ([#13593](https://github.com/librenms/librenms/pull/13593)) - [VirTechSystems](https://github.com/VirTechSystems)
+
+#### Polling
+* Added oids.no_bulk os setting ([#13666](https://github.com/librenms/librenms/pull/13666)) - [Npeca75](https://github.com/Npeca75)
+* Add consistent output of name and app_id to Poller for all Applications (fixes #13641) ([#13648](https://github.com/librenms/librenms/pull/13648)) - [westerterp](https://github.com/westerterp)
+* Fix SnmpQuery bulk boolean backwards ([#13636](https://github.com/librenms/librenms/pull/13636)) - [murrant](https://github.com/murrant)
+
+#### Rancid
+* Gen RANCID host also for FS.com devices ([#13682](https://github.com/librenms/librenms/pull/13682)) - [ssasso](https://github.com/ssasso)
+
+#### Bug
+* Use PHP_BINARY directly instead of trying to build path to PHP binary ([#13690](https://github.com/librenms/librenms/pull/13690)) - [Jellyfrog](https://github.com/Jellyfrog)
+* Small text change for misspelled Virtual ([#13686](https://github.com/librenms/librenms/pull/13686)) - [ilGino](https://github.com/ilGino)
+* Snmp timeout is a float, allow in config ([#13676](https://github.com/librenms/librenms/pull/13676)) - [murrant](https://github.com/murrant)
+* Fix NULL device alert caused by services ([#13663](https://github.com/librenms/librenms/pull/13663)) - [k0079898](https://github.com/k0079898)
+* Disable VRP VLANs test, seems to be a bug in snmpsim snmpbulkwalk ([#13649](https://github.com/librenms/librenms/pull/13649)) - [murrant](https://github.com/murrant)
+* Remove extra rows with duplicate keys in SyncsModels trait ([#13632](https://github.com/librenms/librenms/pull/13632)) - [murrant](https://github.com/murrant)
+
+#### Documentation
+* Update rrdcached link ([#13692](https://github.com/librenms/librenms/pull/13692)) - [twelch24](https://github.com/twelch24)
+* Add missing python3-pip installation dependency for debian11 ([#13691](https://github.com/librenms/librenms/pull/13691)) - [tkjaer](https://github.com/tkjaer)
+
+#### Translation
+* Fix settings language file to include Distributed Poller labels. ([#13511](https://github.com/librenms/librenms/pull/13511)) - [thford89](https://github.com/thford89)
+
+#### Dependencies
+* Update recommended PHP version to 8.0 ([#13687](https://github.com/librenms/librenms/pull/13687)) - [Jellyfrog](https://github.com/Jellyfrog)
+
+
 ## 21.12.0
 *(2021-12-21)*
 
