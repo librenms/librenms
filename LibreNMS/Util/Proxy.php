@@ -63,9 +63,9 @@ class Proxy
     /**
      * Return the proxy url in guzzle format "http://127.0.0.1:8888"
      */
-    public static function forGuzzle(): string
+    public static function forGuzzle(?string $target_url = null): string
     {
-        $proxy = self::forCurl();
+        $proxy = self::forCurl($target_url);
 
         return empty($proxy) ? '' : ('http://' . $proxy);
     }
@@ -75,9 +75,9 @@ class Proxy
      *
      * @return string
      */
-    public static function forCurl(): string
+    public static function forCurl(?string $target_url = null): string
     {
-        return str_replace(['http://', 'https://'], '', rtrim(self::get(), '/'));
+        return str_replace(['http://', 'https://'], '', rtrim(self::get($target_url), '/'));
     }
 
     /**
