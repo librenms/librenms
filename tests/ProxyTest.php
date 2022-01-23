@@ -26,7 +26,7 @@ use LibreNMS\Util\Proxy;
 
 class ProxyTest extends TestCase
 {
-    public function testShouldBeUsed()
+    public function testShouldBeUsed(): void
     {
         $this->assertTrue(Proxy::shouldBeUsed('http://example.com/foobar'));
         $this->assertTrue(Proxy::shouldBeUsed('foo/bar'));
