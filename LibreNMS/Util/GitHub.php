@@ -391,14 +391,14 @@ GRAPHQL;
             $this->getPullRequest();
         }
 
-        if (! isset($previous_release['published_at'])) {
+        if (! isset($previous_release['created_at'])) {
             throw new Exception(
                 $previous_release['message'] ??
                 "Could not find previous release tag. ($this->from)"
             );
         }
 
-        $this->getPullRequests($previous_release['published_at']);
+        $this->getPullRequests($previous_release['created_at']);
         $this->buildChangeLog();
         $this->formatChangeLog();
 
