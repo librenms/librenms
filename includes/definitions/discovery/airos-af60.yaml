@@ -1,10 +1,10 @@
 mib: UI-AF60-MIB
 modules:
     os:
-        hardware: UI-AF60-MIB::af60DevModel.0
-        version: UI-AF60-MIB::af60FirmwareVersion.0
-        lat: UI-AF60-MIB::af60GpsLat.0
-        long: UI-AF60-MIB::af60GpsLon.0
+        hardware: UI-AF60-MIB::af60DevModel.1
+        version: UI-AF60-MIB::af60FirmwareVersion.1
+        lat: UI-AF60-MIB::af60GpsLat.1
+        long: UI-AF60-MIB::af60GpsLon.1
     processors:
         data:
             -
