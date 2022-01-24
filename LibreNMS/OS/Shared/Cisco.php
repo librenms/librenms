@@ -319,14 +319,14 @@ class Cisco extends OS implements OSDiscovery, SlaDiscovery, ProcessorDiscovery,
 
         foreach ($sla_data as $index => $sla_config) {
             $sla_tag = $this->getSlaTag($sla_config);
-            if (empty($sla_config['rttMonCtrlAdminRttType']) || empty($sla_tag)) {
+            if (empty($sla_config['rttMonCtrlAdminRttType'])) {
                 continue; // skip garbage entries
             }
 
             $slas->push(new Sla([
                 'sla_nr' => $index,
                 'owner' => $sla_config['rttMonCtrlAdminOwner'] ?? '',
-                'tag' => $sla_tag,
+                'tag' => $this->getSlaTag($sla_config),
                 'rtt_type' => $sla_config['rttMonCtrlAdminRttType'],
                 'rtt' => $sla_config['rttMonLatestRttOperCompletionTime'] ?? null,
                 'status' => ($sla_config['rttMonCtrlAdminStatus'] == 'active') ? 1 : 0,
@@ -337,7 +337,7 @@ class Cisco extends OS implements OSDiscovery, SlaDiscovery, ProcessorDiscovery,
         return $slas;
     }
 
-    private function getSlaTag($data)
+    private function getSlaTag($data): string
     {
         if (! empty($data['rttMonCtrlAdminTag'])) {
             return $data['rttMonCtrlAdminTag'];
@@ -345,11 +345,11 @@ class Cisco extends OS implements OSDiscovery, SlaDiscovery, ProcessorDiscovery,
 
         switch ($data['rttMonCtrlAdminRttType']) {
             case 'http':
-                return $data['rttMonEchoAdminURL'];
+                return $data['rttMonEchoAdminURL'] ?? '';
             case 'dns':
-                return $data['rttMonEchoAdminTargetAddressString'];
+                return $data['rttMonEchoAdminTargetAddressString'] ?? '';
             case 'echo':
-                return IP::fromHexString($data['rttMonEchoAdminTargetAddress'], true);
+                return IP::fromHexString($data['rttMonEchoAdminTargetAddress'], true) ?? '';
             case 'jitter':
                 $tag = IP::fromHexString($data['rttMonEchoAdminTargetAddress'], true) . ':' . $data['rttMonEchoAdminTargetPort'];
                 if (isset($data['rttMonEchoAdminCodecType']) && $data['rttMonEchoAdminCodecType'] != 'notApplicable') {
