@@ -3,10 +3,10 @@
         "discovery": {
             "devices": [
                 {
-                    "sysName": "vs578 optical switch mgs15",
+                    "sysName": "vs578 optical switch",
                     "sysObjectID": ".1.3.6.1.4.1.34652",
                     "sysDescr": "Model VS5792 CATV Optical Receiver",
-                    "sysContact": "??????? ???????",
+                    "sysContact": "private",
                     "version": "rev2125",
                     "hardware": "VS5782",
                     "features": null,
@@ -14,7 +14,7 @@
                     "type": "network",
                     "serial": "257800162401710412",
                     "icon": "volius.png",
-                    "location": "Ñîñíîâîáîðñê, Ëå"
+                    "location": "private"
                 }
             ]
         },
