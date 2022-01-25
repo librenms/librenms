@@ -1,0 +1,194 @@
+{
+    "os": {
+        "discovery": {
+            "devices": [
+                {
+                    "sysName": "vs578 optical switch mgs15",
+                    "sysObjectID": ".1.3.6.1.4.1.34652",
+                    "sysDescr": "Model VS5792 CATV Optical Receiver",
+                    "sysContact": "??????? ???????",
+                    "version": "rev2125",
+                    "hardware": "VS5782",
+                    "features": null,
+                    "os": "volius",
+                    "type": "network",
+                    "serial": "257800162401710412",
+                    "icon": "volius.png",
+                    "location": "Ñîñíîâîáîðñê, Ëå"
+                }
+            ]
+        },
+        "poller": "matches discovery"
+    },
+    "sensors": {
+        "discovery": {
+            "sensors": [
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "count",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.34652.4.3.0",
+                    "sensor_index": "0",
+                    "sensor_type": "volius",
+                    "sensor_descr": "Current selected opt input",
+                    "group": null,
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 1,
+                    "sensor_limit": null,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": null,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "state_name": null
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "dbm",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.34652.4.1.1.2.1",
+                    "sensor_index": "1",
+                    "sensor_type": "volius",
+                    "sensor_descr": "Optical power input 1",
+                    "group": null,
+                    "sensor_divisor": 10,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 1.1,
+                    "sensor_limit": 10,
+                    "sensor_limit_warn": 8,
+                    "sensor_limit_low": -10,
+                    "sensor_limit_low_warn": -5,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "state_name": null
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "dbm",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.34652.4.1.1.2.2",
+                    "sensor_index": "2",
+                    "sensor_type": "volius",
+                    "sensor_descr": "Optical power input 2",
+                    "group": null,
+                    "sensor_divisor": 10,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 5.9,
+                    "sensor_limit": 10,
+                    "sensor_limit_warn": 8,
+                    "sensor_limit_low": -10,
+                    "sensor_limit_low_warn": -5,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "state_name": null
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "state",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.34652.4.2.0",
+                    "sensor_index": "0",
+                    "sensor_type": "vlsSwitchMode",
+                    "sensor_descr": "SwitchMode",
+                    "group": null,
+                    "sensor_divisor": 1,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 3,
+                    "sensor_limit": null,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": null,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "state_name": "vlsSwitchMode"
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "voltage",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.34652.2.10.7.1.3.1",
+                    "sensor_index": "1",
+                    "sensor_type": "volius",
+                    "sensor_descr": "Voltage Sensor 1",
+                    "group": null,
+                    "sensor_divisor": 1000,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 3.334,
+                    "sensor_limit": 3.8341,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": 2.8339,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "state_name": null
+                }
+            ],
+            "state_indexes": [
+                {
+                    "state_name": "vlsSwitchMode",
+                    "state_descr": "vlsForcePathA",
+                    "state_draw_graph": 0,
+                    "state_value": 1,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "vlsSwitchMode",
+                    "state_descr": "vlsForcePathB",
+                    "state_draw_graph": 0,
+                    "state_value": 2,
+                    "state_generic_value": 1
+                },
+                {
+                    "state_name": "vlsSwitchMode",
+                    "state_descr": "vlsPreferPathA",
+                    "state_draw_graph": 0,
+                    "state_value": 3,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "vlsSwitchMode",
+                    "state_descr": "vlsPreferPathB",
+                    "state_draw_graph": 0,
+                    "state_value": 4,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "vlsSwitchMode",
+                    "state_descr": "vlsAutoLatching",
+                    "state_draw_graph": 0,
+                    "state_value": 5,
+                    "state_generic_value": 0
+                },
+                {
+                    "state_name": "vlsSwitchMode",
+                    "state_descr": "vlsScript",
+                    "state_draw_graph": 0,
+                    "state_value": 6,
+                    "state_generic_value": 0
+                }
+            ]
+        },
+        "poller": "matches discovery"
+    }
+}
