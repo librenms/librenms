@@ -28,7 +28,7 @@ class LocationController extends Controller
             'id' => '{{id}}',
         ];
 
-        $data['available_device_types'] = $this->available_device_types();
+        $data['device_types'] = $this->device_types();
 
         foreach (Html::graphRow($graph_array) as $graph) {
             $data['graph_template'] .= "<div class='col-md-3'>";
@@ -39,9 +39,19 @@ class LocationController extends Controller
         return view('locations', $data);
     }
 
-    private function available_device_types(): object
+    private function device_types(): array
     {
-        return Device::select('type')->distinct('type')->get();
+        $device_types = [];
+        foreach (\LibreNMS\Config::get('device_types') as $device_type) {
+            $device_type['count'] = Device::where('type', $device_type['type'])->count();
+            $device_types[] = $device_type;
+        }
+
+        usort($device_types, function ($item1, $item2) {
+            return $item1['type'] <=> $item2['type'];
+        });
+
+        return $device_types;
     }
 
     /**
