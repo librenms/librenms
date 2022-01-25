@@ -36,18 +36,20 @@ class AirosAf60 extends OS implements
 
     public function discoverWirelessDistance()
     {
+        $sensors = [];
+
         $oids = snmpwalk_cache_oid($this->getDeviceArray(), 'af60StaRemoteDistance', [], 'UI-AF60-MIB', 'ubnt', '-OteQUsb');
 
         foreach ($oids as $index => $entry) {
-            return [
-                new WirelessSensor('distance', $this->getDeviceId(), '.1.3.6.1.4.1.41112.1.11.1.3.1.15.' . $index, 'airos-af60', 1, 'Distance', $entry['af60StaRemoteDistance'], 1, 1000), //UI-AF60-MIB::af60StaRemoteDistance
-            ];
+            $sensors[] = new WirelessSensor('distance', $this->getDeviceId(), '.1.3.6.1.4.1.41112.1.11.1.3.1.15.' . $index, 'airos-af60', 1, 'Distance', $entry['af60StaRemoteDistance'], 1, 1000); //UI-AF60-MIB::af60StaRemoteDistance
         }
+
+        return $sensors;
     }
 
     public function discoverWirelessRate()
     {
-	$sensors = [];
+        $sensors = [];
 
         $oids = snmpwalk_cache_oid($this->getDeviceArray(), 'af60StaTxCapacity', [], 'UI-AF60-MIB', 'ubnt', '-OteQUsb');
         $oids = snmpwalk_cache_oid($this->getDeviceArray(), 'af60StaRxCapacity', $oids, 'UI-AF60-MIB', 'ubnt', '-OteQUsb');
@@ -57,7 +59,7 @@ class AirosAf60 extends OS implements
             $sensors[] = new WirelessSensor('rate', $this->getDeviceId(), '.1.3.6.1.4.1.41112.1.11.1.3.1.8.' . $index, 'airos-af60-RX', 1, 'Rx Capacity', $entry['af60StaRxCapacity'], 1000); //UI-AF60-MIB::af60StaRxCapacity
         }
 
-	return $sensors;
+        return $sensors;
     }
 
     public function discoverWirelessRssi()
