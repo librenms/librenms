@@ -42,3 +42,36 @@ unset(
     $txmcs_state_name,
     $rxmcs_state_name
 );
+
+$oids = snmpwalk_cache_oid($device, 'af60StaActiveLink', [], 'UI-AF60-MIB', 'ubnt', '-OteQUsb'); //UBNT-AFLTU-MIB::afLTUStaTxRate
+// This returns either "main" or "backup" as a string
+
+foreach ($oids as $index => $entry) {
+    // convert string to int main === 1 and backup === 2
+    $entry['af60StaActiveLink'] = $entry['af60StaActiveLink'] === 'main' ? 1 : 2;
+    //Create State Index
+    $activeLink_state_name = 'af60StaActiveLink';
+
+    $rate_states = [
+        ['value' => 1, 'generic' => 0, 'graph' => 1, 'descr' => 'Main'],
+        ['value' => 2, 'generic' => 1, 'graph' => 1, 'descr' => 'Backup'],
+    ];
+
+    create_state_index($activeLink_state_name, $rate_states);
+
+    //Discover Sensors
+    discover_sensor($valid['sensor'], 'state', $device, '.1.3.6.1.4.1.41112.1.11.1.3.1.2.' . $index, 1, $activeLink_state_name, 'Active link', '1', '1', null, null, null, null, $entry['af60StaActiveLink']);
+
+    //Create Sensor To State Index
+    create_sensor_to_state_index($device, $activeLink_state_name, 1);
+
+    break;
+}
+
+unset(
+    $oids,
+    $index,
+    $entry,
+    $rate_states,
+    $activeLink_state_name
+);
