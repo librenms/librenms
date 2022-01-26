@@ -180,7 +180,7 @@ function compare_var($a, $b, $comparison = '=')
             return ! Str::endsWith($a, $b);
         case 'regex':
             return (bool) preg_match($b, $a);
-        case 'not regex':
+        case 'not_regex':
             return ! ((bool) preg_match($b, $a));
         case 'in_array':
             return in_array($a, $b);

@@ -325,12 +325,13 @@ class YamlDiscovery
      * Check to see if we should skip this discovery item
      *
      * @param  mixed  $value
+     * @param  int|string  $index
      * @param  array  $yaml_item_data  The data key from this item
      * @param  array  $group_options  The options key from this group of items
      * @param  array  $pre_cache  The pre-cache data array
      * @return bool
      */
-    public static function canSkipItem($value, $index, $yaml_item_data, $group_options, $pre_cache = [])
+    public static function canSkipItem($value, $index, array $yaml_item_data, array $group_options, array $pre_cache = []): bool
     {
         $skip_values = array_replace((array) ($group_options['skip_values'] ?? []), (array) ($yaml_item_data['skip_values'] ?? []));
 
@@ -338,11 +339,19 @@ class YamlDiscovery
             if (is_array($skip_value) && $pre_cache) {
                 // Dynamic skipping of data
                 $op = $skip_value['op'] ?? '!=';
-                $tmp_value = static::getValueFromData($skip_value['oid'], $index, $yaml_item_data, $pre_cache);
-                if (Str::contains($skip_value['oid'], '.')) {
-                    [$skip_value['oid'], $targeted_index] = explode('.', $skip_value['oid'], 2);
-                    $tmp_value = static::getValueFromData($skip_value['oid'], $targeted_index, $yaml_item_data, $pre_cache);
+
+                if (isset($skip_value['device'])) {
+                    // field from device model
+                    $tmp_value = \DeviceCache::getPrimary()[$skip_value['device']] ?? null;
+                } else {
+                    // oid previously fetched from the device
+                    $tmp_value = static::getValueFromData($skip_value['oid'], $index, $yaml_item_data, $pre_cache);
+                    if (Str::contains($skip_value['oid'], '.')) {
+                        [$skip_value['oid'], $targeted_index] = explode('.', $skip_value['oid'], 2);
+                        $tmp_value = static::getValueFromData($skip_value['oid'], $targeted_index, $yaml_item_data, $pre_cache);
+                    }
                 }
+
                 if (compare_var($tmp_value, $skip_value['value'], $op)) {
                     return true;
                 }

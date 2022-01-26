@@ -2591,11 +2591,6 @@ parameters:
 			path: LibreNMS/Device/WirelessSensor.php
 
 		-
-			message: "#^Method LibreNMS\\\\Device\\\\YamlDiscovery\\:\\:canSkipItem\\(\\) has parameter \\$index with no type specified\\.$#"
-			count: 1
-			path: LibreNMS/Device/YamlDiscovery.php
-
-		-
 			message: "#^Method LibreNMS\\\\Device\\\\YamlDiscovery\\:\\:oidIsNumeric\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: LibreNMS/Device/YamlDiscovery.php
