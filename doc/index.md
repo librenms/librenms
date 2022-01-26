@@ -1,4 +1,3 @@
-path: blob/master/doc/
 <div class="home-container">
     <div class="home-box">
         <div class="home-header">
@@ -61,7 +60,7 @@ path: blob/master/doc/
     <div class="home-box">
         <div class="home-header">
           <a href="/Developing/">
-            <i class="fa fa-code-fork fa-1x"></i>
+            <i class="fa fa-code-branch fa-1x"></i>
             <span> Developing</span>
           </a>
         </div>

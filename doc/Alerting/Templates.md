@@ -4,7 +4,7 @@ path: blob/master/doc/
 # Templates
 
 > This page is for installs running version 1.42 or later. You can
-> find the older docs [here](Old_Templates.md)
+> find the older docs [here](https://github.com/librenms/librenms/blob/773411359489e0ffcc3ba763f1f138403343591a/doc/Alerting/Old_Templates.md)
 
 Templates can be assigned to a single or a group of rules and can
 contain any kind of text. There is also a default template which is
@@ -20,7 +20,7 @@ button. You might hold down the CTRL key to select multiple rules at once.
 
 The templating engine in use is Laravel Blade. We will cover some of
 the basics here, however the official Laravel docs will have more
-information [here](https://laravel.com/docs/5.7/blade)
+information [here](https://laravel.com/docs/blade)
 
 ## Syntax
 
@@ -140,7 +140,7 @@ In your alert template just use
 @endsection
 ```
 
-More info: [https://laravel.com/docs/5.7/blade#extending-a-layout](https://laravel.com/docs/5.7/blade#extending-a-layout)
+More info: [https://laravel.com/docs/blade#extending-a-layout](https://laravel.com/docs/blade#extending-a-layout)
 
 ## Examples
 

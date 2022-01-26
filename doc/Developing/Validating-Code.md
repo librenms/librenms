@@ -4,7 +4,7 @@ path: blob/master/doc/
 #### Validating Code
 
 As part of the pull request process with GitHub we run some automated
-build tests to ensure that  the code is error free, standards [compliant](../Developing/Code-Guidelines.md)
+build tests to ensure that  the code is error free, standards compliant
 and our test suite builds successfully.
 
 Rather than submit a pull request and wait for the results, you can

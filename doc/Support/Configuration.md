@@ -637,7 +637,7 @@ lnms config:set enable_vrfs true # Enable VRFs
 
 ## Port extensions
 
-Please refer to [Port-Description-Parser](../Extensions/Port-Description-Parser.md)
+Please refer to [Port-Description-Parser](../Extensions/Interface-Description-Parsing.md)
 
 ```bash
 lnms config:set enable_ports_etherlike false
