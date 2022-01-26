@@ -493,6 +493,11 @@ modules:
                     descr: '{{ $entPhysicalName }}'
                     index: '{{ $index }}'
                     divisor: 1000
+                    skip_values:
+                        -
+                            oid: hwBoardCurrentPower
+                            op: '='
+                            value: '-1'
         percent:
             data:
                 -
