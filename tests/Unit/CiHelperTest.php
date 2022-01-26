@@ -295,6 +295,7 @@ class CiHelperTest extends TestCase
             'fail-fast' => false,
             'full' => false,
             'quiet' => false,
+            'os-modules-only' => false,
         ];
     }
 }
