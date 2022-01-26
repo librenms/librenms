@@ -48,7 +48,7 @@ class LocationController extends Controller
         // only top n columns visible by default, or show all present device_types
         $top = $counts->take(\LibreNMS\Config::get('top_device_types') ?: count(\LibreNMS\Config::get('device_types')));
 
-        foreach(\LibreNMS\Config::get('device_types') as $device_type) {
+        foreach (\LibreNMS\Config::get('device_types') as $device_type) {
             $device_types[] = [
                 'type' => $device_type['type'],
                 'count' => $counts->get($device_type['type'], 0),
