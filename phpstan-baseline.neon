@@ -4291,11 +4291,6 @@ parameters:
 			path: LibreNMS/OS/Shared/Cisco.php
 
 		-
-			message: "#^Method LibreNMS\\\\OS\\\\Shared\\\\Cisco\\:\\:getSlaTag\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: LibreNMS/OS/Shared/Cisco.php
-
-		-
 			message: "#^Method LibreNMS\\\\OS\\\\Shared\\\\Cisco\\:\\:getSlaTag\\(\\) has parameter \\$data with no type specified\\.$#"
 			count: 1
 			path: LibreNMS/OS/Shared/Cisco.php

@@ -336,7 +336,7 @@ class Cisco extends OS implements OSDiscovery, SlaDiscovery, ProcessorDiscovery,
         return $slas;
     }
 
-    private function getSlaTag($data)
+    private function getSlaTag($data): string
     {
         if (! empty($data['rttMonCtrlAdminTag'])) {
             return $data['rttMonCtrlAdminTag'];
@@ -344,11 +344,11 @@ class Cisco extends OS implements OSDiscovery, SlaDiscovery, ProcessorDiscovery,
 
         switch ($data['rttMonCtrlAdminRttType']) {
             case 'http':
-                return $data['rttMonEchoAdminURL'];
+                return $data['rttMonEchoAdminURL'] ?? '';
             case 'dns':
-                return $data['rttMonEchoAdminTargetAddressString'];
+                return $data['rttMonEchoAdminTargetAddressString'] ?? '';
             case 'echo':
-                return IP::fromHexString($data['rttMonEchoAdminTargetAddress'], true);
+                return IP::fromHexString($data['rttMonEchoAdminTargetAddress'], true) ?? '';
             case 'jitter':
                 $tag = IP::fromHexString($data['rttMonEchoAdminTargetAddress'], true) . ':' . $data['rttMonEchoAdminTargetPort'];
                 if (isset($data['rttMonEchoAdminCodecType']) && $data['rttMonEchoAdminCodecType'] != 'notApplicable') {
