@@ -48,6 +48,7 @@ class DocsTest extends TestCase
         'General/Changelogs/2017.md',
         'General/Changelogs/2018.md',
         'General/Changelogs/2019.md',
+        'General/Changelogs/2020.md',
         'General/Contributing.md',
         'General/Credits.md',
         'Installation/Installation-(Debian-Ubuntu).md',
