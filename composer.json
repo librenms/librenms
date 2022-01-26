@@ -52,8 +52,7 @@
         "rmccue/requests": "^1.7",
         "symfony/yaml": "^4.0",
         "tecnickcom/tcpdf": "^6.4",
-        "tightenco/ziggy": "^0.9",
-        "wpb/string-blade-compiler": "^6.0"
+        "tightenco/ziggy": "^0.9"
     },
     "require-dev": {
         "barryvdh/laravel-debugbar": "^3.5",
