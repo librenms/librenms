@@ -148,6 +148,7 @@ the variable name.  Example `{{ $ifName:2 }}`
 > `skip_values` can also compare items within the OID table against
 > values. The index of the sensor is used to retrieve the value
 > from the OID, unless a target index is appended to the OID.
+> Additionally, you may check fields from the device.
 > Comparisons behave on a logical OR basis when chained, so only
 > one of them needs to be matched for that particular sensor
 > to be skipped during discovery. An example of this is below:
@@ -162,6 +163,10 @@ the variable name.  Example `{{ $ifName:2 }}`
                       oid: sensConfig.0
                       op: '!='
                       value: 1
+                    -
+                      device: hardware
+                      op: 'contains'
+                      value: 'rev2'
 ```
 
 `op` can be any of the following operators :
