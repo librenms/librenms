@@ -918,6 +918,14 @@
             ],
             "type": "array"
         },
+        "top_device_types": {
+            "default": 5,
+            "units": "",
+            "group": "webui",
+            "section": "location",
+            "order": 0,
+            "type": "integer"
+        },
         "device_types": {
             "default": [
                 {

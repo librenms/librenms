@@ -80,6 +80,7 @@ return [
             'search' => ['name' => 'Search Settings'],
             'style' => ['name' => 'Style'],
             'device' => ['name' => 'Device Settings'],
+            'location' => ['name' => 'Location Settings'],
             'worldmap' => ['name' => 'World Map Settings'],
         ],
     ],
@@ -444,6 +445,10 @@ return [
         'device_perf_purge' => [
             'description' => 'Device performance entries older than',
             'help' => 'Cleanup done by daily.sh',
+        ],
+        'top_device_types' => [
+            'description' => 'Show this Top Device Groups by default',
+            'help' => 'Show only Top n Device Groups by default (0 means to show all used Device Groups)',
         ],
         'discovery_modules' => [
             'arp-table' => [

@@ -6,6 +6,7 @@ use App\Models\Device;
 use App\Models\Location;
 use Illuminate\Http\Request;
 use LibreNMS\Config;
+use LibreNMS\DB\Eloquent;
 use LibreNMS\Util\Html;
 
 class LocationController extends Controller
@@ -42,9 +43,17 @@ class LocationController extends Controller
     private function device_types(): array
     {
         $device_types = [];
-        foreach (\LibreNMS\Config::get('device_types') as $device_type) {
-            $device_type['count'] = Device::where('type', $device_type['type'])->count();
-            $device_types[] = $device_type;
+
+        $counts = Device::groupBy('type')->select('type', Eloquent::DB()->raw('COUNT(*) as total'))->orderByDesc('total')->pluck('total', 'type');
+        // only top n columns visible by default, or show all present device_types
+        $top = $counts->take(\LibreNMS\Config::get('top_device_types') ?: count(\LibreNMS\Config::get('device_types')));
+
+        foreach(\LibreNMS\Config::get('device_types') as $device_type) {
+            $device_types[] = [
+                'type' => $device_type['type'],
+                'count' => $counts->get($device_type['type'], 0),
+                'visible' => $top->has($device_type['type']),
+            ];
         }
 
         usort($device_types, function ($item1, $item2) {

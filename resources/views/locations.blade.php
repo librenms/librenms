@@ -25,7 +25,7 @@
                     <th data-column-id="coordinates" data-formatter="coordinates" data-sortable="false">{{ __('Coordinates') }}</th>
                     <th data-column-id="devices" data-formatter="primaryLabel">{{ __('Devices') }}</th>
                     @foreach ($device_types as $device_type)
-                    @if( $device_type['count'])
+                    @if( $device_type['visible'])
                     <th data-column-id="{{ $device_type['type'] }}" data-formatter="defaultLabel" data-visible="true">{{ ucfirst($device_type['type']) }}</th>
                     @else
                     <th data-column-id="{{ $device_type['type'] }}" data-formatter="defaultLabel" data-visible="false">{{ ucfirst($device_type['type']) }}</th>
