@@ -66,7 +66,7 @@ class Stp implements Module
         if ($os instanceof StpInstancePolling) {
             echo 'Instances: ';
             $instances = $device->stpInstances;
-            $instances = $os->pollStpIntances($instances);
+            $instances = $os->pollStpInstances($instances);
             ModuleModelObserver::observe(\App\Models\Stp::class);
             $this->syncModels($device, 'stpInstances', $instances);
         }
