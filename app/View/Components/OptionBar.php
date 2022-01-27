@@ -8,6 +8,7 @@ class OptionBar extends Component
 {
     /**
      * Name of the option bar
+     *
      * @var string
      */
     public $name;
@@ -16,11 +17,13 @@ class OptionBar extends Component
      * [
      *   'name' => ['text' => 'Display Text', 'link' => 'https://...'],
      * ]
+     *
      * @var array
      */
     public $options;
     /**
      * Selected option
+     *
      * @var mixed
      */
     public $selected;

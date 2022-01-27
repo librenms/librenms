@@ -76,7 +76,7 @@ class StpController implements DeviceTab
             'stpPorts' => $device->stpPorts()->where('vlan', $active_vlan)->when($active_vlan == 1, function ($query) {
                 return $query->orWhereNull('vlan');
             })->exists(),
-            'bootgridUrl' => url('/ajax/table/')
+            'bootgridUrl' => url('/ajax/table/'),
         ];
     }
 }

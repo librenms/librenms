@@ -1,4 +1,5 @@
 <?php
+
 return [
     'stp_info' => 'STP Instance Information',
     'stp_ports' => 'STP Ports',
@@ -20,4 +21,3 @@ return [
     'bridge_hello_time' => 'Bridge hello time (s)',
     'bridge_forward_delay' => 'Bridge forward delay (s)',
 ];
-

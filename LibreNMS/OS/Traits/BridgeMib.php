@@ -33,7 +33,6 @@ use SnmpQuery;
 
 trait BridgeMib
 {
-
     public function discoverStpInstances(): Collection
     {
         $protocol = SnmpQuery::get('BRIDGE-MIB::dot1dStpProtocolSpecification.0')->value();
@@ -95,7 +94,6 @@ trait BridgeMib
                 'bridgeHelloTime' => ($stp['BRIDGE-MIB::dot1dStpBridgeHelloTime.0'] ?? 0) * $timeFactor,
                 'bridgeForwardDelay' => ($stp['BRIDGE-MIB::dot1dStpBridgeForwardDelay.0'] ?? 0) * $timeFactor,
             ]));
-
         }
 
         return $instances;
@@ -125,16 +123,19 @@ trait BridgeMib
                 })->filter(function (PortStp $port) {
                     if ($port->enable === 'disabled') {
                         d_echo("$port->port_index ($port->vlan) disabled skipping\n");
+
                         return false;
                     }
 
                     if ($port->state === 'disabled') {
                         d_echo("$port->port_index ($port->vlan) state disabled skipping\n");
+
                         return false;
                     }
 
                     if (! $port->port_id) {
                         d_echo("$port->port_index ($port->vlan) port not found skipping\n");
+
                         return false;
                     }
 
