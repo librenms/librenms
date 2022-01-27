@@ -63,6 +63,58 @@ class ComposerHelper
     {
     }
 
+    public static function addPlugin(string $package, string $version = null): int
+    {
+        $package = escapeshellarg($package . ($version ? ":$version" : null));
+
+        $cmds = [
+            'COMPOSER=composer.plugins.json ' . PHP_BINARY . " ./scripts/composer_wrapper.php require --no-update $package",
+        ];
+
+        return self::exec($cmds);
+    }
+
+    public static function addPackage(string $package, string $version = null): int
+    {
+        $package = escapeshellarg($package . ($version ? ":$version" : null));
+
+        $cmds = [
+            'FORCE=1 ' . PHP_BINARY . " ./scripts/composer_wrapper.php require --update-no-dev $package",
+        ];
+
+        return self::exec($cmds);
+    }
+
+    public static function removePlugin(string $package): int
+    {
+        $package = escapeshellarg($package);
+
+        $cmds = [
+            'COMPOSER=composer.plugins.json ' . PHP_BINARY . " ./scripts/composer_wrapper.php remove --no-update $package",
+        ];
+
+        return self::exec($cmds);
+    }
+
+    public static function removePackage(string $package): int
+    {
+        $package = escapeshellarg($package);
+
+        $cmds = [
+            'FORCE=1 ' . PHP_BINARY . " ./scripts/composer_wrapper.php remove --update-no-dev $package",
+        ];
+
+        return self::exec($cmds);
+    }
+
+    public static function getPlugins(): array
+    {
+        $plugins = is_file('composer.plugins.json') ?
+            json_decode(file_get_contents('composer.plugins.json'), true) : [];
+
+        return $plugins['require'] ?? [];
+    }
+
     /**
      * Initially populate .env file
      */
@@ -120,9 +172,11 @@ class ComposerHelper
      *
      * @param  string|array  $cmds
      */
-    private static function exec($cmds)
+    private static function exec($cmds): int
     {
         $cmd = "set -v\n" . implode(PHP_EOL, (array) $cmds);
-        passthru($cmd);
+        passthru($cmd, $result_code);
+
+        return $result_code;
     }
 }
