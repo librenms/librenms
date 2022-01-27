@@ -3705,13 +3705,14 @@
         "discovery": {
             "stp": [
                 {
+                    "vlan": null,
                     "rootBridge": 1,
                     "bridgeAddress": "000000000000",
                     "protocolSpecification": "ieee8021d",
                     "priority": 32768,
                     "timeSinceTopologyChange": "0",
                     "topChanges": 0,
-                    "designatedRoot": "",
+                    "designatedRoot": "000000000000",
                     "rootCost": 0,
                     "rootPort": 0,
                     "maxAge": 0,

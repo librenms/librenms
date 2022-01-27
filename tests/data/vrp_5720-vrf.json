@@ -38017,6 +38017,7 @@
         "discovery": {
             "stp": [
                 {
+                    "vlan": null,
                     "rootBridge": 1,
                     "bridgeAddress": "488eef716130",
                     "protocolSpecification": "unknown",
