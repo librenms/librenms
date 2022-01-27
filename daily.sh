@@ -286,9 +286,6 @@ main () {
         check_dependencies
         php_ver_ret=$?
 
-        # make sure the vendor directory is clean
-        git checkout vendor/ --quiet > /dev/null 2>&1
-
         update_res=0
         if [[ "$up" == "1" ]] || [[ "$php_ver_ret" == "1" ]]; then
             # Update current branch to latest
