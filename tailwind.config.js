@@ -1,6 +1,6 @@
 module.exports = {
   prefix: 'tw-',
-  purge: [
+  content: [
       './storage/framework/views/*.php',
       './resources/**/*.blade.php',
       './resources/**/*.js',
@@ -32,9 +32,6 @@ module.exports = {
       'lg': '992px',
       'xl': '1200px',
     }
-  },
-  variants: {
-    extend: {},
   },
   plugins: [],
 }
