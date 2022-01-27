@@ -346,12 +346,6 @@ main () {
                 # re-check dependencies after pull with the new code
                 check_dependencies
 
-                # Check for missing vendor dir
-                if [ ! -f vendor/autoload.php ]; then
-                    git checkout 609676a9f8d72da081c61f82967e1d16defc0c4e -- vendor/
-                    git reset HEAD vendor/  # don't add vendor directory to the index
-                fi
-
                 status_run 'Updating Composer packages' "${COMPOSER} install --no-dev" 'update'
 
                 # Check if we need to revert (Must be in post pull so we can update it)
