@@ -34,12 +34,12 @@ class ApcPduOverloadTest extends SnmpTrapTestCase
         $trapText = "$device->hostname
 UDP: [$device->ip]:57602->[192.168.5.5]:162
 DISMAN-EVENT-MIB::sysUpTimeInstance:318:0:09:38.28
-PowerNet-MIB::rPDUIdentSerialNumber.0:5A1036E02224
-PowerNet-MIB::rPDUIdentName.0:Grand POP PDU R15 A1
+PowerNet-MIB::rPDUIdentSerialNumber.0:\"5A1036E02224\"
+PowerNet-MIB::rPDUIdentName.0:\"Grand POP PDU R15 A1\"
 PowerNet-MIB::rPDULoadStatusPhaseNumber.0:1
-PowerNet-MIB::mtrapargsString.0:Metered Rack PDU: Near overload.
+PowerNet-MIB::mtrapargsString.0:\"Metered Rack PDU: Near overload.\"
 SNMP-COMMUNITY-MIB::snmpTrapAddress.0:$device->ip
-SNMP-COMMUNITY-MIB::snmpTrapCommunity.0:Kr5nMp69
+SNMP-COMMUNITY-MIB::snmpTrapCommunity.0:\"Kr5nMp69\"
 SNMPv2-MIB::snmpTrapEnterprise.0:PowerNet-MIB::apc";
 
         $message = 'Grand POP PDU R15 A1 phase 1 Metered Rack PDU: Near overload.';
@@ -55,12 +55,12 @@ SNMPv2-MIB::snmpTrapEnterprise.0:PowerNet-MIB::apc";
         $trapText = "$device->hostname
 UDP: [$device->ip]:57602->[192.168.5.5]:162
 DISMAN-EVENT-MIB::sysUpTimeInstance:318:0:09:38.28
-PowerNet-MIB::rPDUIdentSerialNumber.0:5A1036E02224
-PowerNet-MIB::rPDUIdentName.0:Grand POP PDU R15 A1
+PowerNet-MIB::rPDUIdentSerialNumber.0:\"5A1036E02224\"
+PowerNet-MIB::rPDUIdentName.0:\"Grand POP PDU R15 A1\"
 PowerNet-MIB::rPDULoadStatusPhaseNumber.0:1
-PowerNet-MIB::mtrapargsString.0:Metered Rack PDU: Near overload cleared.
+PowerNet-MIB::mtrapargsString.0:\"Metered Rack PDU: Near overload cleared.\"
 SNMP-COMMUNITY-MIB::snmpTrapAddress.0:$device->ip
-SNMP-COMMUNITY-MIB::snmpTrapCommunity.0:Kr5nMp69
+SNMP-COMMUNITY-MIB::snmpTrapCommunity.0:\"Kr5nMp69\"
 SNMPv2-MIB::snmpTrapEnterprise.0:PowerNet-MIB::apc";
 
         $message = 'Grand POP PDU R15 A1 phase 1 Metered Rack PDU: Near overload cleared.';
@@ -76,12 +76,12 @@ SNMPv2-MIB::snmpTrapEnterprise.0:PowerNet-MIB::apc";
         $trapText = "$device->hostname
 UDP: [$device->ip]:57602->[192.168.5.5]:162
 DISMAN-EVENT-MIB::sysUpTimeInstance:318:0:09:38.28
-PowerNet-MIB::rPDUIdentSerialNumber.0:5A1036E02224
-PowerNet-MIB::rPDUIdentName.0:Grand POP PDU R15 A1
+PowerNet-MIB::rPDUIdentSerialNumber.0:\"5A1036E02224\"
+PowerNet-MIB::rPDUIdentName.0:\"Grand POP PDU R15 A1\"
 PowerNet-MIB::rPDULoadStatusPhaseNumber.0:1
-PowerNet-MIB::mtrapargsString.0:APC Rack PDU: Overload condition.
+PowerNet-MIB::mtrapargsString.0:\"APC Rack PDU: Overload condition.\"
 SNMP-COMMUNITY-MIB::snmpTrapAddress.0:$device->ip
-SNMP-COMMUNITY-MIB::snmpTrapCommunity.0:Kr5nMp69
+SNMP-COMMUNITY-MIB::snmpTrapCommunity.0:\"Kr5nMp69\"
 SNMPv2-MIB::snmpTrapEnterprise.0:PowerNet-MIB::apc";
 
         $message = 'Grand POP PDU R15 A1 phase 1 APC Rack PDU: Overload condition.';
@@ -97,12 +97,12 @@ SNMPv2-MIB::snmpTrapEnterprise.0:PowerNet-MIB::apc";
         $trapText = "$device->hostname
 UDP: [$device->ip]:57602->[192.168.5.5]:162
 DISMAN-EVENT-MIB::sysUpTimeInstance:318:0:09:38.28
-PowerNet-MIB::rPDUIdentSerialNumber.0:5A1036E02224
-PowerNet-MIB::rPDUIdentName.0:Grand POP PDU R15 A1
+PowerNet-MIB::rPDUIdentSerialNumber.0:\"5A1036E02224\"
+PowerNet-MIB::rPDUIdentName.0:\"Grand POP PDU R15 A1\"
 PowerNet-MIB::rPDULoadStatusPhaseNumber.0:1
-PowerNet-MIB::mtrapargsString.0:APC Rack PDU: Overload condition has cleared.
+PowerNet-MIB::mtrapargsString.0:\"APC Rack PDU: Overload condition has cleared.\"
 SNMP-COMMUNITY-MIB::snmpTrapAddress.0:$device->ip
-SNMP-COMMUNITY-MIB::snmpTrapCommunity.0:Kr5nMp69
+SNMP-COMMUNITY-MIB::snmpTrapCommunity.0:\"Kr5nMp69\"
 SNMPv2-MIB::snmpTrapEnterprise.0:PowerNet-MIB::apc";
 
         $message = 'Grand POP PDU R15 A1 phase 1 APC Rack PDU: Overload condition has cleared.';
