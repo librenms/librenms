@@ -354,8 +354,6 @@ function delete_device($id)
 
     $ret .= "Removed device $host\n";
     log_event("Device $host has been removed", 0, 'system', 3);
-    oxidized_reload_nodes();
-
     return $ret;
 }
 
@@ -600,8 +598,6 @@ function createHost(
         }
     }
     if ($device->save()) {
-        oxidized_reload_nodes();
-
         return $device->device_id;
     }
 
