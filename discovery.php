@@ -122,13 +122,6 @@ $end = microtime(true);
 $run = ($end - $start);
 $proctime = substr($run, 0, 5);
 
-if ($discovered_devices) {
-    if ($doing === 'new') {
-        // We have added a new device by this point so we might want to do some other work
-        oxidized_reload_nodes();
-    }
-}
-
 if (isset($new_discovery_lock)) {
     $new_discovery_lock->release();
 }

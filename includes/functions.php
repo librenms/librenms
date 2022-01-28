@@ -19,7 +19,6 @@ use LibreNMS\Exceptions\HostUnreachablePingException;
 use LibreNMS\Exceptions\InvalidPortAssocModeException;
 use LibreNMS\Exceptions\SnmpVersionUnsupportedException;
 use LibreNMS\Modules\Core;
-use LibreNMS\Util\Debug;
 use LibreNMS\Util\IPv4;
 use LibreNMS\Util\IPv6;
 use LibreNMS\Util\Proxy;
@@ -295,68 +294,16 @@ function device_discovery_trigger($id)
 
 function delete_device($id)
 {
-    if (App::runningInConsole() === false) {
-        ignore_user_abort(true);
-        set_time_limit(0);
+    $device = DeviceCache::get($id);
+    if (! $device->exists) {
+        return 'No such device.';
     }
 
-    $ret = '';
-
-    $host = dbFetchCell('SELECT hostname FROM devices WHERE device_id = ?', [$id]);
-    if (empty($host)) {
-        return 'No such host.';
+    if ($device->delete()) {
+        return "Removed device $device->hostname\n";
     }
 
-    // Remove IPv4/IPv6 addresses before removing ports as they depend on port_id
-    dbQuery('DELETE `ipv4_addresses` FROM `ipv4_addresses` INNER JOIN `ports` ON `ports`.`port_id`=`ipv4_addresses`.`port_id` WHERE `device_id`=?', [$id]);
-    dbQuery('DELETE `ipv6_addresses` FROM `ipv6_addresses` INNER JOIN `ports` ON `ports`.`port_id`=`ipv6_addresses`.`port_id` WHERE `device_id`=?', [$id]);
-
-    //Remove IsisAdjacencies
-    \App\Models\IsisAdjacency::where('device_id', $id)->delete();
-
-    //Remove Outages
-    \App\Models\Availability::where('device_id', $id)->delete();
-    \App\Models\DeviceOutage::where('device_id', $id)->delete();
-
-    \App\Models\Port::where('device_id', $id)
-        ->with('device')
-        ->select(['port_id', 'device_id', 'ifIndex', 'ifName', 'ifAlias', 'ifDescr'])
-        ->chunk(100, function ($ports) use (&$ret) {
-            foreach ($ports as $port) {
-                $port->delete();
-                $ret .= "Removed interface $port->port_id (" . $port->getLabel() . ")\n";
-            }
-        });
-
-    // Remove sensors manually due to constraints
-    foreach (dbFetchRows('SELECT * FROM `sensors` WHERE `device_id` = ?', [$id]) as $sensor) {
-        $sensor_id = $sensor['sensor_id'];
-        dbDelete('sensors_to_state_indexes', '`sensor_id` = ?', [$sensor_id]);
-    }
-    $fields = ['device_id', 'host'];
-
-    $db_name = dbFetchCell('SELECT DATABASE()');
-    foreach ($fields as $field) {
-        foreach (dbFetch('SELECT TABLE_NAME FROM information_schema.columns WHERE table_schema = ? AND column_name = ?', [$db_name, $field]) as $table) {
-            $table = $table['TABLE_NAME'];
-            $entries = (int) dbDelete($table, "`$field` =  ?", [$id]);
-            if ($entries > 0 && Debug::isEnabled()) {
-                $ret .= "$field@$table = #$entries\n";
-            }
-        }
-    }
-
-    $ex = shell_exec("bash -c '( [ ! -d " . trim(Rrd::dirFromHost($host)) . ' ] || rm -vrf ' . trim(Rrd::dirFromHost($host)) . " 2>&1 ) && echo -n OK'");
-    $tmp = explode("\n", $ex);
-    if ($tmp[sizeof($tmp) - 1] != 'OK') {
-        $ret .= "Could not remove files:\n$ex\n";
-    }
-
-    $ret .= "Removed device $host\n";
-    log_event("Device $host has been removed", 0, 'system', 3);
-    oxidized_reload_nodes();
-
-    return $ret;
+    return "Failed to remove device $device->hostname";
 }
 
 /**
@@ -860,7 +807,7 @@ function is_port_valid($port, $device)
  * @param  array  $port
  * @param  array  $device
  */
-function port_fill_missing(&$port, $device)
+function port_fill_missing(& $port, $device)
 {
     // When devices do not provide data, populate with other data if available
     if ($port['ifDescr'] == '' || $port['ifDescr'] == null) {
@@ -1017,23 +964,6 @@ function host_exists($hostname, $sysName = null)
     }
 
     return dbFetchCell($query, $params) > 0;
-}
-
-function oxidized_reload_nodes()
-{
-    if (Config::get('oxidized.enabled') === true && Config::get('oxidized.reload_nodes') === true && Config::has('oxidized.url')) {
-        $oxidized_reload_url = Config::get('oxidized.url') . '/reload.json';
-        $ch = curl_init($oxidized_reload_url);
-
-        curl_setopt($ch, CURLOPT_TIMEOUT, 5);
-        curl_setopt($ch, CURLOPT_TIMEOUT_MS, 5000);
-        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 5);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
-        curl_setopt($ch, CURLOPT_HEADER, 1);
-        curl_exec($ch);
-        curl_close($ch);
-    }
 }
 
 /**
@@ -1260,7 +1190,7 @@ function hytera_h2f($number, $nd)
  * Cisco CIMC functions
  */
 // Create an entry in the entPhysical table if it doesnt already exist.
-function setCIMCentPhysical($location, $data, &$entphysical, &$index)
+function setCIMCentPhysical($location, $data, & $entphysical, & $index)
 {
     // Go get the location, this will create it if it doesnt exist.
     $entPhysicalIndex = getCIMCentPhysical($location, $entphysical, $index);
@@ -1284,7 +1214,7 @@ function setCIMCentPhysical($location, $data, &$entphysical, &$index)
     return [$entPhysicalId, $entPhysicalIndex];
 }
 
-function getCIMCentPhysical($location, &$entphysical, &$index)
+function getCIMCentPhysical($location, & $entphysical, & $index)
 {
     global $device;
 
@@ -1382,7 +1312,7 @@ function q_bridge_bits2indices($hex_data)
     return $indices;
 }
 
-function update_device_logo(&$device)
+function update_device_logo(& $device)
 {
     $icon = getImageName($device, false);
     if ($icon != $device['icon']) {
@@ -1670,32 +1600,6 @@ function is_disk_valid($disk, $device)
 
     return true;
 }
-
-/**
- * Queues a hostname to be refreshed by Oxidized
- * Settings: oxidized.url
- *
- * @param  string  $hostname
- * @param  string  $msg
- * @param  string  $username
- * @return bool
- */
-function oxidized_node_update($hostname, $msg, $username = 'not_provided')
-{
-    // Work around https://github.com/rack/rack/issues/337
-    $msg = str_replace('%', '', $msg);
-    $postdata = ['user' => $username, 'msg' => $msg];
-    $oxidized_url = Config::get('oxidized.url');
-    if (! empty($oxidized_url)) {
-        $response = Http::withOptions(['proxy' => Proxy::forGuzzle($oxidized_url)])->put("$oxidized_url/node/next/$hostname", $postdata);
-
-        if ($response->successful()) {
-            return true;
-        }
-    }
-
-    return false;
-}//end oxidized_node_update()
 
 /**
  * Take a BGP error code and subcode to return a string representation of it

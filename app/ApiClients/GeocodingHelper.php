@@ -25,17 +25,14 @@
 namespace App\ApiClients;
 
 use Exception;
+use Illuminate\Http\Client\PendingRequest;
+use Illuminate\Http\Client\Response;
 use LibreNMS\Config;
 use Log;
 
 trait GeocodingHelper
 {
-    /**
-     * From BaseApi...
-     *
-     * @return \GuzzleHttp\Client
-     */
-    abstract protected function getClient();
+    abstract protected function getClient(): PendingRequest;
 
     /**
      * Try to get the coordinates of a given address.
@@ -56,7 +53,7 @@ trait GeocodingHelper
             $options = $this->buildGeocodingOptions($address);
 
             $response = $this->getClient()->get($this->geocoding_uri, $options);
-            $response_data = json_decode($response->getBody(), true);
+            $response_data = $response->json();
             if ($this->checkResponse($response, $response_data)) {
                 return $this->parseLatLng($response_data);
             } else {
@@ -71,14 +68,10 @@ trait GeocodingHelper
 
     /**
      * Checks if the request was a success
-     *
-     * @param  \Psr\Http\Message\ResponseInterface  $response
-     * @param  array  $data  decoded response data
-     * @return bool
      */
-    protected function checkResponse($response, $data)
+    protected function checkResponse(Response $response, array $data): bool
     {
-        return $response->getStatusCode() == 200;
+        return $response->successful();
     }
 
     /**
