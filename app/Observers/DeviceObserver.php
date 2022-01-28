@@ -16,6 +16,7 @@ class DeviceObserver
     public function created(Device $device)
     {
         Log::event("Device $device->hostname has been created", $device, 'system', 3);
+        // Reload Oxidized if needed
         oxidized_reload_nodes();
     }
 
