@@ -16,10 +16,10 @@ class DeviceObserver
      * @param  \App\Models\Device  $device
      * @return void
      */
-    public function created(Device $device, Oxidized $oxidized): void
+    public function created(Device $device): void
     {
         Log::event("Device $device->hostname has been created", $device, 'system', 3);
-        $oxidized->reloadNodes();
+        (new Oxidized)->reloadNodes();
     }
 
     /**
@@ -56,7 +56,7 @@ class DeviceObserver
     /**
      * Handle the device "deleted" event.
      */
-    public function deleted(Device $device, Oxidized $oxidized): void
+    public function deleted(Device $device): void
     {
         // delete rrd files
         $host_dir = addcslashes(escapeshellarg(\Rrd::dirFromHost($device->hostname)), '\'');
@@ -67,7 +67,7 @@ class DeviceObserver
 
         Log::event("Device $device->hostname has been removed", 0, 'system', 3);
 
-        $oxidized->reloadNodes();
+        (new Oxidized)->reloadNodes();
     }
 
     /**
