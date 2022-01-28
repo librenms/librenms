@@ -3,6 +3,8 @@ text: 'Sensaphone Web600'
 type: environment
 icon: sensaphone
 group: sensaphone
+snmp_bulk: false
+snmp_max_oid: 1
 over:
     - { graph: device_bits, text: 'Device Traffic' }
     - { graph: device_processor, text: 'CPU Usage' }
