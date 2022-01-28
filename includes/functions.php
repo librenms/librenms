@@ -354,7 +354,7 @@ function delete_device($id)
 
     $ret .= "Removed device $host\n";
     log_event("Device $host has been removed", 0, 'system', 3);
-    
+
     return $ret;
 }
 
