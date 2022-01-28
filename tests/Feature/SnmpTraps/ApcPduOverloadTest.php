@@ -42,10 +42,9 @@ SNMP-COMMUNITY-MIB::snmpTrapAddress.0:$device->ip
 SNMP-COMMUNITY-MIB::snmpTrapCommunity.0:\"Kr5nMp69\"
 SNMPv2-MIB::snmpTrapEnterprise.0:PowerNet-MIB::apc";
 
+        $trap = new Trap($trapText);
         $message = 'Grand POP PDU R15 A1 phase 1 Metered Rack PDU: Near overload.';
         \Log::shouldReceive('event')->once()->with($message, $device->device_id, 'trap', 4);
-
-        $trap = new Trap($trapText);
         $this->assertTrue(Dispatcher::handle($trap), 'Could not handle rPDUNearOverload trap');
     }
 
@@ -63,10 +62,9 @@ SNMP-COMMUNITY-MIB::snmpTrapAddress.0:$device->ip
 SNMP-COMMUNITY-MIB::snmpTrapCommunity.0:\"Kr5nMp69\"
 SNMPv2-MIB::snmpTrapEnterprise.0:PowerNet-MIB::apc";
 
+        $trap = new Trap($trapText);
         $message = 'Grand POP PDU R15 A1 phase 1 Metered Rack PDU: Near overload cleared.';
         \Log::shouldReceive('event')->once()->with($message, $device->device_id, 'trap', 1);
-
-        $trap = new Trap($trapText);
         $this->assertTrue(Dispatcher::handle($trap), 'Could not handle rPDUNearOverloadClear trap');
     }
 
@@ -84,10 +82,9 @@ SNMP-COMMUNITY-MIB::snmpTrapAddress.0:$device->ip
 SNMP-COMMUNITY-MIB::snmpTrapCommunity.0:\"Kr5nMp69\"
 SNMPv2-MIB::snmpTrapEnterprise.0:PowerNet-MIB::apc";
 
+        $trap = new Trap($trapText);
         $message = 'Grand POP PDU R15 A1 phase 1 APC Rack PDU: Overload condition.';
         \Log::shouldReceive('event')->once()->with($message, $device->device_id, 'trap', 5);
-
-        $trap = new Trap($trapText);
         $this->assertTrue(Dispatcher::handle($trap), 'Could not handle rPDUOverload trap');
     }
 
@@ -105,10 +102,9 @@ SNMP-COMMUNITY-MIB::snmpTrapAddress.0:$device->ip
 SNMP-COMMUNITY-MIB::snmpTrapCommunity.0:\"Kr5nMp69\"
 SNMPv2-MIB::snmpTrapEnterprise.0:PowerNet-MIB::apc";
 
+        $trap = new Trap($trapText);
         $message = 'Grand POP PDU R15 A1 phase 1 APC Rack PDU: Overload condition has cleared.';
         \Log::shouldReceive('event')->once()->with($message, $device->device_id, 'trap', 1);
-
-        $trap = new Trap($trapText);
         $this->assertTrue(Dispatcher::handle($trap), 'Could not handle rPDUOverloadClear trap');
     }
 }
