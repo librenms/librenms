@@ -17,8 +17,77 @@
  *
  * @link       https://www.librenms.org
  *
- * @copyright  2021 Jeremy Ouellet
- * @author     Jeremy Ouellet <jouellet@jouellet.net>
+ * @copyright  2021 Beanfield Technologies Inc
+ * @author     Jeremy Ouellet <jouellet@beanfield.com>
  */
-//$pre_cache['web600'] = snmpwalk_group($device, 'web600', 'SENSAPHONE-MIB');
-echo(json_encode(snmpwalk_group($device,'SNMPv2-SMI::enterprises.8338.1.1.4.1.1','SENSAPHONE-MIB')));
+
+$oidmap = array(
+'ioCalib' => '2',
+'ioDatalogNormInt' => '4',
+'ioDatalogExInt' => '5',
+'ioAlarmLow' => '11',
+'ioAlarmHigh' => '12',
+'ioTblLow' => '13',
+'ioTblHigh' => '14',
+'ioName' => '15',
+'ioRecTime' => '16',
+'ioResetTime' => '17',
+'ioType' => '18',
+'ioUnits' => '19',
+'ioUnitsType' => '20',
+'ioPointEnb' => '21',
+'ioAlarmEnb' => '22',
+'ioAlarmOnClear' => '25',
+'ioIndexID' => '31',
+'ioGaugeLow' => '33',
+'ioGaugeHigh' => '34',
+'ioMin' => '40',
+'ioMax' => '41',
+'ioEntry.42' => '42',
+'ioEntry.43' => '43',
+'ioLastAlarm' => '45',
+'ioValue' => '48',
+'ioValueStr' => '49',
+'ioStatus' => '50',
+'ioRange' => '51',
+'ioUnack' => '52',
+'ioValueInt' => '53',
+'ioMinInt' => '54',
+'ioMaxInt' => '55',
+'ioEntry.56' => '56',
+'ioEntry.60' => '60',
+'ioResetMin' => '71',
+'ioResetMax' => '72',
+'ioSetDefaults' => '73',
+'ioMinStr' => '74',
+'ioMaxStr' => '75',
+'ioEntry.76' => '76',
+'ioEntry.77' => '77',
+'ioEntry.79' => '79',
+'ioSchedule' => '90',
+'ioStatusStr' => '91',
+'ioTypeStr' => '92',
+'ioCategory' => '95',
+'ioADcalib' => '96',
+'io420calib' => '97',
+'ioLastAlarmStr' => '98',
+'ioCalibFloat' => '101',
+'ioEntry.104' => '104'
+);
+
+echo(" walking ");
+$ids = snmpwalk_group($device,'web600','SENSAPHONE-MIB');
+echo(" processing ");
+$iotable = array();
+$first = True;
+foreach ($ids as $key => $value){
+  if(strpos($key, 'ioTable') !== false){
+    $first = False;
+    $item = explode('.', $key);
+    $iotable[$item[1]][$item[2]] = $value;
+  }
+  elseif($first){
+    $iotable[1][$oidmap[$key]] = $value;
+  }
+}
+$pre_cache['web600']['ioTable'] = $iotable;
