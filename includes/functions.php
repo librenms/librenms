@@ -807,7 +807,7 @@ function is_port_valid($port, $device)
  * @param  array  $port
  * @param  array  $device
  */
-function port_fill_missing(& $port, $device)
+function port_fill_missing(&$port, $device)
 {
     // When devices do not provide data, populate with other data if available
     if ($port['ifDescr'] == '' || $port['ifDescr'] == null) {
@@ -1190,7 +1190,7 @@ function hytera_h2f($number, $nd)
  * Cisco CIMC functions
  */
 // Create an entry in the entPhysical table if it doesnt already exist.
-function setCIMCentPhysical($location, $data, & $entphysical, & $index)
+function setCIMCentPhysical($location, $data, &$entphysical, &$index)
 {
     // Go get the location, this will create it if it doesnt exist.
     $entPhysicalIndex = getCIMCentPhysical($location, $entphysical, $index);
@@ -1214,7 +1214,7 @@ function setCIMCentPhysical($location, $data, & $entphysical, & $index)
     return [$entPhysicalId, $entPhysicalIndex];
 }
 
-function getCIMCentPhysical($location, & $entphysical, & $index)
+function getCIMCentPhysical($location, &$entphysical, &$index)
 {
     global $device;
 
@@ -1312,7 +1312,7 @@ function q_bridge_bits2indices($hex_data)
     return $indices;
 }
 
-function update_device_logo(& $device)
+function update_device_logo(&$device)
 {
     $icon = getImageName($device, false);
     if ($icon != $device['icon']) {
