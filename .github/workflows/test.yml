@@ -150,6 +150,9 @@ jobs:
         run: |
           php artisan dusk:update --detect
       -
+        name: Copy seeded config
+        run: cp "${GITHUB_WORKSPACE}/tests/testing_config.yaml" "${GITHUB_WORKSPACE}/database/seeders/config/"
+      -
         name: Ensure MySQL is up
         env:
           PORT: ${{ job.services.database.ports[3306] }}
