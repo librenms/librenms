@@ -83,7 +83,7 @@ snmp-server user <USER-NAME> <GROUP-NAME> v3 auth sha <AUTH-PASSWORD> priv aes 1
 snmp-server contact <YOUR-CONTACT>
 snmp-server location <YOUR-LOCATION>
 
-# Note: The following is also required if using SNMPv3 and you want to populate the FDB table.
+# Note: The following is also required if using SNMPv3 and you want to populate the FDB table, STP info and others.
 
 snmp-server group <GROUP-NAME> v3 priv context vlan- match prefix
 ```

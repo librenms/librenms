@@ -73,6 +73,7 @@ trait BridgeMib
                 continue;
             }
 
+            \Log::debug('VLAN: ' . ($vlan ?: 1) . " Bridge: {$stp['BRIDGE-MIB::dot1dBaseBridgeAddress.0']} DR: {$stp['BRIDGE-MIB::dot1dStpDesignatedRoot.0']}");
             $bridge = Rewrite::macToHex($stp['BRIDGE-MIB::dot1dBaseBridgeAddress.0'] ?? '');
             $drBridge = Rewrite::macToHex($stp['BRIDGE-MIB::dot1dStpDesignatedRoot.0'] ?? '');
             $instances->push(new \App\Models\Stp([

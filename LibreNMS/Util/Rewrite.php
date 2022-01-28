@@ -198,10 +198,12 @@ class Rewrite
      */
     public static function macToHex(string $mac): string
     {
+        // split it apart
         $mac_array = explode(':', str_replace(['-', '.', ' '], ':', strtolower(trim($mac))));
         $len = count($mac_array);
-        $mac_padding = array_fill(0, $len, 12 / $len);
+        $mac_padding = array_fill(0, $len, ceil(12 / $len));
 
+        // pad the parts to prefix 0s and only take the last 12 digits
         return substr(implode(array_map('zeropad', $mac_array, $mac_padding)), -12);
     }
 
