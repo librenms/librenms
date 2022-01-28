@@ -600,6 +600,7 @@ function createHost(
         }
     }
     if ($device->save()) {
+        oxidized_reload_nodes();
         return $device->device_id;
     }
 
