@@ -15,7 +15,7 @@ class AddVlanAndPortIndexFieldsToPortsStpTable extends Migration
     {
         Schema::table('ports_stp', function (Blueprint $table) {
             $table->unsignedInteger('vlan')->nullable()->after('device_id');
-            $table->unsignedInteger('port_index')->after('port_id');
+            $table->unsignedInteger('port_index')->after('port_id')->default(0);
         });
     }
 

@@ -1620,7 +1620,7 @@ ports_stp:
     - { Field: device_id, Type: 'int unsigned', 'Null': false, Extra: '' }
     - { Field: vlan, Type: 'int unsigned', 'Null': true, Extra: '' }
     - { Field: port_id, Type: 'int unsigned', 'Null': false, Extra: '' }
-    - { Field: port_index, Type: 'int unsigned', 'Null': false, Extra: '' }
+    - { Field: port_index, Type: 'int unsigned', 'Null': false, Extra: '', Default: '0' }
     - { Field: priority, Type: 'tinyint unsigned', 'Null': false, Extra: '' }
     - { Field: state, Type: varchar(11), 'Null': false, Extra: '' }
     - { Field: enable, Type: varchar(8), 'Null': false, Extra: '' }
