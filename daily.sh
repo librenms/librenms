@@ -286,9 +286,6 @@ main () {
         check_dependencies
         php_ver_ret=$?
 
-        # make sure the vendor directory is clean
-        git checkout vendor/ --quiet > /dev/null 2>&1
-
         update_res=0
         if [[ "$up" == "1" ]] || [[ "$php_ver_ret" == "1" ]]; then
             # Update current branch to latest
@@ -345,12 +342,6 @@ main () {
             post-pull)
                 # re-check dependencies after pull with the new code
                 check_dependencies
-
-                # Check for missing vendor dir
-                if [ ! -f vendor/autoload.php ]; then
-                    git checkout 609676a9f8d72da081c61f82967e1d16defc0c4e -- vendor/
-                    git reset HEAD vendor/  # don't add vendor directory to the index
-                fi
 
                 status_run 'Updating Composer packages' "${COMPOSER} install --no-dev" 'update'
 
