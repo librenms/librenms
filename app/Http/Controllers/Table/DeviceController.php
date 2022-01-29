@@ -244,7 +244,7 @@ class DeviceController extends TableController
         }
 
         if ($sensor_count) {
-            $metrics[] = $this->formatMetric($device, $sensor_count, 'health', 'fa-dashboard');
+            $metrics[] = $this->formatMetric($device, $sensor_count, 'health', 'fa-heartbeat');
         }
 
         if ($wireless_count) {
