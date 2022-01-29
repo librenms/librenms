@@ -7266,6 +7266,104 @@
         },
         "poller": "matches discovery"
     },
+    "storage": {
+        "discovery": {
+            "storage": [
+                {
+                    "storage_mib": "vrp",
+                    "storage_index": "1",
+                    "storage_type": "dsk",
+                    "storage_descr": "System Flash",
+                    "storage_size": 211275776,
+                    "storage_units": 1024,
+                    "storage_used": 163139584,
+                    "storage_free": 0,
+                    "storage_perc": 0,
+                    "storage_perc_warn": 60,
+                    "storage_deleted": 0
+                }
+            ]
+        },
+        "poller": {
+            "storage": [
+                {
+                    "storage_mib": "vrp",
+                    "storage_index": "1",
+                    "storage_type": "dsk",
+                    "storage_descr": "System Flash",
+                    "storage_size": 211275776,
+                    "storage_units": 1024,
+                    "storage_used": 163139584,
+                    "storage_free": 48136192,
+                    "storage_perc": 77,
+                    "storage_perc_warn": 60,
+                    "storage_deleted": 0
+                }
+            ]
+        }
+    },
+    "vlans": {
+        "discovery": {
+            "vlans": [
+                {
+                    "vlan_vlan": 1,
+                    "vlan_domain": 1,
+                    "vlan_name": "VLAN 1",
+                    "vlan_type": null,
+                    "vlan_mtu": null
+                },
+                {
+                    "vlan_vlan": 70,
+                    "vlan_domain": 1,
+                    "vlan_name": "VLAN 70",
+                    "vlan_type": null,
+                    "vlan_mtu": null
+                },
+                {
+                    "vlan_vlan": 71,
+                    "vlan_domain": 1,
+                    "vlan_name": "VLAN 71",
+                    "vlan_type": null,
+                    "vlan_mtu": null
+                },
+                {
+                    "vlan_vlan": 391,
+                    "vlan_domain": 1,
+                    "vlan_name": "VLAN 391",
+                    "vlan_type": null,
+                    "vlan_mtu": null
+                },
+                {
+                    "vlan_vlan": 392,
+                    "vlan_domain": 1,
+                    "vlan_name": "VLAN 392",
+                    "vlan_type": null,
+                    "vlan_mtu": null
+                },
+                {
+                    "vlan_vlan": 393,
+                    "vlan_domain": 1,
+                    "vlan_name": "VLAN 393",
+                    "vlan_type": null,
+                    "vlan_mtu": null
+                },
+                {
+                    "vlan_vlan": 395,
+                    "vlan_domain": 1,
+                    "vlan_name": "VLAN 395",
+                    "vlan_type": null,
+                    "vlan_mtu": null
+                },
+                {
+                    "vlan_vlan": 419,
+                    "vlan_domain": 1,
+                    "vlan_name": "VLAN 419",
+                    "vlan_type": null,
+                    "vlan_mtu": null
+                }
+            ]
+        }
+    },
     "wireless": {
         "discovery": {
             "wireless_sensors": [
@@ -7734,42 +7832,6 @@
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
                     "sensor_oids": "[\".1.3.6.1.4.1.2011.6.139.17.1.2.1.2.6.87.73.70.73.79.71\",\".1.3.6.1.4.1.2011.6.139.17.1.2.1.3.6.87.73.70.73.79.71\",\".1.3.6.1.4.1.2011.6.139.17.1.2.1.2.11.87.73.70.73.79.71.45.66.89.79.68\",\".1.3.6.1.4.1.2011.6.139.17.1.2.1.3.11.87.73.70.73.79.71.45.66.89.79.68\",\".1.3.6.1.4.1.2011.6.139.17.1.2.1.2.12.87.73.70.73.79.71.45.71.117.101.115.116\",\".1.3.6.1.4.1.2011.6.139.17.1.2.1.3.12.87.73.70.73.79.71.45.71.117.101.115.116\"]"
-                }
-            ]
-        }
-    },
-    "storage": {
-        "discovery": {
-            "storage": [
-                {
-                    "storage_mib": "vrp",
-                    "storage_index": "1",
-                    "storage_type": "dsk",
-                    "storage_descr": "System Flash",
-                    "storage_size": 211275776,
-                    "storage_units": 1024,
-                    "storage_used": 163139584,
-                    "storage_free": 0,
-                    "storage_perc": 0,
-                    "storage_perc_warn": 60,
-                    "storage_deleted": 0
-                }
-            ]
-        },
-        "poller": {
-            "storage": [
-                {
-                    "storage_mib": "vrp",
-                    "storage_index": "1",
-                    "storage_type": "dsk",
-                    "storage_descr": "System Flash",
-                    "storage_size": 211275776,
-                    "storage_units": 1024,
-                    "storage_used": 163139584,
-                    "storage_free": 48136192,
-                    "storage_perc": 77,
-                    "storage_perc_warn": 60,
-                    "storage_deleted": 0
                 }
             ]
         }
