@@ -5153,11 +5153,18 @@
             "type": "integer",
             "default": 0
         },
+        "snmp.oids.no_bulk": {
+            "group": "poller",
+            "section": "snmp",
+            "order": 20,
+            "type": "array",
+            "default": null
+        },
         "snmp.timeout": {
             "group": "poller",
             "section": "snmp",
             "order": 5,
-            "type": "integer",
+            "type": "float",
             "default": 1
         },
         "snmp.retries": {

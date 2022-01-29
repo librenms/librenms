@@ -2,7 +2,7 @@
 $title = $envelope->getTitle();
 switch ($envelope->getType()) {
     case 'success':
-        $color = 'tw-text-green-600';
+        $color = 'tw-text-emerald-600';
         $class = 'flasher-success';
         break;
     case 'error':
@@ -10,7 +10,7 @@ switch ($envelope->getType()) {
         $class = 'flasher-error';
         break;
     case 'warning':
-        $color = 'tw-text-yellow-600';
+        $color = 'tw-text-amber-600';
         $class = 'flasher-warning';
         break;
     case 'info':

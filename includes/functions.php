@@ -9,6 +9,7 @@
  */
 
 use App\Models\Device;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
 use LibreNMS\Config;
 use LibreNMS\Exceptions\HostExistsException;
@@ -180,7 +181,7 @@ function compare_var($a, $b, $comparison = '=')
             return ! Str::endsWith($a, $b);
         case 'regex':
             return (bool) preg_match($b, $a);
-        case 'not regex':
+        case 'not_regex':
             return ! ((bool) preg_match($b, $a));
         case 'in_array':
             return in_array($a, $b);
@@ -942,26 +943,6 @@ function set_curl_proxy($curl)
     \LibreNMS\Util\Proxy::applyToCurl($curl);
 }
 
-/**
- * Return the proxy url in guzzle format
- *
- * @return 'tcp://' + $proxy
- */
-function get_guzzle_proxy()
-{
-    return \LibreNMS\Util\Proxy::forGuzzle();
-}
-
-/**
- * Return the proxy url
- *
- * @return array|bool|false|string
- */
-function get_proxy()
-{
-    return \LibreNMS\Util\Proxy::get();
-}
-
 function target_to_id($target)
 {
     if ($target[0] . $target[1] == 'g:') {
@@ -1436,9 +1417,9 @@ function cache_mac_oui()
             //$mac_oui_url_mirror = 'https://raw.githubusercontent.com/wireshark/wireshark/master/manuf';
 
             echo '  -> Downloading ...' . PHP_EOL;
-            $get = Requests::get($mac_oui_url, [], ['proxy' => get_proxy()]);
+            $get = Http::withOptions(['proxy' => Proxy::forGuzzle()])->get($mac_oui_url);
             echo '  -> Processing CSV ...' . PHP_EOL;
-            $csv_data = $get->body;
+            $csv_data = $get->body();
             foreach (explode("\n", $csv_data) as $csv_line) {
                 unset($oui);
                 $entry = str_getcsv($csv_line, "\t");
@@ -1494,8 +1475,8 @@ function cache_peeringdb()
             $ix_keep = [];
             foreach (dbFetchRows('SELECT `bgpLocalAs` FROM `devices` WHERE `disabled` = 0 AND `ignore` = 0 AND `bgpLocalAs` > 0 AND (`bgpLocalAs` < 64512 OR `bgpLocalAs` > 65535) AND `bgpLocalAs` < 4200000000 GROUP BY `bgpLocalAs`') as $as) {
                 $asn = $as['bgpLocalAs'];
-                $get = Requests::get($peeringdb_url . '/net?depth=2&asn=' . $asn, [], ['proxy' => get_proxy()]);
-                $json_data = $get->body;
+                $get = Http::withOptions(['proxy' => Proxy::forGuzzle()])->get($peeringdb_url . '/net?depth=2&asn=' . $asn);
+                $json_data = $get->body();
                 $data = json_decode($json_data);
                 $ixs = $data->{'data'}[0]->{'netixlan_set'};
                 foreach ($ixs as $ix) {
@@ -1515,8 +1496,8 @@ function cache_peeringdb()
                         $pdb_ix_id = dbInsert($insert, 'pdb_ix');
                     }
                     $ix_keep[] = $pdb_ix_id;
-                    $get_ix = Requests::get("$peeringdb_url/netixlan?ix_id=$ixid", [], ['proxy' => get_proxy()]);
-                    $ix_json = $get_ix->body;
+                    $get_ix = Http::withOptions(['proxy' => Proxy::forGuzzle()])->get("$peeringdb_url/netixlan?ix_id=$ixid");
+                    $ix_json = $get_ix->body();
                     $ix_data = json_decode($ix_json);
                     $peers = $ix_data->{'data'};
                     foreach ($peers as $index => $peer) {
@@ -1706,20 +1687,23 @@ function oxidized_node_update($hostname, $msg, $username = 'not_provided')
     $postdata = ['user' => $username, 'msg' => $msg];
     $oxidized_url = Config::get('oxidized.url');
     if (! empty($oxidized_url)) {
-        Requests::put("$oxidized_url/node/next/$hostname", [], json_encode($postdata), ['proxy' => Proxy::get($oxidized_url)]);
+        $response = Http::withOptions(['proxy' => Proxy::forGuzzle($oxidized_url)])->put("$oxidized_url/node/next/$hostname", $postdata);
 
-        return true;
+        if ($response->successful()) {
+            return true;
+        }
     }
 
     return false;
 }//end oxidized_node_update()
 
 /**
+ * Take a BGP error code and subcode to return a string representation of it
+ *
  * @params int code
  * @params int subcode
  *
  * @return string
- *                Take a BGP error code and subcode to return a string representation of it
  */
 function describe_bgp_error_code($code, $subcode)
 {

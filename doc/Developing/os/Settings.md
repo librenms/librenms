@@ -122,6 +122,15 @@ snmpwalk for an OS set the following.
 snmp_bulk: false
 ```
 
+If only some specific OIDs fail with snmpbulkwalk. You can disable just those OIDs.
+This needs to match exactly the OID being walked by LibreNMS. MIB::oid is preferred to prevent name collisions.
+
+```yaml
+oids:
+    no_bulk:
+        - UCD-SNMP-MIB::laLoadInt
+```
+
 #### Limit the oids per snmpget
 
 ```yaml

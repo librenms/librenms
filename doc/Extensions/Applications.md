@@ -137,6 +137,7 @@ by following the steps under the `SNMP Extend` heading.
 1. [Seafile](#seafile) - SNMP extend
 1. [SMART](#smart) - SNMP extend
 1. [Squid](#squid) - SNMP proxy
+1. [Supervisord](#supervisord) - SNMP extend
 1. [TinyDNS/djbdns](#tinydns-aka-djbdns) - Agent
 1. [Unbound](#unbound) - SNMP extend, Agent
 1. [UPS-nut](#ups-nut) - SNMP extend
@@ -1972,7 +1973,7 @@ SNMP extend script to monitor your (remote) RRDCached via snmp
 
 1. Download the script onto the desired host
 ```
-wget https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/rrdcached -O /etc/snmp/rrdcached
+wget https://raw.githubusercontent.com/librenms/librenms-agent/master/agent-local/rrdcached -O /etc/snmp/rrdcached
 ```
 
 2. Make the script executable
@@ -2181,6 +2182,33 @@ for net-snmp, please see the links below.
 
 <http://wiki.squid-cache.org/Features/Snmp>
 <http://www.net-snmp.org/wiki/index.php/Snmpd_proxy>
+
+## Supervisord
+
+It shows you the totals per status and also the uptime per process. That way you can add alerts for instance when there are process in state `FATAL`.
+
+### SNMP Extend
+
+1. Copy the python script to the desired host.
+```
+wget https://github.com/librenms/librenms-agent/raw/master/snmp/supervisord.py -O /etc/snmp/supervisord.py
+```
+Notice that this will use the default unix socket path. Modify the `unix_socket_path` variable in the script if your path differs from the default.
+
+2. Make the script executable
+```
+chmod +x /etc/snmp/supervisord.py
+```
+
+3. Edit your snmpd.conf file (usually /etc/snmp/snmpd.conf) and add:
+```
+extend supervisord /etc/snmp/supervisord.py
+```
+
+4. Restart snmpd on your host
+```
+systemctl restart snmpd
+```
 
 ## TinyDNS aka djbdns
 

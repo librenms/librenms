@@ -61,17 +61,6 @@ class ComposerHelper
 
     public static function preInstall(Event $event)
     {
-        $vendor_dir = $event->getComposer()->getConfig()->get('vendor-dir');
-
-        if (! is_file("$vendor_dir/autoload.php")) {
-            // checkout vendor from 1.36
-            $cmds = [
-                "git checkout 609676a9f8d72da081c61f82967e1d16defc0c4e -- $vendor_dir",
-                "git reset HEAD $vendor_dir",  // don't add vendor directory to the index
-            ];
-
-            self::exec($cmds);
-        }
     }
 
     /**

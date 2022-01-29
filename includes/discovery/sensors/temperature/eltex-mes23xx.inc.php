@@ -18,30 +18,44 @@
  * @package    LibreNMS
  * @link       https://www.librenms.org
  *
+ * @copyright  2022 Peca Nesovanovic
+ *
  * @author     Peca Nesovanovic <peca.nesovanovic@sattrakt.com>
  */
-
-$low_limit = $low_warn_limit = 5;
-$high_warn_limit = $high_limit = 70;
 $divisor = 1;
-
-$oids = $pre_cache['eltex-mes23xx_rlPhyTestGetResult'];
-if ($oids) {
-    d_echo('Eltex-MES SFP temperature');
-    foreach (explode("\n", $oids) as $data) {
-        if ($data) {
-            $split = trim(explode(' ', $data)[0]);
-            $value = trim(explode(' ', $data)[1]);
-            $ifIndex = explode('.', $split)[13];
-            $type = explode('.', $split)[14];
-
-            //type5 = temperature
-            if ($type == 5) {
-                $value = $value / $divisor;
+$multiplier = 1;
+if ($pre_cache['eltex-mes23xx-sfp']) {
+    foreach ($pre_cache['eltex-mes23xx-sfp'] as $ifIndex => $data) {
+        if (isset($data['rlPhyTestTableTransceiverTemp']['rlPhyTestGetResult'])) {
+            $value = $data['rlPhyTestTableTransceiverTemp']['rlPhyTestGetResult'] / $divisor;
+            if ($value) {
+                $high_limit = $data['temperature']['eltPhdTransceiverThresholdHighAlarm'] / $divisor;
+                $high_warn_limit = $data['temperature']['eltPhdTransceiverThresholdHighWarning'] / $divisor;
+                $low_warn_limit = $data['temperature']['eltPhdTransceiverThresholdLowWarning'] / $divisor;
+                $low_limit = $data['temperature']['eltPhdTransceiverThresholdLowAlarm'] / $divisor;
                 $tmp = get_port_by_index_cache($device['device_id'], $ifIndex);
                 $descr = $tmp['ifName'];
+                $oid = '.1.3.6.1.4.1.89.90.1.2.1.3.' . $ifIndex . '.5';
                 discover_sensor(
-                    $valid['sensor'], 'temperature', $device, $split, 'SfpTemp' . $ifIndex, 'rlPhyTestTableTransceiverTemp', 'SfpTemp-' . $descr, $divisor, '1', $low_limit, $low_warn_limit, $high_warn_limit, $high_limit, $value
+                    $valid['sensor'],
+                    'temperature',
+                    $device,
+                    $oid,
+                    'SfpTemp' . $ifIndex,
+                    'rlPhyTestTableTransceiverTemp',
+                    'SfpTemp-' . $descr,
+                    $divisor,
+                    $multiplier,
+                    $low_limit,
+                    $low_warn_limit,
+                    $high_warn_limit,
+                    $high_limit,
+                    $value,
+                    'snmp',
+                    null,
+                    null,
+                    null,
+                    'Transceiver'
                 );
             }
         }

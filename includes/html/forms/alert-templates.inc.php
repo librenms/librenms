@@ -33,7 +33,7 @@ $template_newid = 0;
 $create = true;
 
 $name = $vars['name'];
-if (isset($vars['template']) && empty(view(['template' => $vars['template']], [])->__toString())) {
+if (isset($vars['template']) && empty(Blade::render($vars['template']))) {
     $message = 'Template failed to be parsed, please check the syntax';
 } elseif (! empty($name)) {
     if ($vars['template'] && is_numeric($vars['template_id'])) {

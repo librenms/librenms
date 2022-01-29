@@ -76,16 +76,6 @@ parameters:
 			path: LibreNMS/Alert/Template.php
 
 		-
-			message: "#^Parameter \\#1 \\$view of function view expects view\\-string\\|null, array\\<string, mixed\\> given\\.$#"
-			count: 2
-			path: LibreNMS/Alert/Template.php
-
-		-
-			message: "#^Parameter \\#1 \\$view of function view expects view\\-string\\|null, array\\<string, string\\> given\\.$#"
-			count: 2
-			path: LibreNMS/Alert/Template.php
-
-		-
 			message: "#^Property LibreNMS\\\\Alert\\\\Template\\:\\:\\$template has no type specified\\.$#"
 			count: 1
 			path: LibreNMS/Alert/Template.php
@@ -931,26 +921,6 @@ parameters:
 			path: LibreNMS/Alerting/QueryBuilderFilter.php
 
 		-
-			message: "#^Parameter \\#2 \\$boolean of method Illuminate\\\\Database\\\\Query\\\\Builder\\:\\:whereNull\\(\\) expects non\\-empty\\-string, string given\\.$#"
-			count: 1
-			path: LibreNMS/Alerting/QueryBuilderFluentParser.php
-
-		-
-			message: "#^Parameter \\#3 \\$boolean of method Illuminate\\\\Database\\\\Query\\\\Builder\\:\\:whereBetween\\(\\) expects non\\-empty\\-string, string given\\.$#"
-			count: 1
-			path: LibreNMS/Alerting/QueryBuilderFluentParser.php
-
-		-
-			message: "#^Parameter \\#3 \\$boolean of method Illuminate\\\\Database\\\\Query\\\\Builder\\:\\:whereIn\\(\\) expects non\\-empty\\-string, string given\\.$#"
-			count: 1
-			path: LibreNMS/Alerting/QueryBuilderFluentParser.php
-
-		-
-			message: "#^Parameter \\#4 \\$boolean of method Illuminate\\\\Database\\\\Query\\\\Builder\\:\\:where\\(\\) expects non\\-empty\\-string, string given\\.$#"
-			count: 4
-			path: LibreNMS/Alerting/QueryBuilderFluentParser.php
-
-		-
 			message: "#^Call to function is_null\\(\\) with string will always evaluate to false\\.$#"
 			count: 1
 			path: LibreNMS/Alerting/QueryBuilderParser.php
@@ -1501,6 +1471,11 @@ parameters:
 			path: LibreNMS/Cache/Device.php
 
 		-
+			message: "#^Parameter \\#1 \\$key of method Illuminate\\\\Support\\\\Collection\\<int,mixed\\>\\:\\:get\\(\\) expects int, string given\\.$#"
+			count: 1
+			path: LibreNMS/Cache/Device.php
+
+		-
 			message: "#^Property LibreNMS\\\\Cache\\\\Device\\:\\:\\$devices has no type specified\\.$#"
 			count: 1
 			path: LibreNMS/Cache/Device.php
@@ -1652,16 +1627,6 @@ parameters:
 
 		-
 			message: "#^Method LibreNMS\\\\Component\\:\\:setComponentPrefs\\(\\) has parameter \\$updated with no type specified\\.$#"
-			count: 1
-			path: LibreNMS/Component.php
-
-		-
-			message: "#^Parameter \\#1 \\$column of method Illuminate\\\\Database\\\\Eloquent\\\\Builder\\<App\\\\Models\\\\Component\\>\\:\\:orderBy\\(\\) expects Closure\\|Illuminate\\\\Database\\\\Query\\\\Builder\\|Illuminate\\\\Database\\\\Query\\\\Expression\\|non\\-empty\\-string, string given\\.$#"
-			count: 1
-			path: LibreNMS/Component.php
-
-		-
-			message: "#^Parameter \\#2 \\$direction of method Illuminate\\\\Database\\\\Eloquent\\\\Builder\\<App\\\\Models\\\\Component\\>\\:\\:orderBy\\(\\) expects non\\-empty\\-string, string given\\.$#"
 			count: 1
 			path: LibreNMS/Component.php
 
@@ -2626,11 +2591,6 @@ parameters:
 			path: LibreNMS/Device/WirelessSensor.php
 
 		-
-			message: "#^Method LibreNMS\\\\Device\\\\YamlDiscovery\\:\\:canSkipItem\\(\\) has parameter \\$index with no type specified\\.$#"
-			count: 1
-			path: LibreNMS/Device/YamlDiscovery.php
-
-		-
 			message: "#^Method LibreNMS\\\\Device\\\\YamlDiscovery\\:\\:oidIsNumeric\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: LibreNMS/Device/YamlDiscovery.php
@@ -2684,6 +2644,11 @@ parameters:
 			message: "#^Method LibreNMS\\\\Exceptions\\\\AuthenticationException\\:\\:__construct\\(\\) has parameter \\$message with no type specified\\.$#"
 			count: 1
 			path: LibreNMS/Exceptions/AuthenticationException.php
+
+		-
+			message: "#^Parameter \\#2 \\$code of class LibreNMS\\\\Exceptions\\\\DatabaseConnectException constructor expects int, string given\\.$#"
+			count: 1
+			path: LibreNMS/Exceptions/DatabaseConnectException.php
 
 		-
 			message: "#^Method LibreNMS\\\\Exceptions\\\\DatabaseInconsistentException\\:\\:__construct\\(\\) has parameter \\$code with no type specified\\.$#"
@@ -3686,6 +3651,11 @@ parameters:
 			path: LibreNMS/Modules/Os.php
 
 		-
+			message: "#^If condition is always true\\.$#"
+			count: 1
+			path: LibreNMS/Modules/Ospf.php
+
+		-
 			message: "#^Method LibreNMS\\\\Modules\\\\PrinterSupplies\\:\\:cleanup\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: LibreNMS/Modules/PrinterSupplies.php
@@ -3974,6 +3944,11 @@ parameters:
 			message: "#^Property LibreNMS\\\\OS\\:\\:\\$validOtherMemory has no type specified\\.$#"
 			count: 1
 			path: LibreNMS/OS.php
+
+		-
+			message: "#^Property App\\\\Models\\\\Device\\:\\:\\$version \\(string\\|null\\) does not accept int\\.$#"
+			count: 1
+			path: LibreNMS/OS/Aix.php
 
 		-
 			message: "#^Parameter \\#8 \\$multiplier of class LibreNMS\\\\Device\\\\WirelessSensor constructor expects int, null given\\.$#"
@@ -4307,11 +4282,6 @@ parameters:
 
 		-
 			message: "#^Method LibreNMS\\\\OS\\\\Shared\\\\Cisco\\:\\:getMainSerial\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: LibreNMS/OS/Shared/Cisco.php
-
-		-
-			message: "#^Method LibreNMS\\\\OS\\\\Shared\\\\Cisco\\:\\:getSlaTag\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: LibreNMS/OS/Shared/Cisco.php
 
@@ -7821,11 +7791,6 @@ parameters:
 			path: app/Http/Controllers/DeviceController.php
 
 		-
-			message: "#^Parameter \\#1 \\$view of function view expects view\\-string\\|null, array\\<string, mixed\\> given\\.$#"
-			count: 1
-			path: app/Http/Controllers/DeviceController.php
-
-		-
 			message: "#^Property App\\\\Http\\\\Controllers\\\\DeviceController\\:\\:\\$tabs has no type specified\\.$#"
 			count: 1
 			path: app/Http/Controllers/DeviceController.php
@@ -8139,11 +8104,6 @@ parameters:
 			message: "#^Method App\\\\Http\\\\Controllers\\\\Maps\\\\MapController\\:\\:visOptions\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: app/Http/Controllers/Maps/MapController.php
-
-		-
-			message: "#^Call to static method Illuminate\\\\Http\\\\Request\\:\\:validate\\(\\) on a separate line has no effect\\.$#"
-			count: 1
-			path: app/Http/Controllers/OverviewController.php
 
 		-
 			message: "#^Method App\\\\Http\\\\Controllers\\\\OverviewController\\:\\:default\\(\\) has no return type specified\\.$#"
@@ -9577,11 +9537,6 @@ parameters:
 
 		-
 			message: "#^Method App\\\\Models\\\\Notification\\:\\:scopeIsSticky\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/Models/Notification.php
-
-		-
-			message: "#^PHPDoc tag @var above a method has no effect\\.$#"
 			count: 1
 			path: app/Models/Notification.php
 
