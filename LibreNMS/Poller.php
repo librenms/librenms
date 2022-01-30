@@ -138,6 +138,10 @@ class Poller
                 $this->device->displayName(),
                 $this->device->device_id,
                 $measurement->getDuration()));
+            \Log::channel('single')->alert(sprintf("INFO: device:poll %s (%s) polled in %0.3fs",
+                $this->device->hostname,
+                $this->device->device_id,
+                $measurement->getDuration()));
 
             // check if the poll took too long and log an event
             if ($measurement->getDuration() > Config::get('rrd.step')) {
