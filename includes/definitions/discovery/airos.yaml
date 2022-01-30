@@ -34,7 +34,7 @@ modules:
                         -
                             device: version
                             op: 'regex'
-                            value: '/^(8\.7\.[4-9]|8\.8|9|\d{2,})\./'
+                            value: '/^8\.7\.[4-6]\./'
                 -
                     oid: ubntHostTemperature
                     divisor: 10000000
@@ -44,5 +44,5 @@ modules:
                         -
                             device: version
                             op: 'not_regex'
-                            value: '/^(8\.7\.[4-9]|8\.8|9|\d{2,})\./'
+                            value: '/^8\.7\.[4-6]\./'
 
