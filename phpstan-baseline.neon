@@ -7201,11 +7201,6 @@ parameters:
 			path: LibreNMS/Validator.php
 
 		-
-			message: "#^Method App\\\\ApiClients\\\\BaseApi\\:\\:getClient\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/ApiClients/BaseApi.php
-
-		-
 			message: "#^Property App\\\\ApiClients\\\\BaseApi\\:\\:\\$base_uri has no type specified\\.$#"
 			count: 1
 			path: app/ApiClients/BaseApi.php
