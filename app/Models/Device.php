@@ -847,6 +847,11 @@ class Device extends BaseModel
         return $this->hasMany(Stp::class, 'device_id');
     }
 
+    public function stpPorts(): HasMany
+    {
+        return $this->hasMany(\App\Models\PortStp::class, 'device_id');
+    }
+
     public function mempools(): HasMany
     {
         return $this->hasMany(\App\Models\Mempool::class, 'device_id');

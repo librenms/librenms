@@ -133,6 +133,7 @@ class AppServiceProvider extends ServiceProvider
         \App\Models\Device::observe(\App\Observers\DeviceObserver::class);
         \App\Models\Service::observe(\App\Observers\ServiceObserver::class);
         \App\Models\User::observe(\App\Observers\UserObserver::class);
+        \App\Models\Stp::observe(\App\Observers\StpObserver::class);
     }
 
     private function bootCustomValidators()
