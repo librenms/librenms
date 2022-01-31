@@ -66,7 +66,7 @@ class DeviceObserver
             Log::error("Could not delete RRD files for: $device->hostname", [$e]);
         }
 
-        if (!$result) {
+        if (isset($result) && $result == false) {
             Log::debug("Could not delete RRD files for: $device->hostname");
         }
 
