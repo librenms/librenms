@@ -54,6 +54,10 @@ foreach ($dbRoute as $dbRow) {
     }
 }
 
+if (file_exists(Config::get('install_dir') . "/includes/discovery/route/{$device['os']}.inc.php")) {
+    include Config::get('install_dir') . "/includes/discovery/route/{$device['os']}.inc.php";
+}
+
 //Not a single route will be discovered if the amount is over maximum
 // To prevent any bad behaviour on routers holding the full internet table
 
