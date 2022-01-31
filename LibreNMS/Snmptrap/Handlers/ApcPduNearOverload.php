@@ -22,8 +22,8 @@
  * Traps when Adva objects are created. This includes Remote User Login object,
  * Flow Creation object, and LAG Creation object.
  *
- * @package    LibreNMS
  * @link       http://librenms.org
+ *
  * @copyright  2022 KanREN, Inc
  * @author     Heath Barnhart <hbarnhart#kanren.net>
  */
@@ -41,8 +41,8 @@ class ApcPduNearOverload implements SnmptrapHandler
      * Handle snmptrap.
      * Data is pre-parsed and delivered as a Trap.
      *
-     * @param Device $device
-     * @param Trap $trap
+     * @param  Device  $device
+     * @param  Trap  $trap
      * @return void
      */
     public function handle(Device $device, Trap $trap)
