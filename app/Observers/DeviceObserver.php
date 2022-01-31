@@ -5,7 +5,7 @@ namespace App\Observers;
 use App;
 use App\ApiClients\Oxidized;
 use App\Models\Device;
-use Illuminate\Support\Str;
+use File;
 use Log;
 
 class DeviceObserver
@@ -59,10 +59,15 @@ class DeviceObserver
     public function deleted(Device $device): void
     {
         // delete rrd files
-        $host_dir = addcslashes(escapeshellarg(\Rrd::dirFromHost($device->hostname)), '\'');
-        $result = trim(shell_exec("bash -c '( [ ! -d $host_dir ] || rm -vrf $host_dir 2>&1 ) && echo -n OK'"));
-        if (! Str::endsWith($result, 'OK')) {
-            Log::debug("Could not $device->hostname files: $result");
+        $host_dir = \Rrd::dirFromHost($device->hostname);
+        try {
+            $result = File::deleteDirectory($host_dir);
+        } catch (\Exception $e) {
+            Log::error("Could not delete RRD files for: $device->hostname", [$e]);
+        }
+
+        if (!$result) {
+            Log::debug("Could not delete RRD files for: $device->hostname");
         }
 
         Log::event("Device $device->hostname has been removed", 0, 'system', 3);
