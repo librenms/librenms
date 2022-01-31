@@ -19,4 +19,8 @@ const tabSync = () => {
   }
 }
 
-tabSync()
+document.addEventListener('DOMContentLoaded', function () {
+    tabSync();
+}, false);
+
+

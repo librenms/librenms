@@ -418,7 +418,7 @@ Feel free to tune the performance settings in librenms.conf to meet your needs.
     dnf install policycoreutils-python-utils
     ```
 
-    ### Configure the contexts needed by LibreNMS
+    <h3>Configure the contexts needed by LibreNMS</h3>
 
     ```
     semanage fcontext -a -t httpd_sys_content_t '/opt/librenms/html(/.*)?'
@@ -430,7 +430,7 @@ Feel free to tune the performance settings in librenms.conf to meet your needs.
     chcon -t httpd_sys_rw_content_t /opt/librenms/.env
     ```
 
-    ### Allow fping
+    <h3>Allow fping</h3>
 
     Create the file http_fping.tt with the following contents. You can
     create this file anywhere, as it is a throw-away file. The last step
@@ -584,7 +584,7 @@ Now that you've installed LibreNMS, we'd suggest that you have a read
 of a few other docs to get you going:
 
 - [Performance tuning](../Support/Performance.md)
-- [Alerting](../Extensions/Alerting.md)
+- [Alerting](../Alerting/index.md)
 - [Device Groups](../Extensions/Device-Groups.md)
 - [Auto discovery](../Extensions/Auto-Discovery.md)
 

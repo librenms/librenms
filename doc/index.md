@@ -3,29 +3,28 @@
         <div class="home-header">
           <a href="/Installation/">
             <i class="fa fa-download fa-1x"></i>
-            <span> Installing</span>
+            <span>Installing</span>
           </a>
         </div>
-        <a href="/Installation/">Ways to install</a><br />
         <a href="/Installation/Install-LibreNMS/">Install LibreNMS Now</a><br />
-        <a href="https://github.com/librenms/docker">Install Using Docker</a><br />
-        <a href="/Installation/Installing-LibreNMS/"><strong>More...</strong></a>
+        <a href="/Installation/Docker/">Install Using Docker</a><br />
+        <a href="/Installation/Images/">Virtual machines</a>
     </div>
     <div class="home-box">
         <div class="home-header">
             <i class="fa fa-plug fa-1x"></i>
-            <span> Setup</span>
+            <span>Setup</span>
         </div>
+        <a href="/Extensions/Applications/">Applications</a><br />
         <a href="/Extensions/Auto-Discovery/">Auto Discovery</a><br />
         <a href="/Extensions/Oxidized/">Oxidized</a><br />
         <a href="/Extensions/RRDCached/">RRDCached</a><br />
-        <strong>More...</strong>
     </div>
     <div class="home-box">
         <div class="home-header">
           <a href="/Alerting/">
             <i class="fa fa-bell fa-1x"></i>
-            <span> Alerting</span>
+            <span>Alerting</span>
           </a>
         </div>
         <a href="/Alerting/Rules/#rules">Rules</a><br />
@@ -37,7 +36,7 @@
         <div class="home-header">
           <a href="/API/">
             <i class="fa fa-connectdevelop fa-1x"></i>
-            <span> API</span>
+            <span>API</span>
           </a>
         </div>
         <a href="/API/">Using the API</a><br />
@@ -49,7 +48,7 @@
         <div class="home-header">
           <a href="/Support/">
             <i class="fa fa-ambulance fa-1x"></i>
-            <span> Support</span>
+            <span>Support</span>
           </a>
         </div>
         <a href="/Support/FAQ/">FAQ</a><br />
@@ -61,12 +60,10 @@
         <div class="home-header">
           <a href="/Developing/">
             <i class="fa fa-code-branch fa-1x"></i>
-            <span> Developing</span>
+            <span>Developing</span>
           </a>
         </div>
-        <a href="/Developing/Code-Guidelines/">Code Guidelines</a><br />
-        <a href="/Developing/Validating-Code/">Validating Code</a><br />
-        <a href="/Developing/Using-Git/">Using Git</a><br />
-        <a href="/Developing/"><strong>More...</strong></a>
+        <a href="/Developing/Getting-Started/">Getting Started</a><br />
+        <a href="/Developing/Support-New-OS/">Support for a new OS</a><br />
     </div>
 </div>
