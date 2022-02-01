@@ -25,7 +25,7 @@
  * @copyright  2022 KanREN, Inc.
  * @author     Heath Barnhart <hbarnhart@kanren.net>
  */
- 
+
 namespace LibreNMS\Snmptrap\Handlers;
 
 use LibreNMS\Snmptrap\Trap;
@@ -54,7 +54,7 @@ class ApcTrapUtil
         return $trap->getOidData($trap->findOid('PowerNet-MIB::rPDULoadStatusPhaseNumber'));
     }
 
-     /**
+    /**
      * Get the APC Trap String
      *
      * @param  Trap  $trap
