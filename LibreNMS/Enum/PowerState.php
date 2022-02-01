@@ -21,12 +21,12 @@ namespace LibreNMS\Enum;
 
 abstract class PowerState
 {
-    const OFF = 0;
-    const ON = 1;
-    const SUSPENDED = 2;
-    const UNKNOWN = 3;
+    public const OFF = 0;
+    public const ON = 1;
+    public const SUSPENDED = 2;
+    public const UNKNOWN = 3;
 
-    const STATES = [
+    public const STATES = [
         'powered off' => self::OFF,
         'poweredoff' => self::OFF,
         'shut off' => self::OFF,

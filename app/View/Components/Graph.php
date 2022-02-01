@@ -8,10 +8,10 @@ use Illuminate\View\Component;
 
 class Graph extends Component
 {
-    const DEFAULT_WIDE_WIDTH = 340;
-    const DEFAULT_WIDE_HEIGHT = 100;
-    const DEFAULT_NORMAL_WIDTH = 300;
-    const DEFAULT_NORMAL_HEIGHT = 150;
+    public const DEFAULT_WIDE_WIDTH = 340;
+    public const DEFAULT_WIDE_HEIGHT = 100;
+    public const DEFAULT_NORMAL_WIDTH = 300;
+    public const DEFAULT_NORMAL_HEIGHT = 150;
 
     /**
      * @var array

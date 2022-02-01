@@ -32,10 +32,10 @@ use Log;
 
 class MeasurementManager
 {
-    const SNMP_COLOR = "\e[0;36m";
-    const DB_COLOR = "\e[1;33m";
-    const DATASTORE_COLOR = "\e[0;32m";
-    const NO_COLOR = "\e[0m";
+    public const SNMP_COLOR = "\e[0;36m";
+    public const DB_COLOR = "\e[1;33m";
+    public const DATASTORE_COLOR = "\e[0;32m";
+    public const NO_COLOR = "\e[0m";
 
     /**
      * @var \Illuminate\Support\Collection<MeasurementCollection>

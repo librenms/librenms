@@ -951,5 +951,6 @@ class Timos extends OS implements MplsDiscovery, MplsPolling, WirelessPowerDisco
 
         return $sensors;
     }
+
     // End Class Timos
 }
