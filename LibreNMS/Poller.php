@@ -138,7 +138,7 @@ class Poller
                 $this->device->displayName(),
                 $this->device->device_id,
                 $measurement->getDuration()));
-            \Log::channel('single')->alert(sprintf("INFO: device:poll %s (%s) polled in %0.3fs",
+            \Log::channel('single')->alert(sprintf('INFO: device:poll %s (%s) polled in %0.3fs',
                 $this->device->hostname,
                 $this->device->device_id,
                 $measurement->getDuration()));
