@@ -28,6 +28,11 @@ use LibreNMS\Snmptrap\Trap;
 
 class ApcPduOverloadTest extends SnmpTrapTestCase
 {
+    /**
+     * Test ApcPduNearOverload trap handle
+     *
+     * @return void
+     */
     public function testNearOverload()
     {
         $device = Device::factory()->create(); /** @var Device $device */
@@ -47,6 +52,11 @@ SNMPv2-MIB::snmpTrapEnterprise.0 PowerNet-MIB::apc";
         $this->assertTrue(Dispatcher::handle($trap), 'Could not handle rPDUNearOverload trap');
     }
 
+    /**
+     * Test ApcPduNearOverloadClear trap handle
+     *
+     * @return void
+     */
     public function testNearOverloadClear()
     {
         $device = Device::factory()->create(); /** @var Device $device */
@@ -66,6 +76,11 @@ SNMPv2-MIB::snmpTrapEnterprise.0 PowerNet-MIB::apc";
         $this->assertTrue(Dispatcher::handle($trap), 'Could not handle rPDUNearOverloadClear trap');
     }
 
+    /**
+     * Test ApcPduOverload trap handle
+     *
+     * @return void
+     */
     public function testOverload()
     {
         $device = Device::factory()->create(); /** @var Device $device */
@@ -85,6 +100,11 @@ SNMPv2-MIB::snmpTrapEnterprise.0 PowerNet-MIB::apc";
         $this->assertTrue(Dispatcher::handle($trap), 'Could not handle rPDUOverload trap');
     }
 
+    /**
+     * Test ApcPduOverloadCleared trap handle
+     *
+     * @return void
+     */
     public function testOverloadClear()
     {
         $device = Device::factory()->create(); /** @var Device $device */
