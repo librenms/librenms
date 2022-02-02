@@ -1,4 +1,4 @@
--- LENOVO-PRODUCTS-MIB: Lenovo product object identifier assignments
+--- LENOVO-PRODUCTS-MIB: Lenovo product object identifier assignments
 -- Copyright (c) 2014-2017 Lenovo Group Ltd.  All rights reserved.
 
 LENOVO-PRODUCTS-MIB DEFINITIONS ::= BEGIN
