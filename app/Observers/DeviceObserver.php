@@ -62,12 +62,12 @@ class DeviceObserver
         $host_dir = \Rrd::dirFromHost($device->hostname);
         try {
             $result = File::deleteDirectory($host_dir);
+
+            if (! $result) {
+                Log::debug("Could not delete RRD files for: $device->hostname");
+            }
         } catch (\Exception $e) {
             Log::error("Could not delete RRD files for: $device->hostname", [$e]);
-        }
-
-        if (isset($result) && $result == false) {
-            Log::debug("Could not delete RRD files for: $device->hostname");
         }
 
         Log::event("Device $device->hostname has been removed", 0, 'system', 3);
