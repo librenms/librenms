@@ -1636,11 +1636,6 @@ parameters:
 			path: LibreNMS/Component.php
 
 		-
-			message: "#^Method LibreNMS\\\\ComposerHelper\\:\\:exec\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: LibreNMS/ComposerHelper.php
-
-		-
 			message: "#^Method LibreNMS\\\\ComposerHelper\\:\\:populateEnv\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: LibreNMS/ComposerHelper.php
