@@ -61,6 +61,8 @@ plugins:
 
 extra_css:
   - https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/fontawesome.min.css
+  - https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/solid.min.css
+  - https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/brands.min.css
   - librenms.css
 extra_javascript:
   - js/docs-install-tab.js

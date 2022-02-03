@@ -2,7 +2,7 @@
     <div class="home-box">
         <div class="home-header">
           <a href="/Installation/">
-            <i class="fa fa-download fa-1x"></i>
+            <i class="fas fa-download"></i>
             <span>Installing</span>
           </a>
         </div>
@@ -12,7 +12,7 @@
     </div>
     <div class="home-box">
         <div class="home-header">
-            <i class="fa fa-plug fa-1x"></i>
+            <i class="fas fa-plug"></i>
             <span>Setup</span>
         </div>
         <a href="/Extensions/Applications/">Applications</a><br />
@@ -23,7 +23,7 @@
     <div class="home-box">
         <div class="home-header">
           <a href="/Alerting/">
-            <i class="fa fa-bell fa-1x"></i>
+            <i class="fas fa-bell"></i>
             <span>Alerting</span>
           </a>
         </div>
@@ -35,7 +35,7 @@
     <div class="home-box">
         <div class="home-header">
           <a href="/API/">
-            <i class="fa fa-connectdevelop fa-1x"></i>
+            <i class="fas fa-connectdevelop"></i>
             <span>API</span>
           </a>
         </div>
@@ -47,7 +47,7 @@
     <div class="home-box">
         <div class="home-header">
           <a href="/Support/">
-            <i class="fa fa-ambulance fa-1x"></i>
+            <i class="fas fa-ambulance"></i>
             <span>Support</span>
           </a>
         </div>
@@ -59,7 +59,7 @@
     <div class="home-box">
         <div class="home-header">
           <a href="/Developing/">
-            <i class="fa fa-code-branch fa-1x"></i>
+            <i class="fas fa-code-branch"></i>
             <span>Developing</span>
           </a>
         </div>
