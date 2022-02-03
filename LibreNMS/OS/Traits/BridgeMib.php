@@ -50,7 +50,7 @@ trait BridgeMib
         foreach ($vlans->isEmpty() ? [null] : $vlans as $vlan) {
             // fetch STP config and store it
             $vlan = (empty($vlan->vlan_vlan) || $vlan->vlan_vlan == '1') ? null : $vlan->vlan_vlan;
-            $instance = SnmpQuery::context("$vlan", 'vlan-')->enumStrings()->get([
+            $instance = SnmpQuery::context("$instance->vlan", 'vlan-')->enumStrings()->get([
                 'BRIDGE-MIB::dot1dBaseBridgeAddress.0',
                 'BRIDGE-MIB::dot1dStpProtocolSpecification.0',
                 'BRIDGE-MIB::dot1dStpPriority.0',
@@ -104,7 +104,7 @@ trait BridgeMib
     {
         $ports = new Collection;
         foreach ($stpInstances as $instance) {
-            $vlan_ports = SnmpQuery::context("$instance->vlan", 'vlan-')
+            $vlan_ports = SnmpQuery::context("$vlan", 'vlan-')
                 ->enumStrings()->walk('BRIDGE-MIB::dot1dStpPortTable')
                 ->mapTable(function ($data, $port) use ($instance) {
                     return new PortStp([
