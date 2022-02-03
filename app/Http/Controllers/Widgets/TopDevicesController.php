@@ -196,6 +196,7 @@ class TopDevicesController extends WidgetController
             }, function ($query) {
                 return $query->has('device');
             })
+            ->where('ifOperStatus','up')
             ->orderByRaw('SUM(ifInOctets_rate + ifOutOctets_rate) ' . $sort)
             ->limit($settings['device_count']);
 
