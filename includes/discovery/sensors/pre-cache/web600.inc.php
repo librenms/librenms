@@ -20,8 +20,7 @@
  * @copyright  2021 Beanfield Technologies Inc
  * @author     Jeremy Ouellet <jouellet@beanfield.com>
  */
-
-$oidmap = array(
+$oidmap = [
 'ioCalib' => '2',
 'ioDatalogNormInt' => '4',
 'ioDatalogExInt' => '5',
@@ -72,22 +71,21 @@ $oidmap = array(
 'io420calib' => '97',
 'ioLastAlarmStr' => '98',
 'ioCalibFloat' => '101',
-'ioEntry.104' => '104'
-);
+'ioEntry.104' => '104',
+];
 
-echo(" walking ");
-$ids = snmpwalk_group($device,'web600','SENSAPHONE-MIB');
-echo(" processing ");
-$iotable = array();
-$first = True;
-foreach ($ids as $key => $value){
-  if(strpos($key, 'ioTable') !== false){
-    $first = False;
-    $item = explode('.', $key);
-    $iotable[$item[1]][$item[2]] = $value;
-  }
-  elseif($first){
-    $iotable[1][$oidmap[$key]] = $value;
-  }
+echo ' walking ';
+$ids = snmpwalk_group($device, 'web600', 'SENSAPHONE-MIB');
+echo ' processing ';
+$iotable = [];
+$first = true;
+foreach ($ids as $key => $value) {
+    if (strpos($key, 'ioTable') !== false) {
+        $first = false;
+        $item = explode('.', $key);
+        $iotable[$item[1]][$item[2]] = $value;
+    } elseif ($first) {
+        $iotable[1][$oidmap[$key]] = $value;
+    }
 }
 $pre_cache['web600']['ioTable'] = $iotable;

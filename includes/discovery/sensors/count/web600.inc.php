@@ -23,11 +23,13 @@
 $oid_base = '.1.3.6.1.4.1.8338.1.1.4.1.1.1.';
 
 for ($x = 1; $x <= 9; $x++) {
-  if($x == 7){continue;}
-  $oid = $oid_base . $x . '.53';
-  $desc = $pre_cache['web600']['ioTable'][$x]['15'];
-  $value = $pre_cache['web600']['ioTable'][$x]['53'];
-  discover_sensor($valid['sensor'], 'count', $device, $oid, strval($x),
+    if ($x == 7) {
+        continue;
+    }
+    $oid = $oid_base . $x . '.53';
+    $desc = $pre_cache['web600']['ioTable'][$x]['15'];
+    $value = $pre_cache['web600']['ioTable'][$x]['53'];
+    discover_sensor($valid['sensor'], 'count', $device, $oid, strval($x),
         $device['os'], $desc, 1, 1, null, null, null, null, $value);
 }
 
