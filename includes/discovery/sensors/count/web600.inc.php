@@ -24,6 +24,7 @@ $oid_base = '.1.3.6.1.4.1.8338.1.1.4.1.1.1.';
 
 for ($x = 1; $x <= 9; $x++) {
     if ($x == 7) {
+        // Sensor 7 is not a valid sensor.
         continue;
     }
     $oid = $oid_base . $x . '.53';
@@ -32,10 +33,3 @@ for ($x = 1; $x <= 9; $x++) {
     discover_sensor($valid['sensor'], 'count', $device, $oid, strval($x),
         $device['os'], $desc, 1, 1, null, null, null, null, $value);
 }
-
-//echo(json_encode($pre_cache['web600']));
-//foreach ($pre_cache['web600']['ioTable'] as $key => $value){
-//  echo(json_encode($value));
-//  discover_sensor($valid['sensor'], 'state', $device, $oid, $name,
-//        $device['os'], $desc, 1, 1, null, null, null, null, $value);
-//}
