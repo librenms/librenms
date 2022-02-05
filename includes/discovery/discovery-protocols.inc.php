@@ -206,11 +206,16 @@ if (($device['os'] == 'routeros')) {
         $local_ifName = $lldp['lldpNeighborPortId'][$IndexId];
         $local_port_id = find_port_id('gigabitEthernet ' . $local_ifName, null, $device['device_id']);
 
-        $remote_device_id = find_device_id($lldp['lldpNeighborDeviceName'][$IndexId]);
+        $remote_device_mac = str_replace(':', '', $lldp['lldpNeighborChassisId'][$IndexId]);
+        $remote_device_id = find_device_id($lldp['lldpNeighborDeviceName'][$IndexId], null, $remote_device_mac);
         $remote_device_name = $lldp['lldpNeighborDeviceName'][$IndexId];
         $remote_device_sysDescr = $lldp['lldpNeighborDeviceDescr'][$IndexId];
         $remote_device_ip = $lldp['lldpNeighborManageIpAddr'][$IndexId];
-        $remote_port_descr = $lldp['lldpNeighborPortIdDescr'][$IndexId];
+        if ($lldp['lldpNeighborPortIdType'][$IndexId] == "MAC address") {
+            $remote_port_descr = $lldp['lldpNeighborPortDescr'][$IndexId];
+        } else {
+            $remote_port_descr = $lldp['lldpNeighborPortIdDescr'][$IndexId];
+        }
         $remote_port_id = find_port_id($remote_port_descr, null, $remote_device_id);
 
         if (! $remote_device_id &&
