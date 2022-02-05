@@ -211,7 +211,7 @@ if (($device['os'] == 'routeros')) {
         $remote_device_name = $lldp['lldpNeighborDeviceName'][$IndexId];
         $remote_device_sysDescr = $lldp['lldpNeighborDeviceDescr'][$IndexId];
         $remote_device_ip = $lldp['lldpNeighborManageIpAddr'][$IndexId];
-        if ($lldp['lldpNeighborPortIdType'][$IndexId] == "MAC address") {
+        if ($lldp['lldpNeighborPortIdType'][$IndexId] == 'MAC address') {
             $remote_port_descr = $lldp['lldpNeighborPortDescr'][$IndexId];
         } else {
             $remote_port_descr = $lldp['lldpNeighborPortIdDescr'][$IndexId];
