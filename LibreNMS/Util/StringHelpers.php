@@ -48,7 +48,7 @@ class StringHelpers
         $replacements = [
             'bind' => 'BIND',
             'dbm' => 'dBm',
-            'dhcp-stats' => 'ISC DHCP Stats',
+            'dhcp-stats' => 'DHCP Stats',
             'entropy' => 'Random entropy',
             'exim-stats' => 'EXIM Stats',
             'fbsd-nfs-client' => 'FreeBSD NFS Client',
