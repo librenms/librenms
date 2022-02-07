@@ -4216,6 +4216,13 @@
                 "value.*": "exists:devices,type"
             }
         },
+        "oxidized.enabled_groups": {
+            "default": [],
+            "type": "array",
+            "group": "external",
+            "section": "oxidized",
+            "order": 9
+        },
         "oxidized.maps": {
             "default": {
                 "os": {
