@@ -14,7 +14,7 @@ foreach ($port_stats as $index => $port) {
     //only convert swp ports
     if (substr($port['ifName'], 0, 3) === 'swp') {
         $portNum = preg_replace('/[a-z]+/', '', $port['ifName']);
-        if ($portNum < 50) { 
+        if ($portNum < 50) {
             $portNum++;
             //Leading 0 for single digits
             if ($portNum < 10) {
@@ -22,7 +22,7 @@ foreach ($port_stats as $index => $port) {
             } else {
                 $ifDescr = '1/' . $portNum;
             }
-        }   
+        }
         if ($portNum > 63 && $portNum < 128) {
             $portNum = $portNum - 63;
             //Leading 0 for single digits
@@ -31,7 +31,7 @@ foreach ($port_stats as $index => $port) {
             } else {
                 $ifDescr = '2/' . $portNum;
             }
-        }   
+        }
         if ($portNum > 127 && $portNum < 192) {
             $portNum = $portNum - 127;
             //Leading 0 for single digits
