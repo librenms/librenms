@@ -1,0 +1,332 @@
+# OAuth and SAML Support
+
+LibreNMS has support for [Laravel Socialite](https://github.com/laravel/socialite) to try and simplify the use of OAuth 1 or 2 providers such as using GitHub, Microsoft, Twitter + many more and SAML.
+
+[Socialite Providers](https://socialiteproviders.com) supports more than 100+ 3rd parties so you will most likely find support for the SAML or OAuth provider you need without too much trouble.
+
+Please do note however, these providers are not maintained by LibreNMS so we cannot add support for new ones and we can only provide you basic help with general configuration. 
+See the Socialite Providers website for more information on adding a new OAuth provider.
+
+Below we will guide you on how to install SAML or some of these OAth providers, you should be able to use these as a guide on how to install any others you may need but **please, please, ensure you read the Socialite Providers documentation carefully**.
+
+[GitHub Provider](https://socialiteproviders.com/GitHub/)  
+[Microsoft Provider](https://socialiteproviders.com/Microsoft/)  
+[SAML2](https://socialiteproviders.com/Saml2/)
+
+
+## GitHub and Microsoft Examples
+
+### Install plugin
+
+!!! note
+    First we need to install the plugin itself. The plugin name can be slightly different so be sure to check the Socialite Providers documentation and look for this line, `composer require socialiteproviders/github` which will give you the name you need for the command, i.e: `socialiteproviders/github`.
+
+=== "GitHub"
+
+	`lnms plugin:add socialiteproviders/github`
+
+=== "Microsoft"
+
+	`lnms plugin:add socialiteproviders/microsoft`
+
+### Find the provider name
+
+Next we need to find the provider name and writing it down
+
+!!! note
+	It's almost always the name of the provider in lowercase but can be different so check the Socialite Providers documentation and look for this line, `github => [` which will give you the name you need for the above command: `github`.
+
+=== "GitHub"
+
+	For GitHub we can find the line:
+	```php
+	'github' => [    
+	  'client_id' => env('GITHUB_CLIENT_ID'),  
+	  'client_secret' => env('GITHUB_CLIENT_SECRET'),  
+	  'redirect' => env('GITHUB_REDIRECT_URI') 
+	],
+	``` 
+	So our provider name is `github`, write this down.
+		
+
+=== "Microsoft"
+
+	For Microsoft we can find the line:
+	```php
+	'microsoft' => [    
+	  'client_id' => env('MICROSOFT_CLIENT_ID'),  
+	  'client_secret' => env('MICROSOFT_CLIENT_SECRET'),  
+	  'redirect' => env('MICROSOFT_REDIRECT_URI') 
+	],
+	``` 
+	So our provider name is `microsoft`, write this down.
+		
+
+### Register OAuth application
+
+#### Register a new application
+
+Now we need some values from the OAuth provider itself, in most cases you need to register a new "OAuth application" at the providers site. This will vary from provider to provider but the process itself should be similar to the examples below.
+
+!!! Note
+	The callback URL is always: https://*your-librenms-url*/auth/*provider*/callback  
+	It doesn't need to be a public available site, but it almost always needs to support TLS (https)!
+
+=== "GitHub"
+	For our example with GitHub we go to [GitHub Developer Settings](https://github.com/settings/developers) and press "Register a new application":
+
+	![socialite-github-1](/img/socialite-github-1.png)
+
+	Fill out the form accordingly (with your own values): 
+	![socialite-github-2](/img/socialite-github-2.png)
+
+=== "Microsoft"
+	For our example with Microsoft we go to ["Azure Active Directory" > "App registrations"](https://aad.portal.azure.com/#blade/Microsoft_AAD_IAM/ActiveDirectoryMenuBlade/RegisteredApps) and press "New registration"
+
+	![socialite-1](/img/socialite-microsoft-1.png)
+
+	Fill out the form accordingly using your own values):  
+	![socialite-2](/img/socialite-microsoft-2.png)
+
+	Copy the value of the **Application (client) ID** and **Directory (tenant) ID** and save them, you will need them in the next step.
+	![socialite-2](/img/socialite-microsoft-3.png)
+
+#### Generate a new client secret
+
+=== "GitHub"
+
+	Press 'Generate a new client secret' to get a new client secret.
+
+	![socialite-github-3](/img/socialite-github-3.png)
+
+	Copy the **Client ID** and **Client secret**  
+	
+	In the example above it is:
+
+	**Client ID**: 7a41f1d8215640ca6b00  
+	**Client secret**: ea03957288edd0e590be202b239e4f0ff26b8047
+
+=== "Microsoft"
+
+	Select Certificates & secrets under Manage.  
+	Select the 'New client secret' button.  
+	Enter a value in Description and select one of the options for Expires and select 'Add'.
+
+	![socialite-2](/img/socialite-microsoft-6.png)	
+
+	Copy the client secret **Value** (not Secret ID!) before you leave this page. You will need it in the next step.
+
+	![socialite-2](/img/socialite-microsoft-5.png)	
+
+
+### Saving configuration
+
+Now we need to set the configuration options for your provider within LibreNMS itself. Please replace the values in the examples below with the values you collected earlier:
+
+The format of the configuration string is `auth.socialite.configs.*provider name*.*value*`
+
+=== "GitHub"
+
+	!!! setting "auth/socialite"
+		```bash
+		lnms config:set auth.socialite.configs.github.client_id 7a41f1d8215640ca6b00
+		lnms config:set auth.socialite.configs.github.client_secret ea03957288edd0e590be202b239e4f0ff26b8047
+		```
+
+=== "Microsoft"
+
+	!!! setting "auth/socialite"
+		```bash
+		lnms config:set auth.socialite.configs.microsoft.client_id 7983ac13-c955-40e9-9b85-5ba27be52a52
+		lnms config:set auth.socialite.configs.microsoft.client_secret J9P7Q~K2F5C.L243sqzbGj.cOOcjTBgAPak_l
+		lnms config:set auth.socialite.configs.microsoft.tenant a15edc05-152d-4eb4-973c-14f1fdc57d8b
+		```		
+
+### Add provider event listener
+
+The final step is to now add an event listener.
+
+!!! Note
+	It's important to copy exactly the right value here,  
+	It should begin with a `\` and end before the `::class.'@handle'`
+
+=== "GitHub"
+
+	Find the section looking like:
+	```php
+	protected $listen = [
+	    \SocialiteProviders\Manager\SocialiteWasCalled::class => [
+	        // ... other providers
+	        \SocialiteProviders\GitHub\GitHubExtendSocialite::class.'@handle',
+	    ],
+	];
+	```
+
+	Copy the part: `\SocialiteProviders\GitHub\GitHubExtendSocialite` and run;
+	!!! setting "auth/socialite"
+		```bash
+		lnms config:set auth.socialite.configs.github.listener "\SocialiteProviders\GitHub\GitHubExtendSocialite"
+		```
+	Don't forget the initial backslash (\\) !
+
+=== "Microsoft"
+
+	Find the section looking like:
+	```php
+	protected $listen = [
+	    \SocialiteProviders\Manager\SocialiteWasCalled::class => [
+	        // ... other providers
+	        \SocialiteProviders\Microsoft\MicrosoftExtendSocialite::class.'@handle',
+	    ],
+	];
+	```
+
+	Copy the part: `\SocialiteProviders\Microsoft\MicrosoftExtendSocialite` and run;
+	!!! setting "auth/socialite"
+		```bash
+		lnms config:set auth.socialite.configs.microsoft.listener "\SocialiteProviders\Microsoft\MicrosoftExtendSocialite"
+		```
+	Don't forget the initial backslash (\\) !
+
+Now you are done with setting up the OAuth provider!  
+If it doesn't work, please double check your configuration values by using the `config:get` command below.
+
+!!! setting "auth/socialite"
+	```bash
+	lnms config:get auth.socialite
+	```
+
+## SAML2 Example
+
+### Install plugin
+
+The first step is to install the plugin itself.
+
+```bash
+lnms plugin:add socialiteproviders/saml2
+```
+
+### Add configuration
+
+Depending on what your identity provider (Google, Azure, ...) supports, the configuration could look different from what you see next so please use this as a rough guide.  
+It is up the IdP to provide the relevant details that you will need for configuration.
+
+=== "Google"
+
+	Go to [https://admin.google.com/ac/apps/unified](https://admin.google.com/ac/apps/unified)
+
+	![socialite-saml-google-1](/img/socialite-saml-google-1.png)
+	![socialite-saml-google-2](/img/socialite-saml-google-2.png)
+
+	Press "DOWNLOAD METADATA" and save the file somewhere accessible by your LibreNMS server
+
+	![socialite-saml-google-3](/img/socialite-saml-google-3.png)
+
+	ACS URL = https://*your-librenms-url*/auth/saml2/callback
+	Entity ID = https://*your-librenms-url*/auth/saml2
+	Name ID format = PERSISTANT
+	Name ID = Basic Information > Primary email
+
+	![socialite-saml-google-4](/img/socialite-saml-google-4.png)
+
+
+	First name = http://schemas.xmlsoap.org/ws/2005/05/identity/claims/givenname  
+	Last name = http://schemas.xmlsoap.org/ws/2005/05/identity/claims/surname  
+	Primary email = http://schemas.xmlsoap.org/ws/2005/05/identity/claims/emailaddress  
+
+
+	![socialite-saml-google-5](/img/socialite-saml-google-5.png)
+
+
+	![socialite-saml-google-6](/img/socialite-saml-google-6.png)
+
+
+	!!! setting "auth/socialite"
+	```bash
+	lnms config:set auth.socialite.configs.saml2.metadata "$(cat /tmp/GoogleIDPMetadata.xml)"
+	```
+
+	Alternatively, you can copy the content of the file and run it like so, this will result in the exact same result as above.
+	!!! setting "auth/socialite"
+	```bash
+	lnms config:set auth.socialite.configs.saml2.metadata '''<?xml version="1.0" encoding
+	...
+	...
+	</md:EntityDescriptor>'''
+	```
+
+
+
+#### Using an Identity Provider metadata URL
+
+!!! note ""
+	This is the prefered and easiest way, if your IdP supports it!
+
+!!! setting "auth/socialite"
+	```bash
+	lnms config:set auth.socialite.configs.saml2.metadata https://idp.co/metadata/xml
+	```
+
+#### Using an Identity Provider metadata XML file
+
+!!! setting "auth/socialite"
+	```bash
+	lnms config:set auth.socialite.configs.saml2.metadata "$(cat GoogleIDPMetadata.xml)"
+	```
+
+#### Manually configuring the Identity Provider with a certificate string
+
+!!! setting "auth/socialite"
+	```bash
+	lnms config:set auth.socialite.configs.saml2.acs https://idp.co/auth/acs
+	lnms config:set auth.socialite.configs.saml2.entityid http://saml.to/trust
+	lnms config:set auth.socialite.configs.saml2.certificate MIIC4jCCAcqgAwIBAgIQbDO5YO....
+	```
+
+#### Manually configuring the Identity Provider with a certificate file
+
+!!! setting "auth/socialite"
+	```bash
+	lnms config:set auth.socialite.configs.saml2.acs https://idp.co/auth/acs
+	lnms config:set auth.socialite.configs.saml2.entityid http://saml.to/trust
+	lnms config:set auth.socialite.configs.saml2.certificate "$(cat /path/to/certificate.pem)"
+	```
+
+### Add provider event listener
+
+Now we just need to define the listener service within LibreNMS:
+
+!!! setting "auth/socialite"
+	```bash
+	lnms config:set auth.socialite.configs.saml2.listener "\SocialiteProviders\Saml2\Saml2ExtendSocialite"
+	```
+
+### SESSION_SAME_SITE_COOKIE
+
+You most likely will need to set `SESSION_SAME_SITE_COOKIE=none` in `.env` if you use SAML2!
+
+!!! note ""
+	Don't forget to run `lnms config:clear` after you modify `.env` to flush the config cache
+
+### Service provider metadata
+
+Your identify provider might ask you for your Service Provider (SP) metadata.  
+LibreNMS exposes all of this information from your [LibreNMS install](https://*your-librenms-url*/auth/saml2/metadata)
+
+
+## Troubleshooting
+If it doesn't work, please double check your configuration values by using the `config:get` command below.
+
+!!! setting "auth/socialite"
+	```bash
+	lnms config:get auth.socialite
+	```
+
+
+TOOD:
+
+* generic tip: remember to set APP_URL
+* can override redirect url with `lnms config:set auth.socialite.configs.github.redirect https://demo.librenms.org/auth/github/callback`
+
+saml redirect url with: `lnms config:set auth.socialite.configs.saml2.sp_acs auth/saml2/callback`
+
