@@ -950,6 +950,10 @@ return [
             'default_group' => [
                 'description' => 'Set the default group returned',
             ],
+            'enabled_groups' => [
+                'description' => 'Backup these device groups with Oxidized',
+                'help' => 'Device groups which are enabled for Oxidized feed',
+            ],
             'ignore_groups' => [
                 'description' => 'Do not backup these Oxidized groups',
                 'help' => 'Groups (set via Variable Mapping) excluded from being sent to Oxidized',
