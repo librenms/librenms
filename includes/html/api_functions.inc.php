@@ -1512,7 +1512,7 @@ function list_oxidized(Illuminate\Http\Request $request)
             foreach ($device_groups as $dev_grp) {
                 # TODO, if the current device is in this group then...
                 if($dev_grp->contains($device) && ! $processed_devices->contains($device)) {
-                    $output = ['group' => $dev_grp->name];
+                    $output = ['group'] = $dev_grp->name;
                     $processed_devices->push($device);
                 }
             }
