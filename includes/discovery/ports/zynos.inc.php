@@ -12,44 +12,44 @@
 foreach ($port_stats as $index => $port) {
     //Logically convert swp ports to human readable
     //only convert swp ports
-    if (substr( $port['ifName'], 0, 3 ) === "swp") {
+    if (substr($port['ifName'], 0, 3) === 'swp') {
         $portNum = preg_replace('/[a-z]+/', '', $port['ifName']);
-        if ( $portNum < 50 ) { 
+        if ($portNum < 50) { 
             $portNum++;
             //Leading 0 for single digits
             if ($portNum < 10) {
-                $ifDescr = "1/0" . $portNum;
+                $ifDescr = '1/0' . $portNum;
             } else {
-                $ifDescr = "1/" . $portNum;
+                $ifDescr = '1/' . $portNum;
             }
         }   
-        if ( $portNum > 63 && $portNum < 128) {
+        if ($portNum > 63 && $portNum < 128) {
             $portNum = $portNum - 63;
             //Leading 0 for single digits
             if ($portNum < 10) {
-                $ifDescr = "2/0" . $portNum;
+                $ifDescr = '2/0' . $portNum;
             } else {
-                $ifDescr = "2/" . $portNum;
+                $ifDescr = '2/' . $portNum;
             }
         }   
-        if ( $portNum > 127 && $portNum < 192) {
+        if ($portNum > 127 && $portNum < 192) {
             $portNum = $portNum - 127;
             //Leading 0 for single digits
             if ($portNum < 10) {
-                $ifDescr = "3/0" . $portNum;
+                $ifDescr = '3/0' . $portNum;
             } else {
-                $ifDescr = "3/" . $portNum;
+                $ifDescr = '3/' . $portNum;
             }
-        }   
+        }
         if ($portNum > 191) {
             $portNum = $portNum - 191;
             //Leading 0 for single digits
             if ($portNum < 10) {
-                $ifDescr = "4/0" . $portNum;
+                $ifDescr = '4/0' . $portNum;
             } else {
-                $ifDescr = "4/" . $portNum;
+                $ifDescr = '4/' . $portNum;
             }
-        }   
+        }
     } else {
         //Set port number to match current
         $ifDescr = $port['ifName'];
