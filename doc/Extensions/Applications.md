@@ -91,7 +91,6 @@ by following the steps under the `SNMP Extend` heading.
 1. [BIND9/named](#bind9-aka-named) - SNMP extend, Agent
 1. [Certificate](#certificate) - Certificate extend
 1. [C.H.I.P.](#chip) - SNMP extend
-1. [DHCP Stats](#dhcp-stats) - SNMP extend
 1. [Docker Stats](#docker-stats) - SNMP extend
 1. [Entropy](#entropy) - SNMP extend
 1. [EXIM Stats](#exim-stats) - SNMP extend
@@ -102,6 +101,7 @@ by following the steps under the `SNMP Extend` heading.
 1. [Freeswitch](#freeswitch) - SNMP extend, Agent
 1. [GPSD](#gpsd) - SNMP extend, Agent
 1. [Icecast](#icecast) - SNMP extend, Agent
+1. [ISC DHCP Stats](#isc-dhcp-stats) - SNMP extend
 1. [Mailcow-dockerized postfix](#mailcow-dockerized-postfix) - SNMP extend
 1. [Mailscanner](#mailscanner) - SNMP extend
 1. [Mdadm](#mdadm) - SNMP extend
@@ -436,42 +436,6 @@ The application should be auto-discovered as described at the top of
 the page. If it is not, please follow the steps set out under `SNMP
 Extend` heading top of page.
 
-## DHCP Stats
-
-A small python3 script that reports current DHCP leases stats and pool usage.
-
-Also you have to install the dhcpd-pools Package.
-Under Ubuntu/Debian just run `apt install dhcpd-pools`
-
-### SNMP Extend
-
-1. Copy the shell script to the desired host.
-```
-wget https://github.com/librenms/librenms-agent/raw/master/snmp/dhcp.py -O /etc/snmp/dhcp.py
-```
-
-2. Make the script executable
-```
-chmod +x /etc/snmp/dhcp.py
-```
-
-3. Edit your config file, Content of an example /etc/snmp/dhcp.json
-```
-{"leasefile": "/var/lib/dhcp/dhcpd.leases" }
-```
-Key 'leasefile' specifies the path to your lease file.
-
-4. Edit your snmpd.conf file (usually /etc/snmp/snmpd.conf) and add:
-```
-extend dhcpstats /etc/snmp/dhcp.py
-```
-
-5. Restart snmpd on your host
-
-The application should be auto-discovered as described at the top of
-the page. If it is not, please follow the steps set out under `SNMP
-Extend` heading top of page.
-
 ## Docker Stats
 
 It allows you to know which container docker run and their stats.
@@ -588,17 +552,17 @@ chmod +x /etc/snmp/fail2ban
 ```
 extend fail2ban /etc/snmp/fail2ban
 ```
-    
+
     1. If you want to use the cache, it is as below, by using the -c switch.
     ```
     extend fail2ban /etc/snmp/fail2ban -c
     ```
-    
+
     2. If you want to use the cache and update it if needed, this can by using the -c and -U switches.
     ```
     extend fail2ban /etc/snmp/fail2ban -c -U
     ```
-    
+
     3. If you need to specify a custom location for the fail2ban-client, that can be done via the -f switch.
     ```
     extend fail2ban /etc/snmp/fail2ban -f /foo/bin/fail2ban-client
@@ -854,6 +818,43 @@ chmod +x /etc/snmp/icecast-stats.sh
 ```
 extend icecast /etc/snmp/icecast-stats.sh
 ```
+
+## ISC DHCP Stats
+
+A small python3 script that reports current DHCP leases stats and pool usage of ISC DHCP Server.
+
+Also you have to install the dhcpd-pools Package.
+Under Ubuntu/Debian just run `apt install dhcpd-pools`
+
+### SNMP Extend
+
+1. Copy the shell script to the desired host.
+```
+wget https://github.com/librenms/librenms-agent/raw/master/snmp/dhcp.py -O /etc/snmp/dhcp.py
+```
+
+2. Make the script executable
+```
+chmod +x /etc/snmp/dhcp.py
+```
+
+3. Edit your config file, Content of an example /etc/snmp/dhcp.json
+```
+{"leasefile": "/var/lib/dhcp/dhcpd.leases" }
+```
+Key 'leasefile' specifies the path to your lease file.
+
+4. Edit your snmpd.conf file (usually /etc/snmp/snmpd.conf) and add:
+```
+extend dhcpstats /etc/snmp/dhcp.py
+```
+
+5. Restart snmpd on your host
+
+The application should be auto-discovered as described at the top of
+the page. If it is not, please follow the steps set out under `SNMP
+Extend` heading top of page.
+
 ## mailcow-dockerized postfix
 
 ### SNMP Extend
