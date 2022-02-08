@@ -192,7 +192,6 @@ Timestamp: {{ $alert->timestamp }}
 Location: {{ $alert->location }}
 Description: {{ $alert->description }}
 Features: {{ $alert->features }}
-Purpose: {{ $alert->purpose }}
 Notes: {{ $alert->notes }}
 
 Server: {{ $alert->sysName }}
@@ -202,7 +201,7 @@ Percent Utilized: {{ $value['storage_perc'] }}
 @endforeach
 ```
 
-#### Temperature Sensors
+#### Value Sensors (Temperature, Humidity, Fanspeed, ...)
 
 ```text
 {{ $alert->title }}
@@ -211,47 +210,26 @@ Device Name: {{ $alert->hostname }}
 Severity: {{ $alert->severity }}
 Timestamp: {{ $alert->timestamp }}
 Uptime: {{ $alert->uptime_short }}
-@if ($alert->state == 0) Time elapsed: {{ $alert->elapsed }} @endif
-Location: {{ $alert->location }}
-Description: {{ $alert->description }}
-Features: {{ $alert->features }}
-Purpose: {{ $alert->purpose }}
-Notes: {{ $alert->notes }}
-
-Rule: @if ($alert->name) {{ $alert->name }} @else {{ $alert->rule }} @endif
-@if ($alert->faults) Faults:
-@foreach ($faults as $key => $value)
-#{{ $key }}: Temperature: {{ $value['sensor_current'] }} °C
-** @php echo ($value['sensor_current']-$value['sensor_limit']); @endphp°C over limit
-Previous Measurement: {{ $value['sensor_prev'] }} °C
-High Temperature Limit: {{ $value['sensor_limit'] }} °C
-@endforeach
+@if ($alert->state == 0)
+Time elapsed: {{ $alert->elapsed }}
 @endif
-```
-
-#### Value Sensors
-
-```text
-{{ $alert->title }}
-
-Device Name: {{ $alert->hostname }}
-Severity: {{ $alert->severity }}
-Timestamp: {{ $alert->timestamp }}
-Uptime: {{ $alert->uptime_short }}
-@if ($alert->state == 0) Time elapsed: {{ $alert->elapsed }} @endif
 Location: {{ $alert->location }}
 Description: {{ $alert->description }}
 Features: {{ $alert->features }}
-Purpose: {{ $alert->purpose }}
 Notes: {{ $alert->notes }}
 
-Rule: @if ($alert->name) {{ $alert->name }} @else {{ $alert->rule }} @endif
-@if ($alert->faults) Faults:
+Rule: {{ $alert->name ?? $alert->rule }}
+@if ($alert->faults)
+Faults:
 @foreach ($alert->faults as $key => $value)
-#{{ $key }}: Sensor {{ $value['sensor_current'] }}
-** @php echo ($value['sensor_current']-$value['sensor_limit']); @endphp over limit
-Previous Measurement: {{ $value['sensor_prev'] }}
-Limit: {{ $value['sensor_limit'] }}
+@php($unit = __("sensors.${value["sensor_class"]}.unit"))
+#{{ $key }}: {{ $value['sensor_descr'] ?? 'Sensor' }}
+
+Current: {{ $value['sensor_current'].$unit }}
+Previous: {{ $value['sensor_prev'].$unit }}
+Limit: {{ $value['sensor_limit'].$unit }}
+Over Limit: {{ round($value['sensor_current']-$value['sensor_limit'], 2).$unit }}
+
 @endforeach
 @endif
 ```
