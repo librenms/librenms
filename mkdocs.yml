@@ -87,6 +87,7 @@ nav:
     - Features: Support/Features.md
     - Changelog: General/Changelog.md
     - Welcome to Observium users: General/Welcome-to-Observium-users.md
+    - 3rd Party Libraries: General/Acknowledgement.md
 
   - Installing:
     - Installing LibreNMS: Installation/Install-LibreNMS.md
