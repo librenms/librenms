@@ -43,6 +43,7 @@ plugins:
         - "Dockerfile"
   - redirects:
       redirect_maps:
+        'Alerting/Introduction.md': 'Alerting/index.md'
         'API/API-Docs.md': 'API/index.md'
         'Extensions/Alerting.md': 'Alerting/index.md'
         'Extensions/Email-Alerting.md': 'Alerting/Transports.md'
@@ -54,10 +55,10 @@ plugins:
         'Extensions/Prometheus.md': 'Extensions/metrics/Prometheus.md'
         'General/Contributing.md': 'Developing/Getting-Started.md'
         'Installation/CentOS-image.md': 'Installation/Images.md'
+        'Installation/index.md': 'Installation/Install-LibreNMS.md'
         'Installation/Installing-LibreNMS.md': 'Installation/Install-LibreNMS.md'
         'Installation/Ubuntu-image.md': 'Installation/Images.md'
         'Support/Support-New-OS.md': 'Developing/Support-New-OS.md'
-
 
 extra_css:
   - https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/fontawesome.min.css

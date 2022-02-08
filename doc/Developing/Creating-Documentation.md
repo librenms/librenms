@@ -32,7 +32,12 @@ least put a placeholder in asking for contributions.
   - Ensure you use the correct formatting for `commands` and `code blocks` by
     wrapping one liners in backticks or blocks in ```.
   - Put content into sub-headings where possible to organise the content.
-- If you rename a file, please add a redirect for the old file in `mkdocs.yml`
+- If you rename a file, please add a redirect for the old file in `mkdocs.yml` like so:
+```yaml
+  - redirects:
+      redirect_maps:
+        'old/page.md': 'new/page.md'
+```
 
 Please ensure you add the document to the relevant section within `pages` of
 `mkdocs.yml` so that it's in the correct menu and is built.  Forgetting this

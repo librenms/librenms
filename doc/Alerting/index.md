@@ -1,4 +1,4 @@
-source: Alerting/Introduction.md
+source: Alerting/index.md
 path: blob/master/doc/
 
 # Introduction
