@@ -1,6 +1,3 @@
-source: Developing/os/Health-Information.md
-path: blob/master/doc/
-
 #### Sensors
 
 This document will guide you through adding health / sensor

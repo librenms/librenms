@@ -1,6 +1,3 @@
-source: Alerting/Macros.md
-path: blob/master/doc/
-
 # Macros
 
 Macros are shorthands to either portion of rules or pure SQL enhanced with placeholders.

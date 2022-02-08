@@ -1,6 +1,3 @@
-source: Alerting/Transports.md
-path: blob/master/doc/
-
 # Transports
 
 Transports are located within `LibreNMS/Alert/Transport/` and can be

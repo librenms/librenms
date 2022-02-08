@@ -1,6 +1,3 @@
-source: Developing/os/Custom-Graphs.md
-path: blob/master/doc/
-
 First we define our graphs in `includes/definitions.inc.php` to share
 our work and contribute in the development of LibreNMS. :-) (or place
 in `config.php` if you don't plan to contribute)

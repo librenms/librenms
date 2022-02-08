@@ -1,6 +1,3 @@
-source: API/Routing.md
-path: blob/master/doc/
-
 ### `list_bgp`
 
 List the current BGP sessions.

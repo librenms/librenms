@@ -1,6 +1,3 @@
-source: Extensions/PeeringDB.md
-path: blob/master/doc/
-
 # PeeringDB Support
 
 LibreNMS has integration with PeeringDB to match up your BGP sessions

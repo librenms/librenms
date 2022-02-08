@@ -30,17 +30,6 @@ use Symfony\Component\Yaml\Yaml;
 class DocsTest extends TestCase
 {
     private $hidden_pages = [
-        'API/API-Docs.md',
-        'Alerting/Old_Templates.md',
-        'Extensions/Alerting.md',
-        'Extensions/Email-Alerting.md',
-        'Extensions/Graphite.md',
-        'Extensions/InfluxDB.md',
-        'Extensions/OpenTSDB.md',
-        'Extensions/Poller-Service.md',
-        'Extensions/Port-Description-Parser.md',
-        'Extensions/Prometheus.md',
-        'Extensions/RRDCached-Security.md',
         'General/Changelogs/2013.md',
         'General/Changelogs/2014.md',
         'General/Changelogs/2015.md',
@@ -49,25 +38,6 @@ class DocsTest extends TestCase
         'General/Changelogs/2018.md',
         'General/Changelogs/2019.md',
         'General/Changelogs/2020.md',
-        'General/Contributing.md',
-        'General/Credits.md',
-        'Installation/Installation-(Debian-Ubuntu).md',
-        'Installation/Installation-(RHEL-CentOS).md',
-        'Installation/Installation-CentOS-6-Apache-Nginx.md',
-        'Installation/Installation-Ubuntu-1404-Apache.md',
-        'Installation/Installation-Ubuntu-1404-Lighttpd.md',
-        'Installation/Installation-Ubuntu-1404-Nginx.md',
-        'Installation/Installation-Ubuntu-1604-Apache.md',
-        'Installation/Installation-Ubuntu-1604-Nginx.md',
-        'Installation/Installation-Ubuntu-1804-Nginx.md',
-        'Installation/Installation-Ubuntu-1804-Apache.md',
-        'Installation/Installation-Debian-11-Nginx.md',
-        'Installation/Installation-CentOS-7-Nginx.md',
-        'Installation/Installation-CentOS-7-Apache.md',
-        'Installation/Installing-LibreNMS.md',
-        'Support/Support-New-OS.md',
-        'Installation/Ubuntu-image.md',
-        'Installation/CentOS-image.md',
     ];
 
     /**

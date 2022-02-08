@@ -1,5 +1,3 @@
-path: blob/master/doc/
-
 # How to get Help
 
 - Browse through the navigation on the left
