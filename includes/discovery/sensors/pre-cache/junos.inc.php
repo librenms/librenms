@@ -3,6 +3,7 @@
  * LibreNMS
  *
  * Copyright (c) 2016 Neil Lathwood <neil@lathwood.co.uk>
+ * Copyright (c) 2022 Beanfield Technologies Inc <jouellet@beanfield.com>
  * This program is free software: you can redistribute it and/or modify it
  * under the terms of the GNU General Public License as published by the
  * Free Software Foundation, either version 3 of the License, or (at your
@@ -21,3 +22,6 @@ $pre_cache['junos_ifotn_oids'] = snmpwalk_cache_multi_oid($device, 'jnxoptIfOTNP
 
 echo 'JnxoptIfOTNPMFECCurrentEntry ';
 $pre_cache['junos_prefec_oids'] = snmpwalk_cache_multi_oid($device, 'jnxoptIfOTNPMCurrentFECMinBERMantissa', [], 'JNX-OPT-IF-EXT-MIB', 'junos');
+
+echo 'jnxFirewallCounterTable ';
+$pre_cache['junos_firewall_oids'] = snmpwalk_cache_multi_oid($device, 'jnxFirewallCounterTable', [], 'JUNIPER-FIREWALL-MIB', 'junos');
