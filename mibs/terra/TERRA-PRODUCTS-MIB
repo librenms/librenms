@@ -1,0 +1,88 @@
+--File Name : TERRA-PRODUCTS-MIB
+--Date      : Wed Sep 03 16:46:25 EEST 2008
+--Author    : AdventNet Agent Toolkit C Edition - MibEditor 6
+
+TERRA-PRODUCTS-MIB DEFINITIONS ::= BEGIN
+    IMPORTS
+    MODULE-IDENTITY
+        FROM SNMPv2-SMI
+    terraRoot
+        FROM TERRA-SMI;
+
+    terraProducts MODULE-IDENTITY
+        LAST-UPDATED        "201303030000Z"
+        ORGANIZATION        "TERRA Electronics "
+        CONTACT-INFO        "design@terraelectronics.com"
+        DESCRIPTION         "At this node are placed devices, that are in production."
+
+        REVISION            "2016-09-29"
+        DESCRIPTION         ""
+        ::= { terraRoot 1 }
+
+
+    terraOD120 OBJECT IDENTIFIER ::= { terraProducts 1 }
+
+    terraMO411 OBJECT IDENTIFIER ::= { terraProducts 2 }
+
+    terraMO4x8 OBJECT IDENTIFIER ::= { terraProducts 3 }
+
+    terraUC412 OBJECT IDENTIFIER ::= { terraProducts 4 }
+
+    terra-sda410C OBJECT IDENTIFIER ::= { terraProducts 5 }
+   
+    terra-sta410C OBJECT IDENTIFIER ::= { terraProducts 6 }
+
+    terra-saa410C OBJECT IDENTIFIER ::= { terraProducts 7 }
+
+    terra-sdi410C OBJECT IDENTIFIER ::= { terraProducts 8 }
+   
+    terra-sti410C OBJECT IDENTIFIER ::= { terraProducts 9 }
+
+    terra-sai410C OBJECT IDENTIFIER ::= { terraProducts 10 }
+
+    terra-S2C16 OBJECT IDENTIFIER ::= { terraProducts 11 }
+
+    terraOT001M OBJECT IDENTIFIER ::= { terraProducts 12 }
+
+    terra-S2C16P OBJECT IDENTIFIER ::= { terraProducts 13 }
+
+	terra-ttd440 OBJECT IDENTIFIER ::= { terraProducts 14 }
+	
+	terra-ttx410C OBJECT IDENTIFIER ::= { terraProducts 15 }
+	
+	terra-tdx410C OBJECT IDENTIFIER ::= { terraProducts 16 }
+
+	terra-sdi480 OBJECT IDENTIFIER ::= { terraProducts 17 }
+
+	terra-sti440 OBJECT IDENTIFIER ::= { terraProducts 18 }
+	
+	terra-ttq440 OBJECT IDENTIFIER ::= { terraProducts 19 }
+
+	terra-OAD514 OBJECT IDENTIFIER ::= { terraProducts 20 }
+	
+	terra-ttq420C OBJECT IDENTIFIER ::= { terraProducts 21 }
+	
+	terra-tdq420C OBJECT IDENTIFIER ::= { terraProducts 22 }
+		
+	terra-ttx420C OBJECT IDENTIFIER ::= { terraProducts 23 }
+		
+	terra-tdx420C OBJECT IDENTIFIER ::= { terraProducts 24 }
+		
+	terra-ttq420 OBJECT IDENTIFIER ::= { terraProducts 25 }
+	
+	terra-tdq420 OBJECT IDENTIFIER ::= { terraProducts 26 }
+		
+	terra-ttx420 OBJECT IDENTIFIER ::= { terraProducts 27 }
+		
+	terra-tdx420 OBJECT IDENTIFIER ::= { terraProducts 28 }
+	
+	terra-mhi430 OBJECT IDENTIFIER ::= { terraProducts 29 }
+	
+	terra-mix440 OBJECT IDENTIFIER ::= { terraProducts 30 }	
+
+	terra-miq440 OBJECT IDENTIFIER ::= { terraProducts 31 }	
+
+	terra-mid420 OBJECT IDENTIFIER ::= { terraProducts 32 }	
+
+END
+

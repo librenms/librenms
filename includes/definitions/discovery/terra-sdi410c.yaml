@@ -1,0 +1,99 @@
+mib: TERRA-sdi410C-MIB
+modules:
+    os:
+        version: TERRA-sdi410C-MIB::infVersion.0
+        serial: TERRA-sdi410C-MIB::infSerNum.0
+
+    processors:
+        data:
+            -
+                oid: TERRA-sdi410C-MIB::load
+                num_oid: '.1.3.6.1.4.1.30631.1.8.1.1.3.{{ $index }}'
+                descr: 'Chassis CPU load'
+                index: 0
+
+    sensors:
+        pre-cache:
+            data:
+                -
+                    oid:
+                        - TERRA-sdi410C-MIB::mainStatus
+                        - TERRA-sdi410C-MIB::inputStatus
+        bitrate:
+            data:
+                -
+                    oid: TERRA-sdi410C-MIB::mainStatus
+                    value: TERRA-sdi410C-MIB::inBR
+                    num_oid: '.1.3.6.1.4.1.30631.1.8.1.1.1.{{ $index }}'
+                    descr: 'Input'
+                    index: 0
+                    group: Total
+                    multiplier: 1000
+                -
+                    oid: TERRA-sdi410C-MIB::mainStatus
+                    value: TERRA-sdi410C-MIB::outBR
+                    num_oid: '.1.3.6.1.4.1.30631.1.8.1.1.2.{{ $index }}'
+                    descr: 'Output'
+                    index: 1
+                    group: Total
+                    multiplier: 1000
+        temperature:
+            data:
+                -
+                    oid: TERRA-sdi410C-MIB::mainStatus
+                    value: TERRA-sdi410C-MIB::temp
+                    num_oid: '.1.3.6.1.4.1.30631.1.8.1.1.4.{{ $index }}'
+                    descr: 'Chassis Temp (C)'
+                    index: 0
+        voltage:
+            data:
+                -
+                    oid: TERRA-sdi410C-MIB::mainStatus
+                    value: TERRA-sdi410C-MIB::suply
+                    num_oid: '.1.3.6.1.4.1.30631.1.8.1.1.5.{{ $index }}'
+                    descr: 'Supply Voltage'
+                    index: 0
+        percent:
+            data:
+                -
+                    oid: TERRA-sdi410C-MIB::inputStatus
+                    value: TERRA-sdi410C-MIB::level
+                    num_oid: '.1.3.6.1.4.1.30631.1.8.1.27.3.{{ $index }}'
+                    descr: 'Input Signal Level'
+                    index: 0
+                    low_limit: 50
+                    low_warn_limit: 60
+        snr:
+            data:
+                -
+                    oid: TERRA-sdi410C-MIB::inputStatus
+                    value: TERRA-sdi410C-MIB::snr
+                    num_oid: '.1.3.6.1.4.1.30631.1.8.1.27.8.{{ $index }}'
+                    descr: 'Input SNR'
+                    index: 0
+                    divisor: 10
+                    low_limit: 13
+                    low_warn_limit: 15
+                    high_limit: 30
+        count:
+            data:
+                -
+                    oid: TERRA-sdi410C-MIB::inputStatus
+                    value: TERRA-sdi410C-MIB::inCCerr
+                    num_oid: '.1.3.6.1.4.1.30631.1.8.1.27.11.{{ $index }}'
+                    descr: 'CC Errors'
+                    index: 0
+                    high_warn_limit: 50
+                    high_limit: 100
+        state:
+            data:
+                -
+                    oid: TERRA-sdi410C-MIB::sdi410calarms
+                    value: TERRA-sdi410C-MIB::alarmInpsig
+                    num_oid: '.1.3.6.1.4.1.30631.1.8.1.27.1.{{ $index }}'
+                    descr: 'Input Signal'
+                    index: 0
+                    state_name: TERRA-sdi410C-MIB::alarmInpsig
+                    states:
+                        - { value: 0, generic: 0, graph: 1, descr: OK }
+                        - { value: 1, generic: 3, graph: 1, descr: Error }

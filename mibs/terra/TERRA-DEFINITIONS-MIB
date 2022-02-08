@@ -1,0 +1,173 @@
+--File Name : TERRA-DEFINITIONS-MIB
+--Date      : Thu Aug 21 10:17:18 EEST 2008
+--Author    : Tadas Leskevicius
+
+TERRA-DEFINITIONS-MIB DEFINITIONS ::= BEGIN
+    IMPORTS
+    TEXTUAL-CONVENTION
+        FROM SNMPv2-TC
+    terraRoot
+        FROM TERRA-SMI
+    Unsigned32, MODULE-IDENTITY, Gauge32, Integer32
+        FROM SNMPv2-SMI;
+
+    terraDefIdentMib MODULE-IDENTITY
+        LAST-UPDATED        "199807280000Z"
+        ORGANIZATION        "TERRA Electronics"
+        CONTACT-INFO        "design@terraelectronics.com"
+        DESCRIPTION         ""
+
+        REVISION            ""
+        DESCRIPTION         ""
+        ::= { terraRoot 3 }
+
+    --TEXTUAL-CONVENTIONS --
+    DefTenthdBm ::= TEXTUAL-CONVENTION
+        DISPLAY-HINT        "d-1"
+        STATUS              current
+        DESCRIPTION         "This data type represents power levels that are
+                            normally expressed in dBm. Units are in tenths
+                            of a dBm; for example, -5.1 dBm will be represented
+                            as -51."
+        SYNTAX              Integer32 (-100..200)
+
+    DefTenthVolt ::= TEXTUAL-CONVENTION
+        DISPLAY-HINT        "d-1"
+        STATUS              current
+        DESCRIPTION         "This data type represents voltage levels that
+                            are normally expressed in volts. Units are in
+                            tenths of a volt; for example, -48.1 volts will
+                            be represented as -481."
+        SYNTAX              Gauge32
+
+    DefOnOffStatus ::= TEXTUAL-CONVENTION
+        STATUS              current
+        DESCRIPTION         "An enumerated value that provides a status of
+                            a particular hardware or software parameter that
+                            usually represent some sort of switch.
+                            
+                            A value off(1) indicates the switch is off.
+                            
+                            A value on(2) indicates the switch is on."
+        SYNTAX              INTEGER {
+                                off( 1 ),
+                                on( 2 )
+                            }
+
+    DefHundredthNanoMeter ::= TEXTUAL-CONVENTION
+        DISPLAY-HINT        "d-2"
+        STATUS              current
+        DESCRIPTION         "This data type represents wavelength values that
+                            are normally expressed in nano meters. Units
+                            are in hundredths of a NanoMeter; for example,
+                            1550.56 nm will be represented as 155056."
+        SYNTAX              Unsigned32
+
+    DefFaultStatus ::= TEXTUAL-CONVENTION
+        STATUS              current
+        DESCRIPTION         "An enumerated value that provides a fault status
+                            of a particular hardware or software parameter
+                            that usually represent some sort of condition.
+                            
+                            A value normal(1) indicates the normal condition.
+                            
+                            
+                            A value fault(2) indicates the fault condition."
+        SYNTAX              INTEGER {
+                                normal( 1 ),
+                                fault( 2 )
+                            }
+
+    DefMilliAmp ::= TEXTUAL-CONVENTION
+        DISPLAY-HINT        "d-3"
+        STATUS              current
+        DESCRIPTION         "This data type represents current levels that
+                            are normally expressed in amperes. Units are
+                            in milliamperes; for example, 2.1 Amperes would
+                            be expressed as 2100."
+        SYNTAX              Gauge32
+
+    DefTenthAmp ::= TEXTUAL-CONVENTION
+        DISPLAY-HINT        "d-1"
+        STATUS              current
+        DESCRIPTION         "This data type represents current levels that
+                            are normally expressed in Amperes. Units are
+                            in tenths of a Ampere; for example, 1.1 Amperes
+                            will be represented as 11."
+        SYNTAX              Gauge32
+
+    DefOnOffControl ::= TEXTUAL-CONVENTION
+        STATUS              current
+        DESCRIPTION         "An enumerated value that provides a control of
+                            a particular hardware or software parameter that
+                            usually represent some sort of switch.
+                            
+                            A SET request with a value off(1) will cause
+                            the switch to be shut off.
+                            
+                            A SET request with a value on(2) will cause the
+                            switch to be turned on.
+                            
+                            A value meaningless(3) will be implemented by
+                            the variables that represent a switch with write-only
+                            access. A GET request for the value of the write-only
+                            variable shall return a value meaningless(3).
+                            
+                            
+                            A SET request with a value meaningless(3) for
+                            the variable with write access shall have no
+                            effect and no exception is generated.
+                            
+                            A value may be used by the variables with both
+                            read-write and write-only access."
+        SYNTAX              INTEGER {
+                                off( 1 ),
+                                on( 2 ),
+                                meaningless( 3 )
+                            }
+
+    DefTenthCentigrade ::= TEXTUAL-CONVENTION
+        DISPLAY-HINT        "d-1"
+        STATUS              current
+        DESCRIPTION         "This data type represents temperature values that
+                            are normally expressed in Centigrade. Units are
+                            in tenths of a Centigrade; for example, -5.1
+                            Centigrade will be represented as -51."
+        SYNTAX              Gauge32
+
+    DefTenthdBuV ::= TEXTUAL-CONVENTION
+        DISPLAY-HINT        "d-1"
+        STATUS              current
+        DESCRIPTION         "This data type represents power levels that are
+                            normally expressed in dBmV. Units are in tenths
+                            of a dBmV; for example, -5.1 dBmV will be represented
+                            as -51."
+        SYNTAX              Integer32 (-100..200)
+
+    DefTenthdB ::= TEXTUAL-CONVENTION
+        DISPLAY-HINT        "d-1"
+        STATUS              current
+        DESCRIPTION         "This data type represents power levels that are
+                            normally expressed in dB. Units are in tenths
+                            of a dB; for example, -5.1 dB will be represented
+                            as -51."
+        SYNTAX              Integer32 (-100..200)
+
+    DefStatus ::= TEXTUAL-CONVENTION
+        STATUS              current
+        DESCRIPTION         "This data type represents base device status (error)
+                            bits ( 0 represents normal condition, 1 - represents
+                            fault condition)."
+        SYNTAX              INTEGER (0..1)
+
+    DefRelayState ::= TEXTUAL-CONVENTION
+        STATUS              current
+        DESCRIPTION         "Represents relay contact state. A value closed
+                            (0) defines closed contact state, value opened
+                            (1) - opened state."
+        SYNTAX              INTEGER (0..1)
+
+
+
+END
+
