@@ -24,8 +24,6 @@
  */
 $divisor = 10;
 $multiplier = 1;
-d_echo($pre_cache['sdi480status']);
-#die();
 
 if (is_array($pre_cache['sdi480status'])) {
     d_echo('Terra sdi480 SNR');
