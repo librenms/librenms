@@ -1,6 +1,3 @@
-source: Extensions/Dell-OpenManage.md
-path: blob/master/doc/
-
 # Dell OpenManage Support
 
 For Dell OpenManage support you will need to install Dell OpenManage

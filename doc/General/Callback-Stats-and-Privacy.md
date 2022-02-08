@@ -1,6 +1,3 @@
-source: General/Callback-Stats-and-Privacy.md
-path: blob/master/doc/
-
 # Submitting Stats
 
 ## Stats data and your privacy

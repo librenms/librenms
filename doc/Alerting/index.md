@@ -1,6 +1,3 @@
-source: Alerting/index.md
-path: blob/master/doc/
-
 # Introduction
 
 To get started, you first need some alert rules which will react to

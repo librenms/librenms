@@ -1,6 +1,3 @@
-source: Extensions/Oxidized.md
-path: blob/master/doc/
-
 # Oxidized
 
 Integrating LibreNMS with

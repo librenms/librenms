@@ -1,6 +1,3 @@
-source: Support/FAQ.md
-path: blob/master/doc/
-
 ## Getting started
 
 ### <a name="faq1"> How do I install LibreNMS?</a>

@@ -1,6 +1,3 @@
-source: Developing/Validating-Code.md
-path: blob/master/doc/
-
 #### Validating Code
 
 As part of the pull request process with GitHub we run some automated

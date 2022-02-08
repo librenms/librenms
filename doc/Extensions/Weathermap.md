@@ -1,6 +1,3 @@
-source: Extensions/Weathermap.md
-path: blob/master/doc/
-
 # Network-WeatherMap with LibreNMS
 
 Integrating LibreNMS with [Network-Weathermap](https://network-weathermap.com/), allows you to build network

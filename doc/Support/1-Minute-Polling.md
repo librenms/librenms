@@ -1,6 +1,3 @@
-source: Support/1-Minute-Polling.md
-path: blob/master/doc/
-
 # 1-Minute Polling
 
 We now have support for polling data at intervals to fit your needs.

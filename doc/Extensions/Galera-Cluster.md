@@ -1,6 +1,3 @@
-source: Extensions/Galera-Cluster.md
-path: blob/master/doc/
-
 # MariaDB Galera Cluster
 
 This is currently being tested, use at your own risk.

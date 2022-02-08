@@ -1,6 +1,3 @@
-source: Support/Adding-a-Device.md
-path: blob/master/doc/
-
 # Adding Device
 
 You have two options for adding a new device into LibreNMS. You can

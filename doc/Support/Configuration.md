@@ -1,6 +1,3 @@
-source: Support/Configuration.md
-path: blob/master/doc/
-
 # Configuration Docs
 
 LibreNMS configuration is a set of key values.

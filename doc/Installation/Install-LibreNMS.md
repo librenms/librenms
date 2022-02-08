@@ -1,6 +1,3 @@
-source: Installation/Install-LibreNMS.md
-path: blob/master/doc/
-
 # Install LibreNMS
 
 ## Prepare Linux Server

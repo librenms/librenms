@@ -1,6 +1,3 @@
-source: Alerting/Templates.md
-path: blob/master/doc/
-
 # Templates
 
 > This page is for installs running version 1.42 or later. You can

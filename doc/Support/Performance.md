@@ -1,6 +1,3 @@
-source: Support/Performance.md
-path: blob/master/doc/
-
 # Performance optimisations
 
 This document will give you some guidance on optimising your setup.

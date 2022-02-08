@@ -1,6 +1,3 @@
-source: Installation/Installation-CentOS-7-Apache.md
-path: blob/master/doc/
-
 > NOTE: These instructions assume you are the **root** user.  If you
 > are not, prepend `sudo` to the shell commands (the ones that aren't
 > at `mysql>` prompts) or temporarily become a user with root
