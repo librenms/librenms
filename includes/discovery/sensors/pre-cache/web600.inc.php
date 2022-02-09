@@ -74,18 +74,15 @@ $oidmap = [
 'ioEntry.104' => '104',
 ];
 
-echo ' walking ';
-$ids = snmpwalk_group($device, 'web600', 'SENSAPHONE-MIB');
-echo ' processing ';
+echo 'ioTable ';
+$ids = snmpwalk_group($device, 'hostIO', 'SENSAPHONE-MIB');
 $iotable = [];
-$first = true;
 foreach ($ids as $key => $value) {
     if (strpos($key, 'ioTable') !== false) {
-        $first = false;
         $item = explode('.', $key);
         $iotable[$item[1]][$item[2]] = $value;
-    } elseif ($first) {
+    } else {
         $iotable[1][$oidmap[$key]] = $value;
     }
 }
-$pre_cache['web600']['ioTable'] = $iotable;
+$pre_cache['web600-ioTable'] = $iotable;
