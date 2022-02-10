@@ -1,6 +1,6 @@
 <?php
 /**
- * SnTrapUserAuth.php
+ * SnTrapUserAuthTest.php
  *
  * -Description-
  *
@@ -31,7 +31,7 @@ use App\Models\Device;
 use LibreNMS\Snmptrap\Dispatcher;
 use LibreNMS\Snmptrap\Trap;
 
-class SnTrapUserAuth extends SnmpTrapTestCase
+class SnTrapUserAuthTest extends SnmpTrapTestCase
 {
     /**
      * Create snTrapUserLogin trap object
@@ -50,8 +50,8 @@ FOUNDRY-SN-AGENT-MIB::snAgGblTrapMessage.0 \"Security: ssh login by rancid from 
 
         $trap = new Trap($trapText);
 
-        $message = 'Security: ssh login by rancid from src IP $device->ip to PRIVILEGED EXEC mode using RSA as Server Host Key. ';
-        \Log::shouldReceive('event')->once()->with($message, $device->device_id, 'trap', 3);
+        $message = "Security: ssh login by rancid from src IP $device->ip to PRIVILEGED EXEC mode using RSA as Server Host Key. ";
+        \Log::shouldReceive('event')->once()->with($message, $device->device_id, 'trap', 2);
 
         $this->assertTrue(Dispatcher::handle($trap), 'Could not handle snTrapUserLogin');
     }
@@ -74,7 +74,7 @@ FOUNDRY-SN-AGENT-MIB::snAgGblTrapMessage.0 \"Security: ssh logout by rancid from
         $trap = new Trap($trapText);
 
         $message = "Security: ssh logout by rancid from src IP $device->ip from USER EXEC mode using RSA as Server Host Key. ";
-        \Log::shouldReceive('event')->once()->with($message, $device->device_id, 'trap', 3);
+        \Log::shouldReceive('event')->once()->with($message, $device->device_id, 'trap', 2);
 
         $this->assertTrue(Dispatcher::handle($trap), 'Could not handle snTrapUserLogout');
     }
