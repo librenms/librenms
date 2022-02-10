@@ -154,7 +154,7 @@ Route::group(['middleware' => ['auth'], 'guard' => 'auth'], function () {
         Route::group(['prefix' => 'table', 'namespace' => 'Table'], function () {
             Route::post('alert-schedule', 'AlertScheduleController');
             Route::post('customers', 'CustomersController');
-	    Route::post('peering_details', 'PeeringDetailsController');
+            Route::post('peering_details', 'PeeringDetailsController');
             Route::post('device', 'DeviceController');
             Route::post('edit-ports', 'EditPortsController');
             Route::post('eventlog', 'EventlogController');
