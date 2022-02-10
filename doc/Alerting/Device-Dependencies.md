@@ -1,6 +1,3 @@
-source: Alerting/Device-Dependencies.md
-path: blob/master/doc/
-
 # Device Dependencies
 
 It is possible to set one or more parents for a device. The aim for

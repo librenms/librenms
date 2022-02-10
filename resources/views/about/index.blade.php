@@ -142,7 +142,7 @@
             <tr>
                 <td><i class='fa fa-fw fa-microchip fa-lg icon-theme' aria-hidden='true'></i> <b>{{ __('Processors') }}</b></td>
                 <td class='text-right'>{{ $stat_processors }}</td>
-                <td><i class='fa fa-fw fa-braille fa-lg icon-theme' aria-hidden='true'></i> <b>{{ __('Memory') }}</b></td>
+                <td><i class='fa-fw fas fa-memory fa-lg icon-theme' aria-hidden='true'></i> <b>{{ __('Memory') }}</b></td>
                 <td class='text-right'>{{ $stat_memory }}</td>
             </tr>
             <tr>

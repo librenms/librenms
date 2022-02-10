@@ -1,6 +1,3 @@
-source: Extensions/Agent-Setup.md
-path: blob/master/doc/
-
 # Check_MK Setup
 
 The agent can be used to gather data from remote systems you can use

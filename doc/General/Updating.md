@@ -1,6 +1,3 @@
-source: General/Updating.md
-path: blob/master/doc/
-
 # Updating an Install
 
 By default, LibreNMS is set to automatically update. If you have

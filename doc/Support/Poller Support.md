@@ -1,6 +1,3 @@
-source: Support/Poller Support.md
-path: blob/master/doc/
-
 # poller.php
 
 This document will explain how to use poller.php to debug issues or

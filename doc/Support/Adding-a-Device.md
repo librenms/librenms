@@ -1,12 +1,23 @@
-source: Support/Adding-a-Device.md
-path: blob/master/doc/
-
 # Adding Device
 
 You have two options for adding a new device into LibreNMS. You can
 add a device via the `cli` or by using the `WebUI`.
 
-## CLI
+## Via WebUI
+
+Using the web interface, go to Devices and click Add Device. Enter the
+details required for the device that you want to add and then click
+'Add Host'. As an example, if your device is configured to use the
+community `my_company` using snmp `v2c` then you would enter: SNMP
+Port defaults to 161.
+
+By default Hostname will be used for polling data. If you want
+to get polling Device data via a specific IP-Address (e.g. Management IP)
+fill out the optional field `Overwrite IP` with it's IP-Address.
+
+![Add device](/img/webui_add_device.png)
+
+## Via CLI
 
 Using the command line via ssh you can add a new device by changing to
 the directory of your LibreNMS install and typing (be sure to put the
@@ -40,20 +51,6 @@ Alternative:
 
 > Please note that if the community contains special characters such
 > as `$` then you will need to wrap it in `'`. I.e: `'Pa$$w0rd'`.
-
-## WebUI
-
-Using the web interface, go to Devices and click Add Device. Enter the
-details required for the device that you want to add and then click
-'Add Host'. As an example, if your device is configured to use the
-community `my_company` using snmp `v2c` then you would enter: SNMP
-Port defaults to 161.
-
-By default Hostname will be used for polling data. If you want
-to get polling Device data via a specific IP-Address (e.g. Management IP)
-fill out the optional field `Overwrite IP` with it's IP-Address.
-
-![Add device](/img/webui_add_device.png)
 
 ## Ping Only Device
 

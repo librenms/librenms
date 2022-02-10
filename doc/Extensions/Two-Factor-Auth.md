@@ -1,6 +1,3 @@
-source: Extensions/Two-Factor-Auth.md
-path: blob/master/doc/
-
 # Two-Factor Authentication
 
 Over the last couple of years, the primary attack vector for internet

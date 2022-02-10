@@ -1,6 +1,3 @@
-source: Extensions/SNMP-Trap-Handler.md
-path: blob/master/doc/
-
 # SNMP trap handling
 
 Currently, LibreNMS supports a lot of trap handlers. You can check them on
