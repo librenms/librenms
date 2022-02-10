@@ -322,6 +322,9 @@
                                 <li><a href="{{ url('iftype/type=peering') }}"><i class="fa fa-handshake-o fa-fw fa-lg"
                                                                                   aria-hidden="true"></i> {{ __('Peering') }}
                                     </a></li>
+                                <li><a href="{{ url('peering-details') }}"><i class="fa fa-handshake-o fa-fw fa-lg"
+                                                                                  aria-hidden="true"></i> Peering Details
+                                    </a></li>
                                 @endconfig
                                 @if(\LibreNMS\Config::get('int_peering') && \LibreNMS\Config::get('int_transit'))
                                     <li><a href="{{ url('iftype/type=peering,transit') }}"><i
