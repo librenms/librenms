@@ -44,7 +44,7 @@ trait BridgeMib
 
         $timeFactor = $this->stpTimeFactor ?? 0.01;
 
-        $vlans = ($protocol == 1 && $this->getName() == 'Cisco') ? $this->getDevice()->vlans : new Collection;
+        $vlans = ($protocol == 1 && preg_match('/^ios.*/', $this->getName())) ? $this->getDevice()->vlans : new Collection;
         $instances = new Collection;
 
         foreach ($vlans->isEmpty() ? [null] : $vlans as $vlan) {
