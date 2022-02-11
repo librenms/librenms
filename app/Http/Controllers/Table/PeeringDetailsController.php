@@ -112,6 +112,10 @@ class PeeringDetailsController extends TableController
         ];
     }
 
+    /**
+     * @param  String $customer
+     * @return array
+     */
     private function getGraphRow($customer)
     {
         $graph_array = [
@@ -133,6 +137,9 @@ class PeeringDetailsController extends TableController
         ];
     }
 
+    /**
+     * @return array
+     */
     private function getTypeStrings()
     {
         return Arr::wrap(Config::get('peering_descr', ['peering']));
