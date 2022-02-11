@@ -45,7 +45,14 @@ use LibreNMS\OS\Traits\YamlOSDiscovery;
 use LibreNMS\RRD\RrdDefinition;
 use LibreNMS\Util\IP;
 
-class Cisco extends OS implements OSDiscovery, SlaDiscovery, StpInstanceDiscovery, ProcessorDiscovery, MempoolsDiscovery, NacPolling, SlaPolling
+class Cisco extends OS implements
+    OSDiscovery,
+    SlaDiscovery,
+    StpInstanceDiscovery,
+    ProcessorDiscovery,
+    MempoolsDiscovery,
+    NacPolling,
+    SlaPolling
 {
     use YamlOSDiscovery {
         YamlOSDiscovery::discoverOS as discoverYamlOS;
@@ -522,14 +529,14 @@ class Cisco extends OS implements OSDiscovery, SlaDiscovery, StpInstanceDiscover
         }
     }
 
-    public function discoverStpInstances(string $vlan = null): Collection
+    public function discoverStpInstances(?string $vlan = null): Collection
     {
         $vlans = $this->getDevice()->vlans;
         $instances = new Collection;
 
         // attempt to discover context based vlan instances
         foreach ($vlans->isEmpty() ? [null] : $vlans as $vlan) {
-            $vlan = (empty($vlan->vlan_vlan) || $vlan->vlan_vlan == '1') ? null : $vlan->vlan_vlan;
+            $vlan = (empty($vlan->vlan_vlan) || $vlan->vlan_vlan == '1') ? null : (string) $vlan->vlan_vlan;
             $instances = $instances->merge(parent::discoverStpInstances($vlan));
         }
 

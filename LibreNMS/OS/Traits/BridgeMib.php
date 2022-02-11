@@ -33,7 +33,7 @@ use SnmpQuery;
 
 trait BridgeMib
 {
-    public function discoverStpInstances(string $vlan = null): Collection
+    public function discoverStpInstances(?string $vlan = null): Collection
     {
         $protocol = SnmpQuery::get('BRIDGE-MIB::dot1dStpProtocolSpecification.0')->value();
         // 1 = unknown (mstp?), 3 = ieee8021d
