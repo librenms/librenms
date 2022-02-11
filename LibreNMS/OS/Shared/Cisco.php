@@ -521,7 +521,7 @@ class Cisco extends OS implements OSDiscovery, SlaDiscovery, ProcessorDiscovery,
         }
     }
 
-    public function discoverStpInstances($vlan = null): Collection
+    public function discoverStpInstances(string $vlan = null): Collection
     {
         $vlans = $this->getDevice()->vlans;
         $instances = new Collection;
