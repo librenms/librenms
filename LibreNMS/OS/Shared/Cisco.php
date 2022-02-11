@@ -31,6 +31,7 @@ use App\Models\Mempool;
 use App\Models\PortsNac;
 use App\Models\Sla;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Collection;
 use LibreNMS\Device\Processor;
 use LibreNMS\Interfaces\Discovery\MempoolsDiscovery;
 use LibreNMS\Interfaces\Discovery\OSDiscovery;
@@ -518,6 +519,20 @@ class Cisco extends OS implements OSDiscovery, SlaDiscovery, ProcessorDiscovery,
             d_echo('The following datasources were collected for #' . $sla['sla_nr'] . ":\n");
             d_echo($fields);
         }
+    }
+
+    public function discoverStpInstances(): Collection
+    {
+        $vlans = $this->getDevice()->vlans;
+        $instances = new Collection;
+
+        // attempt to discover context based vlan instances
+        foreach ($vlans->isEmpty() ? [null] : $vlans as $vlan) {
+            $vlan = (empty($vlan->vlan_vlan) || $vlan->vlan_vlan == '1') ? null : $vlan->vlan_vlan;
+            $instances->push(parent::discoverStpInstances($vlan));
+        }
+
+        return $instances;
     }
 
     protected function getMainSerial()

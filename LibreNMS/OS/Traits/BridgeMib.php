@@ -33,7 +33,7 @@ use SnmpQuery;
 
 trait BridgeMib
 {
-    public function discoverStpInstances(): Collection
+    public function discoverStpInstances($vlan = null): Collection
     {
         $protocol = SnmpQuery::get('BRIDGE-MIB::dot1dStpProtocolSpecification.0')->value();
         // 1 = unknown (mstp?), 3 = ieee8021d
@@ -44,60 +44,53 @@ trait BridgeMib
 
         $timeFactor = $this->stpTimeFactor ?? 0.01;
 
-        $vlans = $protocol == 1 ? $this->getDevice()->vlans : new Collection;
-        $instances = new Collection;
+        // fetch STP config and store it
+        $stp = SnmpQuery::context("$vlan", 'vlan-')->enumStrings()->get([
+            'BRIDGE-MIB::dot1dBaseBridgeAddress.0',
+            'BRIDGE-MIB::dot1dStpProtocolSpecification.0',
+            'BRIDGE-MIB::dot1dStpPriority.0',
+            'BRIDGE-MIB::dot1dStpTimeSinceTopologyChange.0',
+            'BRIDGE-MIB::dot1dStpTopChanges.0',
+            'BRIDGE-MIB::dot1dStpDesignatedRoot.0',
+            'BRIDGE-MIB::dot1dStpRootCost.0',
+            'BRIDGE-MIB::dot1dStpRootPort.0',
+            'BRIDGE-MIB::dot1dStpMaxAge.0',
+            'BRIDGE-MIB::dot1dStpHelloTime.0',
+            'BRIDGE-MIB::dot1dStpHoldTime.0',
+            'BRIDGE-MIB::dot1dStpForwardDelay.0',
+            'BRIDGE-MIB::dot1dStpBridgeMaxAge.0',
+            'BRIDGE-MIB::dot1dStpBridgeHelloTime.0',
+            'BRIDGE-MIB::dot1dStpBridgeForwardDelay.0',
+        ])->values();
 
-        foreach ($vlans->isEmpty() ? [null] : $vlans as $vlan) {
-            // fetch STP config and store it
-            $vlan = (empty($vlan->vlan_vlan) || $vlan->vlan_vlan == '1') ? null : $vlan->vlan_vlan;
-            $instance = SnmpQuery::context("$vlan", 'vlan-')->enumStrings()->get([
-                'BRIDGE-MIB::dot1dBaseBridgeAddress.0',
-                'BRIDGE-MIB::dot1dStpProtocolSpecification.0',
-                'BRIDGE-MIB::dot1dStpPriority.0',
-                'BRIDGE-MIB::dot1dStpTimeSinceTopologyChange.0',
-                'BRIDGE-MIB::dot1dStpTopChanges.0',
-                'BRIDGE-MIB::dot1dStpDesignatedRoot.0',
-                'BRIDGE-MIB::dot1dStpRootCost.0',
-                'BRIDGE-MIB::dot1dStpRootPort.0',
-                'BRIDGE-MIB::dot1dStpMaxAge.0',
-                'BRIDGE-MIB::dot1dStpHelloTime.0',
-                'BRIDGE-MIB::dot1dStpHoldTime.0',
-                'BRIDGE-MIB::dot1dStpForwardDelay.0',
-                'BRIDGE-MIB::dot1dStpBridgeMaxAge.0',
-                'BRIDGE-MIB::dot1dStpBridgeHelloTime.0',
-                'BRIDGE-MIB::dot1dStpBridgeForwardDelay.0',
-            ]);
-
-            $stp = $instance->values();
-            if (empty($stp)) {
-                continue;
-            }
-
-            \Log::debug('VLAN: ' . ($vlan ?: 1) . " Bridge: {$stp['BRIDGE-MIB::dot1dBaseBridgeAddress.0']} DR: {$stp['BRIDGE-MIB::dot1dStpDesignatedRoot.0']}");
-            $bridge = Rewrite::macToHex($stp['BRIDGE-MIB::dot1dBaseBridgeAddress.0'] ?? '');
-            $drBridge = Rewrite::macToHex($stp['BRIDGE-MIB::dot1dStpDesignatedRoot.0'] ?? '');
-            $instances->push(new \App\Models\Stp([
-                'vlan' => $vlan,
-                'rootBridge' => $bridge == $drBridge ? 1 : 0,
-                'bridgeAddress' => $bridge,
-                'protocolSpecification' => $stp['BRIDGE-MIB::dot1dStpProtocolSpecification.0'] ?? 'unknown',
-                'priority' => $stp['BRIDGE-MIB::dot1dStpPriority.0'] ?? 0,
-                'timeSinceTopologyChange' => substr($stp['BRIDGE-MIB::dot1dStpTimeSinceTopologyChange.0'] ?? '', 0, -2) ?: 0,
-                'topChanges' => $stp['BRIDGE-MIB::dot1dStpTopChanges.0'] ?? 0,
-                'designatedRoot' => $drBridge,
-                'rootCost' => $stp['BRIDGE-MIB::dot1dStpRootCost.0'] ?? 0,
-                'rootPort' => $stp['BRIDGE-MIB::dot1dStpRootPort.0'] ?? 0,
-                'maxAge' => ($stp['BRIDGE-MIB::dot1dStpMaxAge.0'] ?? 0) * $timeFactor,
-                'helloTime' => ($stp['BRIDGE-MIB::dot1dStpHelloTime.0'] ?? 0) * $timeFactor,
-                'holdTime' => ($stp['BRIDGE-MIB::dot1dStpHoldTime.0'] ?? 0) * $timeFactor,
-                'forwardDelay' => ($stp['BRIDGE-MIB::dot1dStpForwardDelay.0'] ?? 0) * $timeFactor,
-                'bridgeMaxAge' => ($stp['BRIDGE-MIB::dot1dStpBridgeMaxAge.0'] ?? 0) * $timeFactor,
-                'bridgeHelloTime' => ($stp['BRIDGE-MIB::dot1dStpBridgeHelloTime.0'] ?? 0) * $timeFactor,
-                'bridgeForwardDelay' => ($stp['BRIDGE-MIB::dot1dStpBridgeForwardDelay.0'] ?? 0) * $timeFactor,
-            ]));
+        if (empty($stp)) {
+            return new Collection;
         }
 
-        return $instances;
+        \Log::debug('VLAN: ' . ($vlan ?: 1) . " Bridge: {$stp['BRIDGE-MIB::dot1dBaseBridgeAddress.0']} DR: {$stp['BRIDGE-MIB::dot1dStpDesignatedRoot.0']}");
+        $bridge = Rewrite::macToHex($stp['BRIDGE-MIB::dot1dBaseBridgeAddress.0'] ?? '');
+        $drBridge = Rewrite::macToHex($stp['BRIDGE-MIB::dot1dStpDesignatedRoot.0'] ?? '');
+        $instance = new \App\Models\Stp([
+            'vlan' => $vlan,
+            'rootBridge' => $bridge == $drBridge ? 1 : 0,
+            'bridgeAddress' => $bridge,
+            'protocolSpecification' => $stp['BRIDGE-MIB::dot1dStpProtocolSpecification.0'] ?? 'unknown',
+            'priority' => $stp['BRIDGE-MIB::dot1dStpPriority.0'] ?? 0,
+            'timeSinceTopologyChange' => substr($stp['BRIDGE-MIB::dot1dStpTimeSinceTopologyChange.0'] ?? '', 0, -2) ?: 0,
+            'topChanges' => $stp['BRIDGE-MIB::dot1dStpTopChanges.0'] ?? 0,
+            'designatedRoot' => $drBridge,
+            'rootCost' => $stp['BRIDGE-MIB::dot1dStpRootCost.0'] ?? 0,
+            'rootPort' => $stp['BRIDGE-MIB::dot1dStpRootPort.0'] ?? 0,
+            'maxAge' => ($stp['BRIDGE-MIB::dot1dStpMaxAge.0'] ?? 0) * $timeFactor,
+            'helloTime' => ($stp['BRIDGE-MIB::dot1dStpHelloTime.0'] ?? 0) * $timeFactor,
+            'holdTime' => ($stp['BRIDGE-MIB::dot1dStpHoldTime.0'] ?? 0) * $timeFactor,
+            'forwardDelay' => ($stp['BRIDGE-MIB::dot1dStpForwardDelay.0'] ?? 0) * $timeFactor,
+            'bridgeMaxAge' => ($stp['BRIDGE-MIB::dot1dStpBridgeMaxAge.0'] ?? 0) * $timeFactor,
+            'bridgeHelloTime' => ($stp['BRIDGE-MIB::dot1dStpBridgeHelloTime.0'] ?? 0) * $timeFactor,
+            'bridgeForwardDelay' => ($stp['BRIDGE-MIB::dot1dStpBridgeForwardDelay.0'] ?? 0) * $timeFactor,
+        ]);
+
+        return collect($instance);
     }
 
     public function discoverStpPorts(Collection $stpInstances): Collection
