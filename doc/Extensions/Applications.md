@@ -1,14 +1,15 @@
-source: Extensions/Applications.md
-path: blob/master/doc/
-
 # Applications
 
 You can use Application support to graph performance statistics of
 many applications.
 
-Different applications support a variety of ways to collect data: 1)
-by direct connection to the application, 2) snmpd extend, or 3) [the
-agent](Agent-Setup.md). The monitoring of applications could be added
+Different applications support a variety of ways to collect data: 
+
+1. By direct connection to the application
+2. snmpd extend
+3. [The agent](Agent-Setup.md).
+
+The monitoring of applications could be added
 before or after the hosts have been added to LibreNMS.
 
 If multiple methods of collection are listed you only need to enable one.
@@ -84,66 +85,6 @@ be manually enabled if using the agent. Some applications will be
 automatically enabled by the unix-agent poller module. It is better to
 ensure that your application is enabled for monitoring. You can check
 by following the steps under the `SNMP Extend` heading.
-
-1. [Apache](#apache) - SNMP extend, Agent
-1. [Asterisk](#asterisk) - SNMP extend
-1. [backupninja](#backupninja) - SNMP extend
-1. [BIND9/named](#bind9-aka-named) - SNMP extend, Agent
-1. [Certificate](#certificate) - Certificate extend
-1. [C.H.I.P.](#chip) - SNMP extend
-1. [DHCP Stats](#dhcp-stats) - SNMP extend
-1. [Docker Stats](#docker-stats) - SNMP extend
-1. [Entropy](#entropy) - SNMP extend
-1. [EXIM Stats](#exim-stats) - SNMP extend
-1. [Fail2ban](#fail2ban) - SNMP extend
-1. [FreeBSD NFS Client](#freebsd-nfs-client) - SNMP extend
-1. [FreeBSD NFS Server](#freebsd-nfs-server) - SNMP extend
-1. [FreeRADIUS](#freeradius) - SNMP extend, Agent
-1. [Freeswitch](#freeswitch) - SNMP extend, Agent
-1. [GPSD](#gpsd) - SNMP extend, Agent
-1. [Icecast](#icecast) - SNMP extend, Agent
-1. [Mailcow-dockerized postfix](#mailcow-dockerized-postfix) - SNMP extend
-1. [Mailscanner](#mailscanner) - SNMP extend
-1. [Mdadm](#mdadm) - SNMP extend
-1. [MegaRAID](#megaraid) - SNMP extend
-1. [Memcached](#memcached) - SNMP extend
-1. [Munin](#munin) - Agent
-1. [MySQL](#mysql) - SNMP extend, Agent
-1. [NGINX](#nginx) - SNMP extend, Agent
-1. [NFS Server](#nfs-server) - SNMP extend
-1. [NTP Client](#ntp-client) - SNMP extend
-1. [NTP Server/NTPD](#ntp-server-aka-ntpd) - SNMP extend
-1. [Nvidia GPU](#nvidia-gpu) - SNMP extend
-1. [Open Grid Scheduler](#open-grid-scheduler) - SNMP extend
-1. [Opensips](#opensips) - SNMP extend
-1. [OS Updates](#os-updates) - SNMP extend
-1. [PHP-FPM](#php-fpm) - SNMP extend
-1. [Pi-hole](#pi-hole) - SNMP extend
-1. [Portactivity](#portactivity) - SNMP extend
-1. [Postfix](#postfix) - SNMP extend
-1. [Postgres](#postgres) - SNMP extend
-1. [PowerDNS](#powerdns) - Agent
-1. [PowerDNS Recursor](#powerdns-recursor) - Direct, SNMP extend, Agent
-1. [PowerDNS dnsdist](#powerdns-dnsdist) - SNMP extend
-1. [PowerMon](#powermon) - SNMP extend
-1. [Proxmox](#proxmox) - SNMP extend
-1. [Puppet Agent](#puppet-agent) - SNMP extend
-1. [PureFTPd](#pureftpd) - SNMP extend
-1. [Raspberry PI](#raspberry-pi) - SNMP extend
-1. [Raspberry PI GPIO Monitor](#raspberry-pi-gpio-monitor) - SNMP extend
-1. [Redis](#redis) - SNMP extend
-1. [RRDCached](#rrdcached) - SNMP extend
-1. [SDFS info](#sdfs-info) - SNMP extend
-1. [Seafile](#seafile) - SNMP extend
-1. [SMART](#smart) - SNMP extend
-1. [Squid](#squid) - SNMP proxy
-1. [Supervisord](#supervisord) - SNMP extend
-1. [TinyDNS/djbdns](#tinydns-aka-djbdns) - Agent
-1. [Unbound](#unbound) - SNMP extend, Agent
-1. [UPS-nut](#ups-nut) - SNMP extend
-1. [UPS-apcups](#ups-apcups) - SNMP extend
-1. [Voip-monitor](#voip-monitor) - SNMP extend
-1. [ZFS](#zfs) - SNMP extend
 
 ## Apache
 
@@ -436,42 +377,6 @@ The application should be auto-discovered as described at the top of
 the page. If it is not, please follow the steps set out under `SNMP
 Extend` heading top of page.
 
-## DHCP Stats
-
-A small python3 script that reports current DHCP leases stats and pool usage.
-
-Also you have to install the dhcpd-pools Package.
-Under Ubuntu/Debian just run `apt install dhcpd-pools`
-
-### SNMP Extend
-
-1. Copy the shell script to the desired host.
-```
-wget https://github.com/librenms/librenms-agent/raw/master/snmp/dhcp.py -O /etc/snmp/dhcp.py
-```
-
-2. Make the script executable
-```
-chmod +x /etc/snmp/dhcp.py
-```
-
-3. Edit your config file, Content of an example /etc/snmp/dhcp.json
-```
-{"leasefile": "/var/lib/dhcp/dhcpd.leases" }
-```
-Key 'leasefile' specifies the path to your lease file.
-
-4. Edit your snmpd.conf file (usually /etc/snmp/snmpd.conf) and add:
-```
-extend dhcpstats /etc/snmp/dhcp.py
-```
-
-5. Restart snmpd on your host
-
-The application should be auto-discovered as described at the top of
-the page. If it is not, please follow the steps set out under `SNMP
-Extend` heading top of page.
-
 ## Docker Stats
 
 It allows you to know which container docker run and their stats.
@@ -588,17 +493,17 @@ chmod +x /etc/snmp/fail2ban
 ```
 extend fail2ban /etc/snmp/fail2ban
 ```
-    
+
     1. If you want to use the cache, it is as below, by using the -c switch.
     ```
     extend fail2ban /etc/snmp/fail2ban -c
     ```
-    
+
     2. If you want to use the cache and update it if needed, this can by using the -c and -U switches.
     ```
     extend fail2ban /etc/snmp/fail2ban -c -U
     ```
-    
+
     3. If you need to specify a custom location for the fail2ban-client, that can be done via the -f switch.
     ```
     extend fail2ban /etc/snmp/fail2ban -f /foo/bin/fail2ban-client
@@ -854,6 +759,43 @@ chmod +x /etc/snmp/icecast-stats.sh
 ```
 extend icecast /etc/snmp/icecast-stats.sh
 ```
+
+## ISC DHCP Stats
+
+A small python3 script that reports current DHCP leases stats and pool usage of ISC DHCP Server.
+
+Also you have to install the dhcpd-pools Package.
+Under Ubuntu/Debian just run `apt install dhcpd-pools`
+
+### SNMP Extend
+
+1. Copy the shell script to the desired host.
+```
+wget https://github.com/librenms/librenms-agent/raw/master/snmp/dhcp.py -O /etc/snmp/dhcp.py
+```
+
+2. Make the script executable
+```
+chmod +x /etc/snmp/dhcp.py
+```
+
+3. Edit your config file, Content of an example /etc/snmp/dhcp.json
+```
+{"leasefile": "/var/lib/dhcp/dhcpd.leases" }
+```
+Key 'leasefile' specifies the path to your lease file.
+
+4. Edit your snmpd.conf file (usually /etc/snmp/snmpd.conf) and add:
+```
+extend dhcpstats /etc/snmp/dhcp.py
+```
+
+5. Restart snmpd on your host
+
+The application should be auto-discovered as described at the top of
+the page. If it is not, please follow the steps set out under `SNMP
+Extend` heading top of page.
+
 ## mailcow-dockerized postfix
 
 ### SNMP Extend

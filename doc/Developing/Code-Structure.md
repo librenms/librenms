@@ -1,6 +1,3 @@
-source: Developing/Code-Structure.md
-path: blob/master/doc/
-
 # Code structure
 
 This document will try and provide a good overview of how the code is

@@ -1,6 +1,3 @@
-source: API/index.md
-path: blob/master/doc/
-
 ## Versioning
 
 Versioning an API is a minefield which saw us looking at numerous

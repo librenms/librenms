@@ -26,7 +26,7 @@ jobs:
       -
         name: Build mkdocs Docker image
         run: |
-          docker build -t mkdocs -f ./doc/Dockerfile ./
+          docker build -t mkdocs - < doc/Dockerfile
       -
         name: Build docs
         run: |

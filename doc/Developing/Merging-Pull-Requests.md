@@ -1,6 +1,3 @@
-source: Developing/Merging-Pull-Requests.md
-path: blob/master/doc/
-
 # Merging Pull Requests
 
 ### GitHub

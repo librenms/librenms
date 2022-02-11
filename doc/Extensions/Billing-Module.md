@@ -1,6 +1,3 @@
-source: Extensions/Billing-Module.md
-path: blob/master/doc/
-
 # Billing Module
 
 With the billing module you can create a bill, assign a quota to it

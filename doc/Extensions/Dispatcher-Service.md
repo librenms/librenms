@@ -1,6 +1,3 @@
-source: Extensions/Dispatcher-Service.md
-path: blob/master/doc/
-
 # Dispatcher Service
 
 > Status: Release Candidate

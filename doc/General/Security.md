@@ -1,6 +1,3 @@
-source: General/Security.md
-path: blob/master/doc/
-
 # General
 
 Like any good software we take security seriously. However, bugs do

@@ -1,6 +1,3 @@
-source: Extensions/Interface-Description-Parsing.md
-path: blob/master/doc/
-
 # Interface Description Parsing
 
 Librenms can interpret, display and group certain additional information on ports.

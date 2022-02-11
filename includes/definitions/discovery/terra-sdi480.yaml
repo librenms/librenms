@@ -1,0 +1,98 @@
+mib: TERRA-sdi480-MIB
+modules:
+    os:
+        version: TERRA-sdi480-MIB::infVersion.0
+        serial: TERRA-sdi480-MIB::infSerNum.0
+
+    processors:
+        data:
+            -
+                oid: TERRA-sdi480-MIB::cpuLoad
+                num_oid: '.1.3.6.1.4.1.30631.1.17.1.586.3.{{ $index }}'
+                descr: 'Chassis CPU load'
+                index: 0
+
+    sensors:
+        bitrate:
+            data:
+                -
+                    oid: TERRA-sdi480-MIB::commStatus
+                    value: TERRA-sdi480-MIB::inTotbr
+                    num_oid: '.1.3.6.1.4.1.30631.1.17.1.586.1.{{ $index }}'
+                    descr: 'Input'
+                    index: 0
+                    group: Total
+                    multiplier: 100000
+                -
+                    oid: TERRA-sdi480-MIB::commStatus
+                    value: TERRA-sdi480-MIB::outTotbr
+                    num_oid: '.1.3.6.1.4.1.30631.1.17.1.586.2.{{ $index }}'
+                    descr: 'Output'
+                    index: 1
+                    group: Total
+                    multiplier: 100000
+        temperature:
+            data:
+                -
+                    oid: TERRA-sdi480-MIB::commStatus
+                    value: TERRA-sdi480-MIB::intTemp
+                    num_oid: '.1.3.6.1.4.1.30631.1.17.1.586.4.{{ $index }}'
+                    descr: 'Chassis Temp (C)'
+                    index: 0
+                -
+                    oid: TERRA-sdi480-MIB::commStatus
+                    value: TERRA-sdi480-MIB::demodTemp
+                    num_oid: '.1.3.6.1.4.1.30631.1.17.1.586.5.{{ $index }}'
+                    descr: 'Demodulator Temp (C)'
+                    index: 1
+        voltage:
+            data:
+                -
+                    oid: TERRA-sdi480-MIB::commStatus
+                    value: TERRA-sdi480-MIB::volt
+                    num_oid: '.1.3.6.1.4.1.30631.1.17.1.586.6.{{ $index }}'
+                    descr: 'Supply Voltage'
+                    index: 0
+                    divisor: 10
+        state:
+            data:
+                -
+                    oid: TERRA-sdi480-MIB::sdi480alarms
+                    value: TERRA-sdi480-MIB::alarmLnb1
+                    num_oid: '.1.3.6.1.4.1.30631.1.17.2.1.{{ $index }}'
+                    descr: 'LNB# 01'
+                    index: 0
+                    state_name: TERRA-sdi480-MIB::alarmLnb1
+                    states:
+                        - { value: 0, generic: 0, graph: 1, descr: OK }
+                        - { value: 1, generic: 3, graph: 1, descr: Error }
+                -
+                    oid: TERRA-sdi480-MIB::sdi480alarms
+                    value: TERRA-sdi480-MIB::alarmLnb2
+                    num_oid: '.1.3.6.1.4.1.30631.1.17.2.2.{{ $index }}'
+                    descr: 'LNB# 02'
+                    index: 1
+                    state_name: TERRA-sdi480-MIB::alarmLnb2
+                    states:
+                        - { value: 0, generic: 0, graph: 1, descr: OK }
+                        - { value: 1, generic: 3, graph: 1, descr: Error }
+                -
+                    oid: TERRA-sdi480-MIB::sdi480alarms
+                    value: TERRA-sdi480-MIB::alarmLnb3
+                    num_oid: '.1.3.6.1.4.1.30631.1.17.2.3.{{ $index }}'
+                    descr: 'LNB# 03'
+                    index: 2
+                    state_name: TERRA-sdi480-MIB::alarmLnb3
+                    states:
+                        - { value: 0, generic: 0, graph: 1, descr: OK }
+                        - { value: 1, generic: 3, graph: 1, descr: Error }
+                -
+                    oid: TERRA-sdi480-MIB::sdi480alarms
+                    value: TERRA-sdi480-MIB::alarmLnb4
+                    num_oid: '.1.3.6.1.4.1.30631.1.17.2.4.{{ $index }}'
+                    descr: 'LNB# 04'
+                    index: 3
+                    state_name: TERRA-sdi480-MIB::alarmLnb4
+                    states:
+                        - { value: 0, generic: 0, graph: 1, descr: OK }
+                        - { value: 1, generic: 3, graph: 1, descr: Error }

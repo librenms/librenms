@@ -1,6 +1,3 @@
-source: Extensions/Plugin-System.md
-path: blob/master/doc/
-
 # Developing for the Plugin System
 
 With plugins you can extend LibreNMS with special functions that are
