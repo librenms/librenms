@@ -34,5 +34,5 @@ interface StpInstanceDiscovery
      *
      * @return Collection<\App\Models\Stp>
      */
-    public function discoverStpInstances(): Collection;
+    public function discoverStpInstances($vlan = null): Collection;
 }
