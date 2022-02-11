@@ -1,7 +1,7 @@
 <?php
 
 use LibreNMS\Config;
-use app\Models\Port
+use App\Models\Port;
 
 // Generate a list of ports and then call the multi_bits grapher to generate from the list
 
