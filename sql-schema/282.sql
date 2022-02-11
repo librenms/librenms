@@ -1,0 +1,1 @@
+ALTER TABLE `bgpPeers` ADD `bgpPeerIface` VARCHAR(255) NOT NULL DEFAULT '' AFTER `bgpPeerLastErrorText`;
