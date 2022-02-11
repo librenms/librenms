@@ -529,7 +529,7 @@ class Cisco extends OS implements OSDiscovery, SlaDiscovery, ProcessorDiscovery,
         // attempt to discover context based vlan instances
         foreach ($vlans->isEmpty() ? [null] : $vlans as $vlan) {
             $vlan = (empty($vlan->vlan_vlan) || $vlan->vlan_vlan == '1') ? null : $vlan->vlan_vlan;
-            $instances->push(parent::discoverStpInstances($vlan));
+            $instances->merge(parent::discoverStpInstances($vlan));
         }
 
         return $instances;
