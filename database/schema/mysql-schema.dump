@@ -279,6 +279,7 @@ CREATE TABLE `bgpPeers` (
   `bgpPeerLastErrorCode` int(11) DEFAULT NULL,
   `bgpPeerLastErrorSubCode` int(11) DEFAULT NULL,
   `bgpPeerLastErrorText` varchar(254) COLLATE utf8mb4_unicode_ci DEFAULT NULL,
+  `bgpPeerIface` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
   `bgpLocalAddr` text COLLATE utf8mb4_unicode_ci NOT NULL,
   `bgpPeerRemoteAddr` text COLLATE utf8mb4_unicode_ci NOT NULL,
   `bgpPeerDescr` varchar(255) COLLATE utf8mb4_unicode_ci NOT NULL DEFAULT '',
