@@ -70,7 +70,8 @@ trait BridgeMib
         \Log::debug('VLAN: ' . ($vlan ?: 1) . " Bridge: {$stp['BRIDGE-MIB::dot1dBaseBridgeAddress.0']} DR: {$stp['BRIDGE-MIB::dot1dStpDesignatedRoot.0']}");
         $bridge = Rewrite::macToHex($stp['BRIDGE-MIB::dot1dBaseBridgeAddress.0'] ?? '');
         $drBridge = Rewrite::macToHex($stp['BRIDGE-MIB::dot1dStpDesignatedRoot.0'] ?? '');
-        $instance = new \App\Models\Stp([
+        $instances = new Collection;
+        $instances->push(new \App\Models\Stp([
             'vlan' => $vlan,
             'rootBridge' => $bridge == $drBridge ? 1 : 0,
             'bridgeAddress' => $bridge,
@@ -88,9 +89,9 @@ trait BridgeMib
             'bridgeMaxAge' => ($stp['BRIDGE-MIB::dot1dStpBridgeMaxAge.0'] ?? 0) * $timeFactor,
             'bridgeHelloTime' => ($stp['BRIDGE-MIB::dot1dStpBridgeHelloTime.0'] ?? 0) * $timeFactor,
             'bridgeForwardDelay' => ($stp['BRIDGE-MIB::dot1dStpBridgeForwardDelay.0'] ?? 0) * $timeFactor,
-        ]);
+        ]));
 
-        return collect($instance);
+        return $instances;
     }
 
     public function discoverStpPorts(Collection $stpInstances): Collection
