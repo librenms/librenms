@@ -113,7 +113,7 @@ class PeeringDetailsController extends TableController
     }
 
     /**
-     * @param  String  $customer
+     * @param  string  $customer
      * @return array
      */
     private function getGraphRow($customer)
