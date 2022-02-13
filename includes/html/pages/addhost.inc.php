@@ -55,7 +55,7 @@ if (! empty($_POST['hostname'])) {
             }
 
             $snmpver = strip_tags($_POST['snmpver']);
-            print_message("Adding host $hostname communit" . (count(Config::get('snmp.community')) == 1 ? 'y' : 'ies') . ' ' . implode(', ', Config::get('snmp.community')) . " port $port using $transport");
+            print_message("Adding host $hostname communit" . (count(Config::get('snmp.community')) == 1 ? 'y' : 'ies') . ' ' . implode(', ', array_map("\LibreNMS\Util\Clean::html", Config::get('snmp.community'))) . " port $port using $transport");
         } elseif ($_POST['snmpver'] === 'v3') {
             $v3 = [
                 'authlevel'  => strip_tags($_POST['authlevel']),
