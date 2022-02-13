@@ -82,7 +82,6 @@ Route::group(['middleware' => ['auth'], 'guard' => 'auth'], function () {
         Route::resource('port-groups', 'PortGroupController');
     });
 
-
     Route::get('plugin', 'PluginLegacyController@redirect');
     Route::redirect('plugin/view=admin', '/plugin/admin');
     Route::get('plugin/p={pluginName}', 'PluginLegacyController@redirect');
