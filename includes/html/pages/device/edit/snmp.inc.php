@@ -318,7 +318,7 @@ echo "        </select>
     <div class='form-group'>
     <label for='community' class='col-sm-2 control-label'>SNMP Community</label>
     <div class='col-sm-4'>
-    <input id='community' class='form-control' name='community' value='" . htmlspecialchars($device['community']) . "'/>
+    <input id='community' class='form-control' name='community' value='" . \LibreNMS\Util\Clean::html($device['community']) . "'/>
     </div>
     </div>
     </div>
