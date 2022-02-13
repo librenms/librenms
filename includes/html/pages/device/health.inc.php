@@ -19,6 +19,8 @@
  *
  * @link       https://www.librenms.org
  *
+ * @copyright  2022 Peca Nesovanovic
+ *
  * @author     Peca Nesovanovic <peca.nesovanovic@sattrakt.com>
  */
 use App\Models\DiskIo;
@@ -71,7 +73,9 @@ $sensors = [
 foreach ($sensors as $sensor_name) {
     if (Sensor::where('sensor_class', $sensor_name)->where('device_id', $device['device_id'])->count()) {
         //strtolower because 'dBm - dbm' difference
-        $datas[] = strtolower($sensor_name);
+        $lowname = strtolower($sensor_name);
+        $datas[] = $lowname;
+        $type_text[$lowname] = trans('sensors.' . $lowname)['short'];
     }
 }
 
@@ -81,36 +85,6 @@ $type_text['processor'] = 'Processor';
 $type_text['mempool'] = 'Memory';
 $type_text['storage'] = 'Disk Usage';
 $type_text['diskio'] = 'Disk I/O';
-$type_text['airflow'] = 'Airflow';
-$type_text['ber'] = 'Bit Error Rate';
-$type_text['bitrate'] = 'Bitrate';
-$type_text['charge'] = 'Battery Charge';
-$type_text['chromatic_dispersion'] = 'Chromatic Dispersion';
-$type_text['cooling'] = 'Cooling';
-$type_text['count'] = 'Count';
-$type_text['current'] = 'Current';
-$type_text['dbm'] = 'dBm';
-$type_text['delay'] = 'Delay';
-$type_text['eer'] = 'Energy Efficiency Ratio';
-$type_text['fanspeed'] = 'Fanspeed';
-$type_text['frequency'] = 'Frequency';
-$type_text['humidity'] = 'Humidity';
-$type_text['load'] = 'Load';
-$type_text['loss'] = 'Loss';
-$type_text['percent'] = 'Percent';
-$type_text['power'] = 'Power';
-$type_text['power_consumed'] = 'Power Consumed';
-$type_text['power_factor'] = 'Power Factor';
-$type_text['pressure'] = 'Pressure';
-$type_text['runtime'] = 'Runtime remaining';
-$type_text['signal'] = 'Signal';
-$type_text['snr'] = 'SNR';
-$type_text['state'] = 'State';
-$type_text['temperature'] = 'Temperature';
-$type_text['tv_signal'] = 'TV signal';
-$type_text['voltage'] = 'Voltage';
-$type_text['waterflow'] = 'Water Flow Rate';
-$type_text['quality_factor'] = 'Quality factor';
 
 $link_array = [
     'page'   => 'device',
