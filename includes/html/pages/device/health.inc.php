@@ -20,7 +20,6 @@
  * @link       https://www.librenms.org
  *
  * @copyright  2022 Peca Nesovanovic
- *
  * @author     Peca Nesovanovic <peca.nesovanovic@sattrakt.com>
  */
 use App\Models\DiskIo;
