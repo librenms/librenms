@@ -163,6 +163,7 @@ Route::group(['middleware' => ['auth'], 'guard' => 'auth'], function () {
             Route::post('mempools', 'MempoolsController');
             Route::post('outages', 'OutagesController');
             Route::post('port-nac', 'PortNacController');
+            Route::post('port-stp', 'PortStpController');
             Route::post('ports', 'PortsController')->name('table.ports');
             Route::post('routes', 'RoutesTablesController');
             Route::post('syslog', 'SyslogController');

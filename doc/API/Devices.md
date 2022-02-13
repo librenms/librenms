@@ -1,6 +1,3 @@
-source: API/Devices.md
-path: blob/master/doc/
-
 ### `del_device`
 
 Delete a given device.

@@ -34,15 +34,21 @@ use LibreNMS\Device\YamlDiscovery;
 use LibreNMS\Interfaces\Discovery\MempoolsDiscovery;
 use LibreNMS\Interfaces\Discovery\OSDiscovery;
 use LibreNMS\Interfaces\Discovery\ProcessorDiscovery;
+use LibreNMS\Interfaces\Discovery\StpInstanceDiscovery;
+use LibreNMS\Interfaces\Discovery\StpPortDiscovery;
 use LibreNMS\Interfaces\Polling\Netstats\IcmpNetstatsPolling;
 use LibreNMS\Interfaces\Polling\Netstats\IpForwardNetstatsPolling;
 use LibreNMS\Interfaces\Polling\Netstats\IpNetstatsPolling;
 use LibreNMS\Interfaces\Polling\Netstats\SnmpNetstatsPolling;
 use LibreNMS\Interfaces\Polling\Netstats\TcpNetstatsPolling;
 use LibreNMS\Interfaces\Polling\Netstats\UdpNetstatsPolling;
+use LibreNMS\Interfaces\Polling\StpInstancePolling;
+use LibreNMS\Interfaces\Polling\StpPortPolling;
 use LibreNMS\OS\Generic;
+use LibreNMS\OS\Traits\BridgeMib;
 use LibreNMS\OS\Traits\HostResources;
 use LibreNMS\OS\Traits\NetstatsPolling;
+use LibreNMS\OS\Traits\ResolvesPortIds;
 use LibreNMS\OS\Traits\UcdResources;
 use LibreNMS\OS\Traits\YamlMempoolsDiscovery;
 use LibreNMS\OS\Traits\YamlOSDiscovery;
@@ -52,10 +58,14 @@ class OS implements
     ProcessorDiscovery,
     OSDiscovery,
     MempoolsDiscovery,
+    StpInstanceDiscovery,
+    StpPortDiscovery,
     IcmpNetstatsPolling,
     IpNetstatsPolling,
     IpForwardNetstatsPolling,
     SnmpNetstatsPolling,
+    StpInstancePolling,
+    StpPortPolling,
     TcpNetstatsPolling,
     UdpNetstatsPolling
 {
@@ -70,7 +80,13 @@ class OS implements
     use YamlOSDiscovery;
     use YamlMempoolsDiscovery;
     use NetstatsPolling;
+    use ResolvesPortIds;
+    use BridgeMib;
 
+    /**
+     * @var float|null
+     */
+    public $stpTimeFactor; // for stp time quirks
     private $device; // annoying use of references to make sure this is in sync with global $device variable
     private $graphs; // stores device graphs
     private $cache; // data cache
@@ -81,7 +97,7 @@ class OS implements
      *
      * @param  array  $device
      */
-    private function __construct(&$device)
+    protected function __construct(&$device)
     {
         $this->device = &$device;
         $this->graphs = [];

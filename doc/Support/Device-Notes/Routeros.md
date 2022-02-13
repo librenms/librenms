@@ -1,6 +1,3 @@
-source: doc/Support/Device-Notes/Routeros.md
-path: blob/master/doc/
-
 This is attempt to get vlans information from Mikrotik RouterOS.
 
 # Installation

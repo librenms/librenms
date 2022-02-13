@@ -28,23 +28,23 @@ if (! Auth::user()->hasGlobalAdmin()) {
                 <div class="row">
                     <div class="col-md-12">
                         <div class="form-group">
-                            <label for="name">Template name: </label>
+                            <label for="name">Template name </label>
                             <input type="text" class="form-control input-sm" id="name" name="name">
                         </div>
                         <div class="form-group">
-                            <label for="template">Template: </label>
+                            <label for="template">Template </label>
                             <textarea class="form-control" id="template" name="template" style="font-family: Menlo, Monaco, Consolas, 'Courier New', monospace;" rows="15"></textarea>
                         </div>
                         <div class="form-group">
-                            <label for="rules_list">Attach template to rules: </label>
+                            <label for="rules_list">Attach template to rules </label>
                             <select id="rules_list" name="rules_list[]" class="form-control" multiple="multiple"></select>
                         </div>
                         <div class="form-group">
-                            <label for="title">Alert title: </label>
+                            <label for="title">Alert title </label>
                             <input type="text" class="form-control input-sm" id="title" name="title" placeholder="Alert Title">
                         </div>
                         <div class="form-group">
-                            <label for="title_rec">Recovery title: </label>
+                            <label for="title_rec">Recovery title </label>
                             <input type="text" class="form-control input-sm" id="title_rec" name="title_rec" placeholder="Recovery Title">
                         </div>
                         <button type="button" class="btn btn-primary btn-sm" name="create-template" id="create-template">Create template</button>

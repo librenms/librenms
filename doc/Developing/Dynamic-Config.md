@@ -1,6 +1,3 @@
-source: Developing/Dynamic-Config.md
-path: blob/master/doc/
-
 # Adding new config settings
 
 Adding support for users to update a new config option via the WebUI

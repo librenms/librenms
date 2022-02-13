@@ -388,7 +388,7 @@ class CiHelper
         $type = substr($name, $space ? $space + 1 : 0);
         $quiet = ($this->flags['ci'] && isset($this->ciDefaults['quiet'][$type])) ? $this->ciDefaults['quiet'][$type] : $this->flags['quiet'];
 
-        $proc->setTimeout(3600)->setIdleTimeout(3600);
+        $proc->setTimeout(7200)->setIdleTimeout(3600);
         if (! ($silence || $quiet)) {
             echo PHP_EOL;
             $proc->setTty(Process::isTtySupported());

@@ -1,6 +1,3 @@
-source: Extensions/Component.md
-path: blob/master/doc/
-
 # About
 
 The Component extension provides a generic database storage mechanism

@@ -19,10 +19,10 @@ foreach ($vtpdomains as $vtpdomain_id => $vtpdomain) {
         }
 
         if (($vlan['vtpVlanState'] === '1') && ($vlan_raw < 1002 || $vlan_raw > 1005)) {
-            $fdbPort_table = SnmpQuery::context($vlan_raw, "vlan-$vlan_raw")->walk('BRIDGE-MIB::dot1dTpFdbPort')->table();
+            $fdbPort_table = SnmpQuery::context($vlan_raw, 'vlan-')->walk('BRIDGE-MIB::dot1dTpFdbPort')->table();
 
             $portid_dict = [];
-            $dot1dBasePortIfIndex = SnmpQuery::context($vlan_raw, "vlan-$vlan_raw")->walk('BRIDGE-MIB::dot1dBasePortIfIndex')->table(1);
+            $dot1dBasePortIfIndex = SnmpQuery::context($vlan_raw, 'vlan-')->walk('BRIDGE-MIB::dot1dBasePortIfIndex')->table(1);
             foreach ($dot1dBasePortIfIndex as $portLocal => $data) {
                 $port = get_port_by_index_cache($device['device_id'], $data['BRIDGE-MIB::dot1dBasePortIfIndex']);
                 $portid_dict[$portLocal] = $port['port_id'];

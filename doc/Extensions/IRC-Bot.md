@@ -1,6 +1,3 @@
-source: Extensions/IRC-Bot.md
-path: blob/master/doc/
-
 # IRC Bot
 
 LibreNMS has an easy to use IRC-Interface for basic tasks like viewing

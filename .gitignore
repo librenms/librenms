@@ -29,6 +29,7 @@ patches
 npm-debug.log
 yarn-error.log
 composer.phar
+composer.plugins.json
 _ide_helper.php
 _ide_helper_models.php
 resources/views/menu/custom.blade.php

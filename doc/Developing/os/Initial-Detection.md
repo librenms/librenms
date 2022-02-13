@@ -1,6 +1,3 @@
-source: Developing/os/Initial-Detection.md
-path: blob/master/doc/
-
 This document will provide the information you should need to add
 basic detection for a new OS.
 
@@ -42,6 +39,14 @@ is the preferred method for detection.  Other options are available:
   matches one of the regex statements under this item
 - `snmpget` Do not use this unless none of the other methods
   work. Fetch an oid and compare it against a value.
+```yaml
+discovery:
+    -
+      snmpget:
+        - oid: <someoid>
+        - op: <["=","!=","==","!==","<=",">=","<",">","starts","ends","contains","regex","not_starts","not_ends","not_contains","not_regex","in_array","not_in_array","exists"]>
+        - value: <'string' | boolean>
+```
 - `_except` You can add this to any of the above to exclude that
   element. As an example:
 

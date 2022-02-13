@@ -1,6 +1,3 @@
-source: API/DeviceGroups.md
-path: blob/master/doc/
-
 ### `get_devicegroups`
 
 List all device groups.

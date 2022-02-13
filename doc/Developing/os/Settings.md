@@ -1,6 +1,3 @@
-source: os/Settings.md
-path: blob/master/doc/
-
 # Optional OS Settings
 
 This page documents settings that can be set in the os yaml files or

@@ -1,6 +1,3 @@
-source: Extensions/Distributed-Poller.md
-path: blob/master/doc/
-
 # Distributed Poller
 
 A normal install contains all parts of LibreNMS:
