@@ -32,8 +32,11 @@ $template_id = 0;
 $template_newid = 0;
 $create = true;
 
-$name = $vars['name'];
-if (isset($vars['template']) && empty(Blade::render($vars['template']))) {
+$name = strip_tags($vars['name']);
+if ((isset($vars['template']) && empty(Blade::render($vars['template']))) ||
+    (!empty($vars['title']) && empty(Blade::render($vars['title']))) ||
+    (!empty($vars['title_rec']) && empty(Blade::render($vars['title_rec'])))
+    ) {
     $message = 'Template failed to be parsed, please check the syntax';
 } elseif (! empty($name)) {
     if ($vars['template'] && is_numeric($vars['template_id'])) {
