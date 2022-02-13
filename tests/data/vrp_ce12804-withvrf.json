@@ -12217,8 +12217,8 @@
                     "ifName": "NULL0",
                     "portName": null,
                     "ifIndex": 4,
-                    "ifSpeed": null,
-                    "ifSpeed_prev": 0,
+                    "ifSpeed": 0,
+                    "ifSpeed_prev": null,
                     "ifConnectorPresent": "false",
                     "ifPromiscuousMode": "false",
                     "ifOperStatus": "up",
@@ -12322,8 +12322,8 @@
                     "ifName": "InLoopBack0",
                     "portName": null,
                     "ifIndex": 5,
-                    "ifSpeed": null,
-                    "ifSpeed_prev": 0,
+                    "ifSpeed": 0,
+                    "ifSpeed_prev": null,
                     "ifConnectorPresent": "false",
                     "ifPromiscuousMode": "false",
                     "ifOperStatus": "up",
@@ -24187,8 +24187,8 @@
                     "ifName": "LoopBack2",
                     "portName": null,
                     "ifIndex": 182,
-                    "ifSpeed": null,
-                    "ifSpeed_prev": 0,
+                    "ifSpeed": 0,
+                    "ifSpeed_prev": null,
                     "ifConnectorPresent": "false",
                     "ifPromiscuousMode": "false",
                     "ifOperStatus": "up",
@@ -24292,8 +24292,8 @@
                     "ifName": "LoopBack200",
                     "portName": null,
                     "ifIndex": 198,
-                    "ifSpeed": null,
-                    "ifSpeed_prev": 0,
+                    "ifSpeed": 0,
+                    "ifSpeed_prev": null,
                     "ifConnectorPresent": "false",
                     "ifPromiscuousMode": "false",
                     "ifOperStatus": "up",
@@ -24390,20 +24390,6 @@
             ]
         }
     },
-    "vrf": {
-        "discovery": {
-            "vrfs": [
-                {
-                    "vrf_oid": "5.116.101.115.116.49",
-                    "vrf_name": "test1",
-                    "bgpLocalAs": null,
-                    "mplsVpnVrfRouteDistinguisher": "65301:1",
-                    "mplsVpnVrfDescription": "",
-                    "ifIndices": "198"
-                }
-            ]
-        }
-    },
     "bgp-peers": {
         "discovery": {
             "bgpPeers": [
@@ -24465,8 +24451,8 @@
                     "bgpPeerRemoteAs": 64512,
                     "bgpPeerState": "established",
                     "bgpPeerAdminStatus": "",
-                    "bgpPeerLastErrorCode": null,
-                    "bgpPeerLastErrorSubCode": null,
+                    "bgpPeerLastErrorCode": 2,
+                    "bgpPeerLastErrorSubCode": 2,
                     "bgpPeerLastErrorText": null,
                     "bgpLocalAddr": "0.0.0.0",
                     "bgpPeerRemoteAddr": "192.168.189.96",
