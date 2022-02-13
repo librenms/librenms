@@ -1,5 +1,7 @@
 # OAuth and SAML Support
 
+## Introduction
+
 LibreNMS has support for [Laravel Socialite](https://github.com/laravel/socialite) to try and simplify the use of OAuth 1 or 2 providers such as using GitHub, Microsoft, Twitter + many more and SAML.
 
 [Socialite Providers](https://socialiteproviders.com) supports more than 100+ 3rd parties so you will most likely find support for the SAML or OAuth provider you need without too much trouble.
@@ -13,6 +15,14 @@ Below we will guide you on how to install SAML or some of these OAth providers, 
 [Microsoft Provider](https://socialiteproviders.com/Microsoft/)  
 [SAML2](https://socialiteproviders.com/Saml2/)
 
+## Requirements
+
+LibreNMS version 22.2.0 or later.
+
+Please ensure you set `APP_URL` within your `.env` file so that callback URLs work correctly with the identify provider.
+
+!!! note
+    Once you have configured your OAuth or SAML2 provider, please ensure you check the [Post configuration settings](#post-configration-settings) section at the end.
 
 ## GitHub and Microsoft Examples
 
@@ -68,7 +78,7 @@ Next we need to find the provider name and writing it down
 
 Now we need some values from the OAuth provider itself, in most cases you need to register a new "OAuth application" at the providers site. This will vary from provider to provider but the process itself should be similar to the examples below.
 
-!!! Note
+!!! note
 	The callback URL is always: https://*your-librenms-url*/auth/*provider*/callback  
 	It doesn't need to be a public available site, but it almost always needs to support TLS (https)!
 
@@ -146,7 +156,7 @@ The format of the configuration string is `auth.socialite.configs.*provider name
 
 The final step is to now add an event listener.
 
-!!! Note
+!!! note
 	It's important to copy exactly the right value here,  
 	It should begin with a `\` and end before the `::class.'@handle'`
 
@@ -259,7 +269,7 @@ It is up the IdP to provide the relevant details that you will need for configur
 
 #### Using an Identity Provider metadata URL
 
-!!! note ""
+!!! note
 	This is the prefered and easiest way, if your IdP supports it!
 
 !!! setting "auth/socialite"
@@ -305,7 +315,7 @@ Now we just need to define the listener service within LibreNMS:
 
 You most likely will need to set `SESSION_SAME_SITE_COOKIE=none` in `.env` if you use SAML2!
 
-!!! note ""
+!!! note
 	Don't forget to run `lnms config:clear` after you modify `.env` to flush the config cache
 
 ### Service provider metadata
@@ -322,11 +332,21 @@ If it doesn't work, please double check your configuration values by using the `
 	lnms config:get auth.socialite
 	```
 
+### Redirect URL
+If you have a need to, then you can override redirect url with the following commands:
 
-TOOD:
+=== "OAuth"
+    Replace `github` and the relevant URL below with your identity provider details.
+    `lnms config:set auth.socialite.configs.github.redirect https://demo.librenms.org/auth/github/callback`
 
-* generic tip: remember to set APP_URL
-* can override redirect url with `lnms config:set auth.socialite.configs.github.redirect https://demo.librenms.org/auth/github/callback`
+=== "SAML2"
+    `lnms config:set auth.socialite.configs.saml2.sp_acs auth/saml2/callback`
 
-saml redirect url with: `lnms config:set auth.socialite.configs.saml2.sp_acs auth/saml2/callback`
+## Post configuration settings
 
+!!! setting "auth/socialite"
+    From here you can configure the settings for any identity providers you have configured along with some bespoke options.
+    
+    Redirect Login page: This setting will skip your LibreNMS login and take the end user straight to the first idP you configured.
+    
+    Allow registration via provider: If this setting is disabled, new users signing in via the idP will not be authenticated. This setting allows a local user to be automatically created which permits their login.
