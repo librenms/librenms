@@ -53,7 +53,7 @@
                     "sysDescr": "XGS4600-32F",
                     "sysContact": "<private>",
                     "version": "V4.50(ABBI.1)",
-                    "hardware": "XGS4600-32F",
+                    "hardware": "XGS4600-32",
                     "features": null,
                     "os": "zynos",
                     "type": "network",
