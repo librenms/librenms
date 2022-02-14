@@ -259,7 +259,7 @@ if (\LibreNMS\Config::get('enable_bgp')) {
                                     case 4:
                                         $peer_data['bgpPeerState'] = 'openconfig';
                                         break;
-                                    case 5:
+                                    case 5:-
                                         $peer_data['bgpPeerState'] = 'established';
                                         break;
                                     case 6:
@@ -359,6 +359,22 @@ if (\LibreNMS\Config::get('enable_bgp')) {
                                 'cbgpPeer2LocalAddr' => 'bgpLocalAddr',
                                 'cbgpPeer2LastError' => 'bgpPeerLastErrorCode',
                                 'cbgpPeer2LastErrorTxt' => 'bgpPeerLastErrorText',
+                            ];
+                        } elseif ($device['os'] == 'cumulus') {
+                            $peer_identifier = $peer['bgpPeerIdentifier'];
+                            $mib = 'CUMULUS-BGPUN-MIB';
+                            $oid_map = [
+                                'bgpPeerState' => 'bgpPeerState',
+                                'bgpPeerAdminStatus' => 'bgpPeerAdminStatus',
+                                'bgpPeerInUpdates' => 'bgpPeerInUpdates',
+                                'bgpPeerOutUpdates' => 'bgpPeerOutUpdates',
+                                'bgpPeerInTotalMessages' => 'bgpPeerInTotalMessages',
+                                'bgpPeerOutTotalMessages' => 'bgpPeerOutTotalMessages',
+                                'bgpPeerFsmEstablishedTime' => 'bgpPeerFsmEstablishedTime',
+                                'bgpPeerInUpdateElapsedTime' => 'bgpPeerInUpdateElapsedTime',
+                                'bgpPeerLocalAddr' => 'bgpLocalAddr',
+                                'bgpPeerLastError' => 'bgpPeerLastErrorCode',
+                                'bgpPeerIface' => 'bgpPeerIface',
                             ];
                         } else {
                             $peer_identifier = $peer['bgpPeerIdentifier'];
