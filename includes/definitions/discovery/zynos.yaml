@@ -30,7 +30,6 @@ modules:
             data:
                 -
                     oid:
-                        - ifDescr
                         - zyStackingSlotInfoStackingStatus
         state:
             data:
