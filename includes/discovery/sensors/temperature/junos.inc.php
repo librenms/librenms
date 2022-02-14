@@ -1,5 +1,25 @@
 <?php
-
+/*
+ * LibreNMS discovery module for junos Temperature
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ *
+ * @package    LibreNMS
+ * @link       https://www.librenms.org
+ *
+ * @author     Peca Nesovanovic <peca.nesovanovic@sattrakt.com>
+ */
 echo 'JunOS ';
 $oids = snmp_walk($device, '.1.3.6.1.4.1.2636.3.1.13.1.7', '-Osqn', 'JUNIPER-MIB', 'junos');
 $oids = trim($oids);
@@ -29,7 +49,8 @@ $divisor = 1;
 foreach ($pre_cache['junos_oids'] as $index => $entry) {
     if (is_numeric($entry['jnxDomCurrentModuleTemperature']) && $entry['jnxDomCurrentModuleTemperature'] != 0 && $entry['jnxDomCurrentModuleTemperatureLowAlarmThreshold']) {
         $oid = '.1.3.6.1.4.1.2636.3.60.1.1.1.1.8.' . $index;
-        $descr = dbFetchCell('SELECT `ifDescr` FROM `ports` WHERE `ifIndex`= ? AND `device_id` = ?', [$index, $device['device_id']]) . ' Temperature';
+        $interface = get_port_by_index_cache($device['device_id'], $index)['ifDescr'];
+        $descr = $interface .  ' Temperature';
         $limit_low = $entry['jnxDomCurrentModuleTemperatureLowAlarmThreshold'] / $divisor;
         $warn_limit_low = $entry['jnxDomCurrentModuleTemperatureLowWarningThreshold'] / $divisor;
         $limit = $entry['jnxDomCurrentModuleTemperatureHighAlarmThreshold'] / $divisor;
