@@ -13,7 +13,7 @@ class AddIfaceFieldToBgpPeers extends Migration
     public function up()
     {
         Schema::table('bgpPeers', function (Blueprint $table) {
-            $table->string('bgpPeerIface',255)->after('bgpPeerLastErrorText')->default('');
+            $table->string('bgpPeerIface', 255)->after('bgpPeerLastErrorText')->default('');
         });
     }
 
