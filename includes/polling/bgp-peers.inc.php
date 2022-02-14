@@ -259,7 +259,7 @@ if (\LibreNMS\Config::get('enable_bgp')) {
                                     case 4:
                                         $peer_data['bgpPeerState'] = 'openconfig';
                                         break;
-                                    case 5:-
+                                    case 5:
                                         $peer_data['bgpPeerState'] = 'established';
                                         break;
                                     case 6:
