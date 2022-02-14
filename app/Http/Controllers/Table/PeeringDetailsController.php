@@ -19,8 +19,9 @@
  *
  * @link       https://www.librenms.org
  *
- * @copyright  2018 Tony Murray
+ * @copyright  2018 Tony Murray, 2022 Eric Lindsjö
  * @author     Tony Murray <murraytony@gmail.com>
+ * @author     Eric Lindsjö <eric@emj.se>
  */
 
 namespace App\Http\Controllers\Table;
