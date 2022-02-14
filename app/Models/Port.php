@@ -101,15 +101,11 @@ class Port extends DeviceRelatedModel
     }
 
     /**
-     * Get the description of this port either the parsed description or ifAlias
+     * Get the description of this port
      */
-    public function getDescription(bool $short = false): string
+    public function getDescription(): string
     {
-        if ($short) {
-            return (string) ($this->port_descr_descr ?: $this->ifAlias);
-        } else {
-            return (string) ($this->ifAlias);
-        }
+        return (string) ($this->ifAlias);
     }
 
     /**
