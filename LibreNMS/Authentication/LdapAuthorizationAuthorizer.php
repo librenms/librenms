@@ -167,7 +167,9 @@ class LdapAuthorizationAuthorizer extends AuthorizerBase
         $userlist = [];
 
         $filter = '(' . Config::get('auth_ldap_prefix') . '*)';
-
+        if (Config::get('auth_ldap_userlist_filter') != null) {
+            $filter = '(' . Config::get('auth_ldap_userlist_filter') . ')';
+        }
         $search = ldap_search($this->ldap_connection, trim(Config::get('auth_ldap_suffix'), ','), $filter);
         $entries = ldap_get_entries($this->ldap_connection, $search);
 
