@@ -1301,11 +1301,6 @@ parameters:
 			path: LibreNMS/Authentication/LdapAuthorizationAuthorizer.php
 
 		-
-			message: "#^Method LibreNMS\\\\Authentication\\\\LdapAuthorizationAuthorizer\\:\\:getFullDn\\(\\) has parameter \\$username with no type specified\\.$#"
-			count: 1
-			path: LibreNMS/Authentication/LdapAuthorizationAuthorizer.php
-
-		-
 			message: "#^Parameter \\#1 \\$link_identifier of function ldap_error expects resource, false given\\.$#"
 			count: 1
 			path: LibreNMS/Authentication/LdapAuthorizationAuthorizer.php

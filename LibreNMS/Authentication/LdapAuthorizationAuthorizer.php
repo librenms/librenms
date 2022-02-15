@@ -233,7 +233,7 @@ class LdapAuthorizationAuthorizer extends AuthorizerBase
      *
      * @return string
      */
-    protected function getFullDn($username)
+    protected function getFullDn(string $username)
     {
         return Config::get('auth_ldap_prefix', '') . $username . Config::get('auth_ldap_suffix', '');
     }
