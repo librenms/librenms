@@ -29,6 +29,7 @@ use Config;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Event;
+use Illuminate\Support\Str;
 use Laravel\Socialite\Contracts\User as SocialiteUser;
 use Laravel\Socialite\Facades\Socialite;
 use LibreNMS\Config as LibreNMSConfig;
@@ -76,6 +77,11 @@ class SocialiteController extends Controller
     public function callback(Request $request, string $provider): RedirectResponse
     {
         $this->socialite_user = Socialite::driver($provider)->user();
+
+        // If we already have a valid session, user is trying to pair their account
+        if (Auth::user()) {
+            return $this->pairUser($provider);
+        }
 
         $this->register($provider);
 
@@ -137,6 +143,17 @@ class SocialiteController extends Controller
         $user->realname = $this->buildRealName();
 
         $user->save();
+    }
+
+    private function pairUser(string $provider): RedirectResponse
+    {
+        $user = Auth::user();
+        $user->auth_type = "socialite_$provider";
+        $user->auth_id   = $this->socialite_user->getId();
+
+        $user->save();
+
+        return redirect()->route('preferences.index');
     }
 
     private function buildUsername(): string
