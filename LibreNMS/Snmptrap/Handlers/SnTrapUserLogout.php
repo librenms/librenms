@@ -1,8 +1,10 @@
 <?php
 /**
- * StpInstanceDiscovery.php
+ * SnTrapUserLogout.php
  *
  * -Description-
+ *
+ * Foundry/Brocade trap for user logout.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -18,22 +20,28 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
- *
- * @copyright  2021 Tony Murray
- * @author     Tony Murray <murraytony@gmail.com>
  */
 
-namespace LibreNMS\Interfaces\Discovery;
+namespace LibreNMS\Snmptrap\Handlers;
 
-use Illuminate\Support\Collection;
+use App\Models\Device;
+use LibreNMS\Interfaces\SnmptrapHandler;
+use LibreNMS\Snmptrap\Trap;
+use Log;
 
-interface StpInstanceDiscovery
+class SnTrapUserLogout implements SnmptrapHandler
 {
     /**
-     * Discover STP instances on the device.
+     * Handle snmptrap.
+     * Data is pre-parsed and delivered as a Trap.
      *
-     * @param  string  $vlan  Vlan ID of the instance to discover (or null for default)
-     * @return Collection<\App\Models\Stp>
+     * @param  Device  $device
+     * @param  Trap  $trap
+     * @return void
      */
-    public function discoverStpInstances(?string $vlan = null): Collection;
+    public function handle(Device $device, Trap $trap)
+    {
+        $message = $trap->getOidData($trap->findOid('FOUNDRY-SN-AGENT-MIB::snAgGblTrapMessage.0'));
+        Log::event("$message", $device->device_id, 'trap', 2);
+    }
 }

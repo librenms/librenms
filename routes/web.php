@@ -22,7 +22,6 @@ Route::group(['middleware' => ['auth'], 'guard' => 'auth'], function () {
     // pages
     Route::post('alert/{alert}/ack', [\App\Http\Controllers\AlertController::class, 'ack'])->name('alert.ack');
     Route::resource('device-groups', 'DeviceGroupController');
-    Route::resource('port-groups', 'PortGroupController');
     Route::resource('port', 'PortController', ['only' => 'update']);
     Route::group(['prefix' => 'poller'], function () {
         Route::get('', 'PollerController@pollerTab')->name('poller.index');
@@ -75,11 +74,14 @@ Route::group(['middleware' => ['auth'], 'guard' => 'auth'], function () {
         Route::delete('settings/{name}', 'SettingsController@destroy')->name('settings.destroy');
 
         Route::post('alert/transports/{transport}/test', [\App\Http\Controllers\AlertTransportController::class, 'test'])->name('alert.transports.test');
+
+        Route::get('plugin/settings', 'PluginAdminController')->name('plugin.admin');
+        Route::get('plugin/settings/{plugin:plugin_name}', 'PluginSettingsController')->name('plugin.settings');
+        Route::post('plugin/settings/{plugin:plugin_name}', 'PluginSettingsController@update')->name('plugin.update');
+
+        Route::resource('port-groups', 'PortGroupController');
     });
 
-    Route::get('plugin/settings', 'PluginAdminController')->name('plugin.admin');
-    Route::get('plugin/settings/{plugin:plugin_name}', 'PluginSettingsController')->name('plugin.settings');
-    Route::post('plugin/settings/{plugin:plugin_name}', 'PluginSettingsController@update')->name('plugin.update');
     Route::get('plugin', 'PluginLegacyController@redirect');
     Route::redirect('plugin/view=admin', '/plugin/admin');
     Route::get('plugin/p={pluginName}', 'PluginLegacyController@redirect');
