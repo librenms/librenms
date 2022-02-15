@@ -22,7 +22,8 @@ IMPORTS
     tmnxPortNotifyPortId, tmnxPortPortID
                                                          FROM TIMETRA-PORT-MIB
     TItemDescription, TNamedItemOrEmpty,
-    TmnxAuthPassword, TmnxEnabledDisabled,
+    TmnxAuthPassword, TmnxDisplayStringURL,
+    TmnxEnabledDisabled,
     TmnxEnabledDisabledAdminState
                                                          FROM TIMETRA-TC-MIB
     ;
@@ -609,8 +610,7 @@ tmnxCellularPortEntry            OBJECT-TYPE
 TmnxCellularPortEntry            ::= SEQUENCE
 {
     tmnxCellPortLastChanged          TimeStamp,
-    tmnxCellPortBand125MaxPowerLevel Unsigned32,
-    tmnxCellPortSyncSysTime          TruthValue
+    tmnxCellPortBand125MaxPowerLevel Unsigned32
 }
 
 tmnxCellPortLastChanged          OBJECT-TYPE
@@ -641,16 +641,6 @@ tmnxCellPortBand125MaxPowerLevel OBJECT-TYPE
          Guidelines for 7705 SAR-Hm B125 Antennas'"
     DEFVAL      { 1 }
     ::= { tmnxCellularPortEntry 2 }
-
-tmnxCellPortSyncSysTime          OBJECT-TYPE
-    SYNTAX      TruthValue
-    MAX-ACCESS  read-write
-    STATUS      current
-    DESCRIPTION
-        "The value of tmnxCellPortSyncSysTime specifies whether the system time
-         is synchronized on the cellular port."
-    DEFVAL      { false }
-    ::= { tmnxCellularPortEntry 3 }
 
 tmnxCellularMdaTable             OBJECT-TYPE
     SYNTAX      SEQUENCE OF TmnxCellularMdaEntry
@@ -932,9 +922,8 @@ TmnxCellPortCbsdAuthCfgEntry     ::= SEQUENCE
     tmnxCellPortCbsdAuthUserId       DisplayString,
     tmnxCellPortCbsdAuthAntennaGain  Unsigned32,
     tmnxCellPortCbsdAuthClntTlsProf  TNamedItemOrEmpty,
-    tmnxCellPortCbsdAuthPriSasSvrUrl DisplayString,
-    tmnxCellPortCbsdAuthSecSasSvrUrl DisplayString,
-    tmnxCellPortCbsdAuthCategory     INTEGER
+    tmnxCellPortCbsdAuthPriSasSvrUrl TmnxDisplayStringURL,
+    tmnxCellPortCbsdAuthSecSasSvrUrl TmnxDisplayStringURL
 }
 
 tmnxCellPortCbsdAuthCfgLstChange OBJECT-TYPE
@@ -989,7 +978,7 @@ tmnxCellPortCbsdAuthClntTlsProf  OBJECT-TYPE
     ::= { tmnxCellPortCbsdAuthCfgEntry 5 }
 
 tmnxCellPortCbsdAuthPriSasSvrUrl OBJECT-TYPE
-    SYNTAX      DisplayString
+    SYNTAX      TmnxDisplayStringURL
     MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
@@ -999,7 +988,7 @@ tmnxCellPortCbsdAuthPriSasSvrUrl OBJECT-TYPE
     ::= { tmnxCellPortCbsdAuthCfgEntry 6 }
 
 tmnxCellPortCbsdAuthSecSasSvrUrl OBJECT-TYPE
-    SYNTAX      DisplayString
+    SYNTAX      TmnxDisplayStringURL
     MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
@@ -1007,19 +996,6 @@ tmnxCellPortCbsdAuthSecSasSvrUrl OBJECT-TYPE
          authorization secondary SAS server for the cellular port."
     DEFVAL      { "" }
     ::= { tmnxCellPortCbsdAuthCfgEntry 7 }
-
-tmnxCellPortCbsdAuthCategory     OBJECT-TYPE
-    SYNTAX      INTEGER {
-        a (1),
-        b (2)
-    }
-    MAX-ACCESS  read-write
-    STATUS      current
-    DESCRIPTION
-        "The value of tmnxCellPortCbsdAuthCategory specifies the CBSD
-         authorization category."
-    DEFVAL      { a }
-    ::= { tmnxCellPortCbsdAuthCfgEntry 8 }
 
 tmnxCellularStatusObjs           OBJECT IDENTIFIER ::= { tmnxCellularObjs 3 }
 
@@ -1059,9 +1035,7 @@ TmnxCellularPortStatusEntry      ::= SEQUENCE
     tmnxCellPortCellIdentity         DisplayString,
     tmnxCellPortRssi                 Integer32,
     tmnxCellPortRsrp                 Integer32,
-    tmnxCellPortRscp                 Integer32,
-    tmnxCellPortRsrq                 Integer32,
-    tmnxCellPortSinr                 Integer32
+    tmnxCellPortRscp                 Integer32
 }
 
 tmnxCellPortImei                 OBJECT-TYPE
@@ -1231,43 +1205,6 @@ tmnxCellPortRscp                 OBJECT-TYPE
          set for User Equipment (UE)', 3GPP, December 2016, Section 8.69,
          'Extended signal quality +CESQ'"
     ::= { tmnxCellularPortStatusEntry 10 }
-
-tmnxCellPortRsrq                 OBJECT-TYPE
-    SYNTAX      Integer32 (-20..-3 | 0)
-    UNITS       "decibel"
-    MAX-ACCESS  read-only
-    STATUS      current
-    DESCRIPTION
-        "The value of tmnxCellPortRsrq indicates the reference signal received
-         quality, in decibel.
-
-         A value of -20 indicates that the received signal quality is
-         -20 dBm or less, while a value of -3 indicates that the
-         received signal quality is -3 dBm or greater.
-
-         A value of 0 indicates that the reference signal received quality has
-         not been measured."
-    REFERENCE
-        "3GPP TS 36.133 version 14.3.0 Release 14, '3rd Generation
-         Partnership Project; Technical Specification Group Radio
-         Access Network; Evolved Universal Terrestrial Radio Access
-         (E-UTRA); Requirements for support of radio resource management',
-         3GPP, March 2017, Section 9.1.7 'RSRQ Measurement Report Mapping'"
-    ::= { tmnxCellularPortStatusEntry 11 }
-
-tmnxCellPortSinr                 OBJECT-TYPE
-    SYNTAX      Integer32 (-200..400)
-    UNITS       "0.1 decibel"
-    MAX-ACCESS  read-only
-    STATUS      current
-    DESCRIPTION
-        "The value of tmnxCellPortSinr indicates the signal to interface and
-         noise ratio, in tenths of decibel.
-
-         A value of -200 indicates that the signal to noise and  interface
-         ratio is -20 dBm or less, while a value of 400 indicates that the
-         signal to noise and interface ratio is 40 dBm or greater."
-    ::= { tmnxCellularPortStatusEntry 12 }
 
 tmnxCellularSimCardStatusTable   OBJECT-TYPE
     SYNTAX      SEQUENCE OF TmnxCellularSimCardStatusEntry
@@ -1767,6 +1704,7 @@ tmnxCellPortCbsdAuthStatsEntry   OBJECT-TYPE
 TmnxCellPortCbsdAuthStatsEntry   ::= SEQUENCE
 {
     tmnxCellPortCbsdAuthOperState    TmnxEnabledDisabled,
+    tmnxCellPortCbsdAuthCategory     DisplayString,
     tmnxCellPortCbsdAuthId           DisplayString,
     tmnxCellPortCbsdAuthGrantId      DisplayString,
     tmnxCellPortCbsdAuthFccId        DisplayString,
@@ -1799,6 +1737,15 @@ tmnxCellPortCbsdAuthOperState    OBJECT-TYPE
          state of the CBSD authorization for the cellular port."
     ::= { tmnxCellPortCbsdAuthStatsEntry 1 }
 
+tmnxCellPortCbsdAuthCategory     OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (1))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCellPortCbsdAuthCategory indicates the CBSD
+         authorization category."
+    ::= { tmnxCellPortCbsdAuthStatsEntry 2 }
+
 tmnxCellPortCbsdAuthId           OBJECT-TYPE
     SYNTAX      DisplayString
     MAX-ACCESS  read-only
@@ -1806,7 +1753,7 @@ tmnxCellPortCbsdAuthId           OBJECT-TYPE
     DESCRIPTION
         "The value of tmnxCellPortCbsdAuthId indicates the CBSD authorization
          identifier."
-    ::= { tmnxCellPortCbsdAuthStatsEntry 2 }
+    ::= { tmnxCellPortCbsdAuthStatsEntry 3 }
 
 tmnxCellPortCbsdAuthGrantId      OBJECT-TYPE
     SYNTAX      DisplayString
@@ -1815,7 +1762,7 @@ tmnxCellPortCbsdAuthGrantId      OBJECT-TYPE
     DESCRIPTION
         "The value of tmnxCellPortCbsdAuthGrantId indicates the CBSD
          authorization grant identifier."
-    ::= { tmnxCellPortCbsdAuthStatsEntry 3 }
+    ::= { tmnxCellPortCbsdAuthStatsEntry 4 }
 
 tmnxCellPortCbsdAuthFccId        OBJECT-TYPE
     SYNTAX      DisplayString
@@ -1824,7 +1771,7 @@ tmnxCellPortCbsdAuthFccId        OBJECT-TYPE
     DESCRIPTION
         "The value of tmnxCellPortCbsdAuthFccId indicates the CBSD
          authorization Federal Communications Commission identifier."
-    ::= { tmnxCellPortCbsdAuthStatsEntry 4 }
+    ::= { tmnxCellPortCbsdAuthStatsEntry 5 }
 
 tmnxCellPortCbsdAuthRegState     OBJECT-TYPE
     SYNTAX      INTEGER {
@@ -1836,7 +1783,7 @@ tmnxCellPortCbsdAuthRegState     OBJECT-TYPE
     DESCRIPTION
         "The value of tmnxCellPortCbsdAuthRegState indicates the CBSD
          authorization registration state."
-    ::= { tmnxCellPortCbsdAuthStatsEntry 5 }
+    ::= { tmnxCellPortCbsdAuthStatsEntry 6 }
 
 tmnxCellPortCbsdAuthGrantState   OBJECT-TYPE
     SYNTAX      INTEGER {
@@ -1849,7 +1796,7 @@ tmnxCellPortCbsdAuthGrantState   OBJECT-TYPE
     DESCRIPTION
         "The value of tmnxCellPortCbsdAuthGrantState indicates the CBSD
          authorization grant state."
-    ::= { tmnxCellPortCbsdAuthStatsEntry 6 }
+    ::= { tmnxCellPortCbsdAuthStatsEntry 7 }
 
 tmnxCellPortCbsdAuthGrantExpTime OBJECT-TYPE
     SYNTAX      DateAndTime
@@ -1858,7 +1805,7 @@ tmnxCellPortCbsdAuthGrantExpTime OBJECT-TYPE
     DESCRIPTION
         "The value of tmnxCellPortCbsdAuthGrantExpTime indicates the CBSD
          authorization time the grant will expire."
-    ::= { tmnxCellPortCbsdAuthStatsEntry 7 }
+    ::= { tmnxCellPortCbsdAuthStatsEntry 8 }
 
 tmnxCellPortCbsdAuthTxExpTime    OBJECT-TYPE
     SYNTAX      DateAndTime
@@ -1867,7 +1814,7 @@ tmnxCellPortCbsdAuthTxExpTime    OBJECT-TYPE
     DESCRIPTION
         "The value of tmnxCellPortCbsdAuthTxExpTime indicates the CBSD
          authorization time the transmission will expire."
-    ::= { tmnxCellPortCbsdAuthStatsEntry 8 }
+    ::= { tmnxCellPortCbsdAuthStatsEntry 9 }
 
 tmnxCellPortCbsdAuthHeartbeatInt OBJECT-TYPE
     SYNTAX      Unsigned32
@@ -1877,7 +1824,7 @@ tmnxCellPortCbsdAuthHeartbeatInt OBJECT-TYPE
     DESCRIPTION
         "The value of tmnxCellPortCbsdAuthHeartbeatInt indicates the CBSD
          authorization heartbeat interval."
-    ::= { tmnxCellPortCbsdAuthStatsEntry 9 }
+    ::= { tmnxCellPortCbsdAuthStatsEntry 10 }
 
 tmnxCellPortCbsdAuthChanType     OBJECT-TYPE
     SYNTAX      INTEGER {
@@ -1889,7 +1836,7 @@ tmnxCellPortCbsdAuthChanType     OBJECT-TYPE
     DESCRIPTION
         "The value of tmnxCellPortCbsdAuthChanType indicates the CBSD
          authorization channel type."
-    ::= { tmnxCellPortCbsdAuthStatsEntry 10 }
+    ::= { tmnxCellPortCbsdAuthStatsEntry 11 }
 
 tmnxCellPortCbsdAuthCurSasSvr    OBJECT-TYPE
     SYNTAX      INTEGER {
@@ -1902,7 +1849,7 @@ tmnxCellPortCbsdAuthCurSasSvr    OBJECT-TYPE
     DESCRIPTION
         "The value of tmnxCellPortCbsdAuthCurSasSvr indicates the CBSD
          authorization SAS server that is currently being used."
-    ::= { tmnxCellPortCbsdAuthStatsEntry 11 }
+    ::= { tmnxCellPortCbsdAuthStatsEntry 12 }
 
 tmnxCellPortCbsdAuthCurSasSvrIpT OBJECT-TYPE
     SYNTAX      InetAddressType
@@ -1911,7 +1858,7 @@ tmnxCellPortCbsdAuthCurSasSvrIpT OBJECT-TYPE
     DESCRIPTION
         "The value of tmnxCellPortCbsdAuthCurSasSvrIpT indicates the IP address
          type of the current SAS server being used in CBSD authorization ."
-    ::= { tmnxCellPortCbsdAuthStatsEntry 12 }
+    ::= { tmnxCellPortCbsdAuthStatsEntry 13 }
 
 tmnxCellPortCbsdAuthCurSasSvrIp  OBJECT-TYPE
     SYNTAX      InetAddress (SIZE (0|4|16))
@@ -1920,7 +1867,7 @@ tmnxCellPortCbsdAuthCurSasSvrIp  OBJECT-TYPE
     DESCRIPTION
         "The value of tmnxCellPortCbsdAuthCurSasSvrIp indicates the IP address
          of the current SAS server being used in CBSD authorization ."
-    ::= { tmnxCellPortCbsdAuthStatsEntry 13 }
+    ::= { tmnxCellPortCbsdAuthStatsEntry 14 }
 
 tmnxCellPortCbsdAuthRegRequest   OBJECT-TYPE
     SYNTAX      Unsigned32
@@ -1929,7 +1876,7 @@ tmnxCellPortCbsdAuthRegRequest   OBJECT-TYPE
     DESCRIPTION
         "The value of tmnxCellPortCbsdAuthRegRequest indicates the number of
          CBSD authorization registration requests attempted."
-    ::= { tmnxCellPortCbsdAuthStatsEntry 14 }
+    ::= { tmnxCellPortCbsdAuthStatsEntry 15 }
 
 tmnxCellPortCbsdAuthRegRspSuc    OBJECT-TYPE
     SYNTAX      Unsigned32
@@ -1938,7 +1885,7 @@ tmnxCellPortCbsdAuthRegRspSuc    OBJECT-TYPE
     DESCRIPTION
         "The value of tmnxCellPortCbsdAuthRegRspSuc indicates the number of
          successful CBSD authorization registration responses."
-    ::= { tmnxCellPortCbsdAuthStatsEntry 15 }
+    ::= { tmnxCellPortCbsdAuthStatsEntry 16 }
 
 tmnxCellPortCbsdAuthRegRspFail   OBJECT-TYPE
     SYNTAX      Unsigned32
@@ -1947,7 +1894,7 @@ tmnxCellPortCbsdAuthRegRspFail   OBJECT-TYPE
     DESCRIPTION
         "The value of tmnxCellPortCbsdAuthRegRspFail indicates the number of
          failed CBSD authorization registration responses."
-    ::= { tmnxCellPortCbsdAuthStatsEntry 16 }
+    ::= { tmnxCellPortCbsdAuthStatsEntry 17 }
 
 tmnxCellPortCbsdAuthGrantRequest OBJECT-TYPE
     SYNTAX      Unsigned32
@@ -1956,7 +1903,7 @@ tmnxCellPortCbsdAuthGrantRequest OBJECT-TYPE
     DESCRIPTION
         "The value of tmnxCellPortCbsdAuthGrantRequest indicates the number of
          CBSD authorization grant requests attempted."
-    ::= { tmnxCellPortCbsdAuthStatsEntry 17 }
+    ::= { tmnxCellPortCbsdAuthStatsEntry 18 }
 
 tmnxCellPortCbsdAuthGrantRspSuc  OBJECT-TYPE
     SYNTAX      Unsigned32
@@ -1965,7 +1912,7 @@ tmnxCellPortCbsdAuthGrantRspSuc  OBJECT-TYPE
     DESCRIPTION
         "The value of tmnxCellPortCbsdAuthGrantRspSuc indicates the number of
          successful CBSD authorization grant responses."
-    ::= { tmnxCellPortCbsdAuthStatsEntry 18 }
+    ::= { tmnxCellPortCbsdAuthStatsEntry 19 }
 
 tmnxCellPortCbsdAuthGrantRspFail OBJECT-TYPE
     SYNTAX      Unsigned32
@@ -1974,7 +1921,7 @@ tmnxCellPortCbsdAuthGrantRspFail OBJECT-TYPE
     DESCRIPTION
         "The value of tmnxCellPortCbsdAuthGrantRspFail indicates the number of
          failed CBSD authorization grant responses."
-    ::= { tmnxCellPortCbsdAuthStatsEntry 19 }
+    ::= { tmnxCellPortCbsdAuthStatsEntry 20 }
 
 tmnxCellPortCbsdAuthHrtbtRequest OBJECT-TYPE
     SYNTAX      Unsigned32
@@ -1983,7 +1930,7 @@ tmnxCellPortCbsdAuthHrtbtRequest OBJECT-TYPE
     DESCRIPTION
         "The value of tmnxCellPortCbsdAuthHrtbtRequest indicates the number of
          CBSD authorization heartbeat requests."
-    ::= { tmnxCellPortCbsdAuthStatsEntry 20 }
+    ::= { tmnxCellPortCbsdAuthStatsEntry 21 }
 
 tmnxCellPortCbsdAuthHrtbtRspSuc  OBJECT-TYPE
     SYNTAX      Unsigned32
@@ -1992,7 +1939,7 @@ tmnxCellPortCbsdAuthHrtbtRspSuc  OBJECT-TYPE
     DESCRIPTION
         "The value of tmnxCellPortCbsdAuthHrtbtRspSuc indicates the number of
          successful CBSD authorization heartbeat responses."
-    ::= { tmnxCellPortCbsdAuthStatsEntry 21 }
+    ::= { tmnxCellPortCbsdAuthStatsEntry 22 }
 
 tmnxCellPortCbsdAuthHrtbtRspFail OBJECT-TYPE
     SYNTAX      Unsigned32
@@ -2001,7 +1948,7 @@ tmnxCellPortCbsdAuthHrtbtRspFail OBJECT-TYPE
     DESCRIPTION
         "The value of tmnxCellPortCbsdAuthHrtbtRspFail indicates the number of
          failed CBSD authorization heartbeat responses."
-    ::= { tmnxCellPortCbsdAuthStatsEntry 22 }
+    ::= { tmnxCellPortCbsdAuthStatsEntry 23 }
 
 tmnxCellularNotifyObjects        OBJECT IDENTIFIER ::= { tmnxCellularObjs 4 }
 
@@ -2131,9 +2078,7 @@ tmnxCellularComplianceV21        MODULE-COMPLIANCE
         MANDATORY-GROUPS {
             tmnxCellPortCbsdAuthGroupV21,
             tmnxCellularNotifyObjsGroupV21,
-            tmnxCellNotificationGroupV21,
-            tmnxCellularStatusGroupV21,
-            tmnxCellularConfigGroupV21
+            tmnxCellNotificationGroupV21
         }
     ::= { tmnxCellularCompliances 5 }
 
@@ -2370,27 +2315,6 @@ tmnxCellNotificationGroupV21     NOTIFICATION-GROUP
         "The group of notifications for cellular ports on Nokia SROS series
          systems, introduced in release 21."
     ::= { tmnxCellularV21Groups 3 }
-
-tmnxCellularStatusGroupV21       OBJECT-GROUP
-    OBJECTS     {
-        tmnxCellPortRsrq,
-        tmnxCellPortSinr
-    }
-    STATUS      current
-    DESCRIPTION
-        "The group of objects maintaining cellular port status on Nokia SROS
-         series systems, introduced in release 21."
-    ::= { tmnxCellularV21Groups 4 }
-
-tmnxCellularConfigGroupV21       OBJECT-GROUP
-    OBJECTS     {
-        tmnxCellPortSyncSysTime
-    }
-    STATUS      current
-    DESCRIPTION
-        "The group of objects maintaining cellular port configuration on Nokia
-         SROS series systems, introduced in release 21."
-    ::= { tmnxCellularV21Groups 5 }
 
 tmnxCellularNotifyPrefix         OBJECT IDENTIFIER ::= { tmnxSRNotifyPrefix 109 }
 
