@@ -15,7 +15,7 @@ use App\Models\EntPhysical;
 
 echo 'Comware ';
 
-$entphydata = EntPhysical::where('device_id', $device['device_id'])
+$entphydata = DeviceCache::getPrimary()->entityPhysical()
     ->where('entPhysicalClass', 'regexp', 'module|sensor')
     ->orderBy('entPhysicalIndex')
     ->get(['entPhysicalIndex', 'entPhysicalClass', 'entPhysicalName'])
