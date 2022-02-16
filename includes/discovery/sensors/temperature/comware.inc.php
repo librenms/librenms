@@ -18,7 +18,7 @@ echo 'Comware ';
 $entphydata = EntPhysical::where('device_id', $device['device_id'])
     ->where('entPhysicalClass', 'regexp', 'module|sensor')
     ->orderBy('entPhysicalIndex')
-    ->get(['entPhysicalIndex','entPhysicalClass', 'entPhysicalName'])
+    ->get(['entPhysicalIndex', 'entPhysicalClass', 'entPhysicalName'])
     ->toArray();
 
 if (! empty($entphydata)) {
