@@ -11,8 +11,6 @@
  *
  * @author     Peca Nesovanovic <peca.nesovanovic@sattrakt.com>
 */
-use App\Models\EntPhysical;
-
 echo 'Comware ';
 
 $entphydata = DeviceCache::getPrimary()->entityPhysical()
