@@ -286,7 +286,7 @@ class CiHelper
 
             if (! $this->flags['lint_skip_phpstan']) {
                 $phpstan_cmd = [$this->checkPhpExec('phpstan'), 'analyze', '--no-interaction',  '--memory-limit=2G'];
-                $return += $this->execute('PHPStan Deprecated', $phpstan_cmd + ['--configuration=phpstan-deprecated.neon']);
+                $return += $this->execute('PHPStan Deprecated', array_merge($phpstan_cmd, ['--configuration=phpstan-deprecated.neon']));
                 $return += $this->execute('PHPStan', $phpstan_cmd);
             }
         }
