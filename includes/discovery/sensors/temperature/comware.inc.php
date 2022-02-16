@@ -14,7 +14,7 @@
 echo 'Comware ';
 
 $entphydata = DeviceCache::getPrimary()->entityPhysical()
-    ->where('entPhysicalClass', 'regexp', 'module|sensor')
+    ->whereIn('entPhysicalClass', ['module', 'sensor'])
     ->orderBy('entPhysicalIndex')
     ->get(['entPhysicalIndex', 'entPhysicalClass', 'entPhysicalName'])
     ->toArray();
