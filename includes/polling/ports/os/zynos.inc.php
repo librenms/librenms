@@ -17,38 +17,22 @@ foreach ($port_stats as $index => $port) {
         if ($portNum < 50) {
             $portNum++;
             //Leading 0 for single digits
-            if ($portNum < 10) {
-                $ifDescr = '1/0' . $portNum;
-            } else {
-                $ifDescr = '1/' . $portNum;
-            }
+            $ifDescr = '1/' . zeropad($portNum);
         }
         if ($portNum > 63 && $portNum < 128) {
             $portNum = $portNum - 63;
             //Leading 0 for single digits
-            if ($portNum < 10) {
-                $ifDescr = '2/0' . $portNum;
-            } else {
-                $ifDescr = '2/' . $portNum;
-            }
+            $ifDescr = '2/' . zeropad($portNum);
         }
         if ($portNum > 127 && $portNum < 192) {
             $portNum = $portNum - 127;
             //Leading 0 for single digits
-            if ($portNum < 10) {
-                $ifDescr = '3/0' . $portNum;
-            } else {
-                $ifDescr = '3/' . $portNum;
-            }
+            $ifDescr = '3/' . zeropad($portNum);
         }
         if ($portNum > 191) {
             $portNum = $portNum - 191;
             //Leading 0 for single digits
-            if ($portNum < 10) {
-                $ifDescr = '4/0' . $portNum;
-            } else {
-                $ifDescr = '4/' . $portNum;
-            }
+            $ifDescr = '4/' . zeropad($portNum);
         }
     } else {
         //Set port number to match current
