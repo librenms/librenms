@@ -38,7 +38,7 @@ from snmp.
 
 `-m` This enables you to specify the module you want to run for discovery.
 
-# Discovery wrapper
+## Discovery wrapper
 
 We have a `discovery-wrapper.py` script which is based on
 `poller-wrapper.py` by [Job Snijders](https://github.com/job). This
@@ -56,7 +56,7 @@ With:
 
 `33  */6   * * *   librenms    /opt/librenms/discovery.php -h all >> /dev/null 2>&1`
 
-# Discovery config
+## Discovery config
 
 These are the default discovery config items. You can globally disable
 a module by setting it to 0. If you just want to disable it for one
@@ -189,7 +189,7 @@ device, with history data.
 
 `charge`: APC Charge detection and support.
 
-# Running
+## Running
 
 Here are some examples of running discovery from within your install directory.
 
@@ -199,7 +199,7 @@ Here are some examples of running discovery from within your install directory.
 ./discovery.php -h localhost -m ports
 ```
 
-# Debugging
+## Debugging
 
 To provide debugging output you will need to run the discovery process
 with the `-d` flag. You can do this either against all modules, single
