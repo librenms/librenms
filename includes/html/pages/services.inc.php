@@ -144,7 +144,6 @@ require_once 'includes/html/modal/delete_service.inc.php';
                     }
 
                     $header = true;
-                    $footer = false;
 
                     $service_iteration = 0;
                     $services = dbFetchRows("SELECT * FROM `services` WHERE `device_id` = ? $where ORDER BY service_type", $sql_param);
