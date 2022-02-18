@@ -19,7 +19,7 @@ while (isset($databases[$db_int])) {
     $label = $db;
 
     if ($vars['database'] == $db) {
-        $label = '>>' . $db . '<<';
+        $label = '<span class="pagemenu-selected">' . $db . '</span>';
     }
 
     $db_int++;
