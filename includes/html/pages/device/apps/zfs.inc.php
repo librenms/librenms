@@ -19,7 +19,7 @@ while (isset($pools[$pool_int])) {
     $label = $pool;
 
     if ($vars['pool'] == $pool) {
-        $label = '>>' . $pool . '<<';
+        $label = '<span class="pagemenu-selected">' . $pool . '</span>';
     }
 
     $pool_int++;
