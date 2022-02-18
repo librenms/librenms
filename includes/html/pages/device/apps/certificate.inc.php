@@ -17,7 +17,7 @@ foreach ($domain_list as $label) {
     $cert_name = $label;
 
     if ($vars['cert_name'] == $cert_name) {
-        $label = '<span class="pagemenu-selected">' . $label  . '</span>';
+        $label = '<span class="pagemenu-selected">' . $label . '</span>';
     }
 
     array_push($cert_name_list, generate_link($label, $link_array, ['cert_name' => $cert_name]));

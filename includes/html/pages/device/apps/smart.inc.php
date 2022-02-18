@@ -17,7 +17,7 @@ foreach ($disks as $label) {
     $disk = $label;
 
     if ($vars['disk'] == $disk) {
-        $label = '<span class="pagemenu-selected">' . $label  . '</span>';
+        $label = '<span class="pagemenu-selected">' . $label . '</span>';
     }
 
     array_push($drives, generate_link($label, $link_array, ['disk'=>$disk]));
