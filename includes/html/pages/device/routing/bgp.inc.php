@@ -110,7 +110,7 @@ if ($vars['view'] == 'macaccounting_pkts') {
 print_optionbar_end();
 
 echo '<table border="0" cellspacing="0" cellpadding="5" width="100%">';
-echo '<tr style="height: 30px"><th>Peer address</th><th>Type</th><th>Family</th><th>Remote AS</th><th>Peer description</th><th>State</th><th>Last error</th><th>Uptime</th></tr>';
+echo '<tr style="height: 30px"><th>Peer address</th><th>Peer context</th><th>Type</th><th>Family</th><th>Remote AS</th><th>Peer description</th><th>State</th><th>Last error</th><th>Uptime</th></tr>';
 
 $i = '1';
 
@@ -149,6 +149,8 @@ foreach (dbFetchRows("SELECT * FROM `bgpPeers` WHERE `device_id` = ? $extra_sql 
         $peer['alert']    = 0;
         $peer['disabled'] = 1;
     }
+
+    $peer_context = "<span>" . $peer['context_name'] . "</span>";
 
     if ($peer['bgpPeerRemoteAs'] == $device['bgpLocalAs']) {
         $peer_type = "<span style='color: #00f;'>iBGP</span>";
@@ -240,6 +242,7 @@ foreach (dbFetchRows("SELECT * FROM `bgpPeers` WHERE `device_id` = ? $extra_sql 
 
     echo '
         <td>'.$peeraddresslink.'<br />'.$peername."</td>
+        <td>$peer_context</td>
         <td>$peer_type</td>
         <td style='font-size: 10px; font-weight: bold; line-height: 10px;'>".(isset($peer['afi']) ? $peer['afi'] : '').'</td>
         <td><strong>AS'.$peer['bgpPeerRemoteAs'].'</strong><br />'.$peer['astext']."</td>
