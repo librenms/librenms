@@ -1,0 +1,24 @@
+os: primekey
+text: "Hardware Appliance"
+type: appliance
+icon: primekey
+group: primekey
+snmp_bulk: false
+over:
+    - { graph: device_temperature, text: Temperature }
+    - { graph: device_load, text: "Load Average" }
+    - { graph: device_percent, text: "Database Usage" }
+poller_modules:
+    bgp-peers: false
+    ospf: false
+    stp: false
+    mpls: false
+discovery_modules:
+    bgp-peers: false
+    cisco-vrf-lite: false
+    stp: false
+discovery:
+    - snmpget:
+          oid: .1.3.6.1.4.1.22408.1.1.2.1.7.118.101.114.115.105.111.110.1
+          op: "contains"
+          value: "PrimeKey"

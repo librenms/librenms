@@ -1,0 +1,6 @@
+modules:
+    os:
+        version: '.1.3.6.1.4.1.22408.1.1.2.1.7.118.101.114.115.105.111.110.1'
+        serial: '.1.3.6.1.4.1.22408.1.1.2.2.4.104.115.109.54.1'
+         # Note the above MiB is the serial number of the Hardware Security Module.
+         # The Appliance Serial Number is not available via SNMP.
