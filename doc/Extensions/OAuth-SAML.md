@@ -17,7 +17,7 @@ Below we will guide you on how to install SAML or some of these OAth providers, 
 
 ## Requirements
 
-LibreNMS version 22.2.0 or later.
+LibreNMS version 22.3.0 or later.
 
 Please ensure you set `APP_URL` within your `.env` file so that callback URLs work correctly with the identify provider.
 
