@@ -24,12 +24,11 @@ namespace App\Http\Controllers\Auth;
 
 use App\Http\Controllers\Controller;
 use App\Models\User;
-use Auth;
 use Config;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\Event;
-use Illuminate\Support\Str;
 use Laravel\Socialite\Contracts\User as SocialiteUser;
 use Laravel\Socialite\Facades\Socialite;
 use LibreNMS\Config as LibreNMSConfig;
@@ -149,7 +148,7 @@ class SocialiteController extends Controller
     {
         $user = Auth::user();
         $user->auth_type = "socialite_$provider";
-        $user->auth_id   = $this->socialite_user->getId();
+        $user->auth_id = $this->socialite_user->getId();
 
         $user->save();
 
