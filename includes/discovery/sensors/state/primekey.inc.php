@@ -94,13 +94,13 @@ $oids = [
         // https://github.com/codership/wsrep-API/blob/master/wsrep_api.h#L306 and
         // https://galeracluster.com/library/documentation/node-states.html#node-state-changes
         'states' => [
-            ['value' => 1, 'generic' => 3, 'graph' => 0, 'descr' => 'Undefined'],
-            ['value' => 2, 'generic' => 1, 'graph' => 1, 'descr' => 'Joiner'],
-            ['value' => 3, 'generic' => 0, 'graph' => 2, 'descr' => 'Donor'],
-            ['value' => 4, 'generic' => 0, 'graph' => 3, 'descr' => 'Joined'],
-            ['value' => 5, 'generic' => 0, 'graph' => 4, 'descr' => 'Synced'],
-            ['value' => 6, 'generic' => 2, 'graph' => 5, 'descr' => 'Error'],
-            ['value' => 7, 'generic' => 2, 'graph' => 6, 'descr' => 'Max'],
+            ['value' => 0, 'generic' => 3, 'graph' => 0, 'descr' => 'Undefined'], //!< undefined state
+            ['value' => 1, 'generic' => 1, 'graph' => 1, 'descr' => 'Joiner'],    //!< incomplete state, requested state transfer
+            ['value' => 2, 'generic' => 0, 'graph' => 2, 'descr' => 'Donor'],     //!< complete state, donates state transfer
+            ['value' => 3, 'generic' => 0, 'graph' => 3, 'descr' => 'Joined'],    //!< complete state
+            ['value' => 4, 'generic' => 0, 'graph' => 4, 'descr' => 'Synced'],    //!< complete state, synchronized with group
+            ['value' => 5, 'generic' => 2, 'graph' => 5, 'descr' => 'Error'],     //!< this and above is provider-specific error code
+            ['value' => 6, 'generic' => 2, 'graph' => 6, 'descr' => 'Max'],
         ],
     ],
     7 => [
