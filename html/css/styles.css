@@ -2399,3 +2399,8 @@ label {
     padding: 2px 3px 2px 0;
     z-index: 5;
 }
+.form-button {
+  display: flex;
+	justify-content: center;
+  align-items: center;
+}
