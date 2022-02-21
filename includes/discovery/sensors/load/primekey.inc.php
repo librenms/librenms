@@ -40,7 +40,7 @@ $class = 'load';
 
 $type = 'primekey';
 $divisor = 1;
-$multiplier = 1;
+$multiplier = 100;
 $low_limit = null;
 $low_warn_limit = null;
 $warn_limit = null;
