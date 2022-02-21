@@ -49,6 +49,7 @@
         "php-flasher/flasher-laravel": "^0.9",
         "phpmailer/phpmailer": "~6.0",
         "predis/predis": "^1.1",
+        "socialiteproviders/manager": "^4.1",
         "symfony/yaml": "^4.0",
         "tecnickcom/tcpdf": "^6.4",
         "tightenco/ziggy": "^0.9"

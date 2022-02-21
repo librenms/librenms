@@ -101,6 +101,19 @@
         </form>
     </x-panel>
 
+    @config('auth.socialite.configs')
+    <x-panel title="{{ __('OAuth/SAML Authentication') }}">
+        @foreach (\LibreNMS\Config::get('auth.socialite.configs', []) as $provider => $config)
+        <form role="form" action="{{ route('socialite.redirect', $provider) }}" method="post">
+            {{ csrf_field() }}
+            <button type="submit" id="login" class="btn btn-success btn-block">
+                <i class="fab fa-btn fa-{{ $provider }}"></i> {{ __('Register with') }} {{ ucfirst($provider) }}
+            </button>
+        </form>
+        @endforeach
+    </x-panel>
+    @endconfig
+
     @config('twofactor')
     <x-panel title="{{ __('Two-Factor Authentication') }}">
         @if($twofactor)

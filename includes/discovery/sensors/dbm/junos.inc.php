@@ -8,8 +8,9 @@
  * Free Software Foundation, either version 3 of the License, or (at your
  * option) any later version.  Please see LICENSE.txt at the top level of
  * the source code distribution for details.
- */
-
+ *
+ * @author     Peca Nesovanovic <peca.nesovanovic@sattrakt.com>
+*/
 echo 'JunOS ';
 
 $multiplier = 1;
@@ -17,7 +18,8 @@ $divisor = 100;
 foreach ($pre_cache['junos_oids'] as $index => $entry) {
     if (is_numeric($entry['jnxDomCurrentRxLaserPower']) && $entry['jnxDomCurrentRxLaserPower'] != 0 && $entry['jnxDomCurrentTxLaserOutputPower'] != 0) {
         $oid = '.1.3.6.1.4.1.2636.3.60.1.1.1.1.5.' . $index;
-        $descr = dbFetchCell('SELECT `ifDescr` FROM `ports` WHERE `ifIndex`= ? AND `device_id` = ?', [$index, $device['device_id']]) . ' Rx Power';
+        $interface = get_port_by_index_cache($device['device_id'], $index)['ifDescr'];
+        $descr = $interface . ' Rx Power';
         $limit_low = $entry['jnxDomCurrentRxLaserPowerLowAlarmThreshold'] / $divisor;
         $warn_limit_low = $entry['jnxDomCurrentRxLaserPowerLowWarningThreshold'] / $divisor;
         $limit = $entry['jnxDomCurrentRxLaserPowerHighAlarmThreshold'] / $divisor;
@@ -30,7 +32,8 @@ foreach ($pre_cache['junos_oids'] as $index => $entry) {
 
     if (is_numeric($entry['jnxDomCurrentTxLaserOutputPower']) && $entry['jnxDomCurrentTxLaserOutputPower'] && $entry['jnxDomCurrentRxLaserPower']) {
         $oid = '.1.3.6.1.4.1.2636.3.60.1.1.1.1.7.' . $index;
-        $descr = dbFetchCell('SELECT `ifDescr` FROM `ports` WHERE `ifIndex`= ? AND `device_id` = ?', [$index, $device['device_id']]) . ' Tx Power';
+        $interface = get_port_by_index_cache($device['device_id'], $index)['ifDescr'];
+        $descr = $interface . ' Tx Power';
         $limit_low = $entry['jnxDomCurrentTxLaserOutputPowerLowAlarmThreshold'] / $divisor;
         $warn_limit_low = $entry['jnxDomCurrentTxLaserOutputPowerLowWarningThreshold'] / $divisor;
         $limit = $entry['jnxDomCurrentTxLaserOutputPowerHighAlarmThreshold'] / $divisor;
@@ -45,7 +48,8 @@ foreach ($pre_cache['junos_oids'] as $index => $entry) {
             $lane = $pre_cache['junos_multilane_oids'][$index . '.' . $x];
             if (is_numeric($lane['jnxDomCurrentLaneRxLaserPower']) && $lane['jnxDomCurrentLaneRxLaserPower'] != 0 && $lane['jnxDomCurrentLaneTxLaserOutputPower'] != 0) {
                 $oid = '.1.3.6.1.4.1.2636.3.60.1.2.1.1.6.' . $index . '.' . $x;
-                $descr = dbFetchCell('SELECT `ifDescr` FROM `ports` WHERE `ifIndex`= ? AND `device_id` = ?', [$index, $device['device_id']]) . ' lane ' . $x . ' Rx Power';
+                $interface = get_port_by_index_cache($device['device_id'], $index)['ifDescr'];
+                $descr = $interface . ' lane ' . $x . ' Rx Power';
                 $limit_low = $entry['jnxDomCurrentRxLaserPowerLowAlarmThreshold'] / $divisor;
                 $warn_limit_low = $entry['jnxDomCurrentRxLaserPowerLowWarningThreshold'] / $divisor;
                 $limit = $entry['jnxDomCurrentRxLaserPowerHighAlarmThreshold'] / $divisor;
@@ -57,7 +61,8 @@ foreach ($pre_cache['junos_oids'] as $index => $entry) {
             }
             if (is_numeric($lane['jnxDomCurrentLaneTxLaserOutputPower']) && $lane['jnxDomCurrentLaneTxLaserOutputPower'] && $lane['jnxDomCurrentLaneRxLaserPower']) {
                 $oid = '.1.3.6.1.4.1.2636.3.60.1.2.1.1.8.' . $index . '.' . $x;
-                $descr = dbFetchCell('SELECT `ifDescr` FROM `ports` WHERE `ifIndex`= ? AND `device_id` = ?', [$index, $device['device_id']]) . ' lane ' . $x . ' Tx Power';
+                $interface = get_port_by_index_cache($device['device_id'], $index)['ifDescr'];
+                $descr = $interface . ' lane ' . $x . ' Tx Power';
                 $limit_low = $entry['jnxDomCurrentTxLaserOutputPowerLowAlarmThreshold'] / $divisor;
                 $warn_limit_low = $entry['jnxDomCurrentTxLaserOutputPowerLowWarningThreshold'] / $divisor;
                 $limit = $entry['jnxDomCurrentTxLaserOutputPowerHighAlarmThreshold'] / $divisor;
