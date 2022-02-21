@@ -40,11 +40,11 @@ $class = 'load';
 
 $type = 'primekey';
 $divisor = 1;
-$multiplier = 100;
+$multiplier = 1;
 $low_limit = null;
 $low_warn_limit = null;
 $warn_limit = null;
-$high_limit = null;
+$high_limit = 3;  // Say 4 core processor e.g. Intel(R) Xeon(R) CPU E3-1225 v5
 $poller_type = 'snmp';
 $entPhysicalIndex = null;
 $entPhysicalIndex_measured = null;
