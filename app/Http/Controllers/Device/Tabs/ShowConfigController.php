@@ -78,7 +78,7 @@ class ShowConfigController extends Controller implements DeviceTab
 
         if (Config::has('oxidized.ignore_types.0')) {
             foreach (Config::get('oxidized.ignore_types') as $ignoreType) {
-                if($ignoreType == $device->type){
+                if ($ignoreType == $device->type) {
                     $enabled = false;
                 }
             }
@@ -86,7 +86,7 @@ class ShowConfigController extends Controller implements DeviceTab
 
         if (Config::has('oxidized.ignore_os.0')) {
             foreach (Config::get('oxidized.ignore_os') as $ignoreOS) {
-                if($ignoreOS == $device->os){
+                if ($ignoreOS == $device->os) {
                     $enabled = false;
                 }
             }
