@@ -10,7 +10,7 @@ This documentation will give you a basis for writing a plugin for
 LibreNMS. An example plugin is included in the LibreNMS distribution.
 
 
-# Version 2 Plugin System structure
+## Version 2 Plugin System structure
 
 Plugins in version 2 need to be installed into app/Plugins
 
@@ -92,7 +92,7 @@ abstract class DeviceOverviewHook
     ...
 ```
 
-# Version 1 Plugin System structure (legacy verion)
+## Version 1 Plugin System structure (legacy verion)
 
 Plugins need to be installed into html/plugins
 
@@ -139,7 +139,7 @@ class Test {
 ?>
 ```
 
-# System Hooks
+## System Hooks
 
 System hooks are called as functions within your plugin class. The
 following system hooks are currently available:

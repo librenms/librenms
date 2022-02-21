@@ -16,6 +16,13 @@ use Illuminate\Support\Facades\Route;
 // Auth
 Auth::routes(['register' => false, 'reset' => false, 'verify' => false]);
 
+// Socialite
+Route::prefix('auth')->name('socialite.')->group(function () {
+    Route::post('{provider}/redirect', [\App\Http\Controllers\Auth\SocialiteController::class, 'redirect'])->name('redirect');
+    Route::match(['get', 'post'], '{provider}/callback', [\App\Http\Controllers\Auth\SocialiteController::class, 'callback'])->name('callback');
+    Route::get('{provider}/metadata', [\App\Http\Controllers\Auth\SocialiteController::class, 'metadata'])->name('metadata');
+});
+
 // WebUI
 Route::group(['middleware' => ['auth'], 'guard' => 'auth'], function () {
 

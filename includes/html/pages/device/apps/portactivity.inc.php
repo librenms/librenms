@@ -20,7 +20,7 @@ while (isset($ports[$ports_int])) {
     $label = $ports[$ports_int];
 
     if ($vars['port'] == $port) {
-        $label = '>>' . $port . '<<';
+        $label = '<span class="pagemenu-selected">' . $port . '</span>';
     }
 
     $ports_int++;

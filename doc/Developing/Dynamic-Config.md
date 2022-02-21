@@ -20,7 +20,7 @@ To update the javascript translation files, run:
 
     ./lnms translation:generate
 
-# Definition Format
+## Definition Format
 
 For snmp.community, this is the definition:
 
@@ -59,7 +59,7 @@ types can be defined and implemented in a vue.js component
 * `email`: Will validate the input is the correct format for an email
 * `password`: Will mask the value of the input (but does not keep it fully private)
 
-# Custom Types
+## Custom Types
 
 You may set the type field to a custom type and define a Vue.js component to display it to the user.
 
