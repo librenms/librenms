@@ -89,8 +89,8 @@ $oids = [
         //         .1.3.6.1.4.1.22408.1.1.2.1.8.99.108.117.115.116.101.114.52.1
         //     - wsrep_local_state_comment
         //         .1.3.6.1.4.1.22408.1.1.2.1.8.99.108.117.115.116.101.114.53.1
-	// This state table is based around an interpretation of how these two
-	// variables relate to each other. See these links for more info:
+        // This state table is based around an interpretation of how these two
+        // variables relate to each other. See these links for more info:
         // https://github.com/codership/wsrep-API/blob/master/wsrep_api.h#L306 and
         // https://galeracluster.com/library/documentation/node-states.html#node-state-changes
         'states' => [
