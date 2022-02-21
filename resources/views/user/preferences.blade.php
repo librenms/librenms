@@ -46,7 +46,7 @@
                 </div>
             </div>
             <div class="form-group">
-                <div class="col" align="center">
+                <div class="form-button">
                     <button type="submit" class="btn btn-default">{{ __('Change Password') }}</button>
                 </div>
             </div>
@@ -147,7 +147,7 @@
                     </div>
                 </div>
                 <div class="form-group">
-                    <div class="col" align="center">
+                    <div class="form-button">
                         <button class="btn btn-default" type="submit" id="twofactor-generate">{{ __('Generate TwoFactor Secret Key') }}</button>
                     </div>
                 </div>
