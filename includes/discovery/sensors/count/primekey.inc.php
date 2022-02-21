@@ -35,21 +35,16 @@ $oids = [
         'group' => 'Database',
     ],
     3 => [
-        'descr' => 'Transaction ID',
-        'oid'   => '.1.3.6.1.4.1.22408.1.1.2.1.8.99.108.117.115.116.101.114.54.1',
-        'group' => 'Database',
-    ],
-    4 => [
         'descr' => 'Devices in RAID',
         'oid'   => '.1.3.6.1.4.1.22408.1.1.2.1.5.114.97.105.100.52.1',
         'group' => 'RAID',
     ],
-    5 => [
+    4 => [
         'descr' => 'Active Devices in RAID',
         'oid'   => '.1.3.6.1.4.1.22408.1.1.2.1.5.114.97.105.100.54.1',
         'group' => 'RAID',
     ],
-    6 => [
+    5 => [
         'descr' => 'Active Devices in RAID',
         'oid'   => '.1.3.6.1.4.1.22408.1.1.2.1.5.114.97.105.100.54.1',
         'group' => 'RAID',
