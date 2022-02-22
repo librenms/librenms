@@ -132,7 +132,7 @@ $disable_notify = get_dev_attrib($device, 'disable_notify');
             <button type="button" name="hostname-edit-button" id="hostname-edit-button" class="btn btn-danger" onclick="toggleHostnameEdit()"> <i class="fa fa-pencil"></i> </button>
         </div>
     </div>
-    <div class="form-group" data-toggle="tooltip" data-container="body" data-placement="bottom" title="Display Name for this device.  Keep short. Available placeholders: hostname, sysName, sysName_fallback, ip" >
+    <div class="form-group" data-toggle="tooltip" data-container="body" data-placement="bottom" title="Display Name for this device.  Keep short. Available placeholders: hostname, sysName, sysName_fallback, ip (e.g. '{{ $sysName }}')" >
         <label for="edit-display-input" class="col-sm-2 control-label" >Display Name</label>
         <div class="col-sm-6">
             <input type="text" id="edit-display-input" name="display" class="form-control" placeholder="System Default" value="<?php echo htmlentities($device_model->display); ?>">

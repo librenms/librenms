@@ -53,6 +53,7 @@ class AppServiceProvider extends ServiceProvider
 
         $this->app->booted('\LibreNMS\DB\Eloquent::initLegacyListeners');
         $this->app->booted('\LibreNMS\Config::load');
+        $this->app->booted('\App\Http\Controllers\Auth\SocialiteController::registerEventListeners');
 
         $this->bootCustomBladeDirectives();
         $this->bootCustomValidators();
@@ -174,5 +175,23 @@ class AppServiceProvider extends ServiceProvider
 
             return $validator->passes();
         }, trans('validation.exists'));
+
+        Validator::extend('url_or_xml', function ($attribute, $value): bool {
+            if (! is_string($value)) {
+                return false;
+            }
+
+            if (filter_var($value, FILTER_VALIDATE_URL) !== false) {
+                return true;
+            }
+
+            libxml_use_internal_errors(true);
+            $xml = simplexml_load_string($value);
+            if ($xml !== false) {
+                return true;
+            }
+
+            return false;
+        });
     }
 }
