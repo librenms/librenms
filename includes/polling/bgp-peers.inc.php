@@ -374,7 +374,6 @@ if (\LibreNMS\Config::get('enable_bgp')) {
                                 'bgpPeerInUpdateElapsedTime' => 'bgpPeerInUpdateElapsedTime',
                                 'bgpPeerLocalAddr' => 'bgpLocalAddr',
                                 'bgpPeerLastError' => 'bgpPeerLastErrorCode',
-                                'bgpPeerIface' => 'bgpPeerIface',
                             ];
                         } else {
                             $peer_identifier = $peer['bgpPeerIdentifier'];
@@ -426,6 +425,21 @@ if (\LibreNMS\Config::get('enable_bgp')) {
                         $error_subcode = intval($splitted_codes[1]);
                         $peer_data['bgpPeerLastErrorCode'] = $error_code;
                         $peer_data['bgpPeerLastErrorSubCode'] = $error_subcode;
+                    }
+
+                    // --- Fill the bgpPeerIface column with bgpLocalAddr ---
+                    if (isset($peer_data['bgpLocalAddr'])) {
+                        if (filter_var($peer_data['bgpLocalAddr'], FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) {
+                            $ipv4 = IP::fromHexString($peer_data['bgpLocalAddr'])->uncompressed();
+                            $bgpPeerIface = dbFetchRows('SELECT `ifIndex` FROM  `ports` JOIN `ipv4_addresses` ON `ports`.`port_id`=`ipv4_addresses`.`port_id` WHERE `ipv4_addresses`.`ipv4_address`=? AND ports.device_id=?', [$ipv4, $device['device_id']]);
+                        } elseif (filter_var($peer_data['bgpLocalAddr'], FILTER_VALIDATE_IP, FILTER_FLAG_IPV6)) {
+                            $ipv6 = IP::fromHexString($peer_data['bgpLocalAddr'])->uncompressed();
+                            $bgpPeerIface = dbFetchRows('SELECT `ifIndex` FROM  `ports` JOIN `ipv6_addresses` ON `ports`.`port_id`=`ipv6_addresses`.`port_id` WHERE `ipv6_addresses`.`ipv6_address`=? AND ports.device_id=?', [$ipv6, $device['device_id']]);
+                        }
+
+                        if (isset($bgpPeerIface)) {
+                            $peer_data['bgpPeerIface'] = $bgpPeerIface[0]['ifIndex'];
+                        }
                     }
                 }
 
