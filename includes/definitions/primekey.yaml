@@ -5,9 +5,9 @@ icon: primekey
 group: primekey
 snmp_bulk: false
 over:
-    - { graph: device_temperature, text: Temperature }
-    - { graph: device_load, text: "Load Average" }
     - { graph: device_percent, text: "Database Usage" }
+    - { graph: device_voltage, text: "HSM Voltage" }
+    - { graph: device_count, text: "Counters" }
 poller_modules:
     bgp-peers: false
     ospf: false
