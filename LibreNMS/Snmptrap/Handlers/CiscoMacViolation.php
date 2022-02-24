@@ -1,0 +1,58 @@
+<?php
+/**
+ * CiscoPortSecurity.php
+ *
+ * -Description-
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ *
+ * @link       https://www.librenms.org
+ *
+ * @copyright  2022 Andy Norwood
+ * @author     Andy Norwood <andytnorwood@gmail.com>
+ */
+
+namespace LibreNMS\Snmptrap\Handlers;
+
+use App\Models\Device;
+use LibreNMS\Interfaces\SnmptrapHandler;
+use LibreNMS\Snmptrap\Trap;
+use Log;
+
+class CiscoMacViolation implements SnmptrapHandler
+{
+    /**
+     * Handle snmptrap.
+     * Data is pre-parsed and delivered as a Trap.
+     *
+     * @param  Device  $device
+     * @param  Trap  $trap
+     * @return void
+     */
+    public function handle(Device $device, Trap $trap)
+    {
+        $ifIndex = $trap->getOidData($trap->findOid('IF-MIB::ifIndex'));
+        $port = $device->ports()->where('ifIndex', $ifIndex)->first();
+        $ifDescr = $trap->getOidData($trap->findOid('IF-MIB::ifDescr'));
+        $mac = $trap->getOidData($trap->findOid('CISCO-PORT-SECURITY-MIB::cpsIfSecureLastMacAddress'));
+
+        if (! $port) {
+            Log::event("SNMP Trap: Secure MAC Address Violation on port $ifDescr. Last MAC address: $mac. Could not find port_id.", $device->device_id, 'trap', 4);
+
+            return;
+        }
+
+        Log::event("SNMP Trap: Secure MAC Address Violation on port $ifDescr. Last MAC address: $mac", $device->device_id, 'trap', 4, $port->port_id);
+    }
+}
