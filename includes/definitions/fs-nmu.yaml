@@ -1,10 +1,21 @@
 os: fs-nmu
-text: 'Network Management Unit'
+text: 'Fiberstore Network Management Unit'
 type: network
 icon: fs
 group: fs
 mib_dir: fs
+over:
+    - { graph: device_state, text: 'Sensors' }
+    - { graph: device_temperature, text: 'Temperature' }
+    - { graph: device_dbm, text: 'dbm' }
 discovery:
     -
         sysObjectID:
             - .1.3.6.1.2.1.1.2
+            - .1.3.6.1.4.1.40989
+poller_modules:
+    sensors: true
+    os: true
+discovery_modules:
+    sensors: true
+    os: true
