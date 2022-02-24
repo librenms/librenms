@@ -173,17 +173,6 @@ Example: 192.168.0.0/31 will be treated as an RFC3021 p-t-p network with two add
 Example: 192.168.0.1/32 will be treated as a single host address""",
     )
     parser.add_argument(
-        "-P",
-        "--ping",
-        action="store_const",
-        const="-b",
-        default="",
-        help="""Add the device as an ICMP only device if it replies to ping but not SNMP.
-Example: """
-        + __file__
-        + """ -P 192.168.0.0/24""",
-    )
-    parser.add_argument(
         "-t",
         dest="threads",
         type=int,
@@ -206,6 +195,24 @@ Example: """
         action="count",
         help="Show debug output. Specifying multiple times increases the verbosity.",
     )
+    
+    pinggrp = parser.add_mutually_exclusive_group()
+    pinggrp.add_argument(
+        "--ping-fallback",
+        action="store_const",
+        dest="ping",
+        const="-b",
+        default="",
+        help="Add the device as an ICMP only device if it replies to ping but not SNMP.",
+    )
+    pinggrp.add_argument(
+        "--ping-only",
+        action="store_const",
+        dest="ping",
+        const="-P",
+        default="",
+        help="Always add the device as an ICMP only device.",
+    )
 
     # compatibility arguments
     parser.add_argument("-r", dest="network", action="append", help=argparse.SUPPRESS)
@@ -214,6 +221,16 @@ Example: """
     )
     parser.add_argument("-n", action="store_true", help=argparse.SUPPRESS)
     parser.add_argument("-b", action="store_true", help=argparse.SUPPRESS)
+    pinggrp.add_argument(
+        "-P",
+        "--ping",
+        action="store_const",
+        dest="ping",
+        const="-b",
+        default="",
+        help="Deprecated; Use --ping-fallback instead.",
+        #help.argparse.SUPPRESS, #uncomment after grace period
+    )
 
     args = parser.parse_args()
 
