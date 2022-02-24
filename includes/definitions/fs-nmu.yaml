@@ -14,8 +14,97 @@ discovery:
             - .1.3.6.1.2.1.1.2
             - .1.3.6.1.4.1.40989
 poller_modules:
-    sensors: true
-    os: true
+    unix-agent: false #default false
+    os: true #default true
+    ipmi: false #default true
+    isis: false #default true
+    sensors: true #default true
+    slas: false #default true
+    processors: false #default true
+    mempools: false #default true
+    mib: false #default false
+    storage: false #default true
+    netstats: false #default true
+    hr-mib: false #default true
+    ucd-mib: false #default true
+    ipSystemStats: false #default true
+    ports: false #default true
+    nac: false #default false
+    bgp-peers: false #default true
+    junose-atm-vp: false #default false
+    toner: false #default false
+    ucd-diskio: false #default true
+    wireless: false #default true
+    wifi: false #default true
+    ospf: false #default true
+    cisco-ipsec-flow-monitor: false #default false
+    cisco-remote-access-monitor: false #default false
+    cisco-cef: false #default false
+    cisco-sla: false #default false
+    cisco-mac-accounting: false #default false
+    cipsec-tunnels: false #default false
+    cisco-ace-loadbalancer: false #default false
+    cisco-ace-serverfarms: false #default false
+    cisco-asa-firewall: false #default false
+    cisco-voice: false #default false
+    cisco-cbqos: false #default false
+    cisco-vpdn: false #default true
+    cisco-otv: false #default false
+    cisco-qfp: false #default false
+    netscaler-vsvr: false #default false
+    aruba-controller: false #default false
+    entity-physical: false #default true
+    entity-state: false
+    applications: false #default true
+    availability: false #default true
+    stp: false #default true
+    ntp: false #default true
+    services: false #default true
+    loadbalancers: false #default false
+    mef: false #default false
+    customoid: false #default true
+    mpls: false
 discovery_modules:
-    sensors: true
-    os: true
+    os: true #default true
+    ports: false #default true
+    ports-stack: false #default true
+    entity-physical: false #default true
+    entity-state: false #default false
+    processors: false #default true
+    mempools: false #default true
+    cisco-vrf-lite: false #default true
+    cisco-mac-accounting: false #default false
+    cisco-pw: false #default false
+    vrf: false #default false
+    cisco-cef: false #default false
+    cisco-sla: false #default false
+    cisco-cbqos: false #default false
+    cisco-otv: false #default false
+    cisco-qfp: false #default false
+    ipv4-addresses: false #default true
+    ipv6-addresses: false #default true
+    isis:  false #default true
+    route: false #default false
+    sensors: true #default true
+    storage: false #default true
+    hr-device: false #default true
+    discovery-protocols: false #default true
+    arp-table: false #default true
+    discovery-arp: false #default false
+    junose-atm-vp: false #default false
+    bgp-peers: false #default true
+    vlans: false #default true
+    vmware-vminfo: false #default false
+    libvirt-vminfo: false #default false
+    toner: false #default false
+    ucd-diskio: false #default true
+    applications: false #default false
+    services: false #default true
+    slas: false #default false
+    stp: false #default true
+    ntp: false #default true
+    loadbalancers: false #default false
+    mef: false #default false
+    wireless: false #default true
+    fdb-table: false #default true
+    mpls: false
