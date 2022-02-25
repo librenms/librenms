@@ -42,17 +42,9 @@ class CiscoMacViolation implements SnmptrapHandler
      */
     public function handle(Device $device, Trap $trap)
     {
-        $ifIndex = $trap->getOidData($trap->findOid('IF-MIB::ifIndex'));
-        $port = $device->ports()->where('ifIndex', $ifIndex)->first();
         $ifDescr = $trap->getOidData($trap->findOid('IF-MIB::ifDescr'));
         $mac = $trap->getOidData($trap->findOid('CISCO-PORT-SECURITY-MIB::cpsIfSecureLastMacAddress'));
 
-        if (! $port) {
-            Log::event("SNMP Trap: Secure MAC Address Violation on port $ifDescr. Last MAC address: $mac. Could not find port_id.", $device->device_id, 'trap', 4);
-
-            return;
-        }
-
-        Log::event("SNMP Trap: Secure MAC Address Violation on port $ifDescr. Last MAC address: $mac", $device->device_id, 'trap', 4, $port->port_id);
+        Log::event("SNMP Trap: Secure MAC Address Violation on port $ifDescr. Last MAC address: $mac", $device->device_id, 'trap', 4);
     }
 }
