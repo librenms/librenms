@@ -195,7 +195,7 @@ Example: 192.168.0.1/32 will be treated as a single host address""",
         action="count",
         help="Show debug output. Specifying multiple times increases the verbosity.",
     )
-    
+
     pinggrp = parser.add_mutually_exclusive_group()
     pinggrp.add_argument(
         "--ping-fallback",
@@ -229,7 +229,7 @@ Example: 192.168.0.1/32 will be treated as a single host address""",
         const="-b",
         default="",
         help="Deprecated; Use --ping-fallback instead.",
-        #help.argparse.SUPPRESS, #uncomment after grace period
+        # help=argparse.SUPPRESS, #uncomment after grace period
     )
 
     args = parser.parse_args()
