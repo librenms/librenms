@@ -21,7 +21,7 @@
 $oids = [
     0 => [
         'descr' => 'Database Usage',
-        'oid'   => '.1.3.6.1.4.1.22408.1.1.2.1.4.118.100.98.49.1',
+        'oid'   => 'PRIMEKEY-APPLIANCE-MIB::pkAVdbUsagePercent',
         'group' => 'Database',
     ],
 ];
@@ -42,19 +42,25 @@ $user_func = null;
 
 $transaction = snmp_get_multi_oid($device, array_column($oids, 'oid'));
 
-foreach ($oids as $index => $entry) {
+foreach ( $oids as $index => $entry ) {
     $oid = $entry['oid'];
     $descr = $entry['descr'];
     $group = $entry['group'];
 
-    if (! empty($transaction)) {
-        $current = $transaction[$oid];
+    if ( oid_is_numeric($oid) ) {
+        $oid_num = $oid;
+    } else {
+        $oid_num = snmp_translate($oid, 'ALL', 'primekey', '-On');
+    }
 
-        if (is_numeric($current)) {
+    if ( ! empty($transaction) ) {
+        $current = $transaction[$oid_num];
+
+        if ( is_numeric($current) ) {
             discover_sensor($valid['sensor'],
                             $class,
                             $device,
-                            $oid,
+                            $oid_num,
                             $index,
                             $type,
                             $descr,
