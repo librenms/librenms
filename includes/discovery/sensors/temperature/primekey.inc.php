@@ -52,7 +52,7 @@ foreach ($oids as $index => $entry) {
     } else {
         $oid_num = snmp_translate($oid, 'ALL', 'primekey', '-On');
     }
-    
+
     if (! empty($transaction)) {
         $current = $transaction[$oid_num];
 
