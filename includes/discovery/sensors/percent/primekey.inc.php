@@ -20,7 +20,7 @@
 
 $oids = [
     0 => [
-        'descr' => 'Database Usage',
+        'descr' => 'DB Usage %',
         'oid'   => 'PRIMEKEY-APPLIANCE-MIB::pkAVdbUsagePercent',
         'group' => 'Database',
     ],

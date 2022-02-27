@@ -20,42 +20,42 @@
 
 $oids = [
     0 => [
-        'descr' => ' 1min CPU avg',
+        'descr' => ' 1m CPU load',
         'oid'   => 'PRIMEKEY-APPLIANCE-MIB::pkASfpLoad1m',
         'group' => 'CPU',
     ],
     1 => [
-        'descr' => ' 5min CPU avg',
+        'descr' => ' 5m CPU load',
         'oid'   => 'PRIMEKEY-APPLIANCE-MIB::pkASfpLoad5m',
         'group' => 'CPU',
     ],
     2 => [
-        'descr' => '15min CPU avg',
+        'descr' => '15m CPU load',
         'oid'   => 'PRIMEKEY-APPLIANCE-MIB::pkASfpLoad15m',
         'group' => 'CPU',
     ],
     3 => [
-        'descr' => 'Local Node ID',
+        'descr' => 'Node ID',
         'oid'   => 'PRIMEKEY-APPLIANCE-MIB::pkAClusterLocalNodeID',
         'group' => 'Database',
     ],
     4 => [
-        'descr' => 'DB Cluster Size',
+        'descr' => 'Node Count',
         'oid'   => 'PRIMEKEY-APPLIANCE-MIB::pkAClusterSize',
         'group' => 'Database',
     ],
     5 => [
-        'descr' => 'Active Cluster Nodes',
+        'descr' => 'Nodes Active',
         'oid'   => 'PRIMEKEY-APPLIANCE-MIB::pkAClusterActiveNodes',
         'group' => 'Database',
     ],
     6 => [
-        'descr' => 'Devices in RAID',
+        'descr' => 'RAID Devices',
         'oid'   => 'PRIMEKEY-APPLIANCE-MIB::pkASfpRaidTotalDevices',
         'group' => 'RAID',
     ],
     7 => [
-        'descr' => 'Active Devices in RAID',
+        'descr' => 'RAID Active',
         'oid'   => 'PRIMEKEY-APPLIANCE-MIB::pkASfpRaidActiveDevices',
         'group' => 'RAID',
     ],

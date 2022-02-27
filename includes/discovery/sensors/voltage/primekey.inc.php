@@ -20,12 +20,12 @@
 
 $oids = [
     52 => [
-        'descr' => 'Carrier Battery',
+        'descr' => 'Int Battery',
         'oid'   => 'PRIMEKEY-APPLIANCE-MIB::pkAHsmBatteryInt',
         'group' => 'HSM',
     ],
     55 => [
-        'descr' => 'External Battery',
+        'descr' => 'Ext Battery',
         'oid'   => 'PRIMEKEY-APPLIANCE-MIB::pkAHsmBatteryExt',
         'group' => 'HSM',
     ],

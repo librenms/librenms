@@ -20,39 +20,39 @@
 
 $oids = [
     0 => [
-        'descr'      => 'VMs Status',
+        'descr'      => 'Health VMs',
         'oid'        => 'PRIMEKEY-APPLIANCE-MIB::pkASfpVmStatus',
-        'state_name' => 'VmsStatus',
-        'group'      => 'VMs',
+        'state_name' => 'HealthVMs',
+        'group'      => 'Health of VMs',
         'states'     => [
             ['value' => 0, 'generic' => 0, 'graph' => 0, 'descr' => 'All OK'],
             ['value' => 1, 'generic' => 2, 'graph' => 1, 'descr' => 'Some Inactive'],
         ],
     ],
     1 => [
-        'descr'      => 'EJBCA Healthcheck',
+        'descr'      => 'Health EJBCA',
         'oid'        => 'PRIMEKEY-APPLIANCE-MIB::pkAEJBCAHealth',
-        'state_name' => 'EjbcaHealthcheck',
-        'group'      => 'VMs',
+        'state_name' => 'HealthEjbca',
+        'group'      => 'Health of VMs',
         'states'     => [
             ['value' => 0, 'generic' => 0, 'graph' => 0, 'descr' => 'All OK'],
             ['value' => 1, 'generic' => 3, 'graph' => 2, 'descr' => 'Not Running or Unhealthy'],
         ],
     ],
     2 => [
-        'descr'      => 'Signserver Healthcheck',
+        'descr'      => 'Health SignServer',
         'oid'        => 'PRIMEKEY-APPLIANCE-MIB::pkASignServerHealth',
-        'state_name' => 'SignserverHealthcheck',
-        'group'      => 'VMs',
+        'state_name' => 'HealthSignserver',
+        'group'      => 'Health of VMs',
         'states'     => [
             ['value' => 0, 'generic' => 0, 'graph' => 0, 'descr' => 'All OK'],
             ['value' => 1, 'generic' => 3, 'graph' => 2, 'descr' => 'Not Running or Unhealthy'],
         ],
     ],
     3 => [
-        'descr'      => 'CPU Fan',
+        'descr'      => 'Fan CPU',
         'oid'        => 'PRIMEKEY-APPLIANCE-MIB::pkASfpCpuFanStatus',
-        'state_name' => 'CpuFan',
+        'state_name' => 'FansCpu',
         'group'      => 'Fans',
         'states'     => [
             ['value' => 0, 'generic' => 0, 'graph' => 0, 'descr' => 'OK'],
@@ -60,9 +60,9 @@ $oids = [
         ],
     ],
     4 => [
-        'descr'      => 'System Fans',
+        'descr'      => 'Fans System',
         'oid'        => 'PRIMEKEY-APPLIANCE-MIB::pkASfpSysFansStatus',
-        'state_name' => 'SystemFans',
+        'state_name' => 'FansSystem',
         'group'      => 'Fans',
         'states'     => [
             ['value' => 0, 'generic' => 0, 'graph' => 0, 'descr' => 'All OK'],
@@ -80,9 +80,9 @@ $oids = [
         ],
     ],
     6 => [
-        'descr'      => 'Galera Status',
+        'descr'      => 'DB Enum',
         'oid'        => 'PRIMEKEY-APPLIANCE-MIB::pkAClusterLocalGaleraState',
-        'state_name' => 'Galera Status',
+        'state_name' => 'DbEnum',
         'group'      => 'Database',
         // Galera node status can be reported as a number or a comment:
         //     - wsrep_local_state
@@ -106,9 +106,9 @@ $oids = [
         ],
     ],
     7 => [
-        'descr'      => 'RAID Status',
+        'descr'      => 'RAID Health',
         'oid'        => 'PRIMEKEY-APPLIANCE-MIB::pkASfpRaidStatus',
-        'state_name' => 'RaidStatus',
+        'state_name' => 'RaidHealth',
         'group'      => 'RAID',
         'states'     => [
             ['value' => 0, 'generic' => 0, 'graph' => 0, 'descr' => 'Clean or Active'],
@@ -116,7 +116,7 @@ $oids = [
         ],
     ],
     8 => [
-        'descr'      => 'Enum of Status of HSM',
+        'descr'      => 'HSM Enum',
         'state_name' => 'HsmEnum',
         'oid'        => 'PRIMEKEY-APPLIANCE-MIB::pkAHsmStatusEnum',
         'group'      => 'HSM',
@@ -131,9 +131,9 @@ $oids = [
         ],
     ],
     9 => [
-        'descr'      => 'HSM Status',
+        'descr'      => 'HSM Healthy',
         'oid'        => 'PRIMEKEY-APPLIANCE-MIB::pkAHsmStatusBool',
-        'state_name' => 'HsmStatus',
+        'state_name' => 'HsmHealthy',
         'group'      => 'HSM',
         'states'     => [
             ['value' => 0, 'generic' => 0, 'graph' => 0, 'descr' => 'OK'],
@@ -141,9 +141,9 @@ $oids = [
         ],
     ],
     10 => [
-        'descr'      => 'Carrier Battery',
+        'descr'      => 'Battery Int',
         'oid'        => 'PRIMEKEY-APPLIANCE-MIB::pkAHsmBatteryIntStatus',
-        'state_name' => 'CarrierBattery',
+        'state_name' => 'BatteryInt',
         'group'      => 'HSM',
         'states'     => [
             ['value' => 0, 'generic' => 0, 'graph' => 0, 'descr' => 'OK'],
@@ -151,9 +151,9 @@ $oids = [
         ],
     ],
     11 => [
-        'descr'      => 'Ext Battery',
+        'descr'      => 'Battery Ext',
         'oid'        => 'PRIMEKEY-APPLIANCE-MIB::pkAHsmBatteryExtStatus',
-        'state_name' => 'ExternalBattery',
+        'state_name' => 'BatteryExt',
         'group'      => 'HSM',
         'states'     => [
             ['value' => 0, 'generic' => 0, 'graph' => 0, 'descr' => 'Ok or Absent'],

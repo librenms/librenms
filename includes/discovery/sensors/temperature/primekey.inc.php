@@ -20,7 +20,7 @@
 
 $oids = [
     0 => [
-        'descr'   => 'CPU Temperature',
+        'descr'   => 'CPU Temp',
         'oid'     => 'PRIMEKEY-APPLIANCE-MIB::pkASfpCpuTemp',
         'group'   => 'CPU',
     ],
