@@ -2,7 +2,6 @@ mib: DGS-1210-20ME-AX:DGS-1210-28ME-AX
 modules:
     os:
         hardware: SNMPv2-MIB::sysDescr.0
-#            - DGS-1210-28ME-AX::sysHardwareVersion.0
         version:
             - DGS-1210-20ME-AX::sysFirmwareVersion.0
             - DGS-1210-28ME-AX::sysFirmwareVersion.0

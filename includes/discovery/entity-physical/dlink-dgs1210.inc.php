@@ -26,10 +26,11 @@ echo "\nCaching OIDs:";
 $entity_array = [];
 echo ' Dlink-dgs12xx';
 
-$oids = SnmpQuery::hideMib()->walk('sfpVendorInfoEntry')->table(1);
+$oid20 = SnmpQuery::hideMib()->walk('DGS-1210-20ME-AX::sfpVendorInfoEntry')->table(1);
+$oids = SnmpQuery::hideMib()->walk('DGS-1210-28ME-AX::sfpVendorInfoEntry')->table(1, $oid20);
 
 foreach ($oids as $index => $data) {
-$entIndex = DeviceCache::getPrimary()->entityPhysical()
+    $entIndex = DeviceCache::getPrimary()->entityPhysical()
     ->where('entPhysicalAlias', 'Slot0/' . $index)->value('entPhysicalIndex');
 
     $entity_array[] = [

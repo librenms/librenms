@@ -557,12 +557,13 @@ function send_mail($emails, $subject, $message, $html = false)
  * Convert hex string to ascii if input is pure HEX, otherwise return as-is
  * used when blindly convert vendor name/type from SFP module
  *
- * @param  string  $input hex string to be converted ex: "54 4C 2D 53 4D 33 31 31 4C 53 28 55 4E 29 FF "
- * @return  string  $tmp return converted ascii ex:"TL-SM311LS(UN)"
+ * @param  string  $input  hex string to be converted ex: "54 4C 2D 53 4D 33 31 31 4C 53 28 55 4E 29 FF "
+ * @return string $tmp return converted ascii ex:"TL-SM311LS(UN)"
  */
-
-function hex2ascii($input = null) {
+function hex2ascii($input = null)
+{
     $tmp = str_replace([' ', 'FF'], '', trim(strtoupper($input)));
+
     return preg_match('/^[0-9A-F]+$/', $tmp) ? hex2str($tmp) : $input;
 }
 
