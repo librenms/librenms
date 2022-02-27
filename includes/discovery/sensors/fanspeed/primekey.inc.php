@@ -21,22 +21,22 @@
 $oids = [
     49 => [
         'descr' => 'CPU Fan',
-        'oid'   => '.1.3.6.1.4.1.22408.1.1.2.1.4.102.97.110.49.1',
+        'oid'   => 'PRIMEKEY-APPLIANCE-MIB::pkASfpCpuFan',
         'group' => 'CPU',
     ],
     50 => [
         'descr' => 'System Fan 1',
-        'oid'   => '.1.3.6.1.4.1.22408.1.1.2.1.4.102.97.110.50.1',
+        'oid'   => 'PRIMEKEY-APPLIANCE-MIB::pkASfpSysFan1',
         'group' => 'System',
     ],
     51 => [
         'descr' => 'System Fan 2',
-        'oid'   => '.1.3.6.1.4.1.22408.1.1.2.1.4.102.97.110.51.1',
+        'oid'   => 'PRIMEKEY-APPLIANCE-MIB::pkASfpSysFan2',
         'group' => 'System',
     ],
     52 => [
         'descr' => 'System Fan 3',
-        'oid'   => '.1.3.6.1.4.1.22408.1.1.2.1.4.102.97.110.52.1',
+        'oid'   => 'PRIMEKEY-APPLIANCE-MIB::pkASfpSysFan3',
         'group' => 'System',
     ],
 ];

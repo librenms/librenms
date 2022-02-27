@@ -21,7 +21,7 @@
 $oids = [
     0 => [
         'descr' => 'Database Usage',
-        'oid'   => '.1.3.6.1.4.1.22408.1.1.2.1.4.118.100.98.49.1',
+        'oid'   => 'PRIMEKEY-APPLIANCE-MIB::pkAVdbUsagePercent',
         'group' => 'Database',
     ],
 ];

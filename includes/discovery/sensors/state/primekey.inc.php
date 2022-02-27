@@ -21,7 +21,7 @@
 $oids = [
     0 => [
         'descr'      => 'VMs Status',
-        'oid'        => '.1.3.6.1.4.1.22408.1.1.2.1.2.118.109.1',
+        'oid'        => 'PRIMEKEY-APPLIANCE-MIB::pkASfpVmStatus',
         'state_name' => 'VmsStatus',
         'group'      => 'VMs',
         'states'     => [
@@ -31,7 +31,7 @@ $oids = [
     ],
     1 => [
         'descr'      => 'EJBCA Healthcheck',
-        'oid'        => '.1.3.6.1.4.1.22408.1.1.2.1.8.104.101.97.108.116.104.101.50.1',
+        'oid'        => 'PRIMEKEY-APPLIANCE-MIB::pkAEJBCAHealth',
         'state_name' => 'EjbcaHealthcheck',
         'group'      => 'VMs',
         'states'     => [
@@ -41,7 +41,7 @@ $oids = [
     ],
     2 => [
         'descr'      => 'Signserver Healthcheck',
-        'oid'        => '.1.3.6.1.4.1.22408.1.1.2.1.8.104.101.97.108.116.104.115.50.1',
+        'oid'        => 'PRIMEKEY-APPLIANCE-MIB::pkASignServerHealth',
         'state_name' => 'SignserverHealthcheck',
         'group'      => 'VMs',
         'states'     => [
@@ -51,7 +51,7 @@ $oids = [
     ],
     3 => [
         'descr'      => 'CPU Fan',
-        'oid'        => '.1.3.6.1.4.1.22408.1.1.2.1.4.102.97.110.53.1',
+        'oid'        => 'PRIMEKEY-APPLIANCE-MIB::pkASfpCpuFanStatus',
         'state_name' => 'CpuFan',
         'group'      => 'Fans',
         'states'     => [
@@ -61,7 +61,7 @@ $oids = [
     ],
     4 => [
         'descr'      => 'System Fans',
-        'oid'        => '.1.3.6.1.4.1.22408.1.1.2.1.4.102.97.110.54.1',
+        'oid'        => 'PRIMEKEY-APPLIANCE-MIB::pkASfpSysFansStatus',
         'state_name' => 'SystemFans',
         'group'      => 'Fans',
         'states'     => [
@@ -71,7 +71,7 @@ $oids = [
     ],
     5 => [
         'descr'      => 'DB Storage',
-        'oid'        => '.1.3.6.1.4.1.22408.1.1.2.1.4.118.100.98.50.1',
+        'oid'        => 'PRIMEKEY-APPLIANCE-MIB::pkAVdbStatus',
         'state_name' => 'DbStorage',
         'group'      => 'Database',
         'states'     => [
@@ -81,16 +81,16 @@ $oids = [
     ],
     6 => [
         'descr'      => 'Galera Status',
-        'oid'        => '.1.3.6.1.4.1.22408.1.1.2.1.8.99.108.117.115.116.101.114.52.1',
+        'oid'        => 'PRIMEKEY-APPLIANCE-MIB::pkAClusterLocalGaleraState',
         'state_name' => 'Galera Status',
         'group'      => 'Database',
         // Galera node status can be reported as a number or a comment:
         //     - wsrep_local_state
-        //          PRIMEKEY-APPLIANCE-MIB::pkAClusterLocalGaleraState
-        //          .1.3.6.1.4.1.22408.1.1.2.1.8.99.108.117.115.116.101.114.52.1
+        //        - PRIMEKEY-APPLIANCE-MIB::pkAClusterLocalGaleraState
+        //        - .1.3.6.1.4.1.22408.1.1.2.1.8.99.108.117.115.116.101.114.52.1
         //     - wsrep_local_state_comment
-        //          PRIMEKEY-APPLIANCE-MIB::pkAClusterLocalGaleraStateString
-        //          .1.3.6.1.4.1.22408.1.1.2.1.8.99.108.117.115.116.101.114.53.1
+        //        - PRIMEKEY-APPLIANCE-MIB::pkAClusterLocalGaleraStateString
+        //        - .1.3.6.1.4.1.22408.1.1.2.1.8.99.108.117.115.116.101.114.53.1
         // This state table is based around an interpretation of how these two
         // variables relate to each other. See these links for more info:
         // https://github.com/codership/wsrep-API/blob/master/wsrep_api.h#L306 and
@@ -107,7 +107,7 @@ $oids = [
     ],
     7 => [
         'descr'      => 'RAID Status',
-        'oid'        => '.1.3.6.1.4.1.22408.1.1.2.1.5.114.97.105.100.49.1',
+        'oid'        => 'PRIMEKEY-APPLIANCE-MIB::pkASfpRaidStatus',
         'state_name' => 'RaidStatus',
         'group'      => 'RAID',
         'states'     => [
@@ -118,7 +118,7 @@ $oids = [
     8 => [
         'descr'      => 'Enum of Status of HSM',
         'state_name' => 'HsmEnum',
-        'oid'        => '.1.3.6.1.4.1.22408.1.1.2.2.4.104.115.109.50.1',
+        'oid'        => 'PRIMEKEY-APPLIANCE-MIB::pkAHsmStatusEnum',
         'group'      => 'HSM',
         'states'     => [
             ['value' => 0, 'generic' => 0, 'graph' => 0, 'descr' => 'STATUS_is_OPER'],
@@ -132,7 +132,7 @@ $oids = [
     ],
     9 => [
         'descr'      => 'HSM Status',
-        'oid'        => '.1.3.6.1.4.1.22408.1.1.2.2.4.104.115.109.51.1',
+        'oid'        => 'PRIMEKEY-APPLIANCE-MIB::pkAHsmStatusBool',
         'state_name' => 'HsmStatus',
         'group'      => 'HSM',
         'states'     => [
@@ -142,7 +142,7 @@ $oids = [
     ],
     10 => [
         'descr'      => 'Carrier Battery',
-        'oid'        => '.1.3.6.1.4.1.22408.1.1.2.2.4.104.115.109.53.1',
+        'oid'        => 'PRIMEKEY-APPLIANCE-MIB::pkAHsmBatteryIntStatus',
         'state_name' => 'CarrierBattery',
         'group'      => 'HSM',
         'states'     => [
@@ -152,7 +152,7 @@ $oids = [
     ],
     11 => [
         'descr'      => 'Ext Battery',
-        'oid'        => '.1.3.6.1.4.1.22408.1.1.2.2.4.104.115.109.56.1',
+        'oid'        => 'PRIMEKEY-APPLIANCE-MIB::pkAHsmBatteryExtStatus',
         'state_name' => 'ExternalBattery',
         'group'      => 'HSM',
         'states'     => [
