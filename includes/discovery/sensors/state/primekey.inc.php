@@ -179,15 +179,18 @@ $transaction = snmp_get_multi_oid($device, array_column($oids, 'oid'));
 foreach ($oids as $index => $entry) {
     $oid = $entry['oid'];
     $descr = $entry['descr'];
-    $state_name = $entry['state_name'];
     $group = $entry['group'];
+
     $states = $entry['states'];
+    $state_name = $entry['state_name'];
 
     if (oid_is_numeric($oid)) {
         $oid_num = $oid;
     } else {
         $oid_num = snmp_translate($oid, 'ALL', 'primekey', '-On');
     }
+
+    create_state_index($state_name, $states);
 
     if (! empty($transaction)) {
         $current = $transaction[$oid_num];
