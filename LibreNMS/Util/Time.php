@@ -49,40 +49,38 @@ class Time
         return isset($conversion[$description]) ? $conversion[$description] : 0;
     }
 
-    public static function formatInterval($interval, $format = 'long')
-    {
-        $result = '';
-        $data = [
-            'years' => 31536000,
-            'days' => 86400,
-            'hours' => 3600,
-            'minutes' => 60,
-            'seconds' => 1,
-        ];
-
-        foreach ($data as $k => $v) {
-            if ($interval >= $v) {
-                $diff = floor($interval / $v);
-
-                $result .= " $diff";
-                if ($format == 'short') {
-                    $result .= substr($k, 0, 1);
+    public static function formatInterval($seconds, $format = 'long') {
+        $outfmt = '';
+        $year = '';
+        if ($seconds <> 0 ){
+            $interval = (new \DateTime('@0'))->diff(new \DateTime("@$seconds"));
+            if ($interval->y >= 1) {
+                $year .= $interval->y; 
+                if ($format == 'short' ) {
+                    $year .= 'y ';
+                } elseif ( $interval->y > 1 ) {
+                    $year .= ' years ';
+                } else {
+                    $year .= ' year ';
                 }
-
-                if ($format != 'short' && $diff > 1) {
-                    $result .= ' ' . $k;
-                }
-
-                if ($format != 'short' && $diff < 2) {
-                    $result .= ' ' . substr($k, 0, -1);
-                }
-
-                $interval -= $v * $diff;
+                $interval = (new \DateTime('@0'))->diff( (new \DateTime("@$seconds"))->sub(new \DateInterval('P'.$interval->y.'Y')) );
             }
+            if ($format == 'short' && $interval->d >= 1) {
+                $outfmt .= '%ad ';
+            } elseif ( $interval->d > 1 ) {
+                 $outfmt .= '%a days ';
+            } elseif ( $interval->d == 1 ) {
+                 $outfmt .= '%a day ';
+            }
+            if ( $interval->h > 0 || $interval->i > 0 || $interval->s > 0 ) {
+                 $outfmt .= '%H:%I:%S';
+            }
+            return $year.$interval->format($outfmt);
+        } else {
+            return '';
         }
-
-        return $result;
     }
+
 
     /*
      * @param integer seconds of a time period
