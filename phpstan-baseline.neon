@@ -6471,16 +6471,6 @@ parameters:
 			path: LibreNMS/Util/Time.php
 
 		-
-			message: "#^Method LibreNMS\\\\Util\\\\Time\\:\\:humanTime\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: LibreNMS/Util/Time.php
-
-		-
-			message: "#^Method LibreNMS\\\\Util\\\\Time\\:\\:humanTime\\(\\) has parameter \\$s with no type specified\\.$#"
-			count: 1
-			path: LibreNMS/Util/Time.php
-
-		-
 			message: "#^Method LibreNMS\\\\Util\\\\Time\\:\\:legacyTimeSpecToSecs\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: LibreNMS/Util/Time.php

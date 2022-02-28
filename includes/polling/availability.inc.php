@@ -24,7 +24,7 @@ foreach (dbFetchRows('SELECT * FROM availability WHERE device_id = ?', [$device[
     }
 
     $avail = \LibreNMS\Device\Availability::availability($device, $row['duration']);
-    $human_time = \LibreNMS\Util\Time::humanTime($row['duration']);
+    $human_time = \LibreNMS\Util\Time::formatInterval($row['duration']);
 
     $rrd_name = ['availability', $row['duration']];
     $rrd_def = RrdDefinition::make()

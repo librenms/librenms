@@ -16,7 +16,7 @@ foreach ($duration_list as $duration) {
     $graph_array['type'] = 'device_' . $graph_type;
     $graph_array['duration'] = $duration['duration'];
 
-    $human_duration = \LibreNMS\Util\Time::humanTime($duration['duration']);
+    $human_duration = \LibreNMS\Util\Time::formatInterval($duration['duration']);
     $graph_title = $device['hostname'] . ' - ' . $human_duration;
 
     echo "<div class='panel panel-default'>
