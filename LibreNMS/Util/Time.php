@@ -73,7 +73,7 @@ class Time
                  $outfmt .= '%a day ';
             }
             if ( $interval->h > 0 || $interval->i > 0 || $interval->s > 0 ) {
-                 $outfmt .= '%H:%I:%S';
+                 $outfmt .= '%h:%I:%S';
             }
             return $year.$interval->format($outfmt);
         } else {
