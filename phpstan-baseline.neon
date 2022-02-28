@@ -6466,7 +6466,7 @@ parameters:
 			path: LibreNMS/Util/Time.php
 
 		-
-			message: "#^Method LibreNMS\\\\Util\\\\Time\\:\\:formatInterval\\(\\) has parameter \\$interval with no type specified\\.$#"
+			message: "#^Method LibreNMS\\\\Util\\\\Time\\:\\:formatInterval\\(\\) has parameter \\$seconds with no type specified\\.$#"
 			count: 1
 			path: LibreNMS/Util/Time.php
 

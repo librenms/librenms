@@ -53,7 +53,7 @@ class Time
     {
         $outfmt = '';
         $year = '';
-        if ($seconds != 0){
+        if ($seconds != 0) {
             $interval = (new \DateTime('@0'))->diff(new \DateTime("@$seconds"));
             if ($interval->y >= 1) {
                 $year .= $interval->y;
@@ -64,13 +64,14 @@ class Time
                 } else {
                     $year .= ' year ';
                 }
-                $interval = (new \DateTime('@0'))->diff( (new \DateTime("@$seconds"))->sub(new \DateInterval('P' . $interval->y . 'Y')) );
+                // remove $interval->y years interval, do display remaining days on top of years value
+                $interval = (new \DateTime('@0'))->diff((new \DateTime("@$seconds"))->sub(new \DateInterval('P' . $interval->y . 'Y')));
             }
             if ($format == 'short' && $interval->d >= 1) {
                 $outfmt .= '%ad ';
-            } elseif ( $interval->d > 1) {
+            } elseif ($interval->d > 1) {
                 $outfmt .= '%a days ';
-            } elseif ( $interval->d == 1) {
+            } elseif ($interval->d == 1) {
                 $outfmt .= '%a day ';
             }
             if ($interval->h > 0 || $interval->i > 0 || $interval->s > 0) {
