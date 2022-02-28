@@ -49,33 +49,34 @@ class Time
         return isset($conversion[$description]) ? $conversion[$description] : 0;
     }
 
-    public static function formatInterval($seconds, $format = 'long') {
+    public static function formatInterval($seconds, $format = 'long')
+    {
         $outfmt = '';
         $year = '';
-        if ($seconds <> 0 ){
+        if ($seconds != 0){
             $interval = (new \DateTime('@0'))->diff(new \DateTime("@$seconds"));
             if ($interval->y >= 1) {
-                $year .= $interval->y; 
-                if ($format == 'short' ) {
+                $year .= $interval->y;
+                if ($format == 'short') {
                     $year .= 'y ';
-                } elseif ( $interval->y > 1 ) {
+                } elseif ($interval->y > 1) {
                     $year .= ' years ';
                 } else {
                     $year .= ' year ';
                 }
-                $interval = (new \DateTime('@0'))->diff( (new \DateTime("@$seconds"))->sub(new \DateInterval('P'.$interval->y.'Y')) );
+                $interval = (new \DateTime('@0'))->diff( (new \DateTime("@$seconds"))->sub(new \DateInterval('P' . $interval->y . 'Y')) );
             }
             if ($format == 'short' && $interval->d >= 1) {
                 $outfmt .= '%ad ';
-            } elseif ( $interval->d > 1 ) {
-                 $outfmt .= '%a days ';
-            } elseif ( $interval->d == 1 ) {
-                 $outfmt .= '%a day ';
+            } elseif ( $interval->d > 1) {
+                $outfmt .= '%a days ';
+            } elseif ( $interval->d == 1) {
+                $outfmt .= '%a day ';
             }
-            if ( $interval->h > 0 || $interval->i > 0 || $interval->s > 0 ) {
-                 $outfmt .= '%h:%I:%S';
+            if ($interval->h > 0 || $interval->i > 0 || $interval->s > 0) {
+                $outfmt .= '%h:%I:%S';
             }
-            return $year.$interval->format($outfmt);
+            return $year . $interval->format($outfmt);
         } else {
             return '';
         }
