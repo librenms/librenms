@@ -78,6 +78,7 @@ class Time
                 $outfmt .= '%h:%I:%S';
             }
             return $year . $interval->format($outfmt);
+            
         } else {
             return '';
         }
