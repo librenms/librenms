@@ -77,8 +77,8 @@ class Time
             if ($interval->h > 0 || $interval->i > 0 || $interval->s > 0) {
                 $outfmt .= '%h:%I:%S';
             }
+
             return $year . $interval->format($outfmt);
-            
         } else {
             return '';
         }
