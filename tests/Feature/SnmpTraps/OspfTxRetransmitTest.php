@@ -1,6 +1,6 @@
 <?php
 /**
- * OspfNbrStateChangeTest.php
+ * OspfTxRetransmitTest.php
  *
  * -Description-
  *
@@ -31,7 +31,11 @@ use LibreNMS\Snmptrap\Trap;
 
 class OspfTxReTransmitTest extends SnmpTrapTestCase
 {
-    //Test OSPF routerLink Lsdb type trap
+    /**
+     * Test OSPF routerLink Lsdb type trap
+     *
+     * @return void
+     */
     public function testrouterLink()
     {
         $device = Device::factory()->create(); /** @var Device $device */
@@ -43,8 +47,8 @@ OSPF-MIB::ospfRouterId 10.1.2.3
 OSPF-MIB::ospfIfIpAddress 10.8.9.10
 OSPF-MIB::ospfAddressLessIf 0
 OSPF-MIB::ospfNbrRtrId 10.3.4.5
-OSPF-TRAP-MIB::ospfPacketType 4
-OSPF-MIB::ospfLsdbType 1
+OSPF-TRAP-MIB::ospfPacketType lsUpdate
+OSPF-MIB::ospfLsdbType routerLink
 OSPF-MIB::ospfLsdbLsid 10.1.1.0
 OSPF-MIB::ospfLsdbRouterId 10.4.5.6";
 
