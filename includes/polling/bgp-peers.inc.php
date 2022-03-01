@@ -4,6 +4,7 @@ use Illuminate\Support\Str;
 use LibreNMS\Exceptions\InvalidIpException;
 use LibreNMS\RRD\RrdDefinition;
 use LibreNMS\Util\IP;
+use LibreNMS\DB\Schema;
 
 if (\LibreNMS\Config::get('enable_bgp')) {
     $peers = dbFetchRows('SELECT * FROM `bgpPeers` AS B LEFT JOIN `vrfs` AS V ON `B`.`vrf_id` = `V`.`vrf_id` WHERE `B`.`device_id` = ?', [$device['device_id']]);
@@ -431,14 +432,14 @@ if (\LibreNMS\Config::get('enable_bgp')) {
                     if (isset($peer_data['bgpLocalAddr'])) {
                         if (filter_var($peer_data['bgpLocalAddr'], FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) {
                             $ipv4 = IP::fromHexString($peer_data['bgpLocalAddr'])->uncompressed();
-                            $bgpPeerIface = dbFetchRows('SELECT `ifIndex` FROM  `ports` JOIN `ipv4_addresses` ON `ports`.`port_id`=`ipv4_addresses`.`port_id` WHERE `ipv4_addresses`.`ipv4_address`=? AND ports.device_id=?', [$ipv4, $device['device_id']]);
+                            $bgpPeerIface = DB::table('ports')->join('ipv4_addresses', 'ports.port_id', '=', 'ipv4_addresses.port_id')->where('ipv4_address', '=', $ipv4)->where('device_id', '=', $device['device_id'])->first()->ifIndex;
                         } elseif (filter_var($peer_data['bgpLocalAddr'], FILTER_VALIDATE_IP, FILTER_FLAG_IPV6)) {
                             $ipv6 = IP::fromHexString($peer_data['bgpLocalAddr'])->uncompressed();
-                            $bgpPeerIface = dbFetchRows('SELECT `ifIndex` FROM  `ports` JOIN `ipv6_addresses` ON `ports`.`port_id`=`ipv6_addresses`.`port_id` WHERE `ipv6_addresses`.`ipv6_address`=? AND ports.device_id=?', [$ipv6, $device['device_id']]);
+                            $bgpPeerIface = DB::table('ports')->join('ipv6_addresses', 'ports.port_id', '=', 'ipv6_addresses.port_id')->where('ipv6_address', '=', $ipv6)->where('device_id', '=', $device['device_id'])->first()->ifIndex;
                         }
 
                         if (isset($bgpPeerIface)) {
-                            $peer_data['bgpPeerIface'] = $bgpPeerIface[0]['ifIndex'];
+                            $peer_data['bgpPeerIface'] = $bgpPeerIface;
                         }
                     }
                 }
