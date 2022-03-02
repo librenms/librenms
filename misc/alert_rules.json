@@ -354,6 +354,10 @@
     "name": "Cisco PSU status failed"
   },
   {
+    "rule": "sensors.sensor_current = \"8\" && sensors.sensor_oid ~ \".1.3.6.1.4.1.2636.3.1.15.1.8.2.[1-4].[0-2].0\"",
+    "name": "Juniper PSU status failed"
+  },
+  {
     "rule": "sensors.sensor_current = \"3\" && sensors.sensor_oid = \".1.3.6.1.4.1.4413.1.1.43.1.15.1.2.1\"",
     "name": "UBNT EdgeSwitch Chassis state failed"
   },
