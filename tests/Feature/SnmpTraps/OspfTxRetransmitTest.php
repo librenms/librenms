@@ -29,14 +29,14 @@ use App\Models\Device;
 use LibreNMS\Snmptrap\Dispatcher;
 use LibreNMS\Snmptrap\Trap;
 
-class OspfTxReTransmitTest extends SnmpTrapTestCase
+class OspfTxRetransmitTest extends SnmpTrapTestCase
 {
     /**
-     * Test OSPF routerLink Lsdb type trap
+     * Test OSPF lsUpdate packet type trap
      *
      * @return void
      */
-    public function testrouterLink()
+    public function testLsUpdatePacket()
     {
         $device = Device::factory()->create(); /** @var Device $device */
         $trapText = "$device->hostname
@@ -53,8 +53,35 @@ OSPF-MIB::ospfLsdbLsid 10.1.1.0
 OSPF-MIB::ospfLsdbRouterId 10.4.5.6";
 
         $trap = new Trap($trapText);
-        $message = 'SNMP Trap:' . $device->displayName() . ' (Router ID: 10.1.2.3) sent lsUpdate packet to 10.3.4.5. LSType: routerLink, route ID: 10.1.1.0, originating from 10.4.5.6.';
+        $message = 'SNMP Trap: OSPFTxRetransmit trap  recieved from ' . $device->displayName() . '(Router ID: 10.1.2.3). A lsUpdate packet was sent to 10.3.4.5. LSType: routerLink, route ID: 10.1.1.0, originating from 10.4.5.6.';
         \Log::shouldReceive('event')->once()->with($message, $device->device_id, 'trap', 2);
-        $this->assertTrue(Dispatcher::handle($trap), 'Could not handle testrouterLink trap');
+        $this->assertTrue(Dispatcher::handle($trap), 'Could not handle testlsUpdatePacket trap');
+    }
+
+    /**
+     * Test OSPF non lsUpdate packet type
+     *
+     * @return void
+     */
+    public function testNotLsUpdatePacket()
+    {
+        $device = Device::factory()->create(); /** @var Device $device */
+        $trapText = "$device->hostname
+UDP: [$device->ip]:57602->[10.0.0.1]:162
+SNMPv2-MIB::sysUpTime.0 16:21:49.33
+SNMPv2-MIB::snmpTrapOID.0 OSPF-TRAP-MIB::ospfTxRetransmit
+OSPF-MIB::ospfRouterId 10.1.2.3
+OSPF-MIB::ospfIfIpAddress 10.8.9.10
+OSPF-MIB::ospfAddressLessIf 0
+OSPF-MIB::ospfNbrRtrId 10.3.4.5
+OSPF-TRAP-MIB::ospfPacketType hello
+OSPF-MIB::ospfLsdbType routerLink
+OSPF-MIB::ospfLsdbLsid 10.1.1.0
+OSPF-MIB::ospfLsdbRouterId 10.4.5.6";
+
+        $trap = new Trap($trapText);
+        $message = 'SNMP TRAP: ' . $device->displayName() . '(Router ID: 10.1.2.3) sent a hello packet to 10.3.4.5.';
+        \Log::shouldReceive('event')->once()->with($message, $device->device_id, 'trap', 2);
+        $this->assertTrue(Dispatcher::handle($trap), 'Could not handle testNotLsUpdatePacket trap');
     }
 }
