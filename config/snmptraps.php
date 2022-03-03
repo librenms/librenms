@@ -28,6 +28,7 @@ return [
         'BGP4-V2-MIB-JUNIPER::jnxBgpM2Established' => \LibreNMS\Snmptrap\Handlers\JnxBgpM2Established::class,
         'BRIDGE-MIB::newRoot' => \LibreNMS\Snmptrap\Handlers\BridgeNewRoot::class,
         'BRIDGE-MIB::topologyChange' => \LibreNMS\Snmptrap\Handlers\BridgeTopologyChanged::class,
+        'CISCO-PORT-SECURITY-MIB::cpsSecureMacAddrViolation' => \LibreNMS\Snmptrap\Handlers\CiscoMacViolation::class,
         'CM-ALARM-MIB::cmNetworkElementAlmTrap' => \LibreNMS\Snmptrap\Handlers\AdvaNetworkElementAlmTrap::class,
         'CM-ALARM-MIB::cmSysAlmTrap' => \LibreNMS\Snmptrap\Handlers\AdvaSysAlmTrap::class,
         'CM-PERFORMANCE-MIB::cmEthernetAccPortThresholdCrossingAlert' => \LibreNMS\Snmptrap\Handlers\AdvaAccThresholdCrossingAlert::class,
