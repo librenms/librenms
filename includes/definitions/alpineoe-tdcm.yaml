@@ -1,4 +1,4 @@
-os: alpineoe-tdcm
+os: alpineoe
 text: 'Alpine OptoElectronics TDCM-EDFA platform'
 type: appliance
 icon: alpineoe
