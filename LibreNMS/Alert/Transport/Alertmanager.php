@@ -136,7 +136,7 @@ class Alertmanager extends Transport
                 [
                     'title' => 'Alertmanager Options',
                     'name' => 'alertmanager-options',
-                    'descr' => 'Alertmanager Options',
+                    'descr' => 'Alertmanager Options. You can add any fixed string value or dynamic value from alert details (label name must start with extra_ and value must exists in alert details).',
                     'type' => 'textarea',
                 ],
             ],
