@@ -66,8 +66,8 @@ class Alertmanager extends Transport
         $url = $api['url'];
         unset($api['url']);
         foreach ($api as $label => $value) {
-            # To allow dynamic values
-            if ((preg_match("/^extra_[A-Za-z0-9]+$/", $label)) && (!empty($obj['faults'][1][$value]))) {
+            // To allow dynamic values
+            if ((preg_match("/^extra_[A-Za-z0-9_]+$/", $label)) && (! empty($obj['faults'][1][$value]))) {
                 $data[0]['labels'][$label] = $obj['faults'][1][$value];
             } else {
                 $data[0]['labels'][$label] = $value;
