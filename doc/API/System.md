@@ -1,6 +1,3 @@
-source: API/System.md
-path: blob/master/doc/
-
 ### `system`
 
 Display Librenms instance information.

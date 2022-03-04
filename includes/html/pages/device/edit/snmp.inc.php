@@ -33,7 +33,7 @@ if ($_POST['editing']) {
                 $update['retries'] = ['NULL'];
             }
 
-            if ($snmpver != 'v3') {
+            if ($snmpver != 'v3' && $_POST['community'] != '********') {
                 $community = $_POST['community'];
                 $update['community'] = $community;
             }
@@ -318,7 +318,7 @@ echo "        </select>
     <div class='form-group'>
     <label for='community' class='col-sm-2 control-label'>SNMP Community</label>
     <div class='col-sm-4'>
-    <input id='community' class='form-control' name='community' value='" . htmlspecialchars($device['community']) . "'/>
+    <input id='community' class='form-control' name='community' value='********' onfocus='this.value=(this.value==\"********\" ? decodeURIComponent(\"" . rawurlencode($device['community']) . "\") : this.value);'/>
     </div>
     </div>
     </div>

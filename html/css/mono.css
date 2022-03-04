@@ -121,3 +121,8 @@
   -moz-box-shadow: none;
   -webkit-box-shadow: none;
 }
+
+.devices-graphs-select {
+    margin-right: 5px; 
+     color: #555;
+}

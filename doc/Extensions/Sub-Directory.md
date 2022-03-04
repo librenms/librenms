@@ -1,6 +1,3 @@
-source: Extensions/Sub-Directory.md
-path: blob/master/doc/
-
 To run LibreNMS under a subdirectory on your Apache server, the
 directives for the LibreNMS directory are placed in the base server
 configuration, or in a virtual host container of your choosing. If

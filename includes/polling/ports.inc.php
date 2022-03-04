@@ -796,6 +796,7 @@ foreach ($ports as $port) {
                     $oid_rate = ($oid_diff / $polled_period);
                     if ($oid_rate < 0) {
                         $oid_rate = '0';
+                        $oid_diff = '0';
                         echo "negative $oid";
                     }
 

@@ -1,6 +1,3 @@
-source: Extensions/Syslog.md
-path: blob/master/doc/
-
 # Syslog support
 
 This document will explain how to send syslog data to LibreNMS.

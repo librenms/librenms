@@ -1,6 +1,3 @@
-source: Developing/os/Test-Units.md
-path: blob/master/doc/
-
 # Tests
 
 Tests ensure LibreNMS works as expected, now and in the future.  New

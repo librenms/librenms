@@ -1618,19 +1618,21 @@ ports_stp:
   Columns:
     - { Field: port_stp_id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
     - { Field: device_id, Type: 'int unsigned', 'Null': false, Extra: '' }
+    - { Field: vlan, Type: 'int unsigned', 'Null': true, Extra: '' }
     - { Field: port_id, Type: 'int unsigned', 'Null': false, Extra: '' }
+    - { Field: port_index, Type: 'int unsigned', 'Null': false, Extra: '', Default: '0' }
     - { Field: priority, Type: 'tinyint unsigned', 'Null': false, Extra: '' }
     - { Field: state, Type: varchar(11), 'Null': false, Extra: '' }
     - { Field: enable, Type: varchar(8), 'Null': false, Extra: '' }
     - { Field: pathCost, Type: 'int unsigned', 'Null': false, Extra: '' }
     - { Field: designatedRoot, Type: varchar(32), 'Null': false, Extra: '' }
-    - { Field: designatedCost, Type: 'smallint unsigned', 'Null': false, Extra: '' }
+    - { Field: designatedCost, Type: 'int unsigned', 'Null': false, Extra: '' }
     - { Field: designatedBridge, Type: varchar(32), 'Null': false, Extra: '' }
     - { Field: designatedPort, Type: mediumint, 'Null': false, Extra: '' }
     - { Field: forwardTransitions, Type: 'int unsigned', 'Null': false, Extra: '' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [port_stp_id], Unique: true, Type: BTREE }
-    ports_stp_device_id_port_id_unique: { Name: ports_stp_device_id_port_id_unique, Columns: [device_id, port_id], Unique: true, Type: BTREE }
+    ports_stp_device_id_vlan_port_index_unique: { Name: ports_stp_device_id_vlan_port_index_unique, Columns: [device_id, vlan, port_index], Unique: true, Type: BTREE }
 ports_vlans:
   Columns:
     - { Field: port_vlan_id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
@@ -1962,6 +1964,7 @@ stp:
   Columns:
     - { Field: stp_id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
     - { Field: device_id, Type: 'int unsigned', 'Null': false, Extra: '' }
+    - { Field: vlan, Type: 'int unsigned', 'Null': true, Extra: '' }
     - { Field: rootBridge, Type: tinyint, 'Null': false, Extra: '' }
     - { Field: bridgeAddress, Type: varchar(32), 'Null': false, Extra: '' }
     - { Field: protocolSpecification, Type: varchar(16), 'Null': false, Extra: '' }
@@ -2036,7 +2039,7 @@ users:
   Columns:
     - { Field: user_id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
     - { Field: auth_type, Type: varchar(32), 'Null': true, Extra: '' }
-    - { Field: auth_id, Type: int, 'Null': true, Extra: '' }
+    - { Field: auth_id, Type: varchar(255), 'Null': true, Extra: '' }
     - { Field: username, Type: varchar(255), 'Null': false, Extra: '' }
     - { Field: password, Type: varchar(255), 'Null': true, Extra: '' }
     - { Field: realname, Type: varchar(64), 'Null': false, Extra: '' }

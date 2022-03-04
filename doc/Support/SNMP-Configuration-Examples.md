@@ -1,37 +1,4 @@
-source: Support/SNMP-Configuration-Examples.md
-path: blob/master/doc/
-
 # SNMP configuration examples
-
-Table of Content:
-
-- [Devices](#devices)
-  - [Cisco](#cisco)
-    - [Adaptive Security Appliance (ASA)](#adaptive-security-appliance-asa)
-    - [IOS / IOS XE](#ios--ios-xe)
-    - [NX-OS](#nx-os)
-    - [Wireless LAN Controller (WLC)](#wireless-lan-controller-wlc)
-  - [HPE 3PAR](#hpe3par)
-  - [Inform OS 3.2.x](#inform-os-32x)
-  - [Infoblox](#infoblox)
-    - [NIOS 7.x+](#nios-7x)
-  - [Juniper](#juniper)
-    - [Junos OS](#junos-os)
-  - [Mikrotik](#mikrotik)
-    - [RouterOS 6.x](#routeros-6x)
-  - [Palo Alto](#palo-alto)
-    - [PANOS 6.x/7.x](#panos-6x7x)
-  - [Ubiquiti](#ubiquiti)
-    - [EdgeOs](#edgeos)
-  - [VMware](#vmware)
-    - [ESX/ESXi 5.x/6.x](#esxesxi-5x6x)
-    - [VCenter 6.x](#vcenter-6x)
-- [Operating systems](#operating-systems)
-  - [Linux (snmpd v2)](#linux-snmpd)
-  - [Linux (snmpd v3)](#linux-snmpd-v3)
-  - [Windows Server 2008 R2](#windows-server-2008-r2)
-  - [Windows Server 2012 R2 and newer](#windows-server-2012-r2-and-newer)
-  - [Mac OSX](#Mac-OSX)
 
 ## Devices
 
@@ -83,7 +50,7 @@ snmp-server user <USER-NAME> <GROUP-NAME> v3 auth sha <AUTH-PASSWORD> priv aes 1
 snmp-server contact <YOUR-CONTACT>
 snmp-server location <YOUR-LOCATION>
 
-# Note: The following is also required if using SNMPv3 and you want to populate the FDB table.
+# Note: The following is also required if using SNMPv3 and you want to populate the FDB table, STP info and others.
 
 snmp-server group <GROUP-NAME> v3 priv context vlan- match prefix
 ```

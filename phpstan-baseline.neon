@@ -1636,11 +1636,6 @@ parameters:
 			path: LibreNMS/Component.php
 
 		-
-			message: "#^Method LibreNMS\\\\ComposerHelper\\:\\:exec\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: LibreNMS/ComposerHelper.php
-
-		-
 			message: "#^Method LibreNMS\\\\ComposerHelper\\:\\:populateEnv\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: LibreNMS/ComposerHelper.php
@@ -7201,11 +7196,6 @@ parameters:
 			path: LibreNMS/Validator.php
 
 		-
-			message: "#^Method App\\\\ApiClients\\\\BaseApi\\:\\:getClient\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/ApiClients/BaseApi.php
-
-		-
 			message: "#^Property App\\\\ApiClients\\\\BaseApi\\:\\:\\$base_uri has no type specified\\.$#"
 			count: 1
 			path: app/ApiClients/BaseApi.php
@@ -7624,21 +7614,6 @@ parameters:
 			message: "#^Method App\\\\Http\\\\Controllers\\\\Ajax\\\\RipeNccApiController\\:\\:raw\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: app/Http/Controllers/Ajax/RipeNccApiController.php
-
-		-
-			message: "#^Method App\\\\Http\\\\Controllers\\\\Auth\\\\LoginController\\:\\:loggedOut\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/Http/Controllers/Auth/LoginController.php
-
-		-
-			message: "#^Method App\\\\Http\\\\Controllers\\\\Auth\\\\LoginController\\:\\:showLoginForm\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/Http/Controllers/Auth/LoginController.php
-
-		-
-			message: "#^Method App\\\\Http\\\\Controllers\\\\Auth\\\\LoginController\\:\\:username\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/Http/Controllers/Auth/LoginController.php
 
 		-
 			message: "#^Method App\\\\Http\\\\Controllers\\\\Auth\\\\TwoFactorController\\:\\:showTwoFactorForm\\(\\) has no return type specified\\.$#"

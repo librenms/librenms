@@ -286,6 +286,9 @@ main () {
         check_dependencies
         php_ver_ret=$?
 
+        # Restore composer files if user installed plugins
+        git checkout --quiet -- composer.json composer.lock
+
         update_res=0
         if [[ "$up" == "1" ]] || [[ "$php_ver_ret" == "1" ]]; then
             # Update current branch to latest
@@ -343,6 +346,13 @@ main () {
                 # re-check dependencies after pull with the new code
                 check_dependencies
 
+                # Insert user installed plugins before calling composer install
+
+                PLUGINS=$(call_daily_php "composer_get_plugins")
+                if [ -n "$PLUGINS" ]; then
+                    # shellcheck disable=SC2086
+                    FORCE=1 ${COMPOSER} require --update-no-dev --no-install $PLUGINS
+                fi
                 status_run 'Updating Composer packages' "${COMPOSER} install --no-dev" 'update'
 
                 # Check if we need to revert (Must be in post pull so we can update it)

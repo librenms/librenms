@@ -35,7 +35,7 @@ $pagetitle[] = 'Oxidized';
                                 <th data-column-id="last_update">Last Update</th>
                                 <th data-column-id="model">Model</th>
                                 <th data-column-id="group">Group</th>
-                                <th data-column-id="actions" data-formatter="actions"></th>
+                                <th data-column-id="actions" data-formatter="actions">Actions</th>
                             </tr>
                             </thead>
                             <tbody>

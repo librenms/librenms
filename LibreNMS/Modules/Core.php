@@ -125,7 +125,9 @@ class Core implements Module
         ];
 
         // check yaml files
+        \LibreNMS\Util\OS::loadAllDefinitions();
         $os_defs = Config::get('os');
+
         foreach ($os_defs as $os => $def) {
             if (isset($def['discovery']) && ! in_array($os, $generic_os)) {
                 if (self::discoveryIsSlow($def)) {

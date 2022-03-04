@@ -47,7 +47,7 @@ class SnmpResponseTest extends TestCase
         $this->assertTrue($response->isValid());
         $this->assertEquals(['' => 'IF-MIB::ifDescr'], $response->values());
         $this->assertEquals('IF-MIB::ifDescr', $response->value());
-        $this->assertEquals(['IF-MIB::ifDescr'], $response->table());
+        $this->assertEquals(['' => 'IF-MIB::ifDescr'], $response->table());
 
         // unescaped strings
         $response = new SnmpResponse("Q-BRIDGE-MIB::dot1qVlanStaticName[1] = \"\\default\\\"\nQ-BRIDGE-MIB::dot1qVlanStaticName[6] = \\single\\\nQ-BRIDGE-MIB::dot1qVlanStaticName[9] = \\\\double\\\\\n");
@@ -79,11 +79,12 @@ class SnmpResponseTest extends TestCase
 
     public function testMultiLine(): void
     {
-        $response = new SnmpResponse("SNMPv2-MIB::sysDescr.0 = \"something\n on two lines\"\n");
+        $response = new SnmpResponse("SNMPv2-MIB::sysDescr.1 = \"something\n on two lines\"\n");
 
         $this->assertTrue($response->isValid());
         $this->assertEquals("something\n on two lines", $response->value());
-        $this->assertEquals(['SNMPv2-MIB::sysDescr.0' => "something\n on two lines"], $response->values());
+        $this->assertEquals(['SNMPv2-MIB::sysDescr.1' => "something\n on two lines"], $response->values());
+        $this->assertEquals(['SNMPv2-MIB::sysDescr' => [1 => "something\n on two lines"]], $response->table());
     }
 
     public function numericTest(): void

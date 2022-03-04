@@ -160,9 +160,17 @@ class SnmpResponse
     public function table(int $group = 0, array &$array = []): array
     {
         foreach ($this->values() as $key => $value) {
-            preg_match_all('/([^[\]]+)/', $key, $parts);
-            $parts = $parts[1];
-            array_splice($parts, $group, 0, array_shift($parts)); // move the oid name to the correct depth
+            if (Str::contains($key, '[')) {
+                // table
+                preg_match_all('/([^[\]]+)/', $key, $parts);
+                $parts = $parts[1]; // get all group 1 matches
+            } else {
+                // regular oid
+                $parts = explode('.', $key);
+            }
+
+            // move the oid name to the correct depth
+            array_splice($parts, $group, 0, array_shift($parts));
 
             // merge the parts into an array, creating keys if they don't exist
             $tmp = &$array;
@@ -182,7 +190,7 @@ class SnmpResponse
      */
     public function mapTable(callable $callback): Collection
     {
-        if (! $this->isValid()) {
+        if (! $this->filterBadLines()->isValid()) {
             return new Collection;
         }
 
@@ -210,5 +218,18 @@ class SnmpResponse
     public function getExitCode(): int
     {
         return $this->exitCode;
+    }
+
+    /**
+     * Filter bad lines from the raw output, examples:
+     * "No Such Instance currently exists at this OID"
+     * "No more variables left in this MIB View (It is past the end of the MIB tree)"
+     */
+    public function filterBadLines(): SnmpResponse
+    {
+        $this->raw = preg_replace('/^.*No Such Instance currently exists.*$/', '', $this->raw);
+        $this->raw = preg_replace('/\n[^\r\n]+No more variables left[^\r\n]+$/s', '', $this->raw);
+
+        return $this;
     }
 }

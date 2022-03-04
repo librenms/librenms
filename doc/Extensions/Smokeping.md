@@ -1,6 +1,3 @@
-source: Extensions/Smokeping.md
-path: blob/master/doc/
-
 # Smokeping integration
 
 [SmokePing](https://oss.oetiker.ch/smokeping/) is a tool which lets us keep

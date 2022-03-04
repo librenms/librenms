@@ -1,6 +1,3 @@
-source: Extensions/Gateone.md
-path: blob/master/doc/
-
 # GateOne integration
 
 We have simple integration for
