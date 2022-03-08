@@ -16,6 +16,7 @@ modules:
                         - voltageSensorName
                         - fwLSConnName
                         - mglsGWIP
+                        - vsxStatusVsName
         state:
             data:
                 -
@@ -207,6 +208,16 @@ modules:
                     states:
                         - { value: 0, generic: 1, graph: 1, descr: 'Down' }
                         - { value: 1, generic: 0, graph: 1, descr: 'Up' }
+                -
+                    oid: vsxStatusHAState
+                    num_oid: '.1.3.6.1.4.1.2620.1.16.22.1.1.9.{{ $index }}'
+                    index: 'vsxStatusVSId.{{ $index }}'
+                    descr: '{{ $vsxStatusVsName }}, VS State'
+                    group: VS
+                    states:
+                        - { value: 0, generic: 0, graph: 1, descr: 'Active' }
+                        - { value: 1, generic: 0, graph: 1, descr: 'Standby' }
+                        - { value: 2, generic: 0, graph: 1, descr: 'Backup' }
 #Update Status
                 -
                     oid: advancedUrlFilteringUpdateStatus
