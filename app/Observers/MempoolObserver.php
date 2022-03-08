@@ -37,7 +37,11 @@ class MempoolObserver extends ModuleModelObserver
 
         if ($model->isDirty('mempool_class')) {
             Log::debug("Mempool class changed $model->mempool_descr ($model->mempool_id)");
-            Rrd::renameFile($model->device->toArray(), ['mempool', $model->mempool_type, $model->getOriginal('mempool_class'), $model->mempool_index], ['mempool', $model->mempool_type, $model->mempool_class, $model->mempool_index]);
+            $device = [
+                'device_id' => $model->device->device_id,
+                'hostname' => $model->device->hostname,
+            ];
+            Rrd::renameFile($device, ['mempool', $model->mempool_type, $model->getOriginal('mempool_class'), $model->mempool_index], ['mempool', $model->mempool_type, $model->mempool_class, $model->mempool_index]);
         }
     }
 }

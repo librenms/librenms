@@ -30,8 +30,7 @@ IMPORTS
 		FROM SNMPv2-CONF
 	DisplayString,
 	TEXTUAL-CONVENTION,
-	PhysAddress,
-	DateAndTime
+	PhysAddress
 		FROM SNMPv2-TC
         Ipv6Address
                 FROM IPV6-TC;
@@ -124,10 +123,12 @@ SubscriptionStatusType ::= TEXTUAL-CONVENTION
         STATUS				current
         DESCRIPTION		"enumerated type for subscription status"
         SYNTAX INTEGER	{
-							trial			( 1 ),
-							unsubscribed		( 2 ),
+							none			( 0 ),
+							evaluating		( 1 ),
+							notsubscribed		( 2 ),
 							subscribed		( 3 ),
-							expired			( 4 )
+							expired			( 4 ),
+							deactivated		( 5 )
 						}
 
 IPSecVPNConnectionType ::= TEXTUAL-CONVENTION
@@ -219,7 +220,7 @@ sfosIPSVersion OBJECT-TYPE
 
 -- sfosXGDeviceStats
 sfosCurrentDate	OBJECT-TYPE
-	SYNTAX      		DisplayString
+	SYNTAX			DisplayString
 	MAX-ACCESS		read-only
 	STATUS			current
 	DESCRIPTION	"Current system date and time"
@@ -577,20 +578,21 @@ sfosDeviceWebServerLic				OBJECT IDENTIFIER ::= { sfosXGLicenseDetails 5 }
 sfosDeviceSandstromLic				OBJECT IDENTIFIER ::= { sfosXGLicenseDetails 6 }
 sfosDeviceEnhancedSupportLic		OBJECT IDENTIFIER ::= { sfosXGLicenseDetails 7 }
 sfosDeviceEnhancedPlusSupportLic	OBJECT IDENTIFIER ::= { sfosXGLicenseDetails 8 }
+sfosDeviceCentralOrchestrationLic	OBJECT IDENTIFIER ::= { sfosXGLicenseDetails 9 }
 
 -- sfosXGLicenseDetails.sfosDeviceBaseFWLic
 sfosBaseFWLicRegStatus OBJECT-TYPE
     SYNTAX		SubscriptionStatusType
     MAX-ACCESS		read-only
     STATUS		current
-    DESCRIPTION		"Base Firewall protection lic status "
+    DESCRIPTION		"Base Firewall protection Lic status"
     ::= { sfosDeviceBaseFWLic 1 }
 
 sfosBaseFWLicExpiryDate OBJECT-TYPE
-    SYNTAX      	DisplayString
+    SYNTAX		DisplayString
     MAX-ACCESS		read-only
     STATUS		current
-    DESCRIPTION		"Base Firewall protection lic expiry date "
+    DESCRIPTION		"Base Firewall protection Lic expiry date"
     ::= { sfosDeviceBaseFWLic 2 }
 
 -- sfosXGLicenseDetails.sfosDeviceNetProtecLic
@@ -598,14 +600,14 @@ sfosNetProtectionLicRegStatus OBJECT-TYPE
     SYNTAX		SubscriptionStatusType
     MAX-ACCESS		read-only
     STATUS		current
-    DESCRIPTION		" Network Protection registration Lic status"
+    DESCRIPTION		"Network Protection registration Lic status"
     ::= { sfosDeviceNetProtecLic 1 }
 
 sfosNetProtectionLicExpiryDate OBJECT-TYPE
-    SYNTAX      	DisplayString
+    SYNTAX		DisplayString
     MAX-ACCESS		read-only
     STATUS		current
-    DESCRIPTION		"Network Protection Iic Expiry Date "
+    DESCRIPTION		"Network Protection Lic Expiry Date"
     ::= { sfosDeviceNetProtecLic 2 }
 
 -- sfosXGLicenseDetails.sfosDeviceWebProtecLic
@@ -613,14 +615,14 @@ sfosWebProtectionLicRegStatus OBJECT-TYPE
     SYNTAX		SubscriptionStatusType
     MAX-ACCESS		read-only
     STATUS		current
-    DESCRIPTION		" "
+    DESCRIPTION		"Web Protection registration Lic status"
     ::= { sfosDeviceWebProtecLic 1 }
 
 sfosWebProtectionLicExpiryDate OBJECT-TYPE
-    SYNTAX      	DisplayString
+    SYNTAX		DisplayString
     MAX-ACCESS		read-only
     STATUS			current
-    DESCRIPTION		"Network Protection Iic Expiry Date "
+    DESCRIPTION		"Web Protection Lic Expiry Date"
     ::= { sfosDeviceWebProtecLic 2 }
 
 -- sfosXGLicenseDetails.sfosDeviceMailProtecLic
@@ -628,14 +630,14 @@ sfosMailProtectionLicRegStatus OBJECT-TYPE
     SYNTAX			SubscriptionStatusType
     MAX-ACCESS		read-only
     STATUS			current
-    DESCRIPTION		"EMail Protection Iic Status "
+    DESCRIPTION		"EMail Protection Lic Status"
     ::= { sfosDeviceMailProtecLic 1 }
 
 sfosMailProtectionLicExpiryDate OBJECT-TYPE
-    SYNTAX      	DisplayString
+    SYNTAX			DisplayString
     MAX-ACCESS		read-only
     STATUS			current
-    DESCRIPTION		"EMail Protection Iic Expiry Date"
+    DESCRIPTION		"EMail Protection Lic Expiry Date"
     ::= { sfosDeviceMailProtecLic 2 }
 
 -- sfosXGLicenseDetails.sfosDeviceWebServerLic
@@ -643,14 +645,14 @@ sfosWebServerProtectionLicRegStatus OBJECT-TYPE
     SYNTAX			SubscriptionStatusType
     MAX-ACCESS		read-only
     STATUS			current
-    DESCRIPTION		"web server Protection Iic status"
+    DESCRIPTION		"web server Protection Lic status"
     ::= { sfosDeviceWebServerLic 1 }
 
 sfosWebServerProtectionLicExpiryDate OBJECT-TYPE
-    SYNTAX      	DisplayString
+    SYNTAX			DisplayString
     MAX-ACCESS		read-only
     STATUS			current
-    DESCRIPTION		"web server Protection Iic Expiry Date"
+    DESCRIPTION		"web server Protection Lic Expiry Date"
     ::= { sfosDeviceWebServerLic 2 }
 
 -- sfosXGLicenseDetails.sfosDeviceSandstromLic
@@ -658,14 +660,14 @@ sfosSandstromLicRegStatus OBJECT-TYPE
     SYNTAX			SubscriptionStatusType
     MAX-ACCESS		read-only
     STATUS			current
-    DESCRIPTION		"sandstrom Protection Iic status"
+    DESCRIPTION		"sandstrom Protection Lic status"
     ::= { sfosDeviceSandstromLic 1 }
 
 sfosSandstromLicExpiryDate OBJECT-TYPE
-    SYNTAX      	DisplayString
+    SYNTAX			DisplayString
     MAX-ACCESS		read-only
     STATUS			current
-    DESCRIPTION		"sandstrom Protection Iic Expiry Date"
+    DESCRIPTION		"sandstrom Protection Lic Expiry Date"
     ::= { sfosDeviceSandstromLic 2 }
 
 -- sfosXGLicenseDetails.sfosDeviceEnhancedSupportLic
@@ -677,7 +679,7 @@ sfosEnhancedSupportLicRegStatus OBJECT-TYPE
     ::= { sfosDeviceEnhancedSupportLic 1 }
 
 sfosEnhancedSupportLicExpiryDate OBJECT-TYPE
-    SYNTAX      	DisplayString
+    SYNTAX			DisplayString
     MAX-ACCESS		read-only
     STATUS			current
     DESCRIPTION		"Enhanced Support Lic expiry date"
@@ -692,11 +694,26 @@ sfosEnhancedPlusLicRegStatus OBJECT-TYPE
     ::= { sfosDeviceEnhancedPlusSupportLic 1 }
 
 sfosEnhancedPlusLicExpiryDate OBJECT-TYPE
-    SYNTAX      	DisplayString
+    SYNTAX			DisplayString
     MAX-ACCESS		read-only
     STATUS			current
     DESCRIPTION		"Enhanced Plus Support Lic expiry date"
     ::= { sfosDeviceEnhancedPlusSupportLic 2 }
+
+-- sfosXGLicenseDetails.sfosDeviceCentralOrchestrationLic
+sfosCentralOrchestrationLicRegStatus OBJECT-TYPE
+    SYNTAX			SubscriptionStatusType
+    MAX-ACCESS		read-only
+    STATUS			current
+    DESCRIPTION		"Central Orchestration registration Lic Status"
+    ::= { sfosDeviceCentralOrchestrationLic 1 }
+
+sfosCentralOrchestrationLicExpiryDate OBJECT-TYPE
+    SYNTAX			DisplayString
+    MAX-ACCESS		read-only
+    STATUS			current
+    DESCRIPTION		"Central Orchestration Lic expiry date"
+    ::= { sfosDeviceCentralOrchestrationLic 2 }
 
 -- SFOS-XG MIB.sfosXGTunnelInfo
 
@@ -1194,7 +1211,9 @@ sfosLicInfoGroup OBJECT-GROUP
 		sfosEnhancedSupportLicRegStatus,
 		sfosEnhancedSupportLicExpiryDate,
 		sfosEnhancedPlusLicRegStatus,
-		sfosEnhancedPlusLicExpiryDate }
+		sfosEnhancedPlusLicExpiryDate,
+		sfosCentralOrchestrationLicRegStatus,
+		sfosCentralOrchestrationLicExpiryDate }
 	STATUS current
 	DESCRIPTION "A collection of objects providing SFOS License info"
 	::= { sfosXGMIBGroups 5 }

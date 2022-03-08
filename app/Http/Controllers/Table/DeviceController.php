@@ -30,6 +30,7 @@ use App\Models\Location;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Blade;
 use LibreNMS\Config;
 use LibreNMS\Util\Rewrite;
 use LibreNMS\Util\Time;
@@ -243,7 +244,7 @@ class DeviceController extends TableController
         }
 
         if ($sensor_count) {
-            $metrics[] = $this->formatMetric($device, $sensor_count, 'health', 'fa-dashboard');
+            $metrics[] = $this->formatMetric($device, $sensor_count, 'health', 'fa-heartbeat');
         }
 
         if ($wireless_count) {
@@ -341,7 +342,7 @@ class DeviceController extends TableController
         foreach (array_values(Arr::wrap(Config::get('html.device.links'))) as $index => $custom) {
             if ($custom['action'] ?? false) {
                 $row = $this->isDetailed() ? $index % 2 : 0;
-                $custom['href'] = view(['template' => $custom['url']], ['device' => $device])->__toString(); // @phpstan-ignore-line
+                $custom['href'] = Blade::render($custom['url'], ['device' => $device]);
                 $actions[$row][] = $custom;
             }
         }

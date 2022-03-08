@@ -36,7 +36,7 @@ class Slas implements Module
      * Discover this module. Heavier processes can be run here
      * Run infrequently (default 4 times a day)
      *
-     * @param  OS  $os
+     * @param  \LibreNMS\OS  $os
      */
     public function discover(OS $os)
     {
@@ -52,7 +52,7 @@ class Slas implements Module
      * Try to keep this efficient and only run if discovery has indicated there is a reason to run.
      * Run frequently (default every 5 minutes)
      *
-     * @param  OS  $os
+     * @param  \LibreNMS\OS  $os
      */
     public function poll(OS $os)
     {
@@ -73,7 +73,7 @@ class Slas implements Module
      * Remove all DB data for this module.
      * This will be run when the module is disabled.
      *
-     * @param  OS  $os
+     * @param  \LibreNMS\OS  $os
      */
     public function cleanup(OS $os)
     {

@@ -16,7 +16,8 @@ use App\Models\Availability;
 use App\Models\Device;
 use App\Models\DeviceGroup;
 use App\Models\DeviceOutage;
-use Illuminate\Support\Collection;
+use App\Models\MplsSap;
+use App\Models\MplsService;
 use App\Models\OspfPort;
 use App\Models\Port;
 use App\Models\PortGroup;
@@ -306,12 +307,17 @@ function list_devices(Illuminate\Http\Request $request)
 
     if ($type == 'all' || empty($type)) {
         $sql = '1';
+    } elseif ($type == 'device_id') {
+        $sql = '`d`.`device_id` = ?';
+        $param[] = $query;
     } elseif ($type == 'active') {
         $sql = "`d`.`ignore`='0' AND `d`.`disabled`='0'";
     } elseif ($type == 'location') {
-        $sql = "`locations`.`location` LIKE '%" . $query . "%'";
+        $sql = '`locations`.`location` LIKE ?';
+        $param[] = "%$query%";
     } elseif ($type == 'hostname') {
-        $sql = "`d`.`hostname` LIKE '%" . $query . "%'";
+        $sql = '`d`.`hostname` LIKE ?';
+        $param[] = "%$query%";
     } elseif ($type == 'ignored') {
         $sql = "`d`.`ignore`='1' AND `d`.`disabled`='0'";
     } elseif ($type == 'up') {
@@ -1441,30 +1447,6 @@ function get_oxidized_config(Illuminate\Http\Request $request)
 function list_oxidized(Illuminate\Http\Request $request)
 {
     $return = [];
-    $device_groups = DeviceGroup::whereIn('name', Config::get('oxidized.only_device_groups', []))->get();
-
-    if ($device_groups->isNotEmpty()) {
-        $os_maps = [];
-        foreach (Config::get('oxidized.maps.os.os', []) as $os) {
-            $os_maps[$os["match"]] = $os["value"];
-        }
-        $processed_devices = new Collection;
-        foreach ($device_groups as $dev_grp) {
-            foreach ($dev_grp->devices as $device) { 
-                $output = [
-                    'group' => $dev_grp->name,
-                    'hostname' => $device->hostname,
-                    'ip' => $device->ip,
-                    'os' => $os_maps[$device->os] ?? $device->os,
-                ];
-                if(! $processed_devices->contains($device)) {
-                    $return[] = $output;
-                }
-                $processed_devices->push($device);
-            }
-        }
-        return response()->json($return, 200, [], JSON_PRETTY_PRINT);
-    }
 
     $devices = Device::query()
              ->where('disabled', 0)
@@ -1519,6 +1501,21 @@ function list_oxidized(Illuminate\Http\Request $request)
         //Exclude groups from being sent to Oxidized
         if (in_array($output['group'], Config::get('oxidized.ignore_groups'))) {
             continue;
+        }
+
+        // Device group support
+        // First run legacy mappings and then override groups if this feature is being used
+        // The list of enabled groups is traversed in order and the first match is used to set the membership
+        $device_groups = DeviceGroup::whereIn('name', Config::get('oxidized.enabled_groups', []))->get();
+        if ($device_groups->isNotEmpty()) {
+            $processed_devices = new Collection;
+            foreach ($device_groups as $dev_grp) {
+                # TODO, if the current device is in this group then...
+                if($dev_grp->contains($device) && ! $processed_devices->contains($device)) {
+                    $output['group'] = $dev_grp->name;
+                    $processed_devices->push($device);
+                }
+            }
         }
 
         $return[] = $output;
@@ -2208,6 +2205,38 @@ function get_vrf(Illuminate\Http\Request $request)
     return api_success($vrf, 'vrf');
 }
 
+function list_mpls_services(Illuminate\Http\Request $request)
+{
+    $hostname = $request->get('hostname');
+    $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
+
+    $mpls_services = MplsService::hasAccess(Auth::user())->when($device_id, function ($query, $device_id) {
+        return $query->where('device_id', $device_id);
+    })->get();
+
+    if ($mpls_services->isEmpty()) {
+        return api_error(404, 'MPLS Services do not exist');
+    }
+
+    return api_success($mpls_services, 'mpls_services', null, 200, $mpls_services->count());
+}
+
+function list_mpls_saps(Illuminate\Http\Request $request)
+{
+    $hostname = $request->get('hostname');
+    $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
+
+    $mpls_saps = MplsSap::hasAccess(Auth::user())->when($device_id, function ($query, $device_id) {
+        return $query->where('device_id', $device_id);
+    })->get();
+
+    if ($mpls_saps->isEmpty()) {
+        return api_error(404, 'SAPs do not exist');
+    }
+
+    return api_success($mpls_saps, 'saps', null, 200, $mpls_saps->count());
+}
+
 function list_ipsec(Illuminate\Http\Request $request)
 {
     $hostname = $request->route('hostname');
@@ -2716,11 +2745,11 @@ function add_location(Illuminate\Http\Request $request)
         return api_error(400, 'Required fields missing (location, lat and lng needed)');
     }
     // Set the location
-    $timestamp = date('Y-m-d H:m:s');
-    $insert = ['location' => $data['location'], 'lat' => $data['lat'], 'lng' => $data['lng'], 'timestamp' => $timestamp];
-    $location_id = dbInsert($insert, 'locations');
-    if ($location_id != false) {
-        return api_success_noresult(201, "Location added with id #$location_id");
+    $location = new \App\Models\Location($data);
+    $location->fixed_coordinates = $data['fixed_coordinates'] ?? $location->coordinatesValid();
+
+    if ($location->save()) {
+        return api_success_noresult(201, "Location added with id #$location->id");
     }
 
     return api_error(500, 'Failed to add the location');

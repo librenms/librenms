@@ -31,11 +31,11 @@ use LibreNMS\RRD\RrdDefinition;
 
 class Openbsd extends Unix implements OSPolling
 {
-    public function pollOS()
+    public function pollOS(): void
     {
         $oids = snmp_get_multi($this->getDeviceArray(), ['pfStateCount.0', 'pfStateSearches.0', 'pfStateInserts.0', 'pfStateRemovals.0'], '-OQUs', 'OPENBSD-PF-MIB');
 
-        if (is_numeric($oids[0]['pfStateCount'])) {
+        if (is_numeric($oids[0]['pfStateCount'] ?? null)) {
             $rrd_def = RrdDefinition::make()->addDataset('states', 'GAUGE', 0);
 
             $fields = [
@@ -48,7 +48,7 @@ class Openbsd extends Unix implements OSPolling
             $this->enableGraph('pf_states');
         }
 
-        if (is_numeric($oids[0]['pfStateSearches'])) {
+        if (is_numeric($oids[0]['pfStateSearches'] ?? null)) {
             $rrd_def = RrdDefinition::make()->addDataset('searches', 'COUNTER', 0);
 
             $fields = [
@@ -61,7 +61,7 @@ class Openbsd extends Unix implements OSPolling
             $this->enableGraph('pf_searches');
         }
 
-        if (is_numeric($oids[0]['pfStateInserts'])) {
+        if (is_numeric($oids[0]['pfStateInserts'] ?? null)) {
             $rrd_def = RrdDefinition::make()->addDataset('inserts', 'COUNTER', 0);
 
             $fields = [
@@ -74,7 +74,7 @@ class Openbsd extends Unix implements OSPolling
             $this->enableGraph('pf_inserts');
         }
 
-        if (is_numeric($oids[0]['pfStateCount'])) {
+        if (is_numeric($oids[0]['pfStateCount'] ?? null)) {
             $rrd_def = RrdDefinition::make()->addDataset('removals', 'COUNTER', 0);
 
             $fields = [

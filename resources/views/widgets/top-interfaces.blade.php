@@ -3,9 +3,9 @@
     <table class="table table-hover table-condensed table-striped bootgrid-table">
         <thead>
             <tr>
-                <th class="text-left">@lang('Device')</th>
-                <th class="text-left">@lang('Interface')</th>
-                <th class="text-left">@lang('Total traffic')</th>
+                <th class="text-left">{{ __('Device') }}</th>
+                <th class="text-left">{{ __('Interface') }}</th>
+                <th class="text-left">{{ __('Total traffic') }}</th>
             </tr>
         </thead>
         <tbody>

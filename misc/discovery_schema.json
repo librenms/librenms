@@ -230,6 +230,9 @@
                                                     "string"
                                                 ]
                                             },
+                                            "user_func": {
+                                                "type": "string"
+                                            },
                                             "states": {
                                                 "type": "array",
                                                 "items": {
@@ -484,6 +487,16 @@
                                     "oid": {
                                         "type": "string"
                                     },
+                                    "device": {
+                                        "enum": [
+                                            "sysName",
+                                            "sysObjectID",
+                                            "sysDescr",
+                                            "version",
+                                            "hardware",
+                                            "features"
+                                        ]
+                                    },
                                     "op": {
                                         "$ref": "#/definitions/comparison"
                                     },
@@ -496,10 +509,11 @@
                                 },
                                 "additionalProperties": false,
                                 "required": [
-                                    "oid",
                                     "op",
                                     "value"
-                                ]
+                                ],
+                                "minProperties": 3,
+                                "maxProperties": 3
                             }
                         ]
                     }

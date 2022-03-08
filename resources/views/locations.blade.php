@@ -21,14 +21,14 @@
             <table id="locations" class="table table-hover table-condensed table-striped">
                 <thead>
                 <tr>
-                    <th data-column-id="location" data-formatter="location" data-order="asc">@lang('Location')</th>
-                    <th data-column-id="coordinates" data-formatter="coordinates" data-sortable="false">@lang('Coordinates')</th>
-                    <th data-column-id="devices" data-formatter="primaryLabel">@lang('Devices')</th>
-                    <th data-column-id="network" data-formatter="defaultLabel">@lang('Network')</th>
-                    <th data-column-id="servers" data-formatter="defaultLabel">@lang('Servers')</th>
-                    <th data-column-id="firewalls" data-formatter="defaultLabel">@lang('Firewalls')</th>
-                    <th data-column-id="down" data-formatter="down">@lang('Down')</th>
-                    <th data-column-id="actions" data-formatter="actions" data-sortable="false">@lang('Actions')</th>
+                    <th data-column-id="location" data-formatter="location" data-order="asc">{{ __('Location') }}</th>
+                    <th data-column-id="coordinates" data-formatter="coordinates" data-sortable="false">{{ __('Coordinates') }}</th>
+                    <th data-column-id="devices" data-formatter="primaryLabel">{{ __('Devices') }}</th>
+                    <th data-column-id="network" data-formatter="defaultLabel">{{ __('Network') }}</th>
+                    <th data-column-id="servers" data-formatter="defaultLabel">{{ __('Servers') }}</th>
+                    <th data-column-id="firewalls" data-formatter="defaultLabel">{{ __('Firewalls') }}</th>
+                    <th data-column-id="down" data-formatter="down">{{ __('Down') }}</th>
+                    <th data-column-id="actions" data-formatter="actions" data-sortable="false">{{ __('Actions') }}</th>
                 </tr>
                 </thead>
             </table>
@@ -48,8 +48,8 @@
 
                 </div>
                 <div class="modal-footer">
-                    <button type="button" class="btn btn-default" data-dismiss="modal">@lang('Cancel')</button>
-                    <button type="button" class="btn btn-primary" id="save-location">@lang('Save changes')</button>
+                    <button type="button" class="btn btn-default" data-dismiss="modal">{{ __('Cancel') }}</button>
+                    <button type="button" class="btn btn-primary" id="save-location">{{ __('Save changes') }}</button>
                 </div>
             </div>
         </div>
@@ -94,7 +94,7 @@
                         if (row.lat && row.lng) {
                             text = row.lat + ', ' + row.lng;
                         } else {
-                            text = '@lang('N/A')';
+                            text = '{{ __('N/A') }}';
                         }
                         return '<div class="coordinates-field" onclick="edit_coordinates(this);" data-id="' + row.id +
                             '"><span class="coordinates-text">' + text + '</span> <i class="fa fa-pencil"></i></div>';
@@ -115,21 +115,21 @@
                     "actions": function (column, row) {
                         var buttons = '<div style="white-space:nowrap"><button type="button" class="btn btn-xs btn-primary" onclick="toggle_location_graphs(' + row.id + ', this)"';
                         if (row.devices < 1) {
-                            buttons += ' disabled title="@lang('Location must have devices to show graphs')"';
+                            buttons += ' disabled title="{{ __('Location must have devices to show graphs') }}"';
                         }
-                        buttons += '><i class="fa fa-area-chart" aria-hidden="true"></i><span class="hidden-sm"> @lang('Traffic')</span></button>';
+                        buttons += '><i class="fa fa-area-chart" aria-hidden="true"></i><span class="hidden-sm"> {{ __('Traffic') }}</span></button>';
 
                         @admin
                         buttons += ' <button type="button" class="btn btn-xs btn-default" data-id="' + row.id +
                             '" data-location="' + row.location + '" data-lat="' + row.lat + '" data-lng="' + row.lng +
                             '" onclick="$(\'#edit-location\').modal(\'show\', this)"><i class="fa fa-pencil" aria-hidden="true"></i>' +
-                            '<span class="hidden-sm"> @lang('Edit')</span></button>';
+                            '<span class="hidden-sm"> {{ __('Edit') }}</span></button>';
 
                         buttons += ' <button type="button" class="btn btn-xs btn-danger" onclick="delete_location(' + row.id + ')"';
                         if (row.devices > 0) {
-                            buttons += ' disabled title="@lang('Cannot delete locations used by devices')"';
+                            buttons += ' disabled title="{{ __('Cannot delete locations used by devices') }}"';
                         }
-                        buttons += '><i class="fa fa-trash" aria-hidden="true"></i><span class="hidden-sm">  @lang('Delete')</span></button>';
+                        buttons += '><i class="fa fa-trash" aria-hidden="true"></i><span class="hidden-sm">  {{ __('Delete') }}</span></button>';
                         @endadmin
 
                         buttons += '</div>';
@@ -224,13 +224,13 @@
                 url: "ajax/location/" + locationId
             }).done(function () {
                 locations_grid.bootgrid('reload');
-                toastr.success('@lang('Location deleted')');
+                toastr.success("{{ __('Location deleted') }}");
             }).fail(function (e) {
                 var data = e.responseJSON;
                 if (data && data.hasOwnProperty('id')) {
                     toastr.error(data.id.join(' '));
                 } else {
-                    toastr.error('@lang('Failed to delete location'): ' + e.statusText)
+                    toastr.error("{{ __('Failed to delete location') }}: " + e.statusText)
                 }
             });
         }

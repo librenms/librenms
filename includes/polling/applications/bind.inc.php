@@ -5,8 +5,6 @@ use LibreNMS\RRD\RrdDefinition;
 $name = 'bind';
 $app_id = $app['app_id'];
 
-echo " $name";
-
 if (! empty($agent_data['app'][$name])) {
     $bind = $agent_data['app'][$name];
 } else {
@@ -53,7 +51,7 @@ $fields = [
 ];
 $metrics['queries'] = $fields;
 
-$tags = ['name' => $name, 'app_id' => $app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
+$tags = ['name' => $name, 'app_id' => $app_id, 'type' => 'incoming', 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
 data_update($device, 'app', $tags, $fields);
 
 $rrd_name = ['app', $name, $app_id, 'incoming'];
@@ -127,7 +125,7 @@ $fields = [
 ];
 $metrics['incoming'] = $fields;
 
-$tags = ['name' => $name, 'app_id' => $app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
+$tags = ['name' => $name, 'app_id' => $app_id, 'type' => 'incoming_extended', 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
 data_update($device, 'app', $tags, $fields);
 
 //
@@ -228,7 +226,7 @@ $fields = [
 ];
 $metrics['outgoing'] = $fields;
 
-$tags = ['name' => $name, 'app_id' => $app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
+$tags = ['name' => $name, 'app_id' => $app_id, 'type' => 'outgoing', 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
 data_update($device, 'app', $tags, $fields);
 
 //
@@ -288,7 +286,7 @@ $fields = [
 ];
 $metrics['server'] = $fields;
 
-$tags = ['name' => $name, 'app_id' => $app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
+$tags = ['name' => $name, 'app_id' => $app_id, 'type' => 'server', 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
 data_update($device, 'app', $tags, $fields);
 
 //
@@ -353,7 +351,7 @@ $fields = [
 ];
 $metrics['resolver'] = $fields;
 
-$tags = ['name' => $name, 'app_id' => $app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
+$tags = ['name' => $name, 'app_id' => $app_id, 'type' => 'resolver', 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
 data_update($device, 'app', $tags, $fields);
 
 //
@@ -420,7 +418,7 @@ $fields = [
 ];
 $metrics['adb'] = $fields;
 
-$tags = ['name' => $name, 'app_id' => $app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
+$tags = ['name' => $name, 'app_id' => $app_id, 'type' => 'adb', 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
 data_update($device, 'app', $tags, $fields);
 
 //
@@ -509,7 +507,7 @@ $fields = [
 ];
 $metrics['sockets'] = $fields;
 
-$tags = ['name' => $name, 'app_id' => $app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
+$tags = ['name' => $name, 'app_id' => $app_id, 'type' => 'sockets', 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
 data_update($device, 'app', $tags, $fields);
 
 //
@@ -618,7 +616,7 @@ $fields = [
 ];
 $metrics['rrpositive'] = $fields;
 
-$tags = ['name' => $name, 'app_id' => $app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
+$tags = ['name' => $name, 'app_id' => $app_id, 'type' => 'rrpositive', 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
 data_update($device, 'app', $tags, $fields);
 
 // now handle the negative
@@ -671,6 +669,6 @@ $fields = [
 ];
 $metrics['rrnegative'] = $fields;
 
-$tags = ['name' => $name, 'app_id' => $app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
+$tags = ['name' => $name, 'app_id' => $app_id, 'type' => 'rrnegative', 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
 data_update($device, 'app', $tags, $fields);
 update_application($app, $bind, $metrics);

@@ -212,12 +212,19 @@
             "section": "rules",
             "order": 7
         },
-        "allow_duplicate_sysName": {
+        "discovery_on_reboot": {
             "default": false,
             "type": "boolean",
             "group": "discovery",
             "section": "general",
             "order": 0
+        },
+        "allow_duplicate_sysName": {
+            "default": false,
+            "type": "boolean",
+            "group": "discovery",
+            "section": "general",
+            "order": 1
         },
         "allow_entity_sensor.amperes": {
             "default": true,
@@ -873,6 +880,19 @@
                 "ifName": "ifName",
                 "ifDescr": "ifDescr",
                 "ifAlias": "ifAlias"
+            }
+        },
+        "device_display_default": {
+            "group": "webui",
+            "section": "device",
+            "order": 1,
+            "default": null,
+            "type": "select",
+            "options": {
+                "{{ $hostname }}": "hostname",
+                "{{ $sysName_fallback }}":  "sysName_fallback",
+                "{{ $sysName }}":  "sysName",
+                "{{ $ip }}":  "ip"
             }
         },
         "device_perf_purge": {
@@ -1597,20 +1617,6 @@
             "section": "style",
             "order": 2,
             "type": "text"
-        },
-        "force_hostname_to_sysname": {
-            "group": "webui",
-            "section": "device",
-            "order": 0,
-            "default": false,
-            "type": "boolean"
-        },
-        "force_ip_to_sysname": {
-            "group": "webui",
-            "section": "device",
-            "order": 1,
-            "default": false,
-            "type": "boolean"
         },
         "fping": {
             "default": "fping",
@@ -4218,7 +4224,7 @@
                 "value.*": "exists:devices,type"
             }
         },
-        "oxidized.only_device_groups": {
+        "oxidized.enabled_groups": {
             "default": [],
             "type": "array",
             "group": "external",
@@ -5168,6 +5174,9 @@
                 "public"
             ]
         },
+        "snmp.unescape": {
+            "type": "boolean"
+        },
         "snmp.exec_timeout": {
             "default": 1200,
             "type": "integer",
@@ -5180,11 +5189,18 @@
             "type": "integer",
             "default": 0
         },
+        "snmp.oids.no_bulk": {
+            "group": "poller",
+            "section": "snmp",
+            "order": 20,
+            "type": "array",
+            "default": null
+        },
         "snmp.timeout": {
             "group": "poller",
             "section": "snmp",
             "order": 5,
-            "type": "integer",
+            "type": "float",
             "default": 1
         },
         "snmp.retries": {

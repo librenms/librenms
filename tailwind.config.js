@@ -1,6 +1,6 @@
 module.exports = {
   prefix: 'tw-',
-  purge: [
+  content: [
       './storage/framework/views/*.php',
       './resources/**/*.blade.php',
       './resources/**/*.js',
@@ -21,6 +21,9 @@ module.exports = {
           'white-300': '#bebfbf',
           'white-400': '#acb6bf',
         }
+      },
+      borderWidth: {
+        '0.5': '0.5px',
       }
     },
     screens: {
@@ -29,9 +32,6 @@ module.exports = {
       'lg': '992px',
       'xl': '1200px',
     }
-  },
-  variants: {
-    extend: {},
   },
   plugins: [],
 }

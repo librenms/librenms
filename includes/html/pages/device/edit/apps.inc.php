@@ -1,4 +1,3 @@
-<h3> Applications </h3>
 <?php
 
 use LibreNMS\Config;

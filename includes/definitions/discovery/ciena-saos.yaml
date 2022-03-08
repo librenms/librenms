@@ -24,7 +24,7 @@ modules:
                         -
                             oid: nnOpticalPmRecentMonTypeDescr
                             op: 'regex'
-                            value: (.*(MAX|MIN|AVG|LOW|HIGH).*)
+                            value: (.*(LOW|HIGH).*)
                     group: nnOpticalPmRecentIfIndexDescr
         dbm:
             data:
@@ -42,7 +42,7 @@ modules:
                         -
                             oid: nnOpticalPmRecentMonTypeDescr
                             op: 'regex'
-                            value: (.*(MAX|MIN|AVG|LOW|HIGH).*)
+                            value: (.*(LOW|HIGH).*)
                     group: nnOpticalPmRecentIfIndexDescr
         percentage:
             data:
@@ -60,7 +60,7 @@ modules:
                         -
                             oid: nnOpticalPmRecentMonTypeDescr
                             op: 'regex'
-                            value: (.*(MAX|MIN|AVG|LOW|HIGH).*)
+                            value: (.*(LOW|HIGH).*)
                     group: nnOpticalPmRecentIfIndexDescr
         ber:
             data:
@@ -78,7 +78,7 @@ modules:
                         -
                             oid: nnOpticalPmRecentMonTypeDescr
                             op: 'regex'
-                            value: (.*(MAX|MIN|AVG|LOW|HIGH).*)
+                            value: (.*(LOW|HIGH).*)
                     group: nnOpticalPmRecentIfIndexDescr
         runtime:
             data:
@@ -96,6 +96,6 @@ modules:
                         -
                             oid: nnOpticalPmRecentMonTypeDescr
                             op: 'regex'
-                            value: (.*(MAX|MIN|AVG|LOW|HIGH).*)
+                            value: (.*(LOW|HIGH).*)
                     group: nnOpticalPmRecentIfIndexDescr
                                     

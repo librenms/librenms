@@ -59,8 +59,6 @@ use LibreNMS\RRD\RrdDefinition;
 $name = 'gpsd';
 $app_id = $app['app_id'];
 
-echo " $name\n";
-
 if ($app_id > 0) {
     if (! empty($agent_data['app'][$name])) {
         $gpsd = $agent_data['app'][$name];

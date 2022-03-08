@@ -46,8 +46,6 @@ if ($updated && $update_message) {
 
 ?>
 
-<h3>IPMI settings</h3>
-
 <form id="edit" name="edit" method="post" action="" role="form" class="form-horizontal">
 <?php echo csrf_field() ?>
 <input type="hidden" name="editing" value="yes">

@@ -31,5 +31,5 @@ interface OSPolling
      * Poll additional OS data.
      * Data must be manually saved within this method.
      */
-    public function pollOS();
+    public function pollOS(): void;
 }

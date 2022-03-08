@@ -1,0 +1,424 @@
+UI-AF60-MIB DEFINITIONS ::= BEGIN
+
+  IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Integer32, Counter64, IpAddress
+      FROM SNMPv2-SMI
+    MODULE-COMPLIANCE, OBJECT-GROUP
+      FROM SNMPv2-CONF
+    DisplayString
+      FROM SNMPv2-TC
+    uiAF60, uiAF60Groups
+      FROM UBNT-MIB;
+
+  af60MIB MODULE-IDENTITY
+      LAST-UPDATED "202110050000Z"
+      ORGANIZATION "Ubiquiti, Inc."
+      CONTACT-INFO "support@ui.com"
+      DESCRIPTION  "The AF60 MIB module for Ubiquiti, Inc. entities"
+      REVISION "202110050000Z"
+      DESCRIPTION "AF60.v1.0 revision"
+      ::= { uiAF60 1 }
+
+      af60Compliances  OBJECT IDENTIFIER ::= {uiAF60Groups 1}
+      af60Groups       OBJECT IDENTIFIER ::= {uiAF60Groups 2}
+
+      af60Config       OBJECT IDENTIFIER ::= {af60MIB 1}
+      af60Status       OBJECT IDENTIFIER ::= {af60MIB 2}
+      af60StationTable OBJECT IDENTIFIER ::= {af60MIB 3}
+      af60Gps          OBJECT IDENTIFIER ::= {af60MIB 4}
+      af60Orientation  OBJECT IDENTIFIER ::= {af60MIB 5}
+
+-- --------------------------------------------------------------------------------
+--                            Configuration table
+-- --------------------------------------------------------------------------------
+
+  af60Role OBJECT-TYPE
+    SYNTAX        INTEGER {
+                            ap  (0),
+                            cpe (1)
+                          }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "Wireless Role (ap/cpe)"
+    ::= { af60Config 1 }
+
+  af60Frequency OBJECT-TYPE
+    SYNTAX        Integer32
+    UNITS         "MHz"
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "The main frequency to use in MHz."
+    ::= { af60Config 2 }
+
+  af60Bandwidth OBJECT-TYPE
+    SYNTAX        Integer32
+    UNITS         "MHz"
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "Wireless channel bandwidth in MHz."
+    ::= { af60Config 3 }
+
+  af60Ssid OBJECT-TYPE
+    SYNTAX        DisplayString (SIZE (1..15))
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "Radio SSID"
+    ::= { af60Config 4 }
+
+  af60LastIp OBJECT-TYPE
+    SYNTAX        IpAddress
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "IP address of a device"
+    ::= { af60Config 5 }
+
+-- --------------------------------------------------------------------------------
+--                            Status table
+-- --------------------------------------------------------------------------------
+
+  af60Mac OBJECT-TYPE
+    SYNTAX        Hex-STRING
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "The MAC address of this device"
+    ::= { af60Status 1 }
+
+  af60DevModel OBJECT-TYPE
+    SYNTAX        DisplayString
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "The device model."
+    ::= { af60Status 2 }
+
+  af60DevName OBJECT-TYPE
+    SYNTAX        DisplayString
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "The device name."
+    ::= { af60Status 3 }
+
+  af60FirmwareVersion OBJECT-TYPE
+    SYNTAX        DisplayString
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "The firmware version running."
+    ::= { af60Status 4 }
+
+  af60MemoryUsage OBJECT-TYPE
+    SYNTAX        Integer32
+    UNITS         "%"
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "The percentage of total memory usage."
+    ::= { af60Status 5 }
+
+  af60CpuUsage OBJECT-TYPE
+    SYNTAX        Integer32
+    UNITS         "%"
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "The percentage of total CPU usage."
+    ::= { af60Status 6 }
+
+  af60Uptime OBJECT-TYPE
+    SYNTAX        TimeTicks
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "The uptime of the device"
+    ::= { af60Status 7 }
+
+  af60CarrierDrop OBJECT-TYPE
+    SYNTAX        DisplayString
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "State of Carrier Drop"
+    ::= { af60Status 8 }
+
+-- --------------------------------------------------------------------------------
+--                            Station table
+-- --------------------------------------------------------------------------------
+
+  af60StationTable OBJECT-TYPE
+    SYNTAX        SEQUENCE OF Af60StationEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION   "Remote station table for status and statistics."
+    ::= { af60MIB 3 }
+
+  af60StationEntry OBJECT-TYPE
+    SYNTAX        Af60StationEntry
+    MAX-ACCESS    not-accessible
+    STATUS        current
+    DESCRIPTION   "An entry in the af60StationTable"
+    INDEX         { af60StaMac }
+    ::= { af60StationTable 1 }
+
+  Af60StationEntry ::= SEQUENCE {
+    af60StaMac                        OCTET STRING (SIZE (6)),
+    af60StaActiveLink                 DisplayString,
+    af60StaRSSI                       Integer32,
+    af60StaSNR                        Integer32,
+    af60StaTxMCS                      Integer32,
+    af60StaRxMCS                      Integer32,
+    af60StaTxCapacity                 Integer32,
+    af60StaRxCapacity                 Integer32,
+    af60StaTxBytes                    Counter64,
+    af60StaRxBytes                    Counter64,
+    af60StaTxThroughput               Integer32,
+    af60StaRxThroughput               Integer32,
+    af60StaRemoteDevModel             DisplayString,
+    af60StaRemoteDevName              DisplayString,
+    af60StaRemoteDistance             Integer32,
+    af60StaRemoteDistanceFeet         Integer32,
+    af60StaRemoteConnectionTime       TimeTicks,
+    af60StaRemoteRSSI                 Integer32,
+    af60StaRemoteSNR                  Integer32,
+    af60StaRemoteLastIp               IpAddress
+  }
+
+  af60StaMac OBJECT-TYPE
+    SYNTAX        OCTET STRING (SIZE (6))
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "MAC address of remote endpoint"
+    ::= { af60StationEntry 1 }
+
+  af60StaActiveLink OBJECT-TYPE
+    SYNTAX        DisplayString
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "Link type used at the moment (main or backup)"
+    ::= { af60StationEntry 2 }
+
+  af60StaRSSI OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "Local RSSI"
+    ::= { af60StationEntry 3 }
+
+  af60StaSNR OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "Signal-to-noise ratio"
+    ::= { af60StationEntry 4 }
+
+  af60StaTxMCS OBJECT-TYPE
+    SYNTAX        Integer32
+    UNITS         "X"
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "Currently selected TX modulation and coding scheme"
+    ::= { af60StationEntry 5 }
+
+  af60StaRxMCS OBJECT-TYPE
+    SYNTAX        Integer32
+    UNITS         "X"
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "Currently selected RX modulation and coding scheme"
+    ::= { af60StationEntry 6 }
+
+  af60StaTxCapacity OBJECT-TYPE
+    SYNTAX        Integer32
+    UNITS         "Kbps"
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "Transmit Capacity"
+    ::= { af60StationEntry 7 }
+
+  af60StaRxCapacity OBJECT-TYPE
+    SYNTAX        Integer32
+    UNITS         "Kbps"
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "Receive Capacity"
+    ::= { af60StationEntry 8 }
+
+  af60StaTxBytes OBJECT-TYPE
+    SYNTAX        Counter64
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "Bytes transmitted to remote endpoint"
+    ::= { af60StationEntry 9 }
+
+  af60StaRxBytes OBJECT-TYPE
+    SYNTAX        Counter64
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "Bytes received from remote endpoint"
+    ::= { af60StationEntry 10 }
+
+  af60StaTxThroughput OBJECT-TYPE
+    SYNTAX        Integer32
+    UNITS         "Kbps"
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "Current throughput to remote endpoint"
+    ::= { af60StationEntry 11 }
+
+  af60StaRxThroughput OBJECT-TYPE
+    SYNTAX        Integer32
+    UNITS         "Kbps"
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "Current throughput from remote endpoint"
+    ::= { af60StationEntry 12 }
+
+  af60StaRemoteDevModel OBJECT-TYPE
+    SYNTAX        DisplayString
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "Device model of the remote endpoint"
+    ::= { af60StationEntry 13 }
+
+  af60StaRemoteDevName OBJECT-TYPE
+    SYNTAX        DisplayString
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "Device name of the remote endpoint"
+    ::= { af60StationEntry 14 }
+
+  af60StaRemoteDistance OBJECT-TYPE
+    SYNTAX        Integer32
+    UNITS         "m"
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "Remote endpoint distance in meters"
+    ::= { af60StationEntry 15 }
+
+  af60StaRemoteDistanceFeet OBJECT-TYPE
+    SYNTAX        Integer32
+    UNITS         "ft"
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "Remote endpoint distance in feet"
+    ::= { af60StationEntry 16 }
+
+  af60StaRemoteConnectionTime OBJECT-TYPE
+    SYNTAX        TimeTicks
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "Remote endpoint connection time of current session"
+    ::= { af60StationEntry 17 }
+
+  af60StaRemoteRSSI OBJECT-TYPE
+    SYNTAX        Integer32
+    UNITS         "dBm"
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "Remote endpoint RSSI"
+    ::= { af60StationEntry 18 }
+
+  af60StaRemoteSNR OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "Remote endpoint signal-to-noise ratio"
+    ::= { af60StationEntry 19 }
+
+  af60StaRemoteLastIp OBJECT-TYPE
+    SYNTAX        IpAddress
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "Remote endpoint last known IP address"
+    ::= { af60StationEntry 20 }
+
+-- --------------------------------------------------------------------------------
+--                            GPS table
+-- --------------------------------------------------------------------------------
+
+  af60GpsStatus OBJECT-TYPE
+    SYNTAX        INTEGER {
+                            absent(0),
+                            off(1),
+                            on(2)
+                          }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "GPS status"
+    ::= { af60Gps 1 }
+
+  af60GpsFix OBJECT-TYPE
+    SYNTAX        INTEGER {
+                            unknown(0),
+                            nofix(1),
+                            fix2d(2),
+                            fix3d(3)
+                          }
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "GPS fix status"
+    ::= { af60Gps 2 }
+
+  af60GpsLat OBJECT-TYPE
+    SYNTAX        DisplayString
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "GPS Latitude"
+    ::= { af60Gps 3 }
+
+  af60GpsLon OBJECT-TYPE
+    SYNTAX        DisplayString
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "GPS Longitude"
+    ::= { af60Gps 4 }
+
+  af60GpsAltM OBJECT-TYPE
+    SYNTAX        DisplayString
+    UNITS         "m"
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "GPS Atlitude in meters"
+    ::= { af60Gps 5 }
+
+  af60GpsAltFt OBJECT-TYPE
+    SYNTAX        DisplayString
+    UNITS         "ft"
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "GPS Atlitude in feet"
+    ::= { af60Gps 6 }
+
+  af60GpsSatsVisible OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "GPS visible statellites"
+    ::= { af60Gps 7 }
+
+  af60GpsSatsTracked OBJECT-TYPE
+    SYNTAX        Integer32
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "GPS tracked satellites"
+    ::= { af60Gps 8 }
+
+  af60GpsHDOP OBJECT-TYPE
+    SYNTAX        DisplayString
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "GPS Horizontal Dilution of Precision"
+    ::= { af60Gps 9 }
+
+-- --------------------------------------------------------------------------------
+--                            Orientation table
+-- --------------------------------------------------------------------------------
+
+  af60OrientationTilt OBJECT-TYPE
+    SYNTAX        DisplayString
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "Tilt of orientation"
+    ::= { af60Orientation 1 }
+
+  af60OrientationRoll OBJECT-TYPE
+    SYNTAX        DisplayString
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION   "Roll of orientation"
+    ::= { af60Orientation 2 }
+END
+

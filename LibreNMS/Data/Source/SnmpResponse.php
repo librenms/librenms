@@ -26,7 +26,9 @@
 namespace LibreNMS\Data\Source;
 
 use Illuminate\Support\Arr;
+use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
+use LibreNMS\Config;
 use Log;
 
 class SnmpResponse
@@ -67,7 +69,7 @@ class SnmpResponse
     {
         $this->errorMessage = '';
         // not checking exitCode because I think it may lead to false negatives
-        $invalid = preg_match('/(Timeout: No Response from .*|Unknown user name|Authentication failure)/', $this->stderr, $errors)
+        $invalid = preg_match('/(Timeout: No Response from .*|Unknown user name|Authentication failure|Error: OID not increasing: .*)/', $this->stderr, $errors)
             || empty($this->raw)
             || preg_match('/(No Such Instance|No Such Object|No more variables left).*/', $this->raw, $errors);
 
@@ -111,7 +113,7 @@ class SnmpResponse
         $values = [];
         $line = strtok($this->raw, PHP_EOL);
         while ($line !== false) {
-            if (Str::contains($line, ['at this OID', 'this MIB View'])) {
+            if (Str::contains($line, ['at this OID', 'this MIB View', 'End of MIB'])) {
                 // these occur when we seek past the end of data, usually the end of the response, but grab the next line and continue
                 $line = strtok(PHP_EOL);
                 continue;
@@ -129,18 +131,46 @@ class SnmpResponse
                 $line = strtok(PHP_EOL);
             }
 
-            $values[$oid] = trim($value, "\\\" \n\r");
+            // remove extra escapes
+            if (Config::get('snmp.unescape')) {
+                $value = stripslashes($value);
+            }
+
+            if (Str::startsWith($value, '"') && Str::endsWith($value, '"')) {
+                // unformatted string from net-snmp, remove extra escapes
+                $values[$oid] = trim(stripslashes($value), "\" \n\r");
+            } else {
+                $values[$oid] = trim($value);
+            }
         }
 
         return $values;
     }
 
+    public function valuesByIndex(array &$array = []): array
+    {
+        foreach ($this->values() as $oid => $value) {
+            [$name, $index] = array_pad(explode('.', $oid, 2), 2, '');
+            $array[$index][$name] = $value;
+        }
+
+        return $array;
+    }
+
     public function table(int $group = 0, array &$array = []): array
     {
         foreach ($this->values() as $key => $value) {
-            preg_match_all('/([^[\]]+)/', $key, $parts);
-            $parts = $parts[1];
-            array_splice($parts, $group, 0, array_shift($parts)); // move the oid name to the correct depth
+            if (Str::contains($key, '[')) {
+                // table
+                preg_match_all('/([^[\]]+)/', $key, $parts);
+                $parts = $parts[1]; // get all group 1 matches
+            } else {
+                // regular oid
+                $parts = explode('.', $key);
+            }
+
+            // move the oid name to the correct depth
+            array_splice($parts, $group, 0, array_shift($parts));
 
             // merge the parts into an array, creating keys if they don't exist
             $tmp = &$array;
@@ -155,10 +185,51 @@ class SnmpResponse
     }
 
     /**
+     * Map an snmp table with callback. If invalid data is encountered, an empty collection is returned.
+     * Variables passed to the callback will be an array of row values followed by each individual index.
+     */
+    public function mapTable(callable $callback): Collection
+    {
+        if (! $this->filterBadLines()->isValid()) {
+            return new Collection;
+        }
+
+        return collect($this->values())
+            ->map(function ($value, $oid) {
+                $parts = explode('[', rtrim($oid, ']'), 2);
+
+                return [
+                    '_index' => $parts[1] ?? '',
+                    $parts[0] => $value,
+                ];
+            })
+            ->groupBy('_index')
+            ->map(function ($values, $index) use ($callback) {
+                $values = array_merge(...$values);
+                unset($values['_index']);
+
+                return call_user_func($callback, $values, ...explode('][', (string) $index));
+            });
+    }
+
+    /**
      * @return int
      */
     public function getExitCode(): int
     {
         return $this->exitCode;
+    }
+
+    /**
+     * Filter bad lines from the raw output, examples:
+     * "No Such Instance currently exists at this OID"
+     * "No more variables left in this MIB View (It is past the end of the MIB tree)"
+     */
+    public function filterBadLines(): SnmpResponse
+    {
+        $this->raw = preg_replace('/^.*No Such Instance currently exists.*$/', '', $this->raw);
+        $this->raw = preg_replace('/\n[^\r\n]+No more variables left[^\r\n]+$/s', '', $this->raw);
+
+        return $this;
     }
 }

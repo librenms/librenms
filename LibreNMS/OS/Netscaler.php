@@ -30,7 +30,7 @@ use LibreNMS\RRD\RrdDefinition;
 
 class Netscaler extends \LibreNMS\OS implements OSPolling
 {
-    public function pollOS()
+    public function pollOS(): void
     {
         echo ' IP';
 
@@ -153,7 +153,7 @@ class Netscaler extends \LibreNMS\OS implements OSPolling
 
         $fields = [];
         foreach ($oids as $oid) {
-            $fields[$oid] = is_numeric($data[0][$oid]) ? ':' . $data[0][$oid] : 'U';
+            $fields[$oid] = $data[0][$oid] ?? null;
         }
 
         $tags = compact('rrd_def');

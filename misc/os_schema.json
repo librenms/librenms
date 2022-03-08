@@ -363,6 +363,15 @@
                 "type": "string"
             }
         },
+        "oids": {
+            "type": "object",
+            "properties": {
+                "no_bulk": {
+                    "type": "array"
+                }
+            },
+            "additionalProperties": false
+        },
         "snmp_bulk": {
             "type": "boolean"
         },

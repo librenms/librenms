@@ -4,6 +4,7 @@ use LibreNMS\RRD\RrdDefinition;
 
 $name = 'nginx';
 $app_id = $app['app_id'];
+
 if (! empty($agent_data['app'][$name])) {
     $nginx = $agent_data['app'][$name];
 } else {
@@ -11,8 +12,6 @@ if (! empty($agent_data['app'][$name])) {
     $nginx = snmp_get($device, '.1.3.6.1.4.1.8072.1.3.2.3.1.2.5.110.103.105.110.120', '-Ovq');
 }
 $nginx = trim($nginx, '"');
-
-echo ' nginx';
 
 [$active, $reading, $writing, $waiting, $req] = array_map('rtrim', explode("\n", $nginx));
 d_echo("active: $active reading: $reading writing: $writing waiting: $waiting Requests: $req\n");

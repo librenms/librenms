@@ -30,13 +30,24 @@ use LibreNMS\Config;
 class Proxy
 {
     /**
+     * Check if if the proxy should be used.
+     * (it should not be used for connections to localhost)
+     */
+    public static function shouldBeUsed(string $target_url): bool
+    {
+        return preg_match('#(^|://)(localhost|127\.|::1)#', $target_url) == 0;
+    }
+
+    /**
      * Return the proxy url
      *
      * @return array|bool|false|string
      */
-    public static function get()
+    public static function get(?string $target_url = null)
     {
-        if (getenv('http_proxy')) {
+        if ($target_url && ! self::shouldBeUsed($target_url)) {
+            return false;
+        } elseif (getenv('http_proxy')) {
             return getenv('http_proxy');
         } elseif (getenv('https_proxy')) {
             return getenv('https_proxy');
@@ -50,13 +61,13 @@ class Proxy
     }
 
     /**
-     * Return the proxy url in guzzle format "tcp://127.0.0.1:8888"
+     * Return the proxy url in guzzle format "http://127.0.0.1:8888"
      */
-    public static function forGuzzle(): string
+    public static function forGuzzle(?string $target_url = null): string
     {
-        $proxy = self::forCurl();
+        $proxy = self::forCurl($target_url);
 
-        return empty($proxy) ? '' : ('tcp://' . $proxy);
+        return empty($proxy) ? '' : ('http://' . $proxy);
     }
 
     /**
@@ -64,9 +75,9 @@ class Proxy
      *
      * @return string
      */
-    public static function forCurl(): string
+    public static function forCurl(?string $target_url = null): string
     {
-        return str_replace(['http://', 'https://'], '', rtrim(self::get(), '/'));
+        return str_replace(['http://', 'https://'], '', rtrim(self::get($target_url), '/'));
     }
 
     /**

@@ -1,5 +1,9 @@
 mib: SEMI-MIB
 modules:
+    os:
+        hardware: SEMI-MIB::hpHttpMgDeviceProductName.1
+        version: SEMI-MIB::hpHttpMgDeviceVersion.1
+        serial: SEMI-MIB::hpHttpMgDeviceSerialNumber.1
     sensors:
         state:
             data:

@@ -23,7 +23,7 @@
                 {
                     "sysName": "",
                     "sysObjectID": ".1.3.6.1.4.1.3709",
-                    "sysDescr": null,
+                    "sysDescr": "",
                     "sysContact": null,
                     "version": null,
                     "hardware": null,
@@ -36,23 +36,6 @@
                 }
             ]
         },
-        "poller": {
-            "devices": [
-                {
-                    "sysName": "",
-                    "sysObjectID": ".1.3.6.1.4.1.3709",
-                    "sysDescr": null,
-                    "sysContact": null,
-                    "version": null,
-                    "hardware": "Datacom ",
-                    "features": null,
-                    "os": "datacom",
-                    "type": "network",
-                    "serial": null,
-                    "icon": "datacom.png",
-                    "location": null
-                }
-            ]
-        }
+        "poller": "matches discovery"
     }
 }

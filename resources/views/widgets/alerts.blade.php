@@ -22,6 +22,7 @@
             ...request,
             id: "alerts",
             acknowledged: '{{ $acknowledged }}',
+            unreachable: '{{ $unreachable }}',
             fired: '{{ $fired }}',
             min_severity: '{{ $min_severity }}',
             group: '{{ $device_group }}',

@@ -5,6 +5,12 @@ modules:
         hardware: RAY3-MIB::productName.0
         serial: RAY3-MIB::serialNumber.0
         version: RAY3-MIB::swVer.0
+
+    mempools:
+        data:
+            -
+                percent_used: RAY3-MIB::useMemory
+
     processors:
         data:
             -

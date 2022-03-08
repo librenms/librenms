@@ -28,8 +28,9 @@ namespace LibreNMS\Tests\Mocks;
 use App\Models\Device;
 use DeviceCache;
 use Exception;
+use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
-use LibreNMS\Data\Source\SnmpQuery;
+use LibreNMS\Data\Source\NetSnmpQuery;
 use LibreNMS\Data\Source\SnmpQueryInterface;
 use LibreNMS\Data\Source\SnmpResponse;
 use LibreNMS\Device\YamlDiscovery;
@@ -58,6 +59,10 @@ class SnmpQueryMock implements SnmpQueryInterface
      * @var bool
      */
     private $numeric = false;
+    /**
+     * @var bool
+     */
+    private $hideMib = false;
     /**
      * @var array|mixed
      */
@@ -99,11 +104,19 @@ class SnmpQueryMock implements SnmpQueryInterface
         if ($this->numeric) {
             $options[] = '-On';
         }
+        if ($this->hideMib) {
+            $options[] = '-Os';
+        }
 
-        return SnmpQuery::make()
+        return NetSnmpQuery::make()
             ->mibDir($this->mibDir)
             ->options($options)
             ->translate($oid, $mib);
+    }
+
+    public function allowUnordered(): SnmpQueryInterface
+    {
+        return $this;
     }
 
     public function numeric(): SnmpQueryInterface
@@ -113,9 +126,24 @@ class SnmpQueryMock implements SnmpQueryInterface
         return $this;
     }
 
+    public function hideMib(): SnmpQueryInterface
+    {
+        $this->hideMib = true;
+
+        return $this;
+    }
+
+    public function enumStrings(): SnmpQueryInterface
+    {
+        // TODO: Implement enumStrings() method, no idea how
+        Log::error('enumStrings not implemented in SnmpQueryMock');
+
+        return $this;
+    }
+
     public function options($options = []): SnmpQueryInterface
     {
-        $this->options = $options;
+        $this->options = $options === null ? [] : Arr::wrap($options);
 
         return $this;
     }
@@ -286,7 +314,7 @@ class SnmpQueryMock implements SnmpQueryInterface
             $options[] = "-m $mib";
         }
 
-        $number = SnmpQuery::make()->mibDir($this->mibDir)
+        $number = NetSnmpQuery::make()->mibDir($this->mibDir)
             ->options(array_merge($options, $this->options))->numeric()->translate($oid)->value();
 
         if (empty($number)) {

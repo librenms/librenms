@@ -2,6 +2,7 @@
 
 namespace App\Models;
 
+use App\View\SimpleTemplate;
 use Fico7489\Laravel\Pivot\Traits\PivotEventTrait;
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
@@ -47,6 +48,7 @@ class Device extends BaseModel
         'features',
         'hardware',
         'hostname',
+        'display',
         'icon',
         'ip',
         'os',
@@ -163,27 +165,32 @@ class Device extends BaseModel
     }
 
     /**
-     * Get the display name of this device (hostname) unless force_ip_to_sysname is set
-     * and hostname is an IP and sysName is set
-     *
-     * @return string
+     * Get the display name of this device based on the display format string
+     * The default is {{ $hostname }} controlled by the device_display_default setting
      */
-    public function displayName()
+    public function displayName(): string
     {
-        if (\LibreNMS\Config::get('force_ip_to_sysname') && $this->sysName && IP::isValid($this->hostname)) {
-            return $this->sysName;
-        }
+        $hostname_is_ip = IP::isValid($this->hostname);
 
-        return $this->hostname;
+        return SimpleTemplate::parse($this->display ?: \LibreNMS\Config::get('device_display_default', '{{ $hostname }}'), [
+            'hostname' => $this->hostname,
+            'sysName' => $this->sysName ?: $this->hostname,
+            'sysName_fallback' => $hostname_is_ip ? $this->sysName : $this->hostname,
+            'ip' => $this->overwrite_ip ?: ($hostname_is_ip ? $this->hostname : $this->ip),
+        ]);
     }
 
-    public function name()
+    /**
+     * Returns the device name if not already displayed
+     */
+    public function name(): string
     {
-        $displayName = $this->displayName();
-        if ($this->sysName !== $displayName) {
-            return $this->sysName;
-        } elseif ($this->hostname !== $displayName && $this->hostname !== $this->ip) {
-            return $this->hostname;
+        $display = $this->displayName();
+
+        if (! Str::contains($display, $this->hostname)) {
+            return (string) $this->hostname;
+        } elseif (! Str::contains($display, $this->sysName)) {
+            return (string) $this->sysName;
         }
 
         return '';
@@ -419,12 +426,12 @@ class Device extends BaseModel
 
     // ---- Accessors/Mutators ----
 
-    public function getIconAttribute($icon)
+    public function getIconAttribute($icon): string
     {
         return Str::start(Url::findOsImage($this->os, $this->features, $icon), 'images/os/');
     }
 
-    public function getIpAttribute($ip)
+    public function getIpAttribute($ip): ?string
     {
         if (empty($ip)) {
             return null;
@@ -433,14 +440,24 @@ class Device extends BaseModel
         return @inet_ntop($ip) ?: null;
     }
 
-    public function setIpAttribute($ip)
+    public function setIpAttribute($ip): void
     {
         $this->attributes['ip'] = inet_pton($ip);
     }
 
-    public function setStatusAttribute($status)
+    public function setStatusAttribute($status): void
     {
         $this->attributes['status'] = (int) $status;
+    }
+
+    public function setSysDescrAttribute(?string $sysDescr): void
+    {
+        $this->attributes['sysDescr'] = $sysDescr === null ? null : trim(str_replace(chr(218), "\n", $sysDescr), "\\\" \r\n\t\0");
+    }
+
+    public function setSysNameAttribute(?string $sysName): void
+    {
+        $this->attributes['sysName'] = $sysName === null ? null : str_replace("\n", '', strtolower(trim($sysName)));
     }
 
     // ---- Query scopes ----
@@ -595,9 +612,9 @@ class Device extends BaseModel
         return $this->hasMany(\App\Models\Alert::class, 'device_id');
     }
 
-    public function attribs(): HasMany
+    public function alertLogs(): HasMany
     {
-        return $this->hasMany(\App\Models\DeviceAttrib::class, 'device_id');
+        return $this->hasMany(\App\Models\AlertLog::class, 'device_id');
     }
 
     public function alertSchedules(): MorphToMany
@@ -608,6 +625,16 @@ class Device extends BaseModel
     public function applications(): HasMany
     {
         return $this->hasMany(\App\Models\Application::class, 'device_id');
+    }
+
+    public function attribs(): HasMany
+    {
+        return $this->hasMany(\App\Models\DeviceAttrib::class, 'device_id');
+    }
+
+    public function availability(): HasMany
+    {
+        return $this->hasMany(\App\Models\Availability::class, 'device_id');
     }
 
     public function bgppeers(): HasMany
@@ -630,6 +657,11 @@ class Device extends BaseModel
         return $this->hasMany(\App\Models\Component::class, 'device_id');
     }
 
+    public function diskIo(): HasMany
+    {
+        return $this->hasMany(\App\Models\DiskIo::class, 'device_id');
+    }
+
     public function hostResources(): HasMany
     {
         return $this->hasMany(HrDevice::class, 'device_id');
@@ -643,6 +675,11 @@ class Device extends BaseModel
     public function entityPhysical(): HasMany
     {
         return $this->hasMany(EntPhysical::class, 'device_id');
+    }
+
+    public function entityState(): HasMany
+    {
+        return $this->hasMany(EntityState::class, 'device_id');
     }
 
     public function eventlogs(): HasMany
@@ -675,9 +712,19 @@ class Device extends BaseModel
         return $this->hasManyThrough(\App\Models\Ipv6Address::class, \App\Models\Port::class, 'device_id', 'port_id', 'device_id', 'port_id');
     }
 
+    public function isisAdjacencies(): HasMany
+    {
+        return $this->hasMany(\App\Models\IsisAdjacency::class, 'device_id', 'device_id');
+    }
+
     public function location(): BelongsTo
     {
         return $this->belongsTo(\App\Models\Location::class, 'location_id', 'id');
+    }
+
+    public function macs(): HasMany
+    {
+        return $this->hasMany(Ipv4Mac::class, 'device_id');
     }
 
     public function mefInfo(): HasMany
@@ -688,6 +735,16 @@ class Device extends BaseModel
     public function muninPlugins(): HasMany
     {
         return $this->hasMany(\App\Models\MuninPlugin::class, 'device_id');
+    }
+
+    public function netscalerVservers(): HasMany
+    {
+        return $this->hasMany(NetscalerVserver::class, 'device_id');
+    }
+
+    public function ospfAreas(): HasMany
+    {
+        return $this->hasMany(\App\Models\OspfArea::class, 'device_id');
     }
 
     public function ospfInstances(): HasMany
@@ -703,16 +760,6 @@ class Device extends BaseModel
     public function ospfPorts(): HasMany
     {
         return $this->hasMany(\App\Models\OspfPort::class, 'device_id');
-    }
-
-    public function isisAdjacencies(): HasMany
-    {
-        return $this->hasMany(\App\Models\IsisAdjacency::class, 'device_id', 'device_id');
-    }
-
-    public function netscalerVservers(): HasMany
-    {
-        return $this->hasMany(NetscalerVserver::class, 'device_id');
     }
 
     public function packages(): HasMany
@@ -743,6 +790,21 @@ class Device extends BaseModel
     public function portsNac(): HasMany
     {
         return $this->hasMany(\App\Models\PortsNac::class, 'device_id', 'device_id');
+    }
+
+    public function portsStp(): HasMany
+    {
+        return $this->hasMany(\App\Models\PortStp::class, 'device_id', 'device_id');
+    }
+
+    public function portsVlan(): HasMany
+    {
+        return $this->hasMany(\App\Models\PortVlan::class, 'device_id', 'device_id');
+    }
+
+    public function processes(): HasMany
+    {
+        return $this->hasMany(\App\Models\Process::class, 'device_id');
     }
 
     public function processors(): HasMany
@@ -783,6 +845,11 @@ class Device extends BaseModel
     public function stpInstances(): HasMany
     {
         return $this->hasMany(Stp::class, 'device_id');
+    }
+
+    public function stpPorts(): HasMany
+    {
+        return $this->hasMany(\App\Models\PortStp::class, 'device_id');
     }
 
     public function mempools(): HasMany
@@ -858,6 +925,11 @@ class Device extends BaseModel
     public function syslogs(): HasMany
     {
         return $this->hasMany(\App\Models\Syslog::class, 'device_id', 'device_id');
+    }
+
+    public function tnmsNeInfo(): HasMany
+    {
+        return $this->hasMany(TnmsneInfo::class, 'device_id');
     }
 
     public function users(): BelongsToMany

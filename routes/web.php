@@ -83,7 +83,7 @@ Route::group(['middleware' => ['auth'], 'guard' => 'auth'], function () {
     Route::get('plugin', 'PluginLegacyController@redirect');
     Route::redirect('plugin/view=admin', '/plugin/admin');
     Route::get('plugin/p={pluginName}', 'PluginLegacyController@redirect');
-    Route::any('plugin/v1/{plugin:plugin_name}', 'PluginLegacyController')->name('plugin.legacy');
+    Route::any('plugin/v1/{plugin:plugin_name}/{other?}', 'PluginLegacyController')->where('other', '(.*)')->name('plugin.legacy');
     Route::get('plugin/{plugin:plugin_name}', 'PluginPageController')->name('plugin.page');
 
     // old route redirects
@@ -108,6 +108,9 @@ Route::group(['middleware' => ['auth'], 'guard' => 'auth'], function () {
         Route::resource('pollergroup', 'PollerGroupController', ['only' => ['destroy']]);
         // misc ajax controllers
         Route::group(['namespace' => 'Ajax'], function () {
+            Route::get('search/bgp', 'BgpSearchController');
+            Route::get('search/device', 'DeviceSearchController');
+            Route::get('search/port', 'PortSearchController');
             Route::post('set_map_group', 'AvailabilityMapController@setGroup');
             Route::post('set_map_view', 'AvailabilityMapController@setView');
             Route::post('set_resolution', 'ResolutionController@set');
@@ -160,6 +163,7 @@ Route::group(['middleware' => ['auth'], 'guard' => 'auth'], function () {
             Route::post('mempools', 'MempoolsController');
             Route::post('outages', 'OutagesController');
             Route::post('port-nac', 'PortNacController');
+            Route::post('port-stp', 'PortStpController');
             Route::post('ports', 'PortsController')->name('table.ports');
             Route::post('routes', 'RoutesTablesController');
             Route::post('syslog', 'SyslogController');

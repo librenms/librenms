@@ -54,10 +54,10 @@ Connect to the server command line and follow the instructions below.
         dnf install bash-completion cronie fping git httpd ImageMagick mariadb-server mtr net-snmp net-snmp-utils nmap php-fpm php-cli php-common php-curl php-gd php-gmp php-json php-mbstring php-process php-snmp php-xml php-zip php-mysqlnd python3 python3-PyMySQL python3-redis python3-memcached python3-pip python3-systemd rrdtool unzip
         ```
 
-=== "Debian 10"
+=== "Debian 11"
     === "NGINX"
         ```
-        apt install acl curl composer fping git graphviz imagemagick mariadb-client mariadb-server mtr-tiny nginx-full nmap php7.3-cli php7.3-curl php7.3-fpm php7.3-gd php7.3-gmp php7.3-json php7.3-mbstring php7.3-mysql php7.3-snmp php7.3-xml php7.3-zip python3-dotenv python3-pymysql python3-redis python3-setuptools python3-systemd rrdtool snmp snmpd whois
+        apt install acl curl composer fping git graphviz imagemagick mariadb-client mariadb-server mtr-tiny nginx-full nmap php7.4-cli php7.4-curl php7.4-fpm php7.4-gd php7.4-gmp php7.4-json php7.4-mbstring php7.4-mysql php7.4-snmp php7.4-xml php7.4-zip python3-dotenv python3-pymysql python3-redis python3-setuptools python3-systemd python3-pip rrdtool snmp snmpd whois
         ```
 
 ## Add librenms user
@@ -113,10 +113,10 @@ Ensure date.timezone is set in php.ini to your preferred time zone.
     vi /etc/php.ini
     ```
 
-=== "Debian 10"
+=== "Debian 11"
     ```bash
-    vi /etc/php/7.3/fpm/php.ini
-    vi /etc/php/7.3/cli/php.ini
+    vi /etc/php/7.4/fpm/php.ini
+    vi /etc/php/7.4/cli/php.ini
     ```
 
 Remember to set the system timezone as well.
@@ -138,7 +138,7 @@ timedatectl set-timezone Etc/UTC
     vi /etc/my.cnf.d/mariadb-server.cnf
     ```
 
-=== "Debian 10"
+=== "Debian 11"
     ```
     vi /etc/mysql/mariadb.conf.d/50-server.cnf
     ```
@@ -183,10 +183,10 @@ exit
     vi /etc/php-fpm.d/librenms.conf
     ```
 
-=== "Debian 10"
+=== "Debian 11"
     ```bash
-    cp /etc/php/7.3/fpm/pool.d/www.conf /etc/php/7.3/fpm/pool.d/librenms.conf
-    vi /etc/php/7.3/fpm/pool.d/librenms.conf
+    cp /etc/php/7.4/fpm/pool.d/www.conf /etc/php/7.4/fpm/pool.d/librenms.conf
+    vi /etc/php/7.4/fpm/pool.d/librenms.conf
     ```
 
 Change `[www]` to `[librenms]`:
@@ -368,7 +368,7 @@ Feel free to tune the performance settings in librenms.conf to meet your needs.
         systemctl enable --now php-fpm
         ```
 
-=== "Debian 10"
+=== "Debian 11"
     === "NGINX"
         ```bash
         vi /etc/nginx/sites-enabled/librenms.vhost
@@ -403,7 +403,7 @@ Feel free to tune the performance settings in librenms.conf to meet your needs.
         ```bash
         rm /etc/nginx/sites-enabled/default
         systemctl reload nginx
-        systemctl restart php7.3-fpm
+        systemctl restart php7.4-fpm
         ```
 
 ## SELinux
@@ -465,7 +465,7 @@ Feel free to tune the performance settings in librenms.conf to meet your needs.
     audit2why < /var/log/audit/audit.log
     ```
 
-=== "Debian 10"
+=== "Debian 11"
     SELinux not enabled by default
 
 ## Allow access through firewall
@@ -480,7 +480,7 @@ Feel free to tune the performance settings in librenms.conf to meet your needs.
     firewall-cmd --permanent --zone public --add-service http --add-service https
     ```
 
-=== "Debian 10"
+=== "Debian 11"
     Firewall not enabled by default
 
 

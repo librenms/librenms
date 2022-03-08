@@ -32,6 +32,13 @@ class AppServiceProvider extends ServiceProvider
         $this->app->singleton('device-cache', function ($app) {
             return new \LibreNMS\Cache\Device();
         });
+
+        $this->app->bind(\App\Models\Device::class, function () {
+            /** @var \LibreNMS\Cache\Device $cache */
+            $cache = $this->app->make('device-cache');
+
+            return $cache->hasPrimary() ? $cache->getPrimary() : new \App\Models\Device;
+        });
     }
 
     /**
@@ -126,6 +133,7 @@ class AppServiceProvider extends ServiceProvider
         \App\Models\Device::observe(\App\Observers\DeviceObserver::class);
         \App\Models\Service::observe(\App\Observers\ServiceObserver::class);
         \App\Models\User::observe(\App\Observers\UserObserver::class);
+        \App\Models\Stp::observe(\App\Observers\StpObserver::class);
     }
 
     private function bootCustomValidators()

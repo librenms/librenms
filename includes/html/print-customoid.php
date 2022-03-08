@@ -111,8 +111,8 @@ if (($count % $rows) > 0) {
 
 echo '</table>
 </div>
-<input type="hidden" name="page_num" id="page_num" value="' . $page_num . '">
-<input type="hidden" name="num_of_rows" id="num_of_rows" value="' . $rows . '">
+<input type="hidden" name="page_num" id="page_num" value="' . htmlspecialchars($page_num) . '">
+<input type="hidden" name="num_of_rows" id="num_of_rows" value="' . htmlspecialchars($rows) . '">
 </form>';
 
 ?>

@@ -140,9 +140,9 @@ class Html
     {
         $percent = min($percent, 100);
         if ($colors === null) {
-            $colors = Colors::percentage($percent, $warn ?: null);
+            $colors = Color::percentage($percent, $warn ?: null);
         }
-        $default = Colors::percentage(0);
+        $default = Color::percentage(0);
         $left_text_color = $colors['left_text'] ?? 'ffffff';
         $right_text_color = $colors['right_text'] ?? 'ffffff';
         $left_color = $colors['left'] ?? $default['left'];

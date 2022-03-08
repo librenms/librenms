@@ -28,7 +28,7 @@ namespace LibreNMS\Tests;
 use App\Models\Device;
 use Illuminate\Support\Str;
 use LibreNMS\Config;
-use LibreNMS\Data\Source\SnmpQuery;
+use LibreNMS\Data\Source\NetSnmpQuery;
 use LibreNMS\Modules\Core;
 use LibreNMS\Tests\Mocks\SnmpQueryMock;
 use LibreNMS\Util\Debug;
@@ -44,9 +44,11 @@ class OSDiscoveryTest extends TestCase
 
         $glob = Config::get('install_dir') . '/tests/snmpsim/*.snmprec';
 
-        self::$unchecked_files = array_flip(array_map(function ($file) {
+        self::$unchecked_files = array_flip(array_filter(array_map(function ($file) {
             return basename($file, '.snmprec');
-        }, glob($glob)));
+        }, glob($glob)), function ($file) {
+            return ! Str::contains($file, '@');
+        }));
     }
 
     /**
@@ -68,7 +70,7 @@ class OSDiscoveryTest extends TestCase
     public function testOSDetection($os_name)
     {
         if (! getenv('SNMPSIM')) {
-            $this->app->bind(SnmpQuery::class, SnmpQueryMock::class);
+            $this->app->bind(NetSnmpQuery::class, SnmpQueryMock::class);
         }
 
         $glob = Config::get('install_dir') . "/tests/snmpsim/$os_name*.snmprec";
@@ -76,6 +78,10 @@ class OSDiscoveryTest extends TestCase
             return basename($file, '.snmprec');
         }, glob($glob));
         $files = array_filter($files, function ($file) use ($os_name) {
+            if (Str::contains($file, '@')) {
+                return false;
+            }
+
             return $file == $os_name || Str::startsWith($file, $os_name . '_');
         });
 

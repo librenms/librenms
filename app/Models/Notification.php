@@ -44,10 +44,6 @@ class Notification extends Model
 
     /**
      * Mark this notification as sticky or unsticky
-     *
-     * @var bool
-     *
-     * @return bool
      */
     public function markSticky(bool $enabled = true): bool
     {
