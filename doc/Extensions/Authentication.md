@@ -188,7 +188,11 @@ $config['auth_ldap_starttls'] = True;               // Enable TLS on port 389
 $config['auth_ldap_prefix'] = 'uid=';               // prepended to usernames
 $config['auth_ldap_group']  = 'cn=groupname,ou=groups,dc=example,dc=com'; // generic group with level 0
 $config['auth_ldap_groupmemberattr'] = 'memberUid'; // attribute to use to see if a user is a member of a group
+$config['auth_ldap_groupmembertype'] = 'username';  // username type to find group members by, either username (default), fulldn or puredn
 $config['auth_ldap_uid_attribute'] = 'uidnumber';   // attribute for unique id
+$config['auth_ldap_timeout'] = 5;                   // time to wait before giving up (or trying the next server)
+$config['auth_ldap_emailattr'] = 'mail';            // attribute for email address
+$config['auth_ldap_attr.uid'] = 'uid';              // attribute to check username against
 $config['auth_ldap_debug'] = false;                 // enable for verbose debug messages
 $config['auth_ldap_userdn'] = true;                 // Uses a users full DN as the value of the member attribute in a group instead of member: username. (it’s member: uid=username,ou=groups,dc=domain,dc=com)
 $config['auth_ldap_userlist_filter'] = 'service=informatique'; // Replace 'service=informatique' by your ldap filter to limit the number of responses if you have an ldap directory with thousand of users
