@@ -1252,6 +1252,35 @@ Output:
 ]
 ```
 
+### `update_device_port_notes`
+
+Update a device port notes field in the devices_attrs database.
+
+Route: `/api/v0/devices/:hostname/port/:portid`
+
+- hostname can be either the device hostname or id
+- portid needs to be the port unique id (int).
+
+Input (JSON):
+- notes: The string data to populate on the port notes field.
+
+Examples:
+
+```curl
+curl -X PATCH -d '{"notes": "This port is in a scheduled maintenance with the provider."}' -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/devices/localhost/port/5
+```
+
+Output:
+
+```json
+[
+    {
+        "status": "ok",
+        "message": "Port notes field has been updated"
+    }
+]
+```
+
 ```curl
 curl -X PATCH -d '{"field": ["notes","purpose"], "data": ["This server should be kept online", "For serving web traffic"]}' -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/devices/localhost
 ```
