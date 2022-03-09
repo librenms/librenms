@@ -53,7 +53,7 @@ OSPF-MIB::ospfLsdbLsid 10.1.1.0
 OSPF-MIB::ospfLsdbRouterId 10.4.5.6";
 
         $trap = new Trap($trapText);
-        $message = 'SNMP Trap: OSPFTxRetransmit trap  recieved from ' . $device->displayName() . '(Router ID: 10.1.2.3). A lsUpdate packet was sent to 10.3.4.5. LSType: routerLink, route ID: 10.1.1.0, originating from 10.4.5.6.';
+        $message = 'SNMP Trap: OSPFTxRetransmit trap recieved from ' . $device->displayName() . '(Router ID: 10.1.2.3). A lsUpdate packet was sent to 10.3.4.5. LSType: routerLink, route ID: 10.1.1.0, originating from 10.4.5.6.';
         \Log::shouldReceive('event')->once()->with($message, $device->device_id, 'trap', 2);
         $this->assertTrue(Dispatcher::handle($trap), 'Could not handle testlsUpdatePacket trap');
     }
