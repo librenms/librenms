@@ -123,6 +123,7 @@ return [
         'VMWARE-VMINFO-MIB::vmwVmSuspended' => \LibreNMS\Snmptrap\Handlers\VmwVmSuspended::class,
         'OSPF-TRAP-MIB::ospfIfStateChange' => \LibreNMS\Snmptrap\Handlers\OspfIfStateChange::class,
         'OSPF-TRAP-MIB::ospfNbrStateChange' => \LibreNMS\Snmptrap\Handlers\OspfNbrStateChange::class,
+        'OSPF-TRAP-MIB::ospfTxRetransmit' => \LibreNMS\Snmptrap\Handlers\OspfTxRetransmit::class,
         'UPS-MIB::upsTraps.0.1' => \LibreNMS\Snmptrap\Handlers\UpsTrapsOnBattery::class,
         'VEEAM-MIB::onBackupJobCompleted' => \LibreNMS\Snmptrap\Handlers\VeeamBackupJobCompleted::class,
         'VEEAM-MIB::onVmBackupCompleted' => \LibreNMS\Snmptrap\Handlers\VeeamVmBackupCompleted::class,
