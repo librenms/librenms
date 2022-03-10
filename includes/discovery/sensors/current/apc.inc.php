@@ -57,10 +57,10 @@ if ($oids) {
         $data = trim($data);
         if ($data) {
             [$oid,$phasenum] = explode(' ', $data);
-	    // If the phasenum is 0, we can ignore becuase it's bank data
-	    if($phasenum == 0) {
-		continue;
-	    }
+            // If the phasenum is 0, we can ignore becuase it's bank data
+            if($phasenum == 0) {
+                continue;
+            }
             $split_oid = explode('.', $oid);
             $index = $split_oid[(count($split_oid) - 1)];
             $current_oid = '.1.3.6.1.4.1.318.1.1.12.2.3.1.1.2.' . $index;
@@ -107,10 +107,10 @@ if ($oids) {
         $data = trim($data);
         if ($data) {
             [$oid,$banknum] = explode(' ', $data);
-	    // If the banknum is 0, we can ignore becuase it's phase data
-	    if($banknum == 0) {
-		continue;
-	    }
+            // If the banknum is 0, we can ignore becuase it's phase data
+            if($banknum == 0) {
+                continue;
+            }
             $split_oid = explode('.', $oid);
             $index = $split_oid[(count($split_oid) - 1)];
             $descr = 'Bank ' . $banknum;
