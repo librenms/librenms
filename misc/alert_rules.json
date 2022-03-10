@@ -354,8 +354,8 @@
     "name": "Cisco PSU status failed"
   },
   {
-    "rule": "sensors.sensor_current = \"8\" && sensors.sensor_oid ~ \".1.3.6.1.4.1.2636.3.1.15.1.8.2.[1-4].[0-2].0\"",
-    "name": "Juniper PSU status failed"
+    "builder": {"condition":"AND","rules":[{"id":"sensors.sensor_alert","field":"sensors.sensor_alert","type":"string","input":"text","operator":"equal","value":"1"},{"condition":"OR","rules":[{"id":"sensors.sensor_descr","field":"sensors.sensor_descr","type":"string","input":"text","operator":"regex","value":".*Power Supply.*"},{"id":"sensors.sensor_descr","field":"sensors.sensor_descr","type":"string","input":"text","operator":"regex","value":".*PEM.*"},{"id":"sensors.sensor_descr","field":"sensors.sensor_descr","type":"string","input":"text","operator":"regex","value":".*PSU.*"}]},{"condition":"OR","rules":[{"id":"macros.state_sensor_warning","field":"macros.state_sensor_warning","type":"boolean","input":"radio","operator":"equal","value":"1"},{"id":"macros.state_sensor_critical","field":"macros.state_sensor_critical","type":"boolean","input":"radio","operator":"equal","value":"1"}]}],"valid":true},
+    "name": "Generic PSU status failed"
   },
   {
     "rule": "sensors.sensor_current = \"3\" && sensors.sensor_oid = \".1.3.6.1.4.1.4413.1.1.43.1.15.1.2.1\"",
