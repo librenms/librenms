@@ -58,7 +58,7 @@ if ($oids) {
         if ($data) {
             [$oid,$phasenum] = explode(' ', $data);
             // If the phasenum is 0, we can ignore becuase it's bank data
-            if($phasenum == 0) {
+            if ($phasenum == 0) {
                 continue;
             }
             $split_oid = explode('.', $oid);
@@ -108,7 +108,7 @@ if ($oids) {
         if ($data) {
             [$oid,$banknum] = explode(' ', $data);
             // If the banknum is 0, we can ignore becuase it's phase data
-            if($banknum == 0) {
+            if ($banknum == 0) {
                 continue;
             }
             $split_oid = explode('.', $oid);
