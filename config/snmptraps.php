@@ -100,6 +100,8 @@ return [
         'PowerNet-MIB::rPDUNearOverloadCleared' => \LibreNMS\Snmptrap\Handlers\ApcPduNearOverloadCleared::class,
         'PowerNet-MIB::rPDUOverload' => \LibreNMS\Snmptrap\Handlers\ApcPduOverload::class,
         'PowerNet-MIB::rPDUOverloadCleared' => \LibreNMS\Snmptrap\Handlers\ApcPduOverloadCleared::class,
+        'PowerNet-MIB::smartAvrReducing' => \LibreNMS\Snmptrap\Handlers\ApcSmartAvrReducing::class,
+        'PowerNet-MIB::smartAvrReducingOff' => \LibreNMS\Snmptrap\Handlers\ApcSmartAvrReducingOff::class,
         'RUCKUS-EVENT-MIB::ruckusEventAssocTrap' => \LibreNMS\Snmptrap\Handlers\RuckusAssocTrap::class,
         'RUCKUS-EVENT-MIB::ruckusEventDiassocTrap' => \LibreNMS\Snmptrap\Handlers\RuckusDiassocTrap::class,
         'RUCKUS-EVENT-MIB::ruckusEventSetErrorTrap' => \LibreNMS\Snmptrap\Handlers\RuckusSetError::class,
