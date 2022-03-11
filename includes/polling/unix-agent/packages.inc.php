@@ -10,6 +10,7 @@ $managers = [
         'name' => 'RPM',
         'process' => function ($line) {
             [$name, $version, $build, $arch, $size] = explode(' ', $line);
+
             return new Package([
                 'manager' => 'rpm',
                 'name' => $name,
@@ -19,12 +20,13 @@ $managers = [
                 'size' => $size,
                 'status' => 1,
             ]);
-        }
+        },
     ],
     'dpkg' => [
         'name' => 'DEB',
         'process' => function ($line) {
             [$name, $version, $arch, $size] = explode(' ', $line);
+
             return new Package([
                 'manager' => 'deb',
                 'name' => $name,
@@ -34,8 +36,8 @@ $managers = [
                 'size' => cast_number($size) * 1024,
                 'status' => 1,
             ]);
-        }
-    ]
+        },
+    ],
 ];
 
 foreach ($managers as $key => $manager) {
