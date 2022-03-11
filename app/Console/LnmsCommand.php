@@ -36,6 +36,9 @@ abstract class LnmsCommand extends Command
 {
     protected $developer = false;
 
+    /** @var string[][]|null */
+    protected $optionValues;
+
     /**
      * Create a new command instance.
      *

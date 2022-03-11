@@ -7191,6 +7191,11 @@ parameters:
 			path: LibreNMS/Validator.php
 
 		-
+			message: "#^Property App\\\\Models\\\\Device\\:\\:\\$authlevel \\('authNoPriv'\\|'authPriv'\\|'noAuthNoPriv'\\) does not accept null\\.$#"
+			count: 1
+			path: app/Actions/Device/ValidateDeviceAndCreate.php
+
+		-
 			message: "#^Property App\\\\ApiClients\\\\BaseApi\\:\\:\\$base_uri has no type specified\\.$#"
 			count: 1
 			path: app/ApiClients/BaseApi.php

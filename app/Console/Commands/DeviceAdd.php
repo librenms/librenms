@@ -22,7 +22,7 @@ class DeviceAdd extends LnmsCommand
     /**
      * Valid values for options
      *
-     * @var string[][]
+     * @var string[][]|null
      */
     protected $optionValues;
 
