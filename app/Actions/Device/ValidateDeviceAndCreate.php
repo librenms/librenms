@@ -55,7 +55,7 @@ class ValidateDeviceAndCreate
      */
     private $connectivity;
 
-    public function __construct(Device $device, $force = false, $ping_fallback = false)
+    public function __construct(Device $device, bool $force = false, bool $ping_fallback = false)
     {
         $this->device = $device;
         $this->force = $force;
@@ -171,7 +171,7 @@ class ValidateDeviceAndCreate
         throw $host_unreachable_exception;
     }
 
-    private function cleanCredentials()
+    private function cleanCredentials(): void
     {
         if ($this->device->snmpver == 'v3') {
             $this->device->community = null;
@@ -187,7 +187,7 @@ class ValidateDeviceAndCreate
     /**
      * @throws \LibreNMS\Exceptions\HostExistsException
      */
-    private function exceptIfHostnameExists()
+    private function exceptIfHostnameExists(): void
     {
         if (Device::where('hostname', $this->device->hostname)->exists()) {
             throw new HostExistsException(trans('commands.device:add.errors.hostname_exists', ['hostname' => $this->device->hostname]));
@@ -197,7 +197,7 @@ class ValidateDeviceAndCreate
     /**
      * @throws \LibreNMS\Exceptions\HostExistsException
      */
-    private function exceptIfIpExists()
+    private function exceptIfIpExists(): void
     {
         if ($this->device->overwrite_ip) {
             $ip = $this->device->overwrite_ip;
@@ -226,7 +226,7 @@ class ValidateDeviceAndCreate
      *
      * @throws \LibreNMS\Exceptions\HostExistsException
      */
-    private function exceptIfSysNameExists()
+    private function exceptIfSysNameExists(): void
     {
         if (Config::get('allow_duplicate_sysName')) {
             return;

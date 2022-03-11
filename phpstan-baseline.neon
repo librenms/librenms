@@ -9021,26 +9021,6 @@ parameters:
 			path: app/Models/Config.php
 
 		-
-			message: "#^Method App\\\\Models\\\\Device\\:\\:findByHostname\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/Models/Device.php
-
-		-
-			message: "#^Method App\\\\Models\\\\Device\\:\\:findByHostname\\(\\) has parameter \\$hostname with no type specified\\.$#"
-			count: 1
-			path: app/Models/Device.php
-
-		-
-			message: "#^Method App\\\\Models\\\\Device\\:\\:findByIp\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/Models/Device.php
-
-		-
-			message: "#^Method App\\\\Models\\\\Device\\:\\:findByIp\\(\\) has parameter \\$ip with no type specified\\.$#"
-			count: 1
-			path: app/Models/Device.php
-
-		-
 			message: "#^Method App\\\\Models\\\\Device\\:\\:forgetAttrib\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: app/Models/Device.php
