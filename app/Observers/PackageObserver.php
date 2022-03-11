@@ -29,11 +29,10 @@ class PackageObserver
     {
         if ($package->getOriginal('version') !== $package->version || $package->getOriginal('build') !== $package->build) {
             $message = $package . ' from ' . $package->getOriginal('version') . ($package->getOriginal('build') ? '-' . $package->getOriginal('build') : '');
-            Log::event('Package updated: ' . $message , $package->device_id, 'package', 3);
+            Log::event('Package updated: ' . $message, $package->device_id, 'package', 3);
             Log::info("u $message");
         }
 //        log_event('Package updated: ' . $name . ' (' . $arch . ') from ' . $pkg_c['version'] . $pkg_c_dbuild . ' to ' . $version . $dbuild, $device, 'package', 3);
-
     }
 
     /**

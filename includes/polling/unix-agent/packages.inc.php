@@ -10,8 +10,9 @@ if (! empty($agent_data['rpm'])) {
     $manager = 'rpm';
 
     /** @var \Illuminate\Support\Collection $packages */
-    $packages = DeviceCache::getPrimary()->packages->map(function(\App\Models\Package $package) {
+    $packages = DeviceCache::getPrimary()->packages->map(function (\App\Models\Package $package) {
         $package->status = 0;
+
         return $package;
     })->keyBy->getCompositeKey();
 
@@ -41,9 +42,10 @@ if (! empty($agent_data['dpkg'])) {
     // Build array of existing packages
     $manager = 'deb';
 
-    /** @var \Illuminate\Support\Collection $db_packages */
-    $packages = DeviceCache::getPrimary()->packages->map(function(\App\Models\Package $package) {
+    /** @var \Illuminate\Support\Collection $packages */
+    $packages = DeviceCache::getPrimary()->packages->map(function (\App\Models\Package $package) {
         $package->status = 0;
+
         return $package;
     })->keyBy->getCompositeKey();
 
