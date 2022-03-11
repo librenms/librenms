@@ -92,8 +92,8 @@ return [
             'sysName' => 'Ping only: specify sysName',
         ],
         'validation-errors' => [
-            'port' => 'Port should be 1-65535',
-            'poller-group' => 'The given poller-group does not exist',
+            'port.between' => 'Port should be 1-65535',
+            'poller-group.in' => 'The given poller-group does not exist',
         ],
         'messages' => [
             'save_failed' => 'Failed to save device :hostname',
@@ -139,6 +139,11 @@ return [
         'validation-errors' => [
             'not_in' => ':attribute must not match current APP_KEY',
             'required' => 'Either old key or --generate-new-key is required.',
+        ],
+    ],
+    'lnms' => [
+        'validation-errors' => [
+            'optionValue' => 'Selected :option is invalid. Should be one of: :values',
         ],
     ],
     'smokeping:generate' => [

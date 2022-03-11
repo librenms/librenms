@@ -121,6 +121,10 @@ abstract class LnmsCommand extends Command
             foreach ($this->optionValues as $option => $values) {
                 if (empty($rules[$option])) {
                     $rules[$option] = Rule::in($values);
+                    $messages[$option . '.in'] = trans('commands.lnms.validation-errors.optionValue', [
+                        'option' => $option,
+                        'values' => implode(', ', $values),
+                    ]);
                 }
             }
         }

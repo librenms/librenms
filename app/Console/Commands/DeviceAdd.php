@@ -42,7 +42,7 @@ class DeviceAdd extends LnmsCommand
 
         $this->optionValues = [
             'transport' => ['udp', 'udp6', 'tcp', 'tcp6'],
-            'port-association-mode' => ['ifIndex', 'ifName', 'ifDescr', 'ifAlias'],
+            'port-association-mode' => PortAssociationMode::getModes(),
             'auth-protocol' => array_map('strtolower', \LibreNMS\SNMPCapabilities::supportedAuthAlgorithms()),
             'privacy-protocol' => array_map('strtolower', \LibreNMS\SNMPCapabilities::supportedCryptoAlgorithms()),
         ];
@@ -80,8 +80,8 @@ class DeviceAdd extends LnmsCommand
         $this->configureOutputOptions();
 
         $this->validate([
-            'port' => 'between:1,65535',
-            'poller-group' => Rule::in(PollerGroup::pluck('id')->prepend(0))
+            'port' => 'numeric|between:1,65535',
+            'poller-group' => ['numeric', Rule::in(PollerGroup::pluck('id')->prepend(0))],
         ]);
 
         $auth = $this->option('auth-password');
