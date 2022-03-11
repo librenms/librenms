@@ -31,11 +31,11 @@
             @if($color_only_select == 1)
                 <span class="label {{ $row['labelClass'] }} widget-availability-fixed widget-availability label-font-border"> </span>
             @elseif($color_only_select == 2)
-                <span class="label {{ $row['labelClass'] }} widget-availability label-font-border">{{ __($row['device']->hostname) }}</span>
+                <span class="label {{ $row['labelClass'] }} widget-availability label-font-border">{{ $row['device']->hostname }}</span>
             @elseif($color_only_select == 3)
-                <span class="label {{ $row['labelClass'] }} widget-availability label-font-border">{{ __($row['device']->sysName) }}</span>
+                <span class="label {{ $row['labelClass'] }} widget-availability label-font-border">{{ $row['device']->sysName }}</span>
             @elseif($color_only_select == 4)
-                <span class="label {{ $row['labelClass'] }} widget-availability label-font-border">{{ __($row['device']->displayName()) }}</span>
+                <span class="label {{ $row['labelClass'] }} widget-availability label-font-border">{{ $row['device']->shortDisplayName() }}</span>
             @else
                 <span class="label {{ $row['labelClass'] }} widget-availability label-font-border">{{ __($row['stateName']) }}</span>
             @endif
