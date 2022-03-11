@@ -99,7 +99,7 @@ return [
             'unresolvable' => 'Hostname did not resolve to IP',
             'hostname_exists' => 'Device :hostname already exists',
             'ip_exists' => 'Cannot add :hostname, already have device :existing with this IP :ip',
-            'sysname_exists' => 'Already have device :hostname (:sysname) due to duplicate sysName'
+            'sysname_exists' => 'Already have device :hostname (:sysname) due to duplicate sysName',
         ],
     ],
     'device:ping' => [

@@ -65,6 +65,7 @@ class ValidateDeviceAndCreate
 
     /**
      * @return bool
+     *
      * @throws \LibreNMS\Exceptions\HostExistsException
      * @throws \LibreNMS\Exceptions\HostUnreachablePingException
      * @throws \LibreNMS\Exceptions\HostUnreachableException
@@ -120,7 +121,6 @@ class ValidateDeviceAndCreate
 
         // which snmp version should we try (and in what order)
         $snmp_versions = $this->device->snmpver ? [$this->device->snmpver] : Config::get('snmp.version');
-
 
         $communities = \LibreNMS\Config::get('snmp.community');
         if ($this->device->community) {
@@ -221,7 +221,9 @@ class ValidateDeviceAndCreate
     /**
      * Check if a device with match hostname or sysname exists in the database.
      * Throw and error if they do.
+     *
      * @return void
+     *
      * @throws \LibreNMS\Exceptions\HostExistsException
      */
     private function exceptIfSysNameExists()

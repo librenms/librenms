@@ -1246,7 +1246,6 @@ function q_bridge_bits2indices($hex_data)
     return $indices;
 }
 
-
 /**
  * Function to generate Mac OUI Cache
  */

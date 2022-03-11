@@ -75,7 +75,7 @@ class DeviceAdd extends LnmsCommand
         $this->configureOutputOptions();
 
         $this->validate([
-            'port' => 'between:1,65535'
+            'port' => 'between:1,65535',
         ]);
 
         $auth = $this->option('auth-password');
@@ -120,6 +120,5 @@ class DeviceAdd extends LnmsCommand
 
             return 3;
         }
-
     }
 }

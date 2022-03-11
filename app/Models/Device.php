@@ -560,10 +560,10 @@ class Device extends BaseModel
     {
         return $query->whereIn(
             $query->qualifyColumn('device_id'), function ($query) use ($deviceGroup) {
-            $query->select('device_id')
+                $query->select('device_id')
                 ->from('device_group_device')
                 ->where('device_group_id', $deviceGroup);
-        }
+            }
         );
     }
 
@@ -571,10 +571,10 @@ class Device extends BaseModel
     {
         return $query->whereNotIn(
             $query->qualifyColumn('device_id'), function ($query) use ($deviceGroup) {
-            $query->select('device_id')
+                $query->select('device_id')
                 ->from('device_group_device')
                 ->where('device_group_id', $deviceGroup);
-        }
+            }
         );
     }
 
@@ -582,10 +582,10 @@ class Device extends BaseModel
     {
         return $query->whereIn(
             $query->qualifyColumn('device_id'), function ($query) use ($serviceTemplate) {
-            $query->select('device_id')
+                $query->select('device_id')
                 ->from('service_templates_device')
                 ->where('service_template_id', $serviceTemplate);
-        }
+            }
         );
     }
 
@@ -593,10 +593,10 @@ class Device extends BaseModel
     {
         return $query->whereNotIn(
             $query->qualifyColumn('device_id'), function ($query) use ($serviceTemplate) {
-            $query->select('device_id')
+                $query->select('device_id')
                 ->from('service_templates_device')
                 ->where('service_template_id', $serviceTemplate);
-        }
+            }
         );
     }
 
