@@ -6,6 +6,8 @@ use App\Actions\Device\ValidateDeviceAndCreate;
 use App\Console\LnmsCommand;
 use App\Models\Device;
 use Exception;
+use LibreNMS\Exceptions\HostExistsException;
+use LibreNMS\Exceptions\HostnameExistsException;
 use LibreNMS\Exceptions\HostUnreachableException;
 use LibreNMS\Util\Rewrite;
 use Symfony\Component\Console\Input\InputArgument;
@@ -106,17 +108,33 @@ class DeviceAdd extends LnmsCommand
 
         try {
             $result = (new ValidateDeviceAndCreate($device, $this->option('force'), $this->option('ping-fallback')))->execute();
-//            $result = Action::execute(ValidateDeviceAndCreate::class, $device, $this->option('force'), $this->option('ping-fallback'));
 
-            $this->info("Added device $device->hostname ($device->device_id)");
+            if (! $result) {
+                $this->error(trans('commands.device:add.messages.save_failed', ['hostname' => $device->hostname]));
+                return 4;
+            }
+
+            $this->info(trans('commands.device:add.messages.added', ['hostname' => $device->hostname, 'device_id' => $device->device_id]));
 
             return 0;
         } catch (HostUnreachableException $e) {
+            // host unreachable errors
             $this->error($e->getMessage() . PHP_EOL . implode(PHP_EOL, $e->getReasons()));
+            $this->line(trans('commands.device:add.messages.try_force'));
 
             return 1;
-        } catch (Exception $e) {
+        } catch (HostExistsException $e) {
+            // host exists errors
             $this->error($e->getMessage());
+
+            if (! $e instanceof HostnameExistsException) {
+                $this->line(trans('commands.device:add.messages.try_force'));
+            }
+
+            return 2;
+        } catch (Exception $e) {
+            // other errors?
+            $this->error(get_class($e) . ': ' . $e->getMessage());
 
             return 3;
         }

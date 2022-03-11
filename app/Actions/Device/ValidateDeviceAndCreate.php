@@ -28,12 +28,13 @@ namespace App\Actions\Device;
 use App\Models\Device;
 use Illuminate\Support\Arr;
 use LibreNMS\Config;
-use LibreNMS\Exceptions\HostExistsException;
-use LibreNMS\Exceptions\HostUnreachableException;
+use LibreNMS\Exceptions\HostIpExistsException;
+use LibreNMS\Exceptions\HostnameExistsException;
+use LibreNMS\Exceptions\HostSysnameExistsException;
 use LibreNMS\Exceptions\HostUnreachablePingException;
+use LibreNMS\Exceptions\HostUnreachableSnmpException;
 use LibreNMS\Exceptions\SnmpVersionUnsupportedException;
 use LibreNMS\Modules\Core;
-use LibreNMS\Util\IP;
 use SnmpQuery;
 
 class ValidateDeviceAndCreate
@@ -88,11 +89,7 @@ class ValidateDeviceAndCreate
             $this->exceptIfIpExists();
 
             if (! $this->connectivity->isPingable()->success()) {
-                $ip = gethostbyname($this->device->hostname);
-                throw new HostUnreachablePingException(trans('commands.device:add.errors.unpingable', [
-                    'hostname' => $this->device->hostname,
-                    'ip' => IP::isValid($ip) ? $ip : trans('commands.device:add.errors.unresolvable'),
-                ]));
+                throw new HostUnreachablePingException($this->device->hostname);
             }
 
             $this->detectCredentials();
@@ -117,7 +114,7 @@ class ValidateDeviceAndCreate
             return;
         }
 
-        $host_unreachable_exception = new HostUnreachableException("Could not connect to {$this->device->hostname}, please check the snmp details and snmp reachability");
+        $host_unreachable_exception = new HostUnreachableSnmpException($this->device->hostname);
 
         // which snmp version should we try (and in what order)
         $snmp_versions = $this->device->snmpver ? [$this->device->snmpver] : Config::get('snmp.version');
@@ -143,7 +140,7 @@ class ValidateDeviceAndCreate
                     if ($this->connectivity->isSNMPable()) {
                         return;
                     } else {
-                        $host_unreachable_exception->addReason("SNMP $snmp_version: No reply with credentials " . $this->device->authname . '/' . $this->device->authlevel);
+                        $host_unreachable_exception->addReason($snmp_version, $this->device->authname . '/' . $this->device->authlevel);
                     }
                 }
             } elseif ($snmp_version === 'v2c' || $snmp_version === 'v1') {
@@ -153,11 +150,11 @@ class ValidateDeviceAndCreate
                     if ($this->connectivity->isSNMPable()) {
                         return;
                     } else {
-                        $host_unreachable_exception->addReason("SNMP $snmp_version: No reply with community {$this->device->community}");
+                        $host_unreachable_exception->addReason($snmp_version, $this->device->community);
                     }
                 }
             } else {
-                throw new SnmpVersionUnsupportedException("Unsupported SNMP Version \"$snmp_version\", must be v1, v2c, or v3");
+                throw new SnmpVersionUnsupportedException($snmp_version);
             }
         }
 
@@ -190,7 +187,7 @@ class ValidateDeviceAndCreate
     private function exceptIfHostnameExists(): void
     {
         if (Device::where('hostname', $this->device->hostname)->exists()) {
-            throw new HostExistsException(trans('commands.device:add.errors.hostname_exists', ['hostname' => $this->device->hostname]));
+            throw new HostnameExistsException($this->device->hostname);
         }
     }
 
@@ -210,11 +207,7 @@ class ValidateDeviceAndCreate
         $existing = Device::findByIp($ip);
 
         if ($existing) {
-            throw new HostExistsException(trans('commands.device:add.errors.ip_exists', [
-                'hostname' => $this->device->hostname,
-                'existing' => $existing->hostname,
-                'ip' => $ip,
-            ]));
+            throw new HostIpExistsException($this->device->hostname, $existing->hostname, $ip);
         }
     }
 
@@ -236,10 +229,7 @@ class ValidateDeviceAndCreate
             ->when(Config::get('mydomain'), function ($query, $domain) {
                 $query->orWhere('sysName', rtrim($this->device->sysName, '.') . '.' . $domain);
             })->exists()) {
-            throw new HostExistsException(trans('commands.device:add.errors.sysname_exists', [
-                'hostname' => $this->device->hostname,
-                'sysname' => $this->device->sysName,
-            ]));
+            throw new HostSysnameExistsException($this->device->hostname, $this->device->sysName);
         }
     }
 }

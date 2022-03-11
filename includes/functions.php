@@ -14,8 +14,11 @@ use Illuminate\Support\Str;
 use LibreNMS\Config;
 use LibreNMS\Exceptions\HostExistsException;
 use LibreNMS\Exceptions\HostIpExistsException;
+use LibreNMS\Exceptions\HostnameExistsException;
+use LibreNMS\Exceptions\HostSysnameExistsException;
 use LibreNMS\Exceptions\HostUnreachableException;
 use LibreNMS\Exceptions\HostUnreachablePingException;
+use LibreNMS\Exceptions\HostUnreachableSnmpException;
 use LibreNMS\Exceptions\InvalidPortAssocModeException;
 use LibreNMS\Exceptions\SnmpVersionUnsupportedException;
 use LibreNMS\Modules\Core;
@@ -280,7 +283,7 @@ function addHost($host, $snmp_version = '', $port = 161, $transport = 'udp', $po
 {
     // Test Database Exists
     if (host_exists($host)) {
-        throw new HostExistsException("Already have host $host");
+        throw new HostnameExistsException($host);
     }
 
     // Valid port assoc mode
@@ -298,19 +301,14 @@ function addHost($host, $snmp_version = '', $port = 161, $transport = 'udp', $po
     } else {
         $ip = $host;
     }
-    if ($force_add !== true && $device = device_has_ip($ip)) {
-        $message = "Cannot add $host, already have device with this IP $ip";
-        if ($ip != $device->hostname) {
-            $message .= " ($device->hostname)";
-        }
-        $message .= '. You may force add to ignore this.';
-        throw new HostIpExistsException($message);
+    if ($force_add !== true && $existing = device_has_ip($ip)) {
+        throw new HostIpExistsException($host, $existing->hostname, $ip);
     }
 
     // Test reachability
     if (! $force_add) {
         if (! ((new \LibreNMS\Polling\ConnectivityHelper(new Device(['hostname' => $ip])))->isPingable()->success())) {
-            throw new HostUnreachablePingException("Could not ping $host");
+            throw new HostUnreachablePingException($host);
         }
     }
 
@@ -324,7 +322,7 @@ function addHost($host, $snmp_version = '', $port = 161, $transport = 'udp', $po
     if (isset($additional['snmp_disable']) && $additional['snmp_disable'] == 1) {
         return createHost($host, '', $snmp_version, $port, $transport, [], $poller_group, 1, true, $overwrite_ip, $additional);
     }
-    $host_unreachable_exception = new HostUnreachableException("Could not connect to $host, please check the snmp details and snmp reachability");
+    $host_unreachable_exception = new HostUnreachableSnmpException($host);
     // try different snmp variables to add the device
     foreach ($snmpvers as $snmpver) {
         if ($snmpver === 'v3') {
@@ -334,7 +332,7 @@ function addHost($host, $snmp_version = '', $port = 161, $transport = 'udp', $po
                 if ($force_add === true || isSNMPable($device)) {
                     return createHost($host, null, $snmpver, $port, $transport, $v3, $poller_group, $port_assoc_mode, $force_add, $overwrite_ip);
                 } else {
-                    $host_unreachable_exception->addReason("SNMP $snmpver: No reply with credentials " . $v3['authname'] . '/' . $v3['authlevel']);
+                    $host_unreachable_exception->addReason($snmpver, $v3['authname'] . '/' . $v3['authlevel']);
                 }
             }
         } elseif ($snmpver === 'v2c' || $snmpver === 'v1') {
@@ -345,11 +343,11 @@ function addHost($host, $snmp_version = '', $port = 161, $transport = 'udp', $po
                 if ($force_add === true || isSNMPable($device)) {
                     return createHost($host, $community, $snmpver, $port, $transport, [], $poller_group, $port_assoc_mode, $force_add, $overwrite_ip);
                 } else {
-                    $host_unreachable_exception->addReason("SNMP $snmpver: No reply with community $community");
+                    $host_unreachable_exception->addReason($snmpver, $community);
                 }
             }
         } else {
-            throw new SnmpVersionUnsupportedException("Unsupported SNMP Version \"$snmpver\", must be v1, v2c, or v3");
+            throw new SnmpVersionUnsupportedException($snmpver);
         }
     }
     if (isset($additional['ping_fallback']) && $additional['ping_fallback'] == 1) {
@@ -493,7 +491,7 @@ function createHost(
 
         $device->sysName = SnmpQuery::device($device)->get('SNMPv2-MIB::sysName.0')->value();
         if (host_exists($host, $device->sysName)) {
-            throw new HostExistsException("Already have host $host ({$device->sysName}) due to duplicate sysName");
+            throw new HostSysnameExistsException($host, $device->sysName);
         }
     }
     if ($device->save()) {

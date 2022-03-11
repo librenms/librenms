@@ -94,12 +94,10 @@ return [
         'validation-errors' => [
             'port' => 'Port should be 1-65535',
         ],
-        'errors' => [
-            'unpingable' => 'Could not ping :hostname (:ip)',
-            'unresolvable' => 'Hostname did not resolve to IP',
-            'hostname_exists' => 'Device :hostname already exists',
-            'ip_exists' => 'Cannot add :hostname, already have device :existing with this IP :ip',
-            'sysname_exists' => 'Already have device :hostname (:sysname) due to duplicate sysName',
+        'messages' => [
+            'save_failed' => 'Failed to save device :hostname',
+            'try_force' => 'You my try with the --force option to skip safety checks',
+            'added' => 'Added device :hostname (:device_id)',
         ],
     ],
     'device:ping' => [
