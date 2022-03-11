@@ -1,73 +1,68 @@
 <?php
 
+use App\Models\Package;
+
 $pkgs_id = [];
 $pkgs_db_id = [];
 
-// RPM
-if (! empty($agent_data['rpm'])) {
-    echo "\nRPM Packages: \n";
-    // Build array of existing packages
-    $manager = 'rpm';
-
-    /** @var \Illuminate\Support\Collection $packages */
-    $packages = DeviceCache::getPrimary()->packages->map(function (\App\Models\Package $package) {
-        $package->status = 0;
-
-        return $package;
-    })->keyBy->getCompositeKey();
-
-    foreach (explode("\n", $agent_data['rpm']) as $package) {
-        [$name, $version, $build, $arch, $size] = explode(' ', $package);
-        $package = new \App\Models\Package([
-            'manager' => $manager,
-            'name' => $name,
-            'arch' => $arch,
-            'version' => $version,
-            'build' => $build,
-            'size' => $size,
-            'status' => 1,
-        ]);
-        $package_key = $package->getCompositeKey();
-        if ($existing_package = $packages->get($package_key)) {
-            $existing_package->fill($package->attributesToArray());
-        } else {
-            $packages->put($package_key, $package);
+$managers = [
+    'rpm' => [
+        'name' => 'RPM',
+        'process' => function ($line) {
+            [$name, $version, $build, $arch, $size] = explode(' ', $line);
+            return new Package([
+                'manager' => 'rpm',
+                'name' => $name,
+                'arch' => $arch,
+                'version' => $version,
+                'build' => $build,
+                'size' => $size,
+                'status' => 1,
+            ]);
         }
-    }
-}//end if
-
-// DPKG
-if (! empty($agent_data['dpkg'])) {
-    echo "\nDEB Packages: \n";
-    // Build array of existing packages
-    $manager = 'deb';
-
-    /** @var \Illuminate\Support\Collection $packages */
-    $packages = DeviceCache::getPrimary()->packages->map(function (\App\Models\Package $package) {
-        $package->status = 0;
-
-        return $package;
-    })->keyBy->getCompositeKey();
-
-    foreach (explode("\n", $agent_data['dpkg']) as $package) {
-        [$name, $version, $arch, $size] = explode(' ', $package);
-        $package = new \App\Models\Package([
-            'manager' => $manager,
-            'name' => $name,
-            'arch' => $arch,
-            'version' => $version,
-            'build' => '',
-            'size' => cast_number($size) * 1024,
-            'status' => 1,
-        ]);
-        $package_key = $package->getCompositeKey();
-        if ($existing_package = $packages->get($package_key)) {
-            $existing_package->fill($package->attributesToArray());
-        } else {
-            $packages->put($package_key, $package);
+    ],
+    'dpkg' => [
+        'name' => 'DEB',
+        'process' => function ($line) {
+            [$name, $version, $arch, $size] = explode(' ', $line);
+            return new Package([
+                'manager' => 'deb',
+                'name' => $name,
+                'arch' => $arch,
+                'version' => $version,
+                'build' => '',
+                'size' => cast_number($size) * 1024,
+                'status' => 1,
+            ]);
         }
+    ]
+];
+
+foreach ($managers as $key => $manager) {
+    if (! empty($agent_data[$key])) {
+        echo "\n{$manager['name']} Packages: \n";
+
+        /** @var \Illuminate\Support\Collection $packages */
+        $packages = DeviceCache::getPrimary()->packages->map(function (Package $package) {
+            $package->status = 0;
+
+            return $package;
+        })->keyBy->getCompositeKey();
+
+        foreach (explode("\n", trim($agent_data[$key])) as $line) {
+            /** @var \App\Models\Package $package */
+            $package = $manager['process']($line);
+            $package_key = $package->getCompositeKey();
+            if ($existing_package = $packages->get($package_key)) {
+                $existing_package->fill($package->attributesToArray());
+            } else {
+                $packages->put($package_key, $package);
+            }
+        }
+
+        break;
     }
-}//end if
+}
 
 // update the database
 if (isset($packages)) {
@@ -77,4 +72,4 @@ if (isset($packages)) {
 
 echo "\n";
 
-unset($packages, $existing_package, $package);
+unset($packages, $existing_package, $package, $managers);
