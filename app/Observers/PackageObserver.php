@@ -32,7 +32,6 @@ class PackageObserver
             Log::event('Package updated: ' . $message, $package->device_id, 'package', 3);
             Log::info("u $message");
         }
-//        log_event('Package updated: ' . $name . ' (' . $arch . ') from ' . $pkg_c['version'] . $pkg_c_dbuild . ' to ' . $version . $dbuild, $device, 'package', 3);
     }
 
     /**
