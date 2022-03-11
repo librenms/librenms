@@ -466,4 +466,16 @@ class Rewrite
     {
         return IPv6::isValid($ip) ? "[$ip]" : $ip;
     }
+
+    public static function portAssociationId(string $mode): ?int
+    {
+        $modes = [
+            'ifIndex' => 1,
+            'ifName' => 2,
+            'ifDescr' => 3,
+            'ifAlias' => 4,
+        ];
+
+        return $modes[$mode] ?? null;
+    }
 }

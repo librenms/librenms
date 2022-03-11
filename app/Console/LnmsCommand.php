@@ -26,6 +26,7 @@
 namespace App\Console;
 
 use Illuminate\Console\Command;
+use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
 use LibreNMS\Util\Debug;
 use Symfony\Component\Console\Exception\InvalidArgumentException;
@@ -97,6 +98,10 @@ abstract class LnmsCommand extends Command
             $description = __('commands.' . $this->getName() . '.options.' . $name);
         }
 
+        if (isset($this->optionValues[$name])) {
+            $description .= ' [' . implode(', ', $this->optionValues[$name]) . ']';
+        }
+
         parent::addOption($name, $shortcut, $mode, $description, $default);
 
         return $this;
@@ -108,6 +113,15 @@ abstract class LnmsCommand extends Command
      */
     protected function validate(array $rules, array $messages = []): array
     {
+        // auto create option value rules if they don't exist
+        if (isset($this->optionValues)) {
+            foreach ($this->optionValues as $option => $values) {
+                if (empty($rules[$option])) {
+                    $rules[$option] = Rule::in($values);
+                }
+            }
+        }
+
         $error_messages = trans('commands.' . $this->getName() . '.validation-errors');
         $validator = Validator::make(
             $this->arguments() + $this->options(),

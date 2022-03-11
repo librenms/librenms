@@ -19,8 +19,6 @@ use LibreNMS\Exceptions\HostUnreachablePingException;
 use LibreNMS\Exceptions\InvalidPortAssocModeException;
 use LibreNMS\Exceptions\SnmpVersionUnsupportedException;
 use LibreNMS\Modules\Core;
-use LibreNMS\Util\IPv4;
-use LibreNMS\Util\IPv6;
 use LibreNMS\Util\Proxy;
 
 function array_sort_by_column($array, $on, $order = SORT_ASC)
@@ -113,24 +111,6 @@ function logfile($string)
 }
 
 /**
- * Check an array of regexes against a subject if any match, return true
- *
- * @param  string  $subject  the string to match against
- * @param  array|string  $regexes  an array of regexes or single regex to check
- * @return bool if any of the regexes matched, return true
- */
-function preg_match_any($subject, $regexes)
-{
-    foreach ((array) $regexes as $regex) {
-        if (preg_match($regex, $subject)) {
-            return true;
-        }
-    }
-
-    return false;
-}
-
-/**
  * Perform comparison of two items based on give comparison method
  * Valid comparisons: =, !=, ==, !==, >=, <=, >, <, contains, starts, ends, regex
  * contains, starts, ends: $a haystack, $b needle(s)
@@ -199,36 +179,6 @@ function percent_colour($perc)
     $b = max(0, 255 - (5 * ($perc + 25)));
 
     return sprintf('#%02x%02x%02x', $r, $b, $b);
-}
-
-/**
- * @param $device
- * @return string the logo image path for this device. Images are often wide, not square.
- */
-function getLogo($device)
-{
-    $img = getImageName($device, true, 'images/logos/');
-    if (! Str::startsWith($img, 'generic')) {
-        return 'images/logos/' . $img;
-    }
-
-    return getIcon($device);
-}
-
-/**
- * @param  array  $device
- * @param  string  $class  to apply to the image tag
- * @return string an image tag with the logo for this device. Images are often wide, not square.
- */
-function getLogoTag($device, $class = null)
-{
-    $tag = '<img src="' . url(getLogo($device)) . '" title="' . getImageTitle($device) . '"';
-    if (isset($class)) {
-        $tag .= " class=\"$class\" ";
-    }
-    $tag .= ' />';
-
-    return  $tag;
 }
 
 /**
@@ -920,23 +870,7 @@ function fix_integer_value($value)
  */
 function device_has_ip($ip)
 {
-    if (IPv6::isValid($ip)) {
-        $ip_address = \App\Models\Ipv6Address::query()
-            ->where('ipv6_address', IPv6::parse($ip, true)->uncompressed())
-            ->with('port.device')
-            ->first();
-    } elseif (IPv4::isValid($ip)) {
-        $ip_address = \App\Models\Ipv4Address::query()
-            ->where('ipv4_address', $ip)
-            ->with('port.device')
-            ->first();
-    }
-
-    if (isset($ip_address) && $ip_address->port) {
-        return $ip_address->port->device;
-    }
-
-    return false; // not an ipv4 or ipv6 address...
+    return Device::findByIp($ip);
 }
 
 /**
@@ -1312,16 +1246,6 @@ function q_bridge_bits2indices($hex_data)
     return $indices;
 }
 
-function update_device_logo(&$device)
-{
-    $icon = getImageName($device, false);
-    if ($icon != $device['icon']) {
-        log_event('Device Icon changed ' . $device['icon'] . " => $icon", $device, 'system', 3);
-        $device['icon'] = $icon;
-        dbUpdate(['icon' => $icon], 'devices', 'device_id=?', [$device['device_id']]);
-        echo "Changed Icon! : $icon\n";
-    }
-}
 
 /**
  * Function to generate Mac OUI Cache
