@@ -6,10 +6,10 @@ use App\Actions\Device\ValidateDeviceAndCreate;
 use App\Console\LnmsCommand;
 use App\Models\Device;
 use Exception;
+use LibreNMS\Enum\PortAssociationMode;
 use LibreNMS\Exceptions\HostExistsException;
 use LibreNMS\Exceptions\HostnameExistsException;
 use LibreNMS\Exceptions\HostUnreachableException;
-use LibreNMS\Util\Rewrite;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputOption;
 
@@ -89,7 +89,7 @@ class DeviceAdd extends LnmsCommand
             'port' => $this->option('port'),
             'transport' => $this->option('transport'),
             'poller_group' => $this->option('group'),
-            'port_association_mode' => Rewrite::portAssociationId($this->option('port-association-mode')),
+            'port_association_mode' => PortAssociationMode::getId($this->option('port-association-mode')),
             'community' => $this->option('community'),
             'authlevel'  => ($auth ? 'auth' : 'noAuth') . (($priv && $auth) ? 'Priv' : 'NoPriv'),
             'authname'   => $this->option('security-name'),
@@ -111,6 +111,7 @@ class DeviceAdd extends LnmsCommand
 
             if (! $result) {
                 $this->error(trans('commands.device:add.messages.save_failed', ['hostname' => $device->hostname]));
+
                 return 4;
             }
 

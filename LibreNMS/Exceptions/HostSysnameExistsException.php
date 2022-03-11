@@ -24,6 +24,5 @@ class HostSysnameExistsException extends HostExistsException
         ]);
 
         parent::__construct($message);
-
     }
 }

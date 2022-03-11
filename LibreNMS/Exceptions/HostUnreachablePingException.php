@@ -41,7 +41,7 @@ class HostUnreachablePingException extends HostUnreachableException
     public function __construct(string $hostname)
     {
         $this->hostname = $hostname;
-        $this->ip = gethostbyname($hostname);;
+        $this->ip = gethostbyname($hostname);
 
         $message = trans('exceptions.host_unreachable.unpingable', [
             'hostname' => $hostname,

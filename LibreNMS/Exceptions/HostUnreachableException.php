@@ -49,7 +49,7 @@ class HostUnreachableException extends \Exception
     {
         $vars = [
             'snmpver' => $snmpVersion,
-            'credentials' => $credentials
+            'credentials' => $credentials,
         ];
 
         if ($snmpVersion == 'v3') {

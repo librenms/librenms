@@ -12,6 +12,7 @@ use App\Models\Device;
 use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
 use LibreNMS\Config;
+use LibreNMS\Enum\PortAssociationMode;
 use LibreNMS\Exceptions\HostExistsException;
 use LibreNMS\Exceptions\HostIpExistsException;
 use LibreNMS\Exceptions\HostnameExistsException;
@@ -287,8 +288,8 @@ function addHost($host, $snmp_version = '', $port = 161, $transport = 'udp', $po
     }
 
     // Valid port assoc mode
-    if (! in_array($port_assoc_mode, get_port_assoc_modes())) {
-        throw new InvalidPortAssocModeException("Invalid port association_mode '$port_assoc_mode'. Valid modes are: " . join(', ', get_port_assoc_modes()));
+    if (! in_array($port_assoc_mode, PortAssociationMode::getModes())) {
+        throw new InvalidPortAssocModeException("Invalid port association_mode '$port_assoc_mode'. Valid modes are: " . join(', ', PortAssociationMode::getModes()));
     }
 
     // check if we have the host by IP
@@ -370,7 +371,7 @@ function deviceArray($host, $community, $snmpver, $port = 161, $transport = 'udp
     /* Get port_assoc_mode id if neccessary
      * We can work with names of IDs here */
     if (! is_int($port_assoc_mode)) {
-        $port_assoc_mode = get_port_assoc_mode_id($port_assoc_mode);
+        PortAssociationMode::getId($port_assoc_mode);
     }
     $device['port_association_mode'] = $port_assoc_mode;
 
@@ -466,7 +467,7 @@ function createHost(
     /* Get port_assoc_mode id if necessary
      * We can work with names of IDs here */
     if (! is_int($port_assoc_mode)) {
-        $port_assoc_mode = get_port_assoc_mode_id($port_assoc_mode);
+        PortAssociationMode::getId($port_assoc_mode);
     }
 
     $device = new Device(array_merge([
