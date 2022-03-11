@@ -5,7 +5,10 @@ namespace App\Console\Commands;
 use App\Actions\Device\ValidateDeviceAndCreate;
 use App\Console\LnmsCommand;
 use App\Models\Device;
+use App\Models\PollerGroup;
 use Exception;
+use Illuminate\Validation\Rule;
+use LibreNMS\Config;
 use LibreNMS\Enum\PortAssociationMode;
 use LibreNMS\Exceptions\HostExistsException;
 use LibreNMS\Exceptions\HostnameExistsException;
@@ -50,9 +53,9 @@ class DeviceAdd extends LnmsCommand
         $this->addOption('v3', null, InputOption::VALUE_NONE);
         $this->addOption('display-name', 'd', InputOption::VALUE_REQUIRED);
         $this->addOption('force', 'f', InputOption::VALUE_NONE);
-        $this->addOption('group', 'g', InputOption::VALUE_REQUIRED, null, 0);
+        $this->addOption('poller-group', 'g', InputOption::VALUE_REQUIRED, null, Config::get('default_poller_group'));
         $this->addOption('ping-fallback', 'b', InputOption::VALUE_NONE);
-        $this->addOption('port-association-mode', 'p', InputOption::VALUE_REQUIRED, null, 'ifIndex');
+        $this->addOption('port-association-mode', 'p', InputOption::VALUE_REQUIRED, null, Config::get('default_port_association_mode'));
         $this->addOption('community', 'c', InputOption::VALUE_REQUIRED);
         $this->addOption('transport', 't', InputOption::VALUE_REQUIRED, null, 'udp');
         $this->addOption('port', 'r', InputOption::VALUE_REQUIRED, null, 161);
@@ -78,6 +81,7 @@ class DeviceAdd extends LnmsCommand
 
         $this->validate([
             'port' => 'between:1,65535',
+            'poller-group' => Rule::in(PollerGroup::pluck('id')->prepend(0))
         ]);
 
         $auth = $this->option('auth-password');
@@ -88,7 +92,7 @@ class DeviceAdd extends LnmsCommand
             'snmpver' => $this->option('v3') ? 'v3' : ($this->option('v2c') ? 'v2c' : ($this->option('v1') ? 'v1' : '')),
             'port' => $this->option('port'),
             'transport' => $this->option('transport'),
-            'poller_group' => $this->option('group'),
+            'poller_group' => $this->option('poller-group'),
             'port_association_mode' => PortAssociationMode::getId($this->option('port-association-mode')),
             'community' => $this->option('community'),
             'authlevel'  => ($auth ? 'auth' : 'noAuth') . (($priv && $auth) ? 'Priv' : 'NoPriv'),

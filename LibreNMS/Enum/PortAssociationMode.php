@@ -34,6 +34,7 @@ class PortAssociationMode
 
     /**
      * Get mode names keyed by id
+     *
      * @return string[]
      */
     public static function getModes(): array

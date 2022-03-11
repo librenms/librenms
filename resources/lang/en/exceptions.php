@@ -21,7 +21,6 @@ return [
         'ip_exists' => 'Cannot add :hostname, already have device :existing with this IP :ip',
         'sysname_exists' => 'Already have device :hostname due to duplicate sysName: :sysname',
     ],
-
     'host_unreachable' => [
         'unpingable' => 'Could not ping :hostname (:ip)',
         'unsnmpable' => 'Could not connect to :hostname, please check the snmp details and snmp reachability',
@@ -42,6 +41,6 @@ return [
         'message' => 'The version of PHP your web server is running (:web_version) does not match the CLI version (:cli_version)',
     ],
     'snmp_version_unsupported' => [
-        'message' => 'Unsupported SNMP Version ":snmpver", must be v1, v2c, or v3'
+        'message' => 'Unsupported SNMP Version ":snmpver", must be v1, v2c, or v3',
     ],
 ];

@@ -93,6 +93,7 @@ return [
         ],
         'validation-errors' => [
             'port' => 'Port should be 1-65535',
+            'poller-group' => 'The given poller-group does not exist',
         ],
         'messages' => [
             'save_failed' => 'Failed to save device :hostname',
