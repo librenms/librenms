@@ -126,8 +126,11 @@ class ValidateDeviceAndCreate
         if ($this->device->community) {
             array_unshift($communities, $this->device->community);
         }
+        $communities = array_unique($communities);
+
         $v3_credentials = \LibreNMS\Config::get('snmp.v3');
         array_unshift($v3_credentials, $this->device->only(['authlevel', 'authname', 'authpass', 'authalgo', 'cryptopass', 'cryptoalgo']));
+        $v3_credentials = array_unique($v3_credentials, SORT_REGULAR);
 
         foreach ($snmp_versions as $snmp_version) {
             $this->device->snmpver = $snmp_version;
