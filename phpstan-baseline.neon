@@ -2671,11 +2671,6 @@ parameters:
 			path: LibreNMS/Exceptions/FileWriteFailedException.php
 
 		-
-			message: "#^Property LibreNMS\\\\Exceptions\\\\FileWriteFailedException\\:\\:\\$file has no type specified\\.$#"
-			count: 1
-			path: LibreNMS/Exceptions/FileWriteFailedException.php
-
-		-
 			message: "#^Method LibreNMS\\\\Exceptions\\\\HostUnreachableException\\:\\:addReason\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: LibreNMS/Exceptions/HostUnreachableException.php

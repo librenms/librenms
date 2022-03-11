@@ -29,11 +29,12 @@ use Throwable;
 
 class FileWriteFailedException extends \Exception
 {
-    protected $file;
+    /** @var string */
+    protected $file_path;
 
     public function __construct($file, $code = 0, Throwable $previous = null)
     {
-        $this->file = $file;
+        $this->file_path = $file;
         parent::__construct("Failed to write file: $file", $code, $previous);
     }
 
@@ -45,7 +46,7 @@ class FileWriteFailedException extends \Exception
     public function render(\Illuminate\Http\Request $request)
     {
         $title = trans('exceptions.file_write_failed.title');
-        $message = trans('exceptions.file_write_failed.message', ['file' => $this->file]);
+        $message = trans('exceptions.file_write_failed.message', ['file' => $this->file_path]);
 
         return $request->wantsJson() ? response()->json([
             'status' => 'error',
