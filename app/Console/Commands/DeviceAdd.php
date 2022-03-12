@@ -43,8 +43,8 @@ class DeviceAdd extends LnmsCommand
         $this->optionValues = [
             'transport' => ['udp', 'udp6', 'tcp', 'tcp6'],
             'port-association-mode' => PortAssociationMode::getModes(),
-            'auth-protocol' => array_map('strtolower', \LibreNMS\SNMPCapabilities::supportedAuthAlgorithms()),
-            'privacy-protocol' => array_map('strtolower', \LibreNMS\SNMPCapabilities::supportedCryptoAlgorithms()),
+            'auth-protocol' => \LibreNMS\SNMPCapabilities::supportedAuthAlgorithms(),
+            'privacy-protocol' => \LibreNMS\SNMPCapabilities::supportedCryptoAlgorithms(),
         ];
 
         $this->addArgument('device spec', InputArgument::REQUIRED);
@@ -61,9 +61,9 @@ class DeviceAdd extends LnmsCommand
         $this->addOption('port', 'r', InputOption::VALUE_REQUIRED, null, 161);
         $this->addOption('security-name', 'u', InputOption::VALUE_REQUIRED, null, 'root');
         $this->addOption('auth-password', 'A', InputOption::VALUE_REQUIRED);
-        $this->addOption('auth-protocol', 'a', InputOption::VALUE_REQUIRED, null, 'md5');
+        $this->addOption('auth-protocol', 'a', InputOption::VALUE_REQUIRED, null, 'MD5');
         $this->addOption('privacy-password', 'X', InputOption::VALUE_REQUIRED);
-        $this->addOption('privacy-protocol', 'x', InputOption::VALUE_REQUIRED, null, 'aes');
+        $this->addOption('privacy-protocol', 'x', InputOption::VALUE_REQUIRED, null, 'AES');
         $this->addOption('ping-only', 'P', InputOption::VALUE_NONE);
         $this->addOption('os', 'o', InputOption::VALUE_REQUIRED, null, 'ping');
         $this->addOption('hardware', 'w', InputOption::VALUE_REQUIRED);
