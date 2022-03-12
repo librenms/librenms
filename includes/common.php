@@ -47,6 +47,7 @@ function external_exec($command)
             '/-X\' \'[\S]+\'/',
             '/-P\' \'[\S]+\'/',
             '/-H\' \'[\S]+\'/',
+            '/-y\' \'[\S]+\'/',
             '/(udp|udp6|tcp|tcp6):([^:]+):([\d]+)/',
         ];
         $replacements = [
@@ -57,6 +58,7 @@ function external_exec($command)
             '-X\' \'PASSWORD\'',
             '-P\' \'PASSWORD\'',
             '-H\' \'HOSTNAME\'',
+            '-y\' \'KG_KEY\'',
             '\1:HOSTNAME:\3',
         ];
 
