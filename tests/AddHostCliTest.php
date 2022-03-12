@@ -31,9 +31,11 @@ use Illuminate\Foundation\Testing\DatabaseTransactions;
 class AddHostCliTest extends DBTestCase
 {
     use DatabaseTransactions;
+
+    /** @var string */
     private $hostName = 'testHost';
 
-    public function testCLIsnmpV1()
+    public function testCLIsnmpV1(): void
     {
         $this->artisan('device:add', ['device spec' => $this->hostName, '--force' => true, '-c' => 'community', '--v1' => true])
             ->assertExitCode(0)
@@ -47,7 +49,7 @@ class AddHostCliTest extends DBTestCase
         $this->assertEquals('v1', $device->snmpver, 'Wrong snmp version');
     }
 
-    public function testCLIsnmpV2()
+    public function testCLIsnmpV2(): void
     {
         $this->artisan('device:add', ['device spec' => $this->hostName, '--force' => true, '-c' => 'community', '--v2c' => true])
             ->assertExitCode(0)
@@ -61,7 +63,7 @@ class AddHostCliTest extends DBTestCase
         $this->assertEquals('v2c', $device->snmpver, 'Wrong snmp version');
     }
 
-    public function testCLIsnmpV3UserAndPW()
+    public function testCLIsnmpV3UserAndPW(): void
     {
         $this->artisan('device:add', ['device spec' => $this->hostName, '--force' => true, '-u' => 'SecName', '-A' => 'AuthPW', '-X' => 'PrivPW', '--v3' => true])
         ->assertExitCode(0)
@@ -78,7 +80,7 @@ class AddHostCliTest extends DBTestCase
         $this->assertEquals('v3', $device->snmpver, 'Wrong snmp version');
     }
 
-    public function testPortAssociationMode()
+    public function testPortAssociationMode(): void
     {
         $modes = ['ifIndex', 'ifName', 'ifDescr', 'ifAlias'];
         foreach ($modes as $index => $mode) {
@@ -93,7 +95,7 @@ class AddHostCliTest extends DBTestCase
         }
     }
 
-    public function testSnmpTransport()
+    public function testSnmpTransport(): void
     {
         $modes = ['udp', 'udp6', 'tcp', 'tcp6'];
         foreach ($modes as $mode) {
@@ -109,7 +111,7 @@ class AddHostCliTest extends DBTestCase
         }
     }
 
-    public function testSnmpV3AuthProtocol()
+    public function testSnmpV3AuthProtocol(): void
     {
         $modes = \LibreNMS\SNMPCapabilities::supportedAuthAlgorithms();
         foreach ($modes as $mode) {
@@ -125,7 +127,7 @@ class AddHostCliTest extends DBTestCase
         }
     }
 
-    public function testSnmpV3PrivacyProtocol()
+    public function testSnmpV3PrivacyProtocol(): void
     {
         $modes = \LibreNMS\SNMPCapabilities::supportedCryptoAlgorithms();
         foreach ($modes as $mode) {
@@ -141,7 +143,7 @@ class AddHostCliTest extends DBTestCase
         }
     }
 
-    public function testCLIping()
+    public function testCLIping(): void
     {
         $this->artisan('device:add', ['device spec' => $this->hostName, '--force' => true, '-P' => true, '-o' => 'nameOfOS', '-w' => 'hardware', '-s' => 'System', '--v1' => true])
             ->assertExitCode(0)
@@ -156,7 +158,7 @@ class AddHostCliTest extends DBTestCase
         $this->assertEquals('system', $device->sysName, 'Wrong system name');
     }
 
-    public function testExistingDevice()
+    public function testExistingDevice(): void
     {
         $this->artisan('device:add', ['device spec' => 'existing', '--force' => true])
             ->assertExitCode(0)

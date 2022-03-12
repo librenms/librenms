@@ -34,7 +34,7 @@ class AddHostTest extends DBTestCase
     use DatabaseTransactions;
     private $host = 'testHost';
 
-    public function testAddsnmpV1()
+    public function testAddsnmpV1(): void
     {
         addHost($this->host, 'v1', 111, 'tcp', 0, true, 'ifIndex');
         $device = Device::findByHostname($this->host);
@@ -47,7 +47,7 @@ class AddHostTest extends DBTestCase
         $this->assertEquals('tcp', $device->transport, 'Wrong snmp transport (udp/tcp)');
     }
 
-    public function testAddsnmpV2()
+    public function testAddsnmpV2(): void
     {
         addHost($this->host, 'v2c', 111, 'tcp', 0, true, 'ifName');
         $device = Device::findByHostname($this->host);
@@ -59,7 +59,7 @@ class AddHostTest extends DBTestCase
         $this->assertEquals('v2c', $device->snmpver, 'Wrong snmp version');
     }
 
-    public function testAddsnmpV3()
+    public function testAddsnmpV3(): void
     {
         addHost($this->host, 'v3', 111, 'tcp', 0, true, 'ifIndex');
         $device = Device::findByHostname($this->host);
@@ -73,7 +73,7 @@ class AddHostTest extends DBTestCase
         $this->assertEquals(Config::get('snmp.v3')[0]['authpass'], $device->authpass, 'Wrong snmp v3 password');
     }
 
-    public function testAddping()
+    public function testAddping(): void
     {
         $additional = [
             'snmp_disable' => 1,
