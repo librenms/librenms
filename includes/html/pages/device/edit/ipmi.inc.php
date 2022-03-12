@@ -31,7 +31,7 @@ if ($_POST['editing']) {
         } else {
             del_dev_attrib($device, 'ipmi_password');
         }
-        
+
         if ($ipmi_kg_key != '') {
             set_dev_attrib($device, 'ipmi_kg_key', $ipmi_kg_key);
         } else {
