@@ -1135,8 +1135,11 @@ Route: `/api/v0/devices`
 
 Input (JSON):
 
-- hostname: device hostname
-- overwrite_ip: alternate polling IP. Will be use instead of hostname (optional)
+- hostname: device hostname or IP
+- display: A string to display as the name of this device, defaults to 
+  hostname (or device_display_default setting). May be a simple
+  template using replacements: {{ $hostname }}, {{ $sysName }},
+  {{ $sysName_fallback }}, {{ $ip }}
 - port: SNMP port (defaults to port defined in config).
 - transport: SNMP protocol (defaults to transport defined in config).
 - version: SNMP version to use, v1, v2c or v3. Defaults to v2c.
@@ -1154,7 +1157,7 @@ For SNMP v3
 - authlevel: SNMP authlevel (noAuthNoPriv, authNoPriv, authPriv).
 - authname: SNMP Auth username
 - authpass: SNMP Auth password
-- authalgo: SNMP Auth algorithm (MD5, SHA)
+- authalgo: SNMP Auth algorithm (MD5, SHA) (SHA-224, SHA-256, SHA-384, SHA-512 if supported by your server)
 - cryptopass: SNMP Crypto Password
 - cryptoalgo: SNMP Crypto algorithm (AES, DES)
 
@@ -1162,6 +1165,7 @@ For ICMP only
 
 - snmp_disable: Boolean, set to true for ICMP only.
 - os: OS short name for the device (defaults to ping).
+- sysName: sysName for the device.
 - hardware: Device hardware.
 
 Example:
