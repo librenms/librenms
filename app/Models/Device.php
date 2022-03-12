@@ -79,7 +79,7 @@ class Device extends BaseModel
 
     // ---- Helper Functions ----
 
-    public static function findByHostname($hostname)
+    public static function findByHostname(string $hostname): ?Device
     {
         return static::where('hostname', $hostname)->first();
     }
@@ -110,7 +110,7 @@ class Device extends BaseModel
         return $overwrite_ip ?: $hostname;
     }
 
-    public static function findByIp($ip)
+    public static function findByIp(?string $ip): ?Device
     {
         if (! IP::isValid($ip)) {
             return null;
@@ -561,8 +561,8 @@ class Device extends BaseModel
         return $query->whereIn(
             $query->qualifyColumn('device_id'), function ($query) use ($deviceGroup) {
                 $query->select('device_id')
-                    ->from('device_group_device')
-                    ->where('device_group_id', $deviceGroup);
+                ->from('device_group_device')
+                ->where('device_group_id', $deviceGroup);
             }
         );
     }
@@ -572,8 +572,8 @@ class Device extends BaseModel
         return $query->whereNotIn(
             $query->qualifyColumn('device_id'), function ($query) use ($deviceGroup) {
                 $query->select('device_id')
-                    ->from('device_group_device')
-                    ->where('device_group_id', $deviceGroup);
+                ->from('device_group_device')
+                ->where('device_group_id', $deviceGroup);
             }
         );
     }
@@ -583,8 +583,8 @@ class Device extends BaseModel
         return $query->whereIn(
             $query->qualifyColumn('device_id'), function ($query) use ($serviceTemplate) {
                 $query->select('device_id')
-                    ->from('service_templates_device')
-                    ->where('service_template_id', $serviceTemplate);
+                ->from('service_templates_device')
+                ->where('service_template_id', $serviceTemplate);
             }
         );
     }
@@ -594,8 +594,8 @@ class Device extends BaseModel
         return $query->whereNotIn(
             $query->qualifyColumn('device_id'), function ($query) use ($serviceTemplate) {
                 $query->select('device_id')
-                    ->from('service_templates_device')
-                    ->where('service_template_id', $serviceTemplate);
+                ->from('service_templates_device')
+                ->where('service_template_id', $serviceTemplate);
             }
         );
     }

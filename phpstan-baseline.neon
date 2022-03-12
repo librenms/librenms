@@ -7191,6 +7191,11 @@ parameters:
 			path: LibreNMS/Validator.php
 
 		-
+			message: "#^Property App\\\\Models\\\\Device\\:\\:\\$authlevel \\('authNoPriv'\\|'authPriv'\\|'noAuthNoPriv'\\) does not accept null\\.$#"
+			count: 1
+			path: app/Actions/Device/ValidateDeviceAndCreate.php
+
+		-
 			message: "#^Property App\\\\ApiClients\\\\BaseApi\\:\\:\\$base_uri has no type specified\\.$#"
 			count: 1
 			path: app/ApiClients/BaseApi.php
@@ -9021,26 +9026,6 @@ parameters:
 			path: app/Models/Config.php
 
 		-
-			message: "#^Method App\\\\Models\\\\Device\\:\\:findByHostname\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/Models/Device.php
-
-		-
-			message: "#^Method App\\\\Models\\\\Device\\:\\:findByHostname\\(\\) has parameter \\$hostname with no type specified\\.$#"
-			count: 1
-			path: app/Models/Device.php
-
-		-
-			message: "#^Method App\\\\Models\\\\Device\\:\\:findByIp\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/Models/Device.php
-
-		-
-			message: "#^Method App\\\\Models\\\\Device\\:\\:findByIp\\(\\) has parameter \\$ip with no type specified\\.$#"
-			count: 1
-			path: app/Models/Device.php
-
-		-
 			message: "#^Method App\\\\Models\\\\Device\\:\\:forgetAttrib\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: app/Models/Device.php
@@ -10209,71 +10194,6 @@ parameters:
 			message: "#^Method MigrateToUtf8mb4\\:\\:migrateCharsetTo\\(\\) has parameter \\$collation with no type specified\\.$#"
 			count: 1
 			path: database/migrations/2021_02_09_122930_migrate_to_utf8mb4.php
-
-		-
-			message: "#^Method LibreNMS\\\\Tests\\\\AddHostCliTest\\:\\:testCLIping\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: tests/AddHostCliTest.php
-
-		-
-			message: "#^Method LibreNMS\\\\Tests\\\\AddHostCliTest\\:\\:testCLIsnmpV1\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: tests/AddHostCliTest.php
-
-		-
-			message: "#^Method LibreNMS\\\\Tests\\\\AddHostCliTest\\:\\:testCLIsnmpV2\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: tests/AddHostCliTest.php
-
-		-
-			message: "#^Method LibreNMS\\\\Tests\\\\AddHostCliTest\\:\\:testCLIsnmpV3UserAndPW\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: tests/AddHostCliTest.php
-
-		-
-			message: "#^Method LibreNMS\\\\Tests\\\\AddHostCliTest\\:\\:testPortAssociationMode\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: tests/AddHostCliTest.php
-
-		-
-			message: "#^Method LibreNMS\\\\Tests\\\\AddHostCliTest\\:\\:testSnmpTransport\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: tests/AddHostCliTest.php
-
-		-
-			message: "#^Method LibreNMS\\\\Tests\\\\AddHostCliTest\\:\\:testSnmpV3AuthProtocol\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: tests/AddHostCliTest.php
-
-		-
-			message: "#^Method LibreNMS\\\\Tests\\\\AddHostCliTest\\:\\:testSnmpV3PrivacyProtocol\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: tests/AddHostCliTest.php
-
-		-
-			message: "#^Property LibreNMS\\\\Tests\\\\AddHostCliTest\\:\\:\\$hostName has no type specified\\.$#"
-			count: 1
-			path: tests/AddHostCliTest.php
-
-		-
-			message: "#^Method LibreNMS\\\\Tests\\\\AddHostTest\\:\\:testAddping\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: tests/AddHostTest.php
-
-		-
-			message: "#^Method LibreNMS\\\\Tests\\\\AddHostTest\\:\\:testAddsnmpV1\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: tests/AddHostTest.php
-
-		-
-			message: "#^Method LibreNMS\\\\Tests\\\\AddHostTest\\:\\:testAddsnmpV2\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: tests/AddHostTest.php
-
-		-
-			message: "#^Method LibreNMS\\\\Tests\\\\AddHostTest\\:\\:testAddsnmpV3\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: tests/AddHostTest.php
 
 		-
 			message: "#^Parameter \\#4 \\$transport of function addHost expects string, int given\\.$#"
