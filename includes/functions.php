@@ -371,7 +371,7 @@ function deviceArray($host, $community, $snmpver, $port = 161, $transport = 'udp
     /* Get port_assoc_mode id if neccessary
      * We can work with names of IDs here */
     if (! is_int($port_assoc_mode)) {
-        PortAssociationMode::getId($port_assoc_mode);
+        $port_assoc_mode = PortAssociationMode::getId($port_assoc_mode);
     }
     $device['port_association_mode'] = $port_assoc_mode;
 
@@ -467,7 +467,7 @@ function createHost(
     /* Get port_assoc_mode id if necessary
      * We can work with names of IDs here */
     if (! is_int($port_assoc_mode)) {
-        PortAssociationMode::getId($port_assoc_mode);
+        $port_assoc_mode = PortAssociationMode::getId($port_assoc_mode);
     }
 
     $device = new Device(array_merge([
