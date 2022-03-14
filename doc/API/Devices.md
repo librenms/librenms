@@ -1146,7 +1146,7 @@ Input (JSON):
   {{ $sysName_fallback }}, {{ $ip }}
 - port: SNMP port (defaults to port defined in config).
 - transport: SNMP protocol (defaults to transport defined in config).
-- version: SNMP version to use, v1, v2c or v3. Defaults to v2c.
+- snmpver: SNMP version to use, v1, v2c or v3. Defaults to v2c.
 - port_association_mode: method to identify ports: ifIndex (default), ifName, ifDescr, ifAlias
 - poller_group: This is the poller_group id used for distributed
   poller setup. Defaults to 0.

@@ -387,7 +387,7 @@ function add_device(Illuminate\Http\Request $request)
             'port',
             'transport',
             'poller_group',
-            'version',
+            'snmpver',
             'port_association_mode',
             'community',
             'authlevel',
@@ -398,13 +398,16 @@ function add_device(Illuminate\Http\Request $request)
             'cryptoalgo',
         ]));
 
+        // uses different name in legacy call
+        if (! empty($data['version'])) {
+            $device->snmpver = $data['version'];
+        }
+
         if (! empty($data['snmp_disable'])) {
             $device->os = $data['os'] ?? 'ping';
             $device->sysName = $data['sysName'] ?? '';
             $device->hardware = $data['hardware'] ?? '';
             $device->snmp_disable = 1;
-        } elseif (! in_array($device->version, ['v1', 'v2c', 'v3'])) {
-            return api_error(400, 'You haven\'t specified an SNMP version to use');
         }
 
         (new ValidateDeviceAndCreate($device, ! empty($data['force_add'])))->execute();
