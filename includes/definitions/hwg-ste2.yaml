@@ -10,3 +10,5 @@ discovery:
     -
         sysObjectID:
             - .1.3.6.1.4.1.21796.4.9
+        sysDescr_except:
+            - 'WLD2'
