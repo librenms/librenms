@@ -370,7 +370,7 @@ function list_devices(Illuminate\Http\Request $request)
 function add_device(Illuminate\Http\Request $request)
 {
     // This will add a device using the data passed encoded with json
-    $data = $request->json();
+    $data = $request->json()->all();
 
     if (empty($data)) {
         return api_error(400, 'No information has been provided to add this new device');
@@ -379,34 +379,35 @@ function add_device(Illuminate\Http\Request $request)
         return api_error(400, 'Missing the device hostname');
     }
 
-    $device = new Device(Arr::only($data, [
-        'hostname',
-        'display',
-        'overwrite_ip',
-        'port',
-        'transport',
-        'poller_group',
-        'version',
-        'community',
-        'authlevel',
-        'authname',
-        'authpass',
-        'authalgo',
-        'cryptopass',
-        'cryptoalgo',
-    ]));
-
-    if (! empty($data['snmp_disable'])) {
-        $device->os = $data['os'] ?? 'ping';
-        $device->sysName = $data['sysName'] ?? '';
-        $device->hardware = $data['hardware'] ?? '';
-        $device->snmp_disable = 1;
-    } elseif (! in_array($device->version, ['v1', 'v2c', 'v3'])) {
-        return api_error(400, 'You haven\'t specified an SNMP version to use');
-    }
-
     try {
-        (new ValidateDeviceAndCreate($device, $data['force_add']))->execute();
+        $device = new Device(Arr::only($data, [
+            'hostname',
+            'display',
+            'overwrite_ip',
+            'port',
+            'transport',
+            'poller_group',
+            'version',
+            'port_association_mode',
+            'community',
+            'authlevel',
+            'authname',
+            'authpass',
+            'authalgo',
+            'cryptopass',
+            'cryptoalgo',
+        ]));
+
+        if (! empty($data['snmp_disable'])) {
+            $device->os = $data['os'] ?? 'ping';
+            $device->sysName = $data['sysName'] ?? '';
+            $device->hardware = $data['hardware'] ?? '';
+            $device->snmp_disable = 1;
+        } elseif (! in_array($device->version, ['v1', 'v2c', 'v3'])) {
+            return api_error(400, 'You haven\'t specified an SNMP version to use');
+        }
+
+        (new ValidateDeviceAndCreate($device, ! empty($data['force_add'])))->execute();
     } catch (Exception $e) {
         return api_error(500, $e->getMessage());
     }

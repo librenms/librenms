@@ -1129,13 +1129,17 @@ Output:
 
 ### `add_device`
 
-Add a new device.
+Add a new device.  Most fields are optional. You may omit snmp
+credentials to attempt each system credential in order. See snmp.version, snmp.community, and snmp.v3
+
+To guarantee device is added, use force_add. This will skip checks 
+for duplicate device and snmp reachability, but not duplicate hostname.
 
 Route: `/api/v0/devices`
 
 Input (JSON):
 
-- hostname: device hostname or IP
+- hostname (required): device hostname or IP
 - display: A string to display as the name of this device, defaults to 
   hostname (or device_display_default setting). May be a simple
   template using replacements: {{ $hostname }}, {{ $sysName }},
@@ -1143,9 +1147,10 @@ Input (JSON):
 - port: SNMP port (defaults to port defined in config).
 - transport: SNMP protocol (defaults to transport defined in config).
 - version: SNMP version to use, v1, v2c or v3. Defaults to v2c.
+- port_association_mode: method to identify ports: ifIndex (default), ifName, ifDescr, ifAlias
 - poller_group: This is the poller_group id used for distributed
   poller setup. Defaults to 0.
-- force_add: Force the device to be added regardless of it being able
+- force_add: Set to true to force the device to be added regardless of it being able
   to respond to snmp or icmp.
 
 For SNMP v1 or v2c
