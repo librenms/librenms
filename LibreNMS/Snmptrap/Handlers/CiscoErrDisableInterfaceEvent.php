@@ -1,0 +1,58 @@
+<?php
+/**
+ * CiscoErrDisableInerfaceEvent.php
+ *
+ * -Description-
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ *
+ * @link       https://www.librenms.org
+ *
+ * @copyright  2022 Andy Norwood
+ * @author     Andy Norwood(bonzo81))
+ */
+
+namespace LibreNMS\Snmptrap\Handlers;
+
+use App\Models\Device;
+use LibreNMS\Interfaces\SnmptrapHandler;
+use LibreNMS\Snmptrap\Trap;
+use Log;
+
+class CiscoErrDisableInterfaceEvent implements SnmptrapHandler
+{
+    /**
+     * Handle snmptrap.
+     * Data is pre-parsed and delivered as a Trap.
+     *
+     * @param  Device  $device
+     * @param  Trap  $trap
+     * @return void
+     */
+    public function handle(Device $device, Trap $trap)
+    {
+        $oidText = $trap->toString($trap);
+
+        preg_match('/.cErrDisableIfStatusCause\.(.*?)\./', $oidText, $ifIndex);
+        $port = $device->ports()->where('ifIndex', $ifIndex[1])->first();
+        $cause = $trap->getOidData($trap->findOid('CISCO-ERR-DISABLE-MIB::cErrDisableIfStatusCause.' . $ifIndex[1] . '.0'));
+
+        if (! $port) {
+            Log::event('SNMP TRAP: ' . $cause . ' error detected. Interface name unknown due to ifIndex not found in trap.', $device->device_id, 'trap', 4);
+
+            return;
+        }
+        Log::event('SNMP TRAP: ' . $cause . ' error detected on ' . $port->ifName . ' (Description: ' . $port->ifDescr . '). ' . $port->ifName . ' in err-disable state.', $device->device_id, 'trap', 4);
+    }
+}
