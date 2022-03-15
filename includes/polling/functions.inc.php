@@ -184,8 +184,8 @@ function record_sensor_data($device, $all_sensors)
         $rrd_name = get_sensor_rrd_name($device, $sensor);
 
         if ($sensor['sensor_class'] == 'count_rate') {
-            $rrd_def = RrdDefinition::make()->addDataset('sensor', 'COUNTER');
             //we use the COUNTER rrd to graph the variation instead of the absolute value
+            $rrd_def = RrdDefinition::make()->addDataset('sensor', 'COUNTER');
         } else {
             $rrd_def = RrdDefinition::make()->addDataset('sensor', 'GAUGE');
         }
