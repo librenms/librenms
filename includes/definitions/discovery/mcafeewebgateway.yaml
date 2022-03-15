@@ -18,8 +18,9 @@ modules:
                 -
                     oid: stConnectionsLegitimate
                     num_oid: '.1.3.6.1.4.1.1230.2.7.2.1.3.{{ $index }}'
-                    descr: 'Connections accepted'
+                    descr: 'Total requests'
                     index: 'stConnectionsLegitimate.{{ $index }}'
+                    group: Requests
                 -
                     oid: stBlockedByAntiMalware
                     num_oid: '.1.3.6.1.4.1.1230.2.7.2.1.4.{{ $index }}'
@@ -49,18 +50,20 @@ modules:
                     oid: stCategoryCount
                     num_oid: '.1.3.6.1.4.1.1230.2.7.2.1.10.1.2.{{ $index }}'
                     index: 'stCategoryCount.{{ $index }}'
-                    descr: 'Count {{ $stCategoryName }} Blocked'
+                    descr: 'Blocked "{{ $stCategoryName }}"'
                     group: 'Categories Blocked'
                 -
                     oid: stHttpRequests
                     num_oid: '.1.3.6.1.4.1.1230.2.7.2.2.1.{{ $index }}'
                     index: 'stHttpRequests.{{ $index }}'
                     descr: 'HTTP requests'
+                    group: Requests
                 -
                     oid: stHttpsRequests
                     num_oid: '.1.3.6.1.4.1.1230.2.7.2.3.1.{{ $index }}'
                     index: 'stHttpsRequests.{{ $index }}'
                     descr: 'HTTPS requests'
+                    group: Requests
                 -
                     oid: stClientCount
                     num_oid: '.1.3.6.1.4.1.1230.2.7.2.5.2.{{ $index }}'
