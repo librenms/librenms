@@ -19,6 +19,7 @@ class Sensor extends DeviceRelatedModel
         'chromatic_dispersion' => 'indent',
         'cooling'              => 'thermometer-full',
         'count'                => 'hashtag',
+        'count_rate'           => 'hashtag',
         'current'              => 'bolt fa-flip-horizontal',
         'dbm'                  => 'sun-o',
         'delay'                => 'clock-o',

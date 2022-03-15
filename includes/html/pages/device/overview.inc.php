@@ -66,6 +66,7 @@ require 'overview/sensors/frequency.inc.php';
 require 'overview/sensors/load.inc.php';
 require 'overview/sensors/state.inc.php';
 require 'overview/sensors/count.inc.php';
+require 'overview/sensors/count_rate.inc.php';
 require 'overview/sensors/percent.inc.php';
 require 'overview/sensors/signal.inc.php';
 require 'overview/sensors/tv_signal.inc.php';

@@ -48,6 +48,7 @@ $type_text = [
     'loss' => 'Loss',
     'state' => 'State',
     'count' => 'Count',
+    'count_rate' => 'Count rate',
     'signal' => 'Signal',
     'tv_signal' => 'TV signal',
     'bitrate' => 'Bitrate',

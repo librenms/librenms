@@ -1191,7 +1191,10 @@ function get_sensor_label_color($sensor, $type = 'sensors')
     if ($sensor['sensor_class'] == 'frequency' && $sensor['sensor_type'] == 'openwrt') {
         return "<span class='label $label_style'>" . trim($sensor['sensor_current']) . ' ' . $unit . '</span>';
     }
-
+     if ($sensor['sensor_class'] == 'count_rate') {
+        //compute and display an approx rate for this sensor
+        return "<span class='label $label_style'>" . trim(Number::formatSi(($sensor['sensor_current'] - $sensor['sensor_prev']) / Config::get('rrd.step', 300), 2, 3, $unit)) . '</span>';
+    }
     if ($type == 'wireless' && $sensor['sensor_class'] == 'frequency') {
         return "<span class='label $label_style'>" . trim(Number::formatSi($sensor['sensor_current'] * 1000000, 2, 3, 'Hz')) . '</span>';
     }

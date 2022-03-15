@@ -48,6 +48,12 @@ return [
         'unit' => '',
         'unit_long' => '',
     ],
+    'count_rate' => [
+        'short' => 'Count Rate',
+        'long' => 'Count Rate',
+        'unit' => '#/s',
+        'unit_long' => '#/s',
+    ],
     'current' => [
         'short' => 'Current',
         'long' => 'Current',

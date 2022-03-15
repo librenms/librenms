@@ -8,6 +8,30 @@ modules:
                 -
                     oid:
                         - stCategoryName
+        count_rate:
+            data:
+                -
+                    oid: stHttpRequests
+                    num_oid: '.1.3.6.1.4.1.1230.2.7.2.2.1.{{ $index }}'
+                    index: 'stHttpRequests.{{ $index }}'
+                    descr: 'Rate of HTTP requests'
+                -
+                    oid: stConnectionsLegitimate
+                    num_oid: '.1.3.6.1.4.1.1230.2.7.2.1.3.{{ $index }}'
+                    descr: 'Rate of legitimate connections'
+                    index: 'stConnectionsLegitimate.{{ $index }}'
+                -
+                    oid: stCategoryCount
+                    num_oid: '.1.3.6.1.4.1.1230.2.7.2.1.10.1.2.{{ $index }}'
+                    index: 'stCategoryCount.{{ $index }}'
+                    descr: 'Rate of {{ $stCategoryName }} Blocked'
+                    group: Categories
+                -
+                    oid: stHttpsRequests
+                    num_oid: '.1.3.6.1.4.1.1230.2.7.2.3.1.{{ $index }}'
+                    index: 'stHttpsRequests.{{ $index }}'
+                    descr: 'Rate of HTTPS requests'
+
         count:
             data:
                 -
