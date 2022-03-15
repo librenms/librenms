@@ -38,7 +38,6 @@ class CiscoErrDisableInterfaceEventTest extends SnmpTrapTestCase
     {
         $device = Device::factory()->create(); /** @var Device $device */
         $port = Port::factory()->make(); /** @var Port $port */
-        $device->ports = $port;
         $trapText = "$device->hostname
 UDP: [$device->ip]:57602->[10.0.0.1]:162
 SNMPv2-MIB::sysUpTime.0 18:30:30.32
