@@ -6,38 +6,39 @@ information for your new device.
 Currently we have support for the following health metrics along with
 the values we expect to see the data in:
 
-| Class                           | Measurement                 |
-| ------------------------------- | --------------------------- |
-| airflow                         | cfm                         |
-| ber                             | ratio                       |
-| charge                          | %                           |
-| chromatic_dispersion            | ps/nm                       |
-| cooling                         | W                           |
-| count                           | #                           |
-| current                         | A                           |
-| dbm                             | dBm                         |
-| delay                           | s                           |
-| eer                             | eer                         |
-| fanspeed                        | rpm                         |
-| frequency                       | Hz                          |
-| humidity                        | %                           |
-| load                            | %                           |
-| loss                            | %                           |
-| power                           | W                           |
-| power_consumed                  | kWh                         |
-| power_factor                    | ratio                       |
-| pressure                        | kPa                         |
-| quality_factor                  | dB                          |
-| runtime                         | Min                         |
-| signal                          | dBm                         |
-| snr                             | SNR                         |
-| state                           | #                           |
-| temperature                     | C                           |
-| tv_signal                       | dBmV                        |
-| bitrate                         | bps                         |
-| voltage                         | V                           |
-| waterflow                       | l/m                         |
-| percent                         | %                           |
+| Class                       | Measurement     | Comment |
+| --------------------------- | --------------- | ------- |
+| airflow                     | cfm             | |
+| ber                         | ratio           | |
+| charge                      | %               | |
+| chromatic_dispersion        | ps/nm           | |
+| cooling                     | W               | |
+| count                       | #               | |
+| count_rate                  | #/s             | Computes variation in RRD (using type COUNTER instead of GAUGE) |
+| current                     | A               | | 
+| dbm                         | dBm             | |
+| delay                       | s               | |
+| eer                         | eer             | |
+| fanspeed                    | rpm             | |
+| frequency                   | Hz              | |
+| humidity                    | %               | |
+| load                        | %               | |
+| loss                        | %               | |
+| power                       | W               | |
+| power_consumed              | kWh             | |
+| power_factor                | ratio           | |
+| pressure                    | kPa             | |
+| quality_factor              | dB              | |
+| runtime                     | Min             | |
+| signal                      | dBm             | |
+| snr                         | SNR             | |
+| state                       | #               | |
+| temperature                 | C               | |
+| tv_signal                   | dBmV            | |
+| bitrate                     | bps             | |
+| voltage                     | V               | |
+| waterflow                   | l/m             | |
+| percent                     | %               | |
 
 #### Simple health discovery
 
