@@ -1,6 +1,6 @@
 <?php
 /**
- * CiscoErr-Disable Interface Event.php
+ * CiscoErrDisableInterfaceEventTest.php
  *
  * -Description-
  *
@@ -18,6 +18,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ * 
+ * @copyright  2022 Andy Norwood
+ * @author     Andy Norwood(bonzo81))
  */
 
 namespace LibreNMS\Tests\Feature\SnmpTraps;
@@ -30,7 +33,7 @@ use LibreNMS\Snmptrap\Trap;
 class CiscoErrDisableInterfaceEventTest extends SnmpTrapTestCase
 {
     /**
-     * Test CiscoMacViolation trap handle
+     * Test CiscoErrDisableInterfaceEvent trap handle
      *
      * @return void
      */
