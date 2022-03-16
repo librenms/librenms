@@ -18,7 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
- * 
+ *
  * @copyright  2022 Andy Norwood
  * @author     Andy Norwood(bonzo81))
  */
@@ -52,6 +52,7 @@ CISCO-ERR-DISABLE-MIB::cErrDisableIfStatusCause.$port->ifIndex.0 bpduGuard";
         \Log::shouldReceive('event')->once()->with($message, $device->device_id, 'trap', 4);
         $this->assertTrue(Dispatcher::handle($trap), 'Could not handle testErrDisableInterfaceEvent trap');
     }
+
     public function testErrDisableBadIfIndex()
     {
         $device = Device::factory()->create(); /** @var Device $device */
