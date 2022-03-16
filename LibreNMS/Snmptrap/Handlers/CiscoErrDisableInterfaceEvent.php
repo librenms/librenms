@@ -49,7 +49,7 @@ class CiscoErrDisableInterfaceEvent implements SnmptrapHandler
         $cause = $trap->getOidData($trap->findOid('CISCO-ERR-DISABLE-MIB::cErrDisableIfStatusCause.' . $ifIndex[1] . '.0'));
 
         if (! $port) {
-            Log::event('SNMP TRAP: ' . $cause . ' error detected. Unknown ifIndex for devcie or not found in trap.', $device->device_id, 'trap', 4);
+            Log::event('SNMP TRAP: ' . $cause . ' error detected on unknown port. Either ifIndex is not found in the trap, or it does not match a port on this device.', $device->device_id, 'trap', 4);
 
             return;
         }
