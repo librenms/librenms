@@ -15,7 +15,7 @@ the values we expect to see the data in:
 | cooling                     | W               | |
 | count                       | #               | |
 | count_rate                  | #/s             | Computes variation in RRD (using type COUNTER instead of GAUGE) |
-| current                     | A               | | 
+| current                     | A               | |
 | dbm                         | dBm             | |
 | delay                       | s               | |
 | eer                         | eer             | |
