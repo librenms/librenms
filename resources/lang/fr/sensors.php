@@ -42,10 +42,16 @@ return [
         'unit_long' => 'Watts',
     ],
     'count' => [
-        'short' => 'Count',
-        'long' => 'Count',
+        'short' => 'Compteur',
+        'long' => 'Compteur',
         'unit' => '',
         'unit_long' => '',
+    ],
+    'count_rate' => [
+        'short' => 'Variation',
+        'long' => 'Variation',
+        'unit' => '#/s',
+        'unit_long' => 'Unités par seconde',
     ],
     'current' => [
         'short' => 'Courant',
