@@ -53,6 +53,11 @@ CISCO-ERR-DISABLE-MIB::cErrDisableIfStatusCause.$port->ifIndex.0 bpduGuard";
         $this->assertTrue(Dispatcher::handle($trap), 'Could not handle testErrDisableInterfaceEvent trap');
     }
 
+    /**
+     * Test CiscoErrDisableBadIfIndex trap handle
+     *
+     * @return void
+     */
     public function testErrDisableBadIfIndex()
     {
         $device = Device::factory()->create(); /** @var Device $device */
