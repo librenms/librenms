@@ -41,6 +41,7 @@ so you can view the disk I/O usage delta.
 ## Installation Manual for
 
 1. [RRDCached installation Ubuntu 16](#rrdcached-installation-ubuntu-16)
+1. [RRDCached installation Ubuntu 20.04](#rrdcached-installation-ubuntu-20)
 1. [RRDCached installation Debian Buster](#rrdcached-installation-debian-buster)
 1. [RRDCached installation Debian Stretch](#rrdcached-installation-debian-stretch)
 1. [RRDCached installation CentOS 7 or 8](#rrdcached-installation-centos-7-or-8)
@@ -89,6 +90,50 @@ systemctl restart rrdcached.service
 
 ```php
 $config['rrdcached'] = "unix:/run/rrdcached.sock";
+```
+
+### RRDCached installation Ubuntu 20
+(rrdcached 1.7.2)
+
+1: Install rrdcached
+
+```bash
+sudo apt-get install rrdcached
+```
+
+2: Edit `/etc/default/rrdcached` to include:
+
+```
+DAEMON=/usr/bin/rrdcached
+DAEMON_USER=librenms
+DAEMON_GROUP=librenms
+WRITE_THREADS=4
+WRITE_TIMEOUT=1800
+WRITE_JITTER=1800
+BASE_PATH=/opt/librenms/rrd/
+JOURNAL_PATH=/var/lib/rrdcached/journal/
+PIDFILE=/run/rrdcached.pid
+SOCKFILE=/run/rrdcached.sock
+SOCKGROUP=librenms
+BASE_OPTIONS="-B -F -R"
+```
+
+2: Fix permissions
+
+```bash
+chown librenms:librenms /var/lib/rrdcached/journal/
+```
+
+3: Restart the rrdcached service
+
+```bash
+systemctl restart rrdcached.service
+```
+
+5: Edit `/opt/librenms/config.php` to include:
+
+```php
+$config['rrdcached'] = "unix://run/rrdcached.sock";
 ```
 
 ### RRDCached installation Debian Buster
@@ -148,6 +193,7 @@ $config['rrdcached'] = "IPADDRESS:42217";
 ```
 
 NOTE: change IPADDRESS to the ip the rrdcached server is listening on.
+
 
 ### RRDCached installation Debian Stretch
 (rrdcached 1.6.0)
