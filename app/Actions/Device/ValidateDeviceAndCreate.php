@@ -28,6 +28,7 @@ namespace App\Actions\Device;
 use App\Models\Device;
 use Illuminate\Support\Arr;
 use LibreNMS\Config;
+use LibreNMS\Enum\PortAssociationMode;
 use LibreNMS\Exceptions\HostIpExistsException;
 use LibreNMS\Exceptions\HostnameExistsException;
 use LibreNMS\Exceptions\HostSysnameExistsException;
@@ -79,11 +80,7 @@ class ValidateDeviceAndCreate
         }
 
         $this->exceptIfHostnameExists();
-
-        // defaults
-        $this->device->os = $this->device->os ?: 'generic';
-        $this->device->status_reason = '';
-        $this->device->sysName = $this->device->sysName ?: $this->device->hostname;
+        $this->fillDefaults();
 
         if (! $this->force) {
             $this->exceptIfIpExists();
@@ -178,6 +175,20 @@ class ValidateDeviceAndCreate
             $this->device->authalgo = null;
             $this->device->cryptopass = null;
             $this->device->cryptoalgo = null;
+        }
+    }
+
+    private function fillDefaults(): void
+    {
+        $this->device->port = $this->device->port ?: Config::get('snmp.port', 161);
+        $this->device->transport = $this->device->transport ?: Config::get('snmp.transports.0', 'udp');
+        $this->device->poller_group = $this->device->poller_group ?: Config::get('default_poller_group', 0);
+        $this->device->os = $this->device->os ?: 'generic';
+        $this->device->status_reason = '';
+        $this->device->sysName = $this->device->sysName ?: $this->device->hostname;
+        $this->device->port_association_mode = $this->device->port_association_mode ?: Config::get('default_port_association_mode', 'ifIndex');
+        if (! is_int($this->device->port_association_mode)) {
+            $this->device->port_association_mode = PortAssociationMode::getId($this->device->port_association_mode) ?? 1;
         }
     }
 

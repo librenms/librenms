@@ -57,15 +57,15 @@ class DeviceAdd extends LnmsCommand
         $this->addOption('ping-fallback', 'b', InputOption::VALUE_NONE);
         $this->addOption('port-association-mode', 'p', InputOption::VALUE_REQUIRED, null, Config::get('default_port_association_mode'));
         $this->addOption('community', 'c', InputOption::VALUE_REQUIRED);
-        $this->addOption('transport', 't', InputOption::VALUE_REQUIRED, null, 'udp');
-        $this->addOption('port', 'r', InputOption::VALUE_REQUIRED, null, 161);
+        $this->addOption('transport', 't', InputOption::VALUE_REQUIRED, null, Config::get('snmp.transports.0', 'udp'));
+        $this->addOption('port', 'r', InputOption::VALUE_REQUIRED, null, Config::get('snmp.port', 161));
         $this->addOption('security-name', 'u', InputOption::VALUE_REQUIRED, null, 'root');
         $this->addOption('auth-password', 'A', InputOption::VALUE_REQUIRED);
         $this->addOption('auth-protocol', 'a', InputOption::VALUE_REQUIRED, null, 'MD5');
         $this->addOption('privacy-password', 'X', InputOption::VALUE_REQUIRED);
         $this->addOption('privacy-protocol', 'x', InputOption::VALUE_REQUIRED, null, 'AES');
         $this->addOption('ping-only', 'P', InputOption::VALUE_NONE);
-        $this->addOption('os', 'o', InputOption::VALUE_REQUIRED, null, 'ping');
+        $this->addOption('os', 'o', InputOption::VALUE_REQUIRED);
         $this->addOption('hardware', 'w', InputOption::VALUE_REQUIRED);
         $this->addOption('sysName', 's', InputOption::VALUE_REQUIRED);
     }
