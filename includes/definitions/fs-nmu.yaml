@@ -14,8 +14,6 @@ discovery:
             - .1.3.6.1.2.1.1.2
             - .1.3.6.1.4.1.40989
 poller_modules:
-    os: true
     sensors: true
 discovery_modules:
-    os: true
     sensors: true
