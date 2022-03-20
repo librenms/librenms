@@ -211,6 +211,10 @@ class YamlDiscovery
             $name = $discovery_data[$name];
         }
 
+        if (Str::contains($name, '.')) {
+            [$name, $index] = explode('.', $name, 2);
+        }
+
         if (isset($discovery_data['oid']) && ! is_array($discovery_data['oid']) && isset($pre_cache[$discovery_data['oid']][$index]) && isset($pre_cache[$discovery_data['oid']][$index][$name])) {
             return $pre_cache[$discovery_data['oid']][$index][$name];
         }
@@ -223,9 +227,10 @@ class YamlDiscovery
         $sub_indexes = explode('.', $index);
         // parse sub_index options name with trailing colon and index
         $sub_index = 0;
-        $sub_index_end = null;
-        if (preg_match('/^(.+):(\d+)(?:-(\d+))?$/', $name, $matches)) {
-            [,$name, $sub_index, $sub_index_end] = $matches;
+        if (preg_match('/^(?<name>[^:]+(::[^:]+)?):(?<prefix>[^:]*)(?<index>\d+)(?:-(?<end>\d+))?(?<suffix>.*)$/', $name, $sub_index_matches)) {
+
+            $name = $sub_index_matches['name'];
+            $sub_index = $sub_index_matches['index'];
         }
 
         if (isset($pre_cache[$name]) && ! is_numeric($name)) {
@@ -236,16 +241,17 @@ class YamlDiscovery
                     return $pre_cache[$name][$index];
                 } elseif (count($pre_cache[$name]) === 1 && ! is_array(current($pre_cache[$name]))) {
                     return current($pre_cache[$name]);
-                } elseif (isset($sub_indexes[$sub_index])) {
-                    if ($sub_index_end) {
-                        $multi_sub_index = implode('.', array_slice($sub_indexes, $sub_index, $sub_index_end));
+                } elseif (isset($sub_indexes[$sub_index])) { // check if the sub index exists
+                    if ($sub_index_matches['end']) {
+                        $multi_sub_index = $sub_index_matches['prefix'] . implode('.', array_slice($sub_indexes, $sub_index, $sub_index_matches['end'])) . $sub_index_matches['suffix'];
                         if (isset($pre_cache[$name][$multi_sub_index][$name])) {
                             return $pre_cache[$name][$multi_sub_index][$name];
                         }
                     }
 
-                    if (isset($pre_cache[$name][$sub_indexes[$sub_index]][$name])) {
-                        return $pre_cache[$name][$sub_indexes[$sub_index]][$name];
+                    $full_index = $sub_index_matches['prefix'] . $sub_indexes[$sub_index] . $sub_index_matches['suffix'];
+                    if (isset($pre_cache[$name][$full_index][$name])) {
+                        return $pre_cache[$name][$full_index][$name];
                     }
                 }
             } else {
