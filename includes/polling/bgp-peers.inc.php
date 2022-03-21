@@ -428,7 +428,7 @@ if (\LibreNMS\Config::get('enable_bgp')) {
                     }
 
                     // --- Fill the bgpPeerIface column with bgpLocalAddr ---
-                    if ($device['os'] == 'cumulus' && isset($peer_data['bgpLocalAddr'])) {
+                    if (isset($peer_data['bgpLocalAddr'])) {
                         if (filter_var($peer_data['bgpLocalAddr'], FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) {
                             $ipv4 = IP::fromHexString($peer_data['bgpLocalAddr'])->uncompressed();
                             $bgpPeerIface = DB::table('ports')->join('ipv4_addresses', 'ports.port_id', '=', 'ipv4_addresses.port_id')->where('ipv4_address', '=', $ipv4)->where('device_id', '=', $device['device_id'])->first()->ifIndex;
