@@ -38953,7 +38953,8 @@
                     "bgpPeerInUpdateElapsedTime": 13,
                     "context_name": "",
                     "bgpLocalAs": 55832,
-                    "vrfLocalAs": null
+                    "vrfLocalAs": null,
+                    "bgpPeerIface": null
                 },
                 {
                     "astext": "",
@@ -38975,7 +38976,8 @@
                     "bgpPeerInUpdateElapsedTime": 12,
                     "context_name": "",
                     "bgpLocalAs": 55832,
-                    "vrfLocalAs": null
+                    "vrfLocalAs": null,
+                    "bgpPeerIface": null
                 }
             ]
         }

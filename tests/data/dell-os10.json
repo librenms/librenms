@@ -9037,7 +9037,8 @@
                     "bgpPeerInUpdateElapsedTime": 27997600,
                     "context_name": null,
                     "bgpLocalAs": 64514,
-                    "vrfLocalAs": null
+                    "vrfLocalAs": null,
+                    "bgpPeerIface": null
                 }
             ],
             "bgpPeers_cbgp": [

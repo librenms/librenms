@@ -1554,7 +1554,8 @@
                     "vrfLocalAs": null,
                     "bgpPeerLastErrorCode": 6,
                     "bgpPeerLastErrorSubCode": 2,
-                    "bgpPeerLastErrorText": "administrative shutdown"
+                    "bgpPeerLastErrorText": "administrative shutdown",
+                    "bgpPeerIface": null
                 },
                 {
                     "astext": "",
@@ -1576,7 +1577,8 @@
                     "vrfLocalAs": null,
                     "bgpPeerLastErrorCode": null,
                     "bgpPeerLastErrorSubCode": null,
-                    "bgpPeerLastErrorText": null
+                    "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null
                 },
                 {
                     "astext": "",
@@ -1598,7 +1600,8 @@
                     "vrfLocalAs": null,
                     "bgpPeerLastErrorCode": null,
                     "bgpPeerLastErrorSubCode": null,
-                    "bgpPeerLastErrorText": null
+                    "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null
                 },
                 {
                     "astext": "",
@@ -1620,7 +1623,8 @@
                     "vrfLocalAs": null,
                     "bgpPeerLastErrorCode": null,
                     "bgpPeerLastErrorSubCode": null,
-                    "bgpPeerLastErrorText": null
+                    "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null
                 },
                 {
                     "astext": "",
@@ -1642,7 +1646,8 @@
                     "vrfLocalAs": null,
                     "bgpPeerLastErrorCode": null,
                     "bgpPeerLastErrorSubCode": null,
-                    "bgpPeerLastErrorText": null
+                    "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null
                 },
                 {
                     "astext": "",
@@ -1664,7 +1669,8 @@
                     "vrfLocalAs": null,
                     "bgpPeerLastErrorCode": null,
                     "bgpPeerLastErrorSubCode": null,
-                    "bgpPeerLastErrorText": null
+                    "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null
                 },
                 {
                     "astext": "",
@@ -1686,7 +1692,8 @@
                     "vrfLocalAs": null,
                     "bgpPeerLastErrorCode": null,
                     "bgpPeerLastErrorSubCode": null,
-                    "bgpPeerLastErrorText": null
+                    "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null
                 },
                 {
                     "astext": "",
@@ -1708,7 +1715,8 @@
                     "vrfLocalAs": null,
                     "bgpPeerLastErrorCode": null,
                     "bgpPeerLastErrorSubCode": null,
-                    "bgpPeerLastErrorText": null
+                    "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null
                 },
                 {
                     "astext": "",
@@ -1730,7 +1738,8 @@
                     "vrfLocalAs": null,
                     "bgpPeerLastErrorCode": null,
                     "bgpPeerLastErrorSubCode": null,
-                    "bgpPeerLastErrorText": null
+                    "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null
                 },
                 {
                     "astext": "",
@@ -1752,7 +1761,8 @@
                     "vrfLocalAs": null,
                     "bgpPeerLastErrorCode": null,
                     "bgpPeerLastErrorSubCode": null,
-                    "bgpPeerLastErrorText": null
+                    "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null
                 },
                 {
                     "astext": "",
@@ -1774,7 +1784,8 @@
                     "vrfLocalAs": null,
                     "bgpPeerLastErrorCode": null,
                     "bgpPeerLastErrorSubCode": null,
-                    "bgpPeerLastErrorText": null
+                    "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null
                 },
                 {
                     "astext": "",
@@ -1796,7 +1807,8 @@
                     "vrfLocalAs": null,
                     "bgpPeerLastErrorCode": null,
                     "bgpPeerLastErrorSubCode": null,
-                    "bgpPeerLastErrorText": null
+                    "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null
                 },
                 {
                     "astext": "",
@@ -1818,7 +1830,8 @@
                     "vrfLocalAs": null,
                     "bgpPeerLastErrorCode": null,
                     "bgpPeerLastErrorSubCode": null,
-                    "bgpPeerLastErrorText": null
+                    "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null
                 },
                 {
                     "astext": "",
@@ -1840,7 +1853,8 @@
                     "vrfLocalAs": null,
                     "bgpPeerLastErrorCode": null,
                     "bgpPeerLastErrorSubCode": null,
-                    "bgpPeerLastErrorText": null
+                    "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null
                 },
                 {
                     "astext": "",
@@ -1862,7 +1876,8 @@
                     "vrfLocalAs": null,
                     "bgpPeerLastErrorCode": null,
                     "bgpPeerLastErrorSubCode": null,
-                    "bgpPeerLastErrorText": null
+                    "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null
                 },
                 {
                     "astext": "",
@@ -1884,7 +1899,8 @@
                     "vrfLocalAs": null,
                     "bgpPeerLastErrorCode": null,
                     "bgpPeerLastErrorSubCode": null,
-                    "bgpPeerLastErrorText": null
+                    "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null
                 },
                 {
                     "astext": "",
@@ -1906,7 +1922,8 @@
                     "vrfLocalAs": null,
                     "bgpPeerLastErrorCode": null,
                     "bgpPeerLastErrorSubCode": null,
-                    "bgpPeerLastErrorText": null
+                    "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null
                 },
                 {
                     "astext": "",
@@ -1928,7 +1945,8 @@
                     "vrfLocalAs": null,
                     "bgpPeerLastErrorCode": null,
                     "bgpPeerLastErrorSubCode": null,
-                    "bgpPeerLastErrorText": null
+                    "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null
                 },
                 {
                     "astext": "",
@@ -1950,7 +1968,8 @@
                     "vrfLocalAs": null,
                     "bgpPeerLastErrorCode": null,
                     "bgpPeerLastErrorSubCode": null,
-                    "bgpPeerLastErrorText": null
+                    "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null
                 },
                 {
                     "astext": "",
@@ -1972,7 +1991,8 @@
                     "vrfLocalAs": null,
                     "bgpPeerLastErrorCode": null,
                     "bgpPeerLastErrorSubCode": null,
-                    "bgpPeerLastErrorText": null
+                    "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null
                 },
                 {
                     "astext": "",
@@ -1994,7 +2014,8 @@
                     "vrfLocalAs": null,
                     "bgpPeerLastErrorCode": null,
                     "bgpPeerLastErrorSubCode": null,
-                    "bgpPeerLastErrorText": null
+                    "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null
                 },
                 {
                     "astext": "",
@@ -2016,7 +2037,8 @@
                     "vrfLocalAs": null,
                     "bgpPeerLastErrorCode": null,
                     "bgpPeerLastErrorSubCode": null,
-                    "bgpPeerLastErrorText": null
+                    "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null
                 },
                 {
                     "astext": "",
@@ -2038,7 +2060,8 @@
                     "vrfLocalAs": null,
                     "bgpPeerLastErrorCode": null,
                     "bgpPeerLastErrorSubCode": null,
-                    "bgpPeerLastErrorText": null
+                    "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null
                 },
                 {
                     "astext": "",
@@ -2060,7 +2083,8 @@
                     "vrfLocalAs": null,
                     "bgpPeerLastErrorCode": null,
                     "bgpPeerLastErrorSubCode": null,
-                    "bgpPeerLastErrorText": null
+                    "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null
                 },
                 {
                     "astext": "",
@@ -2082,7 +2106,8 @@
                     "vrfLocalAs": null,
                     "bgpPeerLastErrorCode": null,
                     "bgpPeerLastErrorSubCode": null,
-                    "bgpPeerLastErrorText": null
+                    "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null
                 },
                 {
                     "astext": "",
@@ -2104,7 +2129,8 @@
                     "vrfLocalAs": null,
                     "bgpPeerLastErrorCode": null,
                     "bgpPeerLastErrorSubCode": null,
-                    "bgpPeerLastErrorText": null
+                    "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null
                 },
                 {
                     "astext": "",
@@ -2126,7 +2152,8 @@
                     "vrfLocalAs": null,
                     "bgpPeerLastErrorCode": null,
                     "bgpPeerLastErrorSubCode": null,
-                    "bgpPeerLastErrorText": null
+                    "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null
                 },
                 {
                     "astext": "",
@@ -2148,7 +2175,8 @@
                     "vrfLocalAs": null,
                     "bgpPeerLastErrorCode": null,
                     "bgpPeerLastErrorSubCode": null,
-                    "bgpPeerLastErrorText": null
+                    "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null
                 },
                 {
                     "astext": "",
@@ -2170,7 +2198,8 @@
                     "vrfLocalAs": null,
                     "bgpPeerLastErrorCode": null,
                     "bgpPeerLastErrorSubCode": null,
-                    "bgpPeerLastErrorText": null
+                    "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null
                 },
                 {
                     "astext": "",
@@ -2192,7 +2221,8 @@
                     "vrfLocalAs": null,
                     "bgpPeerLastErrorCode": null,
                     "bgpPeerLastErrorSubCode": null,
-                    "bgpPeerLastErrorText": null
+                    "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null
                 },
                 {
                     "astext": "",
@@ -2214,7 +2244,8 @@
                     "vrfLocalAs": null,
                     "bgpPeerLastErrorCode": null,
                     "bgpPeerLastErrorSubCode": null,
-                    "bgpPeerLastErrorText": null
+                    "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null
                 },
                 {
                     "astext": "",
@@ -2236,7 +2267,8 @@
                     "vrfLocalAs": null,
                     "bgpPeerLastErrorCode": null,
                     "bgpPeerLastErrorSubCode": null,
-                    "bgpPeerLastErrorText": null
+                    "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null
                 },
                 {
                     "astext": "",
@@ -2258,7 +2290,8 @@
                     "vrfLocalAs": null,
                     "bgpPeerLastErrorCode": null,
                     "bgpPeerLastErrorSubCode": null,
-                    "bgpPeerLastErrorText": null
+                    "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null
                 },
                 {
                     "astext": "",
@@ -2280,7 +2313,8 @@
                     "vrfLocalAs": null,
                     "bgpPeerLastErrorCode": null,
                     "bgpPeerLastErrorSubCode": null,
-                    "bgpPeerLastErrorText": null
+                    "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null
                 }
             ],
             "bgpPeers_cbgp": [
