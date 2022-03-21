@@ -146,8 +146,8 @@ If this is undesirable, there are ways to affect the indexes that will be search
 This may be used in either simple template format (as shown below) or the full value of the field.
 
 Hardcoded index: `{{ $ifName.5 }}`
-Partial index: `{{ $ifName:2 }}`
-Partial index range: `{{ $ifName:2-3 }}`
+Partial index: `{{ $ifName:2 }}` where the number is the index of the sub index (starting with 0)
+Partial index range: `{{ $ifName:2-3 }}` You can match multiple contiguous index segments
 Partial (or full) index + hardcoded suffix: `{{ $ifName:0.suffix }}`
 Partial (or full) index + hardcoded prefix: `{{ $ifName:prefix.0 }}` note doesn't work with numeric prefix
 Partial (or full) index + hardcoded prefix and suffix: `{{ $ifName:prefix.0.suffix }}`
