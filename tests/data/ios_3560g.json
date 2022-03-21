@@ -22,7 +22,8 @@
                     "vrfLocalAs": null,
                     "bgpPeerLastErrorCode": null,
                     "bgpPeerLastErrorSubCode": null,
-                    "bgpPeerLastErrorText": null
+                    "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null
                 },
                 {
                     "astext": "",
@@ -44,7 +45,8 @@
                     "vrfLocalAs": null,
                     "bgpPeerLastErrorCode": null,
                     "bgpPeerLastErrorSubCode": null,
-                    "bgpPeerLastErrorText": null
+                    "bgpPeerLastErrorText": null,
+                    "bgpPeerIface": null
                 }
             ],
             "bgpPeers_cbgp": [
