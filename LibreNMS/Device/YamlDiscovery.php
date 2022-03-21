@@ -33,6 +33,7 @@ use LibreNMS\Config;
 use LibreNMS\Exceptions\InvalidOidException;
 use LibreNMS\Interfaces\Discovery\DiscoveryItem;
 use LibreNMS\OS;
+use Log;
 
 class YamlDiscovery
 {
@@ -182,7 +183,7 @@ class YamlDiscovery
             $template->replaceWith(function ($matches) use ($index, $def, $pre_cache) {
                 $replace = static::getValueFromData($matches[1], $index, $def, $pre_cache);
                 if (is_null($replace)) {
-                    \Log::warning('YamlDiscovery: No variable available to replace ' . $matches[1]);
+                    Log::warning('YamlDiscovery: No variable available to replace ' . $matches[1]);
 
                     return ''; // remove the unavailable variable
                 }
@@ -211,6 +212,15 @@ class YamlDiscovery
             $name = $discovery_data[$name];
         }
 
+        //create the sub-index values in order to try to match them with precache
+        $sub_indexes = explode('.', $index);
+        // parse sub_index options name with trailing colon and index
+        $sub_index = 0;
+        if (preg_match('/^(?<name>[^:]+(::[^:]+)?):(?<prefix>[^:-]*?)(?<index>\d+)(?:-(?<end>\d+))?(?<suffix>.*)$/', $name, $sub_index_matches)) {
+            $name = $sub_index_matches['name'];
+            $sub_index = $sub_index_matches['index'];
+        }
+
         if (Str::contains($name, '.')) {
             [$name, $index] = explode('.', $name, 2);
         }
@@ -223,33 +233,34 @@ class YamlDiscovery
             return $pre_cache[$index][$name];
         }
 
-        //create the sub-index values in order to try to match them with precache
-        $sub_indexes = explode('.', $index);
-        // parse sub_index options name with trailing colon and index
-        $sub_index = 0;
-        if (preg_match('/^(?<name>[^:]+(::[^:]+)?):(?<prefix>[^:]*)(?<index>\d+)(?:-(?<end>\d+))?(?<suffix>.*)$/', $name, $sub_index_matches)) {
-
-            $name = $sub_index_matches['name'];
-            $sub_index = $sub_index_matches['index'];
-        }
-
         if (isset($pre_cache[$name]) && ! is_numeric($name)) {
             if (is_array($pre_cache[$name])) {
+                Log::debug("getValueFromData($name): trying [$name][$index][$name]");
                 if (isset($pre_cache[$name][$index][$name])) {
                     return $pre_cache[$name][$index][$name];
-                } elseif (isset($pre_cache[$name][$index])) {
+                }
+
+                Log::debug("getValueFromData($name): trying [$name][$index]");
+                if (isset($pre_cache[$name][$index])) {
                     return $pre_cache[$name][$index];
-                } elseif (count($pre_cache[$name]) === 1 && ! is_array(current($pre_cache[$name]))) {
+                }
+
+                Log::debug("getValueFromData($name): trying [$name]");
+                if (count($pre_cache[$name]) === 1 && ! is_array(current($pre_cache[$name]))) {
                     return current($pre_cache[$name]);
-                } elseif (isset($sub_indexes[$sub_index])) { // check if the sub index exists
+                }
+
+                if (isset($sub_indexes[$sub_index])) { // check if the sub index exists
                     if ($sub_index_matches['end']) {
-                        $multi_sub_index = $sub_index_matches['prefix'] . implode('.', array_slice($sub_indexes, $sub_index, $sub_index_matches['end'])) . $sub_index_matches['suffix'];
+                        $multi_sub_index = $sub_index_matches['prefix'] . implode('.', array_slice($sub_indexes, $sub_index, $sub_index_matches['end'] + 1 - $sub_index)) . $sub_index_matches['suffix'];
+                        Log::debug("getValueFromData($name): trying [$name][$multi_sub_index][$name]");
                         if (isset($pre_cache[$name][$multi_sub_index][$name])) {
                             return $pre_cache[$name][$multi_sub_index][$name];
                         }
                     }
 
                     $full_index = $sub_index_matches['prefix'] . $sub_indexes[$sub_index] . $sub_index_matches['suffix'];
+                    Log::debug("getValueFromData($name): trying [$name][$full_index][$name]");
                     if (isset($pre_cache[$name][$full_index][$name])) {
                         return $pre_cache[$name][$full_index][$name];
                     }

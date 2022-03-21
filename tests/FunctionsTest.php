@@ -95,6 +95,19 @@ sdfsd <a href="ftp://192.168.1.1/help/me/now.php">ftp://192.168.1.1/help/me/now.
                 12 => ['doubletable' => 'Mustard'],
                 13 => ['doubletable' => 'BBQ'],
             ],
+            'prefix' => [
+                'prefix.1' => ['prefix' => 'p-one'],
+                'prefix.2' => ['prefix' => 'p-two'],
+            ],
+            'suffix' => [
+                '1.0.suffix' => ['suffix' => 's-zero'],
+                '2.1.suffix' => ['suffix' => 's-one'],
+            ],
+            'hardcode' => [
+                33 => 'number',
+                'zing' => 'zang',
+                'foo' => ['hardcode' => 'bar'],
+            ],
         ];
 
         $data = ['value' => 'temp', 'oid' => 'firstdata'];
@@ -115,6 +128,29 @@ sdfsd <a href="ftp://192.168.1.1/help/me/now.php">ftp://192.168.1.1/help/me/now.
         $this->assertSame(10, YamlDiscovery::getValueFromData('oneoff', 3, $data, $pre_cache));
         $this->assertSame('Pickle', YamlDiscovery::getValueFromData('singletable', 11, $data, $pre_cache));
         $this->assertSame('BBQ', YamlDiscovery::getValueFromData('doubletable', 13, $data, $pre_cache));
+
+        // sub-index single
+        $this->assertSame('Pickle', YamlDiscovery::getValueFromData('singletable:1', '42.11', ['oid' => 'singletable'], $pre_cache));
+
+        // sub-index range
+        $this->assertSame('p-one', YamlDiscovery::getValueFromData('prefix:2-3', '42.11.prefix.1.43.57', ['oid' => 'prefix'], $pre_cache));
+
+        // hardcoded index
+        $data = ['oid' => 'bleh'];
+        $this->assertSame('Pickle', YamlDiscovery::getValueFromData('singletable.11', 'unused', $data, $pre_cache));
+        $this->assertSame('number', YamlDiscovery::getValueFromData('hardcode.33', '42', $data, $pre_cache));
+        $this->assertSame('zang', YamlDiscovery::getValueFromData('hardcode.zing', '43', $data, $pre_cache));
+        $this->assertSame('bar', YamlDiscovery::getValueFromData('hardcode.foo', '44', $data, $pre_cache));
+
+        // prefix
+        $data = ['oid' => 'suffix'];
+        $this->assertSame('p-one', YamlDiscovery::getValueFromData('prefix:prefix.0', '1', $data, $pre_cache));
+        $this->assertSame('p-two', YamlDiscovery::getValueFromData('prefix:prefix.0', 2, $data, $pre_cache));
+
+        // suffix
+        $this->assertSame('s-zero', YamlDiscovery::getValueFromData('suffix:0.0.suffix', 1, $data, $pre_cache));
+        $this->assertSame('s-one', YamlDiscovery::getValueFromData('suffix:0-1.suffix', '2.1', $data, $pre_cache));
+        $this->assertSame('s-one', YamlDiscovery::getValueFromData('suffix:0-2', '2.1.suffix', $data, $pre_cache));
     }
 
     public function testParseAtTime()
