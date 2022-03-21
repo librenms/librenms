@@ -278,7 +278,7 @@ Example: 192.168.0.1/32 will be treated as a single host address""",
     networks = []
     for net in netargs if netargs else CONFIG.get("nets", []):
         try:
-            networks.append(ip_network(u"%s" % net, True))
+            networks.append(ip_network("%s" % net, True))
             debug("Network parsed: {}".format(net), 2)
         except ValueError as e:
             parser.error("Invalid network format {}".format(e))
