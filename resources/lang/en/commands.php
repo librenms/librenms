@@ -64,6 +64,43 @@ return [
         'removed' => 'Device :id removed',
         'updated' => 'Device :hostname (:id) updated',
     ],
+    'device:add' => [
+        'description' => 'Add a new device',
+        'arguments' => [
+            'device spec' => 'Hostname or IP to add',
+        ],
+        'options' => [
+            'v1' => 'Use SNMP v1',
+            'v2c' => 'Use SNMP v2c',
+            'v3' => 'Use SNMP v3',
+            'display-name' => 'A string to display as the name of this device, defaults to hostname. May be a simple template using replacements: {{ $hostname }}, {{ $sysName }}, {{ $sysName_fallback }}, {{ $ip }}',
+            'force' => 'Just add the device, do not make any safety checks',
+            'group' => 'Poller group (for distributed polling)',
+            'ping-fallback' => 'Add the device as ping only if it does not respond to SNMP',
+            'port-association-mode' => 'Sets how ports are mapped. ifName is suggested for Linux/Unix',
+            'community' => 'SNMP v1 or v2 community',
+            'transport' => 'Transport to connect to the device',
+            'port' => 'SNMP transport port',
+            'security-name' => 'SNMPv3 security username',
+            'auth-password' => 'SNMPv3 authentication password',
+            'auth-protocol' => 'SNMPv3 authentication protocol',
+            'privacy-protocol' => 'SNMPv3 privacy protocol',
+            'privacy-password' => 'SNMPv3 privacy password',
+            'ping-only' => 'Add a ping only device',
+            'os' => 'Ping only: specify OS',
+            'hardware' => 'Ping only: specify hardware',
+            'sysName' => 'Ping only: specify sysName',
+        ],
+        'validation-errors' => [
+            'port.between' => 'Port should be 1-65535',
+            'poller-group.in' => 'The given poller-group does not exist',
+        ],
+        'messages' => [
+            'save_failed' => 'Failed to save device :hostname',
+            'try_force' => 'You my try with the --force option to skip safety checks',
+            'added' => 'Added device :hostname (:device_id)',
+        ],
+    ],
     'device:ping' => [
         'description' => 'Ping device and record data for response',
         'arguments' => [
@@ -102,6 +139,11 @@ return [
         'validation-errors' => [
             'not_in' => ':attribute must not match current APP_KEY',
             'required' => 'Either old key or --generate-new-key is required.',
+        ],
+    ],
+    'lnms' => [
+        'validation-errors' => [
+            'optionValue' => 'Selected :option is invalid. Should be one of: :values',
         ],
     ],
     'smokeping:generate' => [

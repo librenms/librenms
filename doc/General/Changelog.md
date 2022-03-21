@@ -1,3 +1,104 @@
+## 22.3.0
+*(2022-03-17)*
+
+A big thank you to the following 22 contributors this last month:
+
+  - [murrant](https://github.com/murrant) (7)
+  - [Jellyfrog](https://github.com/Jellyfrog) (5)
+  - [bonzo81](https://github.com/bonzo81) (4)
+  - [laf](https://github.com/laf) (3)
+  - [PipoCanaja](https://github.com/PipoCanaja) (2)
+  - [charlyforot](https://github.com/charlyforot) (2)
+  - [geg347](https://github.com/geg347) (2)
+  - [westerterp](https://github.com/westerterp) (2)
+  - [ospfbgp](https://github.com/ospfbgp) (1)
+  - [MrXermon](https://github.com/MrXermon) (1)
+  - [pandalion98](https://github.com/pandalion98) (1)
+  - [eskyuu](https://github.com/eskyuu) (1)
+  - [josh-silvas](https://github.com/josh-silvas) (1)
+  - [martinberg](https://github.com/martinberg) (1)
+  - [lpailhas](https://github.com/lpailhas) (1)
+  - [hanserasmus](https://github.com/hanserasmus) (1)
+  - [si458](https://github.com/si458) (1)
+  - [SantiagoSilvaZ](https://github.com/SantiagoSilvaZ) (1)
+  - [LTangaF](https://github.com/LTangaF) (1)
+  - [dlangille](https://github.com/dlangille) (1)
+  - [Npeca75](https://github.com/Npeca75) (1)
+  - [woidi](https://github.com/woidi) (1)
+
+Thanks to maintainers and others that helped with pull requests this month:
+
+  - [Jellyfrog](https://github.com/Jellyfrog) (19)
+  - [murrant](https://github.com/murrant) (10)
+  - [laf](https://github.com/laf) (8)
+  - [SourceDoctor](https://github.com/SourceDoctor) (3)
+  - [ottorei](https://github.com/ottorei) (1)
+  - [bboy8012](https://github.com/bboy8012) (1)
+  - [PipoCanaja](https://github.com/PipoCanaja) (1)
+
+#### Feature
+* Device_add support display field ([#13846](https://github.com/librenms/librenms/pull/13846)) - [murrant](https://github.com/murrant)
+* Display Name in availability map ([#13841](https://github.com/librenms/librenms/pull/13841)) - [murrant](https://github.com/murrant)
+* Implement OAuth and SAML2 support ([#13764](https://github.com/librenms/librenms/pull/13764)) - [Jellyfrog](https://github.com/Jellyfrog)
+
+#### Security
+* Resolved XSS issue from alert rule list modal ([#13805](https://github.com/librenms/librenms/pull/13805)) - [laf](https://github.com/laf)
+
+#### Device
+* Add support for VOSS 8.6 ([#13857](https://github.com/librenms/librenms/pull/13857)) - [ospfbgp](https://github.com/ospfbgp)
+* Device - HWG-WLD version 2 support ([#13849](https://github.com/librenms/librenms/pull/13849)) - [PipoCanaja](https://github.com/PipoCanaja)
+* Fix an issue with the APC current discovery ([#13837](https://github.com/librenms/librenms/pull/13837)) - [eskyuu](https://github.com/eskyuu)
+* Add VS state for Gaia ([#13831](https://github.com/librenms/librenms/pull/13831)) - [martinberg](https://github.com/martinberg)
+* [new OS] Alpine OptoElectronics TDCM-EDFA support ([#13825](https://github.com/librenms/librenms/pull/13825)) - [charlyforot](https://github.com/charlyforot)
+* Fix db delete on cisco-vrf-lite discovery ([#13823](https://github.com/librenms/librenms/pull/13823)) - [lpailhas](https://github.com/lpailhas)
+* Add rocky linux OS identification ([#13815](https://github.com/librenms/librenms/pull/13815)) - [hanserasmus](https://github.com/hanserasmus)
+* Detect truenas scale ([#13812](https://github.com/librenms/librenms/pull/13812)) - [si458](https://github.com/si458)
+* [comware] dropped dbfetch from discovery/sensors ([#13796](https://github.com/librenms/librenms/pull/13796)) - [Npeca75](https://github.com/Npeca75)
+* Correct divisor in discovery definition vertiv-pdu.yaml ([#13768](https://github.com/librenms/librenms/pull/13768)) - [woidi](https://github.com/woidi)
+
+#### Webui
+* Fixed displaying hostname in create bill when port is passed ([#13830](https://github.com/librenms/librenms/pull/13830)) - [laf](https://github.com/laf)
+* Fix Oxidized Config tab showing when Device OS or Device Type is disabled ([#13809](https://github.com/librenms/librenms/pull/13809)) - [westerterp](https://github.com/westerterp)
+* Position the buttons in the center on user preferences page ([#13802](https://github.com/librenms/librenms/pull/13802)) - [SantiagoSilvaZ](https://github.com/SantiagoSilvaZ)
+* Add usage hints for Display Name placeholder usage ([#13801](https://github.com/librenms/librenms/pull/13801)) - [LTangaF](https://github.com/LTangaF)
+* Fix second menu bar in Apps screens ([#13800](https://github.com/librenms/librenms/pull/13800)) - [westerterp](https://github.com/westerterp)
+* WebUI - Search results for ports ([#13787](https://github.com/librenms/librenms/pull/13787)) - [PipoCanaja](https://github.com/PipoCanaja)
+
+#### Alerting
+* Newer versions of Jira use HTTP code 201 fore created issues ([#13852](https://github.com/librenms/librenms/pull/13852)) - [MrXermon](https://github.com/MrXermon)
+* Add extra dynamic values alerttransport alertmanager ([#13828](https://github.com/librenms/librenms/pull/13828)) - [geg347](https://github.com/geg347)
+
+#### Snmp Traps
+* Add APC SmartAvrReducing trap handlers ([#13839](https://github.com/librenms/librenms/pull/13839)) - [bonzo81](https://github.com/bonzo81)
+* Add APC upsOnBattery & powerRestored trap handler ([#13836](https://github.com/librenms/librenms/pull/13836)) - [bonzo81](https://github.com/bonzo81)
+* Add OspfTxRetransmit Trap Handler ([#13824](https://github.com/librenms/librenms/pull/13824)) - [bonzo81](https://github.com/bonzo81)
+* Cisco Mac address violation trap handler ([#13811](https://github.com/librenms/librenms/pull/13811)) - [bonzo81](https://github.com/bonzo81)
+
+#### Api
+* Adds API call to update port notes on devices. ([#13834](https://github.com/librenms/librenms/pull/13834)) - [josh-silvas](https://github.com/josh-silvas)
+
+#### Bug
+* Rewrite agent packages parsing code ([#13840](https://github.com/librenms/librenms/pull/13840)) - [murrant](https://github.com/murrant)
+* Fix snmpv3 context when empty SnmpQuery ([#13832](https://github.com/librenms/librenms/pull/13832)) - [murrant](https://github.com/murrant)
+* Regression fix from b6a8b602b891d9eb8633f62632c17bdc559cd620 ([#13819](https://github.com/librenms/librenms/pull/13819)) - [Jellyfrog](https://github.com/Jellyfrog)
+* Fix PHPStan Deprecated test ([#13794](https://github.com/librenms/librenms/pull/13794)) - [Jellyfrog](https://github.com/Jellyfrog)
+
+#### Refactor
+* Remove addHost from ModuleTestHelper ([#13847](https://github.com/librenms/librenms/pull/13847)) - [murrant](https://github.com/murrant)
+
+#### Tests
+* PHP8 phpstan fix ([#13843](https://github.com/librenms/librenms/pull/13843)) - [murrant](https://github.com/murrant)
+* Fix tests for MariaDB \> 10.5.15 ([#13829](https://github.com/librenms/librenms/pull/13829)) - [Jellyfrog](https://github.com/Jellyfrog)
+* Add MIB to OS helper to tests ([#13795](https://github.com/librenms/librenms/pull/13795)) - [Jellyfrog](https://github.com/Jellyfrog)
+
+#### Misc
+* Add configuration support for IPMIv2 Kg key ([#13845](https://github.com/librenms/librenms/pull/13845)) - [pandalion98](https://github.com/pandalion98)
+* New device:add code ([#13842](https://github.com/librenms/librenms/pull/13842)) - [murrant](https://github.com/murrant)
+* Fix class error name prevents to show BER graph ([#13833](https://github.com/librenms/librenms/pull/13833)) - [charlyforot](https://github.com/charlyforot)
+* Add generic PSU status failed alert rule template ([#13821](https://github.com/librenms/librenms/pull/13821)) - [geg347](https://github.com/geg347)
+* Bump version to 22.2.1 ([#13798](https://github.com/librenms/librenms/pull/13798)) - [dlangille](https://github.com/dlangille)
+
+
 ## 22.2.0
 *(2022-02-16)*
 

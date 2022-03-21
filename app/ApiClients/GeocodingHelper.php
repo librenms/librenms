@@ -50,9 +50,9 @@ trait GeocodingHelper
         }
 
         try {
-            $options = $this->buildGeocodingOptions($address);
+            $client = $this->getClient()->withOptions($this->buildGeocodingOptions($address));
 
-            $response = $this->getClient()->get($this->geocoding_uri, $options);
+            $response = $client->get($this->geocoding_uri);
             $response_data = $response->json();
             if ($this->checkResponse($response, $response_data)) {
                 return $this->parseLatLng($response_data);
