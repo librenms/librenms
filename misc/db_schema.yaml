@@ -214,7 +214,7 @@ bgpPeers:
     - { Field: bgpPeerLastErrorCode, Type: int, 'Null': true, Extra: '' }
     - { Field: bgpPeerLastErrorSubCode, Type: int, 'Null': true, Extra: '' }
     - { Field: bgpPeerLastErrorText, Type: varchar(254), 'Null': true, Extra: '' }
-    - { Field: bgpPeerIface, Type: 'int unsigned', 'Null': false, Extra: '' }
+    - { Field: bgpPeerIface, Type: 'int unsigned', 'Null': true, Extra: '' }
     - { Field: bgpLocalAddr, Type: text, 'Null': false, Extra: '' }
     - { Field: bgpPeerRemoteAddr, Type: text, 'Null': false, Extra: '' }
     - { Field: bgpPeerDescr, Type: varchar(255), 'Null': false, Extra: '', Default: '' }
