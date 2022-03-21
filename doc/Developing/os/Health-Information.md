@@ -139,9 +139,20 @@ well as pre_cached data. The index ($index) and the sub_indexes (in
 case the oid is indexed multiple times) are also available: if
 $index="1.20", then $subindex0="1" and $subindex1="20".
 
+##### Handling mismatched indexes
+
 When referencing an oid in another table the full index will be used to match the other table.
-If this is undesirable, you may use a single sub index by appending the sub index after a colon to
-the variable name.  Example `{{ $ifName:2 }}`
+If this is undesirable, there are ways to affect the indexes that will be searched for data.
+This may be used in either simple template format (as shown below) or the full value of the field.
+
+Hardcoded index: `{{ $ifName.5 }}`
+Partial index: `{{ $ifName:2 }}`
+Partial index range: `{{ $ifName:2-3 }}`
+Partial (or full) index + hardcoded suffix: `{{ $ifName:0.suffix }}`
+Partial (or full) index + hardcoded prefix: `{{ $ifName:prefix.0 }}` note doesn't work with numeric prefix
+Partial (or full) index + hardcoded prefix and suffix: `{{ $ifName:prefix.0.suffix }}`
+
+##### Skip values
 
 > `skip_values` can also compare items within the OID table against
 > values. The index of the sensor is used to retrieve the value
