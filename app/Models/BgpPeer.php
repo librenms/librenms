@@ -27,7 +27,6 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
-use Illuminate\Database\Eloquent\Relations\HasOne;
 
 class BgpPeer extends DeviceRelatedModel
 {
@@ -45,17 +44,5 @@ class BgpPeer extends DeviceRelatedModel
             $query->where('bgpPeerAdminStatus', 'start')
                 ->orWhere('bgpPeerAdminStatus', 'running');
         })->where('bgpPeerState', '!=', 'established');
-    }
-
-    // ---- Define Relationships ----
-
-    public function ipv4Iface(): HasOne
-    {
-        return $this->hasOne(\App\Models\Ipv4Address::class, 'port_id', 'bgpPeerIface');
-    }
-
-    public function ipv6Iface(): HasOne
-    {
-        return $this->hasOne(\App\Models\Ipv6Address::class, 'port_id', 'bgpPeerIface');
     }
 }
