@@ -427,20 +427,27 @@ if (\LibreNMS\Config::get('enable_bgp')) {
                         $peer_data['bgpPeerLastErrorSubCode'] = $error_subcode;
                     }
 
-                    // --- Fill the bgpPeerIface column with bgpLocalAddr ---
-                    if (isset($peer_data['bgpLocalAddr'])) {
-                        if (filter_var($peer_data['bgpLocalAddr'], FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) {
-                            $ipv4 = IP::fromHexString($peer_data['bgpLocalAddr'])->uncompressed();
-                            $bgpPeerIface = DB::table('ports')->join('ipv4_addresses', 'ports.port_id', '=', 'ipv4_addresses.port_id')->where('ipv4_address', '=', $ipv4)->where('device_id', '=', $device['device_id'])->first()->ifIndex;
-                        } elseif (filter_var($peer_data['bgpLocalAddr'], FILTER_VALIDATE_IP, FILTER_FLAG_IPV6)) {
-                            $ipv6 = IP::fromHexString($peer_data['bgpLocalAddr'])->uncompressed();
-                            $bgpPeerIface = DB::table('ports')->join('ipv6_addresses', 'ports.port_id', '=', 'ipv6_addresses.port_id')->where('ipv6_address', '=', $ipv6)->where('device_id', '=', $device['device_id'])->first()->ifIndex;
-                        }
-
-                        if (isset($bgpPeerIface)) {
-                            $peer_data['bgpPeerIface'] = $bgpPeerIface;
+                    // --- Fill the bgpPeerIface column ---
+                    if(isset($peer_data['bgpPeerIface'])) {
+                        if(!(filter_var($peer_data['bgpPeerIface'], FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) && !(filter_var($peer_data['bgpPeerIface'], FILTER_VALIDATE_IP, FILTER_FLAG_IPV6))) {
+                            // The column is already filled with the ifName, we change it to ifIndex
+                            $bgpPeerIface = DB::table('ports')->where('device_id','=',$device['device_id'])->where('ifName','=',$peer_data['bgpPeerIface'])->first()->ifIndex;
                         }
                     }
+                    elseif (!(isset($bgpPeerIface)) && isset($peer_data['bgpLocalAddr'])) {
+                        // else we use the bgpLocalAddr to find ifIndex
+                        if (filter_var($peer_data['bgpLocalAddr'], FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) {
+                            $ipv4 = IP::fromHexString($peer_data['bgpLocalAddr'])->uncompressed();
+                            $bgpPeerIface = DB::table('ports')->join('ipv4_addresses', 'ports.port_id', '=', 'ipv4_addresses.port_id')->where('ipv4_address', '=', $ipv4)->first()->ifIndex;
+                        } elseif (filter_var($peer_data['bgpLocalAddr'], FILTER_VALIDATE_IP, FILTER_FLAG_IPV6)) {
+                            $ipv6 = IP::fromHexString($peer_data['bgpLocalAddr'])->uncompressed();
+                            $bgpPeerIface = DB::table('ports')->join('ipv6_addresses', 'ports.port_id', '=', 'ipv6_addresses.port_id')->where('ipv6_address', '=', $ipv6)->first()->ifIndex;
+                        }
+                    }
+                    if (isset($bgpPeerIface)) {
+                        $peer_data['bgpPeerIface'] = $bgpPeerIface;
+                    }
+
                 }
 
                 d_echo($peer_data);
