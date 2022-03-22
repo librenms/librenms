@@ -36,10 +36,14 @@ class Alertmanager extends Transport
         $alertmanager_opts = $this->parseUserOptions($this->config['alertmanager-options']);
         $alertmanager_opts['url'] = $this->config['alertmanager-url'];
 
-        return $this->contactAlertmanager($obj, $alertmanager_opts);
+
+        $alertmanager_username = $this->config['alertmanager-username'];
+        $alertmanager_password = $this->config['alertmanager-password'];
+
+        return $this->contactAlertmanager($obj, $alertmanager_opts, $alertmanager_username, $alertmanager_password);
     }
 
-    public function contactAlertmanager($obj, $api)
+    public function contactAlertmanager($obj, $api, $username, $password)
     {
         if ($obj['state'] == AlertState::RECOVERED) {
             $alertmanager_status = 'endsAt';
@@ -74,10 +78,10 @@ class Alertmanager extends Transport
             }
         }
 
-        return $this->postAlerts($url, $data);
+        return $this->postAlerts($url, $data, $username, $password);
     }
 
-    public static function postAlerts($url, $data)
+    public static function postAlerts($url, $data, $username, $password)
     {
         $curl = curl_init();
         Proxy::applyToCurl($curl);
@@ -88,6 +92,12 @@ class Alertmanager extends Transport
         curl_setopt($curl, CURLOPT_CONNECTTIMEOUT, 5);
         curl_setopt($curl, CURLOPT_CONNECTTIMEOUT_MS, 5000);
         curl_setopt($curl, CURLOPT_POST, true);
+
+        if ($username != "" && $password != "") {
+            curl_setopt($curl, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
+            curl_setopt($curl, CURLOPT_USERNAME, $username);
+            curl_setopt($curl, CURLOPT_PASSWORD, $password);
+        }
 
         $alert_message = json_encode($data);
         curl_setopt($curl, CURLOPT_POSTFIELDS, $alert_message);
@@ -132,6 +142,18 @@ class Alertmanager extends Transport
                     'name' => 'alertmanager-url',
                     'descr' => 'Alertmanager Webhook URL(s). Can contain comma-separated URLs',
                     'type' => 'text',
+                ],
+                [
+                    'title' => 'Alertmanager Username',
+                    'name' => 'alertmanager-username',
+                    'descr' => 'Alertmanager Basic Username to authenticate to Alertmanager',
+                    'type' => 'text',
+                ],
+                [
+                    'title' => 'Alertmanager Password',
+                    'name' => 'alertmanager-password',
+                    'descr' => 'Alertmanager Basic Password to authenticate to Alertmanager',
+                    'type' => 'password',
                 ],
                 [
                     'title' => 'Alertmanager Options',
