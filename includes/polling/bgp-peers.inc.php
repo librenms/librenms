@@ -374,6 +374,7 @@ if (\LibreNMS\Config::get('enable_bgp')) {
                                 'bgpPeerInUpdateElapsedTime' => 'bgpPeerInUpdateElapsedTime',
                                 'bgpPeerLocalAddr' => 'bgpLocalAddr',
                                 'bgpPeerLastError' => 'bgpPeerLastErrorCode',
+                                'bgpPeerIface' => 'bgpPeerIface',
                             ];
                         } else {
                             $peer_identifier = $peer['bgpPeerIdentifier'];
