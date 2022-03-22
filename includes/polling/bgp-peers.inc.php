@@ -429,12 +429,14 @@ if (\LibreNMS\Config::get('enable_bgp')) {
                     }
 
                     // --- Fill the bgpPeerIface column ---
+                    $bgpPeerIfaceFilled = False;
                     if (isset($peer_data['bgpPeerIface'])) {
                         if (! (filter_var($peer_data['bgpPeerIface'], FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) && ! (filter_var($peer_data['bgpPeerIface'], FILTER_VALIDATE_IP, FILTER_FLAG_IPV6))) {
                             // The column is already filled with the ifName, we change it to ifIndex
                             $bgpPeerIface = DB::table('ports')->where('device_id', '=', $device['device_id'])->where('ifName', '=', $peer_data['bgpPeerIface'])->first()->ifIndex;
+                            $bgpPeerIfaceFilled = True;
                         }
-                    } elseif (! (isset($bgpPeerIface)) && isset($peer_data['bgpLocalAddr'])) {
+                    } if (! ($bgpPeerIfaceFilled) && isset($peer_data['bgpLocalAddr'])) {
                         // else we use the bgpLocalAddr to find ifIndex
                         if (filter_var($peer_data['bgpLocalAddr'], FILTER_VALIDATE_IP, FILTER_FLAG_IPV4)) {
                             $ipv4 = IP::fromHexString($peer_data['bgpLocalAddr'])->uncompressed();
