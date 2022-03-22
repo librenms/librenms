@@ -61,7 +61,7 @@
                     "bgpPeerLastErrorCode": 0,
                     "bgpPeerLastErrorSubCode": 0,
                     "bgpPeerLastErrorText": null,
-                    "bgpPeerIface": null,
+                    "bgpPeerIface": 3,
                     "bgpLocalAddr": "fe80:0000:0000:0000:0e04:1fff:fe86:0001",
                     "bgpPeerRemoteAddr": "0.0.0.0",
                     "bgpPeerDescr": "",
