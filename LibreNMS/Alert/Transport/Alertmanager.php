@@ -36,7 +36,6 @@ class Alertmanager extends Transport
         $alertmanager_opts = $this->parseUserOptions($this->config['alertmanager-options']);
         $alertmanager_opts['url'] = $this->config['alertmanager-url'];
 
-
         $alertmanager_username = $this->config['alertmanager-username'];
         $alertmanager_password = $this->config['alertmanager-password'];
 
