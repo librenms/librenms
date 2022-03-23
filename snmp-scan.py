@@ -128,8 +128,8 @@ def scan_host(scan_ip):
 
             arguments = [
                 "/usr/bin/env",
-                "php",
-                "addhost.php",
+                "lnms",
+                "device:add",
                 "-g",
                 POLLER_GROUP,
                 hostname or scan_ip,

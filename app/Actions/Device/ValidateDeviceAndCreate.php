@@ -92,10 +92,12 @@ class ValidateDeviceAndCreate
             $this->detectCredentials();
             $this->cleanCredentials();
 
-            $this->device->sysName = SnmpQuery::device($this->device)->get('SNMPv2-MIB::sysName.0')->value();
-            $this->exceptIfSysNameExists();
+            if (! $this->device->snmp_disable) {
+                $this->device->sysName = SnmpQuery::device($this->device)->get('SNMPv2-MIB::sysName.0')->value();
+                $this->exceptIfSysNameExists();
 
-            $this->device->os = Core::detectOS($this->device);
+                $this->device->os = Core::detectOS($this->device);
+            }
         }
 
         return $this->device->save();
