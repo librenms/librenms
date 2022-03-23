@@ -95,9 +95,9 @@ if (! empty($argv[1])) {
                 }
             }
         } elseif ($seclevel === 'anp' or $seclevel === 'authNoPriv') {
-            $device->authlevel  = 'authNoPriv';
+            $device->authlevel = 'authNoPriv';
             $v3args = array_slice($argv, 4);
-            $device->authname= array_shift($v3args);
+            $device->authname = array_shift($v3args);
             $device->authpass = array_shift($v3args);
 
             while ($arg = array_shift($v3args)) {
