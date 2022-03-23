@@ -17,28 +17,27 @@ foreach ($port_stats as $index => $port) {
         if ($portNum < 50) {
             $portNum++;
             //Leading 0 for single digits
-            $ifDescr = '1/' . zeropad($portNum);
+            $ifName = '1/' . zeropad($portNum);
         }
         if ($portNum > 63 && $portNum < 128) {
             $portNum = $portNum - 63;
             //Leading 0 for single digits
-            $ifDescr = '2/' . zeropad($portNum);
+            $ifName = '2/' . zeropad($portNum);
         }
         if ($portNum > 127 && $portNum < 192) {
             $portNum = $portNum - 127;
             //Leading 0 for single digits
-            $ifDescr = '3/' . zeropad($portNum);
+            $ifName = '3/' . zeropad($portNum);
         }
         if ($portNum > 191) {
             $portNum = $portNum - 191;
             //Leading 0 for single digits
-            $ifDescr = '4/' . zeropad($portNum);
+            $ifName = '4/' . zeropad($portNum);
         }
     } else {
         //Set port number to match current
-        $ifDescr = $port['ifName'];
+        $ifName = $port['ifName'];
     }
-    //set the libre ifDescr value to new port name
-    $port_stats[$index]['ifDescr'] = $ifDescr;
-    $port_stats[$index]['ifName'] = $ifDescr;
+    //set the libre ifName value to new port name
+    $port_stats[$index]['ifName'] = $ifName;
 }
