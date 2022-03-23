@@ -43,7 +43,7 @@ class Alertmanager extends Transport
         return $this->contactAlertmanager($obj, $alertmanager_opts, $alertmanager_username, $alertmanager_password);
     }
 
-    public function contactAlertmanager($obj, $api, $username, $password)
+    public function contactAlertmanager($obj, $api, string $username, string $password)
     {
         if ($obj['state'] == AlertState::RECOVERED) {
             $alertmanager_status = 'endsAt';
@@ -81,7 +81,7 @@ class Alertmanager extends Transport
         return $this->postAlerts($url, $data, $username, $password);
     }
 
-    public static function postAlerts($url, $data, $username, $password)
+    public static function postAlerts($url, $data, string $username, string $password)
     {
         $curl = curl_init();
         Proxy::applyToCurl($curl);
