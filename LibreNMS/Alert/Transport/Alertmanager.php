@@ -93,7 +93,7 @@ class Alertmanager extends Transport
         curl_setopt($curl, CURLOPT_CONNECTTIMEOUT_MS, 5000);
         curl_setopt($curl, CURLOPT_POST, true);
 
-        if ($username != "" && $password != "") {
+        if ($username != '' && $password != '') {
             curl_setopt($curl, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
             curl_setopt($curl, CURLOPT_USERNAME, $username);
             curl_setopt($curl, CURLOPT_PASSWORD, $password);
