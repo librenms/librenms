@@ -43,7 +43,10 @@ class Playsms extends Transport
 
     public static function contactPlaysms($obj, $opts)
     {
-        $data = ['u' => $opts['user'], 'h' => $opts['token'], 'to' => implode(',', $opts['to']), 'msg' => $obj['title']];
+        //$data = ['u' => $opts['user'], 'h' => $opts['token'], 'to' => implode(',', $opts['to']), 'msg' => $obj['title']];
+        //$data = ['u' => $opts['user'], 'h' => $opts['token'], 'to' => implode(',', $opts['to']), 'msg' => strip_tags($obj['msg'])];
+	$payload = preg_replace('/[ \t]+/', ' ', preg_replace('/\s*$^\s*/m', "\n", strip_tags($obj['msg'])));
+        $data = ['u' => $opts['user'], 'h' => $opts['token'], 'to' => implode(',', $opts['to']), 'msg' => $payload];
         if (! empty($opts['from'])) {
             $data['from'] = $opts['from'];
         }
