@@ -109,8 +109,8 @@ sdfsd <a href="ftp://192.168.1.1/help/me/now.php">ftp://192.168.1.1/help/me/now.
                 'foo' => ['hardcode' => 'bar'],
             ],
             '.1.3.5.6.7.8.8' => [
-                ['.1.3.5.6.7.8.8' => 'numeric']
-            ]
+                ['.1.3.5.6.7.8.8' => 'numeric'],
+            ],
         ];
 
         $data = ['value' => 'temp', 'oid' => 'firstdata'];
