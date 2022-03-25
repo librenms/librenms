@@ -4,43 +4,66 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "b4fa65afc5e0f75e6f171f432932cb75",
+    "content-hash": "6ae226d7d02a5cc5c60bb124d43a4f6c",
     "packages": [
         {
             "name": "amenadiel/jpgraph",
-            "version": "3.6.14",
+            "version": "v4.1.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/HuasoFoundries/jpgraph.git",
-                "reference": "5a9e0297d26c2c698ac8f4d0367119276f2de9f7"
+                "reference": "e196d51a520a4182cc26240b4a0744495706f11a"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/HuasoFoundries/jpgraph/zipball/5a9e0297d26c2c698ac8f4d0367119276f2de9f7",
-                "reference": "5a9e0297d26c2c698ac8f4d0367119276f2de9f7",
+                "url": "https://api.github.com/repos/HuasoFoundries/jpgraph/zipball/e196d51a520a4182cc26240b4a0744495706f11a",
+                "reference": "e196d51a520a4182cc26240b4a0744495706f11a",
                 "shasum": ""
             },
             "require": {
                 "ext-gd": "*",
-                "php": ">=5.4.0"
+                "php": ">=7.2.0"
+            },
+            "require-dev": {
+                "codeception/codeception": "^4.0",
+                "codeception/module-asserts": "^1.1",
+                "ergebnis/composer-normalize": "^2.13",
+                "ergebnis/php-cs-fixer-config": "^2.13",
+                "kint-php/kint": "^3.3",
+                "monolog/monolog": "^2.0",
+                "overtrue/phplint": "^2.3",
+                "squizlabs/php_codesniffer": "^3.6",
+                "symfony/dotenv": "^4.0 || ^5.0",
+                "symfony/event-dispatcher": "^4.0 || ^5.0",
+                "symfony/yaml": "^4.0 || ^5.0"
             },
             "type": "library",
+            "extra": {
+                "composer-normalize": {
+                    "indent-size": 4,
+                    "indent-style": "space"
+                },
+                "version": "4.1.1"
+            },
             "autoload": {
                 "psr-4": {
                     "Amenadiel\\JpGraph\\": "src/",
-                    "Amenadiel\\JpGraph\\Graph\\": "src/graph",
-                    "Amenadiel\\JpGraph\\Image\\": "src/image",
                     "Amenadiel\\JpGraph\\Plot\\": "src/plot",
                     "Amenadiel\\JpGraph\\Text\\": "src/text",
+                    "Amenadiel\\JpGraph\\Util\\": "src/util",
+                    "Amenadiel\\JpGraph\\Graph\\": "src/graph",
+                    "Amenadiel\\JpGraph\\Image\\": "src/image",
                     "Amenadiel\\JpGraph\\Themes\\": "src/themes",
-                    "Amenadiel\\JpGraph\\Util\\": "src/util"
+                    "Amenadiel\\JpGraph\\Graph\\Axis\\": "src/graph/axis",
+                    "Amenadiel\\JpGraph\\Graph\\Tick\\": "src/graph/tick",
+                    "Amenadiel\\JpGraph\\Graph\\Scale\\": "src/graph/scale"
                 }
             },
             "notification-url": "https://packagist.org/downloads/",
             "license": [
                 "QPL-1.0"
             ],
-            "description": "jpGraph, library to make graphs and charts",
+            "description": "Composer Friendly, full refactor of JpGraph, library to make graphs and charts",
             "homepage": "http://jpgraph.net/",
             "keywords": [
                 "chart",
@@ -51,9 +74,9 @@
             ],
             "support": {
                 "issues": "https://github.com/huasofoundries/jpgraph/issues",
-                "source": "https://github.com/HuasoFoundries/jpgraph/tree/v3.6.14"
+                "source": "https://github.com/HuasoFoundries/jpgraph/tree/v4.1.1"
             },
-            "time": "2018-02-13T19:34:27+00:00"
+            "time": "2021-04-27T19:09:11+00:00"
         },
         {
             "name": "asm89/stack-cors",
