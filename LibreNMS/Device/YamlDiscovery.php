@@ -208,6 +208,7 @@ class YamlDiscovery
      */
     public static function getValueFromData($name, $index, $discovery_data, $pre_cache, $default = null)
     {
+        // if specified in the discovery data, use that
         if (isset($discovery_data[$name])) {
             $name = $discovery_data[$name];
         }
@@ -221,18 +222,22 @@ class YamlDiscovery
             $sub_index = $sub_index_matches['index'];
         }
 
+        // handle hardcoded instances
         if (Str::contains($name, '.') && ! self::oidIsNumeric($name)) {
             [$name, $index] = explode('.', $name, 2);
         }
 
+        // check if the oid for the item is directly in the pre_cache
         if (isset($discovery_data['oid']) && ! is_array($discovery_data['oid']) && isset($pre_cache[$discovery_data['oid']][$index]) && isset($pre_cache[$discovery_data['oid']][$index][$name])) {
             return $pre_cache[$discovery_data['oid']][$index][$name];
         }
 
+        // check if the given name is directly in the pre-cache without prefix
         if (isset($pre_cache[$index][$name])) {
             return $pre_cache[$index][$name];
         }
 
+        // search possible tables pre-cached based on various table schema
         if (isset($pre_cache[$name]) && ! is_numeric($name)) {
             if (is_array($pre_cache[$name])) {
                 Log::debug("getValueFromData($name): trying [$name][$index][$name]");
@@ -270,6 +275,7 @@ class YamlDiscovery
             }
         }
 
+        // give up :(
         return $default;
     }
 
