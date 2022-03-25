@@ -108,6 +108,9 @@ sdfsd <a href="ftp://192.168.1.1/help/me/now.php">ftp://192.168.1.1/help/me/now.
                 'zing' => 'zang',
                 'foo' => ['hardcode' => 'bar'],
             ],
+            '.1.3.5.6.7.8.8' => [
+                ['.1.3.5.6.7.8.8' => 'numeric']
+            ]
         ];
 
         $data = ['value' => 'temp', 'oid' => 'firstdata'];
@@ -151,6 +154,9 @@ sdfsd <a href="ftp://192.168.1.1/help/me/now.php">ftp://192.168.1.1/help/me/now.
         $this->assertSame('s-zero', YamlDiscovery::getValueFromData('suffix:0.0.suffix', 1, $data, $pre_cache));
         $this->assertSame('s-one', YamlDiscovery::getValueFromData('suffix:0-1.suffix', '2.1', $data, $pre_cache));
         $this->assertSame('s-one', YamlDiscovery::getValueFromData('suffix:0-2', '2.1.suffix', $data, $pre_cache));
+
+        // numeric
+        $this->assertSame('numeric', YamlDiscovery::getValueFromData('.1.3.5.6.7.8.8', 0, $data, $pre_cache));
     }
 
     public function testParseAtTime()

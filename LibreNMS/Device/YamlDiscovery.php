@@ -221,7 +221,7 @@ class YamlDiscovery
             $sub_index = $sub_index_matches['index'];
         }
 
-        if (Str::contains($name, '.')) {
+        if (Str::contains($name, '.') && ! self::oidIsNumeric($name)) {
             [$name, $index] = explode('.', $name, 2);
         }
 

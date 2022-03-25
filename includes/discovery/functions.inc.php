@@ -864,7 +864,7 @@ function discovery_process(&$valid, $os, $sensor_class, $pre_cache)
 
         foreach ($discovery[$sensor_class]['data'] as $data) {
             $tmp_name = $data['oid'];
-            $raw_data = (array) $pre_cache[$tmp_name];
+            $raw_data = (array) ($pre_cache[$tmp_name] ?? []);
 
             d_echo("Data $tmp_name: ");
             d_echo($raw_data);
