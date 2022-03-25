@@ -42,9 +42,10 @@ class CiscoErrDisableInterfaceEvent implements SnmptrapHandler
      */
     public function handle(Device $device, Trap $trap)
     {
-        $oidText = $trap->toString(true);
+        $trap->findOid('CISCO-ERR-DISABLE-MIB::cErrDisableIfStatusCause');
 
-        preg_match('/.cErrDisableIfStatusCause\.(.*?)\./', $oidText, $ifIndex);
+        $ifIndex = explode('.', $trap->findOid('CISCO-ERR-DISABLE-MIB::cErrDisableIfStatusCause'));
+
         $port = $device->ports()->where('ifIndex', $ifIndex[1])->first();
         $cause = $trap->getOidData($trap->findOid('CISCO-ERR-DISABLE-MIB::cErrDisableIfStatusCause.' . $ifIndex[1] . '.0'));
 
