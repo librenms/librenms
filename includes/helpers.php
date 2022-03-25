@@ -95,3 +95,23 @@ if (! function_exists('trans_fb')) {
         return ($key === ($translation = trans($key, $replace, $locale))) ? $fallback : $translation;
     }
 }
+
+if (! function_exists('preg_match_any')) {
+    /**
+     * Check an array of regexes against a subject if any match, return true
+     *
+     * @param  string  $subject  the string to match against
+     * @param  array|string  $regexes  an array of regexes or single regex to check
+     * @return bool if any of the regexes matched, return true
+     */
+    function preg_match_any($subject, $regexes)
+    {
+        foreach ((array) $regexes as $regex) {
+            if (preg_match($regex, $subject)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+}

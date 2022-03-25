@@ -66,7 +66,12 @@ class Alertmanager extends Transport
         $url = $api['url'];
         unset($api['url']);
         foreach ($api as $label => $value) {
-            $data[0]['labels'][$label] = $value;
+            // To allow dynamic values
+            if ((preg_match('/^extra_[A-Za-z0-9_]+$/', $label)) && (! empty($obj['faults'][1][$value]))) {
+                $data[0]['labels'][$label] = $obj['faults'][1][$value];
+            } else {
+                $data[0]['labels'][$label] = $value;
+            }
         }
 
         return $this->postAlerts($url, $data);
@@ -131,7 +136,7 @@ class Alertmanager extends Transport
                 [
                     'title' => 'Alertmanager Options',
                     'name' => 'alertmanager-options',
-                    'descr' => 'Alertmanager Options',
+                    'descr' => 'Alertmanager Options. You can add any fixed string value or dynamic value from alert details (label name must start with extra_ and value must exists in alert details).',
                     'type' => 'textarea',
                 ],
             ],
