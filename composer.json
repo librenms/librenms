@@ -23,7 +23,7 @@
         "ext-pdo": "*",
         "ext-session": "*",
         "ext-xml": "*",
-        "amenadiel/jpgraph": "^3.6",
+        "amenadiel/jpgraph": "^4",
         "clue/socket-raw": "^1.4",
         "dapphp/radius": "^2.0",
         "doctrine/dbal": "^2.11",
