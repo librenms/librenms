@@ -1,4 +1,8 @@
 modules:
+    os:
+        hardware: LENOVO-XCC-MIB::machineLevelProductName.0
+        serial: LENOVO-XCC-MIB::machineLevelSerialNumber.0
+        version: LENOVO-XCC-MIB::xccVpdVersionString.1    
     mempools:
         data:
             -
