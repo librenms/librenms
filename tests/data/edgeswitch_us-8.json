@@ -1,0 +1,23 @@
+{
+    "os": {
+        "discovery": {
+            "devices": [
+                {
+                    "sysName": "ubnt",
+                    "sysObjectID": ".1.3.6.1.4.1.41112.1",
+                    "sysDescr": "USW GigaBit Ethernet Switch, firmware v4.3.20.11298",
+                    "sysContact": null,
+                    "version": "v4.3.20.11298",
+                    "hardware": "USW GigaBit Ethernet Switch",
+                    "features": null,
+                    "os": "edgeswitch",
+                    "type": "network",
+                    "serial": null,
+                    "icon": "ubiquiti.svg",
+                    "location": null
+                }
+            ]
+        },
+        "poller": "matches discovery"
+    }
+}
