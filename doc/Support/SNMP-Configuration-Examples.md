@@ -383,7 +383,7 @@ Make sure the agent listens to all interfaces by adding the following
 line inside snmpd.conf:
 
 ```
-agentAddress udp:161,udp6:[::1]:161
+agentAddress udp:161,udp6:161
 ```
 
 This line simply means listen to connections across all interfaces
