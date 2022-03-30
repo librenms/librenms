@@ -96,7 +96,7 @@ class Iosxe extends OS implements
                     'ifIndex' => $circuit_data['ciiCircIfIndex'],
                     'port_id' => $this->ifIndexToId($circuit_data['ciiCircIfIndex']) ?? null,
                     'isisCircAdminState' => $circuit_data['ciiCircAdminState'] ?? 'down',
-                    'isisISAdjState' => $adjacency_data['ciiISAdjState'] ?? 'down', 
+                    'isisISAdjState' => $adjacency_data['ciiISAdjState'] ?? 'down',
                 ]);
 
                 if (! empty($adjacency_data)) {
