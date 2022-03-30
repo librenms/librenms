@@ -43,7 +43,7 @@ use LibreNMS\OS;
 use LibreNMS\OS\Traits\CiscoCellular;
 use LibreNMS\Util\IP;
 
-class Iosxe extends OS implements
+class Iosxe extends Ciscowlc implements
     IsIsDiscovery,
     IsIsPolling,
     OSPolling,
