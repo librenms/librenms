@@ -39,7 +39,6 @@ use LibreNMS\Interfaces\Discovery\Sensors\WirelessSnrDiscovery;
 use LibreNMS\Interfaces\Module;
 use LibreNMS\Interfaces\Polling\IsIsPolling;
 use LibreNMS\Interfaces\Polling\OSPolling;
-use LibreNMS\OS;
 use LibreNMS\OS\Traits\CiscoCellular;
 use LibreNMS\Util\IP;
 
