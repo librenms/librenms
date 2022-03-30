@@ -91,27 +91,25 @@ class Iosxe extends OS implements
 
                 $adjacency_data = Arr::last($adjacencies_data[$circuit_id] ?? [[]]);
 
-                $attributes = [
+                $adjacency = new IsisAdjacency([
                     'device_id' => $this->getDeviceId(),
                     'ifIndex' => $circuit_data['ciiCircIfIndex'],
                     'port_id' => $this->ifIndexToId($circuit_data['ciiCircIfIndex']) ?? null,
                     'isisCircAdminState' => $circuit_data['ciiCircAdminState'] ?? 'down',
-                    'isisISAdjState' => $adjacency_data['ciiISAdjState'] ?? 'down',
-                ];
+                    'isisISAdjState' => $adjacency_data['ciiISAdjState'] ?? 'down', 
+                ]);
 
                 if (! empty($adjacency_data)) {
-                    $attributes = array_merge($attributes, [
-                        'isisISAdjNeighSysType' => Arr::get($this->isis_codes, $adjacency_data['ciiISAdjNeighSysType'] ?? 'unknown', 'unknown'),
-                        'isisISAdjNeighSysID' => str_replace(' ', '.', trim($adjacency_data['ciiISAdjNeighSysID'] ?? '')),
-                        'isisISAdjNeighPriority' => $adjacency_data['ciiISAdjNeighPriority'] ?? '',
-                        'isisISAdjLastUpTime' => $this->parseAdjacencyTime($adjacency_data),
-                        'isisISAdjAreaAddress' => str_replace(' ', '.', trim($adjacency_data['ciiISAdjAreaAddress'] ?? '')),
-                        'isisISAdjIPAddrType' => $adjacency_data['ciiISAdjIPAddrType'] ?? '',
-                        'isisISAdjIPAddrAddress' => (string) IP::fromHexstring($adjacency_data['ciiISAdjIPAddrAddress'] ?? null, true),
-                    ]);
+                    $adjacency->isisISAdjNeighSysType = Arr::get($this->isis_codes, $adjacency_data['ciiISAdjNeighSysType'] ?? 'unknown', 'unknown');
+                    $adjacency->isisISAdjNeighSysID = str_replace(' ', '.', trim($adjacency_data['ciiISAdjNeighSysID'] ?? ''));
+                    $adjacency->isisISAdjNeighPriority = $adjacency_data['ciiISAdjNeighPriority'] ?? '';
+                    $adjacency->isisISAdjLastUpTime = $this->parseAdjacencyTime($adjacency_data);
+                    $adjacency->isisISAdjAreaAddress = str_replace(' ', '.', trim($adjacency_data['ciiISAdjAreaAddress'] ?? ''));
+                    $adjacency->isisISAdjIPAddrType = $adjacency_data['ciiISAdjIPAddrType'] ?? '';
+                    $adjacency->isisISAdjIPAddrAddress = (string) IP::fromHexstring($adjacency_data['ciiISAdjIPAddrAddress'] ?? null, true);
                 }
 
-                $adjacencies->push(new IsisAdjacency($attributes));
+                $adjacencies->push($adjacency);
             }
         }
 
