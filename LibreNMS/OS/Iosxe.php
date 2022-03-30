@@ -26,7 +26,6 @@
 namespace LibreNMS\OS;
 
 use App\Models\IsisAdjacency;
-use App\Observers\ModuleModelObserver;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use LibreNMS\DB\SyncsModels;
