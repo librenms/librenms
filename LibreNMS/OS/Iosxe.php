@@ -94,7 +94,7 @@ class Iosxe extends OS implements
                 $adjacency = new IsisAdjacency([
                     'device_id' => $this->getDeviceId(),
                     'ifIndex' => $circuit_data['ciiCircIfIndex'],
-                    'port_id' => $this->ifIndexToId($circuit_data['ciiCircIfIndex']) ?? null,
+                    'port_id' => $this->ifIndexToId($circuit_data['ciiCircIfIndex']),
                     'isisCircAdminState' => $circuit_data['ciiCircAdminState'] ?? 'down',
                     'isisISAdjState' => $adjacency_data['ciiISAdjState'] ?? 'down',
                 ]);
