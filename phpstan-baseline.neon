@@ -3524,7 +3524,7 @@ parameters:
 			message: "#^Method LibreNMS\\\\Modules\\\\Isis\\:\\:parseAdjacencyTime\\(\\) has parameter \\$data with no type specified\\.$#"
 			count: 1
 			path: LibreNMS/Modules/Isis.php
-			
+
 		-
 			message: "#^Method LibreNMS\\\\Modules\\\\Isis\\:\\:poll\\(\\) has no return type specified\\.$#"
 			count: 1
