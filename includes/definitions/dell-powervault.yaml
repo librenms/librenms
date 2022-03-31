@@ -5,9 +5,8 @@ icon: dell
 group: dell
 discovery:
     -
-        -
-            sysObjectID: .1.3.6.1.4.1.674
-            sysDescr_regex: '/^DELL(\s)+MD/'
-        -
-            sysObjectID: .1.3.6.1.4.1.674.10893.2.31
-            sysDescr: 'DELL EMC '
+      sysObjectID: .1.3.6.1.4.1.674.10893.2.31
+      sysDescr_regex: '/^DELL(\s)+MD/'
+    -
+      sysObjectID: .1.3.6.1.4.1.674
+      sysDescr: 'DELL EMC '
