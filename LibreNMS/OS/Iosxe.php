@@ -145,7 +145,7 @@ class Iosxe extends Ciscowlc implements
     /**
      * Converts SNMP time to int in seconds
      *
-     * @param array $data
+     * @param  array  $data
      * @return int
      */
     protected function parseAdjacencyTime($data): int
