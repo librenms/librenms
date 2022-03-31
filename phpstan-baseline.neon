@@ -4120,16 +4120,6 @@ parameters:
 			path: LibreNMS/OS/Iosxe.php
 
 		-
-			message: "#^Property LibreNMS\\\\OS\\\\Iosxe\\:\\:\\$isis_codes has no type specified\\.$#"
-			count: 1
-			path: LibreNMS/OS/Iosxe.php
-
-		-
-			message: "#^Method LibreNMS\\\\OS\\\\Iosxe\\:\\:parseAdjacencyTime\\(\\) has parameter \\$data with no type specified\\.$#"
-			count: 1
-			path: LibreNMS/OS/Iosxe.php
-
-		-
 			message: "#^Method LibreNMS\\\\OS\\\\Ironware\\:\\:rewriteHardware\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: LibreNMS/OS/Ironware.php

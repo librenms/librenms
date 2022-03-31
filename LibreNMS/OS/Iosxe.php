@@ -3,6 +3,7 @@
  * Iosxe.php
  *
  * Cisco IOS-XE Wireless LAN Controller
+ * Cisco IOS-XE ISIS Neighbors
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -60,7 +61,11 @@ class Iosxe extends Ciscowlc implements
     {
         // Don't poll Ciscowlc FIXME remove when wireless-controller module exists
     }
-
+    /**
+     * Array of shortened ISIS codes
+     *
+     * @var array
+     */
     protected $isis_codes = [
         'l1IntermediateSystem' => 'L1',
         'l2IntermediateSystem' => 'L2',
@@ -137,7 +142,12 @@ class Iosxe extends Ciscowlc implements
 
         return $adjacencies;
     }
-
+    /**
+     * Converts SNMP time to int in seconds
+     *
+     * @param array $data
+     * @return int
+     */
     protected function parseAdjacencyTime($data): int
     {
         return (int) max($data['ciiISAdjLastUpTime'] ?? 1, 1) / 100;
