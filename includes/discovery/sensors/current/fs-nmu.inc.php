@@ -41,7 +41,7 @@ $oap_edfa_sensors = [
     ],
 ];
 
-foreach($oap_edfas as $oap_edfa) {
+foreach ($oap_edfas as $oap_edfa) {
     $object_ident = 'OAP-C' . $oap_edfa . '-EDFA';
 
     foreach ($oap_edfa_sensors as $sensor => $options) {
