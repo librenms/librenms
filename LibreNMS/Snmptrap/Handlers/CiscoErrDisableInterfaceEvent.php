@@ -42,8 +42,6 @@ class CiscoErrDisableInterfaceEvent implements SnmptrapHandler
      */
     public function handle(Device $device, Trap $trap)
     {
-        $trap->findOid('CISCO-ERR-DISABLE-MIB::cErrDisableIfStatusCause');
-
         $ifIndex = explode('.', $trap->findOid('CISCO-ERR-DISABLE-MIB::cErrDisableIfStatusCause'));
 
         $port = $device->ports()->where('ifIndex', $ifIndex[1])->first();
