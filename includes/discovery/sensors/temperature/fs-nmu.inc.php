@@ -9,14 +9,14 @@
  * the Free Software Foundation, either version 3 of the License, or
  *  (at your option) any later version.
  *
- * This program is distributed in the hope that it will be useful, 
- * but WITHOUT ANY WARRANTY; without even the implied warranty of 
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
  * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE. See the GNU
  * General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
  * along with this program. If not, see https://www.gnu.org/licenses/.
- * 
+ *
  * @link       https://www.librenms.org
  *
  * @copyright  2022 Priority Colo Inc.
@@ -156,9 +156,9 @@ foreach ($oap_oeos as $oap_oeo) {
     }
 }
 
-// OAP C1 -> C16 EDAFs 
+// OAP C1 -> C16 EDAFs
 echo "FS NMU EDFA Temperatures\n";
-$oap_edfas = range(1,16);
+$oap_edfas = range(1, 16);
 $oap_edfa_sensors = [
     'ModuleTemperature' => ['desc' => 'Module Temperature', 'id' => '22'],
     'PUMPTemperature' => ['desc' => 'Pump Temperature', 'id' => '25'],
@@ -171,7 +171,7 @@ foreach ($oap_edfas as $oap_edfa) {
         $object_type = 'v' . $sensor . '.0';
         $dbm_value = snmp_get($device, $object_type, $oap_flags, $object_ident);
         if (is_numeric($dbm_value)) {
-            $sensor_oid = '.1.3.6.1.4.1.40989.10.16.' . $oap_edfa . '.1.' .$options['id'] . '.0';
+            $sensor_oid = '.1.3.6.1.4.1.40989.10.16.' . $oap_edfa . '.1.' . $options['id'] . '.0';
             $sensor_description = 'C' . $oap_edfa . ' EDFA ' . $options['desc'];
             $index = $device['device_id'] . '::' . $object_ident . '::' . $object_type;
 
