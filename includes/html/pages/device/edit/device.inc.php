@@ -100,7 +100,7 @@ $disable_notify = get_dev_attrib($device, 'disable_notify');
 <div class="row">
     <!-- Bootstrap 3 doesn't support mediaqueries for text aligns (e.g. text-md-left), which makes these buttons stagger on sm or xs screens -->
     <div class="col-md-2 col-md-offset-2">
-        <form id="delete_host" name="delete_host" method="post" action="delhost/" role="form">
+        <form id="delete_host" name="delete_host" method="post" action="/delhost/" role="form">
             <?php echo csrf_field() ?>
             <input type="hidden" name="id" value="<?php echo $device['device_id']; ?>">
             <button type="submit" class="btn btn-danger" name="Submit"><i class="fa fa-trash"></i> Delete device</button>
