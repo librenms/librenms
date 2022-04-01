@@ -9,7 +9,7 @@ if ($perf->isNotEmpty()) {
         <div class="col-md-12">
         <div class="panel panel-default panel-condensed">
         <div class="panel-heading">
-        <a href="' . Url('device') . '/device=' . DeviceCache::getPrimary()->device_id . '/tab=graphs/group=poller/">
+        <a href="' . $perf_url . '">
         <i class="fas fa-area-chart fa-lg icon-theme" aria-hidden="true"></i><strong>Ping Response</strong></a>
         </div>
         <table class="table table-hover table-condensed table-striped">
