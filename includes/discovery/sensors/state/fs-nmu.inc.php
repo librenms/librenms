@@ -132,7 +132,7 @@ foreach ($oap_oeos as $oap_oeo) {
                 $dwdm_ch = $channel_wavelengths[$mode_wave] . ' ';
             }
             $mode_wave = $dwdm_ch . '(' . strval($mode_wave / 100) . 'nm)';
-            foreach($oap_oeo_sensors as $sensor => $options) {
+            foreach ($oap_oeo_sensors as $sensor => $options) {
                 $object_type = 'vSFP' . $slot . $pair . $sensor . '.0';
                 $dbm_value = snmp_get($device, $object_type, $options['flags'], $object_ident);
                 if (is_numeric($dbm_value)) {
