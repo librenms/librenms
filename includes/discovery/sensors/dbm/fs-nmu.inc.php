@@ -208,7 +208,7 @@ $oap_edfa_sensors = [
             'warn_limit' => 18,
             'high_limit' => 21.5,
         ],
-     ],
+    ],
     'Input' => ['desc' => 'Input Power', 'id' => '28',
         'limits' => [
             'low_limit' => -23,
@@ -231,7 +231,7 @@ foreach ($oap_edfas as $oap_edfa) {
     $object_ident = 'OAP-C' . $oap_edfa . '-EDFA';
 
     foreach ($oap_edfa_sensors as $sensor => $options) {
-        $object_type = 'v' . $sensor. '.0';
+        $object_type = 'v' . $sensor . '.0';
         $dbm_value = snmp_get($device, $object_type, $oap_flags, $object_ident);
 
         if (is_numeric($dbm_value)) {
