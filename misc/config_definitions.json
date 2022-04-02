@@ -950,14 +950,6 @@
             ],
             "type": "array"
         },
-        "top_device_types": {
-            "default": 5,
-            "units": "",
-            "group": "webui",
-            "section": "location",
-            "order": 0,
-            "type": "integer"
-        },
         "device_types": {
             "default": [
                 {
@@ -5346,6 +5338,14 @@
             "section": "style",
             "order": 3,
             "type": "text"
+        },
+        "top_device_types": {
+            "default": 5,
+            "units": "",
+            "group": "webui",
+            "section": "location",
+            "order": 0,
+            "type": "integer"
         },
         "top_devices": {
             "default": true,
