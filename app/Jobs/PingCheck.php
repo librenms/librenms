@@ -82,8 +82,10 @@ class PingCheck implements ShouldQueue
         // set up fping process
         $timeout = Config::get('fping_options.timeout', 500); // must be smaller than period
         $retries = Config::get('fping_options.retries', 2);  // how many retries on failure
+        $tos = Config::get('fping_options.tos', 0);  // TOS marking
+        $fping = Config::get('fping', 'fping'); // use user defined binary
 
-        $this->command = ['fping', '-f', '-', '-e', '-t', $timeout, '-r', $retries];
+        $this->command = [$fping, '-f', '-', '-e', '-t', $timeout, '-r', $retries, '-O', $tos];
         $this->wait = Config::get('rrd.step', 300) * 2;
     }
 

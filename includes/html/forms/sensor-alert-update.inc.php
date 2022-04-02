@@ -49,10 +49,10 @@ if (isset($_POST['sub_type']) && ! empty($_POST['sub_type'])) {
         }
         if (dbUpdate(['sensor_alert' => $state], 'sensors', '`sensor_id` = ? AND `device_id` = ?', [$_POST['sensor_id'], $_POST['device_id']]) >= 0) {
             $status = ($state == 0) ? 'info' : 'ok';
-            $message = 'Alerts ' . $state_string . ' for sensor ' . $_POST['sensor_desc'];
+            $message = 'Alerts ' . $state_string . ' for sensor ' . htmlspecialchars($_POST['sensor_desc']);
         } else {
             $status = 'error';
-            $message = 'Couldn\'t ' . substr($state_string, 0, -1) . ' alerts for sensor ' . $_POST['sensor_desc'] . '. Enable debug and check librenms.log';
+            $message = 'Couldn\'t ' . substr($state_string, 0, -1) . ' alerts for sensor ' . htmlspecialchars($_POST['sensor_desc']) . '. Enable debug and check librenms.log';
         }
     }
 }

@@ -4123,8 +4123,7 @@
                     "app_status": "",
                     "app_instance": ""
                 }
-            ],
-            "application_metrics": []
+            ]
         },
         "poller": {
             "applications": [
@@ -4136,8 +4135,7 @@
                     "app_status": "",
                     "app_instance": ""
                 }
-            ],
-            "application_metrics": []
+            ]
         }
     }
 }

@@ -25,6 +25,7 @@
 
 namespace LibreNMS\Device;
 
+use App\View\SimpleTemplate;
 use Cache;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
@@ -166,35 +167,29 @@ class YamlDiscovery
         $value = static::getValueFromData($name, $index, $def, $pre_cache);
 
         if (is_null($value)) {
-            // built in replacements
-            $search = [
-                '{{ $index }}',
-                '{{ $count }}',
+            // basic replacements
+            $variables = [
+                'index' => $index,
+                'count' => $count,
             ];
-            $replace = [
-                $index,
-                $count,
-            ];
-
-            // prepare the $subindexX match variable replacement
             foreach (explode('.', $index) as $pos => $subindex) {
-                $search[] = '{{ $subindex' . $pos . ' }}';
-                $replace[] = $subindex;
+                $variables['subindex' . $pos] = $subindex;
             }
-
-            $value = str_replace($search, $replace, $def[$name] ?? '');
+            $value = (string) (new SimpleTemplate($def[$name] ?? '', $variables))->keepEmptyTemplates();
 
             // search discovery data for values
-            $value = preg_replace_callback('/{{ \$?([a-zA-Z0-9\-.:]+) }}/', function ($matches) use ($index, $def, $pre_cache) {
-                $replace = static::getValueFromData($matches[1], $index, $def, $pre_cache, null);
+            $template = new SimpleTemplate($value);
+            $template->replaceWith(function ($matches) use ($index, $def, $pre_cache) {
+                $replace = static::getValueFromData($matches[1], $index, $def, $pre_cache);
                 if (is_null($replace)) {
-                    d_echo('Warning: No variable available to replace ' . $matches[1] . ".\n");
+                    \Log::warning('YamlDiscovery: No variable available to replace ' . $matches[1]);
 
                     return ''; // remove the unavailable variable
                 }
 
                 return $replace;
-            }, $value);
+            });
+            $value = (string) $template;
         }
 
         return $value;
@@ -216,7 +211,7 @@ class YamlDiscovery
             $name = $discovery_data[$name];
         }
 
-        if (! is_array($discovery_data['oid']) && isset($pre_cache[$discovery_data['oid']][$index]) && isset($pre_cache[$discovery_data['oid']][$index][$name])) {
+        if (isset($discovery_data['oid']) && ! is_array($discovery_data['oid']) && isset($pre_cache[$discovery_data['oid']][$index]) && isset($pre_cache[$discovery_data['oid']][$index][$name])) {
             return $pre_cache[$discovery_data['oid']][$index][$name];
         }
 
@@ -330,12 +325,13 @@ class YamlDiscovery
      * Check to see if we should skip this discovery item
      *
      * @param  mixed  $value
+     * @param  int|string  $index
      * @param  array  $yaml_item_data  The data key from this item
      * @param  array  $group_options  The options key from this group of items
      * @param  array  $pre_cache  The pre-cache data array
      * @return bool
      */
-    public static function canSkipItem($value, $index, $yaml_item_data, $group_options, $pre_cache = [])
+    public static function canSkipItem($value, $index, array $yaml_item_data, array $group_options, array $pre_cache = []): bool
     {
         $skip_values = array_replace((array) ($group_options['skip_values'] ?? []), (array) ($yaml_item_data['skip_values'] ?? []));
 
@@ -343,11 +339,19 @@ class YamlDiscovery
             if (is_array($skip_value) && $pre_cache) {
                 // Dynamic skipping of data
                 $op = $skip_value['op'] ?? '!=';
-                $tmp_value = static::getValueFromData($skip_value['oid'], $index, $yaml_item_data, $pre_cache);
-                if (Str::contains($skip_value['oid'], '.')) {
-                    [$skip_value['oid'], $targeted_index] = explode('.', $skip_value['oid'], 2);
-                    $tmp_value = static::getValueFromData($skip_value['oid'], $targeted_index, $yaml_item_data, $pre_cache);
+
+                if (isset($skip_value['device'])) {
+                    // field from device model
+                    $tmp_value = \DeviceCache::getPrimary()[$skip_value['device']] ?? null;
+                } else {
+                    // oid previously fetched from the device
+                    $tmp_value = static::getValueFromData($skip_value['oid'], $index, $yaml_item_data, $pre_cache);
+                    if (Str::contains($skip_value['oid'], '.')) {
+                        [$skip_value['oid'], $targeted_index] = explode('.', $skip_value['oid'], 2);
+                        $tmp_value = static::getValueFromData($skip_value['oid'], $targeted_index, $yaml_item_data, $pre_cache);
+                    }
                 }
+
                 if (compare_var($tmp_value, $skip_value['value'], $op)) {
                     return true;
                 }

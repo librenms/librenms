@@ -108,7 +108,7 @@ class Mempools implements Module
     }
 
     /**
-     * @param  OS  $os
+     * @param  \LibreNMS\OS  $os
      * @param  \Illuminate\Support\Collection  $mempools
      * @return \Illuminate\Support\Collection
      */

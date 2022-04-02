@@ -11,3 +11,4 @@ modules:
         features: Dell-Vendor-MIB::productIdentificationDescription.0
         hardware: Dell-Vendor-MIB::productIdentificationDisplayName.0
         version: Dell-Vendor-MIB::productIdentificationVersion.0
+        serial: Dell-Vendor-MIB::productIdentificationSerialNumber.1

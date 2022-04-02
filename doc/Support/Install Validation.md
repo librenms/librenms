@@ -1,6 +1,3 @@
-source: Install Validation.md
-path: blob/master/doc/
-
 # Install validation
 
 With a lot of configuration possibilities, manually editing config.php
@@ -44,9 +41,11 @@ things you need to fix:
 # Validate from the WebUI
 
 You can validate your LibreNMS install from the WebUI, using the nav
-bar and clicking on the little Gear Icon -> Validate
-Config. ![Validate Config Icon](/img/validate-config-icon.png) Then
-You should see the results of validate.
+bar and clicking on the little Gear Icon -> Validate Config. 
+
+![Validate Config Icon](/img/validate-config-icon.png) 
+
+Then You should see the results of validate.
 
 Below is just example of the results.
 

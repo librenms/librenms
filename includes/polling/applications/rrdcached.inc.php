@@ -27,8 +27,6 @@
 
 use LibreNMS\RRD\RrdDefinition;
 
-echo ' rrdcached';
-
 $data = '';
 $name = 'rrdcached';
 $app_id = $app['app_id'];

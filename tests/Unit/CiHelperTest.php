@@ -72,6 +72,7 @@ class CiHelperTest extends TestCase
             'unit_skip' => true,
             'web_skip' => true,
             'lint_skip_php' => true,
+            'lint_skip_phpstan' => true,
             'lint_skip_python' => true,
             'lint_skip_bash' => true,
         ]);
@@ -95,6 +96,7 @@ class CiHelperTest extends TestCase
             'web_skip' => true,
             'unit_os' => true,
             'lint_skip_php' => true,
+            'lint_skip_phpstan' => true,
             'lint_skip_python' => true,
             'lint_skip_bash' => true,
         ]);
@@ -108,6 +110,7 @@ class CiHelperTest extends TestCase
             'web_skip' => true,
             'unit_os' => true,
             'lint_skip_php' => true,
+            'lint_skip_phpstan' => true,
             'lint_skip_python' => true,
             'lint_skip_bash' => true,
         ]);
@@ -131,6 +134,7 @@ class CiHelperTest extends TestCase
             'web_skip' => true,
             'unit_modules' => true,
             'lint_skip_php' => true,
+            'lint_skip_phpstan' => true,
             'lint_skip_python' => true,
             'lint_skip_bash' => true,
         ]);
@@ -147,6 +151,7 @@ class CiHelperTest extends TestCase
             'unit_os' => true,
             'unit_modules' => true,
             'lint_skip_php' => true,
+            'lint_skip_phpstan' => true,
             'lint_skip_python' => true,
             'lint_skip_bash' => true,
         ]);
@@ -160,6 +165,7 @@ class CiHelperTest extends TestCase
             'web_skip' => true,
             'unit_os' => true,
             'lint_skip_php' => true,
+            'lint_skip_phpstan' => true,
             'lint_skip_python' => true,
             'lint_skip_bash' => true,
         ]);
@@ -173,6 +179,7 @@ class CiHelperTest extends TestCase
             'web_skip' => true,
             'unit_os' => true,
             'lint_skip_php' => true,
+            'lint_skip_phpstan' => true,
             'lint_skip_python' => true,
             'lint_skip_bash' => true,
         ]);
@@ -204,6 +211,7 @@ class CiHelperTest extends TestCase
             'unit_skip' => true,
             'web_skip' => true,
             'lint_skip_php' => true,
+            'lint_skip_phpstan' => true,
         ]);
 
         putenv('FILES=includes/polling/sensors/ios.inc.php');
@@ -223,6 +231,7 @@ class CiHelperTest extends TestCase
             'style_skip' => true,
             'web_skip' => true,
             'lint_skip_php' => true,
+            'lint_skip_phpstan' => true,
             'lint_skip_python' => true,
             'lint_skip_bash' => true,
             'unit_svg' => true,
@@ -236,6 +245,7 @@ class CiHelperTest extends TestCase
             'style_skip' => true,
             'web_skip' => true,
             'lint_skip_php' => true,
+            'lint_skip_phpstan' => true,
             'lint_skip_python' => true,
             'lint_skip_bash' => true,
             'unit_svg' => true,
@@ -272,6 +282,7 @@ class CiHelperTest extends TestCase
             'unit_skip' => false,
             'web_skip' => false,
             'lint_skip_php' => false,
+            'lint_skip_phpstan' => false,
             'lint_skip_python' => false,
             'lint_skip_bash' => false,
             'unit_os' => false,
@@ -284,6 +295,7 @@ class CiHelperTest extends TestCase
             'fail-fast' => false,
             'full' => false,
             'quiet' => false,
+            'os-modules-only' => false,
         ];
     }
 }

@@ -67,8 +67,7 @@
                     "bgpLocalAs": 0,
                     "vrfLocalAs": null
                 }
-            ],
-            "bgpPeers_cbgp": []
+            ]
         },
         "poller": {
             "bgpPeers": [
@@ -116,8 +115,7 @@
                     "bgpLocalAs": 0,
                     "vrfLocalAs": null
                 }
-            ],
-            "bgpPeers_cbgp": []
+            ]
         }
     }
 }

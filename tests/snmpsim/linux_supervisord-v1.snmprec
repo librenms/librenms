@@ -1,0 +1,8 @@
+1.3.6.1.2.1.1.1.0|4|Linux server 3.10.0-693.5.2.el7.x86_64 #1 SMP Fri Oct 20 20:32:50 UTC 2017 x86_64
+1.3.6.1.2.1.1.2.0|6|1.3.6.1.4.1.8072.3.2.10
+1.3.6.1.2.1.1.3.0|67|77550514
+1.3.6.1.2.1.1.4.0|4|<private>
+1.3.6.1.2.1.1.5.0|4|<private>
+1.3.6.1.2.1.1.6.0|4|<private>
+1.3.6.1.4.1.8072.1.3.2.2.1.21.11.115.117.112.101.114.118.105.115.111.114.100|2|1
+1.3.6.1.4.1.8072.1.3.2.3.1.2.11.115.117.112.101.114.118.105.115.111.114.100|4|{"version":1,"data":{"processes":[{"start":1641984698,"state":20,"now":1641984768,"group":"test","name":"test-program_00","error":null,"statename":"RUNNING","stop":1641984697,"uptime":70},{"start":1641982882,"state":200,"now":1641984768,"group":"test","name":"test-program_01","error":"Exited too quickly (process log may have details)","statename":"FATAL","stop":1641982882,"uptime":0}],"total":{"RUNNING":1,"STOPPED":0,"STOPPING":0,"UNKNOWN":0,"FATAL":1,"STARTING":0,"EXITED":0,"BACKOFF":0}},"errorString":0,"error":0}

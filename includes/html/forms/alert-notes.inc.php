@@ -26,7 +26,7 @@ header('Content-type: application/json');
 
 $alert_id = $vars['alert_id'];
 $sub_type = $vars['sub_type'];
-$note = $vars['note'] ?: '';
+$note = strip_tags($vars['note']) ?: '';
 $status = 'error';
 
 if (is_numeric($alert_id)) {

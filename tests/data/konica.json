@@ -450,12 +450,6 @@
             ]
         }
     },
-    "processors": {
-        "discovery": {
-            "processors": []
-        },
-        "poller": "matches discovery"
-    },
     "mempools": {
         "discovery": {
             "mempools": [

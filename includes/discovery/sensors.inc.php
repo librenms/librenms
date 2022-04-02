@@ -25,6 +25,10 @@ if ($device['os'] == 'openbsd') {
     include 'includes/discovery/sensors/openbsd.inc.php';
 }
 
+if ($device['os'] == 'linux') {
+    include 'includes/discovery/sensors/rpigpiomonitor.inc.php';
+}
+
 if (strstr($device['hardware'], 'Dell')) {
     include 'includes/discovery/sensors/fanspeed/dell.inc.php';
     include 'includes/discovery/sensors/power/dell.inc.php';
@@ -64,6 +68,7 @@ $run_sensors = [
     'count',
     'temperature',
     'tv_signal',
+    'bitrate',
     'voltage',
     'snr',
     'pressure',

@@ -32,10 +32,10 @@ use App\Models\Dashboard;
 use App\Models\User;
 use App\Models\UserPref;
 use Auth;
+use Flasher\Prime\FlasherInterface;
 use Illuminate\Support\Str;
 use LibreNMS\Authentication\LegacyAuth;
 use LibreNMS\Config;
-use Toastr;
 use URL;
 
 class UserController extends Controller
@@ -89,7 +89,7 @@ class UserController extends Controller
      * @param  StoreUserRequest  $request
      * @return \Illuminate\Http\RedirectResponse
      */
-    public function store(StoreUserRequest $request)
+    public function store(StoreUserRequest $request, FlasherInterface $flasher)
     {
         $user = $request->only(['username', 'realname', 'email', 'descr', 'level', 'can_modify_passwd']);
         $user['auth_type'] = LegacyAuth::getType();
@@ -98,16 +98,16 @@ class UserController extends Controller
         $user = User::create($user);
 
         $user->setPassword($request->new_password);
-        $user->auth_id = LegacyAuth::get()->getUserid($user->username) ?: $user->user_id;
+        $user->auth_id = (string) LegacyAuth::get()->getUserid($user->username) ?: $user->user_id;
         $this->updateDashboard($user, $request->get('dashboard'));
 
         if ($user->save()) {
-            Toastr::success(__('User :username created', ['username' => $user->username]));
+            $flasher->addSuccess(__('User :username created', ['username' => $user->username]));
 
             return redirect(route('users.index'));
         }
 
-        Toastr::error(__('Failed to create user'));
+        $flasher->addError(__('Failed to create user'));
 
         return redirect()->back();
     }
@@ -165,7 +165,7 @@ class UserController extends Controller
      * @param  User  $user
      * @return \Illuminate\Http\RedirectResponse
      */
-    public function update(UpdateUserRequest $request, User $user)
+    public function update(UpdateUserRequest $request, User $user, FlasherInterface $flasher)
     {
         if ($request->get('new_password') && $user->canSetPassword($request->user())) {
             $user->setPassword($request->new_password);
@@ -183,16 +183,16 @@ class UserController extends Controller
         $user->fill($request->all());
 
         if ($request->has('dashboard') && $this->updateDashboard($user, $request->get('dashboard'))) {
-            Toastr::success(__('Updated dashboard for :username', ['username' => $user->username]));
+            $flasher->addSuccess(__('Updated dashboard for :username', ['username' => $user->username]));
         }
 
         if ($user->save()) {
-            Toastr::success(__('User :username updated', ['username' => $user->username]));
+            $flasher->addSuccess(__('User :username updated', ['username' => $user->username]));
 
             return redirect(route(Str::contains(URL::previous(), 'preferences') ? 'preferences.index' : 'users.index'));
         }
 
-        Toastr::error(__('Failed to update user :username', ['username' => $user->username]));
+        $flasher->addError(__('Failed to update user :username', ['username' => $user->username]));
 
         return redirect()->back();
     }

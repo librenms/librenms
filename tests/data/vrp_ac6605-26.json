@@ -3502,8 +3502,8 @@
                     "ifName": "InLoopBack0",
                     "portName": null,
                     "ifIndex": 1,
-                    "ifSpeed": null,
-                    "ifSpeed_prev": 0,
+                    "ifSpeed": 0,
+                    "ifSpeed_prev": null,
                     "ifConnectorPresent": "false",
                     "ifPromiscuousMode": "false",
                     "ifOperStatus": "up",
@@ -3607,8 +3607,8 @@
                     "ifName": "NULL0",
                     "portName": null,
                     "ifIndex": 2,
-                    "ifSpeed": null,
-                    "ifSpeed_prev": 0,
+                    "ifSpeed": 0,
+                    "ifSpeed_prev": null,
                     "ifConnectorPresent": "false",
                     "ifPromiscuousMode": "false",
                     "ifOperStatus": "up",
@@ -7151,6 +7151,30 @@
                     "sensor_prev": null,
                     "user_func": null,
                     "state_name": null
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "voltage",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.2011.5.25.31.1.1.1.1.13.9",
+                    "sensor_index": "9",
+                    "sensor_type": "vrp",
+                    "sensor_descr": "SRU Board 0",
+                    "group": null,
+                    "sensor_divisor": 1000,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 0.003,
+                    "sensor_limit": 0.00345,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": 0.00255,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "state_name": null
                 }
             ],
             "state_indexes": [
@@ -7242,67 +7266,102 @@
         },
         "poller": "matches discovery"
     },
+    "storage": {
+        "discovery": {
+            "storage": [
+                {
+                    "storage_mib": "vrp",
+                    "storage_index": "1",
+                    "storage_type": "dsk",
+                    "storage_descr": "System Flash",
+                    "storage_size": 211275776,
+                    "storage_units": 1024,
+                    "storage_used": 163139584,
+                    "storage_free": 0,
+                    "storage_perc": 0,
+                    "storage_perc_warn": 60,
+                    "storage_deleted": 0
+                }
+            ]
+        },
+        "poller": {
+            "storage": [
+                {
+                    "storage_mib": "vrp",
+                    "storage_index": "1",
+                    "storage_type": "dsk",
+                    "storage_descr": "System Flash",
+                    "storage_size": 211275776,
+                    "storage_units": 1024,
+                    "storage_used": 163139584,
+                    "storage_free": 48136192,
+                    "storage_perc": 77,
+                    "storage_perc_warn": 60,
+                    "storage_deleted": 0
+                }
+            ]
+        }
+    },
     "vlans": {
         "discovery": {
             "vlans": [
                 {
                     "vlan_vlan": 1,
                     "vlan_domain": 1,
-                    "vlan_name": "",
+                    "vlan_name": "VLAN 1",
                     "vlan_type": null,
                     "vlan_mtu": null
                 },
                 {
                     "vlan_vlan": 70,
                     "vlan_domain": 1,
-                    "vlan_name": "",
+                    "vlan_name": "VLAN 70",
                     "vlan_type": null,
                     "vlan_mtu": null
                 },
                 {
                     "vlan_vlan": 71,
                     "vlan_domain": 1,
-                    "vlan_name": "",
+                    "vlan_name": "VLAN 71",
                     "vlan_type": null,
                     "vlan_mtu": null
                 },
                 {
                     "vlan_vlan": 391,
                     "vlan_domain": 1,
-                    "vlan_name": "",
+                    "vlan_name": "VLAN 391",
                     "vlan_type": null,
                     "vlan_mtu": null
                 },
                 {
                     "vlan_vlan": 392,
                     "vlan_domain": 1,
-                    "vlan_name": "",
+                    "vlan_name": "VLAN 392",
                     "vlan_type": null,
                     "vlan_mtu": null
                 },
                 {
                     "vlan_vlan": 393,
                     "vlan_domain": 1,
-                    "vlan_name": "",
+                    "vlan_name": "VLAN 393",
                     "vlan_type": null,
                     "vlan_mtu": null
                 },
                 {
                     "vlan_vlan": 395,
                     "vlan_domain": 1,
-                    "vlan_name": "",
+                    "vlan_name": "VLAN 395",
                     "vlan_type": null,
                     "vlan_mtu": null
                 },
                 {
                     "vlan_vlan": 419,
                     "vlan_domain": 1,
-                    "vlan_name": "",
+                    "vlan_name": "VLAN 419",
                     "vlan_type": null,
                     "vlan_mtu": null
                 }
-            ],
-            "ports_vlans": []
+            ]
         }
     },
     "wireless": {
@@ -7809,6 +7868,94 @@
                     "storage_perc": 77,
                     "storage_perc_warn": 60,
                     "storage_deleted": 0
+                }
+            ]
+        }
+    },
+    "stp": {
+        "discovery": {
+            "stp": [
+                {
+                    "vlan": null,
+                    "rootBridge": 1,
+                    "bridgeAddress": "9c713ada8f8e",
+                    "protocolSpecification": "unknown",
+                    "priority": 32768,
+                    "timeSinceTopologyChange": "0",
+                    "topChanges": 0,
+                    "designatedRoot": "9c713ada8f8e",
+                    "rootCost": 0,
+                    "rootPort": 0,
+                    "maxAge": 20,
+                    "helloTime": 2,
+                    "holdTime": 0,
+                    "forwardDelay": 15,
+                    "bridgeMaxAge": 20,
+                    "bridgeHelloTime": 2,
+                    "bridgeForwardDelay": 15
+                }
+            ]
+        },
+        "poller": "matches discovery"
+    },
+    "vlans": {
+        "discovery": {
+            "vlans": [
+                {
+                    "vlan_vlan": 1,
+                    "vlan_domain": 1,
+                    "vlan_name": "VLAN 1",
+                    "vlan_type": null,
+                    "vlan_mtu": null
+                },
+                {
+                    "vlan_vlan": 70,
+                    "vlan_domain": 1,
+                    "vlan_name": "VLAN 70",
+                    "vlan_type": null,
+                    "vlan_mtu": null
+                },
+                {
+                    "vlan_vlan": 71,
+                    "vlan_domain": 1,
+                    "vlan_name": "VLAN 71",
+                    "vlan_type": null,
+                    "vlan_mtu": null
+                },
+                {
+                    "vlan_vlan": 391,
+                    "vlan_domain": 1,
+                    "vlan_name": "VLAN 391",
+                    "vlan_type": null,
+                    "vlan_mtu": null
+                },
+                {
+                    "vlan_vlan": 392,
+                    "vlan_domain": 1,
+                    "vlan_name": "VLAN 392",
+                    "vlan_type": null,
+                    "vlan_mtu": null
+                },
+                {
+                    "vlan_vlan": 393,
+                    "vlan_domain": 1,
+                    "vlan_name": "VLAN 393",
+                    "vlan_type": null,
+                    "vlan_mtu": null
+                },
+                {
+                    "vlan_vlan": 395,
+                    "vlan_domain": 1,
+                    "vlan_name": "VLAN 395",
+                    "vlan_type": null,
+                    "vlan_mtu": null
+                },
+                {
+                    "vlan_vlan": 419,
+                    "vlan_domain": 1,
+                    "vlan_name": "VLAN 419",
+                    "vlan_type": null,
+                    "vlan_mtu": null
                 }
             ]
         }

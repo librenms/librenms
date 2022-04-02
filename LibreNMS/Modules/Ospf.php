@@ -1,0 +1,224 @@
+<?php
+/**
+ * Ospf.php
+ *
+ * Poll OSPF-MIB
+ *
+ * This program is free software: you can redistribute it and/or modify
+ * it under the terms of the GNU General Public License as published by
+ * the Free Software Foundation, either version 3 of the License, or
+ * (at your option) any later version.
+ *
+ * This program is distributed in the hope that it will be useful,
+ * but WITHOUT ANY WARRANTY; without even the implied warranty of
+ * MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.See the
+ * GNU General Public License for more details.
+ *
+ * You should have received a copy of the GNU General Public License
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ *
+ * @link       https://www.librenms.org
+ *
+ * @copyright  2021 Tony Murray
+ * @author     Tony Murray <murraytony@gmail.com>
+ */
+
+namespace LibreNMS\Modules;
+
+use App\Models\Ipv4Address;
+use App\Models\OspfArea;
+use App\Models\OspfInstance;
+use App\Models\OspfNbr;
+use App\Models\OspfPort;
+use App\Observers\ModuleModelObserver;
+use LibreNMS\Interfaces\Module;
+use LibreNMS\OS;
+use LibreNMS\RRD\RrdDefinition;
+use SnmpQuery;
+
+class Ospf implements Module
+{
+    /**
+     * @inheritDoc
+     */
+    public function discover(OS $os): void
+    {
+        // no discovery
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function poll(OS $os): void
+    {
+        foreach ($os->getDevice()->getVrfContexts() as $context_name) {
+            echo ' Processes: ';
+            ModuleModelObserver::observe(OspfInstance::class);
+
+            // Pull data from device
+            $ospf_instances_poll = SnmpQuery::context($context_name)
+                ->hideMib()->enumStrings()
+                ->walk('OSPF-MIB::ospfGeneralGroup')->valuesByIndex();
+
+            $ospf_instances = collect();
+            foreach ($ospf_instances_poll as $ospf_instance_id => $ospf_entry) {
+                if (empty($ospf_entry['ospfRouterId'])) {
+                    continue; // skip invalid data
+                }
+
+                $instance = OspfInstance::updateOrCreate([
+                    'device_id' => $os->getDeviceId(),
+                    'ospf_instance_id' => $ospf_instance_id,
+                    'context_name' => $context_name,
+                ], $ospf_entry);
+
+                $ospf_instances->push($instance);
+            }
+
+            // cleanup
+            $os->getDevice()->ospfInstances()
+                ->where('context_name', $context_name)
+                ->whereNotIn('id', $ospf_instances->pluck('id'))->delete();
+
+            $instance_count = $ospf_instances->count();
+            echo $instance_count;
+            if ($instance_count == 0) {
+                // if there are no instances, don't check for areas, neighbors, and ports
+                return;
+            }
+
+            echo ' Areas: ';
+            ModuleModelObserver::observe(OspfArea::class);
+
+            // Pull data from device
+            $ospf_areas = SnmpQuery::context($context_name)
+                ->hideMib()->enumStrings()
+                ->walk('OSPF-MIB::ospfAreaTable')
+                ->mapTable(function ($ospf_area, $ospf_area_id) use ($context_name, $os) {
+                    return OspfArea::updateOrCreate([
+                        'device_id' => $os->getDeviceId(),
+                        'ospfAreaId' => $ospf_area_id,
+                        'context_name' => $context_name,
+                    ], $ospf_area);
+                });
+
+            // cleanup
+            $os->getDevice()->ospfAreas()
+                ->where('context_name', $context_name)
+                ->whereNotIn('id', $ospf_areas->pluck('id'))->delete();
+
+            echo $ospf_areas->count();
+
+            echo ' Ports: ';
+            ModuleModelObserver::observe(OspfPort::class);
+
+            // Pull data from device
+            $ospf_ports = SnmpQuery::context($context_name)
+                ->hideMib()->enumStrings()
+                ->walk('OSPF-MIB::ospfIfTable')
+                ->mapTable(function ($ospf_port, $ip, $ifIndex) use ($context_name, $os) {
+                    // find port_id
+                    $ospf_port['port_id'] = (int) $os->getDevice()->ports()->where('ifIndex', $ifIndex)->value('port_id');
+                    if ($ospf_port['port_id'] == 0) {
+                        $ospf_port['port_id'] = (int) $os->getDevice()->ipv4()
+                            ->where('ipv4_address', $ip)
+                            ->where('context_name', $context_name)
+                            ->value('ipv4_addresses.port_id');
+                    }
+
+                    return OspfPort::updateOrCreate([
+                        'device_id' => $os->getDeviceId(),
+                        'ospf_port_id' => "$ip.$ifIndex",
+                        'context_name' => $context_name,
+                    ], $ospf_port);
+                });
+
+            // cleanup
+            $os->getDevice()->ospfPorts()
+                ->where('context_name', $context_name)
+                ->whereNotIn('id', $ospf_ports->pluck('id'))->delete();
+
+            echo $ospf_ports->count();
+
+            echo ' Neighbours: ';
+            ModuleModelObserver::observe(OspfNbr::class);
+
+            // Pull data from device
+            $ospf_neighbours = SnmpQuery::context($context_name)
+                ->hideMib()->enumStrings()
+                ->walk('OSPF-MIB::ospfNbrTable')
+                ->mapTable(function ($ospf_nbr, $ip, $ifIndex) use ($context_name, $os) {
+                    // get neighbor port_id
+                    $ospf_nbr['port_id'] = Ipv4Address::query()
+                        ->where('ipv4_address', $ip)
+                        ->where('context_name', $context_name)
+                        ->value('port_id');
+
+                    return OspfNbr::updateOrCreate([
+                        'device_id' => $os->getDeviceId(),
+                        'ospf_nbr_id' => "$ip.$ifIndex",
+                        'context_name' => $context_name,
+                    ], $ospf_nbr);
+                });
+
+            // cleanup
+            $os->getDevice()->ospfNbrs()
+                ->where('context_name', $context_name)
+                ->whereNotIn('id', $ospf_neighbours->pluck('id'))->delete();
+
+            echo $ospf_neighbours->count();
+
+            echo ' TOS Metrics: ';
+
+            // Pull data from device
+            $ospf_tos_metrics = SnmpQuery::context($context_name)
+                ->hideMib()->enumStrings()
+                ->walk('OSPF-MIB::ospfIfMetricTable')
+                ->mapTable(function ($ospf_tos, $ip) use ($context_name, $os) {
+                    $ospf_tos['ospf_port_id'] = OspfPort::query()
+                        ->where('ospfIfIpAddress', $ip)
+                        ->where('context_name', $context_name)
+                        ->value('ospf_port_id');
+
+                    return OspfPort::updateOrCreate([
+                        'device_id' => $os->getDeviceId(),
+                        'ospf_port_id' => $ospf_tos['ospf_port_id'],
+                        'context_name' => $context_name,
+                    ], $ospf_tos);
+                });
+
+            echo $ospf_tos_metrics->count();
+            echo PHP_EOL;
+
+            if ($instance_count) {
+                // Create device-wide statistics RRD
+                $rrd_def = RrdDefinition::make()
+                    ->addDataset('instances', 'GAUGE', 0, 1000000)
+                    ->addDataset('areas', 'GAUGE', 0, 1000000)
+                    ->addDataset('ports', 'GAUGE', 0, 1000000)
+                    ->addDataset('neighbours', 'GAUGE', 0, 1000000);
+
+                $fields = [
+                    'instances' => $instance_count,
+                    'areas' => $ospf_areas->count(),
+                    'ports' => $ospf_ports->count(),
+                    'neighbours' => $ospf_neighbours->count(),
+                ];
+
+                $tags = compact('rrd_def');
+                app('Datastore')->put($os->getDeviceArray(), 'ospf-statistics', $tags, $fields);
+            }
+        }
+    }
+
+    /**
+     * @inheritDoc
+     */
+    public function cleanup(OS $os): void
+    {
+        $os->getDevice()->ospfPorts()->delete();
+        $os->getDevice()->ospfNbrs()->delete();
+        $os->getDevice()->ospfAreas()->delete();
+        $os->getDevice()->ospfInstances()->delete();
+    }
+}

@@ -15,9 +15,7 @@
  */
 
 // FUA
-echo "<h3>$title</h3>";
 ?>
-
 <form class="form-inline">
 <?php echo csrf_field() ?>
 <table class="table table-striped table-condensed table-bordered">

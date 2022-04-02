@@ -1,6 +1,6 @@
 <?php
 /**
- * Text.php
+ * StringHelpers.php
  *
  * -Description-
  *
@@ -19,7 +19,7 @@
  *
  * @link       https://www.librenms.org
  *
- * @copyright  2018 Tony Murray
+ * @copyright  2021 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
@@ -145,5 +145,16 @@ class StringHelpers
         }, $class);
 
         return $namespace . $class;
+    }
+
+    /**
+     * Check if variable can be cast to a string
+     *
+     * @param  mixed  $var
+     * @return bool
+     */
+    public static function isStringable($var): bool
+    {
+        return $var === null || is_scalar($var) || (is_object($var) && method_exists($var, '__toString'));
     }
 }

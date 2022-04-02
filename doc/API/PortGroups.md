@@ -1,6 +1,3 @@
-source: API/PortGroups.md
-path: blob/master/doc/
-
 ### `get_graph_by_portgroup`
 
 Get the graph based on the group type.

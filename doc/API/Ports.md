@@ -1,6 +1,3 @@
-source: API/Devices.md
-path: blob/master/doc/
-
 ### `get_all_ports`
 
 Get info for all ports on all devices. Strongly recommend that you use
@@ -240,7 +237,7 @@ Output:
     }
   ]
 }
-
+```
 
 ### `get_port_info`
 

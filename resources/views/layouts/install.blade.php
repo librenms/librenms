@@ -1,7 +1,7 @@
 <!DOCTYPE HTML>
 <html lang="en">
 <head>
-    <title>@lang('install.title')</title>
+    <title>{{ __('install.title') }}</title>
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -105,7 +105,7 @@
                            class="install-step btn btn-circle
                            @if($step === $name) btn-outline-info @else btn-info @endif
                            @if(!$controller->enabled()) disabled @endif"
-                           title="@lang("install.$name.title")"
+                           title="{{ __("install.$name.title") }}"
                         >
                             <i class="fa fa-lg {{ $controller->icon() }}"></i>
                         </a>
@@ -117,7 +117,7 @@
         <div class="card-body">
             <div class="row">
                 <div class="col-12 text-center">
-                    <h2 id="step-title">@lang("install.$step.title")</h2>
+                    <h2 id="step-title">{{ __("install.$step.title") }}</h2>
                 </div>
             </div>
             <div class="row">

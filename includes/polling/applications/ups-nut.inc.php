@@ -40,8 +40,6 @@ if (! $ups_nut) {
 }
 //print_r(array_values(explode("\n", $ups_nut)));
 
-echo ' ' . $name;
-
 // (2020-05-13, Jon.W) Added ups status data and updated ups-nut.sh script.
 [
     $charge,

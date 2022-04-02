@@ -2137,8 +2137,8 @@
                     "ifName": "system",
                     "portName": null,
                     "ifIndex": 1,
-                    "ifSpeed": null,
-                    "ifSpeed_prev": 0,
+                    "ifSpeed": 0,
+                    "ifSpeed_prev": null,
                     "ifConnectorPresent": "false",
                     "ifPromiscuousMode": "false",
                     "ifOperStatus": "up",
@@ -2242,8 +2242,8 @@
                     "ifName": "PtP-OC-Loopback",
                     "portName": null,
                     "ifIndex": 2,
-                    "ifSpeed": null,
-                    "ifSpeed_prev": 0,
+                    "ifSpeed": 0,
+                    "ifSpeed_prev": null,
                     "ifConnectorPresent": "false",
                     "ifPromiscuousMode": "false",
                     "ifOperStatus": "up",
@@ -7448,8 +7448,7 @@
                     "bgpLocalAs": 65000,
                     "vrfLocalAs": 65000
                 }
-            ],
-            "bgpPeers_cbgp": []
+            ]
         },
         "poller": {
             "bgpPeers": [
@@ -7497,8 +7496,7 @@
                     "bgpLocalAs": 65000,
                     "vrfLocalAs": 65000
                 }
-            ],
-            "bgpPeers_cbgp": []
+            ]
         }
     },
     "mpls": {
@@ -8257,7 +8255,7 @@
                     "ospfIfMetricTOS": 0,
                     "ospfIfMetricValue": 0,
                     "ospfIfMetricStatus": "active",
-                    "context_name": null,
+                    "context_name": "",
                     "ifIndex": null
                 },
                 {
@@ -8287,7 +8285,7 @@
                     "ospfIfMetricTOS": 0,
                     "ospfIfMetricValue": 0,
                     "ospfIfMetricStatus": "active",
-                    "context_name": null,
+                    "context_name": "",
                     "ifIndex": null
                 },
                 {
@@ -8317,7 +8315,7 @@
                     "ospfIfMetricTOS": 0,
                     "ospfIfMetricValue": 100,
                     "ospfIfMetricStatus": "active",
-                    "context_name": null,
+                    "context_name": "",
                     "ifIndex": null
                 }
             ],
@@ -8338,7 +8336,7 @@
                     "ospfMulticastExtensions": 0,
                     "ospfExitOverflowInterval": 0,
                     "ospfDemandExtensions": "false",
-                    "context_name": null
+                    "context_name": ""
                 }
             ],
             "ospf_areas": [
@@ -8353,7 +8351,7 @@
                     "ospfAreaLsaCksumSum": 27153464,
                     "ospfAreaSummary": "sendAreaSummary",
                     "ospfAreaStatus": "active",
-                    "context_name": null
+                    "context_name": ""
                 }
             ],
             "ospf_nbrs": [
@@ -8371,7 +8369,7 @@
                     "ospfNbmaNbrStatus": "active",
                     "ospfNbmaNbrPermanence": "dynamic",
                     "ospfNbrHelloSuppressed": "false",
-                    "context_name": null
+                    "context_name": ""
                 }
             ]
         }

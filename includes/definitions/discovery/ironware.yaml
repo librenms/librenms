@@ -24,6 +24,7 @@ modules:
         hardware_mib: FOUNDRY-SN-ROOT-MIB
         sysDescr_regex: '/IronWare Version V(?<version>.*) Compiled on/'
         serial: FOUNDRY-SN-AGENT-MIB::snChasSerNum.0
+        version: FOUNDRY-SN-AGENT-MIB::snAgImgVer.0
 #        version: FOUNDRY-SN-AGENT-MIB::snAgBuildVer.0
     sensors:
         pre-cache:

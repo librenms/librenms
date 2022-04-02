@@ -1,11 +1,9 @@
 <?php
 
-$name = 'postgres';
-$app_id = $app['app_id'];
-
 use LibreNMS\RRD\RrdDefinition;
 
-echo 'postgres';
+$name = 'postgres';
+$app_id = $app['app_id'];
 
 $options = '-Oqv';
 $oid = '.1.3.6.1.4.1.8072.1.3.2.3.1.2.8.112.111.115.116.103.114.101.115';

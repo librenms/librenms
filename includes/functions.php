@@ -9,18 +9,21 @@
  */
 
 use App\Models\Device;
+use Illuminate\Support\Facades\Http;
 use Illuminate\Support\Str;
 use LibreNMS\Config;
+use LibreNMS\Enum\PortAssociationMode;
 use LibreNMS\Exceptions\HostExistsException;
 use LibreNMS\Exceptions\HostIpExistsException;
+use LibreNMS\Exceptions\HostnameExistsException;
+use LibreNMS\Exceptions\HostSysnameExistsException;
 use LibreNMS\Exceptions\HostUnreachableException;
 use LibreNMS\Exceptions\HostUnreachablePingException;
+use LibreNMS\Exceptions\HostUnreachableSnmpException;
 use LibreNMS\Exceptions\InvalidPortAssocModeException;
 use LibreNMS\Exceptions\SnmpVersionUnsupportedException;
 use LibreNMS\Modules\Core;
-use LibreNMS\Util\Debug;
-use LibreNMS\Util\IPv4;
-use LibreNMS\Util\IPv6;
+use LibreNMS\Util\Proxy;
 
 function array_sort_by_column($array, $on, $order = SORT_ASC)
 {
@@ -73,7 +76,7 @@ function parse_modules($type, $options)
 {
     $override = false;
 
-    if ($options['m']) {
+    if (! empty($options['m'])) {
         Config::set("{$type}_modules", []);
         foreach (explode(',', $options['m']) as $module) {
             // parse submodules (only supported by some modules)
@@ -109,24 +112,6 @@ function logfile($string)
     $fd = fopen(Config::get('log_file'), 'a');
     fputs($fd, $string . "\n");
     fclose($fd);
-}
-
-/**
- * Check an array of regexes against a subject if any match, return true
- *
- * @param  string  $subject  the string to match against
- * @param  array|string  $regexes  an array of regexes or single regex to check
- * @return bool if any of the regexes matched, return true
- */
-function preg_match_any($subject, $regexes)
-{
-    foreach ((array) $regexes as $regex) {
-        if (preg_match($regex, $subject)) {
-            return true;
-        }
-    }
-
-    return false;
 }
 
 /**
@@ -179,7 +164,7 @@ function compare_var($a, $b, $comparison = '=')
             return ! Str::endsWith($a, $b);
         case 'regex':
             return (bool) preg_match($b, $a);
-        case 'not regex':
+        case 'not_regex':
             return ! ((bool) preg_match($b, $a));
         case 'in_array':
             return in_array($a, $b);
@@ -198,36 +183,6 @@ function percent_colour($perc)
     $b = max(0, 255 - (5 * ($perc + 25)));
 
     return sprintf('#%02x%02x%02x', $r, $b, $b);
-}
-
-/**
- * @param $device
- * @return string the logo image path for this device. Images are often wide, not square.
- */
-function getLogo($device)
-{
-    $img = getImageName($device, true, 'images/logos/');
-    if (! Str::startsWith($img, 'generic')) {
-        return 'images/logos/' . $img;
-    }
-
-    return getIcon($device);
-}
-
-/**
- * @param  array  $device
- * @param  string  $class  to apply to the image tag
- * @return string an image tag with the logo for this device. Images are often wide, not square.
- */
-function getLogoTag($device, $class = null)
-{
-    $tag = '<img src="' . url(getLogo($device)) . '" title="' . getImageTitle($device) . '"';
-    if (isset($class)) {
-        $tag .= " class=\"$class\" ";
-    }
-    $tag .= ' />';
-
-    return  $tag;
 }
 
 /**
@@ -293,68 +248,16 @@ function device_discovery_trigger($id)
 
 function delete_device($id)
 {
-    if (App::runningInConsole() === false) {
-        ignore_user_abort(true);
-        set_time_limit(0);
+    $device = DeviceCache::get($id);
+    if (! $device->exists) {
+        return 'No such device.';
     }
 
-    $ret = '';
-
-    $host = dbFetchCell('SELECT hostname FROM devices WHERE device_id = ?', [$id]);
-    if (empty($host)) {
-        return 'No such host.';
+    if ($device->delete()) {
+        return "Removed device $device->hostname\n";
     }
 
-    // Remove IPv4/IPv6 addresses before removing ports as they depend on port_id
-    dbQuery('DELETE `ipv4_addresses` FROM `ipv4_addresses` INNER JOIN `ports` ON `ports`.`port_id`=`ipv4_addresses`.`port_id` WHERE `device_id`=?', [$id]);
-    dbQuery('DELETE `ipv6_addresses` FROM `ipv6_addresses` INNER JOIN `ports` ON `ports`.`port_id`=`ipv6_addresses`.`port_id` WHERE `device_id`=?', [$id]);
-
-    //Remove IsisAdjacencies
-    \App\Models\IsisAdjacency::where('device_id', $id)->delete();
-
-    //Remove Outages
-    \App\Models\Availability::where('device_id', $id)->delete();
-    \App\Models\DeviceOutage::where('device_id', $id)->delete();
-
-    \App\Models\Port::where('device_id', $id)
-        ->with('device')
-        ->select(['port_id', 'device_id', 'ifIndex', 'ifName', 'ifAlias', 'ifDescr'])
-        ->chunk(100, function ($ports) use (&$ret) {
-            foreach ($ports as $port) {
-                $port->delete();
-                $ret .= "Removed interface $port->port_id (" . $port->getLabel() . ")\n";
-            }
-        });
-
-    // Remove sensors manually due to constraints
-    foreach (dbFetchRows('SELECT * FROM `sensors` WHERE `device_id` = ?', [$id]) as $sensor) {
-        $sensor_id = $sensor['sensor_id'];
-        dbDelete('sensors_to_state_indexes', '`sensor_id` = ?', [$sensor_id]);
-    }
-    $fields = ['device_id', 'host'];
-
-    $db_name = dbFetchCell('SELECT DATABASE()');
-    foreach ($fields as $field) {
-        foreach (dbFetch('SELECT TABLE_NAME FROM information_schema.columns WHERE table_schema = ? AND column_name = ?', [$db_name, $field]) as $table) {
-            $table = $table['TABLE_NAME'];
-            $entries = (int) dbDelete($table, "`$field` =  ?", [$id]);
-            if ($entries > 0 && Debug::isEnabled()) {
-                $ret .= "$field@$table = #$entries\n";
-            }
-        }
-    }
-
-    $ex = shell_exec("bash -c '( [ ! -d " . trim(Rrd::dirFromHost($host)) . ' ] || rm -vrf ' . trim(Rrd::dirFromHost($host)) . " 2>&1 ) && echo -n OK'");
-    $tmp = explode("\n", $ex);
-    if ($tmp[sizeof($tmp) - 1] != 'OK') {
-        $ret .= "Could not remove files:\n$ex\n";
-    }
-
-    $ret .= "Removed device $host\n";
-    log_event("Device $host has been removed", 0, 'system', 3);
-    oxidized_reload_nodes();
-
-    return $ret;
+    return "Failed to remove device $device->hostname";
 }
 
 /**
@@ -381,12 +284,12 @@ function addHost($host, $snmp_version = '', $port = 161, $transport = 'udp', $po
 {
     // Test Database Exists
     if (host_exists($host)) {
-        throw new HostExistsException("Already have host $host");
+        throw new HostnameExistsException($host);
     }
 
     // Valid port assoc mode
-    if (! in_array($port_assoc_mode, get_port_assoc_modes())) {
-        throw new InvalidPortAssocModeException("Invalid port association_mode '$port_assoc_mode'. Valid modes are: " . join(', ', get_port_assoc_modes()));
+    if (! in_array($port_assoc_mode, PortAssociationMode::getModes())) {
+        throw new InvalidPortAssocModeException("Invalid port association_mode '$port_assoc_mode'. Valid modes are: " . join(', ', PortAssociationMode::getModes()));
     }
 
     // check if we have the host by IP
@@ -399,19 +302,14 @@ function addHost($host, $snmp_version = '', $port = 161, $transport = 'udp', $po
     } else {
         $ip = $host;
     }
-    if ($force_add !== true && $device = device_has_ip($ip)) {
-        $message = "Cannot add $host, already have device with this IP $ip";
-        if ($ip != $device->hostname) {
-            $message .= " ($device->hostname)";
-        }
-        $message .= '. You may force add to ignore this.';
-        throw new HostIpExistsException($message);
+    if ($force_add !== true && $existing = device_has_ip($ip)) {
+        throw new HostIpExistsException($host, $existing->hostname, $ip);
     }
 
     // Test reachability
     if (! $force_add) {
         if (! ((new \LibreNMS\Polling\ConnectivityHelper(new Device(['hostname' => $ip])))->isPingable()->success())) {
-            throw new HostUnreachablePingException("Could not ping $host");
+            throw new HostUnreachablePingException($host);
         }
     }
 
@@ -425,7 +323,7 @@ function addHost($host, $snmp_version = '', $port = 161, $transport = 'udp', $po
     if (isset($additional['snmp_disable']) && $additional['snmp_disable'] == 1) {
         return createHost($host, '', $snmp_version, $port, $transport, [], $poller_group, 1, true, $overwrite_ip, $additional);
     }
-    $host_unreachable_exception = new HostUnreachableException("Could not connect to $host, please check the snmp details and snmp reachability");
+    $host_unreachable_exception = new HostUnreachableSnmpException($host);
     // try different snmp variables to add the device
     foreach ($snmpvers as $snmpver) {
         if ($snmpver === 'v3') {
@@ -435,7 +333,7 @@ function addHost($host, $snmp_version = '', $port = 161, $transport = 'udp', $po
                 if ($force_add === true || isSNMPable($device)) {
                     return createHost($host, null, $snmpver, $port, $transport, $v3, $poller_group, $port_assoc_mode, $force_add, $overwrite_ip);
                 } else {
-                    $host_unreachable_exception->addReason("SNMP $snmpver: No reply with credentials " . $v3['authname'] . '/' . $v3['authlevel']);
+                    $host_unreachable_exception->addReason($snmpver, $v3['authname'] . '/' . $v3['authlevel']);
                 }
             }
         } elseif ($snmpver === 'v2c' || $snmpver === 'v1') {
@@ -446,11 +344,11 @@ function addHost($host, $snmp_version = '', $port = 161, $transport = 'udp', $po
                 if ($force_add === true || isSNMPable($device)) {
                     return createHost($host, $community, $snmpver, $port, $transport, [], $poller_group, $port_assoc_mode, $force_add, $overwrite_ip);
                 } else {
-                    $host_unreachable_exception->addReason("SNMP $snmpver: No reply with community $community");
+                    $host_unreachable_exception->addReason($snmpver, $community);
                 }
             }
         } else {
-            throw new SnmpVersionUnsupportedException("Unsupported SNMP Version \"$snmpver\", must be v1, v2c, or v3");
+            throw new SnmpVersionUnsupportedException($snmpver);
         }
     }
     if (isset($additional['ping_fallback']) && $additional['ping_fallback'] == 1) {
@@ -473,7 +371,7 @@ function deviceArray($host, $community, $snmpver, $port = 161, $transport = 'udp
     /* Get port_assoc_mode id if neccessary
      * We can work with names of IDs here */
     if (! is_int($port_assoc_mode)) {
-        $port_assoc_mode = get_port_assoc_mode_id($port_assoc_mode);
+        $port_assoc_mode = PortAssociationMode::getId($port_assoc_mode);
     }
     $device['port_association_mode'] = $port_assoc_mode;
 
@@ -569,7 +467,7 @@ function createHost(
     /* Get port_assoc_mode id if necessary
      * We can work with names of IDs here */
     if (! is_int($port_assoc_mode)) {
-        $port_assoc_mode = get_port_assoc_mode_id($port_assoc_mode);
+        $port_assoc_mode = PortAssociationMode::getId($port_assoc_mode);
     }
 
     $device = new Device(array_merge([
@@ -594,7 +492,7 @@ function createHost(
 
         $device->sysName = SnmpQuery::device($device)->get('SNMPv2-MIB::sysName.0')->value();
         if (host_exists($host, $device->sysName)) {
-            throw new HostExistsException("Already have host $host ({$device->sysName}) due to duplicate sysName");
+            throw new HostSysnameExistsException($host, $device->sysName);
         }
     }
     if ($device->save()) {
@@ -941,26 +839,6 @@ function set_curl_proxy($curl)
     \LibreNMS\Util\Proxy::applyToCurl($curl);
 }
 
-/**
- * Return the proxy url in guzzle format
- *
- * @return 'tcp://' + $proxy
- */
-function get_guzzle_proxy()
-{
-    return \LibreNMS\Util\Proxy::forGuzzle();
-}
-
-/**
- * Return the proxy url
- *
- * @return array|bool|false|string
- */
-function get_proxy()
-{
-    return \LibreNMS\Util\Proxy::get();
-}
-
 function target_to_id($target)
 {
     if ($target[0] . $target[1] == 'g:') {
@@ -991,23 +869,7 @@ function fix_integer_value($value)
  */
 function device_has_ip($ip)
 {
-    if (IPv6::isValid($ip)) {
-        $ip_address = \App\Models\Ipv6Address::query()
-            ->where('ipv6_address', IPv6::parse($ip, true)->uncompressed())
-            ->with('port.device')
-            ->first();
-    } elseif (IPv4::isValid($ip)) {
-        $ip_address = \App\Models\Ipv4Address::query()
-            ->where('ipv4_address', $ip)
-            ->with('port.device')
-            ->first();
-    }
-
-    if (isset($ip_address) && $ip_address->port) {
-        return $ip_address->port->device;
-    }
-
-    return false; // not an ipv4 or ipv6 address...
+    return Device::findByIp($ip);
 }
 
 /**
@@ -1035,23 +897,6 @@ function host_exists($hostname, $sysName = null)
     }
 
     return dbFetchCell($query, $params) > 0;
-}
-
-function oxidized_reload_nodes()
-{
-    if (Config::get('oxidized.enabled') === true && Config::get('oxidized.reload_nodes') === true && Config::has('oxidized.url')) {
-        $oxidized_reload_url = Config::get('oxidized.url') . '/reload.json';
-        $ch = curl_init($oxidized_reload_url);
-
-        curl_setopt($ch, CURLOPT_TIMEOUT, 5);
-        curl_setopt($ch, CURLOPT_TIMEOUT_MS, 5000);
-        curl_setopt($ch, CURLOPT_CONNECTTIMEOUT, 5);
-        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
-        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
-        curl_setopt($ch, CURLOPT_HEADER, 1);
-        curl_exec($ch);
-        curl_close($ch);
-    }
 }
 
 /**
@@ -1378,7 +1223,7 @@ function q_bridge_bits2indices($hex_data)
     /* convert hex string to an array of 1-based indices of the nonzero bits
      * ie. '9a00' -> '100110100000' -> array(1, 4, 5, 7)
     */
-    $hex_data = str_replace(' ', '', $hex_data);
+    $hex_data = str_replace([' ', "\n"], '', $hex_data);
 
     // we need an even number of digits for hex2bin
     if (strlen($hex_data) % 2 === 1) {
@@ -1398,17 +1243,6 @@ function q_bridge_bits2indices($hex_data)
     }
 
     return $indices;
-}
-
-function update_device_logo(&$device)
-{
-    $icon = getImageName($device, false);
-    if ($icon != $device['icon']) {
-        log_event('Device Icon changed ' . $device['icon'] . " => $icon", $device, 'system', 3);
-        $device['icon'] = $icon;
-        dbUpdate(['icon' => $icon], 'devices', 'device_id=?', [$device['device_id']]);
-        echo "Changed Icon! : $icon\n";
-    }
 }
 
 /**
@@ -1431,17 +1265,35 @@ function cache_mac_oui()
     if ($lock->get()) {
         echo 'Caching Mac OUI' . PHP_EOL;
         try {
-            $mac_oui_url = 'https://macaddress.io/database/macaddress.io-db.json';
+            $mac_oui_url = 'https://gitlab.com/wireshark/wireshark/-/raw/master/manuf';
+            //$mac_oui_url_mirror = 'https://raw.githubusercontent.com/wireshark/wireshark/master/manuf';
+
             echo '  -> Downloading ...' . PHP_EOL;
-            $get = Requests::get($mac_oui_url, [], ['proxy' => get_proxy()]);
-            echo '  -> Processing ...' . PHP_EOL;
-            $json_data = $get->body;
-            foreach (explode("\n", $json_data) as $json_line) {
-                $entry = json_decode($json_line);
-                if ($entry && $entry->{'assignmentBlockSize'} == 'MA-L') {
-                    $oui = strtolower(str_replace(':', '', $entry->{'oui'}));
+            $get = Http::withOptions(['proxy' => Proxy::forGuzzle()])->get($mac_oui_url);
+            echo '  -> Processing CSV ...' . PHP_EOL;
+            $csv_data = $get->body();
+            foreach (explode("\n", $csv_data) as $csv_line) {
+                unset($oui);
+                $entry = str_getcsv($csv_line, "\t");
+
+                $length = strlen($entry[0]);
+                $prefix = strtolower(str_replace(':', '', $entry[0]));
+
+                if (is_array($entry) && count($entry) >= 3 && $length == 8) {
+                    // We have a standard OUI xx:xx:xx
+                    $oui = $prefix;
+                } elseif (is_array($entry) && count($entry) >= 3 && $length == 20) {
+                    // We have a smaller range (xx:xx:xx:X or xx:xx:xx:xx:X)
+                    if (substr($prefix, -2) == '28') {
+                        $oui = substr($prefix, 0, 7);
+                    } elseif (substr($prefix, -2) == '36') {
+                        $oui = substr($prefix, 0, 9);
+                    }
+                }
+                if (isset($oui)) {
+                    echo "Adding $oui, $entry[2]" . PHP_EOL;
                     $key = 'OUIDB-' . $oui;
-                    Cache::put($key, $entry->{'companyName'}, $mac_oui_cache_time);
+                    Cache::put($key, $entry[2], $mac_oui_cache_time);
                 }
             }
         } catch (Exception $e) {
@@ -1475,8 +1327,8 @@ function cache_peeringdb()
             $ix_keep = [];
             foreach (dbFetchRows('SELECT `bgpLocalAs` FROM `devices` WHERE `disabled` = 0 AND `ignore` = 0 AND `bgpLocalAs` > 0 AND (`bgpLocalAs` < 64512 OR `bgpLocalAs` > 65535) AND `bgpLocalAs` < 4200000000 GROUP BY `bgpLocalAs`') as $as) {
                 $asn = $as['bgpLocalAs'];
-                $get = Requests::get($peeringdb_url . '/net?depth=2&asn=' . $asn, [], ['proxy' => get_proxy()]);
-                $json_data = $get->body;
+                $get = Http::withOptions(['proxy' => Proxy::forGuzzle()])->get($peeringdb_url . '/net?depth=2&asn=' . $asn);
+                $json_data = $get->body();
                 $data = json_decode($json_data);
                 $ixs = $data->{'data'}[0]->{'netixlan_set'};
                 foreach ($ixs as $ix) {
@@ -1496,8 +1348,8 @@ function cache_peeringdb()
                         $pdb_ix_id = dbInsert($insert, 'pdb_ix');
                     }
                     $ix_keep[] = $pdb_ix_id;
-                    $get_ix = Requests::get("$peeringdb_url/netixlan?ix_id=$ixid", [], ['proxy' => get_proxy()]);
-                    $ix_json = $get_ix->body;
+                    $get_ix = Http::withOptions(['proxy' => Proxy::forGuzzle()])->get("$peeringdb_url/netixlan?ix_id=$ixid");
+                    $ix_json = $get_ix->body();
                     $ix_data = json_decode($ix_json);
                     $peers = $ix_data->{'data'};
                     foreach ($peers as $index => $peer) {
@@ -1672,35 +1524,12 @@ function is_disk_valid($disk, $device)
 }
 
 /**
- * Queues a hostname to be refreshed by Oxidized
- * Settings: oxidized.url
+ * Take a BGP error code and subcode to return a string representation of it
  *
- * @param  string  $hostname
- * @param  string  $msg
- * @param  string  $username
- * @return bool
- */
-function oxidized_node_update($hostname, $msg, $username = 'not_provided')
-{
-    // Work around https://github.com/rack/rack/issues/337
-    $msg = str_replace('%', '', $msg);
-    $postdata = ['user' => $username, 'msg' => $msg];
-    $oxidized_url = Config::get('oxidized.url');
-    if (! empty($oxidized_url)) {
-        Requests::put("$oxidized_url/node/next/$hostname", [], json_encode($postdata), ['proxy' => get_proxy()]);
-
-        return true;
-    }
-
-    return false;
-}//end oxidized_node_update()
-
-/**
  * @params int code
  * @params int subcode
  *
  * @return string
- *                Take a BGP error code and subcode to return a string representation of it
  */
 function describe_bgp_error_code($code, $subcode)
 {

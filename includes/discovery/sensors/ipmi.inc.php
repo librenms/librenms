@@ -14,8 +14,9 @@ if ($ipmi['host'] = get_dev_attrib($device, 'ipmi_hostname')) {
     if (Config::get('own_hostname') == $device['hostname']) {
         $ipmi['host'] = 'localhost';
     }
+    $ipmi['kg_key'] = get_dev_attrib($device, 'ipmi_kg_key');
 
-    $client = new IPMIClient($ipmi['tool'], $ipmi['host'], $ipmi['user'], $ipmi['password']);
+    $client = new IPMIClient($ipmi['tool'], $ipmi['host'], $ipmi['user'], $ipmi['password'], $ipmi['kg_key']);
     foreach (Config::get('ipmi.type', []) as $ipmi_type) {
         $client->setDriver($ipmi_type);
         $results = $client->getSensors();

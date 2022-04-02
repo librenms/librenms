@@ -1,6 +1,3 @@
-source: Alerting/Entities.md
-path: blob/master/doc/
-
 # Entities
 
 Entities as described earlier are based on the table and column names

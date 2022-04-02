@@ -1,5 +1,9 @@
 mib: TIC-RMTI4-G9000-G2020-MIB
 modules:
+    os:
+        hardware: UPS-MIB::upsIdentName.0
+        version: UPS-MIB::upsIdentAgentSoftwareVersion.0
+        version_regex: '/(RemotEye4 )?(?<version>.*)/'
     sensors:
         voltage:
             data:

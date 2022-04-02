@@ -31,7 +31,7 @@ if (! function_exists('d_echo')) {
      * Legacy convenience function - please use this instead of 'if (Debug::isEnabled()) { echo ...; }'
      * Use Log directly in pure Laravel code!
      *
-     * @param  string|array  $text  The error message or array to print
+     * @param  string|array|float|int  $text  The error message or array to print
      * @param  string  $no_debug_text  Text to print if debug is disabled
      */
     function d_echo($text, $no_debug_text = null)
@@ -93,5 +93,25 @@ if (! function_exists('trans_fb')) {
     function trans_fb($key, $fallback, $replace = [], $locale = null)
     {
         return ($key === ($translation = trans($key, $replace, $locale))) ? $fallback : $translation;
+    }
+}
+
+if (! function_exists('preg_match_any')) {
+    /**
+     * Check an array of regexes against a subject if any match, return true
+     *
+     * @param  string  $subject  the string to match against
+     * @param  array|string  $regexes  an array of regexes or single regex to check
+     * @return bool if any of the regexes matched, return true
+     */
+    function preg_match_any($subject, $regexes)
+    {
+        foreach ((array) $regexes as $regex) {
+            if (preg_match($regex, $subject)) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }

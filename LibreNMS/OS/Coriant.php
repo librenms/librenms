@@ -32,7 +32,7 @@ use Log;
 
 class Coriant extends \LibreNMS\OS implements OSPolling
 {
-    public function pollOS()
+    public function pollOS(): void
     {
         echo 'TNMS-NBI-MIB: enmsNETable';
 

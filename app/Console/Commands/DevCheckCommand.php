@@ -50,6 +50,7 @@ class DevCheckCommand extends LnmsCommand
         $this->addOption('db', null, InputOption::VALUE_NONE);
         $this->addOption('snmpsim', null, InputOption::VALUE_NONE);
         $this->addOption('full', null, InputOption::VALUE_NONE);
+        $this->addOption('os-modules-only', null, InputOption::VALUE_NONE);
         $this->addOption('commands', 'c', InputOption::VALUE_NONE);
     }
 
@@ -90,7 +91,13 @@ class DevCheckCommand extends LnmsCommand
         $this->helper->enable('web', $check == 'ci' || $check === 'web');
 
         if ($os = $this->option('os')) {
-            $this->helper->setFlags(['style_enable' => false, 'lint_enable' => false, 'unit_enable' => true, 'web_enable' => false]);
+            $this->helper->setFlags([
+                'style_enable' => false,
+                'lint_enable' => false,
+                'unit_enable' => true,
+                'web_enable' => false,
+                'os-modules-only' => $this->option('os-modules-only'),
+            ]);
             $this->helper->setOS(explode(',', $os));
         }
 
@@ -100,7 +107,14 @@ class DevCheckCommand extends LnmsCommand
         }
 
         if ($check == 'ci') {
-            $this->helper->setFlags(['ci' => true, 'fail-fast' => true]);
+            $this->helper->setFlags([
+                'ci' => true,
+                'fail-fast' => true,
+                // checked in lint workflow
+                'lint_skip_phpstan' => true,
+                'lint_skip_python' => true,
+                'lint_skip_bash' => true,
+            ]);
             $this->helper->duskHeadless();
             $this->helper->enableSnmpsim();
             $this->helper->enableDb();

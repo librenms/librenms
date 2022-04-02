@@ -561,6 +561,29 @@ class Url
         return new ParameterBag($vars);
     }
 
+    /**
+     * Parse options from the url including get/post parameters and any url segments containing an =
+     *
+     * @param  int|string|null  $key  Optional key to pull from the options
+     * @param  mixed  $default  The default value to return when the given key does not exist
+     * @return array|mixed|null
+     */
+    public static function parseOptions($key = null, $default = null)
+    {
+        $request = request();
+        $options = $request->all();
+
+        foreach (explode('/', $request->path()) as $segment) {
+            $segment = urldecode($segment);
+            if (Str::contains($segment, '=')) {
+                [$name, $value] = explode('=', $segment, 2);
+                $options[$name] = $value;
+            }
+        }
+
+        return is_null($key) ? $options : $options[$key] ?? $default;
+    }
+
     private static function escapeBothQuotes($string)
     {
         return str_replace(["'", '"'], "\'", $string);

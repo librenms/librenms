@@ -1,6 +1,3 @@
-source: Extensions/Oxidized.md
-path: blob/master/doc/
-
 # Oxidized
 
 Integrating LibreNMS with
@@ -20,7 +17,9 @@ it and enter the url to your oxidized instance.
 
 To have devices automatically added, you will need to configure
 oxidized to pull them from LibreNMS [Feeding
-Oxidized](#feeding-oxidized)
+Oxidized](#feeding-oxidized) Note: this means devices will be controlled by
+the LibreNMS API, and not router.db, passwords will still need to be in the
+oxidized config file.
 
 LibreNMS will automatically map the OS to the Oxidized model name if
 they don't match. this means you shouldn't need to use the model_map

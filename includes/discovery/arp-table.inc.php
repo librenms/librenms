@@ -26,13 +26,16 @@
 use LibreNMS\Config;
 
 foreach (DeviceCache::getPrimary()->getVrfContexts() as $context_name) {
-    $device['context_name'] = $context_name;
-
     if (file_exists(Config::get('install_dir') . "/includes/discovery/arp-table/{$device['os']}.inc.php")) {
         include Config::get('install_dir') . "/includes/discovery/arp-table/{$device['os']}.inc.php";
     } else {
-        $arp_data = snmpwalk_group($device, 'ipNetToPhysicalPhysAddress', 'IP-MIB');
-        $arp_data = snmpwalk_group($device, 'ipNetToMediaPhysAddress', 'IP-MIB', 1, $arp_data);
+        $arp_data = SnmpQuery::context($context_name)->walk('IP-MIB::ipNetToPhysicalPhysAddress')->table(1);
+
+        $mediaQuery = SnmpQuery::context($context_name);
+        if ($device['os'] == 'bintec-beip-plus') {
+            $mediaQuery->allowUnordered();
+        }
+        $arp_data = $mediaQuery->walk('IP-MIB::ipNetToMediaPhysAddress')->table(1, $arp_data);
     }
 
     $sql = 'SELECT * from `ipv4_mac` WHERE `device_id`=? AND `context_name`=?';
@@ -48,8 +51,8 @@ foreach (DeviceCache::getPrimary()->getVrfContexts() as $context_name) {
         $port_id = $interface['port_id'];
 
         $port_arp = array_merge(
-            (array) $data['ipNetToMediaPhysAddress'],
-            is_array($data['ipNetToPhysicalPhysAddress']) ? (array) $data['ipNetToPhysicalPhysAddress']['ipv4'] : []
+            (array) $data['IP-MIB::ipNetToMediaPhysAddress'],
+            is_array($data['IP-MIB::ipNetToPhysicalPhysAddress']) ? (array) $data['IP-MIB::ipNetToPhysicalPhysAddress']['ipv4'] : []
         );
 
         echo "{$interface['ifName']}: \n";
@@ -117,7 +120,6 @@ foreach (DeviceCache::getPrimary()->getVrfContexts() as $context_name) {
         $insert_data,
         $sql,
         $params,
-        $entry,
-        $device['context_name']
+        $entry
     );
 }

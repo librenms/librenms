@@ -17,7 +17,7 @@ foreach ($domain_list as $label) {
     $container = $label;
 
     if ($vars['container'] == $container) {
-        $label = sprintf('⚫ %s', $label);
+        $label = '<span class="pagemenu-selected">' . $label . '</span>';
     }
 
     array_push($containers_list, generate_link($label, $link_array, ['container' => $container]));

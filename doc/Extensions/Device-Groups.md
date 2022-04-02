@@ -1,6 +1,3 @@
-source: Extensions/Device-Groups.md
-path: blob/master/doc/
-
 # Grouping Devices
 
 LibreNMS supports grouping your devices together in much the same way

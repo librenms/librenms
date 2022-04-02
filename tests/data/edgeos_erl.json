@@ -1,0 +1,23 @@
+{
+    "os": {
+        "discovery": {
+            "devices": [
+                {
+                    "sysName": null,
+                    "sysObjectID": ".1.3.6.1.4.1.41112.1.5",
+                    "sysDescr": "EdgeRouter Lite",
+                    "sysContact": "<private>",
+                    "version": null,
+                    "hardware": "EdgeRouter Lite 3-Port",
+                    "features": null,
+                    "os": "edgeos",
+                    "type": "network",
+                    "serial": null,
+                    "icon": "edgeos.svg",
+                    "location": "<private>"
+                }
+            ]
+        },
+        "poller": "matches discovery"
+    }
+}

@@ -12,10 +12,13 @@
  * the source code distribution for details.
  */
 
+use App\Actions\Device\ValidateDeviceAndCreate;
 use App\Models\Availability;
 use App\Models\Device;
 use App\Models\DeviceGroup;
 use App\Models\DeviceOutage;
+use App\Models\MplsSap;
+use App\Models\MplsService;
 use App\Models\OspfPort;
 use App\Models\Port;
 use App\Models\PortGroup;
@@ -305,12 +308,17 @@ function list_devices(Illuminate\Http\Request $request)
 
     if ($type == 'all' || empty($type)) {
         $sql = '1';
+    } elseif ($type == 'device_id') {
+        $sql = '`d`.`device_id` = ?';
+        $param[] = $query;
     } elseif ($type == 'active') {
         $sql = "`d`.`ignore`='0' AND `d`.`disabled`='0'";
     } elseif ($type == 'location') {
-        $sql = "`locations`.`location` LIKE '%" . $query . "%'";
+        $sql = '`locations`.`location` LIKE ?';
+        $param[] = "%$query%";
     } elseif ($type == 'hostname') {
-        $sql = "`d`.`hostname` LIKE '%" . $query . "%'";
+        $sql = '`d`.`hostname` LIKE ?';
+        $param[] = "%$query%";
     } elseif ($type == 'ignored') {
         $sql = "`d`.`ignore`='1' AND `d`.`disabled`='0'";
     } elseif ($type == 'up') {
@@ -362,12 +370,8 @@ function list_devices(Illuminate\Http\Request $request)
 function add_device(Illuminate\Http\Request $request)
 {
     // This will add a device using the data passed encoded with json
-    // FIXME: Execution flow through this function could be improved
-    $data = json_decode($request->getContent(), true);
+    $data = $request->json()->all();
 
-    $additional = [];
-    // keep scrutinizer from complaining about snmpver not being set for all execution paths
-    $snmpver = 'v2c';
     if (empty($data)) {
         return api_error(400, 'No information has been provided to add this new device');
     }
@@ -375,54 +379,45 @@ function add_device(Illuminate\Http\Request $request)
         return api_error(400, 'Missing the device hostname');
     }
 
-    $hostname = $data['hostname'];
-    $port = $data['port'] ?: Config::get('snmp.port');
-    $transport = $data['transport'] ?: 'udp';
-    $poller_group = $data['poller_group'] ?: 0;
-    $force_add = $data['force_add'] ? true : false;
-    $snmp_disable = ($data['snmp_disable']);
-    if ($snmp_disable) {
-        $additional = [
-            'sysName'      => $data['sysName'] ?: '',
-            'os'           => $data['os'] ?: 'ping',
-            'hardware'     => $data['hardware'] ?: '',
-            'snmp_disable' => 1,
-        ];
-    } elseif ($data['version'] == 'v1' || $data['version'] == 'v2c') {
-        if ($data['community']) {
-            Config::set('snmp.community', [$data['community']]);
+    try {
+        $device = new Device(Arr::only($data, [
+            'hostname',
+            'display',
+            'overwrite_ip',
+            'port',
+            'transport',
+            'poller_group',
+            'snmpver',
+            'port_association_mode',
+            'community',
+            'authlevel',
+            'authname',
+            'authpass',
+            'authalgo',
+            'cryptopass',
+            'cryptoalgo',
+        ]));
+
+        // uses different name in legacy call
+        if (! empty($data['version'])) {
+            $device->snmpver = $data['version'];
         }
 
-        $snmpver = $data['version'];
-    } elseif ($data['version'] == 'v3') {
-        $v3 = [
-            'authlevel'  => $data['authlevel'],
-            'authname'   => $data['authname'],
-            'authpass'   => $data['authpass'],
-            'authalgo'   => $data['authalgo'],
-            'cryptopass' => $data['cryptopass'],
-            'cryptoalgo' => $data['cryptoalgo'],
-        ];
+        if (! empty($data['snmp_disable'])) {
+            $device->os = $data['os'] ?? 'ping';
+            $device->sysName = $data['sysName'] ?? '';
+            $device->hardware = $data['hardware'] ?? '';
+            $device->snmp_disable = 1;
+        }
 
-        $v3_config = Config::get('snmp.v3');
-        array_unshift($v3_config, $v3);
-        Config::set('snmp.v3', $v3_config);
-        $snmpver = 'v3';
-    } else {
-        return api_error(400, 'You haven\'t specified an SNMP version to use');
-    }
-
-    $additional['overwrite_ip'] = $data['overwrite_ip'] ?: null;
-
-    try {
-        $device_id = addHost($hostname, $snmpver, $port, $transport, $poller_group, $force_add, 'ifIndex', $additional);
+        (new ValidateDeviceAndCreate($device, ! empty($data['force_add'])))->execute();
     } catch (Exception $e) {
         return api_error(500, $e->getMessage());
     }
 
-    $device = device_by_id_cache($device_id);
+    $message = "Device $device->hostname ($device->device_id) has been added successfully";
 
-    return api_success([$device], 'devices', $response);
+    return api_success($device->attributesToArray(), 'devices', $message);
 }
 
 function del_device(Illuminate\Http\Request $request)
@@ -1123,6 +1118,28 @@ function get_port_stack(Illuminate\Http\Request $request)
 
         return api_success($mappings, 'mappings');
     });
+}
+
+function update_device_port_notes(Illuminate\Http\Request $request): \Illuminate\Http\JsonResponse
+{
+    $portid = $request->route('portid');
+
+    $hostname = $request->route('hostname');
+    // use hostname as device_id if it's all digits
+    $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
+
+    $data = json_decode($request->getContent(), true);
+    $field = 'notes';
+    $content = $data[$field];
+    if (empty($data)) {
+        return api_error(400, 'Port field to patch has not been supplied.');
+    }
+
+    if (set_dev_attrib($device_id, 'port_id_notes:' . $portid, $content)) {
+        return api_success_noresult(200, 'Port ' . $field . ' field has been updated');
+    } else {
+        return api_error(500, 'Port ' . $field . ' field failed to be updated');
+    }
 }
 
 function list_alert_rules(Illuminate\Http\Request $request)
@@ -2182,6 +2199,38 @@ function get_vrf(Illuminate\Http\Request $request)
     return api_success($vrf, 'vrf');
 }
 
+function list_mpls_services(Illuminate\Http\Request $request)
+{
+    $hostname = $request->get('hostname');
+    $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
+
+    $mpls_services = MplsService::hasAccess(Auth::user())->when($device_id, function ($query, $device_id) {
+        return $query->where('device_id', $device_id);
+    })->get();
+
+    if ($mpls_services->isEmpty()) {
+        return api_error(404, 'MPLS Services do not exist');
+    }
+
+    return api_success($mpls_services, 'mpls_services', null, 200, $mpls_services->count());
+}
+
+function list_mpls_saps(Illuminate\Http\Request $request)
+{
+    $hostname = $request->get('hostname');
+    $device_id = ctype_digit($hostname) ? $hostname : getidbyname($hostname);
+
+    $mpls_saps = MplsSap::hasAccess(Auth::user())->when($device_id, function ($query, $device_id) {
+        return $query->where('device_id', $device_id);
+    })->get();
+
+    if ($mpls_saps->isEmpty()) {
+        return api_error(404, 'SAPs do not exist');
+    }
+
+    return api_success($mpls_saps, 'saps', null, 200, $mpls_saps->count());
+}
+
 function list_ipsec(Illuminate\Http\Request $request)
 {
     $hostname = $request->route('hostname');
@@ -2690,11 +2739,11 @@ function add_location(Illuminate\Http\Request $request)
         return api_error(400, 'Required fields missing (location, lat and lng needed)');
     }
     // Set the location
-    $timestamp = date('Y-m-d H:m:s');
-    $insert = ['location' => $data['location'], 'lat' => $data['lat'], 'lng' => $data['lng'], 'timestamp' => $timestamp];
-    $location_id = dbInsert($insert, 'locations');
-    if ($location_id != false) {
-        return api_success_noresult(201, "Location added with id #$location_id");
+    $location = new \App\Models\Location($data);
+    $location->fixed_coordinates = $data['fixed_coordinates'] ?? $location->coordinatesValid();
+
+    if ($location->save()) {
+        return api_success_noresult(201, "Location added with id #$location->id");
     }
 
     return api_error(500, 'Failed to add the location');

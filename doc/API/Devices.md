@@ -1,6 +1,3 @@
-source: API/Devices.md
-path: blob/master/doc/
-
 ### `del_device`
 
 Delete a given device.
@@ -1053,6 +1050,7 @@ Input:
   - ipv6: search by IPv6 address (compressed or uncompressed)
   - location: search by location
   - hostname: search by hostname
+  - device_id: exact match by device-id
 - query: If searching by, then this will be used as the input.
 
 Example:
@@ -1131,20 +1129,28 @@ Output:
 
 ### `add_device`
 
-Add a new device.
+Add a new device.  Most fields are optional. You may omit snmp
+credentials to attempt each system credential in order. See snmp.version, snmp.community, and snmp.v3
+
+To guarantee device is added, use force_add. This will skip checks 
+for duplicate device and snmp reachability, but not duplicate hostname.
 
 Route: `/api/v0/devices`
 
 Input (JSON):
 
-- hostname: device hostname
-- overwrite_ip: alternate polling IP. Will be use instead of hostname (optional)
+- hostname (required): device hostname or IP
+- display: A string to display as the name of this device, defaults to 
+  hostname (or device_display_default setting). May be a simple
+  template using replacements: {{ $hostname }}, {{ $sysName }},
+  {{ $sysName_fallback }}, {{ $ip }}
 - port: SNMP port (defaults to port defined in config).
 - transport: SNMP protocol (defaults to transport defined in config).
-- version: SNMP version to use, v1, v2c or v3. Defaults to v2c.
+- snmpver: SNMP version to use, v1, v2c or v3. Defaults to v2c.
+- port_association_mode: method to identify ports: ifIndex (default), ifName, ifDescr, ifAlias
 - poller_group: This is the poller_group id used for distributed
   poller setup. Defaults to 0.
-- force_add: Force the device to be added regardless of it being able
+- force_add: Set to true to force the device to be added regardless of it being able
   to respond to snmp or icmp.
 
 For SNMP v1 or v2c
@@ -1156,7 +1162,7 @@ For SNMP v3
 - authlevel: SNMP authlevel (noAuthNoPriv, authNoPriv, authPriv).
 - authname: SNMP Auth username
 - authpass: SNMP Auth password
-- authalgo: SNMP Auth algorithm (MD5, SHA)
+- authalgo: SNMP Auth algorithm (MD5, SHA) (SHA-224, SHA-256, SHA-384, SHA-512 if supported by your server)
 - cryptopass: SNMP Crypto Password
 - cryptoalgo: SNMP Crypto algorithm (AES, DES)
 
@@ -1164,6 +1170,7 @@ For ICMP only
 
 - snmp_disable: Boolean, set to true for ICMP only.
 - os: OS short name for the device (defaults to ping).
+- sysName: sysName for the device.
 - hardware: Device hardware.
 
 Example:
@@ -1250,6 +1257,35 @@ Output:
     {
         "status": "ok",
         "message": "Device notes has been updated"
+    }
+]
+```
+
+### `update_device_port_notes`
+
+Update a device port notes field in the devices_attrs database.
+
+Route: `/api/v0/devices/:hostname/port/:portid`
+
+- hostname can be either the device hostname or id
+- portid needs to be the port unique id (int).
+
+Input (JSON):
+- notes: The string data to populate on the port notes field.
+
+Examples:
+
+```curl
+curl -X PATCH -d '{"notes": "This port is in a scheduled maintenance with the provider."}' -H 'X-Auth-Token: YOURAPITOKENHERE' https://librenms.org/api/v0/devices/localhost/port/5
+```
+
+Output:
+
+```json
+[
+    {
+        "status": "ok",
+        "message": "Port notes field has been updated"
     }
 ]
 ```
@@ -1440,5 +1476,33 @@ Output:
 {
     "status": "ok",
     "message": "All device dependencies have been removed"
+}
+```
+
+### `list_parents_of_host`
+
+This is not a seperate API call.  Instead, you obtain the list of parents
+from `list_devices`.  See that entry point for more detailed information.
+
+Example:
+
+```curl
+curl -H 'X-Auth-Token: YOURAPITOKENHERE' 'http://librenms.org/api/v0/devices?type=device_id&query=34'
+```
+
+Output:
+
+```json
+{
+    "status": "ok",
+    "devices": [
+        {
+            ...
+            "dependency_parent_id": "98,99",
+            "dependency_parent_hostname": "HOSTNAME1,HOSTNAME2",
+            ...
+        }
+    ],
+    "count": 1
 }
 ```

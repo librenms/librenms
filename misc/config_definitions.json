@@ -372,6 +372,38 @@
             "order": 1,
             "type": "text"
         },
+        "auth.socialite.redirect": {
+            "group": "auth",
+            "section": "socialite",
+            "order": 1,
+            "type": "boolean",
+            "default": false
+        },
+        "auth.socialite.register": {
+            "group": "auth",
+            "section": "socialite",
+            "order": 2,
+            "type": "boolean",
+            "default": false
+        },
+
+        "auth.socialite.configs": {
+            "group": "auth",
+            "section": "socialite",
+            "order": 3,
+            "type": "array-sub-keyed",
+            "validate": {
+                "value": "array",
+                "value.*": "array",
+                "value.*.listener": ["not_regex:/[:|@]/"],
+                "value.*.listener": ["regex:/^\\\\SocialiteProviders\\\\[^\\\\]+\\\\[^\\\\]+ExtendSocialite$/"],
+                "value.*.redirect": "url",
+                "value.saml.metadata": "url_or_xml",
+                "value.saml.acs": "url",
+                "value.saml.entityid": "url"
+            }
+        },
+
         "auth_ad_check_certificates": {
             "default": false,
             "group": "auth",
@@ -872,6 +904,19 @@
                 "ifName": "ifName",
                 "ifDescr": "ifDescr",
                 "ifAlias": "ifAlias"
+            }
+        },
+        "device_display_default": {
+            "group": "webui",
+            "section": "device",
+            "order": 1,
+            "default": null,
+            "type": "select",
+            "options": {
+                "{{ $hostname }}": "hostname",
+                "{{ $sysName_fallback }}":  "sysName_fallback",
+                "{{ $sysName }}":  "sysName",
+                "{{ $ip }}":  "ip"
             }
         },
         "device_perf_purge": {
@@ -1596,20 +1641,6 @@
             "section": "style",
             "order": 2,
             "type": "text"
-        },
-        "force_hostname_to_sysname": {
-            "group": "webui",
-            "section": "device",
-            "order": 0,
-            "default": false,
-            "type": "boolean"
-        },
-        "force_ip_to_sysname": {
-            "group": "webui",
-            "section": "device",
-            "order": 1,
-            "default": false,
-            "type": "boolean"
         },
         "fping": {
             "default": "fping",
@@ -5131,6 +5162,9 @@
                 "public"
             ]
         },
+        "snmp.unescape": {
+            "type": "boolean"
+        },
         "snmp.exec_timeout": {
             "default": 1200,
             "type": "integer",
@@ -5143,11 +5177,18 @@
             "type": "integer",
             "default": 0
         },
+        "snmp.oids.no_bulk": {
+            "group": "poller",
+            "section": "snmp",
+            "order": 20,
+            "type": "array",
+            "default": null
+        },
         "snmp.timeout": {
             "group": "poller",
             "section": "snmp",
             "order": 5,
-            "type": "integer",
+            "type": "float",
             "default": 1
         },
         "snmp.retries": {

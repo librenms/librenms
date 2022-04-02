@@ -171,6 +171,11 @@ return [
         Illuminate\View\ViewServiceProvider::class,
 
         /*
+         * Package Service Providers...
+         */
+        \SocialiteProviders\Manager\ServiceProvider::class,
+
+        /*
          * Application Service Providers...
          */
         App\Providers\AppServiceProvider::class,
@@ -240,8 +245,7 @@ return [
         'URL' => Illuminate\Support\Facades\URL::class,
         'Validator' => Illuminate\Support\Facades\Validator::class,
         'View' => Illuminate\Support\Facades\View::class,
-        'Debugbar' => Barryvdh\Debugbar\Facade::class,
-        'Toastr' => Kamaln7\Toastr\Facades\Toastr::class,
+        'Debugbar' => Barryvdh\Debugbar\Facades\Debugbar::class,
 
         // LibreNMS
         'Permissions' => \App\Facades\Permissions::class,

@@ -51,7 +51,7 @@ function var_get($v)
 
 function toner2colour($descr, $percent)
 {
-    $colour = \LibreNMS\Util\Colors::percentage(100 - $percent, null);
+    $colour = \LibreNMS\Util\Color::percentage(100 - $percent, null);
 
     if (substr($descr, -1) == 'C' || stripos($descr, 'cyan') !== false) {
         $colour['left'] = '55D6D3';
@@ -350,11 +350,7 @@ function generate_port_link($port, $text = null, $type = null, $overlib = 1, $si
     }
 
     $content = '<div class=list-large>' . $port['hostname'] . ' - ' . Rewrite::normalizeIfName(addslashes(\LibreNMS\Util\Clean::html($port['label'], []))) . '</div>';
-    if ($port['port_descr_descr']) {
-        $content .= addslashes(\LibreNMS\Util\Clean::html($port['port_descr_descr'], [])) . '<br />';
-    } elseif ($port['ifAlias']) {
-        $content .= addslashes(\LibreNMS\Util\Clean::html($port['ifAlias'], [])) . '<br />';
-    }
+    $content .= addslashes(\LibreNMS\Util\Clean::html($port['ifAlias'], [])) . '<br />';
 
     $content .= "<div style=\'width: 850px\'>";
     $graph_array['type'] = $port['graph_type'];
@@ -440,6 +436,11 @@ function generate_port_url($port, $vars = [])
 
 function generate_sap_url($sap, $vars = [])
 {
+    // Overwrite special QinQ sap identifiers
+    if ($sap['sapEncapValue'] == '*') {
+        $sap['sapEncapValue'] = '4095';
+    }
+
     return \LibreNMS\Util\Url::graphPopup(['device' => $sap['device_id'], 'page' => 'graphs', 'type' => 'device_sap', 'tab' => 'routing', 'proto' => 'mpls', 'view' => 'saps', 'traffic_id' => $sap['svc_oid'] . '.' . $sap['sapPortId'] . '.' . $sap['sapEncapValue']], $vars);
 }//end generate_sap_url()
 
@@ -1317,6 +1318,14 @@ function get_sensor_label_color($sensor, $type = 'sensors')
     }
     if ($sensor['sensor_class'] == 'frequency' && $sensor['sensor_type'] == 'openwrt') {
         return "<span class='label $label_style'>" . trim($sensor['sensor_current']) . ' ' . $unit . '</span>';
+    }
+
+    if ($type == 'wireless' && $sensor['sensor_class'] == 'frequency') {
+        return "<span class='label $label_style'>" . trim(Number::formatSi($sensor['sensor_current'] * 1000000, 2, 3, 'Hz')) . '</span>';
+    }
+
+    if ($type == 'wireless' && $sensor['sensor_class'] == 'distance') {
+        return "<span class='label $label_style'>" . trim(Number::formatSi($sensor['sensor_current'] * 1000, 2, 3, 'm')) . '</span>';
     }
 
     return "<span class='label $label_style'>" . trim(Number::formatSi($sensor['sensor_current'], 2, 3, $unit)) . '</span>';

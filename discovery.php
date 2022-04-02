@@ -15,6 +15,7 @@ $init_modules = ['discovery'];
 require __DIR__ . '/includes/init.php';
 
 $start = microtime(true);
+Log::setDefaultDriver('console');
 $sqlparams = [];
 $options = getopt('h:m:i:n:d::v::a::q', ['os:', 'type:']);
 
@@ -120,13 +121,6 @@ foreach (dbFetch("SELECT * FROM `devices` WHERE disabled = 0 $where ORDER BY dev
 $end = microtime(true);
 $run = ($end - $start);
 $proctime = substr($run, 0, 5);
-
-if ($discovered_devices) {
-    if ($doing === 'new') {
-        // We have added a new device by this point so we might want to do some other work
-        oxidized_reload_nodes();
-    }
-}
 
 if (isset($new_discovery_lock)) {
     $new_discovery_lock->release();

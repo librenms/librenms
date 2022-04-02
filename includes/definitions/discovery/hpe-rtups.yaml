@@ -1,0 +1,4 @@
+modules:
+  os:
+    serial: CPQPOWER-MIB::deviceSerialNumber.0
+    version: CPQPOWER-MIB::deviceFirmwareVersion.0

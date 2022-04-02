@@ -1,6 +1,3 @@
-source: API/Locations.md
-path: blob/master/doc/
-
 ### `add_location`
 
 Add a new location
@@ -12,6 +9,7 @@ Input:
 - location: name of the new location
 - lat: latitude
 - lng: longitude
+- fixed_coordinates: 0 if updated from the device or 1 if the coordinate is fixed (default is fixed if lat and lng are valid)
 
 Example:
 

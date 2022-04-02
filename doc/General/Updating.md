@@ -1,6 +1,3 @@
-source: General/Updating.md
-path: blob/master/doc/
-
 # Updating an Install
 
 By default, LibreNMS is set to automatically update. If you have
@@ -29,10 +26,16 @@ php includes/sql-schema/update.php
 ./validate.php
 ```
 
-You should continue to run daily.sh.  This does database cleanup and
-other processes in addition to updating. You can disable the daily.sh
-update process as described below.
-
 ## Disabling automatic updates
 
-LibreNMS by default performs updates on a daily basis. This can be disabled in the WebUI Global Settings under System -> Updates, or using lnms: `./lnms config:set update false`
+LibreNMS by default performs updates on a daily basis.  
+This can be disabled in the WebUI Global Settings under System -> Updates, or using lnms
+
+!!! warning
+	You should never remove daily.sh from the cronjob!  
+	This does database cleanup and other processes in addition to updating.
+
+!!! setting "settings/system/updates"
+	```bash
+	lnms config:set update false
+	```

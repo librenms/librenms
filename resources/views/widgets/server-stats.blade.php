@@ -1,5 +1,5 @@
 <div class="col-sm-{{ $columns }}">
-    <div class="gauge-title">@lang('CPU Usage')</div>
+    <div class="gauge-title">{{ __('CPU Usage') }}</div>
     <div
         id="cpu-{{ $id }}"
         class="gauge-{{ $id }} gauge-container"
@@ -11,7 +11,7 @@
 
 @foreach($mempools as $key => $mem)
     <div class="col-sm-{{ $columns }}">
-        <div class="gauge-title">{{ $mem->mempool_descr}} @lang('Usage')</div>
+        <div class="gauge-title">{{ $mem->mempool_descr}} {{ __('Usage') }}</div>
         <div
             id="mem-{{ $key }}-{{ $id }}"
             class="gauge-{{ $id }} gauge-container"
@@ -24,7 +24,7 @@
 
 @foreach($disks as $key => $disk)
     <div class="col-sm-{{ $columns }}">
-        <div class="gauge-title">{{ $disk->storage_descr}} @lang('Usage')</div>
+        <div class="gauge-title">{{ $disk->storage_descr}} {{ __('Usage') }}</div>
         <div
             id="disk-{{ $key }}-{{ $id }}"
             class="gauge-{{ $id }} gauge-container"

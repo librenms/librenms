@@ -26,8 +26,6 @@ $app_id = $app['app_id'];
 $options = '-Oqv';
 $oid = '.1.3.6.1.4.1.8072.1.3.2.3.1.2.8.115.100.102.115.105.110.102.111';
 
-d_echo($name);
-
 $sdfsinfo = snmp_walk($device, $oid, $options);
 
 if (is_string($sdfsinfo)) {

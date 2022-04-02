@@ -1,6 +1,3 @@
-source: Installation/Install-LibreNMS.md
-path: blob/master/doc/
-
 # Install LibreNMS
 
 ## Prepare Linux Server
@@ -26,7 +23,7 @@ Connect to the server command line and follow the instructions below.
         apt install software-properties-common
         add-apt-repository universe
         apt update
-        apt install acl curl composer fping git graphviz imagemagick mariadb-client mariadb-server mtr-tiny nginx-full nmap php7.4-cli php7.4-curl php7.4-fpm php7.4-gd php7.4-gmp php7.4-json php7.4-mbstring php7.4-mysql php7.4-snmp php7.4-xml php7.4-zip rrdtool snmp snmpd whois unzip python3-pymysql python3-dotenv python3-redis python3-setuptools python3-systemd
+        apt install acl curl composer fping git graphviz imagemagick mariadb-client mariadb-server mtr-tiny nginx-full nmap php7.4-cli php7.4-curl php7.4-fpm php7.4-gd php7.4-gmp php7.4-json php7.4-mbstring php7.4-mysql php7.4-snmp php7.4-xml php7.4-zip rrdtool snmp snmpd whois unzip python3-pymysql python3-dotenv python3-redis python3-setuptools python3-systemd python3-pip
         ```
 
     === "Apache"
@@ -34,7 +31,7 @@ Connect to the server command line and follow the instructions below.
         apt install software-properties-common
         add-apt-repository universe
         apt update
-        apt install acl curl apache2 composer fping git graphviz imagemagick libapache2-mod-fcgid mariadb-client mariadb-server mtr-tiny nmap php7.4-cli php7.4-curl php7.4-fpm php7.4-gd php7.4-gmp php7.4-json php7.4-mbstring php7.4-mysql php7.4-snmp php7.4-xml php7.4-zip rrdtool snmp snmpd whois python3-pymysql python3-dotenv python3-redis python3-setuptools python3-systemd
+        apt install acl curl apache2 composer fping git graphviz imagemagick libapache2-mod-fcgid mariadb-client mariadb-server mtr-tiny nmap php7.4-cli php7.4-curl php7.4-fpm php7.4-gd php7.4-gmp php7.4-json php7.4-mbstring php7.4-mysql php7.4-snmp php7.4-xml php7.4-zip rrdtool snmp snmpd whois python3-pymysql python3-dotenv python3-redis python3-setuptools python3-systemd python3-pip
         ```
 
 === "CentOS 8"
@@ -57,7 +54,7 @@ Connect to the server command line and follow the instructions below.
 === "Debian 11"
     === "NGINX"
         ```
-        apt install acl curl composer fping git graphviz imagemagick mariadb-client mariadb-server mtr-tiny nginx-full nmap php7.4-cli php7.4-curl php7.4-fpm php7.4-gd php7.4-gmp php7.4-json php7.4-mbstring php7.4-mysql php7.4-snmp php7.4-xml php7.4-zip python3-dotenv python3-pymysql python3-redis python3-setuptools python3-systemd rrdtool snmp snmpd whois
+        apt install acl curl composer fping git graphviz imagemagick mariadb-client mariadb-server mtr-tiny nginx-full nmap php7.4-cli php7.4-curl php7.4-fpm php7.4-gd php7.4-gmp php7.4-json php7.4-mbstring php7.4-mysql php7.4-snmp php7.4-xml php7.4-zip python3-dotenv python3-pymysql python3-redis python3-setuptools python3-systemd python3-pip rrdtool snmp snmpd whois
         ```
 
 ## Add librenms user
@@ -418,7 +415,7 @@ Feel free to tune the performance settings in librenms.conf to meet your needs.
     dnf install policycoreutils-python-utils
     ```
 
-    ### Configure the contexts needed by LibreNMS
+    <h3>Configure the contexts needed by LibreNMS</h3>
 
     ```
     semanage fcontext -a -t httpd_sys_content_t '/opt/librenms/html(/.*)?'
@@ -430,7 +427,7 @@ Feel free to tune the performance settings in librenms.conf to meet your needs.
     chcon -t httpd_sys_rw_content_t /opt/librenms/.env
     ```
 
-    ### Allow fping
+    <h3>Allow fping</h3>
 
     Create the file http_fping.tt with the following contents. You can
     create this file anywhere, as it is a throw-away file. The last step
@@ -584,7 +581,7 @@ Now that you've installed LibreNMS, we'd suggest that you have a read
 of a few other docs to get you going:
 
 - [Performance tuning](../Support/Performance.md)
-- [Alerting](../Extensions/Alerting.md)
+- [Alerting](../Alerting/index.md)
 - [Device Groups](../Extensions/Device-Groups.md)
 - [Auto discovery](../Extensions/Auto-Discovery.md)
 

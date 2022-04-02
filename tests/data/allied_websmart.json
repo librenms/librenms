@@ -1,10 +1,4 @@
 {
-    "mempools": {
-        "discovery": {
-            "mempools": []
-        },
-        "poller": "matches discovery"
-    },
     "ports": {
         "discovery": {
             "ports": [
@@ -5076,12 +5070,6 @@
         },
         "poller": "matches discovery"
     },
-    "processors": {
-        "discovery": {
-            "processors": []
-        },
-        "poller": "matches discovery"
-    },
     "vlans": {
         "discovery": {
             "vlans": [
@@ -5095,12 +5083,11 @@
                 {
                     "vlan_vlan": 4001,
                     "vlan_domain": 1,
-                    "vlan_name": "",
+                    "vlan_name": "VLAN 4001",
                     "vlan_type": null,
                     "vlan_mtu": null
                 }
-            ],
-            "ports_vlans": []
+            ]
         }
     }
 }

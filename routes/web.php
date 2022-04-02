@@ -16,13 +16,19 @@ use Illuminate\Support\Facades\Route;
 // Auth
 Auth::routes(['register' => false, 'reset' => false, 'verify' => false]);
 
+// Socialite
+Route::prefix('auth')->name('socialite.')->group(function () {
+    Route::post('{provider}/redirect', [\App\Http\Controllers\Auth\SocialiteController::class, 'redirect'])->name('redirect');
+    Route::match(['get', 'post'], '{provider}/callback', [\App\Http\Controllers\Auth\SocialiteController::class, 'callback'])->name('callback');
+    Route::get('{provider}/metadata', [\App\Http\Controllers\Auth\SocialiteController::class, 'metadata'])->name('metadata');
+});
+
 // WebUI
 Route::group(['middleware' => ['auth'], 'guard' => 'auth'], function () {
 
     // pages
     Route::post('alert/{alert}/ack', [\App\Http\Controllers\AlertController::class, 'ack'])->name('alert.ack');
     Route::resource('device-groups', 'DeviceGroupController');
-    Route::resource('port-groups', 'PortGroupController');
     Route::resource('port', 'PortController', ['only' => 'update']);
     Route::group(['prefix' => 'poller'], function () {
         Route::get('', 'PollerController@pollerTab')->name('poller.index');
@@ -75,15 +81,18 @@ Route::group(['middleware' => ['auth'], 'guard' => 'auth'], function () {
         Route::delete('settings/{name}', 'SettingsController@destroy')->name('settings.destroy');
 
         Route::post('alert/transports/{transport}/test', [\App\Http\Controllers\AlertTransportController::class, 'test'])->name('alert.transports.test');
+
+        Route::get('plugin/settings', 'PluginAdminController')->name('plugin.admin');
+        Route::get('plugin/settings/{plugin:plugin_name}', 'PluginSettingsController')->name('plugin.settings');
+        Route::post('plugin/settings/{plugin:plugin_name}', 'PluginSettingsController@update')->name('plugin.update');
+
+        Route::resource('port-groups', 'PortGroupController');
     });
 
-    Route::get('plugin/settings', 'PluginAdminController')->name('plugin.admin');
-    Route::get('plugin/settings/{plugin:plugin_name}', 'PluginSettingsController')->name('plugin.settings');
-    Route::post('plugin/settings/{plugin:plugin_name}', 'PluginSettingsController@update')->name('plugin.update');
     Route::get('plugin', 'PluginLegacyController@redirect');
     Route::redirect('plugin/view=admin', '/plugin/admin');
     Route::get('plugin/p={pluginName}', 'PluginLegacyController@redirect');
-    Route::any('plugin/v1/{plugin:plugin_name}', 'PluginLegacyController')->name('plugin.legacy');
+    Route::any('plugin/v1/{plugin:plugin_name}/{other?}', 'PluginLegacyController')->where('other', '(.*)')->name('plugin.legacy');
     Route::get('plugin/{plugin:plugin_name}', 'PluginPageController')->name('plugin.page');
 
     // old route redirects
@@ -108,6 +117,9 @@ Route::group(['middleware' => ['auth'], 'guard' => 'auth'], function () {
         Route::resource('pollergroup', 'PollerGroupController', ['only' => ['destroy']]);
         // misc ajax controllers
         Route::group(['namespace' => 'Ajax'], function () {
+            Route::get('search/bgp', 'BgpSearchController');
+            Route::get('search/device', 'DeviceSearchController');
+            Route::get('search/port', 'PortSearchController');
             Route::post('set_map_group', 'AvailabilityMapController@setGroup');
             Route::post('set_map_view', 'AvailabilityMapController@setView');
             Route::post('set_resolution', 'ResolutionController@set');
@@ -160,6 +172,7 @@ Route::group(['middleware' => ['auth'], 'guard' => 'auth'], function () {
             Route::post('mempools', 'MempoolsController');
             Route::post('outages', 'OutagesController');
             Route::post('port-nac', 'PortNacController');
+            Route::post('port-stp', 'PortStpController');
             Route::post('ports', 'PortsController')->name('table.ports');
             Route::post('routes', 'RoutesTablesController');
             Route::post('syslog', 'SyslogController');

@@ -462,12 +462,6 @@
         },
         "poller": "matches discovery"
     },
-    "processors": {
-        "discovery": {
-            "processors": []
-        },
-        "poller": "matches discovery"
-    },
     "sensors": {
         "discovery": {
             "sensors": [

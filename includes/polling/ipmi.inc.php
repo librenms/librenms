@@ -16,12 +16,13 @@ if (is_array($ipmi_rows)) {
         $ipmi['tool'] = Config::get('ipmitool', 'ipmitool');
         $ipmi['user'] = $device['attribs']['ipmi_username'];
         $ipmi['password'] = $device['attribs']['ipmi_password'];
+        $ipmi['kg_key'] = $device['attribs']['ipmi_kg_key'];
         $ipmi['type'] = $device['attribs']['ipmi_type'];
         if (Config::get('own_hostname') == $device['hostname']) {
             $ipmi['host'] = 'localhost';
         }
 
-        $client = new IPMIClient($ipmi['tool'], $ipmi['host'], $ipmi['user'], $ipmi['password']);
+        $client = new IPMIClient($ipmi['tool'], $ipmi['host'], $ipmi['user'], $ipmi['password'], $ipmi['kg_key']);
         $client->setPort(filter_var($device['attribs']['ipmi_port'], FILTER_VALIDATE_INT) ? $device['attribs']['ipmi_port'] : '623');
 
         echo 'Fetching IPMI sensor data...';

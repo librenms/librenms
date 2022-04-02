@@ -1,6 +1,3 @@
-source: API/Alerts.md
-path: blob/master/doc/
-
 ### `get_alert`
 
 Get details of an alert

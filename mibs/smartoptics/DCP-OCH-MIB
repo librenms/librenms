@@ -1,0 +1,391 @@
+--
+-- DCP-OCH-MIB.mib
+-- Smartoptics DCP Interface Enterprise Specific MIB.
+--
+-- Copyright (c) 2021, Smartoptics
+-- All rights reserved
+--
+
+DCP-OCH-MIB DEFINITIONS ::= BEGIN
+IMPORTS
+    dcpGeneric
+        FROM DCP-MIB
+    OBJECT-GROUP, MODULE-COMPLIANCE
+        FROM SNMPv2-CONF
+    Unsigned32, Gauge32, OBJECT-TYPE, MODULE-IDENTITY
+        FROM SNMPv2-SMI
+    DisplayString
+        FROM SNMPv2-TC
+    OpticalPower1Decimal, ItuPerceivedSeverity, InterfaceStatus, DcpTenths, DcpHundreds, OchPortMode
+        FROM SO-TC-MIB;
+
+-- 1.3.6.1.4.1.30826.2.2.4
+dcpOch MODULE-IDENTITY
+    LAST-UPDATED "202103181449Z"
+    ORGANIZATION "Smartoptics."
+    CONTACT-INFO "http://www.smartoptics.com"
+    DESCRIPTION "This is the enterprise specific DCP OCH MIB for Smartoptics"
+
+    REVISION "202103181449Z"
+    DESCRIPTION "The initial revision"
+::= { dcpGeneric 4 }
+
+
+
+--  Node definitions
+--
+-- 1.3.6.1.4.1.30826.2.2.4.1
+dcpOchGeneral OBJECT IDENTIFIER ::= { dcpOch 1 }
+
+
+
+-- 1.3.6.1.4.1.30826.2.2.4.1.1
+dcpOchGeneralTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF OchGeneralEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+    "A table with general information about the och port."
+::= { dcpOchGeneral 1 }
+
+
+-- 1.3.6.1.4.1.30826.2.2.4.1.1.1
+dcpOchGeneralEntry OBJECT-TYPE
+    SYNTAX OchGeneralEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+    "Description."
+INDEX { dcpOchGeneralIndex }
+::= { dcpOchGeneralTable 1 }
+
+
+OchGeneralEntry ::=
+    SEQUENCE {
+        dcpOchGeneralIndex
+        Unsigned32,
+        dcpOchGeneralPortName
+        DisplayString,
+        dcpOchGeneralSpacing
+        DcpHundreds,
+        dcpOchGeneralMaxChannels
+        Unsigned32,
+        dcpOchGeneralActiveChannels
+        Unsigned32,
+        dcpOchGeneralUtilization
+        Gauge32,
+        dcpOchGeneralConfiguredChannels
+        Unsigned32
+ }
+
+-- 1.3.6.1.4.1.30826.2.2.4.1.1.1.1
+dcpOchGeneralIndex OBJECT-TYPE
+    SYNTAX Unsigned32 (1..1000000)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+    "Port Index in the following format:
+	ccspp where
+
+	cc: chassis.
+	s: slot number.
+	pp: port number."
+::= { dcpOchGeneralEntry 1 }
+
+
+-- 1.3.6.1.4.1.30826.2.2.4.1.1.1.2
+dcpOchGeneralPortName OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "The port name in the following format:
+    och-c/s/port where c = chassis, s = slot, port = port name
+    or
+    ocm-c/s where c = chassis, s = slot"
+::= { dcpOchGeneralEntry 2 }
+
+
+-- 1.3.6.1.4.1.30826.2.2.4.1.1.1.3
+dcpOchGeneralSpacing OBJECT-TYPE
+    SYNTAX DcpHundreds
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "The channel spacing used in units of 0.01 GHz." 
+::= { dcpOchGeneralEntry 3 }
+
+
+-- 1.3.6.1.4.1.30826.2.2.4.1.1.1.4
+dcpOchGeneralMaxChannels OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "The number of channels that is used for the optical power channel plan for the EDFA."
+::= { dcpOchGeneralEntry 4 }
+
+
+-- 1.3.6.1.4.1.30826.2.2.4.1.1.1.5
+dcpOchGeneralActiveChannels OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "The number of active channels currently in regulation."
+::= { dcpOchGeneralEntry 5 }
+
+
+-- 1.3.6.1.4.1.30826.2.2.4.1.1.1.6
+dcpOchGeneralUtilization OBJECT-TYPE
+    SYNTAX Gauge32 (0..100)
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        "The number of channels used in the system in units of %."
+::= { dcpOchGeneralEntry 6 }
+
+
+-- 1.3.6.1.4.1.30826.2.2.4.1.1.1.7
+dcpOchGeneralConfiguredChannels OBJECT-TYPE
+    SYNTAX Unsigned32
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "The number of channels that are enabled."
+::= { dcpOchGeneralEntry 7 }
+
+
+
+--  Node definitions
+--
+-- 1.3.6.1.4.1.30826.2.2.4.2
+dcpOchObjects OBJECT IDENTIFIER ::= { dcpOch 2 }
+
+
+
+-- 1.3.6.1.4.1.30826.2.2.4.2.1
+dcpOchTable OBJECT-TYPE
+    SYNTAX SEQUENCE OF OchInterfaceEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+    "A table with all optical channels of the system."
+::= { dcpOchObjects 1 }
+
+
+-- 1.3.6.1.4.1.30826.2.2.4.2.1.1
+dcpOchEntry OBJECT-TYPE
+    SYNTAX OchInterfaceEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+    "Description."
+INDEX { dcpOchIndex }
+::= { dcpOchTable 1 }
+
+
+OchInterfaceEntry ::=
+    SEQUENCE {
+        dcpOchIndex
+        Unsigned32,
+        dcpOchChannelId
+        DisplayString,
+        dcpOchRxPower
+        DcpTenths,
+        dcpOchTxPower
+        DcpTenths,
+        dcpOchWssAttenuation
+        DcpTenths,
+        dcpOchWssInsertionLoss
+        DcpTenths,
+        dcpOchWantedOutputPower
+        DcpTenths,
+        dcpOchPortMode
+        OchPortMode,
+        dcpOchStatus
+        InterfaceStatus,
+        dcpOchDescription
+        DisplayString,
+        dcpOchAlarm
+        ItuPerceivedSeverity
+ }
+
+-- 1.3.6.1.4.1.30826.2.2.4.2.1.1.1
+dcpOchIndex OBJECT-TYPE
+    SYNTAX Unsigned32 (1..1000000)
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+    "Och Index in the following format:
+	cspoooy where
+
+	c: chassis.
+	s: slot number.
+	p: port number.
+	ooo: Och number.
+	y: 0 = tx+rx port, 1 = tx port, 2 = rx port.
+
+	Same Index is used in the IF-MIB."
+::= { dcpOchEntry 1 }
+
+
+-- 1.3.6.1.4.1.30826.2.2.4.2.1.1.2
+dcpOchChannelId OBJECT-TYPE
+    SYNTAX DisplayString
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "The optical channel id name in the following format:
+     och-c/s/p/och where
+     c = chassis.
+     s = slot number.
+     port = edfa or eq.
+     och = optical channel."
+::= { dcpOchEntry 2 }
+
+
+-- 1.3.6.1.4.1.30826.2.2.4.2.1.1.3
+dcpOchRxPower OBJECT-TYPE
+    SYNTAX DcpTenths
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "The optical input power for the optical channel in units of 0.1 dBm."
+::= { dcpOchEntry 3 }
+
+
+-- 1.3.6.1.4.1.30826.2.2.4.2.1.1.4
+dcpOchTxPower OBJECT-TYPE
+    SYNTAX DcpTenths
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "The optical output power for the optical channel in units of 0.1 dBm."
+::= { dcpOchEntry 4 }
+
+
+-- 1.3.6.1.4.1.30826.2.2.4.2.1.1.5
+dcpOchWssAttenuation OBJECT-TYPE
+    SYNTAX DcpTenths
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "The WSS attenuation for the optical channel in units of 0.1 dB."
+::= { dcpOchEntry 5 }
+
+
+-- 1.3.6.1.4.1.30826.2.2.4.2.1.1.6
+dcpOchWssInsertionLoss OBJECT-TYPE
+    SYNTAX DcpTenths
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "The calibration value of WSS insertion loss in units of 0.1 dBm."
+::= { dcpOchEntry 6 }
+
+
+-- 1.3.6.1.4.1.30826.2.2.4.2.1.1.7
+dcpOchWantedOutputPower OBJECT-TYPE
+    SYNTAX DcpTenths
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "The wanted optical output power for the optical channel in units of 0.1 dBm."
+::= { dcpOchEntry 7 }
+
+
+-- 1.3.6.1.4.1.30826.2.2.4.2.1.1.8
+dcpOchPortMode OBJECT-TYPE
+    SYNTAX OchPortMode
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "The port mode for the channel. Port mode can be on or off. 
+     off - The channel is disabled.
+     on - The channel is enabled.
+     edfa - The channel is enabled and connected to the edfa port.
+     express - The channel is enabled and connected to the express port."
+::= { dcpOchEntry 8 }
+
+
+-- 1.3.6.1.4.1.30826.2.2.4.2.1.1.9
+dcpOchStatus OBJECT-TYPE
+    SYNTAX InterfaceStatus
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "The operational state for a channel.
+
+        idle - The optical channel is not activated.
+
+        down - The optical channel traffic is lost.
+
+        up - There is traffic on the optical channel."
+::= { dcpOchEntry 9 }
+
+
+-- 1.3.6.1.4.1.30826.2.2.4.2.1.1.10
+dcpOchDescription OBJECT-TYPE
+    SYNTAX DisplayString (SIZE(0..128))
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "User configurable description string for the optical channel."
+::= { dcpOchEntry 10 }
+
+-- 1.3.6.1.4.1.30826.2.2.4.2.1.1.11
+dcpOchAlarm OBJECT-TYPE
+    SYNTAX ItuPerceivedSeverity
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+    "The highest alarm severity of the optical channel."
+::= { dcpOchEntry 11 }
+
+
+-- 1.3.6.1.4.1.30826.2.2.4.3
+dcpOchMIBCompliance OBJECT IDENTIFIER ::= { dcpOch 3 }
+
+-- 1.3.6.1.4.1.30826.2.2.4.3.1
+dcpOchMIBGroups OBJECT IDENTIFIER ::= { dcpOchMIBCompliance 1 }
+
+-- 1.3.6.1.4.1.30826.2.2.4.3.1.1
+dcpOchGeneralTableGroupV1 OBJECT-GROUP
+    OBJECTS { dcpOchGeneralPortName, dcpOchGeneralSpacing, dcpOchGeneralMaxChannels, dcpOchGeneralActiveChannels,
+    dcpOchGeneralUtilization, dcpOchGeneralConfiguredChannels}
+    STATUS current
+    DESCRIPTION
+    "The och general table objects V1."
+::= { dcpOchMIBGroups 1 }
+
+-- 1.3.6.1.4.1.30826.2.2.4.3.1.2
+dcpOchTableGroupV1 OBJECT-GROUP
+    OBJECTS { dcpOchChannelId, dcpOchRxPower, dcpOchTxPower, dcpOchWssAttenuation, dcpOchWssInsertionLoss,
+    dcpOchWantedOutputPower, dcpOchPortMode, dcpOchStatus, dcpOchDescription, dcpOchAlarm}
+    STATUS current
+    DESCRIPTION
+    "The och table objects V1."
+::= { dcpOchMIBGroups 2 }
+
+
+-- 1.3.6.1.4.1.30826.2.2.4.3.2
+dcpOchMIBCompliances OBJECT IDENTIFIER ::= { dcpOchMIBCompliance 2 }
+
+-- 1.3.6.1.4.1.30826.2.2.4.3.2.1
+dcpOchBasicComplV1 MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "Basic implementation requirements for the DCP-OCH-MIB V1."
+    MODULE
+        MANDATORY-GROUPS {
+                         dcpOchGeneralTableGroupV1,
+                         dcpOchTableGroupV1}
+    ::= { dcpOchMIBCompliances 1 }
+
+
+END
+
+--
+-- DCP-OCH-MIB.mib
+--
