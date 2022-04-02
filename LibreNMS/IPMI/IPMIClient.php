@@ -54,6 +54,11 @@ class IPMIClient
     private $password;
 
     /**
+     * @var string|null Hexadecimal Kg key for IPMIv2 authentication.
+     */
+    private $kgKey;
+
+    /**
      * @var string|null IPMI port.
      */
     private $port = null;
@@ -78,12 +83,13 @@ class IPMIClient
      * @param  string  $user
      * @param  string  $password
      */
-    public function __construct(string $ipmiToolPath, string $host, string $user, string $password)
+    public function __construct(string $ipmiToolPath, string $host, string $user, string $password, string $kgKey)
     {
         $this->ipmiToolPath = $ipmiToolPath;
         $this->host = $host;
         $this->user = $user;
         $this->password = $password;
+        $this->kgKey = $kgKey;
     }
 
     /**
@@ -191,6 +197,10 @@ class IPMIClient
             array_push($cmd, '-L', $escalate ? 'ADMINISTRATOR' : $this->privLvl);
             if ($this->port) {
                 array_push($cmd, '-p', $this->port);
+            }
+
+            if (!empty($this->kgKey) && !is_null($this->kgKey)) {
+                array_push($cmd, '-y', $this->kgKey);
             }
 
             array_push($cmd, '-I', $this->interface);
