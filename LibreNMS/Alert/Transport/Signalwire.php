@@ -9,6 +9,7 @@
 
 /**
  * SignalWire API Transport
+ *
  * @author Igor Kuznetsov <igor@oczmail.com>
  * This is modifyed Twilio class from Andy Rosen <arosen@arosen.net>
  * @license GPL
@@ -17,9 +18,12 @@
 namespace LibreNMS\Alert\Transport;
 
 use LibreNMS\Alert\Transport;
+use LibreNMS\Util\Proxy;
 
 class Signalwire extends Transport
 {
+    protected $name = 'SignalWire';
+
     public function deliverAlert($obj, $opts)
     {
         $signalwire_opts['spaceUrl'] = $this->config['signalwire-spaceUrl'];
@@ -53,7 +57,7 @@ class Signalwire extends Transport
 
         $curl = curl_init($url);
 
-        // set_curl_proxy($curl);
+        Proxy::applyToCurl($curl);
 
         curl_setopt($curl, CURLOPT_POST, true);
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);

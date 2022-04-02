@@ -26,6 +26,7 @@ namespace LibreNMS\Alert\Transport;
 
 use LibreNMS\Alert\Transport;
 use LibreNMS\Enum\AlertState;
+use LibreNMS\Util\Proxy;
 
 /**
  * The Hue API currently is fairly limited for alerts.
@@ -51,7 +52,6 @@ class Hue extends Transport
         if ($obj['state'] == AlertState::RECOVERED) {
             return true;
         } else {
-            $device = device_by_id_cache($obj['device_id']); // for event logging
             $hue_user = $opts['user'];
             $url = $opts['bridge'] . "/api/$hue_user/groups/0/action";
             $curl = curl_init();
@@ -59,7 +59,7 @@ class Hue extends Transport
             $data = ['alert' => $duration];
             $datastring = json_encode($data);
 
-            set_curl_proxy($curl);
+            Proxy::applyToCurl($curl);
 
             $headers = ['Accept: application/json', 'Content-Type: application/json'];
 
@@ -73,7 +73,7 @@ class Hue extends Transport
             $ret = curl_exec($curl);
             $code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
             if ($code == 200) {
-                d_echo('Sent alert to Phillips Hue Bridge ' . $opts['host'] . ' for ' . $device);
+                d_echo('Sent alert to Phillips Hue Bridge ' . $opts['host'] . ' for ' . $obj['hostname']);
 
                 return true;
             } else {

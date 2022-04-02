@@ -18,6 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2020 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -46,10 +47,10 @@ class ThreeCom extends OS implements OSDiscovery
         if (Str::startsWith($device->sysObjectID, '.1.3.6.1.4.1.43.10.27.4.1.')) {
             $oids = ['stackUnitDesc.1', 'stackUnitPromVersion.1', 'stackUnitSWVersion.1', 'stackUnitSerialNumber.1', 'stackUnitCapabilities.1'];
             $data = snmp_get_multi($this->getDeviceArray(), $oids, ['-OQUs', '--hexOutputLength=0'], 'A3COM0352-STACK-CONFIG');
-            $device->hardware = trim($device->hardware . ' ' . $data[1]['stackUnitDesc']);
-            $device->version = $data[1]['stackUnitSWVersion'];
-            $device->serial = $data[1]['stackUnitSerialNumber'];
-            $device->features = $data[1]['stackUnitCapabilities'];
+            $device->hardware = trim($device->hardware . ' ' . ($data[1]['stackUnitDesc'] ?? ''));
+            $device->version = $data[1]['stackUnitSWVersion'] ?? null;
+            $device->serial = $data[1]['stackUnitSerialNumber'] ?? null;
+            $device->features = $data[1]['stackUnitCapabilities'] ?? null;
         }
     }
 }

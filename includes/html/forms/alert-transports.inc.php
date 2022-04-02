@@ -18,16 +18,10 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2018 Vivia Nguyen-Tran
  * @author     Vivia Nguyen-Tran <vivia@ualberta.ca>
  */
-
-use Illuminate\Container\Container;
-use Illuminate\Filesystem\Filesystem;
-use Illuminate\Translation\FileLoader;
-use Illuminate\Translation\Translator;
-use Illuminate\Validation\Factory;
-
 header('Content-type: application/json');
 
 if (! Auth::user()->hasGlobalAdmin()) {
@@ -40,10 +34,10 @@ if (! Auth::user()->hasGlobalAdmin()) {
 $status = 'ok';
 $message = '';
 
-$transport_id = $vars['transport_id'];
-$name = $vars['name'];
+$transport_id = strip_tags($vars['transport_id']);
+$name = strip_tags($vars['name']);
 $is_default = (int) (isset($vars['is_default']) && $vars['is_default'] == 'on');
-$transport_type = $vars['transport-type'];
+$transport_type = strip_tags($vars['transport-type']);
 
 if (empty($name)) {
     $status = 'error';
@@ -78,10 +72,7 @@ if (empty($name)) {
 
         // Build config values
         $result = call_user_func_array($class . '::configTemplate', []);
-        $loader = new FileLoader(new Filesystem, "$install_dir/resources/lang");
-        $translator = new Translator($loader, 'en');
-        $validation = new Factory($translator, new Container);
-        $validator = $validation->make($vars, $result['validation']);
+        $validator = Validator::make($vars, $result['validation']);
         if ($validator->fails()) {
             $errors = $validator->errors();
             foreach ($errors->all() as $error) {

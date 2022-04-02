@@ -37,7 +37,11 @@ if ($format == 'octets' || $format == 'bytes') {
     $units = 'Bps';
     $format = 'bits';
 } else {
-    $units = 'bps';
+    if (isset($total_units) && $total_units == 'pps') {
+        $units = 'pps';
+    } else {
+        $units = 'bps';
+    }
     $format = 'bits';
 }
 
@@ -48,7 +52,7 @@ if ($width > '500') {
     $rrd_options .= sprintf(" COMMENT:'%12s'", 'Current');
     $rrd_options .= sprintf(" COMMENT:'%10s'", 'Average');
     $rrd_options .= sprintf(" COMMENT:'%10s'", 'Maximum');
-    if (! $$args['nototal']) {
+    if (! $nototal) {
         $rrd_options .= sprintf(" COMMENT:'%8s'", 'Total');
     }
 } else {
@@ -63,7 +67,7 @@ if ($_GET['previous']) {
     $rrd_options .= sprintf(" COMMENT:'\t'", '');
     $rrd_options .= sprintf(" COMMENT:'%10s'", 'P Avg');
     $rrd_options .= sprintf(" COMMENT:'%10s'", 'P Max');
-    if (! $args['nototal']) {
+    if (! $nototal) {
         $rrd_options .= sprintf(" COMMENT:'%8s'", 'P Total');
     }
 }
@@ -106,7 +110,7 @@ foreach ($rrd_list as $rrd) {
         $rrd_options .= ' SHIFT:outB' . $i . "X:$period";
     }
 
-    if (! $args['nototal']) {
+    if (! $nototal) {
         $in_thing .= $seperator . 'inB' . $i . ',UN,0,' . 'inB' . $i . ',IF';
         $out_thing .= $seperator . 'outB' . $i . ',UN,0,' . 'outB' . $i . ',IF';
         $pluses .= $plus;
@@ -142,7 +146,7 @@ foreach ($rrd_list as $rrd) {
     $rrd_options .= ' GPRINT:inbits' . $i . ':AVERAGE:%6.' . $float_precision . "lf%s$units";
     $rrd_options .= ' GPRINT:inbits' . $i . ':MAX:%6.' . $float_precision . "lf%s$units";
 
-    if (! $args['nototal']) {
+    if (! $nototal) {
         $rrd_options .= ' GPRINT:totinB' . $i . ':%6.' . $float_precision . "lf%s$total_units";
     }
 
@@ -150,7 +154,7 @@ foreach ($rrd_list as $rrd) {
         $rrd_options .= " COMMENT:' \t'";
         $rrd_options .= ' GPRINT:inbits' . $i . 'X:AVERAGE:%6.' . $float_precision . "lf%s$units";
         $rrd_options .= ' GPRINT:inbits' . $i . 'X:MAX:%6.' . $float_precision . "lf%s$units";
-        if (! $args['nototal']) {
+        if (! $nototal) {
             $rrd_options .= ' GPRINT:totinB' . $i . 'X' . ':%6.' . $float_precision . "lf%s$total_units";
         }
     }
@@ -162,7 +166,7 @@ foreach ($rrd_list as $rrd) {
     $rrd_options .= ' GPRINT:outbits' . $i . ':AVERAGE:%6.' . $float_precision . "lf%s$units";
     $rrd_options .= ' GPRINT:outbits' . $i . ':MAX:%6.' . $float_precision . "lf%s$units";
 
-    if (! $args['nototal']) {
+    if (! $nototal) {
         $rrd_options .= ' GPRINT:totoutB' . $i . ':%6.' . $float_precision . "lf%s$total_units";
     }
 
@@ -170,7 +174,7 @@ foreach ($rrd_list as $rrd) {
         $rrd_options .= " COMMENT:' \t'";
         $rrd_options .= ' GPRINT:outbits' . $i . 'X:AVERAGE:%6.' . $float_precision . "lf%s$units";
         $rrd_options .= ' GPRINT:outbits' . $i . 'X:MAX:%6.' . $float_precision . "lf%s$units";
-        if (! $args['nototal']) {
+        if (! $nototal) {
             $rrd_options .= ' GPRINT:totoutB' . $i . 'X' . ':%6.' . $float_precision . "lf%s$total_units";
         }
     }
@@ -209,7 +213,7 @@ if ($_GET['previous'] == 'yes') {
     $rrd_optionsb .= ' LINE1.25:dout' . $format . 'X#666666:';
 }
 
-if (! $args['nototal']) {
+if (! $nototal) {
     $rrd_options .= ' CDEF:inB=' . $in_thing . $pluses;
     $rrd_options .= ' CDEF:outB=' . $out_thing . $pluses;
     $rrd_options .= ' CDEF:octets=inB,outB,+';

@@ -18,6 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2017 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -30,9 +31,11 @@ use LibreNMS\Interfaces\Discovery\Sensors\WirelessRsrpDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessRsrqDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessRssiDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessSnrDiscovery;
+use LibreNMS\Interfaces\Polling\OSPolling;
 use LibreNMS\OS\Traits\CiscoCellular;
 
 class Iosxe extends Ciscowlc implements
+    OSPolling,
     WirelessCellDiscovery,
     WirelessChannelDiscovery,
     WirelessRssiDiscovery,
@@ -41,4 +44,9 @@ class Iosxe extends Ciscowlc implements
     WirelessSnrDiscovery
 {
     use CiscoCellular;
+
+    public function pollOS(): void
+    {
+        // Don't poll Ciscowlc FIXME remove when wireless-controller module exists
+    }
 }

@@ -18,6 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -31,7 +32,8 @@ class Html
 {
     /**
      * return icon and color for application state
-     * @param string $app_state
+     *
+     * @param  string  $app_state
      * @return array
      */
     public static function appStateIcon($app_state)
@@ -70,8 +72,8 @@ class Html
     /**
      * Print or return a row of graphs
      *
-     * @param array $graph_array
-     * @param bool $print
+     * @param  array  $graph_array
+     * @param  bool  $print
      * @return array
      */
     public static function graphRow($graph_array, $print = false)
@@ -138,9 +140,9 @@ class Html
     {
         $percent = min($percent, 100);
         if ($colors === null) {
-            $colors = Colors::percentage($percent, $warn ?: null);
+            $colors = Color::percentage($percent, $warn ?: null);
         }
-        $default = Colors::percentage(0);
+        $default = Color::percentage(0);
         $left_text_color = $colors['left_text'] ?? 'ffffff';
         $right_text_color = $colors['right_text'] ?? 'ffffff';
         $left_color = $colors['left'] ?? $default['left'];
@@ -165,7 +167,7 @@ class Html
     }
 
     /**
-     * @param int|string $state
+     * @param  int|string  $state
      */
     public static function powerStateLabel($state): array
     {

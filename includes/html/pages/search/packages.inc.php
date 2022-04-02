@@ -16,6 +16,7 @@
 
 /**
  * Package Search
+ *
  * @author Daniel Preussker <f0o@devilcode.org>
  * @copyright 2014 f0o, LibreNMS
  * @license GPL
@@ -26,15 +27,15 @@ print_optionbar_start(28);
     <?php echo csrf_field() ?>
     <div class="form-group">
         <label for="package">Package</label>
-        <input type="text" name="package" id="package" size=20 value="<?php echo $_POST['package']; ?>" class="form-control input-sm" placeholder="Any" />
+        <input type="text" name="package" id="package" size=20 value="<?php echo htmlspecialchars($_POST['package']); ?>" class="form-control input-sm" placeholder="Any" />
     </div>
     <div class="form-group">
         <label for="version">Version</label>
-        <input type="text" name="version" id="version" size=20 value="<?php echo $_POST['version']; ?>" class="form-control input-sm" placeholder="Any" />
+        <input type="text" name="version" id="version" size=20 value="<?php echo htmlspecialchars($_POST['version']); ?>" class="form-control input-sm" placeholder="Any" />
     </div>
     <div class="form-group">
         <label for="version">Arch</label>
-        <input type="text" name="arch" id="arch" size=20 value="<?php echo $_POST['arch']; ?>" class="form-control input-sm" placeholder="Any" />
+        <input type="text" name="arch" id="arch" size=20 value="<?php echo htmlspecialchars($_POST['arch']); ?>" class="form-control input-sm" placeholder="Any" />
     </div>
     <button type="submit" class="btn btn-default input-sm">Search</button>
 </form>
@@ -171,11 +172,11 @@ if ((int) ($count / $results) > 0 && $count != $results) {
 ?>
 
     </table>
-    <input type="hidden" name="page_number" id="page_number" value="<?php echo $page_number; ?>">
-    <input type="hidden" name="results_amount" id="results_amount" value="<?php echo $results; ?>">
-    <input type="hidden" name="package" id="results_packages" value="<?php echo $_POST['package']; ?>">
-    <input type="hidden" name="version" id="results_version" value="<?php echo $_POST['version']; ?>">
-    <input type="hidden" name="arch" id="results_arch" value="<?php echo $_POST['arch']; ?>">
+    <input type="hidden" name="page_number" id="page_number" value="<?php echo htmlspecialchars($page_number); ?>">
+    <input type="hidden" name="results_amount" id="results_amount" value="<?php echo htmlspecialchars($results); ?>">
+    <input type="hidden" name="package" id="results_packages" value="<?php echo htmlspecialchars($_POST['package']); ?>">
+    <input type="hidden" name="version" id="results_version" value="<?php echo htmlspecialchars($_POST['version']); ?>">
+    <input type="hidden" name="arch" id="results_arch" value="<?php echo htmlspecialchars($_POST['arch']); ?>">
 </form>
 <script type="text/javascript">
     function updateResults(results) {

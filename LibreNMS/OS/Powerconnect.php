@@ -18,6 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -51,6 +52,7 @@ class Powerconnect extends OS implements ProcessorDiscovery, ProcessorPolling
         if (Str::startsWith($device['sysObjectID'], [
             '.1.3.6.1.4.1.674.10895.3020',
             '.1.3.6.1.4.1.674.10895.3021',
+            '.1.3.6.1.4.1.674.10895.3028',
             '.1.3.6.1.4.1.674.10895.3030',
             '.1.3.6.1.4.1.674.10895.3031',
         ])) {
@@ -93,7 +95,7 @@ class Powerconnect extends OS implements ProcessorDiscovery, ProcessorPolling
     /**
      * Poll processor data.  This can be implemented if custom polling is needed.
      *
-     * @param array $processors Array of processor entries from the database that need to be polled
+     * @param  array  $processors  Array of processor entries from the database that need to be polled
      * @return array of polled data
      */
     public function pollProcessors(array $processors)

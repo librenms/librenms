@@ -15,6 +15,7 @@
 
 /**
  * PlaySMS API Transport
+ *
  * @author f0o <f0o@librenms.org>
  * @copyright 2015 f0o, LibreNMS
  * @license GPL
@@ -23,9 +24,12 @@
 namespace LibreNMS\Alert\Transport;
 
 use LibreNMS\Alert\Transport;
+use LibreNMS\Util\Proxy;
 
 class Playsms extends Transport
 {
+    protected $name = 'playSMS';
+
     public function deliverAlert($obj, $opts)
     {
         $playsms_opts['url'] = $this->config['playsms-url'];
@@ -46,7 +50,7 @@ class Playsms extends Transport
         $url = $opts['url'] . '&op=pv&' . http_build_query($data);
         $curl = curl_init($url);
 
-        set_curl_proxy($curl);
+        Proxy::applyToCurl($curl);
         curl_setopt($curl, CURLOPT_CUSTOMREQUEST, 'GET');
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);
 

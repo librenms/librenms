@@ -18,6 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://librenms.org
+ *
  * @copyright  2017 Adam Bishop
  * @author     Adam Bishop <adam@omega.org.uk>
  */
@@ -226,7 +227,6 @@ class AuthSSOTest extends DBTestCase
         $a = LegacyAuth::reset();
 
         $this->assertFalse($a->canUpdatePasswords());
-        $this->assertFalse($a->changePassword(null, null));
         $this->assertTrue($a->canManageUsers());
         $this->assertTrue($a->canUpdateUsers());
         $this->assertTrue($a->authIsExternal());
@@ -396,6 +396,7 @@ class AuthSSOTest extends DBTestCase
 
         $this->basicEnvironmentEnv();
 
+        Config::set('sso.static_level', 0);
         Config::set('sso.group_strategy', 'map');
         Config::set('sso.group_delimiter', ';');
         Config::set('sso.group_attr', 'member');
@@ -416,6 +417,11 @@ class AuthSSOTest extends DBTestCase
         // Empty
         $_SERVER['member'] = '';
         $this->assertTrue($a->authSSOParseGroups() === 0);
+
+        // Empty with default access level
+        Config::set('sso.static_level', 5);
+        $this->assertTrue($a->authSSOParseGroups() === 5);
+        Config::forget('sso.static_level');
 
         // Null
         $_SERVER['member'] = null;

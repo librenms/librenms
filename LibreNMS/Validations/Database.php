@@ -18,6 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2017 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -327,8 +328,8 @@ class Database extends BaseValidation
         if (empty($schema_update)) {
             $validator->ok('Database schema correct');
         } else {
-            $result = ValidationResult::fail('We have detected that your database schema may be wrong, please report the following to us on Discord (https://t.libren.ms/discord) or the community site (https://t.libren.ms/5gscd):')
-                ->setFix('Run the following SQL statements to fix.')
+            $result = ValidationResult::fail('We have detected that your database schema may be wrong')
+                ->setFix('Run the following SQL statements to fix it')
                 ->setList('SQL Statements', $schema_update);
             $validator->result($result);
         }
@@ -392,7 +393,7 @@ class Database extends BaseValidation
     /**
      * Generate an SQL segment to create the column based on data from Schema::dump()
      *
-     * @param array $column_data The array of data for the column
+     * @param  array  $column_data  The array of data for the column
      * @return string sql fragment, for example: "`ix_id` int(10) unsigned NOT NULL"
      */
     private function columnToSql($column_data)
@@ -423,7 +424,7 @@ class Database extends BaseValidation
     /**
      * Generate an SQL segment to create the index based on data from Schema::dump()
      *
-     * @param array $index_data The array of data for the index
+     * @param  array  $index_data  The array of data for the index
      * @return string sql fragment, for example: "PRIMARY KEY (`device_id`)"
      */
     private function indexToSql($index_data)

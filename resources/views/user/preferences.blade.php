@@ -5,7 +5,7 @@
 @section('content')
 <div class="container">
     <row>
-        <legend>@lang('User Preferences')</legend>
+        <legend>{{ __('User Preferences') }}</legend>
     </row>
 
     @if ($errors->any())
@@ -18,32 +18,36 @@
         </div>
     @endif
 
+    <x-panel title="{{ __('Push Notifications') }}">
+        <x-notification-subscription-status></x-notification-subscription-status>
+    </x-panel>
+
     @if($can_change_password)
     <x-panel title="{{ __('Change Password') }}">
         <form method="POST" action="{{ route('users.update', [$user->user_id]) }}" class="form-horizontal" role="form">
             <input type="hidden" name="_method" value="PATCH">
             @csrf
             <div class="form-group">
-                <label for="old_password" class="col-sm-4 control-label">@lang('Current Password')</label>
+                <label for="old_password" class="col-sm-4 control-label">{{ __('Current Password') }}</label>
                 <div class="col-sm-4">
                     <input type="password" name="old_password" autocomplete="off" class="form-control input-sm">
                 </div>
             </div>
             <div class="form-group">
-                <label for="new_password" class="col-sm-4 control-label">@lang('New Password')</label>
+                <label for="new_password" class="col-sm-4 control-label">{{ __('New Password') }}</label>
                 <div class="col-sm-4">
                     <input type="password" name="new_password" autocomplete="off" class="form-control input-sm">
                 </div>
             </div>
             <div class="form-group">
-                <label for="new_password_confirmation" class="col-sm-4 control-label">@lang('Verify New Password')</label>
+                <label for="new_password_confirmation" class="col-sm-4 control-label">{{ __('Verify New Password') }}</label>
                 <div class="col-sm-4">
                     <input type="password" name="new_password_confirmation" autocomplete="off" class="form-control input-sm">
                 </div>
             </div>
             <div class="form-group">
-                <div class="col-sm-4 col-sm-offset-3">
-                    <button type="submit" class="btn btn-default">@lang('Change Password')</button>
+                <div class="col-sm-4 col-sm-offset-4">
+                    <button type="submit" class="btn btn-default">{{ __('Change Password') }}</button>
                 </div>
             </div>
         </form>
@@ -54,7 +58,7 @@
         <form class="form-horizontal" role="form">
             @csrf
             <div class="form-group">
-                <label for="dashboard" class="col-sm-4 control-label">@lang('Dashboard')</label>
+                <label for="dashboard" class="col-sm-4 control-label">{{ __('Dashboard') }}</label>
                 <div class="col-sm-4">
                     <select class="form-control ajax-select" name="dashboard" data-pref="dashboard" data-previous="{{ $default_dashboard }}">
                         @foreach($dashboards as $dash)
@@ -64,10 +68,10 @@
                 </div>
             </div>
             <div class="form-group">
-                <label for="site_style" class="col-sm-4 control-label">@lang('CSS Style')</label>
+                <label for="site_style" class="col-sm-4 control-label">{{ __('CSS Style') }}</label>
                 <div class="col-sm-4">
                     <select class="form-control ajax-select" name="site_style" data-pref="site_style" data-previous="{{ $site_style }}">
-                        <option value="default">@lang('Default') ({{ $site_style_default }})</option>
+                        <option value="default">{{ __('Default') }} ({{ $site_style_default }})</option>
                         @foreach($site_styles as $style => $descr)
                             <option value="{{ $style }}" @if($style == $site_style) selected @endif>{{ $descr }}</option>
                         @endforeach
@@ -75,21 +79,21 @@
                 </div>
             </div>
             <div class="form-group">
-                <label for="locale" class="col-sm-4 control-label">@lang('Language')</label>
+                <label for="locale" class="col-sm-4 control-label">{{ __('Language') }}</label>
                 <div class="col-sm-4">
                     <select class="form-control ajax-select" name="locale" data-pref="locale" data-previous="{{ $locale }}">
-                        <option value="default">@lang('Default') ({{ $locale_default }})</option>
+                        <option value="default">{{ __('Default') }} ({{ $locale_default }})</option>
                         @foreach($locales as $lang => $descr)
                             <option value="{{ $lang }}" @if($lang == $locale) selected @endif>{{ $descr }}</option>
                         @endforeach
                     </select>
                 </div>
                 <div class="col-sm-4">
-                    <small>* @lang('Translation not fully supported')</small>
+                    <small>* {{ __('Translation not fully supported') }}</small>
                 </div>
             </div>
             <div class="form-group">
-                <label for="notetodevice" class="col-sm-4 control-label">@lang('Add schedule notes to devices notes')</label>
+                <label for="notetodevice" class="col-sm-4 control-label">{{ __('Add schedule notes to devices notes') }}</label>
                 <div class="col-sm-4">
                     <input id="notetodevice" type="checkbox" name="notetodevice" @if($note_to_device) checked @endif>
                 </div>
@@ -97,54 +101,67 @@
         </form>
     </x-panel>
 
+    @config('auth.socialite.configs')
+    <x-panel title="{{ __('OAuth/SAML Authentication') }}">
+        @foreach (\LibreNMS\Config::get('auth.socialite.configs', []) as $provider => $config)
+        <form role="form" action="{{ route('socialite.redirect', $provider) }}" method="post">
+            {{ csrf_field() }}
+            <button type="submit" id="login" class="btn btn-success btn-block">
+                <i class="fab fa-btn fa-{{ $provider }}"></i> {{ __('Register with') }} {{ ucfirst($provider) }}
+            </button>
+        </form>
+        @endforeach
+    </x-panel>
+    @endconfig
+
     @config('twofactor')
     <x-panel title="{{ __('Two-Factor Authentication') }}">
         @if($twofactor)
             <div id="twofactorqrcontainer">
                 <div id="twofactorqr"></div>
                 <script>$("#twofactorqr").qrcode({"text": "{{ $twofactor_uri }}"});</script>
-                <button class="btn btn-default" onclick="$('#twofactorkeycontainer').show(); $('#twofactorqrcontainer').hide();">@lang('Manual')</button>
+                <button class="btn btn-default" onclick="$('#twofactorkeycontainer').show(); $('#twofactorqrcontainer').hide();">{{ __('Manual') }}</button>
             </div>
             <div id="twofactorkeycontainer">
                 <form id="twofactorkey" class="form-horizontal" role="form">
                     @csrf
                     <div class="form-group">
-                        <label for="twofactorkey" class="col-sm-4 control-label">@lang('Secret Key')</label>
+                        <label for="twofactorkey" class="col-sm-4 control-label">{{ __('Secret Key') }}</label>
                         <div class="col-sm-4">
                             <input type="text" name="twofactorkey" autocomplete="off" disabled class="form-control input-sm" value="{{ $twofactor['key'] }}" />
                         </div>
                     </div>
                     @if($twofactor['counter'] !== false)
                     <div class="form-group">
-                        <label for="twofactorcounter" class="col-sm-4 control-label">@lang('Counter')</label>
+                        <label for="twofactorcounter" class="col-sm-4 control-label">{{ __('Counter') }}</label>
                         <div class="col-sm-4">
                             <input type="text" name="twofactorcounter" autocomplete="off" disabled class="form-control input-sm" value="{{ $twofactor['counter'] }}" />
                         </div>
                     </div>
                     @endif
                 </form>
-                <button class="btn btn-default" onclick="$('#twofactorkeycontainer').hide(); $('#twofactorqrcontainer').show();">@lang('QR')</button>
+                <button class="btn btn-default" onclick="$('#twofactorkeycontainer').hide(); $('#twofactorqrcontainer').show();">{{ __('QR') }}</button>
             </div>
                 <br/>
                 <form method="post" class="form-horizontal" role="form" action="{{ route('2fa.remove') }}">
                     @csrf
-                    <button class="btn btn-danger" type="submit">@lang('Disable TwoFactor')</button>
+                    <button class="btn btn-danger" type="submit">{{ __('Disable TwoFactor') }}</button>
                 </form>
         @else
             <form method="post" class="form-horizontal" role="form" action="{{ route('2fa.add') }}">
                 @csrf
                 <div class="form-group">
-                    <label for="twofactortype" class="col-sm-4 control-label">@lang('TwoFactor Type')</label>
+                    <label for="twofactortype" class="col-sm-4 control-label">{{ __('TwoFactor Type') }}</label>
                     <div class="col-sm-4">
                         <select name="twofactortype" class="select form-control">
-                            <option value="time">@lang('Time Based (TOTP)')</option>
-                            <option value="counter">@lang('Counter Based (HOTP)')</option>
+                            <option value="time">{{ __('Time Based (TOTP)') }}</option>
+                            <option value="counter">{{ __('Counter Based (HOTP)') }}</option>
                         </select>
                     </div>
                 </div>
                 <div class="form-group">
-                    <div class="col-sm-4 col-sm-offset-3">
-                        <button class="btn btn-default" type="submit" id="twofactor-generate">@lang('Generate TwoFactor Secret Key')</button>
+                    <div class="col-sm-4 col-sm-offset-4">
+                        <button class="btn btn-default" type="submit" id="twofactor-generate">{{ __('Generate TwoFactor Secret Key') }}</button>
                     </div>
                 </div>
             </form>
@@ -154,14 +171,14 @@
 
     <x-panel title="{{ __('Device Permissions') }}">
         @if(auth()->user()->hasGlobalAdmin())
-            <strong class="blue">@lang('Global Administrative Access')</strong>
+            <strong class="blue">{{ __('Global Administrative Access') }}</strong>
         @elseif(auth()->user()->hasGlobalRead())
-            <strong class="green">@lang('Global Viewing Access')</strong>
+            <strong class="green">{{ __('Global Viewing Access') }}</strong>
         @else
             @forelse($devices as $device)
-                @deviceLink($device) <br />
+                <x-device-link :device="$device" /><br />
             @empty
-                <strong class="red">@lang('No access!')</strong>
+                <strong class="red">{{ __('No access!') }}</strong>
             @endforelse
         @endif
     </x-panel>

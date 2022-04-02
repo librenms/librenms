@@ -18,6 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -171,12 +172,16 @@ trait HostResources
                     'mempool_used_oid' => ".1.3.6.1.2.1.25.2.3.1.6.$index",
                     'mempool_total_oid' => null,
                 ]))->setClass(null, $storage['hrStorageType'] == 'hrStorageVirtualMemory' ? 'virtual' : 'system')
-                    ->fillUsage($storage['hrStorageUsed'], $total);
+                    ->fillUsage($storage['hrStorageUsed'] ?? null, $total);
             });
     }
 
     protected function memValid($storage)
     {
+        if (empty($storage['hrStorageType']) || empty($storage['hrStorageDescr'])) {
+            return false;
+        }
+
         if (! in_array($storage['hrStorageType'], $this->memoryStorageTypes)) {
             return false;
         }

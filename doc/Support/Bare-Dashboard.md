@@ -1,6 +1,3 @@
-source: Support/Bare-Dashboard.md
-path: blob/master/doc/
-
 # Bare Dashboard
 
 Settings to assist with wall/monitor displays.

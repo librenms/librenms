@@ -12,7 +12,7 @@
  * the source code distribution for details.
  */
 
-if ($device['os'] == 'equalogic') {
+if ($device['os'] == 'equallogic') {
     $eql_storage = snmpwalk_cache_oid($device, 'EqliscsiVolumeEntry', null, 'EQLVOLUME-MIB', 'equallogic');
 
     if (is_array($eql_storage)) {

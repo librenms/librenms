@@ -18,6 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -32,6 +33,7 @@ class AlertlogController extends WidgetController
     protected $defaults = [
         'title' => null,
         'device_id' => '',
+        'device_group' => null,
         'state' => -1,
         'min_severity' => null,
         'hidenavigation' => 0,

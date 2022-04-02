@@ -33,7 +33,7 @@ if ($phasecount > 1) {
         $oids = snmp_get($device, $item['HighPrecOid'] . '.' . $item['index'], '-OsqnU', $item['mib']);
         if (empty($oids)) {
             $oids = snmp_get($device, $item['AdvOid'] . '.' . $item['index'], '-OsqnU', $item['mib']);
-            $current_oid = '.1.3.6.1.4.1.318.1.1.1.4.3.3';
+            $current_oid = '.1.3.6.1.4.1.318.1.1.1.4.2.3';
             $current = $oids;
             $item['divisor'] = 1;
         } else {

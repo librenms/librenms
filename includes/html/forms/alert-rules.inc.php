@@ -18,6 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2018 Neil Lathwood
  * @author     Neil Lathwood <gh+n@laf.io>
  */
@@ -55,7 +56,7 @@ $delay = $_POST['delay'];
 $interval = $_POST['interval'];
 $mute = isset($_POST['mute']) ? $_POST['mute'] : null;
 $invert = isset($_POST['invert']) ? $_POST['invert'] : null;
-$name = $_POST['name'];
+$name = strip_tags($_POST['name']);
 $proc = $_POST['proc'];
 $recovery = ($vars['recovery']);
 $invert_map = isset($_POST['invert_map']) ? $_POST['invert_map'] : null;

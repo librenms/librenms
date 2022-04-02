@@ -18,6 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2018 Tony Murray
  * @copyright  2021 PipoCanaja
  * @author     Tony Murray <murraytony@gmail.com>
@@ -43,7 +44,7 @@ class TopErrorsController extends WidgetController
     ];
 
     /**
-     * @param Request $request
+     * @param  Request  $request
      * @return View
      */
     public function getView(Request $request)

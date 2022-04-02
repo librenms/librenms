@@ -15,6 +15,7 @@
 
 /**
  * Create Dashboards
+ *
  * @author Daniel Preussker
  * @copyright 2015 Daniel Preussker, QuxLabs UG
  * @license GPL
@@ -33,7 +34,7 @@ if (! Auth::check()) {
 $status = 'error';
 $message = 'unknown error';
 
-$dashboard_name = trim($_REQUEST['dashboard_name']);
+$dashboard_name = trim(strip_tags($_REQUEST['dashboard_name']));
 
 if (! empty($dashboard_name) && ($dash_id = dbInsert(['dashboard_name' => $dashboard_name, 'user_id' => Auth::id()], 'dashboards'))) {
     $status = 'ok';

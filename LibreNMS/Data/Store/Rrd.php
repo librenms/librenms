@@ -18,15 +18,16 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
 namespace LibreNMS\Data\Store;
 
+use App\Polling\Measure\Measurement;
 use Illuminate\Support\Str;
 use LibreNMS\Config;
-use LibreNMS\Data\Measure\Measurement;
 use LibreNMS\Exceptions\FileExistsException;
 use LibreNMS\Exceptions\RrdGraphException;
 use LibreNMS\Proc;
@@ -80,7 +81,7 @@ class Rrd extends BaseDatastore
     /**
      * Opens up a pipe to RRDTool using handles provided
      *
-     * @param bool $dual_process start an additional process that's output should be read after every command
+     * @param  bool  $dual_process  start an additional process that's output should be read after every command
      * @return bool the process(s) have been successfully started
      */
     public function init($dual_process = true)
@@ -140,10 +141,10 @@ class Rrd extends BaseDatastore
      *   rrd_oldname array|string: old rrd filename to rename, will be processed with rrd_name()
      *   rrd_step             int: rrd step, defaults to 300
      *
-     * @param array $device device array
-     * @param string $measurement the name of this measurement (if no rrd_name tag is given, this will be used to name the file)
-     * @param array $tags tags to pass additional info to rrdtool
-     * @param array $fields data values to update
+     * @param  array  $device  device array
+     * @param  string  $measurement  the name of this measurement (if no rrd_name tag is given, this will be used to name the file)
+     * @param  array  $tags  tags to pass additional info to rrdtool
+     * @param  array  $fields  data values to update
      */
     public function put($device, $measurement, $tags, $fields)
     {
@@ -167,7 +168,7 @@ class Rrd extends BaseDatastore
             $fields = array_filter($fields, function ($key) use ($rrd_def) {
                 $valid = $rrd_def->isValidDataset($key);
                 if (! $valid) {
-                    Log::warning("RRD warning: unused data sent $key");
+                    Log::debug("RRD warning: unused data sent $key");
                 }
 
                 return $valid;
@@ -187,8 +188,9 @@ class Rrd extends BaseDatastore
      * Where $options is an array, each entry which is not a number is replaced with "U"
      *
      * @internal
-     * @param string $filename
-     * @param array $data
+     *
+     * @param  string  $filename
+     * @param  array  $data
      * @return array|string
      */
     public function update($filename, $data)
@@ -219,9 +221,9 @@ class Rrd extends BaseDatastore
     /**
      * Modify an rrd file's max value and trim the peaks as defined by rrdtool
      *
-     * @param string $type only 'port' is supported at this time
-     * @param string $filename the path to the rrd file
-     * @param int $max the new max value
+     * @param  string  $type  only 'port' is supported at this time
+     * @param  string  $filename  the path to the rrd file
+     * @param  int  $max  the new max value
      * @return bool
      */
     public function tune($type, $filename, $max)
@@ -263,9 +265,9 @@ class Rrd extends BaseDatastore
     /**
      * Generates a filename for a proxmox cluster rrd
      *
-     * @param string $pmxcluster
-     * @param string $vmid
-     * @param string $vmport
+     * @param  string  $pmxcluster
+     * @param  string  $vmid
+     * @param  string  $vmport
      * @return string full path to the rrd.
      */
     public function proxmoxName($pmxcluster, $vmid, $vmport)
@@ -282,8 +284,8 @@ class Rrd extends BaseDatastore
     /**
      * Get the name of the port rrd file.  For alternate rrd, specify the suffix.
      *
-     * @param int $port_id
-     * @param string $suffix
+     * @param  int  $port_id
+     * @param  string  $suffix
      * @return string
      */
     public function portName($port_id, $suffix = null)
@@ -294,9 +296,9 @@ class Rrd extends BaseDatastore
     /**
      * rename an rrdfile, can only be done on the LibreNMS server hosting the rrd files
      *
-     * @param array $device Device object
-     * @param string|array $oldname RRD name array as used with rrd_name()
-     * @param string|array $newname RRD name array as used with rrd_name()
+     * @param  array  $device  Device object
+     * @param  string|array  $oldname  RRD name array as used with rrd_name()
+     * @param  string|array  $newname  RRD name array as used with rrd_name()
      * @return bool indicating rename success or failure
      */
     public function renameFile($device, $oldname, $newname)
@@ -322,9 +324,9 @@ class Rrd extends BaseDatastore
     /**
      * Generates a filename based on the hostname (or IP) and some extra items
      *
-     * @param string $host Host name
-     * @param array|string $extra Components of RRD filename - will be separated with "-", or a pre-formed rrdname
-     * @param string $extension File extension (default is .rrd)
+     * @param  string  $host  Host name
+     * @param  array|string  $extra  Components of RRD filename - will be separated with "-", or a pre-formed rrdname
+     * @param  string  $extension  File extension (default is .rrd)
      * @return string the name of the rrd file for $host's $extra component
      */
     public function name($host, $extra, $extension = '.rrd')
@@ -337,7 +339,7 @@ class Rrd extends BaseDatastore
     /**
      * Generates a path based on the hostname (or IP)
      *
-     * @param string $host Host name
+     * @param  string  $host  Host name
      * @return string the name of the rrd directory for $host
      */
     public function dirFromHost($host)
@@ -351,10 +353,12 @@ class Rrd extends BaseDatastore
      * Generates and pipes a command to rrdtool
      *
      * @internal
-     * @param string $command create, update, updatev, graph, graphv, dump, restore, fetch, tune, first, last, lastupdate, info, resize, xport, flushcached
-     * @param string $filename The full patth to the rrd file
-     * @param string $options rrdtool command options
+     *
+     * @param  string  $command  create, update, updatev, graph, graphv, dump, restore, fetch, tune, first, last, lastupdate, info, resize, xport, flushcached
+     * @param  string  $filename  The full patth to the rrd file
+     * @param  string  $options  rrdtool command options
      * @return array the output of stdout and stderr in an array
+     *
      * @throws \Exception thrown when the rrdtool process(s) cannot be started
      */
     private function command($command, $filename, $options)
@@ -410,10 +414,12 @@ class Rrd extends BaseDatastore
      * Determines if --daemon and -O should be used
      *
      * @internal
-     * @param string $command The base rrdtool command.  Usually create, update, last.
-     * @param string $filename The full path to the rrd file
-     * @param string $options Options for the command possibly including the rrd definition
+     *
+     * @param  string  $command  The base rrdtool command.  Usually create, update, last.
+     * @param  string  $filename  The full path to the rrd file
+     * @param  string  $options  Options for the command possibly including the rrd definition
      * @return string returns a full command ready to be piped to rrdtool
+     *
      * @throws FileExistsException if rrdtool <1.4.3 and the rrd file exists locally
      */
     public function buildCommand($command, $filename, $options)
@@ -448,7 +454,7 @@ class Rrd extends BaseDatastore
      * Get array of all rrd files for a device,
      * via rrdached or localdisk.
      *
-     * @param array $device device for which we get the rrd's
+     * @param  array  $device  device for which we get the rrd's
      * @return array array of rrd files for this host
      */
     public function getRrdFiles($device)
@@ -474,11 +480,11 @@ class Rrd extends BaseDatastore
     /**
      * Get array of rrd files for specific application.
      *
-     * @param array $device device for which we get the rrd's
-     * @param int   $app_id application id on the device
-     * @param string  $app_name name of app to be searched
-     * @param string  $category which category of graphs are searched
-     * @return array  array of rrd files for this host
+     * @param  array  $device  device for which we get the rrd's
+     * @param  int  $app_id  application id on the device
+     * @param  string  $app_name  name of app to be searched
+     * @param  string  $category  which category of graphs are searched
+     * @return array array of rrd files for this host
      */
     public function getRrdApplicationArrays($device, $app_id, $app_name, $category = null)
     {
@@ -512,7 +518,7 @@ class Rrd extends BaseDatastore
      * Checks if the rrd file exists on the server
      * This will perform a remote check if using rrdcached and rrdtool >= 1.5
      *
-     * @param string $filename full path to the rrd file
+     * @param  string  $filename  full path to the rrd file
      * @return bool whether or not the passed rrd file exists
      */
     public function checkRrdExists($filename)
@@ -529,8 +535,9 @@ class Rrd extends BaseDatastore
 
     /**
      * Remove RRD file(s).  Use with care as this permanently deletes rrd data.
-     * @param string $hostname rrd subfolder (hostname)
-     * @param string $prefix start of rrd file name all files matching will be deleted
+     *
+     * @param  string  $hostname  rrd subfolder (hostname)
+     * @param  string  $prefix  start of rrd file name all files matching will be deleted
      */
     public function purge($hostname, $prefix)
     {
@@ -551,6 +558,7 @@ class Rrd extends BaseDatastore
      *
      * @param  string  $options
      * @return string
+     *
      * @throws \LibreNMS\Exceptions\FileExistsException
      * @throws \LibreNMS\Exceptions\RrdGraphException
      */
@@ -604,7 +612,7 @@ class Rrd extends BaseDatastore
     /**
      * Remove invalid characters from the rrd file name
      *
-     * @param string $name
+     * @param  string  $name
      * @return string
      */
     public static function safeName($name)
@@ -615,7 +623,7 @@ class Rrd extends BaseDatastore
     /**
      * Remove invalid characters from the rrd description
      *
-     * @param string $descr
+     * @param  string  $descr
      * @return string
      */
     public static function safeDescr($descr)
@@ -626,8 +634,8 @@ class Rrd extends BaseDatastore
     /**
      * Escapes strings and sets them to a fixed length for use with RRDtool
      *
-     * @param string $descr the string to escape
-     * @param int $length if passed, string will be padded and trimmed to exactly this length (after rrdtool unescapes it)
+     * @param  string  $descr  the string to escape
+     * @param  int  $length  if passed, string will be padded and trimmed to exactly this length (after rrdtool unescapes it)
      * @return string
      */
     public static function fixedSafeDescr($descr, $length)
@@ -654,9 +662,23 @@ class Rrd extends BaseDatastore
     }
 
     /**
+     * Run rrdtool and parse the version from the output.
+     *
+     * @return string
+     */
+    public static function version(): ?string
+    {
+        $proc = new Process([Config::get('rrdtool', 'rrdtool'), '--version']);
+        $proc->run();
+        $parts = explode(' ', $proc->getOutput(), 3);
+
+        return $proc->isSuccessful() && isset($parts[1]) ? str_replace('1.7.01.7.0', '1.7.0', $parts[1]) : null;
+    }
+
+    /**
      * Only track update and create primarily, just put all others in an "other" bin
      *
-     * @param string $type
+     * @param  string  $type
      * @return string
      */
     private function coalesceStatisticType($type)

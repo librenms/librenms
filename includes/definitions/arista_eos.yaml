@@ -9,8 +9,7 @@ over:
     - { graph: device_mempool, text: 'Memory Usage' }
 discovery:
     -
-        sysDescr:
-            - Arista Networks EOS
+        sysObjectID: .1.3.6.1.4.1.30065.1
 poller_modules:
     wireless: false
     ipmi: false

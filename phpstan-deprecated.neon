@@ -1,0 +1,28 @@
+includes:
+    - vendor/phpstan/phpstan-deprecation-rules/rules.neon
+    - phpstan-baseline-deprecated.neon
+
+parameters:
+    phpVersion: 70300
+
+    customRulesetUsed: true
+    reportUnmatchedIgnoredErrors: false
+    resultCachePath: %tmpDir%/resultCache-deprecated.php
+
+    paths:
+        - LibreNMS
+        - bootstrap
+        - cache
+        - html
+        - storage
+        - app
+        - config
+        - database
+        - doc
+        - includes
+        - licenses
+        - misc
+        - resources
+        - routes
+        - sql-schema
+        - tests

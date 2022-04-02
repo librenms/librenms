@@ -7,7 +7,7 @@ use LibreNMS\RRD\RrdDefinition;
 
 class Gaia extends \LibreNMS\OS implements OSPolling
 {
-    public function pollOS()
+    public function pollOS(): void
     {
         $oids = ['fwLoggingHandlingRate.0', 'mgLSLogReceiveRate.0', 'fwNumConn.0', 'fwAccepted.0', 'fwRejected.0', 'fwDropped.0', 'fwLogged.0'];
 
@@ -16,7 +16,7 @@ class Gaia extends \LibreNMS\OS implements OSPolling
         //#############
         // Create firewall lograte/handlingrate rrd
         //#############
-        if (is_numeric($data[0]['fwLoggingHandlingRate'])) {
+        if (is_numeric($data[0]['fwLoggingHandlingRate'] ?? null)) {
             $rrd_def = RrdDefinition::make()->addDataset('fwlograte', 'GAUGE', 0);
 
             $fields = [
@@ -31,7 +31,7 @@ class Gaia extends \LibreNMS\OS implements OSPolling
         //#############
         // Create MGMT logserver lograte rrd
         //#############
-        if (is_numeric($data[0]['mgLSLogReceiveRate'])) {
+        if (is_numeric($data[0]['mgLSLogReceiveRate'] ?? null)) {
             $rrd_def = RrdDefinition::make()->addDataset('LogReceiveRate', 'GAUGE', 0);
 
             $fields = [
@@ -46,7 +46,7 @@ class Gaia extends \LibreNMS\OS implements OSPolling
         //#############
         // Create firewall active connections rrd
         //#############
-        if (is_numeric($data[0]['fwNumConn'])) {
+        if (is_numeric($data[0]['fwNumConn'] ?? null)) {
             $rrd_def = RrdDefinition::make()->addDataset('NumConn', 'GAUGE', 0);
 
             $fields = [
@@ -61,7 +61,7 @@ class Gaia extends \LibreNMS\OS implements OSPolling
         //#############
         // Create firewall packets rrd
         //#############
-        if (is_numeric($data[0]['fwAccepted']) && is_numeric($data[0]['fwRejected']) && is_numeric($data[0]['fwDropped']) && is_numeric($data[0]['fwLogged'])) {
+        if (is_numeric($data[0]['fwAccepted'] ?? null) && is_numeric($data[0]['fwRejected'] ?? null) && is_numeric($data[0]['fwDropped'] ?? null) && is_numeric($data[0]['fwLogged'] ?? null)) {
             $rrd_def = RrdDefinition::make()
                 ->addDataset('accepted', 'DERIVE', 0)
                 ->addDataset('rejected', 'DERIVE', 0)

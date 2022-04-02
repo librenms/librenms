@@ -9,30 +9,30 @@
                 <span class="fa-stack" aria-hidden="true">
                     <i class="fa fa-square fa-stack-2x"></i>
                     <i class="fa fa-cogs fa-stack-1x fa-inverse"></i>
-                </span> @lang('Services Templates')
+                </span> {{ __('Services Templates') }}
             </x-slot>
             <div class="row" style="padding-bottom: 16px;">
                 <div class="col-md-12">
                     <a type="button" class="btn btn-primary" href="{{ route('services.templates.create') }}">
-                        <i class="fa fa-plus"></i> @lang('New Service Template')
+                        <i class="fa fa-plus"></i> {{ __('New Service Template') }}
                     </a>
-                    <button type="button" title="@lang('Apply Service Templates')" class="btn btn-success" aria-label="@lang('Apply Service Templates')"
+                    <button type="button" title="{{ __('Apply Service Templates') }}" class="btn btn-success" aria-label="{{ __('Apply Service Templates') }}"
                             onclick="applyAll_st(this, '{{ route('services.templates.applyAll') }}')">
                         <i
-                            class="fa fa-refresh" aria-hidden="true"></i> @lang('Apply Service Templates')</button>
+                            class="fa fa-refresh" aria-hidden="true"></i> {{ __('Apply Service Templates') }}</button>
                 </div>
             </div>
             <div class="table-responsive">
                 <table id="manage-services-templates-table" class="table table-condensed table-hover">
                     <thead>
                     <tr>
-                        <th>@lang('Name')</th>
-                        <th>@lang('Description')</th>
-                        <th>@lang('Devices')</th>
-                        <th>@lang('Device Groups')</th>
-                        <th>@lang('Device Type')</th>
-                        <th>@lang('Device Rules')</th>
-                        <th>@lang('Actions')</th>
+                        <th>{{ __('Name') }}</th>
+                        <th>{{ __('Description') }}</th>
+                        <th>{{ __('Devices') }}</th>
+                        <th>{{ __('Device Groups') }}</th>
+                        <th>{{ __('Device Type') }}</th>
+                        <th>{{ __('Device Rules') }}</th>
+                        <th>{{ __('Actions') }}</th>
                     </tr>
                     </thead>
                     <tbody>
@@ -49,16 +49,16 @@
                             <td>{{ __(ucfirst($template->type)) }}</td>
                             <td>{{ $template->type == 'dynamic' ? $template->getDeviceParser()->toSql(false) : '' }}</td>
                             <td>
-                                <button type="button" title="@lang('Apply Services for this Service Template')" class="btn btn-success btn-sm" aria-label="@lang('Apply')"
+                                <button type="button" title="{{ __('Apply Services for this Service Template') }}" class="btn btn-success btn-sm" aria-label="{{ __('Apply') }}"
                                     onclick="apply_st(this, '{{ $template->name }}', '{{ $template->id }}', '{{ route('services.templates.apply', $template->id) }}')">
                                     <i class="fa fa-refresh" aria-hidden="true"></i></button>
-                                <button type="button" title="@lang('Remove Services for this Service Template')" class="btn btn-warning btn-sm" aria-label="@lang('Remove')"
+                                <button type="button" title="{{ __('Remove Services for this Service Template') }}" class="btn btn-warning btn-sm" aria-label="{{ __('Remove') }}"
                                     onclick="remove_st(this, '{{ $template->name }}', '{{ $template->id }}', '{{ route('services.templates.remove', $template->id) }}')">
                                     <i class="fa fa-ban" aria-hidden="true"></i></button>
-                                <a type="button" title="@lang('Edit Service Template')" class="btn btn-primary btn-sm" aria-label="@lang('Edit')"
+                                <a type="button" title="{{ __('Edit Service Template') }}" class="btn btn-primary btn-sm" aria-label="{{ __('Edit') }}"
                                     href="{{ route('services.templates.edit', $template->id) }}">
                                     <i class="fa fa-pencil" aria-hidden="true"></i></a>
-                                <button type="button" class="btn btn-danger btn-sm" title="@lang('Delete Service Template')" aria-label="@lang('Delete')"
+                                <button type="button" class="btn btn-danger btn-sm" title="{{ __('Delete Service Template') }}" aria-label="{{ __('Delete') }}"
                                     onclick="delete_st(this, '{{ $template->name }}', '{{ $template->id }}', '{{ route('services.templates.destroy', $template->id) }}')">
                                     <i class="fa fa-trash" aria-hidden="true"></i></button>
                             </td>
@@ -70,20 +70,20 @@
             @foreach($groups as $group)
                 <x-panel id="manage-services-templates-panel-dg">
                     <x-slot name="title">
-                        <i class="fa fa-th fa-fw fa-lg" aria-hidden="true"></i> @lang($group->name)
+                        <i class="fa fa-th fa-fw fa-lg" aria-hidden="true"></i> {{ __($group->name) }}
                     </x-slot>
                     <div class="table-responsive">
                         <table id="manage-services-templates-table-dg-{{ $group->id }}" class="table table-condensed table-hover">
                             <thead>
                             <tr>
-                                <th>@lang('Name')</th>
-                                <th>@lang('Check Type')</th>
-                                <th>@lang('Parameters')</th>
-                                <th>@lang('Remote Host')</th>
-                                <th>@lang('Description')</th>
-                                <th>@lang('Modified')</th>
-                                <th>@lang('Ignored')</th>
-                                <th>@lang('Disabled')</th>
+                                <th>{{ __('Name') }}</th>
+                                <th>{{ __('Check Type') }}</th>
+                                <th>{{ __('Parameters') }}</th>
+                                <th>{{ __('Remote Host') }}</th>
+                                <th>{{ __('Description') }}</th>
+                                <th>{{ __('Modified') }}</th>
+                                <th>{{ __('Ignored') }}</th>
+                                <th>{{ __('Disabled') }}</th>
                             </tr>
                             </thead>
                             <tbody>
@@ -109,20 +109,20 @@
             @foreach($devices as $device)
                 <x-panel id="manage-services-templates-panel-d">
                     <x-slot name="title">
-                        <i class="fa fa-server fa-fw fa-lg" aria-hidden="true"></i> @lang($device->hostname)
+                        <i class="fa fa-server fa-fw fa-lg" aria-hidden="true"></i> {{ __($device->hostname) }}
                     </x-slot>
                     <div class="table-responsive">
                         <table id="manage-services-templates-table-d-{{ $device->id }}" class="table table-condensed table-hover">
                             <thead>
                             <tr>
-                                <th>@lang('Name')</th>
-                                <th>@lang('Check Type')</th>
-                                <th>@lang('Parameters')</th>
-                                <th>@lang('Remote Host')</th>
-                                <th>@lang('Description')</th>
-                                <th>@lang('Modified')</th>
-                                <th>@lang('Ignored')</th>
-                                <th>@lang('Disabled')</th>
+                                <th>{{ __('Name') }}</th>
+                                <th>{{ __('Check Type') }}</th>
+                                <th>{{ __('Parameters') }}</th>
+                                <th>{{ __('Remote Host') }}</th>
+                                <th>{{ __('Description') }}</th>
+                                <th>{{ __('Modified') }}</th>
+                                <th>{{ __('Ignored') }}</th>
+                                <th>{{ __('Disabled') }}</th>
                             </tr>
                             </thead>
                             <tbody>
@@ -152,7 +152,7 @@
 @section('scripts')
     <script>
         function apply_st(button, name, id, url) {
-            if (confirm('@lang('Are you sure you want to create Services for ')' + name + '?')) {
+            if (confirm('{{ __('Are you sure you want to create Services for ') }}' + name + '?')) {
                 $.ajax({
                     url: url,
                     type: 'POST',
@@ -166,7 +166,7 @@
             }
         }
         function applyAll_st(button, url) {
-            if (confirm('@lang('Are you sure you want to Apply All Service Templates?')')) {
+            if (confirm('{{ __('Are you sure you want to Apply All Service Templates?') }}')) {
                 $.ajax({
                     url: url,
                     type: 'POST',
@@ -180,7 +180,7 @@
             }
         }
         function remove_st(button, name, id, url) {
-            if (confirm('@lang('Are you sure you want to remove all Services created by ')' + name + '?')) {
+            if (confirm('{{ __('Are you sure you want to remove all Services created by ') }}' + name + '?')) {
                 $.ajax({
                     url: url,
                     type: 'POST',
@@ -188,7 +188,7 @@
                         toastr.success(msg);
                     },
                     error: function () {
-                        toastr.error('@lang('No Services for this Service Template were removed')');
+                        toastr.error('{{ __('No Services for this Service Template were removed') }}');
                     }
                 });
             }
@@ -197,7 +197,7 @@
         }
         function delete_st(button, name, id, url) {
             var index = button.parentNode.parentNode.rowIndex;
-            if (confirm('@lang('Are you sure you want to delete AND remove all Services created by ')' + name + '?')) {
+            if (confirm('{{ __('Are you sure you want to delete AND remove all Services created by ') }}' + name + '?')) {
                 $.ajax({
                     url: url,
                     type: 'DELETE',
@@ -206,7 +206,7 @@
                         toastr.success(msg);
                     },
                     error: function () {
-                        toastr.error('@lang('The Service Template could not be deleted')');
+                        toastr.error('{{ __('The Service Template could not be deleted') }}');
                     }
                 });
             }

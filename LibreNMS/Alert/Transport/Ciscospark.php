@@ -13,9 +13,12 @@
 namespace LibreNMS\Alert\Transport;
 
 use LibreNMS\Alert\Transport;
+use LibreNMS\Util\Proxy;
 
 class Ciscospark extends Transport
 {
+    protected $name = 'Cisco Spark';
+
     public function deliverAlert($obj, $opts)
     {
         if (empty($this->config)) {
@@ -57,7 +60,7 @@ class Ciscospark extends Transport
         $data[$akey] = $text;
 
         $curl = curl_init();
-        set_curl_proxy($curl);
+        Proxy::applyToCurl($curl);
         curl_setopt($curl, CURLOPT_URL, 'https://api.ciscospark.com/v1/messages');
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
         curl_setopt($curl, CURLOPT_HTTPHEADER, [

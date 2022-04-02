@@ -18,6 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -176,9 +177,10 @@ trait ActiveDirectoryCommon
     /**
      * Generate a user array from an AD LDAP entry
      * Must have the attributes: objectsid, samaccountname, displayname, mail
+     *
      * @internal
      *
-     * @param array $entry
+     * @param  array  $entry
      * @return array
      */
     protected function userFromAd($entry)

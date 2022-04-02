@@ -18,6 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2020 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -58,6 +59,7 @@ class CiHelper
         'unit_skip' => false,
         'web_skip' => false,
         'lint_skip_php' => false,
+        'lint_skip_phpstan' => false,
         'lint_skip_python' => false,
         'lint_skip_bash' => false,
         'unit_os' => false,
@@ -70,6 +72,7 @@ class CiHelper
         'fail-fast' => false,
         'full' => false,
         'quiet' => false,
+        'os-modules-only' => false,
     ];
 
     public function __construct()
@@ -149,7 +152,8 @@ class CiHelper
 
     /**
      * Get a flag value
-     * @param string $name
+     *
+     * @param  string  $name
      * @return bool
      */
     public function getFlag($name)
@@ -159,6 +163,7 @@ class CiHelper
 
     /**
      * Fetch all flags
+     *
      * @return bool[]
      */
     public function getFlags()
@@ -179,13 +184,21 @@ class CiHelper
             array_push($phpunit_cmd, '--stop-on-error', '--stop-on-failure');
         }
 
+        if (Debug::isVerbose()) {
+            $phpunit_cmd[] = '--debug';
+        }
+
         // exclusive tests
         if ($this->flags['unit_os']) {
             echo 'Only checking os: ' . implode(', ', $this->os) . PHP_EOL;
             $filter = implode('.*|', $this->os);
             // include tests that don't have data providers and only data sets that match
             array_push($phpunit_cmd, '--group', 'os');
-            array_push($phpunit_cmd, '--filter', "/::test[A-Za-z]+$|::testOSDetection|::test[A-Za-z]+ with data set \"$filter.*\"$/");
+            if ($this->flags['os-modules-only']) {
+                array_push($phpunit_cmd, '--filter', "/::testOS with data set \"$filter.*\"$/");
+            } else {
+                array_push($phpunit_cmd, '--filter', "/::test[A-Za-z]+$|::testOSDetection|::test[A-Za-z]+ with data set \"$filter.*\"$/");
+            }
         } elseif ($this->flags['unit_docs']) {
             array_push($phpunit_cmd, '--group', 'docs');
         } elseif ($this->flags['unit_svg']) {
@@ -270,6 +283,12 @@ class CiHelper
             $php_lint_cmd = array_merge($php_lint_cmd, $files);
 
             $return += $this->execute('PHP lint', $php_lint_cmd);
+
+            if (! $this->flags['lint_skip_phpstan']) {
+                $phpstan_cmd = [$this->checkPhpExec('phpstan'), 'analyze', '--no-interaction',  '--memory-limit=2G'];
+                $return += $this->execute('PHPStan Deprecated', array_merge($phpstan_cmd, ['--configuration=phpstan-deprecated.neon']));
+                $return += $this->execute('PHPStan', $phpstan_cmd);
+            }
         }
 
         if (! $this->flags['lint_skip_python']) {
@@ -299,7 +318,7 @@ class CiHelper
      * Run the specified check and return the return value.
      * Make sure it isn't skipped by SKIP_TYPE_CHECK env variable and hasn't been run already
      *
-     * @param string $type type of check lint, style, or unit
+     * @param  string  $type  type of check lint, style, or unit
      * @return int the return value from the check (0 = success)
      */
     private function runCheck($type)
@@ -319,7 +338,7 @@ class CiHelper
     }
 
     /**
-     * @param string $type
+     * @param  string  $type
      * @return false|string the method name to run
      */
     private function canCheck($type)
@@ -339,10 +358,10 @@ class CiHelper
     /**
      * Run a check command
      *
-     * @param string $name name for status output
-     * @param array $command
-     * @param bool $silence silence the status ouput (still shows error output)
-     * @param array $env environment to set
+     * @param  string  $name  name for status output
+     * @param  array  $command
+     * @param  bool  $silence  silence the status ouput (still shows error output)
+     * @param  array  $env  environment to set
      * @return int
      */
     private function execute(string $name, $command, $silence = false, $env = null): int
@@ -369,7 +388,7 @@ class CiHelper
         $type = substr($name, $space ? $space + 1 : 0);
         $quiet = ($this->flags['ci'] && isset($this->ciDefaults['quiet'][$type])) ? $this->ciDefaults['quiet'][$type] : $this->flags['quiet'];
 
-        $proc->setTimeout(3600)->setIdleTimeout(3600);
+        $proc->setTimeout(7200)->setIdleTimeout(3600);
         if (! ($silence || $quiet)) {
             echo PHP_EOL;
             $proc->setTty(Process::isTtySupported());
@@ -422,6 +441,7 @@ class CiHelper
 
         $this->setFlags([
             'lint_skip_php' => empty($this->changed['php']),
+            'lint_skip_phpstan' => $this->flags['ci'] || empty($this->changed['php']),
             'lint_skip_python' => empty($this->changed['python']),
             'lint_skip_bash' => empty($this->changed['bash']),
             'unit_os' => $this->getFlag('unit_os') || (! empty($this->changed['os']) && empty(array_diff($this->changed['php'], $this->changed['os-files']))),
@@ -432,7 +452,7 @@ class CiHelper
 
         $this->setFlags([
             'unit_skip' => empty($this->changed['php']) && ! array_sum(Arr::only($this->getFlags(), ['unit_os', 'unit_docs', 'unit_svg', 'unit_modules', 'docs_changed'])),
-            'lint_skip' => array_sum(Arr::only($this->getFlags(), ['lint_skip_php', 'lint_skip_python', 'lint_skip_bash'])) === 3,
+            'lint_skip' => array_sum(Arr::only($this->getFlags(), ['lint_skip_php', 'lint_skip_phpstan', 'lint_skip_python', 'lint_skip_bash'])) === 4,
             'style_skip' => ! $this->flags['ci'] && empty($this->changed['php']),
             'web_skip' => empty($this->changed['php']) && empty($this->changed['resources']),
         ]);
@@ -443,7 +463,7 @@ class CiHelper
      * If it does not exist, run composer.
      * If composer isn't installed, print error and exit.
      *
-     * @param string $exec the name of the executable to check
+     * @param  string  $exec  the name of the executable to check
      * @return string path to the executable
      */
     private function checkPhpExec($exec)
@@ -471,7 +491,7 @@ class CiHelper
      * If it does not exist, run pip3.
      * If pip3 isn't installed, print error and exit.
      *
-     * @param string $exec the name of the executable to check
+     * @param  string  $exec  the name of the executable to check
      * @return string path to the executable
      */
     private function checkPythonExec($exec)

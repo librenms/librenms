@@ -18,6 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2016 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -26,4 +27,16 @@ namespace LibreNMS\Exceptions;
 
 class SnmpVersionUnsupportedException extends \Exception
 {
+    /**
+     * @var string
+     */
+    public $snmpVersion;
+
+    public function __construct(string $snmpVersion)
+    {
+        $this->snmpVersion = $snmpVersion;
+        $message = trans('exceptions.snmp_version_unsupported.message', ['snmpver' => $snmpVersion]);
+
+        parent::__construct($message);
+    }
 }

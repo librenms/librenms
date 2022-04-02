@@ -18,6 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2020 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -32,9 +33,12 @@ class Edgeos extends \LibreNMS\OS
     {
         parent::discoverOS($device); // yaml
 
-        $hw = implode(PHP_EOL, snmp_get_multi_oid($this->getDeviceArray(), ['.1.3.6.1.2.1.25.4.2.1.5.3818', '.1.3.6.1.2.1.25.4.2.1.5.3819'], '-Ovq'));
-        if (preg_match('/(?<=UBNT )(.*)(?= running on)/', $hw, $matches)) {
-            $this->getDevice()->hardware = $matches[0];
+        $hw = snmpwalk_cache_oid($this->getDeviceArray(), 'hrSWRunParameters', [], 'HOST-RESOURCES-MIB');
+        foreach ($hw as $entry) {
+            if (preg_match('/(?<=UBNT )(.*)(?= running on)/', $entry['hrSWRunParameters'], $matches)) {
+                $this->getDevice()->hardware = $matches[0];
+                break;
+            }
         }
     }
 }

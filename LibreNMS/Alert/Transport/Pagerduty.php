@@ -15,6 +15,7 @@
 
 /**
  * PagerDuty Generic-API Transport
+ *
  * @author f0o <f0o@devilcode.org>
  * @copyright 2015 f0o, LibreNMS
  * @license GPL
@@ -24,15 +25,13 @@ namespace LibreNMS\Alert\Transport;
 
 use GuzzleHttp\Client;
 use GuzzleHttp\Exception\GuzzleException;
-use Illuminate\Http\Request;
 use LibreNMS\Alert\Transport;
 use LibreNMS\Enum\AlertState;
-use Log;
-use Validator;
+use LibreNMS\Util\Proxy;
 
 class Pagerduty extends Transport
 {
-    public static $integrationKey = '2fc7c9f3c8030e74aae6';
+    protected $name = 'PagerDuty';
 
     public function deliverAlert($obj, $opts)
     {
@@ -48,8 +47,8 @@ class Pagerduty extends Transport
     }
 
     /**
-     * @param array $obj
-     * @param array $config
+     * @param  array  $obj
+     * @param  array  $config
      * @return bool|string
      */
     public function contactPagerduty($obj, $config)
@@ -60,7 +59,7 @@ class Pagerduty extends Transport
             'dedup_key'    => (string) $obj['alert_id'],
             'payload'    => [
                 'custom_details'  => strip_tags($obj['msg']) ?: 'Test',
-                'device_groups'   => \DeviceCache::get($obj['device_id'])->groups->pluck('name'),
+                'group'   => (string) \DeviceCache::get($obj['device_id'])->groups->pluck('name'),
                 'source'   => $obj['hostname'],
                 'severity' => $obj['severity'],
                 'summary'  => ($obj['name'] ? $obj['name'] . ' on ' . $obj['hostname'] : $obj['title']),
@@ -80,7 +79,7 @@ class Pagerduty extends Transport
         $client = new Client();
 
         $request_opts = ['json' => $data];
-        $request_opts['proxy'] = get_proxy();
+        $request_opts['proxy'] = Proxy::forGuzzle();
 
         try {
             $result = $client->request('POST', $url, $request_opts);
@@ -100,22 +99,6 @@ class Pagerduty extends Transport
         return [
             'config' => [
                 [
-                    'title' => 'Authorize (EU)',
-                    'descr' => 'Alert with PagerDuty',
-                    'type'  => 'oauth',
-                    'icon'  => 'pagerduty-white.svg',
-                    'class' => 'btn-success',
-                    'url'   => 'https://connect.eu.pagerduty.com/connect?vendor=' . self::$integrationKey . '&callback=',
-                ],
-                [
-                    'title' => 'Authorize (US)',
-                    'descr' => 'Alert with PagerDuty',
-                    'type'  => 'oauth',
-                    'icon'  => 'pagerduty-white.svg',
-                    'class' => 'btn-success',
-                    'url'   => 'https://connect.pagerduty.com/connect?vendor=' . self::$integrationKey . '&callback=',
-                ],
-                [
                     'title' => 'Service Region',
                     'name' => 'region',
                     'descr' => 'Service Region of the PagerDuty account',
@@ -126,17 +109,7 @@ class Pagerduty extends Transport
                     ],
                 ],
                 [
-                    'title' => 'Account',
-                    'type'  => 'hidden',
-                    'name'  => 'account',
-                ],
-                [
-                    'title' => 'Service',
-                    'type'  => 'hidden',
-                    'name'  => 'service_name',
-                ],
-                [
-                    'title' => 'Integration Key',
+                    'title' => 'Routing Key',
                     'type'  => 'text',
                     'name'  => 'service_key',
                 ],
@@ -145,33 +118,5 @@ class Pagerduty extends Transport
                 'region' => 'in:EU,US',
             ],
         ];
-    }
-
-    public function handleOauth(Request $request)
-    {
-        $validator = Validator::make($request->all(), [
-            'account' => 'alpha_dash',
-            'service_key' => 'regex:/^[a-fA-F0-9]+$/',
-            'service_name' => 'string',
-        ]);
-
-        if ($validator->fails()) {
-            Log::error('Pagerduty oauth failed validation.', ['request' => $request->all()]);
-
-            return false;
-        }
-
-        $config = json_encode($request->only('account', 'service_key', 'service_name'));
-
-        if ($id = $request->get('id')) {
-            return (bool) dbUpdate(['transport_config' => $config], 'alert_transports', 'transport_id=?', [$id]);
-        } else {
-            return (bool) dbInsert([
-                'transport_name' => $request->get('service_name', 'PagerDuty'),
-                'transport_type' => 'pagerduty',
-                'is_default' => 0,
-                'transport_config' => $config,
-            ], 'alert_transports');
-        }
     }
 }

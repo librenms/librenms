@@ -2,12 +2,16 @@
 
 use LibreNMS\RRD\RrdDefinition;
 
+$name = 'proxmox';
+$app_id = $app['app_id'];
+
 if (! function_exists('proxmox_port_exists')) {
     /**
      * Check if a port on a Proxmox VM exists
-     * @param string $p Port name
-     * @param string $c Clustername
-     * @param int $i VM ID
+     *
+     * @param  string  $p  Port name
+     * @param  string  $c  Clustername
+     * @param  int  $i  VM ID
      * @return int|bool The port-ID if the port exists, false if it doesn't exist
      */
     function proxmox_port_exists($i, $c, $p)
@@ -23,9 +27,10 @@ if (! function_exists('proxmox_port_exists')) {
 if (! function_exists('proxmox_vm_exists')) {
     /**
      * Check if a Proxmox VM exists
-     * @param int $i VM ID
-     * @param string $c Clustername
-     * @param array $pmxcache Reference to the Proxmox VM Cache
+     *
+     * @param  int  $i  VM ID
+     * @param  string  $c  Clustername
+     * @param  array  $pmxcache  Reference to the Proxmox VM Cache
      * @return bool true if the VM exists, false if it doesn't
      */
     function proxmox_vm_exists($i, $c, &$pmxcache)
@@ -42,9 +47,6 @@ if (! function_exists('proxmox_vm_exists')) {
         return false;
     }
 }
-
-$name = 'proxmox';
-$app_id = $app['app_id'];
 
 if (\LibreNMS\Config::get('enable_proxmox') && ! empty($agent_data['app'][$name])) {
     $proxmox = $agent_data['app'][$name];

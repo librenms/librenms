@@ -26,7 +26,7 @@ if ($width > '500') {
 $descr = \LibreNMS\Data\Store\Rrd::fixedSafeDescr(short_hrDeviceDescr($mempool['mempool_descr']), $descr_len);
 
 $perc = round($mempool['mempool_perc'], 0);
-$background = \LibreNMS\Util\Colors::percentage($perc, $mempool['mempool_perc_warn']);
+$background = \LibreNMS\Util\Color::percentage($perc, $mempool['mempool_perc_warn']);
 
 $rrd_options .= " DEF:{$mempool['mempool_id']}used=$rrd_filename:used:AVERAGE";
 $rrd_options .= " DEF:{$mempool['mempool_id']}free=$rrd_filename:free:AVERAGE";

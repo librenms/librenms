@@ -18,6 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -65,7 +66,7 @@ class PingCheck implements ShouldQueue
     /**
      * Create a new job instance.
      *
-     * @param array $groups List of distributed poller groups to check
+     * @param  array  $groups  List of distributed poller groups to check
      */
     public function __construct($groups = [])
     {
@@ -81,8 +82,10 @@ class PingCheck implements ShouldQueue
         // set up fping process
         $timeout = Config::get('fping_options.timeout', 500); // must be smaller than period
         $retries = Config::get('fping_options.retries', 2);  // how many retries on failure
+        $tos = Config::get('fping_options.tos', 0);  // TOS marking
+        $fping = Config::get('fping', 'fping'); // use user defined binary
 
-        $this->command = ['fping', '-f', '-', '-e', '-t', $timeout, '-r', $retries];
+        $this->command = [$fping, '-f', '-', '-e', '-t', $timeout, '-r', $retries, '-O', $tos];
         $this->wait = Config::get('rrd.step', 300) * 2;
     }
 
@@ -220,7 +223,7 @@ class PingCheck implements ShouldQueue
      * If the device is on the current tier, record the data and remove it
      * $data should have keys: hostname, status, and conditionally rtt
      *
-     * @param array $data
+     * @param  array  $data
      */
     private function recordData(array $data)
     {
@@ -275,7 +278,7 @@ class PingCheck implements ShouldQueue
     /**
      * Done processing $hostname, remove it from our active data
      *
-     * @param string $hostname
+     * @param  string  $hostname
      */
     private function complete($hostname)
     {
@@ -287,7 +290,7 @@ class PingCheck implements ShouldQueue
      * Defer this data processing until all parent devices are complete
      *
      *
-     * @param array $data
+     * @param  array  $data
      */
     private function defer(array $data)
     {

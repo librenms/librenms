@@ -1,6 +1,3 @@
-source: Extensions/Dispatcher-Service.md
-path: blob/master/doc/
-
 # Dispatcher Service
 
 > Status: Release Candidate
@@ -162,8 +159,10 @@ The watchdog scheduler will check that the poller log file has been written to w
 
 ## Cron Scripts
 
-Once the LibreNMS service is installed, the cron scripts used by
-LibreNMS are no longer required and must be removed.
+Once the LibreNMS service is installed, the cron scripts used by LibreNMS to start alerting, polling, discovery and maintenance tasks are no longer required and must be disabled either by removing or commenting them out. The service handles these tasks when enabled. The only cron task enabled after switching to the dispatcher service should be the following:
+```
+*    *    * * *   librenms    cd /opt/librenms/ && php artisan schedule:run >> /dev/null 2>&1
+```
 
 ## Service Installation
 

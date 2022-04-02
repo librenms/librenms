@@ -1,6 +1,6 @@
 <?php
 
-$class = 'er';
+$class = 'ber';
 $unit = '';
 $unit_long = '';
 

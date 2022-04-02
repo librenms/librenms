@@ -18,6 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2019 KanREN, Inc.
  * @author     Heath Barnhart <hbarnhart@kanren.net>
  */
@@ -35,7 +36,7 @@ class AlertUtil
     /**
      * Get the rule_id for a specific alert
      *
-     * @param int $alert_id
+     * @param  int  $alert_id
      * @return mixed|null
      */
     private static function getRuleId($alert_id)
@@ -48,7 +49,7 @@ class AlertUtil
     /**
      * Get the transport for a given alert_id
      *
-     * @param int $alert_id
+     * @param  int  $alert_id
      * @return array
      */
     public static function getAlertTransports($alert_id)
@@ -73,7 +74,8 @@ class AlertUtil
 
     /**
      * Find contacts for alert
-     * @param array $results Rule-Result
+     *
+     * @param  array  $results  Rule-Result
      * @return array
      */
     public static function getContacts($results)
@@ -91,19 +93,19 @@ class AlertUtil
         $uids = [];
         foreach ($results as $result) {
             $tmp = null;
-            if (is_numeric($result['bill_id'])) {
+            if (isset($result['bill_id']) && is_numeric($result['bill_id'])) {
                 $tmpa = dbFetchRows('SELECT user_id FROM bill_perms WHERE bill_id = ?', [$result['bill_id']]);
                 foreach ($tmpa as $tmp) {
                     $uids[$tmp['user_id']] = $tmp['user_id'];
                 }
             }
-            if (is_numeric($result['port_id'])) {
+            if (isset($result['port_id']) && is_numeric($result['port_id'])) {
                 $tmpa = dbFetchRows('SELECT user_id FROM ports_perms WHERE port_id = ?', [$result['port_id']]);
                 foreach ($tmpa as $tmp) {
                     $uids[$tmp['user_id']] = $tmp['user_id'];
                 }
             }
-            if (is_numeric($result['device_id'])) {
+            if (isset($result['device_id']) && is_numeric($result['device_id'])) {
                 if (Config::get('alert.syscontact') == true) {
                     if (dbFetchCell("SELECT attrib_value FROM devices_attribs WHERE attrib_type = 'override_sysContact_bool' AND device_id = ?", [$result['device_id']])) {
                         $tmpa = dbFetchCell("SELECT attrib_value FROM devices_attribs WHERE attrib_type = 'override_sysContact_string' AND device_id = ?", [$result['device_id']]);
@@ -193,7 +195,8 @@ class AlertUtil
 
     /**
      * Check if device is under maintenance
-     * @param int $device_id Device-ID
+     *
+     * @param  int  $device_id  Device-ID
      * @return bool
      */
     public static function isMaintenance($device_id)
@@ -203,7 +206,8 @@ class AlertUtil
 
     /**
      * Check if device is set to ignore alerts
-     * @param int $device_id Device-ID
+     *
+     * @param  int  $device_id  Device-ID
      * @return bool
      */
     public static function hasDisableNotify($device_id)
@@ -215,8 +219,9 @@ class AlertUtil
 
     /**
      * Process Macros
-     * @param string $rule Rule to process
-     * @param int $x Recursion-Anchor
+     *
+     * @param  string  $rule  Rule to process
+     * @param  int  $x  Recursion-Anchor
      * @return string|bool
      */
     public static function runMacros($rule, $x = 1)

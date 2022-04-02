@@ -1,7 +1,6 @@
 <?php
 
 use LibreNMS\Config;
-use LibreNMS\Util\Rewrite;
 
 function rewrite_entity_descr($descr)
 {
@@ -33,8 +32,8 @@ function rewrite_entity_descr($descr)
  * Clean port values for html display
  * Add label to the port array (usually one of ifAlias, ifName, ifDescr)
  *
- * @param array $interface
- * @param null|array $device
+ * @param  array  $interface
+ * @param  null|array  $device
  * @return mixed
  */
 function cleanPort($interface, $device = null)
@@ -42,9 +41,9 @@ function cleanPort($interface, $device = null)
     if (! $interface) {
         return $interface;
     }
-    $interface['ifAlias'] = \LibreNMS\Util\Clean::html($interface['ifAlias'], []);
-    $interface['ifName'] = \LibreNMS\Util\Clean::html($interface['ifName'], []);
-    $interface['ifDescr'] = \LibreNMS\Util\Clean::html($interface['ifDescr'], []);
+    $interface['ifAlias'] = htmlentities($interface['ifAlias']);
+    $interface['ifName'] = htmlentities($interface['ifName']);
+    $interface['ifDescr'] = htmlentities($interface['ifDescr']);
 
     if (! $device) {
         $device = device_by_id_cache($interface['device_id']);
@@ -120,26 +119,6 @@ function makeshortif($if)
     $if = str_replace(array_keys($rewrite_shortif), array_values($rewrite_shortif), $if);
 
     return $if;
-}
-
-function rewrite_junose_hardware($hardware)
-{
-    $rewrite_junose_hardware = [
-        'juniErx1400' => 'ERX-1400',
-        'juniErx700'  => 'ERX-700',
-        'juniErx1440' => 'ERX-1440',
-        'juniErx705'  => 'ERX-705',
-        'juniErx310'  => 'ERX-310',
-        'juniE320'    => 'E320',
-        'juniE120'    => 'E120',
-        'juniSsx1400' => 'SSX-1400',
-        'juniSsx700'  => 'SSX-700',
-        'juniSsx1440' => 'SSX-1440',
-    ];
-
-    $hardware = str_replace(array_keys($rewrite_junose_hardware), array_values($rewrite_junose_hardware), $hardware);
-
-    return $hardware;
 }
 
 function rewrite_generic_hardware($hardware)

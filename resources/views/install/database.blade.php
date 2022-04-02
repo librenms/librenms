@@ -19,51 +19,51 @@
                             <i class="fa fa-lg fa-times-rectangle-o text-danger"></i>
                         @endif
                     </span>
-                    @lang('install.database.credentials')
+                    {{ __('install.database.credentials') }}
                     <i class="fa fa-lg fa-chevron-down rotate-if-collapsed fa-pull-right"></i>
                 </div>
                 <div id="db-form-container" class="card-body collapse @if(!$valid_credentials) show @endif">
                     <form id="database-form" class="form-horizontal" role="form" method="post" action="{{ route('install.acton.test-database') }}">
                         @csrf
                         <div class="form-row pb-3">
-                            <label for="host" class="col-4 col-form-label text-right">@lang('install.database.host')</label>
+                            <label for="host" class="col-4 col-form-label text-right">{{ __('install.database.host') }}</label>
                             <div class="col-6">
-                                <input type="text" class="form-control" name="host" id="host" value="{{ $host ?? 'localhost' }}" placeholder="@lang('install.database.host_placeholder')">
+                                <input type="text" class="form-control" name="host" id="host" value="{{ $host ?? 'localhost' }}" placeholder="{{ __('install.database.host_placeholder') }}">
                             </div>
                         </div>
                         <div class="form-row pb-3">
-                            <label for="port" class="col-4 col-form-label text-right">@lang('install.database.port')</label>
+                            <label for="port" class="col-4 col-form-label text-right">{{ __('install.database.port') }}</label>
                             <div class="col-6">
-                                <input type="text" class="form-control" name="port" id="port" value="{{ $port ?? 3306 }}" placeholder="@lang('install.database.port_placeholder')">
+                                <input type="text" class="form-control" name="port" id="port" value="{{ $port ?? 3306 }}" placeholder="{{ __('install.database.port_placeholder') }}">
                             </div>
                         </div>
                         <div class="form-row pb-3">
-                            <label for="unix_socket" class="col-4 col-form-label text-right">@lang('install.database.socket')</label>
+                            <label for="unix_socket" class="col-4 col-form-label text-right">{{ __('install.database.socket') }}</label>
                             <div class="col-6">
-                                <input type="text" class="form-control" name="unix_socket" id="unix_socket" value="{{ $unix_socket ?? '' }}" placeholder="@lang('install.database.socket_placeholder')">
+                                <input type="text" class="form-control" name="unix_socket" id="unix_socket" value="{{ $unix_socket ?? '' }}" placeholder="{{ __('install.database.socket_placeholder') }}">
                             </div>
                         </div>
                         <div class="form-row pb-3">
-                            <label for="username" class="col-4 col-form-label text-right">@lang('install.database.username')</label>
+                            <label for="username" class="col-4 col-form-label text-right">{{ __('install.database.username') }}</label>
                             <div class="col-6">
                                 <input type="text" class="form-control" name="username" id="username" value="{{ $username ?? 'librenms' }}">
                             </div>
                         </div>
                         <div class="form-row pb-3">
-                            <label for="password" class="col-4 col-form-label text-right">@lang('install.database.password')</label>
+                            <label for="password" class="col-4 col-form-label text-right">{{ __('install.database.password') }}</label>
                             <div class="col-6">
                                 <input type="password" class="form-control" name="password" id="password" value="{{ $password ?? '' }}">
                             </div>
                         </div>
                         <div class="form-row pb-3">
-                            <label for="database" class="col-4 col-form-label text-right">@lang('install.database.name')</label>
+                            <label for="database" class="col-4 col-form-label text-right">{{ __('install.database.name') }}</label>
                             <div class="col-6">
                                 <input type="text" class="form-control" name="database" id="database" value="{{ $database ?? 'librenms' }}">
                             </div>
                         </div>
                         <div class="row">
                             <div class="col-12">
-                                <button type="submit" class="btn btn-primary float-right">@lang('install.database.test')</button>
+                                <button type="submit" class="btn btn-primary float-right">{{ __('install.database.test') }}</button>
                             </div>
                         </div>
                     </form>
@@ -89,21 +89,21 @@
                             <i class="fa fa-lg fa-times-rectangle-o text-danger"></i>
                         @endif
                     </span>
-                    @lang('install.migrate.migrate')
+                    {{ __('install.migrate.migrate') }}
                     <i class="fa fa-lg fa-chevron-down rotate-if-collapsed fa-pull-right"></i>
                 </div>
                 <div id="migrate-container" class="card-body collapse @if(!$migrated) show @endif">
                     <div class="row">
                         <div class="col-md-8">
-                            <div id="migrate-warning" class="alert alert-warning">@lang('install.migrate.building_interrupt')</div>
+                            <div id="migrate-warning" class="alert alert-warning">{{ __('install.migrate.building_interrupt') }}</div>
                         </div>
                         <div class="col-md-4 text-right">
                             <button id="migrate-btn" type="button" class="btn btn-primary mt-1 mb-4">
-                                @lang('install.migrate.migrate')
+                                {{ __('install.migrate.migrate') }}
                             </button>
                         </div>
                     </div>
-                    <textarea readonly id="db-update" class="form-control" rows="20" placeholder="@lang('install.migrate.wait')"></textarea>
+                    <textarea readonly id="db-update" class="form-control" rows="20" placeholder="{{ __('install.migrate.wait') }}"></textarea>
                 </div>
             </div>
         </div>
@@ -156,14 +156,14 @@
                     // if error word in output, show the retry button
                     $('#migrate-warning').hide();
                     $('#migrate-status>i').attr('class', 'fa fa-lg fa-times-rectangle-o text-danger')
-                    $('#migrate-btn').prop('disabled', false).removeClass('disabled').text('@lang('install.migrate.retry')')
-                    $('#error-box').append($('<div class="alert alert-danger">@lang('install.migrate.error')</div>'));
+                    $('#migrate-btn').prop('disabled', false).removeClass('disabled').text('{{ __('install.migrate.retry') }}')
+                    $('#error-box').append($('<div class="alert alert-danger">{{ __('install.migrate.error') }}</div>'));
                 }
             };
             xhr.timeout = 240000; // if no response for 4m, allow the user to retry
             xhr.ontimeout = function (e) {
                 $('#migrate-warning').hide();
-                $('#error-box').append($('<div class="alert alert-danger">@lang('install.migrate.timeout')</div>'));
+                $('#error-box').append($('<div class="alert alert-danger">{{ __('install.migrate.timeout') }}</div>'));
             };
             xhr.onreadystatechange = function () {
                 if (xhr.readyState === XMLHttpRequest.DONE && xhr.status === 200) {

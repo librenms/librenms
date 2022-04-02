@@ -18,6 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2017 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -27,9 +28,10 @@ namespace LibreNMS\Tests;
 use DeviceCache;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use LibreNMS\Config;
+use LibreNMS\Data\Source\Fping;
+use LibreNMS\Data\Source\FpingResponse;
 use LibreNMS\Exceptions\FileNotFoundException;
 use LibreNMS\Exceptions\InvalidModuleException;
-use LibreNMS\Fping;
 use LibreNMS\Util\Debug;
 use LibreNMS\Util\ModuleTestHelper;
 
@@ -79,9 +81,10 @@ class OSModulesTest extends DBTestCase
      *
      * @group os
      * @dataProvider dumpedDataProvider
-     * @param string $os base os
-     * @param string $variant optional variant
-     * @param array $modules modules to test for this os
+     *
+     * @param  string  $os  base os
+     * @param  string  $variant  optional variant
+     * @param  array  $modules  modules to test for this os
      */
     public function testOS($os, $variant, $modules)
     {
@@ -97,10 +100,8 @@ class OSModulesTest extends DBTestCase
             $filename = $helper->getJsonFilepath(true);
             $expected_data = $helper->getTestData();
             $results = $helper->generateTestData($this->getSnmpsim(), true);
-        } catch (FileNotFoundException $e) {
-            return $this->fail($e->getMessage());
-        } catch (InvalidModuleException $e) {
-            return $this->fail($e->getMessage());
+        } catch (FileNotFoundException|InvalidModuleException $e) {
+            $this->fail($e->getMessage());
         }
 
         if (is_null($results)) {
@@ -165,22 +166,15 @@ class OSModulesTest extends DBTestCase
     private function stubClasses(): void
     {
         $this->app->bind('log', function ($app) {
-            return \Mockery::mock('\App\Facades\LogManager[event]', [$app])
-                ->shouldReceive('event');
+            $mock = \Mockery::mock('\App\Facades\LogManager[event]', [$app]);
+            $mock->shouldReceive('event');
+
+            return $mock;
         });
 
         $this->app->bind(Fping::class, function ($app) {
-            $mock = \Mockery::mock('\LibreNMS\Fping');
-            $mock->shouldReceive('ping')->andReturn([
-                'xmt' => 3,
-                'rcv' => 3,
-                'loss' => 0,
-                'min' => 0.62,
-                'max' => 0.93,
-                'avg' => 0.71,
-                'dup' => 0,
-                'exitcode' => 0,
-            ]);
+            $mock = \Mockery::mock('\LibreNMS\Data\Source\Fping');
+            $mock->shouldReceive('ping')->andReturn(FpingResponse::artificialUp());
 
             return $mock;
         });

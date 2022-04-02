@@ -4,11 +4,11 @@
     <table class="table table-hover table-condensed table-striped">
         <thead>
             <tr>
-                <th>@lang('Server Name')</th>
-                <th>@lang('Power Status')</th>
-                <th>@lang('Operating System')</th>
-                <th>@lang('Memory')</th>
-                <th>@lang('CPU')</th>
+                <th>{{ __('Server Name') }}</th>
+                <th>{{ __('Power Status') }}</th>
+                <th>{{ __('Operating System') }}</th>
+                <th>{{ __('Memory') }}</th>
+                <th>{{ __('CPU') }}</th>
             </tr>
         </thead>
         <tbody>
@@ -16,7 +16,7 @@
             <tr>
                 <td>
                     @if ($vm->parentDevice)
-                        @deviceLink($vm->parentDevice)
+                        <x-device-link :device="$vm->parentDevice" />
                     @else
                         {{ $vm->vmwVmDisplayName }}
                     @endif

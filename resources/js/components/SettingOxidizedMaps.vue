@@ -57,6 +57,12 @@
                                 <option value="hostname">hostname</option>
                                 <option value="os">os</option>
                                 <option value="type">type</option>
+                                <option value="hardware">hardware</option>
+                                <option value="sysObjectID">sysObjectID</option>
+                                <option value="sysName">sysName</option>
+                                <option value="sysDescr">sysDescr</option>
+                                <option value="location">location</option>
+                                <option value="ip">ip</option>
                             </select>
                         </div>
                     </div>

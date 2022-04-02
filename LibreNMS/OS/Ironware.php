@@ -18,6 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -623,6 +624,25 @@ class Ironware extends Foundry
             'snICX725048HPOESwitch' => 'FastIron ICX 7250 48-port PoE+ Switch',
             'snICX725048HPOEBaseL3Router' => 'FastIron ICX 7250 48-port PoE+ Base L3',
             'snICX725048HPOERouter' => 'FastIron ICX 7250 48-port PoE+ Router',
+            'snICX715024Switch' => 'Ruckus ICX 7150 24-port Switch',
+            'snICX715024Router' => 'Ruckus ICX 7150 24-port Router',
+            'snICX715024POESwitch' => 'Ruckus ICX 7150 24-port POE+ Switch',
+            'snICX715024POERouter' => 'Ruckus ICX 7150 24-port POE+ Router',
+            'snICX715024FSwitch' => 'Ruckus ICX 7150 24F Switch',
+            'snICX715024FRouter' => 'Ruckus ICX 7150 24F Router',
+            'snICX715048Switch' => 'Ruckus ICX 7150 48-port Switch',
+            'snICX715048Router' => 'Ruckus ICX 7150 48-port Router',
+            'snICX715048POESwitch' => 'Ruckus ICX 7150 48-port POE+ Switch',
+            'snICX715048POERouter' => 'Ruckus ICX 7150 48-port POE+ Router',
+            'snICX7150C12POESwitch' => 'Ruckus ICX 7150 C12 PoE+ Switch',
+            'snICX7150C12POERouter' => 'Ruckus ICX 7150 C12 PoE+ Router',
+            'snICX7150C08PSwitch' => 'Ruckus ICX 7150 C08 PoE+ Switch',
+            'snICX7150C08PRouter' => 'Ruckus ICX 7150 C08 PoE+ Router',
+            'snFastIronStackFamily.10.1' => 'Ruckus ICX 7150 Stack family',
+            'snFastIronStackFamily.10.2' => 'Ruckus ICX 7150 Stack family',
+            'snFastIronStackICX7150Router' => 'Ruckus ICX 7150 Stack Router',
+            'snFastIronStackICX7150Switch' => 'Ruckus ICX 7150 Stack Switch',
+
         ];
 
         $this->getDevice()->hardware = str_replace(array_keys($rewrite_ironware_hardware), array_values($rewrite_ironware_hardware), $this->getDevice()->hardware);

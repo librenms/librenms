@@ -1,25 +1,36 @@
-mib: TELESTE-COMMON-MIB
+mib: TELESTE-COMMON-MIB:UCD-SNMP-MIB:ENTITY-MIB
 modules:
     os:
-        hardware: TELESTE-LUMINATO-MIB::deviceName.0
+        hardware:
+            - TELESTE-LUMINATO-MIB::hwType.0
+            - TELESTE-LUMINATO-MIB::hwVersion.0
+        hardware_template: '{{ TELESTE-LUMINATO-MIB::hwType.0 }} {{ TELESTE-LUMINATO-MIB::hwVersion.0 }}'
         serial: TELESTE-LUMINATO-MIB::hwSerialNumber.0
         version: TELESTE-LUMINATO-MIB::swVersion.0
+
+    processors:
+        data:
+            -
+                oid: laLoadInt
+                num_oid: '.1.3.6.1.4.1.2021.10.1.5.{{ $index }}'
+                descr: Chassis CPU
+                index: 0
     sensors:
         pre-cache:
             data:
                 -
                     oid:
-                        - moduleSlotNo
-                        - moduleHwType
+                        - entPhysicalDescr
+                        - entPhysicalName
         temperature:
             data:
                 -
                     oid: statusInternalTemperature
                     num_oid: '.1.3.6.1.4.1.3715.99.2.2.1.1.3.{{ $index }}'
-                    descr: "Slot {{ $moduleSlotNo }} ({{ $moduleHwType }}) "
+                    descr: "{{ $entPhysicalName }} ({{ $entPhysicalDescr }}) "
                     index: '{{ $index }}'
                     divisor: 10
-                    skip_value_lt: -50
+                    skip_value_lt: 1
         state:
             data:
                 -
@@ -46,8 +57,8 @@ modules:
                 -
                     oid: statusFan
                     num_oid: '.1.3.6.1.4.1.3715.99.1.2.6.{{ $index }}'
-                    descr: Temperature Status
-                    state_name: statusTemperature
+                    descr: Fan Status
+                    state_name: statusFan
                     states:
                         - { descr: Normal, graph: 1, value: 1, generic: 0 }
                         - { descr: Failure, graph: 1, value: 2, generic: 3}

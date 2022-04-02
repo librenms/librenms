@@ -1,4 +1,3 @@
-<h3> Alert Rules </h3>
 <?php
 
 /*

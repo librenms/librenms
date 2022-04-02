@@ -3,17 +3,17 @@
     <table class="table table-hover table-condensed table-striped bootgrid-table">
         <thead>
             <tr>
-                <th class="text-left">@lang('Device')</th>
-                <th class="text-left">@lang('Interface')</th>
-                <th class="text-left">@lang('Error Rate')</th>
+                <th class="text-left">{{ __('Device') }}</th>
+                <th class="text-left">{{ __('Interface') }}</th>
+                <th class="text-left">{{ __('Error Rate') }}</th>
             </tr>
         </thead>
         <tbody>
         @foreach($ports as $port)
             <tr>
-                <td class="text-left">@deviceLink($port->device, $port->device->shortDisplayName())</td>
-                <td class="text-left">@portLink($port, $port->getShortLabel())</td>
-                <td class="text-left">@portLink($port, \LibreNMS\Util\Url::portErrorsThumbnail($port), 'port_errors')</td>
+                <td class="text-left"><x-device-link :device="$port->device">{{$port->device->shortDisplayName() }}</x-device-link></td>
+                <td class="text-left"><x-port-link :port="$port">{{ $port->getShortLabel() }}</x-port-link></td>
+                <td class="text-left"><x-port-link :port="$port"><x-graph :port="$port" type="port_errors" width="150" height="21"></x-graph></x-port-link></td>
             </tr>
         @endforeach
         </tbody>

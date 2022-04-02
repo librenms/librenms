@@ -18,6 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2020 Thomas Berberich
  * @author     Thomas Berberich <sourcehhdoctor@gmail.com>
  */
@@ -76,7 +77,7 @@ foreach ($hour_steps as $hour) {
                     <div class="form-group">
                         <label for="maintenance-submit" class="col-sm-4 control-label"></label>
                         <div class="col-sm-8">
-                            <button type="submit" id="maintenance-submit" data-device_id="<?php echo $device['device_id']; ?>" <?php echo \LibreNMS\Alert\AlertUtil::isMaintenance($device['device_id']) ? 'disabled class="btn btn-warning"' : 'class="btn btn-success"'?> name="maintenance-submit">Start Maintenance</button>
+                            <button type="button" id="maintenance-submit" data-device_id="<?php echo $device['device_id']; ?>" <?php echo \LibreNMS\Alert\AlertUtil::isMaintenance($device['device_id']) ? 'disabled class="btn btn-warning"' : 'class="btn btn-success"'?> name="maintenance-submit">Start Maintenance</button>
                         </div>
                     </div>
                 </form>
@@ -108,6 +109,7 @@ foreach ($hour_steps as $hour) {
             success: function(data){
                 if(data['status'] == 'ok') {
                     toastr.success(data['message']);
+                    location.reload();
                 } else {
                     toastr.error(data['message']);
                 }

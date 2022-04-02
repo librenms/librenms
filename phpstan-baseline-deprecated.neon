@@ -1,0 +1,6653 @@
+parameters:
+	ignoreErrors:
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchCell\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: LibreNMS/Alert/AlertDB.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchCell\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: LibreNMS/Alert/AlertRules.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRow\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: LibreNMS/Alert/AlertRules.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRows\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: LibreNMS/Alert/AlertRules.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbInsert\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
+				"""
+			count: 4
+			path: LibreNMS/Alert/AlertRules.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbUpdate\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
+				"""
+			count: 4
+			path: LibreNMS/Alert/AlertRules.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchCell\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 4
+			path: LibreNMS/Alert/AlertUtil.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRows\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 6
+			path: LibreNMS/Alert/AlertUtil.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbDelete\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#deleting\\-models$#
+				"""
+			count: 2
+			path: LibreNMS/Alert/RunAlerts.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchCell\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 2
+			path: LibreNMS/Alert/RunAlerts.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRow\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 4
+			path: LibreNMS/Alert/RunAlerts.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRows\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 4
+			path: LibreNMS/Alert/RunAlerts.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbInsert\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
+				"""
+			count: 1
+			path: LibreNMS/Alert/RunAlerts.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbUpdate\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
+				"""
+			count: 6
+			path: LibreNMS/Alert/RunAlerts.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRow\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 3
+			path: LibreNMS/Component.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRows\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 2
+			path: LibreNMS/Component.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbDeleteOrphans\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#deleting\\-models$#
+				"""
+			count: 1
+			path: LibreNMS/Device/Processor.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRows\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: LibreNMS/Device/Processor.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbUpdate\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
+				"""
+			count: 1
+			path: LibreNMS/Device/Processor.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbDelete\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#deleting\\-models$#
+				"""
+			count: 1
+			path: LibreNMS/Device/Sensor.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRow\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 2
+			path: LibreNMS/Device/Sensor.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRows\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 2
+			path: LibreNMS/Device/Sensor.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbGenPlaceholders\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 2
+			path: LibreNMS/Device/Sensor.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbInsert\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
+				"""
+			count: 1
+			path: LibreNMS/Device/Sensor.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbUpdate\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
+				"""
+			count: 2
+			path: LibreNMS/Device/Sensor.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchColumn\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: LibreNMS/Device/WirelessSensor.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchCell\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 13
+			path: LibreNMS/IRCBot.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRow\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 3
+			path: LibreNMS/IRCBot.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRows\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 7
+			path: LibreNMS/IRCBot.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbDelete\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#deleting\\-models$#
+				"""
+			count: 1
+			path: LibreNMS/Model.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRow\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 2
+			path: LibreNMS/Model.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRows\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: LibreNMS/Model.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbGenPlaceholders\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: LibreNMS/Model.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbInsert\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
+				"""
+			count: 1
+			path: LibreNMS/Model.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbUpdate\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
+				"""
+			count: 1
+			path: LibreNMS/Model.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRows\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: LibreNMS/OS/Vrp.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbInsert\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
+				"""
+			count: 1
+			path: LibreNMS/OS/Vrp.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbUpdate\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
+				"""
+			count: 2
+			path: LibreNMS/OS/Vrp.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRows\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: LibreNMS/ObjectCache.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRows\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: LibreNMS/Util/ModuleTestHelper.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbUpdate\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
+				"""
+			count: 1
+			path: LibreNMS/Util/ModuleTestHelper.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetch\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: html/ajax_listports.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetch\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 2
+			path: html/network-map.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchCell\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 2
+			path: html/network-map.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRow\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 2
+			path: html/network-map.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetch\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 3
+			path: includes/billing.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchCell\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 4
+			path: includes/billing.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchColumn\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 3
+			path: includes/billing.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRow\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 8
+			path: includes/billing.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRows\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/billing.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbGenPlaceholders\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/caches/alerts.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbGenPlaceholders\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/caches/devices.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbGenPlaceholders\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/caches/ports.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbGenPlaceholders\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/caches/services.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbGenPlaceholders\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/caches/toner.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbDelete\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#deleting\\-models$#
+				"""
+			count: 1
+			path: includes/callback.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchCell\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 4
+			path: includes/callback.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRows\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 2
+			path: includes/callback.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbInsert\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
+				"""
+			count: 1
+			path: includes/callback.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbUpdate\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
+				"""
+			count: 1
+			path: includes/callback.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchCell\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 7
+			path: includes/common.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRow\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 7
+			path: includes/common.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRows\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 4
+			path: includes/common.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbDelete\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#deleting\\-models$#
+				"""
+			count: 1
+			path: includes/discovery/applications.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbDeleteOrphans\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#deleting\\-models$#
+				"""
+			count: 1
+			path: includes/discovery/applications.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRows\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/discovery/applications.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbGenPlaceholders\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/discovery/applications.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbInsert\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
+				"""
+			count: 1
+			path: includes/discovery/applications.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbBulkInsert\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
+				"""
+			count: 1
+			path: includes/discovery/arp-table.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbDelete\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#deleting\\-models$#
+				"""
+			count: 1
+			path: includes/discovery/arp-table.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbDeleteOrphans\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#deleting\\-models$#
+				"""
+			count: 1
+			path: includes/discovery/arp-table.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRows\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/discovery/arp-table.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbUpdate\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
+				"""
+			count: 1
+			path: includes/discovery/arp-table.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbDelete\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#deleting\\-models$#
+				"""
+			count: 5
+			path: includes/discovery/bgp-peers.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchColumn\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/discovery/bgp-peers.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRows\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/discovery/bgp-peers.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbGenPlaceholders\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/discovery/bgp-peers.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbUpdate\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
+				"""
+			count: 2
+			path: includes/discovery/bgp-peers.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbDelete\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#deleting\\-models$#
+				"""
+			count: 1
+			path: includes/discovery/bgp-peers/dell-os10.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchCell\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 3
+			path: includes/discovery/bgp-peers/dell-os10.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRows\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 2
+			path: includes/discovery/bgp-peers/dell-os10.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbInsert\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
+				"""
+			count: 1
+			path: includes/discovery/bgp-peers/dell-os10.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbUpdate\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
+				"""
+			count: 1
+			path: includes/discovery/bgp-peers/dell-os10.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbDelete\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#deleting\\-models$#
+				"""
+			count: 3
+			path: includes/discovery/bgp-peers/firebrick.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchCell\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 2
+			path: includes/discovery/bgp-peers/firebrick.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRows\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/discovery/bgp-peers/firebrick.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbInsert\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
+				"""
+			count: 2
+			path: includes/discovery/bgp-peers/firebrick.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbUpdate\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
+				"""
+			count: 1
+			path: includes/discovery/bgp-peers/firebrick.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbDelete\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#deleting\\-models$#
+				"""
+			count: 1
+			path: includes/discovery/bgp-peers/timos.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchCell\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 2
+			path: includes/discovery/bgp-peers/timos.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRows\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/discovery/bgp-peers/timos.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbInsert\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
+				"""
+			count: 1
+			path: includes/discovery/bgp-peers/timos.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbUpdate\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
+				"""
+			count: 1
+			path: includes/discovery/bgp-peers/timos.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbDelete\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#deleting\\-models$#
+				"""
+			count: 2
+			path: includes/discovery/bgp-peers/vrp.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchCell\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 2
+			path: includes/discovery/bgp-peers/vrp.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRows\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 3
+			path: includes/discovery/bgp-peers/vrp.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbInsert\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
+				"""
+			count: 1
+			path: includes/discovery/bgp-peers/vrp.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbUpdate\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
+				"""
+			count: 1
+			path: includes/discovery/bgp-peers/vrp.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchCell\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/discovery/cisco-cef.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbInsert\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
+				"""
+			count: 1
+			path: includes/discovery/cisco-cef.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchCell\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/discovery/cisco-mac-accounting.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRow\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/discovery/cisco-mac-accounting.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbInsert\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
+				"""
+			count: 1
+			path: includes/discovery/cisco-mac-accounting.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbDelete\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#deleting\\-models$#
+				"""
+			count: 1
+			path: includes/discovery/cisco-pw.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchCell\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 2
+			path: includes/discovery/cisco-pw.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRows\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/discovery/cisco-pw.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbInsert\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
+				"""
+			count: 1
+			path: includes/discovery/cisco-pw.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbDelete\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#deleting\\-models$#
+				"""
+			count: 1
+			path: includes/discovery/cisco-vrf-lite.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRow\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/discovery/cisco-vrf-lite.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRows\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/discovery/cisco-vrf-lite.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbInsert\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
+				"""
+			count: 1
+			path: includes/discovery/cisco-vrf-lite.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbUpdate\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
+				"""
+			count: 1
+			path: includes/discovery/cisco-vrf-lite.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRows\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/discovery/discovery-arp.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbDelete\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#deleting\\-models$#
+				"""
+			count: 1
+			path: includes/discovery/discovery-protocols.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbDeleteOrphans\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#deleting\\-models$#
+				"""
+			count: 1
+			path: includes/discovery/discovery-protocols.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRows\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 2
+			path: includes/discovery/discovery-protocols.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbDelete\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#deleting\\-models$#
+				"""
+			count: 1
+			path: includes/discovery/entity-physical.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRows\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/discovery/entity-physical.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbDelete\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#deleting\\-models$#
+				"""
+			count: 1
+			path: includes/discovery/entity-physical/cimc.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRows\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/discovery/entity-physical/cimc.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbBulkInsert\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
+				"""
+			count: 1
+			path: includes/discovery/entity-state.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbDelete\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#deleting\\-models$#
+				"""
+			count: 1
+			path: includes/discovery/entity-state.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRows\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 2
+			path: includes/discovery/entity-state.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbGenPlaceholders\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/discovery/entity-state.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbUpdate\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
+				"""
+			count: 1
+			path: includes/discovery/entity-state.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRows\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 2
+			path: includes/discovery/fdb-table.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbInsert\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
+				"""
+			count: 1
+			path: includes/discovery/fdb-table/ios.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbDelete\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#deleting\\-models$#
+				"""
+			count: 2
+			path: includes/discovery/functions.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchCell\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 18
+			path: includes/discovery/functions.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchColumn\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/discovery/functions.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRow\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 3
+			path: includes/discovery/functions.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRows\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/discovery/functions.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbInsert\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
+				"""
+			count: 9
+			path: includes/discovery/functions.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbUpdate\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
+				"""
+			count: 13
+			path: includes/discovery/functions.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbDelete\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#deleting\\-models$#
+				"""
+			count: 1
+			path: includes/discovery/hr-device.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchCell\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/discovery/hr-device.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRows\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/discovery/hr-device.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbInsert\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
+				"""
+			count: 1
+			path: includes/discovery/hr-device.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbUpdate\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
+				"""
+			count: 1
+			path: includes/discovery/hr-device.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbDelete\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#deleting\\-models$#
+				"""
+			count: 2
+			path: includes/discovery/ipv4-addresses.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchCell\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 6
+			path: includes/discovery/ipv4-addresses.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRows\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/discovery/ipv4-addresses.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbInsert\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
+				"""
+			count: 2
+			path: includes/discovery/ipv4-addresses.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbUpdate\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
+				"""
+			count: 2
+			path: includes/discovery/ipv4-addresses.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbDelete\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#deleting\\-models$#
+				"""
+			count: 2
+			path: includes/discovery/ipv6-addresses.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchCell\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/discovery/ipv6-addresses.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRows\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/discovery/ipv6-addresses.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbDelete\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#deleting\\-models$#
+				"""
+			count: 1
+			path: includes/discovery/junose-atm-vp.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchCell\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/discovery/junose-atm-vp.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRows\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/discovery/junose-atm-vp.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbDelete\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#deleting\\-models$#
+				"""
+			count: 1
+			path: includes/discovery/libvirt-vminfo.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRow\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/discovery/libvirt-vminfo.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRows\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/discovery/libvirt-vminfo.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbInsert\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
+				"""
+			count: 1
+			path: includes/discovery/libvirt-vminfo.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbUpdate\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
+				"""
+			count: 1
+			path: includes/discovery/libvirt-vminfo.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbDelete\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#deleting\\-models$#
+				"""
+			count: 1
+			path: includes/discovery/mef.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchCell\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/discovery/mef.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRows\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/discovery/mef.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbInsert\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
+				"""
+			count: 1
+			path: includes/discovery/mef.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbDelete\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#deleting\\-models$#
+				"""
+			count: 1
+			path: includes/discovery/ntp/awplus.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchCell\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/discovery/ntp/awplus.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbInsert\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
+				"""
+			count: 1
+			path: includes/discovery/ntp/awplus.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbDelete\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#deleting\\-models$#
+				"""
+			count: 1
+			path: includes/discovery/ntp/cisco.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchCell\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/discovery/ntp/cisco.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbInsert\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
+				"""
+			count: 1
+			path: includes/discovery/ntp/cisco.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbDelete\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#deleting\\-models$#
+				"""
+			count: 1
+			path: includes/discovery/ports-stack.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRows\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/discovery/ports-stack.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbInsert\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
+				"""
+			count: 1
+			path: includes/discovery/ports-stack.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbUpdate\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
+				"""
+			count: 1
+			path: includes/discovery/ports-stack.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRow\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/discovery/ports.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbInsert\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
+				"""
+			count: 1
+			path: includes/discovery/ports.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbUpdate\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
+				"""
+			count: 3
+			path: includes/discovery/ports.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbDelete\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#deleting\\-models$#
+				"""
+			count: 1
+			path: includes/discovery/route.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRows\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 2
+			path: includes/discovery/route.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbInsert\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
+				"""
+			count: 1
+			path: includes/discovery/route.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbUpdate\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
+				"""
+			count: 1
+			path: includes/discovery/route.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchCell\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/discovery/sensors/ber/junos.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRows\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/discovery/sensors/current/comware.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchCell\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/discovery/sensors/current/junos.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchCell\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/discovery/sensors/current/pbn.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRows\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/discovery/sensors/current/procurve.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRows\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 2
+			path: includes/discovery/sensors/dbm/comware.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchCell\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 2
+			path: includes/discovery/sensors/dbm/datacom.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchCell\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 4
+			path: includes/discovery/sensors/dbm/junos.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchCell\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 2
+			path: includes/discovery/sensors/dbm/pbn.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRows\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 2
+			path: includes/discovery/sensors/dbm/procurve.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchCell\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/discovery/sensors/entity-sensor.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRows\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 2
+			path: includes/discovery/sensors/temperature/comware.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchCell\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/discovery/sensors/temperature/junos.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchCell\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/discovery/sensors/temperature/pbn.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRows\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 2
+			path: includes/discovery/sensors/temperature/procurve.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRows\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/discovery/sensors/voltage/comware.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchCell\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/discovery/sensors/voltage/pbn.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRows\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/discovery/sensors/voltage/procurve.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbDelete\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#deleting\\-models$#
+				"""
+			count: 1
+			path: includes/discovery/storage.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRows\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/discovery/storage.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchColumn\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/discovery/storage/freenas-dataset.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchColumn\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/discovery/storage/freenas-zpool.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchColumn\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/discovery/storage/ucd-dsktable.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbDelete\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#deleting\\-models$#
+				"""
+			count: 2
+			path: includes/discovery/stp.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchCell\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 3
+			path: includes/discovery/stp.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRow\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/discovery/stp.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRows\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/discovery/stp.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbInsert\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
+				"""
+			count: 2
+			path: includes/discovery/stp.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbDelete\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#deleting\\-models$#
+				"""
+			count: 1
+			path: includes/discovery/ucd-diskio.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchCell\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/discovery/ucd-diskio.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRows\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/discovery/ucd-diskio.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbInsert\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
+				"""
+			count: 1
+			path: includes/discovery/ucd-diskio.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbDelete\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#deleting\\-models$#
+				"""
+			count: 2
+			path: includes/discovery/vlans.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRow\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/discovery/vlans.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRows\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/discovery/vlans.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbGenPlaceholders\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/discovery/vlans.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbInsert\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
+				"""
+			count: 1
+			path: includes/discovery/vlans.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbUpdate\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
+				"""
+			count: 1
+			path: includes/discovery/vlans.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbInsert\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
+				"""
+			count: 1
+			path: includes/discovery/vlans/aos7.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbUpdate\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
+				"""
+			count: 1
+			path: includes/discovery/vlans/aos7.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbInsert\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
+				"""
+			count: 1
+			path: includes/discovery/vlans/boss.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbUpdate\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
+				"""
+			count: 1
+			path: includes/discovery/vlans/boss.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbInsert\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
+				"""
+			count: 1
+			path: includes/discovery/vlans/cisco-vtp.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbUpdate\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
+				"""
+			count: 1
+			path: includes/discovery/vlans/cisco-vtp.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbInsert\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
+				"""
+			count: 1
+			path: includes/discovery/vlans/jetstream.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbUpdate\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
+				"""
+			count: 1
+			path: includes/discovery/vlans/jetstream.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbInsert\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
+				"""
+			count: 1
+			path: includes/discovery/vlans/junos.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbUpdate\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
+				"""
+			count: 1
+			path: includes/discovery/vlans/junos.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbInsert\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
+				"""
+			count: 1
+			path: includes/discovery/vlans/q-bridge-mib.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbUpdate\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
+				"""
+			count: 1
+			path: includes/discovery/vlans/q-bridge-mib.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbDelete\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#deleting\\-models$#
+				"""
+			count: 1
+			path: includes/discovery/vmware-vminfo.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchCell\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/discovery/vmware-vminfo.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRows\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/discovery/vmware-vminfo.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbInsert\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
+				"""
+			count: 1
+			path: includes/discovery/vmware-vminfo.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbDelete\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#deleting\\-models$#
+				"""
+			count: 1
+			path: includes/discovery/vrf.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchCell\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 6
+			path: includes/discovery/vrf.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRow\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 3
+			path: includes/discovery/vrf.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRows\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 2
+			path: includes/discovery/vrf.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbInsert\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
+				"""
+			count: 3
+			path: includes/discovery/vrf.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbUpdate\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
+				"""
+			count: 7
+			path: includes/discovery/vrf.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbBulkInsert\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
+				"""
+			count: 1
+			path: includes/functions.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbDelete\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#deleting\\-models$#
+				"""
+			count: 8
+			path: includes/functions.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetch\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/functions.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchCell\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 8
+			path: includes/functions.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRow\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 5
+			path: includes/functions.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRows\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 4
+			path: includes/functions.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbGenPlaceholders\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 2
+			path: includes/functions.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbInsert\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
+				"""
+			count: 5
+			path: includes/functions.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbQuery\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#building\\-queries$#
+				"""
+			count: 3
+			path: includes/functions.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbUpdate\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
+				"""
+			count: 7
+			path: includes/functions.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbDelete\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#deleting\\-models$#
+				"""
+			count: 9
+			path: includes/html/api_functions.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchCell\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 5
+			path: includes/html/api_functions.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRow\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 3
+			path: includes/html/api_functions.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRows\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 50
+			path: includes/html/api_functions.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbGenPlaceholders\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/api_functions.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbInsert\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
+				"""
+			count: 4
+			path: includes/html/api_functions.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbSyncRelationship\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 3
+			path: includes/html/api_functions.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbUpdate\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
+				"""
+			count: 8
+			path: includes/html/api_functions.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRow\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 2
+			path: includes/html/application/proxmox.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRows\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 3
+			path: includes/html/application/proxmox.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRow\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/common/alerts.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchColumn\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/common/availability-map.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRows\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 3
+			path: includes/html/common/availability-map.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbGenPlaceholders\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/common/availability-map.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRows\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 2
+			path: includes/html/common/worldmap.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbGenPlaceholders\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 9
+			path: includes/html/common/worldmap.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRows\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/dev-groups-overview-data.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbInsert\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
+				"""
+			count: 1
+			path: includes/html/forms/add-dashboard.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRows\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/forms/alert-details.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchCell\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/forms/alert-notes.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbUpdate\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
+				"""
+			count: 1
+			path: includes/html/forms/alert-notes.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbBulkInsert\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
+				"""
+			count: 1
+			path: includes/html/forms/alert-rules.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbDelete\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#deleting\\-models$#
+				"""
+			count: 2
+			path: includes/html/forms/alert-rules.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchCell\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/forms/alert-rules.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchColumn\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 2
+			path: includes/html/forms/alert-rules.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbGenPlaceholders\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 2
+			path: includes/html/forms/alert-rules.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbInsert\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
+				"""
+			count: 1
+			path: includes/html/forms/alert-rules.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbSyncRelationship\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 3
+			path: includes/html/forms/alert-rules.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbUpdate\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
+				"""
+			count: 1
+			path: includes/html/forms/alert-rules.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbDelete\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#deleting\\-models$#
+				"""
+			count: 1
+			path: includes/html/forms/alert-templates.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbInsert\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
+				"""
+			count: 2
+			path: includes/html/forms/alert-templates.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbUpdate\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
+				"""
+			count: 1
+			path: includes/html/forms/alert-templates.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbDelete\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#deleting\\-models$#
+				"""
+			count: 1
+			path: includes/html/forms/alert-transports.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchCell\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/forms/alert-transports.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbInsert\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
+				"""
+			count: 1
+			path: includes/html/forms/alert-transports.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbUpdate\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
+				"""
+			count: 2
+			path: includes/html/forms/alert-transports.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbDelete\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#deleting\\-models$#
+				"""
+			count: 1
+			path: includes/html/forms/application-update.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbInsert\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
+				"""
+			count: 1
+			path: includes/html/forms/application-update.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbInsert\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
+				"""
+			count: 1
+			path: includes/html/forms/create-alert-item.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbUpdate\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
+				"""
+			count: 1
+			path: includes/html/forms/create-alert-item.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchCell\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/forms/customoid.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRow\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/forms/customoid.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbInsert\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
+				"""
+			count: 1
+			path: includes/html/forms/customoid.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbUpdate\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
+				"""
+			count: 2
+			path: includes/html/forms/customoid.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbDelete\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#deleting\\-models$#
+				"""
+			count: 6
+			path: includes/html/forms/delete-alert-rule.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchCell\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/forms/delete-alert-rule.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbDelete\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#deleting\\-models$#
+				"""
+			count: 2
+			path: includes/html/forms/delete-alert-template.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbDelete\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#deleting\\-models$#
+				"""
+			count: 3
+			path: includes/html/forms/delete-alert-transport.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbDelete\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#deleting\\-models$#
+				"""
+			count: 2
+			path: includes/html/forms/delete-cluster-poller.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchCell\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/forms/delete-cluster-poller.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbDelete\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#deleting\\-models$#
+				"""
+			count: 1
+			path: includes/html/forms/delete-customoid.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbDelete\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#deleting\\-models$#
+				"""
+			count: 2
+			path: includes/html/forms/delete-dashboard.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbDelete\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#deleting\\-models$#
+				"""
+			count: 1
+			path: includes/html/forms/delete-poller.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchCell\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/forms/delete-poller.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbDelete\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#deleting\\-models$#
+				"""
+			count: 3
+			path: includes/html/forms/delete-transport-group.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbUpdate\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
+				"""
+			count: 1
+			path: includes/html/forms/edit-dashboard.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchCell\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 2
+			path: includes/html/forms/get-host-dependencies.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRows\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 6
+			path: includes/html/forms/get-host-dependencies.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbUpdate\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
+				"""
+			count: 1
+			path: includes/html/forms/mempool-update.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbDelete\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#deleting\\-models$#
+				"""
+			count: 1
+			path: includes/html/forms/notifications.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchColumn\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/forms/notifications.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbInsert\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
+				"""
+			count: 4
+			path: includes/html/forms/notifications.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRow\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/forms/parse-alert-rule.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRows\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 5
+			path: includes/html/forms/parse-alert-rule.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchCell\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 3
+			path: includes/html/forms/parse-alert-template.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRow\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/forms/parse-alert-template.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRows\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/forms/parse-alert-template.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRow\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/forms/parse-customoid.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRow\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/forms/parse-poller-groups.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbInsert\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
+				"""
+			count: 1
+			path: includes/html/forms/poller-groups.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbUpdate\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
+				"""
+			count: 1
+			path: includes/html/forms/poller-groups.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbUpdate\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
+				"""
+			count: 1
+			path: includes/html/forms/processor-update.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchColumn\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/forms/rediscover-device.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbUpdate\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
+				"""
+			count: 1
+			path: includes/html/forms/routing-update.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbDelete\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#deleting\\-models$#
+				"""
+			count: 5
+			path: includes/html/forms/schedule-maintenance.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchCell\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 4
+			path: includes/html/forms/schedule-maintenance.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRows\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/forms/schedule-maintenance.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbInsert\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
+				"""
+			count: 1
+			path: includes/html/forms/schedule-maintenance.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbUpdate\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
+				"""
+			count: 1
+			path: includes/html/forms/schedule-maintenance.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbUpdate\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
+				"""
+			count: 1
+			path: includes/html/forms/sensor-alert-reset.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbUpdate\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
+				"""
+			count: 2
+			path: includes/html/forms/sensor-alert-update.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbUpdate\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
+				"""
+			count: 1
+			path: includes/html/forms/sensor-update.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRow\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/forms/show-alert-transport.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchCell\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/forms/show-transport-group.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRows\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/forms/show-transport-group.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRow\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/forms/sql-from-alert-rules.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbUpdate\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
+				"""
+			count: 1
+			path: includes/html/forms/storage-update.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbInsert\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
+				"""
+			count: 1
+			path: includes/html/forms/token-item-create.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbUpdate\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
+				"""
+			count: 1
+			path: includes/html/forms/token-item-disable.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbDelete\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#deleting\\-models$#
+				"""
+			count: 1
+			path: includes/html/forms/token-item-remove.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbBulkInsert\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
+				"""
+			count: 1
+			path: includes/html/forms/transport-groups.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbDelete\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#deleting\\-models$#
+				"""
+			count: 1
+			path: includes/html/forms/transport-groups.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchColumn\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/forms/transport-groups.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbGenPlaceholders\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/forms/transport-groups.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbInsert\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
+				"""
+			count: 1
+			path: includes/html/forms/transport-groups.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbUpdate\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
+				"""
+			count: 1
+			path: includes/html/forms/transport-groups.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbUpdate\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
+				"""
+			count: 1
+			path: includes/html/forms/update-alert-rule.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbDelete\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#deleting\\-models$#
+				"""
+			count: 2
+			path: includes/html/forms/update-dashboard-config.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchCell\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 4
+			path: includes/html/forms/update-dashboard-config.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRow\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/forms/update-dashboard-config.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbInsert\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
+				"""
+			count: 1
+			path: includes/html/forms/update-dashboard-config.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbUpdate\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
+				"""
+			count: 1
+			path: includes/html/forms/update-dashboard-config.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbUpdate\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
+				"""
+			count: 1
+			path: includes/html/forms/update-ifalias.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbUpdate\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
+				"""
+			count: 2
+			path: includes/html/forms/update-ports.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbUpdate\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
+				"""
+			count: 1
+			path: includes/html/forms/wireless-sensor-alert-reset.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbUpdate\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
+				"""
+			count: 2
+			path: includes/html/forms/wireless-sensor-alert-update.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbUpdate\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
+				"""
+			count: 1
+			path: includes/html/forms/wireless-sensor-update.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRow\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/functions.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRows\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 3
+			path: includes/html/functions.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRow\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/graphs/atmvp/auth.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRow\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/graphs/bgp/auth.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRow\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/graphs/bill/auth.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRows\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/graphs/bill/bits.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRow\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/graphs/bill/historicbits.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRow\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/graphs/c6kxbar/auth.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRow\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/graphs/cefswitching/auth.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRows\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/graphs/customer/bits.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbGenPlaceholders\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/graphs/customer/bits.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRows\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/graphs/device/bits.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRows\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/graphs/device/diskio_common.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRows\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/graphs/device/processor.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRows\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/graphs/device/sensor.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRow\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/graphs/device/sla.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRow\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/graphs/device/sla_IcmpEcho.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRow\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/graphs/device/sla_IcmpTimeStamp.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRow\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/graphs/device/sla_icmpAppl.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRow\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/graphs/device/sla_icmpjitter_iajitter.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRow\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/graphs/device/sla_icmpjitter_jitter.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRow\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/graphs/device/sla_icmpjitter_latency.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRow\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/graphs/device/sla_icmpjitter_lost.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRow\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/graphs/device/sla_icmpjitter_oos.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRow\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/graphs/device/sla_jitter-icpif.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRow\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/graphs/device/sla_jitter-latency.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRow\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/graphs/device/sla_jitter-loss.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRow\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/graphs/device/sla_jitter-lost.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRow\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/graphs/device/sla_jitter-mos.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRow\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/graphs/device/sla_jitter.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRows\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/graphs/device/storage.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRows\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/graphs/device/toner.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRows\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/graphs/device/wireless-sensor.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRow\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/graphs/diskio/auth.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRows\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/graphs/global/bits.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRows\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/graphs/global/processor_separate.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRows\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/graphs/global/processor_stack.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRow\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/graphs/ipsectunnel/auth.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRows\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/graphs/location/auth.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRows\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/graphs/location/bits.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRow\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/graphs/macaccounting/auth.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRow\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/graphs/mempool/auth.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRow\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/graphs/multiport/bits.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRow\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 2
+			path: includes/html/graphs/multiport/bits_duo.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRow\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/graphs/multiport/bits_separate.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRow\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 3
+			path: includes/html/graphs/multiport/bits_trio.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRow\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 2
+			path: includes/html/graphs/munin/auth.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRows\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/graphs/munin/graph.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRow\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/graphs/netscalervsvr/auth.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchCell\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/graphs/port/mac_acc_total.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRow\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 3
+			path: includes/html/graphs/port/mac_acc_total.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRows\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/graphs/port/mac_acc_total.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRows\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/graphs/port/pagp_bits.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRow\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/graphs/processor/auth.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRow\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/graphs/rserver/auth.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRow\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/graphs/sensor/auth.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRow\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/graphs/service/auth.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRow\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/graphs/sla-jitter-jitter.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRow\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/graphs/storage/auth.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRow\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/graphs/toner/auth.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRow\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/graphs/vserver/auth.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRow\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/graphs/wireless/auth.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchCell\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/list/devices.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRows\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/list/devices.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbGenPlaceholders\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/list/devices.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchCell\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/list/groups.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRows\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/list/groups.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchCell\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/list/locations.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRows\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/list/locations.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchCell\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/list/transport_groups.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRows\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/list/transport_groups.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchCell\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/list/transports.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRows\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/list/transports.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRows\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/modal/alert_rule_list.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetch\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/modal/new_bill.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRow\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/modal/new_bill.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRow\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/output/query.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRows\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/pages/addhost.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRows\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/pages/addsrv.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRows\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/pages/apps/proxmox.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchCell\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 12
+			path: includes/html/pages/bill.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRow\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/pages/bill.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRows\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/pages/bill.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbDelete\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#deleting\\-models$#
+				"""
+			count: 8
+			path: includes/html/pages/bill/actions.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbInsert\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
+				"""
+			count: 1
+			path: includes/html/pages/bill/actions.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbUpdate\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
+				"""
+			count: 1
+			path: includes/html/pages/bill/actions.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRows\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/pages/bill/edit.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRows\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/pages/bill/history.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchCell\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 8
+			path: includes/html/pages/bill/transfer.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbInsert\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
+				"""
+			count: 2
+			path: includes/html/pages/bills.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRows\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/pages/delhost.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRows\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 2
+			path: includes/html/pages/device/accesspoints.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRow\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/pages/device/apps.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRows\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/pages/device/apps.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchCell\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 3
+			path: includes/html/pages/device/edit.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRows\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/pages/device/edit/apps.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchColumn\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/pages/device/edit/device.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRows\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 2
+			path: includes/html/pages/device/edit/device.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRows\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/pages/device/edit/sensors-common.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRow\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/pages/device/edit/snmp.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRows\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/pages/device/edit/snmp.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbUpdate\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
+				"""
+			count: 1
+			path: includes/html/pages/device/edit/snmp.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchCell\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/pages/device/entphysical.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRow\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/pages/device/entphysical.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRows\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/pages/device/entphysical.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRows\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 2
+			path: includes/html/pages/device/graphs.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRows\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/pages/device/graphs/availability.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRows\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/pages/device/graphs/customoid.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchCell\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 32
+			path: includes/html/pages/device/health.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRows\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/pages/device/health.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRows\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/pages/device/health/diskio.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRows\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/pages/device/health/processor.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRows\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/pages/device/health/sensors.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRows\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/pages/device/health/storage.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchCell\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/pages/device/hrdevice.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRow\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/pages/device/hrdevice.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRows\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/pages/device/hrdevice.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRows\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/pages/device/loadbalancer/ace_rservers.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRows\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/pages/device/loadbalancer/ace_vservers.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRows\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 2
+			path: includes/html/pages/device/loadbalancer/netscaler_vsvr.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRows\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/pages/device/mef.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRows\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/pages/device/munin.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRows\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/pages/device/neighbours/list.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRow\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/pages/device/overview/c6kxbar.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRows\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/pages/device/overview/eventlog.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRows\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/pages/device/overview/generic/sensor.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRows\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/pages/device/overview/ports.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRows\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/pages/device/overview/processors.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchKeyValue\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/pages/device/overview/puppet_agent.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRows\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/pages/device/overview/storage.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRows\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/pages/device/overview/syslog.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRows\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/pages/device/packages.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchCell\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 6
+			path: includes/html/pages/device/port.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRow\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/pages/device/port.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRows\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/pages/device/port.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRows\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/pages/device/port/events.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRows\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/pages/device/port/junose-atm-vp.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchCell\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/pages/device/port/macaccounting.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRow\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 3
+			path: includes/html/pages/device/port/macaccounting.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRows\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/pages/device/port/macaccounting.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRows\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/pages/device/port/pagp.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRows\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/pages/device/port/sensors.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRows\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 3
+			path: includes/html/pages/device/port/vlans.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchCell\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 2
+			path: includes/html/pages/device/ports.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRows\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 2
+			path: includes/html/pages/device/ports.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRows\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/pages/device/ports/adsl.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRows\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/pages/device/ports/neighbours.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRows\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/pages/device/processes.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRow\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/pages/device/pseudowires.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRows\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/pages/device/pseudowires.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchCell\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/pages/device/routing/bgp.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRow\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 3
+			path: includes/html/pages/device/routing/bgp.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRows\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 2
+			path: includes/html/pages/device/routing/bgp.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRow\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 2
+			path: includes/html/pages/device/routing/cef.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRows\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/pages/device/routing/cef.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRows\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/pages/device/routing/ipsec_tunnels.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRow\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 4
+			path: includes/html/pages/device/routing/mpls.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRows\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 6
+			path: includes/html/pages/device/routing/mpls.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchCell\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 6
+			path: includes/html/pages/device/routing/ospf.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRow\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/pages/device/routing/ospf.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRows\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 4
+			path: includes/html/pages/device/routing/ospf.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRows\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/pages/device/routing/vrf.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRow\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/pages/device/slas.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRows\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/pages/device/slas.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchColumn\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/pages/device/wireless.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRows\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/pages/device/wireless.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRows\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/pages/devices.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbDelete\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#deleting\\-models$#
+				"""
+			count: 3
+			path: includes/html/pages/edituser.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchCell\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 6
+			path: includes/html/pages/edituser.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRows\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 5
+			path: includes/html/pages/edituser.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbInsert\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
+				"""
+			count: 3
+			path: includes/html/pages/edituser.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRows\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/pages/fullscreenmap.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchCell\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/pages/iftype.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRows\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 2
+			path: includes/html/pages/inventory.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchCell\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/pages/notifications.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRows\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 2
+			path: includes/html/pages/packages.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchCell\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/pages/peering/as-selection.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRows\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 4
+			path: includes/html/pages/ports.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRow\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/pages/pseudowires.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRows\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/pages/pseudowires.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRow\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/pages/routing/bgp.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRows\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 2
+			path: includes/html/pages/routing/bgp.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRow\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/pages/routing/cef.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRows\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/pages/routing/cef.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchCell\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 2
+			path: includes/html/pages/routing/mpls-path-map.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRows\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 3
+			path: includes/html/pages/routing/mpls-path-map.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRow\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 4
+			path: includes/html/pages/routing/mpls.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRows\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 6
+			path: includes/html/pages/routing/mpls.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchCell\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 4
+			path: includes/html/pages/routing/ospf.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRows\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/pages/routing/ospf.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRows\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 3
+			path: includes/html/pages/routing/vrf.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchCell\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/pages/search.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRows\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/pages/search/arp.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbGenPlaceholders\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/pages/search/arp.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRows\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/pages/search/fdb.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbGenPlaceholders\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/pages/search/fdb.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRows\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/pages/search/ipv4.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbGenPlaceholders\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/pages/search/ipv4.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRows\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/pages/search/ipv6.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbGenPlaceholders\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/pages/search/ipv6.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRows\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/pages/search/mac.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbGenPlaceholders\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/pages/search/mac.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchCell\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/pages/search/packages.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRows\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 2
+			path: includes/html/pages/search/packages.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbGenPlaceholders\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/pages/search/packages.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRows\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 2
+			path: includes/html/pages/services.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbGenPlaceholders\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/pages/services.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbQuery\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#building\\-queries$#
+				"""
+			count: 1
+			path: includes/html/pages/syslog.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchColumn\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/pages/wireless.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchCell\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 7
+			path: includes/html/print-alert-rules.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRows\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 7
+			path: includes/html/print-alert-rules.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbInsert\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
+				"""
+			count: 1
+			path: includes/html/print-alert-rules.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRows\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 2
+			path: includes/html/print-alert-transports.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchCell\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/print-customoid.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRows\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/print-customoid.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRows\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/print-graph-alerts.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbGenPlaceholders\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/print-graph-alerts.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRows\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 2
+			path: includes/html/print-interface-adsl.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchCell\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/print-interface.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchColumn\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/print-interface.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRow\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 6
+			path: includes/html/print-interface.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRows\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 11
+			path: includes/html/print-interface.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchCell\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/print-map.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRows\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 2
+			path: includes/html/print-map.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbGenPlaceholders\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 2
+			path: includes/html/print-map.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRow\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/print-stp.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRows\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/print-vrf.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRows\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/reports/alert-log.pdf.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRows\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/reports/ports.csv.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchCell\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/table/address-search.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRows\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/table/address-search.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbGenPlaceholders\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/table/address-search.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchCell\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/table/alertlog-stats.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRows\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/table/alertlog-stats.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchCell\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 3
+			path: includes/html/table/alertlog.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRows\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/table/alertlog.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbGenPlaceholders\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/table/alertlog.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchCell\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 4
+			path: includes/html/table/alerts.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRows\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/table/alerts.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbGenPlaceholders\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/table/alerts.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchCell\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/table/arp-search.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRow\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/table/arp-search.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRows\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/table/arp-search.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbGenPlaceholders\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/table/arp-search.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchCell\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/table/as-selection.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRows\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/table/as-selection.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchCell\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/table/bills.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRows\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/table/bills.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchCell\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/table/eventlog.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRows\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/table/eventlog.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchCell\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/table/inventory.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRows\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/table/inventory.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbGenPlaceholders\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/table/inventory.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchCell\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/table/ix-list.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRows\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/table/ix-list.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRows\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 2
+			path: includes/html/table/ix-peers.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchCell\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/table/mempool-edit.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRows\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/table/mempool-edit.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchCell\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/table/poll-log.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRows\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/table/poll-log.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchCell\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/table/processor-edit.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRows\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/table/processor-edit.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchCell\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/table/processor.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRows\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/table/processor.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbGenPlaceholders\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/table/processor.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchCell\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/table/routing-edit.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRows\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/table/routing-edit.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchCell\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/table/sensors-common.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRows\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/table/sensors-common.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbGenPlaceholders\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/table/sensors-common.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchCell\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/table/storage-edit.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRows\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/table/storage-edit.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchCell\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/table/storage.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRows\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/table/storage.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbGenPlaceholders\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/table/storage.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchCell\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/table/stp-ports.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRow\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 2
+			path: includes/html/table/stp-ports.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRows\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/table/stp-ports.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchCell\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/table/tnmsneinfo.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRows\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/table/tnmsneinfo.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchCell\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/table/toner.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRows\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/html/table/toner.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbDelete\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#deleting\\-models$#
+				"""
+			count: 2
+			path: includes/notifications.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchCell\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 2
+			path: includes/notifications.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchColumn\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/notifications.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbInsert\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
+				"""
+			count: 2
+			path: includes/notifications.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRows\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/polling/applications.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRow\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 2
+			path: includes/polling/applications/proxmox.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbInsert\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
+				"""
+			count: 2
+			path: includes/polling/applications/proxmox.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbUpdate\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
+				"""
+			count: 3
+			path: includes/polling/applications/proxmox.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRows\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/polling/aruba-controller.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbInsert\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
+				"""
+			count: 1
+			path: includes/polling/aruba-controller.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbUpdate\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
+				"""
+			count: 2
+			path: includes/polling/aruba-controller.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbDelete\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#deleting\\-models$#
+				"""
+			count: 1
+			path: includes/polling/availability.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchColumn\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/polling/availability.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRows\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/polling/availability.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbInsert\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
+				"""
+			count: 1
+			path: includes/polling/availability.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbUpdate\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
+				"""
+			count: 1
+			path: includes/polling/availability.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRows\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 2
+			path: includes/polling/bgp-peers.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbUpdate\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
+				"""
+			count: 3
+			path: includes/polling/bgp-peers.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbDelete\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#deleting\\-models$#
+				"""
+			count: 4
+			path: includes/polling/cipsec-tunnels.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRows\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 2
+			path: includes/polling/cipsec-tunnels.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbGenPlaceholders\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 2
+			path: includes/polling/cipsec-tunnels.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbInsert\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
+				"""
+			count: 2
+			path: includes/polling/cipsec-tunnels.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbUpdate\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
+				"""
+			count: 2
+			path: includes/polling/cipsec-tunnels.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRows\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/polling/cisco-ace-loadbalancer.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbInsert\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
+				"""
+			count: 1
+			path: includes/polling/cisco-ace-loadbalancer.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbUpdate\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
+				"""
+			count: 1
+			path: includes/polling/cisco-ace-loadbalancer.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRows\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/polling/cisco-ace-serverfarms.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbInsert\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
+				"""
+			count: 1
+			path: includes/polling/cisco-ace-serverfarms.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbUpdate\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
+				"""
+			count: 1
+			path: includes/polling/cisco-ace-serverfarms.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchCell\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/polling/cisco-asa-firewall.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbInsert\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
+				"""
+			count: 1
+			path: includes/polling/cisco-asa-firewall.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbUpdate\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
+				"""
+			count: 1
+			path: includes/polling/cisco-asa-firewall.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbDelete\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#deleting\\-models$#
+				"""
+			count: 1
+			path: includes/polling/cisco-cef.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRow\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/polling/cisco-cef.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRows\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/polling/cisco-cef.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbInsert\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
+				"""
+			count: 1
+			path: includes/polling/cisco-cef.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbUpdate\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
+				"""
+			count: 1
+			path: includes/polling/cisco-cef.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRows\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/polling/cisco-mac-accounting.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbUpdate\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
+				"""
+			count: 1
+			path: includes/polling/cisco-mac-accounting.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRows\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/polling/customoid.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbUpdate\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
+				"""
+			count: 1
+			path: includes/polling/customoid.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbDelete\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#deleting\\-models$#
+				"""
+			count: 1
+			path: includes/polling/entity-physical/state.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetch\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/polling/entity-physical/state.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbInsert\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
+				"""
+			count: 1
+			path: includes/polling/entity-physical/state.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbUpdate\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
+				"""
+			count: 1
+			path: includes/polling/entity-physical/state.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRow\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/polling/entity-state.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRows\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/polling/entity-state.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbUpdate\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
+				"""
+			count: 1
+			path: includes/polling/entity-state.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbDelete\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#deleting\\-models$#
+				"""
+			count: 1
+			path: includes/polling/functions.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchCell\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/polling/functions.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRow\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/polling/functions.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRows\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 3
+			path: includes/polling/functions.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbInsert\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
+				"""
+			count: 1
+			path: includes/polling/functions.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbUpdate\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
+				"""
+			count: 5
+			path: includes/polling/functions.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRows\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/polling/ipmi.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbUpdate\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
+				"""
+			count: 1
+			path: includes/polling/ipmi.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRows\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/polling/junose-atm-vp.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRows\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/polling/mef.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbUpdate\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
+				"""
+			count: 1
+			path: includes/polling/mef.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbDelete\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#deleting\\-models$#
+				"""
+			count: 1
+			path: includes/polling/netscaler-vsvr.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRows\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/polling/netscaler-vsvr.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbInsert\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
+				"""
+			count: 1
+			path: includes/polling/netscaler-vsvr.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbUpdate\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
+				"""
+			count: 1
+			path: includes/polling/netscaler-vsvr.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRows\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/polling/os/vmware-esxi.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbUpdate\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
+				"""
+			count: 1
+			path: includes/polling/os/vmware-esxi.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchCell\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/polling/ports.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRow\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/polling/ports.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbInsert\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
+				"""
+			count: 3
+			path: includes/polling/ports.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbUpdate\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
+				"""
+			count: 5
+			path: includes/polling/ports.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchCell\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/polling/ports/port-adsl.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbInsert\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
+				"""
+			count: 1
+			path: includes/polling/ports/port-adsl.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbUpdate\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
+				"""
+			count: 1
+			path: includes/polling/ports/port-adsl.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRows\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/polling/sensors.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbGenPlaceholders\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/polling/sensors.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbUpdate\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
+				"""
+			count: 2
+			path: includes/polling/sensors/load/dhcpatriot.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRows\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/polling/storage.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbUpdate\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
+				"""
+			count: 1
+			path: includes/polling/storage.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchCell\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/polling/stp.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRow\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/polling/stp.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbUpdate\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
+				"""
+			count: 2
+			path: includes/polling/stp.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRows\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/polling/ucd-diskio.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbBulkInsert\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
+				"""
+			count: 2
+			path: includes/polling/unix-agent.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbDelete\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#deleting\\-models$#
+				"""
+			count: 2
+			path: includes/polling/unix-agent.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchCell\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 3
+			path: includes/polling/unix-agent.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbInsert\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
+				"""
+			count: 3
+			path: includes/polling/unix-agent.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRow\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/polling/unix-agent/hddtemp.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbUpdate\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
+				"""
+			count: 1
+			path: includes/polling/unix-agent/hddtemp.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRows\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 2
+			path: includes/polling/unix-agent/munin-plugins.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbInsert\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
+				"""
+			count: 2
+			path: includes/polling/unix-agent/munin-plugins.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbDelete\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#deleting\\-models$#
+				"""
+			count: 1
+			path: includes/polling/unix-agent/packages.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRow\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/polling/unix-agent/packages.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRows\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 2
+			path: includes/polling/unix-agent/packages.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbInsert\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
+				"""
+			count: 1
+			path: includes/polling/unix-agent/packages.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbUpdate\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
+				"""
+			count: 2
+			path: includes/polling/unix-agent/packages.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbDelete\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#deleting\\-models$#
+				"""
+			count: 1
+			path: includes/services.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchCell\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 1
+			path: includes/services.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchRows\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 2
+			path: includes/services.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbInsert\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
+				"""
+			count: 1
+			path: includes/services.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbUpdate\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
+				"""
+			count: 1
+			path: includes/services.inc.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbInsert\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
+				"""
+			count: 1
+			path: includes/sql-schema/update.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbQuery\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#building\\-queries$#
+				"""
+			count: 2
+			path: includes/sql-schema/update.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbUpdate\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
+				"""
+			count: 1
+			path: includes/sql-schema/update.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbFetchCell\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent$#
+				"""
+			count: 6
+			path: includes/syslog.php
+
+		-
+			message:
+				"""
+					#^Call to deprecated function dbInsert\\(\\)\\:
+					Please use Eloquent instead; https\\://laravel\\.com/docs/eloquent\\#inserting\\-and\\-updating\\-models$#
+				"""
+			count: 1
+			path: includes/syslog.php
+

@@ -19,6 +19,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2020 PipoCanaja
  * @author     PipoCanaja
  */
@@ -125,7 +126,7 @@ if (Config::get('enable_bgp')) {
                     $vrp_bgp_peer_count++;
                 }
                 if (dbFetchCell('SELECT COUNT(*) from `bgpPeers_cbgp` WHERE device_id = ? AND bgpPeerIdentifier = ? AND afi=? AND safi=?', [$device['device_id'], $value['hwBgpPeerRemoteAddr'], $value['afi'], $value['safi']]) < 1) {
-                    if ($vrf_name != '') {
+                    if ($vrfName != '') {
                         $device['context_name'] = $vrfName;
                     }
                     add_cbgp_peer($device, ['ip' => $value['hwBgpPeerRemoteAddr']], $value['afi'], $value['safi']);
@@ -139,10 +140,6 @@ if (Config::get('enable_bgp')) {
         $peers = dbFetchRows('SELECT `vrf_id`, `bgpPeerIdentifier` FROM `bgpPeers` WHERE `device_id` = ?', [$device['device_id']]);
         foreach ($peers as $value) {
             $vrfId = $value['vrf_id'];
-            $checkVrf = ' AND vrf_id = ? ';
-            if (empty($vrfId)) {
-                $checkVrf = ' AND `vrf_id` IS NULL ';
-            }
             $vrfName = $map_vrf['byId'][$vrfId]['vrf_name'];
             $address = $value['bgpPeerIdentifier'];
             if (isset($seenPeer[$address])) {
@@ -151,7 +148,10 @@ if (Config::get('enable_bgp')) {
             if ((empty($vrfId) && empty($bgpPeers[''][$address])) ||
                 (! empty($vrfId) && ! empty($vrfName) && empty($bgpPeers[$vrfName][$address])) ||
                 (! empty($vrfId) && empty($vrfName))) {
-                $deleted = dbDelete('bgpPeers', 'device_id = ? AND bgpPeerIdentifier = ? ' . $checkVrf, [$device['device_id'], $address, $vrfId]);
+                $deleted = \App\Models\BgpPeer::where('device_id', $device['device_id'])
+                    ->where('bgpPeerIdentifier', $address)
+                    ->where('vrf_id', $vrfId)
+                    ->delete();
 
                 echo str_repeat('-', $deleted);
                 echo PHP_EOL;

@@ -1,0 +1,613 @@
+TELTONIKA-RUTX-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    OBJECT-TYPE, NOTIFICATION-TYPE, MODULE-IDENTITY,
+    Integer32, Opaque, enterprises, Counter64,
+    IpAddress											FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION, DisplayString, TruthValue,
+	PhysAddress											FROM SNMPv2-TC
+	NetworkAddress                                      FROM RFC1155-SMI;
+
+teltonika MODULE-IDENTITY
+    LAST-UPDATED "201905150000Z"
+    ORGANIZATION "TELTONIKA"
+    CONTACT-INFO "TELTONIKA"
+    DESCRIPTION
+            "The MIB module for TELTONIKA rutx routers.
+            "
+    REVISION      "201905150000Z"
+    DESCRIPTION
+            "Initial version"
+    ::= { enterprises 48690 }
+
+
+device                  OBJECT IDENTIFIER ::= { teltonika 1 }
+mobile                  OBJECT IDENTIFIER ::= { teltonika 2 }
+gps                     OBJECT IDENTIFIER ::= { teltonika 3 }
+notifications           OBJECT IDENTIFIER ::= { teltonika 4 }
+hotspot					OBJECT IDENTIFIER ::= { teltonika 5 }
+mobileNotifications     OBJECT IDENTIFIER ::= { notifications 1 }
+mobileNotificationsObs  OBJECT IDENTIFIER ::= { mobileNotifications 0 }
+ioNotifications         OBJECT IDENTIFIER ::= { notifications 2 }
+ioNotificationsObs      OBJECT IDENTIFIER ::= { ioNotifications 0 }
+
+serial OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Serial number"
+    ::= { device 1 }
+
+routerName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Router name"
+    ::= { device 2 }
+
+productCode OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Router product code"
+    ::= { device 3 }
+
+batchNumber OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Router batch number"
+    ::= { device 4 }
+
+hardwareRevision OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Router hardware revision"
+    ::= { device 5 }
+
+fwVersion OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..255))
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+			"Router firmware version"
+	::= { device 6 }
+
+--
+--GSM
+--
+
+modemNum  OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The number of modems (regardless of their
+            current state) present on this system."
+    ::= { mobile 1 }
+
+-- the modems table
+
+modemTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF ModemEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A list of modem entries.  The number of entries is
+            given by the value of modemNum."
+    ::= { mobile 2 }
+
+modemEntry OBJECT-TYPE
+    SYNTAX      ModemEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "An entry containing information of a particular interface."
+    INDEX   { mIndex }
+    ::= { modemTable 1 }
+
+ModemEntry ::=
+    SEQUENCE {
+        mIndex              INTEGER,
+        mDescr              DisplayString,
+        mImei               DisplayString,
+        mModel              DisplayString,
+        mManufacturer       DisplayString,
+        mRevision           DisplayString,
+        mSerial             DisplayString,
+        mIMSI               DisplayString,
+        mSimState           DisplayString,
+        mPinState           DisplayString,
+        mNetState           DisplayString,
+        mSignal             INTEGER,
+        mOperator           DisplayString,
+        mOperatorNumber     DisplayString,
+        mConnectionState    DisplayString,
+        mConnectionType     DisplayString,
+        mTemperature        INTEGER,
+        mCellID             DisplayString,
+        mSINR               DisplayString,
+        mRSRP               DisplayString,
+        mRSRQ               DisplayString
+    }
+
+mIndex OBJECT-TYPE
+    SYNTAX      Integer32 (1..2147483647)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "A unique value, greater than zero, for each modem."
+    ::= { modemEntry 1 }
+
+mDescr OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "A textual string containing information about the
+            modem."
+    ::= { modemEntry 2 }
+
+mImei OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Modem IMEI"
+    ::= { modemEntry 3 }
+
+mModel OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Modem model"
+    ::= { modemEntry 4 }
+
+mManufacturer OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Modem manufacturer"
+    ::= { modemEntry 5 }
+
+mRevision OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Modem revision"
+    ::= { modemEntry 6 }
+
+mSerial OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Serial number"
+    ::= { modemEntry 7 }
+
+mIMSI OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "IMSI"
+    ::= { modemEntry 8 }
+
+mSimState OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "SIM status"
+    ::= { modemEntry 9 }
+
+mPinState OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "PIN status"
+    ::= { modemEntry 10 }
+
+mNetState OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Mobile network registration status"
+    ::= { modemEntry 11 }
+
+mSignal OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Signal level"
+    ::= { modemEntry 12 }
+
+mOperator OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Operator currently in use"
+    ::= { modemEntry 13 }
+
+mOperatorNumber OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Operator number (MCC+MNC)"
+    ::= { modemEntry 14 }
+
+mConnectionState OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Sata session connection state"
+    ::= { modemEntry 15 }
+
+mConnectionType OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Data session connection type"
+    ::= { modemEntry 16 }
+
+mTemperature OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Modem temperature"
+    ::= { modemEntry 17 }
+
+mCellID OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "CELL ID"
+    ::= { modemEntry 18 }
+
+mSINR OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "LTE SINR level"
+    ::= { modemEntry 19 }
+
+mRSRP OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "LTE RSRP level"
+    ::= { modemEntry 20 }
+
+mRSRQ OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "LTE RSRQ level"
+    ::= { modemEntry 21 }
+
+--
+--
+-- GPS
+--
+--
+
+latitude OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Latitutde coordinates"
+    ::= { gps 1 }
+
+longtitude OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Longtitude coordinates"
+    ::= { gps 2 }
+
+accuracy OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Accuracy"
+    ::= { gps 3 }
+
+datetime OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "GPS datetime"
+    ::= { gps 4 }
+
+numSatellites OBJECT-TYPE
+    SYNTAX 	Integer32
+    MAX-ACCESS  read-only
+    STATUS	current
+    DESCRIPTION
+	"Number of satellites"
+    ::= { gps 5 }
+
+--
+--Hotspot
+--
+
+hsState  OBJECT-TYPE
+    SYNTAX     INTEGER {
+    						enabled(1),  -- Hotspot service enabled
+                            disabled(0)    -- Hotspot service disabled
+                       }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Hotspot state"
+    ::= { hotspot 1 }
+
+hsIP  OBJECT-TYPE
+    SYNTAX      IpAddress
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "The IPv4 address"
+    ::= { hotspot 2 }
+
+hsNet  OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Network interfaces"
+    ::= { hotspot 3 }
+
+hsAuth  OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "Authentication mode"
+    ::= { hotspot 4 }
+
+hsSessionCount  OBJECT-TYPE
+	SYNTAX      Counter64
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+			"Number of sessions"
+	::= { hotspot 5 }
+
+hsSessionTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF HsSessionEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "A list of hotspot session entries.  The number of entries is
+            given by the value of hsSessionNum."
+    ::= { hotspot 6 }
+
+hsSessionEntry OBJECT-TYPE
+    SYNTAX      HsSessionEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+            "An entry containing information of a particular hotspot session."
+    INDEX   { hssIndex }
+    ::= { hsSessionTable 1 }
+
+HsSessionEntry ::=
+    SEQUENCE {
+        hssIndex			INTEGER,
+        hssMAC				PhysAddress,
+        hssIP				IpAddress,
+        hssID				DisplayString,
+        hssUsername			DisplayString,
+        hssState			TruthValue,
+        hssDwLimit			Counter64,
+        hssUpLimit			Counter64,
+        hssTimeLimit		Counter64,
+        hssIdleTimeout		Integer32,
+        hssDwBandwidth		Counter64,
+        hssUpBandwidth		Counter64,
+        hssURL				DisplayString
+    }
+
+hssIndex OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+            "A unique value, greater than zero, for each session."
+    ::= { hsSessionEntry 1 }
+
+hssMAC OBJECT-TYPE
+	SYNTAX      PhysAddress
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+			"Clients MAC address"
+	::= { hsSessionEntry 2 }
+
+hssIP OBJECT-TYPE
+	SYNTAX      IpAddress
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+			"Clients IP address"
+	::= { hsSessionEntry 3 }
+
+hssID OBJECT-TYPE
+	SYNTAX      DisplayString
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+			"Session ID"
+	::= { hsSessionEntry 4 }
+
+hssUsername OBJECT-TYPE
+	SYNTAX      DisplayString (SIZE (0..255))
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+			"Username"
+	::= { hsSessionEntry 5 }
+
+hssState OBJECT-TYPE
+	SYNTAX     INTEGER {
+						notAuthorized(0),  -- user is authorized
+                        authorized(1)    -- user is not authorized
+                   }
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+			"Session state"
+	::= { hsSessionEntry 6 }
+
+hssDwLimit OBJECT-TYPE
+	SYNTAX      Counter64
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+			"Download limit in bytes. Cannot be accessed using SNMPv1."
+	::= { hsSessionEntry 7 }
+
+hssUpLimit OBJECT-TYPE
+	SYNTAX      Counter64
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+			"Upload limit in bytes. Cannot be accessed using SNMPv1."
+	::= { hsSessionEntry 8 }
+
+hssTimeLimit OBJECT-TYPE
+	SYNTAX      Counter64
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+			"Time limit in sec. Cannot be accessed using SNMPv1."
+	::= { hsSessionEntry 9 }
+
+hssIdleTimeout OBJECT-TYPE
+	SYNTAX      Integer32
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+			"Idle timeout in sec."
+	::= { hsSessionEntry 10 }
+
+hssDwBandwidth OBJECT-TYPE
+	SYNTAX      Counter64
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+			"Max download bandwidth in b/s. Cannot be accessed using SNMPv1."
+	::= { hsSessionEntry 11 }
+
+hssUpBandwidth OBJECT-TYPE
+	SYNTAX      Counter64
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+			"Max upwnload bandwidth in b/s. Cannot be accessed using SNMPv1."
+	::= { hsSessionEntry 12 }
+
+hssURL OBJECT-TYPE
+	SYNTAX      DisplayString
+	MAX-ACCESS  read-only
+	STATUS      current
+	DESCRIPTION
+			"Original URL"
+	::= { hsSessionEntry 13 }
+
+--
+-- Traps
+--
+
+signalChangeNotification NOTIFICATION-TYPE
+    STATUS  current
+    DESCRIPTION
+            "Signal strength trap"
+    ::= { mobileNotifications 1 }
+
+connectionTypeNotification NOTIFICATION-TYPE
+    STATUS  current
+    DESCRIPTION
+            "Connection type trap"
+    ::= { mobileNotifications 2 }
+
+digitalInputNotification NOTIFICATION-TYPE
+    STATUS  current
+    DESCRIPTION
+            "Digital input trap"
+    ::= { ioNotifications 1 }
+
+digitalOutputNotification NOTIFICATION-TYPE
+    STATUS  current
+    DESCRIPTION
+            "Digital output trap"
+    ::= { ioNotifications 2 }
+
+modemDescription OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..255))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "Modem description"
+    ::= { mobileNotificationsObs 1 }
+
+signalStrength OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "Modem signal strength"
+    ::= { mobileNotificationsObs 2 }
+
+connectionType OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..255))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "Connection type"
+    ::= { mobileNotificationsObs 3 }
+
+doutState OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..255))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "Digital output state"
+    ::= { ioNotificationsObs 2 }
+
+dinState OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..255))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "Digital input state"
+    ::= { ioNotificationsObs 1 }
+
+
+END

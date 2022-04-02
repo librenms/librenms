@@ -212,12 +212,19 @@
             "section": "rules",
             "order": 7
         },
-        "allow_duplicate_sysName": {
+        "discovery_on_reboot": {
             "default": false,
             "type": "boolean",
             "group": "discovery",
             "section": "general",
             "order": 0
+        },
+        "allow_duplicate_sysName": {
+            "default": false,
+            "type": "boolean",
+            "group": "discovery",
+            "section": "general",
+            "order": 1
         },
         "allow_entity_sensor.amperes": {
             "default": true,
@@ -365,6 +372,38 @@
             "order": 1,
             "type": "text"
         },
+        "auth.socialite.redirect": {
+            "group": "auth",
+            "section": "socialite",
+            "order": 1,
+            "type": "boolean",
+            "default": false
+        },
+        "auth.socialite.register": {
+            "group": "auth",
+            "section": "socialite",
+            "order": 2,
+            "type": "boolean",
+            "default": false
+        },
+
+        "auth.socialite.configs": {
+            "group": "auth",
+            "section": "socialite",
+            "order": 3,
+            "type": "array-sub-keyed",
+            "validate": {
+                "value": "array",
+                "value.*": "array",
+                "value.*.listener": ["not_regex:/[:|@]/"],
+                "value.*.listener": ["regex:/^\\\\SocialiteProviders\\\\[^\\\\]+\\\\[^\\\\]+ExtendSocialite$/"],
+                "value.*.redirect": "url",
+                "value.saml.metadata": "url_or_xml",
+                "value.saml.acs": "url",
+                "value.saml.entityid": "url"
+            }
+        },
+
         "auth_ad_check_certificates": {
             "default": false,
             "group": "auth",
@@ -833,38 +872,22 @@
             "default": "H:i:s",
             "type": "text"
         },
-        "db_name": {
-            "default": "librenms",
-            "hidden": true,
-            "type": "boolean"
-        },
-        "db_pass": {
-            "default": null,
-            "hidden": true,
-            "type": "boolean"
-        },
-        "db_port": {
-            "default": 3306,
-            "hidden": true,
-            "type": "boolean"
-        },
-        "db_socket": {
-            "default": null,
-            "hidden": true,
-            "type": "boolean"
-        },
-        "db_user": {
-            "default": "librenms",
-            "hidden": true,
-            "type": "boolean"
-        },
         "debug.run_trace": {
             "default": false,
             "type": "boolean"
         },
         "default_port_group": {
             "default": 0,
-            "type": "integer"
+            "type": "select-dynamic",
+            "group": "discovery",
+            "section": "networks",
+            "order": 0,
+            "options": {
+                "target": "port-group"
+            },
+            "validate": {
+                "value": "integer|zero_or_exists:port_groups,id"
+            }
         },
         "device_location_map_open": {
             "order": 2,
@@ -881,6 +904,19 @@
                 "ifName": "ifName",
                 "ifDescr": "ifDescr",
                 "ifAlias": "ifAlias"
+            }
+        },
+        "device_display_default": {
+            "group": "webui",
+            "section": "device",
+            "order": 1,
+            "default": null,
+            "type": "select",
+            "options": {
+                "{{ $hostname }}": "hostname",
+                "{{ $sysName_fallback }}":  "sysName_fallback",
+                "{{ $sysName }}":  "sysName",
+                "{{ $ip }}":  "ip"
             }
         },
         "device_perf_purge": {
@@ -1605,20 +1641,6 @@
             "section": "style",
             "order": 2,
             "type": "text"
-        },
-        "force_hostname_to_sysname": {
-            "group": "webui",
-            "section": "device",
-            "order": 0,
-            "default": false,
-            "type": "boolean"
-        },
-        "force_ip_to_sysname": {
-            "group": "webui",
-            "section": "device",
-            "order": 1,
-            "default": false,
-            "type": "boolean"
         },
         "fping": {
             "default": "fping",
@@ -3433,6 +3455,10 @@
                 "other": "Other"
             }
         },
+        "group": {
+            "type": "text",
+            "default": "librenms"
+        },
         "gui.network-map.style": {
             "default": "new",
             "type": "select",
@@ -3446,7 +3472,7 @@
             "type": "array",
             "validate": {
                 "value": "array",
-                "value.*": "object",
+                "value.*": "array",
                 "value.*.action": "boolean",
                 "value.*.icon": "string",
                 "value.*.external": "boolean",
@@ -4234,14 +4260,15 @@
                         {"match": "fireware", "value": "firewareos"},
                         {"match": "fortigate", "value": "fortios"},
                         {"match": "vyos", "value": "vyatta"},
-                        {"match": "slms", "value": "zhoneolt"}
+                        {"match": "slms", "value": "zhoneolt"},
+                        {"match": "oneaccess", "value": "oneos"}
                     ]
                 }
             },
             "type": "oxidized-maps",
             "validate": {
                 "value": "array",
-                "value.*": "array|keys_in:hostname,sysName,sysDescr,hardware,os,location,ip",
+                "value.*": "array|keys_in:hostname,sysName,sysDescr,sysObjectID,hardware,os,location,ip",
                 "value.*.*": "array|min:1",
                 "value.*.*.*": "array|size:2|keys_in:match,regex,value",
                 "value.*.*.*.value": "required|string",
@@ -4367,6 +4394,13 @@
         },
         "poller_modules.os": {
             "order": 320,
+            "group": "poller",
+            "section": "poller_modules",
+            "default": true,
+            "type": "boolean"
+        },
+        "poller_modules.availability": {
+            "order": 25,
             "group": "poller",
             "section": "poller_modules",
             "default": true,
@@ -4762,6 +4796,13 @@
             "section": "prometheus",
             "order": 3
         },
+        "prometheus.prefix": {
+            "default": "",
+            "type": "text",
+            "group": "poller",
+            "section": "prometheus",
+            "order": 4
+        },
         "public_status": {
             "default": false,
             "group": "auth",
@@ -4883,6 +4924,13 @@
             "section": "rrdtool",
             "order": 1,
             "type": "boolean"
+        },
+        "rrdtool_version": {
+            "default": null,
+            "group": "poller",
+            "section": "rrdtool",
+            "order": 12,
+            "type": "text"
         },
         "sensors.guess_limits": {
             "default": true,
@@ -5114,6 +5162,9 @@
                 "public"
             ]
         },
+        "snmp.unescape": {
+            "type": "boolean"
+        },
         "snmp.exec_timeout": {
             "default": 1200,
             "type": "integer",
@@ -5126,11 +5177,18 @@
             "type": "integer",
             "default": 0
         },
+        "snmp.oids.no_bulk": {
+            "group": "poller",
+            "section": "snmp",
+            "order": 20,
+            "type": "array",
+            "default": null
+        },
         "snmp.timeout": {
             "group": "poller",
             "section": "snmp",
             "order": 5,
-            "type": "integer",
+            "type": "float",
             "default": 1
         },
         "snmp.retries": {
@@ -5380,6 +5438,10 @@
             "validate": {
                 "value": "integer|min:0"
             }
+        },
+        "user": {
+            "type": "text",
+            "default": "librenms"
         },
         "vertical_summary": {
             "default": 0,

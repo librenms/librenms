@@ -1,6 +1,3 @@
-source: Support/Configuration.md
-path: blob/master/doc/
-
 # Configuration Docs
 
 LibreNMS configuration is a set of key values.
@@ -78,6 +75,19 @@ lnms config:get snmp.community
   ]
 ```
 
+## Pre-load configuration
+
+This feature is primarily for docker images and other automation.
+When installing LibreNMS for the first time with a new database you can place yaml key value files
+in `database/seeders/config` to pre-populate the config database.
+
+Example snmp.yaml
+```yaml
+snmp.community:
+    - public
+    - private
+snmp.max_repeaters: 30
+```
 
 ## Directories
 
@@ -154,6 +164,7 @@ lnms config:set fping6 fping6
 lnms config:set fping_options.timeout 500
 lnms config:set fping_options.count 3
 lnms config:set fping_options.interval 500
+lnms config:set fping_options.tos 184
 ```
 
 `fping` configuration options:
@@ -165,6 +176,7 @@ lnms config:set fping_options.interval 500
   to each target.
 * `interval` (`fping` parameter `-p`): Time in milliseconds that fping
   waits between successive packets to an individual target.
+* `tos` (`fping`parameter `-O`): Set the type of service flag (TOS). Value can be either decimal or hexadecimal (0xh) format. Can be used to ensure that ping packets are queued in following QOS mecanisms in the network. Table is accessible in the [TOS Wikipedia page](https://en.wikipedia.org/wiki/Type_of_service).
 
 > NOTE: Setting a higher timeout value than the interval value can
 > lead to slowing down poller. Example:
@@ -622,7 +634,7 @@ lnms config:set enable_vrfs true # Enable VRFs
 
 ## Port extensions
 
-Please refer to [Port-Description-Parser](../Extensions/Port-Description-Parser.md)
+Please refer to [Port-Description-Parser](../Extensions/Interface-Description-Parsing.md)
 
 ```bash
 lnms config:set enable_ports_etherlike false

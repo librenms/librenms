@@ -21,7 +21,7 @@
         "discovery": {
             "devices": [
                 {
-                    "sysName": "",
+                    "sysName": null,
                     "sysObjectID": ".1.3.6.1.4.1.30631.1.18",
                     "sysDescr": "Terra four channel DVB-T/T2/C to IP streamer sti440",
                     "sysContact": null,
@@ -65,8 +65,7 @@
                     "user_func": null,
                     "state_name": null
                 }
-            ],
-            "state_indexes": []
+            ]
         },
         "poller": "matches discovery"
     }

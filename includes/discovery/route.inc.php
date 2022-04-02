@@ -54,6 +54,10 @@ foreach ($dbRoute as $dbRow) {
     }
 }
 
+if (file_exists(Config::get('install_dir') . "/includes/discovery/route/{$device['os']}.inc.php")) {
+    include Config::get('install_dir') . "/includes/discovery/route/{$device['os']}.inc.php";
+}
+
 //Not a single route will be discovered if the amount is over maximum
 // To prevent any bad behaviour on routers holding the full internet table
 
@@ -282,7 +286,7 @@ if ($mpls_skip != 1) {
                             d_echo(isset($current));
                             d_echo(isset($current['db']));
                             d_echo($current['db']);
-                            d_echo(count($current['db']));
+                            d_echo(count($current['db'] ?? []));
                             d_echo($delete_row[$current['db']['route_id']]);
                             $entry['created_at'] = ['NOW()'];
                             $create_row[] = $entry;

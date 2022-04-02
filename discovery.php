@@ -15,6 +15,7 @@ $init_modules = ['discovery'];
 require __DIR__ . '/includes/init.php';
 
 $start = microtime(true);
+Log::setDefaultDriver('console');
 $sqlparams = [];
 $options = getopt('h:m:i:n:d::v::a::q', ['os:', 'type:']);
 
@@ -112,7 +113,7 @@ if (! empty(\LibreNMS\Config::get('distributed_poller_group'))) {
 }
 
 global $device;
-foreach (dbFetch("SELECT * FROM `devices` WHERE disabled = 0 AND snmp_disable = 0 $where ORDER BY device_id DESC", $sqlparams) as $device) {
+foreach (dbFetch("SELECT * FROM `devices` WHERE disabled = 0 $where ORDER BY device_id DESC", $sqlparams) as $device) {
     DeviceCache::setPrimary($device['device_id']);
     $discovered_devices += (int) discover_device($device, $module_override);
 }
@@ -120,13 +121,6 @@ foreach (dbFetch("SELECT * FROM `devices` WHERE disabled = 0 AND snmp_disable = 
 $end = microtime(true);
 $run = ($end - $start);
 $proctime = substr($run, 0, 5);
-
-if ($discovered_devices) {
-    if ($doing === 'new') {
-        // We have added a new device by this point so we might want to do some other work
-        oxidized_reload_nodes();
-    }
-}
 
 if (isset($new_discovery_lock)) {
     $new_discovery_lock->release();
@@ -136,7 +130,8 @@ $string = $argv[0] . " $doing " . date(\LibreNMS\Config::get('dateformat.compact
 d_echo("$string\n");
 
 if (! isset($options['q'])) {
-    printStats();
+    echo PHP_EOL;
+    app(\App\Polling\Measure\MeasurementManager::class)->printStats();
 }
 
 logfile($string);

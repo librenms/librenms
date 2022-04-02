@@ -19,6 +19,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2021 Adam Bishop
  * @author     Adam Bishop <adam@omega.org.uk>
  */
@@ -37,7 +38,7 @@ if (! Auth::user()->hasGlobalAdmin()) {
 if (isset($_POST['device_id'])) {
     if (! is_numeric($_POST['device_id'])) {
         $status = 'error';
-        $message = 'Invalid device id ' . $_POST['device_id'];
+        $message = 'Invalid device id ' . htmlspecialchars($_POST['device_id']);
     } else {
         $device = Device::find($_POST['device_id']);
 

@@ -18,6 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2018 Neil Lathwood
  * @author     Neil Lathwood <gh+n@laf.io>
  */
@@ -25,7 +26,7 @@ header('Content-type: application/json');
 
 $alert_id = $vars['alert_id'];
 $sub_type = $vars['sub_type'];
-$note = $vars['note'] ?: '';
+$note = strip_tags($vars['note']) ?: '';
 $status = 'error';
 
 if (is_numeric($alert_id)) {

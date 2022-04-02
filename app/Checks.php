@@ -18,6 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -26,11 +27,11 @@ namespace App;
 
 use App\Models\Device;
 use App\Models\Notification;
+use App\Models\User;
 use Cache;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Auth;
 use LibreNMS\Config;
-use Toastr;
 
 class Checks
 {
@@ -46,31 +47,38 @@ class Checks
 
         Cache::put('checks_popup_timeout', true, Config::get('checks_popup_timer', 5) * 60);
 
+        /** @var User $user */
         $user = Auth::user();
 
         if ($user->isAdmin()) {
             $notifications = Notification::isUnread($user)->where('severity', '>', \LibreNMS\Enum\Alert::OK)->get();
             foreach ($notifications as $notification) {
-                Toastr::error("<a href='notifications/'>$notification->body</a>", $notification->title);
+                flash()
+                    ->using('template.librenms')
+                    ->title($notification->title)
+                    ->addWarning("<a href='notifications/'>$notification->body</a>");
             }
 
             $warn_sec = Config::get('rrd.step', 300) * 3;
             if (Device::isUp()->where('last_polled', '<=', Carbon::now()->subSeconds($warn_sec))->exists()) {
                 $warn_min = $warn_sec / 60;
-                Toastr::warning('<a href="poller/log?filter=unpolled/">It appears as though you have some devices that haven\'t completed polling within the last ' . $warn_min . ' minutes, you may want to check that out :)</a>', 'Devices unpolled');
+                flash()
+                    ->using('template.librenms')
+                    ->title('Devices unpolled')
+                    ->addWarning('<a href="poller/log?filter=unpolled/">It appears as though you have some devices that haven\'t completed polling within the last ' . $warn_min . ' minutes, you may want to check that out :)</a>');
             }
 
             // Directory access checks
             $rrd_dir = Config::get('rrd_dir');
             if (! is_dir($rrd_dir)) {
-                Toastr::error("RRD Directory is missing ($rrd_dir).  Graphing may fail. <a href=" . url('validate') . '>Validate your install</a>');
+                flash()->addError("RRD Directory is missing ($rrd_dir).  Graphing may fail. <a href=" . url('validate') . '>Validate your install</a>');
             }
 
             $temp_dir = Config::get('temp_dir');
             if (! is_dir($temp_dir)) {
-                Toastr::error("Temp Directory is missing ($temp_dir).  Graphing may fail. <a href=" . url('validate') . '>Validate your install</a>');
+                flash()->addError("Temp Directory is missing ($temp_dir).  Graphing may fail. <a href=" . url('validate') . '>Validate your install</a>');
             } elseif (! is_writable($temp_dir)) {
-                Toastr::error("Temp Directory is not writable ($temp_dir).  Graphing may fail. <a href='" . url('validate') . "'>Validate your install</a>");
+                flash()->addError("Temp Directory is not writable ($temp_dir).  Graphing may fail. <a href='" . url('validate') . "'>Validate your install</a>");
             }
         }
     }

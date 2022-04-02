@@ -7,6 +7,7 @@
  * the source code distribution for details. */
 /**
  * API Transport
+ *
  * @author GitStoph <https://github.com/GitStoph>
  * @copyright 2019 GitStoph
  * @license GPL
@@ -17,6 +18,7 @@ namespace LibreNMS\Alert\Transport;
 use LibreNMS\Alert\Transport;
 use LibreNMS\Config;
 use LibreNMS\Enum\AlertState;
+use LibreNMS\Util\Proxy;
 
 class Alerta extends Transport
 {
@@ -62,7 +64,7 @@ class Alerta extends Transport
             'type' => $obj['title'],
         ];
         $alert_message = json_encode($data);
-        set_curl_proxy($curl);
+        Proxy::applyToCurl($curl);
         $headers = ['Content-Type: application/json', 'Authorization: Key ' . $opts['apikey']];
         curl_setopt($curl, CURLOPT_HTTPHEADER, $headers);
         curl_setopt($curl, CURLOPT_URL, $host);

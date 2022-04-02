@@ -18,6 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2017 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -45,13 +46,22 @@ class IpTest extends TestCase
         $this->assertTrue(IP::isValid('8.8.8.8', true));
         $this->assertTrue(IPv4::isValid('192.168.0.1', true));
         $this->assertTrue(IPv6::isValid('FF81::', true));
-        $this->assertTrue(IPv6::isValid('2001:db8:85a3::8a2e:370:7334', true));
         $this->assertFalse(IPv4::isValid('127.0.0.1', true));
         $this->assertFalse(IPv6::isValid('::1', true));
         $this->assertFalse(IP::isValid('169.254.1.1', true));
         $this->assertFalse(IP::isValid('fe80::1', true));
         $this->assertFalse(IPv4::isValid('fe80::1', true));
         $this->assertFalse(IP::isValid('Falafel', true));
+    }
+
+    /**
+     * See https://github.com/librenms/librenms/pull/13468 for more info
+     *
+     * @requires PHP >= 7.4
+     */
+    public function testIsValidIPv6ExcludeReserved(): void
+    {
+        $this->assertFalse(IPv6::isValid('2001:db8:85a3::8a2e:370:7334', true));
     }
 
     public function testIpParse()

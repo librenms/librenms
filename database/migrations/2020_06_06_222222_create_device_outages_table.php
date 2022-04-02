@@ -13,6 +13,7 @@ class CreateDeviceOutagesTable extends Migration
     public function up()
     {
         Schema::create('device_outages', function (Blueprint $table) {
+            $table->bigIncrements('id');
             $table->unsignedInteger('device_id')->index();
             $table->bigInteger('going_down');
             $table->bigInteger('up_again')->nullable();

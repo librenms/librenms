@@ -18,6 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2017 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -27,6 +28,7 @@ namespace LibreNMS\Validations;
 use DateTime;
 use DateTimeZone;
 use Exception;
+use LibreNMS\ComposerHelper;
 use LibreNMS\Config;
 use LibreNMS\Util\EnvHelper;
 use LibreNMS\Util\Git;
@@ -100,12 +102,17 @@ class Updates extends BaseValidation
         $modifiedcmd = 'git diff --name-only --exit-code';
         $validator->execAsUser($modifiedcmd, $cmdoutput, $code);
         if ($code !== 0 && ! empty($cmdoutput)) {
-            $result = ValidationResult::warn(
-                'Your local git contains modified files, this could prevent automatic updates.',
-                'You can fix this with ./scripts/github-remove'
-            );
-            $result->setList('Modified Files', $cmdoutput);
-            $validator->result($result);
+
+            // Check so it's not only plugins that "pests" the diff
+            if (! ($cmdoutput === ['composer.json', 'composer.lock'] && ComposerHelper::getPlugins())) {
+                $result = ValidationResult::warn(
+                    'Your local git contains modified files, this could prevent automatic updates.',
+                    'You can fix this with ./scripts/github-remove'
+                );
+
+                $result->setList('Modified Files', $cmdoutput);
+                $validator->result($result);
+            }
         }
     }
 }

@@ -18,6 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -113,7 +114,7 @@ class SchemaTest extends TestCase
         // use a Mock so we don't have to rely on the schema being stable.
 
         $schema = $this->getMockBuilder(Schema::class)
-            ->setMethods(['getSchema'])
+            ->onlyMethods(['getSchema'])
             ->getMock();
 
         $schema->method('getSchema')->willReturn($this->mock_schema);

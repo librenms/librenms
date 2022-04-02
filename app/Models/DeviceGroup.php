@@ -18,6 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2016 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -26,7 +27,6 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use LibreNMS\Alerting\QueryBuilderFluentParser;
-use Log;
 use Permissions;
 
 class DeviceGroup extends BaseModel
@@ -67,53 +67,6 @@ class DeviceGroup extends BaseModel
             $this->devices()->sync(QueryBuilderFluentParser::fromJSON($this->rules)->toQuery()
                 ->distinct()->pluck('devices.device_id'));
         }
-    }
-
-    /**
-     * Update the device groups for the given device or device_id
-     *
-     * @param Device|int $device
-     * @return array
-     */
-    public static function updateGroupsFor($device)
-    {
-        $device = ($device instanceof Device ? $device : Device::find($device));
-        if (! $device instanceof Device) {
-            // could not load device
-            return [
-                'attached' => [],
-                'detached' => [],
-                'updated' => [],
-            ];
-        }
-
-        $device_group_ids = static::query()
-            ->with(['devices' => function ($query) {
-                $query->select('devices.device_id');
-            }])
-            ->get()
-            ->filter(function ($device_group) use ($device) {
-                /** @var DeviceGroup $device_group */
-                if ($device_group->type == 'dynamic') {
-                    try {
-                        return $device_group->getParser()
-                            ->toQuery()
-                            ->where('devices.device_id', $device->device_id)
-                            ->exists();
-                    } catch (\Illuminate\Database\QueryException $e) {
-                        Log::error("Device Group '$device_group->name' generates invalid query: " . $e->getMessage());
-
-                        return false;
-                    }
-                }
-
-                // for static, if this device is include, keep it.
-                return $device_group->devices
-                    ->where('device_id', $device->device_id)
-                    ->isNotEmpty();
-            })->pluck('id');
-
-        return $device->groups()->sync($device_group_ids);
     }
 
     /**

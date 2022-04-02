@@ -14,7 +14,6 @@ use App\Models\Widget;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use LibreNMS\Config;
-use Toastr;
 
 class OverviewController extends Controller
 {
@@ -39,7 +38,7 @@ class OverviewController extends Controller
     public function default(Request $request)
     {
         $user = Auth::user();
-        $dashboards = Dashboard::allAvailable($user)->with('user:user_id,username')->get()->keyBy('dashboard_id');
+        $dashboards = Dashboard::allAvailable($user)->with('user:user_id,username')->orderBy('dashboard_name')->get()->keyBy('dashboard_id');
 
         // Split dashboards into user owned or shared
         [$user_dashboards, $shared_dashboards] = $dashboards->partition(function ($dashboard) use ($user) {
@@ -66,11 +65,11 @@ class OverviewController extends Controller
 
             // specific dashboard was requested, but doesn't exist
             if (isset($dashboard) && ! empty($request->dashboard)) {
-                Toastr::error(
-                    "Dashboard <code>#$request->dashboard</code> does not exist! Loaded <code>
-                    " . htmlentities($dashboard->dashboard_name) . '</code> instead.',
-                    'Requested Dashboard Not Found!'
-                );
+                flash()
+                    ->using('template.librenms')
+                    ->title('Requested Dashboard Not Found!')
+                    ->addError("Dashboard <code>#$request->dashboard</code> does not exist! Loaded <code>
+                    " . htmlentities($dashboard->dashboard_name) . '</code> instead.');
             }
         }
 
@@ -104,7 +103,7 @@ class OverviewController extends Controller
         $data = serialize(json_encode($data));
         $dash_config = unserialize($data);
         $hide_dashboard_editor = UserPref::getPref($user, 'hide_dashboard_editor');
-        $widgets = Widget::select('widget_id', 'widget_title')->orderBy('widget_title')->get();
+        $widgets = Widget::select(['widget_id', 'widget_title'])->orderBy('widget_title')->get();
 
         $user_list = [];
         if ($user->can('manage', User::class)) {

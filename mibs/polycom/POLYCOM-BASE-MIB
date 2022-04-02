@@ -1,0 +1,21 @@
+POLYCOM-BASE-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+   enterprises, MODULE-IDENTITY
+      FROM SNMPv2-SMI
+;
+
+polycom MODULE-IDENTITY
+   LAST-UPDATED   "201108310000Z"
+   ORGANIZATION   "Polycom, Inc."
+   CONTACT-INFO   "http://www.polycom.com/"
+   DESCRIPTION    "This MIB defines the base for Polycom product MIBs.
+                  Copyright (c) 2011 Polycom, Inc."
+
+   REVISION       "201108310000Z"
+   DESCRIPTION    "Initial draft."
+
+   ::= { enterprises 13885 }
+
+END
+

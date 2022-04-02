@@ -18,6 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2017 Paul Heinrichs
  * @author     Paul Heinrichs<pdheinrichs@gmail.com>
  */
@@ -92,11 +93,11 @@ class Pmp extends OS implements
         $device->hardware = $hardware;
     }
 
-    public function pollOS()
+    public function pollOS(): void
     {
         // Migrated to Wireless Sensor
         $fec = snmp_get_multi_oid($this->getDeviceArray(), ['fecInErrorsCount.0', 'fecOutErrorsCount.0', 'fecCRCError.0'], '-OQUs', 'WHISP-BOX-MIBV2-MIB');
-        if (is_numeric($fec['fecInErrorsCount.0']) && is_numeric($fec['fecOutErrorsCount.0'])) {
+        if (is_numeric($fec['fecInErrorsCount.0'] ?? null) && is_numeric($fec['fecOutErrorsCount.0'] ?? null)) {
             $rrd_def = RrdDefinition::make()
                 ->addDataset('fecInErrorsCount', 'GAUGE', 0, 100000)
                 ->addDataset('fecOutErrorsCount', 'GAUGE', 0, 100000);
@@ -111,7 +112,7 @@ class Pmp extends OS implements
         }
 
         // Migrated to Wireless Sensor
-        if (is_numeric($fec['fecCRCError.0'])) {
+        if (is_numeric($fec['fecCRCError.0'] ?? null)) {
             $rrd_def = RrdDefinition::make()->addDataset('crcErrors', 'GAUGE', 0, 100000);
             $fields = [
                 'crcErrors' => $fec['fecCRCError.0'],
@@ -135,8 +136,8 @@ class Pmp extends OS implements
 
         $multi_get_array = snmp_get_multi($this->getDeviceArray(), ['regCount.0', 'regFailureCount.0'], '-OQU', 'WHISP-APS-MIB');
         d_echo($multi_get_array);
-        $registered = $multi_get_array[0]['WHISP-APS-MIB::regCount'];
-        $failed = $multi_get_array[0]['WHISP-APS-MIB::regFailureCount'];
+        $registered = $multi_get_array[0]['WHISP-APS-MIB::regCount'] ?? null;
+        $failed = $multi_get_array[0]['WHISP-APS-MIB::regFailureCount'] ?? null;
 
         if (is_numeric($registered) && is_numeric($failed)) {
             $rrd_def = RrdDefinition::make()
@@ -168,7 +169,7 @@ class Pmp extends OS implements
         }
 
         $radio = snmp_get_multi_oid($this->getDeviceArray(), ['radioDbmInt.0', 'minRadioDbm.0', 'maxRadioDbm.0', 'radioDbmAvg.0'], '-OQUs', 'WHISP-SM-MIB');
-        if (is_numeric($radio['radioDbmInt.0']) && is_numeric($radio['minRadioDbm.0']) && is_numeric($radio['maxRadioDbm.0']) && is_numeric($radio['radioDbmAvg.0'])) {
+        if (is_numeric($radio['radioDbmInt.0'] ?? null) && is_numeric($radio['minRadioDbm.0'] ?? null) && is_numeric($radio['maxRadioDbm.0'] ?? null) && is_numeric($radio['radioDbmAvg.0'] ?? null)) {
             $rrd_def = RrdDefinition::make()
                 ->addDataset('dbm', 'GAUGE', -100, 0)
                 ->addDataset('min', 'GAUGE', -100, 0)
@@ -187,7 +188,7 @@ class Pmp extends OS implements
         }
 
         $dbm = snmp_get_multi_oid($this->getDeviceArray(), ['linkRadioDbmHorizontal.2', 'linkRadioDbmVertical.2'], '-OQUs', 'WHISP-APS-MIB');
-        if (is_numeric($dbm['linkRadioDbmHorizontal.2']) && is_numeric($dbm['linkRadioDbmVertical.2'])) {
+        if (is_numeric($dbm['linkRadioDbmHorizontal.2'] ?? null) && is_numeric($dbm['linkRadioDbmVertical.2'] ?? null)) {
             $rrd_def = RrdDefinition::make()
                 ->addDataset('horizontal', 'GAUGE', -100, 0)
                 ->addDataset('vertical', 'GAUGE', -100, 0);

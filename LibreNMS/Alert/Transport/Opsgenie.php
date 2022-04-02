@@ -15,6 +15,7 @@
 
 /**
  * OpsGenie API Transport
+ *
  * @author Celal Emre CICEK <celal.emre@opsgenie.com>
  * @copyright 2017 Celal Emre CICEK
  * @license GPL
@@ -23,6 +24,7 @@
 namespace LibreNMS\Alert\Transport;
 
 use LibreNMS\Alert\Transport;
+use LibreNMS\Util\Proxy;
 
 class Opsgenie extends Transport
 {
@@ -41,7 +43,7 @@ class Opsgenie extends Transport
 
         $curl = curl_init();
 
-        set_curl_proxy($curl);
+        Proxy::applyToCurl($curl);
         curl_setopt($curl, CURLOPT_URL, $url);
         curl_setopt($curl, CURLOPT_CUSTOMREQUEST, 'POST');
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);

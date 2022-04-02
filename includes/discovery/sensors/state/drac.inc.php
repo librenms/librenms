@@ -11,6 +11,7 @@
  */
 
 $tables = [
+    ['physicalDiskTable', '.1.3.6.1.4.1.674.10892.5.5.1.20.130.4.1.4.', 'physicalDiskState', 'physicalDiskName'],
     ['virtualDiskTable', '.1.3.6.1.4.1.674.10892.5.5.1.20.140.1.1.4.', 'virtualDiskState', 'virtualDiskName'],
     ['processorDeviceTable', '.1.3.6.1.4.1.674.10892.5.4.1100.30.1.5.', 'processorDeviceStatus', 'processorDeviceBrandName'],
     ['memoryDeviceTable', '.1.3.6.1.4.1.674.10892.5.4.1100.50.1.5.', 'memoryDeviceStatus', 'memoryDeviceLocationName'],
@@ -26,7 +27,20 @@ foreach ($tables as $tablevalue) {
 
     if (! empty($temp)) {
         // Find the right states
-        if ($value_oid == 'virtualDiskState') {
+        if ($value_oid == 'physicalDiskTable') {
+            $states = [
+                ['value' => 1, 'generic' => 3, 'graph' => 0, 'descr' => 'unknown'],
+                ['value' => 2, 'generic' => 0, 'graph' => 0, 'descr' => 'ready'],
+                ['value' => 3, 'generic' => 0, 'graph' => 0, 'descr' => 'online'],
+                ['value' => 4, 'generic' => 1, 'graph' => 0, 'descr' => 'foreign'],
+                ['value' => 5, 'generic' => 2, 'graph' => 0, 'descr' => 'offline'],
+                ['value' => 6, 'generic' => 2, 'graph' => 0, 'descr' => 'blocked'],
+                ['value' => 7, 'generic' => 2, 'graph' => 0, 'descr' => 'failed'],
+                ['value' => 8, 'generic' => 2, 'graph' => 0, 'descr' => 'noraid'],
+                ['value' => 9, 'generic' => 2, 'graph' => 0, 'descr' => 'removed'],
+                ['value' => 10, 'generic' => 2, 'graph' => 0, 'descr' => 'readonly'],
+            ];
+        } elseif ($value_oid == 'virtualDiskState') {
             $states = [
                 ['value' => 1, 'generic' => 3, 'graph' => 0, 'descr' => 'unknown'],
                 ['value' => 2, 'generic' => 0, 'graph' => 0, 'descr' => 'online'],

@@ -15,7 +15,11 @@ if __name__ == "__main__":
         description="LibreNMS Service - manages polling and other periodic processes"
     )
     parser.add_argument(
-        "-g", "--group", type=int, help="Set the poller group for this poller"
+        "-g",
+        "--group",
+        nargs="+",
+        type=int,
+        help="Set the poller group for this poller",
     )
     parser.add_argument("-v", "--verbose", action="count", help="Show verbose output.")
     parser.add_argument("-d", "--debug", action="store_true", help="Show debug output.")
@@ -43,9 +47,10 @@ if __name__ == "__main__":
 
     if args.verbose:
         logging.getLogger().setLevel(logging.INFO)
-
-    if args.debug:
+    elif args.debug:
         logging.getLogger().setLevel(logging.DEBUG)
+    else:
+        logging.getLogger().setLevel(logging.WARNING)
 
     info("Configuring LibreNMS service")
     try:
@@ -58,7 +63,10 @@ if __name__ == "__main__":
     service.config.single_instance = args.multiple
 
     if args.group:
-        service.config.group = [args.group]
+        if isinstance(args.group, list):
+            service.config.group = args.group
+        else:
+            service.config.group = [args.group]
 
     info(
         "Entering main LibreNMS service loop on {}/{}...".format(

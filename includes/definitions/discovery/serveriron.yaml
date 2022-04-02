@@ -1,4 +1,8 @@
 modules:
+    os:
+        serial: FOUNDRY-SN-AGENT-MIB::snChasSerNum.0
+        hardware: FOUNDRY-SN-AGENT-MIB::snAgentBrdMainBrdDescription.1
+        version: FOUNDRY-SN-AGENT-MIB::snAgImgVer.0
     mempools:
         data:
             -

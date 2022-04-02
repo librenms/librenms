@@ -1,0 +1,12 @@
+os: volius
+text: 'Volius'
+type: network
+icon: volius
+mib_dir: volius
+snmp_bulk: false
+over:
+    - { graph: device_dbm, text: 'dBm' }
+discovery:
+    -
+        sysObjectID:
+            - .1.3.6.1.4.1.34652

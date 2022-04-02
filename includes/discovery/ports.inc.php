@@ -3,17 +3,33 @@
 // Build SNMP Cache Array
 use App\Models\PortGroup;
 use LibreNMS\Config;
+use LibreNMS\Enum\PortAssociationMode;
+use LibreNMS\Util\StringHelpers;
+
+$descrSnmpFlags = '-OQUs';
+$typeSnmpFlags = '-OQUs';
+$operStatusSnmpFlags = '-OQUs';
+if ($device['os'] == 'bintec-beip-plus') {
+    $descrSnmpFlags = ['-OQUs', '-Cc'];
+    $typeSnmpFlags = ['-OQUs', '-Cc'];
+    $operStatusSnmpFlags = ['-OQUs', '-Cc'];
+}
 
 $port_stats = [];
-$port_stats = snmpwalk_cache_oid($device, 'ifDescr', $port_stats, 'IF-MIB');
+$port_stats = snmpwalk_cache_oid($device, 'ifDescr', $port_stats, 'IF-MIB', null, $descrSnmpFlags);
 $port_stats = snmpwalk_cache_oid($device, 'ifName', $port_stats, 'IF-MIB');
 $port_stats = snmpwalk_cache_oid($device, 'ifAlias', $port_stats, 'IF-MIB');
-$port_stats = snmpwalk_cache_oid($device, 'ifType', $port_stats, 'IF-MIB');
-$port_stats = snmpwalk_cache_oid($device, 'ifOperStatus', $port_stats, 'IF-MIB');
+$port_stats = snmpwalk_cache_oid($device, 'ifType', $port_stats, 'IF-MIB', null, $typeSnmpFlags);
+$port_stats = snmpwalk_cache_oid($device, 'ifOperStatus', $port_stats, 'IF-MIB', null, $operStatusSnmpFlags);
 
 // Get correct eth0 port status for AirFiber 5XHD devices
 if ($device['os'] == 'airos-af-ltu') {
     require 'ports/airos-af-ltu.inc.php';
+}
+
+//Teleste Luminato ifOperStatus
+if ($device['os'] == 'luminato') {
+    require base_path('includes/discovery/ports/luminato.inc.php');
 }
 
 // End Building SNMP Cache Array
@@ -27,7 +43,7 @@ d_echo($port_stats);
 // compatibility reasons.
 $port_association_mode = Config::get('default_port_association_mode');
 if ($device['port_association_mode']) {
-    $port_association_mode = get_port_assoc_mode_name($device['port_association_mode']);
+    $port_association_mode = PortAssociationMode::getName($device['port_association_mode']);
 }
 
 // Build array of ports in the database and an ifIndex/ifName -> port_id map
@@ -47,12 +63,12 @@ foreach ($ports_mapped['maps']['ifIndex'] as $ifIndex => $port_id) {
 
 // Fill ifAlias for fibrechannel ports
 if ($device['os'] == 'fabos') {
-    require_once 'ports/brocade.inc.php';
+    require base_path('includes/discovery/ports/brocade.inc.php');
 }
 
 //Shorten Ekinops Interfaces
 if ($device['os'] == 'ekinops') {
-    require_once 'ports/ekinops.inc.php';
+    require base_path('includes/discovery/ports/ekinops.inc.php');
 }
 
 $default_port_group = Config::get('default_port_group');
@@ -60,6 +76,7 @@ $default_port_group = Config::get('default_port_group');
 // New interface detection
 foreach ($port_stats as $ifIndex => $snmp_data) {
     $snmp_data['ifIndex'] = $ifIndex; // Store ifIndex in port entry
+    $snmp_data['ifAlias'] = StringHelpers::inferEncoding($snmp_data['ifAlias']);
 
     // Get port_id according to port_association_mode used for this device
     $port_id = get_port_id($ports_mapped, $snmp_data, $port_association_mode);

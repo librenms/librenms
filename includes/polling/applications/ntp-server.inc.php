@@ -7,8 +7,6 @@ use LibreNMS\RRD\RrdDefinition;
 $name = 'ntp-server';
 $app_id = $app['app_id'];
 
-echo $name;
-
 try {
     $ntp = json_app_get($device, $name);
 } catch (JsonAppParsingFailedException $e) {
@@ -16,7 +14,7 @@ try {
     $legacy = $e->getOutput();
 
     $ntp = [
-        data => [],
+        'data' => [],
     ];
 
     [$ntp['data']['stratum'], $ntp['data']['offset'], $ntp['data']['frequency'], $ntp['data']['jitter'],

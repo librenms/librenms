@@ -18,6 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2020 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -33,8 +34,8 @@ class Exa extends OS implements OSDiscovery
     public function discoverOS(Device $device): void
     {
         $info = snmp_getnext_multi($this->getDeviceArray(), ['e7CardSoftwareVersion', 'e7CardSerialNumber'], '-OQUs', 'E7-Calix-MIB');
-        $device->version = $info['e7CardSoftwareVersion'];
-        $device->serial = $info['e7CardSerialNumber'];
+        $device->version = $info['e7CardSoftwareVersion'] ?? null;
+        $device->serial = $info['e7CardSerialNumber'] ?? null;
         $device->hardware = 'Calix ' . $device->sysDescr;
 
         $cards = explode("\n", snmp_walk($this->getDeviceArray(), 'e7CardProvType', '-OQv', 'E7-Calix-MIB'));

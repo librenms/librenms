@@ -1,0 +1,104 @@
+mib: FSC-SERVERCONTROL2-MIB
+modules:
+    os:
+        hardware: FSC-SERVERCONTROL2-MIB::sc2UnitModelName.1 # if MIB is not named here, value is not displayed. 
+        version: FSC-SERVERCONTROL2-MIB::sc2spModelName.1.1 # if MIB is not named here, value is not displayed. 
+        serial: FSC-SERVERCONTROL2-MIB::sc2UnitSerialNumber.1 # if MIB is not named here, value is not displayed. 
+    sensors:
+        state:
+            data:
+                -
+                    oid: sc2AgentStatus
+                    value: sc2AgentStatus
+                    num_oid: '.1.3.6.1.4.1.231.2.10.2.2.10.8.1.{{ $index }}'
+                    descr: 'Global System Status'
+                    states:
+                        - { value: 1, descr: 'ok', graph: 1, generic: 0 }
+                        - { value: 2, descr: 'degraded', graph: 1, generic: 1 }
+                        - { value: 3, descr: 'error', graph: 1, generic: 2 }
+                        - { value: 5, descr: 'unknown', graph: 1, generic: 3 }
+                        - { value: 6, descr: 'notPresent', graph: 1, generic: 3 }
+                        - { value: 7, descr: 'notManageable', graph: 1, generic: 3 }
+                -
+                    oid: sc2PowerSupplyTable
+                    value: sc2PowerSupplyStatus
+                    num_oid: '.1.3.6.1.4.1.231.2.10.2.2.10.6.2.1.5.{{ $index }}'
+                    descr: sc2PowerSupplyDesignation
+                    states:
+                        - { value: 1, descr: unknown, graph: 1, generic: 3 }
+                        - { value: 2, descr: not-present, graph: 1, generic: 2 }
+                        - { value: 3, descr: ok, graph: 1, generic: 0 }
+                        - { value: 4, descr: fail, graph: 1, generic: 2 }
+                        - { value: 5, descr: ac-fail, graph: 1, generic: 1 }
+                        - { value: 6, descr: dc-fail, graph: 1, generic: 1 }
+                        - { value: 7, descr: critical-temp, graph: 1, generic: 1 }
+                -
+                    oid: sc2FanTable
+                    value: sc2fanStatus
+                    num_oid: '.1.3.6.1.4.1.231.2.10.2.2.10.5.2.1.5.{{ $index }}'
+                    descr: sc2fanDesignation
+                    states:
+                        - { value: 1, descr: unknown, graph: 1, generic: 3 }
+                        - { value: 2, descr: disabled, graph: 1, generic: 3 }
+                        - { value: 3, descr: ok, graph: 1, generic: 0 }
+                        - { value: 4, descr: fail, graph: 1, generic: 2 }
+                        - { value: 5, descr: pre-fail, graph: 1, generic: 1 }
+                        - { value: 6, descr: redundant-fail, graph: 1, generic: 1 }
+                        - { value: 7, descr: non-manageable, graph: 1, generic: 3 }
+                        - { value: 8, descr: not-present, graph: 1, generic: 3 }
+                -
+                    oid: sc2Voltage
+                    value: sc2VoltageStatus
+                    num_oid: '.1.3.6.1.4.1.231.2.10.2.2.10.6.3.1.4.{{ $index }}'
+                    descr: sc2VoltageDesignation
+                    states:
+                        - { value: 1, descr: unknown, graph: 1, generic: 3 }
+                        - { value: 2, descr: disabled, graph: 1, generic: 3 }
+                        - { value: 3, descr: ok, graph: 1, generic: 0 }
+                        - { value: 4, descr: too-low, graph: 1, generic: 2 }
+                        - { value: 5, descr: too-high, graph: 1, generic: 2 }
+                        - { value: 6, descr: out-of-range, graph: 1, generic: 2 }
+                        - { value: 7, descr: warning, graph: 1, generic: 1 }
+                -
+                    oid: sc2ComponentStatusSensor
+                    value: sc2cssSensorStatus
+                    num_oid: '.1.3.6.1.4.1.231.2.10.2.2.10.8.3.1.8.{{ $index }}'
+                    descr: sc2cssSensorDesignation
+                    states:
+                        - { value: 1, descr: unknown, graph: 1, generic: 3 }
+                        - { value: 2, descr: ok, graph: 1, generic: 0 }
+                        - { value: 3, descr: identify, graph: 1, generic: 3 }
+                        - { value: 4, descr: pre-fail, graph: 1, generic: 1 }
+                        - { value: 5, descr: fail, graph: 1, generic: 2 }
+                        - { value: 6, descr: not-present, graph: 1, generic: 3 }
+        temperature:
+            data:
+                -
+                    oid: sc2TemperatureSensors
+                    value: sc2tempCurrentTemperature
+                    num_oid: '.1.3.6.1.4.1.231.2.10.2.2.10.5.1.1.6.{{ $index }}'
+                    descr: sc2tempSensorIdentifier
+        voltage:
+            data:
+                -
+                    oid: sc2Voltage
+                    value: sc2VoltageNominalValue
+                    num_oid: '.1.3.6.1.4.1.231.2.10.2.2.10.6.3.1.6.{{ $index }}'
+                    descr: sc2VoltageDesignation
+                    high_limit: sc2VoltageMaximumLevel
+                    low_limit: sc2VoltageMinimumLevel
+                    divisor: 1000
+        power:
+            data:
+                -
+                    oid: sc2PowerSupply
+                    value: sc2psPowerSupplyLoad
+                    num_oid: '.1.3.6.1.4.1.231.2.10.2.2.10.6.2.1.6.{{ $index }}'
+                    descr: 'PSU {{ $index }}'
+        fanspeed:
+            data:
+                -
+                    oid: sc2Fans
+                    value: sc2fanCurrentSpeed
+                    num_oid: '.1.3.6.1.4.1.231.2.10.2.2.10.5.2.1.6.{{ $index }}'
+                    descr: sc2fanDesignation

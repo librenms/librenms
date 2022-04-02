@@ -56,7 +56,7 @@
                                            class="form-control"
                                            autocomplete="off"
                                            aria-describedby="twoFactorErrors"
-                                           placeholder="@lang('Please enter auth token')"
+                                           placeholder="{{ __('Please enter auth token') }}"
                                            required autofocus>
                                     @endif
                                 </div>
@@ -65,7 +65,7 @@
                                 @if(!$errors->has('lockout'))
                                     <div class="col-md-12" style="margin:8px">
                                         <button type="submit" class="btn btn-primary btn-block" name="submit">
-                                            <i class="fa fa-btn fa-sign-in"></i> @lang('Submit')
+                                            <i class="fa fa-btn fa-sign-in"></i> {{ __('Submit') }}
                                         </button>
                                     </div>
                                 @endif
@@ -73,7 +73,7 @@
                                     <div class="col-md-12" style="margin:8px">
                                         <button type="submit" class="btn btn-default btn-block" onclick="event.preventDefault(); document.getElementById('logout-form').submit();">
                                             <i class="fa fa-btn fa-sign-out" aria-hidden="true"></i>
-                                            @lang('Logout')
+                                            {{ __('Logout') }}
                                         </button>
                                     </div>
                                 @endif
@@ -81,7 +81,7 @@
                                     <div class="col-md-12" style="margin:8px">
                                         <button type="submit" class="btn btn-danger btn-block" onclick="event.preventDefault(); document.getElementById('cancel-form').submit();">
                                             <i class="fa fa-btn fa-sign-out" aria-hidden="true"></i>
-                                            @lang('Cancel')
+                                            {{ __('Cancel') }}
                                         </button>
                                     </div>
                                 @endif

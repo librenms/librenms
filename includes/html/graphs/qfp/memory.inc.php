@@ -7,6 +7,7 @@
  * the source code distribution for details.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2019 LibreNMS
  * @author     Pavle Obradovic <pobradovic08@gmail.com>
  */
@@ -34,7 +35,7 @@ $descr = \LibreNMS\Data\Store\Rrd::fixedSafeDescr(short_hrDeviceDescr($component
 
 $perc = $components['memory_used'] * 100 / $components['memory_total'];
 
-$background = \LibreNMS\Util\Colors::percentage($perc, 75);
+$background = \LibreNMS\Util\Color::percentage($perc, 75);
 
 $rrd_options .= " DEF:qfp_used=$rrd_filename:InUse:AVERAGE";
 $rrd_options .= " DEF:qfp_free=$rrd_filename:Free:AVERAGE";

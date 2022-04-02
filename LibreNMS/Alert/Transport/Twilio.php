@@ -8,6 +8,7 @@
 */
 /**
  * Twilio API Transport
+ *
  * @author Andy Rosen <arosen@arosen.net>
  * @license GPL
  */
@@ -15,6 +16,7 @@
 namespace LibreNMS\Alert\Transport;
 
 use LibreNMS\Alert\Transport;
+use LibreNMS\Util\Proxy;
 
 class Twilio extends Transport
 {
@@ -34,7 +36,7 @@ class Twilio extends Transport
             'sid' => $opts['sid'],
             'token' => $opts['token'],
             'phone' => $opts['to'],
-            'text' => $obj['title'],
+            'text' => $obj['msg'],
             'sender' => $opts['sender'],
         ];
 
@@ -49,7 +51,7 @@ class Twilio extends Transport
 
         $curl = curl_init($url);
 
-        // set_curl_proxy($curl);
+        Proxy::applyToCurl($curl);
 
         curl_setopt($curl, CURLOPT_POST, true);
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, true);

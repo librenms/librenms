@@ -1,0 +1,23 @@
+{
+    "os": {
+        "discovery": {
+            "devices": [
+                {
+                    "sysName": "",
+                    "sysObjectID": ".1.3.6.1.4.1.11.2.3.7.11.50",
+                    "sysDescr": "ProCurve J8697A Switch 5406zl, revision K.15.04.0007, ROM K.15.13 (/sw/code/build/btm(K_15_04))",
+                    "sysContact": null,
+                    "version": "K.15.04.0007",
+                    "hardware": "5406zl",
+                    "features": null,
+                    "os": "procurve",
+                    "type": "network",
+                    "serial": null,
+                    "icon": "hpe.svg",
+                    "location": null
+                }
+            ]
+        },
+        "poller": "matches discovery"
+    }
+}

@@ -33,9 +33,9 @@ if ($vars['errors']) {
         <table id="ports" class="table table-condensed table-hover table-striped">
             <thead>
             <tr>
-                <th data-column-id="device" data-formatter="device">Device</th>
-                <th data-column-id="port"<?php echo $sort ?>>Port</th>
-                <th data-column-id="ifLastChange" data-converter="duration">Status Changed</th>
+                <th data-column-id="hostname" data-formatter="device">Device</th>
+                <th data-column-id="ifDescr"<?php echo $sort ?> data-formatter="port">Port</th>
+                <th data-column-id="secondsIfLastChange" data-converter="duration">Status Changed</th>
                 <th data-column-id="ifConnectorPresent" data-visible="false">Connected</th>
                 <th data-column-id="ifSpeed" data-converter="human-bps">Speed</th>
                 <th data-column-id="ifMtu" data-visible="false">MTU</th>
@@ -53,10 +53,10 @@ if ($vars['errors']) {
                     data-visible="<?php echo $details_visible ?>" data-css-class="blue" data-converter="human-pps">
                     Packets Out
                 </th>
-                <th data-column-id="ifInErrors" data-searchable="false" data-visible="<?php echo $errors_visible ?>"
+                <th data-column-id="ifInErrors_delta" data-searchable="false" data-visible="<?php echo $errors_visible ?>"
                     data-css-class="red"<?php echo $error_sort ?>>Errors In
                 </th>
-                <th data-column-id="ifOutErrors" data-searchable="false" data-visible="<?php echo $errors_visible ?>"
+                <th data-column-id="ifOutErrors_delta" data-searchable="false" data-visible="<?php echo $errors_visible ?>"
                     data-css-class="red">Errors Out
                 </th>
                 <th data-column-id="ifType">Media</th>
@@ -98,6 +98,9 @@ var grid = $("#ports").bootgrid({
     formatters: {
       'device': function (column, row) {
           return "<span class='alert-status " + row.status + "' style='float:left;margin-right:10px;'></span>" + row.device + "";
+      },
+      'port': function (column, row) {
+          return row.port
       }
     },
     templates: {
@@ -106,7 +109,6 @@ var grid = $("#ports").bootgrid({
     post: function ()
     {
         return {
-            id: "ports",
             device_id: '<?php echo $vars['device_id']; ?>',
             hostname: '<?php echo htmlspecialchars($vars['hostname']); ?>',
             state: '<?php echo $vars['state']; ?>',
@@ -121,7 +123,7 @@ var grid = $("#ports").bootgrid({
             errors: '<?php echo $vars['errors']; ?>',
         };
     },
-    url: "ajax_table.php"
+    url: '<?php echo route('table.ports') ?>'
 });
 
 $(".actionBar").append("<?php echo $output; ?>");

@@ -18,6 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2017 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -34,9 +35,11 @@ abstract class IP
 
     /**
      * Convert a hex-string to an IP address. For example: "c0 a8 01 fe" -> 192.168.1.254
-     * @param string $hex
-     * @param bool $ignore_errors Do not throw exceptions, instead return null on error.
+     *
+     * @param  string  $hex
+     * @param  bool  $ignore_errors  Do not throw exceptions, instead return null on error.
      * @return IP|null
+     *
      * @throws InvalidIpException
      */
     public static function fromHexString($hex, $ignore_errors = false)
@@ -76,9 +79,11 @@ abstract class IP
      * Convert a decimal space-separated string to an IP address. For example:
      * "192 168 1 154" -> 192.168.1.254
      * "32 01 72 96 72 96 00 00 00 00 00 00 00 00 136 136" -> 2001:4860:4860::8888
-     * @param string $snmpOid
-     * @param bool $ignore_errors Do not throw exceptions, instead return null on error.
+     *
+     * @param  string  $snmpOid
+     * @param  bool  $ignore_errors  Do not throw exceptions, instead return null on error.
      * @return IP|null
+     *
      * @throws InvalidIpException
      */
     public static function fromSnmpString($snmpOid, $ignore_errors = false)
@@ -99,9 +104,11 @@ abstract class IP
 
     /**
      * Parse an IP or IP Network into an IP object. Works with IPv6 and IPv4 addresses.
-     * @param string $ip
-     * @param bool $ignore_errors Do not throw exceptions, instead return null on error.
+     *
+     * @param  string  $ip
+     * @param  bool  $ignore_errors  Do not throw exceptions, instead return null on error.
      * @return IP|null
+     *
      * @throws InvalidIpException
      */
     public static function parse($ip, $ignore_errors = false)
@@ -125,8 +132,9 @@ abstract class IP
 
     /**
      * Check if the supplied IP is valid.
-     * @param string $ip
-     * @param bool $exclude_reserved Exclude reserved IP ranges.
+     *
+     * @param  string  $ip
+     * @param  bool  $exclude_reserved  Exclude reserved IP ranges.
      * @return bool
      */
     public static function isValid($ip, $exclude_reserved = false)
@@ -136,7 +144,8 @@ abstract class IP
 
     /**
      * Get the network of this IP in cidr format.
-     * @param int $cidr If not given will use the cidr stored with this IP
+     *
+     * @param  int  $cidr  If not given will use the cidr stored with this IP
      * @return string
      */
     public function getNetwork($cidr = null)
@@ -150,14 +159,16 @@ abstract class IP
 
     /**
      * Get the network address of this IP
-     * @param int $cidr If not given will use the cidr stored with this IP
+     *
+     * @param  int  $cidr  If not given will use the cidr stored with this IP
      * @return string
      */
     abstract public function getNetworkAddress($cidr = null);
 
     /**
      * Check if this IP address is contained inside the network
-     * @param string $network should be in cidr format.
+     *
+     * @param  string  $network  should be in cidr format.
      * @return mixed
      */
     abstract public function inNetwork($network);
@@ -165,7 +176,7 @@ abstract class IP
     /**
      * Check if this IP is in one of multiple networks
      *
-     * @param array $networks
+     * @param  array  $networks
      * @return bool
      */
     public function inNetworks($networks)
@@ -181,6 +192,7 @@ abstract class IP
 
     /**
      * Check if this IP is in the reserved range.
+     *
      * @return bool
      */
     public function isReserved()
@@ -191,6 +203,7 @@ abstract class IP
     /**
      * Remove extra 0s from this IPv6 address to make it easier to read.
      * IPv4 addresses, just return the address.
+     *
      * @return string|false
      */
     public function compressed()
@@ -201,6 +214,7 @@ abstract class IP
     /**
      * Expand this IPv6 address to it's full IPv6 representation. For example: ::1 -> 0000:0000:0000:0000:0000:0000:0000:0001
      * IPv4 addresses, just return the address.
+     *
      * @return string
      */
     public function uncompressed()
@@ -220,6 +234,7 @@ abstract class IP
 
     /**
      * Get the family of this IP.
+     *
      * @return string ipv4 or ipv6
      */
     public function getFamily()
@@ -238,7 +253,8 @@ abstract class IP
 
     /**
      * Extract an address from a cidr, assume a host is given if it does not contain /
-     * @param string $ip
+     *
+     * @param  string  $ip
      * @return array [$ip, $cidr]
      */
     protected function extractCidr($ip)

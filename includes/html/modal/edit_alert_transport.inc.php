@@ -11,7 +11,7 @@
  * the source code distribution for details.
  */
 
-use LibreNMS\Config;
+use LibreNMS\Alert\Transport;
 
 if (Auth::user()->hasGlobalAdmin()) {
     ?>
@@ -37,22 +37,14 @@ if (Auth::user()->hasGlobalAdmin()) {
                         </div>
                         <div class="form-group" title="The type of transport.">
                             <label for='transport-choice' class='col-sm-3 col-md-2 control-label'>Transport type: </label>
-                            <div class="col-sm-3">
-                                <select name='transport-choice' id='transport-choice' class='form-control'>
+                            <div class="col-sm-9 col-md-10">
+                                <select name='transport-choice' id='transport-choice' class='form-control' style="width: auto">
     <?php
 
 // Create list of transport
-    $transport_dir = Config::get('install_dir') . '/LibreNMS/Alert/Transport';
-    $transports_list = [];
-    foreach (scandir($transport_dir) as $transport) {
-        $transport = strstr($transport, '.', true);
-        if (empty($transport)) {
-            continue;
-        }
-        $transports_list[] = $transport;
-    }
-    foreach ($transports_list as $transport) {
-        echo '<option value="' . strtolower($transport) . '-form">' . $transport . '</option>';
+    $transports_list = Transport::list();
+    foreach ($transports_list as $transport => $name) {
+        echo '<option value="' . $transport . '-form">' . $name . '</option>';
     } ?>
                                 </select>
                             </div>
@@ -67,17 +59,17 @@ if (Auth::user()->hasGlobalAdmin()) {
     <?php
 
     $switches = []; // store names of bootstrap switches
-    foreach ($transports_list as $transport) {
-        $class = 'LibreNMS\\Alert\\Transport\\' . $transport;
+    foreach ($transports_list as $transport => $name) {
+        $class = Transport::getClass($transport);
 
         if (! method_exists($class, 'configTemplate')) {
             // Skip since support has not been added
             continue;
         }
 
-        echo '<form method="post" role="form" id="' . strtolower($transport) . '-form" class="form-horizontal transport">';
+        echo '<form method="post" role="form" id="' . $transport . '-form" class="form-horizontal transport">';
         echo csrf_field();
-        echo '<input type="hidden" name="transport-type" id="transport-type" value="' . strtolower($transport) . '">';
+        echo '<input type="hidden" name="transport-type" value="' . $transport . '">';
 
         $tmp = call_user_func($class . '::configTemplate');
 

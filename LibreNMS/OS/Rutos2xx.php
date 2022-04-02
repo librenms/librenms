@@ -18,6 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2019 Jozef Rebjak
  * @author     Jozef Rebjak <jozefrebjak@icloud.com>
  */
@@ -36,7 +37,7 @@ class Rutos2xx extends OS implements
     WirelessSnrDiscovery,
     WirelessRssiDiscovery
 {
-    public function pollOS()
+    public function pollOS(): void
     {
         // Mobile Data Usage
         $usage = snmp_get_multi_oid($this->getDeviceArray(), [

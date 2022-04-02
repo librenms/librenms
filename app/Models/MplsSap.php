@@ -6,7 +6,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use LibreNMS\Interfaces\Models\Keyable;
 
-class MplsSap extends Model implements Keyable
+class MplsSap extends DeviceRelatedModel implements Keyable
 {
     protected $primaryKey = 'sap_id';
     public $timestamps = false;
@@ -30,6 +30,7 @@ class MplsSap extends Model implements Keyable
 
     /**
      * Get a string that can identify a unique instance of this model
+     *
      * @return string
      */
     public function getCompositeKey()

@@ -18,10 +18,13 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * Original Code:
+ *
  * @author Daniel Preussker <f0o@devilcode.org>
  * @copyright 2014 f0o, LibreNMS
  * @license GPL
+ *
  * @link       https://www.librenms.org
+ *
  * @copyright  2019 KanREN, Inc.
  * @author     Heath Barnhart <hbarnhart@kanren.net>
  */
@@ -30,6 +33,7 @@ namespace LibreNMS\Alert;
 
 use Carbon\Carbon;
 use LibreNMS\Enum\AlertState;
+use Log;
 
 class AlertRules
 {
@@ -54,7 +58,7 @@ class AlertRules
         }
         //Checks each rule.
         foreach (AlertUtil::getRules($device_id) as $rule) {
-            c_echo('Rule %p#' . $rule['id'] . ' (' . $rule['name'] . '):%n ');
+            Log::info('Rule %p#' . $rule['id'] . ' (' . $rule['name'] . '):%n ', ['color' => true]);
             $extra = json_decode($rule['extra'], true);
             if (isset($extra['invert'])) {
                 $inv = (bool) $extra['invert'];
@@ -87,9 +91,9 @@ class AlertRules
             $current_state = dbFetchCell('SELECT state FROM alerts WHERE rule_id = ? AND device_id = ? ORDER BY id DESC LIMIT 1', [$rule['id'], $device_id]);
             if ($doalert) {
                 if ($current_state == AlertState::ACKNOWLEDGED) {
-                    c_echo('Status: %ySKIP');
+                    Log::info('Status: %ySKIP%n', ['color' => true]);
                 } elseif ($current_state >= AlertState::ACTIVE) {
-                    c_echo('Status: %bNOCHG');
+                    Log::info('Status: %bNOCHG%n', ['color' => true]);
                     // NOCHG here doesn't mean no change full stop. It means no change to the alert state
                     // So we update the details column with any fresh changes to the alert output we might have.
                     $alert_log = dbFetchRow('SELECT alert_log.id, alert_log.details FROM alert_log,alert_rules WHERE alert_log.rule_id = alert_rules.id && alert_log.device_id = ? && alert_log.rule_id = ? && alert_rules.disabled = 0
@@ -110,12 +114,12 @@ class AlertRules
                         } else {
                             dbUpdate(['state' => AlertState::ACTIVE, 'open' => 1, 'timestamp' => Carbon::now()], 'alerts', 'device_id = ? && rule_id = ?', [$device_id, $rule['id']]);
                         }
-                        c_echo(PHP_EOL . 'Status: %rALERT');
+                        Log::info(PHP_EOL . 'Status: %rALERT%n', ['color' => true]);
                     }
                 }
             } else {
                 if (! is_null($current_state) && $current_state == AlertState::RECOVERED) {
-                    c_echo('Status: %bNOCHG');
+                    Log::info('Status: %bNOCHG%n', ['color' => true]);
                 } else {
                     if (dbInsert(['state' => AlertState::RECOVERED, 'device_id' => $device_id, 'rule_id' => $rule['id']], 'alert_log')) {
                         if (is_null($current_state)) {
@@ -124,11 +128,10 @@ class AlertRules
                             dbUpdate(['state' => AlertState::RECOVERED, 'open' => 1, 'note' => '', 'timestamp' => Carbon::now()], 'alerts', 'device_id = ? && rule_id = ?', [$device_id, $rule['id']]);
                         }
 
-                        c_echo(PHP_EOL . 'Status: %gOK');
+                        Log::info(PHP_EOL . 'Status: %gOK%n', ['color' => true]);
                     }
                 }
             }
-            c_echo('%n' . PHP_EOL);
         }
     }
 }

@@ -18,6 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -25,6 +26,7 @@
 namespace App\ApiClients;
 
 use Exception;
+use Illuminate\Http\Client\Response;
 use LibreNMS\Config;
 use LibreNMS\Interfaces\Geocoder;
 
@@ -38,7 +40,7 @@ class GoogleMapsApi extends BaseApi implements Geocoder
     /**
      * Get latitude and longitude from geocode response
      *
-     * @param array $data
+     * @param  array  $data
      * @return array
      */
     protected function parseLatLng($data)
@@ -52,7 +54,7 @@ class GoogleMapsApi extends BaseApi implements Geocoder
     /**
      * Get messages from response.
      *
-     * @param array $data
+     * @param  array  $data
      * @return array
      */
     protected function parseMessages($data)
@@ -66,8 +68,9 @@ class GoogleMapsApi extends BaseApi implements Geocoder
     /**
      * Build Guzzle request option array
      *
-     * @param string $address
+     * @param  string  $address
      * @return array
+     *
      * @throws \Exception you may throw an Exception if validation fails
      */
     protected function buildGeocodingOptions($address)
@@ -87,14 +90,9 @@ class GoogleMapsApi extends BaseApi implements Geocoder
 
     /**
      * Checks if the request was a success
-     *
-     * @param \Psr\Http\Message\ResponseInterface $response
-     * @param array $data decoded response data
-     * @return bool
-     * @throws Exception you may throw an Exception if validation fails
      */
-    protected function checkResponse($response, $data)
+    protected function checkResponse(Response $response, array $data): bool
     {
-        return $response->getStatusCode() == 200 && $data['status'] == 'OK';
+        return $response->successful() && $data['status'] == 'OK';
     }
 }

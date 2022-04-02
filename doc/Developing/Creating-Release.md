@@ -1,6 +1,3 @@
-source: Developing/Creating-Release.md
-path: blob/master/doc/
-
 # Creating a release
 
 ### GitHub

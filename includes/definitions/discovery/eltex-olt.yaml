@@ -1,5 +1,10 @@
 mib: ELTEX-LTP8X-STANDALONE
 modules:
+    os:
+        hardware: ELTEX-LTP8X-STANDALONE::ltp8xFirmwareRevision.0
+        hardware_regex: '/(?<hardware>[^:]*):/'
+        version: ELTEX-LTP8X-STANDALONE::ltp8xFirmwareRevision.0
+        version_regex: '/(software version| on)(?<version>.*)/'
     processors:
         data:
             -

@@ -1,6 +1,3 @@
-source: Extensions/Proxmox.md
-path: blob/master/doc/
-
 # Proxmox graphing
 
 It is possible to create graphs of the Proxmox **VMs** that run on

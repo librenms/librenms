@@ -18,6 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2020 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -36,9 +37,9 @@ class Allied extends OS implements OSDiscovery
         //Legacy products: at8024, at8024GB, at8024M, at8016F, at8026FC
         $data = snmp_get_multi_oid($this->getDeviceArray(), ['atiswitchProductType.0', 'atiswitchSwVersion.0', 'atiswitchSw.0'], '-OsvQU', 'AtiSwitch-MIB');
 
-        $hardware = $data['atiswitchProductType.0'];
-        $version = $data['atiswitchSwVersion.0'];
-        $software = $data['atiswitchSw.0'];
+        $hardware = $data['atiswitchProductType.0'] ?? null;
+        $version = $data['atiswitchSwVersion.0'] ?? null;
+        $software = $data['atiswitchSw.0'] ?? null;
 
         if ($software && $version) {
             $version = $software . ' ' . $version;
@@ -58,9 +59,9 @@ class Allied extends OS implements OSDiscovery
         if (! $hardware && ! $version) {
             $data = snmp_get_multi_oid($this->getDeviceArray(), ['.1.3.6.1.4.1.207.8.17.1.3.1.6.1', '.1.3.6.1.4.1.207.8.17.1.3.1.5.1', '.1.3.6.1.4.1.207.8.17.1.3.1.8.1']);
 
-            $hardware = $data['.1.3.6.1.4.1.207.8.17.1.3.1.6.1'];
-            $version = $data['.1.3.6.1.4.1.207.8.17.1.3.1.5.1'];
-            $serial = $data['.1.3.6.1.4.1.207.8.17.1.3.1.8.1'];
+            $hardware = $data['.1.3.6.1.4.1.207.8.17.1.3.1.6.1'] ?? null;
+            $version = $data['.1.3.6.1.4.1.207.8.17.1.3.1.5.1'] ?? null;
+            $serial = $data['.1.3.6.1.4.1.207.8.17.1.3.1.8.1'] ?? null;
         }
 
         //Gets OS outputting "Alliedware Plus" instead of just Alliedware.
@@ -72,7 +73,7 @@ class Allied extends OS implements OSDiscovery
           sysDescr.0 = STRING: "Allied Telesyn AT-8948 version 2.7.4-02 22-Aug-2005"
           sysDescr.0 = STRING: "Allied Telesis AT-8624T/2M version 2.9.1-13 11-Dec-2007"
         Use sysDescr to get Hardware, SW version, and Serial*/
-        [$a, $b, $c, $d, $e, $f] = explode(' ', $this->getDeviceArray()['sysDescr']);
+        [$a, $b, $c, $d, $e, $f] = array_pad(explode(' ', $this->getDeviceArray()['sysDescr']), 6, null);
         if (! $hardware && ! $version) {
             if ($a == 'Allied' && $d == 'version') {
                 $version = $e;

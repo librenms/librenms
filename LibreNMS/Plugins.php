@@ -18,7 +18,9 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>
  *
  * @author     LibreNMS Group
+ *
  * @link       https://www.librenms.org
+ *
  * @copyright  2016
  */
 
@@ -31,7 +33,9 @@ use Log;
  * Handles loading of plugins
  *
  * @author     LibreNMS Group
+ *
  * @link       https://www.librenms.org
+ *
  * @copyright  2016
  *
  * Supported hooks
@@ -90,8 +94,8 @@ class Plugins
     /**
      * Load plugin
      *
-     * @param  string $file       Full path and filename of plugin
-     * @param  string $pluginName Plugin name without any namespace
+     * @param  string  $file  Full path and filename of plugin
+     * @param  string  $pluginName  Plugin name without any namespace
      * @return object|null
      */
     public static function load($file, $pluginName)
@@ -119,8 +123,8 @@ class Plugins
      * Get an instance of this plugin
      * Search various namespaces and include files if needed.
      *
-     * @param string $file
-     * @param string $pluginName
+     * @param  string  $file
+     * @param  string  $pluginName
      * @return object|null
      */
     private static function getInstance($file, $pluginName)
@@ -151,7 +155,7 @@ class Plugins
     /**
      * Get all plugins implementing a specific hook.
      *
-     * @param  string $hook Name of the hook to get count for
+     * @param  string  $hook  Name of the hook to get count for
      * @return int|bool
      */
     public static function countHooks($hook)
@@ -168,8 +172,8 @@ class Plugins
     /**
      * Call hook for plugin.
      *
-     * @param string $hook Name of hook to call
-     * @param array|false $params Optional array of parameters for hook
+     * @param  string  $hook  Name of hook to call
+     * @param  array|false  $params  Optional array of parameters for hook
      * @return string
      */
     public static function call($hook, $params = false)
@@ -209,5 +213,41 @@ class Plugins
         self::start();
 
         return count(self::$plugins);
+    }
+
+    public static function scanNew()
+    {
+        $countInstalled = 0;
+
+        if (file_exists(\LibreNMS\Config::get('plugin_dir'))) {
+            $plugin_files = array_diff(scandir(\LibreNMS\Config::get('plugin_dir')), ['..', '.']);
+            $plugin_files = array_diff($plugin_files, Plugin::versionOne()->pluck('plugin_name')->toArray());
+            foreach ($plugin_files as $name) {
+                if (is_dir(\LibreNMS\Config::get('plugin_dir') . '/' . $name)
+                    && is_file(\LibreNMS\Config::get('plugin_dir') . '/' . $name . '/' . $name . '.php')) {
+                    Plugin::create(['plugin_name' => $name, 'plugin_active' => false, 'version' => 1]);
+                    $countInstalled++;
+                }
+            }
+        }
+
+        return $countInstalled;
+    }
+
+    public static function scanRemoved()
+    {
+        $countRemoved = 0;
+
+        if (file_exists(\LibreNMS\Config::get('plugin_dir'))) {
+            $plugin_files = array_diff(scandir(\LibreNMS\Config::get('plugin_dir')), ['.', '..', '.gitignore']);
+            $plugins = Plugin::versionOne()->whereNotIn('plugin_name', $plugin_files)->select('plugin_id')->get();
+            foreach ($plugins as $plugin) {
+                if ($plugin->delete()) {
+                    $countRemoved++;
+                }
+            }
+        }
+
+        return $countRemoved;
     }
 }

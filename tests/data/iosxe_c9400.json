@@ -5,7 +5,7 @@
                 {
                     "sysName": "<private>",
                     "sysObjectID": ".1.3.6.1.4.1.9.1.1116",
-                    "sysDescr": "Cisco IOS Software, ASR1000 Software (PPC_LINUX_IOSD-ADVENTERPRISEK9-M), Version 15.5(3)S1a, RELEASE SOFTWARE (fc1)\nTechnical Support: http://www.cisco.com/techsupport\r\nCopyright (c) 1986-2015 by Cisco Systems, Inc.\r\nCompiled Wed 04-Nov-15 17:40 by mcpre",
+                    "sysDescr": "Cisco IOS Software, ASR1000 Software (PPC_LINUX_IOSD-ADVENTERPRISEK9-M), Version 15.5(3)S1a, RELEASE SOFTWARE (fc1)\r\nTechnical Support: http://www.cisco.com/techsupport\r\nCopyright (c) 1986-2015 by Cisco Systems, Inc.\r\nCompiled Wed 04-Nov-15 17:40 by mcpre",
                     "sysContact": "<private>",
                     "version": "15.5(3)S1a",
                     "hardware": "C9404R",
@@ -34293,5 +34293,89 @@
                 }
             ]
         }
+    },
+    "stp": {
+        "discovery": {
+            "stp": [
+                {
+                    "vlan": null,
+                    "rootBridge": 0,
+                    "bridgeAddress": "00eeab8f4200",
+                    "protocolSpecification": "unknown",
+                    "priority": 32769,
+                    "timeSinceTopologyChange": "2879862",
+                    "topChanges": 167,
+                    "designatedRoot": "002f5c034480",
+                    "rootCost": 2,
+                    "rootPort": 193,
+                    "maxAge": 20,
+                    "helloTime": 2,
+                    "holdTime": 1,
+                    "forwardDelay": 15,
+                    "bridgeMaxAge": 20,
+                    "bridgeHelloTime": 2,
+                    "bridgeForwardDelay": 15
+                }
+            ],
+            "ports_stp": [
+                {
+                    "vlan": null,
+                    "port_index": 97,
+                    "priority": 128,
+                    "state": "forwarding",
+                    "enable": "enabled",
+                    "pathCost": 2,
+                    "designatedRoot": "002f5c034480",
+                    "designatedCost": 2,
+                    "designatedBridge": "00eeab8f4200",
+                    "designatedPort": 97,
+                    "forwardTransitions": 21,
+                    "ifIndex": 50
+                },
+                {
+                    "vlan": null,
+                    "port_index": 98,
+                    "priority": 128,
+                    "state": "forwarding",
+                    "enable": "enabled",
+                    "pathCost": 4,
+                    "designatedRoot": "002f5c034480",
+                    "designatedCost": 2,
+                    "designatedBridge": "00eeab8f4200",
+                    "designatedPort": 98,
+                    "forwardTransitions": 1,
+                    "ifIndex": 51
+                },
+                {
+                    "vlan": null,
+                    "port_index": 193,
+                    "priority": 128,
+                    "state": "forwarding",
+                    "enable": "enabled",
+                    "pathCost": 2,
+                    "designatedRoot": "002f5c034480",
+                    "designatedCost": 0,
+                    "designatedBridge": "002f5c034480",
+                    "designatedPort": 11,
+                    "forwardTransitions": 17,
+                    "ifIndex": 60
+                },
+                {
+                    "vlan": null,
+                    "port_index": 194,
+                    "priority": 128,
+                    "state": "forwarding",
+                    "enable": "enabled",
+                    "pathCost": 4,
+                    "designatedRoot": "002f5c034480",
+                    "designatedCost": 2,
+                    "designatedBridge": "00eeab8f4200",
+                    "designatedPort": 194,
+                    "forwardTransitions": 1,
+                    "ifIndex": 61
+                }
+            ]
+        },
+        "poller": "matches discovery"
     }
 }

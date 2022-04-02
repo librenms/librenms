@@ -18,6 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2020 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -70,8 +71,10 @@ class ShowConfigController extends Controller implements DeviceTab
     private function oxidizedEnabled(Device $device)
     {
         return Config::get('oxidized.enabled') === true
-            && Config::has('oxidized.url')
-            && $device->getAttrib('override_Oxidized_disable') !== 'true';
+                && Config::has('oxidized.url')
+                && $device->getAttrib('override_Oxidized_disable') !== 'true'
+                && ! in_array($device->type, Config::get('oxidized.ignore_types', []))
+                && ! in_array($device->os, Config::get('oxidized.ignore_os', []));
     }
 
     private function getRancidPath()

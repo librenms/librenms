@@ -18,6 +18,7 @@
  * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * @link       https://www.librenms.org
+ *
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -50,7 +51,7 @@ abstract class TableController extends PaginatedAjaxController
     }
 
     /**
-     * @param Request $request
+     * @param  Request  $request
      * @return \Illuminate\Http\JsonResponse
      */
     public function __invoke(Request $request)
@@ -76,7 +77,7 @@ abstract class TableController extends PaginatedAjaxController
     }
 
     /**
-     * @param LengthAwarePaginator $paginator
+     * @param  LengthAwarePaginator  $paginator
      * @return \Illuminate\Http\JsonResponse
      */
     protected function formatResponse($paginator)

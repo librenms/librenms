@@ -108,8 +108,8 @@ class Mempools implements Module
     }
 
     /**
-     * @param OS $os
-     * @param \Illuminate\Support\Collection $mempools
+     * @param  \LibreNMS\OS  $os
+     * @param  \Illuminate\Support\Collection  $mempools
      * @return \Illuminate\Support\Collection
      */
     private function defaultPolling($os, $mempools)
@@ -176,9 +176,9 @@ class Mempools implements Module
             }
 
             if ($system !== null) {
-                $old = Number::formatBi($system->mempool_free, 2, 3, 'iB');
+                $old = Number::formatBi($system->mempool_free);
                 $system->fillUsage(($system->mempool_used - $buffers - $cached) / $system->mempool_precision, $system->mempool_total / $system->mempool_precision);
-                $new = Number::formatBi($system->mempool_free, 2, 3, 'iB');
+                $new = Number::formatBi($system->mempool_free);
                 Log::debug("Free memory adjusted by availability calculation: {$old} -> {$new}\n");
             }
         }
@@ -190,8 +190,8 @@ class Mempools implements Module
     {
         echo "$mempool->mempool_type [$mempool->mempool_class]: $mempool->mempool_descr: $mempool->mempool_perc%";
         if ($mempool->mempool_total != 100) {
-            $used = Number::formatBi($mempool->mempool_used, 2, 3, 'iB');
-            $total = Number::formatBi($mempool->mempool_total, 2, 3, 'iB');
+            $used = Number::formatBi($mempool->mempool_used);
+            $total = Number::formatBi($mempool->mempool_total);
             echo "  {$used} / {$total}";
         }
         echo PHP_EOL;

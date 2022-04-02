@@ -1,0 +1,83 @@
+mib: XF-RADIOLINK-PTP-RADIO-MIB:XF-RADIOLINK-RLT-MIB:ENTITY-MIB:IF-MIB
+modules:
+    os:
+        hardware: ENTITY-MIB::entPhysicalDescr.1 
+        version: XF-SOFTWARE-MIB::xfSwReleaseRevision.1        
+    sensors:
+        pre-cache:
+            data:
+                -
+                    oid:
+                        - entPhysicalName
+                        - ifName
+        temperature:
+            data:
+                -
+                    oid: XfRAUEntry
+                    value: xfRAUTemperature
+                    num_oid: .1.3.6.1.4.1.193.81.3.4.3.1.1.1.8.{{ $index }}
+                    descr: 'RAU: {{ $entPhysicalName }}'
+
+        runtime:
+            data:
+                -
+                    oid: xfTermTimeElapsed
+                    num_oid: .1.3.6.1.4.1.193.81.3.4.1.1.4.1.1.{{ $index }}
+                    index: 'xfTermTimeElapsed.{{ $index }}'
+                    descr: 'Current Error Period: {{ $ifName }}'                    
+                -
+                    oid: xfTermCurrentES
+                    num_oid: .1.3.6.1.4.1.193.81.3.4.1.1.4.1.2.{{ $index }}
+                    index: 'xfTermCurrentES.{{ $index }}'
+                    descr: 'Errored Seconds: {{ $ifName }}'                    
+                -
+                    oid: xfTermCurrentSES
+                    num_oid: .1.3.6.1.4.1.193.81.3.4.1.1.4.1.3.{{ $index }}
+                    index: 'xfTermCurrentSES.{{ $index }}'
+                    descr: 'Severly Errored Seconds: {{ $ifName }}'
+                -
+                    oid: xfTermCurrentUAS
+                    num_oid: .1.3.6.1.4.1.193.81.3.4.1.1.4.1.5.{{ $index }}
+                    index: 'xfTermCurrentUAS.{{ $index }}'
+                    descr: 'Unavailable Seconds: {{ $ifName }}'
+        count:
+            data:
+                -
+                    oid: xfTermCurrentBBE
+                    num_oid: .1.3.6.1.4.1.193.81.3.4.1.1.4.1.4.{{ $index }}
+                    index: 'xfTermCurrentBBE.{{ $index }}'
+                    descr: 'Background Block Errors: {{ $ifName }}'
+                -
+                    oid: xfTermCurrentBB 
+                    num_oid: .1.3.6.1.4.1.193.81.3.4.1.1.4.1.6.{{ $index }}
+                    index: 'xfTermCurrentBB.{{ $index }}'
+                    descr: 'Background blocks: {{ $ifName }}'
+        state:
+            data:
+                -
+                    oid: xfRFTxOperStatus
+                    value: xfRFTxOperStatus
+                    num_oid: '.1.3.6.1.4.1.193.81.3.4.3.1.2.1.7.{{ $index }}'
+                    descr: 'RAU: {{ $ifName }}'
+                    group: Operational status
+                    index: 'xfRFTxOperStatus.{{ $index }}'
+                    state_name: Operational status
+                    states:
+                        - { value: 4, generic: 3, graph: 0, descr: 'Stand-by' }
+                        - { value:  3, generic: 0, graph: 0, descr: TX On }
+                        - { value:  2, generic: 2, graph: 0, descr: TX Off }
+                        - { value:  1, generic: 3, graph: 0, descr: Other }
+
+                -
+                    oid: xfRFTxAdminStatus
+                    value: xfRFTxAdminStatus
+                    num_oid: '.1.3.6.1.4.1.193.81.3.4.3.1.2.1.8.{{ $index }}'
+                    descr: 'RAU: {{ $ifName }}'
+                    group: Admin status
+                    index: 'xfRFTxAdminStatus.{{ $index }}'
+                    state_name: Admin status
+                    states:
+                        - { value: 4, generic: 3, graph: 0, descr: 'Stand-by' }
+                        - { value:  3, generic: 0, graph: 0, descr: TX On }
+                        - { value:  2, generic: 2, graph: 0, descr: TX Off }
+                        - { value:  1, generic: 3, graph: 0, descr: Other }

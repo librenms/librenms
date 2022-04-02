@@ -4,7 +4,7 @@
 
 // This is the user LibreNMS will run as
 //Please ensure this user is created and has the correct permissions to your install
-$config['user'] = 'librenms';
+#$config['user'] = 'librenms';
 
 ### This should *only* be set if you want to *force* a particular hostname/port
 ### It will prevent the web interface being usable form any other hostname
@@ -15,10 +15,10 @@ $config['user'] = 'librenms';
 #$config['rrdcached']    = "unix:/var/run/rrdcached.sock";
 
 ### Default community
-$config['snmp']['community'] = array('public');
+#$config['snmp']['community'] = array('public');
 
 ### Authentication Model
-$config['auth_mechanism'] = "mysql"; # default, other options: ldap, http-auth
+#$config['auth_mechanism'] = "mysql"; # default, other options: ldap, http-auth
 #$config['http_auth_guest'] = "guest"; # remember to configure this user if you use http-auth
 
 ### List of RFC1918 networks to allow scanning-based discovery
@@ -30,7 +30,7 @@ $config['auth_mechanism'] = "mysql"; # default, other options: ldap, http-auth
 #$config['update'] = 0;
 
 # Number in days of how long to keep old rrd files. 0 disables this feature
-$config['rrd_purge'] = 0;
+#$config['rrd_purge'] = 0;
 
 # Uncomment to submit callback stats via proxy
 #$config['callback_proxy'] = "hostname:port";
@@ -39,7 +39,7 @@ $config['rrd_purge'] = 0;
 #$config['default_port_association_mode'] = 'ifIndex';
 
 # Enable the in-built billing extension
-$config['enable_billing'] = 1;
+#$config['enable_billing'] = 1;
 
 # Enable the in-built services support (Nagios plugins)
-$config['show_services'] = 1;
+#$config['show_services'] = 1;

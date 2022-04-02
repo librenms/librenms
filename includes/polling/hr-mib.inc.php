@@ -2,9 +2,11 @@
 
 // HOST-RESOURCES-MIB
 // Generic System Statistics
+
+use App\Models\HrSystem;
 use LibreNMS\RRD\RrdDefinition;
 
-$oid_list = ['hrSystemProcesses.0', 'hrSystemNumUsers.0'];
+$oid_list = ['hrSystemMaxProcesses.0', 'hrSystemProcesses.0', 'hrSystemNumUsers.0'];
 $hrSystem = snmp_get_multi($device, $oid_list, '-OUQs', 'HOST-RESOURCES-MIB');
 
 if (is_numeric($hrSystem[0]['hrSystemProcesses'])) {
@@ -30,6 +32,11 @@ if (is_numeric($hrSystem[0]['hrSystemNumUsers'])) {
     ];
 
     data_update($device, 'hr_users', $tags, $fields);
+
+    HrSystem::updateOrCreate(['device_id' => $device['device_id']],
+                             ['hrSystemNumUsers' => $hrSystem[0]['hrSystemNumUsers'],
+                                 'hrSystemProcesses' => $hrSystem[0]['hrSystemProcesses'],
+                                 'hrSystemMaxProcesses' => $hrSystem[0]['hrSystemMaxProcesses'], ]);
 
     $os->enableGraph('hr_users');
     echo ' Users';

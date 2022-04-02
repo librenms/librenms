@@ -31,7 +31,7 @@ function bulk_sensor_snmpget($device, $sensors)
 
 /**
  * @param $device
- * @param string $type type/class of sensor
+ * @param  string  $type  type/class of sensor
  * @return array
  */
 function sensor_precache($device, $type)
@@ -226,8 +226,8 @@ function record_sensor_data($device, $all_sensors)
 }
 
 /**
- * @param array $device The device to poll
- * @param bool $force_module Ignore device module overrides
+ * @param  array  $device  The device to poll
+ * @param  bool  $force_module  Ignore device module overrides
  * @return bool
  */
 function poll_device($device, $force_module = false)
@@ -236,10 +236,9 @@ function poll_device($device, $force_module = false)
 
     $device_start = microtime(true);
 
-    $attribs = DeviceCache::getPrimary()->getAttribs();
-    $device['attribs'] = $attribs;
+    $deviceModel = DeviceCache::getPrimary();
+    $device['attribs'] = $deviceModel->getAttribs();
 
-    load_os($device);
     $os = \LibreNMS\OS::make($device);
 
     unset($array);
@@ -289,43 +288,55 @@ function poll_device($device, $force_module = false)
         echo "Created directory : $host_rrd\n";
     }
 
-    $response = device_is_up($device, true);
+    $helper = new \LibreNMS\Polling\ConnectivityHelper($deviceModel);
+    $helper->saveMetrics();
 
-    if ($response['status'] == '1') {
+    if ($helper->isUp()) {
         if ($device['snmp_disable']) {
-            Config::set('poller_modules', ['availability' => true]);
+            // only non-snmp modules
+            Config::set('poller_modules', array_intersect_key(Config::get('poller_modules'), [
+                'availability' => true,
+                'ipmi' => true,
+                'unix-agent' => true,
+            ]));
         } else {
             // we always want the core module to be included, prepend it
-            Config::set('poller_modules', ['core' => true, 'availability' => true] + Config::get('poller_modules'));
+            Config::set('poller_modules', ['core' => true] + Config::get('poller_modules'));
         }
 
-        printChangedStats(true); // don't count previous stats
+        // update $device array status
+        $device['status'] = $deviceModel->status;
+        $device['status_reason'] = $deviceModel->status_reason;
+
+        /** @var \App\Polling\Measure\MeasurementManager $measurements */
+        $measurements = app(\App\Polling\Measure\MeasurementManager::class);
+        $measurements->checkpoint(); // don't count previous stats
+
         foreach (Config::get('poller_modules') as $module => $module_status) {
             $os_module_status = Config::get("os.{$device['os']}.poller_modules.$module");
             d_echo('Modules status: Global' . (isset($module_status) ? ($module_status ? '+ ' : '- ') : '  '));
             d_echo('OS' . (isset($os_module_status) ? ($os_module_status ? '+ ' : '- ') : '  '));
-            d_echo('Device' . (isset($attribs['poll_' . $module]) ? ($attribs['poll_' . $module] ? '+ ' : '- ') : '  '));
+            d_echo('Device' . (isset($device['attribs']['poll_' . $module]) ? ($device['attribs']['poll_' . $module] ? '+ ' : '- ') : '  '));
             if ($force_module === true ||
-                $attribs['poll_' . $module] ||
-                ($os_module_status && ! isset($attribs['poll_' . $module])) ||
-                ($module_status && ! isset($os_module_status) && ! isset($attribs['poll_' . $module]))) {
+                $device['attribs']['poll_' . $module] ||
+                ($os_module_status && ! isset($device['attribs']['poll_' . $module])) ||
+                ($module_status && ! isset($os_module_status) && ! isset($device['attribs']['poll_' . $module]))) {
                 $start_memory = memory_get_usage();
                 $module_start = microtime(true);
                 echo "\n#### Load poller module $module ####\n";
 
                 try {
                     include "includes/polling/$module.inc.php";
-                } catch (Exception $e) {
+                } catch (Throwable $e) {
                     // isolate module exceptions so they don't disrupt the polling process
-                    echo $e->getTraceAsString() . PHP_EOL;
-                    c_echo("%rError in $module module.%n " . $e->getMessage() . PHP_EOL);
-                    logfile("Error in $module module. " . $e->getMessage() . PHP_EOL . $e->getTraceAsString() . PHP_EOL);
+                    Log::error("%rError polling $module module for {$device['hostname']}.%n " . $e->getMessage() . PHP_EOL . $e->getTraceAsString(), ['color' => true]);
+                    Log::event("Error polling $module module. Check log file for more details.", $device['device_id'], 'poller', Alert::ERROR);
                 }
 
                 $module_time = microtime(true) - $module_start;
                 $module_mem = (memory_get_usage() - $start_memory);
                 printf("\n>> Runtime for poller module '%s': %.4f seconds with %s bytes\n", $module, $module_time, $module_mem);
-                printChangedStats();
+                $measurements->printChangedStats();
                 echo "#### Unload poller module $module ####\n\n";
 
                 // save per-module poller stats
@@ -346,7 +357,7 @@ function poll_device($device, $force_module = false)
                     unlink($oldrrd);
                 }
                 unset($tags, $fields, $oldrrd);
-            } elseif (isset($attribs['poll_' . $module]) && $attribs['poll_' . $module] == '0') {
+            } elseif (isset($device['attribs']['poll_' . $module]) && $device['attribs']['poll_' . $module] == '0') {
                 echo "Module [ $module ] disabled on host.\n\n";
             } elseif (isset($os_module_status) && $os_module_status == '0') {
                 echo "Module [ $module ] disabled on os.\n\n";
@@ -356,18 +367,7 @@ function poll_device($device, $force_module = false)
         }
 
         // Ping response
-        if (can_ping_device($attribs) === true && ! empty($response['ping_time'])) {
-            $tags = [
-                'rrd_def' => RrdDefinition::make()->addDataset('ping', 'GAUGE', 0, 65535),
-            ];
-            $fields = [
-                'ping' => $response['ping_time'],
-            ];
-
-            $update_array['last_ping'] = ['NOW()'];
-            $update_array['last_ping_timetaken'] = $response['ping_time'];
-
-            data_update($device, 'ping-perf', $tags, $fields);
+        if ($helper->canPing()) {
             $os->enableGraph('ping_perf');
         }
 
@@ -377,7 +377,7 @@ function poll_device($device, $force_module = false)
         if (! empty($device_time)) {
             $tags = [
                 'rrd_def' => RrdDefinition::make()->addDataset('poller', 'GAUGE', 0),
-                'module'  => 'ALL',
+                'module' => 'ALL',
             ];
             $fields = [
                 'poller' => $device_time,
@@ -404,7 +404,10 @@ function poll_device($device, $force_module = false)
             echo PHP_EOL;
         }
 
-        $updated = dbUpdate($update_array, 'devices', '`device_id` = ?', [$device['device_id']]);
+        $updated = false;
+        if (! empty($update_array)) {
+            $updated = dbUpdate($update_array, 'devices', '`device_id` = ?', [$device['device_id']]);
+        }
         if ($updated) {
             d_echo('Updating ' . $device['hostname'] . PHP_EOL);
         }
@@ -436,10 +439,10 @@ function poll_device($device, $force_module = false)
  * The group name (key) will be prepended to each metric in that group, separated by an underscore
  * The special group "none" will not be prefixed.
  *
- * @param array $app app from the db, including app_id
- * @param string $response This should be the return state of Application polling
- * @param array $metrics an array of additional metrics to store in the database for alerting
- * @param string $status This is the current value for alerting
+ * @param  array  $app  app from the db, including app_id
+ * @param  string  $response  This should be the return state of Application polling
+ * @param  array  $metrics  an array of additional metrics to store in the database for alerting
+ * @param  string  $status  This is the current value for alerting
  */
 function update_application($app, $response, $metrics = [], $status = '')
 {
@@ -529,6 +532,7 @@ function update_application($app, $response, $metrics = [], $status = '')
 
         echo ': ';
         foreach ($metrics as $metric_name => $value) {
+            $value = (float) $value; // cast
             if (! isset($db_metrics[$metric_name])) {
                 // insert new metric
                 dbInsert(
@@ -608,11 +612,11 @@ function update_application($app, $response, $metrics = [], $status = '')
  *
  * If the error is less than -1, you can assume it is a legacy snmp extend script.
  *
- * @param array $device
- * @param string $extend the extend name. For example, if 'zfs' is passed it will be converted to 'nsExtendOutputFull.3.122.102.115'.
- * @param int $min_version the minimum version to accept for the returned JSON. default: 1
- *
+ * @param  array  $device
+ * @param  string  $extend  the extend name. For example, if 'zfs' is passed it will be converted to 'nsExtendOutputFull.3.122.102.115'.
+ * @param  int  $min_version  the minimum version to accept for the returned JSON. default: 1
  * @return array The json output data parsed into an array
+ *
  * @throws JsonAppBlankJsonException
  * @throws JsonAppExtendErroredException
  * @throws JsonAppMissingKeysException
@@ -666,11 +670,10 @@ function json_app_get($device, $extend, $min_version = 1)
  *
  * One argument is taken and that is the array to flatten.
  *
- * @param array $array
- * @param string $prefix What to prefix to the name. Defaults to '', nothing.
- * @param string $joiner The string to join the prefix, if set to something other
- *                       than '', and array keys with.
- *
+ * @param  array  $array
+ * @param  string  $prefix  What to prefix to the name. Defaults to '', nothing.
+ * @param  string  $joiner  The string to join the prefix, if set to something other
+ *                          than '', and array keys with.
  * @return array The flattened array.
  */
 function data_flatten($array, $prefix = '', $joiner = '_')

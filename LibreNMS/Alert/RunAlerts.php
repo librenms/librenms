@@ -30,10 +30,11 @@
 
 namespace LibreNMS\Alert;
 
-use App\Models\DevicePerf;
+use App\Facades\DeviceCache;
 use LibreNMS\Config;
 use LibreNMS\Enum\Alert;
 use LibreNMS\Enum\AlertState;
+use LibreNMS\Polling\ConnectivityHelper;
 use LibreNMS\Util\Time;
 use Log;
 
@@ -41,8 +42,9 @@ class RunAlerts
 {
     /**
      * Populate variables
-     * @param string  $txt  Text with variables
-     * @param bool $wrap Wrap variable for text-usage (default: true)
+     *
+     * @param  string  $txt  Text with variables
+     * @param  bool  $wrap  Wrap variable for text-usage (default: true)
      * @return string
      */
     public function populate($txt, $wrap = true)
@@ -76,48 +78,49 @@ class RunAlerts
 
     /**
      * Describe Alert
-     * @param array $alert Alert-Result from DB
+     *
+     * @param  array  $alert  Alert-Result from DB
      * @return array|bool|string
      */
     public function describeAlert($alert)
     {
         $obj = [];
         $i = 0;
-        $device = dbFetchRow('SELECT hostname, sysName, sysDescr, sysContact, os, type, ip, hardware, version, serial, features, purpose, notes, uptime, status, status_reason, locations.location FROM devices LEFT JOIN locations ON locations.id = devices.location_id WHERE device_id = ?', [$alert['device_id']]);
-        $attribs = get_dev_attribs($alert['device_id']);
+        $device = DeviceCache::get($alert['device_id']);
 
-        $obj['hostname'] = $device['hostname'];
-        $obj['sysName'] = $device['sysName'];
-        $obj['sysDescr'] = $device['sysDescr'];
-        $obj['sysContact'] = $device['sysContact'];
-        $obj['os'] = $device['os'];
-        $obj['type'] = $device['type'];
-        $obj['ip'] = inet6_ntop($device['ip']);
-        $obj['hardware'] = $device['hardware'];
-        $obj['version'] = $device['version'];
-        $obj['serial'] = $device['serial'];
-        $obj['features'] = $device['features'];
-        $obj['location'] = $device['location'];
-        $obj['uptime'] = $device['uptime'];
-        $obj['uptime_short'] = Time::formatInterval($device['uptime'], 'short');
-        $obj['uptime_long'] = Time::formatInterval($device['uptime']);
-        $obj['description'] = $device['purpose'];
-        $obj['notes'] = $device['notes'];
+        $obj['hostname'] = $device->hostname;
+        $obj['sysName'] = $device->sysName;
+        $obj['display'] = $device->displayName();
+        $obj['sysDescr'] = $device->sysDescr;
+        $obj['sysContact'] = $device->sysContact;
+        $obj['os'] = $device->os;
+        $obj['type'] = $device->type;
+        $obj['ip'] = $device->ip;
+        $obj['hardware'] = $device->hardware;
+        $obj['version'] = $device->version;
+        $obj['serial'] = $device->serial;
+        $obj['features'] = $device->features;
+        $obj['location'] = (string) $device->location;
+        $obj['uptime'] = $device->uptime;
+        $obj['uptime_short'] = Time::formatInterval($device->uptime, 'short');
+        $obj['uptime_long'] = Time::formatInterval($device->uptime);
+        $obj['description'] = $device->purpose;
+        $obj['notes'] = $device->notes;
         $obj['alert_notes'] = $alert['note'];
-        $obj['device_id'] = $alert['device_id'];
+        $obj['device_id'] = $device->device_id;
         $obj['rule_id'] = $alert['rule_id'];
         $obj['id'] = $alert['id'];
         $obj['proc'] = $alert['proc'];
-        $obj['status'] = $device['status'];
-        $obj['status_reason'] = $device['status_reason'];
-        if (can_ping_device($attribs)) {
-            $ping_stats = DevicePerf::where('device_id', $alert['device_id'])->latest('timestamp')->first();
+        $obj['status'] = $device->status;
+        $obj['status_reason'] = $device->status_reason;
+        if ((new ConnectivityHelper($device))->canPing()) {
+            $ping_stats = $device->perf()->latest('timestamp')->first();
             $obj['ping_timestamp'] = $ping_stats->timestamp;
             $obj['ping_loss'] = $ping_stats->loss;
             $obj['ping_min'] = $ping_stats->min;
             $obj['ping_max'] = $ping_stats->max;
             $obj['ping_avg'] = $ping_stats->avg;
-            $obj['debug'] = json_decode($ping_stats->debug, true);
+            $obj['debug'] = $ping_stats->debug;
         }
         $extra = $alert['details'];
 
@@ -125,7 +128,7 @@ class RunAlerts
         $template = $tpl->getTemplate($obj);
 
         if ($alert['state'] >= AlertState::ACTIVE) {
-            $obj['title'] = $template->title ?: 'Alert for device ' . $device['hostname'] . ' - ' . ($alert['name'] ? $alert['name'] : $alert['rule']);
+            $obj['title'] = $template->title ?: 'Alert for device ' . $obj['display'] . ' - ' . ($alert['name'] ?: $alert['rule']);
             if ($alert['state'] == AlertState::ACKNOWLEDGED) {
                 $obj['title'] .= ' got acknowledged';
             } elseif ($alert['state'] == AlertState::WORSE) {
@@ -164,7 +167,7 @@ class RunAlerts
             $extra['count'] = 0;
             dbUpdate(['details' => gzcompress(json_encode($id['details']), 9)], 'alert_log', 'id = ?', [$alert['id']]);
 
-            $obj['title'] = $template->title_rec ?: 'Device ' . $device['hostname'] . ' recovered from ' . ($alert['name'] ? $alert['name'] : $alert['rule']);
+            $obj['title'] = $template->title_rec ?: 'Device ' . $obj['display'] . ' recovered from ' . ($alert['name'] ?: $alert['rule']);
             $obj['elapsed'] = $this->timeFormat(strtotime($alert['time_logged']) - strtotime($id['time_logged']));
             $obj['id'] = $id['id'];
             foreach ($extra['rule'] as $incident) {
@@ -196,7 +199,8 @@ class RunAlerts
 
     /**
      * Format Elapsed Time
-     * @param int $secs Seconds elapsed
+     *
+     * @param  int  $secs  Seconds elapsed
      * @return string
      */
     public function timeFormat($secs)
@@ -236,8 +240,9 @@ class RunAlerts
 
     /**
      * Re-Validate Rule-Mappings
-     * @param int $device_id Device-ID
-     * @param int $rule   Rule-ID
+     *
+     * @param  int  $device_id  Device-ID
+     * @param  int  $rule  Rule-ID
      * @return bool
      */
     public function isRuleValid($device_id, $rule)
@@ -258,7 +263,8 @@ class RunAlerts
 
     /**
      * Issue Alert-Object
-     * @param array $alert
+     *
+     * @param  array  $alert
      * @return bool
      */
     public function issueAlert($alert)
@@ -285,6 +291,7 @@ class RunAlerts
 
     /**
      * Issue ACK notification
+     *
      * @return void
      */
     public function runAcks()
@@ -297,6 +304,7 @@ class RunAlerts
 
     /**
      * Run Follow-Up alerts
+     *
      * @return void
      */
     public function runFollowUp()
@@ -381,6 +389,7 @@ class RunAlerts
 
     /**
      * Run all alerts
+     *
      * @return void
      */
     public function runAlerts()
@@ -488,7 +497,8 @@ class RunAlerts
 
     /**
      * Run external transports
-     * @param array $obj Alert-Array
+     *
+     * @param  array  $obj  Alert-Array
      * @return void
      */
     public function extTransports($obj)
@@ -512,7 +522,7 @@ class RunAlerts
         }
 
         foreach ($transport_maps as $item) {
-            $class = 'LibreNMS\\Alert\\Transport\\' . ucfirst($item['transport_type']);
+            $class = Transport::getClass($item['transport_type']);
             if (class_exists($class)) {
                 //FIXME remove Deprecated transport
                 $transport_title = "Transport {$item['transport_type']}";
@@ -576,7 +586,8 @@ class RunAlerts
     /**
      * Check if a device's all parent are down
      * Returns true if all parents are down
-     * @param int $device Device-ID
+     *
+     * @param  int  $device  Device-ID
      * @return bool
      */
     public function isParentDown($device)

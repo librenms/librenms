@@ -1,6 +1,3 @@
-source: Extensions/Syslog.md
-path: blob/master/doc/
-
 # Syslog support
 
 This document will explain how to send syslog data to LibreNMS.
@@ -356,6 +353,17 @@ log host x.x.x.x level notices program imish // Useful for seeing all commands e
 log host x.x.x.x level notices program imi // Required for Oxidized Syslog hook log message.
 log host source <eth0>
 ```
+    
+### HPE/Aruba Procurve
+    
+```config
+configure
+logging severity warning
+logging facility local6
+logging librenms.ip control-descr “LibreNMS”
+logging notify running-config-change
+write memory
+```
 
 If you have permitted udp and tcp 514 through any firewall then that
 should be all you need. Logs should start appearing and displayed
@@ -437,6 +445,12 @@ to the syslog server.
 
 ```ssh
 $config['os']['awplus']['syslog_hook'][] = Array('regex' => '/IMI.+.Startup-config saved on/', 'script' => '/opt/librenms/scripts/syslog-notify-oxidized.php');
+```
+    
+### HPE/Aruba Procurve
+
+```ssh
+$config['os']['procurve']['syslog_hook'][] = Array('regex' => '/Running Config Change/', 'script' => '/opt/librenms/scripts/syslog-notify-oxidized.php');
 ```
 
 ## Configuration Options

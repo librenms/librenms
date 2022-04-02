@@ -7,4 +7,171 @@ modules:
          - SFOS-FIREWALL-MIB::sfosDeviceType.0
       serial:   
          - SFOS-FIREWALL-MIB::sfosDeviceAppKey.0
-
+   sensors:
+      pre-cache:
+         data:
+            -
+               oid:
+                  - sfosIPSecVpnConnName
+      state:
+         data:
+# HA
+            -
+               oid: sfosHAStatus
+               num_oid: '.1.3.6.1.4.1.2604.5.1.4.1.{{ $index }}'
+               index: 'sfosHAStatus.{{ $index }}'
+               descr: 'HA status'
+               group: HA
+               value: sfosHAStatus
+               states:
+                  - { value: 0, graph: 0, generic: 0, descr: disabled }
+                  - { value: 1, graph: 1, generic: 0, descr: enabled }
+            -
+               oid: sfosDeviceCurrentHAState
+               num_oid: '.1.3.6.1.4.1.2604.5.1.4.4.{{ $index }}'
+               index: 'sfosDeviceCurrentHAState.{{ $index }}'
+               descr: 'HA local appliance state'
+               group: HA
+               value: sfosDeviceCurrentHAState
+               states:
+                  - { value: 0, graph: 0, generic: 0, descr: notapplicable }
+                  - { value: 1, graph: 1, generic: 2, descr: auxiliary }
+                  - { value: 2, graph: 2, generic: 2, descr: standAlone }
+                  - { value: 3, graph: 3, generic: 0, descr: primary }
+                  - { value: 4, graph: 4, generic: 2, descr: faulty }
+                  - { value: 5, graph: 5, generic: 0, descr: ready }
+            -
+               oid: sfosDevicePeerHAState
+               num_oid: '.1.3.6.1.4.1.2604.5.1.4.5.{{ $index }}'
+               index: 'sfosDevicePeerHAState.{{ $index }}'
+               descr: 'HA peer appliance state'
+               group: HA
+               value: sfosDevicePeerHAState
+               states:
+                  - { value: 0, graph: 0, generic: 0, descr: notapplicable }
+                  - { value: 1, graph: 1, generic: 0, descr: auxiliary }
+                  - { value: 2, graph: 2, generic: 2, descr: standAlone }
+                  - { value: 3, graph: 3, generic: 2, descr: primary }
+                  - { value: 4, graph: 4, generic: 2, descr: faulty }
+                  - { value: 5, graph: 5, generic: 0, descr: ready }
+# Licensing
+            -
+               oid: sfosNetProtectionLicRegStatus
+               num_oid: '.1.3.6.1.4.1.2604.5.1.5.2.1.{{ $index }}'
+               index: 'sfosNetProtectionLicRegStatus.{{ $index }}'
+               descr: 'Network Protection registration Lic status'
+               group: Licensing
+               value: sfosNetProtectionLicRegStatus
+               states:
+                  - { value: 0, graph: 0, generic: 0, descr: none }
+                  - { value: 1, graph: 1, generic: 0, descr: evaluating }
+                  - { value: 2, graph: 2, generic: 0, descr: notsubscribed }
+                  - { value: 3, graph: 3, generic: 0, descr: subscribed }
+                  - { value: 4, graph: 4, generic: 2, descr: expired }
+                  - { value: 5, graph: 5, generic: 0, descr: deactivated }
+            -
+               oid: sfosWebProtectionLicRegStatus
+               num_oid: '.1.3.6.1.4.1.2604.5.1.5.3.1.{{ $index }}'
+               index: 'sfosWebProtectionLicRegStatus.{{ $index }}'
+               descr: 'Web Protection registration Lic status'
+               group: Licensing
+               value: sfosWebProtectionLicRegStatus
+               states:
+                  - { value: 0, graph: 0, generic: 0, descr: none }
+                  - { value: 1, graph: 1, generic: 0, descr: evaluating }
+                  - { value: 2, graph: 2, generic: 0, descr: notsubscribed }
+                  - { value: 3, graph: 3, generic: 0, descr: subscribed }
+                  - { value: 4, graph: 4, generic: 2, descr: expired }
+                  - { value: 5, graph: 5, generic: 0, descr: deactivated }
+            -
+               oid: sfosMailProtectionLicRegStatus
+               num_oid: '.1.3.6.1.4.1.2604.5.1.5.4.1.{{ $index }}'
+               index: 'sfosMailProtectionLicRegStatus.{{ $index }}'
+               descr: 'EMail Protection Lic Status'
+               group: Licensing
+               value: sfosMailProtectionLicRegStatus
+               states:
+                  - { value: 0, graph: 0, generic: 0, descr: none }
+                  - { value: 1, graph: 1, generic: 0, descr: evaluating }
+                  - { value: 2, graph: 2, generic: 0, descr: notsubscribed }
+                  - { value: 3, graph: 3, generic: 0, descr: subscribed }
+                  - { value: 4, graph: 4, generic: 2, descr: expired }
+                  - { value: 5, graph: 5, generic: 0, descr: deactivated }
+            -
+               oid: sfosWebServerProtectionLicRegStatus
+               num_oid: '.1.3.6.1.4.1.2604.5.1.5.5.1.{{ $index }}'
+               index: 'sfosWebServerProtectionLicRegStatus.{{ $index }}'
+               descr: 'Web Server Protection Lic status'
+               group: Licensing
+               value: sfosWebServerProtectionLicRegStatus
+               states:
+                  - { value: 0, graph: 0, generic: 0, descr: none }
+                  - { value: 1, graph: 1, generic: 0, descr: evaluating }
+                  - { value: 2, graph: 2, generic: 0, descr: notsubscribed }
+                  - { value: 3, graph: 3, generic: 0, descr: subscribed }
+                  - { value: 4, graph: 4, generic: 2, descr: expired }
+                  - { value: 5, graph: 5, generic: 0, descr: deactivated }
+            -
+               oid: sfosSandstromLicRegStatus
+               num_oid: '.1.3.6.1.4.1.2604.5.1.5.6.1.{{ $index }}'
+               index: 'sfosSandstromLicRegStatus.{{ $index }}'
+               descr: 'Sandstorm Protection Lic status'
+               group: Licensing
+               value: sfosSandstromLicRegStatus
+               states:
+                  - { value: 0, graph: 0, generic: 0, descr: none }
+                  - { value: 1, graph: 1, generic: 0, descr: evaluating }
+                  - { value: 2, graph: 2, generic: 0, descr: notsubscribed }
+                  - { value: 3, graph: 3, generic: 0, descr: subscribed }
+                  - { value: 4, graph: 4, generic: 2, descr: expired }
+                  - { value: 5, graph: 5, generic: 0, descr: deactivated }
+            -
+               oid: sfosEnhancedSupportLicRegStatus
+               num_oid: '.1.3.6.1.4.1.2604.5.1.5.7.1.{{ $index }}'
+               index: 'sfosEnhancedSupportLicRegStatus.{{ $index }}'
+               descr: 'Enhanced Support Lic Status'
+               group: Licensing
+               value: sfosEnhancedSupportLicRegStatus
+               states:
+                  - { value: 0, graph: 0, generic: 0, descr: none }
+                  - { value: 1, graph: 1, generic: 0, descr: evaluating }
+                  - { value: 2, graph: 2, generic: 0, descr: notsubscribed }
+                  - { value: 3, graph: 3, generic: 0, descr: subscribed }
+                  - { value: 4, graph: 4, generic: 2, descr: expired }
+                  - { value: 5, graph: 5, generic: 0, descr: deactivated }
+            -
+               oid: sfosEnhancedPlusLicRegStatus
+               num_oid: '.1.3.6.1.4.1.2604.5.1.5.8.1.{{ $index }}'
+               index: 'sfosEnhancedPlusLicRegStatus.{{ $index }}'
+               descr: 'Enhanced Plus Support Lic Status'
+               group: Licensing
+               value: sfosEnhancedPlusLicRegStatus
+               states:
+                  - { value: 0, graph: 0, generic: 0, descr: none }
+                  - { value: 1, graph: 1, generic: 0, descr: evaluating }
+                  - { value: 2, graph: 2, generic: 0, descr: notsubscribed }
+                  - { value: 3, graph: 3, generic: 0, descr: subscribed }
+                  - { value: 4, graph: 4, generic: 2, descr: expired }
+                  - { value: 5, graph: 5, generic: 0, descr: deactivated }
+            -
+               oid: sfosCentralOrchestrationLicRegStatus
+               num_oid: '.1.3.6.1.4.1.2604.5.1.5.9.1.{{ $index }}'
+               index: 'sfosCentralOrchestrationLicRegStatus.{{ $index }}'
+               descr: 'Central Orchestration registration Lic Status'
+               group: Licensing
+               value: sfosCentralOrchestrationLicRegStatus
+               states:
+                  - { value: 0, graph: 0, generic: 0, descr: none }
+                  - { value: 1, graph: 1, generic: 0, descr: evaluating }
+                  - { value: 2, graph: 2, generic: 0, descr: notsubscribed }
+                  - { value: 3, graph: 3, generic: 0, descr: subscribed }
+                  - { value: 4, graph: 4, generic: 2, descr: expired }
+                  - { value: 5, graph: 5, generic: 0, descr: deactivated }
+      count:
+         data:
+            -
+               oid: sfosIPSecVpnActiveTunnel
+               num_oid: '.1.3.6.1.4.1.2604.5.1.6.1.1.1.1.8.{{ $index }}'
+               index: 'sfosIPSecVpnActiveTunnel.{{ $index }}'
+               descr: '{{ $sfosIPSecVpnConnName }} active tunnels'
+               group: IPSec

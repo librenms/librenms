@@ -166,7 +166,7 @@ if (Auth::user()->hasGlobalAdmin()) {
         if ($config_total > 1) {
             // populate current_version
             if (isset($_POST['config'])) {
-                [$oid,$date,$version] = explode('|', $_POST['config']);
+                [$oid,$date,$version] = explode('|', htmlspecialchars($_POST['config']));
                 $current_config = ['oid'=>$oid, 'date'=>$date, 'version'=>$version];
             } else { // no version selected
                 $current_config = ['oid' => $config_versions[0]['oid'], 'date' => $config_versions[0]['date'], 'version' => $config_total];
@@ -197,12 +197,12 @@ if (Auth::user()->hasGlobalAdmin()) {
                 if (! empty($node_info['group'])) {
                     $url .= '&group=' . $node_info['group'];
                 }
-                $url .= '&oid=' . $current_config['oid'] . '&date=' . urlencode($current_config['date']) . '&num=' . $current_config['version'] . '&oid2=' . $previous_config['oid'] . '&format=text';
+                $url .= '&oid=' . urlencode($current_config['oid']) . '&date=' . urlencode($current_config['date']) . '&num=' . urlencode($current_config['version']) . '&oid2=' . $previous_config['oid'] . '&format=text';
 
                 $text = file_get_contents($url); // fetch diff
             } else {
                 // fetch current_version
-                $text = file_get_contents(Config::get('oxidized.url') . '/node/version/view?node=' . $oxidized_hostname . (! empty($node_info['group']) ? '&group=' . $node_info['group'] : '') . '&oid=' . $current_config['oid'] . '&date=' . urlencode($current_config['date']) . '&num=' . $current_config['version'] . '&format=text');
+                $text = file_get_contents(Config::get('oxidized.url') . '/node/version/view?node=' . $oxidized_hostname . (! empty($node_info['group']) ? '&group=' . $node_info['group'] : '') . '&oid=' . urlencode($current_config['oid']) . '&date=' . urlencode($current_config['date']) . '&num=' . urlencode($current_config['version']) . '&format=text');
             }
         } else {  // just fetch the only version
             $text = file_get_contents(Config::get('oxidized.url') . '/node/fetch/' . (! empty($node_info['group']) ? $node_info['group'] . '/' : '') . $oxidized_hostname);
@@ -301,7 +301,7 @@ if (Auth::user()->hasGlobalAdmin()) {
     }
     if (! empty($text)) {
         $language = isset($previous_config) ? 'diff' : Config::getOsSetting($device['os'], 'config_highlighting', 'ios');
-        $geshi = new GeSHi(htmlspecialchars_decode($text), $language);
+        $geshi = new GeSHi(htmlspecialchars_decode($text, ENT_QUOTES | ENT_HTML5), $language);
         $geshi->enable_line_numbers(GESHI_FANCY_LINE_NUMBERS);
         $geshi->set_overall_style('color: black;');
         // $geshi->set_line_style('color: #999999');

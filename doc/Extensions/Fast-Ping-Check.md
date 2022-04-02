@@ -1,6 +1,3 @@
-source: Extensions/Fast-Ping-Check.md
-path: blob/master/doc/
-
 # Fast up/down checking
 
 Normally, LibreNMS sends an ICMP ping to the device before polling to
