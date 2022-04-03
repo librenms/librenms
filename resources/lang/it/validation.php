@@ -38,7 +38,7 @@ return [
     'different' => ':attribute e :other devono essere diversi.',
     'digits' => ':attribute devono essere cifre :digits.',
     'digits_between' => ':attribute devono essere cifre comprese tra :min e :max.',
-    'dimensions' => 'l'immagine :attribute ha dimensioni non valide.',
+    'dimensions' => 'l\'immagine :attribute ha dimensioni non valide.',
     'distinct' => ':attribute campo con valore duplicato.',
     'email' => ':attribute deve essere un indirizzo e-mail valido.',
     'ends_with' => ':attribute deve terminare con: :values',
