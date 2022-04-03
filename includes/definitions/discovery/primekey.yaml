@@ -6,6 +6,34 @@ modules:
          # The Appliance S/N is not available via SNMP,
          # but we can retrieve the S/N for the Hardware Security Module. 
     sensors:
+        fanspeed:
+            options:
+                skip_value_lt: 0
+            data:
+                -
+                    oid: PRIMEKEY-APPLIANCE-MIB::pkASfpCpuFan
+                    num_oid: '.1.3.6.1.4.1.22408.1.1.2.1.4.102.97.110.49.1'
+                    descr: 'CPU Fan'
+                    group: 'CPU'
+                    index: 49
+                -
+                    oid: PRIMEKEY-APPLIANCE-MIB::pkASfpSysFan1
+                    num_oid: '.1.3.6.1.4.1.22408.1.1.2.1.4.102.97.110.50.1'
+                    descr: 'System Fan 1'
+                    group: 'System'
+                    index: 50
+                -
+                    oid: PRIMEKEY-APPLIANCE-MIB::pkASfpSysFan2
+                    num_oid: '.1.3.6.1.4.1.22408.1.1.2.1.4.102.97.110.51.1'
+                    descr: 'System Fan 2'
+                    group: 'System'
+                    index: 51
+                -
+                    oid: PRIMEKEY-APPLIANCE-MIB::pkASfpSysFan3
+                    num_oid: '.1.3.6.1.4.1.22408.1.1.2.1.4.102.97.110.52.1'
+                    descr: 'System Fan 3'
+                    group: 'System'
+                    index: 52
         percent:
             options:
                 skip_value_lt: 0
@@ -19,8 +47,6 @@ modules:
                     warn_limit: 80
                     high_limit: 100
         temperature:
-            options:
-                skip_value_lt: 0
             data:
                 -
                     oid: PRIMEKEY-APPLIANCE-MIB::pkASfpCpuTemp
