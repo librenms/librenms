@@ -19,7 +19,7 @@
  */
 
 $oids = [
-    0 => [
+    1 => [
         'descr' => 'DB Usage %',
         'oid'   => 'PRIMEKEY-APPLIANCE-MIB::pkAVdbUsagePercent',
         'group' => 'Database',
@@ -33,8 +33,8 @@ $divisor = 1;
 $multiplier = 1;
 $low_limit = null;
 $low_warn_limit = null;
-$warn_limit = null;
-$high_limit = null;
+$warn_limit = 80;
+$high_limit = 100;
 $poller_type = 'snmp';
 $entPhysicalIndex = null;
 $entPhysicalIndex_measured = null;

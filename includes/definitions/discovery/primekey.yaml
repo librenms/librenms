@@ -1,3 +1,4 @@
+mib: PRIMEKEY-APPLIANCE-MIB
 modules:
     os:
         version: 'PRIMEKEY-APPLIANCE-MIB::pkAVersion'
