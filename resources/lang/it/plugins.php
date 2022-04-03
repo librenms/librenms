@@ -1,12 +1,12 @@
 <?php
 
 return [
-    'settings_page' => ':plugin: Settings',
-    'admin_page' => 'Plugin Admin',
-    'admin_title' => 'System Plugins',
+    'settings_page' => 'Impostazioni plugin :plugin',
+    'admin_page' => 'Gestione plugin',
+    'admin_title' => 'Plugin',
     'errors' => [
-        'not_exist' => 'Plugin :plugin does not exist.',
-        'disabled' => 'Plugin :plugin is disabled.',
-        'view_missing' => 'Missing view.',
+        'not_exist' => 'Il plugin :plugin non esiste.',
+        'disabled' => 'Plugin :plugin disabilitato.',
+        'view_missing' => 'Mostra quelli mancanti.',
     ],
 ];
