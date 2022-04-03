@@ -393,7 +393,7 @@
                             },
                             "num_oid": {
                                 "type": "string",
-                                "pattern": "^(\\.\\d+)+\\.?\\{\\{ \\$index \\}\\}(\\.\\d+)*$"
+                                "pattern": "^(\\.\\d+)+\\.?(\\{\\{ \\$index \\}\\})*(\\.\\d+)*$"
                             },
                             "index": {
                                 "type": ["integer", "string"]
