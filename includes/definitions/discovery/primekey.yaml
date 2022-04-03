@@ -5,3 +5,16 @@ modules:
         serial: 'PRIMEKEY-APPLIANCE-MIB::pkAHsmSerialNumber'
          # The Appliance S/N is not available via SNMP,
          # but we can retrieve the S/N for the Hardware Security Module. 
+    sensors:
+        percent:
+            options:
+                skip_value_lt: 0
+            data:
+                -
+                    oid: PRIMEKEY-APPLIANCE-MIB::pkAVdbUsagePercent
+                    num_oid: '.1.3.6.1.4.1.22408.1.1.2.1.4.118.100.98.49.1'
+                    descr: 'DB Usage %'
+                    index: 1
+                    warn_limit: 80
+                    high_limit: 100
+                    group: 'Database'
