@@ -6,6 +6,58 @@ modules:
          # The Appliance S/N is not available via SNMP,
          # but we can retrieve the S/N for the Hardware Security Module. 
     sensors:
+        count:
+            options:
+                skip_value_lt: 0
+            data:
+                -
+                    oid: PRIMEKEY-APPLIANCE-MIB::pkASfpLoad1m
+                    num_oid: '.1.3.6.1.4.1.22408.1.1.2.1.5.108.111.97.100.50.1'
+                    descr: ' 1m CPU load'
+                    group: 'CPU'
+                    index: 1
+                -
+                    oid: PRIMEKEY-APPLIANCE-MIB::pkASfpLoad5m
+                    num_oid: '.1.3.6.1.4.1.22408.1.1.2.1.5.108.111.97.100.51.1'
+                    descr: ' 5m CPU load'
+                    group: 'CPU'
+                    index: 2
+                -
+                    oid: PRIMEKEY-APPLIANCE-MIB::pkASfpLoad15m
+                    num_oid: '.1.3.6.1.4.1.22408.1.1.2.1.5.108.111.97.100.52.1'
+                    descr: '15m CPU load'
+                    group: 'CPU'
+                    index: 3
+                -
+                    oid: PRIMEKEY-APPLIANCE-MIB::pkAClusterLocalNodeID
+                    num_oid: '.1.3.6.1.4.1.22408.1.1.2.1.8.99.108.117.115.116.101.114.49.1'
+                    descr: 'Node ID'
+                    group: 'Database'
+                    index: 4
+                -
+                    oid: PRIMEKEY-APPLIANCE-MIB::pkAClusterSize
+                    num_oid: '.1.3.6.1.4.1.22408.1.1.2.1.8.99.108.117.115.116.101.114.50.1'
+                    descr: 'Node Count'
+                    group: 'Database'
+                    index: 5
+                -
+                    oid: PRIMEKEY-APPLIANCE-MIB::pkAClusterActiveNodes
+                    num_oid: '.1.3.6.1.4.1.22408.1.1.2.1.8.99.108.117.115.116.101.114.51.1'
+                    descr: 'Nodes Active'
+                    group: 'Database'
+                    index: 6
+                -
+                    oid: PRIMEKEY-APPLIANCE-MIB::pkASfpRaidTotalDevices
+                    num_oid: '.1.3.6.1.4.1.22408.1.1.2.1.5.114.97.105.100.52.1'
+                    descr: 'RAID Devices'
+                    group: 'RAID'
+                    index: 7
+                -
+                    oid: PRIMEKEY-APPLIANCE-MIB::pkASfpRaidActiveDevices
+                    num_oid: '.1.3.6.1.4.1.22408.1.1.2.1.5.114.97.105.100.54.1'
+                    descr: 'RAID Active'
+                    group: 'RAID'
+                    index: 8
         fanspeed:
             options:
                 skip_value_lt: 0
