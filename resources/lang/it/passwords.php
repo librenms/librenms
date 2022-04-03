@@ -13,9 +13,9 @@ return [
     |
     */
 
-    'password' => 'La password deve essere di almeno otto caratteri ed uguale a quella di conferma.',
-    'reset' => 'La tua password è stata resettata!',
+    'reset' => 'La tua password è stata reimpostata!',
     'sent' => 'Ti abbiamo inviato per e-mail il link per reimpostare la password!',
+    'throttled' => 'Per favore attendi prima di riprovare.',
     'token' => 'Questo token per reimpostare la password non è valido.',
     'user' => "Non è stato possibile trovare un utente con quell'indirizzo e-mail.",
 

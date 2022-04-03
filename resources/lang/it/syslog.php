@@ -1,6 +1,7 @@
 <?php
 
 return [
+    'title' => 'Syslog',
     'severity' => [
         '0' => 'Emergency',
         '1' => 'Alert',
