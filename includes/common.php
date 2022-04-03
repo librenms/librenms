@@ -47,6 +47,7 @@ function external_exec($command)
             '/-X\' \'[\S]+\'/',
             '/-P\' \'[\S]+\'/',
             '/-H\' \'[\S]+\'/',
+            '/-y\' \'[\S]+\'/',
             '/(udp|udp6|tcp|tcp6):([^:]+):([\d]+)/',
         ];
         $replacements = [
@@ -57,6 +58,7 @@ function external_exec($command)
             '-X\' \'PASSWORD\'',
             '-P\' \'PASSWORD\'',
             '-H\' \'HOSTNAME\'',
+            '-y\' \'KG_KEY\'',
             '\1:HOSTNAME:\3',
         ];
 
@@ -649,47 +651,6 @@ function format_hostname($device): string
         'sysName_fallback' => $hostname_is_ip ? $sysName : $hostname,
         'ip' => empty($device['overwrite_ip']) ? ($hostname_is_ip ? $device['hostname'] : $device['ip'] ?? '') : $device['overwrite_ip'],
     ]);
-}
-
-/**
- * Return valid port association modes
- *
- * @return array
- */
-function get_port_assoc_modes()
-{
-    return [
-        1 => 'ifIndex',
-        2 => 'ifName',
-        3 => 'ifDescr',
-        4 => 'ifAlias',
-    ];
-}
-
-/**
- * Get DB id of given port association mode name
- *
- * @param  string  $port_assoc_mode
- * @return int
- */
-function get_port_assoc_mode_id($port_assoc_mode)
-{
-    $modes = array_flip(get_port_assoc_modes());
-
-    return isset($modes[$port_assoc_mode]) ? $modes[$port_assoc_mode] : false;
-}
-
-/**
- * Get name of given port association_mode ID
- *
- * @param  int  $port_assoc_mode_id  Port association mode ID
- * @return bool
- */
-function get_port_assoc_mode_name($port_assoc_mode_id)
-{
-    $modes = get_port_assoc_modes();
-
-    return isset($modes[$port_assoc_mode_id]) ? $modes[$port_assoc_mode_id] : false;
 }
 
 /**

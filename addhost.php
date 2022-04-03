@@ -10,6 +10,7 @@
  */
 
 use LibreNMS\Config;
+use LibreNMS\Enum\PortAssociationMode;
 use LibreNMS\Exceptions\HostUnreachableException;
 
 $init_modules = [];
@@ -39,7 +40,7 @@ if (isset($options['f']) && $options['f'] == 0) {
 }
 
 $port_assoc_mode = Config::get('default_port_association_mode');
-$valid_assoc_modes = get_port_assoc_modes();
+$valid_assoc_modes = PortAssociationMode::getModes();
 if (isset($options['p'])) {
     $port_assoc_mode = $options['p'];
     if (! in_array($port_assoc_mode, $valid_assoc_modes)) {
