@@ -7,7 +7,7 @@ $no_refresh = true;
             <th data-column-id="mac_address" data-formatter="tooltip">MAC address</th>
 <?php
 if (\LibreNMS\Config::get('mac_oui.enabled') === true) {
-    echo '            <th data-column-id="mac_oui" data-sortable="false" data-width="150px" data-visible="false" data-formatter="tooltip">Vendor</th>';
+    echo '            <th data-column-id="mac_oui" data-sortable="false" data-width="" data-visible="true" data-formatter="tooltip">Vendor</th>';
 }
 ?>
             <th data-column-id="ipv4_address" data-formatter="tooltip">IPv4 address</th>

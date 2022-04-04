@@ -75,6 +75,9 @@ label's value will be the string you provided just as it was a fixed string.
 Multiple Alertmanager URLs (comma separated) are supported. Each
 URL will be tried and the search will stop at the first success.
 
+Basic HTTP authentication with a username and a password is supported.
+If you let those value blank, no authentication will be used.
+
 [Alertmanager Docs](https://prometheus.io/docs/alerting/alertmanager/)
 
 **Example:**
@@ -82,6 +85,8 @@ URL will be tried and the search will stop at the first success.
 | Config | Example |
 | ------ | ------- |
 | Alertmanager URL(s)   | http://alertmanager1.example.com,http://alertmanager2.example.com |
+| Alertmanager Username | myUsername |
+| Alertmanager Password | myPassword |
 | Alertmanager Options: | source=librenms <br/> customlabel=value <br/> extra_dynamic_value=variable_name |
 
 ## API
