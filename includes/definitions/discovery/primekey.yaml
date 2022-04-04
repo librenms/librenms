@@ -98,6 +98,149 @@ modules:
                     index: 1
                     warn_limit: 80
                     high_limit: 100
+        state:
+            data:
+                -
+                    oid: PRIMEKEY-APPLIANCE-MIB::pkASfpVmStatus
+                    num_oid: '.1.3.6.1.4.1.22408.1.1.2.1.2.118.109.1'
+                    descr: 'Health VMs'
+                    group: 'Health of VMs'
+                    index: 0
+                    state_name: HealthVMs
+                    states:
+                        -  { value: 0, generic: 0, graph: 0, descr: 'All OK' }
+                        -  { value: 1, generic: 2, graph: 1, descr: 'Some Inactive' }
+                -
+                    oid: PRIMEKEY-APPLIANCE-MIB::pkAEJBCAHealth
+                    num_oid: '.1.3.6.1.4.1.22408.1.1.2.1.8.104.101.97.108.116.104.101.50.1'
+                    descr: 'Health EJBCA'
+                    group: 'Health of VMs'
+                    index: 1
+                    state_name: HealthEjbca
+                    states:
+                        -  { value: 0, generic: 0, graph: 0, descr: 'All OK' }
+                        -  { value: 1, generic: 3, graph: 1, descr: 'Not Running or Unhealthy' }
+                -
+                    oid: PRIMEKEY-APPLIANCE-MIB::pkASignServerHealth
+                    num_oid: '.1.3.6.1.4.1.22408.1.1.2.1.8.104.101.97.108.116.104.115.50.1'
+                    descr: 'Health SignServer'
+                    group: 'Health of VMs'
+                    index: 2
+                    state_name: HealthSignserver
+                    states:
+                        -  { value: 0, generic: 0, graph: 0, descr: 'All OK' }
+                        -  { value: 1, generic: 3, graph: 1, descr: 'Not Running or Unhealthy' }
+                -
+                    oid: PRIMEKEY-APPLIANCE-MIB::pkASfpCpuFanStatus
+                    num_oid: '.1.3.6.1.4.1.22408.1.1.2.1.4.102.97.110.53.1'
+                    descr: 'Fan CPU'
+                    group: 'Fans'
+                    index: 3
+                    state_name: FansCpu
+                    states:
+                        -  { value: 0, generic: 0, graph: 0, descr: 'OK' }
+                        -  { value: 1, generic: 2, graph: 1, descr: 'Fail' }
+                -
+                    oid: PRIMEKEY-APPLIANCE-MIB::pkASfpSysFansStatus
+                    num_oid: '.1.3.6.1.4.1.22408.1.1.2.1.4.102.97.110.54.1'
+                    descr: 'Fans System'
+                    group: 'Fans'
+                    index: 4
+                    state_name: FansSystem
+                    states:
+                        -  { value: 0, generic: 0, graph: 0, descr: 'All OK' }
+                        -  { value: 1, generic: 1, graph: 1, descr: 'Fail' }
+                -
+                    oid: PRIMEKEY-APPLIANCE-MIB::pkAVdbStatus
+                    num_oid: '.1.3.6.1.4.1.22408.1.1.2.1.4.118.100.98.50.1'
+                    descr: 'DB Storage'
+                    group: 'Database'
+                    index: 5
+                    state_name: DbStorage
+                    states:
+                        -  { value: 0, generic: 0, graph: 0, descr: '< 80% full' }
+                        -  { value: 1, generic: 2, graph: 1, descr: '> 80% full' }
+                -
+                    oid: PRIMEKEY-APPLIANCE-MIB::pkAClusterLocalGaleraState
+                    num_oid: '.1.3.6.1.4.1.22408.1.1.2.1.8.99.108.117.115.116.101.114.52.1'
+                    descr: 'DB Enum'
+                    group: 'Database'
+                    index: 6
+                    state_name: DbEnum
+                    # Galera node status can be reported as a number or a comment:
+                    #     - wsrep_local_state
+                    #        - PRIMEKEY-APPLIANCE-MIB::pkAClusterLocalGaleraState
+                    #        - .1.3.6.1.4.1.22408.1.1.2.1.8.99.108.117.115.116.101.114.52.1
+                    #     - wsrep_local_state_comment
+                    #        - PRIMEKEY-APPLIANCE-MIB::pkAClusterLocalGaleraStateString
+                    #        - .1.3.6.1.4.1.22408.1.1.2.1.8.99.108.117.115.116.101.114.53.1
+                    # This state table is based around an interpretation of how these two
+                    # variables relate to each other. See these links for more info:
+                    # https:#github.com/codership/wsrep-API/blob/master/wsrep_api.h#L306 and
+                    # https://galeracluster.com/library/documentation/node-states.html#node-state-changes
+                    states:
+                        -  { value: 0, generic: 3, graph: 0, descr: 'Undefined' } # undefined state
+                        -  { value: 1, generic: 1, graph: 1, descr: 'Joiner' }    # incomplete state, requested state transfer
+                        -  { value: 2, generic: 0, graph: 2, descr: 'Donor' }     # complete state, donates state transfer
+                        -  { value: 3, generic: 0, graph: 3, descr: 'Joined' }    # complete state
+                        -  { value: 4, generic: 0, graph: 4, descr: 'Synced' }    # complete state, synchronized with group
+                        -  { value: 5, generic: 2, graph: 5, descr: 'Error' }     # this and above is provider-specific error code
+                        -  { value: 6, generic: 2, graph: 6, descr: 'Max' }
+                -
+                    oid: PRIMEKEY-APPLIANCE-MIB::pkASfpRaidStatus
+                    num_oid: '.1.3.6.1.4.1.22408.1.1.2.1.5.114.97.105.100.49.1'
+                    descr: 'RAID Health'
+                    group: 'RAID'
+                    index: 7
+                    state_name: RaidHealth
+                    states:
+                        -  { value: 0, generic: 0, graph: 0, descr: 'Clean or Active' }
+                        -  { value: 1, generic: 2, graph: 1, descr: 'Degraded' }
+                -
+                    oid: PRIMEKEY-APPLIANCE-MIB::pkAHsmStatusEnum
+                    num_oid: '.1.3.6.1.4.1.22408.1.1.2.2.4.104.115.109.50.1'
+                    descr: 'HSM Enum'
+                    group: 'HSM'
+                    index: 8
+                    state_name: HsmEnum
+                    states:
+                        -  { value: 0, generic: 0, graph: 0, descr: 'STATUS_is_OPER' }
+                        -  { value: 1, generic: 1, graph: 1, descr: 'STATUS_is_MAINT' }
+                        -  { value: 2, generic: 1, graph: 2, descr: 'STATUS_is_BOOT' }
+                        -  { value: 3, generic: 2, graph: 3, descr: 'STATUS_is_ALARM' }
+                        -  { value: 4, generic: 2, graph: 4, descr: 'STATUS_is_EXTERNALERASE' }
+                        -  { value: 5, generic: 2, graph: 5, descr: 'STATUS_is_FAIL' }
+                        -  { value: 5, generic: 3, graph: 6, descr: 'STATUS_is_OTHER' }
+                -
+                    oid: PRIMEKEY-APPLIANCE-MIB::pkAHsmStatusBool
+                    num_oid: '.1.3.6.1.4.1.22408.1.1.2.2.4.104.115.109.51.1'
+                    descr: 'HSM Healthy'
+                    group: 'HSM'
+                    index: 9
+                    state_name: HsmHealthy
+                    states:
+                        -  { value: 0, generic: 0, graph: 0, descr: 'OK' }
+                        -  { value: 1, generic: 2, graph: 1, descr: 'Fail' }
+                -
+                    oid: PRIMEKEY-APPLIANCE-MIB::pkAHsmBatteryIntStatus
+                    num_oid: '.1.3.6.1.4.1.22408.1.1.2.2.4.104.115.109.53.1'
+                    descr: 'Battery Int'
+                    group: 'HSM'
+                    index: 10
+                    state_name: BatteryInt
+                    states:
+                        -  { value: 0, generic: 0, graph: 0, descr: 'OK' }
+                        -  { value: 1, generic: 2, graph: 1, descr: 'Low or Fail' }
+                -
+                    oid: PRIMEKEY-APPLIANCE-MIB::pkAHsmBatteryExtStatus
+                    num_oid: '.1.3.6.1.4.1.22408.1.1.2.2.4.104.115.109.56.1'
+                    descr: 'Battery Ext'
+                    group: 'HSM'
+                    index: 11
+                    state_name: BatteryExt
+                    states:
+                        -  { value: 0, generic: 0, graph: 0, descr: 'Ok or Absent' }
+                        -  { value: 1, generic: 2, graph: 1, descr: 'Low or Fail' }
         temperature:
             data:
                 -

@@ -762,7 +762,7 @@
                     "state_descr": "> 80% full",
                     "state_draw_graph": 1,
                     "state_value": 1,
-                    "state_generic_value": 1
+                    "state_generic_value": 2
                 },
                 {
                     "state_name": "FansCpu",
@@ -802,7 +802,7 @@
                 {
                     "state_name": "HealthEjbca",
                     "state_descr": "Not Running or Unhealthy",
-                    "state_draw_graph": 2,
+                    "state_draw_graph": 1,
                     "state_value": 1,
                     "state_generic_value": 3
                 },
@@ -816,7 +816,7 @@
                 {
                     "state_name": "HealthSignserver",
                     "state_descr": "Not Running or Unhealthy",
-                    "state_draw_graph": 2,
+                    "state_draw_graph": 1,
                     "state_value": 1,
                     "state_generic_value": 3
                 },
@@ -902,7 +902,7 @@
                     "state_descr": "Degraded",
                     "state_draw_graph": 1,
                     "state_value": 1,
-                    "state_generic_value": 1
+                    "state_generic_value": 2
                 }
             ]
         },
