@@ -1,15 +1,18 @@
 <?php
 
 return [
+    'title' => 'Settings',
     'readonly' => 'Set in config.php, remove from config.php to enable.',
     'groups' => [
         'alerting' => 'Avvisi',
+        'api' => 'API',
         'auth' => 'Autenticazione',
         'authorization' => 'Authorization',
         'external' => 'External',
         'global' => 'Global',
         'os' => 'OS',
         'discovery' => 'Discovery',
+        'graphing' => 'Graphing',
         'poller' => 'Poller',
         'system' => 'System',
         'webui' => 'Web UI',
@@ -20,10 +23,14 @@ return [
             'email' => ['name' => 'Email Options'],
             'rules' => ['name' => 'Alert Rule Default Settings'],
         ],
+        'api' => [
+            'cors' => ['name' => 'CORS'],
+        ],
         'auth' => [
             'general' => ['name' => 'General Authentication Settings'],
             'ad' => ['name' => 'Active Directory Settings'],
             'ldap' => ['name' => 'LDAP Settings'],
+            'socialite' => ['name' => 'Socialite Settings'],
         ],
         'authorization' => [
             'device-group' => ['name' => 'Device Group Settings'],
@@ -33,17 +40,22 @@ return [
             'route' => ['name' => 'Routes Discovery Module'],
             'discovery_modules' => ['name' => 'Discovery Modules'],
             'storage' => ['name' => 'Storage Module'],
+            'networks' => ['name' => 'Networks'],
         ],
         'external' => [
             'binaries' => ['name' => 'Binary Locations'],
             'location' => ['name' => 'Location Settings'],
             'graylog' => ['name' => 'Graylog Integration'],
             'oxidized' => ['name' => 'Oxidized Integration'],
+            'mac_oui' => ['name' => 'Mac OUI Lookup Integration'],
             'peeringdb' => ['name' => 'PeeringDB Integration'],
             'nfsen' => ['name' => 'NfSen Integration'],
             'unix-agent' => ['name' => 'Unix-Agent Integration'],
+            'smokeping' => ['name' => 'Smokeping Integration'],
+            'snmptrapd' => ['name' => 'SNMP Traps Integration'],
         ],
         'poller' => [
+            'availability' => ['name' => 'Device Availability'],
             'distributed' => ['name' => 'Distributed Poller'],
             'graphite' => ['name' => 'Datastore: Graphite'],
             'influxdb' => ['name' => 'Datastore: InfluxDB'],
@@ -53,6 +65,7 @@ return [
             'rrdtool' => ['name' => 'Datastore: RRDTool'],
             'snmp' => ['name' => 'SNMP'],
             'poller_modules' => ['name' => 'Poller Modules'],
+            'interface_types' => ['name' => 'Interface Type by RFC 7224'],
         ],
         'system' => [
             'cleanup' => ['name' => 'Cleanup'],
@@ -64,6 +77,7 @@ return [
             'availability-map' => ['name' => 'Availability Map Settings'],
             'graph' => ['name' => 'Graph Settings'],
             'dashboard' => ['name' => 'Dashboard Settings'],
+            'port-descr' => ['name' => 'Interface Description Parsing'],
             'search' => ['name' => 'Search Settings'],
             'style' => ['name' => 'Style'],
             'device' => ['name' => 'Device Settings'],
@@ -175,6 +189,10 @@ return [
             'description' => 'Alert log entries older than',
             'help' => 'Cleanup done by daily.sh',
         ],
+        'discovery_on_reboot' => [
+            'description' => 'Discovery on Reboot',
+            'help' => 'Do a Discovery on a rebooted Device',
+        ],
         'allow_duplicate_sysName' => [
             'description' => 'Allow Duplicate sysName',
             'help' => 'By default duplicate sysNames are disabled from being added to prevent a device with multiple interfaces from being added multiple times',
@@ -186,6 +204,38 @@ return [
         'allow_unauth_graphs_cidr' => [
             'description' => 'Allow the given networks graph access',
             'help' => 'Allow the given networks unauthenticated graph access (does not apply when unauthenticated graphs is enabled)',
+        ],
+        'api' => [
+            'cors' => [
+                'allowheaders' => [
+                    'description' => 'Allow Headers',
+                    'help' => 'Sets the Access-Control-Allow-Headers response header',
+                ],
+                'allowcredentials' => [
+                    'description' => 'Allow Credentials',
+                    'help' => 'Sets the Access-Control-Allow-Credentials header',
+                ],
+                'allowmethods' => [
+                    'description' => 'Allowed Methods',
+                    'help' => 'Matches the request method.',
+                ],
+                'enabled' => [
+                    'description' => 'Enable CORS support for the API',
+                    'help' => 'Allows you to load api resources from a web client',
+                ],
+                'exposeheaders' => [
+                    'description' => 'Expose Headers',
+                    'help' => 'Sets the Access-Control-Expose-Headers response header',
+                ],
+                'maxage' => [
+                    'description' => 'Max Age',
+                    'help' => 'Sets the Access-Control-Max-Age response header',
+                ],
+                'origin' => [
+                    'description' => 'Allow Request Origins',
+                    'help' => 'Matches the request origin. Wildcards can be used, eg. *.mydomain.com',
+                ],
+            ],
         ],
         'api_demo' => [
             'description' => 'This is the demo',
@@ -209,6 +259,20 @@ return [
         'astext' => [
             'description' => 'Key to hold cache of autonomous systems descriptions',
         ],
+        'auth' => [
+            'socialite' => [
+                'redirect' => [
+                    'description' => 'Redirect Login page',
+                    'help' => 'Login page should redirect immediately to the first defined provider.<br><br>TIPS: You can prevent it by appending ?redirect=0 in the url',
+                ],
+                'register' => [
+                    'description' => 'Allow registration via provider',
+                ],
+                'configs' => [
+                    'description' => 'Provider configs',
+                ],
+            ],
+        ],
         'auth_ad_base_dn' => [
             'description' => 'Base DN',
             'help' => 'groups and users must be under this dn. Example: dc=example,dc=com',
@@ -228,6 +292,14 @@ return [
         'auth_ad_user_filter' => [
             'description' => 'User LDAP filter',
             'help' => 'Active Directory LDAP filter for selecting users',
+        ],
+        'auth_ad_url' => [
+            'description' => 'Active Directory Server(s)',
+            'help' => 'Set server(s), space separated. Prefix with ldaps:// for ssl. Example: ldaps://dc1.example.com ldaps://dc2.example.com',
+        ],
+        'auth_ad_domain' => [
+            'description' => 'Active Directory Domain',
+            'help' => 'Active Directory Domain Example: example.com',
         ],
         'auth_ldap_attr' => [
             'uid' => [
@@ -364,6 +436,22 @@ return [
             'description' => 'Auth log entries older than',
             'help' => 'Cleanup done by daily.sh',
         ],
+        'peering_descr' => [
+            'description' => 'Peering Port Types',
+            'help' => 'Ports of the listed description type(s) will be shown under the peering ports menu entry.  See Interface Description Parsing docs for more info.',
+        ],
+        'transit_descr' => [
+            'description' => 'Transit Port Types',
+            'help' => 'Ports of the listed description type(s) will be shown under the transit ports menu entry.  See Interface Description Parsing docs for more info.',
+        ],
+        'core_descr' => [
+            'description' => 'Core Port Types',
+            'help' => 'Ports of the listed description type(s) will be shown under the core ports menu entry.  See Interface Description Parsing docs for more info.',
+        ],
+        'customers_descr' => [
+            'description' => 'Customer Port Types',
+            'help' => 'Ports of the listed description type(s) will be shown under the customers ports menu entry.  See Interface Description Parsing docs for more info.',
+        ],
         'base_url' => [
             'description' => 'Specific URL',
             'help' => 'This should *only* be set if you want to *force* a particular hostname/port. It will prevent the web interface being usable form any other hostname',
@@ -429,6 +517,9 @@ return [
             ],
             'ipv6-addresses' => [
                 'description' => 'IPv6 Addresses',
+            ],
+            'isis' => [
+                'description' => 'ISIS',
             ],
             'junose-atm-vp' => [
                 'description' => 'Junose ATM VP',
@@ -505,7 +596,7 @@ return [
             'description' => 'Enable Distributed Polling (requires additional setup)',
             'help' => 'Enable distributed polling system wide. This is intended for load sharing, not remote polling. You must read the documentation for steps to enable: https://docs.librenms.org/Extensions/Distributed-Poller/',
         ],
-        'distributed_poller_group' => [
+        'default_poller_group' => [
             'description' => 'Default Poller Group',
             'help' => 'The default poller group all pollers should poll if none is set in config.php',
         ],
@@ -603,17 +694,25 @@ return [
         ],
         'geoloc' => [
             'api_key' => [
-                'description' => 'Geocoding API Key',
+                'description' => 'Mapping Engine API Key',
                 'help' => 'Geocoding API Key (Required to function)',
             ],
+            'dns' => [
+                'description' => 'Use DNS Location Record',
+                'help' => 'Use LOC Record from DNS Server to get geographic coordinates for Hostname',
+            ],
             'engine' => [
-                'description' => 'Geocoding Engine',
+                'description' => 'Mapping Engine',
                 'options' => [
                     'google' => 'Google Maps',
                     'openstreetmap' => 'OpenStreetMap',
                     'mapquest' => 'MapQuest',
                     'bing' => 'Bing Maps',
                 ],
+            ],
+            'latlng' => [
+                'description' => 'Attempt to Geocode Locations',
+                'help' => 'Try to lookup latitude and longitude via geocoding API during polling',
             ],
         ],
         'graphite' => [
@@ -632,6 +731,22 @@ return [
             'prefix' => [
                 'description' => 'Prefix (Optional)',
                 'help' => 'Will add the prefix to the start of all metrics.  Must be alphanumeric separated by dots',
+            ],
+        ],
+        'graphing' => [
+            'availability' => [
+                'description' => 'Duration',
+                'help' => 'Calculate Device Availability for listed durations. (Durations are defined in seconds)',
+            ],
+            'availability_consider_maintenance' => [
+                'description' => 'Scheduled maintenance does not affect availability',
+                'help' => 'Disables the creation of outages and decreasing of availability for devices which are in maintenance mode.',
+            ],
+        ],
+        'graphs' => [
+            'port_speed_zoom' => [
+                'description' => 'Zoom port graphs to port speed',
+                'help' => 'Zoom port graphs so the max is always the port speed, disabled port graphs zoom to traffic',
             ],
         ],
         'graylog' => [
@@ -672,6 +787,14 @@ return [
             'version' => [
                 'description' => 'Version',
                 'help' => 'This is used to automatically create the base_uri for the Graylog API. If you have modified the API uri from the default, set this to other and specify your base_uri.',
+            ],
+        ],
+        'html' => [
+            'device' => [
+                'primary_link' => [
+                    'description' => 'Primary Dropdown Link',
+                    'help' => 'Sets the primary link in the device dropdown menu',
+                ],
             ],
         ],
         'http_proxy' => [
@@ -751,6 +874,12 @@ return [
         'login_message' => [
             'description' => 'Logon Message',
             'help' => 'Displayed on the login page',
+        ],
+        'mac_oui' => [
+            'enabled' => [
+                'description' => 'Enable MAC OUI lookup',
+                'help' => 'Enable mac-address vendor (OUI) lookup (data is downloaded by daily.sh)',
+            ],
         ],
         'mono_font' => [
             'description' => 'Monospaced Font',
@@ -836,6 +965,10 @@ return [
             'default_group' => [
                 'description' => 'Set the default group returned',
             ],
+            'ignore_groups' => [
+                'description' => 'Do not backup these Oxidized groups',
+                'help' => 'Groups (set via Variable Mapping) excluded from being sent to Oxidized',
+            ],
             'enabled' => [
                 'description' => 'Enable Oxidized support',
             ],
@@ -848,8 +981,20 @@ return [
             'group_support' => [
                 'description' => 'Enable the return of groups to Oxidized',
             ],
+            'ignore_os' => [
+                'description' => 'Do not backup these OS',
+                'help' => 'Do not backup the listed OS with Oxidized.  The OS must match the LibreNMS OS name (these are all lowercase with no spaces).  Only allows existing OS.',
+            ],
+            'ignore_types' => [
+                'description' => 'Do not backup these device types',
+                'help' => 'Do not backup the listed device types with Oxidized. Only allows existing types.',
+            ],
             'reload_nodes' => [
                 'description' => 'Reload Oxidized nodes list, each time a device is added',
+            ],
+            'maps' => [
+                'description' => 'Variable Mapping',
+                'help' => 'Used to set group or other variables or map OS names that differ.',
             ],
             'url' => [
                 'description' => 'URL to your Oxidized API',
@@ -875,8 +1020,16 @@ return [
                 ],
             ],
         ],
+        'bad_iftype' => [
+            'description' => 'Bad Interfaces',
+            'help' => 'Network Interface Types which should be ignored',
+        ],
         'ping' => [
             'description' => 'Path to ping',
+        ],
+        'ping_rrd_step' => [
+            'description' => 'Ping Frequency',
+            'help' => 'How often to check. Sets the default value for all nodes. Warning! If you change this you must make additional changes.  Check the Fast Ping docs.',
         ],
         'poller_modules' => [
             'unix-agent' => [
@@ -936,6 +1089,9 @@ return [
             'ospf' => [
                 'description' => 'OSPF',
             ],
+            'isis' => [
+                'description' => 'ISIS',
+            ],
             'cisco-ipsec-flow-monitor' => [
                 'description' => 'Cisco IPSec flow Monitor',
             ],
@@ -987,6 +1143,9 @@ return [
             'aruba-controller' => [
                 'description' => 'Aruba Controller',
             ],
+            'availability' => [
+                'description' => 'Availability',
+            ],
             'entity-physical' => [
                 'description' => 'Entity Physical',
             ],
@@ -1028,13 +1187,21 @@ return [
                 'description' => 'Enable',
                 'help' => 'Exports metrics to Prometheus Push Gateway',
             ],
-            'host' => [
-                'description' => 'Server',
-                'help' => 'The IP or hostname of the Prometheus Push Gateway to send data to',
+            'url' => [
+                'description' => 'URL',
+                'help' => 'The URL of the Prometheus Push Gateway to send data to',
             ],
-            'port' => [
+            'Job' => [
                 'description' => 'Job',
                 'help' => 'Job label for exported metrics',
+            ],
+            'attach_sysname' => [
+                'description' => 'Attach Device sysName',
+                'help' => 'Attach sysName information put to Prometheus.',
+            ],
+            'prefix' => [
+                'description' => 'Prefix',
+                'help' => 'Optional text to prepend to exported metric names',
             ],
         ],
         'public_status' => [
@@ -1044,6 +1211,20 @@ return [
         'routes_max_number' => [
             'description' => 'Max number of routes allowed for discovery',
             'help' => 'No route will be discovered if the size of the routing table is bigger than this number',
+        ],
+        'default_port_group' => [
+            'description' => 'Default Port Group',
+            'help' => 'New discovered Ports will be assigned to this port Group.',
+        ],
+        'nets' => [
+            'description' => 'Autodiscovery Networks',
+            'help' => 'Networks from which devices will be discovered automatically.',
+        ],
+        'autodiscovery' => [
+            'nets-exclude' => [
+                'description' => 'Networks/IPs to be ignored',
+                'help' => 'Networks/IPs which will not be discovered automatically. Excludes also IPs from Autodiscovery Networks',
+            ],
         ],
         'route_purge' => [
             'description' => 'Route entries older than',
@@ -1080,6 +1261,94 @@ return [
             'description' => 'Tune all rrd port files to use max values',
             'help' => 'Auto tune maximum value for rrd port files',
         ],
+        'rrdtool_version' => [
+            'description' => 'Sets the version of rrdtool on your server',
+            'help' => 'Anything over 1.5.5 supports all features LibreNMS uses, do not set higher than your installed version',
+        ],
+        'service_poller_enabled' => [
+            'description' => 'Enable Polling',
+            'help' => 'Enable poller workers. Sets the default value for all nodes.',
+        ],
+        'service_poller_workers' => [
+            'description' => 'Poller Workers',
+            'help' => 'Amount of poller workers to spawn. Sets the default value for all nodes.',
+        ],
+        'service_poller_frequency' => [
+            'description' => 'Poller Frequency (Warning!)',
+            'help' => 'How often to poll devices. Sets the default value for all nodes. Warning! Changing this without fixing rrd files will break graphs. See docs for more info.',
+        ],
+        'service_poller_down_retry' => [
+            'description' => 'Device Down Retry',
+            'help' => 'If a device is down when polling is attempted. This is the amount of time to wait before retrying. Sets the default value for all nodes.',
+        ],
+        'service_discovery_enabled' => [
+            'description' => 'Discovery Enabled',
+            'help' => 'Enable discovery workers. Sets the default value for all nodes.',
+        ],
+        'service_discovery_workers' => [
+            'description' => 'Discovery Workers',
+            'help' => 'Amount of discovery workers to run. Setting too high can cause overload. Sets the default value for all nodes.',
+        ],
+        'service_discovery_frequency' => [
+            'description' => 'Discovery Frequency',
+            'help' => 'How often to run device discovery. Sets the default value for all nodes. Default is 4 times a day.',
+        ],
+        'service_services_enabled' => [
+            'description' => 'Services Enabled',
+            'help' => 'Enable services workers. Sets the default value for all nodes.',
+        ],
+        'service_services_workers' => [
+            'description' => 'Services Workers',
+            'help' => 'Amount of services workers. Sets the default value for all nodes.',
+        ],
+        'service_services_frequency' => [
+            'description' => 'Services Frequency',
+            'help' => 'How often to run services. This should match poller frequency. Sets the default value for all nodes.',
+        ],
+        'service_billing_enabled' => [
+            'description' => 'Billing Enabled',
+            'help' => 'Enable billing workers. Sets the default value for all nodes.',
+        ],
+        'service_billing_frequency' => [
+            'description' => 'Billing Frequency',
+            'help' => 'How often to collect billing data. Sets the default value for all nodes.',
+        ],
+        'service_billing_calculate_frequency' => [
+            'description' => 'Billing Calculate Frequency',
+            'help' => 'How often to calculate bill usage. Sets the default value for all nodes.',
+        ],
+        'service_alerting_enabled' => [
+            'description' => 'Alerting Enabled',
+            'help' => 'Enable the alerting worker. Sets the default value for all nodes.',
+        ],
+        'service_alerting_frequency' => [
+            'description' => 'Alerting Frequency',
+            'help' => 'How often alert rules are checked. Note that data is only updated based on poller frequency. Sets the default value for all nodes.',
+        ],
+        'service_ping_enabled' => [
+            'description' => 'Fast Ping Enabled',
+            'help' => 'Fast Ping just pings devices to check if they are up or down. Sets the default value for all nodes.',
+        ],
+        'service_update_enabled' => [
+            'description' => 'Daily Maintenance Enabled',
+            'help' => 'Run daily.sh maintenance script and restart the dispatcher service afterwards. Sets the default value for all nodes.',
+        ],
+        'service_update_frequency' => [
+            'description' => 'Maintenance Frequency',
+            'help' => 'How often to run daily maintenance. Default is 1 Day. It is highly suggested not to change this. Sets the default value for all nodes.',
+        ],
+        'service_loglevel' => [
+            'description' => 'Log Level',
+            'help' => 'Log level of the dispatch service. Sets the default value for all nodes.',
+        ],
+        'service_watchdog_enabled' => [
+            'description' => 'Watchdog Enabled',
+            'help' => 'Watchdog monitors the log file and restarts the service it it has not been updated. Sets the default value for all nodes.',
+        ],
+        'service_watchdog_log' => [
+            'description' => 'Log File to Watch',
+            'help' => 'Default is the LibreNMS log file. Sets the default value for all nodes.',
+        ],
         'sfdp' => [
             'description' => 'Path to sfdp',
         ],
@@ -1113,9 +1382,23 @@ return [
                 'description' => 'Max Repeaters',
                 'help' => 'Set repeaters to use for SNMP bulk requests',
             ],
+            'oids' => [
+                'no_bulk' => [
+                    'description' => 'Disable snmp bulk for OIDs',
+                    'help' => 'Disable snmp bulk operation for certain OIDs. Generally, this should be set on an OS instead. Format should be MIB::OID',
+                ],
+            ],
             'port' => [
                 'description' => 'Port',
                 'help' => 'Set the tcp/udp port to be used for SNMP',
+            ],
+            'timeout' => [
+                'description' => 'Timeout',
+                'help' => 'SNMP Timeout in seconds',
+            ],
+            'retries' => [
+                'description' => 'Retries',
+                'help' => 'how many times to retry the query',
             ],
             'v3' => [
                 'description' => 'SNMP v3 Authentication (priority)',
@@ -1149,6 +1432,16 @@ return [
         'snmptranslate' => [
             'description' => 'Path to snmptranslate',
         ],
+        'snmptraps' => [
+            'eventlog' => [
+                'description' => 'Create eventlog for snmptraps',
+                'help' => 'Independently of the action that may be mapped to the trap',
+            ],
+            'eventlog_detailed' => [
+                'description' => 'Enable detailed logs',
+                'help' => 'Add all OIDs received with the trap in the eventlog',
+            ],
+        ],
         'snmpwalk' => [
             'description' => 'Path to snmpwalk',
         ],
@@ -1168,6 +1461,14 @@ return [
         ],
         'traceroute6' => [
             'description' => 'Path to traceroute6',
+        ],
+        'twofactor' => [
+            'description' => 'Two-Factor',
+            'help' => 'Allow users to activate and use Timebased (TOTP) or Counterbased (HOTP) One-Time Passwords (OTP)',
+        ],
+        'twofactor_lock' => [
+            'description' => 'Two-Factor Throttle Time (seconds)',
+            'help' => 'Lock-out time to wait in seconds before allowing further attempts if Two-Factor authentication is failed 3 times consecutively - will prompt user to wait this long.  Set to 0 to disable resulting in a permanent account lock-out and a message to user to contact administrator',
         ],
         'unix-agent' => [
             'connection-timeout' => [
@@ -1244,12 +1545,38 @@ return [
                 'help' => 'Minimum Graph Height (default: 300)',
             ],
         ],
+        'device_display_default' => [
+            'description' => 'Default device display name template',
+            'help' => 'Sets the default display name for all devices (can be overridden per-device).  Hostname/IP: Just show the hostname or IP the device was added with. sysName: Just show the sysName from snmp. Hostname or sysName: Show hostname, but if it is an IP, show sysName.',
+            'options' => [
+                'hostname' => 'Hostname / IP',
+                'sysName_fallback' => 'Hostname, fallback to sysName for IPs',
+                'sysName' => 'sysName',
+                'ip' => 'IP (from hostname IP or resolved)',
+            ],
+        ],
         'device_location_map_open' => [
             'description' => 'Location Map open',
             'help' => 'Location Map is shown by default',
         ],
         'whois' => [
             'description' => 'Path to whois',
+        ],
+        'smokeping.integration' => [
+            'description' => 'Enable',
+            'help' => 'Enable smokeping integration',
+        ],
+        'smokeping.dir' => [
+            'description' => 'Path to rrds',
+            'help' => 'Full path to Smokeping RRDs',
+        ],
+        'smokeping.pings' => [
+            'description' => 'Pings',
+            'help' => 'Number of pings configured in Smokeping',
+        ],
+        'smokeping.url' => [
+            'description' => 'URL to smokeping',
+            'help' => 'Full URL to the smokeping gui',
         ],
     ],
     'twofactor' => [
@@ -1270,5 +1597,7 @@ return [
         'select' => ':value is not an allowed value',
         'text' => ':value is not allowed',
         'array' => 'Invalid format',
+        'executable' => ':value is not a valid executable',
+        'directory' => ':value is not a valid directory',
     ],
 ];
