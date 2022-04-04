@@ -63,4 +63,13 @@ class HttpAuthAuthorizer extends MysqlAuthorizer
 
         return -1;
     }
+
+    public function getExternalUsername()
+    {
+        if (isset($_SERVER['HTTP_X_REMOTE_USER'])) {
+            return $_SERVER['HTTP_X_REMOTE_USER'];
+        }
+
+        return parent::getExternalUsername();
+    }
 }
