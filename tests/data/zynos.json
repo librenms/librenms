@@ -3,16 +3,16 @@
         "discovery": {
             "devices": [
                 {
-                    "sysName": null,
+                    "sysName": "<private>",
                     "sysObjectID": ".1.3.6.1.4.1.890.1.15",
                     "sysDescr": "XGS4600-32F",
                     "sysContact": "<private>",
-                    "version": "V4.70(ABBI.2)",
+                    "version": "V4.50(ABBI.1)",
                     "hardware": "XGS4600-32F",
                     "features": null,
                     "os": "zynos",
                     "type": "network",
-                    "serial": "S182L35001343",
+                    "serial": "S999999999999",
                     "icon": "zyxel.svg",
                     "location": "<private>"
                 }
