@@ -3,7 +3,6 @@ text: 'ZyXEL Ethernet Switch'
 group: zyxel
 type: network
 icon: zyxel
-ifname: true
 over:
     - { graph: device_bits, text: 'Device Traffic' }
     - { graph: device_processor, text: 'CPU Usage' }
@@ -17,4 +16,3 @@ discovery:
             - '/^MGS/'
             - '/^XS/'
             - '/^XGS/'
-            - '/^ZyXEL/'
