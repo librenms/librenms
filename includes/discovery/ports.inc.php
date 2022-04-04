@@ -27,11 +27,6 @@ if ($device['os'] == 'airos-af-ltu') {
     require 'ports/airos-af-ltu.inc.php';
 }
 
-//Change Zynos ports from swp to 1/1
-if ($device['os'] == 'zynos') {
-    require base_path('includes/discovery/ports/zynos.inc.php');
-}
-
 //Teleste Luminato ifOperStatus
 if ($device['os'] == 'luminato') {
     require base_path('includes/discovery/ports/luminato.inc.php');
