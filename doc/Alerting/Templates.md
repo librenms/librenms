@@ -1,10 +1,7 @@
-source: Alerting/Templates.md
-path: blob/master/doc/
-
 # Templates
 
 > This page is for installs running version 1.42 or later. You can
-> find the older docs [here](Old_Templates.md)
+> find the older docs [here](https://github.com/librenms/librenms/blob/773411359489e0ffcc3ba763f1f138403343591a/doc/Alerting/Old_Templates.md)
 
 Templates can be assigned to a single or a group of rules and can
 contain any kind of text. There is also a default template which is
@@ -20,7 +17,7 @@ button. You might hold down the CTRL key to select multiple rules at once.
 
 The templating engine in use is Laravel Blade. We will cover some of
 the basics here, however the official Laravel docs will have more
-information [here](https://laravel.com/docs/5.7/blade)
+information [here](https://laravel.com/docs/blade)
 
 ## Syntax
 
@@ -140,7 +137,7 @@ In your alert template just use
 @endsection
 ```
 
-More info: [https://laravel.com/docs/5.7/blade#extending-a-layout](https://laravel.com/docs/5.7/blade#extending-a-layout)
+More info: [https://laravel.com/docs/blade#extending-a-layout](https://laravel.com/docs/blade#extending-a-layout)
 
 ## Examples
 
@@ -195,7 +192,6 @@ Timestamp: {{ $alert->timestamp }}
 Location: {{ $alert->location }}
 Description: {{ $alert->description }}
 Features: {{ $alert->features }}
-Purpose: {{ $alert->purpose }}
 Notes: {{ $alert->notes }}
 
 Server: {{ $alert->sysName }}
@@ -205,7 +201,7 @@ Percent Utilized: {{ $value['storage_perc'] }}
 @endforeach
 ```
 
-#### Temperature Sensors
+#### Value Sensors (Temperature, Humidity, Fanspeed, ...)
 
 ```text
 {{ $alert->title }}
@@ -214,47 +210,26 @@ Device Name: {{ $alert->hostname }}
 Severity: {{ $alert->severity }}
 Timestamp: {{ $alert->timestamp }}
 Uptime: {{ $alert->uptime_short }}
-@if ($alert->state == 0) Time elapsed: {{ $alert->elapsed }} @endif
-Location: {{ $alert->location }}
-Description: {{ $alert->description }}
-Features: {{ $alert->features }}
-Purpose: {{ $alert->purpose }}
-Notes: {{ $alert->notes }}
-
-Rule: @if ($alert->name) {{ $alert->name }} @else {{ $alert->rule }} @endif
-@if ($alert->faults) Faults:
-@foreach ($faults as $key => $value)
-#{{ $key }}: Temperature: {{ $value['sensor_current'] }} °C
-** @php echo ($value['sensor_current']-$value['sensor_limit']); @endphp°C over limit
-Previous Measurement: {{ $value['sensor_prev'] }} °C
-High Temperature Limit: {{ $value['sensor_limit'] }} °C
-@endforeach
+@if ($alert->state == 0)
+Time elapsed: {{ $alert->elapsed }}
 @endif
-```
-
-#### Value Sensors
-
-```text
-{{ $alert->title }}
-
-Device Name: {{ $alert->hostname }}
-Severity: {{ $alert->severity }}
-Timestamp: {{ $alert->timestamp }}
-Uptime: {{ $alert->uptime_short }}
-@if ($alert->state == 0) Time elapsed: {{ $alert->elapsed }} @endif
 Location: {{ $alert->location }}
 Description: {{ $alert->description }}
 Features: {{ $alert->features }}
-Purpose: {{ $alert->purpose }}
 Notes: {{ $alert->notes }}
 
-Rule: @if ($alert->name) {{ $alert->name }} @else {{ $alert->rule }} @endif
-@if ($alert->faults) Faults:
+Rule: {{ $alert->name ?? $alert->rule }}
+@if ($alert->faults)
+Faults:
 @foreach ($alert->faults as $key => $value)
-#{{ $key }}: Sensor {{ $value['sensor_current'] }}
-** @php echo ($value['sensor_current']-$value['sensor_limit']); @endphp over limit
-Previous Measurement: {{ $value['sensor_prev'] }}
-Limit: {{ $value['sensor_limit'] }}
+@php($unit = __("sensors.${value["sensor_class"]}.unit"))
+#{{ $key }}: {{ $value['sensor_descr'] ?? 'Sensor' }}
+
+Current: {{ $value['sensor_current'].$unit }}
+Previous: {{ $value['sensor_prev'].$unit }}
+Limit: {{ $value['sensor_limit'].$unit }}
+Over Limit: {{ round($value['sensor_current']-$value['sensor_limit'], 2).$unit }}
+
 @endforeach
 @endif
 ```

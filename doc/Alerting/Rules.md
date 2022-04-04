@@ -1,6 +1,3 @@
-source: Alerting/Rules.md
-path: blob/master/doc/
-
 # Rules
 
 Rules are defined using a logical language.

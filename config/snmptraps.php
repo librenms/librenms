@@ -6,7 +6,7 @@
 | You can change settings by setting them in the environment or .env
 | If there is something you need to change, but is not available as an environment setting,
 | request an environment variable to be created upstream or send a pull request.
-*/
+ */
 
 return [
     'trap_handlers' => [
@@ -28,6 +28,8 @@ return [
         'BGP4-V2-MIB-JUNIPER::jnxBgpM2Established' => \LibreNMS\Snmptrap\Handlers\JnxBgpM2Established::class,
         'BRIDGE-MIB::newRoot' => \LibreNMS\Snmptrap\Handlers\BridgeNewRoot::class,
         'BRIDGE-MIB::topologyChange' => \LibreNMS\Snmptrap\Handlers\BridgeTopologyChanged::class,
+        'CISCO-PORT-SECURITY-MIB::cpsSecureMacAddrViolation' => \LibreNMS\Snmptrap\Handlers\CiscoMacViolation::class,
+        'CISCO-ERR-DISABLE-MIB::cErrDisableInterfaceEventRev1' => \LibreNMS\Snmptrap\Handlers\CiscoErrDisableInterfaceEvent::class,
         'CM-ALARM-MIB::cmNetworkElementAlmTrap' => \LibreNMS\Snmptrap\Handlers\AdvaNetworkElementAlmTrap::class,
         'CM-ALARM-MIB::cmSysAlmTrap' => \LibreNMS\Snmptrap\Handlers\AdvaSysAlmTrap::class,
         'CM-PERFORMANCE-MIB::cmEthernetAccPortThresholdCrossingAlert' => \LibreNMS\Snmptrap\Handlers\AdvaAccThresholdCrossingAlert::class,
@@ -68,6 +70,8 @@ return [
         'FORTINET-FORTIGATE-MIB::fgTrapVpnTunDown' => \LibreNMS\Snmptrap\Handlers\FgTrapVpnTunDown::class,
         'FORTINET-FORTIGATE-MIB::fgTrapVpnTunUp' => \LibreNMS\Snmptrap\Handlers\FgTrapVpnTunUp::class,
         'FORTINET-FORTIMANAGER-FORTIANALYZER-MIB::fmTrapLogRateThreshold' => \LibreNMS\Snmptrap\Handlers\FmTrapLogRateThreshold::class,
+        'FOUNDRY-SN-TRAP-MIB::snTrapUserLogin' => \LibreNMS\Snmptrap\Handlers\SnTrapUserLogin::class,
+        'FOUNDRY-SN-TRAP-MIB::snTrapUserLogout' => \LibreNMS\Snmptrap\Handlers\SnTrapUserLogout::class,
         'IF-MIB::linkDown' => \LibreNMS\Snmptrap\Handlers\LinkDown::class,
         'IF-MIB::linkUp' => \LibreNMS\Snmptrap\Handlers\LinkUp::class,
         'JUNIPER-CFGMGMT-MIB::jnxCmCfgChange' => \LibreNMS\Snmptrap\Handlers\JnxCmCfgChange::class,
@@ -93,6 +97,14 @@ return [
         'PowerNet-MIB::outletOff' => \LibreNMS\Snmptrap\Handlers\ApcPduOutletOff::class,
         'PowerNet-MIB::outletOn' => \LibreNMS\Snmptrap\Handlers\ApcPduOutletOn::class,
         'PowerNet-MIB::outletReboot' => \LibreNMS\Snmptrap\Handlers\ApcPduOutletReboot::class,
+        'PowerNet-MIB::rPDUNearOverload' => \LibreNMS\Snmptrap\Handlers\ApcPduNearOverload::class,
+        'PowerNet-MIB::rPDUNearOverloadCleared' => \LibreNMS\Snmptrap\Handlers\ApcPduNearOverloadCleared::class,
+        'PowerNet-MIB::rPDUOverload' => \LibreNMS\Snmptrap\Handlers\ApcPduOverload::class,
+        'PowerNet-MIB::rPDUOverloadCleared' => \LibreNMS\Snmptrap\Handlers\ApcPduOverloadCleared::class,
+        'PowerNet-MIB::upsOnBattery' => \LibreNMS\Snmptrap\Handlers\ApcOnBattery::class,
+        'PowerNet-MIB::powerRestored' => \LibreNMS\Snmptrap\Handlers\ApcPowerRestored::class,
+        'PowerNet-MIB::smartAvrReducing' => \LibreNMS\Snmptrap\Handlers\ApcSmartAvrReducing::class,
+        'PowerNet-MIB::smartAvrReducingOff' => \LibreNMS\Snmptrap\Handlers\ApcSmartAvrReducingOff::class,
         'RUCKUS-EVENT-MIB::ruckusEventAssocTrap' => \LibreNMS\Snmptrap\Handlers\RuckusAssocTrap::class,
         'RUCKUS-EVENT-MIB::ruckusEventDiassocTrap' => \LibreNMS\Snmptrap\Handlers\RuckusDiassocTrap::class,
         'RUCKUS-EVENT-MIB::ruckusEventSetErrorTrap' => \LibreNMS\Snmptrap\Handlers\RuckusSetError::class,
@@ -114,6 +126,7 @@ return [
         'VMWARE-VMINFO-MIB::vmwVmSuspended' => \LibreNMS\Snmptrap\Handlers\VmwVmSuspended::class,
         'OSPF-TRAP-MIB::ospfIfStateChange' => \LibreNMS\Snmptrap\Handlers\OspfIfStateChange::class,
         'OSPF-TRAP-MIB::ospfNbrStateChange' => \LibreNMS\Snmptrap\Handlers\OspfNbrStateChange::class,
+        'OSPF-TRAP-MIB::ospfTxRetransmit' => \LibreNMS\Snmptrap\Handlers\OspfTxRetransmit::class,
         'UPS-MIB::upsTraps.0.1' => \LibreNMS\Snmptrap\Handlers\UpsTrapsOnBattery::class,
         'VEEAM-MIB::onBackupJobCompleted' => \LibreNMS\Snmptrap\Handlers\VeeamBackupJobCompleted::class,
         'VEEAM-MIB::onVmBackupCompleted' => \LibreNMS\Snmptrap\Handlers\VeeamVmBackupCompleted::class,

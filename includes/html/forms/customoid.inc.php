@@ -17,9 +17,9 @@ $message = '';
 $device_id = $_POST['device_id'];
 $id = $_POST['ccustomoid_id'];
 $action = $_POST['action'];
-$name = $_POST['name'];
-$oid = $_POST['oid'];
-$datatype = $_POST['datatype'];
+$name = strip_tags($_POST['name']);
+$oid = strip_tags($_POST['oid']);
+$datatype = strip_tags($_POST['datatype']);
 if (empty(($_POST['unit']))) {
     $unit = ['NULL'];
 } else {

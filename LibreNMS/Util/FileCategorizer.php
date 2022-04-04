@@ -26,6 +26,7 @@
 namespace LibreNMS\Util;
 
 use Illuminate\Support\Str;
+use Symfony\Component\Process\Process;
 
 class FileCategorizer extends Categorizer
 {
@@ -79,6 +80,8 @@ class FileCategorizer extends Categorizer
 
     public function categorize()
     {
+        // This can't be a normal addCategory() function since it returns multiple results
+        $this->osFromMibs();
         parent::categorize();
 
         // split out os
@@ -97,6 +100,47 @@ class FileCategorizer extends Categorizer
     private function validateOs($os)
     {
         return file_exists("includes/definitions/$os.yaml") ? $os : null;
+    }
+
+    private function osFromMibs(): void
+    {
+        $mibs = [];
+
+        foreach ($this->items as $file) {
+            if (Str::startsWith($file, 'mibs/')) {
+                $mibs[] = basename($file, '.mib');
+            }
+        }
+
+        if (empty($mibs)) {
+            return;
+        }
+
+        $grep = new Process(
+            [
+                'grep',
+                '--fixed-strings',
+                '--recursive',
+                '--files-with-matches',
+                '--file=-',
+                '--',
+                'includes/definitions/',
+                'includes/discovery/',
+                'includes/polling/',
+                'LibreNMS/OS/',
+            ],
+            null,
+            null,
+            implode("\n", $mibs)
+        );
+
+        $grep->run();
+
+        foreach (explode("\n", trim($grep->getOutput())) as $item) {
+            if (($os_name = $this->osFromFile($item)) !== null) {
+                $this->categorized['os-files'][] = ['os' => $os_name, 'file' => $item];
+            }
+        }
     }
 
     private function osFromFile($file)

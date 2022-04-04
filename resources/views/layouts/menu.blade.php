@@ -373,7 +373,7 @@
                        data-toggle="dropdown"><i class="fa fa-heartbeat fa-fw fa-lg fa-nav-icons hidden-md"
                                                  aria-hidden="true"></i> <span class="hidden-sm">{{ __('Health') }}</span></a>
                     <ul class="dropdown-menu">
-                        <li><a href="{{ url('health/metric=mempool') }}"><i class="fa fa-braille fa-fw fa-lg"
+                        <li><a href="{{ url('health/metric=mempool') }}"><i class="fas fa-memory fa-fw fa-lg"
                                                                             aria-hidden="true"></i> {{ __('Memory') }}</a>
                         </li>
                         <li><a href="{{ url('health/metric=processor') }}"><i class="fa fa-microchip fa-fw fa-lg"

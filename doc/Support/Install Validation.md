@@ -1,6 +1,3 @@
-source: Install Validation.md
-path: blob/master/doc/
-
 # Install validation
 
 With a lot of configuration possibilities, manually editing config.php

@@ -36,10 +36,13 @@ class Alertmanager extends Transport
         $alertmanager_opts = $this->parseUserOptions($this->config['alertmanager-options']);
         $alertmanager_opts['url'] = $this->config['alertmanager-url'];
 
-        return $this->contactAlertmanager($obj, $alertmanager_opts);
+        $alertmanager_username = $this->config['alertmanager-username'];
+        $alertmanager_password = $this->config['alertmanager-password'];
+
+        return $this->contactAlertmanager($obj, $alertmanager_opts, $alertmanager_username, $alertmanager_password);
     }
 
-    public function contactAlertmanager($obj, $api)
+    public function contactAlertmanager($obj, $api, string $username, string $password)
     {
         if ($obj['state'] == AlertState::RECOVERED) {
             $alertmanager_status = 'endsAt';
@@ -66,13 +69,18 @@ class Alertmanager extends Transport
         $url = $api['url'];
         unset($api['url']);
         foreach ($api as $label => $value) {
-            $data[0]['labels'][$label] = $value;
+            // To allow dynamic values
+            if ((preg_match('/^extra_[A-Za-z0-9_]+$/', $label)) && (! empty($obj['faults'][1][$value]))) {
+                $data[0]['labels'][$label] = $obj['faults'][1][$value];
+            } else {
+                $data[0]['labels'][$label] = $value;
+            }
         }
 
-        return $this->postAlerts($url, $data);
+        return $this->postAlerts($url, $data, $username, $password);
     }
 
-    public static function postAlerts($url, $data)
+    public static function postAlerts($url, $data, string $username, string $password)
     {
         $curl = curl_init();
         Proxy::applyToCurl($curl);
@@ -83,6 +91,12 @@ class Alertmanager extends Transport
         curl_setopt($curl, CURLOPT_CONNECTTIMEOUT, 5);
         curl_setopt($curl, CURLOPT_CONNECTTIMEOUT_MS, 5000);
         curl_setopt($curl, CURLOPT_POST, true);
+
+        if ($username != '' && $password != '') {
+            curl_setopt($curl, CURLOPT_HTTPAUTH, CURLAUTH_BASIC);
+            curl_setopt($curl, CURLOPT_USERNAME, $username);
+            curl_setopt($curl, CURLOPT_PASSWORD, $password);
+        }
 
         $alert_message = json_encode($data);
         curl_setopt($curl, CURLOPT_POSTFIELDS, $alert_message);
@@ -129,9 +143,21 @@ class Alertmanager extends Transport
                     'type' => 'text',
                 ],
                 [
+                    'title' => 'Alertmanager Username',
+                    'name' => 'alertmanager-username',
+                    'descr' => 'Alertmanager Basic Username to authenticate to Alertmanager',
+                    'type' => 'text',
+                ],
+                [
+                    'title' => 'Alertmanager Password',
+                    'name' => 'alertmanager-password',
+                    'descr' => 'Alertmanager Basic Password to authenticate to Alertmanager',
+                    'type' => 'password',
+                ],
+                [
                     'title' => 'Alertmanager Options',
                     'name' => 'alertmanager-options',
-                    'descr' => 'Alertmanager Options',
+                    'descr' => 'Alertmanager Options. You can add any fixed string value or dynamic value from alert details (label name must start with extra_ and value must exists in alert details).',
                     'type' => 'textarea',
                 ],
             ],

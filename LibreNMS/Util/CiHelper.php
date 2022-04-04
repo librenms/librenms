@@ -286,7 +286,7 @@ class CiHelper
 
             if (! $this->flags['lint_skip_phpstan']) {
                 $phpstan_cmd = [$this->checkPhpExec('phpstan'), 'analyze', '--no-interaction',  '--memory-limit=2G'];
-                $return += $this->execute('PHPStan Deprecated', $phpstan_cmd + ['--configuration=phpstan-deprecated.neon']);
+                $return += $this->execute('PHPStan Deprecated', array_merge($phpstan_cmd, ['--configuration=phpstan-deprecated.neon']));
                 $return += $this->execute('PHPStan', $phpstan_cmd);
             }
         }
@@ -388,7 +388,7 @@ class CiHelper
         $type = substr($name, $space ? $space + 1 : 0);
         $quiet = ($this->flags['ci'] && isset($this->ciDefaults['quiet'][$type])) ? $this->ciDefaults['quiet'][$type] : $this->flags['quiet'];
 
-        $proc->setTimeout(3600)->setIdleTimeout(3600);
+        $proc->setTimeout(7200)->setIdleTimeout(3600);
         if (! ($silence || $quiet)) {
             echo PHP_EOL;
             $proc->setTty(Process::isTtySupported());

@@ -30,6 +30,7 @@ return [
             'general' => ['name' => 'General Authentication Settings'],
             'ad' => ['name' => 'Active Directory Settings'],
             'ldap' => ['name' => 'LDAP Settings'],
+            'socialite' => ['name' => 'Socialite Settings'],
         ],
         'authorization' => [
             'device-group' => ['name' => 'Device Group Settings'],
@@ -257,6 +258,20 @@ return [
         ],
         'astext' => [
             'description' => 'Key to hold cache of autonomous systems descriptions',
+        ],
+        'auth' => [
+            'socialite' => [
+                'redirect' => [
+                    'description' => 'Redirect Login page',
+                    'help' => 'Login page should redirect immediately to the first defined provider.<br><br>TIPS: You can prevent it by appending ?redirect=0 in the url',
+                ],
+                'register' => [
+                    'description' => 'Allow registration via provider',
+                ],
+                'configs' => [
+                    'description' => 'Provider configs',
+                ],
+            ],
         ],
         'auth_ad_base_dn' => [
             'description' => 'Base DN',

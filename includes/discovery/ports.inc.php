@@ -3,6 +3,7 @@
 // Build SNMP Cache Array
 use App\Models\PortGroup;
 use LibreNMS\Config;
+use LibreNMS\Enum\PortAssociationMode;
 use LibreNMS\Util\StringHelpers;
 
 $descrSnmpFlags = '-OQUs';
@@ -47,7 +48,7 @@ d_echo($port_stats);
 // compatibility reasons.
 $port_association_mode = Config::get('default_port_association_mode');
 if ($device['port_association_mode']) {
-    $port_association_mode = get_port_assoc_mode_name($device['port_association_mode']);
+    $port_association_mode = PortAssociationMode::getName($device['port_association_mode']);
 }
 
 // Build array of ports in the database and an ifIndex/ifName -> port_id map

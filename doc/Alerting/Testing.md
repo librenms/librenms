@@ -1,6 +1,3 @@
-source: Alerting/Testing.md
-path: blob/master/doc/
-
 ### Rules
 
 The simplest way of testing if an alert rule will match a device is by

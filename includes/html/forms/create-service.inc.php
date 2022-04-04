@@ -28,7 +28,14 @@ if (! Auth::user()->hasGlobalAdmin()) {
     exit('ERROR: You need to be admin');
 }
 
-foreach (['desc', 'ip', 'ignore', 'disabled', 'param', 'name', 'template_id'] as $varname) {
+foreach (['desc', 'name'] as $varname) {
+    //sanitize description and name
+    if (isset($vars[$varname])) {
+        $$varname = strip_tags($vars[$varname]);
+        $update['service_' . $varname] = $$varname;
+    }
+}
+foreach (['ip', 'ignore', 'disabled', 'param', 'template_id'] as $varname) {
     if (isset($vars[$varname])) {
         $update['service_' . $varname] = $vars[$varname];
         $$varname = $vars[$varname];

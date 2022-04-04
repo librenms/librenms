@@ -1,6 +1,3 @@
-source: Extensions/Network-Map.md
-path: blob/master/doc/
-
 # Network Map
 
 LibreNMS has the ability to show you a network map based on:
