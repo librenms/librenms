@@ -49,6 +49,10 @@ class Handler extends ExceptionHandler
 
         // try to upgrade generic exceptions to more specific ones
         if (! config('app.debug')) {
+            if ($exception instanceof \Illuminate\View\ViewException || $exception instanceof \Facade\Ignition\Exceptions\ViewException) {
+                $exception = $exception->getPrevious(); // revert to base exception
+            }
+
             foreach ($this->upgradable as $class) {
                 if ($new = $class::upgrade($exception)) {
                     return parent::render($request, $new);
