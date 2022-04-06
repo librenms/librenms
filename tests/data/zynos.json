@@ -15806,7 +15806,7 @@
                 {
                     "vlan": null,
                     "rootBridge": 0,
-                    "bridgeAddress": "ffffffffffff",
+                    "bridgeAddress": "bc9911a736f2",
                     "protocolSpecification": "ieee8021d",
                     "priority": 32768,
                     "timeSinceTopologyChange": "0",
