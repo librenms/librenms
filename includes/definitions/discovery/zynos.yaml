@@ -115,6 +115,25 @@ modules:
                     descr: 'Temp {{ $index }} ({{ $tempDescr }})'
                     index: 'tempCurValue.{{ $index }}'
                     high_limit: tempHighThresh
+                -
+                    oid: transceiverDdmInfoTable
+                    value: transceiverDdmInfoEntryCurrent
+                    snmp_flags: ['-OteQUsb', '-Pu'] # workaround for underscores in mib
+                    num_oid: '.1.3.6.1.4.1.890.1.5.8.47.117.2.1.7.{{ $index }}'
+                    descr: 'SFP ifIndex {{ $transceiverDdmInfoEntryPort }} {{ $transceiverDdmInfoEntryDescription }}'
+                    index: 'transceiverDdmInfoEntryCurrent.{{ $index }}'
+                    high_limit: transceiverDdmInfoEntryAlarmMax
+                    low_limit: transceiverDdmInfoEntryAlarmMin
+                    warn_limit: transceiverDdmInfoEntryWarnMax
+                    low_warn_limit: transceiverDdmInfoEntryWarnMin
+                    divisor: 100
+                    entPhysicalIndex: transceiverDdmInfoEntryPort
+                    entPhysicalIndex_measured: ports
+                    skip_values:
+                        -
+                            oid: transceiverDdmInfoEntryDescription
+                            op: '!='
+                            value: 'Temperature'
         dbm:
             options:
                 divisor: 100
@@ -184,3 +203,22 @@ modules:
                     descr: '{{ $voltageNominalValue }}mV ({{ $voltageDescr }})'
                     index: 'voltageCurValue.{{ $index }}'
                     low_limit: voltageLowThresh
+                -
+                    oid: transceiverDdmInfoTable
+                    value: transceiverDdmInfoEntryCurrent
+                    snmp_flags: ['-OteQUsb', '-Pu'] # workaround for underscores in mib
+                    num_oid: '.1.3.6.1.4.1.890.1.5.8.47.117.2.1.7.{{ $index }}'
+                    descr: 'SFP ifIndex {{ $transceiverDdmInfoEntryPort }} {{ $transceiverDdmInfoEntryDescription }}'
+                    index: 'transceiverDdmInfoEntryCurrent.{{ $index }}'
+                    high_limit: transceiverDdmInfoEntryAlarmMax
+                    low_limit: transceiverDdmInfoEntryAlarmMin
+                    warn_limit: transceiverDdmInfoEntryWarnMax
+                    low_warn_limit: transceiverDdmInfoEntryWarnMin
+                    divisor: 100
+                    entPhysicalIndex: transceiverDdmInfoEntryPort
+                    entPhysicalIndex_measured: ports
+                    skip_values:
+                        -
+                            oid: transceiverDdmInfoEntryDescription
+                            op: '!='
+                            value: 'Voltage'
