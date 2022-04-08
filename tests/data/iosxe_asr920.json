@@ -6964,18 +6964,20 @@
         "discovery": {
             "isis_adjacencies": [
                 {
+                    "index": "[32][1]",
                     "ifIndex": 26,
                     "isisISAdjState": "up",
                     "isisISAdjNeighSysType": "L2",
                     "isisISAdjNeighSysID": "01.02.46.00.00.05",
                     "isisISAdjNeighPriority": "0",
-                    "isisISAdjLastUpTime": 68534,
+                    "isisISAdjLastUpTime": 68535,
                     "isisISAdjAreaAddress": "49.00.00",
                     "isisISAdjIPAddrType": "ipv4",
                     "isisISAdjIPAddrAddress": "10.246.1.30",
                     "isisCircAdminState": "on"
                 },
                 {
+                    "index": "[33][2]",
                     "ifIndex": 27,
                     "isisISAdjState": "up",
                     "isisISAdjNeighSysType": "L2",
@@ -6988,12 +6990,13 @@
                     "isisCircAdminState": "on"
                 },
                 {
+                    "index": "[34][3]",
                     "ifIndex": 28,
                     "isisISAdjState": "up",
                     "isisISAdjNeighSysType": "L2",
                     "isisISAdjNeighSysID": "01.02.46.00.00.01",
                     "isisISAdjNeighPriority": "0",
-                    "isisISAdjLastUpTime": 68535,
+                    "isisISAdjLastUpTime": 68536,
                     "isisISAdjAreaAddress": "49.00.00",
                     "isisISAdjIPAddrType": "ipv4",
                     "isisISAdjIPAddrAddress": "10.246.1.33",
