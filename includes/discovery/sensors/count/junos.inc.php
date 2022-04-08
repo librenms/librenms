@@ -21,8 +21,25 @@
  * @author     Jeremy Ouellet <jouellet@beanfield.com>
  */
 foreach ($pre_cache['junos_firewall_oids'] as $index => $firewall_entry) {
-    $packetOID = genOID($firewall_entry, true);
-    $bytesOID = genOID($firewall_entry, false);
+    $types = [
+        'other'   => 1,
+        'counter' => 2,
+        'policer' => 3,
+        'hpolagg' => 4,
+        'hpolpre' => 5,
+    ];
+
+    $oidBase = '.1.3.6.1.4.1.2636.3.5.2.1.';
+    $suffix = '.' . $types[$firewall_entry['jnxFWCounterDisplayType']];
+    $filter = $firewall_entry['jnxFWCounterDisplayFilterName'];
+    $name = $firewall_entry['jnxFWCounterDisplayName'];
+
+    //Convert strings to numerical OIDs
+    $filter_oid = strlen($filter) . '.' . implode('.', unpack('c*', $filter));
+    $name_oid = strlen($name) . '.' . implode('.', unpack('c*', $name));
+
+    $packetOID = $oidBase . '4.' . $filter_oid . '.' . $name_oid . $suffix;
+    $bytesOID = $oidBase . '5.' . $filter_oid . '.' . $name_oid . $suffix;
 
     discover_sensor(
         $valid['sensor'],
@@ -57,26 +74,4 @@ foreach ($pre_cache['junos_firewall_oids'] as $index => $firewall_entry) {
         null,
         $firewall_entry['jnxFWCounterByteCount']
     );
-}
-
-function genOID($firewall_entry, $isPacket): string
-{
-    $types = [
-        'other'   => 1,
-        'counter' => 2,
-        'policer' => 3,
-        'hpolagg' => 4,
-        'hpolpre' => 5,
-    ];
-
-    $oidBase = '.1.3.6.1.4.1.2636.3.5.2.1.' . ($isPacket ? '4.' : '5.');
-    $suffix = '.' . $types[$firewall_entry['jnxFWCounterDisplayType']];
-    $filter = $firewall_entry['jnxFWCounterDisplayFilterName'];
-    $name = $firewall_entry['jnxFWCounterDisplayName'];
-
-    //Convert strings to numerical OIDs
-    $filter_oid = strlen($filter) . '.' . implode('.', unpack('c*', $filter));
-    $name_oid = strlen($name) . '.' . implode('.', unpack('c*', $name));
-
-    return $oidBase . $filter_oid . '.' . $name_oid . $suffix;
 }
