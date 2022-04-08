@@ -37,11 +37,11 @@ use LibreNMS\Interfaces\Discovery\Sensors\WirelessRsrpDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessRsrqDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessRssiDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessSnrDiscovery;
-use LibreNMS\Interfaces\Module;
 use LibreNMS\Interfaces\Polling\IsIsPolling;
 use LibreNMS\Interfaces\Polling\OSPolling;
 use LibreNMS\OS\Traits\CiscoCellular;
 use LibreNMS\Util\IP;
+use SnmpQuery;
 
 class Iosxe extends Ciscowlc implements
     IsIsDiscovery,
@@ -61,6 +61,7 @@ class Iosxe extends Ciscowlc implements
     {
         // Don't poll Ciscowlc FIXME remove when wireless-controller module exists
     }
+
     /**
      * Array of shortened ISIS codes
      *
@@ -70,50 +71,46 @@ class Iosxe extends Ciscowlc implements
         'l1IntermediateSystem' => 'L1',
         'l2IntermediateSystem' => 'L2',
         'l1L2IntermediateSystem' => 'L1L2',
-        'unknown' => 'unknown',
     ];
 
     public function discoverIsIs(): Collection
     {
         // Check if the device has any ISIS enabled interfaces
-        $circuits = snmpwalk_cache_oid($this->getDeviceArray(), 'CISCO-IETF-ISIS-MIB::ciiCirc', []);
+        $circuits = SnmpQuery::enumStrings()->walk('CISCO-IETF-ISIS-MIB::ciiCirc');
         $adjacencies = new Collection;
 
-        if (! empty($circuits)) {
-            $adjacencies_data = snmpwalk_cache_twopart_oid($this->getDeviceArray(), 'CISCO-IETF-ISIS-MIB::ciiISAdj', [], null, null, '-OQUstx');
-            $ifIndex_port_id_map = $this->getDevice()->ports()->pluck('port_id', 'ifIndex');
+        if ($circuits->isValid()) {
+            $circuits = $circuits->table(1);
+            $adjacencies_data = SnmpQuery::enumStrings()->walk('CISCO-IETF-ISIS-MIB::ciiISAdj')->table(2);
 
-            // No ISIS enabled interfaces -> delete the component
-            foreach ($circuits as $circuit_id => $circuit_data) {
-                if (! isset($circuit_data['ciiCircIfIndex'])) {
-                    continue;
+            foreach ($adjacencies_data as $circuit_index => $adjacency_list) {
+                foreach ($adjacency_list as $adjacency_index => $adjacency_data) {
+                    if (empty($circuits[$circuit_index]['CISCO-IETF-ISIS-MIB::ciiCircIfIndex'])) {
+                        continue;
+                    }
+
+                    if (($circuits[$circuit_index]['CISCO-IETF-ISIS-MIB::ciiCircPassiveCircuit'] ?? 'true') == 'true') {
+                        continue; // Do not poll passive interfaces and bad data
+                    }
+
+                    $adjacencies->push(new IsisAdjacency([
+                        'device_id' => $this->getDeviceId(),
+                        'index' => "[$circuit_index][$adjacency_index]",
+                        'ifIndex' => $circuits[$circuit_index]['CISCO-IETF-ISIS-MIB::ciiCircIfIndex'],
+                        'port_id' => $this->ifIndexToId($circuits[$circuit_index]['CISCO-IETF-ISIS-MIB::ciiCircIfIndex']),
+                        'isisCircAdminState' => $circuits[$circuit_index]['CISCO-IETF-ISIS-MIB::ciiCircAdminState'] ?? 'down',
+                        'isisISAdjState' => $adjacency_data['CISCO-IETF-ISIS-MIB::ciiISAdjState'] ?? 'down',
+                        'isisISAdjNeighSysType' => Arr::get($this->isis_codes, $adjacency_data['CISCO-IETF-ISIS-MIB::ciiISAdjNeighSysType'] ?? '', 'unknown'),
+                        'isisISAdjNeighSysID' => $this->formatIsIsId($adjacency_data['CISCO-IETF-ISIS-MIB::ciiISAdjNeighSysID'] ?? ''),
+                        'isisISAdjNeighPriority' => $adjacency_data['CISCO-IETF-ISIS-MIB::ciiISAdjNeighPriority'] ?? '',
+                        'isisISAdjLastUpTime' => $this->parseAdjacencyTime($adjacency_data['CISCO-IETF-ISIS-MIB::ciiISAdjLastUpTime'] ?? 0),
+                        'isisISAdjAreaAddress' => implode(',', array_map([$this, 'formatIsIsId'], $adjacency_data['CISCO-IETF-ISIS-MIB::ciiISAdjAreaAddress'] ?? [])),
+                        'isisISAdjIPAddrType' => implode(',', $adjacency_data['CISCO-IETF-ISIS-MIB::ciiISAdjIPAddrType'] ?? []),
+                        'isisISAdjIPAddrAddress' => implode(',', array_map(function ($ip) {
+                            return (string) IP::fromHexstring($ip, true);
+                        }, $adjacency_data['CISCO-IETF-ISIS-MIB::ciiISAdjIPAddrAddress'] ?? [])),
+                    ]));
                 }
-
-                if ($circuit_data['ciiCircPassiveCircuit'] == 'true') {
-                    continue; // Do not poll passive interfaces
-                }
-
-                $adjacency_data = Arr::last($adjacencies_data[$circuit_id] ?? [[]]);
-
-                $adjacency = new IsisAdjacency([
-                    'device_id' => $this->getDeviceId(),
-                    'ifIndex' => $circuit_data['ciiCircIfIndex'],
-                    'port_id' => $this->ifIndexToId($circuit_data['ciiCircIfIndex']),
-                    'isisCircAdminState' => $circuit_data['ciiCircAdminState'] ?? 'down',
-                    'isisISAdjState' => $adjacency_data['ciiISAdjState'] ?? 'down',
-                ]);
-
-                if (! empty($adjacency_data)) {
-                    $adjacency->isisISAdjNeighSysType = Arr::get($this->isis_codes, $adjacency_data['ciiISAdjNeighSysType'] ?? 'unknown', 'unknown');
-                    $adjacency->isisISAdjNeighSysID = str_replace(' ', '.', trim($adjacency_data['ciiISAdjNeighSysID'] ?? ''));
-                    $adjacency->isisISAdjNeighPriority = $adjacency_data['ciiISAdjNeighPriority'] ?? '';
-                    $adjacency->isisISAdjLastUpTime = $this->parseAdjacencyTime($adjacency_data);
-                    $adjacency->isisISAdjAreaAddress = str_replace(' ', '.', trim($adjacency_data['ciiISAdjAreaAddress'] ?? ''));
-                    $adjacency->isisISAdjIPAddrType = $adjacency_data['ciiISAdjIPAddrType'] ?? '';
-                    $adjacency->isisISAdjIPAddrAddress = (string) IP::fromHexstring($adjacency_data['ciiISAdjIPAddrAddress'] ?? null, true);
-                }
-
-                $adjacencies->push($adjacency);
             }
         }
 
@@ -122,25 +119,21 @@ class Iosxe extends Ciscowlc implements
 
     public function pollIsIs($adjacencies): Collection
     {
-        $data = snmpwalk_cache_twopart_oid($this->getDeviceArray(), 'ciiISAdjState', [], 'CISCO-IETF-ISIS-MIB');
+        $states = SnmpQuery::enumStrings()->walk('CISCO-IETF-ISIS-MIB::ciiISAdjState')->values();
+        $up_count = array_count_values($states)['up'] ?? 0;
 
-        if (count($data) !== $adjacencies->where('ciiISAdjState', 'up')->count()) {
+        if ($up_count !== $adjacencies->count()) {
             echo 'New Adjacencies, running discovery';
 
             return $this->fillNew($adjacencies, $this->discoverIsIs());
         }
 
-        $data = snmpwalk_cache_twopart_oid($this->getDeviceArray(), 'ciiISAdjLastUpTime', $data, 'CISCO-IETF-ISIS-MIB', null, '-OQUst');
+        $uptime = SnmpQuery::walk('CISCO-IETF-ISIS-MIB::ciiISAdjLastUpTime')->values();
 
-        $adjacencies->each(function (IsisAdjacency $adjacency) use (&$data) {
-            $adjacency_data = Arr::last($data[$adjacency->ifIndex]);
-            $adjacency->isisISAdjState = $adjacency_data['ciiISAdjState'] ?? $adjacency->isisISAdjState;
-            $adjacency->isisISAdjLastUpTime = $this->parseAdjacencyTime($adjacency_data);
-            $adjacency->save();
-            unset($data[$adjacency->ifIndex]);
+        return $adjacencies->each(function (IsisAdjacency $adjacency) use ($states, $uptime) {
+            $adjacency->isisISAdjState = $states['CISCO-IETF-ISIS-MIB::ciiISAdjState' . $adjacency->index] ?? $adjacency->isisISAdjState;
+            $adjacency->isisISAdjLastUpTime = $this->parseAdjacencyTime($uptime['CISCO-IETF-ISIS-MIB::ciiISAdjLastUpTime' . $adjacency->index] ?? 0);
         });
-
-        return $adjacencies;
     }
 
     /**
@@ -149,8 +142,13 @@ class Iosxe extends Ciscowlc implements
      * @param  array  $data
      * @return int
      */
-    protected function parseAdjacencyTime($data): int
+    protected function parseAdjacencyTime($uptime): int
     {
-        return (int) max($data['ciiISAdjLastUpTime'] ?? 1, 1) / 100;
+        return round(max($uptime, 1) / 100);
+    }
+
+    protected function formatIsIsId(string $raw): string
+    {
+        return str_replace(' ', '.', trim($raw));
     }
 }
