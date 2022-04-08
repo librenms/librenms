@@ -144,7 +144,7 @@ class Iosxe extends Ciscowlc implements
      */
     protected function parseAdjacencyTime($uptime): int
     {
-        return round(max($uptime, 1) / 100);
+        return (int) round(max($uptime, 1) / 100);
     }
 
     protected function formatIsIsId(string $raw): string
