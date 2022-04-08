@@ -809,6 +809,7 @@ isis_adjacencies:
   Columns:
     - { Field: id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
     - { Field: device_id, Type: int, 'Null': false, Extra: '' }
+    - { Field: index, Type: varchar(16), 'Null': true, Extra: '' }
     - { Field: port_id, Type: int, 'Null': true, Extra: '' }
     - { Field: ifIndex, Type: int, 'Null': false, Extra: '' }
     - { Field: isisISAdjState, Type: varchar(13), 'Null': false, Extra: '' }
