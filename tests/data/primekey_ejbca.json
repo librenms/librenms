@@ -668,7 +668,7 @@
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
                     "sensor_prev": null,
-                    "user_func": "first_word",
+                    "user_func": "Number::cast",
                     "state_name": null
                 }
             ],
