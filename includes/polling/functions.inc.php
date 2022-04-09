@@ -329,7 +329,7 @@ function poll_device($device, $force_module = false)
                     include "includes/polling/$module.inc.php";
                 } catch (Throwable $e) {
                     // isolate module exceptions so they don't disrupt the polling process
-                    Log::error("%rError polling $module module for {$device['hostname']}.%n " . $e->getMessage() . PHP_EOL . $e->getTraceAsString(), ['color' => true]);
+                    Log::error("%rError polling $module module for {$device['hostname']}.%n $e", ['color' => true]);
                     Log::event("Error polling $module module. Check log file for more details.", $device['device_id'], 'poller', Alert::ERROR);
                 }
 
