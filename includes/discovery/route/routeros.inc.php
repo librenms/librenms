@@ -22,20 +22,21 @@
  *
  * @author     Peca Nesovanovic <peca.nesovanovic@sattrakt.com>
  */
+
 use LibreNMS\Util\IPv6;
 
-$oids = SnmpQuery::walk('IPV6-MIB::ipv6RouteTable')->table(1);
+$oids = SnmpQuery::allowUnordered()->walk('IPV6-MIB::ipv6RouteTable')->table(1);
 
 foreach ($oids as $dst => $data) {
-    $PfxLen = array_key_first($data['IPV6-MIB::ipv6RoutePfxLength']);
-    $RouteIndex = array_key_first($data['IPV6-MIB::ipv6RouteIndex'][$PfxLen]);
+    $PfxLen = array_key_first($data['IPV6-MIB::ipv6RouteIfIndex']);
+    $RouteIndex = array_key_first($data['IPV6-MIB::ipv6RouteIfIndex'][$PfxLen]);
 
     //route destination
     $ipv6dst = new IPv6($dst);
     $dst_uncompressed = $ipv6dst->uncompressed();
 
     //next hop
-    $ipv6hop = new IPv6($entryClean['inetCidrRouteNextHop'] = $data['IPV6-MIB::ipv6RouteNextHop'][$PfxLen][$RouteIndex]);
+    $ipv6hop = new IPv6($data['IPV6-MIB::ipv6RouteNextHop'][$PfxLen][$RouteIndex]);
     $hop_uncompressed = $ipv6hop->uncompressed();
 
     //portId from ifIndex

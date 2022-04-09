@@ -2,6 +2,7 @@
 /* Copyright (C) 2014 Nicolas Armando <nicearma@yahoo.com>
  * Copyright (C) 2014 Mathieu Millet <htam-net@github.net>
  * Copyright (C) 2019 PipoCanaja <pipocanaja@github.net>
+ * Copyright (C) 2022 Peca Nesovanovic <peca.nesovanovic@sattrakt.com>
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -64,7 +65,7 @@ if (file_exists(Config::get('install_dir') . "/includes/discovery/route/{$device
 //if the device does not support IP-FORWARD-MIB, we can still discover the ipv4 (only)
 //routes using RFC1213 but no way to limit the amount of routes here !!
 
-if (! isset($ipForwardNb['0']['inetCidrRouteNumber'])) {
+if (! isset($ipForwardNb['0']['inetCidrRouteNumber']) && $device['os'] != 'routeros') {
     //RFC1213-MIB
     $mib = 'RFC1213-MIB';
     $tableRoute = [];
