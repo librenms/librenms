@@ -25,6 +25,7 @@
 
 namespace LibreNMS;
 
+use App\Models\Callback;
 use App\Models\GraphType;
 use Exception;
 use Illuminate\Database\QueryException;
@@ -471,6 +472,9 @@ class Config
         }
         if (! self::has('snmp.unescape')) {
             self::persist('snmp.unescape', version_compare(Version::get()->netSnmp(), '5.8.0', '<'));
+        }
+        if (! self::has('reporting.usage')) {
+            self::persist('reporting.usage', (bool) Callback::get('enabled'));
         }
 
         self::populateTime();

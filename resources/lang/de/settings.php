@@ -737,8 +737,8 @@ return [
         'update_channel' => [
             'description' => 'Definiere Updatekanal',
             'options' => [
-                'master' => 'master',
-                'release' => 'release',
+                'master' => 'Daily',
+                'release' => 'Monthly',
             ],
         ],
         'virsh' => [

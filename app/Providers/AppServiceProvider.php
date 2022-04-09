@@ -60,8 +60,8 @@ class AppServiceProvider extends ServiceProvider
 
     private function bootCustomBladeDirectives()
     {
-        Blade::if('config', function ($key) {
-            return \LibreNMS\Config::get($key);
+        Blade::if('config', function ($key, $value = true) {
+            return \LibreNMS\Config::get($key) == $value;
         });
         Blade::if('notconfig', function ($key) {
             return ! \LibreNMS\Config::get($key);

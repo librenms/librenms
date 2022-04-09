@@ -90,29 +90,29 @@
       </div>
       <div class="col-md-6">
 
-        <h3>{{ __('Statistics') }}</h3>
+        <h3>{{ __('Reporting & Statistics') }}</h3>
 
         <table class='table table-condensed'>
 
             @admin
             <tr>
                 <td colspan='4'>
-                    <span class='bg-danger'>
-                        <label for="callback">{{ __('Opt in to send anonymous usage statistics to LibreNMS?') }}</label><br />
-                    </span>
-                    <input type="checkbox" id="callback" data-size="normal" name="statistics" @if($callback_status) checked @endif>
-                    <br />
-                    {{ __('Online stats:') }} <a target="_blank" href='https://stats.librenms.org/'>stats.librenms.org</a>
+                    <div>
+                        <label for="reporting.usage" class="bg-info">{{ __('Opt in to send anonymous reports to LibreNMS?') }}</label>
+                    </div>
+                    <div>
+                        {{ __('Error reporting:') }} <input type="checkbox" id="reporting.error" name="reporting" data-size="small" @if($error_reporting_status) checked @endif>
+                    </div>
+                    <div class="tw-mt-2">
+                    {{ __('Usage statistics:') }} <input type="checkbox" id="reporting.usage" name="reporting" data-size="small" @if($usage_reporting_status) checked @endif> <a target="_blank" href='https://stats.librenms.org/'>stats.librenms.org</a>
+                    </div>
+                    @if($reporting_clearable)
+                        <div class="tw-mt-2">
+                            <button class='btn btn-danger btn-xs' type='submit' name='clear-reporting' id='clear-reporting'>{{ __('Clear reporting data') }}</button>
+                        </div>
+                    @endif
                 </td>
             </tr>
-
-            @isset($callback_uuid)
-            <tr>
-                <td colspan='4'>
-                    <button class='btn btn-danger btn-xs' type='submit' name='clear-stats' id='clear-stats'>{{ __('Clear remote stats') }}</button>
-                </td>
-            </tr>
-            @endisset
             @endadmin
 
             <tr>
@@ -202,29 +202,29 @@ along with this program.  If not, see <a target="_blank" href="https://www.gnu.o
 
 @section('scripts')
 <script>
-    $("[name='statistics']").bootstrapSwitch('offColor','danger','size','mini');
-    $('input[name="statistics"]').on('switchChange.bootstrapSwitch',  function(event, state) {
+    $("[name='reporting']").bootstrapSwitch('offColor','danger','size','mini');
+    $('input[name="reporting"]').on('switchChange.bootstrapSwitch',  function(event, state) {
         event.preventDefault();
+        const type = event.target.id;
         $.ajax({
-            type: 'POST',
-            url: 'ajax_form.php',
-            data: { type: "callback-statistics", state: state},
-            dataType: "json",
+            type: 'PUT',
+            url: '{{ route('settings.update', '?') }}'.replace('?', type),
+            data: JSON.stringify({value: state}),
+            contentType: "application/json",
             success: function(data){},
             error:function(){
-                return $("#switch-state").bootstrapSwitch("toggle");
+                return $("#" + type).bootstrapSwitch("toggle");
             }
         });
     });
-    $('#clear-stats').on("click", function(event) {
+    $('#clear-reporting').on("click", function(event) {
         event.preventDefault();
         $.ajax({
-            type: 'POST',
-            url: 'ajax_form.php',
-            data: { type: "callback-clear"},
-            dataType: "json",
-            success: function(data){
-                location.reload(true);
+            type: 'DELETE',
+            url: '{{ route('reporting.clear') }}',
+            success: function(){
+                $('#clear-reporting').remove();
+                $("#callback").bootstrapSwitch('state', false);
             },
             error:function(){}
         });
