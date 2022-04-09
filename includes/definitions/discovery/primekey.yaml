@@ -1,10 +1,14 @@
 mib: PRIMEKEY-APPLIANCE-MIB
 modules:
+    pre-cache:
+        oids:
+            - PRIMEKEY-APPLIANCE-MIB::pkSfp
+            - PRIMEKEY-APPLIANCE-MIB::pkVhsm
     os:
         version: 'PRIMEKEY-APPLIANCE-MIB::pkAVersion'
         serial: 'PRIMEKEY-APPLIANCE-MIB::pkAHsmSerialNumber'
          # The Appliance S/N is not available via SNMP,
-         # but we can retrieve the S/N for the Hardware Security Module. 
+         # but we can retrieve the S/N for the Hardware Security Module.
     sensors:
         count:
             options:
@@ -136,15 +140,13 @@ modules:
                         -  { value: 0, generic: 0, graph: 0, descr: 'All OK' }
                         -  { value: 1, generic: 3, graph: 1, descr: 'Not Running or Unhealthy' }
                 -
-                    #oid: PRIMEKEY-APPLIANCE-MIB::pkSfp
-                    #value: PRIMEKEY-APPLIANCE-MIB::pkASignServerHealth
                     oid: PRIMEKEY-APPLIANCE-MIB::pkASignServerHealth
                     num_oid: '.1.3.6.1.4.1.22408.1.1.2.1.8.104.101.97.108.116.104.115.50.1{{ $index }}'
                     descr: 'Health SignServer'
                     group: 'Health of VMs'
                     index: pkASignServerHealth
-                    state_name: HealthSignserver
                     snmp_flags: ['-OteQUS', '-Ci']  # Workaround to prevent walking off the end of the MiB
+                    state_name: HealthSignserver
                     states:
                         -  { value: 0, generic: 0, graph: 0, descr: 'All OK' }
                         -  { value: 1, generic: 3, graph: 1, descr: 'Not Running or Unhealthy' }
@@ -258,15 +260,13 @@ modules:
                         -  { value: 0, generic: 0, graph: 0, descr: 'OK' }
                         -  { value: 1, generic: 2, graph: 1, descr: 'Low or Fail' }
                 -
-                    #oid: PRIMEKEY-APPLIANCE-MIB::kVhsm
-                    #value: PRIMEKEY-APPLIANCE-MIB::pkAHsmBatteryExtStatus
                     oid: PRIMEKEY-APPLIANCE-MIB::pkAHsmBatteryExtStatus
                     num_oid: '.1.3.6.1.4.1.22408.1.1.2.2.4.104.115.109.56.1{{ $index }}'
                     descr: 'Battery Ext'
                     group: 'HSM'
                     index: pkAHsmBatteryExtStatus
-                    state_name: BatteryExt
                     snmp_flags: ['-OteQUS', '-Ci']  # Workaround to prevent walking off the end of the MiB
+                    state_name: BatteryExt
                     states:
                         -  { value: 0, generic: 0, graph: 0, descr: 'Ok or Absent' }
                         -  { value: 1, generic: 2, graph: 1, descr: 'Low or Fail' }
