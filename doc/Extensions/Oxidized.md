@@ -54,7 +54,7 @@ group credentials within Oxidized. To enable this support please
 switch on 'Enable the return of groups to Oxidized':
 
 !!! setting "external/oxidized"
-   ```bash
+    ```bash
     lnms config:set oxidized.group_support true
     ```
 
