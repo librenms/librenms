@@ -4,7 +4,6 @@ type: appliance
 icon: primekey
 group: primekey
 mib_dir: primekey
-snmp_bulk: false
 over:
     - { graph: device_percent, text: "Database Usage" }
     - { graph: device_voltage, text: "HSM Voltage" }
