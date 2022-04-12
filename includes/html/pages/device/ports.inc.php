@@ -110,12 +110,12 @@ if ($vars['view'] == 'minigraphs') {
             . Url::portLink($port,
                 '<div style="font-weight: bold;">' . $port->getShortLabel() . '</div>' .
                 Url::graphTag([
-                'type' => $graph_type,
-                'id' => $port['port_id'],
-                'from' => $from,
-                'width' => 180,
-                'height' => 45,
-            ]))
+                    'type' => $graph_type,
+                    'id' => $port['port_id'],
+                    'from' => $from,
+                    'width' => 180,
+                    'height' => 45,
+                ]))
         . '</div>';
     }
 
