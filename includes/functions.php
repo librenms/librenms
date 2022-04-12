@@ -1039,7 +1039,7 @@ function hytera_h2f($number, $nd)
     }
 
     $tmppoint = array_reverse($tmppoint);
-    $tpointnumber = number_format($tmppoint[0] / 2, strlen($binpoint), '.', '');
+    $tpointnumber = min(number_format($tmppoint[0] / 2, strlen($binpoint), '.', ''), 1);
 
     $pointnumber = '';
     for ($i = 1; $i < strlen($binpoint); $i++) {
