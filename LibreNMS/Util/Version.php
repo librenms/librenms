@@ -58,6 +58,43 @@ class Version
         return self::VERSION;
     }
 
+    /**
+     * Compiles local commit data
+     * @return array with keys sha, date, and branch
+     */
+    public function localCommit(): array
+    {
+        if ($this->is_git_install) {
+            [$local_sha, $local_date] = explode('|', rtrim(`git show --pretty='%H|%ct' -s HEAD`));
+            return [
+                'sha' => $local_sha,
+                'date' => $local_date,
+                'branch' => rtrim(`git rev-parse --abbrev-ref HEAD`)
+            ];
+        }
+
+        return ['sha' => null, 'date' => null, 'branch' => null];
+    }
+
+    /**
+     * Fetches the remote commit from the github api if on the daily release channel
+     * @return array
+     */
+    public function remoteCommit(): array
+    {
+        if ($this->is_git_install && Config::get('update_channel') == 'master') {
+            $github = \Http::withOptions(['proxy' => Proxy::forGuzzle()])->get(Config::get('github_api') . 'commits/master');
+            return $github->json();
+        }
+
+        return [];
+    }
+
+    public function databaseServer(): string
+    {
+        return \LibreNMS\DB\Eloquent::isConnected() ? \LibreNMS\DB\Eloquent::version() : 'Not Connected';
+    }
+
     public function database(): array
     {
         if (Eloquent::isConnected()) {

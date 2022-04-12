@@ -32,6 +32,7 @@ use LibreNMS\ComposerHelper;
 use LibreNMS\Config;
 use LibreNMS\Util\EnvHelper;
 use LibreNMS\Util\Git;
+use LibreNMS\Util\Version;
 use LibreNMS\ValidationResult;
 use LibreNMS\Validator;
 
@@ -58,13 +59,13 @@ class Updates extends BaseValidation
             return;
         }
 
-        $versions = $validator->getVersions(true);
-
         // check if users on master update channel are up to date
         if (Config::get('update_channel') == 'master') {
-            if ($versions['local_sha'] != $versions['github']['sha']) {
+            $local_ver = Version::get()->localCommit();
+            $remote_ver = Version::get()->remoteCommit();
+            if ($local_ver['sha'] != $remote_ver['sha']) {
                 try {
-                    $commit_date = new DateTime('@' . $versions['local_date'], new DateTimeZone(date_default_timezone_get()));
+                    $commit_date = new DateTime('@' . $local_ver['date'], new DateTimeZone(date_default_timezone_get()));
                     if ($commit_date->diff(new DateTime())->days > 0) {
                         $validator->warn(
                             'Your install is over 24 hours out of date, last update: ' . $commit_date->format('r'),
@@ -76,13 +77,13 @@ class Updates extends BaseValidation
                 }
             }
 
-            if ($versions['local_branch'] != 'master') {
-                if ($versions['local_branch'] == 'php53') {
+            if ($local_ver['branch'] != 'master') {
+                if ($local_ver['branch'] == 'php53') {
                     $validator->warn(
                         'You are on the PHP 5.3 support branch, this will prevent automatic updates.',
                         'Update to PHP 5.6.4 or newer (PHP ' . Php::PHP_RECOMMENDED_VERSION . ' recommended) to continue to receive updates.'
                     );
-                } elseif ($versions['local_branch'] == 'php56') {
+                } elseif ($local_ver['branch'] == 'php56') {
                     $validator->warn(
                         'You are on the PHP 5.6/7.0 support branch, this will prevent automatic updates.',
                         'Update to PHP ' . Php::PHP_MIN_VERSION . ' or newer (PHP ' . Php::PHP_RECOMMENDED_VERSION . ' recommended) to continue to receive updates.'

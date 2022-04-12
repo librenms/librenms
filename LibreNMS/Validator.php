@@ -27,8 +27,10 @@ namespace LibreNMS;
 
 use Illuminate\Support\Str;
 use LibreNMS\Interfaces\ValidationGroup;
+use LibreNMS\Util\Html;
 use LibreNMS\Util\Laravel;
 use ReflectionClass;
+use ReflectionException;
 
 class Validator
 {
@@ -51,12 +53,15 @@ class Validator
             $class_name = basename($file, '.php');
             $class = '\LibreNMS\Validations\\' . $class_name;
 
-            $rc = new ReflectionClass($class);
-            if (! $rc->isAbstract()) {
-                $validation_name = strtolower($class_name);
-                $this->validation_groups[$validation_name] = new $class();
-                $this->results[$validation_name] = [];
-            }
+            try {
+                $rc = new ReflectionClass($class);
+
+                if (! $rc->isAbstract()) {
+                    $validation_name = strtolower($class_name);
+                    $this->validation_groups[$validation_name] = new $class();
+                    $this->results[$validation_name] = [];
+                }
+            } catch (ReflectionException $e) {}
         }
     }
 
@@ -66,7 +71,7 @@ class Validator
      * @param  array  $validation_groups  selected validation groups to run
      * @param  bool  $print_group_status  print out group status
      */
-    public function validate($validation_groups = [], $print_group_status = false)
+    public function validate(array $validation_groups = [], bool $print_group_status = false): void
     {
         foreach ($this->validation_groups as $group_name => $group) {
             // only run each group once
@@ -103,32 +108,25 @@ class Validator
      * @param  string  $validation_group
      * @return int
      */
-    public function getGroupStatus($validation_group)
+    public function getGroupStatus(string $validation_group): int
     {
         $results = $this->getResults($validation_group);
 
-        $status = array_reduce($results, function ($compound, $result) {
-            /** @var ValidationResult $result */
+        return array_reduce($results, function ($compound, ValidationResult $result) {
             return min($compound, $result->getStatus());
         }, ValidationResult::SUCCESS);
-
-        return $status;
     }
 
     /**
      * Get the ValidationResults for a specific validation group.
      *
-     * @param  string  $validation_group
+     * @param  string|null  $validation_group
      * @return ValidationResult[]
      */
-    public function getResults($validation_group = null)
+    public function getResults(string $validation_group = null): array
     {
         if (isset($validation_group)) {
-            if (isset($this->results[$validation_group])) {
-                return $this->results[$validation_group];
-            } else {
-                return [];
-            }
+            return $this->results[$validation_group] ?? [];
         }
 
         return array_reduce($this->results, 'array_merge', []);
@@ -138,9 +136,9 @@ class Validator
      * Get all of the ValidationResults that have been submitted.
      * ValidationResults will be grouped by the validation group.
      *
-     * @return array
+     * @return ValidationResult[][]
      */
-    public function getAllResults()
+    public function getAllResults(): array
     {
         return $this->results;
     }
@@ -148,14 +146,13 @@ class Validator
     /**
      * Print all ValidationResults or a group of them.
      *
-     * @param  string  $validation_group
+     * @param  string|null  $validation_group
      */
-    public function printResults($validation_group = null)
+    public function printResults(string $validation_group = null): void
     {
         $results = $this->getResults($validation_group);
 
         foreach ($results as $result) {
-            /** @var ValidationResult $result */
             $result->consolePrint();
         }
     }
@@ -165,9 +162,9 @@ class Validator
      * This allows customizing ValidationResults before submitting.
      *
      * @param  ValidationResult  $result
-     * @param  string  $group  manually specify the group, otherwise this will be inferred from the callers class name
+     * @param  string|null  $group  manually specify the group, otherwise this will be inferred from the callers class name
      */
-    public function result(ValidationResult $result, $group = null)
+    public function result(ValidationResult $result, string $group = null): void
     {
         // get the name of the validation that submitted this result
         if (empty($group)) {
@@ -188,10 +185,10 @@ class Validator
      * Submit an ok validation result.
      *
      * @param  string  $message
-     * @param  string  $fix
-     * @param  string  $group  manually specify the group, otherwise this will be inferred from the callers class name
+     * @param  string|null  $fix
+     * @param  string|null  $group  manually specify the group, otherwise this will be inferred from the callers class name
      */
-    public function ok($message, $fix = null, $group = null)
+    public function ok(string $message, string $fix = null, string $group = null): void
     {
         $this->result(new ValidationResult($message, ValidationResult::SUCCESS, $fix), $group);
     }
@@ -200,10 +197,10 @@ class Validator
      * Submit a warning validation result.
      *
      * @param  string  $message
-     * @param  string  $fix
-     * @param  string  $group  manually specify the group, otherwise this will be inferred from the callers class name
+     * @param  string|null  $fix
+     * @param  string|null  $group  manually specify the group, otherwise this will be inferred from the callers class name
      */
-    public function warn($message, $fix = null, $group = null)
+    public function warn(string $message, string $fix = null, string $group = null): void
     {
         $this->result(new ValidationResult($message, ValidationResult::WARNING, $fix), $group);
     }
@@ -212,10 +209,10 @@ class Validator
      * Submit a failed validation result.
      *
      * @param  string  $message
-     * @param  string  $fix
-     * @param  string  $group  manually specify the group, otherwise this will be inferred from the callers class name
+     * @param  string|null  $fix
+     * @param  string|null  $group  manually specify the group, otherwise this will be inferred from the callers class name
      */
-    public function fail($message, $fix = null, $group = null)
+    public function fail(string $message, string $fix = null, string $group = null): void
     {
         $this->result(new ValidationResult($message, ValidationResult::FAILURE, $fix), $group);
     }
@@ -224,30 +221,11 @@ class Validator
      * Submit an informational validation result.
      *
      * @param  string  $message
-     * @param  string  $group  manually specify the group, otherwise this will be inferred from the callers class name
+     * @param  string|null  $group  manually specify the group, otherwise this will be inferred from the callers class name
      */
-    public function info($message, $group = null)
+    public function info(string $message, string $group = null): void
     {
         $this->result(new ValidationResult($message, ValidationResult::INFO), $group);
-    }
-
-    /**
-     * Get version_info() array.  This will cache the result and add remote data if requested and not already existing.
-     *
-     * @param  bool  $remote
-     * @return array
-     */
-    public function getVersions($remote = false)
-    {
-        if (! isset($this->versions)) {
-            $this->versions = version_info($remote);
-        } else {
-            if ($remote && ! isset($this->versions['github'])) {
-                $this->versions = version_info($remote);
-            }
-        }
-
-        return $this->versions;
     }
 
     /**
@@ -255,10 +233,10 @@ class Validator
      * Arguments match exec()
      *
      * @param  string  $command  the command to run
-     * @param  array  $output  will hold the output of the command
-     * @param  int  $code  will hold the return code from the command
+     * @param  array|null  $output  will hold the output of the command
+     * @param  int|null  $code  will hold the return code from the command
      */
-    public function execAsUser($command, &$output = null, &$code = null)
+    public function execAsUser(string $command, array &$output = null, int &$code = null): void
     {
         if (self::getUsername() === 'root') {
             $command = 'su ' . \config('librenms.user') . ' -s /bin/sh -c "' . $command . '"';
@@ -271,7 +249,7 @@ class Validator
      *
      * @return string
      */
-    public function getUsername()
+    public function getUsername(): string
     {
         if (! isset($this->username)) {
             if (function_exists('posix_getpwuid')) {
@@ -291,15 +269,57 @@ class Validator
      *
      * @return string the base url without a trailing /
      */
-    public function getBaseURL()
+    public function getBaseURL(): string
     {
         $url = function_exists('get_url') ? get_url() : Config::get('base_url');
 
         return rtrim(str_replace('validate', '', $url), '/');  // get base_url from current url
     }
 
-    public function getBaseDir()
+    public function getBaseDir(): string
     {
         return realpath(__DIR__ . '/..');
+    }
+
+    public function getStatusText(int $status): string
+    {
+        switch ($status) {
+            case ValidationResult::SUCCESS:
+                return 'Ok';
+            case ValidationResult::FAILURE:
+                return 'Failure';
+            case ValidationResult::WARNING:
+                return 'Warning';
+            case ValidationResult::INFO:
+                return 'Info';
+            default:
+                return '';
+        }
+    }
+
+    public function toArray(): array
+    {
+        return array_map(function (array $results, string $group) {
+            $groupStatus = $this->getGroupStatus($group);
+            return [
+                'group' => $group,
+                'name' => ucfirst($group),
+                'status' => $groupStatus,
+                'statusText' => $this->getStatusText($groupStatus),
+                'results' => array_map(function (ValidationResult $result) {
+                    $resultStatus = $result->getStatus();
+                    $resultFix = $result->getFix();
+                    $resultList = $result->getList();
+                    return [
+                        'status' => $resultStatus,
+                        'statusText' => $this->getStatusText($resultStatus),
+                        'message' => $result->getMessage(),
+                        'fix' => is_array($resultFix) ? $resultFix : ($resultList ? [Html::linkify($resultFix)] : []),
+                        'listDescription' => $result->getListDescription(),
+                        'list' => is_array($resultList) ? array_values($resultList) : [],
+                    ];
+                }, $results),
+            ];
+        }, $this->getAllResults(), array_keys($this->getAllResults()));
     }
 }

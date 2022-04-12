@@ -81,19 +81,6 @@ function toner2colour($descr, $percent)
     return $colour;
 }//end toner2colour()
 
-/**
- * Find all links in some text and turn them into html links.
- *
- * @param  string  $text
- * @return string
- */
-function linkify($text)
-{
-    $regex = "#(http|https|ftp|ftps)://[a-z0-9\-.]*[a-z0-9\-]+(/\S*)?#i";
-
-    return preg_replace($regex, '<a href="$0">$0</a>', $text);
-}
-
 function generate_link($text, $vars, $new_vars = [])
 {
     return '<a href="' . \LibreNMS\Util\Url::generate($vars, $new_vars) . '">' . $text . '</a>';
