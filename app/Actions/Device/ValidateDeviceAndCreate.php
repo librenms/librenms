@@ -118,13 +118,15 @@ class ValidateDeviceAndCreate
         // which snmp version should we try (and in what order)
         $snmp_versions = $this->device->snmpver ? [$this->device->snmpver] : Config::get('snmp.version');
 
-        $communities = \LibreNMS\Config::get('snmp.community');
+        $communities = Arr::where(Arr::wrap(Config::get('snmp.community')), function ($community) {
+            return $community && is_string($community);
+        });
         if ($this->device->community) {
             array_unshift($communities, $this->device->community);
         }
         $communities = array_unique($communities);
 
-        $v3_credentials = \LibreNMS\Config::get('snmp.v3');
+        $v3_credentials = Config::get('snmp.v3');
         array_unshift($v3_credentials, $this->device->only(['authlevel', 'authname', 'authpass', 'authalgo', 'cryptopass', 'cryptoalgo']));
         $v3_credentials = array_unique($v3_credentials, SORT_REGULAR);
 
