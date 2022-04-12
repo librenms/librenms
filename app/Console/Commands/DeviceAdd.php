@@ -139,7 +139,7 @@ class DeviceAdd extends LnmsCommand
             return 3;
         } catch (Exception $e) {
             // other errors?
-            $this->error(get_class($e) . ': ' . $e->getMessage());
+            $this->error("Error: $e");
 
             return 1;
         }
