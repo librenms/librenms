@@ -33,6 +33,7 @@ use LibreNMS\Config;
 use LibreNMS\Exceptions\InvalidOidException;
 use LibreNMS\Interfaces\Discovery\DiscoveryItem;
 use LibreNMS\OS;
+use LibreNMS\Util\Compare;
 
 class YamlDiscovery
 {
@@ -352,7 +353,7 @@ class YamlDiscovery
                     }
                 }
 
-                if (compare_var($tmp_value, $skip_value['value'], $op)) {
+                if (Compare::values($tmp_value, $skip_value['value'], $op)) {
                     return true;
                 }
             }

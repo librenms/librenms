@@ -4,12 +4,12 @@
 <div class="card mb-2">
   <div class="card-header h6" data-toggle="collapse" data-target="#env-file-text" aria-expanded="{{ $success ? 'false' : 'true' }}">
     @if($success)
-      <i class="fa fa-lg fa-check-square-o text-success"></i>
+      <i class="fa-solid fa-lg fa-square-check  text-success"></i>
     @else
-      <i class="fa fa-lg fa-times-rectangle-o text-danger"></i>
+      <i class="fa-solid fa-lg fa-rectangle-xmark text-danger"></i>
     @endif
     {{ $env_message }}
-    @if($env)<i class="fa fa-lg fa-chevron-down rotate-if-collapsed pull-right"></i>@endif($env)
+    @if($env)<i class="fa-solid fa-lg fa-chevron-down rotate-if-collapsed pull-right"></i>@endif($env)
   </div>
     @if($env)
     <div id="env-file-text" class="card-body collapse @if(!$success) show @endif">
@@ -26,7 +26,7 @@
                 data-trigger="manual"
                 data-title="{{ __('install.finish.copied') }}"
             >
-                <i class="fa fa-clipboard"></i>
+                <i class="fa-solid fa-clipboard"></i>
             </button>
         </div>
         <pre id="env-content" class="card bg-light p-3">{{ $env }}</pre>
@@ -35,9 +35,9 @@
 </div>
 <div class="card mb-2">
     <div class="card-header h6" data-toggle="collapse" data-target="#config-file-text" aria-expanded="false">
-        <i class="fa fa-lg fa-check-square-o text-success"></i>
+        <i class="fa-solid fa-lg fa-square-check  text-success"></i>
         {{ $config_message }}
-        @if($config)<i class="fa fa-lg fa-chevron-down rotate-if-collapsed pull-right"></i>@endif
+        @if($config)<i class="fa-solid fa-lg fa-chevron-down rotate-if-collapsed pull-right"></i>@endif
     </div>
     @if($config)
     <div id="config-file-text" class="card-body collapse">
@@ -53,7 +53,7 @@
                 data-trigger="manual"
                 data-title="{{ __('install.finish.copied') }}"
             >
-                <i class="fa fa-clipboard"></i>
+                <i class="fa-solid fa-clipboard"></i>
             </button>
         </div>
         <pre id="config-content" class="card bg-light p-3">{{ $config }}</pre>

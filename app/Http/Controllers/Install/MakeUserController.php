@@ -117,6 +117,6 @@ class MakeUserController extends InstallationController implements InstallerStep
 
     public function icon(): string
     {
-        return 'fa-key';
+        return 'fa-solid fa-key';
     }
 }

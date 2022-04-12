@@ -128,8 +128,8 @@ def scan_host(scan_ip):
 
             arguments = [
                 "/usr/bin/env",
-                "php",
-                "addhost.php",
+                "lnms",
+                "device:add",
                 "-g",
                 POLLER_GROUP,
                 hostname or scan_ip,
@@ -261,7 +261,7 @@ Example: """
     networks = []
     for net in netargs if netargs else CONFIG.get("nets", []):
         try:
-            networks.append(ip_network(u"%s" % net, True))
+            networks.append(ip_network("%s" % net, True))
             debug("Network parsed: {}".format(net), 2)
         except ValueError as e:
             parser.error("Invalid network format {}".format(e))
