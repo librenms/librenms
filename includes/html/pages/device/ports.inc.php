@@ -1,5 +1,9 @@
 <?php
 
+use App\Models\Port;
+use LibreNMS\Config;
+use LibreNMS\Util\Url;
+
 if ($vars['view'] == 'graphs' || $vars['view'] == 'minigraphs') {
     if (isset($vars['graph'])) {
         $graph_type = 'port_' . $vars['graph'];
@@ -9,7 +13,7 @@ if ($vars['view'] == 'graphs' || $vars['view'] == 'minigraphs') {
 }
 
 if (! $vars['view']) {
-    $vars['view'] = trim(\LibreNMS\Config::get('ports_page_default'), '/');
+    $vars['view'] = trim(Config::get('ports_page_default'), '/');
 }
 
 $link_array = [
@@ -59,7 +63,7 @@ $graph_types = [
     'errors'    => 'Errors',
 ];
 
-if (\LibreNMS\Config::get('enable_ports_etherlike')) {
+if (Config::get('enable_ports_etherlike')) {
     $graph_types['etherlike'] = 'Etherlike';
 }
 
@@ -101,9 +105,18 @@ if ($vars['view'] == 'minigraphs') {
     echo "<div style='display: block; clear: both; margin: auto; min-height: 500px;'>";
     unset($seperator);
 
-    foreach (dbFetchRows('select * from ports WHERE device_id = ? AND `disabled` = 0 ORDER BY ifIndex', [$device['device_id']]) as $port) {
-        $port = cleanPort($port, $device);
-        echo "<div class='minigraph-div'><div style='font-weight: bold;'>" . generate_port_link($port) . '</div></div>';
+    foreach (Port::where('device_id', $device['device_id'])->where('disabled', 0)->orderBy('ifIndex')->get() as $port) {
+        echo '<div class="minigraph-div">'
+            . Url::portLink($port,
+                '<div style="font-weight: bold;">' . $port->getShortLabel() . '</div>' .
+                Url::graphTag([
+                'type' => $graph_type,
+                'id' => $port['port_id'],
+                'from' => $from,
+                'width' => 180,
+                'height' => 45,
+            ]))
+        . '</div>';
     }
 
     echo '</div>';
@@ -115,10 +128,10 @@ if ($vars['view'] == 'minigraphs') {
     } ?>
 <div style='margin: 0px;'><table class='table'>
   <tr>
-    <th width="350"><A href="<?php echo \LibreNMS\Util\Url::generate($vars, ['sort' => 'port']); ?>">Port</a></th>
+    <th width="350"><A href="<?php echo Url::generate($vars, ['sort' => 'port']); ?>">Port</a></th>
     <th width="100">Port Group</a></th>
     <th width="100"></th>
-    <th width="120"><a href="<?php echo \LibreNMS\Util\Url::generate($vars, ['sort' => 'traffic']); ?>">Traffic</a></th>
+    <th width="120"><a href="<?php echo Url::generate($vars, ['sort' => 'traffic']); ?>">Traffic</a></th>
     <th width="75">Speed</th>
     <th width="100">Media</th>
     <th width="100">Mac Address</th>
