@@ -114,7 +114,8 @@ if ($vars['view'] == 'minigraphs') {
                     'id' => $port['port_id'],
                     'from' => $from,
                     'width' => 180,
-                    'height' => 45,
+                    'height' => 55,
+                    'legend' => 'no',
                 ]))
         . '</div>';
     }
