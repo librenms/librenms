@@ -61,7 +61,8 @@ class Validator
                     $this->validation_groups[$validation_name] = new $class();
                     $this->results[$validation_name] = [];
                 }
-            } catch (ReflectionException $e) {}
+            } catch (ReflectionException $e) {
+            }
         }
     }
 
@@ -301,6 +302,7 @@ class Validator
     {
         return array_map(function (array $results, string $group) {
             $groupStatus = $this->getGroupStatus($group);
+
             return [
                 'group' => $group,
                 'name' => ucfirst($group),
@@ -310,6 +312,7 @@ class Validator
                     $resultStatus = $result->getStatus();
                     $resultFix = $result->getFix();
                     $resultList = $result->getList();
+
                     return [
                         'status' => $resultStatus,
                         'statusText' => $this->getStatusText($resultStatus),

@@ -32,7 +32,7 @@ use Symfony\Component\Process\Process;
 class Version
 {
     // Update this on release
-    const VERSION = '22.3.0';
+    public const VERSION = '22.3.0';
 
     /**
      * @var bool
@@ -66,10 +66,11 @@ class Version
     {
         if ($this->is_git_install) {
             [$local_sha, $local_date] = explode('|', rtrim(`git show --pretty='%H|%ct' -s HEAD`));
+
             return [
                 'sha' => $local_sha,
                 'date' => $local_date,
-                'branch' => rtrim(`git rev-parse --abbrev-ref HEAD`)
+                'branch' => rtrim(`git rev-parse --abbrev-ref HEAD`),
             ];
         }
 
@@ -84,6 +85,7 @@ class Version
     {
         if ($this->is_git_install && Config::get('update_channel') == 'master') {
             $github = \Http::withOptions(['proxy' => Proxy::forGuzzle()])->get(Config::get('github_api') . 'commits/master');
+
             return $github->json();
         }
 

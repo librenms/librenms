@@ -27,10 +27,10 @@ namespace LibreNMS;
 
 class ValidationResult
 {
-    const FAILURE = 0;
-    const WARNING = 1;
-    const SUCCESS = 2;
-    const INFO = 3;
+    public const FAILURE = 0;
+    public const WARNING = 1;
+    public const SUCCESS = 2;
+    public const INFO = 3;
 
     private $message;
     private $status;
