@@ -27,7 +27,6 @@ namespace LibreNMS;
 
 use Illuminate\Support\Str;
 use LibreNMS\Interfaces\ValidationGroup;
-use LibreNMS\Util\Html;
 use LibreNMS\Util\Laravel;
 use ReflectionClass;
 use ReflectionException;
@@ -309,18 +308,7 @@ class Validator
                 'status' => $groupStatus,
                 'statusText' => $this->getStatusText($groupStatus),
                 'results' => array_map(function (ValidationResult $result) {
-                    $resultStatus = $result->getStatus();
-                    $resultFix = $result->getFix();
-                    $resultList = $result->getList();
-
-                    return [
-                        'status' => $resultStatus,
-                        'statusText' => $this->getStatusText($resultStatus),
-                        'message' => $result->getMessage(),
-                        'fix' => is_array($resultFix) ? $resultFix : ($resultList ? [Html::linkify($resultFix)] : []),
-                        'listDescription' => $result->getListDescription(),
-                        'list' => is_array($resultList) ? array_values($resultList) : [],
-                    ];
+                    return $result->toArray();
                 }, $results),
             ];
         }, $this->getAllResults(), array_keys($this->getAllResults()));

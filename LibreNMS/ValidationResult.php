@@ -25,6 +25,8 @@
 
 namespace LibreNMS;
 
+use LibreNMS\Util\Html;
+
 class ValidationResult
 {
     public const FAILURE = 0;
@@ -211,6 +213,22 @@ class ValidationResult
     public function getListDescription(): string
     {
         return $this->list_description;
+    }
+
+    public function toArray(): array
+    {
+        $resultStatus = $this->getStatus();
+        $resultFix = $this->getFix();
+        $resultList = $this->getList();
+
+        return [
+            'status' => $resultStatus,
+            'statusText' => $this->getStatusText($resultStatus),
+            'message' => $this->getMessage(),
+            'fix' => is_array($resultFix) ? $resultFix : ($resultList ? [Html::linkify($resultFix)] : []),
+            'listDescription' => $this->getListDescription(),
+            'list' => is_array($resultList) ? array_values($resultList) : [],
+        ];
     }
 
     /**
