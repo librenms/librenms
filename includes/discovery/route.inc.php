@@ -178,9 +178,7 @@ if (isset($ipForwardNb['0']['inetCidrRouteNumber']) && $ipForwardNb['0']['inetCi
 if (isset($ipForwardNb['0']['ipCidrRouteNumber']) && $ipForwardNb['0']['ipCidrRouteNumber'] > $ipForwardNb['0']['inetCidrRouteNumber'] && $ipForwardNb['0']['ipCidrRouteNumber'] < $max_routes) {
     //device uses only ipCidrRoute and not inetCidrRoute
     d_echo('IP FORWARD MIB (without inetCidr support)');
-    $mib = 'IP-FORWARD-MIB';
-    $oid = '.1.3.6.1.2.1.4.24.4.1';
-    $ipCidrTable = snmpwalk_group($device, $oid, $mib, 6, []);
+    $ipCidrTable = SnmpQuery::allowUnordered()->walk('IP-FORWARD-MIB::ipCidrRouteEntry')->table(6);
     echo 'ipCidrRouteTable ';
     // we need to translate the values to inetCidr structure;
     //d_echo($ipCidrTable);
@@ -191,16 +189,16 @@ if (isset($ipForwardNb['0']['ipCidrRouteNumber']) && $ipForwardNb['0']['ipCidrRo
                     unset($entryClean);
                     $entryClean['inetCidrRouteDestType'] = 'ipv4';
                     $entryClean['inetCidrRouteDest'] = $inetCidrRouteDest;
-                    $inetCidrRoutePfxLen = IPv4::netmask2cidr($entry['ipCidrRouteMask']); //CONVERT
+                    $inetCidrRoutePfxLen = IPv4::netmask2cidr($entry['IP-FORWARD-MIB::ipCidrRouteMask']); //CONVERT
                     $entryClean['inetCidrRoutePfxLen'] = $inetCidrRoutePfxLen;
-                    $entryClean['inetCidrRoutePolicy'] = $entry['ipCidrRouteInfo'];
+                    $entryClean['inetCidrRoutePolicy'] = $entry['IP-FORWARD-MIB::ipCidrRouteInfo'];
                     $entryClean['inetCidrRouteNextHopType'] = 'ipv4';
                     $entryClean['inetCidrRouteNextHop'] = $inetCidrRouteNextHop;
-                    $entryClean['inetCidrRouteMetric1'] = $entry['ipCidrRouteMetric1'];
-                    $entryClean['inetCidrRouteProto'] = $entry['ipCidrRouteProto'];
-                    $entryClean['inetCidrRouteType'] = $entry['ipCidrRouteType'];
-                    $entryClean['inetCidrRouteIfIndex'] = $entry['ipCidrRouteIfIndex'];
-                    $entryClean['inetCidrRouteNextHopAS'] = $entry['ipCidrRouteNextHopAS'];
+                    $entryClean['inetCidrRouteMetric1'] = $entry['IP-FORWARD-MIB::ipCidrRouteMetric1'];
+                    $entryClean['inetCidrRouteProto'] = $entry['IP-FORWARD-MIB::ipCidrRouteProto'];
+                    $entryClean['inetCidrRouteType'] = $entry['IP-FORWARD-MIB::ipCidrRouteType'];
+                    $entryClean['inetCidrRouteIfIndex'] = $entry['IP-FORWARD-MIB::ipCidrRouteIfIndex'];
+                    $entryClean['inetCidrRouteNextHopAS'] = $entry['IP-FORWARD-MIB::ipCidrRouteNextHopAS'];
                     $entryClean['context_name'] = '';
                     $entryClean['device_id'] = $device['device_id'];
                     $entryClean['port_id'] = Device::find($device['device_id'])->ports()->where('ifIndex', '=', $entryClean['inetCidrRouteIfIndex'])->first()->port_id;

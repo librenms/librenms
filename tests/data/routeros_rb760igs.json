@@ -2222,7 +2222,7 @@
                     "inetCidrRouteDest": "0.0.0.0",
                     "inetCidrRouteNextHopType": "ipv4",
                     "inetCidrRouteNextHop": "169.254.101.1",
-                    "inetCidrRoutePolicy": "zeroDotZero",
+                    "inetCidrRoutePolicy": "SNMPv2-SMI::zeroDotZero",
                     "inetCidrRoutePfxLen": 0
                 },
                 {
@@ -2250,7 +2250,7 @@
                     "inetCidrRouteDest": "169.254.101.0",
                     "inetCidrRouteNextHopType": "ipv4",
                     "inetCidrRouteNextHop": "0.0.0.0",
-                    "inetCidrRoutePolicy": "zeroDotZero",
+                    "inetCidrRoutePolicy": "SNMPv2-SMI::zeroDotZero",
                     "inetCidrRoutePfxLen": 24
                 },
                 {
