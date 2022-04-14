@@ -770,8 +770,7 @@ function alert_details($details)
                 $fault_detail .= 'Adjacent ' . $tmp_alerts['isisISAdjIPAddrAddress'];
                 $port = \App\Models\Port::find($tmp_alerts['port_id']);
                 $fault_detail .= ', Interface ' . \LibreNMS\Util\Url::portLink($port);
-            }
-            else {
+            } else {
                 $tmp_alerts = cleanPort($tmp_alerts);
                 $fault_detail .= generate_port_link($tmp_alerts) . ';&nbsp;';
             }
