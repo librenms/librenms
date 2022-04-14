@@ -1,15 +1,19 @@
 @extends('layouts.librenmsv1')
 
-@section('title', __('Validate'))
+@section('title', __('validation.results.validate'))
 
 @section('content')
-    <div x-data="{results: [], listItems: 10}"
-         x-init="fetch('{{ route('validate.results') }}').then(response => response.json().then(data => results = data))"
+    <div x-data="{results: [], listItems: 10, errorMessage: ''}"
+         x-init="fetch('{{ route('validate.results') }}').then(response => response.json().then(data => results = data).catch(error => errorMessage = error))"
          >
         <div class="tw-grid tw-place-items-center" style="height: 80vh" x-show="! results.length">
-            <h3>
-                <i class="fa-solid fa-spinner fa-spin"></i> Validating
-            </h3>
+            <h3 x-show="! errorMessage"><i class="fa-solid fa-spinner fa-spin"></i> {{ __('validation.results.validating') }}</h3>
+            <div x-show="errorMessage" class="panel panel-danger">
+                <div class="panel-heading">
+                    <i class="fa-solid fa-exclamation-triangle"></i> {{ __('validation.results.fetch_failed') }}
+                </div>
+                <div class="panel-body" x-text="errorMessage"></div>
+            </div>
         </div>
         <div x-show="results.length" class="tw-mx-10">
             <template x-for="(group, index) in results">
@@ -35,7 +39,7 @@
                                         ></div>
                                         <div class="panel-body" x-show="result.fix.length || result.list.length">
                                             <div x-show="result.fix.length">
-                                                Fix: <code>
+                                                {{ __('validation.results.fix') }}: <code>
                                                     <template x-for="fixText in result.fix">
                                                         <span x-text="fixText"></span>
                                                     </template>
@@ -49,7 +53,7 @@
                                                     </template>
                                                 </ul>
                                                 <div x-data="{expanded: false}" x-show="result.list.length > listItems">
-                                                    <button style="margin-top: 3px" type="button" class="btn btn-default" x-on:click="expanded = ! expanded" x-text="expanded ? 'Show less' : 'Show all'"></button>
+                                                    <button style="margin-top: 3px" type="button" class="btn btn-default" x-on:click="expanded = ! expanded" x-text="expanded ? '{{ __('validation.results.show_less')}}' : '{{ __('validation.results.show_all')}}'"></button>
                                                     <ul x-show="expanded" class='list-group'>
                                                         <template x-for="longList in result.list.slice(listItems)">
                                                             <li class='list-group-item' x-text="longList"></li>

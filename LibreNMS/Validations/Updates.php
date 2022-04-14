@@ -63,7 +63,7 @@ class Updates extends BaseValidation
         if (Config::get('update_channel') == 'master') {
             $local_ver = Version::get()->localCommit();
             $remote_ver = Version::get()->remoteCommit();
-            if ($local_ver['sha'] != $remote_ver['sha']) {
+            if ($local_ver['sha'] != ($remote_ver['sha'] ?? null)) {
                 try {
                     $commit_date = new DateTime('@' . $local_ver['date'], new DateTimeZone(date_default_timezone_get()));
                     if ($commit_date->diff(new DateTime())->days > 0) {
