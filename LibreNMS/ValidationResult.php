@@ -32,10 +32,15 @@ class ValidationResult
     public const SUCCESS = 2;
     public const INFO = 3;
 
+    /** @var string */
     private $message;
+    /** @var int */
     private $status;
+    /** @var string*/
     private $list_description = '';
+    /** @var array */
     private $list;
+    /** @var string|null */
     private $fix;
 
     /**
@@ -125,7 +130,7 @@ class ValidationResult
         return $this->list;
     }
 
-    public function setList($description, array $list): ValidationResult
+    public function setList(string $description, array $list): ValidationResult
     {
         if (is_array(current($list))) {
             $list = array_map(function ($item) {
@@ -191,7 +196,7 @@ class ValidationResult
      *
      * @return string
      */
-    public static function getStatusText($status): string
+    public static function getStatusText(int $status): string
     {
         $table = [
             self::SUCCESS => '%gOK%n',
