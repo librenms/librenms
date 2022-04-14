@@ -36,7 +36,7 @@ class ValidationResult
     private $message;
     /** @var int */
     private $status;
-    /** @var string*/
+    /** @var string */
     private $list_description = '';
     /** @var array */
     private $list;

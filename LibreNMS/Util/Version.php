@@ -25,6 +25,7 @@
 
 namespace LibreNMS\Util;
 
+use Illuminate\Http\Client\ConnectionException;
 use LibreNMS\Config;
 use LibreNMS\DB\Eloquent;
 use Symfony\Component\Process\Process;
@@ -84,9 +85,12 @@ class Version
     public function remoteCommit(): array
     {
         if ($this->is_git_install && Config::get('update_channel') == 'master') {
-            $github = \Http::withOptions(['proxy' => Proxy::forGuzzle()])->get(Config::get('github_api') . 'commits/master');
+            try {
+                $github = \Http::withOptions(['proxy' => Proxy::forGuzzle()])->get(Config::get('github_api') . 'commits/master');
 
-            return $github->json();
+                return $github->json();
+            } catch (ConnectionException $e) {
+            }
         }
 
         return [];
