@@ -159,7 +159,6 @@ return [
 
     'attributes' => [],
 
-
     'results' => [
         'fix' => 'Fix',
         'fetch_failed' => 'Failed to fetch validation results',

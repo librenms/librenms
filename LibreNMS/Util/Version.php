@@ -61,6 +61,7 @@ class Version
 
     /**
      * Compiles local commit data
+     *
      * @return array with keys sha, date, and branch
      */
     public function localCommit(): array
@@ -80,6 +81,7 @@ class Version
 
     /**
      * Fetches the remote commit from the github api if on the daily release channel
+     *
      * @return array
      */
     public function remoteCommit(): array
