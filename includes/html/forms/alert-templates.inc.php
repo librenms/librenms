@@ -28,63 +28,67 @@ if (! Auth::user()->hasGlobalAdmin()) {
     exit(json_encode($response));
 }
 
-$template_id = 0;
-$template_newid = 0;
-$create = true;
+try {
+    Blade::render($vars['template']);
+    Blade::render($vars['title']);
+    Blade::render($vars['title_rec']);
 
-$name = strip_tags($vars['name']);
-if ((isset($vars['template']) && empty(Blade::render($vars['template']))) ||
-    (! empty($vars['title']) && empty(Blade::render($vars['title']))) ||
-    (! empty($vars['title_rec']) && empty(Blade::render($vars['title_rec'])))
-    ) {
-    $message = 'Template failed to be parsed, please check the syntax';
-} elseif (! empty($name)) {
-    if ($vars['template'] && is_numeric($vars['template_id'])) {
-        // Update template
-        $create = false;
-        $template_id = $vars['template_id'];
-        if (! dbUpdate(['template' => $vars['template'], 'name' => $name, 'title' => $vars['title'], 'title_rec' => $vars['title_rec']], 'alert_templates', 'id = ?', [$template_id]) >= 0) {
-            $status = 'ok';
-        } else {
-            $message = 'Failed to update the template';
-        }
-    } elseif ($vars['template']) {
-        // Create template
-        if ($name != 'Default Alert Template') {
-            $template_newid = dbInsert(['template' => $vars['template'], 'name' => $name, 'title' => $vars['title'], 'title_rec' => $vars['title_rec']], 'alert_templates');
-            if ($template_newid != false) {
-                $template_id = $template_newid;
+    $template_id = 0;
+    $template_newid = 0;
+    $create = true;
+
+    $name = strip_tags($vars['name']);
+    if (! empty($name)) {
+        if ($vars['template'] && is_numeric($vars['template_id'])) {
+            // Update template
+            $create = false;
+            $template_id = $vars['template_id'];
+            if (! dbUpdate(['template' => $vars['template'], 'name' => $name, 'title' => $vars['title'], 'title_rec' => $vars['title_rec']], 'alert_templates', 'id = ?', [$template_id]) >= 0) {
                 $status = 'ok';
             } else {
-                $message = 'Could not create alert template';
+                $message = 'Failed to update the template';
+            }
+        } elseif ($vars['template']) {
+            // Create template
+            if ($name != 'Default Alert Template') {
+                $template_newid = dbInsert(['template' => $vars['template'], 'name' => $name, 'title' => $vars['title'], 'title_rec' => $vars['title_rec']], 'alert_templates');
+                if ($template_newid != false) {
+                    $template_id = $template_newid;
+                    $status = 'ok';
+                } else {
+                    $message = 'Could not create alert template';
+                }
+            } else {
+                $message = 'This template name is reserved!';
             }
         } else {
-            $message = 'This template name is reserved!';
+            $message = 'We could not work out what you wanted to do!';
         }
-    } else {
-        $message = 'We could not work out what you wanted to do!';
-    }
-    if ($status == 'ok') {
-        $alertRulesOk = true;
-        dbDelete('alert_template_map', 'alert_templates_id = ?', [$template_id]);
-        $rules = explode(',', $vars['rules']);
-        if ($rules !== false) {
-            foreach ($rules as $rule_id) {
-                if (! dbInsert(['alert_rule_id' => $rule_id, 'alert_templates_id' => $template_id], 'alert_template_map')) {
-                    $alertRulesOk = false;
+        if ($status == 'ok') {
+            $alertRulesOk = true;
+            dbDelete('alert_template_map', 'alert_templates_id = ?', [$template_id]);
+            $rules = explode(',', $vars['rules']);
+            if ($rules !== false) {
+                foreach ($rules as $rule_id) {
+                    if (! dbInsert(['alert_rule_id' => $rule_id, 'alert_templates_id' => $template_id], 'alert_template_map')) {
+                        $alertRulesOk = false;
+                    }
                 }
             }
+            if ($alertRulesOk) {
+                $status = 'ok';
+                $message = 'Alert template has been ' . ($create ? 'created' : 'updated') . ' and attached rules have been updated.';
+            } else {
+                $status = 'warning';
+                $message = 'Alert template has been ' . ($create ? 'created' : 'updated') . ' but some attached rules have not been updated.';
+            }
         }
-        if ($alertRulesOk) {
-            $status = 'ok';
-            $message = 'Alert template has been ' . ($create ? 'created' : 'updated') . ' and attached rules have been updated.';
-        } else {
-            $status = 'warning';
-            $message = 'Alert template has been ' . ($create ? 'created' : 'updated') . ' but some attached rules have not been updated.';
-        }
+    } else {
+        $message = "You haven't given name to your template";
     }
-} else {
-    $message = "You haven't given name to your template";
+} catch (Exception $e) {
+    $message = 'Template failed to be parsed, please check the syntax. ';
+    $message .= $e->getMessage();
 }
 
 $response = ['status' => $status, 'message' => $message, 'newid' => $template_newid];
