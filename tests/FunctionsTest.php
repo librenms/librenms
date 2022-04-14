@@ -26,6 +26,7 @@
 namespace LibreNMS\Tests;
 
 use LibreNMS\Device\YamlDiscovery;
+use LibreNMS\Util\Html;
 use LibreNMS\Util\Rewrite;
 
 class FunctionsTest extends TestCase
@@ -68,7 +69,7 @@ sdfsd <a href="ftp://192.168.1.1/help/me/now.php">ftp://192.168.1.1/help/me/now.
 <a href="http://regexr.com/foo.html?q=bar">http://regexr.com/foo.html?q=bar</a>
 <a href="https://mediatemple.net">https://mediatemple.net</a>.';
 
-        $this->assertSame($expected, linkify($input));
+        $this->assertSame($expected, Html::linkify($input));
     }
 
     public function testDynamicDiscoveryGetValue()

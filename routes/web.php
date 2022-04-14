@@ -87,6 +87,8 @@ Route::group(['middleware' => ['auth'], 'guard' => 'auth'], function () {
         Route::post('plugin/settings/{plugin:plugin_name}', 'PluginSettingsController@update')->name('plugin.update');
 
         Route::resource('port-groups', 'PortGroupController');
+        Route::get('validate', [\App\Http\Controllers\ValidateController::class, 'index'])->name('validate');
+        Route::get('validate/results', [\App\Http\Controllers\ValidateController::class, 'runValidation'])->name('validate.results');
     });
 
     Route::get('plugin', 'PluginLegacyController@redirect');
