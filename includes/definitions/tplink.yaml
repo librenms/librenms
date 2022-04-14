@@ -8,3 +8,9 @@ discovery:
     -
         sysObjectID:
             - .1.3.6.1.4.1.11863.
+    -
+        sysObjectID: .1.3.6.1.4.1.16972
+        snmpget:
+            oid: .1.3.6.1.2.1.1.5.0
+            op: regex
+            value: '/td-w/i'
