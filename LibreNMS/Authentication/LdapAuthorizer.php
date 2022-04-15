@@ -28,6 +28,12 @@ class LdapAuthorizer extends AuthorizerBase
                 if ((Config::has('auth_ldap_binduser') || Config::has('auth_ldap_binddn')) && Config::has('auth_ldap_bindpassword')) {
                     $this->bind();
                 }
+
+                if (Config::get('auth_ldap_skip_group_check') === true) {
+                    // skip group check if the server does not support ldap_compare (hint: google gsuite ldap)
+                    return true;
+                }
+
                 $ldap_groups = $this->getGroupList();
                 if (empty($ldap_groups)) {
                     // no groups, don't check membership
