@@ -85,12 +85,12 @@
     "severity": "critical"
   },
   {
-    "rule": "macros.state_sensor_critical",
+ "rule": "macros.state_sensor_critical && sensors.sensor_alert = 1"
     "name": "State Sensor Critical",
     "default": true
   },
   {
-    "rule": "macros.state_sensor_warning",
+    "rule": "macros.state_sensor_warning && sensors.sensor_alert = 1",
     "name": "State Sensor Warning"
   },
   {
