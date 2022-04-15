@@ -28,12 +28,10 @@ use Config;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
-use Illuminate\Support\Facades\Event;
 use Laravel\Socialite\Contracts\User as SocialiteUser;
 use Laravel\Socialite\Facades\Socialite;
 use LibreNMS\Config as LibreNMSConfig;
 use LibreNMS\Exceptions\AuthenticationException;
-use Log;
 
 class SocialiteController extends Controller
 {
@@ -43,23 +41,6 @@ class SocialiteController extends Controller
     public function __construct()
     {
         $this->injectConfig();
-    }
-
-    public static function registerEventListeners(): void
-    {
-        foreach (LibreNMSConfig::get('auth.socialite.configs', []) as $provider => $config) {
-            // Treat not set as "disabled"
-            if (! isset($config['listener'])) {
-                continue;
-            }
-            $listener = $config['listener'];
-
-            if (class_exists($listener)) {
-                Event::listen(\SocialiteProviders\Manager\SocialiteWasCalled::class, "$listener@handle");
-            } else {
-                Log::error("Wrong value for auth.socialite.configs.$provider.listener set, class: '$listener' does not exist!");
-            }
-        }
     }
 
     /**

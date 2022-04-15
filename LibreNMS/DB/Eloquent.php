@@ -25,6 +25,7 @@
 
 namespace LibreNMS\DB;
 
+use App\Listeners\LegacyQueryListener;
 use Dotenv\Dotenv;
 use Illuminate\Database\Capsule\Manager as Capsule;
 use Illuminate\Database\Events\StatementPrepared;
@@ -61,14 +62,10 @@ class Eloquent
 
     public static function initLegacyListeners()
     {
-        if (self::isConnected()) {
+        $db = self::DB();
+        if ($db) {
             // set FETCH_ASSOC for queries that required by setting the global variable $PDO_FETCH_ASSOC (for dbFacile)
-            self::DB()->getEventDispatcher()->listen(StatementPrepared::class, function ($event) {
-                global $PDO_FETCH_ASSOC;
-                if ($PDO_FETCH_ASSOC) {
-                    $event->statement->setFetchMode(\PDO::FETCH_ASSOC);
-                }
-            });
+            $db->getEventDispatcher()->listen(StatementPrepared::class, new LegacyQueryListener());
         }
     }
 

@@ -23,6 +23,13 @@ class EventServiceProvider extends ServiceProvider
             \App\Listeners\CheckAlerts::class,
             \App\Listeners\UpdateDeviceGroups::class,
         ],
+        \Illuminate\Database\Events\QueryExecuted::class => [
+            \App\Listeners\QueryDebugListener::class,
+            \App\Listeners\QueryMetricListener::class,
+        ],
+        \Illuminate\Database\Events\StatementPrepared::class => [
+            \App\Listeners\LegacyQueryListener::class,
+        ]
     ];
 
     /**
