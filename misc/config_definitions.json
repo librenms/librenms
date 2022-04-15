@@ -5182,7 +5182,14 @@
             "section": "snmp",
             "order": 20,
             "type": "array",
-            "default": null
+            "default": []
+        },
+        "snmp.oids.unordered": {
+            "group": "poller",
+            "section": "snmp",
+            "order": 21,
+            "type": "array",
+            "default": []
         },
         "snmp.timeout": {
             "group": "poller",
