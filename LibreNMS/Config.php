@@ -206,7 +206,7 @@ class Config
      *
      * @param  string|null  $os  The os name
      * @param  string  $key  period separated config variable name
-     * @param  string  $global_prefix prefix for global setting
+     * @param  string  $global_prefix  prefix for global setting
      * @param  array  $default  optional array to return if the setting is not set
      * @return array
      */
