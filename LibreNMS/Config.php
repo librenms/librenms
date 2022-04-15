@@ -250,11 +250,11 @@ class Config
     public static function persist($key, $value)
     {
         try {
+            Arr::set(self::$config, $key, $value);
             \App\Models\Config::updateOrCreate(['config_name' => $key], [
                 'config_name' => $key,
                 'config_value' => $value,
             ]);
-            Arr::set(self::$config, $key, $value);
 
             // delete any children (there should not be any unless it is legacy)
             \App\Models\Config::query()->where('config_name', 'like', "$key.%")->delete();
