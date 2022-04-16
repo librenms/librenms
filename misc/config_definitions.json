@@ -1649,13 +1649,6 @@
             "order": 0,
             "type": "executable"
         },
-        "fping6": {
-            "default": "fping6",
-            "group": "external",
-            "section": "binaries",
-            "order": 1,
-            "type": "executable"
-        },
         "fping_options.count": {
             "default": 3,
             "group": "poller",
@@ -5352,13 +5345,6 @@
             "group": "external",
             "section": "binaries",
             "order": 13,
-            "type": "executable"
-        },
-        "traceroute6": {
-            "default": "traceroute6",
-            "group": "external",
-            "section": "binaries",
-            "order": 14,
             "type": "executable"
         },
         "transit_descr": {

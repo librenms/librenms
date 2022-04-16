@@ -575,9 +575,6 @@ return [
         'fping' => [
             'description' => 'Chemin vers `fping`',
         ],
-        'fping6' => [
-            'description' => 'Chemin vers `fping6`',
-        ],
         'fping_options' => [
             'count' => [
                 'description' => 'Nombre de paquets fping',
@@ -907,9 +904,6 @@ return [
         ],
         'traceroute' => [
             'description' => 'Chemin vers `traceroute`',
-        ],
-        'traceroute6' => [
-            'description' => 'Chemin vers `traceroute6`',
         ],
         'unix-agent' => [
             'connection-timeout' => [

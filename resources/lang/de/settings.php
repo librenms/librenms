@@ -403,9 +403,6 @@ return [
         'fping' => [
             'description' => 'Pfad zu fping',
         ],
-        'fping6' => [
-            'description' => 'Pfad zu fping6',
-        ],
         'fping_options' => [
             'count' => [
                 'description' => 'fping Anzahl',
@@ -709,9 +706,6 @@ return [
         ],
         'traceroute' => [
             'description' => 'Pfad zu  traceroute',
-        ],
-        'traceroute6' => [
-            'description' => 'Pfad zu traceroute6',
         ],
         'unix-agent' => [
             'connection-timeout' => [

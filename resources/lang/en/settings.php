@@ -675,9 +675,6 @@ return [
         'fping' => [
             'description' => 'Path to fping',
         ],
-        'fping6' => [
-            'description' => 'Path to fping6',
-        ],
         'fping_options' => [
             'count' => [
                 'description' => 'fping count',
@@ -1458,9 +1455,6 @@ return [
         ],
         'traceroute' => [
             'description' => 'Path to traceroute',
-        ],
-        'traceroute6' => [
-            'description' => 'Path to traceroute6',
         ],
         'twofactor' => [
             'description' => 'Two-Factor',

@@ -160,7 +160,7 @@ class SmokepingGenerateCommand extends LnmsCommand
 
         return array_merge(
             $this->buildProbes('FPing', self::DEFAULTIP4PROBE, self::IP4PROBE, Config::get('fping'), $probeCount),
-            $this->buildProbes('FPing6', self::DEFAULTIP6PROBE, self::IP6PROBE, Config::get('fping6'), $probeCount)
+            $this->buildProbes('FPing6', self::DEFAULTIP6PROBE, self::IP6PROBE, Config::locateBinary('fping6'), $probeCount)
         );
     }
 
