@@ -26,7 +26,6 @@
 namespace LibreNMS\Tests;
 
 use LibreNMS\Device\YamlDiscovery;
-use LibreNMS\Util\Html;
 use LibreNMS\Util\Rewrite;
 
 class FunctionsTest extends TestCase
@@ -53,23 +52,6 @@ class FunctionsTest extends TestCase
         $this->assertTrue(isHexString('aF 28 02 CE'));
         $this->assertFalse(isHexString('a5 fj 53'));
         $this->assertFalse(isHexString('a5fe53'));
-    }
-
-    public function testLinkify()
-    {
-        $input = 'foo@demo.net	bar.ba@test.co.uk
-www.demo.com	http://foo.co.uk/
-sdfsd ftp://192.168.1.1/help/me/now.php
-http://regexr.com/foo.html?q=bar
-https://mediatemple.net.';
-
-        $expected = 'foo@demo.net	bar.ba@test.co.uk
-www.demo.com	<a href="http://foo.co.uk/">http://foo.co.uk/</a>
-sdfsd <a href="ftp://192.168.1.1/help/me/now.php">ftp://192.168.1.1/help/me/now.php</a>
-<a href="http://regexr.com/foo.html?q=bar">http://regexr.com/foo.html?q=bar</a>
-<a href="https://mediatemple.net">https://mediatemple.net</a>.';
-
-        $this->assertSame($expected, Html::linkify($input));
     }
 
     public function testDynamicDiscoveryGetValue()
