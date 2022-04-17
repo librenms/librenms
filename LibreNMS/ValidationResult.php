@@ -25,7 +25,7 @@
 
 namespace LibreNMS;
 
-use LibreNMS\Util\Html;
+use Illuminate\Support\Arr;
 
 class ValidationResult
 {
@@ -223,9 +223,9 @@ class ValidationResult
 
         return [
             'status' => $resultStatus,
-            'statusText' => $this->getStatusText($resultStatus),
+            'statusText' => substr($this->getStatusText($resultStatus), 2, -2), // remove console colors
             'message' => $this->getMessage(),
-            'fix' => is_array($resultFix) ? $resultFix : ($resultList ? [Html::linkify($resultFix)] : []),
+            'fix' => Arr::wrap($resultFix),
             'listDescription' => $this->getListDescription(),
             'list' => is_array($resultList) ? array_values($resultList) : [],
         ];

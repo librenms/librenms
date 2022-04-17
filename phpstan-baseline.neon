@@ -11236,11 +11236,6 @@ parameters:
 			path: tests/FunctionsTest.php
 
 		-
-			message: "#^Method LibreNMS\\\\Tests\\\\FunctionsTest\\:\\:testLinkify\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: tests/FunctionsTest.php
-
-		-
 			message: "#^Method LibreNMS\\\\Tests\\\\FunctionsTest\\:\\:testMacCleanToReadable\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: tests/FunctionsTest.php

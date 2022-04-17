@@ -136,19 +136,6 @@ class Html
         return $graph_data;
     }
 
-    /**
-     * Find all links in some text and turn them into html links.
-     *
-     * @param  string|null  $text
-     * @return string
-     */
-    public static function linkify(?string $text): string
-    {
-        $regex = "#(http|https|ftp|ftps)://[a-z0-9\-.]*[a-z0-9\-]+(/\S*)?#i";
-
-        return preg_replace($regex, '<a href="$0">$0</a>', $text);
-    }
-
     public static function percentageBar($width, $height, $percent, $left_text = '', $right_text = '', $warn = null, $shadow = null, $colors = null)
     {
         $percent = min($percent, 100);

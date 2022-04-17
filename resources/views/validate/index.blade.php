@@ -32,18 +32,14 @@
                         <div x-bind:id="'body-' + group.group" class="panel-collapse collapse" x-bind:class="{'in': group.status !== 2}">
                             <div class="panel-body">
                                 <template x-for="result in group.results">
-                                    <div class="panel" x-bind:class="{'panel-success': group.status === 2, 'panel-warning': group.status === 1, 'panel-danger': group.status === 0}">
+                                    <div class="panel" x-bind:class="{'panel-success': result.status === 2, 'panel-warning': result.status === 1, 'panel-danger': result.status === 0}">
                                         <div class="panel-heading"
-                                             x-bind:class="{'bg-success': result.status === 2, 'bg-warning': result.status === 1, 'bg-danger': result.status === 0}"
                                              x-text="result.statusText + ': ' + result.message"
                                         ></div>
                                         <div class="panel-body" x-show="result.fix.length || result.list.length">
                                             <div x-show="result.fix.length">
-                                                {{ __('validation.results.fix') }}: <code>
-                                                    <template x-for="fixText in result.fix">
-                                                        <span x-text="fixText"></span>
-                                                    </template>
-                                                </code>
+                                                {{ __('validation.results.fix') }}: <pre x-text='result.fix.join("\r\n")'>
+                                                </pre>
                                             </div>
                                             <div x-show="result.list.length" class="tw-mt-5">
                                                 <ul class='list-group' style='margin-bottom: -1px'>
