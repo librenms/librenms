@@ -434,6 +434,13 @@
             "order": 0,
             "type": "text"
         },
+        "auth_ldap_skip_group_check": {
+            "default": false,
+            "group": "auth",
+            "section": "ldap",
+            "order": 4,
+            "type": "boolean"
+        },
         "auth_ldap_starttls": {
             "default": "disabled",
             "group": "auth",
