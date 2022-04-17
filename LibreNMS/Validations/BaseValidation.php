@@ -25,12 +25,30 @@
 
 namespace LibreNMS\Validations;
 
+use LibreNMS\Interfaces\Validation;
 use LibreNMS\Interfaces\ValidationGroup;
+use LibreNMS\Validator;
 
 abstract class BaseValidation implements ValidationGroup
 {
     protected $completed = false;
     protected static $RUN_BY_DEFAULT = true;
+    protected $directory = null;
+    protected $name = null;
+
+    public function validate(Validator $validator)
+    {
+        if ($this->directory) {
+            foreach (glob(__DIR__ . "/$this->directory/*.php") as $file) {
+                $base = basename($file, '.php');
+                $class = __NAMESPACE__ . "\\$this->directory\\$base";
+                $validation = new $class;
+                if ($validation instanceof Validation && $validation->enabled()) {
+                    $validator->result($validation->validate(), $this->name);
+                }
+            }
+        }
+    }
 
     /**
      * Returns if this test should be run by default or not.

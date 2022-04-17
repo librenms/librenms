@@ -154,6 +154,17 @@ class Validator
 
         foreach ($results as $result) {
             $result->consolePrint();
+            if ($result->hasFixer()) {
+                $input = readline('Attempt to fix this issue (y or n)?:');
+                if ($input === 'y') {
+                    $result = app()->make($result->getFixer())->fix();
+                    if ($result) {
+                        echo "Attempted to apply fix.\n";
+                    } else {
+                        echo "Failed to apply fix.\n";
+                    }
+                }
+            }
         }
     }
 
