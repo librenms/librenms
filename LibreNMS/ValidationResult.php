@@ -228,6 +228,7 @@ class ValidationResult
             'statusText' => substr($this->getStatusText($resultStatus), 2, -2), // remove console colors
             'message' => $this->getMessage(),
             'fix' => Arr::wrap($resultFix),
+            'fixer' => $this->getFixer(),
             'listDescription' => $this->getListDescription(),
             'list' => is_array($resultList) ? array_values($resultList) : [],
         ];

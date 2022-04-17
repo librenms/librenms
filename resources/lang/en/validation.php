@@ -160,9 +160,12 @@ return [
     'attributes' => [],
 
     'results' => [
+        'autofix' => 'Attempt to automatically fix',
         'fix' => 'Fix',
+        'fixed' => 'Fix has completed, refresh to re-run validations.',
         'fetch_failed' => 'Failed to fetch validation results',
         'backend_failed' => 'Failed to load data from backend, check webserver.',
+        'invalid_fixer' => 'Invalid Fixer',
         'show_all' => 'Show all',
         'show_less' => 'Show less',
         'validate' => 'Validate',
