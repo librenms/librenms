@@ -32,6 +32,7 @@ use LibreNMS\Interfaces\Module;
 use LibreNMS\OS;
 use LibreNMS\RRD\RrdDefinition;
 use LibreNMS\Util\Compare;
+use LibreNMS\Util\Number;
 use LibreNMS\Util\Time;
 use Log;
 use SnmpQuery;
@@ -236,9 +237,9 @@ class Core implements Module
             $uptime_data = SnmpQuery::make()->get(['SNMP-FRAMEWORK-MIB::snmpEngineTime.0', 'HOST-RESOURCES-MIB::hrSystemUptime.0'])->values();
 
             $uptime = max(
-                round($sysUpTime / 100),
-                Config::get("os.$device->os.bad_snmpEngineTime") ? 0 : $uptime_data['SNMP-FRAMEWORK-MIB::snmpEngineTime.0'] ?? 0,
-                Config::get("os.$device->os.bad_hrSystemUptime") ? 0 : round(($uptime_data['HOST-RESOURCES-MIB::hrSystemUptime.0'] ?? 0) / 100)
+                round(Number::cast($sysUpTime) / 100),
+                Config::get("os.$device->os.bad_snmpEngineTime") ? 0 : Number::cast($uptime_data['SNMP-FRAMEWORK-MIB::snmpEngineTime.0'] ?? 0),
+                Config::get("os.$device->os.bad_hrSystemUptime") ? 0 : round(Number::cast($uptime_data['HOST-RESOURCES-MIB::hrSystemUptime.0'] ?? 0) / 100)
             );
             Log::debug("Uptime seconds: $uptime\n");
         }
