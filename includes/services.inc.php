@@ -4,6 +4,7 @@ use App\Models\Device;
 use LibreNMS\Alert\AlertRules;
 use LibreNMS\Config;
 use LibreNMS\RRD\RrdDefinition;
+use LibreNMS\Util\Clean;
 
 function get_service_status($device = null)
 {
@@ -120,6 +121,7 @@ function poll_service($service)
 {
     $update = [];
     $old_status = $service['service_status'];
+    $service['service_type'] = Clean::fileName($service['service_type']);
     $check_cmd = '';
 
     // if we have a script for this check, use it.
