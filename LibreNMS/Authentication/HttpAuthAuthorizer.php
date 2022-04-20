@@ -63,16 +63,4 @@ class HttpAuthAuthorizer extends MysqlAuthorizer
 
         return -1;
     }
-
-    public function getExternalUsername()
-    {
-        if (Config::has('http_auth_header')) {
-            $header_name = Config::get('http_auth_header');
-            if (isset($_SERVER[$header_name])) {
-                return $_SERVER[$header_name];
-            }
-        }
-
-        return parent::getExternalUsername();
-    }
 }

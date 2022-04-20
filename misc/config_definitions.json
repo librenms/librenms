@@ -3502,6 +3502,12 @@
                 "custom8": "Custom 8"
             }
         },
+        "http_auth_header": {
+            "group": "auth",
+            "section": "general",
+            "order": 4,
+            "type": "text"
+        },
         "html_dir": {
             "type": "directory"
         },
