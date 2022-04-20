@@ -128,7 +128,7 @@ function poll_service($service)
     $check_cmd = '';
 
     // if we have a script for this check, use it.
-    $check_script = Config::get('install_dir') . '/includes/services/check_' . strtolower($service_type) . '.inc.php';
+    $check_script = Config::get('install_dir') . '/includes/services/check_' . strtolower($service['service_type']) . '.inc.php';
     if (is_file($check_script)) {
         include $check_script;
     }
