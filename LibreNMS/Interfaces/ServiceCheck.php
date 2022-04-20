@@ -30,16 +30,38 @@ use App\Models\Service;
 
 interface ServiceCheck
 {
+    public function __construct(Service $service);
+
     /**
      * Build command for poller to check this service check
      *
      * @param  \App\Models\Device  $device
-     * @param  \App\Models\Service  $service
      * @return array
      */
-    public function buildCommand(Device $device, Service $service): array;
+    public function buildCommand(Device $device): array;
 
+    /**
+     * Get data sets to be used for graphing.
+     * If you don't want to graph all metrics or perhaps want to add synthetic graphs, you can do so here.
+     *
+     * @return array
+     */
     public function serviceDataSets(): array;
 
-    public function graphs(): array;
+    /**
+     * Creates the rrdtool commandline for graphing the given data set.
+     * See DefaultServiceCheck for base implementation.
+     *
+     * @param  string  $rrd_filename
+     * @param  string  $ds
+     * @return string
+     */
+    public function graphRrdCommands(string $rrd_filename, string $ds): string;
+
+    /**
+     * Get the available check parameters.
+     *
+     * @return \LibreNMS\Services\CheckParameter[]
+     */
+    public function availableParameters(): array;
 }

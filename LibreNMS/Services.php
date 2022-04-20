@@ -25,6 +25,10 @@
 
 namespace LibreNMS;
 
+use App\Models\Service;
+use LibreNMS\Interfaces\ServiceCheck;
+use LibreNMS\Services\DefaultServiceCheck;
+
 class Services
 {
     /**
@@ -32,7 +36,7 @@ class Services
      *
      * @return array
      */
-    public static function list()
+    public static function list(): array
     {
         $services = [];
         if (is_dir(Config::get('nagios_plugins'))) {
@@ -44,5 +48,28 @@ class Services
         }
 
         return $services;
+    }
+
+    /**
+     * Makes an instance of the ServiceCheck for the given service
+     */
+    public static function makeCheck(Service $service): ServiceCheck
+    {
+        $class = self::getCheck($service->service_type);
+
+        return new $class($service);
+    }
+
+    /**
+     * Get the ServiceCheck class for the given check. May be a custom one or the default instance.
+     */
+    public static function getCheck(string $check): string
+    {
+        $check_class = '\LibreNMS\Services\\' . ucfirst(strtolower($check));
+        if (class_exists($check_class) && in_array(ServiceCheck::class, class_implements($check_class))) {
+            return $check_class;
+        }
+
+        return DefaultServiceCheck::class;
     }
 }

@@ -31,7 +31,6 @@ use App\Models\Service;
 use App\Observers\ModuleModelObserver;
 use LibreNMS\Config;
 use LibreNMS\Interfaces\Module;
-use LibreNMS\Interfaces\ServiceCheck;
 use LibreNMS\OS;
 use LibreNMS\RRD\RrdDefinition;
 use LibreNMS\Services\ServiceCheckResponse;
@@ -104,20 +103,9 @@ class Services implements Module
                 continue;
             }
 
-            $service_type = $service->service_type;
-            $check_class = '\LibreNMS\Services\\' . ucfirst(strtolower($service_type));
-            if (class_exists($check_class) && ($check_instance = new $check_class) instanceof ServiceCheck) {
-                $command = $check_instance->buildCommand($device, $service);
-            } else {
-                $command = [
-                    Config::get('nagios_plugins') . '/check_' . $service_type,
-                    '-H',
-                    $service->service_ip ?: $device->overwrite_ip ?: $device->hostname,
-                ];
-                $command = array_merge($command, is_array($service->service_param) ? $service->service_param : $this->sanitizeLegacyParams($service->service_param));
-            }
+            $command = \LibreNMS\Services::makeCheck($service)->buildCommand($device);
 
-            Log::info("Nagios Service $service_type ($service->service_id)");
+            Log::info("Nagios Service $service->service_type ($service->service_id)");
             $response = $this->checkService($command);
             Log::debug("Service Response: $response->message");
 
@@ -156,20 +144,6 @@ class Services implements Module
         $os->getDevice()->services()->delete();
     }
 
-    private function sanitizeLegacyParams(?string $params): array
-    {
-        if (empty($params)) {
-            return [];
-        }
-
-        $parts = preg_split('~(?:\'[^\']*\'|"[^"]*")(*SKIP)(*F)|\h+~', trim($params));
-        return array_map(function ($part) {
-            $trimmed = preg_replace('/^(\'(.*)\'|"(.*)")$/', '$2$3', $part);
-
-            return escapeshellarg($trimmed);
-        }, $parts);
-    }
-
     private function checkService(array $command): ServiceCheckResponse
     {
         $process = new Process($command, null, ['LC_NUMERIC' => 'C']);
@@ -190,6 +164,4 @@ class Services implements Module
 
         return false;
     }
-
-
 }
