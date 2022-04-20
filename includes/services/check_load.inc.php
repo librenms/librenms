@@ -10,7 +10,7 @@ if ($service['service_param']) {
 $check_cmd = \LibreNMS\Config::get('nagios_plugins') . '/check_load ' . $params;
 
 // Check DS is a json array of the graphs that are available
-$check_ds = '{"load":""}';
+$check_ds = ['load' => ''];
 
 // Build the graph data
 $check_graph = [];

@@ -20,7 +20,7 @@ if (Auth::user()->hasGlobalAdmin()) {
         foreach ($files as $file) {
             if (is_executable($dir . $file) && is_file($dir . $file) && strstr($file, 'check_')) {
                 [,$check_name] = explode('_', $file, 2);
-                $stype .= "<option value='$check_name'>$check_name</option>";
+                $service_type .= "<option value='$check_name'>$check_name</option>";
             }
         }
     } ?>
@@ -40,50 +40,49 @@ if (Auth::user()->hasGlobalAdmin()) {
                         <input type="hidden" name="service_id" id="service_id" value="">
                         <input type="hidden" name="service_template_id" id="service_template_id" value="">
                         <input type="hidden" name="device_id" id="device_id" value="<?php echo $device['device_id']?>">
-                        <input type="hidden" name="type" id="type" value="create-service">
                         <div class="form-group">
                             <div class="col-sm-12">
                                 <span id="ajax_response">&nbsp;</span>
                             </div>
                         </div>
                         <div class="form-group row">
-                            <label for='name' class='col-sm-3 control-label'>Name </label>
+                            <label for='service_name' class='col-sm-3 control-label'>Name </label>
                             <div class="col-sm-9">
-                                <input type='text' id='name' name='name' class='form-control input-sm' placeholder=''/>
+                                <input type='text' id='service_name' name='service_name' class='form-control input-sm' placeholder=''/>
                             </div>
                             <div class='col-sm-9'>
                             </div>
                         </div>
                         <div class="form-group row">
-                            <label for='stype' class='col-sm-3 control-label'>Check Type </label>
+                            <label for='service_type' class='col-sm-3 control-label'>Check Type </label>
                             <div class="col-sm-9">
-                                <select id='stype' name='stype' placeholder='type' class='form-control has-feedback'>
-                                    <?php echo $stype?>
+                                <select id='service_type' name='service_type' class='form-control has-feedback'>
+                                    <?php echo $service_type?>
                                 </select>
                             </div>
                             <div class='col-sm-9'>
                             </div>
                         </div>
                         <div class='form-group row'>
-                            <label for='desc' class='col-sm-3 control-label'>Description </label>
+                            <label for='service_desc' class='col-sm-3 control-label'>Description </label>
                             <div class='col-sm-9'>
-                                <textarea id='desc' name='desc' class='form-control' rows='5'></textarea>
-                            </div>
-                            <div class='col-sm-9'>
-                            </div>
-                        </div>
-                        <div class="form-group row">
-                            <label for='ip' class='col-sm-3 control-label'>Remote Host </label>
-                            <div class="col-sm-9">
-                                <input type='text' id='ip' name='ip' class='form-control has-feedback' placeholder='IP Address or Hostname'/>
+                                <textarea id='service_desc' name='service_desc' class='form-control' rows='5'></textarea>
                             </div>
                             <div class='col-sm-9'>
                             </div>
                         </div>
                         <div class="form-group row">
-                            <label for='param' class='col-sm-3 control-label'>Parameters </label>
+                            <label for='service_ip' class='col-sm-3 control-label'>Remote Host </label>
                             <div class="col-sm-9">
-                                <input type='text' id='param' name='param' class='form-control has-feedback' placeholder=''/>
+                                <input type='text' id='service_ip' name='service_ip' class='form-control has-feedback' placeholder='IP Address or Hostname'/>
+                            </div>
+                            <div class='col-sm-9'>
+                            </div>
+                        </div>
+                        <div class="form-group row">
+                            <label for='service_param' class='col-sm-3 control-label'>Parameters </label>
+                            <div class="col-sm-9">
+                                <input type='text' id='service_param' name='service_param' class='form-control has-feedback' placeholder=''/>
                             </div>
                             <div class='col-sm-9'>
                             </div>
@@ -94,17 +93,17 @@ if (Auth::user()->hasGlobalAdmin()) {
                             </div>
                         </div>
                         <div class="form-group row">
-                            <label for='ignore' class='col-sm-3 control-label'>Ignore alert tag </label>
+                            <label for='service_ignore' class='col-sm-3 control-label'>Ignore alert tag </label>
                             <div class="col-sm-9">
-                                <input type="hidden" name="ignore" id='ignore' value="0">
-                                <input type='checkbox' id='ignore_box' name='ignore_box' onclick="$('#ignore').attr('value', $('#ignore_box').prop('checked')?1:0);">
+                                <input type="hidden" name="service_ignore" id='service_ignore' value="0">
+                                <input type='checkbox' id='ignore_box' name='ignore_box' onclick="$('#service_ignore').attr('value', $('#ignore_box').prop('checked')?1:0);">
                             </div>
                         </div>
                         <div class="form-group row">
-                            <label for='disabled' class='col-sm-3 control-label'>Disable polling and alerting </label>
+                            <label for='service_disabled' class='col-sm-3 control-label'>Disable polling and alerting </label>
                             <div class="col-sm-9">
-                                <input type='hidden' id='disabled' name='disabled' value="0">
-                                <input type='checkbox' id='disabled_box' name='disabled_box' onclick="$('#disabled').attr('value', $('#disabled_box').prop('checked')?1:0);">
+                                <input type='hidden' id='service_disabled' name='service_disabled' value="0">
+                                <input type='checkbox' id='disabled_box' name='disabled_box' onclick="$('#service_disabled').attr('value', $('#disabled_box').prop('checked')?1:0);">
                             </div>
                         </div>
                         <hr>
@@ -123,18 +122,19 @@ if (Auth::user()->hasGlobalAdmin()) {
 
 // on-hide
 $('#create-service').on('hide.bs.modal', function (event) {
-    $('#stype').val('');
-    $("#stype").prop("disabled", false);
-    $('#ip').val('');
-    $('#desc').val('');
-    $('#param').val('');
-    $('#ignore').val('');
+    $('#service_type').val('');
+    $("#service_type").prop("disabled", false);
+    $('#service_ip').val('');
+    $('#service_desc').val('');
+    $('#service_param').val('');
+    $('#service_ignore').val('');
     $('#ignore_box').val('');
-    $('#disabled').val('');
+    $('#service_disabled').val('');
     $('#disabled_box').val('');
     $('#service_template_id').val('');
-    $('#name').val('');
+    $('#service_name').val('');
     $('#service_template_name').val('');
+    $("#ajax_response").html('');
 });
 
 // on-load
@@ -144,28 +144,22 @@ $('#create-service').on('show.bs.modal', function (e) {
     var modal = $(this)
     $('#service_id').val(service_id);
     $.ajax({
-        type: "POST",
-        url: "ajax_form.php",
-        data: { type: "parse-service", service_id: service_id },
+        type: "GET",
+        url: "<?php echo route('services.show', ['service' => '?']) ?>".replace('?', service_id),
         dataType: "json",
-        success: function(output) {
-            $('#stype').val(output['stype']);
-            $("#stype").prop("disabled", true);
-            $('#ip').val(output['ip']);
-            $('#desc').val(output['desc']);
-            $('#param').val(output['param']);
-            $('#ignore').val(output['ignore']);
-            $('#disabled').val(output['disabled']);
-            $('#ignore_box').val(output['ignore']);
-            $('#disabled_box').val(output['disabled']);
-            if ($('#ignore').attr('value') == 1) {
-                $('#ignore_box').prop("checked", true);
-            }
-            if ($('#disabled').attr('value') == 1) {
-                $('#disabled_box').prop("checked", true);
-            }
-            $('#service_template_id').val(output['service_template_id']);
-            $('#name').val(output['name']);
+        success: function(service) {
+            $('#service_type').val(service.service_type);
+            $("#service_type").prop("disabled", true);
+            $('#service_ip').val(service.service_ip);
+            $('#device_id').val(service.device_id);
+            $('#service_desc').val(service.service_desc);
+            $('#service_param').val(service.service_param);
+            $('#service_ignore').val(service.service_ignore === true ? 1 : 0);
+            $('#service_disabled').val(service.service_disabled === true ? 1 : 0);
+            $('#ignore_box').prop("checked", service.service_ignore);
+            $('#disabled_box').prop("checked", service.service_disabled);
+            $('#service_template_id').val(service.service_template_id === 0 ? '' : service.service_template_id);
+            $('#service_name').val(service.service_name);
         }
     });
 
@@ -174,26 +168,25 @@ $('#create-service').on('show.bs.modal', function (e) {
 // on-submit
 $('#service-submit').on("click", function(e) {
     e.preventDefault();
+    var service_id = $('#service_id').val();
     $.ajax({
-        type: "POST",
-        url: "ajax_form.php",
-        data: $('form.service-form').serialize(),
-        success: function(result){
-            if (result.status == 0) {
-                // Yay.
-                $("#create-service").modal('hide');
-                $('#message').html('<div class="alert alert-info">' + result.message + '</div>');
-                setTimeout(function() {
-                    location.reload(1);
-                }, 1500);
-            }
-            else {
-                // Nay.
-                $("#ajax_response").html('<div class="alert alert-danger">'+result.message+'</div>');
-            }
+        type: service_id ? 'PUT' : 'POST',
+        url: "<?php echo route('services.store') ?>" + (service_id ? '/' + service_id : ''),
+        data: $('form.service-form').serializeArray(),
+        success: function (result) {
+            $('#message').html('<div class="alert alert-info">' + result.message + '</div>');
+            $("#create-service").modal('hide');
+            setTimeout(function () {
+                location.reload();
+            }, 1500);
         },
-        error: function(){
-            $("#ajax_response").html('<div class="alert alert-info">An error occurred creating this service.</div>');
+        error: function (result) {
+            var message = result.responseJSON.message;
+            for (const field in result.responseJSON.errors) {
+                message += '<br />' + field + ': ' + result.responseJSON.errors[field];
+            }
+
+            $("#ajax_response").html('<div class="alert alert-danger">' + message + '</div>');
         }
     });
 });

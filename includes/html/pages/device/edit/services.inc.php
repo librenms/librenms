@@ -4,21 +4,28 @@ if (Auth::user()->hasGlobalRead()) {
     if ($vars['addsrv']) {
         if (Auth::user()->hasGlobalAdmin()) {
             $updated = '1';
-
-            $service_id = add_service($vars['device'], $vars['type'], $vars['descr'], $vars['ip'], $vars['params'], $vars['ignore'], $vars['disabled'], 0, $vars['name']);
-            if ($service_id) {
-                $message .= $message_break . 'Service added (' . $service_id . ')!';
+            // FIXME
+            $service = \App\Models\Service::create([
+                'device_id' => $vars['device'],
+                'service_type' => $vars['type'],
+                'service_desc' => $vars['descr'],
+                'service_ip' => $vars['ip'],
+                'service_param' => $vars['params'],
+                'service_ignore' => $vars['ignore'],
+                'service_disable' => $vars['disabled'],
+                'service_template_id' => 0,
+                'service_name' => $vars['name'],
+            ]);
+            if ($service->exists) {
+                $message .= $message_break . 'Service added (' . $service->service_id . ')!';
                 $message_break .= '<br />';
             }
         }
     }
 
     // Build the types list.
-    foreach (scandir(\LibreNMS\Config::get('nagios_plugins')) as $file) {
-        if (substr($file, 0, 6) === 'check_') {
-            $check_name = substr($file, 6);
-            $servicesform .= "<option value='$check_name'>$check_name</option>";
-        }
+    foreach (\LibreNMS\Services::list() as $current_service) {
+        $servicesform .= "<option value='$current_service'>$current_service</option>";
     }
 
     $dev = device_by_id_cache($device['device_id']);

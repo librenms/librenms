@@ -4,7 +4,10 @@
 $check_cmd = \LibreNMS\Config::get('nagios_plugins') . '/check_icmp ' . ($service['service_ip'] ? $service['service_ip'] : $service['hostname']) . ' ' . $service['service_param'];
 
 // Check DS is a json array of the graphs that are available
-$check_ds = '{"rtt":"s","pl":"%"}';
+$check_ds = [
+    'rtt' => 's',
+    'pl' => '%',
+];
 
 // Build the graph data
 $check_graph = [];

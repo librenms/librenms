@@ -8,15 +8,25 @@ if (! Auth::user()->hasGlobalAdmin()) {
     if ($vars['addsrv']) {
         if (Auth::user()->hasGlobalAdmin()) {
             $updated = '1';
-
-            $service_id = add_service($vars['device'], $vars['type'], strip_tags($vars['descr']), $vars['ip'], $vars['params'], $vars['ignore'], $vars['disabled'], 0, strip_tags($vars['name']));
-            if ($service_id) {
-                $message .= $message_break . 'Service added (' . $service_id . ')!';
+            // FIXME
+            $service = \App\Models\Service::create([
+                'device_id' => $vars['device'],
+                'service_type' => $vars['type'],
+                'service_desc' => strip_tags($vars['descr']),
+                'service_ip' => $vars['ip'],
+                'service_param' => $vars['params'],
+                'service_ignore' => $vars['ignore'],
+                'service_disable' => $vars['disabled'],
+                'service_template_id' => 0,
+                'service_name' => strip_tags($vars['name']),
+            ]);
+            if ($service->exists) {
+                $message .= $message_break . 'Service added (' . $service->service_id . ')!';
                 $message_break .= '<br />';
             }
         }
     }
-    foreach (list_available_services() as $current_service) {
+    foreach (\LibreNMS\Services::list() as $current_service) {
         $servicesform .= "<option value='$current_service'>$current_service</option>";
     }
 

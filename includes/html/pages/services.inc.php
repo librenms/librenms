@@ -198,25 +198,16 @@ require_once 'includes/html/modal/delete_service.inc.php';
 
                         $service_checked = '';
                         $ico = 'pause';
-                        if ($service['service_ignore'] && $service['service_disabled']) {
+                        if ($service['service_disabled']) {
                             $color = 'default';
-                            $orig_colour = 'danger';
-                            $orig_ico = $ico;
-                        } elseif (! $service['service_ignore'] && ! $service['service_disabled']) {
-                            $ico = 'check';
-                            $color = 'success';
-                            $orig_colour = $color;
-                            $orig_ico = $ico;
+                        } else {
                             $service_checked = 'checked';
-                        } elseif (! $service['service_ignore'] && $service['service_disabled']) {
-                            $color = 'default';
-                            $orig_colour = 'success';
-                            $orig_ico = 'check';
-                        } elseif ($service['service_ignore'] && ! $service['service_disabled']) {
-                            $color = 'danger';
-                            $orig_colour = $color;
-                            $orig_ico = $ico;
-                            $service_checked = 'checked';
+                            if ($service['service_ignore']) {
+                                $color = 'danger';
+                            } else {
+                                $ico = 'check';
+                                $color = 'success';
+                            }
                         }
                         $service_id = $service['service_id'];
                         $service_name = \LibreNMS\Util\Clean::html($service['service_name']);
@@ -224,7 +215,7 @@ require_once 'includes/html/modal/delete_service.inc.php';
                         echo '<td>' . '<span id="service_status-' . $service_id . '" class="fa fa-fw fa-2x text-' . $color . ' fa-' . $ico . '" data-original-title="" title=""></span></td>';
 
                         echo "<td><div id='on-off-checkbox-" . $service_id . " class='btn-group btn-group-sm' role='group'>";
-                        echo "<input id='" . $service_id . "' type='checkbox' name='service_status' data-orig_colour='" . $orig_colour . "' data-orig_state='" . $orig_ico . "' data-service_id='" . $service_id . "' data-service_name='" . $service_name . "' " . $service_checked . " data-size='small' data-toggle='modal'>";
+                        echo "<input id='" . $service_id . "' type='checkbox' name='service_status' data-service_id='" . $service_id . "' data-service_name='" . $service_name . "' " . $service_checked . " data-size='small' data-toggle='modal'>";
                         echo '</div></td>';
 
                         if (Auth::user()->hasGlobalAdmin()) {
@@ -257,36 +248,28 @@ require_once 'includes/html/modal/delete_service.inc.php';
 $("[name='service_status']").bootstrapSwitch('offColor','danger');
 $('input[name="service_status"]').on('switchChange.bootstrapSwitch',  function(event, state) {
     event.preventDefault();
-    var $this = $(this);
     var service_id = $(this).data("service_id");
-    var service_name = $(this).data("service_name");
-    var service_disabled = $(this).data("service_disabled");
-    var orig_state = $(this).data("orig_state");
-    var orig_colour = $(this).data("orig_colour");
     $.ajax({
-        type: 'POST',
-            url: 'ajax_form.php',
-            data: { type: "create-service", service_id: service_id, disabled: (1 - state) },
-            dataType: "html",
-            success: function(msg) {
-                if(msg.indexOf("ERROR:") <= -1) {
-                    if(state) {
-                        $('#service_status-'+service_id).removeClass('fa-pause');
-                        $('#service_status-'+service_id).addClass('fa-'+orig_state);
-                        $('#service_status-'+service_id).removeClass('text-default');
-                        $('#service_status-'+service_id).removeClass('text-danger');
-                        $('#service_status-'+service_id).removeClass('text-success');
-                        $('#service_status-'+service_id).addClass('text-'+orig_colour);
-                    } else {
-                        $('#service_status-'+service_id).removeClass('fa-check');
-                        $('#service_status-'+service_id).addClass('fa-pause');
-                        $('#service_status-'+service_id).removeClass('text-success');
-                        $('#service_status-'+service_id).removeClass('text-danger');
-                        $('#service_status-'+service_id).addClass('text-default');
-                    }
+        type: 'PUT',
+            url: '<?php echo route('services.update', ['service' => '?']) ?>'.replace('?', service_id),
+            data: { service_disabled: (1 - state) },
+            dataType: "json",
+            success: function(service) {
+                if(service.service_disabled) {
+                    $('#service_status-' + service_id)
+                        .removeClass(['fa-check', 'text-success', 'text-danger'])
+                        .addClass(['fa-pause', 'text-default']);
                 } else {
-                    $("#message").html('<div class="alert alert-info">'+msg+'</div>');
-                    $('#'+service_id).bootstrapSwitch('toggleState',true );
+                    var color = 'text-success';
+                    var icon = 'fa-check';
+                    if (service.service_ignore) {
+                        color = 'text-danger';
+                        icon = 'fa-pause';
+                    }
+
+                    $('#service_status-' + service_id)
+                        .removeClass(['fa-pause', 'text-default', 'text-danger', 'text-success'])
+                        .addClass([icon, color]);
                 }
             },
                 error: function() {

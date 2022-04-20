@@ -49,11 +49,10 @@ if (Auth::user()->hasGlobalAdmin()) {
             e.preventDefault();
             var service_id = $("#service_id").val();
             $.ajax({
-                type: 'POST',
-                url: 'ajax_form.php',
-                data: {type: "delete-service", service_id: service_id},
+                type: 'DELETE',
+                url: '<?php echo route('services.destroy', ['service' => '?']) ?>'.replace('?', service_id),
                 success: function (result) {
-                    if (result.status == 0) {
+                    if (result.status == 1) {
                         // Yay.
                         $('#message').html('<div class="alert alert-info">' + result.message + '</div>');
                         $("#row_" + service_id).remove();

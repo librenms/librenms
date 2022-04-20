@@ -28,6 +28,15 @@ $poller_start = microtime(true);
 
 $datastore = Datastore::init($options);
 
+$device = device_by_id_cache($options['h']);
+DeviceCache::setPrimary($device['device_id']);
+$os = \LibreNMS\OS::make($device);
+$services = new \LibreNMS\Modules\Services();
+$services->discover($os);
+
+exit;
+
+
 echo "Starting service polling run:\n\n";
 $polled_services = 0;
 
@@ -52,14 +61,16 @@ $sql = 'SELECT D.*,S.*,attrib_value  FROM `devices` AS D'
        . ' INNER JOIN `services` AS S ON S.device_id = D.device_id AND D.disabled = 0 ' . $where
        . ' LEFT JOIN `devices_attribs` as A ON D.device_id = A.device_id AND A.attrib_type = "override_icmp_disable"'
        . ' ORDER by D.device_id DESC;';
-
+// FIXME FUBAR
+$poller_module = new \LibreNMS\Modules\Services;
+$os = \LibreNMS\OS::make($device);
 foreach (dbFetchRows($sql, $params) as $service) {
     // Run the polling function if service is enabled and the associated device is up, "Disable ICMP Test" option is not enabled,
     // or service hostname/ip is different from associated device
     if (! $service['service_disabled'] && ($service['status'] == 1 || ($service['status'] == 0 && $service['status_reason'] === 'snmp') ||
         $service['attrib_value'] === 'true' || ($service['service_ip'] !== $service['hostname'] &&
         $service['service_ip'] !== inet6_ntop($service['ip'])))) {
-        poll_service($service);
+        $poller_module->poll($os);
         $polled_services++;
     } else {
         if (! $service['service_disabled']) {

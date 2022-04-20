@@ -12,37 +12,22 @@
  */
 
 // Get a list of all services for this device.
-require_once 'includes/services.inc.php';
-$services = service_get($device['device_id']);
+use App\Models\Service;
+use LibreNMS\Util\Clean;
 
-// Determine which key is the service we want to show.
-if (isset($vars['id'])) {
-    // Service is set, find its key.
-    foreach ($services as $key => $service) {
-        if ($service['service_id'] == $vars['id']) {
-            // We have found the service we want.
-            $vars['service'] = $key;
-        }
-    }
-} else {
-    // No service set, set the first one.
-    if (isset($services[0])) {
-        $vars['service'] = 0;
-    }
-}
+$service = Service::where('device_id', $device['device_id'])
+->when(isset($vars['id']), function ($query) use ($vars) {
+    return $query->where('service_id', $vars['id']);
+})->first();
 
 // We know our service. build the filename.
-$rrd_filename = Rrd::name($device['hostname'], ['services', $services[$vars['service']]['service_id']]);
+$rrd_filename = Rrd::name($device['hostname'], ['services', $service->service_id]);
 
 // if we have a script for this check, use it.
-$check_script = \LibreNMS\Config::get('install_dir') . '/includes/services/check_' . strtolower($services[$vars['service']]['service_type']) . '.inc.php';
+$check_script = \LibreNMS\Config::get('install_dir') . '/includes/services/check_' . strtolower(Clean::fileName($service->service_type)) . '.inc.php';
+$check_ds = $service->service_ds;
 if (is_file($check_script)) {
     include $check_script;
-
-    // If we have a replacement DS use it.
-    if (isset($check_ds)) {
-        $services[$vars['service']]['service_ds'] = $check_ds;
-    }
 }
 
 include 'includes/html/graphs/common.inc.php';
@@ -50,15 +35,10 @@ $rrd_options .= ' -l 0 -E ';
 $rrd_options .= " COMMENT:'                      Now     Avg      Max\\n'";
 $rrd_additions = '';
 
-// Remove encoded characters
-$services[$vars['service']]['service_ds'] = htmlspecialchars_decode($services[$vars['service']]['service_ds']);
-
-if ($services[$vars['service']]['service_ds'] != '') {
-    $graphinfo = json_decode($services[$vars['service']]['service_ds'], true);
-
+if (! empty($check_ds)) {
     // Do we have a DS set
-    if (! isset($graphinfo[$vars['ds']])) {
-        foreach ($graphinfo as $k => $v) {
+    if (! isset($check_ds[$vars['ds']])) {
+        foreach ($check_ds as $k => $v) {
             // Select a DS to display.
             $vars['ds'] = $k;
         }
@@ -66,7 +46,7 @@ if ($services[$vars['service']]['service_ds'] != '') {
 
     // Need: DS name, Label
     $ds = $vars['ds'];
-    $label = $graphinfo[$vars['ds']];
+    $label = $check_ds[$ds];
 
     if (Rrd::checkRrdExists($rrd_filename)) {
         if (isset($check_graph)) {

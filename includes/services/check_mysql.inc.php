@@ -9,7 +9,12 @@ if ($service['service_param']) {
 $check_cmd = \LibreNMS\Config::get('nagios_plugins') . '/check_mysql -H ' . $service['hostname'] . ' ' . $dbname . ' ' . $service['service_param'];
 
 // Check DS is a json array of the graphs that are available
-$check_ds = '{"mysqlqueries":"c","mysql":"c","mysqluptime":"c","mysqlQcache":"c"}';
+$check_ds = [
+    'mysqlqueries' => 'c',
+    'mysql' => 'c',
+    'mysqluptime' => 'c',
+    'mysqlQcache' => 'c',
+];
 
 // Build the graph data
 $check_graph = [];
