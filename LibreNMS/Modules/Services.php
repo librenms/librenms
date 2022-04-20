@@ -26,6 +26,7 @@
 namespace LibreNMS\Modules;
 
 use App\Http\Controllers\ServiceTemplateController;
+use App\Models\Device;
 use App\Models\Service;
 use App\Observers\ModuleModelObserver;
 use LibreNMS\Config;
@@ -34,6 +35,7 @@ use LibreNMS\Interfaces\ServiceCheck;
 use LibreNMS\OS;
 use LibreNMS\RRD\RrdDefinition;
 use LibreNMS\Services\ServiceCheckResponse;
+use Log;
 use Symfony\Component\Process\Process;
 
 class Services implements Module
@@ -58,7 +60,7 @@ class Services implements Module
 
             ModuleModelObserver::observe(Service::class);
             // Services
-            $services = \SnmpQuery::enumStrings()->walk('TCP-MIB::tcpConnState')->mapTable(function ($data, $localAddress, $localPort) use ($os) {
+            $services = \SnmpQuery::enumStrings()->walk('TCP-MIB::tcpConnState')->mapTable(function ($data, $localAddress, $localPort) use ($os, $known_services) {
                 if ($data['TCP-MIB::tcpConnState'] == 'listen' && $localAddress == '0.0.0.0') {
                     if (isset($known_services[$localPort])) {
                         $service = $known_services[$localPort];
@@ -80,7 +82,7 @@ class Services implements Module
                         ]);
 
                         if (! $new_service->exists && $new_service->save()) {
-                            \Log::event("Autodiscovered service: type $service", $os->getDevice(), 'service');
+                            Log::event("Autodiscovered service: type $service", $os->getDevice(), 'service');
                         }
                     }
                 }
@@ -90,9 +92,18 @@ class Services implements Module
 
     public function poll(OS $os)
     {
+        $count = 0;
         $device = $os->getDevice();
+
         /** @var Service $service */
         foreach ($device->services()->where('service_disabled', 0)->get() as $service) {
+            if ($this->canSkip($device, $service)) {
+                $device_name = $device->displayName();
+                Log::debug("Skipping service check $service->service_id because device $device_name is down due to icmp.");
+                Log::event("Service check - $service->service_desc ($service->service_id) - Skipping service check because device $device_name is down due to icmp", $device, 'service', 4, $service->service_id);
+                continue;
+            }
+
             $service_type = $service->service_type;
             $check_class = '\LibreNMS\Services\\' . ucfirst(strtolower($service_type));
             if (class_exists($check_class) && ($check_instance = new $check_class) instanceof ServiceCheck) {
@@ -106,14 +117,14 @@ class Services implements Module
                 $command = array_merge($command, is_array($service->service_param) ? $service->service_param : $this->sanitizeLegacyParams($service->service_param));
             }
 
-            \Log::info("Nagios Service $service_type ($service->service_id)");
+            Log::info("Nagios Service $service_type ($service->service_id)");
             $response = $this->checkService($command);
-            \Log::debug("Service Response: $response->message");
+            Log::debug("Service Response: $response->message");
 
             // If we have performance data we will store it.
             if (! empty ($response->metrics)) {
                 $service->service_ds = array_map(function ($metric) { return $metric['uom']; }, $response->metrics);
-                \Log::debug('Service DS: ' . json_encode($service->service_ds));
+                Log::debug('Service DS: ' . json_encode($service->service_ds));
 
                 $rrd_def = new RrdDefinition();
                 $fields = [];
@@ -134,7 +145,10 @@ class Services implements Module
             }
 
             $service->save(); // save if changed
+            $count++;
         }
+
+        return $count;
     }
 
     public function cleanup(OS $os)
@@ -162,6 +176,19 @@ class Services implements Module
         $process->run();
 
         return new ServiceCheckResponse($process->getOutput(), $process->getExitCode());
+    }
+
+    private function canSkip(Device $device, Service $service): bool
+    {
+        if ($device->status == 0) {
+            if ($service->service_ip == $device->ip || $service->service_ip == $device->hostname) {
+                if ($device->status_reason !== 'snmp' && ! $device->getAttrib('override_icmp_disable')) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 
 

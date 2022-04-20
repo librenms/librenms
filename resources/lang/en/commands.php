@@ -167,6 +167,17 @@ return [
         'enabled' => ':count plugin enabled|:count plugins enabled',
         'failed' => 'Failed to enable plugin(s)',
     ],
+    'services:poll' => [
+        'description' => 'Poll services',
+        'arguments' => [
+            'device spec' => 'Device spec to poll: device_id, hostname or wildcard',
+        ],
+        'options' => [
+            'no-data' => 'Do not update datastores (RRD, InfluxDB, etc)',
+        ],
+        'starting' => 'Starting service polling run:',
+        'polled' => 'services:poll :timestamp - :count services polled in :duration secs',
+    ],
     'smokeping:generate' => [
         'args-nonsense' => 'Use one of --probes and --targets',
         'config-insufficient' => 'In order to generate a smokeping configuration, you must have set "smokeping.probes", "fping", and "fping6" set in your configuration',
