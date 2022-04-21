@@ -19,13 +19,6 @@ try {
 // grab  the alert here as it is the global one
 $metrics=[ 'alert'=$suricata['alert'] ];
 
-// add the generic alert graph
-$rrd_name = ['app', $name, $app_id];
-$rrd_def = RrdDefinition::make()
-    ->addDataset('alert', 'GAUGE', 0)
-$tags = ['name' => $name, 'app_id' => $app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
-data_update($device, 'app', $tags, $metrics);
-
 $rrd_def = RrdDefinition::make()
     ->addDataset('alert', 'GAUGE', 0)
     ->addDataset('at_dcerpc_tcp', 'DERIVE', 0)
@@ -96,7 +89,11 @@ $instance_keys=[ 'alert', 'at_dcerpc_tcp', 'at_dcerpc_udp', 'at_dhcp', 'at_dns_t
 // process each instance
 $instance_list=[];
 foreach ($suricata['data'] as $instance => $stats) {
-    $rrd_name = ['app', $name, $app_id, $instance];
+    if ($instance == '.total') {
+        $rrd_name = ['app', $name, $app_id];
+    } else {
+        $rrd_name = ['app', $name, $app_id, $instance];
+    }
     $instance_list[]=$instance;
 
     $fields=[];
@@ -107,7 +104,6 @@ foreach ($suricata['data'] as $instance => $stats) {
 
     $tags = ['name' => $name, 'app_id' => $app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
     data_update($device, 'app', $tags, $fields);
-
 }
 
 //
