@@ -400,7 +400,7 @@ return [
         ],
         'auth_ldap_userdn' => [
             'description' => 'Використовувати повний DN користувача',
-            'help' => "Використовує повний DN користувача як значення атрибута member у групі замість member: username використовуючи префікс та суфікс. (member: uid=username,ou=groups,dc=domain,dc=com)",
+            'help' => 'Використовує повний DN користувача як значення атрибута member у групі замість member: username використовуючи префікс та суфікс. (member: uid=username,ou=groups,dc=domain,dc=com)',
         ],
         'auth_ldap_wildcard_ou' => [
             'description' => 'Вайлдкард OU користувача',
@@ -699,7 +699,7 @@ return [
             ],
             'dns' => [
                 'description' => 'Використати запис місцезнаходження DNS',
-                 'help' => 'Використати LOC записи DNS сервера для отримання географічних координат імені хоста',
+                'help' => 'Використати LOC записи DNS сервера для отримання географічних координат імені хоста',
             ],
             'engine' => [
                 'description' => 'Провайдер мапи',
