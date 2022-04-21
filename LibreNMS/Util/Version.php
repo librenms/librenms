@@ -67,7 +67,7 @@ class Version
     public function localCommit(): array
     {
         if ($this->is_git_install) {
-            [$local_sha, $local_date] = explode('|', rtrim(`git show --pretty='%H|%ct' -s HEAD`));
+            [$local_sha, $local_date] = array_pad(explode('|', rtrim(`git show --pretty='%H|%ct' -s HEAD`), 2), 2, '');
 
             return [
                 'sha' => $local_sha,
