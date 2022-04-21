@@ -9,6 +9,9 @@ discovery:
     -
         sysObjectID:
             - .1.3.6.1.4.1.476.1.42
+    -
+        sysObjectID:
+		        - .1.3.6.1.4.1.8072.3.2.10
 over:
     - { graph: device_power, text: 'Power' }
     - { graph: device_current, text: 'Current' }
