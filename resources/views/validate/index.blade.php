@@ -4,7 +4,7 @@
 
 @section('content')
     <div x-data="{results: [], listItems: 10, errorMessage: ''}"
-         x-init="fetch('{{ route('validate.results') }}').then(response => response.json().then(data => results = data).catch(error => errorMessage = error))"
+         x-init="fetch('{{ route('validate.results') }}').then(response => response.json().then(data => results = data).catch(error => errorMessage=(error instanceof SyntaxError)?'{{ trans('validation.results.backend_failed') }}':error))"
          >
         <div class="tw-grid tw-place-items-center" style="height: 80vh" x-show="! results.length">
             <h3 x-show="! errorMessage"><i class="fa-solid fa-spinner fa-spin"></i> {{ __('validation.results.validating') }}</h3>
