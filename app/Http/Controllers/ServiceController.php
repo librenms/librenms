@@ -19,8 +19,7 @@ class ServiceController extends Controller
     /**
      * Display a listing of the resource.
      *
-     * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View|\Illuminate\Http\Response
-     * @throws \Illuminate\Auth\Access\AuthorizationException
+     * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View
      */
     public function index()
     {
@@ -30,12 +29,11 @@ class ServiceController extends Controller
     /**
      * Show the form for creating a new resource.
      *
-     * @return \Illuminate\Http\Response
-     * @throws \Illuminate\Auth\Access\AuthorizationException
+     * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View
      */
     public function create()
     {
-        //
+        return view('service.create');
     }
 
     /**
@@ -43,7 +41,7 @@ class ServiceController extends Controller
      *
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\JsonResponse
-     * @throws \Illuminate\Auth\Access\AuthorizationException
+     * @throws \Illuminate\Validation\ValidationException
      */
     public function store(Request $request): JsonResponse
     {
@@ -71,23 +69,10 @@ class ServiceController extends Controller
      *
      * @param  \App\Models\Service  $service
      * @return \Illuminate\Http\JsonResponse
-     * @throws \Illuminate\Auth\Access\AuthorizationException
      */
     public function show(Service $service): JsonResponse
     {
         return response()->json($service);
-    }
-
-    /**
-     * Show the form for editing the specified resource.
-     *
-     * @param  \App\Models\Service  $service
-     * @return \Illuminate\Http\Response
-     * @throws \Illuminate\Auth\Access\AuthorizationException
-     */
-    public function edit(Service $service)
-    {
-        //
     }
 
     /**
@@ -124,7 +109,6 @@ class ServiceController extends Controller
      *
      * @param  \App\Models\Service  $service
      * @return \Illuminate\Http\JsonResponse
-     * @throws \Illuminate\Auth\Access\AuthorizationException
      */
     public function destroy(Service $service): JsonResponse
     {

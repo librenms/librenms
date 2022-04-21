@@ -29,7 +29,6 @@ use App\Models\Device;
 use App\Models\Service;
 use LibreNMS\Config;
 use LibreNMS\Data\Store\Rrd;
-use Symfony\Component\Process\Process;
 
 class DefaultServiceCheck implements \LibreNMS\Interfaces\ServiceCheck
 {
@@ -83,28 +82,9 @@ class DefaultServiceCheck implements \LibreNMS\Interfaces\ServiceCheck
      */
     public function availableParameters(): array
     {
-        $command = [Config::get('nagios_plugins') . '/check_' . $this->service->service_type, '--help'];
-        $process = new Process($command);
-        $process->run();
+        $parser = new HelpParser();
 
-        $params = [];
-        foreach (explode("\n", $process->getOutput()) as $line) {
-            if (preg_match('/(-(?<short>\w), )?--(?<param>[\w-]+)(=(?<value>.+))?/', $line, $param_matches)) {
-                if (isset($pending)) {
-                    $params[] = $pending;
-                }
-                $pending = new CheckParameter($param_matches['param'], $param_matches['short'] ?? '', $param_matches['value'] ?? '');
-            } elseif (isset($pending)) {
-                if (empty($line)) {
-                    $params[] = $pending;
-                    unset($pending);
-                } else {
-                    $pending->appendDescription($line);
-                }
-            }
-        }
-
-        return $params;
+        return array_values($parser->parse('check_' . $this->service->service_type));
     }
 
     /**

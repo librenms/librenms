@@ -35,20 +35,45 @@ class CheckParameter
     public $value;
     /** @var string */
     public $description = '';
+    /** @var bool */
+    public $required = false;
+    /** @var \LibreNMS\Services\CheckParameter[] */
+    public $group;
 
-    public function __construct(string $param, string $short, string $value)
+    public function __construct(string $param, string $short, string $value, string $description = '')
     {
-        $this->param = $param;
-        $this->short = $short;
-        $this->value = $value;
+        $this->param = trim(htmlspecialchars($param));
+        $this->short = trim(htmlspecialchars($short));
+        $this->value = trim(htmlspecialchars($value));
+        $this->description = trim(htmlspecialchars($description));
     }
 
-    public function appendDescription(string $line)
+    /**
+     * Append to the existing description, adding new lines
+     */
+    public function appendDescription(string $line): void
     {
         if (! empty($this->description)) {
             $this->description .= PHP_EOL;
         }
 
-        $this->description .= trim($line);
+        $this->description .= trim(htmlspecialchars($line));
+    }
+
+    /**
+     * Mark this parameter as required
+     */
+    public function setRequired(bool $required = true): void
+    {
+        $this->required = $required;
+    }
+
+    /**
+     * @param  \LibreNMS\Services\CheckParameter[]  $group
+     * @return void
+     */
+    public function setExclusiveGroup(array $group): void
+    {
+        $this->group = $group;
     }
 }

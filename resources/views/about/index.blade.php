@@ -1,8 +1,8 @@
 @extends('layouts.librenmsv1')
 
-@section('title', __('About'))
+    @section('title', __('About'))
 
-@section('content')
+    @section('content')
 <div class="modal fade" id="git_log" tabindex="-1" role="dialog" aria-labelledby="git_log_label" aria-hidden="true">
     <div class="modal-dialog">
         <div class="modal-content">
