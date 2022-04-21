@@ -196,7 +196,7 @@ function poll_service($service)
         $new_status_text = isset($status_text[$new_status]) ? $status_text[$new_status] : 'Critical';
 
         log_event(
-            "Service '{$service_type}' changed status from $old_status_text to $new_status_text - {$service['service_desc']} - $msg",
+            "Service '{$service['service_type']}' changed status from $old_status_text to $new_status_text - {$service['service_desc']} - $msg",
             $service['device_id'],
             'service',
             4,
