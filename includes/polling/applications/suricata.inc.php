@@ -19,6 +19,13 @@ try {
 // grab  the alert here as it is the global one
 $metrics=[ 'alert'=$suricata['alert'] ];
 
+// add the generic alert graph
+$rrd_name = ['app', $name, $app_id];
+$rrd_def = RrdDefinition::make()
+    ->addDataset('alert', 'GAUGE', 0)
+$tags = ['name' => $name, 'app_id' => $app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
+data_update($device, 'app', $tags, $metrics);
+
 $rrd_def = RrdDefinition::make()
     ->addDataset('alert', 'GAUGE', 0)
     ->addDataset('at_dcerpc_tcp', 'DERIVE', 0)
