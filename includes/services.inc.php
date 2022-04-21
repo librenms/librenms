@@ -4,6 +4,7 @@ use App\Models\Device;
 use LibreNMS\Alert\AlertRules;
 use LibreNMS\Config;
 use LibreNMS\RRD\RrdDefinition;
+use LibreNMS\Util\Clean;
 
 function get_service_status($device = null)
 {
@@ -120,6 +121,10 @@ function poll_service($service)
 {
     $update = [];
     $old_status = $service['service_status'];
+    $service['service_type'] = Clean::fileName($service['service_type']);
+    $service['service_ip'] = Clean::fileName($service['service_ip']);
+    $service['hostname'] = Clean::fileName($service['hostname']);
+    $service['overwrite_ip'] = Clean::fileName($service['overwrite_ip']);
     $check_cmd = '';
 
     // if we have a script for this check, use it.
@@ -130,7 +135,7 @@ function poll_service($service)
 
     // If we do not have a cmd from the check script, build one.
     if ($check_cmd == '') {
-        $check_cmd = Config::get('nagios_plugins') . '/check_' . $service['service_type'] . ' -H ' . ($service['service_ip'] ? $service['service_ip'] : $service['hostname']);
+        $check_cmd = Config::get('nagios_plugins') . '/check_' . $service['service_type'] . ' -H ' . ($service['service_ip'] ?: $service['hostname']);
         $check_cmd .= ' ' . $service['service_param'];
     }
 
