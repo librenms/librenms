@@ -309,6 +309,18 @@ $graphs['freeradius'] = [
     'proxy_acct',
     'queue',
 ];
+$graphs['suricata']=[
+    'alert',
+    'packets',
+    'bad_delta',
+    'bad_percent',
+    'dec_proto',
+    'flow_proto',
+    'app_flows',
+    'app_tx',
+    'bytes',
+    'mem_use',
+};
 $graphs['zfs'] = [
     'arc_misc',
     'arc_size',
