@@ -2164,7 +2164,6 @@ cpanm Suricata::Monitoring
 2. Setup cron. Below is a example.
 ```
 */5 * * * * /usr/local/bin/suricata_stat_check > /dev/null
-
 ```
 
 3. Configure snmpd.conf
