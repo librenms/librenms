@@ -90,13 +90,13 @@ class Eloquent
     /**
      * Set the active connection, used during install
      *
-     * @param string $name
-     * @param string $db_host
-     * @param string $db_user
-     * @param string $db_pass
-     * @param string $db_name
-     * @param int|string $db_port
-     * @param string $db_socket
+     * @param  string  $name
+     * @param  string  $db_host
+     * @param  string  $db_user
+     * @param  string  $db_pass
+     * @param  string  $db_name
+     * @param  int|string  $db_port
+     * @param  string  $db_socket
      * @return void
      */
     public static function setConnection($name, $db_host = null, $db_user = '', $db_pass = '', $db_name = '', $db_port = null, $db_socket = null): void

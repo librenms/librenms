@@ -53,9 +53,7 @@ use App\Models\WirelessSensor;
 use Illuminate\Http\Request;
 use LibreNMS\Config;
 use LibreNMS\Data\Store\Rrd;
-use LibreNMS\DB\Eloquent;
 use LibreNMS\Util\Version;
-use LibreNMS\Validations\Database;
 
 class AboutController extends Controller
 {
