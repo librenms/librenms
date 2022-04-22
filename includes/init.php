@@ -101,6 +101,7 @@ if (! module_selected('nodb', $init_modules)) {
         exit;
     }
 }
+\LibreNMS\DB\Eloquent::setStrictMode(false); // disable strict mode for legacy code...
 
 if (is_numeric(Config::get('php_memory_limit')) && Config::get('php_memory_limit') > 128) {
     ini_set('memory_limit', Config::get('php_memory_limit') . 'M');
