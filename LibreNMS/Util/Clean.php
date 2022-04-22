@@ -42,6 +42,24 @@ class Clean
     {
         return preg_replace('/[^a-zA-Z0-9\-._]/', '', $file);
     }
+    
+    /**
+     * Sanitize host name by removing all invalid characters.
+     * Behaves the same as Clean::fileName() except that it also allows valid IP addresses.
+     *
+     * @param  string  $file
+     * @return string|string[]|null
+     */
+    public static function hostName($string)
+    {
+        // If the string parses as a valid IP address it's ok
+        if (inet_pton($string) !== false) {
+            return $string;
+        }
+        
+        // Otherwise delegate to fileName
+        return self::fileName($string);
+    }
 
     /**
      * Sanitize string to only contain alpha, numeric, dashes, and underscores
