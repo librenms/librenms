@@ -47,7 +47,7 @@ class Clean
      * Sanitize host name by removing all invalid characters.
      * Behaves the same as Clean::fileName() except that it also allows valid IP addresses.
      *
-     * @param  string  $file
+     * @param  string  $string
      * @return string|string[]|null
      */
     public static function hostName($string)
