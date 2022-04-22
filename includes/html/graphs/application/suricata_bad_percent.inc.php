@@ -2,7 +2,7 @@
 
 $name = 'suricata';
 $app_id = $app['app_id'];
-$unit_text = '% Packets';
+$unit_text = 'Percent Of Packets';
 $colours = 'psychedelic';
 $dostack = 0;
 $printtotal = 0;
