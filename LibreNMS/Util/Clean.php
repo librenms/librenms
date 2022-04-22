@@ -44,26 +44,6 @@ class Clean
     }
 
     /**
-     * Sanitize host name by removing all invalid characters.
-     * Behaves the same as Clean::fileName() except that it also allows valid IP addresses.
-     *
-     * @param  string  $string
-     * @return string|string[]|null
-     */
-    public static function hostName($string)
-    {
-        // If the string parses as a valid IP address it's ok
-        $address = inet_pton($string);
-        if ($address !== false) {
-            // Return address in clean RFC 5952 notation
-            return inet_ntop($address);
-        }
-
-        // Otherwise delegate to fileName
-        return self::fileName($string);
-    }
-
-    /**
      * Sanitize string to only contain alpha, numeric, dashes, and underscores
      *
      * @param  string  $string
