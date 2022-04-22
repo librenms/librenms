@@ -117,7 +117,7 @@ $rrd_def = RrdDefinition::make()
     ->addDataset('packets', 'DERIVE', 0)
     ->addDataset('tcp_memuse', 'GAUGE', 0)
     ->addDataset('tcp_reass_memuse', 'GAUGE', 0)
-    ->addDataset('uptime', 'DERIVE', 0);
+    ->addDataset('uptime', 'GAUGE', 0);
 
 
 // keys that need to by migrated from the instance to the
