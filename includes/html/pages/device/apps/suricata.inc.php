@@ -1,6 +1,6 @@
 <?php
 
-$suricata_status = get_suricata_status($device['device_id']);
+$suricata_instances = get_suricata_instances($device['device_id']);
 
 $link_array = [
     'page'   => 'device',
@@ -14,8 +14,8 @@ print_optionbar_start();
 echo generate_link('Totals', $link_array);
 echo '| Instances:';
 $int_int = 0;
-while (isset($suricata['instances'][$int_int])) {
-    $instance = $suricata['instances'][$int_int];
+while (isset($suricata_instances[$int_int])) {
+    $instance = $suricata_instances[$int_int];
     $label = $instance;
 
     if ($vars['instance'] == $instance) {
@@ -45,6 +45,7 @@ $graphs = [
     'suricata_app_flows'=>'App Layer Flows',
     'suricata_app_tx'=>'App Layer TX',
     'suricata_mem_use'=>'Memory Usage',
+    'suricata_uptime'=>'Uptime',
 ];
 
 

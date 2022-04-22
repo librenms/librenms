@@ -320,7 +320,7 @@ $graphs['suricata']=[
     'app_tx',
     'bytes',
     'mem_use',
-};
+];
 $graphs['zfs'] = [
     'arc_misc',
     'arc_size',
