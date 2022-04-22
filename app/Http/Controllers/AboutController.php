@@ -55,6 +55,7 @@ use LibreNMS\Config;
 use LibreNMS\Data\Store\Rrd;
 use LibreNMS\DB\Eloquent;
 use LibreNMS\Util\Version;
+use LibreNMS\Validations\Database;
 
 class AboutController extends Controller
 {
@@ -73,7 +74,7 @@ class AboutController extends Controller
             'project_name' => Config::get('project_name'),
 
             'version_local' => $version->local(),
-            'version_mysql' => Eloquent::version(),
+            'version_mysql' => $version->databaseServer(),
             'version_php' => phpversion(),
             'version_laravel' => App::VERSION(),
             'version_python' => $version->python(),

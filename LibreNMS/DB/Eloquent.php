@@ -25,8 +25,10 @@
 
 namespace LibreNMS\DB;
 
-use Illuminate\Support\Arr;
+use DB;
+use Illuminate\Database\Connection;
 use LibreNMS\Util\Laravel;
+use PDOException;
 
 class Eloquent
 {
@@ -35,7 +37,7 @@ class Eloquent
      *
      * @param  bool  $strict
      */
-    public static function setStrictMode($strict = true)
+    public static function setStrictMode(bool $strict = true): void
     {
         if (self::isConnected() && self::getDriver() == 'mysql') {
             if ($strict) {
@@ -46,14 +48,14 @@ class Eloquent
         }
     }
 
-    public static function isConnected($name = null)
+    public static function isConnected(?string $name = null): bool
     {
         try {
             $conn = self::DB($name);
             if ($conn) {
                 return ! is_null($conn->getPdo());
             }
-        } catch (\PDOException $e) {
+        } catch (PDOException $e) {
             return false;
         }
 
@@ -63,27 +65,27 @@ class Eloquent
     /**
      * Access the Database Manager for Fluent style queries. Like the Laravel DB facade.
      *
-     * @param  string  $name
+     * @param  string|null  $name
      * @return \Illuminate\Database\Connection|null
      */
-    public static function DB($name = null)
+    public static function DB(?string $name = null): ?Connection
     {
         // check if Laravel is booted
         if (Laravel::isBooted()) {
-            return \DB::connection($name);
+            return DB::connection($name);
         }
 
         return null;
     }
 
-    public static function getDriver()
+    public static function getDriver(): ?string
     {
         $connection = config('database.default');
 
         return config("database.connections.{$connection}.driver");
     }
 
-    public static function setConnection($name, $db_host = null, $db_user = '', $db_pass = '', $db_name = '', $db_port = null, $db_socket = null)
+    public static function setConnection($name, $db_host = null, $db_user = '', $db_pass = '', $db_name = '', $db_port = null, $db_socket = null): void
     {
         \Config::set("database.connections.$name", [
             'driver' => 'mysql',
@@ -100,10 +102,5 @@ class Eloquent
             'engine' => null,
         ]);
         \Config::set('database.default', $name);
-    }
-
-    public static function version($name = null)
-    {
-        return Arr::first(self::DB($name)->selectOne('select version()'));
     }
 }
