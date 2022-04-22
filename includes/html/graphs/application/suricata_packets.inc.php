@@ -2,7 +2,7 @@
 
 $name = 'suricata';
 $app_id = $app['app_id'];
-$unit_text = 'packets';
+$unit_text = 'packets/sec';
 $colours = 'psychedelic';
 $dostack = 0;
 $printtotal = 1;
