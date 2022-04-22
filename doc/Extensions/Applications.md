@@ -2174,6 +2174,11 @@ extend suricata-stats /usr/bin/env PATH=/sbin:/bin:/usr/sbin:/usr/bin:/usr/local
 
 4. Restart snmpd on your system.
 
+You will want to make sure Suricata is set to output the stats
+to the eve file once a minute. This will help make sure that
+it won't be to far back in the file and will make sure it is
+recent when the cronjob runs.
+
 Any configuration of suricata_stat_check should be done in the cron
 setup. If the default does not work, check the docs for it at
 [MetaCPAN for
