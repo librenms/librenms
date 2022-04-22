@@ -48,7 +48,6 @@ $graphs = [
     'suricata_alert'=>'Alert Status',
 ];
 
-
 foreach ($graphs as $key => $text) {
     $graph_type = $key;
     $graph_array['height'] = '100';

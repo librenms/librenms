@@ -11,7 +11,7 @@ $transparency = 15;
 
 if (isset($vars['instance'])) {
     $rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app['app_id'], $vars['instance']]);
-}else{
+} else {
     $rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app['app_id']]);
 }
 

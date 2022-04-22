@@ -1,7 +1,6 @@
 <?php
 
 use LibreNMS\Exceptions\JsonAppException;
-use LibreNMS\Exceptions\JsonAppParsingFailedException;
 use LibreNMS\RRD\RrdDefinition;
 
 $name = 'suricata';
@@ -17,7 +16,7 @@ try {
 }
 
 // grab  the alert here as it is the global one
-$metrics=[ 'alert'=>$suricata['alert'] ];
+$metrics = ['alert'=>$suricata['alert']];
 
 $rrd_def = RrdDefinition::make()
     ->addDataset('af_dcerpc_tcp', 'DERIVE', 0)
@@ -121,7 +120,7 @@ $rrd_def = RrdDefinition::make()
 
 
 // keys that need to by migrated from the instance to the
-$instance_keys=[
+$instance_keys = [
     'af_dcerpc_tcp', 'af_dcerpc_udp', 'af_dhcp', 'af_dns_tcp', 'af_dns_udp', 'af_failed_tcp', 'af_failed_udp', 'af_ftp',
     'af_ftp_data', 'af_http', 'af_ikev2', 'af_imap', 'af_krb5_tcp', 'af_krb5_udp', 'af_mqtt', 'af_nfs_tcp', 'af_nfs_udp',
     'af_ntp', 'af_rdp', 'af_rfb', 'af_sip', 'af_smb', 'af_smtp', 'af_snmp', 'af_ssh', 'af_tftp', 'af_tls', 'alert',
@@ -131,13 +130,13 @@ $instance_keys=[
     'dec_geneve', 'dec_ieee8021ah', 'dec_invalid', 'dec_ipv4', 'dec_ipv4_in_ipv6', 'dec_ipv6', 'dec_max_pkt_size', 'dec_mpls',
     'dec_mx_mac_addrs_d', 'dec_mx_mac_addrs_s', 'dec_packets', 'dec_ppp', 'dec_pppoe', 'dec_raw', 'dec_sctp', 'dec_sll',
     'dec_tcp', 'dec_teredo', 'dec_too_many_layer', 'dec_udp', 'dec_vlan', 'dec_vlan_qinq', 'dec_vntag', 'dec_vxlan',
-    'drop_delta', 'drop_percent', 'dropped', 'error_delta', 'error_percent', 'errors', 'f_icmpv4', 'f_icmpv6','f_memuse',
+    'drop_delta', 'drop_percent', 'dropped', 'error_delta', 'error_percent', 'errors', 'f_icmpv4', 'f_icmpv6', 'f_memuse',
     'f_tcp', 'f_udp', 'ftp_memuse', 'http_memuse', 'ifdrop_delta', 'ifdrop_percent', 'ifdropped', 'packet_delta', 'packets',
-    'tcp_memuse', 'tcp_reass_memuse', 'uptime'
- ];
+    'tcp_memuse', 'tcp_reass_memuse', 'uptime',
+];
 
 // keys to add to the RRD field
-$field_keys=[
+$field_keys = [
     'af_dcerpc_tcp', 'af_dcerpc_udp', 'af_dhcp', 'af_dns_tcp', 'af_dns_udp', 'af_failed_tcp', 'af_failed_udp', 'af_ftp',
     'af_ftp_data', 'af_http', 'af_ikev2', 'af_imap', 'af_krb5_tcp', 'af_krb5_udp', 'af_mqtt', 'af_nfs_tcp', 'af_nfs_udp',
     'af_ntp', 'af_rdp', 'af_rfb', 'af_sip', 'af_smb', 'af_smtp', 'af_snmp', 'af_ssh', 'af_tftp', 'af_tls', 'alert',
@@ -147,33 +146,32 @@ $field_keys=[
     'dec_geneve', 'dec_ieee8021ah', 'dec_invalid', 'dec_ipv4', 'dec_ipv4_in_ipv6', 'dec_ipv6', 'dec_max_pkt_size', 'dec_mpls',
     'dec_mx_mac_addrs_d', 'dec_mx_mac_addrs_s', 'dec_packets', 'dec_ppp', 'dec_pppoe', 'dec_raw', 'dec_sctp', 'dec_sll',
     'dec_tcp', 'dec_teredo', 'dec_too_many_layer', 'dec_udp', 'dec_vlan', 'dec_vlan_qinq', 'dec_vntag', 'dec_vxlan',
-    'drop_percent', 'dropped', 'error_percent', 'errors', 'f_icmpv4', 'f_icmpv6','f_memuse',
+    'drop_percent', 'dropped', 'error_percent', 'errors', 'f_icmpv4', 'f_icmpv6', 'f_memuse',
     'f_tcp', 'f_udp', 'ftp_memuse', 'http_memuse', 'ifdrop_percent', 'ifdropped', 'packets',
-    'tcp_memuse', 'tcp_reass_memuse', 'uptime'
- ];
+    'tcp_memuse', 'tcp_reass_memuse', 'uptime',
+];
 
 // process each instance
-$instance_list=[];
+$instance_list = [];
 foreach ($suricata['data'] as $instance => $stats) {
     if ($instance == '.total') {
         $rrd_name = ['app', $name, $app_id];
     } else {
         $rrd_name = ['app', $name, $app_id, $instance];
-        $instance_list[]=$instance;
+        $instance_list[] = $instance;
     }
 
     foreach ($instance_keys as $metric_key) {
         $metrics[$instance . '_' . $metric_key] = $stats[$metric_key];
     }
 
-    $fields=[];
+    $fields = [];
     foreach ($field_keys as $field_key) {
         $fields[$field_key] = $stats[$field_key];
     }
 
     $tags = ['name' => $name, 'app_id' => $app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
     data_update($device, 'app', $tags, $fields);
-
 }
 
 //

@@ -309,7 +309,7 @@ $graphs['freeradius'] = [
     'proxy_acct',
     'queue',
 ];
-$graphs['suricata']=[
+$graphs['suricata'] = [
     'alert',
     'packets',
     'bad_delta',
