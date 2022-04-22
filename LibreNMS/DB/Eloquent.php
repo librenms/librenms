@@ -53,7 +53,9 @@ class Eloquent
         try {
             $conn = self::DB($name);
             if ($conn) {
-                return ! is_null($conn->getPdo());
+                $conn->getPdo();
+
+                return true;
             }
         } catch (PDOException $e) {
             return false;
@@ -85,6 +87,18 @@ class Eloquent
         return config("database.connections.{$connection}.driver");
     }
 
+    /**
+     * Set the active connection, used during install
+     *
+     * @param string $name
+     * @param string $db_host
+     * @param string $db_user
+     * @param string $db_pass
+     * @param string $db_name
+     * @param int|string $db_port
+     * @param string $db_socket
+     * @return void
+     */
     public static function setConnection($name, $db_host = null, $db_user = '', $db_pass = '', $db_name = '', $db_port = null, $db_socket = null): void
     {
         \Config::set("database.connections.$name", [
