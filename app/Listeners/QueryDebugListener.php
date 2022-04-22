@@ -4,7 +4,6 @@ namespace App\Listeners;
 
 use Illuminate\Database\Events\QueryExecuted;
 use LibreNMS\Util\Debug;
-use LibreNMS\Util\Laravel;
 use Log;
 
 class QueryDebugListener
@@ -38,11 +37,7 @@ class QueryDebugListener
                 return $item;
             })->toJson();
 
-            if (Laravel::isBooted()) {
-                Log::debug("SQL[%Y{$query->sql} %y$bindings%n {$query->time}ms] \n", ['color' => true]);
-            } else {
-                c_echo("SQL[%Y{$query->sql} %y$bindings%n {$query->time}ms] \n");
-            }
+            Log::debug("SQL[%Y{$query->sql} %y$bindings%n {$query->time}ms] \n", ['color' => true]);
         }
     }
 }
