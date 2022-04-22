@@ -124,8 +124,8 @@ function poll_service($service)
     $old_status = $service['service_status'];
     $service['service_type'] = Clean::fileName($service['service_type']);
     $service['service_ip'] = IP::isValid($service['service_ip']) ? $service['service_ip'] : Clean::fileName($service['service_ip']);
-    $service['hostname'] = IP::isValid($service['hostname']) ? $service['hostname'] : Clean::hostName($service['hostname']);
-    $service['overwrite_ip'] = IP::isValid($service['overwrite_ip']) ? $service['overwrite_ip'] : Clean::hostName($service['overwrite_ip']);
+    $service['hostname'] = IP::isValid($service['hostname']) ? $service['hostname'] : Clean::fileName($service['hostname']);
+    $service['overwrite_ip'] = IP::isValid($service['overwrite_ip']) ? $service['overwrite_ip'] : Clean::fileName($service['overwrite_ip']);
     $check_cmd = '';
 
     // if we have a script for this check, use it.
