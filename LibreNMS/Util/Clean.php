@@ -42,7 +42,7 @@ class Clean
     {
         return preg_replace('/[^a-zA-Z0-9\-._]/', '', $file);
     }
-    
+
     /**
      * Sanitize host name by removing all invalid characters.
      * Behaves the same as Clean::fileName() except that it also allows valid IP addresses.
@@ -58,7 +58,7 @@ class Clean
             // Return address in clean RFC 5952 notation
             return inet_ntop($address);
         }
-        
+
         // Otherwise delegate to fileName
         return self::fileName($string);
     }
