@@ -118,7 +118,6 @@ $rrd_def = RrdDefinition::make()
     ->addDataset('tcp_reass_memuse', 'GAUGE', 0)
     ->addDataset('uptime', 'GAUGE', 0);
 
-
 // keys that need to by migrated from the instance to the
 $instance_keys = [
     'af_dcerpc_tcp', 'af_dcerpc_udp', 'af_dhcp', 'af_dns_tcp', 'af_dns_udp', 'af_failed_tcp', 'af_failed_udp', 'af_ftp',
