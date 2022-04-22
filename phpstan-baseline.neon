@@ -10296,11 +10296,6 @@ parameters:
 			path: tests/ConfigTest.php
 
 		-
-			message: "#^Method LibreNMS\\\\Tests\\\\ConfigTest\\:\\:testGetCombined\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: tests/ConfigTest.php
-
-		-
 			message: "#^Method LibreNMS\\\\Tests\\\\ConfigTest\\:\\:testGetDeviceSetting\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: tests/ConfigTest.php
@@ -10347,16 +10342,6 @@ parameters:
 
 		-
 			message: "#^Parameter \\#1 \\$os of static method LibreNMS\\\\Config\\:\\:getOsSetting\\(\\) expects string, null given\\.$#"
-			count: 1
-			path: tests/ConfigTest.php
-
-		-
-			message: "#^Parameter \\#3 \\$default of static method LibreNMS\\\\Config\\:\\:getCombined\\(\\) expects array, false given\\.$#"
-			count: 2
-			path: tests/ConfigTest.php
-
-		-
-			message: "#^Parameter \\#3 \\$default of static method LibreNMS\\\\Config\\:\\:getCombined\\(\\) expects array, true given\\.$#"
 			count: 1
 			path: tests/ConfigTest.php
 

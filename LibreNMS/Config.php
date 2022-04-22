@@ -204,29 +204,32 @@ class Config
      * Removes any duplicates.
      * When the arrays have keys, os settings take precedence over global settings
      *
-     * @param  string  $os  The os name
+     * @param  string|null  $os  The os name
      * @param  string  $key  period separated config variable name
+     * @param  string  $global_prefix  prefix for global setting
      * @param  array  $default  optional array to return if the setting is not set
      * @return array
      */
-    public static function getCombined($os, $key, $default = [])
+    public static function getCombined(?string $os, string $key, string $global_prefix = '', array $default = []): array
     {
-        if (! self::has($key)) {
-            return self::getOsSetting($os, $key, $default);
-        }
+        $global_key = $global_prefix . $key;
 
         if (! isset(self::$config['os'][$os][$key])) {
-            if (! Str::contains($key, '.')) {
-                return self::get($key, $default);
+            if (! Str::contains($global_key, '.')) {
+                return (array) self::get($global_key, $default);
             }
             if (! self::has("os.$os.$key")) {
-                return self::get($key, $default);
+                return (array) self::get($global_key, $default);
             }
+        }
+
+        if (! self::has("os.$os.$key")) {
+            return (array) self::get($global_key, $default);
         }
 
         return array_unique(array_merge(
-            (array) self::get($key, $default),
-            (array) self::getOsSetting($os, $key, $default)
+            (array) self::get($global_key),
+            (array) self::getOsSetting($os, $key)
         ));
     }
 
