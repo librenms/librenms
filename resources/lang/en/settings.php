@@ -251,6 +251,10 @@ return [
             'description' => 'Group access',
             'help' => 'Define groups that have access and level'
         ],
+        'auth_ldap_skip_group_check' => [
+            'description' => 'Skip LDAP Group verification',
+            'help' => 'Skip ldap_compare when the provider does not allow for the Compare action.'
+        ],
         'auth_ldap_port' => [
             'description' => 'LDAP port',
             'help' => 'Port to connect to servers on. For LDAP it should be 389, for LDAPS it should be 636'
