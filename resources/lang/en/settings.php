@@ -1596,6 +1596,7 @@ return [
         'boolean' => ':value is not a valid boolean',
         'color' => ':value is not a valid hex color code',
         'email' => ':value is not a valid email',
+        'float' => ':value is not an float',
         'integer' => ':value is not an integer',
         'password' => 'The password is incorrect',
         'select' => ':value is not an allowed value',
