@@ -165,7 +165,7 @@ if (! empty($argv[1])) {
         }
         exit(2);
     } catch (Exception $e) {
-        print_error($e->getMessage());
+        print_error("$e");
         exit(3);
     }
 } else {

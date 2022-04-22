@@ -1,0 +1,36 @@
+<?php
+
+return [
+    'slas' => [
+        'types' => [
+            'dhcp' => 'DHCP',
+            'dlsw' => 'DLSW',
+            'dns' => 'DNS',
+            'DnsQuery' => 'Запит DNS',
+            'echo' => 'ICMP Ping',
+            'ethernetJitter' => 'Джитер Ethernet',
+            'ethernetPing' => 'Ethernet Ping',
+            'fileIO' => 'File I/O',
+            'ftp' => 'FTP',
+            'http' => 'HTTP',
+            'HttpGet' => 'HTTP Get',
+            'HttpGetMetadata' => 'Метадані HTTP Get',
+            'IcmpEcho' => 'ICMP Echo',
+            'icmpjitter' => 'Джитер ICMP',
+            'IcmpTimeStamp' => 'Часова мітка ICMP',
+            'jitter' => 'Джитер',
+            'lspGroup' => 'Група LSP',
+            'lspPing' => 'LSP Ping',
+            'lspPingPseudowire' => 'LSP Pseudowire Ping"',
+            'lspTrace' => 'LSP Trace',
+            'NtpQuery' => 'Запит NTP',
+            'pathEcho' => 'Path ICMP Ping',
+            'rtp' => 'RTP',
+            'script' => 'Скрипт',
+            'tcpConnect' => 'TCP Connect',
+            'udpEcho' => 'UDP Ping',
+            'UdpTimestamp' => 'Часова мітка UDP',
+            'voip' => 'VoIP',
+        ],
+    ],
+];
