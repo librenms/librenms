@@ -33,7 +33,7 @@ use Symfony\Component\Process\Process;
 class Version
 {
     // Update this on release
-    public const VERSION = '22.3.0';
+    public const VERSION = '22.4.0';
 
     /**
      * @var bool
@@ -67,7 +67,7 @@ class Version
     public function localCommit(): array
     {
         if ($this->is_git_install) {
-            [$local_sha, $local_date] = array_pad(explode('|', rtrim(`git show --pretty='%H|%ct' -s HEAD`), 2), 2, '');
+            [$local_sha, $local_date] = explode('|', rtrim(`git show --pretty='%H|%ct' -s HEAD`));
 
             return [
                 'sha' => $local_sha,
