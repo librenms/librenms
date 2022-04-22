@@ -86,7 +86,7 @@ class Debug
 
     public static function disableQueryDebug(): void
     {
-       self::$sql_debug_enabled = false;
+        self::$sql_debug_enabled = false;
     }
 
     public static function enableCliDebugOutput(): void

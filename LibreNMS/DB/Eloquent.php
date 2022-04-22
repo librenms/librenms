@@ -25,50 +25,11 @@
 
 namespace LibreNMS\DB;
 
-use App\Listeners\LegacyQueryListener;
-use Dotenv\Dotenv;
-use Illuminate\Database\Capsule\Manager as Capsule;
-use Illuminate\Database\Events\StatementPrepared;
-use Illuminate\Events\Dispatcher;
 use Illuminate\Support\Arr;
 use LibreNMS\Util\Laravel;
 
 class Eloquent
 {
-    /** @var Capsule static reference to capsule */
-    private static $capsule;
-
-    public static function boot()
-    {
-        // boot Eloquent outside of Laravel
-        if (! Laravel::isBooted() && is_null(self::$capsule)) {
-            $install_dir = realpath(__DIR__ . '/../../');
-
-            Dotenv::createMutable($install_dir)->load();
-
-            $db_config = include $install_dir . '/config/database.php';
-            $settings = $db_config['connections'][$db_config['default']];
-
-            self::$capsule = new Capsule;
-            self::$capsule->addConnection($settings);
-            self::$capsule->setEventDispatcher(new Dispatcher());
-            self::$capsule->setAsGlobal();
-            self::$capsule->bootEloquent();
-        }
-
-        self::initLegacyListeners();
-        self::setStrictMode(false); // set non-strict mode if for legacy code
-    }
-
-    public static function initLegacyListeners()
-    {
-        $db = self::DB();
-        if ($db) {
-            // set FETCH_ASSOC for queries that required by setting the global variable $PDO_FETCH_ASSOC (for dbFacile)
-            $db->getEventDispatcher()->listen(StatementPrepared::class, new LegacyQueryListener());
-        }
-    }
-
     /**
      * Set the strict mode for the current connection (will not persist)
      *
@@ -112,11 +73,7 @@ class Eloquent
             return \DB::connection($name);
         }
 
-        if (is_null(self::$capsule)) {
-            return null;
-        }
-
-        return self::$capsule->getDatabaseManager()->connection($name);
+        return null;
     }
 
     public static function getDriver()
