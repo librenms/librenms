@@ -416,7 +416,7 @@
                 },
                 {
                     "metric": ".total_dec_mx_mac_addrs_d",
-                    "value": 0
+                    "value": 0,
                     "value_prev": null,
                     "app_type": "suricata"
                 },
@@ -678,7 +678,7 @@
                     "value_prev": null,
                     "app_type": "suricata"
                 },
-                {   
+                {
                     "metric": "ids_af_failed_udp",
                     "value": 8121,
                     "value_prev": null,
@@ -726,7 +726,7 @@
                     "value_prev": null,
                     "app_type": "suricata"
                 },
-                {   
+                {
                     "metric": "ids_af_mqtt",
                     "value": 0,
                     "value_prev": null,
@@ -774,7 +774,7 @@
                     "value_prev": null,
                     "app_type": "suricata"
                 },
-                {   
+                {
                     "metric": "ids_af_smtp",
                     "value": 1408,
                     "value_prev": null,
@@ -822,7 +822,7 @@
                     "value_prev": null,
                     "app_type": "suricata"
                 },
-                {   
+                {
                     "metric": "ids_at_dhcp",
                     "value": 2571,
                     "value_prev": null,
@@ -1034,7 +1034,7 @@
                 },
                 {   
                     "metric": "ids_dec_mx_mac_addrs_d",
-                    "value": 0
+                    "value": 0,
                     "value_prev": null,
                     "app_type": "suricata"
                 },
