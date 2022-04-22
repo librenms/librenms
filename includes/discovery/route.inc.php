@@ -178,7 +178,7 @@ if (isset($ipForwardNb['0']['inetCidrRouteNumber']) && $ipForwardNb['0']['inetCi
 if (isset($ipForwardNb['0']['ipCidrRouteNumber']) && $ipForwardNb['0']['ipCidrRouteNumber'] > $ipForwardNb['0']['inetCidrRouteNumber'] && $ipForwardNb['0']['ipCidrRouteNumber'] < $max_routes) {
     //device uses only ipCidrRoute and not inetCidrRoute
     d_echo('IP FORWARD MIB (without inetCidr support)');
-    $ipCidrTable = SnmpQuery::allowUnordered()->walk('IP-FORWARD-MIB::ipCidrRouteEntry')->table(6);
+    $ipCidrTable = SnmpQuery::walk('IP-FORWARD-MIB::ipCidrRouteEntry')->table(6);
     echo 'ipCidrRouteTable ';
     // we need to translate the values to inetCidr structure;
     //d_echo($ipCidrTable);

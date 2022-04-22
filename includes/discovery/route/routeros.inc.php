@@ -25,7 +25,7 @@
 
 use LibreNMS\Util\IPv6;
 
-$oids = SnmpQuery::allowUnordered()->walk('IPV6-MIB::ipv6RouteTable')->table(1);
+$oids = SnmpQuery::walk('IPV6-MIB::ipv6RouteTable')->table(1);
 
 foreach ($oids as $dst => $data) {
     $PfxLen = array_key_first($data['IPV6-MIB::ipv6RouteIfIndex']);
