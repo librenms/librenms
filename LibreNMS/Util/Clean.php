@@ -53,8 +53,10 @@ class Clean
     public static function hostName($string)
     {
         // If the string parses as a valid IP address it's ok
-        if (inet_pton($string) !== false) {
-            return $string;
+        $address = inet_pton($string);
+        if ($address !== false) {
+            // Return address in clean RFC 5952 notation
+            return inet_ntop($address);
         }
         
         // Otherwise delegate to fileName
