@@ -35,7 +35,6 @@ while (isset($suricata_instances[$int_int])) {
 print_optionbar_end();
 
 $graphs = [
-    'suricata_alert'=>'Alert Status',
     'suricata_packets'=>'Packets',
     'suricata_bytes'=>'Bytes',
     'suricata_bad_delta'=>'Drops or Errors Delta',
@@ -46,6 +45,7 @@ $graphs = [
     'suricata_app_tx'=>'App Layer TX',
     'suricata_mem_use'=>'Memory Usage',
     'suricata_uptime'=>'Uptime',
+    'suricata_alert'=>'Alert Status',
 ];
 
 

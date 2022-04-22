@@ -17,7 +17,7 @@ try {
 }
 
 // grab  the alert here as it is the global one
-$metrics=[ 'alert'=$suricata['alert'] ];
+$metrics=[ 'alert'=>$suricata['alert'] ];
 
 $rrd_def = RrdDefinition::make()
     ->addDataset('af_dcerpc_tcp', 'DERIVE', 0)
@@ -47,8 +47,7 @@ $rrd_def = RrdDefinition::make()
     ->addDataset('af_ssh', 'DERIVE', 0)
     ->addDataset('af_tftp', 'DERIVE', 0)
     ->addDataset('af_tls', 'DERIVE', 0)
-    ->addDataset('alert', 'DERIVE', 0)
-    ->addDataset('alertString', 'GAUGE', 0)
+    ->addDataset('alert', 'GAUGE', 0)
     ->addDataset('at_dcerpc_tcp', 'DERIVE', 0)
     ->addDataset('at_dcerpc_udp', 'DERIVE', 0)
     ->addDataset('at_dhcp', 'DERIVE', 0)
@@ -72,6 +71,7 @@ $rrd_def = RrdDefinition::make()
     ->addDataset('at_smtp', 'DERIVE', 0)
     ->addDataset('at_snmp', 'DERIVE', 0)
     ->addDataset('at_ssh', 'DERIVE', 0)
+    ->addDataset('at_tftp', 'DERIVE', 0)
     ->addDataset('at_tls', 'DERIVE', 0)
     ->addDataset('bytes', 'DERIVE', 0)
     ->addDataset('dec_avg_pkt_size', 'DERIVE', 0)
@@ -99,25 +99,25 @@ $rrd_def = RrdDefinition::make()
     ->addDataset('dec_udp', 'DERIVE', 0)
     ->addDataset('dec_vlan', 'DERIVE', 0)
     ->addDataset('dec_vlan_qinq', 'DERIVE', 0)
-    ->addDataset('dec_wntag', 'DERIVE', 0)
-    ->addDataset('dec_wxlan', 'DERIVE', 0)
-    ->addDataset('drop_percent', 'DERIVE', 0)
+    ->addDataset('dec_vntag', 'DERIVE', 0)
+    ->addDataset('dec_vxlan', 'DERIVE', 0)
+    ->addDataset('drop_percent', 'GAUGE', 0)
     ->addDataset('dropped', 'DERIVE', 0)
     ->addDataset('error_percent', 'GAUGE', 0)
     ->addDataset('errors', 'DERIVE', 0)
     ->addDataset('f_icmpv4', 'DERIVE', 0)
     ->addDataset('f_icmpv6', 'DERIVE', 0)
-    ->addDataset('f_memuse', 'DERIVE', 0)
+    ->addDataset('f_memuse', 'GAUGE', 0)
     ->addDataset('f_tcp', 'DERIVE', 0)
     ->addDataset('f_udp', 'DERIVE', 0)
-    ->addDataset('ftp_memuse', 'DERIVE', 0)
-    ->addDataset('http_memuse', 'DERIVE', 0)
+    ->addDataset('ftp_memuse', 'GAUGE', 0)
+    ->addDataset('http_memuse', 'GAUGE', 0)
     ->addDataset('ifdrop_percent', 'GAUGE', 0)
     ->addDataset('ifdropped', 'DERIVE', 0)
     ->addDataset('packets', 'DERIVE', 0)
     ->addDataset('tcp_memuse', 'GAUGE', 0)
     ->addDataset('tcp_reass_memuse', 'GAUGE', 0)
-    ->addDataset('uptime' 'DERIVE', 0);
+    ->addDataset('uptime', 'DERIVE', 0);
 
 
 // keys that need to by migrated from the instance to the
@@ -130,24 +130,45 @@ $instance_keys=[
     'at_smb', 'at_smtp', 'at_snmp', 'at_ssh', 'at_tftp', 'at_tls', 'bytes', 'dec_avg_pkt_size', 'dec_chdlc', 'dec_ethernet',
     'dec_geneve', 'dec_ieee8021ah', 'dec_invalid', 'dec_ipv4', 'dec_ipv4_in_ipv6', 'dec_ipv6', 'dec_max_pkt_size', 'dec_mpls',
     'dec_mx_mac_addrs_d', 'dec_mx_mac_addrs_s', 'dec_packets', 'dec_ppp', 'dec_pppoe', 'dec_raw', 'dec_sctp', 'dec_sll',
-    'dec_tcp', 'dec_teredo', 'dec_too_many_layer', 'dec_udp', 'dec_vlan', 'dec_vlan_qinq', 'dec_wntag', 'dec_wxlan',
+    'dec_tcp', 'dec_teredo', 'dec_too_many_layer', 'dec_udp', 'dec_vlan', 'dec_vlan_qinq', 'dec_vntag', 'dec_vxlan',
     'drop_delta', 'drop_percent', 'dropped', 'error_delta', 'error_percent', 'errors', 'f_icmpv4', 'f_icmpv6','f_memuse',
     'f_tcp', 'f_udp', 'ftp_memuse', 'http_memuse', 'ifdrop_delta', 'ifdrop_percent', 'ifdropped', 'packet_delta', 'packets',
+    'tcp_memuse', 'tcp_reass_memuse', 'uptime'
+ ];
+
+// keys to add to the RRD field
+$field_keys=[
+    'af_dcerpc_tcp', 'af_dcerpc_udp', 'af_dhcp', 'af_dns_tcp', 'af_dns_udp', 'af_failed_tcp', 'af_failed_udp', 'af_ftp',
+    'af_ftp_data', 'af_http', 'af_ikev2', 'af_imap', 'af_krb5_tcp', 'af_krb5_udp', 'af_mqtt', 'af_nfs_tcp', 'af_nfs_udp',
+    'af_ntp', 'af_rdp', 'af_rfb', 'af_sip', 'af_smb', 'af_smtp', 'af_snmp', 'af_ssh', 'af_tftp', 'af_tls', 'alert',
+    'at_dcerpc_tcp', 'at_dcerpc_udp', 'at_dhcp', 'at_dns_tcp', 'at_dns_udp', 'at_ftp', 'at_ftp_data', 'at_http', 'at_ikev2',
+    'at_imap', 'at_krb5_tcp', 'at_krb5_udp', 'at_mqtt', 'at_nfs_tcp', 'at_nfs_udp', 'at_ntp', 'at_rdp', 'at_rfb', 'at_sip',
+    'at_smb', 'at_smtp', 'at_snmp', 'at_ssh', 'at_tftp', 'at_tls', 'bytes', 'dec_avg_pkt_size', 'dec_chdlc', 'dec_ethernet',
+    'dec_geneve', 'dec_ieee8021ah', 'dec_invalid', 'dec_ipv4', 'dec_ipv4_in_ipv6', 'dec_ipv6', 'dec_max_pkt_size', 'dec_mpls',
+    'dec_mx_mac_addrs_d', 'dec_mx_mac_addrs_s', 'dec_packets', 'dec_ppp', 'dec_pppoe', 'dec_raw', 'dec_sctp', 'dec_sll',
+    'dec_tcp', 'dec_teredo', 'dec_too_many_layer', 'dec_udp', 'dec_vlan', 'dec_vlan_qinq', 'dec_vntag', 'dec_vxlan',
+    'drop_percent', 'dropped', 'error_percent', 'errors', 'f_icmpv4', 'f_icmpv6','f_memuse',
+    'f_tcp', 'f_udp', 'ftp_memuse', 'http_memuse', 'ifdrop_percent', 'ifdropped', 'packets',
     'tcp_memuse', 'tcp_reass_memuse', 'uptime'
  ];
 
 // process each instance
 $instance_list=[];
 foreach ($suricata['data'] as $instance => $stats) {
-    $rrd_name = ['app', $name, $app_id, $instance];
-    $instance_list[]=$instance;
+    if ($instance == '.total') {
+        $rrd_name = ['app', $name, $app_id];
+    } else {
+        $rrd_name = ['app', $name, $app_id, $instance];
+        $instance_list[]=$instance;
+    }
+
+    foreach ($instance_keys as $metric_key) {
+        $metrics[$instance . '_' . $metric_key] = $stats[$metric_key];
+    }
 
     $fields=[];
-    foreach ($instance_keys as $metric_key) {
-        $metrics[$instance . '_' . $metric_key]=>$stats[$intance_key];
-        if ( ! preg_match('/_delta$/', $instance_key ) {
-            $fields[$metric_key]=$stats[$intance_key];
-        }
+    foreach ($field_keys as $field_key) {
+        $fields[$field_key] = $stats[$field_key];
     }
 
     $tags = ['name' => $name, 'app_id' => $app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
@@ -187,7 +208,7 @@ if (empty($instance_list)) {
     sort($instance_list);
 
     $id = $component->getFirstComponentID($ourc);
-    $ourc[$id]['label'] = 'ZFS';
+    $ourc[$id]['label'] = 'Suricata';
     $ourc[$id]['instances'] = json_encode($instance_list);
     $ourc[$id]['alert'] = $suricata['alert'];
     $ourc[$id]['alertString'] = $suricata['alertString'];
