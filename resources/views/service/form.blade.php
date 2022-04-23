@@ -1,10 +1,10 @@
 <form method="post" role="form" id="service" class="form-horizontal" x-data="serviceFormData()">
     <div class="form-group row">
-        <label for='service_name' class='col-sm-3 control-label'>Name </label>
-        <div class="col-sm-9">
+        <label for='service_name' class='col-sm-4 control-label'>Name </label>
+        <div class="col-sm-8">
             <input type='text' id='service_name' name='service_name' class='form-control input-sm' placeholder='' x-model="service_name" x-bind:class="{'!tw-border-red-500': errors.service_name}"/>
         </div>
-        <div class='col-sm-9 col-sm-offset-3 tw-text-red-500'>
+        <div class='col-sm-8 col-sm-offset-4 tw-text-red-500'>
             <template x-for="error in errors.service_name">
                 <div x-text="error"></div>
             </template>
@@ -14,12 +14,12 @@
         <input type="hidden" name="device_id" id="device_id" value="{{ $device_id }}" x-model.number="device_id">
     @else
         <div class="form-group row">
-            <label for='device_id' class='col-sm-3 control-label'>Device </label>
-            <div class="col-sm-9">
+            <label for='device_id' class='col-sm-4 control-label'>Device </label>
+            <div class="col-sm-8">
                 <select id='device_id' name='device_id' class='form-control' x-model.number="device_id" x-bind:class="{'!tw-border-red-500': errors.device_id}">
                 </select>
             </div>
-            <div class='col-sm-9 col-sm-offset-3 tw-text-red-500'>
+            <div class='col-sm-8 col-sm-offset-4 tw-text-red-500'>
                 <template x-for="error in errors.device_id">
                     <div x-text="error"></div>
                 </template>
@@ -27,45 +27,45 @@
         </div>
     @endif
     <div class="form-group row">
-        <label for='service_type' class='col-sm-3 control-label'>Check Type </label>
-        <div class="col-sm-9">
+        <label for='service_type' class='col-sm-4 control-label'>Check Type </label>
+        <div class="col-sm-8">
             <select id='service_type' name='service_type' class='form-control has-feedback' x-model="service_type" x-bind:class="{'!tw-border-red-500': errors.service_type}">
                 @foreach(\LibreNMS\Services::list() as $check)
                     <option value="{{ $check }}">{{ $check }}</option>
                 @endforeach
             </select>
         </div>
-        <div class='col-sm-9 col-sm-offset-3 tw-text-red-500'>
+        <div class='col-sm-8 col-sm-offset-4 tw-text-red-500'>
             <template x-for="error in errors.service_type">
                 <div x-text="error"></div>
             </template>
         </div>
     </div>
     <div class='form-group row'>
-        <label for='service_desc' class='col-sm-3 control-label'>Description </label>
-        <div class='col-sm-9'>
+        <label for='service_desc' class='col-sm-4 control-label'>Description </label>
+        <div class='col-sm-8'>
             <textarea id='service_desc' name='service_desc' class='form-control' rows='5' x-model="service_desc" x-bind:class="{'!tw-border-red-500': errors.service_desc}"></textarea>
         </div>
-        <div class='col-sm-9 col-sm-offset-3 tw-text-red-500'>
+        <div class='col-sm-8 col-sm-offset-4 tw-text-red-500'>
             <template x-for="error in errors.service_desc">
                 <div x-text="error"></div>
             </template>
         </div>
     </div>
     <div class="form-group row" x-show="hasHostname">
-        <label for='service_ip' class='col-sm-3 control-label'>Remote Host </label>
-        <div class="col-sm-9">
+        <label for='service_ip' class='col-sm-4 control-label'>Remote Host </label>
+        <div class="col-sm-8">
             <input type='text' id='service_ip' name='service_ip' class='form-control has-feedback' placeholder='<This Device>' x-model="service_ip" x-bind:class="{'!tw-border-red-500': errors.device_id}"/>
         </div>
-        <div class='col-sm-9 col-sm-offset-3 tw-text-red-500'>
+        <div class='col-sm-8 col-sm-offset-4 tw-text-red-500'>
             <template x-for="error in errors.service_ip">
                 <div x-text="error"></div>
             </template>
         </div>
     </div>
     <div class="form-group row">
-        <label for="service_param" class="col-sm-3 control-label">Parameters </label>
-        <div class="col-sm-9">
+        <label for="service_param" class="col-sm-4 control-label">Parameters </label>
+        <div class="col-sm-8">
             <div class="tw-flex">
                 <select id="parameters" class="form-control has-feedback tw-flex-initial" x-model="currentParam" x-ref="param" x-bind:disabled="! currentParam" x-bind:class="{'!tw-border-red-500': errors.service_param}">
                     <template x-for="param in unusedParams()">
@@ -91,36 +91,36 @@
                 </div>
             </template>
         </div>
-        <div class='col-sm-9 col-sm-offset-3 tw-text-red-500'>
+        <div class='col-sm-8 col-sm-offset-4 tw-text-red-500'>
             <template x-for="error in errors.service_param">
                 <div x-text="error"></div>
             </template>
         </div>
     </div>
     <div class="form-group row">
-        <label for='service_ignore' class='col-sm-3 control-label'>Ignore alert tag </label>
-        <div class="col-sm-9">
-            <input type='checkbox' id='service_ignore' name='service_ignore' x-model="service_ignore">
+        <label for='service_ignore' class='col-sm-4 control-label'>Ignore alert tag </label>
+        <div class="col-sm-8">
+            <x-toggle x-model="service_ignore"></x-toggle>
         </div>
-        <div class='col-sm-9 col-sm-offset-3 tw-text-red-500'>
+        <div class='col-sm-8 col-sm-offset-4 tw-text-red-500'>
             <template x-for="error in errors.service_ignore">
                 <div x-text="error"></div>
             </template>
         </div>
     </div>
     <div class="form-group row">
-        <label for='service_disabled' class='col-sm-3 control-label'>Disable polling and alerting </label>
-        <div class="col-sm-9">
-            <input type='checkbox' id='service_disabled' name='service_disabled' x-model="service_disabled">
+        <label for='service_disabled' class='col-sm-4 control-label'>Disable polling and alerting </label>
+        <div class="col-sm-8">
+            <x-toggle x-model="service_disabled"></x-toggle>
         </div>
-        <div class='col-sm-9 col-sm-offset-3 tw-text-red-500'>
+        <div class='col-sm-8 col-sm-offset-4 tw-text-red-500'>
             <template x-for="error in errors.service_disabled">
                 <div x-text="error"></div>
             </template>
         </div>
     </div>
     <div class="form-group row">
-        <div class="col-sm-offset-3">
+        <div class="col-sm-offset-4">
             <button class="btn btn-default btn-sm" type="button" value="save" x-on:click="save">Save Service</button>
         </div>
     </div>
