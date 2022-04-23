@@ -367,7 +367,7 @@ return [
         ],
         'auth_ldap_skip_group_check' => [
             'description' => 'Skip LDAP Group verification',
-            'help' => 'Skip ldap_compare when the provider does not allow for the Compare action.'
+            'help' => 'Skip ldap_compare when the provider does not allow for the Compare action.',
         ],
         'auth_ldap_port' => [
             'description' => 'LDAP port',
