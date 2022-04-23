@@ -16,7 +16,7 @@
         <div class='col-sm-9'>
         </div>
     </div>
-    @if($device_id)
+    @isset($device_id)
         <input type="hidden" name="device_id" id="device_id" value="{{ $device_id }}" x-model.number="device_id">
     @else
         <div class="form-group row">
@@ -49,10 +49,10 @@
         <div class='col-sm-9'>
         </div>
     </div>
-    <div class="form-group row">
+    <div class="form-group row" x-show="hasHostname">
         <label for='service_ip' class='col-sm-3 control-label'>Remote Host </label>
         <div class="col-sm-9">
-            <input type='text' id='service_ip' name='service_ip' class='form-control has-feedback' placeholder='IP Address or Hostname'/>
+            <input type='text' id='service_ip' name='service_ip' class='form-control has-feedback' placeholder='<This Device>' x-bind:required="hostnameRequired"/>
         </div>
         <div class='col-sm-9'>
         </div>
@@ -61,17 +61,20 @@
         <label for="service_param" class="col-sm-3 control-label">Parameters </label>
         <div class="col-sm-9">
             <div class="tw-flex">
-                <select id="parameters" class="form-control has-feedback tw-flex-initial" x-model="currentParam" x-ref="param">
+                <select id="parameters" class="form-control has-feedback tw-flex-initial" x-model="currentParam" x-ref="param" x-bind:disabled="! currentParam">
                     <template x-for="param in unusedParams()">
-                        <option x-bind:value="param.short || param.param" x-text="(param.required ? '* ' : '') + (param.group ? '~ ' : '') + (param.param || param.short)"></option>
+                        <option x-bind:value="param.param || param.short" x-text="(param.param || param.short) + (param.required ? ' *' : '') + (param.group ? ' []' : '')"></option>
                     </template>
                 </select>
                 <input type='text' id='service_param' name='service_param' class='form-control has-feedback  tw-ml-2 tw-flex-grow' x-model="currentValue" x-ref="value"
-                       x-bind:placeholder="getParameter(currentParam).value"
-                       x-bind:title="getParameter(currentParam).description"
-                       x-bind:disabled="! getParameter(currentParam).value"
-                       x-bind:required="!! getParameter(currentParam).value">
-                <button x-on:click.prevent="addTag(currentParam, currentValue)" class="tw-bg-blue-500 hover:tw-bg-blue-700 tw-text-white tw-font-bold tw-py-2 tw-px-4 tw-rounded tw-ml-2 tw-flex-none"><i class="fa-solid fa-plus"></i></button>
+                       x-bind:placeholder="currentParam && getParameter(currentParam).value"
+                       x-bind:title="currentParam && getParameter(currentParam).description"
+                       x-bind:disabled="currentParam && ! getParameter(currentParam).value"
+                       x-bind:required="currentParam && getParameter(currentParam).value">
+                <button x-on:click.prevent="addTag(currentParam, currentValue)"
+                        x-bind:disabled="! currentParam"
+                        x-bind:class="currentParam ? 'hover:tw-bg-blue-700' : 'tw-opacity-50 !tw-cursor-not-allowed'"
+                        class="tw-bg-blue-500 tw-text-white tw-font-bold tw-py-2 tw-px-4 tw-rounded tw-ml-2 tw-flex-none"><i class="fa-solid fa-plus"></i></button>
             </div>
             <template x-for="(value, param) in service_param">
                 <div class="tw-bg-indigo-100 tw-inline-flex tw-items-center tw-rounded tw-mt-2 tw-mr-1">
@@ -81,8 +84,6 @@
                     </button>
                 </div>
             </template>
-        </div>
-        <div class='col-sm-9'>
         </div>
     </div>
     <div class="form-group row">
@@ -120,24 +121,25 @@
             service_disabled: false,
             currentParam: null,
             currentValue: null,
+            hasHostname: true,
             parameters: [],
-            excluded: [],
+            excluded: {},
             getParameter(key) {
-                const found = this.parameters.find(param => param.short === key || param.param === key);
+                const found = this.parameters.find(param => param.param === key || param.short === key);
                 return found ? found : {};
             },
             unusedParams() {
-                const used = Object.keys(this.service_param).concat(this.excluded);
-                return this.parameters.filter(param => ! (used.includes(param.short) || used.includes(param.param)));
+                const used = Object.keys(this.service_param).concat(Object.values(this.excluded).flat());
+                return this.parameters.filter(param => ! (used.includes(param.param) || used.includes(param.short)));
             },
             removeTag(param) {
                 delete this.service_param[param];
-                this.currentParam = this.$refs.param.value;
+                delete this.excluded[param];
+                // this.selectFirstParam();
             },
             addTag(param, value) {
                 let parameter = this.getParameter(param);
-                let key = parameter.param || parameter.short;
-                if (param !== "" && ! this.service_param.hasOwnProperty(key)) {
+                if (param !== "" && ! this.service_param.hasOwnProperty(param)) {
                     if (parameter.value && ! this.currentValue) {
                         this.$refs.value.classList.add('!tw-border-red-500');
                         setTimeout(() => this.$refs.value.classList.remove('!tw-border-red-500'), 1500);
@@ -145,17 +147,34 @@
                     }
 
                     if (parameter.group) {
-                        this.excluded = [...new Set([...this.excluded, ...parameter.group])];
+                        this.excluded[param] = parameter.group;
                     }
-                    this.service_param[key] = value;
+                    this.service_param[param] = value;
                     this.currentValue = null;
-                    this.$nextTick(() => this.currentParam = this.$refs.param.value);
+                    // this.selectFirstParam();
                 }
             },
             async fetchParams(type) {
                 const response = await fetch('{{ route('services.params', ['type' => '?']) }}'.replace('?', type));
-                this.parameters = await response.json();
+                let parameters = await response.json();
+                let hasHostname = false;
+
+                parameters = parameters.filter(param => {
+                    if (param.param === '--hostname' || param.short === '-H') {
+                        hasHostname = true;
+                        return false;
+                    }
+
+                    return true;
+                });
+
+                this.hasHostname = hasHostname;
+                this.parameters = parameters;
                 this.$nextTick(() => this.currentParam = this.$refs.param.value);
+            },
+            selectFirstParam() {
+                let first = this.unusedParams().first();
+                this.currentParam = first.param || first.short;
             },
             init: function () {
                 let deviceSelect = init_select2('#device_id', 'device', {}, null, null, {allowClear: false});
@@ -171,6 +190,7 @@
                     this.fetchParams(this.service_type);
                 }
                 this.$watch("service_type", service_type => this.fetchParams(service_type));
+                this.$watch('service_param', () => this.currentParam = this.$refs.param.value);
             }
         };
     }
