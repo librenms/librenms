@@ -870,7 +870,7 @@
                     "value_prev": null,
                     "app_type": "suricata"
                 },
-                {   
+                {
                     "metric": "ids_at_krb5_tcp",
                     "value": 0,
                     "value_prev": null,
@@ -918,7 +918,7 @@
                     "value_prev": null,
                     "app_type": "suricata"
                 },
-                {   
+                {
                     "metric": "ids_at_sip",
                     "value": 4137,
                     "value_prev": null,
@@ -966,7 +966,7 @@
                     "value_prev": null,
                     "app_type": "suricata"
                 },
-                {   
+                {
                     "metric": "ids_dec_avg_pkt_size",
                     "value": 513,
                     "value_prev": null,
@@ -1020,43 +1020,43 @@
                     "value_prev": null,
                     "app_type": "suricata"
                 },
-                {   
+                {
                     "metric": "ids_dec_max_pkt_size",
                     "value": 1514,
                     "value_prev": null,
                     "app_type": "suricata"
                 },
-                {   
+                {
                     "metric": "ids_dec_mpls",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "suricata"
                 },
-                {   
+                {
                     "metric": "ids_dec_mx_mac_addrs_d",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "suricata"
                 },
-                {   
+                {
                     "metric": "ids_dec_mx_mac_addrs_s",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "suricata"
                 },
-                {   
+                {
                     "metric": "ids_dec_packets",
                     "value": 14772989,
                     "value_prev": null,
                     "app_type": "suricata"
                 },
-                {   
+                {
                     "metric": "ids_dec_ppp",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "suricata"
                 },
-                {   
+                {
                     "metric": "ids_dec_pppoe",
                     "value": 0,
                     "value_prev": null,
@@ -1104,7 +1104,7 @@
                     "value_prev": null,
                     "app_type": "suricata"
                 },
-                {   
+                {
                     "metric": "ids_dec_vlan",
                     "value": 0,
                     "value_prev": null,
@@ -1146,7 +1146,7 @@
                     "value_prev": null,
                     "app_type": "suricata"
                 },
-                {   
+                {
                     "metric": "ids_error_delta",
                     "value": 0,
                     "value_prev": null,
@@ -1188,7 +1188,7 @@
                     "value_prev": null,
                     "app_type": "suricata"
                 },
-                {   
+                {
                     "metric": "ids_f_udp",
                     "value": 580374,
                     "value_prev": null,
@@ -1236,7 +1236,7 @@
                     "value_prev": null,
                     "app_type": "suricata"
                 },
-                {   
+                {
                     "metric": "ids_tcp_memuse",
                     "value": 2425072,
                     "value_prev": null,
