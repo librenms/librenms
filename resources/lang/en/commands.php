@@ -73,7 +73,7 @@ return [
             'v1' => 'Use SNMP v1',
             'v2c' => 'Use SNMP v2c',
             'v3' => 'Use SNMP v3',
-            'display-name' => 'A string to display as the name of this device, defaults to hostname. May be a simple template using replacements: {{ $hostname }}, {{ $sysName }}, {{ $sysName_fallback }}, {{ $ip }}',
+            'display-name' => "A string to display as the name of this device, defaults to hostname.\nMay be a simple template using replacements: {{ \$hostname }}, {{ \$sysName }}, {{ \$sysName_fallback }}, {{ \$ip }}",
             'force' => 'Just add the device, do not make any safety checks',
             'group' => 'Poller group (for distributed polling)',
             'ping-fallback' => 'Add the device as ping only if it does not respond to SNMP',

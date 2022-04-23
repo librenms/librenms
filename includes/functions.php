@@ -114,69 +114,6 @@ function logfile($string)
     fclose($fd);
 }
 
-/**
- * Perform comparison of two items based on give comparison method
- * Valid comparisons: =, !=, ==, !==, >=, <=, >, <, contains, starts, ends, regex
- * contains, starts, ends: $a haystack, $b needle(s)
- * regex: $a subject, $b regex
- *
- * @param  mixed  $a
- * @param  mixed  $b
- * @param  string  $comparison  =, !=, ==, !== >=, <=, >, <, contains, starts, ends, regex
- * @return bool
- */
-function compare_var($a, $b, $comparison = '=')
-{
-    // handle PHP8 change to implicit casting
-    if (is_numeric($a) || is_numeric($b)) {
-        $a = cast_number($a);
-        $b = is_array($b) ? $b : cast_number($b);
-    }
-
-    switch ($comparison) {
-        case '=':
-            return $a == $b;
-        case '!=':
-            return $a != $b;
-        case '==':
-            return $a === $b;
-        case '!==':
-            return $a !== $b;
-        case '>=':
-            return $a >= $b;
-        case '<=':
-            return $a <= $b;
-        case '>':
-            return $a > $b;
-        case '<':
-            return $a < $b;
-        case 'contains':
-            return Str::contains($a, $b);
-        case 'not_contains':
-            return ! Str::contains($a, $b);
-        case 'starts':
-            return Str::startsWith($a, $b);
-        case 'not_starts':
-            return ! Str::startsWith($a, $b);
-        case 'ends':
-            return Str::endsWith($a, $b);
-        case 'not_ends':
-            return ! Str::endsWith($a, $b);
-        case 'regex':
-            return (bool) preg_match($b, $a);
-        case 'not_regex':
-            return ! ((bool) preg_match($b, $a));
-        case 'in_array':
-            return in_array($a, $b);
-        case 'not_in_array':
-            return ! in_array($a, $b);
-        case 'exists':
-            return isset($a) == $b;
-        default:
-            return false;
-    }
-}
-
 function percent_colour($perc)
 {
     $r = min(255, 5 * ($perc - 25));
@@ -1102,7 +1039,7 @@ function hytera_h2f($number, $nd)
     }
 
     $tmppoint = array_reverse($tmppoint);
-    $tpointnumber = number_format($tmppoint[0] / 2, strlen($binpoint), '.', '');
+    $tpointnumber = min(number_format($tmppoint[0] / 2, strlen($binpoint), '.', ''), 1);
 
     $pointnumber = '';
     for ($i = 1; $i < strlen($binpoint); $i++) {

@@ -417,7 +417,7 @@ function add_device(Illuminate\Http\Request $request)
 
     $message = "Device $device->hostname ($device->device_id) has been added successfully";
 
-    return api_success($device->attributesToArray(), 'devices', $message);
+    return api_success([$device->attributesToArray()], 'devices', $message);
 }
 
 function del_device(Illuminate\Http\Request $request)

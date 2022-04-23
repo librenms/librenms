@@ -460,7 +460,7 @@ class Rrd extends BaseDatastore
     public function getRrdFiles($device)
     {
         if ($this->rrdcached) {
-            $filename = sprintf('/%s', $device['hostname']);
+            $filename = sprintf('/%s', self::safename($device['hostname']));
             $rrd_files = $this->command('list', $filename, '');
             // Command output is an array, create new array with each filename as a item in array.
             $rrd_files_array = explode("\n", trim($rrd_files[0]));

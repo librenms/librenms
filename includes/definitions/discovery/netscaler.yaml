@@ -72,3 +72,25 @@ modules:
                         - { value: 1, generic: 0, graph: 1, descr: primary }
                         - { value: 2, generic: 0, graph: 1, descr: secondary }
                         - { value: 3, generic: 3, graph: 1, descr: unknown }
+        count:
+            data:
+                -
+                    oid: sslTotTransactionsRate
+                    num_oid: '.1.3.6.1.4.1.5951.4.1.1.47.333.{{ $index }}'
+                    index: 'sslTotTransactionsRate.{{ $index }}'
+                    descr: SSL Total Transactions Rate
+                -
+                    oid: httpTotRequestsRate
+                    num_oid: '.1.3.6.1.4.1.5951.4.1.1.48.76.{{ $index }}'
+                    index: 'httpTotRequestsRate.{{ $index }}'
+                    descr: HTTP Total Requests Rate
+                -
+                    oid: tcpCurClientConnEstablished
+                    num_oid: '.1.3.6.1.4.1.5951.4.1.1.46.12.{{ $index }}'
+                    index: 'tcpCurClientConnEstablished.{{ $index }}'
+                    descr: Current TCP Client Connections Established
+                -
+                    oid: tcpCurServerConnEstablished
+                    num_oid: '.1.3.6.1.4.1.5951.4.1.1.46.10.{{ $index }}'
+                    index: 'tcpCurServerConnEstablished.{{ $index }}'
+                    descr: Current TCP Server Connections Established
