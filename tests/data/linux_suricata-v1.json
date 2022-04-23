@@ -1,25 +1,27 @@
 {
     "applications": {
         "discovery": {
-            "applications": {
-                "app_type": "suricata",
-                "app_state": "UNKNOWN",
-                "discovered": "1",
-                "app_state_prev": null,
-                "app_status": "",
-                "app_instance": ""
-            },
-            "application_metrics": []
+            "applications": [
+                {
+                    "app_type": "suricata",
+                    "app_state": "UNKNOWN",
+                    "discovered": 1,
+                    "app_state_prev": null,
+                    "app_status": "",
+                    "app_instance": ""
+                }
         },
         "poller": {
-            "applications": {
-                "app_type": "suricata",
-                "app_state": "OK",
-                "discovered": "1",
-                "app_state_prev": "UNKNOWN",
-                "app_status": "",
-                "app_instance": ""
-            },
+            "applications": [
+                {
+                    "app_type": "suricata",
+                    "app_state": "OK",
+                    "discovered": 1,
+                    "app_state_prev": "UNKNOWN",
+                    "app_status": "",
+                    "app_instance": ""
+                }
+            ],
             "application_metrics": [
                 {
                     "metric": ".total_af_dcerpc_tcp",
