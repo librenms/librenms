@@ -24,7 +24,7 @@ if (Rrd::checkRrdExists($rrd_filename)) {
     ];
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'If Dropped',
+        'descr'    => 'IfDropped',
         'ds'       => 'ifdropped',
     ];
     $rrd_list[] = [
@@ -34,12 +34,12 @@ if (Rrd::checkRrdExists($rrd_filename)) {
     ];
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'Dec Inv.',
+        'descr'    => 'Dec_Invalid',
         'ds'       => 'dec_invalid',
     ];
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'Too Many Layers',
+        'descr'    => 'Too_Many_Layers',
         'ds'       => 'dec_too_many_layer',
     ];
 } else {

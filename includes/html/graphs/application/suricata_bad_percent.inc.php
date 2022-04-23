@@ -2,7 +2,7 @@
 
 $name = 'suricata';
 $app_id = $app['app_id'];
-$unit_text = 'Percent Of Packets';
+$unit_text = 'Percent_Of_Packets';
 $colours = 'psychedelic';
 $dostack = 0;
 $printtotal = 0;
@@ -24,7 +24,7 @@ if (Rrd::checkRrdExists($rrd_filename)) {
     ];
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'If Dropped',
+        'descr'    => 'If_Dropped',
         'ds'       => 'ifdrop_percent',
     ];
     $rrd_list[] = [
