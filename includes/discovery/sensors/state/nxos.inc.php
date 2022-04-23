@@ -11,7 +11,7 @@
  */
 
 $fan_tray_oid = '.1.3.6.1.4.1.9.9.117.1.4.1.1.1';
-$fan_trays = snmpwalk_cache_oid_num($device, $fan_tray_oid, []);
+$fan_trays = snmpwalk_cache_oid($device, $fan_tray_oid, []);
 
 /* CISCO-ENTITY-FRU-CONTROL-MIB cefcFanTrayOperStatus
  *  unknown(1),
@@ -30,7 +30,7 @@ if (is_array($fan_trays)) {
         $entity_oid = '.1.3.6.1.2.1.47.1.1.1.1.7';
         $descr = trim(snmp_get($device, "$entity_oid.$index", '-Ovq'), '"');
 
-        $state_name = "cefcFanTrayOperStatus";
+        $state_name = 'cefcFanTrayOperStatus';
         $states = [
             ['value' => 1, 'generic' => 3, 'graph' => 0, 'descr' => 'unknown'],
             ['value' => 2, 'generic' => 0, 'graph' => 1, 'descr' => 'up'],

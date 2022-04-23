@@ -1,6 +1,3 @@
-source: Developing/Code-Structure.md
-path: blob/master/doc/
-
 # Code structure
 
 This document will try and provide a good overview of how the code is
@@ -41,7 +38,7 @@ directories that will be most interesting during development:
 ### doc/
 
 This is the location of all the documentation for LibreNMS, this is in
-GitHub markdown format and can be viewed [online](http://docs.librenms.org/)
+GitHub markdown format and can be viewed [online](@= config.site_url =@)
 
 ### app/
 

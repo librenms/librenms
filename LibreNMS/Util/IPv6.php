@@ -15,10 +15,10 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
+ *
  * @copyright  2017 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -31,15 +31,17 @@ class IPv6 extends IP
 {
     /**
      * IPv6 constructor.
-     * @param $ipv6
+     *
+     * @param  string  $ipv6
+     *
      * @throws InvalidIpException
      */
     public function __construct($ipv6)
     {
         $this->host_bits = 128;
-        list($this->ip, $this->cidr) = $this->extractCidr($ipv6);
+        [$this->ip, $this->cidr] = $this->extractCidr($ipv6);
 
-        if (!self::isValid($this->ip)) {
+        if (! self::isValid($this->ip)) {
             throw new InvalidIpException("$ipv6 is not a valid ipv4 address");
         }
 
@@ -48,23 +50,26 @@ class IPv6 extends IP
 
     /**
      * Convert a MySQL binary v6 (16-byte) IP address to a printable string.
-     * @param string $ip A binary string containing an IP address, as returned from MySQL's INET6_ATON function
+     *
+     * @param  string  $ip  A binary string containing an IP address, as returned from MySQL's INET6_ATON function
      * @return string Empty if not valid.
      */
-    // Fuction is from http://uk3.php.net/manual/en/function.inet-ntop.php
+    // Fuction is from https://php.net/manual/en/function.inet-ntop.php
     public static function ntop($ip)
     {
         $len = strlen($ip);
         if ($len == 16) {
             return inet_ntop(pack('A' . $len, $ip));
         }
+
         return '';
     }
 
     /**
      * Check if the supplied IP is valid.
-     * @param string $ipv6
-     * @param bool $exclude_reserved Exclude reserved IP ranges.
+     *
+     * @param  string  $ipv6
+     * @param  bool  $exclude_reserved  Exclude reserved IP ranges.
      * @return bool
      */
     public static function isValid($ipv6, $exclude_reserved = false)
@@ -79,6 +84,7 @@ class IPv6 extends IP
 
     /**
      * Remove extra 0s from this IPv6 address to make it easier to read.
+     *
      * @return string|false
      */
     public function compressed()
@@ -88,40 +94,41 @@ class IPv6 extends IP
 
     /**
      * Get the network address of this IP
-     * @param int $cidr If not given will use the cidr stored with this IP
+     *
+     * @param  int  $cidr  If not given will use the cidr stored with this IP
      * @return string
      */
     public function getNetworkAddress($cidr = null)
     {
-        if (is_null($cidr)) {
-            $cidr = $this->cidr;
-        }
+        $cidr = (int) ($cidr ?? $this->cidr);
 
         $net_bytes = unpack('n*', inet_pton($this->ip));
 
         foreach ($net_bytes as $index => $byte) {
             $shift = min($cidr - 16 * ($index - 1), 16);
             if ($shift > 0) {
-                $mask = ~(0xffff >> $shift) & 0xffff;
+                $mask = ~(0xFFFF >> $shift) & 0xFFFF;
                 $net_bytes[$index] = $byte & $mask;
             } else {
                 $net_bytes[$index] = 0;
             }
         }
         array_unshift($net_bytes, 'n*'); // add pack format
+
         return self::ntop(call_user_func_array('pack', $net_bytes));
     }
 
     /**
      * Check if this IP address is contained inside the network
-     * @param string $network should be in cidr format.
+     *
+     * @param  string  $network  should be in cidr format.
      * @return mixed
      */
     public function inNetwork($network)
     {
-        list($net, $cidr) = $this->extractCidr($network);
+        [$net, $cidr] = $this->extractCidr($network);
 
-        if (!self::isValid($net)) {
+        if (! self::isValid($net)) {
             return false;
         }
 
@@ -135,7 +142,7 @@ class IPv6 extends IP
         for ($index = 1; $index <= 8; $index++) {
             $shift = $cidr - 16 * ($index - 1);
             if ($shift > 0) {
-                $mask = ~(0xffff >> $shift) & 0xffff;
+                $mask = ~(0xFFFF >> $shift) & 0xFFFF;
                 if (($net_bytes[$index] & $mask) != ($ip_bytes[$index] & $mask)) {
                     return false;
                 }
@@ -143,11 +150,13 @@ class IPv6 extends IP
                 break; // we've passed the network bits, who cares about the rest.
             }
         }
+
         return true;
     }
 
     /**
      * Expand this IPv6 address to it's full IPv6 representation. For example: ::1 -> 0000:0000:0000:0000:0000:0000:0000:0001
+     *
      * @return string
      */
     public function uncompressed()
@@ -158,6 +167,7 @@ class IPv6 extends IP
 
         // zero pad
         $parts = explode(':', $ip, 8);
+
         return implode(':', array_map(function ($section) {
             return Rewrite::zeropad($section, 4);
         }, $parts));
@@ -171,6 +181,7 @@ class IPv6 extends IP
     public function toSnmpIndex()
     {
         $ipv6_split = str_split(str_replace(':', '', $this->uncompressed()), 2);
+
         return implode('.', array_map('hexdec', $ipv6_split));
     }
 }

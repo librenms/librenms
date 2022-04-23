@@ -14,10 +14,10 @@
   - GNU General Public License for more details.
   -
   - You should have received a copy of the GNU General Public License
-  - along with this program.  If not, see <http://www.gnu.org/licenses/>.
+  - along with this program.  If not, see <https://www.gnu.org/licenses/>.
   -
   - @package    LibreNMS
-  - @link       http://librenms.org
+  - @link       https://www.librenms.org
   - @copyright  2019 Tony Murray
   - @author     Tony Murray <murraytony@gmail.com>
   -->
@@ -38,7 +38,13 @@
         </tab>
         <tab v-for="(sections, group) in groups" :key="group" :name="group" :selected="group === tab" :text="$t('settings.groups.' + group)">
             <accordion @expanded="sectionExpanded" @collapsed="sectionCollapsed">
-                <accordion-item v-for="(items, item) in groups[group]" :key="item" :name="item" :text="$t('settings.sections.' + group + '.' + item)" :active="item === section">
+                <accordion-item v-for="(items, item) in groups[group]" :key="item" :name="item" :text="$t('settings.sections.' + group + '.' + item + '.name')" :active="item === section">
+
+                    <template v-if="$te('settings.sections.' + group + '.' + item + '.description')">
+                      <h5>{{ $t('settings.sections.' + group + '.' + item + '.description') }}</h5>
+                      <hr/>
+                    </template>
+
                     <form class="form-horizontal" @submit.prevent>
                         <librenms-setting
                             v-for="setting in items"
@@ -61,7 +67,7 @@
             prefix: String,
             initialTab: {type: String, default: 'alerting'},
             initialSection: String,
-            tabs: {type: Object}
+            tabs: {type: Array}
         },
         data() {
             return {
@@ -118,6 +124,9 @@
 
                 return this.checkLogic(setting.when);
             },
+            translatedCompare(prefix, a, b, suffix) {
+                return this.$t(prefix + a + suffix).localeCompare(this.$t(prefix + b + suffix))
+            },
             checkLogic(logic) {
                 switch (logic.operator) {
                     case 'equals':
@@ -136,7 +145,12 @@
         computed: {
             groups() {
                 if (_.isEmpty(this.settings)) {
-                    return this.tabs;
+                    let sorted_tabs = {};
+                    this.tabs.sort((a, b) => this.translatedCompare('settings.groups.', a, b)).forEach(function (tab) {
+                        sorted_tabs[tab] = [];
+                    });
+
+                    return sorted_tabs;
                 }
 
                 // group data
@@ -163,9 +177,9 @@
 
                 // sort groups
                 let sorted = {};
-                Object.keys(groups).sort().forEach(group_key => {
+                Object.keys(groups).sort((a, b) => this.translatedCompare('settings.groups.', a, b)).forEach(group_key => {
                     sorted[group_key] = {};
-                    Object.keys(groups[group_key]).sort().forEach(section_key => {
+                    Object.keys(groups[group_key]).sort((a, b) => this.translatedCompare('settings.sections.' + group_key + '.', a , b, '.name')).forEach(section_key => {
                         sorted[group_key][section_key] = _.sortBy(groups[group_key][section_key], 'order').map(a => a.name);
                     });
                 });

@@ -1,0 +1,55 @@
+mib: UBNT-AFLTU-MIB
+modules:
+    os:
+        hardware: UBNT-AFLTU-MIB::afLTUDevModel.0
+        version: UBNT-AFLTU-MIB::afLTUFirmwareVersion.0
+        lat: UBNT-AFLTU-MIB::afLTUgpsLat.0
+        long: UBNT-AFLTU-MIB::afLTUgpsLon.0
+    processors:
+        data:
+            -
+                oid: afLTUCpuUsage
+                num_oid: '.1.3.6.1.4.1.41112.1.10.1.3.6'
+    sensors:
+        state:
+            data:
+                -
+                    oid: afLTURole
+                    num_oid: '.1.3.6.1.4.1.41112.1.10.1.2.1.{{ $index }}'
+                    index: afLTURole
+                    descr: Radio Role
+                    state_name: afLTURole
+                    states:
+                        - { value: 0, generic: 0, graph: 0, descr: AP }
+                        - { value: 1, generic: 0, graph: 0, descr: CPE }
+                -
+                    oid: afLTUgpsStatus
+                    value: afLTUgpsStatus
+                    num_oid: '.1.3.6.1.4.1.41112.1.10.1.7.1.{{ $index }}'
+                    descr: GPS Status
+                    states:
+                        - { value: 0, generic: 1, graph: 0, descr: Absent }
+                        - { value: 1, generic: 1, graph: 0, descr: Off }
+                        - { value: 2, generic: 0, graph: 0, descr: On }
+                -
+                    oid: afLTUgpsDimensions
+                    value: afLTUgpsDimensions
+                    num_oid: '.1.3.6.1.4.1.41112.1.10.1.7.2.{{ $index }}'
+                    descr: GPS fix
+                    states:
+                        - { value: 0, generic: 1, graph: 0, descr: Unknown }
+                        - { value: 1, generic: 1, graph: 0, descr: Nofix }
+                        - { value: 2, generic: 0, graph: 0, descr: Fix2d }
+                        - { value: 3, generic: 0, graph: 0, descr: Fix3d }
+        count:
+            data:
+                -
+                    oid: afLTUgpsSatsVisible
+                    num_oid: '.1.3.6.1.4.1.41112.1.10.1.7.7.{{ $index }}'
+                    index: afLTUgpsSatsVisible
+                    descr: Sat visible
+                -
+                    oid: afLTUgpsSatsTracked
+                    num_oid: '.1.3.6.1.4.1.41112.1.10.1.7.8.{{ $index }}'
+                    index: afLTUgpsSatsTracked
+                    descr: Sat tracked

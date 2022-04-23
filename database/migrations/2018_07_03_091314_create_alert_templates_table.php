@@ -5,7 +5,6 @@ use Illuminate\Database\Schema\Blueprint;
 
 class CreateAlertTemplatesTable extends Migration
 {
-
     /**
      * Run the migrations.
      *
@@ -21,7 +20,6 @@ class CreateAlertTemplatesTable extends Migration
             $table->string('title_rec')->nullable();
         });
     }
-
 
     /**
      * Reverse the migrations.

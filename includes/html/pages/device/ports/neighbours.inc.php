@@ -1,4 +1,5 @@
 <?php
+
 echo '<table class="table table-hover table-condensed">
     <thead>
         <tr>
@@ -9,7 +10,7 @@ echo '<table class="table table-hover table-condensed">
         </tr>
     </thead>';
 
-foreach (dbFetchRows('SELECT * FROM links AS L, ports AS I WHERE I.device_id = ? AND I.port_id = L.local_port_id', array($device['device_id'])) as $neighbour) {
+foreach (dbFetchRows('SELECT * FROM links AS L, ports AS I WHERE I.device_id = ? AND I.port_id = L.local_port_id order by ifName', [$device['device_id']]) as $neighbour) {
     $neighbour = cleanPort($neighbour);
     echo '<td>' . generate_port_link($neighbour) . '<br>' . $neighbour['ifAlias'] . '</td>';
     if (is_numeric($neighbour['remote_port_id']) && $neighbour['remote_port_id']) {

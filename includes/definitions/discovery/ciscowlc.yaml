@@ -1,7 +1,20 @@
 mib: AIRESPACE-SWITCHING-MIB
 modules:
+    os:
+        hardware:
+            - ENTITY-MIB::entPhysicalModelName.1
+            - ENTITY-MIB::entPhysicalName.1
+        hardware_mib: CISCO-PRODUCTS-MIB
+        version: ENTITY-MIB::entPhysicalSoftwareRev.1
+        serial: ENTITY-MIB::entPhysicalSerialNum.1
+    mempools:
+        data:
+            -
+                free: AIRESPACE-SWITCHING-MIB::agentFreeMemory
+                total: AIRESPACE-SWITCHING-MIB::agentTotalMemory
+                precision: 1024
     processors:
-          data:
-              -
-                  oid: agentCurrentCPUUtilization
-                  num_oid: '.1.3.6.1.4.1.14179.1.1.5.1.{{ $index }}'
+        data:
+            -
+                oid: agentCurrentCPUUtilization
+                num_oid: '.1.3.6.1.4.1.14179.1.1.5.1.{{ $index }}'

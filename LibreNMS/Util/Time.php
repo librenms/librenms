@@ -15,10 +15,10 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
+ *
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -67,10 +67,14 @@ class Time
                 $result .= " $diff";
                 if ($format == 'short') {
                     $result .= substr($k, 0, 1);
-                } elseif ($diff > 1) {
+                }
+
+                if ($format != 'short' && $diff > 1) {
                     $result .= ' ' . $k;
-                } else {
-                    $result .= substr($k, 0, -1);
+                }
+
+                if ($format != 'short' && $diff < 2) {
+                    $result .= ' ' . substr($k, 0, -1);
                 }
 
                 $interval -= $v * $diff;
@@ -78,5 +82,54 @@ class Time
         }
 
         return $result;
+    }
+
+    /*
+     * @param integer seconds of a time period
+     * @return string human readably time period
+     */
+    public static function humanTime($s)
+    {
+        $ret = [];
+
+        if ($s >= 86400) {
+            $d = floor($s / 86400);
+            $s -= $d * 86400;
+            if ($d == 1) {
+                $ret[] = $d . ' day';
+            } else {
+                $ret[] = $d . ' days';
+            }
+        }
+
+        if ($s >= 3600) {
+            $h = floor($s / 3600);
+            $s -= $h * 3600;
+            if ($h == 1) {
+                $ret[] = $h . ' hour';
+            } else {
+                $ret[] = $h . ' hours';
+            }
+        }
+
+        if ($s >= 60) {
+            $m = floor($s / 60);
+            $s -= $m * 60;
+            if ($m == 1) {
+                $ret[] = $m . ' minute';
+            } else {
+                $ret[] = $m . ' minutes';
+            }
+        }
+
+        if ($s > 0) {
+            if ($s == 1) {
+                $ret[] = $s . ' second';
+            } else {
+                $ret[] = $s . ' seconds';
+            }
+        }
+
+        return implode(' ,', $ret);
     }
 }

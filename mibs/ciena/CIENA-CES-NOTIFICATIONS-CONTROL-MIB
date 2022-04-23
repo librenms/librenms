@@ -1,0 +1,824 @@
+-- This file was included in Ciena MIB release MIBS-CIENA-CES-08-07-00-024
+--
+-- CIENA-CES-NOTIFICATIONS-CONTROL-MIB.my
+--
+--
+
+        CIENA-CES-NOTIFICATIONS-CONTROL DEFINITIONS ::= BEGIN
+
+ IMPORTS
+    OBJECT-TYPE, MODULE-IDENTITY
+        FROM SNMPv2-SMI
+    cienaCesNotificationsControlModule
+        FROM CIENA-SMI
+    CienaGlobalState
+        FROM CIENA-TC;
+
+
+ cienaCesNotificationsControlMIB MODULE-IDENTITY
+              LAST-UPDATED "201706070000Z"
+              ORGANIZATION "Ciena Corp."
+              CONTACT-INFO
+              "   Mib Meister
+                  7035 Ridge Road
+                  Hanover, Maryland 21076
+                  USA
+                  Phone:  +1 800 921 1144
+                  Email:  support@ciena.com"
+              DESCRIPTION
+                        "This module defines the object identifiers to control the notification state for
+                        each of the notification or set of notifications defined for CES."
+
+                  REVISION
+                        "201706070000Z"
+              DESCRIPTION
+                        "Updated contact info."
+
+                  REVISION
+                        "201610270000Z"
+              DESCRIPTION
+                       "Added cienaCesCommandFileCompletedTrapState and
+                        cienaCesCommandFileFailedTrapState."
+
+                  REVISION
+                       "201610070000Z"
+              DESCRIPTION
+                       "Added  cienaCesXcvrUncertifiedTrapState at cienaCesNotificationsControl 73."
+                  REVISION
+                       "201603060000Z"
+              DESCRIPTION
+                       "Added  cienaCesDataplanePortShapingSubscriptionTrapState at cienaCesNotificationsControl 72."
+                  REVISION
+                        "201505060000Z"
+              DESCRIPTION
+                       "Added  cienaCesAlarmCutoffTrapState at cienaCesNotificationsControl 71."
+
+                  REVISION
+                        "201501070000Z"
+              DESCRIPTION
+                       "Added cienaCesSyncModuleSlotTrapState at cienaCesNotificationsControl 70."
+
+                  REVISION
+                        "201412100000Z"
+              DESCRIPTION
+                       "Added cienaCesSyncInputProtectionUnitTrapState at cienaCesNotificationsControl 68.
+                        Added cienaCesSyncInputProtectionGroupTrapState at cienaCesNotificationsControl 69."
+
+                  REVISION
+                        "201402250000Z"
+              DESCRIPTION
+                       "Added cienaCesChassisUsbFlashEnableChangeTrapState at cienaCesNotificationsControl 66.
+                        Added cienaCesChassisAirFilterTrapState at cienaCesNotificationsControl 67."
+
+                  REVISION
+                        "201312180000Z"
+              DESCRIPTION
+                       "Added cienaCesIOMStateChangeTrapState at cienaCesNotificationsControl 61.
+                        Added cienaCesIOMBuzzerEnableChangeTrapState at cienaCesNotificationsControl 62.
+                        Added cienaCesIOMBuzzerStateChangeTrapState at cienaCesNotificationsControl 63.
+                        Added cienaCesIOMAlarmOutputStateChangeTrapState at cienaCesNotificationsControl 64.
+                        Added cienaCesIOMAlarmInputStateChangeTrapState at cienaCesNotificationsControl 65."
+
+                  REVISION
+                        "201311050000Z"
+              DESCRIPTION
+                       "Added cienaCesCfmDelayVariationFaultTrapState."
+
+                  REVISION
+                        "201310280000Z"
+              DESCRIPTION
+                       "Added cienaCesCfmSyntheticLossNearFaultTrapState and cienaCesCfmSyntheticLossFarFaultTrapState
+                        for controlling synthetic loss traps"
+
+                  REVISION
+                        "201103220000Z"
+              DESCRIPTION
+                       "Initial creation. This module defines the object identifiers to control
+                       the notification state for each of the notification or set of notifications
+                       defined for CES."
+                        ::= { cienaCesNotificationsControlModule 1 }
+
+cienaCesNotificationsControl    OBJECT IDENTIFIER ::= { cienaCesNotificationsControlMIB 1 }
+
+--
+-- Node definitions
+--
+
+--
+-- Port related notification control
+--
+
+ cienaCesPortEnhancedLinkTrapState    OBJECT-TYPE
+     SYNTAX           CienaGlobalState
+     MAX-ACCESS       read-write
+     STATUS           current
+     DESCRIPTION
+             "This object indicates whether the device generates enhanced port link up
+              and down traps."
+     DEFVAL { enabled }
+     ::= { cienaCesNotificationsControl 1 }
+
+  cienaCesPortStdLinkTrapState    OBJECT-TYPE
+     SYNTAX           CienaGlobalState
+     MAX-ACCESS       read-write
+     STATUS           current
+     DESCRIPTION
+             "This object indicates whether the device generates standard port link up
+              and down traps."
+     DEFVAL { enabled }
+     ::= { cienaCesNotificationsControl 2 }
+
+  cienaCesPortAllTrapState                      OBJECT-TYPE
+        SYNTAX                  CienaGlobalState
+        MAX-ACCESS              read-write
+        STATUS                  current
+        DESCRIPTION
+                "This object indicates whether the device generates any port related traps."
+    DEFVAL { enabled }
+        ::= { cienaCesNotificationsControl 3 }
+
+--
+-- Equipment related notification control
+--
+
+ cienaCesModuleAllModulesTrapState              OBJECT-TYPE
+        SYNTAX                  CienaGlobalState
+        MAX-ACCESS              read-write
+        STATUS                  current
+        DESCRIPTION
+                "This object indicates whether the device sends out module related traps."
+    DEFVAL { enabled }
+        ::= { cienaCesNotificationsControl 6 }
+
+ cienaCesModuleAllModulesHealthTrapState                OBJECT-TYPE
+        SYNTAX                  CienaGlobalState
+        MAX-ACCESS              read-write
+        STATUS                  current
+        DESCRIPTION
+                "This object indicates whether the device sends out module health related traps."
+    DEFVAL { enabled }
+        ::= { cienaCesNotificationsControl 7 }
+
+ cienaCesModuleSensorTrapState          OBJECT-TYPE
+        SYNTAX                  CienaGlobalState
+        MAX-ACCESS              read-write
+        STATUS                  current
+        DESCRIPTION
+                "This object indicates whether device sends out module sensor related traps."
+    DEFVAL { enabled }
+        ::= { cienaCesNotificationsControl 8 }
+
+ cienaCesModuleHATrapState              OBJECT-TYPE
+        SYNTAX                  CienaGlobalState
+        MAX-ACCESS              read-write
+        STATUS                  current
+        DESCRIPTION
+                "This object indicates whether the device sends out the HA switchover trap."
+    DEFVAL { enabled }
+        ::= { cienaCesNotificationsControl 9 }
+
+ cienaCesModuleProtectionModeTrapState          OBJECT-TYPE
+        SYNTAX                  CienaGlobalState
+        MAX-ACCESS              read-write
+        STATUS                  current
+        DESCRIPTION
+                "This object indicates whether the device sends out the protection mode
+                 state change trap."
+    DEFVAL { enabled }
+        ::= { cienaCesNotificationsControl 10 }
+
+ cienaCesModulePOSTErrorTrapState               OBJECT-TYPE
+        SYNTAX                  CienaGlobalState
+        MAX-ACCESS              read-write
+        STATUS                  current
+        DESCRIPTION
+                "This object indicates whether the device sends out the POST error trap."
+    DEFVAL { enabled }
+        ::= { cienaCesNotificationsControl 11 }
+
+ cienaCesModuleSwitchFabricDisruptedTrapState   OBJECT-TYPE
+        SYNTAX                  CienaGlobalState
+        MAX-ACCESS              read-write
+        STATUS                  current
+        DESCRIPTION
+                "This object indicates whether the device sends out the switch fabric disrupted trap."
+   DEFVAL { enabled }
+        ::= { cienaCesNotificationsControl 12 }
+
+ cienaCesChassisAllPowerSupplyTrapState         OBJECT-TYPE
+        SYNTAX                  CienaGlobalState
+        MAX-ACCESS              read-write
+        STATUS                  current
+        DESCRIPTION
+                "This object indicates whether the device sends out power-supply
+                related traps."
+    DEFVAL { enabled }
+        ::= { cienaCesNotificationsControl 14 }
+
+ cienaCesChassisAllFanTrapState         OBJECT-TYPE
+        SYNTAX                  CienaGlobalState
+        MAX-ACCESS              read-write
+        STATUS                  current
+        DESCRIPTION
+                "This object indicates whether the device sends out chassis fan related traps."
+    DEFVAL { enabled }
+        ::= { cienaCesNotificationsControl 15 }
+
+ cienaCesChassisAllFanTrayTrapState     OBJECT-TYPE
+        SYNTAX                  CienaGlobalState
+        MAX-ACCESS              read-write
+        STATUS                  current
+        DESCRIPTION
+                "This object indicates whether the device sends out chassis fan tray related traps."
+    DEFVAL { enabled }
+        ::= { cienaCesNotificationsControl 16 }
+
+ cienaCesChassisAllFanTempTrapState     OBJECT-TYPE
+        SYNTAX                  CienaGlobalState
+        MAX-ACCESS              read-write
+        STATUS                  current
+        DESCRIPTION
+                "This object indicates whether the device sends out chassis fan temperature
+                related traps."
+    DEFVAL { enabled }
+        ::= { cienaCesNotificationsControl 17 }
+
+ cienaCesChassisHealthTrapState                 OBJECT-TYPE
+        SYNTAX                  CienaGlobalState
+        MAX-ACCESS              read-write
+        STATUS                  current
+        DESCRIPTION
+                "This object indicates whether the device sends out chassis health related
+                traps."
+    DEFVAL { enabled }
+        ::= { cienaCesNotificationsControl 18 }
+
+ --
+ -- RAPS
+ --
+ cienaCesRapsAlarmTrapState             OBJECT-TYPE
+        SYNTAX                  CienaGlobalState
+        MAX-ACCESS              read-write
+        STATUS                  current
+        DESCRIPTION
+                "This object indicates whether the device sends out RAPS alarm related
+                traps."
+    DEFVAL { enabled }
+        ::= { cienaCesNotificationsControl 19 }
+
+ --
+ -- MPLS
+ --
+ cienaCesMplsTrapState  OBJECT-TYPE
+        SYNTAX          CienaGlobalState
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+                        "Setting this object to 'disabled' causes
+                        MPLS related traps to be suppressed."
+        DEFVAL { enabled }
+        ::= { cienaCesNotificationsControl 20 }
+
+ --
+ -- CFM Fault trap control
+ --
+ cienaCesCfmFaultTrapState OBJECT-TYPE
+     SYNTAX       CienaGlobalState
+     MAX-ACCESS   read-write
+     STATUS       current
+     DESCRIPTION
+             "Setting this object to 'disabled' causes
+              CFM fault traps to be suppressed."
+     DEFVAL { enabled }
+     ::= { cienaCesNotificationsControl 21 }
+
+ cienaCesCfmDelayFaultTrapState         OBJECT-TYPE
+        SYNTAX          CienaGlobalState
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+                        "Setting this object to 'disabled' causes
+                        CFM Y.1731 delay measurement traps to be suppressed."
+        DEFVAL { enabled }
+        ::= { cienaCesNotificationsControl 22 }
+
+ cienaCesCfmJitterFaultTrapState        OBJECT-TYPE
+        SYNTAX          CienaGlobalState
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+                        "Setting this object to 'disabled' causes
+                        CFM Y.1731 jitter measurement traps to be suppressed."
+        DEFVAL { enabled }
+        ::= { cienaCesNotificationsControl 23 }
+
+ cienaCesCfmFrameLossNearFaultTrapState         OBJECT-TYPE
+        SYNTAX          CienaGlobalState
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+                        "Setting this object to 'disabled' causes
+                        CFM Y.1731 frame-loss-near measurement traps to be suppressed."
+        DEFVAL { enabled }
+        ::= { cienaCesNotificationsControl 24 }
+
+ cienaCesCfmFrameLossFarFaultTrapState  OBJECT-TYPE
+        SYNTAX          CienaGlobalState
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+                        "Setting this object to 'disabled' causes
+                        CFM Y.1731 frame-loss-far measurement traps to be suppressed."
+        DEFVAL { enabled }
+        ::= { cienaCesNotificationsControl 25 }
+
+   cienaCesCfmSyntheticLossNearFaultTrapState   OBJECT-TYPE
+        SYNTAX          CienaGlobalState
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+                        "Setting this object to 'disabled' causes
+                        CFM Y.1731 synthetic-loss near fault and clear traps to be suppressed."
+        DEFVAL { enabled }
+        ::= { cienaCesNotificationsControl 26 }
+
+   cienaCesCfmSyntheticLossFarFaultTrapState    OBJECT-TYPE
+        SYNTAX          CienaGlobalState
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+                        "Setting this object to 'disabled' causes
+                        CFM Y.1731 synthetic-loss far fault and clear traps to be suppressed."
+        DEFVAL { enabled }
+        ::= { cienaCesNotificationsControl 27 }
+
+ cienaCesPbtFaultTrapState      OBJECT-TYPE
+        SYNTAX          CienaGlobalState
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+                        "Setting this object to 'disabled' causes
+                        PBB-TE related traps to be suppressed."
+        DEFVAL { enabled }
+        ::= { cienaCesNotificationsControl 28 }
+
+ --
+ -- BFD Fault trap control knob
+ --
+ cienaCesBfdTrapState OBJECT-TYPE
+     SYNTAX       CienaGlobalState
+     MAX-ACCESS   read-write
+     STATUS       current
+     DESCRIPTION
+             "Setting this object to 'disabled' causes
+              BFD related traps to be suppressed."
+     DEFVAL { enabled }
+     ::= { cienaCesNotificationsControl 29 }
+
+--IP Interface
+ cienaCesIPMgmtInterfaceAddrChangeTrapState     OBJECT-TYPE
+        SYNTAX          CienaGlobalState
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+                        "Setting this object to 'disabled' causes the
+                        IP address change trap to be suppressed."
+        DEFVAL { enabled }
+        ::= { cienaCesNotificationsControl 31 }
+
+ cienaCesIPMgmtInterfaceGatewayAddrChangeTrapState      OBJECT-TYPE
+        SYNTAX          CienaGlobalState
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+                        "Setting this object to 'disabled' causes the
+                        IP Gateway change trap to be suppressed."
+        DEFVAL { enabled }
+        ::= { cienaCesNotificationsControl 32 }
+
+ --Dataplane
+ cienaCesDataplaneUcastTrapState        OBJECT-TYPE
+        SYNTAX          CienaGlobalState
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+                        "Setting this object to 'disabled' causes
+                        dataplane unicast threshold exceed/normal traps to be suppressed."
+        DEFVAL { enabled }
+        ::= { cienaCesNotificationsControl 35 }
+
+ cienaCesDataplaneBcastTrapState        OBJECT-TYPE
+        SYNTAX          CienaGlobalState
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+                        "Setting this object to 'disabled' causes
+                        dataplane broadcast threshold exceed/normal traps to be suppressed."
+        DEFVAL { enabled }
+        ::= { cienaCesNotificationsControl 36 }
+
+ cienaCesDataplaneMcastTrapState        OBJECT-TYPE
+        SYNTAX          CienaGlobalState
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+                        "Setting this object to 'disabled' will cause
+                        dataplane multicast threshold exceed/normal traps to be suppressed."
+        DEFVAL { enabled }
+        ::= { cienaCesNotificationsControl 37 }
+
+ cienaCesPortXcvrLinkStateChangeTrapState       OBJECT-TYPE
+        SYNTAX          CienaGlobalState
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+                        "Setting this object to 'disabled' causes
+                        port transceiver link state change traps to be suppressed."
+        DEFVAL { enabled }
+        ::= { cienaCesNotificationsControl 40 }
+
+ cienaCesPortXcvrErrorTrapState         OBJECT-TYPE
+        SYNTAX          CienaGlobalState
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+                        "Setting this object to 'disabled' causes
+                        port transceiver error traps to be suppressed."
+        DEFVAL { enabled }
+        ::= { cienaCesNotificationsControl 41 }
+
+ cienaCesPortXcvrTempChangeTrapState    OBJECT-TYPE
+        SYNTAX          CienaGlobalState
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+                        "Setting this object to 'disabled' causes
+                        port transceiver temperature change traps to be suppressed."
+        DEFVAL { enabled }
+        ::= { cienaCesNotificationsControl 42 }
+
+   cienaCesPortXcvrVoltageChangeTrapState       OBJECT-TYPE
+        SYNTAX          CienaGlobalState
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+                        "Setting this object to 'disabled' causes
+                        port transceiver voltage change traps to be suppressed."
+        DEFVAL { enabled }
+        ::= { cienaCesNotificationsControl 43 }
+
+ cienaCesPortXcvrBiasChangeTrapState    OBJECT-TYPE
+        SYNTAX          CienaGlobalState
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+                        "Setting this object to 'disabled' causes
+                        port transceiver bias change traps to be suppressed."
+        DEFVAL { enabled }
+        ::= { cienaCesNotificationsControl 44 }
+
+ cienaCesPortXcvrTxPowerChangeTrapState         OBJECT-TYPE
+        SYNTAX          CienaGlobalState
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+                        "Setting this object to 'disabled' causes
+                        port transceiver TX power change traps to be suppressed."
+        DEFVAL { enabled }
+        ::= { cienaCesNotificationsControl 45 }
+
+ cienaCesPortXcvrRxPowerChangeTrapState         OBJECT-TYPE
+        SYNTAX          CienaGlobalState
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+                        "Setting this object to 'disabled' causes
+                        port transceiver RX power change traps to be suppressed."
+        DEFVAL { enabled }
+        ::= { cienaCesNotificationsControl 46 }
+
+ cienaCesPortXcvrSpeedInfoTrapState     OBJECT-TYPE
+        SYNTAX          CienaGlobalState
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+                        "Setting this object to 'disabled' causes
+                        port transceiver speed information missing traps to be suppressed."
+        DEFVAL { enabled }
+        ::= { cienaCesNotificationsControl 47 }
+
+ cienaCesRstpPortBackupTrapState        OBJECT-TYPE
+        SYNTAX          CienaGlobalState
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+                        "Setting this object to 'disabled' cause
+                        cienaCesRstpPortBackupNotification traps to be suppressed."
+        DEFVAL { enabled }
+        ::= { cienaCesNotificationsControl 48 }
+
+ cienaCesRstpPortPvstBPduReceivedTrapState      OBJECT-TYPE
+        SYNTAX          CienaGlobalState
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+                        "Setting this object to 'disabled' cause
+                        cienaCesRstpPvstBpduReceivedNotification traps to be suppressed."
+        DEFVAL { enabled }
+        ::= { cienaCesNotificationsControl 49 }
+
+ cienaCesRstpPortSelfLoopTrapState      OBJECT-TYPE
+        SYNTAX          CienaGlobalState
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+                        "Setting this object to 'disabled' causes
+                        cienaCesRstpSelfLoopNotification traps to be suppressed."
+        DEFVAL { enabled }
+        ::= { cienaCesNotificationsControl 50 }
+
+ cienaCesRstpPortOperEdgeTrapState      OBJECT-TYPE
+        SYNTAX          CienaGlobalState
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+                        "Setting this object to 'disabled' causes
+                        cienaCesRstpPortOperEdgeNotification traps to be suppressed."
+        DEFVAL { enabled }
+        ::= { cienaCesNotificationsControl 51 }
+
+ cienaCesRstpPortFlapTrapState  OBJECT-TYPE
+        SYNTAX          CienaGlobalState
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+                        "Setting this object to 'disabled' causes
+                        cienaCesRstpPortFlapNotification traps to be suppressed."
+        DEFVAL { enabled }
+        ::= { cienaCesNotificationsControl 52 }
+
+ cienaCesRstpBridgeRootPortLostTrapState        OBJECT-TYPE
+        SYNTAX          CienaGlobalState
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+                        "Setting this object to 'disabled' causes
+                        cienaCesRstpBridgeRootPortLostNotification traps to be suppressed."
+        DEFVAL { enabled }
+        ::= { cienaCesNotificationsControl 53 }
+
+ cienaCesFeatureLicenseStatusTrapState  OBJECT-TYPE
+        SYNTAX          CienaGlobalState
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+                        "Setting this object to 'disabled' causes
+                        cienaCesPremiumFeatureLicenseNotInstalledNotification and
+                         cienaCesPremiumFeatureLicensePartialStatusNotification traps to be suppressed."
+        DEFVAL { enabled }
+        ::= { cienaCesNotificationsControl 54 }
+
+ cienaCesFeatureLicenseInstallErrorTrapState    OBJECT-TYPE
+        SYNTAX          CienaGlobalState
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+                        "Setting this object to 'disabled' causes
+                        cienaCesPremiumFeatureLicenseInstallErrorNotification traps to be suppressed."
+        DEFVAL { enabled }
+        ::= { cienaCesNotificationsControl 55 }
+
+ cienaCesFileTransferCompletionTrapState        OBJECT-TYPE
+        SYNTAX          CienaGlobalState
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+                        "Setting this object to 'disabled' causes
+                        cienaCesFTransferCompletion traps to be suppressed."
+        DEFVAL { enabled }
+        ::= { cienaCesNotificationsControl 56 }
+
+ cienaCesSwXgradeCompletionTrapState    OBJECT-TYPE
+        SYNTAX          CienaGlobalState
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+                        "Setting this object to 'disabled' causes
+                        cienaCesSwXgradeCompletion traps to be suppressed."
+        DEFVAL { enabled }
+        ::= { cienaCesNotificationsControl 57 }
+
+ cienaCesSystemConfigImproperCmdTrapState       OBJECT-TYPE
+        SYNTAX          CienaGlobalState
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+                        "Setting this object to 'disabled' causes
+                        cienaCesImproperCmdInConfigFile traps to be suppressed."
+        DEFVAL { enabled }
+        ::= { cienaCesNotificationsControl 58 }
+
+ cienaCesOamLinkEventTrapState  OBJECT-TYPE
+        SYNTAX          CienaGlobalState
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+                        "Setting this object to 'disabled' causes
+                        cienaCesOamLinkEventTrap traps to be suppressed."
+        DEFVAL { enabled }
+        ::= { cienaCesNotificationsControl 59 }
+
+ --
+ -- CFM Fault trap control continued
+ --
+ cienaCesCfmDelayVariationFaultTrapState        OBJECT-TYPE
+        SYNTAX          CienaGlobalState
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+                        "Setting this object to 'disabled' causes
+                        CFM Y.1731 Delay Variation measurement traps to be suppressed."
+        DEFVAL { enabled }
+        ::= { cienaCesNotificationsControl 60 }
+
+
+ --
+ -- Chassis IOM trap control
+ --
+ cienaCesIOMStateChangeTrapState  OBJECT-TYPE
+      SYNTAX            CienaGlobalState
+      MAX-ACCESS        read-write
+      STATUS            current
+      DESCRIPTION
+         "Setting this object to 'disabled' causes
+          cienaCesChassisIOMStateChangeNotification traps to be suppressed."
+      DEFVAL { enabled }
+      ::= { cienaCesNotificationsControl 61 }
+
+ cienaCesIOMBuzzerEnableChangeTrapState  OBJECT-TYPE
+      SYNTAX            CienaGlobalState
+      MAX-ACCESS        read-write
+      STATUS            current
+      DESCRIPTION
+         "Setting this object to 'disabled' causes
+          cienaCesChassisIOMBuzzerEnableChangeNotification traps to be suppressed."
+      DEFVAL { enabled }
+      ::= { cienaCesNotificationsControl 62 }
+
+ cienaCesIOMBuzzerStateChangeTrapState  OBJECT-TYPE
+      SYNTAX            CienaGlobalState
+      MAX-ACCESS        read-write
+      STATUS            current
+      DESCRIPTION
+         "Setting this object to 'disabled' causes
+          cienaCesChassisIOMBuzzerStateChangeNotification traps to be suppressed."
+      DEFVAL { enabled }
+      ::= { cienaCesNotificationsControl 63 }
+
+ cienaCesIOMAlarmOutputStateChangeTrapState  OBJECT-TYPE
+      SYNTAX            CienaGlobalState
+      MAX-ACCESS        read-write
+      STATUS            current
+      DESCRIPTION
+         "Setting this object to 'disabled' causes
+          cienaCesChassisIOMAlarmOutputStateChangeNotification traps to be suppressed."
+      DEFVAL { enabled }
+      ::= { cienaCesNotificationsControl 64 }
+
+ cienaCesIOMAlarmInputStateChangeTrapState  OBJECT-TYPE
+      SYNTAX            CienaGlobalState
+      MAX-ACCESS        read-write
+      STATUS            current
+      DESCRIPTION
+         "Setting this object to 'disabled' causes
+          cienaCesChassisIOMAlarmInputStateChangeNotification traps to be suppressed."
+      DEFVAL { enabled }
+      ::= { cienaCesNotificationsControl 65 }
+
+
+ --
+ -- USB Flash trap control
+ --
+ cienaCesChassisUsbFlashEnableChangeTrapState  OBJECT-TYPE
+      SYNTAX            CienaGlobalState
+      MAX-ACCESS        read-write
+      STATUS            current
+      DESCRIPTION
+         "Setting this object to 'disabled' causes
+          cienaCesChassisUsbEnabledNotification and
+          cienaCesChassisUsbDisabledNotification traps to be suppressed."
+      DEFVAL { enabled }
+      ::= { cienaCesNotificationsControl 66 }
+
+ --
+ -- Air Filter trap control
+ --
+ cienaCesChassisAirFilterTrapState  OBJECT-TYPE
+      SYNTAX            CienaGlobalState
+      MAX-ACCESS        read-write
+      STATUS            current
+      DESCRIPTION
+         "Setting this object to 'disabled' causes
+          cienaCesChassisAirFilterServiceNotification traps to be suppressed."
+      DEFVAL { enabled }
+      ::= { cienaCesNotificationsControl 67 }
+
+ --
+ -- Sync Input Protection Unit trap control
+ --
+ cienaCesSyncInputProtectionUnitTrapState  OBJECT-TYPE
+      SYNTAX            CienaGlobalState
+      MAX-ACCESS        read-write
+      STATUS            current
+      DESCRIPTION
+         "Setting this object to 'disabled' causes
+          cienaCesSyncInputPUStateChangeNotification traps to be suppressed."
+      DEFVAL { enabled }
+      ::= { cienaCesNotificationsControl 68 }
+
+ --
+ -- Sync Input Protection Group trap control
+ --
+ cienaCesSyncInputProtectionGroupTrapState  OBJECT-TYPE
+      SYNTAX            CienaGlobalState
+      MAX-ACCESS        read-write
+      STATUS            current
+      DESCRIPTION
+         "Setting this object to 'disabled' causes
+          cienaCesSyncInputProtGroupStateChangeNotification traps to be suppressed."
+      DEFVAL { enabled }
+      ::= { cienaCesNotificationsControl 69 }
+
+ --
+ -- Sync Module Slot trap control
+ --
+ cienaCesSyncModuleSlotTrapState  OBJECT-TYPE
+      SYNTAX            CienaGlobalState
+      MAX-ACCESS        read-write
+      STATUS            current
+      DESCRIPTION
+         "Setting this object to 'disabled' causes
+          cienaCesSyncModuleSlotStateChangeNotification traps to be suppressed."
+      DEFVAL { enabled }
+      ::= { cienaCesNotificationsControl 70 }
+
+ --
+ -- Alarm Cutoff trap control
+ --
+ cienaCesChassisAlarmCutoffTrapState  OBJECT-TYPE
+      SYNTAX            CienaGlobalState
+      MAX-ACCESS        read-write
+      STATUS            current
+      DESCRIPTION
+         "Setting this object to 'disabled' causes
+          cienaCesChassisAlarmCutoffNotification traps to be suppressed."
+      DEFVAL { enabled }
+      ::= { cienaCesNotificationsControl 71 }
+
+ cienaCesDataplanePortShapingSubscriptionTrapState        OBJECT-TYPE
+      SYNTAX          CienaGlobalState
+      MAX-ACCESS      read-write
+      STATUS          current
+      DESCRIPTION
+         "Setting this object to 'disabled' causes
+          dataplane cienaCesDpPortShapingSubscriptionExceedsOperSpeed and
+          cienaCesDpPortShapingSubscriptionWithinOperSpeed traps to be suppressed."
+      DEFVAL { enabled }
+      ::= { cienaCesNotificationsControl 72 }
+
+ cienaCesPortXcvrUncertifiedTrapState     OBJECT-TYPE
+        SYNTAX          CienaGlobalState
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+           "Setting this object to 'enabled' enables generation of 
+            cienaCesPortXcvrUncertifiedNotification traps."
+        DEFVAL { disabled }
+        ::= { cienaCesNotificationsControl 73 }
+
+ --
+ -- Command File Complete trap control
+ --
+ cienaCesCommandFileCompletedTrapState  OBJECT-TYPE
+      SYNTAX          CienaGlobalState
+      MAX-ACCESS      read-write
+      STATUS          current
+      DESCRIPTION
+         "Setting this object to 'disabled' causes
+          cienaCesCommandFileCompletedNotification traps to be
+          suppressed."
+      DEFVAL { enabled }
+      ::= { cienaCesNotificationsControl 74 }
+
+ cienaCesCommandFileFailedTrapState     OBJECT-TYPE
+      SYNTAX          CienaGlobalState
+      MAX-ACCESS      read-write
+      STATUS          current
+      DESCRIPTION
+         "Setting this object to 'disabled' causes
+          cienaCesCommandFileFailedNotification traps to be
+          suppressed."
+      DEFVAL { enabled }
+      ::= { cienaCesNotificationsControl 75 }
+
+  END

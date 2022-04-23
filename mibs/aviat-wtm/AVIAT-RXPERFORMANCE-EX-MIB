@@ -1,0 +1,435 @@
+-- ****************************************************************************
+-- aviatRxPerformanceEx.mib: Aviat Networks RX Performance Extension MIB
+--
+-- Copyright © 2014 Aviat U.S, Inc. All rights reserved.
+-- Certain information and content may be provided by third parties to AVIAT,
+-- and in each case, such copyrighted work remains the property of that third
+-- party creator/licensor.
+-- All rights not expressly granted herein are reserved. Except as otherwise
+-- required by applicable law, any reproduction, distribution, modification,
+-- retransmission, or publication of any copyrighted material is strictly
+-- prohibited without the express written consent of the copyright owner.
+-- "AVIAT", "AVIAT NETWORKS" and the AVIAT logo are trademarks of Aviat
+-- Networks, Inc. All other trademarks or brand names may be trademarks or
+-- registered trademarks of AVIAT's affiliated companies in the United States
+-- and/or other countries.
+--
+-- ****************************************************************************
+
+AVIAT-RXPERFORMANCE-EX-MIB DEFINITIONS ::= BEGIN
+    IMPORTS
+        MODULE-IDENTITY, OBJECT-TYPE
+            FROM SNMPv2-SMI
+        MODULE-COMPLIANCE, OBJECT-GROUP
+            FROM SNMPv2-CONF
+        AviatPowerLevel
+            FROM AVIAT-TEXTCONVENTION-MIB
+        entPhysicalIndex
+            FROM ENTITY-MIB
+        aviatRxPerformQHourIndex, aviatRxPerformQHourPeriod,
+        aviatRxPerformDayIndex, aviatRxPerformDayPeriod
+            FROM AVIAT-RXPERFORMANCE-MIB
+        aviatModules
+            FROM STXN-GLOBALREGISTER-MIB;
+
+    aviatRxPerformanceExModule MODULE-IDENTITY
+        LAST-UPDATED    "201401210157Z"
+        ORGANIZATION    "Aviat Networks"
+        CONTACT-INFO    "Aviat Networks
+                         Customer Service
+
+                         Postal: 5200 Great America Parkway
+                                 Santa Clara
+                                 California 95054
+                                 United States of America
+
+                         Tel: 408 567 7000
+
+                         E-mail: mibsupport@aviatnet.com"
+        DESCRIPTION
+                "This MIB module extends existing performance monitoring of the
+                 receiver on the radio for some parameters."
+        REVISION        "201401210157Z"
+        DESCRIPTION
+                "Initial Version."
+        ::= { aviatModules 33 }
+
+
+-- ****************************************************************************
+-- Conformance area, containing groups and compliance specifications
+-- ****************************************************************************
+    aviatRxPerformanceExConf      OBJECT IDENTIFIER ::= { aviatRxPerformanceExModule 1 }
+
+    aviatRxPerformanceExGroups    OBJECT IDENTIFIER ::= { aviatRxPerformanceExConf 1 }
+
+    aviatRxPerformanceExCompl     OBJECT IDENTIFIER ::= { aviatRxPerformanceExConf 2 }
+
+
+-- ****************************************************************************
+-- Sub-tree for RX Performance MIB objects
+-- ****************************************************************************
+    aviatRxPerformanceExMIBObjs   OBJECT IDENTIFIER ::= { aviatRxPerformanceExModule 2 }
+
+
+-- ****************************************************************************
+-- Receiver Performance Table Extension
+-- ****************************************************************************
+    aviatRxPerformExTable       OBJECT-TYPE
+        SYNTAX          SEQUENCE OF AviatRxPerformExEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     "This is the table containing extended information
+                         about the radio receive path performance of each
+                         terminal in the domain. This performance data is
+                         updated every 1 second."
+            ::= { aviatRxPerformanceExMIBObjs 2 }
+
+    aviatRxPerformExEntry       OBJECT-TYPE
+        SYNTAX          AviatRxPerformExEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     "This is an entry in the table containing the receiver
+                         performance data of an entity in the system."
+        INDEX           { entPhysicalIndex }
+            ::= { aviatRxPerformExTable 1 }
+
+    AviatRxPerformExEntry ::=
+        SEQUENCE {
+            aviatRxPerformCinrReadingMean
+                AviatPowerLevel,
+            aviatRxPerformCinrReadingCurrent
+                AviatPowerLevel,
+            aviatRxPerformCinrReadingMax
+                AviatPowerLevel,
+            aviatRxPerformCinrReadingMin
+                AviatPowerLevel,
+            aviatRxPerformTxpowReadingMean
+                AviatPowerLevel,
+            aviatRxPerformTxpowReadingCurrent
+                AviatPowerLevel,
+            aviatRxPerformTxpowReadingMax
+                AviatPowerLevel,
+            aviatRxPerformTxpowReadingMin
+                AviatPowerLevel
+        }
+
+    aviatRxPerformCinrReadingMean   OBJECT-TYPE
+        SYNTAX          AviatPowerLevel
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "This is the mean reading of the Carrier to
+                         Interference + Noise ratio of the radio over the
+                         period since the start of monitoring."
+            ::= { aviatRxPerformExEntry 2 }
+
+    aviatRxPerformCinrReadingCurrent    OBJECT-TYPE
+        SYNTAX          AviatPowerLevel
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "This is the current reading of the Carrier to
+                         Interference + Noise ratio of the radio."
+            ::= { aviatRxPerformExEntry 3 }
+
+    aviatRxPerformCinrReadingMax    OBJECT-TYPE
+        SYNTAX          AviatPowerLevel
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "This is the highest recorded reading of the Carrier to
+                         Interference + Noise ratio of the radio since the
+                         start of monitoring."
+            ::= { aviatRxPerformExEntry 4 }
+
+    aviatRxPerformCinrReadingMin    OBJECT-TYPE
+        SYNTAX          AviatPowerLevel
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "This is the lowest recorded reading of the Carrier to
+                         Interference + Noise ratio of the radio since the
+                         start of monitoring."
+            ::= { aviatRxPerformExEntry 5 }
+
+    aviatRxPerformTxpowReadingMean  OBJECT-TYPE
+        SYNTAX          AviatPowerLevel
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "This is the mean reading of the Carrier to
+                         Interference + Noise ratio of the radio over the
+                         period since the start of monitoring."
+            ::= { aviatRxPerformExEntry 6 }
+
+    aviatRxPerformTxpowReadingCurrent   OBJECT-TYPE
+        SYNTAX          AviatPowerLevel
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "This is the current reading of the Carrier to
+                         Interference + Noise ratio of the radio."
+            ::= { aviatRxPerformExEntry 7 }
+
+    aviatRxPerformTxpowReadingMax   OBJECT-TYPE
+        SYNTAX          AviatPowerLevel
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "This is the highest recorded reading of the Carrier to
+                         Interference + Noise ratio of the radio since the
+                         start of monitoring."
+            ::= { aviatRxPerformExEntry 8 }
+
+    aviatRxPerformTxpowReadingMin   OBJECT-TYPE
+        SYNTAX          AviatPowerLevel
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "This is the lowest recorded reading of the Carrier to
+                         Interference + Noise ratio of the radio since the
+                         start of monitoring."
+            ::= { aviatRxPerformExEntry 9 }
+
+
+-- ****************************************************************************
+-- Receiver Performance Quarter Hourly Table Extension
+-- ****************************************************************************
+    aviatRxPerformQuarterHourExTable    OBJECT-TYPE
+        SYNTAX          SEQUENCE OF AviatRxPerformQuarterHourExEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     "This is the table containing extended information
+                         about the radio receive path performance of each
+                         terminal in the domain.
+
+                         The performance data recording is started at the next
+                         15 minute boundry in the hour of the time when
+                         monitoring was initiated eg: 12:00, 12:15, 12:30 or
+                         12:45.
+
+                         This performance data is recorded for 15 minute
+                         periods and the object is updated at the end of the
+                         period."
+            ::= { aviatRxPerformanceExMIBObjs 3 }
+
+    aviatRxPerformQuarterHourExEntry    OBJECT-TYPE
+        SYNTAX          AviatRxPerformQuarterHourExEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     "This is an entry in the table containing the receiver
+                         performance data of an entity in the system for a 15
+                         minute period."
+        INDEX           { entPhysicalIndex, aviatRxPerformQHourIndex,
+                          aviatRxPerformQHourPeriod }
+            ::= { aviatRxPerformQuarterHourExTable 1 }
+
+    AviatRxPerformQuarterHourExEntry ::=
+        SEQUENCE {
+            aviatRxPerformQHourCinrReadingMean
+                AviatPowerLevel,
+            aviatRxPerformQHourCinrReadingMax
+                AviatPowerLevel,
+            aviatRxPerformQHourCinrReadingMin
+                AviatPowerLevel,
+            aviatRxPerformQHourTxpowReadingMean
+                AviatPowerLevel,
+            aviatRxPerformQHourTxpowReadingMax
+                AviatPowerLevel,
+            aviatRxPerformQHourTxpowReadingMin
+                AviatPowerLevel
+        }
+
+    aviatRxPerformQHourCinrReadingMean  OBJECT-TYPE
+        SYNTAX          AviatPowerLevel
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "This is the mean reading of the Carrier to
+                         Interference + Noise ratio of the radio for the 15
+                         minute period during which this block of performance
+                         data was collected."
+            ::= { aviatRxPerformQuarterHourExEntry 4 }
+
+    aviatRxPerformQHourCinrReadingMax   OBJECT-TYPE
+        SYNTAX          AviatPowerLevel
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "This is the highest recorded reading of the Carrier to
+                         Interference + Noise ratio of the radio for the 15
+                         minute period during which this block of performance
+                         data was collected."
+            ::= { aviatRxPerformQuarterHourExEntry 5 }
+
+    aviatRxPerformQHourCinrReadingMin   OBJECT-TYPE
+        SYNTAX          AviatPowerLevel
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "This is the lowest recorded reading of the Carrier to
+                         Interference + Noise ratio of the radio for the 15
+                         minute period during which this block of performance
+                         data was collected."
+            ::= { aviatRxPerformQuarterHourExEntry 6 }
+
+    aviatRxPerformQHourTxpowReadingMean OBJECT-TYPE
+        SYNTAX          AviatPowerLevel
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "This is the mean value of the Transmit power of the
+                         radio for the 15 minute period during which this block
+                         of performance data was collected."
+            ::= { aviatRxPerformQuarterHourExEntry 7 }
+
+    aviatRxPerformQHourTxpowReadingMax  OBJECT-TYPE
+        SYNTAX          AviatPowerLevel
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "This is the highest recorded value of the Transmit
+                         power of the radio for the 15 minute period during
+                         which this block of performance data was collected."
+            ::= { aviatRxPerformQuarterHourExEntry 8 }
+
+    aviatRxPerformQHourTxpowReadingMin  OBJECT-TYPE
+        SYNTAX          AviatPowerLevel
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "This is the lowest recorded value of the Transmit
+                         power of the radio for the 15 minute period during
+                         which this block of performance data was collected."
+            ::= { aviatRxPerformQuarterHourExEntry 9 }
+
+
+-- ****************************************************************************
+-- Rx Performance Daily Table
+-- ****************************************************************************
+    aviatRxPerformDayExTable    OBJECT-TYPE
+        SYNTAX          SEQUENCE OF AviatRxPerformDayExEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     "This is a table containing a collection of information
+                         about the radio receive path performance of each
+                         terminal in the domain. Performance data in this table
+                         is recorded for 1 day periods."
+            ::= { aviatRxPerformanceExMIBObjs 4 }
+
+    aviatRxPerformDayExEntry    OBJECT-TYPE
+        SYNTAX          AviatRxPerformDayExEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     "This is an entry in the table containing performance
+                         data of a particular entity within the agent during a
+                         1 day period."
+        INDEX           { entPhysicalIndex, aviatRxPerformDayIndex,
+                          aviatRxPerformDayPeriod }
+            ::= { aviatRxPerformDayExTable 1 }
+
+    AviatRxPerformDayExEntry ::=
+        SEQUENCE {
+            aviatRxPerformDayCinrReadingMean
+                AviatPowerLevel,
+            aviatRxPerformDayCinrReadingMax
+                AviatPowerLevel,
+            aviatRxPerformDayCinrReadingMin
+                AviatPowerLevel,
+            aviatRxPerformDayTxpowReadingMean
+                AviatPowerLevel,
+            aviatRxPerformDayTxpowReadingMax
+                AviatPowerLevel,
+            aviatRxPerformDayTxpowReadingMin
+                AviatPowerLevel
+        }
+
+    aviatRxPerformDayCinrReadingMean    OBJECT-TYPE
+        SYNTAX          AviatPowerLevel
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "This is the mean reading of the Carrier to
+                         Interference + Noise ratio of the radio for the 1 day
+                         period during which this block of performance data was
+                         collected."
+            ::= { aviatRxPerformDayExEntry 4 }
+
+    aviatRxPerformDayCinrReadingMax OBJECT-TYPE
+        SYNTAX          AviatPowerLevel
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "This is the highest recorded reading of the Carrier to
+                         Interference + Noise ratio of the radio for the 1 day
+                         period during which this block of performance data was
+                         collected."
+            ::= { aviatRxPerformDayExEntry 5 }
+
+    aviatRxPerformDayCinrReadingMin OBJECT-TYPE
+        SYNTAX          AviatPowerLevel
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "This is the lowest recorded reading of the Carrier to
+                         Interference + Noise ratio of the radio for the 1 day
+                         period during which this block of performance data was
+                         collected."
+            ::= { aviatRxPerformDayExEntry 6 }
+
+    aviatRxPerformDayTxpowReadingMean   OBJECT-TYPE
+        SYNTAX          AviatPowerLevel
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "This is the mean reading of the Transmit Power of the
+                         radio for the 1 day period during which this block of
+                         performance data was collected."
+            ::= { aviatRxPerformDayExEntry 7 }
+
+    aviatRxPerformDayTxpowReadingMax    OBJECT-TYPE
+        SYNTAX          AviatPowerLevel
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "This is the highest recorded reading of the transmit
+                         Power of the radio for the 1 day period during which
+                         this block of performance data was collected."
+            ::= { aviatRxPerformDayExEntry 8 }
+
+    aviatRxPerformDayTxpowReadingMin    OBJECT-TYPE
+        SYNTAX          AviatPowerLevel
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "This is the lowest recorded reading of the Transmit
+                         Power of the radio for the 1 day period during which
+                         this block of performance data was collected."
+            ::= { aviatRxPerformDayExEntry 9 }
+
+
+-- ****************************************************************************
+-- The Object and Event Groups
+-- ****************************************************************************
+    aviatRxPerformExObjectGroup OBJECT-GROUP
+        OBJECTS {
+            aviatRxPerformCinrReadingMean,
+            aviatRxPerformCinrReadingCurrent,
+            aviatRxPerformCinrReadingMax,
+            aviatRxPerformCinrReadingMin,
+            aviatRxPerformTxpowReadingMean,
+            aviatRxPerformTxpowReadingCurrent,
+            aviatRxPerformTxpowReadingMax,
+            aviatRxPerformTxpowReadingMin,
+            aviatRxPerformQHourCinrReadingMean,
+            aviatRxPerformQHourCinrReadingMax,
+            aviatRxPerformQHourCinrReadingMin,
+            aviatRxPerformQHourTxpowReadingMean,
+            aviatRxPerformQHourTxpowReadingMax,
+            aviatRxPerformQHourTxpowReadingMin,
+            aviatRxPerformDayCinrReadingMean,
+            aviatRxPerformDayCinrReadingMax,
+            aviatRxPerformDayCinrReadingMin,
+            aviatRxPerformDayTxpowReadingMean,
+            aviatRxPerformDayTxpowReadingMax,
+            aviatRxPerformDayTxpowReadingMin
+        }
+        STATUS          current
+        DESCRIPTION     "These are the objects in the Receiver Performance
+                         Extended MIB."
+            ::= { aviatRxPerformanceExGroups 1 }
+
+
+-- ****************************************************************************
+-- The Compliance Specifications
+-- ****************************************************************************
+    aviatRxPerformanceExComplV1 MODULE-COMPLIANCE
+        STATUS          current
+        DESCRIPTION     "The implementation requirements for this MIB."
+        MODULE          -- This module
+            MANDATORY-GROUPS    {
+                                    aviatRxPerformExObjectGroup
+                                }
+            ::= { aviatRxPerformanceExCompl 1 }
+
+END

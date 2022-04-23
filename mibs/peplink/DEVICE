@@ -1,0 +1,314 @@
+-- ********************************************************************
+        DEVICE DEFINITIONS ::= BEGIN
+
+                IMPORTS
+                        OBJECT-GROUP
+                                FROM SNMPv2-CONF
+                        enterprises, IpAddress,Unsigned32, Counter64, OBJECT-TYPE, MODULE-IDENTITY
+                                FROM SNMPv2-SMI
+                        DisplayString, RowStatus, TruthValue, MacAddress
+                                FROM SNMPv2-TC;
+--
+-- Node definitions
+--
+
+-- The Enterprises Number
+                peplink OBJECT IDENTIFIER ::= { enterprises 23695 }
+
+		productMib  OBJECT IDENTIFIER ::= { peplink 200 }
+
+		generalMib OBJECT IDENTIFIER ::= { productMib 1 }
+
+		deviceMib OBJECT IDENTIFIER ::= { generalMib 1 }
+
+-- ********************************************************************
+-- *  MODULE IDENTITY
+-- ********************************************************************
+                deviceInfo MODULE-IDENTITY
+			LAST-UPDATED "201711150000Z"		-- 11 15, 2017 at 12:00 GMT
+			ORGANIZATION
+				"PEPLINK"
+                        CONTACT-INFO
+				""
+			DESCRIPTION
+				"MIB module for device."
+		::= { deviceMib 1 }
+
+-- #####################################################################
+-- 
+-- **********************************************************************
+-- *  MIB attribute OBJECT-TYPE definitions follow
+-- **********************************************************************
+	deviceInfoSystem OBJECT IDENTIFIER ::= { deviceInfo 1 }
+
+		deviceModel OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Device model."
+			::= { deviceInfoSystem 1 }
+
+		deviceSerialNumber OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Device serial number."
+			::= { deviceInfoSystem 2 }
+
+		deviceFirmwareVersion OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Device firmware version."
+			::= { deviceInfoSystem 3 }
+
+	deviceInfoTime OBJECT IDENTIFIER ::= { deviceInfo 2 }
+
+		deviceSystemTime OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Device system time."
+			::= { deviceInfoTime 1 }
+
+		deviceSystemUpTime OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Device up time."
+			::= { deviceInfoTime 2 }
+
+	deviceInfoUsage OBJECT IDENTIFIER ::= { deviceInfo 3 }
+		deviceCpuLoad OBJECT-TYPE
+			SYNTAX INTEGER(0..100)
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Device CPU Load, in hundredths of a percent."
+			::= { deviceInfoUsage 1 }
+
+		deviceTotalMemory OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Device total memory (units KB)."
+			::= { deviceInfoUsage 2 }
+
+		deviceMemoryUsage OBJECT-TYPE
+			SYNTAX INTEGER
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Device memory usage (units KB)."
+			::= { deviceInfoUsage 3 }
+
+	deviceInfoHardware OBJECT IDENTIFIER ::= { deviceInfo 4 }
+
+		devicePSUTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF DevicePSUEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Device Power Supply Unit Table."
+			::= { deviceInfoHardware 1 }
+
+			devicePSUEntry OBJECT-TYPE
+			SYNTAX DevicePSUEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"An entry in the devicePSUTable."
+			INDEX { devicePSUId }
+			::= { devicePSUTable 1 }
+
+			DevicePSUEntry ::=
+			SEQUENCE {
+				devicePSUId
+					Integer32,
+				devicePSUStatus
+					INTEGER,
+				deviceCurrentPower
+					Integer32,
+				deviceMaxPower
+					Integer32,
+				devicePSUPercentage
+					Integer32
+			}
+
+			devicePSUId OBJECT-TYPE
+				SYNTAX Integer32
+				MAX-ACCESS read-only
+				STATUS current
+				DESCRIPTION
+					"Device power consumption ID."
+				::= { devicePSUEntry 1 }
+
+			devicePSUStatus OBJECT-TYPE
+				SYNTAX INTEGER {
+					error(0),
+					on(1)
+				}
+				MAX-ACCESS read-only
+				STATUS current
+				DESCRIPTION
+					"Device power consumption status."
+				::= { devicePSUEntry 2 }
+
+			deviceCurrentPower OBJECT-TYPE
+				SYNTAX Integer32
+				MAX-ACCESS read-only
+				STATUS current
+				DESCRIPTION
+					"Device current power(W)."
+				::= { devicePSUEntry 3 }
+
+			deviceMaxPower OBJECT-TYPE
+				SYNTAX Integer32
+				MAX-ACCESS read-only
+				STATUS current
+				DESCRIPTION
+					"Device max power(W)."
+				::= { devicePSUEntry 4 }
+
+			devicePSUPercentage OBJECT-TYPE
+				SYNTAX Integer32
+				MAX-ACCESS read-only
+				STATUS current
+				DESCRIPTION
+					"Device power consumption, in hundredths of a percent."
+				::= { devicePSUEntry 5 }
+
+		deviceFanTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF DeviceFanEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Device fan Table."
+			::= { deviceInfoHardware 2 }
+
+			deviceFanEntry OBJECT-TYPE
+			SYNTAX DeviceFanEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"An entry in the deviceFanTable."
+			INDEX { deviceFanId }
+			::= { deviceFanTable 1 }
+
+			DeviceFanEntry ::=
+			SEQUENCE {
+				deviceFanId
+					Integer32,
+				deviceFanStatus
+					INTEGER,
+				deviceFanSpeed
+					Integer32
+			}
+
+			deviceFanId OBJECT-TYPE
+				SYNTAX Integer32
+				MAX-ACCESS read-only
+				STATUS current
+				DESCRIPTION
+					"Device fan ID."
+				::= { deviceFanEntry 1 }
+
+			deviceFanStatus OBJECT-TYPE
+				SYNTAX INTEGER {
+					error(0),
+					on(1)
+				}
+				MAX-ACCESS read-only
+				STATUS current
+				DESCRIPTION
+					"Device fan status."
+				::= { deviceFanEntry 2 }
+
+			deviceFanSpeed OBJECT-TYPE
+				SYNTAX Integer32
+				MAX-ACCESS read-only
+				STATUS current
+				DESCRIPTION
+					"Device fan speed(RPM)."
+				::= { deviceFanEntry 3 }
+
+		devicePowerSourceTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF DevicePowerSourceEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Power source Table."
+			::= { deviceInfoHardware 3 }
+
+			devicePowerSourceEntry OBJECT-TYPE
+			SYNTAX DevicePowerSourceEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"An entry in the devicePowerSourceTable."
+			INDEX { devicePowerSourceId }
+			::= { devicePowerSourceTable 1 }
+
+			DevicePowerSourceEntry ::=
+			SEQUENCE {
+				devicePowerSourceId
+					Integer32,
+				devicePowerSourceName
+					OCTET STRING,
+				devicePowerSourceStatus
+					INTEGER
+			}
+
+			devicePowerSourceId OBJECT-TYPE
+				SYNTAX Integer32
+				MAX-ACCESS read-only
+				STATUS current
+				DESCRIPTION
+					"Power source ID."
+				::= { devicePowerSourceEntry 1 }
+
+			devicePowerSourceName OBJECT-TYPE
+				SYNTAX OCTET STRING
+				MAX-ACCESS read-only
+				STATUS current
+				DESCRIPTION
+					"Power source name."
+				::= { devicePowerSourceEntry 2 }
+
+			devicePowerSourceStatus OBJECT-TYPE
+				SYNTAX INTEGER {
+					noCableDetected(0),
+					connected(1)
+				}
+				MAX-ACCESS read-only
+				STATUS current
+				DESCRIPTION
+					"Power source status."
+				::= { devicePowerSourceEntry 3 }
+
+		deviceInfoTemperature OBJECT IDENTIFIER ::= { deviceInfoHardware 4 }
+
+			deviceTemperatureCelsius OBJECT-TYPE
+				SYNTAX Gauge32
+				UNITS "mC"
+				MAX-ACCESS read-only
+				STATUS current
+				DESCRIPTION
+					"System temperature in mC."
+				::= { deviceInfoTemperature 1 }
+
+			deviceTemperatureFahrenheit OBJECT-TYPE
+				SYNTAX Gauge32
+				UNITS "mF"
+				MAX-ACCESS read-only
+				STATUS current
+				DESCRIPTION
+					"System temperature in mF."
+				::= { deviceInfoTemperature 2 }
+END

@@ -24,6 +24,7 @@ abstract class TestCase extends BaseTestCase
             $this->markTestSkipped('Database tests not enabled.  Set DBTEST=1 to enable.');
         }
     }
+
     public function dbTearDown()
     {
         if (getenv('DBTEST')) {

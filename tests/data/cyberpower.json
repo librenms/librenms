@@ -6,36 +6,19 @@
                     "sysName": "<private>",
                     "sysObjectID": ".1.3.6.1.4.1.3808.1.1.3",
                     "sysDescr": "Power Manager",
-                    "sysContact": null,
-                    "version": null,
-                    "hardware": null,
-                    "features": null,
-                    "os": "cyberpower",
-                    "type": "power",
-                    "serial": null,
-                    "icon": "cyberpower.svg",
-                    "location": null
-                }
-            ]
-        },
-        "poller": {
-            "devices": [
-                {
-                    "sysName": "<private>",
-                    "sysObjectID": ".1.3.6.1.4.1.3808.1.1.3",
-                    "sysDescr": "Power Manager",
                     "sysContact": "<private>",
                     "version": "S1A17",
                     "hardware": "OL2200RTXL2U",
                     "features": null,
                     "os": "cyberpower",
                     "type": "power",
-                    "serial": null,
+                    "serial": "ABCFT1000001",
                     "icon": "cyberpower.svg",
                     "location": "<private>"
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     },
     "sensors": {
         "discovery": {
@@ -73,9 +56,9 @@
                     "sensor_type": "cyberpower",
                     "sensor_descr": "Output",
                     "group": null,
-                    "sensor_divisor": 1,
+                    "sensor_divisor": 10,
                     "sensor_multiplier": 1,
-                    "sensor_current": 65,
+                    "sensor_current": 6.5,
                     "sensor_limit": null,
                     "sensor_limit_warn": null,
                     "sensor_limit_low": null,

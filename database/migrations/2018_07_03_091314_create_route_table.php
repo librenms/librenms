@@ -5,7 +5,6 @@ use Illuminate\Database\Schema\Blueprint;
 
 class CreateRouteTable extends Migration
 {
-
     /**
      * Run the migrations.
      *
@@ -24,7 +23,7 @@ class CreateRouteTable extends Migration
             $table->string('ipRouteProto', 256);
             $table->unsignedInteger('discoveredAt');
             $table->string('ipRouteMask', 256);
-            $table->index(['device_id','context_name','ipRouteDest','ipRouteNextHop'], 'device');
+            $table->index(['device_id', 'context_name', 'ipRouteDest', 'ipRouteNextHop'], 'device');
         });
     }
 

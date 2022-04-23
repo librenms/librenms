@@ -1,0 +1,204 @@
+-- ==========================================================================
+-- Copyright (C) 2004 by New H3C Technologies Co., Ltd. All rights reserved.
+--
+-- Description: The purpose of this MIB file is to provide the definition of
+--              the voice interface general configuration.
+-- Reference:
+-- Version: V1.0
+-- History:
+-- V1.0 2007-12-10 Initial version, created by Qu Pingping
+-- ==========================================================================
+HH3C-VOICE-IF-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+        OBJECT-TYPE, MODULE-IDENTITY, Integer32
+    FROM SNMPv2-SMI
+        DisplayString
+    FROM SNMPv2-TC
+        ifIndex
+    FROM IF-MIB
+        hh3cVoice
+    FROM HH3C-OID-MIB;
+
+hh3cVoiceInterface MODULE-IDENTITY
+    LAST-UPDATED "200712101700Z"
+    ORGANIZATION
+        "New H3C Technologies Co., Ltd."
+    CONTACT-INFO
+        "Platform Team New H3C Technologies Co., Ltd.
+         Hai-Dian District Beijing P.R. China
+         Http://www.h3c.com
+         Zip:100085"
+    DESCRIPTION
+        "This MIB file is to provide the definition of the voice
+        interface general configuration."
+    REVISION "200712101700Z"
+    DESCRIPTION
+        "The initial version of this MIB file."
+    ::= { hh3cVoice 13 }
+
+hh3cVoiceIfObjects OBJECT IDENTIFIER ::= { hh3cVoiceInterface 1 }
+
+--===========================================================================
+--                            hh3cVoiceIfConfigTable
+--
+--===========================================================================
+hh3cVoiceIfConfigTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF HH3CVoiceIfConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The table contains configurable parameters for both analog
+        voice interface and digital voice interface."
+    ::= { hh3cVoiceIfObjects 1 }
+
+hh3cVoiceIfConfigEntry OBJECT-TYPE
+    SYNTAX      HH3CVoiceIfConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The entry of voice interface table."
+    INDEX
+        {
+            ifIndex
+        }
+    ::= { hh3cVoiceIfConfigTable 1 }
+
+HH3CVoiceIfConfigEntry ::= SEQUENCE
+    {
+        hh3cVoiceIfCfgCngOn                INTEGER,
+        hh3cVoiceIfCfgNonLinearSwitch      INTEGER,
+        hh3cVoiceIfCfgInputGain            Integer32,
+        hh3cVoiceIfCfgOutputGain           Integer32,
+        hh3cVoiceIfCfgEchoCancelSwitch     INTEGER,
+        hh3cVoiceIfCfgEchoCancelDelay      Integer32,
+        hh3cVoiceIfCfgTimerDialInterval    Integer32,
+        hh3cVoiceIfCfgTimerFirstDial       Integer32,
+        hh3cVoiceIfCfgPrivateline          DisplayString,
+        hh3cVoiceIfCfgRegTone              OCTET STRING
+    }
+
+hh3cVoiceIfCfgCngOn OBJECT-TYPE
+    SYNTAX      INTEGER
+        {
+            enable(1),
+            disable(2)
+        }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object indicates whether the silence gaps should be
+        filled with background noise. It is applicable to FXO, FXS,
+        E&M subscriber lines and E1/T1 voice subscriber line."
+    DEFVAL { enable }
+    ::= { hh3cVoiceIfConfigEntry 1 }
+
+hh3cVoiceIfCfgNonLinearSwitch OBJECT-TYPE
+    SYNTAX      INTEGER
+        {
+            enable(1),
+            disable(2)
+        }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object expresses the nonlinear processing is enable
+        or disable for the voice interface. It is applicable to FXO,
+        FXS, E&M subscriber lines and E1/T1 voice subscriber line.
+        Currently, only digital voice subscriber lines can be set
+        disabled."
+    DEFVAL { enable }
+    ::= { hh3cVoiceIfConfigEntry 2 }
+
+hh3cVoiceIfCfgInputGain OBJECT-TYPE
+    SYNTAX      Integer32(-140..139)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object indicates the amount of gain added to the receiver
+        side of the voice interface. Unit is 0.1 db. It is applicable to
+        FXO, FXS, E&M subscriber lines and E1/T1 voice subscriber line."
+    DEFVAL { 0 }
+    ::= { hh3cVoiceIfConfigEntry 3 }
+
+hh3cVoiceIfCfgOutputGain OBJECT-TYPE
+    SYNTAX      Integer32(-140..139)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object indicates the amount of gain added to the send side
+        of the voice interface. Unit is 0.1 db. It is applicable to FXO,
+        FXS, E&M subscriber lines and E1/T1 voice subscriber line."
+    DEFVAL { 0 }
+    ::= { hh3cVoiceIfConfigEntry 4 }
+
+hh3cVoiceIfCfgEchoCancelSwitch OBJECT-TYPE
+    SYNTAX      INTEGER
+        {
+            enable(1),
+            disable(2)
+        }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object indicates whether the echo cancellation is enabled.
+        It is applicable to FXO, FXS, E&M subscriber lines and E1/T1 voice
+        subscriber line."
+    DEFVAL { enable }
+    ::= { hh3cVoiceIfConfigEntry 5 }
+
+hh3cVoiceIfCfgEchoCancelDelay OBJECT-TYPE
+    SYNTAX      Integer32(0..64)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object indicates the delay of the echo cancellation for
+        the voice interface. This value couldn't be modified unless
+        hh3cVoiceIfCfgEchoCancelSwitch is enable. Unit is milliseconds.
+        It is applicable to FXO, FXS, E&M subscriber lines and E1/T1
+        voice subscriber line. The default value of this object is 32."
+    ::= { hh3cVoiceIfConfigEntry 6 }
+
+hh3cVoiceIfCfgTimerDialInterval OBJECT-TYPE
+    SYNTAX      Integer32(1..300)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The interval, in seconds, between two dialing numbers.
+        The default value of this object is 10 seconds. It is
+        applicable to FXO, FXS, E&M subscriber lines and E1/T1 with
+        loop-start or ground-start protocol voice subscriber line."
+    ::= { hh3cVoiceIfConfigEntry 7 }
+
+hh3cVoiceIfCfgTimerFirstDial OBJECT-TYPE
+    SYNTAX      Integer32(1..300)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The period of time, in seconds, before dialing the first
+        number. The default value of this object is 10 seconds. It
+        is applicable to FXO, FXS subscriber lines and E1/T1 with
+        loop-start or ground-start protocol voice subscriber line."
+    ::= { hh3cVoiceIfConfigEntry 8 }
+
+hh3cVoiceIfCfgPrivateline OBJECT-TYPE
+    SYNTAX      DisplayString(SIZE(0..31))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object indicates the E.164 phone number for plar mode.
+        It is applicable to FXO, FXS, E&M subscriber lines and E1/T1
+        voice subscriber line."
+    ::= { hh3cVoiceIfConfigEntry 9 }
+
+hh3cVoiceIfCfgRegTone OBJECT-TYPE
+    SYNTAX      OCTET STRING(SIZE(0|2..3))
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object uses 2 or 3 letter country code specify voice
+        parameters of different countrys. This value will take effect
+        on all voice interfaces of all cards on the device."
+    ::= { hh3cVoiceIfConfigEntry 10 }
+
+END

@@ -1,0 +1,151 @@
+PACKETLOGIC-HW-SFP-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	NOTIFICATION-TYPE,
+	MODULE-IDENTITY, OBJECT-TYPE, Integer32, Counter64,
+	Unsigned32, TimeTicks FROM SNMPv2-SMI
+	packetlogic2 FROM PACKETLOGIC-MIB
+	hw FROM PACKETLOGIC-HW-MIB
+	DisplayString, DateAndTime FROM SNMPv2-TC
+	CounterBasedGauge64 FROM HCNUM-TC;
+
+sfp MODULE-IDENTITY
+	LAST-UPDATED "201909121500Z"
+	ORGANIZATION "Procera Networks, Inc."
+	CONTACT-INFO "support@proceranetworks.com"
+	DESCRIPTION "MIB For SFP and SFP+ Optical Transceivers"
+	REVISION "201909121500Z"
+	DESCRIPTION " Latest version at the revision date for version GET VERSION HERE"
+
+	::={hw 4}
+
+PortEntry ::= SEQUENCE {
+	portName DisplayString,
+	portCompatibility DisplayString,
+	portVendorName DisplayString,
+	portVendorOUI DisplayString,
+	portVendorPN DisplayString,
+	portVendorRevisionLevel DisplayString,
+	checksumBaseFields DisplayString,
+	portVendorSN DisplayString,
+	portVendorDateCode DisplayString,
+	checksumExtendedFields DisplayString,
+	portEntryIndex Integer32
+}
+
+ports	OBJECT-TYPE
+	SYNTAX SEQUENCE OF PortEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION "Conceptual Table"
+	::= {sfp 1}
+
+portEntry	OBJECT-TYPE
+	SYNTAX PortEntry
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION "Conceptual Table"
+	INDEX { portEntryIndex }
+	::= {ports 1}
+
+portEntryIndex	OBJECT-TYPE
+	SYNTAX Integer32 (1..2147483647)
+	MAX-ACCESS not-accessible
+	STATUS current
+	DESCRIPTION "Unique Row Index for Conceptual Table"
+	::={portEntry 999}
+
+
+
+
+
+
+
+
+
+
+
+
+portName	OBJECT-TYPE
+	SYNTAX	 DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Port Name"
+
+	::={portEntry 1}
+
+portCompatibility	OBJECT-TYPE
+	SYNTAX	 DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Electronic or optical compatibility"
+
+	::={portEntry 2}
+
+portVendorName	OBJECT-TYPE
+	SYNTAX	 DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "SFP vendor name"
+
+	::={portEntry 3}
+
+portVendorOUI	OBJECT-TYPE
+	SYNTAX	 DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "SFP vendor IEEE company ID"
+
+	::={portEntry 4}
+
+portVendorPN	OBJECT-TYPE
+	SYNTAX	 DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Part number provided by SFP vendor"
+
+	::={portEntry 5}
+
+portVendorRevisionLevel	OBJECT-TYPE
+	SYNTAX	 DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Revision level for part number provided by vendor"
+
+	::={portEntry 6}
+
+checksumBaseFields	OBJECT-TYPE
+	SYNTAX	 DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Check code for Base ID Fields"
+
+	::={portEntry 7}
+
+portVendorSN	OBJECT-TYPE
+	SYNTAX	 DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Serial number provided by vendor"
+
+	::={portEntry 8}
+
+portVendorDateCode	OBJECT-TYPE
+	SYNTAX	 DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Vendor manufacturing date code"
+
+	::={portEntry 9}
+
+checksumExtendedFields	OBJECT-TYPE
+	SYNTAX	 DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Check code for the Extended ID Fields"
+
+	::={portEntry 10}
+
+
+
+END

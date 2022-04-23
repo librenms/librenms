@@ -15,12 +15,12 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * Trap sent when a Juniper transciever lambda reaches an alert level threshold.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
+ *
  * @copyright  2018 KanREN, Inc.
  * @author     Heath Barnhart <hbarnhart@kanren.net>
  */
@@ -30,7 +30,6 @@ namespace LibreNMS\Snmptrap\Handlers;
 use App\Models\Device;
 use LibreNMS\Interfaces\SnmptrapHandler;
 use LibreNMS\Snmptrap\Trap;
-use LibreNMS\Snmptrap\Handlers\JnxDomLaneAlarmId;
 use Log;
 
 class JnxDomLaneAlarmCleared implements SnmptrapHandler
@@ -39,8 +38,8 @@ class JnxDomLaneAlarmCleared implements SnmptrapHandler
      * Handle snmptrap.
      * Data is pre-parsed and delivered as a Trap.
      *
-     * @param Device $device
-     * @param Trap $trap
+     * @param  Device  $device
+     * @param  Trap  $trap
      * @return void
      */
     public function handle(Device $device, Trap $trap)
@@ -51,8 +50,9 @@ class JnxDomLaneAlarmCleared implements SnmptrapHandler
 
         $ifIndex = substr(strrchr($trap->findOid('IF-MIB::ifDescr'), '.'), 1);
         $port = $device->ports()->where('ifIndex', $ifIndex)->first();
-        if (!$port) {
-            Log::warning("Snmptrap JnxDomLaneAlarmCleared: Could not find port at ifIndex $port->ifIndex for device: " . $device->hostname);
+        if (! $port) {
+            Log::warning("Snmptrap JnxDomLaneAlarmCleared: Could not find port at ifIndex $ifIndex for device: " . $device->hostname);
+
             return;
         }
 

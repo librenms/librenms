@@ -8,7 +8,8 @@ over:
     - { graph: device_mempool, text: 'Memory Usage' }
 icon: pbn
 discovery:
-    - sysObjectID:
-        - .1.3.6.1.4.1.11606.10
-        - .1.3.6.1.4.1.11606.25
-        - .1.3.6.1.4.1.11606.11
+    -
+        sysObjectID:
+            - .1.3.6.1.4.1.11606.10
+            - .1.3.6.1.4.1.11606.25
+            - .1.3.6.1.4.1.11606.11

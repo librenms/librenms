@@ -1,9 +1,9 @@
-[![Scrutinizer Status](https://scrutinizer-ci.com/g/librenms/librenms/badges/build.png?b=master)](https://scrutinizer-ci.com/g/librenms/librenms/build-status/master) [![Scrutinizer Code Quality](https://scrutinizer-ci.com/g/librenms/librenms/badges/quality-score.png?b=master)](https://scrutinizer-ci.com/g/librenms/librenms/?branch=master) [![Travis Status](https://travis-ci.com/librenms/librenms.svg?branch=master)](https://travis-ci.org/librenms/librenms)
+[![Test Status](https://github.com/librenms/librenms/actions/workflows/test.yml/badge.svg?branch=master&event=push)](https://github.com/librenms/librenms/actions/workflows/test.yml?query=event%3Apush+branch%3Amaster)
 
 Introduction
 ------------
 
-LibreNMS is an autodiscovering PHP/MySQL/SNMP based network monitoring
+LibreNMS is an auto-discovering PHP/MySQL/SNMP based network monitoring
 which includes support for a wide range of network hardware and operating
 systems including Cisco, Linux, FreeBSD, Juniper, Brocade, Foundry, HP and
 many more.
@@ -14,10 +14,7 @@ We intend LibreNMS to be a viable project and community that:
 - offers a welcoming, friendly environment for everyone.
 
 The [Debian Social Contract][10] will be the basis of our priority system,
-and mutual respect is the basis of our behaviour towards others.  For more
-about the culture we're trying to build, please read the [Freenode
-philosophy][13], including [guidelines for running an IRC channel][6] and
-[being a community catalyst][7].
+and mutual respect is the basis of our behavior towards others.
 
 
 Documentation
@@ -31,11 +28,11 @@ Participating
 -------------
 
 You can participate in the project by:
-- Talking to us on [Discord](https://t.libren.ms/discord) or [Twitter][3].
+- Talking to us on [Discord][4] or [Twitter][3].
 - Joining the [LibreNMS Community](https://community.librenms.org)
 - Improving the [documentation][5].
-- Cloning the [repo][2] and filing [pull requests][19] on github.
-- [Bug Reports](https://community.librenms.org) on our Community Fourms
+- Cloning the [repository][2] and filing [pull requests][19] on GitHub.
+- [Bug Reports](https://community.librenms.org) on our Community Forums
 - See [CONTRIBUTING][15] for more details.
 
 
@@ -53,7 +50,7 @@ License
 
 Copyright (C) 2006-2012 Adam Armstrong <adama@memetic.org>
 
-Copyright (C) 2013-2017 by individual LibreNMS contributors
+Copyright (C) 2013-2021 by individual LibreNMS contributors
 
  This program is free software: you can redistribute it and/or modify
  it under the terms of the GNU General Public License as published by
@@ -66,7 +63,7 @@ Copyright (C) 2013-2017 by individual LibreNMS contributors
  GNU General Public License for more details.
 
  You should have received a copy of the GNU General Public License
- along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ along with this program.  If not, see <https://www.gnu.org/licenses/>.
 
 [LICENSE.txt][14] contains a copy of the full GPLv3 licensing conditions.
 
@@ -81,23 +78,17 @@ exception):
 
   Please see [Acknowledgements][17]
 
-[1]: https://groups.google.com/forum/#!forum/librenms-project "LibreNMS"
 [2]: https://github.com/librenms/librenms "Main LibreNMS GitHub repo"
 [3]: https://twitter.com/librenms "@LibreNMS on Twitter"
-[4]: https://t.libren.ms/discord "Discord LibreNMS Server"
+[4]: https://discord.gg/librenms "Discord LibreNMS Server"
 [5]: https://github.com/librenms/librenms/tree/master/doc/
-[6]: http://freenode.net/changuide "Freenode channel guidelines"
-[7]: http://freenode.net/catalysts "Freenode community catalysts"
 [8]: https://www.virtualbox.org/ "VirtualBox"
 [10]: http://www.debian.org/social_contract "Debian project social contract"
-[11]: http://www.librenms.org/#downloads
-[12]: http://docs.librenms.org/General/Welcome-to-Observium-users/
-[13]: http://freenode.net/philosophy.shtml "Freenode philosophy"
+[11]: https://www.librenms.org/#downloads
 [14]: https://github.com/librenms/librenms/tree/master/LICENSE.txt
-[15]: http://docs.librenms.org/General/Contributing/
-[16]: http://docs.librenms.org/
-[17]: http://docs.librenms.org/General/Acknowledgement/
-[18]: https://github.com/librenms/librenms/issues
+[15]: https://docs.librenms.org/General/Contributing/
+[16]: https://docs.librenms.org/
+[17]: https://docs.librenms.org/General/Acknowledgement/
 [19]: https://github.com/librenms/librenms/pulls
 
 
@@ -139,7 +130,7 @@ Support us with a monthly donation and help us continue our activities. [[Become
 
 ## Sponsors
 
-Become a sponsor and get your logo on our README on Github with a link to your site. [[Become a sponsor](https://opencollective.com/librenms#sponsor)]
+Become a sponsor and get your logo on our README on GitHub with a link to your site. [[Become a sponsor](https://opencollective.com/librenms#sponsor)]
 
 <a href="https://opencollective.com/librenms/sponsor/0/website" target="_blank"><img src="https://opencollective.com/librenms/sponsor/0/avatar.svg"></a>
 <a href="https://opencollective.com/librenms/sponsor/1/website" target="_blank"><img src="https://opencollective.com/librenms/sponsor/1/avatar.svg"></a>

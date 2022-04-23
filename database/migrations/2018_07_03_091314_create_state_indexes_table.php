@@ -5,7 +5,6 @@ use Illuminate\Database\Schema\Blueprint;
 
 class CreateStateIndexesTable extends Migration
 {
-
     /**
      * Run the migrations.
      *
@@ -15,7 +14,7 @@ class CreateStateIndexesTable extends Migration
     {
         Schema::create('state_indexes', function (Blueprint $table) {
             $table->increments('state_index_id');
-            $table->string('state_name', 64)->unique('state_name');
+            $table->string('state_name', 64)->unique();
         });
     }
 

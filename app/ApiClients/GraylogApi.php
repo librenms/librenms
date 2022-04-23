@@ -15,10 +15,10 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
+ *
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -58,7 +58,7 @@ class GraylogApi
 
     public function getStreams()
     {
-        if (!$this->isConfigured()) {
+        if (! $this->isConfigured()) {
             return [];
         }
 
@@ -73,22 +73,22 @@ class GraylogApi
     /**
      * Query the Graylog server
      *
-     * @param string $query
-     * @param int $range
-     * @param int $limit
-     * @param int $offset
-     * @param string $sort field:asc or field:desc
-     * @param string $filter
+     * @param  string  $query
+     * @param  int  $range
+     * @param  int  $limit
+     * @param  int  $offset
+     * @param  string  $sort  field:asc or field:desc
+     * @param  string  $filter
      * @return array
      */
     public function query($query = '*', $range = 0, $limit = 0, $offset = 0, $sort = null, $filter = null)
     {
-        if (!$this->isConfigured()) {
+        if (! $this->isConfigured()) {
             return [];
         }
 
         $uri = Config::get('graylog.base_uri');
-        if (!$uri) {
+        if (! $uri) {
             $uri = $this->api_prefix . '/search/universal/relative';
         }
 
@@ -110,8 +110,8 @@ class GraylogApi
     /**
      * Build a simple query string that searches the messages field and/or filters by device
      *
-     * @param string $search Search the message field for this string
-     * @param Device $device
+     * @param  string  $search  Search the message field for this string
+     * @param  Device  $device
      * @return string
      */
     public function buildSimpleQuery($search = null, $device = null)
@@ -144,12 +144,12 @@ class GraylogApi
             $addresses = $addresses->merge($device->ipv4->pluck('ipv4_address')
                 ->filter(
                     function ($address) {
-                        return $address != "127.0.0.1";
+                        return $address != '127.0.0.1';
                     }
                 ))->merge($device->ipv6->pluck('ipv6_address')
                 ->filter(
                     function ($address) {
-                        return $address != "0000:0000:0000:0000:0000:0000:0000:0001";
+                        return $address != '0000:0000:0000:0000:0000:0000:0000:0001';
                     }
                 ));
         }

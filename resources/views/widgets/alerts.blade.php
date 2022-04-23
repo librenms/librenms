@@ -1,10 +1,5 @@
-<div class="row">
-    <div class="col-sm-12">
-        <span id="message"></span>
-    </div>
-</div>
 <div class="table-responsive">
-    <table id="alerts_{{ $id }}" class="table table-hover table-condensed alerts">
+    <table id="alerts_{{ $id }}" class="table table-hover table-condensed alerts" data-ajax="true">
         <thead>
         <tr>
             <th data-column-id="severity"></th>
@@ -23,20 +18,26 @@
 <script>
     var alerts_grid = $("#alerts_{{ $id }}").bootgrid({
         ajax: true,
-        post: function ()
-        {
-            return {
-                id: "alerts",
-                acknowledged: '{{ $acknowledged }}',
-                fired: '{{ $fired }}',
-                min_severity: '{{ $min_severity }}',
-                group: '{{ $device_group }}',
-                proc: '{{ $proc }}',
-                sort: '{{ $sort }}',
-                device_id: '{{ $device }}'
-            }
+        requestHandler: request => ({
+            ...request,
+            id: "alerts",
+            acknowledged: '{{ $acknowledged }}',
+            unreachable: '{{ $unreachable }}',
+            fired: '{{ $fired }}',
+            min_severity: '{{ $min_severity }}',
+            group: '{{ $device_group }}',
+            proc: '{{ $proc }}',
+            sort: '{{ $sort }}',
+            uncollapse_key_count: '{{ $uncollapse_key_count }}',
+            device_id: '{{ $device }}'
+        }),
+        responseHandler: response => {
+            $("#widget_title_counter_{{ $id }}").text(response.total ? ` (${response.total})` : '')
+
+            return response
         },
         url: "ajax_table.php",
+        navigation: ! {{ $hidenavigation }},
         rowCount: [50, 100, 250, -1]
     }).on("loaded.rs.jquery.bootgrid", function() {
         alerts_grid = $(this);

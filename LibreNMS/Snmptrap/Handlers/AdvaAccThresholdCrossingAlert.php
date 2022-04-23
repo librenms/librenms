@@ -15,12 +15,12 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * Adva Threshold Exceeded Alarms.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
+ *
  * @copyright  2018 KanREN, Inc
  * @author     Heath Barnhart <hbarnhart@kanren.net> & Neil Kahle <nkahle@kanren.net>
  */
@@ -28,6 +28,7 @@
 namespace LibreNMS\Snmptrap\Handlers;
 
 use App\Models\Device;
+use Illuminate\Support\Str;
 use LibreNMS\Interfaces\SnmptrapHandler;
 use LibreNMS\Snmptrap\Trap;
 use Log;
@@ -38,17 +39,17 @@ class AdvaAccThresholdCrossingAlert implements SnmptrapHandler
      * Handle snmptrap.
      * Data is pre-parsed and delivered as a Trap.
      *
-     * @param Device $device
-     * @param Trap $trap
+     * @param  Device  $device
+     * @param  Trap  $trap
      * @return void
      */
     public function handle(Device $device, Trap $trap)
     {
-        $interval = $trap->getOidData($trap->findOid("CM-PERFORMANCE-MIB::cmEthernetAccPortThresholdInterval"));
-        $ifName = $trap->getOidData($trap->findOid("IF-MIB::ifName"));
+        $interval = $trap->getOidData($trap->findOid('CM-PERFORMANCE-MIB::cmEthernetAccPortThresholdInterval'));
+        $ifName = $trap->getOidData($trap->findOid('IF-MIB::ifName'));
 
         $thresholdMessage = $this->getThresholdMessage(
-            $trap->getOidData($trap->findOid("CM-PERFORMANCE-MIB::cmEthernetAccPortThresholdVariable"))
+            $trap->getOidData($trap->findOid('CM-PERFORMANCE-MIB::cmEthernetAccPortThresholdVariable'))
         );
 
         Log::event("$ifName $thresholdMessage threshold exceeded for $interval", $device->device_id, 'trap', 2);
@@ -57,10 +58,11 @@ class AdvaAccThresholdCrossingAlert implements SnmptrapHandler
     public function getThresholdMessage($thresholdOid)
     {
         foreach ($this->getThresholds() as $oid => $descr) {
-            if (str_contains($thresholdOid, $oid)) {
+            if (Str::contains($thresholdOid, $oid)) {
                 return $descr;
             }
         }
+
         return 'unknown';
     }
 

@@ -6,7 +6,7 @@ IMPORTS
 		FROM SNMPv2-SMI;
 
 ciena MODULE-IDENTITY
-	LAST-UPDATED "201612140000Z"
+	LAST-UPDATED "201804270000Z"
 	ORGANIZATION
 		"Ciena Corporation"
 	CONTACT-INFO
@@ -16,18 +16,12 @@ ciena MODULE-IDENTITY
                 U.S.A
       Phone:    +1 800-921-1144
       Fax:      +1 410-694-5750"
-	DESCRIPTION
+      DESCRIPTION
 		"Top-level MIB structure for Ciena's Waveserver."
-	REVISION "201612140000Z"
-	DESCRIPTION
-		"Release 1.3. fixed LAST-UPDATED and REVISION statement order."
-	REVISION "201607070000Z"
-	DESCRIPTION
-		"String clean-up and addition of version node for release 1.2."
-	REVISION "201009272317Z"
-	DESCRIPTION
-		"Initial creation of MIB file structure for Ciena."
-	::= { enterprises 1271 }
+       REVISION "201804270000Z" 
+       DESCRIPTION
+		"Added cienaWsPlatformConfig for Ai1.2."
+       ::= { enterprises 1271 }
 	
 --
 -- Node definitions
@@ -68,5 +62,11 @@ cienaWsConfig OBJECT-IDENTITY
    DESCRIPTION
       "Root object for the Waveserver API in 1.2 and beyond."
 ::= { waveserver 4 }
+
+cienaWsPlatformConfig OBJECT-IDENTITY
+   STATUS     current
+   DESCRIPTION
+      "Root object for the Waveserver Platform API in release 1.2 and beyond."
+::= { waveserver 5 }
 
 END

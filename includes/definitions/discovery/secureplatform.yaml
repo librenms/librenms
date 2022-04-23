@@ -1,11 +1,15 @@
 mib: CHECKPOINT-MIB
 modules:
+    os:
+        hardware: CHECKPOINT-MIB::svnApplianceProductName.0
+        serial: CHECKPOINT-MIB::svnApplianceSerialNumber.0
+        version: CHECKPOINT-MIB::svnVersion.0
     processors:
-          data:
-              -
-                  oid: procUsage
-                  num_oid: '.1.3.6.1.4.1.2620.1.6.7.2.4.{{ $index }}'
-                  type: splat-cpu
+        data:
+            -
+                oid: procUsage
+                num_oid: '.1.3.6.1.4.1.2620.1.6.7.2.4.{{ $index }}'
+                type: splat-cpu
     sensors:
         fanspeed:
             data:
@@ -17,15 +21,15 @@ modules:
                     index: 'fanSpeedSensorValue.{{ $index }}'
         load:
             data:
-               -
-                   oid: procUsage
-                   num_oid: '.1.3.6.1.4.1.2620.1.6.7.2.4.{{ $index }}'
-                   descr: Overall CPU utilization
-               -
-                   oid: multiProcUsage
-                   num_oid: '.1.3.6.1.4.1.2620.1.6.7.5.1.5.{{ $index }}'
-                   descr: CPU {{ $index }}
-                   index: 'multiProcUsage.{{ $index }}.0'
+                -
+                    oid: procUsage
+                    num_oid: '.1.3.6.1.4.1.2620.1.6.7.2.4.{{ $index }}'
+                    descr: Overall CPU utilization
+                -
+                    oid: multiProcUsage
+                    num_oid: '.1.3.6.1.4.1.2620.1.6.7.5.1.5.{{ $index }}'
+                    descr: CPU {{ $index }}
+                    index: 'multiProcUsage.{{ $index }}.0'
 
         state:
             data:

@@ -15,10 +15,10 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
+ *
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -26,6 +26,7 @@
 namespace App\Http\Controllers\Table;
 
 use App\Models\Port;
+use Illuminate\Support\Arr;
 use LibreNMS\Config;
 use LibreNMS\Util\Html;
 use LibreNMS\Util\Url;
@@ -37,10 +38,15 @@ class CustomersController extends TableController
         return ['port_descr_descr', 'ifName', 'ifDescr', 'ifAlias', 'hostname', 'sysDescr', 'port_descr_speed', 'port_descr_notes'];
     }
 
+    public function sortFields($request)
+    {
+        return ['port_descr_descr', 'hostname', 'ifDescr', 'port_descr_speed', 'port_descr_circuit', 'port_descr_notes'];
+    }
+
     /**
      * Defines the base query for this resource
      *
-     * @param \Illuminate\Http\Request $request
+     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Query\Builder
      */
     public function baseQuery($request)
@@ -55,7 +61,7 @@ class CustomersController extends TableController
     }
 
     /**
-     * @param \Illuminate\Contracts\Pagination\LengthAwarePaginator $paginator
+     * @param  \Illuminate\Contracts\Pagination\LengthAwarePaginator  $paginator
      * @return \Illuminate\Http\JsonResponse
      */
     protected function formatResponse($paginator)
@@ -78,6 +84,7 @@ class CustomersController extends TableController
 
             // add graphs row
             $rows->push($graph_row);
+
             return $rows;
         }, collect());
 
@@ -90,7 +97,7 @@ class CustomersController extends TableController
     }
 
     /**
-     * @param Port $port
+     * @param  Port  $port
      * @return array|\Illuminate\Database\Eloquent\Model|\Illuminate\Support\Collection
      */
     public function formatItem($port)
@@ -128,6 +135,6 @@ class CustomersController extends TableController
 
     private function getTypeStrings()
     {
-        return array_wrap(Config::get('customers_descr', ['cust']));
+        return Arr::wrap(Config::get('customers_descr', ['cust']));
     }
 }

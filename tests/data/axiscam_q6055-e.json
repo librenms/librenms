@@ -1,0 +1,23 @@
+{
+    "os": {
+        "discovery": {
+            "devices": [
+                {
+                    "sysName": null,
+                    "sysObjectID": ".1.3.6.1.4.1.368.1.1",
+                    "sysDescr": "; AXIS Q6055-E; PTZ Dome Network Camera; 7.40.1; Nov 29 2017 18:51; 725.2; 1;",
+                    "sysContact": null,
+                    "version": "7.40.1",
+                    "hardware": " AXIS Q6055-E",
+                    "features": null,
+                    "os": "axiscam",
+                    "type": "appliance",
+                    "serial": "ac:cc:8e:ac:27:c7",
+                    "icon": "axis.svg",
+                    "location": null
+                }
+            ]
+        },
+        "poller": "matches discovery"
+    }
+}

@@ -1,0 +1,813 @@
+GIGAMON-SNMP-MIB DEFINITIONS ::= BEGIN
+
+--
+-- Gigamon MIB objects for agent module
+--
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, enterprises, Integer32, Unsigned32,
+    NOTIFICATION-TYPE                       FROM SNMPv2-SMI
+    sysLocation                             FROM RFC1213-MIB
+    TEXTUAL-CONVENTION, DisplayString,
+    PhysAddress, TimeStamp                  FROM SNMPv2-TC;
+
+gigamonSnmp MODULE-IDENTITY
+    LAST-UPDATED "201805150000Z"
+    ORGANIZATION "www.gigamon.com"
+    CONTACT-INFO
+     "postal:   Gigamon LLC
+                598 Gibraltar Drive
+                Milpitas, CA  95035
+
+       email:   support@gigamon.com"
+    DESCRIPTION
+    "Top-level infrastructure of Gigamon's MIB objects for
+     GigaVUE-212, GigaVUE-420, GigaVUE-2404,
+     GigaVUE-HD and GigaVUE-TA1"
+
+    -- HISTORY
+    REVISION     "201805150000Z"
+    DESCRIPTION
+    " Fixed smilint errors"
+
+    REVISION     "201309250000Z"
+    DESCRIPTION
+    "Added powerSupply OID to gigamonSystem MIB group"
+
+    REVISION     "201304150000Z"
+    DESCRIPTION
+    "Added 'license-mismatch' to gigamonSnmpNotifModuleOperationType"
+
+    REVISION     "201212040000Z"
+    DESCRIPTION
+    "Added 'up' to gigamonSnmpNotifModuleOperationType"
+
+    REVISION     "201205090000Z"
+    DESCRIPTION
+    "Added new information found under gigamonSystem MIB group
+     1) Updated GigaVUE product line support:
+         (a) Added GigaVUE-TA1
+         (b) Removed G-TAP and GigaVUE-MP
+     2) Added speed40000 and speed100000 in gigamonSnmpPortLinkSpeed
+        for representing 40G and 100G port speed"
+
+    REVISION     "201203270000Z"
+    DESCRIPTION
+    "Added 'shutdown' to gigamonSnmpNotifModuleOperationType"
+
+    REVISION     "201103250000Z"
+    DESCRIPTION
+    "Added the following notifications:
+      - gigamonSnmpCpuUtilHighNotification
+      - gigamonSnmpUnexpectedShutdownNotification
+      - gigamonSnmpDiskSpaceLowNotification"
+
+    REVISION     "201103240000Z"
+    DESCRIPTION
+    "Added G-TAP support"
+
+    REVISION     "201103030000Z"
+    DESCRIPTION
+    "Added GigaVUE-HD support"
+
+    REVISION     "201007101000Z"
+    DESCRIPTION
+    "Created notification definitions. First draft"
+
+    ::= { enterprises 26866 }
+
+--
+--  Gigamon's enterprise-specific management objects
+--
+--  top level structure
+--
+--  GigaVUE product line - GigaVUE-212, GigaVUE-420, GigaVUE-2404,
+--                         GigaVUE-HD, GigaVUE-TA1
+gigamonSnmpNotifications OBJECT IDENTIFIER  ::= { gigamonSnmp 1 }
+gigamonGigaVUE OBJECT IDENTIFIER            ::= { gigamonSnmpNotifications 1 }
+gigamonSnmpNotificationObjects OBJECT IDENTIFIER
+                                            ::= { gigamonSnmpNotifications 2 }
+
+gigamonSystem OBJECT IDENTIFIER             ::= { gigamonSnmp 2 }
+
+------------------------------------------
+-- System Information
+------------------------------------------
+manufacturer OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Displays the manufacturer name of the system."
+::= { gigamonSystem 1 }
+
+model OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Displays the model name of the system."
+::= { gigamonSystem 2 }
+
+name OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Displays the name of the system."
+::= { gigamonSystem 3 }
+
+serialNumber OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Displays the serial number of the system."
+::= { gigamonSystem 4 }
+
+systemDescription OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Displays the description of the system."
+::= { gigamonSystem 5 }
+
+version OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Displays the software version of the system."
+::= { gigamonSystem 6 }
+
+chassisModelNumber OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Displays the chassis model number of the system."
+::= { gigamonSystem 7 }
+
+chassisSerialNumber OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Displays the chassis serial number of the system."
+::= { gigamonSystem 8 }
+
+bladeSerialNumbers OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Displays the blade serial numbers in the system."
+::= { gigamonSystem 9 }
+
+firmwareVersion OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Displays the firmware version of the system."
+::= { gigamonSystem 10 }
+
+hardwareVersion OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Displays the hardware version of the system."
+::= { gigamonSystem 11 }
+
+cpuRAMSize OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Displays the CPU RAM size of the system."
+::= { gigamonSystem 12 }
+
+cpuUtilization OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Displays the CPU utilization of the system."
+::= { gigamonSystem 13 }
+
+fans OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Displays the fans in the system."
+::= { gigamonSystem 14 }
+
+temperatureSensors OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Displays the temperature sensors in the system."
+::= { gigamonSystem 15 }
+
+powerSupply OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Displays the power supplies in the system."
+::= { gigamonSystem 16 }
+
+----
+
+-- Product Type Information
+gigamonProducts OBJECT IDENTIFIER  ::= { gigamonSnmp 3 }
+gigamonGV2404 OBJECT IDENTIFIER  ::= { gigamonProducts 1 }
+gigamonGV420 OBJECT IDENTIFIER  ::= { gigamonProducts 2 }
+gigamonGV212 OBJECT IDENTIFIER  ::= { gigamonProducts 3 }
+gigamonGV216 OBJECT IDENTIFIER  ::= { gigamonProducts 4 }
+
+----
+
+------------------------------------------
+--  Objects used in Gigamon Notifications
+------------------------------------------
+gigamonSnmpNotifLevel OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    information(1),
+                    minor(2),
+                    major(3),
+                    critical(4)
+                }
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "It acts as a payload for the level of Gigamon's Notifications."
+::= { gigamonSnmpNotificationObjects 1 }
+
+gigamonSnmpNotifDescription OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "It acts as a payload for the description of Gigamon's Notifications.
+          The value is to describe the reason for the notification."
+::= { gigamonSnmpNotificationObjects 2 }
+
+gigamonSnmpNotifOpType OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    read(1),
+                    write(2),
+                    delete(3),
+                    validate(4),
+                    change(5)
+                }
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "It specifies the type of operation of Gigamon's Notifications."
+::= { gigamonSnmpNotificationObjects 3 }
+
+gigamonSnmpNotifPortName OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The alpha-numerical name of a port shown in Gigamon's Notifications."
+::= { gigamonSnmpNotificationObjects 4 }
+
+gigamonSnmpNotifPortLinkStatus OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    down(0),
+                    up(1)
+                }
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "It indicates port link status of Gigamon's Notifications."
+::= { gigamonSnmpNotificationObjects 5 }
+
+gigamonSnmpNotifTAPRelayStatus OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    none(0),
+                    passive(1),
+                    active(2)
+                }
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "It indicates TAP relay status of Gigamon's Notifications."
+::= { gigamonSnmpNotificationObjects 6 }
+
+gigamonSnmpNotifRxTxType OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    rx(0),
+                    tx(1)
+                }
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "It indicates Incoming/RX or outgoing/TX packets"
+::= { gigamonSnmpNotificationObjects 7 }
+
+gigamonSnmpNotifRxTxErrorType OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    under-size(0),
+                    fragments(1),
+                    obsolete(2),
+                    jabbers(3),
+                    crc-align(4),
+                    unknown(5)
+                }
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "It indicates RX/TX error type of Gigamon's Notifications."
+::= { gigamonSnmpNotificationObjects 8 }
+
+gigamonSnmpNotifCounter OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "32-bit Counter."
+::= { gigamonSnmpNotificationObjects 9 }
+
+gigamonSnmpNotifFirmwareName OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Name of GigaVUE firmware."
+::= { gigamonSnmpNotificationObjects 10 }
+
+gigamonSnmpNotifModuleOperationType OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    removed(0),
+                    inserted(1),
+                    changed(2),
+                    mismatch(3),
+                    shutdown(4),
+                    up(5),
+                    license-mismatch(6)
+                }
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "It indicates the operation performed on module"
+::= { gigamonSnmpNotificationObjects 11 }
+
+gigamonSnmpNotifModuleName OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Module name of GigaVUE module"
+::= { gigamonSnmpNotificationObjects 12 }
+
+gigamonNotifSlotNumber OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    mid-plane(0),
+                    slot-1(1),
+                    slot-2(2),
+                    slot-3(3),
+                    gigaLink-Back(4),
+                    daughter-Card(5),
+                    slot-4(10),
+                    slot-5(11),
+                    slot-6(12),
+                    slot-7(13),
+                    slot-8(14),
+                    slot-CC1(15),
+                    slot-CC2(16)
+                }
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Slot number"
+::= { gigamonSnmpNotificationObjects 13 }
+
+gigamonSnmpNotifUserName OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "User login name typed in"
+::= { gigamonSnmpNotificationObjects 14 }
+
+gigamonSnmpNotifFileName OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Saved configuration file name"
+::= { gigamonSnmpNotificationObjects 15 }
+
+gigamonNotifPowerStatus OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    failure(-1),
+                    abnormal(0),
+                    normal(1)
+                }
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Power Status"
+::= { gigamonSnmpNotificationObjects 16 }
+
+gigamonSnmpNotifHardWareName OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Description of Hardware"
+::= { gigamonSnmpNotificationObjects 17 }
+
+gigamonSnmpNotifGigaVUE420SlotNumber OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    mid-plane(0),
+                    expansion-slot-1(1),
+                    expansion-slot-2(2),
+                    expansion-slot-3(3),
+                    expansion-slot-4(4),
+                    expansion-slot-5(5),
+                    x1-slot(6),
+                    x2-slot(7),
+                    x3-slot(8),
+                    x4-slot(9)
+                }
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Slot number"
+::= { gigamonSnmpNotificationObjects 18 }
+
+gigamonSnmpNotifFanName OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Name of fan"
+::= { gigamonSnmpNotificationObjects 19 }
+
+gigamonNotifFanStatus OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    failure(-1),
+                    abnormal(0),
+                    normal(1)
+                }
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Fan Status"
+::= { gigamonSnmpNotificationObjects 20 }
+
+gigamonSnmpNotifUtilizationAlarm OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    below(0),
+                    exceed(1)
+                }
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "It indicates over-threshold port utilization alarm of Gigamon's Notifications."
+::= { gigamonSnmpNotificationObjects 21 }
+
+gigamonSnmpNotifUtilizationThreshold OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Utilization threshold percentage"
+::= { gigamonSnmpNotificationObjects 22 }
+
+gigamonSnmpBatteryLevel OBJECT-TYPE
+    SYNTAX      INTEGER {
+                batteryChargeComplete(0),
+                downBelow75(1),
+                downBelow50(2),
+                downBelow25(3),
+                shutDownSystem(4)
+    }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        " battery level:
+             0 - battery charge complete
+             1 - battery level has been down below 75%
+             2 - battery level has been down below 50%
+             3 - battery level has been down below 25%
+             4 - battery level has down to 15% or below and shutting down the system "
+    ::= { gigamonSnmpNotificationObjects 23 }
+
+gigamonSnmpPortLinkSpeed OBJECT-TYPE
+    SYNTAX      INTEGER {
+                notApply(0),
+                speed10(1),
+                speed100(2),
+                speed1000(3),
+                speed10000(4),
+                speed40000(5),
+                speed100000(6)
+    }
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        " port link speed:
+             0 - Not Apply if link is down
+             1 - 10 Mbps
+             2 - 100 Mbps
+             3 - 1000 Mbps
+             4 - 10000 Mbps
+             5 - 40000 Mbps
+             6 - 100000 Mbps "
+    ::= { gigamonSnmpNotificationObjects 24 }
+
+gigamonSnmpPortLinkDuplex OBJECT-TYPE
+    SYNTAX      INTEGER {
+                notApply(0),
+                full(1),
+                half(2)
+    }
+    MAX-ACCESS accessible-for-notify
+    STATUS current
+    DESCRIPTION
+        " port link duplex:
+             0 - Not Apply if link is down
+             1 - full duplex
+             2 - half duplex "
+    ::= { gigamonSnmpNotificationObjects 25 }
+
+gigamonSnmpNotifCpuIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+            "Index of CPU, starting from 0"
+    ::= { gigamonSnmpNotificationObjects 26 }
+
+gigamonSnmpNotifFsMountPoint OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+            "Mount point for this filesystem"
+    ::= { gigamonSnmpNotificationObjects 27 }
+
+gigamonSnmpPowerSource OBJECT-TYPE
+    SYNTAX      INTEGER {
+                mainPower(0),
+                poe(1),
+                power48V(2)
+    }
+    MAX-ACCESS read-only
+    STATUS current
+    DESCRIPTION
+        " power source:
+             0 - main power
+             1 - poe(Power over Ethernet)
+             2 - -48V Power "
+    ::= { gigamonSnmpNotificationObjects 28 }
+
+gigamonSnmpNotifBpsUnitName OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Name of BPS unit"
+    ::= { gigamonSnmpNotificationObjects 29 }
+
+gigamonSnmpNotifBpsFailoverStatus OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    primary(0),
+                    secondary(1)
+                }
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "Inline-bypass active unit change"
+    ::= { gigamonSnmpNotificationObjects 30 }
+
+---------------------------
+--  Gigamon Notifications
+---------------------------
+gigamonSnmpResetSystemNotification NOTIFICATION-TYPE
+    OBJECTS     { gigamonSnmpNotifHardWareName,
+                  gigamonSnmpNotifLevel,
+                  gigamonSnmpNotifDescription}
+    STATUS      current
+    DESCRIPTION
+        "System reset notification triggered by cold or warm start."
+    ::= { gigamonGigaVUE 1 }
+
+gigamonSnmpUserAuthFailNotification NOTIFICATION-TYPE
+    OBJECTS     { gigamonSnmpNotifHardWareName,
+                  gigamonSnmpNotifLevel,
+                  gigamonSnmpNotifDescription,
+                  gigamonSnmpNotifUserName}
+    STATUS      current
+    DESCRIPTION
+        "Failure in user login operation is the triggered Event."
+    ::= { gigamonGigaVUE 2 }
+
+gigamonSnmpFirmwareChangeNotification NOTIFICATION-TYPE
+    OBJECTS     { gigamonSnmpNotifHardWareName,
+                  gigamonSnmpNotifLevel,
+                  gigamonSnmpNotifDescription,
+                  gigamonSnmpNotifFirmwareName }
+    STATUS      current
+    DESCRIPTION
+        "Firmware Change notification is the Edge/Level Triggered Event."
+    ::= { gigamonGigaVUE 3 }
+
+gigamonSnmpConfigSaveNotification NOTIFICATION-TYPE
+    OBJECTS     { gigamonSnmpNotifHardWareName,
+                  gigamonSnmpNotifLevel,
+                  gigamonSnmpNotifDescription,
+                  gigamonSnmpNotifFileName }
+    STATUS      current
+    DESCRIPTION
+        "Config save notification is the Edge/Level Triggered Event."
+    ::= { gigamonGigaVUE 4 }
+
+gigamonSnmpModuleChangeNotification NOTIFICATION-TYPE
+    OBJECTS     { gigamonSnmpNotifHardWareName,
+                  gigamonSnmpNotifLevel,
+                  gigamonSnmpNotifDescription,
+                  gigamonSnmpNotifModuleOperationType,
+                  gigamonSnmpNotifModuleName,
+                  gigamonNotifSlotNumber  }
+    STATUS      current
+    DESCRIPTION
+        "GigaVUE HW module swapping is the triggered Event."
+    ::= { gigamonGigaVUE 5 }
+
+gigamonSnmpPacketDropNotification NOTIFICATION-TYPE
+    OBJECTS     { gigamonSnmpNotifHardWareName,
+                  gigamonSnmpNotifLevel,
+                  gigamonSnmpNotifDescription,
+                  gigamonSnmpNotifPortName,
+                  gigamonSnmpNotifCounter }
+    STATUS      current
+    DESCRIPTION
+        "Packet Drop notification is the Edge/Level Triggered Event."
+    ::= { gigamonGigaVUE 6 }
+
+
+gigamonSnmpTapRelayChangeNotification NOTIFICATION-TYPE
+    OBJECTS     { gigamonSnmpNotifHardWareName,
+                  gigamonSnmpNotifLevel,
+                  gigamonSnmpNotifDescription,
+                  gigamonSnmpNotifPortName,
+                  gigamonSnmpNotifTAPRelayStatus }
+    STATUS      current
+    DESCRIPTION
+        "TAP relay change notification is the Edge/Level Triggered Event."
+    ::= { gigamonGigaVUE 7 }
+
+gigamonSnmpPortLinkChangeNotification NOTIFICATION-TYPE
+    OBJECTS     { gigamonSnmpNotifHardWareName,
+                  gigamonSnmpNotifLevel,
+                  gigamonSnmpNotifDescription,
+                  gigamonSnmpNotifPortName,
+                  gigamonSnmpNotifPortLinkStatus }
+    STATUS      current
+    DESCRIPTION
+        "Port link status change notification is the Edge/Level Triggered Event."
+    ::= { gigamonGigaVUE 8 }
+
+gigamonSnmpRxTxErrorNotification NOTIFICATION-TYPE
+    OBJECTS     { gigamonSnmpNotifHardWareName,
+                  gigamonSnmpNotifLevel,
+                  gigamonSnmpNotifDescription,
+                  gigamonSnmpNotifPortName,
+                  gigamonSnmpNotifRxTxType,
+                  gigamonSnmpNotifRxTxErrorType,
+                  gigamonSnmpNotifCounter  }
+    STATUS      current
+    DESCRIPTION
+        "Packet receive/transmit error notification is the Edge/Level Triggered Event."
+    ::= { gigamonGigaVUE 9 }
+
+gigamonPowerChangeNotification NOTIFICATION-TYPE
+    OBJECTS     { gigamonSnmpNotifHardWareName,
+                  gigamonSnmpNotifLevel,
+                  gigamonSnmpNotifDescription,
+                  gigamonNotifPowerStatus }
+    STATUS      current
+    DESCRIPTION
+        "Power supply status change notification is the Edge/Level Triggered Event."
+    ::= { gigamonGigaVUE 10 }
+
+gigamonFanChangeNotification NOTIFICATION-TYPE
+    OBJECTS     { gigamonSnmpNotifHardWareName,
+                  gigamonSnmpNotifLevel,
+                  gigamonSnmpNotifDescription,
+                  gigamonSnmpNotifFanName,
+                  gigamonNotifFanStatus }
+    STATUS      current
+    DESCRIPTION
+        "Fan status change notification is the Edge/Level Triggered Event."
+    ::= { gigamonGigaVUE 11 }
+
+gigamonSnmpOverThresholdChangeNotification NOTIFICATION-TYPE
+    OBJECTS     { gigamonSnmpNotifHardWareName,
+                  gigamonSnmpNotifLevel,
+                  gigamonSnmpNotifDescription,
+                  gigamonSnmpNotifPortName,
+                  gigamonSnmpNotifUtilizationAlarm,
+                  gigamonSnmpNotifUtilizationThreshold }
+    STATUS      current
+    DESCRIPTION
+        "Utilization alarm notification is the Edge/Level Triggered Event."
+    ::= { gigamonGigaVUE 12 }
+
+gigamonSnmpBatteryLevelChangeNotification NOTIFICATION-TYPE
+    OBJECTS     { gigamonSnmpNotifHardWareName,
+                  gigamonSnmpNotifLevel,
+                  gigamonSnmpNotifDescription,
+                  gigamonSnmpBatteryLevel }
+    STATUS      current
+    DESCRIPTION
+        "Battery level down notification."
+    ::= { gigamonGigaVUE 13 }
+
+gigamonLinkSpeedStatusChangeNotification NOTIFICATION-TYPE
+    OBJECTS     { gigamonSnmpNotifHardWareName,
+                  gigamonSnmpNotifLevel,
+                  gigamonSnmpNotifDescription,
+                  gigamonSnmpNotifPortName,
+                  gigamonSnmpPortLinkSpeed,
+                  gigamonSnmpPortLinkDuplex,
+                  gigamonSnmpNotifPortLinkStatus }
+    STATUS      current
+    DESCRIPTION
+        "Link status or speed change notification. "
+    ::= { gigamonGigaVUE 14 }
+
+gigamonPowerSourceChangeNotification NOTIFICATION-TYPE
+    OBJECTS     { gigamonSnmpNotifHardWareName,
+                  gigamonSnmpNotifLevel,
+                  gigamonSnmpNotifDescription,
+                  gigamonSnmpPowerSource,
+                  gigamonNotifPowerStatus }
+    STATUS      current
+    DESCRIPTION
+        "Power source or status change notification."
+    ::= { gigamonGigaVUE 15 }
+
+gigamonSnmpCpuUtilHighNotification NOTIFICATION-TYPE
+    OBJECTS { gigamonSnmpNotifHardWareName,
+              gigamonSnmpNotifLevel,
+              gigamonSnmpNotifDescription,
+              gigamonSnmpNotifCpuIndex,
+              gigamonSnmpNotifUtilizationThreshold }
+    STATUS  current
+    DESCRIPTION
+            "The average CPU utilization in the past minute has gone
+            above the acceptable threshold"
+    ::= { gigamonGigaVUE 16 }
+
+gigamonSnmpUnexpectedShutdownNotification NOTIFICATION-TYPE
+    OBJECTS { gigamonSnmpNotifHardWareName,
+              gigamonSnmpNotifLevel,
+              gigamonSnmpNotifDescription }
+    STATUS  current
+    DESCRIPTION
+            "The system has shut down unexpectedly"
+    ::= { gigamonGigaVUE 17 }
+
+gigamonSnmpDiskSpaceLowNotification NOTIFICATION-TYPE
+    OBJECTS { gigamonSnmpNotifHardWareName,
+              gigamonSnmpNotifLevel,
+              gigamonSnmpNotifDescription,
+              gigamonSnmpNotifFsMountPoint }
+    STATUS  current
+    DESCRIPTION
+            "Free space in one of the filesystems is low"
+    ::= { gigamonGigaVUE 18 }
+
+gigamonSnmpWatchdogResetNotification NOTIFICATION-TYPE
+    OBJECTS     { gigamonSnmpNotifHardWareName,
+                  gigamonSnmpNotifLevel,
+                  gigamonSnmpNotifDescription}
+    STATUS      current
+    DESCRIPTION
+        "System reset notification triggered by watchdog timer."
+    ::= { gigamonGigaVUE 19 }
+
+gigamonSnmpBpsFailoverNotification NOTIFICATION-TYPE
+    OBJECTS     { gigamonSnmpNotifHardWareName,
+                  gigamonSnmpNotifLevel,
+                  gigamonSnmpNotifDescription,
+                  gigamonSnmpNotifBpsUnitName,
+                  gigamonSnmpNotifBpsFailoverStatus }
+    STATUS      current
+    DESCRIPTION
+        "Inline-bypass active unit change notification is the Edge/Level Triggered Event."
+    ::= { gigamonGigaVUE 20 }
+
+END

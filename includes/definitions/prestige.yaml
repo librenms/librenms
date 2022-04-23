@@ -4,6 +4,7 @@ group: zyxel
 type: network
 icon: zyxel
 discovery:
-    - sysDescr_regex:
-        - '/^Prestige/'
-        - '/^P-.*-/'
+    -
+        sysDescr_regex:
+            - '/^Prestige/'
+            - '/^P-.*-/'

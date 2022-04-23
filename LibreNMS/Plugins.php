@@ -15,12 +15,12 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>
  *
- * @package    LibreNMS
- * @subpackage Plugins
  * @author     LibreNMS Group
- * @link       http://librenms.org
+ *
+ * @link       https://www.librenms.org
+ *
  * @copyright  2016
  */
 
@@ -32,10 +32,10 @@ use Log;
 /**
  * Handles loading of plugins
  *
- * @package    LibreNMS
- * @subpackage Plugins
  * @author     LibreNMS Group
- * @link       http://librenms.org
+ *
+ * @link       https://www.librenms.org
+ *
  * @copyright  2016
  *
  * Supported hooks
@@ -50,39 +50,38 @@ class Plugins
     /**
      * Array of plugin hooks
      *
-     * @var array
+     * @var array|null
      */
     private static $plugins = null;
 
     /**
      * Start loading active plugins
      *
-     * @return boolean
+     * @return bool
      */
     public static function start()
     {
-
-        if (!is_null(self::$plugins)) {
+        if (! is_null(self::$plugins)) {
             return false;
         }
 
         self::$plugins = [];
-        $plugin_dir    = Config::get('plugin_dir');
+        $plugin_dir = Config::get('plugin_dir');
 
-        if (!file_exists($plugin_dir)) {
+        if (! file_exists($plugin_dir)) {
             return false;
         }
 
         $plugin_files = Plugin::isActive()->get()->toArray();
         foreach ($plugin_files as $plugins) {
-            $plugin_file = $plugin_dir.'/'.$plugins['plugin_name'].'/'.$plugins['plugin_name'].'.php';
+            $plugin_file = $plugin_dir . '/' . $plugins['plugin_name'] . '/' . $plugins['plugin_name'] . '.php';
             $plugin_info = pathinfo($plugin_file);
 
             if ($plugin_info['extension'] !== 'php') {
                 continue;
             }
 
-            if (!is_file($plugin_file)) {
+            if (! is_file($plugin_file)) {
                 continue;
             }
 
@@ -95,8 +94,8 @@ class Plugins
     /**
      * Load plugin
      *
-     * @param  string $file       Full path and filename of plugin
-     * @param  string $pluginName Plugin name without any namespace
+     * @param  string  $file  Full path and filename of plugin
+     * @param  string  $pluginName  Plugin name without any namespace
      * @return object|null
      */
     public static function load($file, $pluginName)
@@ -104,11 +103,11 @@ class Plugins
         chdir(Config::get('install_dir') . '/html');
         $plugin = self::getInstance($file, $pluginName);
 
-        if (!is_null($plugin)) {
+        if (! is_null($plugin)) {
             $class = get_class($plugin);
             $hooks = get_class_methods($class);
 
-            foreach ((array)$hooks as $hookName) {
+            foreach ((array) $hooks as $hookName) {
                 if ($hookName[0] != '_') {
                     self::$plugins[$hookName][] = $class;
                 }
@@ -124,15 +123,15 @@ class Plugins
      * Get an instance of this plugin
      * Search various namespaces and include files if needed.
      *
-     * @param string $file
-     * @param string $pluginName
+     * @param  string  $file
+     * @param  string  $pluginName
      * @return object|null
      */
     private static function getInstance($file, $pluginName)
     {
         $ns_prefix = 'LibreNMS\\Plugins\\';
-        $ns_psr4   = $ns_prefix.$pluginName.'\\'.$pluginName;
-        $ns_plugin = $ns_prefix.$pluginName;
+        $ns_psr4 = $ns_prefix . $pluginName . '\\' . $pluginName;
+        $ns_plugin = $ns_prefix . $pluginName;
         $ns_global = $pluginName;
 
         if (class_exists($ns_psr4)) {
@@ -156,14 +155,14 @@ class Plugins
     /**
      * Get all plugins implementing a specific hook.
      *
-     * @param  string $hook Name of the hook to get count for
-     * @return integer|boolean
+     * @param  string  $hook  Name of the hook to get count for
+     * @return int|bool
      */
     public static function countHooks($hook)
     {
         // count all plugins implementing a specific hook
         self::start();
-        if (!empty(self::$plugins[$hook])) {
+        if (! empty(self::$plugins[$hook])) {
             return count(self::$plugins[$hook]);
         } else {
             return false;
@@ -173,8 +172,8 @@ class Plugins
     /**
      * Call hook for plugin.
      *
-     * @param string $hook Name of hook to call
-     * @param array|false $params Optional array of parameters for hook
+     * @param  string  $hook  Name of hook to call
+     * @param  array|false  $params  Optional array of parameters for hook
      * @return string
      */
     public static function call($hook, $params = false)
@@ -183,10 +182,10 @@ class Plugins
         self::start();
 
         ob_start();
-        if (!empty(self::$plugins[$hook])) {
+        if (! empty(self::$plugins[$hook])) {
             foreach (self::$plugins[$hook] as $name) {
                 try {
-                    if (!is_array($params)) {
+                    if (! is_array($params)) {
                         @call_user_func([$name, $hook]);
                     } else {
                         @call_user_func_array([$name, $hook], $params);
@@ -200,17 +199,55 @@ class Plugins
         ob_end_clean();
 
         chdir(Config::get('install_dir'));
+
         return $output;
     }
 
     /**
      * Get count of hooks.
      *
-     * @return integer
+     * @return int
      */
     public static function count()
     {
         self::start();
+
         return count(self::$plugins);
+    }
+
+    public static function scanNew()
+    {
+        $countInstalled = 0;
+
+        if (file_exists(\LibreNMS\Config::get('plugin_dir'))) {
+            $plugin_files = array_diff(scandir(\LibreNMS\Config::get('plugin_dir')), ['..', '.']);
+            $plugin_files = array_diff($plugin_files, Plugin::versionOne()->pluck('plugin_name')->toArray());
+            foreach ($plugin_files as $name) {
+                if (is_dir(\LibreNMS\Config::get('plugin_dir') . '/' . $name)
+                    && is_file(\LibreNMS\Config::get('plugin_dir') . '/' . $name . '/' . $name . '.php')) {
+                    Plugin::create(['plugin_name' => $name, 'plugin_active' => false, 'version' => 1]);
+                    $countInstalled++;
+                }
+            }
+        }
+
+        return $countInstalled;
+    }
+
+    public static function scanRemoved()
+    {
+        $countRemoved = 0;
+
+        if (file_exists(\LibreNMS\Config::get('plugin_dir'))) {
+            $plugin_files = array_diff(scandir(\LibreNMS\Config::get('plugin_dir')), ['.', '..', '.gitignore']);
+            $plugins = Plugin::versionOne()->whereNotIn('plugin_name', $plugin_files)->select('plugin_id')->get();
+            foreach ($plugins as $plugin) {
+                if ($plugin->delete()) {
+                    $countRemoved++;
+                }
+            }
+        }
+
+        return $countRemoved;
     }
 }

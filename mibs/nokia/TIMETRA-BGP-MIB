@@ -249,13 +249,13 @@ BgpPeerGroupName                 ::= TEXTUAL-CONVENTION
     STATUS      current
     DESCRIPTION
         "the name of a Peer Group."
-    SYNTAX      DisplayString (SIZE (1..32))
+    SYNTAX      DisplayString (SIZE (1..64))
 
 BgpPeerGroupNameOrEmpty          ::= TEXTUAL-CONVENTION
     STATUS      current
     DESCRIPTION
         "the name of a Peer Group."
-    SYNTAX      DisplayString (SIZE (0..32))
+    SYNTAX      DisplayString (SIZE (0..64))
 
 BgpPrefixLimit                   ::= TEXTUAL-CONVENTION
     STATUS      current
@@ -592,7 +592,7 @@ TmnxAddPathAddressFamily         ::= TEXTUAL-CONVENTION
 TmnxAddPathSendLimit             ::= TEXTUAL-CONVENTION
     STATUS      current
     DESCRIPTION
-        "The value of TmnxAddPathSendLimit specifies the  number of
+        "The value of TmnxAddPathSendLimit specifies the maximum number of
          paths that can be advertised to ADD-PATH peers per prefix."
     SYNTAX      Integer32 (0..16)
 
@@ -621,9 +621,9 @@ TmnxIpNhChgFamily                ::= TEXTUAL-CONVENTION
     SYNTAX      BITS {
         labelIpv4 (0),
         labelIpv6 (1),
-        reserved2 (2),
-        reserved3 (3),
-        reserved4 (4)
+        vpnIpv4   (2),
+        vpnIpv6   (3),
+        evpn      (4)
     }
 
 TmnxIpFamilyIdentifier           ::= TEXTUAL-CONVENTION
@@ -15346,7 +15346,7 @@ tBgpPeerNgParamsExtInheritanceLo OBJECT-TYPE
          tBgpPeerNgMultipathEligible        0x00004000
          tBgpPeerNgRemovePrivateReplace     0x00008000
          tBgpPeerNgBlockPrefixSID           0x00010000
-         tBgpPeerNgSelLabelIpv4Inst            0x00020000
+         tBgpPeerNgSelLabelIpv4Inst         0x00020000
          tBgpPeerNgDefOriginate             0x00040000
 
          When the bit for an object is set to one, then the object's

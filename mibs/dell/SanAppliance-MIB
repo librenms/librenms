@@ -1,0 +1,104 @@
+--
+-- Copyright (c) 2000  Dell Computer Corporation.
+-- Module Name: sanappl.mib
+-- Abstract:
+--	Defines the Dell San Appliance SNMP interface.
+-- Authors:
+--   
+--
+-- Modified to include updated storage, SanRoot, and SanAppliance identifiers
+
+SanAppliance-MIB DEFINITIONS ::= BEGIN
+
+	IMPORTS
+	TRAP-TYPE FROM RFC-1215
+		enterprises
+			FROM RFC1155-SMI
+		OBJECT-TYPE
+			FROM RFC-1212
+		DisplayString
+			FROM RFC1213-MIB;
+
+		dell			OBJECT IDENTIFIER ::= { enterprises 674 }
+		storage			OBJECT IDENTIFIER ::= { dell 10893 }
+		sanRoot         	OBJECT IDENTIFIER ::= { storage 2 }
+                sanAppliance            OBJECT IDENTIFIER ::= { sanRoot 1 }
+		
+-- SanAppliance MIB
+	                              
+	sanApplGlobalStatus OBJECT-TYPE
+		SYNTAX INTEGER {
+			critical (1),
+			warning  (2),
+			normal   (3),
+			unknown  (4) }
+		ACCESS read-only
+		STATUS mandatory
+		DESCRIPTION
+			"Global health information for the Dell 
+			 San Appliance."
+			::= {sanAppliance 1}
+	                              
+-- Following Array Manager objects are used in Trap generation
+
+	sanApplEvts OBJECT IDENTIFIER ::= { sanAppliance 200 }
+
+sanApplName             OBJECT-TYPE
+                        SYNTAX OCTET STRING
+                        ACCESS read-only
+                        STATUS mandatory
+                        DESCRIPTION
+                                "Dell San Appliance"
+                        ::= { sanApplEvts 1 }
+    
+
+-- Trap definitions which use variables defined in this MIB.
+
+-- San Appliance traps.
+
+	sanApplFailed TRAP-TYPE
+		ENTERPRISE sanApplEvts
+		VARIABLES { sanApplName }
+		DESCRIPTION
+			"The Dell PowerVault 530F SAN Appliance named $1 is in a critical state."
+	--#TYPE "The Dell PowerVault 530F SAN Appliance named $1 has gone into a critical state."
+	--#ARGUMENTS { 0 }
+	--#SEVERITY CRITICAL
+	--#STATE DEGRADED
+	::= 1
+
+	sanApplNormal TRAP-TYPE
+		ENTERPRISE sanApplEvts
+		VARIABLES { sanApplName }
+		DESCRIPTION
+			"The Dell PowerVault 530F SAN Appliance named $1 is back in a normal state."
+	--#TYPE "The Dell PowerVault 530F SAN Appliance named $1 has returned to normal."
+	--#ARGUMENTS { 0 }
+	--#SEVERITY INFORMATIONAL
+	--#STATE OPERATIONAL
+	::= 2
+
+	sanApplStarted TRAP-TYPE
+		ENTERPRISE sanApplEvts
+		VARIABLES { sanApplName }
+		DESCRIPTION
+			"The Dell PowerVault 530F SAN Appliance named $1 is operational."
+	--#TYPE "The Dell PowerVault 530F SAN Appliance named $1 has started."
+	--#ARGUMENTS { 0 }
+	--#SEVERITY INFORMATIONAL
+	--#STATE OPERATIONAL
+	::= 3
+
+	sanApplStopped TRAP-TYPE
+		ENTERPRISE sanApplEvts
+		VARIABLES { sanApplName }
+		DESCRIPTION
+			"The Dell PowerVault 530F SAN Appliance named $1 is no longer running."
+	--#TYPE "The Dell PowerVault 530F SAN Appliance named $1 has stopped."
+	--#ARGUMENTS { 0 }
+	--#SEVERITY INFORMATIONAL
+	--#STATE NONOPERATIONAL
+	::= 4
+
+
+END

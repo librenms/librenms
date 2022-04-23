@@ -1,16 +1,15 @@
-source: Support/1-Minute-Polling.md
-path: blob/master/doc/
-
-# Information
+# 1-Minute Polling
 
 We now have support for polling data at intervals to fit your needs.
 
 > Please be aware of the following:
 
+- If you just want faster up/down alerts, [Fast Ping](../Extensions/Fast-Ping-Check.md) is a much
+  easier path to that goal.
 - You must also change your cron entry for `poller-wrapper.py` for
   this to work (if you change from the default 300 seconds).
 - Your polling _MUST_ complete in the time you configure for the
-  heartbeat step value. See `/pollers/tab=pollers/` in your WebUI for
+  heartbeat step value. See `/poller` in your WebUI for
   your current value.
 - This will only affect RRD files created from the moment you change
   your settings.
@@ -33,7 +32,7 @@ for step and heartbeat intervals:
 - Heartbeat is how long to wait for data before registering a null
   value, i.e 120 seconds.
 
-# Converting existing RRD files
+## Converting existing RRD files
 
 We provide a basic script to convert the default rrd files we generate
 to utilise your configured step and heartbeat values. Please do ensure

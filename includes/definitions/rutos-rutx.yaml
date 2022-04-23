@@ -1,0 +1,21 @@
+os: rutos-rutx
+type: network
+text: "Teltonika RutOS RUTX Series"
+icon: teltonika
+ifXmcbc: true
+ifname: true
+mib_dir: teltonika
+over:
+    - { graph: device_processor, text: "Processor Usage" }
+    - { graph: device_mempool, text: "Memory Usage" }
+    - { graph: device_signal, text: 'Mobile Signal' }
+processor_stacked: true
+discovery:
+    -
+        sysObjectID: .1.3.6.1.4.1.8072.3.2.10
+        snmpget:
+            oid: .1.3.6.1.4.1.48690.1.3.0
+            op: starts
+            value:
+                - RUTX
+                - RUT360

@@ -4,6 +4,7 @@ namespace App\Console;
 
 use Illuminate\Console\Scheduling\Schedule;
 use Illuminate\Foundation\Console\Kernel as ConsoleKernel;
+use LibreNMS\Util\Debug;
 use LibreNMS\Util\Version;
 
 class Kernel extends ConsoleKernel
@@ -36,7 +37,7 @@ class Kernel extends ConsoleKernel
      */
     protected function commands()
     {
-        $this->load(__DIR__.'/Commands');
+        $this->load(__DIR__ . '/Commands');
 
         require base_path('routes/console.php');
 
@@ -49,7 +50,9 @@ class Kernel extends ConsoleKernel
     {
         if (is_null($this->artisan)) {
             parent::getArtisan();
+            /** @phpstan-ignore-next-line */
             $this->artisan->setName(\LibreNMS\Config::get('project_name', 'LibreNMS'));
+            /** @phpstan-ignore-next-line */
             $this->artisan->setVersion(Version::get()->local());
         }
 
@@ -61,10 +64,9 @@ class Kernel extends ConsoleKernel
         // intercept input and check for debug
         if ($input->hasParameterOption(['-d', '--debug', '-vv', '-vvv'], true)) {
             if ($input->hasParameterOption(['-vvv'], true)) {
-                global $vdebug;
-                $vdebug = true;
+                Debug::setVerbose();
             }
-            $this->app->booted('set_debug');
+            $this->app->booted('\LibreNMS\Util\Debug::set');
         }
 
         return parent::handle($input, $output);

@@ -10,13 +10,13 @@ $psus = trim(snmp_walk($device, $psu_oid, '-Osqn'));
 foreach (explode("\n", $psus) as $psu) {
     $psu = trim($psu);
     if ($psu) {
-        list($oid, $presence) = explode(' ', $psu, 2);
+        [$oid, $presence] = explode(' ', $psu, 2);
         if ($presence != 2) {
             $split_oid = explode('.', $oid);
             $current_id = $split_oid[(count($split_oid) - 1)];
-            $current_oid = $psu_usage_oid.$current_id;
-            $psu_max_oid = $psu_max_usage_oid.$current_id;
-            $descr = 'PSU '.$current_id.' output';
+            $current_oid = $psu_usage_oid . $current_id;
+            $psu_max_oid = $psu_max_usage_oid . $current_id;
+            $descr = 'PSU ' . $current_id . ' output';
             $value = snmp_get($device, $current_oid, '-Oqv');
             $max_value = snmp_get($device, $psu_max_oid, '-Oqv');
             discover_sensor($valid['sensor'], 'power', $device, $current_oid, $current_id, $sensor_type, $descr, 1, 1, null, null, null, $max_value, $value);

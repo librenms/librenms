@@ -1,6 +1,3 @@
-source: Extensions/RRDTune.md
-path: blob/master/doc/
-
 # RRDTune
 
 When we create rrd files for ports, we currently do so with a max
@@ -12,7 +9,7 @@ of 10M).
 
 To enable this you can do so in three ways!
 
-- Globally under Global Settings -> External Settings -> RRDTool Setup
+- Globally under Global Settings -> Poller -> Datastore: RRDTool
 - For the actual device, Edit Device -> Misc
 - For each port, Edit Device -> Port Settings
 

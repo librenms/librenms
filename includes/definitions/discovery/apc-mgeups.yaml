@@ -1,5 +1,12 @@
 mib: MG-SNMP-UPS-MIB
 modules:
+    os:
+        hardware:
+            - MG-SNMP-UPS-MIB::upsmgIdentFamilyName.0
+            - MG-SNMP-UPS-MIB::upsmgIdentModelName.0
+        hardware_template: '{{ MG-SNMP-UPS-MIB::upsmgIdentFamilyName.0 }} {{ MG-SNMP-UPS-MIB::upsmgIdentModelName.0 }}'
+        serial: MG-SNMP-UPS-MIB::upsmgIdentSerialNumber.0
+        version: MG-SNMP-UPS-MIB::upsmgIdentFirmwareVersion.0
     sensors:
         power:
             data:

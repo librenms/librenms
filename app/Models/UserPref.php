@@ -15,29 +15,32 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
+ *
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
 namespace App\Models;
 
-use Illuminate\Database\Eloquent\Builder;
-
 class UserPref extends BaseModel
 {
     public $timestamps = false;
     public $incrementing = false;
     protected $table = 'users_prefs';
+    /** @var array */
     protected $primaryKey = ['user_id', 'pref'];
     protected $fillable = ['user_id', 'pref', 'value'];
 
     // ---- Helper Functions ----
     public static function getPref(User $user, $pref)
     {
+        if ($user->relationLoaded('preferences')) {
+            return optional($user->preferences->firstWhere('pref', $pref))->value;
+        }
+
         return $user->preferences()->where('pref', $pref)->value('value');
     }
 
@@ -83,20 +86,20 @@ class UserPref extends BaseModel
 
     public function user()
     {
-        return $this->belongsTo('App\Models\User', 'user_id');
+        return $this->belongsTo(\App\Models\User::class, 'user_id');
     }
-
 
     /**
      * Set the keys for a save update query. (no primary key)
      *
-     * @param  \Illuminate\Database\Eloquent\Builder $query
+     * @param  \Illuminate\Database\Eloquent\Builder  $query
      * @return \Illuminate\Database\Eloquent\Builder
      */
-    protected function setKeysForSaveQuery(Builder $query)
+    protected function setKeysForSaveQuery($query)
     {
+        /** @var array */
         $keys = $this->getKeyName();
-        if (!is_array($keys)) {
+        if (! is_array($keys)) {
             return parent::setKeysForSaveQuery($query);
         }
 
@@ -110,7 +113,7 @@ class UserPref extends BaseModel
     /**
      * Get the primary key value for a save query. (no primary key)
      *
-     * @param mixed $keyName
+     * @param  mixed  $keyName
      * @return mixed
      */
     protected function getKeyForSaveQuery($keyName = null)

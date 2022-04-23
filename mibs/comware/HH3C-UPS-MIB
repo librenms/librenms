@@ -1,0 +1,143 @@
+-- ===========================================================
+-- Copyright (C) 2007 New H3C Tech. Co., Ltd. All rights reserved.
+-- Description: The MIB is designed to manage the UPS.
+-- Reference:
+-- Version: V1.0
+-- History:
+--   V1.0 2007-09-04 created by lizhicheng
+-- =================================================================
+HH3C-UPS-MIB DEFINITIONS ::= BEGIN
+IMPORTS
+        Counter32, Integer32,
+        OBJECT-TYPE, MODULE-IDENTITY, NOTIFICATION-TYPE
+    FROM SNMPv2-SMI
+        TEXTUAL-CONVENTION
+    FROM SNMPv2-TC
+        InetAddressType, InetAddress
+    FROM INET-ADDRESS-MIB
+        entPhysicalIndex
+    FROM ENTITY-MIB
+        hh3cCommon
+    FROM HH3C-OID-MIB;
+
+hh3cUps MODULE-IDENTITY
+    LAST-UPDATED "200709041452Z"
+    ORGANIZATION
+        "New H3C Technologies Co., Ltd."
+    CONTACT-INFO
+        "Platform Team New H3C Technologies Co., Ltd.
+         Hai-Dian District Beijing P.R. China
+         Http://www.h3c.com
+         Zip:100085"
+    DESCRIPTION
+        "This MIB describes the general information of UPS(Uninterrupted
+        Power Supply) device."
+    ::= { hh3cCommon 82 }
+
+hh3cUpsMibObjects OBJECT IDENTIFIER ::= { hh3cUps 1 }
+
+Hh3cActionType  ::=   TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "A control variable used to trigger an operator events,
+        when read, always returns a value of invalid."
+    SYNTAX      INTEGER
+        {
+            action(1),
+            invalid(2)
+        }
+
+-- UPS Entity Extend Table
+-- This table described some information about the UPS.
+
+hh3cUpsConfigEnable OBJECT-TYPE
+    SYNTAX      Hh3cActionType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object identifies the operation which will make the UPS(Uninterrupted
+        Power Supply)'s new configure become effective."
+    ::={ hh3cUpsMibObjects 1 }
+
+hh3cUpsConfigTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF Hh3cUpsConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This table contains an entry for user to get some information
+        about the UPS device."
+    ::= { hh3cUpsMibObjects 2 }
+
+
+
+hh3cUpsConfigEntry OBJECT-TYPE
+    SYNTAX      Hh3cUpsConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry containing management information applicable
+        to a particular UPS."
+    INDEX
+        {
+            hh3cUpsIndex
+        }
+
+    ::= { hh3cUpsConfigTable 1 }
+
+Hh3cUpsConfigEntry ::= SEQUENCE
+    {
+        hh3cUpsIndex            Integer32,
+        hh3cUpsType             INTEGER,
+        hh3cUpsIpAddress        InetAddress,
+        hh3cUpsIpAddressType    InetAddressType
+    }
+
+hh3cUpsIndex OBJECT-TYPE
+    SYNTAX      Integer32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "This object identifies the index of hh3cUpsConfigTable. The object
+        identified by this index is the same object as identified by the
+        same value of entPhysicalIndex."
+    ::= { hh3cUpsConfigEntry 1 }
+
+hh3cUpsType OBJECT-TYPE
+    SYNTAX      INTEGER
+        {
+            emersonUart(1),
+            mge(2),
+            common(3),
+            emersonEth(4),
+            liebert(5)
+        }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object identifies the type of UPS.
+        The value 'emersonUart' means an EMERSON UPS support UART interface.
+        The value 'mge' means a MGE UPS support ethernet interface.
+        The value 'common' means a common UPS support standard UPSMIB.
+        The value 'emersonEth' means an EMERSON UPS support ethernet interface.
+        The value 'liebert' means a Liebert UPS support ethernet interface."
+    ::= { hh3cUpsConfigEntry 2 }
+
+hh3cUpsIpAddress OBJECT-TYPE
+    SYNTAX      InetAddress
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object describes the address of UPS. The value of this object
+        is invalid if the UPS do not support ethernet interface."
+    ::= { hh3cUpsConfigEntry 3 }
+
+hh3cUpsIpAddressType OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This object describes the address type of UPS. The value of this object
+        is invalid if the UPS do not support ethernet interface."
+    ::= { hh3cUpsConfigEntry 4 }
+
+END

@@ -49,6 +49,7 @@ IMPORTS
     svcDhcpLseStateNewChAddr,
     svcDhcpLseStateNewCiAddr
                                                          FROM TIMETRA-SERV-MIB
+    ClassIndex, ClassIndexOrNone,
     DateAndTimeOrEmpty, Dot1PPriority,
     IpAddressPrefixLength, SdpBindId,
     TCIRRate, TCpmProtPolicyID, TDSCPValue,
@@ -4173,7 +4174,7 @@ VRtrIpAddrEntry                  ::= SEQUENCE
 }
 
 vRiaIndex                        OBJECT-TYPE
-    SYNTAX      Integer32 (1..256)
+    SYNTAX      Integer32 (1..2048)
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION
@@ -4182,10 +4183,9 @@ vRiaIndex                        OBJECT-TYPE
          Those row entries with vRiaIndex = 1 represent the primary
          IP address for the interface identified by the vRtrID and
          vRtrIfIndex pair.  Row entries with other values for vRiaIndex
-         are secondary IP addresses.  There must always be a primary
-         IP address assigned an interface.  This implies that if the
-         primary address row is deleted, the secondary rows are also
-         deleted."
+         are secondary IP addresses.  The values greater than 256 are
+         reserved for internal interfaces only and cannot be used to
+         create an IP address entry."
     ::= { vRtrIpAddrEntry 1 }
 
 vRiaRowStatus                    OBJECT-TYPE
@@ -8248,8 +8248,8 @@ VRtrInetStaticRouteEntry         ::= SEQUENCE
     vRtrInetStaticRouteDynBgpNH      InetAddress,
     vRtrInetStaticRouteGenerateIcmp  TruthValue,
     vRtrInetStaticRouteValidateNH    TruthValue,
-    vRtrInetStaticRouteSrcClassIndex Unsigned32,
-    vRtrInetStaticRouteDstClassIndex Unsigned32,
+    vRtrInetStaticRouteSrcClassIndex ClassIndexOrNone,
+    vRtrInetStaticRouteDstClassIndex ClassIndexOrNone,
     vRtrInetStaticRouteHoldTimeLeft  Unsigned32,
     vRtrInetStaticRouteLoadBalWeight Unsigned32
 }
@@ -8894,7 +8894,7 @@ vRtrInetStaticRouteValidateNH    OBJECT-TYPE
     ::= { vRtrInetStaticRouteEntry 39 }
 
 vRtrInetStaticRouteSrcClassIndex OBJECT-TYPE
-    SYNTAX      Unsigned32 (0..255)
+    SYNTAX      ClassIndexOrNone
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
@@ -8906,7 +8906,7 @@ vRtrInetStaticRouteSrcClassIndex OBJECT-TYPE
     ::= { vRtrInetStaticRouteEntry 40 }
 
 vRtrInetStaticRouteDstClassIndex OBJECT-TYPE
-    SYNTAX      Unsigned32 (0 | 1..255)
+    SYNTAX      ClassIndexOrNone
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
@@ -9752,8 +9752,8 @@ VRtrInetCidrRouteEntry           ::= SEQUENCE
     vRtrInetCidrRouteBkupNHType      TmnxInetCidrNextHopType,
     vRtrInetCidrRouteBkupNHOwner     TmnxInetCidrNextHopOwner,
     vRtrInetCidrRouteBkupNHOwnAxInfo Unsigned32,
-    vRtrInetCidrRouteSrcClassIndex   Unsigned32,
-    vRtrInetCidrRouteDstClassIndex   Unsigned32,
+    vRtrInetCidrRouteSrcClassIndex   ClassIndexOrNone,
+    vRtrInetCidrRouteDstClassIndex   ClassIndexOrNone,
     vRtrInetCidrRouteOperFlags       TmnxRouteOperFlags,
     vRtrInetCidrRouteNextHopWeight   Unsigned32,
     vRtrInetCidrRouteNextHopOwnInst  Unsigned32,
@@ -10003,7 +10003,7 @@ vRtrInetCidrRouteBkupNHOwnAxInfo OBJECT-TYPE
     ::= { vRtrInetCidrRouteEntry 19 }
 
 vRtrInetCidrRouteSrcClassIndex   OBJECT-TYPE
-    SYNTAX      Unsigned32 (0..255)
+    SYNTAX      ClassIndexOrNone
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
@@ -10012,7 +10012,7 @@ vRtrInetCidrRouteSrcClassIndex   OBJECT-TYPE
     ::= { vRtrInetCidrRouteEntry 20 }
 
 vRtrInetCidrRouteDstClassIndex   OBJECT-TYPE
-    SYNTAX      Unsigned32 (0..255)
+    SYNTAX      ClassIndexOrNone
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
@@ -13536,8 +13536,8 @@ VRtrInetAllCidrRouteEntry        ::= SEQUENCE
     vRtrInetAllCidrRtBkupNHType      TmnxInetCidrNextHopType,
     vRtrInetAllCidrRtBkupNHOwner     TmnxInetCidrNextHopOwner,
     vRtrInetAllCidrRtBkupNHOwnAxInfo Unsigned32,
-    vRtrInetAllCidrRtSrcClassIndex   Unsigned32,
-    vRtrInetAllCidrRtDstClassIndex   Unsigned32,
+    vRtrInetAllCidrRtSrcClassIndex   ClassIndexOrNone,
+    vRtrInetAllCidrRtDstClassIndex   ClassIndexOrNone,
     vRtrInetAllCidrRtOperFlags       TmnxRouteOperFlags,
     vRtrInetAllCidrRtNextHopOwnInst  Unsigned32,
     vRtrInetAllCidrRtBkupNHOwnInst   Unsigned32,
@@ -13866,7 +13866,7 @@ vRtrInetAllCidrRtBkupNHOwnAxInfo OBJECT-TYPE
     ::= { vRtrInetAllCidrRouteEntry 25 }
 
 vRtrInetAllCidrRtSrcClassIndex   OBJECT-TYPE
-    SYNTAX      Unsigned32 (0..255)
+    SYNTAX      ClassIndexOrNone
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
@@ -13875,7 +13875,7 @@ vRtrInetAllCidrRtSrcClassIndex   OBJECT-TYPE
     ::= { vRtrInetAllCidrRouteEntry 26 }
 
 vRtrInetAllCidrRtDstClassIndex   OBJECT-TYPE
-    SYNTAX      Unsigned32 (0..255)
+    SYNTAX      ClassIndexOrNone
     MAX-ACCESS  read-only
     STATUS      current
     DESCRIPTION
@@ -15461,7 +15461,9 @@ VRtrConfExtEntry                 ::= SEQUENCE
     vRtrFibTelemetry                 TruthValue,
     vRtrWeightedEcmpStrict           TruthValue,
     vRtrIpv6TeRouterIdIfName         TNamedItem,
-    vRtrEcmpUnequalCost              TruthValue
+    vRtrEcmpUnequalCost              TruthValue,
+    vRtrMvpnIpmsiP2mpPolicy          TNamedItemOrEmpty,
+    vRtrMvpnSpmsiP2mpPolicy          TNamedItemOrEmpty
 }
 
 vRtrLdpShortcut                  OBJECT-TYPE
@@ -15617,12 +15619,12 @@ vRtrMvpnSpmsiLspTemplate         OBJECT-TYPE
 
 vRtrMvpnIpmsiType                OBJECT-TYPE
     SYNTAX      INTEGER {
-        none      (0),
-        rsvp      (1),
-        pim       (2),
-        ldp       (3),
-        bier      (4),
-        reserved5 (5)
+        none    (0),
+        rsvp    (1),
+        pim     (2),
+        ldp     (3),
+        bier    (4),
+        treesid (5)
     }
     MAX-ACCESS  read-create
     STATUS      current
@@ -15640,12 +15642,12 @@ vRtrMvpnIpmsiType                OBJECT-TYPE
 
 vRtrMvpnSpmsiType                OBJECT-TYPE
     SYNTAX      INTEGER {
-        none      (0),
-        rsvp      (1),
-        pim       (2),
-        ldp       (3),
-        bier      (4),
-        reserved5 (5)
+        none    (0),
+        rsvp    (1),
+        pim     (2),
+        ldp     (3),
+        bier    (4),
+        treesid (5)
     }
     MAX-ACCESS  read-create
     STATUS      current
@@ -15854,7 +15856,7 @@ vRtrMvpnIpmsiBfdRtTraInt         OBJECT-TYPE
     ::= { vRtrConfExtEntry 26 }
 
 vRtrMvpnIpmsiBfdRootMult         OBJECT-TYPE
-    SYNTAX      Unsigned32 (3..20)
+    SYNTAX      Unsigned32 (1..20)
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
@@ -16392,6 +16394,38 @@ vRtrEcmpUnequalCost              OBJECT-TYPE
         "The value of vRtrEcmpUnequalCost specifies..."
     DEFVAL      { false }
     ::= { vRtrConfExtEntry 69 }
+
+vRtrMvpnIpmsiP2mpPolicy          OBJECT-TYPE
+    SYNTAX      TNamedItemOrEmpty
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMvpnIpmsiP2mpPolicy specifies the name of p2mp policy
+         whose parameters are configured in
+         TIMETRA-TREE-SID-MIB::vRtrTreeSidPolicyEntry table and are signaled to
+         the automatically created P2MP LSP for the inclusive provider tunnel.
+
+         If the corresponding index does not exist in
+         TIMETRA-TREE-SID-MIB::vRtrTreeSidPolicyEntry table, an
+         'inconsistentValue' error will be returned."
+    DEFVAL      { ''H }
+    ::= { vRtrConfExtEntry 70 }
+
+vRtrMvpnSpmsiP2mpPolicy          OBJECT-TYPE
+    SYNTAX      TNamedItemOrEmpty
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMvpnSpmsiP2mpPolicy specifies the name of p2mp policy
+         whose parameters are configured in
+         TIMETRA-TREE-SID-MIB::vRtrTreeSidPolicyEntry table and are signaled to
+         the automatically created P2MP LSP for the selective provider tunnel.
+
+         If the corresponding index does not exist in
+         TIMETRA-TREE-SID-MIB::vRtrTreeSidPolicyEntry table, an
+         'inconsistentValue' error will be returned."
+    DEFVAL      { ''H }
+    ::= { vRtrConfExtEntry 71 }
 
 vRtrIfExtTable                   OBJECT-TYPE
     SYNTAX      SEQUENCE OF VRtrIfExtEntry
@@ -18639,7 +18673,7 @@ vRtrIfBfdExtReceiveInterval      OBJECT-TYPE
     ::= { vRtrIfBfdExtEntry 4 }
 
 vRtrIfBfdExtMultiplier           OBJECT-TYPE
-    SYNTAX      Unsigned32 (3..20)
+    SYNTAX      Unsigned32 (1..20)
     MAX-ACCESS  read-write
     STATUS      current
     DESCRIPTION
@@ -21549,7 +21583,8 @@ VRtrDnsEntry                     ::= SEQUENCE
     vRtrDnsTertiaryAddrType          InetAddressType,
     vRtrDnsTertiaryAddr              InetAddress,
     vRtrDnsIpv4SourceAddr            InetAddressIPv4,
-    vRtrDnsIpv6SourceAddr            InetAddressIPv6
+    vRtrDnsIpv6SourceAddr            InetAddressIPv6,
+    vRtrDnsDefaultDomainName         DisplayString
 }
 
 vRtrDnsLastCh                    OBJECT-TYPE
@@ -21665,6 +21700,17 @@ vRtrDnsIpv6SourceAddr            OBJECT-TYPE
          configured."
     DEFVAL      { '00000000000000000000000000000000'H }
     ::= { vRtrDnsEntry 11 }
+
+vRtrDnsDefaultDomainName         OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..255))
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrDnsDefaultDomainName specifies the default domain
+         name to be searched when performing DNS address resolution. Allowed
+         characters are 'a' to 'z', '0' to '9', '-' and '.'"
+    DEFVAL      { "" }
+    ::= { vRtrDnsEntry 12 }
 
 vRtrInetAllCidrRouteTnlExtTable  OBJECT-TYPE
     SYNTAX      SEQUENCE OF VRtrInetAllCidrRouteTnlExtEntry
@@ -23490,13 +23536,13 @@ vRtrPlcyAcctSrcClassEntry        OBJECT-TYPE
 
 VRtrPlcyAcctSrcClassEntry        ::= SEQUENCE
 {
-    vRtrPlcyAcctSrcClassIndex        Unsigned32,
+    vRtrPlcyAcctSrcClassIndex        ClassIndex,
     vRtrPlcyAcctSrcClassRowStatus    RowStatus,
     vRtrPlcyAcctSrcClassLastChgd     TimeStamp
 }
 
 vRtrPlcyAcctSrcClassIndex        OBJECT-TYPE
-    SYNTAX      Unsigned32 (1..255)
+    SYNTAX      ClassIndex
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION
@@ -23561,13 +23607,13 @@ vRtrPlcyAcctDestClassEntry       OBJECT-TYPE
 
 VRtrPlcyAcctDestClassEntry       ::= SEQUENCE
 {
-    vRtrPlcyAcctDestClassIndex       Unsigned32,
+    vRtrPlcyAcctDestClassIndex       ClassIndex,
     vRtrPlcyAcctDestClassRowStatus   RowStatus,
     vRtrPlcyAcctDestClassLastChgd    TimeStamp
 }
 
 vRtrPlcyAcctDestClassIndex       OBJECT-TYPE
-    SYNTAX      Unsigned32 (1..255)
+    SYNTAX      ClassIndex
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION
@@ -25988,7 +26034,7 @@ VRtrIfExtParmsEntry              ::= SEQUENCE
 vRtrIfIpv4ArpPopulateHost        OBJECT-TYPE
     SYNTAX      TruthValue
     MAX-ACCESS  read-create
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The value of vRtrIfIpv4ArpPopulateHost specifies whether populate host
          is enabled.
@@ -26002,7 +26048,7 @@ vRtrIfIpv4ArpPopulateHost        OBJECT-TYPE
 vRtrIfIpv4ArpRouteTag            OBJECT-TYPE
     SYNTAX      Unsigned32 (0 | 1..255)
     MAX-ACCESS  read-create
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The value of vRtrIfIpv4ArpRouteTag specifies route tag."
     DEFVAL      { 0 }
@@ -26011,7 +26057,7 @@ vRtrIfIpv4ArpRouteTag            OBJECT-TYPE
 vRtrIfIpv6NdPopulateHost         OBJECT-TYPE
     SYNTAX      TruthValue
     MAX-ACCESS  read-create
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The value of vRtrIfIpv6NdPopulateHost specifies whether populate host
          is enabled.
@@ -26025,7 +26071,7 @@ vRtrIfIpv6NdPopulateHost         OBJECT-TYPE
 vRtrIfIpv6NdRouteTag             OBJECT-TYPE
     SYNTAX      Unsigned32 (0 | 1..255)
     MAX-ACCESS  read-create
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The value of vRtrIfIpv6NdRouteTag specifies route tag."
     DEFVAL      { 0 }
@@ -27204,6 +27250,16 @@ tmnxVrtrSysMplsTunnelMode        OBJECT-TYPE
          tunnel mode."
     DEFVAL      { uniform }
     ::= { tmnxVrtrSys 3 }
+
+tmnxVrtrSysMplsLblStackStatCount OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..2)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxVrtrSysMplsLblStackStatCount is used to configure
+         number of labels in stack that must increment the statistics counter."
+    DEFVAL      { 1 }
+    ::= { tmnxVrtrSys 4 }
 
 tmnxVrtrFwdIPoverIPv6            OBJECT-TYPE
     SYNTAX      TruthValue
@@ -28925,7 +28981,23 @@ VRtrIfEgressQueueStatsEntry      ::= SEQUENCE
     vRtrIfEgressQueueFwdPkts         Counter64,
     vRtrIfEgressQueueFwdOcts         Counter64,
     vRtrIfEgressQueueDrpPkts         Counter64,
-    vRtrIfEgressQueueDrpOcts         Counter64
+    vRtrIfEgressQueueDrpOcts         Counter64,
+    vRtrIfEgrQFwdInProfPkts          Counter64,
+    vRtrIfEgrQFwdInProfOcts          Counter64,
+    vRtrIfEgrQDrpInProfPkts          Counter64,
+    vRtrIfEgrQDrpInProfOcts          Counter64,
+    vRtrIfEgrQFwdOutProfPkts         Counter64,
+    vRtrIfEgrQFwdOutProfOcts         Counter64,
+    vRtrIfEgrQDrpOutProfPkts         Counter64,
+    vRtrIfEgrQDrpOutProfOcts         Counter64,
+    vRtrIfEgrQFwdExdProfPkts         Counter64,
+    vRtrIfEgrQFwdExdProfOcts         Counter64,
+    vRtrIfEgrQDrpExdProfPkts         Counter64,
+    vRtrIfEgrQDrpExdProfOcts         Counter64,
+    vRtrIfEgrQFwdInPlusProfPkts      Counter64,
+    vRtrIfEgrQFwdInPlusProfOcts      Counter64,
+    vRtrIfEgrQDrpInPlusProfPkts      Counter64,
+    vRtrIfEgrQDrpInPlusProfOcts      Counter64
 }
 
 vRtrIfEgressQueueIndex           OBJECT-TYPE
@@ -28971,6 +29043,150 @@ vRtrIfEgressQueueDrpOcts         OBJECT-TYPE
         "The value of vRtrIfEgressQueueDrpOcts indicates the number of octets
          dropped on this egress queue."
     ::= { vRtrIfEgressQueueStatsEntry 5 }
+
+vRtrIfEgrQFwdInProfPkts          OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrIfEgrQFwdInProfPkts indicates the number of
+         in-profile packets forwarded on this egress queue."
+    ::= { vRtrIfEgressQueueStatsEntry 6 }
+
+vRtrIfEgrQFwdInProfOcts          OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrIfEgrQFwdInProfOcts indicates the number of
+         in-profile octets forwarded on this egress queue."
+    ::= { vRtrIfEgressQueueStatsEntry 7 }
+
+vRtrIfEgrQDrpInProfPkts          OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrIfEgrQDrpInProfPkts indicates the number of
+         in-profile packets dropped on this egress queue."
+    ::= { vRtrIfEgressQueueStatsEntry 8 }
+
+vRtrIfEgrQDrpInProfOcts          OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrIfEgrQDrpInProfOcts indicates the number of
+         in-profile octets dropped on this egress queue."
+    ::= { vRtrIfEgressQueueStatsEntry 9 }
+
+vRtrIfEgrQFwdOutProfPkts         OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrIfEgrQFwdOutProfPkts indicates the number of
+         out-profile packets forwarded on this egress queue."
+    ::= { vRtrIfEgressQueueStatsEntry 10 }
+
+vRtrIfEgrQFwdOutProfOcts         OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrIfEgrQFwdOutProfOcts indicates the number of
+         out-profile octets forwarded on this egress queue."
+    ::= { vRtrIfEgressQueueStatsEntry 11 }
+
+vRtrIfEgrQDrpOutProfPkts         OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrIfEgrQDrpOutProfPkts indicates the number of
+         out-profile packets dropped on this egress queue."
+    ::= { vRtrIfEgressQueueStatsEntry 12 }
+
+vRtrIfEgrQDrpOutProfOcts         OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrIfEgrQDrpOutProfOcts indicates the number of
+         out-profile octets dropped on this egress queue."
+    ::= { vRtrIfEgressQueueStatsEntry 13 }
+
+vRtrIfEgrQFwdExdProfPkts         OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrIfEgrQFwdExdProfPkts indicates the number
+         exceed-profile packets forwarded on this egress queue."
+    ::= { vRtrIfEgressQueueStatsEntry 14 }
+
+vRtrIfEgrQFwdExdProfOcts         OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrIfEgrQFwdExdProfOcts indicates the number
+         exceed-profile octets forwarded on this egress queue."
+    ::= { vRtrIfEgressQueueStatsEntry 15 }
+
+vRtrIfEgrQDrpExdProfPkts         OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrIfEgrQDrpExdProfPkts indicates the number of
+         exceed-profile packets dropped on this egress queue."
+    ::= { vRtrIfEgressQueueStatsEntry 16 }
+
+vRtrIfEgrQDrpExdProfOcts         OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrIfEgrQDrpExdProfOcts indicates the number of
+         exceed-profile octets dropped on this egress queue."
+    ::= { vRtrIfEgressQueueStatsEntry 17 }
+
+vRtrIfEgrQFwdInPlusProfPkts      OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrIfEgrQFwdInPlusProfPkts indicates the number of
+         inplus-profile packets forwarded on this egress queue."
+    ::= { vRtrIfEgressQueueStatsEntry 18 }
+
+vRtrIfEgrQFwdInPlusProfOcts      OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrIfEgrQFwdInPlusProfOcts indicates the number of
+         inplus-profile octets forwarded on this egress queue."
+    ::= { vRtrIfEgressQueueStatsEntry 19 }
+
+vRtrIfEgrQDrpInPlusProfPkts      OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrIfEgrQDrpInPlusProfPkts indicates the number of
+         inplus-profile packets dropped on this egress queue."
+    ::= { vRtrIfEgressQueueStatsEntry 20 }
+
+vRtrIfEgrQDrpInPlusProfOcts      OBJECT-TYPE
+    SYNTAX      Counter64
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrIfEgrQDrpInPlusProfOcts indicates the number of
+         inplus-profile octets dropped on this egress queue."
+    ::= { vRtrIfEgressQueueStatsEntry 21 }
 
 vRtrIfIngPolicerStatsTable       OBJECT-TYPE
     SYNTAX      SEQUENCE OF VRtrIfIngPolicerStatsEntry
@@ -29158,6 +29374,184 @@ vRtrIfArpHostRtRouteTag          OBJECT-TYPE
          with the route created from an ARP entry."
     DEFVAL      { 0 }
     ::= { vRtrIfArpHostRtEntry 4 }
+
+vRtrIfNdHostRtTblLstChg          OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The vRtrIfNdHostRtTblLstChg indicates the sysUpTime at the time of the
+         last modification of vRtrIfNdHostRtTable.
+
+         If no changes were made to the table since the last re-initialization
+         of the local network management subsystem, this object contains the
+         value zero."
+    ::= { tmnxVRtrObjs 207 }
+
+vRtrIfNdHostRtTable              OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VRtrIfNdHostRtEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The vRtrIfNdHostRtTable has an entry for each type of ND entry to
+         create host route from on the router interface in the system."
+    ::= { tmnxVRtrObjs 208 }
+
+vRtrIfNdHostRtEntry              OBJECT-TYPE
+    SYNTAX      VRtrIfNdHostRtEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each row entry represents an entry for each type of ND entry to create
+         host route from on the router interface in the system. Entries can be
+         created and deleted via SNMP SET operations using the
+         vRtrIfNdHostRtRowStatus variable."
+    INDEX       {
+        vRtrID,
+        vRtrIfIndex,
+        vRtrIfNdHostRtType
+    }
+    ::= { vRtrIfNdHostRtTable 1 }
+
+VRtrIfNdHostRtEntry              ::= SEQUENCE
+{
+    vRtrIfNdHostRtType               INTEGER,
+    vRtrIfNdHostRtRowStatus          RowStatus,
+    vRtrIfNdHostRtLastChgd           TimeStamp,
+    vRtrIfNdHostRtRouteTag           Unsigned32
+}
+
+vRtrIfNdHostRtType               OBJECT-TYPE
+    SYNTAX      INTEGER {
+        static  (1),
+        dynamic (2),
+        evpn    (3)
+    }
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrIfNdHostRtType specifies the ND type to create a host
+         route from."
+    ::= { vRtrIfNdHostRtEntry 1 }
+
+vRtrIfNdHostRtRowStatus          OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrIfNdHostRtRowStatus specifies the row status of this
+         row."
+    ::= { vRtrIfNdHostRtEntry 2 }
+
+vRtrIfNdHostRtLastChgd           OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrIfNdHostRtLastChgd indicates the sysUpTime at the
+         time of the last configuration change in this conceptual row."
+    ::= { vRtrIfNdHostRtEntry 3 }
+
+vRtrIfNdHostRtRouteTag           OBJECT-TYPE
+    SYNTAX      Unsigned32 (0 | 1..255)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrIfNdHostRtRouteTag specifies route tag to use with
+         the route created from a ND entry."
+    DEFVAL      { 0 }
+    ::= { vRtrIfNdHostRtEntry 4 }
+
+vRtrDnsRedirectTableLastChanged  OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object vRtrDnsRedirectTableLastChanged indicates the
+         value of sysUpTime at the time of the last modification of an entry in
+         the vRtrDnsRedirectTable."
+    ::= { tmnxVRtrObjs 209 }
+
+vRtrDnsRedirectTable             OBJECT-TYPE
+    SYNTAX      SEQUENCE OF VRtrDnsRedirectEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The vRtrDnsRedirectTable contains the redirect configuration for DNS
+         resolution via virtual router instances."
+    ::= { tmnxVRtrObjs 210 }
+
+vRtrDnsRedirectEntry             OBJECT-TYPE
+    SYNTAX      VRtrDnsRedirectEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each row entry in the vRtrDnsRedirectTable represents a specific
+         redirect configuration for DNS resolution via VPRN."
+    INDEX       {
+        vRtrDnsRedirectRequestRouterId,
+        vRtrDnsRedirectDnsRouterId
+    }
+    ::= { vRtrDnsRedirectTable 1 }
+
+VRtrDnsRedirectEntry             ::= SEQUENCE
+{
+    vRtrDnsRedirectRequestRouterId   Unsigned32,
+    vRtrDnsRedirectDnsRouterId       Unsigned32,
+    vRtrDnsRedirectRowStatus         RowStatus,
+    vRtrDnsRedirectPreference        Unsigned32,
+    vRtrDnsRedirectLastChanged       TimeStamp
+}
+
+vRtrDnsRedirectRequestRouterId   OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrDnsRedirectRequestRouterId specifies the router
+         instance where the DNS request is coming from."
+    DEFVAL      { 0 }
+    ::= { vRtrDnsRedirectEntry 1 }
+
+vRtrDnsRedirectDnsRouterId       OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrDnsRedirectDnsRouterId specifies the router instance
+         where the DNS request will be executed."
+    DEFVAL      { 0 }
+    ::= { vRtrDnsRedirectEntry 2 }
+
+vRtrDnsRedirectRowStatus         OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The row status used for creation, deletion, or control of
+         vRtrDnsRedirectTable entries."
+    ::= { vRtrDnsRedirectEntry 3 }
+
+vRtrDnsRedirectPreference        OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..255)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrDnsRedirectPreference specifies a number that
+         indicates the relative preference assigned to the redirect router
+         instance. Redirect router instances with a lower value for preference
+         will be tried first."
+    DEFVAL      { 0 }
+    ::= { vRtrDnsRedirectEntry 4 }
+
+vRtrDnsRedirectLastChanged       OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrDnsRedirectLastChanged indicates the sysUpTime at the
+         time of the last configuration change in this conceptual row."
+    ::= { vRtrDnsRedirectEntry 5 }
 
 tmnxVRtrConformance              OBJECT IDENTIFIER ::= { tmnxSRConfs 3 }
 
@@ -30433,7 +30827,7 @@ tmnxVRtr7xx0V19v0Compliance      MODULE-COMPLIANCE
             tmnxVRtrQinQNetworkIntfGroup,
             tmnxVRtrIfExtV15v0ObjectGroup,
             tmnxVRtrClassFwdingV15v0Group,
-            tmnxVRtrIfExtHostRteV15v0Group,
+            tmnxVRtrIfExtHostRteV20v0Group,
             tmnxVRtrIfStatsV16v0Group,
             tmnxVRtrIfNgeStatsGroup,
             tmnxVRtrAdminTagsV16v0Group,
@@ -30470,9 +30864,22 @@ tmnxVRtr7xx0V19v0Compliance      MODULE-COMPLIANCE
             tmnxVRtrIfHostRouteGroup,
             tmnxVRtrTunTerminationV19v0Group,
             tmnxVRtrIfPhysStatsV19v0Group,
-            tmnxVRtrSrTnlStatV19v10Group
+            tmnxVRtrSrTnlStatV19v10Group,
+            vRtrIfEgressQueueV19v01Group
         }
     ::= { tmnxVRtrCompliances 26 }
+
+tmnxVRtr7xx0V20v0Compliance      MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for management of virtual router instances on
+         Nokia SROS series systems release R20."
+    MODULE
+        MANDATORY-GROUPS {
+            tmnxVRtrIfNdHostRouteGroup,
+            tmnxVRtrDnsV20v0Group
+        }
+    ::= { tmnxVRtrCompliances 27 }
 
 tmnxVRtrGroups                   OBJECT IDENTIFIER ::= { tmnxVRtrConformance 2 }
 
@@ -35935,7 +36342,7 @@ tmnxVRtrIfExtHostRteV15v0Group   OBJECT-GROUP
         vRtrStatNdRoutes,
         vRtrStatNdActiveRoutes
     }
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The group of basic router interface specific additional objects for
          release 15.0 on Nokia SROS series systems."
@@ -36547,7 +36954,10 @@ tmnxVRtrV19v0Group               OBJECT-GROUP
         tmnxVRtrNeInfoPlatformType,
         tmnxVRtrNeInfoVendorId,
         vRtrEcmpUnequalCost,
-        vRtrRsmToBaseNetwork
+        vRtrRsmToBaseNetwork,
+        tmnxVrtrSysMplsLblStackStatCount,
+        vRtrMvpnIpmsiP2mpPolicy,
+        vRtrMvpnSpmsiP2mpPolicy
     }
     STATUS      current
     DESCRIPTION
@@ -36752,6 +37162,19 @@ tmnxVRtrTunTerminationV19v0Group OBJECT-GROUP
          19.0 on Nokia SROS series systems."
     ::= { tmnxVRtrGroups 250 }
 
+tmnxVRtrIfNdHostRouteGroup       OBJECT-GROUP
+    OBJECTS     {
+        vRtrIfNdHostRtRowStatus,
+        vRtrIfNdHostRtLastChgd,
+        vRtrIfNdHostRtRouteTag,
+        vRtrIfNdHostRtTblLstChg
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting management of host-routes on router
+         interfaces on Nokia mobile gateway systems in 4.0 release."
+    ::= { tmnxVRtrGroups 251 }
+
 tmnxVRtrIfPhysStatsV19v0Group    OBJECT-GROUP
     OBJECTS     {
         vRtrIfAcctPolicyId,
@@ -36773,6 +37196,75 @@ tmnxVRtrSrTnlStatV19v10Group     OBJECT-GROUP
         "The group of objects supporting SR Policy tunnel statistics on release
          19.10 Nokia SROS series systems."
     ::= { tmnxVRtrGroups 253 }
+
+tmnxVRtrDnsV20v0Group            OBJECT-GROUP
+    OBJECTS     {
+        vRtrDnsDefaultDomainName,
+        vRtrDnsRedirectPreference,
+        vRtrDnsRedirectRowStatus,
+        vRtrDnsRedirectLastChanged,
+        vRtrDnsRedirectTableLastChanged
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting management of DNS servers on release
+         20.0 Nokia SROS series systems."
+    ::= { tmnxVRtrGroups 254 }
+
+vRtrIfEgressQueueV19v01Group     OBJECT-GROUP
+    OBJECTS     {
+        vRtrIfEgrQFwdInProfPkts,
+        vRtrIfEgrQFwdInProfOcts,
+        vRtrIfEgrQDrpInProfPkts,
+        vRtrIfEgrQDrpInProfOcts,
+        vRtrIfEgrQFwdOutProfPkts,
+        vRtrIfEgrQFwdOutProfOcts,
+        vRtrIfEgrQDrpOutProfPkts,
+        vRtrIfEgrQDrpOutProfOcts,
+        vRtrIfEgrQFwdExdProfPkts,
+        vRtrIfEgrQFwdExdProfOcts,
+        vRtrIfEgrQDrpExdProfPkts,
+        vRtrIfEgrQDrpExdProfOcts,
+        vRtrIfEgrQFwdInPlusProfPkts,
+        vRtrIfEgrQFwdInPlusProfOcts,
+        vRtrIfEgrQDrpInPlusProfPkts,
+        vRtrIfEgrQDrpInPlusProfOcts
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of basic router interface egress queue specific objects in
+         release 19.0 on Nokia SROS series systems."
+    ::= { tmnxVRtrGroups 259 }
+
+tmnxVRtrIfExtHostRteV20v0Group   OBJECT-GROUP
+    OBJECTS     {
+        vRtrIfIpv4ArpLearnUnsol,
+        vRtrIfIpv4ArpProRef,
+        vRtrIfIpv6NdLearnUnsol,
+        vRtrIfIpv6NdProRef,
+        vRtrStatArpRoutes,
+        vRtrStatArpActiveRoutes,
+        vRtrStatNdRoutes,
+        vRtrStatNdActiveRoutes
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of basic router interface specific additional objects for
+         release 20.0 on Nokia SROS series systems."
+    ::= { tmnxVRtrGroups 264 }
+
+tmnxVRtrIfTableObsoleteV20v0Grp  OBJECT-GROUP
+    OBJECTS     {
+        vRtrIfIpv4ArpPopulateHost,
+        vRtrIfIpv4ArpRouteTag,
+        vRtrIfIpv6NdPopulateHost,
+        vRtrIfIpv6NdRouteTag
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of basic router interface specific objects obsoleted for
+         release 20.0 on Nokia SROS series systems."
+    ::= { tmnxVRtrGroups 265 }
 
 tmnxVRtrMobGatewayCompliances    OBJECT IDENTIFIER ::= { tmnxVRtrConformance 3 }
 
@@ -38245,18 +38737,24 @@ tmnxVRtrPdnAddrMismatch          NOTIFICATION-TYPE
     DESCRIPTION
         "[CAUSE] The tmnxVRtrPdnAddrMismatch notification is generated when the
          IP address learned by the PDN interface through the cellular network
-         could not be installed on the PDN's parent interface. This occurs when
-         the parent interface has a mismatching configured IP address or when
-         the learned PDN IP address overlaps another IP address in the router
-         instance. The notification will only be generated when the PDN
-         interface is set unnumbered to the system interface or any other
-         existing loopback interface.
+         could not be installed on the PDN router interface.
 
-         [EFFECT] The PDN Interface will be set operational down.
+         For IPv4, this occurs when the parent interface has a mismatching
+         configured IP address or when the learned PDN IP address overlaps
+         another IP address in the router instance. The notification will only
+         be generated when the PDN interface is set unnumbered to the system
+         interface or any other existing loopback interface.
 
-         [RECOVERY] Check the configured IP address on the PDN's parent
-         interface, check the other IP addresses in the router instance and/or
-         check the state of the cellular network."
+         For IPv6 operation, this occurs when the IPv6 address has a
+         mismatching subnet to the address configured for the PDN router
+         interface or if the exact same IPv6 address is configured on the PDN
+         interface as the address received by the network.
+
+         [EFFECT] The PDN Interface will be operationally down.
+
+         [RECOVERY] Check the configured IP address for the PDN interface or
+         parent interface, check the other IP addresses in the router instance,
+         and/or check the state of the cellular network."
     ::= { tmnxVRtrNotifications 82 }
 
 tmnxVRtrPdnAddrMismatchCleared   NOTIFICATION-TYPE
@@ -38270,9 +38768,7 @@ tmnxVRtrPdnAddrMismatchCleared   NOTIFICATION-TYPE
          when the conditions that caused the PDN address mismatch no longer
          exist.
 
-         [EFFECT] The PDN interface will go operational up if it is set
-         unnumbered to an interface that is also operational up. This can be
-         the system interface or any other loopback interface.
+         [EFFECT] The PDN interface will go operationally up.
 
          [RECOVERY] Not applicable."
     ::= { tmnxVRtrNotifications 83 }

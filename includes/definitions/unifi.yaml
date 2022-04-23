@@ -2,8 +2,23 @@ os: unifi
 text: 'Ubiquiti UniFi'
 type: wireless
 icon: ubiquiti
-group: ubnt
+mib_dir: ubnt
 over:
     - { graph: device_bits, text: 'Device Traffic' }
     - { graph: device_wireless_clients, text: 'Connected Clients' }
     - { graph: device_wireless_ccq, text: 'Connection Quality' }
+discovery:
+    -
+        sysObjectID:
+            - .1.3.6.1.4.1.41112
+            - .1.3.6.1.4.1.8072.3.2.10
+        sysDescr_regex:
+            - '/^UAP/'
+            - '/^U6/'
+    -
+        sysObjectID: .1.3.6.1.4.1.10002.1
+        sysDescr: Linux
+        snmpwalk:
+            oid: 'IEEE802dot11-MIB::dot11manufacturerProductName'
+            op: 'contains'
+            value: 'UAP'

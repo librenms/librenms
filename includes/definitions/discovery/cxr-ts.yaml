@@ -1,5 +1,8 @@
 mib: CXR-TS-MIB
 modules:
+    os:
+        hardware: CXR-TS-MIB::productName.0
+        version: CXR-TS-MIB::version.0
     sensors:
         state:
             data:

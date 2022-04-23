@@ -1,0 +1,5726 @@
+LUM-EQUIPMENT-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Integer32, Unsigned32, NOTIFICATION-TYPE
+        FROM SNMPv2-SMI
+    OBJECT-GROUP, MODULE-COMPLIANCE, NOTIFICATION-GROUP
+        FROM SNMPv2-CONF
+    DisplayString, DateAndTime, RowStatus, TestAndIncr, TEXTUAL-CONVENTION
+        FROM SNMPv2-TC
+    lumModules, lumEquipmentMIB
+        FROM LUM-REG
+    MgmtNameString, SubrackNumber, SlotNumber,
+    BoardOrInterfaceOperStatus, BoardOrInterfaceAdminStatus, ObjectProperty,
+    CommandString, FaultStatus, AdminStatus, TruthValueWithNA
+        FROM LUM-TC
+    AlarmPerceivedSeverity
+        FROM LUM-ALARM-MIB;
+
+lumEquipmentMIBModule MODULE-IDENTITY
+    LAST-UPDATED
+        "201908300000Z" -- August 30th 2019
+    ORGANIZATION
+        "Infinera Corporation"
+    CONTACT-INFO
+        "techsupport@infinera.com"
+    DESCRIPTION
+        "The common equipment configuration MIB.
+
+        - General
+
+        - Subrack status
+
+        - Board configuration and status
+
+        - Power supply status
+
+        - Fan status
+
+        - Slot
+
+"
+    REVISION
+        "201908300000Z" -- August 30th 2019
+    DESCRIPTION
+        "Changes made for release r33.1:
+        - Add CO2xOTDR filter
+        - Add CO-D4 filter series"
+    REVISION
+        "201906280000Z" -- June 28th 2019
+    DESCRIPTION
+        "Changes made for release r33.0:
+        - Added oa1x21dBmVgEC board
+        - Added oa2x21dBmVgEC board
+        - added the emxp800xh board"
+    REVISION
+        "201903310000Z" -- March 31st 2019
+    DESCRIPTION
+        "Changes made for release r32.1:
+        - added the emxp440q board
+        - modify power supply type"
+    REVISION
+        "201812210000Z" -- Dec 21th 2018
+    DESCRIPTION
+        "Changes made for release r32.0:
+        - added tm3000iie subrack"
+    REVISION
+        "201807010000Z" -- July 01 2018
+    DESCRIPTION
+        "Changes made for release r31.0:
+        - added the hdea1600 board
+        - added optical module table
+        - improved/corrected the help text for ICN redundancy mode
+        - added the otdr8p board"
+    REVISION
+        "201712150000Z" -- December 15 2017
+    DESCRIPTION
+        "Changes made for release r30.0:
+        - added the emxp440 board
+        - added oaraed20lghyb board
+        - added roadm1x9f board
+        - added ad1c2fotdr board"
+    REVISION
+        "201706150000Z" -- June 15th 2017
+    DESCRIPTION
+        "Changes made for release r29.0:
+         - Changed ORGANIZATION and CONTACT-INFO"
+    REVISION
+        "201702250000Z" -- February 25th 2017
+    DESCRIPTION
+        "Changes made for release r28.1:
+        - Added emxp48 temp hardened board."
+    REVISION
+        "201611300000Z" -- November 30th 2016
+    DESCRIPTION
+        "Changes made for release r28:
+        - Added tp100gotnii board.
+        - Added operationalVariant (normal or openFlowControlled).
+        - Added ptio100g board.
+        - Added AID and physical location for board."
+    REVISION
+        "201607150000Z" -- July 15th 2016
+    DESCRIPTION
+        "Changes made for release r27:
+        - Added tmFha1UDc1 subrack
+        - Added fhau1 board
+        - Added fha1u1 board
+        - Added oa1x20dBmVg2 board
+        - Added oa2x20dBmVg2 board
+        - Added default operStatus to notPresent
+        - Added fwReloadNeeded and fwContextUnknown alarms
+        - Added settable severity for attribute DCPowerFailed
+        - Added nidSfp2488, PORT_DEVICE_SFP_2488
+        - Added edu10GLT
+        - Added edu10GLTS"
+    REVISION
+        "201509300000Z" -- September 30th 2015
+    DESCRIPTION
+        "Changes made for release r26:
+        - Added fpu1 board
+        - Added oaraed21hghyb board
+        - Added oaraed21hgind board
+        - Added dcDk652km100 board
+        - Added dcDk652km120 board
+        - Added dcP652km20 board"
+    REVISION
+        "201509150000Z" -- September 15th 2015
+    DESCRIPTION
+        "Changes made for release r25.1:
+        - Added tpmrHL16GUni board."
+    REVISION
+        "201501130000Z" -- January 13th 2015
+    DESCRIPTION
+        "Changes made for release r25:
+        - Added emxp240iie board"
+    REVISION
+        "201409300000Z" -- September 30th 2014
+    DESCRIPTION
+        "Changes made for release r23.1:
+        - Added mxp100gotn board.
+        - Added additionalInfo for TPQMS."
+    REVISION
+        "201405160000Z" -- May 16th 2014
+    DESCRIPTION
+        "Changes made for release r23:
+        - Added emxp220iie board.
+        - Added tpmrHL16G board.
+        - Changed board name from tp10gotn to tphex10gotn.
+        - Added fhmxp10g board"
+    REVISION
+        "201311150000Z" -- November 15th 2013
+    DESCRIPTION
+        "Changes made for release r22:
+        - Added tp10gotn board.
+        - Added tp100gotn board."
+    REVISION
+        "201305010000Z" -- May 1st 2013
+    DESCRIPTION
+        "Changes made for release r21:
+        - Added postpone firmware upgrade for
+          msMxp10G, gbeMxp10GFEC, msMxp and tpD10GbE.
+        - Added tpq10gfeci board.
+        - Added tpq10gfecregi board.
+        - Attributes for postpone of firmware
+          activation added.
+        - Feature not supported alarm added for msMxp
+          and gbeMxp10GFEC
+        - Feature Proxy ARP added"
+    REVISION
+        "201212200000Z" -- Dec 20th 2012
+    DESCRIPTION
+        "Changes made for release r20:
+         - Added msTp40G board.
+         - Added msMxp40G board.
+         - Added mxp10gotn board.
+         - Added ocudq board.
+         - Added ocuseed2p board.
+         - Added oa2x21seed board.
+         - Added tm100mxp board.
+         - Added tm100tp board.
+         - Added tm100reg board.
+         - Added oa2x21seed board.
+         - Added support for boot error alarm.
+         - Added hardware error alarm.
+         - Added fan fault alarm.
+         - Added low disk space alarm.
+         - Added clock drift alarm.
+         - Added tm2000 subrack.
+         - Added tm3000ii subrack.
+         - Added Slot table."
+    REVISION
+        "201112200000Z" -- December 20th 2011
+    DESCRIPTION
+        "Changes made for release r18:
+         - Added MDU16 board type.
+         - Added dcnRedundancy.
+         - Created LUM-SITE-MIB and moved External Alarms table to it
+         -   Regenerator board added."
+    REVISION
+        "201106211100Z" -- June 21st 2011
+    DESCRIPTION
+        "Added two TM2000 boards."
+    REVISION
+        "201104271100Z" -- April 27th 2011
+    DESCRIPTION
+        "Added more TM boards."
+    REVISION
+        "200701311100Z" -- January 31th 2007
+    DESCRIPTION
+        "Added TS-1100 board types."
+    REVISION
+        "200601270000Z" -- January 27th 2006
+    DESCRIPTION
+        "Added TS-1100 specific alarms."
+    REVISION
+        "200509260000Z" -- September 26th 2005
+    DESCRIPTION
+        "Added TS-1100 mux/demux board types."
+    REVISION
+        "200509140000Z" -- September 14th 2005
+    DESCRIPTION
+        "Added minimal compliance groups."
+    REVISION
+       "200302170000Z" -- February 17th 2003
+    DESCRIPTION
+        "Added new board types; obu, sync2Mhz, mxp8 and mxp16"
+    REVISION
+        "200211200000Z" -- November 20th 2002
+    DESCRIPTION
+        "Changed name of the CU OSC boards."
+    REVISION
+        "200209160000Z" -- September 16th 2002
+    DESCRIPTION
+        "Added internal communication mode."
+    REVISION
+        "200205310000Z" -- May 31st 2002
+    DESCRIPTION
+        "Added equipmentNodeLedTest."
+    REVISION
+        "200203050000Z" -- March 5th 2002
+    DESCRIPTION
+        "Re-defined operStatus.
+        Added boardUnderMaintenance alarm."
+    REVISION
+        "200202210000Z" -- February 21st 2002
+    DESCRIPTION
+        "Added exextedType, actualType and unexpectedType for subracks."
+    REVISION
+        "200202200000Z" -- February 20th 2002
+    DESCRIPTION
+        "Allows creation of subrack entries."
+    REVISION
+        "200112030000Z" -- December 3rd 2001
+    DESCRIPTION
+        "Moved admin and operStatus definitions to LUM-TC"
+    REVISION
+        "200111220000Z" -- November 22nd 2001
+    DESCRIPTION
+        "Changed definitions of the board traps."
+    REVISION
+        "200111090000Z" -- November 9th 2001
+    DESCRIPTION
+        "Changed severity and alias for unexpectedType.
+        Added notifications for board table changes."
+    REVISION
+        "200110300000Z" -- October 30th 2001
+    DESCRIPTION
+        "Added multiplexer and io-unit board types.
+        TestAndIncr and MIB version are hidden - not supported yet.
+        Removed autoSignal from board adminStatus."
+    REVISION
+        "200110250000Z" -- October 25th 2001
+    DESCRIPTION
+        "Added subrack number for subracks.
+        Changed alias for powerEntry"
+    REVISION
+        "200110230000Z" -- October 23d 2001
+    DESCRIPTION
+        "Moved lambdaDirection, lambdaDirection and lambdaFrequency to LUM-TC."
+    REVISION
+        "200110100000Z" -- October 10th 2001
+    DESCRIPTION
+        "Moved most of the old LAMBDA-mib to this MIB.
+        Updated alarm names according to the event definitions.
+        Shortened the board type names.
+        Defined adminStatus and operStatus.
+        Updated max-access to indicate attributes for row-creation.
+        Added 'hidden' property."
+    REVISION
+        "200108140000Z" -- August 14th 2001
+    DESCRIPTION
+        "Changes after first review.
+        Defined the first two board types.
+        Added list of future board types.
+        Added actual board type.
+        Fixed sub-rack, slot and port nubmering.
+        Clarified definition of 'wavelength'.
+        Removed some superfluous default values.
+        Descriptions for all alarms.
+        Board index is no longer persistent.
+        Added compliance groups.
+        Changed name of lambdaWaveLength to lambdaFrequency.
+        Shortened the name of one alarm.
+        Added lastChangeTime attributes."
+    REVISION
+        "200108090000Z" -- August 9th 2001
+    DESCRIPTION
+        "Added LED test. Fixed some comments.
+        Defined adminStatus and operStatus."
+    REVISION
+        "200108080000Z" -- August 8th 2001
+    DESCRIPTION
+        "The initial revision of this module."
+    ::= { lumModules 12 }
+
+
+-- ----------------------------------------------------
+-- Conformance area, containing groups and complicance
+-- specifications.
+-- ----------------------------------------------------
+
+lumEquipmentConfs OBJECT IDENTIFIER ::= { lumEquipmentMIB 1 }
+lumEquipmentGroups OBJECT IDENTIFIER ::= { lumEquipmentConfs 1 }
+lumEquipmentCompl OBJECT IDENTIFIER ::= { lumEquipmentConfs 2 }
+lumEquipmentMinimalGroups OBJECT IDENTIFIER ::= { lumEquipmentConfs 3 }
+lumEquipmentMinimalCompl OBJECT IDENTIFIER ::= { lumEquipmentConfs 4 }
+
+
+-- ----------------------------------------------------
+-- Root for objects in the equipment MIB
+-- ----------------------------------------------------
+
+lumEquipmentMIBObjects OBJECT IDENTIFIER ::= { lumEquipmentMIB 2 }
+
+
+-- ----------------------------------------------------
+-- This MIB contains the following groups:
+-- ----------------------------------------------------
+
+equipmentGeneral OBJECT IDENTIFIER ::= { lumEquipmentMIBObjects 1 }
+equipmentSubrackList OBJECT IDENTIFIER ::= { lumEquipmentMIBObjects 2 }
+equipmentBoardList OBJECT IDENTIFIER ::= { lumEquipmentMIBObjects 3 }
+equipmentPowerList OBJECT IDENTIFIER ::= { lumEquipmentMIBObjects 4 }
+equipmentFanList OBJECT IDENTIFIER ::= { lumEquipmentMIBObjects 5 }
+lumentisEquipmentNotifications  OBJECT IDENTIFIER ::= { lumEquipmentMIBObjects 6 }
+equipmentNode OBJECT IDENTIFIER ::= { lumEquipmentMIBObjects 7 }
+equipmentResource OBJECT IDENTIFIER ::= { lumEquipmentMIBObjects 8 }
+equipmentSlot OBJECT IDENTIFIER ::= { lumEquipmentMIBObjects 9 }
+equipmentOpticalModuleList OBJECT IDENTIFIER ::= {lumEquipmentMIBObjects 10 }
+
+-- ----------------------------------------------------
+-- Textual Conventions
+-- ----------------------------------------------------
+
+EquipmentSubrackType ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "The type of subrack:
+
+        tm300 - The small subrack (old).
+
+        tm3000 - The big subrack.
+
+        tm3000ii - The big subrack, enhanced version.
+
+        tm3000iie - The big subrack, enhanced second version.
+
+        tm301 - The small subrack (new).
+
+        tm301ii - A subrack for maximum four traffic boards, enhanced version.
+        tm101  - Pizza box subrack.
+
+        tm101p - Passive pizza box subrack.
+
+        tm102 - An even smaller pizza box.
+
+        mba1 - Monolith for mobile access
+
+        mba2 - Monolith for mobile access
+
+        mba2E - Monolith for mobile access temp hardened
+
+        tm102pas - Passive pizza box subrack with one full-
+                   sized slot and one half-sized slot.
+
+        tm102pas3 - Passive pizza box subrack with three
+                    half-sized slots.
+
+        tm101p - Passive pizza box subrack.
+
+        tm2000 - Small subrack for 100 Gbps boards.
+
+        aux - virtual subrack for external equipment.
+
+        tmFha1UDc1 - Monolith for mobile front haul.
+
+        tmRfuAc1 - Remote mobile front haul unit.
+
+        tmEmxp1UDc - Emxp temp hardened unit.
+
+        tmHdea1600Dc - Hdea1600 subrack.
+
+        tmEmxpXh800G/DC - Emxp 800 XHAUL subrack."
+
+    SYNTAX INTEGER {
+        undefined (0),
+        tm300 (1),
+        tm3000 (2),
+        tm301 (3),
+        tm101 (4),
+        tm101p (5),
+        aux (6),
+        tm102 (7),
+        mba1 (8),
+        mba2 (9),
+        mba2E (10),
+        tm102pas (11),
+        tm102pas3 (12),
+        tm3000ii (13),
+        tm2000 (14),
+        tm301ii (15),
+        tmFha1UDc1 (16),
+        tmRfuAc1 (17),
+        tmEmxp1UDc (18),
+        tmHdea1600Dc (19),
+        tm3000iie (20),
+        tmEmxpXh800Dc (21),
+        ts1100Subrack2Slots (9002),
+        tm206Subrack6Slots (9006),
+        ts1100Subrack8Slots (9011),
+        ts1100Subrack12Slots (9013) }
+
+EquipmentBoardType ::= TEXTUAL-CONVENTION
+    STATUS current
+    DESCRIPTION
+        "The functional type of the board.
+        At least one type is defined for each combination of
+        the following properties of the board:
+
+        1 - number of interfaces
+
+        2 - type of interfaces
+
+        3 - the functionality of the board (can usually be inferred from
+        the types of interfaces)
+
+        The application should be able to determine which and how many
+        interfaces should be instantiated from the type.
+
+        Functional types defined so far:
+
+        Note: The following type is not in use.
+
+                cu - Control unit
+
+        tpMr2500 - Multi-rate 2500 Mb/s transponder
+
+        ocu2 - Dual optical coupler unit (2x1:2)
+
+        oxc8 - Optical cross-connect 8x8 ports
+
+        oxc16 - Optical cross-connect 16x16 ports
+
+        mxp028 - Muxponder 2xSTM-4 + 8xSTM-1
+
+        ad1AB, ad1BA - Single add-drop units, A/B- and B/A-type
+
+        ad2AB, ad2BA - Double add-drop units, A/B- and B/A-type
+
+        ad4AB, ad4BA - Quad add-drop units, A/B- and B/A-type
+
+        tpDGbE - Dual GbE transponder
+
+        oa - Optical amplifier unit
+
+        oa2 - Dual Optical amplifier unit
+
+        mdu8Ext - Optical mux/demux unit, extension, 8 ports
+
+        mdu8Term - Optical mux/demux unit, terminal, 8 ports
+
+        ocu4 - Quad optical coupler unit (4x1:2)
+
+        Note: The following type is not in use.
+
+                mxp004 - Muxponder 4xSTM-1
+
+        ad2oaAB - 2 channel add-drop unit, type A/B  for use with
+                  optical amplifier
+
+        ad2oaBA - 2 channel add-drop unit, type B/A  for use with
+                  optical amplifier
+
+        adcwdm - Single add-drop units for OSC channels.
+
+        Note: The following type is not in use.
+
+              ad1spr - 1 channel spur unit
+
+        tp10G - 10 Gb/s transponder
+
+        tpLMr2500 - 'Lite' version of the Multi-rate 2500 Mb/s transponder
+
+        cu1osc - CU with one OSC i/f
+
+        cu2osc - CU with two OSC i/fs
+
+        obu - Optical band unit
+
+        sync2Mhz - 2 MHz synchronization unit
+
+        mxp8 - 8 tributaries (STM-1 or STM-4) muxponder
+
+        mxp16 - 16 tributaries (STM-1 or STM-4) muxponder
+
+        tpDGbED - Dual GbE transponder for DWDM
+
+        tpDGbEC - Dual GbE transponder for CWDM
+
+        tpDFcD - Dual fiber channel transponder for DWDM
+
+        tpDFcC - Dual fiber channel transponder for CWDM
+
+        tpFcGbED - Fiber channel and GbE transponder for DWDM
+
+        tpFcGbEC - Fiber channel and GbE transponder for CWDM
+
+        tpTFcD - Triple fiber channel transponder for DWDM
+
+        tpQMr - Quad multirate transponder
+
+        mdu4TermAB - Optical mux/demux unit, terminal, type A/B, 4 ports
+
+        mdu4TermBA - Optical mux/demux unit, terminal, type B/A, 4 ports
+
+        adc1wdm - Single add-drop units for CWDM channels.
+
+        adc2wdm - Double add-drop units for CWDM channels.
+
+        tp10GLAN - 10 Gb/s LAN DWDM transponder
+
+        tp10GRC - 10 Gb/s Rate Concerving DWDM transponder
+
+        escon8 - 8 channel ESCON muxponder
+
+        tpMr25v2 - Multi-rate 2500 Mb/s transponder version 2
+
+        tpD10GbE - Double 10GbE Transponder, Basic Unit
+
+        tpD10GbER - Double 10GbE Transponder, repeater
+
+        mdu4ExtAB - Optical mux/demux unit, extension, type A/B, 4 ports
+
+        mdu4ExtBA - Optical mux/demux unit, extension, type B/A, 4 ports
+
+        oiuc50100 - Optical interleaver unit 50/100 GHz
+
+        mROADM1P800 - Reconfigurable optical add/drop multiplexer
+
+        mxp4x2G5 - 4xSTM-16/10Gb MuxPonder
+
+        tp10GOtnTc - 10Gb/s C-band Tunable OTN Transponder
+
+        mdu40Even - 40 channel Mux/Demux unit, even 50GHz DWDM
+
+        mdu40Odd - 40 channel Mux/Demux unit, odd 50GHz DWDM
+
+        mdu8Ee - 8 channel 50GHz Mux/Demux, extension port, even, 100GHz spacing
+
+        mdu8Eo - 8 channel 50GHz Mux/Demux, extension port, odd, 100GHz spacing
+
+        ocm2p - 2-port Optical Channel Monitor
+
+        msMxp - MultiService MuxPonder
+
+        voa8chii - 8ch Variable Optical Attenuator - II
+
+        msMxpR - MultiService MuxPonder, repeater
+
+        msMxpDQgbe - Double Quad MuxPonder
+
+        gbe10Emxp10G - 10xGbE/10GbE Ethernet MuxPonder
+
+        gbeMxp10GFEC - 10xGbE/10Gb MuxPonder, FEC
+
+        roadm1x4G100 - 4-port Reconfigurable optical add/drop multiplexer
+
+        dQgbeMxpR - Double Quad GbE MuxPonder, repeater
+
+        tpQMS - Quad MultiService transponder
+
+        tpQMSR - Quad MultiService transponder, repeater
+
+        gbe22Emxp10G - 22xGbE/10GbE Ethernet MuxPonder
+
+        mxp4x2G5Oc - 4x2,5G/10Gb MuxPonder in SONET mode
+
+        voa2ch - 2ch Variable Optical Attenuator
+
+        msMxp10GTCEr - Multiservice Muxponder Tunable 10G ER
+
+        msMxp10G - Multiservice Muxponder 10G
+
+        msMxpQMS2G5 - 2.5Gb Quad MultiService transponder
+
+        gbe22Emxp10Gii - 22xGbE/10GbE Ethernet MuxPonder Next Generation
+
+        bsu1x5Even - 1x5 Band Splitter Unit, Even 50 GhZ Spacing
+
+        bsu1x5Odd - 1x5 Band Splitter Unit, Odd 50 GhZ Spacing
+
+        mba1 - MS Access Collector 8xE1/T1+2xEth SDH/SONET mode
+
+        mba1Sonet - Deprecated
+
+        mba2 - MS Access Collector 16xE1/T1+4xEth SDH/SONET mode
+
+        mba2Sonet - Deprecated
+
+        mxpmbh1Sdh - MS Access Hub 4xSTM-1+16xEth SDH mode
+
+        mxpmbh1Sonet - MS Access Hub 4xOC-3+16xEth SONET mode
+
+        roadm1x8G50 - 8-port Reconfigurable optical add/drop multiplexer
+
+        emxp80Gii - 8x10GbE Ethernet MuxPonder-II
+
+        msMxpQMS2G5 - 2.5Gb Quad MultiService Repeater
+
+        mxp8iiSdh - 8p SDH 2,5G Muxponder v2
+
+        mxp8iiSonet - 8p Sonet 2,5G Muxponder v2
+
+        mba2E - MS Access Collector 16xE1/T1+4xEth SDH/SONET mode Temp hardend
+
+        mba2ptpSdh - MS Access Collector 16xE1/T1+4xEth point to point SDH mode
+
+        mba2ptpSonet - MS Access Collector 16xE1/T1+4xEth point to point SONET mode
+
+        mba2EptpSdh - MS Access Collector 16xE1/T1+4xEth point to point SDH mode Temp hardend
+
+        mba2EptpSonet - MS Access Collector 16xE1/T1+4xEth point to point SONET mode Temp hardend
+
+        tpq10Gfec - Quad MultiService 10G FEC Transponder
+
+        mstp40g   - Multiservice Transponder 40G
+
+        msmxp40G  - Multiservice Muxponder 40G
+
+        cuSfpii - CU-SFP/II: CU with 4 SFP OSC ports
+
+        coD40ev - Dual fiber DWDM Mux/Demux filter, 40 even channels, 50GHz spacing.
+        coD40eve - Dual fiber DWDM Mux/Demux filter with 1310 port, 40 even channels, 50 GHz spacing
+        coD40od - Dual fiber DWDM Mux/Demux filter, 40 odd channels, 50GHz spacing.
+        coD40ode - Dual fiber DWDM Mux/Demux filter with 1310 port, 40 odd channels, 50 GHz spacing
+
+        dcDk652km20 - Dispersion Compensation Module 20 km
+        dcDk652km40 - Dispersion Compensation Module 40 km
+        dcDk652km60 - Dispersion Compensation Module 60 km
+        dcDk652km80 - Dispersion Compensation Module 80 km
+        dcDk652km100 - Dispersion Compensation Module 100 km
+        dcDk652km120 - Dispersion Compensation Module 120 km
+        dcP652km20 - Dispersion Compensation Module 20 km
+        dcP652km40 - Dispersion Compensation Module 40 km
+        dcP652km60 - Dispersion Compensation Module 60 km
+        dcP652km80 - Dispersion Compensation Module 80 km
+        dcP652km100 - Dispersion Compensation Module 100 km
+        dcP652km120 - Dispersion Compensation Module 120 km
+
+        emxp40Gii - 4x10GbE Ethernet MuxPonder-II
+
+        tpqmp - Quad MultiProtocol Transponder
+
+        tpq10GfecReg - Quad MultiService 10G FEC Regenerator
+
+        mdu16cl50g - Colorless Mux/Demux Unit
+
+        voa8chsfp - 8ch SFP-based VOA unit
+
+        mxp10gotn - OTN Muxponder 10G
+
+        ocudq - Optical Coupler Unit, Dual Quad (2x1:4)
+
+        ocuseed2p - 2-Port Seed Light coupler Unit
+
+        tm4700 - TM2000 Shelf Controller
+
+        tm4011 - TM2000 40Gb/s Muxponder
+
+        tm100mxp - TM2000 100Gb/s Muxponder
+
+        tm100tp - TM2000 100Gb/s Transponder
+
+        tm100reg - TM2000 100Gb/s Regenerator
+
+        oypatchcord - Optical Y-patch cord
+
+        tpq10gfeci - Quad 10G FEC Transponder 1-slot
+
+        tpq10gfecregi - Quad MultiService 10G FEC Regenerator 1-slot
+
+        tphex10gotn - Hex 10G OTN Transponder
+
+        tp100gotn - 100G OTN Transponder
+
+        emxp220iie - 1x100GbE Ethernet MuxPonder-IIe
+
+        tpmrHL16G - Hex MultiRate 16G Lite Transponder
+
+        fhmxp10g - Fronthaul Muxponder 10G
+
+        mxp100gotn - 100G OTN Muxponder
+
+        fpu1 - Fiber Protection Unit
+
+        oaraed21hghyb - RAMAN/EDFA 21dBm HG hybrid board
+
+        oaraed21hgind - RAMAN/EDFA 21dBm HG individual board
+
+        emxp3 - 8xMPO Ethernet MuxPonder-III
+
+        ptio10g - PT Fabric i/O Unit 10&t
+
+        fhau1 - Fronthaul Access Unit FHAU/1
+
+        fha1u1 - Hardened Fronthaul Access Unit
+
+        tpmrHL16GUni - Hex MultiRate 16G Lite Transponder - - Unidirectional
+
+        oa1x20dBmVg2 - Variable Gain EDFA 20dBm v2
+
+        oa2x20dBmVg2 - Dual Variable Gain EDFA 20dBm v2
+
+        fxp400gotn - 400G OTN Flexponder
+
+        compo24 - CO-MPO24 CO-MPO24
+
+        tp100gotnii - 100G OTN Transponder-II
+
+        rfu1  - Remote Fronthaul Unit
+
+        roadm1x4f - 4-port Flex Reconfigurable optical add/drop multiplexer
+
+        ptio100g - PT Fabric I/O Unit 100&t
+
+        oadm2ch - 2ch DWDM OADM
+
+        emxp1u - Hardened EMXP Unit
+
+        emxp1us - Hardened EMXP with SDN
+
+        mxp200gotn - 200G OTN Muxponder
+
+        emxp440 - 440GbE Ethernet MuxPonder-III
+
+        emxp440q - 440GbE Q Ethernet MuxPonder-III
+
+        oaraed20lghyb - RAMAN/EDFA 20dBm LG hybrid board
+
+        roadm1x9f - 9-port Flex Reconfigurable optical add/drop multiplexer
+
+        ocm8p - 8-port Optical Channel Monitor
+
+        ad1c2fotdr - 1ch CWDM add/drop filter with 1610nm OTDR
+
+        hdea1600 - High Density Ethernet Aggregator
+
+        codsf24mpo10104 - Filter for HDEA1600
+
+        otdr8p - Optical Time Domain Reflectometer
+
+        oa1x21dBmVgEC - Variable Gain Extended C-band EDFA 21dBm
+
+        oa2x21dBmVgEC - Dual Variable Gain Extended C-band EDFA 21dBm
+
+        emxp800xh - Ethernet Muxponder 800 XHAUL"
+
+
+
+    SYNTAX INTEGER {
+        undefined (0),
+        cu (1), -- No longer used
+        tpMr2500 (2),
+        oxc8 (3),
+        oxc16 (4),
+        ocu2 (5),
+        mxp028 (6),
+        ad1AB (7),
+        ad1BA (8),
+        ad2AB (9),
+        ad2BA (10),
+        ad4AB (11),
+        ad4BA (12),
+        tpDGbE (13),
+        oa (14),
+        mdu8Ext (15),
+        mdu8Term (16),
+        ocu4 (17),
+        mxp004 (18), -- No longer used
+        ad2oaAB (19),
+        ad2oaBA (20),
+        oa2 (21),
+        adcwdm (22),
+        ad1spr (23), -- No longer used
+        tp10G (24),
+        tpLMr2500 (25),
+        cu1osc (26),   -- No longer used
+        cu2osc (27),
+        obu (28),
+        sync2Mhz (29),
+        mxp8 (30),
+        mxp16 (31),
+        tpDGbED (32),  -- No longer used (5.0 060120 EvoId 327)
+        tpDGbEC (33),  -- No longer used  (4.0 Evo ID 206)
+        tpDFcD (34),
+        tpDFcC (35),
+        tpFcGbED (36),  -- No longer used (5.0 060120 EvoId 327)
+        tpFcGbEC (37),  -- No longer used (5.0 060120 EvoId 327)
+        tpTFcD (38),    -- No longer used (5.0 060120 EvoId 327)
+        tpQMr (39),
+        mdu4TermAB (40),
+        mdu4TermBA (41),
+        ad1cwdm (42),
+        ad2cwdm (43),
+        tp10GLAN (44),
+        tp10GRC (45),      -- No longer used (5.0 060120 EvoId 327)
+        escon8 (46),       -- No longer used
+        oa1x15dBm (47),
+        oa2x15dBm (48),
+        gxp2500 (49),    -- No longer used (5.0 060120 EvoId 327)
+        gxp2500Sfp (50), -- 10xAny xWDM - pluggable line i/f
+        gxp10G (51),     -- No longer used
+        tpDGbEDv2 (52),  -- No longer used (5.0 060120 EvoId 327)
+        tpDGbESfp (53),  -- No longer used (5.0 060120 EvoId 327)
+        tpDFcDv2 (54),   -- No longer used (5.0 060120 EvoId 327)
+        tpDFcSfp (55),   -- No longer used (5.0 060120 EvoId 327)
+        ad2x1cwdm (56),  -- 2 x 1 Ch CWDM
+        ad2x2cwdm (57),  -- No longer used
+        mdu8Term2 (58),  -- No longer used
+        tpDDGbE (59),    -- Double Dual GbE
+        fpuOas2824 (60),  -- External board: fiber protection unit
+        mu2F8C (61),     -- MU-2F CWDM 8 ch
+        du2F8C (62),     -- DU-2F CWDM 8 ch
+        tpD10GL (63),    -- Double 10G Lite Transponder
+        tpDDGbER (64),   -- Repeater
+        tp10GBu (65),       -- No longer used
+        tp10GLANBu (66),    -- No longer used
+        tp10GClBu (67),     -- 10G (STM64) with client XFP
+        tp10GLANClBu (68),  -- No longer used
+        mdu8EvenExt (69),   -- 8 ch MDU for even channels, extension type
+        mdu8EvenTerm (70),  -- 8 ch MDU for even channels, terminal type
+        oapre1x17dBm (71),  -- No longer used (5.0 060120 EvoId 327)
+        oa2x17dBm (72),     -- Dual OA 17 dBm Line-amp
+        oiuc100200 (73),    -- Optical interleaver unit
+        oapow1x17dBm (74),  -- No longer used (5.0 060120 EvoId 327)
+        oa1x17dBm (75),     -- Single OA 17 dBm Line-amp
+        gbe9Mxp10G (76),   --  9xGbE/10Gb MuxPonder
+        ad1dwdm2F (77),     -- 1ch/2 fiber DWDM add/drop
+        ad1cwdm2F (78),     -- 1ch/2 fiber CWDM add/drop
+        mdu4Ext2F (79),     -- 4ch CWDM Mux, 2 fiber, extendable
+        mdu4Term2F (80),    -- 4ch CWDM Mux, 2 fiber, terminal
+        voa8ch (81),        -- 8ch Voltage controlled attenuator unit
+        oa1x20dBm (82),     -- Single OA 20 dBm amplifier df Gain 22
+        oa2x20dBm (83),     -- Dual OA 20 dBm amplifier df Gain 22
+        fpuYm235 (84),  -- External board: fiber protection unit
+        ad4dwdm2F (85),     -- 4 ch/2 fiber DWDM add/drop
+        tpQMri (86),        -- New QMR
+        oar450c (87),       -- RAMAN
+        cuSfp  (88),        -- New CU architecture
+        tpMr25v2 (89),      -- 2500 transponder version 2
+        tpD10GbE (90),      -- Double 10GbE, basic unit
+        tpD10GbER (91),     -- Double 10GbE, repeater
+        mdu4ExtAB (92),     -- Mux/demux 4 ports, extension, type A/B
+        mdu4ExtBA (93),     -- Mux/demux 4 ports, extension, type B/A
+        oiuc50100 (94),     -- Optical interleaver unit 50/100 GHz
+        mROADM1P800 (95),   -- No longer used
+        edu6pGbE (96),      -- No longer used
+        tp10GClTc (97),     -- 10G tunable
+        mxp4x2G5 (98),      -- 4xSTM-16/10Gb MuxPonder
+        oa1xLG20dBm (99),   -- Single OA 20 dBm amplifier df Gain 26
+        oa2xLG20dBm (100),  -- Dual OA 20 dBm amplifier df Gain 26
+        oa1xFG10dBm (101),  -- Single flat gain OA 10 dBm amplifier
+        oa2xFG10dBm (102),  -- Dual flat gain OA 10 dBm amplifier
+        tp10GOtnTc (103),   -- 10G tunable OTN transponder
+        mdu40Even (104),    -- 40 channel MDU, even 50 GHz DWDM
+        mdu40Odd (105),     -- 40 channel MDU, odd 50 GHz DWDM
+        mdu8Ee (106),       -- 8 channel 50GHz MDU, even, 100 GHz spacing
+        mdu8Eo (107),       -- 8 channel 50GHz MDU, odd, 100 GHz spacing
+        ocm2p (108),        -- 2 port Optical Channel Monitor
+        msMxp (109),        -- MultiService MuxPonder
+        voa8chii (110),     -- 8ch Variable Optical Attenuator - II
+        msMxpR (111),       -- MultiService MuxPonder Repeater
+        msMxpDQgbe (112),   -- DoubleQuad MuxPonder
+        tp10GTcEr (113),    -- 10Gb/s C-band Tunable Ext Reach Transp
+        gbe10Emxp10G (114), -- 10xGbE/10GbE Ethernet MuxPonder
+        edu12pGbE (115),    -- 12 port EDU with GbE line i/f
+        gbeMxp10GFEC (116), -- 10xGbE/10G FEC MuxPonder
+        roadm1x4G100 (117),  -- 4-port ROADM
+        dQgbeMxpR (118),    -- No longer used
+        tpQMS (119),        -- Quad MultiService Transponder
+        tpQMSR (120),       -- Quad MultiService Transponder Repeater
+        gbe22Emxp10G (121), -- 22xGbE/10GbE Ethernet MuxPonder
+        oa1x26dBm(122),     -- Power Extender
+        pcu2p (123),        -- Protection Control Unit
+        mxp4x2G5Oc (124),   -- 4x2,5G/10Gb-OC Muxponder
+        voa2ch (125),       -- 2ch Variable Optical Attenuator
+        msMxp10GTCEr (126), -- MultiService MuxPonder 10G Tunable
+        msMxp10G (127),     -- MultiService Muxponder 10G
+        msMxpQMS2G5 (128),  -- 2.5G Quad MultiService Transponder
+        gbe22Emxp10Gii (129),-- 22xGbE/10GbE Ethernet MuxPonder Next Generation
+        bsu1x5Even (130),    -- 1x5 Band Splitter Unit / EVEN 50GHz
+        bsu1x5Odd (131),     -- 1x5 Band Splitter Unit / ODD 50GHz
+        gbe10Emxp10Gii (132),-- 10xGbE/10GbE Ethernet MuxPonder Next Generation
+        mba1 (133),          --  No longer used
+        mba1SonetDeprecated (134),    --  Deprecated
+        mba2 (135),          --     MS Access Collector 16xE1/T1+4xEth SDH/SONET mode
+        mba2SonetDeprecated (136),    --        Deprecated
+        mxpmbh1Sdh (137),    --  MS Access Hub 4xSTM-1+16xEth SDH mode
+        mxpmbh1Sonet (138),  --  MS Access Hub 4xOC-3+16xEth SONET mode
+        roadm1x8G50 (139),   -- 8-port ROADM
+        ad4Even50 (140),     --  4 Channel DWDM Add/Drop, Even 50GHz
+        ad4Odd50  (141),     --  4 Channel DWDM Add/Drop, Odd 50GHz
+        emxp80Gii (142),     -- 8x10GbE Ethernet MuxPonder-II
+        msMxpQMS2G5R (143),  -- 2.5G Quad MultiService Repeater
+        mxp8iiSdh (144),     -- 8p SDH 2,5G Muxponder v2
+        mxp8iiSonet (145),   -- 8p Sonet 2,5G Muxponder v2
+        mba2E (146),         -- MS Access Collector 16xE1/T1+4xEth SDH/SONET mode Temp hardend
+        mba2ptpSdh (147),    -- MS Access Collector 16xE1/T1+4xEth Point to point SDH mode
+        mba2ptpSonet (148),  -- MS Access Collector 16xE1/T1+4xEth Point to point SONET mode
+        mba2EptpSdh (149),   -- MS Access Collector 16xE1/T1+4xEth Point to point SDH mode Temp hardend
+        mba2EptpSonet (150), -- MS Access Collector 16xE1/T1+4xEth Point to point SONET mode Temp hardend
+        mdu40EvenL (151),    -- 40ch MDU-Lite, even 50GHz DWDM
+        mdu40OddL (152),     -- 40ch MDU-Lite, odd 50GHz DWDM
+        oa1x20dBmVg (153),   -- Variable Gain Opt Ampl 20dBm C-band
+        oa2x20dBmVg (154),   -- Dual Var Gain Opt Ampl 20dBm C-band
+        roadm1x2G100 (155),  -- 1x2 ROADM 100GHz
+        roadm1x2G50 (156),   -- 1x2 ROADM 50GHz
+        tpq10Gfec (157),     -- Quad MultiService 10G FEC Transponder
+        cuSfpii  (158),      -- New CU architecture gen II
+        coD40ev (159),       -- Dual fiber DWDM Mux/Demux filter, 40 even channels, 50GHz spacing.
+        coD40eve (160),      -- Dual fiber DWDM Mux/Demux filter with 1310 port, 40 even channels, 50 GHz spacing
+        coD40od (161),       -- Dual fiber DWDM Mux/Demux filter, 40 odd channels, 50GHz spacing.
+        coD40ode (162),      -- No longer used
+        dcDk652km20 (163),   -- Dispersion Compensation Module 20 km
+        dcDk652km40 (164),   -- Dispersion Compensation Module 40 km
+        dcDk652km60 (165),   -- Dispersion Compensation Module 60 km
+        dcDk652km80 (166),   -- Dispersion Compensation Module 80 km
+        dcP652km40 (167),    -- Dispersion Compensation Module 40 km
+        dcP652km60 (168),    -- Dispersion Compensation Module 60 km
+        dcP652km80 (169),    -- Dispersion Compensation Module 80 km
+        dcP652km100 (170),   -- Dispersion Compensation Module 100 km
+        dcP652km120 (171),   -- Dispersion Compensation Module 120 km
+        emxp40Gii (172),     -- 4x10GbE Ethernet MuxPonder-II
+        tpqmp (173),         -- Quad MultiProtocol Transponder
+        tpq10GfecReg (174),  -- Quad MultiService 10G FEC Regenerator
+        mdu16cl50g (175),    -- Colorless Mux/Demux Unit
+        voa8chsfp (176),     -- 8ch SFP-based VOA unit
+        msTp40G (177),       -- MultiService Transponder 40G
+        msMxp40G(178),       -- MultiService MuxPonder 40G
+        mxp10gotn (179),     -- OTN Muxponder 10G
+        emxp62iie (180),     -- 22xGbE/4x10GbE Ethernet MuxPonder-IIe
+        emxp120iie (181),    -- 12x10GbE Ethernet MuxPonder-IIe
+        ocudq (182),         -- Optical Coupler Unit, Dual Quad (2x1:4)
+        tm4700 (183),        -- TM2000 Shelf Controller
+        tm4011 (184),        -- TM2000 40Gb/s Muxponder
+        tm100mxp (185),      -- TM2000 100Gb/s Muxponder
+        tm100tp (186),       -- TM2000 100Gb/s Transponder
+        tm100reg (187),      -- No longer used
+        ocuseed2p (188),     -- 2-Port Seed Light coupler Unit
+        oa2x21seed (189),    -- Dual 21 dBm Seed Light Unit
+        oypatchcord (190),   -- Optical Y-patch cord
+        tpq10gfeci (191),    -- Quad MultiService 10G FEC Transponder 1-slot
+        tpq10gfecregi (192), -- Quad MultiService 10G FEC Regenerator 1-slot
+        tphex10gotn (193),   -- Hex 10G OTN Transponder
+        emxp48iie (194),     -- 8xGbE/4x10GbE Ethernet MuxPonder-IIe
+        tp100gotn (195),     -- 100G OTN Transponder
+        emxp220iie (196),    -- 1x100GbE Ethernet MuxPonder-IIe
+        tpmrHL16G (197),     -- Hex MultiRate 16G Lite Transponder
+        fhmxp10g (198),      -- Fronthaul Muxponder 10G
+        mxp100gotn (199),    -- 100G OTN Muxponder
+        cuSfpiii (200),      -- New CU architecture gen III,
+        emxp240iie (201),    -- 24x10GbE Ethernet MuxPonder-IIe
+        tpmrHL16GUni (202),  -- Hex MultiRate 16G Lite Transponder - Unidirectional
+        fpu1 (203),          -- Fiber Protection Unit
+        oaraed21hghyb (204), -- Raman EDFA 21 HG hybrid board
+        oaraed21hgind (205), -- Raman EDFA 21 HG individual board
+        emxp3 (206),         -- 8xMPO Ethernet MuxPonder-III
+        dcDk652km100 (207),  -- Dispersion Compensation Module 100 km
+        dcDk652km120 (208),  -- Dispersion Compensation Module 120 km
+        dcP652km20 (209),    -- Dispersion Compensation Module 20 km
+        fhau1(210),          -- Fronthaul Access Unit FHAU/1
+        fha1u1(211),         -- Hardened Fronthaul Access Unit
+        oa1x20dBmVg2 (212),  -- Variable Gain EDFA 20dBm v2
+        oa2x20dBmVg2 (213),  -- Dual Variable Gain EDFA 20dBm v2
+        ptio10g (214),       -- PT-Fabric I/O Unit 10G
+        fxp400gotn (215),      -- 400G OTN Flexponder
+        compo24 (216),       -- CO_MPO24 cassette
+        rfu1 (217),         -- Remote Fronthaul Unit
+        coD919926 (218),    -- Dual fiber DWDM Mux/Demux filter, 8 channels, 100GHz spacing
+        coD927934 (219),    -- Dual fiber DWDM Mux/Demux filter, 8 channels, 100GHz spacing
+        coD935942 (220),    -- Dual fiber DWDM Mux/Demux filter, 8 channels, 100GHz spacing
+        coD943950 (221),    -- Dual fiber DWDM Mux/Demux filter, 8 channels, 100GHz spacing
+        coD951958 (222),    -- Dual fiber DWDM Mux/Demux filter, 8 channels, 100GHz spacing
+        coD919926e (223),   -- Dual fiber DWDM Mux/Demux filter, 8 channels with ext port, 100GHz spacing
+        coD927934e (224),   -- Dual fiber DWDM Mux/Demux filter, 8 channels with ext port, 100GHz spacing
+        coD935942e (225),   -- Dual fiber DWDM Mux/Demux filter, 8 channels with ext port, 100GHz spacing
+        coD943950e (226),   -- Dual fiber DWDM Mux/Demux filter, 8 channels with ext port, 100GHz spacing
+        coD951958e (227),   -- Dual fiber DWDM Mux/Demux filter, 8 channels with ext port, 100GHz spacing
+        co4 (228),          -- Dual fiber CWDM Mux/Demux filter, 8 channels
+        co5 (229),          -- Dual fiber CWDM Mux/Demux filter, 8 channels
+        codsf20eva (230),   -- Single fiber DWDM Mux/Demux filter, even channels, a-side
+        codsf20evb (231),   -- Single fiber DWDM Mux/Demux filter, even channels, b-side
+        codsf4919 (232),    -- Single fiber DWDM Mux/Demux filter
+        codsf4926 (233),    -- Single fiber DWDM Mux/Demux filter
+        codsf4927 (234),    -- Single fiber DWDM Mux/Demux filter
+        codsf4934 (235),    -- Single fiber DWDM Mux/Demux filter
+        codsf4935 (236),    -- Single fiber DWDM Mux/Demux filter
+        codsf4942 (237),    -- Single fiber DWDM Mux/Demux filter
+        codsf4943 (238),    -- Single fiber DWDM Mux/Demux filter
+        codsf4950 (239),    -- Single fiber DWDM Mux/Demux filter
+        codsf4951 (240),    -- Single fiber DWDM Mux/Demux filter
+        codsf4958 (241),    -- Single fiber DWDM Mux/Demux filter
+        codsf2919 (242),    -- Single fiber DWDM Mux/Demux filter
+        codsf2922 (243),    -- Single fiber DWDM Mux/Demux filter
+        codsf2923 (244),    -- Single fiber DWDM Mux/Demux filter
+        codsf2926 (245),    -- Single fiber DWDM Mux/Demux filter
+        codsf2927 (246),    -- Single fiber DWDM Mux/Demux filter
+        codsf2930 (247),    -- Single fiber DWDM Mux/Demux filter
+        codsf2931 (248),    -- Single fiber DWDM Mux/Demux filter
+        codsf2934 (249),    -- Single fiber DWDM Mux/Demux filter
+        codsf2935 (250),    -- Single fiber DWDM Mux/Demux filter
+        codsf2938 (251),    -- Single fiber DWDM Mux/Demux filter
+        codsf2939 (252),    -- Single fiber DWDM Mux/Demux filter
+        codsf2942 (253),    -- Single fiber DWDM Mux/Demux filter
+        codsf2943 (254),    -- Single fiber DWDM Mux/Demux filter
+        codsf2946 (255),    -- Single fiber DWDM Mux/Demux filter
+        codsf2947 (256),    -- Single fiber DWDM Mux/Demux filter
+        codsf2950 (257),    -- Single fiber DWDM Mux/Demux filter
+        codsf2951 (258),    -- Single fiber DWDM Mux/Demux filter
+        codsf2954 (259),    -- Single fiber DWDM Mux/Demux filter
+        codsf2955 (260),    -- Single fiber DWDM Mux/Demux filter
+        codsf2958 (261),    -- Single fiber DWDM Mux/Demux filter
+        tp100gotnii (262),  -- 100G OTN Transponder-II
+        roadm1x4f (263),    -- 1x4 Flex ROADM
+        ptio100g (264),     -- PT-Fabric I/O Unit 100G
+        oadm2ch (265),      -- 2ch DWDM OADM
+        emxp1u(266),        -- Hardened EMXP Unit
+        emxp1us(267),       -- Hardened EMXP with SDN
+        mxp200gotn (268),   -- 200G OTN Muxponder
+        emxp440 (269),      -- 440G Ethernet MuxPonder
+        oaraed20lghyb (270),-- Raman EDFA 20 LG hybrid board
+        roadm1x9f (271),    -- 1x9 Flex ROADM
+        ocm8p (272),        -- 8 port Optical Channel Monitor
+        ad1c2fotdr (273),   -- 1ch CWDM add/drop filter with 1610nm OTDR"
+        hdea1600 (274),     -- High density ethernet aggregator
+        oa1xLG20dBmb (275),   -- Single OA 20 dBm amplifier df Gain 26 (TU2 version)
+        oa2xLG20dBmb (276),   -- Dual OA 20 dBm amplifier df Gain 26 (TU2 version)
+        oa1x20dBmVgb (277),   -- Variable Gain Opt Ampl 20dBm C-band (TU2 version)
+        oa2x20dBmVgb (278),   -- Dual Var Gain Opt Ampl 20dBm C-band (TU2 version)
+        codsf24mpo10104 (279),  -- Single fiber DWDM Mux/Demux filter
+        otdr8p (280),         -- 8 Port Optical Time Domain Reflectometer
+        coD48ev (281),      -- 48ch MDU DWDM 50GHz Even (Not added in ENM R32.0 - marked as obsolete)
+        coD48od (282),      -- 48ch MDU DWDM 50GHz Odd (Not added in ENM R32.0 - marked as obsolete)
+        emxp440q (283),      -- 440G Q Ethernet MuxPonder
+        oa1x21dBmVgEC (284), -- Variable Gain Opt Ampl 21dBm Extended C-band
+        oa2x21dBmVgEC (285), -- Dual Variable Gain Opt Ampl 21dBm Extended C-band
+        co10 (286),          -- Dual fiber CWDM Mux/Demux filter, 4 channels
+        emxp800xh (287),     -- Ethernet Muxponder 800 XHAUL
+        coocuD4x4 (288),     -- CO-OCUD4x4 contains two units of 4x4 couplers.
+        coocuD4x8 (289),     -- CO-OCUD4x8 contains two units of 4x8 couplers.
+        cooiuc50100 (290),   -- Optical interleaver unit 50/100 GHz
+        co2xOTDR1611 (291),  -- Dual OTDR filter 1611nm
+        coD4919 (292),       -- Dual fiber DWDM add/drop filter, 4 channels
+        coD4923 (293),       -- Dual fiber DWDM add/drop filter, 4 channels
+        coD4927 (294),       -- Dual fiber DWDM add/drop filter, 4 channels
+        coD4931 (295),       -- Dual fiber DWDM add/drop filter, 4 channels
+        coD4935 (296),       -- Dual fiber DWDM add/drop filter, 4 channels
+        coD4939 (297),       -- Dual fiber DWDM add/drop filter, 4 channels
+        coD4943 (298),       -- Dual fiber DWDM add/drop filter, 4 channels
+        coD4947 (299),       -- Dual fiber DWDM add/drop filter, 4 channels
+        coD4951 (300),       -- Dual fiber DWDM add/drop filter, 4 channels
+        coD4955 (301),       -- Dual fiber DWDM add/drop filter, 4 channels
+
+        -- TG Series of passive boards, modelled in TNM
+        tgCo4 (1001),          -- CO-4
+        tgCo5 (1005),          -- CO-5
+        tgCo6 (1006),          -- CO-6
+        tgCo7 (1007),          -- CO-7
+        tgCo8 (1008),          -- CO-8
+        tgCo9 (1009),          -- CO-9
+        tgCo10 (1010),         -- CO-10
+        tgCo11 (1011),         -- CO-11
+        tgCo12 (1012),         -- CO-12
+        tgCo14 (1014),         -- CO-14
+        tgCo15 (1015),         -- CO-15
+        tgCo16 (1016),         -- CO-16
+        tgCoDxxxyyy (1040),   -- CO-DXXX-YYY
+        tgCoD40ev (1041),    -- CO_D40EV
+        tgCoD40eve (1042),   -- CO_D40EV-E
+        tgCoD40od (1043),    -- CO_D40OD
+        tgCoD40ode (1044),   -- CO_D40OD-E
+        tgCoBSU1x5ev (1050),   -- CO-BSU1x5EV
+        tgCoBSU1x5od (1051),   -- CO-BSU1x5OD
+        tgCad86XX04 (1055),   -- OAD-86XX/04
+        tgCad86XX02 (1056),   -- OAD-86XX/02
+        tgCoDSF2ch9XXAB (1057), -- CO-DSF2/9XX_AB
+        tgCoDSF4ch9XXAB (1058), -- CO-DSF4/9XX_AB
+        tgCoDSF2ch9XXBA (1059), -- CO-DSF2/9XX_BA
+        tgCoDSF4ch9XXBA (1060), -- CO-DSF4/9XX_BA
+        tgTcosf2x1b (1061),     -- Passive CWDM AD TCO-SF 2x1 B
+        tgTcosf2x1d (1062),     -- Passive CWDM AD TCO-SF 2x1 D TM-EDU Accedian
+        tgCoD4XXX (1070),       -- CO-D4-XXX
+        tgCoDSF20 (1080),       -- CO-DSF20
+        tgCoDSF20evA (1081),    -- CO-DSF20-EVA
+        tgCoDSF20evB (1082),    -- CO-DSF20-EVB
+        tgCoDSF20odA (1083),    -- CO-DSF20-ODA
+        tgCoDSF20odB (1084),    -- CO-DSF20-ODB
+        tgCoSFBSU1x5ev (1085),  -- CO-SFBBSU1x5EV
+
+        tgTco12 (2012),         -- TCO-12
+        tgTco14 (2014),         -- TCO-14
+
+        -- TM-EDU Accedian board types
+        acd2pGbE  (10000),    -- 2 port Accedian EDU
+        acd5pGbE  (10001),    -- 5 port Accedian EDU
+        acd10G    (10002),    -- Accedian EDU 10G
+        edu5GT    (10003),    -- EDU_ACD_5_GT
+        edu10GLT  (10004),    -- EDU_ACD_10G_LT
+        edu10GLTS (10005),    -- EDU_ACD_10G_LTS
+
+        -- Port device board types
+        nidGE (20000),      -- PORT_DEVICE_NID_GE
+        nidSfp155 (20001),  -- PORT_DEVICE_SFP_155
+        nidSfp622 (20002),  -- PORT_DEVICE_SFP_622
+        nidSfpVc12 (20003), -- PORT_DEVICE_SFP_Vc12
+        nidSfp2488 (20004), -- PORT_DEVICE_SFP_2488
+
+        -- TS-1100 board types
+        ts1100EthMux4p  (220401),       -- TS-1100 2204/01 Four port Ethernet Switch/Mux
+        ts1100OPU (250101),             -- TS-1100 2501/01 Optical Protection Unit
+        ts1100OPUDouble (250201),       -- TS-1100 2502/01 Optical Protection Unit (double width +1)
+        ts1100PreAmpDouble (260401),    -- TS-1100 2604/01 Pre-Amplifier (double width +1)
+        ts1100PreAmp (261001),          -- TS-1100 2610/01 Pre-Amplifier
+        ts1100AttenuatorDouble (270001), -- TS-1100 2700/01 Attenuator (double width -1)
+        -- fixme: TS-1100 270X/02 attenuator sub-modules
+        ts1100UnivAggDGbE (540001),     -- TS-1100 5400/01 Universal aggregator
+        ts1100UnivAggDFC (540002),      -- TS-1100 5400/02 Universal aggregator
+        ts1100UnivAggDGbE2 (540003),    -- TS-1100 5400/03 Universal aggregator
+        ts1100UnivAgg (550000),         -- TS-1100 5500/0x Universal aggregator
+        ts1100UnivAgg4xGbE (580000),    -- TS-1100 5800/01 4xGbE Universal aggregator
+        ts1100UnivAgg2xDGbE (5800002),  -- TS-1100 5800/01 Dual 2xGbE Universal aggregator
+        ts1100UnivAgg3xGbERep (5800003),-- TS-1100 5800/01 3xGbE Repeater Universal aggregator
+        ts1100UnivAgg3x25GRep (5800004),-- TS-1100 5800/01 3x2.5G Repeater Universal aggregator
+        ts1100UnivAgg2xGbE2xSTM (581000),-- TS-1100 5810/01 2xGbE 2xSTM Universal aggregator
+        ts1100UnivAgg4xGbE2 (5810002),  -- TS-1100 5810/01 4xGbE Universal aggregator
+        ts1100UnivAgg3xGbERep2 (5810003),-- TS-1100 5810/01 3xGbE Repeater Universal aggregator
+        ts1100Muxponder10G     (590000), -- TS-1100 5900/01 10G Muxponder 1x4,25Gb 4xGbE
+        ts1100Muxponder10G2    (5900002), -- TS-1100 5900/01 10G Muxponder 1G 2x4GFC
+        ts1100Nmb (600100),             -- TS-1100 6001 Network management board
+        ts1100Nmb6003 (600300),         -- TS-1100 6003 Network management board
+        ts1100Tp2x4GFC (740001),        -- TS-1100 7400/01 2x4Gb-Transponders
+        ts1100Conv1250Cwdm (750000),    -- TS-1100 702[0-3] 1,25 Gb CWDM Converter
+                                        -- TS-1100 75[01-18]/* 1,25 Gb CWDM Converter
+                                        -- TS-1100 75[01-18]/01 Repeater versions not supported
+        ts1100Conv2500Cwdm (760000),    -- TS-1100 76[01-16]/* 2,5 Gb CWDM Converter
+                                        -- TS-1100 76[01-16]/01 Repeater versions not supported
+                                        -- TS-1100 76[01-16]/11 Repeater versions not supported
+        ts1100Tp2500Cwdm1 (770000),     -- TS-1100 7700/0[1-2] 2,5 Gb CWDM Transponder
+        ts1100Tp2x2500Cwdm1 (772000),   -- TS-1100 7720/01 2x 2,5 Gb CWDM Transponder
+        ts1100Tp10G (790000),           -- TS-1100 7900/01 10 Gb Transponder
+        ts1100Tp10G7910   (791000),     -- TS-1100 7910/01 10 Gb Transponder
+        ts1100Tp10G7910Rep (7910002),   -- TS-1100 7910/01 10 Gb Repeater
+        ts1100DuplexerDouble (802001),  -- TS-1100 8120/01 Wdm duplexer (double width)
+        ts1100MuxDemux4chPizza (803000), -- TS-1100 8030 4 ch mux/demux (pizza)
+        ts1100MuxDemux4chExtPizza (803100), -- TS-1100 8031 4 ch mux/demux with ext (pizza)
+        ts1100MuxDemux8chPizza (803200), -- TS-1100 8032 mux/demux (pizza)
+                                        -- TS-1100 8034 mux/demux (pizza)
+        ts1100MuxDemux8chExtPizza (803300), -- TS-1100 8033 mux/demux with ext/monitor (ext)
+        ts1100Duplexer (812001),        -- TS-1100 8120/01 Wdm duplexer
+        ts1100MuxDemux4ch1t4 (813001),  -- TS-1100 8130/01 4 channel (1-4) mux/demux
+        ts1100MuxDemux4p1ch1t4 (813101), -- TS-1100 8131/01 4+1 channel (1-4) mux/demux
+        ts1100MuxDemux8ch (813200),     -- TS-1100 813[2-4] 8 channel mux/demux (piu)
+        ts1100MuxDemux8p1ch (813300),   -- TS-1100 813[2-4] 8+1 channel mux/demux (piu)
+        ts1100MuxDemux8ch2 (813400),     -- TS-1100 813[2-4] 8 channel mux/demux 2 (piu)
+        ts1100MuxDemux4ch5t8 (814001),  -- TS-1100 8140/01 4 channel (5-8) mux/demux
+        ts1100MuxDemux4p1ch5t8 (814101), -- TS-1100 8141/01 4+1 channel (5-8) mux/demux
+        ts1100MuxDemux4chBidir (823000), -- TS-1100 8230/[0-1][1-2] 4 channel bidir CWDM mux/demux
+        ts1100AddDropDouble (850100),   -- TS-1100 850[1-8]/* oadm (double width -1)
+        ts1100AddDrop (870101),         -- TS-1100 870[1-8]/01 CWDM OADM
+        ts1100AddDropSingle (870102),   -- TS-1100 870[1-8]/02 CWDM Single Sided OADM
+        ts1100DWDMMuxDemuxExt (883001), -- TS-1100 8830/01 DWDM mux/demux band A ext
+        ts1100DWDMMuxDemux (883101),    -- TS-1100 8831/01 DWDM mux/demux band B
+                                        -- TS-1100 8832/01 DWDM mux/demux band C
+        ts1100Power9000Supply (900000),    -- TS-1100 Unconfigured powersupply in 9011 subrack
+        ts1100Power9048Supply (904800),    -- TS-1100 48 V DC Power supply in 9011 subrack
+        ts1100Power9122Supply (912200),    -- TS-1100 220 V DC Power supply in 9013 subrack
+        ts1100Power9148Supply (914800),    -- TS-1100 48 V DC Power supply in 9013 subrack
+        ts1100Power9220Supply (922000),    -- TS-1100 220 V DC Power supply in 9011 subrack
+
+        -- TM-206 board types
+        tm206Fan (9200201),                -- TM-206 2002/01 Fan
+        tm206OSC1 (9221001),               -- TM-206 2210/01 OSC board
+        tm206OSC2 (9221002),               -- TM-206 2210/02 OSC board
+        tm206TAM4xesc (9500101),           -- TM-206 5001/01 Traffic aggregator 4xescon
+        tm206TAMln4xesc (9510101),         -- TM-206 5101/01 Traffic aggregator line+4xescon
+        tm206TAMln4xetr (9510201),         -- TM-206 5102/01 Traffic aggregator line+4xetr
+        tm206TAMlnFlex (9510301),          -- TM-206 5103/01 Traffic aggregator flexible
+        tm206TAMln2xfc (9510401),          -- TM-206 5104/01 Traffic aggregator 2xfc,gbe
+        tm206TAMlnp2xfc (9510501),         -- TM-206 5105/01 Traffic aggregator 2xfc,gbe
+        tm206Cu (9600201),                 -- TM-206 6002/01 Network management board
+        tm206Cu2 (9600202),                -- TM-206 6002/02 Network management board
+        tm206tp2x4gfc (9780001),           -- TM-206 7800/01 2x4Gb-Transponders
+        tm206MuxDemux4ch1t4 (9813001),     -- TM-206 8130/01 4 channel (1-4) mux/demux
+        tm206MuxDemux4p1ch1t4 (9813101),   -- TM-206 8131/01 4+1 channel (1-4) mux/demux
+        tm206MuxDemux4ch5t8 (9814001),     -- TM-206 8140/01 4 channel (5-8) mux/demux
+        tm206MuxDemux4p1ch5t8 (9814101),   -- TM-206 8141/01 4+1 channel (5-8) mux/demux
+        tm206MuxDemux4chBidir1 (9823001),  -- TM-206 8230/01 4 channel bidir CWDM mux/demux
+        tm206MuxDemux4chBidir2 (9823002),  -- TM-206 8230/02 4 channel bidir CWDM mux/demux
+        tm206AddDrop (9870101)             -- TM-206 870[1-8]/01 CWDM OADM
+    }
+
+FirstPbSlot ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+        "A value indicating the first slot where it is
+        possible to configure a passive board in a subrack.
+
+        undefined - indicates that no value has yet been set.
+
+        slot3 - Slot 3 is the first passive slot.
+
+        slot4 - Slot 4 is the first passive slot.
+
+        slot13 - Slot 13 is the first passive slot."
+    SYNTAX      INTEGER {
+                        undefined(0),
+                        slot3(3),
+                        slot4(4),
+                        slot13(13) }
+
+-- ----------------------------------------------------
+-- General group
+-- ----------------------------------------------------
+
+equipmentGeneralTestAndIncr OBJECT-TYPE
+    SYNTAX      TestAndIncr
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Protection against simultaneous access from
+        multiple managers. See SNMPv2-TC.
+
+"
+    ::= { equipmentGeneral 1 }
+
+equipmentGeneralMibSpecVersion OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The MIB specification version.
+
+        tbd: persistent?
+
+"
+    DEFVAL { "" }
+    ::= { equipmentGeneral 2 }
+
+equipmentGeneralMibImplVersion OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The MIB implementation version.
+
+"
+    DEFVAL { "" }
+    ::= { equipmentGeneral 3 }
+
+equipmentGeneralLastChangeTime OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The time when the configuration of the MIB was last
+        changed.
+
+"
+    ::= { equipmentGeneral 4 }
+
+equipmentGeneralStateLastChangeTime OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The time when the state of the MIB was last changed.
+
+"
+    ::= { equipmentGeneral 5 }
+
+equipmentGeneralEquipmentSubrackTableSize OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Size of table
+
+"
+    ::= { equipmentGeneral 6 }
+
+equipmentGeneralEquipmentBoardTableSize OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Size of table
+
+"
+    ::= { equipmentGeneral 7 }
+
+equipmentGeneralEquipmentPowerTableSize OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Size of table
+
+"
+    ::= { equipmentGeneral 8 }
+
+equipmentGeneralEquipmentFanTableSize OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Size of table
+
+"
+    ::= { equipmentGeneral 9 }
+
+equipmentGeneralEquipmentSlotTableSize OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Size of table
+
+"
+    ::= { equipmentGeneral 10 }
+
+equipmentGeneralEquipmentOpticalModuleTableSize OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Size of table
+
+"
+    ::= { equipmentGeneral 11 }
+
+-- ----------------------------------------------------
+-- Subrack information
+-- ----------------------------------------------------
+
+equipmentSubrackTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF EquipmentSubrackEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The subrack list."
+    ::= { equipmentSubrackList 1 }
+
+equipmentSubrackEntry OBJECT-TYPE
+    SYNTAX      EquipmentSubrackEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry in the subrack list.
+
+"
+    INDEX { equipmentSubrackIndex }
+    ::= { equipmentSubrackTable 1 }
+
+EquipmentSubrackEntry ::=
+    SEQUENCE {
+        equipmentSubrackIndex                   Unsigned32,
+        equipmentSubrackName                    MgmtNameString,
+        equipmentSubrackSubrack                 SubrackNumber,
+        equipmentSubrackDescr                   DisplayString,
+        equipmentSubrackInvPhysIndexOrZero      Unsigned32,
+        equipmentSubrackAllFanUnitsFailed       FaultStatus,
+        equipmentSubrackRowStatus               RowStatus,
+        equipmentSubrackExpectedType            EquipmentSubrackType,
+        equipmentSubrackActualType              EquipmentSubrackType,
+        equipmentSubrackUnexpectedType          FaultStatus,
+        equipmentSubrackTemp                    Integer32,
+        equipmentSubrackTempHighExceeded        FaultStatus,
+        equipmentSubrackTempThreshold           Integer32,
+        equipmentSubrackDataChanged             FaultStatus,
+        equipmentSubrackSystemModeSet           FaultStatus,
+        equipmentSubrackEffectiveSystemMode     Unsigned32,
+        equipmentSubrackCurrentSystemMode       Unsigned32,
+        equipmentSubrackAdminStatus             INTEGER,
+        equipmentSubrackOperStatus              INTEGER,
+        equipmentSubrackObjectProperty          ObjectProperty,
+        equipmentSubrackShelfLength             Unsigned32,
+        equipmentSubrackLANModuleMissing        FaultStatus,
+        equipmentSubrackExpectedFirstPbSlot     FirstPbSlot,
+        equipmentSubrackActualFirstPbSlot       FirstPbSlot,
+        equipmentSubrackFirstPbSlotMismatch     FaultStatus,
+        equipmentSubrackAid                     DisplayString,
+        equipmentSubrackPhysicalLocation        DisplayString,
+        equipmentSubrackChangeExpectedType      CommandString }
+
+equipmentSubrackIndex OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..2147483647)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "An arbitrary index assigned to each
+        subrack entry.
+
+"
+    ::= { equipmentSubrackEntry 1 }
+
+equipmentSubrackName OBJECT-TYPE
+    SYNTAX      MgmtNameString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The name of the subrack, for example 'sub1'
+        where the number indicates the subrack number.
+
+"
+    ::= { equipmentSubrackEntry 2 }
+
+equipmentSubrackSubrack OBJECT-TYPE
+    SYNTAX      SubrackNumber
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The number of the subrack.
+
+"
+    ::= { equipmentSubrackEntry 3 }
+
+equipmentSubrackDescr OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "User configurable label.
+
+"
+    DEFVAL { "" }
+    ::= { equipmentSubrackEntry 4 }
+
+equipmentSubrackInvPhysIndexOrZero OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..2147483647)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The row in the invPhysTable for this subrack.
+        Set to 0 if not known.
+
+"
+    ::= { equipmentSubrackEntry 5 }
+
+equipmentSubrackAllFanUnitsFailed OBJECT-TYPE
+    SYNTAX      FaultStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "All fan units in a subrack have failed.
+
+        A(ctivation): fanUnitFailed active for all fans
+        within a subrack.
+
+        D(e-activiation): fanUnitFailed cleared for one
+        fan unit.
+
+"
+    ::= { equipmentSubrackEntry 6 }
+
+equipmentSubrackRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "SNMP administrivia.
+        Manages creation and deletion of conceptual rows.
+        See also SNMPv2-TC.
+
+"
+    ::= { equipmentSubrackEntry 7 }
+
+equipmentSubrackExpectedType OBJECT-TYPE
+    SYNTAX      EquipmentSubrackType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The expected subrack type.
+
+"
+    DEFVAL { undefined }
+    ::= { equipmentSubrackEntry 8 }
+
+equipmentSubrackActualType OBJECT-TYPE
+    SYNTAX      EquipmentSubrackType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The actual subrack type. If an unexpected
+        subrack has been detected this variable can be
+        used to see what type of subrack has been
+        detected.
+
+"
+    ::= { equipmentSubrackEntry 9 }
+
+equipmentSubrackUnexpectedType OBJECT-TYPE
+    SYNTAX      FaultStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "A type of subrack not matching the expected
+        type is present.
+
+        A: A subrack with type different from the
+        expected type is present (even if the subrack
+        is not activated).
+
+        D: The type matches the expected or no
+        subrack is present.
+
+"
+    ::= { equipmentSubrackEntry 10 }
+
+equipmentSubrackTemp OBJECT-TYPE
+    SYNTAX      Integer32 (-1000..1000)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The temperature in the subrack in 0.1 degrees centigrade.
+
+"
+    ::= { equipmentSubrackEntry 11 }
+
+equipmentSubrackTempHighExceeded OBJECT-TYPE
+    SYNTAX      FaultStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The threshold for environmental temperature
+        in the subrack is exceeded.
+
+        A: The temperature exceeds the associated threshold.
+
+        D: Temperature is 0.5 degrees centigrade below the
+        associated threshold.
+
+"
+    ::= {equipmentSubrackEntry 12 }
+
+equipmentSubrackTempThreshold OBJECT-TYPE
+    SYNTAX      Integer32 (-100..800)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The threshold for temperature alarm in the
+        subrack in 0.1 degrees centigrade.
+
+"
+    DEFVAL { 550 }
+    ::= { equipmentSubrackEntry 13 }
+
+equipmentSubrackDataChanged OBJECT-TYPE
+    SYNTAX      FaultStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The subrack data (dipswitches for subrackId and/or
+         system mode) has been changed. Changing this data might
+         affect the system behaviour after the next restart.
+
+         A: The subrack data has been changed since startup
+
+         D: The subrack data is changed back to the value read
+         at startup, or the system is restarted.
+
+"
+    ::= {equipmentSubrackEntry 14 }
+
+equipmentSubrackSystemModeSet OBJECT-TYPE
+    SYNTAX      FaultStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value read from the system mode
+         dipswitches at startup of the CU was
+         diffrent from 0.
+
+         This will affect the behaviour of the
+         system.
+
+         If the lowest bit is set, the backup
+         is read from the TUs - useful at CU
+         replacement.
+
+         A: The system mode is different from 0
+         at startup.
+
+         D: The system mode is 0 at startup.
+
+"
+    ::= {equipmentSubrackEntry 15 }
+
+equipmentSubrackEffectiveSystemMode OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..2147483647)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the system mode dipswitches
+        read at startup. This value determines the
+        system behaviour.
+
+"
+    ::= { equipmentSubrackEntry 16 }
+
+equipmentSubrackCurrentSystemMode OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..2147483647)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The current value of the system mode
+         dipswitches. Will be used at the next
+         restart.
+
+"
+    ::= { equipmentSubrackEntry 17 }
+
+equipmentSubrackAdminStatus OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    down (1),
+                    up (2) }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The administrative state of the subrack.
+
+        down - This subrack should not be monitored.
+        Suppresses alarms.
+
+        up - The subrack should be monitored.
+
+"
+    DEFVAL { up }
+    ::= { equipmentSubrackEntry 18 }
+
+equipmentSubrackOperStatus OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    notPresent (1),
+                    down (2),
+                    up (3) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The operational state of the subrack.
+
+        notPresent - The subrack is not available.
+
+        down - The subrack remains in the 'down'-state
+        when adminStatus is set to 'down'.
+
+        up - The subrack is active and monitored.
+
+"
+    DEFVAL { notPresent }
+    ::= { equipmentSubrackEntry 19 }
+
+equipmentSubrackObjectProperty  OBJECT-TYPE
+    SYNTAX      ObjectProperty
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Property mask.
+
+"
+    ::= { equipmentSubrackEntry 20 }
+
+equipmentSubrackShelfLength OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..32)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Length of the half-height slot divider shelf. To be
+        manually entered by the user. A value of 0 is
+        interpreted as 'not yet defined by user'.
+
+"
+    DEFVAL { 0 }
+    ::= { equipmentSubrackEntry 21 }
+
+equipmentSubrackLANModuleMissing OBJECT-TYPE
+    SYNTAX      FaultStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The subrack LAN/DCN module is missing.
+
+        A(ctivation): LAN/DCN module disconnected from subrack
+                      for more than 2 seconds.
+
+        D(e-activiation): LAN/DCN module connected to subrack
+                          for more than 2 seconds.
+
+"
+    ::= { equipmentSubrackEntry 22 }
+
+equipmentSubrackExpectedFirstPbSlot OBJECT-TYPE
+    SYNTAX      FirstPbSlot
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The lowest slot number where it is possible to
+        configure a passive board. Automatically configured
+        to the actual value supported by hardware if the
+        hardware is present on subrack configuration.
+
+        If no hardware is present at configuration time,
+        this value is set to 'undefined' until changed by
+        the user. The 'undefined' value allows passive board
+        configuration in the same slots as the highest
+        possible firstPbSlot setting of the subrack type.
+
+"
+    DEFVAL { 0 }
+    ::= { equipmentSubrackEntry 23 }
+
+equipmentSubrackActualFirstPbSlot OBJECT-TYPE
+    SYNTAX      FirstPbSlot
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The actual lowest slot number where it is possible
+        to configure a passive board.
+
+        When no subrack hardware is present, this value is
+        'undefined'.
+
+"
+    DEFVAL { 0 }
+    ::= { equipmentSubrackEntry 24 }
+
+equipmentSubrackFirstPbSlotMismatch OBJECT-TYPE
+    SYNTAX      FaultStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The expected first passive slot allows more passive
+       boards than the hardware supports.
+
+        A(ctivation): A subrack and control unit combination
+                      which supports fewer passive boards
+                      than configured is present.
+
+        D(e-activiation): A subrack and control unit
+                          combination which supports the
+                          current configuration is present.
+
+"
+    ::= { equipmentSubrackEntry 25 }
+
+equipmentSubrackAid OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The access identifier (AID) of the product.
+         The format is according to GR-833.
+
+"
+    ::= { equipmentSubrackEntry 26 }
+
+equipmentSubrackPhysicalLocation OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The Physical location of the product.
+         The format is according to GR-833.
+
+"
+    ::= { equipmentSubrackEntry 27 }
+
+
+equipmentSubrackChangeExpectedType OBJECT-TYPE
+    SYNTAX      CommandString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Command to change expected type,
+        used when upgrading subrack to a new version,
+        e.g TM3000 to TM3000/II
+	
+"
+    ::= { equipmentSubrackEntry 28 }
+
+
+
+-- ----------------------------------------------------
+-- Board information
+-- ----------------------------------------------------
+
+equipmentBoardTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF EquipmentBoardEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The board list."
+    ::= { equipmentBoardList 1 }
+
+equipmentBoardEntry OBJECT-TYPE
+    SYNTAX      EquipmentBoardEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry in the board list.
+        One entry for each slot.
+
+"
+    INDEX { equipmentBoardIndex }
+    ::= { equipmentBoardTable 1 }
+
+EquipmentBoardEntry ::=
+    SEQUENCE {
+        equipmentBoardIndex                     Unsigned32,
+        equipmentBoardName                      MgmtNameString,
+        equipmentBoardExpectedType              EquipmentBoardType,
+        equipmentBoardActualType                EquipmentBoardType,
+        equipmentBoardDescr                     DisplayString,
+        equipmentBoardSubrack                   SubrackNumber,
+        equipmentBoardSlot                      SlotNumber,
+        equipmentBoardTemp                      Integer32,
+        equipmentBoardInvPhysIndexOrZero        Unsigned32,
+        equipmentBoardLedTest                   INTEGER,
+        equipmentBoardAdminStatus               BoardOrInterfaceAdminStatus,
+        equipmentBoardOperStatus                BoardOrInterfaceOperStatus,
+        equipmentBoardLastChangeTime            DateAndTime,
+        equipmentBoardRowStatus                 RowStatus,
+        equipmentBoardMissing                   FaultStatus,
+        equipmentBoardUnexpectedType            FaultStatus,
+        equipmentBoardTempHighExceeded          FaultStatus,
+        equipmentBoardCommunicationFailure      FaultStatus,
+        equipmentBoardInterworkFailed           FaultStatus,
+        equipmentBoardSecondaryPowerFailed      FaultStatus,
+        equipmentBoardVitalDataMissing          FaultStatus,
+        equipmentBoardNonVitalDataMissing       FaultStatus,
+        equipmentBoardUnderMaintenance          FaultStatus,
+        equipmentBoardTempThreshold             Integer32,
+        equipmentBoardSwVersionMismatch         FaultStatus,
+        equipmentBoardObjectProperty            ObjectProperty,
+        equipmentBoardTempLow                   FaultStatus,
+        equipmentBoardTempVeryHigh              FaultStatus,
+        equipmentBoardReconfigure               CommandString,
+        equipmentBoardLedStatus                 INTEGER,
+        equipmentBoardModuleInfo                DisplayString,
+        equipmentBoardNewSwActivatedButNotRestarted   FaultStatus,
+        equipmentBoardLowTemperature            FaultStatus,
+        equipmentBoardTempLowThreshold          Integer32,
+        equipmentBoardAdditionalInfo            DisplayString,
+        equipmentBoardBootError                 FaultStatus,
+        equipmentBoardHardwareError             FaultStatus,
+        equipmentBoardLowDiskSpace              FaultStatus,
+        equipmentBoardClockDrift                FaultStatus,
+        equipmentBoardPostponeFwUpgrade         INTEGER,
+        equipmentBoardActivatePendingFwCommand  CommandString,
+        equipmentBoardFwActivationPending       FaultStatus,
+        equipmentBoardFeatureNotSupported       FaultStatus,
+        equipmentBoardFwReloadNeeded            FaultStatus,
+        equipmentBoardFwContextUnknown          FaultStatus,
+        equipmentBoardBoardVariant              INTEGER,
+        equipmentBoardCabinetConnectivity       INTEGER,
+        equipmentBoardCabinetConnectionFailure  FaultStatus,
+        equipmentBoardOperationalVariant        INTEGER,
+        equipmentBoardAid                       DisplayString,
+        equipmentBoardPhysicalLocation          DisplayString
+        }
+
+equipmentBoardIndex OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..2147483647)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "An arbitrary index assigned to each
+        board entry.
+
+"
+    ::= { equipmentBoardEntry 1 }
+
+equipmentBoardName OBJECT-TYPE
+    SYNTAX      MgmtNameString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The name of the board, for example 'tpmr2500:1:2'
+        where the first number indicates in which sub-rack
+        the board is present and the second number
+        in which slot.
+
+"
+    ::= { equipmentBoardEntry 2 }
+
+equipmentBoardExpectedType OBJECT-TYPE
+    SYNTAX      EquipmentBoardType
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The expected board type.
+
+"
+    DEFVAL { undefined }
+    ::= { equipmentBoardEntry 3 }
+
+equipmentBoardActualType OBJECT-TYPE
+    SYNTAX      EquipmentBoardType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The actual board type. If an unexpected board
+        has been detected this variable can be used to
+        see what type of board has been detected.
+
+"
+    ::= { equipmentBoardEntry 4 }
+
+equipmentBoardDescr OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "User configurable label.
+
+"
+    DEFVAL { "" }
+    ::= { equipmentBoardEntry 5 }
+
+equipmentBoardSubrack OBJECT-TYPE
+    SYNTAX      SubrackNumber
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The number of the subrack where the board is
+        located.
+
+"
+    DEFVAL { 0 }
+    ::= { equipmentBoardEntry 6 }
+
+equipmentBoardSlot OBJECT-TYPE
+    SYNTAX      SlotNumber
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The slot where the board is located.
+
+"
+    DEFVAL { 0 }
+    ::= { equipmentBoardEntry 7 }
+
+equipmentBoardTemp OBJECT-TYPE
+    SYNTAX      Integer32 (-1000..1000)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The temperature on the board in 0.1 degrees
+        centigrade.
+
+"
+    ::= { equipmentBoardEntry 8 }
+
+equipmentBoardInvPhysIndexOrZero OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..2147483647)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The row in the invPhysTable for this board.
+        Set to 0 if not known.
+
+"
+    ::= { equipmentBoardEntry 9 }
+
+equipmentBoardLedTest OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    off (1),
+                    on (2) }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "LED test for the board.
+
+        off - Normal operation.
+
+        on - Light all leds.
+
+"
+    DEFVAL { off }
+    ::= { equipmentBoardEntry 10 }
+
+equipmentBoardAdminStatus OBJECT-TYPE
+    SYNTAX      BoardOrInterfaceAdminStatus
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The administrative state of the board.
+
+        down - The board should be inactive.
+        Alarms are suppressed.
+
+        service - The board is activated but alarms are
+        suppressed. Intended for use during service or
+        re-configuration. When service is concluded
+        adminStatus should be set to 'up' again.
+
+        up - The board should be activated when
+        it becomes available. Alarms are not suppressed.
+
+"
+    DEFVAL { down }
+    ::= { equipmentBoardEntry 11 }
+
+equipmentBoardOperStatus OBJECT-TYPE
+    SYNTAX      BoardOrInterfaceOperStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The operational state of the board.
+
+        notPresent - The board is not available.
+
+        down - The board remains in the 'down'-state
+        when adminStatus is set to 'down' or if there is
+        a fault preventing it from going to the
+        'up'-state.
+
+        up - The board is operational. The operational
+        state becomes 'up' when adminStatus is set to
+        'up' unless there are faults detected.
+
+"
+    DEFVAL { notPresent }
+    ::= { equipmentBoardEntry 12 }
+
+equipmentBoardLastChangeTime OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The time when the operational state of the
+        board entry was last changed.
+
+"
+    ::= { equipmentBoardEntry 13 }
+
+equipmentBoardRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "SNMP administrivia.
+        Manages creation and deletion of conceptual rows.
+        See also SNMPv2-TC.
+
+"
+    ::= { equipmentBoardEntry 14 }
+
+equipmentBoardMissing OBJECT-TYPE
+    SYNTAX      FaultStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "There is no board present in a slot where the
+        expected board type is defined. Suppressed if
+        administrative status is down.
+
+        A(ctivation): Card out of place (COP) indication
+        active for more than 2 seconds.
+
+        D(e-activation): Card out of place (COP) indication
+        inactive for more than 2 seconds.
+
+"
+    ::= { equipmentBoardEntry 15 }
+
+equipmentBoardUnexpectedType OBJECT-TYPE
+    SYNTAX      FaultStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "A type of board not matching the expected type
+        is present and active in the same slot.
+        Since the default value for the type is
+        'undefined' this alarm is raised when inserting
+        an unconfigured board.
+
+        A: A board with type different from the expected
+        type is present in the slot (even if the board
+        is not activated).
+
+        D: The type matches the expected or no board is
+        present.
+
+"
+    ::= { equipmentBoardEntry 16 }
+
+equipmentBoardTempHighExceeded OBJECT-TYPE
+    SYNTAX      FaultStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The threshold for environmental temperature
+        on the board is exceeded.
+
+        A: The temperature exceeds the associated
+        threshold.
+
+        D: Temperature is 0.5 degrees centigrade
+        below the associated threshold.
+
+"
+    ::= {equipmentBoardEntry 17 }
+
+equipmentBoardCommunicationFailure OBJECT-TYPE
+    SYNTAX      FaultStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Communication between the control unit and the
+        the board has failed completely.
+
+        A: There is a board present but there has been
+        no communication established within 20 seconds.
+
+        D: Communication is established.
+
+"
+    ::= {equipmentBoardEntry 18 }
+
+equipmentBoardInterworkFailed OBJECT-TYPE
+    SYNTAX      FaultStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Communication between the control unit and the
+        board has failed due to incompatible software.
+
+        A: The control unit and the board have
+        in-compatible software.
+
+        D: The control unit and the board have compatible
+        software.
+
+"
+    ::= {equipmentBoardEntry 19 }
+
+equipmentBoardSecondaryPowerFailed OBJECT-TYPE
+    SYNTAX      FaultStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Secondary DC power (1.8 or 2.5 V) failure.
+
+        A: The secondary DC power on the board has
+        failed.
+
+        D: The secondary DC power is present.
+
+        Note: If primary power fails a
+        'communicationFailure' alarm will most likely
+        be raised instead.
+
+"
+    ::= {equipmentBoardEntry 20 }
+
+equipmentBoardVitalDataMissing OBJECT-TYPE
+    SYNTAX      FaultStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Product data vital for the safe operation
+        of the equipment is missing.
+
+        A: Product data missing.
+
+        D: Product data present.
+
+"
+    ::= {equipmentBoardEntry 21 }
+
+equipmentBoardNonVitalDataMissing OBJECT-TYPE
+    SYNTAX      FaultStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Administrative product data is missing.
+
+        A: Product data missing.
+
+        D: Product data present.
+
+"
+    ::= {equipmentBoardEntry 22 }
+
+equipmentBoardUnderMaintenance OBJECT-TYPE
+    SYNTAX      FaultStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The board is undergoing maintenance, adminStatus
+        is set to service.
+
+        A: AdminStatus is set to service.
+
+        D: AdminStatus is set to another value.
+
+"
+    ::= {equipmentBoardEntry 23 }
+
+equipmentBoardTempThreshold OBJECT-TYPE
+    SYNTAX      Integer32 (0..800)
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The threshold for temperature alarm on the
+        board in 0.1 degrees centigrade.
+
+"
+    DEFVAL { 700 }
+    ::= { equipmentBoardEntry 24 }
+
+equipmentBoardSwVersionMismatch OBJECT-TYPE
+    SYNTAX      FaultStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The version of the board SW does not match
+         the SW version running och the main CU.
+
+         For versions to match, the release number,
+         e.g. 'r2b', must be the same. The build
+         number is not required to be the same.
+
+         Examples:
+         r2b-2 matches r2b-1, r2b-2, ..., r2b-<n>
+         r2b-<n> does NOT match r2a-<m>
+
+        A: The board is started with as SW version
+           other than the main CU.
+
+        D: The board, or main CU, is restarted with
+           matching SW versions.
+
+"
+    ::= {equipmentBoardEntry 25 }
+
+equipmentBoardObjectProperty  OBJECT-TYPE
+    SYNTAX      ObjectProperty
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Property mask.
+
+"
+    ::= {equipmentBoardEntry 26 }
+
+equipmentBoardTempLow OBJECT-TYPE
+    SYNTAX      FaultStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The low threshold for environmental temperature
+        on the board is exceeded.
+
+        A: The temperature exceeds the associated
+        low threshold.
+
+        D: Temperature is 0.5 degrees centigrade
+        above the associated threshold.
+
+"
+    ::= {equipmentBoardEntry 27 }
+
+equipmentBoardTempVeryHigh OBJECT-TYPE
+    SYNTAX      FaultStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The very high threshold for environmental
+        temperature on the board is exceeded.
+
+        A: The temperature exceeds the associated
+        threshold.
+
+        D: Temperature is 0.5 degrees centigrade
+        below the associated threshold.
+
+"
+    ::= {equipmentBoardEntry 28 }
+
+equipmentBoardReconfigure OBJECT-TYPE
+    SYNTAX      CommandString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Applicable for cu, cu2osc, cuSfp, cuSfpii and voa8chii.
+
+         Reconfigure cu or cu2osc board to cuSfp.
+         Reconfigure cu2osc or cuSfp board to cuSfpii.
+         Reconfigure older CU-board to cuSfpiii.
+         Reconfigure voa8chii to voa8chsfp.
+         Reconfigure tpq10Gfec to tpq10gfeci or vise versa
+         Reconfigure tpq10GfecReg to tpq10gfecregi or vise versa
+
+        "
+    ::= {equipmentBoardEntry 29 }
+
+equipmentBoardLedStatus OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    clear (1),
+                    minor (2),
+                    major (3) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "LED status for the board.
+         This is primarily intended for debugging
+
+"
+    ::= { equipmentBoardEntry 30 }
+
+equipmentBoardModuleInfo OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Information (for example firmware and serial number) about the module.
+
+"
+    ::= { equipmentBoardEntry 31 }
+
+equipmentBoardNewSwActivatedButNotRestarted OBJECT-TYPE
+    SYNTAX      FaultStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "A new SW version on the board has been activated,
+         but the board has not been rebooted. This means that
+         after the next reboot, a new SW will be active.
+
+         For the main CU, this also means that the backup
+         will be read from a new directory.
+
+        A: A new SW has been activated but the board has
+           not been rebooted within 12 hours.
+
+        D: The board is rebooted or the SW is reverted.
+
+"
+    ::= {equipmentBoardEntry 32 }
+
+
+equipmentBoardLowTemperature OBJECT-TYPE
+    SYNTAX      FaultStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The environmental temperature on the board
+        is below startuptemperature (+3 centigrade).
+
+        A: The temperature is below +3 degrees centigrade.
+
+        D: Temperature has increased to +5 degrees centigrade.
+
+"
+    ::= {equipmentBoardEntry 33 }
+
+equipmentBoardTempLowThreshold OBJECT-TYPE
+    SYNTAX      Integer32 (-400..400)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The threshold for low temperature alarm on the
+        board in 0.1 degrees centigrade.
+
+"
+    DEFVAL { 30 }
+    ::= { equipmentBoardEntry 34 }
+
+equipmentBoardAdditionalInfo OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Additional information about the board,
+        e.g. FPGA revision.
+
+"
+    DEFVAL { "" }
+    ::= { equipmentBoardEntry 35 }
+
+equipmentBoardBootError OBJECT-TYPE
+    SYNTAX      FaultStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The card fails to boot.
+
+        A: The card fails to boot.
+
+        D: The card boot successfully.
+
+"
+    ::= {equipmentBoardEntry 36 }
+
+equipmentBoardHardwareError OBJECT-TYPE
+    SYNTAX      FaultStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " A hardware error occured.
+
+        A: A hardware error occured.
+
+        D: No hardware error.
+
+"
+    ::= {equipmentBoardEntry 37 }
+
+equipmentBoardLowDiskSpace OBJECT-TYPE
+    SYNTAX      FaultStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " Low disk space in the board.
+
+        A: Not enough disk space.
+
+        D: Disk space is enough.
+
+"
+    ::= {equipmentBoardEntry 38 }
+
+equipmentBoardClockDrift OBJECT-TYPE
+    SYNTAX      FaultStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " Clock frequency is out of range.
+
+        A: Clock frequency out is out of range.
+
+        D: Clock frequency is in range.
+
+"
+    ::= {equipmentBoardEntry 39 }
+
+equipmentBoardPostponeFwUpgrade OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    disabled (1),
+                    enabled (2) }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Postpone activation of new traffic firmware when
+         the board software is upgraded next time. If no
+         firmware changes are available when upgrading this
+         option will not have any effect.
+
+"
+    DEFVAL { disabled }
+    ::= {equipmentBoardEntry 40 }
+
+equipmentBoardActivatePendingFwCommand OBJECT-TYPE
+    SYNTAX      CommandString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Command to activate a pending firmware upgrade.
+
+"
+    ::= {equipmentBoardEntry 41 }
+
+equipmentBoardFwActivationPending OBJECT-TYPE
+    SYNTAX      FaultStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Firmware activation has been postponed in a
+         previous software upgrade.
+
+"
+    ::= {equipmentBoardEntry 42 }
+
+equipmentBoardFeatureNotSupported OBJECT-TYPE
+    SYNTAX      FaultStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "A configuration request has failed since the chosen
+         feature is not supported by the active firmware.
+
+"
+    ::= { equipmentBoardEntry 43 }
+
+equipmentBoardFwReloadNeeded OBJECT-TYPE
+    SYNTAX      FaultStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The traffic HW has been programmed by a version
+         of the system that does not offer a supported
+         upgrade path to the currently running version.
+         This typically happens after a downgrade
+         or rollback of the SW. The state of the
+         traffic HW is formally unknown and further
+         changes to the traffic configuration cannot
+         be guaranteed. A reset of the traffic unit is
+         recommended. This will cause a short traffic hit.
+
+"
+    ::= { equipmentBoardEntry 44 }
+
+equipmentBoardFwContextUnknown OBJECT-TYPE
+    SYNTAX      FaultStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The running version of the SW cannot recover
+         the settings of the traffic HW/FW. The state
+         of the traffic HW is unknown. A reset of the
+         traffic unit is recommended.
+         This will cause a short traffic hit.
+
+"
+    ::= { equipmentBoardEntry 45 }
+
+equipmentBoardBoardVariant OBJECT-TYPE
+    SYNTAX      INTEGER {
+        dualMuxponderProt   (1),
+        hexTransponder      (2),
+        tripleMuxponderProt (3),
+        quadTransponderProt (4),
+        notApplicable (2147483647)
+    }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Determines board configuration.
+
+        dualMuxponderProt   - 2x Muxponder with protection
+        hexTransponder      - 6x Transponder
+        tripleMuxponderProt - 3x Muxponder with protection
+        quadTransponderProt - 4x Transponder with protection
+
+        notApplicable       - 2147483647 is used to indicate that the attribute
+        is not used on the board.
+
+"
+    DEFVAL { notApplicable }
+    ::= { equipmentBoardEntry 46 }
+
+equipmentBoardCabinetConnectivity OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    disabled (1),
+                    enabled (2) }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Monitor Cabinet status if enabled. Alarm is raised if connection is lost.
+"
+    DEFVAL { disabled }
+    ::= { equipmentBoardEntry 47 }
+
+equipmentBoardCabinetConnectionFailure OBJECT-TYPE
+    SYNTAX      FaultStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Connection to the cabinet has failed.
+"
+    ::= { equipmentBoardEntry 48 }
+
+equipmentBoardOperationalVariant OBJECT-TYPE
+    SYNTAX      INTEGER {
+    normal (1),
+    openFlowControlled (2) }
+
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "Operational Variant mode of board, Normal or OpenFlow Controlled.
+"
+    DEFVAL { normal }
+    ::= { equipmentBoardEntry 49 }
+
+equipmentBoardAid OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The access identifier (AID) of the product.
+         The format is according to GR-833.
+
+"
+    ::= { equipmentBoardEntry 50 }
+
+equipmentBoardPhysicalLocation OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The Physical location of the product.
+         The format is according to GR-833.
+
+"
+    ::= { equipmentBoardEntry 51 }
+
+-- ----------------------------------------------------
+-- Power supply table
+-- ----------------------------------------------------
+
+equipmentPowerTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF EquipmentPowerEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The list of power supplies."
+    ::= { equipmentPowerList 1 }
+
+equipmentPowerEntry OBJECT-TYPE
+    SYNTAX      EquipmentPowerEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry in the power supply list.
+
+"
+    INDEX { equipmentPowerIndex }
+    ::= { equipmentPowerTable 1 }
+
+EquipmentPowerEntry ::=
+    SEQUENCE {
+        equipmentPowerIndex                     Unsigned32,
+        equipmentPowerName                      DisplayString,
+        equipmentPowerSubrack                   SubrackNumber,
+        equipmentPowerSlot                      Unsigned32,
+        equipmentPowerType                      INTEGER,
+        equipmentPowerInvPhysIndexOrZero        Unsigned32,
+        equipmentPowerAdminStatus               INTEGER,
+        equipmentPowerOperStatus                INTEGER,
+        equipmentPowerRowStatus                 RowStatus,
+        equipmentPowerPowerFailed               FaultStatus,
+        equipmentPowerACPowerFailed             FaultStatus,
+        equipmentPowerDCPowerFailed             FaultStatus,
+        equipmentPowerTemperatureHigh           FaultStatus,
+        equipmentPowerModuleMissing             FaultStatus,
+        equipmentPowerObjectProperty            ObjectProperty,
+        equipmentPowerDCPowerFailedSeverity     AlarmPerceivedSeverity,
+        equipmentPowerAid                       DisplayString,
+        equipmentPowerPhysicalLocation          DisplayString
+        }
+
+equipmentPowerIndex OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..2147483647)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "An arbitrary index assigned to each power module.
+
+"
+    ::= { equipmentPowerEntry 1 }
+
+equipmentPowerName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The name of the power module.
+        For example 'pow:1:2'.
+
+"
+    ::= { equipmentPowerEntry 2 }
+
+equipmentPowerSubrack OBJECT-TYPE
+    SYNTAX      SubrackNumber
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of the subrack in which the power
+        module is present.
+
+"
+    ::= { equipmentPowerEntry 3 }
+
+equipmentPowerSlot OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..2)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of the slot in which the power
+        module is present.
+
+"
+    ::= { equipmentPowerEntry 4 }
+
+equipmentPowerType OBJECT-TYPE
+    SYNTAX      INTEGER {
+                undefined (0),
+                ac (1),
+                dc (2) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The the type of power module.
+
+        ac - AC power supply (230V).
+
+        dc - DC power supply (48V).
+
+"
+    DEFVAL { undefined }
+    ::= { equipmentPowerEntry 5 }
+
+equipmentPowerInvPhysIndexOrZero OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..2147483647)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The row in the invPhysTable for this power
+        module. Set to 0 if not known.
+
+"
+    ::= { equipmentPowerEntry 9 }
+
+equipmentPowerAdminStatus OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    down (1),
+                    up (2) }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The administrative state of the power module.
+
+        down - This power module is not monitored.
+        Suppresses alarms.
+
+        up - The power module is monitored.
+
+"
+    DEFVAL { up }
+    ::= { equipmentPowerEntry 10 }
+
+equipmentPowerOperStatus OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    notPresent (1),
+                    down (2),
+                    up (3) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The operational state of the power module.
+
+        notPresent - The power module is not present.
+
+        down - The module is not active or there are
+        faults preventing it from going to the
+        'up'-state.
+
+        up - The module is operational.
+
+"
+    DEFVAL { notPresent }
+   ::= { equipmentPowerEntry 11 }
+
+equipmentPowerRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Manages creation and deletion of conceptual rows.
+        See also SNMPv2-TC.
+
+"
+    ::= { equipmentPowerEntry 12 }
+
+equipmentPowerACPowerFailed OBJECT-TYPE
+    SYNTAX      FaultStatus
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+        "AC power supply failed (230 V).
+
+        A(ctivation): Active HW indication.
+
+        D(e-activation): Inactive HW indication.
+
+"
+    ::= { equipmentPowerEntry 13 }
+
+equipmentPowerDCPowerFailed OBJECT-TYPE
+    SYNTAX      FaultStatus
+    MAX-ACCESS  read-only
+    STATUS      obsolete
+    DESCRIPTION
+        "DC power supply failed (48 V).
+
+        A: Active HW indication.
+
+        D: Inactive HW indication.
+
+"
+    ::= { equipmentPowerEntry 14 }
+
+equipmentPowerTemperatureHigh OBJECT-TYPE
+    SYNTAX      FaultStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The built-in temperature monitoring of the power
+        module thinks it is too hot.
+
+        A: Active HW indication.
+
+        D: Inactive HW indication.
+
+"
+    ::= { equipmentPowerEntry 15 }
+
+equipmentPowerModuleMissing OBJECT-TYPE
+    SYNTAX      FaultStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The power module is not available.
+
+        A: Active HW indication.
+
+        D: Inactive HW indication.
+
+"
+    ::= { equipmentPowerEntry 16 }
+
+equipmentPowerObjectProperty  OBJECT-TYPE
+    SYNTAX      ObjectProperty
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Property mask.
+
+"
+    ::= { equipmentPowerEntry 17 }
+
+equipmentPowerDCPowerFailedSeverity OBJECT-TYPE
+    SYNTAX      AlarmPerceivedSeverity
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The severity of DC Power failed alarm.
+
+"
+    DEFVAL { minor }
+    ::= { equipmentPowerEntry 18 }
+
+equipmentPowerAid OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The access identifier (AID) of the product.
+         The format is according to GR-833.
+
+"
+    ::= { equipmentPowerEntry 19 }
+
+equipmentPowerPhysicalLocation OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The Physical location of the product.
+         The format is according to GR-833.
+
+"
+    ::= { equipmentPowerEntry 20 }
+
+equipmentPowerPowerFailed OBJECT-TYPE
+    SYNTAX      FaultStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Power supply failed.
+
+        A: Active HW indication.
+
+        D: Inactive HW indication.
+
+"
+    ::= { equipmentPowerEntry 21 }
+
+-- ----------------------------------------------------
+-- Fan module table
+-- ----------------------------------------------------
+
+equipmentFanTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF EquipmentFanEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The list of fan modules."
+    ::= { equipmentFanList 1 }
+
+equipmentFanEntry OBJECT-TYPE
+    SYNTAX      EquipmentFanEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry in the fan module list.
+
+"
+    INDEX { equipmentFanIndex }
+    ::= { equipmentFanTable 1 }
+
+EquipmentFanEntry ::=
+    SEQUENCE {
+        equipmentFanIndex               Unsigned32,
+        equipmentFanName                DisplayString,
+        equipmentFanSubrack             SubrackNumber,
+        equipmentFanSlot                Unsigned32,
+        equipmentFanInvPhysIndexOrZero  Unsigned32,
+        equipmentFanAdminStatus         INTEGER,
+        equipmentFanOperStatus          INTEGER,
+        equipmentFanRowStatus           RowStatus,
+        equipmentFanUnitFailed          FaultStatus,
+        equipmentFanMainUnitFailed      FaultStatus,
+        equipmentFanObjectProperty      ObjectProperty,
+        equipmentFanFanFault            FaultStatus,
+        equipmentFanAid                 DisplayString,
+        equipmentFanPhysicalLocation    DisplayString}
+
+equipmentFanIndex OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..2147483647)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "An arbitrary index assigned to each fan module.
+
+"
+    ::= { equipmentFanEntry 1 }
+
+equipmentFanName OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The name of the fan module.
+        For example 'fan:1:2', where the first number
+        indicates the subrack and the second number the
+        fan slot.
+
+"
+    ::= { equipmentFanEntry 2 }
+
+equipmentFanSubrack OBJECT-TYPE
+    SYNTAX      SubrackNumber
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of the subrack in which the fan
+        module is present.
+
+"
+    ::= { equipmentFanEntry 3 }
+
+equipmentFanSlot OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..3)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of the fan-slot in which the fan
+        module is present.
+
+"
+    ::= { equipmentFanEntry 4 }
+
+equipmentFanInvPhysIndexOrZero OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..2147483647)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The row in the invPhysTable for this fan module.
+        Set to 0 if not known.
+
+"
+    ::= { equipmentFanEntry 5 }
+
+equipmentFanAdminStatus OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    down (1),
+                    up (2) }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The administrative state of the fan module.
+
+        down - This fan module should not be monitored.
+        Suppresses alarms. Useful if a subrack has only
+        one fan for some reason.
+
+        up - The fan module should be monitored.
+
+"
+    DEFVAL { up }
+    ::= { equipmentFanEntry 6 }
+
+equipmentFanOperStatus OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    notPresent (1),
+                    down (2),
+                    up (3) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+       "The operational state of the fan module.
+
+       Note: It is not possible to distinguish between
+       a missing fan and a failed fan. Therefore
+       'notPresent' is currently not used.
+
+       down - The fan module is not de-activated or not
+       present or there are faults preventing it from
+       going to the 'up'-state.
+
+       up - The fan module is active and monitored.
+
+"
+    DEFVAL { notPresent }
+   ::= { equipmentFanEntry 7 }
+
+equipmentFanRowStatus OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Manages creation and deletion of conceptual rows.
+        See also SNMPv2-TC.
+
+"
+    ::= { equipmentFanEntry 8 }
+
+equipmentFanUnitFailed OBJECT-TYPE
+    SYNTAX      FaultStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The fan module has failed or is absent.
+
+        A(ctivation): Active HW indication.
+
+        D(e-activation): Inactive HW indication.
+
+"
+    ::= { equipmentFanEntry 9 }
+
+equipmentFanMainUnitFailed OBJECT-TYPE
+    SYNTAX      FaultStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The main fan module has failed or is absent.
+
+        A(ctivation): Active HW indication.
+
+        D(e-activation): Inactive HW indication.
+
+"
+    ::= { equipmentFanEntry 10 }
+
+equipmentFanObjectProperty  OBJECT-TYPE
+    SYNTAX      ObjectProperty
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Property mask.
+
+"
+    ::= { equipmentFanEntry 11 }
+
+equipmentFanFanFault OBJECT-TYPE
+    SYNTAX      FaultStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The Fan malfunction or fan speed differs from the set speed.
+
+        A(ctivation): Active HW indication.
+
+        D(e-activation): Inactive HW indication.
+
+"
+    ::= { equipmentFanEntry 12 }
+
+equipmentFanAid OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The access identifier (AID) of the product.
+         The format is according to GR-833.
+
+"
+    ::= { equipmentFanEntry 13 }
+
+equipmentFanPhysicalLocation OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The Physical location of the product.
+         The format is according to GR-833.
+
+"
+    ::= { equipmentFanEntry 14 }
+
+------------------------------------
+-- Optical Module Table
+-- ---------------------------------
+equipmentOpticalModuleTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF EquipmentOpticalModuleEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The module list."
+    ::= { equipmentOpticalModuleList 1 }
+
+equipmentOpticalModuleEntry OBJECT-TYPE
+    SYNTAX      EquipmentOpticalModuleEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry in the module list.
+
+"
+    INDEX { equipmentOpticalModuleIndex }
+    ::= { equipmentOpticalModuleTable 1 }
+
+EquipmentOpticalModuleEntry ::=
+    SEQUENCE {
+        equipmentOpticalModuleIndex             Unsigned32,
+        equipmentOpticalModuleHostBoardType     EquipmentBoardType,
+        equipmentOpticalModuleType              MgmtNameString,
+        equipmentOpticalModuleName              MgmtNameString,
+        equipmentOpticalModuleSubrack           SubrackNumber,
+        equipmentOpticalModuleSlot              SlotNumber,
+        equipmentOpticalModuleFirmwareVersion   DisplayString,
+        equipmentOpticalModuleSerialNumber      DisplayString,
+        equipmentOpticalModuleWarmingUpState    TruthValueWithNA,
+        equipmentOpticalModuleFailure           FaultStatus }
+
+equipmentOpticalModuleIndex OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..2147483647)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "An arbitrary index assigned to each entry.
+
+"
+    ::= { equipmentOpticalModuleEntry 1 }
+
+equipmentOpticalModuleHostBoardType     OBJECT-TYPE
+    SYNTAX      EquipmentBoardType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The actual board type hosting the optical module.
+
+"
+    ::= { equipmentOpticalModuleEntry 2 }
+
+equipmentOpticalModuleType OBJECT-TYPE
+    SYNTAX      MgmtNameString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The type of optical module,
+        for example monitor, switch, wss, amp etc
+
+"
+    ::= { equipmentOpticalModuleEntry 3 }
+
+equipmentOpticalModuleName OBJECT-TYPE
+    SYNTAX      MgmtNameString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The management name of the interface,
+        for example 'module:[HostBoardType]:[ moduleType]:[subrack]:[slot]'.
+
+"
+    ::= { equipmentOpticalModuleEntry 4 }
+
+equipmentOpticalModuleSubrack OBJECT-TYPE
+    SYNTAX      SubrackNumber
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of the subrack where the module
+        is located.
+
+"
+    ::= { equipmentOpticalModuleEntry 5 }
+
+equipmentOpticalModuleSlot OBJECT-TYPE
+    SYNTAX      SlotNumber
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of the slot where the module is
+        located.
+
+"
+    ::= { equipmentOpticalModuleEntry 6 }
+
+equipmentOpticalModuleFirmwareVersion OBJECT-TYPE
+    SYNTAX        DisplayString
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Firmware version of the module.
+
+"
+    ::= { equipmentOpticalModuleEntry 7 }
+
+equipmentOpticalModuleSerialNumber   OBJECT-TYPE
+    SYNTAX        DisplayString
+    MAX-ACCESS    read-only
+    STATUS        current
+    DESCRIPTION
+        "Serial number of the module.
+
+"
+    ::= { equipmentOpticalModuleEntry 8 }
+
+equipmentOpticalModuleWarmingUpState    OBJECT-TYPE
+    SYNTAX                              TruthValueWithNA
+    MAX-ACCESS                          read-only
+    STATUS                              current
+    DESCRIPTION
+
+        "Module is warming up, the optics has not reached a stable
+         state.
+
+        True: Module is warming up.
+
+        False: Module is ready and optics have reached stable state.
+
+"
+    ::= { equipmentOpticalModuleEntry 9 }
+
+equipmentOpticalModuleFailure   OBJECT-TYPE
+    SYNTAX                      FaultStatus
+    MAX-ACCESS                  read-only
+    STATUS                      current
+    DESCRIPTION
+        "The module is experiencing a failure.
+
+        A(ctivation): The module has failed
+
+        D(e-activation): The module is OK again
+
+"
+    ::= { equipmentOpticalModuleEntry 10 }
+
+
+-- ----------------------------------------------------
+-- Notifications
+-- ----------------------------------------------------
+
+equipmentNotifyPrefix OBJECT IDENTIFIER ::= { lumentisEquipmentNotifications 0 }
+
+equipmentBoardRowStatusActive NOTIFICATION-TYPE
+    OBJECTS {
+        equipmentBoardIndex,
+        equipmentBoardName,
+        equipmentBoardLastChangeTime }
+    STATUS      current
+    DESCRIPTION
+        "Sent when a board is added to the configuration.
+
+"
+    ::= { equipmentNotifyPrefix 1 }
+
+equipmentBoardRowStatusDestroy NOTIFICATION-TYPE
+    OBJECTS {
+        equipmentBoardIndex,
+        equipmentBoardName,
+        equipmentBoardLastChangeTime }
+    STATUS      deprecated
+    DESCRIPTION
+        "Sent when a board is removed from the
+        configuration.
+
+"
+    ::= { equipmentNotifyPrefix 2 }
+
+equipmentBoardRowStatusInserted NOTIFICATION-TYPE
+    OBJECTS {
+        equipmentBoardIndex,
+        equipmentBoardName,
+        equipmentBoardLastChangeTime }
+    STATUS      current
+    DESCRIPTION
+        "Sent when a board is physically inserted.
+
+"
+    ::= { equipmentNotifyPrefix 3 }
+
+equipmentBoardRowStatusRemoved NOTIFICATION-TYPE
+    OBJECTS {
+        equipmentBoardIndex,
+        equipmentBoardName,
+        equipmentBoardLastChangeTime }
+    STATUS      current
+    DESCRIPTION
+        "Sent when a board is physically removed.
+
+"
+    ::= { equipmentNotifyPrefix 4 }
+
+equipmentBoardRowStatusDeleted NOTIFICATION-TYPE
+    OBJECTS {
+        equipmentBoardIndex,
+        equipmentBoardName,
+        equipmentBoardLastChangeTime }
+    STATUS      current
+    DESCRIPTION
+        "Sent when a board is deleted from the
+        configuration.
+
+"
+    ::= { equipmentNotifyPrefix 5 }
+
+-- ----------------------------------------------------
+-- Node group
+-- ----------------------------------------------------
+
+equipmentNodeLedTest OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    off (1),
+                    on (2) }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "LED test for the network element.
+
+        off - Normal operation.
+
+        on - Light all leds.
+
+"
+    DEFVAL { off }
+    ::= { equipmentNode 1 }
+
+equipmentNodeIcnRedundancyMode OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    disabled (1),
+                    ring (3) }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates whether the internal communication
+        network between sub-racks, ICN3 and ICN4, can be
+        connected in a redundant manner or not.
+
+        disabled - Non-redundant ICN connection.
+        Both ICN ports are enable for forwarding.
+        Note: Connecting both ICN ports to the same internal switch
+        will cause a loop.
+
+        ring  - Redundant ICN connection. Only one ICN port at a time
+        is enabled for forwarding even if both are physically connected
+        and both links are up.
+        Note: The port that is first connected will be used for
+        forwarding and if disconnected, the other port will be
+        enabled automatically.
+
+        disabled - Non-redundant connection.
+
+        ring - Redundantly connected in a ring.
+
+"
+    DEFVAL { ring }
+    ::= { equipmentNode 2 }
+
+equipmentNodeMemoryProfile OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    disabled (1),
+                    enabled (2) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Indicates whether memory profilation shall be
+        done or not.
+
+        disabled - No memory profile
+
+        enabled - Memory profile done
+
+"
+    DEFVAL { disabled }
+    ::= { equipmentNode 3 }
+
+equipmentAllowDummyPassiveSlots OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    disabled (1),
+                    enabled (2) }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "This option is applicable for TM-3000
+         subracks only.
+
+         Normally passive boards can only be created in
+         slots 13-22. Enabling this options allows the
+         user to create full-size passive board objects
+         in slot 2-12 as well.
+
+         Note, however, that supervision of board presence
+         and reading of board inventory is NOT possible
+         in slot 2-12.
+
+         Also note that half-size boards, like ad1AB, are
+         not allowed in slots 2-12.
+
+        disabled - Passive boards NOT allowed in slots 2-12.
+
+        enabled - Allow full-size passive boards objects
+                  in slot 2-12.
+
+"
+    DEFVAL { disabled }
+    ::= { equipmentNode 4 }
+
+equipmentNodeManagementVlan OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    off (1),
+                    bridge2dcn (2),
+                    on (3) }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates if VLAN is available (via DCN for nodes with cu) or not.
+
+        off - No bridging of VLAN. (mgmtVlan off in node)
+
+        bridge2dcn - VLAN is bridged to DCN. (mgmtVlan on in node, used for cu)
+
+        on - mgmtVlan is on, used for culess
+
+"
+    DEFVAL { off }
+    ::= { equipmentNode 5 }
+
+equipmentNodeMgmtVlanPrivacy OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    isolated  (1),
+                    community (2) }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Set Mgmt Vlan privacy. Setting is for main subrack in node.
+        Boards affected (in R14.0) is gbeMxp10GFEC, msMxp10G, gbe10Emxp10G
+        and gbe22Emxp10G.
+
+        isolated - privacy enabled. Not possible to communicate
+        between boards nor ports. In slave subrack setting is only
+        on ports, not boards
+
+        community - privacy disabled. It is possible to communicate
+        between both boards and ports.
+
+"
+    DEFVAL { community }
+    ::= { equipmentNode 6 }
+
+equipmentNodeDcnRedundancyMode OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    disabled (1),
+                    enabled (2) }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates whether the DCN ports on a CU, DCN1 and DCN2,
+        can be connected in a redundant manner or not.
+
+        disabled - Non-redundant DCN connection.
+        Both DCN ports are enable for forwarding.
+        Note: Connecting both DCN ports to the same ethernet switch
+        will cause a loop.
+
+        enabled  - Redundant DCN connection. Only one DCN port at a time
+        is enabled for forwarding even if both are physically connected
+        and both links are up.
+        Note: The port that is first connected will be used for
+        forwarding and if disconnected, the other port will be
+        enabled automatically.
+
+        disabled - Non-redundant connection.
+
+        enabled - Redundantly connected through a hub.
+
+"
+    DEFVAL { enabled }
+    ::= { equipmentNode 7 }
+
+equipmentNodeProxyArp OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    disabled (1),
+                    enabled (2) }
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "Indicates if the Proxy ARP functionality is used. Using Proxy ARP simplifies
+        the IP-address allocation and minimizes the use of different subnets in the network.
+
+        disabled - Proxy ARP function disabled. The nodes must be in different subnets and
+        PPP links use routing between the nodes.
+
+        enabled - Proxy ARP function enabled. All nodes can be in the same IP-subnet and
+        PPP links do not require routing between the nodes.
+        The Gateway node/Gateway Network Element (GNE) act as router.
+
+"
+    DEFVAL { disabled }
+    ::= { equipmentNode 8 }
+
+-- ----------------------------------------------------
+-- Resource group
+-- ----------------------------------------------------
+
+equipmentResourceNumberOfBoards  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of boards, active and passive, currently in use
+        in this system
+"
+    ::= { equipmentResource 1 }
+
+equipmentResourceMaxNumberOfBoards  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The maximum number of boards, active and passive, that is
+        supported by the embedded software of this system
+"
+    ::= { equipmentResource 2 }
+
+equipmentResourceNumberOfActiveBoards  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of active boards running on this system
+"
+    ::= { equipmentResource 3 }
+
+equipmentResourceMaxNumberOfActiveBoards  OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The maximum number of active boards that is supported by the
+        embedded software of this system.
+"
+    ::= { equipmentResource 4 }
+
+-- ----------------------------------------------------
+-- Slot table
+-- ----------------------------------------------------
+
+equipmentSlotTable  OBJECT-TYPE
+    SYNTAX      SEQUENCE OF EquipmentSlotEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The slot list."
+    ::= { equipmentSlot 1 }
+
+equipmentSlotEntry OBJECT-TYPE
+    SYNTAX      EquipmentSlotEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry in the slot list.
+        One entry for each slot.
+
+"
+    INDEX { equipmentSlotIndex }
+    ::= { equipmentSlotTable 1 }
+
+EquipmentSlotEntry ::=
+    SEQUENCE {
+        equipmentSlotIndex              Unsigned32,
+        equipmentSlotName               MgmtNameString,
+        equipmentSlotSubrack            SubrackNumber,
+        equipmentSlotSlot               SlotNumber,
+        equipmentSlotAdminStatus        AdminStatus,
+        equipmentSlotUsageState         INTEGER,
+        equipmentSlotEmptySlot          FaultStatus,
+        equipmentSlotEquipped           TruthValueWithNA,
+        equipmentSlotAid                DisplayString,
+        equipmentSlotPhysicalLocation   DisplayString}
+
+equipmentSlotIndex OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..2147483647)
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "An arbitrary index assigned to each
+        slot entry.
+
+"
+    ::= { equipmentSlotEntry 1 }
+
+equipmentSlotName OBJECT-TYPE
+    SYNTAX      MgmtNameString
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The name of the slot, for example 'tpmr2500:1:2'
+        where the first number indicates in which sub-rack
+        the slot is present and the second number
+        in which slot.
+
+"
+    ::= { equipmentSlotEntry 2 }
+
+equipmentSlotSubrack OBJECT-TYPE
+    SYNTAX      SubrackNumber
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The number of the subrack in which the slot
+        is present.
+
+"
+    ::= { equipmentSlotEntry 3 }
+
+equipmentSlotSlot OBJECT-TYPE
+    SYNTAX      SlotNumber
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The slot number.
+
+"
+    ::= { equipmentSlotEntry 4 }
+
+equipmentSlotAdminStatus OBJECT-TYPE
+    SYNTAX      AdminStatus
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The administrative state of the slot.
+
+        down - The slot is not monitored.
+
+        up - The interface should be activated.
+
+"
+    ::= { equipmentSlotEntry 5 }
+
+equipmentSlotUsageState OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    notUsed (1),
+                    used    (2) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        " Tells if the slot is used or not.
+
+        used - Slot is used.
+
+        notUsed - Slot is not used.
+
+"
+    ::= { equipmentSlotEntry 6 }
+
+equipmentSlotEmptySlot OBJECT-TYPE
+    SYNTAX      FaultStatus
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Slot is empty, alarm only applicable for systems with mendatory slot usage
+
+        A: Slot is empty.
+
+        D: No empty slot.
+
+"
+    ::= {equipmentSlotEntry 7 }
+
+equipmentSlotEquipped OBJECT-TYPE
+    SYNTAX      TruthValueWithNA
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "Is the entity equipped.
+
+"
+    ::= { equipmentSlotEntry 8 }
+
+equipmentSlotAid OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The access identifier (AID) of the slot.
+         The format is according to GR-833.
+
+"
+    ::= { equipmentSlotEntry 9 }
+
+equipmentSlotPhysicalLocation OBJECT-TYPE
+    SYNTAX      DisplayString (SIZE (0..255))
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The physical location of the slot.
+         The format is according to GR-833.
+
+"
+    ::= { equipmentSlotEntry 10 }
+
+-- ----------------------------------------------------
+-- Object and event groups
+-- ----------------------------------------------------
+
+equipmentGeneralGroup OBJECT-GROUP
+    OBJECTS {
+        equipmentGeneralTestAndIncr,
+        equipmentGeneralMibSpecVersion,
+        equipmentGeneralMibImplVersion,
+        equipmentGeneralLastChangeTime }
+    STATUS      current
+    DESCRIPTION
+        "The general objects."
+    ::= { lumEquipmentGroups 1 }
+
+equipmentSubrackGroup OBJECT-GROUP
+    OBJECTS {
+        equipmentSubrackIndex,
+        equipmentSubrackName,
+        equipmentSubrackSubrack,
+        equipmentSubrackDescr,
+        equipmentSubrackInvPhysIndexOrZero,
+        equipmentSubrackAllFanUnitsFailed }
+    STATUS      deprecated
+    DESCRIPTION
+        "The subrack module objects."
+    ::= { lumEquipmentGroups 2 }
+
+equipmentBoardGroup OBJECT-GROUP
+    OBJECTS {
+        equipmentBoardIndex,
+        equipmentBoardName,
+        equipmentBoardSubrack,
+        equipmentBoardSlot,
+        equipmentBoardInvPhysIndexOrZero,
+        equipmentBoardExpectedType,
+        equipmentBoardActualType,
+        equipmentBoardDescr,
+        equipmentBoardTemp,
+        equipmentBoardLedTest,
+        equipmentBoardAdminStatus,
+        equipmentBoardOperStatus,
+        equipmentBoardRowStatus,
+        equipmentBoardLastChangeTime,
+        equipmentBoardMissing,
+        equipmentBoardUnexpectedType,
+        equipmentBoardTempHighExceeded,
+        equipmentBoardCommunicationFailure,
+        equipmentBoardInterworkFailed,
+        equipmentBoardSecondaryPowerFailed,
+        equipmentBoardVitalDataMissing,
+        equipmentBoardNonVitalDataMissing }
+    STATUS      deprecated
+    DESCRIPTION
+        "The board objects."
+    ::= { lumEquipmentGroups 3 }
+
+equipmentPowerGroup OBJECT-GROUP
+    OBJECTS {
+        equipmentPowerIndex,
+        equipmentPowerName,
+        equipmentPowerSubrack,
+        equipmentPowerSlot,
+        equipmentPowerType,
+        equipmentPowerInvPhysIndexOrZero,
+        equipmentPowerAdminStatus,
+        equipmentPowerOperStatus,
+        equipmentPowerRowStatus,
+        equipmentPowerACPowerFailed,
+        equipmentPowerDCPowerFailed,
+        equipmentPowerTemperatureHigh,
+        equipmentPowerModuleMissing }
+    STATUS      deprecated
+    DESCRIPTION
+        "The power module objects."
+    ::= { lumEquipmentGroups 4 }
+
+equipmentFanGroup OBJECT-GROUP
+    OBJECTS {
+        equipmentFanIndex,
+        equipmentFanName,
+        equipmentFanSubrack,
+        equipmentFanSlot,
+        equipmentFanInvPhysIndexOrZero,
+        equipmentFanAdminStatus,
+        equipmentFanOperStatus,
+        equipmentFanRowStatus,
+        equipmentFanUnitFailed }
+    STATUS      deprecated
+    DESCRIPTION
+        "The fan module objects."
+    ::= { lumEquipmentGroups 5 }
+
+equipmentGeneralGroupV2 OBJECT-GROUP
+    OBJECTS {
+        equipmentGeneralLastChangeTime }
+    STATUS      deprecated
+    DESCRIPTION
+        "The equipment general objects v2."
+    ::= { lumEquipmentGroups 6 }
+
+equipmentNotificationGroup NOTIFICATION-GROUP
+    NOTIFICATIONS {
+        equipmentBoardRowStatusActive,
+        equipmentBoardRowStatusDestroy }
+    STATUS      deprecated
+    DESCRIPTION
+        "The equipment notifications."
+    ::= { lumEquipmentGroups 7 }
+
+equipmentSubrackGroupV2 OBJECT-GROUP
+    OBJECTS {
+        equipmentSubrackIndex,
+        equipmentSubrackName,
+        equipmentSubrackSubrack,
+        equipmentSubrackDescr,
+        equipmentSubrackInvPhysIndexOrZero,
+        equipmentSubrackAllFanUnitsFailed,
+        equipmentSubrackRowStatus }
+    STATUS      deprecated
+    DESCRIPTION
+        "The subrack module objects V2."
+    ::= { lumEquipmentGroups 8 }
+
+equipmentSubrackGroupV3 OBJECT-GROUP
+    OBJECTS {
+        equipmentSubrackIndex,
+        equipmentSubrackName,
+        equipmentSubrackSubrack,
+        equipmentSubrackDescr,
+        equipmentSubrackInvPhysIndexOrZero,
+        equipmentSubrackAllFanUnitsFailed,
+        equipmentSubrackRowStatus,
+        equipmentSubrackActualType,
+        equipmentSubrackExpectedType,
+        equipmentSubrackUnexpectedType }
+    STATUS      deprecated
+    DESCRIPTION
+        "The subrack module objects V3."
+    ::= { lumEquipmentGroups 9 }
+
+equipmentBoardGroupV2 OBJECT-GROUP
+    OBJECTS {
+        equipmentBoardIndex,
+        equipmentBoardName,
+        equipmentBoardSubrack,
+        equipmentBoardSlot,
+        equipmentBoardInvPhysIndexOrZero,
+        equipmentBoardExpectedType,
+        equipmentBoardActualType,
+        equipmentBoardDescr,
+        equipmentBoardTemp,
+        equipmentBoardLedTest,
+        equipmentBoardAdminStatus,
+        equipmentBoardOperStatus,
+        equipmentBoardRowStatus,
+        equipmentBoardLastChangeTime,
+        equipmentBoardMissing,
+        equipmentBoardUnexpectedType,
+        equipmentBoardTempHighExceeded,
+        equipmentBoardCommunicationFailure,
+        equipmentBoardInterworkFailed,
+        equipmentBoardSecondaryPowerFailed,
+        equipmentBoardVitalDataMissing,
+        equipmentBoardNonVitalDataMissing,
+        equipmentBoardUnderMaintenance,
+        equipmentBoardTempThreshold }
+    STATUS      deprecated
+    DESCRIPTION
+        "The board objects V2."
+    ::= { lumEquipmentGroups 10 }
+
+equipmentNodeGroup OBJECT-GROUP
+    OBJECTS {
+        equipmentNodeLedTest }
+    STATUS      deprecated
+    DESCRIPTION
+        "The node objects."
+    ::= { lumEquipmentGroups 11 }
+
+equipmentGeneralGroupV3 OBJECT-GROUP
+    OBJECTS {
+        equipmentGeneralLastChangeTime,
+        equipmentGeneralStateLastChangeTime }
+    STATUS      deprecated
+    DESCRIPTION
+        "The equipment general objects v3."
+    ::= { lumEquipmentGroups 12 }
+
+equipmentNodeGroupV2 OBJECT-GROUP
+    OBJECTS {
+        equipmentNodeLedTest,
+        equipmentNodeIcnRedundancyMode }
+    STATUS      deprecated
+    DESCRIPTION
+        "The node objects."
+    ::= { lumEquipmentGroups 13 }
+
+equipmentNodeGroupV3 OBJECT-GROUP
+    OBJECTS {
+        equipmentNodeLedTest,
+        equipmentNodeIcnRedundancyMode,
+        equipmentNodeMemoryProfile}
+    STATUS      deprecated
+    DESCRIPTION
+        "The node objects."
+    ::= { lumEquipmentGroups 14 }
+
+equipmentSubrackGroupV4 OBJECT-GROUP
+    OBJECTS {
+        equipmentSubrackIndex,
+        equipmentSubrackName,
+        equipmentSubrackSubrack,
+        equipmentSubrackDescr,
+        equipmentSubrackInvPhysIndexOrZero,
+        equipmentSubrackAllFanUnitsFailed,
+        equipmentSubrackRowStatus,
+        equipmentSubrackActualType,
+        equipmentSubrackExpectedType,
+        equipmentSubrackUnexpectedType,
+        equipmentSubrackTemp,
+        equipmentSubrackTempHighExceeded,
+        equipmentSubrackTempThreshold,
+        equipmentSubrackDataChanged }
+    STATUS      deprecated
+    DESCRIPTION
+        "The subrack module objects V4."
+    ::= { lumEquipmentGroups 15 }
+
+
+equipmentBoardGroupV3 OBJECT-GROUP
+    OBJECTS {
+        equipmentBoardIndex,
+        equipmentBoardName,
+        equipmentBoardSubrack,
+        equipmentBoardSlot,
+        equipmentBoardInvPhysIndexOrZero,
+        equipmentBoardExpectedType,
+        equipmentBoardActualType,
+        equipmentBoardDescr,
+        equipmentBoardTemp,
+        equipmentBoardLedTest,
+        equipmentBoardAdminStatus,
+        equipmentBoardOperStatus,
+        equipmentBoardRowStatus,
+        equipmentBoardLastChangeTime,
+        equipmentBoardMissing,
+        equipmentBoardUnexpectedType,
+        equipmentBoardTempHighExceeded,
+        equipmentBoardCommunicationFailure,
+        equipmentBoardInterworkFailed,
+        equipmentBoardSecondaryPowerFailed,
+        equipmentBoardVitalDataMissing,
+        equipmentBoardNonVitalDataMissing,
+        equipmentBoardUnderMaintenance,
+        equipmentBoardTempThreshold,
+        equipmentBoardSwVersionMismatch }
+    STATUS      deprecated
+    DESCRIPTION
+        "The board objects V3."
+    ::= { lumEquipmentGroups 16 }
+
+equipmentNotificationGroupV2 NOTIFICATION-GROUP
+    NOTIFICATIONS {
+        equipmentBoardRowStatusActive,
+        equipmentBoardRowStatusDestroy,
+        equipmentBoardRowStatusInserted,
+        equipmentBoardRowStatusRemoved }
+    STATUS      deprecated
+    DESCRIPTION
+        "The equipment notifications."
+    ::= { lumEquipmentGroups 17 }
+
+equipmentSubrackGroupV5 OBJECT-GROUP
+    OBJECTS {
+        equipmentSubrackIndex,
+        equipmentSubrackName,
+        equipmentSubrackSubrack,
+        equipmentSubrackDescr,
+        equipmentSubrackInvPhysIndexOrZero,
+        equipmentSubrackAllFanUnitsFailed,
+        equipmentSubrackRowStatus,
+        equipmentSubrackActualType,
+        equipmentSubrackExpectedType,
+        equipmentSubrackUnexpectedType,
+        equipmentSubrackTemp,
+        equipmentSubrackTempHighExceeded,
+        equipmentSubrackTempThreshold,
+        equipmentSubrackDataChanged,
+        equipmentSubrackSystemModeSet,
+        equipmentSubrackEffectiveSystemMode,
+        equipmentSubrackCurrentSystemMode,
+        equipmentSubrackAdminStatus,
+        equipmentSubrackOperStatus }
+    STATUS      deprecated
+    DESCRIPTION
+        "The subrack module objects V5. (2.2)"
+    ::= { lumEquipmentGroups 18 }
+
+equipmentFanGroupV2 OBJECT-GROUP
+    OBJECTS {
+        equipmentFanIndex,
+        equipmentFanName,
+        equipmentFanSubrack,
+        equipmentFanSlot,
+        equipmentFanInvPhysIndexOrZero,
+        equipmentFanAdminStatus,
+        equipmentFanOperStatus,
+        equipmentFanRowStatus,
+        equipmentFanUnitFailed,
+        equipmentFanMainUnitFailed }
+    STATUS      deprecated
+    DESCRIPTION
+        "The fan module objects."
+    ::= { lumEquipmentGroups 19 }
+
+equipmentGeneralGroupV4 OBJECT-GROUP
+    OBJECTS {
+        equipmentGeneralLastChangeTime,
+        equipmentGeneralStateLastChangeTime,
+        equipmentGeneralEquipmentSubrackTableSize,
+        equipmentGeneralEquipmentBoardTableSize,
+        equipmentGeneralEquipmentPowerTableSize,
+        equipmentGeneralEquipmentFanTableSize }
+    STATUS      deprecated
+    DESCRIPTION
+        "The equipment general objects v4 (3.1)."
+    ::= { lumEquipmentGroups 20 }
+
+equipmentSubrackGroupV6 OBJECT-GROUP
+    OBJECTS {
+        equipmentSubrackIndex,
+        equipmentSubrackName,
+        equipmentSubrackSubrack,
+        equipmentSubrackDescr,
+        equipmentSubrackInvPhysIndexOrZero,
+        equipmentSubrackAllFanUnitsFailed,
+        equipmentSubrackRowStatus,
+        equipmentSubrackActualType,
+        equipmentSubrackExpectedType,
+        equipmentSubrackUnexpectedType,
+        equipmentSubrackTemp,
+        equipmentSubrackTempHighExceeded,
+        equipmentSubrackTempThreshold,
+        equipmentSubrackDataChanged,
+        equipmentSubrackSystemModeSet,
+        equipmentSubrackEffectiveSystemMode,
+        equipmentSubrackCurrentSystemMode,
+        equipmentSubrackAdminStatus,
+        equipmentSubrackOperStatus,
+        equipmentSubrackObjectProperty }
+    STATUS      deprecated
+    DESCRIPTION
+        "The subrack module objects V6. (4.0)"
+    ::= { lumEquipmentGroups 21 }
+
+equipmentBoardGroupV4 OBJECT-GROUP
+    OBJECTS {
+        equipmentBoardIndex,
+        equipmentBoardName,
+        equipmentBoardSubrack,
+        equipmentBoardSlot,
+        equipmentBoardInvPhysIndexOrZero,
+        equipmentBoardExpectedType,
+        equipmentBoardActualType,
+        equipmentBoardDescr,
+        equipmentBoardTemp,
+        equipmentBoardLedTest,
+        equipmentBoardAdminStatus,
+        equipmentBoardOperStatus,
+        equipmentBoardRowStatus,
+        equipmentBoardLastChangeTime,
+        equipmentBoardMissing,
+        equipmentBoardUnexpectedType,
+        equipmentBoardTempHighExceeded,
+        equipmentBoardCommunicationFailure,
+        equipmentBoardInterworkFailed,
+        equipmentBoardSecondaryPowerFailed,
+        equipmentBoardVitalDataMissing,
+        equipmentBoardNonVitalDataMissing,
+        equipmentBoardUnderMaintenance,
+        equipmentBoardTempThreshold,
+        equipmentBoardSwVersionMismatch,
+        equipmentBoardObjectProperty }
+    STATUS      deprecated
+    DESCRIPTION
+        "The board objects V4. (4.0)"
+    ::= { lumEquipmentGroups 22 }
+
+equipmentPowerGroupV2 OBJECT-GROUP
+    OBJECTS {
+        equipmentPowerIndex,
+        equipmentPowerName,
+        equipmentPowerSubrack,
+        equipmentPowerSlot,
+        equipmentPowerType,
+        equipmentPowerInvPhysIndexOrZero,
+        equipmentPowerAdminStatus,
+        equipmentPowerOperStatus,
+        equipmentPowerRowStatus,
+        equipmentPowerACPowerFailed,
+        equipmentPowerDCPowerFailed,
+        equipmentPowerTemperatureHigh,
+        equipmentPowerModuleMissing,
+        equipmentPowerObjectProperty }
+    STATUS      deprecated
+    DESCRIPTION
+        "The power module objects (4.0)."
+    ::= { lumEquipmentGroups 23 }
+
+equipmentFanGroupV3 OBJECT-GROUP
+    OBJECTS {
+        equipmentFanIndex,
+        equipmentFanName,
+        equipmentFanSubrack,
+        equipmentFanSlot,
+        equipmentFanInvPhysIndexOrZero,
+        equipmentFanAdminStatus,
+        equipmentFanOperStatus,
+        equipmentFanRowStatus,
+        equipmentFanUnitFailed,
+        equipmentFanMainUnitFailed,
+        equipmentFanObjectProperty }
+    STATUS      deprecated
+    DESCRIPTION
+        "The fan module objects (4.0)."
+    ::= { lumEquipmentGroups 24 }
+
+equipmentNodeGroupV4 OBJECT-GROUP
+    OBJECTS {
+        equipmentNodeLedTest,
+        equipmentNodeIcnRedundancyMode,
+        equipmentNodeMemoryProfile,
+        equipmentAllowDummyPassiveSlots}
+    STATUS      deprecated
+    DESCRIPTION
+        "The node objects V4 (7.0)"
+    ::= { lumEquipmentGroups 25 }
+
+equipmentBoardGroupV5 OBJECT-GROUP
+    OBJECTS {
+        equipmentBoardIndex,
+        equipmentBoardName,
+        equipmentBoardSubrack,
+        equipmentBoardSlot,
+        equipmentBoardInvPhysIndexOrZero,
+        equipmentBoardExpectedType,
+        equipmentBoardActualType,
+        equipmentBoardDescr,
+        equipmentBoardTemp,
+        equipmentBoardLedTest,
+        equipmentBoardAdminStatus,
+        equipmentBoardOperStatus,
+        equipmentBoardRowStatus,
+        equipmentBoardLastChangeTime,
+        equipmentBoardMissing,
+        equipmentBoardUnexpectedType,
+        equipmentBoardTempHighExceeded,
+        equipmentBoardCommunicationFailure,
+        equipmentBoardInterworkFailed,
+        equipmentBoardSecondaryPowerFailed,
+        equipmentBoardVitalDataMissing,
+        equipmentBoardNonVitalDataMissing,
+        equipmentBoardUnderMaintenance,
+        equipmentBoardTempThreshold,
+        equipmentBoardSwVersionMismatch,
+        equipmentBoardObjectProperty,
+        equipmentBoardReconfigure }
+    STATUS      deprecated
+    DESCRIPTION
+        "The board objects V5. (7.0)"
+    ::= { lumEquipmentGroups 26 }
+
+equipmentBoardGroupV6 OBJECT-GROUP
+    OBJECTS {
+        equipmentBoardIndex,
+        equipmentBoardName,
+        equipmentBoardSubrack,
+        equipmentBoardSlot,
+        equipmentBoardInvPhysIndexOrZero,
+        equipmentBoardExpectedType,
+        equipmentBoardActualType,
+        equipmentBoardDescr,
+        equipmentBoardTemp,
+        equipmentBoardLedTest,
+        equipmentBoardAdminStatus,
+        equipmentBoardOperStatus,
+        equipmentBoardRowStatus,
+        equipmentBoardLastChangeTime,
+        equipmentBoardMissing,
+        equipmentBoardUnexpectedType,
+        equipmentBoardTempHighExceeded,
+        equipmentBoardCommunicationFailure,
+        equipmentBoardInterworkFailed,
+        equipmentBoardSecondaryPowerFailed,
+        equipmentBoardVitalDataMissing,
+        equipmentBoardNonVitalDataMissing,
+        equipmentBoardUnderMaintenance,
+        equipmentBoardTempThreshold,
+        equipmentBoardSwVersionMismatch,
+        equipmentBoardObjectProperty,
+        equipmentBoardReconfigure,
+        equipmentBoardLedStatus }
+    STATUS      deprecated
+    DESCRIPTION
+        "The board objects V6. (8.0)"
+    ::= { lumEquipmentGroups 27 }
+
+equipmentBoardGroupV7 OBJECT-GROUP
+    OBJECTS {
+        equipmentBoardIndex,
+        equipmentBoardName,
+        equipmentBoardSubrack,
+        equipmentBoardSlot,
+        equipmentBoardInvPhysIndexOrZero,
+        equipmentBoardExpectedType,
+        equipmentBoardActualType,
+        equipmentBoardDescr,
+        equipmentBoardTemp,
+        equipmentBoardLedTest,
+        equipmentBoardAdminStatus,
+        equipmentBoardOperStatus,
+        equipmentBoardRowStatus,
+        equipmentBoardLastChangeTime,
+        equipmentBoardMissing,
+        equipmentBoardUnexpectedType,
+        equipmentBoardTempHighExceeded,
+        equipmentBoardCommunicationFailure,
+        equipmentBoardInterworkFailed,
+        equipmentBoardSecondaryPowerFailed,
+        equipmentBoardVitalDataMissing,
+        equipmentBoardNonVitalDataMissing,
+        equipmentBoardUnderMaintenance,
+        equipmentBoardTempThreshold,
+        equipmentBoardSwVersionMismatch,
+        equipmentBoardObjectProperty,
+        equipmentBoardReconfigure,
+        equipmentBoardLedStatus,
+        equipmentBoardModuleInfo,
+        equipmentBoardTempLow,
+        equipmentBoardTempVeryHigh }
+    STATUS      deprecated
+    DESCRIPTION
+        "The board objects V7. (9.0)"
+    ::= { lumEquipmentGroups 28 }
+
+equipmentNodeGroupV8 OBJECT-GROUP
+    OBJECTS {
+        equipmentNodeLedTest,
+        equipmentNodeIcnRedundancyMode,
+        equipmentNodeMemoryProfile,
+        equipmentAllowDummyPassiveSlots,
+        equipmentNodeManagementVlan}
+    STATUS      deprecated
+    DESCRIPTION
+        "The node objects V8 (11.0)"
+    ::= { lumEquipmentGroups 29 }
+
+equipmentBoardGroupV8 OBJECT-GROUP
+    OBJECTS {
+        equipmentBoardIndex,
+        equipmentBoardName,
+        equipmentBoardSubrack,
+        equipmentBoardSlot,
+        equipmentBoardInvPhysIndexOrZero,
+        equipmentBoardExpectedType,
+        equipmentBoardActualType,
+        equipmentBoardDescr,
+        equipmentBoardTemp,
+        equipmentBoardLedTest,
+        equipmentBoardAdminStatus,
+        equipmentBoardOperStatus,
+        equipmentBoardRowStatus,
+        equipmentBoardLastChangeTime,
+        equipmentBoardMissing,
+        equipmentBoardUnexpectedType,
+        equipmentBoardTempHighExceeded,
+        equipmentBoardCommunicationFailure,
+        equipmentBoardInterworkFailed,
+        equipmentBoardSecondaryPowerFailed,
+        equipmentBoardVitalDataMissing,
+        equipmentBoardNonVitalDataMissing,
+        equipmentBoardUnderMaintenance,
+        equipmentBoardTempThreshold,
+        equipmentBoardSwVersionMismatch,
+        equipmentBoardObjectProperty,
+        equipmentBoardReconfigure,
+        equipmentBoardLedStatus,
+        equipmentBoardModuleInfo,
+        equipmentBoardTempLow,
+        equipmentBoardTempVeryHigh,
+        equipmentBoardNewSwActivatedButNotRestarted }
+    STATUS      deprecated
+    DESCRIPTION
+        "The board objects V8. (12.0)"
+    ::= { lumEquipmentGroups 30 }
+
+equipmentNodeGroupV9 OBJECT-GROUP
+    OBJECTS {
+        equipmentNodeLedTest,
+        equipmentNodeIcnRedundancyMode,
+        equipmentNodeMemoryProfile,
+        equipmentAllowDummyPassiveSlots,
+        equipmentNodeManagementVlan,
+        equipmentNodeMgmtVlanPrivacy}
+    STATUS      deprecated
+    DESCRIPTION
+        "The node objects V9 (14.0)"
+    ::= { lumEquipmentGroups 31 }
+
+equipmentResourceGroup OBJECT-GROUP
+    OBJECTS {
+        equipmentResourceNumberOfBoards,
+        equipmentResourceMaxNumberOfBoards,
+        equipmentResourceNumberOfActiveBoards,
+        equipmentResourceMaxNumberOfActiveBoards}
+    STATUS      current
+    DESCRIPTION
+        "The resouce objects V1 (16.0)"
+    ::= { lumEquipmentGroups 32 }
+
+equipmentSubrackGroupV7 OBJECT-GROUP
+    OBJECTS {
+        equipmentSubrackIndex,
+        equipmentSubrackName,
+        equipmentSubrackSubrack,
+        equipmentSubrackDescr,
+        equipmentSubrackInvPhysIndexOrZero,
+        equipmentSubrackAllFanUnitsFailed,
+        equipmentSubrackRowStatus,
+        equipmentSubrackActualType,
+        equipmentSubrackExpectedType,
+        equipmentSubrackUnexpectedType,
+        equipmentSubrackTemp,
+        equipmentSubrackTempHighExceeded,
+        equipmentSubrackTempThreshold,
+        equipmentSubrackDataChanged,
+        equipmentSubrackSystemModeSet,
+        equipmentSubrackEffectiveSystemMode,
+        equipmentSubrackCurrentSystemMode,
+        equipmentSubrackAdminStatus,
+        equipmentSubrackOperStatus,
+        equipmentSubrackObjectProperty,
+        equipmentSubrackShelfLength }
+    STATUS      deprecated
+    DESCRIPTION
+        "The subrack module objects V7. (16.0)"
+    ::= { lumEquipmentGroups 33 }
+
+equipmentSubrackGroupV8 OBJECT-GROUP
+    OBJECTS {
+        equipmentSubrackIndex,
+        equipmentSubrackName,
+        equipmentSubrackSubrack,
+        equipmentSubrackDescr,
+        equipmentSubrackInvPhysIndexOrZero,
+        equipmentSubrackAllFanUnitsFailed,
+        equipmentSubrackRowStatus,
+        equipmentSubrackActualType,
+        equipmentSubrackExpectedType,
+        equipmentSubrackUnexpectedType,
+        equipmentSubrackTemp,
+        equipmentSubrackTempHighExceeded,
+        equipmentSubrackTempThreshold,
+        equipmentSubrackDataChanged,
+        equipmentSubrackSystemModeSet,
+        equipmentSubrackEffectiveSystemMode,
+        equipmentSubrackCurrentSystemMode,
+        equipmentSubrackAdminStatus,
+        equipmentSubrackOperStatus,
+        equipmentSubrackObjectProperty,
+        equipmentSubrackShelfLength,
+        equipmentSubrackLANModuleMissing,
+        equipmentSubrackExpectedFirstPbSlot,
+        equipmentSubrackActualFirstPbSlot,
+        equipmentSubrackFirstPbSlotMismatch }
+    STATUS      deprecated
+    DESCRIPTION
+        "The subrack module objects V8. (17.0)"
+    ::= { lumEquipmentGroups 34 }
+
+equipmentBoardGroupV9 OBJECT-GROUP
+    OBJECTS {
+        equipmentBoardIndex,
+        equipmentBoardName,
+        equipmentBoardSubrack,
+        equipmentBoardSlot,
+        equipmentBoardInvPhysIndexOrZero,
+        equipmentBoardExpectedType,
+        equipmentBoardActualType,
+        equipmentBoardDescr,
+        equipmentBoardTemp,
+        equipmentBoardLedTest,
+        equipmentBoardAdminStatus,
+        equipmentBoardOperStatus,
+        equipmentBoardRowStatus,
+        equipmentBoardLastChangeTime,
+        equipmentBoardMissing,
+        equipmentBoardUnexpectedType,
+        equipmentBoardTempHighExceeded,
+        equipmentBoardCommunicationFailure,
+        equipmentBoardInterworkFailed,
+        equipmentBoardSecondaryPowerFailed,
+        equipmentBoardVitalDataMissing,
+        equipmentBoardNonVitalDataMissing,
+        equipmentBoardUnderMaintenance,
+        equipmentBoardTempThreshold,
+        equipmentBoardSwVersionMismatch,
+        equipmentBoardObjectProperty,
+        equipmentBoardReconfigure,
+        equipmentBoardLedStatus,
+        equipmentBoardModuleInfo,
+        equipmentBoardTempLow,
+        equipmentBoardTempVeryHigh,
+        equipmentBoardNewSwActivatedButNotRestarted,
+        equipmentBoardLowTemperature,
+        equipmentBoardTempLowThreshold }
+    STATUS      deprecated
+    DESCRIPTION
+        "The board objects V9. (17.0)"
+    ::= { lumEquipmentGroups 35 }
+
+equipmentNotificationGroupV3 NOTIFICATION-GROUP
+    NOTIFICATIONS {
+        equipmentBoardRowStatusActive,
+        equipmentBoardRowStatusInserted,
+        equipmentBoardRowStatusRemoved,
+        equipmentBoardRowStatusDeleted }
+    STATUS      current
+    DESCRIPTION
+        "The equipment notifications."
+    ::= { lumEquipmentGroups 36 }
+
+equipmentBoardGroupV10 OBJECT-GROUP
+    OBJECTS {
+        equipmentBoardIndex,
+        equipmentBoardName,
+        equipmentBoardSubrack,
+        equipmentBoardSlot,
+        equipmentBoardInvPhysIndexOrZero,
+        equipmentBoardExpectedType,
+        equipmentBoardActualType,
+        equipmentBoardDescr,
+        equipmentBoardTemp,
+        equipmentBoardLedTest,
+        equipmentBoardAdminStatus,
+        equipmentBoardOperStatus,
+        equipmentBoardRowStatus,
+        equipmentBoardLastChangeTime,
+        equipmentBoardMissing,
+        equipmentBoardUnexpectedType,
+        equipmentBoardTempHighExceeded,
+        equipmentBoardCommunicationFailure,
+        equipmentBoardInterworkFailed,
+        equipmentBoardSecondaryPowerFailed,
+        equipmentBoardVitalDataMissing,
+        equipmentBoardNonVitalDataMissing,
+        equipmentBoardUnderMaintenance,
+        equipmentBoardTempThreshold,
+        equipmentBoardSwVersionMismatch,
+        equipmentBoardObjectProperty,
+        equipmentBoardReconfigure,
+        equipmentBoardLedStatus,
+        equipmentBoardModuleInfo,
+        equipmentBoardTempLow,
+        equipmentBoardTempVeryHigh,
+        equipmentBoardNewSwActivatedButNotRestarted,
+        equipmentBoardLowTemperature,
+        equipmentBoardTempLowThreshold,
+        equipmentBoardAdditionalInfo  }
+    STATUS      deprecated
+    DESCRIPTION
+        "The board objects V10. (17.0)"
+    ::= { lumEquipmentGroups 37 }
+
+equipmentNodeGroupV10 OBJECT-GROUP
+    OBJECTS {
+        equipmentNodeLedTest,
+        equipmentNodeIcnRedundancyMode,
+        equipmentNodeMemoryProfile,
+        equipmentAllowDummyPassiveSlots,
+        equipmentNodeManagementVlan,
+        equipmentNodeMgmtVlanPrivacy,
+        equipmentNodeDcnRedundancyMode}
+    STATUS      deprecated
+    DESCRIPTION
+        "The node objects V10 (18.0)"
+    ::= { lumEquipmentGroups 38 }
+
+equipmentBoardGroupV11 OBJECT-GROUP
+    OBJECTS {
+        equipmentBoardIndex,
+        equipmentBoardName,
+        equipmentBoardSubrack,
+        equipmentBoardSlot,
+        equipmentBoardInvPhysIndexOrZero,
+        equipmentBoardExpectedType,
+        equipmentBoardActualType,
+        equipmentBoardDescr,
+        equipmentBoardTemp,
+        equipmentBoardLedTest,
+        equipmentBoardAdminStatus,
+        equipmentBoardOperStatus,
+        equipmentBoardRowStatus,
+        equipmentBoardLastChangeTime,
+        equipmentBoardMissing,
+        equipmentBoardUnexpectedType,
+        equipmentBoardTempHighExceeded,
+        equipmentBoardCommunicationFailure,
+        equipmentBoardInterworkFailed,
+        equipmentBoardSecondaryPowerFailed,
+        equipmentBoardVitalDataMissing,
+        equipmentBoardNonVitalDataMissing,
+        equipmentBoardUnderMaintenance,
+        equipmentBoardTempThreshold,
+        equipmentBoardSwVersionMismatch,
+        equipmentBoardObjectProperty,
+        equipmentBoardReconfigure,
+        equipmentBoardLedStatus,
+        equipmentBoardModuleInfo,
+        equipmentBoardTempLow,
+        equipmentBoardTempVeryHigh,
+        equipmentBoardNewSwActivatedButNotRestarted,
+        equipmentBoardLowTemperature,
+        equipmentBoardTempLowThreshold,
+        equipmentBoardAdditionalInfo,
+        equipmentBoardBootError,
+        equipmentBoardHardwareError,
+        equipmentBoardLowDiskSpace,
+        equipmentBoardClockDrift }
+    STATUS      deprecated
+    DESCRIPTION
+        "The board objects V11. (20.0)"
+    ::= { lumEquipmentGroups 40 }
+
+equipmentFanGroupV4 OBJECT-GROUP
+    OBJECTS {
+        equipmentFanIndex,
+        equipmentFanName,
+        equipmentFanSubrack,
+        equipmentFanSlot,
+        equipmentFanInvPhysIndexOrZero,
+        equipmentFanAdminStatus,
+        equipmentFanOperStatus,
+        equipmentFanRowStatus,
+        equipmentFanUnitFailed,
+        equipmentFanMainUnitFailed,
+        equipmentFanObjectProperty,
+        equipmentFanFanFault }
+    STATUS      deprecated
+    DESCRIPTION
+        "The fan module objects V4. (20.0)"
+    ::= { lumEquipmentGroups 41 }
+
+equipmentSlotGroup OBJECT-GROUP
+    OBJECTS {
+        equipmentSlotIndex,
+        equipmentSlotName,
+        equipmentSlotSubrack,
+        equipmentSlotSlot,
+        equipmentSlotAdminStatus,
+        equipmentSlotUsageState,
+        equipmentSlotEmptySlot }
+    STATUS      deprecated
+    DESCRIPTION
+        "The slot module objects. (20.0)"
+    ::= { lumEquipmentGroups 42 }
+
+equipmentBoardGroupV12 OBJECT-GROUP
+    OBJECTS {
+        equipmentBoardIndex,
+        equipmentBoardName,
+        equipmentBoardSubrack,
+        equipmentBoardSlot,
+        equipmentBoardInvPhysIndexOrZero,
+        equipmentBoardExpectedType,
+        equipmentBoardActualType,
+        equipmentBoardDescr,
+        equipmentBoardTemp,
+        equipmentBoardLedTest,
+        equipmentBoardAdminStatus,
+        equipmentBoardOperStatus,
+        equipmentBoardRowStatus,
+        equipmentBoardLastChangeTime,
+        equipmentBoardMissing,
+        equipmentBoardUnexpectedType,
+        equipmentBoardTempHighExceeded,
+        equipmentBoardCommunicationFailure,
+        equipmentBoardInterworkFailed,
+        equipmentBoardSecondaryPowerFailed,
+        equipmentBoardVitalDataMissing,
+        equipmentBoardNonVitalDataMissing,
+        equipmentBoardUnderMaintenance,
+        equipmentBoardTempThreshold,
+        equipmentBoardSwVersionMismatch,
+        equipmentBoardObjectProperty,
+        equipmentBoardReconfigure,
+        equipmentBoardLedStatus,
+        equipmentBoardModuleInfo,
+        equipmentBoardTempLow,
+        equipmentBoardTempVeryHigh,
+        equipmentBoardNewSwActivatedButNotRestarted,
+        equipmentBoardLowTemperature,
+        equipmentBoardTempLowThreshold,
+        equipmentBoardAdditionalInfo,
+        equipmentBoardBootError,
+        equipmentBoardHardwareError,
+        equipmentBoardLowDiskSpace,
+        equipmentBoardClockDrift,
+        equipmentBoardPostponeFwUpgrade,
+        equipmentBoardActivatePendingFwCommand,
+        equipmentBoardFwActivationPending,
+        equipmentBoardFeatureNotSupported }
+    STATUS      deprecated
+    DESCRIPTION
+        "The board objects V12. (21.0)"
+    ::= { lumEquipmentGroups 43 }
+
+
+equipmentNodeGroupV11 OBJECT-GROUP
+    OBJECTS {
+        equipmentNodeLedTest,
+        equipmentNodeIcnRedundancyMode,
+        equipmentNodeMemoryProfile,
+        equipmentAllowDummyPassiveSlots,
+        equipmentNodeManagementVlan,
+        equipmentNodeMgmtVlanPrivacy,
+        equipmentNodeDcnRedundancyMode,
+        equipmentNodeProxyArp}
+    STATUS      current
+    DESCRIPTION
+        "The node objects V11 (21.0)"
+    ::= { lumEquipmentGroups 44 }
+
+equipmentBoardGroupV13 OBJECT-GROUP
+    OBJECTS {
+        equipmentBoardIndex,
+        equipmentBoardName,
+        equipmentBoardSubrack,
+        equipmentBoardSlot,
+        equipmentBoardInvPhysIndexOrZero,
+        equipmentBoardExpectedType,
+        equipmentBoardActualType,
+        equipmentBoardDescr,
+        equipmentBoardTemp,
+        equipmentBoardLedTest,
+        equipmentBoardAdminStatus,
+        equipmentBoardOperStatus,
+        equipmentBoardRowStatus,
+        equipmentBoardLastChangeTime,
+        equipmentBoardMissing,
+        equipmentBoardUnexpectedType,
+        equipmentBoardTempHighExceeded,
+        equipmentBoardCommunicationFailure,
+        equipmentBoardInterworkFailed,
+        equipmentBoardSecondaryPowerFailed,
+        equipmentBoardVitalDataMissing,
+        equipmentBoardNonVitalDataMissing,
+        equipmentBoardUnderMaintenance,
+        equipmentBoardTempThreshold,
+        equipmentBoardSwVersionMismatch,
+        equipmentBoardObjectProperty,
+        equipmentBoardReconfigure,
+        equipmentBoardLedStatus,
+        equipmentBoardModuleInfo,
+        equipmentBoardTempLow,
+        equipmentBoardTempVeryHigh,
+        equipmentBoardNewSwActivatedButNotRestarted,
+        equipmentBoardLowTemperature,
+        equipmentBoardTempLowThreshold,
+        equipmentBoardAdditionalInfo,
+        equipmentBoardBootError,
+        equipmentBoardHardwareError,
+        equipmentBoardLowDiskSpace,
+        equipmentBoardClockDrift,
+        equipmentBoardPostponeFwUpgrade,
+        equipmentBoardActivatePendingFwCommand,
+        equipmentBoardFwActivationPending,
+        equipmentBoardFeatureNotSupported,
+        equipmentBoardFwReloadNeeded,
+        equipmentBoardFwContextUnknown,
+        equipmentBoardBoardVariant,
+        equipmentBoardCabinetConnectivity,
+        equipmentBoardCabinetConnectionFailure }
+    STATUS      deprecated
+    DESCRIPTION
+        "The board objects V13. (27.0)"
+    ::= { lumEquipmentGroups 45 }
+
+equipmentPowerGroupV3 OBJECT-GROUP
+    OBJECTS {
+        equipmentPowerIndex,
+        equipmentPowerName,
+        equipmentPowerSubrack,
+        equipmentPowerSlot,
+        equipmentPowerType,
+        equipmentPowerInvPhysIndexOrZero,
+        equipmentPowerAdminStatus,
+        equipmentPowerOperStatus,
+        equipmentPowerRowStatus,
+        equipmentPowerACPowerFailed,
+        equipmentPowerDCPowerFailed,
+        equipmentPowerTemperatureHigh,
+        equipmentPowerModuleMissing,
+        equipmentPowerObjectProperty,
+        equipmentPowerDCPowerFailedSeverity }
+    STATUS      deprecated
+    DESCRIPTION
+        "The power module objects V3 (27.0)."
+    ::= { lumEquipmentGroups 46 }
+
+equipmentBoardGroupV14 OBJECT-GROUP
+    OBJECTS {
+        equipmentBoardIndex,
+        equipmentBoardName,
+        equipmentBoardExpectedType,
+        equipmentBoardActualType,
+        equipmentBoardDescr,
+        equipmentBoardSubrack,
+        equipmentBoardSlot,
+        equipmentBoardTemp,
+        equipmentBoardInvPhysIndexOrZero,
+        equipmentBoardLedTest,
+        equipmentBoardAdminStatus,
+        equipmentBoardOperStatus,
+        equipmentBoardLastChangeTime,
+        equipmentBoardRowStatus,
+        equipmentBoardMissing,
+        equipmentBoardUnexpectedType,
+        equipmentBoardTempHighExceeded,
+        equipmentBoardCommunicationFailure,
+        equipmentBoardInterworkFailed,
+        equipmentBoardSecondaryPowerFailed,
+        equipmentBoardVitalDataMissing,
+        equipmentBoardNonVitalDataMissing,
+        equipmentBoardUnderMaintenance,
+        equipmentBoardTempThreshold,
+        equipmentBoardSwVersionMismatch,
+        equipmentBoardObjectProperty,
+        equipmentBoardTempLow,
+        equipmentBoardTempVeryHigh,
+        equipmentBoardReconfigure,
+        equipmentBoardLedStatus,
+        equipmentBoardModuleInfo,
+        equipmentBoardNewSwActivatedButNotRestarted,
+        equipmentBoardLowTemperature,
+        equipmentBoardTempLowThreshold,
+        equipmentBoardAdditionalInfo,
+        equipmentBoardBootError,
+        equipmentBoardHardwareError,
+        equipmentBoardLowDiskSpace,
+        equipmentBoardClockDrift,
+        equipmentBoardPostponeFwUpgrade,
+        equipmentBoardActivatePendingFwCommand,
+        equipmentBoardFwActivationPending,
+        equipmentBoardFeatureNotSupported,
+        equipmentBoardFwReloadNeeded,
+        equipmentBoardFwContextUnknown,
+        equipmentBoardBoardVariant,
+        equipmentBoardCabinetConnectivity,
+        equipmentBoardCabinetConnectionFailure,
+        equipmentBoardOperationalVariant,
+        equipmentBoardAid,
+        equipmentBoardPhysicalLocation}
+    STATUS      current
+    DESCRIPTION
+        "The board objects V14. (28.0)"
+    ::= { lumEquipmentGroups 47 }
+
+equipmentSlotGroupV2 OBJECT-GROUP
+    OBJECTS {
+        equipmentSlotIndex,
+        equipmentSlotName,
+        equipmentSlotSubrack,
+        equipmentSlotSlot,
+        equipmentSlotAdminStatus,
+        equipmentSlotUsageState,
+        equipmentSlotEmptySlot,
+        equipmentSlotEquipped,
+        equipmentSlotAid,
+        equipmentSlotPhysicalLocation
+         }
+    STATUS      current
+    DESCRIPTION
+        "The slot module objects V2. (28.0)"
+    ::= { lumEquipmentGroups 48 }
+
+equipmentSubrackGroupV9 OBJECT-GROUP
+    OBJECTS {
+        equipmentSubrackIndex,
+        equipmentSubrackName,
+        equipmentSubrackSubrack,
+        equipmentSubrackDescr,
+        equipmentSubrackInvPhysIndexOrZero,
+        equipmentSubrackAllFanUnitsFailed,
+        equipmentSubrackRowStatus,
+        equipmentSubrackActualType,
+        equipmentSubrackExpectedType,
+        equipmentSubrackUnexpectedType,
+        equipmentSubrackTemp,
+        equipmentSubrackTempHighExceeded,
+        equipmentSubrackTempThreshold,
+        equipmentSubrackDataChanged,
+        equipmentSubrackSystemModeSet,
+        equipmentSubrackEffectiveSystemMode,
+        equipmentSubrackCurrentSystemMode,
+        equipmentSubrackAdminStatus,
+        equipmentSubrackOperStatus,
+        equipmentSubrackObjectProperty,
+        equipmentSubrackShelfLength,
+        equipmentSubrackLANModuleMissing,
+        equipmentSubrackExpectedFirstPbSlot,
+        equipmentSubrackActualFirstPbSlot,
+        equipmentSubrackFirstPbSlotMismatch,
+        equipmentSubrackAid,
+        equipmentSubrackPhysicalLocation}
+    STATUS      deprecated
+    DESCRIPTION
+        "The subrack module objects V9. (28.0)"
+    ::= { lumEquipmentGroups 49 }
+
+equipmentPowerGroupV4 OBJECT-GROUP
+    OBJECTS {
+        equipmentPowerIndex,
+        equipmentPowerName,
+        equipmentPowerSubrack,
+        equipmentPowerSlot,
+        equipmentPowerType,
+        equipmentPowerInvPhysIndexOrZero,
+        equipmentPowerAdminStatus,
+        equipmentPowerOperStatus,
+        equipmentPowerRowStatus,
+        equipmentPowerACPowerFailed,
+        equipmentPowerDCPowerFailed,
+        equipmentPowerTemperatureHigh,
+        equipmentPowerModuleMissing,
+        equipmentPowerObjectProperty,
+        equipmentPowerDCPowerFailedSeverity,
+        equipmentPowerAid,
+        equipmentPowerPhysicalLocation}
+    STATUS      deprecated
+    DESCRIPTION
+        "The power module objects V4 (28.0)."
+    ::= { lumEquipmentGroups 50 }
+
+equipmentFanGroupV5 OBJECT-GROUP
+    OBJECTS {
+        equipmentFanIndex,
+        equipmentFanName,
+        equipmentFanSubrack,
+        equipmentFanSlot,
+        equipmentFanInvPhysIndexOrZero,
+        equipmentFanAdminStatus,
+        equipmentFanOperStatus,
+        equipmentFanRowStatus,
+        equipmentFanUnitFailed,
+        equipmentFanMainUnitFailed,
+        equipmentFanObjectProperty,
+        equipmentFanFanFault,
+        equipmentFanAid,
+        equipmentFanPhysicalLocation}
+    STATUS      current
+    DESCRIPTION
+        "The fan module objects V5. (28.0)"
+    ::= { lumEquipmentGroups 51 }
+
+equipmentGeneralGroupV5 OBJECT-GROUP
+    OBJECTS {
+        equipmentGeneralLastChangeTime,
+        equipmentGeneralStateLastChangeTime,
+        equipmentGeneralEquipmentSubrackTableSize,
+        equipmentGeneralEquipmentBoardTableSize,
+        equipmentGeneralEquipmentPowerTableSize,
+        equipmentGeneralEquipmentFanTableSize,
+        equipmentGeneralEquipmentSlotTableSize }
+    STATUS      deprecated
+    DESCRIPTION
+        "The equipment general objects v5 (R28.0)."
+    ::= { lumEquipmentGroups 52 }
+
+equipmentSubrackGroupV10 OBJECT-GROUP
+    OBJECTS {
+        equipmentSubrackIndex,
+        equipmentSubrackName,
+        equipmentSubrackSubrack,
+        equipmentSubrackDescr,
+        equipmentSubrackInvPhysIndexOrZero,
+        equipmentSubrackAllFanUnitsFailed,
+        equipmentSubrackRowStatus,
+        equipmentSubrackActualType,
+        equipmentSubrackExpectedType,
+        equipmentSubrackUnexpectedType,
+        equipmentSubrackTemp,
+        equipmentSubrackTempHighExceeded,
+        equipmentSubrackTempThreshold,
+        equipmentSubrackDataChanged,
+        equipmentSubrackSystemModeSet,
+        equipmentSubrackEffectiveSystemMode,
+        equipmentSubrackCurrentSystemMode,
+        equipmentSubrackAdminStatus,
+        equipmentSubrackOperStatus,
+        equipmentSubrackObjectProperty,
+        equipmentSubrackShelfLength,
+        equipmentSubrackLANModuleMissing,
+        equipmentSubrackExpectedFirstPbSlot,
+        equipmentSubrackActualFirstPbSlot,
+        equipmentSubrackFirstPbSlotMismatch,
+        equipmentSubrackAid,
+        equipmentSubrackPhysicalLocation,
+        equipmentSubrackChangeExpectedType}
+    STATUS      current
+    DESCRIPTION
+        "The subrack module objects V10. (29.0)"
+    ::= { lumEquipmentGroups 53 }
+
+equipmentGeneralGroupV6 OBJECT-GROUP
+    OBJECTS {
+        equipmentGeneralLastChangeTime,
+        equipmentGeneralStateLastChangeTime,
+        equipmentGeneralEquipmentSubrackTableSize,
+        equipmentGeneralEquipmentBoardTableSize,
+        equipmentGeneralEquipmentPowerTableSize,
+        equipmentGeneralEquipmentFanTableSize,
+        equipmentGeneralEquipmentSlotTableSize,
+        equipmentGeneralEquipmentOpticalModuleTableSize }
+    STATUS      current
+    DESCRIPTION
+        "The equipment general objects v6 (R31.0)."
+    ::= { lumEquipmentGroups 54 }
+
+equipmentOpticalModuleGroup OBJECT-GROUP
+    OBJECTS {
+    equipmentOpticalModuleIndex,
+        equipmentOpticalModuleHostBoardType,
+        equipmentOpticalModuleType,
+        equipmentOpticalModuleName,
+        equipmentOpticalModuleSubrack,
+        equipmentOpticalModuleSlot,
+        equipmentOpticalModuleFirmwareVersion,
+        equipmentOpticalModuleSerialNumber,
+        equipmentOpticalModuleWarmingUpState,
+        equipmentOpticalModuleFailure
+        }
+    STATUS      current
+    DESCRIPTION
+        "The equipment optical module objects v6 (R31.0)."
+    ::= { lumEquipmentGroups 55 }
+
+equipmentPowerGroupV5 OBJECT-GROUP
+    OBJECTS {
+        equipmentPowerIndex,
+        equipmentPowerName,
+        equipmentPowerSubrack,
+        equipmentPowerSlot,
+        equipmentPowerType,
+        equipmentPowerInvPhysIndexOrZero,
+        equipmentPowerAdminStatus,
+        equipmentPowerOperStatus,
+        equipmentPowerRowStatus,
+        equipmentPowerPowerFailed,
+        equipmentPowerTemperatureHigh,
+        equipmentPowerModuleMissing,
+        equipmentPowerObjectProperty,
+        equipmentPowerDCPowerFailedSeverity,
+        equipmentPowerAid,
+        equipmentPowerPhysicalLocation}
+    STATUS      current
+    DESCRIPTION
+        "The power module objects V5 (32.1)."
+    ::= { lumEquipmentGroups 56 }
+
+-- ----------------------------------------------------
+-- Compliance
+-- ----------------------------------------------------
+
+lumEquipmentBasicComplV1 MODULE-COMPLIANCE
+    STATUS      deprecated
+    DESCRIPTION
+        "Basic implementation requirements for the equipment MIB."
+    MODULE
+        MANDATORY-GROUPS {
+            equipmentGeneralGroup,
+            equipmentSubrackGroup,
+            equipmentBoardGroup,
+            equipmentPowerGroup,
+            equipmentFanGroup }
+    ::= { lumEquipmentCompl 1 }
+
+lumEquipmentBasicComplV2 MODULE-COMPLIANCE
+    STATUS      deprecated
+    DESCRIPTION
+        "Basic implementation requirements for the equipment MIB V2."
+    MODULE
+        MANDATORY-GROUPS {
+            equipmentGeneralGroupV2,
+            equipmentSubrackGroup,
+            equipmentBoardGroup,
+            equipmentPowerGroup,
+            equipmentFanGroup }
+    ::= { lumEquipmentCompl 2 }
+
+lumEquipmentBasicComplV3 MODULE-COMPLIANCE
+    STATUS      deprecated
+    DESCRIPTION
+        "Basic implementation requirements for the equipment MIB V3."
+    MODULE
+        MANDATORY-GROUPS {
+            equipmentGeneralGroupV2,
+            equipmentSubrackGroup,
+            equipmentBoardGroup,
+            equipmentPowerGroup,
+            equipmentFanGroup,
+            equipmentNotificationGroup }
+    ::= { lumEquipmentCompl 3 }
+
+lumEquipmentBasicComplV4 MODULE-COMPLIANCE
+    STATUS      deprecated
+    DESCRIPTION
+        "Basic implementation requirements for the equipment MIB V4."
+    MODULE
+        MANDATORY-GROUPS {
+            equipmentGeneralGroupV2,
+            equipmentSubrackGroupV2,
+            equipmentBoardGroup,
+            equipmentPowerGroup,
+            equipmentFanGroup,
+            equipmentNotificationGroup }
+    ::= { lumEquipmentCompl 4 }
+
+lumEquipmentBasicComplV5 MODULE-COMPLIANCE
+    STATUS      deprecated
+    DESCRIPTION
+        "Basic implementation requirements for the equipment MIB V5."
+    MODULE
+        MANDATORY-GROUPS {
+            equipmentGeneralGroupV2,
+            equipmentSubrackGroupV3,
+            equipmentBoardGroup,
+            equipmentPowerGroup,
+            equipmentFanGroup,
+            equipmentNotificationGroup }
+    ::= { lumEquipmentCompl 5 }
+
+lumEquipmentBasicComplV6 MODULE-COMPLIANCE
+    STATUS      deprecated
+    DESCRIPTION
+        "Basic implementation requirements for the equipment MIB V6."
+    MODULE
+        MANDATORY-GROUPS {
+            equipmentGeneralGroupV2,
+            equipmentSubrackGroupV3,
+            equipmentBoardGroupV2,
+            equipmentPowerGroup,
+            equipmentFanGroup,
+            equipmentNotificationGroup }
+    ::= { lumEquipmentCompl 6 }
+
+lumEquipmentBasicComplV7 MODULE-COMPLIANCE
+    STATUS      deprecated
+    DESCRIPTION
+        "Basic implementation requirements for the equipment MIB V7."
+    MODULE
+        MANDATORY-GROUPS {
+            equipmentGeneralGroupV2,
+            equipmentSubrackGroupV3,
+            equipmentBoardGroupV2,
+            equipmentPowerGroup,
+            equipmentFanGroup,
+            equipmentNotificationGroup,
+            equipmentNodeGroup }
+    ::= { lumEquipmentCompl 7 }
+
+lumEquipmentBasicComplV8 MODULE-COMPLIANCE
+    STATUS      deprecated
+    DESCRIPTION
+        "Basic implementation requirements for the equipment MIB V8."
+    MODULE
+        MANDATORY-GROUPS {
+            equipmentGeneralGroupV3,
+            equipmentSubrackGroupV3,
+            equipmentBoardGroupV2,
+            equipmentPowerGroup,
+            equipmentFanGroup,
+            equipmentNotificationGroup,
+            equipmentNodeGroup }
+    ::= { lumEquipmentCompl 8 }
+
+lumEquipmentBasicComplV9 MODULE-COMPLIANCE
+    STATUS      deprecated
+    DESCRIPTION
+        "Basic implementation requirements for the equipment MIB V9."
+    MODULE
+        MANDATORY-GROUPS {
+            equipmentGeneralGroupV3,
+            equipmentSubrackGroupV3,
+            equipmentBoardGroupV2,
+            equipmentPowerGroup,
+            equipmentFanGroup,
+            equipmentNotificationGroup,
+            equipmentNodeGroupV2 }
+    ::= { lumEquipmentCompl 9 }
+
+lumEquipmentBasicComplV10 MODULE-COMPLIANCE
+    STATUS      deprecated
+    DESCRIPTION
+        "Basic implementation requirements for the equipment MIB V10."
+    MODULE
+        MANDATORY-GROUPS {
+            equipmentGeneralGroupV3,
+            equipmentSubrackGroupV3,
+            equipmentBoardGroupV2,
+            equipmentPowerGroup,
+            equipmentFanGroup,
+            equipmentNotificationGroup,
+            equipmentNodeGroupV3 }
+    ::= { lumEquipmentCompl 10 }
+
+lumEquipmentBasicComplV11 MODULE-COMPLIANCE
+    STATUS      deprecated
+    DESCRIPTION
+        "Basic implementation requirements for the equipment MIB V11.
+        Equivalent to V10, but the notifications differ..."
+    MODULE
+        MANDATORY-GROUPS {
+            equipmentGeneralGroupV3,
+            equipmentSubrackGroupV3,
+            equipmentBoardGroupV2,
+            equipmentPowerGroup,
+            equipmentFanGroup,
+            equipmentNotificationGroup,
+            equipmentNodeGroupV3 }
+    ::= { lumEquipmentCompl 11 }
+
+lumEquipmentBasicComplV12 MODULE-COMPLIANCE
+    STATUS      deprecated
+    DESCRIPTION
+        "Basic implementation requirements for the equipment MIB V12."
+    MODULE
+        MANDATORY-GROUPS {
+            equipmentGeneralGroupV3,
+            equipmentSubrackGroupV4,
+            equipmentBoardGroupV3,
+            equipmentPowerGroup,
+            equipmentFanGroup,
+            equipmentNotificationGroupV2,
+            equipmentNodeGroupV3 }
+    ::= { lumEquipmentCompl 12 }
+
+lumEquipmentBasicComplV13 MODULE-COMPLIANCE
+    STATUS      deprecated
+    DESCRIPTION
+        "Basic implementation requirements for the equipment MIB V13. (2.2)"
+    MODULE
+        MANDATORY-GROUPS {
+            equipmentGeneralGroupV3,
+            equipmentSubrackGroupV5,
+            equipmentBoardGroupV3,
+            equipmentPowerGroup,
+            equipmentFanGroup,
+            equipmentNotificationGroupV2,
+            equipmentNodeGroupV3 }
+    ::= { lumEquipmentCompl 13 }
+
+lumEquipmentBasicComplV14 MODULE-COMPLIANCE
+    STATUS      deprecated
+    DESCRIPTION
+        "Basic implementation requirements for the equipment MIB V14. (2.3)"
+    MODULE
+        MANDATORY-GROUPS {
+            equipmentGeneralGroupV3,
+            equipmentSubrackGroupV5,
+            equipmentBoardGroupV3,
+            equipmentPowerGroup,
+            equipmentFanGroup,
+            equipmentNotificationGroupV2,
+            equipmentNodeGroupV3 }
+    ::= { lumEquipmentCompl 14 }
+
+lumEquipmentBasicComplV15 MODULE-COMPLIANCE
+    STATUS      deprecated
+    DESCRIPTION
+        "Basic implementation requirements for the equipment MIB V15. (2.3.2)"
+    MODULE
+        MANDATORY-GROUPS {
+            equipmentGeneralGroupV3,
+            equipmentSubrackGroupV5,
+            equipmentBoardGroupV3,
+            equipmentPowerGroup,
+            equipmentFanGroupV2,
+            equipmentNotificationGroupV2,
+            equipmentNodeGroupV3 }
+    ::= { lumEquipmentCompl 15 }
+
+lumEquipmentBasicComplV16 MODULE-COMPLIANCE
+    STATUS      deprecated
+    DESCRIPTION
+        "Basic implementation requirements for the equipment MIB V16. (3.0)"
+    MODULE
+        MANDATORY-GROUPS {
+            equipmentGeneralGroupV3,
+            equipmentSubrackGroupV5,
+            equipmentBoardGroupV3,
+            equipmentPowerGroup,
+            equipmentFanGroupV2,
+            equipmentNotificationGroupV2,
+            equipmentNodeGroupV3 }
+    ::= { lumEquipmentCompl 16 }
+
+lumEquipmentBasicComplV17 MODULE-COMPLIANCE
+    STATUS      deprecated
+    DESCRIPTION
+        "Basic implementation requirements for the equipment MIB V17. (3.1)"
+    MODULE
+        MANDATORY-GROUPS {
+            equipmentGeneralGroupV4,
+            equipmentSubrackGroupV5,
+            equipmentBoardGroupV3,
+            equipmentPowerGroup,
+            equipmentFanGroupV2,
+            equipmentNotificationGroupV2,
+            equipmentNodeGroupV3 }
+    ::= { lumEquipmentCompl 17 }
+
+lumEquipmentBasicComplV18 MODULE-COMPLIANCE
+    STATUS      deprecated
+    DESCRIPTION
+        "Basic implementation requirements for the equipment MIB V18. (4.0)"
+    MODULE
+        MANDATORY-GROUPS {
+            equipmentGeneralGroupV4,
+            equipmentSubrackGroupV6,
+            equipmentBoardGroupV4,
+            equipmentPowerGroupV2,
+            equipmentFanGroupV3,
+            equipmentNotificationGroupV2,
+            equipmentNodeGroupV3 }
+    ::= { lumEquipmentCompl 18 }
+
+lumEquipmentBasicComplV19 MODULE-COMPLIANCE
+    STATUS      deprecated
+    DESCRIPTION
+        "Basic implementation requirements for the equipment MIB V19. (7.0)"
+    MODULE
+        MANDATORY-GROUPS {
+            equipmentGeneralGroupV4,
+            equipmentSubrackGroupV6,
+            equipmentBoardGroupV5,
+            equipmentPowerGroupV2,
+            equipmentFanGroupV3,
+            equipmentNotificationGroupV2,
+            equipmentNodeGroupV4 }
+    ::= { lumEquipmentCompl 19 }
+
+lumEquipmentBasicComplV20 MODULE-COMPLIANCE
+    STATUS      deprecated
+    DESCRIPTION
+        "Basic implementation requirements for the equipment MIB V20. (8.0)"
+    MODULE
+        MANDATORY-GROUPS {
+            equipmentGeneralGroupV4,
+            equipmentSubrackGroupV6,
+            equipmentBoardGroupV6,
+            equipmentPowerGroupV2,
+            equipmentFanGroupV3,
+            equipmentNotificationGroupV2,
+            equipmentNodeGroupV4 }
+    ::= { lumEquipmentCompl 20 }
+
+lumEquipmentBasicComplV21 MODULE-COMPLIANCE
+    STATUS      deprecated
+    DESCRIPTION
+        "Basic implementation requirements for the equipment MIB V21. (9.0)"
+    MODULE
+        MANDATORY-GROUPS {
+            equipmentGeneralGroupV4,
+            equipmentSubrackGroupV6,
+            equipmentBoardGroupV7,
+            equipmentPowerGroupV2,
+            equipmentFanGroupV3,
+            equipmentNotificationGroupV2,
+            equipmentNodeGroupV4 }
+    ::= { lumEquipmentCompl 21 }
+
+lumEquipmentBasicComplV22 MODULE-COMPLIANCE
+    STATUS      deprecated
+    DESCRIPTION
+        "Basic implementation requirements for the equipment MIB V22. (10.0)"
+    MODULE
+        MANDATORY-GROUPS {
+            equipmentGeneralGroupV4,
+            equipmentSubrackGroupV6,
+            equipmentBoardGroupV7,
+            equipmentPowerGroupV2,
+            equipmentFanGroupV3,
+            equipmentNotificationGroupV2,
+            equipmentNodeGroupV4 }
+    ::= { lumEquipmentCompl 22 }
+
+lumEquipmentBasicComplV23 MODULE-COMPLIANCE
+    STATUS      deprecated
+    DESCRIPTION
+        "Basic implementation requirements for the equipment MIB V23. (11.0)"
+    MODULE
+        MANDATORY-GROUPS {
+            equipmentGeneralGroupV4,
+            equipmentSubrackGroupV6,
+            equipmentBoardGroupV7,
+            equipmentPowerGroupV2,
+            equipmentFanGroupV3,
+            equipmentNotificationGroupV2,
+            equipmentNodeGroupV8 }
+    ::= { lumEquipmentCompl 23 }
+
+lumEquipmentBasicComplV24 MODULE-COMPLIANCE
+    STATUS      deprecated
+    DESCRIPTION
+        "Basic implementation requirements for the equipment MIB V24. (12.0)"
+    MODULE
+        MANDATORY-GROUPS {
+            equipmentGeneralGroupV4,
+            equipmentSubrackGroupV6,
+            equipmentBoardGroupV8,
+            equipmentPowerGroupV2,
+            equipmentFanGroupV3,
+            equipmentNotificationGroupV2,
+            equipmentNodeGroupV8 }
+    ::= { lumEquipmentCompl 24 }
+
+lumEquipmentBasicComplV25 MODULE-COMPLIANCE
+    STATUS      deprecated
+    DESCRIPTION
+        "Basic implementation requirements for the equipment MIB V24. (14.0)"
+    MODULE
+        MANDATORY-GROUPS {
+            equipmentGeneralGroupV4,
+            equipmentSubrackGroupV6,
+            equipmentBoardGroupV8,
+            equipmentPowerGroupV2,
+            equipmentFanGroupV3,
+            equipmentNotificationGroupV2,
+            equipmentNodeGroupV9 }
+    ::= { lumEquipmentCompl 25 }
+
+lumEquipmentBasicComplV26 MODULE-COMPLIANCE
+    STATUS      deprecated
+    DESCRIPTION
+        "Basic implementation requirements for the equipment MIB V26. (16.0)"
+    MODULE
+        MANDATORY-GROUPS {
+            equipmentGeneralGroupV4,
+            equipmentSubrackGroupV6,
+            equipmentBoardGroupV8,
+            equipmentPowerGroupV2,
+            equipmentFanGroupV3,
+            equipmentNotificationGroupV2,
+            equipmentNodeGroupV9,
+            equipmentResourceGroup }
+    ::= { lumEquipmentCompl 26 }
+
+lumEquipmentBasicComplV27 MODULE-COMPLIANCE
+    STATUS      deprecated
+    DESCRIPTION
+        "Basic implementation requirements for the equipment MIB V26. (16.0)"
+    MODULE
+        MANDATORY-GROUPS {
+            equipmentGeneralGroupV4,
+            equipmentSubrackGroupV7,
+            equipmentBoardGroupV8,
+            equipmentPowerGroupV2,
+            equipmentFanGroupV3,
+            equipmentNotificationGroupV2,
+            equipmentNodeGroupV9,
+            equipmentResourceGroup }
+    ::= { lumEquipmentCompl 27 }
+
+lumEquipmentBasicComplV28 MODULE-COMPLIANCE
+    STATUS      deprecated
+    DESCRIPTION
+        "Basic implementation requirements for the equipment MIB V28. (17.0)"
+    MODULE
+        MANDATORY-GROUPS {
+            equipmentGeneralGroupV4,
+            equipmentSubrackGroupV8,
+            equipmentBoardGroupV9,
+            equipmentPowerGroupV2,
+            equipmentFanGroupV3,
+            equipmentNotificationGroupV3,
+            equipmentNodeGroupV9,
+            equipmentResourceGroup }
+    ::= { lumEquipmentCompl 28 }
+
+lumEquipmentBasicComplV29 MODULE-COMPLIANCE
+    STATUS      deprecated
+    DESCRIPTION
+        "Basic implementation requirements for the equipment MIB V28. (17.0)"
+    MODULE
+        MANDATORY-GROUPS {
+            equipmentGeneralGroupV4,
+            equipmentSubrackGroupV8,
+            equipmentBoardGroupV10,
+            equipmentPowerGroupV2,
+            equipmentFanGroupV3,
+            equipmentNotificationGroupV3,
+            equipmentNodeGroupV9,
+            equipmentResourceGroup }
+    ::= { lumEquipmentCompl 29 }
+
+lumEquipmentBasicComplV30 MODULE-COMPLIANCE
+    STATUS      deprecated
+    DESCRIPTION
+        "Basic implementation requirements for the equipment MIB V30. (18.0)"
+    MODULE
+        MANDATORY-GROUPS {
+            equipmentGeneralGroupV4,
+            equipmentSubrackGroupV8,
+            equipmentBoardGroupV10,
+            equipmentPowerGroupV2,
+            equipmentFanGroupV3,
+            equipmentNotificationGroupV3,
+            equipmentNodeGroupV10,
+            equipmentResourceGroup }
+    ::= { lumEquipmentCompl 30 }
+
+lumEquipmentBasicComplV31 MODULE-COMPLIANCE
+    STATUS      deprecated
+    DESCRIPTION
+        "Basic implementation requirements for the equipment MIB V31. (20.0)"
+    MODULE
+        MANDATORY-GROUPS {
+            equipmentGeneralGroupV4,
+            equipmentSubrackGroupV8,
+            equipmentBoardGroupV11,
+            equipmentPowerGroupV2,
+            equipmentFanGroupV4,
+            equipmentNotificationGroupV3,
+            equipmentNodeGroupV10,
+            equipmentResourceGroup,
+            equipmentSlotGroup }
+    ::= { lumEquipmentCompl 31 }
+
+lumEquipmentBasicComplV32 MODULE-COMPLIANCE
+    STATUS      deprecated
+    DESCRIPTION
+        "Basic implementation requirements for the equipment MIB V32. (21.0)"
+    MODULE
+        MANDATORY-GROUPS {
+            equipmentGeneralGroupV4,
+            equipmentSubrackGroupV8,
+            equipmentBoardGroupV12,
+            equipmentPowerGroupV2,
+            equipmentFanGroupV4,
+            equipmentNotificationGroupV3,
+            equipmentNodeGroupV11,
+            equipmentResourceGroup,
+            equipmentSlotGroup }
+    ::= { lumEquipmentCompl 32 }
+
+lumEquipmentBasicComplV33 MODULE-COMPLIANCE
+    STATUS      deprecated
+    DESCRIPTION
+        "Basic implementation requirements for the equipment MIB V33. (27.0)"
+    MODULE
+        MANDATORY-GROUPS {
+            equipmentGeneralGroupV4,
+            equipmentSubrackGroupV8,
+            equipmentBoardGroupV13,
+            equipmentPowerGroupV3,
+            equipmentFanGroupV4,
+            equipmentNotificationGroupV3,
+            equipmentNodeGroupV11,
+            equipmentResourceGroup,
+            equipmentSlotGroup }
+    ::= { lumEquipmentCompl 33 }
+
+lumEquipmentBasicComplV34 MODULE-COMPLIANCE
+    STATUS      deprecated
+    DESCRIPTION
+        "Basic implementation requirements for the equipment MIB V34. (28.0)"
+    MODULE
+        MANDATORY-GROUPS {
+            equipmentGeneralGroupV5,
+            equipmentSubrackGroupV9,
+            equipmentBoardGroupV14,
+            equipmentPowerGroupV4,
+            equipmentFanGroupV5,
+            equipmentNotificationGroupV3,
+            equipmentNodeGroupV11,
+            equipmentResourceGroup,
+            equipmentSlotGroupV2 }
+    ::= { lumEquipmentCompl 34 }
+
+lumEquipmentBasicComplV35 MODULE-COMPLIANCE
+STATUS      deprecated
+DESCRIPTION
+    "Basic implementation requirements for the equipment MIB V35. (29.0)"
+MODULE
+    MANDATORY-GROUPS {
+        equipmentGeneralGroupV5,
+        equipmentSubrackGroupV10,
+        equipmentBoardGroupV14,
+        equipmentPowerGroupV4,
+        equipmentFanGroupV5,
+        equipmentNotificationGroupV3,
+        equipmentNodeGroupV11,
+        equipmentResourceGroup,
+        equipmentSlotGroupV2 }
+::= { lumEquipmentCompl 35 }
+
+lumEquipmentBasicComplV36 MODULE-COMPLIANCE
+STATUS      deprecated
+DESCRIPTION
+    "Basic implementation requirements for the equipment MIB V36. (31.0)"
+MODULE
+    MANDATORY-GROUPS {
+        equipmentGeneralGroupV6,
+        equipmentSubrackGroupV10,
+        equipmentBoardGroupV14,
+        equipmentPowerGroupV4,
+        equipmentFanGroupV5,
+        equipmentNotificationGroupV3,
+        equipmentNodeGroupV11,
+        equipmentResourceGroup,
+        equipmentSlotGroupV2,
+        equipmentOpticalModuleGroup}
+::= { lumEquipmentCompl 36 }
+
+lumEquipmentBasicComplV37 MODULE-COMPLIANCE
+STATUS      current
+DESCRIPTION
+    "Basic implementation requirements for the equipment MIB V37. (32.1)"
+MODULE
+    MANDATORY-GROUPS {
+        equipmentGeneralGroupV6,
+        equipmentSubrackGroupV10,
+        equipmentBoardGroupV14,
+        equipmentPowerGroupV5,
+        equipmentFanGroupV5,
+        equipmentNotificationGroupV3,
+        equipmentNodeGroupV11,
+        equipmentResourceGroup,
+        equipmentSlotGroupV2,
+        equipmentOpticalModuleGroup}
+::= { lumEquipmentCompl 37 }
+
+-- ----------------------------------------------------
+-- Object and event groups
+-- ----------------------------------------------------
+
+equipmentGeneralMinimalGroupV1 OBJECT-GROUP
+    OBJECTS {
+        equipmentGeneralLastChangeTime,
+        equipmentGeneralStateLastChangeTime,
+        equipmentGeneralEquipmentBoardTableSize }
+    STATUS      current
+    DESCRIPTION
+        "The minimal general equipment MIB objects."
+    ::= { lumEquipmentMinimalGroups 1 }
+
+equipmentBoardMinimalGroupV1 OBJECT-GROUP
+    OBJECTS {
+        equipmentBoardIndex,
+        equipmentBoardName,
+        equipmentBoardSubrack,
+        equipmentBoardSlot,
+        equipmentBoardInvPhysIndexOrZero,
+        equipmentBoardExpectedType,
+        equipmentBoardActualType,
+        equipmentBoardDescr,
+        equipmentBoardTemp,
+        equipmentBoardAdminStatus,
+        equipmentBoardOperStatus,
+        equipmentBoardRowStatus }
+    STATUS      deprecated
+    DESCRIPTION
+        "The minimal board objects."
+    ::= { lumEquipmentMinimalGroups 2 }
+
+equipmentBoardMinimalGroupV2 OBJECT-GROUP
+    OBJECTS {
+        equipmentBoardIndex,
+        equipmentBoardName,
+        equipmentBoardSubrack,
+        equipmentBoardSlot,
+        equipmentBoardInvPhysIndexOrZero,
+        equipmentBoardExpectedType,
+        equipmentBoardActualType,
+        equipmentBoardDescr,
+        equipmentBoardTemp,
+        equipmentBoardAdminStatus,
+        equipmentBoardOperStatus,
+        equipmentBoardRowStatus,
+        equipmentBoardTempLow,
+        equipmentBoardTempVeryHigh }
+    STATUS      current
+    DESCRIPTION
+        "The minimal board objects."
+    ::= { lumEquipmentMinimalGroups 3 }
+
+
+-- ----------------------------------------------------
+-- Minimal Compliance
+-- ----------------------------------------------------
+
+lumEquipmentMinimalComplV1 MODULE-COMPLIANCE
+    STATUS      deprecated
+    DESCRIPTION
+        "Minimal implementation requirements for the equipment MIB V1."
+    MODULE
+        MANDATORY-GROUPS {
+            equipmentGeneralMinimalGroupV1,
+            equipmentBoardMinimalGroupV1 }
+    ::= { lumEquipmentMinimalCompl 1 }
+
+lumEquipmentMinimalComplV2 MODULE-COMPLIANCE
+    STATUS      deprecated
+    DESCRIPTION
+        "Minimal implementation requirements for the equipment MIB V2."
+    MODULE
+        MANDATORY-GROUPS {
+            equipmentGeneralMinimalGroupV1,
+            equipmentBoardMinimalGroupV2,
+            equipmentSubrackGroupV6,
+            equipmentPowerGroupV2 }
+    ::= { lumEquipmentMinimalCompl 2 }
+
+lumEquipmentMinimalComplV3 MODULE-COMPLIANCE
+    STATUS      deprecated
+    DESCRIPTION
+        "Minimal implementation requirements for the equipment MIB V3."
+    MODULE
+        MANDATORY-GROUPS {
+            equipmentGeneralMinimalGroupV1,
+            equipmentBoardMinimalGroupV2,
+            equipmentSubrackGroupV6,
+            equipmentPowerGroupV2,
+            equipmentFanGroupV2 }
+    ::= { lumEquipmentMinimalCompl 3 }
+
+lumEquipmentMinimalComplV4 MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "Minimal implementation requirements for the equipment MIB V4."
+    MODULE
+        MANDATORY-GROUPS {
+            equipmentGeneralMinimalGroupV1,
+            equipmentBoardMinimalGroupV2,
+            equipmentSubrackGroupV7,
+            equipmentPowerGroupV2,
+            equipmentFanGroupV2 }
+    ::= { lumEquipmentMinimalCompl 4 }
+
+lumEquipmentMinimalComplV5 MODULE-COMPLIANCE
+    STATUS      deprecated
+    DESCRIPTION
+        "Minimal implementation requirements for the equipment MIB V5."
+    MODULE
+        MANDATORY-GROUPS {
+            equipmentGeneralMinimalGroupV1,
+            equipmentBoardMinimalGroupV2,
+            equipmentSubrackGroupV8,
+            equipmentPowerGroupV2,
+            equipmentFanGroupV2 }
+    ::= { lumEquipmentMinimalCompl 5 }
+
+lumEquipmentMinimalComplV6 MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "Minimal implementation requirements for the equipment MIB V6."
+    MODULE
+        MANDATORY-GROUPS {
+            equipmentGeneralMinimalGroupV1,
+            equipmentBoardMinimalGroupV2,
+            equipmentSubrackGroupV8,
+            equipmentPowerGroupV3,
+            equipmentFanGroupV2 }
+    ::= { lumEquipmentMinimalCompl 6 }
+
+END
+
+
+

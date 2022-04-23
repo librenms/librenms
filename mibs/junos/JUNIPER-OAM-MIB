@@ -1,0 +1,147 @@
+-- *******************************************************************
+-- Juniper enterprise specific OAM MIB.
+--
+-- Copyright (c) 2016-2017, Juniper Networks, Inc.
+-- All rights reserved.
+--
+-- The contents of this document are subject to change without notice.
+-- *******************************************************************
+
+JUNIPER-OAM-MIB DEFINITIONS ::= BEGIN
+IMPORTS
+    MODULE-IDENTITY, OBJECT-TYPE, Counter32,
+    NOTIFICATION-TYPE, Unsigned32
+        FROM SNMPv2-SMI
+    ifIndex,InterfaceIndex
+        FROM IF-MIB
+    TEXTUAL-CONVENTION, DisplayString, DateAndTime, MacAddress
+        FROM SNMPv2-TC
+    jnxOamMibRoot
+        FROM JUNIPER-SMI;
+
+jnxOamMIB  MODULE-IDENTITY
+    LAST-UPDATED "201612150000Z" --  Dec 15, 2016
+    ORGANIZATION "Juniper Networks, Inc."
+    CONTACT-INFO
+            "        Juniper Technical Assistance Center
+                     Juniper Networks, Inc.
+                     1133 Innovation Way
+                     Sunnyvale, CA 94089
+                     E-mail: support@juniper.net"
+    DESCRIPTION
+        "The JUNOS OAM MIB for the Juniper Networks enterprise."
+
+    -- revision history
+    REVISION      "201612150000Z"
+    DESCRIPTION   "Creation Date"
+    ::= { jnxOamMibRoot 81 }
+
+-- Managed object groups
+jnxOamGreKeepAliveObjects   OBJECT IDENTIFIER ::= { jnxOamMIB 1 }
+
+-- Managed objects for OAM GRE Keep Alive
+jnxOamGreKeepAliveStatus    OBJECT IDENTIFIER
+    ::= { jnxOamGreKeepAliveObjects 1 }
+jnxOamGreKeepAliveTraps     OBJECT IDENTIFIER
+    ::= { jnxOamGreKeepAliveObjects 2 }
+jnxOamGreKeepAliveTrapVars  OBJECT IDENTIFIER
+    ::= { jnxOamGreKeepAliveObjects 3 }
+
+-- OAM GRE Keep Alive Status Table
+
+jnxOamGreKeepAliveStatusTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF JnxOamGreKeepAliveStatusEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "A list of GRE Keep Alives Status for the GRE interfaces maintained by OAM."
+    ::= { jnxOamGreKeepAliveStatus 1 }
+
+jnxOamGreKeepAliveStatusEntry OBJECT-TYPE
+    SYNTAX      JnxOamGreKeepAliveStatusEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "An entry resprenting the status of one GRE interface maintained by OAMD."
+    INDEX   { jnxOamGreKeepAliveStatusIfIndex }
+    ::= { jnxOamGreKeepAliveStatusTable 1 }
+
+JnxOamGreKeepAliveStatusEntry ::= SEQUENCE {
+    jnxOamGreKeepAliveStatusIfIndex             InterfaceIndex,
+    jnxOamGreKeepAliveStatusInterfaceName       DisplayString,
+    jnxOamGreKeepAliveStatusSendCounter         Counter32,
+    jnxOamGreKeepAliveStatusReceiveCounter      Counter32,
+    jnxOamGreKeepAliveStatusAdjacencyState      INTEGER
+    }
+
+jnxOamGreKeepAliveStatusIfIndex OBJECT-TYPE
+    SYNTAX     InterfaceIndex
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "The GRE interface index associated with this entry in GRE Keep Alive Status table."
+    ::= { jnxOamGreKeepAliveStatusEntry 1 }
+
+jnxOamGreKeepAliveStatusInterfaceName OBJECT-TYPE
+    SYNTAX      DisplayString
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The GRE interface name associated with this entry in GRE Keep Alive Status table."
+    ::= { jnxOamGreKeepAliveStatusEntry 2 }
+
+jnxOamGreKeepAliveStatusSendCounter OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The send counter associated with this entry in GRE Keep Alive Status table."
+    ::= { jnxOamGreKeepAliveStatusEntry 3 }
+
+jnxOamGreKeepAliveStatusReceiveCounter OBJECT-TYPE
+    SYNTAX      Counter32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The receive counter associated with this entry in GRE Keep Alive Status table."
+    ::= { jnxOamGreKeepAliveStatusEntry 4 }
+
+jnxOamGreKeepAliveStatusAdjacencyState OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    down(0),
+                    up(1) }
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The state associated with this entry in GRE Keep Alive Status table."
+    ::= { jnxOamGreKeepAliveStatusEntry 5 }
+
+-- Object used for traps
+jnxOamGreKeepAliveInterfaceName OBJECT-TYPE
+    SYNTAX       DisplayString
+    MAX-ACCESS   accessible-for-notify
+    STATUS       current
+    DESCRIPTION
+        "The GRE interface which enabled GRE Keep Alive"
+    ::= { jnxOamGreKeepAliveTrapVars 1 }
+
+jnxOamGreKeepAliveAdjacencyState OBJECT-TYPE
+    SYNTAX      INTEGER {
+                    down(0),
+                    up(1) }
+    MAX-ACCESS   accessible-for-notify
+    STATUS       current
+    DESCRIPTION
+        "The GRE interface which enabled GRE Keep Alive"
+    ::= { jnxOamGreKeepAliveTrapVars 2 }
+
+-- Notifications
+jnxOamGreKeepAliveAdjacencyChangeNotif  NOTIFICATION-TYPE
+    OBJECTS {
+        jnxOamGreKeepAliveInterfaceName,
+        jnxOamGreKeepAliveAdjacencyState }
+    STATUS      current
+    DESCRIPTION
+        "GRE Keep Alive Adjacency Change Notification"
+    ::= { jnxOamGreKeepAliveTraps 1 }
+END

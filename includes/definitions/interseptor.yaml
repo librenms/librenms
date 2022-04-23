@@ -1,0 +1,15 @@
+os: interseptor
+text: 'Jacarta InterSeptor'
+type: environment
+icon: jacarta
+group: jacarta
+over:
+    - { graph: device_temperature, text: 'Temperature' }
+    - { graph: device_humidity, text: 'Humidity' }
+
+
+discovery:
+    -
+        sysObjectID:
+            - .1.3.6.1.4.1.19011.1.3
+

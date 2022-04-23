@@ -822,6 +822,22 @@ a.interface-upup:hover, a.interface-updown:hover, a.interface-admindown:hover {
   color: #999999;
 }
 
+.sensor-low, a.sensor-low, a.sensor-low:visited {
+  color: #c11;
+}
+
+.sensor-high, a.sensor-high, a.sensor-high:visited {
+  color: #c11;
+}
+
+.sensor-ok, a.sensor-ok, a.sensor-ok:visited {
+  color: #11a;
+}
+
+a.sensor-ok:hover, a.sensor-low:hover, a.sensor-high:hover {
+  color: #990099;
+}
+
 #top {
   height:17px;
   padding:2px 21px 0px 21px;
@@ -1946,9 +1962,11 @@ label {
 .widget_body {
     padding: 0.8em;
     overflow-y: auto;
+    overflow-x: hidden;
     width: 100%;
     height: calc(100% - 38px);
     cursor: auto;
+    text-align: center;
 }
 
 .device-availability, .service-availability {
@@ -2253,10 +2271,6 @@ label {
   width: auto !important;
 }
 
-.toast-top-right {
-  top: 34px;
-}
-
 .tooltip {
     display: block !important;
     z-index: 10000;
@@ -2361,4 +2375,27 @@ label {
     visibility: visible;
     opacity: 1;
     transition: opacity .15s;
+}
+
+#manage-device-groups-table > thead > tr > th:last-child {
+    min-width: 7%;
+}
+
+.logon-message {
+    white-space: pre-wrap;
+}
+
+.expandable {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+.expandable:hover {
+    overflow: visible;
+}
+.expandable:hover span {
+    position: relative;
+    background-color: white;
+    padding: 2px 3px 2px 0;
+    z-index: 5;
 }

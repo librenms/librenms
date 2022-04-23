@@ -1,5 +1,14 @@
 mib: EdgeSwitch-BOXSERVICES-PRIVATE-MIB
 modules:
+    mempools:
+        data:
+            -
+                total: EdgeSwitch-SWITCHING-MIB::agentSwitchCpuProcessMemAvailable
+                free: EdgeSwitch-SWITCHING-MIB::agentSwitchCpuProcessMemFree
+                precision: 1024
+    os:
+        sysDescr_regex: '/^(?<hardware>EdgeSwitch[ \d\w\-]*|EdgePoint Switch[ \d\w\-]*|US[ \d\w\-]*)(,)* (firmware )*(?<version>\S*)(, Linux .*)*$/'
+        serial: ENTITY-MIB::entPhysicalSerialNum.1
     sensors:
         state:
             data:
@@ -31,7 +40,7 @@ modules:
                         - { value: 4, descr: shutdown, graph: 1, generic: 2 }
                         - { value: 5, descr: notpresent, graph: 1, generic: 3 }
                         - { value: 6, descr: notoperational, graph: 1, generic: 2 }
- 
+
                 -
                     oid: boxServicesFansEntry
                     value: boxServicesFanItemState

@@ -1,5 +1,7 @@
 <?php
 
+use Illuminate\Support\Str;
+
 $regexp = '/
     \.1\.3\.6\.1\.4\.1\.22626\.1\.5\.2\.
     (?P<id>\d+)
@@ -36,12 +38,12 @@ if ($oids) {
 
     foreach ($out as $sensor_id => $sensor) {
         if ($sensor['temp_intval'] != 9999) {
-            $temperature_oid = '.1.3.6.1.4.1.22626.1.5.2.'.$sensor_id.'.3.0';
-            $temperature_id  = $sensor_id;
-            $descr           = trim($sensor['name'], ' "');
-            $lowlimit        = trim($sensor['limit_low'], ' "');
-            $limit           = trim($sensor['limit_high'], ' "');
-            $temperature     = $sensor['temp_intval'];
+            $temperature_oid = '.1.3.6.1.4.1.22626.1.5.2.' . $sensor_id . '.3.0';
+            $temperature_id = $sensor_id;
+            $descr = trim($sensor['name'], ' "');
+            $lowlimit = trim($sensor['limit_low'], ' "');
+            $limit = trim($sensor['limit_high'], ' "');
+            $temperature = $sensor['temp_intval'];
 
             discover_sensor($valid['sensor'], 'temperature', $device, $temperature_oid, $temperature_id, 'cometsystem-p85xx', $descr, '10', '1', $lowlimit, null, null, $limit, $temperature);
         }
@@ -51,7 +53,7 @@ if ($oids) {
 $temp_unit = snmp_get($device, 'tempUnit.0', '-OevTQUs', 'T3610-MIB');
 $user_func = '';
 
-if (str_contains($temp_unit, 'F')) {
+if (Str::contains($temp_unit, 'F')) {
     $user_func = 'fahrenheit_to_celsius';
 }
 

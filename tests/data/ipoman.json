@@ -5,25 +5,7 @@
                 {
                     "sysName": "<private>",
                     "sysObjectID": ".1.3.6.1.4.1.2468.1.4.2.1",
-                    "sysDescr": null,
-                    "sysContact": null,
-                    "version": null,
-                    "hardware": null,
-                    "features": null,
-                    "os": "ipoman",
-                    "type": "power",
-                    "serial": null,
-                    "icon": "ingrasys.png",
-                    "location": null
-                }
-            ]
-        },
-        "poller": {
-            "devices": [
-                {
-                    "sysName": "<private>",
-                    "sysObjectID": ".1.3.6.1.4.1.2468.1.4.2.1",
-                    "sysDescr": null,
+                    "sysDescr": "",
                     "sysContact": "<private>",
                     "version": "1.05",
                     "hardware": null,
@@ -35,7 +17,8 @@
                     "location": "<private>"
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     },
     "ports": {
         "discovery": {
@@ -51,10 +34,10 @@
                     "portName": null,
                     "ifIndex": 1,
                     "ifSpeed": null,
+                    "ifSpeed_prev": null,
                     "ifConnectorPresent": null,
                     "ifPromiscuousMode": null,
-                    "ifHighSpeed": null,
-                    "ifOperStatus": null,
+                    "ifOperStatus": "up",
                     "ifOperStatus_prev": null,
                     "ifAdminStatus": null,
                     "ifAdminStatus_prev": null,
@@ -160,11 +143,11 @@
                     "portName": null,
                     "ifIndex": 1,
                     "ifSpeed": 10000000,
+                    "ifSpeed_prev": null,
                     "ifConnectorPresent": null,
                     "ifPromiscuousMode": null,
-                    "ifHighSpeed": null,
                     "ifOperStatus": "up",
-                    "ifOperStatus_prev": null,
+                    "ifOperStatus_prev": "up",
                     "ifAdminStatus": "up",
                     "ifAdminStatus_prev": null,
                     "ifDuplex": null,
@@ -655,7 +638,7 @@
                     "group": null,
                     "sensor_divisor": 1000,
                     "sensor_multiplier": 1,
-                    "sensor_current": null,
+                    "sensor_current": 0,
                     "sensor_limit": 0,
                     "sensor_limit_warn": null,
                     "sensor_limit_low": 0,
@@ -679,7 +662,7 @@
                     "group": null,
                     "sensor_divisor": 1000,
                     "sensor_multiplier": 1,
-                    "sensor_current": null,
+                    "sensor_current": 0,
                     "sensor_limit": 0,
                     "sensor_limit_warn": null,
                     "sensor_limit_low": 0,
@@ -703,7 +686,7 @@
                     "group": null,
                     "sensor_divisor": 1000,
                     "sensor_multiplier": 1,
-                    "sensor_current": null,
+                    "sensor_current": 0,
                     "sensor_limit": 0,
                     "sensor_limit_warn": null,
                     "sensor_limit_low": 0,
@@ -727,7 +710,7 @@
                     "group": null,
                     "sensor_divisor": 1000,
                     "sensor_multiplier": 1,
-                    "sensor_current": null,
+                    "sensor_current": 0,
                     "sensor_limit": 0,
                     "sensor_limit_warn": null,
                     "sensor_limit_low": 0,
@@ -751,7 +734,7 @@
                     "group": null,
                     "sensor_divisor": 1000,
                     "sensor_multiplier": 1,
-                    "sensor_current": null,
+                    "sensor_current": 0,
                     "sensor_limit": 0,
                     "sensor_limit_warn": null,
                     "sensor_limit_low": 0,
@@ -775,7 +758,7 @@
                     "group": null,
                     "sensor_divisor": 1000,
                     "sensor_multiplier": 1,
-                    "sensor_current": null,
+                    "sensor_current": 0,
                     "sensor_limit": 0,
                     "sensor_limit_warn": null,
                     "sensor_limit_low": 0,
@@ -799,7 +782,7 @@
                     "group": null,
                     "sensor_divisor": 1000,
                     "sensor_multiplier": 1,
-                    "sensor_current": null,
+                    "sensor_current": 0,
                     "sensor_limit": 0,
                     "sensor_limit_warn": null,
                     "sensor_limit_low": 0,
@@ -823,7 +806,7 @@
                     "group": null,
                     "sensor_divisor": 1000,
                     "sensor_multiplier": 1,
-                    "sensor_current": null,
+                    "sensor_current": 0,
                     "sensor_limit": 0,
                     "sensor_limit_warn": null,
                     "sensor_limit_low": 0,
@@ -847,7 +830,7 @@
                     "group": null,
                     "sensor_divisor": 1000,
                     "sensor_multiplier": 1,
-                    "sensor_current": null,
+                    "sensor_current": 0,
                     "sensor_limit": 0,
                     "sensor_limit_warn": null,
                     "sensor_limit_low": 0,
@@ -871,7 +854,7 @@
                     "group": null,
                     "sensor_divisor": 1000,
                     "sensor_multiplier": 1,
-                    "sensor_current": null,
+                    "sensor_current": 0,
                     "sensor_limit": 0,
                     "sensor_limit_warn": null,
                     "sensor_limit_low": 0,
@@ -895,7 +878,7 @@
                     "group": null,
                     "sensor_divisor": 1000,
                     "sensor_multiplier": 1,
-                    "sensor_current": null,
+                    "sensor_current": 0,
                     "sensor_limit": 0,
                     "sensor_limit_warn": null,
                     "sensor_limit_low": 0,
@@ -919,7 +902,7 @@
                     "group": null,
                     "sensor_divisor": 1000,
                     "sensor_multiplier": 1,
-                    "sensor_current": null,
+                    "sensor_current": 0,
                     "sensor_limit": 0,
                     "sensor_limit_warn": null,
                     "sensor_limit_low": 0,
@@ -980,8 +963,7 @@
                     "user_func": null,
                     "state_name": null
                 }
-            ],
-            "state_indexes": []
+            ]
         },
         "poller": {
             "sensors": [
@@ -1389,7 +1371,7 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_prev": null,
+                    "sensor_prev": 0,
                     "user_func": null,
                     "state_name": null
                 },
@@ -1404,7 +1386,7 @@
                     "group": null,
                     "sensor_divisor": 1000,
                     "sensor_multiplier": 1,
-                    "sensor_current": null,
+                    "sensor_current": 0,
                     "sensor_limit": 0,
                     "sensor_limit_warn": null,
                     "sensor_limit_low": 0,
@@ -1428,7 +1410,7 @@
                     "group": null,
                     "sensor_divisor": 1000,
                     "sensor_multiplier": 1,
-                    "sensor_current": null,
+                    "sensor_current": 0,
                     "sensor_limit": 0,
                     "sensor_limit_warn": null,
                     "sensor_limit_low": 0,
@@ -1452,7 +1434,7 @@
                     "group": null,
                     "sensor_divisor": 1000,
                     "sensor_multiplier": 1,
-                    "sensor_current": null,
+                    "sensor_current": 0,
                     "sensor_limit": 0,
                     "sensor_limit_warn": null,
                     "sensor_limit_low": 0,
@@ -1485,7 +1467,7 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_prev": null,
+                    "sensor_prev": 0,
                     "user_func": null,
                     "state_name": null
                 },
@@ -1509,7 +1491,7 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_prev": null,
+                    "sensor_prev": 0,
                     "user_func": null,
                     "state_name": null
                 },
@@ -1533,7 +1515,7 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_prev": null,
+                    "sensor_prev": 0,
                     "user_func": null,
                     "state_name": null
                 },
@@ -1557,7 +1539,7 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_prev": null,
+                    "sensor_prev": 0,
                     "user_func": null,
                     "state_name": null
                 },
@@ -1581,7 +1563,7 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_prev": null,
+                    "sensor_prev": 0,
                     "user_func": null,
                     "state_name": null
                 },
@@ -1605,7 +1587,7 @@
                     "sensor_custom": "No",
                     "entPhysicalIndex": null,
                     "entPhysicalIndex_measured": null,
-                    "sensor_prev": null,
+                    "sensor_prev": 0,
                     "user_func": null,
                     "state_name": null
                 },
@@ -1620,7 +1602,7 @@
                     "group": null,
                     "sensor_divisor": 1000,
                     "sensor_multiplier": 1,
-                    "sensor_current": null,
+                    "sensor_current": 0,
                     "sensor_limit": 0,
                     "sensor_limit_warn": null,
                     "sensor_limit_low": 0,
@@ -1644,7 +1626,7 @@
                     "group": null,
                     "sensor_divisor": 1000,
                     "sensor_multiplier": 1,
-                    "sensor_current": null,
+                    "sensor_current": 0,
                     "sensor_limit": 0,
                     "sensor_limit_warn": null,
                     "sensor_limit_low": 0,
@@ -1705,8 +1687,7 @@
                     "user_func": null,
                     "state_name": null
                 }
-            ],
-            "state_indexes": []
+            ]
         }
     }
 }

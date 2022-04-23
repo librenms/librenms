@@ -1,5 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<phpunit backupGlobals="true"
+<phpunit xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+         xsi:noNamespaceSchemaLocation="https://schema.phpunit.de/9.3/phpunit.xsd"
+         backupGlobals="true"
          backupStaticAttributes="false"
          bootstrap="tests/bootstrap.php"
          colors="true"
@@ -8,37 +10,35 @@
          convertWarningsToExceptions="true"
          processIsolation="false"
          stopOnFailure="false">
-    <testsuites>
-        <testsuite name="Application Test Suite">
-            <directory>tests/</directory>
-        </testsuite>
-
-        <testsuite name="Feature">
-            <directory suffix="Test.php">./tests/Feature</directory>
-        </testsuite>
-
-        <testsuite name="Unit">
-            <directory suffix="Test.php">./tests/Unit</directory>
-        </testsuite>
-    </testsuites>
-    <groups>
-        <exclude>
-            <group>browser</group>
-            <group>mibs</group>
-        </exclude>
-    </groups>
-    <filter>
-        <whitelist processUncoveredFilesFromWhitelist="true">
-            <directory suffix=".php">./app</directory>
-        </whitelist>
-    </filter>
-    <php>
-        <server name="APP_ENV" value="testing"/>
-        <server name="BCRYPT_ROUNDS" value="4"/>
-        <server name="CACHE_DRIVER" value="array"/>
-        <server name="MAIL_DRIVER" value="array"/>
-        <server name="QUEUE_CONNECTION" value="sync"/>
-        <server name="SESSION_DRIVER" value="array"/>
-        <server name="DB_CONNECTION" value="testing"/>
-    </php>
+  <coverage processUncoveredFiles="true">
+    <include>
+      <directory suffix=".php">./app</directory>
+    </include>
+  </coverage>
+  <testsuites>
+    <testsuite name="Application Test Suite">
+      <directory>tests/</directory>
+    </testsuite>
+    <testsuite name="Feature">
+      <directory suffix="Test.php">./tests/Feature</directory>
+    </testsuite>
+    <testsuite name="Unit">
+      <directory suffix="Test.php">./tests/Unit</directory>
+    </testsuite>
+  </testsuites>
+  <groups>
+    <exclude>
+      <group>browser</group>
+      <group>mibs</group>
+    </exclude>
+  </groups>
+  <php>
+    <server name="APP_ENV" value="testing"/>
+    <server name="BCRYPT_ROUNDS" value="4"/>
+    <server name="CACHE_DRIVER" value="array"/>
+    <server name="MAIL_MAILER" value="array"/>
+    <server name="QUEUE_CONNECTION" value="sync"/>
+    <server name="SESSION_DRIVER" value="array"/>
+    <server name="DB_CONNECTION" value="testing"/>
+  </php>
 </phpunit>

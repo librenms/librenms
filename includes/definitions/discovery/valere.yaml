@@ -1,5 +1,8 @@
 mib: VALERE-DC-POWER-MIB
 modules:
+    os:
+        hardware: VALERE-DC-POWER-MIB::vpwrIdentModel.0
+        version: VALERE-DC-POWER-MIB::vpwrIdentControllerVersion.0
     sensors:
         voltage:
             data:
@@ -25,7 +28,8 @@ modules:
                     group: 'Shelf {{ $vpwrBayIndex }}'
                     descr: 'Module {{ $vpwrModuleIndex }} Current'
                     skip_values:
-                        -   oid: vpwrModuleOID
+                        -
+                            oid: vpwrModuleOID
                             op: '='
                             value: 'vpwrDcPowerLvd'
         temperature:

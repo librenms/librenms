@@ -9,11 +9,11 @@ IMPORTS
 	CounterBasedGauge64 FROM HCNUM-TC;
 
 pl2Trap MODULE-IDENTITY
-	LAST-UPDATED "201212131322Z"
+	LAST-UPDATED "201909121500Z"
 	ORGANIZATION "Procera Networks, Inc."
 	CONTACT-INFO "support@proceranetworks.com"
 	DESCRIPTION "MIB for PacketLogic2 traps"
-	REVISION "201212131322Z"
+	REVISION "201909121500Z"
 	DESCRIPTION " Latest version at the revision date for version GET VERSION HERE"
 
 	::={packetlogic2 8}
@@ -36,6 +36,39 @@ pl2ChannelTraps	OBJECT IDENTIFIER ::={pl2Trap 2}
 
 
 pl2ChannelTrapVals	OBJECT IDENTIFIER ::={pl2Trap 3}
+
+
+
+
+
+
+pl2StorageTrapVals	OBJECT IDENTIFIER ::={pl2Trap 4}
+
+
+
+
+
+
+pl2ContentLogicTraps	OBJECT IDENTIFIER ::={pl2Trap 5}
+
+pl2ContentLogicHourlyUpdateTraps	OBJECT IDENTIFIER ::={pl2ContentLogicTraps 1}
+
+pl2ContentLogicCategoriesLoadingTraps	OBJECT IDENTIFIER ::={pl2ContentLogicTraps 2}
+
+pl2ContentLogicDatabaseUpdateTraps	OBJECT IDENTIFIER ::={pl2ContentLogicTraps 3}
+
+pl2ContentLogicDatabaseLoadingTraps	OBJECT IDENTIFIER ::={pl2ContentLogicTraps 4}
+
+pl2ContentLogicTrapVals	OBJECT IDENTIFIER ::={pl2Trap 6}
+
+
+
+
+
+
+
+
+
 
 
 
@@ -116,7 +149,7 @@ channelPort	OBJECT-TYPE
 	::={pl2ChannelTrapVals 3}
 
 prevState	OBJECT-TYPE
-	SYNTAX INTEGER { auto(0), hd-10(1), fd-10(2), hd-100(3), fd-100(4), fd-1000(5), fd-10000(6) }
+	SYNTAX INTEGER { auto(0), hd-10(1), fd-10(2), hd-100(3), fd-100(4), fd-1000(5), fd-10000(6), fd-40000(7), fd-100000(8) }
 	MAX-ACCESS read-only
 	STATUS current
 	DESCRIPTION "This is the state the channel was in before it changed."
@@ -124,12 +157,28 @@ prevState	OBJECT-TYPE
 	::={pl2ChannelTrapVals 4}
 
 newState	OBJECT-TYPE
-	SYNTAX INTEGER { auto(0), hd-10(1), fd-10(2), hd-100(3), fd-100(4), fd-1000(5), fd-10000(6) }
+	SYNTAX INTEGER { auto(0), hd-10(1), fd-10(2), hd-100(3), fd-100(4), fd-1000(5), fd-10000(6), fd-40000(7), fd-100000(8) }
 	MAX-ACCESS read-only
 	STATUS current
 	DESCRIPTION "This is the new state of the channel."
 
 	::={pl2ChannelTrapVals 5}
+
+pl2ContentLogicDatabase	OBJECT-TYPE
+	SYNTAX	 DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Name of the database."
+
+	::={pl2ContentLogicTrapVals 1}
+
+pl2ContentLogicReason	OBJECT-TYPE
+	SYNTAX	 DisplayString
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION "Reason for the failed event."
+
+	::={pl2ContentLogicTrapVals 2}
 
 
 pl2TrapGenericMsg NOTIFICATION-TYPE
@@ -166,6 +215,106 @@ pl2ChannelStateChanged NOTIFICATION-TYPE
 	STATUS current
 	DESCRIPTION "Channel state changed"
 	::= {  pl2ChannelTraps 1 }
+
+pl2StorageGenericTrap NOTIFICATION-TYPE
+	OBJECTS {pl2TrapMessage}
+	STATUS current
+	DESCRIPTION "Generic or undefined alerts from the storage devices."
+	::= {  pl2StorageTrapVals 1 }
+
+pl2StorageBattery NOTIFICATION-TYPE
+	OBJECTS {pl2TrapMessage}
+	STATUS current
+	DESCRIPTION "Alerts regarding batteries in storage devices."
+	::= {  pl2StorageTrapVals 2 }
+
+pl2StoragePowerSupply NOTIFICATION-TYPE
+	OBJECTS {pl2TrapMessage}
+	STATUS current
+	DESCRIPTION "Alerts for power supplies in storage devices."
+	::= {  pl2StorageTrapVals 3 }
+
+pl2StoragePhysicalDisk NOTIFICATION-TYPE
+	OBJECTS {pl2TrapMessage}
+	STATUS current
+	DESCRIPTION "Alerts for physical disks in storage devices."
+	::= {  pl2StorageTrapVals 4 }
+
+pl2StorageVirtualDisk NOTIFICATION-TYPE
+	OBJECTS {pl2TrapMessage}
+	STATUS current
+	DESCRIPTION "Alerts for virtual disks in storage devices."
+	::= {  pl2StorageTrapVals 5 }
+
+pl2ContentLogicHourlyUpdateStarted NOTIFICATION-TYPE
+	STATUS current
+	DESCRIPTION "A trap for notifying that ContentLogic has started an hourly update."
+	::= {  pl2ContentLogicHourlyUpdateTraps 1 }
+
+pl2ContentLogicHourlyUpdateCompleted NOTIFICATION-TYPE
+	STATUS current
+	DESCRIPTION "A trap for notifying that ContentLogic has completed an hourly update."
+	::= {  pl2ContentLogicHourlyUpdateTraps 2 }
+
+pl2ContentLogicHourlyUpdateFailed NOTIFICATION-TYPE
+	OBJECTS {pl2ContentLogicReason}
+	STATUS current
+	DESCRIPTION "A trap for notifying that ContentLogic has failed an hourly update."
+	::= {  pl2ContentLogicHourlyUpdateTraps 3 }
+
+pl2ContentLogicCategoriesLoadingStarted NOTIFICATION-TYPE
+	OBJECTS {pl2ContentLogicDatabase}
+	STATUS current
+	DESCRIPTION "A trap for notifying that ContentLogic has started to load categories."
+	::= {  pl2ContentLogicCategoriesLoadingTraps 1 }
+
+pl2ContentLogicCategoriesLoadingCompleted NOTIFICATION-TYPE
+	OBJECTS {pl2ContentLogicDatabase}
+	STATUS current
+	DESCRIPTION "A trap for notifying that ContentLogic has completed loading categories."
+	::= {  pl2ContentLogicCategoriesLoadingTraps 2 }
+
+pl2ContentLogicCategoriesLoadingFailed NOTIFICATION-TYPE
+	OBJECTS {pl2ContentLogicDatabase, pl2ContentLogicReason}
+	STATUS current
+	DESCRIPTION "A trap for notifying that ContentLogic has failed to load categories."
+	::= {  pl2ContentLogicCategoriesLoadingTraps 3 }
+
+pl2ContentLogicDatabaseUpdateStarted NOTIFICATION-TYPE
+	OBJECTS {pl2ContentLogicDatabase}
+	STATUS current
+	DESCRIPTION "A trap for notifying that ContentLogic has started to update a database."
+	::= {  pl2ContentLogicDatabaseUpdateTraps 1 }
+
+pl2ContentLogicDatabaseUpdateCompleted NOTIFICATION-TYPE
+	OBJECTS {pl2ContentLogicDatabase}
+	STATUS current
+	DESCRIPTION "A trap for notifying that ContentLogic has completed updating a database."
+	::= {  pl2ContentLogicDatabaseUpdateTraps 2 }
+
+pl2ContentLogicDatabaseUpdateFailed NOTIFICATION-TYPE
+	OBJECTS {pl2ContentLogicDatabase, pl2ContentLogicReason}
+	STATUS current
+	DESCRIPTION "A trap for notifying that ContentLogic has failed to update a database."
+	::= {  pl2ContentLogicDatabaseUpdateTraps 3 }
+
+pl2ContentLogicDatabaseLoadingStarted NOTIFICATION-TYPE
+	OBJECTS {pl2ContentLogicDatabase}
+	STATUS current
+	DESCRIPTION "A trap for notifying that ContentLogic has started to load a database."
+	::= {  pl2ContentLogicDatabaseLoadingTraps 1 }
+
+pl2ContentLogicDatabaseLoadingCompleted NOTIFICATION-TYPE
+	OBJECTS {pl2ContentLogicDatabase}
+	STATUS current
+	DESCRIPTION "A trap for notifying that ContentLogic has completed loading a database."
+	::= {  pl2ContentLogicDatabaseLoadingTraps 2 }
+
+pl2ContentLogicDatabaseLoadingFailed NOTIFICATION-TYPE
+	OBJECTS {pl2ContentLogicDatabase, pl2ContentLogicReason}
+	STATUS current
+	DESCRIPTION "A trap for notifying that ContentLogic has failed to load a database."
+	::= {  pl2ContentLogicDatabaseLoadingTraps 3 }
 
 
 END

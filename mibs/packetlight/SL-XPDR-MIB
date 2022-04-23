@@ -28,7 +28,8 @@ slXpdr MODULE-IDENTITY
 
 --
 --	The XPDR MIB consists of the following groups:
---	Static Optical Connection Tables for Transponders and Muxponders
+--	Optical Connection Table
+--  Table for ODU cross connection
 --	XPDR Last Change
 --	XPDR Traps
 --
@@ -38,6 +39,13 @@ slXpdrConn			OBJECT IDENTIFIER ::= { slXpdr 1 }
 slXpdrLastChange	OBJECT IDENTIFIER ::= { slXpdr 6 }
 slXpdrTraps	 		OBJECT IDENTIFIER ::= { slXpdr 7 }
 slXpdrTraps0	 		OBJECT IDENTIFIER ::= { slXpdrTraps 0 }
+
+
+TsMaskBits ::= TEXTUAL-CONVENTION
+    STATUS         current
+    DESCRIPTION    "100G Tributary Slots Mask Bits 1..80."
+    SYNTAX         OCTET STRING (SIZE (0..10))
+
 
 XpdrServiceType ::= TEXTUAL-CONVENTION
     STATUS         current
@@ -86,6 +94,9 @@ XpdrServiceType ::= TEXTUAL-CONVENTION
 		fc8g(41),           -- 8G FC
 		ficon8g(42),        -- 8G FICON
 		mux10GbE(43),		-- Muxponder 10xGBE into 10GFC
+		syncEgbE(44),		-- SyncE Gigabit Ethernet
+		noPm10GbE(45),		-- 10G LAN without PM (with FEC)
+		totu2(46),			-- Transparent OTU2 (no SFU)
 
 		otu1e(50),       		-- OTU1e
 		otu2e(51),       		-- OTU2e
@@ -102,10 +113,67 @@ XpdrServiceType ::= TEXTUAL-CONVENTION
 		fc10LanToOtu2f(62),		-- 10G FC mapped to OTU2f (like G.Sup43 7.1)
 		fc8LanToOtu2(63),		-- 8G FC mapped to OTU2 (GFP-T)
 
-		copper10m(170),		-- Copper 10Base-T Ethernet
-		copper10mAn(171),	-- Copper 10Base-T Ethernet with Auto-negotiation
-		copperFeAn(1701)	-- Copper Fast Ethernet with Auto-negotiation
+		otu3(64),				-- OTU3  
+		oc768(65),				-- OC-768
+		stm256(66),				-- STM-256
+		otu4(67),				-- OTU4  
+		gbe40lan(68),			-- 40GBE-LAN
+		gbe100lan(69),			-- 100GBE-LAN
+
+		fc16g(70),				-- 16G FC/FICON
+		smpteHdSdi(71),			-- HD-SDI 1.485 Gbit/s SMPTE 292M
+		smpteSdSdi(72),			-- SD-SDI 270Mbit/s SMPTE 259M
+		smpte3gSdi(73),			-- 3G-SDI 2.97Gbs
+		smpte3dSdi(74),			-- 372 Dual link / 3D formats
+		smpteHdSdiNtsc(75),		-- HD-SDI for NTSC 1.485/1.001 Gbit/s SMPTE 292M
+		smpte3gSdiNtsc(76),		-- 3G-SDI for NTSC 2.97Gbs/1.001 
+		fc16gNoIsl(77),			-- 16G FC No ISL mode (NO PM)
+		fc32g(78),				-- 32G FC
+
+		cpri1(81),				-- CPRI Option 1 614.4 Mbps
+		cpri2(82),				-- CPRI Option 2 1228.8 Mbps
+		cpri3(83),				-- CPRI Option 3 2457.6 Mbps
+		cpri4(84),				-- CPRI Option 4 3072.0 Mbps
+		cpri5(85),				-- CPRI Option 5 4915.2 Mbps
+		cpri6(86),				-- CPRI Option 6 6144.0 Mbps
+		cpri7(87),				-- CPRI Option 7 9830.4 Mbps
+
+		enc10GbELan(91),		-- Encrypted 10GbE 10.36208 Gbps
+		enc1GbELan(92),			-- Encrypted 1GbE 2.125 Gbps
+		encfc1g(93),			-- Encrypted 1G FC
+		encfc2g(94),			-- Encrypted 2G FC
+		encfc4g(95),			-- Encrypted 4G FC
+		encfc8g(96),			-- Encrypted 8G FC
+		encfc16g(97),			-- Encrypted 16G FC  
+		encfc10g(98),			-- Encrypted 10G FC  
+		enc1GbE10g(99),			-- Encrypted 1GbE over 10.3125 Gbps
+		encGbe40lan(100),		-- Encrypted 40GBE-LAN
+		encGbe100lan(101),		-- Encrypted 100GBE-LAN
+		encOtu2(102),			-- Encrypted OTU2 
+		encOtu2e(103),       	-- Encrypted OTU2e
+		encOtu3(104),			-- Encrypted OTU3  
+		encOtu4(105),			-- Encrypted OTU4  
+		encOc192(106),			-- Encrypted OC-192
+		encStm64(107),			-- Encrypted STM-64
+		encfc32g(108),			-- Encrypted 32G FC  
+		encfc16gNoIsl(110),		-- Encrypted 16G FC without PM (with FEC)
+		encCpri1(111),			-- Encrypted CPRI Option 1 614.4 Mbps
+		encCpri2(112),			-- Encrypted CPRI Option 2 1228.8 Mbps
+		encCpri3(113),			-- Encrypted CPRI Option 3 2457.6 Mbps
+		encCpri4(114),			-- Encrypted CPRI Option 4 3072.0 Mbps
+		encCpri5(115),			-- Encrypted CPRI Option 5 4915.2 Mbps
+		encCpri6(116),			-- Encrypted CPRI Option 6 6144.0 Mbps
+		encCpri7(117),			-- Encrypted CPRI Option 7 9830.4 Mbps
+		enc10GbENoPm(118),		-- Encrypted 10G LAN without PM (with FEC)
+
+		otuc2(120),				-- The 200G uplink
+		encOtuc2(121),			-- Encrypted 200G uplink
+				
+		copper10m(170),			-- Copper 10Base-T Ethernet
+		copper10mAn(171),		-- Copper 10Base-T Ethernet with Auto-negotiation
+		copperFeAn(1701)		-- Copper Fast Ethernet with Auto-negotiation
     }
+
 
 --
 -- The Static Transponding Connection Table
@@ -144,7 +212,13 @@ XpdrConnConfigEntry ::=
 		xpdrConnAddMask 					INTEGER,
 		xpdrMuxInbandAdmin	 				INTEGER,
 		xpdrMuxInbandOper	 				INTEGER,
-		xpdrDirection 						INTEGER
+		xpdrDirection 						INTEGER,
+		xpdrConnConfigCpriRateControl		TruthValue,
+		xpdrFaultPropagationDelay			INTEGER,
+		xpdrFecMode 						INTEGER,
+		xpdrConnAddMask1 					TsMaskBits,
+		xpdrConnAddMask2 					TsMaskBits,
+		xpdrCryptoUser						DisplayString		
 	}
 
 xpdrConnConfigIf1 OBJECT-TYPE
@@ -204,10 +278,18 @@ xpdrConnAddMask 	OBJECT-TYPE
 	MAX-ACCESS  	read-write
 	STATUS      	current
 	DESCRIPTION
-		"This object is a bit mask relevant only for Muxponder entry. 
+		"This object is a bit mask relevant only for 10G Muxponder entry. 
 		It contains a bit for each Muxponder service.
 		To add a service the management should set the corresponding bit to 1.
-		To remove a service the bit should be set to 0."
+		To remove a service the bit should be set to 0.
+		
+		For ODU allocation, the value of xpdrConnAddMask should be set to reflect the odus/time-slots 
+		provisioned for the service according to the following rules:
+		a.	For ODU1 the first byte is 0; for ODU0 the first byte is 1.
+		b.	The second byte. Is equal to:
+			i.	The 4 bits of the first nibble correspond to Uplink 1 allocated odus counted from right to left
+			ii.	The 4 bits of the second nibble correspond to Uplink 2 allocated odus counted from right to left 
+		c.	The Third and Forth bytes keep bit-mask of the allocated time-slots within the odu."
 	::= { xpdrConnConfigEntry 7 }
 
 xpdrMuxInbandAdmin 	OBJECT-TYPE
@@ -250,95 +332,253 @@ xpdrDirection 	OBJECT-TYPE
 		The transponder on one side should be configured as TX and the peer as RX."
 	::= { xpdrConnConfigEntry 10 }
 
-
---
--- The Static Muxponder Connection Table
--- This table defines the connections of the Muxponder services
---
-
-mpdrConnConfigTable OBJECT-TYPE
-	SYNTAX  SEQUENCE OF MpdrConnConfigEntry
-	MAX-ACCESS  		not-accessible
-	STATUS  			current 
-	DESCRIPTION
-		"The connection table contains entry for each service.
-		All entries are bi-directional."
-	::= { slXpdrConn 2 }
-
-mpdrConnConfigEntry OBJECT-TYPE
-	SYNTAX MpdrConnConfigEntry
-	MAX-ACCESS  not-accessible
-	STATUS  current
-	DESCRIPTION
-		"An entry in the transponding connection table.
-		There are three types of entries:
-		1. Add/Drop - a service that is locally dropped and added.
-		2. Bypass - a path that is bybassed via the node between the uplinks.
-		3. Unequipped - path that is not yet allocated for any service"
-	INDEX   { mpdrConnConfigIf1 }
-	::= { mpdrConnConfigTable 1 }
-
-MpdrConnConfigEntry ::=
-	SEQUENCE {
-		mpdrConnConfigIf1				InterfaceIndex,  
-		mpdrConnConfigIf2				InterfaceIndex,    
-		mpdrConnConfigRateAdmin			INTEGER,
-		mpdrConnConfigLosPropagation	TruthValue,
-		mpdrServiceType					XpdrServiceType
-	}
-
-mpdrConnConfigIf1 OBJECT-TYPE
-	SYNTAX  	InterfaceIndex
-	MAX-ACCESS  read-only
-	STATUS  	current
-	DESCRIPTION
-		"The first MPDR interface. The ifIndex of the uplink path."
-	::= { mpdrConnConfigEntry 1 }
-
-mpdrConnConfigIf2 OBJECT-TYPE
-	SYNTAX  	InterfaceIndex
-	MAX-ACCESS  read-only
-	STATUS  	current
-	DESCRIPTION
-		"The second MPDR interface.
-		- In the case of Bypass the value should be the path ifIndex of the other uplink.
-		  The bypass entry will be duplicated. Once for each uplink.
-		- In the case of Unequipped the value is 0.
-		  The Unequipped entry will be duplicated for a ring. Once for each uplink.
-		- In the case of Add/Drop the value is the ifIndex of the local service port.
-		  The Add/Drop entry will be duplicated in a case of a ring. Once for each uplink
-		The default value is 0"
-	::= { mpdrConnConfigEntry 2 }
-
-mpdrConnConfigRateAdmin OBJECT-TYPE
-	SYNTAX  INTEGER
-	MAX-ACCESS  read-write
-	STATUS  	current
-	DESCRIPTION
-		"This variable ask the rate of the traffic used by this service. 
-		Bandwidth is in Kbp/s units. 		
-		The value 0 is used for rate of Bypass or Unequipped services."
-    ::= { mpdrConnConfigEntry 3 }
-
-mpdrConnConfigLosPropagation 	OBJECT-TYPE
+xpdrConnConfigCpriRateControl 	OBJECT-TYPE
 	SYNTAX      	TruthValue
 	MAX-ACCESS  	read-write
 	STATUS      	current
 	DESCRIPTION
-		"This object is used to detrmine if the LOS propagation should be active."
-	::= { mpdrConnConfigEntry 4 }
+		"This object is used to detrmine if the CPRI rate control should be active."
+	::= { xpdrConnConfigEntry 11 }
 
-mpdrServiceType 	OBJECT-TYPE
+xpdrFaultPropagationDelay 	OBJECT-TYPE
+	SYNTAX      	INTEGER
+	MAX-ACCESS  	read-write
+	STATUS      	current
+	DESCRIPTION
+		"This object is used to determine the fault propagation delay.
+		The value 0 mean no delay, the value 1 means 100ms delay, the value 2 means 200ms delay etc.
+		0 is the default value."
+	::= { xpdrConnConfigEntry 12 }
+
+xpdrFecMode 	OBJECT-TYPE
+	SYNTAX      	INTEGER
+	MAX-ACCESS  	read-write
+	STATUS      	current
+	DESCRIPTION
+		"This object is used to determine the IEEE FEC mode for 10G and 16G services:
+		0 - No FEC (default)
+		1 - FEC Monitoring
+		2 - FEC Generation
+		3 - FEC Regeneration"
+	::= { xpdrConnConfigEntry 13 }
+
+xpdrConnAddMask1 	OBJECT-TYPE
+	SYNTAX      	TsMaskBits
+	MAX-ACCESS  	read-write
+	STATUS      	current
+	DESCRIPTION
+		"This object is a bit mask relevant only for 100G Muxponder entry. 
+		It contains a bit for each tributary slot allocated to the service port from Uplink 1.
+		To incluse a tributary slot the management should set the corresponding bit to 1.
+		To remove a tributary slot service the bit should be set to 0."
+	::= { xpdrConnConfigEntry 14 }
+
+xpdrConnAddMask2 	OBJECT-TYPE
+	SYNTAX      	TsMaskBits
+	MAX-ACCESS  	read-write
+	STATUS      	current
+	DESCRIPTION
+		"This object is a bit mask relevant only for 100G Muxponder entry. 
+		It contains a bit for each tributary slot allocated to the service port from Uplink 2.
+		To incluse a tributary slot the management should set the corresponding bit to 1.
+		To remove a tributary slot service the bit should be set to 0.
+		This entry is relevant only for protected services."
+	::= { xpdrConnConfigEntry 15 }
+
+xpdrCryptoUser 	OBJECT-TYPE
+	SYNTAX      	DisplayString
+	MAX-ACCESS  	read-write
+	STATUS      	current
+	DESCRIPTION
+		"The user name of the crypto officer assigned to this service.
+		Default value is Crypto"
+	::= { xpdrConnConfigEntry 16 }
+
+
+--
+--  This table supports two cases:
+--	1. ODU Cross Connection Table - for 10G Muxponder
+--  2. Tributary Cross Connection - for 100G Muxponder
+--
+
+oduXcConnConfigTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF OduXcConnConfigEntry
+	MAX-ACCESS  		not-accessible
+	STATUS  			current 
+	DESCRIPTION
+		"Description for 10G:
+		1. The port numbers are:
+			0       unassigned 
+			1..10   ODUs of Uplink 1
+			11..20  ODUs of Uplink 2 (not available without 20G or 1+1 license)
+		2. All connections are unidirectional
+		3. P1 is the Source port and P2 is the Sync port
+		4. Port 0 is used as P2 when P1 is dropped
+		5. Port 0 is used as P1 when P2 is added
+		6. In the case of APS the two mate ODUs will apear with oduXcConnConfigProtected=TRUE
+		7. The allocation of ODUs per service port is described in xpdrConnAddMask above
+		Description for 100G:
+		The ports are the ifIndex of the tributary slots, where the path byte equals to the tributary slot."
+	::= { slXpdrConn 2 }
+
+oduXcConnConfigEntry OBJECT-TYPE
+	SYNTAX  OduXcConnConfigEntry
+	MAX-ACCESS  not-accessible
+	STATUS  current
+	DESCRIPTION
+		"An entry in the ODU connection table. 
+		 An entry describes uni-directional connection of traffic from P1 (Source port) to port P2 (Sync port)."
+	INDEX   { oduXcConnConfigP1,
+		 	  oduXcConnConfigP2 }
+	::= { oduXcConnConfigTable 1 }
+
+OduXcConnConfigEntry ::=
+	SEQUENCE {
+		oduXcConnConfigP1					INTEGER,  
+		oduXcConnConfigP2					INTEGER,    
+		oduXcConnConfigProtected			TruthValue,
+		oduXcConnConfigRowStatus      		RowStatus        
+	}
+
+oduXcConnConfigP1 OBJECT-TYPE
+	SYNTAX  	INTEGER
+	MAX-ACCESS  read-create
+	STATUS  	current
+	DESCRIPTION
+		"The Source port."
+	::= { oduXcConnConfigEntry 1 }
+
+oduXcConnConfigP2 OBJECT-TYPE
+	SYNTAX  	INTEGER
+	MAX-ACCESS  read-create
+	STATUS  	current
+	DESCRIPTION
+		"The Sync port."
+	::= { oduXcConnConfigEntry 2 }
+
+oduXcConnConfigProtected 	OBJECT-TYPE
+	SYNTAX      	TruthValue
+	MAX-ACCESS  	read-create
+	STATUS      	current
+	DESCRIPTION
+		"Indication for entry with Protection Mates"
+	::= { oduXcConnConfigEntry 3 }
+
+oduXcConnConfigRowStatus OBJECT-TYPE
+      SYNTAX      RowStatus
+      MAX-ACCESS  read-create
+      STATUS      current
+      DESCRIPTION "The Status of this connection entry."
+      ::= { oduXcConnConfigEntry 4 }
+
+--
+--  This table supports Tributary Cross Connection for 100G Muxponder ADM
+--
+
+tribXcConnConfigTable OBJECT-TYPE
+	SYNTAX  SEQUENCE OF TribXcConnConfigEntry
+	MAX-ACCESS  		not-accessible
+	STATUS  			current 
+	DESCRIPTION
+		"The ports are:
+			For service port - the first tributary (1..80)
+			For Uplink 1 - 100 + first tributary (101..180)
+			For Uplink 2 - 200 + first tributary (201..280)"
+	::= { slXpdrConn 3 }
+
+tribXcConnConfigEntry OBJECT-TYPE
+	SYNTAX  TribXcConnConfigEntry
+	MAX-ACCESS  not-accessible
+	STATUS  current
+	DESCRIPTION
+		"An entry in the tributary cross connection table. 
+		 An entry describes uni-directional connection of traffic from P1 (Source port) to port P2 (Sync port)."
+	INDEX   { tribXcConnConfigP1,
+		 	  tribXcConnConfigP2 }
+	::= { tribXcConnConfigTable 1 }
+
+TribXcConnConfigEntry ::=
+	SEQUENCE {
+		tribXcConnConfigP1					INTEGER,  
+		tribXcConnConfigP2					INTEGER,    
+		tribXcConnServiceType				XpdrServiceType,
+		tribXcConnMask1 					TsMaskBits,
+		tribXcConnMask2 					TsMaskBits,
+		tribXcConnConfigProtected			TruthValue,
+		tribXcConnConfigRowStatus      		RowStatus        
+	}
+
+tribXcConnConfigP1 OBJECT-TYPE
+	SYNTAX  	INTEGER
+	MAX-ACCESS  read-create
+	STATUS  	current
+	DESCRIPTION
+		"The Source port."
+	::= { tribXcConnConfigEntry 1 }
+
+tribXcConnConfigP2 OBJECT-TYPE
+	SYNTAX  	INTEGER
+	MAX-ACCESS  read-create
+	STATUS  	current
+	DESCRIPTION
+		"The Sync port."
+	::= { tribXcConnConfigEntry 2 }
+
+tribXcConnServiceType 	OBJECT-TYPE
 	SYNTAX      	XpdrServiceType
 	MAX-ACCESS  	read-write
 	STATUS      	current
 	DESCRIPTION
-		"The service type of the muxponder interface.
-		In the case of Muxponder sevice the value is e.g gbE(6).
-		In the case of Muxponder uplink the value is mux10GbE(43). 
-		In the case of Bypass or Unequipped the value should be other(11)"
-	::= { mpdrConnConfigEntry 5 }
+		"The service type of the service."
+	::= { tribXcConnConfigEntry 3 }
 
+tribXcConnMask1 	OBJECT-TYPE
+	SYNTAX      	TsMaskBits
+	MAX-ACCESS  	read-write
+	STATUS      	current
+	DESCRIPTION
+		"This object is a bit mask relevant only for 100G Muxponder entry. 
+		It contains a bit for each tributary slot allocated to the service port from Uplink 1.
+		To incluse a tributary slot the management should set the corresponding bit to 1.
+		To remove a tributary slot service the bit should be set to 0."
+	::= { tribXcConnConfigEntry 4 }
+
+tribXcConnMask2 	OBJECT-TYPE
+	SYNTAX      	TsMaskBits
+	MAX-ACCESS  	read-write
+	STATUS      	current
+	DESCRIPTION
+		"This object is a bit mask relevant only for 100G Muxponder entry. 
+		It contains a bit for each tributary slot allocated to the service port from Uplink 2.
+		To incluse a tributary slot the management should set the corresponding bit to 1.
+		To remove a tributary slot service the bit should be set to 0.
+		This entry is relevant only for protected services."
+	::= { tribXcConnConfigEntry 5 }
+
+tribXcConnConfigProtected 	OBJECT-TYPE
+	SYNTAX      	TruthValue
+	MAX-ACCESS  	read-create
+	STATUS      	current
+	DESCRIPTION
+		"Indication for entry with Protection Mates"
+	::= { tribXcConnConfigEntry 6 }
+
+tribXcConnConfigRowStatus OBJECT-TYPE
+      SYNTAX      RowStatus
+      MAX-ACCESS  read-create
+      STATUS      current
+      DESCRIPTION "The Status of this connection entry."
+      ::= { tribXcConnConfigEntry 7 }
+
+smmOwnerMode OBJECT-TYPE
+	SYNTAX      	INTEGER {
+		gui(1),		-- (default)
+		ems(2)		-- 
+	}
+      MAX-ACCESS  read-write
+      STATUS      current
+      DESCRIPTION "The owner of the SMM tables."
+	::= { slXpdrConn 4 }
 
 --
 -- The traps

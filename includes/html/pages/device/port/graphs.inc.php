@@ -1,6 +1,6 @@
 <?php
 
-if (rrdtool_check_rrd_exists(get_port_rrdfile_path($device['hostname'], $port['port_id']))) {
+if (Rrd::checkRrdExists(get_port_rrdfile_path($device['hostname'], $port['port_id']))) {
     $iid = $id;
     echo '<div class="panel panel-default">
             <div class="panel-heading">
@@ -9,7 +9,7 @@ if (rrdtool_check_rrd_exists(get_port_rrdfile_path($device['hostname'], $port['p
     $graph_type = 'port_bits';
 
     echo '<div class="panel-body">';
-        include 'includes/html/print-interface-graphs.inc.php';
+    include 'includes/html/print-interface-graphs.inc.php';
     echo '</div></div>';
 
     echo '<div class="panel panel-default">
@@ -19,7 +19,7 @@ if (rrdtool_check_rrd_exists(get_port_rrdfile_path($device['hostname'], $port['p
     $graph_type = 'port_upkts';
 
     echo '<div class="panel-body">';
-        include 'includes/html/print-interface-graphs.inc.php';
+    include 'includes/html/print-interface-graphs.inc.php';
     echo '</div></div>';
 
     echo '<div class="panel panel-default">
@@ -29,7 +29,7 @@ if (rrdtool_check_rrd_exists(get_port_rrdfile_path($device['hostname'], $port['p
 
     $graph_type = 'port_nupkts';
     echo '<div class="panel-body">';
-        include 'includes/html/print-interface-graphs.inc.php';
+    include 'includes/html/print-interface-graphs.inc.php';
     echo '</div></div>';
 
     echo '<div class="panel panel-default">
@@ -40,10 +40,10 @@ if (rrdtool_check_rrd_exists(get_port_rrdfile_path($device['hostname'], $port['p
     $graph_type = 'port_errors';
 
     echo '<div class="panel-body">';
-        include 'includes/html/print-interface-graphs.inc.php';
+    include 'includes/html/print-interface-graphs.inc.php';
     echo '</div></div>';
 
-    if (rrdtool_check_rrd_exists(get_port_rrdfile_path($device['hostname'], $port['port_id'], 'poe'))) {
+    if (Rrd::checkRrdExists(get_port_rrdfile_path($device['hostname'], $port['port_id'], 'poe'))) {
         echo '<div class="panel panel-default">
             <div class="panel-heading">
                 <h3 class="panel-title">PoE</h3>
@@ -51,11 +51,11 @@ if (rrdtool_check_rrd_exists(get_port_rrdfile_path($device['hostname'], $port['p
         $graph_type = 'port_poe';
 
         echo '<div class="panel-body">';
-            include 'includes/html/print-interface-graphs.inc.php';
+        include 'includes/html/print-interface-graphs.inc.php';
         echo '</div></div>';
     }
 
-    if (rrdtool_check_rrd_exists(get_port_rrdfile_path($device['hostname'], $port['port_id'], 'dot3'))) {
+    if (Rrd::checkRrdExists(get_port_rrdfile_path($device['hostname'], $port['port_id'], 'dot3'))) {
         echo '<div class="panel panel-default">
             <div class="panel-heading">
                 <h3 class="panel-title">Ethernet Errors</h3>
@@ -63,7 +63,7 @@ if (rrdtool_check_rrd_exists(get_port_rrdfile_path($device['hostname'], $port['p
         $graph_type = 'port_etherlike';
 
         echo '<div class="panel-body">';
-            include 'includes/html/print-interface-graphs.inc.php';
+        include 'includes/html/print-interface-graphs.inc.php';
         echo '</div></div>';
     }
 
@@ -71,7 +71,7 @@ if (rrdtool_check_rrd_exists(get_port_rrdfile_path($device['hostname'], $port['p
      *  CISCO-IF-EXTENSION MIB statistics
      *  Additional information about input and output errors as seen in `show interface` output.
      */
-    if (rrdtool_check_rrd_exists(get_port_rrdfile_path($device['hostname'], $port['port_id'], 'cie'))) {
+    if (Rrd::checkRrdExists(get_port_rrdfile_path($device['hostname'], $port['port_id'], 'cie'))) {
         echo '<div class="panel panel-default">
             <div class="panel-heading">
                 <h3 class="panel-title">Detailed interface errors</h3>

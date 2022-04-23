@@ -14,8 +14,8 @@
 
 header('Content-type: text/plain');
 
-if (!Auth::user()->hasGlobalAdmin()) {
-    die('ERROR: You need to be admin');
+if (! Auth::user()->hasGlobalAdmin()) {
+    exit('ERROR: You need to be admin');
 }
 
-\App\Models\Callback::set('enabled', (int)($_POST['state'] == 'true'));
+\App\Models\Callback::set('enabled', (int) ($_POST['state'] == 'true'));

@@ -1,16 +1,16 @@
 --MibName=raisecomSystem
 -- =======================================================================
--- Version info 
+-- Version info
 --
 -- Version 0.1 Created 2003.12.17 by GONGGUIDONG
 -- This version of MIB is created just for the use of Network Management Systems
 -- display the  memory and cpu.
 --
--- Copyright(c) 2002-2005 by RAISECOM TECH, Ltd.     
+-- Copyright(c) 2002-2005 by RAISECOM TECH, Ltd.
 -- modify history
 -- 01, 20131012, huxiangfeng, Add two traps.
 -- 01, 20090915, qiyun, Add CPU monitor MIBs.
---                   
+--
 -- =======================================================================
 
 
@@ -18,15 +18,15 @@
 RAISECOM-SYSTEM-MIB DEFINITIONS ::= BEGIN
 
 	IMPORTS
-        MODULE-IDENTITY,Unsigned32 
+        MODULE-IDENTITY,Unsigned32
                 	FROM SNMPv2-SMI
-        OBJECT-TYPE     
+        OBJECT-TYPE
                     FROM SNMPv2-SMI
-        raisecomAgent    
+        raisecomAgent
                     FROM RAISECOM-BASE-MIB
         TruthValue
-                    FROM SNMPv2-TC 
-        EnableVar	
+                    FROM SNMPv2-TC
+        EnableVar
                     FROM SWITCH-TC
         TimeStamp,TEXTUAL-CONVENTION
                     FROM SNMPv2-TC;
@@ -35,35 +35,35 @@ RAISECOM-SYSTEM-MIB DEFINITIONS ::= BEGIN
                 LAST-UPDATED 	"200507270000Z"
                 ORGANIZATION 	"RAISECOM TECH, Ltd."
                 CONTACT-INFO 	"www.raisecom.com"
-                DESCRIPTION  	
+                DESCRIPTION
                 		"raisecom System objects: objects common to all platforms."
-        	::= { raisecomAgent 1 }	    
---       	
+        	::= { raisecomAgent 1 }
+--
 -- Textual Conventions
 --
-						
+
     ProcessStatus ::= TEXTUAL-CONVENTION
 		STATUS	current
 		DESCRIPTION
-	   	    	"Status of the process."		
+	   	    	"Status of the process."
         SYNTAX   INTEGER
                 {
-	            r_running(1),
-				d_interruptible_sleep(2),
-				s_uninterruptible_sleep(3),
-				t_stopped(4),
-				z_zombie(5),
-				x_dead(6),
-				w_paging(7)
-                }   
-                      
+	            r-running(1),
+				d-interruptible-sleep(2),
+				s-uninterruptible-sleep(3),
+				t-stopped(4),
+				z-zombie(5),
+				x-dead(6),
+				w-paging(7)
+                }
+
     CPUTimeStamp ::= TEXTUAL-CONVENTION
         DISPLAY-HINT "4d.4d.4d.4d"
         STATUS       current
-        DESCRIPTION                
+        DESCRIPTION
                 "The time in seconds that could represent signed
                 quantities like time delay with respect to some
-                source. The signed integer part is in the first 
+                source. The signed integer part is in the first
                 32 bits and the fraction part is in the last 32 bits."
         REFERENCE
                 "D.L. Mills, 'Network Time Protocol (Version 3)',
@@ -73,39 +73,39 @@ RAISECOM-SYSTEM-MIB DEFINITIONS ::= BEGIN
 
 --
 -- RAISECOM CPU objects
---   
+--
 
 	raisecomCpu MODULE-IDENTITY
                 LAST-UPDATED 	"200412170000Z"
                 ORGANIZATION 	"RAISECOM TECH, Ltd."
                 CONTACT-INFO 	"www.raisecom.com"
-                DESCRIPTION  	
+                DESCRIPTION
                 		"raisecom System objects: objects common to all platforms."
-        	::= { raisecomSystem 1 } 
-                   
---------------------------------------------------------------------------
---raisecomCPUTrapGroup
--------------------------------------------------------------------------- 
+        	::= { raisecomSystem 1 }
+
+-- =========================================
+-- raisecomCPUTrapGroup
+-- =========================================
      raisecomCPUTrapGroup  OBJECT IDENTIFIER
-                   ::= { raisecomCpu 1 }   
-                   
+                   ::= { raisecomCpu 1 }
+
      raisecomCPURisingThreshold NOTIFICATION-TYPE
 	        OBJECTS { raisecomProcessIndex, raisecomProcessUtilization,raisecomCPUUtilizationCpuIdx, raisecomCPUUtilization }
 	        STATUS  current
 	        DESCRIPTION
 	             "CPU utilization rising threshold trap transfer."
 	        ::= { raisecomCPUTrapGroup 1 }
-      	                   
+
 	 raisecomCPURisingThresholdRecover NOTIFICATION-TYPE
 	        OBJECTS {raisecomCPUUtilizationCpuIdx, raisecomCPUUtilization }
 	        STATUS  current
 	        DESCRIPTION
 	             "CPU utilization rising threshold return to normal trap transfer."
 	        ::= { raisecomCPUTrapGroup 2 }
-	        		                   
---------------------------------------------------------------------------
---raisecomCPUScalarGroup
---------------------------------------------------------------------------   
+
+-- =========================================
+-- raisecomCPUScalarGroup
+-- =========================================
 
        raisecomCPUScalarGroup  OBJECT IDENTIFIER
                    ::= { raisecomCpu 2 }
@@ -113,133 +113,133 @@ RAISECOM-SYSTEM-MIB DEFINITIONS ::= BEGIN
         raisecomCpuTotalProcNum OBJECT-TYPE
                    SYNTAX  INTEGER  (1..2000)
                    ACCESS  read-only
-                   STATUS  current                     
+                   STATUS  current
                    DESCRIPTION
                           "Total number of processes."
-                   ::= { raisecomCPUScalarGroup 1}  
-  
-                   
+                   ::= { raisecomCPUScalarGroup 1}
+
+
        raisecomCPUHistoryTableSize OBJECT-TYPE
-                   SYNTAX  INTEGER                   
+                   SYNTAX  INTEGER
                    ACCESS  read-only
-                   STATUS  current                  
+                   STATUS  current
                    DESCRIPTION
-                          "A value configured by the user which specifies 
-                          the number of reports in the history table."  
+                          "A value configured by the user which specifies
+                          the number of reports in the history table."
                    DEFVAL { 60 }
-                   ::= { raisecomCPUScalarGroup 2} 
-                   
+                   ::= { raisecomCPUScalarGroup 2}
+
        raisecomCPUThresholdTrapEnable OBJECT-TYPE
                    SYNTAX  EnableVar
                    ACCESS  read-write
-                   STATUS  deprecated  
+                   STATUS  deprecated
                    DESCRIPTION
                           "The administration status of the CPU utilization threshold trap."
-                   ::= { raisecomCPUScalarGroup 3}   
-                   
+                   ::= { raisecomCPUScalarGroup 3}
+
        raisecomCPURisingThresholdValue OBJECT-TYPE
                    SYNTAX  INTEGER  (2..99)
                    ACCESS  read-write
-                   STATUS  current                    
+                   STATUS  current
                    DESCRIPTION
-                          "The percentage rising threshold value configured by the user. 
-                          The value indicates, if the CPU utilization which rise from 
-                          raisecomCPUFallingThresholdValue is equal to or above this value 
-                          for raisecomCPUThresholdInterval duration then send 
-                          a raisecomCPURisingThreshold notification to the NMS." 
+                          "The percentage rising threshold value configured by the user.
+                          The value indicates, if the CPU utilization which rise from
+                          raisecomCPUFallingThresholdValue is equal to or above this value
+                          for raisecomCPUThresholdInterval duration then send
+                          a raisecomCPURisingThreshold notification to the NMS."
                    DEFVAL { 99 }
-                   ::= { raisecomCPUScalarGroup 4} 
-                   
+                   ::= { raisecomCPUScalarGroup 4}
+
        raisecomCPURecoverThresholdValue OBJECT-TYPE
                    SYNTAX  INTEGER  (0..98)
                    ACCESS  read-write
-                   STATUS  current                     
+                   STATUS  current
                    DESCRIPTION
-                          "The percentage falling threshold value configured by the user. 
-                          The value indicates, if the CPU utilization which fell from 
-                          raisecomCPURecoverThresholdValue is equal to or below this value 
-                          for raisecomCPUThresholdInterval duration then send 
+                          "The percentage falling threshold value configured by the user.
+                          The value indicates, if the CPU utilization which fell from
+                          raisecomCPURecoverThresholdValue is equal to or below this value
+                          for raisecomCPUThresholdInterval duration then send
                           a raisecomCPUFallingThreshold notification to the NMS."
                    DEFVAL { 79 }
-                   ::= { raisecomCPUScalarGroup 5}    
-                   
+                   ::= { raisecomCPUScalarGroup 5}
+
        raisecomCPUThresholdInterval OBJECT-TYPE
                    SYNTAX  INTEGER  (5..36000)
                    ACCESS  read-write
-                   STATUS  current                     
+                   STATUS  current
                    DESCRIPTION
                           "This is an observation interval.
-                          The value of this object indicates that the CPU utilization 
-                          should be above raisecomCPURisingThresholdValue for this 
-                          duration to send a raisecomCPURisingThreshold notification 
-                          to the NMS or below raisecomCPUFallingThresholdValue for 
+                          The value of this object indicates that the CPU utilization
+                          should be above raisecomCPURisingThresholdValue for this
+                          duration to send a raisecomCPURisingThreshold notification
+                          to the NMS or below raisecomCPUFallingThresholdValue for
                           this duration to send a raisecomCPUFallingThreshold."
                    DEFVAL { 60 }
-                   ::= { raisecomCPUScalarGroup 6}  
-                   
+                   ::= { raisecomCPUScalarGroup 6}
+
         raisecomCpuNum OBJECT-TYPE
-                   SYNTAX  INTEGER  
+                   SYNTAX  INTEGER
                    ACCESS  read-only
-                   STATUS  current                     
+                   STATUS  current
                    DESCRIPTION
                           "Total number of cpu."
-                   ::= { raisecomCPUScalarGroup 7}     
-                   
-                         
---------------------------------------------------------------------------
---raisecomCPUTableGroup
---------------------------------------------------------------------------   
+                   ::= { raisecomCPUScalarGroup 7}
+
+
+-- =========================================
+-- raisecomCPUTableGroup
+-- =========================================
 
        raisecomCPUTableGroup  OBJECT IDENTIFIER
                    ::= { raisecomCpu 3 }
 
---------------------------------------------------------------------------
---raisecomCPUUtilizationGroup
---------------------------------------------------------------------------   
+-- =========================================
+-- raisecomCPUUtilizationGroup
+-- =========================================
 
        raisecomCPUUtilizationGroup  OBJECT IDENTIFIER
                    ::= { raisecomCPUTableGroup 1 }
 
----------------------------------
---raisecomCPUUtilizationTable
----------------------------------
+-- =========================================
+-- raisecomCPUUtilizationTable
+-- =========================================
        raisecomCPUUtilizationTable OBJECT-TYPE
 				   SYNTAX  SEQUENCE OF RaisecomCPUUtilizationEntry
 				   ACCESS  not-accessible
 				   STATUS  current
 				   DESCRIPTION
 				            "This table contains information about multi-core CPU utilization."
-				   ::= { raisecomCPUUtilizationGroup 1 }                          
-		
+				   ::= { raisecomCPUUtilizationGroup 1 }
+
 	   raisecomCPUUtilizationEntry OBJECT-TYPE
 				    SYNTAX  RaisecomCPUUtilizationEntry
 				    ACCESS  not-accessible
 				    STATUS  current
 				    DESCRIPTION
 				            "Information about the CPU utilization."
-				    INDEX           { raisecomCPUUtilizationPeriod,raisecomCPUUtilizationCpuIdx } 
+				    INDEX           { raisecomCPUUtilizationPeriod,raisecomCPUUtilizationCpuIdx }
 				    ::= { raisecomCPUUtilizationTable 1 }
-		
+
 	   RaisecomCPUUtilizationEntry ::= SEQUENCE {
-			        raisecomCPUUtilizationPeriod    INTEGER, 
+			        raisecomCPUUtilizationPeriod    INTEGER,
 			        raisecomCPUUtilizationCpuIdx    INTEGER,
-			        raisecomCPUUtilization          INTEGER			
-			        }  
-			        					
+			        raisecomCPUUtilization          INTEGER
+			        }
+
 	   raisecomCPUUtilizationPeriod OBJECT-TYPE
 					SYNTAX	INTEGER {
-										oneSec(1), 
-										fiveSec(2), 
+										oneSec(1),
+										fiveSec(2),
 										oneMin(3),
 										tenMin(4),
 										twoHour(5)
-									}				    
+									}
 					ACCESS  not-accessible
 					STATUS  current
 					DESCRIPTION
 					"Periods for computing CPU utilization."
-					::= { raisecomCPUUtilizationEntry 1 } 
-					    
+					::= { raisecomCPUUtilizationEntry 1 }
+
 	   raisecomCPUUtilizationCpuIdx OBJECT-TYPE
 					SYNTAX INTEGER (0..16)
 					MAX-ACCESS read-only
@@ -248,18 +248,18 @@ RAISECOM-SYSTEM-MIB DEFINITIONS ::= BEGIN
 						"The cpu core index"
 					::= { raisecomCPUUtilizationEntry 2 }
 
-				
+
        raisecomCPUUtilization OBJECT-TYPE
 					SYNTAX  INTEGER
-					UNITS	"percent" 				    
+					UNITS	"percent"
 					ACCESS  read-only
 					STATUS  current
 					DESCRIPTION
 					"CPU busy percentage in the last specified period."
-					::= { raisecomCPUUtilizationEntry 3 } 
----------------------------------
---raisecomTotalCPUUtilizationTable 
---------------------------------- 
+					::= { raisecomCPUUtilizationEntry 3 }
+-- =========================================
+-- raisecomTotalCPUUtilizationTable
+-- =========================================
 
        raisecomTotalCPUUtilizationTable OBJECT-TYPE
 					SYNTAX SEQUENCE OF RaisecomTotalCPUUtilizationEntry
@@ -267,8 +267,8 @@ RAISECOM-SYSTEM-MIB DEFINITIONS ::= BEGIN
 					STATUS current
 					DESCRIPTION
 						"This table contains information about total CPU utilization."
-					::= { raisecomCPUUtilizationGroup 2 }  
-					
+					::= { raisecomCPUUtilizationGroup 2 }
+
 		raisecomTotalCPUUtilizationEntry OBJECT-TYPE
 					SYNTAX RaisecomTotalCPUUtilizationEntry
 					MAX-ACCESS not-accessible
@@ -276,17 +276,17 @@ RAISECOM-SYSTEM-MIB DEFINITIONS ::= BEGIN
 					DESCRIPTION
 						"Description."
 					INDEX { raisecomTotalCPUPeriod }
-					::= { raisecomTotalCPUUtilizationTable 1 }   
-					
-		RaisecomTotalCPUUtilizationEntry ::= SEQUENCE {  
+					::= { raisecomTotalCPUUtilizationTable 1 }
+
+		RaisecomTotalCPUUtilizationEntry ::= SEQUENCE {
 					raisecomTotalCPUPeriod          INTEGER,
-			        raisecomTotalCPUUtilization     INTEGER			
-			        }         
-			        
+			        raisecomTotalCPUUtilization     INTEGER
+			        }
+
 		raisecomTotalCPUPeriod OBJECT-TYPE
 					SYNTAX INTEGER  {
-										oneSec(1), 
-										fiveSec(2), 
+										oneSec(1),
+										fiveSec(2),
 										oneMin(3),
 										tenMin(4),
 										twoHour(5)
@@ -295,9 +295,9 @@ RAISECOM-SYSTEM-MIB DEFINITIONS ::= BEGIN
 					STATUS current
 					DESCRIPTION
 						"Periods for computing CPU utilization."
-					::= { raisecomTotalCPUUtilizationEntry 1 }				
+					::= { raisecomTotalCPUUtilizationEntry 1 }
 
-					
+
 		raisecomTotalCPUUtilization OBJECT-TYPE
 					SYNTAX INTEGER (0..10000)
 					UNITS "percent"
@@ -306,51 +306,51 @@ RAISECOM-SYSTEM-MIB DEFINITIONS ::= BEGIN
 					DESCRIPTION
 						"CPU busy percentage in the last specified period."
 					::= { raisecomTotalCPUUtilizationEntry 2 }
-		
-			
 
----------------------------------
---raisecomCPUHistoryTable  
---------------------------------- 
+
+
+-- =========================================
+-- raisecomCPUHistoryTable
+-- =========================================
        raisecomCPUHistoryTable OBJECT-TYPE
 				   SYNTAX   SEQUENCE OF RaisecomCPUHistoryEntry
 				   ACCESS   not-accessible
 				   STATUS   current
 				   DESCRIPTION
 				            "This table contains CPU hsitory utilization records."
-				   ::= { raisecomCPUUtilizationGroup 3} 
-				   
+				   ::= { raisecomCPUUtilizationGroup 3}
+
        raisecomCPUHistoryEntry OBJECT-TYPE
 				    SYNTAX  RaisecomCPUHistoryEntry
 				    ACCESS  not-accessible
 				    STATUS  current
 				    DESCRIPTION
 				            "CPU history utilization record."
-				    INDEX           { raisecomCPUHistoryPeriod, raisecomCPUHistoryIndex,raisecomCPUHistoryCpuIdx } 
-				    ::= { raisecomCPUHistoryTable 1 }  
-				    
+				    INDEX           { raisecomCPUHistoryPeriod, raisecomCPUHistoryIndex,raisecomCPUHistoryCpuIdx }
+				    ::= { raisecomCPUHistoryTable 1 }
+
        RaisecomCPUHistoryEntry ::= SEQUENCE {
        				raisecomCPUHistoryPeriod     INTEGER,
-			        raisecomCPUHistoryIndex      INTEGER,  
+			        raisecomCPUHistoryIndex      INTEGER,
 			        raisecomCPUHistoryCpuIdx     INTEGER,
-			        raisecomCPUHistoryUtil  INTEGER			          		
-			        } 
+			        raisecomCPUHistoryUtil  INTEGER
+			        }
 
 	   raisecomCPUHistoryPeriod OBJECT-TYPE
 					SYNTAX	INTEGER {
-										fiveSec(1), 
+										fiveSec(1),
 										oneMin(2),
 										tenMin(3),
 										twoHour(4)
-									}				    
+									}
 					ACCESS  not-accessible
 					STATUS  current
 					DESCRIPTION
 					"Periods for computing CPU history utilization, the first index of CPU history utilization table."
-					::= { raisecomCPUHistoryEntry 1 }     
-	
+					::= { raisecomCPUHistoryEntry 1 }
+
 	   raisecomCPUHistoryIndex OBJECT-TYPE
-					SYNTAX	INTEGER 				    
+					SYNTAX	INTEGER
 					ACCESS  not-accessible
 					STATUS  current
 					DESCRIPTION
@@ -364,98 +364,98 @@ RAISECOM-SYSTEM-MIB DEFINITIONS ::= BEGIN
 					DESCRIPTION
 						"The cpu core index"
 					::= { raisecomCPUHistoryEntry 3 }
-	
+
 	   raisecomCPUHistoryUtil OBJECT-TYPE
 					SYNTAX	INTEGER
-					UNITS	"percent" 				    
+					UNITS	"percent"
 					ACCESS  read-only
 					STATUS  current
 					DESCRIPTION
 					"History record of CPU utilization in the specified period. "
 					::= { raisecomCPUHistoryEntry 4 }
----------------------------------
---raisecomTotalCPUHistoryTable  
---------------------------------- 
+-- =========================================
+-- raisecomTotalCPUHistoryTable
+-- =========================================
        raisecomTotalCPUHistoryTable OBJECT-TYPE
 				   SYNTAX   SEQUENCE OF RaisecomTotalCPUHistoryEntry
 				   ACCESS   not-accessible
 				   STATUS   current
 				   DESCRIPTION
 				            "This table contains CPU hsitory utilization records."
-				   ::= { raisecomCPUUtilizationGroup 4} 
-				   
+				   ::= { raisecomCPUUtilizationGroup 4}
+
        raisecomTotalCPUHistoryEntry OBJECT-TYPE
 				    SYNTAX  RaisecomTotalCPUHistoryEntry
 				    ACCESS  not-accessible
 				    STATUS  current
 				    DESCRIPTION
 				            "CPU history utilization record."
-				    INDEX           { raisecomTotalCPUHistoryPeriod, raisecomTotalCPUHistoryIndex } 
-				    ::= { raisecomTotalCPUHistoryTable 1 }  
-				    
+				    INDEX           { raisecomTotalCPUHistoryPeriod, raisecomTotalCPUHistoryIndex }
+				    ::= { raisecomTotalCPUHistoryTable 1 }
+
        RaisecomTotalCPUHistoryEntry ::= SEQUENCE {
        				raisecomTotalCPUHistoryPeriod     INTEGER,
-			        raisecomTotalCPUHistoryIndex      INTEGER,  
+			        raisecomTotalCPUHistoryIndex      INTEGER,
 			        raisecomTotalCPUHistoryUtil  INTEGER
-			        } 
+			        }
 
 	   raisecomTotalCPUHistoryPeriod OBJECT-TYPE
 					SYNTAX	INTEGER {
-										fiveSec(1), 
+										fiveSec(1),
 										oneMin(2),
 										tenMin(3),
 										twoHour(4)
-									}				    
+									}
 					ACCESS  not-accessible
 					STATUS  current
 					DESCRIPTION
 					"Periods for computing CPU history utilization, the first index of CPU history utilization table."
-					::= { raisecomTotalCPUHistoryEntry 1 }     
-	
+					::= { raisecomTotalCPUHistoryEntry 1 }
+
 	   raisecomTotalCPUHistoryIndex OBJECT-TYPE
-					SYNTAX	INTEGER 				    
+					SYNTAX	INTEGER
 					ACCESS  not-accessible
 					STATUS  current
 					DESCRIPTION
 					"Process sequence number,the second index of CPU history utilization table."
 					::= { raisecomTotalCPUHistoryEntry 2 }
-	
+
 	   raisecomTotalCPUHistoryUtil OBJECT-TYPE
 					SYNTAX	INTEGER
-					UNITS	"percent" 				    
+					UNITS	"percent"
 					ACCESS  read-only
 					STATUS  current
 					DESCRIPTION
 					"History record of CPU utilization in the specified period. "
 					::= { raisecomTotalCPUHistoryEntry 3 }
-	
---------------------------------------------------------------------------
+
+-- =========================================
 --raisecomCPUProcessesGroup
---------------------------------------------------------------------------   
+-- =========================================
 
        raisecomCPUProcessesGroup  OBJECT IDENTIFIER
                    ::= { raisecomCPUTableGroup 2 }
 
----------------------------------
---raisecomProcessesTable 
---------------------------------- 
+-- =========================================
+-- raisecomProcessesTable
+-- =========================================
        raisecomProcessesTable OBJECT-TYPE
 				   SYNTAX   SEQUENCE OF RaisecomProcessesEntry
 				   ACCESS   not-accessible
 				   STATUS   current
 				   DESCRIPTION
 				            "This table contains information about processes."
-				   ::= { raisecomCPUProcessesGroup 1 } 
-				   
+				   ::= { raisecomCPUProcessesGroup 1 }
+
        raisecomProcessesEntry OBJECT-TYPE
 				    SYNTAX  RaisecomProcessesEntry
 				    ACCESS  not-accessible
 				    STATUS  current
 				    DESCRIPTION
 				            "Information about processes."
-				    INDEX           { raisecomProcessIndex } 
-				    ::= { raisecomProcessesTable 1 }  
-				    
+				    INDEX           { raisecomProcessIndex }
+				    ::= { raisecomProcessesTable 1 }
+
        RaisecomProcessesEntry ::= SEQUENCE {
 			        raisecomProcessIndex            INTEGER,
 			        raisecomProcessPID              INTEGER,
@@ -464,80 +464,80 @@ RAISECOM-SYSTEM-MIB DEFINITIONS ::= BEGIN
 			        raisecomProcessInvokedTotal	    INTEGER,
 			        raisecomProcessTimeCreated      TimeStamp,
 			        raisecomProcessCurrentPriority  INTEGER,
-			        raisecomProcessStatus           ProcessStatus 		
-			        } 
-			         
+			        raisecomProcessStatus           ProcessStatus
+			        }
+
        raisecomProcessIndex OBJECT-TYPE
-					SYNTAX  INTEGER 				    
+					SYNTAX  INTEGER
 					ACCESS  read-only
 					STATUS  current
 					DESCRIPTION
 					"This object index of processes table."
-					::= { raisecomProcessesEntry 1 }  
-        
+					::= { raisecomProcessesEntry 1 }
+
        raisecomProcessPID OBJECT-TYPE
-					SYNTAX  INTEGER 				    
+					SYNTAX  INTEGER
 					ACCESS  read-only
 					STATUS  current
 					DESCRIPTION
 					"This object contains the process ID."
-					::= { raisecomProcessesEntry 2 } 
-					
+					::= { raisecomProcessesEntry 2 }
+
 	   raisecomProcessName OBJECT-TYPE
-					SYNTAX  OCTET STRING (SIZE(1..32))  				    
-					ACCESS  read-only					
+					SYNTAX  OCTET STRING (SIZE(1..32))
+					ACCESS  read-only
 					STATUS  current
 					DESCRIPTION
 					"The name associated with this process."
-					::= { raisecomProcessesEntry 3 } 			
-					
+					::= { raisecomProcessesEntry 3 }
+
 	   raisecomProcessRunTimeTotal OBJECT-TYPE
-					SYNTAX  CPUTimeStamp  				    
+					SYNTAX  CPUTimeStamp
 					ACCESS  read-only
 					STATUS  current
 					DESCRIPTION
 					"The amount of time the process occupied, in microseconds."
-					::= { raisecomProcessesEntry 4 } 
-	
+					::= { raisecomProcessesEntry 4 }
+
 	   raisecomProcessInvokedTotal OBJECT-TYPE
-					SYNTAX  INTEGER 				    
+					SYNTAX  INTEGER
 					ACCESS  read-only
 					STATUS  current
 					DESCRIPTION
-					"The number of times since raisecomProcessTimeCreated 
+					"The number of times since raisecomProcessTimeCreated
 					that the process has been invoked."
 					::= { raisecomProcessesEntry 5 }
-	
+
 	   raisecomProcessTimeCreated OBJECT-TYPE
-					SYNTAX  TimeStamp  				    
+					SYNTAX  TimeStamp
 					ACCESS  read-only
 					STATUS  current
 					DESCRIPTION
-					"The time when the process was created. 
-					The process sequence number and the time 
+					"The time when the process was created.
+					The process sequence number and the time
 					when the process was created, uniquely identifies a process."
 					::= { raisecomProcessesEntry 6 }
-					
+
 	   raisecomProcessCurrentPriority OBJECT-TYPE
-					SYNTAX  INTEGER  				    
+					SYNTAX  INTEGER
 					ACCESS  read-only
 					STATUS  current
 					DESCRIPTION
 					"The current priority at which the process is running."
-					::= { raisecomProcessesEntry 7 }			
-					
+					::= { raisecomProcessesEntry 7 }
+
 	   raisecomProcessStatus OBJECT-TYPE
-					SYNTAX  ProcessStatus  				    
+					SYNTAX  ProcessStatus
 					ACCESS  read-only
 					STATUS  current
 					DESCRIPTION
 					"The current status of the process."
-					::= { raisecomProcessesEntry 8 }		
-				
-										
----------------------------------
---raisecomProcessStatisticsTable 
---------------------------------- 
+					::= { raisecomProcessesEntry 8 }
+
+
+-- =========================================
+-- raisecomProcessStatisticsTable
+-- =========================================
        raisecomProcessStatisticsTable OBJECT-TYPE
 				   SYNTAX   SEQUENCE OF RaisecomProcessStatisticsEntry
 				   ACCESS   not-accessible
@@ -546,93 +546,93 @@ RAISECOM-SYSTEM-MIB DEFINITIONS ::= BEGIN
 				            "This table contains statistics information for processes.
 				            The first index is raisecomProcessIndex,
 				            the second index is raisecomProcessStatisticsPeriod"
-				   ::= { raisecomCPUProcessesGroup 2 } 
-				   
+				   ::= { raisecomCPUProcessesGroup 2 }
+
        raisecomProcessStatisticsEntry OBJECT-TYPE
 				    SYNTAX  RaisecomProcessStatisticsEntry
 				    ACCESS  not-accessible
 				    STATUS  current
 				    DESCRIPTION
 				            "Statistics information for processes."
-				    INDEX           { raisecomProcessIndex, raisecomProcessStatisticsPeriod } 
-				    ::= { raisecomProcessStatisticsTable 1 }  
-				    
+				    INDEX           { raisecomProcessIndex, raisecomProcessStatisticsPeriod }
+				    ::= { raisecomProcessStatisticsTable 1 }
+
        RaisecomProcessStatisticsEntry ::= SEQUENCE {
 			        raisecomProcessStatisticsPeriod    INTEGER,
-			        raisecomProcessRunTime             CPUTimeStamp, 
-			        raisecomProcessUtilization         INTEGER			          		
-			        } 
-							
+			        raisecomProcessRunTime             CPUTimeStamp,
+			        raisecomProcessUtilization         INTEGER
+			        }
+
 	   raisecomProcessStatisticsPeriod OBJECT-TYPE
 					SYNTAX	INTEGER {
 										fiveSec(1),
 							            oneMin(2),
-										tenMin(3)									
-									}  				    
+										tenMin(3)
+									}
 					ACCESS  not-accessible
 					STATUS  current
 					DESCRIPTION
 					"Periods for process statistics,
 					the second index of process statistics table."
-					::= { raisecomProcessStatisticsEntry 1 }				
-	
+					::= { raisecomProcessStatisticsEntry 1 }
+
 	   raisecomProcessRunTime OBJECT-TYPE
-					SYNTAX	CPUTimeStamp 				    
+					SYNTAX	CPUTimeStamp
 					ACCESS  read-only
 					STATUS  current
 					DESCRIPTION
 					"Time of the process occupied in the specified period."
-					::= { raisecomProcessStatisticsEntry 2 } 
-		
+					::= { raisecomProcessStatisticsEntry 2 }
+
 	   raisecomProcessUtilization OBJECT-TYPE
 					SYNTAX	INTEGER
-					UNITS	"percent" 				    
+					UNITS	"percent"
 					ACCESS  read-only
 					STATUS  current
 					DESCRIPTION
-					"This object provides a general idea of how busy 
+					"This object provides a general idea of how busy
 					a process caused the processor to be over a specified period."
-					::= { raisecomProcessStatisticsEntry 3 }	
-	
----------------------------------
---raisecomDeadProcessesTable  
---------------------------------- 
+					::= { raisecomProcessStatisticsEntry 3 }
+
+-- =========================================
+-- raisecomDeadProcessesTable
+-- =========================================
        raisecomDeadProcessesTable OBJECT-TYPE
 				   SYNTAX   SEQUENCE OF RaisecomDeadProcessesEntry
 				   ACCESS   not-accessible
 				   STATUS   current
 				   DESCRIPTION
 				            "This table contains dead processes information."
-				   ::= { raisecomCPUProcessesGroup 3 } 
-				   
+				   ::= { raisecomCPUProcessesGroup 3 }
+
        raisecomDeadProcessesEntry OBJECT-TYPE
 				    SYNTAX  RaisecomDeadProcessesEntry
 				    ACCESS  not-accessible
 				    STATUS  current
 				    DESCRIPTION
 				            "Dead processes information."
-				    INDEX           { raisecomDeadProcessIndex } 
-				    ::= { raisecomDeadProcessesTable 1 }  
-				    
+				    INDEX           { raisecomDeadProcessIndex }
+				    ::= { raisecomDeadProcessesTable 1 }
+
        RaisecomDeadProcessesEntry ::= SEQUENCE {
 			        raisecomDeadProcessIndex        INTEGER,
 			        raisecomDeadProcessName         OCTET STRING,
 			        raisecomDeadProcessPriority     INTEGER,
 			        raisecomDeadProcessTimeDelete   TimeStamp,
 			        raisecomDeadProcessDeadTimes    INTEGER,
-			        raisecomDeadProcessStatus       ProcessStatus			          		
-			        } 
-	
+			        raisecomDeadProcessStatus       ProcessStatus
+			        }
+
 	   raisecomDeadProcessIndex OBJECT-TYPE
-					SYNTAX	INTEGER 				    
+					SYNTAX	INTEGER
 					ACCESS  not-accessible
 					STATUS  current
 					DESCRIPTION
 					"Process sequence number,the index of dead processes table."
 					::= { raisecomDeadProcessesEntry 1 }
-	
+
        raisecomDeadProcessName OBJECT-TYPE
-					SYNTAX	OCTET STRING (SIZE(1..32)) 				    
+					SYNTAX	OCTET STRING (SIZE(1..32))
 					ACCESS  read-only
 					STATUS  current
 					DESCRIPTION
@@ -640,50 +640,50 @@ RAISECOM-SYSTEM-MIB DEFINITIONS ::= BEGIN
 					::= { raisecomDeadProcessesEntry 2 }
 
        raisecomDeadProcessPriority OBJECT-TYPE
-					SYNTAX	INTEGER 				    
+					SYNTAX	INTEGER
 					ACCESS  read-only
 					STATUS  current
 					DESCRIPTION
 					"The priority at which the dead process."
 					::= { raisecomDeadProcessesEntry 3 }
 
-    					
+
 	   raisecomDeadProcessTimeDelete OBJECT-TYPE
-					SYNTAX	TimeStamp 				    
+					SYNTAX	TimeStamp
 					ACCESS  read-only
 					STATUS  current
 					DESCRIPTION
 					"The time when the process was deleted."
 					::= { raisecomDeadProcessesEntry 4}
-					
+
 	   raisecomDeadProcessDeadTimes OBJECT-TYPE
-					SYNTAX	INTEGER 				    
+					SYNTAX	INTEGER
 					ACCESS  read-only
 					STATUS  current
 					DESCRIPTION
 					"Times of the process dead."
-					::= { raisecomDeadProcessesEntry 5 }    
-					
+					::= { raisecomDeadProcessesEntry 5 }
+
 	   raisecomDeadProcessStatus OBJECT-TYPE
-					SYNTAX	ProcessStatus 				    
+					SYNTAX	ProcessStatus
 					ACCESS  read-only
 					STATUS  current
 					DESCRIPTION
 					"The status of the dead process."
 					::= { raisecomDeadProcessesEntry 6}
- 					
---
+
+-- =========================================
 -- RAISECOM END Pool objects
---
-	
+-- =========================================
+
 	raisecomEndPool MODULE-IDENTITY
                 LAST-UPDATED 	"200412170000Z"
                 ORGANIZATION 	"RAISECOM TECH, Ltd."
                 CONTACT-INFO 	"www.raisecom.com"
-                DESCRIPTION  	
+                DESCRIPTION
                 		"raisecom System objects: objects common to all platforms."
         	::= { raisecomSystem 2 }
-		
+
 	raisecomEndPoolTable OBJECT-TYPE
 	        SYNTAX      SEQUENCE OF RaisecomEndPoolEntry
 	        MAX-ACCESS  not-accessible
@@ -691,7 +691,7 @@ RAISECOM-SYSTEM-MIB DEFINITIONS ::= BEGIN
 	        DESCRIPTION
 	                "A table of drivers Pool on a managed system."
 	        ::= { raisecomEndPool 1 }
-	
+
 	raisecomEndPoolEntry OBJECT-TYPE
 	        SYNTAX      RaisecomEndPoolEntry
 	        MAX-ACCESS  not-accessible
@@ -700,24 +700,24 @@ RAISECOM-SYSTEM-MIB DEFINITIONS ::= BEGIN
 	                "An entry in the END driver Pool monitoring table."
 	        INDEX       { raisecomBasePort }
 	        ::= { raisecomEndPoolTable 1 }
-	
+
 	RaisecomEndPoolEntry ::=
 	        SEQUENCE {
 	                raisecomBasePort       	INTEGER,
 	                raisecomTotalEndPool 	INTEGER,
 	                raisecomFreeEndPool	INTEGER
 	        }
-		
-	
+
+
 	raisecomBasePort OBJECT-TYPE
-	        SYNTAX  INTEGER 
+	        SYNTAX  INTEGER
 	        MAX-ACCESS  not-accessible
 	        STATUS  current
 	        DESCRIPTION
 	                "The port number based 1 of the port for which this entry
 	                contains bridge management information."
    		    ::= {  raisecomEndPoolEntry 1 }
-	
+
 	raisecomTotalEndPool OBJECT-TYPE
 	        SYNTAX      INTEGER
 	        MAX-ACCESS  read-only
@@ -732,51 +732,51 @@ RAISECOM-SYSTEM-MIB DEFINITIONS ::= BEGIN
 	        STATUS      current
 	        DESCRIPTION
 	                "Indicates the number of mBlks available  in  this END driver pool."
-	        ::= { raisecomEndPoolEntry 3 }    
+	        ::= { raisecomEndPoolEntry 3 }
 
---
+-- =========================================
 -- RAISECOM Memory objects
---                
+-- =========================================
 	 raisecomMemory MODULE-IDENTITY
                 LAST-UPDATED 	"200412170000Z"
                 ORGANIZATION 	"RAISECOM TECH, Ltd."
                 CONTACT-INFO 	"www.raisecom.com"
-                DESCRIPTION  	
-                		"raisecom System objects: memory objects."	
-      ::= { raisecomSystem 3 }      
-               
---  ------------------------------------------------------------------------
+                DESCRIPTION
+                		"raisecom System objects: memory objects."
+      ::= { raisecomSystem 3 }
+
+-- =========================================
 -- raisecomMemoryTrapGroup
--- ------------------------------------------------------------------------
+-- =========================================
 		-- 1.3.6.1.4.1.8886.1.1.3.1
 		raisecomMemoryTrapGroup OBJECT IDENTIFIER ::= { raisecomMemory 1 }
 
-		
+
 		-- 1.3.6.1.4.1.8886.1.1.3.1.1
 		raisecomMemoryTrap NOTIFICATION-TYPE
 			OBJECTS { raisecomMemoryTotal, raisecomMemoryUtil, raisecomMemoryThrshd }
 			STATUS current
-			DESCRIPTION 
+			DESCRIPTION
 				"Trap transfer when memory utilization upon threshold."
 			::= { raisecomMemoryTrapGroup 1 }
 
-		
+
 		-- 1.3.6.1.4.1.8886.1.1.3.1.2
 		raisecomMemoryTrapRecover NOTIFICATION-TYPE
 			OBJECTS { raisecomMemoryTotal, raisecomMemoryUtil,raisecomMemoryThrshdRecover }
 			STATUS current
-			DESCRIPTION 
+			DESCRIPTION
 				"Trap transfer when memory utilization upon thresholdrecover."
 			::= { raisecomMemoryTrapGroup 2 }
 
-		
---  ------------------------------------------------------------------------
+
+-- =========================================
 -- raisecomMemoryScalarGroup
--- ------------------------------------------------------------------------
+-- =========================================
 		-- 1.3.6.1.4.1.8886.1.1.3.2
 		raisecomMemoryScalarGroup OBJECT IDENTIFIER ::= { raisecomMemory 2 }
 
-		
+
 		-- 1.3.6.1.4.1.8886.1.1.3.2.1
 		raisecomMemoryTotal OBJECT-TYPE
 			SYNTAX INTEGER
@@ -787,7 +787,7 @@ RAISECOM-SYSTEM-MIB DEFINITIONS ::= BEGIN
 				"The total memory of the system for this duration."
 			::= { raisecomMemoryScalarGroup 1 }
 
-		
+
 		-- 1.3.6.1.4.1.8886.1.1.3.2.2
 		raisecomMemoryAvailable OBJECT-TYPE
 			SYNTAX INTEGER
@@ -798,10 +798,10 @@ RAISECOM-SYSTEM-MIB DEFINITIONS ::= BEGIN
 				"The available memory of the system for this duration."
 			::= { raisecomMemoryScalarGroup 2 }
 
-		
+
 		-- 1.3.6.1.4.1.8886.1.1.3.2.3
 		raisecomMemoryUtil OBJECT-TYPE
-			SYNTAX OCTET STRING (SIZE (1..8))   
+			SYNTAX OCTET STRING (SIZE (1..8))
 			UNITS "percent"
 			MAX-ACCESS read-only
 			STATUS current
@@ -809,7 +809,7 @@ RAISECOM-SYSTEM-MIB DEFINITIONS ::= BEGIN
 				"The current value of memory utilization for this duration."
 			::= { raisecomMemoryScalarGroup 3 }
 
-		
+
 		-- 1.3.6.1.4.1.8886.1.1.3.2.4
 		raisecomMemoryTrapEnable OBJECT-TYPE
 			SYNTAX EnableVar
@@ -819,10 +819,10 @@ RAISECOM-SYSTEM-MIB DEFINITIONS ::= BEGIN
 				"The switch of memory trap."
 			::= { raisecomMemoryScalarGroup 4 }
 
-		
+
 		-- 1.3.6.1.4.1.8886.1.1.3.2.5
 		raisecomMemoryThrshd OBJECT-TYPE
-			SYNTAX INTEGER    
+			SYNTAX INTEGER
 			UNITS "percent"
 			MAX-ACCESS read-write
 			STATUS current
@@ -830,10 +830,10 @@ RAISECOM-SYSTEM-MIB DEFINITIONS ::= BEGIN
 				"The threshold of memory monitor."
 			::= { raisecomMemoryScalarGroup 5 }
 
-		
+
 		-- 1.3.6.1.4.1.8886.1.1.3.2.6
 		raisecomMemoryThrshdRecover OBJECT-TYPE
-			SYNTAX INTEGER   
+			SYNTAX INTEGER
 			UNITS "percent"
 			MAX-ACCESS read-write
 			STATUS current
@@ -841,10 +841,10 @@ RAISECOM-SYSTEM-MIB DEFINITIONS ::= BEGIN
 				"The recover threshold of memory monitor."
 			::= { raisecomMemoryScalarGroup 6 }
 
-		
+
 		-- 1.3.6.1.4.1.8886.1.1.3.2.7
 		raisecomMemoryMonInterval OBJECT-TYPE
-			SYNTAX INTEGER   
+			SYNTAX INTEGER
 			UNITS "second"
 			MAX-ACCESS read-write
 			STATUS current
@@ -852,7 +852,7 @@ RAISECOM-SYSTEM-MIB DEFINITIONS ::= BEGIN
 				"The timer interval of memory monitor."
 			::= { raisecomMemoryScalarGroup 7 }
 
-		
+
 		-- 1.3.6.1.4.1.8886.1.1.4.1
 		raisecomDeviceType OBJECT-TYPE
 			SYNTAX OCTET STRING
@@ -861,29 +861,29 @@ RAISECOM-SYSTEM-MIB DEFINITIONS ::= BEGIN
 			DESCRIPTION
 				"Device type."
 			::= { raisecomInformation 1 }
-	
---
+
+-- =========================================
 -- RAISECOM Information objects
---                
+-- =========================================
 
 
 		 raisecomInformation MODULE-IDENTITY
                 LAST-UPDATED 	"200507270000Z"
                 ORGANIZATION 	"RAISECOM TECH, Ltd."
                 CONTACT-INFO 	"www.raisecom.com"
-                DESCRIPTION  	
+                DESCRIPTION
                 		"raisecom System objects: objects common to all platforms."
  		   		::= { raisecomSystem 4 }
 
 		PortAlarmEventList ::= TEXTUAL-CONVENTION
 		    STATUS current
 		    DESCRIPTION
-		        "The low three bits of An OCTET STRING represents an alarm 
-		        events enabled or existed list on a port, in which each bit 
+		        "The low three bits of An OCTET STRING represents an alarm
+		        events enabled or existed list on a port, in which each bit
 		        represents an alarm event type. the other bits of An OCTET
-		         STRING are not used. The figure shown below illustrates the 
+		         STRING are not used. The figure shown below illustrates the
 		         format of an alarm list.
-		         
+
 					         7 6 5 4 3 2 1 0
 					        +-+-+-+-+-+-+-+-+
 					        |               |
@@ -896,88 +896,88 @@ RAISECOM-SYSTEM-MIB DEFINITIONS ::= BEGIN
 					         | | | +--------- none
 					         | | +----------- not-forwarding
 					         | +------------- link-fault
-					         +--------------- link-down             
-			
-			The link-down bit set 1 represents that link-down event alarm output 
+					         +--------------- link-down
+
+			The link-down bit set 1 represents that link-down event alarm output
 			is enabled on port, OR the link-down bit set 1 represents that link-down
-			event occured on port. 
+			event occured on port.
 			The bit represents alarm output enabled in mibs:
 													raisecomAlarmPortSyslogEvList
-													raisecomAlarmPortNotifiesEvList  
+													raisecomAlarmPortNotifiesEvList
 													raisecomAlarmPortRelayEvList
 			The bit represents alarm occured in mibs: raisecomAlarmPortEvList ."
 		    SYNTAX OCTET STRING (SIZE (1))
 
- 
+
 		    raisecomDeviceType OBJECT-TYPE
 		            SYNTAX  OCTET STRING
 		           	MAX-ACCESS read-only
 		            STATUS current
 		            DESCRIPTION
 		                  "Device type."
-					::= { raisecomInformation 1 }   
-					 
-			--Temperature group	
+					::= { raisecomInformation 1 }
+
+			--Temperature group
 		    raisecomTemperature    OBJECT IDENTIFIER ::= { raisecomInformation 2 }
-		    
+
 		       raisecomTemperatureValue OBJECT-TYPE
-		               SYNTAX      INTEGER 
+		               SYNTAX      INTEGER
 		               UNITS  	   "Celsius "
                        MAX-ACCESS  read-only
                        STATUS      current
-                       DESCRIPTION  
+                       DESCRIPTION
                        		"The current temperature of the device."
-        		  	   ::= { raisecomTemperature 1 }   
-        		  	   
+        		  	   ::= { raisecomTemperature 1 }
+
         	   raisecomTemperatureMin OBJECT-TYPE
-       	               SYNTAX      INTEGER 
+       	               SYNTAX      INTEGER
        	               UNITS  	   "Celsius "
                        MAX-ACCESS  read-only
                        STATUS      current
-                       DESCRIPTION  
+                       DESCRIPTION
                        		"The minimum temperature that has occured."
-        		  	   ::= { raisecomTemperature 2 }   
-        	   
+        		  	   ::= { raisecomTemperature 2 }
+
         	   raisecomTemperatureMax OBJECT-TYPE
-       	               SYNTAX      INTEGER  
+       	               SYNTAX      INTEGER
        	               UNITS  	   "Celsius "
                        MAX-ACCESS  read-only
                        STATUS      current
-                       DESCRIPTION  
+                       DESCRIPTION
                        		"The maximum temperature that has occured."
-        		  	   ::= { raisecomTemperature 3 }   
-                                        
+        		  	   ::= { raisecomTemperature 3 }
+
                raisecomTemperatureTrapEnable   OBJECT-TYPE
  	                   SYNTAX     EnableVar
         			   MAX-ACCESS read-write
                        STATUS     deprecated
-                       DESCRIPTION 
-                            " Indicates whether the temperature trap is enabled."                                   
+                       DESCRIPTION
+                            " Indicates whether the temperature trap is enabled."
  	                   ::= { raisecomTemperature 4 }
- 	   
+
                raisecomTemperatureThresholdLow  OBJECT-TYPE
        	               SYNTAX      Integer32
-       	               UNITS  	   "Celsius " 
-                       MAX-ACCESS  read-write
-                       STATUS      current
-                       DESCRIPTION  
-                       		"Low threshold of the temperature alarm."
-        		  	   ::= { raisecomTemperature 5 }    
-
-               raisecomTemperatureThresholdHigh  OBJECT-TYPE
-       	               SYNTAX      Integer32   
        	               UNITS  	   "Celsius "
                        MAX-ACCESS  read-write
                        STATUS      current
-                       DESCRIPTION  
+                       DESCRIPTION
+                       		"Low threshold of the temperature alarm."
+        		  	   ::= { raisecomTemperature 5 }
+
+               raisecomTemperatureThresholdHigh  OBJECT-TYPE
+       	               SYNTAX      Integer32
+       	               UNITS  	   "Celsius "
+                       MAX-ACCESS  read-write
+                       STATUS      current
+                       DESCRIPTION
                        		"High threshold of the temperature alarm."
-        		  	   ::= { raisecomTemperature 6 }     
-        		  	   
+        		  	   ::= { raisecomTemperature 6 }
+
         	   raisecomTemperatureTrapTimes   OBJECT-TYPE
 		               SYNTAX      INTEGER
                        MAX-ACCESS  read-only
                        STATUS      current
-                       DESCRIPTION  
+                       DESCRIPTION
                        		"How many times abnormal temperature has occured."
         		  	   ::= { raisecomTemperature 7 }
 
@@ -985,7 +985,7 @@ RAISECOM-SYSTEM-MIB DEFINITIONS ::= BEGIN
 		               SYNTAX      INTEGER
                        MAX-ACCESS  read-only
                        STATUS      current
-                       DESCRIPTION  
+                       DESCRIPTION
                        		"How many times high temperature has occured."
         		  	   ::= { raisecomTemperature 8 }
 
@@ -993,21 +993,21 @@ RAISECOM-SYSTEM-MIB DEFINITIONS ::= BEGIN
 		               SYNTAX      INTEGER
                        MAX-ACCESS  read-only
                        STATUS      current
-                       DESCRIPTION  
+                       DESCRIPTION
                        		"How many times low temperature has occured."
         		  	   ::= { raisecomTemperature 9 }
-        	
+
         	--Vlot  Information
         	raisecomVolt    OBJECT IDENTIFIER ::= { raisecomInformation 3 }
-        		  	   
+
         	raisecomVoltTable OBJECT-TYPE
 					SYNTAX		SEQUENCE OF	RaisecomVoltEntry
 					MAX-ACCESS	not-accessible
 					STATUS		current
 					DESCRIPTION
 						 "A table of device vlot and associated properties.."
-					::=	{  raisecomVolt 1 } 
-				
+					::=	{  raisecomVolt 1 }
+
 				raisecomVoltEntry  OBJECT-TYPE
 						SYNTAX		RaisecomVoltEntry
 						MAX-ACCESS	not-accessible
@@ -1015,8 +1015,8 @@ RAISECOM-SYSTEM-MIB DEFINITIONS ::= BEGIN
 						DESCRIPTION
 						   	"Table entry for device vlot."
 						INDEX {	raisecomVoltIndex }
-						::=	{ raisecomVoltTable 1 } 	  
-						            
+						::=	{ raisecomVoltTable 1 }
+
 			    RaisecomVoltEntry ::= SEQUENCE {
 			        raisecomVoltIndex         	INTEGER,
 			        raisecomVoltReference     	INTEGER,
@@ -1030,7 +1030,7 @@ RAISECOM-SYSTEM-MIB DEFINITIONS ::= BEGIN
 			        raisecomVoltHighTimes       INTEGER,
 			        raisecomVoltLowTimes        INTEGER
 				    }
-				
+
 			    raisecomVoltIndex OBJECT-TYPE
 						SYNTAX		INTEGER
 						MAX-ACCESS	read-only
@@ -1038,66 +1038,66 @@ RAISECOM-SYSTEM-MIB DEFINITIONS ::= BEGIN
 						DESCRIPTION
 							"An index based 1 that uniquely identifies a volt entry."
 						::=	{ raisecomVoltEntry 1 }
-				
+
 				raisecomVoltReference OBJECT-TYPE
-		               SYNTAX      INTEGER   
+		               SYNTAX      INTEGER
 		               UNITS  	   "mV"
                        MAX-ACCESS  read-only
-                       STATUS      current    
-                       DESCRIPTION  
+                       STATUS      current
+                       DESCRIPTION
                        		"The reference volt."
-        		  	   ::= { raisecomVoltEntry 2 }    
-        		  	   
+        		  	   ::= { raisecomVoltEntry 2 }
+
         		raisecomVoltValue   OBJECT-TYPE
 		               SYNTAX      INTEGER
-		               UNITS  	   "mV" 
+		               UNITS  	   "mV"
                        MAX-ACCESS  read-only
                        STATUS      current
-                       DESCRIPTION  
+                       DESCRIPTION
                        		"The current value."
-        		  	   ::= { raisecomVoltEntry 3 } 
-        		  	   
+        		  	   ::= { raisecomVoltEntry 3 }
+
         		raisecomVoltMin     OBJECT-TYPE
 		               SYNTAX      INTEGER
-		               UNITS  	   "mV" 
+		               UNITS  	   "mV"
                        MAX-ACCESS  read-only
                        STATUS      current
-                       DESCRIPTION  
+                       DESCRIPTION
                        		"The minimum value that has occured."
         		  	   ::= { raisecomVoltEntry 4 }
-				
+
                 raisecomVoltMax    OBJECT-TYPE
 		               SYNTAX      INTEGER
-		               UNITS  	   "mV" 
+		               UNITS  	   "mV"
                        MAX-ACCESS  read-only
                        STATUS      current
-                       DESCRIPTION  
+                       DESCRIPTION
                        		"The maximum value that has occured."
-        		  	   ::= { raisecomVoltEntry 5 }    
-        		 
+        		  	   ::= { raisecomVoltEntry 5 }
+
         		raisecomVoltTrapEnable  OBJECT-TYPE
  	                   SYNTAX     EnableVar
         			   MAX-ACCESS read-write
                        STATUS     deprecated
-                       DESCRIPTION 
-                            " Indicates whether the volt trap is enabled."                                   
- 	                   ::= { raisecomVoltEntry 6 }   
- 	                   
+                       DESCRIPTION
+                            " Indicates whether the volt trap is enabled."
+ 	                   ::= { raisecomVoltEntry 6 }
+
  	            raisecomVoltThresholdLow  OBJECT-TYPE
        	               SYNTAX      Integer32
-       	               UNITS  	   "mV" 
+       	               UNITS  	   "mV"
                        MAX-ACCESS  read-write
                        STATUS      current
-                       DESCRIPTION  
+                       DESCRIPTION
                        		"The low threshold of the volt alarm."
-        		  	   ::= { raisecomVoltEntry 7 } 
+        		  	   ::= { raisecomVoltEntry 7 }
 
                raisecomVoltThresholdHigh  OBJECT-TYPE
        	               SYNTAX      Integer32
-       	               UNITS  	   "mV" 
+       	               UNITS  	   "mV"
                        MAX-ACCESS  read-write
                        STATUS      current
-                       DESCRIPTION  
+                       DESCRIPTION
                        		"The high threshold of the volt alarm."
         		  	   ::= { raisecomVoltEntry 8 }
 
@@ -1105,7 +1105,7 @@ RAISECOM-SYSTEM-MIB DEFINITIONS ::= BEGIN
 		               SYNTAX      INTEGER
                        MAX-ACCESS  read-only
                        STATUS      current
-                       DESCRIPTION  
+                       DESCRIPTION
                        		"How many times abnormal volt has occured."
         		  	   ::= { raisecomVoltEntry 9 }
 
@@ -1113,7 +1113,7 @@ RAISECOM-SYSTEM-MIB DEFINITIONS ::= BEGIN
 		               SYNTAX      INTEGER
                        MAX-ACCESS  read-only
                        STATUS      current
-                       DESCRIPTION  
+                       DESCRIPTION
                        		"How many times high volt has occured."
         		  	   ::= { raisecomVoltEntry 10 }
 
@@ -1121,27 +1121,27 @@ RAISECOM-SYSTEM-MIB DEFINITIONS ::= BEGIN
 		               SYNTAX      INTEGER
                        MAX-ACCESS  read-only
                        STATUS      current
-                       DESCRIPTION  
+                       DESCRIPTION
                        		"How many times low volt has occured."
         		  	   ::= { raisecomVoltEntry 11 }
-          	
-          	--Device information trap  
-        	raisecomInformationTrap    OBJECT IDENTIFIER ::= { raisecomInformation 4 } 
-        	
+
+          	--Device information trap
+        	raisecomInformationTrap    OBJECT IDENTIFIER ::= { raisecomInformation 4 }
+
         		 temperatureAbnormalTrap    NOTIFICATION-TYPE
 				         OBJECTS { raisecomTemperatureValue }
 				         STATUS  deprecated
 				         DESCRIPTION
 				               "Current temperature of the device is abnormal."
        					 ::= { raisecomInformationTrap 1 }
-                 
+
                  temperatureNormalTrap    NOTIFICATION-TYPE
 				         OBJECTS { raisecomTemperatureValue }
 				         STATUS  deprecated
 				         DESCRIPTION
 				               "Current temperature of the device return to normal."
        					 ::= { raisecomInformationTrap 2 }
-                 
+
                  raisecomVoltAbnormalTrap    NOTIFICATION-TYPE
 				         OBJECTS { raisecomVoltIndex, raisecomVoltReference, raisecomVoltValue }
 				         STATUS  deprecated
@@ -1156,178 +1156,178 @@ RAISECOM-SYSTEM-MIB DEFINITIONS ::= BEGIN
 				               "Current volt of the device return to normal."
        					 ::= { raisecomInformationTrap 4 }
 
-		--raisecomAlarm group	
+		--raisecomAlarm group
 		    raisecomAlarm    OBJECT IDENTIFIER ::= { raisecomInformation 7 }
 
-          	--raisecomAlarmTrap trap  
-        	raisecomAlarmTrap    OBJECT IDENTIFIER ::= { raisecomAlarm 1 } 
-        	
+          	--raisecomAlarmTrap trap
+        	raisecomAlarmTrap    OBJECT IDENTIFIER ::= { raisecomAlarm 1 }
+
         		 raisecomAlarmInformationTrap    NOTIFICATION-TYPE
 				         OBJECTS { raisecomAlarmHistSource, raisecomAlarmHistDescr, raisecomAlarmHistTimestamp, raisecomAlarmHistType, raisecomAlarmHistStatus }
 				         STATUS  current
 				         DESCRIPTION
-				               "Trap transfer alarm information in the alarm history table."				               
-       					 ::= { raisecomAlarmTrap 1 }    
-       					 
-			--raisecomAlarmGlobal group	
+				               "Trap transfer alarm information in the alarm history table."
+       					 ::= { raisecomAlarmTrap 1 }
+
+			--raisecomAlarmGlobal group
 		    raisecomAlarmGlobal    OBJECT IDENTIFIER ::= { raisecomAlarm 2 }
-		    
+
 		       raisecomAlarmTrapEnable OBJECT-TYPE
  	                   SYNTAX     EnableVar
         			   MAX-ACCESS read-write
                        STATUS     current
-                       DESCRIPTION 
-                            " Indicates whether the global alarm trap is enabled."     
-                       DEFVAL { disable}                              
+                       DESCRIPTION
+                            " Indicates whether the global alarm trap is enabled."
+                       DEFVAL { disable}
  	                   ::= { raisecomAlarmGlobal 1 }
-		    
+
 		       raisecomAlarmSyslogEnable OBJECT-TYPE
  	                   SYNTAX     EnableVar
         			   MAX-ACCESS read-write
                        STATUS     current
-                       DESCRIPTION 
-                            " Indicates whether the global alarm syslog is enabled."       
-                       DEFVAL { disable}                            
+                       DESCRIPTION
+                            " Indicates whether the global alarm syslog is enabled."
+                       DEFVAL { disable}
  	                   ::= { raisecomAlarmGlobal 2 }
 
 		       raisecomAlarmClear OBJECT-TYPE
  	                   SYNTAX     TruthValue
         			   MAX-ACCESS read-write
                        STATUS     current
-                       DESCRIPTION 
-                            "This object instructs the management entity to clear the whole current alarm information."                                   
+                       DESCRIPTION
+                            "This object instructs the management entity to clear the whole current alarm information."
  	                   ::= { raisecomAlarmGlobal 3 }
 
-			--raisecomAlarmPower group	
+			--raisecomAlarmPower group
 		    raisecomAlarmPower    OBJECT IDENTIFIER ::= { raisecomAlarm 3 }
-		    
+
 		       raisecomAlarmPowerTrapEnable OBJECT-TYPE
  	                   SYNTAX     EnableVar
         			   MAX-ACCESS read-write
                        STATUS     current
-                       DESCRIPTION 
-                            " Indicates whether the power alarm trap is enabled." 
-                       DEFVAL { enable}                                  
+                       DESCRIPTION
+                            " Indicates whether the power alarm trap is enabled."
+                       DEFVAL { enable}
  	                   ::= { raisecomAlarmPower 1 }
-		    
+
  		       raisecomAlarmPowerRelayEnable OBJECT-TYPE
  	                   SYNTAX     EnableVar
         			   MAX-ACCESS read-write
                        STATUS     current
-                       DESCRIPTION 
-                            " Indicates whether the power alarm relay is enabled."                                   
-                       DEFVAL { enable}                                  
+                       DESCRIPTION
+                            " Indicates whether the power alarm relay is enabled."
+                       DEFVAL { enable}
  	                   ::= { raisecomAlarmPower 2 }
 
 		       raisecomAlarmPowerSyslogEnable OBJECT-TYPE
  	                   SYNTAX     EnableVar
         			   MAX-ACCESS read-write
                        STATUS     current
-                       DESCRIPTION 
-                            " Indicates whether the power alarm syslog is enabled."                                   
-                       DEFVAL { enable}                                  
+                       DESCRIPTION
+                            " Indicates whether the power alarm syslog is enabled."
+                       DEFVAL { enable}
  	                   ::= { raisecomAlarmPower 3 }
 
         	   raisecomAlarmPowerOneTimes   OBJECT-TYPE
 		               SYNTAX      INTEGER
                        MAX-ACCESS  read-only
                        STATUS      current
-                       DESCRIPTION  
+                       DESCRIPTION
                        		"How many times power one alarm has occured."
-        		  	   ::= { raisecomAlarmPower 4 }   
+        		  	   ::= { raisecomAlarmPower 4 }
 
         	   raisecomAlarmPowerTwoTimes   OBJECT-TYPE
 		               SYNTAX      INTEGER
                        MAX-ACCESS  read-only
                        STATUS      current
-                       DESCRIPTION  
+                       DESCRIPTION
                        		"How many times power two alarm has occured."
-        		  	   ::= { raisecomAlarmPower 5 }   
-        		  	   
-				raisecomAlarmPowerStatus OBJECT-TYPE
-		               SYNTAX INTEGER { 
-		                           dual_power_on(1),
-		                           dual_power_off(2),
-		                           power1_off(3),
-		                           power2_off(4)
-		                           }  
-                       MAX-ACCESS  read-only
-                       STATUS      current    
-                       DESCRIPTION  
-                       		"The status of power alarm."
-        		  	   ::= { raisecomAlarmPower 6 } 
+        		  	   ::= { raisecomAlarmPower 5 }
 
-			--raisecomAlarmTemperature group	
+				raisecomAlarmPowerStatus OBJECT-TYPE
+		               SYNTAX INTEGER {
+		                           dual-power-on(1),
+		                           dual-power-off(2),
+		                           power1-off(3),
+		                           power2-off(4)
+		                           }
+                       MAX-ACCESS  read-only
+                       STATUS      current
+                       DESCRIPTION
+                       		"The status of power alarm."
+        		  	   ::= { raisecomAlarmPower 6 }
+
+			--raisecomAlarmTemperature group
 		    raisecomAlarmTemperature    OBJECT IDENTIFIER ::= { raisecomAlarm 4 }
-		    
+
 		       raisecomAlarmTemperatureTrapEnable OBJECT-TYPE
  	                   SYNTAX     EnableVar
         			   MAX-ACCESS read-write
                        STATUS     current
-                       DESCRIPTION 
-                            " Indicates whether the temperature alarm trap is enabled." 
-                       DEFVAL { enable}                                  
+                       DESCRIPTION
+                            " Indicates whether the temperature alarm trap is enabled."
+                       DEFVAL { enable}
  	                   ::= { raisecomAlarmTemperature 1 }
-		    
+
 		       raisecomAlarmTemperatureRelayEnable OBJECT-TYPE
  	                   SYNTAX     EnableVar
         			   MAX-ACCESS read-write
                        STATUS     current
-                       DESCRIPTION 
-                            " Indicates whether the temperature alarm relay is enabled."                                   
-                       DEFVAL { enable}                                  
+                       DESCRIPTION
+                            " Indicates whether the temperature alarm relay is enabled."
+                       DEFVAL { enable}
  	                   ::= { raisecomAlarmTemperature 2 }
 
  		       raisecomAlarmTemperatureSyslogEnable OBJECT-TYPE
  	                   SYNTAX     EnableVar
         			   MAX-ACCESS read-write
                        STATUS     current
-                       DESCRIPTION 
-                            " Indicates whether the temperature alarm syslog is enabled."                                   
-                       DEFVAL { enable}                                  
+                       DESCRIPTION
+                            " Indicates whether the temperature alarm syslog is enabled."
+                       DEFVAL { enable}
  	                   ::= { raisecomAlarmTemperature 3 }
 
-			--raisecomAlarmVolt group	
+			--raisecomAlarmVolt group
 		    raisecomAlarmVoltage    OBJECT IDENTIFIER ::= { raisecomAlarm 5 }
-		    
+
 		       raisecomAlarmVoltTrapEnable OBJECT-TYPE
  	                   SYNTAX     EnableVar
         			   MAX-ACCESS read-write
                        STATUS     current
-                       DESCRIPTION 
-                            " Indicates whether the volt alarm trap is enabled." 
-                       DEFVAL { enable}                                  
+                       DESCRIPTION
+                            " Indicates whether the volt alarm trap is enabled."
+                       DEFVAL { enable}
  	                   ::= { raisecomAlarmVoltage 1 }
-		    
+
 		       raisecomAlarmVoltRelayEnable OBJECT-TYPE
  	                   SYNTAX     EnableVar
         			   MAX-ACCESS read-write
                        STATUS     current
-                       DESCRIPTION 
-                            " Indicates whether the volt alarm relay is enabled."                                   
-                       DEFVAL { enable}                                  
+                       DESCRIPTION
+                            " Indicates whether the volt alarm relay is enabled."
+                       DEFVAL { enable}
  	                   ::= { raisecomAlarmVoltage 2 }
 
  		       raisecomAlarmVoltSyslogEnable OBJECT-TYPE
  	                   SYNTAX     EnableVar
         			   MAX-ACCESS read-write
                        STATUS     current
-                       DESCRIPTION 
-                            " Indicates whether the volt alarm syslog is enabled."                                   
-                       DEFVAL { enable}                                  
+                       DESCRIPTION
+                            " Indicates whether the volt alarm syslog is enabled."
+                       DEFVAL { enable}
  	                   ::= { raisecomAlarmVoltage 3 }
 
         	--port fault alarm
         	raisecomAlarmPort     OBJECT IDENTIFIER ::= { raisecomAlarm 6 }
-        		  	   
+
         	raisecomAlarmPortTable OBJECT-TYPE
 					SYNTAX		SEQUENCE OF	RaisecomAlarmPortEntry
 					MAX-ACCESS	not-accessible
 					STATUS		current
 					DESCRIPTION
 						 "A table of port alarm information.."
-					::=	{  raisecomAlarmPort 1 } 
-				
+					::=	{  raisecomAlarmPort 1 }
+
 				raisecomAlarmPortEntry  OBJECT-TYPE
 						SYNTAX		RaisecomAlarmPortEntry
 						MAX-ACCESS	not-accessible
@@ -1335,8 +1335,8 @@ RAISECOM-SYSTEM-MIB DEFINITIONS ::= BEGIN
 						DESCRIPTION
 						   	"Table entry for port alarm information."
 						INDEX {	raisecomAlarmPortIndex }
-						::=	{ raisecomAlarmPortTable 1 } 	  
-						            
+						::=	{ raisecomAlarmPortTable 1 }
+
 			    RaisecomAlarmPortEntry ::= SEQUENCE {
 			        raisecomAlarmPortIndex         	 INTEGER,
 			        raisecomAlarmPortSyslogEvList    PortAlarmEventList,
@@ -1344,7 +1344,7 @@ RAISECOM-SYSTEM-MIB DEFINITIONS ::= BEGIN
 			        raisecomAlarmPortRelayEvList     PortAlarmEventList,
 			        raisecomAlarmPortEvList          PortAlarmEventList
 				    }
-				
+
 			    raisecomAlarmPortIndex OBJECT-TYPE
 						SYNTAX		INTEGER
 						MAX-ACCESS	not-accessible
@@ -1352,50 +1352,50 @@ RAISECOM-SYSTEM-MIB DEFINITIONS ::= BEGIN
 						DESCRIPTION
 							"This object index of alarm port entry."
 						::=	{ raisecomAlarmPortEntry 1 }
-				
+
 				raisecomAlarmPortSyslogEvList OBJECT-TYPE
-		               SYNTAX 	   PortAlarmEventList 
+		               SYNTAX 	   PortAlarmEventList
                        MAX-ACCESS  read-write
-                       STATUS      current    
-                       DESCRIPTION  
+                       STATUS      current
+                       DESCRIPTION
                        		"The port alarm event list of syslog enable status."
-        		  	   ::= { raisecomAlarmPortEntry 2 } 
+        		  	   ::= { raisecomAlarmPortEntry 2 }
 
 				raisecomAlarmPortNotifiesEvList OBJECT-TYPE
-		               SYNTAX 	   PortAlarmEventList 
+		               SYNTAX 	   PortAlarmEventList
                        MAX-ACCESS  read-write
-                       STATUS      current    
-                       DESCRIPTION  
+                       STATUS      current
+                       DESCRIPTION
                        		"The port alarm event list of notifies enable status."
-        		  	   ::= { raisecomAlarmPortEntry 3 } 
+        		  	   ::= { raisecomAlarmPortEntry 3 }
 
 				raisecomAlarmPortRelayEvList OBJECT-TYPE
-		               SYNTAX 	   PortAlarmEventList 
+		               SYNTAX 	   PortAlarmEventList
                        MAX-ACCESS  read-write
-                       STATUS      current    
-                       DESCRIPTION  
+                       STATUS      current
+                       DESCRIPTION
                        		"The port alarm event list of relay enable status."
-        		  	   ::= { raisecomAlarmPortEntry 4 } 
+        		  	   ::= { raisecomAlarmPortEntry 4 }
 
 				raisecomAlarmPortEvList OBJECT-TYPE
-		               SYNTAX 	   PortAlarmEventList 
+		               SYNTAX 	   PortAlarmEventList
                        MAX-ACCESS  read-only
-                       STATUS      current    
-                       DESCRIPTION  
+                       STATUS      current
+                       DESCRIPTION
                        		"The current alarm information on port."
-        		  	   ::= { raisecomAlarmPortEntry 5 } 
+        		  	   ::= { raisecomAlarmPortEntry 5 }
 
         	--raisecomAlarmHist  Information
         	raisecomAlarmHistory    OBJECT IDENTIFIER ::= { raisecomAlarm 7 }
-        		  	   
+
         	raisecomAlarmHistTable OBJECT-TYPE
 					SYNTAX		SEQUENCE OF	RaisecomAlarmHistEntry
 					MAX-ACCESS	not-accessible
 					STATUS		current
 					DESCRIPTION
 						 "A table of history alarm information.."
-					::=	{  raisecomAlarmHistory 1 } 
-				
+					::=	{  raisecomAlarmHistory 1 }
+
 				raisecomAlarmHistEntry  OBJECT-TYPE
 						SYNTAX		RaisecomAlarmHistEntry
 						MAX-ACCESS	not-accessible
@@ -1403,8 +1403,8 @@ RAISECOM-SYSTEM-MIB DEFINITIONS ::= BEGIN
 						DESCRIPTION
 						   	"Table entry for history alarm information."
 						INDEX {	raisecomAlarmHistIndex }
-						::=	{ raisecomAlarmHistTable 1 } 	  
-						            
+						::=	{ raisecomAlarmHistTable 1 }
+
 			    RaisecomAlarmHistEntry ::= SEQUENCE {
 			        raisecomAlarmHistIndex         	INTEGER,
 			        raisecomAlarmHistStatus     	INTEGER,
@@ -1413,7 +1413,7 @@ RAISECOM-SYSTEM-MIB DEFINITIONS ::= BEGIN
 			        raisecomAlarmHistTimestamp    	INTEGER,
 			        raisecomAlarmHistType           INTEGER
 				    }
-				
+
 			    raisecomAlarmHistIndex OBJECT-TYPE
 						SYNTAX		INTEGER
 						MAX-ACCESS	not-accessible
@@ -1421,28 +1421,28 @@ RAISECOM-SYSTEM-MIB DEFINITIONS ::= BEGIN
 						DESCRIPTION
 							"This object index of alarm history entry."
 						::=	{ raisecomAlarmHistEntry 1 }
-				
+
 				raisecomAlarmHistStatus OBJECT-TYPE
-		               SYNTAX INTEGER { 
+		               SYNTAX INTEGER {
  	                               high-volt-cleared(1),
  	                               low-volt-cleared(2),
- 	                               high-temperature-cleared(3),  
+ 	                               high-temperature-cleared(3),
  	                               low-temperature-cleared(4)
-		                           }  
-                       MAX-ACCESS  read-only
-                       STATUS      current    
-                       DESCRIPTION  
-                       		"The status of alarm information£¬asserted:alarm has generated,
-                       		 cleared:alarm is cleared, clearall:all of alarm is cleared."
-        		  	   ::= { raisecomAlarmHistEntry 2 } 
-
-        		raisecomAlarmHistSource   OBJECT-TYPE
-		               SYNTAX INTEGER 
+		                           }
                        MAX-ACCESS  read-only
                        STATUS      current
-                       DESCRIPTION  
+                       DESCRIPTION
+                       		"The status of alarm information£¬asserted:alarm has generated,
+                       		 cleared:alarm is cleared, clearall:all of alarm is cleared."
+        		  	   ::= { raisecomAlarmHistEntry 2 }
+
+        		raisecomAlarmHistSource   OBJECT-TYPE
+		               SYNTAX INTEGER
+                       MAX-ACCESS  read-only
+                       STATUS      current
+                       DESCRIPTION
                        		"The source of alarm information£¬switch or port."
-        		  	   ::= { raisecomAlarmHistEntry 3 } 
+        		  	   ::= { raisecomAlarmHistEntry 3 }
 
 			    raisecomAlarmHistDescr OBJECT-TYPE
 	  				SYNTAX OCTET STRING (SIZE (0..64))
@@ -1451,56 +1451,56 @@ RAISECOM-SYSTEM-MIB DEFINITIONS ::= BEGIN
 					DESCRIPTION
 						"The description of alarm information."
 					    ::= { raisecomAlarmHistEntry 4 }
-        		  	   
+
         		raisecomAlarmHistTimestamp   OBJECT-TYPE
-		               SYNTAX INTEGER 
+		               SYNTAX INTEGER
                        MAX-ACCESS  read-only
                        STATUS      current
-                       DESCRIPTION  
+                       DESCRIPTION
                        		"The timestamp of alarm information."
-        		  	   ::= { raisecomAlarmHistEntry 5 } 
+        		  	   ::= { raisecomAlarmHistEntry 5 }
 
 				raisecomAlarmHistType OBJECT-TYPE
-		               SYNTAX INTEGER { 
+		               SYNTAX INTEGER {
 		                           dev-power-down(0),
 		                           power-abnormal(1),
 		                           high-temperature(2),
-		                           low-temperature(3), 	
+		                           low-temperature(3),
 		                           high-volt(4),
 		                           low-volt(5),
-		                           link-down(6), 
-		                           link-falut(7), 
+		                           link-down(6),
+		                           link-falut(7),
 		                           not-forward(8),
 		                           power-normal(9),
-		                           normal-high-temperature(10), 
+		                           normal-high-temperature(10),
 		                           normal-high-volt(11),
 		                           link-up(12),
-		                           link-ok(13), 
+		                           link-ok(13),
 		                           forward(14),
 		                           all-alarm(15),
 								   offline(16),
 								   online(17),
 								   power-on(18),
-								   normal-low-temperature(19), 
+								   normal-low-temperature(19),
 		                           normal-low-volt(20)
-		                           }  
+		                           }
                        MAX-ACCESS  read-only
-                       STATUS      current    
-                       DESCRIPTION  
+                       STATUS      current
+                       DESCRIPTION
                        		"The type of alarm information."
-        		  	   ::= { raisecomAlarmHistEntry 6 } 
+        		  	   ::= { raisecomAlarmHistEntry 6 }
 
         	--Alarm Curent Information
         	raisecomAlarmCurrent    OBJECT IDENTIFIER ::= { raisecomAlarm 8 }
-        		  	   
+
         	raisecomAlarmCurtTable OBJECT-TYPE
 					SYNTAX		SEQUENCE OF	RaisecomAlarmCurtEntry
 					MAX-ACCESS	not-accessible
 					STATUS		current
 					DESCRIPTION
 						 "A table of current alarm information.."
-					::=	{  raisecomAlarmCurrent 1 } 
-				
+					::=	{  raisecomAlarmCurrent 1 }
+
 				raisecomAlarmCurtEntry  OBJECT-TYPE
 						SYNTAX		RaisecomAlarmCurtEntry
 						MAX-ACCESS	not-accessible
@@ -1508,8 +1508,8 @@ RAISECOM-SYSTEM-MIB DEFINITIONS ::= BEGIN
 						DESCRIPTION
 						   	"Table entry for current alarm information."
 						INDEX {	raisecomAlarmCurtIndex }
-						::=	{ raisecomAlarmCurtTable 1 } 	  
-						            
+						::=	{ raisecomAlarmCurtTable 1 }
+
 			    RaisecomAlarmCurtEntry ::= SEQUENCE {
 			        raisecomAlarmCurtIndex         	INTEGER,
 			        raisecomAlarmCurtSource      	INTEGER,
@@ -1517,7 +1517,7 @@ RAISECOM-SYSTEM-MIB DEFINITIONS ::= BEGIN
 			        raisecomAlarmCurtTimestamp    	INTEGER,
 			        raisecomAlarmCurtType           INTEGER
 				    }
-				
+
 			    raisecomAlarmCurtIndex OBJECT-TYPE
 						SYNTAX		INTEGER
 						MAX-ACCESS	not-accessible
@@ -1525,14 +1525,14 @@ RAISECOM-SYSTEM-MIB DEFINITIONS ::= BEGIN
 						DESCRIPTION
 							"This object index of alarm current entry."
 						::=	{ raisecomAlarmCurtEntry 1 }
-				
+
         		raisecomAlarmCurtSource   OBJECT-TYPE
-		               SYNTAX INTEGER 
+		               SYNTAX INTEGER
                        MAX-ACCESS  read-only
                        STATUS      current
-                       DESCRIPTION  
+                       DESCRIPTION
                        		"The source of alarm information£¬switch or port."
-        		  	   ::= { raisecomAlarmCurtEntry 2 } 
+        		  	   ::= { raisecomAlarmCurtEntry 2 }
 
 			    raisecomAlarmCurtDescr OBJECT-TYPE
 	  				SYNTAX OCTET STRING (SIZE (0..64))
@@ -1541,17 +1541,17 @@ RAISECOM-SYSTEM-MIB DEFINITIONS ::= BEGIN
 					DESCRIPTION
 						"The description of alarm information."
 					    ::= { raisecomAlarmCurtEntry 3 }
-        		  	   
+
         		raisecomAlarmCurtTimestamp   OBJECT-TYPE
-		               SYNTAX INTEGER 
+		               SYNTAX INTEGER
                        MAX-ACCESS  read-only
                        STATUS      current
-                       DESCRIPTION  
+                       DESCRIPTION
                        		"The timestamp of alarm information."
-        		  	   ::= { raisecomAlarmCurtEntry 4 } 
+        		  	   ::= { raisecomAlarmCurtEntry 4 }
 
 				raisecomAlarmCurtType OBJECT-TYPE
-		               SYNTAX INTEGER { 
+		               SYNTAX INTEGER {
 		                           dev-power-down(0),
 		                           power-abnormal(1),
 		                           high-temperature(2),
@@ -1561,11 +1561,11 @@ RAISECOM-SYSTEM-MIB DEFINITIONS ::= BEGIN
 		                           link-down(6),
 		                           link-falut(7),
 		                           not-forward(8)
-		                           }  
+		                           }
                        MAX-ACCESS  read-only
-                       STATUS      current    
-                       DESCRIPTION  
+                       STATUS      current
+                       DESCRIPTION
                        		"The type of alarm information."
-        		  	   ::= { raisecomAlarmCurtEntry 5 } 
+        		  	   ::= { raisecomAlarmCurtEntry 5 }
 
-END  
+END

@@ -9,7 +9,7 @@
  * the source code distribution for details.
  *
  * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
  * @copyright  2017 Thomas GAGNIERE
  * @author     Thomas GAGNIERE <tgagniere@reseau-concept.com>
  */
@@ -18,16 +18,16 @@ echo 'EATON-ATS ';
 
 $oids = snmpwalk_cache_oid($device, 'ats2InputFrequency', [], 'EATON-ATS2-MIB');
 foreach ($oids as $volt_id => $data) {
-    $source_oid="EATON-ATS2-MIB::ats2InputIndex.".$volt_id;
+    $source_oid = 'EATON-ATS2-MIB::ats2InputIndex.' . $volt_id;
     $num_id = snmp_get($device, $source_oid, '-Oqve');
-    $volt_oid = ".1.3.6.1.4.1.534.10.2.2.2.1.3.".$num_id;
-    $index = ".1.3.6.1.4.1.534.10.2.2.2.1.1.".$num_id;
-    $descr    = 'Input';
+    $volt_oid = '.1.3.6.1.4.1.534.10.2.2.2.1.3.' . $num_id;
+    $index = '.1.3.6.1.4.1.534.10.2.2.2.1.1.' . $num_id;
+    $descr = 'Input';
     if (count($oids) > 1) {
         $source = snmp_get($device, $source_oid, '-Oqv');
         $descr .= " $source";
     }
-    $type    = 'eaton-ats';
+    $type = 'eaton-ats';
     $divisor = 10;
     $current = $data['ats2InputFrequency'] / $divisor;
 

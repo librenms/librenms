@@ -1,8 +1,10 @@
 os: comware
 text: 'HPE Comware'
 type: network
+mib_dir: comware
 icon: hpe
 over:
     - { graph: device_bits, text: Traffic }
 discovery:
-    - sysObjectID: .1.3.6.1.4.1.25506.
+    -
+        sysObjectID: .1.3.6.1.4.1.25506.

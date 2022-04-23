@@ -3,8 +3,9 @@ modules:
     sensors:
         pre-cache:
             data:
-                - oid:
-                    - portId
+                -
+                    oid:
+                        - portId
 
         power:
             data:

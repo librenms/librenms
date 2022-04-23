@@ -6,24 +6,6 @@
                     "sysName": "<private>",
                     "sysObjectID": ".1.3.6.1.4.1.1718.4",
                     "sysDescr": "Sentry Smart PDU",
-                    "sysContact": null,
-                    "version": null,
-                    "hardware": null,
-                    "features": null,
-                    "os": "sentry4",
-                    "type": "power",
-                    "serial": null,
-                    "icon": "servertech.png",
-                    "location": null
-                }
-            ]
-        },
-        "poller": {
-            "devices": [
-                {
-                    "sysName": "<private>",
-                    "sysObjectID": ".1.3.6.1.4.1.1718.4",
-                    "sysDescr": "Sentry Smart PDU",
                     "sysContact": "<private>",
                     "version": "Version 8.0n",
                     "hardware": "C2S42CE-YCMFAM00",
@@ -35,7 +17,8 @@
                     "location": "<private>"
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     },
     "sensors": {
         "discovery": {
@@ -4594,10 +4577,10 @@
                     "portName": null,
                     "ifIndex": 1,
                     "ifSpeed": null,
+                    "ifSpeed_prev": null,
                     "ifConnectorPresent": null,
                     "ifPromiscuousMode": null,
-                    "ifHighSpeed": null,
-                    "ifOperStatus": null,
+                    "ifOperStatus": "up",
                     "ifOperStatus_prev": null,
                     "ifAdminStatus": null,
                     "ifAdminStatus_prev": null,
@@ -4699,10 +4682,10 @@
                     "portName": null,
                     "ifIndex": 2,
                     "ifSpeed": null,
+                    "ifSpeed_prev": null,
                     "ifConnectorPresent": null,
                     "ifPromiscuousMode": null,
-                    "ifHighSpeed": null,
-                    "ifOperStatus": null,
+                    "ifOperStatus": "up",
                     "ifOperStatus_prev": null,
                     "ifAdminStatus": null,
                     "ifAdminStatus_prev": null,
@@ -4808,11 +4791,11 @@
                     "portName": null,
                     "ifIndex": 1,
                     "ifSpeed": 0,
+                    "ifSpeed_prev": null,
                     "ifConnectorPresent": null,
                     "ifPromiscuousMode": null,
-                    "ifHighSpeed": null,
                     "ifOperStatus": "up",
-                    "ifOperStatus_prev": null,
+                    "ifOperStatus_prev": "up",
                     "ifAdminStatus": "up",
                     "ifAdminStatus_prev": null,
                     "ifDuplex": null,
@@ -4913,11 +4896,11 @@
                     "portName": null,
                     "ifIndex": 2,
                     "ifSpeed": 100000000,
+                    "ifSpeed_prev": null,
                     "ifConnectorPresent": null,
                     "ifPromiscuousMode": null,
-                    "ifHighSpeed": null,
                     "ifOperStatus": "up",
-                    "ifOperStatus_prev": null,
+                    "ifOperStatus_prev": "up",
                     "ifAdminStatus": "up",
                     "ifAdminStatus_prev": null,
                     "ifDuplex": null,

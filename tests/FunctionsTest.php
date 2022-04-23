@@ -15,21 +15,24 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
+ *
  * @copyright  2017 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
 namespace LibreNMS\Tests;
 
+use LibreNMS\Device\YamlDiscovery;
+use LibreNMS\Util\Rewrite;
+
 class FunctionsTest extends TestCase
 {
     public function testMacCleanToReadable()
     {
-        $this->assertEquals('de:ad:be:ef:a0:c3', mac_clean_to_readable('deadbeefa0c3'));
+        $this->assertEquals('de:ad:be:ef:a0:c3', Rewrite::readableMac('deadbeefa0c3'));
     }
 
     public function testHex2Str()
@@ -51,85 +54,68 @@ class FunctionsTest extends TestCase
         $this->assertFalse(isHexString('a5fe53'));
     }
 
-    public function testLinkify()
-    {
-        $input = 'foo@demo.net	bar.ba@test.co.uk
-www.demo.com	http://foo.co.uk/
-sdfsd ftp://192.168.1.1/help/me/now.php
-http://regexr.com/foo.html?q=bar
-https://mediatemple.net.';
-
-        $expected = 'foo@demo.net	bar.ba@test.co.uk
-www.demo.com	<a href="http://foo.co.uk/">http://foo.co.uk/</a>
-sdfsd <a href="ftp://192.168.1.1/help/me/now.php">ftp://192.168.1.1/help/me/now.php</a>
-<a href="http://regexr.com/foo.html?q=bar">http://regexr.com/foo.html?q=bar</a>
-<a href="https://mediatemple.net">https://mediatemple.net</a>.';
-
-        $this->assertSame($expected, linkify($input));
-    }
-
     public function testDynamicDiscoveryGetValue()
     {
-        $pre_cache = array(
-            'firstdata' => array(
-                0 => array('temp' => 1),
-                1 => array('temp' => 2),
-            ),
-            'high' => array(
-                0 => array('high' => 3),
-                1 => array('high' => 4),
-            ),
-            'table' => array(
-                0 => array('first' => 5, 'second' => 6),
-                1 => array('first' => 7, 'second' => 8),
-            ),
-            'single' => array('something' => 9),
+        $pre_cache = [
+            'firstdata' => [
+                0 => ['temp' => 1],
+                1 => ['temp' => 2],
+            ],
+            'high' => [
+                0 => ['high' => 3],
+                1 => ['high' => 4],
+            ],
+            'table' => [
+                0 => ['first' => 5, 'second' => 6],
+                1 => ['first' => 7, 'second' => 8],
+            ],
+            'single' => ['something' => 9],
             'oneoff' => 10,
-            'singletable' => array(
-                11 => array('singletable' => 'Pickle')
-            ),
-            'doubletable' => array(
-                12 => array('doubletable' => 'Mustard'),
-                13 => array('doubletable' => 'BBQ')
-            ),
-        );
+            'singletable' => [
+                11 => ['singletable' => 'Pickle'],
+            ],
+            'doubletable' => [
+                12 => ['doubletable' => 'Mustard'],
+                13 => ['doubletable' => 'BBQ'],
+            ],
+        ];
 
-        $data = array('value' => 'temp', 'oid' => 'firstdata');
-        $this->assertNull(dynamic_discovery_get_value('missing', 0, $data, $pre_cache));
-        $this->assertSame('yar', dynamic_discovery_get_value('default', 0, $data, $pre_cache, 'yar'));
-        $this->assertSame(2, dynamic_discovery_get_value('value', 1, $data, $pre_cache));
+        $data = ['value' => 'temp', 'oid' => 'firstdata'];
+        $this->assertNull(YamlDiscovery::getValueFromData('missing', 0, $data, $pre_cache));
+        $this->assertSame('yar', YamlDiscovery::getValueFromData('default', 0, $data, $pre_cache, 'yar'));
+        $this->assertSame(2, YamlDiscovery::getValueFromData('value', 1, $data, $pre_cache));
 
-        $data = array('oid' => 'high');
-        $this->assertSame(3, dynamic_discovery_get_value('high', 0, $data, $pre_cache));
+        $data = ['oid' => 'high'];
+        $this->assertSame(3, YamlDiscovery::getValueFromData('high', 0, $data, $pre_cache));
 
-        $data = array('oid' => 'table');
-        $this->assertSame(5, dynamic_discovery_get_value('first', 0, $data, $pre_cache));
-        $this->assertSame(7, dynamic_discovery_get_value('first', 1, $data, $pre_cache));
-        $this->assertSame(6, dynamic_discovery_get_value('second', 0, $data, $pre_cache));
-        $this->assertSame(8, dynamic_discovery_get_value('second', 1, $data, $pre_cache));
+        $data = ['oid' => 'table'];
+        $this->assertSame(5, YamlDiscovery::getValueFromData('first', 0, $data, $pre_cache));
+        $this->assertSame(7, YamlDiscovery::getValueFromData('first', 1, $data, $pre_cache));
+        $this->assertSame(6, YamlDiscovery::getValueFromData('second', 0, $data, $pre_cache));
+        $this->assertSame(8, YamlDiscovery::getValueFromData('second', 1, $data, $pre_cache));
 
-        $this->assertSame(9, dynamic_discovery_get_value('single', 0, $data, $pre_cache));
-        $this->assertSame(10, dynamic_discovery_get_value('oneoff', 3, $data, $pre_cache));
-        $this->assertSame('Pickle', dynamic_discovery_get_value('singletable', 11, $data, $pre_cache));
-        $this->assertSame('BBQ', dynamic_discovery_get_value('doubletable', 13, $data, $pre_cache));
+        $this->assertSame(9, YamlDiscovery::getValueFromData('single', 0, $data, $pre_cache));
+        $this->assertSame(10, YamlDiscovery::getValueFromData('oneoff', 3, $data, $pre_cache));
+        $this->assertSame('Pickle', YamlDiscovery::getValueFromData('singletable', 11, $data, $pre_cache));
+        $this->assertSame('BBQ', YamlDiscovery::getValueFromData('doubletable', 13, $data, $pre_cache));
     }
 
     public function testParseAtTime()
     {
         $this->assertEquals(time(), parse_at_time('now'), 'now did not match');
-        $this->assertEquals(time()+180, parse_at_time('+3m'), '+3m did not match');
-        $this->assertEquals(time()+7200, parse_at_time('+2h'), '+2h did not match');
-        $this->assertEquals(time()+172800, parse_at_time('+2d'), '+2d did not match');
-        $this->assertEquals(time()+63115200, parse_at_time('+2y'), '+2y did not match');
-        $this->assertEquals(time()-180, parse_at_time('-3m'), '-3m did not match');
-        $this->assertEquals(time()-7200, parse_at_time('-2h'), '-2h did not match');
-        $this->assertEquals(time()-172800, parse_at_time('-2d'), '-2d did not match');
-        $this->assertEquals(time()-63115200, parse_at_time('-2y'), '-2y did not match');
+        $this->assertEquals(time() + 180, parse_at_time('+3m'), '+3m did not match');
+        $this->assertEquals(time() + 7200, parse_at_time('+2h'), '+2h did not match');
+        $this->assertEquals(time() + 172800, parse_at_time('+2d'), '+2d did not match');
+        $this->assertEquals(time() + 63115200, parse_at_time('+2y'), '+2y did not match');
+        $this->assertEquals(time() - 180, parse_at_time('-3m'), '-3m did not match');
+        $this->assertEquals(time() - 7200, parse_at_time('-2h'), '-2h did not match');
+        $this->assertEquals(time() - 172800, parse_at_time('-2d'), '-2d did not match');
+        $this->assertEquals(time() - 63115200, parse_at_time('-2y'), '-2y did not match');
         $this->assertEquals(429929439, parse_at_time('429929439'));
         $this->assertEquals(212334234, parse_at_time(212334234));
-        $this->assertEquals(time()-43, parse_at_time('-43'), '-43 did not match');
+        $this->assertEquals(time() - 43, parse_at_time('-43'), '-43 did not match');
         $this->assertEquals(0, parse_at_time('invalid'));
         $this->assertEquals(606614400, parse_at_time('March 23 1989 UTC'));
-        $this->assertEquals(time()+86400, parse_at_time('+1 day'));
+        $this->assertEquals(time() + 86400, parse_at_time('+1 day'));
     }
 }

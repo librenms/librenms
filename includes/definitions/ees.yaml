@@ -6,8 +6,8 @@ over:
     - { graph: device_current, text: Current }
     - { graph: device_voltage, text: Voltage }
     - { graph: device_state, text: State }
-mib_dir:
-    - emerson
+mib_dir: emerson
 discovery:
-    - sysObjectID:
-        - .1.3.6.1.4.1.6302
+    -
+        sysObjectID:
+            - .1.3.6.1.4.1.6302

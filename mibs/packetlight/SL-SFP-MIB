@@ -8,6 +8,7 @@ IMPORTS
 	MODULE-IDENTITY, OBJECT-TYPE,
 	NOTIFICATION-TYPE, Integer32, TimeTicks
 					 			     	FROM SNMPv2-SMI
+	Float32TC, Float64TC, Float128TC   	FROM FLOAT-TC-MIB
 	DisplayString, TruthValue, 
 	TimeStamp					  		FROM SNMPv2-TC
     SnmpAdminString						FROM SNMP-FRAMEWORK-MIB
@@ -36,6 +37,7 @@ slSfp MODULE-IDENTITY
 sfpConf		OBJECT IDENTIFIER ::= { slSfp 1 }
 sfpDiag		OBJECT IDENTIFIER ::= { slSfp 2 }
 sfpTraps	OBJECT IDENTIFIER ::= { slSfp 3 }
+sfpTune		OBJECT IDENTIFIER ::= { slSfp 4 }
 
 -- Textual Conventions
 
@@ -142,7 +144,53 @@ SfpConfigEntry ::=
 		sfpConfigXfpCapFreqFirst10Ghz		INTEGER,
 		sfpConfigXfpCapFreqLastThz			INTEGER,
 		sfpConfigXfpCapFreqLast10Ghz		INTEGER,
-		sfpConfigXfpCapMaxSpacing10Ghz		INTEGER
+		sfpConfigXfpCapMaxSpacing10Ghz		INTEGER,
+		sfpConfigXfpCalibrationSupported	TruthValue,
+		sfpConfigXfpCalibrationEnabled		TruthValue,
+		
+		-- CFP MSA Rev 1.4 
+		sfpConfigCfpExtId					INTEGER,
+		sfpConfigCfpConnectorType			INTEGER,
+		sfpConfigCfpEthernetCode			INTEGER,
+		sfpConfigCfpFcCode					INTEGER,
+		sfpConfigCfpCopperCode				INTEGER,
+		sfpConfigCfpSonetCode				INTEGER,
+		sfpConfigCfpOtnCode					INTEGER,
+		sfpConfigCfpSupportedRates			INTEGER,
+		sfpConfigCfpSupportedLanes			INTEGER,
+		sfpConfigCfpMediaProperties			INTEGER,
+		sfpConfigCfpMaxNetworkLaneRate		INTEGER,
+		sfpConfigCfpMaxHostLaneRate			INTEGER,
+		sfpConfigCfpMaxSmFiberLength		INTEGER,
+		sfpConfigCfpMaxMmFiberLength		INTEGER,
+		sfpConfigCfpMaxCopperCableLength	INTEGER,
+		sfpConfigCfpMinWavelenPerActive		INTEGER,
+		sfpConfigCfpMaxWavelenPerActive		INTEGER,
+		sfpConfigCfpMaxLenOpticalWidth		INTEGER,
+        sfpConfigCfpSpacing					INTEGER,
+		
+		-- QSFP+ SFF-8436 
+		sfpConfigQsfppEthernetCode			INTEGER,
+		sfpConfigQsfppSonetCode				INTEGER,
+		
+		-- CXP 
+		sfpConfigCxpExtId					INTEGER,
+		sfpConfigCxpConnectorType			INTEGER,
+		sfpConfigCxpMaxSupportedRate        INTEGER,
+		sfpConfigCxpNominalWavelength       INTEGER,
+		sfpConfigCxpDeviceTech              INTEGER,
+
+		-- Coherent 
+		sfpConfigCohRxDesiredChannel		INTEGER,
+		sfpConfigCohRxDesiredWl				INTEGER,
+		sfpConfigCohRxDesiredFreq			INTEGER,
+		sfpConfigCohCurrentCD				INTEGER,
+		sfpConfigCohCurrentOSNR				INTEGER,
+		sfpConfigCohAverageOSNR				INTEGER,
+		sfpConfigCohMaxCD					INTEGER,
+		
+		-- DSP
+		sfpConfigNyquist					TruthValue
 	}
 
 sfpConfigInterface OBJECT-TYPE
@@ -162,7 +210,14 @@ sfpConfigXcvrId OBJECT-TYPE
 		module(2),		-- Module/connector soldered to motherboard
 		sfp1310(3),		-- 1310 SFP
 		xfp(6),			-- XFP
-		sfpDwdm(11)		-- DWDM SFP
+		sfpDwdm(11),	-- DWDM SFP
+		qsfp(12),		-- QSFP
+		qsfpPlus(13),	-- QSFP+
+		cfp(14),		-- CFP
+		cxp(15),		-- CXP
+		coherent(16),	-- Coherent  
+		qsfp28(17),		-- QSFP28
+		cfp2(20)      	-- CFP2
 	}
 	MAX-ACCESS  read-only
 	STATUS  	current
@@ -384,10 +439,12 @@ sfpConfigFcCompliance OBJECT-TYPE
 			Bits 17: Multi-mode, 50 m (M5)
 			Bits 18: Single Mode (SM)
 			- Fibre Channel speed
-			Bits 19: 800 MBytes/Sec          -- 1310
-			Bits 20: 400 MBytes/Sec
-			Bits 21: 200 MBytes./Sec
-			Bits 22: 100 MBytes/Sec."
+			Bits 19: 800  MB/Sec          
+			Bits 20: 400  MB/Sec
+			Bits 21: 200  MB/Sec
+			Bits 22: 100  MB/Sec
+			Bits 23: 1200 MB/Sec
+			Bits 24: 1600 MB/Sec."
     REFERENCE   "DWDM MSA Table 2.3.1 and 2.3.5,
     			SFP-8472 Table 3.1 and 3.5"
 	::= { sfpConfigEntry 10 }
@@ -882,6 +939,10 @@ sfpConfigCleiCode OBJECT-TYPE
             "GR-383-CORE"
 	::= { sfpConfigEntry 40 }
 
+--
+-- XFP Information
+--
+
 sfpConfigXfpExtXcvrId OBJECT-TYPE
 	SYNTAX  	INTEGER
 	MAX-ACCESS  read-only
@@ -1176,7 +1237,516 @@ sfpConfigXfpCapMaxSpacing10Ghz OBJECT-TYPE
 		"Lasers maximum supported grid spacing (GHz*10) capability."
     REFERENCE   "SFP-8477."
 	::= { sfpConfigEntry 61 }    
-	
+
+sfpConfigXfpCalibrationSupported OBJECT-TYPE
+	SYNTAX  	TruthValue
+	MAX-ACCESS  read-only
+	STATUS  	current
+	DESCRIPTION
+		"Calibarion Supported."
+	::= { sfpConfigEntry 62 }    
+
+sfpConfigXfpCalibrationEnabled OBJECT-TYPE
+	SYNTAX  	TruthValue
+	MAX-ACCESS  read-write
+	STATUS  	current
+	DESCRIPTION
+		"Enable/Disable the calibration process.
+		 Changing the value to Enable when a signal exist invokes an immidiate calibration process.
+		 Changing the value to Disable returns the calibration values to defaults."
+	::= { sfpConfigEntry 63 }    
+
+--
+-- CFP Information
+--
+
+sfpConfigCfpExtId OBJECT-TYPE
+	SYNTAX  	INTEGER
+	MAX-ACCESS  read-only
+	STATUS  	current
+	DESCRIPTION
+		"Extended Identifier bit fields:
+		Bits 7-6 - Power Class:
+			00b: Power Class 1 Module (? 8 W max), 
+			01b: Power Class 2 Module (?16 W max),  
+			10b: Power Class 3 Module (? 24 W max), 
+			11b: Power Class 4 Module (? 32 W max).
+		Bits 5-4 Lane Ratio:
+			00b: Network lane : Host lane = 1 : n (Mux type),  
+			01b: Network lane : Host lane = n : m (Gear Box type), 
+			10b: Network lane : Host lane = n : n (Parallel type), 
+			11b: Reserved
+		Bits 3-1 WDM Type:
+			000b: Non-WDM,  
+			001b: CWDM,  
+			010b: LANWDM,  
+			011b: DWDM on 200G-grid,  
+			100b: DWDM on 100G-grid, 
+			101b: DWDM on 50G-grid,  
+			110b: DWDM on 25G-grid,  
+			111b: Other type WDM
+		Bit 0 CLEI Presence:
+			0: No CLEI code present,  
+			1: CLEI code present"
+    REFERENCE   "CFP MSA 1.4"
+	::= { sfpConfigEntry 70 }    
+
+sfpConfigCfpConnectorType OBJECT-TYPE
+	SYNTAX  	INTEGER
+	MAX-ACCESS  read-only
+	STATUS  	current
+	DESCRIPTION
+		"Connector Type Code:
+		00h: Undefined, 
+		01h : SC,  
+		07h : LC,  
+		08h : MT-RJ,   
+		09h : MPO, 
+		Other Codes : Reserved"
+    REFERENCE   "CFP MSA 1.4"
+	::= { sfpConfigEntry 71 }    
+
+sfpConfigCfpEthernetCode OBJECT-TYPE
+	SYNTAX  	INTEGER
+	MAX-ACCESS  read-only
+	STATUS  	current
+	DESCRIPTION
+		"Ethernet Application Code.  
+		00h: Undefined type, 
+		01h: 100GE SMF 10km, 100GE-LR4, 
+		02h: 100GE SMF 40km, 100GE-ER4, 
+		03h: 100GE MMF 100m OM3, 100GE-SR10, 
+		04h: For future use,  
+		05h: 40GE SMF 10km, 40GE-LR4, 
+		07h: 40GE MMF 100m OM3, 40GE-SR4, 
+     		For future use: 
+     		100G G.959.1 OTU4 
+     		40G G.693 SDH 
+     		40G G.693 OTU3 
+     		40G G.695 SDH 
+     		40G G.695 OTU3, 
+		0Dh: 40GE-CR4 Copper 
+		0Eh: 100GE-CR10 Copper,  
+		0Fh: 40G BASE-FR, 
+		10h~FFh: Reserved."
+    REFERENCE   "CFP MSA 1.4"
+	::= { sfpConfigEntry 72 }    
+
+sfpConfigCfpFcCode OBJECT-TYPE
+	SYNTAX  	INTEGER
+	MAX-ACCESS  read-only
+	STATUS  	current
+	DESCRIPTION
+		"Fiber Channel Application Code: Undefined"
+    REFERENCE   "CFP MSA 1.4"
+	::= { sfpConfigEntry 73 }    
+
+sfpConfigCfpCopperCode OBJECT-TYPE
+	SYNTAX  	INTEGER
+	MAX-ACCESS  read-only
+	STATUS  	current
+	DESCRIPTION
+		"Copper Link Application Code: Undefined"
+    REFERENCE   "CFP MSA 1.4"
+	::= { sfpConfigEntry 74 }    
+
+sfpConfigCfpSonetCode OBJECT-TYPE
+	SYNTAX  	INTEGER
+	MAX-ACCESS  read-only
+	STATUS  	current
+	DESCRIPTION
+		"SONET/SDH Application Code:
+		00h: Undefined type, 
+		01h: VSR2000-3R2, 
+		02h: VSR2000-3R3, 
+		03h: VSR2000-3R5, 
+		04h ~ 0FFh: Reserved"
+    REFERENCE   "CFP MSA 1.4"
+	::= { sfpConfigEntry 75 }    
+
+sfpConfigCfpOtnCode OBJECT-TYPE
+	SYNTAX  	INTEGER
+	MAX-ACCESS  read-only
+	STATUS  	current
+	DESCRIPTION
+		"OTN Application Code:
+		0h: Undefined type, 
+		01h: VSR2000-3R2F, 
+		02h: VSR2000-3R3F, 
+		03h: VSR2000-3R5F, 
+		04h: VSR2000-3L2F,
+		05h: VSR2000-3L3F, 
+		06h: VSR2000-3L5F, 
+		07h: C4S1-2D1 (OTL3.4), 
+		08h: 4I1-9D1F (OTL4.4), 
+		09h ~ 0FFh: Reserved"
+    REFERENCE   "CFP MSA 1.4"
+	::= { sfpConfigEntry 76 }    
+
+sfpConfigCfpSupportedRates OBJECT-TYPE
+	SYNTAX  	INTEGER
+	MAX-ACCESS  read-only
+	STATUS  	current
+	DESCRIPTION
+		"Additional Capable Rates Supported Bitmap:
+		Bits 7-5 - Reserved
+		Bit 4 - 111.8 Gbps
+		Bit 3 - 103.125 Gbps
+		Bit 2 - 41.25 Gbps
+		Bit 1 - 43 Gbps
+		Bit 0 - 39.8 Gbps"
+    REFERENCE   "CFP MSA 1.4"
+	::= { sfpConfigEntry 77 }    
+
+sfpConfigCfpSupportedLanes OBJECT-TYPE
+	SYNTAX  	INTEGER
+	MAX-ACCESS  read-only
+	STATUS  	current
+	DESCRIPTION
+		"Number of Lanes Supported:
+		Bits 7-4 - Number of Network Lanes 
+			The value of 0 represents 16 network lanes supported.   
+			The values of 1 through 15 represent the actual number of network lanes supported
+		Bits 3-0 - Number of Host Lanes 
+			The value of 0 represents 16 network lanes supported.   
+			The values of 1 through 15 represent the actual number of network lanes supported"
+    REFERENCE   "CFP MSA 1.4"
+	::= { sfpConfigEntry 78 }    
+
+sfpConfigCfpMediaProperties OBJECT-TYPE
+	SYNTAX  	INTEGER
+	MAX-ACCESS  read-only
+	STATUS  	current
+	DESCRIPTION
+		"Media Properties bit fields:
+		Bits 7 - 6 Media Type:
+			00b: SMF ,  
+			01b: MMF (OM3),  
+			10b: Reserved,  
+			11b: Copper
+		Bit 5 - Directionality:
+			0: Normal,  
+			1: BiDi
+		Bit 4 Optical Multiplexing and De-multiplexing:
+			0: Without optical MUX/DEMUX, 
+			1: With optical MUX/DEMUX
+		Bits 3 - 0 ctive Fiber per Connector:	
+		A 4-bit unsigned number representing number of active fibers for TX and RX per connector: 
+			0: 16 TX Lanes and 16 RX Lanes, 
+			1: 1 TX Lane and 1 RX Lane, 
+			4: 4 TX Lanes and 4 RX Lanes, 
+			10: 10 TX Lanes and 10 RX Lanes, 
+			12: 12 TX Lanes and 12 RX Lanes"
+    REFERENCE   "CFP MSA 1.4"
+	::= { sfpConfigEntry 79 }    
+
+sfpConfigCfpMaxNetworkLaneRate OBJECT-TYPE
+	SYNTAX  	INTEGER
+	MAX-ACCESS  read-only
+	STATUS  	current
+	DESCRIPTION
+		"Maximum Network Lane Bit Rate: 8-bit value x 0.2 Gbps"
+    REFERENCE   "CFP MSA 1.4"
+	::= { sfpConfigEntry 80 }    
+
+sfpConfigCfpMaxHostLaneRate OBJECT-TYPE
+	SYNTAX  	INTEGER
+	MAX-ACCESS  read-only
+	STATUS  	current
+	DESCRIPTION
+		"Maximum Host Lane Bit Rate: 8-bit value x 0.2 Gbps"
+    REFERENCE   "CFP MSA 1.4"
+	::= { sfpConfigEntry 81 }    
+
+sfpConfigCfpMaxSmFiberLength OBJECT-TYPE
+	SYNTAX  	INTEGER
+	MAX-ACCESS  read-only
+	STATUS  	current
+	DESCRIPTION
+		"Maximum Single Mode Optical Fiber Length: 
+		8-bit value x 1 km for single mode fiber length"
+    REFERENCE   "CFP MSA 1.4"
+	::= { sfpConfigEntry 82 }    
+
+sfpConfigCfpMaxMmFiberLength OBJECT-TYPE
+	SYNTAX  	INTEGER
+	MAX-ACCESS  read-only
+	STATUS  	current
+	DESCRIPTION
+		"Maximum Multi-Mode Optical Fiber Length:
+		8-bit value x 10 m for multi-mode fiber length"
+    REFERENCE   "CFP MSA 1.4"
+	::= { sfpConfigEntry 83 }    
+
+sfpConfigCfpMaxCopperCableLength OBJECT-TYPE
+	SYNTAX  	INTEGER
+	MAX-ACCESS  read-only
+	STATUS  	current
+	DESCRIPTION
+		"Maximum Copper Cable Length:
+		8-bit value x 1 m for copper cable length"
+    REFERENCE   "CFP MSA 1.4"
+	::= { sfpConfigEntry 84 }    
+
+sfpConfigCfpMinWavelenPerActive OBJECT-TYPE
+	SYNTAX  	INTEGER
+	MAX-ACCESS  read-only
+	STATUS  	current
+	DESCRIPTION
+		"Minimum Wavelength per Active Fiber:
+		16-bit unsigned value x 0.025 nm. 
+		(MSB is at 8012h, LSB is at 8013h)"
+    REFERENCE   "CFP MSA 1.4"
+	::= { sfpConfigEntry 85 }    
+
+sfpConfigCfpMaxWavelenPerActive OBJECT-TYPE
+	SYNTAX  	INTEGER
+	MAX-ACCESS  read-only
+	STATUS  	current
+	DESCRIPTION
+		"Maximum Wavelength per Active Fiber:
+		16-bit unsigned value x 0.025 nm. 
+		(MSB is at 8014h, LSB is at 8015h)"
+    REFERENCE   "CFP MSA 1.4"
+	::= { sfpConfigEntry 86 }    
+
+sfpConfigCfpMaxLenOpticalWidth OBJECT-TYPE
+	SYNTAX  	INTEGER
+	MAX-ACCESS  read-only
+	STATUS  	current
+	DESCRIPTION
+		"Maximum per Lane Optical Width:
+		Guaranteed range of laser wavelength. 
+		16-bit unsigned value x 1 pm. 
+		(MSB is at 8016h, LSB is at 8017h)"
+    REFERENCE   "CFP MSA 1.4"
+	::= { sfpConfigEntry 87 }    
+
+sfpConfigCfpSpacing OBJECT-TYPE
+	SYNTAX  	INTEGER
+	MAX-ACCESS  read-write
+	STATUS  	current
+	DESCRIPTION
+		"The spacing between two lanes:
+		0- unknown spacing
+		1 - 100G spacing
+		2 - 50G spacing
+		3- 25G spacing"
+    REFERENCE   "CFP MSA 1.4"
+	::= { sfpConfigEntry 88 }    
+
+--
+-- QSFP+ Information
+--
+
+sfpConfigQsfppEthernetCode OBJECT-TYPE
+	SYNTAX  	INTEGER
+	MAX-ACCESS  read-only
+	STATUS  	current
+	DESCRIPTION
+		"Maximum per Lane Optical Width:
+		Guaranteed range of laser wavelength. 
+		16-bit unsigned value x 1 pm. 
+		(MSB is at 8016h, LSB is at 8017h)"
+    REFERENCE   "QSFP+ SFF-8436"
+	::= { sfpConfigEntry 100 }    
+
+sfpConfigQsfppSonetCode OBJECT-TYPE
+	SYNTAX  	INTEGER
+	MAX-ACCESS  read-write
+	STATUS  	current
+	DESCRIPTION
+		"The spacing between two lanes:
+		0- unknown spacing
+		1 - 100G spacing
+		2 - 50G spacing
+		3- 25G spacing"
+    REFERENCE   "QSFP+ SFF-8436"
+	::= { sfpConfigEntry 101 }    
+
+--
+-- CXP Information
+--
+
+sfpConfigCxpExtId OBJECT-TYPE
+	SYNTAX  	INTEGER
+	MAX-ACCESS  read-write
+	STATUS  	current
+	DESCRIPTION
+		"Extended Identifier (Byte 129):
+		Bits 7-5 - Power Class:
+			000: 0.25W max - Class 0   
+			001: 1.0W max - Class 1 
+			010: 1.5W max - Class 2     
+			011: 2.5W max - Class 3 
+			100: 4.0W max - Class 4     
+			101: 6.0W max - Class 5
+			110: >6.0W  - Class 6           
+			111: Reserved
+		Bits 4 Tx CDR Presence:
+			1: Tx CDR provided 
+			0: Otherwise 
+		Bits 3 Rx CDR Presence:
+			1: Rx CDR provided;
+			0: Otherwise"
+    REFERENCE   ""
+	::= { sfpConfigEntry 110 }    
+
+sfpConfigCxpConnectorType OBJECT-TYPE
+	SYNTAX  	INTEGER
+	MAX-ACCESS  read-write
+	STATUS  	current
+	DESCRIPTION
+		"Connector Type Code (Byte 130):
+		30h: Passive Copper Cable Assembly 
+		31h: Active Copper Cable Assembly (ref. Byte 147) 
+		32h: Active Optical Cable Assembly 
+		33h: Optical Transceiver w/ optical connector"
+    REFERENCE   ""
+	::= { sfpConfigEntry 111 }    
+
+sfpConfigCxpMaxSupportedRate OBJECT-TYPE
+	SYNTAX  	INTEGER
+	MAX-ACCESS  read-write
+	STATUS  	current
+	DESCRIPTION
+		"Max per-channel bit rate (Byte 134):
+		Max signal rate = binary value x 100 Mb/s"
+    REFERENCE   ""
+	::= { sfpConfigEntry 112 }    
+
+sfpConfigCxpNominalWavelength OBJECT-TYPE
+	SYNTAX  	INTEGER
+	MAX-ACCESS  read-write
+	STATUS  	current
+	DESCRIPTION
+		"Wavelength/Attenuation (Bytes 135-136):
+		Optical: Nominal Laser Wavelength  --  
+			Wavelength in nm = value / 20): e.g. 42h 04h = 16,900,  16,900/20 = 845 nm
+		Copper: Nominal  attenuation of cable  either to the other end (passive) or to equalizer (active)
+		Byte 135: 
+			Attenuation at 2.5 GHz in dB - 
+			00h=no info
+		Byte 136: 
+			Attenuation at 5 GHz in dB - 
+			00h=no info"
+    REFERENCE   ""
+	::= { sfpConfigEntry 113 }    
+
+sfpConfigCxpDeviceTech OBJECT-TYPE
+	SYNTAX  	INTEGER
+	MAX-ACCESS  read-write
+	STATUS  	current
+	DESCRIPTION
+		"Device Technology (Byte 147):
+		Bits 7-4 (Device Technology):
+			0000: 850 nm VCSEL        
+			0001:1310 nm VCSEL 
+			0010:1550 nm VCSEL       
+			0011: 1310 nm FP 
+			0100:1310 nm DFB            
+			0101:1550 nm DFB 
+			0110: 1310 nm EML           
+			0111: 1550 nm EML 
+			1000: Copper or others      
+			11001: 1490 nm DFB 
+			1010: Copper cable un-equalized 
+			1011: Copper cable passive equalized 
+			1100: Copper cable near & far end active equalizers 
+			1101: Copper cable, far end active equalizer 
+			1110: copper cable, near end active equalizer 
+			1111: Reserved 
+		Bit 3 (Wavelength Control):
+			0: No  control  
+			1: Active wavelength control
+		Bit 2 (Transmitter cooling):
+			0: Uncooled transmitter 
+			1: Cooled transmitter
+		Bit 1 (Optical Detector):
+			0: P-I-N Detector 
+			1: APD detector
+		Bit 0 (Optical Tunability):
+			0: Transmitter not tunable 
+			1:Transmitter tunable"
+    REFERENCE   ""
+	::= { sfpConfigEntry 114 }    
+
+
+--
+-- Coherent Information
+--
+
+sfpConfigCohRxDesiredChannel OBJECT-TYPE
+	SYNTAX  	INTEGER
+	MAX-ACCESS  read-write
+	STATUS  	current
+	DESCRIPTION
+		"User input of RX channel number, which is an integer 1 to N (N=Number of Channels)."
+    REFERENCE   "CFP MSA"
+	::= { sfpConfigEntry 115 }    
+
+sfpConfigCohRxDesiredWl OBJECT-TYPE
+	SYNTAX  	INTEGER
+	MAX-ACCESS  read-write
+	STATUS  	current
+	DESCRIPTION
+		"User input of RX Wavelength setpoint (in units of 50 picometers)."
+    REFERENCE   "CFP MSA"
+	::= { sfpConfigEntry 116 }    
+
+sfpConfigCohRxDesiredFreq OBJECT-TYPE
+	SYNTAX  	INTEGER
+	MAX-ACCESS  read-write
+	STATUS  	current
+	DESCRIPTION
+		"User input of channel number, which is an integer to N (N=Number of Channels)."
+    REFERENCE   "CFP MSA"
+	::= { sfpConfigEntry 117 }    
+
+sfpConfigCohCurrentCD OBJECT-TYPE
+	SYNTAX  	INTEGER
+	MAX-ACCESS  read-only
+	STATUS  	current
+	DESCRIPTION
+		"Current Chromatic Dispersion counter. Units are in ps/nm" 
+    REFERENCE   "CFP MSA"
+	::= { sfpConfigEntry 118 }    
+
+sfpConfigCohCurrentOSNR OBJECT-TYPE
+	SYNTAX  	INTEGER
+	MAX-ACCESS  read-only
+	STATUS  	current
+	DESCRIPTION
+		"Current SNR. Units are in 0.1dB" 
+    REFERENCE   "CFP MSA"
+	::= { sfpConfigEntry 119 }    
+
+sfpConfigCohAverageOSNR OBJECT-TYPE
+	SYNTAX  	INTEGER
+	MAX-ACCESS  read-only
+	STATUS  	current
+	DESCRIPTION
+		"Average SNR over PM interval. Units are in 0.1dB" 
+    REFERENCE   "CFP MSA"
+	::= { sfpConfigEntry 120 }    
+
+sfpConfigCohMaxCD OBJECT-TYPE
+	SYNTAX  	INTEGER
+	MAX-ACCESS  read-only
+	STATUS  	current
+	DESCRIPTION
+		"Maximal Chromatic Dispersion counter. Units are in ps/nm" 
+    REFERENCE   "CFP MSA"
+	::= { sfpConfigEntry 121 }    
+
+sfpConfigNyquist OBJECT-TYPE
+	SYNTAX  	TruthValue
+	MAX-ACCESS  read-write
+	STATUS  	current
+	DESCRIPTION
+		"Nyquist - True (ON) or False (OFF). Default is OFF" 
+	::= { sfpConfigEntry 122 }    
+
 
 -- ----------------------------------------------------
 --
@@ -1259,7 +1829,20 @@ SfpDiagEntry ::=
 		sfpDiagAlarmsMask					INTEGER,
 		sfpDiagWarnings						INTEGER,
 		sfpDiagWarningsMask					INTEGER,
-		sfpDiagConfLowRxPowerAlmThreshold	INTEGER
+		sfpDiagConfLowRxPowerAlmThreshold	INTEGER,
+		sfpDiagRxInputPowerFloat			Float32TC,  
+		
+        -- CXP
+		sfpDiagCxpTxTemp					INTEGER,
+		sfpDiagCxpHighTxTempAlmThreshold	INTEGER,
+		sfpDiagCxpLowTxTempAlmThreshold		INTEGER,
+		sfpDiagCxpRxTemp					INTEGER,
+		sfpDiagCxpHighRxTempAlmThreshold	INTEGER,
+		sfpDiagCxpLowRxTempAlmThreshold		INTEGER,
+		
+        -- OTDR
+		sfpDiagOtdrFiberCutRange			INTEGER,
+		sfpDiagModuleTemperatureCelsius		INTEGER
 	}
 
 sfpDiagInterface OBJECT-TYPE
@@ -1890,6 +2473,105 @@ sfpDiagConfLowRxPowerAlmThreshold OBJECT-TYPE
 		The range starts with -50.0 dBm."
 	::= { sfpDiagEntry 46 }
 
+sfpDiagRxInputPowerFloat OBJECT-TYPE
+    SYNTAX      Float32TC
+    MAX-ACCESS  read-only
+    STATUS      current         
+    DESCRIPTION
+		"Measured RX input power sepcified in floating units.
+		 This object is used for power < -40dBm that can be achieved with SFP external calibration.
+		 When not used this value is 0 and sfpDiagRxInputPower should be used."
+	::= { sfpDiagEntry 47 }
+
+--
+-- CXP
+--
+
+sfpDiagCxpTxTemp OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+		"Internally measured Tx temperature. The value 0 means -128 Celsius. 
+		An increment on one is equivalent to 1/256 degree, 
+		yielding a total range of -128 to +128 Celsius
+		For CXP Addr 22-23 (Tx Lower Page)"
+	::= { sfpDiagEntry 50 }
+
+sfpDiagCxpHighTxTempAlmThreshold OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+		"The threshold value for high Tx temperature alarm. 
+		The value 0 means -128 Celsuis. An increment on one is equivalent to 1/256 degree, 
+		yielding a total range of -128 to +128 Celsius
+		For CXP Addr 128-129 (Tx Upper Page)"
+	::= { sfpDiagEntry 51 }
+
+sfpDiagCxpLowTxTempAlmThreshold OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+		"The threshold value for low Tx temperature alarm. 
+		The value 0 means -128 Celsuis. An increment on one is equivalent to 1/256 degree, 
+		yielding a total range of -128 to +128 Celsius
+		For CXP Addr 130-131 (Tx Upper Page)"
+	::= { sfpDiagEntry 52 }
+
+sfpDiagCxpRxTemp OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+		"Internally measured Rx temperature. The value 0 means -128 Celsius. 
+		An increment on one is equivalent to 1/256 degree, 
+		yielding a total range of -128 to +128 Celsius
+		For CXP Addr 22-23 (Rx Lower Page)"
+	::= { sfpDiagEntry 53 }
+
+sfpDiagCxpHighRxTempAlmThreshold OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+		"The threshold value for high Rx temperature alarm. 
+		The value 0 means -128 Celsuis. An increment on one is equivalent to 1/256 degree, 
+		yielding a total range of -128 to +128 Celsius
+		For CXP Addr 128-129 (Rx Upper Page)"
+	::= { sfpDiagEntry 54 }
+
+sfpDiagCxpLowRxTempAlmThreshold OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+		"The threshold value for low Rx temperature alarm. 
+		The value 0 means -128 Celsuis. An increment on one is equivalent to 1/256 degree, 
+		yielding a total range of -128 to +128 Celsius
+		For CXP Addr 130-131 (Rx Upper Page)"
+	::= { sfpDiagEntry 55 }
+
+sfpDiagOtdrFiberCutRange OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+		"The OTDR calculated range to the fiber cut"
+	::= { sfpDiagEntry 56 }
+
+sfpDiagModuleTemperatureCelsius OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+		"Internally measured module temperature, while degress in Celsuis. 
+		Total range of -128 to +128 Celsius. 
+		Temperature accuracy is vendor specific but must be better than ±3
+		degrees Celsius over specified operating temperature and voltage."
+    REFERENCE   "DWDM MSA Table 2.3.21, SFP-8472 Table 3.17."
+	::= { sfpDiagEntry 57 }
 
 -- ----------------------------------------------------
 --

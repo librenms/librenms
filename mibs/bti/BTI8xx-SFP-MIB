@@ -1,0 +1,437 @@
+BTI8xx-SFP-MIB
+
+DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY,
+    OBJECT-TYPE,
+    IpAddress,
+    Unsigned32,
+    Integer32,
+    Gauge32,
+    TimeTicks,
+    Counter32               FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION,
+    DisplayString,
+    MacAddress,
+    TruthValue,
+    DateAndTime,
+    RowStatus               FROM SNMPv2-TC          -- [RFC2579]
+    MODULE-COMPLIANCE,
+    OBJECT-GROUP            FROM SNMPv2-CONF
+    InterfaceIndex,
+    ifIndex                 FROM IF-MIB             -- [RFC2863]
+    PerfCurrentCount,
+    PerfIntervalCount,
+    PerfTotalCount          FROM PerfHist-TC-MIB    -- [RFC3593]
+    mainSystem              FROM BTI8xx-TC-MIB;
+
+    sfp   MODULE-IDENTITY
+
+    LAST-UPDATED "201511201200Z"  -- Friday, Nov 20, 12:00:00 KST 2015
+    ORGANIZATION "Actus Networks Ltd."
+    CONTACT-INFO "
+    Support:  +82-2-26535666
+    R&D:      +82-2-26535666
+    Fax:      +82-2-26534662
+    Email:    ymkim@actusnetworks.com
+    "
+
+    DESCRIPTION  "This is a top-level MIB for Actus whose purpose is to lay out
+    the top-level objects in the OID hierarchy from which
+    BTI8xx MIB OIDs descend."
+
+    REVISION     "201511201200Z"  -- Friday, Nov 20, 12:00:00 KST 2015
+    DESCRIPTION  "
+            *1. Change the MAX-ACCESS(for silvercreek tool).
+              'not-accessible' -> 'read-only'
+                -sfpInfoIndex
+                -sfpInventoryIndex
+                -sfpDiagnosticIndex
+                -sfpStatusIndex
+
+            *2. Change the Syntax(for silver creek tool).
+              2.1. DisplayString -> OCTET STRING
+                sfpInfoLocation
+                sfpInfoSerialNumber
+                sfpInfoProductCode
+                sfpInventoryLocation
+                sfpInventoryType
+                sfpInventoryPecCode
+                sfpInventoryCLEI
+                sfpDiagnosticLocation
+                sfpDiagnosticCalibration
+                sfpDiagnosticTemperature
+                sfpDiagnosticVoltageV
+                sfpDiagnosticTxBiasMA
+                sfpDiagnosticTxPowerDbm
+                sfpDiagnosticRxPowerDbm
+                sfpStatusLocation
+                sfpStatusRxStatus
+                sfpStatusTxStatus
+
+              2.2. Delete the syntax value range
+                sfpInfoDistanceFiber1
+                sfpInfoDistanceFiber2
+                sfpInfoDistanceCopper
+
+            *3. MIB code sorting.
+            "
+
+    REVISION     "201312271200Z"  -- Monday, Dec 30, 12:00:00 KST 2013
+    DESCRIPTION  "Initial version of MIB."
+    ::= { mainSystem 6 }
+
+-- ===========================================================
+-- pManagement:configManagement:mainSystem:sfp:sfpInfoTable ==
+-- ===========================================================
+sfpInfoTable            OBJECT-TYPE
+  SYNTAX          SEQUENCE OF SfpInfoEntry
+  MAX-ACCESS      not-accessible
+  STATUS          current
+  DESCRIPTION
+    "Table that contains sfp port information/configuration."
+  ::= { sfp 1 }
+
+  sfpInfoEntry            OBJECT-TYPE
+    SYNTAX          SfpInfoEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+      "A list of information for each context."
+    INDEX   { sfpInfoIndex }
+    ::= { sfpInfoTable 1 }
+
+  SfpInfoEntry ::=
+    SEQUENCE    {
+      sfpInfoIndex            	Integer32,
+      sfpInfoLocation         	OCTET STRING,
+      sfpInfoSerialNumber     	OCTET STRING,
+      sfpInfoProductCode      	OCTET STRING,
+      sfpInfoWigth	         	  Integer32,
+      sfpInfoDistanceFiber1     DisplayString,
+      sfpInfoDistanceFiber2     DisplayString,
+      sfpInfoDistanceCopper     DisplayString
+    }
+
+    sfpInfoIndex                OBJECT-TYPE
+      SYNTAX          Integer32 (0..12)
+      MAX-ACCESS      read-only
+      STATUS          current
+      DESCRIPTION
+        "The index of sfpInfoTable."
+      ::= { sfpInfoEntry 1 }
+
+    sfpInfoLocation             OBJECT-TYPE
+      SYNTAX          OCTET STRING(SIZE(1..32))
+      MAX-ACCESS      read-only
+      STATUS          current
+      DESCRIPTION
+        "The Location of the sfp."
+      ::= { sfpInfoEntry 2 }
+
+    sfpInfoSerialNumber         OBJECT-TYPE
+      SYNTAX          OCTET STRING(SIZE (0..32))
+      MAX-ACCESS      read-only
+      STATUS          current
+      DESCRIPTION
+        "The Serial Number of the sfp."
+      ::= { sfpInfoEntry 3 }
+
+    sfpInfoProductCode          OBJECT-TYPE
+      SYNTAX          OCTET STRING(SIZE (0..32))
+      MAX-ACCESS      read-only
+      STATUS          current
+      DESCRIPTION
+        "The Product Code of the sfp."
+      ::= { sfpInfoEntry 4 }
+
+    sfpInfoWigth            OBJECT-TYPE
+      SYNTAX          Integer32 (1..2147483647)
+      MAX-ACCESS      read-only
+      STATUS          current
+      DESCRIPTION
+        "The Wigth(nm) of the sfp."
+      ::= { sfpInfoEntry 5 }
+
+	  sfpInfoDistanceFiber1       OBJECT-TYPE
+      SYNTAX          DisplayString
+      MAX-ACCESS      read-only   
+      STATUS          current
+      DESCRIPTION
+        "The Distance Fiber1(m) of the sfp."
+      ::= { sfpInfoEntry 6 }
+
+    sfpInfoDistanceFiber2   OBJECT-TYPE
+      SYNTAX          DisplayString
+      MAX-ACCESS      read-only
+      STATUS          current
+      DESCRIPTION
+        "The Distance Fiber2(m) of the sfp."
+      ::= { sfpInfoEntry 7 }
+
+    sfpInfoDistanceCopper   OBJECT-TYPE
+      SYNTAX          DisplayString
+      MAX-ACCESS      read-only
+      STATUS          current
+      DESCRIPTION
+        "The Distance meter - length type of the sfp."
+      ::= { sfpInfoEntry 8 }
+
+
+-- ================================================================
+-- pManagement:configManagement:mainSystem:sfp:sfpInventoryTable ==
+-- ================================================================
+sfpInventoryTable       OBJECT-TYPE
+  SYNTAX          SEQUENCE OF SfpInventoryEntry
+  MAX-ACCESS      not-accessible
+  STATUS          current
+  DESCRIPTION
+    "Table that contains sfp port information/configuration."
+  ::= { sfp 2 }
+
+  sfpInventoryEntry       OBJECT-TYPE
+    SYNTAX          SfpInventoryEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+      "A list of information for each context."
+    INDEX   { sfpInventoryIndex }
+    ::= { sfpInventoryTable 1 }
+
+  SfpInventoryEntry ::=
+    SEQUENCE    {
+      sfpInventoryIndex       Integer32,
+      sfpInventoryLocation    OCTET STRING,
+      sfpInventoryType        OCTET STRING,
+      sfpInventoryPecCode		  OCTET STRING,
+      sfpInventoryCLEI		    OCTET STRING,
+      sfpInventoryStatus      INTEGER,
+      sfpInventoryEqStatus    INTEGER
+    }
+
+    sfpInventoryIndex           OBJECT-TYPE
+      SYNTAX            Integer32(1..12)
+      MAX-ACCESS        read-only
+      STATUS            current
+      DESCRIPTION
+        "The index of sfpInventoryTable."
+      ::= { sfpInventoryEntry 1 }
+
+    sfpInventoryLocation            OBJECT-TYPE
+      SYNTAX            OCTET STRING (SIZE (0..32))
+      MAX-ACCESS        read-only
+      STATUS            current
+      DESCRIPTION
+        "The Location of the sfp."
+      ::= { sfpInventoryEntry 2 }
+
+    sfpInventoryType            OBJECT-TYPE
+      SYNTAX            OCTET STRING (SIZE (0..32))
+      MAX-ACCESS        read-only
+      STATUS            current
+      DESCRIPTION
+        "The Type of the sfp Inventory."
+      ::= { sfpInventoryEntry 3 }
+
+    sfpInventoryPecCode     OBJECT-TYPE
+      SYNTAX            OCTET STRING (SIZE (0..32))
+      MAX-ACCESS        read-only
+      STATUS            current
+      DESCRIPTION
+        "The Product Equipment Code form-factory pluggable inventory item."
+      ::= { sfpInventoryEntry 4 }
+
+    sfpInventoryCLEI     	OBJECT-TYPE
+      SYNTAX            OCTET STRING (SIZE (0..32))
+      MAX-ACCESS        read-only
+      STATUS            current
+      DESCRIPTION
+        "The Product Equipment Code form-factory pluggable inventory item."
+      ::= { sfpInventoryEntry 5 }
+
+    sfpInventoryStatus          OBJECT-TYPE
+      SYNTAX            INTEGER { supported(1), notSupported(2) }
+      MAX-ACCESS        read-only
+      STATUS            current
+      DESCRIPTION
+        "The Status of the sfp Inventory."
+      ::= { sfpInventoryEntry 6 }
+
+    sfpInventoryEqStatus            OBJECT-TYPE
+      SYNTAX            INTEGER { equipped(1), unEquipped(2) }
+      MAX-ACCESS        read-only
+      STATUS            current
+      DESCRIPTION
+        "The Eq. Status of the sfp Inventory."
+      ::= { sfpInventoryEntry 7 }
+
+
+-- ==================================================================
+-- pManagement:configManagement:mainSystem:sfp:sfpDiagnostincTable ==
+-- ==================================================================
+sfpDiagnosticTable      OBJECT-TYPE
+  SYNTAX          SEQUENCE OF SfpDiagnosticEntry
+  MAX-ACCESS      not-accessible
+  STATUS          current
+  DESCRIPTION     
+    "Table that contains sfp port information/configuration."
+  ::= { sfp 3 }
+
+  sfpDiagnosticEntry      OBJECT-TYPE
+    SYNTAX          SfpDiagnosticEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+      "A list of information for each context."
+    INDEX   { sfpDiagnosticIndex }
+    ::= { sfpDiagnosticTable 1 }
+
+  SfpDiagnosticEntry ::=
+    SEQUENCE    {
+      sfpDiagnosticIndex          	Integer32,
+      sfpDiagnosticLocation         OCTET STRING,
+      sfpDiagnosticCalibration      OCTET STRING,
+      sfpDiagnosticTemperature      OCTET STRING,
+      sfpDiagnosticVoltageV         OCTET STRING,
+      sfpDiagnosticTxBiasMA         OCTET STRING,
+      sfpDiagnosticTxPowerDbm       OCTET STRING,
+      sfpDiagnosticRxPowerDbm       OCTET STRING
+    }
+
+    sfpDiagnosticIndex          OBJECT-TYPE
+      SYNTAX          Integer32 (1..12)
+      MAX-ACCESS      read-only
+      STATUS          current
+      DESCRIPTION
+        "The index of sfpDiagnosticTable. "
+      ::= { sfpDiagnosticEntry 1 }
+
+    sfpDiagnosticLocation   OBJECT-TYPE
+      SYNTAX          OCTET STRING(SIZE(1..32))
+      MAX-ACCESS      read-only
+      STATUS          current
+      DESCRIPTION
+        "The Location of the sfp Diagnostic."
+      ::= { sfpDiagnosticEntry 2 }
+      
+    sfpDiagnosticCalibration        OBJECT-TYPE
+      SYNTAX          OCTET STRING(SIZE(1..32))
+      MAX-ACCESS      read-only
+      STATUS          current
+      DESCRIPTION
+        "The Calibration of the sfp Diagnostic."
+      ::= { sfpDiagnosticEntry 3 }
+      
+    sfpDiagnosticTemperature        OBJECT-TYPE 
+      SYNTAX          OCTET STRING (SIZE (0..24))  
+      MAX-ACCESS      read-only
+      STATUS          current
+      DESCRIPTION
+        "The Temperature Celsius of the sfp Diagnostic."
+      ::= { sfpDiagnosticEntry 4 }
+
+    sfpDiagnosticVoltageV           OBJECT-TYPE 
+      SYNTAX          OCTET STRING (SIZE (0..24))  
+      MAX-ACCESS      read-only
+      STATUS          current
+      DESCRIPTION
+        "The Voltage V of the sfp Diagnostic."
+      ::= { sfpDiagnosticEntry 5 }
+      
+    sfpDiagnosticTxBiasMA           OBJECT-TYPE 
+      SYNTAX          OCTET STRING (SIZE (0..24))  
+      MAX-ACCESS      read-only
+      STATUS          current
+      DESCRIPTION
+        "The Tx Bias mA of the sfp Diagnostic."
+      ::= { sfpDiagnosticEntry 6 }
+
+    sfpDiagnosticTxPowerDbm         OBJECT-TYPE
+      SYNTAX          OCTET STRING (SIZE (0..24)) 
+      MAX-ACCESS      read-only
+      STATUS          current
+      DESCRIPTION
+        "The Tx Power Dbm of the sfp Diagnostic."
+      ::= { sfpDiagnosticEntry 7 }
+
+    sfpDiagnosticRxPowerDbm         OBJECT-TYPE
+      SYNTAX          OCTET STRING (SIZE (0..24)) 
+      MAX-ACCESS      read-only
+      STATUS          current
+      DESCRIPTION
+        "The Rx Power Dbm of the sfp Diagnostic."
+      ::= { sfpDiagnosticEntry 8 }
+
+
+-- =============================================================
+-- pManagement:configManagement:mainSystem:sfp:sfpStatusTable ==
+-- =============================================================
+sfpStatusTable      OBJECT-TYPE
+  SYNTAX          	SEQUENCE OF SfpStatusEntry
+  MAX-ACCESS      	not-accessible
+  STATUS          	current
+  DESCRIPTION     
+    "Table that contains sfp port information/configuration."
+  ::= { sfp 4 }
+
+	sfpStatusEntry      OBJECT-TYPE
+    SYNTAX          	SfpStatusEntry
+    MAX-ACCESS      	not-accessible
+    STATUS          	current
+    DESCRIPTION
+      "A list of information for each context."
+    INDEX   { sfpStatusIndex }
+    ::= { sfpStatusTable 1 }
+
+  SfpStatusEntry ::=
+    SEQUENCE    {
+        sfpStatusIndex          	Integer32,
+        sfpStatusLocation         OCTET STRING,
+        sfpStatusEqStatus	        INTEGER,
+        sfpStatusRxStatus	        OCTET STRING,
+        sfpStatusTxStatus         OCTET STRING
+    }
+
+    sfpStatusIndex          OBJECT-TYPE
+      SYNTAX          Integer32 (1..12)
+      MAX-ACCESS      read-only
+      STATUS          current
+      DESCRIPTION
+        "The index of sfpStatusTable. "
+      ::= { sfpStatusEntry 1 }
+
+    sfpStatusLocation   	OBJECT-TYPE
+      SYNTAX          OCTET STRING(SIZE(1..32))
+      MAX-ACCESS      read-only
+      STATUS          current
+      DESCRIPTION
+        "The Location of the sfp Status."
+      ::= { sfpStatusEntry 2 }
+      
+    sfpStatusEqStatus	    OBJECT-TYPE
+      SYNTAX          INTEGER { equipped(1), unEquipped(2) }
+      MAX-ACCESS      read-only
+      STATUS          current
+      DESCRIPTION
+        "The Equipped of the sfp Status."
+      ::= { sfpStatusEntry 3 }
+      
+    sfpStatusRxStatus       OBJECT-TYPE 
+      SYNTAX          OCTET STRING(SIZE(1..32))
+      MAX-ACCESS      read-only
+      STATUS          current
+      DESCRIPTION
+        "The Rx Status of the sfp Status."
+      ::= { sfpStatusEntry 4 }
+
+    sfpStatusTxStatus       OBJECT-TYPE 
+      SYNTAX          OCTET STRING(SIZE(1..32))
+      MAX-ACCESS      read-only
+      STATUS          current
+      DESCRIPTION
+        "The Tx Status of the sfp Status."
+      ::= { sfpStatusEntry 5 }
+
+
+END

@@ -3,39 +3,22 @@
         "discovery": {
             "devices": [
                 {
-                    "sysName": "<private>",
-                    "sysObjectID": ".1.3.6.1.4.1.17095",
-                    "sysDescr": "Temperature & Sensor Gateway",
-                    "sysContact": null,
-                    "version": null,
-                    "hardware": null,
-                    "features": null,
-                    "location": null,
-                    "os": "serverscheck",
-                    "type": "network",
-                    "serial": null,
-                    "icon": "serverscheck.svg"
-                }
-            ]
-        },
-        "poller": {
-            "devices": [
-                {
-                    "sysName": "<private>",
+                    "sysName": "sensor gateway: sc-ts01",
                     "sysObjectID": ".1.3.6.1.4.1.17095",
                     "sysDescr": "Temperature & Sensor Gateway",
                     "sysContact": "<private>",
                     "version": null,
-                    "hardware": null,
+                    "hardware": "SC-TS01",
                     "features": null,
-                    "location": "<private>",
                     "os": "serverscheck",
-                    "type": "network",
+                    "type": "environment",
                     "serial": null,
-                    "icon": "serverscheck.svg"
+                    "icon": "serverscheck.svg",
+                    "location": "<private>"
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     },
     "sensors": {
         "discovery": {

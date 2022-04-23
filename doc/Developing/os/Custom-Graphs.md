@@ -1,6 +1,3 @@
-source: Developing/os/Custom-Graphs.md
-path: blob/master/doc/
-
 First we define our graphs in `includes/definitions.inc.php` to share
 our work and contribute in the development of LibreNMS. :-) (or place
 in `config.php` if you don't plan to contribute)
@@ -43,7 +40,7 @@ if (is_numeric($users)) {
 
     $tags = compact('rrd_def');
     data_update($device, 'pulse_users', $tags, $fields);
-    $graphs['pulse_users'] = true;
+    $os->enableGraph('pulse_users');
 }
 
 $sessions = snmp_get($device, 'iveConcurrentUsers.0', '-OQv', 'PULSESECURE-PSG-MIB');
@@ -57,7 +54,7 @@ if (is_numeric($sessions)) {
 
     $tags = compact('rrd_def');
     data_update($device, 'pulse_sessions', $tags, $fields);
-    $graphs['pulse_sessions'] = true;
+    $os->enableGraph('pulse_sessions');
 }
 ```
 
@@ -75,7 +72,7 @@ includes/html/graphs/device/pulse_sessions.inc.php
 ```php
 <?php
 
-$rrd_filename = rrd_name($device['hostname'], 'pulse_sessions');
+$rrd_filename = Rrd::name($device['hostname'], 'pulse_sessions');
 
 require 'includes/graphs/common.inc.php';
 
@@ -103,7 +100,7 @@ includes/html/graphs/device/pulse_users.inc.php
 ```php
 <?php
 
-$rrd_filename = rrd_name($device['hostname'], 'pulse_users');
+$rrd_filename = Rrd::name($device['hostname'], 'pulse_users');
 
 require 'includes/html/graphs/common.inc.php';
 

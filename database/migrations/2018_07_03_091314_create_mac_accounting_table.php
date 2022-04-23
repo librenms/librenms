@@ -5,7 +5,6 @@ use Illuminate\Database\Schema\Blueprint;
 
 class CreateMacAccountingTable extends Migration
 {
-
     /**
      * Run the migrations.
      *
@@ -15,7 +14,7 @@ class CreateMacAccountingTable extends Migration
     {
         Schema::create('mac_accounting', function (Blueprint $table) {
             $table->increments('ma_id');
-            $table->unsignedInteger('port_id')->index('interface_id_2');
+            $table->unsignedInteger('port_id')->index();
             $table->string('mac', 32);
             $table->string('in_oid', 128);
             $table->string('out_oid', 128);
@@ -40,7 +39,6 @@ class CreateMacAccountingTable extends Migration
             $table->unsignedInteger('poll_time')->nullable();
             $table->unsignedInteger('poll_prev')->nullable();
             $table->unsignedInteger('poll_period')->nullable();
-            $table->index('port_id', 'interface_id');
         });
     }
 

@@ -1,6 +1,6 @@
 <?php
 
-$rrd_filename = rrd_name($device['hostname'], 'topvision_cmtotal');
+$rrd_filename = Rrd::name($device['hostname'], 'topvision_cmtotal');
 
 $ds = 'cmtotal';
 

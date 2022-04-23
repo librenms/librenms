@@ -2,26 +2,26 @@
 
 print_optionbar_start();
 
-$link_array = array(
+$link_array = [
     'page'   => 'device',
     'device' => $device['device_id'],
-    'tab'    => 'nfsen',
-    );
+    'tab'    => 'netflow',
+];
 
-echo generate_link('General', $link_array, array('nfsen' => 'general'));
+echo generate_link('General', $link_array, ['nfsen' => 'general']);
 echo '|';
-echo generate_link('Stats', $link_array, array('nfsen' => 'stats'));
+echo generate_link('Stats', $link_array, ['nfsen' => 'stats']);
 
 $printedChannel = false;
 $nfsen_hostname = nfsen_hostname($device['hostname']);
 foreach (\LibreNMS\Config::get('nfsen_rrds') as $nfsenDir) {
-    $hostDir = $nfsenDir.'/'.$nfsen_hostname.'/';
+    $hostDir = $nfsenDir . '/' . $nfsen_hostname . '/';
     if (is_dir($hostDir)) {
-        $nfsenRRDchannelGlob = $hostDir.'*.rrd';
+        $nfsenRRDchannelGlob = $hostDir . '*.rrd';
         foreach (glob($nfsenRRDchannelGlob) as $nfsenRRD) {
-            $channel = str_replace(array($hostDir, '.rrd'), '', $nfsenRRD);
+            $channel = str_replace([$hostDir, '.rrd'], '', $nfsenRRD);
 
-            if (!$printedChannel) {
+            if (! $printedChannel) {
                 echo '|Channels:';
                 $printedChannel = true;
             } else {
@@ -29,22 +29,22 @@ foreach (\LibreNMS\Config::get('nfsen_rrds') as $nfsenDir) {
             }
 
             if ($vars['channel'] == $channel) {
-                $channelFilter = $hostDir.$channel.'-filter.txt';
+                $channelFilter = $hostDir . $channel . '-filter.txt';
             }
 
-            echo generate_link($channel, $link_array, array('nfsen' => 'channel', 'channel' => $channel));
+            echo generate_link($channel, $link_array, ['nfsen' => 'channel', 'channel' => $channel]);
         }
     }
 }
 
 print_optionbar_end();
 
-if (!$vars['nfsen']) {
+if (! $vars['nfsen']) {
     $vars['nfsen'] = 'general';
 }
 
-if (is_file('includes/html/pages/device/nfsen/'.mres($vars['nfsen']).'.inc.php')) {
-    include 'includes/html/pages/device/nfsen/'.mres($vars['nfsen']).'.inc.php';
+if (is_file('includes/html/pages/device/nfsen/' . $vars['nfsen'] . '.inc.php')) {
+    include 'includes/html/pages/device/nfsen/' . $vars['nfsen'] . '.inc.php';
 } else {
     include 'includes/html/pages/device/nfsen/general.inc.php';
 }

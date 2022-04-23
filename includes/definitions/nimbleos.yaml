@@ -5,8 +5,8 @@ icon: nimble
 over:
     - { graph: device_bits, text: 'Device Traffic' }
     - { graph: device_storage, text: 'Storage Usage' }
-mib_dir:
-    - nimble
+mib_dir: nimble
 discovery:
-    - sysDescr:
-        -  'Nimble Storage'
+    -
+        sysDescr:
+            - 'Nimble Storage'

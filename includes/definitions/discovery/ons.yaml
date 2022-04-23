@@ -3,8 +3,9 @@ modules:
     sensors:
         pre-cache:
             data:
-                - oid:
-                    - entPhysicalDescr
+                -
+                    oid:
+                        - entPhysicalDescr
         voltage:
             data:
                 -

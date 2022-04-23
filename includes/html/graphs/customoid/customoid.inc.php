@@ -1,6 +1,6 @@
 <?php
 
-$rrd_filename = rrd_name($device['hostname'], array($type, $subtype));
+$rrd_filename = Rrd::name($device['hostname'], [$type, $subtype]);
 
 require 'includes/html/graphs/common.inc.php';
 
@@ -8,7 +8,7 @@ $scale_min = 0;
 $graph_max = 1;
 $unit_text = $unit;
 
-$ds        = 'oid_value';
+$ds = 'oid_value';
 
 $colour_area = '9999cc';
 $colour_line = '0000cc';

@@ -1,0 +1,90 @@
+mib: SSU2000-MIB:DATUM-MIB
+modules:
+    os:
+       hardware: 
+           - SSU2000-MIB::inName.1.2
+           - SSU2000-MIB::inHwPart.1.2
+       hardware_template: '{{ SSU2000-MIB::inName.1.2 }} Module {{ SSU2000-MIB::inHwPart.1.2 }}'
+       serial: SSU2000-MIB::inSerial.1.2
+       version: SSU2000-MIB::inSwPart.1.2
+       features: SSU2000-MIB::inFeature.1
+       features_template: 'NTP {{ SSU2000-MIB::inFeature.1 }}'
+    sensors:
+       pre-cache:
+            data:
+                -
+                    oid:
+                        - staPtPtpTable
+                        - staPtNtpTable
+                        - staGpsTable
+                        - staClkTable
+       state:
+            data:
+                -
+                    oid: staPtPtpTable
+                    num_oid: '.1.3.6.1.4.1.601.3.1.1.2.16.1.1.3.{{ $index }}'
+                    value: staPtPtpStatus
+                    descr: 'PTP Status - Chassis.Slot# {{ $index }}'
+                    states:
+                        - { descr: normal, graph: 0, value: 1, generic: 0 }
+                        - { descr: disabled, graph: 0, value: 3, generic: 1 }
+                        - { descr: fault, graph: 0, value: 4, generic: 2 }
+                        - { descr: reject, graph: 0, value: 5, generic: 1 }
+                -
+                    oid: staPtNtpTable
+                    num_oid: '.1.3.6.1.4.1.601.3.1.1.2.15.1.1.3.{{ $index }}'
+                    value: staPtNtpStatus
+                    descr: 'NTP Status - Chassis.Slot# {{ $index }}'
+                    states:
+                        - { descr: normal, graph: 0, value: 1, generic: 0 }
+                        - { descr: disabled, graph: 0, value: 3, generic: 1 }
+                        - { descr: fault, graph: 0, value: 4, generic: 2 }
+                        - { descr: reject, graph: 0, value: 5, generic: 1 }
+                -
+                    oid: staGpsTable
+                    num_oid: '.1.3.6.1.4.1.601.3.1.1.2.5.1.1.3.{{ $index }}'
+                    value: staGpsStatus
+                    descr: 'GPS Status - Chassis.Slot# {{ $index }}'
+                    states:
+                        - { descr: normal, graph: 0, value: 1, generic: 0 }
+                        - { descr: selected, graph: 0, value: 2, generic: 0 }
+                        - { descr: disabled, graph: 0, value: 3, generic: 1 }
+                        - { descr: fault, graph: 0, value: 4, generic: 2 }
+                        - { descr: reject, graph: 0, value: 5, generic: 1 }
+                -
+                    oid: staClkTable
+                    num_oid: '.1.3.6.1.4.1.601.3.1.1.2.2.1.1.3.{{ $index }}'
+                    value: staCkStatus
+                    descr: 'Clock Status - Chassis.Slot# {{ $index }}'
+                    states:
+                        - { descr: normal, graph: 0, value: 1, generic: 0 }
+                        - { descr: selected, graph: 0, value: 2, generic: 0 }
+                        - { descr: disabled, graph: 0, value: 3, generic: 1 }
+                        - { descr: fault, graph: 0, value: 4, generic: 2 }
+                -
+                    oid: staClkTable
+                    num_oid: '.1.3.6.1.4.1.601.3.1.1.2.2.1.1.4.{{ $index }}'
+                    value: staCkPLLMode
+                    descr: 'PLL Mode - Chassis.Slot# {{ $index }}'
+                    states:
+                        - { descr: failed, graph: 0, value: 1, generic: 2 }
+                        - { descr: warmup, graph: 0, value: 2, generic: 1 }
+                        - { descr: acquire, graph: 0, value: 3, generic: 1 }
+                        - { descr: holdover, graph: 0, value: 4, generic: 1 }
+                        - { descr: lock, graph: 0, value: 5, generic: 0 }
+       delay:
+            data:
+                -
+                    oid: staGpsTable
+                    num_oid: '.1.3.6.1.4.1.601.3.1.1.2.5.1.1.4.{{ $index }}'
+                    value: staGpsPhaseA
+                    index: 'staGpsPhaseA.{{ $index }}'
+                    descr: 'GPS Phase A - Chassis.Slot# {{ $index }}'
+                    divisor: 1000000000
+                -
+                    oid: staGpsTable
+                    num_oid: '.1.3.6.1.4.1.601.3.1.1.2.5.1.1.5.{{ $index }}'
+                    value: staGpsPhaseB
+                    index: 'staGpsPhaseB.{{ $index }}'
+                    descr: 'GPS Phase B - Chassis.Slot# {{ $index }}'
+                    divisor: 1000000000

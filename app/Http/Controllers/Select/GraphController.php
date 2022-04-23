@@ -15,10 +15,10 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
+ *
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -29,6 +29,7 @@ use App\Http\Controllers\Controller;
 use App\Models\Device;
 use Illuminate\Http\Request;
 use Illuminate\Support\Collection;
+use Illuminate\Support\Str;
 use LibreNMS\Util\Graph;
 use LibreNMS\Util\StringHelpers;
 
@@ -58,7 +59,7 @@ class GraphController extends Controller
                     'text' => StringHelpers::niceCase($type),
                     'children' => $graphs->map(function ($graph) use ($type) {
                         return $this->formatGraph($type, $graph);
-                    })->values()
+                    })->values(),
                 ];
             }
         }
@@ -68,46 +69,46 @@ class GraphController extends Controller
             'peering' => 'Peering',
             'core' => 'Core',
             'custom' => 'Custom',
-            'ports' => 'Manual Ports'
+            'ports' => 'Manual Ports',
         ]), 'aggregators', $search);
         if ($aggregators->isNotEmpty()) {
             $data[] = [
                 'text' => 'Aggregators',
                 'children' => $aggregators->map(function ($text, $id) {
                     return compact('id', 'text');
-                })->values()
+                })->values(),
             ];
         }
 
         $billing = $this->filterTypeGraphs(collect([
-            'bill_bits' => 'Bill Bits'
+            'bill_bits' => 'Bill Bits',
         ]), 'bill', $search);
         if ($billing->isNotEmpty()) {
             $data[] = [
                 'text' => 'Bill',
                 'children' => $billing->map(function ($text, $id) {
                     return compact('id', 'text');
-                })->values()
+                })->values(),
             ];
         }
 
         return response()->json([
             'results' => $data,
-            'pagination' => ['more' => false]
+            'pagination' => ['more' => false],
         ]);
     }
 
     private function formatGraph($top, $graph)
     {
         $text = $graph;
-        if (str_contains('_', $graph)) {
-            list($type, $subtype) = explode('_', $graph, 2);
+        if (Str::contains('_', $graph)) {
+            [$type, $subtype] = explode('_', $graph, 2);
         } else {
             $type = $graph;
             $subtype = '';
         }
 
-        if (!Graph::isMibGraph($type, $subtype)) {
+        if (! Graph::isMibGraph($type, $subtype)) {
             $text = ucwords($top . ' ' . str_replace(['_', '-'], ' ', $text));
         }
 
@@ -118,9 +119,9 @@ class GraphController extends Controller
     }
 
     /**
-     * @param Collection $graphs
-     * @param string $type
-     * @param string $search
+     * @param  Collection  $graphs
+     * @param  string  $type
+     * @param  string  $search
      * @return Collection
      */
     private function filterTypeGraphs($graphs, $type, $search)
@@ -131,18 +132,18 @@ class GraphController extends Controller
             $terms = preg_split('/[ _-]/', $search, 2);
             $first = array_shift($terms);
 
-            if (str_contains($type, $first)) {
+            if (Str::contains($type, $first)) {
                 // search matches type, show all unless there are more terms.
-                if (!empty($terms)) {
+                if (! empty($terms)) {
                     $sub_search = array_shift($terms);
                     $graphs = $graphs->filter(function ($graph) use ($sub_search) {
-                        return str_contains(strtolower($graph), $sub_search);
+                        return Str::contains(strtolower($graph), $sub_search);
                     });
                 }
             } else {
                 // if the type matches, don't filter the sub values
                 $graphs = $graphs->filter(function ($graph) use ($search) {
-                    return str_contains(strtolower($graph), $search);
+                    return Str::contains(strtolower($graph), $search);
                 });
             }
         }

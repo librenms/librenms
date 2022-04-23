@@ -1,0 +1,461 @@
+
+OCCAM-SHELF-MIB	DEFINITIONS ::= BEGIN
+	IMPORTS
+		occamGenericHardwareModules
+			FROM OCCAM-REG-MODULE
+		TEXTUAL-CONVENTION, TruthValue, DisplayString
+			FROM SNMPv2-TC
+		MODULE-COMPLIANCE, OBJECT-GROUP
+			FROM SNMPv2-CONF
+		OBJECT-IDENTITY, MODULE-IDENTITY, OBJECT-TYPE, 
+		NOTIFICATION-TYPE, Integer32, enterprises, private, internet, 
+		IpAddress, TimeTicks
+			FROM SNMPv2-SMI;
+
+	occamShelfMib	MODULE-IDENTITY
+		LAST-UPDATED	"200104271051Z"
+		ORGANIZATION	"Occam Networks"
+		CONTACT-INFO	"email support@occamnetworks.com"
+		DESCRIPTION	"The mib module to describe a shelf."
+			
+		REVISION	"200104271051Z"
+		DESCRIPTION	"Reformatted certain text"
+
+
+		REVISION	"200702220000Z"
+		DESCRIPTION	"Removed DISPLAY-HINT"
+		
+		
+		::=  {  occamGenericHardwareModules  3  }
+
+-- TEXTUAL-CONVENTIONS --
+	ValidValue ::= TEXTUAL-CONVENTION 
+		STATUS			current
+		DESCRIPTION
+			"A validity value."
+		SYNTAX 			INTEGER  { valid ( 1 ) ,
+						 not-valid ( 2 ) 
+} 
+
+	ShelfControllerRoleValue ::= TEXTUAL-CONVENTION 
+		STATUS			current
+		DESCRIPTION
+			"A shelf controller role value."
+		SYNTAX 			INTEGER  { primary ( 1 ) ,
+						 secondary ( 2 ) } 
+
+	ShelfSlotIndexValue ::= TEXTUAL-CONVENTION 
+		STATUS			current
+		DESCRIPTION
+			"A slot index value within a shelf."
+		SYNTAX 			Integer32  ( 1 .. 15  ) 
+
+	ShelfIndexValue ::= TEXTUAL-CONVENTION 
+		STATUS			current
+		DESCRIPTION
+			"A shelf index value within the network."
+		SYNTAX 			Integer32  ( 0 .. 4095  ) 
+
+	ShelfControllerPeerFoundStatusValue ::= TEXTUAL-CONVENTION 
+		STATUS			current
+		DESCRIPTION
+			"A peer found status value."
+		SYNTAX 			INTEGER  { peer-found ( 1 ) ,		
+						peer-not-found ( 2 ) } 
+
+	CardOperationalStatusValue ::= TEXTUAL-CONVENTION 
+		STATUS			current
+		DESCRIPTION
+			"A card operational status value."
+		SYNTAX 			INTEGER  { up ( 1 ) , down ( 2 ) } 
+
+	CardRoleValue ::= TEXTUAL-CONVENTION 
+		STATUS			current
+		DESCRIPTION
+			"A card role value."
+		SYNTAX 			INTEGER  { 
+                                        standalone ( 1 ),
+                                        card ( 2 ),
+                                        shelf-controller( 3 )
+                                        } 
+
+	SlotsInShelfValue ::= TEXTUAL-CONVENTION 
+		STATUS			current
+		DESCRIPTION
+			"The number of slots a shelf may have. 
+                        A 1RU has 1 slot. A 12RU has 12 slots."
+		SYNTAX 			Integer32  ( 1 .. 15  ) 
+
+	CardPresenceStatusValue ::= TEXTUAL-CONVENTION 
+		STATUS			current
+		DESCRIPTION
+			"A card presence status value."
+		SYNTAX 			INTEGER  { inserted ( 1 ) ,
+						 removed ( 2 ) } 
+
+	ShelfControllerRedundancyStateValue ::= TEXTUAL-CONVENTION 
+		STATUS			current
+		DESCRIPTION
+			"A shelf controller redundancy role value."
+		SYNTAX 			INTEGER  { active ( 1 ) ,
+						 standby ( 2 ) } 
+
+	ShelfRedundancyStatusValue ::= TEXTUAL-CONVENTION 
+		STATUS			current
+		DESCRIPTION
+			"A shelf redundancy status value."
+		SYNTAX 			INTEGER  { redundant ( 1 ) , 
+						not-redundant ( 2 ) } 
+
+
+	shelfMibObjects	OBJECT IDENTIFIER
+		::=  {  occamShelfMib  1  }
+
+	shelfMibTraps	OBJECT IDENTIFIER
+		::=  {  occamShelfMib  2  }
+
+	cardIpAddress	OBJECT-TYPE	
+		SYNTAX			IpAddress
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+			"This object contains the Ip Address of the card."
+		::=  {  shelfMibObjects  1  }
+
+	cardShelfIndex	OBJECT-TYPE	
+		SYNTAX			ShelfIndexValue
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+			"This object contains the Shelf Index of the card."
+		::=  {  shelfMibObjects  2  }
+
+	cardSlotIndex	OBJECT-TYPE	
+		SYNTAX			ShelfSlotIndexValue
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+			"This object contains the slot index of the card
+                        within the shelf."
+		::=  {  shelfMibObjects  3  }
+
+	cardShelfSlots	OBJECT-TYPE	
+		SYNTAX			SlotsInShelfValue
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+			"Indicates the number of slots in the shelf this 
+                        card is inserted into."
+		::=  {  shelfMibObjects  4  }
+
+	cardRole	OBJECT-TYPE	
+		SYNTAX			CardRoleValue
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+			"Indicates the card shelf role."
+		::=  {  shelfMibObjects  5  }
+
+	shelfControllerPeerIpAddress	OBJECT-TYPE	
+		SYNTAX			IpAddress
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+			"This object contains the Ip Address of this 
+                        shelf controller's peer."
+		::=  {  shelfMibObjects  6  }
+
+	shelfControllerPeerFoundStatus	OBJECT-TYPE	
+		SYNTAX			ShelfControllerPeerFoundStatusValue
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+			"This object indicates if a shelf controller 
+                        peer has been found."
+		::=  {  shelfMibObjects  7  }
+
+	shelfControllerRole	OBJECT-TYPE	
+		SYNTAX			ShelfControllerRoleValue
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+			"Indicates the role of the shelf controller."
+		::=  {  shelfMibObjects  8  }
+
+	shelfControllerRedundancyState	OBJECT-TYPE	
+		SYNTAX			ShelfControllerRedundancyStateValue
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+			"Indicates the redundancy state of the shelf 
+                        controller."
+		::=  {  shelfMibObjects  9  }
+
+	shelfClusterIpAddress	OBJECT-TYPE	
+		SYNTAX			IpAddress
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+			"This object contains the cluster Ip Address of
+                        the shelf."
+		::=  {  shelfMibObjects  10  }
+
+	shelfRedundancyStatus	OBJECT-TYPE	
+		SYNTAX			ShelfRedundancyStatusValue
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+			"Indicates the redundancy status of the shelf."
+		::=  {  shelfMibObjects  11  }
+
+	blcConfigChangeString	OBJECT-TYPE	
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+			"Indicates area(s) of a config change on a BLC."
+		::=  {  shelfMibObjects  12  }
+
+	shelfSlotTable	OBJECT-TYPE
+		SYNTAX		SEQUENCE  OF  ShelfSlotEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+			"A table of information about 
+                        the BLC cards configured in a shelf system 
+                        and managed by a shelf controller.  The number of 
+                        entries depends on how blades are configured 
+                        in the shelf."
+		::=  { shelfMibObjects  13 }
+
+	shelfSlotEntry	OBJECT-TYPE
+		SYNTAX		ShelfSlotEntry
+		MAX-ACCESS	not-accessible
+		STATUS		current
+		DESCRIPTION
+			"An entry in the ShelfSlotTable. A row in this 
+                        table cannot be created or deleted by SNMP 
+                        operations on columns of the table."
+		INDEX		{  shelfSlotIndex  }
+		::=  { shelfSlotTable 1 }
+
+	ShelfSlotEntry  ::=  SEQUENCE {
+		shelfSlotIndex  ShelfSlotIndexValue,
+		shelfCardIpAddress  IpAddress,
+		shelfCardPresenceStatus  CardPresenceStatusValue,
+		shelfCardOperationalStatus  CardOperationalStatusValue,
+		shelfSlotRowStatus  ValidValue
+		}
+
+
+	shelfSlotIndex	OBJECT-TYPE	
+		SYNTAX			ShelfSlotIndexValue
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+			"The index of this slot in the shelf."
+		::=  {  shelfSlotEntry  1  }
+
+
+	shelfCardIpAddress	OBJECT-TYPE	
+		SYNTAX			IpAddress
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+			"The ip address of this card in the shelf."
+		::=  {  shelfSlotEntry  2  }
+
+
+	shelfCardPresenceStatus	OBJECT-TYPE	
+		SYNTAX			CardPresenceStatusValue
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+			"Indicates if a card is inserted in this slot."
+		::=  {  shelfSlotEntry  3  }
+
+
+	shelfCardOperationalStatus	OBJECT-TYPE	
+		SYNTAX			CardOperationalStatusValue
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+			"Indicates if the card is inserted in this slot 
+                        is operational."
+		::=  {  shelfSlotEntry  4  }
+
+
+	shelfSlotRowStatus	OBJECT-TYPE	
+		SYNTAX			ValidValue
+		MAX-ACCESS		read-only
+		STATUS			current
+		DESCRIPTION
+			"Indicates if this row of the card table is valid."
+		::=  {  shelfSlotEntry  5  }
+
+	resyncTrigger	OBJECT-TYPE	
+		SYNTAX			TimeTicks
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+			"A read of this object will trigger a resync of 
+                        past notifications to all hosts.  A write of a 
+                        timetick to this object will trigger a resync
+                        of past notifications newer than this timetick
+                        only to the requesting host.
+			 
+                        NOTE: The resync'd notifications will have an extra
+                        varbind attached that indicates that this 
+			is a resync notification. The extra varbind also 
+                        gives a count of which notification out of the total
+                        notifications is being sent. 
+
+		        The format for the extra varbind is:
+			<this trap count>:<total traps to be 
+resync'd:resync=true
+			"
+		::=  {  shelfMibObjects  14  }
+		
+        resyncTriggerAll	        OBJECT-TYPE	
+		SYNTAX			TimeTicks
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+			"A read of this object will trigger a resync of all 
+                        past notifications to the requesting host.
+			A write of a timetick to this object will trigger a
+                        resync of all past notifications newer than this 
+                        timetick to the requesting host.
+			 
+			NOTE: The resync'd notifications will have an extra
+                        varbind attached that indicates that this is a resync
+                        notification. The extra varbind also gives a count of
+                        which notification out of the total notifications is 
+                        being sent. 
+
+			The format for the extra varbind is:
+			<this trap count>:<total traps to be 
+resync'd:resync=true
+			"
+		::=  {  shelfMibObjects  15  }
+
+	resyncActiveAlarms		OBJECT-TYPE	
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+			"A read of this value will return a dummy value.
+			A write of this object(any value) will send the
+                        active alarms to the requesting host.
+
+			NOTE: The resync'd notifications will have an extra
+                        varbind attached that indicates that this is a resync
+                        notification. The extra varbind also gives a count of
+                        which notification out of the total notifications
+                        is being sent. 
+
+			The format for the extra varbind is:
+			<this trap count>:<total traps to be 
+resynced:resync=true>"
+		::=  {  shelfMibObjects  16  }
+
+	resyncEvents	OBJECT-TYPE	
+		SYNTAX			DisplayString
+		MAX-ACCESS		read-write
+		STATUS			current
+		DESCRIPTION
+			"A read of this value will return a dummy value.
+			A write of this object will send events to the 
+			requesting host. The format of the variable is the	
+			following: 
+			0 will resync all the stored events (a 100 of them).
+			x will resync all the events with a sequence number 
+                                superior to the host
+			x_y will resync all the events between x and y.
+
+		        NOTE: The resync'd notifications will have an extra
+                        varbind attached that indicates that this is a resync
+                        notification. The extra varbind also gives A count 
+                        of which notification out of the total notifications
+                        is being sent.
+
+		        The format for the extra varbind is:
+			<this trap count>:<total traps to be 
+			resynced:resync=true>"
+		::=  {  shelfMibObjects  17  }
+			
+
+	cardPresenceNotification	NOTIFICATION-TYPE
+		OBJECTS			{ cardIpAddress, cardShelfIndex,
+                                        cardSlotIndex,shelfCardPresenceStatus  }
+		STATUS			current
+		DESCRIPTION
+			"This trap is sent when the card presence status 
+			changes."
+		::=  {  shelfMibTraps  1  }
+
+	cardOperationalNotification	NOTIFICATION-TYPE
+		OBJECTS			{ cardIpAddress, cardShelfIndex,
+                                        cardSlotIndex,				
+					shelfCardOperationalStatus  }
+		STATUS			current
+		DESCRIPTION
+			"This trap is sent when the card operational status	
+			changes."
+		::=  {  shelfMibTraps  2  }
+
+	shelfControllerFailoverNotification	NOTIFICATION-TYPE
+		OBJECTS			{ cardIpAddress, cardShelfIndex, 
+                                        cardSlotIndex,				
+					shelfControllerPeerIpAddress,
+                                        shelfControllerRole,
+                                        shelfControllerRedundancyState  }
+		STATUS			current
+		DESCRIPTION
+			"This trap is sent when a shelf failover occurs."
+		::=  {  shelfMibTraps  3  }
+
+	shelfControllerForcedFailoverNotification	NOTIFICATION-TYPE
+		OBJECTS			{ cardIpAddress, cardShelfIndex,
+                                        cardSlotIndex, 
+					shelfControllerPeerIpAddress,
+                                        shelfControllerRole,
+                                        shelfControllerRedundancyState  }
+		STATUS			current
+		DESCRIPTION
+			"This trap is sent when a forced shelf failover occurs."
+		::=  {  shelfMibTraps  4  }
+
+	peerFoundNotification	NOTIFICATION-TYPE
+		OBJECTS			{ cardIpAddress, cardShelfIndex,
+                                        cardSlotIndex, 
+					shelfControllerPeerIpAddress,
+                                        shelfControllerRole,
+                                        shelfControllerRedundancyState,
+                                        shelfControllerPeerFoundStatus  }
+		STATUS			current
+		DESCRIPTION
+			"This trap is sent when the peerFound status changes."
+		::=  {  shelfMibTraps  5  }
+
+	configChangedNotification	NOTIFICATION-TYPE
+		OBJECTS			{ cardIpAddress, cardShelfIndex,
+                                        cardSlotIndex, blcConfigChangeString  }
+		STATUS			current
+		DESCRIPTION
+			"This trap is sent when a copy running to startup 
+			occurs."
+		::=  {  shelfMibTraps  6  }
+
+	shelfRedundancyChangeNotification	NOTIFICATION-TYPE
+		OBJECTS			{ cardIpAddress, cardShelfIndex,
+                                        cardSlotIndex, shelfControllerRole,
+                                        shelfControllerRedundancyState,
+                                        shelfRedundancyStatus  }
+		STATUS			current
+		DESCRIPTION
+			"This trap is sent when the shelf redundancy status 
+			changes."
+		::=  {  shelfMibTraps  7  }
+
+END

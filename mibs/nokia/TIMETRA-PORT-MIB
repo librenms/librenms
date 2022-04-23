@@ -338,6 +338,7 @@ TmnxPortClass                    ::= TEXTUAL-CONVENTION
         xlgige     (10),
         cgige      (11),
         vsme       (12),
+        reserved13 (13),
         vspeede    (14),
         serial     (17),
         wireless   (18),
@@ -345,7 +346,8 @@ TmnxPortClass                    ::= TEXTUAL-CONVENTION
         xxvgige    (20),
         cdgige     (21),
         reserved22 (22),
-        reserved23 (23)
+        reserved23 (23),
+        lgige      (24)
     }
 
 TmnxPortConnectorType            ::= TEXTUAL-CONVENTION
@@ -1209,14 +1211,18 @@ TmnxPortCompatMode               ::= TEXTUAL-CONVENTION
              interop2 - interface will operate in the third party interop mode
                         with alternate differential encoding
              interop3 - interface will operate in the CFP2-DCO Rev A0 Staircase
-                        FEC interop mode"
+                        FEC interop mode
+             longHaulNonDiff - interface will operate in the native long haul
+                        mode using non-differential encoding
+             "
     SYNTAX      INTEGER {
-        longHaul (0),
-        metro    (1),
-        access   (2),
-        interop  (3),
-        interop2 (4),
-        interop3 (5)
+        longHaul        (0),
+        metro           (1),
+        access          (2),
+        interop         (3),
+        interop2        (4),
+        interop3        (5),
+        longHaulNonDiff (6)
     }
 
 TmnxSFFStatus                    ::= TEXTUAL-CONVENTION
@@ -1267,8 +1273,8 @@ TmnxPortOptComplianceExtType     ::= TEXTUAL-CONVENTION
          the tmnxPortOpticalCompliance field of of a small form factor (SFF)
          that is inserted into the port"
     REFERENCE
-        "SFF Committee document SFF-8024 December 2, 2015
-         Revision 3.5 Section 4.4"
+        "SFF Committee document SFF-8024 February 14 2019
+         Revision 4.6 Section 4.4."
     SYNTAX      Unsigned32
 
 TmnxRS232ControlLead             ::= TEXTUAL-CONVENTION
@@ -2294,7 +2300,7 @@ tmnxPortComplianceV14v0          MODULE-COMPLIANCE
     ::= { tmnxPortCompliances 11 }
 
 tmnxPortComplianceV15v0          MODULE-COMPLIANCE
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The compliance statement for revision 15.0 of TIMETRA-PORT-MIB on the
          Nokia SROS series systems."
@@ -2434,6 +2440,114 @@ tmnxPortComplianceV19v0          MODULE-COMPLIANCE
             tmnxPortEtherPhysStatsV19v0Group
         }
     ::= { tmnxPortCompliances 14 }
+
+tmnxPortComplianceV20v0          MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for revision 20.0 of TIMETRA-PORT-MIB on the
+         Nokia SROS series systems."
+    MODULE
+        MANDATORY-GROUPS {
+            tmnxDS3V12v0Group,
+            tmnxPortGroupV7v0,
+            tmnxPortSonetV3v0Group,
+            tmnxPortTDMGroupV7v0,
+            tmnxPortTDME1GroupV6v1,
+            tmnxPortFRGroup,
+            tmnxQosAppObjsGroup,
+            tmnxPortTestGroup,
+            tmnxPortNotificationGroupV8v0,
+            tmnxPortNotificationGroupV9v4,
+            tmnxPortIngrMdaQosStatR2r1Group,
+            tmnxPortATMGroupV7v0,
+            tmnxPortStatsR2r1Group,
+            tmnxCiscoHDLCGroup,
+            tmnxScalarPortV3v0Group,
+            tmnxScalarPortV11v0Group,
+            tmnxMlBundleGroupV6v0,
+            tmnxMlImaBundleGroup,
+            tmnxPortEthernetV7v0Group,
+            tmnxPortEthernetV10v0Group,
+            tmnxPortCemGroupV6v0,
+            tmnxMcMlpppBundleGroup,
+            tmnxMlpppBundleGroup,
+            tmnxHsmdaGroupV10v0,
+            tmnxDigitalDiagMonitorGroup,
+            tmnxDDMLaneGroupV10v0,
+            tmnx7710PortTDMGroupV5v0,
+            tmnxPortQStatV7v0Group,
+            tmnxMcMfrBundleGroup,
+            tmnxFrIntfGroup,
+            tmnxFrf12IntfGroup,
+            tmnxWaveTrackerGroup,
+            tmnxPortDwdmGroup,
+            tmnxPortGroupV8v0,
+            tmnxPortCEMGroupV8v0,
+            tmnxPortSchedStatsGroup,
+            tmnxPortVPortV11v0Group,
+            tmnxPortVPortV12v0Group,
+            tmnxPortParentLocV12v0Group,
+            tmnxMlpppBundleGroupV7v0,
+            tmnxPortATMGroupV9v0,
+            tmnxPortEgrExpShaperV9v0Group,
+            tmnxPortObjAppV9v0Group,
+            tmnxOpticalPortGroupV9v0,
+            tmnxPortNotificationGroupV8v9,
+            tmnxPortEgrVPortStatsV9v0Group,
+            tmnxPortEtherV9v0Group,
+            tmnxPortNotificationV9v0Group,
+            tmnxPortV9v0Group,
+            tmnxPortNetEgrV10v0Group,
+            tmnxPortPlcyGroup,
+            tmnxPwPortV10v0Group,
+            tmnxPortLoadBalGroupV10v0,
+            tmnxPortEgrQGrpV11v0Group,
+            tmnxPortEtherPhysStatsGroup,
+            tmnxPortEtherSymMonGroupV12v0,
+            tmnxPrtEthSmMnNotifyObjsGrpV12v0,
+            tmnxPortEthSymMonNotifyGrpV12v0,
+            tmnxWaveTrackerV11v0Group,
+            tmnxPortEgrQGrpV11v0Group,
+            tmnxCohOptPortGroup,
+            tmnxCohOptPortStatsGroup,
+            tmnxPortNotificationV11v0Group,
+            tmnxPortEgrHsmdaStatV11v0Group,
+            tmnxPortEgrHsmdaOverV11v0Group,
+            tmnxPortEthernetV11v0Group,
+            tmnxPortEthernetV12v0Group,
+            tmnxCohOptPortV11v0Group,
+            tmnxDot1xPaePortGroup,
+            tmnxPortAggRateV12v0Group,
+            tmnxPortSchedPlcyV12v0Group,
+            tmnxSonetPortV12v0Group,
+            tmnxPortTopologyV13v0Group,
+            tmnxPortQueueOvrV13v0Group,
+            tmnxCohOptPortV12v0Group,
+            tmnxCohOptPortStatsV12v0Group,
+            tmnxPortSchedPlcyOvrV13v0Group,
+            tmnxPortAggRateLimitV13v0Group,
+            tmnxPortV13v0Group,
+            tmnxPortSchedV15v0Group,
+            tmnxPortQOverDropTailGroup,
+            tmnxPortEgrHsGroup,
+            tmnxPortEgrHsSchedGroup,
+            tmnxPortEgrHsSecShaperGroup,
+            tmnxPortEtherUtilStatGroup,
+            tmnxPortRateV15v0Group,
+            tmnxPortEtherRsFecModeGroup,
+            tmnxPortSchedBurstV15v0Group,
+            tmnxPortAccSchedOvrSV15v0Group,
+            tmnxPortEtherDampeningGroup,
+            tmnxPortEtherDampeningStatsGroup,
+            tmnxPortConnectorBreakoutGroup,
+            tmnxPwPortEthTypeV15v0Group,
+            tmnxRS232PortGroup,
+            tmnxRS232PortNotifyGroup,
+            tmnxPortVsrGroup,
+            tmnxPortTransceiverGroupV15v0,
+            tmnxNamedPoolGroupV20v0
+        }
+    ::= { tmnxPortCompliances 15 }
 
 tmnxPortGroups                   OBJECT IDENTIFIER ::= { tmnxPortConformance 2 }
 
@@ -3959,7 +4073,7 @@ tmnxNamedPoolGroupV6v0           OBJECT-GROUP
         tmnxPortIngPoolPercentRate,
         tmnxPortEgrPoolPercentRate
     }
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The group of objects supporting the Named Pool feature for revision
          6.0 on Nokia SROS series systems."
@@ -6648,6 +6762,30 @@ tmnxPortEtherPhysStatsV19v0Group OBJECT-GROUP
          systems."
     ::= { tmnxPortV19v0Groups 10 }
 
+tmnxPortV20v0Groups              OBJECT IDENTIFIER ::= { tmnxPortGroups 146 }
+
+tmnxNamedPoolGroupV20v0          OBJECT-GROUP
+    OBJECTS     {
+        tmnxPortIngPoolPercentRate,
+        tmnxPortEgrPoolPercentRate
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting the Named Pool feature for revision
+         20.0 on Nokia SROS series systems."
+    ::= { tmnxPortV20v0Groups 4 }
+
+tmnxPortV20v0ObsoleteGroup       OBJECT-GROUP
+    OBJECTS     {
+        tmnxPortIngNamedPoolPlcy,
+        tmnxPortEgrNamedPoolPlcy
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting the management of named-pool objects
+         obsoleted in release 20.0 on Nokia SROS series systems."
+    ::= { tmnxPortV20v0Groups 5 }
+
 tmnxPortDCCompliances            OBJECT IDENTIFIER ::= { tmnxPortConformance 3 }
 
 tmnxPortDCGroups                 OBJECT IDENTIFIER ::= { tmnxPortConformance 4 }
@@ -7313,7 +7451,6 @@ tmnxResvCbsPoolThreshGreen       NOTIFICATION-TYPE
         tmnxObjMdaId,
         tmnxObjAppType,
         tmnxObjAppPool,
-        tmnxObjNamedPoolPolicy,
         tmnxObjAppResvSize,
         tmnxObjAppSumOfQResvSize,
         tmnxObjAppResvCbsOld,
@@ -7339,7 +7476,6 @@ tmnxResvCbsPoolThreshAmber       NOTIFICATION-TYPE
         tmnxObjMdaId,
         tmnxObjAppType,
         tmnxObjAppPool,
-        tmnxObjNamedPoolPolicy,
         tmnxObjAppResvSize,
         tmnxObjAppSumOfQResvSize,
         tmnxObjAppResvCbsOld,
@@ -7366,7 +7502,6 @@ tmnxResvCbsPoolThreshRed         NOTIFICATION-TYPE
         tmnxObjMdaId,
         tmnxObjAppType,
         tmnxObjAppPool,
-        tmnxObjNamedPoolPolicy,
         tmnxObjAppResvSize,
         tmnxObjAppSumOfQResvSize,
         tmnxObjAppResvCbsOld,
@@ -8411,11 +8546,17 @@ tmnxPortOpticalCompliance        OBJECT-TYPE
          tmnxPortOpticalCompliance is applicable only when the value of
          tmnxPortSFPEquipped is set to 'true'."
     REFERENCE
-        "CFP MSA Management Interface Specification V2.2 R06a, July 1 2013
+        "CFP MSA Management Interface Specification V2.6 R06a, March 24 2017
          Section 5, CFP NVR 1 Table: Base ID Registers, Table 23 CFP NVR 1.
 
-         SFF Committee document SFF-8024 March 14 2016
-         Revision 3.9 Section 4.4."
+         SFF Committee document SFF-8024 February 14 2019
+         Revision 4.6 Section 4.4.
+
+         SFF Committee document SFF-8472 July 29 2018
+         Revision 12.3 Section 5.4 Table 5-3 Transceiver Compliance Codes.
+
+         SFF Committee document SFF-8636 February 14 2019
+         Revision 2.10a Section 6.3.4 Table 6-16 Specification Compliance Codes."
     ::= { tmnxPortEntry 55 }
 
 tmnxPortLoadBalanceAlgorithm     OBJECT-TYPE
@@ -8485,22 +8626,26 @@ tmnxPortEgrHsmdaSchedPlcy        OBJECT-TYPE
 tmnxPortIngNamedPoolPlcy         OBJECT-TYPE
     SYNTAX      TNamedItemOrEmpty
     MAX-ACCESS  read-write
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The value of tmnxPortIngNamedPoolPlcy specifies a named pool policy
          associated with an port ingress context. The policy governs the way
-         named pools are created at the port level."
+         named pools are created at the port level.
+
+         This object is obsoleted in 20.0 Release."
     DEFVAL      { ''H }
     ::= { tmnxPortEntry 60 }
 
 tmnxPortEgrNamedPoolPlcy         OBJECT-TYPE
     SYNTAX      TNamedItemOrEmpty
     MAX-ACCESS  read-write
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The value of tmnxPortEgrNamedPoolPlcy specifies a named pool policy
          associated with an port egress context. The policy governs the way
-         named pools are created at the port level."
+         named pools are created at the port level.
+
+         This object is obsoleted in 20.0 Release."
     DEFVAL      { ''H }
     ::= { tmnxPortEntry 61 }
 
@@ -23598,7 +23743,7 @@ tmnxCohOptPortCfgCprWinSize      OBJECT-TYPE
     ::= { tmnxCohOptPortCfgEntry 8 }
 
 tmnxCohOptPortCfgRxLosThresh     OBJECT-TYPE
-    SYNTAX      Integer32 (-2400..-1300)
+    SYNTAX      Integer32 (-3000..-1300)
     UNITS       "millibels per milliwatt"
     MAX-ACCESS  read-write
     STATUS      current

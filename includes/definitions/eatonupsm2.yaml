@@ -1,0 +1,15 @@
+os: eatonupsm2
+text: 'Eaton UPS'
+group: ups
+type: power
+icon: eaton
+rfc1628_compat: true
+mib_dir: eaton
+over:
+    - { graph: device_voltage, text: Voltage }
+    - { graph: device_current, text: Current }
+    - { graph: device_frequency, text: Load }
+discovery:
+    -
+        sysObjectID: .1.3.6.1.4.1.534.1
+        sysDescr_regex_except: '/^ConnectUPS Web\/SNMP Card .*/'

@@ -16,10 +16,10 @@ if (is_array($temp)) {
     create_state_index($state_name, $states);
 
     foreach ($temp as $index => $data) {
-        $descr      = "sysChassisPowerSupplyStatus.".$temp[$index]['sysChassisPowerSupplyIndex'];
-        $current    = $data['sysChassisPowerSupplyStatus'];
+        $descr = 'sysChassisPowerSupplyStatus.' . $temp[$index]['sysChassisPowerSupplyIndex'];
+        $current = $data['sysChassisPowerSupplyStatus'];
         $sensorType = 'f5';
-        $oid        = '.1.3.6.1.4.1.3375.2.1.3.2.2.2.1.2.'.$index;
+        $oid = '.1.3.6.1.4.1.3375.2.1.3.2.2.2.1.2.' . $index;
         discover_sensor($valid['sensor'], 'state', $device, $oid, $index, $state_name, $descr, 1, 1, null, null, null, null, $current, 'snmp', $index);
 
         //Create Sensor To State Index
@@ -34,17 +34,16 @@ if (is_array($temp)) {
     $state_name = 'sysChassisFanStatus';
     create_state_index($state_name, $states);
     foreach (array_keys($temp) as $index) {
-        $descr      = "Fan Speed Status ".$index;
-        $current    = $temp[$index]['sysChassisFanStatus'];
+        $descr = 'Fan Speed Status ' . $index;
+        $current = $temp[$index]['sysChassisFanStatus'];
         $sensorType = 'f5';
-        $oid        = '.1.3.6.1.4.1.3375.2.1.3.2.1.2.1.2.'.$index;
+        $oid = '.1.3.6.1.4.1.3375.2.1.3.2.1.2.1.2.' . $index;
         discover_sensor($valid['sensor'], 'state', $device, $oid, $index, $state_name, $descr, 1, 1, null, null, null, null, $current, 'snmp', $index);
 
         //Create Sensor To State Index
         create_sensor_to_state_index($device, $state_name, $index);
     } // End foreach (array_keys($temp) as $index)
 } // End if (is_array($temp))
-
 
 $temp = snmpwalk_cache_multi_oid($device, 'sysCmFailoverStatus', [], 'F5-BIGIP-SYSTEM-MIB');
 
@@ -62,10 +61,10 @@ if (is_array($temp)) {
     create_state_index($state_name, $states);
 
     foreach (array_keys($temp) as $index) {
-        $descr      = "sysCmFailoverStatusId.".$temp[$index]['sysCmFailoverStatusId'];
-        $current    = $temp[$index]['sysCmFailoverStatusId'];
+        $descr = 'sysCmFailoverStatusId.' . $temp[$index]['sysCmFailoverStatusId'];
+        $current = $temp[$index]['sysCmFailoverStatusId'];
         $sensorType = 'f5';
-        $oid        = '.1.3.6.1.4.1.3375.2.1.14.3.1.'.$index;
+        $oid = '.1.3.6.1.4.1.3375.2.1.14.3.1.' . $index;
         discover_sensor($valid['sensor'], 'state', $device, $oid, $index, $state_name, $descr, 1, 1, null, null, null, null, $current, 'snmp', $index);
 
         //Create Sensor To State Index
@@ -94,10 +93,10 @@ if (is_array($temp)) {
     create_state_index($state_name, $states);
 
     foreach (array_keys($temp) as $index) {
-        $descr      = "sysCmSyncStatusId.".$index;
-        $current    = $temp[$index]['sysCmSyncStatusId'];
+        $descr = 'sysCmSyncStatusId.' . $index;
+        $current = $temp[$index]['sysCmSyncStatusId'];
         $sensorType = 'f5';
-        $oid        = '.1.3.6.1.4.1.3375.2.1.14.1.1.'.$index;
+        $oid = '.1.3.6.1.4.1.3375.2.1.14.1.1.' . $index;
         discover_sensor($valid['sensor'], 'state', $device, $oid, $index, $state_name, $descr, 1, 1, null, null, null, null, $current, 'snmp', $index);
 
         //Create Sensor To State Index
@@ -122,10 +121,10 @@ if (is_array($temp)) {
     create_state_index($state_name, $states);
 
     foreach (array_keys($temp) as $index) {
-        $descr      = "sysCmFailoverStatusColor.".$index;
-        $current    = $temp[$index]['sysCmFailoverStatusColor'];
+        $descr = 'sysCmFailoverStatusColor.' . $index;
+        $current = $temp[$index]['sysCmFailoverStatusColor'];
         $sensorType = 'f5';
-        $oid        = '.1.3.6.1.4.1.3375.2.1.14.3.3.'.$index;
+        $oid = '.1.3.6.1.4.1.3375.2.1.14.3.3.' . $index;
         discover_sensor($valid['sensor'], 'state', $device, $oid, $index, $state_name, $descr, 1, 1, null, null, null, null, $current, 'snmp', $index);
 
         //Create Sensor To State Index

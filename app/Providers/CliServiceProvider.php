@@ -2,40 +2,15 @@
 
 namespace App\Providers;
 
-use App\Console\MigrateInstallCommand;
-use Illuminate\Foundation\Providers\ArtisanServiceProvider;
+use Illuminate\Support\ServiceProvider;
 
-class CliServiceProvider extends ArtisanServiceProvider
+class CliServiceProvider extends ServiceProvider
 {
     public function register()
     {
         // Restrict LibreNMS CLI commands
-        if (defined('LIBRENMS_CLI') && $this->app->environment() == 'production') {
-            $this->commands = array_intersect_key($this->commands, [
-                "Migrate" => true,
-                "MigrateInstall" => true,
-            ]);
-
-            $this->registerCommands($this->commands);
-        } else {
-            $this->app->register(\Laravel\Tinker\TinkerServiceProvider::class);
-            parent::register();
+        if (defined('ARTISAN_BINARY') && ARTISAN_BINARY == 'lnms' && $this->app->environment() == 'production') {
+            $this->app->register(\NunoMaduro\LaravelConsoleSummary\LaravelConsoleSummaryServiceProvider::class);
         }
-    }
-
-    protected function registerModelMakeCommand()
-    {
-        // override with our own implementation to put models in the correct namespace
-        $this->app->singleton('command.model.make', function ($app) {
-            return new \App\Console\ModelMakeCommand($app['files']);
-        });
-    }
-
-    protected function registerMigrateInstallCommand()
-    {
-        // override so we can hide it
-        $this->app->singleton('command.migrate.install', function ($app) {
-            return new MigrateInstallCommand($app['migration.repository']);
-        });
     }
 }

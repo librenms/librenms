@@ -1,0 +1,122 @@
+mib: SYNOLOGY-SYSTEM-MIB:SYNOLOGY-RAID-MIB:SYNOLOGY-DISK-MIB
+modules:
+    os:
+        hardware: SYNOLOGY-SYSTEM-MIB::modelName.0
+        version: SYNOLOGY-SYSTEM-MIB::version.0
+        version_regex: '/(DSM )?(?<version>\S+)/'
+        serial: SYNOLOGY-SYSTEM-MIB::serialNumber.0
+    sensors:
+        temperature:
+            data:
+                -
+                    oid: temperature
+                    num_oid: '.1.3.6.1.4.1.6574.1.2.{{ $index }}'
+                    descr: 'System'
+                    index: '99'
+                    group: 'System'
+                -
+                    oid: diskTable
+                    value: diskTemperature
+                    num_oid: '.1.3.6.1.4.1.6574.2.1.1.6.{{ $index }}'
+                    descr: '{{ $diskID }} {{ $diskModel }}'
+                    index: '{{ $index }}'
+                    group: 'Disks'
+        state:
+            data:
+                -
+                    oid: systemStatus
+                    num_oid: '.1.3.6.1.4.1.6574.1.1.{{ $index }}'
+                    descr: 'System'
+                    index: '{{ $index }}'
+                    group: 'System'
+                    state_name: systemStatusState
+                    states:
+                        - { value: 1, generic: 0, graph: 0, descr: 'Normal' }
+                        - { value: 2, generic: 2, graph: 0, descr: 'Failed' }
+                -
+                    oid: powerStatus
+                    num_oid: '.1.3.6.1.4.1.6574.1.3.{{ $index }}'
+                    descr: 'Power'
+                    index: '{{ $index }}'
+                    group: 'System'
+                    state_name: powerStatusState
+                    states:
+                        - { value: 1, generic: 0, graph: 0, descr: 'Normal' }
+                        - { value: 2, generic: 2, graph: 0, descr: 'Failed' }
+                -
+                    oid: systemFanStatus
+                    num_oid: '.1.3.6.1.4.1.6574.1.4.1.{{ $index }}'
+                    descr: 'FAN - System'
+                    index: '{{ $index }}'
+                    group: 'System'
+                    state_name: systemFanStatusState
+                    states:
+                        - { value: 1, generic: 0, graph: 0, descr: 'Normal' }
+                        - { value: 2, generic: 2, graph: 0, descr: 'Failed' }
+                -
+                    oid: cpuFanStatus
+                    num_oid: '.1.3.6.1.4.1.6574.1.4.2.{{ $index }}'
+                    descr: 'FAN - CPU'
+                    index: '{{ $index }}'
+                    group: 'System'
+                    state_name: cpuFanStatusState
+                    states:
+                        - { value: 1, generic: 0, graph: 0, descr: 'Normal' }
+                        - { value: 2, generic: 2, graph: 0, descr: 'Failed' }
+                -
+                    oid: upgradeAvailable
+                    num_oid: '.1.3.6.1.4.1.6574.1.5.4.{{ $index }}'
+                    descr: 'Upgrade Availability'
+                    index: '{{ $index }}'
+                    group: 'System'
+                    state_name: upgradeAvailableState
+                    states:
+                        - { value: 1, generic: 1, graph: 0, descr: 'Available' }
+                        - { value: 2, generic: 0, graph: 0, descr: 'Unavailable' }
+                        - { value: 3, generic: 3, graph: 0, descr: 'Connecting' }
+                        - { value: 4, generic: 3, graph: 0, descr: 'Disconnected' }
+                        - { value: 5, generic: 3, graph: 0, descr: 'Others' }
+                -
+                    oid: raidTable
+                    value: raidStatus
+                    num_oid: '.1.3.6.1.4.1.6574.3.1.1.3.{{ $index }}'
+                    descr: '{{ $raidName }}'
+                    index: '{{ $index }}'
+                    group: 'RAIDs'
+                    state_name: raidStatusState
+                    states:
+                        - { value: 1, generic: 0, graph: 0, descr: 'Normal' }
+                        - { value: 2, generic: 1, graph: 0, descr: 'Repairing' }
+                        - { value: 3, generic: 1, graph: 0, descr: 'Migrating' }
+                        - { value: 4, generic: 1, graph: 0, descr: 'Expanding' }
+                        - { value: 5, generic: 1, graph: 0, descr: 'Deleting' }
+                        - { value: 6, generic: 1, graph: 0, descr: 'Creating' }
+                        - { value: 7, generic: 1, graph: 0, descr: 'RaidSyncing' }
+                        - { value: 8, generic: 1, graph: 0, descr: 'RaidParityChecking' }
+                        - { value: 9, generic: 1, graph: 0, descr: 'RaidAssembling' }
+                        - { value: 10, generic: 1, graph: 0, descr: 'Canceling' }
+                        - { value: 11, generic: 2, graph: 0, descr: 'Degrade' }
+                        - { value: 12, generic: 2, graph: 0, descr: 'Crashed' }
+                        - { value: 13, generic: 1, graph: 0, descr: 'DataScrubbing' }
+                        - { value: 14, generic: 1, graph: 0, descr: 'RaidDeploying' }
+                        - { value: 15, generic: 1, graph: 0, descr: 'RaidUnDeploying' }
+                        - { value: 16, generic: 1, graph: 0, descr: 'RaidMountCache' }
+                        - { value: 17, generic: 1, graph: 0, descr: 'RaidUnmountCache' }
+                        - { value: 18, generic: 1, graph: 0, descr: 'RaidExpandingUnfinishedSHR' }
+                        - { value: 19, generic: 1, graph: 0, descr: 'RaidConvertSHRToPool' }
+                        - { value: 20, generic: 1, graph: 0, descr: 'RaidMigrateSHR1ToSHR2' }
+                        - { value: 21, generic: 3, graph: 0, descr: 'RaidUnknownStatus' }
+                -
+                    oid: diskTable
+                    value: diskStatus
+                    num_oid: '.1.3.6.1.4.1.6574.2.1.1.5.{{ $index }}'
+                    descr: '{{ $diskID }} {{ $diskModel }}'
+                    index: '{{ $index }}'
+                    group: 'Disks'
+                    state_name: diskStatusState
+                    states:
+                        - { value: 1, generic: 0, graph: 0, descr: 'Normal' }
+                        - { value: 2, generic: 1, graph: 0, descr: 'Initialized' }
+                        - { value: 3, generic: 1, graph: 0, descr: 'NotInitialized' }
+                        - { value: 4, generic: 2, graph: 0, descr: 'SystemPartitionFailed' }
+                        - { value: 5, generic: 2, graph: 0, descr: 'Crashed' }

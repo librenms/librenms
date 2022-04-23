@@ -2,11 +2,13 @@ os: brother
 group: printer
 text: 'Brother Printer'
 type: printer
+snmp_bulk: false
 over:
     - { graph: device_toner, text: Toner }
 discovery:
-    - sysDescr_regex: '/Brother NC-.*(h|w),/'
+    -
+        sysDescr_regex: '/Brother NC-.*(h|w),/'
 discovery_modules:
-    toner: true
+    printer-supplies:   true
 poller_modules:
-    toner: true
+    printer-supplies:   true

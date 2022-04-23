@@ -6,24 +6,6 @@
                     "sysName": "<private>",
                     "sysObjectID": ".1.3.6.1.4.1.41916.3.2.4",
                     "sysDescr": "Viptela SNMP agent",
-                    "sysContact": null,
-                    "version": null,
-                    "hardware": null,
-                    "features": null,
-                    "os": "viptela",
-                    "type": "network",
-                    "serial": null,
-                    "icon": "cisco.svg",
-                    "location": null
-                }
-            ]
-        },
-        "poller": {
-            "devices": [
-                {
-                    "sysName": "<private>",
-                    "sysObjectID": ".1.3.6.1.4.1.41916.3.2.4",
-                    "sysDescr": "Viptela SNMP agent",
                     "sysContact": "<private>",
                     "version": "17.2.2",
                     "hardware": "Viptela vEdge-1000",
@@ -35,6 +17,7 @@
                     "location": "<private>"
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     }
 }

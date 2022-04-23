@@ -5,7 +5,6 @@ use Illuminate\Database\Schema\Blueprint;
 
 class CreateDeviceGraphsTable extends Migration
 {
-
     /**
      * Run the migrations.
      *
@@ -14,7 +13,8 @@ class CreateDeviceGraphsTable extends Migration
     public function up()
     {
         Schema::create('device_graphs', function (Blueprint $table) {
-            $table->unsignedInteger('device_id')->index('device_id');
+            $table->bigIncrements('id');
+            $table->unsignedInteger('device_id')->index();
             $table->string('graph')->nullable();
         });
     }

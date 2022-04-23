@@ -138,37 +138,13 @@ PhysicalType ::= TEXTUAL-CONVENTION
             instantiated by an agent."
     SYNTAX      INTEGER  {
        	powerModule(1),              -- PSU on slots 201,202
-    	fanModule(2),                -- FAN on slots 203 to 210
-    	switchModule(3),             -- MCC on slots 8 and 9
-    	trunkModule(4),              -- Trunk on slots 2..7 and 10..15
-    	oc12Module(5),               -- OC12
-    	gbeModule(6),                -- GBE
-    	fcModule(7),                 -- FC
-    	passiveModule(8),            -- Slots 1 and 16 and for 2..15 slots with Mux/IO
-    	trunkModuleTransponding(9),  --
-    	oc3Module(10),               -- OC3
-    	ds3Module(11),               -- DS3
-    	oc48tdmModule(12),           -- OC48
-    	transpondingModule(13),      -- Transponding
-    	edfaModule(14),              -- EDFA - an optical fiber amplifier
-    	transponding10GModule(15),   -- 10G Transponder
-    	trunk10GModule(16),          -- 10Gb Trunk 
-    	esconModule(17),             -- Escon
-    	gbeAggModule(18),            -- GBE Aggregation
-    	esconTrunkModule(19),        -- Escon with framer
-    	fc2gModule(20),              -- 2GB Fibre Channel
-        pl16000(90),                 -- 
-        pl10(91),                    -- PL-10
-        pl20(92),                    -- PL-20
-        pl100(93),                   -- PL-100
-        pl400PmPiggy(94),            -- PL-400 PM Piggy
-        pl400MuxPiggy(95),			 -- PL-400 Muxponder Piggy
-        pl400(96),					 -- PL-400 
-        pl1000(97),					 -- PL-1000 
-        pl200(98),					 -- PL-200 
-        pl400E(99),					 -- PL-400E 
-    	unknown(100),                -- Module type is unknown (yet)
-    	pl800(800)                   -- PL-800
+    	fanModule(2),                -- FAN on slots 203 to 210 
+    	switchModule(3),             -- MCC 
+    	edfaModule(14),              -- EDFA - an optical fiber amplifier      
+    	ocmModule(15),             	 -- OCM module
+    	otdrModule(16),              -- OTDR module
+    	lc400G(21),                  -- 400G line card
+    	unknown(100)                 -- Module type is unknown (yet)
     }            
 
 
@@ -219,25 +195,28 @@ slEntPhysicalEntry       OBJECT-TYPE
 
 SlEntPhysicalEntry ::= SEQUENCE {
       slEntPhysicalIndex		    	InterfaceIndex,
-      slEntPhysicalDescr          	SnmpAdminString,
-      slEntPhysicalClass          	PhysicalClass,
-      slEntPhysicalHardwareRev    	SnmpAdminString,
-      slEntPhysicalFirmwareRev    	SnmpAdminString,
-      slEntPhysicalSoftwareRev    	SnmpAdminString,
-      slEntPhysicalSerialNum      	SnmpAdminString,
-	  slEntPhysicalProtectionEntity	PhysicalIndex,
-	  slEntPhysicalProtectState		INTEGER,
-	  slEntPhysicalProtectMode    	INTEGER,
-	  slEntPhysicalStatus         	INTEGER,
-	  slEntPhysicalFailureDescription SnmpAdminString,
+      slEntPhysicalDescr          		SnmpAdminString,
+      slEntPhysicalClass          		PhysicalClass,
+      slEntPhysicalHardwareRev    		SnmpAdminString,
+      slEntPhysicalFirmwareRev    		SnmpAdminString,
+      slEntPhysicalSoftwareRev    		SnmpAdminString,
+      slEntPhysicalSerialNum      		SnmpAdminString,
+	  slEntPhysicalProtectionEntity		PhysicalIndex,
+	  slEntPhysicalProtectState			INTEGER,
+	  slEntPhysicalProtectMode    		INTEGER,
+	  slEntPhysicalStatus         		INTEGER,
+	  slEntPhysicalFailureDescription 	SnmpAdminString,
 	  slEntPhysicalAdminStatus   		INTEGER,
-	  slEntPhysicalOperStatus 		INTEGER,
+	  slEntPhysicalOperStatus 			INTEGER,
 	  slEntPhysicalSysUptime	 		TimeTicks,
-	  slEntPhysicalType				PhysicalType,
-	  slEntPhysicalCleiCode			CleiCode,
+	  slEntPhysicalType					PhysicalType,
+	  slEntPhysicalCleiCode				CleiCode,
 	  slEntPhysicalPartNumber			SnmpAdminString,
-      slEntPhysicalOemSerialNum      	SnmpAdminString,
-      slEntPhysicalProductionDate		SnmpAdminString
+      slEntPhysicalOemSerialNum     	SnmpAdminString,
+      slEntPhysicalProductionDate		SnmpAdminString,
+      slEntPhysicalSysTemp				INTEGER,
+      slEntPhysicalSysAlias				SnmpAdminString,
+      slEntPhysicalSysSubType           INTEGER
 	}
 
 slEntPhysicalIndex OBJECT-TYPE
@@ -258,7 +237,6 @@ slEntPhysicalDescr OBJECT-TYPE
             name for the physical entity, and should be set to a
             distinct value for each version or model of the physical
             entity. 
-            Example: PacketLight-Oc, PacketLight-Ethernet, ...
             The actual value should be taken from the E2prom."
     ::= { slEntPhysicalEntry 2 }
 
@@ -594,6 +572,33 @@ slEntPhysicalProductionDate	OBJECT-TYPE
 		"The entity production date in the format YYYY-WW."
 	::= { slEntPhysicalEntry 24 }
 
+slEntPhysicalSysTemp OBJECT-TYPE
+	SYNTAX  	INTEGER
+	MAX-ACCESS  read-only
+	STATUS  	current		
+	DESCRIPTION
+		"Internally measured module temperature. The value 0 means -128 Celsuis. 
+		An increment on one is equivalent to 1/256 degree,
+		yielding a total range of -128 to +128 Celsius."
+	::= { slEntPhysicalEntry 25 }
+
+slEntPhysicalSysAlias	OBJECT-TYPE
+	SYNTAX			SnmpAdminString
+	MAX-ACCESS		read-write
+	STATUS			current
+	DESCRIPTION	
+		"The module alias as given by the user."
+	::= { slEntPhysicalEntry 26 }
+
+
+slEntPhysicalSysSubType OBJECT-TYPE
+    SYNTAX      INTEGER
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The subtype of the physical module.
+        The possibel values of this object are drived from the value of slEntPhysicalType."
+    ::= { slEntPhysicalEntry 27 }
 
 END
 

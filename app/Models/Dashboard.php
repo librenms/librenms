@@ -4,6 +4,8 @@ namespace App\Models;
 
 use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class Dashboard extends Model
 {
@@ -14,7 +16,7 @@ class Dashboard extends Model
     // ---- Helper Functions ---
 
     /**
-     * @param User $user
+     * @param  User  $user
      * @return bool
      */
     public function canRead($user)
@@ -23,7 +25,7 @@ class Dashboard extends Model
     }
 
     /**
-     * @param User $user
+     * @param  User  $user
      * @return bool
      */
     public function canWrite($user)
@@ -34,8 +36,8 @@ class Dashboard extends Model
     // ---- Query scopes ----
 
     /**
-     * @param Builder $query
-     * @param User $user
+     * @param  Builder  $query
+     * @param  User  $user
      * @return Builder|static
      */
     public function scopeAllAvailable(Builder $query, $user)
@@ -46,13 +48,13 @@ class Dashboard extends Model
 
     // ---- Define Relationships ----
 
-    public function user()
+    public function user(): BelongsTo
     {
-        return $this->belongsTo('App\Models\User', 'user_id');
+        return $this->belongsTo(\App\Models\User::class, 'user_id');
     }
 
-    public function widgets()
+    public function widgets(): HasMany
     {
-        return $this->hasMany('App\Models\UserWidget', 'dashboard_id');
+        return $this->hasMany(\App\Models\UserWidget::class, 'dashboard_id');
     }
 }

@@ -8,33 +8,16 @@
                     "sysDescr": "CMM4 3.0",
                     "sysContact": null,
                     "version": null,
-                    "hardware": "",
+                    "hardware": null,
                     "features": null,
-                    "location": null,
                     "os": "cmm4",
                     "type": "wireless",
                     "serial": null,
-                    "icon": "cambium.svg"
+                    "icon": "cambium.svg",
+                    "location": null
                 }
             ]
         },
-        "poller": {
-            "devices": [
-                {
-                    "sysName": "",
-                    "sysObjectID": ".0.0.0.0.0.0.0.0.0.0",
-                    "sysDescr": "CMM4 3.0",
-                    "sysContact": null,
-                    "version": null,
-                    "hardware": "",
-                    "features": null,
-                    "location": null,
-                    "os": "cmm4",
-                    "type": "wireless",
-                    "serial": null,
-                    "icon": "cambium.svg"
-                }
-            ]
-        }
+        "poller": "matches discovery"
     }
 }

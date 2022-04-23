@@ -15,10 +15,10 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
+ *
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -39,7 +39,7 @@ class ApplicationController extends SelectController
     /**
      * Defines the base query for this resource
      *
-     * @param \Illuminate\Http\Request $request
+     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Query\Builder
      */
     protected function baseQuery($request)
@@ -55,6 +55,9 @@ class ApplicationController extends SelectController
         return $query;
     }
 
+    /**
+     * @param  Application  $app
+     */
     public function formatItem($app)
     {
         return [

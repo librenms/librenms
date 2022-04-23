@@ -1,0 +1,12 @@
+mib: TEMPUSLXUNISON-MIB::MERIDIAN2-MIB::SONOMA-MIB
+modules:
+    os:
+        version_regex: '/(?<hardware>(.+)) v (?<version>(.+)) -/'
+        serial: SNMPv2-MIB::snmpSetSerialNo.0
+        # The info for the three different EndRun devices, all live on different OIDs but follow the same regex.
+        version: 
+          - .1.3.6.1.4.1.13827.5.0.11.0
+          - .1.3.6.1.4.1.13827.12.1.16.0
+          - .1.3.6.1.4.1.13827.14.1.16.0
+        features:
+          - TEMPUSLXUNISON-MIB::cdmaVersion.0

@@ -11,8 +11,8 @@
  * the source code distribution for details.
  */
 
-if (!Auth::user()->hasGlobalAdmin()) {
-    die('ERROR: You need to be admin');
+if (! Auth::user()->hasGlobalAdmin()) {
+    exit('ERROR: You need to be admin');
 }
 
 ?>
@@ -22,29 +22,29 @@ if (!Auth::user()->hasGlobalAdmin()) {
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                <h4 class="modal-title" id="Create">Alert Template :: <a href="https://docs.librenms.org/Alerting/Templates/"><i class="fa fa-book fa-1x"></i> Docs</a></h4>
+                <h4 class="modal-title" id="Create">Alert Template :: <a target="_blank" href="https://docs.librenms.org/Alerting/Templates/"><i class="fa fa-book fa-1x"></i> Docs</a></h4>
             </div>
             <div class="modal-body">
                 <div class="row">
                     <div class="col-md-12">
                         <div class="form-group">
-                            <label for="name">Template name: </label>
+                            <label for="name">Template name </label>
                             <input type="text" class="form-control input-sm" id="name" name="name">
                         </div>
                         <div class="form-group">
-                            <label for="template">Template: </label>
+                            <label for="template">Template </label>
                             <textarea class="form-control" id="template" name="template" style="font-family: Menlo, Monaco, Consolas, 'Courier New', monospace;" rows="15"></textarea>
                         </div>
                         <div class="form-group">
-                            <label for="rules_list">Attach template to rules: </label>
+                            <label for="rules_list">Attach template to rules </label>
                             <select id="rules_list" name="rules_list[]" class="form-control" multiple="multiple"></select>
                         </div>
                         <div class="form-group">
-                            <label for="title">Alert title: </label>
+                            <label for="title">Alert title </label>
                             <input type="text" class="form-control input-sm" id="title" name="title" placeholder="Alert Title">
                         </div>
                         <div class="form-group">
-                            <label for="title_rec">Recovery title: </label>
+                            <label for="title_rec">Recovery title </label>
                             <input type="text" class="form-control input-sm" id="title_rec" name="title_rec" placeholder="Recovery Title">
                         </div>
                         <button type="button" class="btn btn-primary btn-sm" name="create-template" id="create-template">Create template</button>
@@ -137,25 +137,21 @@ $('#alert-template').on('hide.bs.modal', function(event) {
     $('#convert-template').hide();
 });
 
-$('#create-template').click('', function(e) {
+$('#create-template').on("click", function(e) {
     e.preventDefault();
 
-    var rules_items = [];
-    $('#rules_list :selected').each(function(i, selectedElement) {
-        rules_items.push($(selectedElement).val());
-    });
-
+    var rules_items = $('#rules_list').select2('data');
     var template = $("#template").val();
     var template_id = $("#template_id").val();
     var name = $("#name").val();
     var title = $("#title").val();
     var title_rec = $("#title_rec").val();
 
-    alertTemplateAjaxOps(template, name, template_id, title, title_rec, rules_items.join(','));
+    alertTemplateAjaxOps(template, name, template_id, title, title_rec, rules_items);
 });
 
 //FIXME remove Deprecated template
-$('#convert-template').click('', function(e) {
+$('#convert-template').on("click", function(e) {
     e.preventDefault();
     var template = $("#template").val();
     var title    = $("#title").val();
@@ -181,10 +177,17 @@ $('#convert-template').click('', function(e) {
 });
 
 function alertTemplateAjaxOps(template, name, template_id, title, title_rec, rules) {
+    var rule_ajax = [];
+    var row_rules = [];
+    for (var i=0; i < rules.length; i++) {
+        rule_ajax.push(rules[i].id);
+        row_rules.push({id: rules[i].id, name: rules[i].text});
+    }
+
     $.ajax({
         type: "POST",
         url: "ajax_form.php",
-        data: { type: "alert-templates", template: template, name: name, template_id: template_id, title: title, title_rec: title_rec, rules: rules},
+        data: { type: "alert-templates", template: template, name: name, template_id: template_id, title: title, title_rec: title_rec, rules: rule_ajax.join(',')},
         dataType: "json",
         success: function(output) {
             if(output.status == 'ok') {
@@ -198,7 +201,7 @@ function alertTemplateAjaxOps(template, name, template_id, title, title_rec, rul
                         }
                     });
                 } else {
-                    var newrow = [{id: output.newid, templatename:name}];
+                    var newrow = [{id: output.newid, templatename: name, alert_rules: JSON.stringify(row_rules)}];
                     $('#templatetable').bootgrid("append", newrow);
                 }
             } else {

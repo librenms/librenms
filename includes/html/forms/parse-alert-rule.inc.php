@@ -14,9 +14,9 @@
 
 use LibreNMS\Alerting\QueryBuilderParser;
 
-if (!Auth::user()->hasGlobalAdmin()) {
+if (! Auth::user()->hasGlobalAdmin()) {
     header('Content-type: text/plain');
-    die('ERROR: You need to be admin');
+    exit('ERROR: You need to be admin');
 }
 $alert_id = $vars['alert_id'];
 $template_id = $vars['template_id'];
@@ -35,6 +35,10 @@ if (is_numeric($alert_id) && $alert_id > 0) {
     foreach ($groups as $group) {
         $maps[] = ['id' => 'g' . $group['group_id'], 'text' => $group['name']];
     }
+    $locations = dbFetchRows('SELECT `location_id`, `location` FROM `alert_location_map` LEFT JOIN `locations` ON `locations`.`id`=`alert_location_map`.`location_id` WHERE `rule_id`=?', [$alert_id]);
+    foreach ($locations as $location) {
+        $maps[] = ['id' => 'l' . $location['location_id'], 'text' => $location['location']];
+    }
 
     $transports = [];
     $members = dbFetchRows('SELECT `transport_or_group_id`, `transport_name`, `transport_type` FROM `alert_transport_map` LEFT JOIN `alert_transports` ON `transport_or_group_id` = `transport_id` WHERE `target_type`="single" AND `rule_id`=?', [$alert_id]);
@@ -42,15 +46,15 @@ if (is_numeric($alert_id) && $alert_id > 0) {
     foreach ($members as $member) {
         $transports[] = [
             'id' => $member['transport_or_group_id'],
-            'text' => ucfirst($member['transport_type']).": ".$member['transport_name']
+            'text' => ucfirst($member['transport_type']) . ': ' . $member['transport_name'],
         ];
     }
 
     $t_groups = dbFetchRows('SELECT `transport_or_group_id`, `transport_group_name` FROM `alert_transport_map` LEFT JOIN `alert_transport_groups` ON `transport_or_group_id`=`transport_group_id` WHERE `target_type`="group" AND `rule_id`=?', [$alert_id]);
     foreach ($t_groups as $group) {
         $transports[] = [
-            'id' => 'g'.$group['transport_or_group_id'],
-            'text' => 'Group: '.$group['transport_group_name']
+            'id' => 'g' . $group['transport_or_group_id'],
+            'text' => 'Group: ' . $group['transport_group_name'],
         ];
     }
 } elseif (is_numeric($template_id) && $template_id >= 0) {

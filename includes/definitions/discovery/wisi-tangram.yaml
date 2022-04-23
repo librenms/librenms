@@ -1,5 +1,9 @@
 mib: WISI-GTSENSORS-MIB
 modules:
+    os:
+        hardware: WISI-GTMODULES-MIB::gtModuleName.7
+        serial: WISI-GTMODULES-MIB::gtModuleSerNo.7
+        version: WISI-GTMODULES-MIB::gtModuleFWID.7
     sensors:
         fanspeed:
             data:

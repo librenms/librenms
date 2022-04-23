@@ -1,0 +1,45 @@
+mib: ROSMGMT-ALARM-MGMT-MIB:ROSMGMT-COMMON-MANAGEMENT-MIB:ROSMGMT-SYSTEM-MIB:ROSMGMT-VERSION-MIB:ROSMGMT-MEMORY-MIB
+modules:
+    mempools:
+        data:
+            -
+                total: ROSMGMT-MEMORY-MIB::rosMgmtMemoryTotal
+                free: ROSMGMT-MEMORY-MIB::rosMgmtMemoryAvailable
+    os:
+        hardware: ROSMGMT-VERSION-MIB::rosMgmtProductVersion.0
+        serial: ROSMGMT-VERSION-MIB::rosMgmtSerialNumber.0
+        version: ROSMGMT-VERSION-MIB::rosMgmtRosVersion.0
+    processors:
+        data:
+            -
+                oid: rosMgmtCpuUtilizationTable
+                value: rosMgmtCpuUtilization.oneMin
+                num_oid: '.1.3.6.1.4.1.8886.60.1.1.1.2.1.1.1.3.{{ $index }}'
+                snmp_flags: ['-OeQUsb'] # workaround for one Min index
+                descr: 'Processor'
+                index: 3
+    sensors:
+        state:
+            data:
+                -
+                    oid: rosMgmtConfigLoadState
+                    value: rosMgmtConfigLoadState
+                    num_oid: '.1.3.6.1.4.1.8886.1.2.1.3.{{ $index }}'
+                    descr: 'Config {{ $index }} Load  State'
+                    states:
+                        - { graph: 0, value: 1, generic: 1, descr: ready }
+                        - { graph: 0, value: 2, generic: 1, descr: running }
+                        - { graph: 0, value: 3, generic: 0, descr: successful }
+                        - { graph: 0, value: 4, generic: 2, descr: failed }
+                -
+                    oid: rosMgmtAlarmMgmtMonitorLevel
+                    value: rosMgmtAlarmMgmtMonitorLevel
+                    num_oid: '.1.3.6.1.4.1.8886.60.34.1.1.7.{{ $index }}'
+                    descr: 'The level of Alarm Monitor'
+                    states:
+                        - { graph: 0, value: 1, generic: 0, descr: clear }
+                        - { graph: 0, value: 2, generic: 0, descr: indeterminate }
+                        - { graph: 0, value: 3, generic: 2, descr: critical }
+                        - { graph: 0, value: 4, generic: 2, descr: major }
+                        - { graph: 0, value: 5, generic: 1, descr: minor }
+                        - { graph: 0, value: 6, generic: 1, descr: warning }

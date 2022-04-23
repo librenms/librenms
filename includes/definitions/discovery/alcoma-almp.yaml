@@ -1,5 +1,9 @@
 mib: ALCOMA-MIB
 modules:
+    os:
+        hardware: ALCOMA-MIB::alMPModel.0
+        serial: ALCOMA-MIB::alMPSerNumMW.0
+        version: ALCOMA-MIB::alMPVersionSW.0
     sensors:
         temperature:
             data:

@@ -11,8 +11,8 @@
  * the source code distribution for details.
  */
 
-if (!Auth::user()->hasGlobalAdmin()) {
-    die('ERROR: You need to be admin');
+if (! Auth::user()->hasGlobalAdmin()) {
+    exit('ERROR: You need to be admin');
 }
 
 ?>
@@ -82,7 +82,7 @@ $('#edit-dependency').on('show.bs.modal', function() {
     })
 });
 
-$('#hostdep-save').click('', function(event) {
+$('#hostdep-save').on("click", function(event) {
     event.preventDefault();
     var row_id = $("#edit-row_id").val();
     var device_id = $("#edit-device_id").val();

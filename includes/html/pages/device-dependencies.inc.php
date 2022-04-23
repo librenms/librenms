@@ -11,7 +11,6 @@
  * the source code distribution for details.
  */
 
-
 $no_refresh = true;
 
 $pagetitle[] = 'Device Dependencies';
@@ -30,12 +29,12 @@ require_once 'includes/html/modal/manage_host_dependencies.inc.php';
     <table id="hostdeps" class="table table-hover table-condensed table-striped">
         <thead>
             <tr>
-                <th data-column-id="deviceid" data-visible="false" data-css-class="deviceid">No</th>
+                <th data-column-id="id" data-type="int" data-sortable="true" data-visible="true">Id</th>
                 <th data-column-id="hostname" data-type="string" data-css-class="childhost" data-formatter="hostname">Hostname</th>
                 <th data-column-id="sysname" data-type="string" data-visible="false">Sysname</th>
                 <th data-column-id="parent" data-type="string" data-css-class="parenthost" data-formatter="parent">Parent Device(s)</th>
                 <th data-column-id="parentid" data-visible="false">Parent ID</th>
-                <th data-column-id="actions" data-searchable="false" data-formatter="actions">Actions</th>
+                <th data-column-id="actions" data-sortable="false" data-searchable="false" data-formatter="actions">Actions</th>
             </tr>
         </thead>
         <tbody>

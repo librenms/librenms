@@ -1,5 +1,13 @@
 mib: SNMPv2-MIB:ELTEK-DISTRIBUTED-MIB
 modules:
+    os:
+        sysDescr_regex: '/ (?<version>\d+\.[\d.]+)/'
+        features:
+            - ELTEK-DISTRIBUTED-MIB::rectifierStatusType.1
+            - ELTEK-DISTRIBUTED-MIB::batteryName.0
+        features_template: 'Rectifier type: {{ ELTEK-DISTRIBUTED-MIB::rectifierStatusType.1 }}, Battery name: {{ ELTEK-DISTRIBUTED-MIB::batteryName.0 }}'
+        hardware: ELTEK-DISTRIBUTED-MIB::systemSiteInfoControllerType.0
+        serial: ELTEK-DISTRIBUTED-MIB::systemSiteInfoSystemSeriaNum.0
     sensors:
         runtime:
             data:

@@ -1,0 +1,381 @@
+PICA-PRIVATE-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+MODULE-IDENTITY, OBJECT-TYPE, Counter32, Gauge32, Counter64,
+Integer32, TimeTicks, mib-2, snmpModules,IpAddress,
+NOTIFICATION-TYPE FROM SNMPv2-SMI
+TEXTUAL-CONVENTION, DisplayString,
+PhysAddress, TruthValue, RowStatus,
+TimeStamp, AutonomousType, TestAndIncr FROM SNMPv2-TC
+MODULE-COMPLIANCE, OBJECT-GROUP,
+NOTIFICATION-GROUP FROM SNMPv2-CONF
+snmpTraps FROM SNMPv2-MIB
+IANAifType FROM IANAifType-MIB
+enterprises FROM RFC1155-SMI;
+
+picaPrivateMib MODULE-IDENTITY
+LAST-UPDATED "201104280000Z"
+ORGANIZATION "Pica8 Inc."
+CONTACT-INFO
+" Customer Support
+E-Mail: support@pica8.com
+WWW: http://www.pica8.com"
+DESCRIPTION
+"The MIB module to manage Pica8's Pronto product."
+REVISION
+"201104280000Z"
+DESCRIPTION
+"The Pica8 Private MIB, Initial Version.
+Author: Robin Wan."
+
+::= { enterprises 35098 }
+
+hostStatusGroup OBJECT IDENTIFIER ::= { picaPrivateMib 1 }
+
+cpuUsage OBJECT-TYPE
+SYNTAX INTEGER(0..100)
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"The usage of CPU, the output format is integer."
+::= { hostStatusGroup 1 }
+
+totalPhyMemory OBJECT-TYPE
+SYNTAX DisplayString
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"The total physical memory size, the output format is string."
+::= { hostStatusGroup 2 }
+
+usedPhyMemory OBJECT-TYPE
+SYNTAX DisplayString
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"The used physical memory size, the output format is string."
+::= { hostStatusGroup 3 }
+
+freePhyMemory OBJECT-TYPE
+SYNTAX DisplayString
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"The free physical memory size, the output format is string."
+::= { hostStatusGroup 4 }
+
+switchTemperature OBJECT-TYPE
+SYNTAX DisplayString
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"The temperature of switch, the output format is integer."
+::= { hostStatusGroup 5 }
+
+cpuTemperature OBJECT-TYPE
+SYNTAX DisplayString
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"The teperature of CPU, the output format is integer."
+::= { hostStatusGroup 6 }
+
+switchChipTemperature OBJECT-TYPE
+SYNTAX DisplayString
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"The teperature of switch chip."
+::= { hostStatusGroup 7 }
+
+switchFanSpeed OBJECT-TYPE
+SYNTAX DisplayString
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"The fan speed of switch chip."
+::= { hostStatusGroup 8 }
+
+switchPWM OBJECT-TYPE
+SYNTAX DisplayString
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"Pulse Width Modulation(PWM) of switch chip."
+::= { hostStatusGroup 9 }
+
+sfpstatusTable OBJECT-TYPE
+SYNTAX SEQUENCE OF SfpstatusEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"A list of sfp moudule status entries."
+::= { hostStatusGroup 10 }
+
+sfpstatusEntry OBJECT-TYPE
+SYNTAX SfpstatusEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"An entry containing all sfp module stauts"
+INDEX { sfpIndex }
+::= { sfpstatusTable 1 }
+
+SfpstatusEntry ::=
+SEQUENCE {
+sfpIndex INTEGER,
+sfpVendorName DisplayString,
+sfpSerialNumber DisplayString,
+sfpTemp DisplayString,
+sfpVoltage DisplayString,
+sfpBias DisplayString,
+sfpTxPower DisplayString,
+sfpRxPower DisplayString,
+sfpType DisplayString
+}
+
+sfpIndex OBJECT-TYPE
+SYNTAX INTEGER (1..2147483647)
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"The port number of interface."
+::= { sfpstatusEntry 1 }
+
+sfpVendorName OBJECT-TYPE
+SYNTAX DisplayString
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"The vendor name of sfp ransceiver transfer."
+::= { sfpstatusEntry 2 }
+
+sfpSerialNumber OBJECT-TYPE
+SYNTAX DisplayString
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"The serial number of sfp ransceiver transfer."
+::= { sfpstatusEntry 3 }
+
+sfpTemp OBJECT-TYPE
+SYNTAX DisplayString
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"The temperature of sfp ransceiver transfer."
+::= { sfpstatusEntry 4 }
+
+sfpVoltage OBJECT-TYPE
+SYNTAX DisplayString
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"The voltage of sfp ransceiver transfer."
+::= { sfpstatusEntry 5 }
+
+sfpBias OBJECT-TYPE
+SYNTAX DisplayString
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"The bias current of sfp ransceiver transfer."
+::= { sfpstatusEntry 6 }
+
+sfpTxPower OBJECT-TYPE
+SYNTAX DisplayString
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"The Tx power of sfp ransceiver transfer(dBm)."
+::= { sfpstatusEntry 7 }
+
+sfpRxPower OBJECT-TYPE
+SYNTAX DisplayString
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"The Rx power of sfp ransceiver transfer(dBm)."
+::= { sfpstatusEntry 8 }
+
+sfpType OBJECT-TYPE
+SYNTAX DisplayString
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"The type of sfp ransceiver transfer(dBm)."
+::= { sfpstatusEntry 9 }
+
+
+rpsustatusTable OBJECT-TYPE
+SYNTAX SEQUENCE OF RpsustatusEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"A list of Redundancy power supply unit(RPSU) status entries."
+::= { hostStatusGroup 11 }
+rpsustatusEntry OBJECT-TYPE
+SYNTAX RpsustatusEntry
+MAX-ACCESS not-accessible
+STATUS current
+DESCRIPTION
+"An entry containing all Redundancy power supply unit(RPSU) stauts."
+INDEX { rpsuIndex }
+::= { rpsustatusTable 1 }
+
+RpsustatusEntry ::=
+SEQUENCE {
+rpsuIndex INTEGER,
+serialNumber DisplayString,
+rpsuStatus INTEGER,
+rpsuTemprature DisplayString,
+rpsuFanSpeed INTEGER,
+rpsuPWM DisplayString
+}
+rpsuIndex OBJECT-TYPE
+SYNTAX INTEGER(0..10)
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"The slot number Redundancy power supply unit(RPSU)."
+::= { rpsustatusEntry 1 }
+
+serialNumber OBJECT-TYPE
+SYNTAX DisplayString
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"The serial number Redundancy power supply unit(RPSU)."
+::= { rpsustatusEntry 2 }
+
+rpsuStatus OBJECT-TYPE
+SYNTAX INTEGER (0..1)
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"The status of Redundancy power supply unit(RPSU).
+1: The Redundancy power supply unit(RPSU) power on.
+0: The Redundancy power supply unit(RPSU) power off."
+::= { rpsustatusEntry 3 }
+
+rpsuTemprature OBJECT-TYPE
+SYNTAX DisplayString
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"Temprature of the Redundancy power supply unit(RPSU)."
+::= { rpsustatusEntry 4 }
+
+rpsuFanSpeed OBJECT-TYPE
+SYNTAX INTEGER(1..2147483647)
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"Fan speed of the Redundancy power supply unit(RPSU)."
+::= { rpsustatusEntry 5 }
+
+rpsuPWM OBJECT-TYPE
+SYNTAX DisplayString
+MAX-ACCESS read-only
+STATUS current
+DESCRIPTION
+"Pulse Width Modulation(PWM) of the Redundancy power supply unit(RPSU)."
+::= { rpsustatusEntry 6 }
+
+switchConfigGroup OBJECT IDENTIFIER ::= { picaPrivateMib 2 }
+
+tftpConfigFilePath OBJECT-TYPE
+SYNTAX OCTET STRING (SIZE (2..255))
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+"If the tftp path of defined config file is set, the configurations
+included in the config file are also applied meanwhile. "
+::= { switchConfigGroup 0 }
+
+tftpBatchFilePath OBJECT-TYPE
+SYNTAX OCTET STRING (SIZE (2..255))
+MAX-ACCESS read-write
+STATUS current
+DESCRIPTION
+"If the tftp path of a command batch file is set, the present configurations
+will changed depending on the execution of the command in the batch file."
+::= { switchConfigGroup 1 }
+
+picaConformance OBJECT IDENTIFIER ::= { picaPrivateMib 20}
+picaGroups OBJECT IDENTIFIER ::= { picaConformance 1 }
+picaCompliances OBJECT IDENTIFIER ::= { picaConformance 2 }
+
+picaBasicGroup OBJECT-GROUP
+OBJECTS {
+cpuUsage,
+totalPhyMemory,
+usedPhyMemory,
+freePhyMemory,
+switchTemperature,
+cpuTemperature,
+switchChipTemperature,
+switchFanSpeed,
+switchPWM
+
+}
+STATUS current
+DESCRIPTION
+"These objects are required for pica private mib."
+::= { picaGroups 1 }
+picasfpGroup OBJECT-GROUP
+OBJECTS {
+sfpIndex,
+sfpVendorName,
+sfpSerialNumber,
+sfpTemp,
+sfpVoltage,
+sfpBias,
+sfpTxPower,
+sfpRxPower,
+sfpType
+}
+STATUS current
+DESCRIPTION
+"These objects are required for pica private mib."
+::= { picaGroups 2 }
+
+picarpsuGroup OBJECT-GROUP
+OBJECTS {
+rpsuIndex,
+serialNumber,
+rpsuStatus,
+rpsuTemprature,
+rpsuFanSpeed,
+rpsuPWM
+}
+STATUS current
+DESCRIPTION
+" These objects are required for pica private mib."
+::= { picaGroups 3 }
+
+picaConfigGroup OBJECT-GROUP
+OBJECTS {
+tftpConfigFilePath,
+tftpBatchFilePath
+}
+STATUS current
+DESCRIPTION
+" These objects are required for pica private mib."
+::= {picaGroups 4 }
+
+picaCompliance MODULE-COMPLIANCE
+STATUS current
+DESCRIPTION
+"The compliance statement "
+MODULE -- this module
+MANDATORY-GROUPS {
+picaBasicGroup,
+picasfpGroup,
+picarpsuGroup,
+picaConfigGroup
+}
+::= { picaCompliances 1 }
+
+
+END

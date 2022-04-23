@@ -1,0 +1,313 @@
+-- ICT MIB file for ICT Modular Power System.
+--
+-- Date		Version
+-- =============================
+-- 1/5/18	v1.01
+--
+
+ICT-MODULAR-POWER-SYSTEM-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	enterprises, IpAddress	FROM RFC1155-SMI
+	DisplayString		FROM RFC1213-MIB
+	OBJECT-TYPE		FROM RFC-1212
+	TRAP-TYPE		FROM RFC-1215;
+
+ictPower			OBJECT IDENTIFIER ::= { enterprises 39145 }
+
+powerSystem			OBJECT IDENTIFIER ::= { ictPower 13 }
+
+deviceModel			OBJECT-TYPE
+	SYNTAX			DisplayString
+	ACCESS			read-only
+	STATUS			mandatory
+	DESCRIPTION		"Model Number"
+	::= { powerSystem 1 }
+
+deviceName			OBJECT-TYPE
+	SYNTAX			DisplayString
+	ACCESS			read-only
+	STATUS			mandatory
+	DESCRIPTION		"Device Name"
+	::= { powerSystem 2 }
+
+deviceHardware			OBJECT-TYPE
+	SYNTAX			INTEGER (0..127)
+	ACCESS			read-only
+	STATUS			mandatory
+	DESCRIPTION		"Hardware Version"
+	::= { powerSystem 3 }
+
+deviceFirmware			OBJECT-TYPE
+	SYNTAX			DisplayString
+	ACCESS			read-only
+	STATUS			mandatory
+	DESCRIPTION		"Firmware Version"
+	::= { powerSystem 4 }
+
+deviceMacAddress		OBJECT-TYPE
+	SYNTAX			DisplayString
+	ACCESS			read-only
+	STATUS			mandatory
+	DESCRIPTION		"MAC Address"
+	::= { powerSystem 5 }
+
+inputVoltage			OBJECT-TYPE
+	SYNTAX			DisplayString
+	ACCESS			read-only
+	STATUS			mandatory
+	DESCRIPTION		"Input Voltage (VAC)"
+	::= { powerSystem 6 }
+
+outputVoltage			OBJECT-TYPE
+	SYNTAX			DisplayString
+	ACCESS			read-only
+	STATUS			mandatory
+	DESCRIPTION		"Output Voltage (VDC)"
+	::= { powerSystem 7 }
+
+outputCurrent			OBJECT-TYPE
+	SYNTAX			DisplayString
+	ACCESS			read-only
+	STATUS			mandatory
+	DESCRIPTION		"Total System Current (Amps)"
+	::= { powerSystem 8 }
+
+outputEnable			OBJECT-TYPE
+	SYNTAX			INTEGER { enabled(1), disabled(2) }
+	ACCESS			read-write
+	STATUS			mandatory
+	DESCRIPTION		"Output Enable Status (a value of '1' indicates Output is Enabled, and a value of '2' indicates Output is Disabled. Output cannot be disabled during an AC Failure)"
+	::= { powerSystem 9 }
+
+moduleTable			OBJECT-TYPE
+	SYNTAX SEQUENCE OF ModuleEntry
+	ACCESS			not-accessible
+	STATUS			mandatory
+	DESCRIPTION		"Module Table"
+	::= { powerSystem 10 }
+
+moduleEntry			OBJECT-TYPE
+	SYNTAX			ModuleEntry
+	ACCESS			not-accessible
+	STATUS			mandatory
+	INDEX { moduleNumber }
+	::= { moduleTable 1 }
+
+ModuleEntry ::=
+	SEQUENCE {
+		moduleNumber		INTEGER,
+		moduleStatus		INTEGER,
+		moduleType		INTEGER,
+		moduleVoltage		DisplayString,
+		moduleCurrentA		DisplayString,
+		moduleCurrentB		DisplayString,
+		moduleCurrentC		DisplayString,
+		moduleCurrentD		DisplayString,
+		moduleControlA		INTEGER,
+		moduleControlB		INTEGER,
+		moduleControlC		INTEGER,
+		moduleControlD		INTEGER
+	}
+
+moduleNumber			OBJECT-TYPE
+	SYNTAX			INTEGER (1..8)
+	ACCESS			read-only
+	STATUS			mandatory
+	DESCRIPTION		"Module Number"
+	::= { moduleEntry 1 }
+
+moduleStatus			OBJECT-TYPE
+	SYNTAX			INTEGER { notInstalled(1), ok(2), alarm(3) }
+	ACCESS			read-only
+	STATUS			mandatory
+	DESCRIPTION		"Module Status"
+	::= { moduleEntry 2 }
+
+moduleType			OBJECT-TYPE
+	SYNTAX			INTEGER { notInstalled(1), power(2), battery(3), distribution(4) }
+	ACCESS			read-only
+	STATUS			mandatory
+	DESCRIPTION		"Module Type ('1' indicates Module is NOT INSTALLED,'2' indicates POWER Module,'3' indicates BATTERY Module, and '4' indicates DISTRIBUTION Module)"
+	::= { moduleEntry 3 }
+
+moduleVoltage			OBJECT-TYPE
+	SYNTAX			DisplayString
+	ACCESS			read-only
+	STATUS			mandatory
+	DESCRIPTION		"Module Voltage (VDC)"
+	::= { moduleEntry 4 }
+
+moduleCurrentA			OBJECT-TYPE
+	SYNTAX			DisplayString
+	ACCESS			read-only
+	STATUS			mandatory
+	DESCRIPTION		"Channel 1 Current (Amps)"
+	::= { moduleEntry 5 }
+
+moduleCurrentB			OBJECT-TYPE
+	SYNTAX			DisplayString
+	ACCESS			read-only
+	STATUS			mandatory
+	DESCRIPTION		"Channel 2 Current (Amps)"
+	::= { moduleEntry 6 }
+
+moduleCurrentC			OBJECT-TYPE
+	SYNTAX			DisplayString
+	ACCESS			read-only
+	STATUS			mandatory
+	DESCRIPTION		"Channel 3 Current (Amps)"
+	::= { moduleEntry 7 }
+
+moduleCurrentD			OBJECT-TYPE
+	SYNTAX			DisplayString
+	ACCESS			read-only
+	STATUS			mandatory
+	DESCRIPTION		"Channel 4 Current (Amps)"
+	::= { moduleEntry 8 }
+
+moduleControlA			OBJECT-TYPE
+	SYNTAX			INTEGER { enabled(1), disabled(2) }
+	ACCESS			read-write
+	STATUS			mandatory
+	DESCRIPTION		"Channel 1 Control (a value of '1' indicates Channel is Enabled, and a value of '2' indicates Channel is Disabled)"
+	::= { moduleEntry 9 }
+
+moduleControlB			OBJECT-TYPE
+	SYNTAX			INTEGER { enabled(1), disabled(2) }
+	ACCESS			read-write
+	STATUS			mandatory
+	DESCRIPTION		"Channel 2 Control (a value of '1' indicates Channel is Enabled, and a value of '2' indicates Channel is Disabled)"
+	::= { moduleEntry 10 }
+
+moduleControlC			OBJECT-TYPE
+	SYNTAX			INTEGER { enabled(1), disabled(2) }
+	ACCESS			read-write
+	STATUS			mandatory
+	DESCRIPTION		"Channel 3 Control (a value of '1' indicates Channel is Enabled, and a value of '2' indicates Channel is Disabled)"
+	::= { moduleEntry 11 }
+
+moduleControlD			OBJECT-TYPE
+	SYNTAX			INTEGER { enabled(1), disabled(2) }
+	ACCESS			read-write
+	STATUS			mandatory
+	DESCRIPTION		"Channel 4 Control (a value of '1' indicates Channel is Enabled, and a value of '2' indicates Channel is Disabled)"
+	::= { moduleEntry 12 }
+
+alarmTable			OBJECT-TYPE
+	SYNTAX SEQUENCE OF AlarmEntry
+	ACCESS			not-accessible
+	STATUS			mandatory
+	DESCRIPTION		"Alarm Input Table"
+	::= { powerSystem 11 }
+
+alarmEntry			OBJECT-TYPE
+	SYNTAX			AlarmEntry
+	ACCESS			not-accessible
+	STATUS			mandatory
+	INDEX { alarmNumber }
+	::= { alarmTable 1 }
+
+AlarmEntry ::=
+	SEQUENCE {
+		alarmNumber		INTEGER,
+		alarmName		DisplayString,
+		alarmStatus		INTEGER
+	}
+
+alarmNumber			OBJECT-TYPE
+	SYNTAX			INTEGER (1..4)
+	ACCESS			read-only
+	STATUS			mandatory
+	DESCRIPTION		"Alarm Input Number"
+	::= { alarmEntry 1 }
+
+alarmName			OBJECT-TYPE
+	SYNTAX			DisplayString
+	ACCESS			read-only
+	STATUS			mandatory
+	DESCRIPTION		"Alarm Input Name"
+	::= { alarmEntry 2 }
+
+alarmStatus			OBJECT-TYPE
+	SYNTAX			INTEGER { inactive(1), ready(2), alarm(3) }
+	ACCESS			read-only
+	STATUS			mandatory
+	DESCRIPTION		"Alarm Input Status ('1' indicates Alarm is INACTIVE,'2' indicates Alarm is READY, and '3' indicates Alarm is in an ALARM condition)"
+	::= { alarmEntry 3 }
+
+
+--
+-- Trap definitions:
+--
+
+moduleAlarmTrap			TRAP-TYPE
+	ENTERPRISE		powerSystem
+	VARIABLES		{ moduleNumber }
+	DESCRIPTION		"Trap generated when a Module Alarm is triggered"
+	::= 101
+
+alarmInputTrap			TRAP-TYPE
+	ENTERPRISE		powerSystem
+	VARIABLES		{ alarmNumber }
+	DESCRIPTION		"Trap generated when an Alarm Input is activated"
+	::= 102
+
+acFailAlarmTrap			TRAP-TYPE
+	ENTERPRISE		powerSystem
+	DESCRIPTION		"Trap generated when the AC Failure Alarm is triggered"
+	::= 103
+
+sysCurrentLimitTrap		TRAP-TYPE
+	ENTERPRISE		powerSystem
+	DESCRIPTION		"Trap generated when the System Current Limit Alarm is triggered"
+	::= 104
+
+moduleAlarmClear		TRAP-TYPE
+	ENTERPRISE		powerSystem
+	VARIABLES		{ moduleNumber }
+	DESCRIPTION		"Trap generated when a Module Alarm is cleared"
+	::= 111
+
+alarmInputClear			TRAP-TYPE
+	ENTERPRISE		powerSystem
+	VARIABLES		{ alarmNumber }
+	DESCRIPTION		"Trap generated when an Alarm Input is cleared"
+	::= 112
+
+acFailAlarmClear		TRAP-TYPE
+	ENTERPRISE		powerSystem
+	DESCRIPTION		"Trap generated when the AC Failure Alarm is cleared"
+	::= 113
+
+sysCurrentLimitClear		TRAP-TYPE
+	ENTERPRISE		powerSystem
+	DESCRIPTION		"Trap generated when the System Current Limit Alarm is cleared"
+	::= 114
+
+batteryTestStart		TRAP-TYPE
+	ENTERPRISE		powerSystem
+	DESCRIPTION		"Trap generated when a Battery Discharge Test is started"
+	::= 121
+
+batteryTestComplete		TRAP-TYPE
+	ENTERPRISE		powerSystem
+	DESCRIPTION		"Trap generated when a Battery Discharge Test completes successfully"
+	::= 122
+
+batteryTestFail			TRAP-TYPE
+	ENTERPRISE		powerSystem
+	DESCRIPTION		"Trap generated when a Battery Discharge Test fails"
+	::= 123
+
+batteryEqualiseStart		TRAP-TYPE
+	ENTERPRISE		powerSystem
+	DESCRIPTION		"Trap generated when a Battery Equalise Charge is started"
+	::= 124
+
+batteryEqualiseComplete		TRAP-TYPE
+	ENTERPRISE		powerSystem
+	DESCRIPTION		"Trap generated when a Battery Equalise Charge completes"
+	::= 125
+
+END

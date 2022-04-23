@@ -2,9 +2,9 @@
 
 require 'includes/html/graphs/common.inc.php';
 
-$mysql_rrd = rrd_name($device['hostname'], array('app', 'mysql', $app['app_id']));
+$mysql_rrd = Rrd::name($device['hostname'], ['app', 'mysql', $app['app_id']]);
 
-if (rrdtool_check_rrd_exists($mysql_rrd)) {
+if (Rrd::checkRrdExists($mysql_rrd)) {
     $rrd_filename = $mysql_rrd;
 
     $rrd_options .= ' DEF:a=' . $rrd_filename . ':IBIRd:AVERAGE ';

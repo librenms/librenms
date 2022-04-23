@@ -2,110 +2,117 @@
 
 namespace App\Models;
 
-use DB;
+use App\View\SimpleTemplate;
 use Fico7489\Laravel\Pivot\Traits\PivotEventTrait;
 use Illuminate\Database\Eloquent\Builder;
+use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\ModelNotFoundException;
+use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\HasMany;
+use Illuminate\Database\Eloquent\Relations\HasManyThrough;
+use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use Illuminate\Database\Query\JoinClause;
-use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use LibreNMS\Exceptions\InvalidIpException;
 use LibreNMS\Util\IP;
 use LibreNMS\Util\IPv4;
 use LibreNMS\Util\IPv6;
-use LibreNMS\Util\Url;
+use LibreNMS\Util\Rewrite;
 use LibreNMS\Util\Time;
+use LibreNMS\Util\Url;
 use Permissions;
 
+/**
+ * @property-read int|null $ports_count
+ * @property-read int|null $sensors_count
+ * @property-read int|null $wirelessSensors_count
+ *
+ * @method static \Database\Factories\DeviceFactory factory(...$parameters)
+ */
 class Device extends BaseModel
 {
-    use PivotEventTrait;
+    use PivotEventTrait, HasFactory;
 
     public $timestamps = false;
     protected $primaryKey = 'device_id';
-    protected $fillable = ['hostname', 'ip', 'status', 'status_reason'];
+    protected $fillable = [
+        'authalgo',
+        'authlevel',
+        'authname',
+        'authpass',
+        'community',
+        'cryptoalgo',
+        'cryptopass',
+        'features',
+        'hardware',
+        'hostname',
+        'display',
+        'icon',
+        'ip',
+        'os',
+        'overwrite_ip',
+        'poller_group',
+        'port',
+        'port_association_mode',
+        'retries',
+        'serial',
+        'snmp_disable',
+        'snmp_max_repeaters',
+        'snmpver',
+        'status',
+        'status_reason',
+        'sysDescr',
+        'sysName',
+        'sysObjectID',
+        'timeout',
+        'transport',
+        'version',
+        'uptime',
+    ];
+
     protected $casts = [
         'last_polled' => 'datetime',
         'status' => 'boolean',
     ];
 
-    /**
-     * Initialize this class
-     */
-    public static function boot()
-    {
-        parent::boot();
-        self::loadAllOs(true);
-
-        static::deleting(function (Device $device) {
-            // delete related data
-            $device->ports()->delete();
-            $device->syslogs()->delete();
-            $device->eventlogs()->delete();
-            $device->applications()->delete();
-
-            // handle device dependency updates
-            $device->children->each->updateMaxDepth($device->device_id);
-        });
-
-        // handle device dependency updates
-        static::updated(function (Device $device) {
-            if ($device->isDirty('max_depth')) {
-                $device->children->each->updateMaxDepth();
-            }
-        });
-
-        static::pivotAttached(function (Device $device, $relationName, $pivotIds, $pivotIdsAttributes) {
-            if ($relationName == 'parents') {
-                // a parent attached to this device
-
-                // update the parent's max depth incase it used to be standalone
-                Device::whereIn('device_id', $pivotIds)->get()->each->validateStandalone();
-
-                // make sure this device's max depth is updated
-                $device->updateMaxDepth();
-            } elseif ($relationName == 'children') {
-                // a child device attached to this device
-
-                // if this device used to be standalone, we need to udpate max depth
-                $device->validateStandalone();
-
-                // make sure the child's max depth is updated
-                Device::whereIn('device_id', $pivotIds)->get()->each->updateMaxDepth();
-            }
-        });
-
-        static::pivotDetached(function (Device $device, $relationName, $pivotIds) {
-            if ($relationName == 'parents') {
-                // this device detached from a parent
-
-                // update this devices max depth
-                $device->updateMaxDepth();
-
-                // parent may now be standalone, update old parent
-                Device::whereIn('device_id', $pivotIds)->get()->each->validateStandalone();
-            } elseif ($relationName == 'children') {
-                // a child device detached from this device
-
-                // update the detached child's max_depth
-                Device::whereIn('device_id', $pivotIds)->get()->each->updateMaxDepth();
-
-                // this device may be standalone, update it
-                $device->validateStandalone();
-            }
-        });
-    }
-
     // ---- Helper Functions ----
 
-    public static function findByHostname($hostname)
+    public static function findByHostname(string $hostname): ?Device
     {
         return static::where('hostname', $hostname)->first();
     }
 
-    public static function findByIp($ip)
+    /**
+     * Returns IP/Hostname where polling will be targeted to
+     *
+     * @param  string|array  $device  hostname which will be triggered
+     *                                array  $device associative array with device data
+     * @return string IP/Hostname to which Device polling is targeted
+     */
+    public static function pollerTarget($device)
     {
-        if (!IP::isValid($ip)) {
+        if (! is_array($device)) {
+            $ret = static::where('hostname', $device)->first(['hostname', 'overwrite_ip']);
+            if (empty($ret)) {
+                return $device;
+            }
+            $overwrite_ip = $ret->overwrite_ip;
+            $hostname = $ret->hostname;
+        } elseif (array_key_exists('overwrite_ip', $device)) {
+            $overwrite_ip = $device['overwrite_ip'];
+            $hostname = $device['hostname'];
+        } else {
+            return $device['hostname'];
+        }
+
+        return $overwrite_ip ?: $hostname;
+    }
+
+    public static function findByIp(?string $ip): ?Device
+    {
+        if (! IP::isValid($ip)) {
             return null;
         }
 
@@ -147,27 +154,43 @@ class Device extends BaseModel
     }
 
     /**
-     * Get the display name of this device (hostname) unless force_ip_to_sysname is set
-     * and hostname is an IP and sysName is set
+     * Get VRF contexts to poll.
+     * If no contexts are found, return the default context ''
      *
-     * @return string
+     * @return array
      */
-    public function displayName()
+    public function getVrfContexts(): array
     {
-        if (\LibreNMS\Config::get('force_ip_to_sysname') && $this->sysName && IP::isValid($this->hostname)) {
-            return $this->sysName;
-        }
-
-        return $this->hostname;
+        return $this->vrfLites->isEmpty() ? [''] : $this->vrfLites->pluck('context_name')->all();
     }
 
-    public function name()
+    /**
+     * Get the display name of this device based on the display format string
+     * The default is {{ $hostname }} controlled by the device_display_default setting
+     */
+    public function displayName(): string
     {
-        $displayName = $this->displayName();
-        if ($this->sysName !== $displayName) {
-            return $this->sysName;
-        } elseif ($this->hostname !== $displayName && $this->hostname !== $this->ip) {
-            return $this->hostname;
+        $hostname_is_ip = IP::isValid($this->hostname);
+
+        return SimpleTemplate::parse($this->display ?: \LibreNMS\Config::get('device_display_default', '{{ $hostname }}'), [
+            'hostname' => $this->hostname,
+            'sysName' => $this->sysName ?: $this->hostname,
+            'sysName_fallback' => $hostname_is_ip ? $this->sysName : $this->hostname,
+            'ip' => $this->overwrite_ip ?: ($hostname_is_ip ? $this->hostname : $this->ip),
+        ]);
+    }
+
+    /**
+     * Returns the device name if not already displayed
+     */
+    public function name(): string
+    {
+        $display = $this->displayName();
+
+        if (! Str::contains($display, $this->hostname)) {
+            return (string) $this->hostname;
+        } elseif (! Str::contains($display, $this->sysName)) {
+            return (string) $this->sysName;
         }
 
         return '';
@@ -175,18 +198,25 @@ class Device extends BaseModel
 
     public function isUnderMaintenance()
     {
+        if (! $this->device_id) {
+            return false;
+        }
+
         $query = AlertSchedule::isActive()
-            ->join('alert_schedulables', 'alert_schedule.schedule_id', 'alert_schedulables.schedule_id')
-            ->where(function ($query) {
-                $query->where(function ($query) {
-                    $query->where('alert_schedulable_type', 'device')
-                        ->where('alert_schedulable_id', $this->device_id);
+            ->where(function (Builder $query) {
+                $query->whereHas('devices', function (Builder $query) {
+                    $query->where('alert_schedulables.alert_schedulable_id', $this->device_id);
                 });
 
-                if ($this->groups) {
-                    $query->orWhere(function ($query) {
-                        $query->where('alert_schedulable_type', 'device_group')
-                            ->whereIn('alert_schedulable_id', $this->groups->pluck('id'));
+                if ($this->groups->isNotEmpty()) {
+                    $query->orWhereHas('deviceGroups', function (Builder $query) {
+                        $query->whereIn('alert_schedulables.alert_schedulable_id', $this->groups->pluck('id'));
+                    });
+                }
+
+                if ($this->location) {
+                    $query->orWhereHas('locations', function (Builder $query) {
+                        $query->where('alert_schedulables.alert_schedulable_id', $this->location->id);
                     });
                 }
             });
@@ -194,61 +224,11 @@ class Device extends BaseModel
         return $query->exists();
     }
 
-    public function loadOs($force = false)
-    {
-        $yaml_file = base_path('/includes/definitions/' . $this->os . '.yaml');
-
-        if ((!\LibreNMS\Config::getOsSetting($this->os, 'definition_loaded') || $force) && file_exists($yaml_file)) {
-            $os = \Symfony\Component\Yaml\Yaml::parse(file_get_contents($yaml_file));
-
-            \LibreNMS\Config::set("os.$this->os", array_replace_recursive($os, \LibreNMS\Config::get("os.$this->os", [])));
-            \LibreNMS\Config::set("os.$this->os.definition_loaded", true);
-        }
-    }
-
-    /**
-     * Load all OS, optionally load just the OS used by existing devices
-     * Default cache time is 1 day. Controlled by os_def_cache_time.
-     *
-     * @param bool $existing Only load OS that have existing OS in the database
-     * @param bool $cached Load os definitions from the cache file
-     */
-    public static function loadAllOs($existing = false, $cached = true)
-    {
-        $install_dir = \LibreNMS\Config::get('install_dir');
-        $cache_file = $install_dir . '/cache/os_defs.cache';
-        if ($cached && is_file($cache_file) && (time() - filemtime($cache_file) < \LibreNMS\Config::get('os_def_cache_time'))) {
-            // Cached
-            $os_defs = unserialize(file_get_contents($cache_file));
-            if ($existing) {
-                // remove unneeded os
-                $os_defs = array_diff_key($os_defs, self::distinct('os')->get('os')->toArray());
-            }
-            \LibreNMS\Config::set('os', array_replace_recursive($os_defs, \LibreNMS\Config::get('os')));
-        } else {
-            // load from yaml
-            if ($existing) {
-                $os_list = [];
-                foreach (self::distinct('os')->get('os')->toArray() as $os) {
-                    $os_list[] = $install_dir . '/includes/definitions/' . $os['os'] . '.yaml';
-                }
-            } else {
-                $os_list = glob($install_dir . '/includes/definitions/*.yaml');
-            }
-            foreach ($os_list as $file) {
-                if (is_readable($file)) {
-                    $tmp = \Symfony\Component\Yaml\Yaml::parse(file_get_contents($file));
-                    \LibreNMS\Config::set("os.{$tmp['os']}", array_replace_recursive($tmp, \LibreNMS\Config::get("os.{$tmp['os']}", [])));
-                }
-            }
-        }
-    }
-
     /**
      * Get the shortened display name of this device.
      * Length is always overridden by shorthost_target_length.
      *
-     * @param int $length length to shorten to, will not break up words so may be longer
+     * @param  int  $length  length to shorten to, will not break up words so may be longer
      * @return string
      */
     public function shortDisplayName($length = 12)
@@ -262,7 +242,8 @@ class Device extends BaseModel
 
         $length = \LibreNMS\Config::get('shorthost_target_length', $length);
         if ($length < strlen($name)) {
-            $take = substr_count($name, '.', 0, $length) + 1;
+            $take = max(substr_count($name, '.', 0, $length), 1);
+
             return implode('.', array_slice(explode('.', $name), 0, $take));
         }
 
@@ -272,12 +253,12 @@ class Device extends BaseModel
     /**
      * Check if user can access this device.
      *
-     * @param User $user
+     * @param  User  $user
      * @return bool
      */
     public function canAccess($user)
     {
-        if (!$user) {
+        if (! $user) {
             return false;
         }
 
@@ -288,9 +269,11 @@ class Device extends BaseModel
         return Permissions::canAccessDevice($this->device_id, $user->user_id);
     }
 
-    public function formatUptime($short = false)
+    public function formatDownUptime($short = false)
     {
-        return Time::formatInterval($this->uptime, $short);
+        $time = ($this->status == 1) ? $this->uptime : time() - strtotime($this->last_polled);
+
+        return Time::formatInterval($time, $short);
     }
 
     /**
@@ -307,7 +290,7 @@ class Device extends BaseModel
         ];
 
         foreach ($options as $file) {
-            if (is_file(public_path()."/$file")) {
+            if (is_file(public_path() . "/$file")) {
                 return asset($file);
             }
         }
@@ -316,28 +299,16 @@ class Device extends BaseModel
     }
 
     /**
-     * Get list of enabled graphs for this device.
-     *
-     * @return \Illuminate\Support\Collection
-     */
-    public function graphs()
-    {
-        return DB::table('device_graphs')
-            ->where('device_id', $this->device_id)
-            ->pluck('graph');
-    }
-
-    /**
      * Update the max_depth field based on parents
      * Performs SQL query, so make sure all parents are saved first
      *
-     * @param int $exclude exclude a device_id from being considered (used for deleting)
+     * @param  int  $exclude  exclude a device_id from being considered (used for deleting)
      */
     public function updateMaxDepth($exclude = null)
     {
         // optimize for memory instead of time
         $query = $this->parents()->getQuery();
-        if (!is_null($exclude)) {
+        if (! is_null($exclude)) {
             $query->where('device_id', '!=', $exclude);
         }
 
@@ -361,14 +332,13 @@ class Device extends BaseModel
      * Standalone is a special case where the device has no parents or children and is denoted by a max_depth of 0
      *
      * Only checks on root nodes (where max_depth is 1 or 0)
-     *
      */
     public function validateStandalone()
     {
         if ($this->max_depth === 0 && $this->children()->count() > 0) {
-            $this->max_depth = 1;  // has children
+            $this->max_depth = 1; // has children
         } elseif ($this->max_depth === 1 && $this->parents()->count() === 0) {
-            $this->max_depth = 0;  // no children or parents
+            $this->max_depth = 0; // no children or parents
         }
 
         $this->save();
@@ -385,13 +355,14 @@ class Device extends BaseModel
             return $item->attrib_type === $name;
         });
 
-        if (!$attrib) {
+        if (! $attrib) {
             $attrib = new DeviceAttrib(['attrib_type' => $name]);
             $this->attribs->push($attrib);
         }
 
         $attrib->attrib_value = $value;
-        return (bool)$this->attribs()->save($attrib);
+
+        return (bool) $this->attribs()->save($attrib);
     }
 
     public function forgetAttrib($name)
@@ -401,8 +372,12 @@ class Device extends BaseModel
         });
 
         if ($attrib_index !== false) {
-            $this->attribs->forget($attrib_index);
-            return (bool)$this->attribs->get($attrib_index)->delete();
+            $deleted = (bool) $this->attribs->get($attrib_index)->delete();
+            // only forget the attrib_index after delete, otherwise delete() will fail fatally with:
+            // Symfony\\Component\\Debug\Exception\\FatalThrowableError(code: 0):  Call to a member function delete() on null
+            $this->attribs->forget((string) $attrib_index);
+
+            return $deleted;
         }
 
         return false;
@@ -413,15 +388,50 @@ class Device extends BaseModel
         return $this->attribs->pluck('attrib_value', 'attrib_type')->toArray();
     }
 
+    /**
+     * Update the location to the correct location and update GPS if needed
+     *
+     * @param  \App\Models\Location|string  $new_location  location data
+     * @param  bool  $doLookup  try to lookup the GPS coordinates
+     */
+    public function setLocation($new_location, bool $doLookup = false)
+    {
+        $new_location = $new_location instanceof Location ? $new_location : new Location(['location' => $new_location]);
+        $new_location->location = $new_location->location ? Rewrite::location($new_location->location) : null;
+        $coord = array_filter($new_location->only(['lat', 'lng']));
+
+        if (! $this->override_sysLocation) {
+            if (! $new_location->location) { // disassociate if the location name is empty
+                $this->location()->dissociate();
+
+                return;
+            }
+
+            if (! $this->relationLoaded('location') || optional($this->location)->location !== $new_location->location) {
+                if (! $new_location->exists) { // don't fetch if new location persisted to the DB, just use it
+                    $new_location = Location::firstOrCreate(['location' => $new_location->location], $coord);
+                }
+                $this->location()->associate($new_location);
+            }
+        }
+
+        // set coordinates
+        if ($this->location && ! $this->location->fixed_coordinates) {
+            $this->location->fill($coord);
+            if ($doLookup && empty($coord)) { // only if requested and coordinates not passed explicitly
+                $this->location->lookupCoordinates($this->hostname);
+            }
+        }
+    }
+
     // ---- Accessors/Mutators ----
 
-    public function getIconAttribute($icon)
+    public function getIconAttribute($icon): string
     {
-        $this->loadOs();
         return Str::start(Url::findOsImage($this->os, $this->features, $icon), 'images/os/');
     }
 
-    public function getIpAttribute($ip)
+    public function getIpAttribute($ip): ?string
     {
         if (empty($ip)) {
             return null;
@@ -430,14 +440,24 @@ class Device extends BaseModel
         return @inet_ntop($ip) ?: null;
     }
 
-    public function setIpAttribute($ip)
+    public function setIpAttribute($ip): void
     {
         $this->attributes['ip'] = inet_pton($ip);
     }
 
-    public function setStatusAttribute($status)
+    public function setStatusAttribute($status): void
     {
-        $this->attributes['status'] = (int)$status;
+        $this->attributes['status'] = (int) $status;
+    }
+
+    public function setSysDescrAttribute(?string $sysDescr): void
+    {
+        $this->attributes['sysDescr'] = $sysDescr === null ? null : trim(str_replace(chr(218), "\n", $sysDescr), "\\\" \r\n\t\0");
+    }
+
+    public function setSysNameAttribute(?string $sysName): void
+    {
+        $this->attributes['sysName'] = $sysName === null ? null : str_replace("\n", '', strtolower(trim($sysName)));
     }
 
     // ---- Query scopes ----
@@ -448,7 +468,7 @@ class Device extends BaseModel
             ['status', '=', 1],
             ['ignore', '=', 0],
             ['disable_notify', '=', 0],
-            ['disabled', '=', 0]
+            ['disabled', '=', 0],
         ]);
     }
 
@@ -456,7 +476,7 @@ class Device extends BaseModel
     {
         return $query->where([
             ['ignore', '=', 0],
-            ['disabled', '=', 0]
+            ['disabled', '=', 0],
         ]);
     }
 
@@ -466,7 +486,7 @@ class Device extends BaseModel
             ['status', '=', 0],
             ['disable_notify', '=', 0],
             ['ignore', '=', 0],
-            ['disabled', '=', 0]
+            ['disabled', '=', 0],
         ]);
     }
 
@@ -474,28 +494,28 @@ class Device extends BaseModel
     {
         return $query->where([
             ['ignore', '=', 1],
-            ['disabled', '=', 0]
+            ['disabled', '=', 0],
         ]);
     }
 
     public function scopeNotIgnored($query)
     {
         return $query->where([
-            ['ignore', '=', 0]
+            ['ignore', '=', 0],
         ]);
     }
 
     public function scopeIsDisabled($query)
     {
         return $query->where([
-            ['disabled', '=', 1]
+            ['disabled', '=', 1],
         ]);
     }
 
     public function scopeIsDisableNotify($query)
     {
         return $query->where([
-            ['disable_notify', '=', 1]
+            ['disable_notify', '=', 1],
         ]);
     }
 
@@ -503,21 +523,32 @@ class Device extends BaseModel
     {
         return $query->where([
             ['disable_notify', '=', 0],
-            ['disabled', '=', 0]
+            ['disabled', '=', 0],
         ]);
     }
 
-    public function scopeCanPing(Builder $query)
+    public function scopeWhereAttributeDisabled(Builder $query, string $attribute): Builder
     {
-        return $query->where('disabled', 0)
-            ->leftJoin('devices_attribs', function (JoinClause $query) {
-                $query->on('devices.device_id', 'devices_attribs.device_id')
-                    ->where('devices_attribs.attrib_type', 'override_icmp_disable');
-            })
-            ->where(function (Builder $query) {
-                $query->whereNull('devices_attribs.attrib_value')
-                    ->orWhere('devices_attribs.attrib_value', '!=', 'true');
-            });
+        return $query->leftJoin('devices_attribs', function (JoinClause $query) use ($attribute) {
+            $query->on('devices.device_id', 'devices_attribs.device_id')
+                ->where('devices_attribs.attrib_type', $attribute);
+        })->where(function (Builder $query) {
+            $query->whereNull('devices_attribs.attrib_value')
+                ->orWhere('devices_attribs.attrib_value', '!=', 'true');
+        });
+    }
+
+    public function scopeWhereUptime($query, $uptime, $modifier = '<')
+    {
+        return $query->where([
+            ['uptime', '>', 0],
+            ['uptime', $modifier, $uptime],
+        ]);
+    }
+
+    public function scopeCanPing(Builder $query): Builder
+    {
+        return $this->scopeWhereAttributeDisabled($query->where('disabled', 0), 'override_icmp_disable');
     }
 
     public function scopeHasAccess($query, User $user)
@@ -527,213 +558,413 @@ class Device extends BaseModel
 
     public function scopeInDeviceGroup($query, $deviceGroup)
     {
-        return $query->whereIn($query->qualifyColumn('device_id'), function ($query) use ($deviceGroup) {
-            $query->select('device_id')
+        return $query->whereIn(
+            $query->qualifyColumn('device_id'), function ($query) use ($deviceGroup) {
+                $query->select('device_id')
                 ->from('device_group_device')
                 ->where('device_group_id', $deviceGroup);
-        });
+            }
+        );
+    }
+
+    public function scopeNotInDeviceGroup($query, $deviceGroup)
+    {
+        return $query->whereNotIn(
+            $query->qualifyColumn('device_id'), function ($query) use ($deviceGroup) {
+                $query->select('device_id')
+                ->from('device_group_device')
+                ->where('device_group_id', $deviceGroup);
+            }
+        );
+    }
+
+    public function scopeInServiceTemplate($query, $serviceTemplate)
+    {
+        return $query->whereIn(
+            $query->qualifyColumn('device_id'), function ($query) use ($serviceTemplate) {
+                $query->select('device_id')
+                ->from('service_templates_device')
+                ->where('service_template_id', $serviceTemplate);
+            }
+        );
+    }
+
+    public function scopeNotInServiceTemplate($query, $serviceTemplate)
+    {
+        return $query->whereNotIn(
+            $query->qualifyColumn('device_id'), function ($query) use ($serviceTemplate) {
+                $query->select('device_id')
+                ->from('service_templates_device')
+                ->where('service_template_id', $serviceTemplate);
+            }
+        );
     }
 
     // ---- Define Relationships ----
 
-    public function alerts()
+    public function accessPoints(): HasMany
     {
-        return $this->hasMany('App\Models\Alert', 'device_id');
+        return $this->hasMany(AccessPoint::class, 'device_id');
     }
 
-    public function attribs()
+    public function alerts(): HasMany
     {
-        return $this->hasMany('App\Models\DeviceAttrib', 'device_id');
+        return $this->hasMany(\App\Models\Alert::class, 'device_id');
     }
 
-    public function alertSchedules()
+    public function alertLogs(): HasMany
     {
-        return $this->morphToMany('App\Models\AlertSchedule', 'alert_schedulable', 'alert_schedulables', 'schedule_id', 'schedule_id');
+        return $this->hasMany(\App\Models\AlertLog::class, 'device_id');
     }
 
-    public function applications()
+    public function alertSchedules(): MorphToMany
     {
-        return $this->hasMany('App\Models\Application', 'device_id');
+        return $this->morphToMany(\App\Models\AlertSchedule::class, 'alert_schedulable', 'alert_schedulables', 'schedule_id', 'schedule_id');
     }
 
-    public function bgppeers()
+    public function applications(): HasMany
     {
-        return $this->hasMany('App\Models\BgpPeer', 'device_id');
+        return $this->hasMany(\App\Models\Application::class, 'device_id');
     }
 
-    public function cefSwitching()
+    public function attribs(): HasMany
     {
-        return $this->hasMany('App\Models\CefSwitching', 'device_id');
+        return $this->hasMany(\App\Models\DeviceAttrib::class, 'device_id');
     }
 
-    public function children()
+    public function availability(): HasMany
     {
-        return $this->belongsToMany('App\Models\Device', 'device_relationships', 'parent_device_id', 'child_device_id');
+        return $this->hasMany(\App\Models\Availability::class, 'device_id');
     }
 
-    public function components()
+    public function bgppeers(): HasMany
     {
-        return $this->hasMany('App\Models\Component', 'device_id');
+        return $this->hasMany(\App\Models\BgpPeer::class, 'device_id');
     }
 
-    public function eventlogs()
+    public function cefSwitching(): HasMany
     {
-        return $this->hasMany('App\Models\Eventlog', 'device_id', 'device_id');
+        return $this->hasMany(\App\Models\CefSwitching::class, 'device_id');
     }
 
-    public function groups()
+    public function children(): BelongsToMany
     {
-        return $this->belongsToMany('App\Models\DeviceGroup', 'device_group_device', 'device_id', 'device_group_id');
+        return $this->belongsToMany(self::class, 'device_relationships', 'parent_device_id', 'child_device_id');
     }
 
-    public function ipv4()
+    public function components(): HasMany
     {
-        return $this->hasManyThrough('App\Models\Ipv4Address', 'App\Models\Port', 'device_id', 'port_id', 'device_id', 'port_id');
+        return $this->hasMany(\App\Models\Component::class, 'device_id');
     }
 
-    public function ipv6()
+    public function diskIo(): HasMany
     {
-        return $this->hasManyThrough('App\Models\Ipv6Address', 'App\Models\Port', 'device_id', 'port_id', 'device_id', 'port_id');
+        return $this->hasMany(\App\Models\DiskIo::class, 'device_id');
     }
 
-    public function location()
+    public function hostResources(): HasMany
     {
-        return $this->belongsTo('App\Models\Location', 'location_id', 'id');
+        return $this->hasMany(HrDevice::class, 'device_id');
     }
 
-    public function ospfInstances()
+    public function hostResourceValues(): HasOne
     {
-        return $this->hasMany('App\Models\OspfInstance', 'device_id');
+        return $this->hasOne(HrSystem::class, 'device_id');
     }
 
-    public function packages()
+    public function entityPhysical(): HasMany
     {
-        return $this->hasMany('App\Models\Package', 'device_id', 'device_id');
+        return $this->hasMany(EntPhysical::class, 'device_id');
     }
 
-    public function parents()
+    public function entityState(): HasMany
     {
-        return $this->belongsToMany('App\Models\Device', 'device_relationships', 'child_device_id', 'parent_device_id');
+        return $this->hasMany(EntityState::class, 'device_id');
     }
 
-    public function perf()
+    public function eventlogs(): HasMany
     {
-        return $this->hasMany('App\Models\DevicePerf', 'device_id');
+        return $this->hasMany(\App\Models\Eventlog::class, 'device_id', 'device_id');
     }
 
-    public function ports()
+    public function graphs(): HasMany
     {
-        return $this->hasMany('App\Models\Port', 'device_id', 'device_id');
+        return $this->hasMany(\App\Models\DeviceGraph::class, 'device_id');
     }
 
-    public function portsFdb()
+    public function groups(): BelongsToMany
     {
-        return $this->hasMany('App\Models\PortsFdb', 'device_id', 'device_id');
+        return $this->belongsToMany(\App\Models\DeviceGroup::class, 'device_group_device', 'device_id', 'device_group_id');
     }
 
-    public function portsNac()
+    public function ipsecTunnels(): HasMany
     {
-        return $this->hasMany('App\Models\PortsNac', 'device_id', 'device_id');
+        return $this->hasMany(IpsecTunnel::class, 'device_id');
     }
 
-    public function processors()
+    public function ipv4(): HasManyThrough
     {
-        return $this->hasMany('App\Models\Processor', 'device_id');
+        return $this->hasManyThrough(\App\Models\Ipv4Address::class, \App\Models\Port::class, 'device_id', 'port_id', 'device_id', 'port_id');
     }
 
-    public function rules()
+    public function ipv6(): HasManyThrough
     {
-        return $this->belongsToMany('App\Models\AlertRule', 'alert_device_map', 'device_id', 'rule_id');
+        return $this->hasManyThrough(\App\Models\Ipv6Address::class, \App\Models\Port::class, 'device_id', 'port_id', 'device_id', 'port_id');
     }
 
-    public function sensors()
+    public function isisAdjacencies(): HasMany
     {
-        return $this->hasMany('App\Models\Sensor', 'device_id');
+        return $this->hasMany(\App\Models\IsisAdjacency::class, 'device_id', 'device_id');
     }
 
-    public function services()
+    public function location(): BelongsTo
     {
-        return $this->hasMany('App\Models\Service', 'device_id');
+        return $this->belongsTo(\App\Models\Location::class, 'location_id', 'id');
     }
 
-    public function storage()
+    public function macs(): HasMany
     {
-        return $this->hasMany('App\Models\Storage', 'device_id');
+        return $this->hasMany(Ipv4Mac::class, 'device_id');
     }
 
-    public function mempools()
+    public function mefInfo(): HasMany
     {
-        return $this->hasMany('App\Models\Mempool', 'device_id');
+        return $this->hasMany(MefInfo::class, 'device_id');
     }
 
-    public function mplsLsps()
+    public function muninPlugins(): HasMany
     {
-        return $this->hasMany('App\Models\MplsLsp', 'device_id');
+        return $this->hasMany(\App\Models\MuninPlugin::class, 'device_id');
     }
 
-    public function mplsLspPaths()
+    public function netscalerVservers(): HasMany
     {
-        return $this->hasMany('App\Models\MplsLspPath', 'device_id');
+        return $this->hasMany(NetscalerVserver::class, 'device_id');
     }
 
-    public function mplsSdps()
+    public function ospfAreas(): HasMany
     {
-        return $this->hasMany('App\Models\MplsSdp', 'device_id');
+        return $this->hasMany(\App\Models\OspfArea::class, 'device_id');
     }
 
-    public function mplsServices()
+    public function ospfInstances(): HasMany
     {
-        return $this->hasMany('App\Models\MplsService', 'device_id');
+        return $this->hasMany(\App\Models\OspfInstance::class, 'device_id');
     }
 
-    public function mplsSaps()
+    public function ospfNbrs(): HasMany
     {
-        return $this->hasMany('App\Models\MplsSap', 'device_id');
+        return $this->hasMany(\App\Models\OspfNbr::class, 'device_id');
     }
 
-    public function mplsSdpBinds()
+    public function ospfPorts(): HasMany
     {
-        return $this->hasMany('App\Models\MplsSdpBind', 'device_id');
+        return $this->hasMany(\App\Models\OspfPort::class, 'device_id');
     }
 
-    public function mplsTunnelArHops()
+    public function packages(): HasMany
     {
-        return $this->hasMany('App\Models\MplsTunnelArHop', 'device_id');
+        return $this->hasMany(\App\Models\Package::class, 'device_id', 'device_id');
     }
 
-    public function mplsTunnelCHops()
+    public function parents(): BelongsToMany
     {
-        return $this->hasMany('App\Models\MplsTunnelCHop', 'device_id');
+        return $this->belongsToMany(self::class, 'device_relationships', 'child_device_id', 'parent_device_id');
     }
 
-    public function syslogs()
+    public function perf(): HasMany
     {
-        return $this->hasMany('App\Models\Syslog', 'device_id', 'device_id');
+        return $this->hasMany(\App\Models\DevicePerf::class, 'device_id');
     }
 
-    public function users()
+    public function ports(): HasMany
+    {
+        return $this->hasMany(\App\Models\Port::class, 'device_id', 'device_id');
+    }
+
+    public function portsFdb(): HasMany
+    {
+        return $this->hasMany(\App\Models\PortsFdb::class, 'device_id', 'device_id');
+    }
+
+    public function portsNac(): HasMany
+    {
+        return $this->hasMany(\App\Models\PortsNac::class, 'device_id', 'device_id');
+    }
+
+    public function portsStp(): HasMany
+    {
+        return $this->hasMany(\App\Models\PortStp::class, 'device_id', 'device_id');
+    }
+
+    public function portsVlan(): HasMany
+    {
+        return $this->hasMany(\App\Models\PortVlan::class, 'device_id', 'device_id');
+    }
+
+    public function processes(): HasMany
+    {
+        return $this->hasMany(\App\Models\Process::class, 'device_id');
+    }
+
+    public function processors(): HasMany
+    {
+        return $this->hasMany(\App\Models\Processor::class, 'device_id');
+    }
+
+    public function routes(): HasMany
+    {
+        return $this->hasMany(Route::class, 'device_id');
+    }
+
+    public function rules(): BelongsToMany
+    {
+        return $this->belongsToMany(\App\Models\AlertRule::class, 'alert_device_map', 'device_id', 'rule_id');
+    }
+
+    public function sensors(): HasMany
+    {
+        return $this->hasMany(\App\Models\Sensor::class, 'device_id');
+    }
+
+    public function serviceTemplates(): BelongsToMany
+    {
+        return $this->belongsToMany(\App\Models\ServiceTemplate::class, 'service_templates_device', 'device_id', 'service_template_id');
+    }
+
+    public function services(): HasMany
+    {
+        return $this->hasMany(\App\Models\Service::class, 'device_id');
+    }
+
+    public function storage(): HasMany
+    {
+        return $this->hasMany(\App\Models\Storage::class, 'device_id');
+    }
+
+    public function stpInstances(): HasMany
+    {
+        return $this->hasMany(Stp::class, 'device_id');
+    }
+
+    public function stpPorts(): HasMany
+    {
+        return $this->hasMany(\App\Models\PortStp::class, 'device_id');
+    }
+
+    public function mempools(): HasMany
+    {
+        return $this->hasMany(\App\Models\Mempool::class, 'device_id');
+    }
+
+    public function mplsLsps(): HasMany
+    {
+        return $this->hasMany(\App\Models\MplsLsp::class, 'device_id');
+    }
+
+    public function mplsLspPaths(): HasMany
+    {
+        return $this->hasMany(\App\Models\MplsLspPath::class, 'device_id');
+    }
+
+    public function mplsSdps(): HasMany
+    {
+        return $this->hasMany(\App\Models\MplsSdp::class, 'device_id');
+    }
+
+    public function mplsServices(): HasMany
+    {
+        return $this->hasMany(\App\Models\MplsService::class, 'device_id');
+    }
+
+    public function mplsSaps(): HasMany
+    {
+        return $this->hasMany(\App\Models\MplsSap::class, 'device_id');
+    }
+
+    public function mplsSdpBinds(): HasMany
+    {
+        return $this->hasMany(\App\Models\MplsSdpBind::class, 'device_id');
+    }
+
+    public function mplsTunnelArHops(): HasMany
+    {
+        return $this->hasMany(\App\Models\MplsTunnelArHop::class, 'device_id');
+    }
+
+    public function mplsTunnelCHops(): HasMany
+    {
+        return $this->hasMany(\App\Models\MplsTunnelCHop::class, 'device_id');
+    }
+
+    public function outages(): HasMany
+    {
+        return $this->hasMany(DeviceOutage::class, 'device_id');
+    }
+
+    public function printerSupplies(): HasMany
+    {
+        return $this->hasMany(PrinterSupply::class, 'device_id');
+    }
+
+    public function pseudowires(): HasMany
+    {
+        return $this->hasMany(Pseudowire::class, 'device_id');
+    }
+
+    public function rServers(): HasMany
+    {
+        return $this->hasMany(LoadbalancerRserver::class, 'device_id');
+    }
+
+    public function slas(): HasMany
+    {
+        return $this->hasMany(Sla::class, 'device_id');
+    }
+
+    public function syslogs(): HasMany
+    {
+        return $this->hasMany(\App\Models\Syslog::class, 'device_id', 'device_id');
+    }
+
+    public function tnmsNeInfo(): HasMany
+    {
+        return $this->hasMany(TnmsneInfo::class, 'device_id');
+    }
+
+    public function users(): BelongsToMany
     {
         // FIXME does not include global read
-        return $this->belongsToMany('App\Models\User', 'devices_perms', 'device_id', 'user_id');
+        return $this->belongsToMany(\App\Models\User::class, 'devices_perms', 'device_id', 'user_id');
     }
 
-    public function vminfo()
+    public function vminfo(): HasMany
     {
-        return $this->hasMany('App\Models\Vminfo', 'device_id');
+        return $this->hasMany(\App\Models\Vminfo::class, 'device_id');
     }
 
-    public function vrfLites()
+    public function vlans(): HasMany
     {
-        return $this->hasMany('App\Models\VrfLite', 'device_id');
+        return $this->hasMany(\App\Models\Vlan::class, 'device_id');
     }
 
-    public function vrfs()
+    public function vrfLites(): HasMany
     {
-        return $this->hasMany('App\Models\Vrf', 'device_id');
+        return $this->hasMany(\App\Models\VrfLite::class, 'device_id');
     }
 
-    public function wirelessSensors()
+    public function vrfs(): HasMany
     {
-        return $this->hasMany('App\Models\WirelessSensor', 'device_id');
+        return $this->hasMany(\App\Models\Vrf::class, 'device_id');
+    }
+
+    public function vServers(): HasMany
+    {
+        return $this->hasMany(LoadbalancerVserver::class, 'device_id');
+    }
+
+    public function wirelessSensors(): HasMany
+    {
+        return $this->hasMany(\App\Models\WirelessSensor::class, 'device_id');
     }
 }

@@ -7,24 +7,6 @@
                     "sysObjectID": null,
                     "sysDescr": null,
                     "sysContact": null,
-                    "version": null,
-                    "hardware": null,
-                    "features": null,
-                    "os": "enexus",
-                    "type": "power",
-                    "serial": null,
-                    "icon": "eltek.png",
-                    "location": null
-                }
-            ]
-        },
-        "poller": {
-            "devices": [
-                {
-                    "sysName": "",
-                    "sysObjectID": null,
-                    "sysDescr": null,
-                    "sysContact": null,
                     "version": "2.5.2",
                     "hardware": "Smartpack S",
                     "features": null,
@@ -32,10 +14,11 @@
                     "type": "power",
                     "serial": "999999999999",
                     "icon": "eltek.png",
-                    "location": null
+                    "location": "Site"
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     },
     "sensors": {
         "discovery": {

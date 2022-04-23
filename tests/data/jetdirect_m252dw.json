@@ -6,24 +6,6 @@
                     "sysName": "<private>",
                     "sysObjectID": ".1.3.6.1.4.1.11.2.3.9.1",
                     "sysDescr": "HP ETHERNET MULTI-ENVIRONMENT,SN:VNB3J99999,FN:1F31B6C,SVCID:99999,PID:HP Color LaserJet Pro M252dw",
-                    "sysContact": null,
-                    "version": null,
-                    "hardware": null,
-                    "features": null,
-                    "os": "jetdirect",
-                    "type": "printer",
-                    "serial": null,
-                    "icon": "hp.svg",
-                    "location": null
-                }
-            ]
-        },
-        "poller": {
-            "devices": [
-                {
-                    "sysName": "<private>",
-                    "sysObjectID": ".1.3.6.1.4.1.11.2.3.9.1",
-                    "sysDescr": "HP ETHERNET MULTI-ENVIRONMENT,SN:VNB3J99999,FN:1F31B6C,SVCID:99999,PID:HP Color LaserJet Pro M252dw",
                     "sysContact": "<private>",
                     "version": null,
                     "hardware": "Color LaserJet Pro M252dw",
@@ -35,7 +17,8 @@
                     "location": "<private>"
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     },
     "ports": {
         "discovery": {
@@ -51,10 +34,10 @@
                     "portName": null,
                     "ifIndex": 1,
                     "ifSpeed": null,
+                    "ifSpeed_prev": null,
                     "ifConnectorPresent": null,
                     "ifPromiscuousMode": null,
-                    "ifHighSpeed": null,
-                    "ifOperStatus": null,
+                    "ifOperStatus": "up",
                     "ifOperStatus_prev": null,
                     "ifAdminStatus": null,
                     "ifAdminStatus_prev": null,
@@ -156,10 +139,10 @@
                     "portName": null,
                     "ifIndex": 2,
                     "ifSpeed": null,
+                    "ifSpeed_prev": null,
                     "ifConnectorPresent": null,
                     "ifPromiscuousMode": null,
-                    "ifHighSpeed": null,
-                    "ifOperStatus": null,
+                    "ifOperStatus": "up",
                     "ifOperStatus_prev": null,
                     "ifAdminStatus": null,
                     "ifAdminStatus_prev": null,
@@ -261,10 +244,10 @@
                     "portName": null,
                     "ifIndex": 3,
                     "ifSpeed": null,
+                    "ifSpeed_prev": null,
                     "ifConnectorPresent": null,
                     "ifPromiscuousMode": null,
-                    "ifHighSpeed": null,
-                    "ifOperStatus": null,
+                    "ifOperStatus": "down",
                     "ifOperStatus_prev": null,
                     "ifAdminStatus": null,
                     "ifAdminStatus_prev": null,
@@ -366,10 +349,10 @@
                     "portName": null,
                     "ifIndex": 4,
                     "ifSpeed": null,
+                    "ifSpeed_prev": null,
                     "ifConnectorPresent": null,
                     "ifPromiscuousMode": null,
-                    "ifHighSpeed": null,
-                    "ifOperStatus": null,
+                    "ifOperStatus": "down",
                     "ifOperStatus_prev": null,
                     "ifAdminStatus": null,
                     "ifAdminStatus_prev": null,
@@ -475,11 +458,11 @@
                     "portName": null,
                     "ifIndex": 1,
                     "ifSpeed": 0,
+                    "ifSpeed_prev": null,
                     "ifConnectorPresent": null,
                     "ifPromiscuousMode": null,
-                    "ifHighSpeed": null,
                     "ifOperStatus": "up",
-                    "ifOperStatus_prev": null,
+                    "ifOperStatus_prev": "up",
                     "ifAdminStatus": "up",
                     "ifAdminStatus_prev": null,
                     "ifDuplex": null,
@@ -580,11 +563,11 @@
                     "portName": null,
                     "ifIndex": 2,
                     "ifSpeed": 10000000,
+                    "ifSpeed_prev": null,
                     "ifConnectorPresent": null,
                     "ifPromiscuousMode": null,
-                    "ifHighSpeed": null,
                     "ifOperStatus": "up",
-                    "ifOperStatus_prev": null,
+                    "ifOperStatus_prev": "up",
                     "ifAdminStatus": "up",
                     "ifAdminStatus_prev": null,
                     "ifDuplex": null,
@@ -685,11 +668,11 @@
                     "portName": null,
                     "ifIndex": 3,
                     "ifSpeed": 10000000,
+                    "ifSpeed_prev": null,
                     "ifConnectorPresent": null,
                     "ifPromiscuousMode": null,
-                    "ifHighSpeed": null,
                     "ifOperStatus": "down",
-                    "ifOperStatus_prev": null,
+                    "ifOperStatus_prev": "down",
                     "ifAdminStatus": "down",
                     "ifAdminStatus_prev": null,
                     "ifDuplex": null,
@@ -790,11 +773,11 @@
                     "portName": null,
                     "ifIndex": 4,
                     "ifSpeed": 10000000,
+                    "ifSpeed_prev": null,
                     "ifConnectorPresent": null,
                     "ifPromiscuousMode": null,
-                    "ifHighSpeed": null,
                     "ifOperStatus": "down",
-                    "ifOperStatus_prev": null,
+                    "ifOperStatus_prev": "down",
                     "ifAdminStatus": "down",
                     "ifAdminStatus_prev": null,
                     "ifDuplex": null,
@@ -893,14 +876,18 @@
                 {
                     "mempool_index": "1",
                     "entPhysicalIndex": null,
-                    "hrDeviceIndex": null,
                     "mempool_type": "hrstorage",
+                    "mempool_class": "system",
                     "mempool_precision": 1,
                     "mempool_descr": "Random Access Memory",
-                    "mempool_perc": 0,
-                    "mempool_used": 0,
-                    "mempool_free": 0,
-                    "mempool_total": 0,
+                    "mempool_perc": 22,
+                    "mempool_perc_oid": null,
+                    "mempool_used": 59902715,
+                    "mempool_used_oid": ".1.3.6.1.2.1.25.2.3.1.6.1",
+                    "mempool_free": 208532741,
+                    "mempool_free_oid": null,
+                    "mempool_total": 268435456,
+                    "mempool_total_oid": null,
                     "mempool_largestfree": null,
                     "mempool_lowestfree": null,
                     "mempool_deleted": 0,
@@ -908,26 +895,7 @@
                 }
             ]
         },
-        "poller": {
-            "mempools": [
-                {
-                    "mempool_index": "1",
-                    "entPhysicalIndex": null,
-                    "hrDeviceIndex": null,
-                    "mempool_type": "hrstorage",
-                    "mempool_precision": 1,
-                    "mempool_descr": "Random Access Memory",
-                    "mempool_perc": 22,
-                    "mempool_used": 59902715,
-                    "mempool_free": 208532741,
-                    "mempool_total": 268435456,
-                    "mempool_largestfree": null,
-                    "mempool_lowestfree": null,
-                    "mempool_deleted": 0,
-                    "mempool_perc_warn": 90
-                }
-            ]
-        }
+        "poller": "matches discovery"
     },
     "sensors": {
         "discovery": {
@@ -1098,53 +1066,53 @@
         },
         "poller": "matches discovery"
     },
-    "toner": {
+    "printer-supplies": {
         "discovery": {
-            "toner": [
+            "printer_supplies": [
                 {
-                    "toner_index": 1,
-                    "toner_type": "toner",
-                    "toner_oid": ".1.3.6.1.2.1.43.11.1.1.9.1.1",
-                    "toner_descr": "Black Cartridge HP CF400X",
-                    "toner_capacity": 100,
-                    "toner_current": 63,
-                    "toner_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8.1.1"
+                    "supply_index": 1,
+                    "supply_type": "toner",
+                    "supply_oid": ".1.3.6.1.2.1.43.11.1.1.9.1.1",
+                    "supply_descr": "Black Cartridge HP CF400X",
+                    "supply_capacity": 100,
+                    "supply_current": 63,
+                    "supply_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8.1.1"
                 },
                 {
-                    "toner_index": 2,
-                    "toner_type": "toner",
-                    "toner_oid": ".1.3.6.1.2.1.43.11.1.1.9.1.2",
-                    "toner_descr": "Cyan Cartridge HP CF401X",
-                    "toner_capacity": 100,
-                    "toner_current": 63,
-                    "toner_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8.1.2"
+                    "supply_index": 2,
+                    "supply_type": "toner",
+                    "supply_oid": ".1.3.6.1.2.1.43.11.1.1.9.1.2",
+                    "supply_descr": "Cyan Cartridge HP CF401X",
+                    "supply_capacity": 100,
+                    "supply_current": 63,
+                    "supply_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8.1.2"
                 },
                 {
-                    "toner_index": 3,
-                    "toner_type": "toner",
-                    "toner_oid": ".1.3.6.1.2.1.43.11.1.1.9.1.3",
-                    "toner_descr": "Magenta Cartridge HP CF403X",
-                    "toner_capacity": 100,
-                    "toner_current": 88,
-                    "toner_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8.1.3"
+                    "supply_index": 3,
+                    "supply_type": "toner",
+                    "supply_oid": ".1.3.6.1.2.1.43.11.1.1.9.1.3",
+                    "supply_descr": "Magenta Cartridge HP CF403X",
+                    "supply_capacity": 100,
+                    "supply_current": 88,
+                    "supply_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8.1.3"
                 },
                 {
-                    "toner_index": 4,
-                    "toner_type": "toner",
-                    "toner_oid": ".1.3.6.1.2.1.43.11.1.1.9.1.4",
-                    "toner_descr": "Yellow Cartridge HP CF402X",
-                    "toner_capacity": 100,
-                    "toner_current": 36,
-                    "toner_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8.1.4"
+                    "supply_index": 4,
+                    "supply_type": "toner",
+                    "supply_oid": ".1.3.6.1.2.1.43.11.1.1.9.1.4",
+                    "supply_descr": "Yellow Cartridge HP CF402X",
+                    "supply_capacity": 100,
+                    "supply_current": 36,
+                    "supply_capacity_oid": ".1.3.6.1.2.1.43.11.1.1.8.1.4"
                 },
                 {
-                    "toner_index": 2,
-                    "toner_type": "input",
-                    "toner_oid": ".1.3.6.1.2.1.43.8.2.1.10.1.2",
-                    "toner_descr": "Tray 2",
-                    "toner_capacity": 150,
-                    "toner_current": 50,
-                    "toner_capacity_oid": ".1.3.6.1.2.1.43.8.2.1.9.1.2"
+                    "supply_index": 2,
+                    "supply_type": "input",
+                    "supply_oid": ".1.3.6.1.2.1.43.8.2.1.10.1.2",
+                    "supply_descr": "Tray 2",
+                    "supply_capacity": 150,
+                    "supply_current": 50,
+                    "supply_capacity_oid": ".1.3.6.1.2.1.43.8.2.1.9.1.2"
                 }
             ]
         },

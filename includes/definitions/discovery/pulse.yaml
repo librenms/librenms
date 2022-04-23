@@ -1,8 +1,19 @@
 mib: PULSESECURE-PSG-MIB
 modules:
+    mempools:
+        data:
+            -
+                total: UCD-SNMP-MIB::memTotalReal
+                percent_used: PULSESECURE-PSG-MIB::iveMemoryUtil
+                precision: 1024
+                descr: 'Main Memory'
+                type: 'pulse-mem'
+    os:
+        hardware: PULSESECURE-PSG-MIB::productName.0
+        version: PULSESECURE-PSG-MIB::productVersion.0
     processors:
-          data:
-              -
-                  oid: iveCpuUtil
-                  num_oid: '.1.3.6.1.4.1.12532.10.{{ $index }}'
-                  type: pulse-cpu
+        data:
+            -
+                oid: iveCpuUtil
+                num_oid: '.1.3.6.1.4.1.12532.10.{{ $index }}'
+                type: pulse-cpu

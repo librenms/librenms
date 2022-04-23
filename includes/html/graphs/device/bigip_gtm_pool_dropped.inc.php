@@ -13,8 +13,8 @@
  */
 
 $component = new LibreNMS\Component();
-$options = array();
-$options['filter']['type'] = array('=','f5-gtm-pool');
+$options = [];
+$options['filter']['type'] = ['=', 'f5-gtm-pool'];
 $components = $component->getComponents($device['device_id'], $options);
 
 // We only care about our device id.
@@ -25,8 +25,8 @@ if (isset($components[$vars['id']])) {
     $label = $components[$vars['id']]['label'];
     $hash = $components[$vars['id']]['hash'];
 
-    $rrd_filename = rrd_name($device['hostname'], array('f5-gtm-pool', $label, $hash));
-    if (rrdtool_check_rrd_exists($rrd_filename)) {
+    $rrd_filename = Rrd::name($device['hostname'], ['f5-gtm-pool', $label, $hash]);
+    if (Rrd::checkRrdExists($rrd_filename)) {
         require 'includes/html/graphs/common.inc.php';
         $ds = 'dropped';
 

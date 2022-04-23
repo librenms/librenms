@@ -1,0 +1,310 @@
+TAIT-TN9300-TC DEFINITIONS ::= BEGIN
+
+--
+-- Textual conventions and enumerations for the TN9300 DMR Node
+--
+
+IMPORTS
+
+    Integer32, Unsigned32,
+    MODULE-IDENTITY        FROM SNMPv2-SMI
+    TEXTUAL-CONVENTION     FROM SNMPv2-TC
+	taitModules            FROM TAIT-COMMON-MIB;
+
+taittn9300TC MODULE-IDENTITY
+   LAST-UPDATED "201812041200Z"
+   ORGANIZATION "www.taitworld.com"
+   CONTACT-INFO
+      "postal:   Tait International Limited
+                 558 Wairakei Road
+                 Christchurch
+                 PO Box 1645
+                 Christchurch
+                 New Zealand
+
+       phone:    +64 3358 3399
+       email:    support@taitworld.com"
+
+   DESCRIPTION  "Textual conventions used in the TN9300 MIB."
+
+   REVISION "201812041200Z"
+   DESCRIPTION "Defined the EventSeverity, LicenseValidity, UnitAuthentication, and RemoteNodeSyncState textual conventions."
+
+   REVISION "201807171005Z"
+   DESCRIPTION "Changed to Tait International Limited"
+
+   REVISION "201803182203Z"
+   DESCRIPTION "Changed naming on new terminal alarm definitions to camel case."
+
+   REVISION "201703160123Z"
+   DESCRIPTION "Fixed syntax on new terminal alarm definitions."
+
+   REVISION "201608221200Z"
+   DESCRIPTION "Added 3 Terminal alarm descriptions"
+
+   REVISION "201510301200Z"
+   DESCRIPTION "Changed some descriptions"
+
+   REVISION "201503172208Z"
+   DESCRIPTION "added UnitStatusMessageId enum"
+
+   REVISION "201206270902Z"
+   DESCRIPTION "Changed type of the syscode value to string"
+
+   REVISION     "201205282317Z"
+   DESCRIPTION
+      "Version 1.00.01
+       Status  [under review]"
+       ::= { taitModules 11 1 }
+
+
+-- =====================
+--
+--  Textual Conventions
+--
+-- =====================
+
+NodeRequestedState ::= TEXTUAL-CONVENTION
+   STATUS      current
+   DESCRIPTION "The state that a node has been instructed to enter. Status types are: Unknown (0), Offline(1), Program (2), or Online (3)."
+   SYNTAX      INTEGER {
+            unknown(0),
+            offline(1),
+            program(2),
+            online(3)
+            }
+
+NodeState ::= TEXTUAL-CONVENTION
+   STATUS      current
+   DESCRIPTION "The state in which a node is operating. Status types are Unknown (0), Offline (1), Program (2), Switching (3) or Control (4)."
+   SYNTAX      INTEGER {
+            unknown(0),
+            offline(1),
+            program(2),
+            switching(3),
+            control(4)
+            }
+
+NetworkCheckState ::= TEXTUAL-CONVENTION
+   STATUS      current
+   DESCRIPTION "The status of a network check. Status types are Not Configured (0), OK (1) or Failed (2)."
+   SYNTAX      INTEGER {
+            notConfigured(0),
+            ok(1),
+            failed(2)
+            }
+
+ChannelState ::= TEXTUAL-CONVENTION
+   STATUS      current
+   DESCRIPTION "The state in which a channel is operating. Status types are Unknown (0), Disabled (1), Idle (2), Control (3), Traffic (4), Data (5) or Failed (6)."
+   SYNTAX      INTEGER {
+            unknown(0),
+            disabled(1),
+            idle(2),
+            control(3),
+            traffic(4),
+            data(5),
+            failed(6)
+            }
+
+SipLineRegistrationType ::= TEXTUAL-CONVENTION
+   STATUS      current
+   DESCRIPTION "The types of SIP line registration. Registration types are Unknown (0), Outbound (1), Inbound (2) or AIS (3)."
+   SYNTAX      INTEGER {
+            unknown(0),
+            inbound(1),
+            outbound(2),
+            ais(3)
+            }
+
+SipLineIncomingType ::= TEXTUAL-CONVENTION
+   STATUS      current
+   DESCRIPTION "The ident of the A party in an incoming phone call. Ident types are Unknown (0), PSTNI (1) or PABXI (2)."
+   SYNTAX      INTEGER {
+            unknown(0),
+            pstni(1),
+            pabxi(2)
+            }
+
+SipCallSpeechVotingPriority ::= TEXTUAL-CONVENTION
+   STATUS      current
+   DESCRIPTION "The speech voting priority for SIP calls. Priority types are Unknown (0), Normal (1) or Override (2)."
+   SYNTAX      INTEGER {
+            unknown(0),
+            normal(1),
+            override(2)
+            }
+
+SipLineState ::= TEXTUAL-CONVENTION
+   STATUS      current
+   DESCRIPTION "The state in which a SIP line is operating. Status types are Unknown (0), Disabled (1), Up (2) or Down (3)."
+   SYNTAX      INTEGER {
+            unknown(0),
+            disabled(1),
+            up(2),
+            down(3)
+            }
+
+DipLineState ::= TEXTUAL-CONVENTION
+   STATUS      current
+   DESCRIPTION "The state in which a DIP line is operating. Status types are Unknown (0), Unconfigured (1), Idle (2), Active (3) or Failed (4)."
+   SYNTAX      INTEGER {
+            unknown(0),
+            unconfigured(1),
+            idle(2),
+            active(3),
+            failed(4)
+            }
+
+NgwLinkState ::= TEXTUAL-CONVENTION
+   STATUS      current
+   DESCRIPTION "The state of the link to the network gateway. Status types are Unknown (0), OK (1) or Failed (2)."
+   SYNTAX      INTEGER {
+            unknown(0),
+            ok(1),
+            failed(2)
+            }
+
+Mpt1327LinkState ::= TEXTUAL-CONVENTION
+   STATUS      current
+   DESCRIPTION "The state of the link to the MPT gateway. Status types are Unknown (0), OK (1) or Failed (2)."
+   SYNTAX      INTEGER {
+            unknown(0),
+            ok(1),
+            failed(2)
+            }
+
+Mpt1327ChannelState ::= TEXTUAL-CONVENTION
+   STATUS      current
+   DESCRIPTION "The state in which an MPT 1327 channel is operating. Status types are Unknown (0), Idle (1), Traffic (2), Control (3) or Failed (4)."
+   SYNTAX      INTEGER {
+            unknown(0),
+            idle(1),
+            traffic(2),
+            control(3),
+            failed(4)
+            }
+
+RemoteNodeState ::= TEXTUAL-CONVENTION
+   STATUS      current
+   DESCRIPTION "The state in which a remote node is operating. Status types are Unknown (0), Offline (1), Program (2), Switching (3), Control (4), Failed (5) or Graceful Shutdown (6)."
+   SYNTAX      INTEGER {
+            unknown(0),
+            offline(1),
+            program(2),
+            switching(3),
+            control(4),
+            failed(5),
+            gracefulShutdown(6)
+            }
+
+UnitStatusMessageId ::= TEXTUAL-CONVENTION
+   STATUS      current
+   DESCRIPTION "Unit alarm status message IDs:
+        PPP link to MPC down (1),
+        GPS signal lost (2),
+        GPS signal regained (after loss) (3),
+        Unit antenna connection failure (VSWR out of range) (4),
+        Unit supply voltage out of range (5),
+        Unit temperature T0 (normal range) (6),
+        Unit temperature T1 (over temp) (7),
+        Unit temperature T2 (over temp) (8),
+        Unit temperature T3 (over temp) (9),
+        Unit loss of service (10),
+        Radio frequency out of lock (service regained) (11),
+        MCP configuration error (12),
+        Unit antenna connection good (13),
+        Unit unsolicited reset (14),
+        Unit gained service (15)"
+   SYNTAX      INTEGER {
+        clearAll(0),
+        pppLinkToMpcDown(1),
+        gpsSignalLost(2),
+        gpsSignalRegainedAfterLoss(3),
+        terminalAntennaConnectionFailureVswrOutOfRange(4),
+        terminalSupplyVoltageOutOfRange(5),
+        radioTemperatureT0NormalRange(6),
+        radioTemperatureT1OverTemp(7),
+        radioTemperatureT2OverTemp(8),
+        radioTemperatureT3OverTemp(9),
+        terminalLossOfService(10),
+        radioFrequencyOutOfLockServiceRegained(11),
+        mcpConfigurationError(12),
+        terminalAntennaConnectionGood(13),
+        terminalUnsolicitedReset(14),
+        terminalGainedService(15),
+        unknown(128)
+        }
+
+EventSeverity ::= TEXTUAL-CONVENTION
+   STATUS      current
+   DESCRIPTION "The severity of an event. Types are OK (0), Minor (1), or Major (2)."
+   SYNTAX      INTEGER {
+            ok(0),
+            minor(1),
+            major(2)
+            }
+
+LicenseValidity ::= TEXTUAL-CONVENTION
+   STATUS      current
+   DESCRIPTION "The current validity of the license. Types are as follows:
+                Valid (0),
+                File Not Found (1),
+                Invalid Host ID (2),
+                Invalid Product Code(3),
+                Invalid Version (4),
+                Invalid Expiry Date (5),
+                Expired (6),
+                Corrupt Signature (7),
+                Conflicting Features (8),
+                Invalid Tier Mode (9),
+                Invalid License Format (10)"
+   SYNTAX      INTEGER {
+            valid(0),
+            fileNotFound(1),
+            invalidHostId(2),
+            invalidProductCode(3),
+            invalidVersion(4),
+            invalidExpiryDate(5),
+            expired(6),
+            corruptSignature(7),
+            conflictingFeatures(8),
+            invalidTierMode(9),
+            invalidLicenseFormat(10)
+            }
+
+UnitAuthentication ::= TEXTUAL-CONVENTION
+   STATUS      current
+   DESCRIPTION "The authentication state of a unit. Types are as follows:
+                Not Polled (0),
+                Polling (1),
+                Not Home (2),
+                Busy (3),
+                Bad Authentication (4),
+                Bad CRC Received (5),
+                Good Authentication Received (6),
+                Rejected (7),
+                Not Registered (8)"
+   SYNTAX      INTEGER {
+            notPolled(0),
+            polling(1),
+            notHome(2),
+            busy(3),
+            badAuthentication(4),
+            badCrcReceived(5),
+            goodAuthenticationReceived(6),
+            rejected(7),
+            notRegistered(8)
+            }
+
+RemoteNodeSyncState ::= TEXTUAL-CONVENTION
+   STATUS      current
+   DESCRIPTION "The state of synchronisation between the control and a remote node. Types are OK (0), Failed (1), Unknown (2), or None (3)."
+   SYNTAX      INTEGER {
+            ok(0),
+            failed(1),
+            unknown(2),
+            none(3)
+            }
+
+END

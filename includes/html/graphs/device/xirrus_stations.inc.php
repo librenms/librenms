@@ -2,7 +2,7 @@
 
 require 'includes/html/graphs/common.inc.php';
 
-$pallette = array(
+$pallette = [
     1  => '001080',
     2  => '043D85',
     3  => '096C8A',
@@ -18,24 +18,24 @@ $pallette = array(
     13 => 'BE5552',
     14 => 'C35B79',
     15 => 'C864A1',
-    16 => 'CE6FC7'
-);
+    16 => 'CE6FC7',
+];
 
 $rrd_options .= ' -l 0 -E ';
 $rrd_options .= " COMMENT:'Associated Stations    Cur     Min    Max\\n'";
-$radioId=1;
-foreach (glob(rrd_name($device['hostname'], 'xirrus_users-', '*.rrd')) as $rrd) {
+$radioId = 1;
+foreach (glob(Rrd::name($device['hostname'], 'xirrus_users-', '*.rrd')) as $rrd) {
     // get radio name
-    preg_match("/xirrus_users-iap([0-9]{1,2}).rrd/", $rrd, $out);
-    list(,$radioId)=$out;
+    preg_match('/xirrus_users-iap([0-9]{1,2}).rrd/', $rrd, $out);
+    [,$radioId] = $out;
 
     // build graph
-    $color=$pallette[$radioId];
+    $color = $pallette[$radioId];
 
-    $descr        = "iap$radioId             ";
+    $descr = "iap$radioId             ";
 
     $rrd_options .= " DEF:stations$radioId=$rrd:stations:AVERAGE";
-    $rrd_options .= " AREA:stations$radioId#".$color.":'".$descr."':STACK";
+    $rrd_options .= " AREA:stations$radioId#" . $color . ":'" . $descr . "':STACK";
     $rrd_options .= " GPRINT:stations$radioId:LAST:'%5.0lf'";
     $rrd_options .= " GPRINT:stations$radioId:MIN:'%5.0lf'";
     $rrd_options .= " GPRINT:stations$radioId:MAX:'%5.0lf'\\l";

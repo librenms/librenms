@@ -1,0 +1,155 @@
+-- ARISTA-GENERAL-MIB: Arista General MIB
+ARISTA-GENERAL-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY,
+    OBJECT-TYPE,
+    Unsigned32                  FROM SNMPv2-SMI
+    MODULE-COMPLIANCE,
+    OBJECT-GROUP                FROM SNMPv2-CONF
+    DateAndTime                 FROM SNMPv2-TC
+    aristaMibs                  FROM ARISTA-SMI-MIB;
+
+aristaGeneralMib MODULE-IDENTITY
+    LAST-UPDATED "201711060000Z"
+    ORGANIZATION "Arista Networks, Inc."
+    CONTACT-INFO
+        "Arista Networks, Inc.
+
+         Postal: 5453 Great America Parkway
+                 Santa Clara, CA 95054
+
+         Tel: +1 408 547-5500
+
+         E-mail: snmp@arista.com"
+    DESCRIPTION
+         "First draft."
+    REVISION "201711060000Z"
+    DESCRIPTION
+         "Initial version."
+    ::= { aristaMibs 24 }
+
+-- Textual Conventions --
+
+aristaGeneralMibNotifications OBJECT IDENTIFIER
+    ::= { aristaGeneralMib 0 }
+
+aristaGeneralMibObjects OBJECT IDENTIFIER
+    ::= { aristaGeneralMib 1 }
+
+aristaGeneralMibConformance OBJECT IDENTIFIER
+    ::= { aristaGeneralMib 2 }
+
+-- Reload cause table --
+
+aristaReloadCauseTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF AristaReloadCauseEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+         "Information describing the reload cause of each CPU unit.
+         On a modular system, entries for reboot instances of the
+         standby supervisor are present only when the redundancy
+         protocol is stateful switchover (SSO)."
+    ::= { aristaGeneralMibObjects 1 }
+
+aristaReloadCauseEntry OBJECT-TYPE
+    SYNTAX      AristaReloadCauseEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+         "This entry contains reload cause information of a CPU unit
+          for a particular reboot instance."
+    INDEX {
+      aristaReloadUnitIndex,
+      aristaReloadIndex,
+      aristaReloadCauseIndex
+    }
+    ::= { aristaReloadCauseTable 1 }
+
+AristaReloadCauseEntry ::= SEQUENCE {
+    -- INDEX information
+    aristaReloadUnitIndex               Unsigned32,
+    aristaReloadIndex                   Unsigned32,
+    aristaReloadCauseIndex              Unsigned32,
+    -- Reload Cause
+    aristaReloadCauseDescription        OCTET STRING,
+    aristaReloadTime                    DateAndTime
+}
+
+aristaReloadUnitIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+         "A unique identifier for a CPU unit.  On a modular system, it is
+         the slot number of the supervisor.  Unit index 0 mirrors the entries
+         of the active supervisor.  On a fixed system, unit index 0 is for
+         the whole system."
+    ::= { aristaReloadCauseEntry 1 }
+
+aristaReloadIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+         "A unique key to get the particular reboot instance.  Reboot instances
+         are numbered in reverse chronological order, with the latest reboot
+         at index 0."
+    ::= { aristaReloadCauseEntry 2 }
+
+aristaReloadCauseIndex OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+         "A unique key to get one of the causes of a particular reboot instance."
+    ::= { aristaReloadCauseEntry 3 }
+
+aristaReloadCauseDescription OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+         "Description for the reload cause."
+    ::= { aristaReloadCauseEntry 4 }
+
+aristaReloadTime OBJECT-TYPE
+    SYNTAX      DateAndTime
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+         "Time when the reload happened."
+    ::= { aristaReloadCauseEntry 5 }
+
+-- Conformance and Compliance --
+
+aristaGeneralMibCompliances OBJECT IDENTIFIER
+    ::= { aristaGeneralMibConformance 1 }
+
+aristaGeneralMibGroups OBJECT IDENTIFIER
+    ::= { aristaGeneralMibConformance 2 }
+
+aristaGeneralMibCompliance  MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for Arista switches that support
+        the ARISTA-GENERAL-MIB."
+    MODULE        -- this module
+    MANDATORY-GROUPS {
+        aristaGeneralMibGroup
+    }
+    ::= { aristaGeneralMibCompliances 1 }
+
+aristaGeneralMibGroup   OBJECT-GROUP
+    OBJECTS {
+	aristaReloadCauseDescription,
+	aristaReloadTime
+    }
+    STATUS      current
+    DESCRIPTION
+        "The collection of objects that provide reload cause
+        information for the CPU units in the system."
+    ::= { aristaGeneralMibGroups 1 }
+
+END

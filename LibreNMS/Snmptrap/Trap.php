@@ -15,10 +15,10 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
+ *
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -27,9 +27,8 @@ namespace LibreNMS\Snmptrap;
 
 use App\Models\Device;
 use Illuminate\Support\Collection;
-use LibreNMS\Snmptrap\Handlers\Fallback;
+use Illuminate\Support\Str;
 use LibreNMS\Util\IP;
-use Log;
 
 class Trap
 {
@@ -39,12 +38,13 @@ class Trap
 
     protected $device;
 
-    /** @var Collection $oid_data */
+    /** @var Collection */
     protected $oid_data;
 
     /**
      * Construct a trap from raw trap text
-     * @param $trap
+     *
+     * @param  string  $trap
      */
     public function __construct($trap)
     {
@@ -61,11 +61,12 @@ class Trap
         $line = array_shift($lines);
         if (preg_match('/\[([0-9.:a-fA-F]+)\]/', $line, $matches)) {
             $this->ip = $matches[1];
-        };
+        }
 
         // parse the oid data
         $this->oid_data = collect($lines)->mapWithKeys(function ($line) {
-            list($oid, $data) = explode(' ', $line, 2);
+            [$oid, $data] = explode(' ', $line, 2);
+
             return [$oid => trim($data, '"')];
         });
     }
@@ -73,25 +74,26 @@ class Trap
     /**
      * Find the first in this trap by substring
      *
-     * @param $search
+     * @param  string|string[]  $search
      * @return string
      */
     public function findOid($search)
     {
         return $this->oid_data->keys()->first(function ($oid) use ($search) {
-            return str_contains($oid, $search);
+            return Str::contains($oid, $search);
         });
     }
 
     /**
      * Find all oids that match the given string
-     * @param $search
+     *
+     * @param  string|string[]  $search
      * @return array
      */
     public function findOids($search)
     {
         return $this->oid_data->keys()->filter(function ($oid) use ($search) {
-            return str_contains($oid, $search);
+            return Str::contains($oid, $search);
         })->all();
     }
 
@@ -142,5 +144,22 @@ class Trap
     public function getRaw()
     {
         return $this->raw;
+    }
+
+    /**
+     * Render the Trap for debugging purpose
+     *
+     * @param  bool  $detailed
+     * @return string
+     */
+    public function toString($detailed = false)
+    {
+        if ($detailed) {
+            return $this->getTrapOid() . "\n" . json_encode($this->oid_data->reject(function ($value, $key) {
+                return Str::contains($key, 'SNMPv2-MIB::snmpTrapOID.0');
+            })->all());
+        }
+
+        return '' . $this->getTrapOid();
     }
 }

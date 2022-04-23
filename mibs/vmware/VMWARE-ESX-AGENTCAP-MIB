@@ -1,5 +1,5 @@
 -- **********************************************************
--- Copyright 2008-2017 VMware, Inc.  All rights reserved.
+-- Copyright 2008-2020 VMware, Inc.  All rights reserved.
 -- **********************************************************
 
 VMWARE-ESX-AGENTCAP-MIB DEFINITIONS ::= BEGIN
@@ -12,7 +12,7 @@ IMPORTS
     AGENT-CAPABILITIES
        FROM  SNMPv2-CONF;
 vmwAgentCapabilityMIB MODULE-IDENTITY
-   LAST-UPDATED "201710130000Z"
+   LAST-UPDATED "202003270000Z"
    ORGANIZATION "VMware, Inc"
    CONTACT-INFO
       "VMware, Inc
@@ -26,6 +26,9 @@ vmwAgentCapabilityMIB MODULE-IDENTITY
    DESCRIPTION
      "This module defines agent capabilities for deployed VMware ESX agents by release."
 
+   REVISION     "202003270000Z"
+   DESCRIPTION
+         "Capabilities for VMware VSphere (Release 7.0) ESXi 2020 added."
    REVISION     "201710130000Z"
    DESCRIPTION
          "Capabilities for VMware VSphere (Release 6.7) ESXi 2017 added."
@@ -57,6 +60,327 @@ vmwAgentCapabilityMIB MODULE-IDENTITY
         ::= { vmwareAgentCapabilities 1 }
 
 vmwEsxCapability OBJECT IDENTIFIER ::= {  vmwAgentCapabilityMIB 1 }
+
+
+--
+-- ESXi 7.0 and follow up patch releases
+--
+
+vmwESX70x AGENT-CAPABILITIES
+  PRODUCT-RELEASE
+     "7.0.x"
+  STATUS  current
+  DESCRIPTION
+     "Release 7.0 for VMware ESXi supports SNMPv1, SNMPv2c, and SNMPv3.
+      Changes in this release were primarily bug fixing related.
+     "
+  REFERENCE
+     "http://www.vmware.com/products"
+
+     -- RFC 3418
+     SUPPORTS SNMPv2-MIB
+     INCLUDES {
+         snmpGroup,
+         systemGroup,
+         snmpCommunityGroup,
+         snmpBasicNotificationsGroup,
+         snmpWarmStartNotificationGroup
+         -- groups not supported; snmpSetGroup, snmpNotificationGroup
+     }
+
+     VARIATION snmpSetSerialNo
+     ACCESS  not-implemented
+     DESCRIPTION "Agent provides read-only view of system information."
+
+     VARIATION snmpTrapOID
+     ACCESS not-implemented
+     DESCRIPTION "Agent does not proxy other agents RFC1157 Trap-PDUs."
+
+     VARIATION  snmpTrapEnterprise
+     ACCESS not-implemented
+     DESCRIPTION "Agent does not proxy other agents RFC1157 Trap-PDUs."
+
+     VARIATION snmpEnableAuthenTraps
+     SYNTAX INTEGER { disabled(2) }
+     ACCESS read-only
+     DESCRIPTION "Agent does not allow authentication traps. Poll snmpInBadCommunityNames for same info."
+     -- the above clause implies this:
+     -- VARIATION authenticationFailure
+     -- ACCESS not-implemented
+     -- DESCRIPTION "Agent does not provide this notification. snmpEnableAuthenTraps will return disabled."
+
+     -- ********************* ************ ************ *************** ***
+     -- RFC 3412
+     SUPPORTS SNMP-MPD-MIB
+     INCLUDES {
+        snmpMPDGroup
+        }
+
+     -- ********************* ************ ************ *************** ***
+     -- RFC 2863
+     SUPPORTS IF-MIB
+     INCLUDES {
+         ifGeneralInformationGroup,
+         linkUpDownNotificationsGroup
+     }
+
+     VARIATION ifAdminStatus
+     ACCESS read-only
+     DESCRIPTION "Agent provides read-only view of administrative state for each physical interface.
+                  ESX virtual switches support changing administrative state
+                  of physical network interfaces (nics) up or down. For example the command:
+                  esxcli network nic [up|down] -n vmnic0
+                  Virtual vmware interfaces (ifType 238) also support changing administratie state:
+                  network ip interface set --enabled [yes|no] -i vmk0
+                 "
+
+     VARIATION ifLinkUpDownTrapEnable
+     ACCESS read-only
+     DESCRIPTION "Agent provides read-only view of system information."
+
+     VARIATION ifAlias
+     ACCESS read-only
+     DESCRIPTION "ifIndexes may only change across reboot."
+
+     VARIATION ifInUnknownProtos
+     ACCESS not-implemented
+     DESCRIPTION "This counter always returns 0."
+
+     -- ifRcvAddressGroup is interface/media specific
+     VARIATION ifRcvAddressStatus
+     ACCESS not-implemented
+     DESCRIPTION "Required if media specific mib modules are implemented."
+
+     VARIATION ifRcvAddressType
+     ACCESS not-implemented
+     DESCRIPTION "Required if media specific mib modules are implemented."
+
+     -- ********************* ************ ************ *************** ***
+     -- RFC 4293
+     -- supports SNMPv2/3 Contexts for multiple instances
+     SUPPORTS IP-MIB
+     INCLUDES {
+         ipSystemStatsGroup,
+         ipAddressGroup,
+         ipNetToPhysicalGroup,
+         ipDefaultRouterGroup,
+         icmpStatsGroup,
+         ipSystemStatsHCOctetGroup,
+         ipSystemStatsHCPacketGroup,
+         ipv4GeneralGroup,
+         ipv4IfGroup,
+         ipv4SystemStatsGroup,
+         ipv4SystemStatsHCPacketGroup,
+         ipv6GeneralGroup2,
+         ipv6IfGroup,
+         ipAddressPrefixGroup,
+         ipv6RouterAdvertGroup,
+         ipLastChangeGroup
+     }
+     -- VARIATION ipv6ScopeGroup
+     -- ACCESS  not-implemented
+
+     -- ********************* ************ ************ *************** ***
+     -- RFC 4292
+     -- supports SNMPv2/3 Contexts for multiple instances
+     SUPPORTS IP-FORWARD-MIB
+     INCLUDES {
+         inetForwardCidrRouteGroup
+     }
+
+     -- ********************* ************ ************ *************** ***
+     -- RFC 4113
+     -- supports SNMPv2/3 Contexts for multiple instances
+     SUPPORTS UDP-MIB
+     -- The next two 32 bit counters will be fixed per bug report PR 890894
+     -- VARIATION udpInDatagrams
+     -- ACCESS not-implemented, use udpHCInDatagrams
+     -- VARIATION udpOutDatagrams
+     -- ACCESS not-implemented, use udpHCOutDatagrams
+     INCLUDES {
+        udpBaseGroup,
+        udpEndpointGroup,
+        udpHCGroup
+     }
+
+     -- ********************* ************ ************ *************** ***
+     -- RFC 4022
+     -- supports SNMPv2/3 Contexts for multiple instances
+     SUPPORTS TCP-MIB
+     INCLUDES {
+         tcpBaseGroup,
+         tcpConnectionGroup,
+         tcpListenerGroup
+    }
+
+     -- RFC 2790
+     -- NOTE: For storage luns larger than Integer32 (Terabyte) this agent will report INT_MAX
+     -- Enable Largestorage: true  CLI: esxcli system snmp set largestorage
+     SUPPORTS HOST-RESOURCES-MIB
+     INCLUDES {
+            hrSystemGroup,
+            hrStorageGroup, -- visorfs "ramdisks" are not reported
+            hrDeviceGroup,
+            hrSWRunGroup,
+            hrSWRunPerfGroup,
+            hrSWInstalledGroup  -- updates once an hour
+     }
+
+     VARIATION  hrSystemNumUsers
+     ACCESS read-only
+     DESCRIPTION "Value reports number of active ESX Shell sessions"
+
+     VARIATION  hrSWRunName
+     ACCESS read-only
+     DESCRIPTION "Value does not match hrSWInstalledName"
+
+     VARIATION  hrSystemDate
+     ACCESS read-only
+     DESCRIPTION "agent provides read only access"
+
+     VARIATION hrSystemInitialLoadDevice
+     ACCESS read-only
+     DESCRIPTION "agent provides read only access"
+
+     VARIATION hrSystemInitialLoadParameters
+     ACCESS read-only
+     DESCRIPTION "agent provides read only access"
+
+     VARIATION hrStorageSize
+     ACCESS read-only
+     DESCRIPTION "agent provides read only access"
+
+     VARIATION  hrSWRunStatus
+     ACCESS read-only
+     DESCRIPTION "agent provides read only access"
+
+    -- hrDeviceStatus reports unknown for: cpu. pnic either running/unknown.
+    --               disk reports running, warning, down, unknown
+    -- device error counters do not account for all failure cases
+
+     VARIATION hrSWOSIndex
+     ACCESS not-implemented
+     DESCRIPTION "No operatingSystem entry exists in hrSWRunGroup hrSWRunTable"
+
+     VARIATION  hrFSLastFullBackupDate
+     ACCESS not-implemented
+     DESCRIPTION "is not implemented"
+
+     VARIATION  hrFSLastPartialBackupDate
+     ACCESS not-implemented
+     DESCRIPTION "is not implemented"
+
+     VARIATION hrPrinterStatus
+     ACCESS not-implemented
+     DESCRIPTION "is not implemented"
+
+     VARIATION hrPrinterDetectedErrorState
+     ACCESS not-implemented
+     DESCRIPTION "is not implemented"
+
+     -- ********************* ************ ************ *************** ***
+     -- RFC 4133
+     SUPPORTS ENTITY-MIB
+     INCLUDES {
+        entityPhysicalGroup,
+        entityPhysical2Group,
+        entityPhysical3Group,
+        entityGeneralGroup
+     }
+     -- VARIATION entityNotificationsGroup
+     -- ACCESS not-implemented
+     -- VARIATION entityMappingGroup
+     -- ACCESS not-implemented
+
+     -- ********************* ************ ************ *************** ***
+     -- REVISION 200810150000Z
+     SUPPORTS IEEE8021-BRIDGE-MIB
+     INCLUDES {
+        ieee8021BridgeBaseBridgeGroup,
+        ieee8021BridgeBasePortGroup,
+        ieee8021BridgeTpPortGroup
+     }
+
+     -- ********************* ************ ************ *************** ***
+     -- REVISION 200810150000Z
+     -- virtual switch uplinks (physical ports) do perform do mac learning and will
+     -- not report in FDB/forwarding tables
+     SUPPORTS IEEE8021-Q-BRIDGE-MIB
+     INCLUDES {
+        ieee8021QBridgeBaseGroup,
+        ieee8021QBridgeVlanGroup,
+        ieee8021QBridgeVlanStaticGroup,
+        ieee8021QBridgePortGroup2,
+        ieee8021QBridgeFdbUnicastGroup,
+        ieee8021QBridgeFdbMulticastGroup,
+        ieee8021QBridgeFdbStaticGroup,
+        ieee8021QBridgeVlanStatisticsGroup
+     }
+     -- VARATION ieee8021QBridgeVlanCurrentUntaggedPorts
+     -- Reports count of 0 if only untagged vlan access (vid 0) is defined
+
+     -- ********************* ************ ************ *************** ***
+     -- REVISION 200706200000Z
+     -- VDS link aggregations are not reported this release, issue PR 859941
+     -- only VSS, traditional vswitch, nic teams are reported entries
+     SUPPORTS IEEE8023-LAG-MIB
+     INCLUDES {
+        dot3adAggGroup,
+        dot3adAggPortGroup,
+        dot3adTablesLastChangedGroup,
+        dot3adAggPortListGroup
+     }
+
+     -- ********************* ************ ************ *************** ***
+     -- REVISION 200906080000Z
+     SUPPORTS LLDP-V2-MIB
+     INCLUDES {
+        lldpV2ConfigGroup,
+        lldpV2ConfigTxGroup,
+        lldpV2StatsTxGroup,
+        lldpV2LocSysGroup,
+        lldpV2ConfigRxGroup,
+        lldpV2StatsRxGroup,
+        lldpV2RemSysGroup,
+        lldpV2NotificationsGroup
+     }
+
+     -- ********************* ************ ************ *************** ***
+     -- REVISION 201008020000Z
+     SUPPORTS VMWARE-SYSTEM-MIB
+     INCLUDES {
+         vmwSystemGroup
+     }
+     -- REVISION 200810150000Z
+     SUPPORTS VMWARE-RESOURCES-MIB
+     INCLUDES {
+         vmwResourceGroup
+     }
+     -- REVISION 201006220000Z
+     SUPPORTS VMWARE-VMINFO-MIB
+     INCLUDES {
+         vmwVmInfoGroup,
+         vmwVmInfoNotificationGroup
+     }
+     -- VARIATION vmwVmNetConnType
+     -- DESCRIPTION "This object was valid for ESX 2.5 systems only. Only value returned was 'monitor_dev'"
+     -- STATUS deprecated
+
+     -- REVISION 201706050000Z
+     SUPPORTS VMWARE-ENV-MIB
+     INCLUDES {
+         vmwEnvCIMToSNMP,
+         vmwEnvironmentGroup2,
+         vmwESXEnvNotificationGroup3
+     }
+
+     -- REVISION 201008200000Z
+     SUPPORTS VMWARE-CIMOM-MIB
+     INCLUDES {
+        vmwCimOmNotificationGroup
+     }
+
+   ::= { vmwEsxCapability 17 }
 
 
 --

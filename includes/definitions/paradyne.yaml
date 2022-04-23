@@ -1,0 +1,13 @@
+os: paradyne
+text: 'Paradyne (by Zhone)'
+type: network
+icon: paradyne
+over:
+    - { graph: device_bits, text: 'Device Traffic' }
+    - { graph: device_count, text: 'xDSL speed' }
+good_if:
+    - SHDSL
+discovery:
+    -
+        sysObjectID:
+            - .1.3.6.1.4.1.3278.1.

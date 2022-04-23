@@ -1,12 +1,9 @@
-source: Installation/Installation-Ubuntu-1804-Nginx.md
-path: blob/master/doc/
-
 > NOTE: These instructions assume you are the **root** user.  If you
 > are not, prepend `sudo` to the shell commands (the ones that aren't
 > at `mysql>` prompts) or temporarily become a user with root
 > privileges with `sudo -s` or `sudo -i`.
 
-**Please note the minimum supported PHP version is 7.1.3**
+**Please note the minimum supported PHP version is @= php.version_min =@**
 
 # Install Required Packages
 
@@ -14,7 +11,7 @@ path: blob/master/doc/
 apt install software-properties-common
 add-apt-repository universe
 apt update
-apt install curl composer fping git graphviz imagemagick mariadb-client mariadb-server mtr-tiny nginx-full nmap php7.2-cli php7.2-curl php7.2-fpm php7.2-gd php7.2-json php7.2-mbstring php7.2-mysql php7.2-snmp php7.2-xml php7.2-zip python-memcache python-mysqldb rrdtool snmp snmpd whois
+apt install curl composer fping git graphviz imagemagick mariadb-client mariadb-server mtr-tiny nginx-full nmap php7.2-cli php7.2-curl php7.2-fpm php7.2-gd php7.2-json php7.2-mbstring php7.2-mysql php7.2-snmp php7.2-xml php7.2-zip python-memcache python-mysqldb rrdtool snmp snmpd whois unzip python3-pip
 ```
 
 # Add librenms user
@@ -44,6 +41,7 @@ setfacl -R -m g::rwx /opt/librenms/rrd /opt/librenms/logs /opt/librenms/bootstra
 
 ```bash
 su - librenms
+cd /opt/librenms
 ./scripts/composer_wrapper.php install --no-dev
 exit
 ```
@@ -60,7 +58,7 @@ mysql -uroot -p
 > NOTE: Please change the 'password' below to something secure.
 
 ```sql
-CREATE DATABASE librenms CHARACTER SET utf8 COLLATE utf8_unicode_ci;
+CREATE DATABASE librenms CHARACTER SET utf8mb4 COLLATE utf8mb4_unicode_ci;
 CREATE USER 'librenms'@'localhost' IDENTIFIED BY 'password';
 GRANT ALL PRIVILEGES ON librenms.* TO 'librenms'@'localhost';
 FLUSH PRIVILEGES;
@@ -87,9 +85,10 @@ systemctl restart mysql
 ## Configure and Start PHP-FPM
 
 Ensure date.timezone is set in php.ini to your preferred time zone.
-See <http://php.net/manual/en/timezones.php> for a list of supported
+See <https://php.net/manual/en/timezones.php> for a list of supported
 timezones.  Valid examples are: "America/New_York",
 "Australia/Brisbane", "Etc/UTC".
+Please remember to set the system timezone as well.
 
 ```bash
 vi /etc/php/7.2/fpm/php.ini
@@ -98,7 +97,11 @@ vi /etc/php/7.2/cli/php.ini
 
 ```bash
 systemctl restart php7.2-fpm
+´´´
+
 ```
+timedatectl set-timezone Etc/UTC
+´´´
 
 ## Configure NGINX
 
@@ -118,6 +121,11 @@ server {
  charset utf-8;
  gzip on;
  gzip_types text/css application/javascript text/javascript application/x-javascript image/svg+xml text/plain text/xsd text/xsl text/xml image/x-icon;
+
+ proxy_read_timeout 300;
+ proxy_connect_timeout 300;
+ proxy_send_timeout 300;
+
  location / {
   try_files $uri $uri/ /index.php?$query_string;
  }
@@ -167,7 +175,7 @@ cp /opt/librenms/librenms.nonroot.cron /etc/cron.d/librenms
 > settings in config.php is possible too. The config.php file will be
 > created in the upcoming steps. Review the following URL after you
 > finished librenms install steps:
-> <https://docs.librenms.org/Support/Configuration/#proxy-support>
+> <@= config.site_url =@/Support/Configuration/#proxy-support>
 
 # Copy logrotate config
 
@@ -235,19 +243,18 @@ site: <https://www.librenms.org/#support>
 Now that you've installed LibreNMS, we'd suggest that you have a read
 of a few other docs to get you going:
 
-- [Performance tuning](http://docs.librenms.org/Support/Performance)
-- [Alerting](http://docs.librenms.org/Extensions/Alerting/)
-- [Device Groups](http://docs.librenms.org/Extensions/Device-Groups/)
-- [Auto discovery](http://docs.librenms.org/Extensions/Auto-Discovery/)
+- [Performance tuning](../Support/Performance.md)
+- [Alerting](../Alerting/index.md)
+- [Device Groups](../Extensions/Device-Groups.md)
+- [Auto discovery](../Extensions/Auto-Discovery.md)
 
 # Closing
 
 We hope you enjoy using LibreNMS. If you do, it would be great if you
 would consider opting into the stats system we have, please see [this
-page](http://docs.librenms.org/General/Callback-Stats-and-Privacy/) on
+page](../General/Callback-Stats-and-Privacy.md) on
 what it is and how to enable it.
 
 If you would like to help make LibreNMS better there are [many ways to
-help](http://docs.librenms.org/Support/FAQ/#what-can-i-do-to-help). You
-can also [back LibreNMS on Open
-Collective](https://t.libren.ms/donations).
+help](../Support/FAQ.md#a-namefaq9-what-can-i-do-to-helpa). You
+can also [back LibreNMS on Open Collective](https://t.libren.ms/donations).

@@ -59,7 +59,7 @@ IMPORTS
     THsmdaSchedulerPolicyGroupId,
     THsmdaWeight, THsmdaWeightClass,
     THsmdaWrrWeight, TIPFilterType,
-    TIngClassRemarkType,
+    TIcmpTypeOrNone, TIngClassRemarkType,
     TIngDynPolicerIdOrNone, TIngPolicerId,
     TIngPolicerIdOrNone,
     TIngressHsmdaCounterIdOrZero,
@@ -1019,7 +1019,7 @@ tSapIngressQueueMode             OBJECT-TYPE
 tSapIngressQueuePoolName         OBJECT-TYPE
     SYNTAX      TNamedItemOrEmpty
     MAX-ACCESS  read-create
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The value of tSapIngressQueuePoolName specifies the name of the pool
          to be applied for SAP ingress queue."
@@ -3159,7 +3159,9 @@ TSapIngressIPv6CriteriaEntry     ::= SEQUENCE
     tSapIngressIPv6CriteriaFragment  INTEGER,
     tSapIngressIPv6CritVxlanVniVal1  Unsigned32,
     tSapIngressIPv6CritVxlanVniVal2  Unsigned32,
-    tSapIngressIPv6CritVxlanVniOper  INTEGER
+    tSapIngressIPv6CritVxlanVniOper  INTEGER,
+    tSapIngIPv6CritSrcIpPrefixList   TNamedItemOrEmpty,
+    tSapIngIPv6CritDstIpPrefixList   TNamedItemOrEmpty
 }
 
 tSapIngressIPv6CriteriaIndex     OBJECT-TYPE
@@ -3622,6 +3624,78 @@ tSapIngressIPv6CritVxlanVniOper  OBJECT-TYPE
          tSapIngressIPCriteriaDestPortOperator is set to non-default values."
     DEFVAL      { none }
     ::= { tSapIngressIPv6CriteriaEntry 30 }
+
+tSapIngIPv6CritSrcIpPrefixList   OBJECT-TYPE
+    SYNTAX      TNamedItemOrEmpty
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tSapIngIPv6CritSrcIpPrefixList specifies the IP prefix
+         list used as match criterion for the source ip address.
+
+         The value specified for this object must correspond to a prefix list
+         defined in tQosPrefixListTable.
+
+         If the value of this object is empty then the values of the objects
+         tSapIngressIPv6CriteriaSourceIpAddr and
+         tSapIngressIPv6CriteriaSourceIpMask or
+         tSapIngressIPv6CritSrcIpFullMask are used as source ip address match
+         criterion.
+
+         When this object is set to a non-empty value then the objects
+         tSapIngressIPv6CriteriaSourceIpAddr,
+         tSapIngressIPv6CriteriaSourceIpMask and
+         tSapIngressIPv6CritSrcIpFullMask are reset to their default values by
+         the system.
+
+         Vice versa, when a new (non-default) value is provided for the objects
+         tSapIngressIPv6CriteriaSourceIpAddr and
+         tSapIngressIPv6CriteriaSourceIpMask or
+         tSapIngressIPv6CritSrcIpFullMask then this object is reset to its
+         default (empty) value by the system.
+
+         An attempt to set tSapIngIPv6CritSrcIpPrefixList to a non-default
+         value in combination with setting any of
+         tSapIngressIPv6CriteriaSourceIpAddr and
+         tSapIngressIPv6CriteriaSourceIpMask or
+         tSapIngressIPv6CritSrcIpFullMask to (a) non-default value(s) is
+         rejected by the system."
+    DEFVAL      { ''H }
+    ::= { tSapIngressIPv6CriteriaEntry 32 }
+
+tSapIngIPv6CritDstIpPrefixList   OBJECT-TYPE
+    SYNTAX      TNamedItemOrEmpty
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tSapIngIPv6CritDstIpPrefixList specifies the IP prefix
+         list used as match criterion for the destination ip address.
+
+         The value specified for this object must correspond to a prefix list
+         defined in tQosPrefixListTable.
+
+         If the value of this object is empty then the values of the objects
+         tSapIngressIPv6CriteriaDestIpAddr and
+         tSapIngressIPv6CriteriaDestIpMask or tSapIngressIPv6CritDstIpFullMask
+         are used as destination ip address match criterion.
+
+         When this object is set to a non-empty value then the objects
+         tSapIngressIPv6CriteriaDestIpAddr, tSapIngressIPv6CriteriaDestIpMask
+         and tSapIngressIPv6CritDstIpFullMask are reset to their default values
+         by the system.
+
+         Vice versa, when a new (non-default) value is provided for the objects
+         tSapIngressIPv6CriteriaDestIpAddr and
+         tSapIngressIPv6CriteriaDestIpMask or tSapIngressIPv6CritDstIpFullMask
+         then this object is reset to its default (empty) value by the system.
+
+         An attempt to set tSapIngIPv6CritDstIpPrefixList to a non-default
+         value in combination with setting any of
+         tSapIngressIPv6CriteriaDestIpAddr and
+         tSapIngressIPv6CriteriaDestIpMask or tSapIngressIPv6CritDstIpFullMask
+         to (a) non-default value(s) is rejected by the system"
+    DEFVAL      { ''H }
+    ::= { tSapIngressIPv6CriteriaEntry 33 }
 
 tSapIngressHsmdaQueueTable       OBJECT-TYPE
     SYNTAX      SEQUENCE OF TSapIngressHsmdaQueueEntry
@@ -5217,7 +5291,7 @@ tSapEgressQueuePortAvgOverhead   OBJECT-TYPE
 tSapEgressQueuePoolName          OBJECT-TYPE
     SYNTAX      TNamedItemOrEmpty
     MAX-ACCESS  read-create
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The value of tSapEgressQueuePoolName specifies the name of the pool to
          be applied for SAP egress queue."
@@ -8442,7 +8516,7 @@ TNetworkPolicyEntry              ::= SEQUENCE
 }
 
 tNetworkPolicyIndex              OBJECT-TYPE
-    SYNTAX      TNetworkPolicyID (1..65535 | 65536 | 65537 | 65538)
+    SYNTAX      TNetworkPolicyID (1..65535 | 65536 | 65537 | 65538 | 65539)
     MAX-ACCESS  not-accessible
     STATUS      current
     DESCRIPTION
@@ -9776,7 +9850,7 @@ TNetworkEgrIPCritEntry           ::= SEQUENCE
     tNetworkEgrIPCritDstPortOperator TTcpUdpPortOperator,
     tNetworkEgrIPCritDSCP            TDSCPNameOrEmpty,
     tNetworkEgrIPCritFragment        INTEGER,
-    tNetworkEgrIPCritIcmpType        Integer32
+    tNetworkEgrIPCritIcmpType        TIcmpTypeOrNone
 }
 
 tNetworkEgrIPCritType            OBJECT-TYPE
@@ -10131,15 +10205,14 @@ tNetworkEgrIPCritFragment        OBJECT-TYPE
     ::= { tNetworkEgrIPCritEntry 26 }
 
 tNetworkEgrIPCritIcmpType        OBJECT-TYPE
-    SYNTAX      Integer32 (-1 | 0..255)
+    SYNTAX      TIcmpTypeOrNone
     MAX-ACCESS  read-create
     STATUS      current
     DESCRIPTION
-        "The value of tNetworkEgrIPCritIcmpType specifies the Icmp type to be
-         matched. tNetworkEgrIPCritIcmpType complements the object
-         tIPFilterParamsIcmpCode. Both of them need to be set to actually
-         enable ICMP matching. The value -1 means Icmp type matching is not
-         enabled."
+        "The value of tNetworkEgrIPCritIcmpType specifies the ICMP type to be
+         matched.
+
+         The value -1 means ICMP type matching is not enabled."
     DEFVAL      { -1 }
     ::= { tNetworkEgrIPCritEntry 27 }
 
@@ -10696,7 +10769,7 @@ tNetworkQueueRowStatus           OBJECT-TYPE
 tNetworkQueuePoolName            OBJECT-TYPE
     SYNTAX      TNamedItemOrEmpty
     MAX-ACCESS  read-create
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The tNetworkQueuePoolName specifies the pool that is associated with
          this network queue. If tNetworkQueuePoolName is empty, no pool has
@@ -11510,7 +11583,7 @@ tSharedQueueLastChanged          OBJECT-TYPE
 tSharedQueuePoolName             OBJECT-TYPE
     SYNTAX      TNamedItemOrEmpty
     MAX-ACCESS  read-create
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "tSharedQueuePoolName specifies the pool from which the queue should be
          allocating its buffer. By default it will share the default pool being
@@ -12165,7 +12238,7 @@ tQosIngQueueMode                 OBJECT-TYPE
 tQosIngQueuePoolName             OBJECT-TYPE
     SYNTAX      TNamedItemOrEmpty
     MAX-ACCESS  read-create
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "tQosIngQueuePoolName specifies the name of the pool to be applied for
          the ingress queue."
@@ -12733,7 +12806,7 @@ tQosEgrQueuePortCIRWght          OBJECT-TYPE
 tQosEgrQueuePoolName             OBJECT-TYPE
     SYNTAX      TNamedItemOrEmpty
     MAX-ACCESS  read-create
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The value of tQosEgrQueuePoolName specifies the name of the pool to be
          applied for SAP egress queue."
@@ -14324,7 +14397,8 @@ TPortSchedulerPlcyEntry          ::= SEQUENCE
     tPortSchedPlcyLvl8RateType       TPSPRateType,
     tPortSchedPlcyMaxRateHi          TmnxQosRateHigh32,
     tPortSchedPlcyMaxRate            TmnxQosRateLow32,
-    tPortSchedPlcyMonThresholdPrcnt  Unsigned32
+    tPortSchedPlcyMonThresholdPrcnt  Unsigned32,
+    tPortSchedPlcyHQosAlgorithm      INTEGER
 }
 
 tPortSchedulerPlcyName           OBJECT-TYPE
@@ -15289,6 +15363,30 @@ tPortSchedPlcyMonThresholdPrcnt  OBJECT-TYPE
          specified by tPortSchedPlcyMaxRate."
     DEFVAL      { 0 }
     ::= { tPortSchedulerPlcyEntry 55 }
+
+tPortSchedPlcyHQosAlgorithm      OBJECT-TYPE
+    SYNTAX      INTEGER {
+        default                         (1),
+        above-offered-allowance-control (2)
+    }
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tPortSchedPlcyHQosAlgorithm specifies the port scheduler
+         H-QoS algorithm used to calculate the operational rates for the
+         children connected to the port scheduler.
+
+         When the value of tPortSchedPlcyHQosAlgorithm is set to
+         above-offered-allowance-control, this H-QoS algorithm allows control
+         of the amount of bandwidth in excess of the offered rate given to a
+         queue which has not consumed all of its available bandwidth. When
+         used, H-QoS consumes less resources on the line card CPU in a scaled
+         environment.
+
+         When the value of tPortSchedPlcyHQosAlgorithm is set to default,
+         default H-Qos algorithm is used by the port sscheduler."
+    DEFVAL      { default }
+    ::= { tPortSchedulerPlcyEntry 56 }
 
 tHsmdaSchedulerPlcyTable         OBJECT-TYPE
     SYNTAX      SEQUENCE OF THsmdaSchedulerPlcyEntry
@@ -17046,7 +17144,15 @@ TQueueMgmtPlcyEntry              ::= SEQUENCE
     tQueueMgmtPlcyLoStartAverage     Unsigned32,
     tQueueMgmtPlcyLoMaxAverage       Unsigned32,
     tQueueMgmtPlcyLoMaxProbability   Unsigned32,
-    tQueueMgmtPlcyLastChanged        TimeStamp
+    tQueueMgmtPlcyLastChanged        TimeStamp,
+    tQueueMgmtPlcyExcdAdminStatus    TmnxAdminStateUpDown,
+    tQueueMgmtPlcyExcdStartAverage   Unsigned32,
+    tQueueMgmtPlcyExcdMaxAverage     Unsigned32,
+    tQueueMgmtPlcyExcdMaxProbability Unsigned32,
+    tQueueMgmtPlcyHiPlusAdminStatus  TmnxAdminStateUpDown,
+    tQueueMgmtPlcyHiPlusStartAverage Unsigned32,
+    tQueueMgmtPlcyHiPlusMaxAverage   Unsigned32,
+    tQMgmtPlcyHiPlusMaxProbability   Unsigned32
 }
 
 tQueueMgmtPlcyName               OBJECT-TYPE
@@ -17200,6 +17306,99 @@ tQueueMgmtPlcyLastChanged        OBJECT-TYPE
         "Timestamp of last change to this row in tQueueMgmtPlcyTable."
     ::= { tQueueMgmtPlcyEntry 15 }
 
+tQueueMgmtPlcyExcdAdminStatus    OBJECT-TYPE
+    SYNTAX      TmnxAdminStateUpDown
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tQueueMgmtPlcyExcdAdminStatus specifies the admin state
+         for the exceed priority RED slope. If the
+         tQueueMgmtPlcyExcdAdminStatus is set to 'down', the RED slope is
+         inactive."
+    DEFVAL      { down }
+    ::= { tQueueMgmtPlcyEntry 16 }
+
+tQueueMgmtPlcyExcdStartAverage   OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..100)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tQueueMgmtPlcyExcdStartAverage specifies the percentage
+         of the buffer utilized after which the drop probability starts to rise
+         above 0."
+    DEFVAL      { 30 }
+    ::= { tQueueMgmtPlcyEntry 17 }
+
+tQueueMgmtPlcyExcdMaxAverage     OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..100)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tQueueMgmtPlcyExcdMaxAverage specifies the percentage of
+         the buffer utilized after which the drop probability is 100 percent.
+         This implies that all packets beyond this point will be dropped."
+    DEFVAL      { 55 }
+    ::= { tQueueMgmtPlcyEntry 18 }
+
+tQueueMgmtPlcyExcdMaxProbability OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..99)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tQueueMgmtPlcyExcdMaxProbability specifies the drop
+         probability that increases steadily from 0 at the
+         tQueueMgmtPlcyExcdStartAverage up to the
+         tQueueMgmtPlcyExcdMaxProbability at the tQueueMgmtPlcyExcdMaxAverage."
+    DEFVAL      { 75 }
+    ::= { tQueueMgmtPlcyEntry 19 }
+
+tQueueMgmtPlcyHiPlusAdminStatus  OBJECT-TYPE
+    SYNTAX      TmnxAdminStateUpDown
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tQueueMgmtPlcyHiPlusAdminStatus specifies the admin state
+         for the high-plus priority RED slope. If the
+         tQueueMgmtPlcyHiPlusAdminStatus is set to 'down', the RED slope is
+         inactive."
+    DEFVAL      { down }
+    ::= { tQueueMgmtPlcyEntry 20 }
+
+tQueueMgmtPlcyHiPlusStartAverage OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..100)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tQueueMgmtPlcyHiPlusStartAverage specifies the percentage
+         of the buffer utilized after which the drop probability starts to rise
+         above 0."
+    DEFVAL      { 85 }
+    ::= { tQueueMgmtPlcyEntry 21 }
+
+tQueueMgmtPlcyHiPlusMaxAverage   OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..100)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tQueueMgmtPlcyHiPlusMaxAverage specifies the percentage
+         of the buffer utilized after which the drop probability is 100
+         percent. This implies that all packets beyond this point will be
+         dropped."
+    DEFVAL      { 100 }
+    ::= { tQueueMgmtPlcyEntry 22 }
+
+tQMgmtPlcyHiPlusMaxProbability   OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..99)
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tQMgmtPlcyHiPlusMaxProbability specifies the drop
+         probability that increases steadily from 0 at the
+         tQueueMgmtPlcyHiPlusStartAverage up to the
+         tQMgmtPlcyHiPlusMaxProbability at the tQueueMgmtPlcyHiPlusMaxAverage."
+    DEFVAL      { 75 }
+    ::= { tQueueMgmtPlcyEntry 23 }
+
 tVlanQosPlcyTable                OBJECT-TYPE
     SYNTAX      SEQUENCE OF TVlanQosPlcyEntry
     MAX-ACCESS  not-accessible
@@ -17283,9 +17482,9 @@ tVlanQosPlcyLastChanged          OBJECT-TYPE
 
 tVlanQosPlcyStatMode             OBJECT-TYPE
     SYNTAX      INTEGER {
-        no-stats               (1),
-        enqueued-with-discards (2),
-        reserved3              (3)
+        no-stats                         (1),
+        enqueued-with-discards           (2),
+        enqueued-4-profile-with-discards (3)
     }
     MAX-ACCESS  read-create
     STATUS      current
@@ -17959,7 +18158,7 @@ tHsmdaSlopePolicyTableLastChanged OBJECT-TYPE
 tNamedPoolPolicyTableLastChanged OBJECT-TYPE
     SYNTAX      TimeStamp
     MAX-ACCESS  read-only
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The value of tNamedPoolPolicyTableLastChanged indicates the sysUpTime
          at the time of the last modification of an entry in the
@@ -17967,13 +18166,15 @@ tNamedPoolPolicyTableLastChanged OBJECT-TYPE
 
          If no changes were made to the table since the last re-initialization
          of the local network management subsystem, then this object contains a
-         zero value."
+         zero value.
+
+         This object is obsoleted in 20.0 Release."
     ::= { tQosTimeStampObjects 73 }
 
 tQ1NamedPoolTableLastChanged     OBJECT-TYPE
     SYNTAX      TimeStamp
     MAX-ACCESS  read-only
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The value of tQ1NamedPoolTableLastChanged indicates the sysUpTime at
          the time of the last modification of an entry in the
@@ -17981,7 +18182,9 @@ tQ1NamedPoolTableLastChanged     OBJECT-TYPE
 
          If no changes were made to the table since the last re-initialization
          of the local network management subsystem, then this object contains a
-         zero value."
+         zero value.
+
+         This object is obsoleted in 20.0 Release."
     ::= { tQosTimeStampObjects 74 }
 
 tMcMlpppIngrProfTableLastChanged OBJECT-TYPE
@@ -18669,6 +18872,15 @@ tIngClassPlcyLspExpTblLastChgd   OBJECT-TYPE
          timestamp of last change to the Ingress Policy lsp exp Table."
     ::= { tQosTimeStampObjects 137 }
 
+tQosFpResourcePolicyTblLastChgd  OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tQosFpResourcePolicyTblLastChgd indicates the
+         timestamp of last change to the FP Resource Policy Table."
+    ::= { tQosTimeStampObjects 138 }
+
 tAtmTdpObjects                   OBJECT IDENTIFIER ::= { tQosObjects 21 }
 
 tAtmTdpTable                     OBJECT-TYPE
@@ -18976,15 +19188,16 @@ tPoolObjects                     OBJECT IDENTIFIER ::= { tQosObjects 22 }
 tNamedPoolPolicyTable            OBJECT-TYPE
     SYNTAX      SEQUENCE OF TNamedPoolPolicyEntry
     MAX-ACCESS  not-accessible
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
-        "This table contains information on Named buffer pools policy."
+        "This table contains information on Named buffer pools policy. This
+         table is obsoleted in 20.2 release."
     ::= { tPoolObjects 1 }
 
 tNamedPoolPolicyEntry            OBJECT-TYPE
     SYNTAX      TNamedPoolPolicyEntry
     MAX-ACCESS  not-accessible
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "This list contains Named buffer pools policy related information."
     INDEX       { tNamedPoolPolicyName }
@@ -19004,82 +19217,97 @@ TNamedPoolPolicyEntry            ::= SEQUENCE
 tNamedPoolPolicyName             OBJECT-TYPE
     SYNTAX      TNamedItem
     MAX-ACCESS  not-accessible
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The value of tNamedPoolPolicyName indicates the name of Named pool
-         policy."
+         policy.
+
+         This object is obsoleted in 20.0 Release."
     ::= { tNamedPoolPolicyEntry 1 }
 
 tNamedPoolPolicyRowStatus        OBJECT-TYPE
     SYNTAX      RowStatus
     MAX-ACCESS  read-create
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The value of tNamedPoolPolicyRowStatus is used for creation or
-         deletion of named pool policies."
+         deletion of named pool policies.
+
+         This object is obsoleted in 20.0 Release."
     ::= { tNamedPoolPolicyEntry 2 }
 
 tNamedPoolPolicyLastChanged      OBJECT-TYPE
     SYNTAX      TimeStamp
     MAX-ACCESS  read-only
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The value of tNamedPoolPolicyLastChanged indicates the sysUpTime when
-         this row was last modified."
+         this row was last modified.
+
+         This object is obsoleted in 20.0 Release."
     ::= { tNamedPoolPolicyEntry 3 }
 
 tNamedPoolPolicyDescription      OBJECT-TYPE
     SYNTAX      TItemDescription
     MAX-ACCESS  read-create
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The value of tNamedPoolPolicyDescription specifies the description for
-         a specific named pool policy."
+         a specific named pool policy.
+
+         This object is obsoleted in 20.0 Release."
     DEFVAL      { "" }
     ::= { tNamedPoolPolicyEntry 4 }
 
 tNamedPoolPolicyQ1DefaultWeight  OBJECT-TYPE
     SYNTAX      Unsigned32 (0..100)
     MAX-ACCESS  read-create
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The value of tNamedPoolPolicyQ1DefaultWeight specifies the port
-         allocation weight given to the default pools."
+         allocation weight given to the default pools.
+
+         This object is obsoleted in 20.0 Release."
     DEFVAL      { 50 }
     ::= { tNamedPoolPolicyEntry 5 }
 
 tNamedPoolPolicyQ1MdaWeight      OBJECT-TYPE
     SYNTAX      Unsigned32 (0..100)
     MAX-ACCESS  read-create
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The value of tNamedPoolPolicyQ1MdaWeight specifies the port allocation
-         weight given to the MDA named pools."
+         weight given to the MDA named pools.
+
+         This object is obsoleted in 20.0 Release."
     DEFVAL      { 50 }
     ::= { tNamedPoolPolicyEntry 6 }
 
 tNamedPoolPolicyQ1PortWeight     OBJECT-TYPE
     SYNTAX      Unsigned32 (0..100)
     MAX-ACCESS  read-create
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The value of tNamedPoolPolicyQ1PortWeight specifies the port
-         allocation weight given to the local port named pools."
+         allocation weight given to the local port named pools.
+
+         This object is obsoleted in 20.0 Release."
     DEFVAL      { 50 }
     ::= { tNamedPoolPolicyEntry 7 }
 
 tQ1NamedPoolTable                OBJECT-TYPE
     SYNTAX      SEQUENCE OF TQ1NamedPoolEntry
     MAX-ACCESS  not-accessible
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
-        "This table contains information on Q1 pools policy."
+        "This table contains information on Q1 pools policy. This table is
+         obsoleted in 20.2 release."
     ::= { tPoolObjects 2 }
 
 tQ1NamedPoolEntry                OBJECT-TYPE
     SYNTAX      TQ1NamedPoolEntry
     MAX-ACCESS  not-accessible
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "This list contains Q1 pools policy related information."
     INDEX       {
@@ -19108,88 +19336,106 @@ TQ1NamedPoolEntry                ::= SEQUENCE
 tQ1NamedPoolPolicyName           OBJECT-TYPE
     SYNTAX      TNamedItem
     MAX-ACCESS  not-accessible
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The value of tQ1NamedPoolPolicyName indicates the name of the existing
-         Q1 named pool policy."
+         Q1 named pool policy.
+
+         This object is obsoleted in 20.0 Release."
     ::= { tQ1NamedPoolEntry 1 }
 
 tQ1NamedPoolName                 OBJECT-TYPE
     SYNTAX      TNamedItem
     MAX-ACCESS  not-accessible
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The value of tQ1NamedPoolName indicates the name of the existing pool
-         within the policy."
+         within the policy.
+
+         This object is obsoleted in 20.0 Release."
     ::= { tQ1NamedPoolEntry 2 }
 
 tQ1NamedPoolRowStatus            OBJECT-TYPE
     SYNTAX      RowStatus
     MAX-ACCESS  read-create
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The value of tQ1NamedPoolRowStatus is used for creation or deletion of
-         Q1 named pools."
+         Q1 named pools.
+
+         This object is obsoleted in 20.0 Release."
     ::= { tQ1NamedPoolEntry 3 }
 
 tQ1NamedPoolLastChanged          OBJECT-TYPE
     SYNTAX      TimeStamp
     MAX-ACCESS  read-only
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The value of tQ1NamedPoolLastChanged indicates the sysUpTime when this
-         row was last modified. "
+         row was last modified.
+
+         This object is obsoleted in 20.0 Release."
     ::= { tQ1NamedPoolEntry 4 }
 
 tQ1NamedPoolDescription          OBJECT-TYPE
     SYNTAX      TItemDescription
     MAX-ACCESS  read-create
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The value of tQ1NamedPoolDescription specifies the description for a
-         specific Q1 named pool."
+         specific Q1 named pool.
+
+         This object is obsoleted in 20.0 Release."
     DEFVAL      { "" }
     ::= { tQ1NamedPoolEntry 5 }
 
 tQ1NamedPoolNetworkAllocWeight   OBJECT-TYPE
     SYNTAX      Unsigned32 (0..100)
     MAX-ACCESS  read-create
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The value of tQ1NamedPoolNetworkAllocWeight specifies the weight used
-         to divide network associated buffer space between named pools."
+         to divide network associated buffer space between named pools.
+
+         This object is obsoleted in 20.0 Release."
     DEFVAL      { 50 }
     ::= { tQ1NamedPoolEntry 6 }
 
 tQ1NamedPoolAccessAllocWeight    OBJECT-TYPE
     SYNTAX      Unsigned32 (0..100)
     MAX-ACCESS  read-create
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The value of tQ1NamedPoolAccessAllocWeight specifies the weight used
-         to divide access associated buffer space between named pools."
+         to divide access associated buffer space between named pools.
+
+         This object is obsoleted in 20.0 Release."
     DEFVAL      { 50 }
     ::= { tQ1NamedPoolEntry 7 }
 
 tQ1NamedPoolSlopePolicy          OBJECT-TYPE
     SYNTAX      TNamedItemOrEmpty
     MAX-ACCESS  read-create
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The value of tQ1NamedPoolSlopePolicy specifies the name of the slope
          policy which is used to override the default slope policy for the
-         named buffer pool."
+         named buffer pool.
+
+         This object is obsoleted in 20.0 Release."
     DEFVAL      { ''H }
     ::= { tQ1NamedPoolEntry 8 }
 
 tQ1NamedPoolReservedCbs          OBJECT-TYPE
     SYNTAX      Integer32 (0..100)
     MAX-ACCESS  read-create
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The value of tQ1NamedPoolReservedCbs specifies the reserved CBS size
          of the pool. The reserved CBS (Committed Burst Size) defines the
-         amount of buffer space within the pool that is not considered shared."
+         amount of buffer space within the pool that is not considered shared.
+
+         This object is obsoleted in 20.0 Release."
     DEFVAL      { 30 }
     ::= { tQ1NamedPoolEntry 9 }
 
@@ -19197,7 +19443,7 @@ tQ1NamedPoolResvCbsAmbrAlrmStep  OBJECT-TYPE
     SYNTAX      Integer32 (0..100)
     UNITS       "percent"
     MAX-ACCESS  read-create
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The value of tQ1NamedPoolResvCbsAmbrAlrmStep specifies the percentage
          step-size for the reserved CBS size of the pool. When
@@ -19207,7 +19453,9 @@ tQ1NamedPoolResvCbsAmbrAlrmStep  OBJECT-TYPE
          with tQ1NamedPoolResvCbsAmbrAlrmMax. When reserved CBS is default
          adaptive CBS sizing cannot be enabled. The reserved CBS (Committed
          Burst Size) defines the amount of buffer space within the pool that is
-         not considered shared."
+         not considered shared.
+
+         This object is obsoleted in 20.0 Release."
     DEFVAL      { 0 }
     ::= { tQ1NamedPoolEntry 10 }
 
@@ -19215,7 +19463,7 @@ tQ1NamedPoolResvCbsAmbrAlrmMax   OBJECT-TYPE
     SYNTAX      Integer32 (0..100)
     UNITS       "percent"
     MAX-ACCESS  read-create
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The value of tQ1NamedPoolResvCbsAmbrAlrmMax specifies the maximum
          percentage for the reserved CBS size of the pool. When
@@ -19226,7 +19474,9 @@ tQ1NamedPoolResvCbsAmbrAlrmMax   OBJECT-TYPE
          adaptive CBS sizing cannot be enabled. The reserved CBS (Committed
          Burst Size) defines the amount of buffer space within the pool that is
          not considered shared. Max reserved CBS must not be more than the
-         reserved CBS."
+         reserved CBS.
+
+         This object is obsoleted in 20.0 Release."
     DEFVAL      { 0 }
     ::= { tQ1NamedPoolEntry 11 }
 
@@ -19234,10 +19484,12 @@ tQ1NamedPoolAmbrAlrmThresh       OBJECT-TYPE
     SYNTAX      Integer32 (0..1000)
     UNITS       "percent"
     MAX-ACCESS  read-create
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The value of tQ1NamedPoolAmbrAlrmThresh specifies the threshold for
-         the amber alarm on the over-subscription allowed."
+         the amber alarm on the over-subscription allowed.
+
+         This object is obsoleted in 20.0 Release."
     DEFVAL      { 0 }
     ::= { tQ1NamedPoolEntry 12 }
 
@@ -19245,10 +19497,12 @@ tQ1NamedPoolRedAlrmThresh        OBJECT-TYPE
     SYNTAX      Integer32 (0..1000)
     UNITS       "percent"
     MAX-ACCESS  read-create
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The value of tQ1NamedPoolRedAlrmThresh specifies the threshold for the
-         red alarm on the over-subscription allowed."
+         red alarm on the over-subscription allowed.
+
+         This object is obsoleted in 20.0 Release."
     DEFVAL      { 0 }
     ::= { tQ1NamedPoolEntry 13 }
 
@@ -21437,7 +21691,11 @@ TAdvCfgPolicyEntry               ::= SEQUENCE
     tAdvCfgBWDEnqueueOnPIRZero       TruthValue,
     tAdvCfgBWDLimitPIRZeroDrain      TruthValue,
     tAdvCfgBWDLmtUnusedBWInitMinPIR  TruthValue,
-    tAdvCfgBWDInternalSchedWghtMode  TmnxInternalSchedWeightMode
+    tAdvCfgBWDInternalSchedWghtMode  TmnxInternalSchedWeightMode,
+    tAdvCfgAbvOffAUnConsumeAggRPrcnt Unsigned32,
+    tAdvCfgAbvOffADeltaConsAggRPrcnt Unsigned32,
+    tAdvCfgAbvOffAUnConsHiTierRPrcnt Unsigned32,
+    tAdvCfgAbvOffADelConHiTierRPrcnt Unsigned32
 }
 
 tAdvCfgPolicyName                OBJECT-TYPE
@@ -21821,6 +22079,68 @@ tAdvCfgBWDInternalSchedWghtMode  OBJECT-TYPE
          applied to this advanced-config-policy."
     DEFVAL      { noOverride }
     ::= { tAdvCfgPolicyEntry 27 }
+
+tAdvCfgAbvOffAUnConsumeAggRPrcnt OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..10000)
+    UNITS       "centipercent"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tAdvCfgAbvOffAUnConsumeAggRPrcnt specifies the percentage
+         of the unconsumed aggregate rate that can be given to a queue at the
+         end of an H-QoS below CIR, then above CIR, pass. This command is only
+         applicable when the port scheduler is configured to use the
+         above-offered-allowance-control algorithm, otherwise it is ignored."
+    DEFVAL      { 10000 }
+    ::= { tAdvCfgPolicyEntry 28 }
+
+tAdvCfgAbvOffADeltaConsAggRPrcnt OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..10000)
+    UNITS       "centipercent"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tAdvCfgAbvOffADeltaConsAggRPrcnt specifies the percentage
+         of the delta (over the current H-QoS below CIR or above CIR pass)
+         consumed aggregate rate that can be given to a queue at the end of an
+         H-QoS below CIR, then above CIR, pass. This command is only applicable
+         when the port scheduler is configured to use the
+         above-offered-allowance-control algorithm, otherwise it is ignored."
+    DEFVAL      { 2000 }
+    ::= { tAdvCfgPolicyEntry 29 }
+
+tAdvCfgAbvOffAUnConsHiTierRPrcnt OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..10000)
+    UNITS       "centipercent"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tAdvCfgAbvOffAUnConsHiTierRPrcnt specifies the
+         percentage of the  unconsumed higher-tier rate that can be given to a
+         queue at the end of an H-QoS below CIR, then above CIR, pass.
+         Higher tier refers to the Vport aggregate rate and port scheduler
+         level, group and maximum rates.
+
+         This command is only applicable when the port scheduler is configured
+         to use the above-offered-allowance-control algorithm, otherwise it is
+         ignored."
+    DEFVAL      { 10000 }
+    ::= { tAdvCfgPolicyEntry 30 }
+
+tAdvCfgAbvOffADelConHiTierRPrcnt OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..10000)
+    UNITS       "centipercent"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tAdvCfgAbvOffADelConHiTierRPrcnt specifies the percentage
+         of the delta (over the current H-QoS below CIR or above CIR pass)
+         consumed higher-tier rate that can be given to a queue at the end of
+         an H-QoS below CIR, then above CIR, pass. This command is only
+         applicable when the port scheduler is configured to use the
+         above-offered-allowance-control algorithm, otherwise it is ignored."
+    DEFVAL      { 500 }
+    ::= { tAdvCfgPolicyEntry 31 }
 
 tWrrObjects                      OBJECT IDENTIFIER ::= { tQosObjects 28 }
 
@@ -23929,7 +24249,13 @@ TEgrRmrkPlcyFCEntry              ::= SEQUENCE
     tEgrRmrkPlcyFCOutProfDscp        TDSCPNameOrEmpty,
     tEgrRmrkPlcyFCLspExpInProfile    TLspExpValue,
     tEgrRmrkPlcyFCLspExpOutProfile   TLspExpValue,
-    tEgrRmrkPlcyFCLastChanged        TimeStamp
+    tEgrRmrkPlcyFCLastChanged        TimeStamp,
+    tEgrRmrkPlcyFCDot1PExceedProfile Dot1PPriority,
+    tEgrRmrkPlcyFCDot1PInPlusProfile Dot1PPriority,
+    tEgrRmrkPlcyFCExceedDscp         TDSCPNameOrEmpty,
+    tEgrRmrkPlcyFCInPlusDscp         TDSCPNameOrEmpty,
+    tEgrRmrkPlcyFCLspExpExceedProf   TLspExpValue,
+    tEgrRmrkPlcyFCLspExpInPlusProf   TLspExpValue
 }
 
 tEgrRmrkPlcyFCName               OBJECT-TYPE
@@ -24034,6 +24360,66 @@ tEgrRmrkPlcyFCLastChanged        OBJECT-TYPE
     DESCRIPTION
         "timestamp of last change to this row in tEgrRmrkPlcyFCTable."
     ::= { tEgrRmrkPlcyFCEntry 19 }
+
+tEgrRmrkPlcyFCDot1PExceedProfile OBJECT-TYPE
+    SYNTAX      Dot1PPriority
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tEgrRmrkPlcyFCDot1PExceedProfile specifies 802.1p value
+         to set for exceed frames in this forwarding class."
+    DEFVAL      { -1 }
+    ::= { tEgrRmrkPlcyFCEntry 20 }
+
+tEgrRmrkPlcyFCDot1PInPlusProfile OBJECT-TYPE
+    SYNTAX      Dot1PPriority
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tEgrRmrkPlcyFCDot1PInPlusProfile specifies 802.1p value
+         to set for in-plus in this forwarding class."
+    DEFVAL      { -1 }
+    ::= { tEgrRmrkPlcyFCEntry 21 }
+
+tEgrRmrkPlcyFCExceedDscp         OBJECT-TYPE
+    SYNTAX      TDSCPNameOrEmpty
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tEgrRmrkPlcyFCExceedDscp specifies the DSCP name to set
+         for exceed frames in this forwarding class."
+    DEFVAL      { ''H }
+    ::= { tEgrRmrkPlcyFCEntry 22 }
+
+tEgrRmrkPlcyFCInPlusDscp         OBJECT-TYPE
+    SYNTAX      TDSCPNameOrEmpty
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tEgrRmrkPlcyFCInPlusDscp specifies the DSCP name to set
+         for in-plus in this forwarding class."
+    DEFVAL      { ''H }
+    ::= { tEgrRmrkPlcyFCEntry 23 }
+
+tEgrRmrkPlcyFCLspExpExceedProf   OBJECT-TYPE
+    SYNTAX      TLspExpValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tEgrRmrkPlcyFCLspExpExceedProf specifies the lsp-exp
+         value to be used for exceed profile traffic."
+    DEFVAL      { -1 }
+    ::= { tEgrRmrkPlcyFCEntry 24 }
+
+tEgrRmrkPlcyFCLspExpInPlusProf   OBJECT-TYPE
+    SYNTAX      TLspExpValue
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tEgrRmrkPlcyFCLspExpInPlusProf specifies the lsp-exp
+         value to be used for in-plus profile traffic."
+    DEFVAL      { -1 }
+    ::= { tEgrRmrkPlcyFCEntry 25 }
 
 tIngClassObjects                 OBJECT IDENTIFIER ::= { tQosObjects 36 }
 
@@ -24459,6 +24845,91 @@ tIngClassPlcyLspExpLastChanged   OBJECT-TYPE
         "The value of tIngClassPlcyLspExpLastChanged specificies the timestamp
          of last change to this row in tIngClassPlcyLspExpFCTable."
     ::= { tIngClassPlcyLspExpFCEntry 5 }
+
+tQosFpResourcePolicyObjects      OBJECT IDENTIFIER ::= { tQosObjects 37 }
+
+tQosFpResourcePolicyTable        OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TQosFpResourcePolicyEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The tQosFpResourcePolicyTable contains an entry for each FP resource
+         policy which is used to reallocate the hardware queues dynamically
+         between ingress and egress."
+    ::= { tQosFpResourcePolicyObjects 1 }
+
+tQosFpResourcePolicyEntry        OBJECT-TYPE
+    SYNTAX      TQosFpResourcePolicyEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Information about FP resource policy entries defined in QoS area.
+
+         Entries are created and deleted by user."
+    INDEX       { tQosFpResourcePolicyName }
+    ::= { tQosFpResourcePolicyTable 1 }
+
+TQosFpResourcePolicyEntry        ::= SEQUENCE
+{
+    tQosFpResourcePolicyName         TLNamedItem,
+    tQosFpResourcePolicyRowStatus    RowStatus,
+    tQosFpResourcePolicyLastChanged  TimeStamp,
+    tQosFpResourcePolicyDescription  TItemDescription,
+    tQosFpResPlcyQIngPrcntOfTotal    Unsigned32
+}
+
+tQosFpResourcePolicyName         OBJECT-TYPE
+    SYNTAX      TLNamedItem
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of tQosFpResourcePolicyName specifies the FP resource policy
+         name."
+    ::= { tQosFpResourcePolicyEntry 1 }
+
+tQosFpResourcePolicyRowStatus    OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tQosFpResourcePolicyRowStatus is used for the creation
+         and deletion of the FP resource policy entries."
+    ::= { tQosFpResourcePolicyEntry 2 }
+
+tQosFpResourcePolicyLastChanged  OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tQosFpResourcePolicyLastChanged indicates the sysUpTime
+         at the time of the last modification of this row.
+
+         If no changes were made to the row since the last re-initialization of
+         the local network management subsystem, then this object contains the
+         value zero."
+    ::= { tQosFpResourcePolicyEntry 3 }
+
+tQosFpResourcePolicyDescription  OBJECT-TYPE
+    SYNTAX      TItemDescription
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tQosFpResourcePolicyDescription specifies the user
+         provided description of the policy."
+    DEFVAL      { ''H }
+    ::= { tQosFpResourcePolicyEntry 4 }
+
+tQosFpResPlcyQIngPrcntOfTotal    OBJECT-TYPE
+    SYNTAX      Unsigned32 (400..9700)
+    UNITS       "centipercent"
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tQosFpResPlcyQIngPrcntOfTotal specifies the number of
+         ingress queues which is configured as a percentage of the total
+         available queues."
+    DEFVAL      { 5000 }
+    ::= { tQosFpResourcePolicyEntry 5 }
 
 tmnxQosConformance               OBJECT IDENTIFIER ::= { tmnxSRConfs 16 }
 
@@ -25475,7 +25946,7 @@ tmnxQosV16v0Compliance           MODULE-COMPLIANCE
     ::= { tmnxQosCompliances 28 }
 
 tmnxQosV19v0Compliance           MODULE-COMPLIANCE
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The compliance statement for management of QOS features on Nokia 7450
          ESS series systems release R19.0."
@@ -25573,9 +26044,116 @@ tmnxQosV19v0Compliance           MODULE-COMPLIANCE
             tmnxQosMdAutoIdV16v0Group,
             tmnxQosQueueFIRRateV16v0Group,
             tmnxQosQCIRNonProfV16v0Group,
-            tNetworkIngIpPrefixListV16v0Grp
+            tNetworkIngIpPrefixListV16v0Grp,
+            tQosFourWredSlopesV19v0Group,
+            tQosPortSchedHQoSAlgoV19v0Group
         }
     ::= { tmnxQosCompliances 29 }
+
+tmnxQosV20v0Compliance           MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for management of QOS features on Nokia 7750
+         SRS series systems release R20.0."
+    MODULE
+        MANDATORY-GROUPS {
+            tmnxQosGlobalGroup,
+            tmnxQosDSCPGroup,
+            tmnxQosFCGroup,
+            tmnxQosNetworkV9v0Group,
+            tmnxQosSlopeGroup,
+            tmnxQosAtmTdpV5v0Group,
+            tmnxQosAtmTdpV9v0Group,
+            tmnxQosSapIpv6FilterR4r0Group,
+            tmnxQosHsmdaV10v0Group,
+            tmnxQosHsmdaV9v0Group,
+            tmnxQosFrameBasedV6v0Group,
+            tmnxQosMcMlpppIngrGroup,
+            tmnxQosMcMlpppEgrGroup,
+            tQosQGrpFCGroup,
+            tmnxQosSapAtmV7v0Group,
+            tmnxQosMcFrIngrGroup,
+            tmnxQosMcFrEgrGroup,
+            tmnxQosPolicerV9v0Group,
+            tQosQGrpV8v0Group,
+            tmnxQosBurstLimitGroup,
+            tQosFCQGrpFC8v0Group,
+            tmnxQosMacCritVidFltrV9v0Group,
+            tmnxQosSapEgressV9v0Group,
+            tmnxQosSapIngressV9v0Group,
+            tmnxQosPolicyV10v0Group,
+            tmnxQosQueueGrpPolcrV10v0Group,
+            tmnxQosEgrReClassifyV10v0Group,
+            tmnxQosAdvConfigV10v0Group,
+            tmnxQosHsmdaV10v0Group,
+            tmnxQosNetworkV10v0Group,
+            tmnxQosNetworkV11v0Group,
+            tmnxSapEgressFCV11v0Group,
+            tmnxQosHsmdaV11v0Group,
+            tmnxQosSchedulerRateV11v0Group,
+            tmnxQosSapEgrFCDot1pDEV12v0Group,
+            tmnxQosSapIPCritExtV12v0Group,
+            tmnxQosParentLocV12v0Group,
+            tmnxQosParentLocEsmV12v0Group,
+            tmnxQosSapIngIPMacCritV12v0Group,
+            tmnxQosPlcyV12v0Group,
+            tmnxQosSapEgrPlcrV12v0Group,
+            tmnxQosSapIngressV13v0Group,
+            tmnxQosNetworkPlcyV13v0Group,
+            tmnxQosNetworkIngFCV13v0Group,
+            tmnxQosAdvCfgPlcyV13v0Group,
+            tmnxQosFlowBasedRulesV13v0Group,
+            tmnxQosMatchListV13v0Group,
+            tmnxQosIngressPlcyV13v0Group,
+            tmnxQosSapEgrIPCritV13v0Group,
+            tmnxQosPortSchedPlcyV13v0Group,
+            tmnxQosPortSchPlcyV13v0Group,
+            tmnxQosSapEgrIpCritGroup,
+            tmnxQosSchedulerV13v0Group,
+            tmnxQosEgressQueuePlcrGroup,
+            tmnxSapIngressIPCritGroup,
+            tmnxQosEgrQGrpGroup,
+            tQosSapIngEgrV14v0Group,
+            tmnxSlopePolicyV14v0Group,
+            tmnxQosQueueDropTailGroup,
+            tHsSchedPolicyGroup,
+            tHsSchedPolicySchedClassGroup,
+            tHsSchedPolicyGroupGroup,
+            tHsPoolPolicyGroup,
+            tHsPoolPolicyRootPoolGroup,
+            tHsPoolPolicyMidPoolGroup,
+            tHsPortPoolPolicyGroup,
+            tHsPortPoolClassPoolGroup,
+            tHsPortPoolAltClassPoolGroup,
+            tHsAttachPlcyGroup,
+            tHsAttachPlcyWrrGrpGroup,
+            tHsAttachPlcyQueueGroup,
+            tNetworkQueuePolicyHsGroup,
+            tSapEgressHsGroup,
+            tQosEgrQGroupHsGroup,
+            tmnxQosQueueRateGroup,
+            tmnxQosPostPolicerMappingGroup,
+            tmnxQosQGrpRedirectListGroup,
+            tmnxQosTimeStampGroup,
+            tmnxQosEgressV15v0Group,
+            tmnxQosPolicerV15v0Group,
+            tQosNetworkPlcyNameV15v0Group,
+            tmnxQosNetworkEgrPlcyV16v0Group,
+            tmnxQosMdAutoIdV16v0Group,
+            tmnxQosQueueFIRRateV16v0Group,
+            tmnxQosQCIRNonProfV16v0Group,
+            tNetworkIngIpPrefixListV16v0Grp,
+            tQosFpResourcePolicyV20v0Group,
+            tQosFourWredSlopesV19v0Group,
+            tQosPortSchedHQoSAlgoV19v0Group,
+            tQosSapIpPrefixListV20v0Group,
+            tmnxQosSapEgressV20v0Group,
+            tmnxQosSapIngressV20v0Group,
+            tQosNetworkV20v0Group,
+            tmnxQosQueueObjV20v0Group,
+            tQosSharedQueueV20v0Group
+        }
+    ::= { tmnxQosCompliances 30 }
 
 tmnxQosGroups                    OBJECT IDENTIFIER ::= { tmnxQosConformance 2 }
 
@@ -26571,7 +27149,7 @@ tmnxQosNamedPoolPolicyV6v0Group  OBJECT-GROUP
         tQ1NamedPoolSlopePolicy,
         tQ1NamedPoolReservedCbs
     }
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The group of objects for the named pool policy on Nokia SROS series
          systems."
@@ -27483,7 +28061,7 @@ tmnxQosNamedPoolV9v0Group        OBJECT-GROUP
         tQ1NamedPoolAmbrAlrmThresh,
         tQ1NamedPoolRedAlrmThresh
     }
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The group of objects supporting management of Network Named Pool
          policies on Nokia SROS series systems release 9.0."
@@ -28973,7 +29551,7 @@ tmnxQosSapIngressV15v0Group      OBJECT-GROUP
         tSapIngressLspExpFCPriority,
         tSapIngressLspExpTableLastChange
     }
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The group of objects supporting management of SAP ingress QoS policies
          on Nokia SROS series systems release 15.0."
@@ -29018,7 +29596,7 @@ tmnxQosSapEgressV15v0Group       OBJECT-GROUP
         tSapEgressQueuePortAvgOverhead,
         tSapEgressQueuePoolName
     }
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The group of objects supporting management of SAP egress QoS policies
          on Nokia SROS series systems."
@@ -29115,7 +29693,7 @@ tQosNetworkV15v0Group            OBJECT-GROUP
         tNetworkQueueFCLastChanged,
         tNetworkQueueFCTableLastChanged
     }
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The group of objects supporting management of Network QoS policies on
          Nokia SROS series systems."
@@ -29145,7 +29723,7 @@ tQosSharedQueueV15v0Group        OBJECT-GROUP
         tSharedQueueFCBCastQueue,
         tSharedQueueFCUnknownQueue
     }
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The group of objects supporting management of QoS shared queue on
          Nokia SROS series systems release 15.0."
@@ -29200,7 +29778,7 @@ tmnxQosQueueObjV15v0Group        OBJECT-GROUP
         tQosIngQueueRowStatus,
         tQosIngQueueWeight
     }
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The group of objects for the multi-class mlppp egress information on
          Nokia SROS series systems."
@@ -29922,6 +30500,404 @@ tIngressClassObsoletedPlcyGroup  OBJECT-GROUP
     DESCRIPTION
         "The group of obsolete objects in in Ingress classification policy."
     ::= { tmnxQosConformance 20 }
+
+tQosFpResourcePolicyV20v0Group   OBJECT-GROUP
+    OBJECTS     {
+        tQosFpResourcePolicyRowStatus,
+        tQosFpResourcePolicyLastChanged,
+        tQosFpResourcePolicyDescription,
+        tQosFpResPlcyQIngPrcntOfTotal,
+        tQosFpResourcePolicyTblLastChgd
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting management of Qos FP Resource Policy
+         configuration on Nokia SROS series systems in release 20.0."
+    ::= { tmnxQosConformance 21 }
+
+tQosFourWredSlopesV19v0Group     OBJECT-GROUP
+    OBJECTS     {
+        tQueueMgmtPlcyExcdAdminStatus,
+        tQueueMgmtPlcyExcdStartAverage,
+        tQueueMgmtPlcyExcdMaxAverage,
+        tQueueMgmtPlcyExcdMaxProbability,
+        tQueueMgmtPlcyHiPlusAdminStatus,
+        tQueueMgmtPlcyHiPlusStartAverage,
+        tQueueMgmtPlcyHiPlusMaxAverage,
+        tQMgmtPlcyHiPlusMaxProbability,
+        tEgrRmrkPlcyFCDot1PExceedProfile,
+        tEgrRmrkPlcyFCDot1PInPlusProfile,
+        tEgrRmrkPlcyFCExceedDscp,
+        tEgrRmrkPlcyFCInPlusDscp,
+        tEgrRmrkPlcyFCLspExpExceedProf,
+        tEgrRmrkPlcyFCLspExpInPlusProf
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting management of Qos wred slopes on Nokia
+         SROS 7250 series systems in release 19.10."
+    ::= { tmnxQosConformance 23 }
+
+tQosPortSchedHQoSAlgoV19v0Group  OBJECT-GROUP
+    OBJECTS     {
+        tPortSchedPlcyHQosAlgorithm,
+        tAdvCfgAbvOffAUnConsumeAggRPrcnt,
+        tAdvCfgAbvOffADeltaConsAggRPrcnt,
+        tAdvCfgAbvOffAUnConsHiTierRPrcnt,
+        tAdvCfgAbvOffADelConHiTierRPrcnt
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting management of Qos port scheduler H-QoS
+         algorithm configuration on Nokia SROS series systems in release 19.10."
+    ::= { tmnxQosConformance 24 }
+
+tQosSapIpPrefixListV20v0Group    OBJECT-GROUP
+    OBJECTS     {
+        tSapIngIPv6CritSrcIpPrefixList,
+        tSapIngIPv6CritDstIpPrefixList
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting management of Qos SAPs IPv6 Prefix
+         list configuration on Nokia SROS series systems in release 20.0."
+    ::= { tmnxQosConformance 25 }
+
+tmnxQosSapEgressV20v0Group       OBJECT-GROUP
+    OBJECTS     {
+        tSapEgressRowStatus,
+        tSapEgressScope,
+        tSapEgressDescription,
+        tSapEgressLastChanged,
+        tSapEgressTableLastChanged,
+        tSapEgressQueueRowStatus,
+        tSapEgressQueueParent,
+        tSapEgressQueueLevel,
+        tSapEgressQueueWeight,
+        tSapEgressQueueCIRLevel,
+        tSapEgressQueueCIRWeight,
+        tSapEgressQueueExpedite,
+        tSapEgressQueueCBS,
+        tSapEgressQueueCIRAdaptation,
+        tSapEgressQueuePIRAdaptation,
+        tSapEgressQueueLastChanged,
+        tSapEgressQueueTableLastChanged,
+        tSapEgressFCRowStatus,
+        tSapEgressFCQueue,
+        tSapEgressFCLastChanged,
+        tSapEgressFCTableLastChanged,
+        tSapEgressFCDot1PInProfile,
+        tSapEgressFCDot1POutProfile,
+        tSapEgressFCForceDEValue,
+        tSapEgressFCDEMark,
+        tSapEgressFCInProfDscp,
+        tSapEgressFCOutProfDscp,
+        tSapEgressFCInProfPrec,
+        tSapEgressFCOutProfPrec,
+        tSapEgressQueueUsePortParent,
+        tSapEgressQueuePortLvl,
+        tSapEgressQueuePortWght,
+        tSapEgressQueuePortCIRLvl,
+        tSapEgressQueuePortCIRWght,
+        tSapEgressQueuePortAvgOverhead
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting management of SAP egress QoS policies
+         on Nokia SROS series systems."
+    ::= { tmnxQosConformance 26 }
+
+tmnxQosSapIngressV20v0Group      OBJECT-GROUP
+    OBJECTS     {
+        tSapIngressRowStatus,
+        tSapIngressScope,
+        tSapIngressDescription,
+        tSapIngressDefaultFC,
+        tSapIngressDefaultFCPriority,
+        tSapIngressMatchCriteria,
+        tSapIngressLastChanged,
+        tSapIngressTableLastChanged,
+        tSapIngressQueueRowStatus,
+        tSapIngressQueueParent,
+        tSapIngressQueueLevel,
+        tSapIngressQueueWeight,
+        tSapIngressQueueCIRLevel,
+        tSapIngressQueueCIRWeight,
+        tSapIngressQueueMCast,
+        tSapIngressQueueExpedite,
+        tSapIngressQueueCBS,
+        tSapIngressQueueCIRAdaptation,
+        tSapIngressQueuePIRAdaptation,
+        tSapIngressQueueLastChanged,
+        tSapIngressQueueMode,
+        tSapIngressQueueTableLastChanged,
+        tSapIngressQueuePoliced,
+        tSapIngressDSCPRowStatus,
+        tSapIngressDSCPFC,
+        tSapIngressDSCPPriority,
+        tSapIngressDSCPLastChanged,
+        tSapIngressDSCPTableLastChanged,
+        tSapIngressDot1pRowStatus,
+        tSapIngressDot1pFC,
+        tSapIngressDot1pPriority,
+        tSapIngressDot1pLastChanged,
+        tSapIngressDot1pTableLastChanged,
+        tSapIngressIPCriteriaRowStatus,
+        tSapIngressIPCriteriaDescription,
+        tSapIngressIPCriteriaActionFC,
+        tSapIngressIPCriteriaActionPriority,
+        tSapIngressIPCriteriaSourceIpAddr,
+        tSapIngressIPCriteriaSourceIpMask,
+        tSapIngressIPCriteriaDestIpAddr,
+        tSapIngressIPCriteriaDestIpMask,
+        tSapIngressIPCriteriaProtocol,
+        tSapIngressIPCriteriaSourcePortValue1,
+        tSapIngressIPCriteriaSourcePortValue2,
+        tSapIngressIPCriteriaSourcePortOperator,
+        tSapIngressIPCriteriaDestPortValue1,
+        tSapIngressIPCriteriaDestPortValue2,
+        tSapIngressIPCriteriaDestPortOperator,
+        tSapIngressIPCriteriaDSCP,
+        tSapIngressIPCriteriaFragment,
+        tSapIngressIPCriteriaLastChanged,
+        tSapIngressIPCriteriaTableLastChanged,
+        tSapIngressMacCriteriaRowStatus,
+        tSapIngressMacCriteriaDescription,
+        tSapIngressMacCriteriaActionFC,
+        tSapIngressMacCriteriaActionPriority,
+        tSapIngressMacCriteriaFrameType,
+        tSapIngressMacCriteriaSrcMacAddr,
+        tSapIngressMacCriteriaSrcMacMask,
+        tSapIngressMacCriteriaDstMacAddr,
+        tSapIngressMacCriteriaDstMacMask,
+        tSapIngressMacCriteriaDot1PValue,
+        tSapIngressMacCriteriaDot1PMask,
+        tSapIngressMacCriteriaEthernetType,
+        tSapIngressMacCriteriaDSAP,
+        tSapIngressMacCriteriaDSAPMask,
+        tSapIngressMacCriteriaSSAP,
+        tSapIngressMacCriteriaSSAPMask,
+        tSapIngressMacCriteriaSnapPid,
+        tSapIngressMacCriteriaSnapOui,
+        tSapIngressMacCriteriaLastChanged,
+        tSapIngressMacCriteriaTableLastChanged,
+        tSapIngressFCRowStatus,
+        tSapIngressFCQueue,
+        tSapIngressFCMCastQueue,
+        tSapIngressFCBCastQueue,
+        tSapIngressFCUnknownQueue,
+        tSapIngressFCLastChanged,
+        tSapIngressFCInProfRemark,
+        tSapIngressFCInProfDscp,
+        tSapIngressFCInProfPrec,
+        tSapIngressFCDE1OutOfProfile,
+        tSapIngressFCOutProfRemark,
+        tSapIngressFCOutProfDscp,
+        tSapIngressFCOutProfPrec,
+        tSapIngressFCProfile,
+        tSapIngressFCTableLastChanged,
+        tSapIngressPrecRowStatus,
+        tSapIngressPrecFC,
+        tSapIngressPrecFCPriority,
+        tSapIngressPrecLastChanged,
+        tSapIngressPrecTableLastChanged,
+        tSapIngressLspExpRowStatus,
+        tSapIngressLspExpLastChanged,
+        tSapIngressLspExpFC,
+        tSapIngressLspExpFCPriority,
+        tSapIngressLspExpTableLastChange
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting management of SAP ingress QoS policies
+         on Nokia SROS series systems release 20.0."
+    ::= { tmnxQosConformance 27 }
+
+tQosNetworkV20v0Group            OBJECT-GROUP
+    OBJECTS     {
+        tNetworkPolicyRowStatus,
+        tNetworkPolicyScope,
+        tNetworkPolicyDescription,
+        tNetworkPolicyIngressDefaultActionFC,
+        tNetworkPolicyIngressDefaultActionProfile,
+        tNetworkPolicyEgressRemark,
+        tNetworkPolicyLastChanged,
+        tNetworkPolicyIngressLerUseDscp,
+        tNetworkPolicyEgressRemarkDscp,
+        tNetworkPolicyTableLastChanged,
+        tNetworkIngressDSCPRowStatus,
+        tNetworkIngressDSCPFC,
+        tNetworkIngressDSCPProfile,
+        tNetworkIngressDSCPLastChanged,
+        tNetworkIngressDSCPTableLastChanged,
+        tNetworkIngressDot1pRowStatus,
+        tNetworkIngressDot1pFC,
+        tNetworkIngressDot1pProfile,
+        tNetworkIngressDot1pLastChanged,
+        tNetworkIngressDot1pTableLastChanged,
+        tNetworkIngressLSPEXPRowStatus,
+        tNetworkIngressLSPEXPFC,
+        tNetworkIngressLSPEXPProfile,
+        tNetworkIngressLSPEXPLastChanged,
+        tNetworkIngressLSPEXPTableLastChanged,
+        tNetworkEgressFCDSCPInProfile,
+        tNetworkEgressFCDSCPOutProfile,
+        tNetworkEgressFCLspExpInProfile,
+        tNetworkEgressFCLspExpOutProfile,
+        tNetworkEgressFCDot1pInProfile,
+        tNetworkEgressFCDot1pOutProfile,
+        tNetworkEgressFCLastChanged,
+        tNetworkEgressFCForceDEValue,
+        tNetworkEgressFCDEMark,
+        tNetworkEgressFCTableLastChanged,
+        tNetworkQueuePolicyRowStatus,
+        tNetworkQueuePolicyDescription,
+        tNetworkQueuePolicyLastChanged,
+        tNetworkQueuePolicyTableLastChanged,
+        tNetworkQueueRowStatus,
+        tNetworkQueueMCast,
+        tNetworkQueueExpedite,
+        tNetworkQueueCIR,
+        tNetworkQueuePIR,
+        tNetworkQueueCBS,
+        tNetworkQueueMBS,
+        tNetworkQueueLastChanged,
+        tNetworkQueueUsePortParent,
+        tNetworkQueuePortLvl,
+        tNetworkQueuePortWght,
+        tNetworkQueuePortCIRLvl,
+        tNetworkQueuePortCIRWght,
+        tNetworkQueuePortAvgOverhead,
+        tNetworkQueuePIRAdaptation,
+        tNetworkQueueCIRAdaptation,
+        tNetworkQueueTableLastChanged,
+        tNetworkQueueFCRowStatus,
+        tNetworkQueueFC,
+        tNetworkQueueFCMCast,
+        tNetworkQueueFCLastChanged,
+        tNetworkQueueFCTableLastChanged
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting management of Network QoS policies on
+         Nokia SROS series systems."
+    ::= { tmnxQosConformance 28 }
+
+tmnxQosQueueObjV20v0Group        OBJECT-GROUP
+    OBJECTS     {
+        tQosEgrQGroupDescr,
+        tQosEgrQGroupLastChanged,
+        tQosEgrQGroupRowStatus,
+        tQosEgrQGroupTableLastChanged,
+        tQosEgrQTableLastChanged,
+        tQosEgrQueueAdminCIR,
+        tQosEgrQueueAdminPIR,
+        tQosEgrQueueCBS,
+        tQosEgrQueueCIRAdaptation,
+        tQosEgrQueueCIRLevel,
+        tQosEgrQueueCIRWeight,
+        tQosEgrQueueExpedite,
+        tQosEgrQueueLastChanged,
+        tQosEgrQueueLevel,
+        tQosEgrQueuePIRAdaptation,
+        tQosEgrQueueParent,
+        tQosEgrQueuePortCIRLvl,
+        tQosEgrQueuePortCIRWght,
+        tQosEgrQueuePortLvl,
+        tQosEgrQueuePortWght,
+        tQosEgrQueueRowStatus,
+        tQosEgrQueueUsePortParent,
+        tQosEgrQueueWeight,
+        tQosIngQTableLastChanged,
+        tQosIngQGroupDescr,
+        tQosIngQGroupLastChanged,
+        tQosIngQGroupRowStatus,
+        tQosIngQGroupTableLastChanged,
+        tQosIngQueueAdminCIR,
+        tQosIngQueueAdminPIR,
+        tQosIngQueueCBS,
+        tQosIngQueueCIRAdaptation,
+        tQosIngQueueCIRLevel,
+        tQosIngQueueCIRWeight,
+        tQosIngQueueExpedite,
+        tQosIngQueueLastChanged,
+        tQosIngQueueLevel,
+        tQosIngQueueMCast,
+        tQosIngQueueMode,
+        tQosIngQueuePIRAdaptation,
+        tQosIngQueueParent,
+        tQosIngQueuePoliced,
+        tQosIngQueueRowStatus,
+        tQosIngQueueWeight
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects for the multi-class mlppp egress information on
+         Nokia SROS series systems."
+    ::= { tmnxQosConformance 29 }
+
+tQosSharedQueueV20v0Group        OBJECT-GROUP
+    OBJECTS     {
+        tSharedQueuePolicyRowStatus,
+        tSharedQueuePolicyDescription,
+        tSharedQueuePolicyLastChanged,
+        tSharedQueuePolicyTableLastChanged,
+        tSharedQueueRowStatus,
+        tSharedQueueExpedite,
+        tSharedQueueCIR,
+        tSharedQueuePIR,
+        tSharedQueueCBS,
+        tSharedQueueMBS,
+        tSharedQueueLastChanged,
+        tSharedQueueIsMultipoint,
+        tSharedQueueTableLastChanged,
+        tSharedQueueFCRowStatus,
+        tSharedQueueFCQueue,
+        tSharedQueueFCLastChanged,
+        tSharedQueueFCTableLastChanged,
+        tSharedQueueFCMCastQueue,
+        tSharedQueueFCBCastQueue,
+        tSharedQueueFCUnknownQueue
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting management of QoS shared queue on
+         Nokia SROS series systems release 15.0."
+    ::= { tmnxQosConformance 30 }
+
+tQosNamedPoolObsoletedV20v0Grp   OBJECT-GROUP
+    OBJECTS     {
+        tSapEgressQueuePoolName,
+        tSapIngressQueuePoolName,
+        tNetworkQueuePoolName,
+        tQosEgrQueuePoolName,
+        tQosIngQueuePoolName,
+        tSharedQueuePoolName,
+        tNamedPoolPolicyTableLastChanged,
+        tNamedPoolPolicyRowStatus,
+        tNamedPoolPolicyLastChanged,
+        tNamedPoolPolicyDescription,
+        tNamedPoolPolicyQ1DefaultWeight,
+        tNamedPoolPolicyQ1MdaWeight,
+        tNamedPoolPolicyQ1PortWeight,
+        tQ1NamedPoolTableLastChanged,
+        tQ1NamedPoolRowStatus,
+        tQ1NamedPoolLastChanged,
+        tQ1NamedPoolDescription,
+        tQ1NamedPoolNetworkAllocWeight,
+        tQ1NamedPoolAccessAllocWeight,
+        tQ1NamedPoolSlopePolicy,
+        tQ1NamedPoolReservedCbs,
+        tQ1NamedPoolResvCbsAmbrAlrmStep,
+        tQ1NamedPoolResvCbsAmbrAlrmMax,
+        tQ1NamedPoolAmbrAlrmThresh,
+        tQ1NamedPoolRedAlrmThresh
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of obsoleted objects for the named pool policy on Nokia SROS
+         series systems."
+    ::= { tmnxQosConformance 31 }
 
 tQosNotifyPrefix                 OBJECT IDENTIFIER ::= { tmnxSRNotifyPrefix 16 }
 

@@ -1,8 +1,12 @@
 mib: VIPRINET-MIB
 modules:
+    os:
+        version: VIPRINET-MIB::vpnRouterFirmware.0
+        hardware: VIPRINET-MIB::vpnRouterModel.0
+        serial: VIPRINET-MIB::vpnRouterSerial.0
     processors:
-          data:
-              -
-                  oid: vpnRouterCPULoad
-                  num_oid: '.1.3.6.1.4.1.35424.1.2.1.{{ $index }}'
-                  type: viprinet-cpu
+        data:
+            -
+                oid: vpnRouterCPULoad
+                num_oid: '.1.3.6.1.4.1.35424.1.2.1.{{ $index }}'
+                type: viprinet-cpu

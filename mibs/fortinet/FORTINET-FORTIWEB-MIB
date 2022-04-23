@@ -24,7 +24,7 @@ IMPORTS
         FROM SNMPv2-TC;
 
 fnFortiWebMib MODULE-IDENTITY
-    LAST-UPDATED "201711170000Z"
+    LAST-UPDATED "201807130000Z"
     ORGANIZATION 
         "Fortinet Technologies, Inc."
     CONTACT-INFO 
@@ -34,6 +34,15 @@ fnFortiWebMib MODULE-IDENTITY
          http://www.fortinet.com"
     DESCRIPTION
         "MIB module for Fortinet FortiWeb devices"
+    REVISION    "201807130000Z"
+    DESCRIPTION
+	"add  fwbDOCKER."
+    REVISION    "201804040000Z"
+    DESCRIPTION
+	"add  fwbVBOX."
+    REVISION    "201803210000Z"
+    DESCRIPTION
+	"add  fwbGCP."
     REVISION    "201711170000Z"
     DESCRIPTION
 	"add  fwbKVMPAYG."
@@ -163,6 +172,13 @@ fwbVMPAYG OBJECT IDENTIFIER
     ::= { fwModel 50008}
 fwbKVMPAYG OBJECT IDENTIFIER
     ::= { fwModel 50009}
+fwbGCP OBJECT IDENTIFIER
+    ::= { fwModel 50010}
+fwbVBOX OBJECT IDENTIFIER
+    ::= { fwModel 50011}
+fwbDOCKER OBJECT IDENTIFIER
+    ::= { fwModel 50012}
+
 --
 -- fortinet.fnFortiWebMib.fwSystem
 --

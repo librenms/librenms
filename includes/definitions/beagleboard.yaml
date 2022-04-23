@@ -1,0 +1,28 @@
+os: beagleboard
+type: server
+group: unix
+text: BeagleBoard
+icon: beagleboard
+ifXmcbc: true
+ifname: true
+over:
+    - { graph: device_processor, text: 'Processor Usage' }
+    - { graph: device_mempool, text: 'Memory Usage' }
+    - { graph: device_storage, text: 'Storage Usage' }
+poller_modules:
+    bgp-peers: false
+    ospf: false
+    stp: false
+discovery_modules:
+    applications: true
+    bgp-peers: false
+    stp: false
+    vmware-vminfo: true
+    libvirt-vminfo: true
+processor_stacked: true
+discovery:
+    -
+        snmpget:
+            oid: .1.3.6.1.4.1.8072.1.3.2.3.1.2.6.100.105.115.116.114.111
+            op: starts
+            value: "BeagleBoard.org"

@@ -1,0 +1,590 @@
+ALGPOWER-v2-MIB DEFINITIONS ::= BEGIN
+	IMPORTS
+	DisplayString FROM RFC1213-MIB
+	OBJECT-TYPE FROM RFC-1212
+	enterprises FROM RFC1155-SMI;
+
+	algcom OBJECT IDENTIFIER ::= { enterprises 49136 }
+	upsObjects OBJECT IDENTIFIER ::= { algcom 1 }
+	output OBJECT IDENTIFIER ::= { upsObjects 1 }
+	battery OBJECT IDENTIFIER ::= { upsObjects 2 }
+	input OBJECT IDENTIFIER ::= { upsObjects 3 }
+	temperature OBJECT IDENTIFIER ::= { upsObjects 4 }
+	watchdog OBJECT IDENTIFIER ::= { upsObjects 5 }
+	supply OBJECT IDENTIFIER ::= { upsObjects 6 }
+	installation OBJECT IDENTIFIER ::= { upsObjects 7 }
+	bat-tst OBJECT IDENTIFIER ::= { upsObjects 8 }
+
+
+	outputVoltage OBJECT-TYPE
+		SYNTAX INTEGER
+		ACCESS read-only
+		STATUS mandatory
+		DESCRIPTION
+			"Numeric value of instantaneous output voltage from
+			the source in tenths of a volt. To get the value
+			actual in volt should be divided by 10.
+			
+			Example:
+			Read value 241, actual value 24.1V."
+		::= { output 1 }
+
+	outputCurrent OBJECT-TYPE
+		SYNTAX INTEGER
+		ACCESS read-only
+		STATUS mandatory
+		DESCRIPTION
+			"Numeric value of current output of converter AC/DC.
+			Real value reading in milli ampere.
+			
+			Example:
+			Read value 1087, Actual value 1.087 milli ampere
+			or 1.087A.
+			If the output is '0' the AC/DC is off and the output
+			for the equipments is provide from batteries"
+		::= { output 2 }
+
+	oidNotUsed0 OBJECT-TYPE
+		SYNTAX INTEGER
+		ACCESS read-only
+		STATUS mandatory
+		DESCRIPTION
+		"OID not used."
+		::= { output 3 }
+
+	oidNotUsed1 OBJECT-TYPE
+		SYNTAX INTEGER
+		ACCESS read-only
+		STATUS mandatory
+		DESCRIPTION
+		"OID not used."
+		::= { output 4 }
+
+
+	batteryVoltage OBJECT-TYPE
+	SYNTAX INTEGER
+	ACCESS read-only
+	STATUS mandatory
+	DESCRIPTION
+		"Numeric value of instantaneous voltage of battery bank.
+		To get the actual value in volt must be divided by 10.
+		
+		Example:
+		Read value 240, actual value 24.0V."
+	::= { battery 1 }
+
+	batteryCurrent OBJECT-TYPE
+		SYNTAX INTEGER
+		ACCESS read-only
+		STATUS mandatory
+		DESCRIPTION
+			"Numeric value of current in Battery bank. Real
+			value reading in milli ampere.
+			If the value is negative the Battery bank is provide
+			energy for the output.
+			If the value is positive the Battery bank is under
+			charger 
+			
+			Example:
+			Read value -2230, Actual value 2,230 ampere and the
+			battery bank is provide this current.
+			Read value 3000, Actual value 3.000 milli ampere and
+			the battery bank is absorve this current."
+		::= { battery 2 }
+
+	chargerStatus OBJECT-TYPE
+		SYNTAX INTEGER
+		ACCESS read-only
+		STATUS mandatory
+		DESCRIPTION
+			"Show the status of battery charger:
+			0 - The battery is not connected in DC UPS;
+			1 - The battery is voltage incompatible with DC UPS;
+			2 - The DC UPS is in nobreak mode;
+			3 - The charger of Battery is in Bulk stage;
+			4 - The charger of Battery is Absorption stage;
+			5 - The charger of Battery is Float stage;
+			6 - The Battery will be disconnected in 30s due to
+			    low voltage and the DC-UPS output will be
+			    turned off.
+			7 - The Battery is under test"
+		::= { battery 3 }
+
+
+	alarmOnBattery OBJECT-TYPE
+		SYNTAX INTEGER
+		ACCESS read-only
+		STATUS mandatory
+		DESCRIPTION
+			"Shows the operation mode of DC-UPS:
+
+			0 - The DC-UPS output is provide by AC energy.
+			1 - The DC-UPS output is provide by Battery"
+		::= { input 1 }
+
+	acFail OBJECT-TYPE
+		SYNTAX INTEGER
+		ACCESS read-only
+		STATUS mandatory
+		DESCRIPTION
+			"Alarm that alert about AC outages in the last 10
+			minutes:
+			
+			0 - DC-UPS in normal operation.
+			1 - Occur a AC fail in the last 10 minutes."
+		::= { input 2 }
+
+	batteryCharging OBJECT-TYPE
+		SYNTAX INTEGER
+		ACCESS read-only
+		STATUS mandatory
+		DESCRIPTION
+			"Show the status of charging Battery:
+			
+			1 - The battery is on charging.
+			0 - The battery is on discharging."
+		::= { input 3 }
+
+	batteryDischarging OBJECT-TYPE
+		SYNTAX INTEGER
+		ACCESS read-only
+		STATUS mandatory
+		DESCRIPTION
+			"Show the status of discharging Battery:
+			
+			1 - The battery is on discharging.
+			0 - The battery is on charging."
+		::= { input 4 }
+
+	overheat OBJECT-TYPE
+		SYNTAX INTEGER
+		ACCESS read-only
+		STATUS mandatory
+		DESCRIPTION
+			"Alarm that alert about overtemperature of DC-UPS
+			
+			1 - The DC-UPS is in condition of overtemperature.
+			0 - The DC-UPS is in normal condition."
+		::= { input 5 }
+
+	overload OBJECT-TYPE
+		SYNTAX INTEGER
+		ACCESS read-only
+		STATUS mandatory
+		DESCRIPTION
+			"Alarm that alert about overload of DC-UPS
+			
+			1 - The DC-UPS is in condition of overload.
+			0 - The DC-UPS is in normal condition."
+		::= { input 6 }
+
+	fanAfail OBJECT-TYPE
+		SYNTAX INTEGER
+		ACCESS read-only
+		STATUS mandatory
+		DESCRIPTION
+			"Alarm that alert about fail in internal FAN A
+			
+			1 - Internal FAN with fail.
+			0 - Internal FAN ok"
+		::= { input 7 }
+
+	fanBfail OBJECT-TYPE
+		SYNTAX INTEGER
+		ACCESS read-only
+		STATUS mandatory
+		DESCRIPTION
+			"Alarm that alert about fail in internal FAN B
+			
+			1 - Internal FAN with fail.
+			0 - Internal FAN ok"
+		::= { input 8 }
+
+	oidNotUsed2 OBJECT-TYPE
+		SYNTAX INTEGER
+		ACCESS read-only
+		STATUS mandatory
+		DESCRIPTION
+		"OID not used."
+		::= { input 9 }
+
+	oidNotUsed3 OBJECT-TYPE
+		SYNTAX INTEGER
+		ACCESS read-only
+		STATUS mandatory
+		DESCRIPTION
+		"OID not used."
+		::= { input 10 }
+		
+	upTime OBJECT-TYPE
+		SYNTAX INTEGER
+		ACCESS read-only
+		STATUS mandatory
+		DESCRIPTION "System Up time in hours"
+		::= {input 11}	
+
+
+	innerTemperature OBJECT-TYPE
+		SYNTAX INTEGER
+		ACCESS read-only
+		STATUS mandatory
+		DESCRIPTION
+			"Show the internal temperature of power supply.
+			Uses the unit degree Celsius.
+			
+			Example
+			Read value: 25, temperature is 25degC."
+		::= { temperature 1 }
+
+	outerTemperature OBJECT-TYPE
+		SYNTAX INTEGER
+		ACCESS read-only
+		STATUS mandatory
+		DESCRIPTION
+			"Show the temperature of external sensor (cable that
+			comes with power supply).
+			Uses the unit degree Celsius.
+			
+			Example
+			Read value: 25, temperature is 25degC."
+		::= { temperature 2 }
+
+	heatSinkTemperature OBJECT-TYPE
+		SYNTAX INTEGER
+		ACCESS read-only
+		STATUS mandatory
+		DESCRIPTION
+			"Show the temperature of sensor in the heatsink of
+			power supply use the unit degree Celsius.
+			
+			Example
+			Read value: 25, temperature is 25degC."
+		::= { temperature 3 }
+
+
+	watchdogPing1 OBJECT-TYPE
+		SYNTAX INTEGER
+		ACCESS read-only
+		STATUS mandatory
+		DESCRIPTION
+			"Alarm indicating the action of watchdog 1
+			programmed in the last 10 minutes. The watchdog
+			acts on the output by turning it off when not
+			receive response from IP ping command
+			configured.
+			
+			1 - The watchdog 1 acted on the output the last 10
+			    minutes.
+			0 - The Watchdog 1 has not acted in the last 10
+			    minutes."
+		::= { watchdog 1 }
+
+	watchdogPing2 OBJECT-TYPE
+		SYNTAX INTEGER
+		ACCESS read-only
+		STATUS mandatory
+		DESCRIPTION
+			"Alarm indicating the action of watchdog 2
+			programmed in the last 10 minutes. The watchdog
+			acts on the output by turning it off when not
+			receive response from IP ping command
+			configured.
+			
+			1 - The watchdog 2 acted on the output the last 10
+			    minutes.
+			0 - The Watchdog 2 has not acted in the last 10
+			    minutes."
+		::= { watchdog 2 }
+
+	watchdogPing3 OBJECT-TYPE
+		SYNTAX INTEGER
+		ACCESS read-only
+		STATUS mandatory
+		DESCRIPTION
+			"Alarm indicating the action of watchdog 3
+			programmed in the last 10 minutes. The watchdog
+			acts on the output by turning it off when not
+			receive response from IP ping command
+			configured.
+			
+			1 - The watchdog 3 acted on the output the last 10
+			    minutes.
+			0 - The Watchdog 3 has not acted in the last 10
+			    minutes."
+		::= { watchdog 3 }
+
+	watchdogPing4 OBJECT-TYPE
+		SYNTAX INTEGER
+		ACCESS read-only
+		STATUS mandatory
+		DESCRIPTION
+			"Alarm indicating the action of watchdog 4
+			programmed in the last 10 minutes. The watchdog
+			acts on the output by turning it off when not
+			receive response from IP ping command
+			configured.
+			
+			1 - The watchdog 4 acted on the output the last 10
+			    minutes.
+			0 - The Watchdog 4 has not acted in the last 10
+			    minutes."
+		::= { watchdog 4 }
+
+	watchdogPing5 OBJECT-TYPE
+		SYNTAX INTEGER
+		ACCESS read-only
+		STATUS mandatory
+		DESCRIPTION
+			"Alarm indicating the action of watchdog 5
+			programmed in the last 10 minutes. The watchdog
+			acts on the output by turning it off when not
+			receive response from IP ping command
+			configured.
+			
+			1 - The watchdog 5 acted on the output the last 10
+			    minutes.
+			0 - The Watchdog 5 has not acted in the last 10
+			    minutes."
+		::= { watchdog 5 }
+
+	watchdogPing6 OBJECT-TYPE
+		SYNTAX INTEGER
+		ACCESS read-only
+		STATUS mandatory
+		DESCRIPTION
+			"Alarm indicating the action of watchdog 6
+			programmed in the last 10 minutes. The watchdog
+			acts on the output by turning it off when not
+			receive response from IP ping command
+			configured.
+			
+			1 - The watchdog 6 acted on the output the last 10
+			    minutes.
+			0 - The Watchdog 6 has not acted in the last 10
+			    minutes."
+		::= { watchdog 6 }
+
+	watchdogPing7 OBJECT-TYPE
+		SYNTAX INTEGER
+		ACCESS read-only
+		STATUS mandatory
+		DESCRIPTION
+			"Alarm indicating the action of watchdog 7
+			programmed in the last 10 minutes. The watchdog
+			acts on the output by turning it off when not
+			receive response from IP ping command
+			configured.
+			
+			1 - The watchdog 7 acted on the output the last 10
+			    minutes.
+			0 - The Watchdog 7 has not acted in the last 10
+			    minutes."
+		::= { watchdog 7 }
+
+	watchdogPing8 OBJECT-TYPE
+		SYNTAX INTEGER
+		ACCESS read-only
+		STATUS mandatory
+		DESCRIPTION
+			"Alarm indicating the action of watchdog 8
+			programmed in the last 10 minutes. The watchdog
+			acts on the output by turning it off when not
+			receive response from IP ping command
+			configured.
+			
+			1 - The watchdog 8 acted on the output the last 10
+			    minutes.
+			0 - The Watchdog 8 has not acted in the last 10
+			    minutes."
+		::= { watchdog 8 }
+
+	watchdogPing9 OBJECT-TYPE
+		SYNTAX INTEGER
+		ACCESS read-only
+		STATUS mandatory
+		DESCRIPTION
+			"Alarm indicating the action of watchdog 9
+			programmed in the last 10 minutes. The watchdog
+			acts on the output by turning it off when not
+			receive response from IP ping command
+			configured.
+			
+			1 - The watchdog 9 acted on the output the last 10
+			    minutes.
+			0 - The Watchdog 9 has not acted in the last 10
+			    minutes."
+		::= { watchdog 9 }
+
+	watchdogPing10 OBJECT-TYPE
+		SYNTAX INTEGER
+		ACCESS read-only
+		STATUS mandatory
+		DESCRIPTION
+			"Alarm indicating the action of watchdog 10
+			programmed in the last 10 minutes. The watchdog
+			acts on the output by turning it off when not
+			receive response from IP ping command
+			configured.
+			
+			1 - The watchdog 10 acted on the output the last 10
+			    minutes.
+			0 - The Watchdog 10 has not acted in the last 10
+			    minutes."
+		::= { watchdog 10 }
+
+
+	supplyVoltage OBJECT-TYPE
+		SYNTAX INTEGER
+		ACCESS read-only
+		STATUS mandatory
+		DESCRIPTION 
+			"The supply AC voltage decivolt [dV]
+			Numeric value of instantaneous input voltage.
+			An optional sensor is required to read this value.
+			To get the actual value in volt it should be
+			divided by 10.
+			
+			Example:
+			Read value 2410, actual value 241 Vac."
+		::= {supply 1}
+
+
+	popName OBJECT-TYPE
+		SYNTAX DisplayString (SIZE (30))
+		ACCESS read-only
+		STATUS mandatory
+		DESCRIPTION "PoP name"
+		::= {installation 1}
+
+	facilityAddr OBJECT-TYPE
+		SYNTAX DisplayString (SIZE (40))
+		ACCESS read-only
+		STATUS mandatory
+		DESCRIPTION "Facility address"
+		::= {installation 2}
+
+	facilityCity OBJECT-TYPE
+		SYNTAX DisplayString (SIZE (30))
+		ACCESS read-only
+		STATUS mandatory
+		DESCRIPTION "Facility city"
+		::= {installation 3}
+
+	instDate OBJECT-TYPE
+		SYNTAX DisplayString (SIZE (10))
+		ACCESS read-only
+		STATUS mandatory
+		DESCRIPTION "Installation date"
+		::= {installation 4}
+
+	batCapacity OBJECT-TYPE
+		SYNTAX INTEGER
+		ACCESS read-only
+		STATUS mandatory
+		DESCRIPTION "Battery capacity"
+		::= {installation 5}
+
+	batBrand OBJECT-TYPE
+		SYNTAX DisplayString (SIZE (30))
+		ACCESS read-only
+		STATUS mandatory
+		DESCRIPTION "Battery brand"
+		::= {installation 6}
+
+	batInstDate OBJECT-TYPE
+		SYNTAX DisplayString (SIZE (10))
+		ACCESS read-only
+		STATUS mandatory
+		DESCRIPTION "Battery installation date"
+		::= {installation 7}
+
+	respPers OBJECT-TYPE
+		SYNTAX DisplayString (SIZE (50))
+		ACCESS read-only
+		STATUS mandatory
+		DESCRIPTION "Responsible person"
+		::= {installation 8}
+		
+	btst-date OBJECT-TYPE
+		SYNTAX DisplayString (SIZE (10))
+		ACCESS read-only
+		STATUS mandatory
+		DESCRIPTION "Battery test execution date (dd/mm/yyyy)"
+		::= {bat-tst 1}
+		
+	btst-status OBJECT-TYPE
+		SYNTAX INTEGER
+		ACCESS read-only
+		STATUS mandatory
+		DESCRIPTION "Battery test status
+		0 - NEVER DONE
+		1 - Passed
+		2 - Running
+		3 - Aborted
+		4 - Failed"
+		::= {bat-tst 2}
+		
+	btst-duration OBJECT-TYPE
+		SYNTAX INTEGER
+		ACCESS read-only
+		STATUS mandatory
+		DESCRIPTION "Programmed test duration in minutes
+		 * 999 - Perform the test until battery is fully discharged"
+		::= {bat-tst 3}
+
+	btst-elapsed OBJECT-TYPE
+		SYNTAX INTEGER
+		ACCESS read-only
+		STATUS mandatory
+		DESCRIPTION "Elapsed time in current\last battery test"
+		::= {bat-tst 4}
+		
+	btst-volt-i OBJECT-TYPE
+		SYNTAX INTEGER
+		ACCESS read-only
+		STATUS mandatory
+		DESCRIPTION 
+			"The battery initial voltage [dV]
+			Numeric value of battery voltage when starting the battery test.
+						
+			Example:
+			Read value 241, actual value 24.1 V."
+		::= {bat-tst 5}
+
+	btst-amp-i OBJECT-TYPE
+		SYNTAX INTEGER
+		ACCESS read-only
+		STATUS mandatory
+		DESCRIPTION 
+			"The battery initial cuurent [mA]
+			Numeric value of battery current when starting the battery test.
+						
+			Example:
+			Read value 1522, actual value 1.55 A."
+		::= {bat-tst 6}
+	
+	btst-volt-f OBJECT-TYPE
+		SYNTAX INTEGER
+		ACCESS read-only
+		STATUS mandatory
+		DESCRIPTION 
+			"The battery final voltage [dV]
+			Numeric value of battery voltage when the battery test is done.
+						
+			Example:
+			Read value 225, actual value 22.5 V."
+		::= {bat-tst 7}
+	
+	btst-amp-f OBJECT-TYPE
+		SYNTAX INTEGER
+		ACCESS read-only
+		STATUS mandatory
+		DESCRIPTION 
+			"The battery initial cuurent [mA]
+			Numeric value of battery current when the battery test is done.
+						
+			Example:
+			Read value 1485, actual value 1.48 A."
+		::= {bat-tst 8}
+
+END

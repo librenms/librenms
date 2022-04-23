@@ -1,5 +1,7 @@
 mib: MICROSEMI-PDSINE-MIB
 modules:
+    os:
+        sysDescr_regex: '/(?<hardware>\S+)\.  (Unit S\/N=(?<serial>\d*)\.  )?App Ver=(?<version>[^,]*),/'
     sensors:
         power:
             data:
@@ -12,14 +14,12 @@ modules:
                     group: 'Ports (Unit {{ $subindex0 }})'
                 -
                     oid: mainPSEMaxPower
-                    value: mainPSEMaxPower
                     group: 'Main (Unit {{ $index }})'
                     num_oid: '.1.3.6.1.4.1.7428.1.2.2.1.1.5.{{ $index }}'
                     descr: 'Max Power (Unit {{ $index }})'
                     index: 'mainpw-{{ $index }}'
                 -
                     oid: POWER-ETHERNET-MIB::pethMainPseConsumptionPower
-                    value: pethMainPseConsumptionPower
                     group: 'Main (Unit {{ $index }})'
                     descr: 'Used Power (Unit {{ $index }})'
                     index: 'usedmainpw-{{ $index }}'

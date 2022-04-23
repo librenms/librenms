@@ -1,12 +1,18 @@
 os: ciena-sds
 text: 'Ciena Service Delivery Switch'
 icon: ciena
+bad_hrSystemUptime: true
+bad_snmpEngineTime: true
+ifname: true
+bad_ifname_regexp: # ifName (regex, case insensitive) - ignore interfaces with empty name
+    - "/^$/"
 over:
     - { graph: device_bits, text: Traffic }
+    - { graph: device_processor, text: 'CPU Usage' }
 type: network
-mib_dir:
-    - ciena
+mib_dir: ciena
 discovery:
-    - sysObjectID:
-        - .1.3.6.1.4.1.6141.1.
-        - .1.3.6.1.4.1.1271.1.
+    -
+        sysObjectID:
+            - .1.3.6.1.4.1.6141.1.
+            - .1.3.6.1.4.1.1271.1.

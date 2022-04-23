@@ -2,10 +2,12 @@ source: General/Acknowledgement.md
 path: blob/master/doc/
 path: blob/master/doc/
 
+# Acknowledgements
+
 LibreNMS wouldn't be what it is today without the use of some other amazing projects.
 We list below what we make use of including the license compliance.
 
-# 3rd Party GPLv3 Compliant
+## 3rd Party GPLv3 Compliant
 
 - [Bootstrap](http://getbootstrap.com/): MIT
 - [Font Awesome](http://fontawesome.io/icons/): MIT License
@@ -14,11 +16,8 @@ We list below what we make use of including the license compliance.
 - [Twitter typeahead](https://github.com/corejavascript/typeahead.js): Open License
 - [Vis](http://visjs.org/): MIT / Apache 2.0
 - [TCPDF](http://www.tcpdf.org): LGPLv3
-- [Bootstrap 3
-  Datepicker](http://eonasdan.github.io/bootstrap-datetimepicker/):
-  MIT
-- [Bootstrap Dropdown Hover
-  Plugin](https://github.com/CWSpear/bootstrap-hover-dropdown): MIT
+- [Bootstrap 3 Datepicker](http://eonasdan.github.io/bootstrap-datetimepicker/):MIT
+- [Bootstrap Dropdown Hover Plugin](https://github.com/CWSpear/bootstrap-hover-dropdown): MIT
 - [Bootstrap Switch](http://www.bootstrap-switch.org/): Apache 2.0
 - [Handlebars](http://handlebarsjs.com/): Open License
 - [Cycle2](http://jquery.malsup.com/cycle2/): MIT/GPL
@@ -32,10 +31,8 @@ We list below what we make use of including the license compliance.
 - [Gridster](http://gridster.net/): MIT
 - [Pure PHP radius class](http://developer.sysco.ch/php/): GPLv3
 - [GeSHi - Generic Syntax Highlighter](http://qbnz.com/highlighter/): GPLv2+
-- MalaysiaMap.svg - By Exiang [CC BY
-  3.0](http://creativecommons.org/licenses/by/3.0), via Wikimedia Commons
-- Code for UBNT Devices Mark Gibbons <mgibbons@oemcomp.com> Initial
-  code base submitted via PR721
+- MalaysiaMap.svg - By Exiang [CC BY 3.0](http://creativecommons.org/licenses/by/3.0), via Wikimedia Commons
+- Code for UBNT Devices Mark Gibbons <mgibbons@oemcomp.com> Initial code base submitted via PR721
 - [Jquery LazyLoad](http://www.appelsiini.net/projects/lazyload): MIT License
 - [influxdb-php](https://github.com/influxdb/influxdb-php): MIT License
 - [HTML Purifier](http://htmlpurifier.org/): LGPL v2.1
@@ -50,8 +47,7 @@ We list below what we make use of including the license compliance.
 - [jQuery.extendext](https://github.com/mistic100/jQuery.extendext): MIT
 - [doT](https://github.com/olado/doT): MIT
 - [jQuery-queryBuilder](https://github.com/mistic100/jQuery-QueryBuilder/): MIT
-- [sql-parser](https://github.com/mistic100/sql-parser/): MIT
-  (Currently a custom build is used)
+- [sql-parser](https://github.com/mistic100/sql-parser/): MIT (Currently a custom build is used)
 
 ## 3rd Party GPLv3 Non-compliant
 

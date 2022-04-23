@@ -1,6 +1,3 @@
-source: Support/Poller Support.md
-path: blob/master/doc/
-
 # poller.php
 
 This document will explain how to use poller.php to debug issues or
@@ -44,7 +41,7 @@ from snmp.
 
 `-m` This enables you to specify the module you want to run for poller.
 
-# Poller Wrapper
+## Poller Wrapper
 
 We have a `poller-wrapper.py` script by [Job
 Snijders](https://github.com/job). This script is currently the
@@ -54,7 +51,7 @@ If you need to debug the output of poller-wrapper.py then you can add
 `-d` to the end of the command - it is NOT recommended to do this in
 cron.
 
-# Poller config
+## Poller config
 
 These are the default poller config items. You can globally disable a
 module by setting it to 0. If you just want to
@@ -99,7 +96,7 @@ $config['poller_modules']['aruba-controller']            = false;
 $config['poller_modules']['entity-physical']             = true;
 $config['poller_modules']['entity-state']                = false;
 $config['poller_modules']['applications']                = true;
-$config['poller_modules']['mib']                         = false;
+$config['poller_modules']['availability']                = true;
 $config['poller_modules']['stp']                         = true;
 $config['poller_modules']['ntp']                         = true;
 $config['poller_modules']['services']                    = true;
@@ -190,11 +187,13 @@ configured to be ignored by config options.
 
 `applications`: Device application support.
 
+`availability`: Device Availability Calculation.
+
 `cisco-asa-firewall`: Cisco ASA firewall support.
 
 `mib`: Support for generic MIB parsing.
 
-# Running
+## Running
 
 Here are some examples of running poller from within your install directory.
 
@@ -204,7 +203,7 @@ Here are some examples of running poller from within your install directory.
 ./poller.php -h localhost -m ports
 ```
 
-# Debugging
+## Debugging
 
 To provide debugging output you will need to run the poller process
 with the `-d` flag. You can do this either against

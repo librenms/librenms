@@ -1,0 +1,178 @@
+mib: TELTONIKA-RUTX-MIB
+modules:
+    os:
+        hardware: TELTONIKA-RUTX-MIB::routerName.0
+        serial: TELTONIKA-RUTX-MIB::serial.0
+        version: TELTONIKA-RUTX-MIB::fwVersion.0
+    sensors:
+        pre-cache:
+            data:
+                -
+                    oid:
+                        - mOperator
+        temperature:
+            data:
+                -
+                    oid: mTemperature
+                    num_oid: ".1.3.6.1.4.1.48690.2.2.1.17.{{ $index }}"
+                    descr: Modem Module Temp
+                    group: Modem
+                    index: "mTemperature.{{ $index }}"
+                    divisor: 10
+                    low_limit: -40
+                    high_limit: 75
+        state:
+            data:
+                -
+                    oid: mSimState
+                    num_oid: ".1.3.6.1.4.1.48690.2.2.1.9.{{ $index }}"
+                    descr: SIM State
+                    group: Mobile
+                    state_name: TELTONIKA-RUTX-MIB::SimState
+                    states:
+                        - { descr: inserted, graph: 1, value: 0, generic: 0 }
+                        - { descr: not inserted, graph: 1, value: 1, generic: 2 }
+                        - { descr: unknown, graph: 1, value: 2, generic: 3 }
+                -
+                    oid: mPinState
+                    num_oid: ".1.3.6.1.4.1.48690.2.2.1.10.{{ $index }}"
+                    descr: SIM PIN State
+                    group: Mobile
+                    state_name: TELTONIKA-RUTX-MIB::PinState
+                    states:
+                        - { descr: PIN REQUIRED, graph: 1, value: 0, generic: 2 }
+                        - { descr: NOT READY, graph: 1, value: 1, generic: 1 }
+                        - { descr: READY, graph: 1, value: 2, generic: 0 }
+                        - { descr: unknown, graph: 1, value: 3, generic: 3 }
+                -
+                    oid: mNetState
+                    num_oid: ".1.3.6.1.4.1.48690.2.2.1.11.{{ $index }}"
+                    descr: Mobile Net State
+                    group: Mobile
+                    state_name: TELTONIKA-RUTX-MIB::NetState
+                    states:
+                        - { descr: searching, graph: 1, value: 0, generic: 1 }
+                        - { descr: registered (home), graph: 1, value: 1, generic: 0 }
+                        - { descr: registered (roaming), graph: 1, value: 2, generic: 1 }
+                        - { descr: unknown, graph: 1, value: 3, generic: 3 }
+                        - { descr: unregistered, graph: 1, value: 4, generic: 2 }
+                -
+                    oid:  mConnectionState
+                    num_oid: ".1.3.6.1.4.1.48690.2.2.1.15.{{ $index }}"
+                    descr: "Connection State ({{ $mOperator }})"
+                    group: Mobile
+                    index: "mConnectionState.{{ $index }}"
+                    state_name: TELTONIKA-RUTX-MIB::ConnectionState
+                    states:
+                        - { descr: Connected, graph: 1, value: 0, generic: 0 }
+                        - { descr: Not connected, graph: 1, value: 1, generic: 2 }
+                        - { descr: Disconnected, graph: 1, value: 2, generic: 2 }
+                -
+                    oid: mConnectionType
+                    num_oid: ".1.3.6.1.4.1.48690.2.2.1.16.{{ $index }}"
+                    descr: "Connection Type"
+                    group: Mobile
+                    index: "mConnectionType.{{ $index }}"
+                    state_name: TELTONIKA-RUTX-MIB::ConnectionType
+                    states:
+                        - { descr: LTE, graph: 1, value: 0, generic: 0 }
+                        - { descr: 4G, graph: 1, value: 1, generic: 0 }
+                        - { descr: 3G, graph: 1, value: 2, generic: 1 }
+                        - { descr: 2G, graph: 1, value: 3, generic: 1 }
+                        - { descr: WCDMA, graph: 1, value: 4, generic: 0 }
+                        - { descr: unknown, graph: 1, value: 5, generic: 3 }
+        count:
+            data:
+                -
+                    oid: numSatellites
+                    num_oid: ".1.3.6.1.4.1.48690.3.5.{{ $index }}"
+                    descr: "Number of GPS Satellites"
+                    group: GPS
+                    index: "numSatellites.{{ $index }}"
+                -
+                    oid: latitude
+                    num_oid: ".1.3.6.1.4.1.48690.3.1.{{ $index }}"
+                    descr: "GPS Latitude"
+                    group: GPS
+                    index: "latitude.{{ $index }}"
+                -
+                    oid: longtitude
+                    num_oid: ".1.3.6.1.4.1.48690.3.2.{{ $index }}"
+                    descr: "GPS Longitude"
+                    group: GPS
+                    index: "longtitude.{{ $index }}"
+                -
+                    oid: mCellID
+                    num_oid: ".1.3.6.1.4.1.48690.2.2.1.18.{{ $index }}"
+                    descr: "Cell ID"
+                    group: Mobile
+                    index: "mCellID.{{ $index }}"
+                -
+                    oid: mImei
+                    num_oid: ".1.3.6.1.4.1.48690.2.2.1.3.{{ $index }}"
+                    descr: "IMEI"
+                    group: Mobile
+                    index: "mImei.{{ $index }}"
+                -
+                    oid: mIMSI
+                    num_oid: ".1.3.6.1.4.1.48690.2.2.1.8.{{ $index }}"
+                    descr: "IMSI"
+                    group: Mobile
+                    index: "mIMSI.{{ $index }}"
+        signal:
+            data:
+                -
+                    oid: mSignal
+                    num_oid: ".1.3.6.1.4.1.48690.2.2.1.12.{{ $index }}"
+                    entPhysicalIndex: "{{ $index }}"
+                    entPhysicalIndex_measured: "Signal"
+                    descr: "Signal Level - RSSI"
+                    group: Mobile
+                    index: "mSignal.{{ $index }}"
+                    low_warn_limit: -75
+                    low_limit: -85
+                    high_limit: 0
+                -
+                    oid: mRSRP
+                    num_oid: ".1.3.6.1.4.1.48690.2.2.1.20.{{ $index }}"
+                    entPhysicalIndex: "{{ $index }}"
+                    entPhysicalIndex_measured: "Signal"
+                    descr: "Signal Level - RSRP"
+                    group: Mobile
+                    index: "mRSRP.{{ $index }}"
+                    low_warn_limit: -90
+                    low_limit: -100
+                    high_limit: 0
+                -
+                    oid: mRSRQ
+                    num_oid: ".1.3.6.1.4.1.48690.2.2.1.21.{{ $index }}"
+                    entPhysicalIndex: "{{ $index }}"
+                    entPhysicalIndex_measured: "Signal"
+                    descr: "Signal Level - RSRQ"
+                    group: Mobile
+                    index: "mRSRQ.{{ $index }}"
+                    low_warn_limit: -15
+                    low_limit: -20
+                    high_limit: 0
+        snr:
+            data:
+                -
+                    oid: mSINR
+                    num_oid: ".1.3.6.1.4.1.48690.2.2.1.19.{{ $index }}"
+                    entPhysicalIndex: "{{ $index }}"
+                    entPhysicalIndex_measured: "Signal"
+                    descr: "Signal Level - SINR"
+                    group: Mobile
+                    index: "mSINR.{{ $index }}"
+                    low_warn_limit: 13
+                    low_limit: 6
+                    high_limit: 30
+        runtime:
+            data:
+                -
+                    oid: ConnectionUptime
+                    num_oid: ".1.3.6.1.4.1.48690.2.17.{{ $index }}"
+                    descr: "Connection Uptime "
+                    group: Mobile
+                    index: "ConnectionUptime.{{ $index }}"
+                    divisor: 60

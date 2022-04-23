@@ -9,12 +9,16 @@
  * option) any later version.  Please see LICENSE.txt at the top level of
  * the source code distribution for details.
  */
+
 namespace LibreNMS\Alert\Transport;
 
 use LibreNMS\Alert\Transport;
+use LibreNMS\Util\Proxy;
 
 class Ciscospark extends Transport
 {
+    protected $name = 'Cisco Spark';
+
     public function deliverAlert($obj, $opts)
     {
         if (empty($this->config)) {
@@ -24,39 +28,56 @@ class Ciscospark extends Transport
             $room_id = $this->config['room-id'];
             $token = $this->config['api-token'];
         }
+
         return $this->contactCiscospark($obj, $room_id, $token);
     }
 
     public function contactCiscospark($obj, $room_id, $token)
     {
-        $text = strip_tags($obj['msg']);
-        $data = array (
-            'roomId' => $room_id
-        );
+        $text = null;
+        $data = [
+            'roomId' => $room_id,
+        ];
 
         $akey = 'text';
         if ($this->config['use-markdown'] === 'on') {
+            $lines = explode("\n", $obj['msg']);
+            $mlines = [];
+            /* Remove blank lines as they create weird markdown
+             * behaviors.
+             */
+            foreach ($lines as $line) {
+                $line = trim($line);
+                if ($line != '') {
+                    array_push($mlines, $line);
+                }
+            }
+            $text = implode("\n", $mlines);
             $akey = 'markdown';
+        } else {
+            $text = strip_tags($obj['msg']);
         }
         $data[$akey] = $text;
 
-        $curl   = curl_init();
-        set_curl_proxy($curl);
+        $curl = curl_init();
+        Proxy::applyToCurl($curl);
         curl_setopt($curl, CURLOPT_URL, 'https://api.ciscospark.com/v1/messages');
         curl_setopt($curl, CURLOPT_RETURNTRANSFER, 1);
-        curl_setopt($curl, CURLOPT_HTTPHEADER, array(
+        curl_setopt($curl, CURLOPT_HTTPHEADER, [
             'Content-type' => 'application/json',
             'Expect:',
-            'Authorization: Bearer ' . $token
-        ));
+            'Authorization: Bearer ' . $token,
+        ]);
         curl_setopt($curl, CURLOPT_POSTFIELDS, $data);
-        $ret  = curl_exec($curl);
+        $ret = curl_exec($curl);
         $code = curl_getinfo($curl, CURLINFO_HTTP_CODE);
 
         if ($code != 200) {
-            echo("Cisco Spark returned Error, retry later\r\n");
+            echo "Cisco Spark returned Error, retry later\r\n";
+
             return false;
         }
+
         return true;
     }
 
@@ -82,12 +103,12 @@ class Ciscospark extends Transport
                     'descr' => 'Use Markdown when sending the alert',
                     'type' => 'checkbox',
                     'default' => false,
-                ]
+                ],
             ],
             'validation' => [
                 'api-token' => 'required|string',
-                'room-id' => 'required|string'
-            ]
+                'room-id' => 'required|string',
+            ],
         ];
     }
 }

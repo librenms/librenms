@@ -5,7 +5,6 @@ use Illuminate\Database\Schema\Blueprint;
 
 class CreateEventlogTable extends Migration
 {
-
     /**
      * Run the migrations.
      *
@@ -15,8 +14,8 @@ class CreateEventlogTable extends Migration
     {
         Schema::create('eventlog', function (Blueprint $table) {
             $table->increments('event_id');
-            $table->unsignedInteger('device_id')->nullable()->index('device_id');
-            $table->dateTime('datetime')->default('1970-01-02 00:00:01')->index('datetime');
+            $table->unsignedInteger('device_id')->nullable()->index();
+            $table->dateTime('datetime')->default('1970-01-02 00:00:01')->index();
             $table->text('message')->nullable();
             $table->string('type', 64)->nullable();
             $table->string('reference', 64)->nullable();

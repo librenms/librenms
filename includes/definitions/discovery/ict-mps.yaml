@@ -1,0 +1,54 @@
+mib: ICT-MODULAR-POWER-SYSTEM-MIB
+modules:
+    os:
+        hardware: ICT-MODULAR-POWER-SYSTEM-MIB::deviceHardware.0
+        version: ICT-MODULAR-POWER-SYSTEM-MIB::deviceFirmware.0
+    sensors:
+        current:
+            data:
+                -
+                    oid: outputCurrent
+                    num_oid: '.1.3.6.1.4.1.39145.13.8.{{ $index }}'
+                    descr: 'Output Current'
+                    index: 'outputCurrent.{{ $index }}'
+        voltage:
+            data:
+                -
+                    oid: inputVoltage
+                    num_oid: '.1.3.6.1.4.1.39145.13.6.{{ $index }}'
+                    descr: 'Input Voltage'
+                    index: 'inputVoltage.{{ $index }}'
+                -
+                    oid: outputVoltage
+                    num_oid: '.1.3.6.1.4.1.39145.13.7.{{ $index }}'
+                    descr: 'Output Voltage'
+                    index: 'outputVoltage.{{ $index }}'
+                -
+                    oid: moduleTable
+                    value: moduleVoltage
+                    num_oid: '.1.3.6.1.4.1.39145.13.10.1.4.{{ $index }}'
+                    descr: 'Module #{{ $index }} Voltage (VDC)'
+                    index: 'moduleVoltage.{{ $index }}'
+        state:
+            data:
+                -
+                    oid: moduleStatus
+                    value: moduleStatus
+                    num_oid: '.1.3.6.1.4.1.39145.13.10.1.2.{{ $index }}'
+                    descr: 'Module #{{ $index }} Status'
+                    index: 'moduleStatus.{{ $index }}'
+                    states:
+                        - { graph: 0, value: 1, generic: 1, descr: notInstalled }
+                        - { graph: 0, value: 2, generic: 0, descr: ok }
+                        - { graph: 0, value: 3, generic: 2, descr: alarm }
+                -
+                    oid: moduleType
+                    value: moduleType
+                    num_oid: '.1.3.6.1.4.1.39145.13.10.1.3.{{ $index }}'
+                    descr: 'Module #{{ $index }} Type'
+                    index: 'moduleType.{{ $index }}'
+                    states:
+                        - { graph: 0, value: 1, generic: 1, descr: notInstalled }
+                        - { graph: 0, value: 2, generic: 0, descr: power }
+                        - { graph: 0, value: 3, generic: 0, descr: battery }
+                        - { graph: 0, value: 4, generic: 0, descr: distribution }

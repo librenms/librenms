@@ -4,7 +4,7 @@ use LibreNMS\Authentication\LegacyAuth;
 
 echo '<div style="margin: 10px;">';
 
-if (!Auth::user()->isAdmin()) {
+if (! Auth::user()->isAdmin()) {
     include 'includes/html/error-no-perm.inc.php';
 } else {
     echo '<h3>Delete User</h3>';
@@ -13,17 +13,17 @@ if (!Auth::user()->isAdmin()) {
 
     if (LegacyAuth::get()->canManageUsers()) {
         if ($vars['action'] == 'del') {
-            $id = (int)$vars['id'];
+            $id = (int) $vars['id'];
             $user = LegacyAuth::get()->getUser($id);
 
             if ($vars['confirm'] == 'yes') {
                 if (LegacyAuth::get()->deleteUser($id) >= 0) {
-                    print_message('<div class="infobox">User "'.$user['username'].'" deleted!');
+                    print_message('<div class="infobox">User "' . $user['username'] . '" deleted!');
                 } else {
-                    print_error('Error deleting user "'.$user['username'].'"!');
+                    print_error('Error deleting user "' . $user['username'] . '"!');
                 }
             } else {
-                print_error('You have requested deletion of the user "'.$user['username'].'". This action can not be reversed.<br /><a class="btn btn-danger" href="deluser/action=del/id='.$id.'/confirm=yes">Click to confirm</a>');
+                print_error('You have requested deletion of the user "' . $user['username'] . '". This action can not be reversed.<br /><a class="btn btn-danger" href="deluser/action=del/id=' . $id . '/confirm=yes">Click to confirm</a>');
             }
         }
 
@@ -42,7 +42,7 @@ if (!Auth::user()->isAdmin()) {
 
         foreach ($userlist as $userentry) {
             $i++;
-            echo '<option value="'.$userentry['user_id'].'">'.$userentry['username'].'</option>';
+            echo '<option value="' . $userentry['user_id'] . '">' . $userentry['username'] . '</option>';
         }
 
         echo '

@@ -1,12 +1,12 @@
 <?php
 
 $component = new LibreNMS\Component();
-$options = array();
-$options['filter']['ignore'] = array('=',0);
+$options = [];
+$options['filter']['ignore'] = ['=', 0];
 $options['type'] = 'ntp';
 $components = $component->getComponents(null, $options);
 
-$first = $vars['current']-1;           // Which record do we start on.
+$first = $vars['current'] - 1;           // Which record do we start on.
 $last = $first + $vars['rowCount'];    // Which record do we end on.
 $count = 0;
 // Loop through each device in the component array
@@ -29,9 +29,9 @@ foreach ($components as $devid => $comp) {
         }
 
         // Let's process some searching..
-        if (($display === true) && ($vars['searchPhrase'] != "")) {
+        if (($display === true) && ($vars['searchPhrase'] != '')) {
             $searchfound = false;
-            $searchdata = array($device['hostname'],$array['peer'],$array['stratum'],$array['error']);
+            $searchdata = [$device['hostname'], $array['peer'], $array['stratum'], $array['error']];
             foreach ($searchdata as $value) {
                 if (strstr($value, $vars['searchPhrase'])) {
                     $searchfound = true;
@@ -49,45 +49,45 @@ foreach ($components as $devid => $comp) {
 
             // If this record is in the range we want.
             if (($count > $first) && ($count <= $last)) {
-                $device_link = generate_device_link($device, null, array('tab' => 'apps', 'app' => 'ntp'));
+                $device_link = generate_device_link($device, null, ['tab' => 'apps', 'app' => 'ntp']);
 
-                $graph_array = array();
+                $graph_array = [];
                 $graph_array['device'] = $device['device_id'];
-                $graph_array['width']  = 80;
+                $graph_array['width'] = 80;
                 $graph_array['height'] = 20;
 
                 // Which graph type do we want?
-                if ($vars['graph'] == "stratum") {
-                    $graph_array['type']   = 'device_ntp_stratum';
-                } elseif ($vars['graph'] == "offset") {
-                    $graph_array['type']   = 'device_ntp_offset';
-                } elseif ($vars['graph'] == "delay") {
-                    $graph_array['type']   = 'device_ntp_delay';
-                } elseif ($vars['graph'] == "dispersion") {
-                    $graph_array['type']   = 'device_ntp_dispersion';
+                if ($vars['graph'] == 'stratum') {
+                    $graph_array['type'] = 'device_ntp_stratum';
+                } elseif ($vars['graph'] == 'offset') {
+                    $graph_array['type'] = 'device_ntp_offset';
+                } elseif ($vars['graph'] == 'delay') {
+                    $graph_array['type'] = 'device_ntp_delay';
+                } elseif ($vars['graph'] == 'dispersion') {
+                    $graph_array['type'] = 'device_ntp_dispersion';
                 } else {
                     // No Graph
                     unset($graph_array);
                 }
 
-                $response[] = array(
+                $response[] = [
                     'device'    => $device_link,
                     'peer'      => $array['peer'],
                     'stratum'   => $array['stratum'],
                     'error'     => $array['error'],
-                );
+                ];
 
                 // Do we want a graphrow.
                 if (is_array($graph_array)) {
                     $return_data = true;
                     require 'includes/html/print-graphrow.inc.php';
                     unset($return_data);
-                    $response[] = array(
+                    $response[] = [
                         'device'    => $graph_data[0],
                         'peer'      => $graph_data[1],
                         'stratum'   => $graph_data[2],
                         'error'     => $graph_data[3],
-                    );
+                    ];
                 }
             } // End if in range
         } // End if display
@@ -96,13 +96,13 @@ foreach ($components as $devid => $comp) {
 
 // If there are no results, let the user know.
 if ($count == 0) {
-    $response = array();
+    $response = [];
 }
 
-$output = array(
+$output = [
     'current'  => $current,
     'rowCount' => $rowCount,
     'rows'     => $response,
     'total'    => $count,
-);
-echo _json_encode($output);
+];
+echo json_encode($output, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);

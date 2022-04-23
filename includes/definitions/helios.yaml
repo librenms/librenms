@@ -2,11 +2,11 @@ os: helios
 text: 'IgniteNet HeliOS'
 type: wireless
 icon: ignitenet
-mib_dir:
-    - ignitenet
+mib_dir: ignitenet
 discovery:
-    - sysObjectID:
-        - .1.3.6.1.4.1.47307
+    -
+        sysObjectID:
+            - .1.3.6.1.4.1.47307
 discovery_modules:
     bgp-peers: false
     stp: false

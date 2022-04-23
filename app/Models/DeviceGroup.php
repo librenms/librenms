@@ -15,18 +15,18 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
+ *
  * @copyright  2016 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
 namespace App\Models;
 
+use Illuminate\Database\Eloquent\Relations\BelongsToMany;
 use LibreNMS\Alerting\QueryBuilderFluentParser;
-use Log;
 use Permissions;
 
 class DeviceGroup extends BaseModel
@@ -70,59 +70,13 @@ class DeviceGroup extends BaseModel
     }
 
     /**
-     * Update the device groups for the given device or device_id
-     *
-     * @param Device|int $device
-     * @return array
-     */
-    public static function updateGroupsFor($device)
-    {
-        $device = ($device instanceof Device ? $device : Device::find($device));
-        if (!$device instanceof Device) {
-            // could not load device
-            return [
-                "attached" => [],
-                "detached" => [],
-                "updated" => [],
-            ];
-        }
-
-        $device_group_ids = static::query()
-            ->with(['devices' => function ($query) {
-                $query->select('devices.device_id');
-            }])
-            ->get()
-            ->filter(function ($device_group) use ($device) {
-                /** @var DeviceGroup $device_group */
-                if ($device_group->type == 'dynamic') {
-                    try {
-                        return $device_group->getParser()
-                            ->toQuery()
-                            ->where('devices.device_id', $device->device_id)
-                            ->exists();
-                    } catch (\Illuminate\Database\QueryException $e) {
-                        Log::error("Device Group '$device_group->name' generates invalid query: " . $e->getMessage());
-                        return false;
-                    }
-                }
-
-                // for static, if this device is include, keep it.
-                return $device_group->devices
-                    ->where('device_id', $device->device_id)
-                    ->isNotEmpty();
-            })->pluck('id');
-
-        return $device->groups()->sync($device_group_ids);
-    }
-
-    /**
      * Get a query builder parser instance from this device group
      *
      * @return QueryBuilderFluentParser
      */
     public function getParser()
     {
-        return !empty($this->rules) ?
+        return ! empty($this->rules) ?
             QueryBuilderFluentParser::fromJson($this->rules) :
             QueryBuilderFluentParser::fromOld($this->pattern);
     }
@@ -138,20 +92,47 @@ class DeviceGroup extends BaseModel
         return $query->whereIn('id', Permissions::deviceGroupsForUser($user));
     }
 
+    public function scopeInServiceTemplate($query, $serviceTemplate)
+    {
+        return $query->whereIn(
+            $query->qualifyColumn('id'), function ($query) use ($serviceTemplate) {
+                $query->select('device_group_id')
+                    ->from('service_templates_device_group')
+                    ->where('service_template_id', $serviceTemplate);
+            }
+        );
+    }
+
+    public function scopeNotInServiceTemplate($query, $serviceTemplate)
+    {
+        return $query->whereNotIn(
+            $query->qualifyColumn('id'), function ($query) use ($serviceTemplate) {
+                $query->select('device_group_id')
+                    ->from('service_templates_device_group')
+                    ->where('service_template_id', $serviceTemplate);
+            }
+        );
+    }
+
     // ---- Define Relationships ----
 
-    public function devices()
+    public function devices(): BelongsToMany
     {
-        return $this->belongsToMany('App\Models\Device', 'device_group_device', 'device_group_id', 'device_id');
+        return $this->belongsToMany(\App\Models\Device::class, 'device_group_device', 'device_group_id', 'device_id');
     }
 
-    public function services()
+    public function services(): BelongsToMany
     {
-        return $this->belongsToMany('App\Models\Service', 'device_group_device', 'device_group_id', 'device_id');
+        return $this->belongsToMany(\App\Models\Service::class, 'device_group_device', 'device_group_id', 'device_id');
     }
 
-    public function users()
+    public function users(): BelongsToMany
     {
-        return $this->belongsToMany('App\Models\User', 'devices_group_perms', 'device_group_id', 'user_id');
+        return $this->belongsToMany(\App\Models\User::class, 'devices_group_perms', 'device_group_id', 'user_id');
+    }
+
+    public function serviceTemplates(): BelongsToMany
+    {
+        return $this->belongsToMany(\App\Models\ServiceTemplate::class, 'service_templates_device_group', 'device_group_id', 'service_template_id');
     }
 }

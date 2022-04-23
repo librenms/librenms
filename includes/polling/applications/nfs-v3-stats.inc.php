@@ -6,11 +6,9 @@ $name = 'nfs-v3-stats';
 $app_id = $app['app_id'];
 $oid = '.1.3.6.1.4.1.8072.1.3.2.4.1.2.7.110.102.115.115.116.97.116';
 
-echo ' ' . $name;
-
 $nfsstats = snmp_walk($device, $oid, '-Oqv', 'NET-SNMP-EXTEND-MIB');
 
-$rrd_name = array('app', 'nfs-stats', $app_id);
+$rrd_name = ['app', 'nfs-stats', $app_id];
 $rrd_def = RrdDefinition::make()
     ->addDataset('rc_hits', 'GAUGE', 0)
     ->addDataset('rc_misses', 'GAUGE', 0)
@@ -67,7 +65,7 @@ $rrd_def = RrdDefinition::make()
     ->addDataset('proc3_commit', 'GAUGE', 0);
 
 $data = explode("\n", $nfsstats);
-$fields = array(
+$fields = [
     'rc_hits' => $data[1],
     'rc_misses' => $data[2],
     'rc_nocache' => $data[3],
@@ -121,7 +119,7 @@ $fields = array(
     'proc3_fsinfo' => $data[50],
     'proc3_pathconf' => $data[51],
     'proc3_commit' => $data[52],
-);
+];
 
 $tags = compact('name', 'app_id', 'rrd_name', 'rrd_def');
 data_update($device, 'app', $tags, $fields);

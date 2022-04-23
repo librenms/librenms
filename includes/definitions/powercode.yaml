@@ -9,5 +9,6 @@ over:
 type: server
 processor_stacked: true
 discovery:
-    - sysDescr:
-        - 'Powercode BMU'
+    -
+        sysDescr:
+            - 'Powercode BMU'

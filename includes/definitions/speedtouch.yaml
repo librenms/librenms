@@ -5,8 +5,10 @@ type: network
 over:
     - { graph: device_bits, text: Traffic }
 discovery:
-    - sysDescr:
-        - 'TG585v7'
-        - 'SpeedTouch '
-    - sysDescr_regex:
-        - '/^ST/'
+    -
+        sysDescr:
+            - 'TG585v7'
+            - 'SpeedTouch '
+    -
+        sysDescr_regex:
+            - '/^ST/'

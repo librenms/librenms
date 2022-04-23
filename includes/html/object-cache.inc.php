@@ -5,8 +5,8 @@
 // It would be interesting to know where this is used.  It probably should have its own API.
 use LibreNMS\ObjectCache;
 
-$devices  = new ObjectCache('devices');
-$ports    = new ObjectCache('ports');
+$devices = new ObjectCache('devices');
+$ports = new ObjectCache('ports');
 $services = new ObjectCache('services');
 
 if ($devices['down']) {

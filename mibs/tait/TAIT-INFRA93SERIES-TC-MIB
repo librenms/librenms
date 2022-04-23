@@ -1,0 +1,234 @@
+TAIT-INFRA93SERIES-TC-MIB DEFINITIONS ::= BEGIN
+
+--
+-- Textual conventions and enumerations for the monitored TB93xx Repeater
+--
+
+IMPORTS
+    MODULE-IDENTITY,
+    Integer32,
+    Unsigned32
+       FROM SNMPv2-SMI
+       
+    infra93-94TC
+       FROM TAIT-INFRA93-94SERIES-TC-MIB
+    TEXTUAL-CONVENTION      
+        FROM SNMPv2-TC;
+
+infra93TC MODULE-IDENTITY
+    LAST-UPDATED  "201905290026Z"
+    ORGANIZATION  "www.taitradio.com"
+    CONTACT-INFO  "Tait Communications
+                   245 Wooldridge Road
+                   PO Box 1645
+                   Christchurch
+                   New Zealand
+
+           phone:  +64 3358 3399
+           email:  support@taitradio.com"
+
+    DESCRIPTION   "Textual conventions to be used in the Tait-infrastructure-93-series MIBs"
+
+    REVISION      "201905290026Z"
+    DESCRIPTION   "1.23.00 - Minor text edit"
+
+    REVISION      "201805220026Z"
+    DESCRIPTION   "1.16.00 - moved dmr specific textual conventions from common to dmr mib"
+
+    REVISION      "201707280000Z"
+    DESCRIPTION   "1.15.00 - added TransmitterSyncStatus and ReceiverSyncStatus"
+
+    REVISION      "201611180000Z"
+    DESCRIPTION   "1.14.00 - added MPT Fallback Node Status"
+
+    REVISION      "201607010000Z"
+    DESCRIPTION   "1.13.00 - Updated DCS formatting description"
+
+    REVISION      "201410301500Z"
+    DESCRIPTION   "1.05.01 - Description text reviewed"
+
+    REVISION      "201404140000Z"
+    DESCRIPTION   "1.05.00 - Added values for use during coverage testing"
+
+    REVISION      "201401260000Z"
+    DESCRIPTION   "1.04.00 - Moved textual convention module identity OID to start at 1"
+
+    REVISION      "201401141100Z"
+    DESCRIPTION   "1.03.02 - Initial version prior to change log entries"
+    ::= { infra93-94TC 1}
+    
+-- =====================
+--
+--  Textual Conventions
+--
+-- =====================    
+    
+Ratio ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d-1"
+    STATUS       current
+    DESCRIPTION
+         "The increment size is 0.1 1. Displayed unit is N/A"
+    SYNTAX       Integer32 (-256..255)    
+    
+LeveldBm ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT "d-2"
+    STATUS       current
+    DESCRIPTION
+         "The increment size is 0.01 dBm. Displayed unit is dBm"
+    SYNTAX       Integer32 (-32768..32767)
+
+SINADLevel ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+         "The increment size is 1 dB."
+    SYNTAX       Unsigned32 (0..255)
+
+Temperature ::= TEXTUAL-CONVENTION
+    STATUS       current
+    DESCRIPTION
+         "The increment size is 1 degree C"
+    SYNTAX       Integer32 (-32768..32767)
+    
+FrequencydHz ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT  "d-1"
+    STATUS       current
+    DESCRIPTION
+         "The increment size is 0.1 Hz. Displayed unit is Hz"
+    SYNTAX       Unsigned32 (0..4294967295)    
+
+DcsCode ::= TEXTUAL-CONVENTION
+    DISPLAY-HINT  "o"
+    STATUS       current
+    DESCRIPTION
+         "DCS code. Displayed value should be octal."
+    SYNTAX       Unsigned32 (0..4294967295)
+
+SubAudibleType ::= TEXTUAL-CONVENTION
+   STATUS      current
+   DESCRIPTION "Type of sub-audible signaling"
+   SYNTAX      INTEGER {
+                        none(0),
+                        ctcss(1),
+                        dcs(2)
+                       }
+
+TxFrequencyResponse ::= TEXTUAL-CONVENTION
+   STATUS      current
+   DESCRIPTION "Type of Tx frequency response"
+   SYNTAX      INTEGER {
+                        pre-emph-speech(1),
+                        flat-speech(2)
+                       }
+
+RxFrequencyResponse ::= TEXTUAL-CONVENTION
+   STATUS      current
+   DESCRIPTION "Type of Rx frequency response"
+   SYNTAX      INTEGER {
+                        de-emph-speech(1)
+                       }
+
+OperationalMode ::= TEXTUAL-CONVENTION
+   STATUS      current
+   DESCRIPTION "Base Station operational mode"
+   SYNTAX      INTEGER {
+                        analogConventional(1),
+                        dmrConventional(2),
+                        dmrTrunking(3),
+                        mptTrunking(4)
+                       }  
+
+MPTControlProtocolStatus ::= TEXTUAL-CONVENTION
+   STATUS      current
+   DESCRIPTION "MPT Control protocol states"
+   SYNTAX      INTEGER {
+                        unconnected(0),
+                        idle(1),
+                        control(2),
+                        traffic(3),
+                        conventional(4)
+                       }
+
+FallbackNodeStatus ::= TEXTUAL-CONVENTION
+   STATUS      current
+   DESCRIPTION "Fallback status"
+   SYNTAX      INTEGER {
+                        active(1),
+                        inactive(2),
+                        settling(3),
+                        disabled(4)
+                       }
+
+ColourCode ::= TEXTUAL-CONVENTION
+   STATUS      current
+   DESCRIPTION "Colour Code"
+   SYNTAX      Unsigned32 (0..15)
+
+TransmitterSyncStatus ::= TEXTUAL-CONVENTION
+   STATUS      current
+   DESCRIPTION "Transmitter Synchronisation status on TB9300"
+   SYNTAX      INTEGER {
+                        no-license(0),
+                        non-simulcast-operation(1),
+                        frequency-reference-bad-or-absent(2),
+                        never-had-1pps(3),
+                        never-had-ntp(4),
+                        missing-1pps-or-ntp(5),
+                        synchronized(6),
+                        non-channelgroup-operation(7)
+                       }
+
+ReceiverSyncStatus ::= TEXTUAL-CONVENTION
+   STATUS      current
+   DESCRIPTION "Receiver Synchronisation status on TB9300"
+   SYNTAX      INTEGER {
+                        no-license(0),
+                        non-channelgroup-operation(1),
+                        synchronized(2),
+                        never-had-1pps(3),
+                        never-had-ntp(4),
+                        missing-1pps-or-ntp(5)
+                       }
+
+
+ControlProtocolStatus ::= TEXTUAL-CONVENTION
+   STATUS      current
+   DESCRIPTION "Control protocol states"
+   SYNTAX      INTEGER {
+                        unconnected(0),
+                        deprecatedUnconnected(1),
+                        standby(2),
+                        dmrAligned(3),
+                        dmrOffset(4),
+                        dmr2SlotData(5),
+                        dmrHibernate(6),
+                        analogue(7),
+                        testMode(8),
+                        dmrTier2Aligned(9)
+                       }
+
+
+LogicalChannelState ::= TEXTUAL-CONVENTION
+   STATUS      current
+   DESCRIPTION "Network Connection Logical channel state"
+   SYNTAX      INTEGER {
+                        inactive(0),
+                        idle(1),
+                        traffic(2),
+                        control(3),
+                        test(4),
+                        poll(5),
+                        invalid(255)
+                       }
+
+StandaloneNodeStatus ::= TEXTUAL-CONVENTION
+   STATUS current
+   DESCRIPTION "Fallback node status"
+   SYNTAX      INTEGER {
+                        offline(0),
+                        standby(1),
+                        active(2),
+                        disabled(4),
+                        running(5),
+                        master(6)
+                       }
+END

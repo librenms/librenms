@@ -1,0 +1,172 @@
+-- MIB file for ICT Sine Wave Inverter.
+--
+-- Date		Version
+-- =============================
+-- 3/7/18	1.01
+--
+
+ICT-SINE-WAVE-INVERTER-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+	enterprises, IpAddress	FROM RFC1155-SMI
+	DisplayString		FROM RFC1213-MIB
+	OBJECT-TYPE		FROM RFC-1212
+	TRAP-TYPE		FROM RFC-1215;
+
+ictPower			OBJECT IDENTIFIER ::= { enterprises 39145 }
+
+inverter			OBJECT IDENTIFIER ::= { ictPower 12 }
+
+deviceModel			OBJECT-TYPE
+	SYNTAX			DisplayString
+	ACCESS			read-only
+	STATUS			mandatory
+	DESCRIPTION		"Model Number"
+	::= { inverter 1 }
+
+deviceName			OBJECT-TYPE
+	SYNTAX			DisplayString
+	ACCESS			read-only
+	STATUS			mandatory
+	DESCRIPTION		"Site Name"
+	::= { inverter 2 }
+
+deviceHardware			OBJECT-TYPE
+	SYNTAX			INTEGER (0..127)
+	ACCESS			read-only
+	STATUS			mandatory
+	DESCRIPTION		"Hardware Version"
+	::= { inverter 3 }
+
+deviceFirmware			OBJECT-TYPE
+	SYNTAX			DisplayString
+	ACCESS			read-only
+	STATUS			mandatory
+	DESCRIPTION		"Firmware Version"
+	::= { inverter 4 }
+
+deviceMacAddress		OBJECT-TYPE
+	SYNTAX			DisplayString
+	ACCESS			read-only
+	STATUS			mandatory
+	DESCRIPTION		"MAC Address"
+	::= { inverter 5 }
+
+batteryVoltage			OBJECT-TYPE
+	SYNTAX			DisplayString
+	ACCESS			read-only
+	STATUS			mandatory
+	DESCRIPTION		"Battery Voltage (VDC)"
+	::= { inverter 6 }
+
+inverterVoltage			OBJECT-TYPE
+	SYNTAX			DisplayString
+	ACCESS			read-only
+	STATUS			mandatory
+	DESCRIPTION		"Inverter Output Voltage (VAC)"
+	::= { inverter 7 }
+
+inverterPower			OBJECT-TYPE
+	SYNTAX			DisplayString
+	ACCESS			read-only
+	STATUS			mandatory
+	DESCRIPTION		"Inverter Output Power (%)"
+	::= { inverter 8 }
+
+inverterStatus			OBJECT-TYPE
+	SYNTAX			INTEGER { enabled(1), disabled(2) }
+	ACCESS			read-only
+	STATUS			mandatory
+	DESCRIPTION		"Inverter Output Status ('1' indicates the Inverter Output is ENABLED, and '2' indicates the Inverter Output is DISABLED)"
+	::= { inverter 9 }
+
+inverterControl			OBJECT-TYPE
+	SYNTAX			INTEGER { enabled(1), disabled(2) }
+	ACCESS			read-write
+	STATUS			mandatory
+	DESCRIPTION		"Inverter Output Control (set to '1' to ENABLE the Inverter Output if no alarms are active, set to '2' to DISABLE the Inverter Output)"
+	::= { inverter 10 }
+
+transferRelayStatus		OBJECT-TYPE
+	SYNTAX			INTEGER { inverter(1), grid(2) }
+	ACCESS			read-only
+	STATUS			mandatory
+	DESCRIPTION		"Transfer Relay Status ('1' indicates the Output is connected to the INVERTER, and '2' indicates the Output is connected to the GRID)"
+	::= { inverter 11 }
+
+
+--
+-- Trap definitions:
+--
+
+undervoltageAlarmTrap		TRAP-TYPE
+	ENTERPRISE		inverter
+	DESCRIPTION		"Trap generated when the Battery Input Undervoltage Alarm is triggered"
+	::= 101
+
+overvoltageAlarmTrap		TRAP-TYPE
+	ENTERPRISE		inverter
+	DESCRIPTION		"Trap generated when the Battery Input Overvoltage Alarm is triggered"
+	::= 102
+
+overtemperatureAlarmTrap	TRAP-TYPE
+	ENTERPRISE		inverter
+	DESCRIPTION		"Trap generated when the Overtemperature Alarm is triggered"
+	::= 103
+
+outputFaultAlarmTrap		TRAP-TYPE
+	ENTERPRISE		inverter
+	DESCRIPTION		"Trap generated when the Inverter Output Fault Alarm is triggered"
+	::= 104
+
+systemFaultAlarmTrap		TRAP-TYPE
+	ENTERPRISE		inverter
+	DESCRIPTION		"Trap generated when the System Fault Alarm is triggered"
+	::= 105
+
+remoteSwitchAlarmTrap		TRAP-TYPE
+	ENTERPRISE		inverter
+	DESCRIPTION		"Trap generated when the Remote Switch accessory is activated"
+	::= 106
+
+undervoltageAlarmClear		TRAP-TYPE
+	ENTERPRISE		inverter
+	DESCRIPTION		"Trap generated when the Battery Input Undervoltage Alarm is cleared"
+	::= 111
+
+overvoltageAlarmClear		TRAP-TYPE
+	ENTERPRISE		inverter
+	DESCRIPTION		"Trap generated when the Battery Input Overvoltage Alarm is cleared"
+	::= 112
+
+overtemperatureAlarmClear	TRAP-TYPE
+	ENTERPRISE		inverter
+	DESCRIPTION		"Trap generated when the Overtemperature Alarm is cleared"
+	::= 113
+
+outputFaultAlarmClear		TRAP-TYPE
+	ENTERPRISE		inverter
+	DESCRIPTION		"Trap generated when the Inverter Output Fault Alarm is cleared"
+	::= 114
+
+systemFaultAlarmClear		TRAP-TYPE
+	ENTERPRISE		inverter
+	DESCRIPTION		"Trap generated when the System Fault Alarm is cleared"
+	::= 115
+
+remoteSwitchAlarmClear		TRAP-TYPE
+	ENTERPRISE		inverter
+	DESCRIPTION		"Trap generated when the Remote Switch accessory is deactivated"
+	::= 116
+
+inverterPowerTrap		TRAP-TYPE
+	ENTERPRISE		inverter
+	DESCRIPTION		"Trap generated when the Output switches to Inverter (Battery) Power"
+	::= 121
+
+gridPowerTrap			TRAP-TYPE
+	ENTERPRISE		inverter
+	DESCRIPTION		"Trap generated when the Output switches to Grid Power"
+	::= 122
+
+END

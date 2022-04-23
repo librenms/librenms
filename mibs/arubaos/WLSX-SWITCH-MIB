@@ -1,4 +1,4 @@
---- ArubaOS 8.5.0.0_70258
+--- ArubaOS 8.8.0.1_80393
 -- vim:set ts=4 sw=4:
    WLSX-SWITCH-MIB DEFINITIONS ::= BEGIN
 
@@ -31,18 +31,19 @@
 		wlsxEnterpriseMibModules
 			FROM ARUBA-MIB;
 
-   wlsxSwitchMIB MODULE-IDENTITY 
-       LAST-UPDATED "0804160206Z"
-       ORGANIZATION "Aruba Wireless Networks"
+   wlsxSwitchMIB MODULE-IDENTITY
+       LAST-UPDATED "202008141745Z"
+       ORGANIZATION "Aruba, a Hewlett Packard Enterprise company"
        CONTACT-INFO
-            "Postal:    1322 Crossman Avenue
-                        Sunnyvale, CA 94089	
-            E-mail:     dl-support@arubanetworks.com
-            Phone:      +1 408 227 4500"
+            "Postal:    3333 Scott Blvd,
+                        Santa Clara, CA 95054
+            E-mail:     aruba-ext-eng-reg@hpe.com
+            Phone:      408 227 4500
+            Fax:        408 752 0626" 
        DESCRIPTION
            "This MIB module defines MIB objects which provide
             System level information about the Aruba switches."
-       REVISION        "0804160206Z"
+       REVISION        "202008141745Z"
        DESCRIPTION
            "The initial revision."
        ::= { wlsxEnterpriseMibModules 1 }
@@ -50,6 +51,7 @@
    wlsxSystemXGroup         	OBJECT IDENTIFIER ::= { wlsxSwitchMIB 1 }
    wlsxUserInfoGroup         	OBJECT IDENTIFIER ::= { wlsxSwitchMIB 2 }
    wlsxAccessPointInfoGroup     OBJECT IDENTIFIER ::= { wlsxSwitchMIB 3 }
+   wlsxInstantAccessPointInfoGroup      OBJECT IDENTIFIER ::= { wlsxSwitchMIB 5 }
    wlsxSwitchTraps         	OBJECT IDENTIFIER ::= { wlsxSwitchMIB 100 }
 
    -- wlsxSystemXGroup contains objects to describe a switch.
@@ -497,7 +499,7 @@
         ::= { wlsxSystemXGroup 12 }
 
    wlsxSwitchIpv6 OBJECT-TYPE
-        SYNTAX       DisplayString(SIZE(0..45))
+        SYNTAX       DisplayString(SIZE(0..128))
         MAX-ACCESS   read-only
         STATUS       current
         DESCRIPTION
@@ -1598,6 +1600,147 @@
             "
         ::= { wlsxSwitchAccessPointStatsEntry 17 }
 
+-- New wlsxInstantAccessPointInfoGroup contains the information related to IAPs.
+-- This table is valid only, when queried from the controller.
+
+	wlsxIapTotalNumBranches  OBJECT-TYPE
+		SYNTAX       Integer32
+		MAX-ACCESS   read-only
+		STATUS       current
+		DESCRIPTION
+			"Total number of branches in IAP"
+		::= { wlsxInstantAccessPointInfoGroup 1 }
+
+	wlsxIapTotalNumBranchesUp  OBJECT-TYPE
+		SYNTAX       Integer32
+		MAX-ACCESS   read-only
+		STATUS       current
+		DESCRIPTION
+			"Total number of branches with status Up."
+		::= { wlsxInstantAccessPointInfoGroup 2 }
+
+	wlsxIapTotalNumBranchesDown  OBJECT-TYPE
+		SYNTAX       Integer32
+		MAX-ACCESS   read-only
+		STATUS       current
+		DESCRIPTION
+			"Total number of branches with status Down"
+		::= { wlsxInstantAccessPointInfoGroup 3 }
+
+-- IAP Table
+
+	wlsxIapBranchTable  OBJECT-TYPE
+		SYNTAX       SEQUENCE OF IapBranchListEntry
+		MAX-ACCESS   not-accessible
+		STATUS       current
+		DESCRIPTION
+			"
+				This table lists all the information related to IAP branches.
+			"
+		::= { wlsxInstantAccessPointInfoGroup 4 }
+	wlsxIapBranchEntry OBJECT-TYPE
+		SYNTAX       IapBranchListEntry
+		MAX-ACCESS   not-accessible
+		STATUS       current
+		DESCRIPTION
+			"IAP branch entry"
+		INDEX {iapBranchKey}
+		::= { wlsxIapBranchTable 1 }
+
+	IapBranchListEntry ::=
+		SEQUENCE {
+			iapBranchKey                          DisplayString,
+			iapBranchName                         DisplayString,
+			iapBranchVcMacAddress                 MacAddress,
+			iapBranchStatus                       INTEGER,
+			iapBranchInnerIpAddressType           INTEGER,
+			iapBranchInnerIpAddress               DisplayString,
+			iapBranchAssignedSubnet               DisplayString,
+			iapBranchAssignedVlan                 OCTET STRING
+		}
+
+	iapBranchKey OBJECT-TYPE
+		SYNTAX       DisplayString(SIZE(65))
+		MAX-ACCESS   read-only
+		STATUS       current
+		DESCRIPTION
+			"Key of the IAP branch."
+		::= { wlsxIapBranchEntry 1 }
+
+	iapBranchName OBJECT-TYPE
+		SYNTAX       DisplayString(SIZE(0..129))
+		MAX-ACCESS   read-only
+		STATUS       current
+		DESCRIPTION
+			" Name of the IAP branch."
+		::= { wlsxIapBranchEntry 2 }
+
+	iapBranchVcMacAddress OBJECT-TYPE
+		SYNTAX       MacAddress
+		MAX-ACCESS   not-accessible
+		STATUS       current
+		DESCRIPTION
+			"MAC address of the Virtual Controller of the branch."
+		::= { wlsxIapBranchEntry 3 }
+
+	iapBranchStatus OBJECT-TYPE
+		SYNTAX      INTEGER {
+					up(1),
+					down(2)
+					}
+		MAX-ACCESS   read-only
+		STATUS       current
+		DESCRIPTION
+			"Current status of the branch"
+		::= { wlsxIapBranchEntry 4 }
+
+	iapBranchInnerIpAddressType OBJECT-TYPE
+		SYNTAX      INTEGER {
+					ipv4(1),
+					ipv6(2)
+					}
+		MAX-ACCESS   read-only
+		STATUS       current
+		DESCRIPTION
+			"Inner IP Address type IPv4 or IPv6 of the branch."
+		::= { wlsxIapBranchEntry 5 }
+
+	iapBranchInnerIpAddress OBJECT-TYPE
+		SYNTAX       DisplayString(SIZE(0..45))
+		MAX-ACCESS   read-only
+		STATUS       current
+		DESCRIPTION
+			"Inner IPv4/IPv6 Address of the branch."
+		::= { wlsxIapBranchEntry 6 }
+
+	iapBranchAssignedSubnet OBJECT-TYPE
+		SYNTAX       DisplayString
+		MAX-ACCESS   read-only
+		STATUS       current
+		DESCRIPTION
+			"Assigned subnets of the branch."
+		::= { wlsxIapBranchEntry 7 }
+
+	iapBranchAssignedVlan OBJECT-TYPE
+		SYNTAX       OCTET STRING
+		MAX-ACCESS   read-only
+		STATUS       current
+		DESCRIPTION
+			"
+				Assigned vlans of the branch.
+				A string of octets containing one bit per VLAN for a
+				total of 4096 VLANs in the management domain.
+				The most significant bit of the octet string is the
+				lowest value VLAN of 4096 VLANs.
+				By setting the bit(1) we indicate that the vlan is part of the
+				assigned vlans.
+				The most significant bit of the bitmap is transmitted
+				first. Note that if the length of this string is less than
+				512 octets, any 'missing' octets are assumed to contain
+				the value zero.
+			"
+		::= { wlsxIapBranchEntry 8 }
+
 -- wlsxSwitchTraps
 -- This group defines all the traps related to the switch platform. 
 wlsxSwitchTrapObjectsGroup      OBJECT IDENTIFIER ::= { wlsxSwitchTraps 100 }
@@ -1907,7 +2050,7 @@ wlsxStationBlackListReasonStr OBJECT-TYPE
         MAX-ACCESS      accessible-for-notify
         STATUS          current
         DESCRIPTION
-                    "                       
+                    "
             This object is used in the traps to indicate the
             type of Blacklist reason.
                                 "
@@ -2337,6 +2480,34 @@ wlsxWebCCLicenseEnforcement NOTIFICATION-TYPE
                        been triggered.
                        "
     ::= { wlsxSwitchTraps 1045 }
+
+wlsxLowOnFlash1Space NOTIFICATION-TYPE
+   STATUS  current
+   DESCRIPTION
+                     "
+                     A trap which indicates that the switch is running low on flash1 space.
+                     "
+   ::= { wlsxSwitchTraps 1046 }
+
+wlsxSwitchIPv6Changed NOTIFICATION-TYPE
+        OBJECTS {wlsxSwitchIpv6}
+    STATUS  current
+    DESCRIPTION
+                        "A trap which indicates that the switch IPv6 address has changed."
+    ::= { wlsxSwitchTraps 1047 }
+
+wlsxDot1xThresholdLimitHit NOTIFICATION-TYPE
+    STATUS  current
+    DESCRIPTION
+                        "A Trap which indicates that the controller is running on high optimum limit."
+    ::= { wlsxSwitchTraps 1048 }
+
+wlsxDot1xTotalLimitHit NOTIFICATION-TYPE
+    STATUS  current
+    DESCRIPTION
+                        " A Trap which indicates that the controller is running on full optimum limit."
+    ::= { wlsxSwitchTraps 1049 }
+
 
 END
 

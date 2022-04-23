@@ -15,17 +15,17 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
+ *
  * @copyright  2017 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
 namespace LibreNMS\Device;
 
-use LibreNMS\Config;
+use Illuminate\Support\Str;
 use LibreNMS\Interfaces\Discovery\DiscoveryItem;
 use LibreNMS\Interfaces\Discovery\DiscoveryModule;
 use LibreNMS\Interfaces\Discovery\ProcessorDiscovery;
@@ -56,17 +56,18 @@ class Processor extends Model implements DiscoveryModule, PollerModule, Discover
 
     /**
      * Processor constructor.
-     * @param string $type
-     * @param int $device_id
-     * @param string $oid
-     * @param int|string $index
-     * @param string $description
-     * @param int $precision The returned value will be divided by this number (should be factor of 10) If negative this oid returns idle cpu
-     * @param int $current_usage
-     * @param int $warn_percent
-     * @param int $entPhysicalIndex
-     * @param int $hrDeviceIndex
-     * @return Processor
+     *
+     * @param  string  $type
+     * @param  int  $device_id
+     * @param  string  $oid
+     * @param  int|string  $index
+     * @param  string  $description
+     * @param  int  $precision  The returned value will be divided by this number (should be factor of 10) If negative this oid returns idle cpu
+     * @param  int  $current_usage
+     * @param  int  $warn_percent
+     * @param  int  $entPhysicalIndex
+     * @param  int  $hrDeviceIndex
+     * @return static
      */
     public static function discover(
         $type,
@@ -83,7 +84,7 @@ class Processor extends Model implements DiscoveryModule, PollerModule, Discover
         $proc = new static();
         $proc->processor_type = $type;
         $proc->device_id = $device_id;
-        $proc->processor_index = (string)$index;
+        $proc->processor_index = (string) $index;
         $proc->processor_descr = $description;
         $proc->processor_precision = $precision;
         $proc->processor_usage = $current_usage;
@@ -91,15 +92,14 @@ class Processor extends Model implements DiscoveryModule, PollerModule, Discover
         $proc->hrDeviceIndex = $hrDeviceIndex;
 
         // handle string indexes
-        if (str_contains($oid, '"')) {
+        if (Str::contains($oid, '"')) {
             $oid = preg_replace_callback('/"([^"]+)"/', function ($matches) {
                 return string_to_oid($matches[1]);
             }, $oid);
         }
         $proc->processor_oid = '.' . ltrim($oid, '.');
 
-
-        if (!is_null($warn_percent)) {
+        if (! is_null($warn_percent)) {
             $proc->processor_perc_warn = $warn_percent;
         }
 
@@ -107,7 +107,7 @@ class Processor extends Model implements DiscoveryModule, PollerModule, Discover
         if (is_null($proc->processor_usage)) {
             $data = snmp_get(device_by_id_cache($proc->device_id), $proc->processor_oid, '-Ovq');
             $proc->valid = ($data !== false);
-            if (!$proc->valid) {
+            if (! $proc->valid) {
                 return $proc;
             }
             $proc->processor_usage = static::processData($data, $proc->processor_precision);
@@ -160,14 +160,14 @@ class Processor extends Model implements DiscoveryModule, PollerModule, Discover
             );
         }
 
-        dbDeleteOrphans(static::$table, array('devices.device_id'));
+        dbDeleteOrphans(static::$table, ['devices.device_id']);
 
         echo PHP_EOL;
     }
 
     public static function poll(OS $os)
     {
-        $processors = dbFetchRows('SELECT * FROM processors WHERE device_id=?', array($os->getDeviceId()));
+        $processors = dbFetchRows('SELECT * FROM processors WHERE device_id=?', [$os->getDeviceId()]);
 
         if ($os instanceof ProcessorPolling) {
             $data = $os->pollProcessors($processors);
@@ -183,18 +183,18 @@ class Processor extends Model implements DiscoveryModule, PollerModule, Discover
             /** @var string $processor_type */
             /** @var int $processor_index */
             /** @var int $processor_usage */
-
+            /** @var string $processor_descr */
             if (array_key_exists($processor_id, $data)) {
                 $usage = round($data[$processor_id], 2);
-                echo "$usage%\n";
+                echo "$processor_descr: $usage%\n";
 
-                $rrd_name = array('processor', $processor_type, $processor_index);
+                $rrd_name = ['processor', $processor_type, $processor_index];
                 $fields = compact('usage');
                 $tags = compact('processor_type', 'processor_index', 'rrd_name', 'rrd_def');
-                data_update($os->getDevice(), 'processors', $tags, $fields);
+                data_update($os->getDeviceArray(), 'processors', $tags, $fields);
 
                 if ($usage != $processor_usage) {
-                    dbUpdate(array('processor_usage' => $usage), 'processors', '`processor_id` = ?', array($processor_id));
+                    dbUpdate(['processor_usage' => $usage], 'processors', '`processor_id` = ?', [$processor_id]);
                 }
             }
         }
@@ -203,21 +203,21 @@ class Processor extends Model implements DiscoveryModule, PollerModule, Discover
     private static function pollProcessors(OS $os, $processors)
     {
         if (empty($processors)) {
-            return array();
+            return [];
         }
 
         $oids = array_column($processors, 'processor_oid');
 
         // don't fetch too many at a time TODO build into snmp_get_multi_oid?
-        $snmp_data = array();
-        foreach (array_chunk($oids, get_device_oid_limit($os->getDevice())) as $oid_chunk) {
-            $multi_data = snmp_get_multi_oid($os->getDevice(), $oid_chunk);
+        $snmp_data = [];
+        foreach (array_chunk($oids, get_device_oid_limit($os->getDeviceArray())) as $oid_chunk) {
+            $multi_data = snmp_get_multi_oid($os->getDeviceArray(), $oid_chunk);
             $snmp_data = array_merge($snmp_data, $multi_data);
         }
 
         d_echo($snmp_data);
 
-        $results = array();
+        $results = [];
         foreach ($processors as $processor) {
             if (isset($snmp_data[$processor['processor_oid']])) {
                 $value = static::processData(
@@ -251,15 +251,16 @@ class Processor extends Model implements DiscoveryModule, PollerModule, Discover
 
     public static function processYaml(OS $os)
     {
-        $device = $os->getDevice();
-        if (empty($device['dynamic_discovery']['modules']['processors'])) {
+        $discovery = $os->getDiscovery('processors');
+
+        if (empty($discovery)) {
             d_echo("No YAML Discovery data.\n");
-            return array();
+
+            return [];
         }
 
-        return YamlDiscovery::discover($os, get_class(), $device['dynamic_discovery']['modules']['processors']);
+        return YamlDiscovery::discover($os, get_class(), $discovery);
     }
-
 
     /**
      * Is this sensor valid?
@@ -275,28 +276,31 @@ class Processor extends Model implements DiscoveryModule, PollerModule, Discover
     /**
      * Get an array of this sensor with fields that line up with the database.
      *
-     * @param array $exclude exclude columns
+     * @param  array  $exclude  exclude columns
      * @return array
      */
-    public function toArray($exclude = array())
+    public function toArray($exclude = [])
     {
-        $array = array(
+        $array = [
             'processor_id' => $this->processor_id,
-            'entPhysicalIndex' => (int)$this->entPhysicalIndex,
-            'hrDeviceIndex' => (int)$this->hrDeviceIndex,
+            'entPhysicalIndex' => (int) $this->entPhysicalIndex,
+            'hrDeviceIndex' => (int) $this->hrDeviceIndex,
             'device_id' => $this->device_id,
             'processor_oid' => $this->processor_oid,
             'processor_index' => $this->processor_index,
             'processor_type' => $this->processor_type,
             'processor_usage' => $this->processor_usage,
             'processor_descr' => $this->processor_descr,
-            'processor_precision' => (int)$this->processor_precision,
-            'processor_perc_warn' => (int)$this->processor_perc_warn,
-        );
+            'processor_precision' => (int) $this->processor_precision,
+            'processor_perc_warn' => (int) $this->processor_perc_warn,
+        ];
 
         return array_diff_key($array, array_flip($exclude));
     }
 
+    /**
+     * @param  Processor  $processor
+     */
     public static function onCreate($processor)
     {
         $message = "Processor Discovered: {$processor->processor_type} {$processor->processor_index} {$processor->processor_descr}";
@@ -305,6 +309,9 @@ class Processor extends Model implements DiscoveryModule, PollerModule, Discover
         parent::onCreate($processor);
     }
 
+    /**
+     * @param  Processor  $processor
+     */
     public static function onDelete($processor)
     {
         $message = "Processor Removed: {$processor->processor_type} {$processor->processor_index} {$processor->processor_descr}";

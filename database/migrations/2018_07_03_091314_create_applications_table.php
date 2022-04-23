@@ -5,7 +5,6 @@ use Illuminate\Database\Schema\Blueprint;
 
 class CreateApplicationsTable extends Migration
 {
-
     /**
      * Run the migrations.
      *
@@ -21,9 +20,13 @@ class CreateApplicationsTable extends Migration
             $table->tinyInteger('discovered')->default(0);
             $table->string('app_state_prev', 32)->nullable();
             $table->string('app_status', 8);
-            $table->timestamp('timestamp')->default(DB::raw('CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP'));
+            if (\LibreNMS\DB\Eloquent::getDriver() == 'mysql') {
+                $table->timestamp('timestamp')->default(DB::raw('CURRENT_TIMESTAMP on update CURRENT_TIMESTAMP'));
+            } else {
+                $table->timestamp('timestamp')->useCurrent();
+            }
             $table->string('app_instance');
-            $table->unique(['device_id','app_type'], 'unique_index');
+            $table->unique(['device_id', 'app_type']);
         });
     }
 

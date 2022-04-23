@@ -85,7 +85,8 @@ AdminAccess ::= TEXTUAL-CONVENTION
 		read(1),	  		--  Report only and Retrieve user
 		readwrite(2), 		--  Change access
 		provisioning(3), 	--  User is allowed to create connections
-		admin(4)      		--  User admin priviledge
+		admin(4),      		--  User admin priviledge
+		trap(5)				--  SNMP v3 Trap only user
 	}
 
 -- The System Info 
@@ -489,7 +490,7 @@ slmSysMode    	OBJECT-TYPE
 
 slmSysTrapFormat   	OBJECT-TYPE
     SYNTAX  INTEGER  {
-               fullIfIndex(1),  -- RADview and Tivoli
+               fullIfIndex(1),  -- 
                portIfIndex(2)  	-- HPOV and SNMPc
             }
 	MAX-ACCESS		read-write
@@ -519,7 +520,85 @@ slmNetworkMode   OBJECT-TYPE
 		"1 - means that the LAN is define on a different vlan than the MNG ports.
 		 2 - means that the LAN is on the same vlan and the MNG ports"
 	::= { slmSys 44 }
- 
+
+slm40GConf   OBJECT-TYPE
+    SYNTAX  INTEGER  {
+				g40(0), 	-- Zero 40G ports 
+				g41(1), 	-- Single 40G Port 1
+				g42(2), 	-- Single 40G Port 2 
+				g43(3),  	-- Dual 40G ports
+				g100(100)  	-- 40G not supported (taken from the SEEP)
+            }
+	MAX-ACCESS		read-write
+	STATUS			current
+	DESCRIPTION	
+		"g40(0) - No 40G ports (service ports 3..10 are disabled)
+		 g41(1) - Single 40G Port 1 (service ports 7,8,9,10 are disabled)
+		 g42(2) - Single 40G Port 2 (service ports 3,4,5,6 are disabled)
+		 g43(3) - Dual 40G ports"
+	::= { slmSys 45 }
+    
+slmRstpEnabled  OBJECT-TYPE
+	SYNTAX  TruthValue
+	MAX-ACCESS  read-write
+	STATUS  current
+	DESCRIPTION
+		"Enable/Disable the RSTP protocol.
+		 Defalut value is TRUE."
+    ::= { slmSys 46 } 
+    
+slmTopologyEnabled  OBJECT-TYPE
+	SYNTAX  TruthValue
+	MAX-ACCESS  read-write
+	STATUS  current
+	DESCRIPTION
+		"Enable/Disable the topology discovery protocol.
+		 Defalut value is TRUE."
+    ::= { slmSys 47 }
+     
+slmAdminCommunity OBJECT-TYPE
+	SYNTAX  DisplayString
+	MAX-ACCESS  read-write
+	STATUS  current
+	DESCRIPTION
+		"The SNMP admin community.
+		 This object should be accessible only by the Admin users of the Web."
+	::= { slmSys 48 }
+
+slmTrapCommunity OBJECT-TYPE
+	SYNTAX  DisplayString
+	MAX-ACCESS  read-write
+	STATUS  current
+	DESCRIPTION
+		"The SNMP v1/v2c trap community.
+		 This object should be accessible only by the Admin users of the Web."
+	::= { slmSys 49 } 
+
+slmSysSnmpVersion    OBJECT-TYPE
+	SYNTAX  INTEGER  {
+		v3Only(3),		-- V3 Only
+		v1v2v3(4)		-- V1, V2c, V3
+	}
+	MAX-ACCESS              read-write
+	STATUS                  current
+	DESCRIPTION
+		"The format of the sent trap:
+		3 - allow only SNMPv3 pdus.
+		4 - allow all pdus (coexistance mode)."
+	::= { slmSys 50 }
+
+slmSysEncryptionCapability    OBJECT-TYPE
+	SYNTAX  INTEGER  {
+		disabled(1),	-- No Encryption
+		enabled(2)		-- Encryption Supported
+	}
+	MAX-ACCESS              read-only
+	STATUS                  current
+	DESCRIPTION
+		"The encryption capability:
+		1 - No Encryption.
+		2 - Encryption Supported."
+	::= { slmSys 51 }
     
 --
 -- Software Revision Table
@@ -635,7 +714,10 @@ SlmAdminEntry ::=
 		slmAdminLogin		UserLogin,
 		slmAdminPassword	UserPassword,
 		slmAdminRowStatus	RowStatus,
-		slmAdminAccess		AdminAccess
+		slmAdminAccess		AdminAccess,
+		slmSnmpv3Auth		INTEGER,
+		slmSnmpv3Priv		INTEGER,
+		slmSnmpv3Password	UserPassword
 	}
 
 slmAdminLogin    	OBJECT-TYPE
@@ -670,6 +752,47 @@ slmAdminAccess OBJECT-TYPE
 	DESCRIPTION
 		"The user access level."
 	::= { slmAdminEntry 6 }
+
+slmSnmpv3Auth OBJECT-TYPE
+	SYNTAX          INTEGER {
+		noaccess(1),	--  User has no access rights
+		noauth(2),		--  No Auth
+		md5(3),			--  MD5
+		sha(4),			--  HMAC-SHA
+		sha224(5),		--  SHA-224
+		sha256(6),		--  SHA-256
+		sha384(7),		--  SHA-384
+		sha512(8)		--  SHA-512
+	}
+	MAX-ACCESS      read-create
+	STATUS          current
+	DESCRIPTION
+		"The user SNMP v3 authentication mode."
+	::= { slmAdminEntry 7 }
+
+slmSnmpv3Priv OBJECT-TYPE
+	SYNTAX          INTEGER {
+		noaccess(1),            --  User has no access rights
+		nopriv(2),                      --  No Priv
+		des(3),                         --  CBC-DES
+		aes(4),	                        --  AES-128      
+		des3(5),                        --  CBC-DES3
+		aes192(6),	                    --  AES-192      
+		aes256(7)	                    --  AES-256      	
+	}
+	MAX-ACCESS      read-create
+	STATUS          current
+	DESCRIPTION
+		"The user SNMP v3 privacy mode."
+	::= { slmAdminEntry 8 }
+
+slmSnmpv3Password     OBJECT-TYPE
+	SYNTAX			UserPassword
+	MAX-ACCESS		read-create
+	STATUS			current
+	DESCRIPTION
+		"The SNMP v3 Password"
+	::= { slmAdminEntry 9 }
 
 --  The authentication table
 --
@@ -879,7 +1002,8 @@ slmTrapDestCommunity  	OBJECT-TYPE
 slmTrapDestProtVersion OBJECT-TYPE
     SYNTAX     		INTEGER {
 		snmpVer1(1),
-		snmpVer2(2)
+		snmpVer2(2),
+		snmpVer3(3)
     }
     MAX-ACCESS 		read-create
     STATUS     		current

@@ -15,10 +15,10 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
+ *
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -28,7 +28,6 @@ use Illuminate\Database\Schema\Blueprint;
 
 class CreateTransportGroupTransportTable extends Migration
 {
-
     /**
      * Run the migrations.
      *
@@ -37,11 +36,11 @@ class CreateTransportGroupTransportTable extends Migration
     public function up()
     {
         Schema::create('transport_group_transport', function (Blueprint $table) {
+            $table->id();
             $table->unsignedInteger('transport_group_id');
             $table->unsignedInteger('transport_id');
         });
     }
-
 
     /**
      * Reverse the migrations.

@@ -15,10 +15,10 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
+ *
  * @copyright  2019 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -26,13 +26,18 @@
 namespace App\Console;
 
 use Illuminate\Console\Command;
+use Illuminate\Validation\Rule;
 use Illuminate\Validation\ValidationException;
+use LibreNMS\Util\Debug;
 use Symfony\Component\Console\Exception\InvalidArgumentException;
 use Validator;
 
 abstract class LnmsCommand extends Command
 {
     protected $developer = false;
+
+    /** @var string[][]|null */
+    protected $optionValues;
 
     /**
      * Create a new command instance.
@@ -45,23 +50,24 @@ abstract class LnmsCommand extends Command
         $this->setDescription(__('commands.' . $this->getName() . '.description'));
     }
 
-    public function isHidden()
+    public function isHidden(): bool
     {
-        return $this->hidden || ($this->developer && $this->getLaravel()->environment() !== 'production');
+        $env = $this->getLaravel() ? $this->getLaravel()->environment() : getenv('APP_ENV');
+
+        return $this->hidden || ($this->developer && $env !== 'production');
     }
 
     /**
      * Adds an argument. If $description is null, translate commands.command-name.arguments.name
      * If you want the description to be empty, just set an empty string
      *
-     * @param string               $name        The argument name
-     * @param int|null             $mode        The argument mode: InputArgument::REQUIRED or InputArgument::OPTIONAL
-     * @param string               $description A description text
-     * @param string|string[]|null $default     The default value (for InputArgument::OPTIONAL mode only)
+     * @param  string  $name  The argument name
+     * @param  int|null  $mode  The argument mode: InputArgument::REQUIRED or InputArgument::OPTIONAL
+     * @param  string  $description  A description text
+     * @param  string|string[]|null  $default  The default value (for InputArgument::OPTIONAL mode only)
+     * @return $this
      *
      * @throws InvalidArgumentException When argument mode is not valid
-     *
-     * @return $this
      */
     public function addArgument($name, $mode = null, $description = null, $default = null)
     {
@@ -79,21 +85,24 @@ abstract class LnmsCommand extends Command
      * Adds an option. If $description is null, translate commands.command-name.arguments.name
      * If you want the description to be empty, just set an empty string
      *
-     * @param string                        $name        The option name
-     * @param string|array|null             $shortcut    The shortcuts, can be null, a string of shortcuts delimited by | or an array of shortcuts
-     * @param int|null                      $mode        The option mode: One of the InputOption::VALUE_* constants
-     * @param string                        $description A description text
-     * @param string|string[]|int|bool|null $default     The default value (must be null for InputOption::VALUE_NONE)
+     * @param  string  $name  The option name
+     * @param  string|array|null  $shortcut  The shortcuts, can be null, a string of shortcuts delimited by | or an array of shortcuts
+     * @param  int|null  $mode  The option mode: One of the InputOption::VALUE_* constants
+     * @param  string  $description  A description text
+     * @param  string|string[]|int|bool|null  $default  The default value (must be null for InputOption::VALUE_NONE)
+     * @return $this
      *
      * @throws InvalidArgumentException If option mode is invalid or incompatible
-     *
-     * @return $this
      */
     public function addOption($name, $shortcut = null, $mode = null, $description = null, $default = null)
     {
         // use a generated translation location by default
         if (is_null($description)) {
             $description = __('commands.' . $this->getName() . '.options.' . $name);
+        }
+
+        if (isset($this->optionValues[$name])) {
+            $description .= ' [' . implode(', ', $this->optionValues[$name]) . ']';
         }
 
         parent::addOption($name, $shortcut, $mode, $description, $default);
@@ -104,21 +113,49 @@ abstract class LnmsCommand extends Command
     /**
      * Validate the input of this command.  Uses Laravel input validation
      * merging the arguments and options together to check.
-     *
-     * @param array $rules
-     * @param array $messages
      */
-    protected function validate($rules, $messages = [])
+    protected function validate(array $rules, array $messages = []): array
     {
-        $validator = Validator::make($this->arguments() + $this->options(), $rules, $messages);
+        // auto create option value rules if they don't exist
+        if (isset($this->optionValues)) {
+            foreach ($this->optionValues as $option => $values) {
+                if (empty($rules[$option])) {
+                    $rules[$option] = Rule::in($values);
+                    $messages[$option . '.in'] = trans('commands.lnms.validation-errors.optionValue', [
+                        'option' => $option,
+                        'values' => implode(', ', $values),
+                    ]);
+                }
+            }
+        }
+
+        $error_messages = trans('commands.' . $this->getName() . '.validation-errors');
+        $validator = Validator::make(
+            $this->arguments() + $this->options(),
+            $rules,
+            is_array($error_messages) ? array_merge($error_messages, $messages) : $messages
+        );
 
         try {
             $validator->validate();
+
+            return $validator->validated();
         } catch (ValidationException $e) {
             collect($validator->getMessageBag()->all())->each(function ($message) {
                 $this->error($message);
             });
             exit(1);
+        }
+    }
+
+    protected function configureOutputOptions(): void
+    {
+        \Log::setDefaultDriver($this->getOutput()->isQuiet() ? 'stack' : 'console');
+        if (($verbosity = $this->getOutput()->getVerbosity()) >= 128) {
+            Debug::set();
+            if ($verbosity >= 256) {
+                Debug::setVerbose();
+            }
         }
     }
 }

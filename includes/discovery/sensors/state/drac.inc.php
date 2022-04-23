@@ -11,22 +11,36 @@
  */
 
 $tables = [
-    ['virtualDiskTable','.1.3.6.1.4.1.674.10892.5.5.1.20.140.1.1.4.','virtualDiskState','virtualDiskName'],
-    ['processorDeviceTable','.1.3.6.1.4.1.674.10892.5.4.1100.30.1.5.','processorDeviceStatus','processorDeviceBrandName'],
-    ['memoryDeviceTable','.1.3.6.1.4.1.674.10892.5.4.1100.50.1.5.','memoryDeviceStatus','memoryDeviceLocationName'],
-    ['voltageProbeTable','.1.3.6.1.4.1.674.10892.5.4.600.20.1.5.','voltageProbeStatus','voltageProbeLocationName'],
-    ['amperageProbeTable','.1.3.6.1.4.1.674.10892.5.4.600.30.1.5.','amperageProbeStatus','amperageProbeLocationName'],
-    ['systemBatteryTable','.1.3.6.1.4.1.674.10892.5.4.600.50.1.5.','systemBatteryStatus','systemBatteryLocationName']
+    ['physicalDiskTable', '.1.3.6.1.4.1.674.10892.5.5.1.20.130.4.1.4.', 'physicalDiskState', 'physicalDiskName'],
+    ['virtualDiskTable', '.1.3.6.1.4.1.674.10892.5.5.1.20.140.1.1.4.', 'virtualDiskState', 'virtualDiskName'],
+    ['processorDeviceTable', '.1.3.6.1.4.1.674.10892.5.4.1100.30.1.5.', 'processorDeviceStatus', 'processorDeviceBrandName'],
+    ['memoryDeviceTable', '.1.3.6.1.4.1.674.10892.5.4.1100.50.1.5.', 'memoryDeviceStatus', 'memoryDeviceLocationName'],
+    ['voltageProbeTable', '.1.3.6.1.4.1.674.10892.5.4.600.20.1.5.', 'voltageProbeStatus', 'voltageProbeLocationName'],
+    ['amperageProbeTable', '.1.3.6.1.4.1.674.10892.5.4.600.30.1.5.', 'amperageProbeStatus', 'amperageProbeLocationName'],
+    ['systemBatteryTable', '.1.3.6.1.4.1.674.10892.5.4.600.50.1.5.', 'systemBatteryStatus', 'systemBatteryLocationName'],
 ];
 
 foreach ($tables as $tablevalue) {
-    list($table_oid, $num_oid, $value_oid, $descr_oid) = $tablevalue;
+    [$table_oid, $num_oid, $value_oid, $descr_oid] = $tablevalue;
     $temp = snmpwalk_cache_multi_oid($device, $table_oid, [], 'IDRAC-MIB-SMIv2', null, '-OQUse');
     // '-OQUsetX'
 
-    if (!empty($temp)) {
+    if (! empty($temp)) {
         // Find the right states
-        if ($value_oid == 'virtualDiskState') {
+        if ($value_oid == 'physicalDiskTable') {
+            $states = [
+                ['value' => 1, 'generic' => 3, 'graph' => 0, 'descr' => 'unknown'],
+                ['value' => 2, 'generic' => 0, 'graph' => 0, 'descr' => 'ready'],
+                ['value' => 3, 'generic' => 0, 'graph' => 0, 'descr' => 'online'],
+                ['value' => 4, 'generic' => 1, 'graph' => 0, 'descr' => 'foreign'],
+                ['value' => 5, 'generic' => 2, 'graph' => 0, 'descr' => 'offline'],
+                ['value' => 6, 'generic' => 2, 'graph' => 0, 'descr' => 'blocked'],
+                ['value' => 7, 'generic' => 2, 'graph' => 0, 'descr' => 'failed'],
+                ['value' => 8, 'generic' => 2, 'graph' => 0, 'descr' => 'noraid'],
+                ['value' => 9, 'generic' => 2, 'graph' => 0, 'descr' => 'removed'],
+                ['value' => 10, 'generic' => 2, 'graph' => 0, 'descr' => 'readonly'],
+            ];
+        } elseif ($value_oid == 'virtualDiskState') {
             $states = [
                 ['value' => 1, 'generic' => 3, 'graph' => 0, 'descr' => 'unknown'],
                 ['value' => 2, 'generic' => 0, 'graph' => 0, 'descr' => 'online'],
@@ -62,7 +76,7 @@ foreach ($tables as $tablevalue) {
 
         foreach ($temp as $index => $entry) {
             if ($value_oid == 'memoryDeviceStatus') {
-                $descr = $entry[$descr_oid] . ', ' . $entry['memoryDeviceSize']/1024 . ' MB';
+                $descr = $entry[$descr_oid] . ', ' . $entry['memoryDeviceSize'] / 1024 . ' MB';
             } else {
                 $descr = $entry[$descr_oid];
             }

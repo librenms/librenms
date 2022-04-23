@@ -1,0 +1,1078 @@
+-- ==================================================================
+-- Copyright (c) 2004-2017 New H3C Tech. Co., Ltd. All rights reserved.
+--
+-- Description: Multicast Snooping MIB
+-- Reference:
+-- Version: V1.1
+-- History:
+-- V1.0 2014-06-17 Created by Huang Yun
+-- V1.1 2017-09-26 Modified by meihaitao and yangjingdong
+--      Added hh3cMcsVUProxyEnabled and hh3cMcsVUQuerierElection to hh3cMcsVirtualUnitConfigTable.
+--      Modified the description of object hh3cMcsL2EntryIfIndex.
+--      Added 'tunnel(6)', 'mtunnel(7)' to object hh3cMcsL2EntryPortType.
+--      Added 'b(6)', 'e(7)', 'de(8)', 'ee(9)', 'suc(10)', 'f(11)' to object hh3cMcsL2EntryPortAttribute.
+--      Modified the description of object hh3cMcsL2EntryPortAttribute.
+-- ==================================================================
+--
+-- Variables and types be imported
+--
+-- ==================================================================
+HH3C-MULTICAST-SNOOPING-MIB DEFINITIONS ::= BEGIN
+
+
+IMPORTS
+
+    MODULE-IDENTITY,OBJECT-TYPE,Unsigned32,Counter64
+        FROM SNMPv2-SMI
+
+    TEXTUAL-CONVENTION,RowStatus,TruthValue
+        FROM SNMPv2-TC
+
+    hh3cCommon
+        FROM HH3C-OID-MIB
+
+    InetAddressType, InetAddress
+        FROM INET-ADDRESS-MIB
+
+    InterfaceIndex
+        FROM IF-MIB;
+
+hh3cMulticastSnoop MODULE-IDENTITY
+    LAST-UPDATED "201709260950Z"
+    ORGANIZATION
+        "New H3C Tech. Co., Ltd."
+    CONTACT-INFO
+        "Platform Team New H3C Tech. Co., Ltd.
+        Hai-Dian District Beijing P.R. China
+        http://www.h3c.com
+        Zip:100085
+        "
+    DESCRIPTION
+        "IGMP/MLD Snooping Management MIB"
+    -- Revision history.
+    REVISION "201709260950Z"
+    DESCRIPTION
+        "Added hh3cMcsVUProxyEnabled and hh3cMcsVUQuerierElection to hh3cMcsVirtualUnitConfigTable.
+        Modified the description of object hh3cMcsL2EntryIfIndex.
+        Added 'tunnel(6)', 'mtunnel(7)' to object hh3cMcsL2EntryPortType.
+        Added 'b(6)', 'e(7)', 'de(8)', 'ee(9)', 'suc(10)', 'f(11)' to object hh3cMcsL2EntryPortAttribute.
+        Modified the description of object hh3cMcsL2EntryPortAttribute."
+    REVISION "201405141700Z"
+    DESCRIPTION
+        "The initial version of this MIB file."
+    ::= { hh3cCommon 123 }
+
+Hh3cVirtualUnitType ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "VLAN configuration or VSI configuration."
+    SYNTAX      INTEGER  { vlan(1), vsi(2) }
+
+-- ==================================================================
+--
+-- ======================= definition begin =========================
+--
+-- ==================================================================
+
+hh3cMulticastSnoopObject OBJECT IDENTIFIER ::= {   hh3cMulticastSnoop 1  }
+
+hh3cMcsGlobalConfigTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF Hh3cMcsGlobalConfigEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "Table containing information about the global
+        configuration of IGMP/MLD snooping."
+    ::= { hh3cMulticastSnoopObject  1 }
+
+hh3cMcsGlobalConfigEntry OBJECT-TYPE
+    SYNTAX     Hh3cMcsGlobalConfigEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "Entry containing information about the global
+        configuration of IGMP/MLD snooping."
+    INDEX      {  hh3cMcsGlbSnoopingType }
+    ::= { hh3cMcsGlobalConfigTable 1 }
+
+Hh3cMcsGlobalConfigEntry ::=
+    SEQUENCE
+    {
+        hh3cMcsGlbSnoopingType           InetAddressType,
+        hh3cMcsGlbRowStatus              RowStatus,
+        hh3cMcsGlbEntryLimit             Unsigned32,
+        hh3cMcsGlbHostAgingTime          Unsigned32,
+        hh3cMcsGlbMaxResponseTime        Unsigned32,
+        hh3cMcsGlbRouterAgingTime        Unsigned32,
+        hh3cMcsGlbLastMemQryInterval     Unsigned32,
+        hh3cMcsGlbDropUnknownEnabled     TruthValue
+    }
+
+hh3cMcsGlbSnoopingType OBJECT-TYPE
+    SYNTAX     InetAddressType
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "Type of the global configuration.  IPv4 means IGMP snooping
+        configuration, and IPv6 means MLD snooping configuration."
+    ::= { hh3cMcsGlobalConfigEntry 1 }
+
+hh3cMcsGlbRowStatus OBJECT-TYPE
+    SYNTAX  RowStatus
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "The activation of a row enables IGMP/MLD snooping globally.
+        The destruction of a row disables IGMP/MLD snooping globally."
+    ::= { hh3cMcsGlobalConfigEntry 2 }
+
+hh3cMcsGlbEntryLimit   OBJECT-TYPE
+    SYNTAX  Unsigned32
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Global maximum number of IGMP/MLD snooping forwarding entries."
+    ::= { hh3cMcsGlobalConfigEntry  3 }
+
+hh3cMcsGlbHostAgingTime   OBJECT-TYPE
+    SYNTAX  Unsigned32  (1..8097894)
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Global aging time of the multicast group on ports."
+    DEFVAL  {260}
+    ::= { hh3cMcsGlobalConfigEntry  4 }
+
+hh3cMcsGlbMaxResponseTime  OBJECT-TYPE
+    SYNTAX  Unsigned32   (1..3174)
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Global maximum query response time."
+    DEFVAL  {10}
+    ::= { hh3cMcsGlobalConfigEntry  5 }
+
+hh3cMcsGlbRouterAgingTime  OBJECT-TYPE
+    SYNTAX  Unsigned32 (1..8097894)
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Global aging time of router ports."
+    DEFVAL  {260}
+    ::= { hh3cMcsGlobalConfigEntry  6 }
+
+hh3cMcsGlbLastMemQryInterval  OBJECT-TYPE
+    SYNTAX  Unsigned32 (1..25)
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Global last member query interval."
+    DEFVAL  {1}
+    ::= { hh3cMcsGlobalConfigEntry  7 }
+
+hh3cMcsGlbDropUnknownEnabled OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+        "Whether the feature of dropping unknown packets is enabled globally."
+    DEFVAL     { false }
+    ::= { hh3cMcsGlobalConfigEntry  8 }
+
+hh3cMcsVirtualUnitConfigTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF Hh3cMcsVirtualUnitConfigEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "Table containing configuration information about the specified
+        VLAN or VSI."
+    ::= { hh3cMulticastSnoopObject  2 }
+
+hh3cMcsVirtualUnitConfigEntry OBJECT-TYPE
+    SYNTAX     Hh3cMcsVirtualUnitConfigEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "Entry containing information of the specified VLAN or VSI."
+    INDEX
+    {
+        hh3cMcsVUType,
+        hh3cMcsVUID,
+        hh3cMcsVUSnoopingType
+    }
+    ::= { hh3cMcsVirtualUnitConfigTable 1 }
+
+Hh3cMcsVirtualUnitConfigEntry ::=
+    SEQUENCE
+    {
+        hh3cMcsVUType                     Hh3cVirtualUnitType,
+        hh3cMcsVUID                       Unsigned32,
+        hh3cMcsVUSnoopingType             InetAddressType,
+        hh3cMcsVURowStatus                RowStatus,
+        hh3cMcsVUHostAgingTime            Unsigned32,
+        hh3cMcsVUMaxResponseTime          Unsigned32,
+        hh3cMcsVURouterAgingTime          Unsigned32,
+        hh3cMcsVULastMemQryInterval       Unsigned32,
+        hh3cMcsVUDropUnknownEnabled       TruthValue,
+        hh3cMcsVUPimSnoopingEnabled       TruthValue,
+        hh3cMcsVUVersion                  Unsigned32,
+        hh3cMcsVUQuerierEnabled           TruthValue,
+        hh3cMcsVUQuerierInterval          Unsigned32,
+        hh3cMcsVUGeneQuerierSourceAddress InetAddress,
+        hh3cMcsVUSpecQuerierSourceAddress InetAddress,
+        hh3cMcsVULeaveSourceAddress       InetAddress,
+        hh3cMcsVUReportSourceAddress      InetAddress,
+        hh3cMcsVUProxyEnabled             TruthValue,
+        hh3cMcsVUQuerierElection          TruthValue
+    }
+
+hh3cMcsVUType  OBJECT-TYPE
+    SYNTAX     Hh3cVirtualUnitType
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "Type of virtual unit."
+    ::= { hh3cMcsVirtualUnitConfigEntry 1 }
+
+hh3cMcsVUID  OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "VLAN ID or VSI Index.  Its value ranges from 1 to 4094 when type is
+        VLAN, and from 0 to 0xFFFFFFFE when type is VSI"
+    ::= { hh3cMcsVirtualUnitConfigEntry 2 }
+
+hh3cMcsVUSnoopingType OBJECT-TYPE
+    SYNTAX     InetAddressType
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "Type of the configuration.  IPv4 means IGMP snooping configuration,
+        and IPv6 means MLD snooping configuration."
+    ::= { hh3cMcsVirtualUnitConfigEntry 3 }
+
+hh3cMcsVURowStatus OBJECT-TYPE
+    SYNTAX  RowStatus
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "The activation of a row enables IGMP/MLD snooping in the VLAN or
+        VSI.  The destruction of a row disables IGMP/MLD snooping in the
+        VLAN or VSI."
+    ::= { hh3cMcsVirtualUnitConfigEntry 4 }
+
+hh3cMcsVUHostAgingTime   OBJECT-TYPE
+    SYNTAX  Unsigned32  (0..8097894)
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Aging time of the multicast group on ports in the VLAN or VSI.
+        A value of zero indicates that it is not configured in the VLAN
+        or VSI."
+    ::= { hh3cMcsVirtualUnitConfigEntry  5 }
+
+hh3cMcsVUMaxResponseTime  OBJECT-TYPE
+    SYNTAX  Unsigned32   (0..3174)
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Maximum query response time in the VLAN or VSI.  A value of
+        zero indicates that it is not configured in the VLAN or VSI."
+    ::= { hh3cMcsVirtualUnitConfigEntry  6 }
+
+hh3cMcsVURouterAgingTime  OBJECT-TYPE
+    SYNTAX  Unsigned32 (0..8097894)
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Aging time of the router port in the VLAN or VSI.  A value of
+        zero indicates that it is not configured in the VLAN or VSI."
+    ::= { hh3cMcsVirtualUnitConfigEntry  7 }
+
+hh3cMcsVULastMemQryInterval  OBJECT-TYPE
+    SYNTAX  Unsigned32 (0..25)
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Last member query interval in the VLAN or VSI.  A value of
+        zero indicates that it is not configured in the VLAN or VSI."
+    ::= { hh3cMcsVirtualUnitConfigEntry  8 }
+
+hh3cMcsVUDropUnknownEnabled OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+        "Whether the feature of dropping unknown packets is enabled in
+        the VLAN or VSI."
+    DEFVAL     { false }
+    ::= { hh3cMcsVirtualUnitConfigEntry  9 }
+
+hh3cMcsVUPimSnoopingEnabled OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+        "Whether PIM snooping is enabled in the VLAN or VSI."
+    DEFVAL     { false }
+    ::= { hh3cMcsVirtualUnitConfigEntry  10 }
+
+hh3cMcsVUVersion OBJECT-TYPE
+    SYNTAX     Unsigned32 (2|3)
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+        "Version of IGMP/MLD snooping that is running on the VLAN.
+        Value 2 represents IGMPv2 snooping and MLDv1 snooping,
+        and value 3 represents IGMPv3 snooping and MLDv2 snooping."
+    DEFVAL     { 2 }
+    ::= { hh3cMcsVirtualUnitConfigEntry 11 }
+
+hh3cMcsVUQuerierEnabled OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+        "Whether the querier feature is enabled in the VLAN or VSI."
+    DEFVAL     { false }
+    ::= { hh3cMcsVirtualUnitConfigEntry  12 }
+
+hh3cMcsVUQuerierInterval OBJECT-TYPE
+    SYNTAX     Unsigned32 (2..31744)
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+        "Query interval."
+    DEFVAL     { 125 }
+    ::= { hh3cMcsVirtualUnitConfigEntry  13 }
+
+hh3cMcsVUGeneQuerierSourceAddress OBJECT-TYPE
+    SYNTAX     InetAddress
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+        "Source IP address of IGMP or MLD general query packets.  Its value
+        is 255.255.255.255 or FFFF:FFFF:FFFF:FFFF:FFFF:FFFF:FFFF:FFFF
+        when not configured."
+    ::= { hh3cMcsVirtualUnitConfigEntry 14 }
+
+hh3cMcsVUSpecQuerierSourceAddress OBJECT-TYPE
+    SYNTAX     InetAddress
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+        "Source IP address of IGMP or MLD group-specific query packets.  Its
+        value is 255.255.255.255 or FFFF:FFFF:FFFF:FFFF:FFFF:FFFF:FFFF:FFFF
+        when not configured."
+    ::= { hh3cMcsVirtualUnitConfigEntry 15 }
+
+hh3cMcsVULeaveSourceAddress OBJECT-TYPE
+    SYNTAX     InetAddress
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+        "Source IP address of IGMP or MLD leave packets.  Its value is
+        255.255.255.255 or FFFF:FFFF:FFFF:FFFF:FFFF:FFFF:FFFF:FFFF
+        when not configured."
+    ::= { hh3cMcsVirtualUnitConfigEntry 16 }
+
+hh3cMcsVUReportSourceAddress OBJECT-TYPE
+    SYNTAX     InetAddress
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+        "Source IP address of IGMP or MLD report packets.  Its value is
+        255.255.255.255 or FFFF:FFFF:FFFF:FFFF:FFFF:FFFF:FFFF:FFFF
+        when not configured."
+    ::= { hh3cMcsVirtualUnitConfigEntry 17 }
+
+hh3cMcsVUProxyEnabled OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+        "Whether the proxy feature is enabled in the VLAN or VSI."
+    DEFVAL     { false }
+    ::= { hh3cMcsVirtualUnitConfigEntry  18 }
+
+hh3cMcsVUQuerierElection OBJECT-TYPE
+    SYNTAX     TruthValue
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+        "Whether the querier election feature is enabled in the VLAN or VSI."
+    DEFVAL     { false }
+    ::= { hh3cMcsVirtualUnitConfigEntry  19 }
+
+hh3cMcsL2EntryTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF Hh3cMcsL2EntryEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "Table containing a list of Layer 2 multicast group entries."
+    ::= { hh3cMulticastSnoopObject 3 }
+
+hh3cMcsL2EntryEntry OBJECT-TYPE
+    SYNTAX     Hh3cMcsL2EntryEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "Entry of l2-multicast group, which is created for each group
+        learned or configured in the VLAN or VSI."
+    INDEX
+    {
+        hh3cMcsL2EntryVUType,
+        hh3cMcsL2EntryVUID,
+        hh3cMcsL2EntryAddressType,
+        hh3cMcsL2EntryGroupAddress,
+        hh3cMcsL2EntrySourceAddress,
+        hh3cMcsL2EntryIfIndex
+    }
+    ::= { hh3cMcsL2EntryTable 1 }
+
+Hh3cMcsL2EntryEntry ::=
+    SEQUENCE
+    {
+        hh3cMcsL2EntryVUType          Hh3cVirtualUnitType,
+        hh3cMcsL2EntryVUID            Unsigned32,
+        hh3cMcsL2EntryAddressType     InetAddressType,
+        hh3cMcsL2EntryGroupAddress    InetAddress,
+        hh3cMcsL2EntrySourceAddress   InetAddress,
+        hh3cMcsL2EntryIfIndex         InterfaceIndex,
+        hh3cMcsL2EntryPortType        INTEGER,
+        hh3cMcsL2EntryPortAttribute   BITS
+    }
+
+hh3cMcsL2EntryVUType  OBJECT-TYPE
+    SYNTAX     Hh3cVirtualUnitType
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "Type of virtual unit."
+    ::= { hh3cMcsL2EntryEntry 1 }
+
+hh3cMcsL2EntryVUID  OBJECT-TYPE
+    SYNTAX     Unsigned32
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "VLAN ID or VSI Index.  Its value ranges from 1 to 4094 when type is
+        VLAN, and from 0 to 0xFFFFFFFE when type is VSI."
+    ::= { hh3cMcsL2EntryEntry 2 }
+
+hh3cMcsL2EntryAddressType OBJECT-TYPE
+    SYNTAX     InetAddressType
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "Type of multicast IP address."
+    ::= { hh3cMcsL2EntryEntry 3 }
+
+hh3cMcsL2EntryGroupAddress OBJECT-TYPE
+    SYNTAX     InetAddress
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "IP address of the multicast group which the port joined."
+    ::= { hh3cMcsL2EntryEntry 4 }
+
+hh3cMcsL2EntrySourceAddress OBJECT-TYPE
+    SYNTAX     InetAddress
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "IP address of the unicast source which the port joined."
+    ::= { hh3cMcsL2EntryEntry 5 }
+
+hh3cMcsL2EntryIfIndex  OBJECT-TYPE
+    SYNTAX     InterfaceIndex
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "In the VLAN, interface index of the port that joined the Layer 2 IP
+        multicast group.  In the VSI, link ID of the AC, PW, or tunnel that
+        joined the Layer 2 IP multicast group."
+    ::= { hh3cMcsL2EntryEntry 6 }
+
+hh3cMcsL2EntryPortType  OBJECT-TYPE
+    SYNTAX     INTEGER
+               {
+                   interface(1),
+                   ac(2),
+                   npw(3),
+                   upw(4),
+                   trill(5),
+                   tunnel(6),
+                   mtunnel(7)
+               }
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Type of the port."
+    ::= { hh3cMcsL2EntryEntry 7 }
+
+hh3cMcsL2EntryPortAttribute  OBJECT-TYPE
+    SYNTAX           BITS
+    {
+        d(0),
+        s(1),
+        p(2),
+        k(3),
+        r(4),
+        w(5),
+        b(6),
+        e(7),
+        de(8),
+        ee(9),
+        suc(10),
+        f(11)
+    }
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Attribute of the port.  'd' means learned from IGMP/MLD packets,
+        's' means configured statically, 'p' means learned from PIM packets,
+        'k' means obtained from the kernel, 'r' means learned from (*, *)
+        entries, 'w' means learned from (*, G) entries,
+        'b' means broadcast port, 'e' means learned from EVPN BGP route,
+        'de' means learned from IGMP/MLD packets in Exclude filter mode,
+        'ee' means learned from EVPN BGP routein Exclude filter mode,
+        'suc' means processing has succeeded,
+        'f' means processing has failed."
+    ::= { hh3cMcsL2EntryEntry 8 }
+
+hh3cMcsPacketStatisticsTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF Hh3cMcsPacketStatisticsEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "Table containing the IGMP/MLD packets statistics."
+    ::= { hh3cMulticastSnoopObject 4 }
+
+hh3cMcsPacketStatisticsEntry OBJECT-TYPE
+    SYNTAX     Hh3cMcsPacketStatisticsEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "Entry containing the statistic information of IGMP/MLD packets
+        that have been transmitted and received in the device."
+    INDEX      {  hh3cMcsStatisticsSnoopingType }
+    ::= { hh3cMcsPacketStatisticsTable 1 }
+
+Hh3cMcsPacketStatisticsEntry ::=
+    SEQUENCE
+    {
+        hh3cMcsStatisticsSnoopingType   InetAddressType,
+        hh3cMcsRxGeneryQueryNum         Counter64,
+        hh3cMcsRxV2SpecificQueryNum     Counter64,
+        hh3cMcsRxV3SpecificQueryNum     Counter64,
+        hh3cMcsRxV3SpecificSGQueryNum   Counter64,
+        hh3cMcsRxV1ReportNum            Counter64,
+        hh3cMcsRxV2ReportNum            Counter64,
+        hh3cMcsRxV3ReportNum            Counter64,
+        hh3cMcsRxV3ErrCorReportNum      Counter64,
+        hh3cMcsRxLeaveNum               Counter64,
+        hh3cMcsRxPimHelloNum            Counter64,
+        hh3cMcsRxErrorPacketNum         Counter64,
+        hh3cMcsTxV2SpecificQueryNum     Counter64,
+        hh3cMcsTxV3SpecificQueryNum     Counter64,
+        hh3cMcsTxV3SpecificSGQueryNum   Counter64
+    }
+
+hh3cMcsStatisticsSnoopingType OBJECT-TYPE
+    SYNTAX     InetAddressType
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "Type of the snooping, IPv4 means the statistics for IGMP
+        snooping, and IPv6 means the statistics for MLD snooping."
+    ::= { hh3cMcsPacketStatisticsEntry 1 }
+
+hh3cMcsRxGeneryQueryNum OBJECT-TYPE
+    SYNTAX     Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Statistics of IGMP or MLD general query packets received on
+        the device."
+    ::= { hh3cMcsPacketStatisticsEntry 2 }
+
+hh3cMcsRxV2SpecificQueryNum OBJECT-TYPE
+    SYNTAX     Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Statistics of IGMPv2 or MLDv1 group-specific query packets
+        received on the device."
+    ::= { hh3cMcsPacketStatisticsEntry 3 }
+
+hh3cMcsRxV3SpecificQueryNum OBJECT-TYPE
+    SYNTAX     Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "The statistics of IGMPv3 or MLDv2 group-specific query packets
+        received on the device."
+    ::= { hh3cMcsPacketStatisticsEntry 4 }
+
+hh3cMcsRxV3SpecificSGQueryNum OBJECT-TYPE
+    SYNTAX     Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Statistics of IGMPv3 or MLDv2 group-and-source-specific query
+        packets received on the device."
+    ::= { hh3cMcsPacketStatisticsEntry 5 }
+
+hh3cMcsRxV1ReportNum OBJECT-TYPE
+    SYNTAX     Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Statistics of IGMPv1 report packets received on the device."
+    ::= { hh3cMcsPacketStatisticsEntry 6 }
+
+hh3cMcsRxV2ReportNum OBJECT-TYPE
+    SYNTAX     Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Statistics of IGMPv2 or MLDv1 report packets received on the
+        device."
+    ::= { hh3cMcsPacketStatisticsEntry 7 }
+
+hh3cMcsRxV3ReportNum OBJECT-TYPE
+    SYNTAX     Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Statistics of IGMPv3 or MLDv2 report packets received on
+        the device."
+    ::= { hh3cMcsPacketStatisticsEntry 8 }
+
+hh3cMcsRxV3ErrCorReportNum OBJECT-TYPE
+    SYNTAX     Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Statistics of IGMPv3 or MLDv2 report packets with correct and
+        incorrect records received on the device."
+    ::= { hh3cMcsPacketStatisticsEntry 9 }
+
+hh3cMcsRxLeaveNum OBJECT-TYPE
+    SYNTAX     Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Statistics of leave packets received on the device."
+    ::= { hh3cMcsPacketStatisticsEntry 10 }
+
+hh3cMcsRxPimHelloNum OBJECT-TYPE
+    SYNTAX     Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Statistics of PIM hello packets received on the device."
+    ::= { hh3cMcsPacketStatisticsEntry 11 }
+
+hh3cMcsRxErrorPacketNum OBJECT-TYPE
+    SYNTAX     Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Statistics of error IGMP/MLD packets received on the device."
+    ::= { hh3cMcsPacketStatisticsEntry 12 }
+
+hh3cMcsTxV2SpecificQueryNum OBJECT-TYPE
+    SYNTAX     Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Statistics of IGMPv2 or MLDv1 group-specific query packets sent
+        from the device."
+    ::= { hh3cMcsPacketStatisticsEntry 13 }
+
+hh3cMcsTxV3SpecificQueryNum OBJECT-TYPE
+    SYNTAX     Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Statistics of IGMPv3 or MLDv2 group-specific query packets sent
+        from the device."
+    ::= { hh3cMcsPacketStatisticsEntry 14 }
+
+hh3cMcsTxV3SpecificSGQueryNum OBJECT-TYPE
+    SYNTAX     Counter64
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+        "Statistics of IGMPv3 or MLDv2 group-and-source-specific query
+        packets sent from the device."
+    ::= { hh3cMcsPacketStatisticsEntry 15 }
+
+hh3cMcsPortJoinGroupConfigTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF Hh3cMcsPortJoinGroupConfigEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "Table for configuring a port as a simulated member host for a
+        multicast group."
+    ::= { hh3cMulticastSnoopObject 5 }
+
+hh3cMcsPortJoinGroupConfigEntry OBJECT-TYPE
+    SYNTAX     Hh3cMcsPortJoinGroupConfigEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "Entry for configuring a port as a simulated member host for a
+        multicast group."
+    INDEX
+    {
+        hh3cMcsPortJoinGroupIfIndex,
+        hh3cMcsPortJoinGroupSnoopingType,
+        hh3cMcsPortJoinGroupVlanID,
+        hh3cMcsPortJoinGroupGroupAddress,
+        hh3cMcsPortJoinGroupSourceAddress
+    }
+    ::= { hh3cMcsPortJoinGroupConfigTable 1 }
+
+Hh3cMcsPortJoinGroupConfigEntry ::=
+    SEQUENCE
+    {
+        hh3cMcsPortJoinGroupIfIndex         InterfaceIndex,
+        hh3cMcsPortJoinGroupSnoopingType    InetAddressType,
+        hh3cMcsPortJoinGroupVlanID          Unsigned32,
+        hh3cMcsPortJoinGroupGroupAddress    InetAddress,
+        hh3cMcsPortJoinGroupSourceAddress   InetAddress,
+        hh3cMcsPortJoinGroupStatus          RowStatus
+    }
+
+hh3cMcsPortJoinGroupIfIndex OBJECT-TYPE
+    SYNTAX     InterfaceIndex
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "Port for which this entry contains information."
+    ::= { hh3cMcsPortJoinGroupConfigEntry 1 }
+
+hh3cMcsPortJoinGroupSnoopingType OBJECT-TYPE
+    SYNTAX     InetAddressType
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "Type of the configuration.  IPv4 means IGMP snooping configuration,
+        and IPv6 means MLD snooping configuration."
+    ::= { hh3cMcsPortJoinGroupConfigEntry 2 }
+
+hh3cMcsPortJoinGroupVlanID OBJECT-TYPE
+    SYNTAX     Unsigned32(1..4094)
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "Index uniquely identifying the specified VLAN in which a host
+        on a port joined the multicast group."
+    ::= { hh3cMcsPortJoinGroupConfigEntry 3 }
+
+hh3cMcsPortJoinGroupGroupAddress OBJECT-TYPE
+    SYNTAX     InetAddress
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "IP address of the group to which the host belongs."
+    ::= { hh3cMcsPortJoinGroupConfigEntry 4 }
+
+hh3cMcsPortJoinGroupSourceAddress OBJECT-TYPE
+    SYNTAX     InetAddress
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "IP address of the source.  A value of zero indicates that the
+        multicast packets of this group can come from any sources."
+    ::= { hh3cMcsPortJoinGroupConfigEntry 5 }
+
+hh3cMcsPortJoinGroupStatus OBJECT-TYPE
+    SYNTAX     RowStatus
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+        "This object is responsible for managing rows, which supports
+        'active', 'createAndGo' and 'destroy'."
+    ::= { hh3cMcsPortJoinGroupConfigEntry 6 }
+
+hh3cMcsPortStaticGroupConfigTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF Hh3cMcsPortStaticGroupConfigEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "Table for configuring static group membership entries on a port."
+    ::= { hh3cMulticastSnoopObject 6 }
+
+hh3cMcsPortStaticGroupConfigEntry OBJECT-TYPE
+    SYNTAX     Hh3cMcsPortStaticGroupConfigEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "Entry for configuring static group membership entries on a port."
+    INDEX
+    {
+        hh3cMcsPortStaticGroupIfIndex,
+        hh3cMcsPortStaticGroupSnoopingType,
+        hh3cMcsPortStaticGroupVlanID,
+        hh3cMcsPortStaticGroupGroupAddress,
+        hh3cMcsPortStaticGroupSourceAddress
+    }
+    ::= { hh3cMcsPortStaticGroupConfigTable 1 }
+
+Hh3cMcsPortStaticGroupConfigEntry ::=
+    SEQUENCE
+    {
+        hh3cMcsPortStaticGroupIfIndex           InterfaceIndex,
+        hh3cMcsPortStaticGroupSnoopingType      InetAddressType,
+        hh3cMcsPortStaticGroupVlanID            Unsigned32,
+        hh3cMcsPortStaticGroupGroupAddress      InetAddress,
+        hh3cMcsPortStaticGroupSourceAddress     InetAddress,
+        hh3cMcsPortStaticGroupStatus            RowStatus
+    }
+
+hh3cMcsPortStaticGroupIfIndex OBJECT-TYPE
+    SYNTAX     InterfaceIndex
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "Port for which this entry contains information."
+    ::= { hh3cMcsPortStaticGroupConfigEntry 1 }
+
+hh3cMcsPortStaticGroupSnoopingType OBJECT-TYPE
+    SYNTAX     InetAddressType
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "Type of the configuration.  IPv4 means IGMP snooping configuration,
+        and IPv6 means MLD snooping configuration."
+    ::= { hh3cMcsPortStaticGroupConfigEntry 2 }
+
+hh3cMcsPortStaticGroupVlanID OBJECT-TYPE
+    SYNTAX     Unsigned32(1..4094)
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "Index uniquely identifying the specified VLAN in which a port
+        statically joined the multicast group."
+    ::= { hh3cMcsPortStaticGroupConfigEntry 3 }
+
+hh3cMcsPortStaticGroupGroupAddress OBJECT-TYPE
+    SYNTAX     InetAddress
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "IP address of the multicast group."
+    ::= { hh3cMcsPortStaticGroupConfigEntry 4 }
+
+hh3cMcsPortStaticGroupSourceAddress OBJECT-TYPE
+    SYNTAX     InetAddress
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "IP address of the source.  A value of zero indicates that the
+        multicast packets of this group can come from any sources."
+    ::= { hh3cMcsPortStaticGroupConfigEntry 5 }
+
+hh3cMcsPortStaticGroupStatus OBJECT-TYPE
+    SYNTAX     RowStatus
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+        "This object is responsible for managing the creation and
+        deletion of rows, which supports 'active', 'createAndGo'
+        and 'destroy'."
+    ::= { hh3cMcsPortStaticGroupConfigEntry 6 }
+
+hh3cMcsRouterPortConfigTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF Hh3cMcsRouterPortConfigEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Table for configuring a port as a static router port."
+    ::= { hh3cMulticastSnoopObject 7 }
+
+hh3cMcsRouterPortConfigEntry OBJECT-TYPE
+    SYNTAX  Hh3cMcsRouterPortConfigEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Entry for configuring a port as a static router port."
+    INDEX
+    {
+        hh3cMcsRouterPortConfigIfIndex,
+        hh3cMcsRouterPortConfigSnoopingType,
+        hh3cMcsRouterPortConfigVlanID
+    }
+    ::= { hh3cMcsRouterPortConfigTable 1 }
+
+Hh3cMcsRouterPortConfigEntry ::=
+    SEQUENCE
+    {
+        hh3cMcsRouterPortConfigIfIndex               InterfaceIndex,
+        hh3cMcsRouterPortConfigSnoopingType          InetAddressType,
+        hh3cMcsRouterPortConfigVlanID                Unsigned32,
+        hh3cMcsRouterPortConfigRowStatus             RowStatus
+    }
+
+hh3cMcsRouterPortConfigIfIndex OBJECT-TYPE
+    SYNTAX     InterfaceIndex
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "Port for which this entry contains information."
+    ::= { hh3cMcsRouterPortConfigEntry 1 }
+
+hh3cMcsRouterPortConfigSnoopingType OBJECT-TYPE
+    SYNTAX     InetAddressType
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "Type of the configuration.  IPv4 means IGMP snooping configuration,
+        and IPv6 means MLD snooping configuration."
+    ::= { hh3cMcsRouterPortConfigEntry 2 }
+
+hh3cMcsRouterPortConfigVlanID OBJECT-TYPE
+    SYNTAX     Unsigned32(1..4094)
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "Index uniquely identifying the specified VLAN in which a port
+        act as a static router port."
+    ::= { hh3cMcsRouterPortConfigEntry 3 }
+
+hh3cMcsRouterPortConfigRowStatus OBJECT-TYPE
+    SYNTAX     RowStatus
+    MAX-ACCESS read-create
+    STATUS     current
+    DESCRIPTION
+        "This object is a conceptual row entry that allows to add
+        or delete entries to or from the hh3cMcsRouterPortConfigTable.
+        When an entry is created in this table 'createAndGo' method
+        is used and the value of this object is set to 'active'.
+        Deactivation of an 'active' entry is not allowed.  When
+        an entry is deleted in this table 'destroy' method is used."
+    ::= { hh3cMcsRouterPortConfigEntry 4 }
+
+hh3cMcsPortConfigTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF Hh3cMcsPortConfigEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Table for configuring the fast leave status, group limit number,
+        group policy parameter and overflow replace status on a port in
+        the specified VLAN."
+    ::= { hh3cMulticastSnoopObject 8 }
+
+hh3cMcsPortConfigEntry OBJECT-TYPE
+    SYNTAX  Hh3cMcsPortConfigEntry
+    MAX-ACCESS not-accessible
+    STATUS current
+    DESCRIPTION
+        "Entry containing information about the fast leave status, group
+        limit number, group policy parameter and overflow replace status
+        of a port in the specified VLAN."
+    INDEX
+    {
+        hh3cMcsPortConfigIfIndex,
+        hh3cMcsPortConfigSnoopingType,
+        hh3cMcsPortConfigVlanID
+    }
+    ::= { hh3cMcsPortConfigTable 1 }
+
+Hh3cMcsPortConfigEntry ::=
+    SEQUENCE
+    {
+        hh3cMcsPortConfigIfIndex               InterfaceIndex,
+        hh3cMcsPortConfigSnoopingType          InetAddressType,
+        hh3cMcsPortConfigVlanID                Unsigned32,
+        hh3cMcsPortConfigGroupLimitNumber      Unsigned32,
+        hh3cMcsPortConfigFastLeaveStatus       TruthValue,
+        hh3cMcsPortConfigGroupPolicyParameter  Unsigned32,
+        hh3cMcsPortConfigOverflowReplace       TruthValue,
+        hh3cMcsPortConfigRowStatus             RowStatus
+    }
+
+hh3cMcsPortConfigIfIndex OBJECT-TYPE
+    SYNTAX     InterfaceIndex
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "Port for which this entry contains information."
+    ::= { hh3cMcsPortConfigEntry 1 }
+
+hh3cMcsPortConfigSnoopingType OBJECT-TYPE
+    SYNTAX     InetAddressType
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "Type of the configuration.  IPv4 means IGMP snooping configuration,
+        and IPv6 means MLD snooping configuration."
+    ::= { hh3cMcsPortConfigEntry 2 }
+
+hh3cMcsPortConfigVlanID OBJECT-TYPE
+    SYNTAX     Unsigned32(1..4094)
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "VLAN ID."
+    ::= { hh3cMcsPortConfigEntry 3 }
+
+hh3cMcsPortConfigGroupLimitNumber OBJECT-TYPE
+    SYNTAX  Unsigned32
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Group limit number of the port."
+    ::= { hh3cMcsPortConfigEntry 4 }
+
+hh3cMcsPortConfigFastLeaveStatus OBJECT-TYPE
+    SYNTAX  TruthValue
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "Fast leave status of the port."
+    DEFVAL  { false }
+    ::= { hh3cMcsPortConfigEntry 5 }
+
+hh3cMcsPortConfigGroupPolicyParameter OBJECT-TYPE
+    SYNTAX  Unsigned32(0|2000..3999)
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "ACL number which is used as the group policy parameter of the port."
+    DEFVAL  { 0 }
+    ::= { hh3cMcsPortConfigEntry 6 }
+
+hh3cMcsPortConfigOverflowReplace OBJECT-TYPE
+    SYNTAX  TruthValue
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "This object is related to the object hh3cMcsPortConfigGroupLimitNumber.
+        If the current group number is less than the value of
+        hh3cMcsPortConfigGroupLimitNumber, any new group is permitted.
+        If the current group number equals to the value of
+        hh3cMcsPortConfigGroupLimitNumber and the value of this object is enabled,
+        the group with the minimum multicast address will be replaced by the new
+        group.
+        If the current group number equals to the value of
+        hh3cMcsPortConfigGroupLimitNumber and the value of this object is disabled,
+        none of new group will be permitted."
+    DEFVAL  { false }
+    ::= { hh3cMcsPortConfigEntry 7 }
+
+hh3cMcsPortConfigRowStatus OBJECT-TYPE
+    SYNTAX  RowStatus
+    MAX-ACCESS read-create
+    STATUS current
+    DESCRIPTION
+        "The object is responsible for managing the creation and deletion
+        of rows, which supports 'active', 'createAndGo' and 'destroy'."
+    ::= { hh3cMcsPortConfigEntry 8 }
+
+END

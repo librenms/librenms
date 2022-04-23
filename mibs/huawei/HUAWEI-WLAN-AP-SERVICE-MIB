@@ -1,8 +1,8 @@
 -- ============================================================================
--- Copyright (C) 2016 by  HUAWEI TECHNOLOGIES. All rights reserved.
+-- Copyright (C) 2020 by  HUAWEI TECHNOLOGIES. All rights reserved.
 -- Description:  The mib is used for configuring the information of the SERVICE.
 -- Reference: 
--- Version: V1.16
+-- Version: V1.32
 -- ============================================================================
 -- Module definition
 
@@ -20,7 +20,7 @@
 				FROM SNMPv2-TC;
 		--1.3.6.1.4.1.2011.6.139.19
 		hwWlanService MODULE-IDENTITY
-			LAST-UPDATED "201607291458Z"		-- July 29, 2016 at 14:58 GMT
+			LAST-UPDATED "202003102043Z"		-- Mar 10, 2020 at 20:43 GMT
 			ORGANIZATION
 				"Huawei Technologies Co.,Ltd."
 			CONTACT-INFO
@@ -31,6 +31,62 @@
 				   Website: http://www.huawei.com
 				   Email: support@huawei.com
 				  "
+			DESCRIPTION 
+				"V1.32, add the nodes of hwWlanAeroscoutLocationViaAcTrap and hwWlanAeroscoutLocationViaAcRestoreTrap"
+			REVISION "202003102043Z"		-- Mar 10, 2020 at 20:43 GMT
+			DESCRIPTION 
+				"V1.31, add the nodes of hwWlanApIotCardServerName"
+			REVISION "201909271622Z"		-- Sept 27, 2019 at 16:23 GMT
+			
+			DESCRIPTION 
+				"V1.30, add the nodes of hwWlanApIotCardIPv4Address, hwWlanApIotCardIPv6Address, hwWlanApIotCardMAC, 
+				hwWlanApIotCardCentralFreq, hwWlanApIotCardBandwidth and hwWlanApIotCardConnectServerStatus"
+			REVISION "201907191843Z"		-- July 19, 2019 at 18:43 GMT
+			
+			DESCRIPTION 
+				"V1.29, add the nodes of hwWlanApIotCardAntennaStatus"
+			REVISION "201905061100Z"		-- May 06, 2019 at 11:00 GMT
+
+			DESCRIPTION 
+				"V1.28, modify the nodes of hwWlanRadioCalibrationSwitchRecordNewSecChannel and hwWlanRadioCalibrationSwitchRecordOldSecChannel"
+			REVISION "201904171634Z"		-- April 17, 2019 at 16:34 GMT
+			DESCRIPTION 
+				"V1.27, add the node of hwWlanMeshLinkTx and hwWlanMeshLinkRx"
+			REVISION "201902281440Z"		-- Feb 28, 2019 at 14:40 GMT
+			
+			DESCRIPTION 
+				"V1.26, delete the node of hwWlanApIotCardAdminOper."
+			REVISION "201901151700Z"		-- Jan 15, 2019 at 17:00 GMT
+			DESCRIPTION 
+				"V1.25, modify the value of hwWlanBLESiteType."
+			REVISION "201901101712Z"		-- Jan 10, 2019 at 17:12 GMT
+                                                          DESCRIPTION
+				"V1.24, modify the value of hwWlanApIotBaudRate."
+                                                          REVISION "201810261622Z"		-- Oct 26, 2018 at 16:23 GMT
+			DESCRIPTION 
+				"V1.23, Add nodes of hwWlanMeshLinkProfileServiceIdx and hwWlanMeshLinkMeshId."
+			REVISION "201806212012Z"		-- June 21, 2018 at 20:12 GMT
+			DESCRIPTION 
+				"V1.22, Add nodes of hwWlanBLESiteBroadCastCount,hwWlanApIotBaudRate,hwWlanApIotFrameVersion
+				hwWlanApIotCardRecvPackets,hwWlanApIotCardSendPackets,hwWlanApIotCardRecvBytes
+				hwWlanApIotCardSendBytes,hwWlanApIotCardAdminOper."
+			REVISION "201805091607Z"		-- May 9, 2018 at 16:07 GMT
+			DESCRIPTION 
+				"V1.20, Add nodes of hwWlanApIotCardConnectType and hwWlanApIotCardConnectStatus."
+			REVISION "201712261607Z"		-- Dec 26, 2017 at 16:07 GMT
+			DESCRIPTION 
+				"V1.20, Add nodes of hwWlanWdsLinkChainSnr and hwWlanMeshLinkChainSnr."
+			REVISION "201712141621Z"		-- Dec, 2017 at 16:21 GMT
+			DESCRIPTION
+				"V1.19, Add nodes of hwWlanBLESiteHostAPID and hwWlanBLESiteHostAPName."
+			REVISION "201711071640Z"		-- Nov, 2017 at 16:40 GMT
+				
+			DESCRIPTION 
+				"V1.18, Add nodes of synchronize-configuration's trap."
+			REVISION "201703271420Z"		-- Mar 27, 2017 at 14:20 GMT
+			DESCRIPTION 
+				"V1.17, Add nodes of hwWlanMeshVapAuthType."
+			REVISION "201702200920Z"		-- Feb 20, 2017 at 9:20 GMT
 			DESCRIPTION 
 				"V1.16, Add nodes of hwWlanBLESiteAgingTimeout."
 			REVISION "201607291458Z"		-- July 29, 2016 at 14:58 GMT 
@@ -43,7 +99,7 @@
 		        DESCRIPTION 
 				"V1.13, Add nodes of hwWlanApIotCardApName."
 			REVISION "201606011653Z"		-- June 1, 2016 at 16:53 GMT                                                                
-                                                                DESCRIPTION
+                        DESCRIPTION
 				"V1.12, Add hwWlanWdsLinkSecondChannel and hwWlanMeshLinkSecondChannel."
 			REVISION "201605271453Z"		-- May 27, 2016 at 14:53 GMT
 			
@@ -238,7 +294,9 @@
 				hwWlanWdsLinkPeerApId
 					Unsigned32,
 				hwWlanWdsLinkSecondChannel
-					Integer32
+					Integer32,
+				hwWlanWdsLinkChainSnr
+					OCTET STRING
 			 }
 
 		 --1.3.6.1.4.1.2011.6.139.19.1.1.2.1.1
@@ -499,6 +557,15 @@
 				"This object indicates the second channel ID."
 			::= { hwWlanWdsLinkEntry 25 }
 
+		-- 1.3.6.1.4.1.2011.6.139.19.1.1.2.1.26
+		hwWlanWdsLinkChainSnr OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the wds link snr value. The string format is %s/%s/%s/%s."
+			::= { hwWlanWdsLinkEntry 26 }
+			
 		-- 1.3.6.1.4.1.2011.6.139.19.1.2
 		hwWlanMesh OBJECT IDENTIFIER ::= { hwWlanServiceObjects 2 }
 
@@ -531,7 +598,9 @@
 				hwWlanMeshVapMeshProfileName
 					OCTET STRING,
 				hwWlanMeshVapBssid
-					MacAddress 
+					MacAddress,
+				hwWlanMeshVapAuthType
+					INTEGER 
 			 }
 
 		 --1.3.6.1.4.1.2011.6.139.19.1.2.1.1.1
@@ -569,6 +638,19 @@
 			DESCRIPTION 
 				"This object indicates the BSS ID."
 			::= { hwWlanMeshVapInfoEntry 4 }
+
+		 --1.3.6.1.4.1.2011.6.139.19.1.2.1.1.5
+		hwWlanMeshVapAuthType OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				wepOpenSystem(1),
+				wpa2PreShareKey(14)
+				}
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the authentication method."
+			::= { hwWlanMeshVapInfoEntry 5 }
 
 		--1.3.6.1.4.1.2011.6.139.19.1.2.2
 		hwWlanMeshLinkTable OBJECT-TYPE
@@ -631,7 +713,17 @@
 				hwWlanMeshLinkPeerApId
 					Unsigned32,
 				hwWlanMeshLinkSecondChannel
-					Integer32
+					Integer32,
+				hwWlanMeshLinkChainSnr
+					OCTET STRING,
+				hwWlanMeshLinkProfileServiceIdx
+					Integer32,
+				hwWlanMeshLinkMeshId
+					OCTET STRING,
+				hwWlanMeshLinkTx
+					Unsigned32,
+				hwWlanMeshLinkRx
+					Unsigned32
 			 }
 
 		 --1.3.6.1.4.1.2011.6.139.19.1.2.2.1.1
@@ -838,6 +930,54 @@
 				"This object indicates the second channel ID."
 			::= { hwWlanMeshLinkEntry 20 }
 
+		-- 1.3.6.1.4.1.2011.6.139.19.1.2.2.1.21
+		hwWlanMeshLinkChainSnr OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the mesh link snr value. The string format is %s/%s/%s/%s."
+			::= { hwWlanMeshLinkEntry 21 }			
+			
+		-- 1.3.6.1.4.1.2011.6.139.19.1.2.2.1.22
+		hwWlanMeshLinkProfileServiceIdx OBJECT-TYPE
+			SYNTAX Integer32(0..1)
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the mesh link profile service index."
+			::= { hwWlanMeshLinkEntry 22 }	
+			
+		-- 1.3.6.1.4.1.2011.6.139.19.1.2.2.1.23
+		hwWlanMeshLinkMeshId OBJECT-TYPE
+			SYNTAX OCTET STRING(SIZE (1..32))
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the mesh ID"
+			::= { hwWlanMeshLinkEntry 23 }
+
+		
+		-- 1.3.6.1.4.1.2011.6.139.19.1.2.2.1.24
+		hwWlanMeshLinkTx OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the transmission rate of the mesh link"
+			::= { hwWlanMeshLinkEntry 24 }
+
+		
+		-- 1.3.6.1.4.1.2011.6.139.19.1.2.2.1.25
+		hwWlanMeshLinkRx OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the receiving rate of the mesh link"
+			::= { hwWlanMeshLinkEntry 25 }
+
+		
 		-- 1.3.6.1.4.1.2011.6.139.19.1.3
 		hwWlanCalibrateInfo OBJECT IDENTIFIER ::= { hwWlanServiceObjects 3 }
 
@@ -1303,7 +1443,7 @@
 			MAX-ACCESS read-only
 			STATUS current
 			DESCRIPTION 
-				"This object indicates the second channel before calibration."
+				"This object indicates the second channel after calibration."
 			::= { hwWlanRadioCalibrationSwitchRecordEntry 16 }
 			
 		--1.3.6.1.4.1.2011.6.139.19.1.3.4.1.17
@@ -1312,7 +1452,7 @@
 			MAX-ACCESS read-only
 			STATUS current
 			DESCRIPTION 
-				"This object indicates the second channel after calibration."
+				"This object indicates the second channel before calibration."
 			::= { hwWlanRadioCalibrationSwitchRecordEntry 17 }
 			
 		--1.3.6.1.4.1.2011.6.139.19.1.4
@@ -1810,7 +1950,17 @@
 				hwWlanBLESiteAdvData
 					OCTET STRING,
 				hwWlanBLESiteAgingTimeout
-					Unsigned32
+					Unsigned32,
+				hwWlanBLESiteDetachedFlag
+					INTEGER,
+				hwWlanBLESiteType
+					INTEGER,
+				hwWlanBLESiteHostAPID
+					Integer32,
+				hwWlanBLESiteHostAPName
+					OCTET STRING,
+				hwWlanBLESiteBroadCastCount
+				      	Integer32
 			 }
 
 		-- 1.3.6.1.4.1.2011.6.139.19.1.6.1.1.1
@@ -1860,7 +2010,61 @@
 			DESCRIPTION
 				"Description."
 			::= { hwWlanBLESiteInfoEntry 5 }
+			
+		-- 1.3.6.1.4.1.2011.6.139.19.1.6.1.1.6
+		hwWlanBLESiteDetachedFlag OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				notDetached(1),
+				detached(2)
+				}
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates whether or not the ble is detached."
+			::= { hwWlanBLESiteInfoEntry 6 }			
 		
+		-- 1.3.6.1.4.1.2011.6.139.19.1.6.1.1.7
+		hwWlanBLESiteType OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				ibeacon(1),
+				assertTag(2),
+				sensorTag(3)
+				}
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { hwWlanBLESiteInfoEntry 7 }
+		
+		-- 1.3.6.1.4.1.2011.6.139.19.1.6.1.1.8
+		hwWlanBLESiteHostAPID OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { hwWlanBLESiteInfoEntry 8 }
+		
+		-- 1.3.6.1.4.1.2011.6.139.19.1.6.1.1.9
+		hwWlanBLESiteHostAPName OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { hwWlanBLESiteInfoEntry 9 }
+			
+		-- 1.3.6.1.4.1.2011.6.139.19.1.6.1.1.10
+		hwWlanBLESiteBroadCastCount OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { hwWlanBLESiteInfoEntry 10 }
+			
 		-- 1.3.6.1.4.1.2011.6.139.19.1.7
 		hwWlanApIotCardInfo OBJECT IDENTIFIER ::= { hwWlanServiceObjects 7 }
 
@@ -1913,6 +2117,38 @@
 				hwWlanApIotCardFirmwareVer
 					OCTET STRING,
 				hwWlanApIotCardSN
+					OCTET STRING,
+				hwWlanApIotCardConnectType
+					INTEGER,
+				hwWlanApIotCardConnectStatus
+					INTEGER,
+				hwWlanApIotBaudRate
+					INTEGER,
+				hwWlanApIotFrameVersion
+					OCTET STRING,
+				hwWlanApIotCardRecvPackets
+					Counter64,
+				hwWlanApIotCardSendPackets
+					Counter64,
+				hwWlanApIotCardRecvBytes
+					Counter64,
+				hwWlanApIotCardSendBytes
+					Counter64,
+				hwWlanApIotCardAntennaStatus
+					INTEGER,
+				hwWlanApIotCardIPv4Address
+					IpAddress,
+				hwWlanApIotCardIPv6Address
+					OCTET STRING,
+				hwWlanApIotCardMAC
+					MacAddress,
+				hwWlanApIotCardCentralFreq
+					Integer32,
+				hwWlanApIotCardBandwidth
+					Integer32,
+				hwWlanApIotCardConnectServerStatus
+					INTEGER,
+				hwWlanApIotCardServerName
 					OCTET STRING
 			 }
 
@@ -2041,7 +2277,175 @@
 			DESCRIPTION
 				"Description."
 			::= { hwWlanApIotCardEntry 13 }
+			
+		-- 1.3.6.1.4.1.2011.6.139.19.1.7.1.1.14
+		hwWlanApIotCardConnectType OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				serial(1),
+				ethernet(2),
+				ethernetup(3),
+				ethernetdown(4),
+				unknown(5)
+				}
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the connect type of card. For the card of ethernet, when the status is mismatch, up or down do not show."
+			::= { hwWlanApIotCardEntry 14 }
 		
+		-- 1.3.6.1.4.1.2011.6.139.19.1.7.1.1.15
+		hwWlanApIotCardConnectStatus OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				match(1),
+				mismatch(2)
+				}
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { hwWlanApIotCardEntry 15 }
+		-- 1.3.6.1.4.1.2011.6.139.19.1.7.1.1.16
+		hwWlanApIotBaudRate OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				baud115200(1),
+				baud9600(2),
+				unknown(3),
+                                                                             baud921600(4)
+				}
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { hwWlanApIotCardEntry 16 }
+		-- 1.3.6.1.4.1.2011.6.139.19.1.7.1.1.17
+		hwWlanApIotFrameVersion OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE (0..10))
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { hwWlanApIotCardEntry 17 }			
+		-- 1.3.6.1.4.1.2011.6.139.19.1.7.1.1.18
+		hwWlanApIotCardRecvPackets OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the total number of frames received on iot card, which is extended to 64 bits."
+			::= { hwWlanApIotCardEntry 18  }
+
+		-- 1.3.6.1.4.1.2011.6.139.19.1.7.1.1.19
+		hwWlanApIotCardSendPackets OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the total number of frames send on iot card, which is extended to 64 bits."
+			::= { hwWlanApIotCardEntry 19  }
+			
+		-- 1.3.6.1.4.1.2011.6.139.19.1.7.1.1.20
+		hwWlanApIotCardRecvBytes OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the total number of bytes received on iot card, which is extended to 64 bits."
+			::= { hwWlanApIotCardEntry 20  }
+
+		-- 1.3.6.1.4.1.2011.6.139.19.1.7.1.1.21
+		hwWlanApIotCardSendBytes OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the total number of bytes send on iot card, which is extended to 64 bits."
+			::= { hwWlanApIotCardEntry 21  }		
+			
+		-- 1.3.6.1.4.1.2011.6.139.19.1.7.1.1.22
+		hwWlanApIotCardAntennaStatus OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				external(1),
+				internal(2),
+				invalid(3)
+				}
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the antenna status of the iot card."
+			::= { hwWlanApIotCardEntry 22 }	
+		
+		-- 1.3.6.1.4.1.2011.6.139.19.1.7.1.1.23
+		hwWlanApIotCardIPv4Address OBJECT-TYPE
+			SYNTAX IpAddress
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the IOT card IPv4 address."
+			::= { hwWlanApIotCardEntry 23 }
+		
+		-- 1.3.6.1.4.1.2011.6.139.19.1.7.1.1.24
+		hwWlanApIotCardIPv6Address OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the IOT card IPv6 address."
+			::= { hwWlanApIotCardEntry 24 }
+		
+		-- 1.3.6.1.4.1.2011.6.139.19.1.7.1.1.25
+		hwWlanApIotCardMAC OBJECT-TYPE
+			SYNTAX MacAddress
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the IOT card MAC address."
+			::= { hwWlanApIotCardEntry 25 }
+		
+		-- 1.3.6.1.4.1.2011.6.139.19.1.7.1.1.26
+		hwWlanApIotCardCentralFreq OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the IOT card central frequency."
+			::= { hwWlanApIotCardEntry 26 }
+		
+		-- 1.3.6.1.4.1.2011.6.139.19.1.7.1.1.27
+		hwWlanApIotCardBandwidth OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the IOT card bandwidth."
+			::= { hwWlanApIotCardEntry 27 }
+		
+		-- 1.3.6.1.4.1.2011.6.139.19.1.7.1.1.28
+		hwWlanApIotCardConnectServerStatus OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				connected(1),
+				disconnected(2),
+				unknown(3)
+				}
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the IOT card connect server status."
+			::= { hwWlanApIotCardEntry 28 }
+			
+		-- 1.3.6.1.4.1.2011.6.139.19.1.7.1.1.29
+		hwWlanApIotCardServerName OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE (0..32))
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the IOT card server name."
+		::= { hwWlanApIotCardEntry 29 } 
+
 -- 1.3.6.1.4.1.2011.6.139.19.2
 		-- 1.3.6.1.4.1.2011.6.139.19.2
 		hwWlanServiceConformance OBJECT IDENTIFIER ::= { hwWlanService 2 }
@@ -2068,7 +2472,7 @@
 				hwWlanWdsLinkPeerApMac, hwWlanWdsLinkPeerApName, hwWlanWdsLinkWdsProfileName, hwWlanMacWdsLinkWdsMode, hwWlanWdsLinkWdsType, 
 				hwWlanWdsLinkStpMode, hwWlanWdsLinkInstanceIdList, hwWlanWdsLinkInstanceStateList, hwWlanWdsLinkCoverageDistance, hwWlanWdsLinkChannel, 
 				hwWlanWdsLinkMaxRssi, hwWlanWdsLinkRssi, hwWlanWdsLinkSnr, hwWlanWdsLinkPER, hwWlanWdsLinkResendRatio, hwWlanWdsLinkPeerAPStatus, 
-				hwWlanWdsLinkApId, hwWlanWdsLinkPeerApId, hwWlanWdsLinkSecondChannel }
+				hwWlanWdsLinkApId, hwWlanWdsLinkPeerApId, hwWlanWdsLinkSecondChannel, hwWlanWdsLinkChainSnr }
 			STATUS current
 			DESCRIPTION 
 				"Description."
@@ -2080,7 +2484,8 @@
 				hwWlanMeshLinkApName, hwWlanMeshLinkApGroup, hwWlanMeshLinkMeshRole, 
 				hwWlanMeshLinkWlanID, hwWlanMeshLinkPeerApMac, hwWlanMeshLinkPeerApName, hwWlanMeshLinkChannelID, hwWlanMeshLinkCoverageDistance, 
 				hwWlanMeshLinkRssiValue, hwWlanMeshLinkMaxRssi, hwWlanMeshLinkSnr, hwWlanMeshLinkPER, hwWlanMeshLinkResendRatio, hwWlanMeshLinkPeerAPStatus, 
-				hwWlanMeshLinkApId, hwWlanMeshLinkPeerApId, hwWlanMeshLinkSecondChannel }
+				hwWlanMeshLinkApId, hwWlanMeshLinkPeerApId, hwWlanMeshLinkSecondChannel,  hwWlanMeshLinkChainSnr,hwWlanMeshLinkProfileServiceIdx,
+				hwWlanMeshLinkMeshId}
 			STATUS current
 			DESCRIPTION 
 				"Description."
@@ -2133,15 +2538,91 @@
 		-- 1.3.6.1.4.1.2011.6.139.19.2.2.7
 		hwWlanApIotCardInfoGroup OBJECT-GROUP
 			OBJECTS { hwWlanApIotCardState, hwWlanApIotCardApName, hwWlanApIotCardSupportInfo, hwWlanApIotCardProtocolVer, hwWlanApIotCardWirelessStard, hwWlanApIotCardFreq,
-				hwWlanApIotCardVendorName, hwWlanApIotCardCardType, hwWlanApIotCardHardwareVer, hwWlanApIotCardFirmwareVer, hwWlanApIotCardSN }
+				hwWlanApIotCardVendorName, hwWlanApIotCardCardType, hwWlanApIotCardHardwareVer, hwWlanApIotCardFirmwareVer, hwWlanApIotCardSN, hwWlanApIotCardConnectType,
+				hwWlanApIotCardConnectStatus, hwWlanApIotBaudRate,hwWlanApIotFrameVersion,hwWlanApIotCardRecvPackets, hwWlanApIotCardSendPackets, hwWlanApIotCardRecvBytes, hwWlanApIotCardSendBytes, hwWlanApIotCardAntennaStatus,
+				hwWlanApIotCardServerName}
 			STATUS current
 			DESCRIPTION 
 				"Description."
 			::= { hwWlanServiceObjectGroups 7 }
 
+		-- 1.3.6.1.4.1.2011.6.139.19.3
+		hwWlanServiceTrapInfo OBJECT IDENTIFIER ::= { hwWlanService 3 }			
 		
-	
+		-- 1.3.6.1.4.1.2011.6.139.19.3.1
+		hwWlanServiceTrap OBJECT IDENTIFIER ::= { hwWlanServiceTrapInfo 1 }
+		
+		-- 1.3.6.1.4.1.2011.6.139.19.3.1.1
+		hwAcConfigInconsistTrap NOTIFICATION-TYPE
+			OBJECTS { hwWlanRemoteAcIP, hwAcConfigInconsisitReason}
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwWlanServiceTrap 1 }
+			
+		-- 1.3.6.1.4.1.2011.6.139.19.3.1.2
+		hwAcConfigInconsistRestoreTrap NOTIFICATION-TYPE
+			OBJECTS {hwWlanRemoteAcIP}
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwWlanServiceTrap 2 }	
+		
+		-- 1.3.6.1.4.1.2011.6.139.19.3.1.3
+		hwWlanAeroscoutLocationViaAcTrap NOTIFICATION-TYPE
+			OBJECTS { hwWlanAeroscoutExceptionReason }
+			STATUS current
+			DESCRIPTION 
+				"The aeroscout location(via AC) configuration is not ready."
+			::= { hwWlanServiceTrap 3 }	
+		-- 1.3.6.1.4.1.2011.6.139.19.3.1.4
+		hwWlanAeroscoutLocationViaAcRestoreTrap NOTIFICATION-TYPE
+			OBJECTS {hwWlanAeroscoutExceptionReason}
+			STATUS current
+			DESCRIPTION 
+				"The aeroscout location(via AC) configuration is ready or canceled."
+			::= { hwWlanServiceTrap 4 }	
+		-- 1.3.6.1.4.1.2011.6.139.19.3.2
+		hwWlanServiceTrapObjects OBJECT IDENTIFIER ::= { hwWlanServiceTrapInfo 2 }
+		
+		-- 1.3.6.1.4.1.2011.6.139.19.3.2.1
+		hwWlanRemoteAcIP OBJECT-TYPE
+			SYNTAX IpAddress
+			MAX-ACCESS accessible-for-notify
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { hwWlanServiceTrapObjects 1 }
+			
+		-- 1.3.6.1.4.1.2011.6.139.19.3.2.2
+		hwAcConfigInconsisitReason OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS accessible-for-notify
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { hwWlanServiceTrapObjects 2 }
+		-- 1.3.6.1.4.1.2011.6.139.19.3.2.3
+		hwWlanAeroscoutExceptionReason OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS accessible-for-notify
+			STATUS current
+			DESCRIPTION
+				"The reason for aeroscout location exception."
+			::= { hwWlanServiceTrapObjects 3 }
 	END
 --
 -- HUAWEI-WLAN-SERVICE-MIB.mib
 --
+
+
+
+
+
+
+
+
+
+
+
+

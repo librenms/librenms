@@ -1,0 +1,2776 @@
+-- MIB for Dantherm Cooling Controllers
+DANTHERM-COOLING-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+        OBJECT-TYPE
+                FROM RFC-1212
+        enterprises
+                FROM RFC1155-SMI;
+  
+--
+-- Product and Data group Definitions
+danthermCooling            OBJECT IDENTIFIER ::= { enterprises 46651 }
+
+--
+-- Product CC3000 Controller  Definitions
+
+controllerCC3000           OBJECT IDENTIFIER ::= { danthermCooling 1 }
+systemStatus               OBJECT IDENTIFIER ::= { controllerCC3000 1 }
+highlevelControl           OBJECT IDENTIFIER ::= { controllerCC3000 2 }
+fan1Config                 OBJECT IDENTIFIER ::= { controllerCC3000 3 }
+fan2Config                 OBJECT IDENTIFIER ::= { controllerCC3000 4 }
+damper1Config              OBJECT IDENTIFIER ::= { controllerCC3000 5 }
+damper2Config              OBJECT IDENTIFIER ::= { controllerCC3000 6 }
+aircon1Config              OBJECT IDENTIFIER ::= { controllerCC3000 7 }
+aircon2Config              OBJECT IDENTIFIER ::= { controllerCC3000 8 }
+heaterConfig               OBJECT IDENTIFIER ::= { controllerCC3000 9 }
+humidityConfig             OBJECT IDENTIFIER ::= { controllerCC3000 10 }
+systemConfig               OBJECT IDENTIFIER ::= { controllerCC3000 11 }
+alarmConfig                OBJECT IDENTIFIER ::= { controllerCC3000 12 }
+nightModeConfig            OBJECT IDENTIFIER ::= { controllerCC3000 13 }
+networkConfig              OBJECT IDENTIFIER ::= { controllerCC3000 14 }
+trapError                  OBJECT IDENTIFIER ::= { controllerCC3000 15 }
+
+-- Product CCxx Controller  Definitions
+--controllerCCxx           OBJECT IDENTIFIER ::= { danthermCooling x }
+
+--
+-- Controller-CC3000 : systemStatus
+	onBoardTempr    OBJECT-TYPE
+		SYNTAX	INTEGER(-41..101)
+		ACCESS	read-only
+		STATUS	mandatory
+		DESCRIPTION	"Controller On-Board temperature in Degree Celcius "
+		::= { systemStatus 1 }
+
+	roomTempr OBJECT-TYPE
+		SYNTAX	INTEGER(-41..101)
+		ACCESS	read-only
+		STATUS	mandatory
+		DESCRIPTION
+			"Room Sensor or Zone 1 Sensor temperature in Degree Celcius"
+		::= { systemStatus 2 }
+		
+	hotSpotTempr OBJECT-TYPE
+		SYNTAX	INTEGER(-41..101)
+		ACCESS	read-only
+		STATUS	mandatory
+		DESCRIPTION
+			"Hot Spot Sensor or Zone 2 Sensor temperature in Degree Celcius"
+		::= { systemStatus 3 }
+		
+	outdoor1Tempr OBJECT-TYPE
+		SYNTAX	INTEGER(-41..101)
+		ACCESS	read-only
+		STATUS	mandatory
+		DESCRIPTION
+			"Ambient Sensor 1 or Zone 1 Ambient Sensor. temperature in Degree Celcius"
+		::= { systemStatus 4 }
+		
+	outdoor2Tempr OBJECT-TYPE
+		SYNTAX	INTEGER(-41..101)
+		ACCESS	read-only
+		STATUS	mandatory
+		DESCRIPTION
+			"Ambient Sensor 2 or Zone 2 Ambient Sensor. temperature in Degree Celcius"
+		::= { systemStatus 5 }
+
+	shelterTempr OBJECT-TYPE
+		SYNTAX	INTEGER(-41..101)
+		ACCESS	read-only
+		STATUS	mandatory
+		DESCRIPTION
+			"Shelter Temperature. Valid for Single-Zone solution"
+		::= { systemStatus 6 }
+
+	outdoorCombinedTempr OBJECT-TYPE
+		SYNTAX	INTEGER(-41..101)
+		ACCESS	read-only
+		STATUS	mandatory
+		DESCRIPTION
+			"Cobined minimum Outdoor Temeperature. Valid for Single-Zone solution"
+		::= { systemStatus 7 }
+
+	fan1RPM OBJECT-TYPE
+		SYNTAX	INTEGER(0..10000)
+		ACCESS	read-only
+		STATUS	mandatory
+		DESCRIPTION
+			"Fan 1 Rotation Per Minute"
+		::= { systemStatus 8 }
+
+	fan2RPM OBJECT-TYPE
+		SYNTAX	INTEGER(0..10000)
+		ACCESS	read-only
+		STATUS	mandatory
+		DESCRIPTION
+			"Fan 2 Rotation Per Minute"
+		::= { systemStatus 9 }
+
+	fan1SpeedPercentage OBJECT-TYPE
+		SYNTAX	INTEGER(0..100)
+		ACCESS	read-only
+		STATUS	mandatory
+		DESCRIPTION
+			"Fan 1 Speed in Percentage of Maximum Speed. Also represents Duty-Cycle of FAn Signal "
+		::= { systemStatus 10 }
+
+	fan2SpeedPercentage OBJECT-TYPE
+		SYNTAX	INTEGER(0..100)
+		ACCESS	read-only
+		STATUS	mandatory
+		DESCRIPTION
+			"Fan 2 Speed in Percentage of Maximum Speed. Also represents Duty-Cycle of FAn Signal "
+		::= { systemStatus 11 }
+
+
+	damper1Position OBJECT-TYPE
+		SYNTAX	INTEGER(0..100)
+		ACCESS	read-only
+		STATUS	mandatory
+		DESCRIPTION
+			"Damper 1 Shutter Open Percentage. 0% - Damper Closed. 100% - Damper completely open"
+		::= { systemStatus 12 }
+
+	damper2Position OBJECT-TYPE
+		SYNTAX	INTEGER(0..100)
+		ACCESS	read-only
+		STATUS	mandatory
+		DESCRIPTION
+			"Damper 2 Shutter Open Percentage. 0% - Damper Closed. 100% - Damper completely open"
+		::= { systemStatus 13 }
+
+	humidity OBJECT-TYPE
+		SYNTAX	INTEGER(0..100)
+		ACCESS	read-only
+		STATUS	mandatory
+		DESCRIPTION
+			"Internal or external humidity in Rh%"
+		::= { systemStatus 14 }
+
+	dewpoint OBJECT-TYPE
+		SYNTAX	INTEGER(-41..101)
+		ACCESS	read-only
+		STATUS	mandatory
+		DESCRIPTION
+			"Internal or external DewPoint based on Humidity; in Degree Celcius"
+		::= { systemStatus 15 }
+
+	atmosphericPressure OBJECT-TYPE
+		SYNTAX	INTEGER(0..10000)
+		ACCESS	read-only
+		STATUS	mandatory
+		DESCRIPTION
+			"Atmospheric pressure or Pressure of installed enclosure in KiloPascal"
+		::= { systemStatus 16 }
+
+	flowPressure OBJECT-TYPE
+		SYNTAX	INTEGER(-1000..1000)
+		ACCESS	read-only
+		STATUS	mandatory
+		DESCRIPTION
+			"Filter flow Pressure in Pascal"
+		::= { systemStatus 17 }
+
+	fan1Status OBJECT-TYPE
+		SYNTAX	INTEGER(0..2)
+		ACCESS	read-only
+		STATUS	mandatory
+		DESCRIPTION
+			"Fan 1 operation status. 0 - Off; 1 - On -; 2 - Emergency/Boost  "
+		::= { systemStatus 18 }
+
+	fan2Status OBJECT-TYPE
+		SYNTAX	INTEGER(0..2)
+		ACCESS	read-only
+		STATUS	mandatory
+		DESCRIPTION
+			"Fan 2 operation status. 0 - Off; 1 - On -; 2 - Emergency/Boost  "
+		::= { systemStatus 19 }
+
+	damper1Status OBJECT-TYPE
+		SYNTAX	INTEGER(0..3)
+		ACCESS	read-only
+		STATUS	mandatory
+		DESCRIPTION
+			"Damper 1 operation status. 0 - Closed; 1 - Open;  2 - Dynamic or Temperature Compensation; 2 - Emergency/Boost  "
+		::= { systemStatus 20 }
+
+	damper2Status OBJECT-TYPE
+		SYNTAX	INTEGER(0..3)
+		ACCESS	read-only
+		STATUS	mandatory
+		DESCRIPTION
+			"Damper 2 Shutter Open Percentage. 0 - Closed; 1 - Open;  2 - Dynamic or Temperature Compensation; 2 - Emergency/Boost  "
+		::= { systemStatus 21 }
+
+	aircond1Status OBJECT-TYPE
+		SYNTAX	INTEGER(0..2)
+		ACCESS	read-only
+		STATUS	mandatory
+		DESCRIPTION
+			"Airconditioner 1 operation status. 0 - Off; 1 - Restart timeout;  2 - On "
+		::= { systemStatus 22 }
+
+	aircond2Status OBJECT-TYPE
+		SYNTAX	INTEGER(0..2)
+		ACCESS	read-only
+		STATUS	mandatory
+		DESCRIPTION
+			"Airconditioner 2 operation status. 0 - Off; 1 - Restart timeout;  2 - On "
+		::= { systemStatus 23 }
+
+	heaterStatus OBJECT-TYPE
+		SYNTAX	INTEGER(0..1)
+		ACCESS	read-only
+		STATUS	mandatory
+		DESCRIPTION
+			"heater operation status. 0 - Off; 1 - On "
+		::= { systemStatus 24 }
+
+	shelter1Status OBJECT-TYPE
+		SYNTAX	INTEGER(0..6)
+		ACCESS	read-only
+		STATUS	mandatory
+		DESCRIPTION
+			"Shelter Status in Single-Zone mode or Zone 1 Status in Dual-Zone mode respectively.
+				0 - Inactive or None State
+				1 - Heating State
+				2 - Re-Cycling State
+				3 - Free Cooling State
+				4 - Active or Aircon Coolign State
+				5 - Emergency State
+				6 - Intermediate state( strategy transistion) "
+		::= { systemStatus 25 }
+
+	shelter2Status OBJECT-TYPE
+		SYNTAX	INTEGER(0..6)
+		ACCESS	read-only
+		STATUS	mandatory
+		DESCRIPTION
+			"Shelter Status in Dual-Zone mode or Zone 2 Status. 
+				0 - Inactive or None State
+				1 - Heating State
+				2 - Re-Cycling State
+				3 - Free Cooling State
+				4 - Active or Aircon Coolign State
+				5 - Emergency State
+				6 - Intermediate state( strategy transistion) "
+		::= { systemStatus 26 }
+
+	shelter1Mode OBJECT-TYPE
+		SYNTAX	INTEGER(0..3)
+		ACCESS	read-only
+		STATUS	mandatory
+		DESCRIPTION
+			"Shelter Run time mode in Single-Zone mode or Zone 1 Status in Dual-Zone mode respectively.
+				0 - Free Cooling Mode
+				1 - Standard Mode
+				2 - Power Save Mode
+				3 - Air conditioner Mode "
+		::= { systemStatus 27 }
+
+	shelter2Mode OBJECT-TYPE
+		SYNTAX	INTEGER(0..3)
+		ACCESS	read-only
+		STATUS	mandatory
+		DESCRIPTION
+			"Shelter Run time mode in Dual-Zone mode or Zone 2 Status. 
+				0 - Free Cooling Mode
+				1 - Standard Mode
+				2 - Power Save Mode
+				3 - Air conditioner Mode "
+		::= { systemStatus 28 }
+
+	shelter1Setpoint OBJECT-TYPE
+		SYNTAX	INTEGER(-41..80)
+		ACCESS	read-only
+		STATUS	mandatory
+		DESCRIPTION
+			"Shelter run time Cooling Set point in Single-Zone mode or Zone 1 Status in Dual-Zone mode respectively.
+				Cooling setpoint can be offset by following functions
+				RH function 
+				Night mode
+				Digital inputs "
+		::= { systemStatus 29 }
+
+	shelter2Setpoint OBJECT-TYPE
+		SYNTAX	INTEGER(-41..80)
+		ACCESS	read-only
+		STATUS	mandatory
+		DESCRIPTION
+			"Shelter run time Cooling Set point in Dual-Zone mode or Zone 2 Status.
+				Cooling setpoint can be offset by following functions
+				RH function 
+				Night mode
+				Digital inputs "
+		::= { systemStatus 30 }
+
+	errorStatus OBJECT-TYPE
+		SYNTAX	INTEGER(0..33554432)
+		ACCESS	read-only
+		STATUS	mandatory
+		DESCRIPTION
+			" controller internal error status. Binary
+                             bit position - alarm drive state: 0 - inactive , 1 - active
+                             0 - voltage low
+                             1 - voltage high
+                             2 - tempr low     
+                             3 - tempr limit 1
+                             4 - tempr limit 2   
+                             5 - tempr limit 3   
+                             6 - humid. low
+                             7 - humid. high
+                             8 - fltr pressure 1
+                             9 - fltr pressure 2
+                             10 - fan 1
+                             11 - fan 2
+                             12 - onboard sens
+                             13 - room sens
+                             14 - hotspot sens
+                             15 - ambient 1 sens
+                             16 - ambient 2 sens
+                             17 - dig 1 i/p
+                             18 - dig 2 i/p
+                             19 - dig 3 i/p
+                             20 - filter i/p 1
+                             21 - filter i/p 2
+                             22 - network
+                             23 - int storage
+                             24 - sd card "
+		::= { systemStatus 31 }
+
+	maskedErrorStatus OBJECT-TYPE
+		SYNTAX	INTEGER(0..33554432)
+		ACCESS	read-only
+		STATUS	mandatory
+		DESCRIPTION
+			" Controller Output Error status. Binary
+                             Bit Position - Alarm Drive State: 0 - Inactive , 1 - Active
+                             0 - Voltage Low
+                             1 - Voltage High
+                             2 - Tempr Low     
+                             3 - Tempr Limit 1
+                             4 - Tempr Limit 2   
+                             5 - Tempr Limit 3   
+                             6 - Humid. Low
+                             7 - Humid. High
+                             8 - Fltr Pressure 1
+                             9 - Fltr Pressure 2
+                             10 - Fan 1
+                             11 - Fan 2
+                             12 - Onboard Sens
+                             13 - Room Sens
+                             14 - Hotspot Sens
+                             15 - Ambient 1 Sens
+                             16 - Ambient 2 Sens
+                             17 - Dig 1 I/P
+                             18 - Dig 2 I/P
+                             19 - Dig 3 I/P
+                             20 - Filter I/P 1
+                             21 - Filter I/P 2
+                             22 - Network
+                             23 - Int storage
+                             24 - SD Card "
+		::= { systemStatus 32 }
+
+	voltage OBJECT-TYPE
+		SYNTAX	INTEGER(0..80)
+		ACCESS	read-only
+		STATUS	mandatory
+		DESCRIPTION
+			"System Voltage in DC. "
+		::= { systemStatus 33 }
+
+	digitalInputStatus OBJECT-TYPE
+		SYNTAX	INTEGER(0..16)
+		ACCESS	read-only
+		STATUS	mandatory
+		DESCRIPTION
+			" Controller Alarm Drive Status. Binary 
+                              Bit Position - Digital Input State: 0 - Inactive , 1 - Active
+                              0 - DIG 1 I/P
+                              1 - DIG 2 I/P
+                              2 - DIG 3 I/P 
+                              3 - FILTER GUARD DIGI 1 I/P 
+                              4 - FILTER GUARD DIGI 2 I/P  "
+		::= { systemStatus 34 }
+
+	alarmDriveStatus OBJECT-TYPE
+		SYNTAX	INTEGER(0..1024)
+		ACCESS	read-only
+		STATUS	mandatory
+		DESCRIPTION
+			" Controller Alarm Drive Status. Binary
+                             Bit Position - Alarm Drive State: 0 - Inactive , 1 - Active
+                             0 - ALARM 1
+                             1 - ALARM 2
+                             2 - ALARM 3
+                             3 - ALARM 4
+                             4 - ALARM 5
+                             5 - ALARM 6
+                             6 - ALARM 7
+                             7 - ALARM 8
+                             8 - ALARM 9
+                             9 - ALARM 10"
+		::= { systemStatus 35 }
+
+
+	fan1OpertdurHour OBJECT-TYPE
+		SYNTAX	INTEGER(0..65535)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION
+			"Fan 1 operation duration - Hour "
+		::= { systemStatus 36 }
+
+	fan1OpertdurMin OBJECT-TYPE
+		SYNTAX	INTEGER(0..59)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION
+			"Fan 1 operation duration - Minute "
+		::= { systemStatus 37 }
+
+	fan2OpertdurHour OBJECT-TYPE
+		SYNTAX	INTEGER(0..65535)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION
+			"Fan 2 operation duration - Hour "
+		::= { systemStatus 38 }
+
+	fan2OpertdurMin OBJECT-TYPE
+		SYNTAX	INTEGER(0..59)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION
+			"Fan 2 operation duration - Minute "
+		::= { systemStatus 39 }
+
+
+	aircon1OpertdurHour OBJECT-TYPE
+		SYNTAX	INTEGER(0..65535)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION
+			"Airconditioner 1 operation duration - Hour "
+		::= { systemStatus 40 }
+
+	aircon1OpertdurMin OBJECT-TYPE
+		SYNTAX	INTEGER(0..59)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION
+			"Airconditioner 1 operation duration - Minute "
+		::= { systemStatus 41 }
+
+	aircon2OpertdurHour OBJECT-TYPE
+		SYNTAX	INTEGER(0..65535)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION
+			"Airconditioner 2 operation duration - Hour "
+		::= { systemStatus 42 }
+
+	aircon2OpertdurMin OBJECT-TYPE
+		SYNTAX	INTEGER(0..59)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION
+			"Airconditioner 2 operation duration - Minute "
+		::= { systemStatus 43 }
+
+	heaterOpertdurHour OBJECT-TYPE
+		SYNTAX	INTEGER(0..65535)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION
+			"Heater operation duration - Hour "
+		::= { systemStatus 44 }
+
+	heaterOpertdurMin OBJECT-TYPE
+		SYNTAX	INTEGER(0..59)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION
+			"Heater operation duration - Minute "
+		::= { systemStatus 45 }
+
+
+	ccSN	OBJECT-TYPE
+		SYNTAX	OCTET STRING
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	"CC3000 Controller serial number "
+		::= { systemStatus 46 }
+
+
+	fanbox1SN	OBJECT-TYPE
+		SYNTAX	OCTET STRING
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	"Free cooling FanBox unit 1 serial number "
+		::= { systemStatus 47 }
+
+	fanbox2SN	OBJECT-TYPE
+		SYNTAX	OCTET STRING
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	"Free cooling FanBox unit 2 serial number "
+		::= { systemStatus 48 }
+
+	aircond1SN	OBJECT-TYPE
+		SYNTAX	OCTET STRING
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	"Aicodnitioner unit 1 serial number "
+		::= { systemStatus 49 }
+
+	aircond2SN	OBJECT-TYPE
+		SYNTAX	OCTET STRING
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	"Aicodnitioner unit 2 serial number "
+		::= { systemStatus 50 }
+
+	fwVersion OBJECT-TYPE
+		SYNTAX	OCTET STRING
+		ACCESS	read-only
+		STATUS	mandatory
+		DESCRIPTION	"CC3000 Firmware version "
+		::= { systemStatus 51 }
+
+
+--
+-- Controller-CC3000 : highlevelControl
+
+	coolSetpointZone1    OBJECT-TYPE
+		SYNTAX	INTEGER(-41..101)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	"Cooling Setpoint Zone/Shelter 1 "
+		::= { highlevelControl 1 }
+
+	coolSetpointZone2    OBJECT-TYPE
+		SYNTAX	INTEGER(-41..101)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	"Cooling Setpoint Zone/Shelter 2 "
+		::= { highlevelControl 2 }
+
+	heaterSetpoint	OBJECT-TYPE
+		SYNTAX	INTEGER(-41..101)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	"Heater Setpoint "
+		::= { highlevelControl 3 }
+
+	backupConfig	OBJECT-TYPE
+		SYNTAX	INTEGER(0..1)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	"Configuration Backup to Internal memory and SD card. 0 - No change, 1 - Backup "
+		::= { highlevelControl 4 }
+
+	restoreConfig	OBJECT-TYPE
+		SYNTAX	INTEGER(0..1)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	"Configuration restore from Internal memory. 0 - No change, 1 - Restore "
+		::= { highlevelControl 5 }
+
+	systemReset	OBJECT-TYPE
+		SYNTAX	INTEGER(0..1)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	"Colling System reset or restart. 0 - No change, 1 - Restart "
+		::= { highlevelControl 6 }
+
+
+	year	OBJECT-TYPE
+		SYNTAX	INTEGER(2015..2099)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	"Calender - Year "
+		::= { highlevelControl 7 }
+
+	month	OBJECT-TYPE
+		SYNTAX	INTEGER(1..12)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	"Calender - Month "
+		::= { highlevelControl 8 }
+
+	date	OBJECT-TYPE
+		SYNTAX	INTEGER(1..31)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	"Calender - Date "
+		::= { highlevelControl 9 }
+
+	hour	OBJECT-TYPE
+		SYNTAX	INTEGER(0..23)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	"Clock - Hour "
+		::= { highlevelControl 10 }
+
+	minute	OBJECT-TYPE
+		SYNTAX	INTEGER(0..59)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	"Clock - Minute "
+		::= { highlevelControl 11 }
+
+--
+-- Controller-CC3000 : fan1Config
+
+	saveReloadConff1    OBJECT-TYPE
+		SYNTAX	INTEGER(0..1)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	"0 - Discard modifications, 1 - Save Modifications. Configuration reloaded  "
+		::= { fan1Config 1 }
+
+	offTemprf1	OBJECT-TYPE
+		SYNTAX	INTEGER(-41..101)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	"Fan OFF temperature  "
+		::= { fan1Config 2 }
+
+	idleOnTemprf1	OBJECT-TYPE
+		SYNTAX	INTEGER(-41..101)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	"Fan Idle Speed On temperature  "
+		::= { fan1Config 3 }
+	idleEntryTemprf1	OBJECT-TYPE
+		SYNTAX	INTEGER(-41..101)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	"Idle entry temperature  "
+		::= { fan1Config 4 }
+
+	midPoint1Temprf1	OBJECT-TYPE
+		SYNTAX	INTEGER(-41..101)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	"Mid point 1 entry temperature  "
+		::= { fan1Config 5 }
+
+	setPointTemprf1	OBJECT-TYPE
+		SYNTAX	INTEGER(-41..101)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	"Set Point temperature  "
+		::= { fan1Config 6 }
+
+	midPoint2Temprf1	OBJECT-TYPE
+		SYNTAX	INTEGER(-41..101)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	"Mid point 2 entry temperature  "
+		::= { fan1Config 7 }
+
+	highSpeedTemprf1	OBJECT-TYPE
+		SYNTAX	INTEGER(-41..101)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	"high Speed  entry temperature  "
+		::= { fan1Config 8 }
+
+	extendHighSpeedEntryTemprf1	OBJECT-TYPE
+		SYNTAX	INTEGER(-41..101)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	"Extended high Speed entry temperature  "
+		::= { fan1Config 9 }
+
+	extendHighSpeedExitTemprf1	OBJECT-TYPE
+		SYNTAX	INTEGER(-41..101)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	"Extended high Speed exit temperature  "
+		::= { fan1Config 10 }
+
+	boostEntryTemprf1	OBJECT-TYPE
+		SYNTAX	INTEGER(-41..101)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	"Boost Speed  entry temperature  "
+		::= { fan1Config 11 }
+
+	boostExitTemprf1	OBJECT-TYPE
+		SYNTAX	INTEGER(-41..101)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	"Boost Speed  entry temperature  "
+		::= { fan1Config 12 }
+
+	idleRPMf1	OBJECT-TYPE
+		SYNTAX	INTEGER(0..9999)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	"Idle speed RPM  "
+		::= { fan1Config 13 }
+
+	midPointRPMf1	OBJECT-TYPE
+		SYNTAX	INTEGER(0..9999)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	"Midpoint Speed RPM  "
+		::= { fan1Config 14 }
+
+	highSpeedRPMf1	OBJECT-TYPE
+		SYNTAX	INTEGER(0..9999)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	"high Speed RPM  "
+		::= { fan1Config 15 }
+
+	extendHighSpeedRPMf1	OBJECT-TYPE
+		SYNTAX	INTEGER(0..9999)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	"Extended high Speed RPM "
+		::= { fan1Config 16 }
+
+	idleDutyCyclef1	OBJECT-TYPE
+		SYNTAX	INTEGER(0..100)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	"Idle Speed Duty Cycle  "
+		::= { fan1Config 17 }
+
+	midDutyCyclef1	OBJECT-TYPE
+		SYNTAX	INTEGER(0..100)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	"Midpoint speed Duty Cycle  "
+		::= { fan1Config 18 }
+
+	highSpeedDutyCyclef1	OBJECT-TYPE
+		SYNTAX	INTEGER(0..100)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	"high speed Duty Cycle  "
+		::= { fan1Config 19 }
+
+	extendHighSpeedDutyCyclef1	OBJECT-TYPE
+		SYNTAX	INTEGER(0..100)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	"Extended high speed Duty Cycle  "
+		::= { fan1Config 20 }
+
+	boostDutyCyclef1	OBJECT-TYPE
+		SYNTAX	INTEGER(0..100)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	"Boost speed Duty Cycle  "
+		::= { fan1Config 21 }
+								
+	deadBandRPMf1	OBJECT-TYPE
+		SYNTAX	INTEGER(0..1000)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	"Dead band RPM  "
+		::= { fan1Config 22 }
+
+	overrideDigi1f1	OBJECT-TYPE
+		SYNTAX	INTEGER(0..120)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	"0-100 - Fan Speed in Duty cycle. 120 - No action on Over ride.  "
+		::= { fan1Config 23 }
+
+	overrideDigi2f1	OBJECT-TYPE
+		SYNTAX	INTEGER(0..120)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	"0-100 - Fan Speed in Duty cycle. 120 - No action on Over ride.  "
+		::= { fan1Config 24 }
+
+	overrideDigi3f1	OBJECT-TYPE
+		SYNTAX	INTEGER(0..120)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	"0-100 - Fan Speed in Duty cycle. 120 - No action on Over ride.  "
+		::= { fan1Config 25 }
+
+	overrideSensorfailf1	OBJECT-TYPE
+		SYNTAX	INTEGER(0..120)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	"0-100 - Fan Speed in Duty cycle. 120 - No action on Over ride.  "
+		::= { fan1Config 26 }
+
+	sensorSelectf1	OBJECT-TYPE
+		SYNTAX	INTEGER(0..5)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	"0 - Onboard sensor. 1 - Room Sensor. 2 - Hotspot sensor. 3 - Ambient 2 sensor. 4 - Ambient 1 sensor. 5 - Shelter temperature "
+		::= { fan1Config 27 }
+
+	tachoPulseperrotationf1	OBJECT-TYPE
+		SYNTAX	INTEGER(0..100)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	"Number of Tacho pulses per cycle rotation for given fan "
+		::= { fan1Config 28 }
+
+	closedLoopenablef1	OBJECT-TYPE
+		SYNTAX	INTEGER(0..1)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	"Closed Loop control enable or disable for given Fan. 0 - Enable. 1 - Disable  "
+		::= { fan1Config 29 }
+
+	controlTypef1	OBJECT-TYPE
+		SYNTAX	INTEGER(0..1)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	"0 - 0-10V DC control.  1 - PWM control "
+		::= { fan1Config 30 }
+
+	enablef1	OBJECT-TYPE
+		SYNTAX	INTEGER(0..1)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	" 0 - Disable Fan control. 1 - Enabel fan control  "
+		::= { fan1Config 31 }
+
+--
+-- Controller-CC3000 : fan2Config
+
+	saveReloadConff2	OBJECT-TYPE
+		SYNTAX	INTEGER(0..1)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	"0 - Discard modifications, 1 - Save Modifications. Configuration reloaded  "
+		::= { fan2Config 1 }
+
+	offTemprf2	OBJECT-TYPE
+		SYNTAX	INTEGER(-41..101)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	"Fan OFF temperature  "
+		::= { fan2Config 2 }
+
+	idleOnTemprf2	OBJECT-TYPE
+		SYNTAX	INTEGER(-41..101)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	"Fan Idle Speed On temperature  "
+		::= { fan2Config 3 }
+
+	idleEntryTemprf2	OBJECT-TYPE
+		SYNTAX	INTEGER(-41..101)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	"Idle entry temperature  "
+		::= { fan2Config 4 }
+
+	midPoint1Temprf2	OBJECT-TYPE
+		SYNTAX	INTEGER(-41..101)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	"Mid point 1 entry temperature  "
+		::= { fan2Config 5 }
+
+	setPointTemprf2	OBJECT-TYPE
+		SYNTAX	INTEGER(-41..101)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	"Set Point temperature  "
+		::= { fan2Config 6 }
+
+	midPoint2Temprf2	OBJECT-TYPE
+		SYNTAX	INTEGER(-41..101)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	"Mid point 2 entry temperature  "
+		::= { fan2Config 7 }
+
+	highSpeedTemprf2	OBJECT-TYPE
+		SYNTAX	INTEGER(-41..101)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	"high Speed  entry temperature  "
+		::= { fan2Config 8 }
+
+	extendHighSpeedEntryTemprf2	OBJECT-TYPE
+		SYNTAX	INTEGER(-41..101)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	"Extended high Speed entry temperature  "
+		::= { fan2Config 9 }
+
+	extendHighSpeedExitTemprf2	OBJECT-TYPE
+		SYNTAX	INTEGER(-41..101)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	"Extended high Speed exit temperature  "
+		::= { fan2Config 10 }
+
+	boostEntryTemprf2	OBJECT-TYPE
+		SYNTAX	INTEGER(-41..101)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	"Boost Speed  entry temperature  "
+		::= { fan2Config 11 }
+
+	boostExitTemprf2	OBJECT-TYPE
+		SYNTAX	INTEGER(-41..101)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	"Boost Speed  entry temperature  "
+		::= { fan2Config 12 }
+
+	idleRPMf2	OBJECT-TYPE
+		SYNTAX	INTEGER(0..9999)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	"Idle speed RPM  "
+		::= { fan2Config 13 }
+
+	midPointRPMf2	OBJECT-TYPE
+		SYNTAX	INTEGER(0..9999)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	"Midpoint Speed RPM  "
+		::= { fan2Config 14 }
+
+	highSpeedRPMf2	OBJECT-TYPE
+		SYNTAX	INTEGER(0..9999)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	"high Speed RPM  "
+		::= { fan2Config 15 }
+
+	extendHighSpeedRPMf2	OBJECT-TYPE
+		SYNTAX	INTEGER(0..9999)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	"Extended high Speed RPM "
+		::= { fan2Config 16 }
+
+	idleDutyCyclef2	OBJECT-TYPE
+		SYNTAX	INTEGER(0..100)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	"Idle Speed Duty Cycle  "
+		::= { fan2Config 17 }
+
+	midDutyCyclef2	OBJECT-TYPE
+		SYNTAX	INTEGER(0..100)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	"Midpoint speed Duty Cycle  "
+		::= { fan2Config 18 }
+
+	highSpeedDutyCyclef2	OBJECT-TYPE
+		SYNTAX	INTEGER(0..100)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	"high speed Duty Cycle  "
+		::= { fan2Config 19 }
+
+	extendHighSpeedDutyCyclef2	OBJECT-TYPE
+		SYNTAX	INTEGER(0..100)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	"Extended high speed Duty Cycle  "
+		::= { fan2Config 20 }
+
+	boostDutyCyclef2	OBJECT-TYPE
+		SYNTAX	INTEGER(0..100)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	"Boost speed Duty Cycle  "
+		::= { fan2Config 21 }
+								
+	deadBandRPMf2	OBJECT-TYPE
+		SYNTAX	INTEGER(0..1000)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	"Dead band RPM  "
+		::= { fan2Config 22 }
+
+	overrideDigi1f2	OBJECT-TYPE
+		SYNTAX	INTEGER(0..120)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	"0-100 - Fan Speed in Duty cycle. 120 - No action on Over ride.  "
+		::= { fan2Config 23 }
+
+	overrideDigi2f2	OBJECT-TYPE
+		SYNTAX	INTEGER(0..120)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	"0-100 - Fan Speed in Duty cycle. 120 - No action on Over ride.  "
+		::= { fan2Config 24 }
+
+	overrideDigi3f2	OBJECT-TYPE
+		SYNTAX	INTEGER(0..120)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	"0-100 - Fan Speed in Duty cycle. 120 - No action on Over ride.  "
+		::= { fan2Config 25 }
+
+	overrideSensorfailf2	OBJECT-TYPE
+		SYNTAX	INTEGER(0..120)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	"0-100 - Fan Speed in Duty cycle. 120 - No action on Over ride.  "
+		::= { fan2Config 26 }
+
+	sensorSelectf2	OBJECT-TYPE
+		SYNTAX	INTEGER(0..5)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	"0 - Onboard sensor. 1 - Room Sensor. 2 - Hotspot sensor. 3 - Ambient 2 sensor. 4 - Ambient 1 sensor. 5 - Shelter temperature "
+		::= { fan2Config 27 }
+
+	tachoPulseperrotationf2	OBJECT-TYPE
+		SYNTAX	INTEGER(0..100)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	"Number of Tacho pulses per cycle rotation for given fan "
+		::= { fan2Config 28 }
+
+	closedLoopenablef2	OBJECT-TYPE
+		SYNTAX	INTEGER(0..1)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	"Closed Loop control enable or disable for given Fan. 0 - Enable. 1 - Disable "
+		::= { fan2Config 29 }
+
+	controlTypef2	OBJECT-TYPE
+		SYNTAX	INTEGER(0..1)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	" 0 - 0-10V DC control.  1 - PWM control"
+		::= { fan2Config 30 }
+
+	enablef2	OBJECT-TYPE
+		SYNTAX	INTEGER(0..1)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	" 0 - Disable Fan control. 1 - Enabel fan control  "
+		::= { fan2Config 31 }
+
+--
+-- Controller-CC3000 : damper1Config
+
+	saveReloadConfd1	OBJECT-TYPE
+		SYNTAX	INTEGER(0..1)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	"0 - Discard modifications, 1 - Save Modifications. Configuration reloaded  "
+		::= { damper1Config 1 }
+
+
+	lowercloseTemprd1	OBJECT-TYPE
+		SYNTAX	INTEGER(-41..101)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	" Damper lower closing temperature  "
+		::= { damper1Config 2 }
+		
+	setPointd1	OBJECT-TYPE
+		SYNTAX	INTEGER(-41..101)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	" Damper opening temperature  "
+		::= { damper1Config 3 }
+
+
+	upperOpentempd1	OBJECT-TYPE
+		SYNTAX	INTEGER(-41..101)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	" Damper upper opening temperature  "
+		::= { damper1Config 4 }
+
+	upperClosetempd1	OBJECT-TYPE
+		SYNTAX	INTEGER(-41..101)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	" Damper upper closing temperature  "
+		::= { damper1Config 5 }
+
+
+	emgncyClosetempd1	OBJECT-TYPE
+		SYNTAX	INTEGER(-41..101)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	" Damper emergency closing temperature  "
+		::= { damper1Config 6 }
+
+
+	emgncyopentempd1	OBJECT-TYPE
+		SYNTAX	INTEGER(-41..101)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	" Damper emergency open temperature  "
+		::= { damper1Config 7 }
+
+
+	overrideDigi1d1	OBJECT-TYPE
+		SYNTAX	INTEGER(0..120)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	"0 - Damper close. 1 - Damper open. 120 - No action on Over ride.  "
+		::= { damper1Config 8 }
+
+
+	overrideDigi2d1	OBJECT-TYPE
+		SYNTAX	INTEGER(0..120)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	"0 - Damper close. 1 - Damper open. 120 - No action on Over ride.  "
+		::= { damper1Config 9 }
+
+
+	overrideDigi3d1	OBJECT-TYPE
+		SYNTAX	INTEGER(0..120)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	"0 - Damper close. 1 - Damper open. 120 - No action on Over ride.  "
+		::= { damper1Config 10 }
+
+
+	overrideSensorFaild1	OBJECT-TYPE
+		SYNTAX	INTEGER(0..120)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	"0 - Damper close. 1 - Damper open. 120 - No action on Over ride.  "
+		::= { damper1Config 11 }
+
+
+	sensSelectd1	OBJECT-TYPE
+		SYNTAX	INTEGER(0..5)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	"0 - Onboard sensor. 1 - Room Sensor. 2 - Hotspot sensor. 3 - Ambient 2 sensor. 4 - Ambient 1 sensor. 5 - Shelter temperature "
+		::= { damper1Config 12 }
+
+
+	runDurationd1	OBJECT-TYPE
+		SYNTAX	INTEGER(30..300)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	"Damper Run time in minutes "
+		::= { damper1Config 13 }
+
+
+	enabled1	OBJECT-TYPE
+		SYNTAX	INTEGER(0..2)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	"0 - Disable. 1 - ONOFF. 2 - Dynamic "
+		::= { damper1Config 14 }
+
+
+--
+--Controller-CC3000 : damper2Config
+
+	saveReloadConfd2	OBJECT-TYPE
+		SYNTAX	INTEGER(0..1)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	"0 - Discard modifications, 1 - Save Modifications. Configuration reloaded  "
+		::= { damper2Config 1 }
+
+
+	lowercloseTemprd2	OBJECT-TYPE
+		SYNTAX	INTEGER(-41..101)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	" Damper lower closing temperature  "
+		::= { damper2Config 2 }
+		
+	setPointd2	OBJECT-TYPE
+		SYNTAX	INTEGER(-41..101)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	" Damper opening temperature  "
+		::= { damper2Config 3 }
+
+
+	upperOpentempd2	OBJECT-TYPE
+		SYNTAX	INTEGER(-41..101)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	" Damper upper opening temperature  "
+		::= { damper2Config 4 }
+
+	upperClosetempd2	OBJECT-TYPE
+		SYNTAX	INTEGER(-41..101)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	" Damper upper closing temperature  "
+		::= { damper2Config 5 }
+
+
+	emgncyClosetempd2	OBJECT-TYPE
+		SYNTAX	INTEGER(-41..101)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	" Damper emergency closing temperature  "
+		::= { damper2Config 6 }
+
+
+	emgncyopentempd2	OBJECT-TYPE
+		SYNTAX	INTEGER(-41..101)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	" Damper emergency open temperature  "
+		::= { damper2Config 7 }
+
+	
+
+	overrideDigi1d2	OBJECT-TYPE
+		SYNTAX	INTEGER(0..120)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	"0 - Damper close. 1 - Damper open. 120 - No action on Over ride.  "
+		::= { damper2Config 8 }
+
+
+	overrideDigi2d2	OBJECT-TYPE
+		SYNTAX	INTEGER(0..120)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	"0 - Damper close. 1 - Damper open. 120 - No action on Over ride.  "
+		::= { damper2Config 9 }
+
+
+	overrideDigi3d2	OBJECT-TYPE
+		SYNTAX	INTEGER(0..120)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	"0 - Damper close. 1 - Damper open. 120 - No action on Over ride.  "
+		::= { damper2Config 10 }
+
+
+	overrideSensorFaild2	OBJECT-TYPE
+		SYNTAX	INTEGER(0..120)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	"0 - Damper close. 1 - Damper open. 120 - No action on Over ride.  "
+		::= { damper2Config 11 }
+
+
+	sensSelectd2	OBJECT-TYPE
+		SYNTAX	INTEGER(0..5)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	"0 - Onboard sensor. 1 - Room Sensor. 2 - Hotspot sensor. 3 - Ambient 2 sensor. 4 - Ambient 1 sensor. 5 - Shelter temperature  "
+		::= { damper2Config 12 }
+
+
+	runDurationd2		OBJECT-TYPE
+		SYNTAX	INTEGER(30..300)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	"Damper Run time in minutes "
+		::= { damper2Config 13 }
+
+
+	enabled2		OBJECT-TYPE
+		SYNTAX	INTEGER(0..2)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	"0 - Disable. 1 - ONOFF. 2 - Dynamic "
+		::= { damper2Config 14 }
+
+
+--
+-- Controller-CC3000 : AC-1-Config
+
+	saveReloadConfac1    OBJECT-TYPE
+		SYNTAX	INTEGER(0..1)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	"0 - Discard modifications, 1 - Save Modifications. Configuration reloaded  "
+		::= { aircon1Config 1 }
+
+ 
+	oNTemprac1	OBJECT-TYPE
+		SYNTAX	INTEGER(-41..101)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	" Air Conditioner ON temperature  "
+		::= { aircon1Config 2 }
+
+
+	oFFTemprac1	OBJECT-TYPE
+		SYNTAX	INTEGER(-41..101)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	" Air Conditioner OFF temperature  "
+		::= { aircon1Config 3 }
+
+
+
+	overrideDigi1ac1	OBJECT-TYPE
+		SYNTAX	INTEGER(0..120)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	"0 - AC OFF. 1 - AC ON. 120 - No action on Over ride.  "
+		::= { aircon1Config 4 }
+
+
+	overrideDigi2ac1	OBJECT-TYPE
+		SYNTAX	INTEGER(0..120)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	"0 - AC OFF. 1 - AC ON. 120 - No action on Over ride.  "
+		::= { aircon1Config 5 }
+
+
+	overrideDigi3ac1	OBJECT-TYPE
+		SYNTAX	INTEGER(0..120)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	"0 - AC OFF. 1 - AC ON. 120 - No action on Over ride  "
+		::= { aircon1Config 6 }
+
+
+	overrideSensorFailac1	OBJECT-TYPE
+		SYNTAX	INTEGER(0..120)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	"0 - AC OFF. 1 - AC ON. 120 - No action on Over ride  "
+		::= { aircon1Config 7 }
+
+
+
+	sensSelectac1		OBJECT-TYPE
+		SYNTAX	INTEGER(0..5)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	"0 - Onboard sensor. 1 - Room Sensor. 2 - Hotspot sensor. 3 - Ambient 2 sensor. 4 - Ambient 1 sensor. 5 - Shelter temperature "
+		::= { aircon1Config 8 }
+
+
+
+	minimumRunDurationac1	OBJECT-TYPE
+		SYNTAX	INTEGER(60..3600)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	"Minimum AC Run time in seconds "
+		::= { aircon1Config 9 }
+
+
+	restartTimeoutac1	OBJECT-TYPE
+		SYNTAX	INTEGER(60..3600)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	"Restart timer in seconds "
+		::= { aircon1Config 10 }
+
+
+
+	enableac1	OBJECT-TYPE
+		SYNTAX	INTEGER(0..1)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	"0 - Disable. 1 - Enable. "
+		::= { aircon1Config 11 }
+
+
+--
+-- Controller-CC3000 : aircon2Config
+
+	saveReloadConfac2    OBJECT-TYPE
+		SYNTAX	INTEGER(0..1)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	"0 - Discard modifications, 1 - Save Modifications. Configuration reloaded  "
+		::= { aircon2Config 1 }
+
+ 
+	onTemprac2	OBJECT-TYPE
+		SYNTAX	INTEGER(-41..101)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	" Air Conditioner ON temperature  "
+		::= { aircon2Config 2 }
+
+
+	offTemprac2	OBJECT-TYPE
+		SYNTAX	INTEGER(-41..101)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	" Air Conditioner OFF temperature  "
+		::= { aircon2Config 3 }
+
+
+
+	overrideDigi1ac2	OBJECT-TYPE
+		SYNTAX	INTEGER(0..120)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	"0 - AC OFF. 1 - AC ON. 120 - No action on Over ride.  "
+		::= { aircon2Config 4 }
+
+
+	overrideDigi2ac2	OBJECT-TYPE
+		SYNTAX	INTEGER(0..120)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	"0 - AC OFF. 1 - AC ON. 120 - No action on Over ride.  "
+		::= { aircon2Config 5 }
+
+
+	overrideDigi3ac2	OBJECT-TYPE
+		SYNTAX	INTEGER(0..120)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	"0 - AC OFF. 1 - AC ON. 120 - No action on Over ride  "
+		::= { aircon2Config 6 }
+
+
+	overrideSensorFailac2	OBJECT-TYPE
+		SYNTAX	INTEGER(0..120)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	"0 - AC OFF. 1 - AC ON. 120 - No action on Over ride  "
+		::= { aircon2Config 7 }
+
+
+
+	sensSelectac2		OBJECT-TYPE
+		SYNTAX	INTEGER(0..5)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	"0 - Onboard sensor. 1 - Room Sensor. 2 - Hotspot sensor. 3 - Ambient 2 sensor. 4 - Ambient 1 sensor. 5 - Shelter temperature "
+		::= { aircon2Config 8 }
+
+
+
+	minimumRunDurationac2	OBJECT-TYPE
+		SYNTAX	INTEGER(60..3600)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	"Minimum AC Run time in seconds "
+		::= { aircon2Config 9 }
+
+
+	restartTimeoutac2	OBJECT-TYPE
+		SYNTAX	INTEGER(60..3600)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	"Restart timer in seconds "
+		::= { aircon2Config 10 }
+
+
+	enableac2	OBJECT-TYPE
+		SYNTAX	INTEGER(0..1)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	"0 - Disable. 1 - Enable. "
+		::= { aircon2Config 11 }
+
+--
+-- Controller-CC3000 : heaterConfig
+
+	saveReloadConfhtr    OBJECT-TYPE
+		SYNTAX	INTEGER(0..1)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	"0 - Discard modifications, 1 - Save Modifications. Configuration reloaded  "
+		::= { heaterConfig 1 }
+
+ 
+	onTemprhtr	OBJECT-TYPE
+		SYNTAX	INTEGER(-41..101)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	" Heater ON temperature  "
+		::= { heaterConfig 2 }
+
+
+	offTemprhtr	OBJECT-TYPE
+		SYNTAX	INTEGER(-41..101)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	" Heater OFF temperature  "
+		::= { heaterConfig 3 }
+
+
+
+	overrideDigi1htr	OBJECT-TYPE
+		SYNTAX	INTEGER(0..120)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	"0 - Heat OFF. 1 - Heat ON. 120 - No action on Over ride.  "
+		::= { heaterConfig 4 }
+
+
+	overrideDigi2htr	OBJECT-TYPE
+		SYNTAX	INTEGER(0..120)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	"0 - Heat OFF. 1 - Heat ON. 120 - No action on Over ride.  "
+		::= { heaterConfig 5 }
+
+
+	overrideDigi3htr	OBJECT-TYPE
+		SYNTAX	INTEGER(0..120)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	"0 - Heat OFF. 1 - Heat ON. 120 - No action on Over ride  "
+		::= { heaterConfig 6 }
+
+
+	overrideSensorFailhtr	OBJECT-TYPE
+		SYNTAX	INTEGER(0..120)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	"0 - Heat OFF. 1 - Heat ON. 120 - No action on Over ride  "
+		::= { heaterConfig 7 }
+
+
+
+	sensSelecthtr	OBJECT-TYPE
+		SYNTAX	INTEGER(0..5)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	"0 - Onboard sensor. 1 - Room Sensor. 2 - Hotspot sensor. 3 - Ambient 2 sensor. 4 - Ambient 1 sensor. 5 - Shelter temperature  "
+		::= { heaterConfig 8 }
+	
+
+
+
+	enablehtr	OBJECT-TYPE
+		SYNTAX	INTEGER(0..1)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	"0 - Disable. 1 - Enable. "
+		::= { heaterConfig 9 }
+
+
+--
+-- Controller-CC3000 : humidityConfig
+
+	saveReloadConfhum    OBJECT-TYPE
+		SYNTAX	INTEGER(0..1)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	"0 - Discard modifications, 1 - Save Modifications. Configuration reloaded  "
+		::= { humidityConfig 1 }
+
+ 
+	rhEntryhum	OBJECT-TYPE
+		SYNTAX	INTEGER(40..100)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	" Humidity function entry value  "
+		::= { humidityConfig 2 }
+
+
+	rhExithum	OBJECT-TYPE
+		SYNTAX	INTEGER(40..100)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	" Humidity function exit value  "
+		::= { humidityConfig 3 }
+
+
+
+	coolingmodehum	OBJECT-TYPE
+		SYNTAX	INTEGER(0..3)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	"0 - Freecooling. 1 - Standard. 2 - Power save. 3 - Aircon.  "
+		::= { humidityConfig 4 }
+
+
+	temprsetpoffsethum	OBJECT-TYPE
+		SYNTAX	INTEGER(-10..10)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	" Cooling setpoint offset  "
+		::= { humidityConfig 5 }
+
+
+	rhSensPositionhum	OBJECT-TYPE
+		SYNTAX	INTEGER(0..1)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	"0 - Indoor. 1 - Outdoor  "
+		::= { humidityConfig 6 }
+
+
+	enablehum	OBJECT-TYPE
+		SYNTAX	INTEGER(0..1)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	"0 - Disable. 1 - Enable. "
+		::= { humidityConfig 7 }
+
+
+--
+-- Controller-CC3000 : systemConfig
+
+	saveReloadConfsysc    OBJECT-TYPE
+		SYNTAX	INTEGER(0..1)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	"0 - Discard modifications, 1 - Save Modifications. Configuration reloaded  "
+		::= { systemConfig 1 }
+
+ 
+	vdcLowEntrysys	OBJECT-TYPE
+		SYNTAX	INTEGER(18..60)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	" Low voltage shut down entry  "
+		::= { systemConfig 2 }
+
+
+	vdcLowExitsys	OBJECT-TYPE
+		SYNTAX	INTEGER(18..60)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	" Low voltage shut down exit  "
+		::= { systemConfig 3 }
+
+	vdcHighEntrysys	OBJECT-TYPE
+		SYNTAX	INTEGER(18..60)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	" High voltage shut down entry  "
+		::= { systemConfig 4 }
+
+
+	vdcHighExitsys	OBJECT-TYPE
+		SYNTAX	INTEGER(18..60)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	" High voltage shut down exit  "
+		::= { systemConfig 5 }
+
+
+	temprLowlimitsys	OBJECT-TYPE
+		SYNTAX	INTEGER(-40..80)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	" Low temperature alarm limit  "
+		::= { systemConfig 6 }
+
+
+	temprHighlimit1sys	OBJECT-TYPE
+		SYNTAX	INTEGER(-40..80)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	" High temperature alarm limit 1  "
+		::= { systemConfig 7 }
+
+
+	temprHighlimit2sys	OBJECT-TYPE
+		SYNTAX	INTEGER(-40..80)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	" High temperature alarm limit 2  "
+		::= { systemConfig 8 }
+
+
+	temprHighlimit3sys	OBJECT-TYPE
+		SYNTAX	INTEGER(-40..80)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	" High temperature alarm limit 3  "
+		::= { systemConfig 9 }
+
+
+	temprlimithyssys	OBJECT-TYPE
+		SYNTAX	INTEGER(-20..20)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	" Temperature alarm limit hysteresis   "
+		::= { systemConfig 10 }
+
+
+	rhLowlimitsys	OBJECT-TYPE
+		SYNTAX	INTEGER(0..100)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	" Humidity alarm low limit %RH  "
+		::= { systemConfig 11 }
+
+
+
+	rhHighlimitsys	OBJECT-TYPE
+		SYNTAX	INTEGER(0..100)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	" Humidity alarm High limit %RH  "
+		::= { systemConfig 12 }
+
+
+	flowpresslimit1sys	OBJECT-TYPE
+		SYNTAX	INTEGER(60..400)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	" Flow pressure limit 1 Pa  "
+		::= { systemConfig 13 }
+
+
+	flowpresslimit2sys	OBJECT-TYPE
+		SYNTAX	INTEGER(60..400)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	" Flow pressure limit 2 Pa "
+		::= { systemConfig 14 }
+
+
+	flowpresshyssys	OBJECT-TYPE
+		SYNTAX	INTEGER(0..400)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	" Flow pressure limit hysteresis Pa "
+		::= { systemConfig 15 }
+
+
+	coolingzonessys	OBJECT-TYPE
+		SYNTAX	INTEGER(1..2)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	" 1 - One cooling zone, 2 - Two cooling zones  "
+		::= { systemConfig 16 }
+
+
+	coolingModesys	OBJECT-TYPE
+		SYNTAX	INTEGER(0..3)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	" 0 - FC, 1 - Std, 2 - Ps, 3 - Acon  "
+		::= { systemConfig 17 }
+
+
+	negCoolingDeltaOverridesys	OBJECT-TYPE
+		SYNTAX	INTEGER(0..1)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	" 0 - Disable, 1 - Enable  "
+		::= { systemConfig 18 }
+
+
+	negCoolingDeltaHyssys	OBJECT-TYPE
+		SYNTAX	INTEGER(-10..10)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	" Negative cooling delta hysteresis  "
+		::= { systemConfig 19 }
+
+
+	coolingDeltatempsys	OBJECT-TYPE
+		SYNTAX	INTEGER(-10..10)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	" Cooling delta temperature  "
+		::= { systemConfig 20 }
+
+
+	shelterTemprsys	OBJECT-TYPE
+		SYNTAX	INTEGER(0..2)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	" 0 - RA, 1 - HS, 2 - Both  "
+		::= { systemConfig 21 }
+
+
+	acleadlagsys	OBJECT-TYPE
+		SYNTAX	INTEGER(0..1)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	" 0 - Disable, 1 - Enable "
+		::= { systemConfig 22 }
+
+
+	coolingModeXzonesys	OBJECT-TYPE
+		SYNTAX	INTEGER(0..3)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	" 0 - FC, 1 - Std, 2 - Ps, 3 - Acon  "
+		::= { systemConfig 23 }
+
+
+	negCoolingDeltaOverrideXzonesys	OBJECT-TYPE
+		SYNTAX	INTEGER(0..1)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	" 0 - Disable, 1 - Enable  "
+		::= { systemConfig 24 }
+
+
+	negCoolingDeltaHysXzonesys	OBJECT-TYPE
+		SYNTAX	INTEGER(-10..10)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	" Negative cooling delta hysteresis  "
+		::= { systemConfig 25 }
+
+
+	coolingDeltatempXzonesys	OBJECT-TYPE
+		SYNTAX	INTEGER(-10..10)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	" Cooling delta temperature  "
+		::= { systemConfig 26 }
+
+
+	fan1Zonesys	OBJECT-TYPE
+		SYNTAX	INTEGER(1..2)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	" 1 - Fan 1 for Zone 1, 2 - Fan 1 for zone 2  "
+		::= { systemConfig 27 }
+
+
+	fan2Zonesys	OBJECT-TYPE
+		SYNTAX	INTEGER(1..2)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	" 1 - Fan 2 for Zone 1, 2 - Fan 2 for zone 2  "
+		::= { systemConfig 28 }
+
+
+	ac1Zonesys	OBJECT-TYPE
+		SYNTAX	INTEGER(1..2)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	" 1 - AC 1 for Zone 1, 2 - AC 1 for zone 2  "
+		::= { systemConfig 29 }
+
+	ac2Zonesys	OBJECT-TYPE
+		SYNTAX	INTEGER(1..2)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	" 1 - AC 2 for Zone 1, 2 - AC 2 for zone 2  "
+		::= { systemConfig 30 }
+
+
+	damper1Zonesys	OBJECT-TYPE
+		SYNTAX	INTEGER(1..2)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	" 1 - Damper 1 for Zone 1, 2 - Damper 1 for zone 2  "
+		::= { systemConfig 31 }
+
+	damper2Zonesys	OBJECT-TYPE
+		SYNTAX	INTEGER(1..2)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	" 1 - Damper 2 for Zone 1, 2 - Damper 2 for zone 2  "
+		::= { systemConfig 32 }
+
+
+
+	heaterZonesys	OBJECT-TYPE
+		SYNTAX	INTEGER(1..2)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	" 1 - Heater for Zone 1, 2 - Heater for zone 2  "
+		::= { systemConfig 33 }
+
+
+	statusLogsys	OBJECT-TYPE
+		SYNTAX	INTEGER(0..1)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	" 0 - Disable, 1 - Enable  "
+		::= { systemConfig 34 }
+
+
+
+	logintervalsys	OBJECT-TYPE
+		SYNTAX	INTEGER(1..60)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	" Log interval in minutes  "
+		::= { systemConfig 35 }
+
+
+	alarm1NONCsys	OBJECT-TYPE
+		SYNTAX	INTEGER(0..1)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	" 0 - NO, 1 - NC  "
+		::= { systemConfig 36 }
+
+
+	alarm2NONCsys	OBJECT-TYPE
+		SYNTAX	INTEGER(0..1)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	" 0 - NO, 1 - NC  "
+		::= { systemConfig 37 }
+
+	alarm3NONCsys	OBJECT-TYPE
+		SYNTAX	INTEGER(0..1)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	" 0 - NO, 1 - NC  "
+		::= { systemConfig 38 }
+
+	alarm4NONCsys	OBJECT-TYPE
+		SYNTAX	INTEGER(0..1)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	" 0 - NO, 1 - NC  "
+		::= { systemConfig 39 }
+
+	alarm5NONCsys	OBJECT-TYPE
+		SYNTAX	INTEGER(0..1)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	" 0 - NO, 1 - NC  "
+		::= { systemConfig 40 }
+
+	alarm6NONCsys	OBJECT-TYPE
+		SYNTAX	INTEGER(0..1)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	" 0 - NO, 1 - NC  "
+		::= { systemConfig 41 }
+
+	alarm7NONCsys	OBJECT-TYPE
+		SYNTAX	INTEGER(0..1)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	" 0 - NO, 1 - NC  "
+		::= { systemConfig 42 }
+
+	alarm8NONCsys	OBJECT-TYPE
+		SYNTAX	INTEGER(0..1)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	" 0 - NO, 1 - NC  "
+		::= { systemConfig 43 }
+
+	alarm9NONCsys	OBJECT-TYPE
+		SYNTAX	INTEGER(0..1)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	" 0 - NO, 1 - NC  "
+		::= { systemConfig 44 }
+
+	alarm10NONCsys	OBJECT-TYPE
+		SYNTAX	INTEGER(0..1)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	" 0 - NO, 1 - NC  "
+		::= { systemConfig 45 }
+
+	alarm1Delaysys	OBJECT-TYPE
+		SYNTAX	INTEGER(0..100)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	" Alarm output delay in seconds  "
+		::= { systemConfig 46 }
+
+
+	alarm2Delaysys	OBJECT-TYPE
+		SYNTAX	INTEGER(0..100)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	" Alarm output delay in seconds  "
+		::= { systemConfig 47 }
+
+	alarm3Delaysys	OBJECT-TYPE
+		SYNTAX	INTEGER(0..100)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	" Alarm output delay in seconds  "
+		::= { systemConfig 48 }
+
+	alarm4Delaysys	OBJECT-TYPE
+		SYNTAX	INTEGER(0..100)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	" Alarm output delay in seconds  "
+		::= { systemConfig 49 }
+
+	alarm5Delaysys	OBJECT-TYPE
+		SYNTAX	INTEGER(0..100)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	" Alarm output delay in seconds  "
+		::= { systemConfig 50 }
+
+	alarm6Delaysys	OBJECT-TYPE
+		SYNTAX	INTEGER(0..100)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	" Alarm output delay in seconds  "
+		::= { systemConfig 51 }
+
+	alarm7Delaysys	OBJECT-TYPE
+		SYNTAX	INTEGER(0..100)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	" Alarm output delay in seconds  "
+		::= { systemConfig 52 }
+
+	alarm8Delaysys	OBJECT-TYPE
+		SYNTAX	INTEGER(0..100)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	" Alarm output delay in seconds  "
+		::= { systemConfig 53 }
+
+	alarm9Delaysys	OBJECT-TYPE
+		SYNTAX	INTEGER(0..100)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	" Alarm output delay in seconds  "
+		::= { systemConfig 54 }
+
+	alarm10Delaysys	OBJECT-TYPE
+		SYNTAX	INTEGER(0..100)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	" Alarm output delay in seconds  "
+		::= { systemConfig 55 }
+
+	
+	ac1NONCsys	OBJECT-TYPE
+		SYNTAX	INTEGER(0..1)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	" 0 - NO, 1 - NC  "
+		::= { systemConfig 56 }
+
+
+	ac2NONCsys	OBJECT-TYPE
+		SYNTAX	INTEGER(0..1)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	" 0 - NO, 1 - NC  "
+		::= { systemConfig 57 }
+
+
+
+	dig1NONCsys	OBJECT-TYPE
+		SYNTAX	INTEGER(0..1)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	" 0 - NO, 1 - NC  "
+		::= { systemConfig 58 }
+
+	dig2NONCsys	OBJECT-TYPE
+		SYNTAX	INTEGER(0..1)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	" 0 - NO, 1 - NC  "
+		::= { systemConfig 59 }
+
+	dig3NONCsys	OBJECT-TYPE
+		SYNTAX	INTEGER(0..1)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	" 0 - NO, 1 - NC  "
+		::= { systemConfig 60 }
+
+
+	dig2funcoverridesys	OBJECT-TYPE
+		SYNTAX	INTEGER(0..2)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	" 0 - Override, 1 - setpoint offset, 2 - mode X  "
+		::= { systemConfig 61 }
+
+
+	dig3funcoverridesys	OBJECT-TYPE
+		SYNTAX	INTEGER(0..2)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	" 0 - Override, 1 - setpoint offset, 2 - mode X  "
+		::= { systemConfig 62 }
+
+
+
+	dig2offsetsys	OBJECT-TYPE
+		SYNTAX	INTEGER(-10..10)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	" Cooling setpoint offset "
+		::= { systemConfig 63 }
+
+
+	dig3offsetsys	OBJECT-TYPE
+		SYNTAX	INTEGER(-10..10)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	" Cooling setpoint offset "
+		::= { systemConfig 64 }
+
+
+	dig2trigModesys	OBJECT-TYPE
+		SYNTAX	INTEGER(0..3)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	" 0 - FC, 1 - Std, 2 - Ps, 3 - Acon "
+		::= { systemConfig 65 }
+
+
+	dig3TrigModesys	OBJECT-TYPE
+		SYNTAX	INTEGER(0..3)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	" 0 - FC, 1 - Std, 2 - Ps, 3 - Acon"
+		::= { systemConfig 66 }
+
+
+
+	filterGuard1NONCsys	OBJECT-TYPE
+		SYNTAX	INTEGER(0..1)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	" 0 - NO, 1 - NC  "
+		::= { systemConfig 67 }
+
+
+	filterGuard2NONCsys	OBJECT-TYPE
+		SYNTAX	INTEGER(0..1)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	" 0 - NO, 1 - NC  "
+		::= { systemConfig 68 }
+
+	temprUnitsCFsys	OBJECT-TYPE
+		SYNTAX	INTEGER(0..1)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	" 0 - Celcius, 1 - Fahrenheit  "
+		::= { systemConfig 69 }
+
+
+	languageEnglishsys	OBJECT-TYPE
+		SYNTAX	INTEGER(0..1)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	" 0 - Disable, 1 - Enable  "
+		::= { systemConfig 70 }
+
+
+
+
+--
+-- Controller-CC3000 : alarmConfig
+
+	saveReloadConfAlm    OBJECT-TYPE
+		SYNTAX	INTEGER(0..1)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	"0 - Discard modifications, 1 - Save Modifications. Alarm Mapping reloaded "
+		::= { alarmConfig 1 }
+
+ 	alarm1mask	OBJECT-TYPE
+		SYNTAX	INTEGER(0..33554432)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION
+			" Alarm drive 1 Mask [Can have multiple Alarm Errors].
+                              Bit Position - Value - Alarm Drive State: 0 - Unselect, 1 - Select
+                             1 - 1 - Voltage Low
+                             2 - 2 - Voltage High
+                             3 - 4 - Tempr Low     
+                             4 - 8 - Tempr Limit 1
+                             5 - 16 - Tempr Limit 2   
+                             6 - 32 - Tempr Limit 3   
+                             7 - 64 - Humid. Low
+                             8 - 128 - Humid. High
+                             9 - 256 - Fltr Pressure 1
+                             10 - 512 - Fltr Pressure 2
+                             11 - 1024 - Fan 1
+                             12 - 2048 - Fan 2
+                             13 - 4096 - Onboard Sens
+                             14 - 8192 - Room Sens
+                             15 - 16384 - Hotspot Sens
+                             16 - 32768 - Ambient 1 Sens
+                             17 - 65536 - Ambient 2 Sens
+                             18 - 131072 - Dig 1 I/P
+                             19 - 262144 - Dig 2 I/P
+                             20 - 524288 - Dig 3 I/P
+                             21 - 1048576 - Filter I/P 1
+                             22 - 2097152 - Filter I/P 2
+                             23 - 4194304 - Network
+                             24 - 8388608 - Int storage
+                             25 - 16777216 - SD Card "
+		::= { alarmConfig 2 }
+
+
+ 	alarm2mask	OBJECT-TYPE
+		SYNTAX	INTEGER(0..33554432)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION
+			" Alarm drive 2 Mask [Can have multiple Alarm Errors].
+                             Bit Position - Value - Alarm Drive State: 0 - Unselect, 1 - Select
+                             1 - 1 - Voltage Low
+                             2 - 2 - Voltage High
+                             3 - 4 - Tempr Low     
+                             4 - 8 - Tempr Limit 1
+                             5 - 16 - Tempr Limit 2   
+                             6 - 32 - Tempr Limit 3   
+                             7 - 64 - Humid. Low
+                             8 - 128 - Humid. High
+                             9 - 256 - Fltr Pressure 1
+                             10 - 512 - Fltr Pressure 2
+                             11 - 1024 - Fan 1
+                             12 - 2048 - Fan 2
+                             13 - 4096 - Onboard Sens
+                             14 - 8192 - Room Sens
+                             15 - 16384 - Hotspot Sens
+                             16 - 32768 - Ambient 1 Sens
+                             17 - 65536 - Ambient 2 Sens
+                             18 - 131072 - Dig 1 I/P
+                             19 - 262144 - Dig 2 I/P
+                             20 - 524288 - Dig 3 I/P
+                             21 - 1048576 - Filter I/P 1
+                             22 - 2097152 - Filter I/P 2
+                             23 - 4194304 - Network
+                             24 - 8388608 - Int storage
+                             25 - 16777216 - SD Card "
+		::= { alarmConfig 3 }
+
+ 	alarm3mask	OBJECT-TYPE
+		SYNTAX	INTEGER(0..25)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION
+			" Alarm drive 3 Select [Single Alarm Error].
+                             Bit Position - Alarm Drive State: 0 - Unselect, 1-25 - Select
+                             1 - Voltage Low
+                             2 - Voltage High
+                             3 - Tempr Low     
+                             4 - Tempr Limit 1
+                             5 - Tempr Limit 2   
+                             6 - Tempr Limit 3   
+                             7 - Humid. Low
+                             8 - Humid. High
+                             9 - Fltr Pressure 1
+                             10 - Fltr Pressure 2
+                             11 - Fan 1
+                             12 - Fan 2
+                             13 - Onboard Sens
+                             14 - Room Sens
+                             15 - Hotspot Sens
+                             16 - Ambient 1 Sens
+                             17 - Ambient 2 Sens
+                             18 - Dig 1 I/P
+                             19 - Dig 2 I/P
+                             20 - Dig 3 I/P
+                             21 - Filter I/P 1
+                             22 - Filter I/P 2
+                             23 - Network
+                             24 - Int storage
+                             25 - SD Card "
+		::= { alarmConfig 4 }
+
+ 	alarm4mask	OBJECT-TYPE
+		SYNTAX	INTEGER(0..25)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION
+			" Alarm drive 4 Select [Single Alarm Error].
+                            Bit Position - Alarm Drive State: 0 - Unselect, 1-25 - Select
+                             1 - Voltage Low
+                             2 - Voltage High
+                             3 - Tempr Low     
+                             4 - Tempr Limit 1
+                             5 - Tempr Limit 2   
+                             6 - Tempr Limit 3   
+                             7 - Humid. Low
+                             8 - Humid. High
+                             9 - Fltr Pressure 1
+                             10 - Fltr Pressure 2
+                             11 - Fan 1
+                             12 - Fan 2
+                             13 - Onboard Sens
+                             14 - Room Sens
+                             15 - Hotspot Sens
+                             16 - Ambient 1 Sens
+                             17 - Ambient 2 Sens
+                             18 - Dig 1 I/P
+                             19 - Dig 2 I/P
+                             20 - Dig 3 I/P
+                             21 - Filter I/P 1
+                             22 - Filter I/P 2
+                             23 - Network
+                             24 - Int storage
+                             25 - SD Card "
+		::= { alarmConfig 5 }
+
+ 	alarm5mask	OBJECT-TYPE
+		SYNTAX	INTEGER(0..25)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION
+			" Alarm drive 5 Select [Single Alarm Error].
+                             Bit Position - Alarm Drive State: 0 - Unselect, 1-25 - Select
+                             1 - Voltage Low
+                             2 - Voltage High
+                             3 - Tempr Low     
+                             4 - Tempr Limit 1
+                             5 - Tempr Limit 2   
+                             6 - Tempr Limit 3   
+                             7 - Humid. Low
+                             8 - Humid. High
+                             9 - Fltr Pressure 1
+                             10 - Fltr Pressure 2
+                             11 - Fan 1
+                             12 - Fan 2
+                             13 - Onboard Sens
+                             14 - Room Sens
+                             15 - Hotspot Sens
+                             16 - Ambient 1 Sens
+                             17 - Ambient 2 Sens
+                             18 - Dig 1 I/P
+                             19 - Dig 2 I/P
+                             20 - Dig 3 I/P
+                             21 - Filter I/P 1
+                             22 - Filter I/P 2
+                             23 - Network
+                             24 - Int storage
+                             25 - SD Card "
+		::= { alarmConfig 6 }
+
+ 	alarm6mask	OBJECT-TYPE
+		SYNTAX	INTEGER(0..25)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION
+			" Alarm drive 6 Select [Single Alarm Error].
+                            Bit Position - Alarm Drive State: 0 - Unselect, 1-25 - Select
+                             1 - Voltage Low
+                             2 - Voltage High
+                             3 - Tempr Low     
+                             4 - Tempr Limit 1
+                             5 - Tempr Limit 2   
+                             6 - Tempr Limit 3   
+                             7 - Humid. Low
+                             8 - Humid. High
+                             9 - Fltr Pressure 1
+                             10 - Fltr Pressure 2
+                             11 - Fan 1
+                             12 - Fan 2
+                             13 - Onboard Sens
+                             14 - Room Sens
+                             15 - Hotspot Sens
+                             16 - Ambient 1 Sens
+                             17 - Ambient 2 Sens
+                             18 - Dig 1 I/P
+                             19 - Dig 2 I/P
+                             20 - Dig 3 I/P
+                             21 - Filter I/P 1
+                             22 - Filter I/P 2
+                             23 - Network
+                             24 - Int storage
+                             25 - SD Card "
+		::= { alarmConfig 7 }
+
+ 	alarm7mask	OBJECT-TYPE
+		SYNTAX	INTEGER(0..25)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION
+			" Alarm drive 7 Select [Single Alarm Error].
+                             Bit Position - Alarm Drive State: 0 - Unselect, 1-25 - Select
+                             1 - Voltage Low
+                             2 - Voltage High
+                             3 - Tempr Low     
+                             4 - Tempr Limit 1
+                             5 - Tempr Limit 2   
+                             6 - Tempr Limit 3   
+                             7 - Humid. Low
+                             8 - Humid. High
+                             9 - Fltr Pressure 1
+                             10 - Fltr Pressure 2
+                             11 - Fan 1
+                             12 - Fan 2
+                             13 - Onboard Sens
+                             14 - Room Sens
+                             15 - Hotspot Sens
+                             16 - Ambient 1 Sens
+                             17 - Ambient 2 Sens
+                             18 - Dig 1 I/P
+                             19 - Dig 2 I/P
+                             20 - Dig 3 I/P
+                             21 - Filter I/P 1
+                             22 - Filter I/P 2
+                             23 - Network
+                             24 - Int storage
+                             25 - SD Card "
+		::= { alarmConfig 8 }
+
+ 	alarm8mask	OBJECT-TYPE
+		SYNTAX	INTEGER(0..25)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION
+			" Alarm drive 8 Select [Single Alarm Error].
+                             Bit Position - Alarm Drive State: 0 - Unselect, 1-25 - Select
+                             1 - Voltage Low
+                             2 - Voltage High
+                             3 - Tempr Low     
+                             4 - Tempr Limit 1
+                             5 - Tempr Limit 2   
+                             6 - Tempr Limit 3   
+                             7 - Humid. Low
+                             8 - Humid. High
+                             9 - Fltr Pressure 1
+                             10 - Fltr Pressure 2
+                             11 - Fan 1
+                             12 - Fan 2
+                             13 - Onboard Sens
+                             14 - Room Sens
+                             15 - Hotspot Sens
+                             16 - Ambient 1 Sens
+                             17 - Ambient 2 Sens
+                             18 - Dig 1 I/P
+                             19 - Dig 2 I/P
+                             20 - Dig 3 I/P
+                             21 - Filter I/P 1
+                             22 - Filter I/P 2
+                             23 - Network
+                             24 - Int storage
+                             25 - SD Card "
+		::= { alarmConfig 9 }
+
+ 	alarm9mask	OBJECT-TYPE
+		SYNTAX	INTEGER(0..25)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION
+			" Alarm drive 9 Select [Single Alarm Error].
+                             Bit Position - Alarm Drive State: 0 - Unselect, 1-25 - Select
+                             1 - Voltage Low
+                             2 - Voltage High
+                             3 - Tempr Low     
+                             4 - Tempr Limit 1
+                             5 - Tempr Limit 2   
+                             6 - Tempr Limit 3   
+                             7 - Humid. Low
+                             8 - Humid. High
+                             9 - Fltr Pressure 1
+                             10 - Fltr Pressure 2
+                             11 - Fan 1
+                             12 - Fan 2
+                             13 - Onboard Sens
+                             14 - Room Sens
+                             15 - Hotspot Sens
+                             16 - Ambient 1 Sens
+                             17 - Ambient 2 Sens
+                             18 - Dig 1 I/P
+                             19 - Dig 2 I/P
+                             20 - Dig 3 I/P
+                             21 - Filter I/P 1
+                             22 - Filter I/P 2
+                             23 - Network
+                             24 - Int storage
+                             25 - SD Card "
+		::= { alarmConfig 10 }
+
+ 	alarm10mask	OBJECT-TYPE
+		SYNTAX	INTEGER(0..25)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION
+			" Alarm drive 10 Select [Single Alarm Error].
+                              Bit Position - Alarm Drive State: 0 - Unselect, 1-25 - Select
+                             1 - Voltage Low
+                             2 - Voltage High
+                             3 - Tempr Low     
+                             4 - Tempr Limit 1
+                             5 - Tempr Limit 2   
+                             6 - Tempr Limit 3   
+                             7 - Humid. Low
+                             8 - Humid. High
+                             9 - Fltr Pressure 1
+                             10 - Fltr Pressure 2
+                             11 - Fan 1
+                             12 - Fan 2
+                             13 - Onboard Sens
+                             14 - Room Sens
+                             15 - Hotspot Sens
+                             16 - Ambient 1 Sens
+                             17 - Ambient 2 Sens
+                             18 - Dig 1 I/P
+                             19 - Dig 2 I/P
+                             20 - Dig 3 I/P
+                             21 - Filter I/P 1
+                             22 - Filter I/P 2
+                             23 - Network
+                             24 - Int storage
+                             25 - SD Card "
+		::= { alarmConfig 11 }
+
+
+
+--
+-- Controller-CC3000 : nightModeConfig
+
+	saveReloadConfNm    OBJECT-TYPE
+		SYNTAX	INTEGER(0..1)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	"0 - Discard modifications, 1 - Save Modifications. Configuration reloaded  "
+		::= { nightModeConfig 1 }
+
+ 
+	starttimeHournm	OBJECT-TYPE
+		SYNTAX	INTEGER(0..24)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	" Night Mode Start time hour  "
+		::= { nightModeConfig 2 }
+
+
+	startTimeMinutesnm	OBJECT-TYPE
+		SYNTAX	INTEGER(0..59)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	" Night Mode Start time minutes  "
+		::= { nightModeConfig 3 }
+
+
+
+	endTimeHournm	OBJECT-TYPE
+		SYNTAX	INTEGER(0..24)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	" Night Mode End time hour  "
+		::= { nightModeConfig 4 }
+
+
+	endTimeMinutesnm	OBJECT-TYPE
+		SYNTAX	INTEGER(0..59)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	" Night Mode End time minutes  "
+		::= { nightModeConfig 5 }
+
+
+	fanMaxRPMnm	OBJECT-TYPE
+		SYNTAX	INTEGER(0..100)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	" % of max fan speed "
+		::= { nightModeConfig 6 }
+
+
+	setPointOffsetnm	OBJECT-TYPE
+		SYNTAX	INTEGER(-10..10)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	"Cooling setpoint offset "
+		::= { nightModeConfig 7 }
+
+
+
+	coolingModenm	OBJECT-TYPE
+		SYNTAX	INTEGER(0..3)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	"0 - Freecooling. 1 - Standard. 2 - Power save. 3 - Aircon.  "
+		::= { nightModeConfig 8 }
+
+
+	enablenm	OBJECT-TYPE
+		SYNTAX	INTEGER(0..1)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	"0 - Disable. 1 - Enable. "
+		::= { nightModeConfig 9 }
+
+
+--
+-- Controller-CC3000 : networkConfig
+
+	saveReloadConfNW    OBJECT-TYPE
+		SYNTAX	INTEGER(0..1)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	"0 - Discard modifications, 1 - Save Modifications. Configuration reloaded  "
+		::= { networkConfig 1 }
+
+	dhcpenable	OBJECT-TYPE
+		SYNTAX	INTEGER(0..1)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	"0 - Static IP, 1 - Dynamic IP "
+		::= { networkConfig 2 }
+
+	ipaddr	OBJECT-TYPE
+		SYNTAX	OCTET STRING
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	"System IP Address"
+		::= { networkConfig 3 }
+
+	subnetmask	OBJECT-TYPE
+		SYNTAX	OCTET STRING
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	"Sub-net Mask  "
+		::= { networkConfig 4 }
+
+	gatewayIPaddr	OBJECT-TYPE
+		SYNTAX	OCTET STRING
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	"Default Gateway IP Address"
+		::= { networkConfig 5 }
+
+	ntpIPaddr	OBJECT-TYPE
+		SYNTAX	OCTET STRING
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	"DNS IP Address"
+		::= { networkConfig 6 }
+
+	snmpPort	OBJECT-TYPE
+		SYNTAX	INTEGER(0..65535)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	"SNMP Agent Port"
+		::= { networkConfig 7 }
+
+	trapServer1IPaddr	OBJECT-TYPE
+		SYNTAX	OCTET STRING
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	"SNMP TRAP manager 1 IP address"
+		::= { networkConfig 8 }
+
+	trapServer1port	OBJECT-TYPE
+		SYNTAX	INTEGER(0..65535)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	"SNMP TRAP manager 1 Port Number"
+		::= { networkConfig 9 }
+
+	trapServer2IPaddr	OBJECT-TYPE
+		SYNTAX	OCTET STRING
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	"SNMP TRAP manager 2 IP address"
+		::= { networkConfig 10 }
+
+	trapServer2port	OBJECT-TYPE
+		SYNTAX	INTEGER(0..65535)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	"SNMP TRAP manager 2 Port Number"
+		::= { networkConfig 11 }
+
+	trapServer3IPaddr	OBJECT-TYPE
+		SYNTAX	OCTET STRING
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	"SNMP TRAP manager 3 IP address"
+		::= { networkConfig 12 }
+
+	trapServer3port	OBJECT-TYPE
+		SYNTAX	INTEGER(0..65535)
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	"SNMP TRAP manager 3 Port Number"
+		::= { networkConfig 13 }
+
+	snmpCommunity	OBJECT-TYPE
+		SYNTAX	OCTET STRING
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	"SNMP Read/write Community string"
+		::= { networkConfig 14 }
+
+	hostName	OBJECT-TYPE
+		SYNTAX	OCTET STRING
+		ACCESS	read-write
+		STATUS	mandatory
+		DESCRIPTION	"System Netwrok Host name"
+		::= { networkConfig 15 }
+
+--
+-- Controller-CC3000 : trapError
+
+	errorNumber OBJECT-TYPE
+		SYNTAX	INTEGER {
+                             VoltageLow     (1),
+                             VoltageHigh    (2),
+                             TemprLow       (3),
+                             TemprLimit1    (4),
+                             TemprLimit2    (5),
+                             TemprLimit3    (6),
+                             HumidLow       (7),
+                             HumidHigh      (8),
+                             FltrPressure1  (9),
+                             FltPressure2   (10),
+                             Fan1           (11),
+                             Fan2           (12),
+                             OnboardSens    (13),
+                             RoomSens       (14),
+                             HotspotSens    (15),
+                             Ambient1Sens   (16),
+                             Ambient2Sens   (17),
+                             Dig1IP         (18),
+                             Dig2IP         (19),
+                             Dig3IP         (20),
+                             FilterIP1      (21),
+                             FilterIP2      (22),
+                             Network        (23),
+                             Intstorage     (24),
+                             SDCard         (25) }
+		ACCESS	not-accessible
+		STATUS	mandatory
+		DESCRIPTION
+			" Error Number corresponding to CC3000 controller Error."
+		::= { trapError  1 }
+
+	status OBJECT-TYPE
+		SYNTAX INTEGER { ALARMset (1), ALARMclear (0) }
+		ACCESS	not-accessible
+		STATUS	mandatory
+		DESCRIPTION
+			" Error Status Active/SET or Inactive/CLEAR."
+		::= { trapError  2 }
+
+	value OBJECT-TYPE
+		SYNTAX	OCTET STRING
+		ACCESS	not-accessible
+		STATUS	mandatory
+		DESCRIPTION
+			" Value Corresponding to Error Occurance Instance."
+		::= { trapError  3 }
+
+	info OBJECT-TYPE
+		SYNTAX	OCTET STRING
+		ACCESS	not-accessible
+		STATUS	mandatory
+		DESCRIPTION
+			" Description of Current Error."
+		::= { trapError  4 }
+
+
+	cc3000Trap	TRAP-TYPE
+		ENTERPRISE danthermCooling
+		VARIABLES {hostName, errorNumber, status, value, info }
+		DESCRIPTION "Trap From CC300 Controller. Contains TRAP information "
+		REFERENCE "None"
+		::= 1
+
+
+
+END
+

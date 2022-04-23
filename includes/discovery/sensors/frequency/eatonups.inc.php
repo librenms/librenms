@@ -7,14 +7,14 @@ $oids = snmpwalk_cache_oid($device, 'xupsInputFrequency', [], 'XUPS-MIB');
 
 foreach ($oids as $freq_id => $data) {
     $freq_oid = ".1.3.6.1.4.1.534.1.3.1.$freq_id";
-    $descr    = 'Input';
+    $descr = 'Input';
     if (count($oids) > 1) {
         $descr .= " Phase $freq_id";
     }
-    $divisor  = 10;
-    $current  = $data['xupsInputFrequency'] / $divisor;
-    $type     = 'xups';
-    $index    = '3.1.'.$freq_id;
+    $divisor = 10;
+    $current = $data['xupsInputFrequency'] / $divisor;
+    $type = 'xups';
+    $index = '3.1.' . $freq_id;
 
     discover_sensor($valid['sensor'], 'frequency', $device, $freq_oid, $index, $type, $descr, $divisor, '1', null, null, null, null, $current);
 }
@@ -31,7 +31,7 @@ foreach ($oids as $freq_id => $data) {
     $divisor = 10;
     $current = $data['xupsOutputFrequency'] / $divisor;
     $type = 'xups';
-    $index = '4.2.'.$freq_id;
+    $index = '4.2.' . $freq_id;
     discover_sensor($valid['sensor'], 'frequency', $device, $freq_oid, $index, $type, $descr, $divisor, '1', null, null, null, null, $current);
 }
 
@@ -50,7 +50,7 @@ foreach ($oids as $freq_id => $data) {
         // Bypass is not always available in SNMP
         $current /= $divisor;
         $type = 'xups';
-        $index = '5.1.'.$freq_id;
+        $index = '5.1.' . $freq_id;
 
         discover_sensor($valid['sensor'], 'frequency', $device, $freq_oid, $index, $type, $descr, $divisor, '1', null, null, null, null, $current);
     }

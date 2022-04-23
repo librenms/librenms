@@ -1,6 +1,6 @@
 <?php
 
-$rrd_filename = rrd_name($device['hostname'], 'routeros_leases');
+$rrd_filename = Rrd::name($device['hostname'], 'routeros_leases');
 
 require 'includes/html/graphs/common.inc.php';
 

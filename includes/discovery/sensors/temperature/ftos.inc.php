@@ -10,8 +10,8 @@ $oids = snmpwalk_cache_oid($device, 'chStackUnitSysType', $oids, 'F10-S-SERIES-C
 
 if (is_array($oids)) {
     foreach ($oids as $index => $entry) {
-        $descr   = 'Unit '.$index.' '.$entry['chStackUnitSysType'];
-        $oid     = '.1.3.6.1.4.1.6027.3.10.1.2.2.1.14.'.$index;
+        $descr = 'Unit ' . $index . ' ' . $entry['chStackUnitSysType'];
+        $oid = '.1.3.6.1.4.1.6027.3.10.1.2.2.1.14.' . $index;
         $current = $entry['chStackUnitTemp'];
         discover_sensor($valid['sensor'], 'temperature', $device, $oid, $index, 'ftos-sseries', $descr, '1', '1', null, null, null, null, $current);
     }
@@ -20,8 +20,8 @@ if (is_array($oids)) {
 $oids = snmpwalk_cache_oid($device, 'chSysCardTemp', [], 'F10-C-SERIES-CHASSIS-MIB', 'ftos');
 if (is_array($oids)) {
     foreach ($oids as $index => $entry) {
-        $entry['descr']   = 'Slot '.$index;
-        $entry['oid']     = '.1.3.6.1.4.1.6027.3.8.1.2.1.1.5.'.$index;
+        $entry['descr'] = 'Slot ' . $index;
+        $entry['oid'] = '.1.3.6.1.4.1.6027.3.8.1.2.1.1.5.' . $index;
         $entry['current'] = $entry['chSysCardTemp'];
         discover_sensor($valid['sensor'], 'temperature', $device, $entry['oid'], $index, 'ftos-cseries', $entry['descr'], '1', '1', null, null, null, null, $entry['current']);
     }
@@ -33,8 +33,8 @@ $oids = snmpwalk_cache_oid($device, 'chSysCardUpperTemp', [], 'F10-CHASSIS-MIB',
 
 if (is_array($oids)) {
     foreach ($oids as $index => $entry) {
-        $descr   = 'Slot '.$index;
-        $oid     = '.1.3.6.1.4.1.6027.3.1.1.2.3.1.8.'.$index;
+        $descr = 'Slot ' . $index;
+        $oid = '.1.3.6.1.4.1.6027.3.1.1.2.3.1.8.' . $index;
         $current = $entry['chSysCardUpperTemp'];
 
         discover_sensor($valid['sensor'], 'temperature', $device, $oid, $index, 'ftos-eseries', $descr, '1', '1', null, null, null, null, $current);

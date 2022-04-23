@@ -1,10 +1,14 @@
-DO NOT DELETE THIS TEXT
+Please give a short description what your pull request is for
+
+DO NOT DELETE THE UNDERLYING TEXT
 
 #### Please note
 
-> Please read this information carefully. You can run `./scripts/pre-commit.php` to check your code before submitting.
+> Please read this information carefully. You can run `./lnms dev:check` to check your code before submitting.
 
-- [ ] Have you followed our [code guidelines?](http://docs.librenms.org/Developing/Code-Guidelines/)
+- [ ] Have you followed our [code guidelines?](https://docs.librenms.org/Developing/Code-Guidelines/)
+- [ ] If my Pull Request does some changes/fixes/enhancements in the WebUI, I have inserted a screenshot of it.
+- [ ] If my Pull Request makes discovery/polling/yaml changes, I have added/updated [test data](https://docs.librenms.org/Developing/os/Test-Units/).
 
 #### Testers
 

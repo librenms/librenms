@@ -2,13 +2,13 @@ os: dcn-software
 text: 'Digital China Networks'
 type: network
 icon: dcn
-mib_dir:
-    - dcn
+mib_dir: dcn
 over:
     - { graph: device_bits, text: 'Device Traffic' }
     - { graph: device_processor, text: 'Processor Usage' }
     - { graph: device_mempool, text: 'Memory Usage' }
 discovery:
-    - sysObjectID:
-        - .1.3.6.1.4.1.6339.1.1.1.
-        - .1.3.6.1.4.1.6339.1.1.2.
+    -
+        sysObjectID:
+            - .1.3.6.1.4.1.6339.1.1.1.
+            - .1.3.6.1.4.1.6339.1.1.2.

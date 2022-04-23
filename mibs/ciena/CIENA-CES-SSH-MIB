@@ -1,0 +1,57 @@
+-- This file was included in Ciena MIB release MIBS-CIENA-CES-08-07-00-024
+--
+-- CIENA-CES-SSH-MIB.my
+--      
+                    
+CIENA-CES-SSH-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS 		
+    OBJECT-TYPE, MODULE-IDENTITY
+        FROM SNMPv2-SMI			
+    cienaCesConfig
+        FROM CIENA-SMI
+    CienaGlobalState
+        FROM CIENA-TC;
+
+cienaCesSSHMIB MODULE-IDENTITY
+    LAST-UPDATED "201706070000Z"
+    ORGANIZATION "Ciena Corp."
+    CONTACT-INFO
+    "   Mib Meister
+        7035 Ridge Road
+        Hanover, Maryland 21076
+        USA
+        Phone:  +1 800 921 1144
+        Email:  support@ciena.com"
+    DESCRIPTION
+        "The MIB module defines the managed objects for SSH."
+
+    REVISION    "201706070000Z"
+    DESCRIPTION
+        "Updated contact info."
+
+    REVISION    "201608220000Z"            
+    DESCRIPTION
+        "Initial creation."
+    ::= { cienaCesConfig 41 }
+
+--
+-- Node definitions
+--
+
+cienaCesSSHMIBObjects OBJECT IDENTIFIER ::= { cienaCesSSHMIB 1 }
+cienaCesSSHServerGlobal OBJECT IDENTIFIER ::= { cienaCesSSHMIBObjects 1 }
+
+--
+--  The SSH Global Attributes
+--
+cienaCesSSHServerAdminState OBJECT-TYPE
+    SYNTAX      CienaGlobalState
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "This object indicates the global administrative state of the SSH server."               
+    ::= { cienaCesSSHServerGlobal 1 }
+
+END	
+

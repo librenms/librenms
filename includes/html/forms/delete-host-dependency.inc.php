@@ -12,11 +12,11 @@
  * the source code distribution for details.
  */
 
-if (!Auth::user()->hasGlobalAdmin()) {
+if (! Auth::user()->hasGlobalAdmin()) {
     $status = ['status' => 1, 'message' => 'You need to be admin'];
 } else {
     if ($_POST['device_id']) {
-        if (!is_numeric($_POST['device_id'])) {
+        if (! is_numeric($_POST['device_id'])) {
             $status = ['status' => 1, 'message' => 'Wrong device id!'];
         } else {
             $device = \App\Models\Device::find($_POST['device_id']);
@@ -31,7 +31,7 @@ if (!Auth::user()->hasGlobalAdmin()) {
         foreach ($_POST['parent_ids'] as $parent) {
             if (is_numeric($parent) && $parent != 0) {
                 $device = \App\Models\Device::find($_POST['device_id']);
-                if (!$device->children()->detach()) {
+                if (! $device->children()->detach()) {
                     $status = ['status' => 1, 'message' => 'Device dependency cannot be deleted.'];
                 }
             } elseif ($parent == 0) {

@@ -14,32 +14,30 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  *
  * Tests JnxLdpLspDown and JnxLdpLspUp traps from Juniper devices.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
+ *
  * @copyright  2019 KanREN, Inc
  * @author     Heath Barnhart <hbarnhart@kanren.net>
  */
 
-namespace LibreNMS\Tests;
+namespace LibreNMS\Tests\Feature\SnmpTraps;
 
 use App\Models\Device;
 use App\Models\Ipv4Address;
 use LibreNMS\Snmptrap\Dispatcher;
 use LibreNMS\Snmptrap\Trap;
-use LibreNMS\Tests\Feature\SnmpTraps\SnmpTrapTestCase;
 
 class JnxLdpLspTest extends SnmpTrapTestCase
 {
     public function testLdpLspDownTrap()
     {
-        $device = factory(Device::class)->create();
-        $ipv4 = factory(Ipv4Address::class)->make();
-
+        $device = Device::factory()->create(); /** @var Device $device */
+        $ipv4 = Ipv4Address::factory()->make(); /** @var Ipv4Address $ipv4 */
         $trapText = "$device->hostname
 UDP: [$device->ip]:64610->[192.168.5.5]:162
 DISMAN-EVENT-MIB::sysUpTimeInstance 198:2:10:48.91
@@ -60,9 +58,8 @@ SNMPv2-MIB::snmpTrapEnterprise.0 JUNIPER-CHASSIS-DEFINES-MIB::jnxProductNameMX48
 
     public function testLdpLspUpTrap()
     {
-        $device = factory(Device::class)->create();
-        $ipv4 = factory(Ipv4Address::class)->make();
-
+        $device = Device::factory()->create(); /** @var Device $device */
+        $ipv4 = Ipv4Address::factory()->make(); /** @var Ipv4Address $ipv4 */
         $trapText = "$device->hostname
 UDP: [$device->ip]:64610->[192.168.5.5]:162
 DISMAN-EVENT-MIB::sysUpTimeInstance 198:2:10:48.91

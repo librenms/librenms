@@ -1,0 +1,126 @@
+mib: NAS-MIB
+modules:
+    sensors:
+        pre-cache:
+            data:
+                -
+                    oid:
+                        - diskEnclosureID
+                        - volumeName
+        temperature:
+            options:
+                skip_values: -1
+            data:
+                -
+                    oid: enclosureTable
+                    value: enclosureSystemTemp
+                    num_oid: '.1.3.6.1.4.1.24681.1.4.1.1.1.1.1.2.1.7.{{ $index }}'
+                    descr: 'Enclosure {{ $enclosureID }}'
+                    index: 'enclosureSystemTemp.{{ $index }}'
+                    group: 'System'
+                -
+                    oid: cpuTemp
+                    value: cpuTemp
+                    num_oid: '.1.3.6.1.4.1.24681.1.4.1.1.1.1.4.2.{{ $index }}'
+                    descr: 'CPU'
+                    index: 'cpuTemp.{{ $index }}'
+                    group: 'System'
+                -
+                    oid: systemPowerTable
+                    value: systemPowerTemp
+                    num_oid: '.1.3.6.1.4.1.24681.1.4.1.1.1.1.3.2.1.6.{{ $index }}'
+                    descr: 'Enclosure {{ $systemPowerEnclosureID }} PSU {{ $systemPowerID}}'
+                    index: 'systemPowerTemp.{{ $index }}'
+                    group: 'System'
+                -
+                    oid: diskTable
+                    value: diskTemperture
+                    num_oid: '.1.3.6.1.4.1.24681.1.4.1.1.1.1.5.2.1.6.{{ $index }}'
+                    descr: 'Disk {{ $index }} {{ $diskModel }}'
+                    index: 'diskTemperture.{{ $index }}'
+                    group: 'Disks enclosure {{ $diskEnclosureID }}'
+        fanspeed:
+            options:
+                skip_values: -1
+            data:
+                -
+                    oid: systemFan2Table
+                    value: systemFanSpeed
+                    num_oid: '.1.3.6.1.4.1.24681.1.4.1.1.1.1.2.2.1.5.{{ $index }}'
+                    descr: 'FAN {{ $index }}'
+                    index: 'systemFanSpeed.{{ $index }}'
+                    group: 'System enclosure {{ $systemFanEnclosureID }}'
+                -
+                    oid: systemPowerTable
+                    value: systemPowerFanSpeed
+                    num_oid: '.1.3.6.1.4.1.24681.1.4.1.1.1.1.3.2.1.5.{{ $index }}'
+                    descr: 'PSU {{ $systemPowerID }}'
+                    index: 'systemPowerFanSpeed.{{ $index }}'
+                    group: 'Power enclosure {{ $systemPowerEnclosureID }}'
+        state:
+            data:
+                -
+                    oid: systemHdTable
+                    value: hdStatus
+                    num_oid: '.1.3.6.1.4.1.24681.1.2.11.1.4.{{ $index }}'
+                    descr: 'Disk {{ $index }}'
+                    index: 'hdStatus.{{ $index }}'
+                    group: 'Disk Status'
+                    state_name: hdStatus
+                    states:
+                        - { value: 0, generic: 0, graph: 0, descr: 'Ready' }
+                        - { value: -5, generic: 3, graph: 0, descr: 'No Disk' }
+                        - { value: -6, generic: 2, graph: 0, descr: 'Invalid' }
+                        - { value: -9, generic: 2, graph: 0, descr: 'RW Error' }
+                        - { value: -4, generic: 3, graph: 0, descr: 'Unknown' }
+                -
+                    oid: diskTable
+                    value: diskSmartInfo
+                    num_oid: '.1.3.6.1.4.1.24681.1.4.1.1.1.1.5.2.1.5.{{ $index }}'
+                    descr: 'Disk {{ $index }}'
+                    index: 'diskSmartInfo.{{ $index }}'
+                    group: 'Disk S.M.A.R.T. enclosure {{ $diskEnclosureID }}'
+                    state_name: diskSmartInfo
+                    states:
+                        - { value: 2, generic: 2, graph: 0, descr: 'Abnormal' }
+                        - { value: 1, generic: 1, graph: 0, descr: 'Warning' }
+                        - { value: 0, generic: 0, graph: 0, descr: 'Good' }
+                        - { value: -1, generic: 2, graph: 0, descr: 'Error' }
+                -
+                    oid: systemFan2Table
+                    value: systemFanStatus
+                    num_oid: '.1.3.6.1.4.1.24681.1.4.1.1.1.1.5.2.1.5.{{ $index }}'
+                    descr: 'FAN {{ $index }}'
+                    index: 'systemFanStatus.{{ $index }}'
+                    group: 'FANs enclosure {{ $systemFanEnclosureID }}'
+                    state_name: systemFanStatus
+                    states:
+                        - { value: 0, generic: 0, graph: 0, descr: 'Ok' }
+                        - { value: -1, generic: 2, graph: 0, descr: 'Fail' }
+                -
+                    oid: systemPowerTable
+                    value: systemPowerStatus
+                    num_oid: '.1.3.6.1.4.1.24681.1.4.1.1.1.1.5.2.1.5.{{ $index }}'
+                    descr: 'PSU {{ $index }}'
+                    index: 'systemPowerStatus.{{ $index }}'
+                    group: 'PSUs enclosure {{ $systemPowerEnclosureID }}'
+                    state_name: systemPowerStatus
+                    states:
+                        - { value: 0, generic: 0, graph: 0, descr: 'Ok' }
+                        - { value: -1, generic: 2, graph: 0, descr: 'Fail' }
+                -
+                    oid: raidGroupTable
+                    value: raidStatus
+                    num_oid: '.1.3.6.1.4.1.24681.1.4.1.1.1.2.1.2.1.5.{{ $index }}'
+                    descr: '{{ $volumeName }} Raid {{ $raidLevel }}'
+                    index: 'raidStatus.{{ $index }}'
+                    group: 'Volumes'
+                    state_name: raidStatus
+                    states:
+                        - { value: 0, generic: 0, graph: 0, descr: 'Ready' }
+                        - { value: 3, generic: 2, graph: 0, descr: 'Synchronizing' }
+                        - { value: 2, generic: 2, graph: 0, descr: 'Rebulding' }
+                        - { value: 1, generic: 1, graph: 0, descr: 'Degraded' }
+                        - { value: 5, generic: 3, graph: 0, descr: 'Offline' }
+                        - { value: 4, generic: 1, graph: 0, descr: 'Failure' }
+                        - { value: 6, generic: 2, graph: 0, descr: 'Migrating...' }

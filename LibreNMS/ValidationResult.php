@@ -15,35 +15,44 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
+ *
  * @copyright  2017 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
 namespace LibreNMS;
 
+use Illuminate\Support\Arr;
+
 class ValidationResult
 {
-    const FAILURE = 0;
-    const WARNING = 1;
-    const SUCCESS = 2;
+    public const FAILURE = 0;
+    public const WARNING = 1;
+    public const SUCCESS = 2;
+    public const INFO = 3;
 
+    /** @var string */
     private $message;
+    /** @var int */
     private $status;
+    /** @var string */
     private $list_description = '';
+    /** @var array */
     private $list;
+    /** @var string|null */
     private $fix;
 
     /**
      * ValidationResult constructor.
-     * @param string $message The message to describe this result
-     * @param int $status The status of this result FAILURE, WARNING, or SUCCESS
-     * @param string $fix a suggested fix to highlight for the user
+     *
+     * @param  string  $message  The message to describe this result
+     * @param  int  $status  The status of this result FAILURE, WARNING, or SUCCESS
+     * @param  string|null  $fix  a suggested fix to highlight for the user
      */
-    public function __construct($message, $status, $fix = null)
+    public function __construct(string $message, int $status, string $fix = null)
     {
         $this->message = $message;
         $this->status = $status;
@@ -52,33 +61,47 @@ class ValidationResult
 
     /**
      * Create a new ok Validation result
-     * @param string $message The message to describe this result
-     * @param string $fix a suggested fix to highlight for the user
+     *
+     * @param  string  $message  The message to describe this result
+     * @param  string|null  $fix  a suggested fix to highlight for the user
      * @return ValidationResult
      */
-    public static function ok($message, $fix = null)
+    public static function ok(string $message, string $fix = null): ValidationResult
     {
         return new self($message, self::SUCCESS, $fix);
     }
 
     /**
      * Create a new warning Validation result
-     * @param string $message The message to describe this result
-     * @param string $fix a suggested fix to highlight for the user
+     *
+     * @param  string  $message  The message to describe this result
+     * @param  string|null  $fix  a suggested fix to highlight for the user
      * @return ValidationResult
      */
-    public static function warn($message, $fix = null)
+    public static function warn(string $message, string $fix = null): ValidationResult
     {
         return new self($message, self::WARNING, $fix);
     }
 
     /**
-     * Create a new failure Validation result
-     * @param string $message The message to describe this result
-     * @param string $fix a suggested fix to highlight for the user
+     * Create a new informational Validation result
+     *
+     * @param  string  $message  The message to describe this result
      * @return ValidationResult
      */
-    public static function fail($message, $fix = null)
+    public static function info(string $message): ValidationResult
+    {
+        return new self($message, self::INFO);
+    }
+
+    /**
+     * Create a new failure Validation result
+     *
+     * @param  string  $message  The message to describe this result
+     * @param  string|null  $fix  a suggested fix to highlight for the user
+     * @return ValidationResult
+     */
+    public static function fail(string $message, string $fix = null): ValidationResult
     {
         return new self($message, self::FAILURE, $fix);
     }
@@ -89,27 +112,27 @@ class ValidationResult
      *
      * @return int
      */
-    public function getStatus()
+    public function getStatus(): int
     {
         return $this->status;
     }
 
-    public function getMessage()
+    public function getMessage(): string
     {
         return $this->message;
     }
 
-    public function hasList()
+    public function hasList(): bool
     {
-        return !empty($this->list);
+        return ! empty($this->list);
     }
 
-    public function getList()
+    public function getList(): ?array
     {
         return $this->list;
     }
 
-    public function setList($description, array $list)
+    public function setList(string $description, array $list): ValidationResult
     {
         if (is_array(current($list))) {
             $list = array_map(function ($item) {
@@ -119,14 +142,18 @@ class ValidationResult
 
         $this->list_description = $description;
         $this->list = $list;
+
         return $this;
     }
 
-    public function hasFix()
+    public function hasFix(): bool
     {
-        return !empty($this->fix);
+        return ! empty($this->fix);
     }
 
+    /**
+     * @return string|array|null
+     */
     public function getFix()
     {
         return $this->fix;
@@ -136,30 +163,31 @@ class ValidationResult
      * The commands (generally) to fix the issue.
      * If there are multiple, use an array.
      *
-     * @param string|array $fix
+     * @param  string|array  $fix
      * @return ValidationResult $this
      */
-    public function setFix($fix)
+    public function setFix($fix): ValidationResult
     {
         $this->fix = $fix;
+
         return $this;
     }
 
     /**
      * Print out this result to the console.  Formatted nicely and with color.
      */
-    public function consolePrint()
+    public function consolePrint(): void
     {
         c_echo(str_pad('[' . $this->getStatusText($this->status) . ']', 12) . $this->message . PHP_EOL);
 
         if (isset($this->fix)) {
             c_echo("\t[%BFIX%n]: \n");
-            foreach ((array)$this->fix as $fix) {
+            foreach ((array) $this->fix as $fix) {
                 c_echo("\t%B$fix%n\n");
             }
         }
 
-        if (!empty($this->list)) {
+        if (! empty($this->list)) {
             echo "\t" . $this->getListDescription() . ":\n";
             $this->printList();
         }
@@ -170,31 +198,47 @@ class ValidationResult
      *
      * @return string
      */
-    public static function getStatusText($status)
+    public static function getStatusText(int $status): string
     {
-        if ($status === self::SUCCESS) {
-            return '%gOK%n';
-        } elseif ($status === self::WARNING) {
-            return '%YWARN%n';
-        } elseif ($status === self::FAILURE) {
-            return '%RFAIL%n';
-        }
-        return 'Unknown';
+        $table = [
+            self::SUCCESS => '%gOK%n',
+            self::WARNING => '%YWARN%n',
+            self::FAILURE => '%RFAIL%n',
+            self::INFO => '%CINFO%n',
+        ];
+
+        return $table[$status] ?? 'Unknown';
     }
 
-    public function getListDescription()
+    public function getListDescription(): string
     {
         return $this->list_description;
+    }
+
+    public function toArray(): array
+    {
+        $resultStatus = $this->getStatus();
+        $resultFix = $this->getFix();
+        $resultList = $this->getList();
+
+        return [
+            'status' => $resultStatus,
+            'statusText' => substr($this->getStatusText($resultStatus), 2, -2), // remove console colors
+            'message' => $this->getMessage(),
+            'fix' => Arr::wrap($resultFix),
+            'listDescription' => $this->getListDescription(),
+            'list' => is_array($resultList) ? array_values($resultList) : [],
+        ];
     }
 
     /**
      * Print a list of items up to a max amount
      * If over that number, a line will print the total items
      *
-     * @param string $format format as consumed by printf()
-     * @param int $max the max amount of items to print, default 15
+     * @param  string  $format  format as consumed by printf()
+     * @param  int  $max  the max amount of items to print, default 15
      */
-    private function printList($format = "\t %s\n", $max = 15)
+    private function printList(string $format = "\t %s\n", int $max = 15): void
     {
         foreach (array_slice($this->list, 0, $max) as $item) {
             printf($format, $item);

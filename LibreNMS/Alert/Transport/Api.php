@@ -11,25 +11,27 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>. */
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>. */
 
 /**
  * API Transport
+ *
  * @author f0o <f0o@devilcode.org>
  * @author PipoCanaja (github.com/PipoCanaja)
  * @copyright 2014 f0o, LibreNMS
  * @license GPL
- * @package LibreNMS
- * @subpackage Alerts
  */
 
 namespace LibreNMS\Alert\Transport;
 
+use App\View\SimpleTemplate;
 use LibreNMS\Alert\Transport;
-use GuzzleHttp\Client;
+use LibreNMS\Util\Proxy;
 
 class Api extends Transport
 {
+    protected $name = 'API';
+
     public function deliverAlert($obj, $opts)
     {
         $url = $this->config['api-url'];
@@ -38,67 +40,55 @@ class Api extends Transport
         $body = $this->config['api-body'];
         $method = $this->config['api-method'];
         $auth = [$this->config['api-auth-username'], $this->config['api-auth-password']];
+
         return $this->contactAPI($obj, $url, $options, $method, $auth, $headers, $body);
     }
 
     private function contactAPI($obj, $api, $options, $method, $auth, $headers, $body)
     {
         $request_opts = [];
-        $request_heads = [];
-        $query = [];
 
         $method = strtolower($method);
-        $host = explode("?", $api, 2)[0]; //we don't use the parameter part, cause we build it out of options.
+        $host = explode('?', $api, 2)[0]; //we don't use the parameter part, cause we build it out of options.
 
         //get each line of key-values and process the variables for Headers;
-        foreach (preg_split("/\\r\\n|\\r|\\n/", $headers, -1, PREG_SPLIT_NO_EMPTY) as $current_line) {
-            list($u_key, $u_val) = explode('=', $current_line, 2);
-            foreach ($obj as $p_key => $p_val) {
-                $u_val = str_replace("{{ $" . $p_key . ' }}', $p_val, $u_val);
-            }
-            //store the parameter in the array for HTTP headers
-            $request_heads[$u_key] = $u_val;
-        }
+        $request_heads = $this->parseUserOptions($headers, $obj);
         //get each line of key-values and process the variables for Options;
-        foreach (preg_split("/\\r\\n|\\r|\\n/", $options, -1, PREG_SPLIT_NO_EMPTY) as $current_line) {
-            list($u_key, $u_val) = explode('=', $current_line, 2);
-            // Replace the values
-            foreach ($obj as $p_key => $p_val) {
-                $u_val = str_replace("{{ $" . $p_key . ' }}', $p_val, $u_val);
-            }
-            //store the parameter in the array for HTTP query
-            $query[$u_key] = $u_val;
-        }
+        $query = $this->parseUserOptions($options, $obj);
 
-        $client = new \GuzzleHttp\Client();
-        if (isset($auth) && !empty($auth[0])) {
+        $client = app(\GuzzleHttp\Client::class);
+        $request_opts['proxy'] = Proxy::forGuzzle();
+        if (isset($auth) && ! empty($auth[0])) {
             $request_opts['auth'] = $auth;
         }
         if (count($request_heads) > 0) {
             $request_opts['headers'] = $request_heads;
         }
-        if ($method == "get") {
+        if ($method == 'get') {
             $request_opts['query'] = $query;
             $res = $client->request('GET', $host, $request_opts);
-        } elseif ($method == "put") {
+        } elseif ($method == 'put') {
             $request_opts['query'] = $query;
             $request_opts['body'] = $body;
             $res = $client->request('PUT', $host, $request_opts);
         } else { //Method POST
-            $request_opts['form_params'] = $query;
+            $request_opts['query'] = $query;
+            $request_opts['body'] = SimpleTemplate::parse($body, $obj);
             $res = $client->request('POST', $host, $request_opts);
         }
 
         $code = $res->getStatusCode();
         if ($code != 200) {
             var_dump("API '$host' returned Error");
-            var_dump("Params:");
+            var_dump('Params:');
             var_dump($query);
-            var_dump("Response headers:");
+            var_dump('Response headers:');
             var_dump($res->getHeaders());
-            var_dump("Return: ".$res->getReasonPhrase());
-            return 'HTTP Status code '.$code;
+            var_dump('Return: ' . $res->getReasonPhrase());
+
+            return 'HTTP Status code ' . $code;
         }
+
         return true;
     }
 
@@ -114,8 +104,8 @@ class Api extends Transport
                     'options' => [
                         'GET' => 'GET',
                         'POST' => 'POST',
-                        'PUT' => 'PUT'
-                    ]
+                        'PUT' => 'PUT',
+                    ],
                 ],
                 [
                     'title' => 'API URL',
@@ -138,7 +128,7 @@ class Api extends Transport
                 [
                     'title' => 'body',
                     'name' => 'api-body',
-                    'descr' => 'Enter the body (only used by PUT method, discarded otherwise)',
+                    'descr' => 'Enter the body (only used by PUT/POST method, discarded GET)',
                     'type' => 'textarea',
                 ],
                 [
@@ -152,12 +142,12 @@ class Api extends Transport
                     'name' => 'api-auth-password',
                     'descr' => 'Auth Password',
                     'type' => 'password',
-                ]
+                ],
             ],
             'validation' => [
                 'api-method' => 'in:GET,POST,PUT',
-                'api-url' => 'required|url'
-            ]
+                'api-url' => 'required|url',
+            ],
         ];
     }
 }

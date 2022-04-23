@@ -1,0 +1,4 @@
+modules:
+    os:
+        hardware: IGNITENET-MIB::model.0
+        version: IGNITENET-MIB::fwVersion.0

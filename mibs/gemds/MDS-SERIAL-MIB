@@ -1,0 +1,198 @@
+MDS-SERIAL-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, 
+    OBJECT-TYPE, 
+    Unsigned32
+        FROM SNMPv2-SMI
+    TruthValue
+        FROM SNMPv2-TC
+    MODULE-COMPLIANCE, 
+    OBJECT-GROUP
+        FROM SNMPv2-CONF
+    mdsServices 
+        FROM MDS-ORBIT-SMI-MIB;
+
+mdsSerialMIB MODULE-IDENTITY
+    LAST-UPDATED "201805160000Z" -- May 16, 2018
+    ORGANIZATION 
+        "GE MDS LLC
+        http://www.gemds.com"
+    CONTACT-INFO
+        "T 1-800-474-0694 (Toll Free in North America)
+         T 585-242-9600
+         F 585-242-9620
+
+         175 Science Parkway
+         Rochester, New York 14620
+         USA"
+    DESCRIPTION
+        "The MIB module to describe the system."
+    REVISION      "201805160000Z"
+    DESCRIPTION
+        "Updated conformance statments based on smilint."
+    REVISION      "201405120000Z"
+    DESCRIPTION
+        "Initial version."
+    ::= { mdsServices 2 }
+
+mSerMIBObjects OBJECT IDENTIFIER
+    ::= { mdsSerialMIB 1 }
+
+mSerConfig OBJECT IDENTIFIER
+    ::= { mSerMIBObjects 1 }
+
+mSerStatus OBJECT IDENTIFIER
+    ::= { mSerMIBObjects 2 }
+
+-- Textual Conventions
+
+-- Serial Status Objects
+mSerTermServerStatusTable OBJECT-TYPE
+    SYNTAX      SEQUENCE OF MSerTermServerStatusEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+      "This table contains status of terminal servers."
+    ::= { mSerStatus 1 }
+
+mSerTermServerStatusEntry OBJECT-TYPE
+    SYNTAX      MSerTermServerStatusEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+      "Each entry contains status of a terminal server."
+    INDEX   { mSerTermServerSerialPort }
+    ::= { mSerTermServerStatusTable 1 }
+
+MSerTermServerStatusEntry ::=
+    SEQUENCE {
+        mSerTermServerSerialPort OCTET STRING,
+        mSerTermServerDescription OCTET STRING,
+        mSerTermServerEnabled TruthValue,
+        mSerTermServerIpTxPackets Unsigned32,
+        mSerTermServerIpTxBytes Unsigned32,
+        mSerTermServerIpRxPackets Unsigned32,
+        mSerTermServerIpRxBytes Unsigned32,
+        mSerTermServerSerialTxPackets Unsigned32,
+        mSerTermServerSerialTxBytes Unsigned32,
+        mSerTermServerSerialRxPackets Unsigned32,
+        mSerTermServerSerialRxBytes Unsigned32
+    }
+
+mSerTermServerSerialPort OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The serial port on which this terminal server is configured."
+    ::= { mSerTermServerStatusEntry 1 }
+
+mSerTermServerDescription OBJECT-TYPE
+    SYNTAX      OCTET STRING
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The serial port on which this terminal server is configured."
+    ::= { mSerTermServerStatusEntry 2 }
+
+mSerTermServerEnabled OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "The serial port on which this terminal server is configured."
+    ::= { mSerTermServerStatusEntry 3 }
+
+mSerTermServerIpTxPackets OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Number of packets transmitted on IP interface."
+    ::= { mSerTermServerStatusEntry 6 }
+
+mSerTermServerIpTxBytes OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Number of bytes transmitted on IP interface."
+    ::= { mSerTermServerStatusEntry 7 }
+
+mSerTermServerIpRxPackets OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Number of packets received on IP interface."
+    ::= { mSerTermServerStatusEntry 8 }
+
+mSerTermServerIpRxBytes OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Number of bytes received on IP interface."
+    ::= { mSerTermServerStatusEntry 9 }
+
+mSerTermServerSerialTxPackets OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Number of packets transmitted on serial interface."
+    ::= { mSerTermServerStatusEntry 10 }
+
+mSerTermServerSerialTxBytes OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Number of bytes transmitted on serial interface."
+    ::= { mSerTermServerStatusEntry 11 }
+
+mSerTermServerSerialRxPackets OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Number of packets received on serial interface."
+    ::= { mSerTermServerStatusEntry 12 }
+
+mSerTermServerSerialRxBytes OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION "Number of bytes received on serial interface."
+    ::= { mSerTermServerStatusEntry 13 }
+
+-- conformance information
+mdsSerMIBConformance   OBJECT IDENTIFIER ::= { mdsSerialMIB 3 }
+mdsSerMIBCompliances OBJECT IDENTIFIER ::= { mdsSerMIBConformance 1 }
+mdsSerMIBGroups      OBJECT IDENTIFIER ::= { mdsSerMIBConformance 2 }
+
+-- compliance statements
+mSerCompliance MODULE-COMPLIANCE
+    STATUS  current
+    DESCRIPTION
+            "The compliance statement for SNMP entities that 
+            implement the MDS-SERIAL-MIB."
+    MODULE  -- this module
+        MANDATORY-GROUPS {
+            mSerStatusGroup
+        }
+    ::= { mdsSerMIBCompliances 1 }
+
+-- units of conformance
+mSerStatusGroup OBJECT-GROUP
+    OBJECTS {
+      mSerTermServerSerialPort,
+      mSerTermServerDescription,
+      mSerTermServerEnabled,
+      mSerTermServerIpTxPackets,
+      mSerTermServerIpTxBytes,
+      mSerTermServerIpRxPackets,
+      mSerTermServerIpRxBytes,
+      mSerTermServerSerialTxPackets,
+      mSerTermServerSerialTxBytes,
+      mSerTermServerSerialRxPackets,
+      mSerTermServerSerialRxBytes
+    }
+    STATUS  current
+    DESCRIPTION
+        "A collection of objects providing information about
+        orbit system status."
+    ::= { mdsSerMIBGroups 1 }
+
+END

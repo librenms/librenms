@@ -1,0 +1,44 @@
+mib: BTI8xx-MIB:BTI8xx-SYSTEM-MIB:BTI8xx-TC-MIB:BTI8xx-SFP-MIB
+modules:
+    os:
+        hardware:
+            - BTI8xx-SYSTEM-MIB::systemProductName.0
+            - BTI8xx-SYSTEM-MIB::systemHWVersion.0
+        hardware_template: '{{ BTI8xx-SYSTEM-MIB::systemProductName.0 }} {{ BTI8xx-SYSTEM-MIB::systemHWVersion.0 }}'
+        serial: BTI8xx-TC-MIB::fruBaseInfoserialNumber.1
+        version: BTI8xx-SYSTEM-MIB::systemSWVersion.0
+    sensors:
+        dbm:
+            data:
+                -
+                    oid: sfpDiagnosticTable
+                    value: sfpDiagnosticRxPowerDbm
+                    num_oid: '.1.3.6.1.4.1.30005.1.7.100.1.2.6.3.1.8.{{ $index }}'
+                    skip_values: 0
+                    index: 'sfpDiagnosticRxPowerDbm.{{ $index }}'
+                    descr: 'eth-0-{{ $sfpDiagnosticIndex }} Rx Power'
+                    entPhysicalIndex: sfpDiagnosticIndex
+                    entPhysicalIndex_measured: ports
+                -
+                    oid: sfpDiagnosticTable
+                    value: sfpDiagnosticTxPowerDbm
+                    num_oid: '.1.3.6.1.4.1.30005.1.7.100.1.2.6.3.1.7.{{ $index }}'
+                    skip_values: 0
+                    index: 'sfpDiagnosticTxPowerDbm.{{ $index }}'
+                    descr: 'eth-0-{{ $sfpDiagnosticIndex }} Tx Power'
+                    entPhysicalIndex: sfpDiagnosticIndex
+                    entPhysicalIndex_measured: ports
+        temperature:
+            data:
+                -
+                    oid: systemManagement
+                    value: systemTemperature
+                    num_oid: '.1.3.6.1.4.1.30005.1.7.100.1.2.1.1.1.7.{{ $index }}'
+                    descr: systemProductName
+                    low_limit: tempLowThreshold
+                    high_limit: tempHighThreshold
+                -
+                    oid: sfpDiagnosticTable
+                    value: sfpDiagnosticTemperature
+                    num_oid: '.1.3.6.1.4.1.30005.1.7.100.1.2.6.3.1.4.{{ $index }}'
+                    descr: 'eth-0-{{ $sfpDiagnosticIndex }}'

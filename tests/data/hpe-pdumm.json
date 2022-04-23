@@ -6,24 +6,6 @@
                     "sysName": "<private>",
                     "sysObjectID": null,
                     "sysDescr": "HP PDU Management Module, revision 1.00.A, firmware version 1.00.16",
-                    "sysContact": null,
-                    "version": null,
-                    "hardware": null,
-                    "features": null,
-                    "os": "hpe-pdumm",
-                    "type": "power",
-                    "serial": null,
-                    "icon": "hpe.svg",
-                    "location": null
-                }
-            ]
-        },
-        "poller": {
-            "devices": [
-                {
-                    "sysName": "<private>",
-                    "sysObjectID": null,
-                    "sysDescr": "HP PDU Management Module, revision 1.00.A, firmware version 1.00.16",
                     "sysContact": "<private>",
                     "version": "1.00.16",
                     "hardware": null,
@@ -35,7 +17,8 @@
                     "location": "<private>"
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     },
     "ports": {
         "discovery": {
@@ -51,10 +34,10 @@
                     "portName": null,
                     "ifIndex": 1,
                     "ifSpeed": null,
+                    "ifSpeed_prev": null,
                     "ifConnectorPresent": null,
                     "ifPromiscuousMode": null,
-                    "ifHighSpeed": null,
-                    "ifOperStatus": null,
+                    "ifOperStatus": "up",
                     "ifOperStatus_prev": null,
                     "ifAdminStatus": null,
                     "ifAdminStatus_prev": null,
@@ -156,10 +139,10 @@
                     "portName": null,
                     "ifIndex": 2,
                     "ifSpeed": null,
+                    "ifSpeed_prev": null,
                     "ifConnectorPresent": null,
                     "ifPromiscuousMode": null,
-                    "ifHighSpeed": null,
-                    "ifOperStatus": null,
+                    "ifOperStatus": "up",
                     "ifOperStatus_prev": null,
                     "ifAdminStatus": null,
                     "ifAdminStatus_prev": null,
@@ -265,11 +248,11 @@
                     "portName": null,
                     "ifIndex": 1,
                     "ifSpeed": 0,
+                    "ifSpeed_prev": null,
                     "ifConnectorPresent": null,
                     "ifPromiscuousMode": null,
-                    "ifHighSpeed": null,
                     "ifOperStatus": "up",
-                    "ifOperStatus_prev": null,
+                    "ifOperStatus_prev": "up",
                     "ifAdminStatus": "up",
                     "ifAdminStatus_prev": null,
                     "ifDuplex": null,
@@ -370,11 +353,11 @@
                     "portName": null,
                     "ifIndex": 2,
                     "ifSpeed": 100000000,
+                    "ifSpeed_prev": null,
                     "ifConnectorPresent": null,
                     "ifPromiscuousMode": null,
-                    "ifHighSpeed": null,
                     "ifOperStatus": "up",
-                    "ifOperStatus_prev": null,
+                    "ifOperStatus_prev": "up",
                     "ifAdminStatus": "up",
                     "ifAdminStatus_prev": null,
                     "ifDuplex": null,

@@ -15,10 +15,10 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
+ *
  * @copyright  2019 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -61,7 +61,7 @@ class FdbTablesController extends TableController
     /**
      * Defines the base query for this resource
      *
-     * @param \Illuminate\Http\Request $request
+     * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Database\Eloquent\Builder|\Illuminate\Database\Query\Builder
      */
     protected function baseQuery($request)
@@ -70,9 +70,9 @@ class FdbTablesController extends TableController
     }
 
     /**
-     * @param string $search
-     * @param Builder $query
-     * @param array $fields
+     * @param  string  $search
+     * @param  Builder  $query
+     * @param  array  $fields
      * @return Builder|\Illuminate\Database\Query\Builder
      */
     protected function search($search, $query, $fields = [])
@@ -105,8 +105,8 @@ class FdbTablesController extends TableController
     }
 
     /**
-     * @param Request $request
-     * @param Builder $query
+     * @param  Request  $request
+     * @param  Builder  $query
      * @return Builder
      */
     public function sort($request, $query)
@@ -114,40 +114,43 @@ class FdbTablesController extends TableController
         $sort = $request->get('sort');
 
         if (isset($sort['mac_address'])) {
-            $query->orderBy('mac_address', $sort['mac_address']);
+            $query->orderBy('mac_address', $sort['mac_address'] == 'desc' ? 'desc' : 'asc');
         }
 
         if (isset($sort['device'])) {
             $query->leftJoin('devices', 'ports_fdb.device_id', 'devices.device_id')
-                ->orderBy('hostname', $sort['device']);
+                ->orderBy('hostname', $sort['device'] == 'desc' ? 'desc' : 'asc');
         }
 
         if (isset($sort['vlan'])) {
             $query->leftJoin('vlans', 'ports_fdb.vlan_id', 'vlans.vlan_id')
-                ->orderBy('vlan_vlan', $sort['vlan']);
+                ->orderBy('vlan_vlan', $sort['vlan'] == 'desc' ? 'desc' : 'asc');
         }
 
         if (isset($sort['interface'])) {
             $query->leftJoin('ports', 'ports_fdb.port_id', 'ports.port_id')
-                ->orderBy('ports.ifDescr', $sort['interface']);
+                ->orderBy('ports.ifDescr', $sort['interface'] == 'desc' ? 'desc' : 'asc');
         }
 
         if (isset($sort['description'])) {
             $query->leftJoin('ports', 'ports_fdb.port_id', 'ports.port_id')
-                ->orderBy('ports.ifDescr', $sort['description']);
+                ->orderBy('ports.ifDescr', $sort['description'] == 'desc' ? 'desc' : 'asc');
         }
 
         if (isset($sort['last_seen'])) {
-            $query->orderBy('updated_at', $sort['last_seen']);
+            $query->orderBy('updated_at', $sort['last_seen'] == 'desc' ? 'desc' : 'asc');
         }
 
         if (isset($sort['first_seen'])) {
-            $query->orderBy('created_at', $sort['first_seen']);
+            $query->orderBy('created_at', $sort['first_seen'] == 'desc' ? 'desc' : 'asc');
         }
 
         return $query;
     }
 
+    /**
+     * @param  PortsFdb  $fdb_entry
+     */
     public function formatItem($fdb_entry)
     {
         $ip_info = $this->findIps($fdb_entry->mac_address);
@@ -155,15 +158,16 @@ class FdbTablesController extends TableController
         $item = [
             'device' => $fdb_entry->device ? Url::deviceLink($fdb_entry->device) : '',
             'mac_address' => Rewrite::readableMac($fdb_entry->mac_address),
+            'mac_oui' => Rewrite::readableOUI($fdb_entry->mac_address),
             'ipv4_address' => $ip_info['ips']->implode(', '),
             'interface' => '',
             'vlan' => $fdb_entry->vlan ? $fdb_entry->vlan->vlan_vlan : '',
             'description' => '',
             'dnsname' => $ip_info['dns'],
             'first_seen' => 'unknown',
-            'last_seen' => 'unknown'
+            'last_seen' => 'unknown',
         ];
-        
+
         // diffForHumans and doDateTimeString are not safe
         if ($fdb_entry->updated_at) {
             $item['last_seen'] = $fdb_entry->updated_at->diffForHumans();
@@ -188,7 +192,7 @@ class FdbTablesController extends TableController
     }
 
     /**
-     * @param string $ip
+     * @param  string  $ip
      * @return Builder
      */
     protected function findMacs($ip)
@@ -198,16 +202,16 @@ class FdbTablesController extends TableController
 
         return Ipv4Mac::where('ipv4_address', 'like', "%$ip%")
             ->when($device_id, function ($query) use ($device_id) {
-                $query->where('device_id', $device_id);
+                return $query->where('device_id', $device_id);
             })
             ->when($port_id, function ($query) use ($port_id) {
-                $query->where('port_id', $port_id);
+                return $query->where('port_id', $port_id);
             })
             ->pluck('mac_address');
     }
 
     /**
-     * @param string $vlan
+     * @param  string  $vlan
      * @return Builder
      */
     protected function findVlans($vlan)
@@ -217,10 +221,10 @@ class FdbTablesController extends TableController
 
         return Vlan::where('vlan_vlan', $vlan)
             ->when($device_id, function ($query) use ($device_id) {
-                $query->where('device_id', $device_id);
+                return $query->where('device_id', $device_id);
             })
             ->when($port_id, function ($query) use ($port_id) {
-                $query->whereIn('device_id', function ($query) use ($port_id) {
+                return $query->whereIn('device_id', function ($query) use ($port_id) {
                     $query->select('device_id')->from('ports')->where('port_id', $port_id);
                 });
             })
@@ -228,7 +232,7 @@ class FdbTablesController extends TableController
     }
 
     /**
-     * @param string $ifAlias
+     * @param  string  $ifAlias
      * @return Builder
      */
     protected function findPorts($ifAlias)
@@ -238,21 +242,21 @@ class FdbTablesController extends TableController
 
         return Port::where('ifAlias', 'like', "%$ifAlias%")
             ->when($device_id, function ($query) use ($device_id) {
-                $query->where('device_id', $device_id);
+                return $query->where('device_id', $device_id);
             })
             ->when($port_id, function ($query) use ($port_id) {
-                $query->where('port_id', $port_id);
+                return $query->where('port_id', $port_id);
             })
             ->pluck('port_id');
     }
 
     /**
-     * @param string $mac_address
+     * @param  string  $mac_address
      * @return \Illuminate\Support\Collection
      */
     protected function findIps($mac_address)
     {
-        if (!isset($this->ipCache[$mac_address])) {
+        if (! isset($this->ipCache[$mac_address])) {
             $ips = Ipv4Mac::where('mac_address', $mac_address)
                 ->groupBy('ipv4_address')
                 ->pluck('ipv4_address');
@@ -264,7 +268,7 @@ class FdbTablesController extends TableController
                 // don't try too many dns queries, this is the slowest part
                 foreach ($ips->take(3) as $ip) {
                     $hostname = gethostbyaddr($ip);
-                    if (!IP::isValid($hostname)) {
+                    if (! IP::isValid($hostname)) {
                         $dns = $hostname;
                         break;
                     }
@@ -281,12 +285,12 @@ class FdbTablesController extends TableController
     }
 
     /**
-     * @param Port $port
+     * @param  Port  $port
      * @return int
      */
     protected function getMacCount($port)
     {
-        if (!isset($this->macCountCache[$port->port_id])) {
+        if (! isset($this->macCountCache[$port->port_id])) {
             $this->macCountCache[$port->port_id] = $port->fdbEntries()->count();
         }
 

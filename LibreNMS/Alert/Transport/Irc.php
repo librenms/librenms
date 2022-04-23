@@ -11,16 +11,16 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>. */
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>. */
 
 /**
  * IRC Transport
+ *
  * @author f0o <f0o@devilcode.org>
  * @copyright 2014 f0o, LibreNMS
  * @license GPL
- * @package LibreNMS
- * @subpackage Alerts
  */
+
 namespace LibreNMS\Alert\Transport;
 
 use LibreNMS\Alert\Transport;
@@ -28,6 +28,8 @@ use LibreNMS\Config;
 
 class Irc extends Transport
 {
+    protected $name = 'IRC';
+
     public function deliverAlert($obj, $opts)
     {
         return $this->contactIrc($obj, $opts);
@@ -35,9 +37,9 @@ class Irc extends Transport
 
     public function contactIrc($obj, $opts)
     {
-        $f = Config::get('install_dir') . "/.ircbot.alert";
-        if (file_exists($f) && filetype($f) == "fifo") {
-            $f = fopen($f, "w+");
+        $f = Config::get('install_dir') . '/.ircbot.alert';
+        if (file_exists($f) && filetype($f) == 'fifo') {
+            $f = fopen($f, 'w+');
             $r = fwrite($f, json_encode($obj) . "\n");
             $f = fclose($f);
             if ($r === false) {
@@ -60,11 +62,11 @@ class Irc extends Transport
                     'descr' => 'Enable IRC alerts',
                     'type'  => 'checkbox',
                     'default' => true,
-                ]
+                ],
             ],
             'validation' => [
-                'irc' => 'required'
-            ]
+                'irc' => 'required',
+            ],
         ];
     }
 }

@@ -16,10 +16,10 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
+ *
  * @copyright  2016 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -30,8 +30,6 @@ use LibreNMS\RRD\RrdDefinition;
 $data = '';
 $name = 'powerdns-recursor';
 $app_id = $app['app_id'];
-
-echo ' ' . $name;
 
 if ($agent_data['app'][$name]) {
     $data = $agent_data['app'][$name];
@@ -51,8 +49,8 @@ if ($agent_data['app'][$name]) {
     $data = stripslashes(snmp_get($device, $oid, '-Oqv'));
 }
 
-if (!empty($data)) {
-    $ds_list = array(
+if (! empty($data)) {
+    $ds_list = [
         'all-outqueries' => 'DERIVE',
         'answers-slow' => 'DERIVE',
         'answers0-1' => 'DERIVE',
@@ -111,10 +109,10 @@ if (!empty($data)) {
         'unreachables' => 'DERIVE',
         'uptime' => 'DERIVE',
         'user-msec' => 'DERIVE',
-    );
+    ];
 
     //decode and flatten the data
-    $stats = array();
+    $stats = [];
     foreach (json_decode($data, true) as $stat) {
         $stats[$stat['name']] = $stat['value'];
     }
@@ -122,7 +120,7 @@ if (!empty($data)) {
 
     // only the stats we store in rrd
     $rrd_def = new RrdDefinition();
-    $fields = array();
+    $fields = [];
     foreach ($ds_list as $key => $type) {
         $rrd_def->addDataset($key, $type, 0);
 
@@ -133,7 +131,7 @@ if (!empty($data)) {
         }
     }
 
-    $rrd_name = array('app', 'powerdns', 'recursor', $app_id);
+    $rrd_name = ['app', 'powerdns', 'recursor', $app_id];
     $tags = compact('name', 'app_id', 'rrd_name', 'rrd_def');
     data_update($device, 'app', $tags, $fields);
     update_application($app, $data, $fields);

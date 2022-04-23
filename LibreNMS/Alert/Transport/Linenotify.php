@@ -1,18 +1,21 @@
 <?php
 /**
  * LINE Notify Transport
- * @package LibreNMS
- * @subpackage Alerts
  */
+
 namespace LibreNMS\Alert\Transport;
 
 use LibreNMS\Alert\Transport;
+use LibreNMS\Util\Proxy;
 
 class Linenotify extends Transport
 {
+    protected $name = 'LINE Notify';
+
     public function deliverAlert($obj, $opts)
     {
         $opts['line-notify-access-token'] = $this->config['line-notify-access-token'];
+
         return $this->contactLineNotify($obj, $opts);
     }
 
@@ -23,6 +26,7 @@ class Linenotify extends Transport
         $lineFields = ['message' => $obj['msg']];
 
         $curl = curl_init();
+        Proxy::applyToCurl($curl);
         curl_setopt($curl, CURLOPT_URL, $lineUrl);
         curl_setopt($curl, CURLOPT_HTTPHEADER, $lineHead);
         curl_setopt($curl, CURLOPT_NOBODY, false);
@@ -35,6 +39,7 @@ class Linenotify extends Transport
         if ($code != 200) {
             return 'HTTP Status code ' . $code;
         }
+
         return true;
     }
 
@@ -46,12 +51,12 @@ class Linenotify extends Transport
                     'title' => 'Token',
                     'name' => 'line-notify-access-token',
                     'descr' => 'LINE Notify Token',
-                    'type' => 'text'
-                ]
+                    'type' => 'text',
+                ],
             ],
             'validation' => [
                 'line-notify-access-token' => 'required|string',
-            ]
+            ],
         ];
     }
 }

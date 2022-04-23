@@ -1,0 +1,704 @@
+MCAFEE-MWG-MIB DEFINITIONS ::= BEGIN
+
+    -- Title:         MCAFEE-MWG-MIB
+    --
+    -- Version:       1.9 Nov 10, 2014
+    -- Author:        McAfee GmbH
+    --
+    -- Comments:      MIB for McAfee Web Gateway 
+    --                - MIB-II  ( RFC1213 )
+    
+    IMPORTS
+        MODULE-IDENTITY, OBJECT-TYPE, Integer32, Unsigned32,
+		Gauge32, Counter32, Counter64, IpAddress, mib-2, NOTIFICATION-TYPE
+        FROM SNMPv2-SMI
+        enterprises FROM RFC1155-SMI
+        OBJECT-TYPE
+        FROM RFC-1212
+        DisplayString, PhysAddress
+        FROM RFC1213-MIB
+        TRAP-TYPE
+        FROM RFC-1215
+		mcafeeGATEWAY
+        FROM MCAFEE-SMI;
+
+
+mwg MODULE-IDENTITY
+        LAST-UPDATED	"201411100000Z" -- Nov 09, 2014
+        ORGANIZATION
+                "McAfee Inc."
+        CONTACT-INFO
+                "email: support@mcafee.com"
+        DESCRIPTION
+                "McAfee Web Gateway 7.5 MIB definitions"
+        REVISION "201411100000Z" -- Nov 10, 2014
+		DESCRIPTION
+				"Add memory consumption value"
+        REVISION "201410070000Z" -- Oct 07, 2014
+		DESCRIPTION
+				"Fix trap notification enums"
+        REVISION "201305210000Z" -- May 22, 2013
+		DESCRIPTION
+				"Add values for performance measurement"
+        REVISION "201112010000Z" -- Dec 01, 2011
+		DESCRIPTION
+				"Mark stBadReputation as obsolete"
+        REVISION "201101110000Z" -- Jan 11, 2011
+		DESCRIPTION
+				"Add some more statistical values and descriptions"
+        REVISION "201004260000Z" -- Apr 26, 2010
+		DESCRIPTION
+				"Add build number to version information"
+        REVISION "201002190000Z" -- Feb 29, 2010
+        DESCRIPTION
+                "Minor RFC related compatiblility changes in the mib"
+        REVISION     "200910130000Z" -- Oct 13, 2009
+        DESCRIPTION
+                "Initial version"
+        ::= { mcafeeGATEWAY 7 }
+
+  
+    -- groups for mwg
+    
+    mwgInfo          OBJECT IDENTIFIER ::= { mwg 1 }
+    mwgStatistics    OBJECT IDENTIFIER ::= { mwg 2 }
+	mwgTraps         OBJECT IDENTIFIER ::= { mwg 4 }
+	mwgContent       OBJECT IDENTIFIER ::= { mwgStatistics 1 }
+	mwgHttp          OBJECT IDENTIFIER ::= { mwgStatistics 2 }
+	mwgHttps         OBJECT IDENTIFIER ::= { mwgStatistics 3 }
+	mwgFTP           OBJECT IDENTIFIER ::= { mwgStatistics 4 }
+	mwgMiscellaneous OBJECT IDENTIFIER ::= { mwgStatistics 5 }
+    
+    -- the mwgInfo group
+    
+	kProductName OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE (0..128))
+        MAX-ACCESS  read-write
+        STATUS  current
+        DESCRIPTION
+            "Product name"
+        ::= { mwgInfo 1 }
+    
+    kCompanyName OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE (1..20))
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+            "Company holding the copyright on this product"
+        ::= { mwgInfo 2 }
+
+	kProductVersion OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE (1..64))
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+			"String representation of the product version"
+        ::= { mwgInfo 3 }
+
+	kMajorVersion  OBJECT-TYPE
+		SYNTAX  Integer32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION	
+			"Major version number"
+		::= { mwgInfo 4 }
+	
+	kMinorVersion  OBJECT-TYPE
+		SYNTAX  Integer32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Minor version number"
+		::= { mwgInfo 5 }
+	
+	kMicroVersion  OBJECT-TYPE
+		SYNTAX  Integer32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Micro version number"
+		::= { mwgInfo 6 }
+	
+	kHotfixVersion  OBJECT-TYPE
+		SYNTAX  Integer32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Hotfix version number"
+		::= { mwgInfo 7 }
+	
+	kCustomVersion  OBJECT-TYPE
+		SYNTAX  Integer32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Custom  version number"
+		::= { mwgInfo 8 }
+	
+	kRevision  OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE (1..20))
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"SVN revision number"
+		::= { mwgInfo 9 }
+
+	kBuildNumber  OBJECT-TYPE
+        SYNTAX  Integer32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"BUILD number"
+		::= { mwgInfo 10 }
+
+-- EngineVersions
+
+	mwgEngineVersions OBJECT IDENTIFIER ::= { mwgInfo 20 }
+
+	pAMEngineVersion OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE (1..20))
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Version of the McAfee Anti-Malware Engine for Gateway"
+		::= { mwgEngineVersions 1 }
+
+	pAMSignatureVersion OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE (1..20))
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Version of the McAfee Anti-Malware Signature File (obsolete)"
+		::= { mwgEngineVersions 2 }
+
+	pMFEEngineVersion OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE (1..20))
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Version of the McAfee Anti-Malware Engine"
+		::= { mwgEngineVersions 3 }
+
+	pMFEDATVersion OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE (1..20))
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Version of the McAfee DATs"
+		::= { mwgEngineVersions 4 }
+
+
+	pAMProactiveVersion OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE (1..20))
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Version of the ProActive database"
+		::= { mwgEngineVersions 5 }
+
+	pTSDBVersion OBJECT-TYPE
+        SYNTAX  DisplayString (SIZE (1..20))
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Version of McAfee TrustedSource"
+		::= { mwgEngineVersions 6 }
+
+-- Statistics
+
+	stBadReputation  OBJECT-TYPE
+		SYNTAX  Counter64
+		MAX-ACCESS read-only
+		STATUS obsolete
+		DESCRIPTION
+				"This statistic value is obsolete and should no longer be used"
+		::= { mwgContent 1 }
+
+	stMalwareDetected OBJECT-TYPE
+		SYNTAX  Counter64
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+				"Number of infections detected by the McAfee Gateway Antimalware Engine"
+		::= { mwgContent 2 }
+
+	stConnectionsLegitimate	OBJECT-TYPE
+		SYNTAX  Counter64
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Number of connections that not have been blocked"
+		::= { mwgContent 3 }
+
+	stBlockedByAntiMalware	OBJECT-TYPE
+		SYNTAX  Counter64
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Number of connections blocked by Anti-Malware"
+		::= { mwgContent 4 }
+
+	stConnectionsBlocked	OBJECT-TYPE
+		SYNTAX  Counter64
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Number of blocked connections"
+		::= { mwgContent 5 }
+
+	stBlockedByMediaFilter	OBJECT-TYPE
+		SYNTAX  Counter64
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Number of connections that have been blocked by the Media-Type filter"
+		::= { mwgContent 6 }
+
+	stBlockedByURLFilter	OBJECT-TYPE
+		SYNTAX  Counter64
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Number of connection that have been blocked by the URL filter"
+		::= { mwgContent 7 }
+
+	stMimeType  OBJECT-TYPE
+		SYNTAX  Counter64
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+				"Number of media types detected by the Media Type filter"
+		::= { mwgContent 8 }
+
+	stCategories   OBJECT-TYPE
+		SYNTAX  Counter64
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+				"Number of categories detected by the URL filter"
+		::= { mwgContent 9 }
+
+	stCategoriesTable OBJECT-TYPE
+    	SYNTAX     SEQUENCE OF StCategoriesEntry
+    	MAX-ACCESS not-accessible
+    	STATUS     current
+    	DESCRIPTION
+           "A table containing the categories detected by the URL filter"
+    	::= { mwgContent 10 }
+
+	stCategoriesEntry OBJECT-TYPE
+    	SYNTAX     StCategoriesEntry
+    	MAX-ACCESS not-accessible
+    	STATUS     current
+    	DESCRIPTION
+           "An entry containing information about a categorys name and counter."
+    	INDEX   { stCategoryName }
+		::= { stCategoriesTable 1 }
+
+	StCategoriesEntry ::= SEQUENCE {
+		stCategoryName   DisplayString,
+		stCategoryCount  Counter64
+		}
+
+	stCategoryName   OBJECT-TYPE
+		SYNTAX  DisplayString (SIZE (0..128))
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+				"Name of the category"
+		::= { stCategoriesEntry 1 }
+
+	stCategoryCount   OBJECT-TYPE
+		SYNTAX  Counter64
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+				"Number of times the URL filter detected this category"
+		::= { stCategoriesEntry 2 }
+
+
+-- HTTP
+
+	stHttpRequests  OBJECT-TYPE
+		SYNTAX  Counter64
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Number of HTTP requests"
+		::= { mwgHttp 1 }
+
+	stHttpTraffic OBJECT-TYPE
+		SYNTAX  Counter64
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+		"Number of bytes tranferred between proxy and server(s) using the HTTP protocol"
+		::= { mwgHttp 2 }
+
+	stHttpBytesFromClient OBJECT-TYPE
+		SYNTAX  Counter64
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Number of bytes transferred from client to proxy using the HTTP protocol"
+		::= { mwgHttp 3 }
+
+	stHttpBytesFromServer OBJECT-TYPE
+		SYNTAX  Counter64
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Number of bytes transferred from server to proxy using the HTTP protocol"
+		::= { mwgHttp 4 }
+
+	stHttpBytesToClient OBJECT-TYPE
+		SYNTAX  Counter64
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Number of bytes transferred from proxy to client(s) using the HTTP protocol"
+		::= { mwgHttp 5 }
+
+	stHttpBytesToServer OBJECT-TYPE
+		SYNTAX  Counter64
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Number of bytes transferred from proxy to server(s) using the HTTP protocol"
+		::= { mwgHttp 6 }
+
+-- HTTPS
+
+	stHttpsRequests  OBJECT-TYPE
+		SYNTAX  Counter64
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Number of HTTPS requests"
+		::= { mwgHttps 1 }
+
+	stHttpsTraffic OBJECT-TYPE
+		SYNTAX  Counter64
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Number of bytes tranferred between proxy and server(s) using the HTTPS protocol"
+		::= { mwgHttps 2 }
+
+	stHttpsBytesFromClient OBJECT-TYPE
+		SYNTAX  Counter64
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Number of bytes tranferred from client(s) to proxy using the HTTPS protocol"
+		::= { mwgHttps 3 }
+
+	stHttpsBytesFromServer OBJECT-TYPE
+		SYNTAX  Counter64
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Number of bytes tranferred from server(s) to proxy using the HTTPS protocol"
+		::= { mwgHttps 4 }
+
+	stHttpsBytesToClient OBJECT-TYPE
+		SYNTAX  Counter64
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Number of bytes tranferred from proxy to client(s) and proxy using the HTTPS protocol"
+		::= { mwgHttps 5 }
+
+	stHttpsBytesToServer OBJECT-TYPE
+		SYNTAX  Counter64
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Number of bytes tranferred from proxy to server(s) and proxy using the HTTPS protocol"
+		::= { mwgHttps 6 }
+
+-- FTP
+
+	stFtpTraffic OBJECT-TYPE
+		SYNTAX  Counter64
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Number of bytes transmitted between proxy and server(s) using the FTP protocol"
+		::= { mwgFTP 1 }
+
+	stFtpBytesFromClient OBJECT-TYPE
+		SYNTAX  Counter64
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Number of bytes tranferred from proxy to client(s) using the FTP protocol"
+		::= { mwgFTP 2 }
+
+	stFtpBytesFromServer OBJECT-TYPE
+		SYNTAX  Counter64
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Number of bytes tranferred from server(s) to proxy using the FTP protocol"
+		::= { mwgFTP 3 }
+
+	stFtpBytesToClient OBJECT-TYPE
+		SYNTAX  Counter64
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Number of bytes tranferred from proxy to client(s) using the FTP protocol"
+		::= { mwgFTP 4 }
+
+	stFtpBytesToServer OBJECT-TYPE
+		SYNTAX  Counter64
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Number of bytes tranferred from proxy to server(s) using the FTP protocol"
+		::= { mwgFTP 5 }
+
+-- Miscellaneous
+		
+	stCPULoad OBJECT-TYPE
+		SYNTAX  Counter64
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+		"Current overall CPU usage in percent"
+		::= { mwgMiscellaneous 1 }
+	
+	stClientCount  OBJECT-TYPE
+		SYNTAX  Counter64
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+		"Currently connected clients"
+		::= { mwgMiscellaneous 2 } 
+		
+	stConnectedSockets OBJECT-TYPE
+		SYNTAX  Counter64
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+		"Number of open network sockets in use by the proxy"
+		::= { mwgMiscellaneous 3 } 
+
+-- Additional counters for performance measurement and system monitoring
+
+	stCPULoadRaw OBJECT-TYPE
+		SYNTAX  Counter64
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+		"Load value 1 minute average"
+		::= { mwgMiscellaneous 4 } 
+
+	
+	stCPUIOWait OBJECT-TYPE
+		SYNTAX  Counter64
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+		"I/O wait value in percent"
+		::= { mwgMiscellaneous 5 } 
+
+	
+	stResolveHostViaDNS OBJECT-TYPE
+		SYNTAX  Counter64
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+		"Time to resolve DNS in ms"
+		::= { mwgMiscellaneous 6 } 
+	
+	stTimeConsumedByRuleEngine OBJECT-TYPE
+		SYNTAX  Counter64
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+		"Average time used by the rule engine in ms"
+		::= { mwgMiscellaneous 7 } 
+
+	stTimeForTransaction OBJECT-TYPE
+		SYNTAX  Counter64
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+		"Average time for transaction in ms"
+		::= { mwgMiscellaneous 8 } 
+
+	stHandleConnectToServer OBJECT-TYPE
+		SYNTAX  Counter64
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+		"Connect to Server"
+		::= { mwgMiscellaneous 9 } 
+	
+
+	stFirstSentFirstReceivedClient OBJECT-TYPE
+		SYNTAX  Counter64
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+		"First byte received from client until first byte sent back"
+		::= { mwgMiscellaneous 10 } 
+	
+	stLastSentLastReceivedClient OBJECT-TYPE
+		SYNTAX  Counter64
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+		"Last byte received from client until last byte sent back"
+		::= { mwgMiscellaneous 11 } 
+	
+	stFirstSentFirstReceivedServer OBJECT-TYPE
+		SYNTAX  Counter64
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+		"First byte sent to server until first byte received"
+		::= { mwgMiscellaneous 12 } 
+	
+	stLastSentLastReceivedServer OBJECT-TYPE
+		SYNTAX  Counter64
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+		"Last byte sent to server until last byte received"
+		::= { mwgMiscellaneous 13 } 
+	
+	stLastSentFirstReceivedServer OBJECT-TYPE
+		SYNTAX  Counter64
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+		"Last byte sent to server until first byte received"
+		::= { mwgMiscellaneous 14 } 
+	
+	stMemConsumed OBJECT-TYPE
+		SYNTAX  Counter64
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+		"Virtual memory consumption of the main processes divided by RAM + half of SWAP space. Projected to 0-100."
+		::= { mwgMiscellaneous 15 } 
+	
+
+-- Traps
+   
+	trSystem NOTIFICATION-TYPE
+     OBJECTS {
+	 		 notifyOrigin,
+			 notifyOriginName,
+			 notifySeverity,
+			 notifyReason,
+			 notifyReasonString,
+			 notifyAffectedHost,
+			 notifyAdditional
+             }
+     STATUS             current
+     DESCRIPTION
+        "Traps that are generated by a system event"
+     ::= { mwgTraps 1 }
+
+	trApplication NOTIFICATION-TYPE
+     OBJECTS {
+	 		 notifyOrigin,
+			 notifyOriginName,
+			 notifySeverity,
+			 notifyReason,
+			 notifyReasonString,
+			 notifyAffectedHost,
+			 notifyAdditional
+             }
+     STATUS             current
+     DESCRIPTION
+        "Traps that are generated by an application system event"
+     ::= { mwgTraps 2 }
+
+	trUser NOTIFICATION-TYPE
+     OBJECTS {
+			 notifyReason,
+			 notifyReasonString,
+			 notifyAffectedHost,
+			 notifyAdditional
+             }
+     STATUS             current
+     DESCRIPTION
+        "User defined trap that indicates an event connected to a client IP"
+     ::= { mwgTraps 3 }
+
+
+	mwgTrapVariables    OBJECT IDENTIFIER ::= { mwgTraps 10 }
+
+	notifyOrigin OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+	DESCRIPTION
+		"Origin from where the notification has been send"
+    ::= { mwgTrapVariables 1 }
+
+	notifyOriginName OBJECT-TYPE
+    SYNTAX OCTET STRING
+    MAX-ACCESS read-only
+    STATUS current
+	DESCRIPTION
+		"Name of the origin of the trap"
+    ::= { mwgTrapVariables 2 }
+
+	notifySeverity OBJECT-TYPE
+    SYNTAX  INTEGER {
+    	    emergency(0),
+    	    alert(1),
+	    critical(2),
+	    error(3),
+	    warning(4),
+	    notice(5),
+      	    info(6),
+	    debug(7)	
+		}
+	MAX-ACCESS read-only
+	STATUS current
+	DESCRIPTION
+		"Severity of this notification"
+    ::= { mwgTrapVariables 3 }
+
+	notifyReason OBJECT-TYPE
+    SYNTAX Integer32
+    MAX-ACCESS read-only
+    STATUS current
+	DESCRIPTION
+		"Code to identify the notification"
+    ::= { mwgTrapVariables 4 }
+
+	notifyReasonString OBJECT-TYPE
+    SYNTAX OCTET STRING
+    MAX-ACCESS read-only
+    STATUS current
+	DESCRIPTION
+		"Human readable string for the notification"
+    ::= { mwgTrapVariables 5 }
+
+	notifyAffectedHost OBJECT-TYPE
+    SYNTAX IpAddress
+    MAX-ACCESS read-only
+    STATUS current
+	DESCRIPTION
+		"Additional information if a remote host was involved in this message"
+    ::= { mwgTrapVariables 6 }
+
+	notifyAdditional OBJECT-TYPE
+    SYNTAX OCTET STRING
+    MAX-ACCESS read-only
+    STATUS current
+	DESCRIPTION
+		"Additional information string"
+    ::= { mwgTrapVariables 7 }
+
+END
+    
+    

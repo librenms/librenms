@@ -6,28 +6,10 @@
                     "sysName": "<private>",
                     "sysObjectID": ".1.3.6.1.4.1.161.19.250.256",
                     "sysDescr": "CANOPY 16.0.0.1 AP",
-                    "sysContact": null,
-                    "version": null,
-                    "hardware": null,
-                    "features": null,
-                    "os": "pmp",
-                    "type": "wireless",
-                    "serial": null,
-                    "icon": "cambium.svg",
-                    "location": null
-                }
-            ]
-        },
-        "poller": {
-            "devices": [
-                {
-                    "sysName": "<private>",
-                    "sysObjectID": ".1.3.6.1.4.1.161.19.250.256",
-                    "sysDescr": "CANOPY 16.0.0.1 AP",
                     "sysContact": "<private>",
-                    "version": "CANOPY 16.0.0.1 AP",
+                    "version": "16.0.0.1",
                     "hardware": "PMP 450 AP",
-                    "features": null,
+                    "features": "5.7GHz MIMO OFDM - Multipoint - Access Point",
                     "os": "pmp",
                     "type": "wireless",
                     "serial": null,
@@ -35,7 +17,8 @@
                     "location": "<private>"
                 }
             ]
-        }
+        },
+        "poller": "matches discovery"
     },
     "ports": {
         "discovery": {
@@ -51,10 +34,10 @@
                     "portName": null,
                     "ifIndex": 1,
                     "ifSpeed": null,
+                    "ifSpeed_prev": null,
                     "ifConnectorPresent": null,
                     "ifPromiscuousMode": null,
-                    "ifHighSpeed": null,
-                    "ifOperStatus": null,
+                    "ifOperStatus": "up",
                     "ifOperStatus_prev": null,
                     "ifAdminStatus": null,
                     "ifAdminStatus_prev": null,
@@ -156,10 +139,10 @@
                     "portName": null,
                     "ifIndex": 2,
                     "ifSpeed": null,
+                    "ifSpeed_prev": null,
                     "ifConnectorPresent": null,
                     "ifPromiscuousMode": null,
-                    "ifHighSpeed": null,
-                    "ifOperStatus": null,
+                    "ifOperStatus": "up",
                     "ifOperStatus_prev": null,
                     "ifAdminStatus": null,
                     "ifAdminStatus_prev": null,
@@ -265,11 +248,11 @@
                     "portName": null,
                     "ifIndex": 1,
                     "ifSpeed": 100000000000000,
-                    "ifConnectorPresent": "0",
+                    "ifSpeed_prev": null,
+                    "ifConnectorPresent": null,
                     "ifPromiscuousMode": "0",
-                    "ifHighSpeed": 100000000,
                     "ifOperStatus": "up",
-                    "ifOperStatus_prev": null,
+                    "ifOperStatus_prev": "up",
                     "ifAdminStatus": "up",
                     "ifAdminStatus_prev": null,
                     "ifDuplex": "fullDuplex",
@@ -370,11 +353,11 @@
                     "portName": null,
                     "ifIndex": 2,
                     "ifSpeed": 194969600000000,
-                    "ifConnectorPresent": "0",
+                    "ifSpeed_prev": null,
+                    "ifConnectorPresent": null,
                     "ifPromiscuousMode": "0",
-                    "ifHighSpeed": 194969600,
                     "ifOperStatus": "up",
-                    "ifOperStatus_prev": null,
+                    "ifOperStatus_prev": "up",
                     "ifAdminStatus": "up",
                     "ifAdminStatus_prev": null,
                     "ifDuplex": null,

@@ -1,0 +1,23 @@
+{
+    "os": {
+        "discovery": {
+            "devices": [
+                {
+                    "sysName": "",
+                    "sysObjectID": ".1.3.6.1.4.1.11.2.3.7.11.66",
+                    "sysDescr": "PROCURVE J9029A - PA.03.10",
+                    "sysContact": null,
+                    "version": "PA.03.10",
+                    "hardware": "J9029A",
+                    "features": null,
+                    "os": "procurve",
+                    "type": "network",
+                    "serial": null,
+                    "icon": "hpe.svg",
+                    "location": null
+                }
+            ]
+        },
+        "poller": "matches discovery"
+    }
+}

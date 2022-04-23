@@ -16,8 +16,8 @@ echo "\nCaching OIDs:";
 $entity_array = [];
 echo ' MRV OptiDriver';
 $chassis_array = snmpwalk_cache_multi_oid($device, 'nbsCmmcChassisTable', $chassis_array, 'NBS-CMMC-MIB');
-$slot_array    = snmpwalk_cache_multi_oid($device, 'nbsCmmcSlotTable', $slot_array, 'NBS-CMMC-MIB');
-$port_array    = snmpwalk_cache_multi_oid($device, 'nbsCmmcPortTable', $port_array, 'NBS-CMMC-MIB');
+$slot_array = snmpwalk_cache_multi_oid($device, 'nbsCmmcSlotTable', $slot_array, 'NBS-CMMC-MIB');
+$port_array = snmpwalk_cache_multi_oid($device, 'nbsCmmcPortTable', $port_array, 'NBS-CMMC-MIB');
 
 // We use the last digit in the OID to define an entPhysicalIndex for Power Supply state sensors
 $nbsCmmcChassisPSStatus_array = [
@@ -57,39 +57,39 @@ $nbsCmmcPortSensor_array = [
         'objectType'      => 'nbsCmmcPortTemperature',
         'skipValue'       => '-2147483648',
         'entPhysicalName' => 'Port Temperature',
-        ],
+    ],
     31 => [
         'objectType'      => 'nbsCmmcPortTxPower',
         'skipValue'       => '-2147483648',
         'entPhysicalName' => 'Port Tx Power',
-        ],
+    ],
     32 => [
         'objectType'      => 'nbsCmmcPortRxPower',
         'skipValue'       => '-2147483648',
         'entPhysicalName' => 'Port Rx Power',
-        ],
+    ],
     33 => [
         'objectType'      => 'nbsCmmcPortBiasAmps',
         'skipValue'       => '-1',
         'entPhysicalName' => 'Port Tx Bias Current',
-        ],
+    ],
     34 => [
         'objectType'      => 'nbsCmmcPortSupplyVolts',
         'skipValue'       => '-1',
         'entPhysicalName' => 'Port Tx Supply Voltage',
-        ],
+    ],
     38 => [
         'objectType'      => 'nbsCmmcPortDigitalDiags',
         'skipValue'       => '1',
         'entPhysicalName' => 'Port Overall DigiDiags State',
-        ],
+    ],
 ];
 
 foreach ($chassis_array as $nbsCmmcChassis => $chassis_contents) {
-    list($chassisHardwareRev, $chassisFirmwareRev) = explode(', ', $chassis_contents['nbsCmmcChassisHardwareRevision']);
+    [$chassisHardwareRev, $chassisFirmwareRev] = explode(', ', $chassis_contents['nbsCmmcChassisHardwareRevision']);
     // Discover the chassis
     $entity_array[] = [
-        'entPhysicalIndex'        => $chassis_contents['nbsCmmcChassisIfIndex']."00",
+        'entPhysicalIndex'        => $chassis_contents['nbsCmmcChassisIfIndex'] . '00',
         'entPhysicalDescr'        => "MRV OptiDriver {$chassis_contents['nbsCmmcChassisModel']}",
         'entPhysicalClass'        => 'chassis',
         'entPhysicalName'         => "Chassis $nbsCmmcChassis",
@@ -109,9 +109,9 @@ foreach ($chassis_array as $nbsCmmcChassis => $chassis_contents) {
     if (isset($chassis_contents['nbsCmmcChassisTemperature']) && $chassis_contents['nbsCmmcChassisTemperature'] != '-2147483648') {
         $entity_array[] = [
             'entPhysicalIndex'        => "{$chassis_contents['nbsCmmcChassisIfIndex']}15",
-            'entPhysicalDescr'        => "Chassis Temperature Sensor",
+            'entPhysicalDescr'        => 'Chassis Temperature Sensor',
             'entPhysicalClass'        => 'sensor',
-            'entPhysicalName'         => "Chassis Temperature",
+            'entPhysicalName'         => 'Chassis Temperature',
             'entPhysicalContainedIn'  => "{$chassis_contents['nbsCmmcChassisIfIndex']}00",
             'entPhysicalMfgName'      => 'MRV Communications',
             'entPhysicalParentRelPos' => '-1',
@@ -123,9 +123,9 @@ foreach ($chassis_array as $nbsCmmcChassis => $chassis_contents) {
     if (isset($chassis_contents['nbsCmmcChassisPowerStatus']) && $chassis_contents['nbsCmmcChassisPowerStatus'] != 'notSupported') {
         $entity_array[] = [
             'entPhysicalIndex'        => "{$chassis_contents['nbsCmmcChassisIfIndex']}51",
-            'entPhysicalDescr'        => "Chassis Power Budget Status Sensor",
+            'entPhysicalDescr'        => 'Chassis Power Budget Status Sensor',
             'entPhysicalClass'        => 'sensor',
-            'entPhysicalName'         => "Chassis Power Budget Status",
+            'entPhysicalName'         => 'Chassis Power Budget Status',
             'entPhysicalContainedIn'  => "{$chassis_contents['nbsCmmcChassisIfIndex']}00",
             'entPhysicalMfgName'      => 'MRV Communications',
             'entPhysicalParentRelPos' => '-1',
@@ -138,8 +138,8 @@ foreach ($chassis_array as $nbsCmmcChassis => $chassis_contents) {
         if (isset($chassis_contents[$item]) && $chassis_contents[$item] != 'notSupported') {
             $position = substr($item, 16, 1);
             $entity_array[] = [
-                'entPhysicalIndex'        => $chassis_contents['nbsCmmcChassisIfIndex'].$position,
-                'entPhysicalDescr'        => "Power Supply",
+                'entPhysicalIndex'        => $chassis_contents['nbsCmmcChassisIfIndex'] . $position,
+                'entPhysicalDescr'        => 'Power Supply',
                 'entPhysicalClass'        => 'powerSupply',
                 'entPhysicalName'         => "Power Supply $position",
                 'entPhysicalContainedIn'  => "{$chassis_contents['nbsCmmcChassisIfIndex']}00",
@@ -148,11 +148,11 @@ foreach ($chassis_array as $nbsCmmcChassis => $chassis_contents) {
                 'entPhysicalIsFRU'        => 'false',
             ];
             $entity_array[] = [
-                'entPhysicalIndex'        => $chassis_contents['nbsCmmcChassisIfIndex'].$index,
-                'entPhysicalDescr'        => "Power Supply State",
+                'entPhysicalIndex'        => $chassis_contents['nbsCmmcChassisIfIndex'] . $index,
+                'entPhysicalDescr'        => 'Power Supply State',
                 'entPhysicalClass'        => 'sensor',
                 'entPhysicalName'         => "Power Supply $position",
-                'entPhysicalContainedIn'  => $chassis_contents['nbsCmmcChassisIfIndex'].$position,
+                'entPhysicalContainedIn'  => $chassis_contents['nbsCmmcChassisIfIndex'] . $position,
                 'entPhysicalMfgName'      => 'MRV Communications',
                 'entPhysicalParentRelPos' => '-1',
                 'entPhysicalIsFRU'        => 'true',
@@ -166,7 +166,7 @@ foreach ($chassis_array as $nbsCmmcChassis => $chassis_contents) {
             $position = substr($item, 17, 1);
             $entity_array[] = [
                 'entPhysicalIndex'        => "{$chassis_contents['nbsCmmcChassisIfIndex']}0$position",
-                'entPhysicalDescr'        => "Fan Tray",
+                'entPhysicalDescr'        => 'Fan Tray',
                 'entPhysicalClass'        => 'fan',
                 'entPhysicalName'         => "Fan Tray $position",
                 'entPhysicalContainedIn'  => "{$chassis_contents['nbsCmmcChassisIfIndex']}00",
@@ -175,8 +175,8 @@ foreach ($chassis_array as $nbsCmmcChassis => $chassis_contents) {
                 'entPhysicalIsFRU'        => 'false',
             ];
             $entity_array[] = [
-                'entPhysicalIndex'        => $chassis_contents['nbsCmmcChassisIfIndex'].$index,
-                'entPhysicalDescr'        => "Fan State",
+                'entPhysicalIndex'        => $chassis_contents['nbsCmmcChassisIfIndex'] . $index,
+                'entPhysicalDescr'        => 'Fan State',
                 'entPhysicalClass'        => 'sensor',
                 'entPhysicalName'         => "Fan $position",
                 'entPhysicalContainedIn'  => "{$chassis_contents['nbsCmmcChassisIfIndex']}0$position",
@@ -188,8 +188,6 @@ foreach ($chassis_array as $nbsCmmcChassis => $chassis_contents) {
     }
 }
 
-
-
 foreach ($slot_array as $nbsCmmcSlot => $slot_contents) {
     // Obtain the nbsCmmcChassisIfIndex of the chassis which houses this slot
     $nbsCmmcChassisIfIndex = $chassis_array[$slot_contents['nbsCmmcSlotChassisIndex']]['nbsCmmcChassisIfIndex'];
@@ -197,21 +195,21 @@ foreach ($slot_array as $nbsCmmcSlot => $slot_contents) {
     $nbsCmmcSlotIfIndex = $nbsCmmcChassisIfIndex + $slot_contents['nbsCmmcSlotIndex'] * 1000;
     // Discover the slot
     $entity_array[] = [
-        'entPhysicalIndex'        => $nbsCmmcSlotIfIndex."00",
+        'entPhysicalIndex'        => $nbsCmmcSlotIfIndex . '00',
         'entPhysicalDescr'        => 'MRV OptiDriver Slot',
         'entPhysicalClass'        => 'container',
         'entPhysicalName'         => "Card Slot $nbsCmmcSlot",
-        'entPhysicalContainedIn'  => $nbsCmmcChassisIfIndex."00",
+        'entPhysicalContainedIn'  => $nbsCmmcChassisIfIndex . '00',
         'entPhysicalMfgName'      => 'MRV Communications',
         'entPhysicalParentRelPos' => $slot_contents['nbsCmmcSlotIndex'],
         'entPhysicalIsFRU'        => 'false',
     ];
     if (isset($slot_contents['nbsCmmcSlotIfIndex']) && $slot_contents['nbsCmmcSlotIfIndex'] != '-1') {
-        list($cardHardwareRev, $cardFirmwareRev, $cardOtherRev) = explode(', ', $slot_contents['nbsCmmcSlotHardwareRevision']);
+        [$cardHardwareRev, $cardFirmwareRev, $cardOtherRev] = explode(', ', $slot_contents['nbsCmmcSlotHardwareRevision']);
         // Discover the card
         $entity_array[] = [
-            'entPhysicalIndex'        => $slot_contents['nbsCmmcSlotIfIndex']."01",
-            'entPhysicalDescr'        => "MRV ".ucfirst($slot_contents['nbsCmmcSlotOperationType'])." Card",
+            'entPhysicalIndex'        => $slot_contents['nbsCmmcSlotIfIndex'] . '01',
+            'entPhysicalDescr'        => 'MRV ' . ucfirst($slot_contents['nbsCmmcSlotOperationType']) . ' Card',
             'entPhysicalClass'        => 'module',
             'entPhysicalName'         => "Card $nbsCmmcSlot",
             'entPhysicalModelName'    => $slot_contents['nbsCmmcSlotModel'],
@@ -230,9 +228,9 @@ foreach ($slot_array as $nbsCmmcSlot => $slot_contents) {
         if (isset($slot_contents['nbsCmmcSlotTemperature']) && $slot_contents['nbsCmmcSlotTemperature'] != '-2147483648') {
             $entity_array[] = [
                 'entPhysicalIndex'        => "{$slot_contents['nbsCmmcSlotIfIndex']}34",
-                'entPhysicalDescr'        => "Card Temperature Sensor",
+                'entPhysicalDescr'        => 'Card Temperature Sensor',
                 'entPhysicalClass'        => 'sensor',
-                'entPhysicalName'         => "Card Temperature",
+                'entPhysicalName'         => 'Card Temperature',
                 'entPhysicalContainedIn'  => "{$slot_contents['nbsCmmcSlotIfIndex']}01",
                 'entPhysicalMfgName'      => 'MRV Communications',
                 'entPhysicalParentRelPos' => '-1',
@@ -244,7 +242,7 @@ foreach ($slot_array as $nbsCmmcSlot => $slot_contents) {
 
 foreach ($port_array as $nbsCmmcPort => $port_contents) {
     // Obtain the nbsCmmcSlotIfIndex of the slot which houses this port
-    $nbsCmmcSlot = $port_contents['nbsCmmcPortChassisIndex'].".".$port_contents['nbsCmmcPortSlotIndex'];
+    $nbsCmmcSlot = $port_contents['nbsCmmcPortChassisIndex'] . '.' . $port_contents['nbsCmmcPortSlotIndex'];
     $nbsCmmcSlotIfIndex = $slot_array[$nbsCmmcSlot]['nbsCmmcSlotIfIndex'];
 
     // We only need to discover a transceiver container if the port type is pluggable
@@ -253,41 +251,41 @@ foreach ($port_array as $nbsCmmcPort => $port_contents) {
 
         // Discover the transceiver container
         $entity_array[] = [
-            'entPhysicalIndex'        => $port_contents['nbsCmmcPortIfIndex']."00",
+            'entPhysicalIndex'        => $port_contents['nbsCmmcPortIfIndex'] . '00',
             'entPhysicalDescr'        => "$nbsCmmcPortType Transceiver Container",
             'entPhysicalClass'        => 'container',
             'entPhysicalName'         => "Transceiver Container $nbsCmmcPort",
-            'entPhysicalContainedIn'  => $nbsCmmcSlotIfIndex."01",
+            'entPhysicalContainedIn'  => $nbsCmmcSlotIfIndex . '01',
             'entPhysicalMfgName'      => 'MRV Communications',
             'entPhysicalParentRelPos' => $port_contents['nbsCmmcPortIndex'],
             'entPhysicalIsFRU'        => 'false',
         ];
         // Set a few variables for the port discovery
-        $nbsCmmcPortContainedIn  = $port_contents['nbsCmmcPortIfIndex']."00";
-        $nbsCmmcPortVendorInfo   = $port_contents['nbsCmmcPortVendorInfo'];
-        $nbsCmmcPortIsFRU        = 'true';
+        $nbsCmmcPortContainedIn = $port_contents['nbsCmmcPortIfIndex'] . '00';
+        $nbsCmmcPortVendorInfo = $port_contents['nbsCmmcPortVendorInfo'];
+        $nbsCmmcPortIsFRU = 'true';
         $nbsCmmcPortParentRelPos = '-1';
         // If one runs a command like "show 1.1.1 | grep Part" on a port with a genuine pluggable transceiver,
         // CLI output like "Part #/Rev: SFP-10GDWZR-22/0001" indicates / is considered to be the string delimiter.
         // However, non-genuine pluggable transceivers may not adhere to this format.
-        list($nbsCmmcPortModelName, $nbsCmmcPortHardwareRev) = explode('/', $port_contents['nbsCmmcPortPartRev']);
+        [$nbsCmmcPortModelName, $nbsCmmcPortHardwareRev] = explode('/', $port_contents['nbsCmmcPortPartRev']);
     } else {
         $nbsCmmcPortType = 'Built-in';
 
         // Set a few variables for the port discovery
-        $nbsCmmcPortContainedIn  = $nbsCmmcSlotIfIndex."01";
-        $nbsCmmcPortVendorInfo   = "MRV Communications";
-        $nbsCmmcPortIsFRU        = 'false';
+        $nbsCmmcPortContainedIn = $nbsCmmcSlotIfIndex . '01';
+        $nbsCmmcPortVendorInfo = 'MRV Communications';
+        $nbsCmmcPortIsFRU = 'false';
         $nbsCmmcPortParentRelPos = $port_contents['nbsCmmcPortIndex'];
-        $nbsCmmcPortModelName    = '';
-        $nbsCmmcPortHardwareRev  = '';
+        $nbsCmmcPortModelName = '';
+        $nbsCmmcPortHardwareRev = '';
     }
 
     if (isset($port_contents['nbsCmmcPortConnector']) && $port_contents['nbsCmmcPortConnector'] != 'removed') {
         // Determine the correct entPhysicalDescr for the port
         if (isset($port_contents['nbsCmmcPortWavelengthX']) && $port_contents['nbsCmmcPortWavelengthX'] != 'N/A') {
             $portEntPhysicalDescr = "$nbsCmmcPortType Port, {$port_contents['nbsCmmcPortWavelengthX']}nm Tx Signal, {$port_contents['nbsCmmcPortConnector']} Connector";
-        } elseif (!empty($port_contents['nbsCmmcPortDescription'])) {
+        } elseif (! empty($port_contents['nbsCmmcPortDescription'])) {
             $portEntPhysicalDescr = "$nbsCmmcPortType Port, {$port_contents['nbsCmmcPortDescription']}, {$port_contents['nbsCmmcPortConnector']} Connector";
         } else {
             $portEntPhysicalDescr = "$nbsCmmcPortType Port, {$port_contents['nbsCmmcPortConnector']} Connector";
@@ -315,7 +313,7 @@ foreach ($port_array as $nbsCmmcPort => $port_contents) {
         foreach ($nbsCmmcPortSensor_array as $index => $nbsCmmcPortSensor) {
             if (isset($port_contents[$nbsCmmcPortSensor['objectType']]) && $port_contents[$nbsCmmcPortSensor['objectType']] != $nbsCmmcPortSensor['skipValue']) {
                 $entity_array[] = [
-                    'entPhysicalIndex'        => $port_contents['nbsCmmcPortIfIndex'].$index,
+                    'entPhysicalIndex'        => $port_contents['nbsCmmcPortIfIndex'] . $index,
                     'entPhysicalDescr'        => "{$nbsCmmcPortSensor['entPhysicalName']} Sensor",
                     'entPhysicalClass'        => 'sensor',
                     'entPhysicalName'         => $nbsCmmcPortSensor['entPhysicalName'],
@@ -330,23 +328,23 @@ foreach ($port_array as $nbsCmmcPort => $port_contents) {
 }
 
 foreach ($entity_array as $entPhysicalIndex => $entry) {
-        $entPhysicalIndex        = array_key_exists('entPhysicalIndex', $entry)        ? $entry['entPhysicalIndex']        : '';
-        $entPhysicalDescr        = array_key_exists('entPhysicalDescr', $entry)        ? $entry['entPhysicalDescr']        : '';
-        $entPhysicalClass        = array_key_exists('entPhysicalClass', $entry)        ? $entry['entPhysicalClass']        : '';
-        $entPhysicalName         = array_key_exists('entPhysicalName', $entry)         ? $entry['entPhysicalName']         : '';
-        $entPhysicalModelName    = array_key_exists('entPhysicalModelName', $entry)    ? $entry['entPhysicalModelName']    : '';
-        $entPhysicalSerialNum    = array_key_exists('entPhysicalSerialNum', $entry)    ? $entry['entPhysicalSerialNum']    : '';
-        $entPhysicalContainedIn  = array_key_exists('entPhysicalContainedIn', $entry)  ? $entry['entPhysicalContainedIn']  : '';
-        $entPhysicalMfgName      = array_key_exists('entPhysicalMfgName', $entry)      ? $entry['entPhysicalMfgName']      : '';
-        $entPhysicalParentRelPos = array_key_exists('entPhysicalParentRelPos', $entry) ? $entry['entPhysicalParentRelPos'] : '';
-        $entPhysicalVendorType   = array_key_exists('entPhysicalVendorType', $entry)   ? $entry['entPhysicalVendorType']   : '';
-        $entPhysicalHardwareRev  = array_key_exists('entPhysicalHardwareRev', $entry)  ? $entry['entPhysicalHardwareRev']  : '';
-        $entPhysicalFirmwareRev  = array_key_exists('entPhysicalFirmwareRev', $entry)  ? $entry['entPhysicalFirmwareRev']  : '';
-        $entPhysicalSoftwareRev  = array_key_exists('entPhysicalSoftwareRev', $entry)  ? $entry['entPhysicalSoftwareRev']  : '';
-        $entPhysicalIsFRU        = array_key_exists('entPhysicalIsFRU', $entry)        ? $entry['entPhysicalIsFRU']        : '';
-        $entPhysicalAlias        = array_key_exists('entPhysicalAlias', $entry)        ? $entry['entPhysicalAlias']        : '';
-        $entPhysicalAssetID      = array_key_exists('entPhysicalAssetID', $entry)      ? $entry['entPhysicalAssetID']      : '';
-        $ifIndex                 = array_key_exists('ifIndex', $entry)                 ? $entry['ifIndex']                 : '';
+    $entPhysicalIndex = array_key_exists('entPhysicalIndex', $entry) ? $entry['entPhysicalIndex'] : '';
+    $entPhysicalDescr = array_key_exists('entPhysicalDescr', $entry) ? $entry['entPhysicalDescr'] : '';
+    $entPhysicalClass = array_key_exists('entPhysicalClass', $entry) ? $entry['entPhysicalClass'] : '';
+    $entPhysicalName = array_key_exists('entPhysicalName', $entry) ? $entry['entPhysicalName'] : '';
+    $entPhysicalModelName = array_key_exists('entPhysicalModelName', $entry) ? $entry['entPhysicalModelName'] : '';
+    $entPhysicalSerialNum = array_key_exists('entPhysicalSerialNum', $entry) ? $entry['entPhysicalSerialNum'] : '';
+    $entPhysicalContainedIn = array_key_exists('entPhysicalContainedIn', $entry) ? $entry['entPhysicalContainedIn'] : '';
+    $entPhysicalMfgName = array_key_exists('entPhysicalMfgName', $entry) ? $entry['entPhysicalMfgName'] : '';
+    $entPhysicalParentRelPos = array_key_exists('entPhysicalParentRelPos', $entry) ? $entry['entPhysicalParentRelPos'] : '';
+    $entPhysicalVendorType = array_key_exists('entPhysicalVendorType', $entry) ? $entry['entPhysicalVendorType'] : '';
+    $entPhysicalHardwareRev = array_key_exists('entPhysicalHardwareRev', $entry) ? $entry['entPhysicalHardwareRev'] : '';
+    $entPhysicalFirmwareRev = array_key_exists('entPhysicalFirmwareRev', $entry) ? $entry['entPhysicalFirmwareRev'] : '';
+    $entPhysicalSoftwareRev = array_key_exists('entPhysicalSoftwareRev', $entry) ? $entry['entPhysicalSoftwareRev'] : '';
+    $entPhysicalIsFRU = array_key_exists('entPhysicalIsFRU', $entry) ? $entry['entPhysicalIsFRU'] : '';
+    $entPhysicalAlias = array_key_exists('entPhysicalAlias', $entry) ? $entry['entPhysicalAlias'] : '';
+    $entPhysicalAssetID = array_key_exists('entPhysicalAssetID', $entry) ? $entry['entPhysicalAssetID'] : '';
+    $ifIndex = array_key_exists('ifIndex', $entry) ? $entry['ifIndex'] : '';
 
     discover_entity_physical($valid, $device, $entPhysicalIndex, $entPhysicalDescr, $entPhysicalClass, $entPhysicalName, $entPhysicalModelName, $entPhysicalSerialNum, $entPhysicalContainedIn, $entPhysicalMfgName, $entPhysicalParentRelPos, $entPhysicalVendorType, $entPhysicalHardwareRev, $entPhysicalFirmwareRev, $entPhysicalSoftwareRev, $entPhysicalIsFRU, $entPhysicalAlias, $entPhysicalAssetID, $ifIndex);
 }//end foreach

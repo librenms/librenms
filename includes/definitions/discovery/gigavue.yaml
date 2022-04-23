@@ -1,0 +1,5 @@
+modules:
+    os:
+        sysDescr_regex: '/Gigamon (?<hardware>.*) (?<version>v[\d.]+)/'
+        version: GIGAMON-SNMP-MIB::version.0
+        serial: GIGAMON-SNMP-MIB::serialNumber.0

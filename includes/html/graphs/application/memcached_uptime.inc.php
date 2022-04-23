@@ -7,7 +7,7 @@ require 'includes/html/graphs/common.inc.php';
 
 $device = device_by_id_cache($var['id']);
 
-$rrd_options .= ' DEF:uptime='.$rrd_filename.':uptime:AVERAGE';
+$rrd_options .= ' DEF:uptime=' . $rrd_filename . ':uptime:AVERAGE';
 $rrd_options .= ' CDEF:cuptime=uptime,86400,/';
 $rrd_options .= " 'COMMENT:Days      Current  Minimum  Maximum  Average\\n'";
 $rrd_options .= ' AREA:cuptime#EEEEEE:Uptime';

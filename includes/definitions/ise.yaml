@@ -12,22 +12,22 @@ poller_modules:
     cisco-mac-accounting: true
     cisco-voice: true
     cisco-remote-access-monitor: true
-    cisco-sla: true
+    slas: true
     cisco-ipsec-flow-monitor: true
     cipsec-tunnels: true
     cisco-otv: true
 discovery_modules:
     cisco-cef: true
-    cisco-sla: true
+    slas: true
     cisco-mac-accounting: true
     cisco-otv: true
     cisco-pw: true
     vrf: true
     cisco-vrf-lite: true
-mib_dir:
-    - cisco
+mib_dir: cisco
 discovery:
-    - sysObjectID:
-        - .1.3.6.1.4.1.9.1.2139
-        - .1.3.6.1.4.1.9.1.1425
-        - .1.3.6.1.4.1.9.1.1426
+    -
+        sysObjectID:
+            - .1.3.6.1.4.1.9.1.2139
+            - .1.3.6.1.4.1.9.1.1425
+            - .1.3.6.1.4.1.9.1.1426

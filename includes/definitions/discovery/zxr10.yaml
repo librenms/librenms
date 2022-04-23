@@ -1,0 +1,17 @@
+mib: ZXR10-MIB
+modules:
+    os:
+        sysDescr_regex:
+            - '/ZXR10 (?<hardware>.*),( ZTE ZXR10 Software)? Version: (?<version>.*)/'
+            - '/ZXR10 (?<hardware>.*) Software, 5900 Version: (?<version>.*),/'
+            - '/ZXR10_(?<hardware>.*) Software, Version ZXR10 5900 (?<version>\S*) /'
+    mempools:
+        data:
+            -
+                total: ZXR10-MIB::zxr10SystemMemSize
+                percent_used: ZXR10-MIB::zxr10SystemMemUsed
+    processors:
+        data:
+            -
+                oid: zxr10SystemCpuUtility5m
+                num_oid: '.1.3.6.1.4.1.3902.3.3.1.1.12.{{ $index }}'

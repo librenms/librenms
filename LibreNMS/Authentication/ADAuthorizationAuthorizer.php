@@ -11,14 +11,14 @@ class ADAuthorizationAuthorizer extends MysqlAuthorizer
     use LdapSessionCache;
     use ActiveDirectoryCommon;
 
-    protected static $AUTH_IS_EXTERNAL = 1;
-    protected static $CAN_UPDATE_PASSWORDS = 0;
+    protected static $AUTH_IS_EXTERNAL = true;
+    protected static $CAN_UPDATE_PASSWORDS = false;
 
     protected $ldap_connection;
 
     public function __construct()
     {
-        if (!function_exists('ldap_connect')) {
+        if (! function_exists('ldap_connect')) {
             throw new LdapMissingException();
         }
 
@@ -26,7 +26,7 @@ class ADAuthorizationAuthorizer extends MysqlAuthorizer
         if (Config::has('auth_ad_check_certificates') &&
             Config::get('auth_ad_check_certificates') == 0) {
             putenv('LDAPTLS_REQCERT=never');
-        };
+        }
 
         // Set up connection to LDAP server
         $this->ldap_connection = @ldap_connect(Config::get('auth_ad_url'));
@@ -68,14 +68,14 @@ class ADAuthorizationAuthorizer extends MysqlAuthorizer
     public function userExists($username, $throw_exception = false)
     {
         if ($this->authLdapSessionCacheGet('user_exists')) {
-            return 1;
+            return true;
         }
 
         $search = ldap_search(
             $this->ldap_connection,
             Config::get('auth_ad_base_dn'),
             $this->userFilter($username),
-            array('samaccountname')
+            ['samaccountname']
         );
         $entries = ldap_get_entries($this->ldap_connection, $search);
 
@@ -85,12 +85,12 @@ class ADAuthorizationAuthorizer extends MysqlAuthorizer
              * want to speed up.
              */
             $this->authLdapSessionCacheSet('user_exists', 1);
-            return 1;
+
+            return true;
         }
 
-        return 0;
+        return false;
     }
-
 
     public function getUserlevel($username)
     {
@@ -106,7 +106,7 @@ class ADAuthorizationAuthorizer extends MysqlAuthorizer
             $this->ldap_connection,
             Config::get('auth_ad_base_dn'),
             $this->userFilter($username),
-            array('memberOf')
+            ['memberOf']
         );
         $entries = ldap_get_entries($this->ldap_connection, $search);
 
@@ -120,9 +120,9 @@ class ADAuthorizationAuthorizer extends MysqlAuthorizer
         }
 
         $this->authLdapSessionCacheSet('userlevel', $userlevel);
+
         return $userlevel;
     }
-
 
     public function getUserid($username)
     {
@@ -133,7 +133,7 @@ class ADAuthorizationAuthorizer extends MysqlAuthorizer
             $user_id = -1;
         }
 
-        $attributes = array('objectsid');
+        $attributes = ['objectsid'];
         $search = ldap_search(
             $this->ldap_connection,
             Config::get('auth_ad_base_dn'),
@@ -147,6 +147,7 @@ class ADAuthorizationAuthorizer extends MysqlAuthorizer
         }
 
         $this->authLdapSessionCacheSet('userid', $user_id);
+
         return $user_id;
     }
 

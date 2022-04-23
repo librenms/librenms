@@ -1,0 +1,391 @@
+ALU-SAR-GLOBAL-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-IDENTITY    FROM SNMPv2-SMI
+    tmnxBasedProducts                   FROM TIMETRA-GLOBAL-MIB;
+
+aluSARGlobalMIBModule  MODULE-IDENTITY
+    LAST-UPDATED    "0801090000Z"
+
+    ORGANIZATION    "Alcatel-Lucent"
+    CONTACT-INFO    
+        "Alcatel 7x50 Support
+         Web: http://www.alcatel.com/comps/pages/carrier_support.jhtml"
+    DESCRIPTION
+        "This  document  is the SNMP MIB module for central registration
+        of object identifiers defined under the Alcatel 'timetra' branch
+        for the Alcatel 7705 SAR series SNMP MIBs.
+
+        Copyright  2003-2014  Alcatel-Lucent. All rights reserved.
+        Reproduction of  this document is  authorized  on  the condition
+        that the foregoing copyright notice is included.
+
+        This   SNMP   MIB   module  (Specification)  embodies  Alcatel's
+        proprietary intellectual property. Alcatel retains all title and
+        ownership in the Specification, including any revisions.
+
+        Alcatel grants all interested parties a non-exclusive license to
+        use  and  distribute an unmodified copy of this Specification in
+        connection with management of Alcatel products, and without fee,
+        provided this copyright notice and license appear on all copies.
+
+        This  Specification  is  supplied  `as is', and Alcatel makes no
+        warranty,  either  express or implied, as to the use, operation,
+        condition, or performance of the Specification."
+--
+--  Revision History
+--
+        REVISION        "1112061000Z"
+        DESCRIPTION     "Rev 6.1                06 May 2013 00:00
+                This is the 6.1 release of the ALU-SAR-GLOBAL-MIB."
+
+        REVISION        "1112060000Z"
+        DESCRIPTION     "Rev 6.0                06 Dec 2011 00:00
+                This is the 6.0 release of the ALU-SAR-GLOBAL-MIB."
+
+        REVISION        "1012200000Z"
+        DESCRIPTION     "Rev 5.0                20 Dec 2010 00:00
+                This is the 5.0 release of the ALU-SAR-GLOBAL-MIB."
+
+        REVISION        "1008130000Z"
+        DESCRIPTION     "Rev 4.0                13 Aug 2010 00:00
+                This is the 4.0 release of the ALU-SAR-GLOBAL-MIB."
+
+        REVISION        "0801230000Z"
+        DESCRIPTION     "Rev 2.1                23 Jan 2009 00:00
+                This is the 2.1 release of the ALU-SAR-GLOBAL-MIB."
+
+        REVISION        "0808270000Z"
+        DESCRIPTION     "Rev 2.0                27 Aug 2008 00:00
+                This is the 2.0 release of the ALU-SAR-GLOBAL-MIB."
+
+        REVISION        "0806030000Z"
+        DESCRIPTION     "Rev 1.1                03 Jun 2008 00:00
+                This is the 1.1 release of the ALU-SAR-GLOBAL-MIB."
+
+        REVISION        "0801090000Z"
+        DESCRIPTION     "Rev 1.0                09 Jan 2008 00:00
+                This is the 1.0 release of the ALU-SAR-GLOBAL-MIB."
+        ::= { aluSARModules 1 }
+
+--
+-- ----------------------------------------------------------------------------
+-- aluServiceAggrRouters
+-- ----------------------------------------------------------------------------
+--
+aluServiceAggrRouters OBJECT IDENTIFIER ::= { tmnxBasedProducts 1 }
+
+--
+-- ----------------------------------------------------------------------------
+-- aluServiceAggrRouters 1  : SAR registry
+-- ----------------------------------------------------------------------------
+--  Sub-tree for registrations
+aluSARRegistry      OBJECT IDENTIFIER ::= { aluServiceAggrRouters 1 }
+
+--
+-- ----------------------------------------------
+-- aluSARRegistry 1  : SAR MIB Modules
+-- ----------------------------------------------
+--  
+    aluSARModules  OBJECT IDENTIFIER ::= { aluSARRegistry 1 }
+--      aluSARGlobalMIBModule           OBJECT IDENTIFIER ::= { aluSARModules 1 }
+--      aluSARTCMIBModule               OBJECT IDENTIFIER ::= { aluSARModules 2 }
+        aluSARMIBModules              	OBJECT IDENTIFIER ::= { aluSARModules 3 }
+--          aluChassisMIBModule              	OBJECT IDENTIFIER ::= { aluSARMIBModules 1 }
+--          aluPortMIBModule              		OBJECT IDENTIFIER ::= { aluSARMIBModules 2 }
+--          aluQOSMIBModule              		OBJECT IDENTIFIER ::= { aluSARMIBModules 3 }
+--          aluATMMIBModule              		OBJECT IDENTIFIER ::= { aluSARMIBModules 4 }
+--          aluServiceMIBModule           		OBJECT IDENTIFIER ::= { aluSARMIBModules 5 }
+--          aluMwMIBModule           			OBJECT IDENTIFIER ::= { aluSARMIBModules 6 }
+--          aluVrtrIfMIBModule           		OBJECT IDENTIFIER ::= { aluSARMIBModules 7 }
+--          alu1588PtpMIBModule                 OBJECT IDENTIFIER ::= { aluSARMIBModules 8 }
+--          aluDot1agMIBModule                  OBJECT IDENTIFIER ::= { aluSARMIBModules 10 }
+--          aluRMMIBModule                      OBJECT IDENTIFIER ::= { aluSARMIBModules 11 }
+--          aluPtpV2Module                      OBJECT IDENTIFIER ::= { aluSARMIBModules 12 }
+--          aluSystemMIBModule                  OBJECT IDENTIFIER ::= { aluSARMIBModules 13 }
+--          aluFilterMIBModule                  OBJECT IDENTIFIER ::= { aluSARMIBModules 14 }
+--          aluSecurityMIBModule                OBJECT IDENTIFIER ::= { aluSARMIBModules 15 }
+--          aluIPsecMIBModule                   OBJECT IDENTIFIER ::= { aluSARMIBModules 16 }
+--          aluBootLoaderMIBModule              OBJECT IDENTIFIER ::= { aluSARMIBModules 17 }
+--          aluNgeMibModule                     OBJECT IDENTIFIER ::= { aluSARMIBModules 18 }
+--          aluSARModulesOamTestMIBModule       OBJECT IDENTIFIER ::= { aluSARMIBModules 19 }
+
+        aluSARCapabilityModule          OBJECT IDENTIFIER ::= { aluSARModules 4 }
+            aluSAR7705CapModule                 OBJECT IDENTIFIER ::= { aluSARCapabilityModule 1 }
+--              aluSAR7705V1v0CapModule         OBJECT IDENTIFIER ::= { aluSAR7705CapModule 1 }
+--              aluSAR7705V1v1CapModule         OBJECT IDENTIFIER ::= { aluSAR7705CapModule 2 }
+--              aluSAR7705V2v0CapModule         OBJECT IDENTIFIER ::= { aluSAR7705CapModule 3 }
+--              aluSAR7705V2v1CapModule         OBJECT IDENTIFIER ::= { aluSAR7705CapModule 4 }
+--              aluSAR7705V3v0CapModule         OBJECT IDENTIFIER ::= { aluSAR7705CapModule 5 }
+--              aluSAR7705V4v0CapModule         OBJECT IDENTIFIER ::= { aluSAR7705CapModule 6 }
+--              aluSAR7705V5v0CapModule         OBJECT IDENTIFIER ::= { aluSAR7705CapModule 7 }
+--              aluSAR7705V6v0CapModule         OBJECT IDENTIFIER ::= { aluSAR7705CapModule 8 }
+
+--
+-- ----------------------------------------------
+-- aluSARRegistry 2  : SAR Hardware Products
+-- ----------------------------------------------
+--  Sub-trees for registration of Alcatel-Lucent SAR series hardware products
+--
+    aluSAR7705ServiceAggrRouters   OBJECT IDENTIFIER ::= { aluSARRegistry 2 }
+        aluSARModel7705SAR8Reg    OBJECT-IDENTITY
+            STATUS  current
+            DESCRIPTION
+                "This objectID is to be used as the mib-2 sysObjID to
+                 identify the Alcatel-Lucent 7705 SAR-8 (2 Control/Switch Modules
+                 and 6 MDA slots) device."
+        ::= { aluSAR7705ServiceAggrRouters 1 }
+
+        aluSARModel7705SARfReg    OBJECT-IDENTITY
+            STATUS  current
+            DESCRIPTION
+                "This objectID is to be used as the mib-2 sysObjID to
+                 identify the Alcatel-Lucent 7705 SAR-F device."
+        ::= { aluSAR7705ServiceAggrRouters 2 }
+        
+        aluSARModel7705SAR18Reg    OBJECT-IDENTITY
+            STATUS  current
+            DESCRIPTION
+                "This objectID is to be used as the mib-2 sysObjID to
+                 identify the Alcatel-Lucent 7705 SAR-18 device."
+        ::= { aluSAR7705ServiceAggrRouters 3 }
+
+        aluSARModel7705SARmReg    OBJECT-IDENTITY
+            STATUS  current
+            DESCRIPTION
+                "This objectID is to be used as the mib-2 sysObjID to
+                 identify the Alcatel-Lucent 7705 SAR-M device."
+        ::= { aluSAR7705ServiceAggrRouters 4 }
+        
+        aluSARModel7705SARmeReg    OBJECT-IDENTITY
+            STATUS  current
+            DESCRIPTION
+                "This objectID is to be used as the mib-2 sysObjID to
+                 identify the Alcatel-Lucent 7705 SAR-ME device."
+        ::= { aluSAR7705ServiceAggrRouters 5 }
+   
+        aluSARModel7705SARmlAReg    OBJECT-IDENTITY
+            STATUS  current
+            DESCRIPTION
+                "This objectID is to be used as the mib-2 sysObjID to
+                 identify the Alcatel-Lucent 7705 SAR-M lite Alpha
+                 (aka SAR-A) device."
+        ::= { aluSAR7705ServiceAggrRouters 6 }
+        
+        aluSARModel7705SARmlBReg    OBJECT-IDENTITY
+            STATUS  current
+            DESCRIPTION
+                "This objectID is to be used as the mib-2 sysObjID to
+                 identify the Alcatel-Lucent 7705 SAR-M lite Beta
+                 device."
+        ::= { aluSAR7705ServiceAggrRouters 7 }   
+
+        aluSARModel7705SARmlCReg    OBJECT-IDENTITY
+            STATUS  current
+            DESCRIPTION
+                "This objectID is to be used as the mib-2 sysObjID to
+                 identify the Alcatel-Lucent 7705 SAR-M lite Charlie
+                 device."
+        ::= { aluSAR7705ServiceAggrRouters 8 }
+
+        aluSARModel7705SARmlDReg    OBJECT-IDENTITY
+            STATUS  current
+            DESCRIPTION
+                "This objectID is to be used as the mib-2 sysObjID to
+                 identify the Alcatel-Lucent 7705 SAR-M lite Delta
+                 device."
+        ::= { aluSAR7705ServiceAggrRouters 9 }
+
+        aluSARModel7705SARmlEReg    OBJECT-IDENTITY
+            STATUS  current
+            DESCRIPTION
+                "This objectID is to be used as the mib-2 sysObjID to
+                 identify the Alcatel-Lucent 7705 SAR-M lite Echo
+                 (aka SAR-W) device."
+        ::= { aluSAR7705ServiceAggrRouters 10 }  
+        
+        aluSARModel7705SARHReg    OBJECT-IDENTITY
+            STATUS  current
+            DESCRIPTION
+                "This objectID is to be used as the mib-2 sysObjID to
+                 identify the Alcatel-Lucent 7705 SAR-H device."
+        ::= { aluSAR7705ServiceAggrRouters 11 } 
+        
+        aluSARModel7705SARHCReg    OBJECT-IDENTITY
+            STATUS  current
+            DESCRIPTION
+                "This objectID is to be used as the mib-2 sysObjID to
+                 identify the Alcatel-Lucent 7705 SAR-Hc device."
+        ::= { aluSAR7705ServiceAggrRouters 12 } 
+        
+        aluSARModel7705SARWxAReg    OBJECT-IDENTITY
+            STATUS  current
+            DESCRIPTION
+                "This objectID is to be used as the mib-2 sysObjID to
+                 identify the Alcatel-Lucent 7705 SAR-Wx 'A'
+                 device (5 GigE)."
+        ::= { aluSAR7705ServiceAggrRouters 13 }
+        
+        aluSARModel7705SARWxBReg    OBJECT-IDENTITY
+            STATUS  current
+            DESCRIPTION
+                "This objectID is to be used as the mib-2 sysObjID to
+                 identify the Alcatel-Lucent 7705 SAR-Wx 'B'
+                 device (5 GigE, GPS)."
+        ::= { aluSAR7705ServiceAggrRouters 14 }
+       
+        aluSARModel7705SARWxCReg    OBJECT-IDENTITY
+            STATUS  current
+            DESCRIPTION
+                "This objectID is to be used as the mib-2 sysObjID to
+                 identify the Alcatel-Lucent 7705 SAR-Wx 'C'
+                 device (5 GigE, power ethernet)."
+        ::= { aluSAR7705ServiceAggrRouters 15 }
+        
+        aluSARModel7705SARWxDReg    OBJECT-IDENTITY
+            STATUS  current
+            DESCRIPTION
+                "This objectID is to be used as the mib-2 sysObjID to
+                 identify the Alcatel-Lucent 7705 SAR-Wx 'D'
+                 device (5 GigE, power ethernet, GPS Rx)."
+        ::= { aluSAR7705ServiceAggrRouters 16 }
+        
+        aluSARModel7705SARWxEReg    OBJECT-IDENTITY
+            STATUS  current
+            DESCRIPTION
+                "This objectID is to be used as the mib-2 sysObjID to
+                 identify the Alcatel-Lucent 7705 SAR-Wx 'E'
+                 device (4 GigE, 4p xDSL)."
+        ::= { aluSAR7705ServiceAggrRouters 17 }
+        
+        aluSARModel7705SARWxFReg    OBJECT-IDENTITY
+            STATUS  current
+            DESCRIPTION
+                "This objectID is to be used as the mib-2 sysObjID to
+                 identify the Alcatel-Lucent 7705 SAR-Wx 'F'
+                 device (4 GigE, 4p xDSL, GPS Rx)."
+        ::= { aluSAR7705ServiceAggrRouters 18 }
+        
+        aluSARModel7705SARXReg    OBJECT-IDENTITY
+            STATUS  current
+            DESCRIPTION
+                "This objectID is to be used as the mib-2 sysObjID to
+                 identify the Alcatel-Lucent 7705 SAR-X
+                 device."
+        ::= { aluSAR7705ServiceAggrRouters 19 }
+        
+        aluSARModel7705SARWxGReg    OBJECT-IDENTITY
+            STATUS  current
+            DESCRIPTION
+                "This objectID is to be used as the mib-2 sysObjID to
+                 identify the Alcatel-Lucent 7705 SAR-Wx 'G'
+                 device (5 GigE, GNSS Rx)."
+        ::= { aluSAR7705ServiceAggrRouters 20 }
+       
+        aluSARModel7705SARWxHReg    OBJECT-IDENTITY
+            STATUS  current
+            DESCRIPTION
+                "This objectID is to be used as the mib-2 sysObjID to
+                 identify the Alcatel-Lucent 7705 SAR-Wx 'H'
+                 device (5 GigE, power ethernet, GNSS Rx)."
+        ::= { aluSAR7705ServiceAggrRouters 21 }
+        
+        aluSARModel7705SARWxIReg    OBJECT-IDENTITY
+            STATUS  current
+            DESCRIPTION
+                "This objectID is to be used as the mib-2 sysObjID to
+                 identify the Alcatel-Lucent 7705 SAR-Wx 'I'
+                 device (4 GigE, 4p xDSL, GNSS Rx)."
+        ::= { aluSAR7705ServiceAggrRouters 22 }
+        
+--
+-- ----------------------------------------------
+-- aluServiceAggrRouters 2  : SAR objects
+-- ----------------------------------------------
+--  Sub-tree for Service Router MIBs
+    aluSARMIB           OBJECT IDENTIFIER ::= { aluServiceAggrRouters 2 }
+--      Sub-tree for Service Aggr Router conformace
+        aluSARConfs          OBJECT IDENTIFIER ::= { aluSARMIB 1 }
+--        aluHwConformance        OBJECT IDENTIFIER ::= { aluSARConfs 2 }
+--        aluAtmMIBConformance    OBJECT IDENTIFIER ::= { aluSARConfs 3 }
+--        aluSetsMIBConformance   OBJECT IDENTIFIER ::= { aluSARConfs 4 }
+--        aluQOSMIBConformance    OBJECT IDENTIFIER ::= { aluSARConfs 5 }
+--        aluServiceMIBConformance  OBJECT IDENTIFIER ::= { aluSARConfs 6 }
+--        aluMwMIBConformance      OBJECT IDENTIFIER ::= { aluSARConfs 7 }
+--        aluVrtrIfMIBConformance  OBJECT IDENTIFIER ::= { aluSARConfs 8 }
+--        alu1588PtpMIBConformance  OBJECT IDENTIFIER ::= { aluSARConfs 9 }
+--        aluDot1agMIBConformance  OBJECT IDENTIFIER ::= { aluSARConfs 10 }
+--        aluRMMIBConformance      OBJECT IDENTIFIER ::= { aluSARConfs 11 }
+--        aluPtpMIBConformance     OBJECT IDENTIFIER ::= { aluSARConfs 12 }
+--        aluSystemMIBConformance  OBJECT IDENTIFIER ::= { aluSARConfs 13 }
+--        aluVrtrIpAddrMIBConformance  OBJECT IDENTIFIER ::= { aluSARConfs 14 }
+--        aluTwampMIBConformance   OBJECT IDENTIFIER ::= { aluSARConfs 15 }
+--        aluFilterMIBConformance   OBJECT IDENTIFIER ::= { aluSARConfs 16 }
+--        aluSecurityMIBConformance   OBJECT IDENTIFIER ::= { aluSARConfs 17 }
+--        aluVrtrConfMIBConformance   OBJECT IDENTIFIER ::= { aluSARConfs 18 }
+--        aluIPsecMIBConformance      OBJECT IDENTIFIER ::= { aluSARConfs 19 }
+--        aluNgeMIBConformance      OBJECT IDENTIFIER ::= { aluSARConfs 20 }
+--        aluTestConformance   OBJECT IDENTIFIER ::= { aluSARConfs 21 }
+
+
+--      Sub-tree for Service Aggr Router Objects
+        aluSARObjs           OBJECT IDENTIFIER ::= { aluSARMIB 2 }
+--         aluHwObjs       	     OBJECT IDENTIFIER ::= { aluSARObjs 2 }
+--         aluPortObjs       	 OBJECT IDENTIFIER ::= { aluSARObjs 3 }
+--         aluSyncObjs           OBJECT IDENTIFIER ::= { aluSARObjs 4 }
+--         aluQosObjs            OBJECT IDENTIFIER ::= { aluSARObjs 5 }
+--         aluServiceObjs        OBJECT IDENTIFIER ::= { aluSARObjs 6 }
+--         aluMwObjs             OBJECT IDENTIFIER ::= { aluSARObjs 7 }
+--         aluVrtrIfObjs         OBJECT IDENTIFIER ::= { aluSARObjs 8 }
+--         alu1588PtpObjs        OBJECT IDENTIFIER ::= { aluSARObjs 9 }
+--         aluDot1agObjs         OBJECT IDENTIFIER ::= { aluSARObjs 10 }
+--         aluRMObjs             OBJECT IDENTIFIER ::= { aluSARObjs 11 }
+--         aluPtpObjs            OBJECT IDENTIFIER ::= { aluSARObjs 12 }
+--         aluSystemObjs         OBJECT IDENTIFIER ::= { aluSARObjs 13 }
+--         aluVrtrIpAddrObjs     OBJECT IDENTIFIER ::= { aluSARObjs 14 }
+--         aluTwampObjs          OBJECT IDENTIFIER ::= { aluSARObjs 15 }
+--         aluFilterObjs         OBJECT IDENTIFIER ::= { aluSARObjs 16 }
+--         aluSecurityObjs       OBJECT IDENTIFIER ::= { aluSARObjs 17 }
+--         aluVrtrConfObjs       OBJECT IDENTIFIER ::= { aluSARObjs 18 }
+--         aluIPsecObjs          OBJECT IDENTIFIER ::= { aluSARObjs 19 }
+--         aluNgeObjs            OBJECT IDENTIFIER ::= { aluSARObjs 20 }
+--         aluOamTestObjs        OBJECT IDENTIFIER ::= { aluSARObjs 21 }
+
+--      Sub-tree for Service AggrRouter Notifications (events)
+        aluSARNotifyPrefix   OBJECT IDENTIFIER ::= { aluSARMIB 3 }
+--        aluHwNotification      OBJECT IDENTIFIER ::= { aluSARNotifyPrefix 2 }
+--        aluAtmNotifyPrefix     OBJECT IDENTIFIER ::= { aluSARNotifyPrefix 3 }
+--        aluSetsNotifyPrefix    OBJECT IDENTIFIER ::= { aluSARNotifyPrefix 4 } 
+--        alu1588PtpNotifyPrefix OBJECT IDENTIFIER ::= { aluSARNotifyPrefix 5 }        
+--        aluDot1agCfmNotifyPrefix    OBJECT IDENTIFIER ::= { aluSARNotifyPrefix 6 }
+--        aluRMNotifyPrefix      OBJECT IDENTIFIER ::= { aluSARNotifyPrefix 7 }        
+--        aluPtpNotifyPrefix     OBJECT IDENTIFIER ::= { aluSARNotifyPrefix 8 }
+--        aluSystemPrefix        OBJECT IDENTIFIER ::= { aluSARNotifyPrefix 9 }
+--        aluMwNotifyPrefix      OBJECT IDENTIFIER ::= { aluSARNotifyPrefix 10 }
+--        aluVRtrNotifyPrefix    OBJECT IDENTIFIER ::= { aluSARNotifyPrefix 11 }
+--        aluTwampNotifyPrefix   OBJECT IDENTIFIER ::= { aluSARNotifyPrefix 12 }
+--        aluFilterNotifyPrefix  OBJECT IDENTIFIER ::= { aluSARNotifyPrefix 13 }
+--        aluSecurityNotifyPrefix    OBJECT IDENTIFIER ::= { aluSARNotifyPrefix 14 }
+--        aluIPsecNotifyPrefix       OBJECT IDENTIFIER ::= { aluSARNotifyPrefix 15 }
+--        aluNgeNotifyPrefix         OBJECT IDENTIFIER ::= { aluSARNotifyPrefix 16 }
+--        aluOamNotifyPrefix     OBJECT IDENTIFIER ::= { aluSARNotifyPrefix 17 }
+
+--
+-- ----------------------------------------------------------------------------
+-- aluServiceAggrRouters 3  : Product Capabilities
+-- ----------------------------------------------------------------------------
+--
+aluSARProductCapability      OBJECT IDENTIFIER ::= { aluServiceAggrRouters 3 }
+    aluSAR7705Capability         OBJECT IDENTIFIER ::= { aluSARProductCapability 1 }
+        aluSAR7705V1v0               OBJECT IDENTIFIER ::= { aluSAR7705Capability 1 }
+        aluSAR7705V1v1               OBJECT IDENTIFIER ::= { aluSAR7705Capability 2 }
+        aluSAR7705V2v0               OBJECT IDENTIFIER ::= { aluSAR7705Capability 3 }
+        aluSAR7705V2v1               OBJECT IDENTIFIER ::= { aluSAR7705Capability 4 }
+        aluSAR7705V3v0               OBJECT IDENTIFIER ::= { aluSAR7705Capability 5 }
+        aluSAR7705V4v0               OBJECT IDENTIFIER ::= { aluSAR7705Capability 6 }
+        aluSAR7705V5v0               OBJECT IDENTIFIER ::= { aluSAR7705Capability 7 }
+        aluSAR7705V6v0               OBJECT IDENTIFIER ::= { aluSAR7705Capability 8 }
+        aluSAR7705V6v1               OBJECT IDENTIFIER ::= { aluSAR7705Capability 9 }
+        aluSAR7705V7v0               OBJECT IDENTIFIER ::= { aluSAR7705Capability 10 }
+
+END

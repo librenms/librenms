@@ -1,32 +1,94 @@
 mib: NAG-MIB
 modules:
+    mempools:
+        data:
+            -
+                total: NAG-MIB::sysMemorySize
+                used: NAG-MIB::sysMemoryBusy
+                descr: 'Memory Usage'
+                index: 0
+    os:
+        hardware:
+            - NAG-MIB::sysHardwareVersion.0
+            - NAG-MIB::sysHardwareVersion.1
+        version:
+            - NAG-MIB::sysSoftwareVersion.0
+            - NAG-MIB::sysSoftwareVersion.1
+    pre-cache:
+        data:
+            -
+                oid:
+                 - portName
     processors:
         data:
             -
-                  oid: sysCpuUsage
-                  num_oid: '.1.3.6.1.4.1.40418.7.100.1.8.1.11.{{ $index }}'
+                oid: sysCpuUsage
+                num_oid: '.1.3.6.1.4.1.40418.7.100.1.8.1.11.{{ $index }}'
     sensors:
         temperature:
-           data:
+            data:
                 -
                     oid: sysTemperature
                     num_oid: '.1.3.6.1.4.1.40418.7.100.1.8.1.10.{{ $index }}'
                     descr: 'Temperature {{ $index }}'
         state:
-           data:
+            data:
                 -
                     oid: sysFanStatus
                     num_oid: '.1.3.6.1.4.1.40418.7.100.1.12.1.1.3.{{ $index }}'
                     descr: 'Fan {{ $index }} status'
                     states:
-                         - { descr: Normal, graph: 0, value: 0, generic: 0 }
-                         - { descr: Abnormal, graph: 0, value: 1, generic: 2 }
+                        - { descr: Normal, graph: 0, value: 0, generic: 0 }
+                        - { descr: Abnormal, graph: 0, value: 1, generic: 2 }
+                -
+                    oid: sysFanSpeed
+                    num_oid: '.1.3.6.1.4.1.40418.7.100.1.12.1.4.{{ $index }}'
+                    descr: 'Fan {{ $index }} speed '
+                    states:
+                        - { value: 0, generic: 3, graph: 0, descr: none }
+                        - { value: 1, generic: 0, graph: 0, descr: low }
+                        - { value: 2, generic: 0, graph: 0, descr: medium-low }
+                        - { value: 3, generic: 1, graph: 0, descr: medium }
+                        - { value: 4, generic: 2, graph: 0, descr: medium-high }
+                        - { value: 5, generic: 2, graph: 0, descr: high }
                 -
                     oid: showSwitchStartUpStatus
                     num_oid: '.1.3.6.1.4.1.40418.7.100.1.16.{{ $index }}'
                     descr: 'Switch {{ $index }} Startup status'
                     states:
-                         - { descr: idle, graph: 0, value: 1, generic: 3 }
-                         - { descr: success, graph: 0, value: 2, generic: 0 }
-                         - { descr: fail, graph: 0, value: 3, generic: 2 }
-                         - { descr: inProgress, graph: 0, value: 4, generic: 3 }
+                        - { descr: idle, graph: 0, value: 1, generic: 3 }
+                        - { descr: success, graph: 0, value: 2, generic: 0 }
+                        - { descr: fail, graph: 0, value: 3, generic: 2 }
+                        - { descr: inProgress, graph: 0, value: 4, generic: 3 }
+        voltage:
+            data:
+                -
+                    oid: ddmTranscDiagnosisTable
+                    value: ddmDiagnosisVoltage
+                    num_oid: '.1.3.6.1.4.1.40418.7.100.30.1.1.7.{{ $index }}'
+                    descr: "{{ $portName }}"
+                    index: "ddmDiagnosisVoltage.{{ $index }}"
+        current:
+            data:
+                -
+                    oid: ddmTranscDiagnosisTable
+                    value: ddmDiagnosisBias
+                    num_oid: '.1.3.6.1.4.1.40418.7.100.30.1.1.12.{{ $index }}'
+                    descr: "{{ $portName }}"
+                    index: "ddmDiagnosisBias.{{ $index }}"
+        dbm:
+            data:
+                -
+                    oid: ddmTranscDiagnosisTable
+                    value: ddmDiagnosisRXPower
+                    num_oid: '.1.3.6.1.4.1.40418.7.100.30.1.1.17.{{ $index }}'
+                    descr: "{{ $portName }}"
+                    index: "ddmDiagnosisRXPower.{{ $index }}"
+                    group: "Optical RX"
+                -
+                    oid: ddmTranscDiagnosisTable
+                    value: ddmDiagnosisTXPower
+                    num_oid: '.1.3.6.1.4.1.40418.7.100.30.1.1.22.{{ $index }}'
+                    descr: "{{ $portName }}"
+                    index: "ddmDiagnosisTXPower.{{ $index }}"
+                    group: "Optical TX"

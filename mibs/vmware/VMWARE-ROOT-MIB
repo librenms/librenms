@@ -1,5 +1,5 @@
 -- **********************************************************
--- Copyright 2007-2016 VMware, Inc.  All rights reserved. 
+-- Copyright 2007-2017 VMware, Inc.  All rights reserved.
 -- **********************************************************
 
 VMWARE-ROOT-MIB DEFINITIONS ::= BEGIN
@@ -9,7 +9,7 @@ IMPORTS
         FROM SNMPv2-SMI;
 
 vmware MODULE-IDENTITY
-       LAST-UPDATED "201611030000Z"
+       LAST-UPDATED "201808300000Z"
        ORGANIZATION "VMware, Inc"
        CONTACT-INFO
                "VMware, Inc
@@ -17,13 +17,22 @@ vmware MODULE-IDENTITY
                 Palo Alto, CA 94304
                 Tel: 1-877-486-9273 or 650-427-5000
                 Fax: 650-427-5001
-                Web: http://communities.vmware.com/community/developer/forums/managementapi
+                Web: http://kb.vmware.com/kb/1013445
                 "
        DESCRIPTION
                "VMware managed object root assignements
                 This module defines the VMware SNMP MIB root
                 and its primary subtrees.
                "
+       REVISION      "201808300000Z"
+       DESCRIPTION
+               "Arc vmwPerAppTunnel defined."
+       REVISION      "201710300000Z"
+       DESCRIPTION
+               "Arc vmwNSXsys defined."
+       REVISION      "201706070000Z"
+       DESCRIPTION
+               "Arc vmwHCX defined."
        REVISION      "201611030000Z"
        DESCRIPTION
                "Arc vmwNetworkInsight defined."
@@ -38,10 +47,10 @@ vmware MODULE-IDENTITY
 
        REVISION      "200707300000Z"
        DESCRIPTION
-               "The initial revision. Prior version was released in 
+               "The initial revision. Prior version was released in
                 SMIv1 format as VMWARE-ROOT-MIB."
        ::= { enterprises 6876 }
-  
+
 
 -- The parent oid of snmpv1 traps when sent in snmpv2/v3
 -- vmwNotifications OBJECT IDENTIFIER ::= { vmware 0 }
@@ -133,6 +142,24 @@ DESCRIPTION
     "Objects used by VMware vRealize Network Insight and related components."
 ::= { vmware 100 }
 
+vmwHCX OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+    "Objects used by VMware HCX appliance and related components."
+::= { vmware 110 }
+
+vmwNSXsys OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+    "Objects used by VMware NSX systems and related components."
+::= { vmware 120 }
+
+vmwPerAppTunnel OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+    "Objects used by VMware PerApp Tunnel and related components."
+::= { vmware 130 }
+
 vmwExperimental OBJECT-IDENTITY
 STATUS  current
 DESCRIPTION
@@ -142,7 +169,7 @@ DESCRIPTION
 vmwDocumentation OBJECT-IDENTITY
 STATUS  current
 DESCRIPTION
-    "Used in product documentation, examples." 
+    "Used in product documentation, examples."
 ::= { vmware 750 }
 
 vmwObsolete OBJECT-IDENTITY

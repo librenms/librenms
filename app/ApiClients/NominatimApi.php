@@ -15,10 +15,10 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
+ *
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -31,13 +31,13 @@ class NominatimApi extends BaseApi implements Geocoder
 {
     use GeocodingHelper;
 
-    protected $base_uri = 'http://nominatim.openstreetmap.org';
+    protected $base_uri = 'https://nominatim.openstreetmap.org';
     protected $geocoding_uri = '/search';
 
     /**
      * Get latitude and longitude from geocode response
      *
-     * @param array $data
+     * @param  array  $data
      * @return array
      */
     protected function parseLatLng($data)
@@ -51,8 +51,9 @@ class NominatimApi extends BaseApi implements Geocoder
     /**
      * Build Guzzle request option array
      *
-     * @param string $address
+     * @param  string  $address
      * @return array
+     *
      * @throws \Exception you may throw an Exception if validation fails
      */
     protected function buildGeocodingOptions($address)
@@ -66,7 +67,7 @@ class NominatimApi extends BaseApi implements Geocoder
             'headers' => [
                 'User-Agent' => 'LibreNMS',
                 'Accept'     => 'application/json',
-            ]
+            ],
         ];
     }
 }

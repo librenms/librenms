@@ -2,15 +2,15 @@
 
 require 'includes/html/graphs/common.inc.php';
 
-$rrd_filename = rrd_name($device['hostname'], array('app', 'mysql', $app['app_id']));
+$rrd_filename = Rrd::name($device['hostname'], ['app', 'mysql', $app['app_id']]);
 
-$array = array(
-          'QCs'   => 'Cache size',
-          'QCeFy' => 'Free mem',
-         );
+$array = [
+    'QCs'   => 'Cache size',
+    'QCeFy' => 'Free mem',
+];
 
 $i = 0;
-if (rrdtool_check_rrd_exists($rrd_filename)) {
+if (Rrd::checkRrdExists($rrd_filename)) {
     foreach ($array as $ds => $var) {
         $rrd_list[$i]['filename'] = $rrd_filename;
         if (is_array($var)) {
@@ -26,8 +26,8 @@ if (rrdtool_check_rrd_exists($rrd_filename)) {
     echo "file missing: $file";
 }
 
-$colours   = 'mixed';
-$nototal   = 1;
+$colours = 'mixed';
+$nototal = 1;
 $unit_text = 'Bytes';
 
 require 'includes/html/graphs/generic_multi_simplex_seperated.inc.php';

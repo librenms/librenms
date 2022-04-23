@@ -1,7 +1,7 @@
 <?php
 
-if (!(Auth::user()->hasGlobalAdmin())) {
-    die('ERROR: You need to be admin');
+if (! (Auth::user()->hasGlobalAdmin())) {
+    exit('ERROR: You need to be admin');
 }
 
 ?>
@@ -11,7 +11,7 @@ if (!(Auth::user()->hasGlobalAdmin())) {
         <div class="modal-content">
             <div class="modal-header">
                 <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                <h5 class="modal-title" id="Create">Custom OID :: <a href="https://docs.librenms.org/">Docs <i class="fa fa-book fa-1x"></i></a> </h5>
+                <h5 class="modal-title" id="Create">Custom OID :: <a target="_blank" href="https://docs.librenms.org/">Docs <i class="fa fa-book fa-1x"></i></a> </h5>
             </div>
             <div class="modal-body">
                 <form method="post" role="form" id="coids" class="form-horizontal coid_form">
@@ -21,19 +21,19 @@ if (!(Auth::user()->hasGlobalAdmin())) {
                     <input type="hidden" name="type" id="type" value="customoid">
                     <input type="hidden" name="action" id="action" value="">
                     <div class='form-group' title="A description of the OID">
-                        <label for='name' class='col-sm-4 col-md-3 control-label'>Name: </label>
+                        <label for='name' class='col-sm-4 col-md-3 control-label'>Name </label>
                         <div class='col-sm-8 col-md-9'>
                             <input type='text' id='name' name='name' class='form-control validation' maxlength='200' required>
                         </div>
                     </div>
                     <div class="form-group" title="SNMP OID">
-                        <label for='oid' class='col-sm-4 col-md-3 control-label'>OID: </label>
+                        <label for='oid' class='col-sm-4 col-md-3 control-label'>OID </label>
                         <div class='col-sm-8 col-md-9'>
                             <input type='text' id='oid' name='oid' class='form-control validation' maxlength='255' required>
                         </div>
                     </div>
                     <div class="form-group" title="SNMP data type">
-                        <label for='datatype' class='col-sm-4 col-md-3 control-label'>Data Type: </label>
+                        <label for='datatype' class='col-sm-4 col-md-3 control-label'>Data Type </label>
                         <div class='col-sm-8 col-md-9'>
                             <select class="form-control" id="datatype" name="datatype">
                                 <option value="COUNTER">COUNTER</option>
@@ -42,26 +42,26 @@ if (!(Auth::user()->hasGlobalAdmin())) {
                         </div>
                     </div>
                     <div class="form-group" title="Unit of value being polled">
-                        <label for='unit' class='col-sm-4 col-md-3 control-label'>Unit: </label>
+                        <label for='unit' class='col-sm-4 col-md-3 control-label'>Unit </label>
                         <div class='col-sm-8 col-md-9'>
                             <input type='text' id='unit' name='unit' class='form-control validation' maxlength='10'>
                         </div>
                     </div>
                     <div class='form-group form-inline'>
-                        <label class='col-sm-4 col-md-3 control-label'>Calculations: </label>
+                        <label class='col-sm-4 col-md-3 control-label'>Calculations </label>
                         <div class="col-sm-8">
-                            <label for='divisor' class='col-sm-4 col-md-3 control-label' title="Divide raw SNMP value by">Divisor: </label>
+                            <label for='divisor' class='col-sm-4 col-md-3 control-label' title="Divide raw SNMP value by">Divisor </label>
                             <div class="col-sm-4 col-md-3" title="Divide raw SNMP value by">
                                 <input type='text' id='divisor' name='divisor' class='form-control' size="4">
                             </div>
-                            <label for='multiplier' class='col-sm-4 col-md-3 control-label' title="Multiply raw SNMP value by">Multiplier: </label>
+                            <label for='multiplier' class='col-sm-4 col-md-3 control-label' title="Multiply raw SNMP value by">Multiplier </label>
                             <div class="col-sm-4 col-md-3" title="Multiply raw SNMP value by">
                                 <input type='text' id='multiplier' name='multiplier' class='form-control' size="4">
                             </div>
                         </div>
                     </div>
                     <div class="form-group" title="User function to apply to value">
-                        <label for='user_func' class='col-sm-4 col-md-3 control-label'>User Function: </label>
+                        <label for='user_func' class='col-sm-4 col-md-3 control-label'>User Function </label>
                         <div class='col-sm-8 col-md-9'>
                             <select class="form-control" id="user_func" name="user_func">
                                 <option value=""></option>
@@ -72,37 +72,37 @@ if (!(Auth::user()->hasGlobalAdmin())) {
                         </div>
                     </div>
                     <div class='form-group form-inline'>
-                        <label class='col-sm-4 col-md-3 control-label'>Alert Thresholds: </label>
+                        <label class='col-sm-4 col-md-3 control-label'>Alert Thresholds </label>
                         <div class="col-sm-8">
-                            <label for='limit' class='col-sm-4 col-md-3 control-label' title="Level to alert above">High: </label>
+                            <label for='limit' class='col-sm-4 col-md-3 control-label' title="Level to alert above">High </label>
                             <div class="col-sm-4 col-md-3" title="Level to alert above">
                                 <input type='text' id='limit' name='limit' class='form-control' size="4">
                             </div>
-                            <label for='limit_low' class='col-sm-4 col-md-3 control-label' title="Level to alert below">Low: </label>
+                            <label for='limit_low' class='col-sm-4 col-md-3 control-label' title="Level to alert below">Low </label>
                             <div class="col-sm-4 col-md-3" title="Level to alert below">
                                 <input type='text' id='limit_low' name='limit_low' class='form-control' size="4">
                             </div>
                         </div>
                     </div>
                     <div class='form-group form-inline'>
-                        <label class='col-sm-4 col-md-3 control-label'>Warning Thresholds: </label>
+                        <label class='col-sm-4 col-md-3 control-label'>Warning Thresholds </label>
                         <div class="col-sm-8">
-                            <label for='limit_warn' class='col-sm-4 col-md-3 control-label' title="Level to warn above">High: </label>
+                            <label for='limit_warn' class='col-sm-4 col-md-3 control-label' title="Level to warn above">High </label>
                             <div class="col-sm-4 col-md-3" title="Level to warn above">
                                 <input type='text' id='limit_warn' name='limit_warn' class='form-control' size="4">
                             </div>
-                            <label for='limit_low_warn' class='col-sm-4 col-md-3 control-label' title="Level to warn below">Low: </label>
+                            <label for='limit_low_warn' class='col-sm-4 col-md-3 control-label' title="Level to warn below">Low </label>
                             <div class="col-sm-4 col-md-3" title="Level to warn below">
                                <input type='text' id='limit_low_warn' name='limit_low_warn' class='form-control' size="4">
                             </div>
                         </div>
                     </div>
                     <div class="form-group" title="Alerts for this OID enabled">
-                        <label for='alerts' class='col-sm-4 col-md-3 control-label'>Alerts Enabled: </label>
+                        <label for='alerts' class='col-sm-4 col-md-3 control-label'>Alerts Enabled </label>
                         <div class='col-sm-4 col-md-3'>
                             <input type='checkbox' name='alerts' id='alerts'>
                         </div>
-                        <label for='passed' class='col-sm-4 col-md-3 control-label'>Passed Check: </label>
+                        <label for='passed' class='col-sm-4 col-md-3 control-label'>Passed Check </label>
                         <div class='col-sm-4 col-md-3'>
                             <input type='checkbox' name='cpassed' id='cpassed' disabled>
                             <input type='hidden' name='passed' id='passed' value="">
@@ -187,7 +187,7 @@ $('#save-oid-button').on('click', function (e) {
             if (data.status == 'ok') {
                 toastr.success(data.message);
                 $('#create-oid-form').modal('hide');
-                window.location.reload(); 
+                window.location.reload();
             } else {
                 toastr.error(data.message);
             }
@@ -219,7 +219,7 @@ $('#test-oid-button').on('click', function (e) {
         }
     });
 });
-$('#oid').change(function () {
+$('#oid').on("change", function () {
     $("#passed").val('');
     $("#cpassed").prop("checked", false);
 });

@@ -1,8 +1,8 @@
 <?php
 
-$rrd_filename = rrd_name($device['hostname'], 'bigip_system_client_connection_rate');
+$rrd_filename = Rrd::name($device['hostname'], 'bigip_system_client_connection_rate');
 
-require 'includes/graphs/common.inc.php';
+require 'includes/html/graphs/common.inc.php';
 
 $ds = 'ClientTotConns';
 
@@ -16,4 +16,4 @@ $graph_min = 0;
 
 $unit_text = 'Connection Rate';
 
-require 'includes/graphs/generic_simplex.inc.php';
+require 'includes/html/graphs/generic_simplex.inc.php';

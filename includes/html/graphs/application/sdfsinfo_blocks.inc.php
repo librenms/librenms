@@ -11,43 +11,43 @@
 * GNU General Public License for more details.
 *
 * You should have received a copy of the GNU General Public License
-* along with this program.  If not, see <http://www.gnu.org/licenses/>.
+* along with this program.  If not, see <https://www.gnu.org/licenses/>.
 *
 * @package    LibreNMS
-* @link       http://librenms.org
+* @link       https://www.librenms.org
 * @copyright  2017 crcro
 * @author     Cercel Valentin <crc@nuamchefazi.ro>
 */
 
 require 'includes/html/graphs/common.inc.php';
 
-$scale_min     = 0;
-$colours       = 'mixed';
-$unit_text     = 'Blocks';
-$unitlen       = 6;
-$bigdescrlen   = 25;
+$scale_min = 0;
+$colours = 'mixed';
+$unit_text = 'Blocks';
+$unitlen = 6;
+$bigdescrlen = 25;
 $smalldescrlen = 25;
-$dostack       = 0;
-$printtotal    = 0;
-$addarea       = 1;
-$transparency  = 33;
-$rrd_filename = rrd_name($device['hostname'], array('app', $app['app_type'], $app['app_id']));
+$dostack = 0;
+$printtotal = 0;
+$addarea = 1;
+$transparency = 33;
+$rrd_filename = Rrd::name($device['hostname'], ['app', $app['app_type'], $app['app_id']]);
 
-$array    = array(
-    'dup_data' => array('descr' => 'Duplicate data wrote (GB)','colour' => '000000',),
-    'blocks_unique' => array('descr' => 'Unique blocks (GB)','colour' => '2A7A12',),
-    'blocks_compressed' => array('descr' => 'Compressed blocks (GB)','colour' => '74127A',),
-    'cluster_copies' => array('descr' => 'Cluster copies','colour' => 'F44842',),
-);
+$array = [
+    'dup_data' => ['descr' => 'Duplicate data wrote (GB)', 'colour' => '000000'],
+    'blocks_unique' => ['descr' => 'Unique blocks (GB)', 'colour' => '2A7A12'],
+    'blocks_compressed' => ['descr' => 'Compressed blocks (GB)', 'colour' => '74127A'],
+    'cluster_copies' => ['descr' => 'Cluster copies', 'colour' => 'F44842'],
+];
 
 $i = 0;
 
-if (rrdtool_check_rrd_exists($rrd_filename)) {
+if (Rrd::checkRrdExists($rrd_filename)) {
     foreach ($array as $ds => $var) {
         $rrd_list[$i]['filename'] = $rrd_filename;
-        $rrd_list[$i]['descr']    = $var['descr'];
-        $rrd_list[$i]['ds']       = $ds;
-        $rrd_list[$i]['colour']   = $var['colour'];
+        $rrd_list[$i]['descr'] = $var['descr'];
+        $rrd_list[$i]['ds'] = $ds;
+        $rrd_list[$i]['colour'] = $var['colour'];
         $i++;
     }
 } else {

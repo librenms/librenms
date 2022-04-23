@@ -1,0 +1,54 @@
+mib: ICT-SINE-WAVE-INVERTER-MIB
+modules:
+    os:
+        hardware: ICT-SINE-WAVE-INVERTER-MIB::deviceHardware.0
+        version: ICT-SINE-WAVE-INVERTER-MIB::deviceFirmware.0
+    sensors:
+        voltage:
+            data:
+                -
+                    oid: batteryVoltage
+                    num_oid: '.1.3.6.1.4.1.39145.12.6.{{ $index }}'
+                    descr: 'Battery Voltage (VDC)'
+                    index: 'batteryVoltage.{{ $index }}'
+                -
+                    oid: inverterVoltage
+                    num_oid: '.1.3.6.1.4.1.39145.12.7.{{ $index }}'
+                    descr: 'Inverter Voltage (VAC)'
+                    index: 'inverterVoltage.{{ $index }}'
+        load:
+            data:
+                -
+                    oid: inverterPower
+                    num_oid: '.1.3.6.1.4.1.39145.12.8.{{ $index }}'
+                    descr: 'Inverter Load'
+                    index: 'inverterPower.{{ $index }}'
+        state:
+            data:
+                -
+                    oid: inverterStatus
+                    value: inverterStatus
+                    num_oid: '.1.3.6.1.4.1.39145.12.9.{{ $index }}'
+                    descr: 'Inverter Status'
+                    index: 'inverterStatus.{{ $index }}'
+                    states:
+                        - { graph: 0, value: 1, generic: 0, descr: enabled }
+                        - { graph: 0, value: 2, generic: 1, descr: disabled }
+                -
+                    oid: inverterControl
+                    value: inverterControl
+                    num_oid: '.1.3.6.1.4.1.39145.12.10.{{ $index }}'
+                    descr: 'Inverter Control'
+                    index: 'inverterControl.{{ $index }}'
+                    states:
+                        - { graph: 0, value: 1, generic: 0, descr: enabled }
+                        - { graph: 0, value: 2, generic: 1, descr: disabled }
+                -
+                    oid: transferRelayStatus
+                    value: transferRelayStatus
+                    num_oid: '.1.3.6.1.4.1.39145.12.11.{{ $index }}'
+                    descr: 'Transfer Relay Status'
+                    index: 'transferRelayStatus.{{ $index }}'
+                    states:
+                        - { graph: 0, value: 1, generic: 0, descr: inverter }
+                        - { graph: 0, value: 2, generic: 1, descr: grid }

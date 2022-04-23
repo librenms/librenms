@@ -14,8 +14,6 @@
 
 ?>
 
-<h3>Memory settings</h3>
-
 <div class="table-responsive">
     <table id="mempool" class="table table-hover table-condensed mempool">
         <thead>
@@ -50,7 +48,7 @@
         }
     }).on("loaded.rs.jquery.bootgrid", function() {
 
-        grid.find(".mempool").blur(function(event) {
+        grid.find(".mempool").on("blur", function(event) {
             event.preventDefault();
             var device_id = $(this).data("device_id");
             var mempool_id = $(this).data("mempool_id");

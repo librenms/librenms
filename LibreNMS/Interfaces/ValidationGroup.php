@@ -15,10 +15,10 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
+ *
  * @copyright  2017 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -33,7 +33,7 @@ interface ValidationGroup
      * Validate this module.
      * To return ValidationResults, call ok, warn, fail, or result methods on the $validator
      *
-     * @param Validator $validator
+     * @param  Validator  $validator
      */
     public function validate(Validator $validator);
 

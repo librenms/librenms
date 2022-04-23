@@ -1,0 +1,78 @@
+{
+    "os": {
+        "discovery": {
+            "devices": [
+                {
+                    "sysName": "<private>",
+                    "sysObjectID": ".1.3.6.1.4.1.5040.1.2.42",
+                    "sysDescr": "Own Systemname",
+                    "sysContact": "<private>",
+                    "version": null,
+                    "hardware": null,
+                    "features": null,
+                    "os": "wut",
+                    "type": "environment",
+                    "serial": null,
+                    "icon": "wut.svg",
+                    "location": "<private>"
+                }
+            ]
+        },
+        "poller": "matches discovery"
+    },
+    "sensors": {
+        "discovery": {
+            "sensors": [
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "humidity",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.5040.1.2.42.1.4.1.1.2",
+                    "sensor_index": "wtWebGraphThermoHygroSensorNo.2",
+                    "sensor_type": "wut",
+                    "sensor_descr": "Environment",
+                    "group": null,
+                    "sensor_divisor": 10,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 42,
+                    "sensor_limit": 70,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": 30,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "state_name": null
+                },
+                {
+                    "sensor_deleted": 0,
+                    "sensor_class": "temperature",
+                    "poller_type": "snmp",
+                    "sensor_oid": ".1.3.6.1.4.1.5040.1.2.42.1.4.1.1.1",
+                    "sensor_index": "wtWebGraphThermoHygroSensorNo.1",
+                    "sensor_type": "wut",
+                    "sensor_descr": "Environment",
+                    "group": null,
+                    "sensor_divisor": 10,
+                    "sensor_multiplier": 1,
+                    "sensor_current": 20.8,
+                    "sensor_limit": 40.8,
+                    "sensor_limit_warn": null,
+                    "sensor_limit_low": 10.8,
+                    "sensor_limit_low_warn": null,
+                    "sensor_alert": 1,
+                    "sensor_custom": "No",
+                    "entPhysicalIndex": null,
+                    "entPhysicalIndex_measured": null,
+                    "sensor_prev": null,
+                    "user_func": null,
+                    "state_name": null
+                }
+            ]
+        },
+        "poller": "matches discovery"
+    }
+}

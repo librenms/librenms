@@ -5,7 +5,6 @@ use Illuminate\Database\Schema\Blueprint;
 
 class CreateSessionTable extends Migration
 {
-
     /**
      * Run the migrations.
      *
@@ -16,7 +15,7 @@ class CreateSessionTable extends Migration
         Schema::create('session', function (Blueprint $table) {
             $table->increments('session_id');
             $table->string('session_username');
-            $table->string('session_value', 60)->unique('session_value');
+            $table->string('session_value', 60)->unique();
             $table->string('session_token', 60);
             $table->string('session_auth', 16);
             $table->integer('session_expiry');

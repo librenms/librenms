@@ -1,0 +1,3 @@
+modules:
+    os:
+        sysDescr_regex: '/Router Model: (?<hardware>[\w ]+), Version: (?<version>[\w\.]+)/'

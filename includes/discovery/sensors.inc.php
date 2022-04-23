@@ -1,18 +1,21 @@
 <?php
 
 use LibreNMS\Config;
-use LibreNMS\Device\YamlDiscovery;
 use LibreNMS\OS;
 
-$valid['sensor'] = array();
+$valid['sensor'] = [];
 
 /** @var OS $os */
 $pre_cache = $os->preCache();
 
-// Run custom sensors
-require 'includes/discovery/sensors/cisco-entity-sensor.inc.php';
-require 'includes/discovery/sensors/entity-sensor.inc.php';
-require 'includes/discovery/sensors/ipmi.inc.php';
+if ($device['os'] == 'rittal-cmc-iii-pu' || $device['os'] == 'rittal-lcp') {
+    include 'includes/discovery/sensors/rittal-cmc-iii-sensors.inc.php';
+} else {
+    // Run custom sensors
+    require 'includes/discovery/sensors/cisco-entity-sensor.inc.php';
+    require 'includes/discovery/sensors/entity-sensor.inc.php';
+    require 'includes/discovery/sensors/ipmi.inc.php';
+}
 
 if ($device['os'] == 'netscaler') {
     include 'includes/discovery/sensors/netscaler.inc.php';
@@ -20,6 +23,10 @@ if ($device['os'] == 'netscaler') {
 
 if ($device['os'] == 'openbsd') {
     include 'includes/discovery/sensors/openbsd.inc.php';
+}
+
+if ($device['os'] == 'linux') {
+    include 'includes/discovery/sensors/rpigpiomonitor.inc.php';
 }
 
 if (strstr($device['hardware'], 'Dell')) {
@@ -42,7 +49,7 @@ if ($device['os_group'] == 'printer') {
     include 'includes/discovery/sensors/state/printer.inc.php';
 }
 
-$run_sensors = array(
+$run_sensors = [
     'airflow',
     'current',
     'charge',
@@ -51,6 +58,7 @@ $run_sensors = array(
     'frequency',
     'humidity',
     'load',
+    'loss',
     'power',
     'power_consumed',
     'power_factor',
@@ -59,6 +67,8 @@ $run_sensors = array(
     'state',
     'count',
     'temperature',
+    'tv_signal',
+    'bitrate',
     'voltage',
     'snr',
     'pressure',
@@ -69,12 +79,13 @@ $run_sensors = array(
     'ber',
     'eer',
     'waterflow',
-);
+    'percent',
+];
 
 // filter submodules
 $run_sensors = array_intersect($run_sensors, Config::get('discovery_submodules.sensors', $run_sensors));
 
-sensors($run_sensors, $device, $valid, $pre_cache);
+sensors($run_sensors, $os, $valid, $pre_cache);
 unset(
     $pre_cache,
     $run_sensors,

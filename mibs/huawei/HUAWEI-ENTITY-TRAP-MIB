@@ -1,14 +1,14 @@
 -- ============================================================================
--- Copyright (C) 2017 by  HUAWEI TECHNOLOGIES. All rights reserved.
+-- Copyright (C) 2018 by  HUAWEI TECHNOLOGIES. All rights reserved.
 -- Description: 
 -- Reference: None
--- Version:   V2.83
+-- Version:V3.30
 -- ============================================================================
 
 	HUAWEI-ENTITY-TRAP-MIB DEFINITIONS ::= BEGIN
  
 		IMPORTS
-			hwEntityOperStatus, hwStorageEntName, hwStorageEntSpaceFree 
+			hwEntityOperStatus
 				FROM HUAWEI-ENTITY-EXTENT-MIB
 			ifOperStatus,ifAdminStatus
 				FROM RFC1213-MIB	
@@ -27,7 +27,9 @@
              			TEXTUAL-CONVENTION, MacAddress
                                                                                      FROM SNMPv2-TC			
 			Integer32, OBJECT-TYPE, MODULE-IDENTITY, NOTIFICATION-TYPE			
-				FROM SNMPv2-SMI;
+				FROM SNMPv2-SMI
+			hwGtlItemIndex, hwGtlItemName
+				FROM HUAWEI-GTL-MIB;
 	
 	
 --   January 17, 2007 at 00:00 GMT
@@ -35,7 +37,7 @@
 -- January 17, 2007 at 00:00 GMT
 		-- 1.3.6.1.4.1.2011.5.25.219
 		hwEntityTrapMIB MODULE-IDENTITY 
-			LAST-UPDATED "201708130000Z"
+			LAST-UPDATED "201812130000Z"
 			ORGANIZATION 
 				"Huawei Technologies Co.,Ltd."		
 			CONTACT-INFO 
@@ -48,10 +50,113 @@
 				 "
 DESCRIPTION 
 				"This is the base trap definition for DataCom."
+         REVISION      "201812130000Z"
+         DESCRIPTION  "v3.30 Modify trap node hwEntityFileSystemAbnormal."         
+
+         REVISION      "201812040000Z"
+         DESCRIPTION  "v3.30 Add object node hwVirtualLicenseItemName."       
+
+         REVISION      "201811300000Z"
+         DESCRIPTION  "v3.28 Add trap node hwEntityHardwareFaultAbnormal."
+        
+         REVISION      "201811280000Z"
+         DESCRIPTION  "v3.27 Add trap node hwEntityFileSystemAbnormal."
+
+         REVISION     "201811230000Z"
+         DESCRIPTION  "v3.26 Add trap node hwEntityFileSystemRebuild."
+
+         REVISION     "201811080000Z"
+         DESCRIPTION  "v3.25 Add trap node hwNPResourceExcAlarm, hwNPResourceExcResume."
+
+         REVISION     "201811060000Z"
+         DESCRIPTION  "v3.24 Add trap node hwNPDomainDropCauseCntNumabruptlyAlarm, hwNPDomainDropCauseCntNumabruptlyResume, add object node hwLpuSlotId,hwLpuFeId and hwDropCauseId."
+
+         REVISION     "201811050000Z"
+         DESCRIPTION  "v3.23, Add trap node hwVirtualLicenseNearDeadline, hwVirtualLicenseExpire; Add object node hwLicenseRemainTime."
+				
+         REVISION     "201810081630Z"               
+         DESCRIPTION  "V3.22, Add trap node hwCpuFail, hwCpuFailResume."	
+
+         REVISION     "201809121630Z"               
+         DESCRIPTION  "V3.21, Add trap node hwDiskBadPyhsicalBlocks, hwDiskErasePyhsicalBlocks, hwEntityConfigurationTrap."
+
+		 REVISION     "201807021630Z"               
+         DESCRIPTION  "V3.19, Add trap node hwTmPerformanceALarm, hwTmPerformanceResume."
+
+		 REVISION     "201806052000Z"               
+         DESCRIPTION  "V3.19, Add trap node hwBoardUpCoverAlarm, hwBoardUpCoverResume."
+		 
+		 REVISION     "201805192000Z"               
+         DESCRIPTION  "V3.18, Add the objects of RPS Trap Node."
+		 
+         REVISION     "201805082000Z"               
+         DESCRIPTION  "V3.17, Add the objects of hwEntityNpsQuality. Add trap node hwEntityNpsBaseLinkSubhealthy, hwEntityNpsBaseLinkSubhealthyResume."
+	
+		 REVISION     "201804202000Z"               
+         DESCRIPTION  "V3.16, Add trap node hwAllLpuSfuFail, hwAllLpuSfuFailResume."
+
+         REVISION     "201804200000Z"               
+         DESCRIPTION  "V3.15, Add trap node hwEntityNpsTrapObject, hwEntityNpsTrap."
+
+         REVISION     "201803290000Z"               
+         DESCRIPTION  "V3.14, Add trap node hwReportSyslogInfo"
+
+         REVISION     "201803200000Z"               
+         DESCRIPTION  "V3.13, Add trap node hwPduNotPresent, hwPduPresent, hwPduCommLost, hwPduCommLostResume, hwPduDmuHardwareFault, hwPduDmuHardwareFaultResume,
+         hwPduDMUAutoUpgradeFail, hwPduDMUAutoUpgradeFailResume, hwPduDacsHardwareFault, hwPduDacsHardwareFaultResume, 
+         hwPduDacsTempAlarm, hwPduDacsTempAlarmResume, hwPduDacsI2CChannelFault, hwPduDacsI2CChannelFaultResume."
+
+         REVISION     "201803140000Z"
+         DESCRIPTION  "V3.12, Add trap node hwSMSReboot."
+
+         REVISION     "201801150000Z"               
+         DESCRIPTION  "V3.11, Modify the description"
+
+         REVISION     "201712290000Z"               
+         DESCRIPTION  "V3.10, add the objects of hwCapCPUThresholdType, hwCapCPUThresholdValue, hwCapCPUThresholdCurrent and the traps of hwCapCPUUtilizationResume, hwCapCPUUtilizationRising."
+
+         REVISION     "201712280000Z"               
+         DESCRIPTION  "V3.09, add hwPowerWorkMode hwExpectPowerWorkMode hwPowerInsufficient hwPowerInsufficientResume."
+
+         REVISION     "201712260000Z"               
+         DESCRIPTION  "V3.08, add hwPowerCubeFaulty hwPowerCubeFaultyResume."
+        
+        REVISION     "201712200000Z"               
+         DESCRIPTION  "V3.07, add hwRTULicenseActSuccess."
+
+         REVISION     "201712060000Z"               
+         DESCRIPTION  "V3.06, modify hwPartitionThresholdCurrent to hwPartitionUseage,
+hwPartitionThresholdWarning to hwPartitionUseageThreshold,
+hwDiskPartitionUtilizationRising to hwDiskPartitionUseageRising,
+hwDiskPartitionUtilizationResume to hwDiskPartitionUseageResume"
+         REVISION     "201712010000Z"               
+         DESCRIPTION  "V3.04, add the trap list of hwBoardFail and hwBoardWarning"
+
+         REVISION     "201711300000Z"               
+         DESCRIPTION  "V3.04, add hwBoardID, hwBoardAdd and hwBoardDelete."
+
+         REVISION     "201711140000Z"               
+         DESCRIPTION  "V3.03, add hwCardInconsistent"
+
+         REVISION     "201711040000Z"
+         DESCRIPTION  "V3.02, add the trap list of hwBoardInvalid"
+
+         REVISION     "201709260000Z"
+         DESCRIPTION  "V3.01, modify hte description of HwPartitionEntry; delete hwStorageEntName, hwStorageEntSpaceFree"
+
+         REVISION     "201709260000Z"
+         DESCRIPTION  "V3.00, add HwPartitionEntry; delete hwStorageEntName, hwStorageEntSpaceFree"
+
+         REVISION     "201709210000Z"
+         DESCRIPTION  "V2.85, delete hwVPortDown,hwVPortUp and vNetID"
+
+         REVISION     "201709010000Z"
+         DESCRIPTION  "V2.84, add theHiGigLinkOnTheBoardFailed"
+
          REVISION     "201708130000Z"
          DESCRIPTION  "V2.83, modify the parameter of hwBoardlowmemoryoverload and hwBoardlowmemoryoverloadResume"
  
-        REVISION     "201707240000Z"
+         REVISION     "201707240000Z"
          DESCRIPTION  "V2.82, add the trap list of hwPowerFail and add hwBoardlowmemoryoverload and add hwBoardlowmemoryoverloadResume"
 
          REVISION     "201707130000Z"
@@ -153,7 +258,7 @@ DESCRIPTION
          DESCRIPTION  "V2.50, add hwThreadTrap, hwThreadFaultIsolate. " 
 
          REVISION     "201511030000Z"
-         DESCRIPTION  "V2.47, modify the Description of hwBandwidthOfAllCardsExceedsThresholdResume, add hwBandwidthOfAllCardsExceedsThresholdFatalAlarm, hwBandwidthOfAllCardsExceedsThresholdFatalResume" 
+         DESCRIPTION  "V2.49, modify the Description of hwBandwidthOfAllCardsExceedsThresholdResume, add hwBandwidthOfAllCardsExceedsThresholdFatalAlarm, hwBandwidthOfAllCardsExceedsThresholdFatalResume" 
 
 		 REVISION     "201510100000Z"
          DESCRIPTION  "V2.48, add hwVirtualAccessDrvConfigError" 
@@ -203,6 +308,9 @@ DESCRIPTION
          REVISION     "201406280000Z"
          DESCRIPTION  "V2.33, add  hwBandwidthOfAllCardsExceedsThreshold"
 
+        REVISION     "201405190000Z"
+           DESCRIPTION  "V2.32, modify the Description of hwPortDownReason,"
+
          REVISION     "201405190000Z"
            DESCRIPTION  "V2.31, "	
 
@@ -238,8 +346,7 @@ DESCRIPTION
    
          REVISION     "201201250000Z"
            DESCRIPTION  "V2.20, add  the hwPmuRemove,hwPmuInsert,hwPmuFail,hwPmuFailResume,hwPmuInvalid,hwPmuInvalidResume, "
-        REVISION     "201405190000Z"
-           DESCRIPTION  "V2.32, modify the Description of hwPortDownReason,"
+
                                                                    ::= { hwDatacomm 219 } 
 --
 -- Node definitions
@@ -464,8 +571,8 @@ DESCRIPTION
 			sPIBusFault	(132184),
 			-- 132205:  The HiGig Link On The Board Failed
 			theHiGigLinkOnTheBoardFailed	(132205),
-			-- 132207:  The Board Clock Fails
-			theBoardClockFails	(132207),
+			-- 132213:  The external TCAM chip could not be accessed
+			theexternalTCAMchipcouldnotbeaccessed	(132213),
 			-- 132608:  The Board Selfcheck Failed
 			theBoardSelfcheckFailed	(132608),
 			-- 132609:  Heartbeats Of The Board Were Lost And Thus The Board Was Reset
@@ -582,8 +689,10 @@ DESCRIPTION
 			trafficCongestionDueToTheTrafficBackpressure	(132665),
 			-- 132666:  Board Type Mismatches The Preconfiguration
 			boardTypeMismatchesThePreconfiguration	(132666),
-                                                                -- 132675: The LSW port connected to the MPU fails
+                                                          -- 132675: The LSW port connected to the MPU fails
                                                                thsLswPortConnectedToTheMpuFails                  (132675),
+			-- 132677:  The FPGA localbus self-test failed
+			theFPGALocalbusSelf-testFailed	(132677),
 			-- 133120:  The Master/slave Board Switchover Was Performed
 			theMasterSlaveBoardSwitchoverWasPerformed	(133120),
 			-- 133121:  PMU Board Leave Master
@@ -1024,12 +1133,8 @@ DESCRIPTION
 			theOpticalModuleUnauthorized	(145920),
 			-- 146688:  There Is A FAN That Is Abnormal In The Fan Module
 			thereIsAFANThatIsAbnormalInTheFanModule	(146688),
-			-- 147203:  The Buffer Usage Of The SFU Is High
-			theBufferUsageOfTheSFUIsHigh	(147203),
-			-- 147204:  All Links On The SFU Are Down
-			allLinksOnTheSFUAreDown	(147204),
-			-- 147205:  Packet Loss Occurs On The Forward Engine Ingress Interface
-			packetLossOccursOnTheForwardEngineIngressInterface	(147205)
+			-- 147208:  The CPU failed to send packets
+			theCPUfailedtosendpackets	(147208)
 	            }
 
 	
@@ -1405,15 +1510,7 @@ DESCRIPTION
 			DESCRIPTION
 				"The failure reason of virtual-access configuration."
 			::= { hwEntityTrapObject 21 }
---  1.3.6.1.4.1.2011.5.25.219.1.22
-       -- 1.3.6.1.4.1.2011.5.25.219.1.22
-		vNetID OBJECT-TYPE
-			SYNTAX Integer32
-			MAX-ACCESS read-only
-			STATUS current
-			DESCRIPTION
-				"The virtual network ID."
-			::= { hwEntityTrapObject 22 }
+
 -- 1.3.6.1.4.1.2011.5.25.219.1.23
         -- 1.3.6.1.4.1.2011.5.25.219.1.23
 		vmName OBJECT-TYPE
@@ -1432,7 +1529,647 @@ DESCRIPTION
 			DESCRIPTION
 				" The bandwidth mode of card."
 			::= { hwEntityTrapObject 24 }
-																   
+
+		-- 1.3.6.1.4.1.2011.5.25.219.1.25
+		hwPartitionTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF HwPartitionEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"This table describes disk partition information. Currently, it is only used for disk partition-related alarms.
+Creation Restriction: No entry can be created in this table.
+Modification Restriction: The entries in this table cannot be modified.
+Deletion Restriction: The entries in this table cannot be deleted.
+Access Restriction: The entries in this table cannot be accessed."
+			::= { hwEntityTrapObject 25 }
+
+		
+--  1.3.6.1.4.1.2011.5.25.219.1.25.1
+		-- 1.3.6.1.4.1.2011.5.25.219.1.25.1
+		hwPartitionEntry OBJECT-TYPE
+			SYNTAX HwPartitionEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"A device disk partition entry. Each entry consists of information of a device disk partition.
+                                                                              hwPartitionEntPhysicalName and hwPartitionName exclusively decide a device disk partition."
+			INDEX { hwPartitionEntPhysicalName, hwPartitionName}
+			::= { hwPartitionTable 1 }
+
+		
+		HwPartitionEntry ::=
+			SEQUENCE { 
+				hwPartitionEntPhysicalName
+					OCTET STRING,
+				hwPartitionName
+					OCTET STRING,
+				hwPartitionSpaceFree
+					Integer32,
+				hwPartitionSpaceFreeThreshold
+					Integer32,
+				hwPartitionUseage
+					Integer32,
+				hwPartitionUseageThreshold
+					Integer32,
+                                                                             hwEntPhysicalUbiIndex
+					Integer32,
+                                                                            hwEntCurrentBadPhysicalBlocks
+					Integer32,
+			                  hwEntBadPhysicalBlocksThreshold
+					Integer32,
+			                  hwEntMaxErasePhysicalBlocks
+					Integer32,
+			                  hwEntErasePhysicalBlocksThreshold
+					Integer32
+
+			 }
+
+
+		hwPartitionEntPhysicalName OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS accessible-for-notify
+			STATUS current
+			DESCRIPTION
+				"This object indicates an entity name. "
+			::= { hwPartitionEntry 1 }
+			
+			hwPartitionName OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS accessible-for-notify
+			STATUS current
+			DESCRIPTION
+				"This object indicates a disk partition name."
+			::= { hwPartitionEntry 2 }
+
+		
+		hwPartitionSpaceFree OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS accessible-for-notify
+			STATUS current
+			DESCRIPTION
+				"This object indicates the remaining disk partition space for the user, in MB."
+			::= { hwPartitionEntry 3 }
+		
+		hwPartitionSpaceFreeThreshold OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS accessible-for-notify
+			STATUS current
+			DESCRIPTION
+				"This object indicates the threshold for the remaining disk partition space for the user, in MB."
+			::= { hwPartitionEntry 4 }
+			
+		hwPartitionUseage OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS accessible-for-notify
+			STATUS current
+			DESCRIPTION
+				"This object indicates the current disk partition usage, in percentage."
+			::= { hwPartitionEntry 5 }
+			
+		hwPartitionUseageThreshold OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS accessible-for-notify
+			STATUS current
+			DESCRIPTION
+				"This object indicates the threshold for the disk partition usage, in percentage."
+			::= { hwPartitionEntry 6 }
+		
+                                       hwEntPhysicalUbiIndex OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS accessible-for-notify
+			STATUS current
+			DESCRIPTION
+				"This object indicates the current  physical ubi index number."
+			::= { hwPartitionEntry 7 }
+
+                                      hwEntCurrentBadPhysicalBlocks OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS accessible-for-notify
+			STATUS current
+			DESCRIPTION
+				"This object indicates the current bad physical blocks number."
+			::= { hwPartitionEntry 8 }
+
+                                      hwEntBadPhysicalBlocksThreshold OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS accessible-for-notify
+			STATUS current
+			DESCRIPTION
+				"This object indicates the threshold for the bad physical blocks number."
+			::= { hwPartitionEntry 9 }
+			
+		hwEntMaxErasePhysicalBlocks OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS accessible-for-notify
+			STATUS current
+			DESCRIPTION
+				"This object indicates the max erase physica blocks number."
+			::= { hwPartitionEntry 10 }
+			
+		hwEntErasePhysicalBlocksThreshold OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS accessible-for-notify
+			STATUS current
+			DESCRIPTION
+				"This object indicates the threshold for the max erase physical blocks number."
+			::= { hwPartitionEntry 11 }
+	
+		--  1.3.6.1.4.1.2011.5.25.219.1.5.1.26
+		hwEntPhysicalName  OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS accessible-for-notify
+			STATUS current
+			DESCRIPTION
+				"This object indicates an entity name. "
+			::= { hwEntityTrapObject 26 }
+		
+		-- 1.3.6.1.4.1.2011.5.25.219.1.27
+		hwBoardID OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS accessible-for-notify
+			STATUS current
+			DESCRIPTION
+				"Board ID."
+			::= { hwEntityTrapObject 27 }
+		
+-- 1.3.6.1.4.1.2011.5.25.219.1.28
+        -- 1.3.6.1.4.1.2011.5.25.219.1.28
+		hwPowerWorkMode OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS accessible-for-notify
+			STATUS current
+			DESCRIPTION
+				"AP power work mode."
+			::= { hwEntityTrapObject 28 }
+		
+-- 1.3.6.1.4.1.2011.5.25.219.1.29
+        -- 1.3.6.1.4.1.2011.5.25.219.1.29
+		hwExpectPowerWorkMode OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS accessible-for-notify
+			STATUS current
+			DESCRIPTION
+				"AP excepted power work mode."
+			::= { hwEntityTrapObject 29 }
+
+-- 1.3.6.1.4.1.2011.5.25.219.1.30
+        -- 1.3.6.1.4.1.2011.5.25.219.1.30
+		hwCapCPUThresholdType OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS accessible-for-notify
+			STATUS current
+			DESCRIPTION
+				"The type of changes of Cap CPU Utilization."
+			::= { hwEntityTrapObject 30 }
+
+-- 1.3.6.1.4.1.2011.5.25.219.1.31
+        -- 1.3.6.1.4.1.2011.5.25.219.1.31
+		hwCapCPUThresholdValue OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS accessible-for-notify
+			STATUS current
+			DESCRIPTION
+				"The threshold value of Cap CPU Utilization."
+			::= { hwEntityTrapObject 31 }
+
+-- 1.3.6.1.4.1.2011.5.25.219.1.32
+        -- 1.3.6.1.4.1.2011.5.25.219.1.32
+		hwCapCPUThresholdCurrent OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS accessible-for-notify
+			STATUS current
+			DESCRIPTION
+				"The average value of Cap CPU Utilization."
+			::= { hwEntityTrapObject 32 }
+
+-- 1.3.6.1.4.1.2011.5.25.219.1.33
+		-- 1.3.6.1.4.1.2011.5.25.219.1.33
+		hwSyslogModuleName OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS accessible-for-notify
+			STATUS current
+			DESCRIPTION
+				"The module name of syslog."
+			::= { hwEntityTrapObject 33 }
+
+		
+-- 1.3.6.1.4.1.2011.5.25.219.1.34
+		-- 1.3.6.1.4.1.2011.5.25.219.1.34
+		hwSyslogSeverityLevel OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS accessible-for-notify
+			STATUS current
+			DESCRIPTION
+				"The severity of syslog."
+			::= { hwEntityTrapObject 34 }
+
+		
+-- 1.3.6.1.4.1.2011.5.25.219.1.35
+		-- 1.3.6.1.4.1.2011.5.25.219.1.35
+		hwSyslogBrief OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS accessible-for-notify
+			STATUS current
+			DESCRIPTION
+				"The brief of syslog."
+			::= { hwEntityTrapObject 35 }
+
+		
+-- 1.3.6.1.4.1.2011.5.25.219.1.36
+		-- 1.3.6.1.4.1.2011.5.25.219.1.36
+		hwSyslogDescription OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS accessible-for-notify
+			STATUS current
+			DESCRIPTION
+				"The description of syslog."
+			::= { hwEntityTrapObject 36 }
+
+		
+-- 1.3.6.1.4.1.2011.5.25.219.1.37
+		-- 1.3.6.1.4.1.2011.5.25.219.1.37
+		hwSyslogTimeStamp OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS accessible-for-notify
+			STATUS current
+			DESCRIPTION
+				"The time stamp of syslog."
+			::= { hwEntityTrapObject 37 }
+
+		-- 1.3.6.1.4.1.2011.5.25.219.1.38
+		hwEntityNpsTrapObject OBJECT IDENTIFIER ::= { hwEntityTrapObject 38 }
+		
+		-- 1.3.6.1.4.1.2011.5.25.219.1.38.1
+		hwEntityNpsVMName OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS accessible-for-notify
+			STATUS current
+			DESCRIPTION
+				"VM name."
+			::= { hwEntityNpsTrapObject 1 }
+		
+		-- 1.3.6.1.4.1.2011.5.25.219.1.38.2
+		hwEntityNpsVMID OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS accessible-for-notify
+			STATUS current
+			DESCRIPTION
+				"VMID of the MANO layer."
+			::= { hwEntityNpsTrapObject 2 }
+		
+		-- 1.3.6.1.4.1.2011.5.25.219.1.38.3
+		hwEntityNpsPhyVMID OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS accessible-for-notify
+			STATUS current
+			DESCRIPTION
+				"VMID of the physical layer."
+			::= { hwEntityNpsTrapObject 3 }
+		
+		-- 1.3.6.1.4.1.2011.5.25.219.1.38.4
+		hwEntityNpsErrorCode OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS accessible-for-notify
+			STATUS current
+			DESCRIPTION
+				"The error code."
+			::= { hwEntityNpsTrapObject 4 }
+		
+		-- 1.3.6.1.4.1.2011.5.25.219.1.38.5
+		hwEntityNpsErrorDescr OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS accessible-for-notify
+			STATUS current
+			DESCRIPTION
+				"To describe the error of the trap."
+			::= { hwEntityNpsTrapObject 5 }
+		
+		-- 1.3.6.1.4.1.2011.5.25.219.1.38.6
+		hwEntityNpsPort OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS accessible-for-notify
+			STATUS current
+			DESCRIPTION
+				"The port of the virtual machine."
+			::= { hwEntityNpsTrapObject 6 }
+		
+		-- 1.3.6.1.4.1.2011.5.25.219.1.38.7
+		hwEntityNpsPortName OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS accessible-for-notify
+			STATUS current
+			DESCRIPTION
+				"The port name of the virtual machine."
+			::= { hwEntityNpsTrapObject 7 }
+		
+		-- 1.3.6.1.4.1.2011.5.25.219.1.38.8
+		hwEntityNpsIPAddress OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS accessible-for-notify
+			STATUS current
+			DESCRIPTION
+				"The IP address of the virtual machine."
+			::= { hwEntityNpsTrapObject 8 }
+		
+		-- 1.3.6.1.4.1.2011.5.25.219.1.38.9
+		hwEntityNpsPatchName OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS accessible-for-notify
+			STATUS current
+			DESCRIPTION
+				"The patch file name."
+			::= { hwEntityNpsTrapObject 9 }
+		
+		-- 1.3.6.1.4.1.2011.5.25.219.1.38.10
+		hwEntityNpsPatchVersion OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS accessible-for-notify
+			STATUS current
+			DESCRIPTION
+				"The patch file version."
+			::= { hwEntityNpsTrapObject 10 }
+		
+		-- 1.3.6.1.4.1.2011.5.25.219.1.38.11
+		hwEntityNpsCertName OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS accessible-for-notify
+			STATUS current
+			DESCRIPTION
+				"The certificate file name."
+			::= { hwEntityNpsTrapObject 11 }
+		
+		-- 1.3.6.1.4.1.2011.5.25.219.1.38.12
+		hwEntityNpsCertType OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS accessible-for-notify
+			STATUS current
+			DESCRIPTION
+				"The certificate type."
+			::= { hwEntityNpsTrapObject 12 }
+		
+		-- 1.3.6.1.4.1.2011.5.25.219.1.38.13
+		hwEntityNpsCertRemainDays OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS accessible-for-notify
+			STATUS current
+			DESCRIPTION
+				"The remain days of the certificate."
+			::= { hwEntityNpsTrapObject 13 }
+		
+		-- 1.3.6.1.4.1.2011.5.25.219.1.38.14
+		hwEntityNpsCertValidBeginTime OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS accessible-for-notify
+			STATUS current
+			DESCRIPTION
+				"The certificate valid begin time."
+			::= { hwEntityNpsTrapObject 14 }
+		
+		-- 1.3.6.1.4.1.2011.5.25.219.1.38.15
+		hwEntityNpsCertValidEndTime OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS accessible-for-notify
+			STATUS current
+			DESCRIPTION
+				"The certificate valid end time."
+			::= { hwEntityNpsTrapObject 15 }
+		
+		-- 1.3.6.1.4.1.2011.5.25.219.1.38.16
+		hwEntityNpsPartitionName OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS accessible-for-notify
+			STATUS current
+			DESCRIPTION
+				"The disk partition name."
+			::= { hwEntityNpsTrapObject 16 }
+		
+		-- 1.3.6.1.4.1.2011.5.25.219.1.38.17
+		hwEntityNpsPartitionUsage OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS accessible-for-notify
+			STATUS current
+			DESCRIPTION
+				"The usage of the disk partition."
+			::= { hwEntityNpsTrapObject 17 }
+		
+		-- 1.3.6.1.4.1.2011.5.25.219.1.38.18
+		hwEntityNpsPartitionUsageThreshold OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS accessible-for-notify
+			STATUS current
+			DESCRIPTION
+				"The disk partition usage overload threshold."
+			::= { hwEntityNpsTrapObject 18 }
+		
+		-- 1.3.6.1.4.1.2011.5.25.219.1.38.19
+		hwEntityNpsPartitionAvailableSpace OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS accessible-for-notify
+			STATUS current
+			DESCRIPTION
+				"The available space of the disk partition."
+			::= { hwEntityNpsTrapObject 19 }
+		
+		-- 1.3.6.1.4.1.2011.5.25.219.1.38.20
+		hwEntityNpsPartitionCapacityThreshold OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS accessible-for-notify
+			STATUS current
+			DESCRIPTION
+				"The capacity threshold of the disk partition."
+			::= { hwEntityNpsTrapObject 20 }
+		
+		-- 1.3.6.1.4.1.2011.5.25.219.1.38.21
+		hwEntityNpsRUName OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS accessible-for-notify
+			STATUS current
+			DESCRIPTION
+				"The name of RU."
+			::= { hwEntityNpsTrapObject 21 }
+		
+		-- 1.3.6.1.4.1.2011.5.25.219.1.38.22
+		hwEntityNpsVNFCName OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS accessible-for-notify
+			STATUS current
+			DESCRIPTION
+				"The name of the VNFC."
+			::= { hwEntityNpsTrapObject 22 }
+		
+		-- 1.3.6.1.4.1.2011.5.25.219.1.38.23
+		hwEntityNpsVNFCType OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS accessible-for-notify
+			STATUS current
+			DESCRIPTION
+				"The type of the VNFC."
+			::= { hwEntityNpsTrapObject 23 }
+		
+		-- 1.3.6.1.4.1.2011.5.25.219.1.38.24
+		hwEntityNpsAPPType OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS accessible-for-notify
+			STATUS current
+			DESCRIPTION
+				"The application type."
+			::= { hwEntityNpsTrapObject 24 }
+		
+		-- 1.3.6.1.4.1.2011.5.25.219.1.38.25
+		hwEntityNpsSoftwareVersionType OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS accessible-for-notify
+			STATUS current
+			DESCRIPTION
+				"The application version type."
+			::= { hwEntityNpsTrapObject 25 }
+		
+		-- 1.3.6.1.4.1.2011.5.25.219.1.38.26
+		hwEntityNpsSoftwareVersionID OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS accessible-for-notify
+			STATUS current
+			DESCRIPTION
+				"The application version id."
+			::= { hwEntityNpsTrapObject 26 }
+		
+		-- 1.3.6.1.4.1.2011.5.25.219.1.38.27
+		hwEntityNpsLocalVMName OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS accessible-for-notify
+			STATUS current
+			DESCRIPTION
+				"The local VM name."
+			::= { hwEntityNpsTrapObject 27 }
+		
+		-- 1.3.6.1.4.1.2011.5.25.219.1.38.28
+		hwEntityNpsRemoteVMName OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS accessible-for-notify
+			STATUS current
+			DESCRIPTION
+				"The remote VM name."
+			::= { hwEntityNpsTrapObject 28 }
+		
+		-- 1.3.6.1.4.1.2011.5.25.219.1.38.29
+		hwEntityNpsNetworkPlaneID OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS accessible-for-notify
+			STATUS current
+			DESCRIPTION
+				"The network plane id."
+			::= { hwEntityNpsTrapObject 29 }
+		
+		-- 1.3.6.1.4.1.2011.5.25.219.1.38.30
+		hwEntityNpsNetworkErrorThreshold OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS accessible-for-notify
+			STATUS current
+			DESCRIPTION
+				"The network subhealth threshold."
+			::= { hwEntityNpsTrapObject 30 }
+		
+		-- 1.3.6.1.4.1.2011.5.25.219.1.38.31
+		hwEntityNpsDeviceID OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS accessible-for-notify
+			STATUS current
+			DESCRIPTION
+				"The device id."
+			::= { hwEntityNpsTrapObject 31 }
+		
+		-- 1.3.6.1.4.1.2011.5.25.219.1.38.32
+		hwEntityNpsDriverVendor OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS accessible-for-notify
+			STATUS current
+			DESCRIPTION
+				"The driver vendor."
+			::= { hwEntityNpsTrapObject 32 }
+		
+		-- 1.3.6.1.4.1.2011.5.25.219.1.38.33
+		hwEntityNpsDriverType OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS accessible-for-notify
+			STATUS current
+			DESCRIPTION
+				"The driver type of device."
+			::= { hwEntityNpsTrapObject 33 }
+        --1.3.6.1.4.1.2011.5.25.219.1.38.34
+		hwEntityNpsQuality OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS accessible-for-notify
+			STATUS current
+			DESCRIPTION
+				"The quality of base."
+			::= { hwEntityNpsTrapObject 34 }
+
+
+                                   hwEntityConfigurationTrapObject OBJECT IDENTIFIER ::= { hwEntityTrapObject 39 }
+
+                                    hwEntityConfigurationCurrent OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS accessible-for-notify
+			STATUS current
+			DESCRIPTION
+				"The current configuraiton."
+			::= { hwEntityConfigurationTrapObject 1 }
+
+                                    hwEntityConfigurationRollbackReason OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS accessible-for-notify
+			STATUS current
+			DESCRIPTION
+				"The configuration rollback reason."
+			::= { hwEntityConfigurationTrapObject 2 }
+
+-- 1.3.6.1.4.1.2011.5.25.219.1.40
+		-- 1.3.6.1.4.1.2011.5.25.219.1.40
+			hwLicenseRemainTime OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS accessible-for-notify
+			STATUS current
+			DESCRIPTION
+				"The remain time of virtual license."
+			::= { hwEntityTrapObject 40 }
+
+-- 1.3.6.1.4.1.2011.5.25.219.1.41
+			hwLpuSlotId OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS accessible-for-notify
+			STATUS current
+			DESCRIPTION
+				"The Id of the lpu board."
+			::= { hwEntityTrapObject 41 }
+
+-- 1.3.6.1.4.1.2011.5.25.219.1.42
+			hwLpuFeId OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS accessible-for-notify
+			STATUS current
+			DESCRIPTION
+				"Np id."
+			::= { hwEntityTrapObject 42 }
+
+-- 1.3.6.1.4.1.2011.5.25.219.1.43
+			hwDropCauseId OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS accessible-for-notify
+			STATUS current
+			DESCRIPTION
+				"The cause id of drop packet."
+			::= { hwEntityTrapObject 43}
+
+-- 1.3.6.1.4.1.2011.5.25.219.1.44
+		-- 1.3.6.1.4.1.2011.5.25.219.1.44
+		hwVirtualLicenseItemName OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS accessible-for-notify
+			STATUS current
+			DESCRIPTION
+				"The item name of virtual license."
+			::= { hwEntityTrapObject 44 }
+		
 -- 1.3.6.1.4.1.2011.5.25.219.2
 		-- 1.3.6.1.4.1.2011.5.25.219.2			
 		hwEntityTraps OBJECT IDENTIFIER ::= { hwEntityTrapMIB 2 }	
@@ -1449,7 +2186,7 @@ DESCRIPTION
 			OBJECTS { hwEntityPhysicalIndex, entPhysicalName, hwEntityTrapFaultID, hwEntityOperStatus}
 			STATUS current
 			DESCRIPTION 
-				"Chassis has been removed."
+				"This object indicates that a chassis cannot be detected."
 			::= { hwChassisTrap 1 }
 
 		
@@ -1459,7 +2196,7 @@ DESCRIPTION
 			OBJECTS { hwEntityPhysicalIndex, entPhysicalName, hwEntityTrapFaultID, hwEntityOperStatus}
 			STATUS current
 			DESCRIPTION 
-				"Chassis has been inserted."
+				"This object indicates that a chassis can be detected."
 			::= { hwChassisTrap 2 }
 
 		
@@ -1469,7 +2206,7 @@ DESCRIPTION
 			OBJECTS { hwEntityPhysicalIndex, entPhysicalName, hwEntityTrapFaultID, hwEntityOperStatus}
 			STATUS current
 			DESCRIPTION 
-				"Chassis become failure for some reason."
+				"This object indicates that a chassis encounters a partial failure."
 			::= { hwChassisTrap 3 }
 
 		
@@ -1479,7 +2216,7 @@ DESCRIPTION
 			OBJECTS { hwEntityPhysicalIndex, entPhysicalName, hwEntityTrapFaultID, hwEntityOperStatus}
 			STATUS current
 			DESCRIPTION 
-				"Chassis resume from failure."
+				"This object indicates that a chassis recovers from a partial failure."
 			::= { hwChassisTrap 4 }
 
 		
@@ -1489,7 +2226,7 @@ DESCRIPTION
 			OBJECTS { hwEntityPhysicalIndex, entPhysicalName, hwEntityTrapFaultID, hwEntityOperStatus}
 			STATUS current
 			DESCRIPTION 
-				"Chassis is invalid for some reason."
+				"This object indicates that a chassis encounters an overall failure."
 			::= { hwChassisTrap 5 }
 
 		
@@ -1499,7 +2236,7 @@ DESCRIPTION
 			OBJECTS { hwEntityPhysicalIndex, entPhysicalName, hwEntityTrapFaultID, hwEntityOperStatus}
 			STATUS current
 			DESCRIPTION 
-				"Chassis resume from invalid situation."
+				"This object indicates that a chassis recovers from an overall failure."
 			::= { hwChassisTrap 6 }
 
 		
@@ -1514,7 +2251,7 @@ DESCRIPTION
 			OBJECTS { hwEntityPhysicalIndex, entPhysicalName, hwEntityTrapEntType, hwEntityTrapFaultID, hwEntityOperStatus}
 			STATUS current
 			DESCRIPTION 
-				"Board has been removed."
+				"This object indicates that a board cannot be detected."
 			::= { hwBoardTrap 1 }
 
 		
@@ -1524,7 +2261,7 @@ DESCRIPTION
 			OBJECTS { hwEntityPhysicalIndex, entPhysicalName, hwEntityTrapEntType, hwEntityTrapFaultID, hwEntityOperStatus}
 			STATUS current
 			DESCRIPTION 
-				"Board has been inserted."
+				"This object indicates that a board can be detected."
 			::= { hwBoardTrap 2 }
 
 		
@@ -1534,7 +2271,7 @@ DESCRIPTION
 			OBJECTS { hwEntityPhysicalIndex, entPhysicalName, hwEntityTrapEntType, hwEntityTrapFaultID, hwEntityTrapReasonDescr, hwEntityOperStatus}
 			STATUS current
 			DESCRIPTION 
-				"Board become failure for some reason."
+				"This object indicates that a board encounters a partial failure."
 			::= { hwBoardTrap 3 }
 
 		
@@ -1544,7 +2281,7 @@ DESCRIPTION
 			OBJECTS { hwEntityPhysicalIndex, entPhysicalName, hwEntityTrapEntType, hwEntityTrapFaultID, hwEntityTrapReasonDescr, hwEntityOperStatus}
 			STATUS current
 			DESCRIPTION 
-				"Board resume from failure."
+				"This object indicates that a board recovers from a partial failure."
 			::= { hwBoardTrap 4 }
 
 		
@@ -1554,7 +2291,7 @@ DESCRIPTION
 			OBJECTS { hwEntityPhysicalIndex, entPhysicalName, hwEntityTrapEntType, hwEntityTrapFaultID, hwEntityTrapReasonDescr, hwEntityOperStatus}
 			STATUS current
 			DESCRIPTION 
-				"Board is invalid for some reason."
+				"This object indicates that a board encounters an overall failure."
 			::= { hwBoardTrap 5 }
 
 		
@@ -1564,7 +2301,7 @@ DESCRIPTION
 			OBJECTS { hwEntityPhysicalIndex, entPhysicalName, hwEntityTrapEntType, hwEntityTrapFaultID, hwEntityTrapReasonDescr, hwEntityOperStatus }
 			STATUS current
 			DESCRIPTION 
-				"Board resume from invalid situation."
+				"This object indicates that a board recovers from an overall failure."
 			::= { hwBoardTrap 6 }
 
 		
@@ -1574,7 +2311,7 @@ DESCRIPTION
 			OBJECTS { hwEntityPhysicalIndex, entPhysicalName, hwEntityTrapEntType, hwEntityTrapFaultID }
 			STATUS current
 			DESCRIPTION 
-				"MPU leave master role."
+				"This object indicates that a board exits from the active state."
 			::= { hwBoardTrap 7 }
 
 		
@@ -1584,7 +2321,7 @@ DESCRIPTION
 			OBJECTS { hwEntityPhysicalIndex, entPhysicalName, hwEntityTrapEntType, hwEntityTrapFaultID }
 			STATUS current
 			DESCRIPTION 
-				"MPU become master role."
+				"This object indicates that a board enters the active state."
 			::= { hwBoardTrap 8 }
 
 
@@ -1810,6 +2547,75 @@ DESCRIPTION
 				"The low-end memory usage resumes from the overload limit."
 			::= { hwBoardTrap 35 }
 
+		-- 1.3.6.1.4.1.2011.5.25.219.2.2.36
+		hwBoardAdd NOTIFICATION-TYPE
+			OBJECTS { hwEntPhysicalName, hwBoardID }
+			STATUS current
+			DESCRIPTION 
+				"The board was added."
+			::= { hwBoardTrap 36 }
+
+		
+		-- 1.3.6.1.4.1.2011.5.25.219.2.2.37
+		hwBoardDelete NOTIFICATION-TYPE
+			OBJECTS { hwEntPhysicalName, hwBoardID }
+			STATUS current
+			DESCRIPTION 
+				"The board was deleted."
+			::= { hwBoardTrap 37 }
+
+--  1.3.6.1.4.1.2011.5.25.219.2.2.38
+		-- 1.3.6.1.4.1.2011.5.25.219.2.2.38
+		hwAllLpuSfuFail NOTIFICATION-TYPE
+			STATUS current
+			DESCRIPTION 
+				"All installed LPUs and SFUs were not registered for a long time."
+			::= { hwBoardTrap 38 }
+
+--  1.3.6.1.4.1.2011.5.25.219.2.2.39
+		-- 1.3.6.1.4.1.2011.5.25.219.2.2.39
+		hwAllLpuSfuFailResume NOTIFICATION-TYPE
+			STATUS current
+			DESCRIPTION 
+				"Not all installed LPUs and SFUs were not registered."
+			::= { hwBoardTrap 39 }
+		
+--   1.3.6.1.4.1.2011.5.25.219.2.2.40
+-- 1.3.6.1.4.1.2011.5.25.219.2.2.40
+		-- 1.3.6.1.4.1.2011.5.25.219.2.2.40
+		hwBoardUpCoverAlarm NOTIFICATION-TYPE
+			STATUS current
+			DESCRIPTION 
+				"The cover is opened."
+			::= { hwBoardTrap 40 }
+		
+--   1.3.6.1.4.1.2011.5.25.219.2.2.41
+-- 1.3.6.1.4.1.2011.5.25.219.2.2.41
+		-- 1.3.6.1.4.1.2011.5.25.219.2.2.41
+		hwBoardUpCoverResume NOTIFICATION-TYPE
+			STATUS current
+			DESCRIPTION 
+				"The cover is closed."
+			::= { hwBoardTrap 41 }
+--  1.3.6.1.4.1.2011.5.25.219.2.2.42
+		-- 1.3.6.1.4.1.2011.5.25.219.2.2.42
+		hwTmPerformanceALarm NOTIFICATION-TYPE
+			OBJECTS { hwEntityPhysicalIndex, entPhysicalName, hwEntityTrapEntType, hwEntityTrapFaultID, hwEntityTrapReasonDescr, hwEntityOperStatus}
+			STATUS current
+			DESCRIPTION 
+				"This object indicates that a board encounters an overall failure."
+			::= { hwBoardTrap 42 }
+
+		
+--  1.3.6.1.4.1.2011.5.25.219.2.2.43
+		-- 1.3.6.1.4.1.2011.5.25.219.2.2.43
+		hwTmPerformanceResume NOTIFICATION-TYPE
+			OBJECTS { hwEntityPhysicalIndex, entPhysicalName, hwEntityTrapEntType, hwEntityTrapFaultID, hwEntityTrapReasonDescr, hwEntityOperStatus }
+			STATUS current
+			DESCRIPTION 
+				"This object indicates that a board recovers from an overall failure."
+			::= { hwBoardTrap 43 }
+		
 --  1.3.6.1.4.1.2011.5.25.219.2.3
 		-- 1.3.6.1.4.1.2011.5.25.219.2.3
 		hwCardTrap OBJECT IDENTIFIER ::= { hwEntityTraps 3 }
@@ -1820,7 +2626,7 @@ DESCRIPTION
 			OBJECTS { hwEntityPhysicalIndex, entPhysicalName, hwEntityTrapEntType, hwEntityTrapFaultID, hwEntityOperStatus}
 			STATUS current
 			DESCRIPTION 
-				"Card has been removed."
+				"This object indicates that a card cannot be detected."
 			::= { hwCardTrap 1 }
 
 		
@@ -1830,7 +2636,7 @@ DESCRIPTION
 			OBJECTS { hwEntityPhysicalIndex, entPhysicalName, hwEntityTrapEntType, hwEntityTrapFaultID, hwEntityOperStatus}
 			STATUS current
 			DESCRIPTION 
-				"Card has been inserted."
+				"This object indicates that a card can be detected."
 			::= { hwCardTrap 2 }
 
 		
@@ -1925,7 +2731,23 @@ DESCRIPTION
 			DESCRIPTION 
 				"Port split configuration has changed on the card."
 			::= { hwCardTrap 12 }
-			
+		
+--  1.3.6.1.4.1.2011.5.25.219.2.3.13
+		hwCardInconsistent NOTIFICATION-TYPE
+			OBJECTS { hwEntityPhysicalIndex, entPhysicalName, hwEntityTrapEntType, hwEntityTrapFaultID, hwEntityTrapReasonDescr, hwEntityOperStatus }
+			STATUS current
+			DESCRIPTION 
+				"The card types are different."
+			::= { hwCardTrap 13 }
+
+--  1.3.6.1.4.1.2011.5.25.219.2.3.14
+		hwRTULicenseActSuccess NOTIFICATION-TYPE
+			OBJECTS {hwGtlItemIndex,hwGtlItemName,entPhysicalIndex,entPhysicalName}
+			STATUS current
+			DESCRIPTION
+				"Succeed to activate the RTU license."
+			::= {  hwCardTrap 14 }	
+
 --  1.3.6.1.4.1.2011.5.25.219.2.4
 		-- 1.3.6.1.4.1.2011.5.25.219.2.4
 		hwOpticalTrap OBJECT IDENTIFIER ::= { hwEntityTraps 4 }
@@ -2120,7 +2942,7 @@ DESCRIPTION
 			OBJECTS { hwEntityPhysicalIndex, entPhysicalName, hwEntityTrapFaultID, hwEntityOperStatus}
 			STATUS current
 			DESCRIPTION 
-				"Power has been removed."
+				"This object indicates that the power supply cannot be detected."
 			::= { hwPowerTrap 1 }
 
 		
@@ -2130,7 +2952,7 @@ DESCRIPTION
 			OBJECTS { hwEntityPhysicalIndex, entPhysicalName, hwEntityTrapFaultID, hwEntityOperStatus}
 			STATUS current
 			DESCRIPTION 
-				"Power has been inserted."
+				"This object indicates that the power supply can be detected."
 			::= { hwPowerTrap 2 }
 
 		
@@ -2140,7 +2962,7 @@ DESCRIPTION
 			OBJECTS { hwEntityPhysicalIndex, entPhysicalName, hwEntityTrapFaultID, hwEntityOperStatus, hwEntityTrapReasonDescr}
 			STATUS current
 			DESCRIPTION 
-				"Power become failure for some reason."
+				"This object indicates that the power supply encounters a partial failure."
 			::= { hwPowerTrap 3 }
 
 		
@@ -2150,7 +2972,7 @@ DESCRIPTION
 			OBJECTS { hwEntityPhysicalIndex, entPhysicalName, hwEntityTrapFaultID, hwEntityOperStatus, hwEntityTrapReasonDescr}
 			STATUS current
 			DESCRIPTION 
-				"Power resume from failure."
+				"This object indicates that the power supply recovers from a partial failure."
 			::= { hwPowerTrap 4 }
 
 		
@@ -2160,7 +2982,7 @@ DESCRIPTION
 			OBJECTS { hwEntityPhysicalIndex, entPhysicalName, hwEntityTrapFaultID, hwEntityOperStatus, hwEntityTrapReasonDescr}
 			STATUS current
 			DESCRIPTION 
-				"Power is invalid for some reason."
+				"This object indicates that the power supply encounters an overall failure."
 			::= { hwPowerTrap 5 }
 
 		
@@ -2170,7 +2992,7 @@ DESCRIPTION
 			OBJECTS { hwEntityPhysicalIndex, entPhysicalName, hwEntityTrapFaultID, hwEntityOperStatus, hwEntityTrapReasonDescr}
 			STATUS current
 			DESCRIPTION 
-				"Power resume from invalid situation."
+				"This object indicates that the power supply recovers from an overall failure."
 			::= { hwPowerTrap 6 }
 
 		
@@ -2180,7 +3002,7 @@ DESCRIPTION
 			OBJECTS { hwEntityPhysicalIndex, entPhysicalName, hwEntityTrapFaultID }
 			STATUS current
 			DESCRIPTION 
-				"Power change to unusable status."
+				"This object indicates that the power supply is unavailable."
 			::= { hwPowerTrap 7 }
 
 		
@@ -2190,9 +3012,27 @@ DESCRIPTION
 			OBJECTS { hwEntityPhysicalIndex, entPhysicalName, hwEntityTrapFaultID }
 			STATUS current
 			DESCRIPTION 
-				"Power change to usable status."
+				"This object indicates that the power supply is unavailable."
 			::= { hwPowerTrap 8 }
 
+--  1.3.6.1.4.1.2011.5.25.219.2.5.9
+		-- 1.3.6.1.4.1.2011.5.25.219.2.5.9
+		hwPowerInsufficient NOTIFICATION-TYPE
+			OBJECTS { hwPowerWorkMode, hwExpectPowerWorkMode }
+			STATUS current
+			DESCRIPTION 
+				"AP power supply is insufficient."
+			::= { hwPowerTrap 9 }
+
+		
+--  1.3.6.1.4.1.2011.5.25.219.2.5.10
+		-- 1.3.6.1.4.1.2011.5.25.219.2.5.10
+		hwPowerInsufficientResume NOTIFICATION-TYPE
+			OBJECTS { hwPowerWorkMode, hwExpectPowerWorkMode }
+			STATUS current
+			DESCRIPTION 
+				"AP power supply insufficient resume."
+			::= { hwPowerTrap 10 }
 		
 --  1.3.6.1.4.1.2011.5.25.219.2.6
 		-- 1.3.6.1.4.1.2011.5.25.219.2.6
@@ -2205,7 +3045,7 @@ DESCRIPTION
 			OBJECTS { hwEntityPhysicalIndex, entPhysicalName, hwEntityTrapFaultID, hwEntityOperStatus}
 			STATUS current
 			DESCRIPTION 
-				"Fan has been removed."
+				"This object indicates that a fan cannot be detected."
 			::= { hwFanTrap 1 }
 
 		
@@ -2215,7 +3055,7 @@ DESCRIPTION
 			OBJECTS { hwEntityPhysicalIndex, entPhysicalName, hwEntityTrapFaultID, hwEntityOperStatus}
 			STATUS current
 			DESCRIPTION 
-				"Fan has been inserted."
+				"This object indicates that a fan can be detected."
 			::= { hwFanTrap 2 }
 
 		
@@ -2225,7 +3065,7 @@ DESCRIPTION
 			OBJECTS { hwEntityPhysicalIndex, entPhysicalName, hwEntityTrapFaultID, hwEntityOperStatus, hwEntityTrapReasonDescr}
 			STATUS current
 			DESCRIPTION 
-				"This object indicates that a fan module partially fails."
+				"This object indicates that a fan encounters a partial failure."
 			::= { hwFanTrap 3 }
 
 		
@@ -2235,7 +3075,7 @@ DESCRIPTION
 			OBJECTS { hwEntityPhysicalIndex, entPhysicalName, hwEntityTrapFaultID, hwEntityOperStatus, hwEntityTrapReasonDescr}
 			STATUS current
 			DESCRIPTION 
-				"This object indicates that the partial fan module failure is rectified."
+				"This object indicates that a fan recovers from a partial failure."
 			::= { hwFanTrap 4 }
 
 		
@@ -2245,7 +3085,7 @@ DESCRIPTION
 			OBJECTS { hwEntityPhysicalIndex, entPhysicalName, hwEntityTrapFaultID, hwEntityOperStatus, hwEntityTrapReasonDescr}
 			STATUS current
 			DESCRIPTION 
-				"This object indicates that a fan module fails."
+				"This object indicates that a fan encounters an overall failure."
 			::= { hwFanTrap 5 }
 
 		
@@ -2255,7 +3095,7 @@ DESCRIPTION
 			OBJECTS { hwEntityPhysicalIndex, entPhysicalName, hwEntityTrapFaultID, hwEntityOperStatus, hwEntityTrapReasonDescr}
 			STATUS current
 			DESCRIPTION 
-				"This object indicates that a fan module failure is rectified."
+				"This object indicates that a fan recovers from an overall failure."
 			::= { hwFanTrap 6 }
 
 		
@@ -2265,7 +3105,7 @@ DESCRIPTION
 			OBJECTS { hwEntityPhysicalIndex, entPhysicalName, hwEntityTrapFaultID}
 			STATUS current
 			DESCRIPTION 
-				"Fan change to unusable status."
+				"This object indicates that a fan is unavailable."
 			::= { hwFanTrap 7 }
 
 		
@@ -2275,7 +3115,7 @@ DESCRIPTION
 			OBJECTS { hwEntityPhysicalIndex, entPhysicalName, hwEntityTrapFaultID }
 			STATUS current
 			DESCRIPTION 
-				"Fan change to usable status."
+				"This object indicates that a fan becomes available."
 			::= { hwFanTrap 8 }
 		
 --  1.3.6.1.4.1.2011.5.25.219.2.6.9
@@ -2374,7 +3214,7 @@ DESCRIPTION
 			OBJECTS { hwEntityPhysicalIndex, entPhysicalName, hwEntityTrapFaultID }
 			STATUS current
 			DESCRIPTION 
-				"Cmu has been removed."
+				"This object indicates that a CMU cannot be detected."
 			::= { hwCmuTrap 1 }
 
 		
@@ -2384,7 +3224,7 @@ DESCRIPTION
 			OBJECTS { hwEntityPhysicalIndex, entPhysicalName, hwEntityTrapFaultID }
 			STATUS current
 			DESCRIPTION 
-				"Cmu has been inserted."
+				"This object indicates that a CMU can be detected."
 			::= { hwCmuTrap 2 }
 
 		
@@ -2394,7 +3234,7 @@ DESCRIPTION
 			OBJECTS { hwEntityPhysicalIndex, entPhysicalName, hwEntityTrapFaultID }
 			STATUS current
 			DESCRIPTION 
-				"Cmu is invalid for some reason."
+				"This object indicates that a CMU encounters an overall failure."
 			::= { hwCmuTrap 3 }
 
 		
@@ -2404,7 +3244,7 @@ DESCRIPTION
 			OBJECTS { hwEntityPhysicalIndex, entPhysicalName, hwEntityTrapFaultID }
 			STATUS current
 			DESCRIPTION 
-				"Cmu reusme from invalid situation."
+				"This object indicates that a CMU recovers from an overall failure."
 			::= { hwCmuTrap 4 }
 
 		
@@ -2414,7 +3254,7 @@ DESCRIPTION
 			OBJECTS { hwEntityPhysicalIndex, entPhysicalName, hwEntityTrapFaultID }
 			STATUS current
 			DESCRIPTION 
-				"Cmu change to unusable status."
+				"This object indicates that a CMU is unavailable."
 			::= { hwCmuTrap 5 }
 
 		
@@ -2424,7 +3264,7 @@ DESCRIPTION
 			OBJECTS { hwEntityPhysicalIndex, entPhysicalName, hwEntityTrapFaultID }
 			STATUS current
 			DESCRIPTION 
-				"Cmu change to usable status."
+				"This object indicates that a CMU becomes available."
 			::= { hwCmuTrap 6 }
 
 		
@@ -2440,7 +3280,7 @@ DESCRIPTION
 				 }
 			STATUS current
 			DESCRIPTION 
-				"Communication error has been detected."
+				"This object indicates that a channel is abnormal."
 			::= { hwCommunicateTrap 1 }
 
 		
@@ -2451,7 +3291,7 @@ DESCRIPTION
 				 }
 			STATUS current
 			DESCRIPTION 
-				"Resume from communication error situation."
+				"This object indicates that a channel recovers from a fault."
 			::= { hwCommunicateTrap 2 }
 
 		
@@ -2467,7 +3307,7 @@ DESCRIPTION
 				hwEntityTrapFaultID }
 			STATUS current
 			DESCRIPTION 
-				"Temperature rise over or fall below the alarm threshold."
+				"This object indicates that the ambient temperature is abnormal."
 			::= { hwEnvironmentTrap 1 }
 
 		
@@ -2478,7 +3318,7 @@ DESCRIPTION
 				hwEntityTrapFaultID }
 			STATUS current
 			DESCRIPTION 
-				"Temperature back to normal level."
+				"This object indicates that the ambient temperature recovers from an abnormality."
 			::= { hwEnvironmentTrap 2 }
 
 		
@@ -2489,7 +3329,7 @@ DESCRIPTION
 			    hwEntityTrapFaultID}
 			STATUS current
 			DESCRIPTION 
-				"Humidity rise over or fall below the alarm threshold."
+				"This object indicates that the ambient humidity is abnormal."
 			::= { hwEnvironmentTrap 3 }
 
 		
@@ -2500,7 +3340,7 @@ DESCRIPTION
 				hwEntityTrapFaultID }
 			STATUS current
 			DESCRIPTION 
-				"Humidity back to normal level."
+				"This object indicates that the ambient humidity recovers from an abnormality."
 			::= { hwEnvironmentTrap 4 }
 
 		
@@ -2511,7 +3351,7 @@ DESCRIPTION
 				hwEntityTrapFaultID }
 			STATUS current
 			DESCRIPTION 
-				"Voltage of power rise over or fall below the alarm threshold."
+				"This object indicates that the ambient voltage is abnormal."
 			::= { hwEnvironmentTrap 5 }
 
 		
@@ -2522,7 +3362,7 @@ DESCRIPTION
 				hwEntityTrapFaultID }
 			STATUS current
 			DESCRIPTION 
-				"Voltage back to normal level."
+				"This object indicates that the ambient voltage recovers from an abnormality."
 			::= { hwEnvironmentTrap 6 }
 
 		
@@ -2533,7 +3373,7 @@ DESCRIPTION
 				hwEntityTrapFaultID }
 			STATUS current
 			DESCRIPTION 
-				"Gate switch to the alarm status."
+				"This object indicates that the door control status is abnormal."
 			::= { hwEnvironmentTrap 7 }
 
 		
@@ -2544,7 +3384,7 @@ DESCRIPTION
 				hwEntityTrapFaultID }
 			STATUS current
 			DESCRIPTION 
-				"Gate switch to normal status."
+				"This object indicates that the door control status recovers from an abnormality."
 			::= { hwEnvironmentTrap 8 }
 
 		
@@ -2555,7 +3395,7 @@ DESCRIPTION
 				hwEntityTrapFaultID }
 			STATUS current
 			DESCRIPTION 
-				"Fog rise over alarm threshold."
+				"This object indicates that the smoke sensor is abnormal."
 			::= { hwEnvironmentTrap 9 }
 
 		
@@ -2566,7 +3406,7 @@ DESCRIPTION
 				hwEntityTrapFaultID }
 			STATUS current
 			DESCRIPTION 
-				"Fog back to normal level."
+				"This object indicates that the smoke sensor recovers from an abnormality."
 			::= { hwEnvironmentTrap 10 }
 
 		
@@ -2576,7 +3416,7 @@ DESCRIPTION
 			OBJECTS { hwEntityPhysicalIndex, entPhysicalName, hwEntityTrapEntType, hwEntityTrapFaultID }
 			STATUS current
 			DESCRIPTION 
-				"Entity has been inserted but position unstable."
+				"This object indicates that a physical entity is not securely inserted."
 			::= { hwEnvironmentTrap 11 }
 
 		
@@ -2586,7 +3426,7 @@ DESCRIPTION
 			OBJECTS { hwEntityPhysicalIndex, entPhysicalName, hwEntityTrapEntType, hwEntityTrapFaultID }
 			STATUS current
 			DESCRIPTION 
-				"Resume from entity position unstable situation."
+				"This object indicates that a physical entity is securely inserted."
 			::= { hwEnvironmentTrap 12 }
 
 		
@@ -2597,8 +3437,7 @@ DESCRIPTION
 				hwEntityTrapFaultID }
 			STATUS current
 			DESCRIPTION 
-				"Temperature rise over or fall below the warning alarm threshold.
-				Only indicate the temperature of board,card or optical module."
+				"This object indicates that the board temperature is abnormal."
 			::= { hwEnvironmentTrap 13 }
 
 		
@@ -2609,8 +3448,7 @@ DESCRIPTION
 				hwEntityTrapFaultID }
 			STATUS current
 			DESCRIPTION 
-				"Temperature back to normal level.
-				Only indicate the temperature of board,card or optical module."
+				"This object indicates that the board temperature recovers from an abnormality."
 			::= { hwEnvironmentTrap 14 }
 
 		
@@ -2621,8 +3459,7 @@ DESCRIPTION
 				hwEntityTrapFaultID }
 			STATUS current
 			DESCRIPTION 
-				"Temperature rise over or fall below the critical alarm threshold.
-				Only indicate the temperature of board,card or optical module."
+				"This object indicates that the board temperature encounters a fatal abnormality."
 			::= { hwEnvironmentTrap 15 }
 
 		
@@ -2633,8 +3470,7 @@ DESCRIPTION
 				hwEntityTrapFaultID }
 			STATUS current
 			DESCRIPTION 
-				"Temperature back to normal level.
-				Only indicate the temperature of board,card or optical module."
+				"This object indicates that the board temperature recovers from a fatal abnormality."
 			::= { hwEnvironmentTrap 16 }
 
 --  1.3.6.1.4.1.2011.5.25.219.2.10.17
@@ -2770,6 +3606,33 @@ DESCRIPTION
 				"The device needs to restart after the patch is deleted."
 			::= { hwSystemConfigTrap 5 }
 
+ -- 1.3.6.1.4.1.2011.5.25.219.2.11.6
+		-- 1.3.6.1.4.1.2011.5.25.219.2.11.6
+		hwSMSReboot NOTIFICATION-TYPE
+			OBJECTS { hwEntityTrapReasonDescr }
+			STATUS current
+			DESCRIPTION 
+				"The result of the SMS reboot function."
+			::= { hwSystemConfigTrap 6 }
+			
+ -- 1.3.6.1.4.1.2011.5.25.219.2.11.7			
+		-- 1.3.6.1.4.1.2011.5.25.219.2.11.7
+		hwVirtualLicenseNearDeadline NOTIFICATION-TYPE
+			OBJECTS { hwLicenseRemainTime, hwVirtualLicenseItemName }
+			STATUS current
+			DESCRIPTION 
+				"The virtual license of device is near deadline."
+			::= { hwSystemConfigTrap 7 }
+			
+ -- 1.3.6.1.4.1.2011.5.25.219.2.11.8			
+		-- 1.3.6.1.4.1.2011.5.25.219.2.11.8
+		hwVirtualLicenseExpire NOTIFICATION-TYPE
+			OBJECTS { hwVirtualLicenseItemName }		
+			STATUS current
+			DESCRIPTION 
+				"The virtual license of device has expired."
+			::= { hwSystemConfigTrap 8 }
+
  
 --  1.3.6.1.4.1.2011.5.25.219.2.12
 		-- 1.3.6.1.4.1.2011.5.25.219.2.12
@@ -2820,22 +3683,6 @@ DESCRIPTION
 			DESCRIPTION 
 				"One new port is inserted."
 			::= { hwPortTrap 5 }
---  1.3.6.1.4.1.2011.5.25.219.2.12.6
-                                             -- 1.3.6.1.4.1.2011.5.25.219.2.12.6
-                                             hwVPortDown NOTIFICATION-TYPE
-                                                                  OBJECTS { hwEntityPhysicalIndex, entPhysicalName, hwEntityTrapFaultID, vNetID }
-                                                                  STATUS current
-                                                                  DESCRIPTION 
-                                                                                       "One of the port connect down."
-                                                                  ::= { hwPortTrap 6 }
---  1.3.6.1.4.1.2011.5.25.219.2.12.7
-                                            -- 1.3.6.1.4.1.2011.5.25.219.2.12.7
-                                            hwVPortUp NOTIFICATION-TYPE
-                                                                OBJECTS { hwEntityPhysicalIndex, entPhysicalName, hwEntityTrapFaultID, vNetID}
-                                                                STATUS current
-                                                                DESCRIPTION 
-                                                                                      "One of the port connect up."
-                                                                ::= { hwPortTrap 7 }
 
 -- 1.3.6.1.4.1.2011.5.25.219.2.12.8 
                 hwPortOpticalPositionInvalid NOTIFICATION-TYPE 
@@ -2906,7 +3753,27 @@ DESCRIPTION
 				"CPU utilization back to normal level"
 			::= { hwCPUTrap 2 }
 
-        
+ 
+--   1.3.6.1.4.1.2011.5.25.219.2.14.3
+		-- 1.3.6.1.4.1.2011.5.25.219.2.14.3
+		hwCpuFail NOTIFICATION-TYPE
+			OBJECTS { hwEntityPhysicalIndex, entPhysicalName, hwEntityTrapFaultID }
+			STATUS current
+			DESCRIPTION 
+				"A fault occurred in the CPU."
+			::= { hwCPUTrap 3 }
+
+        	
+--   1.3.6.1.4.1.2011.5.25.219.2.14.4
+		-- 1.3.6.1.4.1.2011.5.25.219.2.14.4
+		hwCpuFailResume NOTIFICATION-TYPE
+			OBJECTS { hwEntityPhysicalIndex, entPhysicalName, hwEntityTrapFaultID }
+			STATUS current
+			DESCRIPTION 
+				"The cpu resumed from failure."
+			::= { hwCPUTrap 4 }
+
+  
 --   1.3.6.1.4.1.2011.5.25.219.2.15
 		-- 1.3.6.1.4.1.2011.5.25.219.2.15
 		hwMemoryTrap OBJECT IDENTIFIER ::= { hwEntityTraps 15 }
@@ -3071,7 +3938,7 @@ DESCRIPTION
 			OBJECTS { hwEntityPhysicalIndex, entPhysicalName, hwEntityTrapFaultID }
 			STATUS current
 			DESCRIPTION 
-				"Pmu has been removed."
+				"This object indicates that a PMU board on the X16A cannot be detected."
 			::= { hwPmuTrap 1 }
 
 		
@@ -3081,7 +3948,7 @@ DESCRIPTION
 			OBJECTS { hwEntityPhysicalIndex, entPhysicalName, hwEntityTrapFaultID }
 			STATUS current
 			DESCRIPTION 
-				"Pmu has been inserted."
+				"This object indicates that a PMU is inserted into the X16A."
 			::= { hwPmuTrap 2 }
 
 		
@@ -3091,7 +3958,7 @@ DESCRIPTION
 			OBJECTS { hwEntityPhysicalIndex, entPhysicalName, hwEntityTrapFaultID,hwEntityTrapReasonDescr }
 			STATUS current
 			DESCRIPTION 
-				"Pmu become failure for some reason."
+				"This object indicates that a PMU on the X16A encounters a partial failure."
 			::= { hwPmuTrap 3 }
 
 		
@@ -3101,7 +3968,7 @@ DESCRIPTION
 			OBJECTS { hwEntityPhysicalIndex, entPhysicalName, hwEntityTrapFaultID }
 			STATUS current
 			DESCRIPTION 
-				"Pmu resume from failure."
+				"This object indicates that a PMU on the X16A recovers from a partial failure."
 			::= { hwPmuTrap 4 }
 
 		
@@ -3111,7 +3978,7 @@ DESCRIPTION
 			OBJECTS { hwEntityPhysicalIndex, entPhysicalName, hwEntityTrapFaultID }
 			STATUS current
 			DESCRIPTION 
-				"Pmu is invalid for some reason."
+				"This object indicates that a PMU on the X16A encounters an overall failure."
 			::= { hwPmuTrap 5 }
 
 		
@@ -3121,7 +3988,7 @@ DESCRIPTION
 			OBJECTS { hwEntityPhysicalIndex, entPhysicalName, hwEntityTrapFaultID }
 			STATUS current
 			DESCRIPTION 
-				"Pmu resume from invalid situation."
+				"This object indicates that a PMU on the X16A recovers from an overall failure."
 			::= { hwPmuTrap 6 }
 
 --   1.3.6.1.4.1.2011.5.25.219.2.21
@@ -3187,6 +4054,84 @@ DESCRIPTION
 			DESCRIPTION 
 				 "Available power of the UPS battery is restored to the normal range."
 			::= { hwBatteryTrap 5 }
+		-- 1.3.6.1.4.1.2011.5.25.219.2.22.6
+		hwPowerCubeAlarm NOTIFICATION-TYPE
+			OBJECTS { hwEntityPhysicalIndex, hwEntityTrapFaultID, entPhysicalName}
+			STATUS current
+			DESCRIPTION 
+				"Indicates that power cube Alarm."
+			::= { hwBatteryTrap 6 }
+		-- 1.3.6.1.4.1.2011.5.25.219.2.22.7
+		hwPowerCubeAlarmResume NOTIFICATION-TYPE
+			OBJECTS { hwEntityPhysicalIndex, hwEntityTrapFaultID, entPhysicalName}
+			STATUS current
+			DESCRIPTION 
+				"Indicates that power cube Alarm Resume."
+			::= { hwBatteryTrap 7 }
+			
+		-- 1.3.6.1.4.1.2011.5.25.219.2.22.8
+		hwRpsPowerRemove NOTIFICATION-TYPE
+			OBJECTS { hwEntityPhysicalIndex, entPhysicalName, hwEntityTrapFaultID}
+			STATUS current
+			DESCRIPTION 
+				"This object indicates that the RPS power supply has been removed."
+			::= { hwBatteryTrap 8 }
+			
+		-- 1.3.6.1.4.1.2011.5.25.219.2.22.9
+		hwRpsPowerInsert NOTIFICATION-TYPE
+			OBJECTS { hwEntityPhysicalIndex, entPhysicalName, hwEntityTrapFaultID}
+			STATUS current
+			DESCRIPTION 
+				"This object indicates that an RPS power supply has been connected to the device."
+			::= { hwBatteryTrap 9 }
+			
+		-- 1.3.6.1.4.1.2011.5.25.219.2.22.10
+		hwRpsPowerOn NOTIFICATION-TYPE
+			OBJECTS { hwEntityPhysicalIndex, entPhysicalName, hwEntityTrapFaultID}
+			STATUS current
+			DESCRIPTION 
+				"This object indicates that the RPS power supply starts to provide power."
+			::= { hwBatteryTrap 10 }
+			
+		-- 1.3.6.1.4.1.2011.5.25.219.2.22.11
+		hwRpsPowerOff NOTIFICATION-TYPE
+			OBJECTS { hwEntityPhysicalIndex, entPhysicalName, hwEntityTrapFaultID}
+			STATUS current
+			DESCRIPTION 
+				"This object indicates that the RPS power supply stops providing power."
+			::= { hwBatteryTrap 11 }
+			
+		-- 1.3.6.1.4.1.2011.5.25.219.2.22.12
+		hwRpsFanInvalid NOTIFICATION-TYPE
+			OBJECTS { hwEntityPhysicalIndex, entPhysicalName, hwEntityTrapFaultID}
+			STATUS current
+			DESCRIPTION 
+				"This object indicates that fans of the RPS power supply have failed."
+			::= { hwBatteryTrap 12 }
+			
+		-- 1.3.6.1.4.1.2011.5.25.219.2.22.13
+		hwRpsFanInvalidResume NOTIFICATION-TYPE
+			OBJECTS { hwEntityPhysicalIndex, entPhysicalName, hwEntityTrapFaultID}
+			STATUS current
+			DESCRIPTION 
+				"This object indicates that fans of the RPS power supply have recovered."
+			::= { hwBatteryTrap 13 }
+			
+		-- 1.3.6.1.4.1.2011.5.25.219.2.22.14
+		hwRpsTempInvalid NOTIFICATION-TYPE
+			OBJECTS { hwEntityPhysicalIndex, entPhysicalName, hwEntityTrapFaultID}
+			STATUS current
+			DESCRIPTION 
+				"This object indicates that temperature of the RPS power supply is out of the normal range."
+			::= { hwBatteryTrap 14 }
+			
+		-- 1.3.6.1.4.1.2011.5.25.219.2.22.15
+		hwRpsTempInvalidResume NOTIFICATION-TYPE
+			OBJECTS { hwEntityPhysicalIndex, entPhysicalName, hwEntityTrapFaultID}
+			STATUS current
+			DESCRIPTION 
+				"This object indicates that temperature of the RPS power supply has restored to the normal range."
+			::= { hwBatteryTrap 15 }
 
 
 --   1.3.6.1.4.1.2011.5.25.219.2.23
@@ -3228,61 +4173,88 @@ DESCRIPTION
 -- 1.3.6.1.4.1.2011.5.25.219.2.24.3
 		-- 1.3.6.1.4.1.2011.5.25.219.2.24.3
 		hwDiskPartitionInValid NOTIFICATION-TYPE
-			OBJECTS { hwEntityPhysicalIndex, entPhysicalName, hwStorageEntName }
+			OBJECTS {hwPartitionEntPhysicalName, hwPartitionName }
 			STATUS current
 			DESCRIPTION 
-				"The disk partition was unavailable."
+				"An alarm was generated when a disk partition was unavailable."
 			::= { hwDiskTrap 3 }
 			
 			
 -- 1.3.6.1.4.1.2011.5.25.219.2.24.4
 		-- 1.3.6.1.4.1.2011.5.25.219.2.24.4
 		hwDiskPartitionInValidResume  NOTIFICATION-TYPE
-			OBJECTS { hwEntityPhysicalIndex, entPhysicalName, hwStorageEntName }
+			OBJECTS { hwPartitionEntPhysicalName, hwPartitionName }
 			STATUS current
 			DESCRIPTION 
-				"The fault where the VM's disk partition was unavailable was rectified."
+				"The alarm was cleared when the disk partition became available."
 			::= { hwDiskTrap 4 }
 			
 			
 -- 1.3.6.1.4.1.2011.5.25.219.2.24.5
 		-- 1.3.6.1.4.1.2011.5.25.219.2.24.5
 		hwDiskPartitionSpacinsufficient  NOTIFICATION-TYPE
-			OBJECTS { hwEntityPhysicalIndex, entPhysicalName, hwStorageEntName,  hwStorageEntSpaceFree,  hwEntityThresholdWarning  }
+			OBJECTS { hwPartitionEntPhysicalName, hwPartitionName, hwPartitionSpaceFree, hwPartitionSpaceFreeThreshold }
 			STATUS current
 			DESCRIPTION 
-				"The disk partition's available space was less than the threshold."
-			::= { hwDiskTrap 5 }
+				"An alarm was generated when the disk partition's(except the log partition) available space was below the threshold."
+			::= { hwDiskTrap 5}
 			
 			
 -- 1.3.6.1.4.1.2011.5.25.219.2.24.6
 		-- 1.3.6.1.4.1.2011.5.25.219.2.24.6
 		hwDiskPartitionSpacinsufficientResume  NOTIFICATION-TYPE
-			OBJECTS { hwEntityPhysicalIndex, entPhysicalName, hwStorageEntName,  hwStorageEntSpaceFree,  hwEntityThresholdWarning }
+			OBJECTS {hwPartitionEntPhysicalName, hwPartitionName, hwPartitionSpaceFree, hwPartitionSpaceFreeThreshold }
 			STATUS current
 			DESCRIPTION 
-				"The disk partition's available space was more than the threshold."
+				"The alarm was cleared when the disk partition's(except the log partition) available space was above the threshold."
 			::= { hwDiskTrap 6 }
 			
 -- 1.3.6.1.4.1.2011.5.25.219.2.24.7
 		-- 1.3.6.1.4.1.2011.5.25.219.2.24.7
-		hwDiskPartitionUtilizationRising  NOTIFICATION-TYPE
-			OBJECTS { hwEntityPhysicalIndex, entPhysicalName, hwStorageEntName, hwEntityThresholdCurrent, hwEntityThresholdWarning }
+		hwDiskPartitionUseageRising  NOTIFICATION-TYPE
+			OBJECTS {hwPartitionEntPhysicalName, hwPartitionName, hwPartitionUseage, hwPartitionUseageThreshold }
 			STATUS current
 			DESCRIPTION 
-				"The disk usage exceeded the pre-set overload threshold."
+				"When the disk partition usage(except the log partition) is greater than the specified overload threshold within a statistical period, the alarm is reported."
 			::= { hwDiskTrap 7 }
 
 		
 -- 1.3.6.1.4.1.2011.5.25.219.2.24.8
 		-- 1.3.6.1.4.1.2011.5.25.219.2.24.8
-		hwDiskPartitionUtilizationResume   NOTIFICATION-TYPE
-			OBJECTS { hwEntityPhysicalIndex, entPhysicalName, hwStorageEntName, hwEntityThresholdCurrent, hwEntityThresholdWarning }
+		hwDiskPartitionUseageResume   NOTIFICATION-TYPE
+			OBJECTS {hwPartitionEntPhysicalName, hwPartitionName, hwPartitionUseage, hwPartitionUseageThreshold }
 			STATUS current
 			DESCRIPTION 
-				"The disk partition usage of the slot was 10% lower than the preset threshold."
-			::= { hwDiskTrap 8 }
+				"When the disk partition usage(except the log partition) fell and remained below 10% of the specified overload threshold within a statistical period, the alarm is cleared."
+			::= { hwDiskTrap 8}
 
+		hwDiskInvalid   NOTIFICATION-TYPE
+			OBJECTS {hwEntPhysicalName}
+			STATUS current
+			DESCRIPTION 
+				"An alarm was generated when the disk was Invalid."
+			::= { hwDiskTrap 9}
+			
+		hwDiskInvalidResume   NOTIFICATION-TYPE
+			OBJECTS {hwEntPhysicalName}
+			STATUS current
+			DESCRIPTION 
+				"The alarm was cleared when the disk became available."
+			::= { hwDiskTrap 10 }
+                                      
+                                      hwDiskBadPyhsicalBlocks   NOTIFICATION-TYPE
+			OBJECTS {hwEntPhysicalUbiIndex, hwEntCurrentBadPhysicalBlocks,hwEntBadPhysicalBlocksThreshold}
+			STATUS current
+			DESCRIPTION 
+				"An alarm was generated when the disk bad phsical blocks over the threshold."
+			::= { hwDiskTrap 11 }
+
+                                     hwDiskErasePyhsicalBlocks   NOTIFICATION-TYPE
+			OBJECTS {hwEntPhysicalUbiIndex, hwEntMaxErasePhysicalBlocks,hwEntErasePhysicalBlocksThreshold}
+			STATUS current
+			DESCRIPTION 
+				"An alarm was generated when the disk max erase phsical blocks over the threshold."
+			::= { hwDiskTrap 12 }
 
 		-- 1.3.6.1.4.1.2011.5.25.219.2.25
 		hwVMTrap OBJECT IDENTIFIER ::= { hwEntityTraps 25 }
@@ -3366,8 +4338,634 @@ DESCRIPTION
 				"Vfp system error goes away."
 			::= { hwVfpSysCheckErrTrap 2 }
 
+--   1.3.6.1.4.1.2011.5.25.219.2.32
+		-- 1.3.6.1.4.1.2011.5.25.219.2.32
+		hwCapCPUTrap OBJECT IDENTIFIER ::= { hwEntityTraps 32 }
+
+--   1.3.6.1.4.1.2011.5.25.219.2.32.1
+		-- 1.3.6.1.4.1.2011.5.25.219.2.32.1
+		hwCapCPUUtilizationRising NOTIFICATION-TYPE
+			OBJECTS { hwCapCPUThresholdCurrent, hwCapCPUThresholdValue, hwCapCPUThresholdType }
+			STATUS current
+			DESCRIPTION 
+				"The average value of Cap CPU Utilization exceeds specifications."
+			::= { hwCapCPUTrap 1 }
+
+--   1.3.6.1.4.1.2011.5.25.219.2.32.2
+		-- 1.3.6.1.4.1.2011.5.25.219.2.32.2
+		hwCapCPUUtilizationResume NOTIFICATION-TYPE
+			OBJECTS { hwCapCPUThresholdCurrent, hwCapCPUThresholdValue, hwCapCPUThresholdType }
+			STATUS current
+			DESCRIPTION 
+				"The average value of Cap CPU utilization back to normal level."
+			::= { hwCapCPUTrap 2 }
+
+--   1.3.6.1.4.1.2011.5.25.219.2.33
+		-- 1.3.6.1.4.1.2011.5.25.219.2.33
+		hwPDUTrap OBJECT IDENTIFIER ::= { hwEntityTraps 33 }
+
+--   1.3.6.1.4.1.2011.5.25.219.2.33.1
+		-- 1.3.6.1.4.1.2011.5.25.219.2.33.1
+		hwPduNotPresent NOTIFICATION-TYPE
+		OBJECTS { hwEntityPhysicalIndex, entPhysicalName, hwEntityTrapFaultID }
+		STATUS current
+			DESCRIPTION 
+				"The PDU is not present."
+			::= { hwPDUTrap 1 }
+
+--   1.3.6.1.4.1.2011.5.25.219.2.33.2
+		-- 1.3.6.1.4.1.2011.5.25.219.2.33.2
+		hwPduPresent NOTIFICATION-TYPE
+			OBJECTS { hwEntityPhysicalIndex, entPhysicalName, hwEntityTrapFaultID }
+			STATUS current
+			DESCRIPTION 
+				"The PDU is present."
+			::= { hwPDUTrap 2 }
+
+--   1.3.6.1.4.1.2011.5.25.219.2.33.3
+		-- 1.3.6.1.4.1.2011.5.25.219.2.33.3
+		hwPduCommLost NOTIFICATION-TYPE
+			OBJECTS { hwEntityPhysicalIndex, entPhysicalName, hwEntityTrapFaultID }
+			STATUS current
+			DESCRIPTION 
+				"Communication with the PDU was lost."
+			::= { hwPDUTrap 3 }
+
+--   1.3.6.1.4.1.2011.5.25.219.2.33.4
+		-- 1.3.6.1.4.1.2011.5.25.219.2.33.4
+		hwPduCommLostResume NOTIFICATION-TYPE
+			OBJECTS { hwEntityPhysicalIndex, entPhysicalName, hwEntityTrapFaultID }
+			STATUS current
+			DESCRIPTION 
+				"Communication with the PDU was restored."
+			::= { hwPDUTrap 4}
+
+--   1.3.6.1.4.1.2011.5.25.219.2.33.5
+		-- 1.3.6.1.4.1.2011.5.25.219.2.33.5
+		hwPduDmuHardwareFault NOTIFICATION-TYPE
+			OBJECTS { hwEntityPhysicalIndex, entPhysicalName, hwEntityTrapFaultID }
+			STATUS current
+			DESCRIPTION 
+				"A hardware fault occurred on the DMU."
+			::= { hwPDUTrap 5 }
+
+--   1.3.6.1.4.1.2011.5.25.219.2.33.6
+		-- 1.3.6.1.4.1.2011.5.25.219.2.33.6
+		hwPduDmuHardwareFaultResume NOTIFICATION-TYPE
+			OBJECTS { hwEntityPhysicalIndex, entPhysicalName, hwEntityTrapFaultID }
+			STATUS current
+			DESCRIPTION 
+				"The DMU recovered from a hardware fault."
+			::= { hwPDUTrap 6}
+
+--   1.3.6.1.4.1.2011.5.25.219.2.33.7
+		-- 1.3.6.1.4.1.2011.5.25.219.2.33.7
+		hwPduDMUAutoUpgradeFail NOTIFICATION-TYPE
+			OBJECTS { hwEntityPhysicalIndex, entPhysicalName, hwEntityTrapFaultID }
+			STATUS current
+			DESCRIPTION 
+				"The automatic upgrade of DMU was failed."
+			::= { hwPDUTrap 7 }
+
+--   1.3.6.1.4.1.2011.5.25.219.2.33.8
+		-- 1.3.6.1.4.1.2011.5.25.219.2.33.8
+		hwPduDMUAutoUpgradeFailResume NOTIFICATION-TYPE
+			OBJECTS { hwEntityPhysicalIndex, entPhysicalName, hwEntityTrapFaultID }
+			STATUS current
+			DESCRIPTION 
+				"Automatic upgrade of the DMU was successful."
+			::= { hwPDUTrap 8}
+
+--   1.3.6.1.4.1.2011.5.25.219.2.33.9
+		-- 1.3.6.1.4.1.2011.5.25.219.2.33.9
+		hwPduDacsHardwareFault NOTIFICATION-TYPE
+			OBJECTS { hwEntityPhysicalIndex, entPhysicalName, hwEntityTrapFaultID }
+			STATUS current
+			DESCRIPTION 
+				"A hardware fault occurred on the DACS."
+			::= { hwPDUTrap 9 }
+
+--   1.3.6.1.4.1.2011.5.25.219.2.33.10
+		-- 1.3.6.1.4.1.2011.5.25.219.2.33.10
+		hwPduDacsHardwareFaultResume NOTIFICATION-TYPE
+			OBJECTS { hwEntityPhysicalIndex, entPhysicalName, hwEntityTrapFaultID }
+			STATUS current
+			DESCRIPTION 
+				"The DACS recovered from a hardware fault."
+			::= { hwPDUTrap 10 }
+
+--   1.3.6.1.4.1.2011.5.25.219.2.33.11
+		-- 1.3.6.1.4.1.2011.5.25.219.2.33.11
+		hwPduDacsTempAlarm NOTIFICATION-TYPE
+			OBJECTS { hwEntityPhysicalIndex, entPhysicalName, hwEntityTrapFaultID }
+			STATUS current
+			DESCRIPTION 
+				"The temperature of the temperature sensor on the DACS is too high."
+			::= { hwPDUTrap 11 }
+
+--   1.3.6.1.4.1.2011.5.25.219.2.33.12
+		-- 1.3.6.1.4.1.2011.5.25.219.2.33.12
+		hwPduDacsTempAlarmResume NOTIFICATION-TYPE
+			OBJECTS { hwEntityPhysicalIndex, entPhysicalName, hwEntityTrapFaultID }
+			STATUS current
+			DESCRIPTION 
+				"The temperature of the temperature sensor on the DACS is normal."
+			::= { hwPDUTrap 12}
+
+--   1.3.6.1.4.1.2011.5.25.219.2.33.13
+		-- 1.3.6.1.4.1.2011.5.25.219.2.33.13
+		hwPduDacsI2CChannelFault NOTIFICATION-TYPE
+			OBJECTS { hwEntityPhysicalIndex, entPhysicalName, hwEntityTrapFaultID }
+			STATUS current
+			DESCRIPTION 
+				"The IIC channel of the DACS failed."
+			::= { hwPDUTrap 13 }
+
+--   1.3.6.1.4.1.2011.5.25.219.2.33.14
+		-- 1.3.6.1.4.1.2011.5.25.219.2.33.14
+		hwPduDacsI2CChannelFaultResume NOTIFICATION-TYPE
+			OBJECTS { hwEntityPhysicalIndex, entPhysicalName, hwEntityTrapFaultID }
+			STATUS current
+			DESCRIPTION 
+				"The IIC channel of the DACS recovered."
+			::= { hwPDUTrap 14}
+
+-- 1.3.6.1.4.1.2011.5.25.219.2.34
+		-- 1.3.6.1.4.1.2011.5.25.219.2.34
+		hwSyslogTrap OBJECT IDENTIFIER ::= { hwEntityTraps 34 }
+
+-- 1.3.6.1.4.1.2011.5.25.219.2.34.1
+		-- 1.3.6.1.4.1.2011.5.25.219.2.34.1
+		hwReportSyslogInfo NOTIFICATION-TYPE
+			OBJECTS { hwSyslogModuleName, hwSyslogTimeStamp, hwSyslogDescription, hwSyslogBrief, hwSyslogSeverityLevel
+				 }
+			STATUS current
+			DESCRIPTION 
+				"The information  of syslog trap ."
+			::= { hwSyslogTrap 1 }
 		                                 
---  1.3.6.1.4.1.2011.5.25.219.3
+		-- 1.3.6.1.4.1.2011.5.25.219.2.35
+		hwEntityNpsTrap OBJECT IDENTIFIER ::= { hwEntityTraps 35 }
+		
+		-- 1.3.6.1.4.1.2011.5.25.219.2.35.1
+		hwEntityNpsPatchInstallFail NOTIFICATION-TYPE
+			OBJECTS { hwEntityNpsPatchName, hwEntityNpsPatchVersion, hwEntityNpsErrorDescr }
+			STATUS current
+			DESCRIPTION 
+				"Patch package installation failed."
+			::= { hwEntityNpsTrap 1 }
+		
+		-- 1.3.6.1.4.1.2011.5.25.219.2.35.2
+		hwEntityNpsPatchInstallFailResume NOTIFICATION-TYPE
+			OBJECTS { hwEntityNpsPatchName, hwEntityNpsPatchVersion, hwEntityNpsErrorDescr }
+			STATUS current
+			DESCRIPTION 
+				"The patch-installation failure alarm is cleared."
+			::= { hwEntityNpsTrap 2 }
+		
+		-- 1.3.6.1.4.1.2011.5.25.219.2.35.3
+		hwEntityNpsPatchPacketError NOTIFICATION-TYPE
+			OBJECTS { hwEntityNpsPatchName }
+			STATUS current
+			DESCRIPTION 
+				"Patch package file error."
+			::= { hwEntityNpsTrap 3 }
+		
+		-- 1.3.6.1.4.1.2011.5.25.219.2.35.4
+		hwEntityNpsPatchPacketErrorResume NOTIFICATION-TYPE
+			OBJECTS { hwEntityNpsPatchName }
+			STATUS current
+			DESCRIPTION 
+				"Patch package file error restored."
+			::= { hwEntityNpsTrap 4 }
+		
+		-- 1.3.6.1.4.1.2011.5.25.219.2.35.5
+		hwEntityNpsSysConfigError NOTIFICATION-TYPE
+			OBJECTS { hwEntityNpsErrorCode }
+			STATUS current
+			DESCRIPTION 
+				"A system configuration error occurs."
+			::= { hwEntityNpsTrap 5 }
+		
+		-- 1.3.6.1.4.1.2011.5.25.219.2.35.6
+		hwEntityNpsSysConfigErrorResume NOTIFICATION-TYPE
+			OBJECTS { hwEntityNpsErrorCode }
+			STATUS current
+			DESCRIPTION 
+				"The system configuration error has been rectified."
+			::= { hwEntityNpsTrap 6 }
+		
+		-- 1.3.6.1.4.1.2011.5.25.219.2.35.7
+		hwEntityNpsSslCertInvalidEarlyWarning NOTIFICATION-TYPE
+			OBJECTS { hwEntityNpsCertType, hwEntityNpsCertRemainDays }
+			STATUS current
+			DESCRIPTION 
+				"The inner SSL certificate will expire."
+			::= { hwEntityNpsTrap 7 }
+		
+		-- 1.3.6.1.4.1.2011.5.25.219.2.35.8
+		hwEntityNpsSslCertInvalidEarlyResume NOTIFICATION-TYPE
+			OBJECTS { hwEntityNpsCertType }
+			STATUS current
+			DESCRIPTION 
+				"The inner SSL certificate was upgraded."
+			::= { hwEntityNpsTrap 8 }
+		
+		-- 1.3.6.1.4.1.2011.5.25.219.2.35.9
+		hwEntityNpsSslCertInvalid NOTIFICATION-TYPE
+			OBJECTS { hwEntityNpsCertType, hwEntityNpsErrorDescr }
+			STATUS current
+			DESCRIPTION 
+				"The inner SSL certificate was invalid."
+			::= { hwEntityNpsTrap 9 }
+		
+		-- 1.3.6.1.4.1.2011.5.25.219.2.35.10
+		hwEntityNpsSslCertInvalidResume NOTIFICATION-TYPE
+			OBJECTS { hwEntityNpsCertType }
+			STATUS current
+			DESCRIPTION 
+				"The inner SSL certificate was repaired."
+			::= { hwEntityNpsTrap 10 }
+		
+		-- 1.3.6.1.4.1.2011.5.25.219.2.35.11
+		hwEntityNpsDiskPartitionUsageExceedingThreshold NOTIFICATION-TYPE
+			OBJECTS { hwEntityNpsVMName, hwEntityNpsPartitionName, hwEntityNpsPartitionUsage, hwEntityNpsPartitionUsageThreshold }
+			STATUS current
+			DESCRIPTION 
+				"The disk usage exceeded the pre-set overload threshold."
+			::= { hwEntityNpsTrap 11 }
+		
+		-- 1.3.6.1.4.1.2011.5.25.219.2.35.12
+		hwEntityNpsDiskPartitionUsageExceedingThresholdResume NOTIFICATION-TYPE
+			OBJECTS { hwEntityNpsVMName, hwEntityNpsPartitionName, hwEntityNpsPartitionUsage, hwEntityNpsPartitionUsageThreshold }
+			STATUS current
+			DESCRIPTION 
+				"The disk partition usage of the VM was 10% lower than the preset threshold."
+			::= { hwEntityNpsTrap 12 }
+		
+		-- 1.3.6.1.4.1.2011.5.25.219.2.35.13
+		hwEntityNpsDiskPartitionUnavailable NOTIFICATION-TYPE
+			OBJECTS { hwEntityNpsVMName, hwEntityNpsPartitionName }
+			STATUS current
+			DESCRIPTION 
+				"The VM's disk partition was unavailable."
+			::= { hwEntityNpsTrap 13 }
+		
+		-- 1.3.6.1.4.1.2011.5.25.219.2.35.14
+		hwEntityNpsDiskPartitionUnavailableResume NOTIFICATION-TYPE
+			OBJECTS { hwEntityNpsVMName, hwEntityNpsPartitionName }
+			STATUS current
+			DESCRIPTION 
+				"The fault where the VM's disk partition was unavailable was rectified."
+			::= { hwEntityNpsTrap 14 }
+		
+		-- 1.3.6.1.4.1.2011.5.25.219.2.35.15
+		hwEntityNpsDiskPartitionSpaceInsufficient NOTIFICATION-TYPE
+			OBJECTS { hwEntityNpsVMName, hwEntityNpsPartitionName, hwEntityNpsPartitionAvailableSpace, hwEntityNpsPartitionCapacityThreshold }
+			STATUS current
+			DESCRIPTION 
+				"The disk partition's available space was less than the threshold."
+			::= { hwEntityNpsTrap 15 }
+		
+		-- 1.3.6.1.4.1.2011.5.25.219.2.35.16
+		hwEntityNpsDiskPartitionSpaceInsufficientResume NOTIFICATION-TYPE
+			OBJECTS { hwEntityNpsVMName, hwEntityNpsPartitionName, hwEntityNpsPartitionAvailableSpace, hwEntityNpsPartitionCapacityThreshold }
+			STATUS current
+			DESCRIPTION 
+				"The disk partition's available space was more than the threshold."
+			::= { hwEntityNpsTrap 16 }
+		
+		-- 1.3.6.1.4.1.2011.5.25.219.2.35.17
+		hwEntityNpsExecutableFilesIncomplete NOTIFICATION-TYPE
+			OBJECTS { hwEntityNpsVMName }
+			STATUS current
+			DESCRIPTION 
+				"The file check failed."
+			::= { hwEntityNpsTrap 17 }
+		
+		-- 1.3.6.1.4.1.2011.5.25.219.2.35.18
+		hwEntityNpsExecutableFilesIncompleteResume NOTIFICATION-TYPE
+			OBJECTS { hwEntityNpsVMName }
+			STATUS current
+			DESCRIPTION 
+				"The file check success."
+			::= { hwEntityNpsTrap 18 }
+		
+		-- 1.3.6.1.4.1.2011.5.25.219.2.35.19
+		hwEntityNpsSoftwareIntegrityError NOTIFICATION-TYPE
+			OBJECTS { hwEntityNpsVNFCType, hwEntityNpsAPPType, hwEntityNpsSoftwareVersionType, hwEntityNpsSoftwareVersionID }
+			STATUS current
+			DESCRIPTION 
+				"The software check failed."
+			::= { hwEntityNpsTrap 19 }
+		
+		-- 1.3.6.1.4.1.2011.5.25.219.2.35.20
+		hwEntityNpsSoftwareIntegrityErrorResume NOTIFICATION-TYPE
+			OBJECTS { hwEntityNpsVNFCType, hwEntityNpsAPPType, hwEntityNpsSoftwareVersionType, hwEntityNpsSoftwareVersionID }
+			STATUS current
+			DESCRIPTION 
+				"The software check success."
+			::= { hwEntityNpsTrap 20 }
+		
+		-- 1.3.6.1.4.1.2011.5.25.219.2.35.21
+		hwEntityNpsOMUSyncFail NOTIFICATION-TYPE
+			OBJECTS { hwEntityNpsErrorDescr }
+			STATUS current
+			DESCRIPTION 
+				"Data failed to be synchronized from the master OMU to the slave OMU."
+			::= { hwEntityNpsTrap 21 }
+		
+		-- 1.3.6.1.4.1.2011.5.25.219.2.35.22
+		hwEntityNpsOMUSyncFailResume NOTIFICATION-TYPE
+			OBJECTS { hwEntityNpsErrorDescr }
+			STATUS current
+			DESCRIPTION 
+				"A master/slave OMU data synchronization failure was removed, or the slave OMU became absent after a master/slave OMU data synchronization failure occurred."
+			::= { hwEntityNpsTrap 22 }
+		
+		-- 1.3.6.1.4.1.2011.5.25.219.2.35.23
+		hwEntityNpsVMDiskUnavailable NOTIFICATION-TYPE
+			OBJECTS { hwEntityNpsVMName }
+			STATUS current
+			DESCRIPTION 
+				"A fault occurs on the VM disk."
+			::= { hwEntityNpsTrap 23 }
+		
+		-- 1.3.6.1.4.1.2011.5.25.219.2.35.24
+		hwEntityNpsVMDiskUnavailableResume NOTIFICATION-TYPE
+			OBJECTS { hwEntityNpsVMName }
+			STATUS current
+			DESCRIPTION 
+				"The fault on the VM disk is cleared."
+			::= { hwEntityNpsTrap 24 }
+		
+		-- 1.3.6.1.4.1.2011.5.25.219.2.35.25
+		hwEntityNpsDatabaseRestoreFail NOTIFICATION-TYPE
+			OBJECTS { hwEntityNpsErrorDescr }
+			STATUS current
+			DESCRIPTION 
+				"Database Restoration Failure."
+			::= { hwEntityNpsTrap 25 }
+		
+		-- 1.3.6.1.4.1.2011.5.25.219.2.35.26
+		hwEntityNpsSSLCertExpired NOTIFICATION-TYPE
+			OBJECTS { hwEntityNpsCertName, hwEntityNpsCertType, hwEntityNpsCertValidBeginTime, hwEntityNpsCertValidEndTime }
+			STATUS current
+			DESCRIPTION 
+				"The certificate already expired."
+			::= { hwEntityNpsTrap 26 }
+		
+		-- 1.3.6.1.4.1.2011.5.25.219.2.35.27
+		hwEntityNpsSSLCertExpiredEarlyWarning NOTIFICATION-TYPE
+			OBJECTS { hwEntityNpsCertName, hwEntityNpsCertType, hwEntityNpsCertValidBeginTime, hwEntityNpsCertValidEndTime }
+			STATUS current
+			DESCRIPTION 
+				"The SSL certificate will expire."
+			::= { hwEntityNpsTrap 27 }
+		
+		-- 1.3.6.1.4.1.2011.5.25.219.2.35.28
+		hwEntityNpsVMResInconsist NOTIFICATION-TYPE
+			OBJECTS { hwEntityNpsVMName, hwEntityNpsVMID, hwEntityNpsPhyVMID, hwEntityNpsErrorDescr }
+			STATUS current
+			DESCRIPTION 
+				"Local VM resources are inconsistent with those on the MANO."
+			::= { hwEntityNpsTrap 28 }
+		
+		-- 1.3.6.1.4.1.2011.5.25.219.2.35.29
+		hwEntityNpsVMResInconsistResume NOTIFICATION-TYPE
+			OBJECTS { hwEntityNpsVMName, hwEntityNpsVMID, hwEntityNpsPhyVMID, hwEntityNpsErrorDescr }
+			STATUS current
+			DESCRIPTION 
+				"Local VM resources are consistent with those on the MANO."
+			::= { hwEntityNpsTrap 29 }
+		
+		-- 1.3.6.1.4.1.2011.5.25.219.2.35.30
+		hwEntityNpsVmFault NOTIFICATION-TYPE
+			OBJECTS { hwEntityNpsVMName, hwEntityNpsVMID, hwEntityNpsPhyVMID, hwEntityNpsErrorDescr }
+			STATUS current
+			DESCRIPTION 
+				"A fault occurs on a VM."
+			::= { hwEntityNpsTrap 30 }
+		
+		-- 1.3.6.1.4.1.2011.5.25.219.2.35.31
+		hwEntityNpsVmFaultResume NOTIFICATION-TYPE
+			OBJECTS { hwEntityNpsVMName, hwEntityNpsVMID, hwEntityNpsPhyVMID, hwEntityNpsErrorDescr }
+			STATUS current
+			DESCRIPTION 
+				"The fault on the VM is cleared."
+			::= { hwEntityNpsTrap 31 }
+		
+		-- 1.3.6.1.4.1.2011.5.25.219.2.35.32
+		hwEntityNpsVNFMConnectFault NOTIFICATION-TYPE
+			OBJECTS { hwEntityNpsIPAddress, hwEntityNpsPort, hwEntityNpsErrorDescr }
+			STATUS current
+			DESCRIPTION 
+				"The connection between VNF and VNFM fault was faulty."
+			::= { hwEntityNpsTrap 32 }
+		
+		-- 1.3.6.1.4.1.2011.5.25.219.2.35.33
+		hwEntityNpsVNFMConnectResume NOTIFICATION-TYPE
+			OBJECTS { hwEntityNpsIPAddress, hwEntityNpsPort, hwEntityNpsErrorDescr }
+			STATUS current
+			DESCRIPTION 
+				"The connection between VNF and VNFM fault was rectified."
+			::= { hwEntityNpsTrap 33 }
+		
+		-- 1.3.6.1.4.1.2011.5.25.219.2.35.34
+		hwEntityNpsFabricOamPlaneDown NOTIFICATION-TYPE
+			OBJECTS { hwEntityNpsLocalVMName, hwEntityNpsRemoteVMName, hwEntityNpsNetworkPlaneID }
+			STATUS current
+			DESCRIPTION 
+				"Fabric plane goes Down."
+			::= { hwEntityNpsTrap 34 }
+		
+		-- 1.3.6.1.4.1.2011.5.25.219.2.35.35
+		hwEntityNpsFabricOamPlaneDownResume NOTIFICATION-TYPE
+			OBJECTS { hwEntityNpsLocalVMName, hwEntityNpsRemoteVMName, hwEntityNpsNetworkPlaneID }
+			STATUS current
+			DESCRIPTION 
+				"Fabric plane down alarm was cleared."
+			::= { hwEntityNpsTrap 35 }
+		
+		-- 1.3.6.1.4.1.2011.5.25.219.2.35.36
+		hwEntityNpsFabricLinkSubhealthy NOTIFICATION-TYPE
+			OBJECTS { hwEntityNpsLocalVMName, hwEntityNpsRemoteVMName, hwEntityNpsNetworkPlaneID, hwEntityNpsNetworkErrorThreshold }
+			STATUS current
+			DESCRIPTION 
+				"Fabric link goes subhealthy."
+			::= { hwEntityNpsTrap 36 }
+		
+		-- 1.3.6.1.4.1.2011.5.25.219.2.35.37
+		hwEntityNpsFabricLinkSubhealthyResume NOTIFICATION-TYPE
+			OBJECTS { hwEntityNpsLocalVMName, hwEntityNpsRemoteVMName, hwEntityNpsNetworkPlaneID, hwEntityNpsNetworkErrorThreshold }
+			STATUS current
+			DESCRIPTION 
+				"Fabric link resume from subhealthy."
+			::= { hwEntityNpsTrap 37 }
+		
+		-- 1.3.6.1.4.1.2011.5.25.219.2.35.38
+		hwEntityNpsDriverTypeMismatch NOTIFICATION-TYPE
+			OBJECTS { hwEntityNpsVMName, hwEntityNpsDriverVendor, hwEntityNpsDeviceID, hwEntityNpsDriverType, hwEntityNpsErrorDescr
+				 }
+			STATUS current
+			DESCRIPTION 
+				"Load vNIC driver failure."
+			::= { hwEntityNpsTrap 38 }
+		
+		-- 1.3.6.1.4.1.2011.5.25.219.2.35.39
+		hwEntityNpsDriverTypeMismatchResume NOTIFICATION-TYPE
+			OBJECTS { hwEntityNpsVMName, hwEntityNpsDriverVendor, hwEntityNpsDeviceID, hwEntityNpsDriverType, hwEntityNpsErrorDescr
+				 }
+			STATUS current
+			DESCRIPTION 
+				"Load vNIC driver success."
+			::= { hwEntityNpsTrap 39 }
+		
+		-- 1.3.6.1.4.1.2011.5.25.219.2.35.40
+		hwEntityNpsRuCreateFail NOTIFICATION-TYPE
+			OBJECTS { hwEntityNpsVMName, hwEntityNpsVNFCName, hwEntityNpsRUName, hwEntityNpsErrorDescr }
+			STATUS current
+			DESCRIPTION 
+				"The VM create RU failed."
+			::= { hwEntityNpsTrap 40 }
+		
+		-- 1.3.6.1.4.1.2011.5.25.219.2.35.41
+		hwEntityNpsRuCreateFailResume NOTIFICATION-TYPE
+			OBJECTS { hwEntityNpsVMName, hwEntityNpsVNFCName, hwEntityNpsRUName, hwEntityNpsErrorDescr }
+			STATUS current
+			DESCRIPTION 
+				"The VM create RU succcess."
+			::= { hwEntityNpsTrap 41 }
+		
+		-- 1.3.6.1.4.1.2011.5.25.219.2.35.42
+		hwEntityNpsIpSecRuleFail NOTIFICATION-TYPE
+			OBJECTS { hwEntityNpsVMName, hwEntityNpsPortName, hwEntityNpsIPAddress }
+			STATUS current
+			DESCRIPTION 
+				"Setting Security Group Rules Failed."
+			::= { hwEntityNpsTrap 42 }
+		
+		-- 1.3.6.1.4.1.2011.5.25.219.2.35.43
+		hwEntityNpsIpSecRuleFailResume NOTIFICATION-TYPE
+			OBJECTS { hwEntityNpsVMName, hwEntityNpsPortName, hwEntityNpsIPAddress }
+			STATUS current
+			DESCRIPTION 
+				"Setting Security Group Rules Failed alarm clear."
+			::= { hwEntityNpsTrap 43 }
+		--1.3.6.1.4.1.2011.5.25.219.2.35.44
+		hwEntityNpsBaseLinkSubhealthy NOTIFICATION-TYPE
+			OBJECTS { hwEntityNpsLocalVMName, hwEntityNpsRemoteVMName, hwEntityNpsNetworkPlaneID,hwEntityNpsQuality }
+			STATUS current
+			DESCRIPTION 
+				"Base link goes subhealthy."
+			::= { hwEntityNpsTrap 44 }
+		--1.3.6.1.4.1.2011.5.25.219.2.35.45
+		hwEntityNpsBaseLinkSubhealthyResume NOTIFICATION-TYPE
+			OBJECTS { hwEntityNpsLocalVMName, hwEntityNpsRemoteVMName, hwEntityNpsNetworkPlaneID,hwEntityNpsQuality }
+			STATUS current
+			DESCRIPTION 
+				"Base link resume from subhealthy."
+			::= { hwEntityNpsTrap 45 }
+
+
+                                 -- 1.3.6.1.4.1.2011.5.25.219.2.36
+		hwEntityConfigurationTrap OBJECT IDENTIFIER ::= { hwEntityTraps 36 }
+
+                                     hwEntityConfigurationRollbackRising NOTIFICATION-TYPE
+			OBJECTS { hwEntityConfigurationCurrent, hwEntityConfigurationRollbackReason}
+			STATUS current
+			DESCRIPTION 
+				"An alarm was generated when configuration rollback."
+			::= { hwEntityConfigurationTrap 1}
+
+ --   1.3.6.1.4.1.2011.5.25.219.2.37 
+                 -- 1.3.6.1.4.1.2011.5.25.219.2.37 
+                 hwNPDomainDropCauseCntNumabruptlyTrap  OBJECT IDENTIFIER ::= { hwEntityTraps 37 } 
+ --   1.3.6.1.4.1.2011.5.25.219.2.37.1 
+                 -- 1.3.6.1.4.1.2011.5.25.219.2.37.1 
+                 hwNPDomainDropCauseCntNumabruptlyAlarm NOTIFICATION-TYPE
+		         OBJECTS { hwEntityPhysicalIndex, entPhysicalName, hwEntityTrapFaultID, hwLpuSlotId, hwLpuFeId, hwDropCauseId } 
+                         STATUS current 
+                         DESCRIPTION 
+                                 "The number of key dropcause count on the NP Chip increases abruptly and exceeds the preset threshold." 
+                         ::= { hwNPDomainDropCauseCntNumabruptlyTrap 1 } 
+ --   1.3.6.1.4.1.2011.5.25.219.2.37.2 
+                 -- 1.3.6.1.4.1.2011.5.25.219.2.37.2  
+                 hwNPDomainDropCauseCntNumabruptlyResume NOTIFICATION-TYPE
+		         OBJECTS { hwEntityPhysicalIndex, entPhysicalName, hwEntityTrapFaultID, hwLpuSlotId, hwLpuFeId, hwDropCauseId } 
+                         STATUS current 
+                         DESCRIPTION 
+                                 "The number of key dropcause count on the NP Chip return normal ." 
+                         ::= { hwNPDomainDropCauseCntNumabruptlyTrap 2 }
+
+--   1.3.6.1.4.1.2011.5.25.219.2.38 
+                 -- 1.3.6.1.4.1.2011.5.25.219.2.38 
+                 hwNPResourceExcTrap  OBJECT IDENTIFIER ::= { hwEntityTraps 38 } 
+ --   1.3.6.1.4.1.2011.5.25.219.2.37.1 
+                 -- 1.3.6.1.4.1.2011.5.25.219.2.38.1 
+                 hwNPResourceExcAlarm NOTIFICATION-TYPE
+		         OBJECTS { hwEntityPhysicalIndex, entPhysicalName, hwEntityTrapFaultID, hwLpuSlotId, hwLpuFeId} 
+                         STATUS current 
+                         DESCRIPTION 
+                                 "NP Resources abnormal." 
+                         ::= { hwNPResourceExcTrap 1 } 
+ --   1.3.6.1.4.1.2011.5.25.219.2.38.2 
+                 -- 1.3.6.1.4.1.2011.5.25.219.2.38.2  
+                 hwNPResourceExcResume NOTIFICATION-TYPE
+		         OBJECTS { hwEntityPhysicalIndex, entPhysicalName, hwEntityTrapFaultID, hwLpuSlotId, hwLpuFeId} 
+                         STATUS current 
+                         DESCRIPTION 
+                                 "NP resources returns to normal."
+                         ::= { hwNPResourceExcTrap 2 } 
+
+--   1.3.6.1.4.1.2011.5.25.219.2.39
+               hwEntityFileSystemTrap OBJECT IDENTIFIER ::= { hwEntityTraps 39 }
+-- 1.3.6.1.4.1.2011.5.25.219.2.39.1
+               -- 1.3.6.1.4.1.2011.5.25.219.2.39.1
+                hwEntityFileSystemRebuild NOTIFICATION-TYPE	
+               STATUS current 
+               DESCRIPTION
+               "An alarm was generated when file system rebuild." 
+               ::= { hwEntityFileSystemTrap 1} 
+
+-- 1.3.6.1.4.1.2011.5.25.219.2.39.2
+		-- 1.3.6.1.4.1.2011.5.25.219.2.39.2
+		hwEntityFileSystemAbnormal NOTIFICATION-TYPE
+			OBJECTS { hwEntityPhysicalIndex, entPhysicalName, hwEntityTrapFaultID, hwEntityTrapReasonDescr }
+			STATUS current
+			DESCRIPTION 
+				"The filesystem is abnormal."
+			::= { hwEntityFileSystemTrap 2 }
+
+
+
+--   1.3.6.1.4.1.2011.5.25.219.2.40
+                 -- 1.3.6.1.4.1.2011.5.25.219.2.40
+                 hwEntityHardewareFaultTrap  OBJECT IDENTIFIER ::= { hwEntityTraps 40 } 
+ --   1.3.6.1.4.1.2011.5.25.219.2.40.1 
+                 -- 1.3.6.1.4.1.2011.5.25.219.2.40.1 
+                 hwEntityCODECHardewareFaultAlarm NOTIFICATION-TYPE
+                 STATUS current 
+                 DESCRIPTION 
+                 "CODEC Hardeware Fault." 
+                 ::= { hwEntityHardewareFaultTrap 1 } 
+ --   1.3.6.1.4.1.2011.5.25.219.2.40.2 
+                 -- 1.3.6.1.4.1.2011.5.25.219.2.40.2 
+                 hwEntityTPMHardewareFaultAlarm NOTIFICATION-TYPE
+                 STATUS current 
+                 DESCRIPTION 
+                 "TPM Hardeware Fault." 
+                 ::= { hwEntityHardewareFaultTrap 2 } 
+ --   1.3.6.1.4.1.2011.5.25.219.2.40.3 
+                 -- 1.3.6.1.4.1.2011.5.25.219.2.40.3 
+                 hwEntityMCUHardewareFaultAlarm NOTIFICATION-TYPE
+                 STATUS current 
+                 DESCRIPTION 
+                 "MCU Hardeware Fault." 
+                 ::= { hwEntityHardewareFaultTrap 3 } 
+
+--   1.3.6.1.4.1.2011.5.25.219.3
+-- 1.3.6.1.4.1.2011.5.25.219.3
 		-- 1.3.6.1.4.1.2011.5.25.219.3
 		hwEntityTrapConformance OBJECT IDENTIFIER ::= { hwEntityTrapMIB 3 }
 
@@ -3402,7 +5000,16 @@ DESCRIPTION
 			OBJECTS { hwEntityPhysicalIndex, hwEntityTrapEntType, hwEntityTrapFaultID, hwEntityCommunicateType, hwEntityThresholdType, 
 				hwEntityThresholdValue, hwEntityThresholdCurrent, hwEntityThresholdCritical, hwEntityThresholdWarning, hwUserDefAlarmName, 
 				hwUserDefChannel, hwSoftwareVersion, hwStartupSoftwareFileName, hwStorageDevName, hwPortDownReason, 
-                                                                                     hwEntityTrapRelativeResource, hwEntityTrapReasonDescr,hwUsbOperType, hwOpticalVendorName, hwOpticalVendorSN, hwMasterOpUser, hwAPAdminIP, hwAPID, hwOperation, hwReason }
+                                hwEntityTrapRelativeResource, hwEntityTrapReasonDescr,hwUsbOperType, hwOpticalVendorName, hwOpticalVendorSN, hwMasterOpUser, hwAPAdminIP, hwAPID, hwOperation, hwReason,
+				hwBoardID, hwCapCPUThresholdType, hwCapCPUThresholdValue, hwCapCPUThresholdCurrent, hwSyslogModuleName, 
+				hwSyslogSeverityLevel, hwSyslogBrief, hwSyslogDescription, hwSyslogTimeStamp, hwEntityNpsVMName, 
+				hwEntityNpsVMID, hwEntityNpsPhyVMID, hwEntityNpsErrorCode, hwEntityNpsErrorDescr, hwEntityNpsPort, 
+				hwEntityNpsPortName, hwEntityNpsIPAddress, hwEntityNpsPatchName, hwEntityNpsPatchVersion, hwEntityNpsCertName, 
+				hwEntityNpsCertType, hwEntityNpsCertRemainDays, hwEntityNpsCertValidBeginTime, hwEntityNpsCertValidEndTime, hwEntityNpsPartitionName, 
+				hwEntityNpsPartitionUsage, hwEntityNpsPartitionUsageThreshold, hwEntityNpsPartitionAvailableSpace, hwEntityNpsPartitionCapacityThreshold, hwEntityNpsRUName, 
+				hwEntityNpsVNFCName, hwEntityNpsVNFCType, hwEntityNpsAPPType, hwEntityNpsSoftwareVersionType, hwEntityNpsSoftwareVersionID, 
+				hwEntityNpsLocalVMName, hwEntityNpsRemoteVMName, hwEntityNpsNetworkPlaneID, hwEntityNpsNetworkErrorThreshold, hwEntityNpsDeviceID, 
+				hwEntityNpsDriverVendor, hwEntityNpsDriverType,hwEntityNpsQuality,hwLicenseRemainTime, hwVirtualLicenseItemName }
 			STATUS current
 			DESCRIPTION 
 				"Group for base trap objects."
@@ -3429,7 +5036,7 @@ DESCRIPTION
 				hwBrdTempFatalAlarm, hwBrdTempFatalResume, hwPowerFailureAlarm, hwPowerFailureResume, hwIOSwitchOneAlarm, 
 				hwIOSwitchOneAlarmResume, hwIOSwitchTwoAlarm, hwIOSwitchTwoAlarmResume, hwIOSwitchThreeAlarm, hwIOSwitchThreeAlarmResume, 
 				hwEntityDyingGaspEvent, hwSystemConfigError, hwSystemConfigResume, hwPortDown, 
-				hwPortUp, hwPortNoSupportOETrap, hwPortRemove, hwPortInsert,hwPortOpticalPositionInvalid,hwPortOpticalPositionValid, hwUserDefAlarm, hwUserDefResume, hwCPUUtilizationRising, hwCPUUtilizationResume,      
+				hwPortUp, hwPortNoSupportOETrap, hwPortRemove, hwPortInsert,hwPortOpticalPositionInvalid,hwPortOpticalPositionValid, hwUserDefAlarm, hwUserDefResume, hwCPUUtilizationRising, hwCPUUtilizationResume, hwCpuFail, hwCpuFailResume,     
 				hwUSBUnidentifiedResume, hwUSBUnidentified,
 				hwMemUtilizationRising, hwMemUtilizationResume, hwStorageDevRemove, hwStorageDevInsert, hwSystemRollback, hwVirtualAccessDrvConfigError,
 				hwUpMicroSwitchOpen, hwUpMicroSwitchClose, hwDownMicroSwitchOpen, hwDownMicroSwitchClose, hwBoardPowerOff, hwOpticalPowerAlarm, 
@@ -3440,7 +5047,19 @@ DESCRIPTION
 				hwBoardResetByCmd, hwBoardResetByCmdResume, hwCardResetByCmd, hwDiskUtilizationResume, hwDiskUtilizationRising, hwCardResetByCmdResume, hwBoardHeartbeatTimeout, 
 				hwBoardHeartbeatResume, hwBandwidthOfAllCardsExceedsThresholdAlarm,hwBandwidthOfAllCardsExceedsThresholdResume,
 				hwBandwidthOfAllCardsExceedsThresholdFatalAlarm, hwBandwidthOfAllCardsExceedsThresholdFatalResume,hwPinchCardReset,hwPinchCardResetResume,hwVMResInconsist,hwVMResInconsistResume, hwNeedModifyCfgTrap, hwCardBandwidthModeChange, hwCardSplitChange,
-				hwBoardWarning, hwBoardWarningResume, hwBoardPortsConflict, hwDataplaneCpuOverloadAlarm, hwDataplaneCpuOverloadResume, hwInsSpaceLackAlarm, hwInsSpaceLackResume, hwVfpSysCheckErr, hwVfpSysCheckErrResume,hwBoardlowmemoryoverload,hwBoardlowmemoryoverloadResume}
+				hwBoardWarning, hwBoardWarningResume, hwBoardPortsConflict, hwDataplaneCpuOverloadAlarm, hwDataplaneCpuOverloadResume, hwInsSpaceLackAlarm, hwInsSpaceLackResume, hwVfpSysCheckErr, hwVfpSysCheckErrResume,hwBoardlowmemoryoverload,hwBoardlowmemoryoverloadResume, 
+                                hwCapCPUUtilizationResume, hwCapCPUUtilizationRising, hwCardInconsistent, hwBoardAdd, hwBoardDelete, hwRTULicenseActSuccess, hwSMSReboot, hwPduNotPresent, hwPduPresent, hwPduCommLost, hwPduCommLostResume, hwPduDmuHardwareFault, hwPduDmuHardwareFaultResume, hwPduDMUAutoUpgradeFail, hwPduDMUAutoUpgradeFailResume, hwPduDacsHardwareFault, hwPduDacsHardwareFaultResume, 
+				hwPduDacsTempAlarm, hwPduDacsTempAlarmResume, hwPduDacsI2CChannelFault, hwPduDacsI2CChannelFaultResume, hwReportSyslogInfo,
+				hwEntityNpsPatchInstallFail, hwEntityNpsPatchInstallFailResume, hwEntityNpsPatchPacketError, 
+				hwEntityNpsPatchPacketErrorResume, hwEntityNpsSysConfigError, hwEntityNpsSysConfigErrorResume, hwEntityNpsSslCertInvalidEarlyWarning, hwEntityNpsSslCertInvalidEarlyResume, 
+				hwEntityNpsSslCertInvalid, hwEntityNpsSslCertInvalidResume, hwEntityNpsDiskPartitionUsageExceedingThreshold, hwEntityNpsDiskPartitionUsageExceedingThresholdResume, hwEntityNpsDiskPartitionUnavailable, 
+				hwEntityNpsDiskPartitionUnavailableResume, hwEntityNpsDiskPartitionSpaceInsufficient, hwEntityNpsDiskPartitionSpaceInsufficientResume, hwEntityNpsExecutableFilesIncomplete, hwEntityNpsExecutableFilesIncompleteResume, 
+				hwEntityNpsSoftwareIntegrityError, hwEntityNpsSoftwareIntegrityErrorResume, hwEntityNpsOMUSyncFail, hwEntityNpsOMUSyncFailResume, hwEntityNpsVMDiskUnavailable, 
+				hwEntityNpsVMDiskUnavailableResume, hwEntityNpsDatabaseRestoreFail, hwEntityNpsSSLCertExpired, hwEntityNpsSSLCertExpiredEarlyWarning, hwEntityNpsVMResInconsist, 
+				hwEntityNpsVMResInconsistResume, hwEntityNpsVmFault, hwEntityNpsVmFaultResume, hwEntityNpsVNFMConnectFault, hwEntityNpsVNFMConnectResume, 
+				hwEntityNpsFabricOamPlaneDown, hwEntityNpsFabricOamPlaneDownResume, hwEntityNpsFabricLinkSubhealthy, hwEntityNpsFabricLinkSubhealthyResume, hwEntityNpsDriverTypeMismatch, 
+				hwEntityNpsDriverTypeMismatchResume, hwEntityNpsRuCreateFail, hwEntityNpsRuCreateFailResume, hwEntityNpsIpSecRuleFail, hwBoardUpCoverResume, hwBoardUpCoverAlarm, hwEntityNpsIpSecRuleFailResume, hwAllLpuSfuFail, hwAllLpuSfuFailResume,hwEntityNpsBaseLinkSubhealthy,hwEntityNpsBaseLinkSubhealthyResume,
+				hwVirtualLicenseExpire, hwVirtualLicenseNearDeadline, hwNPDomainDropCauseCntNumabruptlyAlarm, hwNPDomainDropCauseCntNumabruptlyResume,hwNPResourceExcAlarm,hwNPResourceExcResume,hwEntityFileSystemRebuild,hwEntityFileSystemAbnormal,hwEntityCODECHardewareFaultAlarm,hwEntityTPMHardewareFaultAlarm,hwEntityMCUHardewareFaultAlarm}
 			STATUS current
 			DESCRIPTION 
 				"Group for all base traps."
@@ -3453,3 +5072,10 @@ DESCRIPTION
 --
 -- HUAWEI-ENTITY-TRAP-MIB.my
 --
+
+
+
+
+
+
+

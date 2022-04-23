@@ -6,10 +6,10 @@ over:
     - { graph: device_bits, text: 'Device Traffic' }
     - { graph: device_processor, text: 'CPU Usage' }
     - { graph: device_mempool, text: 'Memory Usage' }
-mib_dir:
-    - accedian
+mib_dir: accedian
 discovery:
-    - sysDescr:
-        - AMN-
-        - AEN-
-        - AMO-
+    -
+        sysDescr:
+            - AMN-
+            - AEN-
+            - AMO-

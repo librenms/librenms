@@ -1,5 +1,12 @@
 mib: SP2-MIB
 modules:
+    os:
+        hardware: SP2-MIB::powerSystemModel.0
+        version:
+            - SP2-MIB::controlUnitSwVersion.1
+            - SP2-MIB::controlUnitSwVersion.2
+        serial: SP2-MIB::powerSystemSerialNumber.0
+        location: SP2-MIB::powerSystemSite.0
     sensors:
         state:
             data:
@@ -276,7 +283,7 @@ modules:
                     low_limit: mainsVoltageMajorLowLevel
                     low_warn_limit: mainsVoltageMinorLowLevel
                     warn_limit: mainsVoltageMinorHighLevel
-                    high_limit: mainsVoltageMajorHighLevel 
+                    high_limit: mainsVoltageMajorHighLevel
                 -
                     oid: rectifierTable
                     value: rectifierInputVoltageValue
@@ -286,7 +293,7 @@ modules:
                     low_limit: 80
                     low_warn_limit: 100
                     warn_limit: 260
-                    high_limit: 280 
+                    high_limit: 280
                 -
                     oid: batteryVoltage
                     value: batteryVoltageValue
@@ -297,7 +304,7 @@ modules:
                     low_limit: batteryVoltageMajorLowLevel
                     low_warn_limit: batteryVoltageMinorLowLevel
                     warn_limit: batteryVoltageMinorHighLevel
-                    high_limit: batteryVoltageMajorHighLevel 
+                    high_limit: batteryVoltageMajorHighLevel
         current:
             data:
                 -
@@ -363,10 +370,10 @@ modules:
                     warn_limit: batteryTemperatureMinorHighLevel
                     high_limit: batteryTemperatureMajorHighLevel
                     skip_values:
-                    -
-                      oid: batteryTemperatureStatus
-                      op: '='
-                      value: 4
+                        -
+                            oid: batteryTemperatureStatus
+                            op: '='
+                            value: 4
         runtime:
             data:
                 -

@@ -5,7 +5,6 @@ use Illuminate\Database\Schema\Blueprint;
 
 class CreateUsersTable extends Migration
 {
-
     /**
      * Run the migrations.
      *
@@ -25,9 +24,9 @@ class CreateUsersTable extends Migration
             $table->tinyInteger('level')->default(0);
             $table->boolean('can_modify_passwd')->default(1);
             $table->timestamp('created_at')->default('1970-01-02 00:00:01');
-            $table->timestamp('updated_at')->default(DB::raw('CURRENT_TIMESTAMP'));
+            $table->timestamp('updated_at')->useCurrent();
             $table->string('remember_token', 100)->nullable();
-            $table->unique(['auth_type', 'username'], 'username');
+            $table->unique(['auth_type', 'username']);
         });
     }
 

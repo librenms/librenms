@@ -1,0 +1,621 @@
+-- ****************************************************************************
+-- aviatModem.mib: Aviat Networks Modem Configuration MIB
+--
+-- Copyright © 2014-2015,2017 Aviat U.S, Inc. All rights reserved.
+-- Certain information and content may be provided by third parties to AVIAT,
+-- and in each case, such copyrighted work remains the property of that third
+-- party creator/licensor.
+-- All rights not expressly granted herein are reserved. Except as otherwise
+-- required by applicable law, any reproduction, distribution, modification,
+-- retransmission, or publication of any copyrighted material is strictly
+-- prohibited without the express written consent of the copyright owner.
+-- "AVIAT", "AVIAT NETWORKS" and the AVIAT logo are trademarks of Aviat
+-- Networks, Inc. All other trademarks or brand names may be trademarks or
+-- registered trademarks of AVIAT's affiliated companies in the United States
+-- and/or other countries.
+--
+-- ****************************************************************************
+
+AVIAT-MODEM-MIB DEFINITIONS ::= BEGIN
+    IMPORTS
+        MODULE-IDENTITY, OBJECT-TYPE, Gauge32, Integer32, Counter32
+            FROM SNMPv2-SMI
+        TEXTUAL-CONVENTION, TruthValue
+            FROM SNMPv2-TC
+        OBJECT-GROUP, MODULE-COMPLIANCE
+            FROM SNMPv2-CONF
+        entPhysicalIndex
+            FROM ENTITY-MIB
+        AviatModulationType
+            FROM AVIAT-TEXTCONVENTION-MIB
+        aviatModules
+            FROM STXN-GLOBALREGISTER-MIB;
+
+    aviatModemModule MODULE-IDENTITY
+        LAST-UPDATED    "201703280119Z"
+        ORGANIZATION    "Aviat Networks"
+        CONTACT-INFO    "Aviat Networks
+                         Customer Service
+
+                         Postal: 5200 Great America Parkway
+                                 Santa Clara
+                                 California 95054
+                                 United States of America
+
+                         Tel: 408 567 7000
+
+                         E-mail: mibsupport@aviatnet.com"
+        DESCRIPTION
+                "This MIB module defines the Modem configuration objects for
+                 Aviat Networks radios."
+        REVISION        "201809201130Z"
+        DESCRIPTION
+                "Added aviatModemStatusOper"
+        REVISION        "201703280119Z"
+        DESCRIPTION
+                "Added aviatModemModulationStatsTable, aviatModemCurCapacityTx/Rx
+                 and aviatModemCurModulationTx/Rx.
+                 Fixed descriptions of module and previous revision."
+        REVISION        "201504281530Z"
+        DESCRIPTION
+                "Add MLHC support"
+        REVISION        "201409191505Z"
+        DESCRIPTION
+                "L1LA-Lite support added."
+        REVISION        "201402032220Z"
+        DESCRIPTION
+                "Added aviatModemStatusMaxCapacity to show the maximum possible
+                 capacity of the radio link."
+        REVISION        "201401210157Z"
+        DESCRIPTION
+                "Initial Version."
+            ::= { aviatModules 3 }
+
+
+-- ****************************************************************************
+-- Conformance area, containing groups and compliance specifications
+-- ****************************************************************************
+    aviatModemConformance       OBJECT IDENTIFIER ::= { aviatModemModule 1 }
+
+    aviatModemGroups            OBJECT IDENTIFIER ::= { aviatModemConformance 1 }
+
+    aviatModemCompliance        OBJECT IDENTIFIER ::= { aviatModemConformance 2 }
+
+
+-- ****************************************************************************
+-- Sub-tree for Modem MIB objects
+-- ****************************************************************************
+    aviatModemMIBObjects        OBJECT IDENTIFIER ::= { aviatModemModule 2 }
+
+
+-- ****************************************************************************
+-- Textual Conventions
+-- ****************************************************************************
+    AviatModemCapacityType ::=  TEXTUAL-CONVENTION
+        DISPLAY-HINT    "d"
+        STATUS          current
+        DESCRIPTION
+            "Represents the capacity of a modem in one direction.
+             This value is reported in kilobits per second, rounded to the
+             nearest multiple of 1 kbps. Therefore, if the value of this object
+             is equal to `n' then the capacity is somewhere in the range of
+             `n*1000 - 500` to `n*1000 + 499` bits per second.
+             If the capacity is greater than 4,294,967,295,499 bits per second
+             then the value of this object shall be 4,294,967,295."
+        SYNTAX          Gauge32
+
+
+-- ****************************************************************************
+-- Modem Table
+-- ****************************************************************************
+    aviatModemTable             OBJECT-TYPE
+        SYNTAX          SEQUENCE OF AviatModemEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     "A table containing the modem configuration objects for
+                         a particular entity of the system."
+            ::= { aviatModemMIBObjects 1 }
+
+    aviatModemEntry             OBJECT-TYPE
+        SYNTAX          AviatModemEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     "This is a row in the modem table."
+        INDEX           { entPhysicalIndex }
+            ::= { aviatModemTable 1 }
+
+    AviatModemEntry ::=
+        SEQUENCE {
+            aviatModemBandwidth
+                Gauge32,
+            aviatModemModulationType
+                INTEGER,
+            aviatModemModulationBase
+                AviatModulationType,
+            aviatModemModulationMax
+                AviatModulationType,
+            aviatModemLicensedModulationMask
+                AviatModulationType,
+            aviatModemRegulatoryStandard
+                INTEGER,
+            aviatModemProfileVersion
+                Integer32,
+            aviatModemCapacity
+                Integer32,
+            aviatModemL1laLiteEnabled
+                INTEGER,
+            aviatModemMLHCEnabled
+                INTEGER,
+            aviatModemCurCapacityTx
+                AviatModemCapacityType,
+            aviatModemCurCapacityRx
+                AviatModemCapacityType,
+            aviatModemCurModulationTx
+                AviatModulationType,
+            aviatModemCurModulationRx
+                AviatModulationType
+        }
+
+    aviatModemBandwidth         OBJECT-TYPE
+        SYNTAX          Gauge32
+        UNITS           "kHz"
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION     "The modem channel bandwidth currently in use, in
+                         kilohertz."
+            ::= { aviatModemEntry 1 }
+
+    aviatModemModulationType    OBJECT-TYPE
+        SYNTAX          INTEGER {
+                                    fixed (0),
+                                    acm256 (1),
+                                    acm1024 (2)
+                                }
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION     "This allocates an ACM license for this radio link
+                         allowing modulation up to and including this
+                         modulation."
+        DEFVAL          { 0 }
+            ::= { aviatModemEntry 2 }
+
+    aviatModemModulationBase    OBJECT-TYPE
+        SYNTAX          AviatModulationType
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION     "This specifies the base modulation to use for modem.
+                         Together with aviatModemModulationMax this is used to
+                         define the range of modulations that can be active for
+                         ACM. The modem will configure the ACM operation to
+                         include the minimum and maximum modulations and an
+                         appropriate set of intermediate modulations between
+                         the minimum and maximum.
+
+                         Some combinations of min and max modulations may not
+                         be supported in which case an INCONSISTENT_VALUE error
+                         will be reported."
+            ::= { aviatModemEntry 3 }
+
+    aviatModemModulationMax     OBJECT-TYPE
+        SYNTAX          AviatModulationType
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION     "This specifies the maximum modulation to use for ACM.
+                         See the aviatModemModulationBase description for
+                         details.
+
+                         Setting Max without setting Acm mode to the
+                         appropriate ACM mode will cause this command to fail
+                         (i.e. 1024qam requires acm1024)."
+            ::= { aviatModemEntry 4 }
+
+    aviatModemLicensedModulationMask    OBJECT-TYPE
+        SYNTAX          AviatModulationType
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION     "When configured for adaptive modulation, this
+                         specifies the licensed RF mask. Tx power output will
+                         be controlled to maintain compliance with the
+                         operator's licensed RF mask according to the active
+                         modulation."
+            ::= { aviatModemEntry 5 }
+
+    aviatModemRegulatoryStandard    OBJECT-TYPE
+        SYNTAX          INTEGER {
+                                    none (1),
+                                    ansi (2),
+                                    etsi (3)
+                                }
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION     "This specifies the regulatory standard to use."
+            ::= { aviatModemEntry 6 }
+
+    aviatModemProfileVersion    OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION     "This sets the profile version to use. If a new profile
+                         comes out with the same characteristics to a previous
+                         one but not over air compatible, the new one will have
+                         a different version."
+        DEFVAL          { 1 }
+            ::= { aviatModemEntry 7 }
+
+    aviatModemCapacity          OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION     "This specifies the capacity to license for this
+                         interface. Set to 0 to unlicense."
+        DEFVAL          { 0 }
+            ::= { aviatModemEntry 8 }
+
+    aviatModemL1laLiteEnabled   OBJECT-TYPE
+        SYNTAX          INTEGER {
+                                    disabled (0),
+                                    enabled (1)
+                                }
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION     "Enabled L1laLite for this interface and it's partner"
+        DEFVAL          { 0 }
+            ::= { aviatModemEntry 9 }
+
+	aviatModemMLHCEnabled   OBJECT-TYPE
+        SYNTAX          INTEGER {
+                                    disabled (0), -- Disable header compression
+                                    enabled(1)   -- Enable MLHC
+                                }
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION     "Enable multilayer header compression for this radio interface."
+        DEFVAL          { 0 }
+            ::= { aviatModemEntry 10 }
+
+    aviatModemCurCapacityTx     OBJECT-TYPE
+        SYNTAX          AviatModemCapacityType
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "Current capacity in the transmit direction."
+            ::= { aviatModemEntry 11 }
+
+    aviatModemCurCapacityRx     OBJECT-TYPE
+        SYNTAX          AviatModemCapacityType
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "Current capacity in the receive direction."
+            ::= { aviatModemEntry 12 }
+
+    aviatModemCurModulationTx   OBJECT-TYPE
+        SYNTAX          AviatModulationType
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "Current modulation used to transmit."
+            ::= { aviatModemEntry 13 }
+
+    aviatModemCurModulationRx   OBJECT-TYPE
+        SYNTAX          AviatModulationType
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "Current modulation used to receive."
+            ::= { aviatModemEntry 14 }
+
+-- ****************************************************************************
+-- Modem Modulation Table
+-- ****************************************************************************
+    aviatModemModulationTable   OBJECT-TYPE
+        SYNTAX          SEQUENCE OF AviatModemModulationEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     "This is a table containing the list of modem
+                         modulations configured for use with adaptive
+                         modulation. This list is based on the settings of
+                         aviatModemModulationBase and aviatModemModulationMax,
+                         and a set of automatically selected intermediate
+                         modulations.
+
+                         If configured for static modulation, this list will
+                         contain only one entry, the configured static
+                         modulation."
+            ::= { aviatModemMIBObjects 2 }
+
+    aviatModemModulationEntry   OBJECT-TYPE
+        SYNTAX          AviatModemModulationEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     "A single modulation entry for an entity."
+        INDEX           { entPhysicalIndex, aviatModemModulationIndex }
+            ::= { aviatModemModulationTable 1 }
+
+    AviatModemModulationEntry ::=
+        SEQUENCE {
+            aviatModemModulationIndex
+                Gauge32,
+            aviatModemModulation
+                AviatModulationType
+        }
+
+    aviatModemModulationIndex   OBJECT-TYPE
+        SYNTAX          Gauge32
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     "An index representing a particular modulation entry
+                         for an entity."
+            ::= { aviatModemModulationEntry 1 }
+
+    aviatModemModulation        OBJECT-TYPE
+        SYNTAX          AviatModulationType
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "A configured modem modulation of the system."
+            ::= { aviatModemModulationEntry 2 }
+
+
+-- ****************************************************************************
+-- Modem Xpic Table
+-- ****************************************************************************
+    aviatModemXpicTable         OBJECT-TYPE
+        SYNTAX          SEQUENCE OF AviatModemXpicEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     "A table containing configuration objects for the cross
+                         polarisation interference cancellation (XPIC)
+                         functionality for a particular entity of the system."
+            ::= { aviatModemMIBObjects 3 }
+
+    aviatModemXpicEntry         OBJECT-TYPE
+        SYNTAX          AviatModemXpicEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     "This is a row in the modem XPIC table."
+        INDEX           { entPhysicalIndex }
+            ::= { aviatModemXpicTable 1 }
+
+    AviatModemXpicEntry ::=
+        SEQUENCE {
+            aviatModemXpicEnable
+                TruthValue
+        }
+
+    aviatModemXpicEnable        OBJECT-TYPE
+        SYNTAX          TruthValue
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION     "This specifies whether the cross polarisation
+                         interference cancellation (XPIC) function is enabled."
+        DEFVAL          { false }
+            ::= { aviatModemXpicEntry 1 }
+
+
+-- ****************************************************************************
+-- Modem Status Table
+-- ****************************************************************************
+    aviatModemStatusTable       OBJECT-TYPE
+        SYNTAX          SEQUENCE OF AviatModemStatusEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     "A table containing read only information about the
+                         modem."
+            ::= { aviatModemMIBObjects 4 }
+
+    aviatModemStatusEntry       OBJECT-TYPE
+        SYNTAX          AviatModemStatusEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     "This is a row in the modem status table."
+        INDEX           { entPhysicalIndex }
+            ::= { aviatModemStatusTable 1 }
+
+    AviatModemStatusEntry ::=
+        SEQUENCE {
+            aviatModemStatusMaxCapacity
+                Integer32,
+            aviatModemStatusOper
+                INTEGER
+        }
+
+    aviatModemStatusMaxCapacity OBJECT-TYPE
+        SYNTAX          Integer32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "This is the maximum radio link capacity."
+        DEFVAL          { 0 }
+            ::= { aviatModemStatusEntry 1 }
+
+    aviatModemStatusOper OBJECT-TYPE
+        SYNTAX  INTEGER {
+                up(1),        -- ready to pass packets
+                down(2),
+                testing(3),   -- in some test mode
+                unknown(4),   -- status can not be determined
+                              -- for some reason.
+                dormant(5),
+                notPresent(6),    -- some component is missing
+                lowerLayerDown(7) -- down due to state of
+                                  -- lower-layer interface(s)
+            }
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "Operational status of radio link.
+                        Based off ifOperStatus"
+            ::= { aviatModemStatusEntry 2 }
+
+-- ****************************************************************************
+-- Modulation Time Table
+-- ****************************************************************************
+    aviatModemModulationStatsTable      OBJECT-TYPE
+        SYNTAX          SEQUENCE OF AviatModemModulationStatsEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     "This is a table containing information about the
+                         amount of time the radio spends at each modulation
+                         level. Counters are cumulative. No means to reset
+                         counters is provided within this MIB module.
+
+                         If the radio has never used a particular modulation
+                         since statistics were reset, then a row for that
+                         modulation may or may not be present in this table."
+
+            ::= { aviatModemMIBObjects 5 }
+
+    aviatModemModulationStatsEntry      OBJECT-TYPE
+        SYNTAX          AviatModemModulationStatsEntry
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     "This is an entry in the table containing modulation
+                         time counters for a particular entity at a particular
+                         modulation level."
+        INDEX           { entPhysicalIndex, aviatModemModStatsModulation }
+            ::= { aviatModemModulationStatsTable 1 }
+
+    AviatModemModulationStatsEntry ::=
+        SEQUENCE {
+            aviatModemModStatsModulation
+                AviatModulationType,
+            aviatModemModStatsTxSecs
+                Counter32,
+            aviatModemModStatsTxPct
+                Gauge32,
+            aviatModemModStatsRxSecs
+                Counter32,
+            aviatModemModStatsRxPct
+                Gauge32
+        }
+
+    aviatModemModStatsModulation      OBJECT-TYPE
+        SYNTAX          AviatModulationType
+        MAX-ACCESS      not-accessible
+        STATUS          current
+        DESCRIPTION     "This is the modulation type to which the data in this
+                         is row refers."
+            ::= { aviatModemModulationStatsEntry 1 }
+
+    aviatModemModStatsTxSecs     OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "This is the number of seconds in which the radio was
+                         using the specified modulation to transmit."
+            ::= { aviatModemModulationStatsEntry 2 }
+
+    aviatModemModStatsTxPct    OBJECT-TYPE
+        SYNTAX          Gauge32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "This is the fraction of the total time in which the
+                         radio was receiving, where the radio was receiving in
+                         the specified modulation, multiplied by 1000000
+                         (10^7) and rounded in an unspecified manner."
+            ::= { aviatModemModulationStatsEntry 4 }
+
+    aviatModemModStatsRxSecs OBJECT-TYPE
+        SYNTAX          Counter32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "This is the number of seconds in which the radio was
+                         using the specified modulation to receive."
+            ::= { aviatModemModulationStatsEntry 5 }
+
+    aviatModemModStatsRxPct  OBJECT-TYPE
+        SYNTAX          Gauge32
+        MAX-ACCESS      read-only
+        STATUS          current
+        DESCRIPTION     "This is the fraction of the total time in which the
+                         radio was transmitting, where the radio was
+                         transmitting at the specified modulation, multiplied
+                         by 1000000 (10^7) and rounded in an unspecified
+                         manner."
+            ::= { aviatModemModulationStatsEntry 6 }
+
+-- ****************************************************************************
+-- The Object and Event Groups
+-- ****************************************************************************
+    aviatModemObjectGroup       OBJECT-GROUP
+        OBJECTS {
+            aviatModemBandwidth,
+            aviatModemModulationType,
+            aviatModemModulationBase,
+            aviatModemModulationMax,
+            aviatModemLicensedModulationMask,
+            aviatModemRegulatoryStandard,
+            aviatModemProfileVersion,
+            aviatModemCapacity,
+            aviatModemL1laLiteEnabled,
+            aviatModemModulation,
+            aviatModemStatusMaxCapacity,
+            aviatModemMLHCEnabled
+        }
+        STATUS          current
+        DESCRIPTION     "These are objects in the Aviat Modem management MIB."
+            ::= { aviatModemGroups 1 }
+
+    aviatModemXpicGroup          OBJECT-GROUP
+        OBJECTS {
+            aviatModemXpicEnable
+        }
+        STATUS          current
+        DESCRIPTION     "These are objects for configuring the cross polar
+                         interference cancellation (XPIC) functionality."
+            ::= { aviatModemGroups 2 }
+
+    aviatModemModulationStatsGroup   OBJECT-GROUP
+        OBJECTS {
+            aviatModemModStatsTxSecs,
+            aviatModemModStatsTxPct,
+            aviatModemModStatsRxSecs,
+            aviatModemModStatsRxPct
+        }
+        STATUS          current
+        DESCRIPTION     "These are the objects in the modulation stats table
+                         introduced for WTM4000. They are not supported on
+                         all modems."
+            ::= { aviatModemGroups 3 }
+
+    aviatModemModulationCurrentGroup OBJECT-GROUP
+        OBJECTS {
+            aviatModemCurCapacityTx,
+            aviatModemCurCapacityRx,
+            aviatModemCurModulationTx,
+            aviatModemCurModulationRx
+        }
+        STATUS          current
+        DESCRIPTION     "These are the new 'current modulation' objects
+                         introduced for WTM4000. They are not supported on
+                         all modems."
+            ::= { aviatModemGroups 4 }
+
+    aviatModemStatusGroup OBJECT-GROUP
+        OBJECTS {
+            aviatModemStatusOper
+        }
+        STATUS          current
+        DESCRIPTION     "These are the new 'status' objects
+                         introduced for WTM4000. They are not supported on
+                         all modems."
+            ::= { aviatModemGroups 5 }
+
+
+-- ****************************************************************************
+-- The Compliance Specifications
+-- ****************************************************************************
+    aviatModemComplV1           MODULE-COMPLIANCE
+        STATUS          current
+        DESCRIPTION     "The implementation requirements for this MIB."
+        MODULE          -- This module
+            MANDATORY-GROUPS    {
+                                    aviatModemObjectGroup
+                                }
+            GROUP               aviatModemXpicGroup
+                DESCRIPTION     "This group is mandatory for all modems that
+                                 support cross polar interference cancellation
+                                 (XPIC)."
+            GROUP               aviatModemModulationStatsGroup
+                DESCRIPTION     "This group is not supported on all modems."
+            GROUP               aviatModemModulationCurrentGroup
+                DESCRIPTION     "This group is not supported on all modems."
+            GROUP               aviatModemStatusGroup
+                DESCRIPTION     "This group is not supported on all modems."
+            ::= { aviatModemCompliance 1 }
+
+END

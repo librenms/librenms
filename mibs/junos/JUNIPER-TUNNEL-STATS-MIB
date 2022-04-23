@@ -1,0 +1,103 @@
+
+-- *******************************************************************
+-- Juniper Tunnel Statistics MIB.
+--
+-- Copyright (c) 2017, Juniper Networks, Inc.
+-- All rights reserved.
+--
+-- The contents of this document are subject to change without notice.
+-- *******************************************************************
+
+JUNIPER-TUNNEL-STATS-MIB DEFINITIONS ::= BEGIN
+
+IMPORTS
+    Integer32, OBJECT-TYPE, 
+    MODULE-IDENTITY
+        FROM SNMPv2-SMI
+    jnxTunnelStatsMibRoot
+        FROM JUNIPER-SMI;
+ 
+jnxTunnelStatsMIB MODULE-IDENTITY
+    LAST-UPDATED "201702211502Z" -- Tue Feb 21 15:02:46 2017 UTC
+    ORGANIZATION "Juniper Networks, Inc."
+    CONTACT-INFO
+            "        Juniper Technical Assistance Center
+                     Juniper Networks, Inc.
+                     1133 Innovation Way
+                     Sunnyvale, CA 94089
+                     E-mail: support@juniper.net"
+
+    DESCRIPTION
+            "This is Juniper Networks' implementation of enterprise
+	     specific MIB for tunnel statistics."
+    ::= { jnxTunnelStatsMibRoot 1 }
+
+jnxTunnelStatsObjects     OBJECT IDENTIFIER ::= { jnxTunnelStatsMIB 1 }
+
+--Tunnels statistics Table
+jnxTunnelStatsTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF TunnelStatisticsEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+        "Table for tunnel Statistics stored against each tunnel type."
+    ::= { jnxTunnelStatsObjects 1 }
+
+    jnxTunnelStatsEntry OBJECT-TYPE
+        SYNTAX      TunnelStatisticsEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "IPv4 over IPv6 tunnel details : 
+            jnxTunnelCount : Count of tunnels created in Routing Protocol Daemon.
+            jnxTunnelCountInKernel : Count of tunnels created in Routing Protocol Daemon and successfully sent to kernel.
+            jnxTunnelCountInPfe : Count of tunnels in PFE, which are UP."
+        INDEX { jnxTunnelType }
+        ::= { jnxTunnelStatsTable 1 }
+ 
+    TunnelStatisticsEntry ::= SEQUENCE {
+        jnxTunnelType               INTEGER,
+        jnxTunnelCount              Integer32,
+        jnxTunnelCountInKernel      Integer32,
+        jnxTunnelCountInPfe         Integer32
+    }
+ 
+    jnxTunnelType OBJECT-TYPE
+       SYNTAX     INTEGER {
+                    v4ov6(1)    -- IPV4 over IPV6 tunnels
+                  }
+       MAX-ACCESS not-accessible
+       STATUS     current
+       DESCRIPTION
+               "The encapsulation method used by the tunnel."
+       ::= { jnxTunnelStatsEntry 1 }
+
+    jnxTunnelCount OBJECT-TYPE
+       SYNTAX     Integer32
+       MAX-ACCESS read-only
+       STATUS     current
+       DESCRIPTION
+            "Total count of tunnels created in Routing Protocol Daemon."
+       ::= { jnxTunnelStatsEntry 2 }
+
+    jnxTunnelCountInKernel OBJECT-TYPE
+       SYNTAX     Integer32
+       MAX-ACCESS read-only
+       STATUS     current
+       DESCRIPTION
+            "Total count of tunnels which are successfully sent to kernel."
+       ::= { jnxTunnelStatsEntry 3 }
+
+    jnxTunnelCountInPfe OBJECT-TYPE
+       SYNTAX     Integer32
+       MAX-ACCESS read-only
+       STATUS     current
+       DESCRIPTION
+            "Total count of tunnels which are in Packet Forwarding Engine i.e. tunnel status is UP."
+       ::= { jnxTunnelStatsEntry 4 }
+
+-- ***************************************************************
+--  END of File
+-- ***************************************************************
+
+END

@@ -32,4 +32,25 @@ return [
 
     'group' => env('LIBRENMS_GROUP', env('LIBRENMS_USER', 'librenms')),
 
+    /*
+    |--------------------------------------------------------------------------
+    | Install
+    |--------------------------------------------------------------------------
+    |
+    | This value sets if the install process needs to be run.
+    | You may also specify which install steps to present with a comma separated list.
+    */
+
+    'install' => env('INSTALL', false),
+
+    /*
+    |--------------------------------------------------------------------------
+    | NODE ID
+    |--------------------------------------------------------------------------
+    |
+    | Unique value to identify this node. Primarily used for distributed polling.
+    */
+
+    'node_id' => env('NODE_ID'),
+
 ];

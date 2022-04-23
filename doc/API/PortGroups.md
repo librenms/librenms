@@ -1,6 +1,3 @@
-source: API/PortGroups.md
-path: blob/master/doc/
-
 ### `get_graph_by_portgroup`
 
 Get the graph based on the group type.
@@ -33,7 +30,7 @@ Output is an image.
 
 Get the graph based on the multiple port id separated by commas `,`.
 
-Route: `/api/v0/devices/portgroups/multiport/bits/:id`
+Route: `/api/v0/portgroups/multiport/bits/:id`
 
 - id is a comma separated list of port ids you want, I.e 1,2,3,4,
   etc. You can specify multiple IDs comma separated.

@@ -1,0 +1,10 @@
+os: fs-nmu
+text: 'Network Management Unit'
+type: network
+icon: fs
+group: fs
+mib_dir: fs
+discovery:
+    -
+        sysObjectID:
+            - .1.3.6.1.2.1.1.2

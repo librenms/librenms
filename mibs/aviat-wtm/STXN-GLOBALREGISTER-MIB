@@ -1,0 +1,315 @@
+-- ****************************************************************************
+-- STXN-GLOBALREGISTER.mib: Aviat Networks MIB Registration MIB
+--
+-- Copyright © 2014 Aviat U.S, Inc. All rights reserved.
+-- Certain information and content may be provided by third parties to AVIAT,
+-- and in each case, such copyrighted work remains the property of that third
+-- party creator/licensor.
+-- All rights not expressly granted herein are reserved. Except as otherwise
+-- required by applicable law, any reproduction, distribution, modification,
+-- retransmission, or publication of any copyrighted material is strictly
+-- prohibited without the express written consent of the copyright owner.
+-- "AVIAT", "AVIAT NETWORKS" and the AVIAT logo are trademarks of Aviat
+-- Networks, Inc. All other trademarks or brand names may be trademarks or
+-- registered trademarks of AVIAT's affiliated companies in the United States
+-- and/or other countries.
+--
+-- ****************************************************************************
+
+STXN-GLOBALREGISTER-MIB DEFINITIONS ::= BEGIN
+    IMPORTS
+        MODULE-IDENTITY, OBJECT-IDENTITY, enterprises
+            FROM SNMPv2-SMI;
+
+    stxnGlobalRegModule MODULE-IDENTITY
+        LAST-UPDATED    "201401210358Z"
+        ORGANIZATION    "Aviat Networks"
+        CONTACT-INFO    "Aviat Networks
+                         Customer Service
+
+                         Postal: 5200 Great America Parkway
+                                 Santa Clara
+                                 California 95054
+                                 United States of America
+
+                         Tel: 408 567 7000
+
+                         E-mail: mibsupport@aviatnet.com"
+        DESCRIPTION
+                "This module defines the OID infrastructure under the DMC
+                 Enterprise MIB Branch."
+        REVISION        "201401210358Z"
+        DESCRIPTION
+                "Added sub-module branches for Aviat products."
+        REVISION        "201111280007Z"
+        DESCRIPTION
+                "Added the registration for stxnProductOIDs branch."
+        REVISION        "201103140119Z"
+        DESCRIPTION
+                "Added the registration for aviatModules, aviatEvents and
+                 aviatProducts branches.  Refer to MDR #320."
+        REVISION        "200907230415Z"
+        DESCRIPTION
+                "Added the registration for stxnEfficientSiteControllerUnit
+                 branch.  Refer to MDR #288."
+        REVISION        "200904162358Z"
+        DESCRIPTION
+                "Added the registration for EfficientSite products and new
+                 product event branches.  Refer to MDR #273."
+        REVISION        "200402200055Z"
+        DESCRIPTION
+                "Added the registration for ProVision products and new
+                 product event branches."
+        REVISION        "200301290331Z"
+        DESCRIPTION
+                "Added the registration for UNITY products branch."
+        REVISION        "200211282358Z"
+        DESCRIPTION
+                "Added the registration for AOU and CTU product branches."
+        REVISION        "200210081935Z"
+        DESCRIPTION
+                "Added the registration for AOU and CTU events."
+        REVISION        "200209032315Z"
+        DESCRIPTION
+                "As part of the clean up exercise for the STXN Generic
+                 MIB modules that have not been 'released', the stxnGeneric
+                 branch has been re-registered under a different number.
+                 It used to be dmc 3 and now it is dmc 8."
+        REVISION        "200111150110Z"
+        DESCRIPTION
+                "Added registration for event OIDs."
+        REVISION        "200103142041Z"
+        DESCRIPTION
+                "Updated following the Common MIB Review held in Wellington."
+        REVISION        "200102132021Z"
+        DESCRIPTION
+                "Initial version."
+            ::= { stxnModules 1 }
+
+
+-- ****************************************************************************
+-- The root of the OID infrastructure for DMC Stratex Networks
+-- ****************************************************************************
+    dmc                         OBJECT-IDENTITY
+        STATUS          current
+        DESCRIPTION     "The root of the OID sub-tree assigned to DMC Stratex
+                         Networks by the Internet Assigned Numbers Authority
+                         (IANA)."
+            ::= { enterprises 2509 }
+
+
+-- ****************************************************************************
+-- Pre-DMC Stratex Networks registrations for Digital Microwave Corporation.
+-- ****************************************************************************
+    dmcNet                      OBJECT-IDENTITY
+        STATUS          current
+        DESCRIPTION     "dmcNet branch."
+            ::= { dmc 1 }
+
+    proxyAgent                  OBJECT-IDENTITY
+        STATUS          current
+        DESCRIPTION     "proxyAgent branch."
+            ::= { dmcNet 1 }
+
+    nonsnmpRadio                OBJECT-IDENTITY
+        STATUS          current
+        DESCRIPTION     "nonsnmpRadio branch."
+            ::= { dmcNet 2 }
+
+    snmpRadio                   OBJECT-IDENTITY
+        STATUS          current
+        DESCRIPTION     "snmpRadio branch."
+            ::= { dmcNet 3 }
+
+    dmcEvents                   OBJECT-IDENTITY
+        STATUS          current
+        DESCRIPTION     "dmcEvents branch."
+            ::= { dmcNet 4 }
+
+    dmcSecurity                 OBJECT-IDENTITY
+        STATUS          current
+        DESCRIPTION     "dmcSecurity branch."
+            ::= { dmcNet 5 }
+
+    sp2Radio                    OBJECT-IDENTITY
+        STATUS          current
+        DESCRIPTION     "sp2Radio branch for the Spectrum II product."
+            ::= { snmpRadio 1 }
+
+    altium                      OBJECT-IDENTITY
+        STATUS          current
+        DESCRIPTION     "altium branch for the Altium product."
+            ::= { snmpRadio 2 }
+
+    dmcModules                  OBJECT-IDENTITY
+        STATUS          current
+        DESCRIPTION     "dmcModules branch."
+            ::= { dmc 2 }
+
+
+-- ****************************************************************************
+-- DMC Stratex Networks registrations for STXN MIB modules.
+-- ****************************************************************************
+    stxnEngineering             OBJECT-IDENTITY
+        STATUS          current
+        DESCRIPTION     "This sub-tree holds all the MIB modules developed for
+                         Engineering purposes within Harris Stratex Networks."
+            ::= { dmc 4 }
+
+    stxnProducts                OBJECT-IDENTITY
+        STATUS          current
+        DESCRIPTION     "This sub-tree holds all the MIB modules developed for
+                         specific products of Harris Stratex Networks."
+            ::= { dmc 5 }
+
+    stxnLMCDR                   OBJECT-IDENTITY
+        STATUS          current
+        DESCRIPTION     "This sub-tree holds all the MIB modules developed for
+                         the Low / Medium Capacity Data Radio of Harris Stratex
+                         Networks."
+            ::= { stxnProducts 1 }
+
+    stxnAOU                     OBJECT-IDENTITY
+        STATUS          current
+        DESCRIPTION     "This sub-tree holds all the MIB modules developed for
+                         the Eclipse All Outdoor Unit (AOU) product of Harris
+                         Stratex Networks."
+            ::= { stxnProducts 2 }
+
+    stxnCTU                     OBJECT-IDENTITY
+        STATUS          current
+        DESCRIPTION     "This sub-tree holds all the MIB modules developed for
+                         the Eclipse Intelligent Node Unit (INU) product of
+                         Harris Stratex Networks.
+
+                         Note that the INU was previously known as CTU."
+            ::= { stxnProducts 3 }
+
+    stxnUNITY                   OBJECT-IDENTITY
+        STATUS          current
+        DESCRIPTION     "This sub-tree holds all the MIB modules developed for
+                         the Eclipse products of Harris Stratex Networks.
+
+                         Note that Eclipse was previously referred to as Unity."
+            ::= { stxnProducts 4 }
+
+    stxnProVision               OBJECT-IDENTITY
+        STATUS          current
+        DESCRIPTION     "This sub-tree holds all the MIB modules developed for
+                         the ProVision product of Harris Stratex Networks."
+            ::= { stxnProducts 5 }
+
+    stxnEfficientSite           OBJECT-IDENTITY
+        STATUS          current
+        DESCRIPTION     "This sub-tree holds all the MIB modules developed for
+                         the Efficient Site products of Harris Stratex
+                         Networks."
+            ::= { stxnProducts 6 }
+
+    stxnEfficientSiteControllerUnit OBJECT-IDENTITY
+        STATUS          current
+        DESCRIPTION     "This sub-tree holds all the MIB modules developed for
+                         the Efficient Site Controller Unit - partnership
+                         product with Asentria.
+
+                         Note that the MIB definitions below this node are
+                         managed and controlled by Asentria."
+            ::= { stxnEfficientSite 1 }
+
+    stxnProductOIDs             OBJECT-IDENTITY
+        STATUS          current
+        DESCRIPTION     "This sub-tree holds the object identifiers that are
+                         assigned to Eclipse products."
+            ::= { stxnProducts 10 }
+
+    stxnModules                 OBJECT-IDENTITY
+        STATUS          current
+        DESCRIPTION     "This sub-tree holds all MIB modules that are
+                         registered for STXN under the DMC tree."
+            ::= { dmc 6 }
+
+    stxnEvents                  OBJECT-IDENTITY
+        STATUS          current
+        DESCRIPTION     "This sub-tree holds all Event Definitions registered
+                         for STXN under the DMC tree."
+            ::= { dmc 7 }
+
+    stxnGeneric                 OBJECT-IDENTITY
+        STATUS          current
+        DESCRIPTION     "This sub-tree holds all the reusable generic MIB
+                         modules for the Harris Stratex Networks product range."
+            ::= { dmc 8 }
+
+    aviatModules                OBJECT-IDENTITY
+        STATUS          current
+        DESCRIPTION     "This sub-tree holds all MIB modules that are
+                         registered for Aviat under the DMC tree."
+            ::= { dmc 9 }
+
+    aviatAfModules              OBJECT-IDENTITY
+        STATUS          current
+        DESCRIPTION     "This sub-tree holds a group of MIBs that are common to
+                         a specific functional area for Aviat products."
+            ::= { aviatModules 1000 }
+
+    aviatAaModules              OBJECT-IDENTITY
+        STATUS          current
+        DESCRIPTION     "This sub-tree holds a group of MIBs that are common to
+                         a specific functional area for Aviat products."
+            ::= { aviatModules 1001 }
+
+    aviatAlModules              OBJECT-IDENTITY
+        STATUS          current
+        DESCRIPTION     "This sub-tree holds a group of MIBs that are common to
+                         a specific functional area for Aviat products."
+            ::= { aviatModules 1002 }
+
+    aviatAmModules              OBJECT-IDENTITY
+        STATUS          current
+        DESCRIPTION     "This sub-tree holds a group of MIBs that are common to
+                         a specific functional area for Aviat products."
+            ::= { aviatModules 1003 }
+
+    aviatEvents                 OBJECT-IDENTITY
+        STATUS          current
+        DESCRIPTION     "This sub-tree holds all Event Definitions registered
+                         for Aviat under the DMC tree."
+            ::= { dmc 10 }
+
+    aviatProducts               OBJECT-IDENTITY
+        STATUS          current
+        DESCRIPTION     "This sub-tree contains objects to describe Aviat
+                         Networks products."
+            ::= { dmc 11 }
+
+
+-- ****************************************************************************
+-- Harris Stratex Networks registrations for Product EVENTS.
+-- ****************************************************************************
+    stxnOvationEvents           OBJECT-IDENTITY
+        STATUS          current
+        DESCRIPTION     "Event Definition."
+            ::= { stxnEvents 1 }
+
+    stxnUnityAOUEvents          OBJECT-IDENTITY
+        STATUS          current
+        DESCRIPTION     "Event Definition."
+            ::= { stxnEvents 2 }
+
+    stxnUnityCTUEvents          OBJECT-IDENTITY
+        STATUS          current
+        DESCRIPTION     "Event Definition."
+            ::= { stxnEvents 3 }
+
+    stxnUnityIDUEvents          OBJECT-IDENTITY
+        STATUS          current
+        DESCRIPTION     "Event Definition."
+            ::= { stxnEvents 4 }
+
+    stxnEfficientSiteEvents     OBJECT-IDENTITY
+        STATUS          current
+        DESCRIPTION     "Event Definition."
+            ::= { stxnEvents 5 }
+
+
+END

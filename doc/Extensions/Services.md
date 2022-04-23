@@ -1,42 +1,92 @@
-source: Extensions/Services.md
-path: blob/master/doc/
-[TOC]
+# Nagios Plugins - Services
 
-# Setting up services
+Services within LibreNMS provides the ability to leverage Nagios plugins to
+perform additional monitoring outside of SNMP. Services can also be used
+in conjunction with your SNMP monitoring for larger monitoring functionality.
 
-Services within LibreNMS provides the ability to use Nagios plugins to
-perform additional monitoring outside of SNMP.
 
-**These services are tied into an existing device so you need at least
-one device to be able to add it to LibreNMS - localhost is a good
-one. This is needed in order for alerting to work properly.**
+## Setting up Services
 
-## Pre installed plugins
+**Services must be tied to a device to function properly. A good generic
+option is to use `localhost`, but it is suggested to attach the check to
+the device you are monitoring.**
 
-Note: Plugins will only load if they are prefixed with "check_" and
-they have that prefix stripped out when displaying in the "Add Serice"
+### Nagios plugins source
+
+Plugins come from two main sources:
+
+* [monitoring-plugins](https://www.monitoring-plugins.org)
+* [pkg-nagios-plugins-contrib](https://github.com/bzed/pkg-nagios-plugins-contrib)
+
+Note: Plugins will only load if they are prefixed with `check_`.
+The `check_` prefix is stripped out when displaying in the "Add Service"
 GUI "Type" dropdown list.
 
-Plugins come from two main places
-[pkg-nagios-plugins-contrib](https://github.com/bzed/pkg-nagios-plugins-contrib)
-and [monitoring-plugins](https://www.monitoring-plugins.org). This is
-where you can find the documentation for most, if not all of the plugins.
+### Service Templates
 
-The plugins are bundled with the pre build VM images via the package
-`monitoring-plugins` in Ubuntu and `nagios-plugins-all` in CentOS.
+Service Templates within LibreNMS provides the same ability as Nagios
+does with Host Groups. Known as Device Groups in LibreNMS.
+They are applied devices that belong to the specified Device Group.
 
-## Setup
+Use the Apply buttons to manually create or update Services for the Service
+Template.
+Use the Remove buttons to manually remove Services for the Service Template.
 
-Service checks is now distributed aware. If you run a distributed
-setup then you can now run `services-wrapper.py` in cron instead of
-`check-services.php` across all polling nodes.
+After you Edit a Service Template, and then use Apply, all relevant changes are
+pushed to existing Services previously created.
+
+You can also enable Service Templates Auto Discovery to have Services
+added / removed / updated on regular discover intervals.
+
+When a Device is a member of multiple Device Groups, templates from
+all of those Device Groups are applied.
+
+If a Device is added or removed from a Device Group, when the Apply button
+is used or Auto Discovery runs Services will be added / removed as
+appropriate.
+
+**Service Templates are tied into Device Groups, you need at least
+one Device Group to be able to add Service Templates - You can define a
+dummy one. The Device Group does not need members to add Service Templates.**
+
+### Service Auto Discovery
+
+To automatically create services for devices with available checks.
+
+You need to enable the discover services within config.php with the following:
+
+```php
+$config['discover_services']           = true;
+```
+
+### Service Templates Auto Discovery
+
+To automatically create services for devices with configured
+Service Templates.
+
+You need to enable the discover services within config.php with the following:
+
+```php
+$config['discover_services_templates']           = true;
+```
+
+### Setup
+
+Service checks are now distributable if you run a distributed
+setup. To leverage this, use the `dispatch` service. Alternatively,
+you could also replace `check-services.php` with `services-wrapper.py` in
+cron instead to run across all polling nodes.
 
 If you need to debug the output of services-wrapper.py then you can
 add `-d` to the end of the command - it is NOT recommended to do this
 in cron.
 
-Firstly, install Nagios plugins however you would like, this could be
-via yum, apt-get or direct from source.
+Firstly, install Nagios plugins.
+
+Debian / Ubuntu: `sudo apt install monitoring-plugins`
+Centos: `yum install nagios-plugins-all`
+
+Note: The plugins are bundled with the pre-build VM and Docker images.
 
 Next, you need to enable the services within config.php with the following:
 
@@ -46,15 +96,27 @@ $config['show_services']           = 1;
 
 This will enable a new service menu within your navbar.
 
+Debian/Ubuntu:
 ```php
 $config['nagios_plugins']   = "/usr/lib/nagios/plugins";
+```
+
+Centos:
+```php
+$config['nagios_plugins']   = "/usr/lib64/nagios/plugins";
 ```
 
 This will point LibreNMS at the location of the nagios plugins -
 please ensure that any plugins you use are set to executable. For example:
 
+Debian/Ubuntu:
 ```
 chmod +x /usr/lib/nagios/plugins/*
+```
+
+Centos:
+```
+chmod +x /usr/lib64/nagios/plugins/*
 ```
 
 Finally, you now need to add services-wrapper.py to the current cron
@@ -71,7 +133,7 @@ Note that some services (procs, inodes, load and similar) will always
 poll the local LibreNMS server it's running on, regardless of which
 device you add it to.
 
-## Performance data
+### Performance data
 
 By default, the check-services script will collect all performance
 data that the Nagios script returns and display each datasource on a
@@ -111,9 +173,9 @@ go together. Example below:
     -- snip --
 ```
 
-## Alerting
+### Alerting
 
-Services uses the Nagios Alerting scheme where:
+Services uses the Nagios Alerting scheme where exit code:
 
 ```
     0 = Ok,
@@ -128,7 +190,7 @@ rule would look like:
     %services.service_status = "2"
 ```
 
-## Debug
+### Debug
 
 Change user to librenms for example
 
@@ -142,7 +204,43 @@ then you can run the following command to help troubleshoot services.
 ./check-services.php -d
 ```
 
-## Service checks polling logic
+### Related Polling / Discovery Options
+
+These settings are related and should be investigated and set accordingly.
+The below values are not defaults or recommended.
+
+```php
+$config['service_poller_enabled']           = true;
+```
+```php
+$config['service_poller_workers']           = 16;
+```
+```php
+$config['service_poller_frequency']         = 300;
+```
+```php
+$config['service_poller_down_retry']        = 5;
+```
+```php
+$config['service_discovery_enabled']        = true;
+```
+```php
+$config['service_discovery_workers']        = 16;
+```
+```php
+$config['service_discovery_frequency']      = 3600;
+```
+```php
+$config['service_services_enabled']         = true;
+```
+```php
+$config['service_services_workers']         = 16;
+```
+```php
+$config['service_services_frequency']       = 60;
+```
+
+### Service checks polling logic
 
 Service check is skipped when the associated device is not pingable,
 and an appropriate entry is populated in the event log. Service check
@@ -154,3 +252,18 @@ disable ICMP testing for any device by switching `Disable ICMP Test`
 setting (Edit -> Misc) to ON.
 
 Service checks will never be polled on disabled devices.
+
+### CHECK_MRPE
+
+In most cases, only Nagios plugins that run against a remote host with the -H option are available as services.  However, if you're remote host is running the [Check_MK agent](Agent-Setup.md) you may be able to use MRPE to monitor Nagios plugins that only execute locally as services.
+
+For example, consider the fairly common check_cpu.sh Nagios plugin.
+If you added..
+
+> cpu_check /usr/lib/nagios/plugins/check_cpu.sh -c 95 -w 75
+
+...to `/etc/check_mk/mrpe.cfg` on your remote host, you should be able to check its output by configuring a service using the [check_mrpe](https://raw.githubusercontent.com/librenms/librenms-agent/master/agent-local/check_mrpe) script.
+
+ - Add [check_mrpe](https://raw.githubusercontent.com/librenms/librenms-agent/master/agent-local/check_mrpe) to the Nagios plugins directory on your LibreNMS server and make it executable.
+- In LibreNMS, add a new service to the desired device with the type mrpe.
+- Enter the IP address of the remote host and in parameters enter `-a cpu_check` (this should match the name used at the beginning of the line in the mrpe.cfg file).

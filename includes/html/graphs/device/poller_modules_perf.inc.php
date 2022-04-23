@@ -21,22 +21,22 @@ require 'includes/html/graphs/common.inc.php';
 
 $count = 0;
 foreach ($modules as $module => $module_status) {
-    $rrd_filename = rrd_name($device['hostname'], array('poller-perf', $module));
-    if ($attribs['poll_'.$module] || ($module_status && !isset($attribs['poll_'.$module])) ||
-        (\LibreNMS\Config::getOsSetting($device['os'], 'poller_modules.' . $module) && !isset($attribs['poll_' . $module]))) {
-        if (rrdtool_check_rrd_exists($rrd_filename)) {
-            $ds['ds']       = 'poller';
-            $ds['descr']    = $module;
+    $rrd_filename = Rrd::name($device['hostname'], ['poller-perf', $module]);
+    if ($attribs['poll_' . $module] || ($module_status && ! isset($attribs['poll_' . $module])) ||
+        (\LibreNMS\Config::getOsSetting($device['os'], 'poller_modules.' . $module) && ! isset($attribs['poll_' . $module]))) {
+        if (Rrd::checkRrdExists($rrd_filename)) {
+            $ds['ds'] = 'poller';
+            $ds['descr'] = $module;
             $ds['filename'] = $rrd_filename;
-            $rrd_list[]     = $ds;
+            $rrd_list[] = $ds;
             $count++;
         }
     }
 }
 
-$unit_text = "Seconds";
+$unit_text = 'Seconds';
 $simple_rrd = false;
 $nototal = false;
 $text_orig = true;
 $colours = 'manycolours';
-require "includes/html/graphs/generic_multi_simplex_seperated.inc.php";
+require 'includes/html/graphs/generic_multi_simplex_seperated.inc.php';

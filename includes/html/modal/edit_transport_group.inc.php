@@ -20,7 +20,7 @@ if (Auth::user()->hasGlobalAdmin()) {
             <div class="modal-content">
                 <div class="modal-header">
                     <button type="button" class="close" data-dismiss="modal" aria-hidden="true">&times;</button>
-                    <h5 class="modal-title" id="Edit-transport">Alert Transport Groups :: <a href="https://docs.librenms.org/Alerting/">Docs <i class="fa fa-book fa-1x"></i></a> </h5>
+                    <h5 class="modal-title" id="Edit-transport">Alert Transport Groups :: <a target="_blank" href="https://docs.librenms.org/Alerting/">Docs <i class="fa fa-book fa-1x"></i></a> </h5>
                 </div>
                 <div class="modal-body">
                     <form method="post" role="form" id="transport-group" class="form-horizontal transport-group-form">
@@ -83,13 +83,13 @@ if (Auth::user()->hasGlobalAdmin()) {
         // Get group-id of the clicked element
         var group_id = $(e.relatedTarget).data("group_id");
         $("#group_id").val(group_id);
-        
+
         // Reset form
         $(this).find("input[type=text]").val("");
         var $members = $("#members");
         $members.empty();
         $members.val(null).trigger('change');
-        
+
         if (group_id > 0) {
             $.ajax({
                 type: "POST",
@@ -150,7 +150,7 @@ if (Auth::user()->hasGlobalAdmin()) {
             }
         }
     });
-    
+
     // Populate group id value
     $("#delete-transport-group").on("show.bs.modal", function (event) {
         group_id = $(event.relatedTarget).data("group_id");
@@ -158,7 +158,7 @@ if (Auth::user()->hasGlobalAdmin()) {
     });
 
     // Delete the transport group
-    $("#remove-transport-group").click('', function (event) {
+    $("#remove-transport-group").on("click", function (event) {
         event.preventDefault();
         var group_id = $("#delete_group_id").val();
         $.ajax({
@@ -177,10 +177,10 @@ if (Auth::user()->hasGlobalAdmin()) {
             },
             error: function() {
                 toastr.error("The alert transport could not be deleted.");
-            } 
+            }
         });
     });
-    
+
     </script>
 
     <?php

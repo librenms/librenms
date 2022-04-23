@@ -1,6 +1,6 @@
 <?php
 
-echo "RFC1628 ";
+echo 'RFC1628 ';
 
 $output_power = snmpwalk_group($device, 'upsOutputPower', 'UPS-MIB');
 foreach ($output_power as $index => $data) {
@@ -11,7 +11,7 @@ foreach ($output_power as $index => $data) {
     }
     if (is_array($data['upsOutputPower'])) {
         $data['upsOutputPower'] = $data['upsOutputPower'][0];
-        $pwr_oid .= ".0";
+        $pwr_oid .= '.0';
     }
 
     discover_sensor(
@@ -19,8 +19,8 @@ foreach ($output_power as $index => $data) {
         'power',
         $device,
         $pwr_oid,
-        300+$index,
-        "rfc1628",
+        300 + $index,
+        'rfc1628',
         $descr,
         1,
         1,
@@ -32,7 +32,6 @@ foreach ($output_power as $index => $data) {
     );
 }
 
-
 $input_power = snmpwalk_group($device, 'upsInputTruePower', 'UPS-MIB');
 foreach ($input_power as $index => $data) {
     $pwr_oid = ".1.3.6.1.2.1.33.1.3.3.1.5.$index";
@@ -42,7 +41,7 @@ foreach ($input_power as $index => $data) {
     }
     if (is_array($data['upsInputTruePower'])) {
         $data['upsInputTruePower'] = $data['upsInputTruePower'][0];
-        $pwr_oid .= ".0";
+        $pwr_oid .= '.0';
     }
 
     discover_sensor(
@@ -50,8 +49,8 @@ foreach ($input_power as $index => $data) {
         'power',
         $device,
         $pwr_oid,
-        100+$index,
-        "rfc1628",
+        100 + $index,
+        'rfc1628',
         $descr,
         1,
         1,
@@ -72,7 +71,7 @@ foreach ($bypass_power as $index => $data) {
     }
     if (is_array($data['upsBypassPower'])) {
         $data['upsBypassPower'] = $data['upsBypassPower'][0];
-        $pwr_oid .= ".0";
+        $pwr_oid .= '.0';
     }
 
     discover_sensor(
@@ -80,8 +79,8 @@ foreach ($bypass_power as $index => $data) {
         'power',
         $device,
         $pwr_oid,
-        200+$index,
-        "rfc1628",
+        200 + $index,
+        'rfc1628',
         $descr,
         1,
         1,

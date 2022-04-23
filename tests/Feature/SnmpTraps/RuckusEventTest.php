@@ -15,12 +15,12 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  * Tests generic Ruckus Wireless event trap handlers.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
+ *
  * @copyright  2019 Heath Barnhart
  * @author     Heath Barnhart <hbarnhart@kanren.net>
  */
@@ -31,12 +31,11 @@ use App\Models\Device;
 use LibreNMS\Snmptrap\Dispatcher;
 use LibreNMS\Snmptrap\Trap;
 
-class RuckusEventTrap extends SnmpTrapTestCase
+class RuckusEventTest extends SnmpTrapTestCase
 {
     public function testRuckusAssocTrap()
     {
-        $device = factory(Device::class)->create();
-
+        $device = Device::factory()->create(); /** @var Device $device */
         $trapText = "$device->hostname
 UDP: [$device->ip]:57602->[192.168.5.5]:162
 DISMAN-EVENT-MIB::sysUpTimeInstance 26:19:43:37.24
@@ -45,7 +44,7 @@ RUCKUS-EVENT-MIB::ruckusEventClientMacAddr \"de:ad:be:ef:11:221.0.5.1.1.1.2.2\""
 
         $trap = new Trap($trapText);
 
-        $message = "Client de:ad:be:ef:11:22 associated";
+        $message = 'Client de:ad:be:ef:11:22 associated';
         \Log::shouldReceive('event')->once()->with($message, $device->device_id, 'trap', 2);
 
         $this->assertTrue(Dispatcher::handle($trap), 'Could not handle ruckusEventAssocTrap');
@@ -53,8 +52,7 @@ RUCKUS-EVENT-MIB::ruckusEventClientMacAddr \"de:ad:be:ef:11:221.0.5.1.1.1.2.2\""
 
     public function testRuckusDiassocTrap()
     {
-        $device = factory(Device::class)->create();
-
+        $device = Device::factory()->create(); /** @var Device $device */
         $trapText = "$device->hostname
 UDP: [$device->ip]:57602->[192.168.5.5]:162
 DISMAN-EVENT-MIB::sysUpTimeInstance 26:19:43:37.24
@@ -63,7 +61,7 @@ RUCKUS-EVENT-MIB::ruckusEventClientMacAddr \"de:ad:be:ef:33:441.0.5.1.1.1.2.2\""
 
         $trap = new Trap($trapText);
 
-        $message = "Client de:ad:be:ef:33:44 disassociated";
+        $message = 'Client de:ad:be:ef:33:44 disassociated';
         \Log::shouldReceive('event')->once()->with($message, $device->device_id, 'trap', 2);
 
         $this->assertTrue(Dispatcher::handle($trap), 'Could not handle ruckusEventDiassocTrap');
@@ -71,8 +69,7 @@ RUCKUS-EVENT-MIB::ruckusEventClientMacAddr \"de:ad:be:ef:33:441.0.5.1.1.1.2.2\""
 
     public function testRuckusSetErrorTrap()
     {
-        $device = factory(Device::class)->create();
-
+        $device = Device::factory()->create(); /** @var Device $device */
         $trapText = "$device->hostname
 UDP: [$device->ip]:57602->[192.168.5.5]:162
 DISMAN-EVENT-MIB::sysUpTimeInstance 26:19:43:37.24
@@ -81,7 +78,7 @@ RUCKUS-EVENT-MIB::ruckusEventSetErrorOID Wrong Type (should be OBJECT IDENTIFIER
 
         $trap = new Trap($trapText);
 
-        $message = "SNMP set error on oid 1.3.6.1.2.1.25.1.1.0.5.1.1.1.2.2";
+        $message = 'SNMP set error on oid 1.3.6.1.2.1.25.1.1.0.5.1.1.1.2.2';
         \Log::shouldReceive('event')->once()->with($message, $device->device_id, 'trap', 2);
 
         $this->assertTrue(Dispatcher::handle($trap), 'Could not handle ruckusEventSetErrorTrap');

@@ -1,0 +1,24 @@
+os: primekey
+text: "Hardware Appliance"
+type: appliance
+icon: primekey
+group: primekey
+mib_dir: primekey
+over:
+    - { graph: device_percent, text: "Database Usage" }
+    - { graph: device_voltage, text: "HSM Voltage" }
+    - { graph: device_count, text: "Counters" }
+poller_modules:
+    bgp-peers: false
+    ospf: false
+    stp: false
+    mpls: false
+discovery_modules:
+    bgp-peers: false
+    cisco-vrf-lite: false
+    stp: false
+discovery:
+    - snmpget:
+          oid: PRIMEKEY-APPLIANCE-MIB::pkAVersion
+          op: "contains"
+          value: "PrimeKey"

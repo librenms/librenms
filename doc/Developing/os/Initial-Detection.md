@@ -1,6 +1,3 @@
-source: Developing/os/Initial-Detection.md
-path: blob/master/doc/
-
 This document will provide the information you should need to add
 basic detection for a new OS.
 
@@ -42,6 +39,14 @@ is the preferred method for detection.  Other options are available:
   matches one of the regex statements under this item
 - `snmpget` Do not use this unless none of the other methods
   work. Fetch an oid and compare it against a value.
+```yaml
+discovery:
+    -
+      snmpget:
+        - oid: <someoid>
+        - op: <["=","!=","==","!==","<=",">=","<",">","starts","ends","contains","regex","not_starts","not_ends","not_contains","not_regex","in_array","not_in_array","exists"]>
+        - value: <'string' | boolean>
+```
 - `_except` You can add this to any of the above to exclude that
   element. As an example:
 
@@ -67,17 +72,15 @@ that the device doesn't support ifXEntry and to ignore it:
      - cisco2811
 ```
 
-`mib_dir`: You can use this to specify the additional directories to
-look in for MIBs:
+`mib_dir`: You can use this to specify an additional directory to
+look in for MIBs. An array is not accepted, only one directory may be specified.
 
 ```yaml
-mib_dir:
-    - juniper
-    - cisco
+mib_dir: juniper
 ```
 
 `poller_modules`: This is a list of poller modules to either enable
-(1) or disable (0). Check `includes/defaults.inc.php` to see which
+(1) or disable (0). Check `misc/config_definitions.json` to see which
 modules are enabled/disabled by default.
 
 ```yaml
@@ -87,7 +90,7 @@ poller_modules:
 ```
 
 `discovery_modules`: This is the list of discovery modules to either
-enable (1) or disable (0). Check `includes/defaults.inc.php` to see
+enable (1) or disable (0). Check `misc/config_definitions.json` to see
 which modules are enabled/disabled by default.
 
 ```yaml
@@ -140,30 +143,50 @@ So, considering the example:
 - `sysObjectID: bar, sysDescr: exodar` matches
 - `sysObjectID: bar, sysDescr: snafu` matches
 
-#### Discovery helpers
+#### OS discovery
 
-Within the discovery code base if you are using php then the following helpers are available:
+OS discovery collects additional standardized data about the OS.  These are specified in
+the discovery yaml `includes/definitions/discovery/<os>.yaml` or `LibreNMS/OS/<os>.php` if
+more complex collection is required.
 
-- `$device['sysObjectID]`: This will contain the full numerical
-  sysObjectID for this device.
-- `$device['sysDescr']`: This will contain the full sysDescr for this device.
+- `version` The version of the OS running on the device.
+- `hardware` The hardware version for the device. For example: 'WS-C3560X-24T-S'
+- `features` Features for the device, for example a list of enabled software features.
+- `serial` The main serial number of the device.
 
-### Poller
+##### Yaml based OS discovery
 
-OS polling is done within `includes/polling/os/$os.inc.php` and is where we detect certain values.
+- `sysDescr_regex` apply a regex or list of regexes to the sysDescr to extract named groups, this data has the lowest precedence
+- `<field>` specify an oid or list of oids to attempt to pull the data from, the first non-empty response will be used
+- `<field>_regex` parse the value out of the returned oid data, must use a named group
+- `<field>_template` combine multiple oid results together to create a final string value.  The result is trimmed.
+- `hardware_mib` MIB used to translate sysObjectID to get hardware. hardware_regex can process the result.
 
-```php
-$version = preg_replace('/[\r\n\"]+/', ' ', snmp_get($device, "productVersion.0", "-OQv", "PULSESECURE-PSG-MIB"));
-$hardware = "Juniper " . preg_replace('/[\r\n\"]+/', ' ', snmp_get($device, "productName.0", "-OQv", "PULSESECURE-PSG-MIB"));
+```yaml
+modules:
+    os:
+        sysDescr_regex: '/(?<hardware>MSM\S+) .* Serial number (?<serial>\S+) - Firmware version (?<version>\S+)/'
+        features: UPS-MIB::upsIdentAttachedDevices.0
+        hardware:
+            - ENTITY-MIB::entPhysicalName.1
+            - ENTITY-MIB::entPhysicalHardwareRev.1
+        hardware_template: '{{ ENTITY-MIB::entPhysicalName.1 }} {{ ENTITY-MIB::entPhysicalHardwareRev.1 }}'
+        serial: ENTITY-MIB::entPhysicalSerialNum.1
+        version: ENTITY-MIB::entPhysicalSoftwareRev.1
+        version_regex: '/V(?<version>.*)/'
 ```
 
-`$version`: The version of the OS running on the device.
+##### PHP based OS discovery
 
-`$hardware`: The hardware version for the device. For example: 'WS-C3560X-24T-S'
-
-`$features`: Features for the device, for example a list of cards in the slots of a modular chassis.
-
-`$serial`: The main serial number of the device.
+```php
+public function discoverOS(\App\Models\Device $device): void
+{
+    $info = snmp_getnext_multi($this->getDeviceArray(), ['enclosureModel', 'enclosureSerialNum', 'entPhysicalFirmwareRev'], '-OQUs', 'NAS-MIB:ENTITY-MIB');
+    $device->version = $info['entPhysicalFirmwareRev'];
+    $device->hardware = $info['enclosureModel'];
+    $device->serial = $info['enclosureSerialNum'];
+}
+```
 
 ### MIBs
 

@@ -15,10 +15,10 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
+ *
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -26,6 +26,7 @@
 namespace App\ApiClients;
 
 use Exception;
+use Illuminate\Http\Client\Response;
 use LibreNMS\Config;
 use LibreNMS\Interfaces\Geocoder;
 
@@ -39,10 +40,10 @@ class GoogleMapsApi extends BaseApi implements Geocoder
     /**
      * Get latitude and longitude from geocode response
      *
-     * @param array $data
+     * @param  array  $data
      * @return array
      */
-    private function parseLatLng($data)
+    protected function parseLatLng($data)
     {
         return [
             'lat' => isset($data['results'][0]['geometry']['location']['lat']) ? $data['results'][0]['geometry']['location']['lat'] : 0,
@@ -53,7 +54,7 @@ class GoogleMapsApi extends BaseApi implements Geocoder
     /**
      * Get messages from response.
      *
-     * @param array $data
+     * @param  array  $data
      * @return array
      */
     protected function parseMessages($data)
@@ -67,14 +68,15 @@ class GoogleMapsApi extends BaseApi implements Geocoder
     /**
      * Build Guzzle request option array
      *
-     * @param string $address
+     * @param  string  $address
      * @return array
+     *
      * @throws \Exception you may throw an Exception if validation fails
      */
     protected function buildGeocodingOptions($address)
     {
         $api_key = Config::get('geoloc.api_key');
-        if (!$api_key) {
+        if (! $api_key) {
             throw new Exception('Google Maps API key missing, set geoloc.api_key');
         }
 
@@ -82,20 +84,15 @@ class GoogleMapsApi extends BaseApi implements Geocoder
             'query' => [
                 'key' => $api_key,
                 'address' => $address,
-            ]
+            ],
         ];
     }
 
     /**
      * Checks if the request was a success
-     *
-     * @param \Psr\Http\Message\ResponseInterface $response
-     * @param array $data decoded response data
-     * @return bool
-     * @throws Exception you may throw an Exception if validation fails
      */
-    protected function checkResponse($response, $data)
+    protected function checkResponse(Response $response, array $data): bool
     {
-        return $response->getStatusCode() == 200 && $data['status'] == 'OK';
+        return $response->successful() && $data['status'] == 'OK';
     }
 }

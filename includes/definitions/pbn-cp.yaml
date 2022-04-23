@@ -15,5 +15,6 @@ poller_modules:
     services: false
     storage: false
 discovery:
-    - sysObjectID:
-        - .1.3.6.1.4.1.11606.24
+    -
+        sysObjectID:
+            - .1.3.6.1.4.1.11606.24

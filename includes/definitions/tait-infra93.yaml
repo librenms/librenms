@@ -1,0 +1,11 @@
+os: tait-infra93
+text: 'Tait Infra93 Series'
+type: network
+icon: tait
+mib_dir: tait
+over:
+    - { graph: device_temperature, text: 'Temperature' }
+discovery:
+    -
+        sysObjectID:
+            - '.1.3.6.1.4.1.3570.2.2'

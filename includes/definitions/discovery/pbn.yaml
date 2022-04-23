@@ -1,0 +1,10 @@
+modules:
+    os:
+        sysDescr_regex: '/Software\s+(?<hardware>.*) Series Software, Version (?<version>[^,]+), .*Serial num:(?<serial>[^,]+),/s'
+    mempools:
+        data:
+            -
+                total: NMS-MEMORY-POOL-MIB::nmsMemoryPoolTotalMemorySize
+                percent_used: NMS-MEMORY-POOL-MIB::nmsMemoryPoolUtilization
+                type: pbn-mem
+                descr: 'Main Memory'

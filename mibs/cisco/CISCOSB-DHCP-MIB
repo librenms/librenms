@@ -792,7 +792,9 @@ RlDhcpSrvConfParamsEntry ::= SEQUENCE {
     rlDhcpSrvConfParamsOptionsList
        DisplayString,
     rlDhcpSrvConfParamsRowStatus
-       RowStatus
+       RowStatus,
+	rlDhcpSrvConfParamsAutoDefaultRouter
+       TruthValue
    }
 
 rlDhcpSrvConfParamsName OBJECT-TYPE
@@ -938,6 +940,15 @@ rlDhcpSrvConfParamsRowStatus  OBJECT-TYPE
         row installation and removal conventions."
     ::= { rlDhcpSrvConfParamsEntry 14 }
 
+rlDhcpSrvConfParamsAutoDefaultRouter  OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Controls sending an IP address defined on the input interface
+             as a default router when an default router is not configured as option."
+    DEFVAL { true }
+    ::= { rlDhcpSrvConfParamsEntry 15 }
 
 rlDhcpSrvNumOfNetworkPools OBJECT-TYPE
     SYNTAX Unsigned32

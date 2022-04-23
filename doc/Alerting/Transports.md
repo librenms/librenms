@@ -1,6 +1,3 @@
-source: Alerting/Transports.md
-path: blob/master/doc/
-
 # Transports
 
 Transports are located within `LibreNMS/Alert/Transport/` and can be
@@ -33,8 +30,21 @@ To include users that have `Global-Read`, `Administrator` or
 
 ## Using a AMQP based Transport
 
-You need to install an additional php module : `bcmath` (eg `php72w-bcmath` for
-Centos 7)
+You need to install an additional php module : `bcmath`
+
+## Alerta
+
+The [alerta](https://alerta.io) monitoring system is a tool used to consolidate and de-duplicate alerts from multiple sources for quick ‘at-a-glance’ visualisation. With just one system you can monitor alerts from many other monitoring tools on a single screen.
+
+**Example:**
+
+| Config | Example |
+| ------ | ------- |
+| API Endpoint   | http://alerta.example.com/api/alert |
+| Environment | Production |
+| Apy key | api key with write permission |
+| Alert state | critical |
+| Recover state | cleared |
 
 ## Alertmanager
 
@@ -49,9 +59,24 @@ of alerts of similar content for an array of hosts, whereas
 Alertmanager can group them by alert meta, ideally producing one
 single notice in case an issue occurs.
 
-It is possible to configure as much label values as required in
-Alertmanager Options section. Every label and it's value should be
+It is possible to configure as many label values as required in
+Alertmanager Options section. Every label and its value should be
 entered as a new line.
+
+Labels can be a fixed string or a dynamic variable from the alert.
+To set a dynamic variable your label must start with extra_ then
+complete with the name of your label (only characters, figures and
+underscore are allowed here). The value must be the name of
+the variable you want to get (you can see all the variables in 
+Alerts->Notifications by clicking on the Details icon of your alert when it is pending).
+If the variable's name does not match with an existing value the 
+label's value will be the string you provided just as it was a fixed string.
+
+Multiple Alertmanager URLs (comma separated) are supported. Each
+URL will be tried and the search will stop at the first success.
+
+Basic HTTP authentication with a username and a password is supported.
+If you let those value blank, no authentication will be used.
 
 [Alertmanager Docs](https://prometheus.io/docs/alerting/alertmanager/)
 
@@ -59,8 +84,10 @@ entered as a new line.
 
 | Config | Example |
 | ------ | ------- |
-| Alertmanager URL      | http://alertmanager.example.com |
-| Alertmanager Options: | source=librenms <br/> customlabel=value |
+| Alertmanager URL(s)   | http://alertmanager1.example.com,http://alertmanager2.example.com |
+| Alertmanager Username | myUsername |
+| Alertmanager Password | myPassword |
+| Alertmanager Options: | source=librenms <br/> customlabel=value <br/> extra_dynamic_value=variable_name |
 
 ## API
 
@@ -129,6 +156,22 @@ The example below will use the API named component of my.example.com with id 1, 
 |               | Content-Type=application/json
 | API Body      | { "status": 2 }
 
+
+## aspSMS
+aspSMS is a SMS provider that can be configured by using the generic API Transport.
+You need a token you can find on your personnal space.
+
+[aspSMS docs](https://www.aspsms.com/en/documentation/)
+
+**Example:**
+
+| Config | Example |
+| ------ | ------- |
+| Transport type | Api |
+| API Method | POST |
+| API URL | https://soap.aspsms.com/aspsmsx.asmx/SimpleTextSMS |
+| Options | UserKey=USERKEY<br />Password=APIPASSWORD<br />Recipient=RECIPIENT<br />Originator=ORIGINATOR<br />MessageText={{ $msg }} |
+
 ## Boxcar
 
 Copy your access token from the Boxcar app or from the Boxcar.io
@@ -141,6 +184,15 @@ website and setup the transport.
 | Config | Example |
 | ------ | ------- |
 | Access Token | i23f23mr23rwerw |
+
+## Browser Push
+
+Browser push notifications can send a notification to the user's device even when the browser is not open.
+This requires HTTPS, the PHP GMP extension, [Push API](https://developer.mozilla.org/en-US/docs/Web/API/Push_API) support, 
+and permissions on each device to send alerts.
+
+Simply configure an alert transport and allow notification permission on the device(s) you
+wish to receive alerts on.  You may disable alerts on a browser on the user preferences page.
 
 ## Canopsis
 
@@ -229,11 +281,11 @@ The index pattern uses strftime() formatting.
 | Port | 9200 |
 | Index Patter | librenms-%Y.%m.%d |
 
-## Gitlab
+## GitLab
 
 LibreNMS will create issues for warning and critical level alerts
 however only title and description are set. Uses Personal access
-tokens to authenticate with Gitlab and will store the token in cleartext.
+tokens to authenticate with GitLab and will store the token in cleartext.
 
 **Example:**
 
@@ -324,16 +376,39 @@ As a small reminder, here is it's configuration directives including defaults:
 | ------ | ------- |
 | Email | me@example.com |
 
+## Matrix
+
+For using the Matrix transports, you have to create a room on the Matrix-server.
+The provided Auth_token belongs to an user, which is member of this room.
+The Message, sent to the matrix-room can be built from the variables defined in
+[Template-Syntax](Templates.md#syntax) but without the 'alert->' prefix.
+See API-Transport. The variable ``` $msg ``` is contains the result of the Alert template.
+The Matrix-Server URL is cutted before the beginning of the ``_matrix/client/r0/...`` API-part.
+
+**Example:**
+
+| Config | Example |
+| ------ | ------- |
+| Matrix-Server URL | <https://matrix.example.com/> |
+| Room | !ajPbbPalmVbNuQoBDK:example.com |
+| Auth_token: | MDAyYmxvY2F0aW9uI...z1DCn6lz_uOhtW3XRICg |
+| Message: | Alert: {{ $msg }} https://librenms.example.com |
+
 ## Microsoft Teams
 
-Microsoft Teams. LibreNMS can send alerts to Microsoft Teams Connector
-API which are then posted to a specific channel.
+LibreNMS can send alerts to Microsoft Teams [Incoming Webhooks](https://docs.microsoft.com/en-us/microsoftteams/platform/webhooks-and-connectors/how-to/add-incoming-webhook) which are
+then posted to a specific channel. Microsoft recommends using
+[markdown](https://docs.microsoft.com/en-us/microsoftteams/platform/task-modules-and-cards/cards/cards-format#markdown-formatting-for-connector-cards) formatting for connector cards.
+Administrators can opt to [compose](https://messagecardplayground.azurewebsites.net/)
+the [MessageCard](https://docs.microsoft.com/en-us/outlook/actionable-messages/message-card-reference)
+themselves using JSON to get the full functionality.
 
 **Example:**
 
 | Config | Example |
 | ------ | ------- |
 | WebHook URL | <https://outlook.office365.com/webhook/123456789> |
+| Use JSON? | x |
 
 ## Nagios Compatible
 
@@ -499,6 +574,50 @@ required value is for url, without this then no call to Rocket.chat will be made
 | Webhook URL | https://rocket.url/api/v1/chat.postMessage |
 | Rocket.chat Options | channel=#Alerting <br/> username=myname <br/> icon_url=http://someurl/image.gif <br/> icon_emoji=:smirk: |
 
+## Sensu
+
+The Sensu transport will POST an
+[Event](https://docs.sensu.io/sensu-go/latest/reference/events/) to the
+[Agent API](https://docs.sensu.io/sensu-go/latest/reference/agent/#create-monitoring-events-using-the-agent-api)
+upon an alert being generated.
+
+It will be categorised (ok, warning or critical), and if you configure the
+alert to send recovery notifications, Sensu will also clear the alert
+automatically. No configuration is required - as long as you are running the
+Sensu Agent on your poller with the HTTP socket enabled on tcp/3031, LibreNMS
+will start generating Sensu events as soon as you create the transport.
+
+Acknowledging alerts within LibreNMS is not directly supported, but an
+annotation (`acknowledged`) is set, so a mutator or silence, or even the
+handler could be written to look for it directly in the handler. There is also
+an annotation (`generated-by`) set, to allow you to treat LibreNMS events
+differently from agent events.
+
+The 'shortname' option is a simple way to reduce the length of device names in
+configs. It replaces the last 3 domain components with single letters (e.g.
+websrv08.dc4.eu.corp.example.net gets shortened to websrv08.dc4.eu.cen).
+
+### Limitations
+
+- Only a single namespace is supported
+- Sensu will reject rules with special characters - the Transport will attempt
+to fix up rule names, but it's best to stick to letters, numbers and spaces
+- The transport only deals in absolutes - it ignores the got worse/got better
+states
+- The agent will buffer alerts, but LibreNMS will not - if your agent is
+offline, alerts will be dropped
+- There is no backchannel between Sensu and LibreNMS - if you make changes in
+Sensu to LibreNMS alerts, they'll be lost on the next event (silences will work)
+
+**Example:**
+
+| Config          | Example               |
+| --------------- | --------------------- |
+| Sensu Endpoint  | http://localhost:3031 |
+| Sensu Namespace | eu-west               |
+| Check Prefix    | lnms                  |
+| Source Key      | hostname              |
+
 ## Slack
 
 The Slack transport will POST the alert message to your Slack Incoming
@@ -538,6 +657,66 @@ either local or international dialling format.
 | User | smseagle_user |
 | Password | smseagle_user_password |
 | Mobiles | +3534567890 <br/> 0834567891 |
+
+## SMSmode
+SMSmode is a SMS provider that can be configured by using the generic API Transport.
+You need a token you can find on your personnal space.
+
+[SMSmode docs](https://www.smsmode.com/pdf/fiche-api-http.pdf)
+
+**Example:**
+
+| Config | Example |
+| ------ | ------- |
+| Transport type | Api |
+| API Method | POST |
+| API URL | http://api.smsmode.com/http/1.6/sendSMS.do |
+| Options | accessToken=_PUT_HERE_YOUR_TOKEN_<br />numero=_PUT_HERE_DESTS_NUMBER_COMMA_SEPARATED_<br />message={{ $msg }} |
+
+## Splunk
+
+LibreNMS can send alerts to a Splunk instance and provide all device
+and alert details.
+
+Example output:
+
+```
+Feb 21 15:21:52 nms  hostname="localhost", sysName="localhost", 
+sysDescr="", sysContact="", os="fortigate", type="firewall", ip="localhost", 
+hardware="FGT_50E", version="v5.6.9", serial="", features="", location="", 
+uptime="387", uptime_short=" 6m 27s", uptime_long=" 6 minutes 27 seconds", 
+description="", notes="", alert_notes="", device_id="0", rule_id="0", 
+id="0", proc="", status="1", status_reason="", ping_timestamp="", ping_loss="0", 
+ping_min="25.6", ping_max="26.8", ping_avg="26.3", 
+title="localhost recovered from  Device up/down  ", elapsed="14m 54s", uid="0", 
+alert_id="0", severity="critical", name="Device up/down", 
+timestamp="2020-02-21 15:21:33", state="0", device_device_id="0", 
+device_inserted="", device_hostname="localhost", device_sysName="localhost", 
+device_ip="localhost", device_overwrite_ip="", device_timeout="", device_retries="", 
+device_snmp_disable="0", device_bgpLocalAs="0", 
+device_sysObjectID="", device_sysDescr="", 
+device_sysContact="", device_version="v5.6.9", device_hardware="FGT_50E", 
+device_features="build1673", device_location_id="", device_os="fortigate", 
+device_status="1", device_status_reason="", device_ignore="0", device_disabled="0", 
+device_uptime="387", device_agent_uptime="0", device_last_polled="2020-02-21 15:21:33", 
+device_last_poll_attempted="", device_last_polled_timetaken="7.9", 
+device_last_discovered_timetaken="11.77", device_last_discovered="2020-02-21 13:16:42", 
+device_last_ping="2020-02-21 15:21:33", device_last_ping_timetaken="26.3", 
+device_purpose="", device_type="firewall", device_serial="FGT50EXXX", 
+device_icon="images/os/fortinet.svg", device_poller_group="0", 
+device_override_sysLocation="0", device_notes="", device_port_association_mode="1", 
+device_max_depth="0", device_disable_notify="0", device_location="", 
+device_vrf_lites="Array", device_lat="", device_lng="", - 
+sysObjectID => ""; `
+
+Each alert will be sent as a separate message.
+
+**Example:**
+
+| Config | Example |
+| ------ | ------- |
+| Host | 127.0.0.1 |
+| UDP Port | 514 |
 
 ## Syslog
 
@@ -620,6 +799,19 @@ located at: [https://www.twilio.com/docs/api?filter-product=sms](https://www.twi
 | Token | 7xxxx573acxxxbc2xxx308d6xxx652d32 |
 | Twilio SMS Number | 8888778660 |
 
+## UKFast PSS
+
+UKFast PSS tickets can be raised from alerts using the UKFastPSS transport. This required an [API key](https://my.ukfast.co.uk/applications) with PSS `write` permissions
+
+**Example:**
+
+| Config | Example |
+| ------ | ------- |
+| API Key | ABCDefgfg12 |
+| Author | 5423 |
+| Priority | Critical |
+| Secure | true |
+
 ## VictorOps
 
 VictorOps provide a webHook url to make integration extremely
@@ -669,6 +861,20 @@ connect to servicedesk
 | Kayako API Key | 8cc02f38-7465-4a0c-8730-bb3af122167b |
 | Kayako API Secret | Y2NhZDIxNDMtNjVkMi0wYzE0LWExYTUtZGUwMjJiZDI0ZWEzMmRhOGNiYWMtNTU2YS0yODk0LTA1MTEtN2VhN2YzYzgzZjk5 |
 | Kayako Department | 1 |
+
+## Signal CLI
+
+Use the Signal Mesenger for Alerts. Run the Signal CLI with the D-Bus option.
+
+[GitHub Project](https://github.com/AsamK/signal-cli)
+
+**Example:**
+
+| Config | Example |
+| ------ | ------- |
+| Path | /opt/signal-cli/bin/signal-cli |
+| Recipient type | Group |
+| Recipient | dfgjsdkgljior4345== |
 
 ## SMSFeedback
 

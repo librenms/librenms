@@ -11,8 +11,8 @@
  * the source code distribution for details.
  */
 
-if (!Auth::user()->hasGlobalAdmin()) {
-    die('ERROR: You need to be admin');
+if (! Auth::user()->hasGlobalAdmin()) {
+    exit('ERROR: You need to be admin');
 }
 
 ?>
@@ -157,7 +157,7 @@ $('#manage-dependencies').on('show.bs.modal', function() {
     })
 });
 
-$('#manhostdep-save').click('', function(event) {
+$('#manhostdep-save').on("click", function(event) {
     event.preventDefault();
     var device_ids = [];
     var children = [];

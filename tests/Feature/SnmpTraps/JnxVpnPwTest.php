@@ -15,31 +15,30 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  *
  * Tests JnxVpnPwDown and JnxVpnPwUp traps from Juniper devices.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
+ *
  * @copyright  2019 KanREN, Inc
  * @author     Heath Barnhart <hbarnhart@kanren.net>
  */
 
-namespace LibreNMS\Tests;
+namespace LibreNMS\Tests\Feature\SnmpTraps;
 
 use App\Models\Device;
 use App\Models\Port;
 use LibreNMS\Snmptrap\Dispatcher;
 use LibreNMS\Snmptrap\Trap;
-use LibreNMS\Tests\Feature\SnmpTraps\SnmpTrapTestCase;
 
 class JnxVpnPwTest extends SnmpTrapTestCase
 {
     public function testVpnPwDown()
     {
-        $device = factory(Device::class)->create();
-        $port = factory(Port::class)->make(['ifAdminStatus' => 'up', 'ifOperStatus' => 'up']);
+        $device = Device::factory()->create(); /** @var Device $device */
+        $port = Port::factory()->make(['ifAdminStatus' => 'up', 'ifOperStatus' => 'up']); /** @var Port $port */
         $device->ports()->save($port);
 
         $trapText = "$device->hostname
@@ -60,8 +59,8 @@ SNMPv2-MIB::snmpTrapEnterprise.0 JUNIPER-CHASSIS-DEFINES-MIB::jnxProductNameMX48
 
     public function testVpnPwUp()
     {
-        $device = factory(Device::class)->create();
-        $port = factory(Port::class)->make(['ifAdminStatus' => 'up', 'ifOperStatus' => 'up']);
+        $device = Device::factory()->create(); /** @var Device $device */
+        $port = Port::factory()->make(['ifAdminStatus' => 'up', 'ifOperStatus' => 'up']); /** @var Port $port */
         $device->ports()->save($port);
 
         $trapText = "$device->hostname

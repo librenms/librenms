@@ -1,6 +1,3 @@
-source: API/Bills.md
-path: blob/master/doc/
-
 ### `list_bills`
 
 Retrieve the list of bills currently in the system.
@@ -260,6 +257,8 @@ Output:
         "traf_in": "3235123452544",
         "traf_out": "33608406566",
         "traf_total": "3268731859110",
+        "bill_peak_out": "2782349290",
+        "bill_peak_in": "10161119",
         "pdf": null
     }
  ],

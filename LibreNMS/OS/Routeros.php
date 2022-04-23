@@ -15,10 +15,10 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
+ *
  * @copyright  2017 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -28,17 +28,21 @@ namespace LibreNMS\OS;
 use LibreNMS\Device\WirelessSensor;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessCcqDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessClientsDiscovery;
+use LibreNMS\Interfaces\Discovery\Sensors\WirelessDistanceDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessFrequencyDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessNoiseFloorDiscovery;
+use LibreNMS\Interfaces\Discovery\Sensors\WirelessQualityDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessRateDiscovery;
-use LibreNMS\Interfaces\Discovery\Sensors\WirelessRssiDiscovery;
-use LibreNMS\Interfaces\Discovery\Sensors\WirelessDistanceDiscovery;
-use LibreNMS\Interfaces\Discovery\Sensors\WirelessRsrqDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessRsrpDiscovery;
+use LibreNMS\Interfaces\Discovery\Sensors\WirelessRsrqDiscovery;
+use LibreNMS\Interfaces\Discovery\Sensors\WirelessRssiDiscovery;
 use LibreNMS\Interfaces\Discovery\Sensors\WirelessSinrDiscovery;
+use LibreNMS\Interfaces\Polling\OSPolling;
 use LibreNMS\OS;
+use LibreNMS\RRD\RrdDefinition;
 
 class Routeros extends OS implements
+    OSPolling,
     WirelessCcqDiscovery,
     WirelessClientsDiscovery,
     WirelessFrequencyDiscovery,
@@ -48,10 +52,9 @@ class Routeros extends OS implements
     WirelessDistanceDiscovery,
     WirelessRsrqDiscovery,
     WirelessRsrpDiscovery,
-    WirelessSinrDiscovery
+    WirelessSinrDiscovery,
+    WirelessQualityDiscovery
 {
-    private $data;
-
     /**
      * Returns an array of LibreNMS\Device\Sensor objects that have been discovered
      *
@@ -59,13 +62,15 @@ class Routeros extends OS implements
      */
     public function discoverWirelessCcq()
     {
-        $data = $this->fetchData();
-        $sensors = array();
+        $sensors = [];
+
+        $data = $this->getCacheTable('MIKROTIK-MIB::mtxrWlApTable');
         foreach ($data as $index => $entry) {
             // skip sensors with no data (nv2 should report 1 client, but doesn't report ccq)
             if ($entry['mtxrWlApClientCount'] > 0 && $entry['mtxrWlApOverallTxCCQ'] == 0) {
                 continue;
             }
+            $freq = $entry['mtxrWlApFreq'] ? substr($entry['mtxrWlApFreq'], 0, 1) . 'G' : 'SSID';
 
             $sensors[] = new WirelessSensor(
                 'ccq',
@@ -73,12 +78,14 @@ class Routeros extends OS implements
                 '.1.3.6.1.4.1.14988.1.1.1.3.1.10.' . $index,
                 'mikrotik',
                 $index,
-                'SSID: ' . $entry['mtxrWlApSsid'],
+                "$freq: " . $entry['mtxrWlApSsid'],
                 $entry['mtxrWlApOverallTxCCQ']
             );
         }
+
         return $sensors;
     }
+
     /**
      * Returns an array of LibreNMS\Device\Sensor objects that have been discovered
      *
@@ -86,12 +93,25 @@ class Routeros extends OS implements
      */
     public function discoverWirelessClients()
     {
-        return $this->discoverSensor(
-            'clients',
-            'mtxrWlApClientCount',
-            '.1.3.6.1.4.1.14988.1.1.1.3.1.6.'
-        );
+        $sensors = [];
+        $data = $this->getCacheTable('MIKROTIK-MIB::mtxrWlApTable');
+        foreach ($data as $index => $entry) {
+            $freq = $entry['mtxrWlApFreq'] ? substr($entry['mtxrWlApFreq'], 0, 1) . 'G' : 'SSID';
+
+            $sensors[] = new WirelessSensor(
+                'clients',
+                $this->getDeviceId(),
+                '.1.3.6.1.4.1.14988.1.1.1.3.1.6.' . $index,
+                'mikrotik',
+                $index,
+                "$freq: " . $entry['mtxrWlApSsid'],
+                $entry['mtxrWlApClientCount']
+            );
+        }
+
+        return $sensors;
     }
+
     /**
      * Discover wireless frequency.  This is in MHz. Type is frequency.
      * Returns an array of LibreNMS\Device\Sensor objects that have been discovered
@@ -100,25 +120,41 @@ class Routeros extends OS implements
      */
     public function discoverWirelessFrequency()
     {
-        $data = $this->fetchData();
-       
-        $sensors = array();
+        $sensors = [];
+        $data = $this->getCacheTable('MIKROTIK-MIB::mtxrWlApTable');
         foreach ($data as $index => $entry) {
-            if ($entry['mtxrWlApFreq'] == null) {
-                return $this->discoverSensor(
-                    'frequency',
-                    'mtxrWl60GFreq',
-                    '.1.3.6.1.4.1.14988.1.1.1.8.1.6.'
-                );
-            } else {
-                return $this->discoverSensor(
-                    'frequency',
-                    'mtxrWlApFreq',
-                    '.1.3.6.1.4.1.14988.1.1.1.3.1.7.'
-                );
+            if ($entry['mtxrWlApFreq'] === '0') {
+                continue;
             }
+            $freq = substr($entry['mtxrWlApFreq'], 0, 1) . 'G';
+
+            $sensors[] = new WirelessSensor(
+                'frequency',
+                $this->getDeviceId(),
+                '.1.3.6.1.4.1.14988.1.1.1.3.1.7.' . $index,
+                'mikrotik',
+                $index,
+                "$freq: " . $entry['mtxrWlApSsid'],
+                $entry['mtxrWlApFreq']
+            );
         }
+
+        $data = $this->getCacheTable('MIKROTIK-MIB::mtxrWl60GTable');
+        foreach ($data as $index => $entry) {
+            $sensors[] = new WirelessSensor(
+                'frequency',
+                $this->getDeviceId(),
+                '.1.3.6.1.4.1.14988.1.1.1.8.1.6.' . $index,
+                'mikrotik-60g',
+                $index,
+                '60G: ' . $entry['mtxrWl60GSsid'],
+                $entry['mtxrWl60GFreq']
+            );
+        }
+
+        return $sensors;
     }
+
     /**
      * Discover wireless Rssi.  This is in Dbm. Type is Dbm.
      * Returns an array of LibreNMS\Device\Sensor objects that have been discovered
@@ -127,12 +163,50 @@ class Routeros extends OS implements
      */
     public function discoverWirelessRssi()
     {
-        return $this->discoverSensor(
-            'rssi',
-            'mtxrWl60GRssi',
-            '.1.3.6.1.4.1.14988.1.1.1.8.1.12.'
-        );
+        $sensors = [];
+        $data = $this->getCacheTable('MIKROTIK-MIB::mtxrWl60GTable');
+
+        foreach ($data as $index => $entry) {
+            $sensors[] = new WirelessSensor(
+                'rssi',
+                $this->getDeviceId(),
+                '.1.3.6.1.4.1.14988.1.1.1.8.1.12.' . $index,
+                'mikrotik',
+                $index,
+                '60G: ' . $entry['mtxrWl60GSsid'],
+                $entry['mtxrWl60GRssi']
+            );
+        }
+
+        return $sensors;
     }
+
+    /**
+     * Discover wireless Quality.  This is in Dbm. Type is Dbm.
+     * Returns an array of LibreNMS\Device\Sensor objects that have been discovered
+     *
+     * @return array Sensors
+     */
+    public function discoverWirelessQuality()
+    {
+        $sensors = [];
+        $data = $this->getCacheTable('MIKROTIK-MIB::mtxrWl60GTable');
+
+        foreach ($data as $index => $entry) {
+            $sensors[] = new WirelessSensor(
+                'quality',
+                $this->getDeviceId(),
+                '.1.3.6.1.4.1.14988.1.1.1.8.1.8.' . $index,
+                'mikrotik',
+                $index,
+                '60G: ' . $entry['mtxrWl60GSsid'],
+                $entry['mtxrWl60GSignal']
+            );
+        }
+
+        return $sensors;
+    }
+
     /**
      * Returns an array of LibreNMS\Device\Sensor objects that have been discovered
      *
@@ -140,12 +214,26 @@ class Routeros extends OS implements
      */
     public function discoverWirelessNoiseFloor()
     {
-        return $this->discoverSensor(
-            'noise-floor',
-            'mtxrWlApNoiseFloor',
-            '.1.3.6.1.4.1.14988.1.1.1.3.1.9.'
-        );
+        $sensors = [];
+        $data = $this->getCacheTable('MIKROTIK-MIB::mtxrWlApTable');
+
+        foreach ($data as $index => $entry) {
+            $freq = $entry['mtxrWlApFreq'] ? substr($entry['mtxrWlApFreq'], 0, 1) . 'G' : 'SSID';
+
+            $sensors[] = new WirelessSensor(
+                'noise-floor',
+                $this->getDeviceId(),
+                '.1.3.6.1.4.1.14988.1.1.1.3.1.9.' . $index,
+                'mikrotik',
+                $index,
+                "$freq: " . $entry['mtxrWlApSsid'],
+                $entry['mtxrWlApNoiseFloor']
+            );
+        }
+
+        return $sensors;
     }
+
     /**
      * Discover wireless rate. This is in bps. Type is rate.
      * Returns an array of LibreNMS\Device\Sensor objects that have been discovered
@@ -154,9 +242,13 @@ class Routeros extends OS implements
      */
     public function discoverWirelessRate()
     {
-        $data = $this->fetchData();
-        $sensors = array();
+        $sensors = [];
+        $data = $this->getCacheTable('MIKROTIK-MIB::mtxrWlApTable');
         foreach ($data as $index => $entry) {
+            if ($entry['mtxrWlApTxRate'] === '0' && $entry['mtxrWlApRxRate'] === '0') {
+                continue;  // no data
+            }
+
             $sensors[] = new WirelessSensor(
                 'rate',
                 $this->getDeviceId(),
@@ -175,121 +267,163 @@ class Routeros extends OS implements
                 'SSID: ' . $entry['mtxrWlApSsid'] . ' Rx',
                 $entry['mtxrWlApRxRate']
             );
+        }
+
+        $data = $this->getCacheTable('MIKROTIK-MIB::mtxrWl60GTable');
+
+        foreach ($data as $index => $entry) {
             $sensors[] = new WirelessSensor(
                 'rate',
                 $this->getDeviceId(),
-                '.1.3.6.1.4.1.14988.1.1.1.9.1.8.' . $index,
+                '.1.3.6.1.4.1.14988.1.1.1.8.1.13.' . $index,
                 'mikrotik-60g-tx',
                 $index,
-                'Tx Rate',
-                $entry['mtxrWl60G'],
-                $multiplier = 1000000
+                '60G: ' . $entry['mtxrWl60GSsid'],
+                $entry['mtxrWl60GPhyRate'],
+                1000000
             );
         }
+
         return $sensors;
     }
-    private function fetchData()
-    {
-        if (is_null($this->data)) {
-            $wl60 = snmpwalk_cache_oid($this->getDevice(), 'mtxrWl60GTable', array(), 'MIKROTIK-MIB');
-            $wlap = snmpwalk_cache_oid($this->getDevice(), 'mtxrWlApTable', array(), 'MIKROTIK-MIB');
-            $wl60sta = snmpwalk_cache_oid($this->getDevice(), 'mtxrWl60GStaTable', array(), 'MIKROTIK-MIB');
-            $this->data = $wl60+$wlap;
-            $this->data = $this->data+$wl60sta;
-        }
-        return $this->data;
-    }
+
+    /**
+     * Discover wireless distance.  This is in Kilometers. Type is distance.
+     * Returns an array of LibreNMS\Device\Sensor objects that have been discovered
+     *
+     * @return array Sensors
+     */
     public function discoverWirelessDistance()
     {
-        $data = $this->fetchData();
-        $sensors = array();
+        $sensors = [];
+
+        $data = $this->getCacheTable('MIKROTIK-MIB::mtxrWl60GStaTable');
         foreach ($data as $index => $entry) {
             $sensors[] = new WirelessSensor(
                 'distance',
                 $this->getDeviceId(),
-                '.1.3.6.1.4.1.14988.1.1.1.8.1.13.' . $index,
+                '.1.3.6.1.4.1.14988.1.1.1.9.1.10.' . $index,
                 'mikrotik',
                 $index,
-                'SSID: ' . $entry['mtxrWl60GSsid'],
-                $entry['mtxrWl60G'],
-                null,
-                100000
+                '60G: Sta > ' . $entry['mtxrWl60GStaRemote'],
+                $entry['mtxrWl60GStaDistance'],
+                1,
+                1000
             );
         }
+
         return $sensors;
     }
-    private function discoverSensor($type, $oid, $num_oid_base)
-    {
-        $data = $this->fetchData();
-        $sensors = array();
-        foreach ($data as $index => $entry) {
-            if (($entry['mtxrWlApSsid'] !== null)) {
-                $sensors[] = new WirelessSensor(
-                    $type,
-                    $this->getDeviceId(),
-                    $num_oid_base . $index,
-                    'mikrotik',
-                    $index,
-                    'SSID: ' . $entry['mtxrWlApSsid'],
-                    $entry[$oid]
-                );
-            } else {
-                $sensors[] = new WirelessSensor(
-                    $type,
-                    $this->getDeviceId(),
-                    $num_oid_base . $index,
-                    'mikrotik',
-                    $index,
-                    'SSID: ' . $entry['mtxrWl60GSsid'],
-                    $entry[$oid]
-                );
-            }
-        }
-        return $sensors;
-    }
+
+    /**
+     * Discover LTE RSRQ.  This is in Dbm. Type is Dbm.
+     * Returns an array of LibreNMS\Device\Sensor objects that have been discovered
+     *
+     * @return array Sensors
+     */
     public function discoverWirelessRsrq()
     {
-        $sinr = '.1.3.6.1.4.1.14988.1.1.16.1.1.3.1'; //MIKROTIK-MIB::mtxrLTEModemSignalRSRQ
-        return array(
-            new WirelessSensor(
+        $data = $this->getCacheTable('MIKROTIK-MIB::mtxrLTEModemTable');
+
+        $sensors = [];
+        foreach ($data as $index => $entry) {
+            $name = $this->getCacheByIndex('MIKROTIK-MIB::mtxrInterfaceStatsName');
+            $sensors[] = new WirelessSensor(
                 'rsrq',
                 $this->getDeviceId(),
-                $sinr,
+                '.1.3.6.1.4.1.14988.1.1.16.1.1.3.' . $index,
                 'routeros',
-                0,
-                'Signal RSRQ',
-                null
-            )
-        );
+                $index,
+                $name[$index] . ': Signal RSRQ',
+                $entry['mtxrLTEModemSignalRSRQ']
+            );
+        }
+
+        return $sensors;
     }
+
+    /**
+     * Discover LTE RSRP.  This is in Dbm. Type is Dbm.
+     * Returns an array of LibreNMS\Device\Sensor objects that have been discovered
+     *
+     * @return array Sensors
+     */
     public function discoverWirelessRsrp()
     {
-        $sinr = '.1.3.6.1.4.1.14988.1.1.16.1.1.4.1'; //MIKROTIK-MIB::mtxrLTEModemSignalRSRP
-        return array(
-            new WirelessSensor(
+        $data = $this->getCacheTable('MIKROTIK-MIB::mtxrLTEModemTable');
+
+        $sensors = [];
+        foreach ($data as $index => $entry) {
+            $name = $this->getCacheByIndex('MIKROTIK-MIB::mtxrInterfaceStatsName');
+            $sensors[] = new WirelessSensor(
                 'rsrp',
                 $this->getDeviceId(),
-                $sinr,
+                '.1.3.6.1.4.1.14988.1.1.16.1.1.4.' . $index,
                 'routeros',
-                0,
-                'Signal RSRP',
-                null
-            )
-        );
+                $index,
+                $name[$index] . ': Signal RSRP',
+                $entry['mtxrLTEModemSignalRSRP']
+            );
+        }
+
+        return $sensors;
     }
+
+    /**
+     * Discover LTE SINR.  This is in Dbm. Type is Dbm.
+     * Returns an array of LibreNMS\Device\Sensor objects that have been discovered
+     *
+     * @return array Sensors
+     */
     public function discoverWirelessSinr()
     {
-        $sinr = '.1.3.6.1.4.1.14988.1.1.16.1.1.7.1'; //MIKROTIK-MIB::mtxrLTEModemSignalSINR
-        return array(
-            new WirelessSensor(
+        $data = $this->getCacheTable('MIKROTIK-MIB::mtxrLTEModemTable');
+
+        $sensors = [];
+        foreach ($data as $index => $entry) {
+            $name = $this->getCacheByIndex('MIKROTIK-MIB::mtxrInterfaceStatsName');
+            $sensors[] = new WirelessSensor(
                 'sinr',
                 $this->getDeviceId(),
-                $sinr,
+                '.1.3.6.1.4.1.14988.1.1.16.1.1.7.' . $index,
                 'routeros',
-                0,
-                'Signal SINR',
-                null
-            )
-        );
+                $index,
+                $name[$index] . ': Signal SINR',
+                $entry['mtxrLTEModemSignalSINR']
+            );
+        }
+
+        return $sensors;
+    }
+
+    public function pollOS(): void
+    {
+        $leases = snmp_get($this->getDeviceArray(), 'mtxrDHCPLeaseCount.0', '-OQv', 'MIKROTIK-MIB');
+
+        if (is_numeric($leases)) {
+            $rrd_def = RrdDefinition::make()->addDataset('leases', 'GAUGE', 0);
+
+            $fields = [
+                'leases' => $leases,
+            ];
+
+            $tags = compact('rrd_def');
+            data_update($this->getDeviceArray(), 'routeros_leases', $tags, $fields);
+            $this->enableGraph('routeros_leases');
+        }
+
+        $pppoe_sessions = snmp_get($this->getDeviceArray(), '1.3.6.1.4.1.9.9.150.1.1.1.0', '-OQv', '', '');
+
+        if (is_numeric($pppoe_sessions)) {
+            $rrd_def = RrdDefinition::make()->addDataset('pppoe_sessions', 'GAUGE', 0);
+
+            $fields = [
+                'pppoe_sessions' => $pppoe_sessions,
+            ];
+
+            $tags = compact('rrd_def');
+            data_update($this->getDeviceArray(), 'routeros_pppoe_sessions', $tags, $fields);
+            $this->enableGraph('routeros_pppoe_sessions');
+        }
     }
 }

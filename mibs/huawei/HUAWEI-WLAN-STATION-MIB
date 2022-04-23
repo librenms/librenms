@@ -1,8 +1,8 @@
 -- ============================================================================
--- Copyright (C) 2016 by  HUAWEI TECHNOLOGIES. All rights reserved.
+-- Copyright (C) 2020 by  HUAWEI TECHNOLOGIES. All rights reserved.
 -- Description: The mib is used for station.
 -- Reference: 
--- Version: V1.15
+-- Version: V1.33
 -- ============================================================================
 -- Module definition
 
@@ -28,7 +28,7 @@
 				FROM SNMPv2-TC;
 		--1.3.6.1.4.1.2011.6.139.18
 		hwWlanStation MODULE-IDENTITY
-			LAST-UPDATED "201612171030Z"		-- Dec 17, 2016 at 10:30 GMT
+			LAST-UPDATED "202007081638Z"		-- Jul 08, 2020 at 16:38 GMT
 			ORGANIZATION 
 				"Huawei Technologies Co.,Ltd."
 			CONTACT-INFO 
@@ -37,8 +37,74 @@
 				   Shenzhen 518129
 				   People's Republic of China
 				   Website: http://www.huawei.com
-				   Email: support@huawei.com
-                                                                                        "
+				   Email: support@huawei.com "
+                                   DESCRIPTION 
+				"V1.33,Add enumerations value of hwWlanNaviACStationAuthMethod, hwWlanStaAuthenMethod."
+			REVISION "202007081638Z"		-- Jul 08, 2020 at 16:38 GMT				   
+                                   DESCRIPTION 
+				"V1.32, Modify the english description of hwWlanStationTable,hwWlanWepIDConflictTrapAPMAC,hwWlanWepIDConflictTrapRadioId,hwWlanWepIDConflictTrapPreSSID,hwWlanWepIDConflictTrapCurrSSID,hwWlanWepIDConflictTrapCipherIdx."
+			REVISION "202006161519Z"		-- Jun 16, 2020 at 15:19 GMT
+				   DESCRIPTION 
+				"V1.31, Modify the enumeration value of hwWlanStaRoamTraceInfo."
+			REVISION "202004300908Z"		-- Apr 30, 2020 at 09:08 GMT
+				          DESCRIPTION 
+				"V1.30, Add an enumeration value of hwWlanStaHtMode.
+				        Modify the enumeration value of hwWlanStaHtMode."
+			REVISION "202004151908Z"		-- Apr 15, 2020 at 19:08 GMT
+				                         DESCRIPTION
+				"V1.29, Add enumerations value of hwWlanNaviACStationAuthMethod, hwWlanStaAuthenMethod."
+			REVISION "202004031200Z"		-- Apr 3, 2020 at 12:00 GMT
+				   	      DESCRIPTION 
+				"V1.28, Add an enumeration value of hwWlanStaRfMode."
+			REVISION "202004021658Z"		-- Apr 2, 2020 at 16:58 GMT
+				   	      DESCRIPTION 
+				"V1.27, Add the nodes of hwWlanStaWirelessStatRxIPv6Frames,hwWlanStaWirelessRxIPv6Bytes,hwWlanStaWirelessStatTxIPv6Frames,hwWlanStaWirelessTxIPv6Bytes, hwWlanStaGatewayIPv6 in the hwWlanStationEntry;
+				Add the nodes of hwStationIPConflictTrap in the hwWlanStationObjects;
+				Add the nodes of hwStationIPConflictTrap, hwWlanConflictIPAddress in the hwWlanStaTrapObjects;"
+			REVISION "201905060931Z"		-- May 6, 2019 at 09:31 GMT				   
+				   
+				   	      DESCRIPTION 
+				"V1.26, Add the nodes of hwWlanStaRoamTraceMemberAcIP,hwWlanStaRoamTraceMemberAcIPv6 in the hwWlanStaRoamTraceEntry."
+			REVISION "201902181012Z"		-- Feb 18, 2019 at 10:12 GMT
+                                              DESCRIPTION 
+				"V1.25, Add the nodes of hwWlanStaNaviACID in the hwWlanStationTable. 
+                        Add the nodes of hwWlanStaOnlineFailDevType, hwWlanStaOnlineFailAcId, hwWlanStaOnlineFailAcName in the hwWlanStaOnlineFailTable.
+                        Add the nodes of hwWlanStaOfflineDevType, hwWlanStaOfflineAcId, hwWlanStaOfflineAcName in the hwWlanStaOfflineTable.
+                        Add the table of hwWlanNaviACStationTable."
+			REVISION "201809011720Z"		-- Sep 01, 2018 at 17:20 GMT                   
+                   
+                                              DESCRIPTION 
+				"V1.24, Modify hwWlanStationGroup."
+			REVISION "201807201020Z"		-- Jul 20, 2018 at 10:20 GMT
+
+                                              DESCRIPTION 
+				"V1.23, Add the nodes of hwWlanStationDevType in the hwWlanStationTable."
+			REVISION "201803061620Z"		-- Mar 6, 2018 at 16:20 GMT
+                                              DESCRIPTION 
+				"V1.22, Add the nodes of  hwWlanStaAssocDuration,hwWlanStaWpaDuration,hwWlanStaAuthDuration, 
+                                                                                  hwWlanStaDhcpDuration in the hwWlanStationTable."
+			REVISION "201801041040Z"		-- Jan 04, 2018 at 10:40 GMT
+                                              DESCRIPTION 
+				"V1.21, Modify an enumeration value of hwWlanStaRoamTraceInfo."
+			REVISION "201711241040Z"		-- Nov 24, 2017 at 10:40 GMT
+
+                                              DESCRIPTION 
+				"V1.20, Add an enumeration value of hwWlanStaAuthenMethod."
+			REVISION "201711202040Z"		-- Nov 20, 2017 at 20:40 GMT
+
+                                              DESCRIPTION 
+				"V1.19, Add an enumeration value of hwWlanStaRoamTraceInfo."
+			REVISION "201711181040Z"		-- Nov 18, 2017 at 10:40 GMT
+ 						DESCRIPTION 
+				"V1.18, Add a node hwWlanStaDelayStatus."
+			REVISION "201710190930Z"		-- Oct 19, 2017 at 09:30 GMT
+                                              DESCRIPTION 
+				"V1.17, Add an enumeration value of hwWlanStaRfMode."
+			REVISION "201705261040Z"		-- May 26, 2017 at 10:40 GMT
+
+                        DESCRIPTION 
+				"V1.16, Add station online fail and offline record node."
+			REVISION "201703271430Z"		-- March 27, 2017 at 14:30 GMT
                         DESCRIPTION 
 				"V1.15, Modify the description of hwWlanStaStatOperMode and hwWlanStaApId."
 			REVISION "201612171030Z"		-- Dec 17, 2016 at 10:30 GMT
@@ -208,7 +274,16 @@
 			STATUS current
 			DESCRIPTION 
 				"The STA signal strength is lower than the threshold."
-			::= { hwWlanStaTrap 11 }
+			::= { hwWlanStaTrap 11 }      
+			
+		--1.3.6.1.4.1.2011.6.139.18.1.1.1.12
+		hwStationIPConflictTrap NOTIFICATION-TYPE
+			OBJECTS { hwWlanApMac, hwWlanStaMac,  hwWlanApName, hwWlanConflictIPAddress, hwWlanApId }
+			STATUS current
+			DESCRIPTION 
+				"The IP address of the user conflicts with that of the gateway."
+			::= { hwWlanStaTrap 12 }
+			
 
 		--1.3.6.1.4.1.2011.6.139.18.1.1.2
 		hwWlanStaTrapObjects OBJECT IDENTIFIER ::= { hwWlanStaTraps 2 }
@@ -268,7 +343,7 @@
 			MAX-ACCESS read-only
 			STATUS current
 			DESCRIPTION 
-				"This object indicates the AP MAC."
+				"This object indicates the AP MAC address."
 			::= { hwWlanStaTrapObjects 6 }
 
 		 --1.3.6.1.4.1.2011.6.139.18.1.1.2.7
@@ -286,7 +361,7 @@
 			MAX-ACCESS read-only
 			STATUS current
 			DESCRIPTION 
-				"This object indicates the radio id."
+				"This object indicates the conflicting AP radio ID."
 			::= { hwWlanStaTrapObjects 8 }
 
 		 --1.3.6.1.4.1.2011.6.139.18.1.1.2.9
@@ -295,7 +370,7 @@
 			MAX-ACCESS read-only
 			STATUS current
 			DESCRIPTION 
-				"This object indicates the previous SSID."
+				"This object indicates the SSID that causes conflict."
 			::= { hwWlanStaTrapObjects 9 }
 
 		 --1.3.6.1.4.1.2011.6.139.18.1.1.2.10
@@ -304,7 +379,7 @@
 			MAX-ACCESS read-only
 			STATUS current
 			DESCRIPTION 
-				"This object indicates the current SSID."
+				"This object indicates the SSID used when conflict occurs."
 			::= { hwWlanStaTrapObjects 10 }
 
 		 --1.3.6.1.4.1.2011.6.139.18.1.1.2.11
@@ -313,7 +388,7 @@
 			MAX-ACCESS read-only
 			STATUS current
 			DESCRIPTION 
-				"This object indicates the cipher index."
+				"This object indicates the conflicting WEP key ID newly configured."
 			::= { hwWlanStaTrapObjects 11 }
 
 		 --1.3.6.1.4.1.2011.6.139.18.1.1.2.12
@@ -368,7 +443,16 @@
 			STATUS current
 			DESCRIPTION 
 				"This object indicates the time when a STA alarm is generated."
-			::= { hwWlanStaTrapObjects 17 }
+			::= { hwWlanStaTrapObjects 17 }      
+			
+		 --1.3.6.1.4.1.2011.6.139.18.1.1.2.18
+		hwWlanConflictIPAddress OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"The IP address of the user conflicts with that of the gateway."
+			::= { hwWlanStaTrapObjects 18 }
 
 		--1.3.6.1.4.1.2011.6.139.18.1.2
 		hwWlanStationTable OBJECT-TYPE
@@ -376,7 +460,7 @@
 			MAX-ACCESS not-accessible
 			STATUS current
 			DESCRIPTION 
-				"This table is used to describe access information about terminals."
+				"This table is used to describe access information about STAs.The index of this table is hwWlanStaMac."
 			::= { hwWlanStationObjects 2 }
 
 		--1.3.6.1.4.1.2011.6.139.18.1.2.1
@@ -502,7 +586,7 @@
 					Integer32,
 				hwWlanStationPowerSavePercent
 					Integer32,
-                hwWlanStaAssocStartTime
+				hwWlanStaAssocStartTime
 					Unsigned32,
 				hwWlanStaAssocSuccessTime
 					Unsigned32,
@@ -521,9 +605,39 @@
 				hwWlanStaMUMIMOCapable
 					INTEGER,
 				hwWlanStaWpaStartTime 
-		        	Unsigned32,   
+				    	Unsigned32,   
 				hwWlanStaWpaSuccessTime 
-					Unsigned32
+					Unsigned32,	
+				hwWlanStaWirelessPacketDelay
+					Unsigned32,	
+				hwWlanStaAccessSuccessRate
+					Unsigned32,	
+				hwWlanStaTotalAccessTime
+					Unsigned32,
+				hwWlanStaDelayStatus
+					INTEGER,
+				hwWlanStaAssocDuration
+					Unsigned32,
+				hwWlanStaWpaDuration
+					Unsigned32,
+				hwWlanStaAuthDuration
+					Unsigned32,
+				hwWlanStaDhcpDuration
+					Unsigned32,
+				hwWlanStationDevType	
+					OCTET STRING,
+				hwWlanStaNaviACID
+					Integer32,
+				hwWlanStaWirelessStatRxIPv6Frames
+					Counter64,
+				hwWlanStaWirelessRxIPv6Bytes
+					Counter64,
+				hwWlanStaWirelessStatTxIPv6Frames
+					Counter64,
+				hwWlanStaWirelessTxIPv6Bytes
+					Counter64,
+				hwWlanStaGatewayIPv6
+					OCTET STRING
 			 }
 
 		 --1.3.6.1.4.1.2011.6.139.18.1.2.1.1
@@ -611,11 +725,13 @@
 		hwWlanStaRfMode OBJECT-TYPE
 			SYNTAX INTEGER
 				{
+                                                                                     unknown(0),
 				dotb(1),
 				dotg(2),
 				dotn(3),
 				dota(4),
-				dotac(5)
+				dotac(5),
+				dotax(6)
 				}
 			MAX-ACCESS read-only
 			STATUS current
@@ -630,7 +746,8 @@
 				invalid(1) ,
 				ht40(2) ,
 				ht20(3) ,
-				vht80(4)
+				ht80(4),
+				ht160(5)
 				}
 			MAX-ACCESS read-only
 			STATUS current
@@ -747,7 +864,41 @@
 				wpaWpa2PskMac(20),
 				wpaWpa2PskPortal(21),
 				wpaWpa2Dot1x(22),
-				wapiPskPortal(23)
+				wapiPskPortal(23),
+				macDot1x(24),
+				wepShareKey8021XMac(25),
+				wpa8021XMac(26),
+				wpa2Dot1xMac(27),
+				wpaWpa2Dot1xMac(28),
+				wepOpenSystemPortalMac(29),
+				wepShareKeyPortalMac(30),
+				wpaPskPortalMac(31),
+				wpa2PskPortalMac(32),
+				wpaWpa2PskPortalMac(33),
+				wapiPskPortalMac(34),
+				wpaPpsk(35),
+			   	wpaPpskMac(36),
+			   	wpaPpskPortal(37),
+			   	wpaPpskPortalMac(38),
+			   	wpa2Ppsk(39),
+			   	wpa2PpskMac(40),
+			   	wpa2PpskPortal(41),
+			   	wpa2PpskPortalMac(42),
+			   	wpaWpa2Ppsk(43),
+			   	wpaWpa2PpskMac(44),
+			   	wpaWpa2PpskPortal(45),
+			   	wpaWpa2PpskPortalMac(46),
+			   	wep8021X(47),
+				wpa3Dot1x(48),
+				wpa3Dot1xMac(49),
+				wpa3Sae(50),
+				wpa3SaePortal(51),
+				wpa3SaeMac(52),
+				wpa3SaePortalMac(53),
+				wpa2PskWpa3Sae(54),
+				wpa2PskWpa3SaePortal(55),
+				wpa2PskWpa3SaePortalMac(56),
+				wpa2PskWpa3SaeMac(57)
 				}
 			MAX-ACCESS read-only
 			STATUS current
@@ -1196,7 +1347,7 @@
 			MAX-ACCESS read-only
 			STATUS current
 			DESCRIPTION
-				"This object indicates the wpa start time of the station."
+				"This object indicates the key agreement start time of the station."
 			::= { hwWlanStationEntry 65 }
 
 		-- 1.3.6.1.4.1.2011.6.139.18.1.2.1.66
@@ -1205,9 +1356,150 @@
 			MAX-ACCESS read-only
 			STATUS current
 			DESCRIPTION
-				"This object indicates the wpa success time of the station."
+				"This object indicates the key agreement success time of the station."
                                                     ::= { hwWlanStationEntry 66 }
 
+
+		-- 1.3.6.1.4.1.2011.6.139.18.1.2.1.67
+		hwWlanStaWirelessPacketDelay  OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the packet delay of the station."
+                                                    ::= { hwWlanStationEntry 67 }													
+				
+		-- 1.3.6.1.4.1.2011.6.139.18.1.2.1.68
+		hwWlanStaAccessSuccessRate  OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the access success rate of the station."
+                                                    ::= { hwWlanStationEntry 68 }	
+				
+		-- 1.3.6.1.4.1.2011.6.139.18.1.2.1.69
+		hwWlanStaTotalAccessTime  OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the access time of the station."
+                                                    ::= { hwWlanStationEntry 69 }	
+				
+		-- 1.3.6.1.4.1.2011.6.139.18.1.2.1.70
+		hwWlanStaDelayStatus  OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				delay(1) ,
+				normal(2)
+				}
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the status of the station.Delay(1),Normal(2)"
+                                                    ::= { hwWlanStationEntry 70 }	
+	
+		-- 1.3.6.1.4.1.2011.6.139.18.1.2.1.71
+		hwWlanStaAssocDuration OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the association duration(ms) of the station."
+			::= { hwWlanStationEntry 71 }
+			
+		-- 1.3.6.1.4.1.2011.6.139.18.1.2.1.72
+		hwWlanStaWpaDuration  OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the key agreement duration(ms) of the station."
+			::= { hwWlanStationEntry 72 }
+            
+		-- 1.3.6.1.4.1.2011.6.139.18.1.2.1.73
+		hwWlanStaAuthDuration  OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the auth duration(ms) of the station."
+			::= { hwWlanStationEntry 73 }
+                    
+		-- 1.3.6.1.4.1.2011.6.139.18.1.2.1.74
+		hwWlanStaDhcpDuration  OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the dhcp duration(ms) of the station."
+			::= { hwWlanStationEntry 74 }
+		-- 1.3.6.1.4.1.2011.6.139.18.1.2.1.75
+		hwWlanStationDevType OBJECT-TYPE
+			SYNTAX OCTET STRING (SIZE (0..32))
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the device type."
+			::= { hwWlanStationEntry 75 }
+		
+		-- 1.3.6.1.4.1.2011.6.139.18.1.2.1.76
+		hwWlanStaNaviACID OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the navi-ac id of the station."
+			::= { hwWlanStationEntry 76 }
+			
+		-- 1.3.6.1.4.1.2011.6.139.18.1.2.1.77
+		hwWlanStaWirelessStatRxIPv6Frames OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { hwWlanStationEntry 77 }
+
+		
+		-- 1.3.6.1.4.1.2011.6.139.18.1.2.1.78
+		hwWlanStaWirelessRxIPv6Bytes OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { hwWlanStationEntry 78 }
+
+		
+		-- 1.3.6.1.4.1.2011.6.139.18.1.2.1.79
+		hwWlanStaWirelessStatTxIPv6Frames OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { hwWlanStationEntry 79 }
+
+		
+		-- 1.3.6.1.4.1.2011.6.139.18.1.2.1.80
+		hwWlanStaWirelessTxIPv6Bytes OBJECT-TYPE
+			SYNTAX Counter64
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { hwWlanStationEntry 80 }   
+			
+		-- 1.3.6.1.4.1.2011.6.139.18.1.2.1.81
+		hwWlanStaGatewayIPv6 OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { hwWlanStationEntry 81 }
 
 		-- 1.3.6.1.4.1.2011.6.139.18.1.3
 		hwWlanStationApStatTable OBJECT-TYPE
@@ -1599,7 +1891,13 @@
 				hwWlanStaOnlineFailRowStatus
 					RowStatus,
 				hwWlanStaOnlineFailApId
-					Unsigned32
+					Unsigned32,
+				hwWlanStaOnlineFailDevType
+					Unsigned32,
+				hwWlanStaOnlineFailAcId
+					Unsigned32,
+				hwWlanStaOnlineFailAcName
+					OCTET STRING
 			 }
 
 		 --1.3.6.1.4.1.2011.6.139.18.1.4.1.1.1
@@ -1701,6 +1999,89 @@
 			DESCRIPTION
 				"This object indicates the AP ID."
 			::= { hwWlanStaOnlineFailEntry 11 }
+
+		-- 1.3.6.1.4.1.2011.6.139.18.1.4.1.1.12
+		hwWlanStaOnlineFailDevType OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the device type."
+			::= { hwWlanStaOnlineFailEntry 12 }
+		
+		-- 1.3.6.1.4.1.2011.6.139.18.1.4.1.1.13
+		hwWlanStaOnlineFailAcId OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the ac id."
+			::= { hwWlanStaOnlineFailEntry 13 }
+		
+		-- 1.3.6.1.4.1.2011.6.139.18.1.4.1.1.14
+		hwWlanStaOnlineFailAcName OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the ac name."
+			::= { hwWlanStaOnlineFailEntry 14 }
+            
+		-- 1.3.6.1.4.1.2011.6.139.18.1.4.2
+		hwWlanStaOnlineFailReasonTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF HwWlanStaOnlineFailReasonEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"This object indicates the online fail reason."
+			::= { hwWlanStaOnlineFailInfo 2 }
+		
+		-- 1.3.6.1.4.1.2011.6.139.18.1.4.2.1
+		hwWlanStaOnlineFailReasonEntry OBJECT-TYPE
+			SYNTAX HwWlanStaOnlineFailReasonEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			INDEX { hwWlanStaOnlineFailReasonCode }
+			::= { hwWlanStaOnlineFailReasonTable 1 }
+		
+		HwWlanStaOnlineFailReasonEntry ::=
+			SEQUENCE { 
+				hwWlanStaOnlineFailReasonCode
+					Unsigned32,
+				hwWlanStaOnlineFailReasonDesc
+					OCTET STRING,
+				hwWlanStaOnlineFailReasonCount
+					Unsigned32
+			 }
+
+		-- 1.3.6.1.4.1.2011.6.139.18.1.4.2.1.1
+		hwWlanStaOnlineFailReasonCode OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"This object indicates the online fail reason code."
+			::= { hwWlanStaOnlineFailReasonEntry 1 }
+		
+		-- 1.3.6.1.4.1.2011.6.139.18.1.4.2.1.2
+		hwWlanStaOnlineFailReasonDesc OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the online fail description."
+			::= { hwWlanStaOnlineFailReasonEntry 2 }
+		
+		-- 1.3.6.1.4.1.2011.6.139.18.1.4.2.1.3
+		hwWlanStaOnlineFailReasonCount OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the online fail counts."
+			::= { hwWlanStaOnlineFailReasonEntry 3 }
 			
 		--1.3.6.1.4.1.2011.6.139.18.1.5
 		hwWlanStaOfflineInfo OBJECT IDENTIFIER ::= { hwWlanStationObjects 5 }
@@ -1748,7 +2129,13 @@
 				hwWlanStaOfflineFailRowStatus
 					RowStatus,
 				hwWlanStaOfflineApId
-					Unsigned32
+					Unsigned32,
+				hwWlanStaOfflineDevType
+					Unsigned32,
+				hwWlanStaOfflineAcId
+					Unsigned32,
+				hwWlanStaOfflineAcName
+					OCTET STRING
 			 }
 
 		 --1.3.6.1.4.1.2011.6.139.18.1.5.1.1.1
@@ -1851,7 +2238,89 @@
 				"This object indicates the AP ID."
 			::= { hwWlanStaOfflineEntry 11 }
 			
-			
+		-- 1.3.6.1.4.1.2011.6.139.18.1.5.1.1.12
+		hwWlanStaOfflineDevType OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the device type."
+			::= { hwWlanStaOfflineEntry 12 }
+		
+		-- 1.3.6.1.4.1.2011.6.139.18.1.5.1.1.13
+		hwWlanStaOfflineAcId OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the ac id."
+			::= { hwWlanStaOfflineEntry 13 }
+		
+		-- 1.3.6.1.4.1.2011.6.139.18.1.5.1.1.14
+		hwWlanStaOfflineAcName OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the ac name."
+			::= { hwWlanStaOfflineEntry 14 }
+            
+		-- 1.3.6.1.4.1.2011.6.139.18.1.5.2
+		hwWlanStaOfflineReasonTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF HwWlanStaOfflineReasonEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"This object indicates the station offline reason."
+			::= { hwWlanStaOfflineInfo 2 }
+		
+		-- 1.3.6.1.4.1.2011.6.139.18.1.5.2.1
+		hwWlanStaOfflineReasonEntry OBJECT-TYPE
+			SYNTAX HwWlanStaOfflineReasonEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"This object indicates the station offline reason."
+			INDEX { hwWlanStaOfflineReasonCode }
+			::= { hwWlanStaOfflineReasonTable 1 }
+		
+		HwWlanStaOfflineReasonEntry ::=
+			SEQUENCE { 
+				hwWlanStaOfflineReasonCode
+					Unsigned32,
+				hwWlanStaOfflineReasonDesc
+					OCTET STRING,
+				hwWlanStaOfflineReasonCount
+					Unsigned32
+			 }
+
+		-- 1.3.6.1.4.1.2011.6.139.18.1.5.2.1.1
+		hwWlanStaOfflineReasonCode OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"This object indicates the station offline reason code."
+			::= { hwWlanStaOfflineReasonEntry 1 }
+		
+		-- 1.3.6.1.4.1.2011.6.139.18.1.5.2.1.2
+		hwWlanStaOfflineReasonDesc OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the station offline reason description."
+			::= { hwWlanStaOfflineReasonEntry 2 }
+		
+		-- 1.3.6.1.4.1.2011.6.139.18.1.5.2.1.3
+		hwWlanStaOfflineReasonCount OBJECT-TYPE
+			SYNTAX Unsigned32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the station offline reason counts."
+			::= { hwWlanStaOfflineReasonEntry 3 }
+					
 		--1.3.6.1.4.1.2011.6.139.18.1.6
 		hwWlanStaRoamInfo OBJECT IDENTIFIER ::= { hwWlanStationObjects 6 }
 
@@ -1906,7 +2375,11 @@
 				hwWlanStaRoamTraceApId
 					Unsigned32,
 				hwWlanStaRoamTraceInfo
-					INTEGER
+					INTEGER,
+				hwWlanStaRoamTraceMemberAcIP
+					IpAddress,
+				hwWlanStaRoamTraceMemberAcIPv6
+					OCTET STRING
 			 }
 
 		 --1.3.6.1.4.1.2011.6.139.18.1.6.1.1.1
@@ -1943,7 +2416,7 @@
 			MAX-ACCESS read-only
 			STATUS current
 			DESCRIPTION 
-				"This object indicates the IP address of the AC with which the STA associates."
+				"This object indicates the IPv4 address of the AC for setting up with an AP associated with the STA."
 			::= { hwWlanStaRoamTraceEntry 4 }
 
 		 --1.3.6.1.4.1.2011.6.139.18.1.6.1.1.5
@@ -1952,7 +2425,7 @@
 			MAX-ACCESS read-only
 			STATUS current
 			DESCRIPTION 
-				"This object indicates the IPv6 address of the AC with which the STA associates."
+				"This object indicates the IPv6 address of the AC for setting up with an AP associated with the STA."
 			::= { hwWlanStaRoamTraceEntry 5 }
 
 		 --1.3.6.1.4.1.2011.6.139.18.1.6.1.1.6
@@ -2048,15 +2521,36 @@
 			SYNTAX INTEGER
 				{
 				normal(0),
-				zeroRoam(1),
+				sameFrequencyNetwork(1),
 				pmkCacheRoam(2),
-				ftRoam(3)
+				dot11rRoam(3),
+				dot11rOverthedsRoam(4),
+				dot11rPrivateRoam(5)
 				}
 			MAX-ACCESS read-only
 			STATUS current
 			DESCRIPTION
 				"This object indicates the roam type information."
 			::= { hwWlanStaRoamTraceEntry 15 }	
+			
+		 --1.3.6.1.4.1.2011.6.139.18.1.6.1.1.16
+		hwWlanStaRoamTraceMemberAcIP OBJECT-TYPE
+			SYNTAX IpAddress
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the IPv4 address of the AC for setting up a link with a mobility group after roaming."
+			::= { hwWlanStaRoamTraceEntry 16 }
+
+		 --1.3.6.1.4.1.2011.6.139.18.1.6.1.1.17
+		hwWlanStaRoamTraceMemberAcIPv6 OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION 
+				"This object indicates the IPv6 address of the AC for setting up a link with a mobility group after roaming."
+			::= { hwWlanStaRoamTraceEntry 17 }
+			
 		--1.3.6.1.4.1.2011.6.139.18.1.6.2
 		hwWlanStaAcL3RoamStatisticsTable OBJECT-TYPE
 			SYNTAX SEQUENCE OF HwWlanStaAcL3RoamStatisticsEntry 
@@ -2226,7 +2720,193 @@
 			DESCRIPTION
 				"This object indicates the AP ID."
 			::= { hwWlanStaApL3RoamStatisticsEntry 5 }
+		
+		-- 1.3.6.1.4.1.2011.6.139.18.1.7
+		hwWlanNaviACStationTable OBJECT-TYPE
+			SYNTAX SEQUENCE OF HwWlanNaviACStationEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			::= { hwWlanStationObjects 7 }
+		
+		-- 1.3.6.1.4.1.2011.6.139.18.1.7.1
+		hwWlanNaviACStationEntry OBJECT-TYPE
+			SYNTAX HwWlanNaviACStationEntry
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"Description."
+			INDEX { hwWlanNaviACStationMac }
+			::= { hwWlanNaviACStationTable 1 }
+		
+		HwWlanNaviACStationEntry ::=
+			SEQUENCE { 
+				hwWlanNaviACStationMac
+					MacAddress,
+				hwWlanNaviACStationIPAddress
+					IpAddress,
+				hwWlanNaviACStationIPv6Address
+					OCTET STRING,
+				hwWlanNaviACStationOnlineTime
+					Integer32,
+				hwWlanNaviACStationAuthMethod
+					INTEGER,
+				hwWlanNaviAcStationVlanID
+					Integer32,
+				hwWlanNaviAcStationState
+					INTEGER,
+				hwWlanNaviACStationLocalACID
+					Integer32,
+				hwWlanNaviACStationWlanId
+					Integer32
+			 }
 
+		-- 1.3.6.1.4.1.2011.6.139.18.1.7.1.1
+		hwWlanNaviACStationMac OBJECT-TYPE
+			SYNTAX MacAddress
+			MAX-ACCESS not-accessible
+			STATUS current
+			DESCRIPTION
+				"This object indicates the mac address of the station."
+			::= { hwWlanNaviACStationEntry 1 }
+		
+		-- 1.3.6.1.4.1.2011.6.139.18.1.7.1.2
+		hwWlanNaviACStationIPAddress OBJECT-TYPE
+			SYNTAX IpAddress
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the ipv4 address of the station."
+			::= { hwWlanNaviACStationEntry 2 }
+		
+		-- 1.3.6.1.4.1.2011.6.139.18.1.7.1.3
+		hwWlanNaviACStationIPv6Address OBJECT-TYPE
+			SYNTAX OCTET STRING
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the ipv6 address of the station."
+			::= { hwWlanNaviACStationEntry 3 }
+		
+		-- 1.3.6.1.4.1.2011.6.139.18.1.7.1.4
+		hwWlanNaviACStationOnlineTime OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the online time of the station."
+			::= { hwWlanNaviACStationEntry 4 }
+		
+		-- 1.3.6.1.4.1.2011.6.139.18.1.7.1.5
+		hwWlanNaviACStationAuthMethod OBJECT-TYPE
+            SYNTAX INTEGER
+				{
+				wepOpenSystem(1),
+				wepOpenSystemMac(2),
+				wepOpenSystem8021X(3),
+				wepOpenSystemPortal(4),
+				wepShareKey(5), 
+				wepShareKeyMac(6),
+				wepShareKey8021X(7),
+				wepShareKeyPortal(8),
+				wpa8021X(9),
+				wpaPreShareKey(10),
+				wpaPskMac(11),
+				wpaPskPortal(12),
+				wpa2Dot1x(13),
+				wpa2PreShareKey(14),
+				wpa2PskMac(15),
+				wpa2PskPortal(16),  
+				wapiCertification(17),
+				wapiPreShareKey(18), 
+				wpaWpa2PreShareKey(19),
+				wpaWpa2PskMac(20),
+				wpaWpa2PskPortal(21),
+				wpaWpa2Dot1x(22),
+				wapiPskPortal(23),
+				macDot1x(24),
+				wepShareKey8021XMac(25),
+				wpa8021XMac(26),
+				wpa2Dot1xMac(27),
+				wpaWpa2Dot1xMac(28),
+				wepOpenSystemPortalMac(29),
+				wepShareKeyPortalMac(30),
+				wpaPskPortalMac(31),
+				wpa2PskPortalMac(32),
+				wpaWpa2PskPortalMac(33),
+				wapiPskPortalMac(34),
+				wpaPpsk(35),
+			   	wpaPpskMac(36),
+			   	wpaPpskPortal(37),
+			   	wpaPpskPortalMac(38),
+			   	wpa2Ppsk(39),
+			   	wpa2PpskMac(40),
+			   	wpa2PpskPortal(41),
+			   	wpa2PpskPortalMac(42),
+			   	wpaWpa2Ppsk(43),
+			   	wpaWpa2PpskMac(44),
+			   	wpaWpa2PpskPortal(45),
+			   	wpaWpa2PpskPortalMac(46),
+			   	wep8021X(47),
+			   	wpa3Dot1x(48),
+			    	wpa3Dot1xMac(49),
+			    	wpa3Sae(50),
+			    	wpa3SaePortal(51),
+			    	wpa3SaeMac(52),
+			    	wpa3SaePortalMac(53),
+			    	wpa2PskWpa3Sae(54),
+			    	wpa2PskWpa3SaePortal(55),
+			    	wpa2PskWpa3SaePortalMac(56),
+			    	wpa2PskWpa3SaeMac(57)
+				}         
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the auth method of the station."
+			::= { hwWlanNaviACStationEntry 5 }
+		
+		-- 1.3.6.1.4.1.2011.6.139.18.1.7.1.6
+		hwWlanNaviAcStationVlanID OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the vlan id of the station."
+			::= { hwWlanNaviACStationEntry 6 }
+		
+		-- 1.3.6.1.4.1.2011.6.139.18.1.7.1.7
+		hwWlanNaviAcStationState OBJECT-TYPE
+			SYNTAX INTEGER
+				{
+				assoc(1),
+				authing(2),
+				run(3),
+				delete(4)
+				}            
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the state of the station."
+			::= { hwWlanNaviACStationEntry 7 }
+		
+		-- 1.3.6.1.4.1.2011.6.139.18.1.7.1.8
+		hwWlanNaviACStationLocalACID OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the local ac id of the station."
+			::= { hwWlanNaviACStationEntry 8 }
+		
+		-- 1.3.6.1.4.1.2011.6.139.18.1.7.1.9
+		hwWlanNaviACStationWlanId OBJECT-TYPE
+			SYNTAX Integer32
+			MAX-ACCESS read-only
+			STATUS current
+			DESCRIPTION
+				"This object indicates the wlan id of the station."
+			::= { hwWlanNaviACStationEntry 9 }
 		--1.3.6.1.4.1.2011.6.139.18.2
 		hwWlanStationConformance OBJECT IDENTIFIER ::= { hwWlanStation 2 }
 
@@ -2239,7 +2919,7 @@
 			DESCRIPTION 
 				"Description."
 			MODULE
-					MANDATORY-GROUPS { hwWlanStationGroup, hwWlanApAssocStatGroup, hwWlanStaOnlineFailInfoGroup, hwWlanStaOfflineInfoGroup, hwWlanStaRoamInfoGroup }
+					MANDATORY-GROUPS { hwWlanStationGroup, hwWlanApAssocStatGroup, hwWlanStaOnlineFailInfoGroup, hwWlanStaOfflineInfoGroup, hwWlanStaRoamInfoGroup, hwWlanNaviACStationGroup }
 			::= { hwWlanStationCompliances 1 }
 
 		--1.3.6.1.4.1.2011.6.139.18.2.2
@@ -2249,7 +2929,7 @@
 		hwWlanStaTrapsGroup NOTIFICATION-GROUP
 			NOTIFICATIONS { hwWlanStaAuthErrorTrap, hwWlanStaAssoFailTrap, hwWlanUserInvalidCerficationTrap, hwWlanStaRepititiveAttackTrap, hwWlanStaTamperAttackTrap, 
 			hwWlanStaLowLevelSecAttackTrap, hwWlanStaAddressRedirectionAttackTrap, hwWlanStaWepIdConflictTrap, hwStationOnlineTrap, hwStationOfflineTrap, 
-			hwStationSignalStrengthLowThanThresholdTrap }
+			hwStationSignalStrengthLowThanThresholdTrap, hwStationIPConflictTrap }
 			STATUS current
 			DESCRIPTION 
 				"Description."
@@ -2260,7 +2940,7 @@
 			OBJECTS { hwWlanStaAuthenticationMode,hwWlanStaTrapOccurTime,hwWlanStaFailCodeType,hwWlanSignalStrengthThreshold,hwWlanWepIDConflictTrapRadioId,
 			hwWlanWepIDConflictTrapAPMAC,hwWlanStaAuthenticationFailCause,hwWlanWepIDConflictTrapPreSSID,hwWlanWlanVapAuthEncryptMode,hwWlanWlanStaAuthEncryptMode,
 			hwWlanWepIDConflictTrapCurrSSID,hwWlanStaAuthenticationFailCauseStr,hwWlanWepIDConflictTrapCipherIdx,hwWlanWepIDConflictTrapAPName,hwWlanStaAssociationFailCauseStr,
-			hwWlanStaAssociationFailCause,hwWlanStaAssocBssid }
+			hwWlanStaAssociationFailCause,hwWlanStaAssocBssid,hwWlanConflictIPAddress }
 			STATUS current
 			DESCRIPTION 
 				"Description."
@@ -2279,7 +2959,14 @@
 				hwWlanStaPeriodReSendBytes, hwWlanStaRssi, hwWlanStaNoise, hwWlanStaSnrUs, hwWlanStaRxPowerUs, 
 				hwWlanStaChannelUtilRate, hwWlanStaChannelBusyRate, hwWlanStaChannelTxRatio, hwWlanStaChannelRxRatio, hwWlanStaChannelFreeRate, 
 				hwWlanStaChannelInterfRate, hwWlanStaPeriodSendFrames, hwWlanStaApId, 
-				hwWlanStationUapsdCapacity, hwWlanStationPowerSavePercent, hwWlanStaAssocStartTime, hwWlanStaAuthStartTime, hwWlanStaDhcpStartTime, hwWlanStaVHTCapable, hwWlanStaVHTTxBFCapable, hwWlanStaMUMIMOCapable, hwWlanStaWpaStartTime, hwWlanStaWpaSuccessTime}
+				hwWlanStationUapsdCapacity, hwWlanStationPowerSavePercent, 
+				hwWlanStaAssocStartTime,hwWlanStaAssocSuccessTime,
+				hwWlanStaAuthStartTime, hwWlanStaAuthSuccessTime,
+				hwWlanStaDhcpStartTime, hwWlanStaDhcpSuccessTime,
+				hwWlanStaVHTCapable, hwWlanStaVHTTxBFCapable, hwWlanStaMUMIMOCapable, hwWlanStaWpaStartTime, hwWlanStaWpaSuccessTime,
+				hwWlanStaWirelessPacketDelay,hwWlanStaAccessSuccessRate,hwWlanStaTotalAccessTime,
+				hwWlanStaDelayStatus,hwWlanStaAssocDuration,hwWlanStaWpaDuration,hwWlanStaAuthDuration,hwWlanStaDhcpDuration, 
+				hwWlanStationDevType,hwWlanStaNaviACID,hwWlanStaWirelessStatRxIPv6Frames,hwWlanStaWirelessRxIPv6Bytes,hwWlanStaWirelessStatTxIPv6Frames,hwWlanStaWirelessTxIPv6Bytes, hwWlanStaGatewayIPv6}
 			STATUS current
 			DESCRIPTION 
 				"Description."
@@ -2301,7 +2988,7 @@
 		--1.3.6.1.4.1.2011.6.139.18.2.2.5
 		hwWlanStaOnlineFailInfoGroup OBJECT-GROUP
 			OBJECTS { hwWlanStaOnlineFailApMac, hwWlanStaOnlineFailApName, hwWlanStaOnlineFailRadioId, 
-			hwWlanStaOnlineFailWlanId, hwWlanStaOnlineFailLastFailTime, hwWlanStaOnlineFailReason, hwWlanStaOnlineFailSsid, hwWlanStaOnlineFailRowStatus, hwWlanStaOnlineFailApId }
+			hwWlanStaOnlineFailWlanId, hwWlanStaOnlineFailLastFailTime, hwWlanStaOnlineFailReason, hwWlanStaOnlineFailSsid, hwWlanStaOnlineFailRowStatus, hwWlanStaOnlineFailApId, hwWlanStaOnlineFailDevType, hwWlanStaOnlineFailAcId, hwWlanStaOnlineFailAcName}
 			STATUS current
 			DESCRIPTION 
 				"Description."
@@ -2310,7 +2997,7 @@
 		--1.3.6.1.4.1.2011.6.139.18.2.2.6
 		hwWlanStaOfflineInfoGroup OBJECT-GROUP
 			OBJECTS { hwWlanStaOfflineApMac, hwWlanStaOfflineApName, hwWlanStaOfflineRadioId, 
-			hwWlanStaOfflineWlanId, hwWlanStaOfflineLastFailTime, hwWlanStaOfflineReason, hwWlanStaOfflineSsid, hwWlanStaOfflineFailRowStatus, hwWlanStaOfflineApId }
+			hwWlanStaOfflineWlanId, hwWlanStaOfflineLastFailTime, hwWlanStaOfflineReason, hwWlanStaOfflineSsid, hwWlanStaOfflineFailRowStatus, hwWlanStaOfflineApId, hwWlanStaOfflineDevType, hwWlanStaOfflineAcId, hwWlanStaOfflineAcName }
 			STATUS current
 			DESCRIPTION 
 				"Description."
@@ -2321,13 +3008,22 @@
 			OBJECTS { hwWlanStaRoamTraceTime, hwWlanStaRoamTraceAcIP, 
 			hwWlanStaRoamTraceAcIPv6, hwWlanStaRoamTraceApName, hwWlanStaRoamTraceRadioId, hwWlanStaRoamTraceBssid, 
 			hwWlanStaRoamTraceInRate, hwWlanStaRoamTraceOutRate, hwWlanStaRoamTraceInRssi, hwWlanStaRoamTraceOutRssi, hwWlanStaRoamTraceRoamType, 
-			hwWlanStaRoamTraceApId, hwWlanStaRoamTraceInfo,hwWlanStaAcL3RoamStatisticAcIP, hwWlanStaAcL3RoamStatisticAcIPv6, hwWlanStaAcL3RoamStatisticRoamInCnt, hwWlanStaAcL3RoamStatisticRoamOutCnt, 
+			hwWlanStaRoamTraceApId,hwWlanStaRoamTraceInfo,hwWlanStaRoamTraceMemberAcIP, hwWlanStaRoamTraceMemberAcIPv6, hwWlanStaAcL3RoamStatisticAcIP, hwWlanStaAcL3RoamStatisticAcIPv6, hwWlanStaAcL3RoamStatisticRoamInCnt, hwWlanStaAcL3RoamStatisticRoamOutCnt, 
 			hwWlanStaApL3RoamStatisticApName, hwWlanStaApL3RoamStatisticRoamInCnt, hwWlanStaApL3RoamStatisticRoamOutCnt, hwWlanStaApL3RoamStatisticApId }
 			STATUS current
 			DESCRIPTION 
 				"Description."
 			::= { hwWlanStationObjectGroups 7 }
 
+		--1.3.6.1.4.1.2011.6.139.18.2.2.8
+		hwWlanNaviACStationGroup OBJECT-GROUP
+			OBJECTS { hwWlanNaviACStationIPAddress, hwWlanNaviACStationIPv6Address, hwWlanNaviACStationOnlineTime, hwWlanNaviACStationAuthMethod,
+                      hwWlanNaviAcStationVlanID, hwWlanNaviAcStationState, hwWlanNaviACStationLocalACID, hwWlanNaviACStationWlanId
+                    }
+			STATUS current
+			DESCRIPTION 
+				"Description."
+			::= { hwWlanStationObjectGroups 8 }                       
 
 	END
 --

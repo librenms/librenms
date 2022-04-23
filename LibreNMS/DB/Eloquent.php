@@ -15,69 +15,31 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
+ *
  * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
 namespace LibreNMS\DB;
 
-use Dotenv\Dotenv;
-use Illuminate\Database\Capsule\Manager as Capsule;
-use Illuminate\Database\Events\StatementPrepared;
-use Illuminate\Events\Dispatcher;
+use DB;
+use Illuminate\Database\Connection;
 use LibreNMS\Util\Laravel;
+use PDOException;
 
 class Eloquent
 {
-    /** @var Capsule static reference to capsule */
-    private static $capsule;
-
-    public static function boot()
-    {
-        // boot Eloquent outside of Laravel
-        if (!Laravel::isBooted() && is_null(self::$capsule)) {
-            $install_dir = realpath(__DIR__ . '/../../');
-
-            Dotenv::create($install_dir)->load();
-
-            $db_config = include($install_dir . '/config/database.php');
-            $settings = $db_config['connections'][$db_config['default']];
-
-            self::$capsule = new Capsule;
-            self::$capsule->addConnection($settings);
-            self::$capsule->setEventDispatcher(new Dispatcher());
-            self::$capsule->setAsGlobal();
-            self::$capsule->bootEloquent();
-        }
-
-        self::initLegacyListeners();
-        self::setStrictMode(false); // set non-strict mode if for legacy code
-    }
-
-    public static function initLegacyListeners()
-    {
-        if (self::isConnected()) {
-            // set FETCH_ASSOC for queries that required by setting the global variable $PDO_FETCH_ASSOC (for dbFacile)
-            self::DB()->getEventDispatcher()->listen(StatementPrepared::class, function ($event) {
-                global $PDO_FETCH_ASSOC;
-                if ($PDO_FETCH_ASSOC) {
-                    $event->statement->setFetchMode(\PDO::FETCH_ASSOC);
-                }
-            });
-        }
-    }
-
     /**
      * Set the strict mode for the current connection (will not persist)
-     * @param bool $strict
+     *
+     * @param  bool  $strict
      */
-    public static function setStrictMode($strict = true)
+    public static function setStrictMode(bool $strict = true): void
     {
-        if (self::isConnected()) {
+        if (self::isConnected() && self::getDriver() == 'mysql') {
             if ($strict) {
                 self::DB()->getPdo()->exec("SET sql_mode='ONLY_FULL_GROUP_BY,STRICT_TRANS_TABLES,NO_ZERO_IN_DATE,NO_ZERO_DATE,ERROR_FOR_DIVISION_BY_ZERO,NO_ENGINE_SUBSTITUTION'");
             } else {
@@ -86,14 +48,16 @@ class Eloquent
         }
     }
 
-    public static function isConnected()
+    public static function isConnected(?string $name = null): bool
     {
         try {
-            $conn = self::DB();
+            $conn = self::DB($name);
             if ($conn) {
-                return !is_null($conn->getPdo());
+                $conn->getPdo();
+
+                return true;
             }
-        } catch (\PDOException $e) {
+        } catch (PDOException $e) {
             return false;
         }
 
@@ -103,19 +67,54 @@ class Eloquent
     /**
      * Access the Database Manager for Fluent style queries. Like the Laravel DB facade.
      *
-     * @return \Illuminate\Database\Connection
+     * @param  string|null  $name
+     * @return \Illuminate\Database\Connection|null
      */
-    public static function DB()
+    public static function DB(?string $name = null): ?Connection
     {
         // check if Laravel is booted
         if (Laravel::isBooted()) {
-            return \DB::connection();
+            return DB::connection($name);
         }
 
-        if (is_null(self::$capsule)) {
-            return null;
-        }
+        return null;
+    }
 
-        return self::$capsule->getDatabaseManager()->connection();
+    public static function getDriver(): ?string
+    {
+        $connection = config('database.default');
+
+        return config("database.connections.{$connection}.driver");
+    }
+
+    /**
+     * Set the active connection, used during install
+     *
+     * @param  string  $name
+     * @param  string  $db_host
+     * @param  string  $db_user
+     * @param  string  $db_pass
+     * @param  string  $db_name
+     * @param  int|string  $db_port
+     * @param  string  $db_socket
+     * @return void
+     */
+    public static function setConnection($name, $db_host = null, $db_user = '', $db_pass = '', $db_name = '', $db_port = null, $db_socket = null): void
+    {
+        \Config::set("database.connections.$name", [
+            'driver' => 'mysql',
+            'host' => $db_host,
+            'port' => $db_port,
+            'database' => $db_name,
+            'username' => $db_user,
+            'password' => $db_pass,
+            'unix_socket' => $db_socket,
+            'charset' => 'utf8mb4',
+            'collation' => 'utf8mb4_unicode_ci',
+            'prefix' => '',
+            'strict' => true,
+            'engine' => null,
+        ]);
+        \Config::set('database.default', $name);
     }
 }

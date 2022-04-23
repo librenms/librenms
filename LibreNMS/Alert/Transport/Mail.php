@@ -11,16 +11,16 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>. */
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>. */
 
 /**
  * Mail Transport
+ *
  * @author f0o <f0o@devilcode.org>
  * @copyright 2014 f0o, LibreNMS
  * @license GPL
- * @package LibreNMS
- * @subpackage Alerts
  */
+
 namespace LibreNMS\Alert\Transport;
 
 use LibreNMS\Alert\Transport;
@@ -36,9 +36,17 @@ class Mail extends Transport
     public function contactMail($obj)
     {
         $email = $this->config['email'] ?? $obj['contacts'];
-        $msg = preg_replace("/(?<!\r)\n/", "\r\n", $obj['msg']); // fix line returns for windows mail clients
+        $html = Config::get('email_html');
 
-        return send_mail($email, $obj['title'], $msg, (Config::get('email_html') == 'true') ? true : false);
+        if ($html && ! $this->isHtmlContent($obj['msg'])) {
+            // if there are no html tags in the content, but we are sending an html email, use br for line returns instead
+            $msg = preg_replace("/\r?\n/", "<br />\n", $obj['msg']);
+        } else {
+            // fix line returns for windows mail clients
+            $msg = preg_replace("/(?<!\r)\n/", "\r\n", $obj['msg']);
+        }
+
+        return \LibreNMS\Util\Mail::send($email, $obj['title'], $msg, $html);
     }
 
     public static function configTemplate()
@@ -50,11 +58,11 @@ class Mail extends Transport
                     'name' => 'email',
                     'descr' => 'Email address of contact',
                     'type'  => 'text',
-                ]
+                ],
             ],
             'validation' => [
-                'email' => 'required|email'
-            ]
+                'email' => 'required|email',
+            ],
         ];
     }
 }

@@ -221,7 +221,12 @@ TmnxMplsLspFailCode              ::= TEXTUAL-CONVENTION
         ipv4HopsInIpv6Lsp          (56),
         ipv6HopsInIpv4Lsp          (57),
         sidHopsInIpv6Lsp           (58),
-        srlgPathWithSidHops        (59)
+        srlgPathWithSidHops        (59),
+        mplsV4Down                 (60),
+        mplsV6Down                 (61),
+        lspAdminDown               (62),
+        pathAdminDown              (63),
+        templateAdminDown          (64)
     }
 
 TmnxMplsLabelOwner               ::= TEXTUAL-CONVENTION
@@ -255,7 +260,8 @@ TmnxMplsOperDownReasonCode       ::= TEXTUAL-CONVENTION
         iomFailure           (4),
         clearDown            (5),
         ipv6TeRtrDown        (6),
-        ipv6TeRtrAddrChanged (7)
+        ipv6TeRtrAddrChanged (7),
+        ipv6TeRtrIdIntfDown  (8)
     }
 
 TmnxMplsMBBType                  ::= TEXTUAL-CONVENTION
@@ -518,7 +524,7 @@ vRtrMplsLspOperState             OBJECT-TYPE
 vRtrMplsLspFromAddr              OBJECT-TYPE
     SYNTAX      IpAddress
     MAX-ACCESS  read-create
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The vRtrMplsLspFromAddr specifies the source address of this LSP.
 
@@ -526,13 +532,16 @@ vRtrMplsLspFromAddr              OBJECT-TYPE
          also be specified.
 
          If vRtrMplsLspFromAddr has not been explicitly set, the system IP
-         address will be used."
+         address will be used.
+
+         vRtrMplsLspFromAddr is obsoleted in 20.0, replaced by
+         vRtrMplsLspNgFromAddr"
     ::= { vRtrMplsLspEntry 7 }
 
 vRtrMplsLspToAddr                OBJECT-TYPE
     SYNTAX      IpAddress
     MAX-ACCESS  read-create
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The vRtrMplsLspToAddr specifies the destination address of this LSP.
 
@@ -540,7 +549,10 @@ vRtrMplsLspToAddr                OBJECT-TYPE
          specified.
 
          When vRtrMplsLspToAddrType is 'ipv6', vRtrMplsLspNgToAddr should also
-         be specified."
+         be specified.
+
+         vRtrMplsLspToAddr is obsoleted in 20.0, replaced by
+         vRtrMplsLspNgToAddr"
     ::= { vRtrMplsLspEntry 8 }
 
 vRtrMplsLspType                  OBJECT-TYPE
@@ -696,7 +708,7 @@ vRtrMplsLspDecrementTtl          OBJECT-TYPE
 vRtrMplsLspCspf                  OBJECT-TYPE
     SYNTAX      TruthValue
     MAX-ACCESS  read-create
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "When the value of vRtrMplsLspCspf is 'true', CSPF computation
          for constrained-path LSP is enabled.  When the value of
@@ -1128,7 +1140,7 @@ vRtrMplsLspHoldTimer             OBJECT-TYPE
 vRtrMplsLspCspfTeMetricEnabled   OBJECT-TYPE
     SYNTAX      TruthValue
     MAX-ACCESS  read-create
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The value of vRtrMplsLspCspfTeMetricEnabled specifies whether the TE
          metric would be used for the purpose of the LSP path computation by
@@ -1620,7 +1632,7 @@ vRtrMplsLspClassFwdingEnabled    OBJECT-TYPE
 vRtrMplsLspFC                    OBJECT-TYPE
     SYNTAX      TmnxCBFClasses
     MAX-ACCESS  read-create
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The value of vRtrMplsLspFC specifies a set of forwarding classes
          configured for this LSP expressed as a bit map. If a bit from 0
@@ -4731,10 +4743,13 @@ vRtrMplsTunnelARHopRecordLabel   OBJECT-TYPE
 vRtrMplsTunnelARHopRouterId      OBJECT-TYPE
     SYNTAX      IpAddress
     MAX-ACCESS  read-only
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "vRtrMplsTunnelARHopRouterId indicates the router ID of the node
-         corresponding to this hop."
+         corresponding to this hop.
+
+         vRtrMplsTunnelARHopRouterId is obsoleted in 20.0,  replaced by
+         vRtrMplsTunnelARHopNgRouterId"
     ::= { vRtrMplsTunnelARHopEntry 3 }
 
 vRtrMplsTunnelARHopUnnumIfID     OBJECT-TYPE
@@ -4746,8 +4761,8 @@ vRtrMplsTunnelARHopUnnumIfID     OBJECT-TYPE
          interface identifier of this hop.
 
          This object should be used in conjunction with
-         vRtrMplsTunnelARHopRouterId which would contain the LSR Router ID for
-         the unnumbered interface.
+         vRtrMplsTunnelARHopNgRouterId which would contain the LSR Router ID
+         for the unnumbered interface.
 
          If mplsTunnelARHopAddrType is set to unnum(100), then this entry is
          valid."
@@ -5503,6 +5518,17 @@ vRtrMplsIgpOverloadIgpType       OBJECT-TYPE
         "The value of vRtrMplsIgpOverloadIgpType indicates IGP which is
          notifying MPLS that a node is in the overload state."
     ::= { tmnxMplsNotificationObjects 22 }
+
+vRtrMplsResourceType             OBJECT-TYPE
+    SYNTAX      INTEGER {
+        egressStatistics (1)
+    }
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The value of vRtrMplsResourceType indicates various CPM/IOM resource
+         used by MPLS."
+    ::= { tmnxMplsNotificationObjects 23 }
 
 vRtrMplsLabelRangeTable          OBJECT-TYPE
     SYNTAX      SEQUENCE OF VRtrMplsLabelRangeEntry
@@ -8835,7 +8861,7 @@ vRtrMplsLspTemplateBandwidth     OBJECT-TYPE
 vRtrMplsLspTemplateCspf          OBJECT-TYPE
     SYNTAX      TruthValue
     MAX-ACCESS  read-create
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The value of vRtrMplsLspTemplateCspf specifies whether the CSPF
          computation for constrained-path LSP is enabled for the LSPs that are
@@ -9027,7 +9053,7 @@ vRtrMplsLspTemplateRetryTimer    OBJECT-TYPE
 vRtrMplsLspTemplateCspfTeMetric  OBJECT-TYPE
     SYNTAX      TruthValue
     MAX-ACCESS  read-create
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The value of vRtrMplsLspTemplateCspfTeMetric specifies whether the TE
          metric is used for the purpose of the LSP path computation by CSPF
@@ -9463,7 +9489,7 @@ vRtrMplsLspTempClassFwdEnabled   OBJECT-TYPE
 vRtrMplsLspTempFC                OBJECT-TYPE
     SYNTAX      TmnxCBFClasses
     MAX-ACCESS  read-create
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The value of vRtrMplsLspTempFC specifies a set of forwarding classes
          configured for this LSP template expressed as a bit map. If a bit from
@@ -10559,7 +10585,7 @@ vRtrMplsLspPathOperAdminGrExcld  OBJECT-TYPE
 vRtrMplsLspPathOperCspf          OBJECT-TYPE
     SYNTAX      TruthValue
     MAX-ACCESS  read-only
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The value of vRtrMplsLspPathOperCspf indicates whether the currently
          operational LSP path has used CSPF computation for constrained-path
@@ -11684,7 +11710,7 @@ VRtrMplsLspExtEntry              ::= SEQUENCE
 vRtrMplsLspExtPceCompute         OBJECT-TYPE
     SYNTAX      TruthValue
     MAX-ACCESS  read-create
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The value of vRtrMplsLspExtPceCompute specifies whether the LSP path
          computation request is sent to local CSPF or to PCE. When the value of
@@ -15124,7 +15150,7 @@ tmnxMplsV14v0Compliance          MODULE-COMPLIANCE
     ::= { tmnxMplsCompliances 14 }
 
 tmnxMplsV15v0Compliance          MODULE-COMPLIANCE
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The compliance statement for management of extended MPLS on Nokia SROS
          series systems 15.0 Release."
@@ -15234,6 +15260,75 @@ tmnxMplsV19v0Compliance          MODULE-COMPLIANCE
         }
     ::= { tmnxMplsCompliances 17 }
 
+tmnxMplsV20v0Compliance          MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for management of extended MPLS on Nokia SROS
+         series systems 20.0 Release."
+    MODULE
+        MANDATORY-GROUPS {
+            tmnxMplsLspPathV6v0Group,
+            tmnxMplsXCGroup,
+            tmnxMplsIfGroup,
+            tmnxMplsTunnelCHopGroup,
+            tmnxMplsNotificationR2r1Group,
+            tmnxMplsLabelRangeGroup,
+            tmnxMplsIfV6v0Group,
+            tmnxMplsLspV7v0Group,
+            tmnxMplsGlobalV7v0Group,
+            tmnxMplsP2mpInstanceGroup,
+            tmnxMplsP2mpS2lGroup,
+            tmnxMplsNotificationV7v0Group,
+            tmnxMplsLspPathV7v0Group,
+            tmnxMplsSrlgV7v0Group,
+            tmnxMplsLspStatsV7v0Group,
+            tmnxMplsLspV8v0Group,
+            tmnxMplsLspPathV8v0Group,
+            tmnxMplsNotifyObjsV8v0Group,
+            tmnxMplsNotificationV8v0Group,
+            tmnxMplsGlobalV8v0Group,
+            tmnxMplsLspAutoBWV8v0Group,
+            tmnxMplsGlobalV9v0Group,
+            tmnxMplsLspV9v0R4Group,
+            tmnxMplsNotifV9v0R4Group,
+            tmnxMplsLspPathV9v0R4Group,
+            tmnxMplsTpGroup,
+            tmnxMplsNotifyObjsV10v0Group,
+            tmnxMplsNotifyV10v0Group,
+            tmnxMplsFRAdminGroup,
+            tmnxMplsLspTemplateGroup,
+            tmnxMplsLspAutoBWFcWtGroup,
+            tmnxMplsGlobalV11v0R4Group,
+            tmnxMplsNotifyObjsIgpOverload,
+            tmnxMplsIgpOverloadNotify,
+            tmnxMplsLspTempInStatsGroup,
+            tmnxMplsAutoBwUnderflowGroup,
+            tmnxMplsBgpLabelRetentionGroup,
+            tmnxMplsBypassOptGroup,
+            tmnxMplsGenV12v0Group,
+            tmnxMplsLoadBalanceWtV13v0Group,
+            tmnxMplsLabelSegRouteV13v0Group,
+            tmnxMplsLabelStaticRgeV13v0Group,
+            tmnxMplsGlobalV13v0Group,
+            tmnxMplsIfSrlgV14v0Group,
+            tmnxMplsBfdOnLspV13v0Group,
+            tmnxMplsEntropyLabel14v0Group,
+            tmnxMplsLspTemplEL14v4Group,
+            tmnxMplsSRLfaOvrhd14v4Group,
+            tmnxMplsLspTempPceReportGroup,
+            tmnxMplsLspTempSrLbl15v0Group,
+            tmnxMplsBfdFailureActionGroup,
+            tmnxMplsClassFwdPlcy15v0Group,
+            tmnxMplsP2PSrTe15v0Group,
+            tmnxMplsLspStatsGroup,
+            tmnxMplsTunnelARHopSIDGroup,
+            tmnxMplsEntropyLabelSrteGroup,
+            tmnxMplsNotifyObjsLspResource,
+            tmnxMplsNotifyV20v0Group,
+            tmnxMplsV20v0Group
+        }
+    ::= { tmnxMplsCompliances 18 }
+
 tmnxMplsGroups                   OBJECT IDENTIFIER ::= { tmnxMplsConformance 2 }
 
 tmnxMplsLspPathGroup             OBJECT-GROUP
@@ -15327,7 +15422,7 @@ tmnxMplsTunnelARHopGroup         OBJECT-GROUP
         vRtrMplsTunnelARHopRecordLabel,
         vRtrMplsTunnelARHopRouterId
     }
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The group of objects supporting management of extended MPLS Tunnel AR
          hops on Nokia SROS series systems."
@@ -15667,7 +15762,7 @@ tmnxMplsLspV6v0Group             OBJECT-GROUP
     OBJECTS     {
         vRtrMplsLspCspfTeMetricEnabled
     }
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The group of objects supporting management of Te metric feature
          extended MPLS LSPs on 6.0 release Nokia SROS series systems."
@@ -16155,7 +16250,7 @@ tmnxMplsLspTemplateV8v0Group     OBJECT-GROUP
         vRtrMplsLspTemplateLspCount,
         vRtrMplsLspTemplateMvpnRefCount
     }
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The group of objects supporting management of LSP Templates in MPLS on
          Nokia SROS series systems 8.0 release."
@@ -16867,7 +16962,7 @@ tmnxMplsLSPPathV12v0Group        OBJECT-GROUP
         vRtrMplsLspPathOperPropAdminGrp,
         vRtrMplsLspPathOperFRHopLimit
     }
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The group of all LSP Path objects in MPLS supporting management of
          MPLS features on Nokia SROS series systems 12.0 release."
@@ -17012,7 +17107,7 @@ tmnxMplsClassBasedFwdV13v0Group  OBJECT-GROUP
         vRtrMplsLspTempClassFwdEnabled,
         vRtrMplsLspTempFC
     }
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The group of all objects in MPLS supporting class based forwarding on
          Nokia SROS series systems 13.0 release."
@@ -17092,7 +17187,7 @@ tmnxMplsSegRouting14v0Group      OBJECT-GROUP
         vRtrMplsLspPathLastUpdateState,
         vRtrMplsLspPathLastUpdFailCode
     }
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The group of objects in MPLS supporting Segment Routing TE of MPLS
          features on Nokia SROS series systems 14.0 release."
@@ -17266,7 +17361,7 @@ tmnxMplsLSPV15v0Group            OBJECT-GROUP
         vRtrMplsLspRevertTimer,
         vRtrMplsLspRevertTimeRemain
     }
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The group of all LSP objects in MPLS supporting management of MPLS
          features on Nokia SROS series systems 15.0 release."
@@ -17640,6 +17735,217 @@ tmnxMplsNotificationIPv6Group    NOTIFICATION-GROUP
         "The group of notifications supporting the MPLS IPv6 on Nokia SROS
          series systems 19.10 Release."
     ::= { tmnxMplsGroups 111 }
+
+tmnxMplsNotifyObjsLspResource    OBJECT-GROUP
+    OBJECTS     {
+        vRtrMplsResourceType
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of notification objects supporting IGP shortcut notification
+         feature on Nokia SROS series systems 20.0 Release."
+    ::= { tmnxMplsGroups 112 }
+
+tmnxMplsNotifyV20v0Group         NOTIFICATION-GROUP
+    NOTIFICATIONS {
+        vRtrMplsLspResourceExhaustion
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of notifications supporting the MPLS  on Nokia SROS series
+         systems 20.0 Release."
+    ::= { tmnxMplsGroups 113 }
+
+tmnxMplsV20v0Group               OBJECT-GROUP
+    OBJECTS     {
+        vRtrMplsTunnelARHopProtection,
+        vRtrMplsTunnelARHopRecordLabel,
+        vRtrMplsLspRowStatus,
+        vRtrMplsLspLastChange,
+        vRtrMplsLspName,
+        vRtrMplsLspAdminState,
+        vRtrMplsLspOperState,
+        vRtrMplsLspType,
+        vRtrMplsLspOutSegIndx,
+        vRtrMplsLspRetryTimer,
+        vRtrMplsLspRetryLimit,
+        vRtrMplsLspMetric,
+        vRtrMplsLspFastReroute,
+        vRtrMplsLspFRHopLimit,
+        vRtrMplsLspFRBandwidth,
+        vRtrMplsLspSetupPriority,
+        vRtrMplsLspHoldPriority,
+        vRtrMplsLspRecord,
+        vRtrMplsLspHopLimit,
+        vRtrMplsLspNegotiatedMTU,
+        vRtrMplsLspRsvpResvStyle,
+        vRtrMplsLspRsvpAdspec,
+        vRtrMplsLspFRMethod,
+        vRtrMplsLspFRNodeProtect,
+        vRtrMplsLspAdminGroupInclude,
+        vRtrMplsLspAdminGroupExclude,
+        vRtrMplsLspAdaptive,
+        vRtrMplsLspInheritance,
+        vRtrMplsLspOptimizeTimer,
+        vRtrMplsLspOperFastReroute,
+        vRtrMplsLspFRObject,
+        vRtrMplsLspAge,
+        vRtrMplsLspTimeUp,
+        vRtrMplsLspTimeDown,
+        vRtrMplsLspPrimaryTimeUp,
+        vRtrMplsLspTransitions,
+        vRtrMplsLspLastTransition,
+        vRtrMplsLspLastPathChange,
+        vRtrMplsLspConfiguredPaths,
+        vRtrMplsLspStandbyPaths,
+        vRtrMplsLspOperationalPaths,
+        vRtrMplsLspHoldTimer,
+        vRtrMplsLspIgpShortcutLfaType,
+        vRtrMplsLspPropAdminGroup,
+        vRtrMplsLspIgpShortcutRelOffset,
+        vRtrMplsLspRevertTimer,
+        vRtrMplsLspRevertTimeRemain,
+        vRtrMplsLspTemplateTblLastChgd,
+        vRtrMplsLspTemplateRowStatus,
+        vRtrMplsLspTemplateLastChanged,
+        vRtrMplsLspTemplateAdminState,
+        vRtrMplsLspTemplateType,
+        vRtrMplsLspTemplateAdaptive,
+        vRtrMplsLspTemplateBandwidth,
+        vRtrMplsLspTemplateCspf,
+        vRtrMplsLspTemplateDefaultPath,
+        vRtrMplsLspTemplateAdmGrpIncl,
+        vRtrMplsLspTemplateAdmGrpExcl,
+        vRtrMplsLspTemplateFastReroute,
+        vRtrMplsLspTemplateFRMethod,
+        vRtrMplsLspTemplateFRHopLimit,
+        vRtrMplsLspTemplateHopLimit,
+        vRtrMplsLspTemplateRecord,
+        vRtrMplsLspTemplateRecordLabel,
+        vRtrMplsLspTemplateRetryLimit,
+        vRtrMplsLspTemplateRetryTimer,
+        vRtrMplsLspTemplateCspfTeMetric,
+        vRtrMplsLspOriginTemplate,
+        vRtrMplsLspTemplateLspCount,
+        vRtrMplsLspTemplateMvpnRefCount,
+        vRtrMplsGeneralNewLspSRIndex,
+        vRtrMplsGeneralSrTeLspOriginate,
+        vRtrMplsGeneralPceReport,
+        vRtrMplsLspExtPceControl,
+        vRtrMplsLspExtPceReport,
+        vRtrMplsLspExtTtmTunnelId,
+        vRtrMplsLspExtMaxSrLabels,
+        vRtrMplsLspExtTunnelId,
+        vRtrMplsLspPathProfTblLstChg,
+        vRtrMplsLspPathProfRowStatus,
+        vRtrMplsLspPathProfLastChange,
+        vRtrMplsLspPathProfGroupId,
+        vRtrMplsLspPathLastUpdateTime,
+        vRtrMplsLspPathLastUpdateId,
+        vRtrMplsLspPathLastUpdateState,
+        vRtrMplsLspPathLastUpdFailCode,
+        vRtrMplsLspPathTableSpinlock,
+        vRtrMplsLspPathRowStatus,
+        vRtrMplsLspPathLastChange,
+        vRtrMplsLspPathType,
+        vRtrMplsLspPathProperties,
+        vRtrMplsLspPathBandwidth,
+        vRtrMplsLspPathState,
+        vRtrMplsLspPathPreference,
+        vRtrMplsLspPathSetupPriority,
+        vRtrMplsLspPathHoldPriority,
+        vRtrMplsLspPathRecord,
+        vRtrMplsLspPathHopLimit,
+        vRtrMplsLspPathAdminState,
+        vRtrMplsLspPathOperState,
+        vRtrMplsLspPathInheritance,
+        vRtrMplsLspPathLspId,
+        vRtrMplsLspPathRetryTimeRemaining,
+        vRtrMplsLspPathTunnelARHopListIndex,
+        vRtrMplsLspPathNegotiatedMTU,
+        vRtrMplsLspPathFailCode,
+        vRtrMplsLspPathFailNodeAddr,
+        vRtrMplsLspPathAdminGroupInclude,
+        vRtrMplsLspPathAdminGroupExclude,
+        vRtrMplsLspPathAdaptive,
+        vRtrMplsLspPathOptimizeTimer,
+        vRtrMplsLspPathNextOptimize,
+        vRtrMplsLspPathOperBandwidth,
+        vRtrMplsLspPathResignal,
+        vRtrMplsLspPathTunnelCRHopListIndex,
+        vRtrMplsLspPathOperMTU,
+        vRtrMplsLspPathRecordLabel,
+        vRtrMplsLspPathTimeUp,
+        vRtrMplsLspPathTimeDown,
+        vRtrMplsLspPathRetryAttempts,
+        vRtrMplsLspPathTransitionCount,
+        vRtrMplsLspPathCspfQueries,
+        vRtrMplsLspPathLastResigAttempt,
+        vRtrMplsLspPathMetric,
+        vRtrMplsLspPathLastMBBType,
+        vRtrMplsLspPathLastMBBEnd,
+        vRtrMplsLspPathLastMBBMetric,
+        vRtrMplsLspPathLastMBBState,
+        vRtrMplsLspPathMBBTypeInProg,
+        vRtrMplsLspPathMBBStarted,
+        vRtrMplsLspPathMBBNextRetry,
+        vRtrMplsLspPathMBBRetryAttempts,
+        vRtrMplsLspPathMBBFailCode,
+        vRtrMplsLspPathMBBFailNodeArType,
+        vRtrMplsLspPathMBBFailNodeAddr,
+        vRtrMplsLspPathOperInterArea,
+        vRtrMplsLspPathChanges,
+        vRtrMplsLspPathTimeoutIn,
+        vRtrMplsLspPathMBBTimeoutIn,
+        vRtrMplsLspPathOperSetupPriority,
+        vRtrMplsLspPathOperHoldPriority,
+        vRtrMplsLspPathOperRecord,
+        vRtrMplsLspPathOperRecordLabel,
+        vRtrMplsLspPathOperHopLimit,
+        vRtrMplsLspPathOperAdminGrpIncl,
+        vRtrMplsLspPathOperAdminGrExcld,
+        vRtrMplsLspPathOperLeastFill,
+        vRtrMplsLspPathOperRsvpAdspec,
+        vRtrMplsLspPathOperFRNodeProtect,
+        vRtrMplsLspPathOperPropAdminGrp,
+        vRtrMplsLspPathOperFRHopLimit,
+        vRtrMplsLspClassFwdingEnabled,
+        vRtrMplsLspTempClassFwdEnabled
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting management of extended MPLS interfaces
+         on Nokia SROS series systems 20.0 Release."
+    ::= { tmnxMplsGroups 114 }
+
+tmnxMplsObsoletedV20v0Group      OBJECT-GROUP
+    OBJECTS     {
+        vRtrMplsTunnelARHopRouterId,
+        vRtrMplsLspFromAddr,
+        vRtrMplsLspToAddr,
+        vRtrMplsLspCspf,
+        vRtrMplsLspTemplateCspf,
+        vRtrMplsLspCspfTeMetricEnabled,
+        vRtrMplsLspTemplateCspfTeMetric,
+        vRtrMplsLspExtPceCompute,
+        vRtrMplsLspPathOperCspf
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of obsolete objects for MPLS on a Nokia SROS series systems
+         20.0 release."
+    ::= { tmnxMplsGroups 115 }
+
+tmnxMplsClassFwdObsoleteGroup    OBJECT-GROUP
+    OBJECTS     {
+        vRtrMplsLspFC,
+        vRtrMplsLspTempFC
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting management of class forwarding on
+         Nokia SROS series systems obsoleted in release 20.0."
+    ::= { tmnxMplsGroups 117 }
 
 tmnxMplsNotifyPrefix             OBJECT IDENTIFIER ::= { tmnxSRNotifyPrefix 6 }
 
@@ -18050,5 +18356,31 @@ vRtrMplsIfIPv6StateChange        NOTIFICATION-TYPE
 
          [RECOVERY] There is no recovery required for this notification."
     ::= { tmnxMplsNotifications 26 }
+
+vRtrMplsLspResourceExhaustion    NOTIFICATION-TYPE
+    OBJECTS     {
+        vRtrID,
+        vRtrMplsLspIndex,
+        vRtrMplsLspType,
+        vRtrMplsLspName,
+        vRtrMplsResourceType
+    }
+    STATUS      current
+    DESCRIPTION
+        "[CAUSE] The vRtrMplsLspResourceExhaustion notification is generated
+         when CPM or data path resource specified by vRtrMplsResourceType is
+         exhausted.
+
+         [EFFECT] If vRtrMplsResourceType is 'egressStatistics', LSP path
+         egress statistics will not be collected.
+
+         [RECOVERY] Appropriate config changes in the system may be required to
+         free up the resources.
+
+         Once the resources are available and vRtrMplsResourceType is
+         'egressStatistics' and vRtrMplsLspType is 'srTe', lsp
+         egress-statistics admin down and up will be needed to bring up lsp
+         path egress-statistics."
+    ::= { tmnxMplsNotifications 27 }
 
 END

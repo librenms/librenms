@@ -1,10 +1,7 @@
-source: Alerting/Templates.md
-path: blob/master/doc/
-
 # Templates
 
 > This page is for installs running version 1.42 or later. You can
-> find the older docs [here](Old_Templates.md)
+> find the older docs [here](https://github.com/librenms/librenms/blob/773411359489e0ffcc3ba763f1f138403343591a/doc/Alerting/Old_Templates.md)
 
 Templates can be assigned to a single or a group of rules and can
 contain any kind of text. There is also a default template which is
@@ -20,7 +17,7 @@ button. You might hold down the CTRL key to select multiple rules at once.
 
 The templating engine in use is Laravel Blade. We will cover some of
 the basics here, however the official Laravel docs will have more
-information [here](https://laravel.com/docs/5.7/blade)
+information [here](https://laravel.com/docs/blade)
 
 ## Syntax
 
@@ -47,6 +44,7 @@ been up for 30344 seconds`.
 - Hostname of the Device: `$alert->hostname`
 - sysName of the Device: `$alert->sysName`
 - sysDescr of the Device: `$alert->sysDescr`
+- display name of the Device: `$alert->display`
 - sysContact of the Device: `$alert->sysContact`
 - OS of the Device: `$alert->os`
 - Type of Device: `$alert->type`
@@ -139,7 +137,7 @@ In your alert template just use
 @endsection
 ```
 
-More info: [https://laravel.com/docs/5.7/blade#extending-a-layout](https://laravel.com/docs/5.7/blade#extending-a-layout)
+More info: [https://laravel.com/docs/blade#extending-a-layout](https://laravel.com/docs/blade#extending-a-layout)
 
 ## Examples
 
@@ -194,7 +192,6 @@ Timestamp: {{ $alert->timestamp }}
 Location: {{ $alert->location }}
 Description: {{ $alert->description }}
 Features: {{ $alert->features }}
-Purpose: {{ $alert->purpose }}
 Notes: {{ $alert->notes }}
 
 Server: {{ $alert->sysName }}
@@ -204,7 +201,7 @@ Percent Utilized: {{ $value['storage_perc'] }}
 @endforeach
 ```
 
-#### Temperature Sensors
+#### Value Sensors (Temperature, Humidity, Fanspeed, ...)
 
 ```text
 {{ $alert->title }}
@@ -213,47 +210,26 @@ Device Name: {{ $alert->hostname }}
 Severity: {{ $alert->severity }}
 Timestamp: {{ $alert->timestamp }}
 Uptime: {{ $alert->uptime_short }}
-@if ($alert->state == 0) Time elapsed: {{ $alert->elapsed }} @endif
-Location: {{ $alert->location }}
-Description: {{ $alert->description }}
-Features: {{ $alert->features }}
-Purpose: {{ $alert->purpose }}
-Notes: {{ $alert->notes }}
-
-Rule: @if ($alert->name) {{ $alert->name }} @else {{ $alert->rule }} @endif
-@if ($alert->faults) Faults:
-@foreach ($faults as $key => $value)
-#{{ $key }}: Temperature: {{ $value['sensor_current'] }} °C
-** @php echo ($value['sensor_current']-$value['sensor_limit']); @endphp°C over limit
-Previous Measurement: {{ $value['sensor_prev'] }} °C
-High Temperature Limit: {{ $value['sensor_limit'] }} °C
-@endforeach
+@if ($alert->state == 0)
+Time elapsed: {{ $alert->elapsed }}
 @endif
-```
-
-#### Value Sensors
-
-```text
-{{ $alert->title }}
-
-Device Name: {{ $alert->hostname }}
-Severity: {{ $alert->severity }}
-Timestamp: {{ $alert->timestamp }}
-Uptime: {{ $alert->uptime_short }}
-@if ($alert->state == 0) Time elapsed: {{ $alert->elapsed }} @endif
 Location: {{ $alert->location }}
 Description: {{ $alert->description }}
 Features: {{ $alert->features }}
-Purpose: {{ $alert->purpose }}
 Notes: {{ $alert->notes }}
 
-Rule: @if ($alert->name) {{ $alert->name }} @else {{ $alert->rule }} @endif
-@if ($alert->faults) Faults:
+Rule: {{ $alert->name ?? $alert->rule }}
+@if ($alert->faults)
+Faults:
 @foreach ($alert->faults as $key => $value)
-#{{ $key }}: Sensor {{ $value['sensor_current'] }}
-** @php echo ($value['sensor_current']-$value['sensor_limit']); @endphp over limit
-Previous Measurement: {{ $value['sensor_prev'] }}
-Limit: {{ $value['sensor_limit'] }}
+@php($unit = __("sensors.${value["sensor_class"]}.unit"))
+#{{ $key }}: {{ $value['sensor_descr'] ?? 'Sensor' }}
+
+Current: {{ $value['sensor_current'].$unit }}
+Previous: {{ $value['sensor_prev'].$unit }}
+Limit: {{ $value['sensor_limit'].$unit }}
+Over Limit: {{ round($value['sensor_current']-$value['sensor_limit'], 2).$unit }}
+
 @endforeach
 @endif
 ```
@@ -287,7 +263,7 @@ Conditional formatting example, will display a link to the host in
 email or just the hostname in any other transport:
 
 ```text
-@if ($alert->transport == mail)<a href="https://my.librenms.install/device/device={{ $alert->hostname }}/">{{ $alert->hostname }}</a>
+@if ($alert->transport == 'mail')<a href="https://my.librenms.install/device/device={{ $alert->hostname }}/">{{ $alert->hostname }}</a>
 @else
 {{ $alert->hostname }}
 @endif
@@ -315,6 +291,26 @@ config.php. Allow_unauth_graphs_cidr is optional, but more secure.
 ```
 $config['allow_unauth_graphs_cidr'] = array('127.0.0.1/32');
 $config['allow_unauth_graphs'] = true;
+```
+
+## Using models for optional data
+
+If some value does not exist withing the `$faults[]`-array, you may query fields from the database using Laravel models. You may use models to query additional values and use them on the template by placing the model and the value to search for within the braces. For example, ISIS-alerts do have a `port_id` value associated with the alert but `ifName` is not directly accessible from the `$faults[]`-array. If the name of the port was needed, it's value could be queried using a template such as:
+
+```
+{{ $alert->title }}
+Severity: {{ $alert->severity }}
+@if ($alert->state == 0) Time elapsed: {{ $alert->elapsed }} @endif
+Timestamp: {{ $alert->timestamp }}
+Rule: @if ($alert->name) {{ $alert->name }} @else {{ $alert->rule }} @endif
+@if ($alert->faults) Faults:
+@foreach ($alert->faults as $key => $value)
+  Local interface: {{ \App\Models\Port::find($value['port_id'])->ifName }}
+  Adjacent IP: {{ $value['isisISAdjIPAddrAddress'] }}
+  Adjacent state: {{ $value['isisISAdjState'] }}
+
+@endforeach
+@endif
 ```
 
 #### Service Alert
@@ -361,21 +357,6 @@ Template: CPU alert <br>
 @endif
 ```
 
-#### MS Teams formatted default template
-
-```
-<a href="https://your.librenms.url/device/device={{ $alert->device_id }}/">{{ $alert->title }}</a>
-<pre><strong>Device name:</strong> {{ $alert->sysName }}
-<strong>Severity:</strong> {{ $alert->severity }}
-@if ($alert->state == 0)<strong>Time elapsed:</strong>{{ $alert->elapsed }}
-@endif<strong>Timestamp:</strong> {{ $alert->timestamp }}
-<strong>Unique-ID:</strong> {{ $alert->uid }}
-<strong>Rule:</strong>@if ($alert->name) {{ $alert->name }} @else {{ $alert->rule }} @endif</pre>
-<pre style="white-space:normal;">@if ($alert->faults) <strong>Faults:</strong>
- @foreach ($alert->faults as $key => $value)  #{{ $key }}: {{ $value['string'] }}
- @endforeach </pre>  @endif
-```
-
 ## Included
 
 We include a few templates for you to use, these are specific to the
@@ -388,3 +369,131 @@ The included templates apart from the default template are:
 - BGP Sessions
 - Ports
 - Temperature
+
+## Other Examples
+
+#### Microsoft Teams - Markdown
+
+```
+[{{ $alert->title }}](https://your.librenms.url/device/device={{ $alert->device_id }}/)  
+**Device name:** {{ $alert->sysName }}  
+**Severity:** {{ $alert->severity }}  
+@if ($alert->state == 0)
+**Time elapsed:** {{ $alert->elapsed }}  
+@endif
+**Timestamp:** {{ $alert->timestamp }}  
+**Unique-ID:** {{ $alert->uid }}  
+@if ($alert->name)
+**Rule:** {{ $alert->name }}  
+@else
+**Rule:** {{ $alert->rule }}  
+@endif
+@if ($alert->faults)
+**Faults:**@foreach ($alert->faults as $key => $value) {{ $key }}: {{ $value['string'] }}  
+@endforeach
+@endif
+```
+
+#### Microsoft Teams - JSON
+
+```
+{
+    "@context": "https://schema.org/extensions",
+    "@type": "MessageCard",
+    "title": "{{ $alert->title }}",
+@if ($alert->state === 0)
+    "themeColor": "00FF00",
+@elseif ($alert->state === 1)
+    "themeColor": "FF0000",
+@elseif ($alert->state === 2)
+    "themeColor": "337AB7",
+@elseif ($alert->state === 3)
+    "themeColor": "FF0000",
+@elseif ($alert->state === 4)
+    "themeColor": "F0AD4E",
+@else
+    "themeColor": "337AB7",
+@endif
+    "summary": "LibreNMS",
+    "sections": [
+        {
+@if ($alert->name)
+            "facts": [
+                {
+                    "name": "Rule:",
+                    "value": "[{{ $alert->name }}](https://your.librenms.url/device/device={{ $alert->device_id }}/tab=alert/)"
+                },
+@else
+                {
+                    "name": "Rule:",
+                    "value": "[{{ $alert->rule }}](https://your.librenms.url/device/device={{ $alert->device_id }}/tab=alert/)"
+                },
+@endif
+                {
+                    "name": "Severity:",
+                    "value": "{{ $alert->severity }}"
+                },
+                {
+                    "name": "Unique-ID:",
+                    "value": "{{ $alert->uid }}"
+                },
+                {
+                    "name": "Timestamp:",
+                    "value": "{{ $alert->timestamp }}"
+                },
+@if ($alert->state == 0)
+                {
+                    "name": "Time elapsed:",
+                    "value": "{{ $alert->elapsed }}"
+                },
+@endif
+                {
+                    "name": "Hostname:",
+                    "value": "[{{ $alert->hostname }}](https://your.librenms.url/device/device={{ $alert->device_id }}/)"
+                },
+                {
+                    "name": "Hardware:",
+                    "value": "{{ $alert->hardware }}"
+                },
+                {
+                    "name": "IP:",
+                    "value": "{{ $alert->ip }}"
+                },
+                {
+                    "name": "Faults:",
+                    "value": " "
+                }
+            ]
+@if ($alert->faults)
+@foreach ($alert->faults as $key => $value)
+        },
+        {
+            "facts": [
+                {
+                    "name": "Port:",
+                    "value": "[{{ $value['ifName'] }}](https://your.librenms.url/device/device={{ $alert->device_id }}/tab=port/port={{ $value['port_id'] }}/)"
+                },
+                {
+                    "name": "Description:",
+                    "value": "{{ $value['ifAlias'] }}"
+                },
+@if ($alert->state != 0)
+                {
+                    "name": "Status:",
+                    "value": "down"
+                }
+            ]
+@else
+                {
+                    "name": "Status:",
+                    "value": "up"
+                }
+            ]
+@endif
+@endforeach
+@endif
+        }
+    ]
+}
+```
+

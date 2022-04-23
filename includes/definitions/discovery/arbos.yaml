@@ -1,0 +1,42 @@
+mib: PEAKFLOW-SP-MIB:PEAKFLOW-TMS-MIB
+modules:
+    mempools:
+        data:
+            -
+                percent_used: PEAKFLOW-TMS-MIB::devicePhysicalMemoryUsage
+                class: system
+                descr: 'Physical Memory'
+                index: 0
+            -
+                percent_used: PEAKFLOW-TMS-MIB::deviceSwapSpaceUsage
+                class: swap
+                descr: 'Swap'
+                index: 1
+            -
+                total: PEAKFLOW-SP-MIB::devicePhysicalMemory
+                used: PEAKFLOW-SP-MIB::devicePhysicalMemoryInUse
+                percent_used: PEAKFLOW-SP-MIB::devicePhysicalMemoryUsage
+                precision: 1024
+                class: system
+                descr: 'Physical'
+                index: 0
+            -
+                total: PEAKFLOW-SP-MIB::deviceSwapSpace
+                used: PEAKFLOW-SP-MIB::deviceSwapSpaceInUse
+                percent_used: PEAKFLOW-SP-MIB::deviceSwapSpaceUsage
+                precision: 1024
+                class: swap
+                descr: 'Swap'
+                index: 1
+    processors:
+        data:
+            -
+                oid: PEAKFLOW-SP-MIB::deviceCpuLoadAvg5min
+                num_oid: '.1.3.6.1.4.1.9694.1.4.2.1.2.{{ $index }}'
+                descr: 'Load Average'
+                index: 0
+            -
+                oid: PEAKFLOW-TMS-MIB::deviceCpuLoadAvg5min
+                num_oid: '.1.3.6.1.4.1.9694.1.5.2.4.{{ $index }}'
+                descr: 'Load Average'
+                index: 0

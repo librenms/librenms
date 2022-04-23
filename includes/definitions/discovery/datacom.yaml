@@ -1,11 +1,15 @@
 mib: DMswitch-MIB
 modules:
+    os:
+        hardware: DMswitch-MIB::swChassisModel.0
+        version: DMswitch-MIB::swFirmwareVer.1
+        serial: DMswitch-MIB::swSerialNumber.1
     processors:
-          data:
-              -
-                  oid: swCpuUsage
-                  num_oid: '.1.3.6.1.4.1.3709.3.5.201.1.1.10.{{ $index }}'
-                  precision: 100
+        data:
+            -
+                oid: swCpuUsage
+                num_oid: '.1.3.6.1.4.1.3709.3.5.201.1.1.10.{{ $index }}'
+                precision: 100
     sensors:
         temperature:
             data:

@@ -9,9 +9,9 @@ over:
 icon: zyxel
 discovery:
     -
-      sysObjectID:
-          - .1.3.6.1.4.1.890.1.6
-          - .1.3.6.1.4.1.890.1.15
-      sysDescr_regex_except:
-          - '/^NWA/'
-          - '/^XGS/'
+        sysObjectID:
+            - .1.3.6.1.4.1.890.1.6
+            - .1.3.6.1.4.1.890.1.15
+        sysDescr_regex_except:
+            - '/^NWA/'
+            - '/^XGS/'

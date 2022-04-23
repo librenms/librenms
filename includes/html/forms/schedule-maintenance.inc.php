@@ -1,5 +1,8 @@
 <?php
 
+use App\Models\UserPref;
+use Illuminate\Support\Str;
+
 /*
  * LibreNMS
  *
@@ -12,9 +15,9 @@
  * the source code distribution for details.
  */
 
-if (!Auth::user()->hasGlobalAdmin()) {
+if (! Auth::user()->hasGlobalAdmin()) {
     header('Content-type: text/plain');
-    die('ERROR: You need to be admin');
+    exit('ERROR: You need to be admin');
 }
 
 $sub_type = $_POST['sub_type'];
@@ -25,50 +28,56 @@ if ($sub_type == 'new-maintenance') {
     $update = 0;
     $message = '';
 
-    $schedule_id = mres($_POST['schedule_id']);
+    $schedule_id = $_POST['schedule_id'];
     if ($schedule_id > 0) {
         $update = 1;
     }
 
-    $title = mres($_POST['title']);
-    $notes = mres($_POST['notes']);
-    $recurring = mres($_POST['recurring']);
-    $start_recurring_dt = mres($_POST['start_recurring_dt']);
-    $end_recurring_dt = mres($_POST['end_recurring_dt']);
-    $start_recurring_hr = mres($_POST['start_recurring_hr']);
-    $end_recurring_hr = mres($_POST['end_recurring_hr']);
-    $recurring_day = mres($_POST['recurring_day']);
-    $start = mres($_POST['start']);
-    $end   = mres($_POST['end']);
-    $maps  = mres($_POST['maps']);
+    $title = $_POST['title'];
+    $notes = $_POST['notes'];
+    $recurring = $_POST['recurring'] ? 1 : 0;
+    $start_recurring_dt = $_POST['start_recurring_dt'];
+    $end_recurring_dt = $_POST['end_recurring_dt'];
+    $start_recurring_hr = $_POST['start_recurring_hr'];
+    $end_recurring_hr = $_POST['end_recurring_hr'];
+    $recurring_day = $_POST['recurring_day'];
+    $start = $_POST['start'];
+    [$duration_hour, $duration_min] = explode(':', $_POST['duration']);
+    $end = $_POST['end'];
+    $maps = $_POST['maps'];
+
+    if (isset($duration_hour) && isset($duration_min)) {
+        $end = date('Y-m-d H:i:00', strtotime('+' . intval($duration_hour) . ' hour ' . intval($duration_min) . ' minute', strtotime($start)));
+    }
 
     if (empty($title)) {
         $message = 'Missing title<br />';
     }
 
-    if (!in_array($recurring, array(0,1))) {
+    if (! in_array($recurring, [0, 1])) {
         $message .= 'Missing recurring choice<br />';
     }
 
     // check values if recurring is set to yes
+    $recurring_day = null;
     if ($recurring == 1) {
         if (empty($start_recurring_dt)) {
             $message .= 'Missing start recurring date<br />';
         } else {
             // check if date is correct
-            list($ysrd, $msrd, $dsrd) = explode('-', $start_recurring_dt);
-            if (!checkdate($msrd, $dsrd, $ysrd)) {
+            [$ysrd, $msrd, $dsrd] = explode('-', $start_recurring_dt);
+            if (! checkdate($msrd, $dsrd, $ysrd)) {
                 $message .= 'Please check start recurring date<br />';
             }
         }
         // end recurring dt not mandatory.. but if set, check if correct
-        if (!empty($end_recurring_dt) && $end_recurring_dt != '0000-00-00' && $end_recurring_dt != '') {
-            list($yerd, $merd, $derd) = explode('-', $end_recurring_dt);
-            if (!checkdate($merd, $derd, $yerd)) {
+        if (! empty($end_recurring_dt) && $end_recurring_dt != '0000-00-00' && $end_recurring_dt != '') {
+            [$yerd, $merd, $derd] = explode('-', $end_recurring_dt);
+            if (! checkdate($merd, $derd, $yerd)) {
                 $message .= 'Please check end recurring date<br />';
             }
         } else {
-            $end_recurring_dt = null;
+            $end_recurring_dt = '9000-09-09';
         }
 
         if (empty($start_recurring_hr)) {
@@ -79,10 +88,8 @@ if ($sub_type == 'new-maintenance') {
             $message .= 'Missing end recurring hour<br />';
         }
 
-        if (isset($_POST['recurring_day']) && is_array($_POST['recurring_day']) && !empty($_POST['recurring_day'])) {
-            $recurring_day = implode(',', $_POST['recurring_day']);
-        } else {
-            $recurring_day = null;
+        if (isset($_POST['recurring_day']) && is_array($_POST['recurring_day']) && ! empty($_POST['recurring_day'])) {
+            $recurring_day = $_POST['recurring_day'];
         }
 
         // recurring = 1 => empty no reccurency values to be sure.
@@ -102,39 +109,51 @@ if ($sub_type == 'new-maintenance') {
         $end_recurring_dt = '1970-01-02';
         $start_recurring_hr = '00:00:00';
         $end_recurring_hr = '00:00:00';
-        $recurring_day = null;
     }
 
-    if (!is_array($_POST['maps'])) {
+    if (! is_array($_POST['maps'])) {
         $message .= 'Not mapped to any groups or devices<br />';
     }
 
     if (empty($message)) {
-        if (empty($schedule_id)) {
-            $schedule_id = dbInsert(array('recurring' => $recurring, 'start' => $start, 'end' => $end, 'start_recurring_dt' => $start_recurring_dt, 'end_recurring_dt' => $end_recurring_dt, 'start_recurring_hr' => $start_recurring_hr, 'end_recurring_hr' => $end_recurring_hr, 'recurring_day' => $recurring_day, 'title' => $title, 'notes' => $notes), 'alert_schedule');
-        } else {
-            dbUpdate(array('recurring' => $recurring, 'start' => $start, 'end' => $end, 'start_recurring_dt' => $start_recurring_dt, 'end_recurring_dt' => $end_recurring_dt, 'start_recurring_hr' => $start_recurring_hr, 'end_recurring_hr' => $end_recurring_hr, 'recurring_day' => $recurring_day, 'title' => $title, 'notes' => $notes), 'alert_schedule', '`schedule_id`=?', array($schedule_id));
-        }
+        $alert_schedule = \App\Models\AlertSchedule::findOrNew($schedule_id);
+        $alert_schedule->title = $title;
+        $alert_schedule->notes = $notes;
+        $alert_schedule->recurring = $recurring;
+        $alert_schedule->start = $start;
+        $alert_schedule->end = $end;
 
-        if ($schedule_id > 0) {
-            $items = array();
-            $fail  = 0;
+        if ($recurring) {
+            $alert_schedule->start_recurring_dt = $start_recurring_dt;
+            $alert_schedule->start_recurring_hr = $start_recurring_hr;
+            $alert_schedule->end_recurring_dt = $end_recurring_dt;
+            $alert_schedule->end_recurring_hr = $end_recurring_hr;
+            $alert_schedule->recurring_day = $recurring_day;
+        }
+        $alert_schedule->save();
+
+        if ($alert_schedule->schedule_id > 0) {
+            $items = [];
+            $fail = 0;
 
             if ($update == 1) {
-                dbDelete('alert_schedulables', '`schedule_id`=?', array($schedule_id));
+                dbDelete('alert_schedulables', '`schedule_id`=?', [$alert_schedule->schedule_id]);
             }
 
             foreach ($_POST['maps'] as $target) {
                 $type = 'device';
-                if (starts_with($target, 'g')) {
+                if (Str::startsWith($target, 'l')) {
+                    $type = 'location';
+                    $target = substr($target, 1);
+                } elseif (Str::startsWith($target, 'g')) {
                     $type = 'device_group';
                     $target = substr($target, 1);
                 }
 
-                $item = dbInsert(['schedule_id' => $schedule_id, 'alert_schedulable_type' => $type, 'alert_schedulable_id' => $target], 'alert_schedulables');
-                if ($notes && $type = 'device' && get_user_pref('add_schedule_note_to_device', false)) {
+                $item = dbInsert(['schedule_id' => $alert_schedule->schedule_id, 'alert_schedulable_type' => $type, 'alert_schedulable_id' => $target], 'alert_schedulables');
+                if ($notes && $type = 'device' && UserPref::getPref(Auth::user(), 'add_schedule_note_to_device')) {
                     $device_notes = dbFetchCell('SELECT `notes` FROM `devices` WHERE `device_id` = ?;', [$target]);
-                    $device_notes.= ((empty($device_notes)) ? '' : PHP_EOL) . date("Y-m-d H:i") . ' Alerts delayed: ' . $notes;
+                    $device_notes .= ((empty($device_notes)) ? '' : PHP_EOL) . date('Y-m-d H:i') . ' Alerts delayed: ' . $notes;
                     dbUpdate(['notes' => $device_notes], 'devices', '`device_id` = ?', [$target]);
                 }
                 if ($item > 0) {
@@ -146,13 +165,13 @@ if ($sub_type == 'new-maintenance') {
 
             if ($fail == 1 && $update == 0) {
                 foreach ($items as $item) {
-                    dbDelete('alert_schedulables', '`item_id`=?', array($item));
+                    dbDelete('alert_schedulables', '`item_id`=?', [$item]);
                 }
 
-                dbDelete('alert_schedule', '`schedule_id`=?', array($schedule_id));
+                dbDelete('alert_schedule', '`schedule_id`=?', [$alert_schedule->schedule_id]);
                 $message = 'Issue scheduling maintenance';
             } else {
-                $status  = 'ok';
+                $status = 'ok';
                 $message = 'Scheduling maintenance ok';
             }
         } else {
@@ -160,17 +179,20 @@ if ($sub_type == 'new-maintenance') {
         }//end if
     }//end if
 
-    $response = array(
+    $response = [
         'status'  => $status,
         'message' => $message,
-    );
+    ];
 } elseif ($sub_type == 'parse-maintenance') {
-    $schedule_id = mres($_POST['schedule_id']);
-    $schedule    = dbFetchRow('SELECT * FROM `alert_schedule` WHERE `schedule_id`=?', array($schedule_id));
-    $items       = [];
-    foreach (dbFetchRows('SELECT `alert_schedulable_type`, `alert_schedulable_id` FROM `alert_schedulables` WHERE `schedule_id`=?', [$schedule_id]) as $target) {
+    $alert_schedule = \App\Models\AlertSchedule::findOrFail($_POST['schedule_id']);
+    $items = [];
+
+    foreach (dbFetchRows('SELECT `alert_schedulable_type`, `alert_schedulable_id` FROM `alert_schedulables` WHERE `schedule_id`=?', [$alert_schedule->schedule_id]) as $target) {
         $id = $target['alert_schedulable_id'];
-        if ($target['alert_schedulable_type'] == 'device_group') {
+        if ($target['alert_schedulable_type'] == 'location') {
+            $text = dbFetchCell('SELECT location FROM locations WHERE id = ?', [$id]);
+            $id = 'l' . $id;
+        } elseif ($target['alert_schedulable_type'] == 'device_group') {
             $text = dbFetchCell('SELECT name FROM device_groups WHERE id = ?', [$id]);
             $id = 'g' . $id;
         } else {
@@ -182,29 +204,19 @@ if ($sub_type == 'new-maintenance') {
         ];
     }
 
-    $response = array(
-        'start'                   => $schedule['start'],
-        'end'                     => $schedule['end'],
-        'title'                   => $schedule['title'],
-        'notes'                   => $schedule['notes'],
-        'recurring'               => $schedule['recurring'],
-        'start_recurring_dt'    => ($schedule['start_recurring_dt'] != '0000-00-00' ? $schedule['start_recurring_dt']: '1970-01-02 00:00:01'),
-        'end_recurring_dt'      => ($schedule['end_recurring_dt']!= '0000-00-00' ? $schedule['end_recurring_dt'] : '1970-01-02 00:00:01'),
-        'start_recurring_hr'    => substr($schedule['start_recurring_hr'], 0, 5),
-        'end_recurring_hr'       => substr($schedule['end_recurring_hr'], 0, 5),
-        'recurring_day'           => $schedule['recurring_day'],
-        'targets'                => $items,
-    );
+    $response = $alert_schedule->toArray();
+    $response['recurring_day'] = $alert_schedule->getOriginal('recurring_day');
+    $response['targets'] = $items;
 } elseif ($sub_type == 'del-maintenance') {
-    $schedule_id = mres($_POST['del_schedule_id']);
-    dbDelete('alert_schedule_items', '`schedule_id`=?', array($schedule_id));
-    dbDelete('alert_schedule', '`schedule_id`=?', array($schedule_id));
-    $status   = 'ok';
-    $message  = 'Maintenance schedule has been removed';
-    $response = array(
+    $schedule_id = $_POST['del_schedule_id'];
+    dbDelete('alert_schedule', '`schedule_id`=?', [$schedule_id]);
+    dbDelete('alert_schedulables', '`schedule_id`=?', [$schedule_id]);
+    $status = 'ok';
+    $message = 'Maintenance schedule has been removed';
+    $response = [
         'status'  => $status,
         'message' => $message,
-    );
+    ];
 }//end if
 header('Content-type: application/json');
-echo _json_encode($response);
+echo json_encode($response, JSON_PRETTY_PRINT | JSON_UNESCAPED_SLASHES | JSON_UNESCAPED_UNICODE);

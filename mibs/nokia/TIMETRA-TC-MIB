@@ -818,7 +818,7 @@ TPolicyID                        ::= TEXTUAL-CONVENTION
     STATUS      current
     DESCRIPTION
         "The identification number of a policy."
-    SYNTAX      Unsigned32 (0..65535 | 65536 | 65537 | 65538)
+    SYNTAX      Unsigned32 (0..65535 | 65536 | 65537 | 65538 | 65539)
 
 TTmplPolicyID                    ::= TEXTUAL-CONVENTION
     STATUS      current
@@ -842,7 +842,7 @@ TSapEgressPolicyID               ::= TEXTUAL-CONVENTION
     STATUS      current
     DESCRIPTION
         "The identification number of a SAP egress policy."
-    SYNTAX      TPolicyID (1..65535 | 65536 | 65537 | 65538)
+    SYNTAX      TPolicyID (1..65535 | 65536 | 65537 | 65538 | 65539)
 
 TAnyQosPolicyID                  ::= TEXTUAL-CONVENTION
     STATUS      current
@@ -865,7 +865,7 @@ TAnyQosPolicyID                  ::= TEXTUAL-CONVENTION
                                       identifier is 1..65535. This is the user
                                       configured values.
          When policy type = 1 (0001b)  [NAT/LNS], the acceptable range for base
-                                      policy identifier is 0..2. These policies
+                                      policy identifier is 0..3. These policies
                                       are considered 'internal' and cannot be
                                       created or modified by the user.
          When policy type = 2 (0010b)  The auxiliary identifier represents
@@ -1304,6 +1304,18 @@ DateAndTimeOrEmpty               ::= TEXTUAL-CONVENTION
          specification as in SNMPv2-TC::DateAndTime, or is empty"
     SYNTAX      OCTET STRING (SIZE (0 | 8 | 11))
 
+ClassIndex                       ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Source/Destination class index."
+    SYNTAX      Unsigned32 (1..255)
+
+ClassIndexOrNone                 ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "Source/Destination class index or none(0)."
+    SYNTAX      Unsigned32 (0 | 1..255)
+
 Dot1PPriority                    ::= TEXTUAL-CONVENTION
     STATUS      current
     DESCRIPTION
@@ -1340,7 +1352,7 @@ TLspExpValue                     ::= TEXTUAL-CONVENTION
 TIpProtocol                      ::= TEXTUAL-CONVENTION
     STATUS      current
     DESCRIPTION
-        "IP protocol number.  well known protocol numbers include ICMP(1),
+        "IP protocol number. Well known protocol numbers include ICMP(1),
          TCP(6), UDP(17).
 
          -1 means value not set.
@@ -1348,6 +1360,16 @@ TIpProtocol                      ::= TEXTUAL-CONVENTION
     REFERENCE
         "http://www.iana.org/assignments/protocol-numbers"
     SYNTAX      Integer32 (-2 | -1 | 0..255)
+
+TIpProtocolNumber                ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "IP protocol number.
+
+         Well known protocol numbers include ICMP(1), TCP(6), UDP(17)."
+    REFERENCE
+        "http://www.iana.org/assignments/protocol-numbers"
+    SYNTAX      Integer32 (0..255)
 
 TIpOption                        ::= TEXTUAL-CONVENTION
     STATUS      current
@@ -1399,6 +1421,26 @@ TIpOption                        ::= TEXTUAL-CONVENTION
     REFERENCE
         "http://www.iana.org/assignments/ip-parameters"
     SYNTAX      Integer32 (0..255)
+
+TIcmpTypeOrNone                  ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "ICMP type.
+
+         The value -1 means ICMP type is not set."
+    REFERENCE
+        "www.iana.org/assignments/icmp-parameters/icmp-parameters.xhtml#icmp-parameters-types"
+    SYNTAX      Integer32 (-1 | 0..255)
+
+TIcmpCodeOrNone                  ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "ICMP code.
+
+         The value -1 means ICMP code is not set."
+    REFERENCE
+        "www.iana.org/assignments/icmp-parameters/icmp-parameters.xhtml#icmp-parameters-codes"
+    SYNTAX      Integer32 (-1 | 0..255)
 
 TTcpUdpPort                      ::= TEXTUAL-CONVENTION
     STATUS      current
@@ -2307,7 +2349,8 @@ TmnxTunnelTypeExt                ::= TEXTUAL-CONVENTION
         ospfV3        (13),
         mplsFwdPolicy (14),
         srPolicy      (15),
-        ribApi        (16)
+        ribApi        (16),
+        reserved17    (17)
     }
 
 TmnxIgpSCFamilyType              ::= TEXTUAL-CONVENTION
@@ -2595,7 +2638,7 @@ TmnxSubIdentString               ::= TEXTUAL-CONVENTION
     DESCRIPTION
         "The data type TmnxSubIdentString denotes the subscriber identification
          string."
-    SYNTAX      DisplayString (SIZE (1..32))
+    SYNTAX      DisplayString (SIZE (1..64))
 
 TmnxSubIdentStringOrEmpty        ::= TEXTUAL-CONVENTION
     STATUS      current
@@ -2603,7 +2646,7 @@ TmnxSubIdentStringOrEmpty        ::= TEXTUAL-CONVENTION
         "The data type TmnxSubIdentStringOrEmpty denotes the subscriber
          identification string. The empty string denotes the absence of a
          subscriber identification string."
-    SYNTAX      DisplayString (SIZE (0..32))
+    SYNTAX      DisplayString (SIZE (0..64))
 
 TmnxSubIdentShortString          ::= TEXTUAL-CONVENTION
     STATUS      current
@@ -3358,7 +3401,7 @@ TNetworkPolicyID                 ::= TEXTUAL-CONVENTION
     STATUS      current
     DESCRIPTION
         "the identification number of a network policy."
-    SYNTAX      TPolicyID (1..65535 | 65536 | 65537 | 65538)
+    SYNTAX      TPolicyID (1..65535 | 65536 | 65537 | 65538 | 65539)
 
 TItemScope                       ::= TEXTUAL-CONVENTION
     STATUS      current
@@ -4566,7 +4609,9 @@ TmnxBfdSessionProtocols          ::= TEXTUAL-CONVENTION
         bgpLsp      (21),
         rip         (22),
         ripng       (23),
-        mplsLsp     (24)
+        mplsLsp     (24),
+        reserved25  (25),
+        reserved26  (26)
     }
 
 TmnxBfdSessOperState             ::= TEXTUAL-CONVENTION
@@ -4595,10 +4640,11 @@ TmnxBfdOnLspSessFecType          ::= TEXTUAL-CONVENTION
         "RFC 5884, 'Bidirectional Forwarding Detection (BFD) for MPLS Label
          Switched Paths (LSPs)', Section 3.1, 'BFD for MPLS LSPs: Motivation'."
     SYNTAX      INTEGER {
-        rsvp (1),
-        ldp  (2),
-        bgp  (3),
-        srTe (4)
+        rsvp      (1),
+        ldp       (2),
+        bgp       (3),
+        srTe      (4),
+        reserved5 (5)
     }
 
 TmnxIngPolicerStatMode           ::= TEXTUAL-CONVENTION
@@ -4625,18 +4671,18 @@ TmnxSapIngPolicerStatMode        ::= TEXTUAL-CONVENTION
         "TmnxSapIngPolicerStatMode specifies the mode of statistics collected
          by this sap ingress policer."
     SYNTAX      INTEGER {
-        noStats                    (0),
-        minimal                    (1),
-        offeredProfileNoCIR        (2),
-        offeredTotalCIR            (3),
-        offeredPriorityNoCIR       (4),
-        offeredProfileCIR          (5),
-        offeredPriorityCIR         (6),
-        offeredLimitedProfileCIR   (7),
-        offeredProfileCappedCIR    (8),
-        offeredLimitedCappedCIR    (9),
-        offeredProfileWithDiscards (10),
-        reserved11                 (11)
+        noStats                        (0),
+        minimal                        (1),
+        offeredProfileNoCIR            (2),
+        offeredTotalCIR                (3),
+        offeredPriorityNoCIR           (4),
+        offeredProfileCIR              (5),
+        offeredPriorityCIR             (6),
+        offeredLimitedProfileCIR       (7),
+        offeredProfileCappedCIR        (8),
+        offeredLimitedCappedCIR        (9),
+        offeredProfileWithDiscards     (10),
+        offeredFourProfileWithDiscards (11)
     }
 
 TmnxNetIngPlcyPolicerStatMode    ::= TEXTUAL-CONVENTION
@@ -5573,6 +5619,19 @@ TmnxSubTerminationType           ::= TEXTUAL-CONVENTION
         localRetail    (3)
     }
 
+TmnxSubTerminationTypeOrZero     ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The TmnxSubTerminationType indicates how the subscriber host or
+         session is terminated. Zero indicates no subscriber host is
+         terminated."
+    SYNTAX      INTEGER {
+        notApplicable  (0),
+        local          (1),
+        localWholesale (2),
+        localRetail    (3)
+    }
+
 TmnxLongDisplayString            ::= TEXTUAL-CONVENTION
     STATUS      current
     DESCRIPTION
@@ -6326,10 +6385,10 @@ TWredSlopeProfile                ::= TEXTUAL-CONVENTION
          existing enqueuing priority derived from earlier matches in the
          classification hierarchy."
     SYNTAX      INTEGER {
-        in        (1),
-        out       (2),
-        reserved4 (4),
-        reserved5 (5)
+        in     (1),
+        out    (2),
+        exceed (4),
+        inplus (5)
     }
 
 TDEWredSlopeProfile              ::= TEXTUAL-CONVENTION
@@ -6345,11 +6404,38 @@ TDEWredSlopeProfile              ::= TEXTUAL-CONVENTION
          (Drop-Eligible) bit.  DE bit-value of '0' specifies in-profile and DE
          bit value of '1' specifies out-profile marking."
     SYNTAX      INTEGER {
-        in        (1),
-        out       (2),
-        de        (3),
-        reserved4 (4),
-        reserved5 (5)
+        in     (1),
+        out    (2),
+        de     (3),
+        exceed (4),
+        inplus (5)
+    }
+
+TmnxFlexAlgoId                   ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "TmnxFlexAlgoId identifies a specific Flexible Algorithm in the system."
+    SYNTAX      Unsigned32 (128..255)
+
+TmnxTreeSidOwner                 ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "TmnxTreeSidOwner identifies owner information for tree-sid feature."
+    SYNTAX      INTEGER {
+        none   (0),
+        static (1),
+        pce    (2),
+        srPol  (3)
+    }
+
+TmnxTreeSidOrigin                ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "TmnxTreeSidOrigin identifies origin information for tree-sid feature."
+    SYNTAX      INTEGER {
+        pcep          (10),
+        bgpSrPolicy   (20),
+        configuration (30)
     }
 
 END

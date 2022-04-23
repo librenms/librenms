@@ -5,7 +5,6 @@ use Illuminate\Database\Schema\Blueprint;
 
 class CreateLocationsTable extends Migration
 {
-
     /**
      * Run the migrations.
      *
@@ -15,7 +14,7 @@ class CreateLocationsTable extends Migration
     {
         Schema::create('locations', function (Blueprint $table) {
             $table->increments('id');
-            $table->string('location')->unique('locations_location_uindex');
+            $table->string('location')->unique();
             $table->float('lat', 10, 6)->nullable();
             $table->float('lng', 10, 6)->nullable();
             $table->dateTime('timestamp');

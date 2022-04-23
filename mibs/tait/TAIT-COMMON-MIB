@@ -1,0 +1,72 @@
+TAIT-COMMON-MIB DEFINITIONS ::= BEGIN
+--_________________________________________________________________
+-- Description:
+--   Top-level MIB sub-tree for Tait Communications
+--
+-- Notes:
+--  None
+--_________________________________________________________________
+
+IMPORTS
+    MODULE-IDENTITY, OBJECT-IDENTITY, enterprises
+        FROM SNMPv2-SMI;
+
+--
+-- Module Identification
+--
+taitCommonRegModule MODULE-IDENTITY
+    LAST-UPDATED  "201202201200Z"
+    ORGANIZATION  "www.taitradio.com"
+    CONTACT-INFO
+          "postal: Tait International Limited
+                   558 Wairakei Road
+                   PO Box 1645
+                   Christchurch
+                   New Zealand
+
+           phone:  +64 3358 3399
+           email:  support@taitradio.com"
+    DESCRIPTION   "The Tait Communication registration module."
+    REVISION      "201202201200Z"
+    DESCRIPTION   "Update with new identity."
+
+      ::= { enterprises 3570 1 1 1 }
+--_________________________________________________________________
+
+
+--
+-- Root of OID sub-tree for Tait Communications as assigned by
+-- IANA. This value MUST NOT BE MODIFIED
+--
+tait OBJECT-IDENTITY
+   STATUS current
+   DESCRIPTION "The root of the sub-tree for Tait Communications."
+      ::= { enterprises 3570 }
+
+--
+-- Top Level OID Registrations
+--
+-- sub-tree for registrations, which includes modules
+taitRegistrations OBJECT-IDENTITY
+   STATUS      current
+   DESCRIPTION "Sub-tree for registrations, which includes modules."
+   ::= { tait 1 }
+
+taitModules OBJECT-IDENTITY
+   STATUS current
+   DESCRIPTION "Sub-tree for module registrations. It contains the textual context files."
+      ::= { taitRegistrations 1 }
+
+-- sub-tree for company-wide objects and events
+taitGeneric OBJECT-IDENTITY
+   STATUS      current
+   DESCRIPTION "Sub-tree for common objects and events for products."
+   ::= { tait 2 }
+
+-- sub-tree for product-specific objects and events
+taitProducts OBJECT-IDENTITY
+   STATUS      current
+   DESCRIPTION "Sub-tree for product-specific objects and events."
+   ::= { tait 3 }
+
+END

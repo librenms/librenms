@@ -4,5 +4,6 @@ type: power
 over:
     - { graph: device_current, text: Current }
 discovery:
-    - sysDescr:
-        - 'Net Vision'
+    -
+        sysDescr:
+            - 'Net Vision'

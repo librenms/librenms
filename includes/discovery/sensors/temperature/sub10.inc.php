@@ -4,7 +4,7 @@ echo 'Sub10 temperature ';
 
 // Get Current Value
 $temp_oid = 'sub10UnitLclMWUTemperature.0';
-list($oid, $current) = explode(' ', snmp_get($device, $temp_oid, '-OsqnU', 'SUB10SYSTEMS-MIB'));
+[$oid, $current] = explode(' ', snmp_get($device, $temp_oid, '-OsqnU', 'SUB10SYSTEMS-MIB'));
 
 // Get Alarm Ranges
 $alarm_oid = 'sub10UnitMgmtAlarmName';

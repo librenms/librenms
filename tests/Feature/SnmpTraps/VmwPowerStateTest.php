@@ -14,32 +14,30 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
  *
  * Tests vmwVmPoweredOff, vmwVmPoweredOn, and vmwVmSuspended traps from VMWare ESXi hosts.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
+ *
  * @copyright  2019 KanREN, Inc
  * @author     Heath Barnhart <hbarnhart@kanren.net>
  */
 
-namespace LibreNMS\Tests;
+namespace LibreNMS\Tests\Feature\SnmpTraps;
 
 use App\Models\Device;
 use App\Models\Vminfo;
 use LibreNMS\Snmptrap\Dispatcher;
 use LibreNMS\Snmptrap\Trap;
-use LibreNMS\Tests\Feature\SnmpTraps\SnmpTrapTestCase;
 
 class VmwPowerStateTest extends SnmpTrapTestCase
 {
     public function testVmwVmPoweredOffTrap()
     {
-        $device = factory(Device::class)->create();
-        $guest = factory(Vminfo::class)->create(['device_id' => $device->device_id]);
-
+        $device = Device::factory()->create(); /** @var Device $device */
+        $guest = Vminfo::factory()->create(['device_id' => $device->device_id]); /** @var Vminfo $guest */
         $trapText = "$device->hostname
 UDP: [$device->ip]:28386->[10.10.10.100]:162
 DISMAN-EVENT-MIB::sysUpTimeInstance 5:18:30:26.00
@@ -59,9 +57,8 @@ SNMPv2-MIB::snmpTrapEnterprise.0 VMWARE-PRODUCTS-MIB::vmwESX";
 
     public function testVmwVmPoweredONTrap()
     {
-        $device = factory(Device::class)->create();
-        $guest = factory(Vminfo::class)->create(['device_id' => $device->device_id]);
-
+        $device = Device::factory()->create(); /** @var Device $device */
+        $guest = Vminfo::factory()->create(['device_id' => $device->device_id]); /** @var Vminfo $guest */
         $trapText = "$device->hostname
 UDP: [$device->ip]:28386->[10.10.10.100]:162
 DISMAN-EVENT-MIB::sysUpTimeInstance 5:18:30:26.00
@@ -81,9 +78,8 @@ SNMPv2-MIB::snmpTrapEnterprise.0 VMWARE-PRODUCTS-MIB::vmwESX";
 
     public function testVmwVmSuspendedTrap()
     {
-        $device = factory(Device::class)->create();
-        $guest = factory(Vminfo::class)->create(['device_id' => $device->device_id]);
-
+        $device = Device::factory()->create(); /** @var Device $device */
+        $guest = Vminfo::factory()->create(['device_id' => $device->device_id]); /** @var Vminfo $guest */
         $trapText = "$device->hostname
 UDP: [$device->ip]:28386->[10.10.10.100]:162
 DISMAN-EVENT-MIB::sysUpTimeInstance 5:18:30:26.00

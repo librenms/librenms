@@ -13,7 +13,7 @@ return [
             'full-name' => 'Voller Name des Benutzers',
             'role' => 'Deklariere dem Benutzer die Rolle :roles',
         ],
-        'password-request' => "Definieren Sie ein Benutzerpasswort",
+        'password-request' => 'Definieren Sie ein Benutzerpasswort',
         'success' => 'Benutzer :username erfolgreich hinzugefügt',
         'wrong-auth' => 'Achtung! Sie können sich nicht mit diesem Benutzernamen einloggen wenn die Authentifizierung nicht auf MySQL gesetzt ist',
     ],

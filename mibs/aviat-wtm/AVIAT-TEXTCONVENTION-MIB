@@ -1,0 +1,208 @@
+-- ****************************************************************************
+-- aviatTextConvention.mib: Aviat Networks Common Textual Conventions
+--
+-- Copyright © 2014 Aviat U.S, Inc. All rights reserved.
+-- Certain information and content may be provided by third parties to AVIAT,
+-- and in each case, such copyrighted work remains the property of that third
+-- party creator/licensor.
+-- All rights not expressly granted herein are reserved. Except as otherwise
+-- required by applicable law, any reproduction, distribution, modification,
+-- retransmission, or publication of any copyrighted material is strictly
+-- prohibited without the express written consent of the copyright owner.
+-- "AVIAT", "AVIAT NETWORKS" and the AVIAT logo are trademarks of Aviat
+-- Networks, Inc. All other trademarks or brand names may be trademarks or
+-- registered trademarks of AVIAT's affiliated companies in the United States
+-- and/or other countries.
+--
+-- ****************************************************************************
+
+AVIAT-TEXTCONVENTION-MIB DEFINITIONS ::= BEGIN
+    IMPORTS
+        MODULE-IDENTITY, Integer32, Unsigned32
+            FROM SNMPv2-SMI
+        TEXTUAL-CONVENTION
+            FROM SNMPv2-TC
+        aviatModules
+            FROM STXN-GLOBALREGISTER-MIB;
+
+    aviatTextConventionModule MODULE-IDENTITY
+        LAST-UPDATED    "201703282339Z"
+        ORGANIZATION    "Aviat Networks"
+        CONTACT-INFO    "Aviat Networks
+                         Customer Service
+
+                         Postal: 5200 Great America Parkway
+                                 Santa Clara
+                                 California 95054
+                                 United States of America
+
+                         Tel: 408 567 7000
+
+                         E-mail: mibsupport@aviatnet.com"
+        DESCRIPTION
+                "This module defines the textual conventions used throughout
+                 the DMC Aviat Enterprise MIB. The definitions in this module
+                 are for general purpose use. Textual conventions that are for
+                 specific MIB functionality are defined in the respective MIB
+                 modules."
+        REVISION        "201703282339Z"
+        DESCRIPTION
+                "Added modulation2048qam and modulation4096qam modulations
+                 for WTM4000."
+        REVISION        "201507290845Z"
+        DESCRIPTION
+                "Added RFU side band type textual convention."
+        REVISION        "201501050910Z"
+        DESCRIPTION
+                "Added monitoredHotStandby protection type textual convention."
+        REVISION        "201408262329Z"
+        DESCRIPTION
+                "Added the textual convention AviatL1LinkAggregationType to
+                 discern whether a layer 1 link aggregation group uses the
+                 Aviat L1LA mode or PLA mode."
+        REVISION        "201401210157Z"
+        DESCRIPTION
+                "Initial Version."
+            ::= { aviatModules 1 }
+
+
+-- ****************************************************************************
+-- Textual Conventions
+-- ****************************************************************************
+    AviatFunctionTimer ::=      TEXTUAL-CONVENTION
+        DISPLAY-HINT    "d"
+        STATUS          current
+        DESCRIPTION     "This specifies the status of the Function Related
+                         Timer described as follows:
+
+                              0               The function is off
+                             -1               The function is permanently on
+                                              (until it is manually switched
+                                              off or the unit is powered off)
+                             positive value   The number of seconds until the
+                                              function is automatically
+                                              switched Off"
+        SYNTAX          Integer32 ( -1..2147483647 )
+
+    AviatModulationType ::=     TEXTUAL-CONVENTION
+        STATUS          current
+        DESCRIPTION     "These are the types of modulation techniques."
+        SYNTAX          INTEGER {
+                                    modulationNone (1),
+                                    modulationQpsk (2),
+                                    modulation16qam (3),
+                                    modulation32qam (4),
+                                    modulation64qam (5),
+                                    modulation128qam (6),
+                                    modulation256qam (7),
+                                    modulation512qam (8),
+                                    modulation1024qam (9),
+                                    modulation256qamHG (10),
+                                    modulation512qamHG (11),
+                                    modulation1024qamHG (12),
+                                    modulation2048qam (13),
+                                    modulation4096qam (14)
+                                }
+
+    AviatPowerLevel ::=         TEXTUAL-CONVENTION
+        DISPLAY-HINT    "d-1"
+        STATUS          current
+        DESCRIPTION     "The power in 0.1dBm steps."
+        SYNTAX          Integer32
+
+    AviatDecibel ::=            TEXTUAL-CONVENTION
+        DISPLAY-HINT    "d-1"
+        STATUS          current
+        DESCRIPTION     "Ratio in 0.1dB steps."
+        SYNTAX          Integer32
+
+    AviatProtectionType ::=     TEXTUAL-CONVENTION
+        STATUS          current
+        DESCRIPTION     "The protection modes for a protected pair."
+        SYNTAX          INTEGER {
+                                    nonProtected (1),
+                                    hotStandby (2),
+                                    spaceDiversity (3),
+                                    frequencyDiversity (4),
+                                    monitoredHotStandby (5)
+                                }
+
+    AviatPluginModuleType ::=   TEXTUAL-CONVENTION
+        STATUS          current
+        DESCRIPTION     "These are the types of plugin modules."
+        SYNTAX          INTEGER {
+                                    pluginModuleNone (1),
+                                    pluginModuleUnsupported (2),
+                                    pluginModulePOEx2 (41),
+                                    pluginModulePWR (61),
+                                    pluginModulePWRAUX (62),
+                                    pluginModuleRACx1 (81),
+                                    pluginModuleRACx2 (82)
+                                }
+
+    AviatLoggingProtocolType ::=    TEXTUAL-CONVENTION
+        STATUS          current
+        DESCRIPTION     "These are the types of network protocols for remote
+                         logging."
+        SYNTAX          INTEGER {
+                                    protocolUdp (1),
+                                    protocolTcp (2),
+                                    protocolTls (3)
+                                }
+
+    AviatTimeOfDay ::=          TEXTUAL-CONVENTION
+        DISPLAY-HINT    "1d:1d:1d.1d"
+        STATUS          current
+        DESCRIPTION     "A time in any given day. This is in localtime.
+
+                         field  octets  contents                  range
+                         =====  ======  ========                  =====
+                           1       1    hour                      0..23
+                           2       2    minutes                   0..59
+                           3       3    seconds                   0..60
+                                        (use 60 for leap-second)
+                           4       4    deci-seconds              0..9"
+         SYNTAX          OCTET STRING (SIZE (4))
+
+    AviatEnabledStatus ::=      TEXTUAL-CONVENTION
+        STATUS          current
+        DESCRIPTION     "A simple status value for generic use."
+        SYNTAX          INTEGER {
+                                    enabled (1),
+                                    disabled (2)
+                                }
+
+    AviatTableIndexInteger ::=  TEXTUAL-CONVENTION
+        DISPLAY-HINT    "d"
+        STATUS          current
+        DESCRIPTION     "An integer which may be used as a table index. If 0
+                         then it is invalid."
+        SYNTAX          Unsigned32 ( 0..65535 )
+
+    AviatL1LinkAggregationType ::=  TEXTUAL-CONVENTION
+        STATUS          current
+        DESCRIPTION     "The aggregation type for a L1 link aggregation group."
+        SYNTAX          INTEGER {
+                                    l1la (1),
+                                    pla (2)
+                                }
+
+    AviatRfuSideBandType ::=  TEXTUAL-CONVENTION
+        STATUS          current
+        DESCRIPTION     "The side band type for an RFU."
+        SYNTAX          INTEGER {
+                                    highBand (1),
+                                    lowBand (2),
+                                    fullBand (3)
+                                }
+
+    AviatYangIdentityRef ::= TEXTUAL-CONVENTION
+        DISPLAY-HINT "255t"
+        STATUS       current
+        DESCRIPTION
+            "A reference to a Yang identity, consisting of the namespace and identity id.
+             These are represented as a string delimited with a colon, 
+             i.e. namespace:identity"
+        SYNTAX       OCTET STRING (SIZE (0..255))
+
+END

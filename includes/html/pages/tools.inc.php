@@ -4,9 +4,9 @@ $no_refresh = true;
 
 $pagetitle[] = 'Tools';
 
-$sections = array(
+$sections = [
     'oxidized-cfg-check' => 'Oxidized Config Checker',
-);
+];
 
 print_optionbar_start('', '');
 
@@ -19,7 +19,7 @@ foreach ($sections as $type => $texttype) {
         echo "<span class='pagemenu-selected'>";
     }
 
-    echo generate_link($texttype, array('page' => 'tools', 'tool' => $type));
+    echo generate_link($texttype, ['page' => 'tools', 'tool' => $type]);
 
     if ($vars['search'] == $type) {
         echo '</span>';

@@ -1,5 +1,8 @@
 mib: NEXANS-BM-MIB:NEXANS-MIB
 modules:
+    os:
+        hardware: NEXANS-BM-MIB::infoDescr.0
+        version: NEXANS-BM-MIB::infoMgmtFirmwareVersion.0
     sensors:
         temperature:
             data:

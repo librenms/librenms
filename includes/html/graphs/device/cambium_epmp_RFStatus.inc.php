@@ -10,11 +10,11 @@
  */
 
 require 'includes/html/graphs/common.inc.php';
-$rrdfilename = rrd_name($device['hostname'], 'cambium-epmp-RFStatus');
-if (rrdtool_check_rrd_exists($rrdfilename)) {
+$rrdfilename = Rrd::name($device['hostname'], 'cambium-epmp-RFStatus');
+if (Rrd::checkRrdExists($rrdfilename)) {
     $rrd_options .= " COMMENT:'dBm                Now       Ave      Max     \\n'";
-    $rrd_options .= ' DEF:cambiumSTADLRSSI='.$rrdfilename.':cambiumSTADLRSSI:AVERAGE ';
-    $rrd_options .= ' DEF:cambiumSTADLSNR='.$rrdfilename.':cambiumSTADLSNR:AVERAGE ';
+    $rrd_options .= ' DEF:cambiumSTADLRSSI=' . $rrdfilename . ':cambiumSTADLRSSI:AVERAGE ';
+    $rrd_options .= ' DEF:cambiumSTADLSNR=' . $rrdfilename . ':cambiumSTADLSNR:AVERAGE ';
     $rrd_options .= " AREA:cambiumSTADLRSSI#FF0000:'RSSI       ' ";
     $rrd_options .= ' GPRINT:cambiumSTADLRSSI:LAST:%0.2lf%s ';
     $rrd_options .= ' GPRINT:cambiumSTADLRSSI:MIN:%0.2lf%s ';

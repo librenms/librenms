@@ -1,11 +1,35 @@
 mib: POWERSUPPLY-MIB:FAN-MIB:STATISTICS-MIB
 modules:
+    mempools:
+        data:
+            -
+                total: NETSWITCH-MIB::hpLocalMemTotalBytes
+                free: NETSWITCH-MIB::hpLocalMemFreeBytes
+                used: NETSWITCH-MIB::hpLocalMemAllocBytes
+                descr: 'Local Memory {{ $index }}'
+                type: hpLocal
+            -
+                total: NETSWITCH-MIB::hpGlobalMemTotalBytes
+                free: NETSWITCH-MIB::hpGlobalMemFreeBytes
+                used: NETSWITCH-MIB::hpGlobalMemAllocBytes
+                descr: 'Global Memory {{ $index }}'
+                type: hpGlobal
+    os:
+        sysDescr_regex:
+            - '/( (?<hardware>E?\d{4,}\S*)[^,]*)?, revision (?<version>[^ ,]+)/'
+            - '/PROCURVE (?<hardware>.*) - (?<version>.*)/'
+            - '/(HPE OfficeConnect Switch|HP) (?<hardware>[\d]+[\ \-]\S+).*(?<version>P\S[0-9\.]+)/'
+            - '/(HP ProCurve) (?<hardware>\d+\S?).*(?<version>P[1-9\.]+)/'
+        version:
+            - NETSWITCH-MIB::hpSwitchOsVersion.0
+            - HP-SN-AGENT-MIB::snAgImgVer.0
+        serial: SEMI-MIB::hpHttpMgSerialNumber.0
     processors:
-          data:
-              -
-                  oid: hpSwitchCpuStat
-                  num_oid: '.1.3.6.1.4.1.11.2.14.11.5.1.9.6.1.{{ $index }}'
-                  type: procurve-fixed
+        data:
+            -
+                oid: hpSwitchCpuStat
+                num_oid: '.1.3.6.1.4.1.11.2.14.11.5.1.9.6.1.{{ $index }}'
+                type: procurve-fixed
     sensors:
         temperature:
             data:

@@ -223,14 +223,13 @@ TmnxHwClass                      ::= TEXTUAL-CONVENTION
         mdaModule            (11),
         flashDiskModule      (12),
         port                 (13),
-        mcm                  (14),
         ccm                  (15),
         alarmInputModule     (19),
         pcm                  (20),
         powerShelf           (21),
         powerShelfController (22),
         cpmCarrier           (23),
-        reserved24           (24)
+        xioModule            (24)
     }
 
 TmnxPhysChassisClass             ::= TEXTUAL-CONVENTION
@@ -249,13 +248,15 @@ TmnxPhysChassisClass             ::= TEXTUAL-CONVENTION
             ethSatChassis     (5) - Ethernet Satellite chassis class
             tdmSatChassis     (6) - Time Division Multiplexing Satellite
                                     chassis class
+            esaChassis        (7) - Extended Services Appliance chassis class
             "
     SYNTAX      INTEGER {
         other         (1),
         unknown       (2),
         routerChassis (3),
         ethSatChassis (5),
-        tdmSatChassis (6)
+        tdmSatChassis (6),
+        reserved7     (7)
     }
 
 TmnxPhysChassisRole              ::= TEXTUAL-CONVENTION
@@ -624,6 +625,13 @@ TmnxMdaType                      ::= TEXTUAL-CONVENTION
          specific type of MDA."
     SYNTAX      Unsigned32
 
+TmnxXiomType                     ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "TmnxXiomType is an index into the tmnxXiomTypeTable used to identify a
+         specific type of XIOM."
+    SYNTAX      Unsigned32
+
 TmnxMDASuppType                  ::= TEXTUAL-CONVENTION
     STATUS      current
     DESCRIPTION
@@ -849,7 +857,15 @@ TmnxMDASuppType                  ::= TEXTUAL-CONVENTION
         supp-MDA-type-212 (212),
         supp-MDA-type-213 (213),
         supp-MDA-type-214 (214),
-        supp-MDA-type-215 (215)
+        supp-MDA-type-215 (215),
+        supp-MDA-type-216 (216),
+        supp-MDA-type-217 (217),
+        supp-MDA-type-218 (218),
+        supp-MDA-type-219 (219),
+        supp-MDA-type-220 (220),
+        supp-MDA-type-221 (221),
+        supp-MDA-type-222 (222),
+        supp-MDA-type-223 (223)
     }
 
 TmnxMDAChanType                  ::= TEXTUAL-CONVENTION
@@ -909,7 +925,7 @@ TmnxCcmType                      ::= TEXTUAL-CONVENTION
     SYNTAX      Unsigned32
 
 TmnxMcmType                      ::= TEXTUAL-CONVENTION
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The TmnxMcmType data type is bit-mask field that describes
          the values used to identify the kind of MDA Carrier
@@ -919,7 +935,9 @@ TmnxMcmType                      ::= TEXTUAL-CONVENTION
          manufactured by Nokia.  When multiple bits are set, it can
          be used to identify a set or list of MCM types used in the
          tmnxMcmTable to indicate supported MCMs within a specific
-         card slot."
+         card slot.
+
+         This typedef was obsoleted in release 20.2."
     SYNTAX      Unsigned32
 
 TmnxSlotNum                      ::= TEXTUAL-CONVENTION
@@ -1451,15 +1469,49 @@ TmnxXiomFunctionalLevel          ::= TEXTUAL-CONVENTION
     SYNTAX      INTEGER {
         unknown      (0),
         unrestricted (1),
-        cr1600gPlus  (2),
-        er1600gPlus  (3),
-        he1600gPlus  (4),
-        cr2400gPlus  (5),
-        er2400gPlus  (6),
-        he2400gPlus  (7),
-        cr3000gPlus  (8),
-        er3000gPlus  (9),
-        he3000gPlus  (10)
+        he800gPlus   (2),
+        er800gPlus   (3),
+        cr800gPlus   (4),
+        he1500gPlus  (5),
+        er1500gPlus  (6),
+        cr1500gPlus  (7),
+        he1600gPlus  (8),
+        er1600gPlus  (9),
+        cr1600gPlus  (10),
+        he2400gPlus  (11),
+        er2400gPlus  (12),
+        cr2400gPlus  (13),
+        he3000gPlus  (14),
+        er3000gPlus  (15),
+        cr3000gPlus  (16)
+    }
+
+TmnxXiomFunctionalUpgrade        ::= TEXTUAL-CONVENTION
+    STATUS      current
+    DESCRIPTION
+        "The TmnxXiomFunctionalUpgrade data type is an integer that specifies a
+         functional level upgrade of a given XIOM."
+    SYNTAX      INTEGER {
+        unknown            (0),
+        cr800gCr1500gPlus  (1),
+        er800gEr1500gPlus  (2),
+        he800gHe1500gPlus  (3),
+        cr1600gCr2400gPlus (4),
+        er1600gEr2400gPlus (5),
+        he1600gHe2400gPlus (6),
+        cr2400gCr3000gPlus (7),
+        er2400gEr3000gPlus (8),
+        he2400gHe3000gPlus (9),
+        crEr800gPlus       (10),
+        erHe800gPlus       (11),
+        crEr1500gPlus      (12),
+        erHe1500gPlus      (13),
+        crEr1600gPlus      (14),
+        erHe1600gPlus      (15),
+        crEr2400gPlus      (16),
+        erHe2400gPlus      (17),
+        crEr3000gPlus      (18),
+        erHe3000gPlus      (19)
     }
 
 TmnxGnssConstellation            ::= TEXTUAL-CONVENTION
@@ -1513,7 +1565,8 @@ TmnxHwEventType                  ::= TEXTUAL-CONVENTION
          Not all types of events are supported on all hardware."
     SYNTAX      INTEGER {
         soft-error          (1),
-        internal-frame-loss (2)
+        internal-frame-loss (2),
+        reserved3           (3)
     }
 
 TmnxHwEventAction                ::= TEXTUAL-CONVENTION
@@ -2693,7 +2746,7 @@ tmnxHwTable                      OBJECT-TYPE
         "The tmnxHwTable has an entry for each managed hardware component
          in the Nokia SROS series system's chassis.  Examples of
          these hardware component types are IOM, Fabric, and CPM cards,
-         MCM and CCM, and MDA modules.  Similar information for physical ports
+         and CCM, and MDA modules.  Similar information for physical ports
          is in the tmnxPortObjs."
     ::= { tmnxChassisObjs 8 }
 
@@ -6366,7 +6419,8 @@ TmnxCardEntry                    ::= SEQUENCE
     tmnxCardLicensedBandwidth        Unsigned32,
     tmnxCardFilterScaleProfile       TmnxCardFilterProfile,
     tmnxCardPowerSave                TruthValue,
-    tmnxCardHashSeedShift            Unsigned32
+    tmnxCardHashSeedShift            Unsigned32,
+    tmnxCardNumEquippedXioms         Unsigned32
 }
 
 tmnxCardSlotNum                  OBJECT-TYPE
@@ -6490,7 +6544,7 @@ tmnxCardMemorySize               OBJECT-TYPE
 tmnxCardNamedPoolAdminMode       OBJECT-TYPE
     SYNTAX      TmnxAdminState
     MAX-ACCESS  read-write
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The value of tmnxCardNamedPoolAdminMode specifies whether or not an
          IOM is provisioned for the configuration of named pools. If the value
@@ -6507,7 +6561,7 @@ tmnxCardNamedPoolAdminMode       OBJECT-TYPE
 tmnxCardNamedPoolOperMode        OBJECT-TYPE
     SYNTAX      TmnxAdminState
     MAX-ACCESS  read-only
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The value of tmnxCardNamedPoolOperMode indicates whether or not an IOM
          provisioned with tmnxCardNamedPoolAdminMode to a value of
@@ -7237,6 +7291,15 @@ tmnxCardHashSeedShift            OBJECT-TYPE
          under ECMP and LAG."
     DEFVAL      { 2 }
     ::= { tmnxCardEntry 70 }
+
+tmnxCardNumEquippedXioms         OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxCardNumEquippedXioms indicates the number of xioms
+         equipped on this slot."
+    ::= { tmnxCardEntry 71 }
 
 tmnxCpmCardLastChange            OBJECT-TYPE
     SYNTAX      TimeStamp
@@ -8710,22 +8773,26 @@ tmnxMDAMcPathMgmtAdminState      OBJECT-TYPE
 tmnxMDAIngNamedPoolPolicy        OBJECT-TYPE
     SYNTAX      TNamedItemOrEmpty
     MAX-ACCESS  read-write
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The value of tmnxMDAIngNamedPoolPolicy specifies a named pool policy
          associated with an MDA ingress context. The policy governs the way
-         named pools are created at the MDA level."
+         named pools are created at the MDA level.
+
+         This object is obsoleted in 20.0 Release."
     DEFVAL      { "" }
     ::= { tmnxMDAEntry 32 }
 
 tmnxMDAEgrNamedPoolPolicy        OBJECT-TYPE
     SYNTAX      TNamedItemOrEmpty
     MAX-ACCESS  read-write
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The value of tmnxMDAEgrNamedPoolPolicy specifies a named pool policy
          associated with an MDA egress context. The policy governs the way
-         named pools are created at the MDA level."
+         named pools are created at the MDA level.
+
+         This object is obsoleted in 20.0 Release."
     DEFVAL      { "" }
     ::= { tmnxMDAEntry 33 }
 
@@ -10629,10 +10696,12 @@ tmnxCcagPathCcHwMac              OBJECT-TYPE
 tmnxMcmTable                     OBJECT-TYPE
     SYNTAX      SEQUENCE OF TmnxMcmEntry
     MAX-ACCESS  not-accessible
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The tmnxMcmTable has an entry for each Mda Carrier module (MCM) on the
-         7710 system."
+         7710 system.
+
+         This table was obsoleted in release 20.2."
     ::= { tmnxCardObjs 15 }
 
 tmnxMcmEntry                     OBJECT-TYPE
@@ -10665,39 +10734,45 @@ TmnxMcmEntry                     ::= SEQUENCE
 tmnxMcmSlotNum                   OBJECT-TYPE
     SYNTAX      Unsigned32 (0..16)
     MAX-ACCESS  not-accessible
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The unique value which identifies this MDA slot within a specific
          IOM card in the system.  Since the MCM occupies two MDA slots in
-         the chassis this value can only be an odd number."
+         the chassis this value can only be an odd number.
+
+         This object was obsoleted in release 20.2."
     ::= { tmnxMcmEntry 1 }
 
 tmnxMcmSupportedTypes            OBJECT-TYPE
     SYNTAX      TmnxMcmType
     MAX-ACCESS  read-only
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "A bit-mask that indicates what MCM types can be physically supported
-         in this chassis."
+         in this chassis.
+
+         This object was obsoleted in release 20.2."
     ::= { tmnxMcmEntry 2 }
 
 tmnxMcmAssignedType              OBJECT-TYPE
     SYNTAX      TmnxMcmType
     MAX-ACCESS  read-write
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "A bit-mask that identifies the administratively assigned
          (pre-provisioned) MCM type that should occupy this chassis.
          If tmnxMcmAssignedType has a value of 'unassigned',
          this slot has not yet been pre-provisioned.  There must not be more
-         than one bit set at a time in tmnxMcmAssignedType."
+         than one bit set at a time in tmnxMcmAssignedType.
+
+         This object was obsoleted in release 20.2."
     DEFVAL      { 1 }
     ::= { tmnxMcmEntry 3 }
 
 tmnxMcmEquippedType              OBJECT-TYPE
     SYNTAX      TmnxMcmType
     MAX-ACCESS  read-only
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "A bit-mask that identifies the MCM type that is physically
          inserted into this chassis.  If the chassis has been pre-provisioned,
@@ -10708,26 +10783,32 @@ tmnxMcmEquippedType              OBJECT-TYPE
          tmnxMcmEquippedType is not one of the supported types as
          specified by tmnxMcmSupportedTypes, a mismatch alarm will
          be raised.  There will not be more than one bit set at a time in
-         tmnxMcmEquippedType."
+         tmnxMcmEquippedType.
+
+         This object was obsoleted in release 20.2."
     ::= { tmnxMcmEntry 4 }
 
 tmnxMcmHwIndex                   OBJECT-TYPE
     SYNTAX      TmnxHwIndex
     MAX-ACCESS  read-only
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The value of tmnxMcmHwIndex is the index into the tmnxHwTable for the
          row entry that represents the hardware component information for this
-         MCM."
+         MCM.
+
+         This object was obsoleted in release 20.2."
     ::= { tmnxMcmEntry 5 }
 
 tmnxMcmTypeTable                 OBJECT-TYPE
     SYNTAX      SEQUENCE OF TmnxMcmTypeEntry
     MAX-ACCESS  not-accessible
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The card type table has an entry for each Nokia 7710 series Mda
-         Carrier Module (MCM) model."
+         Carrier Module (MCM) model.
+
+         This table was obsoleted in release 20.2."
     ::= { tmnxCardObjs 16 }
 
 tmnxMcmTypeEntry                 OBJECT-TYPE
@@ -10752,39 +10833,47 @@ TmnxMcmTypeEntry                 ::= SEQUENCE
 tmnxMcmTypeIndex                 OBJECT-TYPE
     SYNTAX      TmnxMcmType
     MAX-ACCESS  not-accessible
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The unique index value which identifies this type of Nokia 7710 series
-         MCM model."
+         MCM model.
+
+         This object was obsoleted in release 20.2."
     ::= { tmnxMcmTypeEntry 1 }
 
 tmnxMcmTypeName                  OBJECT-TYPE
     SYNTAX      TNamedItemOrEmpty
     MAX-ACCESS  read-only
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The administrative name that identifies this type of Nokia
          7710 series MCM model.  This name string may be used in CLI
-         commands to specify a particular card model type."
+         commands to specify a particular card model type.
+
+         This object was obsoleted in release 20.2."
     ::= { tmnxMcmTypeEntry 2 }
 
 tmnxMcmTypeDescription           OBJECT-TYPE
     SYNTAX      TItemDescription
     MAX-ACCESS  read-only
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
-        "A detailed description of this Nokia 7710 series MCM model."
+        "A detailed description of this Nokia 7710 series MCM model.
+
+         This object was obsoleted in release 20.2."
     ::= { tmnxMcmTypeEntry 3 }
 
 tmnxMcmTypeStatus                OBJECT-TYPE
     SYNTAX      TruthValue
     MAX-ACCESS  read-only
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "When tmnxMcmTypeStatus has a value of 'true' it
          indicates that this MCM is supported in this revision of the
          management software.  When it has a value of 'false' there is no
-         support."
+         support.
+
+         This object was obsoleted in release 20.2."
     ::= { tmnxMcmTypeEntry 4 }
 
 tmnxIPsecIsaGrpTableLastChanged  OBJECT-TYPE
@@ -11051,7 +11140,7 @@ tmnxIPsecIsaGrpIsaScaleMode      OBJECT-TYPE
     SYNTAX      INTEGER {
         tunnelLimit2k  (1),
         tunnelLimit32k (2),
-        reserved3      (3),
+        tunnelLimit64k (3),
         tunnelLimit8   (4),
         tunnelLimit32  (5)
     }
@@ -11065,6 +11154,7 @@ tmnxIPsecIsaGrpIsaScaleMode      OBJECT-TYPE
              tunnelLimit2k    (1) - maximum 2048 tunnels (e.g., IPsec, GRE and
                                     IP) per ISA
              tunnelLimit32k   (2) - maximum 32678 tunnels per ISA
+             tunnelLimit64k   (3) - maximum 65536 tunnels per ISA
              tunnelLimit8     (4) - maximum 8 tunnels per ISA
              tunnelLimit32    (5) - maximum 32 tunnels per ISA
 
@@ -11584,7 +11674,8 @@ TmnxFPEntry                      ::= SEQUENCE
     tmnxFPMcPathMgmtSecInUseBw       Gauge32,
     tmnxFPMcPathMgmtBlkHoleInUseBw   Gauge32,
     tmnxFPGeneration                 TmnxFpGeneration,
-    tmnxFPIngNetQueuePolicy          TNamedItem
+    tmnxFPIngNetQueuePolicy          TNamedItem,
+    tmnxFPQosFPResourcePolicy        TLNamedItemOrEmpty
 }
 
 tmnxFPNum                        OBJECT-TYPE
@@ -11934,6 +12025,18 @@ tmnxFPIngNetQueuePolicy          OBJECT-TYPE
          policy being used to define the queueing structure for this object."
     DEFVAL      { "default" }
     ::= { tmnxFPEntry 28 }
+
+tmnxFPQosFPResourcePolicy        OBJECT-TYPE
+    SYNTAX      TLNamedItemOrEmpty
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxFPQosFPResourcePolicy indicates the FP resource
+         policy policy being used to define the queueing structure for this
+         object. For FP4 default value is 'default' and it is empty for other
+         FPs."
+    DEFVAL      { "" }
+    ::= { tmnxFPEntry 29 }
 
 tmnxFPAccIngQGrpTableLastChgd    OBJECT-TYPE
     SYNTAX      TimeStamp
@@ -15053,7 +15156,9 @@ TFPResEntry                      ::= SEQUENCE
     tFPResEgrRemarkMapTotal          Unsigned32,
     tFPResEgrRemarkMapAlloc          Unsigned32,
     tFPResEgrExpRemarkMapTotal       Unsigned32,
-    tFPResEgrExpRemarkMapAlloc       Unsigned32
+    tFPResEgrExpRemarkMapAlloc       Unsigned32,
+    tFPResIPv6McastEntryTotal        Unsigned32,
+    tFPResIPv6McastEntryAlloc        Unsigned32
 }
 
 tFPResSapIngQosPolTotal          OBJECT-TYPE
@@ -15866,44 +15971,52 @@ tFPResResRvplsFdbRecAlloc        OBJECT-TYPE
 tFPResDynQ2NamedPoolTotal        OBJECT-TYPE
     SYNTAX      Unsigned32
     MAX-ACCESS  read-only
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The value of tFPResDynQ2NamedPoolTotal represents the total number of
          dynamic Q2 named pools that are supported on this FP.
 
          When the value of tFPResDynQ2NamedPoolTotal is zero, it indicates that
-         this resource type is not supported on this FP."
+         this resource type is not supported on this FP.
+
+         This object is obsolete in 20.2 release."
     ::= { tFPResEntry 73 }
 
 tFPResDynQ2NamedPoolAlloc        OBJECT-TYPE
     SYNTAX      Unsigned32
     MAX-ACCESS  read-only
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The value of tFPResDynQ2NamedPoolAlloc represents the total number of
-         dynamic Q2 named pools that are currently allocated on this FP."
+         dynamic Q2 named pools that are currently allocated on this FP.
+
+         This object is obsolete in 20.2 release."
     ::= { tFPResEntry 74 }
 
 tFPResDynQ2NamedPoolIUBI         OBJECT-TYPE
     SYNTAX      Unsigned32
     MAX-ACCESS  read-only
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The value of tFPResDynQ2NamedPoolIUBI represents the subset of
          resources which are currently in use by ingress Q2 named pools out of
          currently allocated dynamic Q2 named pools resources,
-         tFPResDynQ2NamedPoolAlloc."
+         tFPResDynQ2NamedPoolAlloc.
+
+         This object is obsolete in 20.2 release."
     ::= { tFPResEntry 75 }
 
 tFPResDynQ2NamedPoolIUBE         OBJECT-TYPE
     SYNTAX      Unsigned32
     MAX-ACCESS  read-only
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The value of tFPResDynQ2NamedPoolIUBE represents the subset of
          resources which are currently in use by egress Q2 named pools out of
          currently allocated dynamic Q2 named pools resources,
-         tFPResDynQ2NamedPoolAlloc."
+         tFPResDynQ2NamedPoolAlloc.
+
+         This object is obsolete in 20.2 release."
     ::= { tFPResEntry 76 }
 
 tFPResIngQ1NamedPoolTotal        OBJECT-TYPE
@@ -16507,6 +16620,24 @@ tFPResEgrExpRemarkMapAlloc       OBJECT-TYPE
         "The value of tFPResEgrExpRemarkMapAlloc represents the total number of
          egress lsp-esp remark maps that are currently allocated on this FP."
     ::= { tFPResEntry 132 }
+
+tFPResIPv6McastEntryTotal        OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tFPResIPv6McastEntryTotal represents the total number of
+         IPv6 multicast CAM entries reserved on this FP."
+    ::= { tFPResEntry 133 }
+
+tFPResIPv6McastEntryAlloc        OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tFPResIPv6McastEntryTotal represents the total number of
+         IPv6 multicast CAM entries that are currently allocated on this FP."
+    ::= { tFPResEntry 134 }
 
 tMDAResTable                     OBJECT-TYPE
     SYNTAX      SEQUENCE OF TMDAResEntry
@@ -18117,6 +18248,506 @@ tCoreResVlanVoqAlloc             OBJECT-TYPE
         "The value of tCoreResVlanVoqAlloc represents the total number of VLAN
          Voqs that are currently allocated on this core."
     ::= { tCoreResEntry 11 }
+
+tmnxXiomConfigTableLastChanged   OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxXiomConfigTableLastChanged indicates the time, since
+         system startup, when tmnxXiomConfigTable last changed configuration."
+    ::= { tmnxCardObjs 77 }
+
+tmnxXiomConfigTable              OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxXiomConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The tmnxXiomConfigTable contains configuration information regarding
+         the XIOM in the system."
+    ::= { tmnxCardObjs 78 }
+
+tmnxXiomConfigEntry              OBJECT-TYPE
+    SYNTAX      TmnxXiomConfigEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each row entry represents XIOM configuration in the system.
+
+         Rows in this table are created by the agent at initialization and
+         cannot be created or destroyed by SNMP Set requests."
+    INDEX       {
+        tmnxCardSlotNum,
+        tmnxXiomSlotNum
+    }
+    ::= { tmnxXiomConfigTable 1 }
+
+TmnxXiomConfigEntry              ::= SEQUENCE
+{
+    tmnxXiomSlotNum                  Unsigned32,
+    tmnxXiomConfigEntryLastChanged   TimeStamp,
+    tmnxXiomAssignedType             TmnxXiomType,
+    tmnxXiomAssignedLevel            TmnxXiomFunctionalLevel,
+    tmnxXiomReboot                   TmnxActionType,
+    tmnxXiomFailOnError              TruthValue,
+    tmnxXiomResetOnRecoverableError  TruthValue
+}
+
+tmnxXiomSlotNum                  OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..2)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The unique value which identifies this XIOM slot within a card in the
+         system."
+    ::= { tmnxXiomConfigEntry 1 }
+
+tmnxXiomConfigEntryLastChanged   OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxXiomConfigEntryLastChanged indicates the time, since
+         system startup, that the configuration of the row was last modified."
+    ::= { tmnxXiomConfigEntry 2 }
+
+tmnxXiomAssignedType             OBJECT-TYPE
+    SYNTAX      TmnxXiomType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxXiomAssignedType specifies the XIOM type that was
+         administratively assigned to this slot. A value of 1 indicates this
+         slot is unassigned."
+    DEFVAL      { 1 }
+    ::= { tmnxXiomConfigEntry 3 }
+
+tmnxXiomAssignedLevel            OBJECT-TYPE
+    SYNTAX      TmnxXiomFunctionalLevel
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxXiomAssignedLevel specifies the administratively
+         assigned (pre-provisioned) XIOM functional level variant that should
+         occupy this slot in this chassis."
+    DEFVAL      { unrestricted }
+    ::= { tmnxXiomConfigEntry 4 }
+
+tmnxXiomReboot                   OBJECT-TYPE
+    SYNTAX      TmnxActionType
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxXiomReboot, when set to 'doAction(1)', causes the
+         XIOM to execute a soft-reboot."
+    DEFVAL      { notApplicable }
+    ::= { tmnxXiomConfigEntry 5 }
+
+tmnxXiomFailOnError              OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxXiomFailOnError specifies the whether or not the XIOM
+         will fail when an error occurs."
+    DEFVAL      { false }
+    ::= { tmnxXiomConfigEntry 6 }
+
+tmnxXiomResetOnRecoverableError  OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-write
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxXiomResetOnRecoverableError specifies whether or not
+         the system resets the XIOM when there are fatal memory parity errors
+         on one of the Q-chips on the card with which this XIOM is associated.
+
+         If the value of tmnxXiomResetOnRecoverableError is 'true (1)' and
+         there is a fatal memory parity error on a Q-chip, the system will
+         reset the XIOM but not fail it, even if tmnxXiomFailOnError is 'true
+         (1)'."
+    DEFVAL      { false }
+    ::= { tmnxXiomConfigEntry 7 }
+
+tmnxXiomStatsTable               OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxXiomStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The tmnxXiomStatsTable contains status and statistic information
+         regarding the XIOM in the system."
+    ::= { tmnxCardObjs 79 }
+
+tmnxXiomStatsEntry               OBJECT-TYPE
+    SYNTAX      TmnxXiomStatsEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each row entry represents XIOM status and statistic information in the
+         system.
+
+         Rows in this table are created by the agent at initialization and
+         cannot be created or destroyed by SNMP Set requests."
+    AUGMENTS    { tmnxXiomConfigEntry }
+    ::= { tmnxXiomStatsTable 1 }
+
+TmnxXiomStatsEntry               ::= SEQUENCE
+{
+    tmnxXiomEquippedType             TmnxXiomType,
+    tmnxXiomEquippedLevel            TmnxXiomFunctionalLevel,
+    tmnxXiomLicensedLevel            TmnxXiomFunctionalLevel,
+    tmnxXiomAvailableMdaSlots        Unsigned32,
+    tmnxXiomNumEquippedMdas          Unsigned32,
+    tmnxXiomHwIndex                  TmnxHwIndex
+}
+
+tmnxXiomEquippedType             OBJECT-TYPE
+    SYNTAX      TmnxXiomType
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxXiomEquippedType indicates indicates the XIOM type
+         that is physically inserted into this slot. If the slot has been
+         pre-provisioned and the value of tmnxXiomEquippedType is not the same
+         as tmnxXiomAssignedType, a mismatch alarm will be raised. A value of 0
+         indicates the equipped XIOM is not supported by this software release."
+    ::= { tmnxXiomStatsEntry 1 }
+
+tmnxXiomEquippedLevel            OBJECT-TYPE
+    SYNTAX      TmnxXiomFunctionalLevel
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxXiomEquippedLevel indicates the XIOM functional-level
+         variant that is physically inserted into this slot in this chassis.  If
+         the value of tmnxXiomAssignedLevel is not equal to the value of
+         tmnxXiomEquippedLevel, a mismatch alarm will be raised."
+    ::= { tmnxXiomStatsEntry 2 }
+
+tmnxXiomLicensedLevel            OBJECT-TYPE
+    SYNTAX      TmnxXiomFunctionalLevel
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxXiomLicensedLevel indicates the XIOM functional-level
+         that is licensed for this slot in this chassis."
+    ::= { tmnxXiomStatsEntry 3 }
+
+tmnxXiomAvailableMdaSlots        OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxXiomAvailableMdaSlots indicates the number of
+         available MDA slots on this XIOM."
+    ::= { tmnxXiomStatsEntry 4 }
+
+tmnxXiomNumEquippedMdas          OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxXiomNumEquippedMdas indicates the number of equipped
+         MDAs on this XIOM."
+    ::= { tmnxXiomStatsEntry 5 }
+
+tmnxXiomHwIndex                  OBJECT-TYPE
+    SYNTAX      TmnxHwIndex
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxXiomHwIndex indicates the hardware index into the
+         tmnxHwTable for the row entry that represents the hardware component
+         information for this XIOM."
+    ::= { tmnxXiomStatsEntry 6 }
+
+tmnxXiomTypeTable                OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxXiomTypeEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The tmnxXiomTypeTable contains an entry for every XIOM type supported
+         by the system."
+    ::= { tmnxCardObjs 80 }
+
+tmnxXiomTypeEntry                OBJECT-TYPE
+    SYNTAX      TmnxXiomTypeEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each row entry represents an Nokia SROS series XIOM.
+
+         Rows in this table are created by the agent at initialization and
+         cannot be created or destroyed by SNMP Get or Set requests."
+    INDEX       { tmnxXiomTypeIndex }
+    ::= { tmnxXiomTypeTable 1 }
+
+TmnxXiomTypeEntry                ::= SEQUENCE
+{
+    tmnxXiomTypeIndex                TmnxXiomType,
+    tmnxXiomTypeName                 TNamedItemOrEmpty,
+    tmnxXiomTypeDescription          TItemDescription,
+    tmnxXiomTypeStatus               TruthValue
+}
+
+tmnxXiomTypeIndex                OBJECT-TYPE
+    SYNTAX      TmnxXiomType
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxXiomTypeIndex specifies the unique index value which
+         identifies this type of Nokia SROS series XIOM."
+    ::= { tmnxXiomTypeEntry 1 }
+
+tmnxXiomTypeName                 OBJECT-TYPE
+    SYNTAX      TNamedItemOrEmpty
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxXiomTypeName indicates the administrative name
+         that identifies this type of Nokia SROS series XIOM.  This name
+         string may be used in CLI commands to specify a particular XIOM type."
+    ::= { tmnxXiomTypeEntry 2 }
+
+tmnxXiomTypeDescription          OBJECT-TYPE
+    SYNTAX      TItemDescription
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxXiomTypeDescription indicates a detailed description
+         of this Nokia SROS series XIOM."
+    ::= { tmnxXiomTypeEntry 3 }
+
+tmnxXiomTypeStatus               OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxXiomTypeStatus indicates whether or not this XIOM is
+         supported in this revision of the management software."
+    ::= { tmnxXiomTypeEntry 4 }
+
+tmnxXiomLevelTable               OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxXiomLevelEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The XIOM level table has an entry for each XIOM card model functional
+         variant supported by the system."
+    ::= { tmnxCardObjs 81 }
+
+tmnxXiomLevelEntry               OBJECT-TYPE
+    SYNTAX      TmnxXiomLevelEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each row entry represents an Nokia SROS series XIOM card
+         model.  Rows in this table are created by the agent at initialization
+         and cannot be created or destroyed by SNMP Get or Set requests."
+    INDEX       {
+        tmnxXiomTypeIndex,
+        tmnxXiomLevelIndex
+    }
+    ::= { tmnxXiomLevelTable 1 }
+
+TmnxXiomLevelEntry               ::= SEQUENCE
+{
+    tmnxXiomLevelIndex               Unsigned32,
+    tmnxXiomLevelName                TNamedItemOrEmpty,
+    tmnxXiomLevelId                  TmnxXiomFunctionalLevel,
+    tmnxXiomLevelDescription         TItemDescription,
+    tmnxXiomLevelStatus              TruthValue
+}
+
+tmnxXiomLevelIndex               OBJECT-TYPE
+    SYNTAX      Unsigned32
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxXiomLevelIndex specifies the unique index value which
+         identifies this type of Nokia SROS series XIOM card model functional
+         variant."
+    ::= { tmnxXiomLevelEntry 1 }
+
+tmnxXiomLevelName                OBJECT-TYPE
+    SYNTAX      TNamedItemOrEmpty
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxXiomLevelName indicates the administrative name that
+         identifies this type of Nokia SROS series XIOM card model functional
+         variant."
+    ::= { tmnxXiomLevelEntry 2 }
+
+tmnxXiomLevelId                  OBJECT-TYPE
+    SYNTAX      TmnxXiomFunctionalLevel
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxXiomLevelId indicates the numeric identifier of this
+         type of Nokia SROS series XIOM model functional variant."
+    ::= { tmnxXiomLevelEntry 3 }
+
+tmnxXiomLevelDescription         OBJECT-TYPE
+    SYNTAX      TItemDescription
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxXiomLevelDescription indicates a detailed description
+         of this Nokia SROS series XIOM card model functional variant."
+    ::= { tmnxXiomLevelEntry 4 }
+
+tmnxXiomLevelStatus              OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxXiomLevelStatus indicates the status.
+
+         A value of 'true' it indicates that this XIOM card level is supported
+         in this revision of the management software.  A value of 'false'
+         indicates there is no support."
+    ::= { tmnxXiomLevelEntry 5 }
+
+tmnxXiomLvlUpgrdTableLastChanged OBJECT-TYPE
+    SYNTAX      TimeStamp
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxXiomLvlUpgrdTableLastChanged indicates the time,
+         since system startup, when tmnxXiomLevelUpgradeTable last changed
+         configuration."
+    ::= { tmnxCardObjs 82 }
+
+tmnxXiomLevelUpgradeTable        OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxXiomLevelUpgradeEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The tmnxXiomLevelUpgradeTable has an entry for each upgrade that has
+         been applied to an XIOM slot."
+    ::= { tmnxCardObjs 83 }
+
+tmnxXiomLevelUpgradeEntry        OBJECT-TYPE
+    SYNTAX      TmnxXiomLevelUpgradeEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each row entry represents an XIOM slot applied upgrade in a chassis in
+         the system."
+    INDEX       {
+        tmnxCardSlotNum,
+        tmnxXiomSlotNum,
+        tmnxXiomLevelUpgradeIndex
+    }
+    ::= { tmnxXiomLevelUpgradeTable 1 }
+
+TmnxXiomLevelUpgradeEntry        ::= SEQUENCE
+{
+    tmnxXiomLevelUpgradeIndex        Unsigned32,
+    tmnxXiomLevelUpgradeRowStatus    RowStatus,
+    tmnxXiomAssignedLevelUpgradeType TmnxXiomFunctionalUpgrade
+}
+
+tmnxXiomLevelUpgradeIndex        OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..6)
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxXiomLevelUpgradeIndex specifies the index value which
+         identifies this type of Nokia SROS series XIOM model functional
+         upgrade."
+    ::= { tmnxXiomLevelUpgradeEntry 1 }
+
+tmnxXiomLevelUpgradeRowStatus    OBJECT-TYPE
+    SYNTAX      RowStatus
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxXiomLevelUpgradeRowStatus specifies the row status of
+         the XIOM level upgrade."
+    ::= { tmnxXiomLevelUpgradeEntry 2 }
+
+tmnxXiomAssignedLevelUpgradeType OBJECT-TYPE
+    SYNTAX      TmnxXiomFunctionalUpgrade
+    MAX-ACCESS  read-create
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxXiomAssignedLevelUpgradeType specifies the unique
+         index value which identifies the Nokia SROS series XIOM model
+         functional upgrade to apply."
+    ::= { tmnxXiomLevelUpgradeEntry 3 }
+
+tmnxXiomLevelUpgradeTypeTable    OBJECT-TYPE
+    SYNTAX      SEQUENCE OF TmnxXiomLevelUpgradeTypeEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The tmnxXiomLevelUpgradeTypeTable has an entry for each possible
+         upgrade of an XIOM based on it's current tmnxXiomLicensedLevel."
+    ::= { tmnxCardObjs 84 }
+
+tmnxXiomLevelUpgradeTypeEntry    OBJECT-TYPE
+    SYNTAX      TmnxXiomLevelUpgradeTypeEntry
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "Each tmnxXiomLevelUpgradeTypeEntry represents an XIOM slot upgrade
+         type in the system based on tmnxXiomLicensedLevel."
+    INDEX       {
+        tmnxCardSlotNum,
+        tmnxXiomSlotNum,
+        tmnxXiomLevelUpgradeType
+    }
+    ::= { tmnxXiomLevelUpgradeTypeTable 1 }
+
+TmnxXiomLevelUpgradeTypeEntry    ::= SEQUENCE
+{
+    tmnxXiomLevelUpgradeType         TmnxXiomFunctionalUpgrade,
+    tmnxXiomLevelUpgradeName         TNamedItemOrEmpty,
+    tmnxXiomUpgradeLevelId           TmnxXiomFunctionalLevel,
+    tmnxXiomUpgradeRequiresReboot    TruthValue
+}
+
+tmnxXiomLevelUpgradeType         OBJECT-TYPE
+    SYNTAX      TmnxXiomFunctionalUpgrade
+    MAX-ACCESS  not-accessible
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxXiomLevelUpgradeType specifies a unique index value
+         which identifies this type of Nokia SROS series XIOM model functional
+         upgrade"
+    ::= { tmnxXiomLevelUpgradeTypeEntry 1 }
+
+tmnxXiomLevelUpgradeName         OBJECT-TYPE
+    SYNTAX      TNamedItemOrEmpty
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxXiomLevelUpgradeName indicates the administrative
+         name that identifies this type of Nokia SROS series XIOM model
+         functional upgrade."
+    ::= { tmnxXiomLevelUpgradeTypeEntry 2 }
+
+tmnxXiomUpgradeLevelId           OBJECT-TYPE
+    SYNTAX      TmnxXiomFunctionalLevel
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxXiomUpgradeLevelId indicates the XIOM upgraded
+         functional-level with this license applied for this slot in this
+         chassis."
+    ::= { tmnxXiomLevelUpgradeTypeEntry 3 }
+
+tmnxXiomUpgradeRequiresReboot    OBJECT-TYPE
+    SYNTAX      TruthValue
+    MAX-ACCESS  read-only
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxXiomUpgradeRequiresReboot indicates whether this
+         upgrade requires a reboot of the XIOM to be applied for this slot in
+         this chassis."
+    ::= { tmnxXiomLevelUpgradeTypeEntry 4 }
 
 tmnxChassisNotificationObjects   OBJECT IDENTIFIER ::= { tmnxHwObjs 6 }
 
@@ -20293,7 +20924,7 @@ tmnxChassisV16v5Compliance       MODULE-COMPLIANCE
     ::= { tmnxChassisCompliances 23 }
 
 tmnxChassisV19Compliance         MODULE-COMPLIANCE
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The compliance statement for management of chassis features on SROS
          series systems in the TIMETRA-CHASSIS-MIB release 19."
@@ -20441,9 +21072,167 @@ tmnxChassisV19Compliance         MODULE-COMPLIANCE
             tmnxHwEventNotifGroupV19v0,
             tmnxCardSapInstV19v0Group,
             tmnxChassisResQMgmtV19v0Group,
-            tmnxSapResourceUsageV19v0Group
+            tmnxSapResourceUsageV19v0Group,
+            tmnxIPv6MCastCamV19v0Group
         }
     ::= { tmnxChassisCompliances 24 }
+
+tmnxChassisV20Compliance         MODULE-COMPLIANCE
+    STATUS      current
+    DESCRIPTION
+        "The compliance statement for management of chassis features on SROS
+         series systems in the TIMETRA-CHASSIS-MIB release 20."
+    MODULE
+        MANDATORY-GROUPS {
+            tmnxXiomGroupV20v0,
+            tmnxChassisNotifGroupV20v0,
+            tmnx7710HwV3v0Group,
+            tmnx7710SETSRefSrcHwV6v0Group,
+            tmnxAtmGroup,
+            tmnxCardCamErrorV6v1Group,
+            tmnxCardPchipV5v0Group,
+            tmnxCardPchipV8v0Group,
+            tmnxCardV10v0Group,
+            tmnxCardV3v0Group,
+            tmnxCardV7v0Group,
+            tmnxChassisFabricV11v0Group,
+            tmnxChassisFanV11v0Group,
+            tmnxChassisHwEventGroup,
+            tmnxChassisHwEventNotifyGroup,
+            tmnxChassisHwV11v0Group,
+            tmnxChassisHwV6v1Group,
+            tmnxChassisHwV9v0Group,
+            tmnxChassisNotificationV7v0Group,
+            tmnxChassisNotificationV9v0Group,
+            tmnxChassisNotifyObjsV12v0Group,
+            tmnxChassisNotifyV10v0Group,
+            tmnxChassisNotifV12v0Group,
+            tmnxChassisPowerMgmtGroup,
+            tmnxChassisPowerMgmtNotifyGroup,
+            tmnxChassisPowerV11v0Group,
+            tmnxChassisPowerV12v0Group,
+            tmnxChassisQGrpOvrGroup,
+            tmnxChassisSwitchFabNtfyV11v0Grp,
+            tmnxChassisUserModV7v0Group,
+            tmnxChassisV10v0Group,
+            tmnxChassisV11v0Group,
+            tmnxChassisV13v0Group,
+            tmnxChassisV6v1Group,
+            tmnxChassisV7v0Group,
+            tmnxChassisV19v0Group,
+            tmnxCpmCardV13v0Group,
+            tmnxCpmCardRebootHoldV11v0Group,
+            tmnxFPDCpuProtV11v0R0Group,
+            tmnxFPDcpNotifyObjsV11v0Group,
+            tmnxFPDcpNotifyV11v0Group,
+            tmnxFPMcPathMgmtV6v1Group,
+            tmnxFPMcPathMgmtV15v0Group,
+            tmnxFPQGrpGroup,
+            tmnxFPQGrpV10v0R4Group,
+            tmnxFPWredV7v0Group,
+            tmnxIPsecIsaGrpV6v0Group,
+            tmnxIPsecNotifV7v0Group,
+            tmnxIPsecV7v0Group,
+            tmnxIpsecV10v0Group,
+            tmnxMDACcagV6v1Group,
+            tmnxMdaHsmdaPoolV10v0Group,
+            tmnxMdaXplV5v0Group,
+            tmnxSyncIfTimingNotifV8v0Group,
+            tmnxSyncIfTimingNotifyV9v0Group,
+            tmnxSyncIfTimingV8v0Group,
+            tmnxSyncIfTimingV9v0Group,
+            tmnxSyncV6v0Group,
+            tmnxPhysChassisGroup,
+            tmnxFPPoolSizingV11v0Group,
+            tmnxCpmCardCmplxMemErrV9v0Group,
+            tmnxFPBufAllocV12v0Group,
+            tmnxCardCmplQChipMemErrV9v0Group,
+            tmnxCardCmplChipIfErrV9v0Group,
+            tmnxFPPlcyAcctV12v0Group,
+            tmnxChassisPowerSupplyV9v0Grp,
+            tmnxChassisSmartPeqV11v0Group,
+            tmnxChassPANotifyObjsV12v0Grp,
+            tmnxChassisPlcyAcctNtfyV12v0Grp,
+            tmnxChassisV12v0Group,
+            tmnxIomResrcNotifyObjsV12v0Grp,
+            tmnxIomResrcNotifyV12v0Group,
+            tmnxChassisHwEventGroupV10v0,
+            tmnxChassisHwEventNotifyGrpV10v0,
+            tmnxCardVirtualSchAdjV13v0Group,
+            tmnxPhysChassisV13v0Group,
+            tmnxChassisMgmtEthRedNtfV13v0Grp,
+            tmnxChassisMgmtEthRedV13v0Grp,
+            tmnxChassisPowerMgmtGroupV13v0,
+            tmnxChassisNotifV13v0Group,
+            tmnxChassisNotifyObjsV13v0Grp,
+            tmnxChassisFpResourceV13v0Group,
+            tmnxFPV13v0Group,
+            tmnxCardResetOnRecoverErGrp,
+            tmnxMDAResetOnRecoverErGrp,
+            tmnxCpmMemSizeNotifGroupV12v0,
+            tmnxCpmPChipFcsObjGroupV12v0,
+            tmnxChassisResourceV14v0Group,
+            tmnxCpmFlashV14v0Group,
+            tmnxPhysChassisGroupV14v0,
+            tmnxPhysChassisNotifGroupV14v0,
+            tmnxSyncIfTimingV14v0Group,
+            tFPFwdEngStatsGroup,
+            tmnxIsaMemWMarkNotifGroupV14v0,
+            tmnxCpmMemSizeNotifGroupV12v0,
+            tmnxIsaGrpIsaScaleModeGroupV14v0,
+            tmnxCardVirtualGroupV14v0,
+            tmnxChassisFanV15v0Group,
+            tmnxCardFPEgrHsGroup,
+            tmnxPhysChassisGroupV15v0,
+            tmnxPhysChassisNotifGroupV15v0,
+            tmnxIcmpMtuExceededStatGroup,
+            tmnxChassisGroupV15v0,
+            tmnxCardResMacFdbUsgNotifGroup,
+            tmnxMacScaleNotifyObjsV15v0Grp,
+            tmnxCardFPResIngV15v0QGroup,
+            tmnxCardFPResEgrV15v0QGroup,
+            tmnxIPsecIsaGrpV15v0Group,
+            tmnxPhysChassisPCMGroupV15v0,
+            tmnxMinFpGenerationGroupV15v0,
+            tmnxPhysChassPCMNotifGroupV15v0,
+            tmnxCardV16v0Group,
+            tmnxCardComplexGroupV16v0,
+            tmnxChassisGroupV16v0,
+            tmnxChassisCardLevelGroupV15v1,
+            tmnxPhysChassisPMGroupV16v0,
+            tmnxChassisGnssGroup,
+            tmnxChassisGnssNotifGroup,
+            tmnxChassisMdaLevelGroupV15v1,
+            tmnxPhysChassisPMNotifGroupV16v0,
+            tmnxNearFullNotifGroupV16v0,
+            tmnxCardV16v0ObsoleteGroup,
+            tmnxCardV16v0FpgaSoftErrNotifGrp,
+            tmnxMDAIsaTnlStatsV16v0Group,
+            tmnxCardPowerSaveGroupV16v0,
+            tmnxFPNetworkIngressGroupV19v5,
+            tmnxCardV19v5Group,
+            tmnxSyncIfTimingV19v0Group,
+            tmnxMDAV19v0Group,
+            tmnxChassisResEgrV19v0Group,
+            tmnxChassisResEgrRmrkV19v0Group,
+            tmnxChassisResIngClassV19v0Group,
+            tmnxChassisResDynCAMV19v0Group,
+            tmnxChassisResIpMacCAMV19v0Group,
+            tmnxChassisCoreResV19v0Group,
+            tmnxSyncIfTimingV19v0NotifGroup,
+            tmnxHwEventGroupV19v0,
+            tmnxHwEventNotifyObjsGrpV19v0,
+            tmnxHwEventNotifGroupV19v0,
+            tmnxCardSapInstV19v0Group,
+            tmnxCardFPQosPolicyV20v0Group,
+            tmnxChassisResQMgmtV19v0Group,
+            tmnxSapResourceUsageV19v0Group,
+            tmnxChassisV20v0ObsoleteGroup,
+            tmnx77x0CESMDAV20v0Group,
+            tmnxIPv6MCastCamV19v0Group,
+            tmnxChassisResourceV20v0Group
+        }
+    ::= { tmnxChassisCompliances 25 }
 
 tmnxChassisGroups                OBJECT IDENTIFIER ::= { tmnxChassisConformance 2 }
 
@@ -20826,13 +21615,6 @@ tmnx7710HwV3v0Group              OBJECT-GROUP
         tmnxCcmTypeName,
         tmnxCcmTypeDescription,
         tmnxCcmTypeStatus,
-        tmnxMcmSupportedTypes,
-        tmnxMcmAssignedType,
-        tmnxMcmEquippedType,
-        tmnxMcmHwIndex,
-        tmnxMcmTypeName,
-        tmnxMcmTypeDescription,
-        tmnxMcmTypeStatus,
         tmnxChassisPowerSupplyInputStatus,
         tmnxChassisPowerSupplyOutputStatus,
         tmnxMDAReboot
@@ -20934,7 +21716,7 @@ tmnx77x0CESMDAV6v0Group          OBJECT-GROUP
         tmnxMDAIngNamedPoolPolicy,
         tmnxMDAEgrNamedPoolPolicy
     }
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The group of objects supporting management of CES MDAs for release 6.0
          on Nokia 77x0 SR series systems."
@@ -21115,7 +21897,7 @@ tmnxCardV6v0NamedPoolPlcyGroup   OBJECT-GROUP
         tmnxCardNamedPoolAdminMode,
         tmnxCardNamedPoolOperMode
     }
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The group of objects supporting named buffer pools for release 6.0 on
          Nokia SROS series systems."
@@ -23784,7 +24566,7 @@ tmnxChassisResourceV16v0Group    OBJECT-GROUP
         tFPResSLAProfileInstanceTotal,
         tFPResSLAProfileInstanceAlloc
     }
-    STATUS      current
+    STATUS      obsolete
     DESCRIPTION
         "The group of objects supporting management of System Resource
          Information on release 16.0 of Nokia SROS series systems."
@@ -24430,6 +25212,42 @@ tmnxChassisResQMgmtV19v0Group    OBJECT-GROUP
         "The group of objects supporting management of Resource Information
          related to Queue Management policy. This is for release 19.10 of Nokia
          IXR systems."
+    ::= { tmnxChassisV19Groups 23 }
+
+tmnxXiomGroupV20v0               OBJECT-GROUP
+    OBJECTS     {
+        tmnxXiomConfigTableLastChanged,
+        tmnxXiomConfigEntryLastChanged,
+        tmnxXiomAssignedType,
+        tmnxXiomAssignedLevel,
+        tmnxXiomReboot,
+        tmnxXiomFailOnError,
+        tmnxXiomResetOnRecoverableError,
+        tmnxXiomEquippedType,
+        tmnxXiomEquippedLevel,
+        tmnxXiomLicensedLevel,
+        tmnxXiomAvailableMdaSlots,
+        tmnxXiomNumEquippedMdas,
+        tmnxXiomHwIndex,
+        tmnxXiomTypeName,
+        tmnxXiomTypeDescription,
+        tmnxXiomTypeStatus,
+        tmnxXiomLevelName,
+        tmnxXiomLevelId,
+        tmnxXiomLevelDescription,
+        tmnxXiomLevelStatus,
+        tmnxXiomLvlUpgrdTableLastChanged,
+        tmnxXiomLevelUpgradeRowStatus,
+        tmnxXiomAssignedLevelUpgradeType,
+        tmnxXiomLevelUpgradeName,
+        tmnxXiomUpgradeLevelId,
+        tmnxXiomUpgradeRequiresReboot,
+        tmnxCardNumEquippedXioms
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting management of XIOM in release 20 on
+         Nokia SROS series systems."
     ::= { tmnxChassisV19Groups 24 }
 
 tmnxSapResourceUsageV19v0Group   OBJECT-GROUP
@@ -24475,7 +25293,208 @@ tmnxSapResourceUsageV19v0Group   OBJECT-GROUP
     DESCRIPTION
         "The group of objects supporting management of Saps that were added in
          the release 19R10 of the Nokia SROS series systems."
-    ::= { tmnxChassisV19Groups 27 }
+    ::= { tmnxChassisV19Groups 25 }
+
+tmnxIPv6MCastCamV19v0Group       OBJECT-GROUP
+    OBJECTS     {
+        tFPResIPv6McastEntryTotal,
+        tFPResIPv6McastEntryAlloc
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting management of IPv6 multicast cam entry
+         allocation."
+    ::= { tmnxChassisV19Groups 26 }
+
+tmnxChassisV20Groups             OBJECT IDENTIFIER ::= { tmnxChassisGroups 82 }
+
+tmnxChassisV20v0ObsoleteGroup    OBJECT-GROUP
+    OBJECTS     {
+        tmnxMcmSupportedTypes,
+        tmnxMcmAssignedType,
+        tmnxMcmEquippedType,
+        tmnxMcmHwIndex,
+        tmnxMcmTypeName,
+        tmnxMcmTypeDescription,
+        tmnxMcmTypeStatus,
+        tmnxMDAIngNamedPoolPolicy,
+        tmnxMDAEgrNamedPoolPolicy,
+        tmnxCardNamedPoolAdminMode,
+        tmnxCardNamedPoolOperMode,
+        tFPResDynQ2NamedPoolTotal,
+        tFPResDynQ2NamedPoolAlloc,
+        tFPResDynQ2NamedPoolIUBI,
+        tFPResDynQ2NamedPoolIUBE
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of chassis objects that were obsoleted in release 20.2 on
+         Nokia SR series systems."
+    ::= { tmnxChassisV20Groups 2 }
+
+tmnxChassisNotifGroupV20v0       NOTIFICATION-GROUP
+    NOTIFICATIONS {
+        tmnxPeKernelVersionMismatch,
+        tmnxFPResourcePolicyModified,
+        tmnxFPResourcePolicyModifiedClr
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of additional notifications supporting chassis management in
+         release 20 of Nokia SROS series systems."
+    ::= { tmnxChassisV20Groups 3 }
+
+tmnx77x0CESMDAV20v0Group         OBJECT-GROUP
+    OBJECTS     {
+        tmnxMDAClockMode,
+        tmnxMDADiffTimestampFreq
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting management of CES MDAs for release
+         20.0 on Nokia 77x0 SR series systems."
+    ::= { tmnxChassisV20Groups 4 }
+
+tmnxChassisResourceV20v0Group    OBJECT-GROUP
+    OBJECTS     {
+        tChassisResDynSvcNHEntryTotal,
+        tChassisResDynSvcNHEntryAlloc,
+        tChassisResIpSecNHEntryTotal,
+        tChassisResIpSecNHEntryAlloc,
+        tChassisResSubNHEntryTotal,
+        tChassisResSubNHEntryAlloc,
+        tChassisResSapIngQosPolTotal,
+        tChassisResSapIngQosPolAlloc,
+        tChassisResSapEgrQosPolTotal,
+        tChassisResSapEgrQosPolAlloc,
+        tChassisResIngQGrpTmplTotal,
+        tChassisResIngQGrpTmplAlloc,
+        tChassisResEgrQGrpTmplTotal,
+        tChassisResEgrQGrpTmplAlloc,
+        tChassisResPortEgrQGrpInstTotal,
+        tChassisResPortEgrQGrpInstAlloc,
+        tChassisResFPIngQGrpInstTotal,
+        tChassisResFPIngQGrpInstAlloc,
+        tChassisResPortEgrVPortTotal,
+        tChassisResPortEgrVPortAlloc,
+        tCardResQosUserSchedsTotal,
+        tCardResQosUserSchedsAlloc,
+        tCardResSubSPIQosOvrTotal,
+        tCardResSubSPIQosOvrAlloc,
+        tCardResHsmdaQOvrTotal,
+        tCardResHsmdaQOvrAlloc,
+        tCardResPortAccEgrQGrpInstTotal,
+        tCardResPortAccEgrQGrpInstAlloc,
+        tCardResPortNetEgrQGrpInstTotal,
+        tCardResPortNetEgrQGrpInstAlloc,
+        tCardResPortEgrQGrpInstTotal,
+        tCardResPortEgrQGrpInstAlloc,
+        tCardResFPIngQGrpInstTotal,
+        tCardResFPIngQGrpInstAlloc,
+        tCardResPortEgrVPortTotal,
+        tCardResPortEgrVPortAlloc,
+        tCardResCategoryEntriesTotal,
+        tCardResCategoryEntriesAlloc,
+        tCardResIntArbiterOvrsTotal,
+        tCardResIntArbiterOvrsAlloc,
+        tCardResSLAProfileInstanceTotal,
+        tCardResSLAProfileInstanceAlloc,
+        tFPResSapIngQosPolTotal,
+        tFPResSapIngQosPolAlloc,
+        tFPResDynEgrClassTotal,
+        tFPResDynEgrClassAlloc,
+        tFPResDynEgrClassIUBSE,
+        tFPResDynEgrClassIUBNE,
+        tFPResIngQueueTotal,
+        tFPResIngQueueAlloc,
+        tFPResEgrQueueTotal,
+        tFPResEgrQueueAlloc,
+        tFPResIngPolicerTotal,
+        tFPResIngPolicerAlloc,
+        tFPResEgrPolicerTotal,
+        tFPResEgrPolicerAlloc,
+        tFPResIngPolicerStatTotal,
+        tFPResIngPolicerStatAlloc,
+        tFPResEgrPolicerStatTotal,
+        tFPResEgrPolicerStatAlloc,
+        tFPResIngRootArbiterTotal,
+        tFPResIngRootArbiterAlloc,
+        tFPResEgrRootArbiterTotal,
+        tFPResEgrRootArbiterAlloc,
+        tFPResDynQueueTotal,
+        tFPResDynQueueAlloc,
+        tFPResDynQueueIUBI,
+        tFPResDynQueueIUBE,
+        tFPResDynPolicerTotal,
+        tFPResDynPolicerAlloc,
+        tFPResDynPolicerIUBI,
+        tFPResDynPolicerIUBE,
+        tFPResDynPolicerStatTotal,
+        tFPResDynPolicerStatAlloc,
+        tFPResDynPolicerStatIUBI,
+        tFPResDynPolicerStatIUBE,
+        tFPResIngAclEntryTotal,
+        tFPResIngAclEntryAlloc,
+        tFPResIngQosEntryTotal,
+        tFPResIngQosEntryAlloc,
+        tFPResIngAclQosEntryTotal,
+        tFPResIngAclQosEntryAlloc,
+        tFPResIngIPv6AclEntryTotal,
+        tFPResIngIPv6AclEntryAlloc,
+        tFPResIngIPv6QosEntryTotal,
+        tFPResIngIPv6QosEntryAlloc,
+        tFPResEgrAclEntryTotal,
+        tFPResEgrAclEntryAlloc,
+        tFPResEgrQosEntryTotal,
+        tFPResEgrQosEntryAlloc,
+        tFPResEgrAclQosEntryTotal,
+        tFPResEgrAclQosEntryAlloc,
+        tFPResEgrIPv6AclEntryTotal,
+        tFPResEgrIPv6AclEntryAlloc,
+        tFPResEgrIPv6QosEntryTotal,
+        tFPResEgrIPv6QosEntryAlloc,
+        tFPResIngAclFilterTotal,
+        tFPResIngAclFilterAlloc,
+        tFPResEgrAclFilterTotal,
+        tFPResEgrAclFilterAlloc,
+        tFPResDynSvcEntryTotal,
+        tFPResDynSvcEntryAlloc,
+        tFPResSubHostTotal,
+        tFPResSubHostAlloc,
+        tFPResEncapGrpMemberTotal,
+        tFPResEncapGrpMemberAlloc,
+        tFPResEgrNetQGrpMapTotal,
+        tFPResEgrNetQGrpMapAlloc,
+        tFPResMacFdbRecTotal,
+        tFPResMacFdbRecAlloc,
+        tFPResDynQ2WredPoolTotal,
+        tFPResDynQ2WredPoolAlloc,
+        tMDAResEgrHsmdaQGrpTotal,
+        tMDAResEgrHsmdaQGrpAlloc,
+        tMDAResEgrHsmdaSecShaperTotal,
+        tMDAResEgrHsmdaSecShaperAlloc,
+        tFPResIngIPv6AclFilterTotal,
+        tFPResIngIPv6AclFilterAlloc,
+        tFPResEgrIPv6AclFilterTotal,
+        tFPResEgrIPv6AclFilterAlloc,
+        tFPResSLAProfileInstanceTotal,
+        tFPResSLAProfileInstanceAlloc
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting management of System Resource
+         Information on release 20.0 of Nokia SROS series systems."
+    ::= { tmnxChassisV20Groups 5 }
+
+tmnxCardFPQosPolicyV20v0Group    OBJECT-GROUP
+    OBJECTS     {
+        tmnxFPQosFPResourcePolicy
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting management of Qos Forwarding Plane
+         (FP) resource policy in release 20.0 on Nokia SROS series systems."
+    ::= { tmnxChassisV20Groups 6 }
 
 tmnxChassisDCCompliances         OBJECT IDENTIFIER ::= { tmnxChassisConformance 3 }
 
@@ -24652,7 +25671,7 @@ tmnxEqCardInserted               NOTIFICATION-TYPE
     STATUS      current
     DESCRIPTION
         "Generated when a card is inserted into the chassis.  The card type
-         may be IOM, Fabric, MDA, MCM, CCM CPM module, compact flash module,
+         may be IOM, Fabric, MDA, CCM CPM module, compact flash module,
          etc."
     ::= { tmnxChassisNotification 8 }
 
@@ -24691,7 +25710,7 @@ tmnxEqWrongCard                  NOTIFICATION-TYPE
          the chassis.  Even though a card may be physically supported by
          the slot, it may have been administratively configured to allow
          only certain card types in a particular slot location.  The card
-         type may be IOM (or XCM), Fabric, MDA (or XMA), MCM, CPM module, etc.
+         type may be IOM (or XCM), Fabric, MDA (or XMA), CPM module, etc.
 
          [EFFECT] The effect is dependent on the card that has been incorrectly
          inserted. Incorrect IOM (or XCM) or MDA (or XMA) insertion will cause
@@ -27878,5 +28897,72 @@ tmnxEqHwEventDetected            NOTIFICATION-TYPE
 
          [RECOVERY] Check hardware component."
     ::= { tmnxChassisNotification 218 }
+
+tmnxPeKernelVersionMismatch      NOTIFICATION-TYPE
+    OBJECTS     {
+        tmnxChassisNotifyHwIndex,
+        tmnxHwID,
+        tmnxHwClass,
+        tmnxChassisNotifyMismatchedVer,
+        tmnxHwSoftwareCodeVersion
+    }
+    STATUS      current
+    DESCRIPTION
+        "[CAUSE] This notification is generated when there is a mismatch
+         between the software version of the host kernel software and the CPM
+         software.
+
+         This may occur if the user updates the system software without
+         following the recommended software upgrade procedures.
+
+         The object tmnxChassisNotifyHwIndex identifies the CPM card.  The
+         object tmnxChassisNotifyMismatchedVer contains the version of
+         the host kernel software and tmnxHwSoftwareCodeVersion contains the
+         version of the CPM software.
+
+         This notification is only applicable to systems that use both host
+         kernel software and CPM software, such as the 7705 SAR-Hm and the 7250
+         IXR-s.
+
+         [EFFECT] Although the system may appear to work properly, the behavior
+         of the system in this state is undefined.  Using mismatched versions of
+         host kernel software and CPM software is not supported.
+
+         [RECOVERY] Follow the recommended software upgrade procedures to
+         update the host kernel software and CPM software to the desired
+         software release."
+    ::= { tmnxChassisNotification 232 }
+
+tmnxFPResourcePolicyModified     NOTIFICATION-TYPE
+    OBJECTS     {
+        tmnxHwClass,
+        tmnxChassisNotifyFpNum
+    }
+    STATUS      current
+    DESCRIPTION
+        "[CAUSE] The FP resource policy applied to the FP has been modified, or
+         a different FP resource policy is applied to the FP.
+
+         [EFFECT] Modifying the configuration could result in a failure to
+         instantiate queues.
+
+         [RECOVERY] The configuration must be saved and the system rebooted
+         immediately."
+    ::= { tmnxChassisNotification 233 }
+
+tmnxFPResourcePolicyModifiedClr  NOTIFICATION-TYPE
+    OBJECTS     {
+        tmnxHwClass,
+        tmnxChassisNotifyFpNum
+    }
+    STATUS      current
+    DESCRIPTION
+        "[CAUSE] Generates a notification when tmnxFPResourcePolicyModified is
+         cleared.
+
+         [EFFECT] None.
+
+         [RECOVERY] None."
+    ::= { tmnxChassisNotification 234 }
 
 END

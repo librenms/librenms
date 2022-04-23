@@ -1,0 +1,1031 @@
+-- ==============================
+-- jnxMVPN-MIB:  JUNIPER MVPN-MIB
+-- 
+-- ==============================
+
+-- Note: This MIB is based on draft-zzhang-mvpn-mib-02 and is temporary & experimental.
+-- This may be replaced in future with a standard MVPN MIB from IETF.
+
+
+     MCAST-VPN-MIB DEFINITIONS ::= BEGIN
+
+     IMPORTS
+        MODULE-IDENTITY, OBJECT-TYPE, NOTIFICATION-TYPE,
+        Unsigned32
+           FROM SNMPv2-SMI
+
+        MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP
+           FROM SNMPv2-CONF
+
+        TruthValue, RowPointer, RowStatus, TimeStamp, TimeInterval
+           FROM SNMPv2-TC
+
+        SnmpAdminString
+           FROM SNMP-FRAMEWORK-MIB
+
+        InetAddress, InetAddressType
+           FROM INET-ADDRESS-MIB
+
+        MplsLabel
+           FROM MPLS-TC-STD-MIB
+
+	mplsVpnVrfName, MplsVpnRouteDistinguisher
+	   FROM MPLS-VPN-MIB
+
+	ipMRouteEntry
+	   FROM IPMROUTE-STD-MIB
+
+-- Juniper specific                                       
+
+	jnxMibs
+	   FROM JUNIPER-SMI
+
+	jnxMvpnExperiment			-- *** JNX ***
+	   FROM JUNIPER-EXPERIMENT-MIB
+	   
+	JnxL2L3VpnMcastProviderTunnelType
+	   FROM L2L3-VPN-MCAST-MIB    
+	;
+
+     jnxMvpnMIB	MODULE-IDENTITY
+        LAST-UPDATED "201307121200Z"  -- 12 July 2013 12:00:00 GMT
+        ORGANIZATION "IETF Layer-3 Virtual Private
+                      Networks Working Group."
+        CONTACT-INFO
+               " Jeffrey (Zhaohui) Zhang
+                 zzhang@juniper.net
+
+                 Comments and discussion to l3vpn@ietf.org"
+
+        DESCRIPTION
+             "This MIB contains managed object definitions for
+              multicast in BGP/MPLS IP VPNs defined by [MVPN]. 
+              Copyright (C) The Internet Society (2012)."
+
+       -- Revision history.
+        REVISION "201301071200Z"  -- 07 January 2013 12:00:00 GMT
+        DESCRIPTION
+           "Initial version of the draft."
+        ::= { jnxMvpnExperiment 1 } -- number to be assigned
+
+     -- Top level components of this MIB.
+     jnxMvpnNotifications OBJECT IDENTIFIER ::= { jnxMvpnMIB 0 }
+
+     -- tables, scalars
+     jnxMvpnObjects       OBJECT IDENTIFIER ::= { jnxMvpnMIB 1 }
+     -- conformance
+     -- jnxMvpnConformance   OBJECT IDENTIFIER ::= { jnxMvpnMIB 2 }
+
+     jnxMvpnScalars       OBJECT IDENTIFIER ::= { jnxMvpnObjects 1 }
+     jnxMvpnGeneral       OBJECT IDENTIFIER ::= { jnxMvpnObjects 2 }
+     jnxMvpnConfig        OBJECT IDENTIFIER ::= { jnxMvpnObjects 3 }
+     jnxMvpnStates        OBJECT IDENTIFIER ::= { jnxMvpnObjects 4 }
+ 
+     -- Scalar Objects
+
+     jnxMvpnMvrfNumber OBJECT-TYPE
+        SYNTAX        Unsigned32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+	    "The number of MVRFs for IPv4 or IPv6 or mLDP C-Multicast
+	    that are present in this device."
+        ::= { jnxMvpnScalars 1 }
+
+     jnxMvpnMvrfNumberV4 OBJECT-TYPE
+        SYNTAX        Unsigned32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+	    "The number of MVRFs for IPv4 C-Multicast that are present
+	     in this device."
+        ::= { jnxMvpnScalars 2 }
+
+     jnxMvpnMvrfNumberV6 OBJECT-TYPE
+        SYNTAX        Unsigned32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+	    "The number of MVRFs for IPv6 C-Multicast that are present
+	     in this device."
+        ::= { jnxMvpnScalars 3 }
+
+     jnxMvpnMvrfNumberPimV4 OBJECT-TYPE
+        SYNTAX        Unsigned32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The number of PIM-MVPN MVRFs for IPv4 C-Multicast that are present 
+	    in this device."
+        ::= { jnxMvpnScalars 4 }
+
+     jnxMvpnMvrfNumberPimV6 OBJECT-TYPE
+        SYNTAX         Unsigned32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION
+	    "The number of PIM-MVPN MVRFs for IPv6 C-Multicast that are present
+	     in this device."
+        ::= { jnxMvpnScalars 5 }
+
+     jnxMvpnMvrfNumberBgpV4 OBJECT-TYPE
+        SYNTAX         Unsigned32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION
+ 	    "The number of BGP-MVPN MVRFs for IPv4 C-Multicast that are present
+ 	     in this device."
+        ::= { jnxMvpnScalars 6 }
+
+     jnxMvpnMvrfNumberBgpV6 OBJECT-TYPE
+        SYNTAX         Unsigned32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION
+	    "The number of BGP-MVPN MVRFs for IPv6 C-Multicast that are present
+	     in this device."
+        ::= { jnxMvpnScalars 7 }
+
+     jnxMvpnMvrfNumberMldp OBJECT-TYPE
+        SYNTAX         Unsigned32
+        MAX-ACCESS     read-only
+        STATUS         current
+        DESCRIPTION
+ 	    "The number of BGP-MVPN MVRFs for mLDP C-Multicast that are present
+	     in this device."
+        ::= { jnxMvpnScalars 8 }
+
+     jnxMvpnNotificationEnable OBJECT-TYPE
+        SYNTAX        TruthValue
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+             "If this object is TRUE, then the generation of all 
+              notifications defined in this MIB is enabled."
+        DEFVAL { false }
+        ::= { jnxMvpnScalars 9 }
+
+     -- General MVRF Information Table
+
+     jnxMvpnGeneralTable  OBJECT-TYPE
+        SYNTAX        SEQUENCE OF JnxMvpnGeneralEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "This table specifies the general information about the MVRFs 
+             present in this device."
+        ::= { jnxMvpnGeneral 1 }
+ 
+     jnxMvpnGeneralEntry OBJECT-TYPE
+        SYNTAX        JnxMvpnGeneralEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "An entry in this table is created for every MVRF in the 
+             device." 
+        INDEX       { mplsVpnVrfName }
+        ::= { jnxMvpnGeneralTable 1 }
+
+     JnxMvpnGeneralEntry ::= SEQUENCE {
+	jnxMvpnGenOperStatusChange         INTEGER,
+	jnxMvpnGenOperChangeTime           TimeStamp,
+	jnxMvpnGenCmcastRouteProtocolV4    INTEGER,
+	jnxMvpnGenCmcastRouteProtocolV6    INTEGER,
+	jnxMvpnGenIpmsiConfigV4		   RowPointer,
+	jnxMvpnGenIpmsiConfigV6		   RowPointer,
+	jnxMvpnGenInterAsPmsiConfigV4	   RowPointer,
+	jnxMvpnGenInterAsPmsiConfigV6	   RowPointer,
+	jnxMvpnGenRowStatus		   RowStatus
+     }
+
+     jnxMvpnGenOperStatusChange OBJECT-TYPE
+        SYNTAX        INTEGER { createdMvrf(1),
+                                deletedMvrf(2),
+                                modifiedMvrfIpmsiConfig(3),
+                                modifiedMvrfSpmsiConfig(4)
+                              }
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "This object describes the last operational change that 
+             happened for the given MVRF. 
+
+             createdMvrf - indicates that the MVRF was created in the 
+             device.
+
+             deletedMvrf - indicates that the MVRF was deleted from the 
+             device. A row in this table will never have 
+             mvpnGenOperStatusChange equal to deletedMvrf(2),
+             because in that case the row itself will be deleted from the 
+             table. This value for mvpnGenOperStatusChange is defined 
+             mainly for use in mvpnMvrfChange notification.
+
+             modifiedMvrfIpmsiConfig - indicates that the I-PMSI 
+             for the MVRF was configured, deleted or changed.
+
+             modifiedMvrfSpmsiConfig - indicates that the S-PMSI 
+             for the MVRF was configured, deleted or changed."
+        DEFVAL { createdMvrf }
+        ::= { jnxMvpnGeneralEntry 1 }
+
+     jnxMvpnGenOperChangeTime OBJECT-TYPE
+        SYNTAX        TimeStamp
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The time at which the last operational change for the MVRF in 
+             question took place. The last operational change is specified 
+             by mvpnGenOperStatusChange."
+        ::= { jnxMvpnGeneralEntry 2 }
+
+     jnxMvpnGenCmcastRouteProtocolV4 OBJECT-TYPE
+        SYNTAX        INTEGER { pim (1),
+                                bgp (2)
+                              }
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Protocol used to signal IPv4 C-multicast states across the
+             provider core.
+             pim(1): PIM (PIM-MVPN).
+             bgp(2): BGP (BGP-MVPN)."
+        ::= { jnxMvpnGeneralEntry 3 }
+
+     jnxMvpnGenCmcastRouteProtocolV6 OBJECT-TYPE
+        SYNTAX        INTEGER { pim (1),
+                                bgp (2)
+                              }
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Protocol used to signal IPv6 C-multicast states across the
+             provider core.
+             pim(1): PIM (PIM-MVPN).
+             bgp(2): BGP (BGP-MVPN)."
+        ::= { jnxMvpnGeneralEntry 4 }
+
+     jnxMvpnGenIpmsiConfigV4	 OBJECT-TYPE
+        SYNTAX        RowPointer 
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+	    " This points to a row in MvpnPmsiConfigTable,
+		for I-PMSI configuration for IPv4."
+
+        ::= { jnxMvpnGeneralEntry 5 }
+
+     jnxMvpnGenIpmsiConfigV6	 OBJECT-TYPE
+        SYNTAX        RowPointer
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+	    " This points to a row in MvpnPmsiConfigTable,
+		for I-PMSI configuration for IPv6."
+
+        ::= { jnxMvpnGeneralEntry 6 }
+
+     jnxMvpnGenInterAsPmsiConfigV4 OBJECT-TYPE
+        SYNTAX        RowPointer
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+	    " This points to a row in MvpnPmsiConfigTable,
+		for inter-as I-PMSI configuration for IPv4, in case of segmented
+		inter-as provider tunnels."    
+
+        ::= { jnxMvpnGeneralEntry 7 }
+
+     jnxMvpnGenInterAsPmsiConfigV6 OBJECT-TYPE
+        SYNTAX        RowPointer 
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+	    "This points to a row in MvpnPmsiConfigTable,
+	    for inter-as I-PMSI configuration for IPv6, in case of segmented
+	    inter-as provider tunnels."
+
+        ::= { jnxMvpnGeneralEntry 8 }
+
+     jnxMvpnGenRowStatus OBJECT-TYPE
+        SYNTAX        RowStatus
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+               "This is used to create or delete a row in this table."
+        ::= { jnxMvpnGeneralEntry 9 }
+
+     -- General BGP-MVPN table
+
+     jnxMvpnBgpGeneralTable OBJECT-TYPE
+        SYNTAX        SEQUENCE OF JnxMvpnBgpGeneralEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "This table augments the mvpnGeneralTable and is for BGP-MVPN
+             specific information."
+        ::= { jnxMvpnGeneral 2 }
+
+     jnxMvpnBgpGeneralEntry OBJECT-TYPE
+        SYNTAX        JnxMvpnBgpGeneralEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "The mvpnBgpGeneralEntry matches and augments an mvpnGeneralEntry
+             for a BGP-MVPN instance, with BGP-MVPN specific informatoin."
+        AUGMENTS      { jnxMvpnGeneralEntry }
+	::= { jnxMvpnBgpGeneralTable 1 }
+
+     JnxMvpnBgpGeneralEntry ::= SEQUENCE {
+        jnxMvpnBgpGenMode           INTEGER,
+        jnxMvpnBgpGenUmhSelection   INTEGER,
+        jnxMvpnBgpGenSiteType       INTEGER,
+        jnxMvpnBgpGenCmcastImportRt MplsVpnRouteDistinguisher,
+        jnxMvpnBgpGenSrcAs          Unsigned32,
+	jnxMvpnBgpGenSptnlLimit     Unsigned32
+     }
+
+     jnxMvpnBgpGenMode       OBJECT-TYPE
+        SYNTAX        INTEGER {
+                            rpt-spt  (1),
+                            spt-only (2)
+                      }
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "For two different BGP-MVPN modes:
+             rpt-spt(1):  intersite-site shared tree mode
+             spt-only(2): inter-site source-only tree mode."
+        ::= { jnxMvpnBgpGeneralEntry 1}
+
+     jnxMvpnBgpGenUmhSelection OBJECT-TYPE
+        SYNTAX        INTEGER {
+                                highest-pe-address   (1),
+                                c-root-group-hashing (2),
+                                ucast-umh-route      (3)
+                          }
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The UMH selection method for this mvpn, as specified in section
+             5.1.3 of [MVPN]:
+               highest-pe-address   (1): PE with the highest address
+               c-root-group-hashing (2): hashing based on (c-root, c-group)
+               uncast-umh-route     (3): per ucast route towards c-root"
+ 
+        ::= { jnxMvpnBgpGeneralEntry 2}
+
+     jnxMvpnBgpGenSiteType   OBJECT-TYPE
+        SYNTAX        INTEGER {
+                                sender-receiver (1),
+                                receiver-only   (2),
+				sender-only     (3)
+                        }
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Whether this site is a receiver-only site or not.
+             sender-receiver (1):   both sender and receiver site.
+             receiver-only   (2):   receiver-only site.
+	     sender-only     (3):   sender-only site."
+        ::= { jnxMvpnBgpGeneralEntry 3}
+
+     jnxMvpnBgpGenCmcastImportRt   OBJECT-TYPE
+        SYNTAX        MplsVpnRouteDistinguisher
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The C-multicast Import RT that this device adds to
+             unicast vpn routes that it advertises for this mvpn."
+        ::= { jnxMvpnBgpGeneralEntry 4}
+
+     jnxMvpnBgpGenSrcAs      OBJECT-TYPE
+        SYNTAX        Unsigned32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The Source AS number in Source AS Extended Community that this device
+             adds to the unicast vpn routes that it advertises for this mvpn."
+        ::= { jnxMvpnBgpGeneralEntry 5}
+
+     jnxMvpnBgpGenSptnlLimit OBJECT-TYPE
+        SYNTAX        Unsigned32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The max number of selective provider tunnels this device allows
+             for this mvpn."
+        ::= { jnxMvpnBgpGeneralEntry 6}
+
+     -- PMSI Configuration Table
+
+     jnxMvpnPmsiConfigTable  OBJECT-TYPE
+        SYNTAX        SEQUENCE OF JnxMvpnPmsiConfigEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "This table specifies the configured PMSIs."
+        ::= { jnxMvpnConfig 1 }
+
+     jnxMvpnPmsiConfigEntry OBJECT-TYPE
+        SYNTAX        JnxMvpnPmsiConfigEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "An entry in this table is created for each PMSI configured
+             on this router. It can be referred to by either I-PMSI
+             configuration (in mvpnGeneralEntry) or S-PMSI configuration
+             (in mvpnSpmsiConfigEntry)"
+        INDEX       { jnxMvpnPmsiConfigTunnelType,
+                      jnxMvpnPmsiConfigTunnelAuxInfo,
+                      jnxMvpnPmsiConfigTunnelPimGroupAddressType,
+                      jnxMvpnPmsiConfigTunnelPimGroupAddress,
+                      jnxMvpnPmsiConfigTunnelOrTemplateName }
+        ::= { jnxMvpnPmsiConfigTable 1 }
+
+     JnxMvpnPmsiConfigEntry ::= SEQUENCE {
+       jnxMvpnPmsiConfigTunnelType                 JnxL2L3VpnMcastProviderTunnelType,
+       jnxMvpnPmsiConfigTunnelAuxInfo              Unsigned32,
+       jnxMvpnPmsiConfigTunnelPimGroupAddressType  InetAddressType,
+       jnxMvpnPmsiConfigTunnelPimGroupAddress      InetAddress,
+       jnxMvpnPmsiConfigTunnelOrTemplateName       SnmpAdminString,
+       jnxMvpnPmsiConfigEncapsType                 INTEGER,
+       jnxMvpnPmsiConfigRowStatus                  RowStatus
+     }
+
+     jnxMvpnPmsiConfigTunnelType OBJECT-TYPE
+        SYNTAX        JnxL2L3VpnMcastProviderTunnelType
+        MAX-ACCESS    not-accessible 
+        STATUS        current
+        DESCRIPTION
+            "Type of tunnel used to instantiate the PMSI."
+        ::= { jnxMvpnPmsiConfigEntry 1 }
+
+     jnxMvpnPmsiConfigTunnelAuxInfo OBJECT-TYPE
+        SYNTAX        Unsigned32
+        MAX-ACCESS    not-accessible 
+        STATUS        current
+        DESCRIPTION
+            "Additional tunnel information depending on the type.
+             pim:         In case of S-PMSI, number of groups starting at
+                          mvpnPmsiConfigTunnelPimGroupAddress.
+                          This allows a range of PIM provider tunnel
+                          group addresses to be specified in S-PMSI case.
+                          In I-PMSI case, it must be 1.
+             rsvp-p2mp:   1 for statically specified rsvp-p2mp tunnel
+                          2 for dynamically created rsvp-p2mp tunnel
+             ingress-replication:
+                          1 for using any existing p2p/mp2p lsp
+                          2 for dynamically creating new p2p lsp"
+        ::= { jnxMvpnPmsiConfigEntry 2 }
+
+     jnxMvpnPmsiConfigTunnelPimGroupAddressType OBJECT-TYPE
+        SYNTAX        InetAddressType
+        MAX-ACCESS    not-accessible 
+        STATUS        current
+        DESCRIPTION
+            "In case of PIM provider tunnel, the type of tunnel address."
+        ::= { jnxMvpnPmsiConfigEntry 3 }
+
+     jnxMvpnPmsiConfigTunnelPimGroupAddress OBJECT-TYPE
+        SYNTAX        InetAddress
+        MAX-ACCESS    not-accessible 
+        STATUS        current
+        DESCRIPTION
+            "In case of PIM provider tunnel, the provider tunnel address."
+        ::= { jnxMvpnPmsiConfigEntry 4 }
+
+     jnxMvpnPmsiConfigTunnelOrTemplateName OBJECT-TYPE
+        SYNTAX        SnmpAdminString
+        MAX-ACCESS    not-accessible 
+        STATUS        current
+        DESCRIPTION
+            "The tunnel name or template name used to create tunnels.
+             Depending on mvpnPmsiConfigTunnelType and
+             mvpnPmsiConfigTunnelAuxInfo:
+
+             dynamically created rsvp-p2mp tunnel:       template name
+             statically specified rsvp-p2mp tunnel:      tunnel name
+             ingress-replication using
+               dynamically created lsps:                 template name
+             other:                                      null"
+        ::= { jnxMvpnPmsiConfigEntry 5 }
+
+     jnxMvpnPmsiConfigEncapsType OBJECT-TYPE
+        SYNTAX        INTEGER { greIp (1),
+                                ipIp  (2),
+                                mpls  (3)
+                              }
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The encapsulation type to be used, in case of PIM tunnel or
+             ingress-replication."
+        ::= { jnxMvpnPmsiConfigEntry 6 }
+
+     jnxMvpnPmsiConfigRowStatus OBJECT-TYPE
+        SYNTAX        RowStatus
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Used to create/modify/delete a row in this table."
+       ::= { jnxMvpnPmsiConfigEntry 7 }
+
+     -- S-PMSI configuration table
+
+     jnxMvpnSpmsiConfigTable  OBJECT-TYPE
+        SYNTAX        SEQUENCE OF JnxMvpnSpmsiConfigEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "This table specifies S-PMSI configuration."
+        ::= { jnxMvpnConfig 2 }
+
+     jnxMvpnSpmsiConfigEntry OBJECT-TYPE  
+        SYNTAX        JnxMvpnSpmsiConfigEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "An entry is created for each S-PMSI configuration."
+        INDEX       {  mplsVpnVrfName,
+                       jnxMvpnSpmsiConfigCmcastAddressType,
+                       jnxMvpnSpmsiConfigCmcastGroupAddress,
+                       jnxMvpnSpmsiConfigCmcastGroupPrefixLen,
+                       jnxMvpnSpmsiConfigCmcastSourceAddress,
+                       jnxMvpnSpmsiConfigCmcastSourcePrefixLen }
+        ::= { jnxMvpnSpmsiConfigTable 1 }
+
+     JnxMvpnSpmsiConfigEntry ::= SEQUENCE {
+        jnxMvpnSpmsiConfigCmcastAddressType     InetAddressType,
+        jnxMvpnSpmsiConfigCmcastGroupAddress    InetAddress,
+        jnxMvpnSpmsiConfigCmcastGroupPrefixLen  Unsigned32,
+        jnxMvpnSpmsiConfigCmcastSourceAddress   InetAddress,
+        jnxMvpnSpmsiConfigCmcastSourcePrefixLen Unsigned32,
+        jnxMvpnSpmsiConfigThreshold             Unsigned32,
+	jnxMvpnSpmsiConfigPmsiPointer		RowPointer,
+        jnxMvpnSpmsiConfigRowStatus             RowStatus
+     }
+
+     jnxMvpnSpmsiConfigCmcastAddressType OBJECT-TYPE
+        SYNTAX        InetAddressType
+        MAX-ACCESS    not-accessible 
+        STATUS        current
+        DESCRIPTION
+            "Type of C-multicast address"
+        ::= { jnxMvpnSpmsiConfigEntry 1 }
+
+     jnxMvpnSpmsiConfigCmcastGroupAddress OBJECT-TYPE
+        SYNTAX        InetAddress
+        MAX-ACCESS    not-accessible 
+        STATUS        current
+        DESCRIPTION
+            "C-multicast group address"
+        ::= { jnxMvpnSpmsiConfigEntry 2 }
+
+     jnxMvpnSpmsiConfigCmcastGroupPrefixLen OBJECT-TYPE
+        SYNTAX        Unsigned32
+        MAX-ACCESS    not-accessible 
+        STATUS        current
+        DESCRIPTION
+            "C-multicast group address prefix length.
+             A group 0 (or ::0) with prefix length 32 (or 128)
+             indicates wildcard group, while a group 0 (or ::0)
+             with prefix length 0 indicates any group."
+        ::= { jnxMvpnSpmsiConfigEntry 3 }
+
+     jnxMvpnSpmsiConfigCmcastSourceAddress OBJECT-TYPE
+        SYNTAX        InetAddress
+        MAX-ACCESS    not-accessible 
+        STATUS        current
+        DESCRIPTION
+            "C-multicast source address"
+        ::= { jnxMvpnSpmsiConfigEntry 4 }
+
+     jnxMvpnSpmsiConfigCmcastSourcePrefixLen OBJECT-TYPE
+        SYNTAX        Unsigned32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "C-multicast source address prefix length.
+             A source 0 (or ::0) with prefix length 32 (or 128)
+             indicates a wildcard source, while a source 0 (or ::0)
+             with prefix length 0 indicates any source."
+        ::= { jnxMvpnSpmsiConfigEntry 5 }
+
+     jnxMvpnSpmsiConfigThreshold OBJECT-TYPE
+        SYNTAX        Unsigned32  (0..4294967295)
+        UNITS         "kilobits per second"
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The bandwidth threshold value which when exceeded for a 
+             multicast routing entry in the given MVRF, triggers usage 
+             of S-PMSI."
+        ::= { jnxMvpnSpmsiConfigEntry 6 }
+
+     jnxMvpnSpmsiConfigPmsiPointer OBJECT-TYPE
+        SYNTAX        RowPointer
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "This points to a row in MvpnPmsiConfigTable,
+             to specify tunnel attributes."
+        ::= { jnxMvpnSpmsiConfigEntry 7 }
+
+     jnxMvpnSpmsiConfigRowStatus OBJECT-TYPE
+        SYNTAX        RowStatus
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Used to create/modify/delete a row in this table."
+       ::= { jnxMvpnSpmsiConfigEntry 8 }
+
+     -- Table of intra-as I-PMSIs advertised/received
+
+     jnxMvpnIpmsiTable OBJECT-TYPE
+        SYNTAX        SEQUENCE OF JnxMvpnIpmsiEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "This table is for all advertised/received I-PMSI
+             advertisements."
+        ::= { jnxMvpnStates 1 }
+
+     jnxMvpnIpmsiEntry OBJECT-TYPE
+        SYNTAX        JnxMvpnIpmsiEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "An entry in this table corresponds to an I-PMSI
+             advertisement that is advertised/received on this router.
+             This represents all the sender PEs in the MVPN,
+             with the provider tunnel they use to send traffic."
+        INDEX  { mplsVpnVrfName,
+		 jnxMvpnIpmsiAfi,
+		 jnxMvpnIpmsiRD,
+                 jnxMvpnIpmsiOrigAddrType,
+                 jnxMvpnIpmsiOrigAddress }
+        ::= { jnxMvpnIpmsiTable 1 }
+
+     JnxMvpnIpmsiEntry ::= SEQUENCE {
+	jnxMvpnIpmsiAfi		 Unsigned32, 
+	jnxMvpnIpmsiRD           MplsVpnRouteDistinguisher,
+        jnxMvpnIpmsiOrigAddrType InetAddressType,
+        jnxMvpnIpmsiOrigAddress  InetAddress,
+	jnxMvpnIpmsiUpTime	 TimeInterval,
+        jnxMvpnIpmsiAttribute    RowPointer
+        }
+
+     jnxMvpnIpmsiAfi OBJECT-TYPE
+	SYNTAX        Unsigned32 (1|2)
+	MAX-ACCESS    not-accessible
+   	STATUS        current
+   	DESCRIPTION
+	    "The address family this I-PMSI is for.
+        	1 - IPv4
+        	2 - IPv6"
+   	::= { jnxMvpnIpmsiEntry 1 }
+
+     jnxMvpnIpmsiRD OBJECT-TYPE
+        SYNTAX        MplsVpnRouteDistinguisher
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "The Route Distinguisher in this I-PMSI."
+        ::= { jnxMvpnIpmsiEntry 2 }
+
+     jnxMvpnIpmsiOrigAddrType OBJECT-TYPE
+        SYNTAX        InetAddressType
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "The Internet address type of mvpnIpmsiOrigAddress."
+        ::= { jnxMvpnIpmsiEntry 3 }
+
+     jnxMvpnIpmsiOrigAddress OBJECT-TYPE
+        SYNTAX        InetAddress
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "The BGP address of the device that originated the I-PMSI." 
+        ::= { jnxMvpnIpmsiEntry 4 }
+
+     jnxMvpnIpmsiUpTime OBJECT-TYPE
+        SYNTAX        TimeInterval
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The time since this I-PMSI was first 
+	     advertised/received by the device."
+        ::= { jnxMvpnIpmsiEntry 5 }
+
+     jnxMvpnIpmsiAttribute OBJECT-TYPE
+        SYNTAX        RowPointer
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Points to a row in the mvpnPmsiTunnelAttributeTable."
+        ::= { jnxMvpnIpmsiEntry 6 }
+
+     -- Table of inter-as I-PMSIs advertised/received
+
+     jnxMvpnInterasIpmsiTable OBJECT-TYPE
+        SYNTAX        SEQUENCE OF JnxMvpnInterasIpmsiEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "This table is for all advertised/received inter-as I-PMSI
+	     advertisements."
+        ::= { jnxMvpnStates 2 }
+
+     jnxMvpnInterasIpmsiEntry OBJECT-TYPE
+        SYNTAX        JnxMvpnInterasIpmsiEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "An entry in this table corresponds to an inter-as I-PMSI
+             advertisement that is advertised/received on this router.
+             This represents all the ASes in the MVPN,
+             with the provider tunnel used to send traffic to."
+        INDEX  { mplsVpnVrfName,
+		 jnxMvpnInterasIpmsiAfi,
+		 jnxMvpnInterasIpmsiRD,
+		 jnxMvpnInterasIpmsiSrcAs }
+        ::= { jnxMvpnInterasIpmsiTable 1 }
+
+     JnxMvpnInterasIpmsiEntry ::= SEQUENCE {
+ 	jnxMvpnInterasIpmsiAfi		Unsigned32,
+	jnxMvpnInterasIpmsiRD           MplsVpnRouteDistinguisher,
+        jnxMvpnInterasIpmsiSrcAs        Unsigned32,
+        jnxMvpnInterasIpmsiAttribute    RowPointer
+        }
+
+     jnxMvpnInterasIpmsiAfi OBJECT-TYPE
+        SYNTAX        Unsigned32 (1|2)
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "The address family this I-PMSI is for.
+                1 - IPv4
+                2 - IPv6"
+        ::= { jnxMvpnInterasIpmsiEntry 1 }
+
+     jnxMvpnInterasIpmsiRD OBJECT-TYPE
+        SYNTAX        MplsVpnRouteDistinguisher
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "The Route Distinguisher in this inter-as I-PMSI."
+        ::= { jnxMvpnInterasIpmsiEntry 2 }
+
+     jnxMvpnInterasIpmsiSrcAs OBJECT-TYPE
+        SYNTAX        Unsigned32
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "The source-as in this inter-as I-PMSI."
+        ::= { jnxMvpnInterasIpmsiEntry 3 }
+
+     jnxMvpnInterasIpmsiAttribute OBJECT-TYPE
+        SYNTAX        RowPointer
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "Points to a row in the mvpnPmsiTunnelAttributeTable."
+        ::= { jnxMvpnInterasIpmsiEntry 4 }
+
+     -- Table of S-PMSIs advertised/received
+
+     jnxMvpnSpmsiTable OBJECT-TYPE
+        SYNTAX        SEQUENCE OF JnxMvpnSpmsiEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+               "This table has information about the S-PMSIs sent/received
+                by a device."
+        ::= { jnxMvpnStates 3 }
+
+     jnxMvpnSpmsiEntry OBJECT-TYPE
+        SYNTAX        JnxMvpnSpmsiEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "An entry in this table is created or updated for every S-PMSI
+             advertised/received in a particular MVRF."
+        INDEX  { mplsVpnVrfName,
+		 jnxMvpnSpmsiOrigAddrType,
+		 jnxMvpnSpmsiOrigAddress,
+                 jnxMvpnSpmsiCmcastAddrType, 
+                 jnxMvpnSpmsiCmcastGroup,
+                 jnxMvpnSpmsiCmcastGroupPrefixLen,
+                 jnxMvpnSpmsiCmcastSource,
+                 jnxMvpnSpmsiCmcastSourcePrefixLen}
+        ::= { jnxMvpnSpmsiTable 1 }
+
+     JnxMvpnSpmsiEntry ::= SEQUENCE {
+	jnxMvpnSpmsiOrigAddrType          InetAddressType,
+	jnxMvpnSpmsiOrigAddress           InetAddress,
+        jnxMvpnSpmsiCmcastAddrType        InetAddressType,
+        jnxMvpnSpmsiCmcastGroup           InetAddress,
+        jnxMvpnSpmsiCmcastGroupPrefixLen  Unsigned32,
+        jnxMvpnSpmsiCmcastSource          InetAddress,
+        jnxMvpnSpmsiCmcastSourcePrefixLen Unsigned32,
+        jnxMvpnSpmsiTunnelAttribute       RowPointer,
+        jnxMvpnSpmsiUpTime                TimeInterval,
+        jnxMvpnSpmsiExpTime               TimeInterval,
+        jnxMvpnSpmsiRefCnt                Unsigned32
+        }
+
+     jnxMvpnSpmsiOrigAddrType OBJECT-TYPE
+        SYNTAX        InetAddressType
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "The Internet address type of mvpnSpmsiOrigAddress."
+        ::= { jnxMvpnSpmsiEntry 1 }
+
+     jnxMvpnSpmsiOrigAddress OBJECT-TYPE
+        SYNTAX        InetAddress
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "The BGP address of the device that originated the S-PMSI."
+        ::= { jnxMvpnSpmsiEntry 2 }
+
+     jnxMvpnSpmsiCmcastAddrType OBJECT-TYPE
+        SYNTAX        InetAddressType   
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "The Internet address type of mvpnSpmsiCmcastGroup/Source."
+        ::= { jnxMvpnSpmsiEntry 3 }
+
+     jnxMvpnSpmsiCmcastGroup OBJECT-TYPE
+        SYNTAX        InetAddress
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "S-PMSI C-multicast group address.
+             If it is 0 (or ::0), this is a wildcard group,
+             and mvpnSpmsiCmcastGroupPrefixLen must be 32 (or 128)."
+        ::= { jnxMvpnSpmsiEntry 4 }
+
+     jnxMvpnSpmsiCmcastGroupPrefixLen OBJECT-TYPE
+        SYNTAX        Unsigned32 
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "S-PMSI C-multicast group address prefix length."
+        ::= { jnxMvpnSpmsiEntry 5 }
+
+     jnxMvpnSpmsiCmcastSource OBJECT-TYPE
+        SYNTAX        InetAddress
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "S-PMSI C-multicast source address
+             If it is 0 (or ::0), this is a wildcard source,
+             and mvpnSpmsiCmcastSourcePrefixLen must be 32 (or 128)."
+        ::= { jnxMvpnSpmsiEntry 6 }
+
+     jnxMvpnSpmsiCmcastSourcePrefixLen OBJECT-TYPE
+        SYNTAX        Unsigned32 
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "S-PMSI C-multicast source address prefix length."
+        ::= { jnxMvpnSpmsiEntry 7 }
+
+     jnxMvpnSpmsiTunnelAttribute OBJECT-TYPE
+        SYNTAX        RowPointer
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "A row pointer to the mvpnPmsiTunnelAttributeTable"
+        ::= { jnxMvpnSpmsiEntry 8 }
+
+     jnxMvpnSpmsiUpTime OBJECT-TYPE
+        SYNTAX        TimeInterval
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The time since this S-PMSI
+             was first advertised/received by the device."
+        ::= { jnxMvpnSpmsiEntry 9 }
+
+     jnxMvpnSpmsiExpTime OBJECT-TYPE
+        SYNTAX        TimeInterval
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+             "For UDP-based S-PMSI signaling for PIM-MVPN,
+             the amount of time remaining before this
+             received S-PMSI Join Message expires,
+             or the next S-PMSI Join Message refresh is to be
+             advertised again from the device.
+	     Otherwise, it is zero."
+        ::= { jnxMvpnSpmsiEntry 10 }
+
+     jnxMvpnSpmsiRefCnt OBJECT-TYPE
+        SYNTAX        Unsigned32
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The number of c-multicast routes that are mapped to
+             this S-PMSI."
+        ::= { jnxMvpnSpmsiEntry 11 }
+
+     -- Table of multicast routes in an MVPN
+
+     jnxMvpnMrouteTable OBJECT-TYPE
+        SYNTAX        SEQUENCE OF JnxMvpnMrouteEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+               "This table augments ipMcastRouteTable, to provide some MVPN 
+                specific information." 
+        ::= { jnxMvpnStates 4 }
+
+     jnxMvpnMrouteEntry OBJECT-TYPE
+        SYNTAX        JnxMvpnMrouteEntry
+        MAX-ACCESS    not-accessible
+        STATUS        current
+        DESCRIPTION
+            "The mvpnMrouteEntry matches and augments an ipMcastRouteTable,
+             with MVPN specific information, such as PMSI used."
+        AUGMENTS      { ipMRouteEntry }
+        ::= { jnxMvpnMrouteTable 1 }
+
+     JnxMvpnMrouteEntry ::= SEQUENCE {
+        jnxMvpnMroutePmsiPointer RowPointer,
+	jnxMvpnMrouteNumberOfLocalReplication  Unsigned32,
+	jnxMvpnMrouteNumberOfRemoteReplication Unsigned32,
+	jnxMvpnMrouteDataRate	Unsigned32
+        }
+
+     jnxMvpnMroutePmsiPointer OBJECT-TYPE
+        SYNTAX        RowPointer
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The I-PMSI or S-PMSI this C-multicast route is using.
+	    This is important because an implementation may not have an
+	    interface corresponding to a provider tunnel,
+	    that can be used in ipMcastRouteNextHopEntry."
+        ::= { jnxMvpnMrouteEntry 1 }
+
+     jnxMvpnMrouteNumberOfLocalReplication OBJECT-TYPE 
+        SYNTAX        Unsigned32
+        MAX-ACCESS    read-only 
+        STATUS        current
+        DESCRIPTION 
+            "Number of replications to local receivers." 
+        ::= { jnxMvpnMrouteEntry 2 } 
+
+     jnxMvpnMrouteNumberOfRemoteReplication OBJECT-TYPE 
+        SYNTAX        Unsigned32
+        MAX-ACCESS    read-only 
+        STATUS        current
+        DESCRIPTION 
+            "Number of (local) replications to remote receivers." 
+        ::= { jnxMvpnMrouteEntry 3 } 
+
+     jnxMvpnMrouteDataRate OBJECT-TYPE
+        SYNTAX        Unsigned32  (0..4294967295)
+	UNITS         "kilobits per second"
+        MAX-ACCESS    read-only
+        STATUS        current
+        DESCRIPTION
+            "The data rate for traffic following this route."
+        ::= { jnxMvpnMrouteEntry 4 }
+
+     -- MVPN Notifications
+
+     jnxMvpnMvrfChange NOTIFICATION-TYPE
+        OBJECTS     {
+                      jnxMvpnGenOperStatusChange
+                    }
+        STATUS      current
+        DESCRIPTION
+            "A mvpnMvrfChange notification signifies a change about
+             a MVRF in the device. The change event can be creation of 
+             the MVRF, deletion of the MVRF or an update on the I-PMSI
+             or S-PMSI configuration of the MVRF. The change event 
+             is indicated by mvpnGenOperStatusChange embedded in 
+             the notification. The user can then query 
+             mvpnGeneralTable, and/or mvpnSpmsiConfigTable to
+             get the details of the change as necessary.
+
+             Note: Since the creation of a MVRF is often followed by 
+             configuration of I-PMSI and/or S-PMSIs for the MVRF, 
+             more than one (three at most) notifications for a MVRF may 
+             be generated serially, and it is really not necessary to 
+             generate all three of them. An agent may choose to generate a 
+             notification for the last event only, that is for S-PMSI
+             configuration.
+
+             Similarly, deletion of I-PMSI and S-PMSI configuration on a 
+             MVRF happens before a MVRF is deleted and it is recommended 
+             that the agent send the notification for MVRF deletion 
+             event only."
+        ::= { jnxMvpnNotifications 2 }
+     END

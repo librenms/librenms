@@ -1,14 +1,14 @@
 <?php
 
-$link_array = array(
-               'page'   => 'device',
-               'device' => $device['device_id'],
-               'tab'    => 'routing',
-               'proto'  => 'vrf',
-              );
+$link_array = [
+    'page'   => 'device',
+    'device' => $device['device_id'],
+    'tab'    => 'routing',
+    'proto'  => 'vrf',
+];
 
 // echo(generate_link("Basic", $link_array,array('view'=>'basic')));
-if (!isset($vars['view'])) {
+if (! isset($vars['view'])) {
     $vars['view'] = 'basic';
 }
 
@@ -16,11 +16,11 @@ print_optionbar_start();
 
 echo "<span style='font-weight: bold;'>VRFs</span> &#187; ";
 
-$menu_options = array('basic' => 'Basic',
-// 'detail' => 'Detail',
-                );
+$menu_options = ['basic' => 'Basic',
+    // 'detail' => 'Detail',
+];
 
-if (!$_GET['opta']) {
+if (! $_GET['opta']) {
     $_GET['opta'] = 'basic';
 }
 
@@ -30,7 +30,7 @@ foreach ($menu_options as $option => $text) {
         echo "<span class='pagemenu-selected'>";
     }
 
-    echo generate_link($text, $link_array, array('view' => $option));
+    echo generate_link($text, $link_array, ['view' => $option]);
     if ($vars['view'] == $option) {
         echo '</span>';
     }
@@ -42,13 +42,13 @@ unset($sep);
 
 echo ' Graphs: ';
 
-$graph_types = array(
-                'bits'      => 'Bits',
-                'upkts'     => 'Unicast Packets',
-                'nupkts'    => 'Non-Unicast Packets',
-                'errors'    => 'Errors',
-                'etherlike' => 'Etherlike',
-               );
+$graph_types = [
+    'bits'      => 'Bits',
+    'upkts'     => 'Unicast Packets',
+    'nupkts'    => 'Non-Unicast Packets',
+    'errors'    => 'Errors',
+    'etherlike' => 'Etherlike',
+];
 
 foreach ($graph_types as $type => $descr) {
     echo "$type_sep";
@@ -56,7 +56,7 @@ foreach ($graph_types as $type => $descr) {
         echo "<span class='pagemenu-selected'>";
     }
 
-    echo generate_link($descr, $link_array, array('view' => 'graphs', 'graph' => $type));
+    echo generate_link($descr, $link_array, ['view' => 'graphs', 'graph' => $type]);
     if ($vars['graph'] == $type) {
         echo '</span>';
     }
@@ -68,7 +68,7 @@ print_optionbar_end();
 
 echo "<div style='margin: 5px;'><table border=0 cellspacing=0 cellpadding=5 width=100%>";
 $i = '0';
-foreach (dbFetchRows('SELECT * FROM `vrfs` WHERE `device_id` = ? ORDER BY `vrf_name`', array($device['device_id'])) as $vrf) {
+foreach (dbFetchRows('SELECT * FROM `vrfs` WHERE `device_id` = ? ORDER BY `vrf_name`', [$device['device_id']]) as $vrf) {
     include 'includes/html/print-vrf.inc.php';
 
     $i++;

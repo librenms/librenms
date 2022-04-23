@@ -1,4 +1,4 @@
-# CentOS
+# LibreNMS VMs
 
 > NOTE: We highly advise that you change all passwords on this image
 > when you deploy it!!
@@ -16,7 +16,7 @@ At present we provide the following builds:
 - OVA Built with VirtualBox.
 
 - Any issues and or help with these images should be reported via
-  [Community Fourm](https://community.librenms.org) or our [Discord
+  [Community Forum](https://community.librenms.org) or our [Discord
   server](https://t.libren.ms/discord)
 
 ## Setup
@@ -49,19 +49,22 @@ available we will push new images out running that version. Please do
 note that if you download an older release with a view to running that
 specific version, you will need to disable updates in config.php.
 
-## Credentials
+## Access/Credentials
 
-- SSH
+To access your newly imported VM, those ports are forwarded from your machine to the VM: 8080 for WebUI and 2023 for SSH.
+Remember to edit/remove them if you change (and you should) the VM network configuration.
+
+- WebUI (http://localhost:8080)
+  - username: librenms
+  - password: `D32fwefwef`
+
+- SSH (ssh://localhost:2023)
   - username: librenms
   - password: `CDne3fwdfds`
 
 - MySQL/MariaDB
   - username: librenms
   - password: `D42nf23rewD`
-
-- WebUI
-  - username: librenms
-  - password: `D32fwefwef`
 
 ## Contributing
 

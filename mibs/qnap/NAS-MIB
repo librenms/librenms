@@ -1,0 +1,2910 @@
+NAS-MIB DEFINITIONS ::= BEGIN
+
+   IMPORTS
+      enterprises, Counter, TimeTicks
+         FROM RFC1155-SMI
+      Integer32, Counter32, IpAddress, Unsigned32, Counter64, OBJECT-TYPE
+         FROM SNMPv2-SMI
+      TRAP-TYPE
+         FROM RFC-1215;
+
+      -- From RFC-1213 (MIB-II)
+      DisplayString ::= OCTET STRING
+
+    storage     OBJECT IDENTIFIER ::= { enterprises 24681 }
+    storageSystem        OBJECT IDENTIFIER ::= { storage 1 }
+
+ -- Frame Relay Multiplexer MIB groups
+ -- system Event
+   systemEventMsg        OBJECT IDENTIFIER ::= { storageSystem 1 }
+
+ -- system event
+   eventInformMsg OBJECT-TYPE
+      SYNTAX  DisplayString
+      ACCESS  read-only
+      STATUS  current
+      DESCRIPTION
+         "Information event of NAS system."
+     ::= { systemEventMsg 101 }
+
+   eventWarningMsg OBJECT-TYPE
+      SYNTAX  DisplayString
+      ACCESS  read-only
+      STATUS  current
+      DESCRIPTION
+         "Warning event of NAS system."
+      ::= { systemEventMsg 102 }
+
+   eventErrorMsg OBJECT-TYPE
+      SYNTAX  DisplayString
+      ACCESS  read-only
+      STATUS  current
+      DESCRIPTION
+         "Error event of NAS system."
+      ::= { systemEventMsg 103 }
+
+    systemTraps OBJECT IDENTIFIER ::= { storageSystem  10 }
+
+    eventInform NOTIFICATION-TYPE
+        OBJECTS  { eventInformMsg }
+        STATUS current
+        DESCRIPTION
+            "Info: %s"
+        ::=  { systemTraps 1 }
+
+    eventWarning NOTIFICATION-TYPE
+        OBJECTS  { eventWarningMsg }
+        STATUS current
+        DESCRIPTION
+            "Warn: %s"
+        ::=  { systemTraps 2 }
+
+    eventError NOTIFICATION-TYPE
+        OBJECTS  { eventErrorMsg }
+        STATUS current
+        DESCRIPTION
+            "Error: %s"
+        ::=  { systemTraps 4 }
+
+ -- system inform
+    systemInfo        OBJECT IDENTIFIER ::= { storageSystem 2 }
+
+    systemCPU-Usage OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "System CPU usage"
+        ::= { systemInfo 1 }
+    systemTotalMem OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "System total memory"
+        ::= { systemInfo 2 }
+    systemFreeMem OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "System free memory"
+        ::= { systemInfo 3 }
+    systemUptime OBJECT-TYPE
+        SYNTAX     TimeTicks
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "The amount of time since this host was last
+            initialized.  Note that this is different from
+            sysUpTime in the SNMPv2-MIB [RFC1907] because
+            sysUpTime is the uptime of the network management
+            portion of the system."
+        ::= { systemInfo 4 }
+    cpu-Temperature OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "CPU temperature"
+        ::= { systemInfo 5 }
+    systemTemperature OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "System temperature"
+        ::= { systemInfo 6 }
+
+ifNumber OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "The number of network interfaces (regardless of
+            their current state) present on this system."
+    ::= { systemInfo 8 }
+systemIfTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF IfEntryDef
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+            "A list of interface entries.  The number of
+            entries is given by the value of IfNumber."
+    ::= { systemInfo 9 }
+ifEntry OBJECT-TYPE
+    SYNTAX  IfEntryDef
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+            "An interface entry containing objects at the
+            subnetwork layer and below for a particular
+            interface."
+    INDEX   { ifIndex }
+    ::= { systemIfTable 1 }
+IfEntryDef ::=
+    SEQUENCE {
+        ifIndex
+            INTEGER,
+        ifDescr
+            DisplayString,
+        ifPacketsReceived
+            Counter,
+        ifPacketsSent
+            Counter,
+        ifErrorPackets
+            Counter
+    }
+ifIndex OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "A unique value for each interface.  Its value
+            ranges between 1 and the value of IfNumber.  The
+            value for each interface must remain constant at
+            least from one re-initialization of the entity's
+            network management system to the next re-
+            initialization."
+    ::= { ifEntry 1 }
+ifDescr OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (0..255))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "A textual string containing information about the
+            interface.  This string should include the name of
+            the manufacturer, the product name and the version
+            of the hardware interface."
+    ::= { ifEntry 2 }
+ifPacketsReceived OBJECT-TYPE
+    SYNTAX  Counter
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "System packets received."
+    ::= { ifEntry 3 }
+ifPacketsSent OBJECT-TYPE
+    SYNTAX  Counter
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "System packets sent."
+    ::= { ifEntry 4 }
+ifErrorPackets OBJECT-TYPE
+    SYNTAX  Counter
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "System error packets."
+    ::= { ifEntry 5 }
+
+hdNumber OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "The number of hard drive slots."
+    ::= { systemInfo 10 }
+systemHdTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF HdEntryDef
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+            "A list of interface entries.  The number of
+            entries is given by the value of HdNumber."
+    ::= { systemInfo 11 }
+hdEntry OBJECT-TYPE
+    SYNTAX  HdEntryDef
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+            "An interface entry containing objects at the
+            subnetwork layer and below for a particular
+            interface."
+    INDEX   { hdIndex }
+    ::= { systemHdTable 1 }
+HdEntryDef ::=
+    SEQUENCE {
+        hdIndex
+            INTEGER,
+        hdDescr
+            DisplayString,
+        hdTemperature
+            DisplayString,
+        hdStatus
+            INTEGER,
+    hdModel DisplayString,
+    hdCapacity DisplayString,
+    hdSmartInfo DisplayString
+    }
+hdIndex OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "A unique value for each hard disk.  Its value
+            ranges between 1 and the value of IfNumber.  The
+            value for each interface must remain constant at
+            least from one re-initialization of the entity's
+            network management system to the next re-
+            initialization."
+    ::= { hdEntry 1 }
+hdDescr OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (0..255))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "A textual string containing information about the
+            interface.  This string should include the name of
+            the manufacturer, the product name and the version
+            of the hardware interface."
+    ::= { hdEntry 2 }
+hdTemperature OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "Hard disk temperature."
+    ::= { hdEntry 3 }
+hdStatus OBJECT-TYPE
+    SYNTAX     INTEGER {
+    ready(0),
+    noDisk(-5),
+    invalid(-6),
+    rwError(-9),
+    unknown(-4)
+    }
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "HDD status. 0:not availible, 1:availible."
+    ::= { hdEntry 4 }
+hdModel OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION "Hard disk model."
+    ::= { hdEntry 5 }
+hdCapacity OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION "Hard disk capacity."
+    ::= { hdEntry 6 }
+hdSmartInfo OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION "Hard disk SMART information."
+    ::= { hdEntry 7 }
+
+    modelName OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "Model name"
+        ::= { systemInfo 12 }
+    hostName OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "Model name"
+        ::= { systemInfo 13 }
+
+sysFanNumber OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "The number of system fan (regardless of
+            their current state) present on this system."
+    ::= { systemInfo 14 }
+systemFanTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF SysFanEntryDef
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+            "A list of interface entries.  The number of
+            entries is given by the value of SysFanNumber."
+    ::= { systemInfo 15 }
+sysFanEntry OBJECT-TYPE
+    SYNTAX  SysFanEntryDef
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+            "An system fan entry containing objects at the
+            subnetwork layer and below for a particular
+            interface."
+    INDEX   { sysFanIndex }
+    ::= { systemFanTable 1 }
+SysFanEntryDef ::=
+    SEQUENCE {
+        sysFanIndex
+            INTEGER,
+        sysFanDescr
+            DisplayString,
+        sysFanSpeed
+            DisplayString
+    }
+sysFanIndex OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "A unique value for each system fan. Its value
+            ranges between 1 and the value of SysFanNumber.  The
+            value for each interface must remain constant at
+            least from one re-initialization of the entity's
+            network management system to the next re-
+            initialization."
+    ::= { sysFanEntry 1 }
+sysFanDescr OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (0..255))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "A textual string containing information about the
+            interface.  This string should include the name of
+            the manufacturer, the product name and the version
+            of the hardware interface."
+    ::= { sysFanEntry 2 }
+sysFanSpeed OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (0..255))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "System fan speed."
+    ::= { sysFanEntry 3 }
+
+sysVolumeNumber OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "The number of system volumes (regardless of
+            their current state) present on this system."
+    ::= { systemInfo 16 }
+systemVolumeTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF SysVolumeEntryDef
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+            "A list of volume entries.  The number of
+            entries is given by the value of SysVolumeNumber."
+    ::= { systemInfo 17 }
+
+ jBODInfo OBJECT-TYPE
+     SYNTAX  DisplayString
+     MAX-ACCESS  read-only
+     STATUS  current
+     DESCRIPTION
+             "The bitmap  of JBOD (regardless of
+             their current state) present on this system."
+     ::= { systemInfo 18 }
+
+ jBODBitmap OBJECT-TYPE
+     SYNTAX  DisplayString
+     MAX-ACCESS  read-only
+     STATUS  current
+     DESCRIPTION
+             "The bitmap  of JBOD (regardless of
+             their current state) present on this system."
+     ::= { jBODInfo 1 }
+
+
+ jBODInfos OBJECT-TYPE
+     SYNTAX  SEQUENCE OF HdEntryDef
+     MAX-ACCESS  not-accessible
+     STATUS  current
+     DESCRIPTION
+             "A list of interface entries.  The number of
+             entries is given by the value of IfNumber."
+     ::= { jBODInfo 2 }
+ jBODInfosEntry OBJECT-TYPE
+     SYNTAX  JBODInfosEntryDef
+     MAX-ACCESS  not-accessible
+     STATUS  current
+     DESCRIPTION
+             "An interface entry containing objects at the
+             subnetwork layer and below for a particular
+             interface."
+     INDEX   { jBODid }
+     ::= { jBODInfos 1 }
+ JBODInfosEntryDef ::=
+     SEQUENCE {
+         jBODid  INTEGER,
+         jBODHdNumber INTEGER
+         }
+ jBODid OBJECT-TYPE
+     SYNTAX  INTEGER
+     MAX-ACCESS  read-only
+     STATUS  current
+     DESCRIPTION
+             "A unique value for each JBOD. Its value
+             ranges between 1 and the value of IfNumber.  The
+             value for each interface must remain constant at
+             least from one re-initialization of the entity's
+             network management system to the next re-
+             initialization."
+     ::= { jBODInfosEntry 1 }
+
+ jBODHdNumber OBJECT-TYPE
+     SYNTAX  INTEGER
+     MAX-ACCESS  read-only
+     STATUS  current
+     DESCRIPTION
+             "JBOD Disk port."
+     ::= { jBODInfosEntry 2 }
+
+ jBODHdTable1 OBJECT-TYPE
+     SYNTAX  SEQUENCE OF JBODInfosEntryDef
+     MAX-ACCESS  not-accessible
+     STATUS  current
+     DESCRIPTION
+             "A list of interface entries.  The number of
+             entries is given by the value of IfNumber."
+     ::= { jBODInfo 3 }
+ jBODHdEntry1 OBJECT-TYPE
+     SYNTAX  JBODHdEntry1Def
+     MAX-ACCESS  not-accessible
+     STATUS  current
+     DESCRIPTION
+             "An interface entry containing objects at the
+             subnetwork layer and below for a particular
+             interface."
+     INDEX   { jBODHdIndex1 }
+     ::= { jBODHdTable1 1 }
+ JBODHdEntry1Def ::=
+     SEQUENCE {
+         jBODHdIndex1  INTEGER,
+         jBODHdDescr1 DisplayString,
+         jBODHdTemperature1 DisplayString,
+         jBODHdStatus1 INTEGER,
+         jBODHdModel1 DisplayString,
+         jBODHdCapacity1 DisplayString,
+         jBODHdSmartInfo1 DisplayString
+         }
+ jBODHdIndex1 OBJECT-TYPE
+     SYNTAX  INTEGER
+     MAX-ACCESS  read-only
+     STATUS  current
+     DESCRIPTION
+             "A unique value for each hard disk.  Its value
+             ranges between 1 and the value of IfNumber.  The
+             value for each interface must remain constant at
+             least from one re-initialization of the entity's
+             network management system to the next re-
+             initialization."
+     ::= { jBODHdEntry1 1 }
+ jBODHdDescr1 OBJECT-TYPE
+     SYNTAX  DisplayString (SIZE (0..255))
+     MAX-ACCESS  read-only
+     STATUS  current
+     DESCRIPTION
+             "A textual string containing information about the
+             interface.  This string should include the name of
+             the manufacturer, the product name and the version
+             of the hardware interface."
+     ::= { jBODHdEntry1 2 }
+ jBODHdTemperature1 OBJECT-TYPE
+     SYNTAX  DisplayString
+     MAX-ACCESS  read-only
+     STATUS  current
+     DESCRIPTION
+             "Hard disk temperature."
+     ::= { jBODHdEntry1 3 }
+ jBODHdStatus1 OBJECT-TYPE
+     SYNTAX     INTEGER {
+         ready(0),
+         noDisk(-5),
+         invalid(-6),
+         rwError(-9),
+         unknown(-4)
+         }
+     MAX-ACCESS  read-only
+     STATUS  current
+     DESCRIPTION
+             "HDD status. 0:not availible, 1:availible."
+     ::= { jBODHdEntry1 4 }
+ jBODHdModel1 OBJECT-TYPE
+     SYNTAX  DisplayString
+     MAX-ACCESS  read-only
+     STATUS  current
+     DESCRIPTION "Hard disk model."
+     ::= { jBODHdEntry1 5 }
+ jBODHdCapacity1 OBJECT-TYPE
+     SYNTAX  DisplayString
+     MAX-ACCESS  read-only
+     STATUS  current
+     DESCRIPTION "Hard disk capacity."
+     ::= { jBODHdEntry1 6 }
+ jBODHdSmartInfo1 OBJECT-TYPE
+     SYNTAX  DisplayString
+     MAX-ACCESS  read-only
+     STATUS  current
+     DESCRIPTION "Hard disk SMART information."
+     ::= { jBODHdEntry1 7 }
+
+ jBODHdTable2 OBJECT-TYPE
+     SYNTAX  SEQUENCE OF JBODHdEntry2Def
+     MAX-ACCESS  not-accessible
+     STATUS  current
+     DESCRIPTION
+             "A list of interface entries.  The number of
+             entries is given by the value of IfNumber."
+     ::= { jBODInfo 4}
+ jBODHdEntry2 OBJECT-TYPE
+     SYNTAX  JBODHdEntry2Def
+     MAX-ACCESS  not-accessible
+     STATUS  current
+     DESCRIPTION
+             "An interface entry containing objects at the
+             subnetwork layer and below for a particular
+             interface."
+     INDEX   { jBODHdIndex2 }
+     ::= { jBODHdTable2 1 }
+ JBODHdEntry2Def ::=
+     SEQUENCE {
+         jBODHdIndex2  INTEGER,
+         jBODHdDescr2  DisplayString,
+         jBODHdTemperature2  DisplayString,
+         jBODHdStatus2  INTEGER,
+         jBODHdModel2  DisplayString,
+         jBODHdCapacity2  DisplayString,
+         jBODHdSmartInfo2  DisplayString
+         }
+ jBODHdIndex2  OBJECT-TYPE
+     SYNTAX  INTEGER
+     MAX-ACCESS  read-only
+     STATUS  current
+     DESCRIPTION
+             "A unique value for each hard disk.  Its value
+             ranges between 1 and the value of IfNumber.  The
+             value for each interface must remain constant at
+             least from one re-initialization of the entity's
+             network management system to the next re-
+             initialization."
+     ::= { jBODHdEntry2  1 }
+ jBODHdDescr2  OBJECT-TYPE
+     SYNTAX  DisplayString (SIZE (0..255))
+     MAX-ACCESS  read-only
+     STATUS  current
+     DESCRIPTION
+             "A textual string containing information about the
+             interface.  This string should include the name of
+             the manufacturer, the product name and the version
+             of the hardware interface."
+     ::= { jBODHdEntry2  2 }
+ jBODHdTemperature2  OBJECT-TYPE
+     SYNTAX  DisplayString
+     MAX-ACCESS  read-only
+     STATUS  current
+     DESCRIPTION
+             "Hard disk temperature."
+     ::= { jBODHdEntry2  3 }
+ jBODHdStatus2  OBJECT-TYPE
+     SYNTAX     INTEGER {
+         ready(0),
+         noDisk(-5),
+         invalid(-6),
+         rwError(-9),
+         unknown(-4)
+         }
+     MAX-ACCESS  read-only
+     STATUS  current
+     DESCRIPTION
+             "HDD status. 0:not availible, 1:availible."
+     ::= { jBODHdEntry2  4 }
+ jBODHdModel2  OBJECT-TYPE
+     SYNTAX  DisplayString
+     MAX-ACCESS  read-only
+     STATUS  current
+     DESCRIPTION "Hard disk model."
+     ::= { jBODHdEntry2  5 }
+ jBODHdCapacity2  OBJECT-TYPE
+     SYNTAX  DisplayString
+     MAX-ACCESS  read-only
+     STATUS  current
+     DESCRIPTION "Hard disk capacity."
+     ::= { jBODHdEntry2  6 }
+ jBODHdSmartInfo2  OBJECT-TYPE
+     SYNTAX  DisplayString
+     MAX-ACCESS  read-only
+     STATUS  current
+     DESCRIPTION "Hard disk SMART information."
+     ::= { jBODHdEntry2  7 }
+
+ jBODHdTable3 OBJECT-TYPE
+     SYNTAX  SEQUENCE OF JBODHdEntry3Def
+     MAX-ACCESS  not-accessible
+     STATUS  current
+     DESCRIPTION
+             "A list of interface entries.  The number of
+             entries is given by the value of IfNumber."
+     ::= { jBODInfo 5 }
+
+ jBODHdEntry3 OBJECT-TYPE
+     SYNTAX  JBODHdEntry3Def
+     MAX-ACCESS  not-accessible
+     STATUS  current
+     DESCRIPTION
+             "An interface entry containing objects at the
+             subnetwork layer and below for a particular
+             interface."
+     INDEX   { jBODHdIndex3 }
+     ::= { jBODHdTable3 1 }
+ JBODHdEntry3Def ::=
+     SEQUENCE {
+         jBODHdIndex3  INTEGER,
+         jBODHdDescr3 DisplayString,
+         jBODHdTemperature3 DisplayString,
+         jBODHdStatus3 INTEGER,
+         jBODHdModel3 DisplayString,
+         jBODHdCapacity3 DisplayString,
+         jBODHdSmartInfo3 DisplayString
+         }
+ jBODHdIndex3 OBJECT-TYPE
+     SYNTAX  INTEGER
+     MAX-ACCESS  read-only
+     STATUS  current
+     DESCRIPTION
+             "A unique value for each hard disk.  Its value
+             ranges between 1 and the value of IfNumber.  The
+             value for each interface must remain constant at
+             least from one re-initialization of the entity's
+             network management system to the next re-
+             initialization."
+     ::= { jBODHdEntry3 1 }
+ jBODHdDescr3 OBJECT-TYPE
+     SYNTAX  DisplayString (SIZE (0..255))
+     MAX-ACCESS  read-only
+     STATUS  current
+     DESCRIPTION
+             "A textual string containing information about the
+             interface.  This string should include the name of
+             the manufacturer, the product name and the version
+             of the hardware interface."
+     ::= { jBODHdEntry3 2 }
+ jBODHdTemperature3 OBJECT-TYPE
+     SYNTAX  DisplayString
+     MAX-ACCESS  read-only
+     STATUS  current
+     DESCRIPTION
+             "Hard disk temperature."
+     ::= { jBODHdEntry3 3 }
+ jBODHdStatus3 OBJECT-TYPE
+     SYNTAX     INTEGER {
+         ready(0),
+         noDisk(-5),
+         invalid(-6),
+         rwError(-9),
+         unknown(-4)
+         }
+     MAX-ACCESS  read-only
+     STATUS  current
+     DESCRIPTION
+             "HDD status. 0:not availible, 1:availible."
+     ::= { jBODHdEntry3 4 }
+ jBODHdModel3 OBJECT-TYPE
+     SYNTAX  DisplayString
+     MAX-ACCESS  read-only
+     STATUS  current
+     DESCRIPTION "Hard disk model."
+     ::= { jBODHdEntry3 5 }
+ jBODHdCapacity3 OBJECT-TYPE
+     SYNTAX  DisplayString
+     MAX-ACCESS  read-only
+     STATUS  current
+     DESCRIPTION "Hard disk capacity."
+     ::= { jBODHdEntry3 6 }
+ jBODHdSmartInfo3 OBJECT-TYPE
+     SYNTAX  DisplayString
+     MAX-ACCESS  read-only
+     STATUS  current
+     DESCRIPTION "Hard disk SMART information."
+     ::= { jBODHdEntry3 7 }
+
+ jBODHdTable4 OBJECT-TYPE
+     SYNTAX  SEQUENCE OF JBODHdEntry4Def
+     MAX-ACCESS  not-accessible
+     STATUS  current
+     DESCRIPTION
+             "A list of interface entries.  The number of
+             entries is given by the value of IfNumber."
+     ::= { jBODInfo 6 }
+
+ jBODHdEntry4 OBJECT-TYPE
+     SYNTAX  JBODHdEntry4Def
+     MAX-ACCESS  not-accessible
+     STATUS  current
+     DESCRIPTION
+             "An interface entry containing objects at the
+             subnetwork layer and below for a particular
+             interface."
+     INDEX   { jBODHdIndex4 }
+     ::= { jBODHdTable4 1 }
+ JBODHdEntry4Def ::=
+     SEQUENCE {
+         jBODHdIndex4  INTEGER,
+         jBODHdDescr4 DisplayString,
+         jBODHdTemperature4 DisplayString,
+         jBODHdStatus4 INTEGER,
+         jBODHdModel4 DisplayString,
+         jBODHdCapacity4 DisplayString,
+         jBODHdSmartInfo4 DisplayString
+         }
+ jBODHdIndex4 OBJECT-TYPE
+     SYNTAX  INTEGER
+     MAX-ACCESS  read-only
+     STATUS  current
+     DESCRIPTION
+             "A unique value for each hard disk.  Its value
+             ranges between 1 and the value of IfNumber.  The
+             value for each interface must remain constant at
+             least from one re-initialization of the entity's
+             network management system to the next re-
+             initialization."
+     ::= { jBODHdEntry4 1 }
+ jBODHdDescr4 OBJECT-TYPE
+     SYNTAX  DisplayString (SIZE (0..255))
+     MAX-ACCESS  read-only
+     STATUS  current
+     DESCRIPTION
+             "A textual string containing information about the
+             interface.  This string should include the name of
+             the manufacturer, the product name and the version
+             of the hardware interface."
+     ::= { jBODHdEntry4 2 }
+ jBODHdTemperature4 OBJECT-TYPE
+     SYNTAX  DisplayString
+     MAX-ACCESS  read-only
+     STATUS  current
+     DESCRIPTION
+             "Hard disk temperature."
+     ::= { jBODHdEntry4 3 }
+ jBODHdStatus4 OBJECT-TYPE
+     SYNTAX     INTEGER {
+         ready(0),
+         noDisk(-5),
+         invalid(-6),
+         rwError(-9),
+         unknown(-4)
+         }
+     MAX-ACCESS  read-only
+     STATUS  current
+     DESCRIPTION
+             "HDD status. 0:not availible, 1:availible."
+     ::= { jBODHdEntry4 4 }
+ jBODHdModel4 OBJECT-TYPE
+     SYNTAX  DisplayString
+     MAX-ACCESS  read-only
+     STATUS  current
+     DESCRIPTION "Hard disk model."
+     ::= { jBODHdEntry4 5 }
+ jBODHdCapacity4 OBJECT-TYPE
+     SYNTAX  DisplayString
+     MAX-ACCESS  read-only
+     STATUS  current
+     DESCRIPTION "Hard disk capacity."
+     ::= { jBODHdEntry4 6 }
+ jBODHdSmartInfo4 OBJECT-TYPE
+     SYNTAX  DisplayString
+     MAX-ACCESS  read-only
+     STATUS  current
+     DESCRIPTION "Hard disk SMART information."
+     ::= { jBODHdEntry4 7 }
+
+ jBODHdTable5 OBJECT-TYPE
+     SYNTAX  SEQUENCE OF JBODHdEntry5Def
+     MAX-ACCESS  not-accessible
+     STATUS  current
+     DESCRIPTION
+             "A list of interface entries.  The number of
+             entries is given by the value of IfNumber."
+     ::= { jBODInfo 7 }
+
+ jBODHdEntry5 OBJECT-TYPE
+     SYNTAX  JBODHdEntry5Def
+     MAX-ACCESS  not-accessible
+     STATUS  current
+     DESCRIPTION
+             "An interface entry containing objects at the
+             subnetwork layer and below for a particular
+             interface."
+     INDEX   { jBODHdIndex5 }
+     ::= { jBODHdTable5 1 }
+ JBODHdEntry5Def ::=
+     SEQUENCE {
+         jBODHdIndex5  INTEGER,
+         jBODHdDescr5 DisplayString,
+         jBODHdTemperature5 DisplayString,
+         jBODHdStatus5 INTEGER,
+         jBODHdModel5 DisplayString,
+         jBODHdCapacity5 DisplayString,
+         jBODHdSmartInfo5 DisplayString
+         }
+ jBODHdIndex5 OBJECT-TYPE
+     SYNTAX  INTEGER
+     MAX-ACCESS  read-only
+     STATUS  current
+     DESCRIPTION
+             "A unique value for each hard disk.  Its value
+             ranges between 1 and the value of IfNumber.  The
+             value for each interface must remain constant at
+             least from one re-initialization of the entity's
+             network management system to the next re-
+             initialization."
+     ::= { jBODHdEntry5 1 }
+ jBODHdDescr5 OBJECT-TYPE
+     SYNTAX  DisplayString (SIZE (0..255))
+     MAX-ACCESS  read-only
+     STATUS  current
+     DESCRIPTION
+             "A textual string containing information about the
+             interface.  This string should include the name of
+             the manufacturer, the product name and the version
+             of the hardware interface."
+     ::= { jBODHdEntry5 2 }
+ jBODHdTemperature5 OBJECT-TYPE
+     SYNTAX  DisplayString
+     MAX-ACCESS  read-only
+     STATUS  current
+     DESCRIPTION
+             "Hard disk temperature."
+     ::= { jBODHdEntry5 3 }
+ jBODHdStatus5 OBJECT-TYPE
+     SYNTAX     INTEGER {
+         ready(0),
+         noDisk(-5),
+         invalid(-6),
+         rwError(-9),
+         unknown(-4)
+         }
+     MAX-ACCESS  read-only
+     STATUS  current
+     DESCRIPTION
+             "HDD status. 0:not availible, 1:availible."
+     ::= { jBODHdEntry5 4 }
+ jBODHdModel5 OBJECT-TYPE
+     SYNTAX  DisplayString
+     MAX-ACCESS  read-only
+     STATUS  current
+     DESCRIPTION "Hard disk model."
+     ::= { jBODHdEntry5 5 }
+ jBODHdCapacity5 OBJECT-TYPE
+     SYNTAX  DisplayString
+     MAX-ACCESS  read-only
+     STATUS  current
+     DESCRIPTION "Hard disk capacity."
+     ::= { jBODHdEntry5 6 }
+ jBODHdSmartInfo5 OBJECT-TYPE
+     SYNTAX  DisplayString
+     MAX-ACCESS  read-only
+     STATUS  current
+     DESCRIPTION "Hard disk SMART information."
+     ::= { jBODHdEntry5 7 }
+
+ jBODHdTable6 OBJECT-TYPE
+     SYNTAX  SEQUENCE OF JBODHdEntry6Def
+     MAX-ACCESS  not-accessible
+     STATUS  current
+     DESCRIPTION
+             "A list of interface entries.  The number of
+             entries is given by the value of IfNumber."
+     ::= { jBODInfo 8 }
+
+ jBODHdEntry6 OBJECT-TYPE
+     SYNTAX  JBODHdEntry6Def
+     MAX-ACCESS  not-accessible
+     STATUS  current
+     DESCRIPTION
+             "An interface entry containing objects at the
+             subnetwork layer and below for a particular
+             interface."
+     INDEX   { jBODHdIndex6 }
+     ::= { jBODHdTable6 1 }
+ JBODHdEntry6Def ::=
+     SEQUENCE {
+         jBODHdIndex6  INTEGER,
+         jBODHdDescr6 DisplayString,
+         jBODHdTemperature6 DisplayString,
+         jBODHdStatus6 INTEGER,
+         jBODHdModel6 DisplayString,
+         jBODHdCapacity6 DisplayString,
+         jBODHdSmartInfo6 DisplayString
+         }
+ jBODHdIndex6 OBJECT-TYPE
+     SYNTAX  INTEGER
+     MAX-ACCESS  read-only
+     STATUS  current
+     DESCRIPTION
+             "A unique value for each hard disk.  Its value
+             ranges between 1 and the value of IfNumber.  The
+             value for each interface must remain constant at
+             least from one re-initialization of the entity's
+             network management system to the next re-
+             initialization."
+     ::= { jBODHdEntry6 1 }
+ jBODHdDescr6 OBJECT-TYPE
+     SYNTAX  DisplayString (SIZE (0..255))
+     MAX-ACCESS  read-only
+     STATUS  current
+     DESCRIPTION
+             "A textual string containing information about the
+             interface.  This string should include the name of
+             the manufacturer, the product name and the version
+             of the hardware interface."
+     ::= { jBODHdEntry6 2 }
+ jBODHdTemperature6 OBJECT-TYPE
+     SYNTAX  DisplayString
+     MAX-ACCESS  read-only
+     STATUS  current
+     DESCRIPTION
+             "Hard disk temperature."
+     ::= { jBODHdEntry6 3 }
+ jBODHdStatus6 OBJECT-TYPE
+     SYNTAX     INTEGER {
+         ready(0),
+         noDisk(-5),
+         invalid(-6),
+         rwError(-9),
+         unknown(-4)
+         }
+     MAX-ACCESS  read-only
+     STATUS  current
+     DESCRIPTION
+             "HDD status. 0:not availible, 1:availible."
+     ::= { jBODHdEntry6 4 }
+ jBODHdModel6 OBJECT-TYPE
+     SYNTAX  DisplayString
+     MAX-ACCESS  read-only
+     STATUS  current
+     DESCRIPTION "Hard disk model."
+     ::= { jBODHdEntry6 5 }
+ jBODHdCapacity6 OBJECT-TYPE
+     SYNTAX  DisplayString
+     MAX-ACCESS  read-only
+     STATUS  current
+     DESCRIPTION "Hard disk capacity."
+     ::= { jBODHdEntry6 6 }
+ jBODHdSmartInfo6 OBJECT-TYPE
+     SYNTAX  DisplayString
+     MAX-ACCESS  read-only
+     STATUS  current
+     DESCRIPTION "Hard disk SMART information."
+     ::= { jBODHdEntry6 7 }
+
+ jBODHdTable7 OBJECT-TYPE
+     SYNTAX  SEQUENCE OF JBODHdEntry7Def
+     MAX-ACCESS  not-accessible
+     STATUS  current
+     DESCRIPTION
+             "A list of interface entries.  The number of
+             entries is given by the value of IfNumber."
+     ::= { jBODInfo 9 }
+
+ jBODHdEntry7 OBJECT-TYPE
+     SYNTAX  JBODHdEntry7Def
+     MAX-ACCESS  not-accessible
+     STATUS  current
+     DESCRIPTION
+             "An interface entry containing objects at the
+             subnetwork layer and below for a particular
+             interface."
+     INDEX   { jBODHdIndex7 }
+     ::= { jBODHdTable7 1 }
+ JBODHdEntry7Def ::=
+     SEQUENCE {
+         jBODHdIndex7  INTEGER,
+         jBODHdDescr7 DisplayString,
+         jBODHdTemperature7 DisplayString,
+         jBODHdStatus7 INTEGER,
+         jBODHdModel7 DisplayString,
+         jBODHdCapacity7 DisplayString,
+         jBODHdSmartInfo7 DisplayString
+         }
+ jBODHdIndex7 OBJECT-TYPE
+     SYNTAX  INTEGER
+     MAX-ACCESS  read-only
+     STATUS  current
+     DESCRIPTION
+             "A unique value for each hard disk.  Its value
+             ranges between 1 and the value of IfNumber.  The
+             value for each interface must remain constant at
+             least from one re-initialization of the entity's
+             network management system to the next re-
+             initialization."
+     ::= { jBODHdEntry7 1 }
+ jBODHdDescr7 OBJECT-TYPE
+     SYNTAX  DisplayString (SIZE (0..255))
+     MAX-ACCESS  read-only
+     STATUS  current
+     DESCRIPTION
+             "A textual string containing information about the
+             interface.  This string should include the name of
+             the manufacturer, the product name and the version
+             of the hardware interface."
+     ::= { jBODHdEntry7 2 }
+ jBODHdTemperature7 OBJECT-TYPE
+     SYNTAX  DisplayString
+     MAX-ACCESS  read-only
+     STATUS  current
+     DESCRIPTION
+             "Hard disk temperature."
+     ::= { jBODHdEntry7 3 }
+ jBODHdStatus7 OBJECT-TYPE
+     SYNTAX     INTEGER {
+         ready(0),
+         noDisk(-5),
+         invalid(-6),
+         rwError(-9),
+         unknown(-4)
+         }
+     MAX-ACCESS  read-only
+     STATUS  current
+     DESCRIPTION
+             "HDD status. 0:not availible, 1:availible."
+     ::= { jBODHdEntry7 4 }
+ jBODHdModel7 OBJECT-TYPE
+     SYNTAX  DisplayString
+     MAX-ACCESS  read-only
+     STATUS  current
+     DESCRIPTION "Hard disk model."
+     ::= { jBODHdEntry7 5 }
+ jBODHdCapacity7 OBJECT-TYPE
+     SYNTAX  DisplayString
+     MAX-ACCESS  read-only
+     STATUS  current
+     DESCRIPTION "Hard disk capacity."
+     ::= { jBODHdEntry7 6 }
+ jBODHdSmartInfo7 OBJECT-TYPE
+     SYNTAX  DisplayString
+     MAX-ACCESS  read-only
+     STATUS  current
+     DESCRIPTION "Hard disk SMART information."
+     ::= { jBODHdEntry7 7 }
+
+ jBODHdTable8 OBJECT-TYPE
+     SYNTAX  SEQUENCE OF JBODHdEntry8Def
+     MAX-ACCESS  not-accessible
+     STATUS  current
+     DESCRIPTION
+             "A list of interface entries.  The number of
+             entries is given by the value of IfNumber."
+     ::= { jBODInfo 10 }
+
+ jBODHdEntry8 OBJECT-TYPE
+     SYNTAX  JBODHdEntry8Def
+     MAX-ACCESS  not-accessible
+     STATUS  current
+     DESCRIPTION
+             "An interface entry containing objects at the
+             subnetwork layer and below for a particular
+             interface."
+     INDEX   { jBODHdIndex8 }
+     ::= { jBODHdTable8 1 }
+ JBODHdEntry8Def ::=
+     SEQUENCE {
+         jBODHdIndex8  INTEGER,
+         jBODHdDescr8 DisplayString,
+         jBODHdTemperature8 DisplayString,
+         jBODHdStatus8 INTEGER,
+         jBODHdModel8 DisplayString,
+         jBODHdCapacity8 DisplayString,
+         jBODHdSmartInfo8 DisplayString
+         }
+ jBODHdIndex8 OBJECT-TYPE
+     SYNTAX  INTEGER
+     MAX-ACCESS  read-only
+     STATUS  current
+     DESCRIPTION
+             "A unique value for each hard disk.  Its value
+             ranges between 1 and the value of IfNumber.  The
+             value for each interface must remain constant at
+             least from one re-initialization of the entity's
+             network management system to the next re-
+             initialization."
+     ::= { jBODHdEntry8 1 }
+ jBODHdDescr8 OBJECT-TYPE
+     SYNTAX  DisplayString (SIZE (0..255))
+     MAX-ACCESS  read-only
+     STATUS  current
+     DESCRIPTION
+             "A textual string containing information about the
+             interface.  This string should include the name of
+             the manufacturer, the product name and the version
+             of the hardware interface."
+     ::= { jBODHdEntry8 2 }
+ jBODHdTemperature8 OBJECT-TYPE
+     SYNTAX  DisplayString
+     MAX-ACCESS  read-only
+     STATUS  current
+     DESCRIPTION
+             "Hard disk temperature."
+     ::= { jBODHdEntry8 3 }
+ jBODHdStatus8 OBJECT-TYPE
+     SYNTAX     INTEGER {
+         ready(0),
+         noDisk(-5),
+         invalid(-6),
+         rwError(-9),
+         unknown(-4)
+         }
+     MAX-ACCESS  read-only
+     STATUS  current
+     DESCRIPTION
+             "HDD status. 0:not availible, 1:availible."
+     ::= { jBODHdEntry8 4 }
+ jBODHdModel8 OBJECT-TYPE
+     SYNTAX  DisplayString
+     MAX-ACCESS  read-only
+     STATUS  current
+     DESCRIPTION "Hard disk model."
+     ::= { jBODHdEntry8 5 }
+ jBODHdCapacity8 OBJECT-TYPE
+     SYNTAX  DisplayString
+     MAX-ACCESS  read-only
+     STATUS  current
+     DESCRIPTION "Hard disk capacity."
+     ::= { jBODHdEntry8 6 }
+ jBODHdSmartInfo8 OBJECT-TYPE
+     SYNTAX  DisplayString
+     MAX-ACCESS  read-only
+     STATUS  current
+     DESCRIPTION "Hard disk SMART information."
+     ::= { jBODHdEntry8 7 }
+
+sysVolumeEntry OBJECT-TYPE
+    SYNTAX  SysVolumeEntryDef
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+            "An system volume entry"
+    INDEX   { sysVolumeIndex }
+    ::= { systemVolumeTable 1 }
+SysVolumeEntryDef ::=
+    SEQUENCE {
+        sysVolumeIndex  INTEGER,
+        sysVolumeDescr  DisplayString,
+    sysVolumeFS DisplayString,
+    sysVolumeTotalSize  DisplayString,
+    sysVolumeFreeSize   DisplayString,
+    sysVolumeStatus DisplayString
+    }
+sysVolumeIndex OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "A unique value for each system volume. Its value
+            ranges between 1 and the value of SysVolumeNumber.  The
+            value for each volume must remain constant at
+            least from one re-initialization of the entity's
+            volume system to the next re-initialization."
+    ::= { sysVolumeEntry 1 }
+sysVolumeDescr OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (0..255))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION "A textual string containing information about the volume."
+    ::= { sysVolumeEntry 2 }
+sysVolumeFS OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (0..15))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION "System Volume file system."
+    ::= { sysVolumeEntry 3 }
+sysVolumeTotalSize OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (0..15))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION "System Volume total size."
+    ::= { sysVolumeEntry 4 }
+sysVolumeFreeSize OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (0..15))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION "System Volume free size."
+    ::= { sysVolumeEntry 5 }
+sysVolumeStatus OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (0..255))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION "System Volume status."
+    ::= { sysVolumeEntry 6 }
+
+
+
+ -- system inform Ex
+    systemInfoEx        OBJECT IDENTIFIER ::= { storageSystem 3 }
+
+    systemCPU-UsageEX OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "system CPU usage"
+        ::= { systemInfoEx 1 }
+    systemTotalMemEX OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "System total memory in byte"
+        ::= { systemInfoEx 2 }
+    systemFreeMemEX OBJECT-TYPE
+        SYNTAX Counter64
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "System free memory in byte"
+        ::= { systemInfoEx 3 }
+    systemUptimeEX OBJECT-TYPE
+        SYNTAX     TimeTicks
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "The amount of time since this host was last
+            initialized.  Note that this is different from
+            sysUpTime in the SNMPv2-MIB [RFC1907] because
+            sysUpTime is the uptime of the network management
+            portion of the system."
+        ::= { systemInfoEx 4 }
+    cpu-TemperatureEX OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "CPU temperature in centigrade"
+        ::= { systemInfoEx 5 }
+    systemTemperatureEX OBJECT-TYPE
+        SYNTAX Integer32
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "System temperature in centigrade"
+        ::= { systemInfoEx 6 }
+
+ifNumberEX OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "The number of network interfaces (regardless of
+            their current state) present on this system."
+    ::= { systemInfoEx 8 }
+systemIfTableEx OBJECT-TYPE
+    SYNTAX  SEQUENCE OF IfEntryExDef
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+            "A list of interface entries.  The number of
+            entries is given by the value of IfNumber."
+    ::= { systemInfoEx 9 }
+ifEntryEx OBJECT-TYPE
+    SYNTAX  IfEntryExDef
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+            "An interface entry containing objects at the
+            subnetwork layer and below for a particular
+            interface."
+    INDEX   { ifIndexEX }
+    ::= { systemIfTableEx 1 }
+IfEntryExDef ::=
+    SEQUENCE {
+        ifIndexEX
+            INTEGER,
+        ifDescrEX
+            DisplayString,
+        ifPacketsReceivedEX
+            Counter,
+        ifPacketsSentEX
+            Counter,
+        ifErrorPacketsEX
+            Counter
+    }
+ifIndexEX OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "A unique value for each interface.  Its value
+            ranges between 1 and the value of IfNumber.  The
+            value for each interface must remain constant at
+            least from one re-initialization of the entity's
+            network management system to the next re-
+            initialization."
+    ::= { ifEntryEx 1 }
+ifDescrEX OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (0..255))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "A textual string containing information about the
+            interface.  This string should include the name of
+            the manufacturer, the product name and the version
+            of the hardware interface."
+    ::= { ifEntryEx 2 }
+ifPacketsReceivedEX OBJECT-TYPE
+    SYNTAX  Counter
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "System packets received."
+    ::= { ifEntryEx 3 }
+ifPacketsSentEX OBJECT-TYPE
+    SYNTAX  Counter
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "System packets sent."
+    ::= { ifEntryEx 4 }
+ifErrorPacketsEX OBJECT-TYPE
+    SYNTAX  Counter
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "System error packets."
+    ::= { ifEntryEx 5 }
+
+hdNumberEX OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "The number of hard drive slots."
+    ::= { systemInfoEx 10 }
+systemHdTableEX OBJECT-TYPE
+    SYNTAX  SEQUENCE OF HdEntryExDef
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+            "A list of interface entries.  The number of
+            entries is given by the value of HdNumber."
+    ::= { systemInfoEx 11 }
+hdEntryEx OBJECT-TYPE
+    SYNTAX  HdEntryExDef
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+            "An interface entry containing objects at the
+            subnetwork layer and below for a particular
+            interface."
+    INDEX   { hdIndex }
+    ::= { systemHdTableEX 1 }
+HdEntryExDef ::=
+    SEQUENCE {
+        hdIndexEX
+            INTEGER,
+        hdDescrEX
+            DisplayString,
+        hdTemperatureEX
+            Integer32,
+        hdStatusEX
+            INTEGER,
+    hdModelEX DisplayString,
+    hdCapacityEX Counter64,
+    hdSmartInfoEX DisplayString
+    }
+hdIndexEX OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "A unique value for each hard disk.  Its value
+            ranges between 1 and the value of IfNumber.  The
+            value for each interface must remain constant at
+            least from one re-initialization of the entity's
+            network management system to the next re-
+            initialization."
+    ::= { hdEntryEx 1 }
+hdDescrEX OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (0..255))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "A textual string containing information about the
+            interface.  This string should include the name of
+            the manufacturer, the product name and the version
+            of the hardware interface."
+    ::= { hdEntryEx 2 }
+hdTemperatureEX OBJECT-TYPE
+    SYNTAX  Integer32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "Hard disk temperature in centigrade."
+    ::= { hdEntryEx 3 }
+hdStatusEX OBJECT-TYPE
+    SYNTAX     INTEGER {
+    ready(0),
+    noDisk(-5),
+    invalid(-6),
+    rwError(-9),
+    unknown(-4)
+    }
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "HDD status. 0:not availible, 1:availible."
+    ::= { hdEntryEx 4 }
+hdModelEX OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION "Hard disk model."
+    ::= { hdEntryEx 5 }
+hdCapacityEX OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION "Hard disk capacity in byte."
+    ::= { hdEntryEx 6 }
+hdSmartInfoEX OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION "Hard disk SMART information."
+    ::= { hdEntryEx 7 }
+
+    modelNameEX OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "Model name"
+        ::= { systemInfoEx 12 }
+    hostNameEX OBJECT-TYPE
+        SYNTAX DisplayString
+        MAX-ACCESS read-only
+        STATUS     current
+        DESCRIPTION
+            "Model name"
+        ::= { systemInfoEx 13 }
+
+sysFanNumberEX OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "The number of system fan (regardless of
+            their current state) present on this system."
+    ::= { systemInfoEx 14 }
+systemFanTableEx OBJECT-TYPE
+    SYNTAX  SEQUENCE OF SysFanEntryExDef
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+            "A list of interface entries.  The number of
+            entries is given by the value of SysFanNumber."
+    ::= { systemInfoEx 15 }
+sysFanEntryEx OBJECT-TYPE
+    SYNTAX  SysFanEntryExDef
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+            "An system fan entry containing objects at the
+            subnetwork layer and below for a particular
+            interface."
+    INDEX   { sysFanIndexEX }
+    ::= { systemFanTableEx 1 }
+SysFanEntryExDef ::=
+    SEQUENCE {
+        sysFanIndexEX
+            INTEGER,
+        sysFanDescrEX
+            DisplayString,
+        sysFanSpeedEX
+            Integer32
+    }
+sysFanIndexEX OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "A unique value for each system fan. Its value
+            ranges between 1 and the value of SysFanNumber.  The
+            value for each interface must remain constant at
+            least from one re-initialization of the entity's
+            network management system to the next re-
+            initialization."
+    ::= { sysFanEntryEx 1 }
+sysFanDescrEX OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (0..255))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "A textual string containing information about the
+            interface.  This string should include the name of
+            the manufacturer, the product name and the version
+            of the hardware interface."
+    ::= { sysFanEntryEx 2 }
+sysFanSpeedEX OBJECT-TYPE
+    SYNTAX  Integer32
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "System fan speed (RPM)."
+    ::= { sysFanEntryEx 3 }
+
+sysVolumeNumberEX OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "The number of system volumes (regardless of
+            their current state) present on this system."
+    ::= { systemInfoEx 16 }
+systemVolumeTableEx OBJECT-TYPE
+    SYNTAX  SEQUENCE OF SysVolumeEntryExDef
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+            "A list of volume entries.  The number of
+            entries is given by the value of SysVolumeNumber."
+    ::= { systemInfoEx 17 }
+sysVolumeEntryEx OBJECT-TYPE
+    SYNTAX  SysVolumeEntryExDef
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+            "An system volume entry"
+    INDEX   { sysVolumeIndexEX }
+    ::= { systemVolumeTableEx 1 }
+SysVolumeEntryExDef ::=
+    SEQUENCE {
+        sysVolumeIndexEX    INTEGER,
+        sysVolumeDescrEX    DisplayString,
+    sysVolumeFSEX   DisplayString,
+    sysVolumeTotalSizeEX    Counter64,
+    sysVolumeFreeSizeEX Counter64,
+    sysVolumeStatusEX   DisplayString
+    }
+sysVolumeIndexEX OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "A unique value for each system volume. Its value
+            ranges between 1 and the value of SysVolumeNumber.  The
+            value for each volume must remain constant at
+            least from one re-initialization of the entity's
+            volume system to the next re-initialization."
+    ::= { sysVolumeEntryEx 1 }
+sysVolumeDescrEX OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (0..255))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION "A textual string containing information about the volume."
+    ::= { sysVolumeEntryEx 2 }
+sysVolumeFSEX OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (0..15))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION "System Volume file system."
+    ::= { sysVolumeEntryEx 3 }
+sysVolumeTotalSizeEX OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION "System Volume total size in byte."
+    ::= { sysVolumeEntryEx 4 }
+sysVolumeFreeSizeEX OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION "System Volume free size in byte."
+    ::= { sysVolumeEntryEx 5 }
+sysVolumeStatusEX OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (0..255))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION "System Volume status."
+    ::= { sysVolumeEntryEx 6 }
+
+ -- storageSystemEx inform
+    storageSystemEx        OBJECT IDENTIFIER ::= { storageSystem 4 }
+    systemSettings        OBJECT IDENTIFIER ::= { storageSystemEx 1 }
+    storageManager        OBJECT IDENTIFIER ::= { systemSettings 1 }
+    systemStatus          OBJECT IDENTIFIER ::= { systemSettings 11 }
+    nasStorage        OBJECT IDENTIFIER ::= { storageManager 1 }
+    components        OBJECT IDENTIFIER ::= { nasStorage 1 }
+    enclosure         OBJECT IDENTIFIER ::= { components 1 }
+    systemFan         OBJECT IDENTIFIER ::= { components 2 }
+    systemPower       OBJECT IDENTIFIER ::= { components 3 }
+    cpu               OBJECT IDENTIFIER ::= { components 4 }
+    disk              OBJECT IDENTIFIER ::= { components 5 }
+    msataDisk              OBJECT IDENTIFIER ::= { components 6 }
+
+    storageSpace        OBJECT IDENTIFIER ::= { nasStorage 2 }
+    raid        OBJECT IDENTIFIER ::= { storageSpace 1 }
+    pool        OBJECT IDENTIFIER ::= { storageSpace 2 }
+    volume        OBJECT IDENTIFIER ::= { storageSpace 3 }
+
+    cacheAcceleration   OBJECT IDENTIFIER ::= { nasStorage 3 }
+
+    iSCSI        OBJECT IDENTIFIER ::= { storageManager 2 }
+    iSCSIStorage        OBJECT IDENTIFIER ::= { iSCSI 1 }
+    lun                 OBJECT IDENTIFIER ::= { iSCSIStorage 10 }
+    target              OBJECT IDENTIFIER ::= { iSCSIStorage 11 }
+
+    resourceMonitor        OBJECT IDENTIFIER ::= { systemStatus 5 }
+    diskPerformance        OBJECT IDENTIFIER ::= { resourceMonitor 6 }
+
+iSCSIService OBJECT-TYPE
+    SYNTAX  INTEGER{
+                   no(0),
+                   yes(1)
+                   }
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION "iSCSI Service."
+    ::= { iSCSIStorage 1 }
+
+iSCSIServicePort OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION "iSCSI ServicePort."
+    ::= { iSCSIStorage 2 }
+
+iSNSService OBJECT-TYPE
+    SYNTAX  INTEGER{
+                   no(0),
+                   yes(1)
+                   }
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION "iSNS Service."
+    ::= { iSCSIStorage 3 }
+
+iSNSIP OBJECT-TYPE
+    SYNTAX  IpAddress
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION "iSNS IP."
+    ::= { iSCSIStorage 4 }
+
+
+
+-- LUNTable
+lunNumber OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "The number of LUNs (regardless of
+            their current state) present on this system."
+    ::= { lun 1 }
+
+lunTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF LUNTableEntryDef
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+            "A list of LUN entries. The number of
+            entries is given by the value of LUNNumber."
+    ::= { lun 2 }
+lunTableEntry OBJECT-TYPE
+    SYNTAX  LUNTableEntryDef
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+            "An LUN entry."
+    INDEX   { lunIndex }
+    ::= { lunTable 1 }
+LUNTableEntryDef ::=
+    SEQUENCE {
+        lunIndex
+            INTEGER,
+        lunID
+            INTEGER,
+        lunCapacity
+            Counter64,
+        lunUsedPercent
+            INTEGER,
+        lunStatus
+            DisplayString,
+        lunName
+            DisplayString,
+        lunBackupStatus
+            INTEGER,
+        lunIsMap
+            INTEGER
+    }
+lunIndex OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION "LUNIndex."
+    ::= { lunTableEntry 1 }
+
+lunID OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION "LUNID."
+    ::= { lunTableEntry 2 }
+
+lunCapacity OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION "LUN capacity in byte."
+    ::= { lunTableEntry 3 }
+
+lunUsedPercent OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION "LUN used percent."
+    ::= { lunTableEntry 4 }
+
+lunStatus OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (0..255))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION "LUN status."
+    ::= { lunTableEntry 5 }
+
+lunName OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (0..255))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION "LUN name."
+    ::= { lunTableEntry 6 }
+
+
+lunBackupStatus OBJECT-TYPE
+    SYNTAX  INTEGER{
+                   none(0),
+                   backup(1),
+                   restore(2),
+                   snapshot(3)
+                   }
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION "LUN backup status."
+    ::= { lunTableEntry 7 }
+
+lunIsMap OBJECT-TYPE
+    SYNTAX  INTEGER{
+                   unmapped(0),
+                   mapped(1)
+                   }
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION "LUN is Mapped."
+    ::= { lunTableEntry 8 }
+
+
+-- targeTable
+targetNumber OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "The number of Targets (regardless of
+            their current state) present on this system."
+    ::= { target 1 }
+targeTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF TargeTableEntryDef
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+            "A list of Target entries.  The number of
+            entries is given by the value of TargetNumber."
+    ::= { target 2 }
+targeTableEntry OBJECT-TYPE
+    SYNTAX  TargeTableEntryDef
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+            "A target entry."
+    INDEX   { targetIndex }
+    ::= { targeTable 1 }
+TargeTableEntryDef ::=
+    SEQUENCE {
+        targetIndex
+            INTEGER,
+        targetID
+            INTEGER,
+        targetName
+            DisplayString,
+        targetIQN
+            DisplayString,
+        targetStatus
+            INTEGER
+    }
+
+targetIndex OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION "TargetIndex."
+    ::= { targeTableEntry 1 }
+
+targetID OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION "TargetID."
+    ::= { targeTableEntry 2 }
+
+targetName OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (0..255))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION "Target name."
+    ::= { targeTableEntry 3 }
+
+targetIQN OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (0..255))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION "TargetIQN."
+    ::= { targeTableEntry 4 }
+
+targetStatus OBJECT-TYPE
+    SYNTAX  INTEGER{
+                   offline(-1),
+                   ready(0),
+                   connected(1)
+                   }
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION "Target status."
+    ::= { targeTableEntry 5 }
+
+-- volumeTable
+volumeNumber OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "The number of volumes (regardless of
+            their current state) present on this system."
+    ::= { volume 1 }
+volumeTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF VolumeTableEntryDef
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+            "A list of volume entries.  The number of
+            entries is given by the value of VolumeNumber."
+    ::= { volume 2 }
+volumeTableEntry OBJECT-TYPE
+    SYNTAX  VolumeTableEntryDef
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+            "An volume entry."
+    INDEX   { volumeIndex }
+    ::= { volumeTable 1 }
+VolumeTableEntryDef ::=
+    SEQUENCE {
+        volumeIndex
+            INTEGER,
+        volumeID
+            INTEGER,
+        volumeCapacity
+            Counter64,
+        volumeFreeSize
+            Counter64,
+        volumeStatus
+            DisplayString,
+--        VolumeThreshold
+--            INTEGER,
+        volumeSSDCache
+            INTEGER,
+        volumeThin
+            INTEGER,
+        volumeName
+            DisplayString
+    }
+volumeIndex OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION "VolumeIndex."
+    ::= { volumeTableEntry 1 }
+
+volumeID OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION "VolumeID."
+    ::= { volumeTableEntry 2 }
+
+volumeCapacity OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION "Volume capacity in byte."
+    ::= { volumeTableEntry 3 }
+
+volumeFreeSize OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION "Volume freesize in byte."
+    ::= { volumeTableEntry 4 }
+
+volumeStatus OBJECT-TYPE
+    SYNTAX  DisplayString  (SIZE (0..255))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION "Volume status"
+    ::= { volumeTableEntry 5 }
+
+-- VolumeThreshold OBJECT-TYPE
+--     SYNTAX  INTEGER
+--     MAX-ACCESS  read-only
+--     STATUS  current
+--     DESCRIPTION  "Volume threshold."
+--     ::= { PoolTableEntry 6 }
+
+volumeSSDCache OBJECT-TYPE
+    SYNTAX  INTEGER{
+                   no(0),
+                   yes(1)
+                   }
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION "If volume enable SSDCache acceleration."
+    ::= { volumeTableEntry 6 }
+
+volumeThin OBJECT-TYPE
+    SYNTAX  INTEGER{
+                   no(0),
+                   yes(1)
+                   }
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION "If volume is thin type."
+    ::= { volumeTableEntry 7 }
+
+volumeName OBJECT-TYPE
+    SYNTAX  DisplayString (SIZE (0..255))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION "Volume alias name."
+    ::= { volumeTableEntry 8 }
+
+-- poolTable
+poolNumber OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "The number of pools (regardless of
+            their current state) present on this system."
+    ::= { pool 1 }
+
+poolTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF PoolTableEntryDef
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+            "A list of pool entries. The number of entries is given by the value of PoolNumber."
+    ::= { pool 2 }
+poolTableEntry OBJECT-TYPE
+    SYNTAX  PoolTableEntryDef
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+            "An pool entry."
+    INDEX   { poolIndex }
+    ::= { poolTable 1 }
+PoolTableEntryDef ::=
+    SEQUENCE {
+        poolIndex
+            INTEGER,
+        poolID
+            INTEGER,
+        poolCapacity
+            Counter64,
+        poolFreeSize
+            Counter64,
+        poolStatus
+--            INTEGER,
+--        PoolThreshold
+--            INTEGER,
+--        PoolAllocated
+--            INTEGER,
+--        PoolRAIDList
+--            INTEGER,
+--        PoolVolumeList
+            INTEGER
+    }
+poolIndex OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION "PoolIndex."
+    ::= { poolTableEntry 1 }
+
+poolID OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION "PoolID."
+    ::= { poolTableEntry 2 }
+
+poolCapacity OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION "Pool capacity in byte."
+    ::= { poolTableEntry 3 }
+
+poolFreeSize OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION "Pool freesize in byte."
+    ::= { poolTableEntry 4 }
+
+poolStatus OBJECT-TYPE
+    SYNTAX  INTEGER{
+                   ready(0),
+                   warning(-1),
+                   notReady(-2),
+                   error(-3)
+                   }
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION "Pool status."
+    ::= { poolTableEntry 5 }
+
+--PoolThreshold OBJECT-TYPE
+--    SYNTAX  INTEGER
+--    MAX-ACCESS  read-only
+--    STATUS  current
+--    DESCRIPTION   "PoolThreshold."
+--    ::= { PoolTableEntry 6 }
+
+--PoolAllocated OBJECT-TYPE
+--    SYNTAX  INTEGER
+--    MAX-ACCESS  read-only
+--    STATUS  current
+--    DESCRIPTION   "PoolAllocated."
+--    ::= { PoolTableEntry 7 }
+
+--PoolRAIDList OBJECT-TYPE
+--    SYNTAX  INTEGER
+--    MAX-ACCESS  read-only
+--    STATUS  current
+--    DESCRIPTION   "PoolRAIDList."
+--    ::= { PoolTableEntry 8 }
+
+--PoolVolumeList OBJECT-TYPE
+--    SYNTAX  INTEGER
+--    MAX-ACCESS  read-only
+--    STATUS  current
+--    DESCRIPTION   "PoolVolumeList."
+--    ::= { PoolTableEntry 9 }
+
+-- raidGroupTable
+raidNumber OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "The number of RAIDs (regardless of
+            their current state) present on this system."
+    ::= { raid 1 }
+
+raidGroupTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF RAIDGroupTableEntryDef
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+             "A list of RAID entries. The number of
+             entries is given by the value of RAIDNumber."
+    ::= { raid 2 }
+raidGroupTableEntry OBJECT-TYPE
+    SYNTAX  RAIDGroupTableEntryDef
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+            "An RAID entry."
+    INDEX   { raidIndex }
+    ::= { raidGroupTable 1 }
+RAIDGroupTableEntryDef ::=
+    SEQUENCE {
+        raidIndex
+            INTEGER,
+        raidID
+            INTEGER,
+        raidCapacity
+            Counter64,
+        raidFreeSize
+            Counter64,
+        raidStatus
+            DisplayString,
+        raidBitmap
+            INTEGER,
+        raidLevel
+            DisplayString
+--        RAIDDiskList
+--            INTEGER,
+--        RAIDSpareList
+--            INTEGER
+
+    }
+raidIndex OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION "RAIDIndex."
+    ::= { raidGroupTableEntry 1 }
+
+raidID OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION "RAIDID."
+    ::= { raidGroupTableEntry 2 }
+
+raidCapacity OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION "RAID capacity  in byte."
+    ::= { raidGroupTableEntry 3 }
+
+raidFreeSize OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION "RAID freesize in byte."
+    ::= { raidGroupTableEntry 4 }
+
+raidStatus OBJECT-TYPE
+    SYNTAX  DisplayString  (SIZE (0..255))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION "RAID status."
+    ::= { raidGroupTableEntry 5 }
+
+raidBitmap OBJECT-TYPE
+    SYNTAX  INTEGER{
+                   no(0),
+                   yes(1)
+                   }
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION "RAID bitmap."
+    ::= { raidGroupTableEntry 6 }
+
+raidLevel OBJECT-TYPE
+    SYNTAX  DisplayString  (SIZE (0..255))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION "RAID level."
+    ::= { raidGroupTableEntry 7 }
+
+--RAIDDiskList OBJECT-TYPE
+--    SYNTAX  INTEGER
+--    MAX-ACCESS  read-only
+--    STATUS  current
+--    DESCRIPTION   "RAIDDiskList."
+--    ::= { RAIDGroupTableEntry 8 }
+--
+--RAIDSpareList OBJECT-TYPE
+--    SYNTAX  INTEGER
+--    MAX-ACCESS  read-only
+--    STATUS  current
+--    DESCRIPTION   "RAIDSpareList."
+--    ::= { RAIDGroupTableEntry 9 }
+
+--cacheAcceleration
+service OBJECT-TYPE
+    SYNTAX  INTEGER{
+                   no(0),
+                   yes(1)
+                   }
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "If service of cache is enabled."
+    ::= { cacheAcceleration 1 }
+
+availablePercent OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "Available percent of cache."
+    ::= { cacheAcceleration 2 }
+
+readHitRate OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "Read hit rate percent of cache."
+    ::= { cacheAcceleration 3 }
+
+writeHitRate OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "Write hit rate percent of cache."
+    ::= { cacheAcceleration 4 }
+
+status OBJECT-TYPE
+    SYNTAX  DisplayString  (SIZE (0..255))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "Status of cache."
+    ::= { cacheAcceleration 5 }
+
+-- diskTable
+diskNumber OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "The number of disks (regardless of
+            their current state) present on this system."
+    ::= { disk 1 }
+
+diskTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF DiskTableEntryDef
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+            "A list of disks.  The number of
+            entries is given by the value of DiskNumber."
+    ::= { disk 2 }
+diskTableEntry OBJECT-TYPE
+    SYNTAX  DiskTableEntryDef
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+            "A disk entry."
+    INDEX   { diskIndex }
+    ::= { diskTable 1 }
+DiskTableEntryDef ::=
+    SEQUENCE {
+        diskIndex
+            INTEGER,
+        diskID
+            INTEGER,
+        diskEnclosureID
+            INTEGER,
+        diskSummary
+            DisplayString,
+        diskSmartInfo
+            INTEGER,
+        diskTemperture
+            INTEGER,
+        diskGlobalSpare
+            INTEGER,
+        diskModel
+            DisplayString,
+        diskCapacity
+            Counter64
+    }
+diskIndex OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION "DiskIndex."
+    ::= { diskTableEntry 1 }
+
+diskID OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION "DiskID."
+    ::= { diskTableEntry 2 }
+
+diskEnclosureID OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION "disk EnclosureID."
+    ::= { diskTableEntry 3 }
+
+diskSummary OBJECT-TYPE
+    SYNTAX  DisplayString  (SIZE (0..255))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION "DiskSummary. 'Good',''Warning','Abnormal'"
+    ::= { diskTableEntry 4 }
+
+diskSmartInfo OBJECT-TYPE
+    SYNTAX  INTEGER{
+                   abnormal(2),
+                   warning(1),
+                   good(0),
+                   error(-1)
+                   }
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION "DiskSmartInfo."
+    ::= { diskTableEntry 5 }
+
+diskTemperture OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION "DiskTemperture."
+    ::= { diskTableEntry 6 }
+
+diskGlobalSpare OBJECT-TYPE
+    SYNTAX  INTEGER{
+                   no(0),
+                   yes(1)
+                   }
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION "DiskGlobalSpare."
+    ::= { diskTableEntry 7 }
+
+diskModel OBJECT-TYPE
+    SYNTAX  DisplayString  (SIZE (0..255))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION "DiskModel."
+    ::= { diskTableEntry 8 }
+
+diskCapacity OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION "DiskCapacity."
+    ::= { diskTableEntry 9 }
+
+-- msataDiskTable
+msataDiskNumber OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "The number of msatadisks (regardless of
+            their current state) present on this system."
+    ::= { msataDisk 1 }
+
+msataDiskTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF MsataDiskTableEntryDef
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+            "A list of msatadisks.  The number of
+            entries is given by the value of msataDiskNumber."
+    ::= { msataDisk 2 }
+msataDiskTableEntry OBJECT-TYPE
+    SYNTAX  MsataDiskTableEntryDef
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+            "A disk entry."
+    INDEX   { msataDiskIndex }
+    ::= { msataDiskTable 1 }
+MsataDiskTableEntryDef ::=
+    SEQUENCE {
+        msataDiskIndex
+            INTEGER,
+        msataDiskID
+            INTEGER,
+        msataDiskEnclosureID
+            INTEGER,
+        msataDiskSummary
+            DisplayString,
+        msataDiskSmartInfo
+            INTEGER,
+        msataDiskTemperture
+            INTEGER,
+        msataDiskGlobalSpare
+            INTEGER,
+        msataDiskModel
+            DisplayString,
+        msataDiskCapacity
+            Counter64
+    }
+msataDiskIndex OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION "DiskIndex."
+    ::= { msataDiskTableEntry 1 }
+
+msataDiskID OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION "DiskID."
+    ::= { msataDiskTableEntry 2 }
+
+msataDiskEnclosureID OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION "disk EnclosureID."
+    ::= { msataDiskTableEntry 3 }
+
+msataDiskSummary OBJECT-TYPE
+    SYNTAX  DisplayString  (SIZE (0..255))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION "DiskSummary. 'Good',''Warning','Abnormal'"
+    ::= { msataDiskTableEntry 4 }
+
+msataDiskSmartInfo OBJECT-TYPE
+    SYNTAX  INTEGER{
+                   abnormal(2),
+                   warning(1),
+                   good(0),
+                   error(-1)
+                   }
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION "DiskSmartInfo."
+    ::= { msataDiskTableEntry 5 }
+
+msataDiskTemperture OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION "DiskTemperture."
+    ::= { msataDiskTableEntry 6 }
+
+msataDiskGlobalSpare OBJECT-TYPE
+    SYNTAX  INTEGER{
+                   no(0),
+                   yes(1)
+                   }
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION "DiskGlobalSpare."
+    ::= { msataDiskTableEntry 7 }
+
+msataDiskModel OBJECT-TYPE
+    SYNTAX  DisplayString  (SIZE (0..255))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION "DiskModel."
+    ::= { msataDiskTableEntry 8 }
+
+msataDiskCapacity OBJECT-TYPE
+    SYNTAX  Counter64
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION "DiskCapacity."
+    ::= { msataDiskTableEntry 9 }
+
+-- enclosureTable
+
+enclosurelNumber OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "The number of Enclosures (regardless of
+            their current state) present on this system."
+    ::= { enclosure 1 }
+
+enclosureTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF EnclosureTableEntryDef
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+            "A list of enclosures.  The number of
+            entries is given by the value of EnclosureNumber."
+    ::= { enclosure 2 }
+enclosureTableEntry OBJECT-TYPE
+    SYNTAX  EnclosureTableEntryDef
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+            "An enclosure entry."
+    INDEX   { enclosureIndex }
+    ::= { enclosureTable 1 }
+EnclosureTableEntryDef ::=
+    SEQUENCE {
+        enclosureIndex
+            INTEGER,
+        enclosureID
+            INTEGER,
+        enclosureModel
+            DisplayString,
+        enclosureSerialNum
+            DisplayString,
+        enclosureSlot
+            INTEGER,
+        enclosureName
+            DisplayString,
+        enclosureSystemTemp
+            INTEGER
+--        EnclosureDiskList
+--            INTEGER
+    }
+
+enclosureIndex OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION "EnclosureIndex."
+    ::= { enclosureTableEntry 1 }
+
+enclosureID OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION "enclosureID."
+    ::= { enclosureTableEntry 2 }
+
+enclosureModel OBJECT-TYPE
+    SYNTAX  DisplayString  (SIZE (0..255))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION "EnclosureModel."
+    ::= { enclosureTableEntry 3 }
+
+enclosureSerialNum OBJECT-TYPE
+    SYNTAX  DisplayString  (SIZE (0..255))
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION "EnclosureSerialNum."
+    ::= { enclosureTableEntry 4 }
+
+enclosureSlot OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION "EnclosureSlot."
+    ::= { enclosureTableEntry 5 }
+
+enclosureName OBJECT-TYPE
+    SYNTAX  DisplayString
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION "Enclosure Name."
+    ::= { enclosureTableEntry 6 }
+
+enclosureSystemTemp OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION "Enclosure System temperature in centigrade."
+    ::= { enclosureTableEntry 7 }
+
+--EnclosureDiskList OBJECT-TYPE
+--    SYNTAX  INTEGER
+--    MAX-ACCESS  read-only
+--    STATUS  current
+--    DESCRIPTION   "EnclosureDiskList."
+--    ::= { EnclosureTableEntry 8 }
+
+-- systemFan2Table
+systemFanNumber OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "The number of systemfans (regardless of
+            their current state) present on this system."
+    ::= { systemFan 1 }
+
+systemFan2Table OBJECT-TYPE
+    SYNTAX  SEQUENCE OF SystemFanTableEntryDef
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+            "A list of systemfans.  The number of
+            entries is given by the value of SystemFanNumber."
+    ::= { systemFan 2 }
+systemFan2TableEntry OBJECT-TYPE
+    SYNTAX  SystemFanTableEntryDef
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+            "An system fan entry."
+    INDEX   { systemFanIndex }
+    ::= { systemFan2Table 1 }
+SystemFanTableEntryDef ::=
+    SEQUENCE {
+        systemFanIndex
+            INTEGER,
+        systemFanID
+            INTEGER,
+        systemFanEnclosureID
+            INTEGER,
+        systemFanStatus
+            INTEGER,
+        systemFanSpeed
+            INTEGER
+    }
+
+systemFanIndex OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION "SystemFanIndex."
+    ::= { systemFan2TableEntry 1 }
+
+systemFanID OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION "SystemFanID."
+    ::= { systemFan2TableEntry 2 }
+
+systemFanEnclosureID OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION "SystemFanEnclosureID."
+    ::= { systemFan2TableEntry 3 }
+
+systemFanStatus OBJECT-TYPE
+    SYNTAX  INTEGER{
+                   ok(0),
+                   fail(-1)
+                   }
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION "Systemfan status."
+    ::= { systemFan2TableEntry 4 }
+
+systemFanSpeed OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION "Systemfan speed."
+    ::= { systemFan2TableEntry 5 }
+
+
+-- systemPowerTable
+systemPowerNumber OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "The number of systemfans (regardless of
+            their current state) present on this system."
+    ::= { systemPower 1 }
+
+systemPowerTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF SystemPowerTableEntryDef
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+            "A list of systemfans.  The number of
+            entries is given by the value of SystemPowerNumber."
+    ::= { systemPower 2 }
+systemPowerTableEntry OBJECT-TYPE
+    SYNTAX  SystemPowerTableEntryDef
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+            "An system fan entry."
+    INDEX   { systemPowerIndex }
+    ::= { systemPowerTable 1 }
+SystemPowerTableEntryDef ::=
+    SEQUENCE {
+        systemPowerIndex
+            INTEGER,
+        systemPowerID
+            INTEGER,
+        systemPowerEnclosureID
+            INTEGER,
+        systemPowerStatus
+            INTEGER,
+        systemPowerFanSpeed
+            INTEGER,
+        systemPowerTemp
+            INTEGER
+    }
+
+systemPowerIndex OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION "SystemPowerIndex."
+    ::= { systemPowerTableEntry 1 }
+
+systemPowerID OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION "SystemPowerID."
+    ::= { systemPowerTableEntry 2 }
+
+systemPowerEnclosureID OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION "SystemPowerEnclosureID."
+    ::= { systemPowerTableEntry 3 }
+
+systemPowerStatus OBJECT-TYPE
+    SYNTAX  INTEGER{
+                   ok(0),
+                   fail(-1)
+                   }
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION "Systemfan status."
+    ::= { systemPowerTableEntry 4 }
+
+systemPowerFanSpeed OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION "SystemPower speed."
+    ::= { systemPowerTableEntry 5 }
+
+systemPowerTemp OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION "SystemPower temperature in centigrade."
+    ::= { systemPowerTableEntry 6 }
+
+-- cpuTable
+cpuNumber OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "The number of CPUs (regardless of
+            their current state) present on this system."
+    ::= { cpu 1 }
+
+cpuTemp OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION "CPU temperature in centigrade."
+    ::= { cpu 2 }
+
+cpuTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF CPUTableEntryDef
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+            "A list of CPUs.  The number of
+            entries is given by the value of CPUNumber."
+    ::= { cpu 3 }
+cpuTableEntry OBJECT-TYPE
+    SYNTAX  CPUTableEntryDef
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+            "A CPU entry."
+    INDEX   { cpuIndex }
+    ::= { cpuTable 1 }
+CPUTableEntryDef ::=
+    SEQUENCE {
+        cpuIndex
+            INTEGER,
+        cpuID
+            INTEGER,
+        cpuUsage
+            INTEGER,
+        cpuTemp
+            INTEGER
+
+    }
+
+cpuIndex OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION "CPUIndex."
+    ::= { cpuTableEntry 1 }
+
+cpuID OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION "CPUID."
+    ::= { cpuTableEntry 2 }
+
+cpuUsage OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION "CPUUsage."
+    ::= { cpuTableEntry 3 }
+
+
+-- diskPerformanceTable
+diskPerformanceNumber OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION
+            "The number of Devices (regardless of
+            their current state) for monitor perfrmance present on this system."
+    ::= { diskPerformance 1 }
+
+diskPerformanceTable OBJECT-TYPE
+    SYNTAX  SEQUENCE OF DiskPerformanceTableEntryDef
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+            "A list of interface entries.  The number of
+            entries is given by the value of VolumeNumber."
+    ::= { diskPerformance 2 }
+diskPerformanceTableEntry OBJECT-TYPE
+    SYNTAX  DiskPerformanceTableEntryDef
+    MAX-ACCESS  not-accessible
+    STATUS  current
+    DESCRIPTION
+            "An system fan entry containing objects at the
+            subnetwork layer and below for a particular
+            interface."
+    INDEX   { diskPerformanceIndex }
+    ::= { diskPerformanceTable 1 }
+DiskPerformanceTableEntryDef ::=
+    SEQUENCE {
+        diskPerformanceIndex
+            INTEGER,
+         blvID
+             INTEGER,
+        iops
+            INTEGER,
+        latency
+            INTEGER
+    }
+
+diskPerformanceIndex OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION "DiskPerformanceIndex."
+    ::= { diskPerformanceTableEntry 1 }
+
+blvID OBJECT-TYPE
+     SYNTAX  INTEGER
+     MAX-ACCESS  read-only
+     STATUS  current
+     DESCRIPTION    "BLVID."
+     ::= { diskPerformanceTableEntry 2 }
+
+iops OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION "IOPS."
+    ::= { diskPerformanceTableEntry 3 }
+
+latency OBJECT-TYPE
+    SYNTAX  INTEGER
+    MAX-ACCESS  read-only
+    STATUS  current
+    DESCRIPTION "Latency."
+    ::= { diskPerformanceTableEntry 4 }
+END

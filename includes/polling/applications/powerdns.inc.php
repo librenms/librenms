@@ -9,7 +9,6 @@ use LibreNMS\RRD\RrdDefinition;
 $name = 'powerdns';
 $app_id = $app['app_id'];
 $powerdns = [];
-echo " $name";
 
 // unused metrics:
 // deferred-packetcache-inserts, deferred-packetcache-lookup, dnsupdate-answers, dnsupdate-changes, dnsupdate-queries, dnsupdate-refused, incoming-notifications
@@ -50,15 +49,16 @@ if (isset($agent_data) && isset($agent_data['app'][$name])) {
     } catch (JsonAppParsingFailedException $e) {
         $legacy = $e->getOutput();
     } catch (JsonAppException $e) {
-        echo PHP_EOL . $name . ':' .$e->getCode().':'. $e->getMessage() . PHP_EOL;
-        update_application($app, $e->getCode().':'.$e->getMessage(), []); // Set empty metrics and error message
+        echo PHP_EOL . $name . ':' . $e->getCode() . ':' . $e->getMessage() . PHP_EOL;
+        update_application($app, $e->getCode() . ':' . $e->getMessage(), []); // Set empty metrics and error message
+
         return;
     }
 }
 
 if (isset($legacy)) {
     // Legacy script, build compatible array
-    list(
+    [
         $powerdns['corrupt-packets'],
         $powerdns['deferred-cache-inserts'],
         $powerdns['deferred-cache-lookup'],
@@ -81,7 +81,7 @@ if (isset($legacy)) {
         $powerdns['udp4-queries'],
         $powerdns['udp6-answers'],
         $powerdns['udp6-queries'],
-        ) = explode("\n", $legacy);
+        ] = explode("\n", $legacy);
 }
 
 d_echo($powerdns);

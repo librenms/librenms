@@ -15,29 +15,42 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
+ *
  * @copyright  2019 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
 namespace LibreNMS\Util;
 
+use Carbon\Carbon;
 use LibreNMS\Config;
 
 class Git
 {
-    public static function repoPresent()
+    public static function repoPresent(): bool
     {
         $install_dir = Config::get('install_dir', realpath(__DIR__ . '/../..'));
+
         return file_exists("$install_dir/.git");
     }
 
-    public static function binaryExists()
+    public static function binaryExists(): bool
     {
         exec('git > /dev/null 2>&1', $response, $exit_code);
+
         return $exit_code === 1;
+    }
+
+    public static function localCommit(): string
+    {
+        return rtrim(exec("git show --pretty='%H' -s HEAD"));
+    }
+
+    public static function localDate(): Carbon
+    {
+        return \Date::createFromTimestamp(exec("git show --pretty='%ct' -s HEAD"));
     }
 }

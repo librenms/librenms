@@ -7,7 +7,7 @@
 
 require('./bootstrap');
 
-window.Vue = require('vue');
+window.Vue = require('vue').default;
 import { i18n } from "./plugins/i18n.js"; // translation
 
 /**
@@ -30,11 +30,20 @@ Vue.use(VTooltip);
 import vSelect from 'vue-select'
 Vue.component('v-select', vSelect);
 
-Vue.mixin({
-    methods: {
-        route: route
-    }
-});
+import Multiselect from 'vue-multiselect'
+Vue.component('multiselect', Multiselect)
+
+import VueTabs from 'vue-nav-tabs'
+Vue.use(VueTabs)
+
+import VModal from 'vue-js-modal'
+Vue.use(VModal)
+
+// Vue.mixin({
+//     methods: {
+//         route: route
+//     }
+// });
 
 Vue.filter('ucfirst', function (value) {
     if (!value) return '';

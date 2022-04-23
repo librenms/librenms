@@ -15,10 +15,10 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
+ *
  * @copyright  2019 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -32,7 +32,7 @@ class DuskUnsafeException extends \Exception implements UpgradeableException
     /**
      * Try to convert the given Exception to this exception
      *
-     * @param \Exception $exception
+     * @param  \Exception  $exception
      * @return static
      */
     public static function upgrade($exception)
@@ -45,13 +45,12 @@ class DuskUnsafeException extends \Exception implements UpgradeableException
     /**
      * Render the exception into an HTTP or JSON response.
      *
-     * @param  \Illuminate\Http\Request
      * @return \Illuminate\Http\Response|\Symfony\Component\HttpFoundation\Response
      */
     public function render(\Illuminate\Http\Request $request)
     {
-        $title = __('It is unsafe to run Dusk in production');
-        $message = __('Run ":command" to remove Dusk or if you are a developer set the appropriate APP_ENV', ['command' => './scripts/composer_wrapper.php install --no-dev']);
+        $title = trans('exceptions.dusk_unsafe.title');
+        $message = trans('exceptions.dusk_unsafe.message', ['command' => './scripts/composer_wrapper.php install --no-dev']);
 
         return $request->wantsJson() ? response()->json([
             'status' => 'error',

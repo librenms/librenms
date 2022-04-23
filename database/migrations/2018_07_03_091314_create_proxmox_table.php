@@ -5,7 +5,6 @@ use Illuminate\Database\Schema\Blueprint;
 
 class CreateProxmoxTable extends Migration
 {
-
     /**
      * Run the migrations.
      *
@@ -19,8 +18,8 @@ class CreateProxmoxTable extends Migration
             $table->integer('vmid');
             $table->string('cluster');
             $table->string('description')->nullable();
-            $table->timestamp('last_seen')->default(DB::raw('CURRENT_TIMESTAMP'));
-            $table->unique(['cluster','vmid'], 'cluster_vm');
+            $table->timestamp('last_seen')->useCurrent();
+            $table->unique(['cluster', 'vmid']);
         });
     }
 

@@ -722,5 +722,26 @@
                 }
             ]
         }
+    },
+    "os": {
+        "discovery": {
+            "devices": [
+                {
+                    "sysName": "",
+                    "sysObjectID": ".1.3.6.1.4.1.4329.15.1.1.13",
+                    "sysDescr": "Extreme Networks Wireless Controller - V2110 Medium,  System Version 10.21.04.0005",
+                    "sysContact": null,
+                    "version": null,
+                    "hardware": null,
+                    "features": null,
+                    "os": "ewc",
+                    "type": "wireless",
+                    "serial": null,
+                    "icon": "extreme.svg",
+                    "location": null
+                }
+            ]
+        },
+        "poller": "matches discovery"
     }
 }

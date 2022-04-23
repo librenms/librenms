@@ -13,14 +13,14 @@
 
 use LibreNMS\RRD\RrdDefinition;
 
-if ($device['os_group'] == "cisco") {
+if ($device['os_group'] == 'cisco') {
     // Total
-    $total = snmpwalk_cache_oid_num($device, "1.3.6.1.4.1.9.9.86.1.6.4.1.3", null);
+    $total = snmpwalk_cache_oid_num($device, '1.3.6.1.4.1.9.9.86.1.6.4.1.3', null);
     $total = $total['1.3.6.1.4.1.9.9.86.1.6.4.1.3'][''];
 
     if (isset($total) && $total > 0) {
         // Available
-        $available = snmpwalk_cache_oid_num($device, "1.3.6.1.4.1.9.9.86.1.6.4.1.4", null);
+        $available = snmpwalk_cache_oid_num($device, '1.3.6.1.4.1.9.9.86.1.6.4.1.4', null);
         $available = $available['1.3.6.1.4.1.9.9.86.1.6.4.1.4'][''];
 
         // Active
@@ -30,16 +30,16 @@ if ($device['os_group'] == "cisco") {
             ->addDataset('total', 'GAUGE', 0)
             ->addDataset('active', 'GAUGE', 0);
 
-        $fields = array(
+        $fields = [
             'total'  => $total,
             'active' => $active,
-        );
+        ];
 
         $tags = compact('rrd_def');
         data_update($device, 'cisco-iosmtp', $tags, $fields);
 
-        $graphs['cisco-iosmtp'] = true;
-        echo (" Cisco IOS MTP ");
+        $os->enableGraph('cisco-iosmtp');
+        echo ' Cisco IOS MTP ';
     }
     unset($rrd_def, $total, $active, $available, $fields, $tags);
 }

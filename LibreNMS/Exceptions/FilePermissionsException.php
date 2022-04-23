@@ -15,16 +15,17 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
+ *
  * @copyright  2019 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
 namespace LibreNMS\Exceptions;
 
+use Illuminate\Support\Str;
 use LibreNMS\Config;
 use LibreNMS\Interfaces\Exceptions\UpgradeableException;
 use Symfony\Component\HttpFoundation\Response as SymfonyResponse;
@@ -34,26 +35,26 @@ class FilePermissionsException extends \Exception implements UpgradeableExceptio
     /**
      * Try to convert the given Exception to a FilePermissionsException
      *
-     * @param \Exception $exception
-     * @return static
+     * @param  \Exception  $exception
+     * @return static|null
      */
     public static function upgrade($exception)
     {
         // cannot write to storage directory
         if ($exception instanceof \ErrorException &&
-            starts_with($exception->getMessage(), 'file_put_contents(') &&
-            str_contains($exception->getMessage(), '/storage/')) {
+            Str::startsWith($exception->getMessage(), 'file_put_contents(') &&
+            Str::contains($exception->getMessage(), '/storage/')) {
             return new static();
         }
 
-            // cannot write to bootstrap directory
+        // cannot write to bootstrap directory
         if ($exception instanceof \Exception && $exception->getMessage() == 'The bootstrap/cache directory must be present and writable.') {
-                return new static ();
+            return new static();
         }
 
-            // monolog cannot init log file
-        if ($exception instanceof \UnexpectedValueException && str_contains($exception->getFile(), 'Monolog/Handler/StreamHandler.php')) {
-                return new static();
+        // monolog cannot init log file
+        if ($exception instanceof \UnexpectedValueException && Str::contains($exception->getFile(), 'Monolog/Handler/StreamHandler.php')) {
+            return new static();
         }
 
         return null;
@@ -62,7 +63,6 @@ class FilePermissionsException extends \Exception implements UpgradeableExceptio
     /**
      * Render the exception into an HTTP or JSON response.
      *
-     * @param  \Illuminate\Http\Request
      * @return \Illuminate\Http\Response|\Symfony\Component\HttpFoundation\Response
      */
     public function render(\Illuminate\Http\Request $request)
@@ -75,13 +75,11 @@ class FilePermissionsException extends \Exception implements UpgradeableExceptio
         $content = str_replace('!!!!CONTENT!!!!', '<p>' . implode('</p><p>', $commands) . '</p>', $template);
         $content = str_replace('!!!!LOG_FILE!!!!', $log_file, $content);
 
-        return SymfonyResponse::create($content);
+        return new SymfonyResponse($content);
     }
 
     /**
-     * @param \Illuminate\Config\Repository $user
-     * @param \Illuminate\Config\Repository $group
-     * @param $log_file
+     * @param  string  $log_file
      * @return array
      */
     private function generateCommands($log_file): array
@@ -108,33 +106,33 @@ class FilePermissionsException extends \Exception implements UpgradeableExceptio
         ];
 
         $mk_dirs = array_filter($mkdirs, function ($file) {
-            return !file_exists($file);
+            return ! file_exists($file);
         });
 
-        if (!empty($mk_dirs)) {
+        if (! empty($mk_dirs)) {
             $commands[] = 'sudo mkdir -p ' . implode(' ', $mk_dirs);
         }
 
         // always print chwon/setfacl/chmod commands
-        $commands[] = "sudo chown -R $user:$group $install_dir";
+        $commands[] = "sudo chown -R $user:$group '$install_dir'";
         $commands[] = 'sudo setfacl -d -m g::rwx ' . implode(' ', $dirs);
         $commands[] = 'sudo chmod -R ug=rwX ' . implode(' ', $dirs);
 
         // check if webserver is in the librenms group
         $current_groups = explode(' ', trim(exec('groups')));
-        if (!in_array($group, $current_groups)) {
+        if (! in_array($group, $current_groups)) {
             $current_user = trim(exec('whoami'));
             $commands[] = "usermod -a -G $group $current_user";
         }
 
         // check for invalid log setting
-        if (!is_file($log_file) || !is_writable($log_file)) {
+        if (! is_file($log_file) || ! is_writable($log_file)) {
             // override for proper error output
             $dirs = [$log_file];
             $install_dir = $log_file;
             $commands = [
                 '<h3>Cannot write to log file: &quot;' . $log_file . '&quot;</h3>',
-                'Make sure it exists and is writable, or change your LOG_DIR setting.'
+                'Make sure it exists and is writable, or change your LOG_DIR setting.',
             ];
         }
 
@@ -144,6 +142,7 @@ class FilePermissionsException extends \Exception implements UpgradeableExceptio
             $commands[] = "semanage fcontext -a -t httpd_sys_rw_content_t '$dir(/.*)?'";
         }
         $commands[] = "restorecon -RFv $install_dir";
+
         return $commands;
     }
 }

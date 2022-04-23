@@ -117,7 +117,7 @@ foreach ($temperatures as $temperature) {
     $current = (snmp_get($device, $temperature['mib'], '-OqvU') / $temperature['precision']);
 
     $high_limit = null;
-    $low_limit  = null;
+    $low_limit = null;
 
     if (is_numeric($current) && $current != 0) {
         $index = implode('.', array_slice(explode('.', $temperature['oid']), -5));

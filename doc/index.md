@@ -1,32 +1,30 @@
-path: blob/master/doc/
 <div class="home-container">
     <div class="home-box">
         <div class="home-header">
           <a href="/Installation/">
-            <i class="fa fa-download fa-1x"></i>
-            <span> Installing</span>
+            <i class="fas fa-download"></i>
+            <span>Installing</span>
           </a>
         </div>
-        <a href="/Installation/">Installing LibreNMS</a><br />
-        <a href="/Installation/Installation-Ubuntu-1804-Nginx/">Ubuntu 18.04 + Nginx</a><br />
-        <a href="/Installation/Installation-CentOS-7-Nginx/">CentOS 7 + Nginx</a><br />
-        <a href="/Installation/Installing-LibreNMS/"><strong>More...</strong></a>
+        <a href="/Installation/Install-LibreNMS/">Install LibreNMS Now</a><br />
+        <a href="/Installation/Docker/">Install Using Docker</a><br />
+        <a href="/Installation/Images/">Virtual machines</a>
     </div>
     <div class="home-box">
         <div class="home-header">
-            <i class="fa fa-plug fa-1x"></i>
-            <span> Setup</span>
+            <i class="fas fa-plug"></i>
+            <span>Setup</span>
         </div>
+        <a href="/Extensions/Applications/">Applications</a><br />
         <a href="/Extensions/Auto-Discovery/">Auto Discovery</a><br />
         <a href="/Extensions/Oxidized/">Oxidized</a><br />
         <a href="/Extensions/RRDCached/">RRDCached</a><br />
-        <strong>More...</strong>
     </div>
     <div class="home-box">
         <div class="home-header">
           <a href="/Alerting/">
-            <i class="fa fa-bell fa-1x"></i>
-            <span> Alerting</span>
+            <i class="fas fa-bell"></i>
+            <span>Alerting</span>
           </a>
         </div>
         <a href="/Alerting/Rules/#rules">Rules</a><br />
@@ -37,8 +35,8 @@ path: blob/master/doc/
     <div class="home-box">
         <div class="home-header">
           <a href="/API/">
-            <i class="fa fa-connectdevelop fa-1x"></i>
-            <span> API</span>
+            <i class="fas fa-connectdevelop"></i>
+            <span>API</span>
           </a>
         </div>
         <a href="/API/">Using the API</a><br />
@@ -49,8 +47,8 @@ path: blob/master/doc/
     <div class="home-box">
         <div class="home-header">
           <a href="/Support/">
-            <i class="fa fa-ambulance fa-1x"></i>
-            <span> Support</span>
+            <i class="fas fa-ambulance"></i>
+            <span>Support</span>
           </a>
         </div>
         <a href="/Support/FAQ/">FAQ</a><br />
@@ -61,13 +59,11 @@ path: blob/master/doc/
     <div class="home-box">
         <div class="home-header">
           <a href="/Developing/">
-            <i class="fa fa-code-fork fa-1x"></i>
-            <span> Developing</span>
+            <i class="fas fa-code-branch"></i>
+            <span>Developing</span>
           </a>
         </div>
-        <a href="/Developing/Code-Guidelines/">Code Guidelines</a><br />
-        <a href="/Developing/Validating-Code/">Validating Code</a><br />
-        <a href="/Developing/Using-Git/">Using Git</a><br />
-        <a href="/Developing/"><strong>More...</strong></a>
+        <a href="/Developing/Getting-Started/">Getting Started</a><br />
+        <a href="/Developing/Support-New-OS/">Support for a new OS</a><br />
     </div>
 </div>

@@ -109,7 +109,12 @@ SlOTNConfigEntry ::=
         slOTNConfigODUkDAPIToExpect		OTNTraceMessage,    
         slOTNConfigODUkSAPIToExpect		OTNTraceMessage,    
         slOTNConfigODUkDAPIReceived		OTNTraceMessage,    
-        slOTNConfigODUkSAPIReceived		OTNTraceMessage     
+        slOTNConfigODUkSAPIReceived		OTNTraceMessage,
+        -- TTI Mismatch kill traffic enable/disable     
+        slOTNConfigOTUkTIMKillEnabled	TruthValue,    		
+        slOTNConfigODUkTIMKillEnabled	TruthValue,   
+        -- GCC Selection     
+        slOTNConfigInbandGCC			INTEGER    		
 	}
 
 slOTNConfigLineIndex OBJECT-TYPE
@@ -141,7 +146,8 @@ slOTNConfigFECEnabled OBJECT-TYPE
 		1 - G.709 FEC 
 		2 - disable
 		3 - I.4
-		4 - I.7"
+		4 - I.7
+		5 - HG-FEC"
     ::= { slOTNConfigEntry 3 }
 
 slOTNConfigStuffingEnabled OBJECT-TYPE
@@ -270,6 +276,31 @@ slOTNConfigODUkSAPIReceived OBJECT-TYPE
     	"The received Source Access Point Identifier."
     ::= { slOTNConfigEntry 18 }
 
+slOTNConfigOTUkTIMKillEnabled                OBJECT-TYPE
+	SYNTAX          TruthValue
+	MAX-ACCESS  	read-write
+	STATUS          current
+	DESCRIPTION
+		"TIM Mismatch kill traffic Enabled."
+	::= { slOTNConfigEntry 19 }
+
+slOTNConfigODUkTIMKillEnabled                OBJECT-TYPE
+	SYNTAX          TruthValue
+	MAX-ACCESS  	read-write
+	STATUS          current
+	DESCRIPTION
+		"TIM Mismatch kill traffic Enabled."
+	::= { slOTNConfigEntry 20 }
+
+slOTNConfigInbandGCC                OBJECT-TYPE
+	SYNTAX          INTEGER
+	MAX-ACCESS  	read-write
+	STATUS          current
+	DESCRIPTION
+		"GCC selection:
+		 0 - GCC0
+		 1 - GCC1"
+	::= { slOTNConfigEntry 21 }
 
 
 --

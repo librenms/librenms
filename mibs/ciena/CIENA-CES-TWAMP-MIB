@@ -1,0 +1,279 @@
+-- This file was included in Ciena MIB release MIBS-CIENA-CES-08-07-00-024
+ --
+ -- CIENA-CES-TWAMP-MIB.my
+ --
+ --
+
+ CIENA-CES-TWAMP-MIB DEFINITIONS ::= BEGIN
+
+ IMPORTS 		
+     Integer32, Unsigned32, IpAddress, OBJECT-TYPE, MODULE-IDENTITY			
+	    FROM SNMPv2-SMI
+     DisplayString
+        FROM SNMPv2-TC
+     cienaCesConfig
+	    FROM CIENA-SMI;	
+
+ cienaCesTwampMIB MODULE-IDENTITY
+	    LAST-UPDATED "201706070000Z"
+	    ORGANIZATION "Ciena Corp."
+	    CONTACT-INFO
+	    "   Mib Meister
+	        7035 Ridge Road
+	        Hanover, Maryland 21076
+	        USA
+	        Phone:  +1 800 921 1144
+	        Email:  support@ciena.com"   
+	    DESCRIPTION
+		    "The MIB module for the Ciena specifc TWAMP MIB."
+
+	    REVISION  "201706070000Z"
+	    DESCRIPTION
+		    "Updated contact info."
+
+	    REVISION  "201311180000Z"
+	    DESCRIPTION
+		    "Initial creation."
+	    ::= { cienaCesConfig 33 }
+
+ 
+ --
+ -- Node definitions
+ --
+	
+ cienaCesTwampMIBObjects OBJECT IDENTIFIER ::= { cienaCesTwampMIB 1 }
+ 
+ cienaCesTwamp OBJECT IDENTIFIER ::= { cienaCesTwampMIBObjects 1 }
+ 
+  -- the Twamp Module 
+
+ cienaCesTwampModule OBJECT IDENTIFIER ::= { cienaCesTwamp 1 } 
+
+  cienaCesTwampPort OBJECT-TYPE
+     SYNTAX             INTEGER (256..65535)
+     MAX-ACCESS         read-only
+     STATUS             current
+     DESCRIPTION
+                "TCP/UDP port for TWAMP messaging."
+     ::= { cienaCesTwampModule 1 }   
+     
+  cienaCesTwampEnable OBJECT-TYPE
+     SYNTAX             INTEGER {
+                            disable(0),
+                            enable(1)
+                        }
+     MAX-ACCESS         read-only
+     STATUS             current
+     DESCRIPTION
+                "System level TWAMP enable/disable."
+     ::= { cienaCesTwampModule 2 }   
+
+ --
+ -- TWAMP Port enable/disable
+ --
+  cienaCesTwampServerEnable OBJECT-TYPE
+     SYNTAX             INTEGER {
+                            disable(0),
+                            enable(1)
+                        }
+     MAX-ACCESS         read-only
+     STATUS             current
+     DESCRIPTION
+                "TWAMP Server enable/disable."
+     ::= { cienaCesTwampModule 3 }   
+
+
+ --
+ -- TWAMP Server Test Sessions Status
+ --
+
+ cienaCesTwampServerSessionsTable OBJECT-TYPE
+     SYNTAX       SEQUENCE OF CienaCesTwampServerSessionEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+             "Table of Ethernet Ports Traps."
+     ::= { cienaCesTwampModule 4 }
+                
+ cienaCesTwampServerSessionEntry OBJECT-TYPE
+     SYNTAX       CienaCesTwampServerSessionEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+             "TWAMP Server Session characteristics."
+     INDEX { cienaCesTwampServerSessionId }
+     ::= { cienaCesTwampServerSessionsTable 1 } 
+
+ CienaCesTwampServerSessionEntry ::= SEQUENCE { 
+     cienaCesTwampServerSessionId        INTEGER,
+     cienaCesTwampServerSessionState     INTEGER,     
+     cienaCesTwampServerSessionPort      INTEGER,     
+     cienaCesTwampServerSessionHost      IpAddress,     
+     cienaCesTwampServerSessionNumPkts   Integer32,     
+     cienaCesTwampServerSessionSeqNum    Integer32,
+     cienaCesTwampServerSessionHwAssist  INTEGER     
+  } 
+
+ cienaCesTwampServerSessionId     OBJECT-TYPE
+     SYNTAX             INTEGER (1..30)
+     MAX-ACCESS         read-only
+     STATUS             current
+     DESCRIPTION
+                "Session index for TWAMP Server records."
+     ::= { cienaCesTwampServerSessionEntry 1 }   
+     
+ cienaCesTwampServerSessionState   OBJECT-TYPE
+     SYNTAX         INTEGER {
+                        listen(0),
+                        greet(1),
+                        start(2),
+                        accept(3),
+                        test(4),
+                        stop(5),
+                        error(6)
+                    }
+     MAX-ACCESS     read-only
+     STATUS         current
+     DESCRIPTION
+             "The current state of the Server Session."
+     ::= { cienaCesTwampServerSessionEntry 2 }
+     
+ cienaCesTwampServerSessionPort     OBJECT-TYPE
+     SYNTAX             INTEGER (0..65535)
+     MAX-ACCESS         read-only
+     STATUS             current
+     DESCRIPTION
+                "Host source/reply port for TWAMP Server records."
+     ::= { cienaCesTwampServerSessionEntry 3 }   
+     
+ cienaCesTwampServerSessionHost     OBJECT-TYPE
+     SYNTAX             IpAddress
+     MAX-ACCESS         read-only
+     STATUS             current
+     DESCRIPTION
+                "Host IP address for TWAMP Server records."
+     ::= { cienaCesTwampServerSessionEntry 4 }   
+     
+ cienaCesTwampServerSessionNumPkts     OBJECT-TYPE
+     SYNTAX             Integer32 
+     MAX-ACCESS         read-only
+     STATUS             current
+     DESCRIPTION
+                "Number of packets defined for TWAMP Server records."
+     ::= { cienaCesTwampServerSessionEntry 5 }   
+     
+ cienaCesTwampServerSessionSeqNum     OBJECT-TYPE
+     SYNTAX             Integer32 
+     MAX-ACCESS         read-only
+     STATUS             current
+     DESCRIPTION
+                "Current sequence number for TWAMP Server records."
+     ::= { cienaCesTwampServerSessionEntry 6 }   
+ 
+     
+ --
+ -- TWAMP TCP Session Timeout
+ --
+
+  cienaCesTwampTimeout OBJECT-TYPE
+     SYNTAX             INTEGER (1..86400)
+     MAX-ACCESS         read-only
+     STATUS             current
+     DESCRIPTION
+                "TCP session timeout (max lifetime) for TWAMP messaging."
+     ::= { cienaCesTwampModule 5 }   
+     
+    
+ --
+ --  Added TWAMP Fields
+ --
+
+ cienaCesTwampServerDscp     OBJECT-TYPE
+     SYNTAX             INTEGER(0..63) 
+     MAX-ACCESS         read-only
+     STATUS             current
+     DESCRIPTION
+                "DSCP value to use for TWAMP Server TCP test messages."
+     ::= { cienaCesTwampModule 6 }   
+
+
+ --
+ -- TWAMP Server Control Sessions Status
+ --
+
+ cienaCesTwampServerCtrlSessionsTable OBJECT-TYPE
+     SYNTAX       SEQUENCE OF CienaCesTwampServerCtrlSessionEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+             "Table of TWAMP Control Session Records."
+     ::= { cienaCesTwampModule 7 }
+                
+ cienaCesTwampServerCtrlSessionEntry OBJECT-TYPE
+     SYNTAX       CienaCesTwampServerCtrlSessionEntry
+     MAX-ACCESS   not-accessible
+     STATUS       current
+     DESCRIPTION
+             "TWAMP Server Control Session characteristics."
+     INDEX { cienaCesTwampServerCtrlSessionId }
+     ::= { cienaCesTwampServerCtrlSessionsTable 1 } 
+
+ CienaCesTwampServerCtrlSessionEntry ::= SEQUENCE { 
+     cienaCesTwampServerCtrlSessionId        INTEGER,
+     cienaCesTwampServerCtrlSessionState     INTEGER,     
+     cienaCesTwampServerCtrlSessionPort      INTEGER,     
+     cienaCesTwampServerCtrlSessionHost      IpAddress,
+     cienaCesTwampServerCtrlSessionTestMap   Unsigned32  
+  } 
+
+ cienaCesTwampServerCtrlSessionId     OBJECT-TYPE
+     SYNTAX             INTEGER (1..30)
+     MAX-ACCESS         read-only
+     STATUS             current
+     DESCRIPTION
+                "Session index for TWAMP Server Control Session records."
+     ::= { cienaCesTwampServerCtrlSessionEntry 1 }   
+     
+ cienaCesTwampServerCtrlSessionState   OBJECT-TYPE
+     SYNTAX         INTEGER {
+                        listen(0),
+                        greet(1),
+                        start(2),
+                        accept(3),
+                        test(4),
+                        stop(5),
+                        error(6)
+                    }
+     MAX-ACCESS     read-only
+     STATUS         current
+     DESCRIPTION
+             "The current state of the Server Control Session."
+     ::= { cienaCesTwampServerCtrlSessionEntry 2 }
+     
+ cienaCesTwampServerCtrlSessionPort     OBJECT-TYPE
+     SYNTAX             INTEGER (0..65535)
+     MAX-ACCESS         read-only
+     STATUS             current
+     DESCRIPTION
+                "Host port for TWAMP Server Control session records."
+     ::= { cienaCesTwampServerCtrlSessionEntry 3 }   
+     
+ cienaCesTwampServerCtrlSessionHost     OBJECT-TYPE
+     SYNTAX             IpAddress
+     MAX-ACCESS         read-only
+     STATUS             current
+     DESCRIPTION
+                "Host IP address for TWAMP Server Control session records."
+     ::= { cienaCesTwampServerCtrlSessionEntry 4 }   
+     
+ cienaCesTwampServerCtrlSessionTestMap     OBJECT-TYPE
+     SYNTAX             Unsigned32
+     MAX-ACCESS         read-only
+     STATUS             current
+     DESCRIPTION
+                "Bitmap of TWAMP Test sessions associated with Control session."
+     ::= { cienaCesTwampServerCtrlSessionEntry 5 }   
+
+
+ END
+  

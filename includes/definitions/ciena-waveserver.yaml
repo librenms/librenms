@@ -1,11 +1,12 @@
 os: ciena-waveserver
 text: 'Ciena Waveserver'
 icon: ciena
+ifname: true
 over:
     - { graph: device_bits, text: Traffic }
 type: network
-mib_dir:
-    - ciena
+mib_dir: ciena
 discovery:
-    - sysObjectID:
-        - .1.3.6.1.4.1.1271.3
+    -
+        sysObjectID:
+            - .1.3.6.1.4.1.1271.3

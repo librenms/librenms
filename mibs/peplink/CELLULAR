@@ -1,0 +1,269 @@
+-- ********************************************************************
+        CELLULAR DEFINITIONS ::= BEGIN
+
+                IMPORTS
+                        OBJECT-GROUP
+                                FROM SNMPv2-CONF
+                        enterprises, Integer32, IpAddress,Unsigned32, Counter64, OBJECT-TYPE, MODULE-IDENTITY
+                                FROM SNMPv2-SMI
+                        DisplayString, RowStatus, TruthValue, MacAddress
+                                FROM SNMPv2-TC;
+
+--
+-- Node definitions
+--
+-- ********************************************************************
+-- *  MODULE IDENTITY
+-- ********************************************************************
+-- The Enterprises Number
+        peplink OBJECT IDENTIFIER ::= { enterprises 23695 }
+
+        productMib  OBJECT IDENTIFIER ::= { peplink 200 }
+
+        generalMib OBJECT IDENTIFIER ::= { productMib 1 }
+
+        cellularMib MODULE-IDENTITY
+                    LAST-UPDATED "201805071200Z"        -- 05 07, 2018 at 12:00 GMT
+                    ORGANIZATION "PEPLINK"
+                    CONTACT-INFO ""
+                    DESCRIPTION
+                        "MIB module for CELLULAR."
+            ::= { generalMib 12 }
+
+-- #####################################################################
+--
+-- **********************************************************************
+-- *  MIB attribute OBJECT-TYPE definitions follow
+-- **********************************************************************
+        cellularSignalInfo OBJECT IDENTIFIER ::= { cellularMib 1 }
+
+-- **********************************************************************
+-- *  Table
+-- **********************************************************************
+        cellularSignalInfoTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF CellularSignalInfoEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Cellular signal info table"
+            ::= { cellularSignalInfo 1 }
+
+            cellularSignalInfoEntry OBJECT-TYPE
+            SYNTAX CellularSignalInfoEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "An entry in the cellularSignalInfoTable"
+            INDEX { cellularSignalInfoId }
+            ::= { cellularSignalInfoTable 1 }
+
+            CellularSignalInfoEntry ::=
+            SEQUENCE {
+                cellularSignalInfoId
+                    Integer32,
+                cellularSignalInfoWanId
+                    Integer32,
+                cellularSignalRssi
+                    Integer32,
+                cellularSignalSnr
+                    Integer32,
+                cellularSignalSinr
+                    Integer32,
+                cellularSignalEcio
+                    Integer32,
+                cellularSignalRsrp
+                    Integer32,
+                cellularSignalRsrq
+                    Integer32,
+                cellularNetworkType
+                    OCTET STRING,
+                cellularBand
+                    OCTET STRING,
+                cellularLac
+                    Integer32,
+                cellularTac
+                    Integer32,
+		cellularENodeBId
+                    Integer32
+            }
+
+            cellularSignalInfoId OBJECT-TYPE
+                SYNTAX Integer32
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                    "Cellular signal info ID."
+                ::= { cellularSignalInfoEntry 1 }
+
+            cellularSignalInfoWanId OBJECT-TYPE
+                SYNTAX Integer32
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                    "Cellular signal info WAN ID."
+                ::= { cellularSignalInfoEntry 2 }
+
+            cellularSignalRssi OBJECT-TYPE
+                SYNTAX Integer32
+                UNITS "dBm"
+                    MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                    "Cellular RSSI (units: dBm).
+                    Remark:
+                    If the value equals -9999, means signal strength
+                    not applicable in this cellular."
+                ::= { cellularSignalInfoEntry 3 }
+
+            cellularSignalSnr OBJECT-TYPE
+                SYNTAX Integer32
+                UNITS "dB"
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                    "Cellular SNR (units: dB).
+                    Remark:
+                    If the value equals -9999, means signal strength
+                    not applicable in this cellular."
+                ::= { cellularSignalInfoEntry 4 }
+
+            cellularSignalSinr OBJECT-TYPE
+                SYNTAX Integer32
+                UNITS "dB"
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                    "Cellular SINR (units: dB).
+                    Remark:
+                    If the value equals -9999, means signal strength
+                    not applicable in this cellular."
+                ::= { cellularSignalInfoEntry 5 }
+
+            cellularSignalEcio OBJECT-TYPE
+                SYNTAX Integer32
+                UNITS "dB"
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                    "Cellular Ec/Io (units: dB).
+                    Remark:
+                    If the value equals -9999, means signal strength
+                    not applicable in this cellular."
+                ::= { cellularSignalInfoEntry 6 }
+
+            cellularSignalRsrp OBJECT-TYPE
+                SYNTAX Integer32
+                UNITS "dBm"
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                    "Cellular RSRP (units: dBm).
+                    Remark:
+                    If the value equals -9999, means signal strength
+                    not applicable in this cellular."
+                ::= { cellularSignalInfoEntry 7 }
+
+            cellularSignalRsrq OBJECT-TYPE
+                SYNTAX Integer32
+                UNITS "dB"
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                    "Cellular RSRQ (units: dB).
+                    Remark:
+                    If the value equals -9999, means signal strength
+                    not applicable in this cellular."
+                ::= { cellularSignalInfoEntry 8 }
+
+            cellularNetworkType OBJECT-TYPE
+                SYNTAX OCTET STRING
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                    "Cellular Network Type."
+                ::= { cellularSignalInfoEntry 9 }
+
+            cellularBand OBJECT-TYPE
+                SYNTAX OCTET STRING
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                    "Cellular Band."
+                ::= { cellularSignalInfoEntry 10 }
+
+            cellularLac OBJECT-TYPE
+                SYNTAX Integer32
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                    "Cellular Location Area Code(LAC).
+                    Remark:
+                    If the value equals -1, means LAC not applicable in this cellular."
+                ::= { cellularSignalInfoEntry 11 }
+
+            cellularTac OBJECT-TYPE
+                SYNTAX Integer32
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                    "Cellular Tracking Area Code(TAC).
+                    Remark:
+                    If the value equals -1, means TAC not applicable in this cellular."
+                ::= { cellularSignalInfoEntry 12 }
+
+            cellularENodeBId OBJECT-TYPE
+                SYNTAX Integer32
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                    "Cellular eNodeB ID.
+                    Remark:
+                    If the value equals -1, means eNodeB ID not applicable in this cellular."
+                ::= { cellularSignalInfoEntry 13 }
+
+        cellularIdentityInfo OBJECT IDENTIFIER ::= { cellularMib 2 }
+
+-- **********************************************************************
+-- *  Table
+-- **********************************************************************
+	cellularIdentityInfoTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF CellularIdentityInfoEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "Cellular identity info table"
+            ::= { cellularIdentityInfo 1 }
+
+            cellularIdentityInfoEntry OBJECT-TYPE
+            SYNTAX CellularIdentityInfoEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "An entry in the cellularIdentityInfoTable"
+            INDEX { cellularIdentityInfoId }
+            ::= { cellularIdentityInfoTable 1 }
+
+            CellularIdentityInfoEntry ::=
+            SEQUENCE {
+		cellularIdentityInfoId
+			Integer32,
+           	cellularIdentityInfoImei
+                	OCTET STRING
+            }
+
+            cellularIdentityInfoId OBJECT-TYPE
+                SYNTAX Integer32
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                    "Cellular identity ID."
+                ::= { cellularIdentityInfoEntry 1 }
+
+            cellularIdentityInfoImei OBJECT-TYPE
+                SYNTAX OCTET STRING
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                    "Cellular IMEI."
+                ::= { cellularIdentityInfoEntry 2 }
+END

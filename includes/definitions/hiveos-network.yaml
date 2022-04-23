@@ -2,8 +2,7 @@ os: hiveos-network
 text: 'Aerohive HiveOS'
 type: network
 icon: aerohive
-mib_dir:
-    - aerohive
+mib_dir: aerohive
 over:
     - { graph: device_bits, text: Traffic }
 discovery:

@@ -31,7 +31,7 @@ $data = get_dev_attrib($device, $port_id_notes);
             echo '
             <button type="submit" name="btn-update-notes" id="btn-update-notes" class="btn btn-primary">Submit</button>
             ';
-?>
+            ?>
         </div>
     </div>
 </form>

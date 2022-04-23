@@ -2,7 +2,6 @@
 
 namespace App\Http\Middleware;
 
-use Auth;
 use Closure;
 use LibreNMS\Config;
 
@@ -35,21 +34,21 @@ class LoadUserPreferences
      * Fetch preferences from the database
      * Load all preferences at once if we need to query the database
      *
-     * @param \Illuminate\Http\Request $request
-     * @param array $preferences
+     * @param  \Illuminate\Http\Request  $request
+     * @param  array  $preferences
      */
     private function loadPreferences($request, $preferences)
     {
-        if (!$request->session()->has('preferences') && !is_null($request->user())) {
+        if (! $request->session()->has('preferences') && ! is_null($request->user())) {
             $loaded = $request->user()->preferences()->whereIn('pref', $preferences)->pluck('value', 'pref');
             $request->session()->put('preferences', $loaded);
         }
     }
 
     /**
-     * @param \Illuminate\Http\Request $request
-     * @param string $pref
-     * @param callable $callable
+     * @param  \Illuminate\Http\Request  $request
+     * @param  string  $pref
+     * @param  callable  $callable
      */
     private function setPreference($request, $pref, $callable)
     {

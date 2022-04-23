@@ -1,0 +1,37 @@
+mib: SPSv1-MIB
+modules:
+    sensors:
+        power:
+            data:
+                -
+                    oid: pduPwrMonitoringInletStatusTable
+                    value: inletPowerPhase1
+                    num_oid: '.1.3.6.1.4.1.42610.1.4.4.1.6.1.2.1.15.{{ $index }}'
+                    descr: 'Inlet Power S{{ $index }}'
+                    divisor: 10
+                    group: 'Inlets'
+        current:
+            data:
+                -
+                    oid: pduPwrMonitoringInletStatusTable
+                    value: inletCurrPhase1
+                    num_oid: '.1.3.6.1.4.1.42610.1.4.4.1.6.1.2.1.6.{{ $index }}'
+                    descr: 'Inlet Current S{{ $index }}'
+                    divisor: 100
+                    group: 'Inlets'
+        power_consumed:
+            data:
+                -
+                    oid: pduPwrMonitoringInletStatusTable
+                    value: inletEnergy
+                    num_oid: '.1.3.6.1.4.1.42610.1.4.4.1.6.1.2.1.4.{{ $index }}'
+                    descr: 'Inlet Total Energy  S{{ $index }}'
+                    group: 'Inlets'
+        voltage:
+            data:
+                -
+                    oid: pduPwrMonitoringInletStatusTable
+                    value: inletVoltPhase1
+                    num_oid: '.1.3.6.1.4.1.42610.1.4.4.1.6.1.2.1.9.{{ $index }}'
+                    descr: 'Inlet Voltage  S{{ $index }}'
+                    group: 'Inlets'

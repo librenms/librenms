@@ -8156,7 +8156,7 @@ tmnxDhcpSvrNotifLinkAddr         OBJECT-TYPE
     ::= { tmnxDhcpServerNotificationObjs 17 }
 
 tmnxDhcpSvrNotifPrimaryPool      OBJECT-TYPE
-    SYNTAX      TNamedItem
+    SYNTAX      TNamedItemOrEmpty
     MAX-ACCESS  accessible-for-notify
     STATUS      current
     DESCRIPTION
@@ -8165,7 +8165,7 @@ tmnxDhcpSvrNotifPrimaryPool      OBJECT-TYPE
     ::= { tmnxDhcpServerNotificationObjs 18 }
 
 tmnxDhcpSvrNotifSecondaryPool    OBJECT-TYPE
-    SYNTAX      TNamedItem
+    SYNTAX      TNamedItemOrEmpty
     MAX-ACCESS  accessible-for-notify
     STATUS      current
     DESCRIPTION
@@ -8242,6 +8242,26 @@ tmnxDhcpSvrNotifUnbindTime       OBJECT-TYPE
         "The value of the object tmnxDhcpSvrNotifUnbindTime indicates the time
          left before this binding expires."
     ::= { tmnxDhcpServerNotificationObjs 27 }
+
+tmnxDhcpSvrNotifGwIpAddrType     OBJECT-TYPE
+    SYNTAX      InetAddressType
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The value of the object tmnxDhcpSvrNotifGwIpAddrType specifies the
+         address type of tmnxDhcpSvrNotifGatewayIpAddr.
+
+         The only value supported is 'ipv4'."
+    ::= { tmnxDhcpServerNotificationObjs 28 }
+
+tmnxDhcpSvrNotifGatewayIpAddr    OBJECT-TYPE
+    SYNTAX      InetAddress (SIZE (0|4))
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION
+        "The value of tmnxDhcpSvrNotifGatewayIpAddr indicates the gateway
+         address from the RELAY-FORWARD message."
+    ::= { tmnxDhcpServerNotificationObjs 29 }
 
 tmnxDhcpServerConformance        OBJECT IDENTIFIER ::= { tmnxSRConfs 47 }
 
@@ -9646,6 +9666,17 @@ tmnxDhcpServerV16v0Group         OBJECT-GROUP
          series systems added in release 16.0."
     ::= { tmnxDhcpServerGroups 32 }
 
+tmnxDhcpsNotifyObjsV20v0Group    OBJECT-GROUP
+    OBJECTS     {
+        tmnxDhcpSvrNotifGwIpAddrType,
+        tmnxDhcpSvrNotifGatewayIpAddr
+    }
+    STATUS      current
+    DESCRIPTION
+        "The group of objects supporting DHCP server notifications added in
+         Nokia SROS release 20.0."
+    ::= { tmnxDhcpServerGroups 33 }
+
 tmnxDhcpsObsoletedNotifyGroup    NOTIFICATION-GROUP
     NOTIFICATIONS {
         tmnxDhcpSvrSubnetBindingCreate,
@@ -10387,7 +10418,11 @@ tmnxDhcpsAddrAllocationFailure   NOTIFICATION-TYPE
         tmnxDhcpSvrNotifVRtrID,
         tmnxDhcpSvrNotifServerName,
         tmnxDhcpSvrNotifMsgHwAddress,
-        tmnxDhcpSvrNotifString
+        tmnxDhcpSvrNotifString,
+        tmnxDhcpSvrNotifGwIpAddrType,
+        tmnxDhcpSvrNotifGatewayIpAddr,
+        tmnxDhcpSvrNotifPrimaryPool,
+        tmnxDhcpSvrNotifSecondaryPool
     }
     STATUS      current
     DESCRIPTION

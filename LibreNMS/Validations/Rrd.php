@@ -15,10 +15,10 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <http://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <https://www.gnu.org/licenses/>.
  *
- * @package    LibreNMS
- * @link       http://librenms.org
+ * @link       https://www.librenms.org
+ *
  * @copyright  2017 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
@@ -26,6 +26,7 @@
 namespace LibreNMS\Validations;
 
 use LibreNMS\Config;
+use LibreNMS\Util\Version;
 use LibreNMS\Validator;
 
 class Rrd extends BaseValidation
@@ -34,23 +35,23 @@ class Rrd extends BaseValidation
      * Validate this module.
      * To return ValidationResults, call ok, warn, fail, or result methods on the $validator
      *
-     * @param Validator $validator
+     * @param  Validator  $validator
      */
     public function validate(Validator $validator)
     {
-        $versions = $validator->getVersions();
-
         // Check that rrdtool config version is what we see
-        if (Config::has('rrdtool_version')
-            && version_compare(Config::get('rrdtool_version'), $versions['rrdtool_ver'], '>')
-        ) {
-            $validator->fail(
-                'The rrdtool version you have specified is newer than what is installed.',
-                "Either comment out \$config['rrdtool_version'] = '" .
-                Config::get('rrdtool_version') . "'; or set \$config['rrdtool_version'] = '{$versions['rrdtool_ver']}';"
-            );
+        if (Config::has('rrdtool_version')) {
+            $rrd_version = Version::get()->rrdtool();
+            if (version_compare(Config::get('rrdtool_version'), '1.5.5', '<')
+                && version_compare(Config::get('rrdtool_version'), $rrd_version, '>')
+            ) {
+                $validator->fail(
+                    'The rrdtool version you have specified is newer than what is installed.',
+                    "Either comment out \$config['rrdtool_version'] = '" .
+                    Config::get('rrdtool_version') . "'; or set \$config['rrdtool_version'] = '{$rrd_version}';"
+                );
+            }
         }
-
 
         if (Config::get('rrdcached')) {
             self::checkRrdcached($validator);
@@ -70,14 +71,14 @@ class Rrd extends BaseValidation
 
     public static function checkRrdcached(Validator $validator)
     {
-        list($host,$port) = explode(':', Config::get('rrdcached'));
+        [$host,$port] = explode(':', Config::get('rrdcached'));
         if ($host == 'unix') {
             // Using socket, check that file exists
-            if (!file_exists($port)) {
+            if (! file_exists($port)) {
                 $validator->fail("$port doesn't appear to exist, rrdcached test failed");
             }
         } else {
-            $connection = @fsockopen($host, $port);
+            $connection = @fsockopen($host, (int) $port);
             if (is_resource($connection)) {
                 fclose($connection);
             } else {
