@@ -55,7 +55,7 @@
     <div class="form-group row" x-show="hasHostname">
         <label for='service_ip' class='col-sm-4 control-label'>Remote Host </label>
         <div class="col-sm-8">
-            <input type='text' id='service_ip' name='service_ip' class='form-control has-feedback' placeholder='<This Device>' x-model="service_ip" x-bind:class="{'!tw-border-red-500': errors.device_id}"/>
+            <input type='text' id='service_ip' name='service_ip' class='form-control has-feedback' placeholder='<This Device>' x-model="service_ip" x-bind:class="{'!tw-border-red-500': errors.service_ip}"/>
         </div>
         <div class='col-sm-8 col-sm-offset-4 tw-text-red-500'>
             <template x-for="error in errors.service_ip">
@@ -67,7 +67,7 @@
         <label for="service_param" class="col-sm-4 control-label">Parameters </label>
         <div class="col-sm-8">
             <div class="tw-flex">
-                <select id="parameters" class="form-control has-feedback tw-flex-initial" x-model="currentParam" x-ref="param" x-bind:disabled="! currentParam" x-bind:class="{'!tw-border-red-500': errors.service_param}">
+                <select id="parameters" class="form-control has-feedback tw-flex-initial" x-model="currentParam" x-ref="param" x-bind:disabled="! currentParam" x-bind:class="{'!tw-border-red-500': Object.keys(errors).findIndex(e => e.includes('service_param')) >= 0}">
                     <template x-for="param in unusedParams()">
                         <option x-bind:value="param.param || param.short" x-text="(param.param || param.short) + (param.required ? ' *' : '') + (param.group ? ' []' : '')"></option>
                     </template>
@@ -92,7 +92,7 @@
             </template>
         </div>
         <div class='col-sm-8 col-sm-offset-4 tw-text-red-500'>
-            <template x-for="error in errors.service_param">
+            <template x-for="error in Object.entries(errors).reduce((carry, [key, message]) => key.includes('service_param') ? carry.concat(String(message).replace('service param.', '')) : carry, [])">
                 <div x-text="error"></div>
             </template>
         </div>

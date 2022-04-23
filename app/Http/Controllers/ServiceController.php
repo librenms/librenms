@@ -47,12 +47,7 @@ class ServiceController extends Controller
     {
         $services = Services::list();
         $param_rules = $this->buildParamRules($request->get('service_type'), $services);
-
-        $service_ip_required = 'nullable';
-        if (isset($param_rules['service_param.--hostname'])) {
-            $service_ip_required = 'required';
-            unset($param_rules['service_param.--hostname']);
-        }
+        unset($param_rules['service_param.--hostname']);
 
         $validated = $this->validate($request, [
                 'device_id' => 'required|int|exists:devices,device_id',
@@ -60,10 +55,7 @@ class ServiceController extends Controller
                     'required',
                     Rule::in($services),
                 ],
-                'service_ip' => [
-                    $service_ip_required,
-                    'ip_or_hostname'
-                ],
+                'service_ip' => 'nullable|ip_or_hostname',
                 'service_desc' => 'nullable|string',
                 'service_param' => 'nullable|array',
                 'service_param.*' => 'string',
