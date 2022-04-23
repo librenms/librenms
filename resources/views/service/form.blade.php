@@ -1,8 +1,8 @@
 <form method="post" role="form" id="service" class="form-horizontal" x-data="serviceFormData()">
     <div class="form-group row">
-        <label for='service_name' class='col-sm-4 control-label'>Name </label>
+        <label for='service_name' class='col-sm-4 control-label'>{{ __('service.fields.service_name') }}</label>
         <div class="col-sm-8">
-            <input type='text' id='service_name' name='service_name' class='form-control input-sm' placeholder='' x-model="service_name" x-bind:class="{'!tw-border-red-500': errors.service_name}"/>
+            <input type='text' id='service_name' name='service_name' class='form-control input-sm' x-model="service_name" x-bind:class="{'!tw-border-red-500': errors.service_name}"/>
         </div>
         <div class='col-sm-8 col-sm-offset-4 tw-text-red-500'>
             <template x-for="error in errors.service_name">
@@ -14,7 +14,7 @@
         <input type="hidden" name="device_id" id="device_id" value="{{ $device_id }}" x-model.number="device_id">
     @else
         <div class="form-group row">
-            <label for='device_id' class='col-sm-4 control-label'>Device </label>
+            <label for='device_id' class='col-sm-4 control-label'>{{ __('service.fields.device_id') }}</label>
             <div class="col-sm-8">
                 <select id='device_id' name='device_id' class='form-control' x-model.number="device_id" x-bind:class="{'!tw-border-red-500': errors.device_id}">
                 </select>
@@ -27,7 +27,7 @@
         </div>
     @endif
     <div class="form-group row">
-        <label for='service_type' class='col-sm-4 control-label'>Check Type </label>
+        <label for='service_type' class='col-sm-4 control-label'>{{ __('service.fields.service_type') }}</label>
         <div class="col-sm-8">
             <select id='service_type' name='service_type' class='form-control has-feedback' x-model="service_type" x-bind:class="{'!tw-border-red-500': errors.service_type}">
                 @foreach(\LibreNMS\Services::list() as $check)
@@ -42,7 +42,7 @@
         </div>
     </div>
     <div class='form-group row'>
-        <label for='service_desc' class='col-sm-4 control-label'>Description </label>
+        <label for='service_desc' class='col-sm-4 control-label'>{{ __('service.fields.service_desc') }}</label>
         <div class='col-sm-8'>
             <textarea id='service_desc' name='service_desc' class='form-control' rows='5' x-model="service_desc" x-bind:class="{'!tw-border-red-500': errors.service_desc}"></textarea>
         </div>
@@ -53,9 +53,9 @@
         </div>
     </div>
     <div class="form-group row" x-show="hasHostname">
-        <label for='service_ip' class='col-sm-4 control-label'>Remote Host </label>
+        <label for='service_ip' class='col-sm-4 control-label'>{{ __('service.fields.service_ip') }}</label>
         <div class="col-sm-8">
-            <input type='text' id='service_ip' name='service_ip' class='form-control has-feedback' placeholder='<This Device>' x-model="service_ip" x-bind:class="{'!tw-border-red-500': errors.service_ip}"/>
+            <input type='text' id='service_ip' name='service_ip' class='form-control has-feedback' placeholder='{{ __('service.this_device') }}' x-model="service_ip" x-bind:class="{'!tw-border-red-500': errors.service_ip}"/>
         </div>
         <div class='col-sm-8 col-sm-offset-4 tw-text-red-500'>
             <template x-for="error in errors.service_ip">
@@ -64,7 +64,7 @@
         </div>
     </div>
     <div class="form-group row">
-        <label for="service_param" class="col-sm-4 control-label">Parameters </label>
+        <label for="service_param" class="col-sm-4 control-label">{{ __('service.fields.service_param') }}</label>
         <div class="col-sm-8">
             <div class="tw-flex">
                 <select id="parameters" class="form-control has-feedback tw-flex-initial" x-model="currentParam" x-ref="param" x-bind:disabled="! currentParam" x-bind:class="{'!tw-border-red-500': Object.keys(errors).findIndex(e => e.includes('service_param')) >= 0}">
@@ -98,7 +98,7 @@
         </div>
     </div>
     <div class="form-group row">
-        <label for='service_ignore' class='col-sm-4 control-label'>Ignore alert tag </label>
+        <label for='service_ignore' class='col-sm-4 control-label'>{{ __('service.fields.service_ignore') }}</label>
         <div class="col-sm-8">
             <x-toggle x-model="service_ignore"></x-toggle>
         </div>
@@ -109,7 +109,7 @@
         </div>
     </div>
     <div class="form-group row">
-        <label for='service_disabled' class='col-sm-4 control-label'>Disable polling and alerting </label>
+        <label for='service_disabled' class='col-sm-4 control-label'>{{ __('service.fields.service_disabled') }}</label>
         <div class="col-sm-8">
             <x-toggle x-model="service_disabled"></x-toggle>
         </div>
@@ -121,10 +121,9 @@
     </div>
     <div class="form-group row">
         <div class="col-sm-offset-4">
-            <button class="btn btn-default btn-sm" type="button" value="save" x-on:click="save">Save Service</button>
+            <button class="btn btn-default btn-sm" type="button" value="save" x-on:click="save">{{ __('service.save') }}</button>
         </div>
     </div>
-    <div class="clearfix"></div>
 </form>
 
 <script>
