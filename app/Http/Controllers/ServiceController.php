@@ -45,21 +45,33 @@ class ServiceController extends Controller
      */
     public function store(Request $request): JsonResponse
     {
+        $services = Services::list();
+        $param_rules = $this->buildParamRules($request->get('service_type'), $services);
+
+        $service_ip_required = 'nullable';
+        if (isset($param_rules['service_param.--hostname'])) {
+            $service_ip_required = 'required';
+            unset($param_rules['service_param.--hostname']);
+        }
+
         $validated = $this->validate($request, [
-            'device_id' => 'required|int|exists:App\Models\Device',
-            'service_type' => [
-                'required',
-                Rule::in(Services::list()),
-            ],
-            'service_ip' => 'nullable|ip_or_hostname',
-            'service_desc' => 'nullable|string',
-            'service_param' => 'nullable|array',
-            'service_param.*' => 'string',
-            'service_ignore' => 'nullable|in:0,1',
-            'service_disabled' => 'nullable|in:0,1',
-            'service_name' => 'nullable|string',
-            'service_template_id' => 'nullable|int|exists:App\Models\ServiceTemplate',
-        ]);
+                'device_id' => 'required|int|exists:devices,device_id',
+                'service_type' => [
+                    'required',
+                    Rule::in($services),
+                ],
+                'service_ip' => [
+                    $service_ip_required,
+                    'ip_or_hostname'
+                ],
+                'service_desc' => 'nullable|string',
+                'service_param' => 'nullable|array',
+                'service_param.*' => 'string',
+                'service_ignore' => 'boolean',
+                'service_disabled' => 'boolean',
+                'service_name' => 'nullable|string',
+                'service_template_id' => 'nullable|int|exists:App\Models\ServiceTemplate,id',
+            ] + $param_rules);
 
         return response()->json(Service::create($validated));
     }
@@ -123,5 +135,38 @@ class ServiceController extends Controller
             'status' => 0,
             'message' => 'Service: ' . $service->service_id . ', has NOT been deleted.',
         ]);
+    }
+
+    /**
+     * @param  string  $type
+     * @param  string[]  $services
+     * @return array
+     */
+    private function buildParamRules(string $type, array $services): array
+    {
+        $parameter_rules = [];
+
+        // don't try to load a check that isn't valid
+        if (! in_array($type, $services)) {
+            return $parameter_rules;
+        }
+
+        $check = Services::makeCheck(new Service(['service_type' => $type]));
+
+        foreach ($check->availableParameters() as $parameter) {
+            $rules = [];
+            $param = $parameter->param ?: $parameter->short;
+
+            if ($parameter->required) {
+                $rules[] = 'required';
+            }
+
+            if ($parameter->value == 'INTEGER') {
+                $rules[] = 'integer';
+            }
+
+            $parameter_rules["service_param.$param"] = $rules;
+        }
+        return $parameter_rules;
     }
 }

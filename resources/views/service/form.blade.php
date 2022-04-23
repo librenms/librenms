@@ -1,19 +1,13 @@
-<form method="post" role="form" id="service" class="form-horizontal service-form" x-data="serviceFormData()">
-    <?php echo csrf_field() ?>
-    <input type="hidden" name="service_id" id="service_id" value="">
-    <input type="hidden" name="service_template_id" id="service_template_id" value="">
-
-    <div class="form-group">
-        <div class="col-sm-12">
-            <span id="ajax_response">&nbsp;</span>
-        </div>
-    </div>
+<form method="post" role="form" id="service" class="form-horizontal" x-data="serviceFormData()">
     <div class="form-group row">
         <label for='service_name' class='col-sm-3 control-label'>Name </label>
         <div class="col-sm-9">
-            <input type='text' id='service_name' name='service_name' class='form-control input-sm' placeholder=''/>
+            <input type='text' id='service_name' name='service_name' class='form-control input-sm' placeholder='' x-model="service_name" x-bind:class="{'!tw-border-red-500': errors.service_name}"/>
         </div>
-        <div class='col-sm-9'>
+        <div class='col-sm-9 col-sm-offset-3 tw-text-red-500'>
+            <template x-for="error in errors.service_name">
+                <div x-text="error"></div>
+            </template>
         </div>
     </div>
     @isset($device_id)
@@ -22,46 +16,58 @@
         <div class="form-group row">
             <label for='device_id' class='col-sm-3 control-label'>Device </label>
             <div class="col-sm-9">
-                <select id='device_id' name='device_id' class='form-control has-feedback' x-model.number="device_id">
+                <select id='device_id' name='device_id' class='form-control' x-model.number="device_id" x-bind:class="{'!tw-border-red-500': errors.device_id}">
                 </select>
             </div>
-            <div class='col-sm-9'>
+            <div class='col-sm-9 col-sm-offset-3 tw-text-red-500'>
+                <template x-for="error in errors.device_id">
+                    <div x-text="error"></div>
+                </template>
             </div>
         </div>
     @endif
     <div class="form-group row">
         <label for='service_type' class='col-sm-3 control-label'>Check Type </label>
         <div class="col-sm-9">
-            <select id='service_type' name='service_type' class='form-control has-feedback' x-model="service_type">
+            <select id='service_type' name='service_type' class='form-control has-feedback' x-model="service_type" x-bind:class="{'!tw-border-red-500': errors.service_type}">
                 @foreach(\LibreNMS\Services::list() as $check)
                     <option value="{{ $check }}">{{ $check }}</option>
                 @endforeach
             </select>
         </div>
-        <div class='col-sm-9'>
+        <div class='col-sm-9 col-sm-offset-3 tw-text-red-500'>
+            <template x-for="error in errors.service_type">
+                <div x-text="error"></div>
+            </template>
         </div>
     </div>
     <div class='form-group row'>
         <label for='service_desc' class='col-sm-3 control-label'>Description </label>
         <div class='col-sm-9'>
-            <textarea id='service_desc' name='service_desc' class='form-control' rows='5'></textarea>
+            <textarea id='service_desc' name='service_desc' class='form-control' rows='5' x-model="service_desc" x-bind:class="{'!tw-border-red-500': errors.service_desc}"></textarea>
         </div>
-        <div class='col-sm-9'>
+        <div class='col-sm-9 col-sm-offset-3 tw-text-red-500'>
+            <template x-for="error in errors.service_desc">
+                <div x-text="error"></div>
+            </template>
         </div>
     </div>
     <div class="form-group row" x-show="hasHostname">
         <label for='service_ip' class='col-sm-3 control-label'>Remote Host </label>
         <div class="col-sm-9">
-            <input type='text' id='service_ip' name='service_ip' class='form-control has-feedback' placeholder='<This Device>' x-bind:required="hostnameRequired"/>
+            <input type='text' id='service_ip' name='service_ip' class='form-control has-feedback' placeholder='<This Device>' x-model="service_ip" x-bind:class="{'!tw-border-red-500': errors.device_id}"/>
         </div>
-        <div class='col-sm-9'>
+        <div class='col-sm-9 col-sm-offset-3 tw-text-red-500'>
+            <template x-for="error in errors.service_ip">
+                <div x-text="error"></div>
+            </template>
         </div>
     </div>
     <div class="form-group row">
         <label for="service_param" class="col-sm-3 control-label">Parameters </label>
         <div class="col-sm-9">
             <div class="tw-flex">
-                <select id="parameters" class="form-control has-feedback tw-flex-initial" x-model="currentParam" x-ref="param" x-bind:disabled="! currentParam">
+                <select id="parameters" class="form-control has-feedback tw-flex-initial" x-model="currentParam" x-ref="param" x-bind:disabled="! currentParam" x-bind:class="{'!tw-border-red-500': errors.service_param}">
                     <template x-for="param in unusedParams()">
                         <option x-bind:value="param.param || param.short" x-text="(param.param || param.short) + (param.required ? ' *' : '') + (param.group ? ' []' : '')"></option>
                     </template>
@@ -85,25 +91,37 @@
                 </div>
             </template>
         </div>
+        <div class='col-sm-9 col-sm-offset-3 tw-text-red-500'>
+            <template x-for="error in errors.service_param">
+                <div x-text="error"></div>
+            </template>
+        </div>
     </div>
     <div class="form-group row">
         <label for='service_ignore' class='col-sm-3 control-label'>Ignore alert tag </label>
         <div class="col-sm-9">
-            <input type="hidden" name="service_ignore" id='service_ignore' value="0">
-            <input type='checkbox' id='ignore_box' name='ignore_box' onclick="$('#service_ignore').attr('value', $('#ignore_box').prop('checked')?1:0);">
+            <input type='checkbox' id='service_ignore' name='service_ignore' x-model="service_ignore">
+        </div>
+        <div class='col-sm-9 col-sm-offset-3 tw-text-red-500'>
+            <template x-for="error in errors.service_ignore">
+                <div x-text="error"></div>
+            </template>
         </div>
     </div>
     <div class="form-group row">
         <label for='service_disabled' class='col-sm-3 control-label'>Disable polling and alerting </label>
         <div class="col-sm-9">
-            <input type='hidden' id='service_disabled' name='service_disabled' value="0">
-            <input type='checkbox' id='disabled_box' name='disabled_box' onclick="$('#service_disabled').attr('value', $('#disabled_box').prop('checked')?1:0);">
+            <input type='checkbox' id='service_disabled' name='service_disabled' x-model="service_disabled">
+        </div>
+        <div class='col-sm-9 col-sm-offset-3 tw-text-red-500'>
+            <template x-for="error in errors.service_disabled">
+                <div x-text="error"></div>
+            </template>
         </div>
     </div>
-    <hr>
     <div class="form-group row">
         <div class="col-sm-offset-3">
-            <button class="btn btn-default btn-sm" type="submit" name="service-submit" id="service-submit" value="save">Save Service</button>
+            <button class="btn btn-default btn-sm" type="button" value="save" x-on:click="save">Save Service</button>
         </div>
     </div>
     <div class="clearfix"></div>
@@ -112,7 +130,9 @@
 <script>
     function serviceFormData() {
         return {
+            service_id: null,
             device_id: null,
+            service_name: '',
             service_type: 'ping',
             service_desc: '',
             service_ip: null,
@@ -124,6 +144,30 @@
             hasHostname: true,
             parameters: [],
             excluded: {},
+            errors: {},
+            async save() {
+                const response = await fetch('{{ route('services.store') }}', {
+                    method: this.service_id ? 'PUT' : 'POST',
+                    headers: {
+                        'Accept': 'application/json',
+                        'Content-Type': 'application/json',
+                        "X-CSRF-Token": document.head.querySelector("[name~=csrf-token][content]").content
+                    },
+                    body: JSON.stringify({
+                        service_name: this.service_name,
+                        device_id: this.device_id,
+                        service_type: this.service_type,
+                        service_desc: this.service_desc,
+                        service_ip: this.service_ip,
+                        service_param: this.service_param,
+                        service_ignore: this.service_ignore,
+                        service_disabled: this.service_disabled,
+                    })
+                });
+                let result = await response.json();
+                console.log(result);
+                this.errors = result.errors
+            },
             getParameter(key) {
                 const found = this.parameters.find(param => param.param === key || param.short === key);
                 return found ? found : {};
@@ -194,79 +238,4 @@
             }
         };
     }
-
-
-
-
-    $('#service_type').val($('#service_type option:eq(0)').val()).trigger('change');
-    // on-hide
-    $('#create-service').on('hide.bs.modal', function (event) {
-        $('#service_type').val('');
-        $("#service_type").prop("disabled", false);
-        $('#service_ip').val('');
-        $('#service_desc').val('');
-        $('#service_param').val('');
-        $('#service_ignore').val('');
-        $('#ignore_box').val('');
-        $('#service_disabled').val('');
-        $('#disabled_box').val('');
-        $('#service_template_id').val('');
-        $('#service_name').val('');
-        $('#service_template_name').val('');
-        $("#ajax_response").html('');
-    });
-
-    // on-load
-    $('#create-service').on('show.bs.modal', function (e) {
-        var button = $(e.relatedTarget);
-        var service_id = button.data('service_id');
-        var modal = $(this)
-        $('#service_id').val(service_id);
-        $.ajax({
-            type: "GET",
-            url: "<?php echo route('services.show', ['service' => '?']) ?>".replace('?', service_id),
-            dataType: "json",
-            success: function (service) {
-                $('#service_type').val(service.service_type);
-                $("#service_type").prop("disabled", true);
-                $('#service_ip').val(service.service_ip);
-                $('#device_id').val(service.device_id);
-                $('#service_desc').val(service.service_desc);
-                $('#service_param').val(service.service_param);
-                $('#service_ignore').val(service.service_ignore === true ? 1 : 0);
-                $('#service_disabled').val(service.service_disabled === true ? 1 : 0);
-                $('#ignore_box').prop("checked", service.service_ignore);
-                $('#disabled_box').prop("checked", service.service_disabled);
-                $('#service_template_id').val(service.service_template_id === 0 ? '' : service.service_template_id);
-                $('#service_name').val(service.service_name);
-            }
-        });
-
-    });
-
-    // on-submit
-    $('#service-submit').on("click", function (e) {
-        e.preventDefault();
-        var service_id = $('#service_id').val();
-        $.ajax({
-            type: service_id ? 'PUT' : 'POST',
-            url: "<?php echo route('services.store') ?>" + (service_id ? '/' + service_id : ''),
-            data: $('form.service-form').serializeArray(),
-            success: function (result) {
-                $('#message').html('<div class="alert alert-info">' + result.message + '</div>');
-                $("#create-service").modal('hide');
-                setTimeout(function () {
-                    location.reload();
-                }, 1500);
-            },
-            error: function (result) {
-                var message = result.responseJSON.message;
-                for (const field in result.responseJSON.errors) {
-                    message += '<br />' + field + ': ' + result.responseJSON.errors[field];
-                }
-
-                $("#ajax_response").html('<div class="alert alert-danger">' + message + '</div>');
-            }
-        });
-    });
 </script>
