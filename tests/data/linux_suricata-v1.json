@@ -637,32 +637,38 @@
                     "app_type": "suricata"
                 },
                 {
+                    "metric": "alert",
+                    "value": 0.0,
+                    "value_prev": null,
+                    "app_type": "suricata"
+                },
+                {
                     "metric": "ids_af_dcerpc_tcp",
-                    "value": 0,
+                    "value": 0.0,
                     "value_prev": null,
                     "app_type": "suricata"
                 },
                 {
                     "metric": "ids_af_dcerpc_udp",
-                    "value": 0,
+                    "value": 0.0,
                     "value_prev": null,
                     "app_type": "suricata"
                 },
                 {
                     "metric": "ids_af_dhcp",
-                    "value": 52,
+                    "value": 52.0,
                     "value_prev": null,
                     "app_type": "suricata"
                 },
                 {
                     "metric": "ids_af_dns_tcp",
-                    "value": 1901,
+                    "value": 1901.0,
                     "value_prev": null,
                     "app_type": "suricata"
                 },
                 {
                     "metric": "ids_af_dns_udp",
-                    "value": 556315,
+                    "value": 556315.0,
                     "value_prev": null,
                     "app_type": "suricata"
                 },

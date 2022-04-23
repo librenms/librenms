@@ -37,8 +37,8 @@ print_optionbar_end();
 $graphs = [
     'suricata_packets'=>'Packets',
     'suricata_bytes'=>'Bytes',
-    'suricata_bad_delta'=>'Drops or Errors Delta',
-    'suricata_bad_percent'=>'Drops or Errors Percent',
+    'suricata_nasty_delta'=>'Drops or Errors Delta',
+    'suricata_nasty_percent'=>'Drops or Errors Percent',
     'suricata_dec_proto'=>'Decoder Protocols',
     'suricata_flow_proto'=>'Flow Protocols',
     'suricata_app_flows'=>'App Layer Flows',
