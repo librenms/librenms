@@ -811,12 +811,6 @@
                     "app_type": "suricata"
                 },
                 {
-                    "metric": "ids_alertString",
-                    "value": "",
-                    "value_prev": null,
-                    "app_type": "suricata"
-                },
-                {
                     "metric": "ids_at_dcerpc_tcp",
                     "value": 0,
                     "value_prev": null,
