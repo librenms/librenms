@@ -31,7 +31,6 @@ use Illuminate\Database\QueryException;
 use Illuminate\Support\Arr;
 use Illuminate\Support\Str;
 use LibreNMS\Data\Store\Rrd;
-use LibreNMS\DB\Eloquent;
 use LibreNMS\Util\Debug;
 use LibreNMS\Util\Version;
 use Log;
@@ -254,11 +253,11 @@ class Config
     public static function persist($key, $value)
     {
         try {
+            Arr::set(self::$config, $key, $value);
             \App\Models\Config::updateOrCreate(['config_name' => $key], [
                 'config_name' => $key,
                 'config_value' => $value,
             ]);
-            Arr::set(self::$config, $key, $value);
 
             // delete any children (there should not be any unless it is legacy)
             \App\Models\Config::query()->where('config_name', 'like', "$key.%")->delete();
@@ -338,10 +337,6 @@ class Config
      */
     private static function loadDB()
     {
-        if (! Eloquent::isConnected()) {
-            return;
-        }
-
         try {
             \App\Models\Config::get(['config_name', 'config_value'])
                 ->each(function ($item) {
@@ -462,15 +457,10 @@ class Config
             self::persist('device_display_default', $display_value);
         }
 
-        $persist = Eloquent::isConnected();
         // make sure we have full path to binaries in case PATH isn't set
         foreach (['fping', 'fping6', 'snmpgetnext', 'rrdtool', 'traceroute', 'traceroute6'] as $bin) {
             if (! is_executable(self::get($bin))) {
-                if ($persist) {
-                    self::persist($bin, self::locateBinary($bin));
-                } else {
-                    self::set($bin, self::locateBinary($bin));
-                }
+                self::persist($bin, self::locateBinary($bin));
             }
         }
 

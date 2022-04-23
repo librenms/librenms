@@ -100,7 +100,7 @@ class Database extends BaseValidation
 
     private function checkVersion(Validator $validator)
     {
-        $version = Eloquent::version();
+        $version = \LibreNMS\Util\Version::get()->databaseServer();
         $version = explode('-', $version);
 
         if (isset($version[1]) && $version[1] == 'MariaDB') {
