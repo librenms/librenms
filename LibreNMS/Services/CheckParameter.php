@@ -59,7 +59,7 @@ class CheckParameter
             $this->description .= PHP_EOL;
         }
 
-        $this->description .= trim(htmlspecialchars($line));
+        $this->description .= $line;
 
         return $this;
     }
