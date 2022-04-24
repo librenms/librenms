@@ -34,7 +34,7 @@ function string_to_oid($string)
 }//end string_to_oid()
 
 // Options!
-$short_opts = 'sktmlhj:a:';
+$short_opts = 'sktmlhj:a:S';
 $options = getopt($short_opts);
 
 // print the help
@@ -47,6 +47,7 @@ if (isset($options['h'])) {
   -m      Extract and print metric variables from the JSON file.
   -k      If m is specified, just print the keys in tested order.
   -a      The application name for use with -s and -t.
+  -S      SNMP extend name. Defaults to the same as -a.
   -h      Show this help text.
 
 -j must always be specified.
@@ -138,9 +139,14 @@ if (! isset($options['a'])) {
     exit(1);
 }
 
+// -S defaults to -a if not set
+if (! isset($options['S'])) {
+    $options['S'] = $options['a'];
+}
+
 // Output snmprec data for snmpsim for use with testing.
 if (isset($options['s'])) {
-    $oid = string_to_oid($options['a']);
+    $oid = string_to_oid($options['S']);
     echo "1.3.6.1.2.1.1.1.0|4|Linux server 3.10.0-693.5.2.el7.x86_64 #1 SMP Fri Oct 20 20:32:50 UTC 2017 x86_64\n" .
         "1.3.6.1.2.1.1.2.0|6|1.3.6.1.4.1.8072.3.2.10\n" .
         "1.3.6.1.2.1.1.3.0|67|77550514\n" .
@@ -159,25 +165,24 @@ if (isset($options['t'])) {
     $test_data = [
         'applications' => [
             'discovery' => [
-                'applications' => [
+                'applications' => [ [
                     'app_type' => $options['a'],
                     'app_state' => 'UNKNOWN',
                     'discovered' => '1',
                     'app_state_prev' => null,
                     'app_status' => '',
                     'app_instance' => '',
-                ],
-                'application_metrics' => [],
+                ], ],
             ],
             'poller' => [
-                'applications' => [
+                'applications' => [ [
                     'app_type' => $options['a'],
                     'app_state' => 'OK',
                     'discovered' => '1',
                     'app_state_prev' => 'UNKNOWN',
                     'app_status' => '',
                     'app_instance' => '',
-                ],
+                ], ],
                 'application_metrics' => [],
             ],
         ],
