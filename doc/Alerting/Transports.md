@@ -101,14 +101,17 @@ The API transport allows to reach any service provider using POST, PUT or GET UR
 - The same text built from the Alert template is available in the
   variable
 
-``` $msg ```, which can then be sent as an option to the API. Be
-carefull that HTTP GET requests are usually limited in length.
-- The API-Option fields can be directly built from the variables defined in
-[Template-Syntax](Templates.md#syntax) but without the 'alert->' prefix.
-For instance, ``` $alert->uptime ``` is available as ``` $uptime ``` in the
-API transport
+`$msg`, which can then be sent as an option to the API. Be carefull
+that HTTP GET requests are usually limited in length.
+
+- The API-Option fields can be directly built from the variables
+  defined in [Template-Syntax](Templates.md#syntax) but without the
+  'alert->' prefix. For instance, `$alert->uptime` is available as
+  `$uptime` in the API transport
+
 - The API-Headers allows you to add the headers that the api endpoint requires.
-- The API-body allow sending data in the format required by the ApI endpoint.
+
+- The API-body allow sending data in the format required by the API endpoint.
 
 A few variables commonly used :
 
@@ -165,6 +168,7 @@ authentication and content type required.
 | API Body      | { "status": 2 }
 
 ## aspSMS
+
 aspSMS is a SMS provider that can be configured by using the generic API Transport.
 You need a token you can find on your personnal space.
 
