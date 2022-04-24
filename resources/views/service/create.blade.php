@@ -1,11 +1,11 @@
 @extends('layouts.librenmsv1')
 
-@section('title', trans('service.add'))
+@section('title', __('service.add'))
 
 @section('content')
     <div class="container">
-        <div class='well well-lg'>
+        <x-panel title="{{ __('service.add') }}">
             @include('service.form')
-        </div>
+        </x-panel>
     </div>
 @endsection

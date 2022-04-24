@@ -1,7 +1,7 @@
 <form method="post" role="form" id="service" class="form-horizontal" x-data="serviceFormData()">
     <div class="form-group row">
-        <label for='service_name' class='col-sm-4 control-label'>{{ __('service.fields.service_name') }}</label>
-        <div class="col-sm-8">
+        <label for='service_name' class="col-sm-4 col-md-3 control-label">{{ __('service.fields.service_name') }}</label>
+        <div class="col-sm-8 col-md-9">
             <input type='text' id='service_name' name='service_name' class='form-control input-sm' x-model="service_name" x-bind:class="{'!tw-border-red-500': errors.service_name}"/>
         </div>
         <div class='col-sm-8 col-sm-offset-4 tw-text-red-500'>
@@ -14,12 +14,12 @@
         <input type="hidden" name="device_id" id="device_id" value="{{ $device_id }}" x-model.number="device_id">
     @else
         <div class="form-group row">
-            <label for='device_id' class='col-sm-4 control-label'>{{ __('service.fields.device_id') }}</label>
-            <div class="col-sm-8">
+            <label for='device_id' class="col-sm-4 col-md-3 control-label">{{ __('service.fields.device_id') }}</label>
+            <div class="col-sm-8 col-md-9">
                 <select id='device_id' name='device_id' class='form-control' x-model.number="device_id" x-bind:class="{'!tw-border-red-500': errors.device_id}">
                 </select>
             </div>
-            <div class='col-sm-8 col-sm-offset-4 tw-text-red-500'>
+            <div class="col-sm-8 col-sm-offset-4 tw-text-red-500">
                 <template x-for="error in errors.device_id">
                     <div x-text="error"></div>
                 </template>
@@ -27,8 +27,8 @@
         </div>
     @endif
     <div class="form-group row">
-        <label for='service_type' class='col-sm-4 control-label'>{{ __('service.fields.service_type') }}</label>
-        <div class="col-sm-8">
+        <label for='service_type' class="col-sm-4 col-md-3 control-label">{{ __('service.fields.service_type') }}</label>
+        <div class="col-sm-8 col-md-9">
             <select id='service_type' name='service_type' class='form-control has-feedback' x-model="service_type" x-bind:class="{'!tw-border-red-500': errors.service_type}">
                 @foreach(\LibreNMS\Services::list() as $check)
                     <option value="{{ $check }}">{{ $check }}</option>
@@ -42,7 +42,7 @@
         </div>
     </div>
     <div class='form-group row'>
-        <label for='service_desc' class='col-sm-4 control-label'>{{ __('service.fields.service_desc') }}</label>
+        <label for='service_desc' class="col-sm-4 col-md-3 control-label">{{ __('service.fields.service_desc') }}</label>
         <div class='col-sm-8'>
             <textarea id='service_desc' name='service_desc' class='form-control' rows='5' x-model="service_desc" x-bind:class="{'!tw-border-red-500': errors.service_desc}"></textarea>
         </div>
@@ -53,8 +53,8 @@
         </div>
     </div>
     <div class="form-group row" x-show="hasHostname">
-        <label for='service_ip' class='col-sm-4 control-label'>{{ __('service.fields.service_ip') }}</label>
-        <div class="col-sm-8">
+        <label for='service_ip' class="col-sm-4 col-md-3 control-label">{{ __('service.fields.service_ip') }}</label>
+        <div class="col-sm-8 col-md-9">
             <input type='text' id='service_ip' name='service_ip' class='form-control has-feedback' placeholder='{{ __('service.this_device') }}' x-model="service_ip" x-bind:class="{'!tw-border-red-500': errors.service_ip}"/>
         </div>
         <div class='col-sm-8 col-sm-offset-4 tw-text-red-500'>
@@ -64,8 +64,8 @@
         </div>
     </div>
     <div class="form-group row">
-        <label for="service_param" class="col-sm-4 control-label">{{ __('service.fields.service_param') }}</label>
-        <div class="col-sm-8">
+        <label for="service_param" class="col-sm-4 col-md-3 control-label">{{ __('service.fields.service_param') }}</label>
+        <div class="col-sm-8 col-md-9">
             <div class="tw-flex">
                 <select id="parameters" class="form-control has-feedback tw-flex-initial" x-model="currentParam" x-ref="param" x-bind:disabled="! currentParam" x-bind:class="{'!tw-border-red-500': Object.keys(errors).findIndex(e => e.includes('service_param')) >= 0}">
                     <template x-for="param in unusedParams()">
@@ -98,8 +98,8 @@
         </div>
     </div>
     <div class="form-group row">
-        <label for='service_ignore' class='col-sm-4 control-label'>{{ __('service.fields.service_ignore') }}</label>
-        <div class="col-sm-8">
+        <label for='service_ignore' class="col-sm-4 col-md-3 control-label">{{ __('service.fields.service_ignore') }}</label>
+        <div class="col-sm-8 col-md-9">
             <x-toggle x-model="service_ignore"></x-toggle>
         </div>
         <div class='col-sm-8 col-sm-offset-4 tw-text-red-500'>
@@ -109,21 +109,29 @@
         </div>
     </div>
     <div class="form-group row">
-        <label for='service_disabled' class='col-sm-4 control-label'>{{ __('service.fields.service_disabled') }}</label>
-        <div class="col-sm-8">
+        <label for='service_disabled' class='col-sm-4 col-md-3 control-label'>{{ __('service.fields.service_disabled') }}</label>
+        <div class="col-sm-8 col-md-9">
             <x-toggle x-model="service_disabled"></x-toggle>
         </div>
-        <div class='col-sm-8 col-sm-offset-4 tw-text-red-500'>
+        <div class='col-sm-8 col-sm-offset-4 col-md-9 col-md-offset-3 tw-text-red-500'>
             <template x-for="error in errors.service_disabled">
                 <div x-text="error"></div>
             </template>
         </div>
     </div>
     <div class="form-group row">
-        <div class="col-sm-offset-4">
-            <button class="btn btn-default btn-sm" type="button" value="save" x-on:click="save">{{ __('service.save') }}</button>
+        <div class="col-sm-offset-4 col-md-offset-3">
+            <button class="btn btn-primary btn-sm" type="button" value="save" x-on:click="save">{{ __('service.save') }}</button>
+            <button class="btn btn-default btn-sm" type="button" value="test" x-on:click="test">{{ __('service.test') }}</button>
         </div>
     </div>
+    <x-panel x-show="testMessage"
+             title="Test Result"
+             x-bind:class="{'panel-success': testResult === 0, 'panel-warning': testResult === 1, 'panel-danger': testResult === 2}">
+        <pre x-text="testMessage">
+
+        </pre>
+    </x-panel>
 </form>
 
 <script>
@@ -132,7 +140,7 @@
             service_id: null,
             device_id: null,
             service_name: '',
-            service_type: 'ping',
+            service_type: 'icmp',
             service_desc: '',
             service_ip: null,
             service_param: {},
@@ -141,11 +149,28 @@
             currentParam: null,
             currentValue: null,
             hasHostname: true,
+            testMessage: '',
+            testResult: 1,
             parameters: [],
             excluded: {},
             errors: {},
             async save() {
-                const response = await fetch('{{ route('services.store') }}', {
+                if (await this.submitCheck('{{ route('services.store') }}') !== false) {
+                    toastr.success('{{ __('service.added') }}');
+
+                    // reset form except device and check type
+                    this.service_name = '';
+                    this.service_desc = '';
+                    this.service_ip = '';
+                    this.service_param = {};
+                    this.service_ignore = false;
+                    this.service_disabled = false;
+                    this.testMessage = '';
+                    this.testResult = 1;
+                }
+            },
+            async submitCheck(url) {
+                const response = await fetch(url, {
                     method: this.service_id ? 'PUT' : 'POST',
                     headers: {
                         'Accept': 'application/json',
@@ -164,8 +189,22 @@
                     })
                 });
                 let result = await response.json();
+
+                if (result.errors) {
+                    this.errors = result.errors;
+                    return false;
+                } else {
+                    this.errors = {};
+                    return result;
+                }
+            },
+            async test() {
+                const result = await this.submitCheck('{{ route('services.test') }}')
                 console.log(result);
-                this.errors = result.errors ? result.errors : {};
+                if (result !== false) {
+                    this.testMessage = result.message;
+                    this.testResult = result.result;
+                }
             },
             getParameter(key) {
                 const found = this.parameters.find(param => param.param === key || param.short === key);

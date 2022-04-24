@@ -103,7 +103,7 @@ class CheckParameter
             'short' => htmlentities($this->short),
             'value' => htmlentities($this->value),
             'description' => htmlentities($this->description),
-            'required' => (bool) $this->required,
+            'required' => $this->required,
             'exclusive_group' => isset($this->exclusive_group) ? array_map('htmlentities', $this->exclusive_group) : null,
             'inclusive_group' => isset($this->inclusive_group) ? array_map('htmlentities', $this->inclusive_group) : null,
         ];

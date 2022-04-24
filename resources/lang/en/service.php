@@ -4,6 +4,8 @@ return [
     'title' => 'Services',
     'add' => 'Add Service',
     'save' => 'Save Service',
+    'test' => 'Test Service',
+    'added' => 'Service Created',
     'this_device' => '<This Device>',
     'fields' => [
         'service_name' => 'Name',

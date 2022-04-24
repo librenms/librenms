@@ -45,27 +45,7 @@ class ServiceController extends Controller
      */
     public function store(Request $request): JsonResponse
     {
-        $services = Services::list();
-        $param_rules = $this->buildParamRules($request->get('service_type'), $services);
-        unset($param_rules['service_param.--hostname']);
-
-        $validated = $this->validate($request, [
-                'device_id' => 'required|int|exists:devices,device_id',
-                'service_type' => [
-                    'required',
-                    Rule::in($services),
-                ],
-                'service_ip' => 'nullable|ip_or_hostname',
-                'service_desc' => 'nullable|string',
-                'service_param' => 'nullable|array',
-                'service_param.*' => 'string',
-                'service_ignore' => 'boolean',
-                'service_disabled' => 'boolean',
-                'service_name' => 'nullable|string',
-                'service_template_id' => 'nullable|int|exists:App\Models\ServiceTemplate,id',
-            ] + $param_rules);
-
-        return response()->json(Service::create($validated));
+        return response()->json($this->validateNewService($request));
     }
 
     /**
@@ -177,5 +157,51 @@ class ServiceController extends Controller
         }
 
         return $parameter_rules;
+    }
+
+    /**
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Http\JsonResponse
+     * @throws \Illuminate\Validation\ValidationException
+     */
+    public function test(Request $request): JsonResponse
+    {
+        $service = $this->validateNewService($request);
+        $response = app(\LibreNMS\Modules\Services::class)->checkService($service->device, $service);
+
+        return response()->json([
+            'message' => htmlentities($response->message),
+            'result' => $response->result,
+        ]);
+    }
+
+    /**
+     * @param  \Illuminate\Http\Request  $request
+     * @return \App\Models\Service
+     * @throws \Illuminate\Validation\ValidationException
+     */
+    private function validateNewService(Request $request): Service
+    {
+        $services = Services::list();
+        $param_rules = $this->buildParamRules($request->get('service_type'), $services);
+        unset($param_rules['service_param.--hostname']);
+
+        $validated = $this->validate($request, [
+                'device_id' => 'required|int|exists:devices,device_id',
+                'service_type' => [
+                    'required',
+                    Rule::in($services),
+                ],
+                'service_ip' => 'nullable|ip_or_hostname',
+                'service_desc' => 'nullable|string',
+                'service_param' => 'nullable|array',
+                'service_param.*' => 'string',
+                'service_ignore' => 'boolean',
+                'service_disabled' => 'boolean',
+                'service_name' => 'nullable|string',
+                'service_template_id' => 'nullable|int|exists:App\Models\ServiceTemplate,id',
+            ] + $param_rules);
+
+        return Service::create($validated);
     }
 }

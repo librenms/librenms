@@ -43,6 +43,7 @@ Route::group(['middleware' => ['auth'], 'guard' => 'auth'], function () {
         Route::resource('{id}/settings', 'PollerSettingsController', ['as' => 'poller'])->only(['update', 'destroy']);
     });
     Route::resource('services', 'ServiceController')->except(['index', 'edit']);
+    Route::post('services/test', 'ServiceController@test')->name('services.test');
     Route::get('services/check/{type}/params', 'ServiceCheckController@params')->name('services.params');
     Route::prefix('services')->name('services.')->group(function () {
         Route::resource('templates', 'ServiceTemplateController');

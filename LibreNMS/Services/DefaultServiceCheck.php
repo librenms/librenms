@@ -100,7 +100,15 @@ class DefaultServiceCheck implements \LibreNMS\Interfaces\ServiceCheck
         }
 
         if (is_array($this->service->service_param)) {
-            return array_merge($command, $this->service->service_param);
+            foreach ($this->service->service_param as $flag => $value) {
+                $command[] = $flag;
+
+                if ($value) {
+                    $command[] = $value;
+                }
+            }
+
+            return $command;
         }
 
         return array_merge($command, $this->parseLegacyParams());
