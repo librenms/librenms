@@ -165,24 +165,24 @@ if (isset($options['t'])) {
     $test_data = [
         'applications' => [
             'discovery' => [
-                'applications' => [ [
+                'applications' => [[
                     'app_type' => $options['a'],
                     'app_state' => 'UNKNOWN',
                     'discovered' => '1',
                     'app_state_prev' => null,
                     'app_status' => '',
                     'app_instance' => '',
-                ], ],
+                ]],
             ],
             'poller' => [
-                'applications' => [ [
+                'applications' => [[
                     'app_type' => $options['a'],
                     'app_state' => 'OK',
                     'discovered' => '1',
                     'app_state_prev' => 'UNKNOWN',
                     'app_status' => '',
                     'app_instance' => '',
-                ], ],
+                ]],
                 'application_metrics' => [],
             ],
         ],
