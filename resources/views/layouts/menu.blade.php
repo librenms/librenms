@@ -257,7 +257,7 @@
                             @endif
                             @admin
                                 <li role="presentation" class="divider"></li>
-                            <li><a href="{{ url('addsrv') }}"><i class="fa fa-plus fa-fw fa-lg"
+                            <li><a href="{{ route('services.create') }}"><i class="fa fa-plus fa-fw fa-lg"
                                                                  aria-hidden="true"></i> {{ __('Add Service') }}</a></li>
                             @endadmin
                         </ul>

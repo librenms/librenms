@@ -10,9 +10,7 @@
             </template>
         </div>
     </div>
-    @isset($device_id)
-        <input type="hidden" name="device_id" id="device_id" value="{{ $device_id }}" x-model.number="device_id">
-    @else
+    @empty($device_id)
         <div class="form-group row">
             <label for='device_id' class="col-sm-4 col-md-3 control-label">{{ __('service.fields.device_id') }}</label>
             <div class="col-sm-8 col-md-9">
@@ -126,6 +124,7 @@
         </div>
     </div>
     <x-panel x-show="testMessage"
+             style="display: none;"
              title="Test Result"
              x-bind:class="{'panel-success': testResult === 0, 'panel-warning': testResult === 1, 'panel-danger': testResult === 2}">
         <pre x-text="testMessage">
@@ -138,7 +137,7 @@
     function serviceFormData() {
         return {
             service_id: null,
-            device_id: null,
+            device_id: {{ $device_id ?? 'null' }},
             service_name: '',
             service_type: 'icmp',
             service_desc: '',
@@ -273,14 +272,17 @@
                 this.$nextTick(() => this.currentParam = this.$refs.param.value);
             },
             init: function () {
-                let deviceSelect = init_select2('#device_id', 'device', {}, null, null, {allowClear: false});
+                if (! this.device_id) {
+                    let deviceSelect = init_select2('#device_id', 'device', {}, null, null, {allowClear: false});
 
-                deviceSelect.on("select2:select", (event) => {
-                    this.device_id = event.target.value;
-                });
-                this.$watch("device_id", (device) => {
-                    deviceSelect.val(device).trigger("change");
-                });
+                    deviceSelect.on("select2:select", (event) => {
+                        this.device_id = event.target.value;
+                    });
+
+                    this.$watch("device_id", (device) => {
+                        deviceSelect.val(device).trigger("change");
+                    });
+                }
 
                 if (this.service_type) {
                     this.fetchParams(this.service_type);
