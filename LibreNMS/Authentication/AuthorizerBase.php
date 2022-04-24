@@ -74,11 +74,9 @@ abstract class AuthorizerBase implements Authorizer
 
     public function getExternalUsername()
     {
-        if (isset($_SERVER['REMOTE_USER'])) {
-            return $_SERVER['REMOTE_USER'];
-        } elseif (isset($_SERVER['PHP_AUTH_USER'])) {
+        if (isset($_SERVER['PHP_AUTH_USER'])) {
             return $_SERVER['PHP_AUTH_USER'];
-        } elseif (Config::has('http_auth_header')) {
+        } else {
             $header_name = Config::get('http_auth_header');
             if (isset($_SERVER[$header_name])) {
                 return $_SERVER[$header_name];
