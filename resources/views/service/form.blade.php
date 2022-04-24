@@ -69,7 +69,7 @@
             <div class="tw-flex">
                 <select id="parameters" class="form-control has-feedback tw-flex-initial" x-model="currentParam" x-ref="param" x-bind:disabled="! currentParam" x-bind:class="{'!tw-border-red-500': Object.keys(errors).findIndex(e => e.includes('service_param')) >= 0}">
                     <template x-for="param in unusedParams()">
-                        <option x-bind:value="param.param || param.short" x-text="(param.param || param.short) + (param.required ? ' *' : '') + (param.group ? ' []' : '')"></option>
+                        <option x-bind:value="param.param || param.short" x-text="(param.param || param.short) + (paramIsRequired(param) ? ' *' : '') + (param.exclusive_group ? ' []' : '')"></option>
                     </template>
                 </select>
                 <input type='text' id='service_param' name='service_param' class='form-control has-feedback  tw-ml-2 tw-flex-grow' x-model="currentValue" x-ref="value"
@@ -171,6 +171,26 @@
                 const found = this.parameters.find(param => param.param === key || param.short === key);
                 return found ? found : {};
             },
+            paramIsRequired(param)
+            {
+                if (param.required === true) {
+                    return true;
+                }
+
+                if (Array.isArray(param.inclusive_group)) {
+                    const group = this.parameters.filter(p => param.inclusive_group.includes(p.short ? p.short : p.param));
+                    // console.log(group);
+
+                    const l = group.length;
+                    for (let i = 0; i < l; i++) {
+                        if (this.service_param.hasOwnProperty(group[i].param)) {
+                            return true;
+                        }
+                    }
+                }
+
+                return false;
+            },
             unusedParams() {
                 const used = Object.keys(this.service_param).concat(Object.values(this.excluded).flat());
                 return this.parameters.filter(param => ! (used.includes(param.param) || used.includes(param.short)));
@@ -178,7 +198,6 @@
             removeTag(param) {
                 delete this.service_param[param];
                 delete this.excluded[param];
-                // this.selectFirstParam();
             },
             addTag(param, value) {
                 let parameter = this.getParameter(param);
@@ -189,12 +208,11 @@
                         return;
                     }
 
-                    if (parameter.group) {
-                        this.excluded[param] = parameter.group;
+                    if (parameter.exclusive_group) {
+                        this.excluded[param] = parameter.exclusive_group;
                     }
                     this.service_param[param] = value;
                     this.currentValue = null;
-                    // this.selectFirstParam();
                 }
             },
             async fetchParams(type) {
@@ -214,10 +232,6 @@
                 this.hasHostname = hasHostname;
                 this.parameters = parameters;
                 this.$nextTick(() => this.currentParam = this.$refs.param.value);
-            },
-            selectFirstParam() {
-                let first = this.unusedParams().first();
-                this.currentParam = first.param || first.short;
             },
             init: function () {
                 let deviceSelect = init_select2('#device_id', 'device', {}, null, null, {allowClear: false});

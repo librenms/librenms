@@ -37,43 +37,70 @@ class CheckParameter
     public $description = '';
     /** @var bool */
     public $required = false;
-    /** @var \LibreNMS\Services\CheckParameter[] */
-    public $group;
+    /** @var string[] */
+    public $exclusive_group;
+    /** @var string[] */
+    public $inclusive_group;
 
     public function __construct(string $param, string $short, string $value, string $description = '')
     {
-        $this->param = trim(htmlspecialchars($param));
-        $this->short = trim(htmlspecialchars($short));
-        $this->value = trim(htmlspecialchars($value));
-        $this->description = trim(htmlspecialchars($description));
+        $this->param = $param;
+        $this->short = $short;
+        $this->value = $value;
+        $this->description = $description;
     }
 
     /**
      * Append to the existing description, adding new lines
      */
-    public function appendDescription(string $line): void
+    public function appendDescription(string $line): CheckParameter
     {
         if (! empty($this->description)) {
             $this->description .= PHP_EOL;
         }
 
         $this->description .= trim(htmlspecialchars($line));
+
+        return $this;
     }
 
     /**
      * Mark this parameter as required
      */
-    public function setRequired(bool $required = true): void
+    public function setRequired(bool $required = true): CheckParameter
     {
         $this->required = $required;
+
+        return $this;
     }
 
     /**
-     * @param  \LibreNMS\Services\CheckParameter[]  $group
-     * @return void
+     * @param  string[]  $group
+     * @return \LibreNMS\Services\CheckParameter
      */
-    public function setExclusiveGroup(array $group): void
+    public function setExclusiveGroup(array $group): CheckParameter
     {
-        $this->group = $group;
+        $this->exclusive_group = $group;
+
+        return $this;
+    }
+
+    /**
+     * @param  string[]  $group
+     * @return \LibreNMS\Services\CheckParameter
+     */
+    public function setInclusiveGroup(array $group): CheckParameter
+    {
+        $this->inclusive_group = $group;
+
+        return $this;
+    }
+
+    public function __get(string $name) {
+        if (property_exists($this, $name)) {
+            return trim(htmlspecialchars($this->$name));
+        }
+
+        return null;
     }
 }

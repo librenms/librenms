@@ -25,7 +25,7 @@
 
 namespace LibreNMS\Services;
 
-use Illuminate\Support\Str;
+use Illuminate\Support\Collection;
 use LibreNMS\Config;
 use Symfony\Component\Process\Process;
 
@@ -40,18 +40,14 @@ class HelpParser
      */
     public function parse(string $check): array
     {
-        $command = [Config::get('nagios_plugins') . '/' . $check, '--help'];
-        $process = new Process($command);
-        $process->run();
-
-        foreach (explode("\n", $process->getOutput()) as $line) {
+        foreach (explode("\n", $this->fetchHelp($check)) as $line) {
             // parse usage section, includes optional/required information
             if (preg_match("/^(Usage:)?\s*$check [-[{]/", $line)) {
                 if (isset($usage)) {
-                    $this->parseUsage( $usage);
+                    $this->parseUsage($usage);
                 }
                 $usage = trim($line);
-            } elseif(isset($usage)) {
+            } elseif (isset($usage)) {
                 if (empty($line)) {
                     $this->parseUsage($usage);
                     unset($usage);
@@ -80,56 +76,70 @@ class HelpParser
         return $this->params;
     }
 
+    protected function fetchHelp(string $check): string
+    {
+        $command = [Config::get('nagios_plugins') . '/' . $check, '--help'];
+        $process = new Process($command);
+        $process->run();
+
+        return $process->getOutput();
+    }
+
     /**
      * @param  string  $usage
      * @return void
      */
-    private function parseUsage(string $usage)
+    private function parseUsage(string $usage): void
     {
-        preg_match_all('/[{[]?(-{1,2}\w+)( [^-[\]{}|]+)?[}\]|]?/', $usage, $matches);
+        $usage .= ' ';
+        $optional_args = [];
+        $required_args = [];
+        $filtered = preg_replace_callback('/\[(-\w.*?)\] /', function ($match) use (&$optional_args) {
+            $optional_args[] = $match[1];
+            return '';
+        }, $usage);
 
-        $group = [];
-        $required = false;
-        foreach ($matches[0] as $index => $match) {
-            $short = $matches[1][$index];
-            $value = trim($matches[2][$index]);
+        preg_match('/(?<= )-\w \S+/', $filtered, $required_args);
 
-            $this->setParameter(new CheckParameter('', $short, $value));
-
-            // check the starting character if we aren't in a group
-            if (empty($group) && Str::startsWith($match, ['-', '{'])) {
-                $required = true;
-            }
-
-            // if $required is set, set it on the parameter
-            $this->params[$short]->setRequired($required);
-
-            if (! empty($group)) {
-                // keep adding to the group until we find the end
-                $group[] = $short;
-
-                // if found the last one, save the group to all members
-                if (Str::endsWith($match, ['}', ']'])) {
-                    foreach ($group as $member) {
-                        $this->params[$member]->setExclusiveGroup($group);
-                    }
-                    $group = []; // clear group
-                    $required = false; // clear required status
-                }
-            } elseif (Str::endsWith($match, '|')) {
-                // the start of a group
-                $group[] = $short;
-            } else {
-                $required = false; // not a group, reset $required
-            }
+        foreach ($required_args as $entry) {
+            $this->parseOptionGroup($entry, true);
+        }
+        foreach ($optional_args as $entry) {
+            $this->parseOptionGroup($entry, false);
         }
     }
 
-    private function setParameter(CheckParameter $param)
+    private function parseOptionGroup(string $group, bool $required): void
+    {
+        $group_params = new Collection;
+        $exclusive = true;
+
+        $args = preg_split('/(\||]\[)/', $group);
+        if (count($args) === 1) {
+            $exclusive = false;
+            preg_match_all('/((?<= )-\w \S+|^-\w \S+)/', $group, $inclusive_args);
+            $args = $inclusive_args[0];
+        }
+        foreach ($args as $arg) {
+            $parts = explode(' ', $arg, 2);
+            $group_params->push((new CheckParameter('', $parts[0], $parts[1] ?? ''))->setRequired($required));
+        }
+
+        // set group
+        $group_keys = $group_params->pluck('short')->all();
+        foreach ($group_params as $param) {
+            if (count($group_params) > 1) {
+                $param = $exclusive ? $param->setExclusiveGroup($group_keys) : $param->setInclusiveGroup($group_keys);
+            }
+            $this->setParameter($param);
+        }
+    }
+
+    private function setParameter(CheckParameter $param): void
     {
         $key = $param->short ?: $param->param;
         if (isset($this->params[$key])) {
-            foreach (['short', 'param', 'value', 'description', 'required', 'group'] as $field) {
+            foreach (['short', 'param', 'value', 'description', 'required', 'inclusive_group', 'exclusive_group'] as $field) {
                 $this->params[$key]->$field = $param->$field ?: $this->params[$key]->$field;
             }
         } else {
