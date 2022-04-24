@@ -382,21 +382,21 @@ The included templates apart from the default template are:
 ### Microsoft Teams - Markdown
 
 ```
-[{{ $alert->title }}](https://your.librenms.url/device/device={{ $alert->device_id }}/)  
-**Device name:** {{ $alert->sysName }}  
-**Severity:** {{ $alert->severity }}  
+[{{ $alert->title }}](https://your.librenms.url/device/device={{ $alert->device_id }}/)
+**Device name:** {{ $alert->sysName }}
+**Severity:** {{ $alert->severity }}
 @if ($alert->state == 0)
-**Time elapsed:** {{ $alert->elapsed }}  
+**Time elapsed:** {{ $alert->elapsed }}
 @endif
-**Timestamp:** {{ $alert->timestamp }}  
-**Unique-ID:** {{ $alert->uid }}  
+**Timestamp:** {{ $alert->timestamp }}
+**Unique-ID:** {{ $alert->uid }}
 @if ($alert->name)
-**Rule:** {{ $alert->name }}  
+**Rule:** {{ $alert->name }}
 @else
-**Rule:** {{ $alert->rule }}  
+**Rule:** {{ $alert->rule }}
 @endif
 @if ($alert->faults)
-**Faults:**@foreach ($alert->faults as $key => $value) {{ $key }}: {{ $value['string'] }}  
+**Faults:**@foreach ($alert->faults as $key => $value) {{ $key }}: {{ $value['string'] }}
 @endforeach
 @endif
 ```
