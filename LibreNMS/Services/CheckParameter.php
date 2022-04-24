@@ -44,10 +44,10 @@ class CheckParameter
 
     public function __construct(string $param, string $short, string $value, string $description = '')
     {
-        $this->param = $param;
-        $this->short = $short;
-        $this->value = $value;
-        $this->description = $description;
+        $this->param = trim($param);
+        $this->short = trim($short);
+        $this->value = trim($value);
+        $this->description = trim($description);
     }
 
     /**
@@ -59,7 +59,7 @@ class CheckParameter
             $this->description .= PHP_EOL;
         }
 
-        $this->description .= $line;
+        $this->description .= trim($line);
 
         return $this;
     }
@@ -96,11 +96,16 @@ class CheckParameter
         return $this;
     }
 
-    public function __get(string $name) {
-        if (property_exists($this, $name)) {
-            return trim(htmlspecialchars($this->$name));
-        }
-
-        return null;
+    public function toEscapedArray(): array
+    {
+        return [
+            'param' => htmlentities($this->param),
+            'short' => htmlentities($this->short),
+            'value' => htmlentities($this->value),
+            'description' => htmlentities($this->description),
+            'required' => (bool) $this->required,
+            'exclusive_group' => isset($this->exclusive_group) ? array_map('htmlentities', $this->exclusive_group) : null,
+            'inclusive_group' => isset($this->inclusive_group) ? array_map('htmlentities', $this->inclusive_group) : null,
+        ];
     }
 }
