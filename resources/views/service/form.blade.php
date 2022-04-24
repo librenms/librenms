@@ -165,7 +165,7 @@
                 });
                 let result = await response.json();
                 console.log(result);
-                this.errors = result.errors
+                this.errors = result.errors ? result.errors : {};
             },
             getParameter(key) {
                 const found = this.parameters.find(param => param.param === key || param.short === key);
