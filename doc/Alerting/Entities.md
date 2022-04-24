@@ -49,7 +49,8 @@ Entity | Description
 Entity | Description
 ---|---
 `mempools.mempool_type` | The memory pool type such as hrstorage, cmp and cemp
-`mempools.mempool_descr` | The description of the pool such as Physical memory, Virtual memory and System memory
+`mempools.mempool_descr` | The description of the pool such as
+Physical memory, Virtual memory and System memory
 `mempools.mempool_perc` | The used percentage of the memory pool.
 
 ## Ports
