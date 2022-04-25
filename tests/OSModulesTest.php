@@ -118,7 +118,7 @@ class OSModulesTest extends DBTestCase
             $actual = $results[$module]['discovery'] ?? [];
             $time_diff=1650911765 - time();
             $this->freezeTime();
-            $this->travel($time)->seconds();
+            $this->travel($time_diff)->seconds();
             $this->assertEquals(
                 $expected,
                 $actual,
