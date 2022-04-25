@@ -25,8 +25,6 @@
 
 namespace App\Polling\Measure;
 
-use DB;
-use Illuminate\Database\Events\QueryExecuted;
 use Illuminate\Support\Collection;
 use Log;
 
@@ -49,17 +47,6 @@ class MeasurementManager
             self::$categories->put('snmp', new MeasurementCollection());
             self::$categories->put('db', new MeasurementCollection());
         }
-    }
-
-    /**
-     * Register DB listener to record sql query stats
-     */
-    public function listenDb(): void
-    {
-        DB::listen(function (QueryExecuted $event) {
-            $type = strtolower(substr($event->sql, 0, strpos($event->sql, ' ')));
-            $this->recordDb(Measurement::make($type, $event->time ? $event->time / 100 : 0));
-        });
     }
 
     /**

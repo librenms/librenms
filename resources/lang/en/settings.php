@@ -1387,6 +1387,10 @@ return [
                     'description' => 'Disable snmp bulk for OIDs',
                     'help' => 'Disable snmp bulk operation for certain OIDs. Generally, this should be set on an OS instead. Format should be MIB::OID',
                 ],
+                'unordered' => [
+                    'description' => 'Allow out of order snmp respsonse for OIDs',
+                    'help' => 'Ignore unordered OIDs in snmp responses for certain OIDs. Unordered OIDs could result in an oid loop during an snmpwalk. Generally, this should be set on an OS instead. Format should be MIB::OID',
+                ],
             ],
             'port' => [
                 'description' => 'Port',
@@ -1592,6 +1596,7 @@ return [
         'boolean' => ':value is not a valid boolean',
         'color' => ':value is not a valid hex color code',
         'email' => ':value is not a valid email',
+        'float' => ':value is not an float',
         'integer' => ':value is not an integer',
         'password' => 'The password is incorrect',
         'select' => ':value is not an allowed value',

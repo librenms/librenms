@@ -25,7 +25,9 @@
 
 namespace LibreNMS\Util;
 
+use DB;
 use Illuminate\Http\Client\ConnectionException;
+use Illuminate\Support\Arr;
 use LibreNMS\Config;
 use LibreNMS\DB\Eloquent;
 use Symfony\Component\Process\Process;
@@ -33,7 +35,7 @@ use Symfony\Component\Process\Process;
 class Version
 {
     // Update this on release
-    public const VERSION = '22.3.0';
+    public const VERSION = '22.4.0';
 
     /**
      * @var bool
@@ -100,7 +102,7 @@ class Version
 
     public function databaseServer(): string
     {
-        return \LibreNMS\DB\Eloquent::isConnected() ? \LibreNMS\DB\Eloquent::version() : 'Not Connected';
+        return Eloquent::isConnected() ? Arr::first(DB::selectOne('select version()')) : 'Not Connected';
     }
 
     public function database(): array
