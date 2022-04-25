@@ -4,7 +4,7 @@
         <div class="col-sm-8 col-md-9">
             <input type='text' id='service_name' name='service_name' class='form-control input-sm' x-model="service_name" x-bind:class="{'!tw-border-red-500': errors.service_name}"/>
         </div>
-        <div class='col-sm-8 col-sm-offset-4 tw-text-red-500'>
+        <div class='col-sm-8 col-sm-offset-4 col-md-9 col-md-offset-3 tw-text-red-500'>
             <template x-for="error in errors.service_name">
                 <div x-text="error"></div>
             </template>
@@ -17,7 +17,7 @@
                 <select id='device_id' name='device_id' class='form-control' x-model.number="device_id" x-bind:class="{'!tw-border-red-500': errors.device_id}">
                 </select>
             </div>
-            <div class="col-sm-8 col-sm-offset-4 tw-text-red-500">
+            <div class="col-sm-8 col-sm-offset-4 col-md-9 col-md-offset-3 tw-text-red-500">
                 <template x-for="error in errors.device_id">
                     <div x-text="error"></div>
                 </template>
@@ -33,7 +33,7 @@
                 @endforeach
             </select>
         </div>
-        <div class='col-sm-8 col-sm-offset-4 tw-text-red-500'>
+        <div class='col-sm-8 col-sm-offset-4 col-md-9 col-md-offset-3 tw-text-red-500'>
             <template x-for="error in errors.service_type">
                 <div x-text="error"></div>
             </template>
@@ -44,7 +44,7 @@
         <div class='col-sm-8'>
             <textarea id='service_desc' name='service_desc' class='form-control' rows='5' x-model="service_desc" x-bind:class="{'!tw-border-red-500': errors.service_desc}"></textarea>
         </div>
-        <div class='col-sm-8 col-sm-offset-4 tw-text-red-500'>
+        <div class='col-sm-8 col-sm-offset-4 col-md-9 col-md-offset-3 tw-text-red-500'>
             <template x-for="error in errors.service_desc">
                 <div x-text="error"></div>
             </template>
@@ -55,7 +55,7 @@
         <div class="col-sm-8 col-md-9">
             <input type='text' id='service_ip' name='service_ip' class='form-control has-feedback' placeholder='{{ __('service.this_device') }}' x-model="service_ip" x-bind:class="{'!tw-border-red-500': errors.service_ip}"/>
         </div>
-        <div class='col-sm-8 col-sm-offset-4 tw-text-red-500'>
+        <div class='col-sm-8 col-sm-offset-4 col-md-9 col-md-offset-3 tw-text-red-500'>
             <template x-for="error in errors.service_ip">
                 <div x-text="error"></div>
             </template>
@@ -89,7 +89,7 @@
                 </div>
             </template>
         </div>
-        <div class='col-sm-8 col-sm-offset-4 tw-text-red-500'>
+        <div class='col-sm-8 col-sm-offset-4 col-md-9 col-md-offset-3 tw-text-red-500'>
             <template x-for="error in Object.entries(errors).reduce((carry, [key, message]) => key.includes('service_param') ? carry.concat(String(message).replace('service param.', '')) : carry, [])">
                 <div x-text="error"></div>
             </template>
@@ -100,7 +100,7 @@
         <div class="col-sm-8 col-md-9">
             <x-toggle x-model="service_ignore"></x-toggle>
         </div>
-        <div class='col-sm-8 col-sm-offset-4 tw-text-red-500'>
+        <div class='col-sm-8 col-sm-offset-4 col-md-9 col-md-offset-3 tw-text-red-500'>
             <template x-for="error in errors.service_ignore">
                 <div x-text="error"></div>
             </template>
@@ -127,9 +127,7 @@
              style="display: none;"
              title="Test Result"
              x-bind:class="{'panel-success': testResult === 0, 'panel-warning': testResult === 1, 'panel-danger': testResult === 2}">
-        <pre x-text="testMessage">
-
-        </pre>
+        <pre x-text="testMessage"></pre>
     </x-panel>
 </form>
 
@@ -189,17 +187,17 @@
                 });
                 let result = await response.json();
 
-                if (result.errors) {
+                if (result.errors.length) {
                     this.errors = result.errors;
                     return false;
                 } else {
                     this.errors = {};
+                    this.$dispatch('service-saved');
                     return result;
                 }
             },
             async test() {
                 const result = await this.submitCheck('{{ route('services.test') }}')
-                console.log(result);
                 if (result !== false) {
                     this.testMessage = result.message;
                     this.testResult = result.result;
@@ -267,6 +265,8 @@
                     return true;
                 });
 
+                this.errors = {};
+                this.service_param = {};
                 this.hasHostname = hasHostname;
                 this.parameters = parameters;
                 this.$nextTick(() => this.currentParam = this.$refs.param.value);

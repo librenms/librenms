@@ -8,6 +8,10 @@
         'lg' => 'sm:tw-max-w-lg',
         'xl' => 'sm:tw-max-w-xl',
         '2xl' => 'sm:tw-max-w-2xl',
+        '3xl' => 'tw-max-w-3xl',
+        '4xl' => 'tw-max-w-4xl',
+        '5xl' => 'tw-max-w-5xl',
+        '6xl' => 'tw-max-w-6xl',
     ][$maxWidth ?? '2xl'];
 @endphp
 

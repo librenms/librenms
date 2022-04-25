@@ -41,12 +41,12 @@
                                 <div>{{ $service->service_ip ?: $device->overwrite_ip ?: $device->hostname }}</div>
                             </div>
                             <div class="col-sm-2 text-muted">{{ $service->service_desc }}</div>
-                            <div class="col-sm-4">{{ nl2br($service->service_message) }}</div>
+                            <div class="col-sm-4">{!! nl2br(e($service->service_message)) !!}</div>
                             <div class="col-sm-2 text-muted">{{ \LibreNMS\Util\Time::formatInterval(time() - $service->service_changed, 'short') }}</div>
                             <div class="col-sm-1">
-                                <div class="pull-right">
+                                <div class="tw-flex tw-flex-nowrap tw-flex-row-reverse">
                                     <button type='button' class='btn btn-primary btn-sm' aria-label='Edit' data-toggle='modal' data-target='#create-service' data-service_id='{$service->service_id}' name='edit-service'><i class='fa fa-pencil' aria-hidden='true'></i></button>
-                                    <button type='button' class='btn btn-danger btn-sm' aria-label='Delete' data-toggle='modal' data-target='#confirm-delete' data-service_id='{$service->service_id}' name='delete-service'><i class='fa fa-trash' aria-hidden='true'></i></button>
+                                    <button type='button' class='btn btn-danger btn-sm tw-mr-1' aria-label='Delete' data-toggle='modal' data-target='#confirm-delete' data-service_id='{$service->service_id}' name='delete-service'><i class='fa fa-trash' aria-hidden='true'></i></button>
                                 </div>
                             </div>
                         </td>
@@ -69,8 +69,8 @@
         @endisset
     </x-panel>
 
-    <x-modal x-model="showModal">
-        <x-panel title="{{ __('service.add') }}" class="!tw-mb-0">
+    <x-modal x-model="showModal" max-width="5xl">
+        <x-panel title="{{ __('service.add') }}" class="!tw-mb-0" x-on:service-saved="showModal=false; console.log('saved');">
             @include('service.form', ['device_id' => $device->device_id ?? null])
         </x-panel>
     </x-modal>
