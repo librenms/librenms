@@ -26,7 +26,6 @@
 namespace LibreNMS\Tests;
 
 use DeviceCache;
-#use Carbon\Carbon;
 use Illuminate\Support\Carbon;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use LibreNMS\Config;
@@ -117,9 +116,9 @@ class OSModulesTest extends DBTestCase
         foreach ($modules as $module) {
             $expected = $expected_data[$module]['discovery'] ?? [];
             $actual = $results[$module]['discovery'] ?? [];
-            $time=1650911765;
+            $time_diff=1650911765 - time();
             $this->freezeTime();
-            $this->travelTo(Carbon::new($time));
+            $this->travel($time)->seconds();
             $this->assertEquals(
                 $expected,
                 $actual,
