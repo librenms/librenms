@@ -1,0 +1,72 @@
+{
+    "applications": {
+        "discovery": {
+            "applications": [
+                {
+                    "app_type": "sneck",
+                    "app_state": "UNKNOWN",
+                    "discovered": "1",
+                    "app_state_prev": null,
+                    "app_status": "",
+                    "app_instance": ""
+                }
+            ]
+        },
+        "poller": {
+            "applications": [
+                {
+                    "app_type": "sneck",
+                    "app_state": "OK",
+                    "discovered": "1",
+                    "app_state_prev": "UNKNOWN",
+                    "app_status": "",
+                    "app_instance": ""
+                }
+            ],
+            "application_metrics": [
+                {
+                    "metric": "alert",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "sneck"
+                },
+                {
+                    "metric": "critical",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "sneck"
+                },
+                {
+                    "metric": "errored",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "sneck"
+                },
+                {
+                    "metric": "ok",
+                    "value": 1,
+                    "value_prev": null,
+                    "app_type": "sneck"
+                },
+                {
+                    "metric": "time_to_polling_abs",
+                    "value": 10,
+                    "value_prev": null,
+                    "app_type": "sneck"
+                },
+                {
+                    "metric": "unknown",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "sneck"
+                },
+                {
+                    "metric": "warning",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "sneck"
+                }
+            ]
+        }
+    }
+}

@@ -111,38 +111,40 @@ class OSModulesTest extends DBTestCase
         // output all discovery and poller output if debug mode is enabled for phpunit
         $phpunit_debug = in_array('--debug', $_SERVER['argv'], true);
 
-        foreach ($modules as $module) {
-            $expected = $expected_data[$module]['discovery'] ?? [];
-            $actual = $results[$module]['discovery'] ?? [];
-            $this->assertEquals(
-                $expected,
-                $actual,
-                "OS $os: Discovered $module data does not match that found in $filename\n"
-                . print_r(array_diff($expected, $actual), true)
-                . $helper->getDiscoveryOutput($phpunit_debug ? null : $module)
-                . "\nOS $os: Discovered $module data does not match that found in $filename"
-            );
+        $this->freezeTime(function (Carbon '1650911765') {
+            foreach ($modules as $module) {
+                $expected = $expected_data[$module]['discovery'] ?? [];
+                $actual = $results[$module]['discovery'] ?? [];
+                $this->assertEquals(
+                    $expected,
+                    $actual,
+                    "OS $os: Discovered $module data does not match that found in $filename\n"
+                    . print_r(array_diff($expected, $actual), true)
+                    . $helper->getDiscoveryOutput($phpunit_debug ? null : $module)
+                    . "\nOS $os: Discovered $module data does not match that found in $filename"
+                );
 
-            if ($module === 'route') {
-                // no route poller module
-                continue;
-            }
+                if ($module === 'route') {
+                    // no route poller module
+                    continue;
+                }
 
-            if ($expected_data[$module]['poller'] == 'matches discovery') {
-                $expected = $expected_data[$module]['discovery'];
-            } else {
-                $expected = $expected_data[$module]['poller'] ?? [];
-            }
-            $actual = $results[$module]['poller'] ?? [];
-            $this->assertEquals(
-                $expected,
-                $actual,
-                "OS $os: Polled $module data does not match that found in $filename\n"
-                . print_r(array_diff($expected, $actual), true)
-                . $helper->getPollerOutput($phpunit_debug ? null : $module)
-                . "\nOS $os: Polled $module data does not match that found in $filename"
-            );
-        }
+                if ($expected_data[$module]['poller'] == 'matches discovery') {
+                    $expected = $expected_data[$module]['discovery'];
+                } else {
+                    $expected = $expected_data[$module]['poller'] ?? [];
+                }
+                $actual = $results[$module]['poller'] ?? [];
+                $this->assertEquals(
+                    $expected,
+                    $actual,
+                    "OS $os: Polled $module data does not match that found in $filename\n"
+                    . print_r(array_diff($expected, $actual), true)
+                    . $helper->getPollerOutput($phpunit_debug ? null : $module)
+                    . "\nOS $os: Polled $module data does not match that found in $filename"
+                );
+              }
+        });
 
         DeviceCache::flush(); // clear cached devices
     }
