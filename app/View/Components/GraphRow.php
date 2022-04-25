@@ -42,6 +42,10 @@ class GraphRow extends Component
      * @var string
      */
     public $aspect;
+    /**
+     * @var array
+     */
+    private $vars;
 
     /**
      * Create a new component instance.
@@ -55,14 +59,16 @@ class GraphRow extends Component
      * @param  \App\Models\Device|int|null  $device
      * @param  \App\Models\Port|int|null  $port
      */
-    public function __construct(string $type = '', string $title = null, string $loading = 'eager', string $aspect = 'normal', $columns = 2, array $graphs = [['from' => '-1d'], ['from' => '-7d'], ['from' => '-30d'], ['from' => '-1y']], $device = null, $port = null)
+    public function __construct(string $type = '', string $title = null, string $loading = 'eager', string $aspect = 'normal', $columns = 2, array $graphs = [['from' => '-1d'], ['from' => '-7d'], ['from' => '-30d'], ['from' => '-1y']], array $vars = [], $device = null, $port = null)
     {
         $this->type = $type;
         $this->aspect = $aspect;
         $this->loading = $loading;
         $this->device = $device;
         $this->port = $port;
-        $this->graphs = $graphs;
+        $this->graphs = array_map(function ($graph) use ($vars) {
+            return $vars + $graph;
+        }, $graphs);
         $this->title = $title;
         $this->responsive = $columns == 'responsive';
         $this->rowWidth = $this->calculateRowWidth((int) $columns);

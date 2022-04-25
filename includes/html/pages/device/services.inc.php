@@ -20,6 +20,27 @@ use LibreNMS\Util\Time;
 
 $pagetitle[] = 'Services';
 
+$view = Request::segment(4, 'basic');
+
+if ($view == 'graphs') {
+
+}
+
+
+
+echo view('service.index', [
+        'services' => DeviceCache::getPrimary()->services,
+        'menu' => ['view' => [
+            ['url' => 'basic', 'name' => trans('service.view_basic')],
+            ['url' => 'graphs', 'name' => trans('service.view_graphs')],
+        ]],
+        'view' => $view,
+        'device' => DeviceCache::getPrimary(),
+        'graph_vars' => ['id' => 1, 'ds' => 'blah']
+    ]
+);
+return;
+
 $services = DeviceCache::getPrimary()->services;
 
 require_once 'includes/html/modal/new_service.inc.php';

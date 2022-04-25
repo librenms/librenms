@@ -7,15 +7,20 @@ return [
     'test' => 'Test Service',
     'added' => 'Service Created',
     'this_device' => '<This Device>',
+    'view_basic' => 'Basic',
+    'view_graphs' => 'Graphs',
+    'graph' => 'Data Set: :ds',
     'fields' => [
-        'service_name' => 'Name',
         'device_id' => 'Device',
-        'service_type' => 'Check Type',
+        'service_changed' => 'Last Changed',
         'service_desc' => 'Description',
-        'service_ip' => 'Remote Host',
-        'service_param' => 'Parameters',
-        'service_ignore' => 'Ignore Alert Tag',
         'service_disabled' => 'Disable Polling and Alerting',
+        'service_ignore' => 'Ignore Alert Tag',
+        'service_ip' => 'Remote Host',
+        'service_message' => 'Message',
+        'service_name' => 'Name',
+        'service_param' => 'Parameters',
+        'service_type' => 'Type',
     ]
 ];
 
