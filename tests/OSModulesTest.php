@@ -117,16 +117,17 @@ class OSModulesTest extends DBTestCase
             $expected = $expected_data[$module]['discovery'] ?? [];
             $actual = $results[$module]['discovery'] ?? [];
             $time=1650911765;
-            $this->freezeTime(function (Carbon $time) {
-                $this->assertEquals(
-                    $expected,
-                    $actual,
-                    "OS $os: Discovered $module data does not match that found in $filename\n"
-                    . print_r(array_diff($expected, $actual), true)
-                    . $helper->getDiscoveryOutput($phpunit_debug ? null : $module)
-                    . "\nOS $os: Discovered $module data does not match that found in $filename"
-                );
-            });
+            $this->freezeTime();
+            $this->travelTo(Carbon::new($time));
+            $this->assertEquals(
+                $expected,
+                $actual,
+                "OS $os: Discovered $module data does not match that found in $filename\n"
+                . print_r(array_diff($expected, $actual), true)
+                . $helper->getDiscoveryOutput($phpunit_debug ? null : $module)
+                . "\nOS $os: Discovered $module data does not match that found in $filename"
+            );
+            $this->travelBack();
 
             if ($module === 'route') {
                 // no route poller module
