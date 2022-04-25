@@ -26,6 +26,7 @@
 namespace LibreNMS\Tests;
 
 use DeviceCache;
+use Carbon\Carbon;
 use Illuminate\Support\Carbon;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use LibreNMS\Config;
