@@ -31,7 +31,6 @@ $time_to_polling=time() - $json_return['data']['time'];
 $fields = [
     'time' => $json_return['data']['time'],
     'time_to_polling' => $time_to_polling,
-
     'ok' => $json_return['data']['ok'],
     'warning' => $json_return['data']['warning'],
     'critical' => $json_return['data']['critical'],
@@ -43,7 +42,7 @@ $tags = ['name' => $name, 'app_id' => $app_id, 'rrd_def' => $rrd_def, 'rrd_name'
 data_update($device, 'app', $tags, $fields);
 
 // only used for alerting
-$fields['time_to_polling_abs'] = ($time_to_polling);
+$fields['time_to_polling_abs'] = abs($time_to_polling);
 
 // update it here as we are done with this mostly
 update_application($app, 'OK', $fields);
