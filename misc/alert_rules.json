@@ -482,5 +482,30 @@
   {
     "builder": {"condition":"AND","rules":[{"id":"ports.ifSpeed","field":"ports.ifSpeed","type":"string","input":"text","operator":"greater","value":"0"},{"id":"ports.ifSpeed","field":"ports.ifSpeed","type":"string","input":"text","operator":"less","value":"`ports.ifSpeed_prev`"},{"id":"eventlog.message","field":"eventlog.message","type":"string","input":"text","operator":"begins_with","value":"ifSpeed:"},{"id":"eventlog.datetime","field":"eventlog.datetime","type":"datetime","input":"text","operator":"greater_or_equal","value":"`macros.past_10m`"},{"id":"ports.port_id","field":"ports.port_id","type":"string","input":"text","operator":"equal","value":"`eventlog.reference`"},{"id":"ports.ifOperStatus","field":"ports.ifOperStatus","type":"string","input":"text","operator":"equal","value":"up"},{"id":"ports.disabled","field":"ports.disabled","type":"string","input":"text","operator":"equal","value":"0"}],"valid":true},
     "name": "Port Speed Degraded"
+  },
+  {
+    "rule": "applications.app_type = \"sneck\" && application_metrics.metric = \"warning\" && application_metrics.value >= \"1\"",
+    "name": "Sneck Warnings >= 1",
+    "severity": "warning"
+  },
+  {
+    "rule": "applications.app_type = \"sneck\" && application_metrics.metric = \"critical\" && application_metrics.value >= \"1\"",
+    "name": "Sneck Critical >= 1",
+    "severity": "critical"
+  },
+  {
+    "rule": "applications.app_type = \"sneck\" && application_metrics.metric = \"unknown\" && application_metrics.value >= \"1\"",
+    "name": "Sneck Unknown >= 1",
+    "severity": "critical"
+  },
+  {
+    "rule": "applications.app_type = \"sneck\" && application_metrics.metric = \"errored\" && application_metrics.value >= \"1\"",
+    "name": "Sneck Errored >= 1",
+    "severity": "critical"
+  },
+  {
+    "rule": "applications.app_type = \"sneck\" && application_metrics.metric = \"time_to_polling_abs\" && application_metrics.value >= \"540\"",
+    "name": "Sneck Has Not Run For Over 540 Seconds",
+    "severity": "critical"
   }
 ]
