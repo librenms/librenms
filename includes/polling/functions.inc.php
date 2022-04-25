@@ -634,7 +634,10 @@ function json_app_get($device, $extend, $min_version = 1)
     }
 
     //  turn the JSON into a array
-    $parsed_json = json_decode(stripslashes($output), true);
+    $output=str_replace( '\n', "%%%NEWLINENELINENEWLINE%%%", $output);
+    $output=stripslashes($output);
+    $output=str_replace( "%%%NEWLINENELINENEWLINE%%%", '\n', $output);
+    $parsed_json = json_decode($output, true);
 
     // improper JSON or something else was returned. Populate the variable with an error.
     if (json_last_error() !== JSON_ERROR_NONE) {
