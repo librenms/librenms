@@ -116,7 +116,8 @@ class OSModulesTest extends DBTestCase
         foreach ($modules as $module) {
             $expected = $expected_data[$module]['discovery'] ?? [];
             $actual = $results[$module]['discovery'] ?? [];
-            $this->freezeTime(function (Carbon '1650911765') {
+            $time=1650911765;
+            $this->freezeTime(function (Carbon $time) {
                 $this->assertEquals(
                     $expected,
                     $actual,
