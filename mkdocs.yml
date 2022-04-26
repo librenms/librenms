@@ -8,7 +8,20 @@ theme:
     text: 'Roboto'
     code: 'Roboto Mono'
   palette:
-    primary: black
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: black
+      accent: indigo
+      toggle:
+        icon: material/lightbulb-outline
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: black
+      accent: indigo
+      toggle:
+        icon: material/lightbulb
+        name: Switch to light mode
 
   features:
     - navigation.instant
