@@ -2109,7 +2109,7 @@ UNKNOWN statuses.
 Included are alert examples. Although if you want to set up your own,
 the metrics below are provided.
 
-| Metric | Descrition |
+| Metric | Description |
 |--------|------------|
 | ok     | Total OK checks |
 | warning | Total WARNING checks |
