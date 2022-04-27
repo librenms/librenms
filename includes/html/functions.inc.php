@@ -1325,6 +1325,33 @@ function get_sensor_label_color($sensor, $type = 'sensors')
 }
 
 /**
+ * Returns a list of the various suricata instances for
+ * the specified device id.
+ *
+ * @param $device_id
+ * @return array
+ */
+function get_suricata_instances($device_id)
+{
+    $options = [
+        'filter' => [
+            'type' => ['=', 'suricata'],
+        ],
+    ];
+
+    $component = new LibreNMS\Component();
+    $ourc = $component->getComponents($device_id, $options);
+
+    if (isset($ourc[$device_id])) {
+        $id = $component->getFirstComponentID($ourc, $device_id);
+
+        return json_decode($ourc[$device_id][$id]['instances']);
+    }
+
+    return [];
+}
+
+/**
  * @params int unix time
  * @params int seconds
  *

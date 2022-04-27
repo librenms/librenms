@@ -141,7 +141,7 @@ More info: [https://laravel.com/docs/blade#extending-a-layout](https://laravel.c
 
 ## Examples
 
-#### Default Template
+### Default Template
 
 ```text
 {{ $alert->title }}
@@ -295,7 +295,14 @@ $config['allow_unauth_graphs'] = true;
 
 ## Using models for optional data
 
-If some value does not exist withing the `$faults[]`-array, you may query fields from the database using Laravel models. You may use models to query additional values and use them on the template by placing the model and the value to search for within the braces. For example, ISIS-alerts do have a `port_id` value associated with the alert but `ifName` is not directly accessible from the `$faults[]`-array. If the name of the port was needed, it's value could be queried using a template such as:
+If some value does not exist withing the `$faults[]`-array, you may
+query fields from the database using Laravel models. You may use
+models to query additional values and use them on the template by
+placing the model and the value to search for within the braces. For
+example, ISIS-alerts do have a `port_id` value associated with the
+alert but `ifName` is not directly accessible from the
+`$faults[]`-array. If the name of the port was needed, it's value
+could be queried using a template such as:
 
 ```
 {{ $alert->title }}
@@ -313,7 +320,7 @@ Rule: @if ($alert->name) {{ $alert->name }} @else {{ $alert->rule }} @endif
 @endif
 ```
 
-#### Service Alert
+### Service Alert
 
 ```
 <div style="font-family:Helvetica;">
@@ -372,29 +379,29 @@ The included templates apart from the default template are:
 
 ## Other Examples
 
-#### Microsoft Teams - Markdown
+### Microsoft Teams - Markdown
 
 ```
-[{{ $alert->title }}](https://your.librenms.url/device/device={{ $alert->device_id }}/)  
-**Device name:** {{ $alert->sysName }}  
-**Severity:** {{ $alert->severity }}  
+[{{ $alert->title }}](https://your.librenms.url/device/device={{ $alert->device_id }}/)
+**Device name:** {{ $alert->sysName }}
+**Severity:** {{ $alert->severity }}
 @if ($alert->state == 0)
-**Time elapsed:** {{ $alert->elapsed }}  
+**Time elapsed:** {{ $alert->elapsed }}
 @endif
-**Timestamp:** {{ $alert->timestamp }}  
-**Unique-ID:** {{ $alert->uid }}  
+**Timestamp:** {{ $alert->timestamp }}
+**Unique-ID:** {{ $alert->uid }}
 @if ($alert->name)
-**Rule:** {{ $alert->name }}  
+**Rule:** {{ $alert->name }}
 @else
-**Rule:** {{ $alert->rule }}  
+**Rule:** {{ $alert->rule }}
 @endif
 @if ($alert->faults)
-**Faults:**@foreach ($alert->faults as $key => $value) {{ $key }}: {{ $value['string'] }}  
+**Faults:**@foreach ($alert->faults as $key => $value) {{ $key }}: {{ $value['string'] }}
 @endforeach
 @endif
 ```
 
-#### Microsoft Teams - JSON
+### Microsoft Teams - JSON
 
 ```
 {
