@@ -51,7 +51,7 @@ foreach ($graphs as $key => $text) {
     echo '</div>';
 }
 
-# print it if we got data
+// print it if we got data
 if (isset($sneck_data)) {
     print_optionbar_start();
     echo "<b>Alerts:</b><br>\n";
