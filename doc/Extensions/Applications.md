@@ -2099,6 +2099,55 @@ Also if the system you are using uses non-static device naming based
 on bus information, it may be worthwhile just using the SN as the
 device ID is going to be irrelevant in that case.
 
+## Sneck
+
+If you want to replace Nagios/Icinga, especially in regards to NRPE,
+this works great. This allows LibreNMS to query what checks were ran
+on the server and keep track of totals of OK, WARNING, CRITICAL, and
+UNKNOWN statuses.
+
+Included are alert examples. Although if you want to set up your own,
+the metrics below are provided.
+
+| Metric | Descrition |
+|--------|------------|
+| ok     | Total OK checks |
+| warning | Total WARNING checks |
+| critical | Total CRITICAL checks |
+| unknown | Total UNKNOWN checks |
+| errored | Total checks that errored |
+| time_to_polling | Differnce in seconds between when polling data was generated and when polled |
+| time_to_polling_abs | The aboslute value of time_to_polling. |
+
+### SNMP Extend
+
+1. Install the extend.
+
+```
+cpanm Monitoring::Sneck
+```
+
+2. Configure any of the check you want to run in
+   '/usr/local/etc/sneck.conf'. You con find it documented
+   [here](https://metacpan.org/pod/Monitoring::Sneck#CONFIG-FORMAT).
+
+3. Set it up in cron. This will mean you don't need to wait for all
+   the checks to complete when polled via SNMP.
+
+```
+*/5 * * * * /usr/bin/env PATH=/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin /usr/local/bin/sneck -u 2> /dev/null > /dev/null
+```
+
+4. Set it up in the snmpd config and restart snmpd. The -c flag will
+   read from the cache.
+
+```
+extend sneck /usr/bin/env PATH=/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin /usr/local/bin/sneck -c
+```
+
+5. Enable the application for the server in question or wait for auto
+   discovery to find it.
+
 ## Squid
 
 ### SNMP Proxy
