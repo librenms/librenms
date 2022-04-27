@@ -12,9 +12,9 @@ if (isset($vars['clear'])) {
 } else {
     $sneck_data = get_sneck_data($device['device_id']);
 
-    if (isset($sneck_data) ) {
+    if (isset($sneck_data)) {
         print_optionbar_start();
-        echo "There is saved data, likely from some sort of error. Please bottom of page to review and clear.";
+        echo 'There is saved data, likely from some sort of error. Please bottom of page to review and clear.';
         print_optionbar_end();
     }
 }
@@ -52,12 +52,12 @@ foreach ($graphs as $key => $text) {
 }
 
 # print it if we got data
-if (isset($sneck_data) ) {
+if (isset($sneck_data)) {
     print_optionbar_start();
     echo "<b>Alerts:</b><br>\n";
-    echo str_replace("\n", "<br>\n", $sneck_data['data']['alertString']) . "<br><br>";
+    echo str_replace("\n", "<br>\n", $sneck_data['data']['alertString']) . "<br><br>\n";
     echo "<b>Raw JSON:</b><br>\n";
-    echo "<pre>" . json_encode($sneck_data, JSON_PRETTY_PRINT) . "</pre>";
+    echo "<pre>\n" . json_encode($sneck_data, JSON_PRETTY_PRINT) . "</pre>\n";
     echo generate_link('Click here to clear.', $link_array, ['clear'=>1]) . $append;
     print_optionbar_end();
 }

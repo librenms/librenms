@@ -1,8 +1,8 @@
 <?php
 
+use Carbon\Carbon;
 use LibreNMS\Exceptions\JsonAppException;
 use LibreNMS\RRD\RrdDefinition;
-use Carbon\Carbon;
 
 $name = 'sneck';
 $app_id = $app['app_id'];
@@ -27,7 +27,7 @@ $rrd_def = RrdDefinition::make()
     ->addDataset('errored', 'GAUGE', 0);
 
 // epoch off set between poller and when the when the JSON was generated
-$time_to_polling=Carbon::now()->timestamp - $json_return['data']['time'];
+$time_to_polling = Carbon::now()->timestamp - $json_return['data']['time'];
 
 $fields = [
     'time' => $json_return['data']['time'],
