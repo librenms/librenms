@@ -1477,7 +1477,6 @@ function get_sneck_data($device_id)
 
     if (isset($ourc[$device_id])) {
         $id = $component->getFirstComponentID($ourc, $device_id);
-
         return json_decode($ourc[$device_id][$id]['returned'], true);
     }
 }
