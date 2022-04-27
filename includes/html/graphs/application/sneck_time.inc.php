@@ -3,7 +3,7 @@
 $name = 'sneck';
 $app_id = $app['app_id'];
 $unit_text = 'Diff In Secs';
-$colours = 'greens';
+$colours = 'psychedelic';
 $dostack = 0;
 $printtotal = 0;
 $addarea = 0;
