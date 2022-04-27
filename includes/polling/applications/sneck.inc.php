@@ -2,6 +2,7 @@
 
 use LibreNMS\Exceptions\JsonAppException;
 use LibreNMS\RRD\RrdDefinition;
+use Carbon\Carbon;
 
 $name = 'sneck';
 $app_id = $app['app_id'];
@@ -26,7 +27,7 @@ $rrd_def = RrdDefinition::make()
     ->addDataset('errored', 'GAUGE', 0);
 
 // epoch off set between poller and when the when the JSON was generated
-$time_to_polling=time() - $json_return['data']['time'];
+$time_to_polling=Carbon::now()->timestamp - $json_return['data']['time'];
 
 $fields = [
     'time' => $json_return['data']['time'],
@@ -41,7 +42,6 @@ $fields = [
 $tags = ['name' => $name, 'app_id' => $app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
 data_update($device, 'app', $tags, $fields);
 
-// only used for alerting
 $fields['time_to_polling_abs'] = abs($time_to_polling);
 
 // update it here as we are done with this mostly
@@ -56,6 +56,9 @@ if ($json_return['data']['warning'] == 0 &&
     abs($time_to_polling) < 540) {
     return;
 }
+
+// remove this so if we have a alert, we don't spam the logs
+unset($json_return['data']['time']);
 
 if (abs($time_to_polling) > 540) {
     $json_return['data']['alertString'] = $json_return['data']['alertString'] . "\nGreater than 540 seconds since the polled data was generated";
