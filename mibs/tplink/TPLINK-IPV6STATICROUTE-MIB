@@ -1,0 +1,126 @@
+TPLINK-IPV6STATICROUTE-MIB	DEFINITIONS ::= BEGIN
+    IMPORTS
+        TPRowStatus
+			FROM TPLINK-TC-MIB
+		tplinkMgmt
+			FROM TPLINK-MIB	
+        OBJECT-TYPE,IpAddress
+            FROM SNMPv2-SMI
+        InetAddress
+			FROM INET-ADDRESS-MIB;
+
+    MacAddress ::= OCTET STRING (SIZE (6))
+
+	tplinkIPv6StaticRouteMIB MODULE-IDENTITY
+		LAST-UPDATED    "201212130930Z"
+		ORGANIZATION    "TPLINK"
+		CONTACT-INFO    "www.tplink.com"
+		DESCRIPTION    "Private MIB for IPv6 static route configuration."
+		REVISION        "201212130930Z"
+		DESCRIPTION
+				"Initial version of this MIB module."
+		::= { tplinkMgmt 53 }
+
+	tplinkIPv6StaticRouteMIBObjects		OBJECT IDENTIFIER	::= { tplinkIPv6StaticRouteMIB 1 }
+	tplinkIPv6StaticRouteNotifications	OBJECT IDENTIFIER	::= { tplinkIPv6StaticRouteMIB 2 }
+
+	--**************
+	--Set static route
+	--**************
+
+    tpIPv6StaticRouteConfig 		OBJECT IDENTIFIER ::= {tplinkIPv6StaticRouteMIBObjects 1}
+
+        tpIPv6StaticRouteConfigTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF STATICITEMCTRLENTRY
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+            "A list of static route entries.Route is choosing a best way to trasmit the data from
+            the source to the destination.Static route is a special route,it is set by
+            the administrator,and it is not automatically changed along with the change of network topo,
+            so the static route is most used in the net which is small and has a fixed topo with 
+            virtues of simple,efficient and reliable."
+        ::= { tpIPv6StaticRouteConfig 1 }
+
+    tpIPv6StaticRouteConfigEntry OBJECT-TYPE
+        SYNTAX  STATICITEMCTRLENTRY
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+            "The item can be added or removed ."
+        INDEX   { tpIPv6StaticRouteItemDesIp,tpIPv6StaticRouteItemPrefixLen,tpIPv6StaticRouteItemNexthop}
+        ::= { tpIPv6StaticRouteConfigTable 1 }
+
+
+    STATICITEMCTRLENTRY ::=
+        SEQUENCE {
+            tpIPv6StaticRouteItemDesIp
+                InetAddress, 
+            tpIPv6StaticRouteItemPrefixLen
+                INTEGER(1..128),
+            tpIPv6StaticRouteItemNexthop
+                InetAddress,
+			tpIPv6StaticRouteItemDistance
+                INTEGER(1..255),
+            tpIPv6StaticRouteItemInterfaceName
+                OCTET STRING (SIZE (0..32)),
+            tpIPv6StaticRouteItemStatus
+                TPRowStatus
+        }
+
+    tpIPv6StaticRouteItemDesIp OBJECT-TYPE
+        SYNTAX  InetAddress  
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+            "The ip Address of the packet should be arrived"
+        ::= { tpIPv6StaticRouteConfigEntry 1 }
+
+    tpIPv6StaticRouteItemPrefixLen  OBJECT-TYPE
+        SYNTAX  INTEGER(1..128)  
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+            "The mask of the ip."
+        ::= { tpIPv6StaticRouteConfigEntry 2 }
+
+	tpIPv6StaticRouteItemNexthop  OBJECT-TYPE
+		SYNTAX  InetAddress  
+		MAX-ACCESS  read-create
+		STATUS  current
+		DESCRIPTION
+			"The next jump ip address which the packet would be sent to by the switch."
+		::= { tpIPv6StaticRouteConfigEntry 3 }
+
+	tpIPv6StaticRouteItemDistance  OBJECT-TYPE
+        SYNTAX  INTEGER(1..255)  
+        MAX-ACCESS  read-create
+        STATUS  current
+        DESCRIPTION
+            "Specify the administrative distance."
+        ::= { tpIPv6StaticRouteConfigEntry 4 }
+
+	tpIPv6StaticRouteItemInterfaceName  OBJECT-TYPE
+		SYNTAX  OCTET STRING (SIZE (0..255))  
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"The name of the VLAN interface."
+		::= { tpIPv6StaticRouteConfigEntry 5 }
+
+	tpIPv6StaticRouteItemStatus OBJECT-TYPE
+        SYNTAX  TPRowStatus
+        MAX-ACCESS  read-create
+        STATUS  current
+        DESCRIPTION
+            " The following values are states:
+             these values may be used as follow:
+             active(1),if the entry is being used.
+             notInService(2),destory the entry.
+             notReady(3),destory the entry.
+             createAndGo(4),not being used
+             createAndWait(5),creat a new entry
+             destroy(6),destory the entry."
+        ::={tpIPv6StaticRouteConfigEntry 6 }
+     
+END

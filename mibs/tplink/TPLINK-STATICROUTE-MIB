@@ -1,0 +1,124 @@
+TPLINK-STATICROUTE-MIB	DEFINITIONS ::= BEGIN	
+    IMPORTS
+	    TPRowStatus       	 
+  			FROM TPLINK-TC-MIB
+		tplinkMgmt
+			FROM TPLINK-MIB			
+        OBJECT-TYPE,IpAddress
+          	FROM SNMPv2-SMI;
+          	  	          
+    MacAddress ::= OCTET STRING (SIZE (6))
+	
+	tplinkStaticRouteMIB MODULE-IDENTITY
+		LAST-UPDATED    "201212130930Z"
+		ORGANIZATION    "TPLINK"
+		CONTACT-INFO    "www.tplink.com"
+		DESCRIPTION	    "Private MIB for static route configuration."
+		REVISION        "201212130930Z"
+		DESCRIPTION
+				"Initial version of this MIB module."
+		::= { tplinkMgmt 36 }
+		
+	tplinkStaticRouteMIBObjects		OBJECT IDENTIFIER	::= { tplinkStaticRouteMIB 1 }
+	tplinkStaticRouteNotifications	OBJECT IDENTIFIER	::= { tplinkStaticRouteMIB 2 }
+	
+	--**************
+	--Set static route
+	--**************
+		
+    tpStaticRouteConfig 		OBJECT IDENTIFIER ::= {tplinkStaticRouteMIBObjects 1}
+    
+	tpStaticRouteConfigTable OBJECT-TYPE
+        SYNTAX  SEQUENCE OF STATICITEMCTRLENTRY
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+            "A list of static route entries.Route is choosing a best way to trasmit the data from
+            the source to the destination.Static route is a special route,it is set by
+            the administrator,and it is not automatically changed along with the change of network topo,
+            so the static route is most used in the net which is small and has a fixed topo with 
+            virtues of simple,efficient and reliable."
+        ::= { tpStaticRouteConfig 1 }
+        
+    tpStaticRouteConfigEntry OBJECT-TYPE
+        SYNTAX  STATICITEMCTRLENTRY
+        MAX-ACCESS  not-accessible
+        STATUS  current
+        DESCRIPTION
+            "The item can be added or removed ."
+        INDEX   { tpStaticRouteItemDesIp,tpStaticRouteItemMask,tpStaticRouteItemNextIp}
+        ::= { tpStaticRouteConfigTable 1 }
+              
+              
+    STATICITEMCTRLENTRY ::=
+        SEQUENCE {
+            tpStaticRouteItemDesIp
+                IpAddress, 
+            tpStaticRouteItemMask
+                IpAddress,
+            tpStaticRouteItemNextIp
+                IpAddress,
+			tpStaticRouteItemDistance
+                INTEGER(1..255),
+            tpStaticRouteItemInterfaceName
+                OCTET STRING (SIZE (0..255)),
+            tpStaticRouteItemStatus
+                TPRowStatus
+        }
+              
+    tpStaticRouteItemDesIp OBJECT-TYPE
+        SYNTAX  IpAddress  
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+            "The ip Address of the packet should be arrived"
+        ::= { tpStaticRouteConfigEntry 1 }
+            
+    tpStaticRouteItemMask  OBJECT-TYPE
+        SYNTAX  IpAddress  
+        MAX-ACCESS  read-only
+        STATUS  current
+        DESCRIPTION
+            "The mask of the ip."
+        ::= { tpStaticRouteConfigEntry 2 }
+           
+	tpStaticRouteItemNextIp  OBJECT-TYPE
+		SYNTAX  IpAddress  
+		MAX-ACCESS  read-create
+		STATUS  current
+		DESCRIPTION
+			"The next jump ip address which the packet would be sent to by the switch."
+		::= { tpStaticRouteConfigEntry 3 }
+		
+	tpStaticRouteItemDistance  OBJECT-TYPE
+		SYNTAX  INTEGER(1..255)  
+		MAX-ACCESS  read-create
+		STATUS  current
+		DESCRIPTION
+			"Specify the administrative distance."
+		::= { tpStaticRouteConfigEntry 4 }
+			      
+	tpStaticRouteItemInterfaceName  OBJECT-TYPE
+		SYNTAX  OCTET STRING (SIZE (0..255))  
+		MAX-ACCESS  read-only
+		STATUS  current
+		DESCRIPTION
+			"The name of the VLAN interface."
+		::= { tpStaticRouteConfigEntry 5 }
+			      
+	tpStaticRouteItemStatus OBJECT-TYPE
+        SYNTAX  TPRowStatus
+        MAX-ACCESS  read-create
+        STATUS  current
+        DESCRIPTION
+            " The following values are states:
+             these values may be used as follow:
+             active(1),if the entry is being used.
+             notInService(2),destory the entry.
+             notReady(3),destory the entry.
+             createAndGo(4),not being used
+             createAndWait(5),creat a new entry
+             destroy(6),destory the entry."
+        ::={tpStaticRouteConfigEntry 6 }        	
+     
+END	
