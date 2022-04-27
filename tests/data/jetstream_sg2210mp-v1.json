@@ -2595,54 +2595,6 @@
         },
         "poller": "matches discovery"
     },
-    "route": {
-        "discovery": {
-            "route": [
-                {
-                    "context_name": "",
-                    "inetCidrRouteIfIndex": 254,
-                    "inetCidrRouteType": 4,
-                    "inetCidrRouteProto": 3,
-                    "inetCidrRouteNextHopAS": 0,
-                    "inetCidrRouteMetric1": 0,
-                    "inetCidrRouteDestType": "ipv4",
-                    "inetCidrRouteDest": "0.0.0.0",
-                    "inetCidrRouteNextHopType": "ipv4",
-                    "inetCidrRouteNextHop": "169.254.103.1",
-                    "inetCidrRoutePolicy": "zeroDotZero.254",
-                    "inetCidrRoutePfxLen": 0
-                },
-                {
-                    "context_name": "",
-                    "inetCidrRouteIfIndex": 254,
-                    "inetCidrRouteType": 4,
-                    "inetCidrRouteProto": 3,
-                    "inetCidrRouteNextHopAS": 0,
-                    "inetCidrRouteMetric1": 1,
-                    "inetCidrRouteDestType": "ipv6",
-                    "inetCidrRouteDest": "FD00:0000:0000:0000:0000:0000:0000:0000",
-                    "inetCidrRouteNextHopType": "ipv6",
-                    "inetCidrRouteNextHop": "FD00:0003:0254:0000:0000:0000:0000:0001",
-                    "inetCidrRoutePolicy": "zeroDotZero.254",
-                    "inetCidrRoutePfxLen": 16
-                },
-                {
-                    "context_name": "",
-                    "inetCidrRouteIfIndex": 254,
-                    "inetCidrRouteType": 4,
-                    "inetCidrRouteProto": 3,
-                    "inetCidrRouteNextHopAS": 0,
-                    "inetCidrRouteMetric1": 1,
-                    "inetCidrRouteDestType": "ipv6",
-                    "inetCidrRouteDest": "FD01:0255:0000:0000:0000:0000:0000:0000",
-                    "inetCidrRouteNextHopType": "ipv6",
-                    "inetCidrRouteNextHop": "FD00:0003:0254:0000:0000:0000:0000:0001",
-                    "inetCidrRoutePolicy": "zeroDotZero.254",
-                    "inetCidrRoutePfxLen": 64
-                }
-            ]
-        }
-    },
     "sensors": {
         "discovery": {
             "sensors": [

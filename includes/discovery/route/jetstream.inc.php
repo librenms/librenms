@@ -25,20 +25,20 @@
 
 use LibreNMS\Util\IPv4;
 
-$oids = SnmpQuery::walk('TPLINK-STATICROUTE-MIB::tpStaticRouteConfigTable')->table(3);
+$oids = SnmpQuery::hideMib()->walk('TPLINK-STATICROUTE-MIB::tpStaticRouteConfigTable')->table(3);
 if (isset($oids)) {
     d_echo('ROUTE: Jetstream IPv4');
-    $oids = call_user_func_array('array_merge', $oids);
-    $oids = call_user_func_array('array_merge', $oids);
+    $oids = array_shift($oids);
+    $oids = array_shift($oids);
 
     foreach ($oids as $data) {
         unset($entryClean);
         $entryClean['device_id'] = $device['device_id'];
         $entryClean['inetCidrRouteDestType'] = 'ipv4';
-        $entryClean['inetCidrRouteDest'] = $data['TPLINK-STATICROUTE-MIB::tpStaticRouteItemDesIp'];
-        $entryClean['inetCidrRoutePfxLen'] = IPv4::netmask2cidr($data['TPLINK-STATICROUTE-MIB::tpStaticRouteItemMask']); //CONVERT
+        $entryClean['inetCidrRouteDest'] = $data['tpStaticRouteItemDesIp'];
+        $entryClean['inetCidrRoutePfxLen'] = IPv4::netmask2cidr($data['tpStaticRouteItemMask']); //CONVERT
         $entryClean['inetCidrRouteNextHopType'] = 'ipv4';
-        $entryClean['inetCidrRouteNextHop'] = $data['TPLINK-STATICROUTE-MIB::tpStaticRouteItemNextIp'];
+        $entryClean['inetCidrRouteNextHop'] = $data['tpStaticRouteItemNextIp'];
         $entryClean['inetCidrRouteNextHopAS'] = '0';
         $entryClean['inetCidrRouteProto'] = '3';
         $entryClean['inetCidrRouteType'] = '4';
@@ -46,10 +46,10 @@ if (isset($oids)) {
         $entryClean['updated_at'] = $update_timestamp;
 
         // InterfaceName & Distance are swapped on different chipsets
-        if (preg_match('/^vlan([\d]+)$/i', $data['TPLINK-STATICROUTE-MIB::tpStaticRouteItemInterfaceName'], $intName)) { //other TP-LINKs
+        if (preg_match('/^vlan([\d]+)$/i', $data['tpStaticRouteItemInterfaceName'], $intName)) { //other TP-LINKs
             $metric = $data['tpStaticRouteItemDistance'];
         } else {
-            preg_match('/^vlan([\d]+)$/i', $data['TPLINK-STATICROUTE-MIB::tpStaticRouteItemDistance'], $intName); //T1600-g28-v2 Broadcom chipset
+            preg_match('/^vlan([\d]+)$/i', $data['tpStaticRouteItemDistance'], $intName); //T1600-g28-v2 Broadcom chipset
             $metric = $data['tpStaticRouteItemInterfaceName'];
         }
 
@@ -62,7 +62,7 @@ if (isset($oids)) {
             $entryClean['port_id'] = $portId;
             $entryClean['inetCidrRoutePolicy'] = 'zeroDotZero.' . $ifIndex;
 
-            $current = $mixed['']['ipv4'][$inetCidrRouteDest][$inetCidrRoutePfxLen][$entryClean['inetCidrRoutePolicy']]['ipv4'][$inetCidrRouteNextHop];
+            $current = $mixed['']['ipv4'][$entryClean['inetCidrRouteDest']][$entryClean['inetCidrRoutePfxLen']][$entryClean['inetCidrRoutePolicy']]['ipv4'][$entryClean['inetCidrRouteNextHop']];
             if (isset($current) && isset($current['db']) && count($current['db']) > 0 && $delete_row[$current['db']['route_id']] != 1) {
                 //we already have a row in DB
                 $entryClean['route_id'] = $current['db']['route_id'];
@@ -81,6 +81,7 @@ if (isset($oids)) {
     foreach ($oids as $data) {
         $ipv6dst = normalize_snmp_ip_address(str_replace(' ', ':', trim($data['tpIPv6StaticRouteItemDesIp'])));
         $ipv6hop = normalize_snmp_ip_address(str_replace(' ', ':', trim($data['tpIPv6StaticRouteItemNexthop'])));
+
         unset($entryClean);
         $entryClean['device_id'] = $device['device_id'];
         $entryClean['inetCidrRouteDestType'] = 'ipv6';
@@ -102,7 +103,7 @@ if (isset($oids)) {
             $entryClean['port_id'] = $portId;
             $entryClean['inetCidrRoutePolicy'] = 'zeroDotZero.' . $ifIndex;
 
-            $current = $mixed['']['ipv4'][$inetCidrRouteDest][$inetCidrRoutePfxLen][$entryClean['inetCidrRoutePolicy']]['ipv4'][$inetCidrRouteNextHop];
+            $current = $mixed['']['ipv4'][$entryClean['inetCidrRouteDest']][$entryClean['inetCidrRoutePfxLen']][$entryClean['inetCidrRoutePolicy']]['ipv4'][$entryClean['inetCidrRouteNextHop']];
             if (isset($current) && isset($current['db']) && count($current['db']) > 0 && $delete_row[$current['db']['route_id']] != 1) {
                 //we already have a row in DB
                 $entryClean['route_id'] = $current['db']['route_id'];
@@ -114,4 +115,3 @@ if (isset($oids)) {
         }
     }
 }
-
