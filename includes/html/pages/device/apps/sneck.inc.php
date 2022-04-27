@@ -55,7 +55,7 @@ foreach ($graphs as $key => $text) {
 if (isset($sneck_data) ) {
     print_optionbar_start();
     echo "<b>Alerts:</b><br>\n";
-    echo str_replace( "\n", "<br>", $sneck_data['data']['alertString'] ) . "<br><br>";
+    echo str_replace("\n", "<br>\n", $sneck_data['data']['alertString']) . "<br><br>";
     echo "<b>Raw JSON:</b><br>\n";
     echo "<pre>" . json_encode($sneck_data, JSON_PRETTY_PRINT) . "</pre>";
     echo generate_link('Click here to clear.', $link_array, ['clear'=>1]) . $append;
