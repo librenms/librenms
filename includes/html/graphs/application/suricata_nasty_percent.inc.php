@@ -2,15 +2,15 @@
 
 $name = 'suricata';
 $app_id = $app['app_id'];
-$unit_text = 'Percent_Of_Packets';
+$unit_text = '% Of Packets';
 $colours = 'psychedelic';
 $dostack = 0;
 $printtotal = 0;
 $addarea = 0;
 $transparency = 15;
 
-if (isset($vars['instance'])) {
-    $rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app['app_id'], $vars['instance']]);
+if (isset($vars['pool'])) {
+    $rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app['app_id'], $vars['pool']]);
 } else {
     $rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app['app_id']]);
 }
@@ -24,7 +24,7 @@ if (Rrd::checkRrdExists($rrd_filename)) {
     ];
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'If_Dropped',
+        'descr'    => 'If Dropped',
         'ds'       => 'ifdrop_percent',
     ];
     $rrd_list[] = [
