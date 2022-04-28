@@ -26,7 +26,7 @@ from .service import Service, ServiceConfig
 
 # Hard limit script execution time so we don't get to "hang"
 DEFAULT_SCRIPT_TIMEOUT = 3600
-MAX_LOGFILE_SIZE = (1024 ** 2) * 10  # 10 Megabytes max log files
+MAX_LOGFILE_SIZE = (1024**2) * 10  # 10 Megabytes max log files
 
 logger = logging.getLogger(__name__)
 
