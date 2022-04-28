@@ -634,6 +634,10 @@ function json_app_get($device, $extend, $min_version = 1)
     }
 
     //  turn the JSON into a array
+    $rand_data=rand();
+    $output = str_replace('\n', '|||%%%@@@' . $rand_data  . 'NEWLINENELINENEWLINE@@@%%%|||', $output);
+    $output = stripslashes($output);
+    $output = str_replace('|||%%%@@@' . $rand_data . 'NEWLINENELINENEWLINE@@@%%%|||', '\n', $output);
     $parsed_json = json_decode($output, true);
 
     // improper JSON or something else was returned. Populate the variable with an error.
