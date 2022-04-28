@@ -211,6 +211,7 @@ class QueueManager:
                 unix_socket_path=self.config.redis_socket,
                 sentinel=self.config.redis_sentinel,
                 sentinel_service=self.config.redis_sentinel_service,
+                sentinel_password=self.config.redis_sentinel_password,
                 socket_timeout=self.config.redis_timeout,
             )
 

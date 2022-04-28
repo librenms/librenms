@@ -94,6 +94,7 @@ class ServiceConfig:
     redis_socket = None
     redis_sentinel = None
     redis_sentinel_service = None
+    redis_sentinel_password = None
     redis_timeout = 60
 
     db_host = "localhost"
@@ -199,6 +200,10 @@ class ServiceConfig:
         self.redis_sentinel_service = os.getenv(
             "REDIS_SENTINEL_SERVICE",
             config.get("redis_sentinel_service", ServiceConfig.redis_sentinel_service),
+        )
+        self.redis_sentinel_password = os.getenv(
+            "REDIS_SENTINEL_PASSWORD",
+            config.get('redis_sentinel_password', ServiceConfig.redis_sentinel_password),
         )
         self.redis_timeout = int(
             os.getenv(
@@ -652,6 +657,7 @@ class Service:
                 unix_socket_path=self.config.redis_socket,
                 sentinel=self.config.redis_sentinel,
                 sentinel_service=self.config.redis_sentinel_service,
+                sentinel_password=self.config.redis_sentinel_password,
                 socket_timeout=self.config.redis_timeout,
             )
         except ImportError:
