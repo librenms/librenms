@@ -203,7 +203,9 @@ class ServiceConfig:
         )
         self.redis_sentinel_password = os.getenv(
             "REDIS_SENTINEL_PASSWORD",
-            config.get('redis_sentinel_password', ServiceConfig.redis_sentinel_password),
+            config.get(
+                "redis_sentinel_password", ServiceConfig.redis_sentinel_password
+            ),
         )
         self.redis_timeout = int(
             os.getenv(
