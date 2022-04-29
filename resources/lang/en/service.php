@@ -7,6 +7,7 @@ return [
     'test' => 'Test Service',
     'added' => 'Service Created',
     'this_device' => '<This Device>',
+    'status' => 'Status',
     'view_basic' => 'Basic',
     'view_graphs' => 'Graphs',
     'graph' => 'Data Set: :ds',

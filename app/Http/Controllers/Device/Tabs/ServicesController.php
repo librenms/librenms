@@ -27,6 +27,7 @@ namespace App\Http\Controllers\Device\Tabs;
 
 use App\Models\Device;
 use LibreNMS\Interfaces\UI\DeviceTab;
+use Request;
 
 class ServicesController implements DeviceTab
 {
@@ -52,6 +53,16 @@ class ServicesController implements DeviceTab
 
     public function data(Device $device): array
     {
-        return [];
+        $view = Request::segment(4, 'basic');
+
+        return [
+            'services' => $device->services,
+            'device' => $device,
+            'menu' => ['view' => [
+                ['url' => 'basic', 'name' => trans('service.view_basic')],
+                ['url' => 'graphs', 'name' => trans('service.view_graphs')],
+            ]],
+            'view' => $view,
+        ];
     }
 }

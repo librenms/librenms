@@ -105,6 +105,8 @@ class Services implements Module
 
             Log::info("Nagios Service $service->service_type ($service->service_id)");
             $response = $this->checkService($device, $service);
+            $service->service_message = $response->message;
+            $service->service_status = $response->result;
             Log::debug("Service Response: $response->message");
 
             // If we have performance data we will store it.

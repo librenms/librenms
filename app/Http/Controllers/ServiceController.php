@@ -45,7 +45,9 @@ class ServiceController extends Controller
      */
     public function store(Request $request): JsonResponse
     {
-        return response()->json($this->validateNewService($request));
+        $service = $this->validateNewService($request);
+        $service->save();
+        return response()->json($service);
     }
 
     /**
@@ -202,6 +204,6 @@ class ServiceController extends Controller
                 'service_template_id' => 'nullable|int|exists:App\Models\ServiceTemplate,id',
             ] + $param_rules);
 
-        return Service::create($validated);
+        return Service::make($validated);
     }
 }

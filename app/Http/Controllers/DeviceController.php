@@ -99,7 +99,7 @@ class DeviceController extends Controller
         unset($device_links[$primary_device_link_name], $primary_device_link_name);
 
         if (view()->exists('device.tabs.' . $current_tab)) {
-            return view('device.tabs.' . $current_tab, get_defined_vars());
+            return view('device.tabs.' . $current_tab, array_merge(get_defined_vars(), $data));
         }
 
         $tab_content = $this->renderLegacyTab($current_tab, $device, $data);

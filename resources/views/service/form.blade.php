@@ -154,6 +154,7 @@
             async save() {
                 if (await this.submitCheck('{{ route('services.store') }}') !== false) {
                     toastr.success('{{ __('service.added') }}');
+                    this.$dispatch('service-saved');
 
                     // reset form except device and check type
                     this.service_name = '';
@@ -187,12 +188,11 @@
                 });
                 let result = await response.json();
 
-                if (result.errors.length) {
+                if (result.errors) {
                     this.errors = result.errors;
                     return false;
                 } else {
                     this.errors = {};
-                    this.$dispatch('service-saved');
                     return result;
                 }
             },
@@ -232,6 +232,7 @@
                 return this.parameters.filter(param => ! (used.includes(param.param) || used.includes(param.short)));
             },
             removeTag(param) {
+                this.currentValue = this.service_param[param];
                 delete this.service_param[param];
                 delete this.excluded[param];
             },
