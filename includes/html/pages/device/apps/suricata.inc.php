@@ -25,11 +25,11 @@ while (isset($suricata_instances[$int_int])) {
     $int_int++;
 
     $append = '';
-    if (isset($pools[$int_int])) {
+    if (isset($suricata_instances[$int_int])) {
         $append = ', ';
     }
 
-    echo generate_link($label, $link_array, ['pool'=>$pool]) . $append;
+    echo generate_link($label, $link_array, ['pool'=>$instance]) . $append;
 }
 
 print_optionbar_end();
@@ -56,8 +56,8 @@ foreach ($graphs as $key => $text) {
     $graph_array['id'] = $app['app_id'];
     $graph_array['type'] = 'application_' . $key;
 
-    if (isset($vars['instance'])) {
-        $graph_array['instance'] = $vars['instance'];
+    if (isset($vars['pool'])) {
+        $graph_array['pool'] = $vars['pool'];
     }
 
     echo '<div class="panel panel-default">

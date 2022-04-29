@@ -9,8 +9,8 @@ $printtotal = 0;
 $addarea = 0;
 $transparency = 15;
 
-if (isset($vars['instance'])) {
-    $rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app['app_id'], $vars['instance']]);
+if (isset($vars['pool'])) {
+    $rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app['app_id'], $vars['pool']]);
 } else {
     $rrd_filename = Rrd::name($device['hostname'], ['app', $name, $app['app_id']]);
 }
