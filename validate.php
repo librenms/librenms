@@ -134,7 +134,7 @@ if (\LibreNMS\DB\Eloquent::isConnected()) {
 }
 
 $precheck_complete = true; // disable shutdown function
-print_header($validator->getVersions());
+print_header(version_info());
 
 if (isset($options['g'])) {
     $modules = explode(',', $options['g']);

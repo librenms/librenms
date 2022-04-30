@@ -386,8 +386,6 @@ if ($options['f'] === 'recalculate_device_dependencies') {
 
     $lock = Cache::lock('recalculate_device_dependencies', 86000);
     if ($lock->get()) {
-        \LibreNMS\DB\Eloquent::boot();
-
         // update all root nodes and recurse, chunk so we don't blow up
         Device::doesntHave('parents')->with('children')->chunk(100, function (Collection $devices) {
             // anonymous recursive function

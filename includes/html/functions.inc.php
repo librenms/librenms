@@ -81,19 +81,6 @@ function toner2colour($descr, $percent)
     return $colour;
 }//end toner2colour()
 
-/**
- * Find all links in some text and turn them into html links.
- *
- * @param  string  $text
- * @return string
- */
-function linkify($text)
-{
-    $regex = "#(http|https|ftp|ftps)://[a-z0-9\-.]*[a-z0-9\-]+(/\S*)?#i";
-
-    return preg_replace($regex, '<a href="$0">$0</a>', $text);
-}
-
 function generate_link($text, $vars, $new_vars = [])
 {
     return '<a href="' . \LibreNMS\Util\Url::generate($vars, $new_vars) . '">' . $text . '</a>';
@@ -766,8 +753,14 @@ function alert_details($details)
         }
 
         if ($tmp_alerts['port_id']) {
-            $tmp_alerts = cleanPort($tmp_alerts);
-            $fault_detail .= generate_port_link($tmp_alerts) . ';&nbsp;';
+            if ($tmp_alerts['isisISAdjState']) {
+                $fault_detail .= 'Adjacent ' . $tmp_alerts['isisISAdjIPAddrAddress'];
+                $port = \App\Models\Port::find($tmp_alerts['port_id']);
+                $fault_detail .= ', Interface ' . \LibreNMS\Util\Url::portLink($port);
+            } else {
+                $tmp_alerts = cleanPort($tmp_alerts);
+                $fault_detail .= generate_port_link($tmp_alerts) . ';&nbsp;';
+            }
             $fallback = false;
         }
 
@@ -1329,6 +1322,33 @@ function get_sensor_label_color($sensor, $type = 'sensors')
     }
 
     return "<span class='label $label_style'>" . trim(Number::formatSi($sensor['sensor_current'], 2, 3, $unit)) . '</span>';
+}
+
+/**
+ * Returns a list of the various suricata instances for
+ * the specified device id.
+ *
+ * @param $device_id
+ * @return array
+ */
+function get_suricata_instances($device_id)
+{
+    $options = [
+        'filter' => [
+            'type' => ['=', 'suricata'],
+        ],
+    ];
+
+    $component = new LibreNMS\Component();
+    $ourc = $component->getComponents($device_id, $options);
+
+    if (isset($ourc[$device_id])) {
+        $id = $component->getFirstComponentID($ourc, $device_id);
+
+        return json_decode($ourc[$device_id][$id]['instances']);
+    }
+
+    return [];
 }
 
 /**

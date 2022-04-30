@@ -43,6 +43,7 @@ use LibreNMS\Util\Debug;
 use LibreNMS\Util\Dns;
 use LibreNMS\Util\Git;
 use LibreNMS\Util\StringHelpers;
+use LibreNMS\Util\Version;
 use Psr\Log\LoggerInterface;
 use Throwable;
 
@@ -180,7 +181,7 @@ class Poller
                     $instance->poll($this->os);
                 } catch (Throwable $e) {
                     // isolate module exceptions so they don't disrupt the polling process
-                    $this->logger->error("%rError polling $module module for {$this->device->hostname}.%n " . $e->getMessage() . PHP_EOL . $e->getTraceAsString(), ['color' => true]);
+                    $this->logger->error("%rError polling $module module for {$this->device->hostname}.%n $e", ['color' => true]);
                     \Log::event("Error polling $module module. Check log file for more details.", $this->device, 'poller', Alert::ERROR);
                 }
 
@@ -371,7 +372,7 @@ EOH,
                 Git::localDate(),
                 vsprintf('%s (%s)', $version->database()),
                 phpversion(),
-                \LibreNMS\DB\Eloquent::isConnected() ? \LibreNMS\DB\Eloquent::version() : '?',
+                Version::get()->databaseServer(),
                 $version->rrdtool(),
                 $version->netSnmp()
             ));

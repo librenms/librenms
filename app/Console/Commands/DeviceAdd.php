@@ -48,22 +48,22 @@ class DeviceAdd extends LnmsCommand
         ];
 
         $this->addArgument('device spec', InputArgument::REQUIRED);
-        $this->addOption('v1', null, InputOption::VALUE_NONE);
-        $this->addOption('v2c', null, InputOption::VALUE_NONE);
-        $this->addOption('v3', null, InputOption::VALUE_NONE);
-        $this->addOption('display-name', 'd', InputOption::VALUE_REQUIRED);
-        $this->addOption('force', 'f', InputOption::VALUE_NONE);
-        $this->addOption('poller-group', 'g', InputOption::VALUE_REQUIRED, null, Config::get('default_poller_group'));
-        $this->addOption('ping-fallback', 'b', InputOption::VALUE_NONE);
-        $this->addOption('port-association-mode', 'p', InputOption::VALUE_REQUIRED, null, Config::get('default_port_association_mode'));
+        $this->addOption('v1', '1', InputOption::VALUE_NONE);
+        $this->addOption('v2c', '2', InputOption::VALUE_NONE);
+        $this->addOption('v3', '3', InputOption::VALUE_NONE);
         $this->addOption('community', 'c', InputOption::VALUE_REQUIRED);
-        $this->addOption('transport', 't', InputOption::VALUE_REQUIRED, null, Config::get('snmp.transports.0', 'udp'));
         $this->addOption('port', 'r', InputOption::VALUE_REQUIRED, null, Config::get('snmp.port', 161));
+        $this->addOption('transport', 't', InputOption::VALUE_REQUIRED, null, Config::get('snmp.transports.0', 'udp'));
+        $this->addOption('display-name', 'd', InputOption::VALUE_REQUIRED);
         $this->addOption('security-name', 'u', InputOption::VALUE_REQUIRED, null, 'root');
         $this->addOption('auth-password', 'A', InputOption::VALUE_REQUIRED);
         $this->addOption('auth-protocol', 'a', InputOption::VALUE_REQUIRED, null, 'MD5');
         $this->addOption('privacy-password', 'X', InputOption::VALUE_REQUIRED);
         $this->addOption('privacy-protocol', 'x', InputOption::VALUE_REQUIRED, null, 'AES');
+        $this->addOption('force', 'f', InputOption::VALUE_NONE);
+        $this->addOption('ping-fallback', 'b', InputOption::VALUE_NONE);
+        $this->addOption('poller-group', 'g', InputOption::VALUE_REQUIRED, null, Config::get('default_poller_group'));
+        $this->addOption('port-association-mode', 'p', InputOption::VALUE_REQUIRED, null, Config::get('default_port_association_mode'));
         $this->addOption('ping-only', 'P', InputOption::VALUE_NONE);
         $this->addOption('os', 'o', InputOption::VALUE_REQUIRED);
         $this->addOption('hardware', 'w', InputOption::VALUE_REQUIRED);
@@ -127,7 +127,7 @@ class DeviceAdd extends LnmsCommand
             $this->error($e->getMessage() . PHP_EOL . implode(PHP_EOL, $e->getReasons()));
             $this->line(trans('commands.device:add.messages.try_force'));
 
-            return 1;
+            return 2;
         } catch (HostExistsException $e) {
             // host exists errors
             $this->error($e->getMessage());
@@ -136,12 +136,12 @@ class DeviceAdd extends LnmsCommand
                 $this->line(trans('commands.device:add.messages.try_force'));
             }
 
-            return 2;
+            return 3;
         } catch (Exception $e) {
             // other errors?
-            $this->error(get_class($e) . ': ' . $e->getMessage());
+            $this->error("Error: $e");
 
-            return 3;
+            return 1;
         }
     }
 }

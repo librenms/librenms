@@ -1741,101 +1741,6 @@ parameters:
 			path: LibreNMS/Config.php
 
 		-
-			message: "#^Call to function is_null\\(\\) with Illuminate\\\\Database\\\\Capsule\\\\Manager will always evaluate to false\\.$#"
-			count: 2
-			path: LibreNMS/DB/Eloquent.php
-
-		-
-			message: "#^Call to function is_null\\(\\) with PDO will always evaluate to false\\.$#"
-			count: 1
-			path: LibreNMS/DB/Eloquent.php
-
-		-
-			message: "#^Method LibreNMS\\\\DB\\\\Eloquent\\:\\:boot\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: LibreNMS/DB/Eloquent.php
-
-		-
-			message: "#^Method LibreNMS\\\\DB\\\\Eloquent\\:\\:getDriver\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: LibreNMS/DB/Eloquent.php
-
-		-
-			message: "#^Method LibreNMS\\\\DB\\\\Eloquent\\:\\:initLegacyListeners\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: LibreNMS/DB/Eloquent.php
-
-		-
-			message: "#^Method LibreNMS\\\\DB\\\\Eloquent\\:\\:isConnected\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: LibreNMS/DB/Eloquent.php
-
-		-
-			message: "#^Method LibreNMS\\\\DB\\\\Eloquent\\:\\:isConnected\\(\\) has parameter \\$name with no type specified\\.$#"
-			count: 1
-			path: LibreNMS/DB/Eloquent.php
-
-		-
-			message: "#^Method LibreNMS\\\\DB\\\\Eloquent\\:\\:setConnection\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: LibreNMS/DB/Eloquent.php
-
-		-
-			message: "#^Method LibreNMS\\\\DB\\\\Eloquent\\:\\:setConnection\\(\\) has parameter \\$db_host with no type specified\\.$#"
-			count: 1
-			path: LibreNMS/DB/Eloquent.php
-
-		-
-			message: "#^Method LibreNMS\\\\DB\\\\Eloquent\\:\\:setConnection\\(\\) has parameter \\$db_name with no type specified\\.$#"
-			count: 1
-			path: LibreNMS/DB/Eloquent.php
-
-		-
-			message: "#^Method LibreNMS\\\\DB\\\\Eloquent\\:\\:setConnection\\(\\) has parameter \\$db_pass with no type specified\\.$#"
-			count: 1
-			path: LibreNMS/DB/Eloquent.php
-
-		-
-			message: "#^Method LibreNMS\\\\DB\\\\Eloquent\\:\\:setConnection\\(\\) has parameter \\$db_port with no type specified\\.$#"
-			count: 1
-			path: LibreNMS/DB/Eloquent.php
-
-		-
-			message: "#^Method LibreNMS\\\\DB\\\\Eloquent\\:\\:setConnection\\(\\) has parameter \\$db_socket with no type specified\\.$#"
-			count: 1
-			path: LibreNMS/DB/Eloquent.php
-
-		-
-			message: "#^Method LibreNMS\\\\DB\\\\Eloquent\\:\\:setConnection\\(\\) has parameter \\$db_user with no type specified\\.$#"
-			count: 1
-			path: LibreNMS/DB/Eloquent.php
-
-		-
-			message: "#^Method LibreNMS\\\\DB\\\\Eloquent\\:\\:setConnection\\(\\) has parameter \\$name with no type specified\\.$#"
-			count: 1
-			path: LibreNMS/DB/Eloquent.php
-
-		-
-			message: "#^Method LibreNMS\\\\DB\\\\Eloquent\\:\\:setStrictMode\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: LibreNMS/DB/Eloquent.php
-
-		-
-			message: "#^Method LibreNMS\\\\DB\\\\Eloquent\\:\\:version\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: LibreNMS/DB/Eloquent.php
-
-		-
-			message: "#^Method LibreNMS\\\\DB\\\\Eloquent\\:\\:version\\(\\) has parameter \\$name with no type specified\\.$#"
-			count: 1
-			path: LibreNMS/DB/Eloquent.php
-
-		-
-			message: "#^Result of && is always false\\.$#"
-			count: 1
-			path: LibreNMS/DB/Eloquent.php
-
-		-
 			message: "#^Method LibreNMS\\\\DB\\\\Schema\\:\\:columnExists\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: LibreNMS/DB/Schema.php
@@ -6636,86 +6541,6 @@ parameters:
 			path: LibreNMS/Util/Validate.php
 
 		-
-			message: "#^Method LibreNMS\\\\ValidationResult\\:\\:consolePrint\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: LibreNMS/ValidationResult.php
-
-		-
-			message: "#^Method LibreNMS\\\\ValidationResult\\:\\:getFix\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: LibreNMS/ValidationResult.php
-
-		-
-			message: "#^Method LibreNMS\\\\ValidationResult\\:\\:getList\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: LibreNMS/ValidationResult.php
-
-		-
-			message: "#^Method LibreNMS\\\\ValidationResult\\:\\:getListDescription\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: LibreNMS/ValidationResult.php
-
-		-
-			message: "#^Method LibreNMS\\\\ValidationResult\\:\\:getMessage\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: LibreNMS/ValidationResult.php
-
-		-
-			message: "#^Method LibreNMS\\\\ValidationResult\\:\\:getStatusText\\(\\) has parameter \\$status with no type specified\\.$#"
-			count: 1
-			path: LibreNMS/ValidationResult.php
-
-		-
-			message: "#^Method LibreNMS\\\\ValidationResult\\:\\:hasFix\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: LibreNMS/ValidationResult.php
-
-		-
-			message: "#^Method LibreNMS\\\\ValidationResult\\:\\:hasList\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: LibreNMS/ValidationResult.php
-
-		-
-			message: "#^Method LibreNMS\\\\ValidationResult\\:\\:printList\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: LibreNMS/ValidationResult.php
-
-		-
-			message: "#^Method LibreNMS\\\\ValidationResult\\:\\:setList\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: LibreNMS/ValidationResult.php
-
-		-
-			message: "#^Method LibreNMS\\\\ValidationResult\\:\\:setList\\(\\) has parameter \\$description with no type specified\\.$#"
-			count: 1
-			path: LibreNMS/ValidationResult.php
-
-		-
-			message: "#^Property LibreNMS\\\\ValidationResult\\:\\:\\$fix has no type specified\\.$#"
-			count: 1
-			path: LibreNMS/ValidationResult.php
-
-		-
-			message: "#^Property LibreNMS\\\\ValidationResult\\:\\:\\$list has no type specified\\.$#"
-			count: 1
-			path: LibreNMS/ValidationResult.php
-
-		-
-			message: "#^Property LibreNMS\\\\ValidationResult\\:\\:\\$list_description has no type specified\\.$#"
-			count: 1
-			path: LibreNMS/ValidationResult.php
-
-		-
-			message: "#^Property LibreNMS\\\\ValidationResult\\:\\:\\$message has no type specified\\.$#"
-			count: 1
-			path: LibreNMS/ValidationResult.php
-
-		-
-			message: "#^Property LibreNMS\\\\ValidationResult\\:\\:\\$status has no type specified\\.$#"
-			count: 1
-			path: LibreNMS/ValidationResult.php
-
-		-
 			message: "#^Property LibreNMS\\\\Validations\\\\BaseValidation\\:\\:\\$RUN_BY_DEFAULT has no type specified\\.$#"
 			count: 1
 			path: LibreNMS/Validations/BaseValidation.php
@@ -7124,71 +6949,6 @@ parameters:
 			message: "#^Method LibreNMS\\\\Validations\\\\User\\:\\:validate\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: LibreNMS/Validations/User.php
-
-		-
-			message: "#^Method LibreNMS\\\\Validator\\:\\:execAsUser\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: LibreNMS/Validator.php
-
-		-
-			message: "#^Method LibreNMS\\\\Validator\\:\\:fail\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: LibreNMS/Validator.php
-
-		-
-			message: "#^Method LibreNMS\\\\Validator\\:\\:getBaseDir\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: LibreNMS/Validator.php
-
-		-
-			message: "#^Method LibreNMS\\\\Validator\\:\\:info\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: LibreNMS/Validator.php
-
-		-
-			message: "#^Method LibreNMS\\\\Validator\\:\\:ok\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: LibreNMS/Validator.php
-
-		-
-			message: "#^Method LibreNMS\\\\Validator\\:\\:printResults\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: LibreNMS/Validator.php
-
-		-
-			message: "#^Method LibreNMS\\\\Validator\\:\\:result\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: LibreNMS/Validator.php
-
-		-
-			message: "#^Method LibreNMS\\\\Validator\\:\\:validate\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: LibreNMS/Validator.php
-
-		-
-			message: "#^Method LibreNMS\\\\Validator\\:\\:warn\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: LibreNMS/Validator.php
-
-		-
-			message: "#^Property LibreNMS\\\\Validator\\:\\:\\$results has no type specified\\.$#"
-			count: 1
-			path: LibreNMS/Validator.php
-
-		-
-			message: "#^Property LibreNMS\\\\Validator\\:\\:\\$username has no type specified\\.$#"
-			count: 1
-			path: LibreNMS/Validator.php
-
-		-
-			message: "#^Property LibreNMS\\\\Validator\\:\\:\\$validation_groups has no type specified\\.$#"
-			count: 1
-			path: LibreNMS/Validator.php
-
-		-
-			message: "#^Property LibreNMS\\\\Validator\\:\\:\\$versions has no type specified\\.$#"
-			count: 1
-			path: LibreNMS/Validator.php
 
 		-
 			message: "#^Property App\\\\Models\\\\Device\\:\\:\\$authlevel \\('authNoPriv'\\|'authPriv'\\|'noAuthNoPriv'\\) does not accept null\\.$#"
@@ -10441,11 +10201,6 @@ parameters:
 			path: tests/ConfigTest.php
 
 		-
-			message: "#^Method LibreNMS\\\\Tests\\\\ConfigTest\\:\\:testGetCombined\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: tests/ConfigTest.php
-
-		-
 			message: "#^Method LibreNMS\\\\Tests\\\\ConfigTest\\:\\:testGetDeviceSetting\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: tests/ConfigTest.php
@@ -10492,16 +10247,6 @@ parameters:
 
 		-
 			message: "#^Parameter \\#1 \\$os of static method LibreNMS\\\\Config\\:\\:getOsSetting\\(\\) expects string, null given\\.$#"
-			count: 1
-			path: tests/ConfigTest.php
-
-		-
-			message: "#^Parameter \\#3 \\$default of static method LibreNMS\\\\Config\\:\\:getCombined\\(\\) expects array, false given\\.$#"
-			count: 2
-			path: tests/ConfigTest.php
-
-		-
-			message: "#^Parameter \\#3 \\$default of static method LibreNMS\\\\Config\\:\\:getCombined\\(\\) expects array, true given\\.$#"
 			count: 1
 			path: tests/ConfigTest.php
 
@@ -11377,11 +11122,6 @@ parameters:
 
 		-
 			message: "#^Method LibreNMS\\\\Tests\\\\FunctionsTest\\:\\:testIsHexString\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: tests/FunctionsTest.php
-
-		-
-			message: "#^Method LibreNMS\\\\Tests\\\\FunctionsTest\\:\\:testLinkify\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: tests/FunctionsTest.php
 

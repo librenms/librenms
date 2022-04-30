@@ -157,7 +157,7 @@ function discover_device(&$device, $force_module = false)
                 include "includes/discovery/$module.inc.php";
             } catch (Throwable $e) {
                 // isolate module exceptions so they don't disrupt the polling process
-                Log::error("%rError discovering $module module for {$device['hostname']}.%n " . $e->getMessage() . PHP_EOL . $e->getTraceAsString(), ['color' => true]);
+                Log::error("%rError discovering $module module for {$device['hostname']}.%n $e", ['color' => true]);
                 Log::event("Error discovering $module module. Check log file for more details.", $device['device_id'], 'discovery', Alert::ERROR);
             }
 
@@ -815,7 +815,7 @@ function get_device_divisor($device, $os_version, $sensor_type, $oid)
  */
 function ignore_storage($os, $descr)
 {
-    foreach (Config::getCombined($os, 'ignore_mount', []) as $im) {
+    foreach (Config::getCombined($os, 'ignore_mount') as $im) {
         if ($im == $descr) {
             d_echo("ignored $descr (matched: $im)\n");
 
@@ -823,7 +823,7 @@ function ignore_storage($os, $descr)
         }
     }
 
-    foreach (Config::getCombined($os, 'ignore_mount_string', []) as $ims) {
+    foreach (Config::getCombined($os, 'ignore_mount_string') as $ims) {
         if (Str::contains($descr, $ims)) {
             d_echo("ignored $descr (matched: $ims)\n");
 
@@ -831,7 +831,7 @@ function ignore_storage($os, $descr)
         }
     }
 
-    foreach (Config::getCombined($os, 'ignore_mount_regexp', []) as $imr) {
+    foreach (Config::getCombined($os, 'ignore_mount_regexp') as $imr) {
         if (preg_match($imr, $descr)) {
             d_echo("ignored $descr (matched: $imr)\n");
 
@@ -1182,15 +1182,15 @@ function add_cbgp_peer($device, $peer, $afi, $safi)
  */
 function can_skip_sensor($device, $sensor_class = '', $sensor_descr = '')
 {
-    if (! empty($sensor_class) && Config::getCombined($device['os'], "disabled_sensors.$sensor_class", false)) {
+    if (! empty($sensor_class) && (Config::getOsSetting($device['os'], "disabled_sensors.$sensor_class") || Config::get("disabled_sensors.$sensor_class"))) {
         return true;
     }
-    foreach (Config::getCombined($device['os'], 'disabled_sensors_regex', []) as $skipRegex) {
+    foreach (Config::getCombined($device['os'], 'disabled_sensors_regex') as $skipRegex) {
         if (! empty($sensor_descr) && preg_match($skipRegex, $sensor_descr)) {
             return true;
         }
     }
-    foreach (Config::getCombined($device['os'], "disabled_sensors_regex.$sensor_class", []) as $skipRegex) {
+    foreach (Config::getCombined($device['os'], "disabled_sensors_regex.$sensor_class") as $skipRegex) {
         if (! empty($sensor_descr) && preg_match($skipRegex, $sensor_descr)) {
             return true;
         }

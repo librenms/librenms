@@ -154,7 +154,7 @@ trait BridgeMib
             ])->values();
 
             $instance->timeSinceTopologyChange = substr($data['BRIDGE-MIB::dot1dStpTimeSinceTopologyChange.0'] ?? '', 0, -2) ?: 0;
-            $instance->topChanges = $data['BRIDGE-MIB::dot1dStpTopChanges.0'];
+            $instance->topChanges = $data['BRIDGE-MIB::dot1dStpTopChanges.0'] ?? 0;
             $instance->designatedRoot = Rewrite::macToHex($data['BRIDGE-MIB::dot1dStpDesignatedRoot.0'] ?? '');
         });
     }
