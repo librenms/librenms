@@ -1,7 +1,12 @@
-<div {{ $attributes->merge(['class' => 'panel panel-default']) }}>
-@if (isset($heading))
-  <div class="panel-heading">
-    {{ $heading }}
+@props([
+'header',
+'footer',
+])
+
+<div {{ $attributes->class(['panel', 'panel-default']) }}>
+@if (isset($header))
+  <div {{ $header->attributes ? $header->attributes->class(['panel-heading']) : 'class="panel-heading"' }}>
+    {{ $header }}
   </div>
 @elseif (isset($title))
   <div class="panel-heading">
@@ -10,7 +15,7 @@
 @endif
 
 @if (isset($slot) && !empty($slot->toHtml()))
-  <div class="panel-body {{ $body_class }}">
+  <div {{ $slot->attributes ? $slot->attributes->class(['panel-body']) : 'class="panel-body"' }}>
     {{ $slot }}
   </div>
 @endif
@@ -20,7 +25,7 @@
 @endisset
 
 @isset($footer)
-  <div class="panel-footer {{ $footer_class }}">
+  <div {{ $footer->attributes ? $footer->attributes->class(['panel-footer']) : 'class="panel-footer"' }}>
     {{ $footer }}
   </div>
 @endisset

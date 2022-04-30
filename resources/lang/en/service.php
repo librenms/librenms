@@ -6,6 +6,8 @@ return [
     'save' => 'Save Service',
     'test' => 'Test Service',
     'added' => 'Service Created',
+    'deleted' => 'Service :service has been deleted.',
+    'not_deleted' => 'Service :service has NOT been deleted.',
     'this_device' => '<This Device>',
     'status' => 'Status',
     'view_basic' => 'Basic',

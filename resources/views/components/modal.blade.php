@@ -1,7 +1,6 @@
 @props(['id', 'maxWidth'])
 
 @php
-    $id = $id ?? md5('FIXME');
     $maxWidth = [
         'sm' => 'sm:tw-max-w-sm',
         'md' => 'sm:tw-max-w-md',
@@ -46,7 +45,7 @@
         x-on:keydown.tab.prevent="$event.shiftKey || nextFocusable().focus()"
         x-on:keydown.shift.tab.prevent="prevFocusable().focus()"
         x-show="show"
-        id="{{ $id }}"
+        @isset($id)id="{{ $id }}"@endisset
         class="tw-fixed tw-inset-0 tw-overflow-y-auto tw-px-4 tw-py-6 sm:tw-px-0 tw-z-50"
         style="display: none;"
         {{ $attributes }}

@@ -27,7 +27,7 @@
 
     </x-panel>
 
-    <x-modal x-model="showModal" max-width="5xl">
+    <x-modal x-model="showModal" max-width="5xl" id="service-add-modal">
         <x-panel title="{{ __('service.add') }}" class="!tw-mb-0" x-on:service-saved="showModal=false; console.log('saved');">
             @include('service.form', ['device_id' => $device->device_id ?? null])
         </x-panel>

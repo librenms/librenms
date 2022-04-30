@@ -101,13 +101,15 @@ class ServiceController extends Controller
         if ($service->delete()) {
             return response()->json([
                 'status' => 1,
-                'message' => 'Service: ' . $service->service_id . ', has been deleted.',
+                'service_id' => $service->service_id,
+                'message' => __('service.deleted', ['service' => $service->service_name . " ($service->service_id)"]),
             ]);
         }
 
         return response()->json([
             'status' => 0,
-            'message' => 'Service: ' . $service->service_id . ', has NOT been deleted.',
+            'service_id' => $service->service_id,
+            'message' => __('service.not_deleted', ['service' => $service->service_name . " ($service->service_id)"]),
         ]);
     }
 

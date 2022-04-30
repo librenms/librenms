@@ -14,29 +14,13 @@ class Panel extends Component
     public $title;
 
     /**
-     * The Panel body class.
-     *
-     * @var string
-     */
-    public $body_class;
-
-    /**
-     * The Panel footer class.
-     *
-     * @var string
-     */
-    public $footer_class;
-
-    /**
      * Create a new component instance.
      *
      * @return void
      */
-    public function __construct($title = null, $bodyClass = null, $footerClass = null)
+    public function __construct($title = null)
     {
         $this->title = $title;
-        $this->body_class = $bodyClass;
-        $this->footer_class = $footerClass;
     }
 
     /**
