@@ -4828,6 +4828,7 @@
         },
         "redis_sentinel_password": {
             "group": "poller",
+            "order": 26,
             "section": "distributed",
             "type": "text"
         },
