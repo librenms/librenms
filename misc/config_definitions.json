@@ -4826,6 +4826,11 @@
                 "git": "Git"
             }
         },
+        "redis_sentinel_password": {
+            "group": "poller",
+            "section": "distributed",
+            "type": "text"
+        },
         "rewrite_if": {
             "type": "array"
         },

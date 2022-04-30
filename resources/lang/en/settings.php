@@ -1230,6 +1230,10 @@ return [
             'description' => 'Route entries older than',
             'help' => 'Cleanup done by daily.sh',
         ],
+        'redis_sentinel_password' => [
+            'description' => 'Password for authenticating to Redis Sentinel',
+            'help' => 'This only needs to be set if you are running Redis Sentinel with a requirepass in the redis-sentinel.conf',
+        ]
         'rrd' => [
             'heartbeat' => [
                 'description' => 'Change the rrd heartbeat value (default 600)',
