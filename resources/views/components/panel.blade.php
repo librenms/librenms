@@ -14,11 +14,11 @@
   </div>
 @endif
 
-@if (isset($slot) && !empty($slot->toHtml()))
-  <div {{ $slot->attributes ? $slot->attributes->class(['panel-body']) : 'class="panel-body"' }}>
-    {{ $slot }}
-  </div>
-@endif
+  @if (isset($slot) && !empty($slot->toHtml()))
+    <div class="panel-body {{ $body_class }}">
+      {{ $slot }}
+    </div>
+  @endif
 
 @isset($table)
 {{ $table }}
