@@ -24,7 +24,7 @@ return [
     ],
     'finish' => [
         'config_exists' => 'il file config.php esiste già',
-        'config_not_required' => 'Questo file non è richiesto.  Questi i valori predefiniti.',
+        'config_not_required' => 'Questo file non è richiesto. Questi i valori predefiniti.',
         'config_not_written' => 'Non posso salvare il file config.php',
         'config_written' => 'file config.php salvato',
         'copied' => 'Copiato negli appunti',
@@ -34,7 +34,7 @@ return [
         'manual_copy' => 'Premi Ctrl-C per copiare',
         'not_finished' => 'Non hai ancora terminato!',
         'retry' => 'Riprova',
-        'statistics' => 'Sarebbe fantastico se contribuissi alle nostre statistiche, puoi farlo su :about selezionando la casella sotto statistiche.',
+        'statistics' => 'Sarebbe fantastico se contribuissi alle nostre statistiche, puoi farlo su :about selezionando il pulsante sotto statistiche.',
         'statistics_link' => 'Informazioni su LibreNMS',
         'thanks' => 'Grazie per aver configurato LibreNMS.',
         'title' => 'Installazione terminata',
@@ -57,7 +57,7 @@ return [
         'migrate' => 'Versione database',
         'user' => 'Creazione utente',
     ],
-    'title' => 'Installazione LibreNMS',
+    'title' => 'Installazione di LibreNMS',
     'user' => [
         'button' => 'Aggiungi utente',
         'created' => 'Utente creato',
