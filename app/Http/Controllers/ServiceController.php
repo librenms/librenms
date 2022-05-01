@@ -71,18 +71,22 @@ class ServiceController extends Controller
      */
     public function update(Request $request, Service $service): JsonResponse
     {
+        $services = Services::list();
+        $param_rules = $this->buildParamRules($request->get('service_type'), $services);
+        unset($param_rules['service_param.--hostname']);
+
         $validated = $this->validate($request, [
             'device_id' => 'int|exists:App\Models\Device,device_id',
             'service_ip' => 'nullable|ip_or_hostname',
-            'service_type' => ['nullable', Rule::in(Services::list())],
-            'service_desc' => 'string',
+            'service_type' => ['nullable', Rule::in($services)],
+            'service_desc' => 'nullable|string',
             'service_param' => 'nullable|array',
             'service_param.*' => 'string',
             'service_ignore' => 'boolean',
             'service_disabled' => 'boolean',
-            'service_name' => 'string',
+            'service_name' => 'nullable|string',
             'service_template_id' => 'nullable|int|exists:App\Models\ServiceTemplate,id',
-        ]);
+        ] + $param_rules);
 
         $service->fill($validated);
         $service->save();

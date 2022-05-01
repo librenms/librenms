@@ -1,5 +1,5 @@
 @isset($services)
-<div x-data="{deleteId: 0, deleteText: '', deleteService() {
+<div x-data="{editService: 0, deleteId: 0, deleteText: '', deleteService() {
     if (this.deleteId) {
         fetch('{{ route('services.destroy', ['service' => '?']) }}'.replace('?', this.deleteId), {
         method: 'DELETE',
@@ -54,7 +54,7 @@
             <div class="col-sm-2 text-muted">{{ \LibreNMS\Util\Time::formatInterval(time() - $service->service_changed, 'short') }}</div>
             <div class="col-sm-1">
                 <div class="tw-flex tw-flex-nowrap tw-flex-row-reverse">
-                    <button type="button" class="btn btn-primary btn-sm" data-service_id='{$service->service_id}'><i class="fa fa-pencil" aria-hidden="true"></i></button>
+                    <button type="button" class="btn btn-primary btn-sm" x-on:click="editService='{{ $service->service_id }}'"><i class="fa fa-pencil" aria-hidden="true"></i></button>
                     <button type="button" class="btn btn-danger btn-sm tw-mr-1" x-on:click="deleteId = {{ $service->service_id }}; deleteText = '{{ $service->service_name }}'"><i class="fa fa-trash" aria-hidden="true"></i></button>
                 </div>
             </div>
@@ -76,6 +76,9 @@
 <x-dialog x-model="deleteId" id="service-delete-dialog" title="Delete Service" x-on:dialog-confirm="deleteService">
     <span x-text="'Delete service' + (deleteText ? ` &quot;${deleteText}&quot;` : '') + '?'"></span>
 </x-dialog>
+<x-modal x-model="editService">
+    @include('service.form')
+</x-modal>
 </div>
 @else
 <div class="device-services-page-no-service">No Services</div>

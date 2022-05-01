@@ -1,4 +1,4 @@
-<form method="post" role="form" id="service" class="form-horizontal" x-data="serviceFormData()">
+<form method="post" role="form" id="service" class="form-horizontal" x-data="serviceFormData()" x-modelable="service_id">
     <div class="form-group row">
         <label for='service_name' class="col-sm-4 col-md-3 control-label">{{ __('service.fields.service_name') }}</label>
         <div class="col-sm-8 col-md-9">
@@ -152,7 +152,7 @@
             excluded: {},
             errors: {},
             async save() {
-                if (await this.submitCheck('{{ route('services.store') }}') !== false) {
+                if (await this.submitCheck() !== false) {
                     toastr.success('{{ __('service.added') }}');
                     this.$dispatch('service-saved');
 
@@ -167,7 +167,8 @@
                     this.testResult = 1;
                 }
             },
-            async submitCheck(url) {
+            async submitCheck() {
+                const url = this.service_id ? '{{ route('services.update', ['service' => '?']) }}'.replace('?', this.service_id) : '{{ route('services.store') }}';
                 const response = await fetch(url, {
                     method: this.service_id ? 'PUT' : 'POST',
                     headers: {
@@ -285,11 +286,29 @@
                     });
                 }
 
+
                 if (this.service_type) {
                     this.fetchParams(this.service_type);
                 }
-                this.$watch("service_type", service_type => this.fetchParams(service_type));
+                this.$watch('service_type', service_type => this.fetchParams(service_type));
                 this.$watch('service_param', () => this.currentParam = this.$refs.param.value);
+                this.$watch('show' , show => this.service_id = show);
+                this.$watch('service_id',  service_id => {
+                    if (service_id) {
+                        fetch('{{ route('services.show', ['service' => '?']) }}'.replace('?', service_id))
+                            .then(response => response.json())
+                            .then(result => {
+                                console.log(result);
+                                this.service_name = result.service_name;
+                                this.service_desc = result.service_desc;
+                                this.service_type = result.service_type;
+                                this.service_ip = result.service_ip;
+                                this.service_param = result.service_param;
+                                this.service_ignore = result.service_ignore;
+                                this.service_disabled = result.service_disabled;
+                            });
+                    }
+                });
             }
         };
     }
