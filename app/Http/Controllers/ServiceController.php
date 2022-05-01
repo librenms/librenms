@@ -2,10 +2,13 @@
 
 namespace App\Http\Controllers;
 
+use App\Models\Device;
 use App\Models\Service;
+use Illuminate\Database\Eloquent\Builder;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
+use LibreNMS\Enum\CheckStatus;
 use LibreNMS\Services;
 use LibreNMS\Services\CheckParameter;
 
@@ -21,9 +24,42 @@ class ServiceController extends Controller
      *
      * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View
      */
-    public function index()
+    public function index(Request $request)
     {
-        return view('services.index');
+        $state = $request->input('state', 'all');
+        $devices = Device::with(['services' => function ($query) use ($state) {
+            if($state !== 'all') {
+                $query->where('service_status', CheckStatus::toState($state));
+            }
+        }])
+            ->whereHas('services', function (Builder $query) use ($state) {
+                if ($state !== 'all') {
+                    $query->where('service_status', CheckStatus::toState($state));
+                }
+            })->get();
+
+        $view_menu = [
+            'view' => [
+                ['key' => 'basic', 'name' => trans('service.view_basic'), 'default' => true],
+                ['key' => 'graphs', 'name' => trans('service.view_graphs')],
+            ]
+        ];
+
+        $state_menu = [
+            'state' => [
+                ['key' => 'all', 'name' => trans('service.state_all'), 'default' => true],
+                ['key' => 'ok', 'name' => trans('service.state_ok')],
+                ['key' => 'warning', 'name' => trans('service.state_warning')],
+                ['key' => 'critical', 'name' => trans('service.state_critical')],
+            ]
+        ];
+
+        return view('service.index', [
+            'devices' => $devices,
+            'view_menu' => $view_menu,
+            'state_menu' => $state_menu,
+            'view' => $request->input('view'),
+        ]);
     }
 
     /**
@@ -76,17 +112,17 @@ class ServiceController extends Controller
         unset($param_rules['service_param.--hostname']);
 
         $validated = $this->validate($request, [
-            'device_id' => 'int|exists:App\Models\Device,device_id',
-            'service_ip' => 'nullable|ip_or_hostname',
-            'service_type' => ['nullable', Rule::in($services)],
-            'service_desc' => 'nullable|string',
-            'service_param' => 'nullable|array',
-            'service_param.*' => 'string',
-            'service_ignore' => 'boolean',
-            'service_disabled' => 'boolean',
-            'service_name' => 'nullable|string',
-            'service_template_id' => 'nullable|int|exists:App\Models\ServiceTemplate,id',
-        ] + $param_rules);
+                'device_id' => 'int|exists:App\Models\Device,device_id',
+                'service_ip' => 'nullable|ip_or_hostname',
+                'service_type' => ['nullable', Rule::in($services)],
+                'service_desc' => 'nullable|string',
+                'service_param' => 'nullable|array',
+                'service_param.*' => 'string',
+                'service_ignore' => 'boolean',
+                'service_disabled' => 'boolean',
+                'service_name' => 'nullable|string',
+                'service_template_id' => 'nullable|int|exists:App\Models\ServiceTemplate,id',
+            ] + $param_rules);
 
         $service->fill($validated);
         $service->save();
@@ -143,7 +179,7 @@ class ServiceController extends Controller
                 $rules[] = 'required';
             } elseif ($parameter->inclusive_group) {
                 $rules[] = 'required_with:' . implode(',', $keyed->only($parameter->inclusive_group)->map(function (CheckParameter $param) {
-                    return 'service_param.' . $param->param ?: $param->short;
+                        return 'service_param.' . $param->param ?: $param->short;
                     })->all());
             }
 

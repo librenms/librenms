@@ -73,7 +73,7 @@ $labels = [
     CheckStatus::OK => 'label-info',
     CheckStatus::UNKNOWN => 'label-default',
     CheckStatus::WARNING => 'label-warning',
-    CheckStatus::ERROR => 'label-danger',
+    CheckStatus::CRITICAL => 'label-danger',
 ];
 
 foreach ($messages['messages'] as $message) {

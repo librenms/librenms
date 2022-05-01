@@ -1,5 +1,8 @@
-<div>
+@props(['menu' => [], 'title' => '', 'base' => url()->current(), 'current' => null])
+
+<span>
     @foreach ($menu as $header => $m)
+        @php($current_value = $current ?: request()->input($header))
         @if($loop->first)
             <b>{{ $title }}</b>
             »
@@ -8,8 +11,9 @@
         @endif
 
         @foreach($m as $sm)
-            @if($isSelected($sm['url']))<span class="pagemenu-selected">@endif
-            <a href="{{ route('device', ['device' => $device_id, 'tab' => $current_tab, 'vars' => $sm['url']]) }}">{{ $sm['name'] }}</a>@if($isSelected($sm['url']))</span>@endif
+            <span @if($current_value ? $current_value == $sm['key'] : isset($sm['default'])) class="pagemenu-selected" @endif><a
+                        href="{{ $base . '?' . Arr::query([$header => $sm['key']] + request()->all()) }}"
+                >{{ $sm['name'] }}</a></span>
 
             @if(!$loop->last)
                 |
@@ -17,4 +21,4 @@
         @endforeach
     @endforeach
     {{ $slot }}
-</div>
+</span>

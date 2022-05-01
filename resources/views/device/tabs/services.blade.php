@@ -4,11 +4,13 @@
     <div x-data="{ showAddServiceModal: false}">
         <x-panel body-class="!tw-p-0">
             <x-slot name="title">
-                <x-submenu title="{{ __('service.title') }}" :menu="$menu" :device-id="$device->device_id" current-tab="services" :selected="$view">
-                    <div class="pull-right"><a x-on:click="showAddServiceModal=true">
-                            <i class="fa-solid fa-plus" style="color:green" aria-hidden="true"></i> {{ __('service.add') }}</a>
-                    </div>
-                </x-submenu>
+                <div class="tw-flex tw-justify-between">
+                    <x-submenu title="{{ __('service.title') }}" :menu="$menu" :current="$view" />
+                    <a x-on:click="showAddServiceModal=true">
+                        <i class="fa-solid fa-plus" style="color:green" aria-hidden="true"></i>
+                        {{ __('service.add') }}
+                    </a>
+                </div>
             </x-slot>
 
             @include('service.table')

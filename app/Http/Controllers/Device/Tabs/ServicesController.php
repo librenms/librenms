@@ -53,16 +53,14 @@ class ServicesController implements DeviceTab
 
     public function data(Device $device): array
     {
-        $view = Request::segment(4, 'basic');
-
         return [
             'services' => $device->services,
             'device' => $device,
             'menu' => ['view' => [
-                ['url' => 'basic', 'name' => trans('service.view_basic')],
-                ['url' => 'graphs', 'name' => trans('service.view_graphs')],
+                ['key' => 'basic', 'name' => trans('service.view_basic'), 'default' => true],
+                ['key' => 'graphs', 'name' => trans('service.view_graphs')],
             ]],
-            'view' => $view,
+            'view' => Request::input('view', 'basic'),
         ];
     }
 }

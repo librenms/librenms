@@ -12,6 +12,10 @@ return [
     'status' => 'Status',
     'view_basic' => 'Basic',
     'view_graphs' => 'Graphs',
+    'state_all' => 'All',
+    'state_ok' => 'Ok',
+    'state_warning' => 'Warning',
+    'state_critical' => 'Critical',
     'graph' => 'Data Set: :ds',
     'fields' => [
         'device_id' => 'Device',

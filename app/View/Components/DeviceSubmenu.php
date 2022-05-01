@@ -4,7 +4,7 @@ namespace App\View\Components;
 
 use Illuminate\View\Component;
 
-class Submenu extends Component
+class DeviceSubmenu extends Component
 {
     /**
      * The submenu title.

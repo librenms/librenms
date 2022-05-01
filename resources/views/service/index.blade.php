@@ -3,28 +3,26 @@
 @section('title', __('service.title'))
 
 @section('content')
-<div x-data="{ 'showModal': false }">
-    <x-panel title=""
-    @foreach($devices as $device)
-    <x-panel body-class="!tw-p-0">
+<div class="container-fluid" x-data="{ 'showModal': false }">
+
+    <x-panel>
         <x-slot name="title">
+            <div class="tw-flex tw-justify-between">
+            <x-submenu title="{{ __('service.title') }}" :menu="$view_menu" :selected="$view" />
 
-            <x-submenu title="{{ __('service.title') }}" :menu="$menu" :device-id="$device->device_id" current-tab="services" :selected="$view">
-                <div class="pull-right"><a x-on:click="showModal=true">
-                        <i class="fa-solid fa-plus" style="color:green" aria-hidden="true"></i> {{ __('service.add') }}</a>
-                </div>
-            </x-submenu>
-
-            <x-submenu title="{{ __('service.status') }}" :menu="$menu" :device-id="$device->device_id" current-tab="services" :selected="$view">
-                <div class="pull-right"><a x-on:click="showModal=true">
-                        <i class="fa-solid fa-plus" style="color:green" aria-hidden="true"></i> {{ __('service.add') }}</a>
-                </div>
-            </x-submenu>
+            <x-submenu title="{{ __('service.status') }}" :menu="$state_menu" />
+            </div>
         </x-slot>
 
-        @php($services = $device->services)
-        @include('service.table')
-
+        @foreach($devices as $device)
+            <x-panel body-class="!tw-p-0">
+                <x-slot name="header">
+                    {!! \LibreNMS\Util\Url::deviceLink($device) !!}
+                </x-slot>
+                @php($services = $device->services)
+                @include('service.table')
+            </x-panel>
+        @endforeach
     </x-panel>
 
     <x-modal x-model="showModal" max-width="5xl" id="service-add-modal">
