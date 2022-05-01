@@ -634,7 +634,7 @@ function json_app_get($device, $extend, $min_version = 1)
     }
 
     //  turn the JSON into a array
-    $output = preg_replace('/\\\([^n])/', '$1', $output);
+    $output = preg_replace('/\\\([^n\\\])/', '$1', $output);
     $parsed_json = json_decode($output, true);
 
     // improper JSON or something else was returned. Populate the variable with an error.
