@@ -14,7 +14,7 @@
         <div class="form-group row">
             <label for='device_id' class="col-sm-4 col-md-3 control-label">{{ __('service.fields.device_id') }}</label>
             <div class="col-sm-8 col-md-9">
-                <select id='device_id' name='device_id' class='form-control' x-model.number="device_id" x-bind:class="{'!tw-border-red-500': errors.device_id}">
+                <select id="device_id" name="device_id" class="form-control" x-model.number="device_id" x-bind:class="{'!tw-border-red-500': errors.device_id}">
                 </select>
             </div>
             <div class="col-sm-8 col-sm-offset-4 col-md-9 col-md-offset-3 tw-text-red-500">
@@ -25,15 +25,15 @@
         </div>
     @endif
     <div class="form-group row">
-        <label for='service_type' class="col-sm-4 col-md-3 control-label">{{ __('service.fields.service_type') }}</label>
+        <label for="service_type" class="col-sm-4 col-md-3 control-label">{{ __('service.fields.service_type') }}</label>
         <div class="col-sm-8 col-md-9">
-            <select id='service_type' name='service_type' class='form-control has-feedback' x-model="service_type" x-bind:class="{'!tw-border-red-500': errors.service_type}">
+            <select id="service_type" name="service_type" class="form-control has-feedback" x-model="service_type" x-bind:class="{'!tw-border-red-500': errors.service_type}">
                 @foreach(\LibreNMS\Services::list() as $check)
                     <option value="{{ $check }}">{{ $check }}</option>
                 @endforeach
             </select>
         </div>
-        <div class='col-sm-8 col-sm-offset-4 col-md-9 col-md-offset-3 tw-text-red-500'>
+        <div class="col-sm-8 col-sm-offset-4 col-md-9 col-md-offset-3 tw-text-red-500">
             <template x-for="error in errors.service_type">
                 <div x-text="error"></div>
             </template>
@@ -118,9 +118,10 @@
         </div>
     </div>
     <div class="form-group row">
-        <div class="col-sm-offset-4 col-md-offset-3">
+        <div class="col-sm-offset-4 col-md-offset-3 col-sm-8 tw-text-right">
             <button class="btn btn-primary btn-sm" type="button" value="save" x-on:click="save">{{ __('service.save') }}</button>
             <button class="btn btn-default btn-sm" type="button" value="test" x-on:click="test">{{ __('service.test') }}</button>
+            <button class="btn btn-danger btn-sm" type="button" value="test" x-on:click="cancel">{{ __('service.cancel') }}</button>
         </div>
     </div>
     <x-panel x-show="testMessage"
@@ -152,7 +153,8 @@
             excluded: {},
             errors: {},
             async save() {
-                if (await this.submitCheck() !== false) {
+                const url = this.service_id ? '{{ route('services.update', ['service' => '?']) }}'.replace('?', this.service_id) : '{{ route('services.store') }}';
+                if (await this.submitCheck(url) !== false) {
                     toastr.success('{{ __('service.added') }}');
                     this.$dispatch('service-saved');
 
@@ -167,8 +169,7 @@
                     this.testResult = 1;
                 }
             },
-            async submitCheck() {
-                const url = this.service_id ? '{{ route('services.update', ['service' => '?']) }}'.replace('?', this.service_id) : '{{ route('services.store') }}';
+            async submitCheck(url) {
                 const response = await fetch(url, {
                     method: this.service_id ? 'PUT' : 'POST',
                     headers: {
@@ -203,6 +204,22 @@
                     this.testMessage = result.message;
                     this.testResult = result.result;
                 }
+            },
+            cancel(event) {
+                this.$dispatch('service-form-cancel');
+                this.service_id = null;
+                this.device_id = null;
+                this.service_type = 'icmp';
+                this.service_name = '';
+                this.service_desc = '';
+                this.currentValue = '';
+                this.service_ip = '';
+                this.service_param = {};
+                this.service_ignore = false;
+                this.service_disabled = false;
+                this.testMessage = '';
+                this.testResult = 1;
+                event.target.blur();
             },
             getParameter(key) {
                 const found = this.parameters.find(param => param.param === key || param.short === key);
@@ -286,20 +303,21 @@
                     });
                 }
 
-
                 if (this.service_type) {
                     this.fetchParams(this.service_type);
                 }
                 this.$watch('service_type', service_type => this.fetchParams(service_type));
                 this.$watch('service_param', () => this.currentParam = this.$refs.param.value);
-                this.$watch('show' , show => this.service_id = show);
+                if (typeof this.show !== 'undefined') {
+                    this.$watch('show' , show => this.service_id = show);
+                }
                 this.$watch('service_id',  service_id => {
                     if (service_id) {
                         fetch('{{ route('services.show', ['service' => '?']) }}'.replace('?', service_id))
                             .then(response => response.json())
                             .then(result => {
-                                console.log(result);
                                 this.service_name = result.service_name;
+                                this.device_id = result.device_id;
                                 this.service_desc = result.service_desc;
                                 this.service_type = result.service_type;
                                 this.service_ip = result.service_ip;

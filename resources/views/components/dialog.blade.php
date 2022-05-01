@@ -10,10 +10,14 @@
         </x-slot>
         <div class="tw-flex tw-flex-col tw-p-4">
             <div>{{ $slot }}</div>
-            <div class="tw-text-right tw-mt-4">
-                <button class="btn btn-primary" x-on:click="$dispatch('dialog-confirm')">{{ __('Ok') }}</button>
-                <button class="btn btn-danger" x-on:click="show=false">{{ __('Cancel') }}</button>
-            </div>
+            @isset($footer)
+                {{ $footer }}
+            @else
+                <div class="tw-text-right tw-mt-4">
+                    <button class="btn btn-primary" x-on:click="$dispatch('dialog-confirm')">{{ __('Ok') }}</button>
+                    <button class="btn btn-danger" x-on:click="show=false">{{ __('Cancel') }}</button>
+                </div>
+            @endisset
         </div>
     </x-panel>
 </x-modal>
