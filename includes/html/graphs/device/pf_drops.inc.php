@@ -5,6 +5,10 @@ $rrd_filename = Rrd::name($device['hostname'], 'pf_drops');
 $i = 0;
 
 foreach ([
+    'badoffset' => 'BadOffset',
+    'fragmented' => 'Fragmented',
+    'short' => 'Short',
+    'normalized' => 'Normalized',
     'memory' => 'Memory',
     'timestamp' => 'Timestamp',
     'congestion' => 'Congestion',

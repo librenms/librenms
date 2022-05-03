@@ -43,7 +43,6 @@ class Openbsd extends Unix implements OSPolling
             'pfCntFragment.0',
             'pfCntShort.0',
             'pfCntNormalize.0',
-
             'pfCntMemory.0',
             'pfCntTimestamp.0',
             'pfCntCongestion.0',
@@ -63,12 +62,12 @@ class Openbsd extends Unix implements OSPolling
         $this->parseOID('inserts', ['inserts' => $oids[0]['pfStateInserts']]);
         $this->parseOID('removals', ['removals' => $oids[0]['pfStateRemovals']]);
         $this->parseOID('matches', ['matches' => $oids[0]['pfCntMatch']]);
-        $this->parseOID('badoffset', ['badoffset' => $oids[0]['pfCntBadOffset']]);
-        $this->parseOID('fragmented', ['fragmented' => $oids[0]['pfCntFragment']]);
-        $this->parseOID('short', ['short' => $oids[0]['pfCntShort']]);
-        $this->parseOID('normalized', ['normalized' => $oids[0]['pfCntNormalize']]);
 
         $this->parseOID('drops', [
+            'badoffset' => $oids[0]['pfCntBadOffset'],
+            'fragmented' => $oids[0]['pfCntFragment'],
+            'short' => $oids[0]['pfCntShort'],
+            'normalized' => $oids[0]['pfCntNormalize'],
             'memory' => $oids[0]['pfCntMemory'],
             'timestamp' => $oids[0]['pfCntTimestamp'],
             'congestion' => $oids[0]['pfCntCongestion'],
