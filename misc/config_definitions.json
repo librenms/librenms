@@ -2717,11 +2717,43 @@
             },
             "type": "graph"
         },
+        "graph_types.device.pf_badchecksum": {
+            "default": {
+                "section": "firewall",
+                "order": 14,
+                "descr": "Drops (Bad Checksum)"
+            },
+            "type": "graph"
+        },
+        "graph_types.device.pf_badinsert": {
+            "default": {
+                "section": "firewall",
+                "order": 16,
+                "descr": "Drops (Bad Insert)"
+            },
+            "type": "graph"
+        },
         "graph_types.device.pf_badoffset": {
             "default": {
                 "section": "firewall",
                 "order": 6,
                 "descr": "BadOffset"
+            },
+            "type": "graph"
+        },
+        "graph_types.device.pf_badstate": {
+            "default": {
+                "section": "firewall",
+                "order": 15,
+                "descr": "Drops (Bad State)"
+            },
+            "type": "graph"
+        },
+        "graph_types.device.pf_congestion": {
+            "default": {
+                "section": "firewall",
+                "order": 12,
+                "descr": "Drops (Congestion)"
             },
             "type": "graph"
         },
@@ -2738,6 +2770,14 @@
                 "section": "firewall",
                 "order": 3,
                 "descr": "Inserts"
+            },
+            "type": "graph"
+        },
+        "graph_types.device.pf_ipoption": {
+            "default": {
+                "section": "firewall",
+                "order": 13,
+                "descr": "Drops (IP Option)"
             },
             "type": "graph"
         },
@@ -2765,6 +2805,14 @@
             },
             "type": "graph"
         },
+        "graph_types.device.pf_noroute": {
+            "default": {
+                "section": "firewall",
+                "order": 21,
+                "descr": "Drops (No Route)"
+            },
+            "type": "graph"
+        },
         "graph_types.device.pf_removals": {
             "default": {
                 "section": "firewall",
@@ -2789,11 +2837,51 @@
             },
             "type": "graph"
         },
+        "graph_types.device.pf_srclimit": {
+            "default": {
+                "section": "firewall",
+                "order": 18,
+                "descr": "Drops (Src Limit)"
+            },
+            "type": "graph"
+        },
+        "graph_types.device.pf_statelimit": {
+            "default": {
+                "section": "firewall",
+                "order": 17,
+                "descr": "Drops (State Limit)"
+            },
+            "type": "graph"
+        },
         "graph_types.device.pf_states": {
             "default": {
                 "section": "firewall",
                 "order": 1,
                 "descr": "States"
+            },
+            "type": "graph"
+        },
+        "graph_types.device.pf_synproxy": {
+            "default": {
+                "section": "firewall",
+                "order": 19,
+                "descr": "Drops (Syn Proxy)"
+            },
+            "type": "graph"
+        },
+        "graph_types.device.pf_timestamp": {
+            "default": {
+                "section": "firewall",
+                "order": 11,
+                "descr": "Drops (Timestamp)"
+            },
+            "type": "graph"
+        },
+        "graph_types.device.pf_translate": {
+            "default": {
+                "section": "firewall",
+                "order": 20,
+                "descr": "Drops (Translate)"
             },
             "type": "graph"
         },

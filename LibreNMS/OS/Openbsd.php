@@ -33,58 +33,70 @@ class Openbsd extends Unix implements OSPolling
 {
     public function pollOS(): void
     {
-        $oids = snmp_get_multi($this->getDeviceArray(), ['pfStateCount.0', 'pfStateSearches.0', 'pfStateInserts.0', 'pfStateRemovals.0'], '-OQUs', 'OPENBSD-PF-MIB');
+        $oids = snmp_get_multi($this->getDeviceArray(), [
+            'pfStateCount.0',
+            'pfStateSearches.0',
+            'pfStateInserts.0',
+            'pfStateRemovals.0',
 
-        if (is_numeric($oids[0]['pfStateCount'] ?? null)) {
-            $rrd_def = RrdDefinition::make()->addDataset('states', 'GAUGE', 0);
+            'pfCntMatch.0',
+            'pfCntBadOffset.0',
+            'pfCntFragment.0',
+            'pfCntShort.0',
+            'pfCntNormalize.0',
+            'pfCntMemory.0',
+
+            'pfCntTimestamp.0',
+            'pfCntCongestion.0',
+            'pfCntIpOption.0',
+            'pfCntProtoCksum.0',
+            'pfCntStateMismatch.0',
+            'pfCntStateInsert.0',
+            'pfCntStateLimit.0',
+            'pfCntSrcLimit.0',
+            'pfCntSynproxy.0',
+            'pfCntTranslate.0',
+            'pfCntNoRoute.0',
+        ], '-OQUs', 'OPENBSD-PF-MIB');
+
+        $this->parseOID($oids[0]['pfStateCount'], 'states', 'GAUGE');
+        $this->parseOID($oids[0]['pfStateSearches'], 'searches');
+        $this->parseOID($oids[0]['pfStateInserts'], 'inserts');
+        $this->parseOID($oids[0]['pfStateRemovals'], 'removals');
+
+        $this->parseOID($oids[0]['pfCntMatch'], 'matches');
+        $this->parseOID($oids[0]['pfCntBadOffset'], 'badoffset');
+        $this->parseOID($oids[0]['pfCntFragment'], 'fragmented');
+        $this->parseOID($oids[0]['pfCntShort'], 'short');
+        $this->parseOID($oids[0]['pfCntNormalize'], 'normalized');
+        $this->parseOID($oids[0]['pfCntMemory'], 'memdropped');
+
+        $this->parseOID($oids[0]['pfCntTimestamp'], 'timestamp');
+        $this->parseOID($oids[0]['pfCntCongestion'], 'congestion');
+        $this->parseOID($oids[0]['pfCntIpOption'], 'ipoption');
+        $this->parseOID($oids[0]['pfCntProtoCksum'], 'badchecksum');
+        $this->parseOID($oids[0]['pfCntStateMismatch'], 'badstate');
+        $this->parseOID($oids[0]['pfCntStateInsert'], 'badinsert');
+        $this->parseOID($oids[0]['pfCntStateLimit'], 'statelimit');
+        $this->parseOID($oids[0]['pfCntSrcLimit'], 'srclimit');
+        $this->parseOID($oids[0]['pfCntSynproxy'], 'synproxy');
+        $this->parseOID($oids[0]['pfCntTranslate'], 'translate');
+        $this->parseOID($oids[0]['pfCntNoRoute'], 'noroute');
+    }
+
+    private function parseOID(?string $oid, string $field, string $type = 'COUNTER'): void
+    {
+        if (is_numeric($oid ?? null)) {
+            $rrd_def = RrdDefinition::make()->addDataset($field, $type, 0);
 
             $fields = [
-                'states' => $oids[0]['pfStateCount'],
+                $field => $oid,
             ];
 
             $tags = compact('rrd_def');
-            data_update($this->getDeviceArray(), 'pf_states', $tags, $fields);
+            data_update($this->getDeviceArray(), "pf_$field", $tags, $fields);
 
-            $this->enableGraph('pf_states');
-        }
-
-        if (is_numeric($oids[0]['pfStateSearches'] ?? null)) {
-            $rrd_def = RrdDefinition::make()->addDataset('searches', 'COUNTER', 0);
-
-            $fields = [
-                'searches' => $oids[0]['pfStateSearches'],
-            ];
-
-            $tags = compact('rrd_def');
-            data_update($this->getDeviceArray(), 'pf_searches', $tags, $fields);
-
-            $this->enableGraph('pf_searches');
-        }
-
-        if (is_numeric($oids[0]['pfStateInserts'] ?? null)) {
-            $rrd_def = RrdDefinition::make()->addDataset('inserts', 'COUNTER', 0);
-
-            $fields = [
-                'inserts' => $oids[0]['pfStateInserts'],
-            ];
-
-            $tags = compact('rrd_def');
-            data_update($this->getDeviceArray(), 'pf_inserts', $tags, $fields);
-
-            $this->enableGraph('pf_inserts');
-        }
-
-        if (is_numeric($oids[0]['pfStateCount'] ?? null)) {
-            $rrd_def = RrdDefinition::make()->addDataset('removals', 'COUNTER', 0);
-
-            $fields = [
-                'removals' => $oids[0]['pfStateCount'],
-            ];
-
-            $tags = compact('rrd_def');
-            data_update($this->getDeviceArray(), 'pf_removals', $tags, $fields);
-
-            $this->enableGraph('pf_removals');
+            $this->enableGraph("pf_$field");
         }
     }
 }
