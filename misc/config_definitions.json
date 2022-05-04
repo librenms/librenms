@@ -578,8 +578,8 @@
             "order": 0,
             "type": "text"
         },
-        "auth_ldap_skip_group_check": {
-            "default": false,
+        "auth_ldap_require_groupmembership": {
+            "default": true,
             "group": "auth",
             "section": "ldap",
             "order": 4,
