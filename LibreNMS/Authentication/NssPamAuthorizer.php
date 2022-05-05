@@ -21,7 +21,7 @@ class NssPamAuthorizer extends AuthorizerBase
         $password = $credentials['password'] ?? null;
         $service = 'librenms'; // default to librenms if not set
         if (Config::has('nss_pam_auth_service')) {
-		  $service = Config::get('nss_pam_auth_service');
+            $service = Config::get('nss_pam_auth_service');
         }
 
         $error;
@@ -41,9 +41,9 @@ class NssPamAuthorizer extends AuthorizerBase
     public function userExists($username, $throw_exception = false)
     {
         if(posix_getpwnam($username)) {
-		    return true;
-	    }
-		return false;
+            return true;
+        }
+        return false;
     }
 
     public function getUserlevel($username)
@@ -76,7 +76,7 @@ class NssPamAuthorizer extends AuthorizerBase
     public function getUserid($username)
     {
         $userinfo = posix_getpwnam($username);
-		if ($userinfo) {
+        if ($userinfo) {
             return $userinfo['uid'];
         }
         return;
@@ -91,22 +91,52 @@ class NssPamAuthorizer extends AuthorizerBase
             $groupinfo = posix_getgrnam($group);
             if ($groupinfo) {
                 foreach ($groupinfo['members'] as $member) {
-                    $userlist[$member] = 1;
+                    $userinfo = posix_getpwnam($username);
+                    if ($userinfo){
+                        $userlist[$member]=array(
+                            userid => $userinfo['uid'];
+                            username => $userinfo,
+                            auth_type => 'nss_pam',
+                            realname => $userinfo['gecos'],
+                            email => '',
+                            can_modify_passwd => 0,
+                            updated_at=>'',
+                            created_at=>'',
+                            enabled => 1,
+                        );
+                    }
                 }
             }
         }
 
-		if (Config::has('nss_pam_normal_group')){
+       if (Config::has('nss_pam_normal_group')){
             $group = Config::get('nss_pam_normal_group');
             $groupinfo = posix_getgrnam($group);
             if ($groupinfo) {
                 foreach ($groupinfo['members'] as $member) {
-                    $userlist[$member] = 1;
+                    $userinfo = posix_getpwnam($username);
+                    if ($userinfo && !isset($userlist[$member]) ){
+                        $userlist[$member]=array(
+                            userid => $userinfo['uid'];
+                            username => $userinfo,
+                            auth_type => 'nss_pam',
+                            realname => $userinfo['gecos'],
+                            email => '',
+                            can_modify_passwd => 0,
+                            updated_at=>'',
+                            created_at=>'',
+                            enabled => 1,
+                        );
+                    }
                 }
             }
         }
 
-		return array_keys($userlist);
+       $user_array=array();
+       foreach ($userlist as $user) {
+           $user_array[]=$user;
+       }
+       return $user_array;
     }
 
     public function getUser($user_id)
