@@ -131,7 +131,7 @@ class Sensu extends Transport
                     'namespace' => $opts['namespace'],
                 ],
                 'system' => [
-                    'hostname' => $obj['hostname'],
+                    'hostname' => $obj['display'],
                     'os' => $obj['os'],
                 ],
             ],
@@ -177,7 +177,7 @@ class Sensu extends Transport
     public static function getEntityName($obj, $key)
     {
         if ($key === 'shortname') {
-            return Sensu::shortenName($obj['hostname']);
+            return Sensu::shortenName($obj['display']);
         }
 
         return $obj[$key];
