@@ -91,10 +91,10 @@ class NssPamAuthorizer extends AuthorizerBase
             $groupinfo = posix_getgrnam($group);
             if ($groupinfo) {
                 foreach ($groupinfo['members'] as $member) {
-                    $userinfo = posix_getpwnam($username);
+                    $userinfo = posix_getpwnam($member);
                     if ($userinfo){
                         $userlist[$member]=array(
-												 userid => $userinfo['uid'],
+                            user_id => $userinfo['uid'],
                             username => $userinfo['name'],
                             auth_type => 'nss_pam',
                             realname => $userinfo['gecos'],
@@ -114,10 +114,10 @@ class NssPamAuthorizer extends AuthorizerBase
             $groupinfo = posix_getgrnam($group);
             if ($groupinfo) {
                 foreach ($groupinfo['members'] as $member) {
-                    $userinfo = posix_getpwnam($username);
+                    $userinfo = posix_getpwnam($member);
                     if ($userinfo && !isset($userlist[$member]) ){
                         $userlist[$member]=array(
-												 userid => $userinfo['uid'],
+                            user_id => $userinfo['uid'],
                             username => $userinfo['name'],
                             auth_type => 'nss_pam',
                             realname => $userinfo['gecos'],
