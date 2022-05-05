@@ -18,6 +18,7 @@ class LegacyAuth
         'ad-authorization' => 'LibreNMS\Authentication\ADAuthorizationAuthorizer',
         'ldap-authorization' => 'LibreNMS\Authentication\LdapAuthorizationAuthorizer',
         'sso' => 'LibreNMS\Authentication\SSOAuthorizer',
+        'nss_pam' => 'LibreNMS\Authentication\NssPamAuthorizer',
     ];
 
     /**
