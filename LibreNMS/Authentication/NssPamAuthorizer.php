@@ -142,7 +142,7 @@ class NssPamAuthorizer extends AuthorizerBase
 
     public function getUser($user_id)
     {
-        if (!isset($user_id) {
+        if (!isset($user_id)) {
             return false;
         }
         $userinfo = posix_getpwuid($user_id);
