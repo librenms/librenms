@@ -2104,7 +2104,12 @@ device ID is going to be irrelevant in that case.
 If you want to replace Nagios/Icinga, especially in regards to NRPE,
 this works great. This allows LibreNMS to query what checks were ran
 on the server and keep track of totals of OK, WARNING, CRITICAL, and
-UNKNOWN statuses.
+UNKNOWN statuses. The big advantage over this compared to a NRPE with
+the Services extension is you don't need to know what checks are
+configured on it. Also don't need to wait for the tests to run as
+sneck is meant to be ran via cron and the then return the cache when
+queried via SNMP, meaning a lot faster response time, especially if
+slow checks are being performed.
 
 Included are alert examples. Although if you want to set up your own,
 the metrics below are provided.
@@ -2118,6 +2123,15 @@ the metrics below are provided.
 | errored | Total checks that errored |
 | time_to_polling | Differnce in seconds between when polling data was generated and when polled |
 | time_to_polling_abs | The aboslute value of time_to_polling. |
+
+For more information on Sneck, check it out on
+[MetaCPAN](https://metacpan.org/dist/Monitoring-Sneck) or
+[Github](https://github.com/VVelox/Monitoring-Sneck).
+
+For poking systems using Sneck, also check out boop_snoot
+if you want to query those systems via the CLI. Docs on it
+at [MetaCPAN](https://metacpan.org/dist/Monitoring-Sneck-Boop_Snoot) and
+[Github](https://github.com/VVelox/Monitoring-Sneck-Boop_Snoot).
 
 ### SNMP Extend
 
