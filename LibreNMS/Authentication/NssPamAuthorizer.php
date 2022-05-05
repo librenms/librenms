@@ -94,8 +94,8 @@ class NssPamAuthorizer extends AuthorizerBase
                     $userinfo = posix_getpwnam($username);
                     if ($userinfo){
                         $userlist[$member]=array(
-                            userid => $userinfo['uid'];
-                            username => $userinfo,
+												 userid => $userinfo['uid'],
+                            username => $userinfo['name'],
                             auth_type => 'nss_pam',
                             realname => $userinfo['gecos'],
                             email => '',
@@ -117,8 +117,8 @@ class NssPamAuthorizer extends AuthorizerBase
                     $userinfo = posix_getpwnam($username);
                     if ($userinfo && !isset($userlist[$member]) ){
                         $userlist[$member]=array(
-                            userid => $userinfo['uid'];
-                            username => $userinfo,
+												 userid => $userinfo['uid'],
+                            username => $userinfo['name'],
                             auth_type => 'nss_pam',
                             realname => $userinfo['gecos'],
                             email => '',
