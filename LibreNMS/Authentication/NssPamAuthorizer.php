@@ -8,7 +8,7 @@ use LibreNMS\Config;
 use LibreNMS\DB\Eloquent;
 use LibreNMS\Exceptions\AuthenticationException;
 
-class MysqlAuthorizer extends AuthorizerBase
+class NssPamAuthorizer extends AuthorizerBase
 {
     protected static $HAS_AUTH_USERMANAGEMENT = true;
     protected static $CAN_UPDATE_USER = false;
