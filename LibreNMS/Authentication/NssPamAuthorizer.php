@@ -13,7 +13,7 @@ class NssPamAuthorizer extends AuthorizerBase
     protected static $HAS_AUTH_USERMANAGEMENT = true;
     protected static $CAN_UPDATE_USER = false;
     protected static $CAN_UPDATE_PASSWORDS = false;
-    protected static $AUTH_IS_EXTERNAL = true;
+    protected static $AUTH_IS_EXTERNAL = false;
 
     public function authenticate($credentials)
     {
@@ -40,6 +40,7 @@ class NssPamAuthorizer extends AuthorizerBase
 
     public function userExists($username, $throw_exception = false)
     {
+
         if(posix_getpwnam($username)) {
             return true;
         }
@@ -141,7 +142,7 @@ class NssPamAuthorizer extends AuthorizerBase
 
     public function getUser($user_id)
     {
-       if (!isset($user_id) {
+        if (!isset($user_id) {
             return false;
         }
         $userinfo = posix_getpwuid($user_id);
