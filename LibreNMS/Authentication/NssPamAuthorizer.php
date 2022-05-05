@@ -1,0 +1,121 @@
+<?php
+
+namespace LibreNMS\Authentication;
+
+use App\Models\User;
+use Illuminate\Support\Facades\Hash;
+use LibreNMS\Config;
+use LibreNMS\DB\Eloquent;
+use LibreNMS\Exceptions\AuthenticationException;
+
+class MysqlAuthorizer extends AuthorizerBase
+{
+    protected static $HAS_AUTH_USERMANAGEMENT = true;
+    protected static $CAN_UPDATE_USER = false;
+    protected static $CAN_UPDATE_PASSWORDS = false;
+    protected static $AUTH_IS_EXTERNAL = true;
+
+    public function authenticate($credentials)
+    {
+        $username = $credentials['username'] ?? null;
+        $password = $credentials['password'] ?? null;
+        $service = 'librenms'; // default to librenms if not set
+        if (Config::has('nss_pam_auth_service')) {
+		  $service = Config::get('nss_pam_auth_service');
+        }
+
+        $error;
+
+        if (pam_auth($username, $password, $error, true, $service)) {
+            return true;
+        }
+
+        throw new AuthenticationException();
+    }
+
+    public function canUpdatePasswords($username = '')
+    {
+         return false;
+    }
+
+    public function userExists($username, $throw_exception = false)
+    {
+        if(posix_getpwnam($username)) {
+		    return true;
+	    }
+		return false;
+    }
+
+    public function getUserlevel($username)
+    {
+        if (Config::has('nss_pam_admin_group')){
+            $group = Config::get('nss_pam_admin_group');
+            $groupinfo = posix_getgrnam($group);
+            if ($groupinfo) {
+                foreach ($groupinfo['members'] as $member) {
+                    if ($member == $username) {
+                      return 10;
+                    }
+                }
+            }
+        }
+
+        if (Config::has('nss_pam_normal_group')){
+            $group = Config::get('nss_pam_normal_group');
+            $groupinfo = posix_getgrnam($group);
+            if ($groupinfo) {
+                foreach ($groupinfo['members'] as $member) {
+                    if ($member == $username) {
+                      return 1;
+                    }
+                }
+            }
+        }
+    }
+
+    public function getUserid($username)
+    {
+        $userinfo = posix_getpwnam($username);
+		if ($userinfo) {
+            return $userinfo['uid'];
+        }
+        return;
+    }
+
+    public function getUserlist()
+    {
+        $userlist = array();
+
+        if (Config::has('nss_pam_admin_group')){
+            $group = Config::get('nss_pam_admin_group');
+            $groupinfo = posix_getgrnam($group);
+            if ($groupinfo) {
+                foreach ($groupinfo['members'] as $member) {
+                    $userlist[$member] = 1;
+                }
+            }
+        }
+
+		if (Config::has('nss_pam_normal_group')){
+            $group = Config::get('nss_pam_normal_group');
+            $groupinfo = posix_getgrnam($group);
+            if ($groupinfo) {
+                foreach ($groupinfo['members'] as $member) {
+                    $userlist[$member] = 1;
+                }
+            }
+        }
+
+		return array_keys($userlist);
+    }
+
+    public function getUser($user_id)
+    {
+        $userinfo = posix_getpwuid($user_id);
+        if ($userinfo) {
+            return $userinfo['name'];
+        }
+
+        return false;
+    }
+}
