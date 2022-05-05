@@ -147,7 +147,18 @@ class NssPamAuthorizer extends AuthorizerBase
         }
         $userinfo = posix_getpwuid($user_id);
         if ($userinfo) {
-            return $userinfo['name'];
+            $to_return=array(
+                user_id => $userinfo['uid'],
+                username => $userinfo['name'],
+                auth_type => 'nss_pam',
+                realname => $userinfo['gecos'],
+                email => '',
+                can_modify_passwd => 0,
+                updated_at=>'',
+                created_at=>'',
+                enabled => 1,
+            );
+            return $to_return;
         }
 
         return false;
