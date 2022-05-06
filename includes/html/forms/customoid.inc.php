@@ -79,13 +79,13 @@ if ($action == 'test') {
 
     if (is_numeric($rawdata)) {
         $oid_value = $rawdata;
-    } else if (
-        !empty($_POST['unit']) &&
+    } elseif (
+        ! empty($_POST['unit']) &&
         str_i_contains($rawdata, $unit) &&
         is_numeric(trim(str_replace($unit, '', $rawdata)))
     ) {
         $oid_value = trim(str_replace($unit, '', $rawdata));
-    } else if (is_numeric(string_to_float($rawdata))) {
+    } elseif (is_numeric(string_to_float($rawdata))) {
         $oid_value = string_to_float($rawdata);
     }
 
