@@ -43,6 +43,7 @@ jobs:
         with:
           php-version: 7.4
           tools: composer
+          extensions: pam
 
       -
         name: Get composer cache directory
