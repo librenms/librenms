@@ -131,7 +131,7 @@ class Sensu extends Transport
                     'namespace' => $opts['namespace'],
                 ],
                 'system' => [
-                    'hostname' => $obj['display'],
+                    'hostname' => $obj['hostname'],
                     'os' => $obj['os'],
                 ],
             ],
