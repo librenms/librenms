@@ -267,6 +267,16 @@ $config['nss_pam_admin_group'] = sudoers';
 $config['nss_pam_normal_group'] = 'librenms';
 ```
 
+This module requires the PECL library `pam`.
+
+On Debian based systems it can be installed via...
+
+```
+apt-get install libpam0g-dev
+pecl channel-update pecl.php.net
+pecl install pam
+```
+
 ## Radius Authentication
 
 Please note that a mysql user is created for each user the logs in
