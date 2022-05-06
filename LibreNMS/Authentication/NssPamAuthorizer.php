@@ -5,6 +5,12 @@ namespace LibreNMS\Authentication;
 use LibreNMS\Config;
 use LibreNMS\Exceptions\AuthenticationException;
 
+/**
+ * @property bool $HAS_AUTH_USERMANAGEMENT
+ * @property bool $CAN_UPDATE_USER
+ * @property bool $CAN_UPDATE_PASSWORDS
+ * @property bool $AUTH_IS_EXTERNAL
+ */
 class NssPamAuthorizer extends AuthorizerBase
 {
     protected static $HAS_AUTH_USERMANAGEMENT = true;
