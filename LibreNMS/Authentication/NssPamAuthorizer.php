@@ -155,7 +155,7 @@ class NssPamAuthorizer extends AuthorizerBase
                 auth_type => 'nss_pam',
                 realname => $userinfo['gecos'],
                 email => '',
-                level => $this->getUserlevel($userinfo['name'],
+                level => $this->getUserlevel($userinfo['name']),
                 can_modify_passwd => 0,
                 updated_at=>'',
                 created_at=>'',

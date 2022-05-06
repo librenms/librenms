@@ -73,8 +73,8 @@ Enable debug output to troubleshoot issues
 
 Config option: `mysql`
 
-This is default option with LibreNMS so you should have already have the configuration setup in your
-environment file (.env).
+This is default option with LibreNMS so you should have already have
+the configuration setup in your environment file (.env).
 
 ```dotenv
 DB_HOST=HOSTNAME
@@ -250,6 +250,23 @@ $config['auth_ldap_groups'] = [
 ];
 ```
 
+## NSS + PAM
+
+This module allows LibreNMS to authenticate users using PAM and pull
+what users are available via NSS.
+
+Both `nss_pam_admin_group` and `nss_pam_normal_group` are undefined by
+default, meaning no groups will be polled for either.
+
+`nss_pam_auth_service` defaults to `librenms`.
+
+```php
+$config['auth_mechanism'] = 'nss_pam';
+$config['nss_pam_auth_service'] = 'librenms';
+$config['nss_pam_admin_group'] = sudoers';
+$config['nss_pam_normal_group'] = 'librenms';
+```
+
 ## Radius Authentication
 
 Please note that a mysql user is created for each user the logs in
@@ -339,10 +356,11 @@ will use LDAP to determine and assign the userlevel of a user. The
 userlevel will be calculated by using LDAP group membership
 information as the ___ldap___ module does.
 
-The configuration is similar to the ___ldap___ module with one extra option: auth_ldap_cache_ttl.
-This option allows to control how long user information (user_exists, userid, userlevel) are cached within the PHP Session.
-The default value is 300 seconds.
-To disabled this caching (highly discourage) set this option to 0.
+The configuration is similar to the ___ldap___ module with one extra
+option: auth_ldap_cache_ttl. This option allows to control how long
+user information (user_exists, userid, userlevel) are cached within
+the PHP Session. The default value is 300 seconds. To disabled this
+caching (highly discourage) set this option to 0.
 
 #### Standard config
 
