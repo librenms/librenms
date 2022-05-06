@@ -94,7 +94,7 @@ class NssPamAuthorizer extends AuthorizerBase
             if ($groupinfo) {
                 foreach ($groupinfo['members'] as $member) {
                     $userinfo = posix_getpwnam($member);
-                    if ($userinfo){
+                    if ($userinfo) {
                         $userlist[$member]=array(
                             'user_id' => $userinfo['uid'],
                             'username' => $userinfo['name'],
@@ -103,8 +103,8 @@ class NssPamAuthorizer extends AuthorizerBase
                             'level' => 10,
                             'email' => '',
                             'can_modify_passwd' => 0,
-                            'updated'_at => '',
-                            'created'_at => '',
+                            'updated_at' => '',
+                            'created_at' => '',
                             'enabled' => 1,
                         );
                     }
@@ -118,8 +118,8 @@ class NssPamAuthorizer extends AuthorizerBase
             if ($groupinfo) {
                 foreach ($groupinfo['members'] as $member) {
                     $userinfo = posix_getpwnam($member);
-                    if ($userinfo && !isset($userlist[$member]) ){
-                        $userlist[$member]=array(
+                    if ($userinfo && !isset($userlist[$member])) {
+                        $userlist[$member] = array(
                             'user_id' => $userinfo['uid'],
                             'username' => $userinfo['name'],
                             'auth_type' => 'nss_pam',
@@ -158,8 +158,8 @@ class NssPamAuthorizer extends AuthorizerBase
                 'email' => '',
                 'level' => $this->getUserlevel($userinfo['name']),
                 'can_modify_passwd' => 0,
-                'updated'_at => '',
-                'created'_at => '',
+                'updated_at' => '',
+                'created_at' => '',
                 'enabled' => 1,
             );
             return $to_return;
