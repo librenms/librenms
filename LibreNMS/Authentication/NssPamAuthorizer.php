@@ -76,7 +76,7 @@ class NssPamAuthorizer extends AuthorizerBase
 
     public function getUserid($username)
     {
-        if (!is_null($username)) {
+        if (is_null($username)) {
             return -1;
         }
 	    $userinfo = posix_getpwnam($username);
@@ -147,7 +147,7 @@ class NssPamAuthorizer extends AuthorizerBase
 
     public function getUser($user_id)
     {
-        if (!is_null($user_id)) {
+        if (is_null($user_id)) {
             return false;
         }
         $userinfo = posix_getpwuid($user_id);
