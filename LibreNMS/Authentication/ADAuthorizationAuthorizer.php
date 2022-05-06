@@ -11,8 +11,8 @@ class ADAuthorizationAuthorizer extends MysqlAuthorizer
     use LdapSessionCache;
     use ActiveDirectoryCommon;
 
-    protected static bool $AUTH_IS_EXTERNAL = true;
-    protected static bool $CAN_UPDATE_PASSWORDS = false;
+    protected static $AUTH_IS_EXTERNAL = true;
+    protected static $CAN_UPDATE_PASSWORDS = false;
 
     protected $ldap_connection;
 

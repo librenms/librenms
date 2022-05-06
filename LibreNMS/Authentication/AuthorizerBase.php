@@ -29,10 +29,10 @@ use LibreNMS\Interfaces\Authentication\Authorizer;
 
 abstract class AuthorizerBase implements Authorizer
 {
-    protected static bool $HAS_AUTH_USERMANAGEMENT = false;
-    protected static bool $CAN_UPDATE_USER = false;
-    protected static bool $CAN_UPDATE_PASSWORDS = false;
-    protected static bool $AUTH_IS_EXTERNAL = false;
+    protected static $HAS_AUTH_USERMANAGEMENT = false;
+    protected static $CAN_UPDATE_USER = false;
+    protected static $CAN_UPDATE_PASSWORDS = false;
+    protected static $AUTH_IS_EXTERNAL = false;
 
     public function canUpdatePasswords($username = '')
     {

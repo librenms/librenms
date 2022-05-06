@@ -9,9 +9,9 @@ use LibreNMS\Util\Debug;
 
 class RadiusAuthorizer extends MysqlAuthorizer
 {
-    protected static bool $HAS_AUTH_USERMANAGEMENT = true;
-    protected static bool $CAN_UPDATE_USER = true;
-    protected static bool $CAN_UPDATE_PASSWORDS = false;
+    protected static $HAS_AUTH_USERMANAGEMENT = true;
+    protected static $CAN_UPDATE_USER = true;
+    protected static $CAN_UPDATE_PASSWORDS = false;
 
     /** @var Radius */
     protected $radius;

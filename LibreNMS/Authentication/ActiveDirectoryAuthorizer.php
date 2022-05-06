@@ -14,7 +14,7 @@ class ActiveDirectoryAuthorizer extends AuthorizerBase
 {
     use ActiveDirectoryCommon;
 
-    protected static bool $CAN_UPDATE_PASSWORDS = false;
+    protected static $CAN_UPDATE_PASSWORDS = false;
 
     protected $ldap_connection;
     protected $is_bound = false; // this variable tracks if bind has been called so we don't call it multiple times
