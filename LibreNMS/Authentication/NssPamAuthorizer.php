@@ -2,10 +2,7 @@
 
 namespace LibreNMS\Authentication;
 
-use App\Models\User;
-use Illuminate\Support\Facades\Hash;
 use LibreNMS\Config;
-use LibreNMS\DB\Eloquent;
 use LibreNMS\Exceptions\AuthenticationException;
 
 class NssPamAuthorizer extends AuthorizerBase
@@ -33,13 +30,12 @@ class NssPamAuthorizer extends AuthorizerBase
 
     public function canUpdatePasswords($username = '')
     {
-         return false;
+        return false;
     }
 
     public function userExists($username, $throw_exception = false)
     {
-
-        if(posix_getpwnam($username)) {
+        if (posix_getpwnam($username)) {
             return true;
         }
         return false;
@@ -47,25 +43,25 @@ class NssPamAuthorizer extends AuthorizerBase
 
     public function getUserlevel($username)
     {
-        if (Config::has('nss_pam_admin_group')){
+        if (Config::has('nss_pam_admin_group')) {
             $group = Config::get('nss_pam_admin_group');
             $groupinfo = posix_getgrnam($group);
             if ($groupinfo) {
                 foreach ($groupinfo['members'] as $member) {
                     if ($member == $username) {
-                      return 10;
+                        return 10;
                     }
                 }
             }
         }
 
-        if (Config::has('nss_pam_normal_group')){
+        if (Config::has('nss_pam_normal_group')) {
             $group = Config::get('nss_pam_normal_group');
             $groupinfo = posix_getgrnam($group);
             if ($groupinfo) {
                 foreach ($groupinfo['members'] as $member) {
                     if ($member == $username) {
-                      return 1;
+                        return 1;
                     }
                 }
             }
@@ -79,25 +75,26 @@ class NssPamAuthorizer extends AuthorizerBase
         if (is_null($username)) {
             return -1;
         }
-	    $userinfo = posix_getpwnam($username);
+        $userinfo = posix_getpwnam($username);
         if ($userinfo) {
             return $userinfo['uid'];
         }
+
         return -1;
     }
 
     public function getUserlist()
     {
-        $userlist = array();
+        $userlist = [];
 
-        if (Config::has('nss_pam_admin_group')){
+        if (Config::has('nss_pam_admin_group')) {
             $group = Config::get('nss_pam_admin_group');
             $groupinfo = posix_getgrnam($group);
             if ($groupinfo) {
                 foreach ($groupinfo['members'] as $member) {
                     $userinfo = posix_getpwnam($member);
                     if ($userinfo) {
-                        $userlist[$member]=array(
+                        $userlist[$member]=[
                             'user_id' => $userinfo['uid'],
                             'username' => $userinfo['name'],
                             'auth_type' => 'nss_pam',
@@ -108,20 +105,20 @@ class NssPamAuthorizer extends AuthorizerBase
                             'updated_at' => '',
                             'created_at' => '',
                             'enabled' => 1,
-                        );
+                        ];
                     }
                 }
             }
         }
 
-       if (Config::has('nss_pam_normal_group')){
+       if (Config::has('nss_pam_normal_group')) {
             $group = Config::get('nss_pam_normal_group');
             $groupinfo = posix_getgrnam($group);
             if ($groupinfo) {
                 foreach ($groupinfo['members'] as $member) {
                     $userinfo = posix_getpwnam($member);
                     if ($userinfo && !isset($userlist[$member])) {
-                        $userlist[$member] = array(
+                        $userlist[$member] = [
                             'user_id' => $userinfo['uid'],
                             'username' => $userinfo['name'],
                             'auth_type' => 'nss_pam',
@@ -132,17 +129,18 @@ class NssPamAuthorizer extends AuthorizerBase
                             'updated_at' => '',
                             'created_at' => '',
                             'enabled' => 1,
-                        );
+                        ];
                     }
                 }
             }
         }
 
-       $user_array=array();
-       foreach ($userlist as $user) {
-           $user_array[]=$user;
-       }
-       return $user_array;
+        $user_array = [];
+        foreach ($userlist as $user) {
+            $user_array[] = $user;
+        }
+
+        return $user_array;
     }
 
     public function getUser($user_id)
@@ -152,7 +150,7 @@ class NssPamAuthorizer extends AuthorizerBase
         }
         $userinfo = posix_getpwuid($user_id);
         if ($userinfo) {
-            $to_return=array(
+            $to_return= [
                 'user_id' => $userinfo['uid'],
                 'username' => $userinfo['name'],
                 'auth_type' => 'nss_pam',
@@ -163,7 +161,8 @@ class NssPamAuthorizer extends AuthorizerBase
                 'updated_at' => '',
                 'created_at' => '',
                 'enabled' => 1,
-            );
+            ];
+
             return $to_return;
         }
 
