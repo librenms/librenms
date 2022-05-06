@@ -24,13 +24,11 @@ class NssPamAuthorizer extends AuthorizerBase
             $service = Config::get('nss_pam_auth_service');
         }
 
-        $error;
-
         if (pam_auth($username, $password, $error, true, $service)) {
             return true;
         }
 
-        throw new AuthenticationException();
+        throw new AuthenticationException($error . '... Likely user does not exist');
     }
 
     public function canUpdatePasswords($username = '')
@@ -76,11 +74,14 @@ class NssPamAuthorizer extends AuthorizerBase
 
     public function getUserid($username)
     {
-        $userinfo = posix_getpwnam($username);
+        if (!isset($username)) {
+            return -1;
+        }
+	    $userinfo = posix_getpwnam($username);
         if ($userinfo) {
             return $userinfo['uid'];
         }
-        return;
+        return -1;
     }
 
     public function getUserlist()
@@ -95,16 +96,16 @@ class NssPamAuthorizer extends AuthorizerBase
                     $userinfo = posix_getpwnam($member);
                     if ($userinfo){
                         $userlist[$member]=array(
-                            user_id => $userinfo['uid'],
-                            username => $userinfo['name'],
-                            auth_type => 'nss_pam',
-                            realname => $userinfo['gecos'],
-                            level => 10,
-                            email => '',
-                            can_modify_passwd => 0,
-                            updated_at => '',
-                            created_at => '',
-                            enabled => 1,
+                            'user_id' => $userinfo['uid'],
+                            'username' => $userinfo['name'],
+                            'auth_type' => 'nss_pam',
+                            'realname' => $userinfo['gecos'],
+                            'level' => 10,
+                            'email' => '',
+                            'can_modify_passwd' => 0,
+                            'updated'_at => '',
+                            'created'_at => '',
+                            'enabled' => 1,
                         );
                     }
                 }
@@ -119,16 +120,16 @@ class NssPamAuthorizer extends AuthorizerBase
                     $userinfo = posix_getpwnam($member);
                     if ($userinfo && !isset($userlist[$member]) ){
                         $userlist[$member]=array(
-                            user_id => $userinfo['uid'],
-                            username => $userinfo['name'],
-                            auth_type => 'nss_pam',
-                            realname => $userinfo['gecos'],
-                            level => 1,
-                            email => '',
-                            can_modify_passwd => 0,
-                            updated_at => '',
-                            created_at => '',
-                            enabled => 1,
+                            'user_id' => $userinfo['uid'],
+                            'username' => $userinfo['name'],
+                            'auth_type' => 'nss_pam',
+                            'realname' => $userinfo['gecos'],
+                            'level' => 1,
+                            'email' => '',
+                            'can_modify_passwd' => 0,
+                            'updated_at' => '',
+                            'created_at' => '',
+                            'enabled' => 1,
                         );
                     }
                 }
@@ -150,16 +151,16 @@ class NssPamAuthorizer extends AuthorizerBase
         $userinfo = posix_getpwuid($user_id);
         if ($userinfo) {
             $to_return=array(
-                user_id => $userinfo['uid'],
-                username => $userinfo['name'],
-                auth_type => 'nss_pam',
-                realname => $userinfo['gecos'],
-                email => '',
-                level => $this->getUserlevel($userinfo['name']),
-                can_modify_passwd => 0,
-                updated_at => '',
-                created_at => '',
-                enabled => 1,
+                'user_id' => $userinfo['uid'],
+                'username' => $userinfo['name'],
+                'auth_type' => 'nss_pam',
+                'realname' => $userinfo['gecos'],
+                'email' => '',
+                'level' => $this->getUserlevel($userinfo['name']),
+                'can_modify_passwd' => 0,
+                'updated'_at => '',
+                'created'_at => '',
+                'enabled' => 1,
             );
             return $to_return;
         }
