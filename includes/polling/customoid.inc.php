@@ -18,6 +18,16 @@ foreach (dbFetchRows('SELECT * FROM `customoids` WHERE `customoid_passed` = 1 AN
     if (is_numeric($rawdata)) {
         $os->enableGraph('customoid');
         $oid_value = $rawdata;
+    } else if (
+        $customoid['customoid_unit'] &&
+        str_i_contains($rawdata, $customoid['customoid_unit']) &&
+        is_numeric(trim(str_replace($customoid['customoid_unit'], '', $rawdata)))
+    ) {
+        $os->enableGraph('customoid');
+        $oid_value = trim(str_replace($customoid['customoid_unit'], '', $rawdata));
+    } else if (is_numeric(string_to_float($rawdata))) {
+        $os->enableGraph('customoid');
+        $oid_value = string_to_float($rawdata);
     } else {
         $oid_value = 0;
         $error = 'Invalid SNMP reply.';
