@@ -44,6 +44,8 @@ jobs:
           php-version: 7.4
           tools: composer
           extensions: pam
+        env:
+          PAM_LINUX_LIBS: libpam0g-dev
 
       -
         name: Get composer cache directory
