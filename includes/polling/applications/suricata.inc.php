@@ -207,8 +207,6 @@ if (empty($instance_list)) {
     $id = $component->getFirstComponentID($ourc);
     $ourc[$id]['label'] = 'Suricata';
     $ourc[$id]['instances'] = json_encode($instance_list);
-    $ourc[$id]['alert'] = $suricata['alert'];
-    $ourc[$id]['alertString'] = $suricata['alertString'];
 
     $component->setComponentPrefs($device_id, $ourc);
 }
