@@ -38,6 +38,7 @@ class NssPamAuthorizer extends AuthorizerBase
         if (posix_getpwnam($username)) {
             return true;
         }
+
         return false;
     }
 
@@ -94,7 +95,7 @@ class NssPamAuthorizer extends AuthorizerBase
                 foreach ($groupinfo['members'] as $member) {
                     $userinfo = posix_getpwnam($member);
                     if ($userinfo) {
-                        $userlist[$member]=[
+                        $userlist[$member] = [
                             'user_id' => $userinfo['uid'],
                             'username' => $userinfo['name'],
                             'auth_type' => 'nss_pam',
@@ -111,13 +112,13 @@ class NssPamAuthorizer extends AuthorizerBase
             }
         }
 
-       if (Config::has('nss_pam_normal_group')) {
+        if (Config::has('nss_pam_normal_group')) {
             $group = Config::get('nss_pam_normal_group');
             $groupinfo = posix_getgrnam($group);
             if ($groupinfo) {
                 foreach ($groupinfo['members'] as $member) {
                     $userinfo = posix_getpwnam($member);
-                    if ($userinfo && !isset($userlist[$member])) {
+                    if ($userinfo && ! isset($userlist[$member])) {
                         $userlist[$member] = [
                             'user_id' => $userinfo['uid'],
                             'username' => $userinfo['name'],
@@ -150,7 +151,7 @@ class NssPamAuthorizer extends AuthorizerBase
         }
         $userinfo = posix_getpwuid($user_id);
         if ($userinfo) {
-            $to_return= [
+            $to_return = [
                 'user_id' => $userinfo['uid'],
                 'username' => $userinfo['name'],
                 'auth_type' => 'nss_pam',
