@@ -10,10 +10,10 @@ use LibreNMS\Exceptions\AuthenticationException;
 
 class NssPamAuthorizer extends AuthorizerBase
 {
-    protected static $HAS_AUTH_USERMANAGEMENT = true;
-    protected static $CAN_UPDATE_USER = false;
-    protected static $CAN_UPDATE_PASSWORDS = false;
-    protected static $AUTH_IS_EXTERNAL = false;
+    protected static bool $HAS_AUTH_USERMANAGEMENT = true;
+    protected static bool $CAN_UPDATE_USER = false;
+    protected static bool $CAN_UPDATE_PASSWORDS = false;
+    protected static bool $AUTH_IS_EXTERNAL = false;
 
     public function authenticate($credentials)
     {
@@ -70,11 +70,13 @@ class NssPamAuthorizer extends AuthorizerBase
                 }
             }
         }
+
+        return 0;
     }
 
     public function getUserid($username)
     {
-        if (!isset($username)) {
+        if (!is_null($username)) {
             return -1;
         }
 	    $userinfo = posix_getpwnam($username);
@@ -145,7 +147,7 @@ class NssPamAuthorizer extends AuthorizerBase
 
     public function getUser($user_id)
     {
-        if (!isset($user_id)) {
+        if (!is_null($user_id)) {
             return false;
         }
         $userinfo = posix_getpwuid($user_id);
