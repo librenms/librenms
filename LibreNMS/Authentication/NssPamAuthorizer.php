@@ -99,11 +99,11 @@ class NssPamAuthorizer extends AuthorizerBase
                             username => $userinfo['name'],
                             auth_type => 'nss_pam',
                             realname => $userinfo['gecos'],
-                            level=>10,
+                            level => 10,
                             email => '',
                             can_modify_passwd => 0,
-                            updated_at=>'',
-                            created_at=>'',
+                            updated_at => '',
+                            created_at => '',
                             enabled => 1,
                         );
                     }
@@ -123,11 +123,11 @@ class NssPamAuthorizer extends AuthorizerBase
                             username => $userinfo['name'],
                             auth_type => 'nss_pam',
                             realname => $userinfo['gecos'],
-                            level=>1,
+                            level => 1,
                             email => '',
                             can_modify_passwd => 0,
-                            updated_at=>'',
-                            created_at=>'',
+                            updated_at => '',
+                            created_at => '',
                             enabled => 1,
                         );
                     }
@@ -157,8 +157,8 @@ class NssPamAuthorizer extends AuthorizerBase
                 email => '',
                 level => $this->getUserlevel($userinfo['name']),
                 can_modify_passwd => 0,
-                updated_at=>'',
-                created_at=>'',
+                updated_at => '',
+                created_at => '',
                 enabled => 1,
             );
             return $to_return;
