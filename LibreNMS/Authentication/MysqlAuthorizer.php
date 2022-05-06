@@ -9,9 +9,9 @@ use LibreNMS\Exceptions\AuthenticationException;
 
 class MysqlAuthorizer extends AuthorizerBase
 {
-    protected static $HAS_AUTH_USERMANAGEMENT = true;
-    protected static $CAN_UPDATE_USER = true;
-    protected static $CAN_UPDATE_PASSWORDS = true;
+    protected static bool $HAS_AUTH_USERMANAGEMENT = true;
+    protected static bool $CAN_UPDATE_USER = true;
+    protected static bool $CAN_UPDATE_PASSWORDS = true;
 
     public function authenticate($credentials)
     {

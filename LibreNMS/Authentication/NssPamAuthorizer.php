@@ -7,10 +7,10 @@ use LibreNMS\Exceptions\AuthenticationException;
 
 class NssPamAuthorizer extends AuthorizerBase
 {
-    protected static $HAS_AUTH_USERMANAGEMENT = true;
-    protected static $CAN_UPDATE_USER = false;
-    protected static $CAN_UPDATE_PASSWORDS = false;
-    protected static $AUTH_IS_EXTERNAL = false;
+    protected static bool $HAS_AUTH_USERMANAGEMENT = true;
+    protected static bool $CAN_UPDATE_USER = false;
+    protected static bool $CAN_UPDATE_PASSWORDS = false;
+    protected static bool $AUTH_IS_EXTERNAL = false;
 
     public function authenticate($credentials)
     {

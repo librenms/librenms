@@ -34,7 +34,7 @@ class LdapAuthorizationAuthorizer extends AuthorizerBase
     use LdapSessionCache;
 
     protected $ldap_connection;
-    protected static $AUTH_IS_EXTERNAL = true;
+    protected static bool $AUTH_IS_EXTERNAL = true;
 
     public function __construct()
     {
