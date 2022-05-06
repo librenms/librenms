@@ -365,6 +365,10 @@ return [
             'description' => 'Group access',
             'help' => 'Define groups that have access and level',
         ],
+        'auth_ldap_require_groupmembership' => [
+            'description' => 'LDAP Group membership verification',
+            'help' => 'Perform (or skip) ldap_compare when the provider allows (or does not) for the Compare action.',
+        ],
         'auth_ldap_port' => [
             'description' => 'LDAP port',
             'help' => 'Port to connect to servers on. For LDAP it should be 389, for LDAPS it should be 636',
