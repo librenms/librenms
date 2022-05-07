@@ -255,15 +255,21 @@ $config['auth_ldap_groups'] = [
 This module allows LibreNMS to authenticate users using PAM and pull
 what users are available via NSS.
 
-Both `nss_pam_admin_group` and `nss_pam_normal_group` are undefined by
-default, meaning no groups will be polled for either.
+Both `nss_pam_admin_group`, `nss_pam_globalread_group`,  `nss_pam_normal_group`
+are undefined by default, meaning any one who auths will have a level of 0.
 
 `nss_pam_auth_service` defaults to `librenms`.
 
 ```php
+// enable NSS + PAM
 $config['auth_mechanism'] = 'nss_pam';
+// PAM service to use
 $config['nss_pam_auth_service'] = 'librenms';
+// group to consider members of admins
 $config['nss_pam_admin_group'] = sudoers';
+// group to consider members as having global read
+$config['nss_pam_globalread_group'] = 'librenms.globalread';
+// group to consider members as being normal users
 $config['nss_pam_normal_group'] = 'librenms';
 ```
 

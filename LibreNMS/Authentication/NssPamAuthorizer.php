@@ -68,6 +68,18 @@ class NssPamAuthorizer extends AuthorizerBase
             }
         }
 
+        if (Config::has('nss_pam_globalread_group')) {
+            $group = Config::get('nss_pam_globalread_group');
+            $groupinfo = posix_getgrnam($group);
+            if ($groupinfo) {
+                foreach ($groupinfo['members'] as $member) {
+                    if ($member == $username) {
+                        return 5;
+                    }
+                }
+            }
+        }
+
         if (Config::has('nss_pam_normal_group')) {
             $group = Config::get('nss_pam_normal_group');
             $groupinfo = posix_getgrnam($group);
@@ -113,6 +125,30 @@ class NssPamAuthorizer extends AuthorizerBase
                             'auth_type' => 'nss_pam',
                             'realname' => $userinfo['gecos'],
                             'level' => 10,
+                            'email' => '',
+                            'can_modify_passwd' => 0,
+                            'updated_at' => '',
+                            'created_at' => '',
+                            'enabled' => 1,
+                        ];
+                    }
+                }
+            }
+        }
+
+        if (Config::has('nss_pam_globalread_group')) {
+            $group = Config::get('nss_pam_globalread_group');
+            $groupinfo = posix_getgrnam($group);
+            if ($groupinfo) {
+                foreach ($groupinfo['members'] as $member) {
+                    $userinfo = posix_getpwnam($member);
+                    if ($userinfo && ! isset($userlist[$member])) {
+                        $userlist[$member] = [
+                            'user_id' => $userinfo['uid'],
+                            'username' => $userinfo['name'],
+                            'auth_type' => 'nss_pam',
+                            'realname' => $userinfo['gecos'],
+                            'level' => 1,
                             'email' => '',
                             'can_modify_passwd' => 0,
                             'updated_at' => '',
