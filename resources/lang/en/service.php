@@ -20,6 +20,9 @@ return [
     'state_warning' => 'Warning',
     'state_critical' => 'Critical',
     'graph' => 'Data Set: :ds',
+    'defaults' => [
+        'hostname' => 'This Device'
+    ],
     'fields' => [
         'device_id' => 'Device',
         'service_changed' => 'Last Changed',
@@ -31,7 +34,13 @@ return [
         'service_name' => 'Name',
         'service_param' => 'Parameters',
         'service_type' => 'Type',
-    ]
+    ],
+    'check_params' => [
+        'dns' => [
+            'hostname' => 'The name or address you want to query',
+            'server' => 'Optional DNS server you want to use for the lookup',
+        ]
+    ],
 ];
 
 

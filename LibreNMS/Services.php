@@ -25,6 +25,7 @@
 
 namespace LibreNMS;
 
+use App\Facades\DeviceCache;
 use App\Models\Service;
 use LibreNMS\Interfaces\ServiceCheck;
 use LibreNMS\Services\DefaultServiceCheck;
@@ -57,6 +58,10 @@ class Services
      */
     public static function makeCheck(Service $service): ServiceCheck
     {
+        if (DeviceCache::hasPrimary()) {
+            $service->setRelation('device', DeviceCache::getPrimary());
+        }
+
         $class = self::getCheck($service->service_type);
 
         return new $class($service);

@@ -25,7 +25,6 @@
 
 namespace LibreNMS\Services;
 
-use App\Models\Device;
 use App\Models\Service;
 use LibreNMS\Config;
 use LibreNMS\Data\Store\Rrd;
@@ -43,14 +42,11 @@ class DefaultServiceCheck implements \LibreNMS\Interfaces\ServiceCheck
     /**
      * @inheritDoc
      */
-    public function buildCommand(Device $device): array
+    public function buildCommand(): array
     {
-        $command = [
+        return $this->appendParameters([
             Config::get('nagios_plugins') . '/check_' . $this->service->service_type,
-            '-H',
-            $this->service->service_ip ?: $device->overwrite_ip ?: $device->hostname,
-        ];
-        return $this->appendParameters($command);
+        ]);
     }
 
     public function serviceDataSets(): array
@@ -89,29 +85,25 @@ class DefaultServiceCheck implements \LibreNMS\Interfaces\ServiceCheck
 
     /**
      * Merge either modern (array) or legacy (string) parameters into the command
-     *
-     * @param  array  $command
-     * @return array
      */
-    protected function appendParameters(array $command): array
+    private function appendParameters(array $command): array
     {
-        if (empty($this->service->service_param)) {
-            return $command;
+        $flags = array_keys($this->hasDefaults());
+        $modern = is_array($this->service->service_param);
+        if ($modern) {
+            $flags += array_keys($this->service->service_param);
         }
 
-        if (is_array($this->service->service_param)) {
-            foreach ($this->service->service_param as $flag => $value) {
-                $command[] = $flag;
+        foreach ($flags as $flag) {
+            $command[] = $flag;
 
-                if ($value) {
-                    $command[] = $value;
-                }
+            $value = $this->service->service_param[$flag] ?? $this->getDefault($flag);
+            if ($value) {
+                $command[] = $value;
             }
-
-            return $command;
         }
 
-        return array_merge($command, $this->parseLegacyParams());
+        return $modern ? $command : array_merge($command, $this->parseLegacyParams());
     }
 
     protected function parseLegacyParams(): array
@@ -120,5 +112,22 @@ class DefaultServiceCheck implements \LibreNMS\Interfaces\ServiceCheck
         return array_map(function ($part) {
             return preg_replace('/^(\'(.*)\'|"(.*)")$/', '$2$3', $part);
         }, $parts);
+    }
+
+    public function hasDefaults(): array
+    {
+        return [
+            '-H' => trans('service.defaults.hostname'),
+        ];
+    }
+
+    public function getDefault(string $flag): string
+    {
+        switch($flag) {
+            case '-H':
+                return $this->service->service_ip ?? $this->service->device->overwrite_ip ?? $this->service->device->hostname;
+            default:
+                return '';
+        }
     }
 }

@@ -32,21 +32,21 @@ class Log extends DefaultServiceCheck
     public function availableParameters(): array
     {
         return [
-            new CheckParameter('filename', 'F', 'logfile', 'Log file to check'),
-            new CheckParameter('oldlog', 'O', 'oldlog', 'Location to store the old log file, must start with /tmp/check_log/'),
-            new CheckParameter('query', 'q', 'query', 'grep query to run against the file'),
+            CheckParameter::make('--filename', '-F', 'logfile', 'Log file to check'),
+            CheckParameter::make('--oldlog', '-O', 'oldlog', 'Location to store the old log file, must start with /tmp/check_log/'),
+            CheckParameter::make('--query', '-q', 'query', 'grep query to run against the file'),
         ];
     }
 
     public function validateParameters(): array{
         return [
-            'filename' => function ($attribute, $value, $fail) {
+            '--filename' => function ($attribute, $value, $fail) {
                 if (Str::startsWith($value, ['/etc', '/usr', '/bin']) || ! is_readable($value)) {
                     $fail(trans('validation.exists', ['attribute' => $attribute]));
                 }
             },
-            'oldlog' => 'required|starts_with:/tmp/check_log/',
-            'query' => 'required|string'
+            '--oldlog' => 'required|starts_with:/tmp/check_log/',
+            '--query' => 'required|string'
         ];
     }
 }

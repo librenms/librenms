@@ -42,6 +42,14 @@ class CheckParameter
     /** @var string[] */
     public $inclusive_group;
 
+    /**
+     * Create a new check parameter
+     */
+    public static function make(string $param, string $short, string $value, string $description = ''): CheckParameter
+    {
+        return new static($param, $short, $value, $description);
+    }
+
     public function __construct(string $param, string $short, string $value, string $description = '')
     {
         $this->param = trim($param);

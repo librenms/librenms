@@ -25,7 +25,6 @@
 
 namespace LibreNMS\Interfaces;
 
-use App\Models\Device;
 use App\Models\Service;
 
 interface ServiceCheck
@@ -34,11 +33,8 @@ interface ServiceCheck
 
     /**
      * Build command for poller to check this service check
-     *
-     * @param  \App\Models\Device  $device
-     * @return array
      */
-    public function buildCommand(Device $device): array;
+    public function buildCommand(): array;
 
     /**
      * Get data sets to be used for graphing.
@@ -64,4 +60,15 @@ interface ServiceCheck
      * @return \LibreNMS\Services\CheckParameter[]
      */
     public function availableParameters(): array;
+
+    /**
+     * Mark parameters that have defaults with descriptions
+     * This will mark these as optional for users and indicate the defaults.
+     */
+    public function hasDefaults(): array;
+
+    /**
+     * Fill in the default value for the given flag, must exist in the hasDefaults() array
+     */
+    public function getDefault(string $flag): string;
 }

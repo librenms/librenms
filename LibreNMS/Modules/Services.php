@@ -104,7 +104,7 @@ class Services implements Module
             }
 
             Log::info("Nagios Service $service->service_type ($service->service_id)");
-            $response = $this->checkService($device, $service);
+            $response = $this->checkService($service);
             $service->service_message = $response->message;
             $service->service_status = $response->result;
             Log::debug("Service Response: $response->message");
@@ -144,10 +144,13 @@ class Services implements Module
         $os->getDevice()->services()->delete();
     }
 
-    public function checkService(Device $device, Service $service): ServiceCheckResponse
+    public function checkService(Service $service): ServiceCheckResponse
     {
-        $command = \LibreNMS\Services::makeCheck($service)->buildCommand($device);
+        $command = \LibreNMS\Services::makeCheck($service)->buildCommand();
         $process = new Process($command, null, ['LC_NUMERIC' => 'C']);
+
+        Log::debug(sprintf("[Service Check] %s", $process->getCommandLine()));
+
         $process->run();
 
         return new ServiceCheckResponse($process->getOutput(), $process->getExitCode());

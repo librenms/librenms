@@ -211,7 +211,7 @@ class ServiceController extends Controller
     public function test(Request $request): JsonResponse
     {
         $service = $this->validateNewService($request);
-        $response = app(\LibreNMS\Modules\Services::class)->checkService($service->device, $service);
+        $response = app(\LibreNMS\Modules\Services::class)->checkService($service);
 
         return response()->json([
             'message' => htmlentities($response->message),
