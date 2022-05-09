@@ -83,19 +83,19 @@ class FdbTablesController extends TableController
                 case 'mac':
                     return $query->where('ports_fdb.mac_address', 'like', $mac_search);
                 case 'vlan':
-                    return $query->whereIn('ports_fdb.vlan_id', $this->findVlans($search));
+                    return $query->whereIntegerInRaw('ports_fdb.vlan_id', $this->findVlans($search));
                 case 'dnsname':
                     $search = gethostbyname($search);
                     // no break
                 case 'ip':
                     return $query->whereIn('ports_fdb.mac_address', $this->findMacs($search));
                 case 'description':
-                    return $query->whereIn('ports_fdb.port_id', $this->findPorts($search));
+                    return $query->whereIntegerInRaw('ports_fdb.port_id', $this->findPorts($search));
                 default:
                     return $query->where(function ($query) use ($search, $mac_search) {
                         $query->where('ports_fdb.mac_address', 'like', $mac_search)
-                            ->orWhereIn('ports_fdb.port_id', $this->findPorts($search))
-                            ->orWhereIn('ports_fdb.vlan_id', $this->findVlans($search))
+                            ->orWhereIntegerInRaw('ports_fdb.port_id', $this->findPorts($search))
+                            ->orWhereIntegerInRaw('ports_fdb.vlan_id', $this->findVlans($search))
                             ->orWhereIn('ports_fdb.mac_address', $this->findMacs($search));
                     });
             }
