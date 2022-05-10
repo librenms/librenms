@@ -39,6 +39,11 @@ $fields = [
     'errored' => $json_return['data']['errored'],
 ];
 
+// save the return status for each alerting possibilities
+foreach ($json_return['data']['checks'] as $key=>$value) {
+    $fields['checks_' . $key] = $value['exit'];
+}
+
 $tags = ['name' => $name, 'app_id' => $app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
 data_update($device, 'app', $tags, $fields);
 
