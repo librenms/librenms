@@ -504,6 +504,71 @@
     "severity": "critical"
   },
   {
+    "rule": "applications.app_type = \"sneck\" && application_metrics.metric = \"check_ipmi_psu\" && application_metrics.value != \"1\"",
+    "name": "Sneck - IPMI PSU Warning",
+    "severity": "warning"
+  },
+  {
+    "rule": "applications.app_type = \"sneck\" && application_metrics.metric = \"check_ipmi_psu\" && application_metrics.value != \"2\"",
+    "name": "Sneck - IPMI PSU Critical",
+    "severity": "critical"
+  },
+  {
+    "rule": "applications.app_type = \"sneck\" && application_metrics.metric = \"check_ipmi_psu\" && application_metrics.value != \"3\"",
+    "name": "Sneck - IPMI PSU Unknown",
+    "severity": "critical"
+  },
+  {
+    "rule": "applications.app_type = \"sneck\" && application_metrics.metric = \"check_ipmi_fan\" && application_metrics.value != \"1\"",
+    "name": "Sneck - IPMI Fan Warning",
+    "severity": "warning"
+  },
+  {
+    "rule": "applications.app_type = \"sneck\" && application_metrics.metric = \"check_ipmi_fan\" && application_metrics.value != \"2\"",
+    "name": "Sneck - IPMI Fan Critical",
+    "severity": "critical"
+  },
+  {
+    "rule": "applications.app_type = \"sneck\" && application_metrics.metric = \"check_ipmi_fan\" && application_metrics.value != \"3\"",
+    "name": "Sneck - IPMI Fan Unknown",
+    "severity": "critical"
+  },
+  {
+    "rule": "applications.app_type = \"sneck\" && application_metrics.metric = \"check_ipmi_temp\" && application_metrics.value != \"1\"",
+    "name": "Sneck - IPMI Temperature Warning",
+    "severity": "warning"
+  },
+  {
+    "rule": "applications.app_type = \"sneck\" && application_metrics.metric = \"check_ipmi_temp\" && application_metrics.value != \"2\"",
+    "name": "Sneck - IPMI Temperature Critical",
+    "severity": "critical"
+  },
+  {
+    "rule": "applications.app_type = \"sneck\" && application_metrics.metric = \"check_ipmi_temp\" && application_metrics.value != \"3\"",
+    "name": "Sneck - IPMI Temperature Unknown",
+    "severity": "critical"
+  },
+  {
+    "rule": "applications.app_type = \"sneck\" && application_metrics.metric = \"check_suricata_procs\" && application_metrics.value != \"0\"",
+    "name": "Sneck - Wrong Number Of Suricata Procs Running",
+    "severity": "critical"
+  },
+  {
+    "rule": "applications.app_type = \"sneck\" && application_metrics.metric = \"check_meer_procs\" && application_metrics.value != \"0\"",
+    "name": "Sneck - Wrong Number Of Meer Procs Running",
+    "severity": "critical"
+  },
+  {
+    "rule": "applications.app_type = \"sneck\" && application_metrics.metric = \"check_sagan_procs\" && application_metrics.value != \"0\"",
+    "name": "Sneck - Wrong Number Of Sagan Procs Running",
+    "severity": "critical"
+  },
+  {
+    "rule": "applications.app_type = \"sneck\" && application_metrics.metric = \"check_daemonlogger_procs\" && application_metrics.value != \"0\"",
+    "name": "Sneck - Wrong Number Of Daemonlogger Procs Running",
+    "severity": "critical"
+  },
+  {
     "rule": "applications.app_type = \"sneck\" && application_metrics.metric = \"time_to_polling_abs\" && application_metrics.value >= \"540\"",
     "name": "Sneck Has Not Run For Over 540 Seconds",
     "severity": "critical"
