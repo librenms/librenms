@@ -2372,7 +2372,7 @@ echo "extend zfs /etc/snmp/zfs-freebsd" >> /etc/snmp/snmpd.conf
 ```
 wget https://github.com/librenms/librenms-agent/raw/master/snmp/zfs-linux -O /etc/snmp/zfs-linux
 chmod +x /etc/snmp/zfs-linux
-echo "extend zfs sudo /etc/snmp/zfs-linux" >> /etc/snmp/snmpd.conf
+echo "extend zfs /usr/bin/sudo /etc/snmp/zfs-linux" >> /etc/snmp/snmpd.conf
 ```
 
 Edit your sudo users (usually `visudo`) and add at the bottom:
