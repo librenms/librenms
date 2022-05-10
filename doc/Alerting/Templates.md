@@ -25,8 +25,7 @@ Controls:
 
 - if-else (Else can be omitted): `@if ($alert->placeholder  ==
   'value') Some Text @else Other Text @endif`
-- foreach-loop: `@foreach ($alert->faults as $key => $value) Key: $key
-  </br> alue: $value @endforeach`
+- foreach-loop: `@foreach ($alert->faults as $key => $value) Key: $key Value: $value @endforeach`
 
 Placeholders:
 
