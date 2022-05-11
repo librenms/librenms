@@ -504,48 +504,78 @@
     "severity": "critical"
   },
   {
-    "rule": "applications.app_type = \"sneck\" && application_metrics.metric = \"check_ipmi_psu\" && application_metrics.value != \"1\"",
+    "rule": "applications.app_type = \"sneck\" && application_metrics.metric = \"check_ipmi_psu\" && application_metrics.value = \"1\"",
     "name": "Sneck - IPMI PSU Warning",
     "severity": "warning"
   },
   {
-    "rule": "applications.app_type = \"sneck\" && application_metrics.metric = \"check_ipmi_psu\" && application_metrics.value != \"2\"",
+    "rule": "applications.app_type = \"sneck\" && application_metrics.metric = \"check_ipmi_psu\" && application_metrics.value = \"2\"",
     "name": "Sneck - IPMI PSU Critical",
     "severity": "critical"
   },
   {
-    "rule": "applications.app_type = \"sneck\" && application_metrics.metric = \"check_ipmi_psu\" && application_metrics.value != \"3\"",
+    "rule": "applications.app_type = \"sneck\" && application_metrics.metric = \"check_ipmi_psu\" && application_metrics.value = \"3\"",
     "name": "Sneck - IPMI PSU Unknown",
     "severity": "critical"
   },
   {
-    "rule": "applications.app_type = \"sneck\" && application_metrics.metric = \"check_ipmi_fan\" && application_metrics.value != \"1\"",
+    "rule": "applications.app_type = \"sneck\" && application_metrics.metric = \"check_ipmi_fan\" && application_metrics.value = \"1\"",
     "name": "Sneck - IPMI Fan Warning",
     "severity": "warning"
   },
   {
-    "rule": "applications.app_type = \"sneck\" && application_metrics.metric = \"check_ipmi_fan\" && application_metrics.value != \"2\"",
+    "rule": "applications.app_type = \"sneck\" && application_metrics.metric = \"check_ipmi_fan\" && application_metrics.value = \"2\"",
     "name": "Sneck - IPMI Fan Critical",
     "severity": "critical"
   },
   {
-    "rule": "applications.app_type = \"sneck\" && application_metrics.metric = \"check_ipmi_fan\" && application_metrics.value != \"3\"",
+    "rule": "applications.app_type = \"sneck\" && application_metrics.metric = \"check_ipmi_fan\" && application_metrics.value = \"3\"",
     "name": "Sneck - IPMI Fan Unknown",
     "severity": "critical"
   },
   {
-    "rule": "applications.app_type = \"sneck\" && application_metrics.metric = \"check_ipmi_temp\" && application_metrics.value != \"1\"",
+    "rule": "applications.app_type = \"sneck\" && application_metrics.metric = \"check_ipmi_temp\" && application_metrics.value = \"1\"",
     "name": "Sneck - IPMI Temperature Warning",
     "severity": "warning"
   },
   {
-    "rule": "applications.app_type = \"sneck\" && application_metrics.metric = \"check_ipmi_temp\" && application_metrics.value != \"2\"",
+    "rule": "applications.app_type = \"sneck\" && application_metrics.metric = \"check_ipmi_temp\" && application_metrics.value = \"2\"",
     "name": "Sneck - IPMI Temperature Critical",
     "severity": "critical"
   },
   {
-    "rule": "applications.app_type = \"sneck\" && application_metrics.metric = \"check_ipmi_temp\" && application_metrics.value != \"3\"",
+    "rule": "applications.app_type = \"sneck\" && application_metrics.metric = \"check_ipmi_temp\" && application_metrics.value = \"3\"",
     "name": "Sneck - IPMI Temperature Unknown",
+    "severity": "critical"
+  },
+  {
+    "rule": "applications.app_type = \"sneck\" && application_metrics.metric = \"check_ipmi_volts\" && application_metrics.value = \"1\"",
+    "name": "Sneck - IPMI Volts Warning",
+    "severity": "warning"
+  },
+  {
+    "rule": "applications.app_type = \"sneck\" && application_metrics.metric = \"check_ipmi_volts\" && application_metrics.value = \"2\"",
+    "name": "Sneck - IPMI Volts Critical",
+    "severity": "critical"
+  },
+  {
+    "rule": "applications.app_type = \"sneck\" && application_metrics.metric = \"check_ipmi_volts\" && application_metrics.value = \"3\"",
+    "name": "Sneck - IPMI Volts Unknown",
+    "severity": "critical"
+  },
+  {
+    "rule": "applications.app_type = \"sneck\" && application_metrics.metric = \"check_ipmi_amps\" && application_metrics.value = \"1\"",
+    "name": "Sneck - IPMI Amps Warning",
+    "severity": "warning"
+  },
+  {
+    "rule": "applications.app_type = \"sneck\" && application_metrics.metric = \"check_ipmi_amps\" && application_metrics.value = \"2\"",
+    "name": "Sneck - IPMI Amps Critical",
+    "severity": "critical"
+  },
+  {
+    "rule": "applications.app_type = \"sneck\" && application_metrics.metric = \"check_ipmi_amps\" && application_metrics.value = \"3\"",
+    "name": "Sneck - IPMI Amps Unknown",
     "severity": "critical"
   },
   {
