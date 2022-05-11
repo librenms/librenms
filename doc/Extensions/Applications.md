@@ -2152,6 +2152,37 @@ extend supervisord /etc/snmp/supervisord.py
 systemctl restart snmpd
 ```
 
+## Suricata
+
+### SNMP Extend
+
+1. Install the extend.
+```
+cpanm Suricata::Monitoring
+```
+
+2. Setup cron. Below is a example.
+```
+*/5 * * * * /usr/local/bin/suricata_stat_check > /dev/null
+```
+
+3. Configure snmpd.conf
+```
+extend suricata-stats /usr/bin/env PATH=/sbin:/bin:/usr/sbin:/usr/bin:/usr/local/sbin:/usr/local/bin suricata_stat_check -c
+```
+
+4. Restart snmpd on your system.
+
+You will want to make sure Suricata is set to output the stats
+to the eve file once a minute. This will help make sure that
+it won't be to far back in the file and will make sure it is
+recent when the cronjob runs.
+
+Any configuration of suricata_stat_check should be done in the cron
+setup. If the default does not work, check the docs for it at
+[MetaCPAN for
+suricata_stat_check](https://metacpan.org/dist/Suricata-Monitoring/view/bin/suricata_stat_check)
+
 ## TinyDNS aka djbdns
 
 ### Agent

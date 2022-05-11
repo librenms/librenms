@@ -11,10 +11,10 @@ return [
     |
     */
 
-    'title' => 'Sensors',
+    'title' => 'Sensori',
     'airflow' => [
-        'short' => 'Airflow',
-        'long' => 'Airflow',
+        'short' => 'Flusso di aria',
+        'long' => 'Flusso di aria',
         'unit' => 'cfm',
         'unit_long' => 'Cubic Feet per Minute',
     ],
@@ -25,7 +25,7 @@ return [
         'unit_long' => '',
     ],
     'charge' => [
-        'short' => 'Charge',
+        'short' => 'Carica',
         'long' => 'Charge Percent',
         'unit' => '%',
         'unit_long' => 'Percent',
@@ -37,7 +37,7 @@ return [
         'unit_long' => 'Picoseconds per Nanometer per Kilometer',
     ],
     'cooling' => [
-        'short' => 'Cooling',
+        'short' => 'Raffreddamento',
         'long' => '',
         'unit' => 'W',
         'unit_long' => 'Watts',
@@ -49,7 +49,7 @@ return [
         'unit_long' => '',
     ],
     'current' => [
-        'short' => 'Current',
+        'short' => 'Corrente',
         'long' => 'Current',
         'unit' => 'A',
         'unit_long' => 'Amperes',
@@ -79,32 +79,32 @@ return [
         'unit_long' => 'Rotations per Minute',
     ],
     'frequency' => [
-        'short' => 'Frequency',
-        'long' => 'Frequency',
+        'short' => 'Frequenza',
+        'long' => 'Frequenza',
         'unit' => 'Hz',
         'unit_long' => 'Hertz',
     ],
     'humidity' => [
-        'short' => 'Humidity',
-        'long' => 'Humidity Percent',
+        'short' => 'Umidità',
+        'long' => 'Percentuale umidità',
         'unit' => '%',
         'unit_long' => 'Percent',
     ],
     'load' => [
-        'short' => 'Load',
-        'long' => 'Load Percent',
+        'short' => 'Carico',
+        'long' => 'Percentuale di carico',
         'unit' => '%',
         'unit_long' => 'Percent',
     ],
     'loss' => [
-        'short' => 'Percent',
+        'short' => 'Percentuale',
         'long' => 'Loss Percentage',
         'unit' => '%',
         'unit_long' => 'percentage',
     ],
     'power' => [
-        'short' => 'Power',
-        'long' => 'Power',
+        'short' => 'Potenza',
+        'long' => 'Potenza',
         'unit' => 'W',
         'unit_long' => 'Watts',
     ],
@@ -121,8 +121,8 @@ return [
         'unit_long' => '',
     ],
     'pressure' => [
-        'short' => 'Pressure',
-        'long' => 'Pressure',
+        'short' => 'Pressione',
+        'long' => 'Pressione',
         'unit' => 'kPa',
         'unit_long' => 'Kilopascals',
     ],
@@ -139,8 +139,8 @@ return [
         'unit_long' => 'Minutes',
     ],
     'signal' => [
-        'short' => 'Signal',
-        'long' => 'Signal',
+        'short' => 'Segnale',
+        'long' => 'Segnale',
         'unit' => 'dBm',
         'unit_long' => 'Decibal-Milliwatts',
     ],
@@ -168,14 +168,14 @@ return [
         'unit' => '',
     ],
     'temperature' => [
-        'short' => 'Temperature',
-        'long' => 'Temperature',
+        'short' => 'Temperatura',
+        'long' => 'Temperatura',
         'unit' => '°C',
         'unit_long' => '° Celsius',
     ],
     'voltage' => [
-        'short' => 'Voltage',
-        'long' => 'voltage',
+        'short' => 'Voltaggio',
+        'long' => 'voltaggio',
         'unit' => 'V',
         'unit_long' => 'Volts',
     ],
@@ -186,9 +186,9 @@ return [
         'unit_long' => 'Liters Per Minute',
     ],
     'percent' => [
-        'short' => 'Percent',
-        'long' => 'Percent',
+        'short' => 'Percentuale',
+        'long' => 'Percentuale',
         'unit' => '%',
-        'unit_long' => 'Percent',
+        'unit_long' => 'Percentuale',
     ],
 ];
