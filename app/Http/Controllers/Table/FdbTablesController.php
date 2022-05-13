@@ -193,9 +193,9 @@ class FdbTablesController extends TableController
 
     /**
      * @param  string  $ip
-     * @return Builder
+     * @return \Illuminate\Support\Collection
      */
-    protected function findMacs($ip)
+    protected function findMacs($ip): \Illuminate\Support\Collection
     {
         $port_id = \Request::get('port_id');
         $device_id = \Request::get('device_id');
@@ -212,9 +212,9 @@ class FdbTablesController extends TableController
 
     /**
      * @param  string  $vlan
-     * @return Builder
+     * @return \Illuminate\Support\Collection
      */
-    protected function findVlans($vlan)
+    protected function findVlans($vlan): \Illuminate\Support\Collection
     {
         $port_id = \Request::get('port_id');
         $device_id = \Request::get('device_id');
@@ -233,9 +233,9 @@ class FdbTablesController extends TableController
 
     /**
      * @param  string  $ifAlias
-     * @return Builder
+     * @return \Illuminate\Support\Collection
      */
-    protected function findPorts($ifAlias)
+    protected function findPorts($ifAlias): \Illuminate\Support\Collection
     {
         $port_id = \Request::get('port_id');
         $device_id = \Request::get('device_id');
@@ -252,9 +252,9 @@ class FdbTablesController extends TableController
 
     /**
      * @param  string  $mac_address
-     * @return \Illuminate\Support\Collection
+     * @return array
      */
-    protected function findIps($mac_address)
+    protected function findIps($mac_address): array
     {
         if (! isset($this->ipCache[$mac_address])) {
             $ips = Ipv4Mac::where('mac_address', $mac_address)
