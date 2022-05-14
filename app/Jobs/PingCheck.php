@@ -166,7 +166,7 @@ class PingCheck implements ShouldQueue
 
         $this->devices = $query->get()->keyBy(function ($device) {
             /** @var Device $device */
-            
+
             return $device->overwrite_ip ?: $device->hostname;
         });
 
