@@ -810,6 +810,7 @@ isis_adjacencies:
   Columns:
     - { Field: id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
     - { Field: device_id, Type: int, 'Null': false, Extra: '' }
+    - { Field: index, Type: varchar(16), 'Null': true, Extra: '' }
     - { Field: port_id, Type: int, 'Null': true, Extra: '' }
     - { Field: ifIndex, Type: int, 'Null': false, Extra: '' }
     - { Field: isisISAdjState, Type: varchar(13), 'Null': false, Extra: '' }
@@ -2040,7 +2041,7 @@ users:
   Columns:
     - { Field: user_id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
     - { Field: auth_type, Type: varchar(32), 'Null': true, Extra: '' }
-    - { Field: auth_id, Type: int, 'Null': true, Extra: '' }
+    - { Field: auth_id, Type: varchar(255), 'Null': true, Extra: '' }
     - { Field: username, Type: varchar(255), 'Null': false, Extra: '' }
     - { Field: password, Type: varchar(255), 'Null': true, Extra: '' }
     - { Field: realname, Type: varchar(64), 'Null': false, Extra: '' }

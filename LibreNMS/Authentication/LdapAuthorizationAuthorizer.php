@@ -59,6 +59,17 @@ class LdapAuthorizationAuthorizer extends AuthorizerBase
                 throw new AuthenticationException('Fatal error: LDAP TLS required but not successfully negotiated:' . ldap_error($this->ldap_connection));
             }
         }
+        if ((Config::has('auth_ldap_binduser') || Config::has('auth_ldap_binddn')) && Config::has('auth_ldap_bindpassword')) {
+            if (Config::get('auth_ldap_binddn') == null) {
+                Config::set('auth_ldap_binddn', $this->getFullDn(Config::get('auth_ldap_binduser')));
+            }
+            $username = Config::get('auth_ldap_binddn');
+            $password = Config::get('auth_ldap_bindpassword');
+            $bind_result = ldap_bind($this->ldap_connection, $username, $password);
+            if (! $bind_result) {
+                throw new AuthenticationException('Fatal error: LDAP bind configured but not successfully authenticated:' . ldap_error($this->ldap_connection));
+            }
+        }
     }
 
     public function authenticate($credentials)
@@ -167,7 +178,9 @@ class LdapAuthorizationAuthorizer extends AuthorizerBase
         $userlist = [];
 
         $filter = '(' . Config::get('auth_ldap_prefix') . '*)';
-
+        if (Config::get('auth_ldap_userlist_filter') != null) {
+            $filter = '(' . Config::get('auth_ldap_userlist_filter') . ')';
+        }
         $search = ldap_search($this->ldap_connection, trim(Config::get('auth_ldap_suffix'), ','), $filter);
         $entries = ldap_get_entries($this->ldap_connection, $search);
 
@@ -211,6 +224,18 @@ class LdapAuthorizationAuthorizer extends AuthorizerBase
         }
 
         return false;
+    }
+
+    /**
+     * Get the full dn with auth_ldap_prefix and auth_ldap_suffix
+     *
+     * @internal
+     *
+     * @return string
+     */
+    protected function getFullDn(string $username)
+    {
+        return Config::get('auth_ldap_prefix', '') . $username . Config::get('auth_ldap_suffix', '');
     }
 
     protected function getMembername($username)

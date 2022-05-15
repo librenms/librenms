@@ -171,7 +171,12 @@ return [
         Illuminate\View\ViewServiceProvider::class,
 
         /*
-         * Application Service Providers...
+         * Package Service Providers...
+         */
+        \SocialiteProviders\Manager\ServiceProvider::class,
+
+        /*
+         * LibreNMS Service Providers...
          */
         App\Providers\AppServiceProvider::class,
         App\Providers\CliServiceProvider::class,
@@ -179,12 +184,12 @@ return [
         // App\Providers\BroadcastServiceProvider::class,
         App\Providers\EventServiceProvider::class,
         App\Providers\RouteServiceProvider::class,
+
+        App\Providers\ConfigServiceProvider::class,
+        App\Providers\SocialiteListenersServiceProvider::class,
+
         App\Providers\ComposerServiceProvider::class,
         App\Providers\DatastoreServiceProvider::class,
-
-        /*
-         * LibreNMS Service Providers...
-         */
         App\Providers\SnmptrapProvider::class,
         App\Providers\PluginProvider::class,
     ],

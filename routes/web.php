@@ -16,13 +16,19 @@ use Illuminate\Support\Facades\Route;
 // Auth
 Auth::routes(['register' => false, 'reset' => false, 'verify' => false]);
 
+// Socialite
+Route::prefix('auth')->name('socialite.')->group(function () {
+    Route::post('{provider}/redirect', [\App\Http\Controllers\Auth\SocialiteController::class, 'redirect'])->name('redirect');
+    Route::match(['get', 'post'], '{provider}/callback', [\App\Http\Controllers\Auth\SocialiteController::class, 'callback'])->name('callback');
+    Route::get('{provider}/metadata', [\App\Http\Controllers\Auth\SocialiteController::class, 'metadata'])->name('metadata');
+});
+
 // WebUI
 Route::group(['middleware' => ['auth'], 'guard' => 'auth'], function () {
 
     // pages
     Route::post('alert/{alert}/ack', [\App\Http\Controllers\AlertController::class, 'ack'])->name('alert.ack');
     Route::resource('device-groups', 'DeviceGroupController');
-    Route::resource('port-groups', 'PortGroupController');
     Route::resource('port', 'PortController', ['only' => 'update']);
     Route::group(['prefix' => 'poller'], function () {
         Route::get('', 'PollerController@pollerTab')->name('poller.index');
@@ -75,11 +81,16 @@ Route::group(['middleware' => ['auth'], 'guard' => 'auth'], function () {
         Route::delete('settings/{name}', 'SettingsController@destroy')->name('settings.destroy');
 
         Route::post('alert/transports/{transport}/test', [\App\Http\Controllers\AlertTransportController::class, 'test'])->name('alert.transports.test');
+
+        Route::get('plugin/settings', 'PluginAdminController')->name('plugin.admin');
+        Route::get('plugin/settings/{plugin:plugin_name}', 'PluginSettingsController')->name('plugin.settings');
+        Route::post('plugin/settings/{plugin:plugin_name}', 'PluginSettingsController@update')->name('plugin.update');
+
+        Route::resource('port-groups', 'PortGroupController');
+        Route::get('validate', [\App\Http\Controllers\ValidateController::class, 'index'])->name('validate');
+        Route::get('validate/results', [\App\Http\Controllers\ValidateController::class, 'runValidation'])->name('validate.results');
     });
 
-    Route::get('plugin/settings', 'PluginAdminController')->name('plugin.admin');
-    Route::get('plugin/settings/{plugin:plugin_name}', 'PluginSettingsController')->name('plugin.settings');
-    Route::post('plugin/settings/{plugin:plugin_name}', 'PluginSettingsController@update')->name('plugin.update');
     Route::get('plugin', 'PluginLegacyController@redirect');
     Route::redirect('plugin/view=admin', '/plugin/admin');
     Route::get('plugin/p={pluginName}', 'PluginLegacyController@redirect');

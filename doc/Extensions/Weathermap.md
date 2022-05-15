@@ -22,7 +22,11 @@ git clone https://github.com/librenms-plugins/Weathermap.git
 ### Step 2
 
 Inside the html/plugins directory, change the ownership of the
-Weathermap directory by typing `chown -R librenms:librenms Weathermap/`
+Weathermap directory by typing
+
+```bash
+chown -R librenms:librenms Weathermap/
+```
 
 Make the configs directory writeable.
 

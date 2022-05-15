@@ -34,7 +34,10 @@ You need to install an additional php module : `bcmath`
 
 ## Alerta
 
-The [alerta](https://alerta.io) monitoring system is a tool used to consolidate and de-duplicate alerts from multiple sources for quick ‘at-a-glance’ visualisation. With just one system you can monitor alerts from many other monitoring tools on a single screen.
+The [alerta](https://alerta.io) monitoring system is a tool used to
+consolidate and de-duplicate alerts from multiple sources for quick
+‘at-a-glance’ visualisation. With just one system you can monitor
+alerts from many other monitoring tools on a single screen.
 
 **Example:**
 
@@ -63,8 +66,21 @@ It is possible to configure as many label values as required in
 Alertmanager Options section. Every label and its value should be
 entered as a new line.
 
+Labels can be a fixed string or a dynamic variable from the alert.
+To set a dynamic variable your label must start with extra_ then
+complete with the name of your label (only characters, figures and
+underscore are allowed here). The value must be the name of
+the variable you want to get (you can see all the variables in
+Alerts->Notifications by clicking on the Details icon of your alert
+when it is pending). If the variable's name does not match with an
+existing value the label's value will be the string you provided just
+as it was a fixed string.
+
 Multiple Alertmanager URLs (comma separated) are supported. Each
 URL will be tried and the search will stop at the first success.
+
+Basic HTTP authentication with a username and a password is supported.
+If you let those value blank, no authentication will be used.
 
 [Alertmanager Docs](https://prometheus.io/docs/alerting/alertmanager/)
 
@@ -73,22 +89,29 @@ URL will be tried and the search will stop at the first success.
 | Config | Example |
 | ------ | ------- |
 | Alertmanager URL(s)   | http://alertmanager1.example.com,http://alertmanager2.example.com |
-| Alertmanager Options: | source=librenms <br/> customlabel=value |
+| Alertmanager Username | myUsername |
+| Alertmanager Password | myPassword |
+| Alertmanager Options: | source=librenms <br/> customlabel=value <br/> extra_dynamic_value=variable_name |
 
 ## API
 
 The API transport allows to reach any service provider using POST, PUT or GET URLs
 (Like SMS provider, etc). It can be used in multiple ways:
 
-- The same text built from the Alert template is available in the variable
-``` $msg ```, which can then be sent as an option to the API. Be carefull that
-HTTP GET requests are usually limited in length.
-- The API-Option fields can be directly built from the variables defined in
-[Template-Syntax](Templates.md#syntax) but without the 'alert->' prefix.
-For instance, ``` $alert->uptime ``` is available as ``` $uptime ``` in the
-API transport
+- The same text built from the Alert template is available in the
+  variable
+
+`$msg`, which can then be sent as an option to the API. Be carefull
+that HTTP GET requests are usually limited in length.
+
+- The API-Option fields can be directly built from the variables
+  defined in [Template-Syntax](Templates.md#syntax) but without the
+  'alert->' prefix. For instance, `$alert->uptime` is available as
+  `$uptime` in the API transport
+
 - The API-Headers allows you to add the headers that the api endpoint requires.
-- The API-body allow sending data in the format required by the ApI endpoint.
+
+- The API-body allow sending data in the format required by the API endpoint.
 
 A few variables commonly used :
 
@@ -132,7 +155,9 @@ the title and text of the alert to a screen in the Network Operation Center.
 | API URL       | <http://my.example.com/wall-display>
 | API Options   | title={{ $title }} <br/> msg={{ $msg }}|
 
-The example below will use the API named component of my.example.com with id 1, body as json status value and headers send token authentication and content type required.
+The example below will use the API named component of my.example.com
+with id 1, body as json status value and headers send token
+authentication and content type required.
 
 | Config | Example |
 | ------ | ------- |
@@ -142,8 +167,8 @@ The example below will use the API named component of my.example.com with id 1, 
 |               | Content-Type=application/json
 | API Body      | { "status": 2 }
 
-
 ## aspSMS
+
 aspSMS is a SMS provider that can be configured by using the generic API Transport.
 You need a token you can find on your personnal space.
 
@@ -156,7 +181,7 @@ You need a token you can find on your personnal space.
 | Transport type | Api |
 | API Method | POST |
 | API URL | https://soap.aspsms.com/aspsmsx.asmx/SimpleTextSMS |
-| Options | UserKey=USERKEY<br />Password=APIPASSWORD<br />Recipient=RECIPIENT<br />Originator=ORIGINATOR<br />MessageText={{ $msg }} |
+| Options | UserKey=USERKEY<br />Password=APIPASSWORD<br />Recipient=RECIPIENT<br/> Originator=ORIGINATOR<br />MessageText={{ $msg }} |
 
 ## Boxcar
 
@@ -173,12 +198,15 @@ website and setup the transport.
 
 ## Browser Push
 
-Browser push notifications can send a notification to the user's device even when the browser is not open.
-This requires HTTPS, the PHP GMP extension, [Push API](https://developer.mozilla.org/en-US/docs/Web/API/Push_API) support, 
-and permissions on each device to send alerts.
+Browser push notifications can send a notification to the user's
+device even when the browser is not open. This requires HTTPS, the PHP
+GMP extension, [Push
+API](https://developer.mozilla.org/en-US/docs/Web/API/Push_API)
+support, and permissions on each device to send alerts.
 
-Simply configure an alert transport and allow notification permission on the device(s) you
-wish to receive alerts on.  You may disable alerts on a browser on the user preferences page.
+Simply configure an alert transport and allow notification permission
+on the device(s) you wish to receive alerts on.  You may disable
+alerts on a browser on the user preferences page.
 
 ## Canopsis
 
@@ -368,8 +396,9 @@ For using the Matrix transports, you have to create a room on the Matrix-server.
 The provided Auth_token belongs to an user, which is member of this room.
 The Message, sent to the matrix-room can be built from the variables defined in
 [Template-Syntax](Templates.md#syntax) but without the 'alert->' prefix.
-See API-Transport. The variable ``` $msg ``` is contains the result of the Alert template.
-The Matrix-Server URL is cutted before the beginning of the ``_matrix/client/r0/...`` API-part.
+See API-Transport. The variable ``` $msg ``` is contains the result of
+the Alert template.The Matrix-Server URL is cutted before the
+beginning of the ``_matrix/client/r0/...`` API-part.
 
 **Example:**
 
@@ -382,11 +411,13 @@ The Matrix-Server URL is cutted before the beginning of the ``_matrix/client/r0/
 
 ## Microsoft Teams
 
-LibreNMS can send alerts to Microsoft Teams [Incoming Webhooks](https://docs.microsoft.com/en-us/microsoftteams/platform/webhooks-and-connectors/how-to/add-incoming-webhook) which are
-then posted to a specific channel. Microsoft recommends using
-[markdown](https://docs.microsoft.com/en-us/microsoftteams/platform/task-modules-and-cards/cards/cards-format#markdown-formatting-for-connector-cards) formatting for connector cards.
-Administrators can opt to [compose](https://messagecardplayground.azurewebsites.net/)
-the [MessageCard](https://docs.microsoft.com/en-us/outlook/actionable-messages/message-card-reference)
+LibreNMS can send alerts to Microsoft Teams [Incoming
+Webhooks](https://docs.microsoft.com/en-us/microsoftteams/platform/webhooks-and-connectors/how-to/add-incoming-webhook)
+which are then posted to a specific channel. Microsoft recommends using
+[markdown](https://docs.microsoft.com/en-us/microsoftteams/platform/task-modules-and-cards/cards/cards-format#markdown-formatting-for-connector-cards)
+formatting for connector cards. Administrators can opt to
+[compose](https://messagecardplayground.azurewebsites.net/) the
+[MessageCard](https://docs.microsoft.com/en-us/outlook/actionable-messages/message-card-reference)
 themselves using JSON to get the full functionality.
 
 **Example:**
@@ -645,6 +676,7 @@ either local or international dialling format.
 | Mobiles | +3534567890 <br/> 0834567891 |
 
 ## SMSmode
+
 SMSmode is a SMS provider that can be configured by using the generic API Transport.
 You need a token you can find on your personnal space.
 
@@ -657,7 +689,7 @@ You need a token you can find on your personnal space.
 | Transport type | Api |
 | API Method | POST |
 | API URL | http://api.smsmode.com/http/1.6/sendSMS.do |
-| Options | accessToken=_PUT_HERE_YOUR_TOKEN_<br />numero=_PUT_HERE_DESTS_NUMBER_COMMA_SEPARATED_<br />message={{ $msg }} |
+| Options | accessToken=_PUT_HERE_YOUR_TOKEN_<br/> numero=_PUT_HERE_DESTS_NUMBER_COMMA_SEPARATED_<br />message={{ $msg }} |
 
 ## Splunk
 
@@ -694,6 +726,7 @@ device_override_sysLocation="0", device_notes="", device_port_association_mode="
 device_max_depth="0", device_disable_notify="0", device_location="", 
 device_vrf_lites="Array", device_lat="", device_lng="", - 
 sysObjectID => ""; `
+```
 
 Each alert will be sent as a separate message.
 
@@ -787,7 +820,10 @@ located at: [https://www.twilio.com/docs/api?filter-product=sms](https://www.twi
 
 ## UKFast PSS
 
-UKFast PSS tickets can be raised from alerts using the UKFastPSS transport. This required an [API key](https://my.ukfast.co.uk/applications) with PSS `write` permissions
+UKFast PSS tickets can be raised from alerts using the UKFastPSS
+transport. This required an [API
+key](https://my.ukfast.co.uk/applications) with PSS `write`
+permissions
 
 **Example:**
 
@@ -864,7 +900,8 @@ Use the Signal Mesenger for Alerts. Run the Signal CLI with the D-Bus option.
 
 ## SMSFeedback
 
-SMSFeedback is a SAAS service, which can be used to deliver Alerts via API, using API url, Username & Password.
+SMSFeedback is a SAAS service, which can be used to deliver Alerts via
+API, using API url, Username & Password.
 
 They can be in international dialling format only.
 

@@ -159,4 +159,13 @@ return [
 
     'attributes' => [],
 
+    'results' => [
+        'fix' => 'Fix',
+        'fetch_failed' => 'Failed to fetch validation results',
+        'backend_failed' => 'Failed to load data from backend, check webserver.',
+        'show_all' => 'Show all',
+        'show_less' => 'Show less',
+        'validate' => 'Validate',
+        'validating' => 'Validating',
+    ],
 ];

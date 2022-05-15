@@ -98,7 +98,7 @@ class UserController extends Controller
         $user = User::create($user);
 
         $user->setPassword($request->new_password);
-        $user->auth_id = LegacyAuth::get()->getUserid($user->username) ?: $user->user_id;
+        $user->auth_id = (string) LegacyAuth::get()->getUserid($user->username) ?: $user->user_id;
         $this->updateDashboard($user, $request->get('dashboard'));
 
         if ($user->save()) {

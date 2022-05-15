@@ -11,3 +11,6 @@ over:
 discovery:
     - sysObjectID:
         - .1.3.6.1.4.1.272.4.201.66.69.50.48
+oids:
+    unordered:
+        - IP-MIB::ipNetToMediaPhysAddress

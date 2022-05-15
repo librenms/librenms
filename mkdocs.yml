@@ -8,7 +8,20 @@ theme:
     text: 'Roboto'
     code: 'Roboto Mono'
   palette:
-    primary: black
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      primary: black
+      accent: indigo
+      toggle:
+        icon: material/lightbulb-outline
+        name: Switch to dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      primary: black
+      accent: indigo
+      toggle:
+        icon: material/lightbulb
+        name: Switch to light mode
 
   features:
     - navigation.instant
@@ -134,6 +147,7 @@ nav:
       - Galera Database Cluster: Extensions/Galera-Cluster.md
       - IRC Bot Extensions: Extensions/IRC-Bot-Extensions.md
       - IRC Bot: Extensions/IRC-Bot.md
+      - Oauth/SAML support: Extensions/OAuth-SAML.md
       - RRDCached: Extensions/RRDCached.md
       - RRDTune: Extensions/RRDTune.md
       - Scaling LibreNMS: Extensions/Distributed-Poller.md

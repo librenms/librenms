@@ -24,7 +24,7 @@ class AlertTransportController extends Controller
             'elapsed'   => '11s',
             'alert_id'  => '000',
             'id'        => '000',
-            'faults'    => false,
+            'faults'    => [],
             'uid'       => '000',
             'severity'  => 'critical',
             'rule'      => 'macros.device = 1',

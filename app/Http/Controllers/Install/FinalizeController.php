@@ -149,6 +149,6 @@ class FinalizeController extends InstallationController implements InstallerStep
 
     public function icon(): string
     {
-        return 'fa-check';
+        return 'fa-solid fa-check';
     }
 }

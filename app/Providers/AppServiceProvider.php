@@ -3,7 +3,6 @@
 namespace App\Providers;
 
 use App\Models\Sensor;
-use App\Polling\Measure\MeasurementManager;
 use Illuminate\Database\Eloquent\Relations\Relation;
 use Illuminate\Support\Facades\Blade;
 use Illuminate\Support\Facades\Log;
@@ -46,13 +45,9 @@ class AppServiceProvider extends ServiceProvider
      *
      * @return void
      */
-    public function boot(MeasurementManager $measure)
+    public function boot()
     {
-        $measure->listenDb();
         \Illuminate\Pagination\Paginator::useBootstrap();
-
-        $this->app->booted('\LibreNMS\DB\Eloquent::initLegacyListeners');
-        $this->app->booted('\LibreNMS\Config::load');
 
         $this->bootCustomBladeDirectives();
         $this->bootCustomValidators();
@@ -131,9 +126,10 @@ class AppServiceProvider extends ServiceProvider
     private function bootObservers()
     {
         \App\Models\Device::observe(\App\Observers\DeviceObserver::class);
+        \App\Models\Package::observe(\App\Observers\PackageObserver::class);
         \App\Models\Service::observe(\App\Observers\ServiceObserver::class);
-        \App\Models\User::observe(\App\Observers\UserObserver::class);
         \App\Models\Stp::observe(\App\Observers\StpObserver::class);
+        \App\Models\User::observe(\App\Observers\UserObserver::class);
     }
 
     private function bootCustomValidators()
@@ -174,5 +170,23 @@ class AppServiceProvider extends ServiceProvider
 
             return $validator->passes();
         }, trans('validation.exists'));
+
+        Validator::extend('url_or_xml', function ($attribute, $value): bool {
+            if (! is_string($value)) {
+                return false;
+            }
+
+            if (filter_var($value, FILTER_VALIDATE_URL) !== false) {
+                return true;
+            }
+
+            libxml_use_internal_errors(true);
+            $xml = simplexml_load_string($value);
+            if ($xml !== false) {
+                return true;
+            }
+
+            return false;
+        });
     }
 }

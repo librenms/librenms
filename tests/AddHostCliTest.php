@@ -31,12 +31,16 @@ use Illuminate\Foundation\Testing\DatabaseTransactions;
 class AddHostCliTest extends DBTestCase
 {
     use DatabaseTransactions;
+
+    /** @var string */
     private $hostName = 'testHost';
 
-    public function testCLIsnmpV1()
+    public function testCLIsnmpV1(): void
     {
-        $result = \Artisan::call('device:add ' . $this->hostName . ' -force -ccommunity --v1');
-        $this->assertEquals(0, $result, 'command returned non zero value');
+        $this->artisan('device:add', ['device spec' => $this->hostName, '--force' => true, '-c' => 'community', '--v1' => true])
+            ->assertExitCode(0)
+            ->execute();
+
         $device = Device::findByHostname($this->hostName);
         $this->assertNotNull($device);
 
@@ -45,10 +49,12 @@ class AddHostCliTest extends DBTestCase
         $this->assertEquals('v1', $device->snmpver, 'Wrong snmp version');
     }
 
-    public function testCLIsnmpV2()
+    public function testCLIsnmpV2(): void
     {
-        $result = \Artisan::call('device:add ' . $this->hostName . ' -force -ccommunity --v2c');
-        $this->assertEquals(0, $result, 'command returned non zero value');
+        $this->artisan('device:add', ['device spec' => $this->hostName, '--force' => true, '-c' => 'community', '--v2c' => true])
+            ->assertExitCode(0)
+            ->execute();
+
         $device = Device::findByHostname($this->hostName);
         $this->assertNotNull($device);
 
@@ -57,10 +63,12 @@ class AddHostCliTest extends DBTestCase
         $this->assertEquals('v2c', $device->snmpver, 'Wrong snmp version');
     }
 
-    public function testCLIsnmpV3UserAndPW()
+    public function testCLIsnmpV3UserAndPW(): void
     {
-        $result = \Artisan::call('device:add ' . $this->hostName . ' -force -uSecName -AAuthPW -XPrivPW --v3');
-        $this->assertEquals(0, $result, 'command returned non zero value');
+        $this->artisan('device:add', ['device spec' => $this->hostName, '--force' => true, '-u' => 'SecName', '-A' => 'AuthPW', '-X' => 'PrivPW', '--v3' => true])
+        ->assertExitCode(0)
+        ->execute();
+
         $device = Device::findByHostname($this->hostName);
         $this->assertNotNull($device);
 
@@ -72,26 +80,30 @@ class AddHostCliTest extends DBTestCase
         $this->assertEquals('v3', $device->snmpver, 'Wrong snmp version');
     }
 
-    public function testPortAssociationMode()
+    public function testPortAssociationMode(): void
     {
         $modes = ['ifIndex', 'ifName', 'ifDescr', 'ifAlias'];
         foreach ($modes as $index => $mode) {
             $host = 'hostName' . $mode;
-            $result = \Artisan::call('device:add ' . $host . ' -force -p ' . $mode . ' --v1');
-            $this->assertEquals(0, $result, 'command returned non zero value');
+            $this->artisan('device:add', ['device spec' => $host, '--force' => true, '-p' => $mode, '--v1' => true])
+                ->assertExitCode(0)
+                ->execute();
+
             $device = Device::findByHostname($host);
             $this->assertNotNull($device);
             $this->assertEquals($index + 1, $device->port_association_mode, 'Wrong port association mode ' . $mode);
         }
     }
 
-    public function testSnmpTransport()
+    public function testSnmpTransport(): void
     {
         $modes = ['udp', 'udp6', 'tcp', 'tcp6'];
         foreach ($modes as $mode) {
             $host = 'hostName' . $mode;
-            $result = \Artisan::call('device:add ' . $host . ' -force -t ' . $mode . ' --v1');
-            $this->assertEquals(0, $result, 'command returned non zero value');
+            $this->artisan('device:add', ['device spec' => $host, '--force' => true, '-t' => $mode, '--v1' => true])
+                ->assertExitCode(0)
+                ->execute();
+
             $device = Device::findByHostname($host);
             $this->assertNotNull($device);
 
@@ -99,13 +111,15 @@ class AddHostCliTest extends DBTestCase
         }
     }
 
-    public function testSnmpV3AuthProtocol()
+    public function testSnmpV3AuthProtocol(): void
     {
-        $modes = ['MD5', 'SHA', 'SHA-224', 'SHA-256', 'SHA-384', 'SHA-512'];
+        $modes = \LibreNMS\SNMPCapabilities::supportedAuthAlgorithms();
         foreach ($modes as $mode) {
             $host = 'hostName' . $mode;
-            $result = \Artisan::call('device:add ' . $host . ' -force -a ' . $mode . ' --v3');
-            $this->assertEquals(0, $result, 'command returned non zero value');
+            $this->artisan('device:add', ['device spec' => $host, '--force' => true, '-a' => $mode, '--v3' => true])
+                ->assertExitCode(0)
+                ->execute();
+
             $device = Device::findByHostname($host);
             $this->assertNotNull($device);
 
@@ -113,13 +127,15 @@ class AddHostCliTest extends DBTestCase
         }
     }
 
-    public function testSnmpV3PrivacyProtocol()
+    public function testSnmpV3PrivacyProtocol(): void
     {
-        $modes = ['DES', 'AES', 'AES-192', 'AES-256', 'AES-256-C'];
+        $modes = \LibreNMS\SNMPCapabilities::supportedCryptoAlgorithms();
         foreach ($modes as $mode) {
             $host = 'hostName' . $mode;
-            $result = \Artisan::call('device:add ' . $host . ' -force -x ' . $mode . ' --v3');
-            $this->assertEquals(0, $result, 'command returned non zero value');
+            $this->artisan('device:add', ['device spec' => $host, '--force' => true, '-x' => $mode, '--v3' => true])
+                ->assertExitCode(0)
+                ->execute();
+
             $device = Device::findByHostname($host);
             $this->assertNotNull($device);
 
@@ -127,10 +143,11 @@ class AddHostCliTest extends DBTestCase
         }
     }
 
-    public function testCLIping()
+    public function testCLIping(): void
     {
-        $result = \Artisan::call('device:add ' . $this->hostName . ' -force -P -onameOfOS -whardware -sSystem --v1');
-        $this->assertEquals(0, $result, 'command returned non zero value');
+        $this->artisan('device:add', ['device spec' => $this->hostName, '--force' => true, '-P' => true, '-o' => 'nameOfOS', '-w' => 'hardware', '-s' => 'System', '--v1' => true])
+            ->assertExitCode(0)
+            ->execute();
 
         $device = Device::findByHostname($this->hostName);
         $this->assertNotNull($device);
@@ -139,5 +156,15 @@ class AddHostCliTest extends DBTestCase
         $this->assertEquals('hardware', $device->hardware, 'Wrong hardware name');
         $this->assertEquals('nameOfOS', $device->os, 'Wrong os name');
         $this->assertEquals('system', $device->sysName, 'Wrong system name');
+    }
+
+    public function testExistingDevice(): void
+    {
+        $this->artisan('device:add', ['device spec' => 'existing', '--force' => true])
+            ->assertExitCode(0)
+            ->execute();
+        $this->artisan('device:add', ['device spec' => 'existing'])
+            ->assertExitCode(3)
+            ->execute();
     }
 }

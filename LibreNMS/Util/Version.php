@@ -25,6 +25,9 @@
 
 namespace LibreNMS\Util;
 
+use DB;
+use Illuminate\Http\Client\ConnectionException;
+use Illuminate\Support\Arr;
 use LibreNMS\Config;
 use LibreNMS\DB\Eloquent;
 use Symfony\Component\Process\Process;
@@ -32,7 +35,7 @@ use Symfony\Component\Process\Process;
 class Version
 {
     // Update this on release
-    const VERSION = '22.1.0';
+    public const VERSION = '22.4.0';
 
     /**
      * @var bool
@@ -56,6 +59,50 @@ class Version
         }
 
         return self::VERSION;
+    }
+
+    /**
+     * Compiles local commit data
+     *
+     * @return array with keys sha, date, and branch
+     */
+    public function localCommit(): array
+    {
+        if ($this->is_git_install) {
+            [$local_sha, $local_date] = array_pad(explode('|', rtrim(`git show --pretty='%H|%ct' -s HEAD`)), 2, '');
+
+            return [
+                'sha' => $local_sha,
+                'date' => $local_date,
+                'branch' => rtrim(`git rev-parse --abbrev-ref HEAD`),
+            ];
+        }
+
+        return ['sha' => null, 'date' => null, 'branch' => null];
+    }
+
+    /**
+     * Fetches the remote commit from the github api if on the daily release channel
+     *
+     * @return array
+     */
+    public function remoteCommit(): array
+    {
+        if ($this->is_git_install && Config::get('update_channel') == 'master') {
+            try {
+                $github = \Http::withOptions(['proxy' => Proxy::forGuzzle()])->get(Config::get('github_api') . 'commits/master');
+
+                return $github->json();
+            } catch (ConnectionException $e) {
+            }
+        }
+
+        return [];
+    }
+
+    public function databaseServer(): string
+    {
+        return Eloquent::isConnected() ? Arr::first(DB::selectOne('select version()')) : 'Not Connected';
     }
 
     public function database(): array

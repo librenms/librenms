@@ -2,9 +2,6 @@
 
 // PDU - Phase
 $oids = snmp_walk($device, 'rPDUStatusPhaseIndex', '-OsqnU', 'PowerNet-MIB');
-if (empty($oids)) {
-    $oids = snmp_walk($device, 'rPDULoadPhaseConfigIndex', '-OsqnU', 'PowerNet-MIB');
-}
 if ($oids) {
     d_echo($oids . "\n");
     $oids = trim($oids);
@@ -47,10 +44,57 @@ if ($oids) {
     }
 }
 unset($oids);
+$oids = snmp_walk($device, 'rPDULoadStatusPhaseNumber', '-OsqnU', 'PowerNet-MIB');
+if ($oids) {
+    d_echo($oids . "\n");
+    $oids = trim($oids);
+    if ($oids) {
+        echo 'APC PowerNet-MIB Phase ';
+    }
+    $type = 'apc';
+    $precision = '10';
+    foreach (explode("\n", $oids) as $data) {
+        $data = trim($data);
+        if ($data) {
+            [$oid,$phasenum] = explode(' ', $data);
+            // If the phasenum is 0, we can ignore becuase it's bank data
+            if ($phasenum == 0) {
+                continue;
+            }
+            $split_oid = explode('.', $oid);
+            $index = $split_oid[(count($split_oid) - 1)];
+            $current_oid = '.1.3.6.1.4.1.318.1.1.12.2.3.1.1.2.' . $index;
+            // rPDULoadStatusLoad
+            $phase_oid = '.1.3.6.1.4.1.318.1.1.12.2.3.1.1.4.' . $index;
+            // rPDULoadStatusPhaseNumber
+            $limit_oid = '.1.3.6.1.4.1.318.1.1.12.2.2.1.1.4.' . $phasenum;
+            // rPDULoadPhaseConfigOverloadThreshold
+            $lowlimit_oid = '.1.3.6.1.4.1.318.1.1.12.2.2.1.1.2.' . $phasenum;
+            // rPDULoadPhaseConfigLowLoadThreshold
+            $warnlimit_oid = '.1.3.6.1.4.1.318.1.1.12.2.2.1.1.3.' . $phasenum;
+            // rPDULoadPhaseConfigNearOverloadThreshold
+            $phase = snmp_get($device, $phase_oid, '-Oqv', '');
+            $current = (snmp_get($device, $current_oid, '-Oqv', '') / $precision);
+            $limit = snmp_get($device, $limit_oid, '-Oqv', '');
+            // No / $precision here! Nice, APC!
+            $lowlimit = snmp_get($device, $lowlimit_oid, '-Oqv', '');
+            // No / $precision here! Nice, APC!
+            $warnlimit = snmp_get($device, $warnlimit_oid, '-Oqv', '');
+            // No / $precision here! Nice, APC!
+            if (count(explode("\n", $oids)) != 1) {
+                $descr = "Phase $phase";
+            } else {
+                $descr = 'Output';
+            }
+            discover_sensor($valid['sensor'], 'current', $device, $current_oid, $index, $type, $descr, '10', '1', $lowlimit, null, $warnlimit, $limit, $current);
+        }
+    }
+}
+unset($oids);
 // v2 firmware- first bank is total, v3 firmware, 3rd bank is total
 $bank_count = snmp_get($device, 'rPDULoadDevNumBanks.0', '-Oqv', 'PowerNet-MIB');
 if ($bank_count > 0) {
-    $oids = snmp_walk($device, 'rPDULoadStatusIndex', '-OsqnU', 'PowerNet-MIB');
+    $oids = snmp_walk($device, 'rPDULoadStatusBankNumber', '-OsqnU', 'PowerNet-MIB');
 }
 // should work with firmware v2 and v3
 if ($oids) {
@@ -59,39 +103,26 @@ if ($oids) {
     $oids = trim($oids);
     $type = 'apc';
     $precision = '10';
-    // version 2 does some stuff differently- total power is first oid in index instead of the last.
-    // will look something like "AOS v2.6.4 / App v2.6.5"
-    $baseversion = '3';
-    if (stristr($device['version'], 'AOS v2') == true) {
-        $baseversion = '2';
-    }
     foreach (explode("\n", $oids) as $data) {
         $data = trim($data);
         if ($data) {
-            [$oid,$kind] = explode(' ', $data);
+            [$oid,$banknum] = explode(' ', $data);
+            // If the banknum is 0, we can ignore becuase it's phase data
+            if ($banknum == 0) {
+                continue;
+            }
             $split_oid = explode('.', $oid);
             $index = $split_oid[(count($split_oid) - 1)];
-            $banknum = ($index - 1);
             $descr = 'Bank ' . $banknum;
-            if ($baseversion == '3') {
-                if ($index == '1') {
-                    $descr = 'Bank Total';
-                }
-            }
-            if ($baseversion == '2') {
-                if ($index == '1') {
-                    $descr = 'Bank Total';
-                }
-            }
             $current_oid = '.1.3.6.1.4.1.318.1.1.12.2.3.1.1.2.' . $index;
             // rPDULoadStatusLoad
             $bank_oid = '.1.3.6.1.4.1.318.1.1.12.2.3.1.1.5.' . $index;
             // rPDULoadStatusBankNumber
-            $limit_oid = '.1.3.6.1.4.1.318.1.1.12.2.4.1.1.4.' . $index;
+            $limit_oid = '.1.3.6.1.4.1.318.1.1.12.2.4.1.1.4.' . $banknum;
             // rPDULoadBankConfigOverloadThreshold
-            $lowlimit_oid = '.1.3.6.1.4.1.318.1.1.12.2.4.1.1.2.' . $index;
+            $lowlimit_oid = '.1.3.6.1.4.1.318.1.1.12.2.4.1.1.2.' . $banknum;
             // rPDULoadBankConfigLowLoadThreshold
-            $warnlimit_oid = '.1.3.6.1.4.1.318.1.1.12.2.4.1.1.3.' . $index;
+            $warnlimit_oid = '.1.3.6.1.4.1.318.1.1.12.2.4.1.1.3.' . $banknum;
             // rPDULoadBankConfigNearOverloadThreshold
             $bank = snmp_get($device, $bank_oid, '-Oqv', '');
             $current = (snmp_get($device, $current_oid, '-Oqv', '') / $precision);

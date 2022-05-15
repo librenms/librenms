@@ -15,7 +15,9 @@
                     <td>{{ trans('stp.bridge_address') }}</td>
                     <td>
                         {{ \LibreNMS\Util\Rewrite::readableMac($instance['bridgeAddress']) }}
-                        @if($brVendor = \LibreNMS\Util\Rewrite::readableOUI($instance['bridgeAddress']))
+                        @if($url = \LibreNMS\Util\Url::deviceLink(\App\Facades\DeviceCache::get(\App\Models\Stp::where('bridgeAddress', $instance['bridgeAddress'])->value('device_id'))))
+                           ({!! $url !!})
+                        @elseif($brVendor = \LibreNMS\Util\Rewrite::readableOUI($instance['bridgeAddress']))
                             ({{ $brVendor }})
                         @endif
                     </td>
@@ -40,7 +42,9 @@
                     <td>{{ trans('stp.designated_root') }}</td>
                     <td>
                         {{ \LibreNMS\Util\Rewrite::readableMac($instance['designatedRoot']) }}
-                        @if($drVendor = \LibreNMS\Util\Rewrite::readableOUI($instance['designatedRoot']))
+                        @if($url = \LibreNMS\Util\Url::deviceLink(\App\Facades\DeviceCache::get(\App\Models\Stp::where('bridgeAddress', $instance['designatedRoot'])->value('device_id'))))
+                           ({!! $url !!})
+                        @elseif($drVendor = \LibreNMS\Util\Rewrite::readableOUI($instance['designatedRoot']))
                             ({{ $drVendor }})
                         @endif
                     </td>

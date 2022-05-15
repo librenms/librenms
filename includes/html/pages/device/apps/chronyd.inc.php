@@ -19,7 +19,7 @@ while (isset($sources[$sources_ctr])) {
     $label = $source;
 
     if ($vars['source'] == $source) {
-        $label = '>>' . $source . '<<';
+        $label = '<span class="pagemenu-selected">' . $source . '</span>';
     }
 
     $sources_ctr++;
