@@ -80,7 +80,7 @@ if (! empty($insert)) {
         echo PHP_EOL;
     }
 
-    DB::table('ports_fdb')->whereIn('ports_fdb_id', $update_time_only)->update(['updated_at' => $now]);
+    DB::table('ports_fdb')->whereIntegerInRaw('ports_fdb_id', $update_time_only)->update(['updated_at' => $now]);
 
     //We do not delete anything here, as daily.sh will take care of the cleaning.
 

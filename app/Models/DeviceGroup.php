@@ -89,7 +89,7 @@ class DeviceGroup extends BaseModel
             return $query;
         }
 
-        return $query->whereIn('id', Permissions::deviceGroupsForUser($user));
+        return $query->whereIntegerInRaw('id', Permissions::deviceGroupsForUser($user));
     }
 
     public function scopeInServiceTemplate($query, $serviceTemplate)

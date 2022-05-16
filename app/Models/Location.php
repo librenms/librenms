@@ -155,7 +155,7 @@ class Location extends Model
             ->whereNotNull('location_id')
             ->pluck('location_id');
 
-        return $query->whereIn('id', $ids);
+        return $query->whereIntegerInRaw('id', $ids);
     }
 
     public function scopeInDeviceGroup($query, $deviceGroup)

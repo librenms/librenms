@@ -213,7 +213,7 @@ class User extends Authenticatable
     {
         // pseudo relation
         return Device::query()->when(! $this->hasGlobalRead(), function ($query) {
-            return $query->whereIn('device_id', Permissions::devicesForUser($this));
+            return $query->whereIntegerInRaw('device_id', Permissions::devicesForUser($this));
         });
     }
 
