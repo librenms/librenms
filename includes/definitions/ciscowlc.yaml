@@ -32,3 +32,4 @@ discovery:
     -
         sysDescr:
             - 'Cisco Controller'
+            - 'Cisco Business Wireless'
