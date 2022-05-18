@@ -4,6 +4,12 @@ modules:
         version: RUGGEDCOM-SYS-INFO-MIB::rcDeviceInfoMainSwVersion.0
         serial: RUGGEDCOM-SYS-INFO-MIB::rcDeviceInfoSerialNumber.0
         sysDescr_regex: '/(?<hardware>.*?)-/'
+    processors:
+          data:
+              -
+                  oid: rcDeviceStsCpuUsagePercent
+                  num_oid: '.1.3.6.1.4.1.15004.4.2.2.6.{{ $index }}'
+                  type: pulse
     sensors:
         state:
             data:
