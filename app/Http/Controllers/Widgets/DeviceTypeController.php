@@ -29,18 +29,10 @@ use App\Models\Device;
 use Illuminate\Http\Request;
 use LibreNMS\Config;
 use LibreNMS\DB\Eloquent;
-# use LibreNMS\Util\ObjectCache;
 
 class DeviceTypeController extends WidgetController
 {
     protected $title = 'Device Types';
-
-    /*
-     * Zeilen für die Location + Summary als "Location"
-     * eleganterer Weg für die Sortorder
-     * nutze ObjectCache
-     *
-    */
 
     public function __construct()
     {
@@ -70,28 +62,29 @@ class DeviceTypeController extends WidgetController
 
         $count = 0;
         foreach (\LibreNMS\Config::get('device_types') as $device_type) {
-                $count++;
-                $device_types[] = [
-                    'type' => $device_type['type'],
-                    'count' => $counts->get($device_type['type'], 0),
-                    'visible' => $top->has($device_type['type']) || (!$data['top_device_group_count'] || $count < $data['top_device_group_count']),
-                ];
+            $count++;
+            $device_types[] = [
+                'type' => $device_type['type'],
+                'count' => $counts->get($device_type['type'], 0),
+                'visible' => $top->has($device_type['type']) || (!$data['top_device_group_count'] || $count < $data['top_device_group_count']),
+            ];
         }
 
         if ($data['sort_order'] == 'name') {
             usort($device_types, function ($item1, $item2) {
-                    return $item1['type'] <=> $item2['type'];
+                return $item1['type'] <=> $item2['type'];
             });
         } else {
             usort($device_types, function ($item1, $item2) {
-                    return $item2['count'] <=> $item1['count'];
+                return $item2['count'] <=> $item1['count'];
             });
-        };
+        }
 
         $data['device_types'] = $device_types;
 
         return $data;
     }
+
     /**
      * @param  Request  $request
      * @return View
