@@ -41,6 +41,8 @@ class CheckParameter
     public $exclusive_group;
     /** @var string[] */
     public $inclusive_group;
+    /** @var bool */
+    public $default = false;
 
     /**
      * Create a new check parameter
@@ -112,8 +114,16 @@ class CheckParameter
             'value' => htmlentities($this->value),
             'description' => htmlentities($this->description),
             'required' => $this->required,
+            'default' => $this->default,
             'exclusive_group' => isset($this->exclusive_group) ? array_map('htmlentities', $this->exclusive_group) : null,
             'inclusive_group' => isset($this->inclusive_group) ? array_map('htmlentities', $this->inclusive_group) : null,
         ];
+    }
+
+    public function setHasDefault(): CheckParameter
+    {
+        $this->default = true;
+
+        return $this;
     }
 }

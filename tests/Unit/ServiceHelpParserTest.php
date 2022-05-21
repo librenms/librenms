@@ -26,7 +26,7 @@ class ServiceHelpParserTest extends TestCase
 
         $this->assertCount(count($expected), $actual);
 
-        $actual = collect($actual)->keyBy('short');
+        $actual = $actual->keyBy('short');
         /** @var CheckParameter $check_parameter */
         foreach ($expected as $check_parameter) {
             $this->assertEquals($check_parameter, $actual->get($check_parameter->short));

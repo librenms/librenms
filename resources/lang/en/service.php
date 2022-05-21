@@ -20,9 +20,6 @@ return [
     'state_warning' => 'Warning',
     'state_critical' => 'Critical',
     'graph' => 'Data Set: :ds',
-    'defaults' => [
-        'hostname' => 'This Device'
-    ],
     'fields' => [
         'device_id' => 'Device',
         'service_changed' => 'Last Changed',
@@ -35,10 +32,22 @@ return [
         'service_param' => 'Parameters',
         'service_type' => 'Type',
     ],
+    'defaults' => [
+        '-H' => [
+            'description' => 'Remote Host',
+            'default' => 'This Device',
+        ],
+    ],
     'check_params' => [
         'dns' => [
-            'hostname' => 'The name or address you want to query',
-            'server' => 'Optional DNS server you want to use for the lookup',
+            '-H' => [
+                'description' => 'Hostname',
+                'default' => 'localhost',
+            ],
+            '-s' => [
+                'description' => 'Server',
+                'default' => 'This Device',
+            ],
         ]
     ],
 ];

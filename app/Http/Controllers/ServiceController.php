@@ -169,8 +169,8 @@ class ServiceController extends Controller
 
         $check = Services::makeCheck(new Service(['service_type' => $type]));
 
-        $parameters = $check->availableParameters();
-        $keyed = collect($parameters)->keyBy('short');
+        $parameters = $check->availableParameters()->keyBy('short');
+
         foreach ($parameters as $parameter) {
             $rules = [];
             $param = $parameter->param ?: $parameter->short;
@@ -178,13 +178,13 @@ class ServiceController extends Controller
             if ($parameter->required) {
                 $rules[] = 'required';
             } elseif ($parameter->inclusive_group) {
-                $rules[] = 'required_with:' . implode(',', $keyed->only($parameter->inclusive_group)->map(function (CheckParameter $param) {
+                $rules[] = 'required_with:' . implode(',', $parameters->only($parameter->inclusive_group)->map(function (CheckParameter $param) {
                         return 'service_param.' . $param->param ?: $param->short;
                     })->all());
             }
 
             if ($parameter->exclusive_group) {
-                $rules[] = 'exclude_with:' . implode(',', $keyed->only($parameter->inclusive_group)->map(function (CheckParameter $param) {
+                $rules[] = 'exclude_with:' . implode(',', $parameters->only($parameter->inclusive_group)->map(function (CheckParameter $param) {
                         return 'service_param.' . $param->param ?: $param->short;
                     })->all());
             }

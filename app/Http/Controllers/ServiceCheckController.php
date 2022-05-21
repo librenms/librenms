@@ -18,8 +18,8 @@ class ServiceCheckController extends Controller
         $service = new Service(['service_type' => $type]);
         $check = Services::makeCheck($service);
 
-        return response()->json(array_map(function (Services\CheckParameter $param) {
+        return response()->json($check->availableParameters()->map(function (Services\CheckParameter $param) {
             return $param->toEscapedArray();
-        }, $check->availableParameters()));
+        })->values());
     }
 }

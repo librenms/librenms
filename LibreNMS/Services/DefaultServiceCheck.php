@@ -26,6 +26,7 @@
 namespace LibreNMS\Services;
 
 use App\Models\Service;
+use Illuminate\Support\Collection;
 use LibreNMS\Config;
 use LibreNMS\Data\Store\Rrd;
 
@@ -74,13 +75,19 @@ class DefaultServiceCheck implements \LibreNMS\Interfaces\ServiceCheck
     /**
      * Get the available check parameters.
      *
-     * @return \LibreNMS\Services\CheckParameter[]
+     * @return \Illuminate\Support\Collection<\LibreNMS\Services\CheckParameter>
      */
-    public function availableParameters(): array
+    public function availableParameters(): Collection
     {
         $parser = new HelpParser();
 
-        return array_values($parser->parse('check_' . $this->service->service_type));
+        $checkParameters = $parser->parse('check_' . $this->service->service_type);
+
+        // set hostname has default if it exists
+        $checkParameters->get('-H', new CheckParameter('', '', ''))
+            ->setHasDefault()->setRequired(false);
+
+        return $checkParameters;
     }
 
     /**

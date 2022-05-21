@@ -26,6 +26,7 @@
 namespace LibreNMS\Interfaces;
 
 use App\Models\Service;
+use Illuminate\Support\Collection;
 
 interface ServiceCheck
 {
@@ -57,9 +58,9 @@ interface ServiceCheck
     /**
      * Get the available check parameters.
      *
-     * @return \LibreNMS\Services\CheckParameter[]
+     * @return \Illuminate\Support\Collection<\LibreNMS\Services\CheckParameter>
      */
-    public function availableParameters(): array;
+    public function availableParameters(): Collection;
 
     /**
      * Mark parameters that have defaults with descriptions

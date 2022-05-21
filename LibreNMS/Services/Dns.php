@@ -25,14 +25,20 @@
 
 namespace LibreNMS\Services;
 
+use Illuminate\Support\Collection;
+
 class Dns extends DefaultServiceCheck
 {
-    public function hasDefaults(): array
+    /**
+     * @inerhitDoc
+     */
+    public function availableParameters(): Collection
     {
-        return [
-            '-H' => trans('service.check_params.dns.hostname'),
-            '--server' => trans('service.check_params.dns.server'),
-        ];
+        $checkParameters = parent::availableParameters();
+
+        $checkParameters->get('-s')->setHasDefault()->setRequired(false);
+
+        return $checkParameters;
     }
 
     public function getDefault(string $flag): string

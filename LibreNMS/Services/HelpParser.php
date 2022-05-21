@@ -31,14 +31,19 @@ use Symfony\Component\Process\Process;
 
 class HelpParser
 {
-    /** @var \LibreNMS\Services\CheckParameter[] */
-    private $params = [];
+    /** @var \Illuminate\Support\Collection<\LibreNMS\Services\CheckParameter> */
+    private $params;
+
+    public function __construct()
+    {
+        $this->params = new Collection;
+    }
 
     /**
      * @param  string  $check
-     * @return \LibreNMS\Services\CheckParameter[]
+     * @return \Illuminate\Support\Collection<\LibreNMS\Services\CheckParameter>
      */
-    public function parse(string $check): array
+    public function parse(string $check): Collection
     {
         foreach (explode("\n", $this->fetchHelp($check)) as $line) {
             // parse usage section, includes optional/required information
@@ -138,12 +143,16 @@ class HelpParser
     private function setParameter(CheckParameter $param): void
     {
         $key = $param->short ?: $param->param;
-        if (isset($this->params[$key])) {
-            foreach (['short', 'param', 'value', 'description', 'required', 'inclusive_group', 'exclusive_group'] as $field) {
-                $this->params[$key]->$field = $param->$field ?: $this->params[$key]->$field;
+
+        // if existing, update fields.
+        if ($current_param = $this->params->get($key)) {
+            foreach (['short', 'param', 'value', 'description', 'required', 'inclusive_group', 'exclusive_group', 'default'] as $field) {
+                $current_param->$field = $param->$field ?? $current_param->$field;
             }
-        } else {
-            $this->params[$key] = $param;
+
+            return;
         }
+
+        $this->params->put($key, $param);
     }
 }
