@@ -66,7 +66,7 @@ class DeviceTypeController extends WidgetController
             $device_types[] = [
                 'type' => $device_type['type'],
                 'count' => $counts->get($device_type['type'], 0),
-                'visible' => $top->has($device_type['type']) || (!$data['top_device_group_count'] || $count < $data['top_device_group_count']),
+                'visible' => $top->has($device_type['type']) || (! $data['top_device_group_count'] || $count < $data['top_device_group_count']),
             ];
         }
 
