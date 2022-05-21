@@ -578,6 +578,13 @@
             "order": 0,
             "type": "text"
         },
+        "auth_ldap_require_groupmembership": {
+            "default": true,
+            "group": "auth",
+            "section": "ldap",
+            "order": 4,
+            "type": "boolean"
+        },
         "auth_ldap_starttls": {
             "default": "disabled",
             "group": "auth",
