@@ -44,16 +44,7 @@ class LocationController extends TableController
 
     protected function sortFields($request)
     {
-        $device_types = [];
-        foreach (\LibreNMS\Config::get('device_types') as $device_type) {
-            $device_types[] = $device_type['type'];
-        }
-
-        $sort_fields = ['location', 'devices'];
-        $sort_fields = array_merge($sort_fields, $device_types);
-        $sort_fields[] = 'down';
-
-        return $sort_fields;
+        return ['location', 'devices', 'down'];
     }
 
     /**
@@ -85,7 +76,7 @@ class LocationController extends TableController
      */
     public function formatItem($location)
     {
-        $data = [
+        return [
             'id' => $location->id,
             'location' => $location->location,
             'lat' => $location->lat,
@@ -93,24 +84,10 @@ class LocationController extends TableController
             'down' => $location->devices()->isDown()->count(),
             'devices' => $location->devices()->count(),
         ];
-        foreach (\LibreNMS\Config::get('device_types') as $device_type) {
-            $data[$device_type['type']] = $location->devices()->where('type', $device_type['type'])->count();
-        }
-
-        return $data;
     }
 
     private function getJoinQuery($field)
     {
-        foreach (\LibreNMS\Config::get('device_types') as $device_type) {
-            if ($field == $device_type['type']) {
-                return function ($query, $field) {
-                    $query->on('devices.location_id', 'locations.id')
-                        ->where('devices.type', $field);
-                };
-            }
-        }
-
         switch ($field) {
             case 'devices':
                 return function ($query) {

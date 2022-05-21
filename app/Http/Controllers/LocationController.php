@@ -2,11 +2,9 @@
 
 namespace App\Http\Controllers;
 
-use App\Models\Device;
 use App\Models\Location;
 use Illuminate\Http\Request;
 use LibreNMS\Config;
-use LibreNMS\DB\Eloquent;
 use LibreNMS\Util\Html;
 
 class LocationController extends Controller
@@ -28,9 +26,6 @@ class LocationController extends Controller
             'legend' => 'no',
             'id' => '{{id}}',
         ];
-
-        $data['device_types'] = $this->device_types();
-
         foreach (Html::graphRow($graph_array) as $graph) {
             $data['graph_template'] .= "<div class='col-md-3'>";
             $data['graph_template'] .= str_replace('%7B%7Bid%7D%7D', '{{id}}', $graph); // restore handlebars
@@ -38,29 +33,6 @@ class LocationController extends Controller
         }
 
         return view('locations', $data);
-    }
-
-    private function device_types(): array
-    {
-        $device_types = [];
-
-        $counts = Device::groupBy('type')->select('type', Eloquent::DB()->raw('COUNT(*) as total'))->orderByDesc('total')->pluck('total', 'type');
-        // only top n columns visible by default, or show all present device_types
-        $top = $counts->take(\LibreNMS\Config::get('top_device_types') ?: count(\LibreNMS\Config::get('device_types')));
-
-        foreach (\LibreNMS\Config::get('device_types') as $device_type) {
-            $device_types[] = [
-                'type' => $device_type['type'],
-                'count' => $counts->get($device_type['type'], 0),
-                'visible' => $top->has($device_type['type']),
-            ];
-        }
-
-        usort($device_types, function ($item1, $item2) {
-            return $item1['type'] <=> $item2['type'];
-        });
-
-        return $device_types;
     }
 
     /**
