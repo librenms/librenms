@@ -1,3 +1,107 @@
+## 22.5.0
+*(2022-05-21)*
+
+A big thank you to the following 23 contributors this last month:
+
+  - [murrant](https://github.com/murrant) (7)
+  - [VVelox](https://github.com/VVelox) (6)
+  - [slimey99uk](https://github.com/slimey99uk) (2)
+  - [dependabot](https://github.com/apps/dependabot) (2)
+  - [Npeca75](https://github.com/Npeca75) (2)
+  - [nox-x](https://github.com/nox-x) (1)
+  - [nsn-amagruder](https://github.com/nsn-amagruder) (1)
+  - [mkuurstra](https://github.com/mkuurstra) (1)
+  - [booth-f](https://github.com/booth-f) (1)
+  - [sajiby3k](https://github.com/sajiby3k) (1)
+  - [skandragon](https://github.com/skandragon) (1)
+  - [Martin22](https://github.com/Martin22) (1)
+  - [twelch24](https://github.com/twelch24) (1)
+  - [ppasserini](https://github.com/ppasserini) (1)
+  - [bl3nd3r](https://github.com/bl3nd3r) (1)
+  - [SantiagoSilvaZ](https://github.com/SantiagoSilvaZ) (1)
+  - [Jimmy-Cl](https://github.com/Jimmy-Cl) (1)
+  - [lfkeitel](https://github.com/lfkeitel) (1)
+  - [steffann](https://github.com/steffann) (1)
+  - [micko](https://github.com/micko) (1)
+  - [IVI053](https://github.com/IVI053) (1)
+  - [pfromme25](https://github.com/pfromme25) (1)
+  - [mzacchi](https://github.com/mzacchi) (1)
+
+Thanks to maintainers and others that helped with pull requests this month:
+
+  - [Jellyfrog](https://github.com/Jellyfrog) (19)
+  - [murrant](https://github.com/murrant) (16)
+  - [ottorei](https://github.com/ottorei) (3)
+  - [mpikzink](https://github.com/mpikzink) (1)
+
+#### Feature
+* Allow unordered OIDs (global and per-os) ([#13923](https://github.com/librenms/librenms/pull/13923)) - [murrant](https://github.com/murrant)
+* Added --ping-only to snmp-scan.py ([#13810](https://github.com/librenms/librenms/pull/13810)) - [IVI053](https://github.com/IVI053)
+
+#### Device
+* Add Cisco Business Wirless to ciscowlc.yaml ([#13984](https://github.com/librenms/librenms/pull/13984)) - [nsn-amagruder](https://github.com/nsn-amagruder)
+* Add Eaton SC200 OS model ([#13978](https://github.com/librenms/librenms/pull/13978)) - [slimey99uk](https://github.com/slimey99uk)
+* Fortigate LTE sensor addition ([#13977](https://github.com/librenms/librenms/pull/13977)) - [slimey99uk](https://github.com/slimey99uk)
+* Added BKE power supply support. ([#13972](https://github.com/librenms/librenms/pull/13972)) - [Martin22](https://github.com/Martin22)
+* Don't use bulk-walk for PrimeKey Appliances ([#13958](https://github.com/librenms/librenms/pull/13958)) - [bl3nd3r](https://github.com/bl3nd3r)
+* Fix avtech12e sensors ([#13943](https://github.com/librenms/librenms/pull/13943)) - [lfkeitel](https://github.com/lfkeitel)
+* [mikrotik] fixed RouterOS ipv4/ipv6 routes ([#13902](https://github.com/librenms/librenms/pull/13902)) - [Npeca75](https://github.com/Npeca75)
+* Netscaler new counter metrics ([#13323](https://github.com/librenms/librenms/pull/13323)) - [mzacchi](https://github.com/mzacchi)
+
+#### Webui
+* Update dark mode to fix BGP and Peering page ([#13951](https://github.com/librenms/librenms/pull/13951)) - [Jimmy-Cl](https://github.com/Jimmy-Cl)
+* Fix snmp.timeout setting via Web UI ([#13937](https://github.com/librenms/librenms/pull/13937)) - [murrant](https://github.com/murrant)
+
+#### Alerting
+* More realistic alert test data ([#13969](https://github.com/librenms/librenms/pull/13969)) - [murrant](https://github.com/murrant)
+
+#### Graphs
+* [RRD] fix IPv6 folder name ([#13945](https://github.com/librenms/librenms/pull/13945)) - [Npeca75](https://github.com/Npeca75)
+
+#### Applications
+* Remove alert keys from component for Suricata ([#13959](https://github.com/librenms/librenms/pull/13959)) - [VVelox](https://github.com/VVelox)
+* Fix a few issues with variable names for Suricata ([#13956](https://github.com/librenms/librenms/pull/13956)) - [VVelox](https://github.com/VVelox)
+* Scripts/json-app-tool.php JSON generation fix and add -S for SNMP extend name ([#13948](https://github.com/librenms/librenms/pull/13948)) - [VVelox](https://github.com/VVelox)
+* Add Suricata monitoring ([#13942](https://github.com/librenms/librenms/pull/13942)) - [VVelox](https://github.com/VVelox)
+
+#### Discovery
+* Fix polling and discovery of FortiGate cluster sensors ([#13980](https://github.com/librenms/librenms/pull/13980)) - [mkuurstra](https://github.com/mkuurstra)
+
+#### Oxidized
+* Oxidized API to return groups based on device purpose or notes ([#13976](https://github.com/librenms/librenms/pull/13976)) - [sajiby3k](https://github.com/sajiby3k)
+
+#### Authentication
+* Auth_ldap_skip_group_check when ldap_compare is not supported ([#13926](https://github.com/librenms/librenms/pull/13926)) - [micko](https://github.com/micko)
+* Add LDAP bind and userlist filter support to ldap-authorization ([#13788](https://github.com/librenms/librenms/pull/13788)) - [pfromme25](https://github.com/pfromme25)
+
+#### Bug
+* Inconsistency in ldap starttls config parameter ([#13987](https://github.com/librenms/librenms/pull/13987)) - [nox-x](https://github.com/nox-x)
+* Fix version check error ([#13981](https://github.com/librenms/librenms/pull/13981)) - [murrant](https://github.com/murrant)
+* Use full sudo path ([#13975](https://github.com/librenms/librenms/pull/13975)) - [skandragon](https://github.com/skandragon)
+* Fix IPv6 in service check host ([#13939](https://github.com/librenms/librenms/pull/13939)) - [steffann](https://github.com/steffann)
+
+#### Refactor
+* Improve the efficiency of some queries ([#13974](https://github.com/librenms/librenms/pull/13974)) - [murrant](https://github.com/murrant)
+* Move Config loading to a service provider ([#13927](https://github.com/librenms/librenms/pull/13927)) - [murrant](https://github.com/murrant)
+
+#### Documentation
+* Fix typo in dispatcher service doc ([#13979](https://github.com/librenms/librenms/pull/13979)) - [booth-f](https://github.com/booth-f)
+* Fix  a typo in alerting doc ([#13970](https://github.com/librenms/librenms/pull/13970)) - [twelch24](https://github.com/twelch24)
+* DOCS, switch to dark or light mode ([#13953](https://github.com/librenms/librenms/pull/13953)) - [SantiagoSilvaZ](https://github.com/SantiagoSilvaZ)
+* Assorted cleanups to alerting docs, primarily to make mdl happier ([#13950](https://github.com/librenms/librenms/pull/13950)) - [VVelox](https://github.com/VVelox)
+* Update test doc making it more mdl happy and add a section on writing JSON app tests ([#13949](https://github.com/librenms/librenms/pull/13949)) - [VVelox](https://github.com/VVelox)
+
+#### Translation
+* Small Italian lang update ([#13960](https://github.com/librenms/librenms/pull/13960)) - [ppasserini](https://github.com/ppasserini)
+
+#### Misc
+* Improve lnms shortcut validation ([#13982](https://github.com/librenms/librenms/pull/13982)) - [murrant](https://github.com/murrant)
+
+#### Dependencies
+* Bump async from 2.6.3 to 2.6.4 ([#13947](https://github.com/librenms/librenms/pull/13947)) - [dependabot](https://github.com/apps/dependabot)
+* Bump composer/composer from 2.2.4 to 2.3.5 ([#13944](https://github.com/librenms/librenms/pull/13944)) - [dependabot](https://github.com/apps/dependabot)
+
+
 ## 22.4.0
 *(2022-04-21)*
 
