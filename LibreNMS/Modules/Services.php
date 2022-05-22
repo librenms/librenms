@@ -30,6 +30,7 @@ use App\Models\Device;
 use App\Models\Service;
 use App\Observers\ModuleModelObserver;
 use LibreNMS\Config;
+use LibreNMS\Enum\CheckStatus;
 use LibreNMS\Interfaces\Module;
 use LibreNMS\OS;
 use LibreNMS\RRD\RrdDefinition;
@@ -103,11 +104,11 @@ class Services implements Module
                 continue;
             }
 
-            Log::info("Nagios Service $service->service_type ($service->service_id)");
             $response = $this->checkService($service);
             $service->service_message = $response->message;
             $service->service_status = $response->result;
-            Log::debug("Service Response: $response->message");
+
+            $this->printService($service);
 
             // If we have performance data we will store it.
             if (! empty ($response->metrics)) {
@@ -167,5 +168,25 @@ class Services implements Module
         }
 
         return false;
+    }
+
+    private function printService(Service $service)
+    {
+        switch ($service->service_status) {
+            case CheckStatus::OK:
+                $status_text = '%G' . trans('service.state_ok') . '%n';
+                break;
+            case CheckStatus::WARNING:
+                $status_text = '%Y' . trans('service.state_warning') . '%n';
+                break;
+            case CheckStatus::CRITICAL:
+                $status_text = '%R' . trans('service.state_critical') . '%n';
+                break;
+            default:
+                $status_text = '%W' . trans('service.state_unknown') . '%n';
+        }
+
+        Log::info("Nagios Service $service->service_type ($service->service_id): " . $status_text, ['color' => true]);
+        Log::debug("Service Response: $service->service_message");
     }
 }

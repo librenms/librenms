@@ -19,6 +19,7 @@ return [
     'state_ok' => 'Ok',
     'state_warning' => 'Warning',
     'state_critical' => 'Critical',
+    'state_unknown' => 'Unknown',
     'graph' => 'Data Set: :ds',
     'fields' => [
         'device_id' => 'Device',
