@@ -34,7 +34,8 @@ class AristaMos extends OS implements OSDiscovery
      */
     public function discoverOS(Device $device): void
     {
-        if (preg_match('/^Metamako MOS release ([.0-9]+) .*? running on a (.*)$/', $device->sysDescr, $attrs) !== false) {
+	if (preg_match('/^Metamako MOS release ([.0-9]+) .*? running on a (.*)$/', $device->sysDescr, $attrs) !== false) {
+            $device->serial = snmp_get($this->getDeviceArray(), 'snmpSetSerialNo.0', '-Oqv');
             $device->version = $attrs[1];
             $device->hardware = $attrs[2];
         }

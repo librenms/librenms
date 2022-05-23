@@ -8,34 +8,17 @@
                     "sysDescr": "Metamako MOS release 0.16.5 \\\\(build mos-0.16+287\\\\) running on a MetaMux 48 with C-Series",
                     "sysContact": "<private>",
                     "version": "0.16.5",
-                    "hardware": null,
+                    "hardware": "MetaMux 48 with C-Series",
                     "features": null,
-                    "location": "<private>",
                     "os": "arista-mos",
                     "type": "network",
                     "serial": null,
-                    "icon": "arista.svg"
+                    "icon": "arista.svg",
+                    "location": "<private>"
                 }
             ]
         },
-        "poller": {
-            "devices": [
-                {
-                    "sysName": "<private>",
-                    "sysObjectID": ".1.3.6.1.4.1.43191.1.6.7",
-                    "sysDescr": "Metamako MOS release 0.16.5 \\\\(build mos-0.16+287\\\\) running on a MetaMux 48 with C-Series",
-                    "sysContact": "<private>",
-                    "version": "0.16.5",
-                    "hardware": "MetaMux 48 with C-Series",
-                    "features": null,
-                    "location": "<private>",
-                    "os": "arista-mos",
-                    "type": "network",
-                    "serial": null,
-                    "icon": "arista.svg"
-                }
-            ]
-        }
+        "poller": "matches discovery"
     },
     "ports": {
         "discovery": {
