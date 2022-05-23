@@ -177,6 +177,7 @@ return [
         ],
         'starting' => 'Starting service polling run:',
         'polled' => 'services:poll :timestamp - :count services polled in :duration secs',
+        'module_enabled' => 'Refusing to run to prevent double polling, poller module is enabled. Use lnms device:poll -m services instead.',
     ],
     'smokeping:generate' => [
         'args-nonsense' => 'Use one of --probes and --targets',

@@ -36,6 +36,11 @@ class ServicesPoll extends LnmsCommand
     {
         $this->configureOutputOptions();
 
+        if (Config::get('poller_modules.services')) {
+            $this->warn(trans('commands.services:poll.module_enabled'));
+            return 0;
+        }
+
         if ($this->option('no-data')) {
             Config::set('rrd.enable', false);
             Config::set('influxdb.enable', false);
