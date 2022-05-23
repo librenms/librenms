@@ -36,6 +36,7 @@ use LibreNMS\OS;
 use LibreNMS\RRD\RrdDefinition;
 use LibreNMS\Services\ServiceCheckResponse;
 use Log;
+use SnmpQuery;
 use Symfony\Component\Process\Process;
 
 class Services implements Module
@@ -60,7 +61,7 @@ class Services implements Module
 
             ModuleModelObserver::observe(Service::class);
             // Services
-            $services = \SnmpQuery::enumStrings()->walk('TCP-MIB::tcpConnState')->mapTable(function ($data, $localAddress, $localPort) use ($os, $known_services) {
+            SnmpQuery::enumStrings()->walk('TCP-MIB::tcpConnState')->mapTable(function ($data, $localAddress, $localPort) use ($os, $known_services) {
                 if ($data['TCP-MIB::tcpConnState'] == 'listen' && $localAddress == '0.0.0.0') {
                     if (isset($known_services[$localPort])) {
                         $service = $known_services[$localPort];
@@ -90,7 +91,7 @@ class Services implements Module
         }
     }
 
-    public function poll(OS $os)
+    public function poll(OS $os): int
     {
         $count = 0;
         $device = $os->getDevice();
@@ -110,28 +111,7 @@ class Services implements Module
 
             $this->printService($service);
 
-            // If we have performance data we will store it.
-            if (! empty ($response->metrics)) {
-                $service->service_ds = array_map(function ($metric) { return $metric['uom']; }, $response->metrics);
-                Log::debug('Service DS: ' . json_encode($service->service_ds));
-
-                $rrd_def = new RrdDefinition();
-                $fields = [];
-                foreach ($response->metrics as $key => $data) {
-                    // c = counter type (exclude uptime)
-                    $ds_type = ($data['uom'] == 'c') && ! (preg_match('/[Uu]ptime/', $key)) ? 'COUNTER' : 'GAUGE';
-                    $rrd_def->addDataset($key, $ds_type, 0);
-
-                    // prep update data
-                    $fields[$key] = $data['value'];
-                }
-
-                app('Datastore')->put($os->getDeviceArray(), 'services', [
-                    'service_id' => $service->service_id,
-                    'rrd_name' => ['services', $service->service_id],
-                    'rrd_def' => $rrd_def,
-                ], $fields);
-            }
+            $this->saveMetrics($response->metrics, $service, $os);
 
             $service->save(); // save if changed
             $count++;
@@ -188,5 +168,33 @@ class Services implements Module
 
         Log::info("Nagios Service $service->service_type ($service->service_id): " . $status_text, ['color' => true]);
         Log::debug("Service Response: $service->service_message");
+    }
+
+    private function saveMetrics(array $metrics, Service $service, OS $os): void
+    {
+        // If we have performance data we will store it.
+        if (! empty ($metrics)) {
+            $service->service_ds = array_map(function ($metric) {
+                return $metric['uom'];
+            }, $metrics);
+            Log::debug('Service DS: ' . json_encode($service->service_ds));
+
+            $rrd_def = new RrdDefinition();
+            $fields = [];
+            foreach ($metrics as $key => $data) {
+                // c = counter type (exclude uptime)
+                $ds_type = ($data['uom'] == 'c') && ! (preg_match('/[Uu]ptime/', $key)) ? 'COUNTER' : 'GAUGE';
+                $rrd_def->addDataset($key, $ds_type, 0);
+
+                // prep update data
+                $fields[$key] = $data['value'];
+            }
+
+            app('Datastore')->put($os->getDeviceArray(), 'services', [
+                'service_id' => $service->service_id,
+                'rrd_name' => ['services', $service->service_id],
+                'rrd_def' => $rrd_def,
+            ], $fields);
+        }
     }
 }
