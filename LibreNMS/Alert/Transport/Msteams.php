@@ -35,6 +35,7 @@ class Msteams extends Transport
             'title' => $obj['title'],
             'themeColor' => self::getColorForState($obj['state']),
             'text' => strip_tags($obj['msg'], '<strong><em><h1><h2><h3><strike><ul><ol><li><pre><blockquote><a><img><p>'),
+            'summary' => $obj['title'],
         ];
         $curl = curl_init();
         Proxy::applyToCurl($curl);
