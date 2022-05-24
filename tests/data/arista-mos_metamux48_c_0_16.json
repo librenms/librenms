@@ -31871,17 +31871,5 @@
                 }
             ]
         }
-    },
-    "bgp-peers": {
-        "discovery": {
-            "devices": [
-                {
-                    "bgpLocalAs": null
-                }
-            ],
-            "bgpPeers": [],
-            "bgpPeers_cbgp": []
-        },
-        "poller": "matches discovery"
     }
 }
