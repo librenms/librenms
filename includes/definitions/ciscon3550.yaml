@@ -1,11 +1,11 @@
-os: exablaze-fusion
-text: 'Exablaze Fusion'
+os: ciscon3550
+text: 'Cisco Nexus 3550 Series'
 type: network
-icon: exablaze
+icon: cisco.svg
 discovery:
     - sysObjectID:
         - .1.3.6.1.4.1.43296.
-mib_dir: exablaze
+mib_dir: ciscon3550
 poller_modules:
     ipmi: false
     processors: false

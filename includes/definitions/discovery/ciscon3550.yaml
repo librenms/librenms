@@ -1,5 +1,9 @@
 mib: EXALINK-FUSION-MIB
 modules:
+    os:
+        version_template: '{{ fusionInfoVersion }} {{ fusionInfoSoftware }}'
+        hardware: fusionInfoBoard
+        serial: fusionInfoSerial
     sensors:
         power:
             data:
