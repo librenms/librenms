@@ -1,4 +1,5 @@
 <?php
+
 return [
     'alerts' => [
         'title' => 'Alerts',
@@ -16,7 +17,7 @@ return [
         'title' => 'Component Status',
     ],
     'device-summary-horiz' => [
-        'title' => 'Device Summary Horizontal'
+        'title' => 'Device Summary Horizontal',
     ],
     'device-summary-vert' => [
         'title' => 'Device Summary Vertical',

@@ -69,15 +69,14 @@ class DashboardWidgetController extends Controller
         $this->authorize('update', $dashboard);
 
         $validated = $this->getValidationFactory()->make(
-            json_decode($request->get('data', '[]'), true)
-        , [
-            '*' => 'array',
-            '*.id' => 'integer',
-            '*.col' => 'integer',
-            '*.row' => 'integer',
-            '*.size_x' => 'integer',
-            '*.size_y' => 'integer',
-        ])->validate();
+            json_decode($request->get('data', '[]'), true), [
+                '*' => 'array',
+                '*.id' => 'integer',
+                '*.col' => 'integer',
+                '*.row' => 'integer',
+                '*.size_x' => 'integer',
+                '*.size_y' => 'integer',
+            ])->validate();
 
         foreach ($validated as $item) {
             if ($widget = UserWidget::find($item['id'])) {
@@ -91,5 +90,4 @@ class DashboardWidgetController extends Controller
             'message' => 'Widgets updated',
         ]);
     }
-
 }

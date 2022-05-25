@@ -147,7 +147,7 @@ class DashboardController extends Controller
                     'size_x' => 6,
                     'size_y' => 2,
                     'refresh' => 60,
-                ]
+                ],
             ];
         }
 
@@ -223,7 +223,7 @@ class DashboardController extends Controller
     public function copy(Request $request, Dashboard $dashboard): JsonResponse
     {
         $this->validate($request, [
-            'target_user_id' => 'required|exists:App\Models\User,user_id'
+            'target_user_id' => 'required|exists:App\Models\User,user_id',
         ]);
 
         $target_user_id = $request->get('target_user_id');

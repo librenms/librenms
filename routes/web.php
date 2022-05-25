@@ -75,7 +75,6 @@ Route::group(['middleware' => ['auth'], 'guard' => 'auth'], function () {
     Route::delete('dashboard/widgets/{widget}', 'DashboardWidgetController@remove')->name('dashboard.widget.remove');
     Route::put('dashboard/widgets/{widget}', 'WidgetSettingsController@update')->name('dashboard.widget.settings');
 
-
     // Push notifications
     Route::group(['prefix' => 'push'], function () {
         Route::get('token', [\App\Http\Controllers\PushNotificationController::class, 'token'])->name('push.token');
