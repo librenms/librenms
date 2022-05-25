@@ -23,7 +23,7 @@
                     @forelse ($user_dashboards as $dash)
                         @if($dash->dashboard_id != $dashboard->dashboard_id)
                         <li>
-                            <a href="{{ url("?dashboard=$dash->dashboard_id") }}">{{ $dash->dashboard_name }}</a>
+                            <a href="{{ route('dashboard.show', $dash->dashboard_id) }}">{{ $dash->dashboard_name }}</a>
                         </li>
                         @endif
                     @empty
@@ -36,7 +36,7 @@
                         @foreach ($shared_dashboards as $dash)
                             @if($dash->dashboard_id != $dashboard->dashboard_id)
                             <li>
-                                <a href="{{ url("?dashboard=$dash->dashboard_id") }}">
+                                <a href="{{ route('dashboard.show', $dash->dashboard_id) }}">
                                 {{ ($dash->user->username ?? __('Deleted User')) . ':' . $dash->dashboard_name . ($dash->access == 1 ? ' (Read)' : '') }}</a>
                             </li>
                             @endif
@@ -99,8 +99,8 @@
                         <div class="btn-group">
                         <select class="form-control" id="dashboard_copy_target" name="dashboard_copy_target" onchange="dashboard_copy_user_select()">
                             <option value="-1" selected> Copy Dashboard to </option>
-                        @foreach ($user_list as $user)
-                            <option value="{{ $user->user_id }}">{{ $user->username }}</option>
+                        @foreach ($user_list as $user_id => $username)
+                            <option value="{{ $user_id }}">{{ $username }}</option>
                         @endforeach
                         </select>
                         </div>
@@ -175,7 +175,7 @@
 <script type="text/javascript">
     var gridster;
 
-    var serialization = {!! $dash_config !!};
+    var serialization = @json($dash_config);
 
     serialization = Gridster.sort_by_row_and_col_asc(serialization);
     var gridster_state = 0;
@@ -382,7 +382,7 @@
                 if( data.status == "ok" ) {
                     toastr.success(data.message);
                     setTimeout(function (){
-                        window.location.href = "{{ url('/') }}";
+                        window.location.href = "{{ route('home') }}";
                     }, 500);
 
                 } else {
@@ -419,7 +419,7 @@
                     if (data.status == "ok") {
                         toastr.success(data.message);
                         setTimeout(function (){
-                            window.location.href = "{{ url('/?dashboard=') }}" + dashboard_id;
+                            window.location.href = '{{ route('dashboard.show', '?') }}'.replace('?', dashboard_id);
                         }, 500);
                     }
                     else {
@@ -448,7 +448,7 @@
                 if( data.status == "ok" ) {
                     toastr.success(data.message);
                     setTimeout(function (){
-                        window.location.href = "{{ url('/?dashboard=') }}" + data.dashboard_id;
+                        window.location.href = '{{ route('dashboard.show', '?') }}'.replace('?', data.dashboard_id);
                     }, 500);
                 }
                 else {
