@@ -7,7 +7,8 @@ use Illuminate\Support\Collection;
 
 class MigrateWidgetIds extends Migration
 {
-    private $map = [];
+    /** @var Illuminate\Support\Collection<string, mixed> */
+    private $map;
 
     /**
      * Run the migrations.
@@ -19,7 +20,7 @@ class MigrateWidgetIds extends Migration
         $this->map = DB::table('widgets')->pluck('widget', 'widget_id');
 
         UserWidget::query()->chunk(1000, function (Collection $widgets) {
-            $widgets->each(function (UserWidget $widget) {
+            $widgets->each(function ($widget) {
                 $widget->widget = $this->map[$widget->widget_id];
                 $widget->save();
             });

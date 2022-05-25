@@ -13,6 +13,10 @@ use LibreNMS\Config;
 
 class OverviewController extends Controller
 {
+    /**
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Contracts\View\View
+     */
     public function index(Request $request)
     {
         $view = Config::get('front_page');
@@ -27,6 +31,10 @@ class OverviewController extends Controller
         return (new DashboardController())->index($request);
     }
 
+    /**
+     * @param  \Illuminate\Http\Request  $request
+     * @return \Illuminate\Contracts\View\View
+     */
     public function simple(Request $request)
     {
         //TODO: All below missing D.ignore = '0' check

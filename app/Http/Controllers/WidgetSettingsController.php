@@ -26,11 +26,12 @@
 namespace App\Http\Controllers;
 
 use App\Models\UserWidget;
+use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class WidgetSettingsController extends Controller
 {
-    public function update(Request $request, UserWidget $widget)
+    public function update(Request $request, UserWidget $widget): JsonResponse
     {
         $this->validate($request, [
             'settings' => 'array',

@@ -20,7 +20,7 @@ class DashboardWidgetController extends Controller
         ]);
 
         $type = $request->get('widget_type');
-        $widget = UserWidget::make([
+        $widget = new UserWidget([
             'user_id' => Auth::id(),
             'widget' => $type,
             'col' => 1,

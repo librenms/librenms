@@ -7536,21 +7536,6 @@ parameters:
 			path: app/Http/Controllers/DeviceGroupController.php
 
 		-
-			message: "#^Method App\\\\Http\\\\Controllers\\\\Form\\\\CopyDashboardController\\:\\:store\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/Http/Controllers/Form/CopyDashboardController.php
-
-		-
-			message: "#^Method App\\\\Http\\\\Controllers\\\\Form\\\\WidgetSettingsController\\:\\:update\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/Http/Controllers/Form/WidgetSettingsController.php
-
-		-
-			message: "#^Method App\\\\Http\\\\Controllers\\\\Form\\\\WidgetSettingsController\\:\\:update\\(\\) has parameter \\$widget_settings with no type specified\\.$#"
-			count: 1
-			path: app/Http/Controllers/Form/WidgetSettingsController.php
-
-		-
 			message: "#^Method App\\\\Http\\\\Controllers\\\\Install\\\\ChecksController\\:\\:checkPhpVersion\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: app/Http/Controllers/Install/ChecksController.php
@@ -7839,26 +7824,6 @@ parameters:
 			message: "#^Method App\\\\Http\\\\Controllers\\\\Maps\\\\MapController\\:\\:visOptions\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: app/Http/Controllers/Maps/MapController.php
-
-		-
-			message: "#^Method App\\\\Http\\\\Controllers\\\\OverviewController\\:\\:default\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/Http/Controllers/OverviewController.php
-
-		-
-			message: "#^Method App\\\\Http\\\\Controllers\\\\OverviewController\\:\\:index\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/Http/Controllers/OverviewController.php
-
-		-
-			message: "#^Method App\\\\Http\\\\Controllers\\\\OverviewController\\:\\:simple\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: app/Http/Controllers/OverviewController.php
-
-		-
-			message: "#^Variable \\$user_dashboards in empty\\(\\) always exists and is always falsy\\.$#"
-			count: 1
-			path: app/Http/Controllers/OverviewController.php
 
 		-
 			message: "#^Method App\\\\Http\\\\Controllers\\\\PollerController\\:\\:checkTimeSinceLastPoll\\(\\) has no return type specified\\.$#"

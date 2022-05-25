@@ -71,7 +71,7 @@ class DashboardController extends Controller
 
     /**
      * @param  \Illuminate\Http\Request  $request
-     * @return \Illuminate\Contracts\Foundation\Application|\Illuminate\Contracts\View\Factory|\Illuminate\Contracts\View\View
+     * @return \Illuminate\Contracts\View\View
      */
     public function index(Request $request)
     {
@@ -115,6 +115,11 @@ class DashboardController extends Controller
         ]));
     }
 
+    /**
+     * @param  \Illuminate\Http\Request  $request
+     * @param  \App\Models\Dashboard  $dashboard
+     * @return \Illuminate\Contracts\View\View
+     */
     public function show(Request $request, Dashboard $dashboard)
     {
         $request->validate([

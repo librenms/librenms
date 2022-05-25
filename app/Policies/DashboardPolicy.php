@@ -83,9 +83,10 @@ class DashboardPolicy
      *
      * @param  \App\Models\User  $user
      * @param  \App\Models\Dashboard  $dashboard
-     * @return mixed
+     * @param  int  $target_user_id
+     * @return bool
      */
-    public function copy(User $user, Dashboard $dashboard, $target_user_id)
+    public function copy(User $user, Dashboard $dashboard, int $target_user_id): bool
     {
         // user can copy to themselves if they can view, otherwise admins can
         return $user->isAdmin() || ($user->user_id == $target_user_id && $this->view($user, $dashboard));
