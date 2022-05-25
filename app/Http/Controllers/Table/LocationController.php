@@ -44,7 +44,7 @@ class LocationController extends TableController
 
     protected function sortFields($request)
     {
-        return ['location', 'devices', 'network', 'servers', 'firewalls', 'down'];
+        return ['location', 'devices', 'down'];
     }
 
     /**
@@ -83,9 +83,6 @@ class LocationController extends TableController
             'lng' => $location->lng,
             'down' => $location->devices()->isDown()->count(),
             'devices' => $location->devices()->count(),
-            'network' => $location->devices()->where('type', 'network')->count(),
-            'servers' => $location->devices()->where('type', 'server')->count(),
-            'firewalls' => $location->devices()->where('type', 'firewall')->count(),
         ];
     }
 
@@ -100,21 +97,6 @@ class LocationController extends TableController
                 return function ($query) {
                     $query->on('devices.location_id', 'locations.id');
                     (new Device)->scopeIsDown($query);
-                };
-            case 'network':
-                return function ($query) {
-                    $query->on('devices.location_id', 'locations.id')
-                        ->where('devices.type', 'network');
-                };
-            case 'servers':
-                return function ($query) {
-                    $query->on('devices.location_id', 'locations.id')
-                        ->where('devices.type', 'server');
-                };
-            case 'firewalls':
-                return function ($query) {
-                    $query->on('devices.location_id', 'locations.id')
-                        ->where('devices.type', 'firewall');
                 };
             default:
                 return null;
