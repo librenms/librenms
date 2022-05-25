@@ -124,9 +124,9 @@
                                 </span>
                                 </button>
                                 <ul class="dropdown-menu">
-                                    @foreach ($widgets as $widget)
+                                    @foreach ($widgets as $type => $title)
                                     <li>
-                                        <a href="#" onsubmit="return false;" class="place_widget" data-widget_id="{{ $widget->widget_id }}">{{ $widget->widget_title }}</a>
+                                        <a href="#" onsubmit="return false;" class="place_widget" data-widget_type="{{ $type }}">{{ $title }}</a>
                                     </li>
                                     @endforeach
                                 </ul>
@@ -244,16 +244,10 @@
     });
 
     $(document).on('click','#clear_widgets', function() {
-        var widget_id = $(this).data('widget-id');
         if (dashboard_id > 0) {
             $.ajax({
-                type: 'POST',
-                url: 'ajax_form.php',
-                data: {
-                    type: "update-dashboard-config",
-                    sub_type: 'remove-all',
-                    dashboard_id: dashboard_id
-                },
+                type: 'DELETE',
+                url: '{{ route('dashboard.widget.clear', '?') }}'.replace('?', dashboard_id),
                 dataType: "json",
                 success: function (data) {
                     if (data.status == 'ok') {
@@ -272,21 +266,18 @@
     });
 
     $('.place_widget').on('click',  function(event, state) {
-        var widget_id = $(this).data('widget_id');
+        var widget_type = $(this).data('widget_type');
         event.preventDefault();
         if (dashboard_id > 0) {
             $.ajax({
                 type: 'POST',
-                url: 'ajax_form.php',
+                url: '{{ route('dashboard.widget.add', '?') }}'.replace('?', dashboard_id),
                 data: {
-                    type: "update-dashboard-config",
-                    sub_type: 'add',
-                    widget_id: widget_id,
-                    dashboard_id: dashboard_id
+                    widget_type: widget_type
                 },
                 dataType: "json",
                 success: function (data) {
-                    if (data.status == 'ok') {
+                    if (data.status === 'ok') {
                         widget_dom(data.extra);
                         updatePos(gridster);
                         toastr.success(data.message);
@@ -305,14 +296,8 @@
     $(document).on( "click", ".close-widget", function() {
         var widget_id = $(this).data('widget-id');
         $.ajax({
-            type: 'POST',
-            url: 'ajax_form.php',
-            data: {
-                type: "update-dashboard-config",
-                sub_type: 'remove',
-                widget_id: widget_id,
-                dashboard_id: dashboard_id
-            },
+            type: 'DELETE',
+            url: '{{ route('dashboard.widget.remove', '?') }}'.replace('?', widget_id),
             dataType: "json",
             success: function (data) {
                 if (data.status == 'ok') {
@@ -344,8 +329,6 @@
 
 
     function updatePos(gridster) {
-        var s = JSON.stringify(gridster.serialize());
-
         @if ($dashboard->dashboard_id > 0)
             var dashboard_id = {{ $dashboard->dashboard_id }};
         @else
@@ -354,13 +337,9 @@
 
         if (dashboard_id > 0) {
             $.ajax({
-                type: 'POST',
-                url: 'ajax_form.php',
-                data: {
-                    type: "update-dashboard-config",
-                    data: s,
-                    dashboard_id: dashboard_id
-                },
+                type: 'PUT',
+                url: '{{ route('dashboard.widget.update', '?') }}'.replace('?', dashboard_id),
+                data: {data: JSON.stringify(gridster.serialize())},
                 dataType: "json",
                 success: function (data) {
                     if (data.status == 'ok') {
@@ -396,12 +375,8 @@
 
     function dashboard_delete(data) {
         $.ajax({
-            type: 'POST',
-            url: 'ajax_form.php',
-            data: {
-                type: 'delete-dashboard',
-                dashboard_id: $(data).data('dashboard')
-            },
+            type: 'DELETE',
+            url: '{{ route('dashboard.destroy', '?') }}'.replace('?', $(data).data('dashboard')),
             dataType: "json",
             success: function (data) {
                 if( data.status == "ok" ) {
@@ -433,12 +408,10 @@
         }
         if (dashboard_id > 0) {
             $.ajax({
-                type: 'POST',
-                url: 'ajax_form.php',
+                type: 'PUT',
+                url: '{{ route('dashboard.update', '?') }}'.replace('?', dashboard_id),
                 data: {
-                    type: 'edit-dashboard',
                     dashboard_name: data['dashboard_name'],
-                    dashboard_id: dashboard_id,
                     access: data['access']
                 },
                 dataType: "json",
@@ -468,8 +441,8 @@
         }
         $.ajax({
             type: 'POST',
-            url: 'ajax_form.php',
-            data: {type: 'add-dashboard', dashboard_name: data['dashboard_name']},
+            url: '{{ route('dashboard.store') }}',
+            data: {dashboard_name: data['dashboard_name']},
             dataType: "json",
             success: function (data) {
                 if( data.status == "ok" ) {
@@ -511,8 +484,8 @@
 
             $.ajax({
                 type: 'POST',
-                url: '{{ url('/ajax/form/copy-dashboard') }}',
-                data: {target_user_id: target_user_id, dashboard_id: dashboard_id},
+                url: '{{ route('dashboard.copy', '?') }}'.replace('?', dashboard_id),
+                data: {target_user_id: target_user_id},
                 dataType: "json",
                 success: function (data) {
                     if( data.status == "ok" ) {
@@ -589,7 +562,7 @@
         if(widget_id > 0 && widget_settings != {}) {
             $.ajax({
                 type: 'PUT',
-                url: '{{ url('/ajax/form/widget-settings/') }}/' + widget_id,
+                url: '{{ route('dashboard.widget.settings', '?') }}/'.replace('?', widget_id),
                 data: { settings: widget_settings },
                 dataType: "json",
                 success: function (data) {

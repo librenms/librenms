@@ -10,13 +10,35 @@ use App\Models\Service;
 use App\Models\Syslog;
 use App\Models\User;
 use App\Models\UserPref;
-use App\Models\Widget;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 use LibreNMS\Config;
 
 class OverviewController extends Controller
 {
+    public static $widgets = [
+        'alerts',
+        'alertlog',
+        'alertlog-stats',
+        'availability-map',
+        'component-status',
+        'device-summary-horiz',
+        'device-summary-vert',
+        'device-types',
+        'eventlog',
+        'globe',
+        'generic-graph',
+        'graylog',
+        'generic-image',
+        'notes',
+        'server-stats',
+        'syslog',
+        'top-devices',
+        'top-errors',
+        'top-interfaces',
+        'worldmap',
+    ];
+
     public function index(Request $request)
     {
         $request->validate([
@@ -80,30 +102,29 @@ class OverviewController extends Controller
             ]);
         }
 
-        $data = $dashboard
-            ->widgets()
-            ->select(['user_widget_id', 'users_widgets.widget_id', 'title', 'widget', 'col', 'row', 'size_x', 'size_y', 'refresh', 'settings'])
-            ->join('widgets', 'widgets.widget_id', '=', 'users_widgets.widget_id')
-            ->get();
+        $data = $dashboard->widgets;
 
         if ($data->isEmpty()) {
-            $data[] = ['user_widget_id'=>'0',
-                'widget_id'=>1,
-                'title'=>'Add a widget',
-                'widget'=>'placeholder',
-                'col'=>1,
-                'row'=>1,
-                'size_x'=>6,
-                'size_y'=>2,
-                'refresh'=>60,
+            $data = [
+                [
+                    'user_widget_id' => 0,
+                    'title' => 'Add a widget',
+                    'widget' => 'placeholder',
+                    'col' => 1,
+                    'row' => 1,
+                    'size_x' => 6,
+                    'size_y' => 2,
+                    'refresh' => 60,
+                ]
             ];
         }
 
         $bare = $request->bare;
-        $data = serialize(json_encode($data));
-        $dash_config = unserialize($data);
+        $dash_config = unserialize(serialize(json_encode($data)));
         $hide_dashboard_editor = UserPref::getPref($user, 'hide_dashboard_editor');
-        $widgets = Widget::select(['widget_id', 'widget_title'])->orderBy('widget_title')->get();
+        $widgets = array_combine(self::$widgets, array_map(function ($widget) {
+            return trans("widgets.$widget.title");
+        }, self::$widgets));
 
         $user_list = [];
         if ($user->can('manage', User::class)) {

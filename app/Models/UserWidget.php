@@ -11,7 +11,7 @@ class UserWidget extends Model
     public $timestamps = false;
     protected $table = 'users_widgets';
     protected $primaryKey = 'user_widget_id';
-    protected $fillable = ['user_id', 'widget_id', 'col', 'row', 'size_x', 'size_y', 'title', 'refresh', 'settings', 'dashboard_id'];
+    protected $fillable = ['user_id', 'widget', 'col', 'row', 'size_x', 'size_y', 'title', 'refresh', 'settings', 'dashboard_id'];
     protected $casts = ['settings' => 'array'];
 
     // ---- Define Relationships ----
