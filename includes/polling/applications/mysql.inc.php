@@ -99,7 +99,9 @@ $mapping = [
 ];
 
 $data = explode("\n", $mysql);
-if (sizeof($data) > 0 && strpos($data[0], "ERROR") === 0) $mysql= "ERROR";
+if (sizeof($data) > 0 && strpos($data[0], "ERROR") === 0) {
+    $mysql= "ERROR";
+}
 
 $map = [];
 foreach ($data as $str) {
