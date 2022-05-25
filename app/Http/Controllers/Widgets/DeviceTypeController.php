@@ -48,7 +48,7 @@ class DeviceTypeController extends WidgetController
         return view('widgets.settings.device-types', $this->getSettings(true));
     }
 
-    protected function getData(Request $request)
+    protected function getData(Request $request): array
     {
         $data = $this->getSettings();
 
@@ -88,7 +88,7 @@ class DeviceTypeController extends WidgetController
 
     /**
      * @param  Request  $request
-     * @return View
+     * @return \Illuminate\View\View
      */
     public function getView(Request $request)
     {
