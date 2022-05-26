@@ -6,36 +6,19 @@
                     "sysName": "<private>",
                     "sysObjectID": ".1.3.6.1.4.1.43296.3",
                     "sysDescr": "Linux <private> 3.12.30 #1 Fri Oct 13 18:41:36 AEDT 2017 armv7l",
-                    "sysContact": null,
+                    "sysContact": "<private>",
                     "version": null,
-                    "hardware": "",
+                    "hardware": "Simulated Nexus 3550",
                     "features": null,
-                    "location": null,
-                    "os": "exablaze-fusion",
+                    "os": "ciscon3550",
                     "type": "network",
-                    "serial": null,
-                    "icon": "exablaze.png"
+                    "serial": "EBFSN-Z-123123",
+                    "icon": "cisco.svg",
+                    "location": "<private>"
                 }
             ]
         },
-        "poller": {
-            "devices": [
-                {
-                    "sysName": "<private>",
-                    "sysObjectID": ".1.3.6.1.4.1.43296.3",
-                    "sysDescr": "Linux <private> 3.12.30 #1 Fri Oct 13 18:41:36 AEDT 2017 armv7l",
-                    "sysContact": "<private>",
-                    "version": "1.9.0 2018-03-23 12:11:15 +1100 (964571d)",
-                    "hardware": "<private>",
-                    "features": null,
-                    "location": "<private>",
-                    "os": "exablaze-fusion",
-                    "type": "network",
-                    "serial": "<private>",
-                    "icon": "exablaze.png"
-                }
-            ]
-        }
+        "poller": "matches discovery"
     },
     "ports": {
         "discovery": {
