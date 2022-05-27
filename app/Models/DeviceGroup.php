@@ -26,6 +26,7 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Relations\BelongsToMany;
+use Illuminate\Database\Eloquent\Relations\MorphToMany;
 use LibreNMS\Alerting\QueryBuilderFluentParser;
 use Permissions;
 
@@ -115,6 +116,11 @@ class DeviceGroup extends BaseModel
     }
 
     // ---- Define Relationships ----
+
+    public function alertSchedules(): MorphToMany
+    {
+        return $this->morphToMany(\App\Models\AlertSchedule::class, 'alert_schedulable', 'alert_schedulables', 'schedule_id', 'schedule_id');
+    }
 
     public function devices(): BelongsToMany
     {
