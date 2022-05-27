@@ -2142,7 +2142,7 @@ function maintenance_devicegroup(Illuminate\Http\Request $request)
     $device_group = ctype_digit($name) ? DeviceGroup::find($name) : DeviceGroup::where('name', $name)->first();
 
     if (! $device_group) {
-        return api_error(404, "Device group not found");
+        return api_error(404, 'Device group not found');
     }
 
     $notes = $request->json('notes');
