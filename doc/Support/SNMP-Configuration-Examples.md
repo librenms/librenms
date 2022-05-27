@@ -91,7 +91,36 @@ snmp-server location <YOUR-LOCATION>
 1. After rebooting the card (safe for connected load), configure Network, System and Access Control. Save config for each step.
 1. Configure SNMP. The device defaults to both SNMP v1 and v3 enabled, with default credentials. Disable what you do not need. SNMP v3 works, but uses MD5/DES. You may have to add another section to your SNMP credentials table in LibreNMS. Save.
 
-### HPE 3PAR
+### HPE / 3PAR
+
+#### Comware
+
+SNMPv2c
+
+```
+snmp-agent community read <YOUR-COMMUNITY>
+snmp-agent sys-info contact <YOUR-CONTACT>
+snmp-agent sys-info location <YOUR-LOCATION>
+snmp-agent sys-info version all
+snmp-agent packet max-size 4000
+```
+
+> `packet max-size` is required for some walks to complete.
+
+SNMPv3
+
+```
+snmp-agent mib-view excluded ExcludeAll snmp
+snmp-agent group v3 V3ROGroup privacy read-view ViewDefault write-view ExcludeAll
+snmp-agent usm-user v3 <USER> V3ROGroup simple authentication-mode sha <AuthKey> privacy-mode aes128 <PrivacyKey>
+snmp-agent sys-info contact <YOUR-CONTACT>
+snmp-agent sys-info location <YOUR-LOCATION>
+snmp-agent sys-info version v3
+undo snmp-agent sys-info version v1 v2c
+snmp-agent packet max-size 4000
+```
+
+> `packet max-size` is required for some walks to complete.
 
 #### Inform OS 3.2.x
 
