@@ -2171,7 +2171,6 @@ function maintenance_devicegroup(Illuminate\Http\Request $request)
     return api_success_noresult(201, "Device group {$device_group->name} ({$device_group->id}) will begin maintenance mode at $start" . ($duration ? " for {$duration}h" : ''));
 }
 
-
 function get_devices_by_group(Illuminate\Http\Request $request)
 {
     $name = $request->route('name');
