@@ -102,10 +102,10 @@ snmp-agent community read <YOUR-COMMUNITY>
 snmp-agent sys-info contact <YOUR-CONTACT>
 snmp-agent sys-info location <YOUR-LOCATION>
 snmp-agent sys-info version all
-snmp-agent packet max-size 4000
+snmp-agent packet max-size 6000
 ```
 
-> `packet max-size` is required for some walks to complete.
+> `packet max-size` is required for some walks to complete, but the path must support fragmentation.
 
 SNMPv3
 
@@ -117,10 +117,10 @@ snmp-agent sys-info contact <YOUR-CONTACT>
 snmp-agent sys-info location <YOUR-LOCATION>
 snmp-agent sys-info version v3
 undo snmp-agent sys-info version v1 v2c
-snmp-agent packet max-size 4000
+snmp-agent packet max-size 6000
 ```
 
-> `packet max-size` is required for some walks to complete.
+> `packet max-size` is required for some walks to complete, but the path must support fragmentation.
 
 #### Inform OS 3.2.x
 
