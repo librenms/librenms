@@ -1,7 +1,7 @@
 mib: EXALINK-FUSION-MIB
 modules:
     os:
-        version_template: '{{ EXALINK-FUSION-MIB::fusionInfoVersion }} {{ EXALINK-FUSION-MIB::fusionInfoSoftware }}'
+        version: EXALINK-FUSION-MIB::fusionInfoVersion
         hardware: EXALINK-FUSION-MIB::fusionInfoBoard
         serial: EXALINK-FUSION-MIB::fusionInfoSerial
     sensors:
@@ -54,3 +54,7 @@ modules:
                     num_oid: '.1.3.6.1.4.1.43296.3.2.2.1.3.{{ $index }}'
                     descr: 'fan{{ $index }} RPM'
                     index: 'fusionFanSensorValue.{{ $index }}'
+                    low_limit: 512
+                    low_warn_limit: 4096
+                    warn_limit: 32768
+                    high_limit: 32769
