@@ -48,17 +48,16 @@ $ifType = 'ethernetCsmacd';
 foreach ($exa_stats as $name => $tmp_stats) {
     $e_name = explode('.', $name);
     $index = (((int) ($e_name[0])) - 1) * 16 + (int) ($e_name[1]);
-    $port_stats[$index] = array();
+    $port_stats[$index] = [];
     $port_stats[$index]['ifName'] = $name;
     $port_stats[$index]['ifType'] = $ifType;
     foreach ($obj_map as $ifEntry => $IfxStat) {
-	if(in_array($IfxStat, $tf_rename_map)){
-	    $val = str_replace($orig_tf, $std_tf, $exa_stats[$name][$IfxStat]);
-	}
-	else{
-	    $val = $exa_stats[$name][$IfxStat];
-	}
-	$port_stats[$index][$ifEntry] = $val;
+        if (in_array($IfxStat, $tf_rename_map)) {
+            $val = str_replace($orig_tf, $std_tf, $exa_stats[$name][$IfxStat]);
+        } else {
+            $val = $exa_stats[$name][$IfxStat];
+        }
+        $port_stats[$index][$ifEntry] = $val;
     }
     $port_stats[$index]['ifDescr'] = $port_stats[$index]['ifName'];
 }
