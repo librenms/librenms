@@ -103,6 +103,9 @@ os:
         included_fields: [sysName, sysObjectID, sysDescr, sysContact, version, hardware, features, location, os, type, serial, icon]
         joins:
             - { left: devices.location_id, right: locations.id, select: [location] }
+    device_graphs:
+        included_fields: [graph]
+        order_by: graph
 processors:
     processors:
         excluded_fields: [device_id, processor_id]
