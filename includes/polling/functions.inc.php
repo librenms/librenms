@@ -470,7 +470,8 @@ function update_application($app, $response, $metrics = [], $status = '')
             'Traceback (most recent call last):'
         ])) {
             $data['app_status'] = $response;
-            $data['app_state'] = 'ERROR';
+            $has_generic_error = in_array($response, ['ERROR', 'LEGACY', 'UNSUPPORTED']);
+            $data['app_state'] = $has_generic_error ? $has_generic_error : "ERROR";
         } else {
             // should maybe be 'unknown' as state
             $data['app_state'] = 'OK';
