@@ -459,12 +459,18 @@ function update_application($app, $response, $metrics = [], $status = '')
     ];
 
     if ($response != '' && $response !== false) {
-        if (Str::contains($response, [
-            'Traceback (most recent call last):',
+        /**
+         * check if the response starts with an error and set that in the app_state field
+         * also set app_status to the raw response
+         */
+        if (Str::startsWith($response, [
+            'ERROR',
+            'LEGACY',
+            'UNSUPPORTED',
+            'Traceback (most recent call last):'
         ])) {
+            $data['app_status'] = $response;
             $data['app_state'] = 'ERROR';
-        } elseif (in_array($response, ['OK', 'ERROR', 'LEGACY', 'UNSUPPORTED'])) {
-            $data['app_state'] = $response;
         } else {
             // should maybe be 'unknown' as state
             $data['app_state'] = 'OK';
