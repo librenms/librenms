@@ -2067,7 +2067,7 @@ users_widgets:
   Columns:
     - { Field: user_widget_id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
     - { Field: user_id, Type: 'int unsigned', 'Null': false, Extra: '' }
-    - { Field: widget_id, Type: 'int unsigned', 'Null': false, Extra: '' }
+    - { Field: widget, Type: varchar(32), 'Null': false, Extra: '' }
     - { Field: col, Type: tinyint, 'Null': false, Extra: '' }
     - { Field: row, Type: tinyint, 'Null': false, Extra: '' }
     - { Field: size_x, Type: tinyint, 'Null': false, Extra: '' }
@@ -2078,7 +2078,7 @@ users_widgets:
     - { Field: dashboard_id, Type: 'int unsigned', 'Null': false, Extra: '' }
   Indexes:
     PRIMARY: { Name: PRIMARY, Columns: [user_widget_id], Unique: true, Type: BTREE }
-    user_id: { Name: user_id, Columns: [user_id, widget_id], Unique: false, Type: BTREE }
+    user_id: { Name: user_id, Columns: [user_id], Unique: false, Type: BTREE }
 vlans:
   Columns:
     - { Field: vlan_id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
@@ -2131,15 +2131,6 @@ vrf_lite_cisco:
     vrf_lite_cisco_device_id_context_name_vrf_name_index: { Name: vrf_lite_cisco_device_id_context_name_vrf_name_index, Columns: [device_id, context_name, vrf_name], Unique: false, Type: BTREE }
     vrf_lite_cisco_device_id_index: { Name: vrf_lite_cisco_device_id_index, Columns: [device_id], Unique: false, Type: BTREE }
     vrf_lite_cisco_vrf_name_index: { Name: vrf_lite_cisco_vrf_name_index, Columns: [vrf_name], Unique: false, Type: BTREE }
-widgets:
-  Columns:
-    - { Field: widget_id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
-    - { Field: widget_title, Type: varchar(255), 'Null': false, Extra: '' }
-    - { Field: widget, Type: varchar(255), 'Null': false, Extra: '' }
-    - { Field: base_dimensions, Type: varchar(10), 'Null': false, Extra: '' }
-  Indexes:
-    PRIMARY: { Name: PRIMARY, Columns: [widget_id], Unique: true, Type: BTREE }
-    widgets_widget_unique: { Name: widgets_widget_unique, Columns: [widget], Unique: true, Type: BTREE }
 wireless_sensors:
   Columns:
     - { Field: sensor_id, Type: 'int unsigned', 'Null': false, Extra: auto_increment }
