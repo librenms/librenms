@@ -18,7 +18,7 @@ modules:
         sysDescr_regex:
             - '/( (?<hardware>E?\d{4,}\S*)[^,]*)?, revision (?<version>[^ ,]+)/'
             - '/PROCURVE (?<hardware>.*) - (?<version>.*)/'
-            - '/(HPE OfficeConnect Switch|HP) (?<hardware>[\d]+[\ \-]\S+).*(?<version>P\S[0-9\.]+)/'
+            - '/(HPE OfficeConnect Switch|HP) (?<hardware>[^,]+), (?<version>[^,]+), Linux/'
             - '/(HP ProCurve) (?<hardware>\d+\S?).*(?<version>P[1-9\.]+)/'
         version:
             - NETSWITCH-MIB::hpSwitchOsVersion.0
