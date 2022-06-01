@@ -16,10 +16,10 @@ modules:
                 type: hpGlobal
     os:
         sysDescr_regex:
-            - '/(?:HPE OfficeConnect Switch|HP) (?<hardware>.+) J[a-zA-Z0-9]+, (?<version>[^,]+), (?:Linux|eCos)/'        
-            - '/(?:ProCurve|HP(?! Stack)(?: J[a-zA-Z\d]+)?) (?<hardware>.*?)(?: Switch|,)/'
-            - '/PROCURVE (?<hardware>.*) - (?<version>.*)/'
+            - '/(?:PROCURVE|ProCurve|HPE OfficeConnect Switch|HP(?! Stack)) (?<hardware>.+?)(?:,| Switch| J[A-Z0-9]+| - )/'
+            - '/, (?<version>[A-Z]{2}[^,]+), (?:Linux|eCos)/'
             - '/revision (?<version>[^,]+)/'
+            - '/PROCURVE (?<hardware>.*) - (?<version>.*)/'
         version:
             - NETSWITCH-MIB::hpSwitchOsVersion.0
             - HP-SN-AGENT-MIB::snAgImgVer.0
