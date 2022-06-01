@@ -19,29 +19,30 @@
  *
  * @link       https://www.librenms.org
  *
- * @copyright  2022 Tony Murray
+ * @copyright  2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
-namespace App\Http\Controllers;
+namespace App\Http\Controllers\Form;
 
+use App\Http\Controllers\Controller;
 use App\Models\UserWidget;
-use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 
 class WidgetSettingsController extends Controller
 {
-    public function update(Request $request, UserWidget $widget): JsonResponse
+    public function update(Request $request, $widget_settings)
     {
         $this->validate($request, [
             'settings' => 'array',
             'settings.refresh' => 'int|min:1',
         ]);
 
+        $widget = UserWidget::with('dashboard')->findOrFail($widget_settings);
         $widget_settings = (array) $request->get('settings', []);
         unset($widget_settings['_token']);
 
-        if (! $request->user()->can('update', $widget->dashboard)) {
+        if (! $widget->dashboard->canWrite($request->user())) {
             return response()->json([
                 'status' => 'error',
                 'message' => 'ERROR: You have no write-access to this dashboard',

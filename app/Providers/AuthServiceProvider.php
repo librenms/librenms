@@ -16,7 +16,6 @@ class AuthServiceProvider extends ServiceProvider
      */
     protected $policies = [
         \App\Models\User::class => \App\Policies\UserPolicy::class,
-        \App\Models\Dashboard::class => \App\Policies\DashboardPolicy::class,
         \App\Models\Device::class => \App\Policies\DevicePolicy::class,
         \App\Models\DeviceGroup::class => \App\Policies\DeviceGroupPolicy::class,
         \App\Models\PollerCluster::class => \App\Policies\PollerClusterPolicy::class,
