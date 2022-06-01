@@ -39,7 +39,7 @@
                             <td>{{ $user->level }}</td>
                             <td>{{ $user->auth_type }}</td>
                             <td>{{ $user->email }}</td>
-                            <td>{{ \App\Models\UserPref::getPref($user, 'timezone') ? \App\Models\UserPref::getPref($user, 'timezone') : "Browser Timezone" }}</td>
+                            <td>{{ \App\Models\UserPref::getPref($user, 'timezone') ?: "Browser Timezone" }}</td>
                             @if(\LibreNMS\Authentication\LegacyAuth::getType() == 'mysql')
                             <td>{{ $user->enabled }}</td>
                             @endif
