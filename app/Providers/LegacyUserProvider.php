@@ -131,9 +131,9 @@ class LegacyUserProvider implements UserProvider
                 throw new AuthenticationException();
             }
 
-            if (UserPref::getPref($user, 'timezone')) {
+            if ($tz = UserPref::getPref($user, 'timezone')) {
                 session([
-                    'timezone' => UserPref::getPref($user, 'timezone'),
+                    'timezone' => $tz,
                     'timezone_static' => true,
                 ]);
             }
