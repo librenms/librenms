@@ -11,6 +11,8 @@ $msg = $argv[3];
 $oxidized_api = new \App\ApiClients\Oxidized();
 if (preg_match('/(SYS-(SW[0-9]+-)?5-CONFIG_I|VSHD-5-VSHD_SYSLOG_CONFIG_I): Configured from .+ by (?P<user>.+) on .*/', $msg, $matches)) {
     $oxidized_api->updateNode($hostname, $msg, $matches['user']);
+} elseif (preg_match('/(SYS-(SW[0-9]+-)?5-CONFIG_I|VSHD-5-VSHD_SYSLOG_CONFIG_I): Configured from .+ by.*/', $msg, $matches)) {
+    $oxidized_api->updateNode($hostname, $msg,);
 } elseif (preg_match('/GBL-CONFIG-6-DB_COMMIT : Configuration committed by user \\\\\'(?P<user>.+?)\\\\\'..*/', $msg, $matches)) {
     $oxidized_api->updateNode($hostname, $msg, $matches['user']);
 } elseif (preg_match('/ASA-(config-)?5-111005: (?P<user>.+) end configuration: OK/', $msg, $matches)) {
