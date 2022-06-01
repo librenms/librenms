@@ -145,7 +145,7 @@ class UserController extends Controller
             'user' => $user,
             'dashboard' => UserPref::getPref($user, 'dashboard'),
             'dashboards' => Dashboard::allAvailable($user)->get(),
-            'timezone' => UserPref::getPref($user, 'timezone') ? UserPref::getPref($user, 'timezone') : 'default',
+            'timezone' => UserPref::getPref($user, 'timezone') ?: 'default',
         ];
 
         if (Config::get('twofactor')) {
