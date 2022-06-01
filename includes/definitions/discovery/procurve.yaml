@@ -16,8 +16,8 @@ modules:
                 type: hpGlobal
     os:
         sysDescr_regex:
-            - '/(?:HPE OfficeConnect Switch|HP) (?<hardware>[^,]+), (?<version>[^,]+), (?:Linux|eCos)/'        
-            - '/(?:ProCurve|HP(?! Stack)(?: [a-zA-Z\d]+)?) (?<hardware>.*?)(?: Switch|,)/'
+            - '/(?:HPE OfficeConnect Switch|HP) (?<hardware>.+) J[a-zA-Z0-9]+, (?<version>[^,]+), (?:Linux|eCos)/'        
+            - '/(?:ProCurve|HP(?! Stack)(?: J[a-zA-Z\d]+)?) (?<hardware>.*?)(?: Switch|,)/'
             - '/PROCURVE (?<hardware>.*) - (?<version>.*)/'
             - '/revision (?<version>[^,]+)/'
         version:
