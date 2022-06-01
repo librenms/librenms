@@ -18,7 +18,7 @@ modules:
         sysDescr_regex:
             - '/^(Aruba|HP|ProCurve) (?<hardware>[^,]+), revision (?<version>[^ ,]+)/'
             - '/^(HPE OfficeConnect Switch|HP|HP ProCurve) (?<hardware>[^,]*), (?<version>P\S[0-9\.]+)/'
-            - '/^Aruba Instant On (?<hardware>\d{4}.*), InstantOn_\d+_(?<version>[0-9\.]+)/'
+            - '/^Aruba Instant On (?<hardware>[^,]+), InstantOn_\d+_(?<version>[0-9\.]+)/'
             - '/^PROCURVE (?<hardware>.*) - (?<version>.*)$/'
             - '/^(?<hardware>GbE2c)/'
         version:
