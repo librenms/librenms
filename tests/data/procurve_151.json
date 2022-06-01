@@ -8,7 +8,7 @@
                     "sysDescr": "HP 1810-24G, PL.1.9, eCos-3.0, 1_12_8-customized-h",
                     "sysContact": null,
                     "version": "PL.1.9",
-                    "hardware": "1810-24G,",
+                    "hardware": "1810-24G",
                     "features": null,
                     "os": "procurve",
                     "type": "network",
