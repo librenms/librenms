@@ -1,8 +1,8 @@
 <?php
 /**
- * Widget.php
+ * arista-mos.inc.php
  *
- * -Description-
+ * Copyright (C) 2018 Goldman Sachs & Co.
  *
  * This program is free software: you can redistribute it and/or modify
  * it under the terms of the GNU General Public License as published by
@@ -15,21 +15,15 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @link       https://www.librenms.org
- *
- * @copyright  2018 Tony Murray
- * @author     Tony Murray <murraytony@gmail.com>
+ * @author     Nash Kaminski <Nash.Kaminski@gs.com>
  */
 
-namespace App\Models;
-
-use Illuminate\Database\Eloquent\Model;
-
-class Widget extends Model
-{
-    public $timestamps = false;
-    protected $primaryKey = 'widget_id';
-    protected $fillable = ['widget_title', 'widget', 'base_dimensions'];
+// Workaround for Metamako platform fanspeed reporting bug on early (circa 0.16.x) code versions
+if ((strpos($sensor['sensor_oid'], '.1.3.6.1.4.1.2021.13.16.3.1.3.') === 0) &&
+        ($sensor_value >= 2 ** 31)) {
+    // 2's complement negation of the value
+    $sensor_value = $sensor_value ^ 0xFFFFFFFF;
+    $sensor_value += 1;
 }

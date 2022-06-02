@@ -8,7 +8,7 @@
                     "sysDescr": "Metamako MOS release 0.32.0 \\\\(build mos-0.32+22\\\\) running on a MetaMux 48 with L-Series",
                     "sysContact": "<private>",
                     "version": "0.32.0",
-                    "hardware": null,
+                    "hardware": "MetaMux 48 with L-Series",
                     "features": null,
                     "os": "arista-mos",
                     "type": "network",

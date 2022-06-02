@@ -385,9 +385,9 @@ class LdapAuthorizer extends AuthorizerBase
         ldap_set_option($this->ldap_connection, LDAP_OPT_PROTOCOL_VERSION, Config::get('auth_ldap_version', 3));
 
         $use_tls = Config::get('auth_ldap_starttls');
-        if ($use_tls == 'optional' || $use_tls == 'require') {
+        if ($use_tls == 'optional' || $use_tls == 'required') {
             $tls_success = ldap_start_tls($this->ldap_connection);
-            if ($use_tls == 'require' && $tls_success === false) {
+            if ($use_tls == 'required' && $tls_success === false) {
                 $error = ldap_error($this->ldap_connection);
                 throw new AuthenticationException("Fatal error: LDAP TLS required but not successfully negotiated: $error");
             }

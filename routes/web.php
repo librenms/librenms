@@ -66,6 +66,15 @@ Route::group(['middleware' => ['auth'], 'guard' => 'auth'], function () {
         Route::get('devicedependency', 'DeviceDependencyController@dependencyMap');
     });
 
+    // dashboard
+    Route::resource('dashboard', 'DashboardController')->except(['create', 'edit']);
+    Route::post('dashboard/{dashboard}/copy', 'DashboardController@copy')->name('dashboard.copy');
+    Route::post('dashboard/{dashboard}/widgets', 'DashboardWidgetController@add')->name('dashboard.widget.add');
+    Route::delete('dashboard/{dashboard}/widgets', 'DashboardWidgetController@clear')->name('dashboard.widget.clear');
+    Route::put('dashboard/{dashboard}/widgets', 'DashboardWidgetController@update')->name('dashboard.widget.update');
+    Route::delete('dashboard/widgets/{widget}', 'DashboardWidgetController@remove')->name('dashboard.widget.remove');
+    Route::put('dashboard/widgets/{widget}', 'WidgetSettingsController@update')->name('dashboard.widget.settings');
+
     // Push notifications
     Route::group(['prefix' => 'push'], function () {
         Route::get('token', [\App\Http\Controllers\PushNotificationController::class, 'token'])->name('push.token');
@@ -132,12 +141,6 @@ Route::group(['middleware' => ['auth'], 'guard' => 'auth'], function () {
 
         Route::get('settings/list', 'SettingsController@listAll')->name('settings.list');
 
-        // form ajax handlers, perhaps should just be page controllers
-        Route::group(['prefix' => 'form', 'namespace' => 'Form'], function () {
-            Route::resource('widget-settings', 'WidgetSettingsController');
-            Route::post('copy-dashboard', 'CopyDashboardController@store');
-        });
-
         // js select2 data controllers
         Route::group(['prefix' => 'select', 'namespace' => 'Select'], function () {
             Route::get('application', 'ApplicationController')->name('ajax.select.application');
@@ -189,6 +192,7 @@ Route::group(['middleware' => ['auth'], 'guard' => 'auth'], function () {
             Route::post('component-status', 'ComponentStatusController');
             Route::post('device-summary-horiz', 'DeviceSummaryHorizController');
             Route::post('device-summary-vert', 'DeviceSummaryVertController');
+            Route::post('device-types', 'DeviceTypeController');
             Route::post('eventlog', 'EventlogController');
             Route::post('generic-graph', 'GraphController');
             Route::post('generic-image', 'ImageController');
