@@ -70,10 +70,12 @@ class Pagerduty extends Transport
         if ($config['region'] == 'EU') {
             $url = 'https://events.eu.pagerduty.com/v2/enqueue';
         }
-
+        else if ($config['region'] == 'US') {
         // US service region
-        else {
             $url = 'https://events.pagerduty.com/v2/enqueue';
+        }
+        else {
+            $url = $config['custom-url'];
         }
 
         $client = new Client();
@@ -106,6 +108,7 @@ class Pagerduty extends Transport
                     'options' => [
                         'EU' => 'EU',
                         'US' => 'US',
+			'Custom URL' => 'CUSTOM',
                     ],
                 ],
                 [
@@ -113,9 +116,16 @@ class Pagerduty extends Transport
                     'type'  => 'text',
                     'name'  => 'service_key',
                 ],
+                [
+                    'title' => 'Custom API URL',
+                    'type' => 'text',
+                    'name' => 'custom-url',
+                    'descr' => 'Custom PagerDuty API URL',
+                ]
             ],
             'validation' => [
-                'region' => 'in:EU,US',
+                'region' => 'in:EU,US,CUSTOM',
+                'custom-url' => 'url',
             ],
         ];
     }
