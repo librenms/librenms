@@ -53,12 +53,13 @@ class Pagerduty extends Transport
      */
     public function contactPagerduty($obj, $config)
     {
+        $custom_details = [ 'message' => strip_tags($obj['msg']) ?: 'Test' ];
         $data = [
             'routing_key'  => $config['service_key'],
             'event_action' => $obj['event_type'],
             'dedup_key'    => (string) $obj['alert_id'],
             'payload'    => [
-                'custom_details'  => strip_tags($obj['msg']) ?: 'Test',
+                'custom_details'  => $custom_details,
                 'group'   => (string) \DeviceCache::get($obj['device_id'])->groups->pluck('name'),
                 'source'   => $obj['hostname'],
                 'severity' => $obj['severity'],
