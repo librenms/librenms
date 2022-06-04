@@ -213,6 +213,8 @@ $port_stats = [];
 
 if ($device['os'] === 'f5' && (version_compare($device['version'], '11.2.0', '>=') && version_compare($device['version'], '11.7', '<'))) {
     require 'ports/f5.inc.php';
+} elseif ($device['os'] === 'exalink-fusion') {
+    require 'ports/exalink-fusion.inc.php';
 } else {
     if (Config::getOsSetting($device['os'], 'polling.selected_ports') || (isset($device['attribs']['selected_ports']) && $device['attribs']['selected_ports'] == 'true')) {
         echo 'Selected ports polling ';
