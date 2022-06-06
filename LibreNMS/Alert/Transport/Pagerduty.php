@@ -54,7 +54,7 @@ class Pagerduty extends Transport
     public function contactPagerduty($obj, $config)
     {
         $safe_message = strip_tags($obj['msg']) ?: 'Test';
-        $custom_details = ['message' => explode("\n", $safe_message)];
+        $custom_details = ['message' => array_filter(explode("\n", $safe_message), 'strlen')];
         $data = [
             'routing_key'  => $config['service_key'],
             'event_action' => $obj['event_type'],
