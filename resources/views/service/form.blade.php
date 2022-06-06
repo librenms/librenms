@@ -169,9 +169,9 @@
                     this.testResult = 1;
                 }
             },
-            async submitCheck(url) {
+            async submitCheck(url, test=false) {
                 const response = await fetch(url, {
-                    method: this.service_id ? 'PUT' : 'POST',
+                    method: test ? 'POST' : 'PUT',
                     headers: {
                         'Accept': 'application/json',
                         'Content-Type': 'application/json',
@@ -199,7 +199,7 @@
                 }
             },
             async test() {
-                const result = await this.submitCheck('{{ route('services.test') }}')
+                const result = await this.submitCheck('{{ route('services.test') }}', true)
                 if (result !== false) {
                     this.testMessage = result.message;
                     this.testResult = result.result;

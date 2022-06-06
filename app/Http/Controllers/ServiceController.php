@@ -214,7 +214,7 @@ class ServiceController extends Controller
         $response = app(\LibreNMS\Modules\Services::class)->checkService($service);
 
         return response()->json([
-            'message' => htmlentities($response->message),
+            'message' => $response->message,
             'result' => $response->result,
         ]);
     }
@@ -246,6 +246,6 @@ class ServiceController extends Controller
                 'service_template_id' => 'nullable|int|exists:App\Models\ServiceTemplate,id',
             ] + $param_rules);
 
-        return Service::make($validated);
+        return new Service($validated);
     }
 }
