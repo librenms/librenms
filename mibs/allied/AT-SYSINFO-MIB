@@ -14,14 +14,14 @@
                 FROM AT-SMI-MIB
             InterfaceIndex
                 FROM IF-MIB
-            OBJECT-TYPE, MODULE-IDENTITY, NOTIFICATION-TYPE
+            OBJECT-TYPE, MODULE-IDENTITY, NOTIFICATION-TYPE, Unsigned32
                 FROM SNMPv2-SMI
             DisplayString
                 FROM SNMPv2-TC;
 
 
         sysinfo MODULE-IDENTITY
-            LAST-UPDATED "201009070000Z"
+            LAST-UPDATED "202003050000Z"
             ORGANIZATION
                 "Allied Telesis, Inc."
             CONTACT-INFO
@@ -41,27 +41,67 @@
                 { sysinfo 12 } awpEnvMon
                 { sysinfo 13 } awpStack
                 { sysinfo 14 } atPortInfo"
-            REVISION "200606140000Z"
+
+            REVISION "202003050000Z"
             DESCRIPTION
-                "Initial version of this MIB module."
-            REVISION "200802260000Z"
+                "Added SP10TM to atPortInfoTransceiverType"
+            REVISION "201804230000Z"
             DESCRIPTION
-                "Changed top DESCRIPTION section."
-            REVISION "201006040000Z"
+                "Added QSFP28-LR and QSFP-SWDM to atPortInfoTransceiverType"
+            REVISION "201803120000Z"
             DESCRIPTION
-                "Added new object atPortRenumberEvents."
-            REVISION "201006150015Z"
+                "Added QSFP28-CR to atPortInfoTransceiverEntry"
+            REVISION "201612140000Z"
             DESCRIPTION
-                "MIB revision history dates in descriptions updated."
-            REVISION "201008160016Z"
+                "Added QSFP28-SR to atPortInfoTransceiverEntry"
+            REVISION "201612120000Z"
             DESCRIPTION
-                "Added SFP Plus descriptions to atPortInfoTransceiverEntry."
-            REVISION "201008310031Z"
+                "Added 10GBASE-ZR SFP+ to atPortInfoTransceiverEntry"
+            REVISION "201605050000Z"
             DESCRIPTION
-                "Added Infinband descriptions to atPortInfoTransceiverEntry."
+                "Added 40GBASE-ER4 and 10GBBASE-T SFP+ to atPortInfoTransceiverEntry"
+            REVISION "201503160000Z"
+            DESCRIPTION
+                "Added 40GBASE-SR4 and 40GBASE-LR4 to atPortInfoTransceiverEntry"
+            REVISION "201406090000Z"
+            DESCRIPTION
+                "Added 4 x Cu Passive QSFP description to atPortInfoTransceiverEntry."
+            REVISION "201404300000Z"
+            DESCRIPTION
+                "Updated decriptions to refer to chassisMappingTable"
+            REVISION "201404160000Z"
+            DESCRIPTION
+                "Added more descriptions to cpuUtilisationStackId for VCStack Plus"
+            REVISION "201209210000Z"
+            DESCRIPTION
+                "Added chassis switch (e.g. SBx8100) descriptions to stack-related MIB objects"
+            REVISION "201103140000Z"
+            DESCRIPTION
+                "Added CX4 description to atPortInfoTransceiverEntry."
+            REVISION "201009180000Z"
+            DESCRIPTION
+                "Updated CPU Utilization to be per stack member."
             REVISION "201009070000Z"
             DESCRIPTION
                 "Generic syntax tidy up"
+            REVISION "201008310031Z"
+            DESCRIPTION
+                "Added Infinband descriptions to atPortInfoTransceiverEntry."
+            REVISION "201008160016Z"
+            DESCRIPTION
+                "Added SFP Plus descriptions to atPortInfoTransceiverEntry."
+            REVISION "201006150015Z"
+            DESCRIPTION
+                "MIB revision history dates in descriptions updated."
+            REVISION "201006040000Z"
+            DESCRIPTION
+                "Added new object atPortRenumberEvents."
+            REVISION "200802260000Z"
+            DESCRIPTION
+                "Changed top DESCRIPTION section."
+            REVISION "200606140000Z"
+            DESCRIPTION
+                "Initial version of this MIB module."
             ::= { atRouter 3 }
 
 
@@ -642,6 +682,122 @@
                 Expressed as a percentage."
             ::= { cpu 7 }
 
+        cpuUtilisationStackTable OBJECT-TYPE
+            SYNTAX SEQUENCE OF CpuUtilisationStackEntry
+            MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                "A list of stack members. For a chassis switch, this is a list
+                of cards."
+            ::= { cpu 8 }
+
+        cpuUtilisationStackEntry OBJECT-TYPE
+           SYNTAX CpuUtilisationStackEntry
+           MAX-ACCESS not-accessible
+           STATUS current
+           DESCRIPTION
+               "A set of parameters that describe the CPU utilisation of a
+                stack member. For a chassis switch, it corresponds to the CPU
+                utilisation of a card."
+           INDEX { cpuUtilisationStackId }
+           ::= { cpuUtilisationStackTable 1 }
+
+        CpuUtilisationStackEntry ::= SEQUENCE {
+           cpuUtilisationStackId
+                Unsigned32,
+           cpuUtilisationStackMax
+                INTEGER,
+           cpuUtilisationStackAvg
+                INTEGER,
+           cpuUtilisationStackAvgLastMinute
+                INTEGER,
+           cpuUtilisationStackAvgLast10Seconds
+                INTEGER,
+           cpuUtilisationStackAvgLastSecond
+                INTEGER,
+           cpuUtilisationStackMaxLast5Minutes
+                INTEGER,
+           cpuUtilisationStackAvgLast5Minutes
+                INTEGER
+           }
+
+        cpuUtilisationStackId OBJECT-TYPE
+            SYNTAX Unsigned32
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "Stack member ID. For a chassis switch, it corresponds to the
+                card ID. For VCStack Plus, 1-12 refers to the cards on VCS stack
+                member 1 and 13-24 refers to the cards on VCS stack member 2.
+                Refer to chassisMappingTable for more details."
+            ::= { cpuUtilisationStackEntry 1 }
+
+        cpuUtilisationStackMax OBJECT-TYPE
+            SYNTAX  INTEGER  (0..100)
+            MAX-ACCESS  read-only
+            STATUS      current
+            DESCRIPTION
+                "Maximum CPU utilisation since the router was last restarted.
+                Expressed as a percentage."
+            ::= { cpuUtilisationStackEntry 2 }
+
+        cpuUtilisationStackAvg OBJECT-TYPE
+            SYNTAX  INTEGER  (0..100) 
+            MAX-ACCESS  read-only
+            STATUS      current
+            DESCRIPTION
+                "Average CPU utilisation since the router was last restarted.
+                 Expressed as a percentage."
+            ::= { cpuUtilisationStackEntry 3 }  
+
+        cpuUtilisationStackAvgLastMinute OBJECT-TYPE
+            SYNTAX  INTEGER  (0..100) 
+            MAX-ACCESS  read-only
+            STATUS      current
+            DESCRIPTION
+                "Average CPU utilisation over the past minute.
+                 Expressed as a percentage."
+            ::= { cpuUtilisationStackEntry 4 }
+          
+        cpuUtilisationStackAvgLast10Seconds OBJECT-TYPE
+            SYNTAX  INTEGER  (0..100) 
+            MAX-ACCESS  read-only
+            STATUS      current
+            DESCRIPTION
+                "Average CPU utilisation over the past ten seconds.
+                 Expressed as a percentage."
+           ::= { cpuUtilisationStackEntry 5 }
+
+        cpuUtilisationStackAvgLastSecond OBJECT-TYPE
+            SYNTAX  INTEGER  (0..100) 
+            MAX-ACCESS  read-only
+            STATUS      current
+            DESCRIPTION
+                "Average CPU utilisation over the past second.
+                 Expressed as a percentage."
+           ::= { cpuUtilisationStackEntry 6 }
+
+        cpuUtilisationStackMaxLast5Minutes OBJECT-TYPE
+            SYNTAX  INTEGER  (0..100)
+            MAX-ACCESS  read-only
+            STATUS      current
+            DESCRIPTION
+                "Maximum CPU utilisation over the last 5 minutes.
+                 Expressed as a percentage."
+           ::= { cpuUtilisationStackEntry 7 }
+
+        cpuUtilisationStackAvgLast5Minutes OBJECT-TYPE
+            SYNTAX  INTEGER  (0..100) 
+            MAX-ACCESS  read-only
+            STATUS      current
+            DESCRIPTION
+                "Average CPU utilisation over the past 5 minutes.
+                 Expressed as a percentage."
+           ::= { cpuUtilisationStackEntry 8 }
+
+   
+   
+
 --  sysTemperature - this group contains information about the temperature monitoring
 --  in the system. under this group is a general group, containing generic temperature
 --  monitoring variables, and one or more specific groups, which contain variables specific
@@ -1097,7 +1253,19 @@
                 inf-1-x-copper-pasv(30),
                 inf-1-x-copper-actv(31),
                 inf-1-x-lx(32),
-                inf-1-x-sx(33)
+                inf-1-x-sx(33),
+                cx4(34),
+                inf-4-x-copper-pasv(35),
+                qsfp-sr(36),
+                qsfp-lr(37),
+                qsfp-er(38),
+                sfpp-t(39),
+                sfpp-zr(40),
+                qsfp28-sr(41),
+                qsfp28-lr(42),
+                qsfp-swdm(43),
+                qsfp28-cr(44),
+                sfpp-tm(45)
                 }
             MAX-ACCESS read-only
             STATUS current

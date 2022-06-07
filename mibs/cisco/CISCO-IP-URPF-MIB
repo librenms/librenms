@@ -1,416 +1,490 @@
 -- ******************************************************************
 -- CISCO-IP-URPF-MIB
---
+--   
 -- This module is used for monitoring the state of Unicast Reverse
 -- Path Forwarding (URPF) checking.
---
+--   
 -- September 2004, Michael Grobelch
---
--- Copyright (c) 2004 by Cisco Systems, Inc.
+--   
+-- Copyright (c) 2004-2006-2012 by Cisco Systems Inc.
+--   
 -- All rights reserved.
--- ******************************************************************
---
+-- *****************************************************************
 
 CISCO-IP-URPF-MIB DEFINITIONS ::= BEGIN
 
-IMPORTS 
+IMPORTS
     MODULE-IDENTITY,
     OBJECT-TYPE,
     Gauge32,
     Integer32,
     Counter32,
     Unsigned32,
-    NOTIFICATION-TYPE      FROM SNMPv2-SMI
-    MODULE-COMPLIANCE, 
+    NOTIFICATION-TYPE
+        FROM SNMPv2-SMI
+    MODULE-COMPLIANCE,
     NOTIFICATION-GROUP,
-    OBJECT-GROUP           FROM SNMPv2-CONF
+    OBJECT-GROUP
+        FROM SNMPv2-CONF
+    TEXTUAL-CONVENTION,
     TimeStamp,
-    TruthValue             FROM SNMPv2-TC
-    SnmpAdminString        FROM SNMP-FRAMEWORK-MIB
-    ifIndex                FROM IF-MIB
-    ciscoMgmt              FROM CISCO-SMI;
+    TruthValue
+        FROM SNMPv2-TC
+    SnmpAdminString
+        FROM SNMP-FRAMEWORK-MIB
+    ifIndex
+        FROM IF-MIB
+    ciscoMgmt
+        FROM CISCO-SMI;
+
 
 ciscoIpUrpfMIB MODULE-IDENTITY
-    LAST-UPDATED "200411120000Z"
-    ORGANIZATION "Cisco System, Inc."
+    LAST-UPDATED    "201112290000Z"
+    ORGANIZATION    "Cisco System, Inc."
     CONTACT-INFO
-        "Postal: Cisco Systems, Inc.
-        170 West Tasman Drive
-        San Jose, CA 95134-1706
-        USA
+            "Postal: Cisco Systems, Inc.
+            170 West Tasman Drive
+            San Jose, CA 95134-1706
+            USA
 
-        Tel: +1 800 553-NETS
+            Tel: +1 800 553-NETS
 
-        E-mail: cs-cef@cisco.com"
-
+            E-mail: cs-cef@cisco.com"
     DESCRIPTION
-        "Unicast Reverse Path Forwarding (URPF) is a function 
-         that checks the validity of the source address of IP 
-         packets received on an interface. This in an attempt 
-         to prevent Denial of Service attacks based on IP address 
-         spoofing.
+        "Unicast Reverse Path Forwarding (URPF) is a function that
+        checks the validity of the source address of IP packets
+        received on an interface. This in an attempt to prevent
+        Denial of Service attacks based on IP address spoofing.
 
         URPF checks validity of a source address by determining
         whether the packet would be successfully routed as a
-        destination address.
-
-        Based on configuration, the check made can be for existence
-        of any route for the address, or more strictly for a route
-        out the interface on which the packet was received by the 
-        device. When a violating packet is detected, it can be dropped.
-
-        This MIB allows detection of spoofing events."
-    REVISION        "200411120000Z" 
+        destination address. 
+        Based on configuration, the check made
+        can be for existence of any route for the address, or more
+        strictly for a route out the interface on which the packet
+        was received by the device. When a violating packet is
+        detected, it can be dropped. 
+        This MIB allows detection of
+        spoofingevents."
+    REVISION        "201112290000Z"
     DESCRIPTION
-        "Initial version of this MIB module."    
+        "2 New TC are defined to support Dynamic template MIB"
+    REVISION        "200411120000Z"
+    DESCRIPTION
+        "Initial version of this MIB module."
     ::= { ciscoMgmt 451 }
 
---
+
+
+-- Textual Conventions
+
+UnicastRpfType ::= TEXTUAL-CONVENTION
+    STATUS          current
+    DESCRIPTION
+        "An enumerated integer-value describing the type of
+        unicast Reverse Path Forwarding (RPF) a system applies to
+        traffic received on an interface. UnicastRpfTypes 'strict' and 
+        'loose' RPF methods are defined in RFC3704.
+
+        'disabled'
+            The system does not perform unicast RPF on packets received
+            by the interface.
+
+        'strict'
+            The system performs strict unicast RPF on packets received
+            by the interface.
+        'loose'
+            The system performs loose unicast RPF on packets received by
+            the interface."
+
+    REFERENCE       "RFC3704 (http://tools.ietf.org/html/rfc3704)"
+    SYNTAX          INTEGER  {
+                        strict(1),
+                        loose(2),
+                        disabled(3)
+                    }
+
+UnicastRpfOptions ::= TEXTUAL-CONVENTION
+    STATUS          current
+    DESCRIPTION
+        "A bit string describing unicast Reverse Path Forwarding (RPF)
+        options:
+
+        'allowDefault'
+            Allows the use of the default route for RPF verification.
+
+        'allowSelfPing'
+            Allows a router to ping its own interface or interfaces."
+    SYNTAX          BITS {
+                        allowDefault(0),
+                        allowSelfPing(1)
+                    }
 -- MIB Object Definitions
---
 
-ciscoIpUrpfMIBNotifs      OBJECT IDENTIFIER ::= { ciscoIpUrpfMIB 0 }
-ciscoIpUrpfMIBObjects     OBJECT IDENTIFIER ::= { ciscoIpUrpfMIB 1 }
-ciscoIpUrpfMIBConformance OBJECT IDENTIFIER ::= { ciscoIpUrpfMIB 2 }
+ciscoIpUrpfMIBNotifs  OBJECT IDENTIFIER
+    ::= { ciscoIpUrpfMIB 0 }
 
---
+ciscoIpUrpfMIBObjects  OBJECT IDENTIFIER
+    ::= { ciscoIpUrpfMIB 1 }
+
+ciscoIpUrpfMIBConformance  OBJECT IDENTIFIER
+    ::= { ciscoIpUrpfMIB 2 }
+
 -- URPF Statistics objects
---
-cipUrpfScalar          OBJECT IDENTIFIER ::= { ciscoIpUrpfMIBObjects 1 }
-cipUrpfStatistics      OBJECT IDENTIFIER ::= { ciscoIpUrpfMIBObjects 2 }
-cipUrpfInterfaceConfig OBJECT IDENTIFIER ::= { ciscoIpUrpfMIBObjects 3 }
-cipUrpfVrf             OBJECT IDENTIFIER ::= { ciscoIpUrpfMIBObjects 4 }
+
+cipUrpfScalar  OBJECT IDENTIFIER
+    ::= { ciscoIpUrpfMIBObjects 1 }
+
+cipUrpfStatistics  OBJECT IDENTIFIER
+    ::= { ciscoIpUrpfMIBObjects 2 }
+
+cipUrpfInterfaceConfig  OBJECT IDENTIFIER
+    ::= { ciscoIpUrpfMIBObjects 3 }
+
+cipUrpfVrf  OBJECT IDENTIFIER
+    ::= { ciscoIpUrpfMIBObjects 4 }
+
 
 cipUrpfDropRateWindow OBJECT-TYPE
-    SYNTAX     Integer32 (1..600)
-    UNITS      "seconds"
-    MAX-ACCESS read-write
-    STATUS     current
+    SYNTAX          Integer32 (1..600)
+    UNITS           "seconds"
+    MAX-ACCESS      read-write
+    STATUS          current
     DESCRIPTION
         "The window of time in the recent past over which the drop
-         count used in the drop rate computation is collected. 
-         This global value applies for the computation of all URPF 
-         rates, global and per-interface. 
+        count used in the drop rate computation is collected. 
+        This global value applies for the computation of all URPF 
+        rates, global and per-interface. 
 
-         Once the period over which computations have been 
-         performed exceeds cipUrpfDropRateWindow, every time a 
-         computation is performed, the window slides up to end 
-         at the current time and start at cipUrpfDropRateWindow 
-         seconds before. 
+        Once the period over which computations have been 
+        performed exceeds cipUrpfDropRateWindow, every time a 
+        computation is performed, the window slides up to end 
+        at the current time and start at cipUrpfDropRateWindow 
+        seconds before. 
 
-         The cipUrpfDropRateWindow must be greater than
-         or equal to the interval between computations 
-         (cipUrpfComputeInterval).
+        The cipUrpfDropRateWindow must be greater than
+        or equal to the interval between computations 
+        (cipUrpfComputeInterval).
 
-         Since the agent must save the drop count values
-         for each compute interval in order to slide the window,
-         the number of counts saved is the quotient of
-         cipUrpfDropRateWindow divided by cipUrpfComputeInterval."
-    DEFVAL { 300 }
+        Since the agent must save the drop count values
+        for each compute interval in order to slide the window,
+        the number of counts saved is the quotient of
+        cipUrpfDropRateWindow divided by cipUrpfComputeInterval."
+    DEFVAL          { 300 } 
     ::= { cipUrpfScalar 1 }
 
 cipUrpfComputeInterval OBJECT-TYPE
-    SYNTAX     Integer32 (1..120)
-    UNITS      "seconds"
-    MAX-ACCESS read-write
-    STATUS     current
+    SYNTAX          Integer32 (1..120)
+    UNITS           "seconds"
+    MAX-ACCESS      read-write
+    STATUS          current
     DESCRIPTION
-        "The time between rate computations. This global value 
-         applies for the computation of all URPF rates, global
-         and per-interface.
+        "The time between rate computations. This global value
+        applies for the computation of all URPF rates, global
+        and per-interface.
 
-         When the value of cipUrpfComputeInterval is changed,
-         the interval in-progress proceeds as though the value
-         had not changed. The change will apply to the length
-         of subsequent intervals.
+        When the value of cipUrpfComputeInterval is changed,
+        the interval in-progress proceeds as though the value
+        had not changed. The change will apply to the length
+        of subsequent intervals.
 
-         The cipUrpfComputeInterval must be less than or equal 
-         to the cipUrpfDropRateWindow."
-    DEFVAL { 30 }
+        The cipUrpfComputeInterval must be less than or equal 
+        to the cipUrpfDropRateWindow."
+    DEFVAL          { 30 } 
     ::= { cipUrpfScalar 2 }
 
 cipUrpfDropNotifyHoldDownTime OBJECT-TYPE
-    SYNTAX     Integer32(1..1000)
-    UNITS      "seconds"
-    MAX-ACCESS read-write
-    STATUS     current
+    SYNTAX          Integer32 (1..1000)
+    UNITS           "seconds"
+    MAX-ACCESS      read-write
+    STATUS          current
     DESCRIPTION
-        "The minimum time between issuance of 
-         cipUrpfIfDropRateNotify notifications for a 
-         particular interface and packet forwarding type.
+        "The minimum time between issuance of
+        cipUrpfIfDropRateNotify notifications for a 
+        particular interface and packet forwarding type.
 
-         Notifications are generated for each interface and
-         packet forwarding type that exceeds the drop-rate. 
-         When a Notify is sent because the drop-rate is 
-         exceeded for a particular interface and forwarding
-         type, the time specified by this object is used to 
-         specify the minimum time that must elapse before 
-         another Notify can be sent for that interface and
-         forwarding type. The time is specified globally but 
-         used individually."
-    DEFVAL { 300 }
+        Notifications are generated for each interface and
+        packet forwarding type that exceeds the drop-rate. 
+        When a Notify is sent because the drop-rate is 
+        exceeded for a particular interface and forwarding
+        type, the time specified by this object is used to 
+        specify the minimum time that must elapse before 
+        another Notify can be sent for that interface and
+        forwarding type. The time is specified globally but 
+        used individually."
+    DEFVAL          { 300 } 
     ::= { cipUrpfScalar 3 }
 
 cipUrpfTable OBJECT-TYPE
-    SYNTAX     SEQUENCE OF CipUrpfEntry
-    MAX-ACCESS not-accessible
-    STATUS     current
+    SYNTAX          SEQUENCE OF CipUrpfEntry 
+    MAX-ACCESS      not-accessible
+    STATUS          current
     DESCRIPTION
         "This table contains summary information for the
-         managed device on URPF dropping."
+        managed device on URPF dropping."
     ::= { cipUrpfStatistics 1 }
 
 cipUrpfEntry OBJECT-TYPE
-    SYNTAX     CipUrpfEntry
-    MAX-ACCESS not-accessible
-    STATUS     current
+    SYNTAX          CipUrpfEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
     DESCRIPTION
         "If the managed device supports URPF dropping,
-         a row exists for each IP version type (v4 and v6).
-         A row contains summary information on URPF
-         dropping over the entire managed device." 
-    INDEX  { cipUrpfIpVersion }
+        a row exists for each IP version type (v4 and v6).
+        A row contains summary information on URPF
+        dropping over the entire managed device."
+    INDEX           { cipUrpfIpVersion } 
     ::= { cipUrpfTable 1 }
 
 CipUrpfEntry ::= SEQUENCE {
-        cipUrpfIpVersion               INTEGER,
-        cipUrpfDrops                   Counter32,
-        cipUrpfDropRate                Gauge32
-    }
+        cipUrpfIpVersion INTEGER,
+        cipUrpfDrops     Counter32,
+        cipUrpfDropRate  Gauge32
+}
 
 cipUrpfIpVersion OBJECT-TYPE
-    SYNTAX     INTEGER {ipv4(1), ipv6(2)}
-    MAX-ACCESS not-accessible
-    STATUS     current
+    SYNTAX          INTEGER  {
+                        ipv4(1),
+                        ipv6(2)
+                    }
+    MAX-ACCESS      not-accessible
+    STATUS          current
     DESCRIPTION
-       "Specifies the version of IP forwarding on an interface
+        "Specifies the version of IP forwarding on an interface
         to which the table row URPF counts, rates, and
-        configuration apply."
+        configuration apply." 
     ::= { cipUrpfEntry 1 }
 
 cipUrpfDrops OBJECT-TYPE
-    SYNTAX     Counter32
-    UNITS      "packets"
-    MAX-ACCESS read-only
-    STATUS     current
+    SYNTAX          Counter32
+    UNITS           "packets"
+    MAX-ACCESS      read-only
+    STATUS          current
     DESCRIPTION
-        "Sum of dropped IP version cipUrpfIpVersion packets failing 
-         a URPF check. This value is the sum of drops of packets 
-         received on all interfaces of the managed device."
+        "Sum of dropped IP version cipUrpfIpVersion packets failing
+        a URPF check. This value is the sum of drops of packets 
+        received on all interfaces of the managed device." 
     ::= { cipUrpfEntry 2 }
 
 cipUrpfDropRate OBJECT-TYPE
-    SYNTAX     Gauge32
-    UNITS      "packets per second"
-    MAX-ACCESS read-only
-    STATUS     current
+    SYNTAX          Gauge32
+    UNITS           "packets per second"
+    MAX-ACCESS      read-only
+    STATUS          current
     DESCRIPTION
-        "The rate of packet drops of IP version cipUrpfIpVersion 
-         packets due to URPF for the managed device. The 
-         per-interface drop rate notification is issued on rates 
-         exceeding a limit (rising rate). This dropping may 
-         indicate an security attack on the network. To determine 
-         whether the attack/event is over, the NMS must 
-         consult the managed device. This object can be polled to 
-         determine the recent drop rate for the managed device
-         as a whole, in addition to querying particular interface 
-         objects.
-
-         This object is the average rate of dropping over the most 
-         recent window of time. The rate is computed by dividing 
-         the number of packets dropped over a window by the window 
-         time in seconds. The window time is specified by 
-         cipUrpfDropRateWindow. Each time the drop rate is computed, 
-         and at system startup, a snapshot is taken of the latest 
-         value of cipUrpfDrops. Subtracting from this the snapshot 
-         of cipUrpfDrops at the start of the current window of time 
-         gives the number of packets dropped.  The drop rate is 
-         computed every cipUrpfComputeInterval seconds. As an 
-         example, let cipUrpfDropRateWindow be 300 seconds,
-         and cipUrpfComputeInterval 30 seconds. Every 30 seconds,
-         the drop count five minutes previous is subtracted
-         from the current drop count, and the result is divided
-         by 300 to arrive at the drop rate.
-
-         At device start-up, until the device has been up more than
-         cipUrpfDropRateWindow, when drop rate is computed,
-         the value of cipUrpfDrops is divided by the time the
-         device has been up.
-
-         After the device has been up for cipUrpfDropRateWindow,
-         when drop rate is computed, the number of packet drops counted 
-         from interval start time to the computation time is divided 
-         by cipUrpfDropRateWindow.
-
-         Changes to cipUrpfDropRateWindow are not reflected in this
-         object until the next computation time.
-
-         The rate from the  most recent computation is the value 
-         fetched until the subsequent computation is performed."
+        "The rate of packet drops of IP version cipUrpfIpVersion
+        packets due to URPF for the managed device. The
+        per-interface drop rate notification is issued on rates
+        exceeding a limit (rising rate). This dropping may indicate
+        an security attack on the network. To determine whether the
+        attack/event is over, the NMS must consult the managed
+        device. This object can be polled to determine the recent
+        drop rate for the managed device as a whole, in addition to
+        querying particular interface objects. 
+        This object is the
+        average rate of dropping over the most recent window of
+        time. The rate is computed by dividing the number of packets
+        dropped over a window by the window time in seconds. The
+        window time is specified by cipUrpfDropRateWindow. Each time
+        the drop rate is computed, and at system startup, a snapshot
+        is taken of the latest value of cipUrpfDrops. Subtracting
+        from this the snapshot of cipUrpfDrops at the start of the
+        current window of time gives the number of packets dropped.
+        The drop rate is computed every cipUrpfComputeInterval
+        seconds. As an example, let cipUrpfDropRateWindow be 300
+        seconds, and cipUrpfComputeInterval 30 seconds. Every 30
+        seconds, the drop count five minutes previous is subtracted
+        from the current drop count, and the result is divided by
+        300 to arrive at the drop rate. 
+        At device start-up, until
+        the device has been up more than cipUrpfDropRateWindow, when
+        drop rate is computed, the value of cipUrpfDrops is divided
+        by the time the device has been up. 
+        After the device has
+        been up for cipUrpfDropRateWindow, when drop rate is
+        computed, the number of packet drops counted from interval
+        start time to the computation time is divided by
+        cipUrpfDropRateWindow. 
+        Changes to cipUrpfDropRateWindow are
+        not reflected in this object until the next computation
+        time. 
+        The rate from the most recent computation is the
+        value fetched until the subsequent computation is
+        performed." 
     ::= { cipUrpfEntry 3 }
+ 
+
 
 cipUrpfIfMonTable OBJECT-TYPE
-    SYNTAX     SEQUENCE OF CipUrpfIfMonEntry
-    MAX-ACCESS not-accessible
-    STATUS     current
+    SYNTAX          SEQUENCE OF CipUrpfIfMonEntry 
+    MAX-ACCESS      not-accessible
+    STATUS          current
     DESCRIPTION
         "This table contains information on URPF dropping on
-         an interface."
+        an interface."
     ::= { cipUrpfStatistics 2 }
-                
+
 cipUrpfIfMonEntry OBJECT-TYPE
-    SYNTAX     CipUrpfIfMonEntry
-    MAX-ACCESS not-accessible
-    STATUS     current
+    SYNTAX          CipUrpfIfMonEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
     DESCRIPTION
         "If IPv4 packet forwarding is configured on an interface,
-         and is configured to perform URPF checking, a row appears
-         in this table with indices [ifIndex][ipv4]. If IPv4
-         packet forwarding is deconfigured, or URPF checking
-         is deconfigured, the row disappears.
+        and is configured to perform URPF checking, a row appears
+        in this table with indices [ifIndex][ipv4]. If IPv4
+        packet forwarding is deconfigured, or URPF checking
+        is deconfigured, the row disappears.
 
-         If IPv6 packet forwarding is configured on an interface,
-         and is configured to perform URPF checking, a row appears
-         in the table with indices [ifIndex][ipv6].  If IPv6
-         packet forwarding is deconfigured, or URPF checking
-         is deconfigured, the row disappears."
-    INDEX  { ifIndex, cipUrpfIfIpVersion }
+        If IPv6 packet forwarding is configured on an interface,
+        and is configured to perform URPF checking, a row appears
+        in the table with indices [ifIndex][ipv6].  If IPv6
+        packet forwarding is deconfigured, or URPF checking
+        is deconfigured, the row disappears."
+    INDEX           {
+                        ifIndex,
+                        cipUrpfIfIpVersion
+                    } 
     ::= { cipUrpfIfMonTable 1 }
 
-CipUrpfIfMonEntry ::= SEQUENCE { 
-        cipUrpfIfIpVersion             INTEGER,
-        cipUrpfIfDrops                 Counter32,
-        cipUrpfIfSuppressedDrops       Counter32,
-        cipUrpfIfDropRate              Gauge32,
-        cipUrpfIfDiscontinuityTime     TimeStamp
-    }
+CipUrpfIfMonEntry ::= SEQUENCE {
+        cipUrpfIfIpVersion         INTEGER,
+        cipUrpfIfDrops             Counter32,
+        cipUrpfIfSuppressedDrops   Counter32,
+        cipUrpfIfDropRate          Gauge32,
+        cipUrpfIfDiscontinuityTime TimeStamp
+}
 
 cipUrpfIfIpVersion OBJECT-TYPE
-    SYNTAX     INTEGER {ipv4(1), ipv6(2)}
-    MAX-ACCESS not-accessible
-    STATUS     current
+    SYNTAX          INTEGER  {
+                        ipv4(1),
+                        ipv6(2)
+                    }
+    MAX-ACCESS      not-accessible
+    STATUS          current
     DESCRIPTION
-       "Specifies the version of IP forwarding on an interface 
+        "Specifies the version of IP forwarding on an interface
         to which the table row URPF counts, rates, and 
-        configuration apply."
-    ::= { cipUrpfIfMonEntry 1}
+        configuration apply." 
+    ::= { cipUrpfIfMonEntry 1 }
 
 cipUrpfIfDrops OBJECT-TYPE
-    SYNTAX     Counter32
-    UNITS      "packets"
-    MAX-ACCESS read-only
-    STATUS     current
+    SYNTAX          Counter32
+    UNITS           "packets"
+    MAX-ACCESS      read-only
+    STATUS          current
     DESCRIPTION
         "The number of IP packets of version cipUrpfIfIpVersion
-         failing the URPF check and dropped by the managed device
-         on a particular interface.
+        failing the URPF check and dropped by the managed device
+        on a particular interface.
 
-         Discontinuities in the value of this variable can occur 
-         at re-initialization of the management system, and at 
-         other times as indicated by the values of 
-         cipUrpfIfDiscontinuityTime."
+        Discontinuities in the value of this variable can occur 
+        at re-initialization of the management system, and at 
+        other times as indicated by the values of 
+        cipUrpfIfDiscontinuityTime." 
     ::= { cipUrpfIfMonEntry 2 }
 
 cipUrpfIfSuppressedDrops OBJECT-TYPE
-    SYNTAX     Counter32 
-    UNITS      "packets"
-    MAX-ACCESS read-only
-    STATUS     current
+    SYNTAX          Counter32
+    UNITS           "packets"
+    MAX-ACCESS      read-only
+    STATUS          current
     DESCRIPTION
-        "The number of IP packets of version cipUrpfIfIpVersion 
-         failing the URPF check but given a reprieve and not 
-         dropped by the managed device. Depending on the 
-         device configuration and capabilities, the following 
-         cases may cause incrementing of the counter: 
-         - if the managed device is configured to allow self-pings 
-           and the managed device pings itself.
-         - if the managed device is configured for loose URPF (if any
-           interface has a route to the source), and the strict
-           case fails while the loose case passes.
-         - DHCP Request packets (src 0.0.0.0 dst 255.255.255.255) 
-           will pass after initially being marked for drop.
-         - RIP routing on unnumbered interfaces will pass after 
-           initially being marked for drop.
-         - multicast packets will pass after initially being marked 
-           for drop
-         - ACL's can be applied to permit packets after initially 
-           being marked for drop.
+        "The number of IP packets of version cipUrpfIfIpVersion
+        failing the URPF check but given a reprieve and not 
+        dropped by the managed device. Depending on the 
+        device configuration and capabilities, the following 
+        cases may cause incrementing of the counter: 
+        - if the managed device is configured to allow self-pings 
+          and the managed device pings itself.
+        - if the managed device is configured for loose URPF (if any
+          interface has a route to the source), and the strict
+          case fails while the loose case passes.
+        - DHCP Request packets (src 0.0.0.0 dst 255.255.255.255) 
+          will pass after initially being marked for drop.
+        - RIP routing on unnumbered interfaces will pass after 
+          initially being marked for drop.
+        - multicast packets will pass after initially being marked 
+          for drop
+        - ACL's can be applied to permit packets after initially 
+          being marked for drop.
 
-         Discontinuities in the value of this variable can occur 
-         at re-initialization of the management system, and at 
-         other times as indicated by the values of 
-         cipUrpfIfDiscontinuityTime."
+        Discontinuities in the value of this variable can occur 
+        at re-initialization of the management system, and at 
+        other times as indicated by the values of 
+        cipUrpfIfDiscontinuityTime." 
     ::= { cipUrpfIfMonEntry 3 }
 
 cipUrpfIfDropRate OBJECT-TYPE
-    SYNTAX     Gauge32
-    UNITS      "packets/second"
-    MAX-ACCESS read-only
-    STATUS     current
+    SYNTAX          Gauge32
+    UNITS           "packets/second"
+    MAX-ACCESS      read-only
+    STATUS          current
     DESCRIPTION
         "The rate of packet drops of IP version cipUrpfIfIpVersion
-         packets due to URPF on the interface. 
+        packets due to URPF on the interface. 
 
-         This object is the average rate of dropping over the most 
-         recent interval of time. The rate is computed by dividing
-         the number of packets dropped over an interval by the 
-         interval time in seconds. Each time the drop rate
-         is computed, and at system startup, a snapshot is taken
-         of the latest value of cipUrpfIfDrops. Subtracting from this
-         the snapshot of cipUrpfIfDrops at the start of the current
-         interval of time gives the number of packets dropped.
-         The drop rate is computed every cipUrpfComputeInterval
-         seconds.
+        This object is the average rate of dropping over the most 
+        recent interval of time. The rate is computed by dividing
+        the number of packets dropped over an interval by the 
+        interval time in seconds. Each time the drop rate
+        is computed, and at system startup, a snapshot is taken
+        of the latest value of cipUrpfIfDrops. Subtracting from this
+        the snapshot of cipUrpfIfDrops at the start of the current
+        interval of time gives the number of packets dropped.
+        The drop rate is computed every cipUrpfComputeInterval
+        seconds.
 
-         When drop rate is computed, if time since the creation of 
-         a row in cipUrpfIfMonTable is less than 
-         cipUrpfDropRateWindow, the value of cipUrpfIfDrops is 
-         divided by the time since row was created.
+        When drop rate is computed, if time since the creation of 
+        a row in cipUrpfIfMonTable is less than 
+        cipUrpfDropRateWindow, the value of cipUrpfIfDrops is 
+        divided by the time since row was created.
 
-         After the row has been in existence for 
-         cipUrpfDropRateWindow, when drop rate is computed, the 
-         number of packet drops counted on the interface from 
-         interval start time to the computation time is divided 
-         by cipUrpfDropRateWindow.
+        After the row has been in existence for 
+        cipUrpfDropRateWindow, when drop rate is computed, the 
+        number of packet drops counted on the interface from 
+        interval start time to the computation time is divided 
+        by cipUrpfDropRateWindow.
 
-         Changes to cipUrpfDropRateWindow are not reflected in this
-         object until the next computation time.
+        Changes to cipUrpfDropRateWindow are not reflected in this
+        object until the next computation time.
 
-         The rate from the  most recent computation is the value 
-         fetched until the subsequent computation is performed."
+        The rate from the  most recent computation is the value 
+        fetched until the subsequent computation is performed." 
     ::= { cipUrpfIfMonEntry 4 }
 
 cipUrpfIfDiscontinuityTime OBJECT-TYPE
-    SYNTAX     TimeStamp
-    MAX-ACCESS read-only
-    STATUS     current
+    SYNTAX          TimeStamp
+    MAX-ACCESS      read-only
+    STATUS          current
     DESCRIPTION
         "The value of sysUpTime on the most recent
-         occasion at which this interface's  counters
-         suffered  a discontinuity.
-         If no such discontinuities have occurred
-         since the last re-initialization of the
-         local management subsystem, then this
-         object contains a value of zero."
+        occasion at which this interface's  counters
+        suffered  a discontinuity.
+        If no such discontinuities have occurred
+        since the last re-initialization of the
+        local management subsystem, then this
+        object contains a value of zero." 
     ::= { cipUrpfIfMonEntry 5 }
+ 
+
 
 cipUrpfIfConfTable OBJECT-TYPE
-    SYNTAX     SEQUENCE OF CipUrpfIfConfEntry
-    MAX-ACCESS not-accessible
-    STATUS     current
+    SYNTAX          SEQUENCE OF CipUrpfIfConfEntry 
+    MAX-ACCESS      not-accessible
+    STATUS          current
     DESCRIPTION
         "This table contains statistics information on URPF on
-         an interface."
+        an interface."
     ::= { cipUrpfInterfaceConfig 1 }
 
 cipUrpfIfConfEntry OBJECT-TYPE
-    SYNTAX     CipUrpfIfConfEntry
-    MAX-ACCESS not-accessible
-    STATUS     current
+    SYNTAX          CipUrpfIfConfEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
     DESCRIPTION
         "A row exists in this table if a row exists
-         in cipUrpfIfMonTable."
-    AUGMENTS { cipUrpfIfMonEntry }
+        in cipUrpfIfMonTable."
+    AUGMENTS           { cipUrpfIfMonEntry  } 
     ::= { cipUrpfIfConfTable 1 }
 
 CipUrpfIfConfEntry ::= SEQUENCE {
@@ -420,289 +494,299 @@ CipUrpfIfConfEntry ::= SEQUENCE {
         cipUrpfIfCheckStrict             INTEGER,
         cipUrpfIfWhichRouteTableID       INTEGER,
         cipUrpfIfVrfName                 SnmpAdminString
-    }
+}
 
 cipUrpfIfDropRateNotifyEnable OBJECT-TYPE
-    SYNTAX     TruthValue
-    MAX-ACCESS read-write
-    STATUS     current
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-write
+    STATUS          current
     DESCRIPTION
-        "This object specifies whether the system produces the 
-         cipUrpfIfDropRateNotify notification as a result of URPF 
-         dropping of version cipUrpfIfIpVersion IP packets on this 
-         interface. A false value prevents such notifications from 
-         being generated by this system."
-    DEFVAL { false }
+        "This object specifies whether the system produces the
+        cipUrpfIfDropRateNotify notification as a result of URPF 
+        dropping of version cipUrpfIfIpVersion IP packets on this 
+        interface. A false value prevents such notifications from 
+        being generated by this system."
+    DEFVAL          { false } 
     ::= { cipUrpfIfConfEntry 1 }
 
 cipUrpfIfNotifyDropRateThreshold OBJECT-TYPE
-    SYNTAX     Unsigned32
-    UNITS      "packets/second"
-    MAX-ACCESS read-write
-    STATUS     current
+    SYNTAX          Unsigned32
+    UNITS           "packets/second"
+    MAX-ACCESS      read-write
+    STATUS          current
     DESCRIPTION
-        "When the calculated rate of URPF packet drops 
-         (cipUrpfIfDropRate) meets or exceeds the value 
-         specified by this object, a cipUrpfIfDropRateNotify 
-         notification is sent if cipUrpfIfDropRateNotifyEnable 
-         is set to true, and no such notification for the
-         IP version has been sent for this interface for the 
-         hold-down period.
+        "When the calculated rate of URPF packet drops
+        (cipUrpfIfDropRate) meets or exceeds the value 
+        specified by this object, a cipUrpfIfDropRateNotify 
+        notification is sent if cipUrpfIfDropRateNotifyEnable 
+        is set to true, and no such notification for the
+        IP version has been sent for this interface for the 
+        hold-down period.
 
-         Note that due to the calculation used for drop rate, 
-         if there are less than n drop events in an n-second
-         period the notification will not be generated. To allow
-         for the detection of a small number of drop events, the
-         value 0 (zero) is used to indicate that if any drop events
-         occur during the interval, a notification is generated."
-    DEFVAL { 1000 }
+        Note that due to the calculation used for drop rate, 
+        if there are less than n drop events in an n-second
+        period the notification will not be generated. To allow
+        for the detection of a small number of drop events, the
+        value 0 (zero) is used to indicate that if any drop events
+        occur during the interval, a notification is generated."
+    DEFVAL          { 1000 } 
     ::= { cipUrpfIfConfEntry 2 }
 
 cipUrpfIfNotifyDrHoldDownReset OBJECT-TYPE
-    SYNTAX     TruthValue
-    MAX-ACCESS read-write
-    STATUS     current
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-write
+    STATUS          current
     DESCRIPTION
-        "Setting this object to true causes the five-minute 
-         hold-down timer for emitting URPF drop rate 
-         notifications for IP version cipUrpfIfIpVersion on 
-         the interface to be short-circuited.  If a notification 
-         is due and would be emitted for the interface if the 
-         five-minutes elapsed, setting this object will cause 
-         the notification to be sent.
+        "Setting this object to true causes the five-minute
+        hold-down timer for emitting URPF drop rate 
+        notifications for IP version cipUrpfIfIpVersion on 
+        the interface to be short-circuited.  If a notification 
+        is due and would be emitted for the interface if the 
+        five-minutes elapsed, setting this object will cause 
+        the notification to be sent.
 
-         This is a trigger, and doesn't hold information. It is
-         set and an action is performed. Therefore a get for 
-         this object always returns false."
-    DEFVAL { false }
+        This is a trigger, and doesn't hold information. It is
+        set and an action is performed. Therefore a get for 
+        this object always returns false."
+    DEFVAL          { false } 
     ::= { cipUrpfIfConfEntry 3 }
 
 cipUrpfIfCheckStrict OBJECT-TYPE
-    SYNTAX INTEGER {
-              strict(1),
-              loose(2)
-            }
-    MAX-ACCESS read-only
-    STATUS     current
+    SYNTAX          INTEGER  {
+                        strict(1),
+                        loose(2)
+                    }
+    MAX-ACCESS      read-only
+    STATUS          current
     DESCRIPTION
-        "Interface configuration indicating the strictness of 
-         the reachability check performed 
-         on the interface.
-         - strict: check that source addr is reachable via 
-                   the interface it came in on.
-         - loose : check that source addr is reachable via 
-		   some interface on the device."
+        "Interface configuration indicating the strictness of
+        the reachability check performed 
+        on the interface.
+        - strict: check that source addr is reachable via 
+                  the interface it came in on.
+        - loose : check that source addr is reachable via 
+                  some interface on the device." 
     ::= { cipUrpfIfConfEntry 4 }
 
 cipUrpfIfWhichRouteTableID OBJECT-TYPE
-    SYNTAX INTEGER {
-              default(1),
-              vrf(2)
-            }
-    MAX-ACCESS read-only
-    STATUS     current
+    SYNTAX          INTEGER  {
+                        default(1),
+                        vrf(2)
+                    }
+    MAX-ACCESS      read-only
+    STATUS          current
     DESCRIPTION
-        "Interface configuration indicating the routing table 
-         consulted for the reachability check:
-         - default: the non-private routing table for of the 
-                    managed system.
-         - vrf   : a particular VPN routing table."
+        "Interface configuration indicating the routing table
+        consulted for the reachability check:
+        - default: the non-private routing table for of the 
+                   managed system.
+        - vrf   : a particular VPN routing table." 
     ::= { cipUrpfIfConfEntry 5 }
 
 cipUrpfIfVrfName OBJECT-TYPE
-    SYNTAX     SnmpAdminString (SIZE (0..32))
-    MAX-ACCESS read-only
-    STATUS     current
+    SYNTAX          SnmpAdminString (SIZE  (0..32))
+    MAX-ACCESS      read-only
+    STATUS          current
     DESCRIPTION
         "If the value of cipUrpfIfWhichRouteTableID is 'vrf',
-         the name of the VRF Table. Otherwise a zero-length
-         string."
+        the name of the VRF Table. Otherwise a zero-length
+        string." 
     ::= { cipUrpfIfConfEntry 6 }
+ 
+
 
 cipUrpfVrfTable OBJECT-TYPE
-    SYNTAX     SEQUENCE OF CipUrpfVrfEntry
-    MAX-ACCESS not-accessible
-    STATUS     current
+    SYNTAX          SEQUENCE OF CipUrpfVrfEntry 
+    MAX-ACCESS      not-accessible
+    STATUS          current
     DESCRIPTION
         "This table enables indexing URPF drop statistics
-         by Virtual Routing and Forwarding instances."
+        by Virtual Routing and Forwarding instances."
     ::= { cipUrpfVrf 1 }
 
 cipUrpfVrfEntry OBJECT-TYPE
-    SYNTAX     CipUrpfVrfEntry
-    MAX-ACCESS not-accessible
-    STATUS     current
+    SYNTAX          CipUrpfVrfEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
     DESCRIPTION
-        "An entry exists for a VRF if and only if the VRF 
-         is associated with an interface that is configured
-         to perform IP URPF checking using the routing table 
-         for that VRF."
-    INDEX  { cipUrpfVrfName }
+        "An entry exists for a VRF if and only if the VRF
+        is associated with an interface that is configured
+        to perform IP URPF checking using the routing table 
+        for that VRF."
+    INDEX           { cipUrpfVrfName } 
     ::= { cipUrpfVrfTable 1 }
 
 CipUrpfVrfEntry ::= SEQUENCE {
-        cipUrpfVrfName               SnmpAdminString
-    }
+        cipUrpfVrfName SnmpAdminString
+}
 
 cipUrpfVrfName OBJECT-TYPE
-    SYNTAX     SnmpAdminString (SIZE (0..32))
-    MAX-ACCESS read-only
-    STATUS     current
+    SYNTAX          SnmpAdminString (SIZE  (0..32))
+    MAX-ACCESS      read-only
+    STATUS          current
     DESCRIPTION
         "This field is used to specify the VRF Table
-         name."
+        name." 
     ::= { cipUrpfVrfEntry 1 }
+ 
+
 
 cipUrpfVrfIfTable OBJECT-TYPE
-    SYNTAX     SEQUENCE OF CipUrpfVrfIfEntry
-    MAX-ACCESS not-accessible
-    STATUS     current
+    SYNTAX          SEQUENCE OF CipUrpfVrfIfEntry 
+    MAX-ACCESS      not-accessible
+    STATUS          current
     DESCRIPTION
         "This table contains statistics information for interfaces
-         performing URPF using VRF table to determine reachability."
+        performing URPF using VRF table to determine reachability."
     ::= { cipUrpfStatistics 3 }
 
 cipUrpfVrfIfEntry OBJECT-TYPE
-    SYNTAX     CipUrpfVrfIfEntry
-    MAX-ACCESS not-accessible
-    STATUS     current
+    SYNTAX          CipUrpfVrfIfEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
     DESCRIPTION
-        "An entry exists for a VRF and interface if and only 
-         if the VRF associated with the interface is configured 
-         to perform IP URPF checking using the routing 
-         table for the VRF."
-    INDEX  { cipUrpfVrfName, ifIndex }
+        "An entry exists for a VRF and interface if and only
+        if the VRF associated with the interface is configured 
+        to perform IP URPF checking using the routing 
+        table for the VRF."
+    INDEX           {
+                        cipUrpfVrfName,
+                        ifIndex
+                    } 
     ::= { cipUrpfVrfIfTable 1 }
 
 CipUrpfVrfIfEntry ::= SEQUENCE {
-        cipUrpfVrfIfDrops              Counter32,
-        cipUrpfVrfIfDiscontinuityTime  TimeStamp
-    }
+        cipUrpfVrfIfDrops             Counter32,
+        cipUrpfVrfIfDiscontinuityTime TimeStamp
+}
 
 cipUrpfVrfIfDrops OBJECT-TYPE
-    SYNTAX     Counter32
-    UNITS      "packets"
-    MAX-ACCESS read-only
-    STATUS     current
+    SYNTAX          Counter32
+    UNITS           "packets"
+    MAX-ACCESS      read-only
+    STATUS          current
     DESCRIPTION
-        "The number of packets failing the URPF check for a VRF on 
-         the interface and dropped by the managed device.
+        "The number of packets failing the URPF check for a VRF on
+        the interface and dropped by the managed device.
 
-         Discontinuities in the value of this variable can occur 
-         at re-initialization of the management system, and at 
-         other times as indicated by the values of 
-         cipUrpfVrfIfDiscontinuityTime."
+        Discontinuities in the value of this variable can occur 
+        at re-initialization of the management system, and at 
+        other times as indicated by the values of 
+        cipUrpfVrfIfDiscontinuityTime." 
     ::= { cipUrpfVrfIfEntry 2 }
 
 cipUrpfVrfIfDiscontinuityTime OBJECT-TYPE
-    SYNTAX     TimeStamp
-    MAX-ACCESS read-only
-    STATUS     current
+    SYNTAX          TimeStamp
+    MAX-ACCESS      read-only
+    STATUS          current
     DESCRIPTION
-        "The value of sysUpTime on the most recent occasion at 
-         which the URPF counters for this VRF on this interface 
-         suffered  a discontinuity.  If no such discontinuities 
-         have occurred since the last re-initialization of the
-         local management subsystem, then this object contains a 
-         value of zero."
+        "The value of sysUpTime on the most recent occasion at
+        which the URPF counters for this VRF on this interface 
+        suffered  a discontinuity.  If no such discontinuities 
+        have occurred since the last re-initialization of the
+        local management subsystem, then this object contains a 
+        value of zero." 
     ::= { cipUrpfVrfIfEntry 3 }
+ 
 
---
+
 -- URPF Notification objects
---
 
 cipUrpfIfDropRateNotify NOTIFICATION-TYPE
-    OBJECTS     {
-                cipUrpfIfDropRate
-                }
-    STATUS      current
+    OBJECTS         { cipUrpfIfDropRate }
+    STATUS          current
     DESCRIPTION
-        "This notification is generated when 
-         cipUrpfIfDropRateNotifyEnable is set to true and
-         the calculated URPF drop rate (cipUrpfIfDropRate) 
-         exceeds the notification threshold drop rate 
-         (cipUrpfIfNotifyDropRateThreshold). Note the 
-         exceptional value of 0 for threshold allows notification 
-         generation if any drop events occur in an interval.
- 
-         After generating this notification, another such
-         notification will not be sent out for a minimum of five 
-         minutes (note the exception to this provided by 
-         cipUrpfIfNotifyDrHoldDownReset).
+        "This notification is generated when
+        cipUrpfIfDropRateNotifyEnable is set to true and
+        the calculated URPF drop rate (cipUrpfIfDropRate) 
+        exceeds the notification threshold drop rate 
+        (cipUrpfIfNotifyDropRateThreshold). Note the 
+        exceptional value of 0 for threshold allows notification 
+        generation if any drop events occur in an interval.
 
-         The object value present in the notification is the 
-         the drop rate that exceeded the threshold."
-    ::= { ciscoIpUrpfMIBNotifs 1 }
+        After generating this notification, another such
+        notification will not be sent out for a minimum of five 
+        minutes (note the exception to this provided by 
+        cipUrpfIfNotifyDrHoldDownReset).
 
-
+        The object value present in the notification is the 
+        the drop rate that exceeded the threshold."
+   ::= { ciscoIpUrpfMIBNotifs 1 }
 -- Conformance Information Definition
-ciscoIpUrpfMIBCompliances OBJECT IDENTIFIER ::= 
-                                   { ciscoIpUrpfMIBConformance 1 }
-ciscoIpUrpfMIBGroups  OBJECT IDENTIFIER ::= 
-                                   { ciscoIpUrpfMIBConformance 2 }
-                
+
+ciscoIpUrpfMIBCompliances  OBJECT IDENTIFIER
+    ::= { ciscoIpUrpfMIBConformance 1 }
+
+ciscoIpUrpfMIBGroups  OBJECT IDENTIFIER
+    ::= { ciscoIpUrpfMIBConformance 2 }
+
 
 ciscoIpUrpfMIBCompliance MODULE-COMPLIANCE
-    STATUS     current
+    STATUS          current
     DESCRIPTION
         "An SNMP entity can implement this module to
         provide URPF problem diagnosis information."
+    MODULE          -- this module
+    MANDATORY-GROUPS {
+                        ciscoIpUrpfMIBMainObjectGroup,
+                        ciscoIpUrpfMIBNotifyGroup
+                    }
 
-    MODULE  -- this module
-
-    MANDATORY-GROUPS { ciscoIpUrpfMIBMainObjectGroup,
-                       ciscoIpUrpfMIBNotifyGroup }
-
-    GROUP           ciscoIpUrpfMIBVrfObjectGroup 
+    GROUP           ciscoIpUrpfMIBVrfObjectGroup
     DESCRIPTION
         "This group is mandatory for all implementations
-         that need to index URPF statistics by VRF interfaces."
-
+        that need to index URPF statistics by VRF interfaces."
     ::= { ciscoIpUrpfMIBCompliances 1 }
-                
+
 ciscoIpUrpfMIBMainObjectGroup OBJECT-GROUP
-    OBJECTS  {
-        cipUrpfDropRateWindow,
-        cipUrpfComputeInterval,
-        cipUrpfDropNotifyHoldDownTime,
-        cipUrpfDrops,
-        cipUrpfDropRate,
-        cipUrpfIfDrops,
-        cipUrpfIfSuppressedDrops,
-        cipUrpfIfDropRate,
-        cipUrpfIfDropRateNotifyEnable,
-        cipUrpfIfNotifyDropRateThreshold,
-        cipUrpfIfNotifyDrHoldDownReset,
-        cipUrpfIfCheckStrict,
-        cipUrpfIfDiscontinuityTime
-    }
-    STATUS     current
+    OBJECTS         {
+                        cipUrpfDropRateWindow,
+                        cipUrpfComputeInterval,
+                        cipUrpfDropNotifyHoldDownTime,
+                        cipUrpfDrops,
+                        cipUrpfDropRate,
+                        cipUrpfIfDrops,
+                        cipUrpfIfSuppressedDrops,
+                        cipUrpfIfDropRate,
+                        cipUrpfIfDropRateNotifyEnable,
+                        cipUrpfIfNotifyDropRateThreshold,
+                        cipUrpfIfNotifyDrHoldDownReset,
+                        cipUrpfIfCheckStrict,
+                        cipUrpfIfDiscontinuityTime
+                    }
+    STATUS          current
     DESCRIPTION
-        "The collection of common counter objects, those 
-         needed by other objects, and the common interface 
-         table."
+        "The collection of common counter objects, those
+        needed by other objects, and the common interface 
+        table."
     ::= { ciscoIpUrpfMIBGroups 1 }
 
 ciscoIpUrpfMIBVrfObjectGroup OBJECT-GROUP
-    OBJECTS  {
-        cipUrpfVrfName,
-        cipUrpfIfWhichRouteTableID,
-        cipUrpfIfVrfName,
-        cipUrpfVrfIfDrops,
-        cipUrpfVrfIfDiscontinuityTime
-    }
-    STATUS     current
+    OBJECTS         {
+                        cipUrpfVrfName,
+                        cipUrpfIfWhichRouteTableID,
+                        cipUrpfIfVrfName,
+                        cipUrpfVrfIfDrops,
+                        cipUrpfVrfIfDiscontinuityTime
+                    }
+    STATUS          current
     DESCRIPTION
-        "The collection of objects needed to index by  
-         VRF."
+        "The collection of objects needed to index by
+        VRF."
     ::= { ciscoIpUrpfMIBGroups 2 }
 
 ciscoIpUrpfMIBNotifyGroup NOTIFICATION-GROUP
-    NOTIFICATIONS { cipUrpfIfDropRateNotify }
-    STATUS     current
+   NOTIFICATIONS    { cipUrpfIfDropRateNotify }
+    STATUS          current
     DESCRIPTION
-        "The collection of objects which are used to specify 
-         notifications for URPF."
+        "The collection of objects which are used to specify
+        notifications for URPF."
     ::= { ciscoIpUrpfMIBGroups 6 }
 
 END
+
+
+
+
+
+

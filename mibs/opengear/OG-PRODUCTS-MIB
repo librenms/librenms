@@ -2,7 +2,7 @@
 -- == OG-PRODUCTS-MIB:                                          ==
 -- == Opengear Product Management Information Base              ==
 -- ==                                                                 ==
--- == (c) Copyright 2005-2018 Opengear Inc.                           ==
+-- == (c) Copyright 2005-2020 Opengear Inc.                           ==
 -- =====================================================================
 
 OG-PRODUCTS-MIB DEFINITIONS ::= BEGIN
@@ -14,7 +14,7 @@ IMPORTS
 		FROM SNMPv2-SMI;
 
 ogProductsMib MODULE-IDENTITY
-	LAST-UPDATED "201806150000Z"
+	LAST-UPDATED "202005200000Z"
 	ORGANIZATION "Opengear Inc."
 	CONTACT-INFO
 		"Opengear Inc.
@@ -23,6 +23,9 @@ ogProductsMib MODULE-IDENTITY
 		 support@opengear.com"
 	DESCRIPTION
 		"Opengear Product MIB"
+	REVISION "202005200000Z"
+	DESCRIPTION
+		"Add Operations Manager to the MIB."
 	REVISION "201806150000Z"
 	DESCRIPTION
 		"Add Lighthouse 5 target to the MIB."
@@ -71,5 +74,6 @@ ogACM500x OBJECT IDENTIFIER ::= { ogProducts 80 }
 ogACM550x OBJECT IDENTIFIER ::= { ogProducts 81 }
 ogACM700x OBJECT IDENTIFIER ::= { ogProducts 90 }
 ogACM70045 OBJECT IDENTIFIER ::= { ogProducts 91 }
+ogOperationsManager OBJECT IDENTIFIER ::= { ogProducts 101 }
 
 END
