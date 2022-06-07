@@ -1,0 +1,98 @@
+
+-- ============================================================================
+
+EXTREME-EAPS-MIB DEFINITIONS ::= BEGIN
+
+        IMPORTS
+                MODULE-IDENTITY         FROM SNMPv2-SMI
+		OBJECT-TYPE             FROM SNMPv2-SMI
+                DisplayString           FROM RFC1213-MIB
+                extremeAgent            FROM EXTREME-BASE-MIB;
+
+        extremeEaps MODULE-IDENTITY
+                LAST-UPDATED "0007240000Z"
+                ORGANIZATION "Extreme Networks, Inc."
+                CONTACT-INFO "www.extremenetworks.com"
+                DESCRIPTION "Ethernet Automatic Protection Switching information"
+        ::= { extremeAgent 18 }
+
+	extremeEapsTable OBJECT-TYPE
+		SYNTAX SEQUENCE OF ExtremeEapsEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"This table contains EAPS information about all EAPS
+                         domains on this device."
+		::= { extremeEaps 1 }
+
+	extremeEapsEntry OBJECT-TYPE
+		SYNTAX ExtremeEapsEntry
+		MAX-ACCESS not-accessible
+		STATUS current
+		DESCRIPTION
+			"An individual entry of this table contains EAPS 
+                         information related to that EAPS domain."
+		INDEX { extremeEapsName }
+		::= { extremeEapsTable 1 }
+
+	ExtremeEapsEntry ::= SEQUENCE {
+		extremeEapsName		DisplayString (SIZE(0..32)),
+		extremeEapsMode		INTEGER, 
+		extremeEapsState	INTEGER
+	}
+
+        extremeEapsName  OBJECT-TYPE
+            SYNTAX DisplayString (SIZE(0..32))
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The EAPS domain name."
+	::= { extremeEapsEntry 1 }
+
+        extremeEapsMode OBJECT-TYPE
+                SYNTAX  INTEGER {
+			invalid(0),
+			master(1),
+			transit(2)
+		}
+                MAX-ACCESS  read-only
+                STATUS current
+                DESCRIPTION
+                        "This indicates the mode of the EAPS domain."
+                ::= { extremeEapsEntry 2 }
+
+        extremeEapsState OBJECT-TYPE
+                SYNTAX	INTEGER {
+                        idle(0),
+                        complete(1),
+                        failed(2),
+			linksup(3),
+			linkdown(4),
+			preforwarding(5),
+			init(6)
+                }
+        	MAX-ACCESS  read-only
+                STATUS current
+                DESCRIPTION
+                        "This indicates the current EAPS state of this EAPS 
+                         domain."
+                ::= { extremeEapsEntry 3 }
+
+        extremeEapsPrevState OBJECT-TYPE
+                SYNTAX	INTEGER {
+                        idle(0),
+                        complete(1),
+                        failed(2),
+			linksup(3),
+			linkdown(4),
+			preforwarding(5),
+			init(6)
+                }
+        	MAX-ACCESS  read-only
+                STATUS current
+                DESCRIPTION
+                        "This indicates the previous EAPS state of this EAPS 
+                         domain. Used in state change traps information."
+                ::= { extremeEaps 2 }
+
+END

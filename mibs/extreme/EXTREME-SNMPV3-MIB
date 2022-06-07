@@ -1,0 +1,105 @@
+
+
+-- ===========================================================================
+
+EXTREME-SNMPV3-MIB DEFINITIONS ::= BEGIN
+
+    IMPORTS  
+                MODULE-IDENTITY                 FROM SNMPv2-SMI
+		OBJECT-TYPE                     FROM SNMPv2-SMI
+                TruthValue                      FROM SNMPv2-TC
+		extremeAgent                    FROM EXTREME-BASE-MIB
+                snmpTargetAddrEntry             FROM SNMP-TARGET-MIB;
+
+            
+        extremeSnmpv3 MODULE-IDENTITY
+                LAST-UPDATED "0007240000Z"
+                ORGANIZATION "Extreme Networks, Inc."
+                CONTACT-INFO "www.extremenetworks.com"
+                DESCRIPTION "Extreme-specific SNMPv3 objects"
+        ::= { extremeAgent 23 }
+
+	extremeTarget	OBJECT IDENTIFIER ::= { extremeSnmpv3 1 }
+	
+	extremeTargetAddrExtTable OBJECT-TYPE
+		SYNTAX  SEQUENCE OF ExtremeTargetAddrExtEntry
+		MAX-ACCESS  not-accessible
+		STATUS current
+		DESCRIPTION
+		"This table is an extension to the snmpTargetAddrTable found in the 
+		SNMP-TARGET-MIB. It contains Extreme Networks specific objects needed for
+		each management target."
+			::= { extremeTarget 1 }
+
+	extremeTargetAddrExtEntry OBJECT-TYPE
+		SYNTAX  ExtremeTargetAddrExtEntry
+		MAX-ACCESS  not-accessible
+		STATUS current
+		DESCRIPTION
+		"An entry in the extremeTargetAddrExtTable."
+                AUGMENTS { snmpTargetAddrEntry }
+			::= { extremeTargetAddrExtTable 1 }
+
+	ExtremeTargetAddrExtEntry ::= SEQUENCE {
+		extremeTargetAddrExtIgnoreMPModel		TruthValue,
+                extremeTargetAddrExtStandardMode                TruthValue,
+                extremeTargetAddrExtTrapDestIndex               INTEGER,
+                extremeTargetAddrExtUseEventComm                TruthValue
+	}
+	
+	
+	extremeTargetAddrExtIgnoreMPModel OBJECT-TYPE
+		SYNTAX TruthValue
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+		"When this object is set to TRUE, the version of the trap/notification sent to 
+		the corresponding management target (trap receiver) will be the same as in 
+		releases of Extremeware prior to 7.1.0. Thus, the value of the 
+		snmpTargetParamsMPModel object in the snmpTargetParamsTable will be ignored while
+		determining the version of the trap/notification to be sent. When a trap-receiver
+		is created via the RMON trapDestTable or from the CLI command 'configure snmp add
+		trapreceiver ....', the value of this object will be set to TRUE for the 
+		corresponding entry in this table."
+                DEFVAL { false }
+		::= { extremeTargetAddrExtEntry 1 }
+
+	extremeTargetAddrExtStandardMode OBJECT-TYPE
+		SYNTAX TruthValue
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+		"When this object is set to TRUE, the management target will be treated as 
+		a 'standard mode' one, in that any Extreme Networks specific extra varbinds 
+		present in a standards-based trap/notification will not be sent to this 
+		management target. Only the varbinds defined in the standard will be sent."
+                DEFVAL { false }
+		::= { extremeTargetAddrExtEntry 2 }
+
+	extremeTargetAddrExtTrapDestIndex OBJECT-TYPE
+		SYNTAX INTEGER
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+		"This object contains the value of the trapDestIndex in the corresponding 
+		entry of the RMON trapDestTable."
+		::= { extremeTargetAddrExtEntry 3 }
+
+        extremeTargetAddrExtUseEventComm OBJECT-TYPE
+                SYNTAX TruthValue
+                MAX-ACCESS read-write
+                STATUS current
+                DESCRIPTION
+                "This object is used only when sending RMON alarms as SNMPv3 traps.
+                When it is set to TRUE and an RMON risingAlarm or fallingAlarm is being sent
+                for an event, then the eventCommunity in the RMON event table is compared to 
+                the snmpTargetAddrName in the snmpTargetAddrTable. The alarm is sent to the 
+                target only when the two are the same. This behavior is exhibited only when the
+                snmpTargetParamsMPModel corresponding to the target indicates an SNMPv3 trap. For 
+                SNMPv1/v2c traps, the community in the RMON trapDestTable is used for the 
+                comparision, which is the 'regular' method, as per the standards.
+                When this object is set to FALSE, then the RMON alarm (if being sent as an SNMPv3
+                trap) is sent without using the event community for any comparision."
+                DEFVAL { true }        
+		::= { extremeTargetAddrExtEntry 4 }
+END

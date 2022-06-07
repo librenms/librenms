@@ -1,0 +1,75 @@
+
+EXTREME-ENTITY-MIB DEFINITIONS ::= BEGIN
+
+        IMPORTS
+                MODULE-IDENTITY FROM SNMPv2-SMI
+		OBJECT-TYPE     FROM SNMPv2-SMI
+		Unsigned32         FROM SNMPv2-SMI
+		entPhysicalIndex   FROM ENTITY-MIB
+                extremeAgent    FROM EXTREME-BASE-MIB;
+
+        extremeEntity MODULE-IDENTITY
+                LAST-UPDATED "0409170000Z"
+                ORGANIZATION "Extreme Networks, Inc."
+                CONTACT-INFO "www.extremenetworks.com"
+                DESCRIPTION "Extreme FRU Odometer objects"
+        ::= { extremeAgent 31 }
+
+
+--
+--    FRU Table
+--
+
+	extremeEntityFRUTable OBJECT-TYPE
+             SYNTAX SEQUENCE OF ExtremeEntityFRUEntry
+	     MAX-ACCESS	not-accessible
+	     STATUS current
+	     DESCRIPTION
+		"A table containing information about each FRU in the chassis
+		based on Entity MIB"
+		    ::= { extremeEntity 1 }
+
+	extremeEntityFRUEntry OBJECT-TYPE
+	     SYNTAX ExtremeEntityFRUEntry
+	     MAX-ACCESS not-accessible
+	     STATUS current
+	     DESCRIPTION
+		"Entry in the table for a FRU Entity"
+	     INDEX	{ entPhysicalIndex }
+	     	    ::= { extremeEntityFRUTable 1 }
+
+	ExtremeEntityFRUEntry ::= SEQUENCE {
+	     extremeEntityFRUStartTime		Unsigned32,
+	     extremeEntityFRUOdometer		Unsigned32,
+	     extremeEntityFRUOdometerUnit	INTEGER
+	}
+
+	extremeEntityFRUStartTime OBJECT-TYPE
+	     SYNTAX Unsigned32
+	     MAX-ACCESS read-only
+	     STATUS current
+	     DESCRIPTION
+		"First Recorded Start Date/Time. The units are represented
+                 as the standard time_t value of the start Date/Time"
+	     	   ::= { extremeEntityFRUEntry 1 }
+
+	extremeEntityFRUOdometer OBJECT-TYPE
+	     SYNTAX Unsigned32
+	     MAX-ACCESS read-only
+	     STATUS current
+	     DESCRIPTION
+		"Number of time units in service."
+	     	   ::= { extremeEntityFRUEntry 2 }
+
+	extremeEntityFRUOdometerUnit OBJECT-TYPE
+	     SYNTAX INTEGER {
+		days(1),
+		seconds(2)
+	     }
+	     MAX-ACCESS read-only
+	     STATUS current
+	     DESCRIPTION
+		"Time unit used to represent value reported by extremeEntityFRUOdometer. Depending on the underlying hardware capability, the agent implementation can choose the time-unit used to represent the Odometer value."
+		  ::= { extremeEntityFRUEntry 3 }
+
+END	

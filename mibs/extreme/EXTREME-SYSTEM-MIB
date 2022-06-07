@@ -1,0 +1,1053 @@
+
+
+-- ===========================================================================
+
+--
+-- Extreme System objects
+--
+
+EXTREME-SYSTEM-MIB DEFINITIONS ::= BEGIN
+
+        IMPORTS
+                MODULE-IDENTITY FROM SNMPv2-SMI
+		OBJECT-TYPE     FROM SNMPv2-SMI
+                Unsigned32	FROM SNMPv2-SMI
+                TruthValue      FROM SNMPv2-TC
+		DisplayString   FROM RFC1213-MIB
+                extremeAgent   FROM EXTREME-BASE-MIB
+		PortList	FROM EXTREME-BASE-MIB
+                IpAddress       FROM SNMPv2-SMI;
+
+        extremeSystem MODULE-IDENTITY
+                LAST-UPDATED "0007240000Z"
+                ORGANIZATION "Extreme Networks, Inc."
+                CONTACT-INFO "www.extremenetworks.com"
+                DESCRIPTION "Extreme System objects: objects common to all platforms"
+        ::= { extremeAgent 1 }
+
+        extremeSystemCommon OBJECT IDENTIFIER
+        ::= { extremeSystem 1 }
+
+--
+--  System group
+--
+--  Objects common to all platforms
+--
+--  Configuration save objects.  These objects are used by the network
+--  management application to save configuration changes into the
+--  persistant store.  There are 2 stores on the device; a primary and
+--  a secondary.
+
+        extremeSaveConfiguration OBJECT-TYPE
+               	SYNTAX INTEGER {
+                    	saveToPrimary(1),
+                        saveToSecondary(2)
+        	}
+                MAX-ACCESS read-write
+                STATUS current
+                DESCRIPTION
+            	"When this object is set, the device will copy the contents
+		of the configuration database to a buffer and save it to the 
+		persistant store specified by the value of the object.  The 
+		save is	performed asynchronously, and the snmp agent will
+                continue to respond to both gets and sets while the save is
+                taking place.  A network management application may use the
+		extremeSaveStatus object to determine when the asynchronous
+		save operation has completed."
+	::= { extremeSystemCommon 3 }
+
+	extremeSaveStatus OBJECT-TYPE
+               	SYNTAX INTEGER { saveInProgress(1), saveNotInProgress(2) }
+                MAX-ACCESS	read-only
+                STATUS current
+                DESCRIPTION
+           	"This object will return the status of a save operation invoked
+		by setting the extremeSaveConfiguration object.  A network
+		management application can read this object to determine that a
+		save operation has completed."
+	::= { extremeSystemCommon 4 }                
+
+        extremeCurrentConfigInUse OBJECT-TYPE
+                SYNTAX INTEGER { primary(1), secondary(2) }
+        	MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                "Shows which NVRAM configuration store was used at last boot"
+	::= { extremeSystemCommon 5 }                
+
+        extremeConfigToUseOnReboot OBJECT-TYPE
+                SYNTAX INTEGER { primary(1), secondary(2) }
+        	MAX-ACCESS read-write
+                STATUS current
+                DESCRIPTION
+        	"Controls which NVRAM configuration store will be used 
+                on next reboot."
+	::= { extremeSystemCommon 6 }               
+ 
+        extremeOverTemperatureAlarm OBJECT-TYPE
+                SYNTAX TruthValue
+        	MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                "Alarm status of overtemperature sensor in device 
+                enclosure."
+	::= { extremeSystemCommon 7 }
+
+        extremeCurrentTemperature OBJECT-TYPE
+                SYNTAX INTEGER (0..100)
+        	MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                "Current temperature in degrees celcius measured inside
+                device enclosure."
+	::= { extremeSystemCommon 8 }
+
+--
+-- Table of operational status of all internal Fans
+--
+        extremeFanStatusTable OBJECT-TYPE
+		SYNTAX  SEQUENCE OF ExtremeFanStatusEntry
+		MAX-ACCESS  not-accessible
+		STATUS current
+                DESCRIPTION
+                "Table of operational status of all internal cooling fans."
+	::= { extremeSystemCommon 9 }
+
+        extremeFanStatusEntry OBJECT-TYPE
+		SYNTAX  ExtremeFanStatusEntry
+		MAX-ACCESS  not-accessible
+		STATUS current
+		DESCRIPTION
+                "Entry in table of all internal cooling fans."
+		INDEX { extremeFanNumber }
+	::= { extremeFanStatusTable 1 }
+
+	ExtremeFanStatusEntry ::=
+		SEQUENCE {
+			extremeFanNumber
+				INTEGER,
+			extremeFanOperational
+				TruthValue,
+		        extremeFanEntPhysicalIndex 
+				INTEGER
+		}
+
+        extremeFanNumber OBJECT-TYPE
+                SYNTAX INTEGER
+        	MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                "Identifier of cooling fan, numbered from the front and/or 
+                left side of device."
+	::= { extremeFanStatusEntry 1 }
+
+        extremeFanOperational OBJECT-TYPE
+                SYNTAX TruthValue
+        	MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                "Operational status of a cooling fan."
+	::= { extremeFanStatusEntry 2 }
+
+        extremeFanEntPhysicalIndex OBJECT-TYPE
+                SYNTAX INTEGER
+        	MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                "The entity index for this fan entity in the entity table."
+	::= { extremeFanStatusEntry 3 }
+
+        extremePrimaryPowerOperational OBJECT-TYPE
+                SYNTAX TruthValue
+        	MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                "Operational status of internal power supply of a device."
+	::= { extremeSystemCommon 10 }
+
+        extremeRedundantPowerStatus OBJECT-TYPE
+                SYNTAX INTEGER { notPresent(1), presentOK(2), presentNotOK(3) }
+        	MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                "Operational status of an external redundant power supply to a device."
+	::= { extremeSystemCommon 11 }
+
+        extremeRedundantPowerAlarm OBJECT-TYPE
+                SYNTAX TruthValue
+        	MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                "Alarm state of an external redundant power supply to a device. 
+                Alarm state indicates either fan failure or overtemperature 
+                condition."
+	::= { extremeSystemCommon 12 }
+
+        extremePrimarySoftwareRev  OBJECT-TYPE
+            SYNTAX DisplayString (SIZE(0..15))
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The software revision of the primary image stored in 
+                this device.  This string will have a zero length if 
+                the revision is unknown, invalid or not present. This
+                will also be reported in RMON2 probeSoftwareRev if this
+                is the software image currently running in the device."
+	::= { extremeSystemCommon 13 }
+
+        extremeSecondarySoftwareRev  OBJECT-TYPE
+            SYNTAX DisplayString (SIZE(0..15))
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "The software revision of the secondary image stored in 
+                this device.  This string will have a zero length if 
+                the revision is unknown, invalid or not present. This
+                will also be reported in RMON2 probeSoftwareRev if this
+                is the software image currently running in the device."
+	::= { extremeSystemCommon 14 }
+
+        extremeImageToUseOnReboot OBJECT-TYPE
+                SYNTAX INTEGER { primary(1), secondary(2) }
+        	MAX-ACCESS read-write
+                STATUS current
+                DESCRIPTION
+        	"Controls which image will be used 
+                on next reboot."
+	::= { extremeSystemCommon 15 }               
+
+        extremeSystemID  OBJECT-TYPE
+            SYNTAX DisplayString (SIZE(0..126))
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This represents the System ID of the Summit Switch."
+	::= { extremeSystemCommon 16 }
+
+        extremeSystemBoardID  OBJECT-TYPE
+            SYNTAX DisplayString (SIZE(0..126))
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This represents the Board ID of the Summit Switch."
+	::= { extremeSystemCommon 17 }
+
+        extremeSystemLeftBoardID  OBJECT-TYPE
+            SYNTAX DisplayString (SIZE(0..126))
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This represents the Left Board ID of the Summit Switch."
+	::= { extremeSystemCommon 18 }
+
+        extremeSystemRightBoardID  OBJECT-TYPE
+            SYNTAX DisplayString (SIZE(0..126))
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                "This represents the Right Board ID of the Summit Switch."
+	::= { extremeSystemCommon 19 }
+
+	-- Add variables to report power supply data
+	extremeInputPowerVoltage OBJECT-TYPE
+		SYNTAX  INTEGER {
+			v110 (1),
+			v220 (2),
+			v48DC (3)
+		}	
+		MAX-ACCESS  read-only
+		STATUS current
+		DESCRIPTION
+		"The input power voltage at which the system is currently operating."
+	::= { extremeSystemCommon 20 }
+
+        extremePowerStatus OBJECT-TYPE
+                SYNTAX INTEGER { notPresent(1), presentOK(2), presentNotOK(3) }
+        	MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                "Operational status of the power supply to a device."
+	::= { extremeSystemCommon 21 }
+
+        extremePowerAlarm OBJECT-TYPE
+                SYNTAX TruthValue
+        	MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                "Alarm state of the power supply to a device. 
+                Alarm state indicates either fan failure or overtemperature 
+                condition."
+	::= { extremeSystemCommon 22 }
+
+        extremeRmonEnable OBJECT-TYPE
+                SYNTAX TruthValue
+        	MAX-ACCESS read-write
+                STATUS current
+                DESCRIPTION
+                      "Setting this to true will cause the agent to 
+		       start collecting RMON statistics."
+	::= { extremeSystemCommon 23 }
+
+-- OID extremeSystemCommon.24 has been deprecated and extremeCpuTasktable
+-- has been moved to extremeSystemCommon.29 with new name extremeCpuTask2table
+
+   extremeBootROMVersion OBJECT-TYPE
+		SYNTAX DisplayString (SIZE(0..15))	
+        	MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+		  "The software revision of the bootrom on the device. 
+                   This string will have a zero length if the revision is 
+                   unknown or invalid."
+		       
+	::= { extremeSystemCommon 25 }
+
+   extremeDot1dTpFdbTableEnable OBJECT-TYPE
+		SYNTAX TruthValue
+		MAX-ACCESS read-write
+		STATUS current
+		DESCRIPTION
+		 "Setting this to true will cause GetNext operations on 			  the dot1dTpFdbTable to be allowed. Note that Get operations 			  are always allowed."
+
+	::= { extremeSystemCommon 26 }
+
+        extremePowerSupplyTable OBJECT-TYPE
+		SYNTAX  SEQUENCE OF ExtremePowerSupplyEntry
+		MAX-ACCESS  not-accessible
+		STATUS current
+                DESCRIPTION
+                "Table of status of all power supplies in the system."
+	::= { extremeSystemCommon 27 }
+
+        extremePowerSupplyEntry OBJECT-TYPE
+		SYNTAX  ExtremePowerSupplyEntry
+		MAX-ACCESS  not-accessible
+		STATUS current
+		DESCRIPTION
+                "An entry indicating the status of a specific power supply."
+		INDEX { extremePowerSupplyNumber }
+	::= { extremePowerSupplyTable 1 }
+
+	ExtremePowerSupplyEntry ::=
+		SEQUENCE {
+			extremePowerSupplyNumber
+				INTEGER,
+			extremePowerSupplyStatus
+				INTEGER,
+                        extremePowerSupplyInputVoltage
+				INTEGER,
+                        extremePowerSupplySerialNumber
+                                DisplayString,
+		        extremePowerSupplyEntPhysicalIndex 
+				INTEGER
+		}
+
+        extremePowerSupplyNumber OBJECT-TYPE
+                SYNTAX INTEGER
+        	MAX-ACCESS accessible-for-notify
+                STATUS current
+                DESCRIPTION
+                	"Power supply number."
+	::= { extremePowerSupplyEntry 1 }
+
+        extremePowerSupplyStatus OBJECT-TYPE
+                SYNTAX INTEGER { notPresent(1), presentOK(2), presentNotOK(3) }
+        	MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                	"Status of the power supply."
+	::= { extremePowerSupplyEntry 2 }
+
+	extremePowerSupplyInputVoltage OBJECT-TYPE
+		SYNTAX INTEGER { v110 (1), v220 (2), v48DC (3), unknown(4) }
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+			"Input voltage of the power supply"
+	::= { extremePowerSupplyEntry 3 }
+
+        extremePowerSupplySerialNumber OBJECT-TYPE
+                SYNTAX DisplayString (SIZE(0..126))
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                        " The serial number of the power supply unit."
+         ::= { extremePowerSupplyEntry 4 }
+
+        extremePowerSupplyEntPhysicalIndex OBJECT-TYPE
+                SYNTAX INTEGER
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                        " The entity index for this psu entity in the entity
+                table."
+         ::= { extremePowerSupplyEntry 5 }
+
+     extremeCpuAggregateUtilization OBJECT-TYPE
+        SYNTAX INTEGER
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+                  "The aggregate CPU utilization since
+		   the time the start started executing."
+	::= { extremeSystemCommon 28 }
+
+--
+-- The CPU Task table lists all executing tasks 
+--
+        extremeCpuTask2Table OBJECT-TYPE
+		SYNTAX  SEQUENCE OF ExtremeCpuTask2Entry
+		MAX-ACCESS  not-accessible
+		STATUS current
+                DESCRIPTION
+                  "Table of CPU tasks that are active."
+	::= { extremeSystemCommon 29 }
+
+        extremeCpuTask2Entry OBJECT-TYPE
+		SYNTAX  ExtremeCpuTask2Entry
+		MAX-ACCESS  not-accessible
+		STATUS current
+		DESCRIPTION
+                  "An entry in table of describes a single task."
+        INDEX { extremeCpuTask2CpuId, extremeCpuTask2Name }
+	::= { extremeCpuTask2Table 1 }
+
+	ExtremeCpuTask2Entry ::=
+		SEQUENCE {
+			extremeCpuTask2CpuId
+				Unsigned32,
+			extremeCpuTask2Name
+				DisplayString,
+           	extremeCpuTask2Id
+				Unsigned32,
+			extremeCpuTask2Pc
+				Unsigned32,
+			extremeCpuTask2Status
+				DisplayString,
+			extremeCpuTask2Utilization
+				Unsigned32,
+			extremeCpuTask2MaxUtilization
+				Unsigned32
+		}
+
+	  extremeCpuTask2CpuId OBJECT-TYPE
+            SYNTAX Unsigned32
+        	MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                  "CPU on which this task last executed or is executing.
+                   The primary CPU has a value of 1."
+	::= { extremeCpuTask2Entry 1 }
+
+        extremeCpuTask2Name OBJECT-TYPE
+            SYNTAX DisplayString (SIZE(0..31))
+        	MAX-ACCESS not-accessible
+            STATUS current
+            DESCRIPTION
+                  "Name associated with the reported task id."
+	::= { extremeCpuTask2Entry 2 }
+
+    
+        extremeCpuTask2Id OBJECT-TYPE
+                SYNTAX Unsigned32
+        	MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                  "Task identifier assigned by the operating system when
+                   this task is spawned."
+	::= { extremeCpuTask2Entry 3 }
+
+        extremeCpuTask2Pc OBJECT-TYPE
+            SYNTAX Unsigned32
+        	MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                  "The value of the program counter for this task.
+		   It indicates the address of the next instruction
+                   that would be executed once the operating system
+ 		   resumes this task." 
+	::= { extremeCpuTask2Entry 4 }
+
+        extremeCpuTask2Status OBJECT-TYPE
+            SYNTAX DisplayString
+        	MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                  "The current status of the task as reported by the
+	  	   operating system."
+	::= { extremeCpuTask2Entry 5 }
+
+        extremeCpuTask2Utilization OBJECT-TYPE
+            SYNTAX Unsigned32
+        	MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+                  "The current CPU utilization by this task. This
+		   is the utilization when the task last executed."
+	::= { extremeCpuTask2Entry 6 }
+
+        extremeCpuTask2MaxUtilization OBJECT-TYPE
+            SYNTAX Unsigned32
+        	MAX-ACCESS read-write
+            STATUS current
+            DESCRIPTION
+                  "The maximum CPU utilization by this task since
+		   the time the start started executing. This value
+		   may be cleared."
+	::= { extremeCpuTask2Entry 7 }
+
+        extremeAuthFailSrcAddr  OBJECT-TYPE
+            SYNTAX IpAddress
+            MAX-ACCESS  accessible-for-notify
+            STATUS current
+            DESCRIPTION
+                "The IP address of the originator of the bad SNMP 
+                request that caused the generation of an authentication 
+                failure trap."
+        ::= { extremeSystemCommon 30 }
+
+        extremeCpuTransmitPriority      OBJECT-TYPE
+            SYNTAX INTEGER {
+                   normal(1),
+                   high(2)
+                   }
+            MAX-ACCESS                  read-write
+            STATUS                      deprecated
+            DESCRIPTION
+                "The CPU transmit priority."
+         ::= { extremeSystemCommon 31 }
+
+        extremeImageBooted OBJECT-TYPE
+                SYNTAX INTEGER { primary(1), secondary(2) }
+        	  MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+        	"The image with which the switch was last booted, using which it is currently running."
+	::= { extremeSystemCommon 32 }               
+        
+        extremeMsmFailoverCause OBJECT-TYPE
+            SYNTAX INTEGER { never(1),
+                             admin(2),
+                             exception(3), 
+                             removal(4),
+                             hwFailure(5), 
+                             watchdog(6),
+                             keepalive(7) 
+                           }
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+        "The cause of the last MSM failover. never(1) means an
+                MSM Failover has not occurred since the last reboot. 
+                admin(2) means the failover was initiated by the user. 
+                exception(3) means the former master MSM encountered a 
+                software exception condition. removal(4) means the master 
+                MSM was physically removed from the chassis. hwFailure(5) 
+                means a diagnostic failure was detected in the master MSM. 
+                watchdog(6) means that the master MSM hardware watchdog 
+                timer expired. keepalive(7) means the master MSM failed to 
+                respond to slave keepalive requests. The MSM failover will 
+                have been hitless only in the admin(2) and exception(3) 
+                cases "
+        ::= { extremeSystemCommon 33 }
+
+
+extremeImageTable OBJECT-TYPE
+		SYNTAX  SEQUENCE OF ExtremeImageEntry
+		MAX-ACCESS  not-accessible
+		STATUS current
+		DESCRIPTION
+		"A table containing information about each software image."
+        ::= { extremeSystemCommon 34 }
+
+	extremeImageEntry OBJECT-TYPE
+		SYNTAX  ExtremeImageEntry
+		MAX-ACCESS  not-accessible
+		STATUS current
+		DESCRIPTION
+		"A table entry containing information about each software image."
+		INDEX	  { extremeImageNumber }
+			::= { extremeImageTable 1 }
+
+	ExtremeImageEntry ::= SEQUENCE {
+		extremeImageNumber 		INTEGER,
+                extremeMajorVersion             INTEGER,
+                extremeSubMajorVersion          INTEGER,
+                extremeMinorVersion             INTEGER,
+                extremeBuildNumber              INTEGER,
+                extremeTechnologyReleaseNumber  INTEGER,
+                extremeSustainingReleaseNumber  INTEGER,
+                extremeBranchRevisionNumber     INTEGER,
+                extremeImageType                INTEGER,
+                extremeImageDescription         DisplayString,
+                extremeImageSecurity            INTEGER,
+                extremePatchVersion             INTEGER
+	}
+
+	extremeImageNumber OBJECT-TYPE
+		SYNTAX  INTEGER {
+                       cur(0),
+                       pri(1),
+                       sec(2)
+                }
+		MAX-ACCESS  read-only
+		STATUS current
+		DESCRIPTION
+		"A unique integer identifying the particular software
+                image."
+		::= { extremeImageEntry 1 }
+
+	extremeMajorVersion   OBJECT-TYPE
+		SYNTAX  INTEGER
+		MAX-ACCESS  read-only
+		STATUS current
+		DESCRIPTION
+		"The ExtremeWare Release Major Version."
+		::= { extremeImageEntry 2 }
+
+        extremeSubMajorVersion   OBJECT-TYPE
+		SYNTAX  INTEGER
+		MAX-ACCESS  read-only
+		STATUS deprecated
+		DESCRIPTION
+		"The ExtremeWare Release Sub-major Version. This object is
+                 deprecated from extremeware 7.3. The extremeMinorVersion
+                 gets the value of extremeSubMajorVersion and the new
+                 extremePatchVersion gets the value of old extremeMinorVersion
+                 value."
+		::= { extremeImageEntry 3 }
+                
+        extremeMinorVersion   OBJECT-TYPE
+		SYNTAX  INTEGER
+		MAX-ACCESS  read-only
+		STATUS current
+		DESCRIPTION
+		"The ExtremeWare Release Minor Version."
+		::= { extremeImageEntry 4 }
+                
+        extremeBuildNumber   OBJECT-TYPE
+		SYNTAX  INTEGER
+		MAX-ACCESS  read-only
+		STATUS current
+		DESCRIPTION
+		"The ExtremeWare Build Number."
+		::= { extremeImageEntry 5 }
+                
+        extremeTechnologyReleaseNumber   OBJECT-TYPE
+		SYNTAX  INTEGER
+		MAX-ACCESS  read-only
+		STATUS current
+		DESCRIPTION
+		"The Technology Release version. This value is zero for
+                all but TR releases."
+		::= { extremeImageEntry 6 }
+                
+        extremeSustainingReleaseNumber   OBJECT-TYPE
+		SYNTAX  INTEGER
+		MAX-ACCESS  read-only
+		STATUS current
+		DESCRIPTION
+		"The Sustaining Release number for the ExtremeWare version."
+		::= { extremeImageEntry 7 }
+                
+        extremeBranchRevisionNumber   OBJECT-TYPE
+		SYNTAX  INTEGER
+		MAX-ACCESS  read-only
+		STATUS current
+		DESCRIPTION
+		"The incremental build on specified branch."
+		::= { extremeImageEntry 8 }
+                
+        extremeImageType   OBJECT-TYPE
+		SYNTAX  INTEGER {
+                       trunk(0),
+                       branch(1),
+                       patch(2),
+                       technology(3),
+                       beta(4)
+                      }
+		MAX-ACCESS  read-only
+		STATUS current
+		DESCRIPTION
+		"The branch type from which the image was built."
+		::= { extremeImageEntry 9 }
+                
+        extremeImageDescription   OBJECT-TYPE
+		SYNTAX  DisplayString (SIZE(0..13))
+            MAX-ACCESS read-only
+            STATUS current
+            DESCRIPTION
+		"A unique string that can be used to identify the specific patch,
+                technology, or development branch release."
+		::= { extremeImageEntry 10 }
+                
+        extremeImageSecurity   OBJECT-TYPE
+		SYNTAX  INTEGER {
+                       unknown(0),
+                       nossh(1),
+                       ssh(2)
+                      }
+		MAX-ACCESS  read-only
+		STATUS deprecated
+		DESCRIPTION
+		"Indicates whether image was built with ssh.This object
+                 is deprecated, the ssh capability can be obtained from
+                 the extremeImageSshCapability of the ImageFeatureTable"
+		::= { extremeImageEntry 11 }
+               
+        extremePatchVersion   OBJECT-TYPE
+		SYNTAX  INTEGER
+		MAX-ACCESS  read-only
+		STATUS current
+		DESCRIPTION
+		"The ExtremeWare Release Patch Version."
+		::= { extremeImageEntry 12 }
+                
+extremeImageFeatureTable OBJECT-TYPE
+		SYNTAX  SEQUENCE OF ExtremeImageFeatureEntry
+		MAX-ACCESS  not-accessible
+		STATUS current
+		DESCRIPTION
+		"A table containing information about the software features."
+        ::= { extremeSystemCommon 35 }
+
+	extremeImageFeatureEntry OBJECT-TYPE
+		SYNTAX  ExtremeImageFeatureEntry
+		MAX-ACCESS  not-accessible
+		STATUS current
+		DESCRIPTION
+		"A table entry containing information about software features."
+		INDEX	  { extremeImageFeatureNumber }
+			::= { extremeImageFeatureTable 1 }
+
+	ExtremeImageFeatureEntry ::= SEQUENCE {
+                extremeImageFeatureNumber 		INTEGER,
+                extremeImageSshCapability       INTEGER,
+                extremeImageUAACapability       INTEGER
+	}
+
+        extremeImageFeatureNumber OBJECT-TYPE
+		SYNTAX  INTEGER {
+                       cur(0),
+                       pri(1),
+                       sec(2)
+                }
+		MAX-ACCESS  read-only
+		STATUS current
+		DESCRIPTION
+		"A unique integer identifying the particular software
+                image."
+		::= { extremeImageFeatureEntry 1 }
+
+        extremeImageSshCapability   OBJECT-TYPE
+		SYNTAX  INTEGER {
+                       unknown(0),
+                       nossh(1),
+                       ssh(2)
+                      }
+		MAX-ACCESS  read-only
+		STATUS current
+		DESCRIPTION
+		"Indicates whether image has ssh capability."
+		::= { extremeImageFeatureEntry 2 }
+
+        extremeImageUAACapability   OBJECT-TYPE
+		SYNTAX  INTEGER {
+                       unknown(0),
+                       nouaa(1),
+                       uaa(2)
+                      }
+		MAX-ACCESS  read-only
+		STATUS current
+		DESCRIPTION
+		"Indicates whether image has Wireless(UAA) components."
+		::= { extremeImageFeatureEntry 3 }
+
+---------------------------------------------------------------------------
+	-- Objects specific to Chassis products
+	extremeChassisGroup OBJECT IDENTIFIER ::=	{ extremeSystem 2}
+
+	extremeMasterMSMSlot OBJECT-TYPE
+		SYNTAX  INTEGER
+		MAX-ACCESS  read-only
+		STATUS current
+		DESCRIPTION
+		"The extremeSlotNumber of the master MSM module."
+	::= { extremeChassisGroup 1  }
+	
+	extremeChassisPortsPerSlot OBJECT-TYPE
+		SYNTAX  INTEGER
+		MAX-ACCESS  read-only
+		STATUS current
+		DESCRIPTION
+		"The maximum number of ports that can be accomodated
+		in a single slot. This number would change to accomodate
+		blades with higher port density than current ones."
+	::= { extremeChassisGroup 3  }
+	
+	extremeSlotTable OBJECT-TYPE
+		SYNTAX  SEQUENCE OF ExtremeSlotEntry
+		MAX-ACCESS  not-accessible
+		STATUS current
+		DESCRIPTION
+		"A table containing information about each slot in the 
+		chassis."
+			::= { extremeChassisGroup 2 }
+
+	extremeSlotEntry OBJECT-TYPE
+		SYNTAX  ExtremeSlotEntry
+		MAX-ACCESS  not-accessible
+		STATUS current
+		DESCRIPTION
+		"A table entry containing information about the module in 
+		each slot of the chassis."
+		INDEX	  { extremeSlotNumber }
+			::= { extremeSlotTable 1 }
+
+	ExtremeSlotEntry ::= SEQUENCE {
+		extremeSlotNumber 		INTEGER,	
+		extremeSlotName			DisplayString,
+		extremeSlotModuleConfiguredType	INTEGER,
+		extremeSlotModuleInsertedType	INTEGER,
+		extremeSlotModuleState		INTEGER,	
+		extremeSlotModuleSerialNumber	DisplayString
+	}
+
+	extremeSlotNumber OBJECT-TYPE
+		SYNTAX  INTEGER
+		MAX-ACCESS  read-only
+		STATUS current
+		DESCRIPTION
+		"A unique integer identifying the particular slot 
+		in the chassis."
+		::= { extremeSlotEntry 1 }
+
+	extremeSlotName   OBJECT-TYPE
+		SYNTAX  DisplayString
+		MAX-ACCESS  read-only
+		STATUS current
+		DESCRIPTION
+		"A name identifying the particular slot in the chassis."
+		::= { extremeSlotEntry 2 }
+
+	extremeSlotModuleConfiguredType OBJECT-TYPE
+		SYNTAX  INTEGER	{
+			none(1),
+			fe32(2),
+			g4x(3),
+			g6x(4),
+			fe32fx(5),
+			f48ti(7),
+			g8xi(8),
+			g8ti(9),
+			g12sxi(10),
+			g12ti(11),
+			fm32t(21),
+			gm4x(22),
+			gm4sx(23),
+			gm4t(24),
+            wdm8(25),
+			fm24f(26),
+			fm24sf(27),
+			fm24te(28),
+			f96ti(29),
+	        wdm4(30),
+			f32fi(31),
+            tenGx3(32),
+            tenGigLR(33),
+            g16x3(34),
+            g24t3(35),
+            gm16x3(36),
+            gm16t3(37),
+            fm16t3(38),
+            fm32p(39),
+            fm8v(50), -- vdsl blade
+            wm4t1(51), -- 4port t1
+            wm4t3(52), -- 4port t3
+            wm1t3(53), -- 1port t3
+            wm4e1(54),  -- 4port e1
+			p3c(101),
+            p12c(102),
+            arm(103),
+            mpls(104),
+            sma(105),
+            p48c(106),
+            a3c(107),
+            a12c(108),
+	        pxm(200),
+            s300fixed(201)
+		}
+		MAX-ACCESS  read-write
+		STATUS current
+		DESCRIPTION
+		"The configured module type for the given slot. 
+		At startup, the module-type is none(1). It is 
+		possible to configure the module-type even if there 
+		is no module in the slot. If the current module in the 
+		slot is different than the requested configured module-type, 
+		then the current configuration for the module is erased and 
+		the card will be restarted. The new configured module-type 
+		will be recorded. Since the configured module type is different 
+		than the actual module type, a moduleMismatch trap will be sent,
+ 		and the extremeSlotModuleState for that module will show a 
+		mismatch(3). Setting this variable to none(1) will clear the 
+		previously assigned module-type of this slot, and all 
+		configuration information related to the slot will be erased."
+		::= { extremeSlotEntry 3 }
+
+	extremeSlotModuleInsertedType OBJECT-TYPE
+		SYNTAX  INTEGER	{
+			none(1),
+			fe32(2),
+			g4x(3),
+			g6x(4),
+			fe32fx(5),
+			msm(6),
+			f48ti(7),
+			g8xi(8),
+			g8ti(9),
+			g12sxi(10),
+			g12ti(11),
+			msm64i(18),
+			alpine3808(19),
+			alpine3804(20),
+			fm32t(21),
+			gm4x(22),
+			gm4sx(23),
+			gm4t(24),
+            wdm8(25),
+			fm24f(26), 
+			fm24sf(27),
+			fm24te(28),
+			f96ti(29),
+	        wdm4(30),
+			f32fi(31),
+            tenGx3(32),
+            tenGigLR(33),   
+            g16x3(34),
+            g24t3(35),
+            gm16x3(36),
+            gm16t3(37),
+            fm16t3(38),
+            fm32p(39),
+            fm8v(50), -- vdsl blade
+            wm4t1(51), -- 4port t1
+            wm4t3(52), -- 4port t3
+            wm1t3(53), -- 1port t3
+            wm4e1(54),  -- 4port e1
+            alpine3802(55),
+			p3c(101),
+            p12c(102),
+            arm(103),
+            mpls(104),
+            sma(105),
+            p48c(106),
+            a3c(107),
+            a12c(108),
+	        pxm(200),
+            s300fixed(201),
+            msm3(202)
+		}
+		MAX-ACCESS  read-only
+		STATUS current
+		DESCRIPTION
+		"The module type inserted into the slot. It is possible 
+		to have a slot inserted into the slot even though 
+		extremeSlotConfiguredType is none(1)."
+		::= { extremeSlotEntry 4 }
+
+	extremeSlotModuleState OBJECT-TYPE
+		SYNTAX  INTEGER	{
+			notPresent(1),
+			testing(2),
+			mismatch(3),
+			failed(4),
+			operational(5),
+                        powerdown(6),
+			unknown(7),
+                        present(8),
+                        poweron(9),
+                        post(10),
+                        downloading(11),
+                        booting(12),
+                        offline(13),
+                        initializing(14),
+                        invalid(100) 
+
+		}
+		MAX-ACCESS  read-only
+		STATUS current
+		DESCRIPTION
+		"The state of the module inserted in this slot."
+		::= { extremeSlotEntry 5 }
+
+	extremeSlotModuleSerialNumber OBJECT-TYPE
+		SYNTAX  DisplayString
+		MAX-ACCESS  read-only
+		STATUS current
+		DESCRIPTION
+		"The serial number of the module inserted in this slot."
+		::= { extremeSlotEntry 6 }
+	extremeSystemHealthCheck OBJECT IDENTIFIER
+		::= { extremeSystem 3 }
+
+	extremeHealthCheckErrorType OBJECT-TYPE
+		SYNTAX INTEGER { 
+				unknown(1), 
+				cpuPacket(2), 
+				backplane(3), 
+				hardwareFail(4),
+				pbusChecksum(5)
+				}			
+		MAX-ACCESS accessible-for-notify
+		STATUS current
+		DESCRIPTION
+		"The error reported in the system health check trap"
+		::= { extremeSystemHealthCheck 1 }
+
+	extremeHealthCheckAction OBJECT-TYPE
+		SYNTAX INTEGER {
+				syslogOnly(1),
+				healthCheckTrap(2),
+				ioModuleDown(3),
+				systemDown(4),
+				autoRecovery(5)
+				}
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+		"The action/alarm level that has been configured for health check."
+		::= { extremeSystemHealthCheck 2 }
+
+	extremeHealthCheckMaxRetries OBJECT-TYPE
+		SYNTAX INTEGER
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+		"The maximum number of times a module restart will be attempted if it fails. 
+		If extremeHealthCheckAction is not autorecovery(5), then this value is zero."
+		::= { extremeSystemHealthCheck 3 }
+
+-- =========================================================================== 
+ 
+  extremeSystemThresholds OBJECT IDENTIFIER
+        ::= { extremeSystem  4 }
+
+  extremeCpuUtilRisingThreshold OBJECT-TYPE
+        SYNTAX INTEGER (0..100)
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+                  "Rising threshold for CPU Aggregation utilization trap"
+	::= { extremeSystemThresholds 1 }
+
+  extremeCpuTaskUtilPair OBJECT-TYPE
+                SYNTAX DisplayString 
+        	    MAX-ACCESS accessible-for-notify
+                STATUS current
+                DESCRIPTION
+                  "TaskName/CPU_% Util pair reported in CPU Utilization trap"
+	::= { extremeSystemThresholds 2 }
+
+
+END
