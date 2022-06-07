@@ -4,11 +4,11 @@
             "devices": [
                 {
                     "sysName": null,
-                    "sysObjectID": ".1.3.6.1.4.1.11.2.3.7.11.131",
-                    "sysDescr": "HP J9625A 2620-24-PoEP Switch, revision RA.16.02.0012, ROM RA.15.13 (/ws/swbuildm/rel_spokane_qaoff/code/build/xform(swbuildm_rel_spokane_qaoff_rel_spokane))",
+                    "sysObjectID": ".1.3.6.1.4.1.11.2.3.7.11.200",
+                    "sysDescr": "Aruba Instant On 1930 48G Class4 PoE 4SFP/SFP  370W Switch JL686A, InstantOn_1930_1.0.5.0 (139), Linux 4.4.120, U-Boot 2013.01 (V1.0.1.29)",
                     "sysContact": null,
-                    "version": "RA.16.02.0012",
-                    "hardware": "J9625A 2620-24-PoEP",
+                    "version": "1.0.5.0",
+                    "hardware": "1930 48G Class4 PoE 4SFP/SFP 370W JL686A",
                     "features": null,
                     "os": "procurve",
                     "type": "network",
