@@ -40,7 +40,7 @@ IMPORTS
     rndErrorDesc, rndErrorSeverity                          FROM CISCOSB-DEVICEPARAMS-MIB;
 
 rlPhysicalDescription  MODULE-IDENTITY
-                       LAST-UPDATED "200602120000Z"
+                       LAST-UPDATED "202105190000Z"
                        ORGANIZATION "Cisco Systems, Inc."
 
                        CONTACT-INFO
@@ -54,7 +54,7 @@ rlPhysicalDescription  MODULE-IDENTITY
                        DESCRIPTION
                             "The private MIB module definition for physical
                              device configuration."
-                       REVISION "200602120000Z"
+                       REVISION "202105190000Z"
                        DESCRIPTION
                             "Removed TRAP-TYPE from IMPORTS."
                        REVISION "200310180000Z"
