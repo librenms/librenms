@@ -33,57 +33,57 @@ class Openbsd extends Unix implements OSPolling
 {
     public function pollOS(): void
     {
-        $oids = snmp_get_multi($this->getDeviceArray(), [
-            'pfStateCount.0',
-            'pfStateSearches.0',
-            'pfStateInserts.0',
-            'pfStateRemovals.0',
-            'pfCntMatch.0',
-            'pfCntBadOffset.0',
-            'pfCntFragment.0',
-            'pfCntShort.0',
-            'pfCntNormalize.0',
-            'pfCntMemory.0',
-            'pfCntTimestamp.0',
-            'pfCntCongestion.0',
-            'pfCntIpOption.0',
-            'pfCntProtoCksum.0',
-            'pfCntStateMismatch.0',
-            'pfCntStateInsert.0',
-            'pfCntStateLimit.0',
-            'pfCntSrcLimit.0',
-            'pfCntSynproxy.0',
-            'pfCntTranslate.0',
-            'pfCntNoRoute.0',
-        ], '-OQUs', 'OPENBSD-PF-MIB');
+        $oids = \SnmpQuery::get([
+            'OPENBSD-PF-MIB::pfStateCount.0',
+            'OPENBSD-PF-MIB::pfStateSearches.0',
+            'OPENBSD-PF-MIB::pfStateInserts.0',
+            'OPENBSD-PF-MIB::pfStateRemovals.0',
+            'OPENBSD-PF-MIB::pfCntMatch.0',
+            'OPENBSD-PF-MIB::pfCntBadOffset.0',
+            'OPENBSD-PF-MIB::pfCntFragment.0',
+            'OPENBSD-PF-MIB::pfCntShort.0',
+            'OPENBSD-PF-MIB::pfCntNormalize.0',
+            'OPENBSD-PF-MIB::pfCntMemory.0',
+            'OPENBSD-PF-MIB::pfCntTimestamp.0',
+            'OPENBSD-PF-MIB::pfCntCongestion.0',
+            'OPENBSD-PF-MIB::pfCntIpOption.0',
+            'OPENBSD-PF-MIB::pfCntProtoCksum.0',
+            'OPENBSD-PF-MIB::pfCntStateMismatch.0',
+            'OPENBSD-PF-MIB::pfCntStateInsert.0',
+            'OPENBSD-PF-MIB::pfCntStateLimit.0',
+            'OPENBSD-PF-MIB::pfCntSrcLimit.0',
+            'OPENBSD-PF-MIB::pfCntSynproxy.0',
+            'OPENBSD-PF-MIB::pfCntTranslate.0',
+            'OPENBSD-PF-MIB::pfCntNoRoute.0',
+        ])->values();
 
-        $this->parseOID('states', ['states' => $oids[0]['pfStateCount']], 'GAUGE');
-        $this->parseOID('searches', ['searches' => $oids[0]['pfStateSearches']]);
-        $this->parseOID('inserts', ['inserts' => $oids[0]['pfStateInserts']]);
-        $this->parseOID('removals', ['removals' => $oids[0]['pfStateRemovals']]);
-        $this->parseOID('matches', ['matches' => $oids[0]['pfCntMatch']]);
+        $this->graphOID('states', ['states' => $oids['OPENBSD-PF-MIB::pfStateCount.0']], 'GAUGE');
+        $this->graphOID('searches', ['searches' => $oids['OPENBSD-PF-MIB::pfStateSearches.0']]);
+        $this->graphOID('inserts', ['inserts' => $oids['OPENBSD-PF-MIB::pfStateInserts.0']]);
+        $this->graphOID('removals', ['removals' => $oids['OPENBSD-PF-MIB::pfStateRemovals.0']]);
+        $this->graphOID('matches', ['matches' => $oids['OPENBSD-PF-MIB::pfCntMatch.0']]);
 
-        $this->parseOID('drops', [
-            'badoffset' => $oids[0]['pfCntBadOffset'],
-            'fragmented' => $oids[0]['pfCntFragment'],
-            'short' => $oids[0]['pfCntShort'],
-            'normalized' => $oids[0]['pfCntNormalize'],
-            'memory' => $oids[0]['pfCntMemory'],
-            'timestamp' => $oids[0]['pfCntTimestamp'],
-            'congestion' => $oids[0]['pfCntCongestion'],
-            'ipoption' => $oids[0]['pfCntIpOption'],
-            'protocksum' => $oids[0]['pfCntProtoCksum'],
-            'statemismatch' => $oids[0]['pfCntStateMismatch'],
-            'stateinsert' => $oids[0]['pfCntStateInsert'],
-            'statelimit' => $oids[0]['pfCntStateLimit'],
-            'srclimit' => $oids[0]['pfCntSrcLimit'],
-            'synproxy' => $oids[0]['pfCntSynproxy'],
-            'translate' => $oids[0]['pfCntTranslate'],
-            'noroute' => $oids[0]['pfCntNoRoute'],
+        $this->graphOID('drops', [
+            'badoffset' => $oids['OPENBSD-PF-MIB::pfCntBadOffset.0'],
+            'fragmented' => $oids['OPENBSD-PF-MIB::pfCntFragment.0'],
+            'short' => $oids['OPENBSD-PF-MIB::pfCntShort.0'],
+            'normalized' => $oids['OPENBSD-PF-MIB::pfCntNormalize.0'],
+            'memory' => $oids['OPENBSD-PF-MIB::pfCntMemory.0'],
+            'timestamp' => $oids['OPENBSD-PF-MIB::pfCntTimestamp.0'],
+            'congestion' => $oids['OPENBSD-PF-MIB::pfCntCongestion.0'],
+            'ipoption' => $oids['OPENBSD-PF-MIB::pfCntIpOption.0'],
+            'protocksum' => $oids['OPENBSD-PF-MIB::pfCntProtoCksum.0'],
+            'statemismatch' => $oids['OPENBSD-PF-MIB::pfCntStateMismatch.0'],
+            'stateinsert' => $oids['OPENBSD-PF-MIB::pfCntStateInsert.0'],
+            'statelimit' => $oids['OPENBSD-PF-MIB::pfCntStateLimit.0'],
+            'srclimit' => $oids['OPENBSD-PF-MIB::pfCntSrcLimit.0'],
+            'synproxy' => $oids['OPENBSD-PF-MIB::pfCntSynproxy.0'],
+            'translate' => $oids['OPENBSD-PF-MIB::pfCntTranslate.0'],
+            'noroute' => $oids['OPENBSD-PF-MIB::pfCntNoRoute.0'],
         ]);
     }
 
-    private function parseOID(string $graphName, array $oids, string $type = 'COUNTER'): void
+    private function graphOID(string $graphName, array $oids, string $type = 'COUNTER'): void
     {
         $rrd_def = RrdDefinition::make();
         $fields = [];
