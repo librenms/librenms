@@ -1,3 +1,4 @@
+-- ################################################################################
 
 
 
@@ -11,17 +12,30 @@ EXTREME-STACKING-MIB DEFINITIONS ::= BEGIN
 		NOTIFICATION-TYPE FROM SNMPv2-SMI
 		Unsigned32	FROM SNMPv2-SMI
 		IpAddress         FROM SNMPv2-SMI
-		MacAddress	FROM SNMPv2-TC
+                MacAddress, DateAndTime FROM SNMPv2-TC
 		sysUpTime, sysDescr, ifIndex, DisplayString   FROM RFC1213-MIB
 		TruthValue	FROM SNMPv2-TC
                 extremeAgent    FROM EXTREME-BASE-MIB
 		extremeCurrentTemperature	FROM EXTREME-SYSTEM-MIB;
 
         extremeStackable MODULE-IDENTITY
-                LAST-UPDATED "0409270000Z"
+                LAST-UPDATED "201712061500Z"
                 ORGANIZATION "Extreme Networks, Inc."
                 CONTACT-INFO "www.extremenetworks.com"
                 DESCRIPTION "Extreme Stackable MIB objects"
+
+                REVISION "201712061500Z" -- Tue Dec 6 15:00 UTC 2017
+                DESCRIPTION "Change extremeStackingPortLinkSpeed description."
+
+                REVISION "201710101515Z" -- Tue Oct 10 15:15 UTC 2017
+                DESCRIPTION "Change extremeStackDetecton from read-write to read-only."
+
+                REVISION "201410131030Z" -- Mon Oct 13 10:30 UTC 2014
+                DESCRIPTION "Added table objects for current image booted and
+                             switch boot time."
+
+                REVISION "200409270915Z" -- Mon Sept 27 09:15 UTC 2004
+                DESCRIPTION "Initial version."
         ::= { extremeAgent 33 }
 
 -- 
@@ -29,7 +43,7 @@ EXTREME-STACKING-MIB DEFINITIONS ::= BEGIN
 --
 	extremeStackDetection OBJECT-TYPE
              SYNTAX TruthValue
-	     MAX-ACCESS	read-write
+	     MAX-ACCESS read-only
 	     STATUS current
 	     DESCRIPTION
 		"This field provides the information as to whether the stacking
@@ -78,7 +92,9 @@ EXTREME-STACKING-MIB DEFINITIONS ::= BEGIN
 	     extremeStackMemberMgmtIpAddress	IpAddress,
 	     extremeStackMemberSysLocation      DisplayString,
              extremeStackMemberAutoConfig	TruthValue, 	  
-	     extremeStackMemberStackStatus	INTEGER
+	     extremeStackMemberStackStatus	INTEGER,
+	     extremeStackMemberImageBooted      INTEGER,
+	     extremeStackMemberBootTime         DateAndTime
 	}
 
 	extremeStackMemberSlotId OBJECT-TYPE
@@ -117,13 +133,14 @@ EXTREME-STACKING-MIB DEFINITIONS ::= BEGIN
 	extremeStackMemberRole OBJECT-TYPE
 	     SYNTAX INTEGER {
 		master (1),
-		slave  (2)
+		slave  (2),
+		backup (3)
 	     }
 	     MAX-ACCESS read-only
 	     STATUS current
 	     DESCRIPTION
 		"The role of the stack member as to whether it is acting as a
-	master or a slave"
+	master,backup or a slave"
 	     	   ::= { extremeStackMemberEntry 4 }
 
 	extremeStackMemberEntPhysicalIndex OBJECT-TYPE
@@ -186,7 +203,8 @@ EXTREME-STACKING-MIB DEFINITIONS ::= BEGIN
 	extremeStackMemberConfigSelected OBJECT-TYPE
 	     SYNTAX INTEGER {
 		primary   (1),
-		secondary (2)
+		secondary (2),
+		other     (3)
 	     }
 	     MAX-ACCESS read-only
 	     STATUS current
@@ -262,6 +280,22 @@ EXTREME-STACKING-MIB DEFINITIONS ::= BEGIN
 	is removed from the stack and the corresponding row disappears"
 	     	   ::= { extremeStackMemberEntry 18 }
 
+        extremeStackMemberImageBooted OBJECT-TYPE
+             SYNTAX INTEGER { primary(1), secondary(2) }
+             MAX-ACCESS read-only
+             STATUS current
+             DESCRIPTION
+                "The image with which the stack member was last booted, which it is currently running."
+                   ::= { extremeStackMemberEntry 19 }
+
+        extremeStackMemberBootTime OBJECT-TYPE
+             SYNTAX  DateAndTime
+             MAX-ACCESS read-only
+             STATUS      current
+             DESCRIPTION
+                "The date and time when the switch was last booted."
+                   ::= { extremeStackMemberEntry 20 }
+
 --
 --  	Stacking Port Table
 --
@@ -319,8 +353,7 @@ EXTREME-STACKING-MIB DEFINITIONS ::= BEGIN
 	     MAX-ACCESS read-only
 	     STATUS current
 	     DESCRIPTION
-		"The Speed of the stacking port link in bps. The speed will be
-	zero if the link is not up"
+		"The Speed of the stacking port link in Gbps."
 	     	   ::= { extremeStackingPortEntry 3 }
 
 	extremeStackingPortLinkStatus OBJECT-TYPE
@@ -371,4 +404,4 @@ EXTREME-STACKING-MIB DEFINITIONS ::= BEGIN
                 ::= { extremeStackTrapsPrefix 3 }
 
 
-END	
+END

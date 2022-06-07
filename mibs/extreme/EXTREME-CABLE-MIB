@@ -1,7 +1,4 @@
-
--- ===========================================================================
-
--- ===========================================================================
+-- ################################################################################
 
 EXTREME-CABLE-MIB DEFINITIONS ::= BEGIN
 
@@ -16,7 +13,7 @@ EXTREME-CABLE-MIB DEFINITIONS ::= BEGIN
 		NOTIFICATION-TYPE	FROM SNMPv2-SMI;
             
     extremeCable MODULE-IDENTITY
-                LAST-UPDATED "0007240000Z"
+                LAST-UPDATED "201310111700Z"
                 ORGANIZATION "Extreme Networks, Inc."
                 CONTACT-INFO "www.extremenetworks.com"
                 DESCRIPTION "Extreme-specific Cable objects"
@@ -481,20 +478,26 @@ EXTREME-CABLE-MIB DEFINITIONS ::= BEGIN
 
 --TRAPS MIB Definitions for CDM
   
+--   extremeTrapDiagPortDiagnostics	TRAP-TYPE
+--   ENTERPRISE  extremenetworks
+--   VARIABLES   {extremeDiagPortCfgPortIfIndex, extremeDiagPortCfgMode, extremeDiagPortCfgStatus}
+--   DESCRIPTION
+--   	  "Indicates the status of Diagnostics for a port. The status indicates 
+--   	  whether Diagnostics for a particular port failed"
+--   ::= 22
+
    extremeCableTraps 	OBJECT IDENTIFIER
-	::= { extremeV2Traps 13 }
+	::= { extremeCable 5 }
 
    extremeCableTrapsPrefix   OBJECT IDENTIFIER
 	::= { extremeCableTraps 0 }
 
-   extremeTrapDiagPortDiagnostics NOTIFICATION-TYPE
-	OBJECTS { extremeDiagPortCfgPortIfIndex,
-                  extremeDiagPortCfgMode,
-                  extremeDiagPortCfgStatus }
-	STATUS current
-	DESCRIPTION
+   extremeTrapDiagPortDiagnostics	NOTIFICATION-TYPE
+   	OBJECTS   {extremeDiagPortCfgPortIfIndex, extremeDiagPortCfgMode, extremeDiagPortCfgStatus}
+      STATUS current
+      DESCRIPTION
    	  "Indicates the status of Diagnostics for a port. The status indicates 
    	  whether Diagnostics for a particular port failed"
-	    ::= { extremeCableTrapsPrefix 1 }
+      ::= { extremeCableTrapsPrefix 1 }
 
 END

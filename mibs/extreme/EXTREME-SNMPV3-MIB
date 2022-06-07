@@ -1,25 +1,26 @@
+-- ################################################################################
 
-
--- ===========================================================================
-
-EXTREME-SNMPV3-MIB DEFINITIONS ::= BEGIN
+    EXTREME-SNMPV3-MIB DEFINITIONS ::= BEGIN
 
     IMPORTS  
-                MODULE-IDENTITY                 FROM SNMPv2-SMI
+        MODULE-IDENTITY                 FROM SNMPv2-SMI
 		OBJECT-TYPE                     FROM SNMPv2-SMI
-                TruthValue                      FROM SNMPv2-TC
+        DisplayString                   FROM SNMPv2-TC
+        TruthValue           		FROM SNMPv2-TC
+        IpAddress, Integer32            FROM SNMPv2-SMI
 		extremeAgent                    FROM EXTREME-BASE-MIB
-                snmpTargetAddrEntry             FROM SNMP-TARGET-MIB;
+        snmpTargetAddrEntry             FROM SNMP-TARGET-MIB
+        InetAddressType, InetAddress    FROM INET-ADDRESS-MIB;
 
-            
         extremeSnmpv3 MODULE-IDENTITY
-                LAST-UPDATED "0007240000Z"
+                LAST-UPDATED "201301071200Z"
                 ORGANIZATION "Extreme Networks, Inc."
                 CONTACT-INFO "www.extremenetworks.com"
                 DESCRIPTION "Extreme-specific SNMPv3 objects"
         ::= { extremeAgent 23 }
 
 	extremeTarget	OBJECT IDENTIFIER ::= { extremeSnmpv3 1 }
+    extremeUsm      OBJECT IDENTIFIER ::= { extremeSnmpv3 2 }
 	
 	extremeTargetAddrExtTable OBJECT-TYPE
 		SYNTAX  SEQUENCE OF ExtremeTargetAddrExtEntry
@@ -41,10 +42,14 @@ EXTREME-SNMPV3-MIB DEFINITIONS ::= BEGIN
 			::= { extremeTargetAddrExtTable 1 }
 
 	ExtremeTargetAddrExtEntry ::= SEQUENCE {
-		extremeTargetAddrExtIgnoreMPModel		TruthValue,
+		extremeTargetAddrExtIgnoreMPModel                       TruthValue,
                 extremeTargetAddrExtStandardMode                TruthValue,
-                extremeTargetAddrExtTrapDestIndex               INTEGER,
-                extremeTargetAddrExtUseEventComm                TruthValue
+                extremeTargetAddrExtTrapDestIndex               Integer32,
+                extremeTargetAddrExtUseEventComm                TruthValue,
+                extremeTargetAddrExtTrapSrcIp                   IpAddress,
+                extremeTargetAddrExtVrName                      DisplayString,
+                extremeTargetAddrExtTrapSrcAddrType             InetAddressType,
+                extremeTargetAddrExtTrapSrcAddr                 InetAddress
 	}
 	
 	
@@ -77,7 +82,7 @@ EXTREME-SNMPV3-MIB DEFINITIONS ::= BEGIN
 		::= { extremeTargetAddrExtEntry 2 }
 
 	extremeTargetAddrExtTrapDestIndex OBJECT-TYPE
-		SYNTAX INTEGER
+		SYNTAX Integer32
 		MAX-ACCESS read-only
 		STATUS current
 		DESCRIPTION
@@ -101,5 +106,91 @@ EXTREME-SNMPV3-MIB DEFINITIONS ::= BEGIN
                 When this object is set to FALSE, then the RMON alarm (if being sent as an SNMPv3
                 trap) is sent without using the event community for any comparision."
                 DEFVAL { true }        
-		::= { extremeTargetAddrExtEntry 4 }
+        ::= { extremeTargetAddrExtEntry 4 }
+
+-- This object can be used only for IPv4 addresses. If this is set, then
+-- extremeTargetAddrExtTrapSrcAddr must not be set. Similarly if
+-- extremeTargetAddrExtTrapSrcAddr is set, then extremeTargetAddrExtTrapSrcIp
+-- must not be set. When extremeTargetAddrExtTrapSrcAddr is set to a non IPv4
+-- address, the value of this object shall be 0. When extremeTargetAddrExtTrapSrcAddr
+-- is set to a IPv4 address, this object shall return the same value as
+-- extremeTargetAddrExtTrapSrcAddr.
+    extremeTargetAddrExtTrapSrcIp OBJECT-TYPE
+        SYNTAX IpAddress
+        MAX-ACCESS read-write
+        STATUS deprecated
+        DESCRIPTION
+        "This object contains the source IP address from which traps have to be sent out. 
+         If this object is assigned an IP address that does not belong to the switch, 
+         an error is thrown."
+        DEFVAL { 0 }
+        ::= { extremeTargetAddrExtEntry 5}
+
+    extremeTargetAddrExtVrName OBJECT-TYPE
+        SYNTAX DisplayString (SIZE(0..32))
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+        "This object contains the virtual router name through which the SNMP Traps are being sent out. If extremeTargetAddrExtVrName is not specified then the SNMP Traps will be sent out through either VR-Mgmt or VR-Default."
+        ::= { extremeTargetAddrExtEntry 6}
+
+    extremeTargetAddrExtTrapSrcAddrType OBJECT-TYPE
+        SYNTAX InetAddressType
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+        "This object indicates the transport type of the address contained in extremeTargetAddrExtTrapSrcAddr."
+        ::= { extremeTargetAddrExtEntry 7}
+
+    extremeTargetAddrExtTrapSrcAddr OBJECT-TYPE
+        SYNTAX InetAddress
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+        "This object contains the source address the NE shall use when sending a message to the target."
+        ::= { extremeTargetAddrExtEntry 8}
+
+    extremeUsm3DESPrivProtocol OBJECT-IDENTITY
+        STATUS        current
+        DESCRIPTION  "The 3DES-EDE Symmetric Encryption Protocol. This is the protocol
+        as specified in draft-reeder-snmpv3-usm-3desede-00."
+        REFERENCE    "-Data Encryption Standard, National Institute
+        of Standards and Technology.  Federal Information Processing
+        Standard (FIPS) Publication 46-3,(1999, pending approval).
+        Will supersede FIPS Publication 46-2.
+
+        - Data Encryption Algorithm, American National Standards
+        Institute.  ANSI X3.92-1981,(December, 1980).
+
+        - DES Modes of Operation, National Institute of Standards
+        and Technology.  Federal Information Processing Standard
+        (FIPS) Publication 81,(December, 1980).
+
+        - Data Encryption Algorithm - Modes of Operation, American
+        National Standards Institute. ANSI X3.106-1983, (May 1983)."
+        ::= { extremeUsm 1 }
+         
+    extremeUsmAesCfb192Protocol OBJECT-IDENTITY
+        STATUS        current
+        DESCRIPTION  "The CFB128-AES-192 Privacy Protocol."
+        REFERENCE    "- Specification for the ADVANCED ENCRYPTION
+        STANDARD (DRAFT). Federal Information Processing Standard
+        (FIPS) Publication 197. (November 2001).
+
+        - Dworkin, M., NIST Recommendation for Block Cipher Modes
+        of Operation, Methods and Techniques (DRAFT). NIST Special
+        Publication 800-38A (December 2001)."
+        ::= { extremeUsm 2 }
+
+    extremeUsmAesCfb256Protocol OBJECT-IDENTITY
+        STATUS        current
+        DESCRIPTION  "The CFB128-AES-256 Privacy Protocol."
+        REFERENCE    "- Specification for the ADVANCED ENCRYPTION
+        STANDARD (DRAFT). Federal Information Processing Standard
+        (FIPS) Publication 197 (November 2001).
+        - Dworkin, M., NIST Recommendation for Block Cipher Modes
+        of Operation, Methods and Techniques (DRAFT). NIST Special
+        Publication 800-38A (December 2001)."
+        ::= { extremeUsm 3 }
+    
 END

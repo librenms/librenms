@@ -1,296 +1,1983 @@
--- 
---  $RCSfile: extreme.mib,v $ - ExtremeWare enterprise MIB
--- 
---  Copyright (c) 1997 - 2002 by Extreme Networks Inc.
---  
--- 	  Extreme Networks
---       http://www.extremenetworks.com
--- 
--- 
--- This file contains multiple ASN.1 Module definitions
---
+-- Extreme Networks ExtremeXOS 30.7.1.1 Proprietary MIB
 
+
+-- ################################################################################
 
 EXTREME-BASE-MIB DEFINITIONS ::= BEGIN
 
-	IMPORTS
-		enterprises 		FROM RFC1155-SMI
-                OBJECT-TYPE, OBJECT-IDENTITY    FROM SNMPv2-SMI
-		TEXTUAL-CONVENTION 	FROM SNMPv2-TC
-                MODULE-COMPLIANCE, OBJECT-GROUP       FROM SNMPv2-CONF;
+    IMPORTS
+    enterprises            FROM RFC1155-SMI
+    TEXTUAL-CONVENTION     FROM SNMPv2-TC
+    OBJECT-IDENTITY, MODULE-IDENTITY  FROM SNMPv2-SMI;
 
 
-	--  Organization & Product branches
-    
-        extremenetworks		OBJECT IDENTIFIER ::= { enterprises 1916 }
-        extremeV1Traps            OBJECT IDENTIFIER ::= { extremenetworks 0 }
-	extremeAgent            OBJECT IDENTIFIER ::= { extremenetworks 1 }
-	extremeProduct          OBJECT IDENTIFIER ::= { extremenetworks 2 }
-	extremeMisc             OBJECT IDENTIFIER ::= { extremenetworks 3 }
-   	extremeV2Traps	        OBJECT IDENTIFIER ::= { extremenetworks 4 } 
+
+    --  Organization & Product branches
+    extremenetworks MODULE-IDENTITY
+                LAST-UPDATED "201912061620Z"  -- Fri Dec  6 16:20 UTC 2019
+                ORGANIZATION "Extreme Networks, Inc."
+                CONTACT-INFO
+                    "Postal:  Extreme Networks, Inc.
+                              6480 Via Del Oro
+                              San Jose, CA 95119 USA
+
+                     Phone:   +1 408 579-2800
+                     E-mail:  support@extremenetworks.com
+                     WWW:     http://www.extremenetworks.com"
+
+                DESCRIPTION "Extreme Base MIB"
+
+                REVISION    "201912061620Z"  -- Fri Dec  6 16:20 UTC 2019
+                DESCRIPTION "Added extremeECAx6120H"
+
+                REVISION    "201909042120Z"  -- Wed Sep 4 21:20:00 UTC 2019
+                DESCRIPTION "Add X465-24XE, X465-24S and X465i-48W OIDs"
+
+                REVISION    "201908051031Z"  -- Mon Aug  5 10:31 UTC 2019
+                DESCRIPTION "Add X435 OIDs"
+
+                REVISION    "201809262302Z"  -- Fri Sep 26 23:02 UTC 2018
+                DESCRIPTION "Add X725 OID"
+
+                REVISION    "201909181400Z"  -- Mon Sep 18 14:00 UTC 2019
+                DESCRIPTION "Added extremeECAx6125"
+
+                REVISION    "201905061507Z"  -- Mon May  6 15:07 UTC 2019
+                DESCRIPTION "Added the following MIB base OIDs:
+                             xa1440, xa1480."
+
+                REVISION    "201905030900Z"  -- Fri May 03 09:00 UTC 2019
+                DESCRIPTION "Added the following OIDs:
+                             extremeSLX9150,
+                             extremeSLX9150T,
+                             extremeSLX9250,
+                             extremeSLX9740x40,
+                             extremeSLX9740x80"
+
+                REVISION    "201904011753Z"  -- Mon Apr  1 17:53 UTC 2019
+                DESCRIPTION "Added the following base OID: extremeOnieStack"
+
+                REVISION    "201901281235Z"  -- Mon Jan 28 12:35 UTC 2019
+                DESCRIPTION "Added the following MIB base OIDs:
+                             extremeVirtualTAP, extremeVirtualPB."
+
+                REVISION    "201901041422Z"  -- Fri Jan  4 14:22 UTC 2019
+                DESCRIPTION "Added the following MIB base OIDs:
+                             extremeMauType10GBaseBX10U
+                             extremeMauType10GBaseBX10D
+                             extremeMauType10GBaseBX40U
+                             extremeMauType10GBaseBX40D."
+
+                REVISION    "201901041255Z"  -- Fri Jan  4 12:55 UTC 2019
+                DESCRIPTION "Added the following MIB base OIDs:
+                             vsp7400-48Y-8C."
+
+                REVISION    "201811211946Z"  -- Wed Nov 21 19:46 UTC 2018
+                DESCRIPTION "Added the following MIB base OIDs:
+                             extremeBgp4V2, extremeBgp4V2TC."
+
+                REVISION    "201810091702Z"  -- Tue Oct  9 17:02 UTC 2018
+                DESCRIPTION "Added the following OIDs:
+                             extremeSnVirtualSensor100,
+                             extremeSnVirtualSensor250."
+
+                REVISION    "201809171220Z"  -- Mon Sep 17 12:20 UTC 2018
+                DESCRIPTION "Added the following OIDs:
+                             extremeCspAwsSubnetType,
+                             extremeCspGcpSubnetType,
+                             extremeCspAzureSubnetType,
+                             extremeMcsVmwareHypervisorType."
+
+                REVISION    "201809141531Z"  -- Fri Sep 14 15:31 UTC 2018
+                DESCRIPTION "Add X465 OIDs"
+
+                REVISION    "201807251145Z"  -- Wed Jul 25 11:45 UTC 2018
+                DESCRIPTION "Added the vsp1100 OID."
+
+                REVISION    "201807020900Z"  -- Mon Jul 02 09:00 UTC 2018
+                DESCRIPTION "Added the following OIDs:
+                             extremeSLX9030,
+                             extremeSLX9030T,
+                             extremeSLX9640"
+
+                REVISION    "201806141839Z"  -- Thu Jun 14 18:39 UTC 2018
+                DESCRIPTION "Added the following OIDs:
+                             vsp7432CQ, vsp7456VSC."
+
+                REVISION    "201806071405Z"  --  Thu Jun  7 14:05 UTC 2018
+                DESCRIPTION "Remove unsupported OIDs under extremeProduct"
+
+                REVISION    "201805171333Z"  -- Thu May 17 13:33 UTC 2018
+                DESCRIPTION "Updated the following OIDs:
+                             extremeEMPx35, extremeEMPx5310, extremeEMPxV,
+                             extremeESEx2000."
+
+                REVISION    "201805011446Z"  -- Tue May  1 14:46 UTC 2018
+                DESCRIPTION "Added the following OIDs:
+                             es6108x32c, es6108x48vx8c"
+
+                REVISION    "201803130915Z"  -- Tue Mar 13 09:15 UTC 2018
+                DESCRIPTION "Added the following OIDs:
+                             slxOsAcctonAS771232X,
+                             slxOsDniAG9032v1"
+
+                REVISION    "201803011631Z"  --  Thu Mar  1 16:31 UTC 2018
+                DESCRIPTION "Added new OIDs X590-24t-1q-2c and X590-24x-1q-2c"
+
+                REVISION    "201802081415Z"  -- Thu Feb  8 14:15 UTC 2018
+                DESCRIPTION "Added the following OIDs:
+                             extremeMauType100GBaseCWDM4Lite,
+                             extremeMauType100GBaseBIDI"
+
+                REVISION    "201802071347Z"  -- Wed Feb  7 13:47 UTC 2018
+                DESCRIPTION "Added the extremeFabricManager OID.
+                             Updated the following OIDs:
+                             extremeEMPx35, extremeEMPx5310, extremeEMPxV,
+                             extremeESEx2000."
+
+                REVISION    "201711141251Z"  -- Tue Nov 14 12:51 UTC 2017
+                DESCRIPTION "Added the following OIDs:
+                             extremeSSxIxA, extremeESEx2000.
+                             Updated the following OIDs:
+                             extremeEMPx35, extremeEMPx5310, extremeEMPxV."
+
+                REVISION    "201710251422Z"  -- Wed Oct 25 14:22 UTC 2017
+                DESCRIPTION "Added a new OID for extremeNMSxV.
+                             Update the CONTACT-INFO clause."
+
+                REVISION    "201710031451Z"  -- Tue Oct  3 14:51 UTC 2017
+                DESCRIPTION "extremeMauType100GBaseSWDM4,
+                             extremeMauType25GBaseSR,
+                             extremeMauType25GBaseESR,
+                             extremeMauType25GBaseLR,
+                             extremeMauType25GBaseCR4"
+
+                REVISION    "201706280338Z"  -- Wed Jun 28 03:38 UTC 2017
+                DESCRIPTION "Added a new OID for vm386EXOS"
+
+                REVISION    "201706011123Z"  --  Thu Jun 1 11:23 UTC 2017
+                DESCRIPTION "Added OID under extremeProduct for
+                             X690 WhiteBox"
+
+                REVISION    "201704211748Z"  -- Fri Apr 21 17:48 UTC 2017
+                DESCRIPTION "Added the following OIDs:
+                             extremeEMPx35, extremeEMPx5310, 
+                             extremeEMPxV."
+
+                REVISION    "201704101334Z"  -- Mon Apr 10 13:34 UTC 2017
+                DESCRIPTION "Added the following OIDs:
+                             extreme825-48v-6c, extremeNMSxAx25, 
+                             extremeNMSxAx305, extremeIAxAx25,
+                             extremeIAxAx305, extremePVxAx305."
+
+                REVISION    "201612051503Z"  -- Mon Dec 5 15:03 UTC 2016
+                DESCRIPTION "Added the following OIDs:
+                             extreme240-8mt-16t-10GE4, extreme240-8mp-16p-10GE4
+                             extreme240-32t-16mt-10GE6, extreme240-32p-16mp-10GE6."
+
+                REVISION    "201610261503Z"  -- Wed Oct 26 15:03 UTC 2016
+                DESCRIPTION "Added the following OIDs:
+                             extreme210-12t-GE2, extreme210-12p-GE2,
+                             extreme210-24t-GE2, extreme210-24p-GE2,
+                             extreme210-48t-GE4, extreme210-48p-GE4,
+                             extreme220-12t-10GE2, extreme220-12p-10GE2,
+                             extreme220-24t-10GE2, extreme220-24p-10GE2,
+                             extreme220-48t-10GE4,extreme220-48p-10GE4."
+
+                REVISION    "201608051809Z"  -- Fri Aug  5 18:09:52 UTC 2016 
+                DESCRIPTION "Added new slot types for new halfcat cards 
+                             x460G2-24p-24hp and x460G2-24t-24ht"
+
+                REVISION    "201607250810Z"  -- Mon Jul 25 8:10 UTC 2016
+                DESCRIPTION "Added summitX460-G2-16mp-32p-10GE4 at 
+                             extremeProduct.257"
+
+                REVISION    "201606211142Z"  -- Tue Jun 21 11:42 UTC 2016
+                DESCRIPTION "Added extremeMauType100GBase: PSM4(32)"
+
+                REVISION    "201604221249Z"  -- Fri Apr 22 12:49 UTC 2016
+                DESCRIPTION "Added the following OIDs:
+                             extremeSNSxNSSxA, extremeNSxAx20, 
+                             extremeNACxAx20, extremeIAxV,
+                             extremeIAxAx20, extremeIAxAx300,
+                             extremePVxV, extremePVxAx300."
+
+                REVISION    "201604081247Z"  --  Fri Apr 8 12:47 UTC 2016
+                DESCRIPTION "Added extremeMauType100GBase: SR4(23),CR4(24),CWDM4(25)"
+
+                REVISION    "201603290000Z"  --  Tue Mar 29 2016
+                DESCRIPTION "Added OIDs under extremeProduct for 
+                             X690 models"
+
+                REVISION    "201603170000Z"  --  Thu Mar 17 2016
+                DESCRIPTION "Added OIDs under extremeProduct for for
+                             isw-4P-2-G2, isw-8P-G4, isw-4GP-2G-G2
+                             and isw-8GP-G4"
+
+                REVISION    "201505180000Z"  --  Mon May 18 2015
+                DESCRIPTION "Added extremeErps at extremeAgent.46"
+
+                REVISION    "201504230000Z"  --  Thu Apr 23 2015
+                DESCRIPTION "Added extremeMacAuthMIB at extremeAgent.44"
+        ::= { enterprises 1916 }
+
+    extremeV1Traps         OBJECT IDENTIFIER ::= { extremenetworks 0 }
+    extremeAgent           OBJECT IDENTIFIER ::= { extremenetworks 1 }
+    extremeProduct         OBJECT IDENTIFIER ::= { extremenetworks 2 }
+    extremeMisc            OBJECT IDENTIFIER ::= { extremenetworks 3 }
+    extremeV2Traps         OBJECT IDENTIFIER ::= { extremenetworks 4 } 
 
     --
     -- Extreme Products
     --    
-    summit1			OBJECT IDENTIFIER ::= { extremeProduct 1 }
-                        -- 8 x 1Gbps
+    summit1                OBJECT IDENTIFIER ::= { extremeProduct 1 }
+                           -- 8 x 1Gbps
 
-	summit2			OBJECT IDENTIFIER ::= { extremeProduct 2 }
-                        -- 2 x 1Gbps, 16 x 10/100Mbps
+    summit2                OBJECT IDENTIFIER ::= { extremeProduct 2 }
+                           -- 2 x 1Gbps, 16 x 10/100Mbps
 
-	summit3			OBJECT IDENTIFIER ::= { extremeProduct 3 }
-                        -- 1 x 1Gbps, 24 x 10/100Mbps
+    summit3                OBJECT IDENTIFIER ::= { extremeProduct 3 }
+                           -- 1 x 1Gbps, 24 x 10/100Mbps
 
-	summit4			OBJECT IDENTIFIER ::= { extremeProduct 4 }
-                        -- 6 x 1Gbps, 16 x 10/100Mbps UTP
+    summit4                OBJECT IDENTIFIER ::= { extremeProduct 4 }
+                           -- 6 x 1Gbps, 16 x 10/100Mbps UTP
 
-	summit4fx		OBJECT IDENTIFIER ::= { extremeProduct 5 }
-                        -- 6 x 1Gbps, 16 x 10/100Mbps fiber FX
+    summit4fx              OBJECT IDENTIFIER ::= { extremeProduct 5 }
+                           -- 6 x 1Gbps, 16 x 10/100Mbps fiber FX
 
-	summit48 		OBJECT IDENTIFIER ::= { extremeProduct 6 }
-                        -- 2 x 1Gbps, 48 x 10/100Mbps
+    summit48               OBJECT IDENTIFIER ::= { extremeProduct 6 }
+                           -- 2 x 1Gbps, 48 x 10/100Mbps
 
-	summit24 		OBJECT IDENTIFIER ::= { extremeProduct 7 }
-                        -- 1 x 1Gbps, 24 x 10/100Mbps
+    summit24               OBJECT IDENTIFIER ::= { extremeProduct 7 }
+                           -- 1 x 1Gbps, 24 x 10/100Mbps
 
-	blackDiamond6800 	     OBJECT IDENTIFIER ::= { extremeProduct 8 }
-                   -- chassis based system with dual msm and 8 switching cards
+    blackDiamond6800       OBJECT IDENTIFIER ::= { extremeProduct 8 }
+                           -- chassis based system with dual msm and 8 switching cards
 
-	blackDiamond6808 	    OBJECT IDENTIFIER ::= { extremeProduct 11 }
-                   -- black diamond with the inferno chipset aka MSM64
+    blackDiamond6808       OBJECT IDENTIFIER ::= { extremeProduct 11 }
+                           -- black diamond with the inferno chipset aka MSM64
 
-	summit7iSX 		OBJECT IDENTIFIER ::= { extremeProduct 12 }
-                        -- 4 x 1Gbps GBIC, 28 x 1Gbps MT-RJ
+    summit7iSX             OBJECT IDENTIFIER ::= { extremeProduct 12 }
+                           -- 4 x 1Gbps GBIC, 28 x 1Gbps MT-RJ
 
-	summit7iTX 		OBJECT IDENTIFIER ::= { extremeProduct 13 }
-                        -- 4 x 1Gbps GBIC, 28 x 10/100/1000 Base-TX
+    summit7iTX             OBJECT IDENTIFIER ::= { extremeProduct 13 }
+                           -- 4 x 1Gbps GBIC, 28 x 10/100/1000 Base-TX
 
-	summit1iTX 		OBJECT IDENTIFIER ::= { extremeProduct 14 }
-                    -- 2 x 1Gbps MT-RJ, 6 x 10/100/1000 Base-TX inferno chipset
+    summit1iTX             OBJECT IDENTIFIER ::= { extremeProduct 14 }
+                           -- 2 x 1Gbps MT-RJ, 6 x 10/100/1000 Base-TX inferno chipset
 
-	summit5i 		OBJECT IDENTIFIER ::= { extremeProduct 15 }
-                        -- 4 x 1Gbps GBIC, 12 x 1Gbps MT-RJ inferno chipset
+    summit5i               OBJECT IDENTIFIER ::= { extremeProduct 15 }
+                           -- 4 x 1Gbps GBIC, 12 x 1Gbps MT-RJ inferno chipset
 
-	summit48i 		OBJECT IDENTIFIER ::= { extremeProduct 16 }
-                        -- 2 x 1Gbps GBIC, 48 x 10/100Mbps inferno chipset
+    summit48i              OBJECT IDENTIFIER ::= { extremeProduct 16 }
+                           -- 2 x 1Gbps GBIC, 48 x 10/100Mbps inferno chipset
 
-	alpine3808 	        OBJECT IDENTIFIER ::= { extremeProduct 17 }
-          -- mini chassis based on the inferno chipset with 8 switching cards
+    alpine3808             OBJECT IDENTIFIER ::= { extremeProduct 17 }
+                           -- mini chassis based on the inferno chipset with 8 switching cards
 
-	summit1iSX 		OBJECT IDENTIFIER ::= { extremeProduct 19 }
-                        -- 2 x 1Gbps GBIC, 6 x 1Gbps MT-RJ inferno chipset
+    summit1iSX             OBJECT IDENTIFIER ::= { extremeProduct 19 }
+                           -- 2 x 1Gbps GBIC, 6 x 1Gbps MT-RJ inferno chipset
 
-	alpine3804 	        OBJECT IDENTIFIER ::= { extremeProduct 20 }
-          -- mini chassis based on the inferno chipset with 4 switching cards
+    alpine3804             OBJECT IDENTIFIER ::= { extremeProduct 20 }
+                           -- mini chassis based on the inferno chipset with 4 switching cards
 
-	summit5iLX 		OBJECT IDENTIFIER ::= { extremeProduct 21 }
-                    -- 4 x 1Gbps GBIC, 12 x 10/100/1000 Base-TX inferno chipset
+    summit5iLX             OBJECT IDENTIFIER ::= { extremeProduct 21 }
+                           -- 4 x 1Gbps GBIC, 12 x 10/100/1000 Base-TX inferno chipset
 
-	summit5iTX 		OBJECT IDENTIFIER ::= { extremeProduct 22 }
-                    -- 4 x 1Gbps GBIC, 12 x 10/100/1000 Base-TX inferno chipset
+    summit5iTX             OBJECT IDENTIFIER ::= { extremeProduct 22 }
+                           -- 4 x 1Gbps GBIC, 12 x 10/100/1000 Base-TX inferno chipset
 
-	enetSwitch24Port	OBJECT IDENTIFIER ::= { extremeProduct 23 }
-		    --  24 x 10/100 Mbps  
+    enetSwitch24Port       OBJECT IDENTIFIER ::= { extremeProduct 23 }
+                           --  24 x 10/100 Mbps  
 
-	blackDiamond6816 	OBJECT IDENTIFIER ::= { extremeProduct 24 }
-                    -- black diamond with 4 msm's and 16 switching cards
+    blackDiamond6816       OBJECT IDENTIFIER ::= { extremeProduct 24 }
+                           -- black diamond with 4 msm's and 16 switching cards
 
-	summit24e3 		OBJECT IDENTIFIER ::= { extremeProduct 25 }
-                    -- 2 x 1Gbps GBIC, 24 x 10/100 Base-TX
+    summit24e3             OBJECT IDENTIFIER ::= { extremeProduct 25 }
+                           -- 2 x 1Gbps GBIC, 24 x 10/100 Base-TX
 
-	alpine3802 	        OBJECT IDENTIFIER ::= { extremeProduct 26 }
-          -- mini chassis based on the inferno chipset with 2-3 switching cards
+    alpine3802             OBJECT IDENTIFIER ::= { extremeProduct 26 }
+                           -- mini chassis based on the inferno chipset with 2-3 switching cards
 
-	blackDiamond6804 	     OBJECT IDENTIFIER ::= { extremeProduct 27 }
-                   -- chassis based system with 2 msm's and 4 switching cards
+    blackDiamond6804       OBJECT IDENTIFIER ::= { extremeProduct 27 }
+                           -- chassis based system with 2 msm's and 4 switching cards
 
-	summit48si		OBJECT IDENTIFIER ::= { extremeProduct 28 }
-		    -- 2 x 1Gbps GBIC, 48 x 10/100Mbps, 1u
-        	
-	summitPx1		OBJECT IDENTIFIER ::= { extremeProduct 30 }
-		    --	1 x 1Gbps GBIC
+    summit48si             OBJECT IDENTIFIER ::= { extremeProduct 28 }
+                           -- 2 x 1Gbps GBIC, 48 x 10/100Mbps, 1u
+            
+    summitPx1              OBJECT IDENTIFIER ::= { extremeProduct 30 }
+                           --    1 x 1Gbps GBIC
 
-	summit24e2TX	OBJECT IDENTIFIER ::= { extremeProduct 40 }
-		    --  2 x 1000Base-T, 24 x 10/100 Base-TX
+    summit24e2TX           OBJECT IDENTIFIER ::= { extremeProduct 40 }
+                           --  2 x 1000Base-T, 24 x 10/100 Base-TX
 
-	summit24e2SX	OBJECT IDENTIFIER ::= { extremeProduct 41 }
+    summit24e2SX           OBJECT IDENTIFIER ::= { extremeProduct 41 }
+                           --  2 x 1Gbps GBIC, 24 x 10/100 Base-SX
 
-		    --  2 x 1Gbps GBIC, 24 x 10/100 Base-TX
-        summit200-24    OBJECT IDENTIFIER ::= { extremeProduct 53 }
-                    --  2 x 1Gbps GBIC, 24 x 10/100 Base-TX
+    summit200-24           OBJECT IDENTIFIER ::= { extremeProduct 53 }
+                           --  2 x 1Gbps GBIC, 24 x 10/100 Base-TX
+
+    summit200-48           OBJECT IDENTIFIER ::= { extremeProduct 54 }
+                           --  2 x 1Gbps GBIC, 48 x 10/100 Base-TX
+
+    summit300-48           OBJECT IDENTIFIER ::= { extremeProduct 55 }
+                           --  2 x 1Gbps GBIC, 48 x 10/100 Base-TX POE
+
+    bd10808                OBJECT IDENTIFIER ::= { extremeProduct 56 }
+                           -- BlackDiamond 10808 Chassis
  
-        summit200-48    OBJECT IDENTIFIER ::= { extremeProduct 54 }
-                    --  2 x 1Gbps GBIC, 48 x 10/100 Base-TX
+    summit400-48t          OBJECT IDENTIFIER ::= { extremeProduct 58 }
+                           --  4 x 1Gbps fiber/copper, 44 x 1000 Base-T
  
-        summit400-48t   OBJECT IDENTIFIER ::= { extremeProduct 58 }
-                    --  4 x 1Gbps fiber/copper, 44 x 1000 Base-T
+    summit300-24           OBJECT IDENTIFIER ::= { extremeProduct 61 }
+                           --  2 x 1Gbps GBIC, 24 x 10/100 Base-TX POE
+
+    bd8810	           OBJECT IDENTIFIER ::= { extremeProduct 62 }
+                           --  BlackDiamond 8810 Chassis
+
+    summit400-24t           OBJECT IDENTIFIER ::= { extremeProduct 63 }
+                           --  4 x 1Gbps fiber/copper, 20 x 1Gbps fiber
+
+    summit400-24p           OBJECT IDENTIFIER ::= { extremeProduct 64 }
+                           --  4 x 1Gbps fiber/copper, 20 x 1Gbps fiber
+
+    summitX450-24x   OBJECT IDENTIFIER ::= { extremeProduct 65 }
+                           --  4 x 1Gbps fiber/copper, 20 x 1Gbps fiber, 2 x 10G uplink
+                  
+    summitX450-24t   OBJECT IDENTIFIER ::= { extremeProduct 66 }
+                           --  4 x 1Gbps fiber/copper, 20 x 1000 Base-T, 2 x 10G uplink
+                  
+    summitStack		   OBJECT IDENTIFIER ::= { extremeProduct 67 }
+			   -- A stacked version of the Summit 200/300/4000
+
+    summitWM100		   OBJECT IDENTIFIER ::= { extremeProduct 68 }
+			   -- The FlightPath wireless controller with 10/100 ports
+
+    summitWM1000	   OBJECT IDENTIFIER ::= { extremeProduct 69 }
+			   -- The FlightPath wireless controller with 1 gig ports
+
+    summit200-24fx	   OBJECT IDENTIFIER ::= { extremeProduct 70 }
+			   -- 24 100FX fiber ports + 2 combo Gig uplink ports
+
+	
+    summitX450a-24t 	   OBJECT IDENTIFIER ::= { extremeProduct 71 }
+			   -- 24 combo ports + 2 optional 10 gig ports + 
+			   -- 4 combo ports + 2 stacking ports
+
+    summitX450e-24p 	   OBJECT IDENTIFIER ::= { extremeProduct 72 }
+			   -- PoE version of summitX450e-24p 
+
+
+
+    bd8806                 OBJECT IDENTIFIER ::= { extremeProduct 74 }
+                           -- Black Diamond 8800 6 slot chassis
+
+    altitude350		   OBJECT IDENTIFIER ::= {extremeProduct 75 }
+			   -- The altitude 350 product
+
+    summitX450a-48t        OBJECT IDENTIFIER ::= {extremeProduct 76 }
+
+
+    bd12804                OBJECT IDENTIFIER ::= {extremeProduct 77 }
+                           -- bd12804 Chassis 
+
+
+    summitX450e-48p   OBJECT IDENTIFIER ::= { extremeProduct 79 }
+                           -- PoE version of the summitX450a-48t 
+
+    summitX450a-24tDC   OBJECT IDENTIFIER ::= { extremeProduct 80 }
+                           -- summitX450a-24t with DC power supply
+
+--  OID 81 is deprecated.
+
+    summitX450a-24xDC   OBJECT IDENTIFIER ::= { extremeProduct 82 }
+                      -- summitX450a-24x with DC power supply
+
+    sentriantCE150   OBJECT IDENTIFIER ::= { extremeProduct 83 }
+
+                                    -- sentriantCE150, this is security appliance.  
+
+
+    summitX450a-24x   OBJECT IDENTIFIER ::= { extremeProduct 84 }
+                                    --  4 x 1Gbps fiber/copper, 20 x 1Gbps fiber, 2 x 10G uplink
+
+
+    bd12802   OBJECT IDENTIFIER ::= { extremeProduct 85 }
+                                    -- 3-slot chassis, 1 MSM 2 IO modules
+
+
+     altitude300 OBJECT IDENTIFIER ::= { extremeProduct 86 }
+				-- altitude300 is the access point box. 
+
+
+     summitX450a-48tDC   OBJECT IDENTIFIER ::= { extremeProduct 87 }
+                           -- summitX450a-48t with DC power supply
+
+
+     summitX250-24t     OBJECT IDENTIFIER ::= { extremeProduct 88 }
+
+                           -- summitX250e: 24 10/100 copper ports, 2 100M fiber combo ports, 2 x 1G uplink option module
+
  
-        summit400-24x   OBJECT IDENTIFIER ::= { extremeProduct 59 }
-                    --  4 x 1Gbps fiber/copper, 20 x 1Gbps fiber
-                    
-        summit400-24t   OBJECT IDENTIFIER ::= { extremeProduct 63 }
-                    --  4 x 1Gbps fiber/copper, 20 x 1Gbps fiber
-                    
-        summit400-24p   OBJECT IDENTIFIER ::= { extremeProduct 64 }
-                    --  4 x 1Gbps fiber/copper, 20 x 1Gbps fiber
-                    
-        summit300-24   OBJECT IDENTIFIER ::= { extremeProduct 61 }
-                    --  2 x 1Gbps GBIC, 24 x 10/100 Base-TX POE
 
-        summit300-48   OBJECT IDENTIFIER ::= { extremeProduct 55 }
-                    --  2 x 1Gbps GBIC, 48 x 10/100 Base-TX POE
+     summitX250-24p     OBJECT IDENTIFIER ::= { extremeProduct 89 }
 
-	extremeStack   OBJECT IDENTIFIER ::= { extremeProduct 67 }
-		    --  stack entity comprising of (1..8) stackables
-		    
-	summit200-24fx   OBJECT IDENTIFIER ::= { extremeProduct 70 }
-                    --  2 x 1Gbps fiber/copper, 24 x 100FX
-------------------------------------------------------------------------------
+                           -- PoE version of the summitX250-24t
 
---
--- Assorted OIDs that are pointed to by other MIBs
---
-          extremeOids
-              OBJECT IDENTIFIER ::= { extremeMisc 1 }
+ 
 
---
--- OIDs for as-yet-unstandardised 802.3 MAU types
---     (see MAU MIB for usage)
---
-          extremeMauType
-              OBJECT IDENTIFIER ::= { extremeOids 1 }
+     summitX250-24x     OBJECT IDENTIFIER ::= { extremeProduct 90 }
 
-          extremeMauType1000BaseSX OBJECT IDENTIFIER
-              ::= { extremeMauType 1 }
---                      "X fiber over short-wavelength laser PMD as specified
---                        in clause 38, duplex mode unknown"
+                           -- summitX250e: 24 SFP 100M fiber ports, 2 10/100 copper combo ports, 2 x 1G uplink option module
 
-          extremeMauType1000BaseLX OBJECT IDENTIFIER
-              ::= { extremeMauType 2 }
---                      "X fiber over long-wavelength laser PMD as specified
---                        in clause 38, duplex mode unknown"
+   
 
-          extremeMauType1000BaseCX OBJECT IDENTIFIER
-              ::= { extremeMauType 3 }
---                      "X copper over 150-ohm balanced cable PMD as specified
---                        in clause 39, duplex mode unknown"
+     summitX250-48t     OBJECT IDENTIFIER ::= { extremeProduct 91 }
 
-          extremeMauType1000BaseSXFD OBJECT IDENTIFIER
-              ::= { extremeMauType 4 }
---                      "X fiber over short-wavelength laser PMD as specified
---                        in clause 38, full-duplex mode"
+                           -- summitX250e: 48 10/100 copper ports, 2 100M fiber combo ports, 2 x 1G uplink option module
 
-          extremeMauType1000BaseLXFD OBJECT IDENTIFIER
-              ::= { extremeMauType 5 }
---                      "X fiber over long-wavelength laser PMD as specified
---                        in clause 38, full-duplex mode"
+ 
 
-          extremeMauType1000BaseCXFD OBJECT IDENTIFIER
-              ::= { extremeMauType 6 }
---                      "X copper over 150-ohm balanced cable PMD as specified
---                        in clause 39, full-duplex mode"
+     summitX250-48p     OBJECT IDENTIFIER ::= { extremeProduct 92 }
 
-          extremeMauType1000BaseWDMHD OBJECT IDENTIFIER
-              ::= { extremeMauType 7 }
---                      "Gigabit WDM, half duplex"
-          extremeMauType1000BaseWDMFD OBJECT IDENTIFIER
-              ::= { extremeMauType 8 }
---                      "Gigabit WDM, full duplex"
+                           -- PoE version of the summitX250-48t
 
-          extremeMauType1000BaseLX70HD OBJECT IDENTIFIER
-              ::= { extremeMauType 9 }
---                      "Gigabit LX70, half duplex"
-
-          extremeMauType1000BaseLX70FD OBJECT IDENTIFIER
-              ::= { extremeMauType 10 }
---                      "Gigabit LX70, full duplex"
-
-          extremeMauType1000BaseZXHD OBJECT IDENTIFIER
-              ::= { extremeMauType 11 }
---                      "Gigabit ZX, half duplex"
-
-          extremeMauType1000BaseZXFD OBJECT IDENTIFIER
-              ::= { extremeMauType 12 }
---                      "Gigabit ZX, full duplex"
-
-          extremeMauType1000BaseLX100HD OBJECT IDENTIFIER
-              ::= { extremeMauType 13 }
---                      "Gigabit LX100, half duplex"
-
-          extremeMauType1000BaseLX100FD OBJECT IDENTIFIER
-              ::= { extremeMauType 14 }
---                      "Gigabit LX100, full duplex"
-
--- ===============================================================================
-
---
--- Extreme MIB Objects
---
-        extremeSystem    OBJECT IDENTIFIER ::= { extremeAgent 1 }
-        extremeVlan      OBJECT IDENTIFIER ::= { extremeAgent 2 }
-        extremeQos       OBJECT IDENTIFIER ::= { extremeAgent 3 }
-        extremePort      OBJECT IDENTIFIER ::= { extremeAgent 4 }
-        extremeVC        OBJECT IDENTIFIER ::= { extremeAgent 5 }
-        extremeTrapPoll  OBJECT IDENTIFIER ::= { extremeAgent 6 }
-        extremeQosPolicy OBJECT IDENTIFIER ::= { extremeAgent 7 }
-        extremeDlcs      OBJECT IDENTIFIER ::= { extremeAgent 8 }
-        extremeFileTransfer OBJECT IDENTIFIER ::= { extremeAgent 10 }
-        extremeRtStats   OBJECT IDENTIFIER ::= { extremeAgent 11 }
-        extremeEsrp      OBJECT IDENTIFIER ::= { extremeAgent 12 }
-        extremeEdp       OBJECT IDENTIFIER ::= { extremeAgent 13 }
-        extremeSlb       OBJECT IDENTIFIER ::= { extremeAgent 14 }
-        extremeOspf      OBJECT IDENTIFIER ::= { extremeAgent 15 }
-        extremeFdb	     OBJECT IDENTIFIER ::= { extremeAgent 16 }
-        extremeStp       OBJECT IDENTIFIER ::= { extremeAgent 17 }
-	    extremePOSMib    OBJECT IDENTIFIER ::= { extremeAgent 20 }
-	    extremeNPMib     OBJECT IDENTIFIER ::= { extremeAgent 21 }
-	    extremeNetFlow     OBJECT IDENTIFIER ::= { extremeAgent 22 }
-        extremeSnmpv3      OBJECT IDENTIFIER ::= { extremeAgent 23 }
-        extremeCable      OBJECT IDENTIFIER ::= { extremeAgent 24 }
-        extremeDosMib      OBJECT IDENTIFIER ::= { extremeAgent 28 }
-        extremeEnhDosMib      OBJECT IDENTIFIER ::= { extremeAgent 29 }
-        extremeWireless  OBJECT IDENTIFIER ::= { extremeAgent 25 }
-	extremeEntity	 OBJECT IDENTIFIER ::= { extremeAgent 31 }
-        extremeAP        OBJECT IDENTIFIER ::= { extremeWireless 1 }
-        extremeLAC       OBJECT IDENTIFIER ::= { extremeWireless 2 }
+    summitVer2Stack     OBJECT IDENTIFIER ::= { extremeProduct 93 }
+                           -- A stacked version of the EXOS Summit X450's, X250's
 
 
-PortList ::= TEXTUAL-CONVENTION
-       STATUS      current
-       DESCRIPTION
-           "Each octet within this value specifies a set of eight
-           ports, with the first octet specifying ports 1 through
-           8, the second octet specifying ports 9 through 16, etc.
-           Within each octet, the most significant bit represents
-           the lowest numbered port, and the least significant bit
-           represents the highest numbered port.  Thus, each port
-           of the bridge is represented by a single bit within the
-           value of this object.  If that bit has a value of '1'
-           then that port is included in the set of ports; the port
-           is not included if its bit has a value of '0'. If the
-           object has a length of 0 then it is taken to refer to all
-           of the ports in a given device."
-       SYNTAX      OCTET STRING
+    summitWM200 OBJECT IDENTIFIER ::= { extremeProduct 94 }
 
-L4Port ::= TEXTUAL-CONVENTION
+    summitWM2000 OBJECT IDENTIFIER ::= { extremeProduct 95 }
+
+    summitWM100Lite OBJECT IDENTIFIER ::= { extremeProduct 96 }
+
+    summitX250-24tDC   OBJECT IDENTIFIER ::= { extremeProduct 97 }
+                           -- summitX250e: DC powered 24 10/100 copper ports, 2 x 1G fiber combo ports
+
+    summitX250-24xDC   OBJECT IDENTIFIER ::= { extremeProduct 98 }
+                           -- summitX250e: DC powered 24 SFP 100M fiber ports, 2 x 1G copper combo ports
+
+    summitX250-48tDC   OBJECT IDENTIFIER ::= { extremeProduct 99 }
+                           -- summitX250e: DC powered 48 10/100 copper ports, 2 x 1G fiber combo ports
+
+    summitX150-24t     OBJECT IDENTIFIER ::= { extremeProduct 100 }
+                           -- summitX150: Layer 2 24 10/100 copper ports, 2 x 1G fiber combo ports
+
+    summitX150-24tDC   OBJECT IDENTIFIER ::= { extremeProduct 101 }
+                           -- summitX150: Layer 2 DC powered 24 10/100 copper ports, 2 x 1G fiber combo ports
+
+    summitX150-24p     OBJECT IDENTIFIER ::= { extremeProduct 102 }
+                           -- Layer 2 PoE version of the summitX150-24t
+
+    summitX150-24x     OBJECT IDENTIFIER ::= { extremeProduct 103 }
+                           -- summitX150: Layer 2 24 SFP 100M fiber ports, 2 x 1G copper combo ports
+
+    summitX150-24xDC   OBJECT IDENTIFIER ::= { extremeProduct 104 }
+                           -- summitX150: Layer 2 DC powered 24 SFP 100M fiber ports, 2 x 1G copper combo ports
+
+    summitX150-48t     OBJECT IDENTIFIER ::= { extremeProduct 105 }
+                           -- summitX150: Layer 2 48 10/100 copper ports, 2 x 1G fiber combo ports
+
+    summitX150-48tDC   OBJECT IDENTIFIER ::= { extremeProduct 106 }
+                           -- summitX150: Layer 2 DC powered 48 10/100 copper ports, 2 x 1G fiber combo ports
+
+    summitX150-48p     OBJECT IDENTIFIER ::= { extremeProduct 107 }
+                           -- Layer 2 PoE version of the summitX150-48t
+
+    sentriantAGSW      OBJECT IDENTIFIER ::= { extremeProduct 108 }
+                          -- Sentriant AG Network Access Control Software
+
+    sentriantAG200     OBJECT IDENTIFIER ::= { extremeProduct 109 }
+                          -- Sentriant AG200 Network Access Control appliance
+
+    summitWM20         OBJECT IDENTIFIER ::= { extremeProduct 110 }
+                          -- Summit WM20 WLAN Controller
+
+    summitX350-24t     OBJECT IDENTIFIER ::= { extremeProduct 111 }
+                          -- Layer 2 24 10/100/1000 copper ports, 4 x 1G fiber combo ports
+
+    summitX350-48t     OBJECT IDENTIFIER ::= { extremeProduct 112 }
+                          -- Layer 2 48 10/100/1000 copper ports, 4 x 1G fiber combo ports
+
+    summitX650-24t     OBJECT IDENTIFIER ::= { extremeProduct 113 }
+                          -- 24-port SummitX650 -10GbaseT (no VIM installed)
+
+    summitX650-24x     OBJECT IDENTIFIER ::= { extremeProduct 114 }
+                          -- 24-port SummitX650 SFP+ (no VIM installed)
+
+    sentriantNG300     OBJECT IDENTIFIER ::= { extremeProduct 115 }
+                         -- Sentriant NG300 Network  Behavioral Security appliance
+
+    altitude360        OBJECT IDENTIFIER ::= { extremeProduct 116 }
+				 -- altitude360 is the Outdoor Access Point(OAP)
+
+    altitude450        OBJECT IDENTIFIER ::= { extremeProduct 117 }
+				 -- altitude450 is the Next Generation Access Point(NGAP - supports high speed 11n WLAN)
+
+    summitX650-24x-SSns      OBJECT IDENTIFIER ::= { extremeProduct 118 }
+                          -- 24-port SummitX650 SFP+ switch +  VIM1-SummitStack (10G stack ports not selected)
+
+    summitX650-24t-SSns      OBJECT IDENTIFIER ::= { extremeProduct 119 }
+                          -- 24-port SummitX650 10GBaseT switch + VIM1-SummitStack (10G stack ports not selected)
+
+    summitX650-24x-SS        OBJECT IDENTIFIER ::= { extremeProduct 120 }
+                          -- 24-port SummitX650 SFP+ switch +  VIM1-SummitStack (10G stack ports selected)
+
+    summitX650-24t-SS        OBJECT IDENTIFIER ::= { extremeProduct 121 }
+                          -- 24-port  SummitX650 10GBaseT switch +  VIM1-SummitStack (10G stack ports selected)
+
+    summitX650-24x-10G8X     OBJECT IDENTIFIER ::= { extremeProduct 122 }
+                          -- 24-port SummitX650 SFP+ switch +  VIM1-10G8X
+
+    summitX650-24t-10G8X     OBJECT IDENTIFIER ::= { extremeProduct 123 }
+                          -- 24-port SummitX650 10GBaseT switch +  VIM1-10G8X
+
+    summitX650-24x-SS256     OBJECT IDENTIFIER ::= { extremeProduct 124 }
+                          -- 24-port SummitX650 SFP+ switch +  VIM1-SummitStack256
+
+    summitX650-24t-SS256     OBJECT IDENTIFIER ::= { extremeProduct 125 }
+                          -- 24-port SummitX650 10GBaseT +  VIM1-SummitStack256
+
+    summitX650-24x-SS512     OBJECT IDENTIFIER ::= { extremeProduct 126 }
+                          -- 24-port SummitX650 SFP+ switch +  VIM1-SummitStack512
+
+    summitX650-24t-SS512     OBJECT IDENTIFIER ::= { extremeProduct 127 }
+                          -- 24-port SummitX650 10GBaseT switch +  VIM1-SummitStack512
+ 
+    bd20808            OBJECT IDENTIFIER ::= { extremeProduct 128 }
+                             -- BD20808 10 slot Chassis 2 MSMs and 8 IO blades
+    
+    nwi-e450a          OBJECT IDENTIFIER ::= { extremeProduct 129 }
+                             -- derived from summitX450a-24t for Ericsson OEM chassis blade  
+                             -- 13 copper ports
+                             -- 2 fiber ports
+                             -- no stacking
+    
+    sentriantPS200v1     OBJECT IDENTIFIER ::= { extremeProduct 130 }
+                               -- Sentriant PS200 Network Security Violation Monitoring appliance
+
+    wirelessProducts  OBJECT IDENTIFIER ::= { extremeProduct 131 }
+
+    summitWM3700       OBJECT IDENTIFIER ::= { wirelessProducts 15 }
+                             -- Summit WM3700 WLAN Controller. Manages up to 256 Access Points 
+
+    summitWM3600       OBJECT IDENTIFIER ::= { wirelessProducts 16 }
+                             -- Summit WM3600 WLAN Controller. Manages up to 48 Access Points
+
+    summitWM3400       OBJECT IDENTIFIER ::= { wirelessProducts 18 }
+                             -- 5x 10/100/1000 LAN ports, 1x 10/100/1000 WAN port
+                                                    
+    bd20804            OBJECT IDENTIFIER ::= {extremeProduct 132 }
+                             -- BD20804 6 slot Chassis 2 MSMs and 4 IO blades
+
+    summitX480-48t       OBJECT IDENTIFIER ::= { extremeProduct 133 }
+                         -- SummitX480-48t 48-port 10/100/1000 BASE-T,4-port 100/1000 BASE-X SFP (shared)
+
+    summitX480-48t-SS    OBJECT IDENTIFIER ::= { extremeProduct 134 }
+                         -- SummitX480-48t 48-port 10/100/1000 BASE-T,4-port 100/1000 BASE-X SFP (shared)
+                         -- with VIM2-SummitStack
+
+    summitX480-48t-10G4X OBJECT IDENTIFIER ::= { extremeProduct 135 }
+                         -- SummitX480-48t 48-port 10/100/1000 BASE-T,4-port 100/1000 BASE-X SFP (shared)
+                         -- with VIM2-10G4X
+
+    summitX480-48t-SS128 OBJECT IDENTIFIER ::= { extremeProduct 136 }
+                         -- SummitX480-48t 48-port 10/100/1000 BASE-T,4-port 100/1000 BASE-X SFP (shared)
+                         -- with VIM2-SummitStack128
+
+    summitX480-24x       OBJECT IDENTIFIER ::= { extremeProduct 137}
+                         -- SummitX480-24x 24-port 100/1000 BASE-X SFP, 12 10/100/1000 BASE-T (shared) and 2 10G XFP ports
+
+    summitX480-24x-SS    OBJECT IDENTIFIER ::= { extremeProduct 138 }
+                         -- SummitX480-24x 24-port 100/1000 BASE-X SFP, 12 10/100/1000 BASE-T (shared) and 2 10G XFP ports
+                         -- with VIM2-SummitStack
+
+    summitX480-24x-10G4X OBJECT IDENTIFIER ::= { extremeProduct 139 }
+                         -- SummitX480-24x 24-port 100/1000 BASE-X SFP, 12 10/100/1000 BASE-T (shared) and 2 10G XFP ports
+                         -- with VIM2-10G4X
+
+    summitX480-24x-SS128 OBJECT IDENTIFIER ::= { extremeProduct 140 }
+                         -- SummitX480-24x 24-port 100/1000 BASE-X SFP, 12 10/100/1000 BASE-T (shared) and 2 10G XFP ports
+                         -- with VIM2-SummitStack128
+
+    summitX480-48x       OBJECT IDENTIFIER ::= { extremeProduct 141 }
+                         -- SummitX480-48x 48-port 100/1000 BASE-X SFP 
+
+    summitX480-48x-SS    OBJECT IDENTIFIER ::= { extremeProduct 142 }
+                         -- SummitX480-48x 48-port 100/1000 BASE-X SFP 
+                         -- with VIM2-SummitStack
+
+    summitX480-48x-10G4X OBJECT IDENTIFIER ::= { extremeProduct 143 }
+                         -- SummitX480-48x 48-port 100/1000 BASE-X SFP 
+                         -- with VIM2-10G4X
+
+    summitX480-48x-SS128  OBJECT IDENTIFIER ::= { extremeProduct 144 }
+                         -- SummitX480-48x 48-port 100/1000 BASE-X SFP 
+                         -- with VIM2-SummitStack128
+
+    altitude3510         OBJECT IDENTIFIER ::= { extremeProduct 145 }
+                               -- Dual Radio, Indoor Access Point, IEEE 802.11a/b/g
+
+    altitude3550         OBJECT IDENTIFIER ::= { extremeProduct 146 }
+                               -- Dual Radio, Outdoor Access Point, IEEE 802.11a/b/g 
+
+    altitude4610         OBJECT IDENTIFIER ::= { extremeProduct 148 }
+                               -- Dual Radio, Indoor Access Point - Internal antennas, IEEE 802.11a/b/g/n
+
+    altitude4620         OBJECT IDENTIFIER ::= { extremeProduct 149 }
+                               -- Dual Radio, Indoor Access Point - External antennas, IEEE 802.11a/b/g/n
+
+    summitX450e-24t      OBJECT IDENTIFIER ::= { extremeProduct 150 }
+			 -- 20 10/100/1000 copper ports
+			 -- 4 combo copper/fiber ports 
+                         -- XGM2 2 optional 10 gig ports
+                         -- 2 10G stacking ports
+
+    summitX450e-48t      OBJECT IDENTIFIER ::= { extremeProduct 151 }
+			 -- 44 10/100/1000 copper ports
+			 -- 4 combo copper/fiber ports 
+                         -- XGM2 2 optional 10 gig ports
+                         -- 2 10G stacking ports
+
+    summitX460-24t         OBJECT IDENTIFIER ::= { extremeProduct 152 }
+                          -- Summit X460: 20-ports copper + 4-ports combo copper/fiber + 4-ports fiber
+
+    summitX460-24p         OBJECT IDENTIFIER ::= { extremeProduct 153 }
+                          -- Summit X460: 20-ports POE+ copper + 4-ports combo copper/fiber + 4-ports fiber
+
+    summitX460-24x         OBJECT IDENTIFIER ::= { extremeProduct 154 }
+                          -- Summit X460: 20-ports fiber + 4-ports combo fiber/copper + 4-ports copper
+
+    summitX460-48t         OBJECT IDENTIFIER ::= { extremeProduct 155 }
+                          -- Summit X460: 48-ports copper + 4-ports fiber
+
+    summitX460-48p         OBJECT IDENTIFIER ::= { extremeProduct 156 }
+                          -- Summit X460: 48-ports POE+ copper + 4-ports fiber
+
+    summitX460-48x         OBJECT IDENTIFIER ::= { extremeProduct 157 }
+                          -- Summit X460: 48-ports fiber
+
+    altitude4700           OBJECT IDENTIFIER ::= {extremeProduct 158 }
+                                 -- High performance dual radio or tri-radio 802.11abgn access points with 3x3 MIMO. 
+
+    summitX480-24x-SSV80 OBJECT IDENTIFIER ::= { extremeProduct 159 }
+                         -- SummitX480-24x 24-port 100/1000 BASE-X SFP, 12 10/100/1000 BASE-T (shared) and 2 10G XFP ports
+                         -- with VIM2-SummitStack-V80
+    
+    summitX480-48x-SSV80  OBJECT IDENTIFIER ::= { extremeProduct 160 }
+                         -- SummitX480-48x 48-port 100/1000 BASE-X SFP 
+                         -- with VIM2-SummitStack-V80
+
+    summitX480-48t-SSV80 OBJECT IDENTIFIER ::= { extremeProduct 161 }
+                         -- SummitX480-48t 48-port 10/100/1000 BASE-T,4-port 100/1000 BASE-X SFP (shared)
+                         -- with VIM2-SummitStack-V80
+
+    summitX650-24x-40G4X OBJECT IDENTIFIER ::= { extremeProduct 162 }
+                         -- SummitX650-24x 24-port 1000/10000 SFP+ switch
+                         -- with VIM3-40G4X
+    
+    summitX650-24t-40G4X OBJECT IDENTIFIER ::= { extremeProduct 163 }
+                         -- SummitX650-24t 24-port 1000/10000 BASE-T switch
+                         -- with VIM3-40G4X
+    
+    summitX480-24x-40G4X OBJECT IDENTIFIER ::= { extremeProduct 164 }
+                         -- SummitX480-24x 24-port 100/1000 BASE-X SFP, 12 10/100/1000 BASE-T (shared) and 2 10G XFP ports
+                         -- with VIM3-40G4X
+
+    summitX480-48x-40G4X OBJECT IDENTIFIER ::= { extremeProduct 165 }
+                         -- SummitX480-48x 48-port 100/1000 BASE-X SFP
+                         -- with VIM3-40G4X
+
+    summitX480-48t-40G4X OBJECT IDENTIFIER ::= { extremeProduct 166 }
+                         -- SummitX480-48t 48-port 10/100/1000 BASE-T,4-port 100/1000 BASE-X SFP (shared)
+                         -- with VIM3-40G4X
+    
+    summitX670-48x       OBJECT IDENTIFIER ::= { extremeProduct 167 }
+                         -- 48-port SFP+ switch 
+
+    summitX670v-48x      OBJECT IDENTIFIER ::= { extremeProduct 168 }
+                         --  48-port SFP+ switch
+                         -- with VIM4-40G4X
+    
+    e4g-400               OBJECT IDENTIFIER ::= { extremeProduct 169 }
+                          -- E4G-400 20-ports copper + 4-ports combo copper/fiber + 4-ports fiber with SyncE
+
+    e4g-200               OBJECT IDENTIFIER ::= { extremeProduct 171 }
+                          -- E4G-200 Mobile Backhaul Cell Site Router 8-port 10/100/1000, 4 port SFP
+
+    summitX440-8t       OBJECT IDENTIFIER ::= { extremeProduct 172 }
+                          -- Summit X440: 8 10/100/1000BASE-T, 4 1000BASE-X SFP ports, Summit Stack Stacking ports
+
+    summitX440-8p       OBJECT IDENTIFIER ::= { extremeProduct 173 }
+                          -- Summit X440: 8 10/100/1000BASE-T PoE+, 4 1000BASE-X SFP ports, Summit Stack Stacking ports
+
+    summitX440-24t      OBJECT IDENTIFIER ::= { extremeProduct 174 }
+                          -- Summit X440: 24 10/100/1000BASE-T, 4 1000BASE-X SFP combo ports, Summit Stack Stacking ports
+
+    summitX440-24p      OBJECT IDENTIFIER ::= { extremeProduct 175 }
+                          -- Summit X440: 24 10/100/1000BASE-T PoE+, 4 1000BASE-X SFP combo ports, Summit Stack Stacking ports
+
+    summitX440-48t      OBJECT IDENTIFIER ::= { extremeProduct 176 }
+                          -- Summit X440: 48 10/100/1000BASE-T, 4 1000BASE-X SFP combo ports, Summit Stack Stacking ports
+
+    summitX440-48p      OBJECT IDENTIFIER ::= { extremeProduct 177 }
+                          -- Summit X440: 48 10/100/1000BASE-T PoE+, 4 1000BASE-X SFP combo ports, Summit Stack Stacking ports
+
+    summitX440-24t-10G  OBJECT IDENTIFIER ::= { extremeProduct 178 }
+                          -- Summit X440: 24 10/100/1000BASE-T, 4 1000BASE-X SFP combo ports, 2 10GBASE-X SFP+
+
+    summitX440-24p-10G  OBJECT IDENTIFIER ::= { extremeProduct 179 }
+                          -- Summit X440: 24 10/100/1000BASE-T PoE+, 4 1000BASE-X SFP combo ports, 2 10GBASE-X SFP+
+
+    summitX440-48t-10G  OBJECT IDENTIFIER ::= { extremeProduct 180 }
+                          -- Summit X440: 48 10/100/1000BASE-T, 2 1000BASE-X SFP combo ports, 2 10GBASE-X SFP+
+
+    summitX440-48p-10G  OBJECT IDENTIFIER ::= { extremeProduct 181 }
+                          -- Summit X440: 48 10/100/1000BASE-T PoE+, 2 1000BASE-X SFP combo ports, 2 10GBASE-X SFP+
+
+    ags100-24t OBJECT IDENTIFIER ::= { extremeProduct 182 }
+                         --	AGS100-24t
+                         --	AGS 24-port TX Gig switch with 4 combo SFP 1000 Mbps ports
+ 
+    ags150-24p OBJECT IDENTIFIER ::= { extremeProduct 183 }
+                         --	AGS150-24p
+                         --	AGS 24-port TX PoE 10G stack switch with 4 combo SFP 1000 Mbps ports 
+                         -- and 2 CX4 10G Stacking ports
+                         
+    bdx8                 OBJECT IDENTIFIER ::= { extremeProduct 170 }
+                           --  BlackDiamond X 8 Slot Chassis
+
+    summitX670v-48t      OBJECT IDENTIFIER ::= { extremeProduct 184 }
+                         -- 48 port 10GBASE-T switch
+                         -- with 4 SFP+ combo ports and VIM4-40G4X optional card
+
+    summitX440-L2-24t  OBJECT IDENTIFIER ::= { extremeProduct 185 }
+                          -- Summit X440 L2 only: 24 10/100/1000BASE-T, 4 1000BASE-X SFP combo ports, Summit Stack is not supported
+
+    summitX440-L2-48t  OBJECT IDENTIFIER ::= { extremeProduct 186 }
+                          -- Summit X440 L2 only: 48 10/100/1000BASE-T, 4 1000BASE-X SFP combo ports, Summit Stack is not supported
+
+    e4g-200-12x         OBJECT IDENTIFIER ::= { extremeProduct 187 }
+                          -- E4G-200-12x Mobile Backhaul Cell Site Router 12 port SFP 
+
+    summitX440-24x      OBJECT IDENTIFIER ::= { extremeProduct 188 }
+                          -- Summit X440: 24 1000BASE-X SFP ports, Summit Stack Stacking ports
+
+    summitX440-24x-10g  OBJECT IDENTIFIER ::= { extremeProduct 189 }
+                          -- Summit X440: 24 1000BASE-X SFP ports, 4 10/100/1000 copper combo ports, 2 10GBASE-X SFP+
+
+    summitX430-24t      OBJECT IDENTIFIER ::= { extremeProduct 190 }
+                          -- Summit X430: L2 only, 24 10/100/1000BASE-T, 4 1000BASE-X SFP ports, Summit Stack is not supported
+
+    summitX430-48t      OBJECT IDENTIFIER ::= { extremeProduct 191 }
+                          -- Summit X430: L2 only, 48 10/100/1000BASE-T, 4 1000BASE-X SFP ports, Summit Stack is not supported
+
+    summitX440-24tdc    OBJECT IDENTIFIER ::= { extremeProduct 192 }
+                          -- Summit X440: DC powered 24 10/100/1000BASE-T, 4 1000BASE-X SFP combo ports, Summit Stack Stacking ports
+
+    summitX440-48tdc    OBJECT IDENTIFIER ::= { extremeProduct 193 }
+                          -- Summit X440: DC powered 48 10/100/1000BASE-T, 4 1000BASE-X SFP combo ports, Summit Stack Stacking ports
+
+    summitX770-32q      OBJECT IDENTIFIER ::= { extremeProduct 194 }
+                         -- Summit X770-32q: 32 QSFP+
+
+    summitX670G2-48x-4q OBJECT IDENTIFIER ::= { extremeProduct 195 }
+                          -- Summit X670-G2-48x-4q: 48 SFP+, 4 QSFP+
+
+    summitX670G2-72x    OBJECT IDENTIFIER ::= { extremeProduct 196 } 
+                          -- Summit X670-G2-72x: 72 SFP+
+
+    summitX460G2-24t-10G4   OBJECT IDENTIFIER ::= { extremeProduct 197 }
+                              -- Summit X460-G2-24t-10GE4: 24 BaseT, 8 SFP (4 Combo), 4 SFP+, 1 VIM slot, 1 Clock slot
+
+    summitX460G2-24p-10G4   OBJECT IDENTIFIER ::= { extremeProduct 198 }
+                              -- Summit X460-G2-24p-10GE4: 24 BaseT (PoE+), 8 SFP (4 Combo), 4 SFP+, 1 VIM slot, 1 Clock slot
+
+    summitX460G2-24x-10G4   OBJECT IDENTIFIER ::= { extremeProduct 199 }
+                              -- Summit X460-G2-24x-10GE4: 24 SFP, 8 BaseT (4 Combo), 4 SFP+, 1 VIM slot, 1 Clock slot
+
+    summitX460G2-48t-10G4   OBJECT IDENTIFIER ::= { extremeProduct 200 }
+                              -- Summit X460-G2-48t-10GE4: 48 BaseT, 4 SFP+, 1 VIM slot, 1 Clock slot
+
+    summitX460G2-48p-10G4   OBJECT IDENTIFIER ::= { extremeProduct 201 }
+                              -- Summit X460-G2-48p-10GE4:  48 BaseT (PoE+), 4 SFP+, 1 VIM slot, 1 Clock slot
+
+    summitX460G2-48x-10G4   OBJECT IDENTIFIER ::= { extremeProduct 202 }
+                              -- Summit X460-G2-48x-10GE4: 48 SFP, 4 SFP+, 1 VIM slot, 1 Clock slot
+
+    summitX430-8p      OBJECT IDENTIFIER ::= { extremeProduct 203 }
+                          -- Summit X430: L2 only, 8 10/100/1000BASE-T PoE+, 2 1000BASE-X SFP ports, Summit Stack is not supported
+
+    summitX430-24p     OBJECT IDENTIFIER ::= { extremeProduct 204 }
+                          -- Summit X430: L2 only, 24 10/100/1000BASE-T PoE+, 4 1000BASE-X SFP ports, Summit Stack is not supported
+
+    aviatCtr-8440      OBJECT IDENTIFIER ::= { extremeProduct 205 }
+                          -- CTR-8440 Mobile Backhaul Cell Site Router 8-port 10/100/1000, 4 port SFP
+
+    summitX450G2-24t-10G4   OBJECT IDENTIFIER ::= { extremeProduct 206 }
+                              -- Summit X450-G2-24t-10GE4: 24 BaseT, 4 SFP+, 2 HG[21] (Stack only)
+
+    summitX450G2-24p-10G4   OBJECT IDENTIFIER ::= { extremeProduct 207 }
+                              -- Summit X450-G2-24p-10GE4: 24 BaseT (PoE+), 4 SFP+, 2 HG[21] (Stack only)
+
+    summitX450G2-48t-10G4   OBJECT IDENTIFIER ::= { extremeProduct 208 }
+                              -- Summit X450-G2-48t-10GE4: 48 BaseT, 4 SFP+, 2 HG[21] (Stack only)
+
+    summitX450G2-48p-10G4   OBJECT IDENTIFIER ::= { extremeProduct 209 }
+                              -- Summit X450-G2-48p-10GE4: 48 BaseT (PoE+), 4 SFP+, 2 HG[21] (Stack only)
+
+    summitX450G2-24t-G4     OBJECT IDENTIFIER ::= { extremeProduct 210 }
+                              -- Summit X450-G2-24t-GE4: 24 BaseT, 4 SFP, 2 HG[21] (Stack only)
+
+    summitX450G2-24p-G4     OBJECT IDENTIFIER ::= { extremeProduct 211 }
+                              -- Summit X450-G2-24p-GE4: 24 BaseT (PoE+), 4 SFP, 2 HG[21] (Stack only)
+
+    summitX450G2-48t-G4     OBJECT IDENTIFIER ::= { extremeProduct 212 }
+                              -- Summit X450-G2-48t-GE4: 48 BaseT, 4 SFP, 2 HG[21] (Stack only)
+
+    summitX450G2-48p-G4     OBJECT IDENTIFIER ::= { extremeProduct 213 }
+                              -- Summit X450-G2-48p-GE4: 48 BaseT (PoE+), 4 SFP, 2 HG[21] (Stack only)
+
+    summitX460G2-24t-G4     OBJECT IDENTIFIER ::= { extremeProduct 214 }
+                              -- Summit X460-G2-24t-GE4: 24 BaseT, 8 SFP (4 Combo), 4 SFP, 1 VIM slot, 1 Clock slot
+
+    summitX460G2-24p-G4     OBJECT IDENTIFIER ::= { extremeProduct 215 }
+                              -- Summit X460-G2-24p-GE4: 24 BaseT (PoE+), 8 SFP (4 Combo), 4 SFP, 1 VIM slot, 1 Clock slot
+    
+    summitX460G2-48t-G4     OBJECT IDENTIFIER ::= { extremeProduct 216 }
+                              -- Summit X460-G2-48t-GE4: 48 BaseT, 4 SFP, 1 VIM slot, 1 Clock slot
+
+    summitX460G2-48p-G4     OBJECT IDENTIFIER ::= { extremeProduct 217 }
+                              -- Summit X460-G2-48p-GE4:  48 BaseT (PoE+), 4 SFP, 1 VIM slot, 1 Clock slot
+
+    oneC-A-600              OBJECT IDENTIFIER ::= { extremeProduct 218 }
+                              -- OneC-A-600: Extreme Networks Physical SDN OneController
+
+    oneC-V                  OBJECT IDENTIFIER ::= { extremeProduct 219 }
+                              -- OneC-V: Extreme Networks Virtual SDN OneController
+    
+    summitX440G2-48p-10G4     OBJECT IDENTIFIER ::= { extremeProduct 220 }
+                              -- Summit X440-G2-48p-10GE4: 48 BaseT (PoE+), 4 SFP (Combo), 4 SFP+ (2 10GBase-T combo), 1 Fixed AC PSU, 1 RPS port
+    
+    summitX440G2-48t-10G4     OBJECT IDENTIFIER ::= { extremeProduct 221 }
+                              -- Summit X440-G2-48t-10GE4: 48 BaseT, 4 SFP (Combo), 4 SFP+ (2 10GBase-T combo), 1 Fixed AC PSU, 1 RPS port  
+    
+    summitX440G2-48t-10G4-DC     OBJECT IDENTIFIER ::= { extremeProduct 222 }
+                              -- Summit X440-G2-48t-10GE4-DC: 48 BaseT, 4 SFP (Combo), 4 SFP+ (2 10GBase-T combo), 1 Fixed DC PSU, 1 RPS port  
+    
+    summitX440G2-24p-10G4     OBJECT IDENTIFIER ::= { extremeProduct 223 }
+                              -- Summit X440-G2-24p-10GE4: 24 BaseT (PoE+), 4 SFP (Combo), 4 SFP+, 1 Fixed AC PSU, 1 RPS port  
+    
+    summitX440G2-24t-10G4     OBJECT IDENTIFIER ::= { extremeProduct 224 }
+                              -- Summit X440-G2-24t-10GE4: 24 BaseT, 4 SFP (Combo), 4 SFP+, 1 Fixed AC PSU, 1 RPS port  
+    
+    summitX440G2-24t-10G4-DC     OBJECT IDENTIFIER ::= { extremeProduct 225 }
+                              -- Summit X440-G2-24t-10GE4-DC: 24 BaseT, 4 SFP (Combo), 4 SFP+, 1 Fixed DC PSU, 1 RPS port  
+    
+    summitX440G2-24x-10G4     OBJECT IDENTIFIER ::= { extremeProduct 226 }
+                              --  Summit X440-G2-24x-10GE4: 24 SFP, 4 BaseT (Combo), 4 SFP+, 1 Fixed AC PSU, 1 RPS port 
+    
+    summitX440G2-12p-10G4     OBJECT IDENTIFIER ::= { extremeProduct 227 }
+                              --  Summit X440-G2-12p-10GE4: 12 BaseT (PoE+), 4 SFP+, 1 Fixed AC PSU, 1 RPS port 
+    
+    summitX440G2-12t-10G4     OBJECT IDENTIFIER ::= { extremeProduct 228 }
+                              --  Summit X440-G2-12t-10GE4: 12 BaseT, 4 SFP+, 1 Fixed AC PSU, 1 RPS port 
+    
+    summitX440G2-12t8fx-G4    OBJECT IDENTIFIER ::= { extremeProduct 229 }
+                              --  Summit X440-G2-12t8fx-GE4: 12 BaseT, 8 100Base-FX LC, 4 SFP, 1 Fixed AC PSU, 1 RPS port 
+    
+    summitX440G2-24t-G4     OBJECT IDENTIFIER ::= { extremeProduct 230 }
+                              --  Summit X440-G2-24t-GE4: 24 BaseT, 4 SFP, 1 Fixed AC PSU, 1 RPS port 
+    
+    summitX440G2-24fx-G4     OBJECT IDENTIFIER ::= { extremeProduct 231 }
+                              --  Summit X440-G2-24fx-GE4: 24 100Base-FX LC, 4 SFP, 1 Fixed AC PSU, 1 RPS port 
+    
+    summitX620-16T     OBJECT IDENTIFIER ::= { extremeProduct 232 }
+                              --  Summit X620-16T: 12 1G/2.5G/5G/10GBaseT, 4 10GBaseT, 4 SFP+ (combo)
+    
+    summitX620-16P     OBJECT IDENTIFIER ::= { extremeProduct 233 }
+                              --  Summit X620-16P: 12 MGBaseT, 4 with POE+, 4 with POE++, 4 10GBaseT with POE+, 4 SFP+ (combo)
+    
+    summitX620-16X     OBJECT IDENTIFIER ::= { extremeProduct 234 }
+                              --  Summit X620-16X: 16 SFP+
+    
+    summitX620-8T-2X     OBJECT IDENTIFIER ::= { extremeProduct 235 }
+                              --  Summit X620-8T-2X: 8 MGBaseT, 2 SFP+, 1 Fixed AC PSU, 1 RPS port 
+    
+    summitX620-10X     OBJECT IDENTIFIER ::= { extremeProduct 236 }
+                              --  Summit X620-16X: 10 SFP+, 1 Fixed AC PSU, 1 RPS port 
+    
+    summitX870-32C     OBJECT IDENTIFIER ::= { extremeProduct 237 }
+                              --  Summit X870-32C: 32 QSFP+ (100Gb)
+
+    summitX870-96X-8C  OBJECT IDENTIFIER ::= { extremeProduct 238 }
+                              --  Summit X870-96X-8C: 24 QSFP+ (4x10Gb), 8 QSFP+ (100Gb)
+
+    ecos               OBJECT IDENTIFIER ::= { extremeProduct 239 }
+                              --  Extreme Cloud Operating System (ECOS)
+
+    isw-4P-2-G2        OBJECT IDENTIFIER ::= { extremeProduct 240 }
+                              -- Industrial Switch isw-4P-2-G2: 4 10/100 Base-TX (POE+), 2 10/100 Base-TX, 2 SFP
+
+    isw-8P-G4          OBJECT IDENTIFIER ::= { extremeProduct 241 }
+                              -- Industrial Switch isw-8P-G4: 8 10/100 Base-TX (POE+), 4 SFP
+
+    isw-4GP-2G-G2      OBJECT IDENTIFIER ::= { extremeProduct 242 }
+                              -- Industrial Switch isw-4GP-2G-G2: 4 BaseT (POE+), 2 BaseT, 2 SFP
+
+    isw-8GP-G4         OBJECT IDENTIFIER ::= { extremeProduct 243 }
+                              -- Industrial Switch isw-8GP-G4: 8 BaseT (POE+), 4 SFP
+
+    x690-48t-4q-2c     OBJECT IDENTIFIER ::= { extremeProduct 247 }
+                              -- X690 48 10GBASE-T, 4 10Gb/40Gb QSFP+, 2 10Gb/25Gb/40Gb/50Gb/100Gb QSFP28
+
+    x690-48x-4q-2c     OBJECT IDENTIFIER ::= { extremeProduct 248 }
+                              -- X690 48 1/10Gb SFP+, 4 10Gb/40Gb QSFP+, 2 10Gb/25Gb/40Gb/50Gb/100Gb QSFP28
+
+extremeSNSxNSSxA OBJECT-IDENTITY
+    STATUS    current
+--  Name      "SNS-NSS-A"
+--  Date      "201604201503Z"  - Wed Apr 20 15:03 UTC 2016
+    DESCRIPTION
+        "Extreme Management Center Server.  Management Center is a key
+         component of Extreme's suite of network management products."
+    ::= { extremeProduct 249 }
+
+extremeNSxAx20 OBJECT-IDENTITY
+    STATUS    current
+--  Name      "NS-A-20"
+--  Date      "201604221150Z"  - Fri Apr 22 11:50 UTC 2016
+    DESCRIPTION
+        "Extreme Management Center Server.  Management Center is a key
+         component of Extreme's suite of network management products."
+    ::= { extremeProduct 250 }
+
+extremeNACxAx20 OBJECT-IDENTITY
+    STATUS    current
+--  Name      "NAC-A-20"
+--  Date      "201604201503Z"  - Wed Apr 20 15:03 UTC 2016
+    DESCRIPTION
+        "Extreme Access Control Engine for controlling end system access 
+         to the network.  It controls network access through Extreme 
+         Policy or VLANs based on user, device, location, time, and 
+         configuration (health).  Supports optional on-board assessment.  
+         It is a 1U rack mountable system."
+    ::= { extremeProduct 251 }
+
+extremeIAxV OBJECT-IDENTITY
+    STATUS    current
+--  Name      "IA-V"
+--  Date      "201604221249Z"  - Fri Apr 22 12:49 UTC 2016
+    DESCRIPTION
+        "Extreme Virtual Access Control Engine for controlling end
+         system access to the network.  It controls network access through
+         Extreme Policy or VLANs based on user, device, OS, location,
+         time, and configuration.  Supports optional on-board posture
+         assessment."
+    ::= { extremeProduct 252 }
+
+extremeIAxAx20 OBJECT-IDENTITY 
+    STATUS    current
+--  Name      "IA-A-20"
+--  Date      "201604221150Z"  - Fri Apr 22 11:50 UTC 2016
+    DESCRIPTION
+        "Extreme Access Control Engine for controlling end system
+         access to the network.  It controls network access through
+         Extreme Policy or VLANs based on user, device, OS, location,
+         time, and configuration.  Supports optional on-board posture
+         assessment.  It is a 1U rack mountable system."
+    ::= { extremeProduct 253 }
+
+extremeIAxAx300 OBJECT-IDENTITY 
+    STATUS    current
+--  Name      "IA-A-300"
+--  Date      "201604221150Z"  - Fri Apr 22 11:50 UTC 2016
+    DESCRIPTION
+        "Extreme Access Control Engine for controlling end system
+         access to the network.  It controls network access through
+         Extreme Policy or VLANs based on user, device, OS, location,
+         time, and configuration.  Supports optional on-board posture
+         assessment.  It is a 1U rack mountable system."
+    ::= { extremeProduct 254 }
+
+extremePVxV OBJECT-IDENTITY
+    STATUS    current
+--  Name      "PV-V"
+--  Date      "201604201503Z"  - Wed Apr 20 15:03 UTC 2016
+    DESCRIPTION
+        "Extreme Virtual Application Analytics Engine.  This appliance 
+         provides the engine to monitor and classify layer 7 application
+         information based on data from Extreme switches and report
+         information to ExtremeControl where applications are managed."
+    ::= { extremeProduct 255 }
+
+extremePVxAx300 OBJECT-IDENTITY
+    STATUS    current
+--  Name      "PV-A-300"
+--  Date      "201604201503Z"  - Wed Apr 20 15:03 UTC 2016
+    DESCRIPTION
+        "Extreme Application Analytics Engine.  This appliance provides the
+         engine to monitor and classify layer 7 application information
+         based on data from Extreme switches and report information to
+         ExtremeControl where applications are managed."
+    ::= { extremeProduct 256 }
+
+summitX460-G2-16mp-32p-10GE4 OBJECT IDENTIFIER ::= { extremeProduct 257 }
+-- Summit X460-G2-16mp-32p-10GE4: 16 100Mb/1.0/2.5GbE (PoE+), 32 10/100/1000BASE?T (PoE+),
+-- 4 1000/10GBaseX SFP+, 1 VIM slot, 1 Clock slot
+
+summitX460G2-24p-24hp   OBJECT IDENTIFIER ::= { extremeProduct 258 }
+-- Summit X460-G2-24p-24hp-10GE4-Base:  24 BaseT(PoE+), 24 BaseT(PoE+) Half Duplex , 4 SFP+, 1 VIM slot, 1 Clock slot
+
+summitX460G2-24t-24ht   OBJECT IDENTIFIER ::= { extremeProduct 259 }
+-- Summit X460-G2-24t-24ht-10GE4-Base: 24 BaseT, 24 BaseT Half Duplex, 4 SFP+, 1 VIM slot, 1 Clock slot
+
+extreme210-12t-GE2 OBJECT-IDENTITY
+    STATUS    current
+--  Name      "210-12t-GE2"
+--  Date      "201610201503Z"  - Wed Oct 26 15:03 UTC 2016
+    DESCRIPTION
+        "Extreme 210-Series 12 port 10/100/1000BASE-T, 2 1GbE SFP ports, 1 Fixed AC PSU, L2 Switching"
+    ::= { extremeProduct 260 }
+
+extreme210-12p-GE2 OBJECT-IDENTITY
+    STATUS    current
+--  Name      "210-12p-GE2"
+--  Date      "201610261503Z"  - Wed Oct 26 15:03 UTC 2016
+    DESCRIPTION
+        "Extreme 210-Series 12 port 10/100/1000BASE-T PoE+, 2 1GbE SFP ports, 1 Fixed AC PSU, L2 Switching"
+    ::= { extremeProduct 261 }
+
+extreme210-24t-GE2 OBJECT-IDENTITY
+    STATUS    current
+--  Name      "210-24t-GE2"
+--  Date      "201610261503Z"  - Wed Oct 26 15:03 UTC 2016
+    DESCRIPTION
+        "Extreme 210-Series 24 port 10/100/1000BASE-T, 2 1GbE SFP ports, 1 Fixed AC PSU, L2 Switching"
+    ::= { extremeProduct 262 }
+
+extreme210-24p-GE2 OBJECT-IDENTITY
+    STATUS    current
+--  Name      "210-24p-GE2"
+--  Date      "201610261503Z"  - Wed Oct 26 15:03 UTC 2016
+    DESCRIPTION
+        "Extreme 210-Series 24 port 10/100/1000BASE-T PoE+, 2 1GbE SFP ports, 1 Fixed AC PSU, L2 Switching"
+    ::= { extremeProduct 263 }
+
+extreme210-48t-GE4 OBJECT-IDENTITY
+     STATUS    current
+--  Name      "210-48t-GE4"
+--  Date      "201610261503Z"  - Wed Oct 26 15:03 UTC 2016
+    DESCRIPTION
+        "Extreme 210-Series 48 port 10/100/1000BASE-T, 4 1GbE SFP ports, 1 Fixed AC PSU, L2 Switching"
+    ::= { extremeProduct 264 }
+
+extreme210-48p-GE4 OBJECT-IDENTITY
+    STATUS    current
+--  Name      "210-48p-GE4"
+--  Date      "201610261503Z"  - Wed Oct 26 15:03 UTC 2016
+    DESCRIPTION
+        "Extreme 210-Series 48 port 10/100/1000BASE-T PoE+, 4 1GbE SFP ports, 1 Fixed AC PSU, L2 Switching"
+    ::= { extremeProduct 265 }
+
+extreme220-12t-10GE2 OBJECT-IDENTITY
+    STATUS    current
+--  Name      "220-12t-10GE2"
+--  Date      "201610261503Z"  - Wed Oct 26 15:03 UTC 2016
+    DESCRIPTION
+        "Extreme 220-Series 12 port 10/100/1000BASE-T, 2 10GbE SFP+ ports, 1 Fixed AC PSU, L3 Switching"
+    ::= { extremeProduct 266 }
+
+extreme220-12p-10GE2 OBJECT-IDENTITY
+    STATUS    current
+--  Name      "220-12p-10GE2"
+--  Date      "201610261503Z"  - Wed Oct 26 15:03 UTC 2016
+    DESCRIPTION
+        "Extreme 220-Series 12 port 10/100/1000BASE-T PoE+, 2 10GbE SFP+ ports, 1 Fixed AC PSU, L3 Switching"
+    ::= { extremeProduct 267 }
+
+extreme220-24t-10GE2 OBJECT-IDENTITY
+    STATUS    current
+--  Name      "220-24t-10GE2"
+--  Date      "201610261503Z"  - Wed Oct 26 15:03 UTC 2016
+    DESCRIPTION
+        "Extreme 220-Series 24 port 10/100/1000BASE-T, 2 10GbE SFP+ ports, 1 Fixed AC PSU, 1 RPS port, L3 Switching"
+    ::= { extremeProduct 268 }
+
+extreme220-24p-10GE2  OBJECT-IDENTITY
+    STATUS    current
+--  Name      "220-24p-10GE2"
+--  Date      "201610261503Z"  - Wed Oct 26 15:03 UTC 2016
+    DESCRIPTION
+        "Extreme 220-Series 24 port 10/100/1000BASE-T PoE+, 2 10GbE SFP+ ports, 1 Fixed AC PSU, 1 RPS port, L3 Switching"
+    ::= { extremeProduct 269 }
+
+extreme220-48t-10GE4 OBJECT-IDENTITY
+    STATUS    current
+--  Name      "220-48t-10GE4"
+--  Date      "201610261503Z"  - Wed Oct 26 15:03 UTC 2016
+    DESCRIPTION
+        "Extreme 220-Series 48 port 10/100/1000BASE-T, 4 10GbE SFP+ ports (2 LRM Capable), 1 Fixed AC PSU, 1 RPS port, L3 Switching"
+    ::= { extremeProduct 270 }
+
+extreme220-48p-10GE4 OBJECT-IDENTITY
+    STATUS    current
+--  Name      "220-48p-10GE4"
+--  Date      "201610261503Z"  - Wed Oct 26 15:03 UTC 2016
+    DESCRIPTION
+        "Extreme 220-Series 48 port 10/100/1000BASE-T PoE+, 4 10GbE unpopulated SFP+ ports (2 LRM Capable), 1 Fixed AC PSU, 1 RPS port, L3 Switching"
+    ::= { extremeProduct 271 }
+
+extreme240-8mt-16t-10GE4 OBJECT-IDENTITY
+    STATUS    current
+--  Name      "240-8mt-16t-10GE4"
+--  Date      "201612051503Z"  - Mon Dec 5 15:03 UTC 2016
+    DESCRIPTION
+        "240-Series 8 100/1000/2.5Gb Base-T ports plus 16 ports 10/100/1000BASE-T ports, 4 10GbE unpopulated SFP+ ports, 1 Fixed AC PSU, 1 RPS port "
+    ::= { extremeProduct 272 }
+
+extreme240-8mp-16p-10GE4 OBJECT-IDENTITY
+    STATUS    current
+--  Name      "240-8mp-16p-10GE4 "
+--  Date      "201612051503Z"  - Mon Dec 5 15:03 UTC 2016
+    DESCRIPTION
+        "240-Series 8 100/1000/2.5Gb Base-T PoE+ ports plus 16 ports 10/100/1000BASE-T PoE+, 4 10GbE unpopulated SFP+ ports, 1 Fixed AC PSU, 1 RPS port "
+    ::= { extremeProduct 273 }
+
+extreme240-32t-16mt-10GE6 OBJECT-IDENTITY
+    STATUS    current
+--  Name      "240-32t-16mt-10GE6 "
+--  Date      "201612051503Z"  - Mon Dec 5 15:03 UTC 2016
+    DESCRIPTION
+        "240-Series 32 port 10/100/1000Base-T ports plus 16 100/1000/2.5Gb Base-T ports, 6 10GbE unpopulated SFP+ ports (2 LRM capable), 1 Fixed AC PSU, 1 RPS port"
+    ::= { extremeProduct 274 }
+
+extreme240-32p-16mp-10GE6 OBJECT-IDENTITY
+    STATUS    current
+--  Name      "240-32p-16mp-10GE6"
+--  Date      "201612051503Z"  - Mon Dec 5 15:03 UTC 2016
+    DESCRIPTION
+        "240-Series 32 port 10/100/1000Base-T PoE+ ports plus 16 100/1000/2.5Gb Base-T PoE+ ports, 6 10GbE unpopulated SFP+ ports (2 LRM capable), 1 Fixed AC PSU, 1 RPS port"
+    ::= { extremeProduct 275 }
+
+extreme825-48v-6c OBJECT-IDENTITY
+    STATUS    current
+--  Name      "X825-48v-6c"
+--  Date      "201704101334Z"  - Mon Apr 10 13:34 UTC 2017
+    DESCRIPTION
+        "X825-48v-6c: 48 10Gb/25Gb SFP28, 6 10Gb/25Gb/40Gb/50Gb/100Gb QSFP28."
+    ::= { extremeProduct 276 }
+
+extremeNMSxAx25 OBJECT-IDENTITY
+    STATUS    current
+--  Name      "NMS-A-25"
+--  Date      "201704101334Z"  - Mon Apr 10 13:34 UTC 2017
+    DESCRIPTION
+        "Extreme Management Center Server.  Management Center is a key
+         component of Extreme's suite of network management products."
+    ::= { extremeProduct 277 }
+
+extremeNMSxAx305 OBJECT-IDENTITY
+    STATUS    current
+--  Name      "NMS-A-305"
+--  Date      "201704101334Z"  - Mon Apr 10 13:34 UTC 2017
+    DESCRIPTION
+        "Extreme Management Center Server.  Management Center is a key
+         component of Extreme's suite of network management products."
+    ::= { extremeProduct 278 }
+
+extremeIAxAx25 OBJECT-IDENTITY 
+    STATUS    current
+--  Name      "IA-A-25"
+--  Date      "201704101334Z"  - Mon Apr 10 13:34 UTC 2017
+    DESCRIPTION
+        "Extreme Access Control Engine for controlling end system
+         access to the network.  It controls network access through
+         Extreme Policy or VLANs based on user, device, OS, location,
+         time, and configuration.  Supports optional on-board posture
+         assessment.  It is a 1U rack mountable system."
+    ::= { extremeProduct 279 }
+
+extremeIAxAx305 OBJECT-IDENTITY 
+    STATUS    current
+--  Name      "IA-A-305"
+--  Date      "201704101334Z"  - Mon Apr 10 13:34 UTC 2017
+    DESCRIPTION
+        "Extreme Access Control Engine for controlling end system
+         access to the network.  It controls network access through
+         Extreme Policy or VLANs based on user, device, OS, location,
+         time, and configuration.  Supports optional on-board posture
+         assessment.  It is a 1U rack mountable system."
+    ::= { extremeProduct 280 }
+
+extremePVxAx305 OBJECT-IDENTITY
+    STATUS    current
+--  Name      "PV-A-305"
+--  Date      "201704101334Z"  - Mon Apr 10 13:34 UTC 2017
+    DESCRIPTION
+        "Extreme Application Analytics Engine.  This appliance provides the
+         engine to monitor and classify layer 7 application information
+         based on data from Extreme switches and report information to
+         ExtremeControl where applications are managed."
+    ::= { extremeProduct 281 }
+
+extremeEMPx35 OBJECT-IDENTITY
+    STATUS    current
+--  Name      "E1120"
+--  Date      "201805171333Z"  - Thu May 17 13:33 UTC 2018
+    DESCRIPTION
+        "ExtremCloud Appliance.  This appliance provides an integrated
+         Extreme Wireless Controller and an Identity and Access
+         Controller in a single physical device."
+    ::= { extremeProduct 282 }
+
+extremeEMPx5310 OBJECT-IDENTITY
+    STATUS    current
+--  Name      "E3120"
+--  Date      "201805171333Z"  - Thu May 17 13:33 UTC 2018
+    DESCRIPTION
+        "ExtremCloud Appliance.  This appliance provides an integrated
+         Extreme Wireless Controller and an Identity and Access
+         Controller in a single physical device."
+    ::= { extremeProduct 283 }
+
+extremeEMPxV OBJECT-IDENTITY
+    STATUS    current
+--  Name      "VE6120"
+--  Date      "201805171333Z"  - Thu May 17 13:33 UTC 2018
+    DESCRIPTION
+        "ExtremCloud Appliance.  This virtual appliance provides an
+         integrated Extreme Wireless Controller and an Identity and Access
+         Controller in a single virtual device."
+    ::= { extremeProduct 284 }
+
+xtremeWhitebox     OBJECT IDENTIFIER ::= { extremeProduct 286 }
+-- WHITEBOX: Extreme generic whitebox for all platforms
+
+vm386EXOS OBJECT-IDENTITY
+    STATUS    current
+--  Name      "vm386EXOS"
+--  Date      "201706280338Z"  - Wed Jun 28 03:38 GMT 2017
+    DESCRIPTION
+        "EXOS i386 platform that can be used in a Virtual Machine environment."
+    ::= { extremeProduct 291 }
+
+extremeNMSxV OBJECT-IDENTITY
+    STATUS    current
+--  Name      "NMS-V"
+--  Date      "201710251422Z"  - Wed Oct 25 14:22 UTC 2017
+    DESCRIPTION
+        "Virtual Extreme Management Center Server.  Management Center is a key
+         component of Extreme's suite of network management products."
+    ::= { extremeProduct 292 }
+
+extremeSSxIxA OBJECT-IDENTITY
+    STATUS    current
+--  Name      ""
+--  Date      "201711141251Z"  - Tue Nov 14 12:51 UTC 2017
+    DESCRIPTION
+        "Extreme StackStorm Integration Appliance."
+    ::= { extremeProduct 293 }
+
+extremeESEx2000 OBJECT-IDENTITY
+    STATUS    current
+--  Name      "E2120"
+--  Date      "201805171333Z"  - Thu May 17 13:33 UTC 2018
+    DESCRIPTION
+        "ExtremCloud Appliance.  This appliance provides an integrated
+         Extreme Wireless Controller and an Identity and Access
+         Controller in a single physical device."
+    ::= { extremeProduct 294 }
+
+extremeFabricManager OBJECT-IDENTITY
+    STATUS    current
+--  Name      ""
+--  Date      "201802071347Z"  - Wed Feb  7 13:47 UTC 2018
+    DESCRIPTION
+        "Extreme application to manage and orchestrate the SPBm Fabric based
+         network. Fabric Manager will discover and manage the fabric
+         infrastructure as well as L2 / L3 services."
+    ::= { extremeProduct 295 }
+
+x590-24t-1q-2c OBJECT-IDENTITY
+    STATUS    current
+--  Name      "X590-24t-1q-2c"
+--  Date      "201803011631Z"  - Thu Mar  1 16:31 UTC 2018
+    DESCRIPTION
+        "X590 24 10GBASE-T, 1 10Gb/40Gb QSFP+, 2 10Gb/25Gb/40Gb/50Gb/100Gb QSFP28"
+    ::= { extremeProduct 296 }
+
+x590-24x-1q-1c OBJECT-IDENTITY
+    STATUS    current
+--  Name      "X590-24x-1q-2c"
+--  Date      "201803011631Z"  - Thu Mar  1 16:31 UTC 2018
+    DESCRIPTION
+        "X590 24 1/10Gb SFP+, 1 10Gb/40Gb QSFP+, 2 10Gb/25Gb/40Gb/50Gb/100Gb QSFP28"
+    ::= { extremeProduct 297 }
+
+slxOsAcctonAS771232X OBJECT-IDENTITY
+    STATUS    current
+--  Name      "AS7712-32X"
+--  Date      "201803130915Z"  - Tue Mar 13 09:15 UTC 2018
+    DESCRIPTION
+        "Accton AS7712-32X L2/L3 switch with Extreme SLXOS and
+         32 port 40/100GbE, extendable up to 128 10/25GbE ports."
+    ::= { extremeProduct 298 }
+
+slxOsDniAG9032v1 OBJECT-IDENTITY
+    STATUS    current
+--  Name      "AG9032v1"
+--  Date      "201803130915Z"  - Tue Mar 13 09:15 UTC 2018
+    DESCRIPTION
+        "DNI AG9032v1 L2/L3 switch with Extreme SLXOS and
+         32 port 40/100GbE, extendable up to 128 10/25GbE ports."
+    ::= { extremeProduct 299 }
+
+es6108x32c OBJECT-IDENTITY
+    STATUS    current
+--  Name      "ES6108-32c"
+--  Date      "201805011446Z"  - Tue May  1 14:46 UTC 2018
+    DESCRIPTION
+        "Extreme Switch 6100 family with 8 cores, 32 QSFP28 100G/40G
+         (channelizable) ports and 2 10G Sideband ports."
+    ::= { extremeProduct 300 }
+
+es6108x48vx8c OBJECT-IDENTITY
+    STATUS    current
+--  Name      "ES6108-48v-8c"
+--  Date      "201805011446Z"  - Tue May  1 14:46 UTC 2018
+    DESCRIPTION
+        "Extreme Switch 6100 family with 8 cores, 48 SFP28 25G ports and
+         8 100G/40G (Channelizeable) and 2 10G Sideband ports."
+    ::= { extremeProduct 301 }
+
+vsp7432CQ OBJECT-IDENTITY
+    STATUS    current
+--  Name      "VSP-7432CQ"
+--  Date      "201806141839Z"  - Thu Jun 14 18:39 UTC 2018
+    DESCRIPTION
+        "Virtual Services Platform 7400 family with 8 cores, 32 QSFP28
+         100G/40G (Channelizable) ports and 2 10G Internal ports."
+    ::= { extremeProduct 302 }
+
+vsp7456VSC OBJECT-IDENTITY
+    STATUS    current
+--  Name      "VSP-7456VSC"
+--  Date      "201806141839Z"  - Thu Jun 14 18:39 UTC 2018
+    DESCRIPTION
+        "Virtual Services Platform 7400 family with 8 cores, 48 SFP28 25G
+         ports and 8 100G/40G (Channelizable) and 1 10G Internal ports."
+    ::= { extremeProduct 303 }
+
+extremeSLX9030 OBJECT-IDENTITY
+    STATUS    current
+--  Name      "SLX9030"
+--  Date      "201807020900Z"  - Mon Jul 02 09:00 UTC 2018
+    DESCRIPTION
+        "Extreme L2/L3 Switch with SLXOS and
+         48x10GE/1GE + 4x100GE/40GE interfaces."
+    ::= { extremeProduct 304 }
+
+extremeSLX9030T OBJECT-IDENTITY
+    STATUS    current
+--  Name      "SLX9030T"
+--  Date      "201807020900Z"  - Mon Jul 02 09:00 UTC 2018
+    DESCRIPTION
+        "Extreme L2/L3 Switch with SLXOS and
+         48x10GE/1GE/100M Base-T + 4x100GE/40GE interfaces."
+    ::= { extremeProduct 305 }
+
+extremeSLX9640 OBJECT-IDENTITY
+    STATUS    current
+--  Name      "SLX9640"
+--  Date      "201807020900Z"  - Mon Jul 02 09:00 UTC 2018
+    DESCRIPTION
+        "Extreme L2/L3 Switch/Router with SLXOS and
+         24xSFP+ (1GE/10GE) +
+         12xQSFP28 (40GE/4x10GE/100GE/4x25GE/2x50GE) interfaces."
+    ::= { extremeProduct 306 }
+
+vsp1100 OBJECT-IDENTITY
+    STATUS    current
+--  Name      "VSP-1100"
+--  Date      "201807251145Z"  - Wed Jul 25 11:45 UTC 2018
+    DESCRIPTION
+        "Virtual Services Platform 1100 family to run as a service in a
+         VM on a Hypervisor with all the VOSS features supported on any
+         standard x86 hardware."
+    ::= { extremeProduct 307 }
+
+x465-48t OBJECT-IDENTITY
+    STATUS    current
+--  Name      "X465-48T"
+--  Date      "201809141531Z"  - Fri Sep 14 15:31:32 UTC 2018
+    DESCRIPTION
+        "X465 with 48 10/100/1000Mb FDX/HDX MACSEC capable ports, 1 VIM slot"
+    ::= { extremeProduct 312 }
+
+x465-48p OBJECT-IDENTITY
+    STATUS    current
+--  Name      "X465-48P"
+--  Date      "201809141531Z"  - Fri Sep 14 15:31:32 UTC 2018
+    DESCRIPTION
+        "X465 with 48 10/100/1000Mb FDX/HDX MACSEC capable ports, 802.3at PoE (30W), 1 VIM slot"
+    ::= { extremeProduct 313 }
+
+x465-48w OBJECT-IDENTITY
+    STATUS    current
+--  Name      "X465-48W"
+--  Date      "201809141531Z"  - Fri Sep 14 15:31:32 UTC 2018
+    DESCRIPTION
+        "X465 with 48 10/100/1000Mb FDX/HDX MACSEC capable ports, 802.3bt Type3/Type4 PoE (90W), 1 VIM slot"
+    ::= { extremeProduct 314 }
+
+x465-24mu OBJECT-IDENTITY
+    STATUS    current
+--  Name      "X465-24MU"
+--  Date      "201809141531Z"  - Fri Sep 14 15:31:32 UTC 2018
+    DESCRIPTION
+        "X465 with 24 100Mb/1/2.5/5Gb ports, 802.3bt Type3 PoE (60W), 1 VIM slot"
+    ::= { extremeProduct 315 }
+
+x465-24mu-24w OBJECT-IDENTITY
+    STATUS    current
+--  Name      "X465-24MU-24W"
+--  Date      "201809141531Z"  - Fri Sep 14 15:31:32 UTC 2018
+    DESCRIPTION
+        "X465 with 24 100Mb/1/2.5/5Gb ports, 802.3bt Type3 PoE (60W) and 24 10/100/1000Mb FDX/HDX ports with MACSEC, 802.1bt Type3/Type4 PoE (90W), 1 VIM slot"
+    ::= { extremeProduct 316 }
+
+x465-24w OBJECT-IDENTITY
+    STATUS    current
+--  Name      "X465-24W"
+--  Date      "201809141531Z"  - Fri Sep 14 15:31:32 UTC 2018
+    DESCRIPTION
+        "X465 with 24 10/100/1000Mb FDX/HDX MACSEC capable ports, 802.3bt PoE Type3/Type4 (90W), 1 VIM slot"
+    ::= { extremeProduct 319 }
+
+extremeCspAwsSubnetType OBJECT-IDENTITY
+    STATUS    current
+--  Name      ""
+--  Date      "201809171220Z"  - Mon Sep 17 12:20 UTC 2018
+    DESCRIPTION
+        "Extreme Cloud Services Platform virtual switch for Amazon
+         Web Services (AWS) Subnet Type deployments."
+    ::= { extremeProduct 308 }
+
+extremeCspGcpSubnetType OBJECT-IDENTITY
+    STATUS    current
+--  Name      ""
+--  Date      "201809171220Z"  - Mon Sep 17 12:20 UTC 2018
+    DESCRIPTION
+        "Extreme Cloud Services Platform virtual switch for Google Cloud
+         Platform (GCP) Subnet Type deployments."
+    ::= { extremeProduct 309 }
+
+extremeCspAzureSubnetType OBJECT-IDENTITY
+    STATUS    current
+--  Name      ""
+--  Date      "201809171220Z"  - Mon Sep 17 12:20 UTC 2018
+    DESCRIPTION
+        "Extreme Cloud Services Platform virtual switch for Azure Subnet
+         Type deployments."
+    ::= { extremeProduct 310 }
+
+x725-48y-8c OBJECT-IDENTITY
+    STATUS    current
+--  Name      "X725-48y-8c"
+--  Date      "201809262302Z"  - Fri Sep 26 23:02 UTC 2018
+    DESCRIPTION
+        "X725 with 48 10Gb/25Gb SFP28 ports and 8 10Gb/25Gb/40Gb/50Gb/100Gb QSFP28 ports"
+    ::= { extremeProduct 320 }
+
+extremeMcsVmwareHypervisorType OBJECT-IDENTITY
+    STATUS    current
+--  Name      ""
+--  Date      "201809171220Z"  - Mon Sep 17 12:20 UTC 2018
+    DESCRIPTION
+        "Extreme Management Connect Services virtual switch for physical
+         VMware Hypervisor deployments."
+    ::= { extremeProduct 311 }
+
+extremeSnVirtualSensor100 OBJECT-IDENTITY
+    STATUS    current
+--  Name      ""
+--  Date      "201810091702Z"  - Tue Oct  9 17:02 UTC 2018
+    DESCRIPTION
+        "Extreme Analytics Virtual Sensor Model 100."
+    ::= { extremeProduct 321 }
+
+extremeSnVirtualSensor250 OBJECT-IDENTITY
+    STATUS    current
+--  Name      ""
+--  Date      "201810091702Z"  - Tue Oct  9 17:02 UTC 2018
+    DESCRIPTION
+        "Extreme Analytics Virtual Sensor Model 250."
+    ::= { extremeProduct 322 }
+
+vsp7400-48Y-8C OBJECT-IDENTITY
+    STATUS    current
+--  Name      "VSP7400-48Y-8C"
+--  Date      "201901041255Z"  - Fri Jan  4 12:55 UTC 2019
+    DESCRIPTION
+        "Virtual Services Platform 7400 family with 8 cores, 48 SFP28 25G
+         ports and 8 100G/40G (Channelizable) and 1 10G Internal ports."
+    ::= { extremeProduct 325 }
+
+extremeVirtualTAP OBJECT-IDENTITY
+    STATUS    current
+--  Name      "vTAP"
+--  Date      "201901281235Z"  - Mon Jan 28 12:35 UTC 2019
+    DESCRIPTION
+        "Extreme Virtual TAP (vTAP) is a full-featured network visibility
+         solution software based tap built for virtualized service
+         provider and enterprise networks. It offers an end-to-end set of
+         capabilities including traffic interception, filtering
+         (SMARTMatch), header stripping, packet slicing, sampling and
+         IPFIX export, and optimization for network monitoring and analytics
+         tools."
+    ::= { extremeProduct 326 }
+
+extremeVirtualPB OBJECT-IDENTITY
+    STATUS    current
+--  Name      "vPB"
+--  Date      "201901281235Z"  - Mon Jan 28 12:35 UTC 2019
+    DESCRIPTION
+        "Extreme Virtual Packet Broker(vPB) is an aggregator of Extreme
+         Virtual Taps(vTAP)."
+    ::= { extremeProduct 327 }
+
+x695-48y-8c OBJECT-IDENTITY
+    STATUS    current
+--  Name      "X695-48Y-8C"
+--  Date      "201903182302Z"  - Mon Mar 18 23:02 UTC 2019
+    DESCRIPTION
+        "X695 with 48 1Gb/10Gb/25Gb SFP28 and 8 40Gb/100Gb QSFP28"
+    ::= { extremeProduct 328 }
+
+extremeOnieStack OBJECT-IDENTITY
+    STATUS    current
+--  Name      "extremeOnieStack"
+--  Date      "201904011753Z"  - Mon Apr  1 17:53 UTC 2019
+    DESCRIPTION
+        "A stacked version of EXOS ONIE-based switches"
+    ::= { extremeProduct 329 }
+
+x465-24xe OBJECT-IDENTITY
+    STATUS    current
+--  Name      "X465-24XE"
+--  Date      "201909042120Z"  - Wed Sep 4 21:20:00 UTC 2019
+    DESCRIPTION
+        "X465 with 24 1/10GbE SFP+ MACSEC capable ports, 1 VIM slot"
+    ::= { extremeProduct 330 }
+
+x465-24s OBJECT-IDENTITY
+    STATUS    current
+--  Name      "X465-24S"
+--  Date      "201909042120Z"  - Wed Sep 4 21:20:00 UTC 2019
+    DESCRIPTION
+        "X465-24s: X465 with 24 1GbE SFP ports, 1 VIM slot"
+    ::= { extremeProduct 331 }
+
+extremeSLX9150 OBJECT-IDENTITY
+    STATUS    current
+--  Name      "SLX9150"
+--  Date      "201905030900Z"  - Fri May 03 09:00 UTC 2019
+    DESCRIPTION
+        "Extreme L2/L3 Switch with SLXOS,
+         48x25GE/10GE and 8x100GE/40GE interfaces."
+    ::= { extremeProduct 332 }
+
+extremeSLX9150T OBJECT-IDENTITY
+    STATUS    current
+--  Name      "SLX9150T"
+--  Date      "201905030900Z"  - Fri May 03 09:00 UTC 2019
+    DESCRIPTION
+        "Extreme L2/L3 Switch with SLXOS,
+         48x10GE/1GE Base-T and 6x100GE/40GE interfaces."
+    ::= { extremeProduct 333 }
+
+extremeSLX9250 OBJECT-IDENTITY
+    STATUS    current
+--  Name      "SLX9250"
+--  Date      "201905030900Z"  - Fri May 03 09:00 UTC 2019
+    DESCRIPTION
+        "Extreme L2/L3 Switch with SLXOS and
+         32x100GE/40GE interfaces."
+    ::= { extremeProduct 334 }
+
+extremeSLX9740x40 OBJECT-IDENTITY
+    STATUS    current
+--  Name      "SLX9740-40"
+--  Date      "201905030900Z"  - Fri May 03 09:00 UTC 2019
+    DESCRIPTION
+        "Extreme L2/L3 Switch/Router with SLXOS and
+         40x100GE/40GE interfaces."
+    ::= { extremeProduct 335 }
+
+extremeSLX9740x80 OBJECT-IDENTITY
+    STATUS    current
+--  Name      "SLX9740-80"
+--  Date      "201905030900Z"  - Fri May 03 09:00 UTC 2019
+    DESCRIPTION
+        "Extreme L2/L3 Switch/Router with SLXOS and
+         80x100GE/40GE interfaces."
+    ::= { extremeProduct 336 }
+
+xa1440 OBJECT-IDENTITY
+    STATUS    current
+--  Name      "XA1440
+--  Date      "201905061507Z"  - Mon May  6 15:07 UTC 2019
+    DESCRIPTION
+        "Extreme Access Platform running VOSS software as a VM on Hypervisor
+         over 4 cores Denverton base box"
+    ::= { extremeProduct 337 }
+
+xa1480 OBJECT-IDENTITY
+    STATUS    current
+--  Name      "XA1480
+--  Date      "201905061507Z"  - Mon May  6 15:07 UTC 2019
+    DESCRIPTION
+        "Extreme Access Platform running VOSS software as a VM on Hypervisor
+         over 8 cores Denverton base box"
+    ::= { extremeProduct 338 }
+
+x435-24p-4s OBJECT-IDENTITY
+    STATUS    current
+--  Name      "X435-24P-4S"
+--  Date      "201908051031Z"  - Mon Aug  5 10:31:29 UTC 2019
+    DESCRIPTION
+        "X435 with 24 10/100/1000Mb FDX/HDX capable ports, 802.3at PoE (30W), 2 1/2.5G SFP ports"
+    ::= { extremeProduct 343 }
+
+x435-24t-4s OBJECT-IDENTITY
+    STATUS    current
+--  Name      "X435-24T-4S"
+--  Date      "201908051031Z"  - Mon Aug  5 10:31:29 UTC 2019
+    DESCRIPTION
+        "X435 with 24 10/100/1000Mb FDX/HDX capable ports, 2 1/2.5G SFP ports"
+    ::= { extremeProduct 344 }
+
+x435-8p-4s OBJECT-IDENTITY
+    STATUS    current
+--  Name      "X435-8P-4S"
+--  Date      "201908051031Z"  - Mon Aug  5 10:31:29 UTC 2019
+    DESCRIPTION
+        "X435 with 8 10/100/1000Mb FDX/HDX capable ports, 802.3at PoE (30W), 2 1/2.5G SFP ports"
+    ::= { extremeProduct 345 }
+
+x435-8t-4s OBJECT-IDENTITY
+    STATUS    current
+--  Name      "X435-8T-4S"
+--  Date      "201908051031Z"  - Mon Aug  5 10:31:29 UTC 2019
+    DESCRIPTION
+        "X435 with 8 10/100/1000Mb FDX/HDX capable ports, 2 1/2.5G SFP ports"
+    ::= { extremeProduct 346 }
+
+x435-8p-2t-w OBJECT-IDENTITY
+    STATUS    current
+--  Name      "X435-8P-2T-W"
+--  Date      "201908051031Z"  - Mon Aug  5 10:31:29 UTC 2019
+    DESCRIPTION
+        "X435 with 8 10/100/1000Mb FDX/HDX capable ports, 802.3at PoE (30W), 2 10/100/1000Mb FDX/HDX, 802.3bt PoE (90W) powered ports"
+    ::= { extremeProduct 347 }
+
+x465i-48w OBJECT-IDENTITY
+    STATUS    current
+--  Name      "X465i-48W"
+--  Date      "201909042120Z"  - Wed Sep 4 21:20:00 UTC 2019
+    DESCRIPTION
+        "X465 with 48 10/100/1000Mb FDX/HDX MACSEC capable ports, 802.3bt Type3/Type4 PoE (90W), 1 VIM slot"
+    ::= { extremeProduct 348 }
+
+extremeECAx6125 OBJECT-IDENTITY
+    STATUS    current
+--  Name      "VE6125"
+--  Date      "201909181400Z"  - Mon Sep 18 14:00 UTC 2019
+    DESCRIPTION
+        "ExtremCloud Appliance.  This virtual appliance provides an
+         integrated Extreme Wireless Controller and an Identity and Access
+         Controller in a single virtual device."
+    ::= { extremeProduct 339 }
+
+extremeECAx6120H OBJECT-IDENTITY
+    STATUS    current
+--  Name      "VE6120H"
+--  Date      "201912061620Z"  - Fri Dec  6 16:20 UTC 2019
+    DESCRIPTION
+        "ExtremCloud Appliance. The VE6120H is an elastic virtual appliance 
+         for Microsoft Hyper-V that supports up to 1,000 APs/Defenders, up to 
+         400 switches and 16,000 mobility sessions depending on the hosting hardware."
+    ::= { extremeProduct 356 }
+
+    --
+    -- Assorted OIDs that are pointed to by other MIBs 
+    --
+    extremeOids
+         OBJECT IDENTIFIER ::= { extremeMisc 1 }
+
+   --
+   -- OIDs for as-yet-unstandardised 802.3 MAU types
+   --     (see MAU MIB for usage)
+   --
+    extremeMauType
+         OBJECT IDENTIFIER ::= { extremeOids 1 }
+
+     extremeMauType1000BaseSX OBJECT IDENTIFIER
+     ::= { extremeMauType 1 }
+         -- "X fiber over short-wavelength laser PMD as specified
+         -- in clause 38, duplex mode unknown"
+
+     extremeMauType1000BaseLX OBJECT IDENTIFIER
+     ::= { extremeMauType 2 }
+         -- "X fiber over long-wavelength laser PMD as specified
+         -- in clause 38, duplex mode unknown"
+
+     extremeMauType1000BaseCX OBJECT IDENTIFIER
+     ::= { extremeMauType 3 }
+         -- "X copper over 150-ohm balanced cable PMD as specified
+         -- in clause 39, duplex mode unknown"
+
+     extremeMauType1000BaseSXFD OBJECT IDENTIFIER
+     ::= { extremeMauType 4 }
+         -- "X fiber over short-wavelength laser PMD as specified
+         -- in clause 38, full-duplex mode"
+
+     extremeMauType1000BaseLXFD OBJECT IDENTIFIER
+     ::= { extremeMauType 5 }
+         -- "X fiber over long-wavelength laser PMD as specified
+         -- in clause 38, full-duplex mode"
+
+     extremeMauType1000BaseCXFD OBJECT IDENTIFIER
+     ::= { extremeMauType 6 }
+         -- "X copper over 150-ohm balanced cable PMD as specified
+         -- in clause 39, full-duplex mode"
+
+     extremeMauType1000BaseWDMHD OBJECT IDENTIFIER
+     ::= { extremeMauType 7 }
+         -- "Gigabit WDM, half duplex"
+
+     extremeMauType1000BaseWDMFD OBJECT IDENTIFIER
+     ::= { extremeMauType 8 }
+         -- "Gigabit WDM, full duplex"
+
+     extremeMauType1000BaseLX70HD OBJECT IDENTIFIER
+     ::= { extremeMauType 9 }
+         -- "Gigabit LX70, half duplex"
+
+     extremeMauType1000BaseLX70FD OBJECT IDENTIFIER
+     ::= { extremeMauType 10 }
+         -- "Gigabit LX70, full duplex"
+
+     extremeMauType1000BaseZXHD OBJECT IDENTIFIER
+     ::= { extremeMauType 11 }
+         -- "Gigabit ZX, half duplex"
+
+     extremeMauType1000BaseZXFD OBJECT IDENTIFIER
+     ::= { extremeMauType 12 }
+         -- "Gigabit ZX, full duplex"
+
+     extremeMauType1000BaseLX100HD OBJECT IDENTIFIER
+     ::= { extremeMauType 13 }
+         -- "Gigabit LX100, half duplex"
+
+     extremeMauType1000BaseLX100FD OBJECT IDENTIFIER
+     ::= { extremeMauType 14 }
+         -- "Gigabit LX100, full duplex"
+
+     extremeMauType10GBaseCX4 OBJECT IDENTIFIER
+     ::= { extremeMauType 15 }
+         -- "10 Gigabit CX4"
+
+     extremeMauType10GBaseZR OBJECT IDENTIFIER
+     ::= { extremeMauType 16 }
+         -- "10 Gigabit ZR"
+
+     extremeMauType10GBaseDWDM OBJECT IDENTIFIER
+     ::= { extremeMauType 17 }
+         -- "10 Gigabit DWDM"
+
+     extremeMauType10GBaseCX OBJECT IDENTIFIER
+     ::= { extremeMauType 18 }
+         -- "10 Gigabit CX - SFP+ twin coax cable"
+
+     extremeMauType10GBaseT OBJECT IDENTIFIER
+          ::= { extremeMauType 19 }
+         -- "10 Gigabit BaseT "
+
+     extremeMauType40GBaseX OBJECT IDENTIFIER
+          ::= { extremeMauType 20 }
+         -- "40 Gigabit BaseX "
+
+    extremeMauType100GBaseX OBJECT IDENTIFIER
+          ::= { extremeMauType 21 }
+         -- "100 Gigabit BaseX"
+
+    extremeMauType40GBasePSM4 OBJECT IDENTIFIER
+          ::= { extremeMauType 22 }
+         -- "40 Gigabit PSM4"
+
+    extremeMauType100GBaseSR4 OBJECT IDENTIFIER
+          ::= { extremeMauType 23 }
+         -- "100 Gigabit SR4"
+
+    extremeMauType100GBaseCR4 OBJECT IDENTIFIER
+          ::= { extremeMauType 24 }
+         -- "100 Gigabit CR4"
+
+    extremeMauType100GBaseCWDM4 OBJECT IDENTIFIER
+          ::= { extremeMauType 25 }
+         -- "100 Gigabit CWDM4"
+
+    extremeMauType100GBasePSM4 OBJECT IDENTIFIER
+          ::= { extremeMauType 32 }
+         -- "100 Gigabit PSM4"
+
+    extremeMauType100GBaseSWDM4 OBJECT IDENTIFIER
+          ::= { extremeMauType 33 }
+         -- "100 Gigabit SWDM4"
+
+    extremeMauType25GBaseSR OBJECT IDENTIFIER
+          ::= { extremeMauType 34 }
+         -- "25 Gigabit SR"
+
+    extremeMauType25GBaseESR OBJECT IDENTIFIER
+          ::= { extremeMauType 35 }
+         -- "25 Gigabit ESR"
+
+    extremeMauType25GBaseLR OBJECT IDENTIFIER
+          ::= { extremeMauType 36 }
+         -- "25 Gigabit LR"
+
+    extremeMauType25GBaseCR4 OBJECT IDENTIFIER
+          ::= { extremeMauType 37 }
+         -- "25 Gigabit CR4"
+
+    extremeMauType100GBaseCWDM4Lite OBJECT IDENTIFIER
+          ::= { extremeMauType 38 }
+         -- "100 Gigabit CWDM4Lite"
+
+    extremeMauType100GBaseBIDI OBJECT IDENTIFIER
+          ::= { extremeMauType 39 }
+         -- "100 Gigabit BIDI"
+
+    extremeMauType10GBaseBX10U OBJECT IDENTIFIER
+          ::= { extremeMauType 40 }
+         -- "10 Gigabit BX10-U"
+
+    extremeMauType10GBaseBX10D OBJECT IDENTIFIER
+          ::= { extremeMauType 41 }
+         -- "10 Gigabit BX10-D"
+
+    extremeMauType10GBaseBX40U OBJECT IDENTIFIER
+          ::= { extremeMauType 42 }
+         -- "10 Gigabit BX40-U"
+
+    extremeMauType10GBaseBX40D OBJECT IDENTIFIER
+          ::= { extremeMauType 43 }
+         -- "10 Gigabit BX40-D"
+
+
+
+    -- ===============================================================================
+
+    --
+    -- Extreme MIB Objects
+    --
+    extremeSystem          OBJECT IDENTIFIER ::= { extremeAgent 1 }
+    extremeVlan            OBJECT IDENTIFIER ::= { extremeAgent 2 }
+    extremeQos             OBJECT IDENTIFIER ::= { extremeAgent 3 }
+    extremePort            OBJECT IDENTIFIER ::= { extremeAgent 4 }
+    extremeVC              OBJECT IDENTIFIER ::= { extremeAgent 5 }
+    extremeTrapPoll        OBJECT IDENTIFIER ::= { extremeAgent 6 }
+    extremeQosPolicy       OBJECT IDENTIFIER ::= { extremeAgent 7 }
+    extremeDlcs            OBJECT IDENTIFIER ::= { extremeAgent 8 }
+    extremeFileTransfer    OBJECT IDENTIFIER ::= { extremeAgent 10 }
+    extremeRtStats         OBJECT IDENTIFIER ::= { extremeAgent 11 }
+    extremeEsrp            OBJECT IDENTIFIER ::= { extremeAgent 12 }
+    extremeEdp             OBJECT IDENTIFIER ::= { extremeAgent 13 }
+    extremeSlb             OBJECT IDENTIFIER ::= { extremeAgent 14 }
+    extremeOspf            OBJECT IDENTIFIER ::= { extremeAgent 15 }
+    extremeFdb             OBJECT IDENTIFIER ::= { extremeAgent 16 }
+    extremeStp             OBJECT IDENTIFIER ::= { extremeAgent 17 }
+    extremeEaps            OBJECT IDENTIFIER ::= { extremeAgent 18 }
+    extremeLacp            OBJECT IDENTIFIER ::= { extremeAgent 19 }
+    extremePOSMib          OBJECT IDENTIFIER ::= { extremeAgent 20 }
+    extremeNPMib           OBJECT IDENTIFIER ::= { extremeAgent 21 }
+    extremeNetFlow         OBJECT IDENTIFIER ::= { extremeAgent 22 }
+    extremeSnmpv3          OBJECT IDENTIFIER ::= { extremeAgent 23 }
+    extremeCable           OBJECT IDENTIFIER ::= { extremeAgent 24 }
+    extremeWireless 	   OBJECT IDENTIFIER ::= { extremeAgent 25 }
+    extremeServices 	   OBJECT IDENTIFIER ::= { extremeAgent 26 }
+    extremePoE             OBJECT IDENTIFIER ::= { extremeAgent 27 }
+    extremeDosMib          OBJECT IDENTIFIER ::= { extremeAgent 28 }
+    extremeEnhDosMib       OBJECT IDENTIFIER ::= { extremeAgent 29 }
+    extremeClearflow       OBJECT IDENTIFIER ::= { extremeAgent 30 }
+    extremeEntity          OBJECT IDENTIFIER ::= { extremeAgent 31 }
+    extremeSwMonitor       OBJECT IDENTIFIER ::= { extremeAgent 32 }
+    extremeStackable       OBJECT IDENTIFIER ::= { extremeAgent 33 }
+    extremeIpSecurity      OBJECT IDENTIFIER ::= { extremeAgent 34 }
+    extremeUpm             OBJECT IDENTIFIER ::= { extremeAgent 35 }
+    extremeIdMgr           OBJECT IDENTIFIER ::= { extremeAgent 36 }
+    extremeMplsMIB         OBJECT IDENTIFIER ::= { extremeAgent 37 }
+    extremeHclag           OBJECT IDENTIFIER ::= { extremeAgent 38 }
+    extremeVM              OBJECT IDENTIFIER ::= { extremeAgent 39 }
+    extremeAutoProvision   OBJECT IDENTIFIER ::= { extremeAgent 40 }
+    extremeMlag            OBJECT IDENTIFIER ::= { extremeAgent 41 }
+    extremeCfgMgmt         OBJECT IDENTIFIER ::= { extremeAgent 42 }
+    extremeBfd             OBJECT IDENTIFIER ::= { extremeAgent 43 }
+    extremeMacAuthMIB      OBJECT IDENTIFIER ::= { extremeAgent 44 }
+    extremePbbMib          OBJECT IDENTIFIER ::= { extremeAgent 45 }
+    extremeErps          OBJECT IDENTIFIER ::= { extremeAgent 46 }
+    extremeCfm             OBJECT IDENTIFIER ::= { extremeAgent 47 }
+    extremeAcl             OBJECT IDENTIFIER ::= { extremeAgent 48 }
+    extremeVrrpMIB         OBJECT IDENTIFIER ::= { extremeAgent 49 }
+    extremeOspfv3MIB       OBJECT IDENTIFIER ::= { extremeAgent 50 }
+    extremeBgp4V2          OBJECT IDENTIFIER ::= { extremeAgent 51 }
+    extremeBgp4V2TC        OBJECT IDENTIFIER ::= { extremeAgent 52 }
+
+    extremeInternal        OBJECT IDENTIFIER ::= { extremeAgent 1000 }
+
+    extremeAP 		   OBJECT IDENTIFIER ::= { extremeWireless 1 }
+    extremeLAC 		   OBJECT IDENTIFIER ::= { extremeWireless 2 }
+
+    PortList ::= TEXTUAL-CONVENTION
+        STATUS current
+        DESCRIPTION
+            "Each octet within this value specifies a set of eight
+            ports, with the first octet specifying ports 1 through
+            8, the second octet specifying ports 9 through 16, etc.
+            Within each octet, the most significant bit represents
+            the lowest numbered port, and the least significant bit
+            represents the highest numbered port.  Thus, each port
+            of the bridge is represented by a single bit within the
+            value of this object.  If that bit has a value of '1'
+            then that port is included in the set of ports; the port
+            is not included if its bit has a value of '0'. If the
+            object has a length of 0 then it is taken to refer to all
+            of the ports in a given device."
+        SYNTAX      OCTET STRING
+
+    L4Port ::= TEXTUAL-CONVENTION
         STATUS  current
         DESCRIPTION
-           "The value of a transport layer (layer-4) port number, in network
-           byte order. A value of 0 indicates all allowed values of this 
-           field i.e. wildcard."
+            "The value of a transport layer (layer-4) port number, in network
+            byte order. A value of 0 indicates all allowed values of this 
+            field i.e. wildcard."
         SYNTAX  INTEGER (0|1..65535)
 
-ExtremeGenAddr ::= TEXTUAL-CONVENTION
-    STATUS      current
-    DESCRIPTION
-            "The value of an address."
-    SYNTAX      OCTET STRING (SIZE (0..20))
+    ExtremeGenAddr ::= TEXTUAL-CONVENTION
+         STATUS      current
+         DESCRIPTION
+             "The value of an address."
+         SYNTAX      OCTET STRING (SIZE (0..20))
 
-ExtremeDeviceId ::= TEXTUAL-CONVENTION
-    STATUS      current
-    DESCRIPTION
-            "The switch identifier used by Extreme EDP protocol."
-    SYNTAX      OCTET STRING (SIZE (8))
+    ExtremeDeviceId ::= TEXTUAL-CONVENTION
+         STATUS      current
+         DESCRIPTION
+             "The switch identifier used by Extreme EDP protocol."
+         SYNTAX      OCTET STRING (SIZE (8))
 
 WPACipherSet ::= TEXTUAL-CONVENTION
 	STATUS current
@@ -301,7 +1988,7 @@ WPACipherSet ::= TEXTUAL-CONVENTION
 		 allowed for representing the absence of information.
 		 The value other is used to indicate an unknown cipher."
 	SYNTAX BITS {
-		none(0),
+	        none(0),
 		wep64(1),
 		tkip(2),
 		wrap(3),
@@ -321,19 +2008,20 @@ WPAKeyMgmtSet ::= TEXTUAL-CONVENTION
 	}
 
 ClientAuthType ::= TEXTUAL-CONVENTION
-STATUS current
-DESCRIPTION "Type of client specified in the netlogin traps as well as the client table. For
-wired clients, only none, netlogin and dot1x are valid"
-SYNTAX INTEGER { none(0),
-    open(1),
-    wep(2),
-    mac-based(3),
-    dot1x(4),
-    wpa-psk(5),
-    web-based (6),
-    wpa(7),
-    wpa2(8),
-    wpa2-psk(9)}
+	STATUS current
+	DESCRIPTION "Type of client specified in the netlogin traps as well as the client table. For
+			wired clients, only none, netlogin and dot1x are valid"
+	SYNTAX INTEGER {
+                          none(0),	   
+			  open(1),
+			  wep(2),
+			  mac-based(3),
+			  dot1x(4),
+			  wpa-psk(5),
+			  web-based (6),
+    			  wpa2(7),
+    			  wpa(8),
+    			  wpa2-psk(9)}
 
 WirelessRemoteConnectBindingType ::= TEXTUAL-CONVENTION
 STATUS current
