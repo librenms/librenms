@@ -2,7 +2,7 @@
 -- CISCO-LWAPP-MOBILITY-EXT-MIB.my
 -- January 2011, Srinath Candadai
 --   
--- Copyright (c) 2011-2014 by Cisco Systems Inc.
+-- Copyright (c) 2011-2017 by Cisco Systems Inc.
 -- All rights reserved.
 -- *******************************************************************
 
@@ -20,18 +20,24 @@ IMPORTS
     OBJECT-GROUP,
     NOTIFICATION-GROUP
         FROM SNMPv2-CONF
+    TEXTUAL-CONVENTION,
     MacAddress,
     DateAndTime,
     TruthValue,
-    RowStatus
+    RowStatus,
+    StorageType
         FROM SNMPv2-TC
     InetAddressType,
     InetAddress
         FROM INET-ADDRESS-MIB
     SnmpAdminString
         FROM SNMP-FRAMEWORK-MIB
+    VlanIndex
+        FROM Q-BRIDGE-MIB
     cLWlanIndex
         FROM CISCO-LWAPP-WLAN-MIB
+    Dscp
+        FROM CISCO-QOS-PIB-MIB
     ciscoMgmt
         FROM CISCO-SMI;
 
@@ -41,7 +47,7 @@ IMPORTS
 -- ********************************************************************
 
 ciscoLwappMobilityExtMIB MODULE-IDENTITY
-    LAST-UPDATED    "201404210000Z"
+    LAST-UPDATED    "201705020000Z"
     ORGANIZATION    "Cisco Systems Inc."
     CONTACT-INFO
             "Cisco Systems,
@@ -313,14 +319,10 @@ ciscoLwappMobilityExtMIB MODULE-IDENTITY
 
            [2] Draft-obara-capwap-lwapp-00.txt, IETF Light 
            Weight Access Point Protocol."
-    REVISION        "201404140000Z"
-    DESCRIPTION
-        "Deprecated the mib objects cLMobilityExtMCClientAssociationTime, cLMobilityExtMOClientAssociationTime 
-         and Added the mib object cLMobilityExtMCClientUpTime, cLMobilityExtMOClientUpTime"
-    REVISION        "201301090100Z"
+    REVISION        "201705020000Z"
     DESCRIPTION
         "Initial version of this MIB module."
-    ::= { ciscoMgmt 999999 }
+    ::= { ciscoMgmt 846 }
 
 
 ciscoLwappMobilityExtMIBNotifs  OBJECT IDENTIFIER
@@ -353,17 +355,24 @@ ciscoLwappMobilityExtMAGlobalObjects  OBJECT IDENTIFIER
 ciscoLwappMobilityExtMCStats  OBJECT IDENTIFIER
     ::= { ciscoLwappMobilityExtGlobalObjects 4 }
 
+ciscoLwappMobilityExtMAStats  OBJECT IDENTIFIER
+    ::= { ciscoLwappMobilityExtGlobalObjects 5 }
+
+ciscoLwappMobilityExtGlobalStats  OBJECT IDENTIFIER
+    ::= { ciscoLwappMobilityExtGlobalObjects 6 }
+
+
 CiscoAbsZeroBasedCounter64 ::= TEXTUAL-CONVENTION
     STATUS          current
     DESCRIPTION
         "This TC describes an object which counts events with the
         following semantics: objects of this type will be set to
         zero(0) on creation and will thereafter count appropriate
-        events, it locks at the maximum value of 18,446,744,073,709,551,615
-        If the counter overflows.
+        events, it locks at the maximum value of 18,446,744,073,709,551
+        ,615 if the counter overflows.
         This TC may be used only in situations where wrapping is
         not possible or extremely unlikely situation."
-    SYNTAX          Counter64 
+    SYNTAX          Counter64
 
 -- *******************************************************************
 -- Mobility Controller (MC) global parameters
@@ -374,7 +383,7 @@ cLMobilityExtMCMOEnableStatus OBJECT-TYPE
     MAX-ACCESS      read-only
     STATUS          current
     DESCRIPTION
-        "This object  represents the current status of the
+        "This object represents the current status of the
         Mobility Oracle (MO).
         A value of 'true' indicates Mobility Oracle is enabled. 
         A value of 'false' indicates Mobility Oracle (MO) 
@@ -387,14 +396,15 @@ cLMobilityExtMCMOAdminEnableStatus OBJECT-TYPE
     MAX-ACCESS      read-write
     STATUS          current
     DESCRIPTION
-        "This object allows the user to enable or disable
+        "This object specifies the user to enable or disable
         MO mode.  
         A value of 'true' indicates both Mobility 
         Oracle (MO) is enabled. 
         A value of 'false' indicates Mobility Oracle (MO)
         is disabled.
-        Please note that cLMobilityExtMOEnableStatus (operational value)
-        can be false even if cLMobilityExtMOAdminEnableStatus is true."
+        Please note that cLMobilityExtMOEnableStatus (operational 
+        value)can be false even if cLMobilityExtMOAdminEnableStatus is 
+        true."
     DEFVAL          { false } 
     ::= { ciscoLwappMobilityExtMCGlobalObjects 2 }
 
@@ -406,7 +416,7 @@ cLMobilityExtMCEnableStatus OBJECT-TYPE
         "This object represents the current status of
         Mobility Controller (MC).  The controller can 
         operate either in MC/MA or MA only mode. 
-        A value of 'true' indicates both Mobility 
+        A value of 'true' indicates Mobility 
         Controller (MC) is enabled. 
         A value of 'false' indicates Mobility Controller (MC)
         is disabled."
@@ -418,15 +428,16 @@ cLMobilityExtMCAdminEnableStatus OBJECT-TYPE
     MAX-ACCESS      read-write
     STATUS          current
     DESCRIPTION
-        "This object allows the user to enable or disable
+        "This object specifies the user to enable or disable
         MC mode.  The controller can operate 
         either in MC/MA or MA only mode. 
         A value of 'true' indicates both Mobility 
         Controller (MC) is enabled. 
         A value of 'false' indicates Mobility Controller (MC)
         is disabled.
-        Please note that cLMobilityExtMCEnableStatus (operational value)
-        can be false even if cLMobilityExtMCAdminEnableStatus is true."
+        Please note that cLMobilityExtMCEnableStatus (operational 
+        value)can be false even if cLMobilityExtMCAdminEnableStatus is 
+        true."
     DEFVAL          { false } 
     ::= { ciscoLwappMobilityExtMCGlobalObjects 4 }
 
@@ -435,11 +446,11 @@ cLMobilityExtMCMulticastMode OBJECT-TYPE
     MAX-ACCESS      read-write
     STATUS          current
     DESCRIPTION
-        "This object allows the user to enable or disable
+        "This object specifies the user to enable or disable
         multicast  mode.
-        A value of 'true' indicates Multicast mode 
+        A value of 'true' indicates multicast mode 
         is enabled.
-        A value of 'false' indicates Multicast mode 
+        A value of 'false' indicates multicast mode 
         is disabled."
     DEFVAL          { false } 
     ::= { ciscoLwappMobilityExtMCGlobalObjects 5 }
@@ -449,30 +460,29 @@ cLMobilityExtMCKeepAliveCount OBJECT-TYPE
     MAX-ACCESS      read-write
     STATUS          current
     DESCRIPTION
-        "This object represents the keep alive count.
+        "This object specifies the keep alive count.
         If keep alive response is not received consecutively
         for N (keep alive count) times, the mobility link is
-        declared as down"
+        declared as down."
     DEFVAL          { 3 } 
     ::= { ciscoLwappMobilityExtMCGlobalObjects 6 }
 
 cLMobilityExtMCKeepAliveInterval OBJECT-TYPE
     SYNTAX          Unsigned32 (1..30)
+    UNITS           "seconds"
     MAX-ACCESS      read-write
     STATUS          current
     DESCRIPTION
-        "Each MC sends periodically keep alive packet to other
-        mobility devices (MA or MC). This object represents the keep
-        alive interval. This object is valid for MC, not MA."
-    DEFVAL          { 10 } 
+        "This object specifies the keep alive interval. This object is
+        valid for MC, not MA." 
     ::= { ciscoLwappMobilityExtMCGlobalObjects 7 }
 
 cLMobilityExtMCDscpValue OBJECT-TYPE
-    SYNTAX          Unsigned32 (0..63)
+    SYNTAX          Dscp
     MAX-ACCESS      read-write
     STATUS          current
     DESCRIPTION
-        "This object represents the Differentiated Services Code Point
+        "This object specifies the Differentiated Services Code Point
         (DSCP) value. Here it is used for classifying and managing 
         mobility control packets and providing quality of service (QoS)
         on IP networks. Valid value ranges from 0 to 63."
@@ -484,7 +494,7 @@ cLMobilityExtMCMOPublicAddressType OBJECT-TYPE
     MAX-ACCESS      read-write
     STATUS          current
     DESCRIPTION
-        "This object represents the MO's public IP address type." 
+        "This object specifies the MO's public IP address type." 
     ::= { ciscoLwappMobilityExtMCGlobalObjects 9 }
 
 cLMobilityExtMCMOPublicAddress OBJECT-TYPE
@@ -492,7 +502,9 @@ cLMobilityExtMCMOPublicAddress OBJECT-TYPE
     MAX-ACCESS      read-write
     STATUS          current
     DESCRIPTION
-        "This object represents the MO's public IP address." 
+        "This object specifies the MO's public IP address.The
+        type of this address is determined by the value of
+        cLMobilityExtMCMOPublicAddressType object." 
     ::= { ciscoLwappMobilityExtMCGlobalObjects 10 }
 
 cLMobilityExtMCApCountLicensesInUse OBJECT-TYPE
@@ -500,8 +512,9 @@ cLMobilityExtMCApCountLicensesInUse OBJECT-TYPE
     MAX-ACCESS      read-only
     STATUS          current
     DESCRIPTION
-        "This object represents the total APs directly associated with
-        this MC and its MAs." 
+        "This object represents the total APs directly associated
+        with this MC and its MAs. Each Access point that joins 
+        the Controller acquires a licence from the controller." 
     ::= { ciscoLwappMobilityExtMCGlobalObjects 11 }
 
 cLMobilityExtMCOwnGroupMulticastAddressType OBJECT-TYPE
@@ -509,8 +522,8 @@ cLMobilityExtMCOwnGroupMulticastAddressType OBJECT-TYPE
     MAX-ACCESS      read-write
     STATUS          current
     DESCRIPTION
-        "This object represents the multicast IP address type of its own
-         mobility group." 
+        "This object specifies the multicast IP address type of its own
+        mobility group." 
     ::= { ciscoLwappMobilityExtMCGlobalObjects 12 }
 
 cLMobilityExtMCOwnGroupMulticastAddress OBJECT-TYPE
@@ -518,18 +531,54 @@ cLMobilityExtMCOwnGroupMulticastAddress OBJECT-TYPE
     MAX-ACCESS      read-write
     STATUS          current
     DESCRIPTION
-        "This object represents the multicast IP address of its own
-        mobility group." 
+        "This object specifies the multicast IP address of its own
+        mobility group. The type of this address is determined by the 
+        value of cLMobilityExtMCOwnGroupMulticastAddressType object." 
     ::= { ciscoLwappMobilityExtMCGlobalObjects 13 }
 
 cLMobilityExtMCMobilityGroupName OBJECT-TYPE
-    SYNTAX          SnmpAdminString
+    SYNTAX          SnmpAdminString (SIZE  (1..32))
     MAX-ACCESS      read-write
     STATUS          current
     DESCRIPTION
-        "This object represents the name for this mobility group." 
+        "This object specifies the name for this mobility group." 
     ::= { ciscoLwappMobilityExtMCGlobalObjects 14 }
 
+cLMobilityExtMCMONumberOfClients OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the total number of clients reported
+        by MO." 
+    ::= { ciscoLwappMobilityExtMCGlobalObjects 15 }
+
+cLMobilityExtMCNumberOfMCs OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the total number of MCs within a mobility
+        domain." 
+    ::= { ciscoLwappMobilityExtMCGlobalObjects 16 }
+
+cLMobilityExtMCTotalNumberOfReportedAPs OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the total number of APs reported
+        by this MC, its peer MCs and its MAs." 
+    ::= { ciscoLwappMobilityExtMCGlobalObjects 17 }
+
+cLMobilityExtMCNumberOfReportedAPsInSubDomain OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the total number of APs reported
+        by this MC and its MAs." 
+    ::= { ciscoLwappMobilityExtMCGlobalObjects 18 }
 
 -- *******************************************************************
 -- Mobility Manager global parameters (applicable to both MC and MA)
@@ -540,8 +589,8 @@ cLMobilityExtMgrAddressType OBJECT-TYPE
     MAX-ACCESS      read-only
     STATUS          current
     DESCRIPTION
-        "The mobility manager is the management entity of MC or MA.
-        This object represents the mobility manager's IP address type." 
+        "This object indicates the mobility manager's IP address type.
+        The mobility manager is the management entity of MC or MA." 
     ::= { ciscoLwappMobilityExtMCMAGlobalObjects 1 }
 
 cLMobilityExtMgrAddress OBJECT-TYPE
@@ -549,7 +598,9 @@ cLMobilityExtMgrAddress OBJECT-TYPE
     MAX-ACCESS      read-only
     STATUS          current
     DESCRIPTION
-        "This object represents the mobility manager's IP address." 
+        "This object indicates the mobility manager's IP address. The
+        type of this address is determined by the value of
+        cLMobilityExtMgrAddressType." 
     ::= { ciscoLwappMobilityExtMCMAGlobalObjects 2 }
 
 cLMobilityExtMgrNetmaskType OBJECT-TYPE
@@ -557,7 +608,7 @@ cLMobilityExtMgrNetmaskType OBJECT-TYPE
     MAX-ACCESS      read-only
     STATUS          current
     DESCRIPTION
-        "This object represents the mobility manager's netmask type." 
+        "This object indicates the mobility manager's netmask type." 
     ::= { ciscoLwappMobilityExtMCMAGlobalObjects 3 }
 
 cLMobilityExtMgrNetmask OBJECT-TYPE
@@ -565,7 +616,9 @@ cLMobilityExtMgrNetmask OBJECT-TYPE
     MAX-ACCESS      read-only
     STATUS          current
     DESCRIPTION
-        "This object represents the mobility manager's netmask." 
+        "This object indicates the mobility manager's netmask. The
+        type of this address is determined by the value of 
+        cLMobilityExtMgrNetmaskType." 
     ::= { ciscoLwappMobilityExtMCMAGlobalObjects 4 }
 
 cLMobilityExtMgrMacAddress OBJECT-TYPE
@@ -573,24 +626,24 @@ cLMobilityExtMgrMacAddress OBJECT-TYPE
     MAX-ACCESS      read-only
     STATUS          current
     DESCRIPTION
-        "This object represents the mac address for this mobility
+        "This object indicates the mac address for this mobility
         manager." 
     ::= { ciscoLwappMobilityExtMCMAGlobalObjects 5 }
 
 cLMobilityExtMgrVlanId OBJECT-TYPE
-    SYNTAX          Unsigned32
+    SYNTAX          VlanIndex
     MAX-ACCESS      read-only
     STATUS          current
     DESCRIPTION
-        "This object represents the VLAN ID for this mobility manager." 
+        "This object indicates the VLAN ID for this mobility manager." 
     ::= { ciscoLwappMobilityExtMCMAGlobalObjects 6 }
 
 cLMobilityExtMgrName OBJECT-TYPE
-    SYNTAX          SnmpAdminString
+    SYNTAX          SnmpAdminString (SIZE  (1..32))
     MAX-ACCESS      read-write
     STATUS          current
     DESCRIPTION
-        "This object represents the name for this mobility manager." 
+        "This object specifies the name for this mobility manager." 
     ::= { ciscoLwappMobilityExtMCMAGlobalObjects 7 }
 
 cLMobilityExtMgrInterfaceType OBJECT-TYPE
@@ -601,10 +654,11 @@ cLMobilityExtMgrInterfaceType OBJECT-TYPE
     MAX-ACCESS      read-only
     STATUS          current
     DESCRIPTION
-        "This object represents the mobility manager interface type.
+        "This object indicates the mobility manager interface type.
         It can be of two types:
-        management: for in-band management of the controller
-        ap: for L3 communications between the controller and LWAPP APs."
+        management(1) - For in-band management of the controller.
+        ap(2) -  For L3 communications between the controller 
+                 and LWAPP APs." 
     ::= { ciscoLwappMobilityExtMCMAGlobalObjects 8 }
 
 cLMobilityExtNewArchitectureEnableStatus OBJECT-TYPE
@@ -612,10 +666,10 @@ cLMobilityExtNewArchitectureEnableStatus OBJECT-TYPE
     MAX-ACCESS      read-only
     STATUS          current
     DESCRIPTION
-        "This object represents the current status of the
+        "This object indicates the current status of the
         new mobility feature.
-        A value of 'true' indicates new Mobility is enabled.
-        A value of 'false' indicates new Mobility is disabled." 
+        A value of 'true' indicates new mobility is enabled.
+        A value of 'false' indicates new mobility is disabled." 
     ::= { ciscoLwappMobilityExtMCMAGlobalObjects 9 }
 
 cLMobilityExtNewArchitectureAdminEnableStatus OBJECT-TYPE
@@ -623,13 +677,41 @@ cLMobilityExtNewArchitectureAdminEnableStatus OBJECT-TYPE
     MAX-ACCESS      read-write
     STATUS          current
     DESCRIPTION
-        "This object allows users to enable or disable
+        "This object specifies users to enable or disable
         new mobility feature.
-        A value of 'true' indicates new Mobility is enabled.
-        A value of 'false' indicates new Mobility is disabled." 
+        A value of 'true' indicates new mobility is enabled.
+        A value of 'false' indicates new mobility is disabled." 
     ::= { ciscoLwappMobilityExtMCMAGlobalObjects 10 }
 
+cLMobilityExtSecureCipher OBJECT-TYPE
+    SYNTAX          INTEGER  {
+                        disable(1),
+                        aes256sha1(2),
+                        aes256sha2(3)
+                    }
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This object specifies to configure secure ciphers, AES256+SHA
+        or AES256+SHA2 for mobility tunnel.
+        disable(1) - Implies that controllers will continue 
+                     to use default ciphers for mobility  tunnel.
+        aes256sha1(2) - Implies that controllers will use
+                        AES256_SHA cipher for mobility tunnel.
+        aes256sha2(3) - Implies that controllers will use 
+                        AES256_SHA256 cipher for mobility tunnel." 
+    ::= { ciscoLwappMobilityExtMCMAGlobalObjects 11 }
 
+cLMobilityExtEncryptionStatus OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object represents the current status of the
+        encryption in the mobility tunnel.
+        A value of 'true' indicates encryption is enabled.
+        A value of 'false' indicates encryption is disabled." 
+    ::= { ciscoLwappMobilityExtMCMAGlobalObjects 12 }
 -- *******************************************************************
 -- Switch Peer Group Table (applicable to MC only)
 -- *******************************************************************
@@ -639,8 +721,8 @@ cLMobilityExtSpgTable OBJECT-TYPE
     MAX-ACCESS      not-accessible
     STATUS          current
     DESCRIPTION
-        "This table represents the information about the
-        802.11 LWAPP Mobility Switch Peer Group (SPG)."
+        "This table contains the information about the
+        802.11 LWAPP mobility Switch Peer Group (SPG)."
     ::= { ciscoLwappMobilityExtTableObjects 1 }
 
 cLMobilityExtSpgEntry OBJECT-TYPE
@@ -648,9 +730,8 @@ cLMobilityExtSpgEntry OBJECT-TYPE
     MAX-ACCESS      not-accessible
     STATUS          current
     DESCRIPTION
-        "Each entry in this table provides information about
-        one 802.11 LWAPP Mobility SPG configured 
-        on this controller."
+        "Each entry in this table represents information about
+        one 802.11 LWAPP mobility SPG configured on this controller."
     INDEX           { cLMobilityExtSpgGroupName } 
     ::= { cLMobilityExtSpgTable 1 }
 
@@ -662,6 +743,7 @@ CLMobilityExtSpgEntry ::= SEQUENCE {
         cLMobilityExtSpgMulticastAddressType InetAddressType,
         cLMobilityExtSpgMulticastAddress     InetAddress,
         cLMobilityExtSpgMulticastMode        TruthValue,
+        cLMobilityExtSpgStorageType          StorageType,
         cLMobilityExtSpgRowStatus            RowStatus
 }
 
@@ -670,8 +752,7 @@ cLMobilityExtSpgGroupName OBJECT-TYPE
     MAX-ACCESS      not-accessible
     STATUS          current
     DESCRIPTION
-        "This object represents the group name for this SPG.
-        This object is for human consumption."
+        "This object represents the group name for this SPG." 
     ::= { cLMobilityExtSpgEntry 1 }
 
 cLMobilityExtSpgGroupId OBJECT-TYPE
@@ -679,8 +760,8 @@ cLMobilityExtSpgGroupId OBJECT-TYPE
     MAX-ACCESS      read-create
     STATUS          current
     DESCRIPTION
-        "This object represents the group ID for this SPG.
-        This object is used in the control data packet for SPG."
+        "This object specifies the group ID for this SPG.
+        This object is used in the control data packet for SPG." 
     ::= { cLMobilityExtSpgEntry 2 }
 
 cLMobilityExtSpgBridgeDomainId OBJECT-TYPE
@@ -688,7 +769,7 @@ cLMobilityExtSpgBridgeDomainId OBJECT-TYPE
     MAX-ACCESS      read-create
     STATUS          current
     DESCRIPTION
-        "This object represents the bridge domain ID for this SPG." 
+        "This object specifies the bridge domain ID for this SPG." 
     ::= { cLMobilityExtSpgEntry 3 }
 
 cLMobilityExtSpgMemberCount OBJECT-TYPE
@@ -696,7 +777,7 @@ cLMobilityExtSpgMemberCount OBJECT-TYPE
     MAX-ACCESS      read-only
     STATUS          current
     DESCRIPTION
-        "This object represents the number of members on this SPG." 
+        "This object indicates the number of members on this SPG." 
     ::= { cLMobilityExtSpgEntry 4 }
 
 cLMobilityExtSpgMulticastAddressType OBJECT-TYPE
@@ -704,7 +785,7 @@ cLMobilityExtSpgMulticastAddressType OBJECT-TYPE
     MAX-ACCESS      read-create
     STATUS          current
     DESCRIPTION
-        "This object represents the member's multicast IP address
+        "This object specifies the member's multicast IP address
         type." 
     ::= { cLMobilityExtSpgEntry 5 }
 
@@ -713,7 +794,9 @@ cLMobilityExtSpgMulticastAddress OBJECT-TYPE
     MAX-ACCESS      read-create
     STATUS          current
     DESCRIPTION
-        "This object represents the member's multicast IP address." 
+        "This object specifies the member's multicast IP address.
+        The type of this address is determined by the value of
+        cLMobilityExtSpgMulticastAddressType." 
     ::= { cLMobilityExtSpgEntry 6 }
 
 cLMobilityExtSpgMulticastMode OBJECT-TYPE
@@ -721,21 +804,32 @@ cLMobilityExtSpgMulticastMode OBJECT-TYPE
     MAX-ACCESS      read-create
     STATUS          current
     DESCRIPTION
-        "This object allows the user to enable or disable
+        "This object specifies the user to enable or disable
         multicast  mode.
-        A value of 'true' indicates Multicast mode 
+        A value of 'true' indicates multicast mode 
         is enabled.
-        A value of 'false' indicates Multicast mode 
+        A value of 'false' indicates multicast mode 
         is disabled." 
     ::= { cLMobilityExtSpgEntry 7 }
+
+cLMobilityExtSpgStorageType OBJECT-TYPE
+    SYNTAX          StorageType
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the storage type for this
+        conceptual row." 
+    ::= { cLMobilityExtSpgEntry 8 }
 
 cLMobilityExtSpgRowStatus OBJECT-TYPE
     SYNTAX          RowStatus
     MAX-ACCESS      read-create
     STATUS          current
     DESCRIPTION
-        "This object creates or deletes an entry in this table." 
-    ::= { cLMobilityExtSpgEntry 8 }
+        "This is the status column for this row and used
+        to create and delete specific instances of rows             
+        in this table." 
+    ::= { cLMobilityExtSpgEntry 9 }
  
 
 -- *******************************************************************
@@ -747,8 +841,8 @@ cLMobilityExtSpgMemberTable OBJECT-TYPE
     MAX-ACCESS      not-accessible
     STATUS          current
     DESCRIPTION
-        "This table represents the information about the
-        802.11 LWAPP Mobility Switch Peer Group (SPG) Members."
+        "This table contains the information about the
+        802.11 LWAPP mobility Switch Peer Group (SPG) members."
     ::= { ciscoLwappMobilityExtTableObjects 2 }
 
 cLMobilityExtSpgMemberEntry OBJECT-TYPE
@@ -756,8 +850,8 @@ cLMobilityExtSpgMemberEntry OBJECT-TYPE
     MAX-ACCESS      not-accessible
     STATUS          current
     DESCRIPTION
-        "Each entry in this table provides information about
-        one 802.11 LWAPP Mobility SPG Member configured 
+        "Each entry in this table represents information about
+        one 802.11 LWAPP mobility SPG member configured 
         on this controller."
     INDEX           {
                         cLMobilityExtSpgGroupName,
@@ -788,7 +882,9 @@ cLMobilityExtSpgMemberPrivateAddress OBJECT-TYPE
     MAX-ACCESS      not-accessible
     STATUS          current
     DESCRIPTION
-        "This object represents the member's private IP address." 
+        "This object represents the member's private IP address.
+        The type of this address is determined by the value of
+        cLMobilityExtSpgMemberPrivateAddressType." 
     ::= { cLMobilityExtSpgMemberEntry 2 }
 
 cLMobilityExtSpgMemberStatus OBJECT-TYPE
@@ -802,28 +898,23 @@ cLMobilityExtSpgMemberStatus OBJECT-TYPE
     MAX-ACCESS      read-only
     STATUS          current
     DESCRIPTION
-        "This object specifies the operational and connectivity
+        "This object indicates the operational and connectivity
         status of the member.
 
-             notconfigured:
-                     This means group is not configured
-                     for ICMP or EoIP pings.
+        notconfigured(0) - This means group member is not configured
+                           for ICMP or EoIP pings.
 
-             datapathdown:
-                     This means group is not responding
-                     to EoIP pings.
+        datapathdown(1) - This means group member is not responding
+                          to EoIP pings.
 
-             controlpathdown:
-                     This means successive ICMP pings
-                     to the group have failed.
+        controlpathdown(2) - This means successive ICMP pings
+                             to the group member have failed.
 
-             bothdown:
-                     This means group is not responding
-                     to ICMP or EOIP pings.
+        bothdown(3) - This means group member is not responding
+                      to ICMP or EOIP pings.
 
-             up:
-                     This means group is responding to
-                     both EOIP and ICMP pings." 
+        up(4) - This means group member is responding to
+                both EOIP and ICMP pings." 
     ::= { cLMobilityExtSpgMemberEntry 3 }
 
 cLMobilityExtSpgMemberPublicAddressType OBJECT-TYPE
@@ -831,7 +922,7 @@ cLMobilityExtSpgMemberPublicAddressType OBJECT-TYPE
     MAX-ACCESS      read-create
     STATUS          current
     DESCRIPTION
-        "This object represents the member's public IP address type." 
+        "This object specifies the member's public IP address type." 
     ::= { cLMobilityExtSpgMemberEntry 4 }
 
 cLMobilityExtSpgMemberPublicAddress OBJECT-TYPE
@@ -839,7 +930,9 @@ cLMobilityExtSpgMemberPublicAddress OBJECT-TYPE
     MAX-ACCESS      read-create
     STATUS          current
     DESCRIPTION
-        "This object represents the member's public IP address." 
+        "This object specifies the member's public IP address. The
+        type of this address is determined by the value of
+        cLMobilityExtSpgMemberPublicAddressType." 
     ::= { cLMobilityExtSpgMemberEntry 5 }
 
 cLMobilityExtSpgMemberRowStatus OBJECT-TYPE
@@ -847,7 +940,9 @@ cLMobilityExtSpgMemberRowStatus OBJECT-TYPE
     MAX-ACCESS      read-create
     STATUS          current
     DESCRIPTION
-        "This object creates or deletes an entry in this table." 
+        "This is the status column for this row and used
+        to create and delete specific instances of rows             
+        in this table." 
     ::= { cLMobilityExtSpgMemberEntry 6 }
  
 
@@ -860,8 +955,8 @@ cLMobilityExtGroupMemberTable OBJECT-TYPE
     MAX-ACCESS      not-accessible
     STATUS          current
     DESCRIPTION
-        "This table represents the information about the
-        802.11 LWAPP Mobility Group Members."
+        "This table contains the information about the
+        802.11 LWAPP mobility group members."
     ::= { ciscoLwappMobilityExtTableObjects 3 }
 
 cLMobilityExtGroupMemberEntry OBJECT-TYPE
@@ -869,8 +964,8 @@ cLMobilityExtGroupMemberEntry OBJECT-TYPE
     MAX-ACCESS      not-accessible
     STATUS          current
     DESCRIPTION
-        "Each entry in this table provides information about
-        one 802.11 LWAPP Mobility Member configured 
+        "Each entry in this table represents information about
+        one 802.11 LWAPP mobility member configured 
         on this controller."
     INDEX           {
                         cLMobilityExtGroupMemberPrivateAddressType,
@@ -905,7 +1000,9 @@ cLMobilityExtGroupMemberPrivateAddress OBJECT-TYPE
     MAX-ACCESS      not-accessible
     STATUS          current
     DESCRIPTION
-        "This object represents the member's private IP address." 
+        "This object represents the member's private IP address. The
+        type of this address is determined by the value of
+        cLMobilityExtGroupMemberPrivateAddressType." 
     ::= { cLMobilityExtGroupMemberEntry 2 }
 
 cLMobilityExtGroupMemberGroupName OBJECT-TYPE
@@ -913,7 +1010,7 @@ cLMobilityExtGroupMemberGroupName OBJECT-TYPE
     MAX-ACCESS      read-create
     STATUS          current
     DESCRIPTION
-        "This object represents the member's mobility group name." 
+        "This object specifies the member's mobility group name." 
     ::= { cLMobilityExtGroupMemberEntry 3 }
 
 cLMobilityExtGroupMemberPublicAddressType OBJECT-TYPE
@@ -921,7 +1018,7 @@ cLMobilityExtGroupMemberPublicAddressType OBJECT-TYPE
     MAX-ACCESS      read-create
     STATUS          current
     DESCRIPTION
-        "This object represents the member's public IP address type." 
+        "This object specifies the member's public IP address type." 
     ::= { cLMobilityExtGroupMemberEntry 4 }
 
 cLMobilityExtGroupMemberPublicAddress OBJECT-TYPE
@@ -929,7 +1026,9 @@ cLMobilityExtGroupMemberPublicAddress OBJECT-TYPE
     MAX-ACCESS      read-create
     STATUS          current
     DESCRIPTION
-        "This object represents the member's public IP address." 
+        "This object specifies the member's public IP address. The
+        type of this address is determined by the value of
+        cLMobilityExtGroupMemberPublicAddressType." 
     ::= { cLMobilityExtGroupMemberEntry 5 }
 
 cLMobilityExtGroupMemberStatus OBJECT-TYPE
@@ -943,28 +1042,22 @@ cLMobilityExtGroupMemberStatus OBJECT-TYPE
     MAX-ACCESS      read-only
     STATUS          current
     DESCRIPTION
-        "This object specifies the operational and connectivity
+        "This object indicates the operational and connectivity
         status of the member.
+        notconfigured(0) - This means group member is not configured
+                           for ICMP or EoIP pings.
 
-             notconfigured:
-                     This means group is not configured 
-                     for ICMP or EoIP pings.
+        datapathdown(1) - This means group member is not responding
+                          to EoIP pings.
 
-             datapathdown:
-                     This means group is not responding 
-                     to EoIP pings.
+        controlpathdown(2) - This means successive ICMP pings
+                             to the group member have failed.
 
-             controlpathdown:
-                     This means successive ICMP pings 
-                     to the group have failed.
+        bothdown(3) - This means group member is not responding
+                      to ICMP or EOIP pings.
 
-             bothdown:
-                     This means group is not responding
-                     to ICMP or EOIP pings.
-
-             up:      
-                     This means group is responding to 
-                     both EOIP and ICMP pings." 
+        up(4) - This means group member is responding to
+                both EOIP and ICMP pings." 
     ::= { cLMobilityExtGroupMemberEntry 6 }
 
 cLMobilityExtGroupMemberMacAddress OBJECT-TYPE
@@ -972,7 +1065,7 @@ cLMobilityExtGroupMemberMacAddress OBJECT-TYPE
     MAX-ACCESS      read-create
     STATUS          current
     DESCRIPTION
-        "This object represents the member's mac address." 
+        "This object specifies the member's MAC address." 
     ::= { cLMobilityExtGroupMemberEntry 7 }
 
 cLMobilityExtGroupMemberMulticastAddressType OBJECT-TYPE
@@ -980,7 +1073,7 @@ cLMobilityExtGroupMemberMulticastAddressType OBJECT-TYPE
     MAX-ACCESS      read-only
     STATUS          current
     DESCRIPTION
-        "This used represents the member's multicast IP address type." 
+        "This used indicates the member's multicast IP address type." 
     ::= { cLMobilityExtGroupMemberEntry 8 }
 
 cLMobilityExtGroupMemberMulticastAddress OBJECT-TYPE
@@ -988,17 +1081,19 @@ cLMobilityExtGroupMemberMulticastAddress OBJECT-TYPE
     MAX-ACCESS      read-only
     STATUS          current
     DESCRIPTION
-        "This object represents the member's multicast IP address." 
+        "This object indicates the member's multicast IP address.
+        The type of this address is determined by the value of
+        cLMobilityExtGroupMemberMulticastAddressType." 
     ::= { cLMobilityExtGroupMemberEntry 9 }
 
-cLMobilityExtGroupMemberHashKey  OBJECT-TYPE 
-    SYNTAX          OCTET STRING(SIZE(4..40))
+cLMobilityExtGroupMemberHashKey OBJECT-TYPE
+    SYNTAX          OCTET STRING (SIZE  (4..40))
     MAX-ACCESS      read-create
     STATUS          current
     DESCRIPTION
-        "This object indicates the Hash key of the peer mobility
-        member. It is a 40 hex digit value or 'none' to clear the
-        previously configured hash key."
+        "This object specifies the hash key of the peer mobility
+        member. It is a 40 digit hex value or 'none'. Value 'none' is 
+        used to clear the previously configured hash key." 
     ::= { cLMobilityExtGroupMemberEntry 10 }
 
 cLMobilityExtGroupMemberRowStatus OBJECT-TYPE
@@ -1007,7 +1102,7 @@ cLMobilityExtGroupMemberRowStatus OBJECT-TYPE
     STATUS          current
     DESCRIPTION
         "This is the status column for this row and used
-        to create and delete specific instances of rows
+        to create and delete specific instances of rows             
         in this table." 
     ::= { cLMobilityExtGroupMemberEntry 11 }
  
@@ -1021,7 +1116,7 @@ cLMobilityExtAnchorTable OBJECT-TYPE
     MAX-ACCESS      not-accessible
     STATUS          current
     DESCRIPTION
-        "This table represents the information about the
+        "This table contains the information about the
         802.11 LWAPP Mobility Anchors on individual WLANs.
 
                +...............+
@@ -1062,14 +1157,14 @@ cLMobilityExtAnchorTable OBJECT-TYPE
         10.16.109.199               10.16.109.199
 
         In the above diagram, Central Controllers CC1 and CC2 have
-        been configure in a Mobility Group.
+        been configured in a Mobility Group.
 
         Currently the Mobile Node 'MN1' obtains its IP from the
         Central Controller 'CC1' with which it first associates
         via WLAN '1' through Access Point 'AP1'. 'CC1'
         obtains DHCP address, say 10.16.109.199 for client 'MN1'.
         Now the client 'MN1' is identified by 10.16.109.199 for
-        furthure communication with the network and the
+        further communication with the network and the
         communication happens via 'CC1'.
 
         Since, 'CC1' and 'CC2' are in same mobility group, 'CC1'
@@ -1104,7 +1199,7 @@ cLMobilityExtAnchorTable OBJECT-TYPE
         Mobility Anchoring. 'CC1' is the Mobility Anchor and 'CC2' is
         the 'Foreign' for WLAN '1'.
 
-        As per the configuration, user creates a MobilityAnchor entry
+        As per the configuration, user creates a Mobility Anchor entry
         in 'CC2' for WLAN '1' with IP address as 'CC1', i.e.
         10.16.109.112. So, when 'MN1' connects to WLAN '1' via
         'AP2', then 'CC2' establishes EoIP tunnel with 10.16.109.112
@@ -1145,8 +1240,8 @@ cLMobilityExtAnchorEntry OBJECT-TYPE
     MAX-ACCESS      not-accessible
     STATUS          current
     DESCRIPTION
-        "Each entry in this table provides information about
-        one 802.11 LWAPP Mobility Anchor configured on a WLAN
+        "Each entry in this table represents information about
+        one 802.11 LWAPP Mobility Anchor(MA) configured on a WLAN
         on this controller."
     INDEX           {
                         cLWlanIndex,
@@ -1159,7 +1254,8 @@ CLMobilityExtAnchorEntry ::= SEQUENCE {
         cLMobilityExtAnchorAssociatedMCAddressType InetAddressType,
         cLMobilityExtAnchorAssociatedMCAddress     InetAddress,
         cLMobilityExtAnchorStatus                  INTEGER,
-        cLMobilityExtAnchorRowStatus               RowStatus
+        cLMobilityExtAnchorRowStatus               RowStatus,
+        cLMobilityExtAnchorPriority                INTEGER
 }
 
 cLMobilityExtAnchorAssociatedMCAddressType OBJECT-TYPE
@@ -1175,7 +1271,9 @@ cLMobilityExtAnchorAssociatedMCAddress OBJECT-TYPE
     MAX-ACCESS      not-accessible
     STATUS          current
     DESCRIPTION
-        "This object represents the anchor's IP address" 
+        "This object represents the anchor's IP address. The type
+        of this address is determined by the value of
+        cLMobilityExtAnchorAssociatedMCAddressType." 
     ::= { cLMobilityExtAnchorEntry 2 }
 
 cLMobilityExtAnchorStatus OBJECT-TYPE
@@ -1189,28 +1287,22 @@ cLMobilityExtAnchorStatus OBJECT-TYPE
     MAX-ACCESS      read-only
     STATUS          current
     DESCRIPTION
-        "This object specifies the operational and connectivity
-        status of the mobility anchor.
+        "This object indicates the operational and connectivity
+        status of the Mobility Anchor(MA).
+        notconfigured(0) - This means anchor is not configured
+                           for ICMP or EoIP pings.
 
-             notconfigured:
-                     This means anchor is not configured 
-                     for ICMP or EoIP pings.
+        datapathdown(1) - This means anchor is not responding
+                          to EoIP pings.
 
-             datapathdown:
-                     This means anchor is not responding 
-                     to EoIP pings.
+        controlpathdown(2) - This means successive ICMP pings
+                             to the anchor have failed.
 
-             controlpathdown:
-                     This means successive ICMP pings 
-                     to the anchor have failed.
+        bothdown(3) - This means anchor is not responding
+                      to ICMP or EOIP pings.
 
-             bothdown:
-                     This means anchor is not responding
-                     to ICMP or EOIP pings.
-
-             up:      
-                     This means anchor is responding to 
-                     both EOIP and ICMP pings." 
+        up(4) - This means anchor is responding to
+                both EOIP and ICMP pings." 
     ::= { cLMobilityExtAnchorEntry 3 }
 
 cLMobilityExtAnchorRowStatus OBJECT-TYPE
@@ -1222,7 +1314,33 @@ cLMobilityExtAnchorRowStatus OBJECT-TYPE
         to create and delete specific instances of rows
         in this table." 
     ::= { cLMobilityExtAnchorEntry 4 }
+
+cLMobilityExtAnchorPriority OBJECT-TYPE
+    SYNTAX          INTEGER  {
+                        local(1),
+                        primary(2),
+                        secondary(3),
+                        tertiary(4)
+                    }
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the priority configured for
+        an anchor WLC mapped on a WLAN.
+        local(1) - Local priority can't be configured. This indicates 
+                   that anchor WLC is configured with its own IP.
+
+        primary(2) - This indicates that anchor WLC configured with 
+                     this priority will have highest priority.
+
+        secondary(3) - This indicates that anchor WLC configured with 
+                       this priority will have medium priority.
+
+        tertiary(4) - This indicates that anchor WLC configured with 
+                      this priority will have lowest priority." 
+    ::= { cLMobilityExtAnchorEntry 5 }
  
+
 -- *******************************************************************
 -- Mobility Controllers table reported by Mobility Oracle (MO)
 -- *******************************************************************
@@ -1232,7 +1350,7 @@ cLMobilityExtMOMCTable OBJECT-TYPE
     MAX-ACCESS      not-accessible
     STATUS          current
     DESCRIPTION
-        "This table represents the information about the
+        "This table contains the information about the
         802.11 LWAPP Mobility Controllers on this MO."
     ::= { ciscoLwappMobilityExtTableObjects 5 }
 
@@ -1241,7 +1359,7 @@ cLMobilityExtMOMCEntry OBJECT-TYPE
     MAX-ACCESS      not-accessible
     STATUS          current
     DESCRIPTION
-        "Each entry in this table provides information about
+        "Each entry in this table represents information about
         one 802.11 LWAPP Mobility Controller on this MO."
     INDEX           {
                         cLMobilityExtMOMCAddressType,
@@ -1270,7 +1388,9 @@ cLMobilityExtMOMCAddress OBJECT-TYPE
     MAX-ACCESS      not-accessible
     STATUS          current
     DESCRIPTION
-        "This object represents the MC's IP address." 
+        "This object represents the MC's IP address. The
+        type of this address is determined by the value of
+        cLMobilityExtMOMCAddressType." 
     ::= { cLMobilityExtMOMCEntry 2 }
 
 cLMobilityExtMOMCMacAddress OBJECT-TYPE
@@ -1278,7 +1398,7 @@ cLMobilityExtMOMCMacAddress OBJECT-TYPE
     MAX-ACCESS      read-only
     STATUS          current
     DESCRIPTION
-        "This object represents the MC's MAC IP address." 
+        "This object indicates the MC's MAC address." 
     ::= { cLMobilityExtMOMCEntry 3 }
 
 cLMobilityExtMOMCLinkStatus OBJECT-TYPE
@@ -1292,28 +1412,23 @@ cLMobilityExtMOMCLinkStatus OBJECT-TYPE
     MAX-ACCESS      read-only
     STATUS          current
     DESCRIPTION
-        "This object specifies the operational and connectivity
+        "This object indicates the operational and connectivity
         status of the MC.
 
-             notconfigured:
-                     This means MC is not configured 
-                     for ICMP or EoIP pings.
+        notconfigured(0) - This means MC is not configured
+                           for ICMP or EoIP pings.
 
-             datapathdown:
-                     This means MC is not responding 
-                     to EoIP pings.
+        datapathdown(1) - This means MC is not responding
+                          to EoIP pings.
 
-             controlpathdown:
-                     This means successive ICMP pings 
-                     to the MC have failed.
+        controlpathdown(2) - This means successive ICMP pings
+                             to the MC have failed.
 
-             bothdown:
-                     This means MC is not responding
-                     to ICMP or EOIP pings.
+        bothdown(3) - This means MC is not responding
+                      to ICMP or EOIP pings.
 
-             up:      
-                     This means MC is responding to 
-                     both EOIP and ICMP pings." 
+        up(4) - This means MC is responding to
+                both EOIP and ICMP pings." 
     ::= { cLMobilityExtMOMCEntry 4 }
 
 cLMobilityExtMOMCClientCount OBJECT-TYPE
@@ -1321,7 +1436,8 @@ cLMobilityExtMOMCClientCount OBJECT-TYPE
     MAX-ACCESS      read-only
     STATUS          current
     DESCRIPTION
-        "This object represents the MC's client count." 
+        "This object indicates the number of clients associated to the
+        MC." 
     ::= { cLMobilityExtMOMCEntry 5 }
  
 
@@ -1334,7 +1450,7 @@ cLMobilityExtMCClientTable OBJECT-TYPE
     MAX-ACCESS      not-accessible
     STATUS          current
     DESCRIPTION
-        "This table represents the information about the
+        "This table contains the information about the
         802.11 LWAPP Mobility Clients on this MC."
     ::= { ciscoLwappMobilityExtTableObjects 6 }
 
@@ -1343,29 +1459,29 @@ cLMobilityExtMCClientEntry OBJECT-TYPE
     MAX-ACCESS      not-accessible
     STATUS          current
     DESCRIPTION
-        "Each entry in this table provides information about
+        "Each entry in this table represents information about
         one 802.11 LWAPP Mobility Clients on this MC."
     INDEX           { cLMobilityExtMCClientMacAddress } 
     ::= { cLMobilityExtMCClientTable 1 }
 
 CLMobilityExtMCClientEntry ::= SEQUENCE {
-        cLMobilityExtMCClientMacAddress                   MacAddress,
-        cLMobilityExtMCClientAnchorMCPrivateAddressType   InetAddressType,
-        cLMobilityExtMCClientAnchorMCPrivateAddress       InetAddress,
-        cLMobilityExtMCClientAssociatedMCAddressType      InetAddressType,
-        cLMobilityExtMCClientAssociatedMCAddress          InetAddress,
-        cLMobilityExtMCClientAddressType                  InetAddressType,
-        cLMobilityExtMCClientAddress                      InetAddress,
-        cLMobilityExtMCClientState                        INTEGER,
-        cLMobilityExtMCClientAssociationTime              DateAndTime,
-        cLMobilityExtMCClientLocalClient                  TruthValue,
-        cLMobilityExtMCClientAnchorMCGroupId              Unsigned32,
-        cLMobilityExtMCClientAssociatedMCGroupId          Unsigned32,
-        cLMobilityExtMCClientAssociatedMAAddressType      InetAddressType,
-        cLMobilityExtMCClientAssociatedMAAddress          InetAddress,
-        cLMobilityExtMCClientAnchorMAAddressType          InetAddressType,
-        cLMobilityExtMCClientAnchorMAAddress              InetAddress,
-        cLMobilityExtMCClientUpTime                     CiscoAbsZeroBasedCounter64 
+        cLMobilityExtMCClientMacAddress                 MacAddress,
+        cLMobilityExtMCClientAnchorMCPrivateAddressType InetAddressType,
+        cLMobilityExtMCClientAnchorMCPrivateAddress     InetAddress,
+        cLMobilityExtMCClientAssociatedMCAddressType    InetAddressType,
+        cLMobilityExtMCClientAssociatedMCAddress        InetAddress,
+        cLMobilityExtMCClientAddressType                InetAddressType,
+        cLMobilityExtMCClientAddress                    InetAddress,
+        cLMobilityExtMCClientState                      INTEGER,
+        cLMobilityExtMCClientAssociationTime            DateAndTime,
+        cLMobilityExtMCClientLocalClient                TruthValue,
+        cLMobilityExtMCClientAnchorMCGroupId            Unsigned32,
+        cLMobilityExtMCClientAssociatedMCGroupId        Unsigned32,
+        cLMobilityExtMCClientAssociatedMAAddressType    InetAddressType,
+        cLMobilityExtMCClientAssociatedMAAddress        InetAddress,
+        cLMobilityExtMCClientAnchorMAAddressType        InetAddressType,
+        cLMobilityExtMCClientAnchorMAAddress            InetAddress,
+        cLMobilityExtMCClientUpTime                     CiscoAbsZeroBasedCounter64
 }
 
 cLMobilityExtMCClientMacAddress OBJECT-TYPE
@@ -1373,7 +1489,7 @@ cLMobilityExtMCClientMacAddress OBJECT-TYPE
     MAX-ACCESS      not-accessible
     STATUS          current
     DESCRIPTION
-        "This object represents the client MAC IP address." 
+        "This object represents the client's MAC address." 
     ::= { cLMobilityExtMCClientEntry 1 }
 
 cLMobilityExtMCClientAnchorMCPrivateAddressType OBJECT-TYPE
@@ -1381,7 +1497,7 @@ cLMobilityExtMCClientAnchorMCPrivateAddressType OBJECT-TYPE
     MAX-ACCESS      read-only
     STATUS          current
     DESCRIPTION
-        "This object represents the client's anchor MC private
+        "This object indicates the client's anchor MC private
         IP address type." 
     ::= { cLMobilityExtMCClientEntry 2 }
 
@@ -1390,8 +1506,9 @@ cLMobilityExtMCClientAnchorMCPrivateAddress OBJECT-TYPE
     MAX-ACCESS      read-only
     STATUS          current
     DESCRIPTION
-        "This object represents the client's anchor MC private
-        IP address." 
+        "This object indicates the client's anchor MC private
+        IP address. The type of this address is determined by
+        the value of cLMobilityExtMCClientAnchorMCPrivateAddressType." 
     ::= { cLMobilityExtMCClientEntry 3 }
 
 cLMobilityExtMCClientAssociatedMCAddressType OBJECT-TYPE
@@ -1399,8 +1516,8 @@ cLMobilityExtMCClientAssociatedMCAddressType OBJECT-TYPE
     MAX-ACCESS      read-only
     STATUS          current
     DESCRIPTION
-        "This object represents the client's associated MC
-        (local or foreign)  IP address type." 
+        "This object indicates the client's associated MC
+        (local or foreign) IP address type." 
     ::= { cLMobilityExtMCClientEntry 4 }
 
 cLMobilityExtMCClientAssociatedMCAddress OBJECT-TYPE
@@ -1408,8 +1525,10 @@ cLMobilityExtMCClientAssociatedMCAddress OBJECT-TYPE
     MAX-ACCESS      read-only
     STATUS          current
     DESCRIPTION
-        "This object represents the client's associated MC
-        (local or foreign)  IP address." 
+        "This object indicates the client's associated MC
+        (local or foreign) IP address. The type of this 
+        address is determined by the value of 
+        cLMobilityExtMCClientAssociatedMCAddressType." 
     ::= { cLMobilityExtMCClientEntry 5 }
 
 cLMobilityExtMCClientAddressType OBJECT-TYPE
@@ -1417,7 +1536,7 @@ cLMobilityExtMCClientAddressType OBJECT-TYPE
     MAX-ACCESS      read-only
     STATUS          current
     DESCRIPTION
-        "This object represents the client IP address type." 
+        "This object indicates the client IP address type." 
     ::= { cLMobilityExtMCClientEntry 6 }
 
 cLMobilityExtMCClientAddress OBJECT-TYPE
@@ -1425,7 +1544,9 @@ cLMobilityExtMCClientAddress OBJECT-TYPE
     MAX-ACCESS      read-only
     STATUS          current
     DESCRIPTION
-        "This object represents the client IP address." 
+        "This object indicates the client IP address. The type
+        of this address is determined by the value of
+        cLMobilityExtMCClientAddressType." 
     ::= { cLMobilityExtMCClientEntry 7 }
 
 cLMobilityExtMCClientState OBJECT-TYPE
@@ -1438,16 +1559,23 @@ cLMobilityExtMCClientState OBJECT-TYPE
     MAX-ACCESS      read-only
     STATUS          current
     DESCRIPTION
-        "This object represents the client state." 
+        "This object indicates the client state.
+        init(0) - Client is not associated. 
+        local(1) - Client is local to Mobility Controller.
+        foreign(2) - Client is foreign to Mobility Controller.
+        anchor(3) - Client is anchor to Mobility Controller." 
     ::= { cLMobilityExtMCClientEntry 8 }
 
 cLMobilityExtMCClientAssociationTime OBJECT-TYPE
     SYNTAX          DateAndTime
     MAX-ACCESS      read-only
-    STATUS          deprecated 
+    STATUS          deprecated
     DESCRIPTION
-        "This object represents the client's association time. 
-	 The object cLMobilityExtMCClientUpTime represents the MC client up time since its association." 
+        "This object indicates the client's association time.
+        The object cLMobilityExtMCClientUpTime represents the MC 
+        client up time since its association.
+        cLMobilityExtMCClientAssociationTime object is superseded by 
+        cLMobilityExtMCClientUpTime." 
     ::= { cLMobilityExtMCClientEntry 9 }
 
 cLMobilityExtMCClientLocalClient OBJECT-TYPE
@@ -1455,9 +1583,10 @@ cLMobilityExtMCClientLocalClient OBJECT-TYPE
     MAX-ACCESS      read-only
     STATUS          current
     DESCRIPTION
-        "This object specifies whether the client is local.
-        A value of true indicates the client is local. A value
-        of false indicates the client is not local to this MC." 
+        "This object indicates whether the client is local.
+        A value of 'true' indicates the client is local. 
+        A value of 'false' indicates the client is not local to this 
+        MC." 
     ::= { cLMobilityExtMCClientEntry 10 }
 
 cLMobilityExtMCClientAnchorMCGroupId OBJECT-TYPE
@@ -1465,7 +1594,7 @@ cLMobilityExtMCClientAnchorMCGroupId OBJECT-TYPE
     MAX-ACCESS      read-only
     STATUS          current
     DESCRIPTION
-        "This object represents the client's anchor MC mobility
+        "This object indicates the client's anchor MC mobility
         group ID." 
     ::= { cLMobilityExtMCClientEntry 11 }
 
@@ -1474,7 +1603,7 @@ cLMobilityExtMCClientAssociatedMCGroupId OBJECT-TYPE
     MAX-ACCESS      read-only
     STATUS          current
     DESCRIPTION
-        "This object represents the client's associated MC
+        "This object indicates the client's associated MC
         (local or foreign) mobility group ID." 
     ::= { cLMobilityExtMCClientEntry 12 }
 
@@ -1483,7 +1612,7 @@ cLMobilityExtMCClientAssociatedMAAddressType OBJECT-TYPE
     MAX-ACCESS      read-only
     STATUS          current
     DESCRIPTION
-        "This object represents the MA local or foreign IP
+        "This object indicates the MA local or foreign IP
         address type." 
     ::= { cLMobilityExtMCClientEntry 13 }
 
@@ -1492,7 +1621,9 @@ cLMobilityExtMCClientAssociatedMAAddress OBJECT-TYPE
     MAX-ACCESS      read-only
     STATUS          current
     DESCRIPTION
-        "This object represents the MA local or foreign IP address." 
+        "This object indicates the MA local or foreign IP address.
+        The type of this address is determined by the value of
+        cLMobilityExtMCClientAssociatedMAAddressType." 
     ::= { cLMobilityExtMCClientEntry 14 }
 
 cLMobilityExtMCClientAnchorMAAddressType OBJECT-TYPE
@@ -1500,7 +1631,7 @@ cLMobilityExtMCClientAnchorMAAddressType OBJECT-TYPE
     MAX-ACCESS      read-only
     STATUS          current
     DESCRIPTION
-        "This object represents the MA anchor's IP address type." 
+        "This object indicates the MA anchor's IP address type." 
     ::= { cLMobilityExtMCClientEntry 15 }
 
 cLMobilityExtMCClientAnchorMAAddress OBJECT-TYPE
@@ -1508,16 +1639,20 @@ cLMobilityExtMCClientAnchorMAAddress OBJECT-TYPE
     MAX-ACCESS      read-only
     STATUS          current
     DESCRIPTION
-        "This object represents the MA anchor's IP address." 
+        "This object indicates the MA anchor's IP address. The
+        type of this address is determined by the value of
+        cLMobilityExtMCClientAnchorMAAddressType." 
     ::= { cLMobilityExtMCClientEntry 16 }
- 
+
 cLMobilityExtMCClientUpTime OBJECT-TYPE
-    SYNTAX          CiscoAbsZeroBasedCounter64 
+    SYNTAX          CiscoAbsZeroBasedCounter64
     MAX-ACCESS      read-only
     STATUS          current
     DESCRIPTION
-        "The object cLMobilityExtMCClientUpTime represents the MC client up time since its association." 
+        "The object indicates the MC client up time since its
+        association." 
     ::= { cLMobilityExtMCClientEntry 17 }
+ 
 
 -- *******************************************************************
 -- Mobility Clients table reported by Mobility Oracle (MO)
@@ -1528,7 +1663,7 @@ cLMobilityExtMOClientTable OBJECT-TYPE
     MAX-ACCESS      not-accessible
     STATUS          current
     DESCRIPTION
-        "This table represents the information about the
+        "This table contains the information about the
         802.11 LWAPP Mobility Clients on this MO."
     ::= { ciscoLwappMobilityExtTableObjects 7 }
 
@@ -1537,8 +1672,8 @@ cLMobilityExtMOClientEntry OBJECT-TYPE
     MAX-ACCESS      not-accessible
     STATUS          current
     DESCRIPTION
-        "Each entry in this table provides information about
-        one 802.11 LWAPP Mobility Clients on this MO."
+        "Each entry in this table represents information about
+        one 802.11 LWAPP mobility Clients on this MO."
     INDEX           { cLMobilityExtMOClientMacAddress } 
     ::= { cLMobilityExtMOClientTable 1 }
 
@@ -1555,8 +1690,8 @@ CLMobilityExtMOClientEntry ::= SEQUENCE {
         cLMobilityExtMOClientAddressType                    InetAddressType,
         cLMobilityExtMOClientAddress                        InetAddress,
         cLMobilityExtMOClientLocalTime                      DateAndTime,
-        cLMobilityExtMOClientAssociationTime                DateAndTime,
-        cLMobilityExtMOClientUpTime				CiscoAbsZeroBasedCounter64 
+        cLMobilityExtMOClientAssociationTime                Counter64,
+        cLMobilityExtMOClientUpTime                         CiscoAbsZeroBasedCounter64
 }
 
 cLMobilityExtMOClientMacAddress OBJECT-TYPE
@@ -1572,7 +1707,7 @@ cLMobilityExtMOClientAnchorMCPublicAddressType OBJECT-TYPE
     MAX-ACCESS      read-only
     STATUS          current
     DESCRIPTION
-        "This object represents the client's anchor MC public
+        "This object indicates the client's anchor MC public
         IP address type." 
     ::= { cLMobilityExtMOClientEntry 2 }
 
@@ -1581,8 +1716,9 @@ cLMobilityExtMOClientAnchorMCPublicAddress OBJECT-TYPE
     MAX-ACCESS      read-only
     STATUS          current
     DESCRIPTION
-        "This object represents the client's anchor MC public
-        IP address." 
+        "This object indicates the client's anchor MC public
+        IP address. The type of this address is determined by the 
+        value of cLMobilityExtMOClientAnchorMCPublicAddressType." 
     ::= { cLMobilityExtMOClientEntry 3 }
 
 cLMobilityExtMOClientAnchorMCPrivateAddressType OBJECT-TYPE
@@ -1590,7 +1726,7 @@ cLMobilityExtMOClientAnchorMCPrivateAddressType OBJECT-TYPE
     MAX-ACCESS      read-only
     STATUS          current
     DESCRIPTION
-        "This object represents the client's anchor MC private
+        "This object indicates the client's anchor MC private
         IP address type." 
     ::= { cLMobilityExtMOClientEntry 4 }
 
@@ -1599,8 +1735,9 @@ cLMobilityExtMOClientAnchorMCPrivateAddress OBJECT-TYPE
     MAX-ACCESS      read-only
     STATUS          current
     DESCRIPTION
-        "This object represents the client's anchor MC private
-        IP address." 
+        "This object indicates the client's anchor MC private
+        IP address. The type of this address is determined by 
+        the value of cLMobilityExtMOClientAnchorMCPrivateAddressType." 
     ::= { cLMobilityExtMOClientEntry 5 }
 
 cLMobilityExtMOClientAssociatedMCPublicAddressType OBJECT-TYPE
@@ -1608,7 +1745,7 @@ cLMobilityExtMOClientAssociatedMCPublicAddressType OBJECT-TYPE
     MAX-ACCESS      read-only
     STATUS          current
     DESCRIPTION
-        "This object represents the client's associated MC
+        "This object indicates the client's associated MC
         (local or foreign) public IP address type." 
     ::= { cLMobilityExtMOClientEntry 6 }
 
@@ -1617,8 +1754,10 @@ cLMobilityExtMOClientAssociatedMCPublicAddress OBJECT-TYPE
     MAX-ACCESS      read-only
     STATUS          current
     DESCRIPTION
-        "This object represents the client's associated MC
-        (local or foreign) public IP address." 
+        "This object indicates the client's associated MC
+        (local or foreign) public IP address. The type of 
+        this address is determined by the value of
+        cLMobilityExtMOClientAssociatedMCPublicAddressType." 
     ::= { cLMobilityExtMOClientEntry 7 }
 
 cLMobilityExtMOClientAssociatedMCPrivateAddressType OBJECT-TYPE
@@ -1626,7 +1765,7 @@ cLMobilityExtMOClientAssociatedMCPrivateAddressType OBJECT-TYPE
     MAX-ACCESS      read-only
     STATUS          current
     DESCRIPTION
-        "This object represents the client's associated MC
+        "This object indicates the client's associated MC
         (local or foreign) private IP address type." 
     ::= { cLMobilityExtMOClientEntry 8 }
 
@@ -1635,8 +1774,10 @@ cLMobilityExtMOClientAssociatedMCPrivateAddress OBJECT-TYPE
     MAX-ACCESS      read-only
     STATUS          current
     DESCRIPTION
-        "This object represents the client's associated MC
-        (local or foreign) private IP address type." 
+        "This object indicates the client's associated MC
+        (local or foreign) private IP address. The
+        type of this address is determined by the value of
+        cLMobilityExtMOClientAssociatedMCPrivateAddressType." 
     ::= { cLMobilityExtMOClientEntry 9 }
 
 cLMobilityExtMOClientAddressType OBJECT-TYPE
@@ -1644,7 +1785,7 @@ cLMobilityExtMOClientAddressType OBJECT-TYPE
     MAX-ACCESS      read-only
     STATUS          current
     DESCRIPTION
-        "This object represents the client IP address type." 
+        "This object indicates the client IP address type." 
     ::= { cLMobilityExtMOClientEntry 10 }
 
 cLMobilityExtMOClientAddress OBJECT-TYPE
@@ -1652,7 +1793,9 @@ cLMobilityExtMOClientAddress OBJECT-TYPE
     MAX-ACCESS      read-only
     STATUS          current
     DESCRIPTION
-        "This object represents the client IP address." 
+        "This object indicates the client IP address. The
+        type of this address is determined by the value of
+        cLMobilityExtMOClientAddressType." 
     ::= { cLMobilityExtMOClientEntry 11 }
 
 cLMobilityExtMOClientLocalTime OBJECT-TYPE
@@ -1660,30 +1803,35 @@ cLMobilityExtMOClientLocalTime OBJECT-TYPE
     MAX-ACCESS      read-only
     STATUS          current
     DESCRIPTION
-        "This object represents the client's local time." 
+        "This object indicates the client's local time." 
     ::= { cLMobilityExtMOClientEntry 12 }
 
 cLMobilityExtMOClientAssociationTime OBJECT-TYPE
-    SYNTAX          DateAndTime
+    SYNTAX          Counter64
     UNITS           "seconds"
     MAX-ACCESS      read-only
-    STATUS          deprecated 
+    STATUS          deprecated
     DESCRIPTION
-        "This object represents the client's association time.The object cLMobilityExtMOClientUpTime 
-	 represents the up time of the MO client since its association" 
+        "This object represents the client's association time.
+        The object cLMobilityExtMOClientUpTime represents the 
+        up time of the MO client since its association
+        cLMobilityExtMOClientAssociationTime object is superseded
+        by cLMobilityExtMOClientUpTime." 
     ::= { cLMobilityExtMOClientEntry 13 }
 
 cLMobilityExtMOClientUpTime OBJECT-TYPE
-    SYNTAX          CiscoAbsZeroBasedCounter64 
+    SYNTAX          CiscoAbsZeroBasedCounter64
     MAX-ACCESS      read-only
     STATUS          current
     DESCRIPTION
-        "This object represents the client's up time since its association." 
-    ::= { cLMobilityExtMOClientEntry 14 } 
+        "This object indicates the client's up time since its
+        association." 
+    ::= { cLMobilityExtMOClientEntry 14 }
+ 
 
 -- *******************************************************************
--- Mobility AP Manager table (applicable to Moblity Controller
---                            with AP-manager interface )
+-- Mobility AP Manager table (applicable to Mobility Controller
+-- with AP-manager interface )
 -- *******************************************************************
 
 cLMobilityExtApMgrTable OBJECT-TYPE
@@ -1691,8 +1839,8 @@ cLMobilityExtApMgrTable OBJECT-TYPE
     MAX-ACCESS      not-accessible
     STATUS          current
     DESCRIPTION
-        "This table represents the information about the
-        802.11 LWAPP Mobility AP Manager."
+        "This table contains the information about the
+        802.11 LWAPP mobility AP Manager."
     ::= { ciscoLwappMobilityExtTableObjects 8 }
 
 cLMobilityExtApMgrEntry OBJECT-TYPE
@@ -1700,14 +1848,14 @@ cLMobilityExtApMgrEntry OBJECT-TYPE
     MAX-ACCESS      not-accessible
     STATUS          current
     DESCRIPTION
-        "Each entry in this table provides information about
-        one 802.11 LWAPP Mobility AP Manager configured 
+        "Each entry in this table represents information about
+        one 802.11 LWAPP mobility AP Manager configured 
         on this controller."
     INDEX           { cLMobilityExtApMgrName } 
     ::= { cLMobilityExtApMgrTable 1 }
 
 CLMobilityExtApMgrEntry ::= SEQUENCE {
-        cLMobilityExtApMgrName        	SnmpAdminString,
+        cLMobilityExtApMgrName          SnmpAdminString,
         cLMobilityExtApMgrAddressType   InetAddressType,
         cLMobilityExtApMgrAddress       InetAddress,
         cLMobilityExtApMgrNetmaskType   InetAddressType,
@@ -1731,7 +1879,7 @@ cLMobilityExtApMgrAddressType OBJECT-TYPE
     MAX-ACCESS      read-only
     STATUS          current
     DESCRIPTION
-        "This object represents the AP manager's IP address type." 
+        "This object indicates the AP manager's IP address type." 
     ::= { cLMobilityExtApMgrEntry 2 }
 
 cLMobilityExtApMgrAddress OBJECT-TYPE
@@ -1739,7 +1887,9 @@ cLMobilityExtApMgrAddress OBJECT-TYPE
     MAX-ACCESS      read-only
     STATUS          current
     DESCRIPTION
-        "This object represents the AP manager's IP address." 
+        "This object indicates the AP manager's IP address. The
+        type of this address is determined by the value of
+        cLMobilityExtApMgrAddressType." 
     ::= { cLMobilityExtApMgrEntry 3 }
 
 cLMobilityExtApMgrNetmaskType OBJECT-TYPE
@@ -1747,8 +1897,7 @@ cLMobilityExtApMgrNetmaskType OBJECT-TYPE
     MAX-ACCESS      read-only
     STATUS          current
     DESCRIPTION
-        "This object represents the AP manager's netmask
-        type." 
+        "This object indicates the AP manager's netmask type." 
     ::= { cLMobilityExtApMgrEntry 4 }
 
 cLMobilityExtApMgrNetmask OBJECT-TYPE
@@ -1756,7 +1905,9 @@ cLMobilityExtApMgrNetmask OBJECT-TYPE
     MAX-ACCESS      read-only
     STATUS          current
     DESCRIPTION
-        "This object represents the AP manager's netmask." 
+        "This object indicates the AP manager's netmask. The
+        type of this address is determined by the value of
+        cLMobilityExtApMgrNetmaskType." 
     ::= { cLMobilityExtApMgrEntry 5 }
 
 cLMobilityExtApMgrMacAddress OBJECT-TYPE
@@ -1764,7 +1915,7 @@ cLMobilityExtApMgrMacAddress OBJECT-TYPE
     MAX-ACCESS      read-only
     STATUS          current
     DESCRIPTION
-        "This object represents the mac address for this AP manager." 
+        "This object indicates the mac address for this AP manager." 
     ::= { cLMobilityExtApMgrEntry 6 }
 
 cLMobilityExtApMgrVlanId OBJECT-TYPE
@@ -1772,7 +1923,7 @@ cLMobilityExtApMgrVlanId OBJECT-TYPE
     MAX-ACCESS      read-only
     STATUS          current
     DESCRIPTION
-        "This object represents the VLAN ID for this AP manager." 
+        "This object indicates the VLAN Id for this AP manager." 
     ::= { cLMobilityExtApMgrEntry 7 }
 
 cLMobilityExtApMgrInterfaceType OBJECT-TYPE
@@ -1783,10 +1934,11 @@ cLMobilityExtApMgrInterfaceType OBJECT-TYPE
     MAX-ACCESS      read-only
     STATUS          current
     DESCRIPTION
-        "This object represents the AP manager interface type.
+        "This object indicates the AP manager interface type.
         It can be of two types:
-        management: for in-band management of the controller 
-        ap: for L3 communications between the controller and LWAPP APs"
+        management(1) - For in-band management of the controller.
+        ap(2) - For L3 communications between the controller and LWAPP 
+                APs." 
     ::= { cLMobilityExtApMgrEntry 8 }
 
 cLMobilityExtApMgrRowStatus OBJECT-TYPE
@@ -1794,7 +1946,9 @@ cLMobilityExtApMgrRowStatus OBJECT-TYPE
     MAX-ACCESS      read-create
     STATUS          current
     DESCRIPTION
-        "This object creates or deletes an entry in this table." 
+        "This is the status column for this row and used
+        to create and delete specific instances of rows             
+        in this table." 
     ::= { cLMobilityExtApMgrEntry 9 }
  
 
@@ -1802,36 +1956,37 @@ cLMobilityExtApMgrRowStatus OBJECT-TYPE
 -- Mobility Foreign WLC Map table (applicable to WLC)
 -- *******************************************************************
 
-cLMobilityExtForeignWlcMapTable  OBJECT-TYPE
-    SYNTAX     SEQUENCE OF CLMobilityExtForeignWlcMapEntry
-    MAX-ACCESS not-accessible
-    STATUS     current
+cLMobilityExtForeignWlcMapTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF CLMobilityExtForeignWlcMapEntry 
+    MAX-ACCESS      not-accessible
+    STATUS          current
     DESCRIPTION
-        "This table is used to create mappings of the foreign controller
-         with the interface/interface group to be used, when clients
-         directly connected to the foreign controller send the DHCP
-         request to the anchor controller."
+        "This table contains mappings of the foreign controller
+        with the interface/interface group to be used, when clients
+        directly connected to the foreign controller send the DHCP
+        request to the anchor controller."
     ::= { ciscoLwappMobilityExtTableObjects 9 }
 
 cLMobilityExtForeignWlcMapEntry OBJECT-TYPE
-    SYNTAX     CLMobilityExtForeignWlcMapEntry
-    MAX-ACCESS not-accessible
-    STATUS     current
+    SYNTAX          CLMobilityExtForeignWlcMapEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
     DESCRIPTION
-        "This represents a row in the 
+        "Each entry represents a row in the
         cLMobilityExtForeignWlcIfMappingTable. The entries are added 
         and deleted by explicit user driven action."
-    INDEX {cLWlanIndex, 
-           cLMobilityExtForeignWlcAddressType,
-           cLMobilityExtForeignWlcAddress }
-    ::= { cLMobilityExtForeignWlcMapTable  1 }
+    INDEX           {
+                        cLWlanIndex,
+                        cLMobilityExtForeignWlcAddressType,
+                        cLMobilityExtForeignWlcAddress
+                    } 
+    ::= { cLMobilityExtForeignWlcMapTable 1 }
 
-CLMobilityExtForeignWlcMapEntry ::=
-    SEQUENCE {
-        cLMobilityExtForeignWlcAddressType     InetAddressType,
-        cLMobilityExtForeignWlcAddress         InetAddress,
-        cLMobilityExtForeignWlcMapIf           SnmpAdminString,
-        cLMobilityExtForeignWlcMapRowStatus    RowStatus
+CLMobilityExtForeignWlcMapEntry ::= SEQUENCE {
+        cLMobilityExtForeignWlcAddressType  InetAddressType,
+        cLMobilityExtForeignWlcAddress      InetAddress,
+        cLMobilityExtForeignWlcMapIf        SnmpAdminString,
+        cLMobilityExtForeignWlcMapRowStatus RowStatus
 }
 
 cLMobilityExtForeignWlcAddressType OBJECT-TYPE
@@ -1839,7 +1994,7 @@ cLMobilityExtForeignWlcAddressType OBJECT-TYPE
     MAX-ACCESS      not-accessible
     STATUS          current
     DESCRIPTION
-        "This object represents the IP address type of 
+        "This object represents the IP address type of
         the foreign controller,to which the interface 
         mapping is to be configured." 
     ::= { cLMobilityExtForeignWlcMapEntry 1 }
@@ -1849,43 +2004,45 @@ cLMobilityExtForeignWlcAddress OBJECT-TYPE
     MAX-ACCESS      not-accessible
     STATUS          current
     DESCRIPTION
-        "This object represents the IP address of 
+        "This object represents the IP address of
         the foreign controller,to which the interface 
-        mapping is to be configured " 
+        mapping is to be configured. The type of this address
+        is determined by the value of
+        cLMobilityExtForeignWlcAddressType." 
     ::= { cLMobilityExtForeignWlcMapEntry 2 }
 
-cLMobilityExtForeignWlcMapIf   OBJECT-TYPE
+cLMobilityExtForeignWlcMapIf OBJECT-TYPE
     SYNTAX          SnmpAdminString
     MAX-ACCESS      read-create
     STATUS          current
     DESCRIPTION
-        "This object represents name of the 
+        "This object specifies name of the
         interface/interface group which would be 
         used for the communication with the clients 
-        connected to the foreign controller ."
+        connected to the foreign controller ." 
     ::= { cLMobilityExtForeignWlcMapEntry 3 }
 
-cLMobilityExtForeignWlcMapRowStatus   OBJECT-TYPE
+cLMobilityExtForeignWlcMapRowStatus OBJECT-TYPE
     SYNTAX          RowStatus
     MAX-ACCESS      read-create
     STATUS          current
     DESCRIPTION
         "This is the status column for this row and used
-        to create and delete specific instances of rows
-        in this table."
+        to create and delete specific instances of rows             
+        in this table." 
     ::= { cLMobilityExtForeignWlcMapEntry 4 }
-
+ 
 
 -- *******************************************************************
 -- Mobility group info table (applicable to Mobility Controller)
 -- *******************************************************************
 
 cLMobilityExtGroupTable OBJECT-TYPE
-    SYNTAX          SEQUENCE OF CLMobilityExtGroupEntry
+    SYNTAX          SEQUENCE OF CLMobilityExtGroupEntry 
     MAX-ACCESS      not-accessible
     STATUS          current
     DESCRIPTION
-        "This table represents the information about the
+        "This table contains the information about the
         mobility groups where clients from this MC can roam."
     ::= { ciscoLwappMobilityExtTableObjects 10 }
 
@@ -1894,17 +2051,16 @@ cLMobilityExtGroupEntry OBJECT-TYPE
     MAX-ACCESS      not-accessible
     STATUS          current
     DESCRIPTION
-        "Each entry in this table provides information about
+        "Each entry in this table represents information about
         one mobility group."
-    INDEX           {
-                        cLMobilityExtGroupName
-                    }
+    INDEX           { cLMobilityExtGroupName } 
     ::= { cLMobilityExtGroupTable 1 }
 
 CLMobilityExtGroupEntry ::= SEQUENCE {
-      cLMobilityExtGroupName                  SnmpAdminString,
-      cLMobilityExtGroupMulticastAddressType  InetAddressType,
-      cLMobilityExtGroupMulticastAddress      InetAddress
+        cLMobilityExtGroupName                 SnmpAdminString,
+        cLMobilityExtGroupMulticastAddressType InetAddressType,
+        cLMobilityExtGroupMulticastAddress     InetAddress,
+        cLMobilityExtGroupRowStatus            RowStatus
 }
 
 cLMobilityExtGroupName OBJECT-TYPE
@@ -1912,38 +2068,49 @@ cLMobilityExtGroupName OBJECT-TYPE
     MAX-ACCESS      not-accessible
     STATUS          current
     DESCRIPTION
-        "This object represents the name for the mobility group."
+        "This object represents the name for the mobility group." 
     ::= { cLMobilityExtGroupEntry 1 }
 
 cLMobilityExtGroupMulticastAddressType OBJECT-TYPE
     SYNTAX          InetAddressType
-    MAX-ACCESS      read-write
+    MAX-ACCESS      read-create
     STATUS          current
     DESCRIPTION
-        "This object represents the multicast IP address type
-        for the mobility group."
+        "This object specifies the multicast IP address type
+        for the mobility group." 
     ::= { cLMobilityExtGroupEntry 2 }
 
 cLMobilityExtGroupMulticastAddress OBJECT-TYPE
     SYNTAX          InetAddress
-    MAX-ACCESS      read-write
+    MAX-ACCESS      read-create
     STATUS          current
     DESCRIPTION
-        "This object represents the multicast IP address for the 
-        mobility group."
+        "This object specifies the multicast IP address for the
+        mobility group. The type of this address is determined
+        by the value of cLMobilityExtGroupMulticastAddressType." 
     ::= { cLMobilityExtGroupEntry 3 }
 
+cLMobilityExtGroupRowStatus OBJECT-TYPE
+    SYNTAX          RowStatus
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "This is the status column for this row and used
+        to create and delete specific instances of rows             
+        in this table." 
+    ::= { cLMobilityExtGroupEntry 4 }
+ 
 
 -- *******************************************************************
 -- Mobility Agent (MA) peer member table
 -- *******************************************************************
 
 cLMobilityExtMAPeerTable OBJECT-TYPE
-    SYNTAX          SEQUENCE OF CLMobilityExtMAPeerEntry
+    SYNTAX          SEQUENCE OF CLMobilityExtMAPeerEntry 
     MAX-ACCESS      not-accessible
     STATUS          current
     DESCRIPTION
-        "This table represents the information about the
+        "This table contains the information about the
         802.11 LWAPP SPG peer members of this MA."
     ::= { ciscoLwappMobilityExtTableObjects 11 }
 
@@ -1952,12 +2119,12 @@ cLMobilityExtMAPeerEntry OBJECT-TYPE
     MAX-ACCESS      not-accessible
     STATUS          current
     DESCRIPTION
-        "Each entry in this table provides information about
-        one 802.11 LWAPP Mobility SPG peer member of this MA."
+        "Each entry in this table represents information about
+        one 802.11 LWAPP mobility SPG peer member of this MA."
     INDEX           {
                         cLMobilityExtMAPeerPrivateAddressType,
                         cLMobilityExtMAPeerPrivateAddress
-                    }
+                    } 
     ::= { cLMobilityExtMAPeerTable 1 }
 
 CLMobilityExtMAPeerEntry ::= SEQUENCE {
@@ -1973,7 +2140,7 @@ cLMobilityExtMAPeerPrivateAddressType OBJECT-TYPE
     MAX-ACCESS      not-accessible
     STATUS          current
     DESCRIPTION
-        "This object represents this MA peer's private IP address type."
+        "This object represents this MA peer's private IP address type." 
     ::= { cLMobilityExtMAPeerEntry 1 }
 
 cLMobilityExtMAPeerPrivateAddress OBJECT-TYPE
@@ -1981,7 +2148,9 @@ cLMobilityExtMAPeerPrivateAddress OBJECT-TYPE
     MAX-ACCESS      not-accessible
     STATUS          current
     DESCRIPTION
-        "This object represents this MA peer's private IP address."
+        "This object represents this MA peer's private IP address. The
+        type of this address is determined by the value of
+        cLMobilityExtMAPeerPrivateAddressType." 
     ::= { cLMobilityExtMAPeerEntry 2 }
 
 cLMobilityExtMAPeerPublicAddressType OBJECT-TYPE
@@ -1989,7 +2158,7 @@ cLMobilityExtMAPeerPublicAddressType OBJECT-TYPE
     MAX-ACCESS      read-only
     STATUS          current
     DESCRIPTION
-        "This object represents this MA peer's public IP address type."
+        "This object indicates this MA peer's public IP address type." 
     ::= { cLMobilityExtMAPeerEntry 3 }
 
 cLMobilityExtMAPeerPublicAddress OBJECT-TYPE
@@ -1997,7 +2166,9 @@ cLMobilityExtMAPeerPublicAddress OBJECT-TYPE
     MAX-ACCESS      read-only
     STATUS          current
     DESCRIPTION
-        "This object represents this MA peer's public address."
+        "This object indicates this MA peer's public address. The
+        type of this address is determined by the value of
+        cLMobilityExtMAPeerPublicAddressType." 
     ::= { cLMobilityExtMAPeerEntry 4 }
 
 cLMobilityExtMAPeerLinkStatus OBJECT-TYPE
@@ -2011,41 +2182,36 @@ cLMobilityExtMAPeerLinkStatus OBJECT-TYPE
     MAX-ACCESS      read-only
     STATUS          current
     DESCRIPTION
-        "This object specifies the control path and data path status
+        "This object indicates the control path and data path status
         of the link between this MA and its peer MA in the same SPG.
 
-             notconfigured:
-                     This means group is not configured
-                     for ICMP or EoIP pings.
+        notconfigured(0) - This means group member is not configured
+                           for ICMP or EoIP pings.
 
-             datapathdown:
-                     This means group is not responding
-                     to EoIP pings.
+        datapathdown(1) - This means group member is not responding
+                          to EoIP pings.
 
-             controlpathdown:
-                     This means successive ICMP pings
-                     to the group have failed.
+        controlpathdown(2) - This means successive ICMP pings
+                             to the group member have failed.
 
-             bothdown:
-                     This means group is not responding
-                     to ICMP or EOIP pings.
+        bothdown(3) - This means group member is not responding
+                      to ICMP or EOIP pings.
 
-             up:
-                     This means group is responding to
-                     both EOIP and ICMP pings."
+        up(4) - This means group member is responding to
+                both EOIP and ICMP pings." 
     ::= { cLMobilityExtMAPeerEntry 5 }
-
+ 
 
 -- *******************************************************************
 -- Mobility Agent (MA) statistics reported by Mobility Controller
 -- *******************************************************************
 
 cLMobilityExtMCMAStatisticsTable OBJECT-TYPE
-    SYNTAX          SEQUENCE OF CLMobilityExtMCMAStatisticsEntry
+    SYNTAX          SEQUENCE OF CLMobilityExtMCMAStatisticsEntry 
     MAX-ACCESS      not-accessible
     STATUS          current
     DESCRIPTION
-        "This table represents the information about the
+        "This table contains the information about the
         MA statistics as reported by this MC."
     ::= { ciscoLwappMobilityExtTableObjects 12 }
 
@@ -2054,12 +2220,12 @@ cLMobilityExtMCMAStatisticsEntry OBJECT-TYPE
     MAX-ACCESS      not-accessible
     STATUS          current
     DESCRIPTION
-        "Each entry in this table provides information about
+        "Each entry in this table represents information about
         statistics of one MA that is associated with this MC."
     INDEX           {
                         cLMobilityExtMCMAPrivateAddressType,
                         cLMobilityExtMCMAPrivateAddress
-                    }
+                    } 
     ::= { cLMobilityExtMCMAStatisticsTable 1 }
 
 CLMobilityExtMCMAStatisticsEntry ::= SEQUENCE {
@@ -2073,7 +2239,7 @@ cLMobilityExtMCMAPrivateAddressType OBJECT-TYPE
     MAX-ACCESS      not-accessible
     STATUS          current
     DESCRIPTION
-        "This object represents the MA's private IP address type."
+        "This object represents the MA's private IP address type." 
     ::= { cLMobilityExtMCMAStatisticsEntry 1 }
 
 cLMobilityExtMCMAPrivateAddress OBJECT-TYPE
@@ -2081,7 +2247,9 @@ cLMobilityExtMCMAPrivateAddress OBJECT-TYPE
     MAX-ACCESS      not-accessible
     STATUS          current
     DESCRIPTION
-        "This object represents the MA's private IP address."
+        "This object represents the MA's private IP address. The
+        type of this address is determined by the value of
+        cLMobilityExtMCMAPrivateAddressType." 
     ::= { cLMobilityExtMCMAStatisticsEntry 2 }
 
 cLMobilityExtMCMAClientCount OBJECT-TYPE
@@ -2089,9 +2257,152 @@ cLMobilityExtMCMAClientCount OBJECT-TYPE
     MAX-ACCESS      read-only
     STATUS          current
     DESCRIPTION
-        "This object represents the MA's client count." 
+        "This object indicates the MA's client count." 
     ::= { cLMobilityExtMCMAStatisticsEntry 3 }
  
+
+-- *******************************************************************
+-- Associated APs reported to Mobility Controller
+-- *******************************************************************
+
+cLMobilityExtMCAPTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF CLMobilityExtMCAPEntry 
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This table contains the information about the
+        APs that are reported by this MC, its peer MCs and its MAs."
+    ::= { ciscoLwappMobilityExtTableObjects 13 }
+
+cLMobilityExtMCAPEntry OBJECT-TYPE
+    SYNTAX          CLMobilityExtMCAPEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "Each entry in this table represents information about AP that
+        is reported by this MC or its peer MC or its MA."
+    INDEX           { cLMobilityExtMCAPMacAddress } 
+    ::= { cLMobilityExtMCAPTable 1 }
+
+CLMobilityExtMCAPEntry ::= SEQUENCE {
+        cLMobilityExtMCAPMacAddress                 MacAddress,
+        cLMobilityExtMCAPName                       SnmpAdminString,
+        cLMobilityExtMCAPReportingDeviceAddressType InetAddressType,
+        cLMobilityExtMCAPReportingDeviceAddress     InetAddress,
+        cLMobilityExtMCAPReportingDeviceType        INTEGER
+}
+
+cLMobilityExtMCAPMacAddress OBJECT-TYPE
+    SYNTAX          MacAddress
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This object represents the reported AP's mac address." 
+    ::= { cLMobilityExtMCAPEntry 1 }
+
+cLMobilityExtMCAPName OBJECT-TYPE
+    SYNTAX          SnmpAdminString (SIZE  (1..32))
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the reported AP's name." 
+    ::= { cLMobilityExtMCAPEntry 2 }
+
+cLMobilityExtMCAPReportingDeviceAddressType OBJECT-TYPE
+    SYNTAX          InetAddressType
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object insdicates the reporting device's IP address type." 
+    ::= { cLMobilityExtMCAPEntry 3 }
+
+cLMobilityExtMCAPReportingDeviceAddress OBJECT-TYPE
+    SYNTAX          InetAddress
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the reporting device's IP address. The
+        type of this address is determined by the value of 
+        cLMobilityExtMCAPReportingDeviceAddressType." 
+    ::= { cLMobilityExtMCAPEntry 4 }
+
+cLMobilityExtMCAPReportingDeviceType OBJECT-TYPE
+    SYNTAX          INTEGER  {
+                        peerMC(0),
+                        associatedMA(1),
+                        localMC(2)
+                    }
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the reporting device's type:
+        this MC, or its peer MC or its MA.
+        peerMC(0) - The reporting device is peer Mobility Controller. 
+        associatedMA(1) - The reporting device is Mobility Agent.
+        localMC(2) - The reporting device is local Mobility Controller." 
+    ::= { cLMobilityExtMCAPEntry 5 }
+ 
+
+-- *******************************************************************
+-- Associated APs count reported to Mobility Controller
+-- *******************************************************************
+
+cLMobilityExtMCAPCountTable OBJECT-TYPE
+    SYNTAX          SEQUENCE OF CLMobilityExtMCAPCountEntry 
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This table contains the information about the total number
+        of APs that are reported by this MC, its peer MCs and its MAs."
+    ::= { ciscoLwappMobilityExtTableObjects 14 }
+
+cLMobilityExtMCAPCountEntry OBJECT-TYPE
+    SYNTAX          CLMobilityExtMCAPCountEntry
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "Each entry in this table represents information on total number
+        of APs that is reported by this MC or its peer MC or its MA."
+    INDEX           {
+                        cLMobilityExtMCAPCountReportingDeviceAddressType,
+                        cLMobilityExtMCAPCountReportingDeviceAddress
+                    } 
+    ::= { cLMobilityExtMCAPCountTable 1 }
+
+CLMobilityExtMCAPCountEntry ::= SEQUENCE {
+        cLMobilityExtMCAPCountReportingDeviceAddressType InetAddressType,
+        cLMobilityExtMCAPCountReportingDeviceAddress     InetAddress,
+        cLMobilityExtMCAPCount                           Unsigned32
+}
+
+cLMobilityExtMCAPCountReportingDeviceAddressType OBJECT-TYPE
+    SYNTAX          InetAddressType
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This object represents the reporting device's IP address type." 
+    ::= { cLMobilityExtMCAPCountEntry 1 }
+
+cLMobilityExtMCAPCountReportingDeviceAddress OBJECT-TYPE
+    SYNTAX          InetAddress
+    MAX-ACCESS      not-accessible
+    STATUS          current
+    DESCRIPTION
+        "This object represents the reporting device's IP address. The
+        type of this address is determined by the value of
+        cLMobilityExtMCAPCountReportingDeviceAddressType." 
+    ::= { cLMobilityExtMCAPCountEntry 2 }
+
+cLMobilityExtMCAPCount OBJECT-TYPE
+    SYNTAX          Unsigned32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the total number of APs reported by
+        this device: this MC, or its peer MC or its MA." 
+    ::= { cLMobilityExtMCAPCountEntry 3 }
+ 
+
 
 -- *******************************************************************
 -- Mobility Agent (MA) global parameters
@@ -2102,8 +2413,8 @@ cLMobilityExtMAMCPublicAddressType OBJECT-TYPE
     MAX-ACCESS      read-write
     STATUS          current
     DESCRIPTION
-        "This object represents the MC's public IP address type
-        for this MA."
+        "This object specifies the MC's public IP address type
+        for this MA." 
     ::= { ciscoLwappMobilityExtMAGlobalObjects 1 }
 
 cLMobilityExtMAMCPublicAddress OBJECT-TYPE
@@ -2111,8 +2422,9 @@ cLMobilityExtMAMCPublicAddress OBJECT-TYPE
     MAX-ACCESS      read-write
     STATUS          current
     DESCRIPTION
-        "This object represents the MC's public IP address
-        for this MA."
+        "This object specifies the MC's public IP address
+        for this MA. The type of this address is determined by 
+        the value of cLMobilityExtMAMCPublicAddressType." 
     ::= { ciscoLwappMobilityExtMAGlobalObjects 2 }
 
 cLMobilityExtMAMCPrivateAddressType OBJECT-TYPE
@@ -2120,8 +2432,8 @@ cLMobilityExtMAMCPrivateAddressType OBJECT-TYPE
     MAX-ACCESS      read-write
     STATUS          current
     DESCRIPTION
-        "This object represents the MC's private IP address type
-        for this MA."
+        "This object specifies the MC's private IP address type
+        for this MA." 
     ::= { ciscoLwappMobilityExtMAGlobalObjects 3 }
 
 cLMobilityExtMAMCPrivateAddress OBJECT-TYPE
@@ -2129,8 +2441,9 @@ cLMobilityExtMAMCPrivateAddress OBJECT-TYPE
     MAX-ACCESS      read-write
     STATUS          current
     DESCRIPTION
-        "This object represents the MC's private IP address
-        for this MA."
+        "This object specifies the MC's private IP address for
+        this MA. The type of this address is determined by the 
+        value of cLMobilityExtMAMCPrivateAddressType." 
     ::= { ciscoLwappMobilityExtMAGlobalObjects 4 }
 
 cLMobilityExtMAToMCLinkStatus OBJECT-TYPE
@@ -2144,29 +2457,24 @@ cLMobilityExtMAToMCLinkStatus OBJECT-TYPE
     MAX-ACCESS      read-only
     STATUS          current
     DESCRIPTION
-        "This object specifies the control path and data path status
-        of the link between this mobility agent and its  mobility 
+        "This object indicates the control path and data path status
+        of the link between this Mobility Agent(MA) and its  mobility 
         controller.
+        notconfigured(0) - This indicates that link between MA and MC 
+                           is not configured for ICMP or EoIP pings.
 
-             notconfigured:
-                     This means group is not configured
-                     for ICMP or EoIP pings.
+        datapathdown(1) - This indicates that link between MA and MC is 
+                          not responding to EoIP pings.
 
-             datapathdown:
-                     This means group is not responding
-                     to EoIP pings.
+        controlpathdown(2) - This indicates that link between MA and MC 
+                             successive ICMP pings to the group have 
+                             failed.
 
-             controlpathdown:
-                     This means successive ICMP pings
-                     to the group have failed.
+        bothdown(3) - This indicates that link between MA and MC is not 
+                      responding to ICMP or EOIP pings.
 
-             bothdown:
-                     This means group is not responding
-                     to ICMP or EOIP pings.
-
-             up:
-                     This means group is responding to
-                     both EOIP and ICMP pings."
+        up(4) - This indicates that link between MA and MC is 
+                responding to both EOIP and ICMP pings." 
     ::= { ciscoLwappMobilityExtMAGlobalObjects 5 }
 
 cLMobilityExtMASpgPeerCount OBJECT-TYPE
@@ -2174,8 +2482,8 @@ cLMobilityExtMASpgPeerCount OBJECT-TYPE
     MAX-ACCESS      read-only
     STATUS          current
     DESCRIPTION
-        "This object represents the number of peer members of this
-        mobility agent (MA)."
+        "This object indicates the number of peer members of this
+        mobility agent (MA)." 
     ::= { ciscoLwappMobilityExtMAGlobalObjects 6 }
 
 cLMobilityExtMASpgName OBJECT-TYPE
@@ -2183,8 +2491,8 @@ cLMobilityExtMASpgName OBJECT-TYPE
     MAX-ACCESS      read-only
     STATUS          current
     DESCRIPTION
-        "This object represents the Switch Peer Group (SPG) name where
-        this MA belongs."
+        "This object indicates the Switch Peer Group (SPG) name where
+        this MA belongs." 
     ::= { ciscoLwappMobilityExtMAGlobalObjects 7 }
 
 cLMobilityExtMAOwnMulticastAddressType OBJECT-TYPE
@@ -2192,8 +2500,12 @@ cLMobilityExtMAOwnMulticastAddressType OBJECT-TYPE
     MAX-ACCESS      read-only
     STATUS          current
     DESCRIPTION
-        "This object represents the multicast address type for the
-        own SPG group."
+        "This object indicates the multicast address type for
+        the own SPG group. SPG represents the switch peer group which
+        indicates the proximity group inside which the WiFi
+        client has most likelihood of roaming. Each device belongs
+        to a SPG which is identified by a SPG name and optionally
+        it could have a multicast ip address as well." 
     ::= { ciscoLwappMobilityExtMAGlobalObjects 8 }
 
 cLMobilityExtMAOwnMulticastAddress OBJECT-TYPE
@@ -2201,8 +2513,9 @@ cLMobilityExtMAOwnMulticastAddress OBJECT-TYPE
     MAX-ACCESS      read-only
     STATUS          current
     DESCRIPTION
-        "This object represents the multicast address for the own 
-        SPG group."
+        "This object indicates the multicast address for the own
+        SPG group. The type of this address is determined by the
+        value of cLMobilityExtMAOwnMulticastAddressType." 
     ::= { ciscoLwappMobilityExtMAGlobalObjects 9 }
 
 cLMobilityExtMAKeepAliveCount OBJECT-TYPE
@@ -2210,36 +2523,36 @@ cLMobilityExtMAKeepAliveCount OBJECT-TYPE
     MAX-ACCESS      read-only
     STATUS          current
     DESCRIPTION
-        "This object represents the keep alive count.
+        "This object indicates the keep alive count.
         If keep alive response is not received consecutively
         for N (keep alive count) times, the mobility link is
         declared as down."
-    DEFVAL          { 3 }
+    DEFVAL          { 3 } 
     ::= { ciscoLwappMobilityExtMAGlobalObjects 10 }
 
 cLMobilityExtMAKeepAliveInterval OBJECT-TYPE
     SYNTAX          Unsigned32 (1..30)
+    UNITS           "seconds"
     MAX-ACCESS      read-only
     STATUS          current
     DESCRIPTION
-        "Each MA sends periodically keep alive packet to other
-        mobility devices (MA or MC). This object represents the keep
-        alive interval."
-    DEFVAL          { 10 }
+        "This object indicates the keep alive interval.
+        Each MA sends periodically keep alive packet to other
+        mobility devices (MA or MC)."
+    DEFVAL          { 10 } 
     ::= { ciscoLwappMobilityExtMAGlobalObjects 11 }
 
 cLMobilityExtMADscpValue OBJECT-TYPE
-    SYNTAX          Unsigned32 (0..63)
+    SYNTAX          Dscp
     MAX-ACCESS      read-only
     STATUS          current
     DESCRIPTION
-        "This object represents the Differentiated Services Code Point
+        "This object indicates the Differentiated Services Code Point
         (DSCP) value. Here it is used for classifying and managing 
         mobility control packets and providing quality of service (QoS)
         on IP networks."
-    DEFVAL          { 0 }
+    DEFVAL          { 0 } 
     ::= { ciscoLwappMobilityExtMAGlobalObjects 12 }
-
 
 -- *******************************************************************
 -- Mobility Controller (MC) statistics
@@ -2250,7 +2563,9 @@ cLMobilityExtMCReceivedTotal OBJECT-TYPE
     MAX-ACCESS      read-only
     STATUS          current
     DESCRIPTION
-        "This object represents the received total."
+        "This object indicates the total number
+        of mobility control messages received by 
+        the Mobility Controller." 
     ::= { ciscoLwappMobilityExtMCStats 1 }
 
 cLMobilityExtMCReceivedDrops OBJECT-TYPE
@@ -2258,7 +2573,9 @@ cLMobilityExtMCReceivedDrops OBJECT-TYPE
     MAX-ACCESS      read-only
     STATUS          current
     DESCRIPTION
-        "This object represents the received drops."
+        "This object indicates the total number
+        of mobility control messages dropped by 
+        Mobility Controller." 
     ::= { ciscoLwappMobilityExtMCStats 2 }
 
 cLMobilityExtMCProtocolReceiveErrors OBJECT-TYPE
@@ -2266,7 +2583,12 @@ cLMobilityExtMCProtocolReceiveErrors OBJECT-TYPE
     MAX-ACCESS      read-only
     STATUS          current
     DESCRIPTION
-        "This object represents the protocol received errors."
+        "This object indicates the total number of mobility control
+        error messages received by the Mobility Controller.The 
+        counter represents the received packet errors as seen by the
+        controller deviating from the proprietary mobility protocol
+        which is instrumental in achieving the seamless WiFi client
+        roaming." 
     ::= { ciscoLwappMobilityExtMCStats 3 }
 
 cLMobilityExtMCProtocolTransmitErrors OBJECT-TYPE
@@ -2274,7 +2596,12 @@ cLMobilityExtMCProtocolTransmitErrors OBJECT-TYPE
     MAX-ACCESS      read-only
     STATUS          current
     DESCRIPTION
-        "This object represents the protocol transmitted errors."
+        "This object indicates the total number of
+        mobility control error messages on transmit 
+        side of Mobility Controller.The counter represents the
+        transmit packet errors as seen by the controller deviating 
+        from the proprietary mobility protocol,which is instrumental
+        in achieving the seamless WiFi client roaming." 
     ::= { ciscoLwappMobilityExtMCStats 4 }
 
 cLMobilityExtMCStateErrors OBJECT-TYPE
@@ -2282,7 +2609,8 @@ cLMobilityExtMCStateErrors OBJECT-TYPE
     MAX-ACCESS      read-only
     STATUS          current
     DESCRIPTION
-        "This object represents the state errors."
+        "This object indicates the state transition
+        errors on Mobility Controller." 
     ::= { ciscoLwappMobilityExtMCStats 5 }
 
 cLMobilityExtMCProtocolRetransmitted OBJECT-TYPE
@@ -2290,7 +2618,8 @@ cLMobilityExtMCProtocolRetransmitted OBJECT-TYPE
     MAX-ACCESS      read-only
     STATUS          current
     DESCRIPTION
-        "This object represents the protocol retransmitted."
+        "This object indicates the total number of control
+        messages retransmitted by Mobility Controller." 
     ::= { ciscoLwappMobilityExtMCStats 6 }
 
 cLMobilityExtMCHandoffRequestsReceived OBJECT-TYPE
@@ -2298,15 +2627,17 @@ cLMobilityExtMCHandoffRequestsReceived OBJECT-TYPE
     MAX-ACCESS      read-only
     STATUS          current
     DESCRIPTION
-        "This object represents the handoff requests received."
+        "This object indicates the handoff requests
+        received by Mobility Controller." 
     ::= { ciscoLwappMobilityExtMCStats 7 }
 
-cLMobilityExtMCHandoffCmplReceived OBJECT-TYPE
+cLMobilityExtMCHandoffCompleteReceived OBJECT-TYPE
     SYNTAX          Counter32
     MAX-ACCESS      read-only
     STATUS          current
     DESCRIPTION
-        "This object represents the handoff cmpl received."
+        "This object indicates the handoff completion
+        received  by Mobility Controller." 
     ::= { ciscoLwappMobilityExtMCStats 8 }
 
 cLMobilityExtMCHandoffClientDeleteReceived OBJECT-TYPE
@@ -2314,7 +2645,8 @@ cLMobilityExtMCHandoffClientDeleteReceived OBJECT-TYPE
     MAX-ACCESS      read-only
     STATUS          current
     DESCRIPTION
-        "This object represents the handoff client delete received."
+        "This object indicates the total number of client
+        deletes received by Mobility Controller." 
     ::= { ciscoLwappMobilityExtMCStats 9 }
 
 cLMobilityExtMCHandoffRequestsTransmitted OBJECT-TYPE
@@ -2322,15 +2654,17 @@ cLMobilityExtMCHandoffRequestsTransmitted OBJECT-TYPE
     MAX-ACCESS      read-only
     STATUS          current
     DESCRIPTION
-        "This object represents the handoff requests transmitted."
+        "This object indicates the handoff requests
+        transmitted by Mobility Controller." 
     ::= { ciscoLwappMobilityExtMCStats 10 }
 
-cLMobilityExtMCHandoffCmplTransmitted OBJECT-TYPE
+cLMobilityExtMCHandoffCompleteTransmitted OBJECT-TYPE
     SYNTAX          Counter32
     MAX-ACCESS      read-only
     STATUS          current
     DESCRIPTION
-        "This object represents the handoff cmpl transmitted."
+        "This object indicates the handoff completion
+        transmitted by Mobility Controller." 
     ::= { ciscoLwappMobilityExtMCStats 11 }
 
 cLMobilityExtMCHandoffClientDeleteTransmitted OBJECT-TYPE
@@ -2338,7 +2672,8 @@ cLMobilityExtMCHandoffClientDeleteTransmitted OBJECT-TYPE
     MAX-ACCESS      read-only
     STATUS          current
     DESCRIPTION
-        "This object represents the handoff client delete transmitted."
+        "This object indicates the nubmer of client deletes
+        transmitted by Mobility Controller." 
     ::= { ciscoLwappMobilityExtMCStats 12 }
 
 cLMobilityExtMCTotalClientCount OBJECT-TYPE
@@ -2346,7 +2681,8 @@ cLMobilityExtMCTotalClientCount OBJECT-TYPE
     MAX-ACCESS      read-only
     STATUS          current
     DESCRIPTION
-        "This object represents the total client count."
+        "This object indicates the total client count
+        on Mobility Controller." 
     ::= { ciscoLwappMobilityExtMCStats 13 }
 
 cLMobilityExtMCWgbCount OBJECT-TYPE
@@ -2354,9 +2690,9 @@ cLMobilityExtMCWgbCount OBJECT-TYPE
     MAX-ACCESS      read-only
     STATUS          current
     DESCRIPTION
-        "This object represents the wgb count."
+        "This object indicates the WGB(Work Group Bridge)
+        count on Mobility Controller." 
     ::= { ciscoLwappMobilityExtMCStats 14 }
-
 
 -- *************************************************************
 -- extra trap variables definining here
@@ -2375,7 +2711,9 @@ cLMobilityExtNotifyObjectSourceIPAddress OBJECT-TYPE
     MAX-ACCESS      accessible-for-notify
     STATUS          current
     DESCRIPTION
-        "This object represents the sourc address" 
+        "This object represents the sourc address. The type
+        of this address is determined by the value of
+        cLMobilityExtNotifyObjectSourceIPAddressType." 
     ::= { ciscoLwappMobilityExtNotifObjects 2 }
 
 cLMobilityExtNotifyObjectSourceType OBJECT-TYPE
@@ -2388,7 +2726,14 @@ cLMobilityExtNotifyObjectSourceType OBJECT-TYPE
     MAX-ACCESS      accessible-for-notify
     STATUS          current
     DESCRIPTION
-        "Mobility source type"
+        "This object represents mobility source type.
+        unknown(0) - The source of the messages is unknown. 
+        mobilityAgent(1) - The source of the messages is Mobility 
+                           Agent.
+        mobilityController(2) - The source of the messages is Mobility
+                                Controller.
+        mobilityOracle(3) - The source of the messages is Mobility 
+                            Oracle." 
     ::= { ciscoLwappMobilityExtNotifObjects 3 }
 
 cLMobilityExtNotifyObjectDestinationType OBJECT-TYPE
@@ -2401,67 +2746,247 @@ cLMobilityExtNotifyObjectDestinationType OBJECT-TYPE
     MAX-ACCESS      accessible-for-notify
     STATUS          current
     DESCRIPTION
-        "Mobility destination type"
+        "This object represents the mobility destination type.
+        unknown(0) - The destination of the messages is unknown. 
+        mobilityAgent(1) - The destination of the messages is Mobility 
+                           Agent.
+        mobilityController(2) - The destination of the messages is 
+                                Mobility Controller.
+        mobilityOracle(3) - The destination of the messages is Mobility 
+                            Oracle." 
     ::= { ciscoLwappMobilityExtNotifObjects 4 }
 
+-- *******************************************************************
+-- Mobility Agent (MA) statistics
+-- *******************************************************************
+
+cLMobilityExtMAReceivedTotal OBJECT-TYPE
+    SYNTAX          Counter32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the total number
+        of mobility control messages received by 
+        the Mobility Agent." 
+    ::= { ciscoLwappMobilityExtMAStats 1 }
+
+cLMobilityExtMAReceivedDrops OBJECT-TYPE
+    SYNTAX          Counter32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the total number
+        of mobility control messages dropped by 
+        Mobility Agent." 
+    ::= { ciscoLwappMobilityExtMAStats 2 }
+
+cLMobilityExtMAProtocolReceiveErrors OBJECT-TYPE
+    SYNTAX          Counter32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the total number
+        of mobility control error messages received 
+        by the Mobility Agent." 
+    ::= { ciscoLwappMobilityExtMAStats 3 }
+
+cLMobilityExtMAProtocolTransmitErrors OBJECT-TYPE
+    SYNTAX          Counter32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the total number
+        of mobility control error messages on 
+        transmit side of Mobility Agent." 
+    ::= { ciscoLwappMobilityExtMAStats 4 }
+
+cLMobilityExtMAStateErrors OBJECT-TYPE
+    SYNTAX          Counter32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the state transition
+        errors on Mobility Agent." 
+    ::= { ciscoLwappMobilityExtMAStats 5 }
+
+cLMobilityExtMAProtocolRetransmitted OBJECT-TYPE
+    SYNTAX          Counter32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the total number
+        of control messages retransmitted by 
+        Mobility Agent." 
+    ::= { ciscoLwappMobilityExtMAStats 6 }
+
+cLMobilityExtMATotalClients OBJECT-TYPE
+    SYNTAX          Counter32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the total clients
+        connected to Mobility Agent." 
+    ::= { ciscoLwappMobilityExtMAStats 7 }
+
+cLMobilityExtMALocalClients OBJECT-TYPE
+    SYNTAX          Counter32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates local clients connected
+        to  Mobility Agent." 
+    ::= { ciscoLwappMobilityExtMAStats 8 }
+
+cLMobilityExtMAAnchoredClients OBJECT-TYPE
+    SYNTAX          Counter32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the anchored clients
+        connected to Mobility Agent." 
+    ::= { ciscoLwappMobilityExtMAStats 9 }
+
+cLMobilityExtMAForeignedClients OBJECT-TYPE
+    SYNTAX          Counter32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the foreign clients
+        connected to Mobility Agent." 
+    ::= { ciscoLwappMobilityExtMAStats 10 }
+
+cLMobilityExtMATotalInterGroupHandoffReceived OBJECT-TYPE
+    SYNTAX          Counter32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the total inter group
+        handoff received by Mobility Agent." 
+    ::= { ciscoLwappMobilityExtMAStats 11 }
+
+cLMobilityExtMATotalIntraGroupHandoffReceived OBJECT-TYPE
+    SYNTAX          Counter32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the total intra group
+        handoffs received by Mobility Agent." 
+    ::= { ciscoLwappMobilityExtMAStats 12 }
+
+cLMobilityExtMATotalHandoffEndRequestReceived OBJECT-TYPE
+    SYNTAX          Counter32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the total handoff end
+        requests received by Mobility Agent." 
+    ::= { ciscoLwappMobilityExtMAStats 13 }
+
+cLMobilityExtMATotalInterGroupHandoffSent OBJECT-TYPE
+    SYNTAX          Counter32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the total inter group
+        handoffs sent by Mobility Agent." 
+    ::= { ciscoLwappMobilityExtMAStats 14 }
+
+cLMobilityExtMATotalIntraGroupHandoffSent OBJECT-TYPE
+    SYNTAX          Counter32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the total intra group
+        handoffs sent by Mobility Agent." 
+    ::= { ciscoLwappMobilityExtMAStats 15 }
+
+cLMobilityExtReceivedTotal OBJECT-TYPE
+    SYNTAX          Counter32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the total received ." 
+    ::= { ciscoLwappMobilityExtGlobalStats 1 }
+
+cLMobilityExtTransmitTotal OBJECT-TYPE
+    SYNTAX          Counter32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the total transmitted." 
+    ::= { ciscoLwappMobilityExtGlobalStats 2 }
+
+cLMobilityExtTotalResourceAllocation OBJECT-TYPE
+    SYNTAX          Counter32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the total resources allocated ." 
+    ::= { ciscoLwappMobilityExtGlobalStats 3 }
+
+cLMobilityExtTotalResourceFree OBJECT-TYPE
+    SYNTAX          Counter32
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the total resources free ." 
+    ::= { ciscoLwappMobilityExtGlobalStats 4 }
 
 -- *******************************************************************
 -- *   NOTIFICATIONS
 -- *******************************************************************
 
 ciscoLwappMobilityControlPathDown NOTIFICATION-TYPE
-        OBJECTS {
-                cLMobilityExtNotifyObjectSourceIPAddressType,
-                cLMobilityExtNotifyObjectSourceIPAddress,
-                cLMobilityExtNotifyObjectSourceType,
-                cLMobilityExtNotifyObjectDestinationType
-        }
-        STATUS  current
-        DESCRIPTION
-                "This notification is sent by the agent when
-                a mobility control path goes down."
-       ::= { ciscoLwappMobilityExtMIBNotifs 1 }
+    OBJECTS         {
+                        cLMobilityExtNotifyObjectSourceIPAddressType,
+                        cLMobilityExtNotifyObjectSourceIPAddress,
+                        cLMobilityExtNotifyObjectSourceType,
+                        cLMobilityExtNotifyObjectDestinationType
+                    }
+    STATUS          current
+    DESCRIPTION
+        "This notification is sent by the agent when
+        a mobility control path goes down."
+   ::= { ciscoLwappMobilityExtMIBNotifs 1 }
 
 ciscoLwappMobilityControlPathUp NOTIFICATION-TYPE
-        OBJECTS {
-                cLMobilityExtNotifyObjectSourceIPAddressType,
-                cLMobilityExtNotifyObjectSourceIPAddress,
-                cLMobilityExtNotifyObjectSourceType,
-                cLMobilityExtNotifyObjectDestinationType
-        }
-        STATUS  current
-        DESCRIPTION
-                "This notification is sent by the agent when
-                a mobility control path goes up."
-       ::= { ciscoLwappMobilityExtMIBNotifs 2 }
+    OBJECTS         {
+                        cLMobilityExtNotifyObjectSourceIPAddressType,
+                        cLMobilityExtNotifyObjectSourceIPAddress,
+                        cLMobilityExtNotifyObjectSourceType,
+                        cLMobilityExtNotifyObjectDestinationType
+                    }
+    STATUS          current
+    DESCRIPTION
+        "This notification is sent by the agent when
+        a mobility control path goes up."
+   ::= { ciscoLwappMobilityExtMIBNotifs 2 }
 
 ciscoLwappMobilityDataPathDown NOTIFICATION-TYPE
-        OBJECTS {
-                cLMobilityExtNotifyObjectSourceIPAddressType,
-                cLMobilityExtNotifyObjectSourceIPAddress,
-                cLMobilityExtNotifyObjectSourceType,
-                cLMobilityExtNotifyObjectDestinationType
-        }
-        STATUS  current
-        DESCRIPTION
-                "This notification is sent by the agent when
-                a mobility data path goes down."
-       ::= { ciscoLwappMobilityExtMIBNotifs 3 }
+    OBJECTS         {
+                        cLMobilityExtNotifyObjectSourceIPAddressType,
+                        cLMobilityExtNotifyObjectSourceIPAddress,
+                        cLMobilityExtNotifyObjectSourceType,
+                        cLMobilityExtNotifyObjectDestinationType
+                    }
+    STATUS          current
+    DESCRIPTION
+        "This notification is sent by the agent when
+        a mobility data path goes down."
+   ::= { ciscoLwappMobilityExtMIBNotifs 3 }
 
 ciscoLwappMobilityDataPathUp NOTIFICATION-TYPE
-        OBJECTS {
-                cLMobilityExtNotifyObjectSourceIPAddressType,
-                cLMobilityExtNotifyObjectSourceIPAddress,
-                cLMobilityExtNotifyObjectSourceType,
-                cLMobilityExtNotifyObjectDestinationType
-        }
-        STATUS  current
-        DESCRIPTION
-                "This notification is sent by the agent when
-                a mobility data path goes up."
-       ::= { ciscoLwappMobilityExtMIBNotifs 4 }
-
-
+    OBJECTS         {
+                        cLMobilityExtNotifyObjectSourceIPAddressType,
+                        cLMobilityExtNotifyObjectSourceIPAddress,
+                        cLMobilityExtNotifyObjectSourceType,
+                        cLMobilityExtNotifyObjectDestinationType
+                    }
+    STATUS          current
+    DESCRIPTION
+        "This notification is sent by the agent when
+        a mobility data path goes up."
+   ::= { ciscoLwappMobilityExtMIBNotifs 4 }
 -- *******************************************************************
 -- *    Compliance statements
 -- *******************************************************************
@@ -2474,7 +2999,7 @@ ciscoLwappMobilityExtMIBGroups  OBJECT IDENTIFIER
 
 
 ciscoLwappMobilityExtMIBCompliance MODULE-COMPLIANCE
-    STATUS          deprecated 
+    STATUS          deprecated
     DESCRIPTION
         "The compliance statement for the SNMP entities that
         implement the ciscoLwappMobilityExtMIB module."
@@ -2487,6 +3012,33 @@ ciscoLwappMobilityExtMIBCompliance MODULE-COMPLIANCE
     ::= { ciscoLwappMobilityExtMIBCompliances 1 }
 
 ciscoLwappMobilityExtMIBComplianceRev1 MODULE-COMPLIANCE
+    STATUS          deprecated
+    DESCRIPTION
+        "The compliance statement for the SNMP entities that
+        implement the ciscoLwappMobilityExtMIB module."
+    MODULE          -- this module
+    MANDATORY-GROUPS {
+                        cLMobilityExtConfigGroupRev1,
+                        ciscoLwappMobilityExtNotifyObjectsGroup,
+                        ciscoLwappMobilityExtNotifsGroup
+                    }
+    ::= { ciscoLwappMobilityExtMIBCompliances 2 }
+
+ciscoLwappMobilityExtMIBComplianceRev2 MODULE-COMPLIANCE
+    STATUS          deprecated
+    DESCRIPTION
+        "The compliance statement for the SNMP entities that
+        implement the ciscoLwappMobilityExtMIB module."
+    MODULE          -- this module
+    MANDATORY-GROUPS {
+                        cLMobilityExtConfigGroupRev1,
+                        cLMobilityExtMAStatsConfigGroup,
+                        ciscoLwappMobilityExtNotifyObjectsGroup,
+                        ciscoLwappMobilityExtNotifsGroup
+                    }
+    ::= { ciscoLwappMobilityExtMIBCompliances 3 }
+
+ciscoLwappMobilityExtMIBComplianceRev3 MODULE-COMPLIANCE
     STATUS          current
     DESCRIPTION
         "The compliance statement for the SNMP entities that
@@ -2494,12 +3046,13 @@ ciscoLwappMobilityExtMIBComplianceRev1 MODULE-COMPLIANCE
     MODULE          -- this module
     MANDATORY-GROUPS {
                         cLMobilityExtConfigGroupRev1,
-            ciscoLwappMobilityExtNotifyObjectsGroup,
-            ciscoLwappMobilityExtNotifsGroup
-         }
-
-    ::= { ciscoLwappMobilityExtMIBCompliances 2 }
-
+                        cLMobilityExtMAStatsConfigGroup,
+                        ciscoLwappMobilityExtNotifyObjectsGroup,
+                        ciscoLwappMobilityExtNotifsGroup,
+                        ciscoLwappMobilityExtMCMAStatsGroup,
+                        cLMobilityExtAnchorConfigGroup
+                    }
+    ::= { ciscoLwappMobilityExtMIBCompliances 4 }
 
 -- *******************************************************************
 -- *    Units of conformance
@@ -2508,7 +3061,7 @@ ciscoLwappMobilityExtMIBComplianceRev1 MODULE-COMPLIANCE
 cLMobilityExtConfigGroup OBJECT-GROUP
     OBJECTS         {
                         cLMobilityExtMCMOEnableStatus,
-                        cLMobilityExtMCMOAdminEnableStatus,                        
+                        cLMobilityExtMCMOAdminEnableStatus,
                         cLMobilityExtMCEnableStatus,
                         cLMobilityExtMCAdminEnableStatus,
                         cLMobilityExtMCMulticastMode,
@@ -2520,7 +3073,11 @@ cLMobilityExtConfigGroup OBJECT-GROUP
                         cLMobilityExtMCApCountLicensesInUse,
                         cLMobilityExtMCOwnGroupMulticastAddressType,
                         cLMobilityExtMCOwnGroupMulticastAddress,
-                        cLMobilityExtMCMobilityGroupName,                        
+                        cLMobilityExtMCMobilityGroupName,
+                        cLMobilityExtMCMONumberOfClients,
+                        cLMobilityExtMCNumberOfMCs,
+                        cLMobilityExtMCTotalNumberOfReportedAPs,
+                        cLMobilityExtMCNumberOfReportedAPsInSubDomain,
                         cLMobilityExtMgrAddressType,
                         cLMobilityExtMgrAddress,
                         cLMobilityExtMgrNetmaskType,
@@ -2530,7 +3087,7 @@ cLMobilityExtConfigGroup OBJECT-GROUP
                         cLMobilityExtMgrName,
                         cLMobilityExtMgrInterfaceType,
                         cLMobilityExtNewArchitectureEnableStatus,
-                        cLMobilityExtNewArchitectureAdminEnableStatus,                        
+                        cLMobilityExtNewArchitectureAdminEnableStatus,
                         cLMobilityExtMCClientAnchorMCPrivateAddressType,
                         cLMobilityExtMCClientAnchorMCPrivateAddress,
                         cLMobilityExtMCClientAnchorMCGroupId,
@@ -2595,10 +3152,16 @@ cLMobilityExtConfigGroup OBJECT-GROUP
                         cLMobilityExtForeignWlcMapRowStatus,
                         cLMobilityExtGroupMulticastAddressType,
                         cLMobilityExtGroupMulticastAddress,
+                        cLMobilityExtGroupRowStatus,
                         cLMobilityExtMAPeerPublicAddressType,
                         cLMobilityExtMAPeerPublicAddress,
                         cLMobilityExtMAPeerLinkStatus,
                         cLMobilityExtMCMAClientCount,
+                        cLMobilityExtMCAPName,
+                        cLMobilityExtMCAPReportingDeviceAddressType,
+                        cLMobilityExtMCAPReportingDeviceAddress,
+                        cLMobilityExtMCAPReportingDeviceType,
+                        cLMobilityExtMCAPCount,
                         cLMobilityExtMAMCPublicAddressType,
                         cLMobilityExtMAMCPublicAddress,
                         cLMobilityExtMAMCPrivateAddressType,
@@ -2618,18 +3181,20 @@ cLMobilityExtConfigGroup OBJECT-GROUP
                         cLMobilityExtMCStateErrors,
                         cLMobilityExtMCProtocolRetransmitted,
                         cLMobilityExtMCHandoffRequestsReceived,
-                        cLMobilityExtMCHandoffCmplReceived,
+                        cLMobilityExtMCHandoffCompleteReceived,
                         cLMobilityExtMCHandoffClientDeleteReceived,
                         cLMobilityExtMCHandoffRequestsTransmitted,
-                        cLMobilityExtMCHandoffCmplTransmitted,
+                        cLMobilityExtMCHandoffCompleteTransmitted,
                         cLMobilityExtMCHandoffClientDeleteTransmitted,
                         cLMobilityExtMCTotalClientCount,
-                        cLMobilityExtMCWgbCount                        
+                        cLMobilityExtMCWgbCount
                     }
-    STATUS          deprecated 
+    STATUS          deprecated
     DESCRIPTION
         "This is a collection of objects which can
-        be configured to control Mobility parameters."
+        be configured to control Mobility parameters.
+        cLMobilityExtConfigGroup object is superseded by 
+        cLMobilityExtConfigGroupRev1."
     ::= { ciscoLwappMobilityExtMIBGroups 1 }
 
 ciscoLwappMobilityExtNotifyObjectsGroup OBJECT-GROUP
@@ -2648,18 +3213,18 @@ ciscoLwappMobilityExtNotifyObjectsGroup OBJECT-GROUP
     ::= { ciscoLwappMobilityExtMIBGroups 2 }
 
 ciscoLwappMobilityExtNotifsGroup NOTIFICATION-GROUP
-        NOTIFICATIONS {
-                ciscoLwappMobilityControlPathDown,
-                ciscoLwappMobilityControlPathUp,
-                ciscoLwappMobilityDataPathDown,
-                ciscoLwappMobilityDataPathUp
-        }
-        STATUS  current
-        DESCRIPTION
-                "This collection of objects provides the information
-                about the notifications sent by the agent related
-                to mobility."
-        ::= { ciscoLwappMobilityExtMIBGroups 3 }
+   NOTIFICATIONS    {
+                        ciscoLwappMobilityControlPathDown,
+                        ciscoLwappMobilityControlPathUp,
+                        ciscoLwappMobilityDataPathDown,
+                        ciscoLwappMobilityDataPathUp
+                    }
+    STATUS          current
+    DESCRIPTION
+        "This collection of objects provides the information
+        about the notifications sent by the agent related
+        to mobility."
+    ::= { ciscoLwappMobilityExtMIBGroups 3 }
 
 cLMobilityExtConfigGroupRev1 OBJECT-GROUP
     OBJECTS         {
@@ -2677,6 +3242,10 @@ cLMobilityExtConfigGroupRev1 OBJECT-GROUP
                         cLMobilityExtMCOwnGroupMulticastAddressType,
                         cLMobilityExtMCOwnGroupMulticastAddress,
                         cLMobilityExtMCMobilityGroupName,
+                        cLMobilityExtMCMONumberOfClients,
+                        cLMobilityExtMCNumberOfMCs,
+                        cLMobilityExtMCTotalNumberOfReportedAPs,
+                        cLMobilityExtMCNumberOfReportedAPsInSubDomain,
                         cLMobilityExtMgrAddressType,
                         cLMobilityExtMgrAddress,
                         cLMobilityExtMgrNetmaskType,
@@ -2749,10 +3318,16 @@ cLMobilityExtConfigGroupRev1 OBJECT-GROUP
                         cLMobilityExtForeignWlcMapRowStatus,
                         cLMobilityExtGroupMulticastAddressType,
                         cLMobilityExtGroupMulticastAddress,
+                        cLMobilityExtGroupRowStatus,
                         cLMobilityExtMAPeerPublicAddressType,
                         cLMobilityExtMAPeerPublicAddress,
                         cLMobilityExtMAPeerLinkStatus,
                         cLMobilityExtMCMAClientCount,
+                        cLMobilityExtMCAPName,
+                        cLMobilityExtMCAPReportingDeviceAddressType,
+                        cLMobilityExtMCAPReportingDeviceAddress,
+                        cLMobilityExtMCAPReportingDeviceType,
+                        cLMobilityExtMCAPCount,
                         cLMobilityExtMAMCPublicAddressType,
                         cLMobilityExtMAMCPublicAddress,
                         cLMobilityExtMAMCPrivateAddressType,
@@ -2772,10 +3347,10 @@ cLMobilityExtConfigGroupRev1 OBJECT-GROUP
                         cLMobilityExtMCStateErrors,
                         cLMobilityExtMCProtocolRetransmitted,
                         cLMobilityExtMCHandoffRequestsReceived,
-                        cLMobilityExtMCHandoffCmplReceived,
+                        cLMobilityExtMCHandoffCompleteReceived,
                         cLMobilityExtMCHandoffClientDeleteReceived,
                         cLMobilityExtMCHandoffRequestsTransmitted,
-                        cLMobilityExtMCHandoffCmplTransmitted,
+                        cLMobilityExtMCHandoffCompleteTransmitted,
                         cLMobilityExtMCHandoffClientDeleteTransmitted,
                         cLMobilityExtMCTotalClientCount,
                         cLMobilityExtMCWgbCount,
@@ -2785,8 +3360,55 @@ cLMobilityExtConfigGroupRev1 OBJECT-GROUP
     STATUS          current
     DESCRIPTION
         "This is a collection of objects which can
-        be configured to control Mobility parameters."
+        be configured to control mobility parameters."
     ::= { ciscoLwappMobilityExtMIBGroups 4 }
 
+cLMobilityExtMAStatsConfigGroup OBJECT-GROUP
+    OBJECTS         {
+                        cLMobilityExtMAReceivedTotal,
+                        cLMobilityExtMAReceivedDrops,
+                        cLMobilityExtMAProtocolReceiveErrors,
+                        cLMobilityExtMAProtocolTransmitErrors,
+                        cLMobilityExtMAStateErrors,
+                        cLMobilityExtMAProtocolRetransmitted,
+                        cLMobilityExtMATotalClients,
+                        cLMobilityExtMALocalClients,
+                        cLMobilityExtMAAnchoredClients,
+                        cLMobilityExtMAForeignedClients,
+                        cLMobilityExtMATotalInterGroupHandoffReceived,
+                        cLMobilityExtMATotalIntraGroupHandoffReceived,
+                        cLMobilityExtMATotalHandoffEndRequestReceived,
+                        cLMobilityExtMATotalInterGroupHandoffSent,
+                        cLMobilityExtMATotalIntraGroupHandoffSent,
+                        cLMobilityExtReceivedTotal,
+                        cLMobilityExtTransmitTotal,
+                        cLMobilityExtTotalResourceAllocation,
+                        cLMobilityExtTotalResourceFree
+                    }
+    STATUS          current
+    DESCRIPTION
+        "This is collection of MA stat objects which
+        can be configure to control mobility parameters."
+    ::= { ciscoLwappMobilityExtMIBGroups 5 }
+
+ciscoLwappMobilityExtMCMAStatsGroup OBJECT-GROUP
+    OBJECTS         { cLMobilityExtEncryptionStatus }
+    STATUS          current
+    DESCRIPTION
+        "This object represents the current status of the
+        encryption in the mobilty tunnel."
+    ::= { ciscoLwappMobilityExtMIBGroups 6 }
+
+cLMobilityExtAnchorConfigGroup OBJECT-GROUP
+    OBJECTS         { cLMobilityExtAnchorPriority }
+    STATUS          current
+    DESCRIPTION
+        "This object specifies the priority configured for
+        an Anchor WLC mapped on a WLAN."
+    ::= { ciscoLwappMobilityExtMIBGroups 7 }
+
 END
+
+
+
 

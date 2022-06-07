@@ -5,7 +5,7 @@
 --
 -- Copyright (c) 2003, 2006 by cisco Systems, Inc.
 -- All rights reserved.
--- 
+--
 -- Made Cisco Proprietary based on IETF draft:
 -- draft-ietf-pwe3-pw-tc-mib-00.txt
 -- *****************************************************************
@@ -24,7 +24,7 @@ CISCO-IETF-PW-TC-MIB DEFINITIONS ::= BEGIN
   ; 
 
   cpwTCMIB MODULE-IDENTITY 
-     LAST-UPDATED "200302261200Z"  -- 26 Feb 2003 12:00:00 GMT 
+     LAST-UPDATED "200607211200Z"  -- 21 July 2006 10:30:00 GMT 
      ORGANIZATION  
         "Cisco Systems, Inc."
      CONTACT-INFO 
@@ -48,7 +48,16 @@ CISCO-IETF-PW-TC-MIB DEFINITIONS ::= BEGIN
          "This MIB Module provides Textual Conventions 
           and OBJECT-IDENTITY Objects to be used PW services." 
 
-     -- Revision history. 
+     -- Revision history.
+     REVISION "200607211200Z"  -- 21 July 2006 10:30:00 GMT 
+     DESCRIPTION
+           "Added following enumerations to cpwVcType TC:
+           e1Satop(12), t1Satop(13), e3Satop(14), t3Satop(15), 
+           basicCesPsn(16), basicTdmIp(17), tdmCasCesPsn(18),
+           tdmCasTdmIp(19). The above enumerations are based 
+           on IANAPwTypeTC TC in draft-ietf-pwe3-pw-mib-08.txt"
+
+ 
      REVISION "200302261200Z"  -- 26 Feb 2003 12:00:00 GMT 
      DESCRIPTION
            "Made Cisco proprietary based on the PW-TC-MIB.my file
@@ -159,7 +168,15 @@ CISCO-IETF-PW-TC-MIB DEFINITIONS ::= BEGIN
       cep(8),   
       atmVccCell(9), 
       atmVpcCell(10), 
-      ethernetVPLS (11) 
+      ethernetVPLS (11),
+      e1Satop(12), 
+      t1Satop(13),
+      e3Satop(14), 
+      t3Satop(15),
+      basicCesPsn(16),
+      basicTdmIp(17),  
+      tdmCasCesPsn(18),
+      tdmCasTdmIp(19) 
        }       
 
 END

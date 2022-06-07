@@ -1,13 +1,13 @@
 -- ============================================================================
--- Copyright (C) 2007 by  HUAWEI TECHNOLOGIES. All rights reserved.
+-- Copyright (C) 2014 by HUAWEI TECHNOLOGIES. All rights reserved.
 -- 
--- Description: hwMcast.my , this Mib module for management 
+-- Description: hwIpMcast.my , this MIB module for management 
 --              of IP Multicast, including multicast routing, data
 --              forwarding, and data reception.
 -- Reference: This MIB was extracted from RFC 2934 
--- Version: V1.0
+-- Version: V2.03
 -- History:
---    Created by caibenrui 63321 2007-04-12
+--    Created by caibenrui 2007-04-12
 -- 
 -- ============================================================================
 
@@ -16,11 +16,12 @@ HUAWEI-IPMCAST-MIB DEFINITIONS ::= BEGIN
 
 IMPORTS
     MODULE-IDENTITY, OBJECT-TYPE,
-    mib-2, Unsigned32, Counter64,
-    Gauge32, TimeTicks, IpAddress    FROM SNMPv2-SMI
+    mib-2, Unsigned32, Counter64, Gauge32, TimeTicks, IpAddress, 
+    NOTIFICATION-TYPE, Integer32     FROM SNMPv2-SMI
     RowStatus, TruthValue, DisplayString,
+    TEXTUAL-CONVENTION,
     StorageType, TimeStamp           FROM SNMPv2-TC
-    MODULE-COMPLIANCE, OBJECT-GROUP  FROM SNMPv2-CONF
+    MODULE-COMPLIANCE, OBJECT-GROUP, NOTIFICATION-GROUP  FROM SNMPv2-CONF
     SnmpAdminString                  FROM SNMP-FRAMEWORK-MIB
     InterfaceIndexOrZero,
     InterfaceIndex                   FROM IF-MIB
@@ -36,28 +37,62 @@ hwMcast  OBJECT IDENTIFIER  ::= { hwDatacomm 149 }
 
 
 hwIpMcastMib MODULE-IDENTITY
-    LAST-UPDATED "200704160000Z" -- 16 April 2007
-    ORGANIZATION "Huawei Technologies co.,Ltd."
+    LAST-UPDATED "201407010000Z" -- 1 July 2014
+    ORGANIZATION "Huawei Technologies Co.,Ltd."
     CONTACT-INFO 
-            " R&D BeiJing, Huawei Technologies co.,Ltd.
-            Huawei Bld.,NO.3 Xinxi Rd., 
-            Shang-Di Information Industry Base,
-            Hai-Dian District Beijing P.R. China
-            Zip:100085 
-            Http://www.huawei.com                                       
-            E-mail:support@huawei.com "
+            "Huawei Industrial Base
+              Bantian, Longgang
+               Shenzhen 518129
+               People's Republic of China
+               Website: http://www.huawei.com
+               Email: support@huawei.com
+             "
     DESCRIPTION
-            "The Mib module for management of IP Multicast, including
+            "The MIB module for management of IP Multicast, including
             multicast routing, data forwarding, and data reception.
-            Huawei Technologies co.,Ltd . Supplementary information may
+            Huawei Technologies Co.,Ltd . Supplementary information may
             be available at:
             http://www.huawei.com" 
+
+     REVISION "201407010000Z" -- 1 July 2014
+    DESCRIPTION 
+            "1.Modify the description of hwIpMcastSGThresholdExceed.
+             2.Modify the description of hwIpMcastSGThresholdExceedClear.
+             3.Modify the description of hwIpMcastSGExceedClear. 
+            "       
+ 
+    REVISION "201406200000Z" -- 20 Jun 2014
+    DESCRIPTION 
+            "1.Add hwIpMcastSGThresholdExceed trap.
+             2.Add hwIpMcastSGThresholdExceedClear trap.
+             3.Add hwIpMcastSGExceed trap.
+             4.Add hwIpMcastSGExceedClear trap.
+            "
+   
+    REVISION "201308280000Z" -- 28 Aug 2007
+    DESCRIPTION 
+            "Modify import mibs"
+                        
     REVISION "200704160000Z" -- 16 April 2007
     DESCRIPTION 
             "The initial revision of this Mib module."
     ::= { hwMcast 1 }
 
+HWChannelMode ::= TEXTUAL-CONVENTION
+    STATUS     current
+    DESCRIPTION
+            "The mode in which a channel is operating.            
 
+            ssm(1)       Source-Specific Multicast (SSM) with PIM Sparse
+                         Mode.
+
+            asm(2)       Any Source Multicast (ASM), with PIM Sparse
+                         Mode."
+
+    SYNTAX     INTEGER {
+                  ssm(1),
+                  asm(2)
+               }
 
 
 hwIpMcastMibObjects OBJECT IDENTIFIER ::= { hwIpMcastMib 1 }
@@ -134,7 +169,7 @@ hwIpMcastInterfaceIfIndex OBJECT-TYPE
            "The index value that uniquely identifies the interface to
             which this entry is applicable.  The interface identified by
             a particular value of this index is the same interface as
-            identified by the same value of the IF-Mib's ifIndex."
+            identified by the same value of the IF-MIB's ifIndex."
     ::= { hwIpMcastInterfaceEntry 2 }
 
 hwIpMcastInterfaceTtl OBJECT-TYPE
@@ -168,7 +203,7 @@ hwIpMcastInterfaceInMcastOctets OBJECT-TYPE
     DESCRIPTION
             "The number of octets of multicast packets that have arrived
             on the interface, including framing characters.  This object
-            is similar to ifInOctets in the Interfaces Mib, except that
+            is similar to ifInOctets in the Interfaces MIB, except that
             only multicast packets are counted.
 
             Discontinuities in the value of this counter can occur at
@@ -185,7 +220,7 @@ hwIpMcastInterfaceOutMcastOctets OBJECT-TYPE
     DESCRIPTION
             "The number of octets of multicast packets that have been
             sent on the interface, including framing characters.  This
-            object is similar to ifOutOctets in the Interfaces Mib,
+            object is similar to ifOutOctets in the Interfaces MIB,
             except that only multicast packets are counted.
 
             Discontinuities in the value of this counter can occur at
@@ -202,7 +237,7 @@ hwIpMcastInterfaceInMcastPkts OBJECT-TYPE
     DESCRIPTION
             "The number of multicast packets that have arrived on the
             interface.  In many cases, this object is identical to
-            ifInMulticastPkts in the Interfaces Mib.
+            ifInMulticastPkts in the Interfaces MIB.
 
             However, some implementations use ifXTable for Layer 2
             traffic statistics and hwIpMcastInterfaceTable at Layer 3.  In
@@ -224,7 +259,7 @@ hwIpMcastInterfaceOutMcastPkts OBJECT-TYPE
     DESCRIPTION
             "The number of multicast packets that have been sent on the
             interface.  In many cases, this object is identical to
-            ifOutMulticastPkts in the Interfaces Mib.
+            ifOutMulticastPkts in the Interfaces MIB.
 
             However, some implementations use ifXTable for Layer 2
             traffic statistics and hwIpMcastInterfaceTable at Layer 3.  In
@@ -1056,18 +1091,14 @@ hwIpMcastBoundaryAddress OBJECT-TYPE
     ::= { hwIpMcastBoundaryEntry 3 }
 
 hwIpMcastBoundaryAddressPrefixLength OBJECT-TYPE
-    SYNTAX     InetAddressPrefixLength (4..32)
+    SYNTAX     InetAddressPrefixLength (4..128)
     MAX-ACCESS not-accessible
     STATUS     current
     DESCRIPTION
             "The length in bits of the mask which when, combined with
             the corresponding value of hwIpMcastBoundaryAddress,
             identifies the group range for which the scoped boundary
-            exists.
-
-            The InetAddressType is given by hwIpMcastBoundaryAddressType.
-            For 'ipv4' this object must be in the range 4..32.  For
-            'ipv6', this object must be 16."
+            exists."
     ::= { hwIpMcastBoundaryEntry 4 }
 
 hwIpMcastBoundaryTimeStamp OBJECT-TYPE
@@ -1151,7 +1182,7 @@ hwIpMcastChannelName  OBJECT-TYPE
     MAX-ACCESS read-only
     STATUS     current
     DESCRIPTION
-            " Channel name limited by cac on the interface."
+            "Channel name limited by CAC on the interface."
     ::= { hwIpMcast 8 }
 
 hwIpMcastChannelGroup OBJECT-TYPE
@@ -1159,7 +1190,7 @@ hwIpMcastChannelGroup OBJECT-TYPE
     MAX-ACCESS read-only
     STATUS     current    
     DESCRIPTION
-             " Group address of the entry."
+             "Group address of the entry."
     ::= { hwIpMcast 9 }
     
 hwIpMcastChannelSource OBJECT-TYPE
@@ -1167,7 +1198,7 @@ hwIpMcastChannelSource OBJECT-TYPE
     MAX-ACCESS read-only 
     STATUS     current                        
     DESCRIPTION                               
-             " Source address of the entry."    
+             "Source address of the entry."    
     ::= { hwIpMcast 10 }  
             
 hwIpMcastChannelDownstreamEntries  OBJECT-TYPE
@@ -1175,7 +1206,7 @@ hwIpMcastChannelDownstreamEntries  OBJECT-TYPE
     MAX-ACCESS read-only
     STATUS     current                                             
     DESCRIPTION                                                    
-             " The total number of entries on the interface."                                       
+             "The total number of entries on the interface."                                       
     ::= { hwIpMcast 11 }   
 
 hwIpMcastChannelDownstreamBandWidth   OBJECT-TYPE                                   
@@ -1183,7 +1214,7 @@ hwIpMcastChannelDownstreamBandWidth   OBJECT-TYPE
     MAX-ACCESS   read-only
     STATUS       current                                                   
     DESCRIPTION                                                            
-             " The value of bandwidth on this interface."                    
+             "The value of bandwidth on this interface."                    
     ::= { hwIpMcast 12 } 
     
 hwIpMcastChannelGlobalEntries  OBJECT-TYPE                                       
@@ -1191,31 +1222,31 @@ hwIpMcastChannelGlobalEntries  OBJECT-TYPE
     MAX-ACCESS read-only
     STATUS     current                                                              
     DESCRIPTION                                                                   
-             " The total number of entries on the interface."                         
+             "The total number of entries on the router."                         
     ::= { hwIpMcast 13 }   
     
 hwIpMcastChannelDownstreamLimitBandWidth   OBJECT-TYPE                                   
     SYNTAX       DisplayString (SIZE(1..64))                                     
     MAX-ACCESS   read-only
-    STATUS       current                                                   
+    STATUS       obsolete                                                   
     DESCRIPTION                                                            
-             " The configured limit of bandwidth on this interface."                    
+             "The configured limit of bandwidth on this interface."                    
     ::= { hwIpMcast 14 }  
 
 hwIpMcastChannelDownstreamLimitEntries  OBJECT-TYPE
     SYNTAX     Unsigned32 (0..65535)                               
     MAX-ACCESS read-only
-    STATUS     current                                             
+    STATUS     obsolete                                             
     DESCRIPTION                                                    
-             " The configured limit of entries on the interface."                                       
+             "The configured limit of entries on the interface."                                       
     ::= { hwIpMcast 15 }   
     
 hwIpMcastChannelGlobalLimitEntries  OBJECT-TYPE                                       
     SYNTAX     Unsigned32 (0..65535)
     MAX-ACCESS read-only
-    STATUS     current                                                              
+    STATUS     obsolete                                                              
     DESCRIPTION                                                                   
-             " The configured limit of global entries."                         
+             "The configured limit of global entries."                         
     ::= { hwIpMcast 16 }
     
 hwIpMcastChannelInterfaceIfIndex OBJECT-TYPE
@@ -1223,8 +1254,344 @@ hwIpMcastChannelInterfaceIfIndex OBJECT-TYPE
     MAX-ACCESS read-only
     STATUS     current
     DESCRIPTION
-           " The interface on which this router most recently sent or received a cac trap, or zero if this router has not sent or received a cac trap."
+           "The interface on which this router most recently sent or received a CAC trap, or zero if this router has not sent or received a CAC trap."
     ::= { hwIpMcast 17 }
+
+hwIpMcastChannelInterfaceName OBJECT-TYPE
+    SYNTAX     DisplayString (SIZE(1..64))
+    MAX-ACCESS accessible-for-notify
+    STATUS     current
+    DESCRIPTION
+           "The name of interface on which this router most recently sent or received a CAC trap."
+    ::= { hwIpMcast 18 }
+
+-- Added by tanxin
+    
+hwIpMcastCfgTotalLimit OBJECT-TYPE
+    SYNTAX     Unsigned32 (1..65535)
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "The configured limit of global entries."
+    ::= { hwIpMcast 19 }
+    
+hwIpMcastCfgTotalThreshold OBJECT-TYPE
+    SYNTAX     Unsigned32 (1..65535)
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "The configured threshold of global entries."
+    ::= { hwIpMcast 20 }
+    
+hwIpMcastTotalStat OBJECT-TYPE
+    SYNTAX     Unsigned32 (0..65535)
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "The total number of entries of this instance."
+    ::= { hwIpMcast 21 }
+    
+hwIpMcastDownstreamTotalTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF HwIpMcastDownstreamTotalEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "The (conceptual) table used to list CAC limit and statistic 
+            information on an interface."
+    ::= { hwIpMcast 22 }
+
+hwIpMcastDownstreamTotalEntry OBJECT-TYPE
+    SYNTAX     HwIpMcastDownstreamTotalEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "An entry (conceptual row) containing the CAC limit and statistic
+            information for a particular interface."
+    INDEX      { hwIpMcastDownstreamTotalIpVersion,
+                 hwIpMcastDownstreamTotalIfIndex }
+    ::= { hwIpMcastDownstreamTotalTable 1 }
+
+HwIpMcastDownstreamTotalEntry ::= SEQUENCE {
+    hwIpMcastDownstreamTotalIpVersion         InetVersion,
+    hwIpMcastDownstreamTotalIfIndex           InterfaceIndex,
+    hwIpMcastDownstreamTotalEntriesLimit      Unsigned32,
+    hwIpMcastDownstreamTotalBandwidthLimit    DisplayString,
+    hwIpMcastDownstreamTotalEntriesStat       Unsigned32,
+    hwIpMcastDownstreamTotalBandwidthStat     DisplayString
+}
+
+hwIpMcastDownstreamTotalIpVersion OBJECT-TYPE
+    SYNTAX     InetVersion
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+           "The IP version of this row."
+    ::= { hwIpMcastDownstreamTotalEntry 1 }
+
+hwIpMcastDownstreamTotalIfIndex OBJECT-TYPE
+    SYNTAX     InterfaceIndex
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+           "The index value that uniquely identifies the interface to
+            which this entry is applicable.  The interface identified by
+            a particular value of this index is the same interface as
+            identified by the same value of the IF-MIB's ifIndex."
+    ::= { hwIpMcastDownstreamTotalEntry 2 }
+    
+hwIpMcastDownstreamTotalEntriesLimit OBJECT-TYPE
+    SYNTAX     Unsigned32 (1..65535)
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "The configured limit of entries on the interface."
+    ::= { hwIpMcastDownstreamTotalEntry 3 }  
+    
+hwIpMcastDownstreamTotalBandwidthLimit OBJECT-TYPE
+    SYNTAX     DisplayString (SIZE(1..64))
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "The configured limit of bandwidth on this interface."
+    ::= { hwIpMcastDownstreamTotalEntry 4 }    
+    
+hwIpMcastDownstreamTotalEntriesStat OBJECT-TYPE
+    SYNTAX     Unsigned32 (0..65535)
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "The total number of entries on the interface."
+    ::= { hwIpMcastDownstreamTotalEntry 5 }     
+    
+hwIpMcastDownstreamTotalBandwidthStat OBJECT-TYPE
+    SYNTAX     DisplayString (SIZE(1..64))
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "The value of bandwidth on this interface."
+    ::= { hwIpMcastDownstreamTotalEntry 6 }
+    
+hwIpMcastDownstreamChannelTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF HwIpMcastDownstreamChannelEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "The (conceptual) table used to list CAC limit and statistic 
+            information for a channel on an interface."
+    ::= { hwIpMcast 23 }
+
+hwIpMcastDownstreamChannelEntry OBJECT-TYPE
+    SYNTAX     HwIpMcastDownstreamChannelEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "An entry (conceptual row) containing the multicast protocol
+            information for a particular interface."
+    INDEX      { hwIpMcastDownstreamChannelIpVersion,
+                 hwIpMcastDownstreamChannelIfIndex,
+                 hwIpMcastDownstreamChannelName }
+    ::= { hwIpMcastDownstreamChannelTable 1 }
+
+HwIpMcastDownstreamChannelEntry ::= SEQUENCE {
+    hwIpMcastDownstreamChannelIpVersion        InetVersion,
+    hwIpMcastDownstreamChannelIfIndex          InterfaceIndex,
+    hwIpMcastDownstreamChannelName             DisplayString,
+    hwIpMcastDownstreamChannelEntryLimit       Unsigned32,
+    hwIpMcastDownstreamChannelBandwidthLimit   DisplayString,
+    hwIpMcastDownstreamChannelEntryStat        Unsigned32,
+    hwIpMcastDownstreamChannelBandwidthStat    DisplayString
+}
+
+hwIpMcastDownstreamChannelIpVersion OBJECT-TYPE
+    SYNTAX     InetVersion
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+           "The IP version of this row."
+    ::= { hwIpMcastDownstreamChannelEntry 1 }
+
+hwIpMcastDownstreamChannelIfIndex OBJECT-TYPE
+    SYNTAX     InterfaceIndex
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+           "The index value that uniquely identifies the interface to
+            which this entry is applicable.  The interface identified by
+            a particular value of this index is the same interface as
+            identified by the same value of the IF-MIB's ifIndex."
+    ::= { hwIpMcastDownstreamChannelEntry 2 }
+    
+hwIpMcastDownstreamChannelName  OBJECT-TYPE
+    SYNTAX     DisplayString (SIZE(1..64))
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "Channel name limited by CAC on the interface."
+    ::= { hwIpMcastDownstreamChannelEntry 3 }
+    
+hwIpMcastDownstreamChannelEntryLimit OBJECT-TYPE
+    SYNTAX     Unsigned32 (1..65535)
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "The configured limit of entries of this channel on the interface."
+    ::= { hwIpMcastDownstreamChannelEntry 4 }  
+    
+hwIpMcastDownstreamChannelBandwidthLimit OBJECT-TYPE
+    SYNTAX     DisplayString (SIZE(1..64))
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "The configured limit of bandwidth of this channel on this interface."
+    ::= { hwIpMcastDownstreamChannelEntry 5 }    
+    
+hwIpMcastDownstreamChannelEntryStat OBJECT-TYPE
+    SYNTAX     Unsigned32 (0..65535)
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "The total number of entries of this channel on the interface."
+    ::= { hwIpMcastDownstreamChannelEntry 6 }     
+    
+hwIpMcastDownstreamChannelBandwidthStat OBJECT-TYPE
+    SYNTAX     DisplayString (SIZE(1..64))
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "The value of bandwidth of this channel on the interface."
+    ::= { hwIpMcastDownstreamChannelEntry 7 }
+ 
+hwIpMcastChannelTable OBJECT-TYPE
+    SYNTAX     SEQUENCE OF HwIpMcastChannelEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "The (conceptual) table used to list CAC limit and statistic 
+            information for all channels."
+    ::= { hwIpMcast 24 }
+
+hwIpMcastChannelEntry OBJECT-TYPE
+    SYNTAX     HwIpMcastChannelEntry
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+            "An entry (conceptual row) containing the CAC limit and statistic
+            information for a particular channel."
+    INDEX      { hwIpMcastChannelChnName }
+    ::= { hwIpMcastChannelTable 1 }
+
+HwIpMcastChannelEntry ::= SEQUENCE {    
+    hwIpMcastChannelChnName          DisplayString,
+    hwIpMcastChannelLimit            Unsigned32,  
+    hwIpMcastChannelThreshold        Unsigned32,   
+    hwIpMcastChannelStat             Unsigned32,
+    hwIpMcastChannelMode             HWChannelMode
+}
+
+hwIpMcastChannelChnName OBJECT-TYPE
+    SYNTAX     DisplayString (SIZE(1..64))
+    MAX-ACCESS not-accessible
+    STATUS     current
+    DESCRIPTION
+           "The channel name of this row."
+    ::= { hwIpMcastChannelEntry 1 } 
+    
+hwIpMcastChannelLimit OBJECT-TYPE
+    SYNTAX     Unsigned32 (1..65535)
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "The configured limit of global entries for a channel."
+    ::= { hwIpMcastChannelEntry 2 }
+    
+hwIpMcastChannelThreshold OBJECT-TYPE
+    SYNTAX     Unsigned32 (1..65535)
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "The configured threshold of global entries for a channel."
+    ::= { hwIpMcastChannelEntry 3 }
+    
+hwIpMcastChannelStat OBJECT-TYPE
+    SYNTAX     Unsigned32 (0..65535)
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "The total number of entries for this channel."
+    ::= { hwIpMcastChannelEntry 4 }  
+    
+hwIpMcastChannelMode OBJECT-TYPE
+    SYNTAX     HWChannelMode
+    MAX-ACCESS read-only
+    STATUS     current
+    DESCRIPTION
+           "The mode of this channel."
+    ::= { hwIpMcastChannelEntry 5 }
+ 
+-- Ended Add   
+hwIpMcastInstanceName OBJECT-TYPE
+    SYNTAX     DisplayString
+    MAX-ACCESS accessible-for-notify
+    STATUS     current
+    DESCRIPTION
+            "The instance name of the trap."
+    ::= { hwIpMcast 25 }
+    
+hwBoardIndex   OBJECT-TYPE
+    SYNTAX     Integer32
+    MAX-ACCESS accessible-for-notify
+    STATUS     current
+    DESCRIPTION
+            "The BoardIndex of the trap."
+    ::= { hwIpMcast 26 }
+    
+hwIpMcastOverloadAddressType  OBJECT-TYPE
+    SYNTAX     Integer32
+    MAX-ACCESS accessible-for-notify
+    STATUS     current
+    DESCRIPTION
+            "The OverloadAddressType of the trap."
+    ::= { hwIpMcast 27 }
+    
+hwIpMcastOverloadSource   OBJECT-TYPE
+    SYNTAX     InetAddress
+    MAX-ACCESS accessible-for-notify
+    STATUS     current
+    DESCRIPTION
+            "The OverloadSource of the trap."
+    ::= { hwIpMcast 28 }
+    
+hwIpMcastOverloadGroup  OBJECT-TYPE
+    SYNTAX     InetAddress
+    MAX-ACCESS accessible-for-notify
+    STATUS     current
+    DESCRIPTION
+            "The OverloadGroup of the trap."
+    ::= { hwIpMcast 29 }
+    
+hwIpMcastSGCurrentCount  OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..262144)   
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION                                                                
+             "The current number of multicast routing (S, G) entries of all instances." 
+    ::= { hwIpMcast 30 } 
+
+hwIpMcastSGThreshold  OBJECT-TYPE
+    SYNTAX      Unsigned32 (1..100)   
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION                                                                
+             "The threshold value of multicast routing (S, G) entries uppper limit(%) of all instances." 
+    ::= { hwIpMcast 31 } 	    
+
+hwIpMcastSGTotalCount  OBJECT-TYPE
+    SYNTAX      Unsigned32 (0..262144)   
+    MAX-ACCESS  accessible-for-notify
+    STATUS      current
+    DESCRIPTION                                                                
+             "The total number of multicast routing (S, G) entries of all instances." 
+    ::= { hwIpMcast 32 }
 
 --
 -- MCAC TRAP NODE
@@ -1236,14 +1603,16 @@ hwIpMcastDownstreamChannelLimit  NOTIFICATION-TYPE
               hwIpMcastChannelInterfaceIfIndex,
               hwIpMcastChannelName,
               hwIpMcastChannelDownstreamEntries,
-              hwIpMcastChannelDownstreamBandWidth
+              hwIpMcastChannelDownstreamBandWidth,
+              hwIpMcastChannelInterfaceName,
+              hwIpMcastInstanceName
             }
     STATUS    current
     DESCRIPTION
-              " A hwIpMcastDownstreamChannelLimit notification signifies that a entry belongs to
+              "A hwIpMcastDownstreamChannelLimit notification signifies that an entry belongs to
               specified channel has been limited.
               
-              This notification is generated whenever a entry belongs to specified channel
+              This notification is generated whenever an entry belongs to specified channel
               failed to add downstream cause channel downstream entry or bandwidth limit."
     ::= { hwIpMcastNotifications 1 }
 
@@ -1252,13 +1621,15 @@ hwIpMcastDownstreamTotalLimit  NOTIFICATION-TYPE
               hwIpMcastChannelGroup,
               hwIpMcastChannelInterfaceIfIndex,
               hwIpMcastChannelDownstreamEntries,
-              hwIpMcastChannelDownstreamBandWidth
+              hwIpMcastChannelDownstreamBandWidth,
+              hwIpMcastChannelInterfaceName,
+              hwIpMcastInstanceName
             }
     STATUS    current
     DESCRIPTION
-              " A hwIpMcastDownstreamTotalLimit notification signifies that a entry has been limited.
+              "A hwIpMcastDownstreamTotalLimit notification signifies that an entry has been limited.
               
-              This notification is generated whenever a entry failed to add downstream 
+              This notification is generated whenever an entry failed to add downstream 
               cause total downstream entry or bandwidth limit."
     ::= { hwIpMcastNotifications 2 }
     
@@ -1266,28 +1637,29 @@ hwIpMcastGlobalChannelLimit  NOTIFICATION-TYPE
     OBJECTS { hwIpMcastChannelSource,
               hwIpMcastChannelGroup,
               hwIpMcastChannelName,
-              hwIpMcastChannelGlobalEntries
+              hwIpMcastChannelGlobalEntries,
+              hwIpMcastInstanceName
             }
     STATUS    current
     DESCRIPTION
-              " A hwIpMcastGlobalChannelLimit notification signifies that a entry belongs to specified channel
-              has been limited for global limite.
+              "A hwIpMcastGlobalChannelLimit notification signifies that an entry belongs to specified channel
+              has been limited for global limit.
               
-              This notification is generated whenever a entry belongs to specified channel
+              This notification is generated whenever an entry belongs to specified channel
               failed to create as global entries limits."
     ::= { hwIpMcastNotifications 3 }                                             
                 
 hwIpMcastGlobalTotalLimit  NOTIFICATION-TYPE
     OBJECTS { hwIpMcastChannelSource,
               hwIpMcastChannelGroup,
-              hwIpMcastChannelGlobalEntries
+              hwIpMcastChannelGlobalEntries,
+              hwIpMcastInstanceName
             }
     STATUS    current
     DESCRIPTION
-              " A hwIpMcastGlobalTotalLimit notification signifies that a entry 
-              has been limited for global total entries limite.
-              
-              This notification is generated whenever a entry failed to create 
+              "A hwIpMcastGlobalTotalLimit notification signifies that an entry 
+              has been limited for global total entries limit.              
+              This notification is generated whenever an entry failed to create 
               as global total entries limits."
     ::= { hwIpMcastNotifications 4 }                                           
 
@@ -1297,16 +1669,17 @@ hwIpMcastOutChannelExceededLimit   NOTIFICATION-TYPE
               hwIpMcastChannelDownstreamEntries,
               hwIpMcastChannelDownstreamBandWidth,
               hwIpMcastChannelDownstreamLimitEntries,
-              hwIpMcastChannelDownstreamLimitBandWidth
+              hwIpMcastChannelDownstreamLimitBandWidth,
+              hwIpMcastChannelInterfaceName
             }                                                                             
-    STATUS    current                                                                                            
+    STATUS    obsolete                                                                                            
     DESCRIPTION                                                                                                  
-              " A hwIpMcastOutChannelExceededLimit notification signifies that existed entries 
+              "A hwIpMcastOutChannelExceededLimit notification signifies that existed entries 
               exceeded channel downstream entry or bandwidth limit of pim routing-table.                                                     
                                                                                                                  
               This notification is generated whenever existed entries belongs to specified 
               channel exceeded downstream entry or bandwidth limit due to downstream 
-              limit config."                                                                     
+              limit configuration."                                                                     
     ::= { hwIpMcastNotifications 5 } 
     
 hwIpMcastOutTotalExceededLimit   NOTIFICATION-TYPE                                                                             
@@ -1314,16 +1687,17 @@ hwIpMcastOutTotalExceededLimit   NOTIFICATION-TYPE
               hwIpMcastChannelDownstreamEntries,
               hwIpMcastChannelDownstreamBandWidth,
               hwIpMcastChannelDownstreamLimitEntries,
-              hwIpMcastChannelDownstreamLimitBandWidth
+              hwIpMcastChannelDownstreamLimitBandWidth,
+              hwIpMcastChannelInterfaceName
             }                                                                             
-    STATUS    current                                                                                            
+    STATUS    obsolete                                                                                            
     DESCRIPTION                                                                                                  
-              " A hwIpMcastOutTotalExceededLimit notification signifies that existed entries 
+              "A hwIpMcastOutTotalExceededLimit notification signifies that existed entries 
               exceeded total downstream entry or bandwidth limit of pim routing-table.                                                     
                                                                                                                  
               This notification is generated whenever existed entries exceeded total 
               downstream entry or bandwidth limit due to downstream 
-              limit config."                                                                     
+              limit configuration."                                                                     
     ::= { hwIpMcastNotifications 6 } 
     
 hwIpMcastGlobalChannelExceededLimit   NOTIFICATION-TYPE                                                                             
@@ -1331,28 +1705,120 @@ hwIpMcastGlobalChannelExceededLimit   NOTIFICATION-TYPE
               hwIpMcastChannelGlobalEntries,
               hwIpMcastChannelGlobalLimitEntries
             }                                                                             
-    STATUS    current                                                                                            
+    STATUS    obsolete                                                                                            
     DESCRIPTION                                                                                                  
-              " A hwIpMcastGlobalChannelExceededLimit notification signifies that existed entries exceeded
+              "A hwIpMcastGlobalChannelExceededLimit notification signifies that existed entries exceeded
               global entry limit of pim routing-table.                                                     
                                                                                                                  
               This notification is generated whenever existed entries belongs to specified channel                       
-              exceeded global entry or bandwidth limit due to global limit config."                                                                     
+              exceeded global entry or bandwidth limit due to global limit configuration."                                                                     
     ::= { hwIpMcastNotifications 7 }   
     
 hwIpMcastGlobalTotalExceededLimit   NOTIFICATION-TYPE                                                                             
     OBJECTS { hwIpMcastChannelGlobalEntries,
               hwIpMcastChannelGlobalLimitEntries
             }                                                                             
-    STATUS    current                                                                                            
+    STATUS    obsolete                                                                                            
     DESCRIPTION                                                                                                  
-              " A hwIpMcastGlobalTotalExceededLimit notification signifies that existed entries exceeded
+              "A hwIpMcastGlobalTotalExceededLimit notification signifies that existed entries exceeded
               global total entry limit of pim routing-table.                                                     
                                                                                                                  
-              This notification is generated whenever existed entries  exceeded global total entry 
-              or bandwidth limit due to global limit config."                                                                     
+              This notification is generated whenever existed entries exceeded global total entry 
+              or bandwidth limit due to global limit configuration."                                                                     
     ::= { hwIpMcastNotifications 8 }
-                                         
+hwMFIBEntryOverloadSuspend   NOTIFICATION-TYPE                                                                             
+    OBJECTS { hwIpMcastOverloadAddressType,
+    	      hwIpMcastInstanceName,
+              hwBoardIndex 
+            }                                                                             
+    STATUS    current                                                                                            
+    DESCRIPTION                                                                                                  
+              "A hwMFIBEntryOverloadSuspend notification signifies that the MFIB module is overloaded.                                                     
+                                                                                                                 
+              This notification is generated whenever the MFIB module is overloaded in the board."                                                                     
+    ::= { hwIpMcastNotifications 9 }
+    
+hwMFIBEntryOverloadSusResume   NOTIFICATION-TYPE                                                                             
+    OBJECTS { hwIpMcastOverloadAddressType,
+    	      hwIpMcastInstanceName,
+              hwBoardIndex 
+            }                                                                             
+    STATUS    current                                                                                            
+    DESCRIPTION                                                                                                  
+              "A hwMFIBEntryOverloadSusResume notification signifies that the board MFIB module changes 
+              from the overload suspension state to the normal state.                                                     
+                                                                                                                 
+              This notification is generated whenever the MFIB module changes from the overload suspension 
+              state to the normal state."                                                                     
+    ::= { hwIpMcastNotifications 10 }
+    
+hwMFIBEntryOifOverloadSuspend   NOTIFICATION-TYPE                                                                             
+    OBJECTS { hwIpMcastOverloadAddressType,
+              hwIpMcastOverloadSource,
+              hwIpMcastOverloadGroup,
+              hwIpMcastInstanceName,
+              hwBoardIndex 
+            }                                                                             
+    STATUS    current                                                                                            
+    DESCRIPTION                                                                                                  
+              "A hwMFIBEntryOifOverloadSuspend notification signifies that  the downstream of the MFIB entry is 
+              overloaded.                                                     
+                                                                                                                 
+              This notification is generated whenever the downstream of the MFIB entry is overloaded."                                                                     
+    ::= { hwIpMcastNotifications 11 }
+    
+hwMFIBEntryOifOverloadSusResume   NOTIFICATION-TYPE                                                                             
+    OBJECTS { hwIpMcastOverloadAddressType,
+              hwIpMcastOverloadSource,
+              hwIpMcastOverloadGroup,
+              hwIpMcastInstanceName,
+              hwBoardIndex 
+            }                                                                             
+    STATUS    current                                                                                            
+    DESCRIPTION                                                                                                  
+              "A hwMFIBEntryOifOverloadSuspend notification signifies that the MFIB entry changes from the overload 
+              suspension state to the normal state.                                                     
+                                                                                                                 
+              This notification is generated whenever the MFIB entry changes from the overload suspension state to 
+              the normal state."                                                                     
+    ::= { hwIpMcastNotifications 12 }
+          
+  hwIpMcastSGThresholdExceed NOTIFICATION-TYPE
+    OBJECTS { hwIpMcastSGCurrentCount,
+              hwIpMcastSGThreshold,
+              hwIpMcastSGTotalCount
+            }
+    STATUS      current
+    DESCRIPTION
+            "A hwIpMcastSGThresholdExceed notification signifies that multicast routing (S, G) entries count of all instances reached the upper threshold."
+      ::= { hwIpMcastNotifications 13 }
+
+hwIpMcastSGThresholdExceedClear NOTIFICATION-TYPE
+    OBJECTS { hwIpMcastSGCurrentCount,
+              hwIpMcastSGThreshold,
+              hwIpMcastSGTotalCount
+            }
+    STATUS      current
+    DESCRIPTION
+            "A hwIpMcastSGThresholdExceedClear notification signifies that multicast routing (S, G) entries count of all instances fell below the lower threshold."
+      ::= { hwIpMcastNotifications 14 }
+
+hwIpMcastSGExceed NOTIFICATION-TYPE
+    OBJECTS { hwIpMcastSGTotalCount 
+            }
+    STATUS      current
+    DESCRIPTION
+            "A hwIpMcastSGExceed notification signifies that multicast routing (S, G) entries count of all instances reached the limit."
+      ::= { hwIpMcastNotifications 15 }
+
+hwIpMcastSGExceedClear NOTIFICATION-TYPE
+    OBJECTS { hwIpMcastSGTotalCount
+            }
+    STATUS      current
+    DESCRIPTION
+            "A hwIpMcastSGExceedClear notification signifies that multicast routing (S, G) entries count of all instances fell below the limit."
+      ::= { hwIpMcastNotifications 16 }
+	                             
 --
 -- Conformance information
 --
@@ -1368,7 +1834,7 @@ hwIpMcastMibGroups                       OBJECT IDENTIFIER ::= { hwIpMcastMibCon
 hwIpMcastMibComplianceHost MODULE-COMPLIANCE
     STATUS  current
     DESCRIPTION
-            "The compliance statement for hosts supporting IPMCAST-Mib."
+            "The compliance statement for hosts supporting IPMCAST-MIB."
     MODULE  -- this module
     MANDATORY-GROUPS { hwIpMcastMibBasicGroup }
 
@@ -1403,7 +1869,7 @@ hwIpMcastMibComplianceRouter MODULE-COMPLIANCE
     STATUS  current
     DESCRIPTION
             "The compliance statement for routers supporting
-             IPMCAST-Mib."
+             IPMCAST-MIB."
 
     MODULE  -- this module
     MANDATORY-GROUPS { hwIpMcastMibRouteProtoGroup,
@@ -1459,7 +1925,7 @@ hwIpMcastMibComplianceBorderRouter MODULE-COMPLIANCE
     STATUS  current
     DESCRIPTION
             "The compliance statement for routers on scope
-            boundaries supporting IPMCAST-Mib."
+            boundaries supporting IPMCAST-MIB."
     MODULE  -- this module
     MANDATORY-GROUPS { hwIpMcastMibRouteProtoGroup,
                        hwIpMcastMibBasicGroup,
@@ -1617,7 +2083,19 @@ hwIpMcastMibNotificationObjects OBJECT-GROUP
               hwIpMcastChannelDownstreamLimitBandWidth,
               hwIpMcastChannelDownstreamLimitEntries,
               hwIpMcastChannelGlobalLimitEntries,
-              hwIpMcastChannelInterfaceIfIndex
+              hwIpMcastChannelInterfaceIfIndex,
+              hwIpMcastChannelInterfaceName,
+              hwIpMcastCfgTotalLimit,
+              hwIpMcastCfgTotalThreshold,
+              hwIpMcastTotalStat,
+              hwIpMcastInstanceName,
+              hwBoardIndex,
+              hwIpMcastOverloadAddressType,
+              hwIpMcastOverloadSource,
+              hwIpMcastOverloadGroup,
+              hwIpMcastSGCurrentCount,  
+              hwIpMcastSGThreshold,  
+              hwIpMcastSGTotalCount              
             }
     STATUS  current
     DESCRIPTION
@@ -1633,7 +2111,15 @@ hwIpMcastMibNotificationGroup NOTIFICATION-GROUP
                     hwIpMcastOutChannelExceededLimit,
                     hwIpMcastOutTotalExceededLimit,
                     hwIpMcastGlobalChannelExceededLimit,
-                    hwIpMcastGlobalTotalExceededLimit
+                    hwIpMcastGlobalTotalExceededLimit,
+                    hwMFIBEntryOverloadSuspend,
+                    hwMFIBEntryOverloadSusResume,
+                    hwMFIBEntryOifOverloadSuspend,
+                    hwMFIBEntryOifOverloadSusResume,
+                    hwIpMcastSGThresholdExceed,
+                    hwIpMcastSGThresholdExceedClear,
+                    hwIpMcastSGExceed,
+                    hwIpMcastSGExceedClear
                   }
     STATUS  current
     DESCRIPTION

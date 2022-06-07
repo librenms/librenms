@@ -1,11 +1,12 @@
 -- =================================================================
--- Copyright (C) 2003 by  HUAWEI TECHNOLOGIES. All rights reserved.
+-- Copyright (C) 2016 by  HUAWEI TECHNOLOGIES. All rights reserved.
 --
 -- Description: Huawei DHCP Server MIB
 -- Reference:   HUAWEI Enterprise MIB
--- Version:     V1.0
+-- Version:     V2.07
 -- History:
---
+--              V2.05
+--              modified by Huangjun 2009-12-08
 -- =================================================================
 
 HUAWEI-DHCPS-MIB DEFINITIONS ::= BEGIN
@@ -17,47 +18,77 @@ HUAWEI-DHCPS-MIB DEFINITIONS ::= BEGIN
             FROM RFC1213-MIB            
         OBJECT-GROUP            
             FROM SNMPv2-CONF            
-        IpAddress, Integer32, OBJECT-TYPE, MODULE-IDENTITY            
+        IpAddress, Integer32, OBJECT-TYPE, MODULE-IDENTITY  --,TEXTUAL-CONVENTION            
             FROM SNMPv2-SMI            
-        RowStatus, MacAddress            
-            FROM SNMPv2-TC;
-
+        EnabledStatus
+            FROM P-BRIDGE-MIB         
+        RowStatus, TruthValue, MacAddress            
+            FROM SNMPv2-TC
+        MODULE-COMPLIANCE    
+           FROM SNMPv2-CONF;
 
     hwDHCPServerMib MODULE-IDENTITY 
-        LAST-UPDATED "200303010000Z"        -- March 01, 2003 at 00:00 GMT
+        LAST-UPDATED "201606220000Z"        -- June22, 2016 at 16:00 GMT
         ORGANIZATION 
-            "Huawei Technologies co., Ltd."
+            "Huawei Technologies Co.,Ltd."
         CONTACT-INFO 
-            " R&D BeiJing, Huawei Technologies co.,Ltd.
-            Huawei Bld.,NO.3 Xinxi Rd., 
-            Shang-Di Information Industry Base,
-            Hai-Dian District Beijing P.R. China
-            Zip:100085 
-            Http://www.huawei.com                       
-            E-mail:support@huawei.com "
+            "Huawei Industrial Base
+             Bantian, Longgang
+             Shenzhen 518129
+             People's Republic of China
+             Website: http://www.huawei.com
+             Email: support@huawei.com
+            "
+   DESCRIPTION
+            "modify  the description of node hwDHCPSWriteDataDelay"
+        REVISION "201606220000Z"       
+
+   DESCRIPTION 
+            "Add node hwDHCPSGlobalPoolConflictRecycleTime hwDHCPSInterfacePoolConflictRecycleTime"
+        REVISION "201503050000Z"       
+
+    DESCRIPTION 
+            "This MIB describes objects used for managing DHCP server,
+             including objects used for DHCP server global pool, 
+             interface pool and informations of ip address used and conflicted
+             in DHCP server, some Statistic informations about DHCP server"
+        REVISION "201408250000Z"        -- Mar174, 2014 at 00:00 GMT
+        
+    DESCRIPTION 
+            "This MIB describes objects used for managing DHCP server,
+             including objects used for DHCP server global pool, 
+             interface pool and informations of ip address used and conflicted
+             in DHCP server, some Statistic informations about DHCP server"
+        REVISION "201403170000Z"        -- Mar17, 2014 at 00:00 GMT
+
+    DESCRIPTION 
+            "This MIB describes objects used for managing DHCP server,
+             including objects used for DHCP server global pool, 
+             interface pool and informations of ip address used and conflicted
+             in DHCP server, some Statistic informations about DHCP server"
+        REVISION "201307040000Z"        -- Jul4, 2013 at 00:00 GMT
+
+     DESCRIPTION 
+            "This MIB describes objects used for managing DHCP server,
+             including objects used for DHCP server global pool, 
+             interface pool and informations of ip address used and conflicted
+             in DHCP server, some Statistic informations about DHCP server"
+        REVISION "201306190000Z"        -- Jun19, 2013 at 00:00 GMT
+
         DESCRIPTION 
             "This MIB describes objects used for managing DHCP server,
              including objects used for DHCP server global pool, 
              interface pool and informations of ip address used and conflicted
              in DHCP server, some Statistic informations about DHCP server"
+        REVISION "201305170000Z"        -- May 17, 2013 at 00:00 GMT
+        DESCRIPTION
+            "The modify revision of this MIB module."
+
         REVISION "200302120000Z"        -- February 12, 2003 at 00:00 GMT
         DESCRIPTION
             "The initial revision of this MIB module."
         ::= { hwDhcp 2 }
     
-    --
-    -- Textual Conventions 
-    --
-
-    EnabledStatus ::= TEXTUAL-CONVENTION
-        STATUS  current
-        DESCRIPTION "To describe the status of some function is Enabled or 
-                    Disabled"
-        SYNTAX  INTEGER {
-                enabled(1),
-                disabled(0)
-                }    
-
     --
     -- Node definitions
     --
@@ -308,11 +339,11 @@ HUAWEI-DHCPS-MIB DEFINITIONS ::= BEGIN
     HwDHCPSGlobalPoolParaEntry ::=
         SEQUENCE { 
             hwDHCPSGlobalPoolLeaseDay
-                INTEGER,
+                Integer32,
             hwDHCPSGlobalPoolLeaseHour
-                INTEGER,
+                Integer32,
             hwDHCPSGlobalPoolLeaseMinute
-                INTEGER,
+                Integer32,
             hwDHCPSGlobalPoolLeaseUnlimited
                 INTEGER,
             hwDHCPSGlobalPoolDomainName
@@ -334,12 +365,16 @@ HUAWEI-DHCPS-MIB DEFINITIONS ::= BEGIN
             hwDHCPSGlobalPoolParaUndoFlag
                 INTEGER,
             hwDHCPSGlobalPoolIPInUseReset
-                INTEGER
+                INTEGER,
+           hwDHCPSGlobalPoolLogging
+                INTEGER,
+           hwDHCPSGlobalPoolConflictRecycleTime
+                Integer32
          }
 
     -- 1.3.6.1.4.1.2011.5.7.2.1.3.1.1
     hwDHCPSGlobalPoolLeaseDay OBJECT-TYPE
-        SYNTAX INTEGER (0..365)
+        SYNTAX Integer32 (0..365)
         MAX-ACCESS read-write
         STATUS current
         DESCRIPTION
@@ -351,7 +386,7 @@ HUAWEI-DHCPS-MIB DEFINITIONS ::= BEGIN
     
     -- 1.3.6.1.4.1.2011.5.7.2.1.3.1.2
     hwDHCPSGlobalPoolLeaseHour OBJECT-TYPE
-        SYNTAX INTEGER (0..23)
+        SYNTAX Integer32 (0..23)
         MAX-ACCESS read-write
         STATUS current
         DESCRIPTION
@@ -363,7 +398,7 @@ HUAWEI-DHCPS-MIB DEFINITIONS ::= BEGIN
     
     -- 1.3.6.1.4.1.2011.5.7.2.1.3.1.3
     hwDHCPSGlobalPoolLeaseMinute OBJECT-TYPE
-        SYNTAX INTEGER (0..59)
+        SYNTAX Integer32 (0..59)
         MAX-ACCESS read-write
         STATUS current
         DESCRIPTION
@@ -396,7 +431,7 @@ HUAWEI-DHCPS-MIB DEFINITIONS ::= BEGIN
     
     -- 1.3.6.1.4.1.2011.5.7.2.1.3.1.5
     hwDHCPSGlobalPoolDomainName OBJECT-TYPE
-        SYNTAX OCTET STRING (SIZE (3..50))
+        SYNTAX OCTET STRING (SIZE (1..63))
         MAX-ACCESS read-write
         STATUS current
         DESCRIPTION
@@ -452,7 +487,7 @@ HUAWEI-DHCPS-MIB DEFINITIONS ::= BEGIN
     -- 1.3.6.1.4.1.2011.5.7.2.1.3.1.10
     hwDHCPSGlobalPoolClientNetbiosType OBJECT-TYPE
         SYNTAX INTEGER
-            {
+            {             
             null(0),
             bnode(1),
             pnode(2),
@@ -540,6 +575,27 @@ HUAWEI-DHCPS-MIB DEFINITIONS ::= BEGIN
                 default vlaue, do nothing"
         ::= { hwDHCPSGlobalPoolParaEntry 14 }
     
+    -- 1.3.6.1.4.1.2011.5.7.2.1.3.1.15
+    hwDHCPSGlobalPoolLogging OBJECT-TYPE
+        SYNTAX INTEGER { disable(0),enable(1) }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Log the assigning IP addresses information  of the given global pool for DHCP server. "
+         DEFVAL { disable }
+        ::= { hwDHCPSGlobalPoolParaEntry 15 }
+
+		
+    -- 1.3.6.1.4.1.2011.5.7.2.1.3.1.16
+    hwDHCPSGlobalPoolConflictRecycleTime OBJECT-TYPE
+         SYNTAX Integer32 (0..1439999)
+         UNITS "minute"
+         MAX-ACCESS read-write
+         STATUS current
+         DESCRIPTION
+              "Description."
+         DEFVAL { 0 }
+         ::= { hwDHCPSGlobalPoolParaEntry 16 }
     --  =================================================================
     -- 4th Table of hwDHCPServerMibObject: hwDHCPSGlobalPoolOptionTable
     -- =================================================================
@@ -567,7 +623,7 @@ HUAWEI-DHCPS-MIB DEFINITIONS ::= BEGIN
     HwDHCPSGlobalPoolOptionEntry ::=
         SEQUENCE { 
             hwDHCPSGlobalPoolOptionCode
-                INTEGER,
+                Integer32,
             hwDHCPSGlobalPoolOptionType
                 INTEGER,
             hwDHCPSGlobalPoolOptionAscii
@@ -577,12 +633,14 @@ HUAWEI-DHCPS-MIB DEFINITIONS ::= BEGIN
             hwDHCPSGlobalPoolOptionIPString
                 OCTET STRING,
             hwDHCPSGlobalPoolOptionRowStatus
-                RowStatus
+                RowStatus,
+            hwDHCPSGlobalPoolOptionCipher
+                OCTET STRING
          }
 
     -- 1.3.6.1.4.1.2011.5.7.2.1.4.1.1
     hwDHCPSGlobalPoolOptionCode OBJECT-TYPE
-        SYNTAX INTEGER (2..254)
+        SYNTAX Integer32 (2..254)
         MAX-ACCESS read-only
         STATUS current
         DESCRIPTION
@@ -596,7 +654,8 @@ HUAWEI-DHCPS-MIB DEFINITIONS ::= BEGIN
             {
             ascii(1),
             hex(2),
-            ip(3)
+            ip(3),
+            cipher(4)
             }
         MAX-ACCESS read-create
         STATUS current
@@ -606,7 +665,8 @@ HUAWEI-DHCPS-MIB DEFINITIONS ::= BEGIN
             The value means :
             ascii(1)- The option type is ascii string
             hex(2)  - The option type is hex number
-            ip(3)   - The option type is ip address"
+            ip(3)   - The option type is ip address
+           cipher(4) - The option type is cipher string"
         ::= { hwDHCPSGlobalPoolOptionEntry 2 }
     
     -- 1.3.6.1.4.1.2011.5.7.2.1.4.1.3
@@ -652,6 +712,13 @@ HUAWEI-DHCPS-MIB DEFINITIONS ::= BEGIN
             and value"
         ::= { hwDHCPSGlobalPoolOptionEntry 6 }
     
+    hwDHCPSGlobalPoolOptionCipher OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE (0..104))
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "Cipher string of a option."
+       ::= { hwDHCPSGlobalPoolOptionEntry 7 }
     --  =================================================================
     -- 5th Table of hwDHCPServerMibObject:hwDHCPSGlobalTreeTable
     -- =================================================================
@@ -754,11 +821,11 @@ HUAWEI-DHCPS-MIB DEFINITIONS ::= BEGIN
     HwDHCPSInterfacePoolParaEntry ::=
         SEQUENCE { 
             hwDHCPSInterfacePoolLeaseDay
-                INTEGER,
+                Integer32,
             hwDHCPSInterfacePoolLeaseHour
-                INTEGER,
+                Integer32,
             hwDHCPSInterfacePoolLeaseMinute
-                INTEGER,
+                Integer32,
             hwDHCPSInterfacePoolLeaseUnlimited
                 INTEGER,
             hwDHCPSInterfacePoolDomainName
@@ -776,12 +843,16 @@ HUAWEI-DHCPS-MIB DEFINITIONS ::= BEGIN
             hwDHCPSInterfacePoolParaUndoFlag
                 INTEGER,
             hwDHCPSInterfacePoolIPInUseReset
-                INTEGER
+                INTEGER,
+           hwDHCPSInterfacePoolLogging
+                INTEGER,
+           hwDHCPSInterfacePoolConflictRecycleTime
+                Integer32
          }
 
     -- 1.3.6.1.4.1.2011.5.7.2.1.6.1.1
     hwDHCPSInterfacePoolLeaseDay OBJECT-TYPE
-        SYNTAX INTEGER (0..365)
+        SYNTAX Integer32 (0..365)
         MAX-ACCESS read-write
         STATUS current
         DESCRIPTION
@@ -793,7 +864,7 @@ HUAWEI-DHCPS-MIB DEFINITIONS ::= BEGIN
     
     -- 1.3.6.1.4.1.2011.5.7.2.1.6.1.2
     hwDHCPSInterfacePoolLeaseHour OBJECT-TYPE
-        SYNTAX INTEGER (0..23)
+        SYNTAX Integer32 (0..23)
         MAX-ACCESS read-write
         STATUS current
         DESCRIPTION
@@ -805,7 +876,7 @@ HUAWEI-DHCPS-MIB DEFINITIONS ::= BEGIN
     
     -- 1.3.6.1.4.1.2011.5.7.2.1.6.1.3
     hwDHCPSInterfacePoolLeaseMinute OBJECT-TYPE
-        SYNTAX INTEGER (0..59)
+        SYNTAX Integer32 (0..59)
         MAX-ACCESS read-write
         STATUS current
         DESCRIPTION
@@ -837,7 +908,7 @@ HUAWEI-DHCPS-MIB DEFINITIONS ::= BEGIN
     
     -- 1.3.6.1.4.1.2011.5.7.2.1.6.1.5
     hwDHCPSInterfacePoolDomainName OBJECT-TYPE
-        SYNTAX OCTET STRING (SIZE (3..50))
+        SYNTAX OCTET STRING (SIZE (1..63))
         MAX-ACCESS read-write
         STATUS current
         DESCRIPTION
@@ -945,7 +1016,7 @@ HUAWEI-DHCPS-MIB DEFINITIONS ::= BEGIN
             undoNbns(5)    - It means to deletd a given ip address of NetBios
                              server,
             undoNbType(6)  - It means to delete NetBios node type
-            invalid(7)     - The value is a default value,do nothing 
+            invalid(7)     - The value is a default value,do nothing
             "
         ::= { hwDHCPSInterfacePoolParaEntry 11 }
     
@@ -960,6 +1031,27 @@ HUAWEI-DHCPS-MIB DEFINITIONS ::= BEGIN
                 vlaue, do nothing"
         ::= { hwDHCPSInterfacePoolParaEntry 12 }
     
+    -- 1.3.6.1.4.1.2011.5.7.2.1.6.1.13
+    hwDHCPSInterfacePoolLogging OBJECT-TYPE
+        SYNTAX INTEGER { disable(0),enable(1) }
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+            "Log the assigning IP addresses information of the given interface pool for DHCP server. "
+        DEFVAL { disable }
+        ::= { hwDHCPSInterfacePoolParaEntry 13 }
+
+		
+    -- 1.3.6.1.4.1.2011.5.7.2.1.6.1.14
+    hwDHCPSInterfacePoolConflictRecycleTime OBJECT-TYPE
+        SYNTAX Integer32 (0..1439999)
+        UNITS "minute"
+        MAX-ACCESS read-write
+        STATUS current
+        DESCRIPTION
+             "Description."
+        DEFVAL { 0 }
+        ::= { hwDHCPSInterfacePoolParaEntry 14 }
     --  =====================================================================
     -- 7th Table of hwDHCPServerMibObject: hwDHCPSInterfacePoolOptionTable
     -- =====================================================================
@@ -979,7 +1071,7 @@ HUAWEI-DHCPS-MIB DEFINITIONS ::= BEGIN
         MAX-ACCESS not-accessible
         STATUS current
         DESCRIPTION
-            "An entry fo objects for configuring options
+            "An entry of objects for configuring options
             to DHCP interface pools.
             The index of this entry is the inIndex of ethernet"
         INDEX { ifIndex, hwDHCPSInterfacePoolOptionCode }
@@ -988,7 +1080,7 @@ HUAWEI-DHCPS-MIB DEFINITIONS ::= BEGIN
     HwDHCPSInterfacePoolOptionEntry ::=
         SEQUENCE { 
             hwDHCPSInterfacePoolOptionCode
-                INTEGER,
+                Integer32,
             hwDHCPSInterfacePoolOptionType
                 INTEGER,
             hwDHCPSInterfacePoolOptionAscii
@@ -998,12 +1090,14 @@ HUAWEI-DHCPS-MIB DEFINITIONS ::= BEGIN
             hwDHCPSInterfacePoolOptionIPString
                 OCTET STRING,
             hwDHCPSInterfacePoolOptionRowStatus
-                RowStatus
+                RowStatus,
+            hwDHCPSInterfacePoolOptionCipher
+                OCTET STRING
          }
 
     -- 1.3.6.1.4.1.2011.5.7.2.1.7.1.1
     hwDHCPSInterfacePoolOptionCode OBJECT-TYPE
-        SYNTAX INTEGER (2..254)
+        SYNTAX Integer32 (2..254)
         MAX-ACCESS read-only
         STATUS current
         DESCRIPTION
@@ -1017,7 +1111,8 @@ HUAWEI-DHCPS-MIB DEFINITIONS ::= BEGIN
             {
             ascii(1),
             hex(2),
-            ip(3)
+            ip(3),
+            cipher(4)
             }
         MAX-ACCESS read-create
         STATUS current
@@ -1028,6 +1123,7 @@ HUAWEI-DHCPS-MIB DEFINITIONS ::= BEGIN
             ascii(1)- The option type is ascii string
             hex(2)  - The option type is hex number
             ip(3)   - The option type is ip address
+           cipher(4) - The option type is cipher string
             "
         ::= { hwDHCPSInterfacePoolOptionEntry 2 }
     
@@ -1074,6 +1170,13 @@ HUAWEI-DHCPS-MIB DEFINITIONS ::= BEGIN
             and value"
         ::= { hwDHCPSInterfacePoolOptionEntry 6 }
     
+    hwDHCPSInterfacePoolOptionCipher OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE (0..104))
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "Cipher string of an option"
+       ::= { hwDHCPSInterfacePoolOptionEntry 7 }
     --  =========================================================================
     -- 8th Table of hwDHCPServerMibObject: hwDHCPSInterfacePoolStaticBindTable
     -- =========================================================================
@@ -1183,11 +1286,11 @@ HUAWEI-DHCPS-MIB DEFINITIONS ::= BEGIN
             hwDHCPSIPInUsePoolName
                 OCTET STRING,
             hwDHCPSIPInUseInterface
-                INTEGER,
+                Integer32,
             hwDHCPSIPInUseVlan
-                INTEGER,
+                Integer32,
             hwDHCPSIPInUseAtmpvc
-                INTEGER
+                Integer32
          }
 
     -- 1.3.6.1.4.1.2011.5.7.2.1.9.1.1
@@ -1253,7 +1356,7 @@ HUAWEI-DHCPS-MIB DEFINITIONS ::= BEGIN
     
     -- 1.3.6.1.4.1.2011.5.7.2.1.9.1.6
     hwDHCPSIPInUseInterface OBJECT-TYPE
-        SYNTAX INTEGER
+        SYNTAX Integer32
         MAX-ACCESS read-only
         STATUS current
         DESCRIPTION
@@ -1262,7 +1365,7 @@ HUAWEI-DHCPS-MIB DEFINITIONS ::= BEGIN
     
     -- 1.3.6.1.4.1.2011.5.7.2.1.9.1.7
     hwDHCPSIPInUseVlan OBJECT-TYPE
-        SYNTAX INTEGER (1..4094)
+        SYNTAX Integer32 (1..4094)
         MAX-ACCESS read-only
         STATUS current
         DESCRIPTION
@@ -1271,7 +1374,7 @@ HUAWEI-DHCPS-MIB DEFINITIONS ::= BEGIN
     
     -- 1.3.6.1.4.1.2011.5.7.2.1.9.1.8
     hwDHCPSIPInUseAtmpvc OBJECT-TYPE
-        SYNTAX INTEGER
+        SYNTAX Integer32
         MAX-ACCESS read-only
         STATUS current
         DESCRIPTION
@@ -1425,10 +1528,9 @@ HUAWEI-DHCPS-MIB DEFINITIONS ::= BEGIN
         MAX-ACCESS read-write
         STATUS current
         DESCRIPTION
-            "The status of DHCP service, The default value is enabled, which
-            mean enable the DHCP service; the other value is disabled, which
-            mean disabled the DHCP service"
-        DEFVAL { enabled }
+            "The status of DHCP service, The default value is disabled, which
+            mean disabled the DHCP service; the other value is enabled, which
+            mean enable the DHCP service"
         ::= { hwDHCPServerMibObject 12 }
     
     -- 1.3.6.1.4.1.2011.5.7.2.1.13
@@ -1440,28 +1542,25 @@ HUAWEI-DHCPS-MIB DEFINITIONS ::= BEGIN
             "The status of DHCP servers detecting function.
              If the value is enabled, It will check whether have other DHCP Servers.
              The default value is disabled"
-        DEFVAL { disabled }
         ::= { hwDHCPServerMibObject 13 }
     
     -- 1.3.6.1.4.1.2011.5.7.2.1.14
     hwDHCPSPingNum OBJECT-TYPE
-        SYNTAX INTEGER (0..10)
+        SYNTAX Integer32 (0..10)
         MAX-ACCESS read-write
         STATUS current
         DESCRIPTION
-            "The number of ping packets sent out when check address conflict"
-        DEFVAL { 2 }
+            "The number of ping packets sent out when check address conflict,the default value is 2."
         ::= { hwDHCPServerMibObject 14 }
     
     -- 1.3.6.1.4.1.2011.5.7.2.1.15
     hwDHCPSPingTimeout OBJECT-TYPE
-        SYNTAX INTEGER (0..10000)
+        SYNTAX Integer32 (0..10000)
         MAX-ACCESS read-write
         STATUS current
         DESCRIPTION
             "The delay for the reply of a ping packet when check address conflict.
-            Unit: millisecond"
-        DEFVAL { 500 }
+            Unit: millisecond, the default value is 500."
         ::= { hwDHCPServerMibObject 15 }
     
     -- 1.3.6.1.4.1.2011.5.7.2.1.16
@@ -1472,8 +1571,8 @@ HUAWEI-DHCPS-MIB DEFINITIONS ::= BEGIN
         DESCRIPTION
             "The status of the function writing data to the
             harddisk, It does not write data to the harddisk default,
-            The information that written are the content that hwDHCPSConflictIPTable and hwDHCPSIPInUseTable"
-        DEFVAL { disabled }
+            The information that written are the content that hwDHCPSConflictIPTable and hwDHCPSIPInUseTable,
+            the default value is disable."
         ::= { hwDHCPServerMibObject 16 }
     
     -- 1.3.6.1.4.1.2011.5.7.2.1.17
@@ -1488,13 +1587,12 @@ HUAWEI-DHCPS-MIB DEFINITIONS ::= BEGIN
     
     -- 1.3.6.1.4.1.2011.5.7.2.1.18
     hwDHCPSWriteDataDelay OBJECT-TYPE
-        SYNTAX INTEGER (300..86400)
+        SYNTAX Integer32 (300..86400)
         MAX-ACCESS read-write
         STATUS current
         DESCRIPTION
             "The allowable delay of writing data to the
-            harddisk. Unit: second"
-        DEFVAL { 300 }
+            harddisk. Unit: second."
         ::= { hwDHCPServerMibObject 18 }
     
     -- 1.3.6.1.4.1.2011.5.7.2.1.19
@@ -1738,8 +1836,272 @@ HUAWEI-DHCPS-MIB DEFINITIONS ::= BEGIN
             received and sent by the DHCP server.
             The value 1 means clear the statictics information"
         ::= { hwDHCPServerMibObject 42 }
+        
+    --  =================================================================
+    -- 43th Table of hwDHCPServerMibObject: hwDHCPChastenTable
+    -- =================================================================
+    -- 1.3.6.1.4.1.2011.5.7.2.1.43
+    hwDHCPChastenTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF HwDHCPChastenEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "A table for configuring parameters of chasten , which 
+            don't allow to deal with packet of clients"
+        ::= { hwDHCPServerMibObject 43 }
     
+    -- 1.3.6.1.4.1.2011.5.7.2.1.43.1
+    hwDHCPChastenEntry OBJECT-TYPE
+        SYNTAX HwDHCPChastenEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "An entry for configuring parameters of chasten"
+        INDEX { hwDHCPChastenIndex }
+        ::= { hwDHCPChastenTable 1 }
+    
+    HwDHCPChastenEntry ::=
+        SEQUENCE { 
+            hwDHCPChastenIndex
+                Integer32,
+            hwDHCPChastenPktNum
+                Integer32,  
+            hwDHCPChastenAutenPktNum
+                Integer32,
+            hwDHCPChastenCheckPeriod
+                Integer32,
+            hwDHCPChastenChastenPeriod
+                Integer32,  
+            hwDHCPChastenChastenRowStatus 
+                RowStatus 
+         }
 
+    -- 1.3.6.1.4.1.2011.5.7.2.1.43.1.1
+    hwDHCPChastenIndex OBJECT-TYPE
+        SYNTAX Integer32 (0..16)
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Slot of LPU"
+        ::= { hwDHCPChastenEntry 1 }
+    
+    -- 1.3.6.1.4.1.2011.5.7.2.1.43.1.2
+    hwDHCPChastenPktNum OBJECT-TYPE
+        SYNTAX Integer32 (0..10000)
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "The threshold number of DHCP Discover packet"
+        ::= { hwDHCPChastenEntry 2 }     
+        
+    -- 1.3.6.1.4.1.2011.5.7.2.1.43.1.3   
+    hwDHCPChastenAutenPktNum OBJECT-TYPE
+        SYNTAX Integer32 (0..10000)
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "The threshold number of DHCP Discover packet"
+        ::= { hwDHCPChastenEntry 3 }
+     
+    -- 1.3.6.1.4.1.2011.5.7.2.1.43.1.4
+    hwDHCPChastenCheckPeriod OBJECT-TYPE
+        SYNTAX Integer32 (1..3600)
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "The period of checking"
+        ::= { hwDHCPChastenEntry 4 }
+    -- 1.3.6.1.4.1.2011.5.7.2.1.43.1.5
+    hwDHCPChastenChastenPeriod OBJECT-TYPE
+        SYNTAX Integer32 (0..3600)
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "The period of chasten"
+        ::= { hwDHCPChastenEntry 5 }  
+    -- 1.3.6.1.4.1.2011.5.7.2.1.43.1.6    
+    hwDHCPChastenChastenRowStatus OBJECT-TYPE
+            SYNTAX RowStatus
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This object is used to configuration new rows in this
+            table, modify existing rows, and to delete
+            existing rows.Only three actions are used: active(1),
+            createAndGo(4), destroy(6).
+            while configuration new suboption, you must specify suboption type 
+            and value"
+            ::= { hwDHCPChastenEntry 6 }    
+
+--  =================================================================
+    -- 45th Table of hwDHCPServerMibObject: hwDHCPSIPPOOLForbiddenIPTable
+    -- =================================================================
+    -- 1.3.6.1.4.1.2011.5.7.2.1.45
+    hwDHCPSIPPOOLForbiddenIPTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF HwDHCPSIPPOOLForbiddenIPEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "A table for configuring forbidden ip to DHCP server, which 
+            don't allow to allocate to clients"
+        ::= { hwDHCPServerMibObject 45 }
+    
+    -- 1.3.6.1.4.1.2011.5.7.2.1.45.1
+    hwDHCPSIPPOOLForbiddenIPEntry OBJECT-TYPE
+        SYNTAX HwDHCPSIPPOOLForbiddenIPEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "An entry for configuring forbidden ip to DHCP
+            server"
+        INDEX { hwDHCPSIPPOOLForbiddenIPStart, hwDHCPSIPPOOLForbiddenIPEnd, hwDHCPSIPPOOLForbiddenIPVRFName }
+        ::= { hwDHCPSIPPOOLForbiddenIPTable 1 }
+    
+    HwDHCPSIPPOOLForbiddenIPEntry ::=
+        SEQUENCE { 
+            hwDHCPSIPPOOLForbiddenIPStart
+                IpAddress,
+            hwDHCPSIPPOOLForbiddenIPEnd
+                IpAddress,
+            hwDHCPSIPPOOLForbiddenIPVRFName
+                OCTET STRING,
+            hwDHCPSIPPOOLForbiddenIPRowStatus
+                RowStatus
+         }
+
+    -- 1.3.6.1.4.1.2011.5.7.2.1.45.1.1
+    hwDHCPSIPPOOLForbiddenIPStart OBJECT-TYPE
+        SYNTAX IpAddress
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Start ip address of forbidden ip"
+        ::= { hwDHCPSIPPOOLForbiddenIPEntry 1 }
+    
+    -- 1.3.6.1.4.1.2011.5.7.2.1.45.1.2
+    hwDHCPSIPPOOLForbiddenIPEnd OBJECT-TYPE
+        SYNTAX IpAddress
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "End ip address of forbidden ip"
+        ::= { hwDHCPSIPPOOLForbiddenIPEntry 2 }
+    
+    -- 1.3.6.1.4.1.2011.5.7.2.1.45.1.3
+    hwDHCPSIPPOOLForbiddenIPVRFName OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE (0..31))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Index: the VRFNAME of forbidden ip."
+        ::= { hwDHCPSIPPOOLForbiddenIPEntry 3 }
+        
+    -- 1.3.6.1.4.1.2011.5.7.2.1.45.1.4
+    hwDHCPSIPPOOLForbiddenIPRowStatus OBJECT-TYPE
+        SYNTAX RowStatus
+        MAX-ACCESS read-create
+        STATUS current
+        DESCRIPTION
+            "This object is used to configuration new rows in this
+            table, modify existing rows, and to delete
+            existing rows.Only three actions are used: active(1),
+            createAndGo(4), destroy(6)
+            "
+        ::= { hwDHCPSIPPOOLForbiddenIPEntry 4 }
+    
+    --  =================================================================
+    -- 46th Table of hwDHCPServerMibObject: hwDHCPSIPPOOLConflictIPTable
+    -- =================================================================
+    -- 1.3.6.1.4.1.2011.5.7.2.1.46
+    hwDHCPSIPPOOLConflictIPTable OBJECT-TYPE
+        SYNTAX SEQUENCE OF HwDHCPSIPPOOLConflictIPEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "
+            A table for displaying the information of conflict
+            ip for DHCP server,ip address is uesed by others 
+            when allocate the address.
+            "
+        ::= { hwDHCPServerMibObject 46 }
+    
+    -- 1.3.6.1.4.1.2011.5.7.2.1.46.1
+    hwDHCPSIPPOOLConflictIPEntry OBJECT-TYPE
+        SYNTAX HwDHCPSIPPOOLConflictIPEntry
+        MAX-ACCESS not-accessible
+        STATUS current
+        DESCRIPTION
+            "An entry for displaying the information of
+            conflict ip for DHCP server"
+        INDEX { hwDHCPSIPPOOLConflictIP, hwDHCPSIPPOOLConflictIPVRFName }
+        ::= { hwDHCPSIPPOOLConflictIPTable 1 }
+    
+    HwDHCPSIPPOOLConflictIPEntry ::=
+        SEQUENCE { 
+            hwDHCPSIPPOOLConflictIP
+                IpAddress,
+            hwDHCPSIPPOOLConflictIPVRFName
+                OCTET STRING,
+            hwDHCPSIPPOOLConflictIPType
+                INTEGER,
+            hwDHCPSIPPOOLConflictIPDetectTime
+                OCTET STRING
+         }
+        
+    -- 1.3.6.1.4.1.2011.5.7.2.1.46.1.1
+    hwDHCPSIPPOOLConflictIP OBJECT-TYPE
+        SYNTAX IpAddress
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Conflict ip address"
+        ::= { hwDHCPSIPPOOLConflictIPEntry 1 }
+        
+    -- 1.3.6.1.4.1.2011.5.7.2.1.46.1.2
+    hwDHCPSIPPOOLConflictIPVRFName OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE (1..31))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Index: the VRFNAME of conflict ip."
+        ::= { hwDHCPSIPPOOLConflictIPEntry 2 }
+    
+    -- 1.3.6.1.4.1.2011.5.7.2.1.46.1.3
+    hwDHCPSIPPOOLConflictIPType OBJECT-TYPE
+        SYNTAX INTEGER
+            {
+            ping(1),
+            arp(2)
+            }
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Type of the detection of conflict ip,
+             As a consistency check, the allocating
+             server SHOULD probe the reused address before allocating the address,
+             e.g., with ping or ARP"
+        ::= { hwDHCPSIPPOOLConflictIPEntry 3 }
+    
+    -- 1.3.6.1.4.1.2011.5.7.2.1.46.1.4
+    hwDHCPSIPPOOLConflictIPDetectTime OBJECT-TYPE
+        SYNTAX OCTET STRING (SIZE (20))
+        MAX-ACCESS read-only
+        STATUS current
+        DESCRIPTION
+            "Time when the confict is detected.
+            The structure of the OCTET STRING is
+            year/month/day:hour:munite:second --
+            YYYY/MM/DD:hh:mm:ss"
+        ::= { hwDHCPSIPPOOLConflictIPEntry 4 }
+        
+    hwDHCPThroughPacket OBJECT-TYPE
+    SYNTAX TruthValue
+    MAX-ACCESS read-write
+    STATUS current
+    DESCRIPTION
+        "Set client request packet through"
+    ::= { hwDHCPServerMibObject 47 }
+        
 -- Reserved for H3C
 --    hwDHCPSIPInUseExTable OBJECT-TYPE
 --        SYNTAX SEQUENCE OF HwDHCPSIPInUseExEntry
@@ -1748,7 +2110,7 @@ HUAWEI-DHCPS-MIB DEFINITIONS ::= BEGIN
 --        DESCRIPTION
 --            "A table for displaying the information of ip in use
 --            for DHCP Server pools. "
---        ::= { hwDHCPServerMibObject 43 }
+--        ::= { hwDHCPServerMibObject 45 }
         
         
     --  Conformance information
@@ -1758,8 +2120,16 @@ HUAWEI-DHCPS-MIB DEFINITIONS ::= BEGIN
     
     -- 1.3.6.1.4.1.2011.5.7.2.2.1
     hwDHCPServerMIBCompliances OBJECT IDENTIFIER ::= { hwDHCPServerMIBConformance 1 }
-    
-    -- 1.3.6.1.4.1.2011.5.7.2.2.2
+    hwDHCPServerMIBCompliance MODULE-COMPLIANCE
+               STATUS      current
+               DESCRIPTION
+                   "The compliance statement for systems supporting 
+                this module."
+
+               MODULE      -- this module     1.3.6.1.4.1.2011.5.7.2.2.2      
+               MANDATORY-GROUPS    {hwDHCPServerMIBGroup}  
+                                               
+              ::= { hwDHCPServerMIBCompliances 1 }
     hwDHCPServerMIBGroups OBJECT IDENTIFIER ::= { hwDHCPServerMIBConformance 2 }
     
     --  Units of conformance
@@ -1785,7 +2155,9 @@ HUAWEI-DHCPS-MIB DEFINITIONS ::= BEGIN
             hwDHCPSGlobalPoolAutoBindingNum, hwDHCPSGlobalPoolManualBindingNum, hwDHCPSGlobalPoolExpiredBindingNum, hwDHCPSInterfacePoolNumber, hwDHCPSInterfacePoolAutoBindingNum, 
             hwDHCPSInterfacePoolManualBindingNum, hwDHCPSInterfacePoolExpiredBindingNum, hwDHCPSBadPktNum, hwDHCPSBootRequestPktNum, hwDHCPSDiscoverPktNum, 
             hwDHCPSRequestPktNum, hwDHCPSDeclinePktNum, hwDHCPSReleasePktNum, hwDHCPSInformPktNum, hwDHCPSBootReplyPktNum, 
-            hwDHCPSOfferPktNum, hwDHCPSAckPktNum, hwDHCPSNakPktNum, hwDHCPSStatisticsReset }
+            hwDHCPSOfferPktNum, hwDHCPSAckPktNum, hwDHCPSNakPktNum, hwDHCPSStatisticsReset, hwDHCPSIPPOOLForbiddenIPStart, hwDHCPSIPPOOLForbiddenIPEnd, hwDHCPSIPPOOLForbiddenIPVRFName, 
+            hwDHCPSIPPOOLForbiddenIPRowStatus, hwDHCPSIPPOOLConflictIP, hwDHCPSIPPOOLConflictIPVRFName, hwDHCPSIPPOOLConflictIPType, hwDHCPSIPPOOLConflictIPDetectTime, hwDHCPThroughPacket,
+            hwDHCPSGlobalPoolConflictRecycleTime, hwDHCPSInterfacePoolConflictRecycleTime }
         STATUS current
         DESCRIPTION 
             "The basic collection of objects providing management of

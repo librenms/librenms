@@ -2,7 +2,7 @@
 -- CISCO-LWAPP-DOT11-MIB.my
 -- January 2007, Devesh Pujari, Srinath Candadai
 --   
--- Copyright (c) 2007, 2009-2010 by Cisco Systems Inc.
+-- Copyright (c) 2007, 2009-2010-2014, 2017 by Cisco Systems Inc.
 -- All rights reserved.
 -- *******************************************************************
 
@@ -35,7 +35,7 @@ IMPORTS
 -- ********************************************************************
 
 ciscoLwappDot11MIB MODULE-IDENTITY
-    LAST-UPDATED    "201005060000Z"
+    LAST-UPDATED    "201705220000Z"
     ORGANIZATION    "Cisco Systems Inc."
     CONTACT-INFO
             "Cisco Systems,
@@ -247,6 +247,15 @@ ciscoLwappDot11MIB MODULE-IDENTITY
 
         [4] Enhanced Wireless Consortium PHY Specification,
             v1.27."
+    REVISION        "201705220000Z"
+    DESCRIPTION
+        "Added cldVhtDot11acEnable in cld11acConfig.
+        Added cldLoadBalancingTrafficThreshold  in
+        cldLoadBalancing.
+        Added following in cld11acMcs table:
+        cld11acMcsSpatialStreamIndex,
+        cld11acMcsDataRateIndex,
+        cld11acMcsSupportEnable"
     REVISION        "201005060000Z"
     DESCRIPTION
         "Added cldHtDot11nEnable in CldHtMacOperationsEntry
@@ -419,7 +428,7 @@ cldHtDot11nEnable OBJECT-TYPE
 -- ********************************************************************
 
 cldMultipleCountryCode OBJECT-TYPE
-    SYNTAX          SnmpAdminString (SIZE  (1..255))
+    SYNTAX          SnmpAdminString (SIZE  (1..600))
     MAX-ACCESS      read-write
     STATUS          current
     DESCRIPTION
@@ -435,9 +444,9 @@ cldRegulatoryDomain OBJECT-TYPE
     STATUS          current
     DESCRIPTION
         "This object represents the regulatory domains for
-        the controller.
-        Regulatory domain specifies allowed 802.11 chanels.
-        Multiple domains can be listed seperated with spaces." 
+        the controller.Regulatory domain specifies allowed 
+        802.11 chanels.Multiple domains can be listed seperated 
+        with spaces." 
     ::= { cldConfig 3 }
 -- ********************************************************************
 -- *    MCS table
@@ -458,7 +467,7 @@ cld11nMcsEntry OBJECT-TYPE
     STATUS          current
     DESCRIPTION
         "An entry in this table represents a MCS data rate for 802.11n
-        band which is uniquely identifies by cld11nMcsDataRateIndex 
+        band which is uniquely identified by cld11nMcsDataRateIndex 
         and cld11nMcsBand.
         All entries are added by the controller at startup.
         cld11nMcsDataRate are calculated by different permutation of
@@ -514,9 +523,9 @@ cld11nMcsSupportEnable OBJECT-TYPE
     STATUS          current
     DESCRIPTION
         "This object is used to enable or disable the data
-        rate.  When this object is set to 'true' the MCS 
-        support is enabled. When this object is set 
-        to 'false' the MCS support is disabled.."
+        rate.  
+        A value of 'true' indicates, MCS support is enabled. 
+        A value of 'false' indicates, MCS support is disabled."
     DEFVAL          { true } 
     ::= { cld11nMcsEntry 4 }
 
@@ -548,7 +557,27 @@ cld11nMcsModulation OBJECT-TYPE
         "The object represents the modulation used to calculate
         cld11nMcsDataRate." 
     ::= { cld11nMcsEntry 7 }
+ 
 
+-- *****************************
+-- LOAD BALANCING CONFIGURATION
+-- *****************************
+
+cld11acConfig  OBJECT IDENTIFIER
+    ::= { cldConfig 5 }
+
+
+cldVhtDot11acEnable OBJECT-TYPE
+    SYNTAX          TruthValue
+    MAX-ACCESS      read-write
+    STATUS          current
+    DESCRIPTION
+        "This object is used to enable the controller to manage
+        802.11ac networks. A value of 'true' means the 802.11ac
+        network is enabled. A value of 'false' means the 802.11ac
+        network is disabled."
+    DEFVAL          { true } 
+    ::= { cld11acConfig 1 }
 -- ********************************************************************
 -- *    MCS table
 -- ********************************************************************
@@ -567,9 +596,9 @@ cld11acMcsEntry OBJECT-TYPE
     MAX-ACCESS      not-accessible
     STATUS          current
     DESCRIPTION
-        "An entry in this table represents the additional  MCS data rate for 802.11ac
-        band which is uniquely identifies by cld11acMcsSpatialStreamIndex
-        and cld11acMcsDataRateIndex.
+        "An entry in this table represents the additional  MCS data
+        rate for 802.11ac band which is uniquely identifies by 
+        cld11acMcsSpatialStreamIndex and cld11acMcsDataRateIndex.
         All entries are added by the controller at startup."
     INDEX           {
                         cld11acMcsSpatialStreamIndex,
@@ -578,11 +607,10 @@ cld11acMcsEntry OBJECT-TYPE
     ::= { cld11acMcsTable 1 }
 
 Cld11acMcsEntry ::= SEQUENCE {
-        cld11acMcsSpatialStreamIndex    Unsigned32,
-        cld11acMcsDataRateIndex Unsigned32,
-        cld11acMcsSupportEnable TruthValue
+        cld11acMcsSpatialStreamIndex Unsigned32,
+        cld11acMcsDataRateIndex      Unsigned32,
+        cld11acMcsSupportEnable      TruthValue
 }
-
 
 cld11acMcsSpatialStreamIndex OBJECT-TYPE
     SYNTAX          Unsigned32
@@ -609,30 +637,12 @@ cld11acMcsSupportEnable OBJECT-TYPE
     STATUS          current
     DESCRIPTION
         "This object is used to enable or disable the data
-        rate.  When this object is set to 'true' the MCS 
-        support is enabled. When this object is set 
-        to 'false' the MCS support is disabled.."
+        rate.  
+        A value of 'true' indicates the MCS support is enabled. 
+        A value of 'false' indicates the MCS support is disabled."
     DEFVAL          { true } 
     ::= { cld11acMcsEntry 3 }
-
--- *****************************
--- LOAD BALANCING CONFIGURATION
--- *****************************
-
-cld11acConfig  OBJECT IDENTIFIER
-    ::= { cldConfig 5 }
  
-cldVhtDot11acEnable OBJECT-TYPE
-    SYNTAX          TruthValue
-    MAX-ACCESS      read-write
-    STATUS          current
-    DESCRIPTION
-        "This object is used to enable the controller to manage
-        802.11ac networks. A value of 'true' means the 802.11ac
-        network is enabled. A value of 'false' means the 802.11ac
-        network is disabled."
-    DEFVAL          { true }
-    ::= { cld11acConfig 1 }
 
 -- *****************************
 -- LOAD BALANCING CONFIGURATION
@@ -717,21 +727,20 @@ cldLoadBalancingDenialCount OBJECT-TYPE
     ::= { cldLoadBalancing 3 }
 
 cldLoadBalancingTrafficThreshold OBJECT-TYPE
-    SYNTAX          Unsigned32 
+    SYNTAX          Unsigned32
     UNITS           "Percent"
     MAX-ACCESS      read-write
     STATUS          current
     DESCRIPTION
         "This object specifies the traffic threshold that  
-         triggers 'uplinkUsage' based load balancing. When the 
-         uplink usage of an AP is above this threshold, this AP 
-         is valid for 'uplinkUsage' based load balancing, if 
-         load balance is enabled by cLWlanLoadBalancingEnable 
-         and 'uplinkUsage' mode is chosen by cLWlanLoadBalancingMode
-         at that WLAN."
-    DEFVAL          { 50 }
+        triggers 'uplinkUsage' based load balancing. When the 
+        uplink usage of an AP is above this threshold, this AP 
+        is valid for 'uplinkUsage' based load balancing, if 
+        load balance is enabled by cLWlanLoadBalancingEnable 
+        and 'uplinkUsage' mode is chosen by cLWlanLoadBalancingMode
+        at that WLAN."
+    DEFVAL          { 50 } 
     ::= { cldLoadBalancing 4 }
-
 -- **************************
 -- BAND SELECT CONFIGURATION
 -- **************************
@@ -1076,7 +1085,10 @@ ciscoLwappDot11MIBConfigGroup OBJECT-GROUP
                         cldBandSelectClientRssi,
                         cld11nMcsChannelWidth,
                         cld11nMcsGuardInterval,
-                        cld11nMcsModulation
+                        cld11nMcsModulation,
+                        cldVhtDot11acEnable,
+                        cld11acMcsSupportEnable,
+                        cldLoadBalancingTrafficThreshold
                     }
     STATUS          current
     DESCRIPTION
@@ -1107,3 +1119,20 @@ ciscoLwappDot11MIBStatusGroup OBJECT-GROUP
     ::= { ciscoLwappDot11MIBGroups 4 }
 
 END
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

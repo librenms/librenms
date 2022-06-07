@@ -1,5 +1,5 @@
 --==================================================================
--- Copyright (C) 2006 by  HUAWEI TECHNOLOGIES. All rights reserved.
+-- Copyright (C) 2013 by  HUAWEI TECHNOLOGIES. All rights reserved.
 -- 
 -- Description: HUAWEI SSH MIB
 -- Reference:
@@ -8,6 +8,7 @@
 -- <author>,  <date>,  <contents>
 -- ZhengYuting   2006-11-22
 -- ==================================================================
+
 -- ==================================================================
 -- 
 -- Variables and types are imported
@@ -28,20 +29,24 @@
     
     
         hwBulkStat MODULE-IDENTITY 
-            LAST-UPDATED "200611221414Z"        -- November 22, 2006 at 14:14 GMT
+            LAST-UPDATED "201307011339Z"        -- July 1, 2013 at 13:39 GMT
             ORGANIZATION 
                 "Huawei Technologies Co.,Ltd."
-            CONTACT-INFO 
-                "VRP Team Huawei Technologies Co.,Ltd.
-                Huawei Bld.,NO.3 Xinxi Rd., 
-                Shang-Di Information Industry Base,
-                Hai-Dian District Beijing P.R. China
-                http://www.huawei.com
-                Zip:100085
-                "
+            CONTACT-INFO
+                "Huawei Industrial Base
+                  Bantian, Longgang
+                   Shenzhen 518129
+                   People's Republic of China
+                   Website: http://www.huawei.com
+                   Email: support@huawei.com
+                 "
             DESCRIPTION 
                 "The MIB module for creating and deleting bulk files of
                 SNMP data for file transfer."
+           REVISION "201307011339Z"        --  July 1, 2013 at 13:39 GMT
+            DESCRIPTION 
+                "The initial revision of this MIB module ."
+
             REVISION "200611221414Z"        -- November 22, 2006 at 14:14 GMT
             DESCRIPTION 
                 "The initial revision of this MIB module ."
@@ -71,8 +76,7 @@
             MAX-ACCESS read-write
             STATUS current
             DESCRIPTION
-                "The object specifies whether the bulk statistic function is enable or not."
-            DEFVAL { disable }
+                "The value of this object identifies whether BulkStat is enabled."
             ::= { hwBulkStatMibObjects 1 }
 
         
@@ -81,7 +85,7 @@
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "Collect capability per 5 minutes."
+                "The value of this object identifies the collection capability in five minutes."
             ::= { hwBulkStatMibObjects 2 }
 
         
@@ -90,7 +94,7 @@
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "Maximum number of the bulk files allowed to create."
+                "The value of this object identifies the maximum number of statistics files that can be created."
             ::= { hwBulkStatMibObjects 3 }
 
         
@@ -99,7 +103,7 @@
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "The total number of the current configured bulk files."
+                "The value of this object identifies the number of statistics files that are configured currently."
             ::= { hwBulkStatMibObjects 4 }
 
         
@@ -108,7 +112,7 @@
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "The total number of the configured objects of all current bulk files."
+                "The value of this object identifies the number of statistics objects configured in all files."
             ::= { hwBulkStatMibObjects 5 }
 
         
@@ -122,8 +126,8 @@
             STATUS current
             DESCRIPTION
                 "The object specifies whether to send trap information to NMS.
-                It's allowed to send trap information to NMS only when the value is enable."
-            DEFVAL { disable }
+                It's allowed to send trap information to NMS only when the value is enable.
+                The default value is disable."
             ::= { hwBulkStatMibObjects 6 }
 
         
@@ -132,8 +136,8 @@
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "Next available index for table hwBulkStatDefineFileTable.
-                If there is no available index, the value will be filled with '0'."
+                "The value of this object identifies the index of the next available hwBulkStatDefineObjectTable.
+                If there is no available index, the value will be filled with 0."
             ::= { hwBulkStatMibObjects 7 }
 
         
@@ -169,18 +173,18 @@
                 hwBulkStatDefineFileFormat
                     INTEGER,
                 hwBulkStatDefineFileCollectInterval
-                    INTEGER,
+                    Integer32,
                 hwBulkStatDefineFileTransferInterval
-                    INTEGER,
-                hwBulkStatDefineFileStatus
-                    INTEGER,
+                    Integer32,
                 hwBulkStatDefineFileTransferPrimaryURL
                     OCTET STRING,
                 hwBulkStatDefineFileTransferSecondaryURL
                     OCTET STRING,
                 hwBulkStatDefineFileTransferRetryTimes
-                    INTEGER,
+                    Integer32,
                 hwBulkStatDefineFileRemainTime
+                    Integer32,
+                hwBulkStatDefineFileStatus
                     INTEGER,
                 hwBulkStatDefineFileLastTransferSuccessTime
                     Integer32,
@@ -197,7 +201,8 @@
             MAX-ACCESS not-accessible
             STATUS current
             DESCRIPTION
-                "Index of bulk file, a unique identifier for a bulk file."
+                "The value of this object identifies the indexes of statistics files. 
+                The maximum index number is equal to that of the bulk files allowed to create."
             ::= { hwBulkStatDefineFileEntry 1 }
 
         
@@ -206,8 +211,7 @@
             MAX-ACCESS read-create
             STATUS current
             DESCRIPTION
-                "Bulk file name.
-                If you specify a path in the file name, this file is invalid."
+                "The value of this object identifies the name of a statistics file."
             ::= { hwBulkStatDefineFileEntry 11 }
 
         
@@ -216,8 +220,7 @@
             MAX-ACCESS read-create
             STATUS current
             DESCRIPTION
-                "Bulk file dumping mode:
-                ephemeral(1):data file of small volume. It applies to be read at once."
+                "The value of this object identifies the storage mode of a statistics file."
             DEFVAL { ephemeral }
             ::= { hwBulkStatDefineFileEntry 12 }
 
@@ -227,34 +230,80 @@
             MAX-ACCESS read-create
             STATUS current
             DESCRIPTION
-                "Bulk file formats:
-                bulkASCII(1):readable ASCII."
+                "The value of this object identifies the format of a statistics file."
             DEFVAL { bulkASCII }
             ::= { hwBulkStatDefineFileEntry 13 }
 
         
         hwBulkStatDefineFileCollectInterval OBJECT-TYPE
-            SYNTAX INTEGER (5 | 10 | 15 | 30)
+            SYNTAX Integer32 (5 | 10 | 15 | 30)
             MAX-ACCESS read-create
             STATUS current
             DESCRIPTION
-                "Interval of collecting node value, in minutes."
+                "The value of this object identifies the interval for collecting statistics files."
             DEFVAL { 5 }
             ::= { hwBulkStatDefineFileEntry 14 }
 
         
         hwBulkStatDefineFileTransferInterval OBJECT-TYPE
-            SYNTAX INTEGER (5 | 10 | 15 | 30)
+            SYNTAX Integer32 (5 | 10 | 15 | 30)
             MAX-ACCESS read-create
             STATUS current
             DESCRIPTION
-                "Interval of transferring bulk files to NMS, in minutes. 
-                It must be several times of the collect-interval."
+                "The value of this object identifies the interval for uploading statistics files."
             DEFVAL { 5 }
             ::= { hwBulkStatDefineFileEntry 15 }
 
-        
-        hwBulkStatDefineFileStatus OBJECT-TYPE
+
+        hwBulkStatDefineFileTransferPrimaryURL OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (0..256))
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This object indicates the primary URL the statistics file is uploaded to.
+                It should be in the forms of below:
+                ftp://user:password@host/folder/bulkstat1
+                sftp://user:password@host/folder/bulkstat1
+                tftp://10.1.0.1/tftpboot/user/bulkstat1
+                "
+            ::= { hwBulkStatDefineFileEntry 16 }
+
+
+        hwBulkStatDefineFileTransferSecondaryURL OBJECT-TYPE
+            SYNTAX OCTET STRING (SIZE (0..256))
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "This object indicates the secondary URL the statistics file is uploaded to.
+                It should be in the forms of below:
+                ftp://user:password@host/folder/bulkstat1
+                sftp://user:password@host/folder/bulkstat1
+                tftp://10.1.0.1/tftpboot/user/bulkstat1
+                "
+            ::= { hwBulkStatDefineFileEntry 17 }
+
+
+        hwBulkStatDefineFileTransferRetryTimes OBJECT-TYPE
+            SYNTAX Integer32 (0..5)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The value of this object identifies the retransmission times of the statistics file during uploading."
+            DEFVAL { 5 }
+            ::= { hwBulkStatDefineFileEntry 18 }
+
+
+        hwBulkStatDefineFileRemainTime OBJECT-TYPE
+            SYNTAX Integer32 (1..30)
+            MAX-ACCESS read-create
+            STATUS current
+            DESCRIPTION
+                "The value of this object identifies the time for reserving statistics files."
+            DEFVAL { 5 }
+            ::= { hwBulkStatDefineFileEntry 19 }
+
+
+                hwBulkStatDefineFileStatus OBJECT-TYPE
             SYNTAX INTEGER
                 {
                 ready(1),
@@ -264,70 +313,18 @@
             MAX-ACCESS read-create
             STATUS current
             DESCRIPTION
-                "
-                Bulk file status:
-                ready(1): When a bulk file created, the status is stop. You should change it to ready status to start the bulk file.
-                running(2):The collection task is writing data to this file. You cannot delete the file. This value cannot be set.
-                stop(3):This state means that the bulk file is suspended. If this value is set when in the running status, then writing file is
-                            stopped. "
-            DEFVAL { stopped }
-            ::= { hwBulkStatDefineFileEntry 16 }
-
-        
-        hwBulkStatDefineFileTransferPrimaryURL OBJECT-TYPE
-            SYNTAX OCTET STRING (SIZE (0..127))
-            MAX-ACCESS read-create
-            STATUS current
-            DESCRIPTION
-                "The primary URL to transfer the bulk file to NMS.
-                It should be in the forms of below:
-                ftp://user:password@host/folder/bulkstat1
-                tftp://10.1.0.1/tftpboot/user/bulkstat1
-                "
-            ::= { hwBulkStatDefineFileEntry 17 }
-
-        
-        hwBulkStatDefineFileTransferSecondaryURL OBJECT-TYPE
-            SYNTAX OCTET STRING (SIZE (0..127))
-            MAX-ACCESS read-create
-            STATUS current
-            DESCRIPTION
-                "The secondary URL to transfer the bulk file to NMS.
-                It should be in the forms of below:
-                ftp://user:password@host/folder/bulkstat1
-                tftp://10.1.0.1/tftpboot/user/bulkstat1
-                "
-            ::= { hwBulkStatDefineFileEntry 18 }
-
-        
-        hwBulkStatDefineFileTransferRetryTimes OBJECT-TYPE
-            SYNTAX INTEGER (0..5)
-            MAX-ACCESS read-create
-            STATUS current
-            DESCRIPTION
-                "Max retry times to transfer the bulk file to NMS."
-            DEFVAL { 5 }
-            ::= { hwBulkStatDefineFileEntry 19 }
-
-        
-        hwBulkStatDefineFileRemainTime OBJECT-TYPE
-            SYNTAX INTEGER (1..30)
-            MAX-ACCESS read-create
-            STATUS current
-            DESCRIPTION
-                "Max minutes to remain the bulk file in memory.
-                It can not be more than the transfer-interval."
-            DEFVAL { 5 }
+                "The value of this object identifies status of statistics files.There are three available values: stopped, ready, and running. For running state, it is read-only. For the other two, they are read-create, but can not be set to running, and set duplicatedly."
+                DEFVAL { stopped }
             ::= { hwBulkStatDefineFileEntry 20 }
-
-        
+            
+            
         hwBulkStatDefineFileLastTransferSuccessTime OBJECT-TYPE
             SYNTAX Integer32
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "The object specifies the latest successful 
-                collecting time stamp when the file  transferred successfully."
+                "The value of this object identifies the last file collection timestamp of the latest successful statistics file uploading.
+                The value is in seconds."
             ::= { hwBulkStatDefineFileEntry 21 }
 
         
@@ -336,8 +333,7 @@
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "The object specifies the latest successful 
-                collecting time stamp when the file transferred unsuccessfully."
+                "The value of this object identifies the last file collection timestamp of the latest failed statistics file uploading."
             ::= { hwBulkStatDefineFileEntry 22 }
 
         
@@ -346,8 +342,7 @@
             MAX-ACCESS read-only
             STATUS current
             DESCRIPTION
-                "Next available index for table hwBulkStatDefineObjectTable.
-                IF no available index, the value will be filled with '0'."
+                "The value of this object identifies the index of the next available hwBulkStatDefineObjectTable."
             ::= { hwBulkStatDefineFileEntry 23 }
 
         
@@ -356,7 +351,7 @@
             MAX-ACCESS read-create
             STATUS current
             DESCRIPTION
-                "Row operation node. When the bulk file in Running status it cannot be deleted."
+                "This object indicates the row status of the statistics file table."
             ::= { hwBulkStatDefineFileEntry 51 }
 
         
@@ -398,14 +393,13 @@
                     RowStatus
              }
 
+
         hwBulkStatDefineObjectIndex OBJECT-TYPE
             SYNTAX Integer32 (1..1000)
             MAX-ACCESS not-accessible
             STATUS current
             DESCRIPTION
-                "Object index in the bulk file.
-                A unique identifier for a record,
-                indicating the sequence of objects."
+                "The value of this object identifies statistics objects."
             ::= { hwBulkStatDefineObjectEntry 1 }
 
         
@@ -418,10 +412,7 @@
             MAX-ACCESS read-create
             STATUS current
             DESCRIPTION
-                "Object class: 
-                single(1): a single MIB object is retrieved.
-                column(2): an entire column or partial column
-                           is retrieved in lexical order of rows."
+                "The value of this object identifies the types of statistics objects."
             ::= { hwBulkStatDefineObjectEntry 11 }
 
         
@@ -430,12 +421,7 @@
             MAX-ACCESS read-create
             STATUS current
             DESCRIPTION
-                "The object identifier of a MIB object to be included in the file.
-                If the object class is 'single', this must be a full OID,
-                including all instance information.
-                If the object class is 'column', this must be an OID
-                without any instance information.
-                "
+                "This object indicates the OID of the statistics object."
             ::= { hwBulkStatDefineObjectEntry 12 }
 
         
@@ -444,9 +430,7 @@
             MAX-ACCESS read-create
             STATUS current
             DESCRIPTION
-                "If the object class is 'column', this must be the begin index of the object. 
-                The default value is '0'.
-                "
+                "This object indicates the start index of the statistics object."
             ::= { hwBulkStatDefineObjectEntry 13 }
 
         
@@ -455,11 +439,7 @@
             MAX-ACCESS read-create
             STATUS current
             DESCRIPTION
-                "If the object class is 'column', this represents 
-                the maximum number of entries which will be 
-                populated in the file starting from the lexicographically
-                begin instance of the OID.The default value is 0.
-                "
+                "The value of this object identifies the number of instances of statistics objects."
             ::= { hwBulkStatDefineObjectEntry 14 }
 
         
@@ -468,7 +448,7 @@
             MAX-ACCESS read-create
             STATUS current
             DESCRIPTION
-                "Row operation node."
+                "This object indicates the row status of the statistics object."
             ::= { hwBulkStatDefineObjectEntry 51 }
 
         
@@ -479,7 +459,7 @@
             OBJECTS { hwBulkStatDefineFileName }
             STATUS current
             DESCRIPTION 
-                "Notification represents the incomplete collection of file in a collection period."
+                "An alarm is generated when the collected statistics files are incomplete."
             ::= { hwBulkStatNotifications 1 }
 
         
@@ -487,8 +467,7 @@
             OBJECTS { hwBulkStatDefineFileName }
             STATUS current
             DESCRIPTION 
-                "Notification represents the data collection resumes itself to normal in latter 
-                collection period."
+                "An alarm is generated when the incomplete statistics files are resumed."
             ::= { hwBulkStatNotifications 2 }
 
         
@@ -496,7 +475,7 @@
             OBJECTS { hwBulkStatDefineFileName, hwBulkStatDefineFileTransferPrimaryURL, hwBulkStatDefineFileTransferSecondaryURL }
             STATUS current
             DESCRIPTION 
-                "Notification represents connecting to URL fails in file transfer."
+                "An alarm is generated when the link for file uploading fails."
             ::= { hwBulkStatNotifications 3 }
 
         
@@ -504,7 +483,7 @@
             OBJECTS { hwBulkStatDefineFileName, hwBulkStatDefineFileTransferPrimaryURL, hwBulkStatDefineFileTransferSecondaryURL }
             STATUS current
             DESCRIPTION 
-                "Notification represents the connection to URL resumes in file transfer."
+                "An alarm is generated when the link for file uploading recovers from the fault."
             ::= { hwBulkStatNotifications 4 }
 
         
@@ -512,13 +491,12 @@
             OBJECTS { hwBulkStatDefineFileName, hwBulkStatDefineFileLastTransferFailTime }
             STATUS current
             DESCRIPTION 
-                "Notification represents the transfer file is discarded automatically
-                because of tranfer failure.
-                "
+                "An alarm is generated when the file fails to be uploaded and then is discarded."
             ::= { hwBulkStatNotifications 5 }
 
         
 --    Conformance information            
+
         hwBulkStatConformance OBJECT IDENTIFIER ::= { hwBulkStat 3 }
 
         
