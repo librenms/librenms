@@ -58,7 +58,7 @@ class ConfigSeeder extends Seeder
         }
 
         if (\App\Models\Config::exists()) {
-            if (! $this->command->confirm(trans('commands.db:seed.existing_config'), false)) {
+            if (! app()->runningInConsole() || ! $this->command->confirm(trans('commands.db:seed.existing_config'), false)) {
                 return; // don't overwrite existing settings.
             }
         }
