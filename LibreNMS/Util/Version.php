@@ -71,7 +71,7 @@ class Version
     {
         if ($this->is_git_install) {
             $install_dir = base_path();
-            $version_process = new Process(['git', 'show', '-q', "--pretty=%H|%ct"], $install_dir);
+            $version_process = new Process(['git', 'show', '-q', '--pretty=%H|%ct'], $install_dir);
             $version_process->run();
 
             // failed due to permissions issue
