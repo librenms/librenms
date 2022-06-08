@@ -33,7 +33,6 @@ use LibreNMS\ValidationResult;
 
 class CheckSqlServerTime implements Validation
 {
-
     /**
      * @inheritDoc
      */

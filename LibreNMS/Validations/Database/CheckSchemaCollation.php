@@ -32,7 +32,6 @@ use LibreNMS\ValidationResult;
 
 class CheckSchemaCollation implements Validation, ValidationFixer
 {
-
     /**
      * @inheritDoc
      */

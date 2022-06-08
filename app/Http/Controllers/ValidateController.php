@@ -33,7 +33,7 @@ class ValidateController extends Controller
                         $fail(trans('validation.results.invalid_fixer'));
                     }
                 },
-            ]
+            ],
         ]);
         $fixer = $request->get('fixer');
 

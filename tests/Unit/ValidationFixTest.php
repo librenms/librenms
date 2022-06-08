@@ -31,7 +31,7 @@ use Storage;
 
 class ValidationFixTest extends TestCase
 {
-    public function testRrdVersionFix()
+    public function testRrdVersionFix(): void
     {
         Storage::fake('base');
         Storage::disk('base')->put('config.php', <<<'EOF'

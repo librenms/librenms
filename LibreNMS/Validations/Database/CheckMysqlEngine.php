@@ -35,7 +35,6 @@ use LibreNMS\ValidationResult;
 
 class CheckMysqlEngine implements Validation, ValidationFixer
 {
-
     /**
      * @inheritDoc
      */
@@ -79,7 +78,7 @@ class CheckMysqlEngine implements Validation, ValidationFixer
         return true;
     }
 
-    private function databaseName()
+    private function databaseName(): string
     {
         return \config('database.connections.' . \config('database.default') . '.database');
     }

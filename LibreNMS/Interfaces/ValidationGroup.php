@@ -32,29 +32,21 @@ interface ValidationGroup
     /**
      * Validate this module.
      * To return ValidationResults, call ok, warn, fail, or result methods on the $validator
-     *
-     * @param  Validator  $validator
      */
-    public function validate(Validator $validator);
+    public function validate(Validator $validator): void;
 
     /**
      * Returns if this test should be run by default or not.
-     *
-     * @return bool
      */
-    public function isDefault();
+    public function isDefault(): bool;
 
     /**
      * Returns true if this group has been run
-     *
-     * @return bool
      */
-    public function isCompleted();
+    public function isCompleted(): bool;
 
     /**
      * Mark this group as completed
-     *
-     * @return void
      */
-    public function markCompleted();
+    public function markCompleted(): void;
 }

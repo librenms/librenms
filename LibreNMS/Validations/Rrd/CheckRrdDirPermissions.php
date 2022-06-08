@@ -41,7 +41,7 @@ class CheckRrdDirPermissions implements Validation
         $dir_stat = stat($rrd_dir);
         if ($dir_stat[4] == 0 || $dir_stat[5] == 0) {
             return ValidationResult::warn(trans('validation.validations.rrd.CheckRrdDirPermissions.fail_root'),
-                sprintf("chown %s:%s %s", Config::get('user'), Config::get('group'), $rrd_dir)
+                sprintf('chown %s:%s %s', Config::get('user'), Config::get('group'), $rrd_dir)
             );
         }
 

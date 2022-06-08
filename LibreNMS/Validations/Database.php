@@ -25,6 +25,12 @@
 
 namespace LibreNMS\Validations;
 
+use LibreNMS\Validations\Database\CheckDatabaseServerVersion;
+use LibreNMS\Validations\Database\CheckDatabaseTableNamesCase;
+use LibreNMS\Validations\Database\CheckMysqlEngine;
+use LibreNMS\Validations\Database\CheckSqlServerTime;
+use LibreNMS\Validator;
+
 class Database extends BaseValidation
 {
     public const MYSQL_MIN_VERSION = '5.7.7';
@@ -37,4 +43,15 @@ class Database extends BaseValidation
 
     protected $directory = 'Database';
     protected $name = 'database';
+
+    /**
+     * Tests used by the installer to validate that SQL server doesn't have any known issues (before migrations)
+     */
+    public function validateSystem(Validator $validator): void
+    {
+        $validator->result((new CheckDatabaseServerVersion)->validate(), $this->name);
+        $validator->result((new CheckMysqlEngine)->validate(), $this->name);
+        $validator->result((new CheckSqlServerTime)->validate(), $this->name);
+        $validator->result((new CheckDatabaseTableNamesCase)->validate(), $this->name);
+    }
 }

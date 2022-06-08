@@ -31,12 +31,16 @@ use LibreNMS\Validator;
 
 abstract class BaseValidation implements ValidationGroup
 {
+    /** @var bool */
     protected $completed = false;
+    /** @var bool */
     protected static $RUN_BY_DEFAULT = true;
+    /** @var string */
     protected $directory = null;
+    /** @var string */
     protected $name = null;
 
-    public function validate(Validator $validator)
+    public function validate(Validator $validator): void
     {
         if ($this->directory) {
             foreach (glob(__DIR__ . "/$this->directory/*.php") as $file) {
@@ -52,30 +56,24 @@ abstract class BaseValidation implements ValidationGroup
 
     /**
      * Returns if this test should be run by default or not.
-     *
-     * @return bool
      */
-    public function isDefault()
+    public function isDefault(): bool
     {
         return static::$RUN_BY_DEFAULT;
     }
 
     /**
      * Returns true if this group has been run
-     *
-     * @return bool
      */
-    public function isCompleted()
+    public function isCompleted(): bool
     {
         return $this->completed;
     }
 
     /**
      * Mark this group as completed
-     *
-     * @return void
      */
-    public function markCompleted()
+    public function markCompleted(): void
     {
         $this->completed = true;
     }

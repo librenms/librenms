@@ -33,6 +33,7 @@ use LibreNMS\ValidationResult;
 
 class CheckDatabaseSchemaVersion implements Validation, ValidationFixer
 {
+    /** @var bool|null */
     private static $current = null;
 
     /**
@@ -60,7 +61,8 @@ class CheckDatabaseSchemaVersion implements Validation, ValidationFixer
                 trans('validation.validations.database.CheckSchemaVersion.fail_legacy_outdated', ['current' => $current, 'latest' => $latest]),
                 trans('validation.validations.database.CheckSchemaVersion.fix_legacy_outdated'),
             );
-        } elseif ($current > $latest) {
+        } else {
+            // latest > current
             return ValidationResult::warn(trans('validation.validations.database.CheckSchemaVersion.warn_legacy_newer'));
         }
 

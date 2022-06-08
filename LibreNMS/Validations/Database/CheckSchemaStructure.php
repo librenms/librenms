@@ -37,7 +37,6 @@ use Symfony\Component\Yaml\Yaml;
 
 class CheckSchemaStructure implements Validation, ValidationFixer
 {
-
     /** @var array */
     private $descriptions = [];
     /** @var array */
