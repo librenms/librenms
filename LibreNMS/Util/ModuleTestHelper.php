@@ -567,7 +567,7 @@ class ModuleTestHelper
                 'port' => $snmpsim->getPort(),
                 'disabled' => 1, // disable to block normal pollers
             ]);
-            (new ValidateDeviceAndCreate($new_device))->execute();
+            (new ValidateDeviceAndCreate($new_device, true))->execute();
             $device_id = $new_device->device_id;
 
             $this->qPrint("Added device: $device_id\n");
