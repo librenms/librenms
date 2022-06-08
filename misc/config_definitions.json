@@ -5375,13 +5375,6 @@
             "order": 13,
             "type": "executable"
         },
-        "traceroute6": {
-            "default": "traceroute6",
-            "group": "external",
-            "section": "binaries",
-            "order": 14,
-            "type": "executable"
-        },
         "transit_descr": {
             "default": ["transit"],
             "type": "array",
