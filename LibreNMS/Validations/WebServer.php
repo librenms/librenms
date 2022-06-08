@@ -34,7 +34,7 @@ class WebServer extends BaseValidation
     /**
      * @inheritDoc
      */
-    public function validate(Validator $validator)
+    public function validate(Validator $validator): void
     {
         if (! app()->runningInConsole()) {
             $url = request()->url();
@@ -56,7 +56,7 @@ class WebServer extends BaseValidation
         }
     }
 
-    public function isDefault()
+    public function isDefault(): bool
     {
         return ! app()->runningInConsole();
     }
