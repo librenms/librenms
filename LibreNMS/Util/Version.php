@@ -28,6 +28,7 @@ namespace LibreNMS\Util;
 use DB;
 use Illuminate\Http\Client\ConnectionException;
 use Illuminate\Support\Arr;
+use Illuminate\Support\Str;
 use LibreNMS\Config;
 use LibreNMS\DB\Eloquent;
 use Symfony\Component\Process\Process;
@@ -69,12 +70,26 @@ class Version
     public function localCommit(): array
     {
         if ($this->is_git_install) {
-            [$local_sha, $local_date] = array_pad(explode('|', rtrim(`git show --pretty='%H|%ct' -s HEAD`)), 2, '');
+            $install_dir = base_path();
+            $version_process = new Process(['git', 'show', '-q', "--pretty=%H|%ct"], $install_dir);
+            $version_process->run();
+
+            // failed due to permissions issue
+            if ($version_process->getExitCode() == 128 && Str::startsWith($version_process->getErrorOutput(), 'fatal: unsafe repository')) {
+                (new Process(['git', 'config', '--global', '--add', 'safe.directory', $install_dir]))->run();
+                $version_process->run();
+            }
+
+            [$local_sha, $local_date] = array_pad(explode('|', rtrim($version_process->getOutput())), 2, '');
+
+            $branch_process = new Process(['git', 'rev-parse', '--abbrev-ref', 'HEAD'], $install_dir);
+            $branch_process->run();
+            $branch = rtrim($branch_process->getOutput());
 
             return [
                 'sha' => $local_sha,
                 'date' => $local_date,
-                'branch' => rtrim(`git rev-parse --abbrev-ref HEAD`),
+                'branch' => $branch,
             ];
         }
 
