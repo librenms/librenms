@@ -31,7 +31,6 @@ use LibreNMS\Validator;
 
 class WebServer extends BaseValidation
 {
-
     /**
      * @inheritDoc
      */
@@ -44,14 +43,14 @@ class WebServer extends BaseValidation
                 preg_match('#://([^/]+)/#', $url, $actual_host_match);
                 preg_match('#://([^/]+)/#', $expected, $expected_host_match);
                 $actual_host = $actual_host_match[1];
-                if($actual_host != $expected_host_match[1]) {
+                if ($actual_host != $expected_host_match[1]) {
                     $nginx = Str::startsWith(request()->server->get('SERVER_SOFTWARE'), 'nginx');
                     $server_name = $nginx ? 'server_name' : 'ServerName';
-                    $fix = $nginx ? "server_name $actual_host;": "ServerName $actual_host";
+                    $fix = $nginx ? "server_name $actual_host;" : "ServerName $actual_host";
                     $validator->fail("$server_name is set incorrectly for your webserver, update your webserver config.", $fix);
                 } else {
                     $correct_base = str_replace('validate/results', '', $url);
-                    $validator->fail("base_url is not set correctly", "lnms config:set base_url $correct_base");
+                    $validator->fail('base_url is not set correctly', "lnms config:set base_url $correct_base");
                 }
             }
         }
