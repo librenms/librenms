@@ -210,13 +210,12 @@ under Device -> Edit -> Misc -> Disable ICMP Test? On
 
 #### traceroute
 
-LibreNMS uses traceroute / traceroute6 to record debug information
+LibreNMS uses traceroute to record debug information
 when a device is down due to icmp AND you have
 `lnms config:set debug.run_trace true` set.
 
 ```bash
 lnms config:set traceroute /usr/bin/traceroute
-lnms config:set traceroute6 /usr/bin/traceroute6
 ```
 
 #### SNMP

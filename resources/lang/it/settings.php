@@ -1459,9 +1459,6 @@ return [
         'traceroute' => [
             'description' => 'Path to traceroute',
         ],
-        'traceroute6' => [
-            'description' => 'Path to traceroute6',
-        ],
         'twofactor' => [
             'description' => 'Two-Factor',
             'help' => 'Allow users to activate and use Timebased (TOTP) or Counterbased (HOTP) One-Time Passwords (OTP)',

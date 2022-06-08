@@ -710,9 +710,6 @@ return [
         'traceroute' => [
             'description' => 'Pfad zu  traceroute',
         ],
-        'traceroute6' => [
-            'description' => 'Pfad zu traceroute6',
-        ],
         'unix-agent' => [
             'connection-timeout' => [
                 'description' => 'Unix-agent Verbindungstimeout',

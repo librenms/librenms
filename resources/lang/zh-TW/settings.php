@@ -890,9 +890,6 @@ return [
         'traceroute' => [
             'description' => 'traceroute 路徑',
         ],
-        'traceroute6' => [
-            'description' => 'traceroute6 路徑',
-        ],
         'twofactor' => [
             'description' => '雙因素驗證',
             'help' => '允許使用者啟用基於時間 (TOTP) 或基於雜湊訊息驗證 (HOTP) 的一次性密碼 (OTP)',

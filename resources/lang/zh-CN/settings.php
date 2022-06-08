@@ -725,9 +725,6 @@ return [
         'traceroute' => [
             'description' => 'traceroute 路径',
         ],
-        'traceroute6' => [
-            'description' => 'traceroute6 路径',
-        ],
         'unix-agent' => [
             'connection-timeout' => [
                 'description' => 'Unix-agent 联机逾时',
