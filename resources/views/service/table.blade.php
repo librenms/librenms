@@ -29,8 +29,10 @@
                 <th>
                     <div class="col-sm-1"><span class="device-services-page">{{ __('service.fields.service_type') }}</span></div>
                     <div class="col-sm-2">{{ __('service.fields.service_name') }} / {{ __('service.fields.service_ip') }}</div>
-                    <div class="col-sm-2">{{ __('service.fields.service_desc') }}</div>
-                    <div class="col-sm-4">{{ __('service.fields.service_message') }}</div>
+                    @if($view != 'basic')
+                        <div class="col-sm-2">{{ __('service.fields.service_desc') }}</div>
+                        <div class="col-sm-4">{{ __('service.fields.service_message') }}</div>
+                    @endif
                     <div class="col-sm-2">{{ __('service.fields.service_changed') }}</div>
                     <div class="col-sm-1"></div>
                 </th>
@@ -50,8 +52,10 @@
                             <div>{{ $service->service_name }}</div>
                             <div>{{ $service->service_ip ?: $device->overwrite_ip ?: $device->hostname }}</div>
                         </div>
-                        <div class="col-sm-2 text-muted">{{ $service->service_desc }}</div>
-                        <div class="col-sm-4">{!! nl2br(e($service->service_message)) !!}</div>
+                        @if($view != 'basic')
+                            <div class="col-sm-2 text-muted">{{ $service->service_desc }}</div>
+                            <div class="col-sm-4">{!! nl2br(e($service->service_message)) !!}</div>
+                        @endif
                         <div class="col-sm-2 text-muted">{{ \LibreNMS\Util\Time::formatInterval(time() - $service->service_changed, 'short') }}</div>
                         <div class="col-sm-1">
                             <div class="tw-flex tw-flex-nowrap tw-flex-row-reverse">

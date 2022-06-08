@@ -14,6 +14,7 @@ return [
     'this_device' => '<This Device>',
     'status' => 'Status',
     'view_basic' => 'Basic',
+    'view_detailed' => 'Detailed',
     'view_graphs' => 'Graphs',
     'state_all' => 'All',
     'state_ok' => 'Ok',

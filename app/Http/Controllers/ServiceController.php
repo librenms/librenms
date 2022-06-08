@@ -4,7 +4,7 @@ namespace App\Http\Controllers;
 
 use App\Models\Device;
 use App\Models\Service;
-use Illuminate\Database\Eloquent\Builder;
+use Closure;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\Validation\Rule;
@@ -27,20 +27,17 @@ class ServiceController extends Controller
     public function index(Request $request)
     {
         $state = $request->input('state', 'all');
-        $devices = Device::with(['services' => function ($query) use ($state) {
-            if($state !== 'all') {
-                $query->where('service_status', CheckStatus::toState($state));
-            }
-        }])
-            ->whereHas('services', function (Builder $query) use ($state) {
-                if ($state !== 'all') {
-                    $query->where('service_status', CheckStatus::toState($state));
-                }
-            })->get();
+        $disabled = $request->input('disabled', false);
+        $ignored = $request->input('ignored', false);
+
+        $devices = Device::with(['services' => $this->filterServices($state, $disabled, $ignored)])
+            ->whereHas('services', $this->filterServices($state, $disabled, $ignored))
+            ->get();
 
         $view_menu = [
             'view' => [
-                ['key' => 'basic', 'name' => trans('service.view_basic'), 'default' => true],
+                ['key' => 'basic', 'name' => trans('service.view_basic')],
+                ['key' => 'detailed', 'name' => trans('service.view_detailed'), 'default' => true],
                 ['key' => 'graphs', 'name' => trans('service.view_graphs')],
             ]
         ];
@@ -217,6 +214,23 @@ class ServiceController extends Controller
             'message' => $response->message,
             'result' => $response->result,
         ]);
+    }
+
+    private function filterServices($state, $disabled, $ignored): Closure
+    {
+        return function ($query) use ($state, $disabled, $ignored) {
+            if ($state !== 'all') {
+                $query->where('service_status', CheckStatus::toState($state));
+            }
+
+            if ($disabled) {
+                $query->where('service_disabled', 1);
+            }
+
+            if ($ignored) {
+                $query->where('service_ignore', 1);
+            }
+        };
     }
 
     /**
