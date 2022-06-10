@@ -213,5 +213,9 @@ Artisan::command('scan
 
     $command = array_merge($command, $this->argument('network'));
 
-    (new Process($command))->setTimeout(null)->setIdleTimeout(null)->setTty(true)->run();
+    return (new Process($command))
+        ->setTimeout(null)
+        ->setIdleTimeout(null)
+        ->setTty(! $this->option('quiet'))
+        ->run();
 })->purpose(__('Scan the network for hosts and try to add them to LibreNMS'));
