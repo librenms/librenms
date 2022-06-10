@@ -215,17 +215,14 @@ Artisan::command('scan
 
     $scan_process = (new Process($command))
         ->setTimeout(null)
-        ->setIdleTimeout(null);
+        ->setIdleTimeout(null)
+        ->setTty(Process::isTtySupported() && ! $this->option('quiet'));
+    $scan_process->run();
 
-    // handle output
-    if (! $this->option('quiet')) {
-        if (Process::isTtySupported()) {
-            $scan_process->setTty(true);
-        } else {
-            // just dump the output after we are done
-            $this->line($scan_process->getOutput());
-        }
+    if (! Process::isTtySupported() && ! $this->option('quiet')) {
+        // just dump the output after we are done if we couldn't use tty
+        $this->line($scan_process->getOutput());
     }
 
-    return $scan_process->run();
+    return $scan_process->getExitCode();
 })->purpose(__('Scan the network for hosts and try to add them to LibreNMS'));
