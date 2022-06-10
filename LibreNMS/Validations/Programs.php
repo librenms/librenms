@@ -37,7 +37,7 @@ class Programs extends BaseValidation
      *
      * @param  Validator  $validator
      */
-    public function validate(Validator $validator)
+    public function validate(Validator $validator): void
     {
         // Check programs
         $bins = ['fping', 'rrdtool', 'snmpwalk', 'snmpget', 'snmpgetnext', 'snmpbulkwalk'];

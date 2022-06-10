@@ -36,7 +36,7 @@ class System extends BaseValidation
     /**
      * {@inheritdoc}
      */
-    public function validate(Validator $validator)
+    public function validate(Validator $validator): void
     {
         $install_dir = $validator->getBaseDir();
 

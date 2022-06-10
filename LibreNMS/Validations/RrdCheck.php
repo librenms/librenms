@@ -41,7 +41,7 @@ class RrdCheck extends BaseValidation
      *
      * @param  Validator  $validator
      */
-    public function validate(Validator $validator)
+    public function validate(Validator $validator): void
     {
         // Loop through the rrd_dir
         $rrd_directory = new RecursiveDirectoryIterator(Config::get('rrd_dir'));

@@ -40,7 +40,7 @@ class Php extends BaseValidation
      *
      * @param  Validator  $validator
      */
-    public function validate(Validator $validator)
+    public function validate(Validator $validator): void
     {
         $this->checkVersion($validator);
         $this->checkExtensions($validator);

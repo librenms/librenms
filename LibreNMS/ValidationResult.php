@@ -44,6 +44,8 @@ class ValidationResult
     private $list;
     /** @var string|null */
     private $fix;
+    /** @var string|null */
+    private $fixer;
 
     /**
      * ValidationResult constructor.
@@ -226,6 +228,7 @@ class ValidationResult
             'statusText' => substr($this->getStatusText($resultStatus), 2, -2), // remove console colors
             'message' => $this->getMessage(),
             'fix' => Arr::wrap($resultFix),
+            'fixer' => $this->getFixer(),
             'listDescription' => $this->getListDescription(),
             'list' => is_array($resultList) ? array_values($resultList) : [],
         ];
@@ -248,5 +251,31 @@ class ValidationResult
         if ($extra > 0) {
             printf($format, " and $extra more...");
         }
+    }
+
+    /**
+     * Fixer exists
+     */
+    public function hasFixer(): bool
+    {
+        return $this->fixer !== null;
+    }
+
+    /**
+     * @return string|null the class of the fixer
+     */
+    public function getFixer(): ?string
+    {
+        return $this->fixer;
+    }
+
+    /**
+     * Set fixer, optionally denote if this is fixable
+     */
+    public function setFixer(string $fixer, bool $fixable = true): ValidationResult
+    {
+        $this->fixer = $fixable ? $fixer : null;
+
+        return $this;
     }
 }

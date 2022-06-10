@@ -38,7 +38,7 @@ use LibreNMS\Validator;
 
 class Updates extends BaseValidation
 {
-    public function validate(Validator $validator)
+    public function validate(Validator $validator): void
     {
         if (EnvHelper::librenmsDocker()) {
             $validator->warn('Updates are managed through the official Docker image');
