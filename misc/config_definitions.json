@@ -2725,6 +2725,14 @@
             },
             "type": "graph"
         },
+        "graph_types.device.pf_drops": {
+            "default": {
+                "section": "firewall",
+                "order": 11,
+                "descr": "Drops"
+            },
+            "type": "graph"
+        },
         "graph_types.device.pf_fragmented": {
             "default": {
                 "section": "firewall",
@@ -5373,13 +5381,6 @@
             "group": "external",
             "section": "binaries",
             "order": 13,
-            "type": "executable"
-        },
-        "traceroute6": {
-            "default": "traceroute6",
-            "group": "external",
-            "section": "binaries",
-            "order": 14,
             "type": "executable"
         },
         "transit_descr": {

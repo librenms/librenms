@@ -160,6 +160,7 @@ more complex collection is required.
 - `<field>` specify an oid or list of oids to attempt to pull the data from, the first non-empty response will be used
 - `<field>_regex` parse the value out of the returned oid data, must use a named group
 - `<field>_template` combine multiple oid results together to create a final string value.  The result is trimmed.
+- `<field>_replace` An array of replacements ['find', 'replace'] or strings to remove
 - `hardware_mib` MIB used to translate sysObjectID to get hardware. hardware_regex can process the result.
 
 ```yaml

@@ -24,9 +24,6 @@
  * @copyright  2017-2018 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
-
-use Database\Seeders\DefaultWidgetSeeder;
-
 if (! isset($init_modules) && php_sapi_name() == 'cli') {
     // Not called from within discovery, let's load up the necessary stuff.
     $init_modules = [];
@@ -98,7 +95,6 @@ if (! empty($skip_schema_lock) || $schemaLock->get()) {
     }
 
     if ($db_rev == 1000) {
-        Artisan::call('db:seed', ['--force' => true, '--ansi' => true, '--class' => DefaultWidgetSeeder::class]);
         $return = Artisan::call('migrate', $migrate_opts);
         echo Artisan::output();
     }

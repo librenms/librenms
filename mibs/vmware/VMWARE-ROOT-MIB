@@ -9,7 +9,7 @@ IMPORTS
         FROM SNMPv2-SMI;
 
 vmware MODULE-IDENTITY
-       LAST-UPDATED "201808300000Z"
+       LAST-UPDATED "202105170000Z"
        ORGANIZATION "VMware, Inc"
        CONTACT-INFO
                "VMware, Inc
@@ -24,6 +24,9 @@ vmware MODULE-IDENTITY
                 This module defines the VMware SNMP MIB root
                 and its primary subtrees.
                "
+       REVISION      "202105170000Z"
+       DESCRIPTION
+               "Arc vmwHzecc defined."
        REVISION      "201808300000Z"
        DESCRIPTION
                "Arc vmwPerAppTunnel defined."
@@ -47,10 +50,10 @@ vmware MODULE-IDENTITY
 
        REVISION      "200707300000Z"
        DESCRIPTION
-               "The initial revision. Prior version was released in
+               "The initial revision. Prior version was released in 
                 SMIv1 format as VMWARE-ROOT-MIB."
        ::= { enterprises 6876 }
-
+  
 
 -- The parent oid of snmpv1 traps when sent in snmpv2/v3
 -- vmwNotifications OBJECT IDENTIFIER ::= { vmware 0 }
@@ -159,6 +162,12 @@ STATUS  current
 DESCRIPTION
     "Objects used by VMware PerApp Tunnel and related components."
 ::= { vmware 130 }
+
+vmwHzecc OBJECT-IDENTITY
+STATUS  current
+DESCRIPTION
+    "Objects used by VMware Horizon Cloud Connector and related components."
+::= { vmware 140 }
 
 vmwExperimental OBJECT-IDENTITY
 STATUS  current
