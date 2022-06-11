@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "81dfa705e77280f0e4badb11566e4659",
+    "content-hash": "aaf35a5b25ee679d27efef41a397db86",
     "packages": [
         {
             "name": "amenadiel/jpgraph",
@@ -3311,16 +3311,16 @@
         },
         {
             "name": "paragonie/constant_time_encoding",
-            "version": "v2.6.0",
+            "version": "v2.6.1",
             "source": {
                 "type": "git",
                 "url": "https://github.com/paragonie/constant_time_encoding.git",
-                "reference": "3f3bf06406244a94aeffd5818ba05b41a1754ae5"
+                "reference": "d6e1d5d0fb2458dfdd7018ec2f74be120353a3b9"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/paragonie/constant_time_encoding/zipball/3f3bf06406244a94aeffd5818ba05b41a1754ae5",
-                "reference": "3f3bf06406244a94aeffd5818ba05b41a1754ae5",
+                "url": "https://api.github.com/repos/paragonie/constant_time_encoding/zipball/d6e1d5d0fb2458dfdd7018ec2f74be120353a3b9",
+                "reference": "d6e1d5d0fb2458dfdd7018ec2f74be120353a3b9",
                 "shasum": ""
             },
             "require": {
@@ -3374,7 +3374,7 @@
                 "issues": "https://github.com/paragonie/constant_time_encoding/issues",
                 "source": "https://github.com/paragonie/constant_time_encoding"
             },
-            "time": "2022-06-10T07:38:28+00:00"
+            "time": "2022-06-11T00:43:46+00:00"
         },
         {
             "name": "paragonie/random_compat",
@@ -9855,16 +9855,16 @@
         },
         {
             "name": "nunomaduro/larastan",
-            "version": "1.0.3",
+            "version": "1.0.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/nunomaduro/larastan.git",
-                "reference": "f5ce15319da184a5e461ef12c60489c15a9cf65b"
+                "reference": "3e0beabe8cf98373700f4d30cdfb2aa6badb9144"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/nunomaduro/larastan/zipball/f5ce15319da184a5e461ef12c60489c15a9cf65b",
-                "reference": "f5ce15319da184a5e461ef12c60489c15a9cf65b",
+                "url": "https://api.github.com/repos/nunomaduro/larastan/zipball/3e0beabe8cf98373700f4d30cdfb2aa6badb9144",
+                "reference": "3e0beabe8cf98373700f4d30cdfb2aa6badb9144",
                 "shasum": ""
             },
             "require": {
@@ -9929,7 +9929,7 @@
             ],
             "support": {
                 "issues": "https://github.com/nunomaduro/larastan/issues",
-                "source": "https://github.com/nunomaduro/larastan/tree/1.0.3"
+                "source": "https://github.com/nunomaduro/larastan/tree/1.0.2"
             },
             "funding": [
                 {
@@ -9949,7 +9949,7 @@
                     "type": "patreon"
                 }
             ],
-            "time": "2022-01-20T19:33:48+00:00"
+            "time": "2021-11-23T10:50:03+00:00"
         },
         {
             "name": "phar-io/manifest",
@@ -10468,16 +10468,16 @@
         },
         {
             "name": "phpstan/phpstan",
-            "version": "1.4.10",
+            "version": "1.4.2",
             "source": {
                 "type": "git",
                 "url": "https://github.com/phpstan/phpstan.git",
-                "reference": "898c479c39caa727bedf4311dd294a8f4e250e72"
+                "reference": "1dd8f3e40bf7aa30031a75c65cece99220a161b8"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/phpstan/phpstan/zipball/898c479c39caa727bedf4311dd294a8f4e250e72",
-                "reference": "898c479c39caa727bedf4311dd294a8f4e250e72",
+                "url": "https://api.github.com/repos/phpstan/phpstan/zipball/1dd8f3e40bf7aa30031a75c65cece99220a161b8",
+                "reference": "1dd8f3e40bf7aa30031a75c65cece99220a161b8",
                 "shasum": ""
             },
             "require": {
@@ -10491,6 +10491,11 @@
                 "phpstan.phar"
             ],
             "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.4-dev"
+                }
+            },
             "autoload": {
                 "files": [
                     "bootstrap.php"
@@ -10503,7 +10508,7 @@
             "description": "PHPStan - PHP Static Analysis Tool",
             "support": {
                 "issues": "https://github.com/phpstan/phpstan/issues",
-                "source": "https://github.com/phpstan/phpstan/tree/1.4.10"
+                "source": "https://github.com/phpstan/phpstan/tree/1.4.2"
             },
             "funding": [
                 {
@@ -10523,7 +10528,7 @@
                     "type": "tidelift"
                 }
             ],
-            "time": "2022-03-14T10:25:45+00:00"
+            "time": "2022-01-18T16:09:11+00:00"
         },
         {
             "name": "phpstan/phpstan-deprecation-rules",
