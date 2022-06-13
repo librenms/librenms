@@ -99,7 +99,7 @@ class Mail
                 switch (strtolower(trim(Config::get('email_backend')))) {
                     case 'sendmail':
                         $mail->Mailer = 'sendmail';
-                        $mail->Sendmail = Config::get('email_sendmail_path');
+                        $mail->Sendmail = Config::getExecutable('email_sendmail_path');
                         break;
                     case 'smtp':
                         $mail->isSMTP();

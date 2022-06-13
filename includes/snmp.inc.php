@@ -113,7 +113,7 @@ function mibdir($mibdir = null, $device = null)
  */
 function gen_snmpget_cmd($device, $oids, $options = null, $mib = null, $mibdir = null)
 {
-    $snmpcmd = [Config::get('snmpget')];
+    $snmpcmd = [Config::getExecutable('snmpget')];
 
     return gen_snmp_cmd($snmpcmd, $device, $oids, $options, $mib, $mibdir);
 } // end gen_snmpget_cmd()
@@ -136,9 +136,9 @@ function gen_snmpwalk_cmd($device, $oids, $options = null, $mib = null, $mibdir 
         || (isset($device['os']) && (Config::getOsSetting($device['os'], 'snmp_bulk', true) == false
                 || ! empty(array_intersect($oids, Config::getCombined($device['os'], 'oids.no_bulk', 'snmp.'))))) // skip for oids that do not work with bulk
     ) {
-        $snmpcmd = [Config::get('snmpwalk')];
+        $snmpcmd = [Config::getExecutable('snmpwalk')];
     } else {
-        $snmpcmd = [Config::get('snmpbulkwalk')];
+        $snmpcmd = [Config::getExecutable('snmpbulkwalk')];
         $max_repeaters = get_device_max_repeaters($device);
         if ($max_repeaters > 0) {
             $snmpcmd[] = "-Cr$max_repeaters";
@@ -326,7 +326,7 @@ function snmp_getnext($device, $oid, $options = null, $mib = null, $mibdir = nul
 {
     $measure = Measurement::start('snmpgetnext');
 
-    $snmpcmd = [Config::get('snmpgetnext', 'snmpgetnext')];
+    $snmpcmd = [Config::getExecutable('snmpgetnext')];
     $cmd = gen_snmp_cmd($snmpcmd, $device, $oid, $options, $mib, $mibdir);
     $data = trim(external_exec($cmd), "\" \n\r");
 
@@ -357,7 +357,7 @@ function snmp_getnext_multi($device, $oids, $options = '-OQUs', $mib = null, $mi
     if (! is_array($oids)) {
         $oids = explode(' ', $oids);
     }
-    $snmpcmd = [Config::get('snmpgetnext', 'snmpgetnext')];
+    $snmpcmd = [Config::getExecutable('snmpgetnext')];
     $cmd = gen_snmp_cmd($snmpcmd, $device, $oids, $options, $mib, $mibdir);
     $data = trim(external_exec($cmd), "\" \n\r");
 
@@ -829,7 +829,7 @@ function snmp_gen_auth(&$device, $cmd = [])
 function snmp_translate($oid, $mib = 'ALL', $mibdir = null, $options = null, $device = null)
 {
     $measure = Measurement::start('snmptranslate');
-    $cmd = [Config::get('snmptranslate', 'snmptranslate'), '-M', mibdir($mibdir, $device), '-m', $mib];
+    $cmd = [Config::getExecutable('snmptranslate'), '-M', mibdir($mibdir, $device), '-m', $mib];
 
     if (oid_is_numeric($oid)) {
         $default_options = ['-Os', '-Pu'];

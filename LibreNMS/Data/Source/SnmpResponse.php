@@ -29,6 +29,7 @@ use Illuminate\Support\Arr;
 use Illuminate\Support\Collection;
 use Illuminate\Support\Str;
 use LibreNMS\Config;
+use LibreNMS\Util\Version;
 use Log;
 
 class SnmpResponse
@@ -63,6 +64,10 @@ class SnmpResponse
         $this->exitCode = $exitCode;
         $this->raw = preg_replace('/Wrong Type \(should be .*\): /', '', $output);
         $this->stderr = $errorOutput;
+
+        if (! Config::has('snmp.unescape')) {
+            Config::persist('snmp.unescape', version_compare(Version::get()->netSnmp(), '5.8.0', '<'));
+        }
     }
 
     public function isValid(): bool

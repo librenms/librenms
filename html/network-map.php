@@ -186,14 +186,14 @@ if (isset($_GET['format']) && preg_match('/^[a-z]*$/', $_GET['format'])) {
 
     if ($links > 30) {
         // Unflatten if there are more than 10 links. beyond that it gets messy
-        $maptool = Config::get('dot');
+        $maptool = Config::getExecutable('dot');
     } else {
-        $maptool = Config::get('dot');
+        $maptool = Config::getExecutable('dot');
     }
 
     if ($where == '') {
-        $maptool = Config::get('sfdp') . ' -Gpack -Goverlap=prism -Gcharset=latin1 -Gsize=20,20';
-        $maptool = Config::get('dot');
+        $maptool = Config::getExecutable('sfdp') . ' -Gpack -Goverlap=prism -Gcharset=latin1 -Gsize=20,20';
+        $maptool = Config::getExecutable('dot');
     }
 
     $descriptorspec = [0 => ['pipe', 'r'], 1 => ['pipe', 'w']];

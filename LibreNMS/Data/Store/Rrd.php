@@ -65,6 +65,10 @@ class Rrd extends BaseDatastore
             ' RRA:MAX:0.5:1:2016 RRA:MAX:0.5:6:1440     RRA:MAX:0.5:24:1440     RRA:MAX:0.5:288:1440 ' .
             ' RRA:LAST:0.5:1:2016 '
         );
+
+        if (! Config::has('rrdtool_version')) {
+            Config::persist('rrdtool_version', self::version());
+        }
         $this->version = Config::get('rrdtool_version', '1.4');
     }
 
@@ -86,7 +90,7 @@ class Rrd extends BaseDatastore
      */
     public function init($dual_process = true)
     {
-        $command = Config::get('rrdtool', 'rrdtool') . ' -';
+        $command = Config::getExecutable('rrdtool') . ' -';
 
         $descriptor_spec = [
             0 => ['pipe', 'r'], // stdin  is a pipe that the child will read from
@@ -563,7 +567,7 @@ class Rrd extends BaseDatastore
      */
     public function graph(string $options): string
     {
-        $process = new Process([Config::get('rrdtool', 'rrdtool'), '-'], $this->rrd_dir);
+        $process = new Process([Config::getExecutable('rrdtool'), '-'], $this->rrd_dir);
         $process->setTimeout(300);
         $process->setIdleTimeout(300);
 
@@ -674,7 +678,7 @@ class Rrd extends BaseDatastore
      */
     public static function version(): ?string
     {
-        $proc = new Process([Config::get('rrdtool', 'rrdtool'), '--version']);
+        $proc = new Process([Config::getExecutable('rrdtool'), '--version']);
         $proc->run();
         $parts = explode(' ', $proc->getOutput(), 3);
 

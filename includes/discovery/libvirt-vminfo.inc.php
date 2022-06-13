@@ -35,7 +35,7 @@ if (Config::get('enable_libvirt') && $device['os'] == 'linux') {
         if ($ssh_ok || ! Str::contains($method, 'ssh')) {
             // Fetch virtual machine list
             unset($domlist);
-            exec(Config::get('virsh') . ' -rc ' . $uri . ' list', $domlist);
+            exec(Config::getExecutable('virsh') . ' -rc ' . $uri . ' list', $domlist);
 
             foreach ($domlist as $dom) {
                 [$dom_id,] = explode(' ', trim($dom), 2);
@@ -43,7 +43,7 @@ if (Config::get('enable_libvirt') && $device['os'] == 'linux') {
                 if (is_numeric($dom_id)) {
                     // Fetch the Virtual Machine information.
                     unset($vm_info_array);
-                    exec(Config::get('virsh') . ' -rc ' . $uri . ' dumpxml ' . $dom_id, $vm_info_array);
+                    exec(Config::getExecutable('virsh') . ' -rc ' . $uri . ' dumpxml ' . $dom_id, $vm_info_array);
 
                     // Example xml:
                     // <domain type='kvm' id='3'>
@@ -73,7 +73,7 @@ if (Config::get('enable_libvirt') && $device['os'] == 'linux') {
                     $vmwVmDisplayName = $xml->name;
                     $vmwVmGuestOS = '';
                     // libvirt does not supply this
-                    exec(Config::get('virsh') . ' -rc ' . $uri . ' domstate ' . $dom_id, $vm_state);
+                    exec(Config::getExecutable('virsh') . ' -rc ' . $uri . ' domstate ' . $dom_id, $vm_state);
                     $vmwVmState = PowerState::STATES[strtolower($vm_state[0])] ?? PowerState::UNKNOWN;
                     unset($vm_state);
 

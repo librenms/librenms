@@ -6306,56 +6306,6 @@ parameters:
 			path: LibreNMS/Validations/Php.php
 
 		-
-			message: "#^Method LibreNMS\\\\Validations\\\\Programs\\:\\:checkFping6\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: LibreNMS/Validations/Programs.php
-
-		-
-			message: "#^Method LibreNMS\\\\Validations\\\\Programs\\:\\:checkFping6\\(\\) has parameter \\$fping with no type specified\\.$#"
-			count: 1
-			path: LibreNMS/Validations/Programs.php
-
-		-
-			message: "#^Method LibreNMS\\\\Validations\\\\Programs\\:\\:extraFpingChecks\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: LibreNMS/Validations/Programs.php
-
-		-
-			message: "#^Method LibreNMS\\\\Validations\\\\Programs\\:\\:extraFpingChecks\\(\\) has parameter \\$cmd with no type specified\\.$#"
-			count: 1
-			path: LibreNMS/Validations/Programs.php
-
-		-
-			message: "#^Method LibreNMS\\\\Validations\\\\Programs\\:\\:failFping\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: LibreNMS/Validations/Programs.php
-
-		-
-			message: "#^Method LibreNMS\\\\Validations\\\\Programs\\:\\:failFping\\(\\) has parameter \\$cmd with no type specified\\.$#"
-			count: 1
-			path: LibreNMS/Validations/Programs.php
-
-		-
-			message: "#^Method LibreNMS\\\\Validations\\\\Programs\\:\\:failFping\\(\\) has parameter \\$output with no type specified\\.$#"
-			count: 1
-			path: LibreNMS/Validations/Programs.php
-
-		-
-			message: "#^Method LibreNMS\\\\Validations\\\\Programs\\:\\:failFping\\(\\) has parameter \\$validator with no type specified\\.$#"
-			count: 1
-			path: LibreNMS/Validations/Programs.php
-
-		-
-			message: "#^Method LibreNMS\\\\Validations\\\\Programs\\:\\:findExecutable\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: LibreNMS/Validations/Programs.php
-
-		-
-			message: "#^Method LibreNMS\\\\Validations\\\\Programs\\:\\:findExecutable\\(\\) has parameter \\$bin with no type specified\\.$#"
-			count: 1
-			path: LibreNMS/Validations/Programs.php
-
-		-
 			message: "#^Method LibreNMS\\\\Validations\\\\Python\\:\\:checkExtensions\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: LibreNMS/Validations/Python.php

@@ -11,7 +11,7 @@ if ($ipmi['host'] = get_dev_attrib($device, 'ipmi_hostname')) {
     $ipmi['password'] = get_dev_attrib($device, 'ipmi_password');
     $ipmi['kg_key'] = get_dev_attrib($device, 'ipmi_kg_key');
 
-    $cmd = [Config::get('ipmitool', 'ipmitool')];
+    $cmd = [Config::getExecutable('ipmitool')];
     if (Config::get('own_hostname') != $device['hostname'] || $ipmi['host'] != 'localhost') {
         if (empty($ipmi['kg_key']) || is_null($ipmi['kg_key'])) {
             array_push($cmd, '-H', $ipmi['host'], '-U', $ipmi['user'], '-P', $ipmi['password'], '-L', 'USER');

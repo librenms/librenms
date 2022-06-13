@@ -177,9 +177,9 @@ class Snmpsim
 
     public function findSnmpsimd()
     {
-        $cmd = Config::locateBinary('snmpsimd');
+        $cmd = Config::getExecutable('snmpsimd');
         if (! is_executable($cmd)) {
-            $cmd = Config::locateBinary('snmpsimd.py');
+            $cmd = Config::getExecutable('snmpsimd.py');
         }
 
         return $cmd;

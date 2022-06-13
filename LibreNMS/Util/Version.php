@@ -135,7 +135,7 @@ class Version
 
     public function rrdtool(): string
     {
-        $process = new Process([Config::get('rrdtool', 'rrdtool'), '--version']);
+        $process = new Process([Config::getExecutable('rrdtool'), '--version']);
         $process->run();
         preg_match('/^RRDtool ([\w.]+) /', $process->getOutput(), $matches);
 
@@ -144,7 +144,7 @@ class Version
 
     public function netSnmp(): string
     {
-        $process = new Process([Config::get('snmpget', 'snmpget'), '-V']);
+        $process = new Process([Config::getExecutable('snmpget'), '-V']);
 
         $process->run();
         preg_match('/[\w.]+$/', $process->getErrorOutput(), $matches);
