@@ -53,7 +53,7 @@ if ($graph_set == 'cluster') {
     $graphs = [
         'opensearch_ti_total' => 'Index Total',
         'opensearch_ti_time' => 'Index Time in Milliseconds',
-        'opensearch_ti_failed' => 'index_failed',
+        'opensearch_ti_failed' => 'Index Failed',
         'opensearch_ti_del_total' => 'Delete Total',
         'opensearch_ti_del_time' => 'Delete Time in Milliseconds',
         'opensearch_ti_noop_up_total' => 'NoOP Update Total',
