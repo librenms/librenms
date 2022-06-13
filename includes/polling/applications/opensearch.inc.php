@@ -42,7 +42,6 @@ $metrics = [
     'ti_del_total' => $data['ti_del_total'],
     'ti_del_time' => $data['ti_del_time'],
     'ti_noop_up_total' => $data['ti_noop_up_total'],
-    'ti_throttled' => $data['ti_throttled'],
     'ti_throttled_time' => $data['ti_throttled_time'],
     'ti_throttled' => $data['ti_throttled'],
     'ts_q_total' => $data['ts_q_total'],
@@ -63,7 +62,6 @@ $metrics = [
     'tqc_size' => $data['tqc_size'],
     'tqc_total' => $data['tqc_total'],
     'tqc_hit' => $data['tqc_hit'],
-    'tqc_miss' => $data['tqc_miss'],
     'tqc_miss' => $data['tqc_miss'],
     'tqc_cache_size' => $data['tqc_cache_size'],
     'tqc_cache_count' => $data['tqc_cache_count'],
@@ -147,7 +145,6 @@ $rrd_def = RrdDefinition::make()
     ->addDataset('tqc_size', 'GAUGE', 0)
     ->addDataset('tqc_total', 'DERIVE', 0)
     ->addDataset('tqc_hit', 'DERIVE', 0)
-    ->addDataset('tqc_miss', 'DERIVE', 0)
     ->addDataset('tqc_miss', 'DERIVE', 0)
     ->addDataset('tqc_cache_size', 'GAUGE', 0)
     ->addDataset('tqc_cache_count', 'GAUGE', 0)
