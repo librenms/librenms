@@ -17,7 +17,7 @@ print_optionbar_end();
 
 if (isset($vars['set'])) {
     $graph_set=$vars['set'];
-}else{
+} else {
     $graph_set=$vars['cluster'];
 }
 
@@ -36,7 +36,7 @@ if ($graph_set == 'cluster') {
         'opensearch_c_act_shards_perc'=>'Active Shards Percentage',
         'opensearch_status'=>'Status: 0=Green, 1=Yellow, 2=Red, 3=Unknown',
     ];
-}elseif ($graph_set == 'translog') {
+} elseif ($graph_set == 'translog') {
     $graphs = [
         'opensearch_ttl_ops' => 'Translog Operations',
         'opensearch_ttl_size' => 'Translog Size In Bytes',
@@ -44,7 +44,7 @@ if ($graph_set == 'cluster') {
         'opensearch_ttl_uncom_size' => 'Translog Uncommitted Size In Bytes',
         'opensearch_ttl_last_mod_age' => 'Translog Earliest Last Modified Age',
     ];
-}else{
+} else {
     $graphs = [
         'opensearch_c_nodes'=>'Nodes',
         'opensearch_c_data_nodes'=>'Data Nodes',
