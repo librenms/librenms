@@ -73,7 +73,6 @@ class Canopsis extends Transport
         // non-resource key example
         // $msg_rk = $msg_body['connector'] . '.' . $msg_body['connector_name'] . '.' . $msg_body['event_type'] . '.' . $msg_body['source_type'] . '.' . $msg_body['component'];
 
-
         // Publish Event
         $msg = new AMQPMessage($msg_raw, ['content_type' => 'application/json', 'delivery_mode' => 2]);
         $ch->basic_publish($msg, $exchange, $msg_rk);
