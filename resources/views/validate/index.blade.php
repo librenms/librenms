@@ -36,7 +36,13 @@
                                         <div class="panel-heading"
                                              x-text="result.statusText + ': ' + result.message"
                                         ></div>
-                                        <div class="panel-body" x-show="result.fix.length || result.list.length">
+                                        <div class="panel-body" x-show="result.fix.length || result.list.length || result.fixer">
+                                            <div x-show="result.fixer" class="tw-mb-2" x-data="fixerData(result.fixer)">
+                                                <button class="btn btn-success" x-on:click="runFixer" x-bind:disabled="running" x-show="! fixed">
+                                                    <i class="fa-solid" x-bind:class="running ? 'fa-spinner fa-spin' : 'fa-wrench'"></i> {{ __('validation.results.autofix') }}
+                                                </button>
+                                                <div x-show="fixed">{{ __('validation.results.fixed') }}</div>
+                                            </div>
                                             <div x-show="result.fix.length">
                                                 {{ __('validation.results.fix') }}: <pre x-text='result.fix.join("\r\n")'>
                                                 </pre>
@@ -71,6 +77,30 @@
 
 @push('scripts')
     <script>
-
+        function fixerData(name) {
+            return {
+                running: false,
+                fixed: false,
+                fixer: name,
+                runFixer() {
+                    event.target.disabled = true;
+                    fetch('{{ route('validate.fix') }}', {
+                        method: 'POST',
+                        body: JSON.stringify({fixer: this.fixer}),
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'Accept': 'application/json',
+                            "X-CSRF-Token": document.querySelector('input[name=_token]').value
+                        },
+                    }).then(response => {
+                        if (response.ok) {
+                            this.fixed = true;
+                        } else {
+                            this.running = false;
+                        }
+                    }).catch(response => this.running = false);
+                }
+            }
+        }
     </script>
 @endpush

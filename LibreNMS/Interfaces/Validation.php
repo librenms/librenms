@@ -1,6 +1,6 @@
 <?php
-/**
- * Rrd.php
+/*
+ * Validation.php
  *
  * -Description-
  *
@@ -15,18 +15,29 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @link       https://www.librenms.org
- *
- * @copyright  2017 Tony Murray
+ * @package    LibreNMS
+ * @link       http://librenms.org
+ * @copyright  2022 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
-namespace LibreNMS\Validations;
+namespace LibreNMS\Interfaces;
 
-class Rrd extends BaseValidation
+use LibreNMS\ValidationResult;
+
+interface Validation
 {
-    protected $directory = 'Rrd';
-    protected $name = 'rrd';
+    /**
+     * Validate this module.
+     */
+    public function validate(): ValidationResult;
+
+    /**
+     * If this validation is enabled or not.
+     *
+     * @return bool
+     */
+    public function enabled(): bool;
 }
