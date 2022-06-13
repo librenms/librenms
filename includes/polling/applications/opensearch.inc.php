@@ -184,8 +184,16 @@ $rrd_def = RrdDefinition::make()
     ->addDataset('tst_size', 'GAUGE', 0)
     ->addDataset('tst_res_size', 'GAUGE', 0);
 
+$tags = ['name' => $name, 'app_id' => $app_id, 'rrd_def' => $rrd_def, 'rrd_name' => $rrd_name];
+data_update($device, 'app', $tags, $metrics);
+
 //
-// component processing for Opensearch
+// mostly done so update the app metrics
+//
+update_application($app, 'OK', $metrics);
+
+//
+// component processing
 //
 $device_id = $device['device_id'];
 $options = [
@@ -208,8 +216,3 @@ $id = $component->getFirstComponentID($ourc);
 $ourc[$id]['label'] = 'Opensearch';
 $ourc[$id]['cluster'] = $returned['data']['cluster_name'];
 $component->setComponentPrefs($device_id, $ourc);
-
-//
-// all done so update the app metrics
-//
-update_application($app, 'OK', $metrics);
