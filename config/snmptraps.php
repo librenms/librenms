@@ -127,7 +127,8 @@ return [
         'OSPF-TRAP-MIB::ospfIfStateChange' => \LibreNMS\Snmptrap\Handlers\OspfIfStateChange::class,
         'OSPF-TRAP-MIB::ospfNbrStateChange' => \LibreNMS\Snmptrap\Handlers\OspfNbrStateChange::class,
         'OSPF-TRAP-MIB::ospfTxRetransmit' => \LibreNMS\Snmptrap\Handlers\OspfTxRetransmit::class,
-        'UPS-MIB::upsTraps.0.1' => \LibreNMS\Snmptrap\Handlers\UpsTrapsOnBattery::class,
+        'UPS-MIB::upsTrapOnBattery' => \LibreNMS\Snmptrap\Handlers\UpsTrapOnBattery::class,
+        'UPS-MIB::upsTraps.0.1' => \LibreNMS\Snmptrap\Handlers\UpsTrapOnBattery::class, // apparently bad/old UPS-MIB
         'VEEAM-MIB::onBackupJobCompleted' => \LibreNMS\Snmptrap\Handlers\VeeamBackupJobCompleted::class,
         'VEEAM-MIB::onVmBackupCompleted' => \LibreNMS\Snmptrap\Handlers\VeeamVmBackupCompleted::class,
         'VEEAM-MIB::onLinuxFLRMountStarted' => \LibreNMS\Snmptrap\Handlers\VeeamLinuxFLRMountStarted::class,
@@ -145,6 +146,5 @@ return [
         'VEEAM-MIB::onSobrOffloadFinished' => \LibreNMS\Snmptrap\Handlers\VeeamSobrOffloadFinished::class,
         'VEEAM-MIB::onCdpRpoReport' => \LibreNMS\Snmptrap\Handlers\VeeamCdpRpoReport::class,
         'HP-ICF-FAULT-FINDER-MIB::hpicfFaultFinderTrap' => \LibreNMS\Snmptrap\Handlers\HpFault::class,
-        'UPS-MIB::upsTrapOnBattery' => \LibreNMS\Snmptrap\Handlers\UpsTrapOnBattery::class,
     ],
 ];

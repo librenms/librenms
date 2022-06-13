@@ -2546,11 +2546,6 @@ parameters:
 			path: LibreNMS/Exceptions/AuthenticationException.php
 
 		-
-			message: "#^Parameter \\#2 \\$code of class LibreNMS\\\\Exceptions\\\\DatabaseConnectException constructor expects int, string given\\.$#"
-			count: 1
-			path: LibreNMS/Exceptions/DatabaseConnectException.php
-
-		-
 			message: "#^Method LibreNMS\\\\Exceptions\\\\DatabaseInconsistentException\\:\\:__construct\\(\\) has parameter \\$code with no type specified\\.$#"
 			count: 1
 			path: LibreNMS/Exceptions/DatabaseInconsistentException.php
@@ -3931,11 +3926,6 @@ parameters:
 			path: LibreNMS/OS/Ceraos.php
 
 		-
-			message: "#^Variable \\$multi_get_array in empty\\(\\) is never defined\\.$#"
-			count: 2
-			path: LibreNMS/OS/Ceraos.php
-
-		-
 			message: "#^Variable \\$multi_get_array on left side of \\?\\? is never defined\\.$#"
 			count: 2
 			path: LibreNMS/OS/Ceraos.php
@@ -4991,16 +4981,6 @@ parameters:
 			path: LibreNMS/Snmptrap/Handlers/AdvaNetThresholdCrossingAlert.php
 
 		-
-			message: "#^Parameter \\#5 \\$reference of static method App\\\\Facades\\\\LogManager\\:\\:event\\(\\) expects int\\|null, string given\\.$#"
-			count: 1
-			path: LibreNMS/Snmptrap/Handlers/BgpBackwardTransition.php
-
-		-
-			message: "#^Parameter \\#5 \\$reference of static method App\\\\Facades\\\\LogManager\\:\\:event\\(\\) expects int\\|null, string given\\.$#"
-			count: 1
-			path: LibreNMS/Snmptrap/Handlers/BgpEstablished.php
-
-		-
 			message: "#^Method LibreNMS\\\\Snmptrap\\\\Handlers\\\\EquipStatusTrap\\:\\:getSeverity\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: LibreNMS/Snmptrap/Handlers/EquipStatusTrap.php
@@ -5367,36 +5347,6 @@ parameters:
 
 		-
 			message: "#^Method LibreNMS\\\\Util\\\\DynamicConfigItem\\:\\:isValid\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: LibreNMS/Util/DynamicConfigItem.php
-
-		-
-			message: "#^Method LibreNMS\\\\Util\\\\DynamicConfigItem\\:\\:offsetExists\\(\\) has parameter \\$offset with no type specified\\.$#"
-			count: 1
-			path: LibreNMS/Util/DynamicConfigItem.php
-
-		-
-			message: "#^Method LibreNMS\\\\Util\\\\DynamicConfigItem\\:\\:offsetGet\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: LibreNMS/Util/DynamicConfigItem.php
-
-		-
-			message: "#^Method LibreNMS\\\\Util\\\\DynamicConfigItem\\:\\:offsetGet\\(\\) has parameter \\$offset with no type specified\\.$#"
-			count: 1
-			path: LibreNMS/Util/DynamicConfigItem.php
-
-		-
-			message: "#^Method LibreNMS\\\\Util\\\\DynamicConfigItem\\:\\:offsetSet\\(\\) has parameter \\$offset with no type specified\\.$#"
-			count: 1
-			path: LibreNMS/Util/DynamicConfigItem.php
-
-		-
-			message: "#^Method LibreNMS\\\\Util\\\\DynamicConfigItem\\:\\:offsetSet\\(\\) has parameter \\$value with no type specified\\.$#"
-			count: 1
-			path: LibreNMS/Util/DynamicConfigItem.php
-
-		-
-			message: "#^Method LibreNMS\\\\Util\\\\DynamicConfigItem\\:\\:offsetUnset\\(\\) has parameter \\$offset with no type specified\\.$#"
 			count: 1
 			path: LibreNMS/Util/DynamicConfigItem.php
 
@@ -6339,6 +6289,16 @@ parameters:
 			message: "#^Property LibreNMS\\\\Util\\\\Snmpsim\\:\\:\\$snmprec_dir has no type specified\\.$#"
 			count: 1
 			path: LibreNMS/Util/Snmpsim.php
+
+		-
+			message: "#^Unreachable statement \\- code above always terminates\\.$#"
+			count: 1
+			path: LibreNMS/Util/Snmpsim.php
+
+		-
+			message: "#^Anonymous function should return non\\-empty\\-string but returns string\\.$#"
+			count: 1
+			path: LibreNMS/Util/StringHelpers.php
 
 		-
 			message: "#^Method LibreNMS\\\\Util\\\\StringHelpers\\:\\:niceCase\\(\\) has no return type specified\\.$#"
@@ -8121,7 +8081,22 @@ parameters:
 			path: app/Jobs/PingCheck.php
 
 		-
+			message: "#^Property App\\\\Jobs\\\\PingCheck\\:\\:\\$deferred is never written, only read\\.$#"
+			count: 1
+			path: app/Jobs/PingCheck.php
+
+		-
 			message: "#^Property App\\\\Jobs\\\\PingCheck\\:\\:\\$devices \\(Illuminate\\\\Database\\\\Eloquent\\\\Collection\\) in isset\\(\\) is not nullable\\.$#"
+			count: 1
+			path: app/Jobs/PingCheck.php
+
+		-
+			message: "#^Property App\\\\Jobs\\\\PingCheck\\:\\:\\$devices is never written, only read\\.$#"
+			count: 1
+			path: app/Jobs/PingCheck.php
+
+		-
+			message: "#^Property App\\\\Jobs\\\\PingCheck\\:\\:\\$groups is never read, only written\\.$#"
 			count: 1
 			path: app/Jobs/PingCheck.php
 
@@ -8131,7 +8106,17 @@ parameters:
 			path: app/Jobs/PingCheck.php
 
 		-
+			message: "#^Property App\\\\Jobs\\\\PingCheck\\:\\:\\$tiered is never written, only read\\.$#"
+			count: 1
+			path: app/Jobs/PingCheck.php
+
+		-
 			message: "#^Property App\\\\Jobs\\\\PingCheck\\:\\:\\$wait has no type specified\\.$#"
+			count: 1
+			path: app/Jobs/PingCheck.php
+
+		-
+			message: "#^Unreachable statement \\- code above always terminates\\.$#"
 			count: 1
 			path: app/Jobs/PingCheck.php
 
@@ -9359,6 +9344,16 @@ parameters:
 			message: "#^Method App\\\\Providers\\\\AppServiceProvider\\:\\:registerGeocoder\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: app/Providers/AppServiceProvider.php
+
+		-
+			message: "#^Result of && is always false\\.$#"
+			count: 1
+			path: app/Providers/CliServiceProvider.php
+
+		-
+			message: "#^Right side of && is always false\\.$#"
+			count: 1
+			path: app/Providers/CliServiceProvider.php
 
 		-
 			message: "#^Method App\\\\Providers\\\\DatastoreServiceProvider\\:\\:registerInflux\\(\\) has no return type specified\\.$#"
