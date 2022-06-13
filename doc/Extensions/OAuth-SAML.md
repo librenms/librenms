@@ -128,6 +128,8 @@ Now we need some values from the OAuth provider itself, in most cases you need t
 	Fill in the Name, Logo, and Assignments based on your preferred settings. Leave the `Sign-In Redirect URI` field, this is where you will edit this later:
 	![socialite-okta-2](/img/socialite-okta-2.png)
 
+	Note your Okta domain or login url. Sometimes this can be a vanity url like `login.company.com`, or sometimes just `company.okta.com`.
+
 	Click save.
 
 #### Generate a new client secret
@@ -193,6 +195,7 @@ The format of the configuration string is `auth.socialite.configs.*provider name
 	```bash
 	lnms config:set auth.socialite.configs.okta.client_id 0oa1c08tti8D7xgXb697
 	lnms config:set auth.socialite.configs.okta.client_secret sWew90IKqKDmURj1XLsCPjXjre0U3zmJuFR6SzsG
+	lnms config:set auth.socialite.configs.okta.base_url "https://<okta_login_url>"
 	```
 
 ### Add provider event listener
