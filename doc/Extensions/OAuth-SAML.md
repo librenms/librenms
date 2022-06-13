@@ -192,11 +192,11 @@ The format of the configuration string is `auth.socialite.configs.*provider name
 === "Okta"
 
 	!!! setting "auth/socialite"
-	```bash
-		lnms config:set auth.socialite.configs.okta.client_id 0oa1c08tti8D7xgXb697
-		lnms config:set auth.socialite.configs.okta.client_secret sWew90IKqKDmURj1XLsCPjXjre0U3zmJuFR6SzsG
-		lnms config:set auth.socialite.configs.okta.base_url "https://<okta_login_url>"
-	```
+		```bash
+			lnms config:set auth.socialite.configs.okta.client_id 0oa1c08tti8D7xgXb697
+			lnms config:set auth.socialite.configs.okta.client_secret sWew90IKqKDmURj1XLsCPjXjre0U3zmJuFR6SzsG
+			lnms config:set auth.socialite.configs.okta.base_url "https://<okta_login_url>"
+		```
 
 ### Add provider event listener
 
