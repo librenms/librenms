@@ -15,8 +15,8 @@ $rrd_list = [];
 if (Rrd::checkRrdExists($rrd_filename)) {
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'In.Fl. Shards',
-        'ds'       => 'c_in_fl_fetch',
+        'descr'    => 'Pending Tasks',
+        'ds'       => 'c_pending_tasks',
     ];
 } else {
     d_echo('RRD "' . $rrd_filename . '" not found');
