@@ -1486,7 +1486,7 @@ function get_chrony_sources($device_id)
 }
 
 /**
- * Fetches the returned data for sneck if it was saved
+ * Fetches the returned data for cluster name for opensearch
  *
  * @param $device_id
  * @return string
