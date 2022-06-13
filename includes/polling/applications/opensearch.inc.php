@@ -102,6 +102,7 @@ $metrics = [
     'tst_res_size' => $data['tst_res_size'],
 ];
 
+$rrd_name = ['app', $name, $app_id];
 $rrd_def = RrdDefinition::make()
     ->addDataset('c_nodes', 'GAUGE', 0)
     ->addDataset('c_data_nodes', 'GAUGE', 0)
