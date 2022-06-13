@@ -10,10 +10,13 @@ $link_array = [
 ];
 
 print_optionbar_start();
-echo 'Cluster Name: ' . get_opensearch_cluster_name($device['device_id']) .'<br>';
+echo '<b>Cluster Name:</b> ' . get_opensearch_cluster_name($device['device_id']) .'<br>';
+echo '<b>Graph Sets:</b> ';
 echo generate_link('Cluster, ', $link_array);
 $link_array['set']='translog';
 echo generate_link('Translog, ', $link_array);
+$link_array['set']='indexing';
+echo generate_link('Indexing, ', $link_array);
 print_optionbar_end();
 
 if (isset($vars['set'])) {
@@ -45,6 +48,17 @@ if ($graph_set == 'cluster') {
         'opensearch_ttl_uncom_ops' => 'Translog Uncommitted Operations',
         'opensearch_ttl_uncom_size' => 'Translog Uncommitted Size In Bytes',
         'opensearch_ttl_last_mod_age' => 'Translog Earliest Last Modified Age',
+    ];
+} elseif ($graph_set == 'indexing') {
+    $graphs = [
+        'opensearch_ti_total' => 'Index Total',
+        'opensearch_ti_time' => 'Index Time in Milliseconds',
+        'opensearch_ti_failed' => 'index_failed',
+        'opensearch_ti_del_total' => 'Delete Total',
+        'opensearch_ti_del_time' => 'Delete Time in Milliseconds',
+        'opensearch_ti_noop_up_total' => 'NoOP Update Total',
+        'opensearch_ti_throttled_time' => 'Throttle Time in Milliseconds',
+        'opensearch_ti_throttled' => 'Throttled',
     ];
 } else {
     $graphs = [
