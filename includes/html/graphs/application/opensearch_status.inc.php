@@ -15,7 +15,7 @@ $rrd_list = [];
 if (Rrd::checkRrdExists($rrd_filename)) {
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'Init Shards',
+        'descr'    => 'Status',
         'ds'       => 'status',
     ];
 } else {
