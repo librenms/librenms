@@ -174,7 +174,7 @@ return [
     'validations' => [
         'rrd' => [
             'CheckRrdVersion' => [
-                'fail' => 'The rrdtool version you have specified is newer than what is installed.',
+                'fail' => 'The rrdtool version you have specified is newer than what is installed. Config: :config_version Installed :installed_version',
                 'fix' => 'Either comment out or delete $config[\'rrdtool_version\'] = \':version\'; from your config.php file',
                 'ok' => 'rrdtool version ok',
             ],
