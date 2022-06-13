@@ -80,7 +80,7 @@ $metrics = [
     'tm_throttled_size' => $data['tm_throttled_size'],
     'tw_total' => $data['tw_total'],
     'tfd_size' => $data['tfd_size'],
-    'tfd_evictiosn' => $data['tfd_evictiosn'],
+    'tfd_evictions' => $data['tfd_evictions'],
     'tseg_count' => $data['tseg_count'],
     'tseg_size' => $data['tseg_size'],
     'tseg_terms_size' => $data['tseg_terms_size'],
@@ -97,7 +97,7 @@ $metrics = [
     'trc_hits' => $data['trc_hits'],
     'trc_misses' => $data['trc_misses'],
     'tst_size' => $data['tst_size'],
-    'tst_res_size' => $data['tst_res_size'],
+    'tst_res_size' => $data['tst_res_size']
 ];
 
 $rrd_name = ['app', $name, $app_id];
