@@ -15,7 +15,7 @@ try {
     return;
 }
 
-$data=$returned['data'];
+$data = $returned['data'];
 
 // grab  the alert here as it is the global one
 $metrics = [
