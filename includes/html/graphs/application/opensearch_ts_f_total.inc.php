@@ -2,7 +2,7 @@
 
 $name = 'opensearch';
 $app_id = $app['app_id'];
-$unit_text = 'Milliseconds / Second';
+$unit_text = 'Fetches / Second';
 $colours = 'greens';
 $dostack = 0;
 $printtotal = 0;
@@ -15,8 +15,8 @@ $rrd_list = [];
 if (Rrd::checkRrdExists($rrd_filename)) {
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'Delete Time',
-        'ds'       => 'ti_del_time',
+        'descr'    => 'Fetches',
+        'ds'       => 'ts_f_total',
     ];
 } else {
     d_echo('RRD "' . $rrd_filename . '" not found');
