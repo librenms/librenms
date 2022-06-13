@@ -150,7 +150,7 @@ class ModuleTestHelper
     public function captureFromDevice(int $device_id, bool $prefer_new = false, bool $full = false): void
     {
         if ($full) {
-            $snmp_oids[] = [
+            $snmp_oids[][] = [
                 'oid' => '.',
                 'method' => 'walk',
                 'mib' => null,
