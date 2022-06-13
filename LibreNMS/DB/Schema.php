@@ -407,6 +407,8 @@ class Schema
             }
         }
 
+        DB::statement("SET TIME_ZONE=@@global.time_zone"); // restore session timezone
+
         return $output;
     }
 }
