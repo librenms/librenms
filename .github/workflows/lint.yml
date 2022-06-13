@@ -12,7 +12,7 @@ jobs:
     steps:
       -
         name: Checkout Code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
         with:
           fetch-depth: 0
 
@@ -35,7 +35,7 @@ jobs:
     steps:
       -
         name: Checkout Code
-        uses: actions/checkout@v2
+        uses: actions/checkout@v3
 
       -
         name: Set up PHP
@@ -43,6 +43,7 @@ jobs:
         with:
           php-version: 7.4
           tools: composer
+          coverage: none
 
       -
         name: Get composer cache directory
@@ -51,7 +52,7 @@ jobs:
 
       -
         name: Cache composer
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: ${{ steps.composer-cache.outputs.dir }}
           key: ${{ runner.os }}-composer-${{ secrets.CACHE_VERSION }}-${{ hashFiles('**/composer.lock') }}
@@ -59,7 +60,7 @@ jobs:
 
       -
         name: Cache pip
-        uses: actions/cache@v2
+        uses: actions/cache@v3
         with:
           path: ~/.cache/pip
           key: ${{ runner.os }}-pip-${{ secrets.CACHE_VERSION }}-${{ hashFiles('**/requirements.txt') }}
