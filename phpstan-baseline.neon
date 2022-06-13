@@ -2546,11 +2546,6 @@ parameters:
 			path: LibreNMS/Exceptions/AuthenticationException.php
 
 		-
-			message: "#^Parameter \\#2 \\$code of class LibreNMS\\\\Exceptions\\\\DatabaseConnectException constructor expects int, string given\\.$#"
-			count: 1
-			path: LibreNMS/Exceptions/DatabaseConnectException.php
-
-		-
 			message: "#^Method LibreNMS\\\\Exceptions\\\\DatabaseInconsistentException\\:\\:__construct\\(\\) has parameter \\$code with no type specified\\.$#"
 			count: 1
 			path: LibreNMS/Exceptions/DatabaseInconsistentException.php
@@ -3931,11 +3926,6 @@ parameters:
 			path: LibreNMS/OS/Ceraos.php
 
 		-
-			message: "#^Variable \\$multi_get_array in empty\\(\\) is never defined\\.$#"
-			count: 2
-			path: LibreNMS/OS/Ceraos.php
-
-		-
 			message: "#^Variable \\$multi_get_array on left side of \\?\\? is never defined\\.$#"
 			count: 2
 			path: LibreNMS/OS/Ceraos.php
@@ -4991,16 +4981,6 @@ parameters:
 			path: LibreNMS/Snmptrap/Handlers/AdvaNetThresholdCrossingAlert.php
 
 		-
-			message: "#^Parameter \\#5 \\$reference of static method App\\\\Facades\\\\LogManager\\:\\:event\\(\\) expects int\\|null, string given\\.$#"
-			count: 1
-			path: LibreNMS/Snmptrap/Handlers/BgpBackwardTransition.php
-
-		-
-			message: "#^Parameter \\#5 \\$reference of static method App\\\\Facades\\\\LogManager\\:\\:event\\(\\) expects int\\|null, string given\\.$#"
-			count: 1
-			path: LibreNMS/Snmptrap/Handlers/BgpEstablished.php
-
-		-
 			message: "#^Method LibreNMS\\\\Snmptrap\\\\Handlers\\\\EquipStatusTrap\\:\\:getSeverity\\(\\) has no return type specified\\.$#"
 			count: 1
 			path: LibreNMS/Snmptrap/Handlers/EquipStatusTrap.php
@@ -5367,36 +5347,6 @@ parameters:
 
 		-
 			message: "#^Method LibreNMS\\\\Util\\\\DynamicConfigItem\\:\\:isValid\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: LibreNMS/Util/DynamicConfigItem.php
-
-		-
-			message: "#^Method LibreNMS\\\\Util\\\\DynamicConfigItem\\:\\:offsetExists\\(\\) has parameter \\$offset with no type specified\\.$#"
-			count: 1
-			path: LibreNMS/Util/DynamicConfigItem.php
-
-		-
-			message: "#^Method LibreNMS\\\\Util\\\\DynamicConfigItem\\:\\:offsetGet\\(\\) has no return type specified\\.$#"
-			count: 1
-			path: LibreNMS/Util/DynamicConfigItem.php
-
-		-
-			message: "#^Method LibreNMS\\\\Util\\\\DynamicConfigItem\\:\\:offsetGet\\(\\) has parameter \\$offset with no type specified\\.$#"
-			count: 1
-			path: LibreNMS/Util/DynamicConfigItem.php
-
-		-
-			message: "#^Method LibreNMS\\\\Util\\\\DynamicConfigItem\\:\\:offsetSet\\(\\) has parameter \\$offset with no type specified\\.$#"
-			count: 1
-			path: LibreNMS/Util/DynamicConfigItem.php
-
-		-
-			message: "#^Method LibreNMS\\\\Util\\\\DynamicConfigItem\\:\\:offsetSet\\(\\) has parameter \\$value with no type specified\\.$#"
-			count: 1
-			path: LibreNMS/Util/DynamicConfigItem.php
-
-		-
-			message: "#^Method LibreNMS\\\\Util\\\\DynamicConfigItem\\:\\:offsetUnset\\(\\) has parameter \\$offset with no type specified\\.$#"
 			count: 1
 			path: LibreNMS/Util/DynamicConfigItem.php
 

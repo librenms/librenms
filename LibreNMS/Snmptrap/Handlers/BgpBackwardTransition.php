@@ -56,7 +56,7 @@ class BgpBackwardTransition implements SnmptrapHandler
         $bgpPeer->bgpPeerState = $trap->getOidData($state_oid);
 
         if ($bgpPeer->isDirty('bgpPeerState')) {
-            \Log::event('SNMP Trap: BGP Down ' . $bgpPeer->bgpPeerIdentifier . ' ' . get_astext($bgpPeer->bgpPeerRemoteAs) . ' is now ' . $bgpPeer->bgpPeerState, $device->device_id, 'bgpPeer', 5, $bgpPeerIp);
+            \Log::event('SNMP Trap: BGP Down ' . $bgpPeer->bgpPeerIdentifier . ' ' . get_astext($bgpPeer->bgpPeerRemoteAs) . ' is now ' . $bgpPeer->bgpPeerState, $device->device_id, 'bgpPeer', 5, $bgpPeer->bgpPeer_id);
         }
 
         $bgpPeer->save();
