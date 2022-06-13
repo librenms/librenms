@@ -1484,3 +1484,27 @@ function get_chrony_sources($device_id)
 
     return [];
 }
+
+/**
+ * Fetches the returned data for sneck if it was saved
+ *
+ * @param $device_id
+ * @return string
+ */
+function get_opensearch_cluster_name($device_id)
+{
+    $options = [
+        'filter' => [
+            'type' => ['=', 'opensearch'],
+        ],
+    ];
+
+    $component = new LibreNMS\Component();
+    $ourc = $component->getComponents($device_id, $options);
+
+    if (isset($ourc[$device_id])) {
+        $id = $component->getFirstComponentID($ourc, $device_id);
+
+        return $ourc[$device_id][$id]['cluster'];
+    }
+}
