@@ -10,6 +10,7 @@ $link_array = [
 ];
 
 print_optionbar_start();
+echo 'Cluster Name: ' . get_opensearch_cluster_name($device['device_id']) .'<br>';
 echo generate_link('Cluster, ', $link_array);
 $link_array['set']='translog';
 echo generate_link('Translog, ', $link_array);
