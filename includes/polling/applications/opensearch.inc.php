@@ -182,7 +182,7 @@ $rrd_def = RrdDefinition::make()
 	->addDataset('trc_hits', 'DERIVE', 0)
 	->addDataset('trc_misses', 'DERIVE', 0)
 	->addDataset('tst_size', 'GAUGE', 0)
-	->addDataset('tst_res_size', 'GAUGE', 0)
+    ->addDataset('tst_res_size', 'GAUGE', 0);
   
 //
 // component processing for Opensearch
