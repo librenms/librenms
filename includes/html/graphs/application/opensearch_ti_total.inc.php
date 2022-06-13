@@ -2,7 +2,7 @@
 
 $name = 'opensearch';
 $app_id = $app['app_id'];
-$unit_text = 'Index';
+$unit_text = 'Index Ops / Second';
 $colours = 'greens';
 $dostack = 0;
 $printtotal = 0;
@@ -15,7 +15,7 @@ $rrd_list = [];
 if (Rrd::checkRrdExists($rrd_filename)) {
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'Index Total',
+        'descr'    => 'Index Ops',
         'ds'       => 'ti_total',
     ];
 } else {
