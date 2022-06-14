@@ -40,3 +40,7 @@ resources/js/vue-i18n-locales.generated.js
 ########
 out
 librenms_theme
+
+bin/
+lib/
+pyvenv.cfg
