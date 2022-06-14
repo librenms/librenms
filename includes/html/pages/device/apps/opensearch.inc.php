@@ -106,6 +106,35 @@ if ($graph_set == 'cluster') {
         'opensearch_tf_periodic' => 'Periodic',
         'opensearch_tf_time' => 'Flush Time',
     ];
+} elseif ($graph_set == 'qc') {
+    $graphs = [
+        'opensearch_tqc_size' => 'Query Cache Size',
+        'opensearch_tqc_total' => 'Query Cache',
+        'opensearch_tqc_hit' => 'Query Cache Hits',
+        'opensearch_tqc_miss' => 'Query Cache Misses',
+        'opensearch_tqc_cache_size' => 'Query Cache Size',
+        'opensearch_tqc_cache_count' => 'Query Cache Count',
+        'opensearch_tqc_evictions' => 'Query Cache Evictions',
+    ];
+} elseif ($graph_set == 'get') {
+    $graphs = [
+        'opensearch_tg_total' => 'Gets',
+        'opensearch_tg_time' => 'Get Time',
+        'opensearch_tg_exists_total' => 'Exists',
+        'opensearch_tg_exists_time' => 'Get Exists Time',
+        'opensearch_tg_missing_total' => 'Get Missing Total',
+        'opensearch_tg_missing_time' => 'Get Missing Time',
+    ];
+} elseif ($graph_set == 'merges') {
+    $graphs = [
+        'opensearch_' => '',
+        'opensearch_tm_total' => 'Merges',
+        'opensearch_tm_time' => 'Merges Time',
+        'opensearch_tm_docs' => 'Merges Docs',
+        'opensearch_tm_size' => 'Merges Size',
+        'opensearch_tm_throttled_time' => 'Merges Throttled Time',
+        'opensearch_tm_throttled_size' => 'Merges Throttled Size',
+    ];
 } else {
     $graphs = [
         'opensearch_c_nodes'=>'Nodes',
