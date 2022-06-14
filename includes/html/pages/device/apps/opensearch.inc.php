@@ -108,7 +108,7 @@ if ($graph_set == 'cluster') {
     ];
 } elseif ($graph_set == 'qc') {
     $graphs = [
-        'opensearch_tqc_size' => 'Query Cache Size',
+        'opensearch_tqc_size' => 'Query Cache Memory Size',
         'opensearch_tqc_total' => 'Query Cache',
         'opensearch_tqc_hit' => 'Query Cache Hits',
         'opensearch_tqc_miss' => 'Query Cache Misses',
