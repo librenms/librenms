@@ -2,7 +2,7 @@
 
 $name = 'opensearch';
 $app_id = $app['app_id'];
-$unit_text = 'Index Failed / Second';
+$unit_text = 'Failed Ops/Sec';
 $colours = 'greens';
 $dostack = 0;
 $printtotal = 0;

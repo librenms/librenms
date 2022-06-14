@@ -2,7 +2,7 @@
 
 $name = 'opensearch';
 $app_id = $app['app_id'];
-$unit_text = 'Index Ops / Second';
+$unit_text = 'Ops/Sec';
 $colours = 'greens';
 $dostack = 0;
 $printtotal = 0;

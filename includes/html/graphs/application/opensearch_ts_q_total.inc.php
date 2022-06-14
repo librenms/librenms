@@ -2,7 +2,7 @@
 
 $name = 'opensearch';
 $app_id = $app['app_id'];
-$unit_text = 'Queries / Second';
+$unit_text = 'Ops/Sec';
 $colours = 'greens';
 $dostack = 0;
 $printtotal = 0;
@@ -15,7 +15,7 @@ $rrd_list = [];
 if (Rrd::checkRrdExists($rrd_filename)) {
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'Query',
+        'descr'    => 'Queries',
         'ds'       => 'ts_q_total',
     ];
 } else {

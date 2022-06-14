@@ -2,7 +2,7 @@
 
 $name = 'opensearch';
 $app_id = $app['app_id'];
-$unit_text = 'Milliseconds / Second';
+$unit_text = 'Millisecs/Sec';
 $colours = 'greens';
 $dostack = 0;
 $printtotal = 0;
