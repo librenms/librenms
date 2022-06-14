@@ -39,6 +39,10 @@ $link_array['set']='rc';
 echo generate_link('Request_Cache, ', $link_array);
 $link_array['set']='store';
 echo generate_link('Store, ', $link_array);
+$link_array['set']='time';
+echo generate_link('Time, ', $link_array);
+$link_array['set']='memory';
+echo generate_link('Memory', $link_array);
 print_optionbar_end();
 
 if (isset($vars['set'])) {
@@ -169,6 +173,41 @@ if ($graph_set == 'cluster') {
     $graphs = [
         'opensearch_tst_size' => 'Store Size',
         'opensearch_tst_res_size' => 'Store Reserved Size',
+    ];
+} elseif ($graph_set == 'time') {
+    $graphs = [
+        'opensearch_c_task_max_in_time'=>'Tasks Max Time',
+        'opensearch_ti_time' => 'Index Time',
+        'opensearch_ti_del_time' => 'Delete Time',
+        'opensearch_ti_throttled_time' => 'Throttle Time',
+        'opensearch_ts_q_time' => 'Query Time',
+        'opensearch_ts_f_time' => 'Fetch Time',
+        'opensearch_ts_sc_time' => 'Scroll Time',
+        'opensearch_ts_su_time' => 'Suggest Time',
+        'opensearch_tr_time' => 'Refresh Time',
+        'opensearch_tr_ext_time' => 'External Time',
+        'opensearch_tf_time' => 'Flush Time',
+        'opensearch_tg_time' => 'Get Time',
+        'opensearch_tg_exists_time' => 'Get Exists Time',
+        'opensearch_tg_missing_time' => 'Get Missing Time',
+        'opensearch_tm_time' => 'Merges Time',
+        'opensearch_tm_throttled_time' => 'Merges Throttled Time',
+    ];
+} elseif ($graph_set == 'memory') {
+    $graphs = [
+        'opensearch_tqc_size' => 'Query Cache Size',
+        'opensearch_trc_size' => 'Request Cache Memory Size',
+        'opensearch_tfd_size' => 'Field Data Memory Size',
+        'opensearch_tseg_size' => 'Segments Memory Size',
+        'opensearch_tseg_terms_size' => 'Segments Terms Memory Size',
+        'opensearch_tseg_fields_size' => 'Segments Stored Fields Memory Size',
+        'opensearch_tseg_tvector_size' => 'Segments Term Vertors Memory Size',
+        'opensearch_tseg_norms_size' => 'Segments Norms Memory Size',
+        'opensearch_tseg_points_size' => 'Segments Points Memory Size',
+        'opensearch_tseg_docval_size' => 'Segments Doc Values Memory Size',
+        'opensearch_tseg_indwrt_size' => 'Segments Index Writer Memory Size',
+        'opensearch_tseg_vermap_size' => 'Segments Version Map Memory Size',
+        'opensearch_tseg_fbs_size' => 'Segment Fixed Bit Set Memory Size',
     ];
 } else {
     $graphs = [
