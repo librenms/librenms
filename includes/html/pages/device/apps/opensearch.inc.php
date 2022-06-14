@@ -73,7 +73,7 @@ if ($graph_set == 'cluster') {
     ];
 } elseif ($graph_set == 'indexing') {
     $graphs = [
-        'opensearch_ti_total' => 'Index Per Second',
+        'opensearch_ti_total' => 'Index',
         'opensearch_ti_time' => 'Index Time',
         'opensearch_ti_failed' => 'Index Failed',
         'opensearch_ti_del_total' => 'Delete',

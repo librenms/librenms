@@ -2,7 +2,7 @@
 
 $name = 'opensearch';
 $app_id = $app['app_id'];
-$unit_text = 'Ops/Sec';
+$unit_text = 'Millisecs/Sec';
 $colours = 'greens';
 $dostack = 0;
 $printtotal = 0;
@@ -15,8 +15,8 @@ $rrd_list = [];
 if (Rrd::checkRrdExists($rrd_filename)) {
     $rrd_list[] = [
         'filename' => $rrd_filename,
-        'descr'    => 'Index',
-        'ds'       => 'ti_total',
+        'descr'    => 'External Refresh',
+        'ds'       => 'tr_ext_time',
     ];
 } else {
     d_echo('RRD "' . $rrd_filename . '" not found');
