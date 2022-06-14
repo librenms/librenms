@@ -26,7 +26,7 @@ class RemovePortsStpUniqueIndex extends Migration
     public function down()
     {
         Schema::table('ports_stp', function (Blueprint $table) {
-            $table->unique(['device_id', 'port_index']);
+            $table->unique(['device_id', 'port_id']);
         });
     }
 }
