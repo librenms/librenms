@@ -141,12 +141,12 @@ if ($graph_set == 'cluster') {
 } elseif ($graph_set == 'warmer') {
     $graphs = [
         'opensearch_tw_total' => 'Warmer',
-        'opensearch_tw_time' => ' Time',
+        'opensearch_tw_time' => 'Warmer Time',
     ];
 } elseif ($graph_set == 'fielddata') {
     $graphs = [
-        'opensearch_tfd_size' => 'Field Data Memory Size',
-        'opensearch_tfd_evictions' => ' Field Data Evictions',
+        'opensearch_tfd_size' => 'Fielddata Memory Size',
+        'opensearch_tfd_evictions' => ' Fielddata Evictions',
     ];
 } elseif ($graph_set == 'segments') {
     $graphs = [
@@ -192,6 +192,7 @@ if ($graph_set == 'cluster') {
         'opensearch_tg_missing_time' => 'Get Missing Time',
         'opensearch_tm_time' => 'Merges Time',
         'opensearch_tm_throttled_time' => 'Merges Throttled Time',
+        'opensearch_tw_time' => 'Warmer Time',
     ];
 } elseif ($graph_set == 'memory') {
     $graphs = [
