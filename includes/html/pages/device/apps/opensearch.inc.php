@@ -127,13 +127,48 @@ if ($graph_set == 'cluster') {
     ];
 } elseif ($graph_set == 'merges') {
     $graphs = [
-        'opensearch_' => '',
         'opensearch_tm_total' => 'Merges',
         'opensearch_tm_time' => 'Merges Time',
         'opensearch_tm_docs' => 'Merges Docs',
         'opensearch_tm_size' => 'Merges Size',
         'opensearch_tm_throttled_time' => 'Merges Throttled Time',
         'opensearch_tm_throttled_size' => 'Merges Throttled Size',
+    ];
+} elseif ($graph_set == 'warmer') {
+    $graphs = [
+        'opensearch_tw_total' => 'Warmer',
+        'opensearch_tw_time' => ' Time',
+    ];
+} elseif ($graph_set == 'fielddata') {
+    $graphs = [
+        'opensearch_tfd_size' => 'Field Data Memory Size',
+        'opensearch_tfd_evictions' => ' Field Data Evictions',
+    ];
+} elseif ($graph_set == 'segments') {
+    $graphs = [
+        'opensearch_tseg_count' => 'Segments Count',
+        'opensearch_tseg_size' => 'Segments Memory Size',
+        'opensearch_tseg_terms_size' => 'Segments Terms Memory Size',
+        'opensearch_tseg_fields_size' => 'Segments Stored Fields Memory Size',
+        'opensearch_tseg_tvector_size' => 'Segments Term Vertors Memory Size',
+        'opensearch_tseg_norms_size' => 'Segments Norms Memory Size',
+        'opensearch_tseg_points_size' => 'Segments Points Memory Size',
+        'opensearch_tseg_docval_size' => 'Segments Doc Values Memory Size',
+        'opensearch_tseg_indwrt_size' => 'Segments Index Writer Memory Size',
+        'opensearch_tseg_vermap_size' => 'Segments Version Map Memory Size',
+        'opensearch_tseg_fbs_size' => 'Segment Fixed Bit Set Memory Size',
+    ];
+} elseif ($graph_set == 'rc') {
+    $graphs = [
+        'opensearch_trc_size' => 'Request Cache Memory Size',
+        'opensearch_trc_evictions' => 'Request Cache Evictions',
+        'opensearch_trc_hits' => 'Request Cache Hits',
+        'opensearch_trc_misses' => 'Request Cache Misses',
+    ];
+} elseif ($graph_set == 'store') {
+    $graphs = [
+        'opensearch_tst_size' => 'Store Size',
+        'opensearch_tst_res_size' => 'Store Reserved Size',
     ];
 } else {
     $graphs = [
