@@ -79,6 +79,7 @@ $metrics = [
     'tm_throttled_time' => $data['tm_throttled_time'],
     'tm_throttled_size' => $data['tm_throttled_size'],
     'tw_total' => $data['tw_total'],
+    'tw_time' => $data['tw_time'],
     'tfd_size' => $data['tfd_size'],
     'tfd_evictions' => $data['tfd_evictions'],
     'tseg_count' => $data['tseg_count'],
@@ -161,7 +162,8 @@ $rrd_def = RrdDefinition::make()
     ->addDataset('tm_size', 'DERIVE', 0)
     ->addDataset('tm_throttled_time', 'DERIVE', 0)
     ->addDataset('tm_throttled_size', 'DERIVE', 0)
-    ->addDataset('tw_total', 'GAUGE', 0)
+    ->addDataset('tw_total', 'DERIVE', 0)
+    ->addDataset('tw_time', 'DERIVE', 0)
     ->addDataset('tfd_size', 'GAUGE', 0)
     ->addDataset('tfd_evictions', 'DERIVE', 0)
     ->addDataset('tseg_count', 'GAUGE', 0)
