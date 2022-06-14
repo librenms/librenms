@@ -214,6 +214,7 @@ if ($graph_set == 'cluster') {
     $graphs = [
         'opensearch_c_nodes'=>'Nodes',
         'opensearch_c_data_nodes'=>'Data Nodes',
+        'opensearch_c_all_shards'=>'Combined Shard Stats',
         'opensearch_c_act_pri_shards'=>'Active Primary Shards',
         'opensearch_c_act_shards'=>'Active Shards',
         'opensearch_c_rel_shards'=>'Relocating Shards',
