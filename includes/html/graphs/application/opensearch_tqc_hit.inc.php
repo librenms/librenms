@@ -16,7 +16,7 @@ if (Rrd::checkRrdExists($rrd_filename)) {
     $rrd_list[] = [
         'filename' => $rrd_filename,
         'descr'    => 'QC Hits',
-        'ds'       => 'tqc_hits',
+        'ds'       => 'tqc_hit',
     ];
 } else {
     d_echo('RRD "' . $rrd_filename . '" not found');
