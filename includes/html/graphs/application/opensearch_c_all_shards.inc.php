@@ -3,7 +3,7 @@
 $name = 'opensearch';
 $app_id = $app['app_id'];
 $unit_text = 'Shards';
-$colours = 'greens';
+$colours = 'psychedelic';
 $dostack = 0;
 $printtotal = 0;
 $addarea = 0;
