@@ -36,7 +36,7 @@ use Symfony\Component\Process\Process;
 class Version
 {
     // Update this on release
-    public const VERSION = '22.5.0';
+    public const VERSION = '22.6.0';
 
     /**
      * @var bool
