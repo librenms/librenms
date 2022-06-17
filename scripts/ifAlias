@@ -66,18 +66,18 @@ interface_id()
                 if [ "$(/usr/bin/uname)" = 'Linux' ]; then
                     for N in $(echo "$IP_LINK" | grep -oE "^[0-9]+:" | cut -d':' -f 1)
                     do
-                        if [ "$L" = "$ID" -o ! "$ID" ]
+                        if [ "$L" = "$ID" ] || [ ! "$ID" ]
                         then
-                            echo -n "$N"
+                            printf "$N"
                             return 0
                         fi
                         L="$N"
                     done
                 else
                     for N in $(ifconfig | grep -E '^[A-Za-z]+' | cut -d: -f1 | cat -n -b | sed 's/^  *//' | sed 's/[\t\ ].*//'); do
-                        if [ "$L" = "$ID" -o ! "$ID" ]
+                        if [ "$L" = "$ID" ] || [ ! "$ID" ]
                         then
-                            echo -n "$N"
+                            printf "$N"
                             return 0
                         fi
                         L="$N"
