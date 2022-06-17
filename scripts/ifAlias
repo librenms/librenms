@@ -133,7 +133,9 @@ alias_from_interfaces_config_file()
     fi
     if [ "$CONFIG_FILE" ]
     then
-         echo "$(grep -i "^# $1:" $CONFIG_FILE | sed "s/^# $1: //i")"
+         # echo squashes possible multi line replies to a single line
+         TO_ECHO_AND_MAKE_LING_HAPPY="$(grep -i "^# $1:" $CONFIG_FILE | sed "s/^# $1: //i")"
+         echo "${TO_ECHO_AND_MAKE_LING_HAPPY}"
     fi
 }
 
