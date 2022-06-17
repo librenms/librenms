@@ -41,9 +41,9 @@ fi
 #
 interface_id()
 {
-    local N=
-    local L=
-    local ID="${GET_OID#${BASE}.}"
+    N=
+    L=
+    ID="${GET_OID#${BASE}.}"
 
     case "$GET_TYPE" in
         -g)
@@ -68,7 +68,7 @@ interface_id()
                     do
                         if [ "$L" = "$ID" ] || [ ! "$ID" ]
                         then
-                            printf "$N"
+                            printf '%s' "$N"
                             return 0
                         fi
                         L="$N"
@@ -77,7 +77,7 @@ interface_id()
                     for N in $(ifconfig | grep -E '^[A-Za-z]+' | cut -d: -f1 | cat -n -b | sed 's/^  *//' | sed 's/[\t\ ].*//'); do
                         if [ "$L" = "$ID" ] || [ ! "$ID" ]
                         then
-                            printf "$N"
+                            printf '%s' "$N"
                             return 0
                         fi
                         L="$N"
@@ -92,8 +92,7 @@ interface_id()
 interface_name()
 {
     if [ "$(/usr/bin/uname)" = 'Linux' ]; then
-        local IFACE_ID="$1"
-        echo "$IP_LINK" | grep -oE "^${IFACE_ID}: [^:@ ]*" | cut -d " " -f 2
+        echo "$IP_LINK" | grep -oE "^$1: [^:@ ]*" | cut -d " " -f 2
     else
         ifconfig | grep -E '^[A-Za-z]+' | cut -d: -f1 | head -n "$1" | tail -n 1
     fi
@@ -101,8 +100,7 @@ interface_name()
 
 alias_from_interfaces_config_file()
 {
-    local IFACE="$1"
-    local CONFIG_FILE=
+    CONFIG_FILE=
 
     if [ -x "$DISTRO_BIN" ]
     then
@@ -123,10 +121,10 @@ alias_from_interfaces_config_file()
                 CONFIG_FILE="/etc/conf.d/net"
             ;;
             CentOS|RedHat|SuSE|Mandriva|Mandrake)
-                CONFIG_FILE="/etc/sysconfig/network-scripts/ifcfg-$IFACE"
+                CONFIG_FILE="/etc/sysconfig/network-scripts/ifcfg-$1"
             ;;
             Archlinux)
-                CONFIG_FILE="/etc/conf.d/net-conf-$IFACE"
+                CONFIG_FILE="/etc/conf.d/net-conf-$1"
             ;;
             FreeBSD)
                 CONFIG_FILE="/etc/rc.conf"
@@ -135,20 +133,19 @@ alias_from_interfaces_config_file()
     fi
     if [ "$CONFIG_FILE" ]
     then
-         echo "$(grep -i "^# $IFACE:" $CONFIG_FILE | sed "s/^# $IFACE: //i")"
+         echo "$(grep -i "^# $1:" $CONFIG_FILE | sed "s/^# $1: //i")"
     fi
 }
 
 alias_from_ip_link()
-{   
+{
     case $(/usr/bin/uname) in
         Linux)
-            local IFACE="$1"
-            ip link show "$IFACE" | grep -e "^[[:space:]]*alias[[:space:]]" | sed -e 's/^[[:space:]]*alias //'
+            ip link show "$1" | grep -e "^[[:space:]]*alias[[:space:]]" | sed -e 's/^[[:space:]]*alias //'
             ;;
         FreeBSD)
             COUNT=$(/sbin/ifconfig "$1" | grep 'description:' | head -n 1 | cut -d: -f 2- | wc -l)
-            if [ ${COUNT} -eq 1 ]; then
+            if [ "${COUNT}" -eq 1 ]; then
                 /sbin/ifconfig "$1" | grep 'description:' | head -n 1 | cut -d: -f 2- | sed 's/^ //'
            else
                echo "$1"
