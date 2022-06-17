@@ -43,7 +43,7 @@ interface_id()
 {
     N=
     L=
-    ID="${GET_OID#${BASE}.}"
+    ID="${GET_OID#"$BASE".}"
 
     case "$GET_TYPE" in
         -g)
