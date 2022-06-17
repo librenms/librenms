@@ -19,7 +19,7 @@ GET_TYPE="$1"
 GET_OID="$2"
 
 # cache ip link output
-if [ `/usr/bin/uname` = 'Linux' ]; then
+if [ "$(/usr/bin/uname)" = 'Linux' ]; then
     IP_LINK="$(ip link)"
 fi
 
@@ -53,7 +53,7 @@ interface_id()
         -n)
             if [ "$ID" = "$BASE" ]
             then
-                if [ `/usr/bin/uname` = 'Linux' ]; then
+                if [ "$(/usr/bin/uname)" = 'Linux' ]; then
                     # find the first iface_id
                     echo "$IP_LINK" | grep -oE "^[0-9]+:" | head -n 1 | cut -d':' -f 1
                     return 0
@@ -63,7 +63,7 @@ interface_id()
                 fi
             else
                 # find the next iface_id
-                if [ `/usr/bin/uname` = 'Linux' ]; then
+                if [ "$(/usr/bin/uname)" = 'Linux' ]; then
                     for N in $(echo "$IP_LINK" | grep -oE "^[0-9]+:" | cut -d':' -f 1)
                     do
                         if [ "$L" = "$ID" -o ! "$ID" ]
@@ -74,7 +74,7 @@ interface_id()
                         L="$N"
                     done
                 else
-                    for N in `ifconfig | grep -E '^[A-Za-z]+' | cut -d: -f1 | cat -n -b | sed 's/^  *//' | sed 's/[\t\ ].*//'`; do
+                    for N in $(ifconfig | grep -E '^[A-Za-z]+' | cut -d: -f1 | cat -n -b | sed 's/^  *//' | sed 's/[\t\ ].*//'); do
                         if [ "$L" = "$ID" -o ! "$ID" ]
                         then
                             echo -n "$N"
@@ -91,7 +91,7 @@ interface_id()
 
 interface_name()
 {
-    if [ `/usr/bin/uname` = 'Linux' ]; then
+    if [ "$(/usr/bin/uname)" = 'Linux' ]; then
         local IFACE_ID="$1"
         echo "$IP_LINK" | grep -oE "^${IFACE_ID}: [^:@ ]*" | cut -d " " -f 2
     else
@@ -106,10 +106,10 @@ alias_from_interfaces_config_file()
 
     if [ -x "$DISTRO_BIN" ]
     then
-        if [ `/usr/bin/uname` = 'Linux' ]; then
-            DISTRO_VAR=`$DISTRO_BIN | cut -d " " -f 1`
+        if [ "$(/usr/bin/uname)" = 'Linux' ]; then
+            DISTRO_VAR="$($DISTRO_BIN | cut -d " " -f 1)"
         else
-            DISTRO_VAR=`/usr/bin/uname`
+            DISTRO_VAR="$(/usr/bin/uname)"
         fi
 
         case "${DISTRO_VAR}" in
@@ -141,13 +141,13 @@ alias_from_interfaces_config_file()
 
 alias_from_ip_link()
 {   
-    case `/usr/bin/uname` in
+    case $(/usr/bin/uname) in
         Linux)
             local IFACE="$1"
             ip link show "$IFACE" | grep -e "^[[:space:]]*alias[[:space:]]" | sed -e 's/^[[:space:]]*alias //'
             ;;
         FreeBSD)
-            COUNT=`/sbin/ifconfig "$1" | grep 'description:' | head -n 1 | cut -d: -f 2- | wc -l`
+            COUNT=$(/sbin/ifconfig "$1" | grep 'description:' | head -n 1 | cut -d: -f 2- | wc -l)
             if [ ${COUNT} -eq 1 ]; then
                 /sbin/ifconfig "$1" | grep 'description:' | head -n 1 | cut -d: -f 2- | sed 's/^ //'
            else
