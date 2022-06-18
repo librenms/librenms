@@ -33,15 +33,23 @@ interface Gi0/4
 descr Cust: Example Customer [10Mbit] (T1 Telco Y CCID129031) {EXAMP0001}
 ```
 
-Unix / Linux:
+*BSD / Linux:
 
 This requires an additional script to be [setup](#setup)
+
+Via config...
 
 ```text
 # eth3: Cust: Example Customer [10Mbit] (T1 Telco Y CCID129031) {EXAMP0001}
 # eth0: Transit: Example Provider (AS65000)
 # eth1: Core: core.router01 FastEthernet0/0 (Telco X CCID023141)
 # eth2: Peering: Peering Exchange
+```
+
+Via ifconfig settings in rc.conf for on the various BSD.
+
+```raw
+ifconfig_igb3="98.102.84.2 netmask 255.255.255.248 description 'Transit: Comcast (ID03039481)'"
 ```
 
 ## Customisation
