@@ -20,8 +20,7 @@ GET_OID="$2"
 
 UNAME="$(/usr/bin/uname)"
 
-COUNT="$(echo "${UNAME}" | grep -ci 'bsd$')"
-if [ "${COUNT}" -eq 1 ]; then
+if [ "$(echo "${UNAME}" | grep -ci 'bsd$')" -eq 1 ]; then
     UNAME="BSD"
 fi
 
@@ -73,8 +72,7 @@ interface_id()
                 if [ "${UNAME}" = 'Linux' ]; then
                     for N in $(echo "$IP_LINK" | grep -oE "^[0-9]+:" | cut -d':' -f 1)
                     do
-                        if [ "$L" = "$ID" ] || [ ! "$ID" ]
-                        then
+                        if [ "$L" = "$ID" ] || [ -z "$ID" ]; then
                             printf '%s' "$N"
                             return 0
                         fi
@@ -82,8 +80,7 @@ interface_id()
                     done
                 else
                     for N in $(ifconfig | grep -E '^[A-Za-z]+' | cut -d: -f1 | cat -n -b | sed 's/^  *//' | sed 's/[\t\ ].*//'); do
-                        if [ "$L" = "$ID" ] || [ ! "$ID" ]
-                        then
+                        if [ "$L" = "$ID" ] || [ -z "$ID" ]; then
                             printf '%s' "$N"
                             return 0
                         fi
@@ -109,12 +106,11 @@ alias_from_interfaces_config_file()
 {
     CONFIG_FILE=
 
-    if [ -x "$DISTRO_BIN" ]
-    then
+    if [ -x "$DISTRO_BIN" ]; then
         if [ "$(/usr/bin/uname)" = 'Linux' ]; then
             DISTRO_VAR="$($DISTRO_BIN | cut -d " " -f 1)"
         else
-            DISTRO_VAR="$(/usr/bin/uname)"
+            DISTRO_VAR="${UNAME}"
         fi
 
         case "${DISTRO_VAR}" in
@@ -138,11 +134,20 @@ alias_from_interfaces_config_file()
             ;;
         esac
     fi
-    if [ "$CONFIG_FILE" ]
-    then
+    if [ "$CONFIG_FILE" ]; then
          # echo squashes possible multi line replies to a single line
-         TO_ECHO_AND_MAKE_LINT_HAPPY="$(grep -i "^# $1:" $CONFIG_FILE | sed "s/^# $1: //i")"
-         echo "${TO_ECHO_AND_MAKE_LINT_HAPPY}"
+         FOUND_LINES="$(grep -i "^# $1:" $CONFIG_FILE | sed "s/^# $1: //i")"
+         if [ "$(echo "${FOUND_LINES}" | wc -l)" -ge 1 ]; then
+             echo "${FOUND_LINES}"
+             return 0
+         fi
+    fi
+    if [ "${UNAME}" -eq "Linux" ] && [ -d '/etc/network/interfaces.d' ]; then
+         if [ "$(/bin/ls /etc/network/interfaces.d/ | wc -l)" -ge 1 ]; then
+             # echo squashes possible multi line replies to a single line
+             TO_ECHO_AND_MAKE_LINT_HAPPY="$(grep -i "^# $1:"  | sed "s/^# $1: //i")"
+             echo "${TO_ECHO_AND_MAKE_LINT_HAPPY}"
+         fi
     fi
 }
 
