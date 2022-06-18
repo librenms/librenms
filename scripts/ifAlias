@@ -20,7 +20,7 @@ GET_OID="$2"
 
 UNAME="$(/usr/bin/uname)"
 
-COUNT="$(echo ${UNAME} | grep -i 'bsd$' | wc -l)"
+COUNT="$(echo "${UNAME}" | grep -ci 'bsd$')"
 if [ "${COUNT}" -eq 1 ]; then
     UNAME="BSD"
 fi
