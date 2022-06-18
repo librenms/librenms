@@ -18,8 +18,15 @@ BASE='.1.3.6.1.2.1.31.1.1.1.18'
 GET_TYPE="$1"
 GET_OID="$2"
 
+UNAME="$(/usr/bin/uname)"
+
+COUNT="$(echo ${UNAME} | grep -i 'bsd$' | wc -l)"
+if [ "${COUNT}" -eq 1 ]; then
+    UNAME="BSD"
+fi
+
 # cache ip link output
-if [ "$(/usr/bin/uname)" = 'Linux' ]; then
+if [ "${UNAME}" = 'Linux' ]; then
     IP_LINK="$(ip link)"
 fi
 
@@ -53,7 +60,7 @@ interface_id()
         -n)
             if [ "$ID" = "$BASE" ]
             then
-                if [ "$(/usr/bin/uname)" = 'Linux' ]; then
+                if [ "${UNAME}" = 'Linux' ]; then
                     # find the first iface_id
                     echo "$IP_LINK" | grep -oE "^[0-9]+:" | head -n 1 | cut -d':' -f 1
                     return 0
@@ -63,7 +70,7 @@ interface_id()
                 fi
             else
                 # find the next iface_id
-                if [ "$(/usr/bin/uname)" = 'Linux' ]; then
+                if [ "${UNAME}" = 'Linux' ]; then
                     for N in $(echo "$IP_LINK" | grep -oE "^[0-9]+:" | cut -d':' -f 1)
                     do
                         if [ "$L" = "$ID" ] || [ ! "$ID" ]
@@ -91,7 +98,7 @@ interface_id()
 
 interface_name()
 {
-    if [ "$(/usr/bin/uname)" = 'Linux' ]; then
+    if [ "${UNAME}" = 'Linux' ]; then
         echo "$IP_LINK" | grep -oE "^$1: [^:@ ]*" | cut -d " " -f 2
     else
         ifconfig | grep -E '^[A-Za-z]+' | cut -d: -f1 | head -n "$1" | tail -n 1
@@ -126,7 +133,7 @@ alias_from_interfaces_config_file()
             Archlinux)
                 CONFIG_FILE="/etc/conf.d/net-conf-$1"
             ;;
-            FreeBSD)
+            BSD)
                 CONFIG_FILE="/etc/rc.conf"
             ;;
         esac
@@ -141,11 +148,11 @@ alias_from_interfaces_config_file()
 
 alias_from_ip_link()
 {
-    case $(/usr/bin/uname) in
+    case "${UNAME}" in
         Linux)
             ip link show "$1" | grep -e "^[[:space:]]*alias[[:space:]]" | sed -e 's/^[[:space:]]*alias //'
             ;;
-        FreeBSD)
+        BSD)
             COUNT=$(/sbin/ifconfig "$1" | grep 'description:' | head -n 1 | cut -d: -f 2- | wc -l)
             if [ "${COUNT}" -eq 1 ]; then
                 /sbin/ifconfig "$1" | grep 'description:' | head -n 1 | cut -d: -f 2- | sed 's/^ //'
