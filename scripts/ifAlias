@@ -27,6 +27,8 @@ fi
 # cache ip link output
 if [ "${UNAME}" = 'Linux' ]; then
     IP_LINK="$(ip link)"
+else
+    IFCONFIG="$(ifconfig)"
 fi
 
 # Get interface id from GET_OID script parameter depending on the get type -g
@@ -64,7 +66,7 @@ interface_id()
                     echo "$IP_LINK" | grep -oE "^[0-9]+:" | head -n 1 | cut -d':' -f 1
                     return 0
                 else
-                    ifconfig| head -n 1 | cut -d: -f 1
+                    echo "${IFCONFIG}" | head -n 1 | cut -d: -f 1
                     return 0
                 fi
             else
@@ -79,7 +81,7 @@ interface_id()
                         L="$N"
                     done
                 else
-                    for N in $(ifconfig | grep -E '^[A-Za-z]+' | cut -d: -f1 | cat -n -b | sed 's/^  *//' | sed 's/[\t\ ].*//'); do
+                    for N in $(echo "${IFCONFIG}" | grep -E '^[A-Za-z]+' | cut -d: -f1 | cat -n -b | sed 's/^  *//' | sed 's/[\t\ ].*//'); do
                         if [ "$L" = "$ID" ] || [ -z "$ID" ]; then
                             printf '%s' "$N"
                             return 0
@@ -98,7 +100,7 @@ interface_name()
     if [ "${UNAME}" = 'Linux' ]; then
         echo "$IP_LINK" | grep -oE "^$1: [^:@ ]*" | cut -d " " -f 2
     else
-        ifconfig | grep -E '^[A-Za-z]+' | cut -d: -f1 | head -n "$1" | tail -n 1
+        echo "${IFCONFIG}" | grep -E '^[A-Za-z]+' | cut -d: -f1 | head -n "$1" | tail -n 1
     fi
 }
 
@@ -158,9 +160,8 @@ alias_from_ip_link()
             ip link show "$1" | grep -e "^[[:space:]]*alias[[:space:]]" | sed -e 's/^[[:space:]]*alias //'
             ;;
         BSD)
-            COUNT=$(/sbin/ifconfig "$1" | grep 'description:' | head -n 1 | cut -d: -f 2- | wc -l)
-            if [ "${COUNT}" -eq 1 ]; then
-                /sbin/ifconfig "$1" | grep 'description:' | head -n 1 | cut -d: -f 2- | sed 's/^ //'
+            if [ "$(ifconfig "$1" | grep 'description:' | head -n 1 | cut -d: -f 2- | wc -l)" -eq 1 ]; then
+                ifconfig "$1" | grep 'description:' | head -n 1 | cut -d: -f 2- | sed 's/^ //'
            else
                echo "$1"
            fi
