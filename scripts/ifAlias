@@ -109,7 +109,7 @@ alias_from_interfaces_config_file()
     CONFIG_FILE=
 
     if [ -x "$DISTRO_BIN" ]; then
-        if [ "$(/usr/bin/uname)" = 'Linux' ]; then
+        if [ "${UNAME}" = 'Linux' ]; then
             DISTRO_VAR="$($DISTRO_BIN | cut -d " " -f 1)"
         else
             DISTRO_VAR="${UNAME}"
