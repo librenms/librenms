@@ -1,0 +1,1238 @@
+ZTE-AN-PON-BASE-MIB DEFINITIONS ::= BEGIN
+    IMPORTS 
+        enterprises                      FROM SNMPv2-SMI
+        RowStatus                        FROM SNMPv2-TC
+        IpAddress                        FROM SNMPv2-SMI
+        Unsigned32                       FROM SNMPv2-SMI
+        Counter64                        FROM SNMPv2-SMI
+        MacAddress                       FROM SNMPv2-TC
+        TEXTUAL-CONVENTION               FROM SNMPv2-TC
+        MODULE-IDENTITY                  FROM SNMPv2-SMI
+        OBJECT-GROUP                     FROM SNMPv2-CONF
+        MODULE-COMPLIANCE                FROM SNMPv2-CONF
+        OBJECT-TYPE                      FROM SNMPv2-SMI
+        NOTIFICATION-TYPE                FROM SNMPv2-SMI
+        ifIndex,InterfaceIndex           FROM IF-MIB
+        DisplayString                    FROM SNMPv2-TC
+        Integer32                        FROM SNMPv2-SMI
+        zxAnPon                          FROM ZTE-AN-SMI
+        zxAnSubIfIndex                   FROM ZTE-AN-IF-MIB
+        NOTIFICATION-GROUP               FROM SNMPv2-CONF
+        InetAddress,InetAddressType      FROM INET-ADDRESS-MIB
+        InetAddressPrefixLength          FROM INET-ADDRESS-MIB
+        ZxAnPonOnuIndex                  FROM ZTE-AN-PON-TC-MIB
+        DateAndTime                      FROM SNMPv2-TC;
+        
+zxAnPonBaseMib MODULE-IDENTITY
+    LAST-UPDATED    "201111020000Z"
+    ORGANIZATION    "ZTE Corporation"
+    CONTACT-INFO    "Guo HongJian      ZTE Corporation
+                    Mail: guo.hongjian@zte.com.cn
+                    Tel : +86-21-68897417"
+    DESCRIPTION     
+        "The MIB module for the management of PON." 
+        
+    REVISION        "201111020000Z"
+    DESCRIPTION
+        "The following are the modification of this mib file:
+        - modify description"
+        
+    REVISION        "201110110000Z"
+    DESCRIPTION
+        "The following are the modification of this mib file:
+        - add multi-variables usage rules for data copy configuration
+        - modify description of ONU type
+        - add multi-variables usage rules for rogue ONU control"
+        
+    REVISION        "201110090000Z"
+    DESCRIPTION
+        "Add multi-variables usage rules for variables of ONU type 
+         configuration."
+         
+    REVISION        "201105260000Z"
+    DESCRIPTION
+        "Initial version of this MIB module."
+    ::= { zxAnPon 1 }
+
+--------------------------------------------------------------------------------
+-- Following management objects are defined.
+
+-- zxAnPonBaseObjects
+    -- zxAnPonOnuTypeObjects
+        -- zxAnPonOnuTypeTable
+        -- zxAnPonOnuIfAttrTable
+    -- zxAnPonOamObjects
+        -- zxAnPonRogueOnuMgmt
+            -- zxAnPonRogueOnuDetectInfoTable
+            -- zxAnPonRogueOnuCtrl
+            -- zxAnPonRogueOnuInfoTable
+            -- zxAnPonPortRogueOnuConfTable
+        -- zxAnPonRxOpticalPowerTable
+        -- zxAnPonRxOpticalPowerThreshTable
+    -- zxAnPonBaseNotifications
+        -- zxAnPonOamTraps
+
+-- Following conformance information is defined.
+-- zxAnPonConformance
+    -- zxAnPonCompliances
+    -- zxAnPonGroups
+        -- zxAnPonConfDataCopyGroup
+        -- zxAnPonOnuTypeGroup
+        -- zxAnPonOamGroup
+        -- zxAnPonTrapGroup
+--------------------------------------------------------------------------------   
+
+zxAnPonBaseObjects          OBJECT IDENTIFIER ::= { zxAnPonBaseMib 2 }
+zxAnPonBaseNotifications    OBJECT IDENTIFIER ::= { zxAnPonBaseMib 3 }
+
+zxAnPonOnuTypeObjects       OBJECT IDENTIFIER ::= { zxAnPonBaseObjects 2 }
+zxAnPonOamObjects           OBJECT IDENTIFIER ::= { zxAnPonBaseObjects 4 }
+zxAnPonGisObjects           OBJECT IDENTIFIER ::= { zxAnPonBaseObjects 5 }
+
+zxAnPonRogueOnuMgmt         OBJECT IDENTIFIER ::= { zxAnPonOamObjects 1 }
+zxAnPonRogueOnuCtrl         OBJECT IDENTIFIER ::= { zxAnPonRogueOnuMgmt 1 }
+
+zxAnPonGisGlobalObjects     OBJECT IDENTIFIER ::= { zxAnPonGisObjects 1 }
+
+zxAnPonOamTraps             OBJECT IDENTIFIER ::= { zxAnPonBaseNotifications 1 }
+
+--------------------------------------------------------------------------------
+-- zxAnPonOnuTypeTable
+--------------------------------------------------------------------------------
+    zxAnPonOnuTypeTable OBJECT-TYPE
+        SYNTAX     SEQUENCE OF ZxAnPonOnuTypeEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+            "Configuration of ONU type."
+        ::= { zxAnPonOnuTypeObjects 2 }
+
+    zxAnPonOnuTypeEntry OBJECT-TYPE
+        SYNTAX      ZxAnPonOnuTypeEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Entry of zxAnPonOnuTypeTable.
+            For the default ONU type such as ZTE-F641,ZTE-F622,
+            ZTE-F625, ZTE-F621, ZTE-F601, ZTE-F640, ZTE-F628, ZTE-9806,
+            ZTE-D400, ZTE-D402, ZTE-D420, ZTE-D421, ZTE-D422, ZTE-F401,
+            ZTE-F420, ZTE-F425, ZTE-F429, ZTE-F430, ZTE-F435, ZTE-F500,
+            ZTE-F803, ZTE-F820, ZTE-F821, ZTE-F822, set operation is prohibited.        
+                    
+            The multi-variables binding rule should be complied with 
+            when a manager configures ONU type. According to this rule, 
+            all the related mib variables must be included in one SNMP 
+            set operation. 
+            
+            There are two types of variables: mandatory and optional.
+            All of the mandatory variables must be included in one SNMP
+            set operation. Optional variables may be included in one 
+            SNMP set operation with the mandatory variables, but must 
+            not be used alone. 
+            
+            To create or modify ONU type, the mandatory variables are as 
+            follows:
+            mandatoty: zxAnPonOnuTypePonType."
+        INDEX   { zxAnPonOnuTypeName }
+        ::= { zxAnPonOnuTypeTable 1 }
+
+    ZxAnPonOnuTypeEntry ::=
+        SEQUENCE {
+            zxAnPonOnuTypeName                           DisplayString,
+            zxAnPonOnuTypePonType                        INTEGER,
+            zxAnPonOnuTypeDesc                           DisplayString,
+            zxAnPonOnuTypeAttr1                          Integer32,
+            zxAnPonOnuTypeAttr2                          Integer32,
+            zxAnPonOnuTypeAttr3                          Integer32,
+            zxAnPonOnuTypeAttr4                          Integer32,
+            zxAnPonOnuTypeAttr5                          Integer32,
+            zxAnPonOnuTypeAttr6                          Integer32,
+            zxAnPonOnuTypeAttr7                          Integer32,
+            zxAnPonOnuTypeAttr8                          Integer32,
+            zxAnPonOnuTypeAttr9                          Integer32,
+            zxAnPonOnuTypeAttr10                         Integer32,
+            zxAnPonOnuTypeRowStatus                      RowStatus
+        }
+
+    zxAnPonOnuTypeName OBJECT-TYPE
+        SYNTAX      DisplayString(SIZE(1..64))
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Name of ONU type."
+        ::= { zxAnPonOnuTypeEntry 1 }
+
+    zxAnPonOnuTypePonType OBJECT-TYPE
+        SYNTAX      INTEGER {
+                    epon(1),
+                    gpon(2)
+                    }
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "PON type.There are two types:
+            -epon: Ethernet Passive Optical Network
+            -gpon: Gigabit-Capable PON."
+        ::= { zxAnPonOnuTypeEntry 2 }
+
+    zxAnPonOnuTypeDesc OBJECT-TYPE
+        SYNTAX      DisplayString(SIZE(0..64))
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "Description of ONU type.
+             eg. the interface attributes of ONU type.
+             This variable must comply with the multi-variables binding 
+             rule described in zxAnPonOnuTypeEntry."
+        ::= { zxAnPonOnuTypeEntry 3 }
+
+    zxAnPonOnuTypeAttr1 OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "For EPON: This attribute indicates protect type,
+                       1-none, 2-typeC, 3-typeD, default value is 1.
+             For GPON: This attribute indicates the maximum number of T-CONT, 
+                       default value is 255.
+             This variable must comply with the multi-variables binding 
+             rule described in 'zxAnPonOnuTypeEntry'."
+        ::= { zxAnPonOnuTypeEntry 4 }
+
+    zxAnPonOnuTypeAttr2 OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "For EPON: This attribute indicates speed,
+                       1-1G, 2-10G Symmetric, 3-10G Asymmetric, 
+                       default value is 1.
+             For GPON: This attribute indicates the maximum number of GEM port,
+                       default value is 255.
+             This variable must comply with the multi-variables binding 
+             rule described in 'zxAnPonOnuTypeEntry'."
+        ::= { zxAnPonOnuTypeEntry 5 }
+
+    zxAnPonOnuTypeAttr3 OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "For EPON: This attribute indicates ONU auto dispatch enable status,
+                       1-enable, 2-disable, default value is 1.
+             For GPON: This attribute indicates maximum number of switch per 
+                       slot, default value is 255.
+             This variable must comply with the multi-variables binding 
+             rule described in 'zxAnPonOnuTypeEntry'."
+        ::= { zxAnPonOnuTypeEntry 6 }
+
+    zxAnPonOnuTypeAttr4 OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "For GPON: This attribute indicates maximum number of flow per 
+                       switch, default value is 255.
+             This attribute is not used for EPON.            
+             This variable must comply with the multi-variables binding 
+             rule described in 'zxAnPonOnuTypeEntry'."
+        ::= { zxAnPonOnuTypeEntry 7 }
+
+    zxAnPonOnuTypeAttr5 OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "For GPON: This attribute indicates maximum number of IP host.
+             MSB : Most Significant Byte
+             LSB : Least Significant Byte
+        
+             |      MSB     |    Byte 2    |    Byte 1       |    LSB          |
+             |--------------|--------------|-----------------|-----------------|
+             |              |              |IPv6 host number | IPv4 host number|
+             |     (8bits)  |  (8bits)     |    (8bits)      |     (8bits)     |
+             |-----------------------------------------------------------------|
+             
+             IPv4 host default number is 2. IPv6 host default number is 0.
+             This attribute is not used for EPON.            
+             This variable must comply with the multi-variables binding 
+             rule described in 'zxAnPonOnuTypeEntry'."
+        ::= { zxAnPonOnuTypeEntry 8 }
+
+    zxAnPonOnuTypeAttr6 OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "For GPON: This attribute indicates service ability of ONU type,
+            there are three service mode :N:1,1:M,1:P.
+            If support the service mode,set the corresponding bit to 1,
+            if not support, set to 0.   
+            Default value is 7.               
+                 
+            | MSB                                  LSB| 
+            |-----|-----------|-----------|-----------|
+            | ... |    1:P    |    1:M    |    N:1    |
+            | ... | (1bits)   | (1bits)   | (1bits)   |
+            +-----+-----------+-----------+-----------+
+            This attribute is not used for EPON.
+            This variable must comply with the multi-variables binding 
+            rule described in 'zxAnPonOnuTypeEntry'."
+        ::= { zxAnPonOnuTypeEntry 9 }
+
+    zxAnPonOnuTypeAttr7 OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "The OLT OMCI management mode. 
+            |      MSB       |    Byte 2    |    Byte 1    |      LSB     |
+            |-------------------------------------------------------------|
+            |    Reserved    |   Reserved   |   Reserved   |Reserved WiFi |
+            |     (8bits)    |   (8bits)    |    (8bits)   |(7bits) (1bit)|
+            |-------------------------------------------------------------|
+            Bits 1 - 31 are reserved for future use. 
+            Bit 0 represents WiFi service, default value is 0.
+            If the bit is set to 1, WiFi service is managed via non-OMCI.                        
+            If the bit is set to 0, WiFi service is managed via OMCI.            
+            This attribute is not used for EPON."
+        ::= { zxAnPonOnuTypeEntry 10 }
+
+    zxAnPonOnuTypeAttr8 OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "A set of capabilities information about ONU.            
+            | MSB |Byte2|Byte1|               LSB                                       |
+            |---------------------------------------------------------------------------|
+            |Rese-|Rese-|Rese-|Rese-|  GIS    |Extended|       |      |Multicast| OMCI  |
+            |rved |rved |rved |rved |Function |  OMCI  | MGC   | VRG  | Address |Sending|
+            |(8bi-|(8bi-|(8bi-|(1bi-| Enabling|Enabling| Mode  |      |  Range  | Mode  |
+            | ts) | ts) | ts) | ts)-|(1bit)   | (1bit) |(2bits)|(1bit)| (1bit)  |(1bit) |
+            |-----------------------  --------------------------------------------------|
+            Bits 7 - 31 are reserved for future use.            
+            Bit 0 represents OMCI sending mode, default value is 0.
+            If the bit is set to 1, OLT sends OMCI by synchronous mode.             
+            If the bit is set to 0, OLT sends OMCI by asynchronous mode.  
+             
+            Bit 1 represents default multicast address range mode,
+            default value is 0.            
+            If the bit is set to 1, default multicast address range is
+            all-inclusive mode(224.0.0.0-239.255.255.255).                                   
+            If the bit is set to 0, default multicast address range is none. 
+            
+            Bit 2 represents VRG enabling status, default value is 0.        
+            If the bit is set to 1, VRG function of the ONU is enabled.            
+            If the bit is set to 0, VRG function of the ONU is disabled.            
+            This attribute is not used for EPON.
+            
+            Bit 3 and bit 4 represent MGC configuration mode, default value 
+            is 0. If both of two bits are set to 0, the MGC configuration mode 
+            is private. If bit 3 is set to 1 and bit 4 is set to 0, the MGC
+            configuration mode is ITU-T. If bit 3 is set to 0 and bit 4 is set 
+            to 1, the MGC configure mode is both.
+
+            Bit 5 represents extended OMCI enabling status, default value is 0.
+            If the bit is set to 1, extended OMCI is enabled.
+            If the bit is set to 0, extended OMCI is disabled.            
+            This attribute is not used for EPON.
+            
+            Bit 6 represents PON GIS function is supported or not, 
+            default value is 0.
+            If the bit is set to 1, GIS function is supported.
+            If the bit is set to 0, GIS function is not supported."            
+        ::= { zxAnPonOnuTypeEntry 11 }
+
+    zxAnPonOnuTypeAttr9 OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "A set of capabilities information about ONU.
+            |      MSB       |    Byte 2    |    Byte 1    |      LSB     |
+            |-------------------------------------------------------------|
+            |    Reserved    |   Reserved   |   Reserved   |  VEIP Number |
+            |     (8bits)    |   (8bits)    |    (8bits)   |    (8bits)   |
+            |-------------------------------------------------------------|
+            The LSB represents the number of VEIP port. The value 0 represents
+            the system default.
+            This attribute is not used for EPON."
+        ::= { zxAnPonOnuTypeEntry 12 }
+
+    zxAnPonOnuTypeAttr10 OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "A set of capabilities information about ONU.
+            |      MSB       |    Byte 2    |    Byte 1    |      LSB          |
+            |------------------------------------------------------------------|
+            |    Reserved    |   Reserved   |   Reserved   |Reserved|Speed Mode|
+            |     (8bits)    |   (8bits)    |    (8bits)   | (4bits)|(4bits)   |
+            |------------------------------------------------------------------|
+            Bits 4 - 31 are reserved for future use.            
+            Bits 0 - 3 represents the ONU speed mode, 
+                 1 - GPON, 2 - XG-PON, 3 - XGS-PON, 4 - automatic, 
+                 the default value is 4.
+            This attribute is not used for EPON."           
+        ::= { zxAnPonOnuTypeEntry 13 }
+
+    zxAnPonOnuTypeRowStatus OBJECT-TYPE
+        SYNTAX      RowStatus
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "The status of this conceptual row.
+             
+            The supported actions of this conceptual row only include:
+            'createAndGo' and 'destroy'.
+             
+            To create a row in this table, a manager must
+            set this object to createAndGo(4).
+                 
+            In particular, a newly created row cannot be created
+            until the corresponding zxAnPonOnuTypeName
+            and zxAnPonOnuTypePonType have been set.
+    
+            To delete a row in this table, a manager must
+            set this object to destroy(6). 
+            
+            To get this object, the agent always returns active(1)."
+        ::= { zxAnPonOnuTypeEntry 50 }
+
+--------------------------------------------------------------------------------
+-- zxAnPonOnuIfAttrTable
+--------------------------------------------------------------------------------
+    zxAnPonOnuIfAttrTable    OBJECT-TYPE
+        SYNTAX      SEQUENCE OF ZxAnPonOnuIfAttrEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Configuration of ONU interface attributes."
+        ::= { zxAnPonOnuTypeObjects 3 }
+
+    zxAnPonOnuIfAttrEntry OBJECT-TYPE
+        SYNTAX      ZxAnPonOnuIfAttrEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Entry of zxAnPonOnuIfAttrTable.
+             Entries in the zxAnPonOnuIfAttrTable are created and
+             deleted using the zxAnPonOnuIfAttrRowStatus object,
+             modify is prohibited."
+        INDEX   { zxAnPonOnuTypeName, zxAnPonOnuIfId }
+        ::= { zxAnPonOnuIfAttrTable 1 }
+
+    ZxAnPonOnuIfAttrEntry ::=
+        SEQUENCE {
+            zxAnPonOnuIfId                             Integer32,
+            zxAnPonOnuIfAttr1                          Integer32,
+            zxAnPonOnuIfAttr2                          Integer32,
+            zxAnPonOnuIfAttr3                          Integer32,
+            zxAnPonOnuIfAttr4                          Integer32,
+            zxAnPonOnuIfAttr5                          Integer32,
+            zxAnPonOnuIfAttr6                          Integer32,
+            zxAnPonOnuIfAttr7                          Integer32,
+            zxAnPonOnuIfAttr8                          Integer32,
+            zxAnPonOnuIfAttr9                          Integer32,
+            zxAnPonOnuIfAttr10                         Integer32,
+            zxAnPonOnuIfAttrRowStatus                  RowStatus
+        }
+
+    zxAnPonOnuIfId OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "
+            The most significant 16 bits indicate the type of this interface:
+            ETH(10), E1(20), T1(21), DS1(22), POTS(30), RF(40), WiFi(50), 
+            COM(60), VEIP(70), xDSL(80). 
+            The least significant 16 bits indicate the ID of this interface:
+            the first 8 bits specifies the slot ID associated with this UNI,
+            the second 8 bits specifies the port ID associated with this UNI.
+            eg.the zxAnPonOnuIfId for eth_0/1 is 655361(0xA0001).
+            "
+        ::= { zxAnPonOnuIfAttrEntry 1 }
+
+    zxAnPonOnuIfAttr1 OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "Reserved for future use."
+        ::= { zxAnPonOnuIfAttrEntry 2 }
+
+    zxAnPonOnuIfAttr2 OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "Reserved for future use."
+        ::= { zxAnPonOnuIfAttrEntry 3 }
+
+    zxAnPonOnuIfAttr3 OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "Reserved for future use."
+        ::= { zxAnPonOnuIfAttrEntry 4 }
+
+    zxAnPonOnuIfAttr4 OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "Reserved for future use."
+        ::= { zxAnPonOnuIfAttrEntry 5 }
+
+    zxAnPonOnuIfAttr5 OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "Reserved for future use."
+        ::= { zxAnPonOnuIfAttrEntry 6 }
+
+    zxAnPonOnuIfAttr6 OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "Reserved for future use."
+        ::= { zxAnPonOnuIfAttrEntry 7 }
+
+    zxAnPonOnuIfAttr7 OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "Reserved for future use."
+        ::= { zxAnPonOnuIfAttrEntry 8 }
+
+    zxAnPonOnuIfAttr8 OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "Reserved for future use."
+        ::= { zxAnPonOnuIfAttrEntry 9 }
+
+    zxAnPonOnuIfAttr9 OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "Reserved for future use."
+        ::= { zxAnPonOnuIfAttrEntry 10 }
+
+    zxAnPonOnuIfAttr10 OBJECT-TYPE
+        SYNTAX      Integer32
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "Reserved for future use."
+        ::= { zxAnPonOnuIfAttrEntry 11 }
+
+    zxAnPonOnuIfAttrRowStatus OBJECT-TYPE
+        SYNTAX      RowStatus
+        MAX-ACCESS  read-create
+        STATUS      current
+        DESCRIPTION
+            "The status of this conceptual row.
+    
+            The supported actions of this conceptual row only include:
+            'createAndGo' and 'destroy'.
+            
+            To create a row in this table, a manager must
+            set this object to createAndGo(4).
+    
+            To delete a row in this table, a manager must
+            set this object to destroy(6). 
+            
+            To get this object, the agent always returns active(1)."
+        ::= { zxAnPonOnuIfAttrEntry 50 }
+
+
+--------------------------------------------------------------------------------
+-- zxAnPonRxOpticalPowerTable
+--------------------------------------------------------------------------------
+    zxAnPonRxOpticalPowerTable OBJECT-TYPE
+        SYNTAX     SEQUENCE OF ZxAnPonRxOpticalPowerEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+            "Received optical power on OLT side from ONU."
+        ::= { zxAnPonOamObjects 2 }
+
+    zxAnPonRxOpticalPowerEntry OBJECT-TYPE
+        SYNTAX      ZxAnPonRxOpticalPowerEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Entry of zxAnPonRxOpticalPowerTable.
+            The index 'zxAnPonOnuIndex' represents the normal ONU index."
+        INDEX   {ifIndex, zxAnPonOnuIndex }
+        ::= { zxAnPonRxOpticalPowerTable 1 }
+
+    ZxAnPonRxOpticalPowerEntry ::= SEQUENCE {
+        zxAnPonOnuIndex                             ZxAnPonOnuIndex,
+        zxAnPonRxOpticalPower                       Integer32
+        }
+
+    zxAnPonOnuIndex OBJECT-TYPE
+        SYNTAX       ZxAnPonOnuIndex
+        MAX-ACCESS   not-accessible
+        STATUS       current
+        DESCRIPTION
+            "This attribute represents the index of ONU."
+        ::= { zxAnPonRxOpticalPowerEntry 1 }
+
+    zxAnPonRxOpticalPower OBJECT-TYPE
+        SYNTAX       Integer32
+        UNITS        "0.001 dBm"
+        MAX-ACCESS   read-only
+        STATUS       current
+        DESCRIPTION
+            "Measured the received optical power. 
+            65535000 means N/A, ONU is not in service.
+            -80000 means no signal received."
+        ::= { zxAnPonRxOpticalPowerEntry 2 }
+
+--------------------------------------------------------------------------------
+-- zxAnPonRxOpticalPowerThreshTable
+--------------------------------------------------------------------------------
+    zxAnPonRxOpticalPowerThreshTable OBJECT-TYPE
+        SYNTAX     SEQUENCE OF ZxAnPonRxOpticalPowerThreshEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+            "Received threshold of transceiver on OLT side."
+        ::= { zxAnPonOamObjects 4 }
+
+    zxAnPonRxOpticalPowerThreshEntry OBJECT-TYPE
+        SYNTAX      ZxAnPonRxOpticalPowerThreshEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Entry of zxAnPonRxOpticalPowerThreshTable.
+            The index 'zxAnPonOnuIndex' represents the normal ONU index."
+        INDEX   {ifIndex, zxAnPonOnuIndex }
+        ::= { zxAnPonRxOpticalPowerThreshTable 1 }
+
+    ZxAnPonRxOpticalPowerThreshEntry ::= SEQUENCE {
+        zxAnPonRxPowerRisingAlarmThresh                Integer32,
+        zxAnPonRxPowerFallingAlarmThresh               Integer32,
+        zxAnPonRxPowerDetectPeriod                     Unsigned32,
+        zxAnPonRxPowerRestoreDefault                   INTEGER
+        }
+
+    zxAnPonRxPowerRisingAlarmThresh OBJECT-TYPE
+        SYNTAX       Integer32(-34000..-3000)
+        UNITS        "0.001 dBm"                 
+        MAX-ACCESS   read-write
+        STATUS       current 
+        DESCRIPTION
+            "Rising alarm threshold of received power."    
+        DEFVAL { -3000 }    
+        ::= { zxAnPonRxOpticalPowerThreshEntry 1 }
+
+    zxAnPonRxPowerFallingAlarmThresh OBJECT-TYPE 
+        SYNTAX       Integer32(-34000..-3000)
+        UNITS        "0.001 dBm"                              
+        MAX-ACCESS   read-write 
+        STATUS       current 
+        DESCRIPTION
+            "Falling alarm threshold of received power."   
+        DEFVAL { -34000 }          
+        ::= { zxAnPonRxOpticalPowerThreshEntry 2 }
+
+    zxAnPonRxPowerDetectPeriod OBJECT-TYPE
+        SYNTAX       Unsigned32(60..4294967295)
+        UNITS        "Seconds"    
+        MAX-ACCESS   read-write
+        STATUS       current
+        DESCRIPTION
+            "Detect period."    
+        DEFVAL { 900 }    
+        ::= { zxAnPonRxOpticalPowerThreshEntry 3 }               
+        
+    zxAnPonRxPowerRestoreDefault OBJECT-TYPE 
+        SYNTAX       INTEGER {
+            restoreDefault(1)
+        }                      
+        MAX-ACCESS   read-write 
+        STATUS       current 
+        DESCRIPTION
+            "The action of the ONU, when do the action, the 
+             'zxAnPonRxPowerRisingAlarmThresh' value and 
+             'zxAnPonRxPowerFallingAlarmThresh' value will be restored to the 
+             system defaule value."          
+        ::= { zxAnPonRxOpticalPowerThreshEntry 4 }                 
+
+--------------------------------------------------------------------------------
+-- Rogue ONU Control Group 
+--------------------------------------------------------------------------------        
+    zxAnPonRogueOnuOltIndex OBJECT-TYPE 
+        SYNTAX       InterfaceIndex                          
+        MAX-ACCESS   read-write
+        STATUS       current 
+        DESCRIPTION
+            "Same as ifIndex:
+             |-------------+----------|------------|---------|---------|
+             |InterfaceType| rack No. |  Shelf No. | Slot No.| Port No.|
+             |  1 (4bits)  | (4bits)  |  (8bits)   | (8bits) | (8bits) |
+             +-------------+----------+------------+---------+---------+       
+             
+             The multi-variables binding rule should be complied with 
+             when a manager configures rogue ONU control. 
+             According to this rule, all the related mib variables must be 
+             included in one SNMP set operation. 
+             
+             There are two types of variables: mandatory and optional.
+             All of the mandatory variables must be included in one SNMP
+             set operation. Optional variables may be included in one 
+             SNMP set operation with the mandatory variables, but must 
+             not be used alone. 
+             
+             To configure rogue ONU control, the mandatory and optional 
+             variables are as follows:
+             mandatoty: zxAnPonRogueOnuOltIndex,
+                        zxAnPonRogueOnuIndex"         
+        ::= { zxAnPonRogueOnuCtrl 1 }
+
+    zxAnPonRogueOnuIndex OBJECT-TYPE 
+        SYNTAX       ZxAnPonOnuIndex                          
+        MAX-ACCESS   read-write
+        STATUS       current 
+        DESCRIPTION
+            "Represents the normal ONU index."        
+        ::= { zxAnPonRogueOnuCtrl 2 }     
+
+    zxAnPonRogueOnuState OBJECT-TYPE
+        SYNTAX          INTEGER{
+                        rogueOn(1),               
+                        rogueOff(2),                      
+                        shutDown(3)
+                        }
+        MAX-ACCESS      read-write
+        STATUS          current
+        DESCRIPTION
+            "This object indicates the control action.
+            -rogueOn:open the transmit power.
+            -rogueOff:close the transmit power.
+            -shutDown:shutdown the transceiver."
+        ::= { zxAnPonRogueOnuCtrl 3 }
+
+    zxAnPonRogueOnuRecoverTime OBJECT-TYPE
+        SYNTAX      Integer32(0..255)
+        UNITS       "Minutes"
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "This object indicates the recovery time.
+            When 'zxAnPonRogueOnuState' is 'rogueOn',
+            'zxAnPonRogueOnuRecoverTime' is invalid."
+        ::= { zxAnPonRogueOnuCtrl 4}
+
+--------------------------------------------------------------------------------
+-- Rogue ONU Detect Group 
+--------------------------------------------------------------------------------
+    zxAnPonRogueOnuDetectInfoTable OBJECT-TYPE
+        SYNTAX     SEQUENCE OF ZxAnPonRogueOnuDetectInfoEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+            "This table is defined to control rogue ONU."
+        ::= { zxAnPonRogueOnuMgmt 2 }
+  
+    zxAnPonRogueOnuDetectInfoEntry OBJECT-TYPE
+        SYNTAX      ZxAnPonRogueOnuDetectInfoEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "Entry of zxAnPonRogueOnuDetectInfoTable.  
+            
+             The multi-variables binding rule should be complied with 
+             when a manager configures rogue ONU detect. 
+             According to this rule, 
+             all the related mib variables must be included in one SNMP 
+             set operation. 
+             
+             There are two types of variables: mandatory and optional.
+             All of the mandatory variables must be included in one SNMP
+             set operation. Optional variables may be included in one 
+             SNMP set operation with the mandatory variables, but must 
+             not be used alone. 
+             
+             To configure rogue ONU detect, the mandatory and 
+             optional variables are as follows:
+             mandatoty: zxAnRogueOnuDetectEnable,
+                        zxAnRogueOnuLocatingEnable,
+                        zxAnRogueOnuAutoCloseEnable."
+        INDEX   { zxAnRogueOnuSlot } 
+        ::= { zxAnPonRogueOnuDetectInfoTable 1 }
+
+    ZxAnPonRogueOnuDetectInfoEntry ::=
+        SEQUENCE {
+              zxAnRogueOnuSlot                     Integer32,
+              zxAnRogueOnuDetectEnable             INTEGER,
+              zxAnRogueOnuLocatingEnable           INTEGER,
+              zxAnRogueOnuAutoCloseEnable          INTEGER
+        }
+
+    zxAnRogueOnuSlot OBJECT-TYPE 
+        SYNTAX       Integer32
+        MAX-ACCESS   not-accessible
+        STATUS       current 
+        DESCRIPTION
+            "The OLT slot to be configured rogue ONU detection."        
+        ::= { zxAnPonRogueOnuDetectInfoEntry 1 }      
+          
+    zxAnRogueOnuDetectEnable OBJECT-TYPE 
+        SYNTAX       INTEGER{
+                     enabled(1),
+                     disabled(2)
+                     }
+        MAX-ACCESS   read-write 
+        STATUS       current 
+        DESCRIPTION
+            "This object indicates the rogue ONU detection mode.
+            -enabled(1): enable the rogue ONU detection  
+            -disabled(2): disable the rogue ONU detection."               
+        ::= { zxAnPonRogueOnuDetectInfoEntry 2 }
+
+    zxAnRogueOnuLocatingEnable OBJECT-TYPE 
+        SYNTAX       INTEGER{
+                     enabled(1),
+                     disabled(2)
+                     }
+        MAX-ACCESS   read-write 
+        STATUS       current 
+        DESCRIPTION
+            "This object indicates the rogue ONU locating mode.
+            -enabled(1): locating the rogue ONU
+            -disabled(1): not locating the rogue ONU.
+            When 'zxAnRogueOnuDetectEnable' is 'enabled', you can configure
+            'zxAnRogueOnuLocatingEnable'. 
+            When 'zxAnRogueOnuDetectEnable' is 'disabled', you can not 
+            configure 'zxAnRogueOnuLocatingEnable'.
+            This object is not supported for C600 serial."
+        ::= { zxAnPonRogueOnuDetectInfoEntry 3 }
+
+    zxAnRogueOnuAutoCloseEnable OBJECT-TYPE 
+        SYNTAX       INTEGER{
+                     enabled(1),
+                     disabled(2)
+                     }
+        MAX-ACCESS   read-write 
+        STATUS       current 
+        DESCRIPTION
+            "This object indicates the rogue ONU shutdown mode.
+            -enabled(1): shutdown the rogue ONU automatically
+            -disabled(2): shutdown the rogue ONU manually
+            When 'zxAnRogueOnuLocatingEnable' is 'enabled', you can configure
+            'zxAnRogueOnuAutoCloseEnable'. 
+            When 'zxAnRogueOnuLocatingEnable' is 'disabled', you can not 
+            configure 'zxAnRogueOnuAutoCloseEnable'.
+            This object is not supported for C600 serial."
+        ::= { zxAnPonRogueOnuDetectInfoEntry 4 }
+
+------------------------------------------------------------------------------
+-- Rogue ONU Information
+------------------------------------------------------------------------------  
+    zxAnPonRogueOnuInfoTable OBJECT-TYPE
+        SYNTAX     SEQUENCE OF ZxAnPonRogueOnuInfoEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+            "This table is defined to get rogue ONU information."
+        ::= { zxAnPonRogueOnuMgmt 3 }
+    
+    zxAnPonRogueOnuInfoEntry OBJECT-TYPE
+        SYNTAX      ZxAnPonRogueOnuInfoEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+                "It is an entry in the zxAnPonRogueOnuInfoTable. The index 
+                 'ifIndex' represents the normal OLT index"
+        INDEX   { ifIndex, zxAnPonRogueOnuInstIndex} 
+        ::= { zxAnPonRogueOnuInfoTable 1 }
+            
+    ZxAnPonRogueOnuInfoEntry ::=
+        SEQUENCE {
+            zxAnPonRogueOnuInstIndex                 Integer32,
+            zxAnPonRogueOnuAuthStatus                INTEGER,
+            zxAnPonRogueOnuId                        Integer32,
+            zxAnPonRogueOnuMacAddress                MacAddress,
+            zxAnPonRogueOnuSerialNumber              DisplayString,
+            zxAnPonRogueOnuDetectedTime              DateAndTime
+            }
+              
+    zxAnPonRogueOnuInstIndex OBJECT-TYPE 
+        SYNTAX       Integer32(1..256)                      
+        MAX-ACCESS   not-accessible
+        STATUS       current 
+        DESCRIPTION
+            "The instance No. of the rogue ONU."        
+        ::= { zxAnPonRogueOnuInfoEntry 1 }
+        
+    zxAnPonRogueOnuAuthStatus OBJECT-TYPE 
+        SYNTAX       INTEGER {
+            authenticated(1),
+            unauthenticated(2)
+        }                      
+        MAX-ACCESS   read-only 
+        STATUS       current 
+        DESCRIPTION
+            "The rogue ONU authentication status, 'authenticated' means this ONU 
+            is authenticated  and 'unauthenticated' means this ONU is discovered 
+            by OLT but not authenticated."          
+        ::= { zxAnPonRogueOnuInfoEntry 2 }
+        
+    zxAnPonRogueOnuId OBJECT-TYPE 
+        SYNTAX       Integer32(0..256)                      
+        MAX-ACCESS   read-only 
+        STATUS       current 
+        DESCRIPTION
+            "The unique ONU ID of the specified PON port, 
+             value 0 means ONU is discovered by OLT but not authenticated."  
+        ::= { zxAnPonRogueOnuInfoEntry 3 }
+        
+    zxAnPonRogueOnuMacAddress OBJECT-TYPE 
+        SYNTAX       MacAddress                   
+        MAX-ACCESS   read-only 
+        STATUS       current 
+        DESCRIPTION
+            "The MAC address of the rogue ONU, only for EPON ONU."               
+        ::= { zxAnPonRogueOnuInfoEntry 4 }
+        
+    zxAnPonRogueOnuSerialNumber OBJECT-TYPE 
+        SYNTAX       DisplayString(SIZE(0..12))       
+        MAX-ACCESS   read-only 
+        STATUS       current 
+        DESCRIPTION
+            "The SN of the rogue ONU, only for GPON ONU."               
+        ::= { zxAnPonRogueOnuInfoEntry 5 }
+        
+    zxAnPonRogueOnuDetectedTime OBJECT-TYPE 
+        SYNTAX       DateAndTime      
+        MAX-ACCESS   read-only 
+        STATUS       current 
+        DESCRIPTION
+            "The date and time when the rogue ONU is detected."               
+        ::= { zxAnPonRogueOnuInfoEntry 6 }
+
+------------------------------------------------------------------------------
+-- PON Port Rogue ONU Configuration
+------------------------------------------------------------------------------                     
+    zxAnPonPortRogueOnuConfTable OBJECT-TYPE
+        SYNTAX     SEQUENCE OF ZxAnPonPortRogueOnuConfEntry
+        MAX-ACCESS not-accessible
+        STATUS     current
+        DESCRIPTION
+            "The PON port rogue ONU management table.
+             This table only is used for C600 serial."
+        ::= { zxAnPonRogueOnuMgmt 4 }
+  
+    zxAnPonPortRogueOnuConfEntry OBJECT-TYPE
+        SYNTAX      ZxAnPonPortRogueOnuConfEntry
+        MAX-ACCESS  not-accessible
+        STATUS      current
+        DESCRIPTION
+            "The PON port rogue ONU management entry."              
+        INDEX   { ifIndex } 
+        ::= { zxAnPonPortRogueOnuConfTable 1 }
+
+    ZxAnPonPortRogueOnuConfEntry ::=
+        SEQUENCE {
+              zxAnPortRogueOnuLocatingEnable           INTEGER,
+              zxAnPortRogueOnuAutoCloseEnable          INTEGER,
+              zxAnPortRogueOnuDetectEnable             INTEGER
+        }
+
+    zxAnPortRogueOnuLocatingEnable OBJECT-TYPE 
+        SYNTAX       INTEGER{
+                     enabled(1),
+                     disabled(2)
+                     }
+        MAX-ACCESS   read-write 
+        STATUS       current 
+        DESCRIPTION
+            "The rogue ONU locating mode.
+             enabled(1): locating the rogue ONU
+             disabled(2): not locating the rogue ONU."
+        ::= { zxAnPonPortRogueOnuConfEntry 1 }
+
+    zxAnPortRogueOnuAutoCloseEnable  OBJECT-TYPE 
+        SYNTAX       INTEGER{
+                     enabled(1),
+                     disabled(2)
+                     }
+        MAX-ACCESS   read-write 
+        STATUS       current 
+        DESCRIPTION
+            "The rogue ONU shutdown mode.
+             enabled(1): shutdown the rogue ONU automatically
+             disabled(2): shutdown the rogue ONU manually."
+        ::= { zxAnPonPortRogueOnuConfEntry 2 }
+
+    zxAnPortRogueOnuDetectEnable  OBJECT-TYPE 
+        SYNTAX       INTEGER{
+                     enabled(1),
+                     disabled(2)
+                     }
+        MAX-ACCESS   read-write 
+        STATUS       current 
+        DESCRIPTION
+            "The rogue ONU detection mode.
+             enabled(1) enable the rogue ONU detection function 
+             disabled(2): disable the rogue ONU detection function."             
+        ::= { zxAnPonPortRogueOnuConfEntry 3 }
+--------------------------------------------------------------------------------
+-- zxAnPonGisGlobalObjects
+--------------------------------------------------------------------------------
+    zxAnPonGisLongitude OBJECT-TYPE
+        SYNTAX      Integer32(-18000000..18000000)
+        UNITS       "0.00001 degree"
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The longitude of the PON equipment."
+        ::= { zxAnPonGisGlobalObjects 1 }
+        
+    zxAnPonGisLatitude OBJECT-TYPE
+        SYNTAX      Integer32(-9000000..9000000)
+        UNITS       "0.00001 degree"
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The latitude of the PON equipment."
+        ::= { zxAnPonGisGlobalObjects 2 }
+        
+    zxAnPonGisElevation OBJECT-TYPE
+        SYNTAX      Integer32(-32768..32767)
+        UNITS       "Meter"
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The elevation of the PON equipment."
+        ::= { zxAnPonGisGlobalObjects 3 }
+        
+    zxAnPonGisHorizontalError OBJECT-TYPE
+        SYNTAX      Integer32(0..65535)
+        UNITS       "Meter"
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The horizontal error of the PON equipment. It caused by the 
+             changing of horizontal location during the measurement."
+        ::= { zxAnPonGisGlobalObjects 4 }
+        
+    zxAnPonGisAltitudeError OBJECT-TYPE
+        SYNTAX      Integer32(0..65535)
+        UNITS       "Meter"
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The altitude error of the PON equipment. It caused by the changing 
+             of altitude location during the measurement."
+        ::= { zxAnPonGisGlobalObjects 5 }
+        
+    zxAnPonGisAreaCode OBJECT-TYPE
+        SYNTAX      OCTET STRING(SIZE(8))
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The GIS area code of the PON equipment. 
+             It references from the latest version 2013 of 
+             NBS(National Bureau of Statistics of China),
+             http://www.stats.gov.cn/tjsj/tjbz/tjyqhdmhcxhfdm/2013/index.html."
+        ::= { zxAnPonGisGlobalObjects 6 }
+        
+    zxAnPonGisTimestamp OBJECT-TYPE
+        SYNTAX      Unsigned32(0..4294967295)
+        UNITS       "Seconds"
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The timestamp of GIS generated by BUAPP.
+             The offset time based on 0 hour 0 minute 0 second Jan 1st 1970 
+             in seconds."   
+        ::= { zxAnPonGisGlobalObjects 7 }
+        
+    zxAnPonGisDigest OBJECT-TYPE
+        SYNTAX      OCTET STRING(SIZE(8))
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The GIS digest."    
+        ::= { zxAnPonGisGlobalObjects 8 }
+        
+    zxAnPonGisCheckCode OBJECT-TYPE
+        SYNTAX      OCTET STRING(SIZE(2))
+        MAX-ACCESS  read-write
+        STATUS      current
+        DESCRIPTION
+            "The GIS check code. In order to prevent user input wrong 
+             information, the OLT will generate a new check code according to 
+             the calculation of above 8 variables, and compare the new check 
+             code with the check code generated by BUAPP."      
+        ::= { zxAnPonGisGlobalObjects 9 }
+
+--------------------------------------------------------------------------------
+-- PON Trap
+--------------------------------------------------------------------------------       
+    zxAnPonRxPowerHighAlm    NOTIFICATION-TYPE
+        OBJECTS {
+                zxAnPonRxOpticalPower
+                }
+        STATUS current
+        DESCRIPTION 
+            "Alarm for received power."
+        ::={zxAnPonOamTraps 1}
+        
+    zxAnPonRxPowerHighClr    NOTIFICATION-TYPE
+        OBJECTS {
+                zxAnPonRxOpticalPower
+                }
+        STATUS current
+        DESCRIPTION 
+            "Restore of alarm for received power."
+        ::={zxAnPonOamTraps 2}
+
+   zxAnPonRxPowerLowAlm    NOTIFICATION-TYPE
+        OBJECTS {
+                zxAnPonRxOpticalPower
+                }
+        STATUS current
+        DESCRIPTION 
+            "Alarm for received power."
+        ::={zxAnPonOamTraps 3}
+        
+    zxAnPonRxPowerLowClr    NOTIFICATION-TYPE
+        OBJECTS {
+                zxAnPonRxOpticalPower
+                }
+        STATUS current
+        DESCRIPTION 
+            "Restore of alarm for received power."
+        ::={zxAnPonOamTraps 4}
+
+--------------------------------------------------------------------------------
+--  zxAnPonConformance
+-------------------------------------------------------------------------------- 
+zxAnPonBaseConformance            OBJECT IDENTIFIER ::= { zxAnPonBaseMib 4}
+
+zxAnPonCompliances             OBJECT IDENTIFIER ::= {zxAnPonBaseConformance 1}
+zxAnPonGroups                  OBJECT IDENTIFIER ::= {zxAnPonBaseConformance 2}
+
+zxAnPonCompliance MODULE-COMPLIANCE
+    STATUS current
+    DESCRIPTION
+        "The compliance statement for entities which implement the
+         ZTE-AN-PON-BASE-MIB."
+    MODULE
+    MANDATORY-GROUPS{
+                    zxAnPonOnuTypeGroup,
+                    zxAnPonOamGroup,                                                              
+                    zxAnPonTrapGroup
+                    }
+    ::= { zxAnPonCompliances 1 }
+
+--------------------------------------------------------------------------------
+-- Units of Conformance
+--------------------------------------------------------------------------------
+zxAnPonOnuTypeGroup OBJECT-GROUP
+    OBJECTS         {
+                    zxAnPonOnuTypePonType,
+                    zxAnPonOnuTypeDesc,
+                    zxAnPonOnuTypeAttr1,
+                    zxAnPonOnuTypeAttr2,
+                    zxAnPonOnuTypeAttr3,
+                    zxAnPonOnuTypeAttr4,
+                    zxAnPonOnuTypeAttr5,
+                    zxAnPonOnuTypeAttr6,
+                    zxAnPonOnuTypeAttr7,
+                    zxAnPonOnuTypeAttr8,
+                    zxAnPonOnuTypeAttr9,
+                    zxAnPonOnuTypeAttr10,
+                    zxAnPonOnuTypeRowStatus,
+                    zxAnPonOnuIfAttr1,
+                    zxAnPonOnuIfAttr2,
+                    zxAnPonOnuIfAttr3,
+                    zxAnPonOnuIfAttr4,
+                    zxAnPonOnuIfAttr5,
+                    zxAnPonOnuIfAttr6,
+                    zxAnPonOnuIfAttr7,
+                    zxAnPonOnuIfAttr8,
+                    zxAnPonOnuIfAttr9,
+                    zxAnPonOnuIfAttr10,
+                    zxAnPonOnuIfAttrRowStatus
+                    }
+    STATUS          current
+    DESCRIPTION
+        "A collection of objects for ONU type 
+        configuration."
+    ::= { zxAnPonGroups 2 }
+    
+zxAnPonOamGroup OBJECT-GROUP
+    OBJECTS         {
+                    zxAnPonRogueOnuOltIndex,
+                    zxAnPonRogueOnuIndex,
+                    zxAnPonRogueOnuState,
+                    zxAnPonRogueOnuRecoverTime,
+                    zxAnRogueOnuDetectEnable,
+                    zxAnRogueOnuLocatingEnable,
+                    zxAnRogueOnuAutoCloseEnable,
+                    zxAnPonRogueOnuAuthStatus,
+                    zxAnPonRogueOnuId,
+                    zxAnPonRogueOnuMacAddress,
+                    zxAnPonRogueOnuSerialNumber,
+                    zxAnPonRogueOnuDetectedTime,
+                    zxAnPortRogueOnuLocatingEnable,
+                    zxAnPortRogueOnuAutoCloseEnable,
+                    zxAnPortRogueOnuDetectEnable,
+                    zxAnPonRxOpticalPower,
+                    zxAnPonRxPowerRisingAlarmThresh,
+                    zxAnPonRxPowerFallingAlarmThresh,
+                    zxAnPonRxPowerDetectPeriod
+                    }
+    STATUS          current
+    DESCRIPTION
+        "A collection of objects for OLT diagnose."
+    ::= { zxAnPonGroups 4 }   
+    
+zxAnPonGisGroup OBJECT-GROUP
+    OBJECTS         {
+                     zxAnPonGisLongitude,
+                     zxAnPonGisLatitude,
+                     zxAnPonGisElevation,
+                     zxAnPonGisHorizontalError,
+                     zxAnPonGisAltitudeError,
+                     zxAnPonGisAreaCode,
+                     zxAnPonGisTimestamp,
+                     zxAnPonGisDigest,
+                     zxAnPonGisCheckCode
+                    }
+    STATUS          current
+    DESCRIPTION
+        "A collection of objects for ONU gis configuration data."
+    ::= { zxAnPonGroups 6 }
+     
+zxAnPonTrapGroup NOTIFICATION-GROUP
+    NOTIFICATIONS   {
+                    zxAnPonRxPowerHighAlm,
+                    zxAnPonRxPowerHighClr,
+                    zxAnPonRxPowerLowAlm,
+                    zxAnPonRxPowerLowClr
+                    }
+    STATUS          current
+    DESCRIPTION
+        "A collection of notifications."
+    ::= { zxAnPonGroups 20 }
+
+END
+
