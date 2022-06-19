@@ -142,7 +142,7 @@ alias_from_interfaces_config_file()
              return 0
          fi
     fi
-    if [ "${UNAME}" -eq "Linux" ] && [ -d '/etc/network/interfaces.d' ]; then
+    if [ "${UNAME}" = "Linux" ] && [ -d '/etc/network/interfaces.d' ]; then
          if [ "$(/bin/ls /etc/network/interfaces.d/ | wc -l)" -ge 1 ]; then
              # echo squashes possible multi line replies to a single line
              TO_ECHO_AND_MAKE_LINT_HAPPY="$(grep -i "^# $1:"  | sed "s/^# $1: //i")"
