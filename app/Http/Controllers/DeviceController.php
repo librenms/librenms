@@ -207,7 +207,7 @@ class DeviceController extends Controller
         if ($server = Config::get('gateone.server')) {
             $ssh_url = Config::get('gateone.use_librenms_user')
                 ? $server . '?ssh=ssh://' . Auth::user()->username . '@' . $ssh_target . '&location=' . $ssh_target
-                : $server . '?ssh=ssh://' .  $ssh_target . '&location=' . $ssh_target;
+                : $server . '?ssh=ssh://' . $ssh_target . '&location=' . $ssh_target;
         }
         $device_links['ssh'] = [
             'icon' => 'fa-lock',
