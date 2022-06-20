@@ -69,12 +69,9 @@ class Canopsis extends Transport
         $msg_raw = json_encode($msg_body);
 
         // Build routing key
-        $msg_rk = '';
-        if ($msg_body['source_type'] == 'resource') {
-            $msg_rk = $msg_rk . '.' . $msg_body['resource'];
-        } else {
-            $msg_rk = $msg_body['connector'] . '.' . $msg_body['connector_name'] . '.' . $msg_body['event_type'] . '.' . $msg_body['source_type'] . '.' . $msg_body['component'];
-        }
+        $msg_rk = '.' . $msg_body['resource'];
+        // non-resource key example
+        // $msg_rk = $msg_body['connector'] . '.' . $msg_body['connector_name'] . '.' . $msg_body['event_type'] . '.' . $msg_body['source_type'] . '.' . $msg_body['component'];
 
         // Publish Event
         $msg = new AMQPMessage($msg_raw, ['content_type' => 'application/json', 'delivery_mode' => 2]);

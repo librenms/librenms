@@ -5,7 +5,7 @@ IMPORTS
     OBJECT-IDENTITY                     FROM SNMPv2-SMI;
 
 ruggedcom MODULE-IDENTITY
-    LAST-UPDATED "201504020900Z"      -- Apr 2, 9:00 EST 2015;
+    LAST-UPDATED "201709201100Z"      -- Sept. 20, 11:00 EST 2017;
     ORGANIZATION "RuggedCom"
     CONTACT-INFO
        "Postal: RuggedCom Inc.
@@ -18,6 +18,11 @@ ruggedcom MODULE-IDENTITY
     DESCRIPTION
         "RuggedCom enterprise structure of management information."
 
+	REVISION    "201709201100Z"      -- Sept. 20, 11:00 EST 2017;
+    DESCRIPTION                
+        "Added Added specific ros product branch rcAAAServer (Authentication,
+		 Authentication and Access Server)."
+		
 	REVISION    "201504020900Z"      -- Apr 2, 9:00 EST 2015;
     DESCRIPTION                
         "Added Added specific ros product branch ruggedcomMC."
@@ -128,6 +133,8 @@ ruggedcomMgmt  OBJECT-IDENTITY
 
 -- ruggedcomMgmt.3 branch is reserved for RuggedCom Internal use (Discovery Tool uses .1)
 -- ruggedcomMgmt.10 branch is reserved for ruggedmax
+-- ruggedcomMgmt.13 branch is reserved for rcNTP
+-- ruggedcomMgmt.14 branch is reserved for rcAAAServer
 
 ruggedcomTraps OBJECT-IDENTITY 
     STATUS  current
@@ -135,6 +142,9 @@ ruggedcomTraps OBJECT-IDENTITY
         "The root of the subtree where RuggedCom traps can be placed."
     ::= { ruggedcom 5 }  
 
+-- ruggedcomTraps.22 branch is reserved for radiusServiceAvailableChange
+-- ruggedcomTraps.23 branch is reserved for tacacsServiceAvailableChange	
+	
 ruggedcomAgentCapabilities OBJECT-IDENTITY
     STATUS  current
     DESCRIPTION
@@ -149,4 +159,6 @@ ruggedcomAgentCapability OBJECT-IDENTITY
         individual MIBs are described."
     ::= { ruggedcomAgentCapabilities 30 }  
 
+-- ruggedcomAgentCapability.48 branch is reserved for ruggedcomRcAAAServerACModule
+	
 END

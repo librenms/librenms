@@ -35,11 +35,12 @@ namespace LibreNMS\Validations;
 use App\Models\PollerCluster;
 use Carbon\Carbon;
 use LibreNMS\Config;
+use LibreNMS\Validations\Rrd\CheckRrdcachedConnectivity;
 use LibreNMS\Validator;
 
 class DistributedPoller extends BaseValidation
 {
-    public function isDefault()
+    public function isDefault(): bool
     {
         // run by default if distributed polling is enabled
         return Config::get('distributed_poller');
@@ -51,7 +52,7 @@ class DistributedPoller extends BaseValidation
      *
      * @param  Validator  $validator
      */
-    public function validate(Validator $validator)
+    public function validate(Validator $validator): void
     {
         if (! Config::get('distributed_poller')) {
             $validator->fail('You have not enabled distributed_poller', 'lnms config:set distributed_poller true');
@@ -64,7 +65,7 @@ class DistributedPoller extends BaseValidation
         } elseif (! is_dir(Config::get('rrd_dir'))) {
             $validator->fail('You have not configured $config[\'rrd_dir\']');
         } else {
-            Rrd::checkRrdcached($validator);
+            $validator->result((new CheckRrdcachedConnectivity)->validate(), $this->name);
         }
 
         if (PollerCluster::exists()) {
@@ -82,7 +83,7 @@ class DistributedPoller extends BaseValidation
         $this->checkPythonWrapper($validator);
     }
 
-    private function checkDispatcherService(Validator $validator)
+    private function checkDispatcherService(Validator $validator): void
     {
         $driver = config('cache.default');
         if ($driver != 'redis') {
@@ -109,7 +110,7 @@ class DistributedPoller extends BaseValidation
         }
     }
 
-    private function checkPythonWrapper(Validator $validator)
+    private function checkPythonWrapper(Validator $validator): void
     {
         if (! Config::get('distributed_poller_memcached_host')) {
             $validator->fail('You have not configured $config[\'distributed_poller_memcached_host\']');
