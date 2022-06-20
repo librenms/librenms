@@ -331,6 +331,15 @@ return [
             'description' => 'Bind username',
             'help' => 'Used to query the AD server when no user is logged in (alerts, API, etc)',
         ],
+        'auth_ad_starttls' => [
+            'description' => 'Use STARTTLS',
+            'help' => 'Use STARTTLS to secure the connection.  Alternative to LDAPS.',
+            'options' => [
+                'disabled' => 'Disabled',
+                'optional' => 'Optional',
+                'required' => 'Required',
+            ],
+        ],
         'auth_ldap_cache_ttl' => [
             'description' => 'LDAP cache expiration',
             'help' => 'Temporarily stores LDAP query results.  Improves speeds, but the data may be stale.',
