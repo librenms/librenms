@@ -33,7 +33,6 @@ if ($oids) {
     discover_sensor($valid['sensor'], 'runtime', $device, $oid, $index, $type, $descr, $divisor, '1', $low_limit, $low_limit_warn, $warn_limit, $high_limit, $current);
 }
 
-
 // InRow IRRP100
 $oids = snmp_get($device, 'airIRRP100GroupSetpointsCoolMetric.0', '-OsqnU', 'PowerNet-MIB');
 if ($oids) {
