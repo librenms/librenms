@@ -9,10 +9,10 @@ $name = 'sneck';
 $app_id = $app['app_id'];
 
 if (Config::has('apps.sneck.polling_time_diff')) {
-    $compute_time_diff=Config::get('apps.sneck.polling_time_diff');
- } else {
-    $compute_time_diff=false;
- }
+    $compute_time_diff = Config::get('apps.sneck.polling_time_diff');
+} else {
+    $compute_time_diff = false;
+}
 
 try {
     $json_return = json_app_get($device, $name, 1);
@@ -38,9 +38,9 @@ $rrd_def = RrdDefinition::make()
 // only compueted if
 if ($compute_time_diff) {
     $time_to_polling = Carbon::now()->timestamp - $json_return['data']['time'];
- } else {
-    $time_to_polling=0;
- }
+} else {
+    $time_to_polling = 0;
+}
 
 $fields = [
     'time' => $json_return['data']['time'],

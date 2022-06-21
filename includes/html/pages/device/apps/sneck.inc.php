@@ -7,7 +7,6 @@ $link_array = [
     'app'    => 'sneck',
 ];
 
-
 $link_array = [
     'page'   => 'device',
     'device' => $device['device_id'],
@@ -44,7 +43,7 @@ foreach ($graphs as $key => $text) {
 $sneck_data = get_sneck_data($device['device_id']);
 if (isset($sneck_data)) {
     print_optionbar_start();
-	echo "Information From The Last Saved Alert State...<br>";
+    echo 'Information From The Last Saved Alert State...<br>';
     echo "<b>Alert(s):</b><br>\n";
     echo str_replace("\n", "<br>\n", $sneck_data['data']['alertString']) . "<br><br>\n";
     echo "<b>Raw JSON:</b><br>\n";
