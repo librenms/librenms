@@ -2124,6 +2124,19 @@ the metrics below are provided.
 | time_to_polling | Differnce in seconds between when polling data was generated and when polled |
 | time_to_polling_abs | The aboslute value of time_to_polling. |
 
+You can check the exit status of a specific check via the metric
+`check_$CHECK` where $CHECK is equal to the name of the check in
+questions. So if the check is named `foo` you can check the exit
+status by checking `check_foo`. The standard Nagios/Icinga style exit
+codes are used and those are as below.
+
+| Exit | Meaning  |
+|------|----------|
+| 0    | okay     |
+| 1    | warning  |
+| 2    | critical |
+| 3+   | unknown  |
+
 If you wish to use `time_to_polling`, you will need to set in the
 config the item below. The default is false. Unless set to true, this
 value will default to 0. If you plan to enable this, you will want
