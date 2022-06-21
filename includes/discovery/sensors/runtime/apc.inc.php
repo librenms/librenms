@@ -25,7 +25,7 @@ if ($oids) {
     $divisor = 1;
     $type = 'apc';
     $index = 'upsBasicBatteryLastReplaceDate.0';
-    $descr = 'Battery Usage Time';
+    $descr = 'Battery Operating Time';
     $low_limit = 0;
     $low_limit_warn = 0;
     $warn_limit = 4*365*24*60; // 5 years
