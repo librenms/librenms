@@ -10,6 +10,7 @@ modules:
                 -
                     oid:
                         - mOperator
+                        - ioSystemName
         temperature:
             data:
                 -
@@ -23,6 +24,24 @@ modules:
                     high_limit: 75
         state:
             data:
+                -
+                    oid: ioInput
+                    num_oid: ".1.3.6.1.4.1.48690.6.2.1.7.{{ $index }}"
+                    descr:  I/O {{ $index }} Type
+                    group: Inputs/Outputs
+                    state_name: TELTONIKA-RUTX-MIB::ioInput
+                    states:
+                        - { descr: Digital Output, graph: 1, value: 0, generic: 0 }
+                        - { descr: Digital Input, graph: 1, value: 1, generic: 0 }
+                -
+                    oid: ioState
+                    num_oid: ".1.3.6.1.4.1.48690.6.2.1.6.{{ $index }}"
+                    descr:  I/O {{ $index }} State ({{ $ioSystemName }})
+                    group: Inputs/Outputs
+                    state_name: TELTONIKA-RUTX-MIB::ioState
+                    states:
+                        - { descr: Low, graph: 1, value: 0, generic: 0 }
+                        - { descr: High, graph: 1, value: 1, generic: 2 }
                 -
                     oid: mSimState
                     num_oid: ".1.3.6.1.4.1.48690.2.2.1.9.{{ $index }}"
@@ -83,6 +102,30 @@ modules:
                         - { descr: unknown, graph: 1, value: 5, generic: 3 }
         count:
             data:
+                -
+                    oid: mReceivedToday
+                    num_oid: ".1.3.6.1.4.1.48690.2.2.1.26.{{ $index }}"
+                    descr: "Mobile bytes received today"
+                    group: Mobile
+                    index: "mReceivedToday.{{ $index }}"
+                -
+                    oid: mSentToday
+                    num_oid: ".1.3.6.1.4.1.48690.2.2.1.25.{{ $index }}"
+                    descr: "Mobile bytes sent today"
+                    group: Mobile
+                    index: "mSentToday.{{ $index }}"
+                -
+                    oid: mReceived
+                    num_oid: ".1.3.6.1.4.1.48690.2.2.1.23.{{ $index }}"
+                    descr: "Mobile total bytes received"
+                    group: Mobile
+                    index: "mReceived.{{ $index }}"
+                -
+                    oid: mSent
+                    num_oid: ".1.3.6.1.4.1.48690.2.2.1.22.{{ $index }}"
+                    descr: "Mobile total bytes sent"
+                    group: Mobile
+                    index: "mSent.{{ $index }}"
                 -
                     oid: numSatellites
                     num_oid: ".1.3.6.1.4.1.48690.3.5.{{ $index }}"

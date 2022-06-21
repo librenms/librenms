@@ -81,6 +81,8 @@ trait YamlOSDiscovery
                     : $value;
             }
         }
+
+        $this->replaceStringsInFields($device, $os_yaml);
     }
 
     public function fetchLocation(): Location
@@ -157,5 +159,18 @@ trait YamlOSDiscovery
         }
 
         return false;
+    }
+
+    private function replaceStringsInFields(Device $device, array $os_yaml): void
+    {
+        foreach ($this->osFields as $field) {
+            foreach ($os_yaml["{$field}_replace"] ?? [] as $replacements) {
+                if (is_array($replacements) && count($replacements) == 2) {
+                    $device->$field = str_replace($replacements[0], $replacements[1], $device->$field);
+                } elseif (is_string($replacements)) {
+                    $device->$field = str_replace($replacements, '', $device->$field);
+                }
+            }
+        }
     }
 }

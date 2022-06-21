@@ -3,7 +3,7 @@
 --   
 -- August 2005, Katherine Yang
 --   
--- Copyright (c) 2005-2014 by Cisco Systems Inc.
+-- Copyright (c) 2005-2014, 2017 by Cisco Systems Inc.
 -- All rights reserved.
 --   
 -- *****************************************************************
@@ -12,7 +12,8 @@ CISCO-RTTMON-TC-MIB DEFINITIONS ::= BEGIN
 
 IMPORTS
     MODULE-IDENTITY,
-    Unsigned32
+    Unsigned32,
+    Integer32
         FROM SNMPv2-SMI
     TEXTUAL-CONVENTION
         FROM SNMPv2-TC
@@ -21,7 +22,7 @@ IMPORTS
 
 
 ciscoRttMonTCMIB MODULE-IDENTITY
-    LAST-UPDATED    "201403190000Z"
+    LAST-UPDATED    "201709060000Z"
     ORGANIZATION    "Cisco Systems, Inc."
     CONTACT-INFO
             "Cisco Systems, Inc.
@@ -49,6 +50,9 @@ ciscoRttMonTCMIB MODULE-IDENTITY
           SAA: Service Assurance Agent
           VPN: Virtual Private Network
           CFM: Connection Fault Management"
+    REVISION        "201708030000Z"
+    DESCRIPTION
+        "Added a new TC cipslaPercentileVar"
     REVISION        "201403190000Z"
     DESCRIPTION
         "Added new fabricPathEcho type to RttMonRttType and
@@ -382,14 +386,16 @@ RttMonRttType ::= TEXTUAL-CONVENTION
         The value 'rtp' will cause the RTT application to perform
         delay variance analysis for RTP packet.
 
-        The value 'lspGroup' will cause the RTT application to logically
+        The value 'lspGroup' will cause the RTT application to
+        logically
         group Label Switched Paths discovered as part of LSP Path
         Discovery to the target and perform an RTT operation end to end
         over each path in the Group. The type of operation configured
         is determined by rttMplsVpnMonCtrlRttType.
 
         The value 'icmpjitter' will cause the RTT application
-        to perform delay variance analysis using ICMP timestamp packets.
+        to perform delay variance analysis using ICMP timestamp
+        packets.
 
         The value of 'lspPingIpv4' will cause the RTT application to
         perform ping over LSP path.
@@ -405,18 +411,20 @@ RttMonRttType ::= TEXTUAL-CONVENTION
         perform delay variance analysis using CFM frame.
 
         The value of 'lspPingPseudowire' will cause the RTT application
-        to
-        perform LSP Ping over Pseudowire and measure response time.
+        to perform LSP Ping over Pseudowire and measure response time.
 
         The value 'video' will cause the the RTT application to perform
-        a video stream analysis directed at the 'RttMonTargetAddress
-        The value 'y1731Delay' will cause the RTT application to perform
-        a ITU-T standard Y.1731 delay variance analysis
+        a video stream analysis directed at the 'RttMonTargetAddress'.
+
+        The value 'y1731Delay' will cause the RTT application to
+        perform
+        a ITU-T standard Y.1731 delay variance analysis.
+
         The value 'y1731Loss' will cause the RTT application to perform
-        a ITU-T standard Y.1731 loss measure analysis
+        a ITU-T standard Y.1731 loss measure analysis.
+
         The value 'mcastJitter' will cause the RTT application to
-        perform 
-        udp jitter stream analysis on a multicast network.
+        perform udp jitter stream analysis on a multicast network.
 
         The value 'fabricPathEcho' will cause the RTT application to
         perform delay performance measurment and verify connectivity in
@@ -947,16 +955,25 @@ RttMonCtrlIndex ::= TEXTUAL-CONVENTION
         It can be used for other IP SLA control tables."
     SYNTAX          Unsigned32 (1..2147483647)
 
+CipslaPercentileVar ::= TEXTUAL-CONVENTION
+    STATUS          current
+    DESCRIPTION
+        "The following are specific percentile types. These types are
+        supported by UDP Jitter, ICMP Jitter and Ethernet Jitter
+        probes:
+        rtt(1)        - Round Trip Time
+        owsd(2)       - One way delay - Source to Destination
+        owds(3)       - One way delay - Destination to Source
+        jittersd(4)   - One way jitter - Source to Destination
+        jitterds(5)   - One way jitter - Destination to Source
+        jitteravg(6)  - Jitter values in both directions."
+    SYNTAX          INTEGER  {
+                        rtt(1),
+                        owsd(2),
+                        owds(3),
+                        jittersd(4),
+                        jitterds(5),
+                        jitteravg(6)
+                    }
+
 END
-
-
--- %DNP%  MLC -Submitted MLC
-
--- %DNP%  MRS -with reviewer MRS
-
--- %DNP%  MRC - ciscoRttMonTCMIB~2~ - 2014031805:01 PST - vivsreev -11.0 -ACK
--- %DNP%  - Can we allign the description of mcastJitterAppl into one line or two 
--- %DNP%lines for better readability? in Line: 633
--- %DNP%
--- %DNP% -0 MRC 
-

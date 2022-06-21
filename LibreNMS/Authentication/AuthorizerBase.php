@@ -25,6 +25,7 @@
 
 namespace LibreNMS\Authentication;
 
+use LibreNMS\Config;
 use LibreNMS\Interfaces\Authentication\Authorizer;
 
 abstract class AuthorizerBase implements Authorizer
@@ -74,12 +75,6 @@ abstract class AuthorizerBase implements Authorizer
 
     public function getExternalUsername()
     {
-        if (isset($_SERVER['REMOTE_USER'])) {
-            return $_SERVER['REMOTE_USER'];
-        } elseif (isset($_SERVER['PHP_AUTH_USER'])) {
-            return $_SERVER['PHP_AUTH_USER'];
-        }
-
-        return null;
+        return $_SERVER[Config::get('http_auth_header')] ?? $_SERVER['PHP_AUTH_USER'] ?? null;
     }
 }

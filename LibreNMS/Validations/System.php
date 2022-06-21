@@ -25,6 +25,7 @@
 
 namespace LibreNMS\Validations;
 
+use Illuminate\Support\Arr;
 use LibreNMS\Config;
 use LibreNMS\Validator;
 
@@ -35,13 +36,23 @@ class System extends BaseValidation
     /**
      * {@inheritdoc}
      */
-    public function validate(Validator $validator)
+    public function validate(Validator $validator): void
     {
         $install_dir = $validator->getBaseDir();
 
-        $lnms = `which lnms 2>/dev/null`;
-        if (empty($lnms) && ! Config::get('installed_from_package')) {
-            $validator->warn('Global lnms shortcut not installed. lnms command must be run with full path', "sudo ln -s $install_dir/lnms /usr/bin/lnms");
+        $lnms = str_replace('lnms:', '', rtrim(`whereis -b lnms 2>/dev/null`));
+        $path = rtrim(`echo "\$PATH"`);
+
+        // if couldn't find lnms and we have PATH
+        if (empty($lnms) && ! empty($path)) {
+            $paths = explode(':', $path);
+            $bin = Arr::first(array_intersect([
+                '/usr/local/bin',
+                '/usr/bin',
+                '/bin',
+            ], $paths), null, Arr::last($paths));
+
+            $validator->warn('Global lnms shortcut not installed. lnms command must be run with full path', "sudo ln -s $install_dir/lnms $bin/lnms");
         }
 
         $bash_completion_dir = '/etc/bash_completion.d/';

@@ -28,10 +28,12 @@ class DeviceGroupsRewrite extends Migration
      */
     public function down()
     {
-//        Schema::table('device_groups', function (Blueprint $table) {
-//            $table->string('desc')->change();
-//            $table->dropColumn(['type', 'rules']);
-//            $table->text('params')->nullable()->after('pattern');
-//        });
+        if (\LibreNMS\DB\Eloquent::getDriver() !== 'sqlite') {
+            Schema::table('device_groups', function (Blueprint $table) {
+                $table->string('desc')->change();
+                $table->dropColumn(['type', 'rules']);
+                $table->text('params')->nullable()->after('pattern');
+            });
+        }
     }
 }

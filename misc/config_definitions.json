@@ -578,6 +578,13 @@
             "order": 0,
             "type": "text"
         },
+        "auth_ldap_require_groupmembership": {
+            "default": true,
+            "group": "auth",
+            "section": "ldap",
+            "order": 4,
+            "type": "boolean"
+        },
         "auth_ldap_starttls": {
             "default": "disabled",
             "group": "auth",
@@ -2718,6 +2725,14 @@
             },
             "type": "graph"
         },
+        "graph_types.device.pf_drops": {
+            "default": {
+                "section": "firewall",
+                "order": 11,
+                "descr": "Drops"
+            },
+            "type": "graph"
+        },
         "graph_types.device.pf_fragmented": {
             "default": {
                 "section": "firewall",
@@ -3501,6 +3516,13 @@
                 "custom7": "Custom 7",
                 "custom8": "Custom 8"
             }
+        },
+        "http_auth_header": {
+            "default": "REMOTE_USER",
+            "group": "auth",
+            "section": "general",
+            "order": 4,
+            "type": "text"
         },
         "html_dir": {
             "type": "directory"
@@ -5359,13 +5381,6 @@
             "group": "external",
             "section": "binaries",
             "order": 13,
-            "type": "executable"
-        },
-        "traceroute6": {
-            "default": "traceroute6",
-            "group": "external",
-            "section": "binaries",
-            "order": 14,
             "type": "executable"
         },
         "transit_descr": {

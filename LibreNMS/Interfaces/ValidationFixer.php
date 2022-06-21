@@ -1,6 +1,6 @@
 <?php
-/**
- * Widget.php
+/*
+ * ValidationFixer.php
  *
  * -Description-
  *
@@ -15,21 +15,22 @@
  * GNU General Public License for more details.
  *
  * You should have received a copy of the GNU General Public License
- * along with this program.  If not, see <https://www.gnu.org/licenses/>.
+ * along with this program.  If not, see <http://www.gnu.org/licenses/>.
  *
- * @link       https://www.librenms.org
- *
- * @copyright  2018 Tony Murray
+ * @package    LibreNMS
+ * @link       http://librenms.org
+ * @copyright  2022 Tony Murray
  * @author     Tony Murray <murraytony@gmail.com>
  */
 
-namespace App\Models;
+namespace LibreNMS\Interfaces;
 
-use Illuminate\Database\Eloquent\Model;
-
-class Widget extends Model
+interface ValidationFixer
 {
-    public $timestamps = false;
-    protected $primaryKey = 'widget_id';
-    protected $fillable = ['widget_title', 'widget', 'base_dimensions'];
+    /**
+     * Fix the failed validation result. Take care not to break user installs.
+     *
+     * @return bool
+     */
+    public function fix(): bool;
 }

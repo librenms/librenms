@@ -24,9 +24,6 @@
                     <th data-column-id="location" data-formatter="location" data-order="asc">{{ __('Location') }}</th>
                     <th data-column-id="coordinates" data-formatter="coordinates" data-sortable="false">{{ __('Coordinates') }}</th>
                     <th data-column-id="devices" data-formatter="primaryLabel">{{ __('Devices') }}</th>
-                    <th data-column-id="network" data-formatter="defaultLabel">{{ __('Network') }}</th>
-                    <th data-column-id="servers" data-formatter="defaultLabel">{{ __('Servers') }}</th>
-                    <th data-column-id="firewalls" data-formatter="defaultLabel">{{ __('Firewalls') }}</th>
                     <th data-column-id="down" data-formatter="down">{{ __('Down') }}</th>
                     <th data-column-id="actions" data-formatter="actions" data-sortable="false">{{ __('Actions') }}</th>
                 </tr>

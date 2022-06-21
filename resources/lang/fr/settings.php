@@ -908,9 +908,6 @@ return [
         'traceroute' => [
             'description' => 'Chemin vers `traceroute`',
         ],
-        'traceroute6' => [
-            'description' => 'Chemin vers `traceroute6`',
-        ],
         'unix-agent' => [
             'connection-timeout' => [
                 'description' => 'Délai d\'attente de connexion Unix-agent',

@@ -41,7 +41,7 @@ class User extends BaseValidation
      *
      * @param  Validator  $validator
      */
-    public function validate(Validator $validator)
+    public function validate(Validator $validator): void
     {
         // Check we are running this as the root user
         $username = $validator->getUsername();

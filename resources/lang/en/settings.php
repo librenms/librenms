@@ -365,6 +365,10 @@ return [
             'description' => 'Group access',
             'help' => 'Define groups that have access and level',
         ],
+        'auth_ldap_require_groupmembership' => [
+            'description' => 'LDAP Group membership verification',
+            'help' => 'Perform (or skip) ldap_compare when the provider allows (or does not) for the Compare action.',
+        ],
         'auth_ldap_port' => [
             'description' => 'LDAP port',
             'help' => 'Port to connect to servers on. For LDAP it should be 389, for LDAPS it should be 636',
@@ -796,6 +800,10 @@ return [
                     'help' => 'Sets the primary link in the device dropdown menu',
                 ],
             ],
+        ],
+        'http_auth_header' => [
+            'description' => 'Field name containing username',
+            'help' => 'Can be a ENV or HTTP-header field like REMOTE_USER, PHP_AUTH_USER or a custom variant',
         ],
         'http_proxy' => [
             'description' => 'HTTP(S) Proxy',
@@ -1462,9 +1470,6 @@ return [
         ],
         'traceroute' => [
             'description' => 'Path to traceroute',
-        ],
-        'traceroute6' => [
-            'description' => 'Path to traceroute6',
         ],
         'twofactor' => [
             'description' => 'Two-Factor',

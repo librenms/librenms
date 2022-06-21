@@ -13,26 +13,6 @@ class Dashboard extends Model
     protected $primaryKey = 'dashboard_id';
     protected $fillable = ['user_id', 'dashboard_name', 'access'];
 
-    // ---- Helper Functions ---
-
-    /**
-     * @param  User  $user
-     * @return bool
-     */
-    public function canRead($user)
-    {
-        return $this->user_id == $user->user_id || $this->access > 0;
-    }
-
-    /**
-     * @param  User  $user
-     * @return bool
-     */
-    public function canWrite($user)
-    {
-        return $this->user_id == $user->user_id || $this->access > 1;
-    }
-
     // ---- Query scopes ----
 
     /**

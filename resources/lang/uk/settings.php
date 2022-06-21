@@ -1459,9 +1459,6 @@ return [
         'traceroute' => [
             'description' => 'Шлях до traceroute',
         ],
-        'traceroute6' => [
-            'description' => 'Шлях до traceroute6',
-        ],
         'twofactor' => [
             'description' => 'Двохфакторна автентифікація',
             'help' => 'Дозволяє користувачам активувати та використовувати Timebased (TOTP) або Counterbased (HOTP) одноразові паролі (OTP)',

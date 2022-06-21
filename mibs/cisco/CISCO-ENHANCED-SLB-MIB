@@ -3,7 +3,7 @@
 --   
 -- February 2006, Subra Hegde
 --   
--- Copyright (c) 1999, 2002, 2004, 2006, 2007, 2009 by cisco Systems, Inc.
+-- Copyright (c) 2006, 2008-2009, 2012 by cisco Systems Inc.
 -- All rights reserved.
 -- *****************************************************************
 
@@ -50,7 +50,7 @@ IMPORTS
 
 
 ciscoEnhancedSlbMIB MODULE-IDENTITY
-    LAST-UPDATED    "200909190000Z"
+    LAST-UPDATED    "201212030000Z"
     ORGANIZATION    "Cisco Systems, Inc."
     CONTACT-INFO
             "Cisco Systems
@@ -117,7 +117,29 @@ ciscoEnhancedSlbMIB MODULE-IDENTITY
                  request that the client store the information.
                  In certain applications, the client returns 
                  the information to the server to maintain 
-                 the state between the client and the server."
+                 the state between the client and the server.
+        BuddyGroup : Contains buddy group name of real server."
+    REVISION        "201212030000Z"
+    DESCRIPTION
+        "-Added SlbRserverLocalityState new TEXTUAL-CONVENTION.
+
+        -Added cesRealServerGroupRev2 & cesRealServerNotifGroupRev3. 
+
+        -Added ciscoEnhancedSlbMIBComplianceRev6. 
+
+        -Deprecated ciscoEnhancedSlbMIBComplianceRev5."
+    REVISION        "201204090000Z"
+    DESCRIPTION
+        "-Added the object cesServerFarmRserverBuddyGroup to
+        cesServerFarmRserverTable.
+
+        -Added cesRealServerFarmBuddyGroup OBJECT-GROUP.
+
+        -Deprecated ciscoEnhancedSlbMIBComplianceRev4
+        MODULE-COMPLIANCE.
+
+        -Added ciscoEnhancedSlbMIBComplianceRev5 MODULE-COMPLIANCE 
+        statement"
     REVISION        "200909190000Z"
     DESCRIPTION
         "-Added cesServerFarmRserverDescr to cesServerFarmRserverTable.
@@ -244,6 +266,23 @@ CiscoRserverAdminStatus ::= TEXTUAL-CONVENTION
                         outOfService(2),
                         inServiceStandby(3)
                     }
+
+SlbRserverLocalityState ::= TEXTUAL-CONVENTION
+    STATUS          current
+    DESCRIPTION
+        "This is the textual convention for
+        locality status of the real server.
+        The possible value(s) are :
+          'unknown'        : The locality of the real server is not
+        known.
+          'local'          : The locality of the real server is local.
+          'remote'         : The locality of the real server is remote.
+                               state."
+    SYNTAX          INTEGER  {
+                        unknown(1),
+                        local(2),
+                        remote(3)
+                    }
 -- *************************************************************
 -- *                                                           *
 -- * SLB - Real Server(identified by Name) Table               *
@@ -296,7 +335,8 @@ CesRserverEntry ::= SEQUENCE {
         cesRserverRowStatus             RowStatus,
         cesRserverTotalConns            Counter64,
         cesRserverFailedConns           Counter64,
-        cesRserverCurrConns             Counter64
+        cesRserverCurrConns             Counter64,
+        cesRserverLocality              SlbRserverLocalityState
 }
 
 cesRserverName OBJECT-TYPE
@@ -562,6 +602,16 @@ cesRserverCurrConns OBJECT-TYPE
         "The total number of active connections loadbalanced to
         this real server." 
     ::= { cesRserverEntry 19 }
+
+cesRserverLocality OBJECT-TYPE
+    SYNTAX          SlbRserverLocalityState
+    MAX-ACCESS      read-only
+    STATUS          current
+    DESCRIPTION
+        "This object indicates the current locality state of the
+        real server."
+    DEFVAL          { 1 } 
+    ::= { cesRserverEntry 20 }
  
 
 -- Probes configured in RServers.
@@ -751,7 +801,8 @@ CesServerFarmRserverEntry ::= SEQUENCE {
         cesServerFarmRserverCurrentConns Counter64,
         cesServerFarmRserverStorageType  StorageType,
         cesServerFarmRserverRowStatus    RowStatus,
-        cesServerFarmRserverDescr        SnmpAdminString
+        cesServerFarmRserverDescr        SnmpAdminString,
+        cesServerFarmRserverBuddyGroup   SnmpAdminString
 }
 
 cesServerFarmRserverPort OBJECT-TYPE
@@ -950,6 +1001,15 @@ cesServerFarmRserverDescr OBJECT-TYPE
         "This object contains the descriptive text
         qualifying the real server." 
     ::= { cesServerFarmRserverEntry 17 }
+
+cesServerFarmRserverBuddyGroup OBJECT-TYPE
+    SYNTAX          SnmpAdminString
+    MAX-ACCESS      read-create
+    STATUS          current
+    DESCRIPTION
+        "This object contains the buddy group
+        of the real server." 
+    ::= { cesServerFarmRserverEntry 18 }
  
 
 -- Probes configured in Real Servers.
@@ -1087,7 +1147,8 @@ cesRealServerStateUp NOTIFICATION-TYPE
 
         The cesServerFarmRserverBackupPort refers to the
         real server port.  This object contains the value
-        of cesServerFarmRserverPort."
+        of cesServerFarmRserverPort.
+        cesRealServerStateUp object is superseded by cesRealServerStateUpRev1."
    ::= { ciscoEnhancedSlbMIBNotifs 1 }
 
 cesRealServerStateDown NOTIFICATION-TYPE
@@ -1112,7 +1173,8 @@ cesRealServerStateDown NOTIFICATION-TYPE
 
         The cesServerFarmRserverBackupPort refers to the
         real server port.  This object contains the value
-        of cesServerFarmRserverPort."
+        of cesServerFarmRserverPort.
+        cesRealServerStateDown object is superseded by cesRealServerStateDownRev1."
    ::= { ciscoEnhancedSlbMIBNotifs 2 }
 
 cesRealServerStateChange NOTIFICATION-TYPE
@@ -1146,7 +1208,8 @@ cesRealServerStateChange NOTIFICATION-TYPE
 
         The cesProbeName object with zero length
         octet string specifies that real server state
-        change is not due to probe failure."
+        change is not due to probe failure.
+        cesRealServerStateChange object is superseded by cesRealServerStateChangeRev1."
    ::= { ciscoEnhancedSlbMIBNotifs 3 }
 
 cesRserverStateUp NOTIFICATION-TYPE
@@ -1331,6 +1394,14 @@ cesRealServerStateChangeRev1 NOTIFICATION-TYPE
         The cesServerFarmRserverDescr refers to the
         description configured for the real server."
    ::= { ciscoEnhancedSlbMIBNotifs 9 }
+
+cesRserverLocalityChange NOTIFICATION-TYPE
+    OBJECTS         { cesRserverLocality }
+    STATUS          current
+    DESCRIPTION
+        "This notification is generated when the system detects the
+        change of cesRserverLocality object value."
+   ::= { ciscoEnhancedSlbMIBNotifs 10 }
 -- Conformance Information
 
 ciscoEnhancedSlbMIBCompliances  OBJECT IDENTIFIER
@@ -1435,7 +1506,7 @@ ciscoEnhancedSlbMIBComplianceRev3 MODULE-COMPLIANCE
     ::= { ciscoEnhancedSlbMIBCompliances 4 }
 
 ciscoEnhancedSlbMIBComplianceRev4 MODULE-COMPLIANCE
-    STATUS          current
+    STATUS          deprecated
     DESCRIPTION
         "The compliance statement for entities which implement the Cisco
         Enhanced SLB MIB."
@@ -1457,6 +1528,56 @@ ciscoEnhancedSlbMIBComplianceRev4 MODULE-COMPLIANCE
         "This group is mandatory for those systems which supports
         real server notifications."
     ::= { ciscoEnhancedSlbMIBCompliances 5 }
+
+ciscoEnhancedSlbMIBComplianceRev5 MODULE-COMPLIANCE
+    STATUS          deprecated
+    DESCRIPTION
+        "The compliance statement for entities which implement the Cisco
+        Enhanced SLB MIB."
+    MODULE          -- this module
+    MANDATORY-GROUPS {
+                        cesRealServerFarmGroupRev1,
+                        cesRealServerGroupRev1,
+                        cesRserverProbeGroupRev1,
+                        cesRealserverProbeGroup,
+                        cesRealServerFarmBuddyGroup
+                    }
+
+    GROUP           cesNotificationObjectGroup
+    DESCRIPTION
+        "This group is mandatory for those systems which support
+        enabling/disabling of notifications."
+
+    GROUP           cesRealServerNotifGroupRev2
+    DESCRIPTION
+        "This group is mandatory for those systems which supports
+        real server notifications."
+    ::= { ciscoEnhancedSlbMIBCompliances 6 }
+
+ciscoEnhancedSlbMIBComplianceRev6 MODULE-COMPLIANCE
+    STATUS          current
+    DESCRIPTION
+        "The compliance statement for entities which implement the Cisco
+        Enhanced SLB MIB."
+    MODULE          -- this module
+    MANDATORY-GROUPS {
+                        cesRealServerFarmGroupRev1,
+                        cesRealServerGroupRev2,
+                        cesRserverProbeGroupRev1,
+                        cesRealserverProbeGroup,
+                        cesRealServerFarmBuddyGroup
+                    }
+
+    GROUP           cesNotificationObjectGroup
+    DESCRIPTION
+        "This group is mandatory for those systems which support
+        enabling/disabling of notifications."
+
+    GROUP           cesRealServerNotifGroupRev3
+    DESCRIPTION
+        "This group is mandatory for those systems which supports
+        real server notifications."
+    ::= { ciscoEnhancedSlbMIBCompliances 7 }
 
 -- Units of Conformance
 
@@ -1484,7 +1605,8 @@ cesRealServerGroup OBJECT-GROUP
     STATUS          deprecated
     DESCRIPTION
         "This group contains objects applicable for
-        Rserver configuration."
+        Rserver configuration.
+        cesRealServerGroup object is superseded by cesRealServerGroupRev1."
     ::= { ciscoEnhancedSlbMIBGroups 1 }
 
 cesRealServerFarmGroup OBJECT-GROUP
@@ -1508,7 +1630,8 @@ cesRealServerFarmGroup OBJECT-GROUP
     STATUS          deprecated
     DESCRIPTION
         "The group contains obbjects for
-        real server configuration in a server farm."
+        real server configuration in a server farm.
+        cesRealServerFarmGroup object is superseded by cesRealServerFarmGroup2."
     ::= { ciscoEnhancedSlbMIBGroups 3 }
 
 cesNotificationObjectGroup OBJECT-GROUP
@@ -1532,7 +1655,8 @@ cesRealServerNotifGroup NOTIFICATION-GROUP
                     }
     STATUS          deprecated
     DESCRIPTION
-        "This group contains real server Notifications."
+        "This group contains real server Notifications.
+        cesRealServerNotifGroup object is superseded by cesRealServerNotifGroupRev1."
     ::= { ciscoEnhancedSlbMIBGroups 10 }
 
 cesRealServerNotifGroupRev1 NOTIFICATION-GROUP
@@ -1544,9 +1668,10 @@ cesRealServerNotifGroupRev1 NOTIFICATION-GROUP
                         cesRserverStateDown,
                         cesRserverStateChange
                     }
-    STATUS          deprecated
+    STATUS          current
     DESCRIPTION
-        "This group contains real server Notifications."
+        "This group contains real server Notifications.
+        cesRealServerNotifGroupRev1 object is superseded by cesRealServerNotifGroupRev2."
     ::= { ciscoEnhancedSlbMIBGroups 11 }
 
 cesRealServerGroupRev1 OBJECT-GROUP
@@ -1574,7 +1699,8 @@ cesRealServerGroupRev1 OBJECT-GROUP
     STATUS          current
     DESCRIPTION
         "This group contains objects applicable for
-        Rserver configuration."
+        Rserver configuration.
+        cesRealServerGroupRev1 object is superseded by NA."
     ::= { ciscoEnhancedSlbMIBGroups 12 }
 
 cesRserverProbeGroup OBJECT-GROUP
@@ -1588,7 +1714,8 @@ cesRserverProbeGroup OBJECT-GROUP
     STATUS          deprecated
     DESCRIPTION
         "This group contains objects applicable for
-        Rserver probe configuration and Rserver probe statistics."
+        Rserver probe configuration and Rserver probe statistics.
+        cesRserverProbeGroup object is superseded by NA."
     ::= { ciscoEnhancedSlbMIBGroups 13 }
 
 cesRealserverProbeGroup OBJECT-GROUP
@@ -1638,10 +1765,11 @@ cesRealServerFarmGroupRev1 OBJECT-GROUP
                         cesServerFarmRserverRowStatus,
                         cesServerFarmRserverDescr
                     }
-    STATUS          current
+    STATUS          deprecated
     DESCRIPTION
         "The group contains objects for real server configuration in a
-        server farm."
+        server farm.
+        cesRealServerFarmGroupRev1 object is superseded by NA."
     ::= { ciscoEnhancedSlbMIBGroups 19 }
 
 cesRealServerNotifGroupRev2 NOTIFICATION-GROUP
@@ -1655,10 +1783,256 @@ cesRealServerNotifGroupRev2 NOTIFICATION-GROUP
                     }
     STATUS          current
     DESCRIPTION
-        "This group contains real server Notifications."
+        "This group contains real server Notifications.
+        cesRealServerNotifGroupRev2 object is superseded by NA."
     ::= { ciscoEnhancedSlbMIBGroups 21 }
 
+cesRealServerFarmBuddyGroup OBJECT-GROUP
+    OBJECTS         { cesServerFarmRserverBuddyGroup }
+    STATUS          current
+    DESCRIPTION
+        "The group contains objects for buddy group configuration of
+        real server in a server farm."
+    ::= { ciscoEnhancedSlbMIBGroups 22 }
+
+cesRealServerGroupRev2 OBJECT-GROUP
+    OBJECTS         { cesRserverLocality }
+    STATUS          current
+    DESCRIPTION
+        "This group contains object indicates the current locality state
+        of the real server."
+    ::= { ciscoEnhancedSlbMIBGroups 23 }
+
+cesRealServerNotifGroupRev3 NOTIFICATION-GROUP
+   NOTIFICATIONS    { cesRserverLocalityChange }
+    STATUS          current
+    DESCRIPTION
+        "This group contain real server Locality state change
+        Notification."
+    ::= { ciscoEnhancedSlbMIBGroups 24 }
+
 END
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

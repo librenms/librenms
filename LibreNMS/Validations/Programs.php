@@ -37,7 +37,7 @@ class Programs extends BaseValidation
      *
      * @param  Validator  $validator
      */
-    public function validate(Validator $validator)
+    public function validate(Validator $validator): void
     {
         // Check programs
         $bins = ['fping', 'rrdtool', 'snmpwalk', 'snmpget', 'snmpgetnext', 'snmpbulkwalk'];
@@ -107,7 +107,7 @@ class Programs extends BaseValidation
             $getcap_out = shell_exec("$getcap $cmd");
             preg_match("#^$cmd = (.*)$#", $getcap_out, $matches);
 
-            if (is_null($matches) || ! Str::contains($matches[1], 'cap_net_raw+ep')) {
+            if (empty($matches) || ! Str::contains($matches[1], 'cap_net_raw+ep')) {
                 $validator->fail(
                     "$cmd should have CAP_NET_RAW!",
                     "setcap cap_net_raw+ep $cmd"

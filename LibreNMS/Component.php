@@ -218,7 +218,7 @@ class Component
     public function setComponentPrefs($device_id, $updated)
     {
         $updated = Arr::wrap($updated);
-        \App\Models\Component::whereIn('id', array_keys($updated))
+        \App\Models\Component::whereIntegerInRaw('id', array_keys($updated))
             ->with('prefs')
             ->get()
             ->each(function (\App\Models\Component $component) use ($device_id, $updated) {

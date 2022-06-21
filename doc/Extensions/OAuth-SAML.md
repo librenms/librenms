@@ -13,6 +13,7 @@ Below we will guide you on how to install SAML or some of these OAth providers, 
 
 [GitHub Provider](https://socialiteproviders.com/GitHub/)  
 [Microsoft Provider](https://socialiteproviders.com/Microsoft/)  
+[Okta Provider](https://socialiteproviders.com/Okta)  
 [SAML2](https://socialiteproviders.com/Saml2/)
 
 ## Requirements
@@ -38,6 +39,10 @@ Please ensure you set `APP_URL` within your `.env` file so that callback URLs wo
 === "Microsoft"
 
 	`lnms plugin:add socialiteproviders/microsoft`
+
+=== "Okta"
+
+	`lnms plugin:add socialiteproviders/okta'
 
 ### Find the provider name
 
@@ -72,6 +77,20 @@ Next we need to find the provider name and writing it down
 	So our provider name is `microsoft`, write this down.
 		
 
+=== "Okta"
+
+	For Okta we can find the line:
+	```php
+	'okta' => [    
+	  'base_url' => env('OKTA_BASE_URL'),
+	  'client_id' => env('OKTA_CLIENT_ID'),  
+	  'client_secret' => env('OKTA_CLIENT_SECRET'),  
+	  'redirect' => env('OKTA_REDIRECT_URI') 
+	],
+	``` 
+	So our provider name is `okta`, write this down.
+
+
 ### Register OAuth application
 
 #### Register a new application
@@ -101,6 +120,18 @@ Now we need some values from the OAuth provider itself, in most cases you need t
 	Copy the value of the **Application (client) ID** and **Directory (tenant) ID** and save them, you will need them in the next step.
 	![socialite-2](/img/socialite-microsoft-3.png)
 
+=== "Okta"
+	For our example with Okta, we go to `Applications>Create App Integration`, Select `OIDC - OpenID Connect`, then `Web Application`.
+
+	! [socialite-okta-1](/img/socialite-okta-1.png)
+
+	Fill in the Name, Logo, and Assignments based on your preferred settings. Leave the `Sign-In Redirect URI` field, this is where you will edit this later:
+	![socialite-okta-2](/img/socialite-okta-2.png)
+
+	Note your Okta domain or login url. Sometimes this can be a vanity url like `login.company.com`, or sometimes just `company.okta.com`.
+
+	Click save.
+
 #### Generate a new client secret
 
 === "GitHub"
@@ -128,6 +159,12 @@ Now we need some values from the OAuth provider itself, in most cases you need t
 
 	![socialite-2](/img/socialite-microsoft-5.png)	
 
+=== "Okta"
+
+	This step is done for you when creating the app. All you have to do is copy down the client secret. You will need it in the next step.
+
+	![socialite-okta-3](/img/socialite-okta-3.png)	
+
 
 ### Saving configuration
 
@@ -150,7 +187,16 @@ The format of the configuration string is `auth.socialite.configs.*provider name
 		lnms config:set auth.socialite.configs.microsoft.client_id 7983ac13-c955-40e9-9b85-5ba27be52a52
 		lnms config:set auth.socialite.configs.microsoft.client_secret J9P7Q~K2F5C.L243sqzbGj.cOOcjTBgAPak_l
 		lnms config:set auth.socialite.configs.microsoft.tenant a15edc05-152d-4eb4-973c-14f1fdc57d8b
-		```		
+		```
+
+=== "Okta"
+
+	!!! setting "auth/socialite"
+		```bash
+		lnms config:set auth.socialite.configs.okta.client_id 0oa1c08tti8D7xgXb697
+		lnms config:set auth.socialite.configs.okta.client_secret sWew90IKqKDmURj1XLsCPjXjre0U3zmJuFR6SzsG
+		lnms config:set auth.socialite.configs.okta.base_url "https://<okta_login_url>"
+		```
 
 ### Add provider event listener
 
@@ -197,6 +243,25 @@ The final step is to now add an event listener.
 		lnms config:set auth.socialite.configs.microsoft.listener "\SocialiteProviders\Microsoft\MicrosoftExtendSocialite"
 		```
 	Don't forget the initial backslash (\\) !
+
+=== "Okta"
+
+	Find the section looking like:
+	```php
+	protected $listen = [
+    \SocialiteProviders\Manager\SocialiteWasCalled::class => [
+        // ... other providers
+        \SocialiteProviders\Okta\OktaExtendSocialite::class.'@handle',
+    ],
+	];
+	```
+
+	Copy the part: `\SocialiteProviders\Okta\OktaExtendSocialite` and run;
+	!!! setting "auth/socialite"
+		```bash
+		lnms config:set auth.socialite.configs.okta.listener "\SocialiteProviders\Okta\OktaExtendSocialite"
+		```
+	Don't forget the initial backslack (\\) !
 
 Now you are done with setting up the OAuth provider!  
 If it doesn't work, please double check your configuration values by using the `config:get` command below.
