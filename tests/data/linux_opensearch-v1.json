@@ -98,7 +98,7 @@
                 },
                 {
                     "metric": "status",
-                    "value": 1,
+                    "value": 0,
                     "value_prev": null,
                     "app_type": "opensearch"
                 },

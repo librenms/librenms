@@ -532,5 +532,15 @@
     "rule": "applications.app_type = \"mysql\" && applications.app_state != \"OK\"",
     "name": "MySQL Server not responding",
     "severity":"critical"
+  },
+  {
+    "rule": "applications.app_type = \"opensearch\" && application_metrics.metric = \".status\" && application_metrics.value = \"1\"",
+    "name": "Opensearch/Elasticsearch Cluster Status Yellow",
+    "severity": "warning"
+  },
+  {
+    "rule": "applications.app_type = \"opensearch\" && application_metrics.metric = \".status\" && application_metrics.value = \"2\"",
+    "name": "Opensearch/Elasticsearch Cluster Status Red",
+    "severity": "critical"
   }
 ]
