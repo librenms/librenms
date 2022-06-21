@@ -31,6 +31,48 @@
                     "app_type": "sneck"
                 },
                 {
+                    "metric": "checks_clamav",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "sneck"
+                },
+                {
+                    "metric": "checks_entropy",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "sneck"
+                },
+                {
+                    "metric": "checks_http",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "sneck"
+                },
+                {
+                    "metric": "checks_ipmi_sensor",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "sneck"
+                },
+                {
+                    "metric": "checks_mongodb",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "sneck"
+                },
+                {
+                    "metric": "checks_raid",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "sneck"
+                },
+                {
+                    "metric": "checks_virtqemud_procs",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "sneck"
+                },
+                {
                     "metric": "critical",
                     "value": 0,
                     "value_prev": null,
@@ -44,12 +86,12 @@
                 },
                 {
                     "metric": "ok",
-                    "value": 1,
+                    "value": 7,
                     "value_prev": null,
                     "app_type": "sneck"
                 },
                 {
-                    "metric": "time_to_polling_abs",
+                    "metric": "time_to_polling",
                     "value": 0,
                     "value_prev": null,
                     "app_type": "sneck"
