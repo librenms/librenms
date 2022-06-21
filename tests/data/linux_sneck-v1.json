@@ -25,12 +25,6 @@
             ],
             "application_metrics": [
                 {
-                    "metric": "alert",
-                    "value": 0,
-                    "value_prev": null,
-                    "app_type": "sneck"
-                },
-                {
                     "metric": "checks_clamav",
                     "value": 0,
                     "value_prev": null,
