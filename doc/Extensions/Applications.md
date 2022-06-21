@@ -1178,7 +1178,7 @@ nvidia-smi man file under the section covering dmon.
 
 1. Download the script onto the desired host.
 ```
-wget https://raw.githubusercontent.com/librenms/librenms-agent/master/agent-local/rocks.sh -O /etc/snmp/opensearch
+wget https://raw.githubusercontent.com/librenms/librenms-agent/master/snmp/opensearch -O /etc/snmp/opensearch
 ```
 
 2. Make it executable
