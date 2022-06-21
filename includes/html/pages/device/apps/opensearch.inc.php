@@ -10,45 +10,45 @@ $link_array = [
 ];
 
 print_optionbar_start();
-echo '<b>Cluster Name:</b> ' . get_opensearch_cluster_name($device['device_id']) .'<br>';
+echo '<b>Cluster Name:</b> ' . get_opensearch_cluster_name($device['device_id']) . '<br>';
 echo '<b>Graph Sets:</b> ';
 echo generate_link('Cluster, ', $link_array);
-$link_array['set']='translog';
+$link_array['set'] = 'translog';
 echo generate_link('Translog, ', $link_array);
-$link_array['set']='indexing';
+$link_array['set'] = 'indexing';
 echo generate_link('Indexing, ', $link_array);
-$link_array['set']='search';
+$link_array['set'] = 'search';
 echo generate_link('Search, ', $link_array);
-$link_array['set']='refresh';
+$link_array['set'] = 'refresh';
 echo generate_link('Refresh, ', $link_array);
-$link_array['set']='flush';
+$link_array['set'] = 'flush';
 echo generate_link('Flush, ', $link_array);
-$link_array['set']='qc';
+$link_array['set'] = 'qc';
 echo generate_link('Query_Cache, ', $link_array);
-$link_array['set']='get';
+$link_array['set'] = 'get';
 echo generate_link('Get, ', $link_array);
-$link_array['set']='merges';
+$link_array['set'] = 'merges';
 echo generate_link('Merges, ', $link_array);
-$link_array['set']='warmer';
+$link_array['set'] = 'warmer';
 echo generate_link('Warmer, ', $link_array);
-$link_array['set']='fielddata';
+$link_array['set'] = 'fielddata';
 echo generate_link('Fielddata, ', $link_array);
-$link_array['set']='segments';
+$link_array['set'] = 'segments';
 echo generate_link('Segments, ', $link_array);
-$link_array['set']='rc';
+$link_array['set'] = 'rc';
 echo generate_link('Request_Cache, ', $link_array);
-$link_array['set']='store';
+$link_array['set'] = 'store';
 echo generate_link('Store, ', $link_array);
-$link_array['set']='time';
+$link_array['set'] = 'time';
 echo generate_link('Time, ', $link_array);
-$link_array['set']='memory';
+$link_array['set'] = 'memory';
 echo generate_link('Memory', $link_array);
 print_optionbar_end();
 
 if (isset($vars['set'])) {
-    $graph_set=$vars['set'];
+    $graph_set = $vars['set'];
 } else {
-    $graph_set=$vars['cluster'];
+    $graph_set = $vars['cluster'];
 }
 
 if ($graph_set == 'cluster') {

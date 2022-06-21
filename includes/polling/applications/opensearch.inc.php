@@ -98,7 +98,7 @@ $metrics = [
     'trc_hits' => $data['trc_hits'],
     'trc_misses' => $data['trc_misses'],
     'tst_size' => $data['tst_size'],
-    'tst_res_size' => $data['tst_res_size']
+    'tst_res_size' => $data['tst_res_size'],
 ];
 
 $rrd_name = ['app', $name, $app_id];
