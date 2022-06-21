@@ -85,6 +85,12 @@
                     "app_type": "sneck"
                 },
                 {
+                    "metric": "time",
+                    "value": 0,
+                    "value_prev": null,
+                    "app_type": "sneck"
+                },
+                {
                     "metric": "time_to_polling",
                     "value": 0,
                     "value_prev": null,
