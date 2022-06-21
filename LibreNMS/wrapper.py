@@ -44,6 +44,7 @@
 import logging
 import os
 import queue
+import re
 import sys
 import threading
 import time
@@ -228,6 +229,7 @@ def poll_worker(
     log_dir,  # Type: str
     wrapper_type,  # Type: str
     debug,  # Type: bool
+    modules = '',  # Type: string
 ):
     """
     This function will fork off single instances of the php process, record
@@ -278,6 +280,9 @@ def poll_worker(
                     wrappers[wrapper_type]["executable"],
                 )
                 command = "/usr/bin/env php {} -h {}".format(executable, device_id)
+                if modules is not None and len(str(modules).strip()):
+                    module_str = re.sub('\s', "", str(modules).strip())
+                    command = command + " -m {}".format(module_str)
                 if debug:
                     command = command + " -d"
                 exit_code, output = command_runner(
@@ -340,6 +345,7 @@ def wrapper(
     config,  # Type: dict
     log_dir,  # Type: str
     _debug=False,  # Type: bool
+    **kwargs,  # Type: dict, may contain modules
 ):  # -> None
     """
     Actual code that runs various php scripts, in single node mode or distributed poller mode
@@ -507,6 +513,7 @@ def wrapper(
                 "log_dir": log_dir,
                 "wrapper_type": wrapper_type,
                 "debug": _debug,
+                "modules": kwargs.get('modules', '')
             },
         )
         worker.setDaemon(True)
@@ -627,6 +634,12 @@ if __name__ == "__main__":
         default=False,
         help="Enable debug output. WARNING: Leaving this enabled will consume a lot of disk space.",
     )
+    parser.add_argument(
+        "-m",
+        "--modules",
+        default='',
+        help="Enable passing of a module string, modules are separated by comma",
+    )
 
     parser.add_argument(
         dest="wrapper",
@@ -640,6 +653,7 @@ if __name__ == "__main__":
     args = parser.parse_args()
 
     debug = args.debug
+    modules = args.modules or ''
     wrapper_type = args.wrapper
     amount_of_workers = args.threads
 
@@ -666,4 +680,7 @@ if __name__ == "__main__":
             )
         )
 
-    wrapper(wrapper_type, amount_of_workers, config, log_dir, _debug=debug)
+    if wrapper_type in ["discovery", "poller"]:
+        wrapper(wrapper_type, amount_of_workers, config, log_dir, _debug=debug, modules=modules)
+    else:
+        wrapper(wrapper_type, amount_of_workers, config, log_dir, _debug=debug, modules='')
