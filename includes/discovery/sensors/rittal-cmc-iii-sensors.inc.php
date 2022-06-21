@@ -76,8 +76,10 @@ foreach ($cmc_iii_var_table as $index => $entry) {
                 $cmc_iii_sensors[$sensor_id]['multiplier'] = substr($entry['cmcIIIVarScale'], 1);
             }
 
-            $unit = $entry['cmcIIIVarUnit'];
+            // encode string to ensure that degree sign may be used properly for unit comparison
+            $unit = utf8_encode($entry['cmcIIIVarUnit']);
             $type = 'state';
+            $temperature_units = ['degree C', 'degree F', '°C', '°F'];
             if ($unit == 'mA') {
                 //In some cases we get a mA value. However, the cmcIIIVarScale is simply 1.
                 //Therefore, we must hardcode the divisor here to calculate the value into A.
@@ -92,7 +94,7 @@ foreach ($cmc_iii_var_table as $index => $entry) {
                 $type = 'power_consumed';
             } elseif ($unit == 'Hz') {
                 $type = 'frequency';
-            } elseif ($unit == 'degree C' || $unit == 'degree F') {
+            } elseif (in_array($unit, $temperature_units)) {
                 $type = 'temperature';
             } elseif ($unit == 'l/min') {
                 $type = 'waterflow';
