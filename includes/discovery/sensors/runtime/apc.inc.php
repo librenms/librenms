@@ -16,6 +16,25 @@ if ($oids) {
     discover_sensor($valid['sensor'], 'runtime', $device, $oid, $index, $type, $descr, $divisor, '1', $low_limit, $low_limit_warn, $warn_limit, $high_limit, $current);
 }
 
+$oids = snmp_get($device, '.1.3.6.1.4.1.318.1.1.1.2.1.3.0', '-OsqnUt', '');
+d_echo($oids . "\n");
+if ($oids) {
+    echo ' APC Battery Lifetime ';
+    [$oid,$currentRAW] = explode(' "', $oids);
+    $current = (strtotime(date('Y-m-d'))-strtotime($currentRAW))/60;
+    d_echo("BATTERYLT_DEBUG:".$current."\n");
+    $divisor = 1;
+    $type = 'apc';
+    $index = 'upsBasicBatteryLastReplaceDate.0';
+    $descr = 'Time since last battery replace';
+    $low_limit = 0;
+    $low_limit_warn = 4*365*24;
+    $warn_limit = 6*365*24;
+    $high_limit = 0;
+    discover_sensor($valid['sensor'], 'runtime', $device, $oid, $index, $type, $descr, $divisor, '1', $low_limit, $low_limit_warn, $warn_limit, $high_limit, $current);
+}
+
+
 // InRow IRRP100
 $oids = snmp_get($device, 'airIRRP100GroupSetpointsCoolMetric.0', '-OsqnU', 'PowerNet-MIB');
 if ($oids) {
