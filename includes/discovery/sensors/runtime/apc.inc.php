@@ -19,14 +19,14 @@ if ($oids) {
 $oids = snmp_get($device, '.1.3.6.1.4.1.318.1.1.1.2.1.3.0', '-OsqnUt', '');
 d_echo($oids . "\n");
 if ($oids) {
-    echo ' APC Battery Lifetime ';
+    echo ' APC Battery Life Time ';
     [$oid,$currentRAW] = explode(' "', $oids);
     $current = (strtotime(date('Y-m-d'))-strtotime($currentRAW))/60;
     d_echo("BATTERYLT_DEBUG:".$current."\n");
     $divisor = 1;
     $type = 'apc';
     $index = 'upsBasicBatteryLastReplaceDate.0';
-    $descr = 'Time since last battery replace';
+    $descr = 'Battery Life Time';
     $low_limit = 0;
     $low_limit_warn = 4*365*24;
     $warn_limit = 6*365*24;
