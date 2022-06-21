@@ -50,7 +50,7 @@
                 },
                 {
                     "metric": "time_to_polling_abs",
-                    "value": 10,
+                    "value": 0,
                     "value_prev": null,
                     "app_type": "sneck"
                 },
