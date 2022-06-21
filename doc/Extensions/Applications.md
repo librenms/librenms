@@ -2126,7 +2126,9 @@ the metrics below are provided.
 
 If you wish to use `time_to_polling`, you will need to set in the
 config the item below. The default is false. Unless set to true, this
-value will default to `0`.
+value will default to 0. If you plan to enable this, you will want
+to make sure you are using NTP every were or it will alert if it goes
+over a difference of 540s.
 
 ```
 $config['apps']['sneck']['polling_time_diff'=true;
