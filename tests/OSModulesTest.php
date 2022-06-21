@@ -26,8 +26,6 @@
 namespace LibreNMS\Tests;
 
 use DeviceCache;
-// For once we update to Laravel 9.5+
-// use Illuminate\Support\Carbon;
 use Illuminate\Foundation\Testing\DatabaseTransactions;
 use LibreNMS\Config;
 use LibreNMS\Data\Source\Fping;
@@ -116,10 +114,6 @@ class OSModulesTest extends DBTestCase
         foreach ($modules as $module) {
             $expected = $expected_data[$module]['discovery'] ?? [];
             $actual = $results[$module]['discovery'] ?? [];
-            // For once we update to Laravel 9.5+
-            // $time_diff=1650911765 - time();
-            // $this->freezeTime();
-            // $this->travel($time_diff)->seconds();
             $this->assertEquals(
                 $expected,
                 $actual,
@@ -128,8 +122,6 @@ class OSModulesTest extends DBTestCase
                 . $helper->getDiscoveryOutput($phpunit_debug ? null : $module)
                 . "\nOS $os: Discovered $module data does not match that found in $filename"
             );
-            // For once we update to Laravel 9.5+
-            // $this->travelBack();
 
             if ($module === 'route') {
                 // no route poller module
