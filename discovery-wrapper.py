@@ -37,7 +37,7 @@ parser.add_argument(
     "-m",
     "--modules",
     dest="modules",
-    default='',
+    default="",
     help="Enable passing of a module string, modules are separated by comma",
 )
 args = parser.parse_args()
@@ -66,6 +66,6 @@ wrapper.wrapper(
     amount_of_workers=amount_of_workers,
     config=config,
     log_dir=log_dir,
-    modules=args.modules or '',
+    modules=args.modules or "",
     _debug=args.debug,
 )
