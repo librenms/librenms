@@ -513,7 +513,7 @@ def wrapper(
                 "log_dir": log_dir,
                 "wrapper_type": wrapper_type,
                 "debug": _debug,
-                "modules": kwargs.get('modules', "")
+                "modules": kwargs.get('modules', ""),
             },
         )
         worker.setDaemon(True)
@@ -683,7 +683,7 @@ if __name__ == "__main__":
     if wrapper_type in ["discovery", "poller"]:
         modules_validated = modules
     else:
-        modules_validated = "" # ignore module parameter
+        modules_validated = ""  # ignore module parameter
 
     wrapper(
         wrapper_type,
@@ -691,5 +691,5 @@ if __name__ == "__main__":
         config,
         log_dir,
         _debug=debug,
-        modules=modules_validated
+        modules=modules_validated,
     )
