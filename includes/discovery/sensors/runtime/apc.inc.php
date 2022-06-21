@@ -21,7 +21,7 @@ d_echo($oids . "\n");
 if ($oids) {
     echo ' APC Battery Usage Time ';
     [$oid,$currentRAW] = explode(' "', $oids);
-    $current = (strtotime(date('Y-m-d')) - strtotime($currentRAW))/60;
+    $current = (strtotime(date('Y-m-d')) - strtotime($currentRAW)) / 60;
     $divisor = 1;
     $type = 'apc';
     $index = 'upsBasicBatteryLastReplaceDate.0';
