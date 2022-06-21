@@ -1172,6 +1172,45 @@ sees them as being.
 For questions about what the various values are/mean, please see the
 nvidia-smi man file under the section covering dmon.
 
+## Opensearch\Elasticsearch
+
+### SNMP Extend
+
+1. Download the script onto the desired host.
+```
+wget https://raw.githubusercontent.com/librenms/librenms-agent/master/agent-local/rocks.sh -O /etc/snmp/opensearch
+```
+
+2. Make it executable
+```
+chmod +x /etc/snmp/opensearch
+```
+
+3. Install the required Perl dependencies.
+```
+# FreeBSD
+pkg install p5-JSON p5-libwww
+# Debian/Ubuntu
+apt-get install libjson-perl libwww-perl
+# cpanm
+cpanm JSON Libwww
+```
+
+4. Update your snmpd.conf.
+```
+extend opensearch /bin/cat /var/cache/opensearch.json
+```
+
+5. Update root crontab with. This is required as it will this will
+likely time out otherwise. Use `*/1` if you want to have the most
+recent stats when polled or to `*/5` if you just want at exactly a 5
+minute interval.
+```
+*/5 * * * * /etc/snmp/opensearch > /var/cache/opensearch.json
+```
+
+6. Enable it or wait for the device to be re-disocvered.
+
 ## Open Grid Scheduler
 
 Shell script to track the OGS/GE jobs running on clusters.
