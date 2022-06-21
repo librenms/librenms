@@ -1508,29 +1508,3 @@ function get_sneck_data($device_id)
         return json_decode($ourc[$device_id][$id]['returned'], true);
     }
 }
-
-/**
- * Deletes the snek data.
- *
- * @param $device_id
- * @return array
- */
-function del_sneck_data($device_id)
-{
-    $options = [
-        'filter' => [
-            'type' => ['=', 'sneck'],
-        ],
-    ];
-
-    $component = new LibreNMS\Component();
-    $ourc = $component->getComponents($device_id, $options);
-
-    if (isset($ourc[$device_id])) {
-        foreach ($ourc[$device_id] as $component_id => $_unused) {
-            $component->deleteComponent($component_id);
-        }
-    }
-
-    return 1;
-}
