@@ -22,15 +22,14 @@ if ($oids) {
     echo ' APC Battery Life Time ';
     [$oid,$currentRAW] = explode(' "', $oids);
     $current = (strtotime(date('Y-m-d'))-strtotime($currentRAW))/60;
-    d_echo("BATTERYLT_DEBUG:".$current."\n");
     $divisor = 1;
     $type = 'apc';
     $index = 'upsBasicBatteryLastReplaceDate.0';
     $descr = 'Battery Life Time';
     $low_limit = 0;
-    $low_limit_warn = 4*365*24;
-    $warn_limit = 6*365*24;
-    $high_limit = 0;
+    $low_limit_warn = 0;
+    $warn_limit = 4*365*24*60; // 5 years
+    $high_limit = 5*365*24*60; // 6 years
     discover_sensor($valid['sensor'], 'runtime', $device, $oid, $index, $type, $descr, $divisor, '1', $low_limit, $low_limit_warn, $warn_limit, $high_limit, $current);
 }
 
