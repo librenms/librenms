@@ -284,6 +284,21 @@ class DeviceController extends TableController
             : substr($device->location, 0, 32);
     }
 
+    /**
+     * only for https, ssh, telnet, value (after protocol) for url
+     */
+    private function buildDeviceLinkTargetValue($device)
+    {
+        if (Config::get('device_external_link.use_assigned_ip') && $device->overwrite_ip) {
+            $target = $device->overwrite_ip;
+        } elseif (Config::get('device_external_link.use_sysName') && strlen(trim($device->sysName))) {
+            $target = trim($device->sysName);
+        } else { // fallback to hostname
+            $target = trim($device->hostname);
+        }
+        return $target;
+    }
+
     private function getActions(Device $device): array
     {
         $actions = [
@@ -313,34 +328,16 @@ class DeviceController extends TableController
         }
         $row = $this->isDetailed() ? 1 : 0;
 
-        /** Use hostname as default target for all access links */
-        $hostname = trim($device->hostname);
-
         /** Icon for Telnet link */
-        $telnet_target = $device->hostname;
-        if (Config::get('device_external_link.use_assigned_ip') && $device->overwrite_ip) {
-            $telnet_target = $device->overwrite_ip;
-        } elseif (Config::get('device_external_link.use_sysName') && strlen(trim($device->sysName))) {
-            $telnet_target = trim($device->sysName);
-        } else { // fallback to hostname
-            $telnet_target = $hostname;
-        }
-        $telnet_href = 'telnet://' . $telnet_target;
+        $telnet_url = 'telnet://' . $this->buildDeviceLinkTargetValue($device);
         $actions[$row][] = [
             'title' => __('Telnet'),
-            'href' => $telnet_href,
+            'href' => $telnet_url,
             'icon' => 'fa-terminal',
         ];
 
         /** Icon for SSH link */
-        $ssh_target = $device->hostname;
-        if (Config::get('device_external_link.use_assigned_ip') && $device->overwrite_ip) {
-            $ssh_target = $device->overwrite_ip;
-        } elseif (Config::get('device_external_link.use_sysName') && strlen(trim($device->sysName))) {
-            $ssh_target = trim($device->sysName);
-        } else { // fallback to hostname
-            $ssh_target = $hostname;
-        }
+        $ssh_target = $this->buildDeviceLinkTargetValue($device);
         $ssh_url = 'ssh://' . $ssh_target;
         if ($server = Config::get('gateone.server')) {
             $ssh_url = Config::get('gateone.use_librenms_user')
@@ -355,19 +352,10 @@ class DeviceController extends TableController
         ];
 
         /** Icon for WEB (https) link */
-        $https_target = $device->hostname;
-        if (Config::get('device_external_link.use_assigned_ip') && $device->overwrite_ip) {
-            $https_target = $device->overwrite_ip;
-        } elseif (Config::get('device_external_link.use_sysName') && strlen(trim($device->sysName))) {
-            $https_target = trim($device->sysName);
-        } else { // fallback to hostname
-            $https_target = $hostname;
-        }
-        $https_ref = 'https://' . $https_target;
-
+        $https_url = 'https://' . $this->buildDeviceLinkTargetValue($device);
         $actions[$row][] = [
             'title' => __('Web'),
-            'href' => $https_ref,
+            'href' => $https_url,
             'onclick' => 'http_fallback(this); return false;',
             'icon' => 'fa-globe',
         ];
