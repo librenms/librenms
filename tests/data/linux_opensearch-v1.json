@@ -91,12 +91,6 @@
                     "app_type": "opensearch"
                 },
                 {
-                    "metric": "cluster_name",
-                    "value": "vulpes",
-                    "value_prev": null,
-                    "app_type": "opensearch"
-                },
-                {
                     "metric": "status",
                     "value": 0,
                     "value_prev": null,
