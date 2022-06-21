@@ -513,7 +513,7 @@ def wrapper(
                 "log_dir": log_dir,
                 "wrapper_type": wrapper_type,
                 "debug": _debug,
-                "modules": kwargs.get('modules', ""),
+                "modules": kwargs.get("modules", ""),
             },
         )
         worker.setDaemon(True)
