@@ -2124,6 +2124,14 @@ the metrics below are provided.
 | time_to_polling | Differnce in seconds between when polling data was generated and when polled |
 | time_to_polling_abs | The aboslute value of time_to_polling. |
 
+If you wish to use `time_to_polling`, you will need to set in the
+config the item below. The default is false. Unless set to true, this
+value will default to `0`.
+
+```
+$config['apps']['sneck']['polling_time_diff'=true;
+```
+
 For more information on Sneck, check it out on
 [MetaCPAN](https://metacpan.org/dist/Monitoring-Sneck) or
 [Github](https://github.com/VVelox/Monitoring-Sneck).

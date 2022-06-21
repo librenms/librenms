@@ -1,17 +1,25 @@
 <?php
 
 use Carbon\Carbon;
+use LibreNMS\Config;
 use LibreNMS\Exceptions\JsonAppException;
 use LibreNMS\RRD\RrdDefinition;
 
 $name = 'sneck';
 $app_id = $app['app_id'];
 
+if (Config::has('apps.sneck.polling_time_diff')) {
+    $compute_time_diff=Config::get('apps.sneck.polling_time_diff');
+ } else {
+    $compute_time_diff=false;
+ }
+
 try {
     $json_return = json_app_get($device, $name, 1);
 } catch (JsonAppException $e) {
     echo PHP_EOL . $name . ':' . $e->getCode() . ':' . $e->getMessage() . PHP_EOL;
-    update_application($app, $e->getCode() . ':' . $e->getMessage(), []); // Set empty metrics and error message
+    // Set empty metrics and error message
+    update_application($app, $e->getCode() . ':' . $e->getMessage(), []);
 
     return;
 }
@@ -27,7 +35,12 @@ $rrd_def = RrdDefinition::make()
     ->addDataset('errored', 'GAUGE', 0);
 
 // epoch off set between poller and when the when the JSON was generated
-$time_to_polling = Carbon::now()->timestamp - $json_return['data']['time'];
+// only compueted if
+if ($compute_time_diff) {
+    $time_to_polling = Carbon::now()->timestamp - $json_return['data']['time'];
+ } else {
+    $time_to_polling=0;
+ }
 
 $fields = [
     'time' => $json_return['data']['time'],
