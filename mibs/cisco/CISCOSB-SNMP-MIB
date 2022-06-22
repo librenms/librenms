@@ -8,10 +8,10 @@ IMPORTS
     InetAddressType, InetAddress                FROM INET-ADDRESS-MIB
     snmpTargetAddrExtEntry                      FROM SNMP-COMMUNITY-MIB
     SnmpEngineID, SnmpAdminString                          FROM SNMP-FRAMEWORK-MIB
-    usmUserEntry,usmNoAuthProtocol,usmNoPrivProtocol       FROM SNMP-USER-BASED-SM-MIB;
+    usmUserEntry                                FROM SNMP-USER-BASED-SM-MIB;
 
 rlSNMP MODULE-IDENTITY
-          LAST-UPDATED "200709100000Z"
+          LAST-UPDATED "202105190000Z"
           ORGANIZATION "Cisco Systems, Inc."
 
           CONTACT-INFO
@@ -24,7 +24,7 @@ rlSNMP MODULE-IDENTITY
 
           DESCRIPTION
                   "Private MIB module for SNMP support in CISCOSB devices."
-          REVISION "201102110000Z"
+          REVISION "202105190000Z"
           DESCRIPTION
                   "Added support in usmUserTable augment for authentication and
                    privacy passwords saving."
@@ -572,7 +572,7 @@ rlEventsPollerId OBJECT-TYPE
      ::=  { rlEvents 1 }
 
 rlEventsDefaultPollingInterval OBJECT-TYPE
-   SYNTAX TimeTicks (1..65535)
+   SYNTAX TimeTicks
    MAX-ACCESS read-write
    STATUS     current
    DESCRIPTION
@@ -735,7 +735,7 @@ rlEventsPollingControlPollerId  OBJECT-TYPE
 
 
 rlEventsPollingControlPollingInterval OBJECT-TYPE
-   SYNTAX     TimeTicks (1..65535)
+   SYNTAX     TimeTicks
    MAX-ACCESS read-create
    STATUS     current
    DESCRIPTION
