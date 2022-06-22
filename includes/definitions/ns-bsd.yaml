@@ -9,6 +9,6 @@ icon: stormshield
 mib_dir: stormshield
 discovery:
     -
-        sysObjectID: [ .1.3.6.1.4.1.11256.2.0, .1.3.6.1.4.1.8072.3.2.8]
+        sysObjectID: [ .1.3.6.1.4.1.11256.2.0, .1.3.6.1.4.1.8072.3.2.8 ]
         sysDescr_regex:
             - '/^NS-BSD/'
