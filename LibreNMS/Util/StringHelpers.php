@@ -64,6 +64,7 @@ class StringHelpers
             'ntp-client' => 'NTP Client',
             'ntp-server' => 'NTP Server',
             'opengridscheduler' => 'Open Grid Scheduler',
+            'opensearch' => 'Elasticsearch\Opensearch',
             'os-updates' => 'OS Updates',
             'php-fpm' => 'PHP-FPM',
             'pi-hole' => 'Pi-hole',
