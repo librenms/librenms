@@ -296,6 +296,7 @@ class DeviceController extends TableController
         } else { // fallback to hostname
             $target = trim($device->hostname);
         }
+
         return $target;
     }
 
