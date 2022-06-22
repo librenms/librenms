@@ -1,0 +1,669 @@
+
+
+-- ===========================================================================
+
+EXTREME-NP-MIB DEFINITIONS ::= BEGIN
+
+	IMPORTS
+                MODULE-IDENTITY FROM SNMPv2-SMI
+		OBJECT-TYPE     FROM SNMPv2-SMI
+                Unsigned32	FROM SNMPv2-SMI
+		Counter32	FROM SNMPv2-SMI
+		Counter64	FROM SNMPv2-SMI
+                IpAddress       FROM SNMPv2-SMI
+		DisplayString   FROM RFC1213-MIB
+		extremeAgent    FROM EXTREME-BASE-MIB;
+		
+
+
+        extremeNPMib MODULE-IDENTITY
+                LAST-UPDATED "0007240000Z"
+                ORGANIZATION "Extreme Networks, Inc."
+                CONTACT-INFO "www.extremenetworks.com"
+                DESCRIPTION "Extreme NP objects: NP card information"
+        ::= { extremeAgent 21 }
+
+	extremeNPModule	OBJECT IDENTIFIER ::= { extremeNPMib 1 }
+	
+	extremeNPModuleTable OBJECT-TYPE
+		SYNTAX  SEQUENCE OF ExtremeNPModuleEntry
+		MAX-ACCESS  not-accessible
+		STATUS current
+		DESCRIPTION
+		"A table containing information about each Intelligent
+		module in the chassis."
+			::= { extremeNPModule 1 }
+
+	extremeNPModuleEntry OBJECT-TYPE
+		SYNTAX  ExtremeNPModuleEntry
+		MAX-ACCESS  not-accessible
+		STATUS current
+		DESCRIPTION
+		"A table entry containing information about the
+		intelligent modules configured in the chassis.
+		This table does not contain rows for the slots
+		which do not have a network processor based module."
+		INDEX	  { extremeNPModuleSlotNumber }
+			::= { extremeNPModuleTable 1 }
+
+	ExtremeNPModuleEntry ::= SEQUENCE {
+		extremeNPModuleSlotNumber		INTEGER,		
+		extremeNPModuleDescription		DisplayString,
+		extremeNPModuleCurrentSoftware		DisplayString,
+		extremeNPModulePrimarySoftware		DisplayString,
+		extremeNPModuleSecondarySoftware	DisplayString,
+		extremeNPModuleBootromVersion		DisplayString,
+		extremeNPModuleProcessorState		OCTET STRING
+	}
+	
+	
+	extremeNPModuleSlotNumber OBJECT-TYPE
+		SYNTAX INTEGER(1..8)
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+		"A unique integer identifying the particular slot 
+		in the chassis."
+		::= { extremeNPModuleEntry 1 }
+
+	extremeNPModuleDescription   OBJECT-TYPE
+		SYNTAX  DisplayString (SIZE(0..32))
+		MAX-ACCESS  read-only
+		STATUS current
+		DESCRIPTION
+		"A description of the particular slot in the chassis."
+		::= { extremeNPModuleEntry 2 }
+
+	extremeNPModuleCurrentSoftware   OBJECT-TYPE
+		SYNTAX  DisplayString (SIZE(0..160))
+		MAX-ACCESS  read-only
+		STATUS current
+		DESCRIPTION
+		"The version of the software currently running on the module."
+		::= { extremeNPModuleEntry 3 }
+
+	extremeNPModulePrimarySoftware   OBJECT-TYPE
+		SYNTAX  DisplayString (SIZE(0..160))
+		MAX-ACCESS  read-only
+		STATUS current
+		DESCRIPTION
+		"The version of software in the primary image of the module."
+		::= { extremeNPModuleEntry 4 }
+					   
+	extremeNPModuleSecondarySoftware   OBJECT-TYPE
+		SYNTAX  DisplayString (SIZE(0..160))
+		MAX-ACCESS  read-only
+		STATUS current
+		DESCRIPTION
+		"The version of software in the secondary image of the module."
+		::= { extremeNPModuleEntry 5 }
+
+	extremeNPModuleBootromVersion   OBJECT-TYPE
+		SYNTAX  DisplayString (SIZE(0..80))
+		MAX-ACCESS  read-only
+		STATUS current
+		DESCRIPTION
+		"The version of bootrom that the module will use when restarting."
+		::= { extremeNPModuleEntry 6 }
+
+	extremeNPModuleProcessorState   OBJECT-TYPE
+		SYNTAX  OCTET STRING (SIZE (8))
+		MAX-ACCESS  read-only
+		STATUS current
+		DESCRIPTION
+		"An Octet String indicating the status of the various processors
+		on an Intelligent Module. Each byte in the Octet String represents
+		state for one processor.
+		For the Avalanche based PoS and ARM modules, the first byte (from MSB)
+		represents the state of the General Purpose Processor, the second byte
+		the state of Network Processor 1, and the third byte the state of Network
+		Processor 2 and so on. A value of 0 in each byte indicates that the
+		Processor is not operational, while a value 1 indicates that it is."
+		::= { extremeNPModuleEntry 7 }
+		
+	  
+--		
+-- SMA Module
+--
+
+	extremeSMAModule OBJECT IDENTIFIER ::= { extremeNPMib 2 }
+	
+	extremeSMATable OBJECT-TYPE
+		SYNTAX  SEQUENCE OF ExtremeSMAEntry
+		MAX-ACCESS  not-accessible
+		STATUS current
+		DESCRIPTION
+		"A table containing information about each SMA
+		module in the chassis."
+			::= { extremeSMAModule 1 }
+
+	extremeSMAEntry OBJECT-TYPE
+		SYNTAX  ExtremeSMAEntry
+		MAX-ACCESS  not-accessible
+		STATUS current
+		DESCRIPTION
+		"A table entry containing information about the
+		SMA modules configured in the chassis.
+		This table does not contain rows for the slots
+		which do not have an SMA module."
+		INDEX	  { extremeSMASlotNumber }
+			::= { extremeSMATable 1 }
+
+	ExtremeSMAEntry ::= SEQUENCE {	      
+		extremeSMASlotNumber			INTEGER,  
+		extremeSMAProtocolVersion		INTEGER,
+		extremeSMAServiceVersion		DisplayString,
+		extremeSMAUpTime			Unsigned32,
+		extremeSMACpuUtilization                Unsigned32,
+		extremeSMAMemUtilization                Unsigned32,
+		extremeSMAQosBroadcaster                Unsigned32,		
+		extremeSMANumFromBroadcaster            Unsigned32,		
+		extremeSMANumToListener                 Unsigned32,
+		extremeSMABytesBroadcaster		Counter64,
+		extremeSMABytesListener			Counter64
+	}
+	
+	extremeSMASlotNumber OBJECT-TYPE
+		SYNTAX INTEGER(1..8)
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+		"A unique integer identifying the particular slot 
+		in the chassis."
+		::= { extremeSMAEntry 1 }
+				
+	extremeSMAProtocolVersion OBJECT-TYPE
+		SYNTAX INTEGER(1..255)
+		MAX-ACCESS  read-only
+		STATUS current
+		DESCRIPTION
+		"Protocol version."
+		::= { extremeSMAEntry 2 }
+	
+	extremeSMAServiceVersion OBJECT-TYPE
+		SYNTAX DisplayString (SIZE(0..128))
+		MAX-ACCESS  read-only
+		STATUS current
+		DESCRIPTION
+		"Service release version."
+		::= { extremeSMAEntry 3 }
+		
+	extremeSMAUpTime OBJECT-TYPE
+		SYNTAX Unsigned32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+		"Continuous operating time of the module in seconds."
+		::= { extremeSMAEntry 4 }
+		
+	extremeSMACpuUtilization OBJECT-TYPE
+		SYNTAX Unsigned32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+		"Percentage of CPU utilized in the last 5 seconds."
+		::= { extremeSMAEntry 5 }
+	
+	extremeSMAMemUtilization OBJECT-TYPE
+		SYNTAX Unsigned32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+		"Percentage of memory utilized."		
+		::= { extremeSMAEntry 6 }
+
+	extremeSMAQosBroadcaster OBJECT-TYPE
+		SYNTAX Unsigned32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION		
+		"60 second rolling average of %QoS.
+		Number of bytes received / Number of bytes expected per duration.
+		Note: this can potentially exceed 100%."
+		::= { extremeSMAEntry 7 }			
+				
+        extremeSMANumFromBroadcaster OBJECT-TYPE
+		SYNTAX Unsigned32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+		"The total number of broadcasters sending streams."
+		::= { extremeSMAEntry 8 }
+				
+	extremeSMANumToListener OBJECT-TYPE
+		SYNTAX Unsigned32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION		
+		"The total number of listeners connected."
+		::= { extremeSMAEntry 9 }
+		
+	extremeSMABytesBroadcaster OBJECT-TYPE
+		SYNTAX Counter64
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION		
+		"The total number of media bytes received from the broadcasters."
+		::= { extremeSMAEntry 10 }
+		
+	extremeSMABytesListener OBJECT-TYPE
+		SYNTAX Counter64
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION		
+		"The total number of data bytes sent to listeners."
+		::= { extremeSMAEntry 11 }
+
+
+--		
+-- ATM Module
+--
+
+	extremeATMModule OBJECT IDENTIFIER ::= { extremeNPMib 3 }
+	
+	extremeATMCellPduTable OBJECT-TYPE
+		SYNTAX  SEQUENCE OF ExtremeATMCellPduEntry
+		MAX-ACCESS  not-accessible
+		STATUS current
+		DESCRIPTION
+		"A table containing information about each ATM
+		module in the chassis."
+			::= { extremeATMModule 1 }
+
+	extremeATMCellPduEntry OBJECT-TYPE
+		SYNTAX  ExtremeATMCellPduEntry
+		MAX-ACCESS  not-accessible
+		STATUS current
+		DESCRIPTION
+		"A table entry containing information about the
+		ATM modules configured in the chassis.
+		This table does not contain rows for the slots
+		which do not have an ATM module."
+		INDEX	  { extremeATMPortNumber }
+			::= { extremeATMCellPduTable 1 }
+
+
+	ExtremeATMCellPduEntry ::= SEQUENCE {	      
+  		extremeATMPortNumber         INTEGER,  
+                extremeATMRxCell             Unsigned32,
+                extremeATMTxCell             Unsigned32,
+                extremeATMRxCellHecError     Unsigned32,   
+                extremeATMRxCellError        Unsigned32,
+                extremeATMRxAAL5Pdu          Unsigned32,
+                extremeATMTxAAL5Pdu          Unsigned32,
+                extremeATMRxAAL5Bytes        Counter64,
+                extremeATMTxAAL5Bytes        Counter64,
+                extremeATMPortStatus         DisplayString
+	}
+
+
+	extremeATMPortNumber OBJECT-TYPE
+		SYNTAX INTEGER(1..64)
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+		"A unique integer identifying the particular port number
+		in the chassis."
+		::= { extremeATMCellPduEntry 1 }
+
+	extremeATMRxCell OBJECT-TYPE
+		SYNTAX Unsigned32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+		"The number of ATM cell Received."
+		::= { extremeATMCellPduEntry 2 }
+
+	extremeATMTxCell OBJECT-TYPE
+		SYNTAX Unsigned32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+		"The number of ATM cell Transmitted."
+		::= { extremeATMCellPduEntry 3 }
+				
+	extremeATMRxCellHecError OBJECT-TYPE
+		SYNTAX Unsigned32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+		"The number of received cells with HEC error."
+		::= { extremeATMCellPduEntry 4 }
+				
+	extremeATMRxCellError OBJECT-TYPE
+		SYNTAX Unsigned32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+		"The number of received cells discarded due to other error."
+		::= { extremeATMCellPduEntry 5 }
+				
+
+        extremeATMRxAAL5Pdu OBJECT-TYPE      
+		SYNTAX Unsigned32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+		"The number AAL-5 PDU Received."
+		::= { extremeATMCellPduEntry 6 }
+
+        extremeATMTxAAL5Pdu OBJECT-TYPE      
+		SYNTAX Unsigned32
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+		"The number AAL-5 PDU Transmitted."
+		::= { extremeATMCellPduEntry 7 }
+
+        extremeATMRxAAL5Bytes OBJECT-TYPE      
+		SYNTAX Counter64
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+		"The number AAL-5 PDU Octetd Received."
+		::= { extremeATMCellPduEntry 8 }
+
+        extremeATMTxAAL5Bytes OBJECT-TYPE      
+		SYNTAX Counter64
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+		"The number AAL-5 PDU Octetd Transmitted."
+		::= { extremeATMCellPduEntry 9 }
+
+	extremeATMPortStatus OBJECT-TYPE
+		SYNTAX DisplayString (SIZE(0..4))
+		MAX-ACCESS  read-only
+		STATUS current
+		DESCRIPTION
+		"ATM port status."
+		::= { extremeATMCellPduEntry 10 }
+
+
+-- Table 2
+	extremeATMVpiVciTable OBJECT-TYPE
+		SYNTAX  SEQUENCE OF ExtremeATMVpiVciEntry
+		MAX-ACCESS  not-accessible
+		STATUS current
+		DESCRIPTION
+		"A table containing information about each ATM
+		module in the chassis."
+			::= { extremeATMModule 2 }
+
+	extremeATMVpiVciEntry OBJECT-TYPE
+		SYNTAX  ExtremeATMVpiVciEntry
+		MAX-ACCESS  not-accessible
+		STATUS current
+		DESCRIPTION
+		"A table entry containing information about the
+		ATM modules configured in the chassis.
+		This table does not contain rows for the slots
+		which do not have an ATM module."
+		INDEX	  { extremeATMPortNum,
+                            extremeATMPvc        }
+			::= { extremeATMVpiVciTable 1 }
+
+	ExtremeATMVpiVciEntry ::= SEQUENCE {	      
+  		extremeATMPortNum            INTEGER,  
+                extremeATMPvc                INTEGER,
+                extremeATMVpi                INTEGER,
+                extremeATMVci                INTEGER
+	}
+
+	extremeATMPortNum OBJECT-TYPE
+		SYNTAX INTEGER(1..64)
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+		"A unique integer identifying the particular port number
+		in the chassis."
+		::= { extremeATMVpiVciEntry 1 }
+
+	extremeATMPvc OBJECT-TYPE
+		SYNTAX INTEGER(1..3072)
+                MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+		"A unique integer identifying the pvc number configured
+		on a single port."
+		::= { extremeATMVpiVciEntry 2 }
+
+	extremeATMVpi OBJECT-TYPE
+		SYNTAX INTEGER(0..15)
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+		"A unique integer identifying the VPI value
+		of the configured PVCs."
+		::= { extremeATMVpiVciEntry 3 }
+
+	extremeATMVci OBJECT-TYPE
+		SYNTAX INTEGER(17..4095)
+		MAX-ACCESS read-only
+		STATUS current
+		DESCRIPTION
+		"A unique integer identifying the VCI value
+		of the configured PVCs."
+		::= { extremeATMVpiVciEntry 4 }
+
+--              
+-- MPLS TLS Module
+--
+
+        extremeMplsModule OBJECT IDENTIFIER ::= { extremeNPMib 4 }
+        
+        extremeMplsTlsTable OBJECT-TYPE
+                SYNTAX  SEQUENCE OF ExtremeMplsTlsEntry
+                MAX-ACCESS  not-accessible
+                STATUS current
+                DESCRIPTION
+                "A table containing information about each MPLS TLS
+                tunnel in the chassis."
+                        ::= { extremeMplsModule 1 }
+
+        extremeMplsTlsEntry OBJECT-TYPE
+                SYNTAX  ExtremeMplsTlsEntry
+                MAX-ACCESS  not-accessible
+                STATUS current
+                DESCRIPTION
+                "A table entry containing information about the
+                MPLS TLS tunnel."
+                INDEX     { extremeMplsTlsNum }
+                        ::= { extremeMplsTlsTable 1 }
+
+
+        ExtremeMplsTlsEntry ::= SEQUENCE {            
+                extremeMplsTlsNum            INTEGER, 
+                extremeMplsTlsName           DisplayString,  
+                extremeMplsTlsLocalIpAddr    IpAddress,
+                extremeMplsTlsPeerIpAddr     IpAddress,
+                extremeMplsTlsLocalVlanID    Unsigned32,   
+                extremeMplsTlsLocalVlanName  DisplayString,
+                extremeMplsTlsDynamic        Unsigned32,
+                extremeMplsTlsType           Unsigned32,
+                extremeMplsTlsVcID           Unsigned32,
+                extremeMplsTlsLocalGroupID   Unsigned32,
+                extremeMplsTlsRemoteGroupID  Unsigned32,
+                extremeMplsTlsVcState        DisplayString,
+                extremeMplsTlsIngressVcLabel Unsigned32,
+                extremeMplsTlsEgressVcLabel  Unsigned32, 
+                extremeMplsTlsPacketTx       Unsigned32,
+                extremeMplsTlsPacketRx       Unsigned32,
+                extremeMplsTlsOctetTx        Counter64,
+                extremeMplsTlsOctetRx        Counter64
+        }
+
+        extremeMplsTlsNum OBJECT-TYPE
+                SYNTAX INTEGER (1..16384)
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                "An index used to reference each configured TLS tunnel."
+                ::= { extremeMplsTlsEntry 1 }
+
+        extremeMplsTlsName OBJECT-TYPE
+                SYNTAX DisplayString (SIZE(0..31))
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                "The user defined TLS tunnel identifier name."
+                ::= { extremeMplsTlsEntry 2 }
+
+        extremeMplsTlsLocalIpAddr OBJECT-TYPE
+                SYNTAX IpAddress
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                "The TLS tunnel local endpoint IP address, only valid if TLS tunnel
+                is Dynamic. Otherwise, this field is set to zero."
+                ::= { extremeMplsTlsEntry 3 }
+
+        extremeMplsTlsPeerIpAddr OBJECT-TYPE
+                SYNTAX IpAddress
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                "The TLS tunnel peer endpoint IP address."
+                ::= { extremeMplsTlsEntry 4 }
+
+        extremeMplsTlsLocalVlanID  OBJECT-TYPE
+                SYNTAX Unsigned32
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                "The local Egress Vlan ID."
+                ::= { extremeMplsTlsEntry 5 }
+                                
+        extremeMplsTlsLocalVlanName  OBJECT-TYPE
+                SYNTAX DisplayString (SIZE(0..31))
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                "The local Egress Vlan Name."
+                ::= { extremeMplsTlsEntry 6 }
+                                
+        extremeMplsTlsDynamic OBJECT-TYPE
+                SYNTAX Unsigned32
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                "Flag indicating that the TLS tunnel is Dynamic. If set, the TLS tunnel
+                is dynamically signaled. If zero, the TLS tunnel is statically configured."
+                ::= { extremeMplsTlsEntry 7 }
+                                
+        extremeMplsTlsType OBJECT-TYPE
+                SYNTAX Unsigned32
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                "The TLS tunnel type
+                0- MPLS, Static
+                1- MPLS, Martini ."
+                ::= { extremeMplsTlsEntry 8 }
+
+        extremeMplsTlsVcID OBJECT-TYPE      
+                SYNTAX Unsigned32
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                "The configured VC ID, only valid if TLS tunnel is Dynamic.
+                Otherwise, this field is set to zero."
+                ::= { extremeMplsTlsEntry 9 }
+
+        extremeMplsTlsLocalGroupID OBJECT-TYPE      
+                SYNTAX Unsigned32
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                "The configured Local Group ID, only valid if TLS tunnel is Dynamic.
+                Otherwise, this field is set to zero."
+                ::= { extremeMplsTlsEntry 10 }
+
+        extremeMplsTlsRemoteGroupID OBJECT-TYPE      
+                SYNTAX Unsigned32
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                "The learned Remote Group ID, only valid if TLS tunnel is Dynamic.
+                Otherwise, this field is set to zero."
+                ::= { extremeMplsTlsEntry 11 }
+
+        extremeMplsTlsIngressVcLabel OBJECT-TYPE
+                SYNTAX Unsigned32
+                MAX-ACCESS  read-only
+                STATUS current
+                DESCRIPTION
+                "The TLS tunnel VLAN Ingress Label. If the TLS tunnel is Static,
+                this value is configured. If TLS tunnel is Dynamic,
+                this value is dynamically allocated from the TLS
+                label range and signaled to the TLS tunnel peer."
+                ::= { extremeMplsTlsEntry 12 }
+
+        extremeMplsTlsEgressVcLabel OBJECT-TYPE
+                SYNTAX Unsigned32
+                MAX-ACCESS  read-only
+                STATUS current
+                DESCRIPTION
+                "The TLS tunnel VLAN Egress Label. If the TLS tunnel is Static,
+                this value is configured. If TLS tunnel is Dynamic,
+                this value is learned from the TLS tunnel peer."
+                ::= { extremeMplsTlsEntry 13 }
+
+        extremeMplsTlsVcState OBJECT-TYPE      
+                SYNTAX DisplayString (SIZE(0..79))
+                MAX-ACCESS read-only
+                STATUS current
+                DESCRIPTION
+                "The TLS tunnel VC state. Valid states include:
+                - Idle
+                - No LSP Available
+                - Waiting for LDP session
+                - Pending label mapping
+                - Pending local configuration
+                - MTU incompatibility
+                - Up
+                - Unknown
+                - Error .. General failure
+                - Error .. Targeted LDP session failure
+                - Error .. Bridge configuration problem
+                - Error .. Ingress label allocation failure
+                - Error .. Failure sending TLS label mapping
+                - Error .. Patricia tree insertion failure
+                - Error .. Failure programming TLS hardware
+                - Error .. MPLS not initialized
+                - Error .. Unknown."
+                ::= { extremeMplsTlsEntry 14 }
+
+        extremeMplsTlsPacketTx  OBJECT-TYPE
+                SYNTAX Unsigned32
+                MAX-ACCESS  read-only
+                STATUS current
+                DESCRIPTION
+                "The number of Packets Transmitted on this TLS tunnel."
+                ::= { extremeMplsTlsEntry 15 }
+
+        extremeMplsTlsPacketRx OBJECT-TYPE
+                SYNTAX Unsigned32
+                MAX-ACCESS  read-only
+                STATUS current
+                DESCRIPTION
+                "The number of Packets Received on this TLS tunnel."
+                ::= { extremeMplsTlsEntry 16 }
+
+        extremeMplsTlsOctetTx OBJECT-TYPE
+                SYNTAX Counter64
+                MAX-ACCESS  read-only
+                STATUS current
+                DESCRIPTION
+                "The number of Octets Transmitted on this TLS tunnel."
+                ::= { extremeMplsTlsEntry 17 }
+
+        extremeMplsTlsOctetRx OBJECT-TYPE
+                SYNTAX Counter64
+                MAX-ACCESS  read-only
+                STATUS current
+                DESCRIPTION
+                "The number of Octets Received on this TLS tunnel."
+                ::= { extremeMplsTlsEntry 18 }
+
+END

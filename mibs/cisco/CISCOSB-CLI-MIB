@@ -12,7 +12,7 @@ IMPORTS
     TruthValue, DisplayString, RowStatus         FROM SNMPv2-TC;
 
 rlCli MODULE-IDENTITY
-                LAST-UPDATED "201005250000Z"
+                LAST-UPDATED "201005250001Z"
                 ORGANIZATION "Cisco Systems, Inc."
 
                 CONTACT-INFO

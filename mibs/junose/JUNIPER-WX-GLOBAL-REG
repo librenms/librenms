@@ -1,0 +1,229 @@
+
+-- Each module definition could be in its own file.
+-- They have been concatenated and placed in this file.
+-- They can be separated if this file grows too big.
+--
+-- This document should be viewed using tab-stops 4 spaces wide.
+-- When updating this document, please use tabs, not spaces, for indents.
+
+-- ========================================================================
+-- Start - JUNIPER-WX-GLOBAL-REG Module
+
+-- WX OID infrastructure layout.
+--
+-- The convention described in "Understanding SNMP MIBs"
+-- (David Perkins, Evan McGinnis), Chapter 8, has generally been followed.
+
+JUNIPER-WX-GLOBAL-REG DEFINITIONS ::= BEGIN
+
+	IMPORTS
+		MODULE-IDENTITY, OBJECT-IDENTITY,
+		enterprises
+			FROM SNMPv2-SMI;
+
+	jnxWxGlobalRegModule MODULE-IDENTITY
+		LAST-UPDATED			"200107292200Z"
+		ORGANIZATION			"Juniper Networks, Inc"
+		CONTACT-INFO			"
+					Customer Support
+					Juniper Networks, Inc.
+					1194 North Mathilda Avenue
+					Sunnyvale, CA  94089
+
+					+1 888-314-JTAC
+					support@juniper.net"
+
+		DESCRIPTION				"
+			A MIB module containing top-level OID definitions
+			for various sub-trees for Juniper Networks' enterprise MIB modules."
+
+		REVISION				"200711171000Z"
+		DESCRIPTION				"
+			Add wxc1800, wxc2600, wxc3400 product OID"
+
+		REVISION				"200711171000Z"
+		DESCRIPTION				"
+			Change ISM200 product identity to jnxIsm200Wxc"
+
+		REVISION				"200711140130Z"
+		DESCRIPTION				"
+			Add ISM200 product OID."
+
+		REVISION				"200606081800Z"
+		DESCRIPTION				"
+			Update contact and MIB with Juniper information
+			Add wxc590 and wx60 product OID."
+
+		REVISION				"200505091012Z"
+		DESCRIPTION				"
+			Added wxc250 product OID."
+
+		REVISION				"200403151400Z"
+		DESCRIPTION				"
+			Add wx100 product OID."
+
+		REVISION				"200306262000Z"
+		DESCRIPTION				"
+			Add wx80 product OID."
+
+		REVISION				"200107292200Z"
+		DESCRIPTION				"
+			Rev 1.0
+			Initial version of MIB module JUNIPER-WX-GLOBAL-REG."
+
+		::= { jnxWxModules 1 }
+
+	juniperWxRoot OBJECT-IDENTITY
+		STATUS					current
+		DESCRIPTION				"
+			The root of the OID sub-tree assigned to Juniper Networks assigned by
+			the Internet Assigned Numbers Authority (IANA)."
+		::= { enterprises 8239 }
+
+	jnxWxReg OBJECT-IDENTITY
+		STATUS					current
+		DESCRIPTION				"
+			Sub-tree for registrations - identification of modules and logical and
+			physical components."
+		::= { juniperWxRoot 1 }
+
+	jnxWxModules OBJECT-IDENTITY
+		STATUS					current
+		DESCRIPTION				"
+			Sub-tree for module registrations."
+		::= { jnxWxReg 1 }
+
+	jnxWxMibs OBJECT-IDENTITY
+		STATUS					current
+		DESCRIPTION				"
+			Sub-tree for all WX object and event definitions."
+		::= { juniperWxRoot 2 }
+
+	jnxWxCaps OBJECT-IDENTITY
+		STATUS					current
+		DESCRIPTION				"
+			Sub-tree for agent profiles."
+		::= { juniperWxRoot 3 }
+
+	jnxWxReqs OBJECT-IDENTITY
+		STATUS					current
+		DESCRIPTION				"
+			Sub-tree for management application requirements."
+		::= { juniperWxRoot 4 }
+
+	jnxWxExpr OBJECT-IDENTITY
+		STATUS					current
+		DESCRIPTION				"
+			Sub-tree for experimental definitions."
+		::= { juniperWxRoot 5 }
+
+	-- Sub-trees for WX managed objects
+
+	jnxWxCommonMib OBJECT-IDENTITY
+		STATUS					current
+		DESCRIPTION				"
+			Sub-tree for common WX object and event definitions.
+			These would be implemented by all WX products."
+		::= { jnxWxMibs 1 }
+
+	jnxWxSpecificMib OBJECT-IDENTITY
+		STATUS					current
+		DESCRIPTION				"
+			Sub-tree for specific WX object and event definitions."
+		::= { jnxWxMibs 2 }
+
+	-- OID registrations for WX product lines
+	-- These OIDs are never queried by management stations.
+	-- They can be returned as product identifiers in responses.
+
+	jnxWxProduct OBJECT-IDENTITY
+		STATUS					current
+		DESCRIPTION				"
+			The WAN Acceleration product family."
+		::= { jnxWxReg 2 }
+
+		jnxWxProductWx50 OBJECT-IDENTITY
+			STATUS					current
+			DESCRIPTION				"
+				WAN Acceleration Model 50"
+			::= { jnxWxProduct 1 }
+
+		jnxWxProductWx55 OBJECT-IDENTITY
+			STATUS					current
+			DESCRIPTION				"
+				WAN Acceleration Model 55"
+			::= { jnxWxProduct 2 }
+
+		jnxWxProductWx20 OBJECT-IDENTITY
+			STATUS					current
+			DESCRIPTION				"
+				WAN Acceleration Model 20"
+			::= { jnxWxProduct 3 }
+
+		jnxWxProductWx80 OBJECT-IDENTITY
+			STATUS					current
+			DESCRIPTION				"
+				WAN Acceleration Model 80"
+			::= { jnxWxProduct 4 }
+
+		jnxWxProductWx100 OBJECT-IDENTITY
+			STATUS					current
+			DESCRIPTION				"
+				WAN Acceleration Model 100"
+			::= { jnxWxProduct 5 }
+
+		jnxWxProductWxc500 OBJECT-IDENTITY
+			STATUS					current
+			DESCRIPTION				"
+				Sequence Caching Model 500"
+			::= { jnxWxProduct 6 }
+
+		jnxWxProductWx15 OBJECT-IDENTITY
+			STATUS					current
+			DESCRIPTION				"
+				WAN Acceleration Model 15"
+			::= { jnxWxProduct 7 }
+
+		jnxWxProductWxc250 OBJECT-IDENTITY
+			STATUS					current
+			DESCRIPTION				"
+				Sequence Caching Model 250"
+			::= { jnxWxProduct 8 }
+
+		jnxWxProductWx60 OBJECT-IDENTITY
+			STATUS					current
+			DESCRIPTION				"
+				WAN Acceleration Model 60"
+			::= { jnxWxProduct 9 }
+
+		jnxWxProductWxc590 OBJECT-IDENTITY
+			STATUS					current
+			DESCRIPTION				"
+				Sequence Caching Model 590"
+			::= { jnxWxProduct 10 }
+
+		jnxWxProductIsm200Wxc OBJECT-IDENTITY
+			STATUS					current
+			DESCRIPTION				"
+				WAN Acceleration Model ISM200"
+			::= { jnxWxProduct 11 }
+
+		jnxWxProductWxc1800 OBJECT-IDENTITY
+			STATUS					current
+			DESCRIPTION				"
+				WAN Acceleration Model 1800"
+			::= { jnxWxProduct 12 }
+
+		jnxWxProductWxc2600 OBJECT-IDENTITY
+			STATUS					current
+			DESCRIPTION				"
+				WAN Acceleration Model 2600"
+			::= { jnxWxProduct 13 }
+
+		jnxWxProductWxc3400 OBJECT-IDENTITY
+			STATUS					current
+			DESCRIPTION				"
+				WAN Acceleration Model 3400"
+			::= { jnxWxProduct 14 }
+
+END
