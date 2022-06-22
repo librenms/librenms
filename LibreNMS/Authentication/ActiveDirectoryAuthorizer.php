@@ -209,7 +209,7 @@ class ActiveDirectoryAuthorizer extends AuthorizerBase
             $tls = ldap_start_tls($this->ldap_connection);
             if (Config::get('auth_ad_starttls') == 'required' && $tls === false) {
                 throw new AuthenticationException('Fatal error: LDAP TLS required but not successfully negotiated:' . ldap_error($this->ldap_connection));
-	    }
+            }
         }
     }
 
