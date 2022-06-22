@@ -150,7 +150,7 @@ class DeviceController extends Controller
         return $graphs;
     }
 
-    private function buildDeviceLinkTargetValue($device)
+    private function buildDeviceLinkTargetValue(Device $device): string
     {
         if (Config::get('device_external_link.use_assigned_ip') && $device->overwrite_ip) {
             $target = $device->overwrite_ip;
