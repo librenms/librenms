@@ -24,12 +24,6 @@ class ActiveDirectoryAuthorizer extends AuthorizerBase
         $this->connect();
 
         if ($this->ldap_connection) {
-            if (Config::get('auth_ad_starttls') && (Config::get('auth_ad_starttls') == 'optional' || Config::get('auth_ad_starttls') == 'required')) {
-                $tls = ldap_start_tls($this->ldap_connection);
-                if (Config::get('auth_ad_starttls') == 'required' && $tls === false) {
-                    throw new AuthenticationException('Fatal error: LDAP TLS required but not successfully negotiated:' . ldap_error($this->ldap_connection));
-                }
-            }
             // bind with sAMAccountName instead of full LDAP DN
             if (! empty($credentials['username']) && ! empty($credentials['password']) && ldap_bind($this->ldap_connection, $credentials['username'] . '@' . Config::get('auth_ad_domain'), $credentials['password'])) {
                 $this->is_bound = true;
@@ -211,6 +205,12 @@ class ActiveDirectoryAuthorizer extends AuthorizerBase
         // disable referrals and force ldap version to 3
         ldap_set_option($this->ldap_connection, LDAP_OPT_REFERRALS, 0);
         ldap_set_option($this->ldap_connection, LDAP_OPT_PROTOCOL_VERSION, 3);
+        if (Config::get('auth_ad_starttls') && (Config::get('auth_ad_starttls') == 'optional' || Config::get('auth_ad_starttls') == 'required')) {
+            $tls = ldap_start_tls($this->ldap_connection);
+            if (Config::get('auth_ad_starttls') == 'required' && $tls === false) {
+                throw new AuthenticationException('Fatal error: LDAP TLS required but not successfully negotiated:' . ldap_error($this->ldap_connection));
+	    }
+        }
     }
 
     public function bind($credentials = [])
