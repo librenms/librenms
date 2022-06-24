@@ -588,4 +588,32 @@ class Url
     {
         return str_replace(["'", '"'], "\'", $string);
     }
+
+    /**
+     * Generate link parts (without protocols) for https/ssh/telnet access
+     * on a device. These links are displayed at the device main page and also at the
+     * device table view
+     *
+     * The url part is either ...
+     * - the assigned ip address, if set and
+     *   $config['device_external_link']['use_assigned_ip']
+     * - the system name (sysName), if set and
+     *   $config['device_external_link']['use_sysName']
+     * - or otherwise the hostname
+     *
+     * @param  Device  $device  The device
+     * @return string
+     */
+    public static function directDeviceUrlPart($device)
+    {
+        if (Config::get('device_external_link.use_assigned_ip') && $device->overwrite_ip) {
+            $target = $device->overwrite_ip;
+        } elseif (Config::get('device_external_link.use_sysName') && strlen(trim($device->sysName))) {
+            $target = trim($device->sysName);
+        } else { // fallback to hostname
+            $target = trim($device->hostname);
+        }
+
+        return $target;
+    }
 }
